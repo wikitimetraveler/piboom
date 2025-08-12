@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>The ICE Box • Zen Starter</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+<link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="#"><i class="bi-box mr-1"></i>The ICE Box</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="#"><i class="bi-house"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/debug.html"><i class="bi-bug"></i> Debug</a></li>
+        <li class="nav-item"><a class="nav-link" href="/test-audio.html"><i class="bi-volume-up"></i> Audio Test</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" id="showHelp"><i class="bi-question-circle"></i> Help</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="header">
+  <div class="container text-center">
+    <h1>The ICE Box</h1>
+    <p class="subtitle">Professional tools, Zen front-end.</p>
+    <p class="subtitle">Clean, animated UI • Bootstrap • HTML5 • JS</p>
+  </div>
+</header>
+
+<main class="container">
+  <div class="row">
+    <div class="col-lg-6 col-md-6 mb-4">
+      <a href="#" class="tool-card fade-in">
+        <span class="card-icon">🧮</span>
+        <h3>The Calculator</h3>
+        <p>Fast, compliant math with a modern feel.</p>
+        <div class="card-meta"><i class="bi-clock"></i> Updated recently</div>
+      </a>
+    </div>
+
+    <div class="col-lg-6 col-md-6 mb-4">
+      <a href="/player.html" class="tool-card fade-in">
+        <span class="card-icon">📻</span>
+        <h3>The Boombox</h3>
+        <p>Audio player UI (works in cloud via browser stream; Pi does local playback).</p>
+        <div class="card-meta"><i class="bi-music-note-beamed"></i> Audio tools</div>
+      </a>
+    </div>
+  </div>
+</main>
+
+<div class="voice-help" id="helpPanel">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="m-0">Quick Tips</h4>
+    <button class="btn btn-link p-0" id="closeHelp"><i class="bi-x-circle"></i></button>
+  </div>
+  <ul class="mb-0">
+    <li>Tune colors/animations in <code>styles.css</code>.</li>
+    <li>API: <code>/api/audio/files</code>, <code>/api/audio/play/:file</code>, <code>/api/audio/stop</code>, <code>/api/audio/volume/:n</code>, <code>/api/audio/stream/:file</code>.</li>
+    <li>Set <code>MODE=cloud</code> on Render; <code>MODE=pi</code> on the Raspberry Pi.</li>
+  </ul>
+</div>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>Design • Zen</strong> — <span id="dt"></span>
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts.js"></script>
+<script>
+document.getElementById('dt').textContent = new Date().toLocaleDateString();
+document.getElementById('showHelp').onclick = (e)=>{e.preventDefault(); document.getElementById('helpPanel').classList.add('show');};
+document.getElementById('closeHelp').onclick = ()=>document.getElementById('helpPanel').classList.remove('show');
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

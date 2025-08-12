@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        button { margin: 5px; padding: 10px 15px; }
+        .status { margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Audio Playback Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Basic Audio Element Test</h3>
+        <audio id="testAudio" controls>
+            <source src="/api/audio/stream/Simply%20Dave.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+        <div class="status">
+            <strong>Status:</strong> <span id="audioStatus">Ready</span><br>
+            <strong>Volume:</strong> <span id="volumeDisplay">100%</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Programmatic Play Test</h3>
+        <button id="playBtn">Play Audio</button>
+        <button id="pauseBtn">Pause Audio</button>
+        <button id="stopBtn">Stop Audio</button>
+        <div class="status">
+            <strong>Play State:</strong> <span id="playState">Stopped</span><br>
+            <strong>Current Time:</strong> <span id="currentTime">0:00</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Volume Control Test</h3>
+        <input type="range" id="volumeSlider" min="0" max="100" value="100">
+        <span id="volumeValue">100%</span>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Audio Context Test</h3>
+        <button id="initAudioContext">Initialize Audio Context</button>
+        <div class="status">
+            <strong>Audio Context State:</strong> <span id="audioContextState">Not initialized</span>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. File List</h3>
+        <button id="loadFiles">Load Available Files</button>
+        <div id="fileList"></div>
+    </div>
+
+    <script>
+        const audio = document.getElementById('testAudio');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const initAudioContextBtn = document.getElementById('initAudioContext');
+        const loadFilesBtn = document.getElementById('loadFiles');
+
+        let audioContext = null;
+
+        // Audio event listeners
+        audio.addEventListener('loadstart', () => updateStatus('Loading...'));
+        audio.addEventListener('canplay', () => updateStatus('Ready to play'));
+        audio.addEventListener('play', () => updateStatus('Playing'));
+        audio.addEventListener('pause', () => updateStatus('Paused'));
+        audio.addEventListener('ended', () => updateStatus('Ended'));
+        audio.addEventListener('error', (e) => updateStatus('Error: ' + (e.message || 'Unknown error')));
+
+        // Play controls
+        playBtn.addEventListener('click', async () => {
+            try {
+                await audio.play();
+                updatePlayState('Playing');
+            } catch (error) {
+                console.error('Play error:', error);
+                alert('Play failed: ' + error.message);
+            }
+        });
+
+        pauseBtn.addEventListener('click', () => {
+            audio.pause();
+            updatePlayState('Paused');
+        });
+
+        stopBtn.addEventListener('click', () => {
+            audio.pause();
+            audio.currentTime = 0;
+            updatePlayState('Stopped');
+        });
+
+        // Volume control
+        volumeSlider.addEventListener('input', (e) => {
+            const volume = e.target.value;
+            audio.volume = volume / 100;
+            document.getElementById('volumeValue').textContent = volume + '%';
+            document.getElementById('volumeDisplay').textContent = volume + '%';
+        });
+
+        // Audio context test
+        initAudioContextBtn.addEventListener('click', async () => {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                document.getElementById('audioContextState').textContent = audioContext.state;
+                
+                if (audioContext.state === 'suspended') {
+                    await audioContext.resume();
+                    document.getElementById('audioContextState').textContent = audioContext.state;
+                }
+            } catch (error) {
+                console.error('Audio context error:', error);
+                document.getElementById('audioContextState').textContent = 'Error: ' + error.message;
+            }
+        });
+
+        // Load files
+        loadFilesBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/audio/files');
+                const files = await response.json();
+                const fileList = document.getElementById('fileList');
+                fileList.innerHTML = '<strong>Available files:</strong><br>' + 
+                    files.map(f => `<div>• ${f}</div>`).join('');
+            } catch (error) {
+                console.error('Failed to load files:', error);
+                document.getElementById('fileList').innerHTML = '<strong>Error loading files:</strong> ' + error.message;
+            }
+        });
+
+        // Update functions
+        function updateStatus(status) {
+            document.getElementById('audioStatus').textContent = status;
+        }
+
+        function updatePlayState(state) {
+            document.getElementById('playState').textContent = state;
+        }
+
+        // Update current time
+        setInterval(() => {
+            const time = audio.currentTime;
+            const minutes = Math.floor(time / 60);
+            const seconds = Math.floor(time % 60);
+            document.getElementById('currentTime').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }, 100);
+
+        // Load files on page load
+        loadFilesBtn.click();
+    </script>
+</body>
+</html>

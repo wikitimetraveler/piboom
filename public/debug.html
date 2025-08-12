@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        button { margin: 5px; padding: 10px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>Audio API Debug</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Server Health</h3>
+        <button onclick="testHealth()">Test /health</button>
+        <div id="healthResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. Test Audio Files List</h3>
+        <button onclick="testFiles()">Test /api/audio/files</button>
+        <div id="filesResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>3. Test Audio Stream</h3>
+        <select id="fileSelect">
+            <option>Select a file first...</option>
+        </select>
+        <button onclick="testStream()">Test Stream</button>
+        <div id="streamResult"></div>
+        <audio id="testAudio" controls></audio>
+    </div>
+    
+    <div class="test-section">
+        <h3>4. Test Play Command</h3>
+        <button onclick="testPlay()">Test Play</button>
+        <div id="playResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>5. Test Stop Command</h3>
+        <button onclick="testStop()">Test Stop</button>
+        <div id="stopResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>6. Console Logs</h3>
+        <div id="consoleLogs"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logs = document.getElementById('consoleLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `<strong>${timestamp}</strong>: ${message}`;
+            logs.appendChild(logEntry);
+            console.log(message);
+        }
+
+        async function testHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                document.getElementById('healthResult').innerHTML = 
+                    `<pre class="success">✅ Success: ${JSON.stringify(data, null, 2)}</pre>`;
+                log('Health check successful');
+            } catch (error) {
+                document.getElementById('healthResult').innerHTML = 
+                    `<pre class="error">❌ Error: ${error.message}</pre>`;
+                log('Health check failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testFiles() {
+            try {
+                const response = await fetch('/api/audio/files');
+                const data = await response.json();
+                document.getElementById('filesResult').innerHTML = 
+                    `<pre class="success">✅ Success: ${JSON.stringify(data, null, 2)}</pre>`;
+                
+                // Update file select
+                const fileSelect = document.getElementById('fileSelect');
+                fileSelect.innerHTML = '<option>Select a file...</option>';
+                data.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file;
+                    option.textContent = file;
+                    fileSelect.appendChild(option);
+                });
+                
+                log(`Found ${data.length} audio files`);
+            } catch (error) {
+                document.getElementById('filesResult').innerHTML = 
+                    `<pre class="error">❌ Error: ${error.message}</pre>`;
+                log('Files check failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testStream() {
+            const fileSelect = document.getElementById('fileSelect');
+            const selectedFile = fileSelect.value;
+            
+            if (!selectedFile || selectedFile === 'Select a file...') {
+                document.getElementById('streamResult').innerHTML = 
+                    `<pre class="error">❌ Please select a file first</pre>`;
+                return;
+            }
+            
+            try {
+                const audio = document.getElementById('testAudio');
+                audio.src = `/api/audio/stream/${encodeURIComponent(selectedFile)}`;
+                
+                audio.onloadstart = () => {
+                    document.getElementById('streamResult').innerHTML = 
+                        `<pre class="success">✅ Stream started for: ${selectedFile}</pre>`;
+                    log(`Stream started for: ${selectedFile}`);
+                };
+                
+                audio.onerror = (e) => {
+                    document.getElementById('streamResult').innerHTML = 
+                        `<pre class="error">❌ Stream error: ${e.message || 'Unknown error'}</pre>`;
+                    log(`Stream error for ${selectedFile}: ${e.message || 'Unknown error'}`, 'error');
+                };
+                
+            } catch (error) {
+                document.getElementById('streamResult').innerHTML = 
+                    `<pre class="error">❌ Error: ${error.message}</pre>`;
+                log('Stream test failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testPlay() {
+            const fileSelect = document.getElementById('fileSelect');
+            const selectedFile = fileSelect.value;
+            
+            if (!selectedFile || selectedFile === 'Select a file...') {
+                document.getElementById('playResult').innerHTML = 
+                    `<pre class="error">❌ Please select a file first</pre>`;
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/audio/play/${encodeURIComponent(selectedFile)}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.ok) {
+                    document.getElementById('playResult').innerHTML = 
+                        `<pre class="success">✅ Play command successful: ${JSON.stringify(data, null, 2)}</pre>`;
+                    log(`Play command successful for: ${selectedFile}`);
+                } else {
+                    document.getElementById('playResult').innerHTML = 
+                        `<pre class="error">❌ Play command failed: ${JSON.stringify(data, null, 2)}</pre>`;
+                    log(`Play command failed for: ${selectedFile}`, 'error');
+                }
+            } catch (error) {
+                document.getElementById('playResult').innerHTML = 
+                    `<pre class="error">❌ Error: ${error.message}</pre>`;
+                log('Play test failed: ' + error.message, 'error');
+            }
+        }
+
+        async function testStop() {
+            try {
+                const response = await fetch('/api/audio/stop', {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.ok) {
+                    document.getElementById('stopResult').innerHTML = 
+                        `<pre class="success">✅ Stop command successful: ${JSON.stringify(data, null, 2)}</pre>`;
+                    log('Stop command successful');
+                } else {
+                    document.getElementById('stopResult').innerHTML = 
+                        `<pre class="error">❌ Stop command failed: ${JSON.stringify(data, null, 2)}</pre>`;
+                    log('Stop command failed', 'error');
+                }
+            } catch (error) {
+                document.getElementById('stopResult').innerHTML = 
+                    `<pre class="error">❌ Error: ${error.message}</pre>`;
+                log('Stop test failed: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-run health check on page load
+        window.onload = () => {
+            log('Debug page loaded');
+            testHealth();
+        };
+    </script>
+</body>
+</html>

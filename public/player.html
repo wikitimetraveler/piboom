@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Boombox • Zen</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+<link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<nav class="navbar navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="btn btn-link" href="/"><i class="bi-arrow-left"></i> Back</a>
+    <span class="navbar-text"><i class="bi-music-note-list mr-1"></i> Boombox</span>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="row">
+    <div class="col-lg-6 mb-3">
+      <div class="panel">
+        <h5 class="mb-3"><i class="bi-collection"></i> Library</h5>
+        <div class="input-group mb-3">
+          <select class="custom-select" id="fileSelect">
+            <option disabled selected>— files will appear here —</option>
+          </select>
+          <div class="input-group-append">
+            <button id="refresh" class="btn btn-outline-secondary"><i class="bi-arrow-clockwise"></i></button>
+          </div>
+        </div>
+        <div class="d-flex">
+          <button id="play" class="btn btn-ice mr-2" disabled><i class="bi-play-fill"></i> Play</button>
+          <button id="stop" class="btn btn-outline-secondary" disabled><i class="bi-stop-fill"></i> Stop</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 mb-3">
+      <div class="panel">
+        <h5 class="mb-3"><i class="bi-volume-up"></i> Volume</h5>
+        <input type="range" class="custom-range" id="vol" min="0" max="100" value="70">
+        <div class="meta mt-2"><span id="volVal">70%</span></div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="panel">
+        <h5 class="mb-3"><i class="bi-activity"></i> VU Meter</h5>
+        <canvas id="vu" height="80"></canvas>
+        <audio id="ghost" preload="auto" crossorigin="anonymous"></audio>
+        <div class="mt-2">
+          <small class="text-muted">
+            Status: <span id="audioStatus">Ready</span> | 
+            Mode: <span id="audioMode">Cloud</span> | 
+            File: <span id="currentFile">None</span>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/scripts.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const file = $('#fileSelect'), play=$('#play'), stopBtn=$('#stop'), vol=$('#vol'), volVal=$('#volVal');
+let ghost = document.getElementById('ghost'), canvas=document.getElementById('vu'), ctx=canvas.getContext('2d');
+const audioStatus = $('#audioStatus'), audioMode = $('#audioMode'), currentFile = $('#currentFile');
+let audioCtx, analyser, data;
+
+// Update status display
+function updateStatus(status, file = null) {
+  audioStatus.textContent = status;
+  if (file) currentFile.textContent = file;
+}
+
+// Reset audio element state
+function resetAudio() {
+  // Close existing audio context first
+  if (audioCtx) {
+    console.log('Closing audio context during reset');
+    audioCtx.close();
+    audioCtx = null;
+    analyser = null;
+    data = null;
+  }
+  
+  // Create a completely new audio element to avoid connection issues
+  const newGhost = document.createElement('audio');
+  newGhost.id = 'ghost';
+  newGhost.preload = 'auto';
+  newGhost.crossOrigin = 'anonymous';
+  newGhost.volume = 0.7;
+  
+  // Replace the old audio element
+  ghost.parentNode.replaceChild(newGhost, ghost);
+  
+  // Update the global reference
+  ghost = newGhost;
+  
+  // Re-attach event listeners
+  newGhost.addEventListener('loadedmetadata', () => {
+    console.log('Audio metadata loaded');
+    console.log('Duration:', newGhost.duration);
+    console.log('Current volume:', newGhost.volume);
+  });
+
+  newGhost.addEventListener('canplay', () => {
+    console.log('Audio can play');
+  });
+
+  newGhost.addEventListener('error', (e) => {
+    console.error('Audio error:', e);
+    console.error('Error details:', newGhost.error);
+  });
+  
+  console.log('Audio element completely replaced');
+}
+
+// Audio event handlers
+ghost.onloadstart = () => updateStatus('Loading...');
+ghost.oncanplay = () => updateStatus('Ready to play');
+ghost.onplay = () => updateStatus('Playing');
+ghost.onpause = () => updateStatus('Paused');
+ghost.onended = () => updateStatus('Ended');
+ghost.onerror = (e) => updateStatus('Error: ' + (e.message || 'Unknown error'));
+
+// Set initial volume
+ghost.volume = 0.7;
+
+async function loadFiles(){
+  try{
+    const refreshBtn = document.getElementById('refresh');
+    refreshBtn.disabled = true;
+    refreshBtn.innerHTML = '<i class="bi-arrow-clockwise"></i>';
+    
+    const r = await fetch('/api/audio/files'); 
+    if (!r.ok) {
+      throw new Error(`Server error: ${r.status}`);
+    }
+    
+    const list = await r.json();
+    if (list && list.length > 0) {
+      file.innerHTML = list.map(f=>`<option>${f}</option>`).join('');
+      file.disabled = false;
+    } else {
+      file.innerHTML = '<option disabled>No audio files found</option>';
+      file.disabled = true;
+    }
+  } catch (error) {
+    console.error('Failed to load files:', error);
+    file.innerHTML = '<option disabled>Error loading files</option>';
+    file.disabled = true;
+  } finally {
+    const refreshBtn = document.getElementById('refresh');
+    refreshBtn.disabled = false;
+    refreshBtn.innerHTML = '<i class="bi-arrow-clockwise"></i>';
+  }
+}
+document.getElementById('refresh').onclick = loadFiles;
+file.onchange = e => {
+  const selectedFile = e.target.value;
+  const hasValidFile = selectedFile && selectedFile !== '— files will appear here —' && !selectedFile.includes('Error') && !selectedFile.includes('No audio');
+  
+  console.log('File change event:', selectedFile, 'Valid:', hasValidFile);
+  
+  play.disabled = !hasValidFile;
+  stopBtn.disabled = !hasValidFile;
+  
+  if (hasValidFile) {
+    // Reset audio element state for new file
+    resetAudio();
+    
+    // Reset button state
+    play.classList.remove('btn-success');
+    play.innerHTML = '<i class="bi-play-fill"></i> Play';
+    
+    // Reset status
+    updateStatus('Ready', selectedFile);
+    
+    console.log('New file selected:', selectedFile);
+    console.log('Audio element after reset - src:', ghost.src, 'readyState:', ghost.readyState);
+  }
+};
+
+play.onclick = async ()=>{
+  const f = file.value; 
+  if(!f || f === '— files will appear here —') {
+    alert('Please select a file to play first');
+    return;
+  }
+  
+  console.log('Attempting to play:', f);
+  console.log('Current audio src:', ghost.src);
+  console.log('Current audio state:', ghost.readyState);
+  
+  try {
+    play.disabled = true;
+    play.innerHTML = '<i class="bi-hourglass-split"></i> Playing...';
+    
+    // Always set new source for new file (prevents caching issues)
+    const newSrc = `/api/audio/stream/${encodeURIComponent(f)}`;
+    console.log('Setting new source:', newSrc);
+    ghost.src = newSrc;
+    updateStatus('Loading...', f);
+    
+    // Reset audio state
+    ghost.currentTime = 0;
+    
+    // Wait for audio to be ready
+    await new Promise((resolve, reject) => {
+      const onCanPlay = () => {
+        console.log('Audio can play, readyState:', ghost.readyState);
+        ghost.removeEventListener('canplay', onCanPlay);
+        ghost.removeEventListener('error', onError);
+        clearTimeout(timeoutId);
+        resolve();
+      };
+      
+      const onError = (error) => {
+        console.error('Audio load error:', error);
+        ghost.removeEventListener('canplay', onCanPlay);
+        ghost.removeEventListener('error', onError);
+        clearTimeout(timeoutId);
+        reject(error);
+      };
+      
+      ghost.addEventListener('canplay', onCanPlay);
+      ghost.addEventListener('error', onError);
+      
+      // Timeout after 5 seconds
+      const timeoutId = setTimeout(() => {
+        console.error('Audio load timeout');
+        ghost.removeEventListener('canplay', onCanPlay);
+        ghost.removeEventListener('error', onError);
+        reject(new Error('Audio load timeout'));
+      }, 5000);
+    });
+    
+    // Ensure audio context is resumed (browser requirement)
+    if (audioCtx && audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+    
+    // Try to play the audio
+    const playPromise = ghost.play();
+    if (playPromise !== undefined) {
+      await playPromise;
+      await startVU();
+      play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+      play.classList.add('btn-success');
+      updateStatus('Playing', f);
+    }
+    
+  } catch (error) {
+    console.error('Play error:', error);
+    
+    // Handle specific browser audio permission errors
+    if (error.name === 'NotAllowedError') {
+      alert('Please click the play button again to allow audio playback');
+      // Reset button state
+      play.innerHTML = '<i class="bi-play-fill"></i> Play';
+      play.classList.remove('btn-success');
+    } else {
+      alert('Failed to play audio: ' + error.message);
+    }
+  } finally {
+    play.disabled = false;
+  }
+};
+stopBtn.onclick = async ()=>{
+  try {
+    stopBtn.disabled = true;
+    const response = await fetch('/api/audio/stop', {method:'POST'});
+    if (response.ok) {
+      ghost.pause();
+      ghost.currentTime = 0;
+      play.innerHTML = '<i class="bi-play-fill"></i> Play';
+      play.classList.remove('btn-success');
+      if (audioCtx) {
+        audioCtx.close();
+        audioCtx = null;
+        analyser = null;
+        data = null;
+      }
+    }
+  } catch (error) {
+    console.error('Stop error:', error);
+  } finally {
+    stopBtn.disabled = false;
+  }
+};
+vol.oninput = async e => {
+  const volume = e.target.value;
+  volVal.textContent = volume + '%';
+  
+  // Set volume on the audio element (works in cloud mode)
+  ghost.volume = volume / 100;
+  console.log('Audio volume set to:', ghost.volume);
+  
+  // Also try to set system volume (works on Linux/Unix, not Windows)
+  try {
+    const response = await fetch('/api/audio/volume/'+volume, {method:'POST'});
+    if (response.ok) {
+      const result = await response.json();
+      if (result.mode === 'pi') {
+        console.log('System volume set to:', volume + '%');
+      } else {
+        console.log('Using browser volume control (system volume not available)');
+      }
+    }
+  } catch (error) {
+    console.log('System volume control not available (using browser volume)');
+  }
+};
+
+async function startVU(){
+  try {
+    // Check if audio element is already connected
+    if (audioCtx && audioCtx.state !== 'closed') {
+      console.log('Audio context already exists and active');
+      return; // Don't recreate if already working
+    }
+    
+    // Create new audio context only if needed
+    if (!audioCtx || audioCtx.state === 'closed') {
+      console.log('Creating new audio context');
+      audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      
+      // Check if audio context is suspended and resume if needed
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+        console.log('Audio context resumed');
+      }
+      
+      const node = audioCtx.createMediaElementSource(ghost);
+      analyser = audioCtx.createAnalyser(); 
+      analyser.fftSize = 1024;
+      data = new Uint8Array(analyser.frequencyBinCount);
+      node.connect(analyser); 
+      analyser.connect(audioCtx.destination);
+      
+      console.log('VU meter initialized, audio context state:', audioCtx.state);
+    }
+    
+    draw();
+  } catch (error) {
+    console.error('VU meter setup failed:', error);
+    // Continue without VU meter if it fails
+  }
+}
+function draw(){
+  requestAnimationFrame(draw); if(!analyser) return;
+  analyser.getByteFrequencyData(data);
+  const w = canvas.width = canvas.clientWidth, h = canvas.height = canvas.clientHeight;
+  ctx.clearRect(0,0,w,h);
+  const bars = 40, step = Math.floor(data.length/bars);
+  for(let i=0;i<bars;i++){
+    let s=0; for(let j=0;j<step;j++) s+=data[i*step+j];
+    const v = (s/step)/255, bh = v*h;
+    const x=(w/bars)*i+2, bw=(w/bars)-4;
+    ctx.fillStyle = '#38bdf8'; ctx.fillRect(x, h-bh, bw, bh);
+  }
+}
+// Add debug info
+console.log('Player initialized');
+console.log('Audio element:', ghost);
+console.log('Initial volume:', ghost.volume);
+
+// Test audio element
+ghost.addEventListener('loadedmetadata', () => {
+  console.log('Audio metadata loaded');
+  console.log('Duration:', ghost.duration);
+  console.log('Current volume:', ghost.volume);
+});
+
+ghost.addEventListener('canplay', () => {
+  console.log('Audio can play');
+});
+
+ghost.addEventListener('error', (e) => {
+  console.error('Audio error:', e);
+  console.error('Error details:', ghost.error);
+});
+
+loadFiles();
+</script>
+</body>
+</html>
