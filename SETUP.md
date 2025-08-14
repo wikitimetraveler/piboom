@@ -1,92 +1,367 @@
-# BOOM Project Setup Guide
+# 🎵 BOOM Box - Setup & Configuration Guide
 
-## Hardware Assembly
+Complete setup instructions for the voice-controlled BOOM box audio system.
 
-### 1. Raspberry Pi 5 Setup
-- Install microSD card with Raspberry Pi OS
-- Connect 5V/5A power supply
-- Ensure proper cooling (Pi 5 can get warm)
+## 🚀 Quick Start
 
-### 2. Audio Chain Assembly
-- **Pi → DAC**: Connect HifiMe UAE23HD via USB-C to USB-A cable
-- **DAC → Amplifier**: Connect via RCA stereo cable
-- **Amplifier → Speakers**: Connect via 14 AWG speaker wire
-- **Power**: Connect amplifier to power source
+### 1. Clone & Install
+```bash
+git clone <your-repo>
+cd boom
+npm install
+```
 
-### 3. Display & Input
-- Connect SunFounder 7" touchscreen to Pi
-- Pair iClever BK09 Bluetooth keyboard
-- Test touchscreen responsiveness
+### 2. Add Music Files
+```bash
+# Copy your MP3 files to the music directory
+cp /path/to/your/music/*.mp3 ./music/
+```
 
-## Software Setup
+### 3. Start Development Mode
+```bash
+npm start
+# Open http://localhost:3000/player.html
+```
 
-### 1. System Dependencies
+## 🔧 Development vs Production Setup
+
+### Windows Development Mode
+- **Voice Recognition**: Web Speech API (browser-based)
+- **Text-to-Speech**: `say` package
+- **Audio Playback**: Browser audio
+- **No system dependencies required**
+
+### Raspberry Pi Production Mode
+- **Voice Recognition**: System audio tools (`arecord`, `sox`)
+- **Text-to-Speech**: `espeak-ng`
+- **Audio Playback**: System audio (`mpg123`)
+- **Requires system dependencies**
+
+## 🍓 Raspberry Pi Setup
+
+### Prerequisites
+- Raspberry Pi 5 with Raspberry Pi OS 64-bit
+- MicroSD card (32GB+ recommended)
+- Power supply (5V/3A USB-C)
+- Network connection (WiFi or Ethernet)
+
+### Initial Pi Setup
 ```bash
 # Update system
-sudo apt update && sudo apt upgrade -y
+sudo apt update && sudo apt upgrade
 
-# Install audio tools
-sudo apt install -y mpg123 alsa-utils
-
-# Install Node.js (if not already installed)
+# Install Node.js 18+
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 sudo apt-get install -y nodejs
+
+# Verify installation
+node --version  # Should be 18.x or higher
+npm --version   # Should be 9.x or higher
 ```
 
-### 2. Project Setup
+### Install System Dependencies
 ```bash
-# Clone/install project
-cd /path/to/boom
-npm install
+# Audio processing tools
+sudo apt install sox espeak-ng alsa-utils
 
-# Create environment file
-cp .env.example .env
-# Edit .env as needed
+# Audio playback
+sudo apt install mpg123
+
+# Additional tools
+sudo apt install git curl wget
 ```
 
-### 3. Environment Configuration
+### Audio Configuration
 ```bash
-# .env file should contain:
-PORT=3000
-MUSIC_DIR=./music
-DEFAULT_VOLUME=70
-MODE=pi  # Important: must be 'pi' for local audio
+# List audio devices
+aplay -l
+
+# Set default audio output (adjust card/device numbers)
+sudo nano /etc/asound.conf
+
+# Add this content (adjust for your setup):
+pcm.!default {
+    type hw
+    card 0
+    device 0
+}
+
+ctl.!default {
+    type hw
+    card 0
+}
 ```
 
-### 4. Audio System Configuration
+### Test Audio Setup
+```bash
+# Test speaker output
+speaker-test -t wav -c 2 -l 1
+
+# Test microphone input
+arecord -f S16_LE -r 16000 -c 1 -D hw:1,0 test.wav
+aplay test.wav
+
+# Test text-to-speech
+espeak "Hello from your BOOM box"
+```
+
+## 🎤 Voice Control Configuration
+
+### Microphone Setup
+1. **Connect USB microphone** to Pi
+2. **Check device**: `arecord -l`
+3. **Test input levels**: `alsamixer`
+4. **Set gain**: Adjust microphone volume to 70-80%
+
+### Voice Recognition Testing
+```bash
+# Test basic audio capture
+arecord -f S16_LE -r 16000 -c 1 -D hw:1,0 -d 5 test.wav
+
+# Test with sox processing
+arecord -f S16_LE -r 16000 -c 1 -D hw:1,0 | sox -t raw -r 16000 -s 2 -c 1 - -t wav processed.wav
+```
+
+### Command Recognition
+The system recognizes these voice commands:
+- **"play"** / **"start"** / **"begin"**
+- **"pause"** / **"stop"** / **"halt"**
+- **"next"** / **"skip"** / **"forward"**
+- **"previous"** / **"back"** / **"rewind"**
+- **"volume up"** / **"louder"** / **"turn up"**
+- **"volume down"** / **"quieter"** / **"turn down"**
+- **"what song"** / **"what track"** / **"what is playing"**
+- **"help"** / **"commands"** / **"what can you do"**
+
+## 🔄 Mode Switching
+
+### Switch to Pi Mode
+```bash
+node switch-mode.js pi
+```
+
+### Switch to Windows Mode
+```bash
+node switch-mode.js cloud
+```
+
+### Manual Mode Switch
+Edit `config/index.js`:
+```javascript
+const DEV_MODE = 'pi';  // 'pi' for Raspberry Pi, 'cloud' for Windows
+```
+
+## 🌐 Network Configuration
+
+### WiFi Setup
+```bash
+# Configure WiFi
+sudo raspi-config
+# Navigate to: System Options → Wireless LAN
+
+# Or edit manually
+sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+```
+
+### Static IP (Optional)
+```bash
+sudo nano /etc/dhcpcd.conf
+
+# Add at the end:
+interface wlan0
+static ip_address=192.168.1.100/24
+static routers=192.168.1.1
+static domain_name_servers=8.8.8.8
+```
+
+### Firewall Configuration
+```bash
+# Allow web access
+sudo ufw allow 3000
+
+# Enable firewall
+sudo ufw enable
+```
+
+## 📱 Web Interface Access
+
+### Local Access
+- **Development**: `http://localhost:3000/player.html`
+- **Pi Local**: `http://raspberrypi.local:3000/player.html`
+
+### Network Access
+- **From other devices**: `http://[pi-ip-address]:3000/player.html`
+- **Find Pi IP**: `hostname -I` or check router admin panel
+
+### HTTPS Setup (Optional)
+```bash
+# Install certbot
+sudo apt install certbot
+
+# Get SSL certificate
+sudo certbot certonly --standalone -d yourdomain.com
+
+# Configure Express to use HTTPS
+```
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+#### No Audio Output
 ```bash
 # Check audio devices
 aplay -l
 
-# Set default audio device (if needed)
-# Edit /etc/asound.conf or ~/.asoundrc
+# Test ALSA
+speaker-test -t wav -c 2 -l 1
+
+# Check volume levels
+alsamixer
 ```
 
-## Testing & Verification
-
-### 1. Audio Test
+#### Voice Recognition Not Working
 ```bash
-# Test audio output
-speaker-test -t wav -c 2
+# Test microphone
+arecord -f S16_LE -r 16000 -c 1 -D hw:1,0 test.wav
 
-# Test mpg123
-mpg123 /path/to/test.mp3
+# Check microphone levels
+alsamixer
+
+# Verify dependencies
+which arecord sox espeak-ng
 ```
 
-### 2. Web Interface
-- Navigate to `http://your-pi-ip:3000`
-- Upload music files to `./music` directory
-- Test playback controls
+#### Network Access Issues
+```bash
+# Check Pi IP address
+hostname -I
 
-## Troubleshooting
+# Test network connectivity
+ping 8.8.8.8
 
-### Common Issues
-- **No audio**: Check ALSA configuration, DAC connections
-- **High latency**: Ensure Pi 5 has adequate cooling
-- **Touchscreen not working**: Check display drivers and connections
+# Check firewall
+sudo ufw status
+```
 
-### Performance Tips
-- Use Class 10+ microSD for better I/O
-- Ensure adequate power supply (5V/5A minimum)
-- Monitor Pi 5 temperature during operation
+#### Node.js Issues
+```bash
+# Check Node.js version
+node --version
+
+# Clear npm cache
+npm cache clean --force
+
+# Reinstall dependencies
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### Performance Optimization
+
+#### Audio Latency
+```bash
+# Edit ALSA configuration
+sudo nano /etc/asound.conf
+
+# Add low-latency settings
+pcm.!default {
+    type hw
+    card 0
+    device 0
+    rate 48000
+    period_size 256
+    buffer_size 1024
+}
+```
+
+#### System Resources
+```bash
+# Monitor system resources
+htop
+
+# Check audio processes
+ps aux | grep -E "(arecord|sox|espeak|mpg123)"
+
+# Monitor audio devices
+watch -n 1 "cat /proc/asound/card*/pcm*/sub*/hw_params"
+```
+
+## 📊 Monitoring & Logs
+
+### Application Logs
+```bash
+# View real-time logs
+npm start
+
+# Check for errors in console output
+# Look for voice recognition and audio processing messages
+```
+
+### System Logs
+```bash
+# Audio system logs
+dmesg | grep -i audio
+
+# ALSA logs
+cat /var/log/alsa.log
+
+# System messages
+journalctl -f
+```
+
+### Performance Monitoring
+```bash
+# CPU usage
+top -p $(pgrep -f "node.*server.js")
+
+# Memory usage
+free -h
+
+# Audio device status
+cat /proc/asound/card*/pcm*/sub*/hw_params
+```
+
+## 🔒 Security Considerations
+
+### Network Security
+- **Change default Pi password**
+- **Use strong WiFi password**
+- **Consider VPN for remote access**
+- **Regular system updates**
+
+### Application Security
+- **Environment variables** for sensitive config
+- **Input validation** for voice commands
+- **Rate limiting** for API endpoints
+- **HTTPS** for production deployment
+
+## 📝 Maintenance
+
+### Regular Updates
+```bash
+# System updates
+sudo apt update && sudo apt upgrade
+
+# Node.js updates
+npm update -g npm
+npm update
+
+# Check for security updates
+npm audit
+```
+
+### Backup Configuration
+```bash
+# Backup important files
+cp config/index.js config/index.js.backup
+cp .env .env.backup
+
+# Backup music library
+rsync -av music/ /backup/music/
+```
+
+---
+
+**🎵 Your BOOM box is ready to rock with voice control! Follow these steps for a smooth setup experience.** 🚀✨
 

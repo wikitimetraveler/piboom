@@ -13,6 +13,13 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Add middleware for parsing JSON request bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Make io available to routes
+app.locals.io = io;
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', buildRoutes(io));
 
@@ -25,4 +32,5 @@ app.get('*', (req,res)=>{
 server.listen(config.port, ()=>{
   console.log(`ICE Zen listening on http://localhost:${config.port}`);
   console.log(`Mode: ${config.mode} | Music dir: ${config.musicDir}`);
+  console.log(`Socket.IO server ready for voice commands`);
 });

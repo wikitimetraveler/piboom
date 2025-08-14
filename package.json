@@ -11,6 +11,9 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "play-sound": "^1.1.6",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "node-record-lpcm16": "^1.0.1",
+    "@google-cloud/speech": "^6.0.0",
+    "say": "^0.16.0"
   }
 }

@@ -1,124 +1,168 @@
-# BOOM Project - Raspberry Pi 5 Audio System
+# 🎵 BOOM Box - Voice-Controlled Audio Player
 
-A high-quality audio streaming and playback system built for the Raspberry Pi 5, featuring a custom wooden enclosure and modern web interface.
+A retro-style audio player with **real voice control** that works on both Windows (development) and Raspberry Pi (production). Built with Node.js, Express, and Web Speech API.
 
-## 🎵 Features
+## ✨ Features
 
-- **Web-based Audio Player**: Modern, responsive interface accessible from any device
-- **Audio Streaming**: Stream MP3 files directly to web browsers
-- **VU Meter Visualization**: Real-time audio frequency visualization
-- **Volume Control**: Both system and browser-based volume management
-- **Cross-Platform**: Works on Windows for development, Pi for production
-- **Real-time Updates**: WebSocket integration for live status updates
+- **🎵 Audio Playback**: MP3 support with play/pause, next/previous, volume control
+- **🎤 Real Voice Control**: Hands-free operation using your actual voice
+- **🗣️ Voice Feedback**: The system talks back to confirm your commands
+- **📱 Modern Web Interface**: Responsive design with VU meter visualization
+- **🔄 Cross-Platform**: Windows development mode + Raspberry Pi production mode
+- **🔧 Easy Mode Switching**: Simple command to switch between dev and production
+
+## 🎤 Voice Commands
+
+Say these commands to control your BOOM box:
+
+- **"play"** or **"start"** → Start music playback
+- **"pause"** or **"stop"** → Pause music
+- **"next"** or **"skip"** → Next track
+- **"previous"** or **"back"** → Previous track  
+- **"volume up"** or **"louder"** → Increase volume
+- **"volume down"** or **"quieter"** → Decrease volume
+- **"what song"** → Show current track info
+- **"help"** → List available commands
 
 ## 🛠️ Technical Stack
 
-- **Backend**: Node.js with Express
-- **Audio Processing**: Web Audio API with VU meter visualization
-- **Real-time Communication**: Socket.IO
-- **Frontend**: Vanilla JavaScript with Bootstrap styling
-- **Audio Playback**: MP3 streaming with browser-native audio support
+- **Backend**: Node.js + Express
+- **Audio**: `play-sound` library, `mpg123` (Pi mode)
+- **Voice Recognition**: Web Speech API (browser-based)
+- **Text-to-Speech**: `say` package (Windows), `espeak` (Pi)
+- **Frontend**: Vanilla JavaScript, Web Audio API
+- **Real-time**: Socket.IO for communication
 
-## 🏗️ Hardware
-
-- **Raspberry Pi 5**: Main computing unit
-- **Custom Wooden Enclosure**: Handcrafted wooden case by Steven Wedekind
-- **Metal Components**: Custom metalwork and hardware by Steven Wedekind
-- **Audio Output**: High-quality audio interface for premium sound
-
-## 👨‍💻 Development
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- npm or yarn
+- Node.js 18+ 
+- Windows 10/11 (development) or Raspberry Pi (production)
 
 ### Installation
 ```bash
-git clone <repository-url>
+git clone <your-repo>
 cd boom
 npm install
 ```
 
-### Environment Variables
+### Development Mode (Windows)
 ```bash
-# For Windows/Cloud development
-MODE=cloud
-
-# For Raspberry Pi production
-MODE=pi
-
-# Optional: Custom music directory
-MUSIC_DIR=/path/to/music
-
-# Optional: Custom port
-PORT=3000
-```
-
-### Running
-```bash
-# Development mode (Windows)
+# Start the server
 npm start
 
-# Production mode (Pi)
-MODE=pi npm start
+# Open http://localhost:3000/player.html
+# Initialize Voice → Start Listening → Speak commands!
+```
+
+### Production Mode (Raspberry Pi)
+```bash
+# Switch to Pi mode
+node switch-mode.js pi
+
+# Install system dependencies
+sudo apt install sox espeak-ng alsa-utils
+
+# Start the server
+npm start
 ```
 
 ## 🎯 Usage
 
-1. **Start the server**: `npm start`
-2. **Open browser**: Navigate to `http://localhost:3000`
-3. **Select audio file**: Choose from available MP3 files
-4. **Control playback**: Use play/pause/stop controls
-5. **Adjust volume**: Use the volume slider
-6. **Monitor audio**: Watch the VU meter visualization
+### Voice Control Setup
+1. **Initialize Voice** - Sets up speech recognition
+2. **Start Listening** - Microphone activates, listens for commands
+3. **Speak Commands** - Use natural language to control playback
+4. **Stop Listening** - Deactivates microphone
 
-## 🚀 Deployment to Pi
+### Manual Controls
+- **File Selection**: Choose from your music library
+- **Playback Controls**: Standard play/pause/next/previous buttons
+- **Volume Slider**: Adjust audio level
+- **VU Meter**: Visual audio level indicator
 
-1. **Transfer code** to Raspberry Pi 5
-2. **Install dependencies**: `npm install`
-3. **Set environment**: `export MODE=pi`
+## 🔧 Configuration
+
+### Environment Variables
+```bash
+MODE=cloud|pi          # Operating mode
+MUSIC_DIR=./music      # Music directory path
+PORT=3000              # Server port
+```
+
+### Easy Mode Switching
+```bash
+# Switch to Windows development mode
+node switch-mode.js cloud
+
+# Switch to Raspberry Pi production mode  
+node switch-mode.js pi
+```
+
+## 🍓 Deployment to Pi
+
+1. **Transfer files** to Raspberry Pi
+2. **Switch to Pi mode**: `node switch-mode.js pi`
+3. **Install dependencies**: `sudo apt install sox espeak-ng alsa-utils`
 4. **Start server**: `npm start`
-5. **Access remotely**: Use Pi's IP address in browser
-
-## 👥 Credits
-
-### Software Development
-**David Lane** - Full-stack development, audio processing, web interface, and system architecture
-
-### Hardware & Enclosure
-**Steven Wedekind** - Custom wooden enclosure design, metal fabrication, and all physical components
+5. **Access from network**: `http://[pi-ip]:3000/player.html`
 
 ## 📁 Project Structure
-
 ```
 boom/
-├── config/          # Configuration files
-├── controllers/     # API controllers
-├── lib/            # Utility libraries
-├── music/          # Audio file storage
-├── public/         # Web interface files
-├── routes/         # API route definitions
-├── services/       # Business logic services
-├── server.js       # Main server entry point
-└── README.md       # This file
+├── config/           # Configuration files
+├── controllers/      # API controllers
+├── lib/             # Utility libraries
+├── music/           # Music files directory
+├── public/          # Web interface files
+├── routes/          # API routes
+├── services/        # Business logic services
+├── server.js        # Main server file
+├── switch-mode.js   # Mode switching utility
+└── README.md        # This file
 ```
 
-## 🔧 Configuration Modes
+## 🎵 Supported Audio Formats
+- MP3 (primary)
+- WAV
+- Other formats supported by `play-sound` library
 
-### Cloud Mode (`MODE=cloud`)
-- Browser-based audio streaming
-- No system audio dependencies
-- Perfect for development and testing
+## 🔍 Troubleshooting
 
-### Pi Mode (`MODE=pi`)
-- System audio output via mpg123
-- Hardware volume control via amixer
-- Optimized for Raspberry Pi deployment
+### Voice Recognition Issues
+- **Browser Compatibility**: Use Chrome, Edge, or Safari
+- **Microphone Permissions**: Allow microphone access when prompted
+- **HTTPS Required**: Some browsers require HTTPS for microphone access
 
-## 📝 License
+### Audio Issues
+- **Windows**: Ensure audio drivers are installed
+- **Pi**: Check ALSA configuration and audio output
 
-This project is proprietary and confidential. All rights reserved.
+### Development vs Production
+- **Windows**: Uses Web Speech API + `say` package
+- **Pi**: Uses system audio tools (`arecord`, `espeak`)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test on both Windows and Pi
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Web Speech API for voice recognition
+- `say` package for Windows text-to-speech
+- `espeak` for Raspberry Pi text-to-speech
+- Express.js community for the web framework
+- **Special thanks** to **David Lane** (Pure Mathematics degree, Computer Science minor, Youngstown State University, 1991) whose 30+ years of development experience guided this project's architecture and elegant solutions
+- **AI Collaboration**: This project demonstrates the power of human expertise combined with AI assistance (ChatGPT and Claude)
 
 ---
 
-*Built with ❤️ by David Lane & Steven Wedekind*
+**🎤 Ready to rock with voice control? Initialize Voice and Start Listening!** 🎵✨

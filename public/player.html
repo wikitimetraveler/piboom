@@ -46,6 +46,56 @@
       </div>
     </div>
 
+    <div class="col-12 mb-3">
+      <div class="panel">
+        <h5 class="mb-3"><i class="bi-mic"></i> Voice Control</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="d-flex mb-2">
+              <button id="voiceInit" class="btn btn-outline-primary mr-2">
+                <i class="bi-mic"></i> Initialize Voice
+              </button>
+              <button id="voiceStart" class="btn btn-success mr-2" disabled>
+                <i class="bi-mic-fill"></i> Start Listening
+              </button>
+              <button id="voiceStop" class="btn btn-danger" disabled>
+                <i class="bi-mic-mute"></i> Stop Listening
+              </button>
+            </div>
+            <div class="d-flex mb-2">
+              <button id="voiceFeedback" class="btn btn-outline-info mr-2">
+                <i class="bi-volume-up"></i> Toggle Feedback
+              </button>
+              <button id="voiceTest" class="btn btn-outline-secondary">
+                <i class="bi-chat"></i> Test Voice
+              </button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="voice-status">
+              <small class="text-muted">
+                Status: <span id="voiceStatus">Not initialized</span><br>
+                Listening: <span id="voiceListening">No</span><br>
+                Feedback: <span id="voiceFeedbackStatus">Enabled</span>
+              </small>
+            </div>
+            <div class="mt-2">
+              <small class="text-muted">
+                <strong>Voice Commands:</strong><br>
+                "Play", "Pause", "Next", "Previous"<br>
+                "Volume Up", "Volume Down", "What Song", "Help"
+              </small>
+            </div>
+          </div>
+        </div>
+        <div id="voiceCommands" class="mt-2" style="display: none;">
+          <div class="alert alert-info">
+            <strong>Voice Command Detected:</strong> <span id="lastCommand">None</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="col-12">
       <div class="panel">
         <h5 class="mb-3"><i class="bi-activity"></i> VU Meter</h5>
@@ -365,6 +415,362 @@ function draw(){
     ctx.fillStyle = '#38bdf8'; ctx.fillRect(x, h-bh, bw, bh);
   }
 }
+// Voice Control System
+const voiceInit = $('#voiceInit');
+const voiceStart = $('#voiceStart');
+const voiceStop = $('#voiceStop');
+const voiceFeedback = $('#voiceFeedback');
+const voiceTest = $('#voiceTest');
+const voiceStatus = $('#voiceStatus');
+const voiceListening = $('#voiceListening');
+const voiceFeedbackStatus = $('#voiceFeedbackStatus');
+const voiceCommands = $('#voiceCommands');
+const lastCommand = $('#lastCommand');
+
+let voiceActive = false;
+
+// Set initial button states
+voiceStart.disabled = true;
+voiceStop.disabled = true;
+voiceStart.classList.add('btn-outline-success');
+voiceStart.classList.remove('btn-success');
+voiceStop.classList.add('btn-outline-danger');
+voiceStop.classList.remove('btn-danger');
+
+console.log('🎤 Voice control buttons initialized with correct states');
+
+// Remove old Socket.IO and polling code - we're using real voice recognition now
+
+// Initialize voice service
+  // Voice control button handlers
+  voiceInit.onclick = async () => {
+    try {
+      voiceInit.disabled = true;
+      voiceStart.disabled = true; // Keep start button disabled during init
+      voiceInit.innerHTML = '<i class="bi-hourglass-split"></i> Initializing...';
+      
+      // Initialize real voice recognition
+      if (initVoiceRecognition()) {
+        voiceStatus.innerHTML = '<i class="bi-check-circle"></i> Voice Ready';
+        voiceStatus.style.color = '#28a745';
+        voiceInit.innerHTML = '<i class="bi-check-circle"></i> Voice Ready';
+        voiceInit.disabled = false;
+        
+        // Enable the start listening button
+        voiceStart.disabled = false;
+        voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+        voiceStart.classList.remove('btn-outline-success');
+        voiceStart.classList.add('btn-success');
+        
+        console.log('✅ Voice recognition ready - Start Listening button enabled');
+      } else {
+        voiceStatus.innerHTML = '<i class="bi-x-circle"></i> Voice Not Supported';
+        voiceStatus.style.color = '#dc3545';
+        voiceInit.innerHTML = '<i class="bi-x-circle"></i> Retry';
+        voiceInit.disabled = false;
+        
+        // Keep start button disabled
+        voiceStart.disabled = true;
+        voiceStart.innerHTML = '<i class="bi-mic-slash"></i> Not Available';
+        voiceStart.classList.remove('btn-success');
+        voiceStart.classList.add('btn-outline-secondary');
+      }
+    } catch (error) {
+      console.error('Voice init error:', error);
+      voiceStatus.innerHTML = '<i class="bi-x-circle"></i> Error';
+      voiceStatus.style.color = '#dc3545';
+      voiceInit.innerHTML = '<i class="bi-arrow-clockwise"></i> Retry';
+      voiceInit.disabled = false;
+      
+      // Keep start button disabled
+      voiceStart.disabled = true;
+    }
+  };
+
+  voiceStart.onclick = () => {
+    if (!recognition) {
+      alert('Please initialize voice recognition first!');
+      return;
+    }
+    
+    startVoiceRecognition();
+    
+    // Update button states
+    voiceStart.disabled = true;
+    voiceStart.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+    voiceStart.classList.remove('btn-success');
+    voiceStart.classList.add('btn-warning');
+    
+    voiceStop.disabled = false;
+    voiceStop.classList.remove('btn-outline-danger');
+    voiceStop.classList.add('btn-danger');
+    
+    voiceListening.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+    voiceListening.style.color = '#28a745';
+    
+    console.log('🎤 Voice recognition started - buttons updated');
+  };
+
+  voiceStop.onclick = () => {
+    stopVoiceRecognition();
+    
+    // Update button states
+    voiceStart.disabled = false;
+    voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+    voiceStart.classList.remove('btn-warning');
+    voiceStart.classList.add('btn-success');
+    
+    voiceStop.disabled = true;
+    voiceStop.classList.remove('btn-danger');
+    voiceStop.classList.add('btn-outline-danger');
+    
+    voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
+    voiceListening.style.color = '#6c757d';
+    
+    console.log('🔇 Voice recognition stopped - buttons updated');
+  };
+
+// Toggle voice feedback
+voiceFeedback.onclick = async () => {
+  try {
+    voiceFeedback.disabled = true;
+    voiceFeedback.innerHTML = '<i class="bi-hourglass-split"></i> Toggling...';
+    
+    const response = await fetch('/api/voice/feedback/toggle', { method: 'POST' });
+    const result = await response.json();
+    
+    if (result.success) {
+      voiceFeedbackStatus.textContent = result.voiceFeedback ? 'Enabled' : 'Disabled';
+      voiceFeedback.innerHTML = result.voiceFeedback ? 
+        '<i class="bi-volume-up"></i> Disable Feedback' : 
+        '<i class="bi-volume-mute"></i> Enable Feedback';
+    }
+  } catch (error) {
+    console.error('Voice feedback toggle error:', error);
+  } finally {
+    voiceFeedback.disabled = false;
+  }
+};
+
+// Test voice
+voiceTest.onclick = () => {
+  if (!recognition) {
+    alert('Please initialize voice recognition first!');
+    return;
+  }
+  
+  // Test the voice feedback by speaking a test message
+  const testMessage = 'Voice control system is working. Hello from your BOOM box!';
+  console.log('🎤 Test message:', testMessage);
+  
+  // You can also test the text-to-speech by calling the server
+  fetch('/api/voice/speak', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: testMessage })
+  }).then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        console.log('✅ Text-to-speech test successful');
+      }
+    })
+    .catch(error => console.error('Text-to-speech test error:', error));
+};
+
+// Manual test button for debugging
+const manualTestBtn = document.createElement('button');
+manualTestBtn.innerHTML = '<i class="bi-bug"></i> Manual Test';
+manualTestBtn.className = 'btn btn-warning btn-sm ms-2';
+manualTestBtn.onclick = () => {
+  console.log('🧪 Manual test: Simulating voice command "play"');
+  handleVoiceCommand('play');
+};
+  
+// Add manual test button after the voice test button
+voiceTest.parentNode.appendChild(manualTestBtn);
+
+// Voice recognition using Web Speech API
+let recognition = null;
+let isListening = false;
+
+// Initialize voice recognition
+function initVoiceRecognition() {
+  console.log('🎤 Initializing voice recognition...');
+  console.log('Browser support check:');
+  console.log('- SpeechRecognition:', 'SpeechRecognition' in window);
+  console.log('- webkitSpeechRecognition:', 'webkitSpeechRecognition' in window);
+  
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    try {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onstart = () => {
+        console.log('🎤 Voice recognition started');
+        voiceListening.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+        voiceListening.style.color = '#28a745';
+      };
+      
+      recognition.onresult = (event) => {
+        const command = event.results[0][0].transcript.toLowerCase().trim();
+        console.log('🎤 Voice command recognized:', command);
+        lastCommand.innerHTML = `<strong>Last Command:</strong> ${command}`;
+        
+        // Process the voice command
+        handleVoiceCommand(command);
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('Voice recognition error:', event.error);
+        voiceListening.innerHTML = '<i class="bi-mic-slash"></i> Error';
+        voiceListening.style.color = '#dc3545';
+      };
+      
+      recognition.onend = () => {
+        console.log('🎤 Voice recognition ended');
+        if (isListening) {
+          // Restart listening if still enabled
+          setTimeout(() => {
+            if (isListening) {
+              recognition.start();
+            }
+          }, 100);
+        } else {
+          voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
+          voiceListening.style.color = '#6c757d';
+        }
+      };
+      
+      console.log('✅ Voice recognition initialized successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Error creating SpeechRecognition:', error);
+      return false;
+    }
+  } else {
+    console.error('❌ Speech recognition not supported in this browser');
+    console.log('💡 Try using Chrome, Edge, or Safari for voice recognition');
+    return false;
+  }
+}
+
+// Start voice recognition
+function startVoiceRecognition() {
+  if (!recognition) {
+    if (!initVoiceRecognition()) {
+      alert('Voice recognition not supported in your browser. Try Chrome or Edge.');
+      return;
+    }
+  }
+  
+  isListening = true;
+  recognition.start();
+}
+
+// Stop voice recognition
+function stopVoiceRecognition() {
+  isListening = false;
+  if (recognition) {
+    recognition.stop();
+  }
+}
+
+// Handle voice commands from server
+async function handleVoiceCommand(command) {
+  console.log('Voice command received:', command);
+  
+  // Show command in UI
+  lastCommand.textContent = command;
+  voiceCommands.style.display = 'block';
+  
+  // Hide command display after 3 seconds
+  setTimeout(() => {
+    voiceCommands.style.display = 'none';
+  }, 3000);
+  
+  // Execute command based on voice input
+  switch (command) {
+    case 'play':
+      if (file.value && file.value !== '— files will appear here —') {
+        console.log('🎵 Voice command: Playing music');
+        play.click();
+      } else {
+        console.log('❌ Voice command: No file selected');
+        // Speak feedback
+        fetch('/api/voice/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: 'Please select a file first' })
+        });
+      }
+      break;
+      
+    case 'pause':
+      if (ghost.paused === false) {
+        console.log('⏸️ Voice command: Pausing music');
+        ghost.pause();
+        play.innerHTML = '<i class="bi-play-fill"></i> Play';
+        play.classList.remove('btn-success');
+        updateStatus('Paused', file.value);
+      }
+      break;
+      
+    case 'volume up':
+      const newVolUp = Math.min(100, parseInt(vol.value) + 10);
+      console.log('🔊 Voice command: Volume up to', newVolUp + '%');
+      vol.value = newVolUp;
+      volVal.textContent = newVolUp + '%';
+      ghost.volume = newVolUp / 100;
+      vol.dispatchEvent(new Event('input'));
+      break;
+      
+    case 'volume down':
+      const newVolDown = Math.max(0, parseInt(vol.value) - 10);
+      console.log('🔉 Voice command: Volume down to', newVolDown + '%');
+      vol.value = newVolDown;
+      volVal.textContent = newVolDown + '%';
+      ghost.volume = newVolDown / 100;
+      vol.dispatchEvent(new Event('input'));
+      break;
+      
+    case 'what song':
+      const currentSong = file.value || 'No song selected';
+      console.log('🎤 Voice command: Current song is', currentSong);
+      fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: `Currently playing: ${currentSong}` })
+      });
+      break;
+      
+    case 'help':
+      console.log('❓ Voice command: Showing help');
+      fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: 'Available commands: play, pause, volume up, volume down, what song, and help' })
+      });
+      break;
+      
+    case 'test':
+      console.log('🧪 Test voice command received - frontend communication working!');
+      // Show success message
+      lastCommand.textContent = 'TEST SUCCESS - Frontend communication working!';
+      voiceCommands.style.display = 'block';
+      setTimeout(() => {
+        voiceCommands.style.display = 'none';
+      }, 5000);
+      break;
+      
+    default:
+      console.log('❓ Voice command not recognized:', command);
+  }
+}
+
 // Add debug info
 console.log('Player initialized');
 console.log('Audio element:', ghost);
