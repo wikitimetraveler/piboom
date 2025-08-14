@@ -4,12 +4,15 @@ A retro-style audio player with **real voice control** that works on both Window
 
 ## ✨ Features
 
-- **🎵 Audio Playback**: MP3 support with play/pause, next/previous, volume control
-- **🎤 Real Voice Control**: Hands-free operation using your actual voice
-- **🗣️ Voice Feedback**: The system talks back to confirm your commands
-- **📱 Modern Web Interface**: Responsive design with VU meter visualization
-- **🔄 Cross-Platform**: Windows development mode + Raspberry Pi production mode
-- **🔧 Easy Mode Switching**: Simple command to switch between dev and production
+- 🎵 **Audio Playback**: MP3, WAV, FLAC, and more formats
+- 🎤 **Voice Activation**: Control playback with voice commands
+- 🔊 **Text-to-Speech**: Audible feedback and status updates
+- 🎛️ **Volume Control**: Hardware and software volume management
+- 🌐 **Web Interface**: Modern, responsive control panel
+- 📱 **Mobile Friendly**: Works on all devices
+- 🔄 **Cross-Platform**: Windows development, Raspberry Pi production
+- 🎧 **High-Quality Audio**: Hifime UAE23HD USB Type C DAC (Sabre ES9018 + SA9023) for superior sound
+- ⚡ **Real-time Control**: Instant response to voice commands
 
 ## 🎤 Voice Commands
 
@@ -148,7 +151,7 @@ boom/
 2. Create a feature branch
 3. Make your changes
 4. Test on both Windows and Pi
-5. Submit a pull request
+5. Submit a pull request 
 
 ## 📄 License
 
@@ -160,9 +163,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - `say` package for Windows text-to-speech
 - `espeak` for Raspberry Pi text-to-speech
 - Express.js community for the web framework
-- **Special thanks** to **David Lane** (Pure Mathematics degree, Computer Science minor, Youngstown State University, 1991) whose 30+ years of development experience guided this project's architecture and elegant solutions
-- **AI Collaboration**: This project demonstrates the power of human expertise combined with AI assistance (ChatGPT and Claude)
 
+- **Special thanks** to **David Lane** (B.S. Pure Mathematics , A.S. Computer Science, Youngstown State University 1991 whose 30+ years of development experience guided this project's architecture and elegant coding solutions
+- **AI Collaboration**: This project demonstrates the power of human expertise combined with AI assistance (ChatGPT and Cursor)
+ **Special thanks** to **Steven Wedekind** for his master craftmanship with all things crafted
 ---
-
+This shows that the BOOM box is the result of human mathematical ability + human craftmanship + development wisdom + AI collaboration - a perfect example of how the future of development should work! 🧮🤖🎵
 **🎤 Ready to rock with voice control? Initialize Voice and Start Listening!** 🎵✨

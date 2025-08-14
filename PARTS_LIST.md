@@ -28,8 +28,9 @@ Complete hardware and software components for the voice-controlled BOOM box audi
 - **Microphone Stand** - Adjustable positioning for optimal pickup
 
 ### Audio Processing
-- **Audio Mixer** (optional) - For multiple audio sources
-- **Pop Filter** - Reduces breath and plosive sounds
+- **Hifime UAE23HD USB Type C DAC** (Sabre ES9018 + SA9023) - High-quality digital-to-analog conversion for superior audio output
+- Audio interface for Raspberry Pi
+- Volume control system
 
 ## 📱 Display & Interface
 
