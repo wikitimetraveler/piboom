@@ -223,7 +223,7 @@ export class VoiceService {
       
       espeak.on('error', (error) => {
         console.log('espeak not available, falling back to console log');
-        console.log('Voice feedback:', text);
+        console.log('🎤 Voice feedback:', text);
       });
     } else if (process.platform === 'win32') {
       // Windows development mode - use say package for actual speech
