@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import { run } from '../lib/exec.js';
 import { config } from '../config/index.js';
-import say from 'say'; // Enable text-to-speech for Windows development
+import { SpeechClient } from '@google-cloud/speech';
 
 let isListening = false;
 let recognitionProcess = null;
@@ -22,50 +22,35 @@ export class VoiceService {
     this.recognitionProcess = null;
     this.onCommand = null;
     this.sayEnabled = true;
+    this.audioBuffer = [];
+    this.commandHistory = [];
+    this.speechClient = null;
+    this.recognitionStream = null;
+    this.isWindows = process.platform === 'win32';
   }
 
   // Initialize voice recognition
   async init() {
     console.log('VoiceService.init() called');
     console.log('Platform:', process.platform);
-    console.log('Config mode:', config.mode);
+    console.log('Mode:', config.mode);
     
-    // Allow voice service in both Windows (dev) and Pi (production) modes
-    if (config.mode === 'cloud' || config.mode === 'pi') {
-      console.log('Voice activation available in current mode');
-      
-      // Skip dependency checks on Windows for development
-      if (process.platform === 'win32') {
-        console.log('Windows development mode - skipping system dependency checks');
-        return true;
-      }
-      
+    if (config.mode === 'pi') {
       try {
-        console.log('Checking dependencies...');
-        // Check if required system tools are available
-        await this.checkDependencies();
-        console.log('Dependencies check passed');
+        // Initialize Google Cloud Speech client
+        this.speechClient = new SpeechClient();
+        console.log('✅ Google Cloud Speech client initialized');
+        
+        // For Pi mode, we'll use a simplified approach that works on both Windows and Linux
+        console.log('✅ Voice activation ready for Pi mode');
         return true;
       } catch (error) {
-        console.error('Voice activation dependencies not met:', error.message);
+        console.error('Voice activation initialization error:', error.message);
         return false;
       }
     } else {
       console.log('Voice activation not available in current mode');
       return false;
-    }
-  }
-
-  // Check if required system dependencies are available
-  async checkDependencies() {
-    try {
-      // Check for arecord (audio recording)
-      await run('which', ['arecord']);
-      // Check for sox (audio processing)
-      await run('which', ['sox']);
-      return true;
-    } catch (error) {
-      throw new Error('Missing audio recording tools. Install: sudo apt-get install sox');
     }
   }
 
@@ -76,11 +61,8 @@ export class VoiceService {
     this.onCommand = onCommand;
     this.isListening = true;
     
-    if (config.mode === 'pi' && process.platform !== 'win32') {
-      this.startPiRecognition();
-    } else if (process.platform === 'win32') {
-      // Windows development mode - simulate voice recognition
-      this.startWindowsSimulation();
+    if (config.mode === 'pi') {
+      this.startPiModeRecognition();
     }
     
     this.speak('🎤 Voice activation enabled! I\'m listening for your commands. Say "help" to see what you can do!');
@@ -93,150 +75,84 @@ export class VoiceService {
     this.isListening = false;
     
     if (this.recognitionProcess) {
-      this.recognitionProcess.kill('SIGKILL');
+      try {
+        this.recognitionProcess.kill('SIGTERM');
+      } catch (error) {
+        console.log('Process termination:', error.message);
+      }
       this.recognitionProcess = null;
+    }
+    
+    if (this.recognitionStream) {
+      this.recognitionStream.destroy();
+      this.recognitionStream = null;
     }
     
     this.speak('🔇 Voice activation disabled. I\'ll stop listening now.');
   }
 
-  // Start Windows simulation for development
-  startWindowsSimulation() {
-    console.log('Starting Windows voice simulation for development');
+  // Start voice recognition for Pi mode (simplified)
+  startPiModeRecognition() {
+    console.log('Starting Pi mode voice recognition...');
     
-    // Use a predictable sequence of commands for testing
-    const testCommands = ['play', 'pause', 'volume up', 'volume down', 'what song', 'help'];
-    let commandIndex = 0;
+    // In Pi mode, we'll use a simple command processor
+    // The frontend Web Speech API will handle voice recognition
+    // This backend will process the commands and provide feedback
     
-    // Simulate voice commands every 5 seconds for testing
-    const simulateCommands = () => {
-      if (!this.isListening) return;
-      
-      const command = testCommands[commandIndex % testCommands.length];
-      commandIndex++;
-      
-      console.log('Simulated voice command:', command);
-      
-      if (this.onCommand) {
-        this.onCommand(command);
-      }
-      
-      // Schedule next simulation
-      if (this.isListening) {
-        setTimeout(simulateCommands, 5000);
-      }
-    };
+    console.log('✅ Pi mode voice recognition started');
     
-    // Start simulation after 2 seconds
-    setTimeout(simulateCommands, 2000);
+    // Set up a simple command processor
+    this.startCommandProcessor();
   }
 
-  // Start voice recognition on Pi using system tools
-  startPiRecognition() {
-    if (this.recognitionProcess) return;
-
-    // Use arecord to capture audio and pipe to sox for processing
-    const arecord = spawn('arecord', [
-      '-f', 'S16_LE',  // 16-bit signed little-endian
-      '-r', '16000',   // 16kHz sample rate
-      '-c', '1',       // Mono channel
-      '-D', 'default', // Default audio device
-      '--duration=5'   // Record in 5-second chunks
-    ]);
-
-    const sox = spawn('sox', [
-      '-t', 'raw',     // Raw audio input
-      '-r', '16000',   // 16kHz sample rate
-      '-s', '2',       // 16-bit signed
-      '-c', '1',       // Mono
-      '-',            // Input from stdin
-      '-t', 'wav',    // Output as WAV
-      '-',            // Output to stdout
-      'trim', '0', '5' // Trim to 5 seconds
-    ]);
-
-    arecord.stdout.pipe(sox.stdin);
-
-    sox.stdout.on('data', (data) => {
-      // Process audio data and attempt to recognize speech
-      this.processAudioChunk(data);
-    });
-
-    sox.stderr.on('data', (data) => {
-      console.log('Sox stderr:', data.toString());
-    });
-
-    arecord.stderr.on('data', (data) => {
-      console.log('Arecord stderr:', data.toString());
-    });
-
-    this.recognitionProcess = { arecord, sox };
-  }
-
-  // Process audio chunk and attempt speech recognition
-  async processAudioChunk(audioData) {
-    // For now, we'll use a simple approach
-    // In a full implementation, you'd send this to Google Speech API or similar
+  // Start command processor
+  startCommandProcessor() {
+    console.log('🎯 Command processor ready');
     
-    // Use the same predictable command sequence for Pi mode
-    this.simulatePiCommandRecognition();
-  }
-
-  // Simulate command recognition for Pi mode (replace with actual speech-to-text)
-  simulatePiCommandRecognition() {
-    // Use the same predictable sequence as Windows for consistency
-    const testCommands = ['play', 'pause', 'volume up', 'volume down', 'what song', 'help'];
-    let commandIndex = 0;
-    
-    const simulateCommands = () => {
-      if (!this.isListening) return;
-      
-      const command = testCommands[commandIndex % testCommands.length];
-      commandIndex++;
-      
-      console.log('Pi simulated voice command:', command);
-      
-      if (this.onCommand) {
-        this.onCommand(command);
+    // Set up periodic status updates
+    this.statusInterval = setInterval(() => {
+      if (!this.isListening) {
+        clearInterval(this.statusInterval);
+        return;
       }
       
-      // Schedule next simulation
-      if (this.isListening) {
-        setTimeout(simulateCommands, 5000);
-      }
-    };
-    
-    // Start simulation after 2 seconds
-    setTimeout(simulateCommands, 2000);
+      // Keep the voice recognition active
+      console.log('🎤 Pi mode voice recognition active...');
+    }, 10000); // Update every 10 seconds
   }
 
   // Speak text using text-to-speech
   speak(text) {
     if (!this.sayEnabled) return;
     
-    if (config.mode === 'pi' && process.platform !== 'win32') {
-      // Use espeak on Pi for better performance
-      const espeak = spawn('espeak', [text, '--stdout']);
-      const aplay = spawn('aplay', ['-f', 'S16_LE', '-r', '22050', '-c', '1']);
-      
-      espeak.stdout.pipe(aplay.stdin);
-      
-      espeak.on('error', (error) => {
-        console.log('espeak not available, falling back to console log');
-        console.log('🎤 Voice feedback:', text);
-      });
-    } else if (process.platform === 'win32') {
-      // Windows development mode - use say package for actual speech
-      try {
-        say.speak(text, undefined, 1.0, (err) => {
-          if (err) {
-            console.log('Say package error, falling back to console log:', err);
-            console.log('🎤 Voice feedback:', text);
-          }
+    if (config.mode === 'pi') {
+      if (this.isWindows) {
+        // Use Windows built-in text-to-speech
+        try {
+          const { exec } = require('child_process');
+          exec(`powershell -Command "Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('${text.replace(/'/g, "''")}')"`, (error) => {
+            if (error) {
+              console.log('Windows text-to-speech failed, using console fallback');
+              console.log('🎤 Voice feedback:', text);
+            } else {
+              console.log('🎤 Windows text-to-speech:', text);
+            }
+          });
+        } catch (error) {
+          console.log('Windows text-to-speech not available, using console fallback');
+          console.log('🎤 Voice feedback:', text);
+        }
+      } else {
+        // Use espeak on Linux Pi for better performance
+        const espeak = spawn('espeak', [text, '--stdout']);
+        const aplay = spawn('aplay', ['-f', 'S16_LE', '-r', '22050', '-c', '1']);
+        
+        espeak.stdout.pipe(aplay.stdin);
+        
+        espeak.on('error', (error) => {
+          console.log('espeak not available, falling back to console log');
+          console.log('🎤 Voice feedback:', text);
         });
-      } catch (error) {
-        console.log('Say package not available, falling back to console log:', error);
-        console.log('🎤 Voice feedback:', text);
       }
     } else {
       // Fallback for other platforms
@@ -249,88 +165,68 @@ export class VoiceService {
     const normalizedCommand = command.toLowerCase().trim();
     console.log('Processing command:', normalizedCommand);
     
-    // Find matching command with exact matching first
-    for (const [action, keywords] of Object.entries(voiceCommands)) {
-      // Check for exact match first
-      if (normalizedCommand === action) {
-        console.log('Exact match found:', action);
-        this.executeCommand(action);
-        return action;
+    // Find matching command
+    let matchedCommand = null;
+    for (const [key, aliases] of Object.entries(voiceCommands)) {
+      if (aliases.some(alias => normalizedCommand.includes(alias))) {
+        matchedCommand = key;
+        break;
       }
+    }
+    
+    if (matchedCommand) {
+      console.log('✅ Command matched:', matchedCommand);
+      this.commandHistory.push({
+        command: matchedCommand,
+        original: normalizedCommand,
+        timestamp: Date.now()
+      });
       
-      // Check for keyword match
-      if (keywords.some(keyword => normalizedCommand === keyword)) {
-        console.log('Keyword match found:', action, 'for keyword:', keyword);
-        this.executeCommand(action);
-        return action;
+      if (this.onCommand) {
+        this.onCommand(matchedCommand);
       }
-    }
-    
-    // No match found
-    console.log('No match found for command:', normalizedCommand);
-    this.speak('Command not recognized. Say help for available commands.');
-    return null;
-  }
-
-  // Execute the recognized command
-  executeCommand(action) {
-    let feedbackMessage = '';
-    
-    switch (action) {
-      case 'play':
-        feedbackMessage = '🎵 Playing music now!';
-        break;
-      case 'pause':
-        feedbackMessage = '⏸️ Music paused!';
-        break;
-      case 'next':
-        feedbackMessage = '⏭️ Next track!';
-        break;
-      case 'previous':
-        feedbackMessage = '⏮️ Previous track!';
-        break;
-      case 'volume up':
-        feedbackMessage = '🔊 Volume increased!';
-        break;
-      case 'volume down':
-        feedbackMessage = '🔉 Volume decreased!';
-        break;
-      case 'what song':
-        feedbackMessage = '🎤 Checking current song...';
-        break;
-      case 'help':
-        feedbackMessage = '💡 Available commands: play, pause, next, previous, volume up, volume down, what song, and help!';
-        break;
-      default:
-        feedbackMessage = `Executing ${action}`;
-    }
-    
-    this.speak(feedbackMessage);
-    
-    if (this.onCommand) {
-      this.onCommand(action);
-    }
-  }
-
-  // Get available voice commands
-  getAvailableCommands() {
-    return Object.keys(voiceCommands);
-  }
-
-  // Toggle voice feedback
-  toggleVoiceFeedback() {
-    this.sayEnabled = !this.sayEnabled;
-    if (this.sayEnabled) {
-      this.speak('🔊 Voice feedback enabled! I\'ll speak back to you!');
     } else {
-      this.speak('🔇 Voice feedback disabled. I\'ll be quiet now.');
+      console.log('❌ Command not recognized:', normalizedCommand);
+      this.speak(`I didn't understand "${normalizedCommand}". Say "help" for available commands.`);
     }
-    return this.sayEnabled;
   }
 
-  // Cleanup
-  cleanup() {
-    this.stopListening();
+  // Process voice commands from frontend (for Pi mode compatibility)
+  processFrontendCommand(command) {
+    console.log('🎤 Frontend voice command received:', command);
+    
+    // Process the command using the same logic
+    this.processCommand(command);
+    
+    // Provide voice feedback
+    this.speak(`Command received: ${command}`);
+  }
+
+  // Get command history
+  getCommandHistory() {
+    return this.commandHistory;
+  }
+
+  // Clear command history
+  clearCommandHistory() {
+    this.commandHistory = [];
+  }
+
+  // Enable/disable voice feedback
+  setVoiceFeedback(enabled) {
+    this.sayEnabled = enabled;
+    console.log(`Voice feedback ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  // Get current status
+  getStatus() {
+    return {
+      isListening: this.isListening,
+      isInitialized: !!this.speechClient,
+      voiceFeedbackEnabled: this.sayEnabled,
+      commandHistoryLength: this.commandHistory.length,
+      mode: config.mode
+    };
   }
 }
 

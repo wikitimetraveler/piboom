@@ -23,14 +23,20 @@ app.locals.io = io;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api', buildRoutes(io));
 
-app.get('/health', (req,res)=>res.json({ok:true, mode: config.mode}));
+app.get('/health', (req,res)=>res.json({ok:true, mode: config.mode, platform: process.platform}));
 
 app.get('*', (req,res)=>{
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 server.listen(config.port, ()=>{
-  console.log(`ICE Zen listening on http://localhost:${config.port}`);
-  console.log(`Mode: ${config.mode} | Music dir: ${config.musicDir}`);
-  console.log(`Socket.IO server ready for voice commands`);
+  console.log(`🎵 Pi BOOM Audio System listening on http://localhost:${config.port}`);
+  console.log(`🔧 Mode: ${config.mode} | Platform: ${process.platform}`);
+  console.log(`🎤 Music directory: ${config.musicDir}`);
+  console.log(`🔊 Voice activation: ${config.mode === 'pi' ? 'ENABLED' : 'DISABLED'}`);
+  console.log(`📡 Socket.IO server ready for voice commands`);
+  
+  if (config.mode === 'pi') {
+    console.log(`🎯 Pi mode active - using local audio playback and voice recognition`);
+  }
 });

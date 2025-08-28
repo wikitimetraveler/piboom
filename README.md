@@ -1,172 +1,207 @@
-# 🎵 BOOM Box - Voice-Controlled Audio Player
+# 🎵 Pi BOOM Audio System
 
-A retro-style audio player with **real voice control** that works on both Windows (development) and Raspberry Pi (production). Built with Node.js, Express, and Web Speech API.
+A Raspberry Pi-powered audio system with voice activation, designed for hands-free music control and high-quality audio playback.
 
 ## ✨ Features
 
-- 🎵 **Audio Playback**: MP3, WAV, FLAC, and more formats
-- 🎤 **Voice Activation**: Control playback with voice commands
-- 🔊 **Text-to-Speech**: Audible feedback and status updates
-- 🎛️ **Volume Control**: Hardware and software volume management
-- 🌐 **Web Interface**: Modern, responsive control panel
-- 📱 **Mobile Friendly**: Works on all devices
-- 🔄 **Cross-Platform**: Windows development, Raspberry Pi production
-- 🎧 **High-Quality Audio**: Hifime UAE23HD USB Type C DAC (Sabre ES9018 + SA9023) for superior sound
-- ⚡ **Real-time Control**: Instant response to voice commands
+- **🎤 Voice Commands**: Control music with natural voice commands
+- **🔊 High-Quality Audio**: Local audio playback using mpg123
+- **🎵 Music Library**: Support for MP3, WAV, and FLAC formats
+- **📱 Web Interface**: Touch-friendly web UI for manual control
+- **🔊 System Volume Control**: Hardware volume control via amixer/pactl
+- **🎤 Text-to-Speech**: Voice feedback using espeak
+- **📡 Real-time Communication**: Socket.IO for instant voice command processing
+
+## 🚀 Quick Start (Raspberry Pi)
+
+### 1. Clone and Setup
+```bash
+git clone <your-repo-url>
+cd piBoom
+chmod +x setup-pi.sh
+./setup-pi.sh
+```
+
+### 2. Start the System
+```bash
+npm run pi
+```
+
+### 3. Open Web Interface
+Navigate to `http://localhost:3000` in your browser
+
+### 4. Initialize Voice
+Click "Initialize Voice" button to start voice recognition
 
 ## 🎤 Voice Commands
 
-Say these commands to control your BOOM box:
+| Command | Aliases | Action |
+|---------|---------|---------|
+| **play** | start, begin, go | Start playing current track |
+| **pause** | stop, halt, wait | Pause current track |
+| **next** | skip, forward, advance | Skip to next track |
+| **previous** | back, rewind, last | Go to previous track |
+| **volume up** | louder, turn up | Increase volume by 10% |
+| **volume down** | quieter, turn down | Decrease volume by 10% |
+| **what song** | what track, current song | Announce current track |
+| **help** | commands, what can you do | List available commands |
 
-- **"play"** or **"start"** → Start music playback
-- **"pause"** or **"stop"** → Pause music
-- **"next"** or **"skip"** → Next track
-- **"previous"** or **"back"** → Previous track  
-- **"volume up"** or **"louder"** → Increase volume
-- **"volume down"** or **"quieter"** → Decrease volume
-- **"what song"** → Show current track info
-- **"help"** → List available commands
+## 🛠️ System Requirements
 
-## 🛠️ Technical Stack
+- **Hardware**: Raspberry Pi 3B+ or newer (4B recommended)
+- **OS**: Raspberry Pi OS (Bullseye or newer)
+- **Storage**: 8GB+ SD card
+- **Audio**: Built-in audio or USB audio interface
+- **Microphone**: USB microphone or built-in mic (Pi 4)
 
-- **Backend**: Node.js + Express
-- **Audio**: `play-sound` library, `mpg123` (Pi mode)
-- **Voice Recognition**: Web Speech API (browser-based)
-- **Text-to-Speech**: `say` package (Windows), `espeak` (Pi)
-- **Frontend**: Vanilla JavaScript, Web Audio API
-- **Real-time**: Socket.IO for communication
+## 📦 Dependencies
 
-## 🚀 Quick Start
+### System Tools
+- `sox` - Audio processing
+- `alsa-utils` - Audio recording and playback
+- `espeak-ng` - Text-to-speech
+- `mpg123` - MP3 playback
+- `libasound2-dev` - ALSA development libraries
+- `portaudio19-dev` - PortAudio development libraries
 
-### Prerequisites
-- Node.js 18+ 
-- Windows 10/11 (development) or Raspberry Pi (production)
-
-### Installation
-```bash
-git clone <your-repo>
-cd boom
-npm install
-```
-
-### Development Mode (Windows)
-```bash
-# Start the server
-npm start
-
-# Open http://localhost:3000/player.html
-# Initialize Voice → Start Listening → Speak commands!
-```
-
-### Production Mode (Raspberry Pi)
-```bash
-# Switch to Pi mode
-node switch-mode.js pi
-
-# Install system dependencies
-sudo apt install sox espeak-ng alsa-utils
-
-# Start the server
-npm start
-```
-
-## 🎯 Usage
-
-### Voice Control Setup
-1. **Initialize Voice** - Sets up speech recognition
-2. **Start Listening** - Microphone activates, listens for commands
-3. **Speak Commands** - Use natural language to control playback
-4. **Stop Listening** - Deactivates microphone
-
-### Manual Controls
-- **File Selection**: Choose from your music library
-- **Playback Controls**: Standard play/pause/next/previous buttons
-- **Volume Slider**: Adjust audio level
-- **VU Meter**: Visual audio level indicator
+### Node.js Packages
+- `express` - Web server
+- `socket.io` - Real-time communication
+- `play-sound` - Audio playback interface
+- `@google-cloud/speech` - Speech recognition (optional)
 
 ## 🔧 Configuration
 
-### Environment Variables
-```bash
-MODE=cloud|pi          # Operating mode
-MUSIC_DIR=./music      # Music directory path
-PORT=3000              # Server port
-```
+### Audio Settings
+- **Sample Rate**: 16kHz for voice recognition
+- **Channels**: Mono for voice, Stereo for music
+- **Format**: 16-bit signed little-endian
 
-### Easy Mode Switching
-```bash
-# Switch to Windows development mode
-node switch-mode.js cloud
-
-# Switch to Raspberry Pi production mode  
-node switch-mode.js pi
-```
-
-## 🍓 Deployment to Pi
-
-1. **Transfer files** to Raspberry Pi
-2. **Switch to Pi mode**: `node switch-mode.js pi`
-3. **Install dependencies**: `sudo apt install sox espeak-ng alsa-utils`
-4. **Start server**: `npm start`
-5. **Access from network**: `http://[pi-ip]:3000/player.html`
+### Voice Recognition
+- **Engine**: Google Speech API (configurable)
+- **Language**: English (configurable)
+- **Timeout**: 3-second audio chunks
+- **Silence Removal**: Automatic silence detection
 
 ## 📁 Project Structure
+
 ```
-boom/
-├── config/           # Configuration files
-├── controllers/      # API controllers
-├── lib/             # Utility libraries
-├── music/           # Music files directory
-├── public/          # Web interface files
-├── routes/          # API routes
-├── services/        # Business logic services
-├── server.js        # Main server file
-├── switch-mode.js   # Mode switching utility
-└── README.md        # This file
+piBoom/
+├── config/          # Configuration files
+├── controllers/     # API controllers
+├── lib/            # Utility libraries
+├── music/          # Music library
+├── public/         # Web interface
+├── routes/         # API routes
+├── services/       # Core services
+├── setup-pi.sh     # Pi setup script
+└── server.js       # Main server
 ```
 
-## 🎵 Supported Audio Formats
-- MP3 (primary)
-- WAV
-- Other formats supported by `play-sound` library
+## 🎯 Pi Mode Features
+
+- **Local Audio Playback**: Direct hardware audio output
+- **System Volume Control**: Hardware volume via amixer
+- **Voice Recognition**: Real-time microphone input
+- **Text-to-Speech**: Local espeak synthesis
+- **Audio Processing**: Real-time audio analysis
 
 ## 🔍 Troubleshooting
 
+### Microphone Issues
+```bash
+# Check microphone permissions
+groups $USER
+
+# List audio devices
+arecord -l
+aplay -l
+
+# Test microphone
+arecord --duration=5 test.wav
+aplay test.wav
+```
+
+### Audio Playback Issues
+```bash
+# Check volume
+amixer sget Master
+
+# Set volume
+amixer sset Master 70%
+
+# Test audio
+mpg123 --version
+```
+
 ### Voice Recognition Issues
-- **Browser Compatibility**: Use Chrome, Edge, or Safari
-- **Microphone Permissions**: Allow microphone access when prompted
-- **HTTPS Required**: Some browsers require HTTPS for microphone access
+```bash
+# Check espeak
+espeak "test" --stdout | aplay
 
-### Audio Issues
-- **Windows**: Ensure audio drivers are installed
-- **Pi**: Check ALSA configuration and audio output
+# Check sox
+sox --version
 
-### Development vs Production
-- **Windows**: Uses Web Speech API + `say` package
-- **Pi**: Uses system audio tools (`arecord`, `espeak`)
+# Restart audio service
+sudo systemctl restart alsa-utils
+```
+
+## 🚀 Deployment
+
+### Production Setup
+1. Run `./setup-pi.sh` for initial setup
+2. Configure audio devices in `~/.asoundrc`
+3. Set up auto-start with systemd
+4. Configure firewall rules
+5. Set up SSL certificates (optional)
+
+### Auto-start Service
+```bash
+sudo nano /etc/systemd/system/pi-boom.service
+```
+
+```ini
+[Unit]
+Description=Pi BOOM Audio System
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/piBoom
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+```bash
+sudo systemctl enable pi-boom
+sudo systemctl start pi-boom
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test on both Windows and Pi
-5. Submit a pull request 
+4. Test on Raspberry Pi
+5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-- Web Speech API for voice recognition
-- `say` package for Windows text-to-speech
-- `espeak` for Raspberry Pi text-to-speech
-- Express.js community for the web framework
+- Raspberry Pi Foundation for the amazing hardware
+- ALSA project for audio support
+- Node.js community for the runtime
+- Open source audio tools (sox, espeak, mpg123)
 
-- **Special thanks** to **David Lane** (B.S. Pure Mathematics , A.S. Computer Science, Youngstown State University 1991 whose 30+ years of development experience guided this project's architecture and elegant coding solutions
-- **AI Collaboration**: This project demonstrates the power of human expertise combined with AI assistance (ChatGPT and Cursor)
- **Special thanks** to **Steven Wedekind** for his master craftmanship with all things crafted
 ---
-This shows that the BOOM box is the result of human mathematical ability + human craftmanship + development wisdom + AI collaboration - a perfect example of how the future of development should work! 🧮🤖🎵
-**🎤 Ready to rock with voice control? Initialize Voice and Start Listening!** 🎵✨
+
+**🎵 Pi BOOM - Your Voice-Controlled Audio Companion! 🎵**

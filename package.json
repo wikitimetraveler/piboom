@@ -1,11 +1,13 @@
 {
-  "name": "ice-zen",
+  "name": "pi-boom",
   "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "NODE_ENV=development node server.js"
+    "dev": "NODE_ENV=development node server.js",
+    "pi": "MODE=pi node server.js",
+    "install-pi-deps": "sudo apt update && sudo apt install -y sox alsa-utils espeak-ng mpg123"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
@@ -13,7 +15,9 @@
     "play-sound": "^1.1.6",
     "socket.io": "^4.7.5",
     "node-record-lpcm16": "^1.0.1",
-    "@google-cloud/speech": "^6.0.0",
-    "say": "^0.16.0"
+    "@google-cloud/speech": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Recognition Test - PiBoom</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <style>
+        body { padding: 20px; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        .command { background-color: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎤 Voice Recognition Test</h1>
+        <p>This page tests if voice recognition is working on your Windows system.</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Voice Recognition Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="status" class="status info">Initializing...</div>
+                        <button id="initBtn" class="btn btn-primary">Initialize Voice</button>
+                        <button id="startBtn" class="btn btn-success" disabled>Start Listening</button>
+                        <button id="stopBtn" class="btn btn-danger" disabled>Stop Listening</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Voice Commands</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="commands" class="status info">No commands yet</div>
+                        <small class="text-muted">
+                            Try saying: "play", "pause", "volume up", "help"
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Test Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="results"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <a href="/player.html" class="btn btn-outline-primary">← Back to Player</a>
+        </div>
+    </div>
+
+    <script>
+        const initBtn = document.getElementById('initBtn');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const status = document.getElementById('status');
+        const commands = document.getElementById('commands');
+        const results = document.getElementById('results');
+        
+        let recognition = null;
+        let isListening = false;
+        let commandCount = 0;
+        
+        function updateStatus(message, type = 'info') {
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
+        // Initialize voice recognition
+        initBtn.onclick = async () => {
+            try {
+                initBtn.disabled = true;
+                updateStatus('Checking Web Speech API...', 'info');
+                
+                // Check if Web Speech API is available
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    throw new Error('Web Speech API not supported in this browser');
+                }
+                
+                updateStatus('Initializing voice recognition...', 'info');
+                
+                // Initialize frontend voice recognition
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+                
+                // Set up recognition event handlers
+                recognition.onstart = () => {
+                    updateStatus('Voice recognition started', 'success');
+                    addResult('Voice recognition started successfully', 'success');
+                };
+                
+                recognition.onresult = (event) => {
+                    const transcript = Array.from(event.results)
+                        .map(result => result[0])
+                        .map(result => result.transcript)
+                        .join('');
+                    
+                    commandCount++;
+                    commands.textContent = `Command ${commandCount}: "${transcript}"`;
+                    addResult(`Voice input: "${transcript}"`, 'command');
+                    
+                    // Process the voice command
+                    processVoiceCommand(transcript.toLowerCase().trim());
+                };
+                
+                recognition.onerror = (event) => {
+                    console.error('Voice recognition error:', event.error);
+                    if (event.error === 'not-allowed') {
+                        updateStatus('Microphone Access Denied', 'error');
+                        addResult('Error: Microphone access denied', 'error');
+                    } else {
+                        updateStatus(`Recognition Error: ${event.error}`, 'error');
+                        addResult(`Error: ${event.error}`, 'error');
+                    }
+                };
+                
+                recognition.onend = () => {
+                    updateStatus('Voice recognition ended', 'info');
+                    if (isListening) {
+                        // Restart if we're supposed to be listening
+                        recognition.start();
+                    }
+                };
+                
+                // Test the recognition system
+                updateStatus('Testing recognition system...', 'info');
+                await recognition.start();
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Give it a second to start
+                recognition.stop();
+                
+                updateStatus('Voice recognition ready!', 'success');
+                addResult('Voice recognition system initialized successfully', 'success');
+                
+                // Enable the start listening button
+                startBtn.disabled = false;
+                startBtn.innerHTML = 'Start Listening';
+                
+                speakText('Voice recognition system is ready!');
+                
+            } catch (error) {
+                console.error('Voice init error:', error);
+                updateStatus(`Error: ${error.message}`, 'error');
+                addResult(`Initialization failed: ${error.message}`, 'error');
+            } finally {
+                initBtn.disabled = false;
+            }
+        };
+        
+        // Start listening
+        startBtn.onclick = () => {
+            try {
+                if (!recognition) {
+                    throw new Error('Voice recognition not initialized');
+                }
+                
+                recognition.start();
+                isListening = true;
+                
+                startBtn.disabled = true;
+                startBtn.innerHTML = 'Listening...';
+                stopBtn.disabled = false;
+                
+                updateStatus('Listening for voice commands...', 'success');
+                addResult('Started listening for voice commands', 'success');
+                
+                speakText('I\'m listening for your commands. Try saying play, pause, or help.');
+                
+            } catch (error) {
+                console.error('Voice start error:', error);
+                updateStatus(`Error: ${error.message}`, 'error');
+                addResult(`Failed to start: ${error.message}`, 'error');
+            }
+        };
+        
+        // Stop listening
+        stopBtn.onclick = () => {
+            try {
+                if (recognition) {
+                    recognition.stop();
+                }
+                isListening = false;
+                
+                startBtn.disabled = false;
+                startBtn.innerHTML = 'Start Listening';
+                stopBtn.disabled = true;
+                
+                updateStatus('Stopped listening', 'info');
+                addResult('Stopped listening for voice commands', 'info');
+                
+                speakText('Stopped listening for commands.');
+                
+            } catch (error) {
+                console.error('Voice stop error:', error);
+                updateStatus(`Error: ${error.message}`, 'error');
+            }
+        };
+        
+        // Process voice commands
+        function processVoiceCommand(command) {
+            addResult(`Processing command: "${command}"`, 'info');
+            
+            switch (command) {
+                case 'play':
+                    speakText('Play command recognized');
+                    break;
+                case 'pause':
+                    speakText('Pause command recognized');
+                    break;
+                case 'volume up':
+                    speakText('Volume up command recognized');
+                    break;
+                case 'volume down':
+                    speakText('Volume down command recognized');
+                    break;
+                case 'help':
+                    speakText('Help command recognized. Available commands are play, pause, volume up, volume down, and help.');
+                    break;
+                case 'test':
+                    speakText('Test command recognized. Voice recognition is working perfectly!');
+                    break;
+                default:
+                    // Try to find partial matches
+                    if (command.includes('play') || command.includes('start')) {
+                        speakText('Play command recognized from partial match');
+                    } else if (command.includes('pause') || command.includes('stop')) {
+                        speakText('Pause command recognized from partial match');
+                    } else if (command.includes('volume') && command.includes('up')) {
+                        speakText('Volume up command recognized from partial match');
+                    } else if (command.includes('volume') && command.includes('down')) {
+                        speakText('Volume down command recognized from partial match');
+                    } else if (command.includes('help')) {
+                        speakText('Help command recognized from partial match');
+                    } else {
+                        speakText(`I didn't understand "${command}". Try saying help for available commands.`);
+                    }
+            }
+        }
+        
+        // Auto-initialize on page load
+        window.onload = () => {
+            updateStatus('Ready to initialize voice recognition', 'info');
+            addResult('Page loaded, ready for voice recognition test', 'info');
+        };
+    </script>
+</body>
+</html>

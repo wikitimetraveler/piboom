@@ -7,7 +7,8 @@ import {
   toggleVoiceFeedback,
   speakText,
   getVoiceCommands,
-  getLastVoiceCommand
+  getLastVoiceCommand,
+  processFrontendVoiceCommand
 } from '../controllers/voice.controller.js';
 
 const router = express.Router();
@@ -35,5 +36,8 @@ router.get('/commands', getVoiceCommands);
 
 // Fallback: Get last voice command
 router.get('/last-command', getLastVoiceCommand);
+
+// Handle frontend voice commands (for Windows compatibility)
+router.post('/frontend-command', processFrontendVoiceCommand);
 
 export default router;

@@ -7,9 +7,8 @@ import { run } from '../lib/exec.js';
 let Player = null;
 let currentProc = null;
 
-if (config.mode === 'pi') {
-  Player = PlayerLib({ players: ['mpg123'] });
-}
+// Pi mode only - use mpg123 for audio playback
+Player = PlayerLib({ players: ['mpg123'] });
 
 export function listFiles(musicDir) {
   if (!fs.existsSync(musicDir)) return [];
@@ -23,11 +22,6 @@ export function playFile(musicDir, filename, onEnd) {
   const full = path.join(musicDir, safe);
   if (!fs.existsSync(full)) throw new Error('FILE_NOT_FOUND');
 
-  if (config.mode === 'cloud') {
-    // Let the browser stream; server doesn't play audio in cloud mode.
-    return { playing: true, file: safe, mode: 'cloud' };
-  }
-
   // Pi mode: use mpg123 via play-sound
   stop();
   currentProc = Player.play(full, err => {
@@ -38,7 +32,6 @@ export function playFile(musicDir, filename, onEnd) {
 }
 
 export function stop() {
-  if (config.mode === 'cloud') return { playing: false, mode: 'cloud' };
   if (currentProc) {
     try { currentProc.kill('SIGKILL'); } catch {}
     currentProc = null;
@@ -48,23 +41,21 @@ export function stop() {
 
 export async function setVolume(percent) {
   const level = Math.max(0, Math.min(100, Number(percent) || 0));
-  if (config.mode === 'cloud') return { level, mode: 'cloud' };
-  
-  // Check if we're on Windows
-  const isWindows = process.platform === 'win32';
   
   try {
-    if (isWindows) {
-      // On Windows, we can't easily control system volume from Node.js
-      // The browser handles volume control in cloud mode anyway
-      console.log('System volume control not available on Windows (using browser volume)');
-    } else {
-      // Linux/Unix systems can use amixer
-      await run('amixer', ['sset', 'Master', `${level}%`]);
-    }
+    // Use amixer for volume control on Pi
+    await run('amixer', ['sset', 'Master', `${level}%`]);
+    console.log(`Volume set to ${level}%`);
   } catch (error) {
     console.log('Volume control not available:', error.message);
+    // Fallback: try using pactl if amixer fails
+    try {
+      await run('pactl', ['set-sink-volume', '@DEFAULT_SINK@', `${level}%`]);
+      console.log(`Volume set to ${level}% using pactl`);
+    } catch (pactlError) {
+      console.log('Pactl volume control also failed:', pactlError.message);
+    }
   }
   
-  return { level, mode: config.mode };
+  return { level, mode: 'pi' };
 }

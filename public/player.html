@@ -66,9 +66,21 @@
               <button id="voiceFeedback" class="btn btn-outline-info mr-2">
                 <i class="bi-volume-up"></i> Toggle Feedback
               </button>
-              <button id="voiceTest" class="btn btn-outline-secondary">
-                <i class="bi-chat"></i> Test Voice
-              </button>
+                             <button id="voiceTest" class="btn btn-outline-secondary">
+                 <i class="bi-chat"></i> Test Voice
+               </button>
+               <button id="voiceDebug" class="btn btn-outline-warning ml-2">
+                 <i class="bi-bug"></i> Debug Voice
+               </button>
+               <button id="voiceReset" class="btn btn-outline-danger ml-2">
+                 <i class="bi-arrow-clockwise"></i> Reset Voice
+               </button>
+               <button id="voiceShutdown" class="btn btn-danger ml-2">
+                 <i class="bi-power"></i> Shutdown Voice
+               </button>
+               <button id="pauseTest" class="btn btn-outline-warning ml-2">
+                 <i class="bi-pause"></i> Test Pause
+               </button>
             </div>
           </div>
           <div class="col-md-6">
@@ -82,8 +94,9 @@
             <div class="mt-2">
               <small class="text-muted">
                 <strong>Voice Commands:</strong><br>
-                "Play", "Pause", "Next", "Previous"<br>
-                "Volume Up", "Volume Down", "What Song", "Help"
+                "Play", "Pause", "Stop", "Next", "Previous"<br>
+                "Volume Up", "Volume Down", "What Song", "Help"<br>
+                <em>Works offline using your browser's built-in voice recognition!</em>
               </small>
             </div>
           </div>
@@ -109,17 +122,66 @@
           </small>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+         </div>
+   </div>
+ </div>
 
-<script src="/scripts.js"></script>
+ <!-- Footer -->
+ <footer class="text-center py-4 mt-5">
+   <div class="container">
+     <hr class="my-3">
+     <p class="text-muted mb-0">
+               <strong>David and Steven's Pi Project #1</strong> | 
+       <span id="currentDate"></span> | 
+       <em>Powered by AI</em>
+     </p>
+   </div>
+ </footer>
+
+ <!-- Socket.IO client -->
+ <script src="/socket.io/socket.io.js"></script>
+ <script src="/scripts.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const file = $('#fileSelect'), play=$('#play'), stopBtn=$('#stop'), vol=$('#vol'), volVal=$('#volVal');
 let ghost = document.getElementById('ghost'), canvas=document.getElementById('vu'), ctx=canvas.getContext('2d');
 const audioStatus = $('#audioStatus'), audioMode = $('#audioMode'), currentFile = $('#currentFile');
 let audioCtx, analyser, data;
+
+// Socket.IO connection for voice commands
+let socket = null;
+
+// Initialize Socket.IO connection
+function initSocketIO() {
+  try {
+    socket = io();
+    
+    socket.on('connect', () => {
+      console.log('✅ Connected to server via Socket.IO');
+    });
+    
+    socket.on('disconnect', () => {
+      console.log('❌ Disconnected from server');
+    });
+    
+    // Listen for voice commands from the server
+    socket.on('voiceCommand', (data) => {
+      console.log('🎤 Voice command received from server:', data);
+      
+      if (data.command && data.action === 'execute') {
+        // Process the voice command from the server
+        handleVoiceCommand(data.command);
+      }
+    });
+    
+    socket.on('connect_error', (error) => {
+      console.error('Socket.IO connection error:', error);
+    });
+    
+  } catch (error) {
+    console.error('Socket.IO initialization error:', error);
+  }
+}
 
 // Update status display
 function updateStatus(status, file = null) {
@@ -415,6 +477,7 @@ function draw(){
     ctx.fillStyle = '#38bdf8'; ctx.fillRect(x, h-bh, bw, bh);
   }
 }
+
 // Voice Control System
 const voiceInit = $('#voiceInit');
 const voiceStart = $('#voiceStart');
@@ -428,6 +491,42 @@ const voiceCommands = $('#voiceCommands');
 const lastCommand = $('#lastCommand');
 
 let voiceActive = false;
+let recognition = null;
+let isListening = false;
+let isPiMode = false;
+let useBackendVoice = false;
+let lastCommandTime = 0; // Track when last command was processed
+let lastCommandText = ''; // Track the last command text
+
+// Detect platform and capabilities
+function detectPlatform() {
+  const platform = navigator.platform || 'unknown';
+  const userAgent = navigator.userAgent || '';
+  
+  console.log('Platform detection:', {
+    platform: platform,
+    userAgent: userAgent,
+    hasWebSpeech: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
+    hasSpeechSynthesis: !!window.speechSynthesis
+  });
+  
+  // Check if we're on Pi (Linux ARM) or should use backend
+  if (platform.includes('Linux') || platform.includes('arm') || platform.includes('aarch64')) {
+    isPiMode = true;
+    useBackendVoice = true;
+    console.log('🎯 Pi mode detected - using backend voice service');
+  } else if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+    isPiMode = false;
+    useBackendVoice = false;
+    console.log('🖥️ Desktop mode detected - using Web Speech API');
+  } else {
+    isPiMode = false;
+    useBackendVoice = true;
+    console.log('🔄 Fallback mode - using backend voice service');
+  }
+  
+  return { isPiMode, useBackendVoice };
+}
 
 // Set initial button states
 voiceStart.disabled = true;
@@ -439,21 +538,27 @@ voiceStop.classList.remove('btn-danger');
 
 console.log('🎤 Voice control buttons initialized with correct states');
 
-// Remove old Socket.IO and polling code - we're using real voice recognition now
-
 // Initialize voice service
-  // Voice control button handlers
-  voiceInit.onclick = async () => {
-    try {
-      voiceInit.disabled = true;
-      voiceStart.disabled = true; // Keep start button disabled during init
-      voiceInit.innerHTML = '<i class="bi-hourglass-split"></i> Initializing...';
+voiceInit.onclick = async () => {
+  try {
+    voiceInit.disabled = true;
+    voiceStart.disabled = true; // Keep start button disabled during init
+    voiceInit.innerHTML = '<i class="bi-hourglass-split"></i> Initializing...';
+    
+    // Detect platform and capabilities
+    const { isPiMode, useBackendVoice } = detectPlatform();
+    
+    if (useBackendVoice) {
+      // Use backend voice service (Pi mode or fallback)
+      console.log('🎤 Initializing backend voice service...');
       
-      // Initialize real voice recognition
-      if (initVoiceRecognition()) {
-        voiceStatus.innerHTML = '<i class="bi-check-circle"></i> Voice Ready';
+      const response = await fetch('/api/voice/init', { method: 'POST' });
+      const result = await response.json();
+      
+      if (result.success && result.available) {
+        voiceStatus.innerHTML = '<i class="bi-check-circle"></i> Backend Voice Ready';
         voiceStatus.style.color = '#28a745';
-        voiceInit.innerHTML = '<i class="bi-check-circle"></i> Voice Ready';
+        voiceInit.innerHTML = '<i class="bi-check-circle"></i> Backend Voice Ready';
         voiceInit.disabled = false;
         
         // Enable the start listening button
@@ -462,59 +567,401 @@ console.log('🎤 Voice control buttons initialized with correct states');
         voiceStart.classList.remove('btn-outline-success');
         voiceStart.classList.add('btn-success');
         
-        console.log('✅ Voice recognition ready - Start Listening button enabled');
+        console.log('✅ Backend voice service ready - Start Listening button enabled');
       } else {
-        voiceStatus.innerHTML = '<i class="bi-x-circle"></i> Voice Not Supported';
-        voiceStatus.style.color = '#dc3545';
-        voiceInit.innerHTML = '<i class="bi-x-circle"></i> Retry';
+        throw new Error(result.message || 'Backend voice service not available');
+      }
+      
+    } else {
+      // Use frontend Web Speech API (Windows/Desktop)
+      console.log('🎤 Initializing frontend voice recognition...');
+      
+      // Check if Web Speech API is available
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        throw new Error('Web Speech API not supported in this browser');
+      }
+      
+                     // Initialize frontend voice recognition
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = true;
+        recognition.interimResults = false; // Disable interim results to prevent loops
+        recognition.lang = 'en-US';
+        
+        // Add noise filtering settings for Windows
+        if (navigator.platform.indexOf('Win') !== -1) {
+          // Make recognition more sensitive for testing
+          recognition.maxAlternatives = 3; // Get multiple alternatives
+          console.log('🪟 Windows: Using 3 alternatives for better recognition');
+        }
+      
+      // Set up recognition event handlers
+      recognition.onstart = () => {
+        console.log('🎤 Voice recognition started');
+        voiceStatus.innerHTML = '<i class="bi-check-circle"></i> Frontend Voice Ready';
+        voiceStatus.style.color = '#28a745';
+      };
+      
+                     recognition.onresult = (event) => {
+          // Get all results including alternatives
+          const results = Array.from(event.results);
+          console.log('🎤 Voice results received:', results.length, 'results');
+          
+          // Only process final results to prevent loops
+          for (let i = 0; i < results.length; i++) {
+            const result = results[i];
+            
+            // Only process final results
+            if (result.isFinal && result[0] && result[0].transcript) {
+              const transcript = result[0].transcript;
+              console.log('🎤 Final transcript found:', transcript);
+              
+              // Process the voice command
+              handleVoiceCommand(transcript.toLowerCase().trim());
+            } else {
+              console.log('🔇 Skipping interim result:', result[0]?.transcript);
+            }
+          }
+        };
+      
+      recognition.onerror = (event) => {
+        console.error('Voice recognition error:', event.error);
+        if (event.error === 'not-allowed') {
+          voiceStatus.innerHTML = '<i class="bi-x-circle"></i> Microphone Access Denied';
+          voiceStatus.style.color = '#dc3545';
+        } else {
+          voiceStatus.innerHTML = '<i class="bi-x-circle"></i> Recognition Error';
+          voiceStatus.style.color = '#dc3545';
+        }
+      };
+      
+                     recognition.onend = () => {
+          console.log('🎤 Voice recognition ended');
+          // Force stop listening to prevent loops
+          isListening = false;
+          
+          // Reset button states
+          voiceStart.disabled = false;
+          voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+          voiceStart.classList.remove('btn-warning');
+          voiceStart.classList.add('btn-success');
+          
+          voiceStop.disabled = true;
+          voiceStop.classList.remove('btn-danger');
+          voiceStop.classList.add('btn-outline-danger');
+          
+          voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
+          voiceListening.style.color = '#6c757d';
+        };
+      
+      // Test the recognition system
+      try {
+        await recognition.start();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Give it a second to start
+        recognition.stop();
+        
+        voiceStatus.innerHTML = '<i class="bi-check-circle"></i> Frontend Voice Ready';
+        voiceStatus.style.color = '#28a745';
+        voiceInit.innerHTML = '<i class="bi-check-circle"></i> Frontend Voice Ready';
         voiceInit.disabled = false;
         
-        // Keep start button disabled
-        voiceStart.disabled = true;
-        voiceStart.innerHTML = '<i class="bi-mic-slash"></i> Not Available';
-        voiceStart.classList.remove('btn-success');
-        voiceStart.classList.add('btn-outline-secondary');
+        // Enable the start listening button
+        voiceStart.disabled = false;
+        voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+        voiceStart.classList.remove('btn-outline-success');
+        voiceStart.classList.add('btn-success');
+        
+        console.log('✅ Frontend voice recognition ready - Start Listening button enabled');
+      } catch (error) {
+        throw new Error('Failed to initialize voice recognition: ' + error.message);
       }
-    } catch (error) {
-      console.error('Voice init error:', error);
-      voiceStatus.innerHTML = '<i class="bi-x-circle"></i> Error';
-      voiceStatus.style.color = '#dc3545';
-      voiceInit.innerHTML = '<i class="bi-arrow-clockwise"></i> Retry';
-      voiceInit.disabled = false;
-      
-      // Keep start button disabled
-      voiceStart.disabled = true;
-    }
-  };
-
-  voiceStart.onclick = () => {
-    if (!recognition) {
-      alert('Please initialize voice recognition first!');
-      return;
     }
     
-    startVoiceRecognition();
+  } catch (error) {
+    console.error('Voice init error:', error);
+    voiceStatus.innerHTML = '<i class="bi-x-circle"></i> ' + error.message;
+    voiceStatus.style.color = '#dc3545';
+    voiceInit.innerHTML = '<i class="bi-arrow-clockwise"></i> Retry';
+    voiceInit.disabled = false;
     
-    // Update button states
+    // Keep start button disabled
     voiceStart.disabled = true;
-    voiceStart.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+    voiceStart.innerHTML = '<i class="bi-mic-slash"></i> Not Available';
     voiceStart.classList.remove('btn-success');
-    voiceStart.classList.add('btn-warning');
+    voiceStart.classList.add('btn-outline-secondary');
+  }
+};
+
+voiceStart.onclick = async () => {
+  try {
+    voiceStart.disabled = true;
+    voiceStart.innerHTML = '<i class="bi-hourglass-split"></i> Starting...';
     
+    if (useBackendVoice) {
+      // Start backend voice recognition
+      console.log('🎤 Starting backend voice recognition...');
+      
+      const response = await fetch('/api/voice/start', { method: 'POST' });
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update button states
+        voiceStart.disabled = true;
+        voiceStart.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+        voiceStart.classList.remove('btn-success');
+        voiceStart.classList.add('btn-warning');
+        
+        voiceStop.disabled = false;
+        voiceStop.classList.remove('btn-outline-danger');
+        voiceStop.classList.add('btn-danger');
+        
+        voiceListening.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+        voiceListening.style.color = '#28a745';
+        
+        console.log('🎤 Backend voice recognition started - buttons updated');
+      } else {
+        throw new Error(result.message || 'Failed to start voice recognition');
+      }
+      
+    } else {
+      // Start frontend voice recognition
+      if (!recognition) {
+        throw new Error('Voice recognition not initialized');
+      }
+      
+      console.log('🎤 Starting frontend voice recognition...');
+      
+             // Stop any existing recognition first
+       if (recognition) {
+         recognition.stop();
+       }
+       
+       // Start fresh recognition
+       recognition.start();
+       isListening = true;
+      
+      // Update button states
+      voiceStart.disabled = true;
+      voiceStart.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+      voiceStart.classList.remove('btn-success');
+      voiceStart.classList.add('btn-warning');
+      
+      voiceStop.disabled = false;
+      voiceStop.classList.remove('btn-outline-danger');
+      voiceStop.classList.add('btn-danger');
+      
+      voiceListening.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+      voiceListening.style.color = '#28a745';
+      
+      console.log('🎤 Frontend voice recognition started - buttons updated');
+    }
+    
+    // Provide voice feedback
+    speakText('Voice recognition started. I\'m listening for your commands.');
+    
+  } catch (error) {
+    console.error('Voice start error:', error);
+    alert('Failed to start voice recognition: ' + error.message);
+    
+    // Reset button state on error
+    voiceStart.disabled = false;
+    voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+    voiceStart.classList.remove('btn-warning');
+    voiceStart.classList.add('btn-success');
+  }
+};
+
+voiceStop.onclick = async () => {
+  try {
+    voiceStop.disabled = true;
+    voiceStop.innerHTML = '<i class="bi-hourglass-split"></i> Stopping...';
+    
+    if (useBackendVoice) {
+      // Stop backend voice recognition
+      console.log('🎤 Stopping backend voice recognition...');
+      
+      const response = await fetch('/api/voice/stop', { method: 'POST' });
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update button states
+        voiceStart.disabled = false;
+        voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+        voiceStart.classList.remove('btn-warning');
+        voiceStart.classList.add('btn-success');
+        
+        voiceStop.disabled = true;
+        voiceStop.classList.remove('btn-danger');
+        voiceStop.classList.add('btn-outline-danger');
+        
+        voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
+        voiceListening.style.color = '#6c757d';
+        
+        console.log('🔇 Backend voice recognition stopped - buttons updated');
+      } else {
+        throw new Error(result.message || 'Failed to stop voice recognition');
+      }
+      
+    } else {
+      // Stop frontend voice recognition
+      console.log('🎤 Stopping frontend voice recognition...');
+      
+      if (recognition) {
+        recognition.stop();
+      }
+      isListening = false;
+      
+      // Update button states
+      voiceStart.disabled = false;
+      voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+      voiceStart.classList.remove('btn-warning');
+      voiceStart.classList.add('btn-success');
+      
+      voiceStop.disabled = true;
+      voiceStop.classList.remove('btn-danger');
+      voiceStop.classList.add('btn-outline-danger');
+      
+      voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
+      voiceListening.style.color = '#6c757d';
+      
+      console.log('🔇 Frontend voice recognition stopped - buttons updated');
+    }
+    
+    // Provide voice feedback
+    speakText('Voice recognition stopped. I\'m no longer listening.');
+    
+  } catch (error) {
+    console.error('Voice stop error:', error);
+    alert('Failed to stop voice recognition: ' + error.message);
+    
+    // Reset button state on error
     voiceStop.disabled = false;
+    voiceStop.innerHTML = '<i class="bi-mic-mute"></i> Stop Listening';
     voiceStop.classList.remove('btn-outline-danger');
     voiceStop.classList.add('btn-danger');
-    
-    voiceListening.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
-    voiceListening.style.color = '#28a745';
-    
-    console.log('🎤 Voice recognition started - buttons updated');
-  };
+  }
+};
 
-  voiceStop.onclick = () => {
-    stopVoiceRecognition();
+// Toggle voice feedback
+voiceFeedback.onclick = async () => {
+  try {
+    voiceFeedback.disabled = true;
+    voiceFeedback.innerHTML = '<i class="bi-hourglass-split"></i> Toggling...';
     
-    // Update button states
+    if (useBackendVoice) {
+      // Use backend voice feedback toggle
+      const response = await fetch('/api/voice/feedback/toggle', { method: 'POST' });
+      const result = await response.json();
+      
+      if (result.success) {
+        // Update the status display
+        voiceFeedbackStatus.textContent = result.voiceFeedback ? 'Enabled' : 'Disabled';
+        
+        // Update the button text and icon
+        voiceFeedback.innerHTML = result.voiceFeedback ? 
+          '<i class="bi-volume-mute"></i> Disable Feedback' : 
+          '<i class="bi-volume-up"></i> Enable Feedback';
+        
+        // Update button styling
+        if (result.voiceFeedback) {
+          voiceFeedback.classList.remove('btn-outline-info');
+          voiceFeedback.classList.add('btn-info');
+        } else {
+          voiceFeedback.classList.remove('btn-info');
+          voiceFeedback.classList.add('btn-outline-info');
+        }
+        
+        console.log('✅ Backend voice feedback toggled:', result.message);
+      } else {
+        throw new Error(result.message || 'Failed to toggle voice feedback');
+      }
+    } else {
+      // Toggle local voice feedback state
+      const currentFeedback = voiceFeedbackStatus.textContent === 'Enabled';
+      const newFeedback = !currentFeedback;
+      
+      // Update the status display
+      voiceFeedbackStatus.textContent = newFeedback ? 'Enabled' : 'Disabled';
+      
+      // Update the button text and icon
+      voiceFeedback.innerHTML = newFeedback ? 
+        '<i class="bi-volume-mute"></i> Disable Feedback' : 
+        '<i class="bi-volume-up"></i> Enable Feedback';
+      
+      // Update button styling
+      if (newFeedback) {
+        voiceFeedback.classList.remove('btn-outline-info');
+        voiceFeedback.classList.add('btn-info');
+      } else {
+        voiceFeedback.classList.remove('btn-info');
+        voiceFeedback.classList.add('btn-outline-info');
+      }
+      
+      console.log('✅ Frontend voice feedback toggled:', newFeedback ? 'enabled' : 'disabled');
+    }
+    
+    // Provide voice feedback about the change
+    const feedbackMessage = voiceFeedbackStatus.textContent === 'Enabled' ? 
+      'Voice feedback enabled. I will speak back to you.' : 
+      'Voice feedback disabled. I will be quiet now.';
+    speakText(feedbackMessage);
+    
+  } catch (error) {
+    console.error('Voice feedback toggle error:', error);
+    // Reset button state on error
+    voiceFeedback.innerHTML = '<i class="bi-volume-up"></i> Toggle Feedback';
+  } finally {
+    voiceFeedback.disabled = false;
+  }
+};
+
+// Test voice
+voiceTest.onclick = async () => {
+  try {
+    voiceTest.disabled = true;
+    voiceTest.innerHTML = '<i class="bi-hourglass-split"></i> Testing...';
+    
+    // Test the voice feedback by speaking a test message
+    const testMessage = 'Voice control system is working. Hello from your BOOM box!';
+    console.log('🎤 Test message:', testMessage);
+    
+    speakText(testMessage);
+    
+    console.log('✅ Text-to-speech test successful');
+    alert('Voice test successful! You should hear the test message.');
+    
+  } catch (error) {
+    console.error('Voice test error:', error);
+    alert('Voice test failed: ' + error.message);
+  } finally {
+    voiceTest.disabled = false;
+    voiceTest.innerHTML = '<i class="bi-chat"></i> Test Voice';
+  }
+};
+
+// Reset voice recognition
+const voiceReset = $('#voiceReset');
+voiceReset.onclick = async () => {
+  try {
+    voiceReset.disabled = true;
+    voiceReset.innerHTML = '<i class="bi-hourglass-split"></i> Resetting...';
+    
+    // Completely destroy the recognition object
+    if (recognition) {
+      try {
+        recognition.stop();
+        recognition.abort();
+      } catch (e) {
+        console.log('Recognition stop/abort error:', e);
+      }
+      recognition = null;
+    }
+    
+    // Reset state variables
+    isListening = false;
+    lastCommandTime = 0;
+    lastCommandText = '';
+    
+    // Reset button states
     voiceStart.disabled = false;
     voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
     voiceStart.classList.remove('btn-warning');
@@ -527,161 +974,251 @@ console.log('🎤 Voice control buttons initialized with correct states');
     voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
     voiceListening.style.color = '#6c757d';
     
-    console.log('🔇 Voice recognition stopped - buttons updated');
-  };
-
-// Toggle voice feedback
-voiceFeedback.onclick = async () => {
-  try {
-    voiceFeedback.disabled = true;
-    voiceFeedback.innerHTML = '<i class="bi-hourglass-split"></i> Toggling...';
-    
-    const response = await fetch('/api/voice/feedback/toggle', { method: 'POST' });
-    const result = await response.json();
-    
-    if (result.success) {
-      voiceFeedbackStatus.textContent = result.voiceFeedback ? 'Enabled' : 'Disabled';
-      voiceFeedback.innerHTML = result.voiceFeedback ? 
-        '<i class="bi-volume-up"></i> Disable Feedback' : 
-        '<i class="bi-volume-mute"></i> Enable Feedback';
+    // Clear any ongoing speech
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
+    
+    console.log('✅ Voice recognition completely reset');
+    speakText('Voice recognition has been completely reset');
+    
   } catch (error) {
-    console.error('Voice feedback toggle error:', error);
+    console.error('Voice reset error:', error);
+    alert('Voice reset failed: ' + error.message);
   } finally {
-    voiceFeedback.disabled = false;
+    voiceReset.disabled = false;
+    voiceReset.innerHTML = '<i class="bi-arrow-clockwise"></i> Reset Voice';
   }
 };
 
-// Test voice
-voiceTest.onclick = () => {
-  if (!recognition) {
-    alert('Please initialize voice recognition first!');
-    return;
-  }
-  
-  // Test the voice feedback by speaking a test message
-  const testMessage = 'Voice control system is working. Hello from your BOOM box!';
-  console.log('🎤 Test message:', testMessage);
-  
-  // You can also test the text-to-speech by calling the server
-  fetch('/api/voice/speak', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: testMessage })
-  }).then(response => response.json())
-    .then(result => {
-      if (result.success) {
-        console.log('✅ Text-to-speech test successful');
+// Complete voice shutdown
+const voiceShutdown = $('#voiceShutdown');
+voiceShutdown.onclick = async () => {
+  try {
+    voiceShutdown.disabled = true;
+    voiceShutdown.innerHTML = '<i class="bi-hourglass-split"></i> Shutting down...';
+    
+    // Completely destroy everything
+    if (recognition) {
+      try {
+        recognition.stop();
+        recognition.abort();
+      } catch (e) {
+        console.log('Recognition stop/abort error:', e);
       }
-    })
-    .catch(error => console.error('Text-to-speech test error:', error));
-};
-
-// Manual test button for debugging
-const manualTestBtn = document.createElement('button');
-manualTestBtn.innerHTML = '<i class="bi-bug"></i> Manual Test';
-manualTestBtn.className = 'btn btn-warning btn-sm ms-2';
-manualTestBtn.onclick = () => {
-  console.log('🧪 Manual test: Simulating voice command "play"');
-  handleVoiceCommand('play');
-};
-  
-// Add manual test button after the voice test button
-voiceTest.parentNode.appendChild(manualTestBtn);
-
-// Voice recognition using Web Speech API
-let recognition = null;
-let isListening = false;
-
-// Initialize voice recognition
-function initVoiceRecognition() {
-  console.log('🎤 Initializing voice recognition...');
-  console.log('Browser support check:');
-  console.log('- SpeechRecognition:', 'SpeechRecognition' in window);
-  console.log('- webkitSpeechRecognition:', 'webkitSpeechRecognition' in window);
-  
-  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    try {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-      
-      recognition.onstart = () => {
-        console.log('🎤 Voice recognition started');
-        voiceListening.innerHTML = '<i class="bi-mic-fill"></i> Listening...';
-        voiceListening.style.color = '#28a745';
-      };
-      
-      recognition.onresult = (event) => {
-        const command = event.results[0][0].transcript.toLowerCase().trim();
-        console.log('🎤 Voice command recognized:', command);
-        lastCommand.innerHTML = `<strong>Last Command:</strong> ${command}`;
-        
-        // Process the voice command
-        handleVoiceCommand(command);
-      };
-      
-      recognition.onerror = (event) => {
-        console.error('Voice recognition error:', event.error);
-        voiceListening.innerHTML = '<i class="bi-mic-slash"></i> Error';
-        voiceListening.style.color = '#dc3545';
-      };
-      
-      recognition.onend = () => {
-        console.log('🎤 Voice recognition ended');
-        if (isListening) {
-          // Restart listening if still enabled
-          setTimeout(() => {
-            if (isListening) {
-              recognition.start();
-            }
-          }, 100);
-        } else {
-          voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
-          voiceListening.style.color = '#6c757d';
-        }
-      };
-      
-      console.log('✅ Voice recognition initialized successfully');
-      return true;
-    } catch (error) {
-      console.error('❌ Error creating SpeechRecognition:', error);
-      return false;
+      recognition = null;
     }
-  } else {
-    console.error('❌ Speech recognition not supported in this browser');
-    console.log('💡 Try using Chrome, Edge, or Safari for voice recognition');
+    
+    // Reset all state
+    isListening = false;
+    lastCommandTime = 0;
+    lastCommandText = '';
+    
+    // Disable all voice buttons
+    voiceStart.disabled = true;
+    voiceStart.innerHTML = '<i class="bi-mic-slash"></i> Voice Disabled';
+    voiceStart.classList.remove('btn-success', 'btn-warning');
+    voiceStart.classList.add('btn-secondary');
+    
+    voiceStop.disabled = true;
+    voiceStop.classList.remove('btn-danger');
+    voiceStop.classList.add('btn-outline-secondary');
+    
+    voiceListening.innerHTML = '<i class="bi-mic-slash"></i> Voice Disabled';
+    voiceListening.style.color = '#6c757d';
+    
+    // Clear any ongoing speech
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    
+    // Force stop any ongoing speech synthesis
+    if (window.speechSynthesis) {
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
+      window.speechSynthesis.cancel();
+    }
+    
+    console.log('✅ Voice recognition completely shut down');
+    alert('Voice recognition has been completely shut down. Refresh the page to re-enable.');
+    
+  } catch (error) {
+    console.error('Voice shutdown error:', error);
+    alert('Voice shutdown failed: ' + error.message);
+  } finally {
+    voiceShutdown.disabled = false;
+    voiceShutdown.innerHTML = '<i class="bi-power"></i> Shutdown Voice';
+  }
+};
+
+// Debug voice recognition
+const voiceDebug = $('#voiceDebug');
+voiceDebug.onclick = async () => {
+  try {
+    voiceDebug.disabled = true;
+    voiceDebug.innerHTML = '<i class="bi-hourglass-split"></i> Debugging...';
+    
+    console.log('🐛 === VOICE RECOGNITION DEBUG ===');
+    console.log('🎤 Recognition object:', recognition);
+    console.log('🎤 Is listening:', isListening);
+    console.log('🎤 Platform:', navigator.platform);
+    console.log('🎤 User agent:', navigator.userAgent);
+    console.log('🎤 Web Speech API available:', !!(window.SpeechRecognition || window.webkitSpeechRecognition));
+    console.log('🎤 Speech synthesis available:', !!window.speechSynthesis);
+    
+    if (recognition) {
+      console.log('🎤 Recognition state:', recognition.state || 'unknown');
+      console.log('🎤 Recognition continuous:', recognition.continuous);
+      console.log('🎤 Recognition interim results:', recognition.interimResults);
+      console.log('🎤 Recognition max alternatives:', recognition.maxAlternatives);
+      console.log('🎤 Recognition lang:', recognition.lang);
+    }
+    
+    // Test microphone access
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('✅ Microphone access granted');
+      stream.getTracks().forEach(track => track.stop());
+    } catch (micError) {
+      console.error('❌ Microphone access denied:', micError);
+    }
+    
+         alert('Voice debug info logged to console. Check the browser console for details.');
+     
+   } catch (error) {
+     console.error('Voice debug error:', error);
+     alert('Voice debug failed: ' + error.message);
+   } finally {
+     voiceDebug.disabled = false;
+     voiceDebug.innerHTML = '<i class="bi-bug"></i> Debug Voice';
+   }
+ };
+ 
+ // Test pause functionality
+ const pauseTest = $('#pauseTest');
+ pauseTest.onclick = async () => {
+   try {
+     pauseTest.disabled = true;
+     pauseTest.innerHTML = '<i class="bi-hourglass-split"></i> Testing...';
+     
+     console.log('🧪 Testing pause functionality...');
+     console.log('🎵 Audio state - paused:', ghost.paused, 'readyState:', ghost.readyState, 'src:', ghost.src);
+     
+     if (ghost.src && ghost.src !== '' && !ghost.paused && ghost.readyState >= 2) {
+       console.log('⏸️ Audio is playing, testing pause...');
+       ghost.pause();
+       play.innerHTML = '<i class="bi-play-fill"></i> Play';
+       play.classList.remove('btn-success');
+       updateStatus('Paused', file.value);
+       speakText('Pause test successful - music paused');
+     } else if (ghost.paused && ghost.src && ghost.src !== '') {
+       console.log('▶️ Audio is paused, testing resume...');
+       ghost.play();
+       play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+       play.classList.add('btn-success');
+       updateStatus('Playing', file.value);
+       speakText('Resume test successful - music playing');
+     } else {
+       console.log('⚠️ Audio not ready for pause test');
+       speakText('No music ready for pause test. Please play music first.');
+     }
+     
+   } catch (error) {
+     console.error('Pause test error:', error);
+     speakText('Pause test failed: ' + error.message);
+   } finally {
+     pauseTest.disabled = false;
+     pauseTest.innerHTML = '<i class="bi-pause"></i> Test Pause';
+   }
+ };
+
+// Function to validate voice commands - ultra permissive for testing
+function isValidVoiceCommand(transcript) {
+  const cleanCommand = transcript.toLowerCase().trim();
+  
+  // Log everything for debugging
+  console.log('🔍 Raw transcript:', transcript);
+  console.log('🔍 Clean command:', cleanCommand);
+  console.log('🔍 Command length:', cleanCommand.length);
+  
+  // Ultra permissive - accept ANYTHING that's not empty
+  if (cleanCommand.length < 1) {
+    console.log('❌ Empty command, rejecting');
     return false;
   }
+  
+  // Accept everything for now to debug the issue
+  console.log('✅ Accepting all commands for debugging');
+  return true;
 }
 
-// Start voice recognition
-function startVoiceRecognition() {
-  if (!recognition) {
-    if (!initVoiceRecognition()) {
-      alert('Voice recognition not supported in your browser. Try Chrome or Edge.');
+// Function to speak text using browser's built-in speech synthesis or backend
+function speakText(text) {
+  try {
+    // Check if voice feedback is enabled
+    if (voiceFeedbackStatus.textContent === 'Disabled') {
+      console.log('Voice feedback disabled, not speaking:', text);
       return;
     }
+    
+    if (useBackendVoice) {
+      // Use backend text-to-speech (Pi mode)
+      console.log('🎤 Using backend text-to-speech:', text);
+      fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      }).catch(error => {
+        console.error('Backend speak error:', error);
+        // Fallback to console log
+        console.log('🎤 Voice feedback (fallback):', text);
+      });
+    } else {
+      // Use browser's built-in speech synthesis (Windows/Desktop)
+      if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        // Create a new speech utterance
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        utterance.volume = 0.8;
+        
+        // Speak the text
+        window.speechSynthesis.speak(utterance);
+        console.log('🎤 Browser speech synthesis:', text);
+      } else {
+        console.log('🎤 Speech synthesis not available, using console fallback:', text);
+      }
+    }
+  } catch (error) {
+    console.error('Speech synthesis error:', error);
+    console.log('🎤 Voice feedback fallback:', text);
+  }
+}
+
+// Handle voice commands from server - simplified and working
+async function handleVoiceCommand(command) {
+  console.log('🎤 Voice command received:', command);
+  console.log('🎤 Command length:', command.length);
+  console.log('🎤 Command contains "pause":', command.toLowerCase().includes('pause'));
+  console.log('🎤 Command contains "stop":', command.toLowerCase().includes('stop'));
+  
+  // Check if this is a duplicate command (same text within 10 seconds)
+  const now = Date.now();
+  const timeSinceLastCommand = now - lastCommandTime;
+  const isDuplicate = (command.toLowerCase().trim() === lastCommandText && timeSinceLastCommand < 10000);
+  
+  if (isDuplicate) {
+    console.log('🔇 Duplicate command ignored:', command);
+    return; // Don't process duplicate commands
   }
   
-  isListening = true;
-  recognition.start();
-}
-
-// Stop voice recognition
-function stopVoiceRecognition() {
-  isListening = false;
-  if (recognition) {
-    recognition.stop();
-  }
-}
-
-// Handle voice commands from server
-async function handleVoiceCommand(command) {
-  console.log('Voice command received:', command);
+  // Update tracking variables
+  lastCommandTime = now;
+  lastCommandText = command.toLowerCase().trim();
   
   // Show command in UI
   lastCommand.textContent = command;
@@ -692,82 +1229,232 @@ async function handleVoiceCommand(command) {
     voiceCommands.style.display = 'none';
   }, 3000);
   
-  // Execute command based on voice input
-  switch (command) {
-    case 'play':
-      if (file.value && file.value !== '— files will appear here —') {
-        console.log('🎵 Voice command: Playing music');
-        play.click();
+  // If using backend voice, send command to backend for processing
+  if (useBackendVoice) {
+    try {
+      await fetch('/api/voice/frontend-command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command })
+      });
+    } catch (error) {
+      console.error('Failed to send command to backend:', error);
+    }
+  }
+  
+  // Simple command detection - no complex logic
+  const cleanCommand = command.toLowerCase().trim();
+  
+  // Basic commands
+     if (cleanCommand.includes('play')) {
+     console.log('🎵 Voice command: Playing music');
+     // Don't speak here to prevent loops - just play the music
+    
+    // Auto-select file if none selected
+    if (!file.value || file.value === '— files will appear here —') {
+      const fileSelect = document.getElementById('fileSelect');
+      if (fileSelect.options.length > 1) {
+        fileSelect.selectedIndex = 1;
+        file.value = fileSelect.value;
+        console.log('🎵 Auto-selected file:', file.value);
       } else {
-        console.log('❌ Voice command: No file selected');
-        // Speak feedback
-        fetch('/api/voice/speak', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: 'Please select a file first' })
-        });
+        speakText('No music files available');
+        return;
       }
-      break;
+    }
+    
+    // Play the music
+    await playAudioFromVoice();
+    
+        } else if (cleanCommand.includes('pause') || cleanCommand.includes('paws')) {
+      console.log('⏸️ Voice command: Pausing music');
+      console.log('🎵 Current audio state - paused:', ghost.paused, 'readyState:', ghost.readyState, 'src:', ghost.src);
       
-    case 'pause':
-      if (ghost.paused === false) {
-        console.log('⏸️ Voice command: Pausing music');
-        ghost.pause();
-        play.innerHTML = '<i class="bi-play-fill"></i> Play';
-        play.classList.remove('btn-success');
-        updateStatus('Paused', file.value);
-      }
-      break;
-      
-    case 'volume up':
-      const newVolUp = Math.min(100, parseInt(vol.value) + 10);
-      console.log('🔊 Voice command: Volume up to', newVolUp + '%');
-      vol.value = newVolUp;
-      volVal.textContent = newVolUp + '%';
-      ghost.volume = newVolUp / 100;
+             // Check if audio is actually playing (has source and is not paused)
+       if (ghost.src && ghost.src !== '' && !ghost.paused && ghost.readyState >= 2) {
+         console.log('⏸️ Audio is playing, pausing it');
+         ghost.pause();
+         play.innerHTML = '<i class="bi-play-fill"></i> Play';
+         play.classList.remove('btn-success');
+         updateStatus('Paused', file.value);
+         // Don't speak here to prevent loops
+       } else if (ghost.paused && ghost.src && ghost.src !== '') {
+         console.log('▶️ Audio is paused, resuming it');
+         ghost.play();
+         play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+         play.classList.add('btn-success');
+         updateStatus('Playing', file.value);
+         // Don't speak here to prevent loops
+       } else {
+         console.log('⚠️ Audio not ready or no source');
+         // Don't speak here to prevent loops
+       }
+     
+        } else if (cleanCommand.includes('resume') || cleanCommand.includes('continue')) {
+       console.log('▶️ Voice command: Resuming music');
+       if (ghost.paused === true && ghost.readyState >= 2) {
+         console.log('▶️ Audio is paused, resuming it');
+         ghost.play();
+         play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+         play.classList.add('btn-success');
+         updateStatus('Playing', file.value);
+         // Don't speak here to prevent loops
+       } else {
+         console.log('⚠️ Audio not paused or not ready');
+         // Don't speak here to prevent loops
+       }
+     
+       } else if (cleanCommand.includes('stop') || cleanCommand.includes('stahp')) {
+      console.log('⏹️ Voice command: Stopping music');
+      ghost.pause();
+      ghost.currentTime = 0;
+      play.innerHTML = '<i class="bi-play-fill"></i> Play';
+      play.classList.remove('btn-success');
+      updateStatus('Stopped', file.value);
+      // Don't speak here to prevent loops - just stop the music
+    
+  } else if (cleanCommand.includes('volume') || cleanCommand.includes('vol')) {
+    if (cleanCommand.includes('up')) {
+      const newVol = Math.min(100, parseInt(vol.value) + 10);
+      vol.value = newVol;
+      volVal.textContent = newVol + '%';
+      ghost.volume = newVol / 100;
       vol.dispatchEvent(new Event('input'));
-      break;
-      
-    case 'volume down':
-      const newVolDown = Math.max(0, parseInt(vol.value) - 10);
-      console.log('🔉 Voice command: Volume down to', newVolDown + '%');
-      vol.value = newVolDown;
-      volVal.textContent = newVolDown + '%';
-      ghost.volume = newVolDown / 100;
+      speakText(`Volume increased to ${newVol} percent`);
+    } else if (cleanCommand.includes('down')) {
+      const newVol = Math.max(0, parseInt(vol.value) - 10);
+      vol.value = newVol;
+      volVal.textContent = newVol + '%';
+      ghost.volume = newVol / 100;
       vol.dispatchEvent(new Event('input'));
-      break;
+      speakText(`Volume decreased to ${newVol} percent`);
+    }
+    
+  } else if (cleanCommand.includes('song') || cleanCommand.includes('what')) {
+    const currentSong = file.value || 'No song selected';
+    speakText(`Currently playing: ${currentSong}`);
+    
+  } else if (cleanCommand.includes('help')) {
+    speakText('Available commands: play, pause, stop, volume up, volume down, what song, and help');
+    
+     } else if (cleanCommand.includes('test')) {
+     speakText('Voice command system is working!');
+     
+   } else {
+     console.log('❌ Command not recognized:', command);
+     console.log('🔍 Full command analysis:');
+     console.log('  - Raw command:', command);
+     console.log('  - Clean command:', cleanCommand);
+     console.log('  - Contains "play":', cleanCommand.includes('play'));
+     console.log('  - Contains "pause":', cleanCommand.includes('pause'));
+     console.log('  - Contains "stop":', cleanCommand.includes('stop'));
+     console.log('  - Contains "volume":', cleanCommand.includes('volume'));
+     // Don't speak for unrecognized commands to avoid loops
+     // speakText(`I didn't understand "${command}". Try saying "play" or "help"`);
+   }
+}
+
+// Helper function to play audio from voice command
+async function playAudioFromVoice() {
+  const f = file.value; 
+  if(!f || f === '— files will appear here —') {
+    console.log('No file selected for voice play command');
+    return;
+  }
+  
+  console.log('Voice command: Attempting to play:', f);
+  
+  try {
+    // Always set new source for new file (prevents caching issues)
+    const newSrc = `/api/audio/stream/${encodeURIComponent(f)}`;
+    console.log('Setting new source from voice command:', newSrc);
+    ghost.src = newSrc;
+    updateStatus('Loading...', f);
+    
+    // Reset audio state
+    ghost.currentTime = 0;
+    
+    // Wait for audio to be ready
+    await new Promise((resolve, reject) => {
+      const onCanPlay = () => {
+        console.log('Audio can play from voice command, readyState:', ghost.readyState);
+        ghost.removeEventListener('canplay', onCanPlay);
+        ghost.removeEventListener('error', onError);
+        clearTimeout(timeoutId);
+        resolve();
+      };
       
-    case 'what song':
-      const currentSong = file.value || 'No song selected';
-      console.log('🎤 Voice command: Current song is', currentSong);
-      fetch('/api/voice/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: `Currently playing: ${currentSong}` })
-      });
-      break;
+      const onError = (error) => {
+        console.error('Audio load error from voice command:', error);
+        ghost.removeEventListener('canplay', onCanPlay);
+        ghost.removeEventListener('error', onError);
+        clearTimeout(timeoutId);
+        reject(error);
+      };
       
-    case 'help':
-      console.log('❓ Voice command: Showing help');
-      fetch('/api/voice/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: 'Available commands: play, pause, volume up, volume down, what song, and help' })
-      });
-      break;
+      ghost.addEventListener('canplay', onCanPlay);
+      ghost.addEventListener('error', onError);
       
-    case 'test':
-      console.log('🧪 Test voice command received - frontend communication working!');
-      // Show success message
-      lastCommand.textContent = 'TEST SUCCESS - Frontend communication working!';
-      voiceCommands.style.display = 'block';
-      setTimeout(() => {
-        voiceCommands.style.display = 'none';
+      // Timeout after 5 seconds
+      const timeoutId = setTimeout(() => {
+        console.error('Audio load timeout from voice command');
+        ghost.removeEventListener('canplay', onCanPlay);
+        ghost.removeEventListener('error', onError);
+        reject(new Error('Audio load timeout'));
       }, 5000);
-      break;
+    });
+    
+    // Ensure audio context is resumed (browser requirement)
+    if (audioCtx && audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+    
+    // Try to play the audio with better Windows compatibility
+    try {
+      const playPromise = ghost.play();
+      if (playPromise !== undefined) {
+        await playPromise;
+        await startVU();
+        play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+        play.classList.add('btn-success');
+        updateStatus('Playing', f);
+                 console.log('✅ Voice command play successful');
+         // Don't speak here to prevent loops - just play the music
+      }
+    } catch (playError) {
+      console.error('Play promise error:', playError);
       
-    default:
-      console.log('❓ Voice command not recognized:', command);
+      // Try alternative approach for Windows
+      if (playError.name === 'NotAllowedError' || playError.name === 'AbortError') {
+        console.log('Trying alternative play method for Windows...');
+        
+                 // Force play with user interaction simulation
+         ghost.play().then(() => {
+           console.log('✅ Alternative play method successful');
+           play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+           play.classList.add('btn-success');
+           updateStatus('Playing', f);
+           // Don't speak here to prevent loops
+         }).catch((altError) => {
+          console.error('Alternative play method failed:', altError);
+          speakText('Failed to play music. Please check audio permissions.');
+        });
+      } else {
+        throw playError;
+      }
+    }
+    
+  } catch (error) {
+    console.error('Voice command play error:', error);
+    
+    // Handle specific browser audio permission errors
+    if (error.name === 'NotAllowedError') {
+      console.log('Audio permission denied for voice command');
+      speakText('Audio permission denied. Please allow audio playback in your browser.');
+    } else {
+      console.error('Failed to play audio from voice command:', error.message);
+      speakText('Failed to play music. Please try again.');
+    }
   }
 }
 
@@ -775,6 +1462,29 @@ async function handleVoiceCommand(command) {
 console.log('Player initialized');
 console.log('Audio element:', ghost);
 console.log('Initial volume:', ghost.volume);
+
+// Windows-specific audio fixes
+if (navigator.platform.indexOf('Win') !== -1) {
+  console.log('🪟 Windows platform detected - applying audio fixes');
+  
+  // Ensure audio context is created and resumed
+  if (audioCtx) {
+    audioCtx.resume().then(() => {
+      console.log('✅ Audio context resumed for Windows');
+    }).catch(err => {
+      console.log('⚠️ Audio context resume failed:', err);
+    });
+  }
+  
+  // Add Windows-specific audio event handlers
+  ghost.addEventListener('loadstart', () => {
+    console.log('🪟 Windows: Audio load started');
+  });
+  
+  ghost.addEventListener('canplaythrough', () => {
+    console.log('🪟 Windows: Audio can play through');
+  });
+}
 
 // Test audio element
 ghost.addEventListener('loadedmetadata', () => {
@@ -792,7 +1502,25 @@ ghost.addEventListener('error', (e) => {
   console.error('Error details:', ghost.error);
 });
 
+// Initialize Socket.IO connection
+initSocketIO();
+
 loadFiles();
-</script>
-</body>
+ 
+ // Update footer date
+ function updateFooterDate() {
+   const today = new Date();
+   const options = { 
+     year: 'numeric', 
+     month: 'long', 
+     day: 'numeric' 
+   };
+   const dateString = today.toLocaleDateString('en-US', options);
+   document.getElementById('currentDate').textContent = dateString;
+ }
+ 
+ // Set the date when page loads
+ updateFooterDate();
+ </script>
+ </body>
 </html>
