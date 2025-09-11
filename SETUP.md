@@ -17,7 +17,28 @@ npm install
 cp /path/to/your/music/*.mp3 ./music/
 ```
 
-### 3. Start Development Mode
+### 3. Configure Environment Variables
+Create a `.env` file in the project root:
+```bash
+# piBoom Environment Variables
+
+# Mode: 'pi' for Raspberry Pi, 'cloud' for cloud deployment
+MODE=pi
+
+# Port (default: 3000)
+PORT=3000
+
+# Music directory path
+MUSIC_DIR=./music
+
+# Default volume (0-100)
+DEFAULT_VOLUME=70
+
+# Google API Key (for Knowledge Graph, YouTube, and Maps)
+GOOGLE_API_KEY=your_google_api_key_here
+```
+
+### 4. Start Development Mode
 ```bash
 npm start
 # Open http://localhost:3000/player.html

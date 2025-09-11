@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Music Research - piBoom</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+<link rel="stylesheet" href="/styles.css"/>
+<style>
+  .search-container {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  }
+  
+  .search-box {
+    border: 2px solid var(--ice-primary);
+    border-radius: 12px;
+    padding: 1rem;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .search-box:focus {
+    border-color: var(--ice-secondary);
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.3);
+    outline: none;
+  }
+  
+  .map-container {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    min-height: 400px;
+  }
+  
+  .youtube-container {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    min-height: 300px;
+  }
+  
+  .artist-info {
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  }
+  
+  .info-card {
+    background: rgba(248,250,252,.8);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--ice-primary);
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+  }
+  
+  .spinner {
+    border: 3px solid var(--border);
+    border-top: 3px solid var(--ice-primary);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  
+  .video-item {
+    background: rgba(248,250,252,.8);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .video-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+  }
+  
+  .back-btn {
+    background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+  }
+  
+  .back-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    color: white;
+  }
+</style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi-box mr-1"></i>piBoom</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/player.html"><i class="bi-music-note-beamed"></i> Player</a></li>
+        <li class="nav-item"><a class="nav-link" href="/debug.html"><i class="bi-bug"></i> Debug</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="search-container">
+    <h2 class="text-center mb-4"><i class="bi-search"></i> Music Research</h2>
+    <div class="row">
+      <div class="col-md-8 mx-auto">
+        <div class="input-group">
+          <input type="text" class="form-control search-box" id="searchInput" 
+                 placeholder="Search for artists, bands, musicians..." 
+                 onkeypress="handleSearchKeypress(event)">
+          <div class="input-group-append">
+            <button class="btn btn-ice" type="button" onclick="searchArtist()">
+              <i class="bi-search"></i> Search
+            </button>
+          </div>
+        </div>
+        <div class="text-center mt-3">
+          <span class="badge badge-info" id="modeBadge">
+            <i class="bi-cloud"></i> <span id="modeText">Loading...</span>
+          </span>
+          <div class="mt-2">
+            <div class="btn-group" role="group">
+              <button type="button" class="btn btn-sm btn-outline-primary active" id="kgBtn" onclick="switchSearchMode('kg')">
+                <i class="bi-google"></i> Knowledge Graph
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="wikiBtn" onclick="switchSearchMode('wiki')">
+                <i class="bi-wikipedia"></i> Wikipedia
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="artist-info" id="artistInfo">
+        <h4><i class="bi-person-circle"></i> Artist Information</h4>
+        <div class="loading" id="artistLoading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Loading artist information...</p>
+        </div>
+        <div id="artistContent">
+          <p class="text-muted">Search for an artist to see detailed information including band members, birth places, and more.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-lg-6">
+      <div class="map-container" id="mapContainer">
+        <h4><i class="bi-geo-alt"></i> Birth Places Map</h4>
+        <div class="loading" id="mapLoading" style="display: none;">
+          <div class="spinner"></div>
+          <p>Loading map...</p>
+        </div>
+        <div id="mapContent">
+          <p class="text-muted">Artist birth places will appear on the map after searching.</p>
+          <div id="map" style="height: 400px; width: 100%; border-radius: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+            <div class="text-center">
+              <i class="bi-map" style="font-size: 3rem;"></i>
+              <p class="mt-2">Map will load here</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="youtube-container" id="youtubeContainer">
+    <h4><i class="bi-youtube"></i> YouTube Videos</h4>
+    <div class="loading" id="youtubeLoading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Loading videos...</p>
+    </div>
+    <div id="youtubeContent">
+      <p class="text-muted">Related videos will appear here after searching.</p>
+      <div class="video-grid" id="videoGrid">
+        <!-- Video placeholders will be added here -->
+      </div>
+    </div>
+    
+    <!-- Video Player Container -->
+    <div id="videoPlayer" class="mt-3" style="display: none;">
+      <h5><i class="bi-play-circle"></i> Now Playing</h5>
+      <!-- YouTube embed will be inserted here -->
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>Music Research • piBoom</strong> — <span id="dt"></span>
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<!-- Google Maps API will be loaded dynamically with the correct API key -->
+<script>
+document.getElementById('dt').textContent = new Date().toLocaleDateString();
+
+// Global variables
+let currentMode = 'unknown';
+let isCloudMode = false;
+let searchMode = 'kg'; // 'kg' for Knowledge Graph, 'wiki' for Wikipedia
+
+// Google API Key will be loaded from server
+let GOOGLE_API_KEY = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  checkMode();
+  setupVoiceCommands();
+  loadGoogleMapsAPI();
+  initializeMap('Ready for search');
+});
+
+function loadGoogleMapsAPI() {
+  // Get the API key from the server first
+  fetch('/api/music-research/google-api-key')
+    .then(response => response.json())
+    .then(data => {
+      if (data.apiKey) {
+        GOOGLE_API_KEY = data.apiKey;
+        // Load Google Maps API with the correct key
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=initMap`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+        console.log('🗺️ Google Maps API loading with key from server');
+      } else {
+        console.warn('❌ Google Maps API key not available from server');
+      }
+    })
+    .catch(error => {
+      console.error('❌ Error loading Google Maps API key:', error);
+    });
+}
+
+function setupVoiceCommands() {
+  // Listen for voice commands from Pi
+  if (typeof io !== 'undefined') {
+    const socket = io();
+    
+    socket.on('voiceCommand', function(data) {
+      console.log('Voice command received:', data);
+      
+      if (data.command === 'musicResearch' && data.artist) {
+        // Search for the artist
+        document.getElementById('searchInput').value = data.artist;
+        searchArtist();
+      } else if (data.command === 'openMusicResearch') {
+        // Just open the research page (already here)
+        console.log('Music research page opened via voice command');
+      }
+    });
+  }
+}
+
+function checkMode() {
+  fetch('/health')
+    .then(response => response.json())
+    .then(data => {
+      currentMode = data.mode || 'unknown';
+      isCloudMode = currentMode === 'cloud';
+      updateModeDisplay();
+    })
+    .catch(error => {
+      console.error('Error checking mode:', error);
+      currentMode = 'unknown';
+      updateModeDisplay();
+    });
+}
+
+function updateModeDisplay() {
+  const modeText = document.getElementById('modeText');
+  const modeBadge = document.getElementById('modeBadge');
+  
+  if (isCloudMode) {
+    modeText.textContent = 'Cloud Mode';
+    modeBadge.className = 'badge badge-success';
+    modeBadge.innerHTML = '<i class="bi-cloud"></i> Cloud Mode';
+  } else if (currentMode === 'pi') {
+    modeText.textContent = 'Pi Mode';
+    modeBadge.className = 'badge badge-primary';
+    modeBadge.innerHTML = '<i class="bi-cpu"></i> Pi Mode';
+  } else {
+    modeText.textContent = 'Unknown Mode';
+    modeBadge.className = 'badge badge-warning';
+    modeBadge.innerHTML = '<i class="bi-question-circle"></i> Unknown Mode';
+  }
+}
+
+function switchSearchMode(mode) {
+  searchMode = mode;
+  
+  // Update button states
+  document.getElementById('kgBtn').className = mode === 'kg' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary';
+  document.getElementById('wikiBtn').className = mode === 'wiki' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary';
+  
+  // Update search placeholder
+  const searchInput = document.getElementById('searchInput');
+  if (mode === 'kg') {
+    searchInput.placeholder = 'Search for artists, bands, musicians... (Google Knowledge Graph)';
+  } else {
+    searchInput.placeholder = 'Search for artists, bands, musicians... (Wikipedia)';
+  }
+}
+
+function handleSearchKeypress(event) {
+  if (event.key === 'Enter') {
+    searchArtist();
+  }
+}
+
+function searchArtist() {
+  const searchTerm = document.getElementById('searchInput').value.trim();
+  if (!searchTerm) {
+    alert('Please enter an artist name to search');
+    return;
+  }
+  
+  // Show loading states
+  showLoading('artistLoading', true);
+  showLoading('youtubeLoading', true);
+  // Map doesn't reload, so no map loading state
+  
+  // Clear previous results
+  document.getElementById('artistContent').innerHTML = '';
+  document.getElementById('videoGrid').innerHTML = '';
+  // Map stays loaded - no need to clear it
+  
+  // Search for artist information based on selected mode
+  if (searchMode === 'kg') {
+    searchKnowledgeGraph(searchTerm);
+  } else {
+    searchWikipedia(searchTerm);
+  }
+  searchYouTube(searchTerm);
+  // Map is already loaded, no need to initialize again
+}
+
+function showLoading(elementId, show) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.style.display = show ? 'block' : 'none';
+  }
+}
+
+function searchKnowledgeGraph(artistName) {
+  // This uses Google Knowledge Graph Cloud API
+  fetch('/api/music-research/knowledge-graph', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ artist: artistName })
+  })
+  .then(response => response.json())
+  .then(data => {
+    showLoading('artistLoading', false);
+    displayArtistInfo(data);
+  })
+  .catch(error => {
+    showLoading('artistLoading', false);
+    document.getElementById('artistContent').innerHTML = 
+      '<div class="alert alert-warning">Error loading artist information. Please try again.</div>';
+    console.error('Error:', error);
+  });
+}
+
+function searchWikipedia(artistName) {
+  // This uses Wikipedia API (free, no auth needed)
+  fetch('/api/music-research/wikipedia', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ artist: artistName })
+  })
+  .then(response => response.json())
+  .then(data => {
+    showLoading('artistLoading', false);
+    displayArtistInfo(data);
+  })
+  .catch(error => {
+    showLoading('artistLoading', false);
+    document.getElementById('artistContent').innerHTML = 
+      '<div class="alert alert-warning">Error loading artist information. Please try again.</div>';
+    console.error('Error:', error);
+  });
+}
+
+function searchYouTube(artistName) {
+  // This will be implemented with your YouTube API
+  fetch('/api/music-research/youtube', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ artist: artistName })
+  })
+  .then(response => response.json())
+  .then(data => {
+    showLoading('youtubeLoading', false);
+    displayYouTubeVideos(data);
+  })
+  .catch(error => {
+    showLoading('youtubeLoading', false);
+    document.getElementById('videoGrid').innerHTML = 
+      '<div class="alert alert-warning">Error loading videos. Please try again.</div>';
+    console.error('Error:', error);
+  });
+}
+
+function displayArtistInfo(data) {
+  const content = document.getElementById('artistContent');
+  
+  if (data.error) {
+    content.innerHTML = `<div class="alert alert-warning">${data.error}</div>`;
+    return;
+  }
+  
+  let html = '';
+  
+  // Artist image and name header
+  if (data.image) {
+    html += `<div class="info-card text-center mb-3">
+      <img src="${data.image}" alt="${data.name || 'Artist'}" 
+           style="max-width: 200px; max-height: 200px; border-radius: 8px; margin-bottom: 1rem;"
+           onerror="this.style.display='none'">
+      <h5><i class="bi-person"></i> ${data.name || 'Unknown Artist'}</h5>
+    </div>`;
+  } else if (data.name) {
+    html += `<div class="info-card">
+      <h5><i class="bi-person"></i> ${data.name}</h5>
+    </div>`;
+  }
+  
+  if (data.description) {
+    html += `<div class="info-card">
+      <h6><i class="bi-info-circle"></i> About</h6>
+      <p class="mb-0">${data.description}</p>
+    </div>`;
+  }
+  
+  if (data.genre) {
+    html += `<div class="info-card">
+      <h6><i class="bi-music-note"></i> Genre</h6>
+      <p class="mb-0">${data.genre}</p>
+    </div>`;
+  }
+  
+  if (data.birthDate) {
+    html += `<div class="info-card">
+      <h6><i class="bi-calendar"></i> Birth Date</h6>
+      <p class="mb-0">${data.birthDate}</p>
+    </div>`;
+  }
+  
+  if (data.birthPlace) {
+    html += `<div class="info-card">
+      <h6><i class="bi-geo-alt"></i> Birth Place</h6>
+      <p class="mb-0">${data.birthPlace}</p>
+    </div>`;
+  }
+  
+  if (data.bandMembers && data.bandMembers.length > 0) {
+    html += `<div class="info-card">
+      <h6><i class="bi-people"></i> Band Members</h6>
+      <ul class="mb-0">`;
+    data.bandMembers.forEach(member => {
+      html += `<li>${member.name}${member.instrument ? ` - ${member.instrument}` : ''}</li>`;
+    });
+    html += `</ul></div>`;
+  }
+  
+  if (data.url) {
+    html += `<div class="info-card">
+      <h6><i class="bi-link"></i> More Info</h6>
+      <p class="mb-0">
+        <a href="${data.url}" target="_blank" class="btn btn-sm btn-outline-primary">
+          <i class="bi-external-link"></i> View Full Article
+        </a>
+      </p>
+    </div>`;
+  }
+  
+  if (html === '') {
+    html = '<div class="alert alert-info">No detailed information found for this artist.</div>';
+  }
+  
+  content.innerHTML = html;
+}
+
+function displayYouTubeVideos(data) {
+  const grid = document.getElementById('videoGrid');
+  
+  if (data.error || !data.videos || data.videos.length === 0) {
+    grid.innerHTML = '<div class="alert alert-info">No videos found for this artist.</div>';
+    return;
+  }
+  
+  let html = '';
+  data.videos.forEach(video => {
+    html += `
+      <div class="video-item">
+        <div class="mb-2">
+          <i class="bi-play-circle" style="font-size: 2rem; color: var(--ice-primary);"></i>
+        </div>
+        <h6>${video.title}</h6>
+        <p class="text-muted small">${video.channelTitle}</p>
+        <button class="btn btn-sm btn-ice" onclick="playVideo('${video.videoId}')">
+          <i class="bi-play"></i> Play
+        </button>
+      </div>
+    `;
+  });
+  
+  grid.innerHTML = html;
+}
+
+function playVideo(videoId) {
+  console.log('Playing video:', videoId);
+  
+  // Show the video player container
+  const videoPlayer = document.getElementById('videoPlayer');
+  videoPlayer.style.display = 'block';
+  
+  // Create embedded YouTube player
+  videoPlayer.innerHTML = `
+    <div class="embed-responsive embed-responsive-16by9">
+      <iframe class="embed-responsive-item" 
+              src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
+              allowfullscreen
+              style="border-radius: 8px;">
+      </iframe>
+    </div>
+    <div class="mt-2">
+      <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" class="btn btn-sm btn-outline-danger">
+        <i class="bi-youtube"></i> Open in YouTube
+      </a>
+    </div>
+  `;
+  
+  // Scroll to video player
+  videoPlayer.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Global map variable
+let map = null;
+let markers = [];
+
+function initializeMap(artistName) {
+  console.log('🗺️ Loading map...');
+  
+  // Wait for Google Maps to load
+  const waitForGoogleMaps = () => {
+    if (typeof google !== 'undefined' && google.maps) {
+      console.log('✅ Google Maps ready, initializing...');
+      initBasicMap(artistName);
+    } else {
+      console.log('⏳ Waiting for Google Maps...');
+      setTimeout(waitForGoogleMaps, 500);
+    }
+  };
+  
+  waitForGoogleMaps();
+}
+
+function initBasicMap(artistName) {
+  try {
+    // Clear existing markers
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+    
+    // Check if map div exists
+    const mapElement = document.getElementById('map');
+    if (!mapElement) {
+      console.error('❌ Map element not found');
+      return;
+    }
+    
+    // Ayers Rock (Uluru) coordinates
+    const ayersRock = { lat: -25.3444, lng: 131.0369 };
+    
+    console.log('🗺️ Initializing map with Ayers Rock...');
+    
+    // Create map centered on Ayers Rock
+    map = new google.maps.Map(mapElement, {
+      zoom: 8,
+      center: ayersRock,
+      mapTypeId: 'roadmap'
+    });
+    
+    // Add Ayers Rock marker
+    const marker = new google.maps.Marker({
+      position: ayersRock,
+      map: map,
+      title: `Uluru (Ayers Rock) - Search: ${artistName}`,
+      label: '🏔️'
+    });
+    
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="padding: 10px;">
+          <h6><i class="bi-geo-alt"></i> Uluru (Ayers Rock)</h6>
+          <p class="mb-1">Sacred site in Australia</p>
+          <p class="mb-1">Search: ${artistName}</p>
+          <p class="mb-0 small">Ready for your coordinates</p>
+        </div>
+      `
+    });
+    
+    marker.addListener('click', () => {
+      infoWindow.open(map, marker);
+    });
+    
+    markers.push(marker);
+    
+    console.log('✅ Map initialized successfully with Ayers Rock');
+    
+  } catch (error) {
+    console.error('❌ Error initializing map:', error);
+    document.getElementById('mapContent').innerHTML = `
+      <div id="map" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+        <div class="text-center">
+          <i class="bi-exclamation-triangle" style="font-size: 3rem;"></i>
+          <p class="mt-2">Error loading map</p>
+          <p class="small">${error.message}</p>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function initMapWithData(mapData, artistName) {
+  // Clear existing markers
+  markers.forEach(marker => marker.setMap(null));
+  markers = [];
+  
+  if (mapData.length === 0) {
+    document.getElementById('mapContent').innerHTML = `
+      <div id="map" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+        <div class="text-center">
+          <i class="bi-map" style="font-size: 3rem;"></i>
+          <p class="mt-2">No birth place data found</p>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  // Create map centered on first location
+  const firstLocation = mapData[0];
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 6,
+    center: { lat: firstLocation.lat, lng: firstLocation.lng },
+    mapTypeId: 'roadmap',
+    styles: [
+      {
+        featureType: 'poi',
+        elementType: 'labels',
+        stylers: [{ visibility: 'off' }]
+      }
+    ]
+  });
+  
+  // Add markers for each birth place
+  mapData.forEach((location, index) => {
+    const marker = new google.maps.Marker({
+      position: { lat: location.lat, lng: location.lng },
+      map: map,
+      title: location.name,
+      label: (index + 1).toString(),
+      animation: google.maps.Animation.DROP
+    });
+    
+    // Add info window
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="padding: 10px;">
+          <h6><i class="bi-geo-alt"></i> ${location.name}</h6>
+          <p class="mb-0">Birth place of ${artistName} ${index > 0 ? 'band member' : ''}</p>
+        </div>
+      `
+    });
+    
+    marker.addListener('click', () => {
+      infoWindow.open(map, marker);
+    });
+    
+    markers.push(marker);
+  });
+  
+  // Fit map to show all markers
+  if (mapData.length > 1) {
+    const bounds = new google.maps.LatLngBounds();
+    mapData.forEach(location => {
+      bounds.extend({ lat: location.lat, lng: location.lng });
+    });
+    map.fitBounds(bounds);
+  }
+}
+
+// Function to add custom markers with coordinates
+function addCustomMarker(lat, lng, title, label) {
+  if (!map) {
+    console.log('Map not initialized yet');
+    return;
+  }
+  
+  const marker = new google.maps.Marker({
+    position: { lat: lat, lng: lng },
+    map: map,
+    title: title || 'Custom Marker',
+    label: label || 'M'
+  });
+  
+  const infoWindow = new google.maps.InfoWindow({
+    content: `
+      <div style="padding: 10px;">
+        <h6><i class="bi-geo-alt"></i> ${title || 'Custom Marker'}</h6>
+        <p class="mb-0">Lat: ${lat}, Lng: ${lng}</p>
+      </div>
+    `
+  });
+  
+  marker.addListener('click', () => {
+    infoWindow.open(map, marker);
+  });
+  
+  markers.push(marker);
+  
+  // Center map on new marker
+  map.setCenter({ lat: lat, lng: lng });
+  map.setZoom(8);
+}
+
+// Function to add multiple markers at once
+function addMultipleMarkers(coordinates) {
+  if (!map) {
+    console.log('Map not initialized yet');
+    return;
+  }
+  
+  // Clear existing markers
+  markers.forEach(marker => marker.setMap(null));
+  markers = [];
+  
+  coordinates.forEach((coord, index) => {
+    addCustomMarker(
+      coord.lat, 
+      coord.lng, 
+      coord.title || `Location ${index + 1}`, 
+      (index + 1).toString()
+    );
+  });
+  
+  // Fit map to show all markers
+  if (coordinates.length > 1) {
+    const bounds = new google.maps.LatLngBounds();
+    coordinates.forEach(coord => {
+      bounds.extend({ lat: coord.lat, lng: coord.lng });
+    });
+    map.fitBounds(bounds);
+  }
+}
+
+// Global function for Google Maps callback
+window.initMap = function() {
+  console.log('🗺️ Google Maps API loaded successfully');
+  // Map will be initialized when search is performed
+};
+
+// Also try to initialize map when Google Maps loads
+window.addEventListener('load', function() {
+  console.log('📄 Page fully loaded');
+});
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

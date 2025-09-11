@@ -35,7 +35,7 @@ Complete hardware and software components for the voice-controlled BOOM box audi
 ## 📱 Display & Interface
 
 ### Primary Display
-- **7" Raspberry Pi Touchscreen** - Official Pi touch display
+- **SunFounder 7" Touchscreen for Raspberry Pi 5** - Capacitive screen IPS monitor LCD display
 - **HDMI Monitor** - Alternative display option
 - **Touchscreen Case** - Protective enclosure for display
 

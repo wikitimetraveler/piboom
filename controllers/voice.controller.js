@@ -15,6 +15,23 @@ function executeVoiceCommand(command) {
     action: 'execute'
   };
   
+  // Check for music research commands first
+  if (command.startsWith('search ') || command.startsWith('tell me about ') || command.startsWith('who is ')) {
+    const artistName = command.replace(/^(search |tell me about |who is )/i, '').trim();
+    console.log('🔍 Voice command: Music research for', artistName);
+    
+    // Send to frontend to open music research page and search
+    if (req.app.locals.io) {
+      req.app.locals.io.emit('voiceCommand', { 
+        command: 'musicResearch', 
+        artist: artistName,
+        timestamp: Date.now(),
+        action: 'search'
+      });
+    }
+    return;
+  }
+  
   switch (command) {
     case 'play':
       console.log('🎵 Voice command: Starting playback');
@@ -34,6 +51,18 @@ function executeVoiceCommand(command) {
       
     case 'what song':
       console.log('🎤 Voice command: Announcing current song');
+      break;
+      
+    case 'music research':
+    case 'open research':
+      console.log('🔍 Voice command: Opening music research');
+      if (req.app.locals.io) {
+        req.app.locals.io.emit('voiceCommand', { 
+          command: 'openMusicResearch', 
+          timestamp: Date.now(),
+          action: 'navigate'
+        });
+      }
       break;
       
     case 'help':

@@ -10,6 +10,7 @@
     "install-pi-deps": "sudo apt update && sudo apt install -y sox alsa-utils espeak-ng mpg123"
   },
   "dependencies": {
+    "axios": "^1.6.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "play-sound": "^1.1.6",
