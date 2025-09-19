@@ -13,7 +13,7 @@ async function testMapData() {
         action: 'query',
         format: 'json',
         list: 'search',
-        srsearch: 'Tool band',
+        srsearch: 'Eminem',
         srlimit: 1
       }
     });
@@ -50,19 +50,30 @@ async function testMapData() {
 
     console.log('Page content preview:', pageData.extract?.substring(0, 200) + '...');
 
-    // Test birth place extraction
+    // Test birth place extraction with improved patterns
     const birthPlacePatterns = [
-      /born in[:\s]+([^,\.]+)/i,
-      /from[:\s]+([^,\.]+)/i,
-      /birthplace[:\s]+([^,\.]+)/i
+      /born in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+      /from[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+      /birthplace[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+      /formed in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+      /based in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+      /hails from[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+      /originated in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+      /started in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+      /established in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i
     ];
     
     let birthPlace = null;
     for (const pattern of birthPlacePatterns) {
       const match = pageData.extract.match(pattern);
       if (match) {
-        birthPlace = match[1].trim();
-        break;
+        let place = match[1].trim();
+        place = place.replace(/[,\n].*$/, '').trim();
+        if (place.length > 0 && place.length < 100) {
+          birthPlace = place;
+          console.log('📍 Pattern matched:', pattern.toString(), '->', place);
+          break;
+        }
       }
     }
 

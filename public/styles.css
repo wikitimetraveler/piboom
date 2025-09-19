@@ -2,11 +2,32 @@
   --ice-primary:#3498db; --ice-secondary:#2ecc71; --ice-dark:#1a1f35;
   --ice-light:#e8f1ff; --ice-glow:rgba(135,206,250,.3);
   --text:#1f2937; --muted:#6b7280; --border:#e5e7eb; --white:#fff;
+  
+  /* Zen Design Variables */
+  --zen-breath-duration: 4s;
+  --zen-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --zen-spacing: 1.618rem; /* Golden ratio spacing */
+  --zen-radius: 12px;
+  --zen-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --zen-glow: 0 0 30px rgba(52,152,219,0.15);
 }
 body{
   background:linear-gradient(135deg,#f8fafc 0%,#e2e8f0 50%,#cbd5e1 100%);
   color:var(--text); font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   line-height:1.6; min-height:100vh; overflow-x:hidden;
+  animation: zenBreath var(--zen-breath-duration) var(--zen-ease) infinite;
+}
+
+/* Zen Breathing Animation */
+@keyframes zenBreath {
+  0%, 100% { 
+    background: linear-gradient(135deg,#f8fafc 0%,#e2e8f0 50%,#cbd5e1 100%);
+    transform: scale(1);
+  }
+  50% { 
+    background: linear-gradient(135deg,#f0f4f8 0%,#dde7f0 50%,#c1d5e8 100%);
+    transform: scale(1.001);
+  }
 }
 .header{background:rgba(255,255,255,.95); backdrop-filter:blur(20px);
   box-shadow:0 1px 2px rgba(0,0,0,.05); padding:1rem 0; margin-bottom:2rem;
@@ -15,8 +36,12 @@ body{
   background:linear-gradient(90deg,transparent,var(--ice-glow),transparent);
   animation:headerShine 3s ease-in-out infinite;}
 @keyframes headerShine{0%{left:-100%}50%{left:100%}100%{left:100%}}
-.header h1{font-size:1.8rem;font-weight:700;letter-spacing:-.025em;text-align:center;position:relative;
-  text-shadow:0 0 10px var(--ice-glow); animation:titleGlow 3s ease-in-out infinite alternate;}
+.header h1{
+  font-size:2.2rem;font-weight:300;letter-spacing:0.05em;text-align:center;position:relative;
+  text-shadow:0 0 10px var(--ice-glow); animation:titleGlow 3s ease-in-out infinite alternate;
+  margin: var(--zen-spacing) 0; line-height: 1.2;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
 @keyframes titleGlow{from{ text-shadow:0 0 5px var(--ice-glow);} to{ text-shadow:0 0 20px var(--ice-primary);} }
 .header h1::after{content:""; position:absolute; bottom:-5px; left:50%; transform:translateX(-50%);
   width:0; height:3px; background:linear-gradient(90deg,var(--ice-primary),var(--ice-secondary));
@@ -32,14 +57,32 @@ body{
   box-shadow:0 6px 18px rgba(0,0,0,.08);
 }
 .tool-card{background:rgba(255,255,255,.9); backdrop-filter:blur(15px);
-  border:1px solid rgba(255,255,255,.3); border-radius:16px; padding:2rem; margin-bottom:1.5rem;
-  text-decoration:none; color:var(--text); display:block; transition:all .5s cubic-bezier(.4,0,.2,1);
-  box-shadow:0 1px 2px rgba(0,0,0,.05); position:relative; overflow:hidden; animation:cardFloat 8s ease-in-out infinite;}
+  border:1px solid rgba(255,255,255,.3); border-radius:var(--zen-radius); padding:var(--zen-spacing); margin-bottom:var(--zen-spacing);
+  text-decoration:none; color:var(--text); display:block; transition:all .5s var(--zen-ease);
+  box-shadow:var(--zen-shadow); position:relative; overflow:hidden; 
+  animation:cardFloat 8s ease-in-out infinite, zenCardBreath var(--zen-breath-duration) var(--zen-ease) infinite;}
 .tool-card:nth-child(odd){animation-delay:0s} .tool-card:nth-child(even){animation-delay:3s}
 @keyframes cardFloat{0%,100%{transform:translateY(0) rotate(0)}25%{translate:0 -5px; rotate:.5deg}
   50%{translate:0 -2px; rotate:-.5deg}75%{translate:0 -8px; rotate:.3deg}}
-.tool-card:hover{transform:translateY(-12px) scale(1.03); box-shadow:0 10px 24px rgba(0,0,0,.1), 0 0 40px var(--ice-glow);
-  border-color:var(--ice-primary); background:rgba(255,255,255,.95)}
+
+/* Zen Card Breathing Animation */
+@keyframes zenCardBreath {
+  0%, 100% { 
+    box-shadow: var(--zen-shadow);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 6px 25px rgba(0,0,0,0.12), var(--zen-glow);
+    transform: scale(1.005);
+  }
+}
+.tool-card:hover{
+  transform:translateY(-12px) scale(1.03); 
+  box-shadow:0 15px 35px rgba(0,0,0,.15), var(--zen-glow);
+  border-color:var(--ice-primary); 
+  background:rgba(255,255,255,.98);
+  animation-play-state: paused;
+}
 .tool-card::before{content:""; position:absolute; top:0; left:0; right:0; height:4px;
   background:linear-gradient(90deg,var(--ice-primary),var(--ice-secondary),var(--ice-glow)); transform:scaleX(0);
   transition:transform .4s ease}
@@ -47,14 +90,41 @@ body{
 .tool-card::after{content:""; position:absolute; inset:0; background:linear-gradient(135deg,var(--ice-glow) 0%, transparent 50%);
   opacity:0; transition:opacity .3s ease}
 .tool-card:hover::after{opacity:1}
-.tool-card .card-icon{font-size:2.2rem; margin-bottom:.75rem; color:var(--ice-primary);
-  animation:iconPulse 3s ease-in-out infinite; filter: drop-shadow(0 0 10px var(--ice-glow))}
+.tool-card .card-icon{font-size:2.2rem; margin-bottom:var(--zen-spacing); color:var(--ice-primary);
+  animation:iconPulse 3s ease-in-out infinite, zenIconBreath var(--zen-breath-duration) var(--zen-ease) infinite; 
+  filter: drop-shadow(0 0 10px var(--ice-glow));
+  transition: all 0.3s var(--zen-ease);}
 @keyframes iconPulse{0%,100%{transform:scale(1) rotate(0)}25%{transform:scale(1.08) rotate(2deg)}
   50%{transform:scale(1.05) rotate(-1deg)}75%{transform:scale(1.03) rotate(1deg)}}
+
+/* Zen Icon Breathing Animation */
+@keyframes zenIconBreath {
+  0%, 100% { 
+    filter: drop-shadow(0 0 10px var(--ice-glow));
+    opacity: 0.9;
+  }
+  50% { 
+    filter: drop-shadow(0 0 20px var(--ice-primary));
+    opacity: 1;
+  }
+}
 .tool-card:hover .card-icon{transform:scale(1.25) rotate(8deg)}
-.tool-card h3{font-weight:600;margin-bottom:.75rem}
-.tool-card p{color:var(--muted); margin-bottom:0}
-.tool-card .card-meta{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border); color:var(--muted)}
+.tool-card h3{
+  font-weight:400;margin-bottom:calc(var(--zen-spacing) * 0.5);
+  font-size:1.4rem;letter-spacing:0.02em;
+  transition: all 0.3s var(--zen-ease);
+}
+.tool-card p{
+  color:var(--muted); margin-bottom:0;
+  font-size:0.95rem;line-height:1.5;
+  transition: all 0.3s var(--zen-ease);
+}
+.tool-card .card-meta{
+  margin-top:var(--zen-spacing);padding-top:calc(var(--zen-spacing) * 0.5);
+  border-top:1px solid var(--border); color:var(--muted);
+  font-size:0.85rem;font-weight:300;
+  transition: all 0.3s var(--zen-ease);
+}
 .tool-card:hover h3{color:var(--ice-primary)} .tool-card:hover p{color:var(--text)}
 .tool-card:hover .card-meta{color:var(--ice-primary); border-top-color:var(--ice-primary)}
 
@@ -127,17 +197,42 @@ body{
   background: linear-gradient(135deg, #f8fafc, #e2e8f0);
 }
 
-/* Compact navbar */
+/* Enhanced navbar */
 .navbar {
-  padding: 0.5rem 0 !important;
+  padding: 1rem 0 !important;
+  margin-bottom: 2rem;
+  background: rgba(255,255,255,.95) !important;
+  backdrop-filter: blur(20px);
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.1);
 }
 
 .navbar-brand {
-  font-size: 1.1rem !important;
-  font-weight: 600;
+  font-size: 1.4rem !important;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: var(--ice-primary) !important;
+  text-shadow: 0 0 10px var(--ice-glow);
+  transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+  transform: scale(1.05);
+  text-shadow: 0 0 15px var(--ice-primary);
 }
 
 .nav-link {
-  padding: 0.5rem 0.75rem !important;
-  font-size: 0.9rem;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--text) !important;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  margin: 0 0.25rem;
+}
+
+.nav-link:hover {
+  color: var(--ice-primary) !important;
+  background: rgba(52, 152, 219, 0.1);
+  transform: translateY(-2px);
 }

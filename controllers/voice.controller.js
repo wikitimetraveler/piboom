@@ -57,14 +57,6 @@ async function executeVoiceCommand(command, io) {
         });
       }
       
-      // Also use text-to-speech to speak the response
-      if (process.env.MODE === 'pi') {
-        const { exec } = await import('child_process');
-        exec(`espeak "${chatResponse.replace(/"/g, '\\"')}"`, (error) => {
-          if (error) console.error('TTS Error:', error);
-        });
-      }
-      
     } catch (error) {
       console.error('ChatGPT Error:', error.message);
       if (io) {

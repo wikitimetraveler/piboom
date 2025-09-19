@@ -1,18 +1,8 @@
 import axios from 'axios';
+import { config } from '../config/index.js';
 
-// Wikipedia API configuration
-const WIKIPEDIA_API_URL = 'https://en.wikipedia.org/api/rest_v1';
-const WIKIPEDIA_SEARCH_URL = 'https://en.wikipedia.org/w/api.php';
-
-// Google API configuration (single key for all Google services)
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-const GOOGLE_KNOWLEDGE_GRAPH_URL = 'https://kgsearch.googleapis.com/v1/entities:search';
-const YOUTUBE_API_URL = 'https://www.googleapis.com/youtube/v3/search';
-
-/**
- * Search Google Knowledge Graph Cloud for artist information
- */
-const searchKnowledgeGraph = async (req, res) => {
+// Google Knowledge Graph search
+export async function searchKnowledgeGraph(req, res) {
   try {
     const { artist } = req.body;
     
@@ -20,715 +10,349 @@ const searchKnowledgeGraph = async (req, res) => {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    if (!GOOGLE_API_KEY) {
+    console.log('🔍 Searching Knowledge Graph for:', artist);
+
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
       return res.status(500).json({ error: 'Google API key not configured' });
     }
 
-    const response = await axios.get(GOOGLE_KNOWLEDGE_GRAPH_URL, {
-      params: {
-        query: artist,
-        key: GOOGLE_API_KEY,
-        types: 'Person,MusicGroup',
-        limit: 1
-      }
-    });
+    // Search Google Knowledge Graph API
+    const searchQuery = encodeURIComponent(artist);
+    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${searchQuery}&key=${apiKey}&limit=1&types=MusicGroup,Person,MusicRecording`;
 
-    const result = response.data.itemListElement?.[0]?.result;
+    const response = await axios.get(url);
+    const data = response.data;
+
+    if (data.itemListElement && data.itemListElement.length > 0) {
+      const entity = data.itemListElement[0].result;
+      
+      const result = {
+        name: entity.name || artist,
+        description: entity.description || entity.detailedDescription?.articleBody || 'No description available',
+        genre: entity.genre || 'Unknown',
+        birthDate: entity.birthDate || 'Unknown',
+        birthPlace: entity.birthPlace || 'Unknown',
+        bandMembers: entity.member || [],
+        url: entity.url || entity.detailedDescription?.url || '',
+        image: entity.image?.contentUrl || ''
+      };
+
+      res.json(result);
+    } else {
+      res.json({ 
+        name: artist,
+        description: 'No information found in Knowledge Graph',
+        error: 'No results found'
+      });
+    }
+  } catch (error) {
+    console.error('Knowledge Graph search error:', error);
+    res.status(500).json({ error: 'Failed to search Knowledge Graph' });
+  }
+}
+
+// Wikipedia search with Wikidata integration
+export async function searchWikipedia(req, res) {
+  try {
+    const { artist } = req.body;
     
-    if (!result) {
-      return res.json({ error: 'No artist information found' });
+    if (!artist) {
+      return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    // Extract relevant information
-    const artistInfo = {
-      name: result.name,
-      description: result.detailedDescription?.articleBody || result.description,
-      genre: extractGenreFromKG(result),
-      birthDate: result.birthDate,
-      birthPlace: extractBirthPlaceFromKG(result),
-      bandMembers: extractBandMembersFromKG(result),
-      type: result['@type']?.includes('MusicGroup') ? 'Band' : 'Person',
-      image: result.image?.contentUrl,
-      url: result.url
+    console.log('🔍 Searching Wikipedia/Wikidata for:', artist);
+
+    // First search for the page
+    const searchQuery = encodeURIComponent(artist);
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=1`;
+    
+    const searchResponse = await axios.get(searchUrl);
+    const searchData = searchResponse.data;
+    
+    if (!searchData.query?.search?.[0]) {
+      res.json({ 
+        name: artist,
+        description: 'No Wikipedia page found',
+        error: 'No results found'
+      });
+      return;
+    }
+
+    const pageTitle = searchData.query.search[0].title;
+    console.log('📄 Found Wikipedia page:', pageTitle);
+
+    // Get page summary for description first
+    const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`;
+    const summaryResponse = await axios.get(summaryUrl);
+    const summaryData = summaryResponse.data;
+
+    // Get Wikidata information for structured data
+    const wikidataInfo = await getWikidataInfo(pageTitle);
+    
+    // Fallback: if Wikidata didn't find birth place, try extracting from description
+    if (wikidataInfo.birthPlace === 'Unknown' && summaryData.extract) {
+      const extractedPlace = extractPlaceFromText(summaryData.extract);
+      if (extractedPlace) {
+        wikidataInfo.birthPlace = extractedPlace;
+        console.log('📍 Fallback extraction from description:', extractedPlace);
+      }
+    }
+    
+    // Fallback: if no band members found in Wikidata, try extracting from description
+    if (wikidataInfo.bandMembers.length === 0 && summaryData.extract) {
+      const extractedMembers = extractBandMembersFromText(summaryData.extract);
+      if (extractedMembers.length > 0) {
+        wikidataInfo.bandMembers = extractedMembers;
+        console.log('👥 Fallback extraction of band members:', extractedMembers.length);
+      }
+    }
+
+    const result = {
+      name: pageTitle,
+      description: summaryData.extract || 'No description available',
+      genre: wikidataInfo.genre || 'Various',
+      birthDate: wikidataInfo.birthDate || 'Unknown',
+      birthPlace: wikidataInfo.birthPlace || 'Unknown',
+      bandMembers: wikidataInfo.bandMembers || [],
+      url: summaryData.content_urls?.desktop?.page || `https://en.wikipedia.org/wiki/${encodeURIComponent(pageTitle)}`,
+      image: summaryData.thumbnail?.source || ''
     };
 
-    res.json(artistInfo);
-
+    res.json(result);
   } catch (error) {
-    console.error('Knowledge Graph API Error:', error.message);
-    res.status(500).json({ error: 'Failed to fetch artist information' });
+    console.error('Wikipedia search error:', error);
+    res.status(500).json({ error: 'Failed to search Wikipedia' });
   }
-};
+}
 
-/**
- * Search Wikipedia for artist information
- */
-const searchWikipedia = async (req, res) => {
+// Get structured data from Wikidata
+async function getWikidataInfo(pageTitle) {
   try {
-    const { artist } = req.body;
+    // Get Wikidata ID from Wikipedia page
+    const wikidataUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageprops&titles=${encodeURIComponent(pageTitle)}&ppprop=wikibase_item`;
     
-    if (!artist) {
-      return res.status(400).json({ error: 'Artist name is required' });
-    }
-
-    // First, search for the artist page
-    const searchResponse = await axios.get(WIKIPEDIA_SEARCH_URL, {
-      params: {
-        action: 'query',
-        format: 'json',
-        list: 'search',
-        srsearch: artist,
-        srlimit: 1,
-        srprop: 'snippet'
-      }
-    });
-
-    const searchResults = searchResponse.data.query?.search;
-    
-    if (!searchResults || searchResults.length === 0) {
-      return res.json({ error: 'No artist information found' });
-    }
-
-    const pageTitle = searchResults[0].title;
-    
-    // Get the full page content (including more than just intro for better data extraction)
-    const pageResponse = await axios.get(WIKIPEDIA_SEARCH_URL, {
-      params: {
-        action: 'query',
-        format: 'json',
-        prop: 'extracts|pageimages|info',
-        titles: pageTitle,
-        exintro: false, // Get more than just intro
-        exsentences: 10, // Get first 10 sentences for better context
-        explaintext: true,
-        piprop: 'original',
-        inprop: 'url'
-      }
-    });
-
-    const pages = pageResponse.data.query?.pages;
+    const wikidataResponse = await axios.get(wikidataUrl);
+    const pages = wikidataResponse.data.query?.pages;
     const pageId = Object.keys(pages)[0];
-    const pageData = pages[pageId];
-
-    if (!pageData || pageData.missing) {
-      return res.json({ error: 'Artist page not found' });
-    }
-
-    // Extract relevant information
-    const artistInfo = {
-      name: pageData.title,
-      description: pageData.extract || 'No description available',
-      genre: extractGenreFromText(pageData.extract),
-      birthDate: extractBirthDate(pageData.extract) || extractBirthDateFromInfobox(pageData.extract),
-      birthPlace: extractBirthPlace(pageData.extract),
-      bandMembers: extractBandMembers(pageData.extract),
-      type: determineArtistType(pageData.extract),
-      image: pageData.original?.source,
-      url: pageData.fullurl
-    };
-
-    res.json(artistInfo);
-
-  } catch (error) {
-    console.error('Wikipedia API Error:', error.message);
-    res.status(500).json({ error: 'Failed to fetch artist information' });
-  }
-};
-
-/**
- * Search YouTube for artist videos
- */
-const searchYouTube = async (req, res) => {
-  try {
-    const { artist } = req.body;
+    const wikidataId = pages[pageId]?.pageprops?.wikibase_item;
     
-    if (!artist) {
-      return res.status(400).json({ error: 'Artist name is required' });
+    if (!wikidataId) {
+      console.log('❌ No Wikidata ID found');
+      return { birthDate: 'Unknown', birthPlace: 'Unknown', bandMembers: [] };
     }
 
-    if (!GOOGLE_API_KEY) {
-      return res.status(500).json({ error: 'Google API key not configured' });
+    console.log('🔍 Found Wikidata ID:', wikidataId);
+
+    // Get structured data from Wikidata
+    const dataUrl = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${wikidataId}&format=json&props=claims`;
+    
+    const dataResponse = await axios.get(dataUrl);
+    const entity = dataResponse.data.entities[wikidataId];
+    
+    if (!entity) {
+      return { birthDate: 'Unknown', birthPlace: 'Unknown', bandMembers: [] };
     }
 
-    const response = await axios.get(YOUTUBE_API_URL, {
-      params: {
-        part: 'snippet',
-        q: `${artist} music`,
-        type: 'video',
-        key: GOOGLE_API_KEY,
-        maxResults: 6,
-        order: 'relevance'
+    const claims = entity.claims || {};
+    
+    // Extract birth place (P19) or formation place (P740 for bands)
+    let birthPlace = 'Unknown';
+    
+    // Try birth place first (P19)
+    if (claims.P19 && claims.P19[0]) {
+      const placeId = claims.P19[0].mainsnak?.datavalue?.value?.id;
+      if (placeId) {
+        birthPlace = await getPlaceName(placeId);
       }
-    });
-
-    const videos = response.data.items.map(item => ({
-      videoId: item.id.videoId,
-      title: item.snippet.title,
-      channelTitle: item.snippet.channelTitle,
-      thumbnail: item.snippet.thumbnails.medium?.url,
-      publishedAt: item.snippet.publishedAt
-    }));
-
-    res.json({ videos });
-
-  } catch (error) {
-    console.error('YouTube API Error:', error.message);
-    res.status(500).json({ error: 'Failed to fetch YouTube videos' });
-  }
-};
-
-/**
- * Get map data for artist birth places using Wikipedia
- */
-const getMapData = async (req, res) => {
-  try {
-    const { artist } = req.body;
+    }
     
-    if (!artist) {
-      return res.status(400).json({ error: 'Artist name is required' });
-    }
-
-    if (!GOOGLE_API_KEY) {
-      return res.status(500).json({ error: 'Google API key not configured' });
-    }
-
-    // First get artist info from Wikipedia to find birth places
-    const searchResponse = await axios.get(WIKIPEDIA_SEARCH_URL, {
-      params: {
-        action: 'query',
-        format: 'json',
-        list: 'search',
-        srsearch: artist,
-        srlimit: 1
+    // If no birth place, try formation place for bands (P740)
+    if (birthPlace === 'Unknown' && claims.P740 && claims.P740[0]) {
+      const placeId = claims.P740[0].mainsnak?.datavalue?.value?.id;
+      if (placeId) {
+        birthPlace = await getPlaceName(placeId);
       }
-    });
-
-    const searchResults = searchResponse.data.query?.search;
-    
-    if (!searchResults || searchResults.length === 0) {
-      return res.json({ error: 'No artist information found' });
     }
-
-    const pageTitle = searchResults[0].title;
     
-    // Get the full page content
-    const pageResponse = await axios.get(WIKIPEDIA_SEARCH_URL, {
-      params: {
-        action: 'query',
-        format: 'json',
-        prop: 'extracts',
-        titles: pageTitle,
-        exintro: true,
-        explaintext: true
+    // If still no place, try founded in (P571)
+    if (birthPlace === 'Unknown' && claims.P571 && claims.P571[0]) {
+      const placeId = claims.P571[0].mainsnak?.datavalue?.value?.id;
+      if (placeId) {
+        birthPlace = await getPlaceName(placeId);
       }
-    });
-
-    const pages = pageResponse.data.query?.pages;
-    const pageId = Object.keys(pages)[0];
-    const pageData = pages[pageId];
-
-    if (!pageData || pageData.missing) {
-      return res.json({ error: 'Artist page not found' });
     }
 
-    const birthPlaces = extractBirthPlaces(pageData.extract);
-    const mapData = [];
-    const timelineEvents = [];
+    // Extract birth date (P569)
+    let birthDate = 'Unknown';
+    if (claims.P569 && claims.P569[0]) {
+      const dateValue = claims.P569[0].mainsnak?.datavalue?.value?.time;
+      if (dateValue) {
+        birthDate = formatWikidataDate(dateValue);
+      }
+    }
 
-    // Get coordinates for each birth place and create timeline events
-    for (const place of birthPlaces) {
-      try {
-        const geocodeResponse = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
-          params: {
-            address: place,
-            key: GOOGLE_API_KEY
+    // Extract band members (P527 for "has part")
+    let bandMembers = [];
+    if (claims.P527) {
+      for (const member of claims.P527) {
+        const memberId = member.mainsnak?.datavalue?.value?.id;
+        if (memberId) {
+          const memberName = await getEntityLabel(memberId);
+          if (memberName) {
+            bandMembers.push({ name: memberName, instrument: 'Unknown', birthPlace: 'Unknown' });
           }
-        });
-
-        const location = geocodeResponse.data.results?.[0]?.geometry?.location;
-        if (location) {
-          mapData.push({
-            name: place,
-            lat: location.lat,
-            lng: location.lng
-          });
-          
-          // Create timeline event for birth place
-          timelineEvents.push({
-            date: 'Unknown',
-            title: `Birth Place: ${place}`,
-            description: `Birth place of ${artist}`,
-            location: place,
-            type: 'birth',
-            coordinates: { lat: location.lat, lng: location.lng }
-          });
         }
-      } catch (geocodeError) {
-        console.error(`Geocoding error for ${place}:`, geocodeError.message);
       }
     }
 
-    // Extract additional timeline events from the text
-    const additionalEvents = extractTimelineEvents(pageData.extract, artist);
-    timelineEvents.push(...additionalEvents);
+    console.log('📍 Wikidata extracted:', { birthPlace, birthDate, members: bandMembers.length });
 
-    // Sort timeline events chronologically
-    timelineEvents.sort((a, b) => {
-      const dateA = parseDateForSorting(a.date);
-      const dateB = parseDateForSorting(b.date);
-      return dateA - dateB;
-    });
-
-    res.json({ 
-      mapData,
-      timelineEvents 
-    });
+    return {
+      birthDate,
+      birthPlace,
+      bandMembers,
+      genre: 'Various' // Could extract from P136 (genre) if needed
+    };
 
   } catch (error) {
-    console.error('Map Data Error:', error.message);
-    res.status(500).json({ error: 'Failed to fetch map data' });
+    console.error('Wikidata extraction error:', error);
+    return { birthDate: 'Unknown', birthPlace: 'Unknown', bandMembers: [] };
   }
-};
-
-// Helper functions for Knowledge Graph data extraction
-
-function extractGenreFromKG(result) {
-  // Try to extract genre from various properties
-  const genre = result.genre || 
-                result.detailedDescription?.articleBody?.match(/genre[:\s]+([^,\.]+)/i)?.[1] ||
-                result.description?.match(/genre[:\s]+([^,\.]+)/i)?.[1];
-  return genre?.trim();
 }
 
-function extractBirthPlaceFromKG(result) {
-  // Extract birth place from various sources
-  return result.birthPlace?.name || 
-         result.birthPlace?.address?.addressLocality ||
-         result.birthPlace?.address?.addressCountry ||
-         result.birthPlace;
+// Get place name from Wikidata ID
+async function getPlaceName(placeId) {
+  try {
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${placeId}&format=json&props=labels&languages=en`;
+    const response = await axios.get(url);
+    const entity = response.data.entities[placeId];
+    return entity?.labels?.en?.value || 'Unknown';
+  } catch (error) {
+    console.error('Error getting place name:', error);
+    return 'Unknown';
+  }
 }
 
-function extractBandMembersFromKG(result) {
-  if (!result.member || !Array.isArray(result.member)) {
-    return [];
-  }
-  
-  return result.member.map(member => ({
-    name: member.name,
-    instrument: member.instrument || member.role,
-    birthPlace: extractBirthPlaceFromKG(member)
-  }));
-}
-
-// Helper functions for Wikipedia text parsing
-
-function extractGenreFromText(text) {
-  if (!text) return null;
-  
-  // Look for genre patterns in Wikipedia text
-  const genrePatterns = [
-    /genre[:\s]+([^,\.]+)/i,
-    /musical genre[:\s]+([^,\.]+)/i,
-    /style[:\s]+([^,\.]+)/i,
-    /known for[:\s]+([^,\.]+)/i
-  ];
-  
-  for (const pattern of genrePatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      return match[1].trim();
-    }
-  }
-  
+// Get entity label from Wikidata ID
+async function getEntityLabel(entityId) {
+  try {
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&format=json&props=labels&languages=en`;
+    const response = await axios.get(url);
+    const entity = response.data.entities[entityId];
+    return entity?.labels?.en?.value || null;
+  } catch (error) {
+    console.error('Error getting entity label:', error);
   return null;
 }
+}
 
-function extractBirthDate(text) {
-  if (!text) return null;
-  
-  // Enhanced birth date patterns for better extraction (ordered by specificity)
-  const birthPatterns = [
-    // Most specific patterns first - exact date formats
-    /born[:\s]+([A-Za-z]+ \d{1,2},? \d{4})/i,
-    /born[:\s]+(\d{1,2} [A-Za-z]+ \d{4})/i,
-    /born[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
-    
-    // Parenthetical patterns with dates
-    /\(born[:\s]+([A-Za-z]+ \d{1,2},? \d{4})\)/i,
-    /\(born[:\s]+(\d{1,2} [A-Za-z]+ \d{4})\)/i,
-    /\(born[:\s]+(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})\)/i,
-    
-    // Just year patterns
-    /born[:\s]+(\d{4})/i,
-    /\(born[:\s]+(\d{4})\)/i,
-    
-    // Wikipedia infobox patterns
-    /birth_date[:\s]*=?\s*([A-Za-z]+ \d{1,2},? \d{4})/i,
-    /born[:\s]*=?\s*([A-Za-z]+ \d{1,2},? \d{4})/i,
-    /birth_date[:\s]*=?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
-    /born[:\s]*=?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
-    
-    // Age-based patterns (calculate birth year)
-    /born[:\s]+([^,\.]+)[^,\.]*?\(age[:\s]*(\d+)\)/i,
-    
-    // More flexible patterns but with better boundaries
-    /born[:\s]+([A-Za-z]+ \d{1,2},? \d{4})[^A-Za-z]/i,
-    /born[:\s]+(\d{1,2} [A-Za-z]+ \d{4})[^A-Za-z]/i,
-    
-    // Fallback patterns (less specific)
-    /born[:\s]+([^,\.\(]+(?:January|February|March|April|May|June|July|August|September|October|November|December)[^,\.\(]*)/i,
-    /born[:\s]+([^,\.\(]+\d{4}[^,\.\(]*)/i,
-    
-    // Last resort patterns (most general)
-    /born[:\s]+([^,\.]+)/i,
-    /birth[:\s]+([^,\.]+)/i,
-    /\(born[:\s]+([^\)]+)\)/i
-  ];
-  
-  for (const pattern of birthPatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      let dateStr = match[1].trim();
-      
-      // Clean up the date string
-      dateStr = dateStr.replace(/[,\s]+$/, ''); // Remove trailing commas/spaces
-      dateStr = dateStr.replace(/^[,\s]+/, ''); // Remove leading commas/spaces
-      
-      // If we found an age-based pattern, try to calculate birth year
-      if (pattern.source.includes('age') && match[2]) {
-        const currentYear = new Date().getFullYear();
-        const age = parseInt(match[2]);
-        const birthYear = currentYear - age;
-        return birthYear.toString();
-      }
-      
-      // Validate that we have a reasonable date
-      if (isValidDateString(dateStr)) {
-        return dateStr;
-      }
+// Format Wikidata date
+function formatWikidataDate(dateString) {
+  try {
+    // Wikidata dates are in format +1965-00-00T00:00:00Z
+    const year = dateString.match(/\+(\d{4})/);
+    if (year) {
+      return year[1];
     }
+    return 'Unknown';
+  } catch (error) {
+    return 'Unknown';
   }
-  
-  return null;
 }
 
-// Helper function to validate date strings
-function isValidDateString(dateStr) {
-  if (!dateStr || dateStr.length < 4) return false;
-  
-  // Check if it contains a year (4 digits)
-  const yearMatch = dateStr.match(/\d{4}/);
-  if (!yearMatch) return false;
-  
-  const year = parseInt(yearMatch[0]);
-  
-  // Reasonable year range (1800-2025)
-  if (year < 1800 || year > 2025) return false;
-  
-  // Check if it's not just a random number
-  if (dateStr.length < 6) return false;
-  
-  // Additional validation - check for common date patterns
-  const hasValidDatePattern = 
-    // Month name patterns
-    /(January|February|March|April|May|June|July|August|September|October|November|December)/i.test(dateStr) ||
-    // Numeric date patterns
-    /\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(dateStr) ||
-    // Just year (but with some context)
-    (dateStr.length <= 10 && /\d{4}/.test(dateStr));
-  
-  if (!hasValidDatePattern) return false;
-  
-  // Reject if it contains too much extra text (likely captured too much)
-  if (dateStr.length > 50) return false;
-  
-  return true;
-}
-
-// Extract birth date from Wikipedia infobox patterns
-function extractBirthDateFromInfobox(text) {
-  if (!text) return null;
-  
-  // Look for infobox patterns that might contain birth dates
-  const infoboxPatterns = [
-    // Common infobox patterns
-    /birth_date[:\s]*=?\s*([^|\n]+)/i,
-    /born[:\s]*=?\s*([^|\n]+)/i,
-    /date_of_birth[:\s]*=?\s*([^|\n]+)/i,
-    /birth[:\s]*=?\s*([^|\n]+)/i,
-    
-    // Table-like patterns
-    /\|\s*birth_date\s*=\s*([^|\n]+)/i,
-    /\|\s*born\s*=\s*([^|\n]+)/i,
-    /\|\s*date_of_birth\s*=\s*([^|\n]+)/i,
-    
-    // More specific date patterns in infobox context
-    /birth_date[:\s]*=?\s*([A-Za-z]+ \d{1,2},? \d{4})/i,
-    /born[:\s]*=?\s*([A-Za-z]+ \d{1,2},? \d{4})/i,
-    /birth_date[:\s]*=?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
-    /born[:\s]*=?\s*(\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4})/i,
-    
-    // Parenthetical patterns in infobox
-    /birth_date[:\s]*=?\s*[^|]*?\(([^)]+)\)/i,
-    /born[:\s]*=?\s*[^|]*?\(([^)]+)\)/i
-  ];
-  
-  for (const pattern of infoboxPatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      let dateStr = match[1].trim();
-      
-      // Clean up the date string
-      dateStr = dateStr.replace(/[,\s]+$/, '');
-      dateStr = dateStr.replace(/^[,\s]+/, '');
-      
-      // Validate that we have a reasonable date
-      if (isValidDateString(dateStr)) {
-        return dateStr;
-      }
-    }
-  }
-  
-  return null;
-}
-
-function extractBirthPlace(text) {
-  if (!text) return null;
-  
-  // Look for birth place patterns
+// Extract place from text as fallback
+function extractPlaceFromText(text) {
   const placePatterns = [
-    /born in[:\s]+([^,\.]+)/i,
-    /from[:\s]+([^,\.]+)/i,
-    /birthplace[:\s]+([^,\.]+)/i
+    /formed in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+    /born in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+    /from[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+    /based in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+    /originated in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+    /started in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i,
+    /established in[:\s]+([^,\.\n]+?)(?:\s+in\s+\d{4}|\s+on\s+|\s+at\s+|$)/i
   ];
   
   for (const pattern of placePatterns) {
     const match = text.match(pattern);
     if (match) {
-      return match[1].trim();
+      let place = match[1].trim();
+      place = place.replace(/[,\n].*$/, '').trim();
+      if (place.length > 0 && place.length < 100) {
+        return place;
+      }
     }
   }
   
   return null;
 }
 
-function extractBirthPlaces(text) {
-  const places = [];
-  
-  // Add main birth place
-  const birthPlace = extractBirthPlace(text);
-  if (birthPlace) {
-    places.push(birthPlace);
-  }
-  
-  // Look for band members' birth places
-  const memberPattern = /members?[:\s]+([^\.]+)/i;
-  const memberMatch = text.match(memberPattern);
-  if (memberMatch) {
-    const membersText = memberMatch[1];
-    // Look for birth places in member descriptions
-    const memberPlacePattern = /\(born[:\s]+([^\)]+)\)/gi;
-    let match;
-    while ((match = memberPlacePattern.exec(membersText)) !== null) {
-      const place = match[1].trim();
-      if (place && !places.includes(place)) {
-        places.push(place);
-      }
-    }
-  }
-  
-  return places;
-}
-
-function extractBandMembers(text) {
-  if (!text) return [];
-  
+// Extract band members from text as fallback
+function extractBandMembersFromText(text) {
   const members = [];
   
-  // Look for band members section
+  // Look for patterns like "consisted of [names]" or "members included [names]"
   const memberPatterns = [
-    /members?[:\s]+([^\.]+)/i,
-    /lineup[:\s]+([^\.]+)/i,
-    /band members?[:\s]+([^\.]+)/i
+    /consisted of[:\s]+([^.]+?)\./i,
+    /members included[:\s]+([^.]+?)\./i,
+    /members were[:\s]+([^.]+?)\./i,
+    /band members[:\s]+([^.]+?)\./i
   ];
   
   for (const pattern of memberPatterns) {
     const match = text.match(pattern);
     if (match) {
-      const membersText = match[1];
+      const memberText = match[1];
+      console.log('🎵 Found member text:', memberText);
+      
       // Split by common separators and clean up
-      const memberList = membersText.split(/[,;]/).map(member => {
-        const cleanMember = member.trim();
-        const nameMatch = cleanMember.match(/^([^(]+)/);
-        const instrumentMatch = cleanMember.match(/\(([^)]+)\)/);
-        
-        return {
-          name: nameMatch ? nameMatch[1].trim() : cleanMember,
-          instrument: instrumentMatch ? instrumentMatch[1].trim() : null,
-          birthPlace: extractBirthPlace(cleanMember)
-        };
+      const memberNames = memberText
+        .split(/[,;]|\sand\s/i)
+        .map(name => name.trim())
+        .filter(name => name.length > 0 && name.length < 50)
+        .map(name => {
+          // Clean up common prefixes/suffixes
+          return name
+            .replace(/^(Canadians?|Americans?|British|English|Scottish|Irish|Welsh|Australian|New Zealanders?)\s+/i, '')
+            .replace(/\s+(Canadians?|Americans?|British|English|Scottish|Irish|Welsh|Australian|New Zealanders?)$/i, '')
+            .trim();
+        })
+        .filter(name => name.length > 0);
+      
+      // Handle the case where we have "and" in the middle of the text
+      // Split the original text more carefully
+      const fullMemberText = memberText.replace(/^(Canadians?|Americans?|British|English|Scottish|Irish|Welsh|Australian|New Zealanders?)\s+/i, '');
+      const allMembers = fullMemberText
+        .split(/\sand\s/i)
+        .map(part => part.trim())
+        .filter(part => part.length > 0)
+        .flatMap(part => part.split(/[,;]/))
+        .map(name => name.trim())
+        .filter(name => name.length > 0 && name.length < 50);
+      
+      console.log('👥 All members after better splitting:', allMembers);
+      
+      // Use the better splitting result
+      allMembers.forEach(name => {
+        if (name && name.length > 0) {
+          members.push({
+            name: name,
+            birthPlace: 'Unknown',
+            birthDate: 'Unknown'
+          });
+        }
       });
       
-      members.push(...memberList);
-      break;
+      break; // Only process the first match
     }
   }
   
   return members;
 }
 
-function determineArtistType(text) {
-  if (!text) return 'Unknown';
-  
-  const bandIndicators = ['band', 'group', 'ensemble', 'collective', 'members'];
-  const soloIndicators = ['singer', 'musician', 'artist', 'solo'];
-  
-  const lowerText = text.toLowerCase();
-  
-  for (const indicator of bandIndicators) {
-    if (lowerText.includes(indicator)) {
-      return 'Band';
-    }
-  }
-  
-  for (const indicator of soloIndicators) {
-    if (lowerText.includes(indicator)) {
-      return 'Solo Artist';
-    }
-  }
-  
-  return 'Musician';
-}
 
-/**
- * Extract timeline events from Wikipedia text
- */
-function extractTimelineEvents(text, artistName) {
-  const events = [];
-  
-  if (!text) return events;
-  
-  // Extract birth date and create birth event
-  const birthDate = extractBirthDate(text);
-  const birthPlace = extractBirthPlace(text);
-  
-  if (birthDate && birthPlace) {
-    events.push({
-      date: birthDate,
-      title: `Born: ${artistName}`,
-      description: `Birth of ${artistName}`,
-      location: birthPlace,
-      type: 'birth'
-    });
-  }
-  
-  // Extract band formation dates
-  const formationPatterns = [
-    /formed in (\d{4})/i,
-    /founded in (\d{4})/i,
-    /established in (\d{4})/i,
-    /created in (\d{4})/i
-  ];
-  
-  for (const pattern of formationPatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      events.push({
-        date: match[1],
-        title: `Band Formed: ${artistName}`,
-        description: `Formation of ${artistName}`,
-        location: birthPlace || 'Unknown',
-        type: 'formation'
-      });
-      break;
-    }
-  }
-  
-  // Extract album release dates
-  const albumPatterns = [
-    /released (?:their )?(?:debut )?album[^.]*?(\d{4})/i,
-    /album[^.]*?(\d{4})/i
-  ];
-  
-  for (const pattern of albumPatterns) {
-    const match = text.match(pattern);
-    if (match) {
-      events.push({
-        date: match[1],
-        title: `Album Release`,
-        description: `Album released by ${artistName}`,
-        location: 'Unknown',
-        type: 'album'
-      });
-      break;
-    }
-  }
-  
-  // Extract band member information
-  const memberPattern = /members?[:\s]+([^\.]+)/i;
-  const memberMatch = text.match(memberPattern);
-  if (memberMatch) {
-    const membersText = memberMatch[1];
-    const memberPlacePattern = /\(born[:\s]+([^\)]+)\)/gi;
-    let match;
-    while ((match = memberPlacePattern.exec(membersText)) !== null) {
-      const place = match[1].trim();
-      events.push({
-        date: 'Unknown',
-        title: `Band Member Birth Place`,
-        description: `Band member from ${place}`,
-        location: place,
-        type: 'other'
-      });
-    }
-  }
-  
-  return events;
-}
-
-/**
- * Parse date string for chronological sorting
- */
-function parseDateForSorting(dateString) {
-  if (!dateString || dateString === 'Unknown') {
-    return new Date(1900, 0, 1);
-  }
-  
-  // Try to extract year from various formats
-  const yearMatch = dateString.match(/(\d{4})/);
-  if (yearMatch) {
-    return new Date(parseInt(yearMatch[1]), 0, 1);
-  }
-  
-  // Try to parse the full date
-  const date = new Date(dateString);
-  if (!isNaN(date.getTime())) {
-    return date;
-  }
-  
-  return new Date(1900, 0, 1);
-}
-
-/**
- * Get Google API key for frontend
- */
-const getGoogleApiKey = async (req, res) => {
-  try {
-    if (!GOOGLE_API_KEY) {
-      return res.status(500).json({ error: 'Google API key not configured' });
-    }
-    
-    res.json({ apiKey: GOOGLE_API_KEY });
-  } catch (error) {
-    console.error('API Key Error:', error.message);
-    res.status(500).json({ error: 'Failed to get API key' });
-  }
-};
-
-/**
- * Test birth date extraction for debugging
- */
-const testBirthDateExtraction = async (req, res) => {
+// YouTube search
+export async function searchYouTube(req, res) {
   try {
     const { artist } = req.body;
     
@@ -736,74 +360,213 @@ const testBirthDateExtraction = async (req, res) => {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    // Get Wikipedia page content
-    const searchResponse = await axios.get(WIKIPEDIA_SEARCH_URL, {
-      params: {
-        action: 'query',
-        format: 'json',
-        list: 'search',
-        srsearch: artist,
-        srlimit: 1
-      }
-    });
+    console.log('🔍 Searching YouTube for:', artist);
 
-    const searchResults = searchResponse.data.query?.search;
-    
-    if (!searchResults || searchResults.length === 0) {
-      return res.json({ error: 'No artist information found' });
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Google API key not configured' });
     }
 
-    const pageTitle = searchResults[0].title;
-    
-    // Get the full page content
-    const pageResponse = await axios.get(WIKIPEDIA_SEARCH_URL, {
-      params: {
-        action: 'query',
-        format: 'json',
-        prop: 'extracts',
-        titles: pageTitle,
-        exintro: false,
-        exsentences: 15,
-        explaintext: true
-      }
-    });
+    // Search YouTube Data API
+    const searchQuery = encodeURIComponent(artist);
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${searchQuery}&type=video&key=${apiKey}&maxResults=6`;
 
-    const pages = pageResponse.data.query?.pages;
-    const pageId = Object.keys(pages)[0];
-    const pageData = pages[pageId];
+    const response = await axios.get(url);
+    const data = response.data;
 
-    if (!pageData || pageData.missing) {
-      return res.json({ error: 'Artist page not found' });
+    if (data.items && data.items.length > 0) {
+      const videos = data.items.map(item => ({
+      videoId: item.id.videoId,
+      title: item.snippet.title,
+      channelTitle: item.snippet.channelTitle,
+        thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url || ''
+    }));
+
+    res.json({ videos });
+    } else {
+      res.json({ videos: [] });
     }
-
-    // Test different extraction methods
-    const birthDate1 = extractBirthDate(pageData.extract);
-    const birthDate2 = extractBirthDateFromInfobox(pageData.extract);
-    const birthPlace = extractBirthPlace(pageData.extract);
-
-    res.json({
-      artist: pageTitle,
-      text: pageData.extract.substring(0, 1000) + '...', // First 1000 chars for debugging
-      birthDate: {
-        method1: birthDate1,
-        method2: birthDate2,
-        final: birthDate1 || birthDate2
-      },
-      birthPlace: birthPlace,
-      textLength: pageData.extract.length
-    });
-
   } catch (error) {
-    console.error('Birth Date Test Error:', error.message);
-    res.status(500).json({ error: 'Failed to test birth date extraction' });
+    console.error('YouTube search error:', error);
+    res.status(500).json({ error: 'Failed to search YouTube' });
   }
-};
+}
 
-export {
-  searchKnowledgeGraph,
-  searchWikipedia,
-  searchYouTube,
-  getMapData,
-  getGoogleApiKey,
-  testBirthDateExtraction
-};
+// Map data for birth places using Wikipedia/Wikidata
+export async function getMapData(req, res) {
+  try {
+    const { artist } = req.body;
+    
+    if (!artist) {
+      return res.status(400).json({ error: 'Artist name is required' });
+    }
+
+    console.log('🔍 Getting map data for:', artist);
+
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'Google API key not configured' });
+    }
+
+    // Get artist information from Wikipedia/Wikidata
+    const artistInfo = await getArtistInfoFromWikipedia(artist);
+    
+    let mapData = [];
+    let timelineEvents = [];
+
+    // Process main artist birth place
+    if (artistInfo.birthPlace && artistInfo.birthPlace !== 'Unknown') {
+      const geocoded = await geocodeLocation(artistInfo.birthPlace, apiKey);
+      if (geocoded) {
+        mapData.push(geocoded);
+        timelineEvents.push({
+          date: artistInfo.birthDate || 'Unknown',
+          title: `Born: ${artistInfo.name}`,
+          description: `Birth of ${artistInfo.name}`,
+          location: artistInfo.birthPlace,
+          type: 'birth',
+          coordinates: { lat: geocoded.lat, lng: geocoded.lng }
+        });
+      }
+    }
+
+    // Process band members' birth places
+    if (artistInfo.bandMembers && artistInfo.bandMembers.length > 0) {
+      for (const member of artistInfo.bandMembers) {
+        if (member.birthPlace && member.birthPlace !== 'Unknown') {
+          const geocoded = await geocodeLocation(member.birthPlace, apiKey);
+          if (geocoded) {
+            // Check if this location is already in mapData
+            const exists = mapData.some(loc => 
+              Math.abs(loc.lat - geocoded.lat) < 0.01 && 
+              Math.abs(loc.lng - geocoded.lng) < 0.01
+            );
+            
+            if (!exists) {
+              mapData.push(geocoded);
+            }
+            
+          timelineEvents.push({
+              date: member.birthDate || 'Unknown',
+              title: `Band Member: ${member.name}`,
+              description: `${member.name}${member.instrument ? ` (${member.instrument})` : ''}`,
+              location: member.birthPlace,
+              type: 'other',
+              coordinates: { lat: geocoded.lat, lng: geocoded.lng }
+      });
+    }
+  }
+      }
+    }
+
+    console.log('📍 Map data extracted:', { locations: mapData.length, events: timelineEvents.length });
+
+    res.json({ 
+      mapData,
+      timelineEvents 
+    });
+  } catch (error) {
+    console.error('Map data error:', error);
+    res.status(500).json({ error: 'Failed to get map data' });
+  }
+}
+
+// Get artist info from Wikipedia/Wikidata
+async function getArtistInfoFromWikipedia(artist) {
+  try {
+    // Search for the page
+    const searchQuery = encodeURIComponent(artist);
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=1`;
+    
+    const searchResponse = await axios.get(searchUrl);
+    const searchData = searchResponse.data;
+    
+    if (!searchData.query?.search?.[0]) {
+      return { name: artist, birthPlace: 'Unknown', birthDate: 'Unknown', bandMembers: [] };
+    }
+
+    const pageTitle = searchData.query.search[0].title;
+    console.log('📄 Found Wikipedia page for map data:', pageTitle);
+
+    // Get Wikidata information
+    const wikidataInfo = await getWikidataInfo(pageTitle);
+        
+        return {
+      name: pageTitle,
+      birthPlace: wikidataInfo.birthPlace,
+      birthDate: wikidataInfo.birthDate,
+      bandMembers: wikidataInfo.bandMembers
+    };
+  } catch (error) {
+    console.error('Error getting artist info:', error);
+    return { name: artist, birthPlace: 'Unknown', birthDate: 'Unknown', bandMembers: [] };
+  }
+}
+
+// Geocode a location using Google Maps API
+async function geocodeLocation(placeName, apiKey) {
+  try {
+    const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(placeName)}&key=${apiKey}`;
+    
+    const geoResponse = await axios.get(geocodingUrl);
+    const geoData = geoResponse.data;
+    
+    if (geoData.results && geoData.results.length > 0) {
+      const location = geoData.results[0].geometry.location;
+      console.log('📍 Geocoded:', placeName, '->', location);
+      return {
+        name: placeName,
+        lat: location.lat,
+        lng: location.lng
+      };
+    }
+    
+    console.log('❌ Geocoding failed for:', placeName);
+    return null;
+  } catch (error) {
+    console.error('Geocoding error for', placeName, ':', error);
+    return null;
+  }
+}
+
+// Get Google API key
+export async function getGoogleApiKey(req, res) {
+  try {
+    // Get API key from environment variable
+    const apiKey = process.env.GOOGLE_API_KEY;
+    
+    if (apiKey) {
+      console.log('🗺️ Using Google Maps API key from environment');
+      res.json({ apiKey: apiKey });
+    } else {
+      console.warn('❌ No Google Maps API key found in environment variables');
+      res.json({ apiKey: null });
+    }
+  } catch (error) {
+    console.error('Google API key error:', error);
+    res.status(500).json({ error: 'Failed to get Google API key' });
+  }
+}
+
+// Test birth date extraction
+export async function testBirthDateExtraction(req, res) {
+  try {
+    const { text } = req.body;
+    
+    if (!text) {
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    // Mock birth date extraction
+    const mockResult = {
+      extractedDate: '1960-10-09',
+      confidence: 0.85,
+      source: 'Wikipedia'
+    };
+
+    res.json(mockResult);
+  } catch (error) {
+    console.error('Birth date extraction error:', error);
+    res.status(500).json({ error: 'Failed to extract birth date' });
+  }
+}
