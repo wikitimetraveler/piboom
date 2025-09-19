@@ -36,6 +36,9 @@ DEFAULT_VOLUME=70
 
 # Google API Key (for Knowledge Graph, YouTube, and Maps)
 GOOGLE_API_KEY=your_google_api_key_here
+
+# OpenAI API Key (for ChatGPT integration)
+OPENAI_API_KEY=your_openai_api_key_here
 ```
 
 ### 4. Start Development Mode

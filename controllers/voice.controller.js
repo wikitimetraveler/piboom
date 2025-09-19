@@ -1,11 +1,12 @@
 import VoiceService from '../services/voice.service.js';
+import axios from 'axios';
 
 const voiceService = new VoiceService();
 let isInitialized = false;
 let lastVoiceCommand = null;
 
 // Execute voice commands with server-side actions
-function executeVoiceCommand(command) {
+async function executeVoiceCommand(command, io) {
   console.log('Executing voice command:', command);
   
   // Store the last command for fallback communication
@@ -21,13 +22,59 @@ function executeVoiceCommand(command) {
     console.log('🔍 Voice command: Music research for', artistName);
     
     // Send to frontend to open music research page and search
-    if (req.app.locals.io) {
-      req.app.locals.io.emit('voiceCommand', { 
+    if (io) {
+      io.emit('voiceCommand', { 
         command: 'musicResearch', 
         artist: artistName,
         timestamp: Date.now(),
         action: 'search'
       });
+    }
+    return;
+  }
+  
+  // Check for ChatGPT-powered commands
+  if (command.startsWith('ask ') || command.startsWith('what ') || command.startsWith('how ') || 
+      command.startsWith('why ') || command.startsWith('explain ') || command.includes('recommend')) {
+    console.log('🤖 Voice command: ChatGPT query -', command);
+    
+    try {
+      const response = await axios.post('http://localhost:3000/api/chat/chat', {
+        message: command,
+        context: { source: 'voice_command' }
+      });
+      
+      const chatResponse = response.data.response;
+      console.log('🤖 ChatGPT response:', chatResponse);
+      
+      // Send response to frontend
+      if (io) {
+        io.emit('voiceCommand', { 
+          command: 'chatResponse', 
+          response: chatResponse,
+          timestamp: Date.now(),
+          action: 'chat'
+        });
+      }
+      
+      // Also use text-to-speech to speak the response
+      if (process.env.MODE === 'pi') {
+        const { exec } = await import('child_process');
+        exec(`espeak "${chatResponse.replace(/"/g, '\\"')}"`, (error) => {
+          if (error) console.error('TTS Error:', error);
+        });
+      }
+      
+    } catch (error) {
+      console.error('ChatGPT Error:', error.message);
+      if (io) {
+        io.emit('voiceCommand', { 
+          command: 'chatError', 
+          error: 'Sorry, I could not process that request right now.',
+          timestamp: Date.now(),
+          action: 'error'
+        });
+      }
     }
     return;
   }
@@ -56,8 +103,8 @@ function executeVoiceCommand(command) {
     case 'music research':
     case 'open research':
       console.log('🔍 Voice command: Opening music research');
-      if (req.app.locals.io) {
-        req.app.locals.io.emit('voiceCommand', { 
+      if (io) {
+        io.emit('voiceCommand', { 
           command: 'openMusicResearch', 
           timestamp: Date.now(),
           action: 'navigate'
@@ -67,10 +114,36 @@ function executeVoiceCommand(command) {
       
     case 'help':
       console.log('❓ Voice command: Showing help');
+      if (io) {
+        io.emit('voiceCommand', { 
+          command: 'showHelp', 
+          timestamp: Date.now(),
+          action: 'help'
+        });
+      }
       break;
       
     default:
       console.log('❓ Voice command not recognized:', command);
+      // Try ChatGPT for unrecognized commands
+      try {
+        const response = await axios.post('http://localhost:3000/api/chat/chat', {
+          message: `I said "${command}" but I'm not sure what you want me to do. Can you help me understand?`,
+          context: { source: 'unrecognized_voice_command' }
+        });
+        
+        const chatResponse = response.data.response;
+        if (io) {
+          io.emit('voiceCommand', { 
+            command: 'chatResponse', 
+            response: chatResponse,
+            timestamp: Date.now(),
+            action: 'chat'
+          });
+        }
+      } catch (error) {
+        console.error('ChatGPT fallback error:', error.message);
+      }
   }
 }
 
@@ -120,9 +193,9 @@ export async function initVoice(req, res) {
 export function startVoice(req, res) {
   console.log('startVoice endpoint called');
   try {
-    voiceService.startListening((command) => {
+    voiceService.startListening(async (command) => {
       console.log('Voice command recognized:', command);
-      executeVoiceCommand(command);
+      await executeVoiceCommand(command, req.app.locals.io);
       
       // Send command to frontend via Socket.IO for immediate action
       if (req.app.locals.io) {
@@ -139,7 +212,7 @@ export function startVoice(req, res) {
     
     res.json({ 
       success: true, 
-      message: 'Voice activation started',
+      message: 'Voice activation started with ChatGPT integration',
       listening: true
     });
   } catch (error) {
