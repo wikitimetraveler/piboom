@@ -1,15 +1,25 @@
-# 🎵 Pi BOOM Audio System
+# 🎵 Pi BOOM Music Research System
 
-A Raspberry Pi-powered audio system with voice activation, designed for hands-free music control and high-quality audio playback.
+A voice-activated Raspberry Pi system designed for comprehensive music research and discovery, with integrated audio playback capabilities. **Voice activation is the primary interface** - simply speak your commands to explore artists, get AI-powered insights, and control music playback.
 
-## ✨ Features
+**🔥 Multi-API Mashup Architecture**: This system intelligently combines multiple APIs and data sources to create a unified, comprehensive music research experience that no single service could provide alone.
 
-- **🎤 Voice Commands**: Control music with natural voice commands
-- **🔊 High-Quality Audio**: Local audio playback using mpg123
-- **🎵 Music Library**: Support for MP3, WAV, and FLAC formats
-- **📱 Web Interface**: Touch-friendly web UI for manual control
+## ✨ Primary Features
+
+- **🎤 Voice-Activated Music Research**: "Search Pink Floyd", "Tell me about Tool", "Who is Maynard?"
+- **🤖 ChatGPT AI Integration**: Ask anything about music - "Ask what makes Pink Floyd unique", "Recommend progressive metal", "Explain the difference between genres"
+- **🗺️ Interactive Artist Maps**: Visualize band member birth places and musical journeys
+- **📊 Comprehensive Timelines**: Chronological artist and band history
+- **🎬 YouTube Integration**: Discover and play related music videos
+- **🔍 Multi-Source Research**: Google Knowledge Graph, Wikipedia, MusicBrainz, and YouTube APIs
+- **📱 Responsive Web Interface**: Beautiful, modern UI with collapsible sections
+
+## 🔊 Secondary Features
+
+- **🎵 Local Audio Player**: High-quality MP3 playback using mpg123
+- **🎤 Voice-Controlled Playback**: "Play", "Pause", "Next", "Previous", "Volume up"
 - **🔊 System Volume Control**: Hardware volume control via amixer/pactl
-- **🎤 Text-to-Speech**: Voice feedback using espeak
+- **🎤 Text-to-Speech Feedback**: Voice confirmation using espeak
 - **📡 Real-time Communication**: Socket.IO for instant voice command processing
 
 ## 🚀 Quick Start (Raspberry Pi)
@@ -30,11 +40,31 @@ npm run pi
 ### 3. Open Web Interface
 Navigate to `http://localhost:3000` in your browser
 
-### 4. Initialize Voice
-Click "Initialize Voice" button to start voice recognition
+### 4. Start Music Research
+- **Primary Interface**: Go to `http://localhost:3000/music-research.html` for the main music research system
+- **Secondary Interface**: Go to `http://localhost:3000/player.html` for audio playback controls
+
+### 5. Initialize Voice
+Click "Initialize Voice" button to start voice recognition for hands-free operation
 
 ## 🎤 Voice Commands
 
+### 🔍 Music Research Commands
+| Command | Example | Action |
+|---------|---------|---------|
+| **search [artist]** | "search Pink Floyd" | Search for artist information |
+| **tell me about [artist]** | "tell me about Tool" | Get detailed artist info |
+| **who is [artist]** | "who is Maynard" | Quick artist lookup |
+| **music research** | "music research" | Open research page |
+
+### 🤖 ChatGPT AI Commands
+| Command | Example | Action |
+|---------|---------|---------|
+| **ask [question]** | "ask what makes Pink Floyd unique" | Get AI insights about music |
+| **recommend [genre/mood]** | "recommend progressive metal" | Get music recommendations |
+| **explain [topic]** | "explain the difference between Pink Floyd and Led Zeppelin" | Get detailed explanations |
+
+### 🎵 Audio Player Commands
 | Command | Aliases | Action |
 |---------|---------|---------|
 | **play** | start, begin, go | Start playing current track |
@@ -65,10 +95,13 @@ Click "Initialize Voice" button to start voice recognition
 - `portaudio19-dev` - PortAudio development libraries
 
 ### Node.js Packages
-- `express` - Web server
-- `socket.io` - Real-time communication
+- `express` - Web server framework
+- `socket.io` - Real-time communication for voice commands
 - `play-sound` - Audio playback interface
 - `@google-cloud/speech` - Speech recognition (optional)
+- `openai` - ChatGPT API integration for AI-powered music insights
+- `axios` - HTTP client for multi-API requests
+- `cors` - Cross-origin resource sharing for API calls
 
 ## 🔧 Configuration
 
@@ -82,6 +115,47 @@ Click "Initialize Voice" button to start voice recognition
 - **Language**: English (configurable)
 - **Timeout**: 3-second audio chunks
 - **Silence Removal**: Automatic silence detection
+
+### ChatGPT Integration
+- **API**: OpenAI GPT models for intelligent music analysis
+- **Voice Commands**: "Ask [question]", "Recommend [genre]", "Explain [topic]"
+- **Context-Aware**: Understands music terminology and artist relationships
+- **Real-time Responses**: Instant AI insights delivered via voice and text
+
+### Multi-API Configuration
+- **Google APIs**: Knowledge Graph, Maps, and YouTube Data APIs
+- **OpenAI API**: ChatGPT integration for AI analysis
+- **Environment Variables**: All API keys stored securely in `.env` file
+- **Rate Limiting**: Intelligent API usage to respect service limits
+- **Fallback Handling**: Graceful degradation when APIs are unavailable
+
+## 🔥 Multi-API Mashup Architecture
+
+This system creates a powerful music research platform by intelligently combining multiple APIs and data sources:
+
+### 📊 Data Sources & APIs
+| API/Service | Purpose | Data Provided |
+|-------------|---------|---------------|
+| **Google Knowledge Graph** | Artist Discovery | Rich entity data, images, descriptions |
+| **Wikipedia API** | Detailed Information | Comprehensive biographies, band histories |
+| **MusicBrainz API** | Music Metadata | Discographies, relationships, identifiers |
+| **YouTube Data API** | Video Content | Music videos, live performances, interviews |
+| **OpenAI ChatGPT** | AI Analysis | Intelligent insights, recommendations, explanations |
+| **Google Maps API** | Geographic Data | Birth places, concert venues, geographic context |
+
+### 🎯 Mashup Benefits
+- **Comprehensive Coverage**: No single API provides complete artist information
+- **Rich Context**: Combines factual data with AI analysis and visual content
+- **Interactive Experience**: Maps, timelines, videos, and text in one interface
+- **Voice Integration**: All data sources accessible through natural speech commands
+- **Real-time Synthesis**: Multiple APIs queried simultaneously for instant results
+
+### 🔄 Data Flow
+1. **Voice Input** → Speech recognition processes command
+2. **Multi-API Query** → System queries relevant APIs in parallel
+3. **Data Fusion** → Results combined into unified presentation
+4. **AI Enhancement** → ChatGPT adds analysis and insights
+5. **Interactive Output** → Maps, timelines, videos, and text displayed together
 
 ## 📁 Project Structure
 
