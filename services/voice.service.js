@@ -198,8 +198,10 @@ export class VoiceService {
     // Process the command using the same logic
     this.processCommand(command);
     
-    // Provide voice feedback
-    this.speak(`Command received: ${command}`);
+    // Provide voice feedback only if enabled
+    if (this.sayEnabled) {
+      this.speak(`Command received: ${command}`);
+    }
   }
 
   // Get command history

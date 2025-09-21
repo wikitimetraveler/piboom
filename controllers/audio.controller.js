@@ -11,13 +11,22 @@ export const AudioController = {
 
   play: (io) => (req, res) => {
     try {
-      const state = playFile(config.musicDir, req.params.file, () => {
-        io.emit('audio:status', { playing: false, file: null });
+      const state = playFile(config.musicDir, req.params.file, (err) => {
+        if (err) {
+          console.error('Audio playback ended with error:', err);
+          io.emit('audio:status', { playing: false, file: null, error: err.message });
+        } else {
+          console.log('Audio playback ended normally');
+          io.emit('audio:status', { playing: false, file: null });
+        }
       });
       io.emit('audio:status', state);
       res.json({ ok: true, ...state });
     } catch (e) {
-      res.status(e.message === 'FILE_NOT_FOUND' ? 404 : 500).json({ ok:false, error:e.message });
+      console.error('Audio play error:', e);
+      const statusCode = e.message === 'FILE_NOT_FOUND' ? 404 : 
+                        e.message === 'AUDIO_PLAYBACK_FAILED' ? 500 : 500;
+      res.status(statusCode).json({ ok: false, error: e.message });
     }
   },
 

@@ -24,11 +24,27 @@ export function playFile(musicDir, filename, onEnd) {
 
   // Pi mode: use mpg123 via play-sound
   stop();
-  currentProc = Player.play(full, err => {
-    currentProc = null;
-    if (onEnd) onEnd(err);
-  });
-  return { playing: true, file: safe, mode: 'pi' };
+  
+  try {
+    currentProc = Player.play(full, err => {
+      currentProc = null;
+      if (onEnd) onEnd(err);
+    });
+    
+    // Add error handling for the process
+    if (currentProc) {
+      currentProc.on('error', (err) => {
+        console.error('Audio playback error:', err);
+        currentProc = null;
+        if (onEnd) onEnd(err);
+      });
+    }
+    
+    return { playing: true, file: safe, mode: 'pi' };
+  } catch (error) {
+    console.error('Failed to start audio playback:', error);
+    throw new Error('AUDIO_PLAYBACK_FAILED');
+  }
 }
 
 export function stop() {
@@ -54,6 +70,13 @@ export async function setVolume(percent) {
       console.log(`Volume set to ${level}% using pactl`);
     } catch (pactlError) {
       console.log('Pactl volume control also failed:', pactlError.message);
+      // Final fallback: try using alsamixer
+      try {
+        await run('alsamixer', ['-c', '0', '-s', `${level}%`]);
+        console.log(`Volume set to ${level}% using alsamixer`);
+      } catch (alsamixerError) {
+        console.log('All volume control methods failed:', alsamixerError.message);
+      }
     }
   }
   

@@ -284,6 +284,51 @@
     z-index: 1;
   }
   
+  /* Accordion Styling */
+  .accordion .card {
+    border: none;
+    margin-bottom: 1rem;
+  }
+  
+  .accordion .card-header {
+    border: none;
+    padding: 0;
+  }
+  
+  .accordion .card-header button {
+    color: inherit;
+    text-decoration: none;
+    padding: 1rem 1.5rem;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .accordion .card-header button:hover {
+    background: rgba(255,255,255,0.1);
+  }
+  
+  .accordion .card-header button:focus {
+    box-shadow: none;
+    outline: none;
+  }
+  
+  .accordion .card-header button[aria-expanded="true"] .bi-chevron-down {
+    transform: rotate(180deg);
+  }
+  
+  .accordion .card-body {
+    padding: 1.5rem;
+  }
+  
+  /* Smooth transitions */
+  .collapse {
+    transition: height 0.3s ease;
+  }
+  
   /* Make sure the search input has proper focus styling */
   #kgBand:focus {
     border-color: var(--ice-secondary);
@@ -306,17 +351,47 @@
 <body>
 <div class="particles" id="particles"></div>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background: linear-gradient(135deg, rgba(135,206,250,0.9) 0%, rgba(144,238,144,0.9) 100%); backdrop-filter: blur(20px);">
   <div class="container">
-    <a class="navbar-brand" href="/"><i class="bi-box mr-1"></i>piBoom</a>
+    <a class="navbar-brand" href="/" style="color: #2c3e50; font-weight: 600;"><i class="bi-box mr-1"></i>piBoom</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div id="nav" class="collapse navbar-collapse">
-      <ul class="navbar-nav ml-auto">
-        <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="/player.html"><i class="bi-music-note-beamed"></i> Player</a></li>
-        <li class="nav-item"><a class="nav-link" href="/debug.html"><i class="bi-bug"></i> Debug</a></li>
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item"><a class="nav-link" href="/" style="color: #2c3e50;"><i class="bi-house"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/player.html" style="color: #2c3e50;"><i class="bi-music-note-beamed"></i> Player</a></li>
+        <li class="nav-item"><a class="nav-link" href="/debug.html" style="color: #2c3e50;"><i class="bi-bug"></i> Debug</a></li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="voiceDropdown" role="button" data-toggle="dropdown" style="color: #2c3e50;">
+            <i class="bi-mic"></i> Voice
+          </a>
+          <div class="dropdown-menu" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <button class="dropdown-item" onclick="toggleVoiceSection()"><i class="bi-mic-fill"></i> Voice Commands</button>
+            <button class="dropdown-item" onclick="toggleInstructions()"><i class="bi-question-circle"></i> Help</button>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" style="color: #2c3e50;">
+            <i class="bi-search"></i> Search
+          </a>
+          <div class="dropdown-menu" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <button class="dropdown-item" onclick="toggleSearchSection()"><i class="bi-search"></i> Search Panel</button>
+            <button class="dropdown-item" onclick="toggleResults()"><i class="bi-music-note-list"></i> Results</button>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="mediaDropdown" role="button" data-toggle="dropdown" style="color: #2c3e50;">
+            <i class="bi-collection"></i> Media
+          </a>
+          <div class="dropdown-menu" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <button class="dropdown-item" onclick="toggleYouTube()"><i class="bi-youtube"></i> YouTube Videos</button>
+            <button class="dropdown-item" onclick="toggleMap()"><i class="bi-geo-alt"></i> Map View</button>
+            <button class="dropdown-item" onclick="toggleTimeline()"><i class="bi-clock-history"></i> Timeline</button>
+          </div>
+        </li>
       </ul>
     </div>
   </div>
@@ -357,155 +432,233 @@
           </div>
         </div>
         
-        <!-- ChatGPT Submit Button (shown when in chat mode) -->
-        <div class="mt-3" id="chatSubmitContainer" style="display: none;">
-          <div class="text-center">
-            <button class="btn btn-success btn-lg" type="button" onclick="askChatGPT()">
-              <i class="bi-robot"></i> Ask ChatGPT
-            </button>
-          </div>
-        </div>
+        <!-- ChatGPT Submit Button removed - users can press Enter after clicking ChatGPT mode -->
       </div>
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-lg-3">
-      <div class="artist-info" id="artistInfo">
-        <h4><i class="bi-person-circle"></i> Artist Information</h4>
-        <div class="loading" id="artistLoading" style="display: none;">
-          <div class="spinner"></div>
-          <p>Loading artist information...</p>
-        </div>
-        <div id="artistContent">
-          <p class="text-muted">Search for an artist to see detailed information including band members, birth places, and more.</p>
-        </div>
-      </div>
+
+  <!-- Search & Results Section (Combined) -->
+  <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+    <div class="card-header" style="background: linear-gradient(135deg, rgba(144,238,144,0.8) 0%, rgba(135,206,250,0.8) 100%); color: #2c3e50; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0">
+        <i class="bi-search"></i> Search & Results
+        <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#searchAndResults" aria-expanded="true" style="border-color: rgba(44,62,80,0.3); color: #2c3e50;">
+          <i class="bi-chevron-down"></i>
+        </button>
+      </h5>
     </div>
-    
-    <div class="col-lg-3">
-      <div class="band-members" id="bandMembers" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
-        <h4><i class="bi-people"></i> Band Members</h4>
-        <div class="loading" id="membersLoading" style="display: none;">
-          <div class="spinner"></div>
-          <p>Loading members...</p>
-        </div>
-        <div id="membersContent">
-          <p class="text-muted">Band members and their locations will appear here after searching.</p>
-          <div id="membersList" style="max-height: 400px; overflow-y: auto;">
-            <!-- Band members will be added here -->
+    <div class="collapse show" id="searchAndResults">
+      <div class="card-body">
+        <!-- Search Results -->
+        <div class="row">
+          <div class="col-lg-3">
+            <div class="artist-info" id="artistInfo">
+              <h4><i class="bi-person-circle"></i> Artist Information</h4>
+              <div class="loading" id="artistLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading artist information...</p>
+              </div>
+              <div id="artistContent">
+                <p class="text-muted">Search for an artist to see detailed information including band members, birth places, and more.</p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="col-lg-3">
-      <div class="map-container" id="mapContainer">
-        <h4><i class="bi-geo-alt"></i> Birth Places Map</h4>
-        <div class="loading" id="mapLoading" style="display: none;">
-          <div class="spinner"></div>
-          <p>Loading map...</p>
-        </div>
-        <div id="mapContent">
-          <p class="text-muted">Artist birth places will appear on the map after searching.</p>
-          <div id="map" style="height: 400px; width: 100%; border-radius: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-            <div class="text-center">
-              <i class="bi-map" style="font-size: 3rem;"></i>
-              <p class="mt-2">Map will load here</p>
+          
+          <div class="col-lg-3">
+            <div class="band-members" id="bandMembers" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+              <h4><i class="bi-people"></i> Band Members</h4>
+              <div class="loading" id="membersLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading members...</p>
+              </div>
+              <div id="membersContent">
+                <p class="text-muted">Band members and their locations will appear here after searching.</p>
+                <div id="membersList" style="max-height: 400px; overflow-y: auto;">
+                  <!-- Band members will be added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-3">
+            <div class="map-container" id="mapContainer">
+              <h4><i class="bi-geo-alt"></i> Birth Places Map</h4>
+              <div class="loading" id="mapLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading map...</p>
+              </div>
+              <div id="mapContent">
+                <p class="text-muted">Artist birth places will appear on the map after searching.</p>
+                <div id="map" style="height: 400px; width: 100%; border-radius: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                  <div class="text-center">
+                    <i class="bi-map" style="font-size: 3rem;"></i>
+                    <p class="mt-2">Map will load here</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-3">
+            <div class="timeline-container" id="timelineContainer">
+              <h4><i class="bi-clock-history"></i> Timeline</h4>
+              <div class="loading" id="timelineLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading timeline...</p>
+              </div>
+              <div id="timelineContent">
+                <p class="text-muted">Chronological events will appear here after searching.</p>
+                <div id="timeline" style="max-height: 400px; overflow-y: auto;">
+                  <!-- Timeline events will be added here -->
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    
-    <div class="col-lg-3">
-      <div class="timeline-container" id="timelineContainer">
-        <h4><i class="bi-clock-history"></i> Timeline</h4>
-        <div class="loading" id="timelineLoading" style="display: none;">
+  </div>
+
+  <!-- YouTube Videos Section -->
+  <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+    <div class="card-header" style="background: linear-gradient(135deg, rgba(144,238,144,0.8) 0%, rgba(135,206,250,0.8) 100%); color: #2c3e50; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0">
+        <i class="bi-youtube"></i> YouTube Videos
+        <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#youtubeVideos" aria-expanded="false" style="border-color: rgba(44,62,80,0.3); color: #2c3e50;">
+          <i class="bi-chevron-down"></i>
+        </button>
+      </h5>
+    </div>
+    <div class="collapse" id="youtubeVideos">
+      <div class="card-body">
+        <div class="loading" id="youtubeLoading" style="display: none;">
           <div class="spinner"></div>
-          <p>Loading timeline...</p>
+          <p>Loading videos...</p>
         </div>
-        <div id="timelineContent">
-          <p class="text-muted">Chronological events will appear here after searching.</p>
-          <div id="timeline" style="max-height: 400px; overflow-y: auto;">
-            <!-- Timeline events will be added here -->
+        <div id="youtubeContent">
+          <p class="text-muted">Related videos will appear here after searching.</p>
+          <div id="videoGrid" class="row">
+            <!-- Videos will be added here -->
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="youtube-container" id="youtubeContainer">
-    <h4><i class="bi-youtube"></i> YouTube Videos</h4>
-    <div class="loading" id="youtubeLoading" style="display: none;">
-      <div class="spinner"></div>
-      <p>Loading videos...</p>
+  <!-- Instructions Section -->
+  <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+    <div class="card-header" style="background: linear-gradient(135deg, rgba(135,206,250,0.8) 0%, rgba(144,238,144,0.8) 100%); color: #2c3e50; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0">
+        <i class="bi-question-circle"></i> Instructions & Help
+        <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#instructions" aria-expanded="false" style="border-color: rgba(44,62,80,0.3); color: #2c3e50;">
+          <i class="bi-chevron-down"></i>
+        </button>
+      </h5>
     </div>
-    <div id="youtubeContent">
-      <p class="text-muted">Related videos will appear here after searching.</p>
-      <div class="video-grid" id="videoGrid">
-        <!-- Video placeholders will be added here -->
+    <div class="collapse" id="instructions">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="bi-mic"></i> Voice Commands</h6>
+            <ul class="list-unstyled">
+              <li><strong>"search [artist]"</strong> - Search for an artist (e.g., "search Pink Floyd")</li>
+              <li><strong>"ask [question]"</strong> - Ask ChatGPT anything (e.g., "ask what makes Pink Floyd unique")</li>
+              <li><strong>"explain [topic]"</strong> - Get explanations (e.g., "explain the difference between Pink Floyd and Led Zeppelin")</li>
+              <li><strong>"tell me about [artist]"</strong> - Get detailed artist information</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h6><i class="bi-geo-alt"></i> Navigation Tips</h6>
+            <ul class="list-unstyled">
+              <li><strong>Click band members</strong> to focus on their locations on the map</li>
+              <li><strong>Collapse sections</strong> you don't need to focus on specific data</li>
+              <li><strong>Use voice commands</strong> for hands-free operation</li>
+              <li><strong>Explore the timeline</strong> for chronological events</li>
+            </ul>
+          </div>
+        </div>
+        <hr>
+        <div class="row">
+          <div class="col-12">
+            <h6><i class="bi-info-circle"></i> About This System</h6>
+            <p class="mb-0">This music research system combines multiple APIs including Wikipedia, Wikidata, MusicBrainz, Google Knowledge Graph, and YouTube to provide comprehensive information about artists and bands. Click on band members in the sidebar to see their birth places on the interactive map.</p>
+          </div>
+        </div>
       </div>
-    </div>
-    
-    <!-- Video Player Container -->
-    <div id="videoPlayer" class="mt-3" style="display: none;">
-      <h5><i class="bi-play-circle"></i> Now Playing</h5>
-      <!-- YouTube embed will be inserted here -->
     </div>
   </div>
 
-  <!-- Voice Commands Help -->
-  <div class="artist-info">
-    <h4><i class="bi-mic"></i> Voice Commands</h4>
-    <div class="info-card">
-      <h6><i class="bi-search"></i> Music Research Commands</h6>
-      <ul class="mb-0">
-        <li><strong>"search [artist]"</strong> - Search for an artist (e.g., "search Pink Floyd")</li>
-        <li><strong>"tell me about [artist]"</strong> - Get detailed artist info (e.g., "tell me about Maynard")</li>
-        <li><strong>"who is [artist]"</strong> - Quick artist lookup (e.g., "who is A Perfect Circle")</li>
-        <li><strong>"music research"</strong> - Open this research page</li>
-      </ul>
+  <!-- Video Player Container -->
+  <div id="videoPlayer" class="mt-3" style="display: none;">
+    <h5><i class="bi-play-circle"></i> Now Playing</h5>
+    <!-- YouTube embed will be inserted here -->
+  </div>
+
+  <!-- Voice Commands Help Section -->
+  <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+    <div class="card-header" style="background: linear-gradient(135deg, rgba(135,206,250,0.8) 0%, rgba(144,238,144,0.8) 100%); color: #2c3e50; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0">
+        <i class="bi-mic"></i> Voice Commands & Help
+        <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#voiceCommandsHelp" aria-expanded="false" style="border-color: rgba(44,62,80,0.3); color: #2c3e50;">
+          <i class="bi-chevron-down"></i>
+        </button>
+      </h5>
     </div>
-    <div class="info-card">
-      <h6><i class="bi-robot"></i> AI Chat Commands</h6>
-      <ul class="mb-0">
-        <li><strong>"ask [question]"</strong> - Ask ChatGPT anything (e.g., "ask what makes Pink Floyd unique")</li>
-        <li><strong>"recommend [genre/mood]"</strong> - Get music recommendations (e.g., "recommend progressive metal")</li>
-        <li><strong>"explain [topic]"</strong> - Get explanations (e.g., "explain the difference between Pink Floyd and Led Zeppelin")</li>
-      </ul>
-    </div>
-    <div class="info-card">
-      <h6><i class="bi-gear"></i> Voice System Control</h6>
-      <p class="mb-2">Initialize and test voice commands:</p>
-      <div class="btn-group mb-2" role="group">
-        <button class="btn btn-sm btn-outline-primary" id="voiceInitBtn" onclick="initVoiceSystem()">
-          <i class="bi-mic"></i> Initialize Voice
-        </button>
-        <button class="btn btn-sm btn-outline-success" id="voiceStartBtn" onclick="startVoiceSystem()" disabled>
-          <i class="bi-mic-fill"></i> Start Listening
-        </button>
-        <button class="btn btn-sm btn-outline-danger" id="voiceStopBtn" onclick="stopVoiceSystem()" disabled>
-          <i class="bi-mic-mute"></i> Stop Listening
-        </button>
-      </div>
-      <div class="btn-group mb-2" role="group">
-        <button class="btn btn-sm btn-outline-primary" onclick="testVoiceCommand('search Pink Floyd')">
-          <i class="bi-mic"></i> Test "search Pink Floyd"
-        </button>
-        <button class="btn btn-sm btn-outline-success" onclick="testVoiceCommand('ask what makes Pink Floyd unique')">
-          <i class="bi-robot"></i> Test "ask Pink Floyd"
-        </button>
-        <button class="btn btn-sm btn-outline-info" onclick="testVoiceCommand('help')">
-          <i class="bi-question-circle"></i> Test "help"
-        </button>
-      </div>
-      <div class="input-group input-group-sm">
-        <input type="text" class="form-control" id="testVoiceInput" placeholder="Type a voice command to test..." onkeypress="handleTestVoiceKeypress(event)">
-        <div class="input-group-append">
-          <button class="btn btn-outline-secondary" onclick="testCustomVoiceCommand()">
-            <i class="bi-play"></i> Test
-          </button>
+    <div class="collapse" id="voiceCommandsHelp">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="bi-search"></i> Music Research Commands</h6>
+            <ul class="list-unstyled mb-3">
+              <li><strong>"search [artist]"</strong> - Search for an artist (e.g., "search Pink Floyd")</li>
+              <li><strong>"tell me about [artist]"</strong> - Get detailed artist info (e.g., "tell me about Maynard")</li>
+              <li><strong>"who is [artist]"</strong> - Quick artist lookup (e.g., "who is A Perfect Circle")</li>
+              <li><strong>"music research"</strong> - Open this research page</li>
+            </ul>
+            
+            <h6><i class="bi-robot"></i> AI Chat Commands</h6>
+            <ul class="list-unstyled mb-3">
+              <li><strong>"ask [question]"</strong> - Ask ChatGPT anything (e.g., "ask what makes Pink Floyd unique")</li>
+              <li><strong>"recommend [genre/mood]"</strong> - Get music recommendations (e.g., "recommend progressive metal")</li>
+              <li><strong>"explain [topic]"</strong> - Get explanations (e.g., "explain the difference between Pink Floyd and Led Zeppelin")</li>
+            </ul>
+          </div>
+          
+          <div class="col-md-6">
+            <h6><i class="bi-gear"></i> Voice System Control</h6>
+            <p class="mb-2">Initialize and test voice commands:</p>
+            <div class="btn-group mb-2" role="group">
+              <button class="btn btn-sm btn-outline-primary" id="voiceInitBtn" onclick="initVoiceSystem()">
+                <i class="bi-mic"></i> Initialize Voice
+              </button>
+              <button class="btn btn-sm btn-outline-success" id="voiceStartBtn" onclick="startVoiceSystem()" disabled>
+                <i class="bi-mic-fill"></i> Start Listening
+              </button>
+              <button class="btn btn-sm btn-outline-danger" id="voiceStopBtn" onclick="stopVoiceSystem()" disabled>
+                <i class="bi-mic-mute"></i> Stop Listening
+              </button>
+            </div>
+            <div class="btn-group mb-2" role="group">
+              <button class="btn btn-sm btn-outline-primary" onclick="testVoiceCommand('search Pink Floyd')">
+                <i class="bi-mic"></i> Test "search Pink Floyd"
+              </button>
+              <button class="btn btn-sm btn-outline-success" onclick="testVoiceCommand('ask what makes Pink Floyd unique')">
+                <i class="bi-robot"></i> Test "ask Pink Floyd"
+              </button>
+              <button class="btn btn-sm btn-outline-info" onclick="testVoiceCommand('help')">
+                <i class="bi-question-circle"></i> Test "help"
+              </button>
+            </div>
+            <div class="input-group input-group-sm">
+              <input type="text" class="form-control" id="testVoiceInput" placeholder="Type a voice command to test..." onkeypress="handleTestVoiceKeypress(event)">
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" onclick="testCustomVoiceCommand()">
+                  <i class="bi-play"></i> Test
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -515,7 +668,17 @@
 <footer class="footer">
   <div class="container text-center">
     <div class="footer-content">
-      <strong>Music Research • piBoom</strong> — <span id="dt"></span>
+      <span class="zen-element">🐢</span>
+      <span class="zen-dot"></span>
+      <span class="zen-element"><strong>David E Lane</strong></span>
+      <span class="zen-dot"></span>
+      <span class="zen-element">Powered by Cursor AI</span>
+      <span class="zen-dot"></span>
+      <span class="zen-element">ChatGPT™</span>
+      <span class="zen-dot"></span>
+      <span class="zen-element">All Rights Reserved</span>
+      <span class="zen-dot"></span>
+      <span class="zen-element">🦨</span>
     </div>
   </div>
 </footer>
@@ -526,7 +689,11 @@
 <script src="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.js"></script>
 <!-- Google Maps API will be loaded dynamically with the correct API key -->
 <script>
-document.getElementById('dt').textContent = new Date().toLocaleDateString();
+// Set date if element exists
+const dtElement = document.getElementById('dt');
+if (dtElement) {
+  dtElement.textContent = new Date().toLocaleDateString();
+}
 
 // Global variables
 let currentMode = 'unknown';
@@ -682,73 +849,87 @@ function speakText(text) {
   }
 }
 
-// Handle voice commands (enhanced from player page)
+// Handle voice commands - working code from player page
 function handleVoiceCommand(command) {
   console.log('🎤 Voice command received:', command);
   
-  // Check if this is a duplicate command (same text within 15 seconds)
+  // Check if this is a duplicate command (same text within 5 seconds)
   const now = Date.now();
   const timeSinceLastCommand = now - lastCommandTime;
-  const isDuplicate = (command.toLowerCase().trim() === lastCommandText && timeSinceLastCommand < 15000);
+  const isDuplicate = (command.toLowerCase().trim() === lastCommandText && timeSinceLastCommand < 5000);
   
   if (isDuplicate) {
     console.log('🔇 Duplicate command ignored:', command);
     return; // Don't process duplicate commands
   }
   
-  // Check if command is too short or likely to be noise
-  const cleanCommand = command.toLowerCase().trim();
-  if (cleanCommand.length < 3) {
-    console.log('🔇 Command too short, ignoring:', command);
-    return;
-  }
-  
   // Update tracking variables
   lastCommandTime = now;
-  lastCommandText = cleanCommand;
+  lastCommandText = command.toLowerCase().trim();
+  
+  // Show command in UI (voice commands section moved to bottom accordion)
+  // Note: Voice command display functionality moved to bottom voice commands section
+  
+  // If using backend voice, send command to backend for processing
+  if (useBackendVoice) {
+    try {
+      fetch('/api/voice/frontend-command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command })
+      }).catch(error => {
+        console.error('Failed to send command to backend:', error);
+      });
+    } catch (error) {
+      console.error('Failed to send command to backend:', error);
+    }
+  }
+  
+  // Improved command detection with better matching
+  const cleanCommand = command.toLowerCase().trim();
   
   // Music research commands
-  if (cleanCommand.startsWith('search ')) {
-    const artist = cleanCommand.replace('search ', '');
+  if (cleanCommand.startsWith('search ') || cleanCommand.startsWith('look up ')) {
+    const artist = cleanCommand.replace(/^(search |look up )/, '');
     document.getElementById('kgBand').value = artist;
     searchArtistByName(artist);
-    // Only speak for search commands, not for every action
-    if (Math.random() < 0.3) { // 30% chance to speak to reduce loops
-      speakText(`Searching for ${artist}`);
-    }
-  } else if (cleanCommand.startsWith('tell me about ')) {
-    const artist = cleanCommand.replace('tell me about ', '');
+    speakText(`Searching for ${artist}`);
+    
+  } else if (cleanCommand.startsWith('tell me about ') || cleanCommand.startsWith('info about ')) {
+    const artist = cleanCommand.replace(/^(tell me about |info about )/, '');
     document.getElementById('kgBand').value = artist;
     searchArtistByName(artist);
-    if (Math.random() < 0.3) {
-      speakText(`Getting information about ${artist}`);
-    }
-  } else if (cleanCommand.startsWith('who is ')) {
-    const artist = cleanCommand.replace('who is ', '');
+    speakText(`Getting information about ${artist}`);
+    
+  } else if (cleanCommand.startsWith('who is ') || cleanCommand.startsWith('who are ')) {
+    const artist = cleanCommand.replace(/^(who is |who are )/, '');
     document.getElementById('kgBand').value = artist;
     searchArtistByName(artist);
-    if (Math.random() < 0.3) {
-      speakText(`Looking up ${artist}`);
-    }
-  } else if (cleanCommand.startsWith('ask ')) {
-    const question = cleanCommand.replace('ask ', '');
+    speakText(`Looking up ${artist}`);
+    
+  } else if (cleanCommand.startsWith('ask ') || cleanCommand.startsWith('question ')) {
+    const question = cleanCommand.replace(/^(ask |question )/, '');
     document.getElementById('kgBand').value = question;
     switchSearchMode('chat');
     askChatGPT();
-    if (Math.random() < 0.3) {
-      speakText(`Asking ChatGPT: ${question}`);
-    }
-  } else if (cleanCommand === 'music research') {
+    speakText(`Asking ChatGPT: ${question}`);
+    
+  } else if (cleanCommand === 'music research' || cleanCommand === 'research') {
     showVoiceNotification('Music research page is ready!');
     speakText('Music research page is ready!');
-  } else if (cleanCommand === 'help') {
+    
+  } else if (cleanCommand === 'help' || cleanCommand === 'commands') {
     const helpText = 'Available commands: "search [artist]", "tell me about [artist]", "who is [artist]", "ask [question]", "music research"';
     showVoiceNotification(helpText);
     speakText(helpText);
+    
+  } else if (cleanCommand === 'test') {
+    speakText('Voice command system is working!');
+    
   } else {
     console.log('❌ Command not recognized:', command);
-    showVoiceNotification(`Command received: ${command}`);
-    // Don't speak for unrecognized commands to prevent loops
+    // Provide helpful feedback for unrecognized commands
+    speakText(`I didn't understand "${command}". Try saying "search [artist]", "tell me about [artist]", or "help"`);
   }
 }
 
@@ -784,40 +965,62 @@ function loadGoogleMapsAPI() {
 
 // Initialize Google Knowledge Graph Widget
 function initializeKGWidget() {
-  // Get the API key from the server first
-  fetch('/api/music-research/google-api-key')
-    .then(response => response.json())
-    .then(data => {
-      if (data.apiKey) {
-        GOOGLE_API_KEY = data.apiKey;
-        
-        // Initialize the KG widget only for KG and Wikipedia modes
-        const el = document.getElementById('kgBand');
-        if (el && typeof KGSearchWidget === 'function') {
-          const cfg = {
-            limit: 10,
-            // Narrow to music-related entities (schema.org types)
-            types: ['MusicGroup','Person','MusicRecording'],
-            maxDescChars: 180,
-            selectHandler: (e) => renderCard(e.row)  // when a result is chosen
-          };
-          
-          // Store the original widget function for re-initialization
-          window.kgWidgetConfig = { apiKey: data.apiKey, config: cfg, element: el };
-          
-          // Initialize the widget
-          KGSearchWidget(data.apiKey, el, cfg);
-          console.log('🔍 Google Knowledge Graph widget initialized');
-        } else {
-          console.warn('❌ KG widget elements not found or KGSearchWidget not available');
+  try {
+    console.log('🔍 Initializing KG Widget...');
+    // Get the API key from the server first
+    fetch('/api/music-research/google-api-key')
+      .then(response => response.json())
+      .then(data => {
+        try {
+          console.log('🔍 API Key response:', data);
+          if (data.apiKey) {
+            GOOGLE_API_KEY = data.apiKey;
+            console.log('🔍 API Key loaded:', data.apiKey.substring(0, 10) + '...');
+            
+            // Initialize the KG widget only for KG and Wikipedia modes
+            const el = document.getElementById('kgBand');
+            console.log('🔍 Input element found:', el);
+            console.log('🔍 KGSearchWidget function available:', typeof KGSearchWidget);
+            
+            if (el && typeof KGSearchWidget === 'function') {
+              const cfg = {
+                limit: 10,
+                // Narrow to music-related entities (schema.org types)
+                types: ['MusicGroup','Person','MusicRecording'],
+                maxDescChars: 180,
+                selectHandler: (e) => {
+                  try {
+                    console.log('🔍 KG Widget selection:', e.row);
+                    renderCard(e.row);
+                  } catch (error) {
+                    console.error('❌ Error in selectHandler:', error);
+                  }
+                }
+              };
+              
+              // Store the original widget function for re-initialization
+              window.kgWidgetConfig = { apiKey: data.apiKey, config: cfg, element: el };
+              
+              // Initialize the widget
+              KGSearchWidget(data.apiKey, el, cfg);
+              console.log('✅ Google Knowledge Graph widget initialized successfully');
+            } else {
+              console.warn('❌ KG widget elements not found or KGSearchWidget not available');
+              console.warn('Element:', el, 'KGSearchWidget:', typeof KGSearchWidget);
+            }
+          } else {
+            console.warn('❌ Google API key not available for KG widget');
+          }
+        } catch (error) {
+          console.error('❌ Error in KG widget initialization:', error);
         }
-      } else {
-        console.warn('❌ Google API key not available for KG widget');
-      }
-    })
-    .catch(error => {
-      console.error('❌ Error loading Google API key for KG widget:', error);
-    });
+      })
+      .catch(error => {
+        console.error('❌ Error loading Google API key for KG widget:', error);
+      });
+  } catch (error) {
+    console.error('❌ Error in initializeKGWidget:', error);
+  }
 }
 
 // Toggle KG widget functionality based on search mode
@@ -985,7 +1188,6 @@ function switchSearchMode(mode) {
   // Show/hide appropriate elements
   const kgWidget = document.getElementById('kgBand');
   const kgCard = document.getElementById('kgCard');
-  const chatSubmitContainer = document.getElementById('chatSubmitContainer');
   
   // Always show the KG widget input, but change its behavior based on mode
   if (kgWidget) {
@@ -1007,10 +1209,7 @@ function switchSearchMode(mode) {
     kgCard.style.display = mode === 'chat' ? 'none' : 'block';
   }
   
-  // Show/hide ChatGPT submit button
-  if (chatSubmitContainer) {
-    chatSubmitContainer.style.display = mode === 'chat' ? 'block' : 'none';
-  }
+  // ChatGPT submit button removed - users can press Enter to submit
   
   // Toggle KG widget functionality
   toggleKGWidget(mode !== 'chat');
@@ -1125,7 +1324,7 @@ function handleTestVoiceKeypress(event) {
   }
 }
 
-// Voice Recognition System (copied from working player page)
+// Voice Recognition System (working code from player page)
 let recognition = null;
 let isListening = false;
 let isPiMode = false;
@@ -1163,7 +1362,7 @@ function detectPlatform() {
   return { isPiMode, useBackendVoice };
 }
 
-// Initialize Web Speech Recognition (for desktop mode)
+// Initialize Web Speech Recognition (for desktop mode) - working code from player
 function initWebSpeechRecognition() {
   console.log('🎤 Initializing Web Speech Recognition...');
   
@@ -1193,6 +1392,7 @@ function initWebSpeechRecognition() {
   recognition.onresult = function(event) {
     // Get all results including alternatives
     const results = Array.from(event.results);
+    console.log('🎤 Voice results received:', results.length, 'results');
     
     // Only process final results to prevent loops
     for (let i = 0; i < results.length; i++) {
@@ -1201,9 +1401,12 @@ function initWebSpeechRecognition() {
       // Only process final results
       if (result.isFinal && result[0] && result[0].transcript) {
         const transcript = result[0].transcript;
+        console.log('🎤 Final transcript found:', transcript);
         
         // Process the voice command
         handleVoiceCommand(transcript.toLowerCase().trim());
+      } else {
+        console.log('🔇 Skipping interim result:', result[0]?.transcript);
       }
     }
   };
@@ -1211,11 +1414,44 @@ function initWebSpeechRecognition() {
   // Handle recognition errors
   recognition.onerror = function(event) {
     console.error('Speech recognition error:', event.error);
-    showVoiceNotification(`Voice error: ${event.error}`);
     
-    if (event.error === 'not-allowed') {
-      showVoiceNotification('Microphone access denied. Please allow microphone access.');
+    // Handle specific error types
+    switch(event.error) {
+      case 'not-allowed':
+        showVoiceNotification('Microphone access denied. Please allow microphone access.');
+        break;
+      case 'no-speech':
+        showVoiceNotification('No speech detected. Please try again.');
+        break;
+      case 'audio-capture':
+        showVoiceNotification('Microphone not found or in use by another application. Please close other apps using the microphone and try again.');
+        break;
+      case 'not-supported':
+        showVoiceNotification('Speech recognition not supported in this browser.');
+        break;
+      case 'service-not-allowed':
+        showVoiceNotification('Speech recognition service not allowed.');
+        break;
+      case 'bad-grammar':
+        showVoiceNotification('Speech recognition grammar error.');
+        break;
+      case 'network':
+        showVoiceNotification('Network error. Please check your connection.');
+        break;
+      case 'aborted':
+        showVoiceNotification('Speech recognition was aborted.');
+        break;
+      default:
+        if (event.error.includes('mike') || event.error.includes('microphone') || event.error.includes('busy')) {
+          showVoiceNotification('Microphone is busy. Please close other applications using the microphone (Zoom, Teams, Discord, etc.) and try again.');
+        } else {
+          showVoiceNotification(`Voice error: ${event.error}. Please try again.`);
+        }
     }
+    
+    // Stop listening on error
+    isListening = false;
+    stopVoiceRecognition();
   };
   
   // Handle recognition end
@@ -1255,12 +1491,33 @@ function initWebSpeechRecognition() {
   return true;
 }
 
-// Voice system control functions
+// Check microphone availability
+async function checkMicrophoneAvailability() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach(track => track.stop()); // Stop the test stream
+    return true;
+  } catch (error) {
+    console.error('Microphone check failed:', error);
+    return false;
+  }
+}
+
+// Voice system control functions - working code from player page
 async function initVoiceSystem() {
   try {
     const btn = document.getElementById('voiceInitBtn');
     btn.disabled = true;
     btn.innerHTML = '<i class="bi-hourglass-split"></i> Initializing...';
+    
+    // Check microphone availability first
+    const micAvailable = await checkMicrophoneAvailability();
+    if (!micAvailable) {
+      showVoiceNotification('Microphone not available or in use by another application.');
+      btn.disabled = false;
+      btn.innerHTML = '<i class="bi-mic"></i> Initialize Voice';
+      return;
+    }
     
     // Detect platform and capabilities
     const { isPiMode, useBackendVoice } = detectPlatform();
@@ -1284,6 +1541,7 @@ async function initVoiceSystem() {
         startBtn.classList.add('btn-success');
         
         showVoiceNotification('Backend voice service ready!');
+        speakText('Voice system initialized and ready');
       } else {
         throw new Error(result.message || 'Backend voice service not available');
       }
@@ -1292,32 +1550,103 @@ async function initVoiceSystem() {
       // Use frontend Web Speech API (Windows/Desktop)
       console.log('🎤 Initializing frontend voice recognition...');
       
-      // Initialize Web Speech Recognition
-      const success = initWebSpeechRecognition();
+      // Check if Web Speech API is available
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        throw new Error('Web Speech API not supported in this browser');
+      }
       
-      if (success) {
-        // Test the recognition system
-        try {
-          await recognition.start();
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Give it a second to start
-          recognition.stop();
+      // Initialize frontend voice recognition
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.continuous = true;
+      recognition.interimResults = false; // Disable interim results to prevent loops
+      recognition.lang = 'en-US';
+      
+      // Add noise filtering settings for Windows
+      if (navigator.platform.indexOf('Win') !== -1) {
+        // Make recognition more sensitive for testing
+        recognition.maxAlternatives = 3; // Get multiple alternatives
+        console.log('🪟 Windows: Using 3 alternatives for better recognition');
+      }
+      
+      // Set up recognition event handlers
+      recognition.onstart = () => {
+        console.log('🎤 Voice recognition started');
+      };
+      
+      recognition.onresult = (event) => {
+        // Get all results including alternatives
+        const results = Array.from(event.results);
+        console.log('🎤 Voice results received:', results.length, 'results');
+        
+        // Only process final results to prevent loops
+        for (let i = 0; i < results.length; i++) {
+          const result = results[i];
           
-          btn.innerHTML = '<i class="bi-check-circle"></i> Frontend Voice Ready';
-          btn.classList.remove('btn-outline-primary');
-          btn.classList.add('btn-success');
-          
-          // Enable start button
-          const startBtn = document.getElementById('voiceStartBtn');
-          startBtn.disabled = false;
-          startBtn.classList.remove('btn-outline-success');
-          startBtn.classList.add('btn-success');
-          
-          showVoiceNotification('Frontend voice recognition ready!');
-        } catch (error) {
-          throw new Error('Failed to initialize voice recognition: ' + error.message);
+          // Only process final results
+          if (result.isFinal && result[0] && result[0].transcript) {
+            const transcript = result[0].transcript;
+            console.log('🎤 Final transcript found:', transcript);
+            
+            // Process the voice command
+            handleVoiceCommand(transcript.toLowerCase().trim());
+          } else {
+            console.log('🔇 Skipping interim result:', result[0]?.transcript);
+          }
         }
-      } else {
-        throw new Error('Web Speech Recognition not available');
+      };
+      
+      recognition.onerror = (event) => {
+        console.error('Voice recognition error:', event.error);
+        if (event.error === 'not-allowed') {
+          showVoiceNotification('Microphone access denied. Please allow microphone access.');
+        } else {
+          showVoiceNotification('Voice recognition error: ' + event.error);
+        }
+      };
+      
+      recognition.onend = () => {
+        console.log('🎤 Voice recognition ended');
+        // Force stop listening to prevent loops
+        isListening = false;
+        
+        // Reset button states
+        const startBtn = document.getElementById('voiceStartBtn');
+        const stopBtn = document.getElementById('voiceStopBtn');
+        
+        if (startBtn) {
+          startBtn.disabled = false;
+          startBtn.innerHTML = '<i class="bi-mic"></i> Start Listening';
+          startBtn.classList.remove('btn-warning');
+          startBtn.classList.add('btn-success');
+        }
+        
+        if (stopBtn) {
+          stopBtn.disabled = true;
+          stopBtn.classList.remove('btn-danger');
+          stopBtn.classList.add('btn-outline-danger');
+        }
+      };
+      
+      // Test the recognition system
+      try {
+        await recognition.start();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Give it a second to start
+        recognition.stop();
+        
+        btn.innerHTML = '<i class="bi-check-circle"></i> Frontend Voice Ready';
+        btn.classList.remove('btn-outline-primary');
+        btn.classList.add('btn-success');
+        
+        // Enable start button
+        const startBtn = document.getElementById('voiceStartBtn');
+        startBtn.disabled = false;
+        startBtn.classList.remove('btn-outline-success');
+        startBtn.classList.add('btn-success');
+        
+        console.log('✅ Frontend voice recognition ready - Start Listening button enabled');
+        speakText('Voice system initialized and ready');
+      } catch (error) {
+        throw new Error('Failed to initialize voice recognition: ' + error.message);
       }
     }
     
@@ -1327,16 +1656,23 @@ async function initVoiceSystem() {
     btn.innerHTML = '<i class="bi-x-circle"></i> Retry';
     btn.disabled = false;
     showVoiceNotification('Voice initialization failed: ' + error.message);
+    speakText('Voice initialization failed. Please try again.');
   }
 }
 
-async function startVoiceSystem() {
+async function startVoiceSystem(retryCount = 0) {
   try {
     const startBtn = document.getElementById('voiceStartBtn');
     const stopBtn = document.getElementById('voiceStopBtn');
     
     startBtn.disabled = true;
     startBtn.innerHTML = '<i class="bi-hourglass-split"></i> Starting...';
+    
+    // Check microphone availability first
+    const micAvailable = await checkMicrophoneAvailability();
+    if (!micAvailable) {
+      throw new Error('Microphone not available or in use by another application');
+    }
     
     if (useBackendVoice) {
       // Start backend voice recognition
@@ -1357,6 +1693,7 @@ async function startVoiceSystem() {
         stopBtn.classList.add('btn-danger');
         
         showVoiceNotification('Backend voice recognition started!');
+        speakText('Voice recognition started. I\'m listening for your commands.');
       } else {
         throw new Error(result.message || 'Failed to start voice recognition');
       }
@@ -1389,14 +1726,27 @@ async function startVoiceSystem() {
       stopBtn.classList.add('btn-danger');
       
       showVoiceNotification('Frontend voice recognition started!');
+      speakText('Voice recognition started. I\'m listening for your commands.');
     }
     
   } catch (error) {
     console.error('Voice start error:', error);
     const startBtn = document.getElementById('voiceStartBtn');
+    
+    // Retry mechanism for microphone in use errors
+    if (retryCount < 3 && (error.message.includes('in use') || error.message.includes('busy') || error.message.includes('audio-capture'))) {
+      console.log(`Retrying voice start (attempt ${retryCount + 1}/3)...`);
+      showVoiceNotification(`Microphone busy, retrying in 2 seconds... (${retryCount + 1}/3)`);
+      setTimeout(() => {
+        startVoiceSystem(retryCount + 1);
+      }, 2000);
+      return;
+    }
+    
     startBtn.innerHTML = '<i class="bi-mic"></i> Start Listening';
     startBtn.disabled = false;
     showVoiceNotification('Failed to start voice recognition: ' + error.message);
+    speakText('Failed to start voice recognition. Please try again.');
   }
 }
 
@@ -1427,6 +1777,7 @@ async function stopVoiceSystem() {
         stopBtn.classList.add('btn-outline-danger');
         
         showVoiceNotification('Backend voice recognition stopped.');
+        speakText('Voice recognition stopped. I\'m no longer listening.');
       } else {
         throw new Error(result.message || 'Failed to stop voice recognition');
       }
@@ -1451,6 +1802,7 @@ async function stopVoiceSystem() {
       stopBtn.classList.add('btn-outline-danger');
       
       showVoiceNotification('Frontend voice recognition stopped.');
+      speakText('Voice recognition stopped. I\'m no longer listening.');
     }
     
   } catch (error) {
@@ -1459,6 +1811,7 @@ async function stopVoiceSystem() {
     stopBtn.innerHTML = '<i class="bi-mic-mute"></i> Stop Listening';
     stopBtn.disabled = false;
     showVoiceNotification('Failed to stop voice recognition: ' + error.message);
+    speakText('Failed to stop voice recognition. Please try again.');
   }
 }
 
@@ -1490,6 +1843,64 @@ function searchArtistByName(artistName) {
   document.getElementById('membersList').innerHTML = '';
   document.getElementById('videoGrid').innerHTML = '';
   document.getElementById('timeline').innerHTML = '';
+  
+  // Auto-expand YouTube section when videos are loaded
+  setTimeout(() => {
+    const youtubeSection = document.getElementById('youtubeVideos');
+    if (youtubeSection && !youtubeSection.classList.contains('show')) {
+      const collapse = new bootstrap.Collapse(youtubeSection, { show: true });
+    }
+  }, 2000);
+  
+  // Navigation toggle functions
+  window.toggleVoiceSection = function() {
+    const voiceSection = document.getElementById('voiceCommandsHelp');
+    const collapse = new bootstrap.Collapse(voiceSection, { toggle: true });
+  };
+  
+  window.toggleSearchSection = function() {
+    const searchSection = document.getElementById('searchAndResults');
+    const collapse = new bootstrap.Collapse(searchSection, { toggle: true });
+  };
+  
+  window.toggleResults = function() {
+    const resultsSection = document.getElementById('searchAndResults');
+    const collapse = new bootstrap.Collapse(resultsSection, { toggle: true });
+  };
+  
+  window.toggleYouTube = function() {
+    const youtubeSection = document.getElementById('youtubeVideos');
+    const collapse = new bootstrap.Collapse(youtubeSection, { toggle: true });
+  };
+  
+  window.toggleInstructions = function() {
+    const instructionsSection = document.getElementById('instructions');
+    const collapse = new bootstrap.Collapse(instructionsSection, { toggle: true });
+  };
+  
+  window.toggleMap = function() {
+    const resultsSection = document.getElementById('searchAndResults');
+    const collapse = new bootstrap.Collapse(resultsSection, { show: true });
+    // Scroll to map section
+    setTimeout(() => {
+      const mapContainer = document.getElementById('mapContainer');
+      if (mapContainer) {
+        mapContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300);
+  };
+  
+  window.toggleTimeline = function() {
+    const resultsSection = document.getElementById('searchAndResults');
+    const collapse = new bootstrap.Collapse(resultsSection, { show: true });
+    // Scroll to timeline section
+    setTimeout(() => {
+      const timelineContainer = document.getElementById('timelineContainer');
+      if (timelineContainer) {
+        timelineContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 300);
+  };
   
   // Search for artist information based on selected mode
   if (searchMode === 'kg') {
@@ -1910,7 +2321,10 @@ function displayBandMembers(data) {
     const birthYear = member.birthDate || 'Unknown year';
     
     html += `
-      <div class="member-item mb-3 p-2" style="border: 1px solid #e9ecef; border-radius: 8px; background: rgba(248,249,250,0.5);">
+      <div class="member-item mb-3 p-2" style="border: 1px solid #e9ecef; border-radius: 8px; background: rgba(248,249,250,0.5); cursor: pointer; transition: all 0.3s ease;" 
+           onclick="focusOnMemberLocation('${member.name}', '${location}')" 
+           onmouseover="this.style.background='rgba(52,152,219,0.1)'; this.style.borderColor='#3498db';" 
+           onmouseout="this.style.background='rgba(248,249,250,0.5)'; this.style.borderColor='#e9ecef';">
         <div class="d-flex align-items-center">
           <div class="flex-shrink-0">
             <i class="bi-person-circle text-primary" style="font-size: 1.5rem;"></i>
@@ -1925,12 +2339,79 @@ function displayBandMembers(data) {
               <i class="bi-calendar"></i> ${birthYear}
             </small>
           </div>
+          <div class="flex-shrink-0">
+            <i class="bi-arrow-right-circle text-muted" style="font-size: 1rem;"></i>
+          </div>
         </div>
       </div>
     `;
   });
   
   membersList.innerHTML = html;
+}
+
+// Focus on a specific member's location on the map
+function focusOnMemberLocation(memberName, location) {
+  console.log(`🎯 Focusing on ${memberName} at ${location}`);
+  
+  if (!window.map || !window.mapMarkers) {
+    console.warn('Map not initialized yet');
+    return;
+  }
+  
+  // Find the marker for this location
+  const marker = window.mapMarkers.find(m => 
+    m.name === location || m.name.toLowerCase().includes(location.toLowerCase())
+  );
+  
+  if (marker) {
+    // Focus on the marker
+    window.map.setCenter(marker.position);
+    window.map.setZoom(10);
+    
+    // Open the info window if available
+    if (marker.infoWindow) {
+      marker.infoWindow.open(window.map, marker);
+    }
+    
+    // Add a highlight effect
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(() => {
+      marker.setAnimation(null);
+    }, 2000);
+    
+    console.log(`✅ Focused on ${memberName} at ${location}`);
+  } else {
+    console.warn(`❌ No marker found for location: ${location}`);
+    
+    // Try to geocode the location if not found
+    if (window.geocoder) {
+      window.geocoder.geocode({ address: location }, (results, status) => {
+        if (status === 'OK' && results[0]) {
+          const position = results[0].geometry.location;
+          window.map.setCenter(position);
+          window.map.setZoom(10);
+          
+          // Create a temporary marker
+          const tempMarker = new google.maps.Marker({
+            position: position,
+            map: window.map,
+            title: `${memberName} - ${location}`,
+            icon: {
+              url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            }
+          });
+          
+          // Remove the temporary marker after 5 seconds
+          setTimeout(() => {
+            tempMarker.setMap(null);
+          }, 5000);
+          
+          console.log(`✅ Created temporary marker for ${memberName} at ${location}`);
+        }
+      });
+    }
+  }
 }
 
 function playVideo(videoId) {
@@ -2079,6 +2560,11 @@ function initMapWithData(mapData, artistName) {
     ]
   });
   
+  // Store map and geocoder globally for member focus functionality
+  window.map = map;
+  window.geocoder = new google.maps.Geocoder();
+  window.mapMarkers = [];
+  
   // Add markers for each birth place
   mapData.forEach((location, index) => {
     const marker = new google.maps.Marker({
@@ -2086,7 +2572,10 @@ function initMapWithData(mapData, artistName) {
       map: map,
       title: location.name,
       label: (index + 1).toString(),
-      animation: google.maps.Animation.DROP
+      animation: google.maps.Animation.DROP,
+      icon: {
+        url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
+      }
     });
     
     // Add info window
@@ -2103,7 +2592,13 @@ function initMapWithData(mapData, artistName) {
       infoWindow.open(map, marker);
     });
     
+    // Store marker with additional info for member focus
+    marker.name = location.name;
+    marker.infoWindow = infoWindow;
+    marker.position = { lat: location.lat, lng: location.lng };
+    
     markers.push(marker);
+    window.mapMarkers.push(marker);
   });
   
   // Fit map to show all markers

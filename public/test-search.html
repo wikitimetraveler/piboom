@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Test</title>
+</head>
+<body>
+    <h1>Search Test</h1>
+    <input id="kgBand" placeholder="Enter artist name..." />
+    <button onclick="testSearch()">Test Search</button>
+    <div id="result"></div>
+    
+    <script>
+        function testSearch() {
+            const searchTerm = document.getElementById('kgBand').value.trim();
+            console.log('Search term:', searchTerm);
+            document.getElementById('result').innerHTML = 'Search term: ' + searchTerm;
+        }
+    </script>
+</body>
+</html>

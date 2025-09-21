@@ -538,7 +538,7 @@ voiceStop.classList.remove('btn-danger');
 
 console.log('🎤 Voice control buttons initialized with correct states');
 
-// Initialize voice service
+// Initialize voice service - improved
 voiceInit.onclick = async () => {
   try {
     voiceInit.disabled = true;
@@ -568,6 +568,7 @@ voiceInit.onclick = async () => {
         voiceStart.classList.add('btn-success');
         
         console.log('✅ Backend voice service ready - Start Listening button enabled');
+        speakText('Voice system initialized and ready');
       } else {
         throw new Error(result.message || 'Backend voice service not available');
       }
@@ -581,18 +582,18 @@ voiceInit.onclick = async () => {
         throw new Error('Web Speech API not supported in this browser');
       }
       
-                     // Initialize frontend voice recognition
-        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.continuous = true;
-        recognition.interimResults = false; // Disable interim results to prevent loops
-        recognition.lang = 'en-US';
-        
-        // Add noise filtering settings for Windows
-        if (navigator.platform.indexOf('Win') !== -1) {
-          // Make recognition more sensitive for testing
-          recognition.maxAlternatives = 3; // Get multiple alternatives
-          console.log('🪟 Windows: Using 3 alternatives for better recognition');
-        }
+      // Initialize frontend voice recognition
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.continuous = true;
+      recognition.interimResults = false; // Disable interim results to prevent loops
+      recognition.lang = 'en-US';
+      
+      // Add noise filtering settings for Windows
+      if (navigator.platform.indexOf('Win') !== -1) {
+        // Make recognition more sensitive for testing
+        recognition.maxAlternatives = 3; // Get multiple alternatives
+        console.log('🪟 Windows: Using 3 alternatives for better recognition');
+      }
       
       // Set up recognition event handlers
       recognition.onstart = () => {
@@ -601,27 +602,27 @@ voiceInit.onclick = async () => {
         voiceStatus.style.color = '#28a745';
       };
       
-                     recognition.onresult = (event) => {
-          // Get all results including alternatives
-          const results = Array.from(event.results);
-          console.log('🎤 Voice results received:', results.length, 'results');
+      recognition.onresult = (event) => {
+        // Get all results including alternatives
+        const results = Array.from(event.results);
+        console.log('🎤 Voice results received:', results.length, 'results');
+        
+        // Only process final results to prevent loops
+        for (let i = 0; i < results.length; i++) {
+          const result = results[i];
           
-          // Only process final results to prevent loops
-          for (let i = 0; i < results.length; i++) {
-            const result = results[i];
+          // Only process final results
+          if (result.isFinal && result[0] && result[0].transcript) {
+            const transcript = result[0].transcript;
+            console.log('🎤 Final transcript found:', transcript);
             
-            // Only process final results
-            if (result.isFinal && result[0] && result[0].transcript) {
-              const transcript = result[0].transcript;
-              console.log('🎤 Final transcript found:', transcript);
-              
-              // Process the voice command
-              handleVoiceCommand(transcript.toLowerCase().trim());
-            } else {
-              console.log('🔇 Skipping interim result:', result[0]?.transcript);
-            }
+            // Process the voice command
+            handleVoiceCommand(transcript.toLowerCase().trim());
+          } else {
+            console.log('🔇 Skipping interim result:', result[0]?.transcript);
           }
-        };
+        }
+      };
       
       recognition.onerror = (event) => {
         console.error('Voice recognition error:', event.error);
@@ -634,24 +635,24 @@ voiceInit.onclick = async () => {
         }
       };
       
-                     recognition.onend = () => {
-          console.log('🎤 Voice recognition ended');
-          // Force stop listening to prevent loops
-          isListening = false;
-          
-          // Reset button states
-          voiceStart.disabled = false;
-          voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
-          voiceStart.classList.remove('btn-warning');
-          voiceStart.classList.add('btn-success');
-          
-          voiceStop.disabled = true;
-          voiceStop.classList.remove('btn-danger');
-          voiceStop.classList.add('btn-outline-danger');
-          
-          voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
-          voiceListening.style.color = '#6c757d';
-        };
+      recognition.onend = () => {
+        console.log('🎤 Voice recognition ended');
+        // Force stop listening to prevent loops
+        isListening = false;
+        
+        // Reset button states
+        voiceStart.disabled = false;
+        voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+        voiceStart.classList.remove('btn-warning');
+        voiceStart.classList.add('btn-success');
+        
+        voiceStop.disabled = true;
+        voiceStop.classList.remove('btn-danger');
+        voiceStop.classList.add('btn-outline-danger');
+        
+        voiceListening.innerHTML = '<i class="bi-mic"></i> Not Listening';
+        voiceListening.style.color = '#6c757d';
+      };
       
       // Test the recognition system
       try {
@@ -671,6 +672,7 @@ voiceInit.onclick = async () => {
         voiceStart.classList.add('btn-success');
         
         console.log('✅ Frontend voice recognition ready - Start Listening button enabled');
+        speakText('Voice system initialized and ready');
       } catch (error) {
         throw new Error('Failed to initialize voice recognition: ' + error.message);
       }
@@ -688,6 +690,9 @@ voiceInit.onclick = async () => {
     voiceStart.innerHTML = '<i class="bi-mic-slash"></i> Not Available';
     voiceStart.classList.remove('btn-success');
     voiceStart.classList.add('btn-outline-secondary');
+    
+    // Provide error feedback
+    speakText('Voice initialization failed. Please try again.');
   }
 };
 
@@ -1199,17 +1204,14 @@ function speakText(text) {
   }
 }
 
-// Handle voice commands from server - simplified and working
+// Handle voice commands from server - improved and working
 async function handleVoiceCommand(command) {
   console.log('🎤 Voice command received:', command);
-  console.log('🎤 Command length:', command.length);
-  console.log('🎤 Command contains "pause":', command.toLowerCase().includes('pause'));
-  console.log('🎤 Command contains "stop":', command.toLowerCase().includes('stop'));
   
-  // Check if this is a duplicate command (same text within 10 seconds)
+  // Check if this is a duplicate command (same text within 5 seconds)
   const now = Date.now();
   const timeSinceLastCommand = now - lastCommandTime;
-  const isDuplicate = (command.toLowerCase().trim() === lastCommandText && timeSinceLastCommand < 10000);
+  const isDuplicate = (command.toLowerCase().trim() === lastCommandText && timeSinceLastCommand < 5000);
   
   if (isDuplicate) {
     console.log('🔇 Duplicate command ignored:', command);
@@ -1242,13 +1244,12 @@ async function handleVoiceCommand(command) {
     }
   }
   
-  // Simple command detection - no complex logic
+  // Improved command detection with better matching
   const cleanCommand = command.toLowerCase().trim();
   
-  // Basic commands
-     if (cleanCommand.includes('play')) {
-     console.log('🎵 Voice command: Playing music');
-     // Don't speak here to prevent loops - just play the music
+  // Play command - improved logic
+  if (cleanCommand.includes('play') || cleanCommand.includes('start') || cleanCommand.includes('begin')) {
+    console.log('🎵 Voice command: Playing music');
     
     // Auto-select file if none selected
     if (!file.value || file.value === '— files will appear here —') {
@@ -1266,109 +1267,111 @@ async function handleVoiceCommand(command) {
     // Play the music
     await playAudioFromVoice();
     
-        } else if (cleanCommand.includes('pause') || cleanCommand.includes('paws')) {
-      console.log('⏸️ Voice command: Pausing music');
-      console.log('🎵 Current audio state - paused:', ghost.paused, 'readyState:', ghost.readyState, 'src:', ghost.src);
-      
-             // Check if audio is actually playing (has source and is not paused)
-       if (ghost.src && ghost.src !== '' && !ghost.paused && ghost.readyState >= 2) {
-         console.log('⏸️ Audio is playing, pausing it');
-         ghost.pause();
-         play.innerHTML = '<i class="bi-play-fill"></i> Play';
-         play.classList.remove('btn-success');
-         updateStatus('Paused', file.value);
-         // Don't speak here to prevent loops
-       } else if (ghost.paused && ghost.src && ghost.src !== '') {
-         console.log('▶️ Audio is paused, resuming it');
-         ghost.play();
-         play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
-         play.classList.add('btn-success');
-         updateStatus('Playing', file.value);
-         // Don't speak here to prevent loops
-       } else {
-         console.log('⚠️ Audio not ready or no source');
-         // Don't speak here to prevent loops
-       }
-     
-        } else if (cleanCommand.includes('resume') || cleanCommand.includes('continue')) {
-       console.log('▶️ Voice command: Resuming music');
-       if (ghost.paused === true && ghost.readyState >= 2) {
-         console.log('▶️ Audio is paused, resuming it');
-         ghost.play();
-         play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
-         play.classList.add('btn-success');
-         updateStatus('Playing', file.value);
-         // Don't speak here to prevent loops
-       } else {
-         console.log('⚠️ Audio not paused or not ready');
-         // Don't speak here to prevent loops
-       }
-     
-       } else if (cleanCommand.includes('stop') || cleanCommand.includes('stahp')) {
-      console.log('⏹️ Voice command: Stopping music');
+  } else if (cleanCommand.includes('pause') || cleanCommand.includes('paws') || cleanCommand.includes('halt')) {
+    console.log('⏸️ Voice command: Pausing music');
+    
+    // Check if audio is actually playing (has source and is not paused)
+    if (ghost.src && ghost.src !== '' && !ghost.paused && ghost.readyState >= 2) {
+      console.log('⏸️ Audio is playing, pausing it');
       ghost.pause();
-      ghost.currentTime = 0;
       play.innerHTML = '<i class="bi-play-fill"></i> Play';
       play.classList.remove('btn-success');
-      updateStatus('Stopped', file.value);
-      // Don't speak here to prevent loops - just stop the music
+      updateStatus('Paused', file.value);
+      speakText('Music paused');
+    } else if (ghost.paused && ghost.src && ghost.src !== '') {
+      console.log('▶️ Audio is paused, resuming it');
+      ghost.play();
+      play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+      play.classList.add('btn-success');
+      updateStatus('Playing', file.value);
+      speakText('Music resumed');
+    } else {
+      console.log('⚠️ Audio not ready or no source');
+      speakText('No music is currently playing');
+    }
+    
+  } else if (cleanCommand.includes('resume') || cleanCommand.includes('continue') || cleanCommand.includes('unpause')) {
+    console.log('▶️ Voice command: Resuming music');
+    if (ghost.paused === true && ghost.readyState >= 2) {
+      console.log('▶️ Audio is paused, resuming it');
+      ghost.play();
+      play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+      play.classList.add('btn-success');
+      updateStatus('Playing', file.value);
+      speakText('Music resumed');
+    } else {
+      console.log('⚠️ Audio not paused or not ready');
+      speakText('No music is currently paused');
+    }
+    
+  } else if (cleanCommand.includes('stop') || cleanCommand.includes('stahp') || cleanCommand.includes('halt')) {
+    console.log('⏹️ Voice command: Stopping music');
+    ghost.pause();
+    ghost.currentTime = 0;
+    play.innerHTML = '<i class="bi-play-fill"></i> Play';
+    play.classList.remove('btn-success');
+    updateStatus('Stopped', file.value);
+    speakText('Music stopped');
     
   } else if (cleanCommand.includes('volume') || cleanCommand.includes('vol')) {
-    if (cleanCommand.includes('up')) {
+    if (cleanCommand.includes('up') || cleanCommand.includes('increase') || cleanCommand.includes('louder')) {
       const newVol = Math.min(100, parseInt(vol.value) + 10);
       vol.value = newVol;
       volVal.textContent = newVol + '%';
       ghost.volume = newVol / 100;
       vol.dispatchEvent(new Event('input'));
       speakText(`Volume increased to ${newVol} percent`);
-    } else if (cleanCommand.includes('down')) {
+    } else if (cleanCommand.includes('down') || cleanCommand.includes('decrease') || cleanCommand.includes('quieter')) {
       const newVol = Math.max(0, parseInt(vol.value) - 10);
       vol.value = newVol;
       volVal.textContent = newVol + '%';
       ghost.volume = newVol / 100;
       vol.dispatchEvent(new Event('input'));
       speakText(`Volume decreased to ${newVol} percent`);
+    } else {
+      speakText(`Current volume is ${vol.value} percent`);
     }
     
-  } else if (cleanCommand.includes('song') || cleanCommand.includes('what')) {
+  } else if (cleanCommand.includes('song') || cleanCommand.includes('what') || cleanCommand.includes('track')) {
     const currentSong = file.value || 'No song selected';
     speakText(`Currently playing: ${currentSong}`);
     
-  } else if (cleanCommand.includes('help')) {
+  } else if (cleanCommand.includes('help') || cleanCommand.includes('commands')) {
     speakText('Available commands: play, pause, stop, volume up, volume down, what song, and help');
     
-     } else if (cleanCommand.includes('test')) {
-     speakText('Voice command system is working!');
-     
-   } else {
-     console.log('❌ Command not recognized:', command);
-     console.log('🔍 Full command analysis:');
-     console.log('  - Raw command:', command);
-     console.log('  - Clean command:', cleanCommand);
-     console.log('  - Contains "play":', cleanCommand.includes('play'));
-     console.log('  - Contains "pause":', cleanCommand.includes('pause'));
-     console.log('  - Contains "stop":', cleanCommand.includes('stop'));
-     console.log('  - Contains "volume":', cleanCommand.includes('volume'));
-     // Don't speak for unrecognized commands to avoid loops
-     // speakText(`I didn't understand "${command}". Try saying "play" or "help"`);
-   }
+  } else if (cleanCommand.includes('test')) {
+    speakText('Voice command system is working!');
+    
+  } else {
+    console.log('❌ Command not recognized:', command);
+    // Provide helpful feedback for unrecognized commands
+    speakText(`I didn't understand "${command}". Try saying "play", "pause", "stop", or "help"`);
+  }
 }
 
-// Helper function to play audio from voice command
+// Helper function to play audio from voice command - improved
 async function playAudioFromVoice() {
   const f = file.value; 
   if(!f || f === '— files will appear here —') {
     console.log('No file selected for voice play command');
+    speakText('No music file selected. Please select a file first.');
     return;
   }
   
   console.log('Voice command: Attempting to play:', f);
   
   try {
+    // Check if already playing the same file
+    const currentSrc = `/api/audio/stream/${encodeURIComponent(f)}`;
+    if (ghost.src === currentSrc && !ghost.paused && ghost.readyState >= 2) {
+      console.log('Audio is already playing the same file');
+      speakText('Music is already playing');
+      return;
+    }
+    
     // Always set new source for new file (prevents caching issues)
-    const newSrc = `/api/audio/stream/${encodeURIComponent(f)}`;
-    console.log('Setting new source from voice command:', newSrc);
-    ghost.src = newSrc;
+    console.log('Setting new source from voice command:', currentSrc);
+    ghost.src = currentSrc;
     updateStatus('Loading...', f);
     
     // Reset audio state
@@ -1418,8 +1421,8 @@ async function playAudioFromVoice() {
         play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
         play.classList.add('btn-success');
         updateStatus('Playing', f);
-                 console.log('✅ Voice command play successful');
-         // Don't speak here to prevent loops - just play the music
+        console.log('✅ Voice command play successful');
+        speakText('Music is now playing');
       }
     } catch (playError) {
       console.error('Play promise error:', playError);
@@ -1428,14 +1431,14 @@ async function playAudioFromVoice() {
       if (playError.name === 'NotAllowedError' || playError.name === 'AbortError') {
         console.log('Trying alternative play method for Windows...');
         
-                 // Force play with user interaction simulation
-         ghost.play().then(() => {
-           console.log('✅ Alternative play method successful');
-           play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
-           play.classList.add('btn-success');
-           updateStatus('Playing', f);
-           // Don't speak here to prevent loops
-         }).catch((altError) => {
+        // Force play with user interaction simulation
+        ghost.play().then(() => {
+          console.log('✅ Alternative play method successful');
+          play.innerHTML = '<i class="bi-pause-fill"></i> Playing';
+          play.classList.add('btn-success');
+          updateStatus('Playing', f);
+          speakText('Music is now playing');
+        }).catch((altError) => {
           console.error('Alternative play method failed:', altError);
           speakText('Failed to play music. Please check audio permissions.');
         });
