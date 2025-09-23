@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dave - piBoom Assistant</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+<link rel="stylesheet" href="/styles.css"/>
+<style>
+  /* Zen Assistant Container */
+  .assistant-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--zen-spacing);
+    position: relative;
+    z-index: 2;
+  }
+  
+  /* Zen Chat Messages */
+  .chat-messages {
+    height: 450px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--zen-radius);
+    padding: var(--zen-spacing);
+    background: linear-gradient(135deg, var(--ice-light) 0%, rgba(240,248,255,0.8) 100%);
+    margin-bottom: var(--zen-spacing);
+    box-shadow: var(--zen-shadow);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .chat-messages::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
+    animation: zenShine 4s ease-in-out infinite;
+  }
+  
+  @keyframes zenShine {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+  }
+  
+  /* Zen Messages */
+  .message {
+    margin-bottom: var(--zen-spacing);
+    padding: 12px 18px;
+    border-radius: var(--zen-radius);
+    max-width: 85%;
+    word-wrap: break-word;
+    position: relative;
+    z-index: 1;
+    animation: zenFloat 6s ease-in-out infinite;
+    transition: all 0.3s var(--zen-ease);
+  }
+  
+  .user-message {
+    background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
+    color: white;
+    margin-left: auto;
+    text-align: right;
+    box-shadow: 0 4px 15px rgba(135,206,250,0.3);
+  }
+  
+  .user-message:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(135,206,250,0.4);
+  }
+  
+  .assistant-message {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--text);
+    margin-right: auto;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .assistant-message.dave {
+    background: linear-gradient(135deg, #ff6b6b, #ffa500);
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+  }
+  
+  .assistant-message:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  
+  /* Zen Typing Indicator */
+  .typing-indicator {
+    display: none;
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+    padding: 10px;
+    animation: zenPulse 2s ease-in-out infinite;
+  }
+  
+  /* Zen Input Group */
+  .input-group {
+    margin-bottom: var(--zen-spacing);
+    position: relative;
+  }
+  
+  .input-group .form-control {
+    border: 1px solid var(--border);
+    border-radius: var(--zen-radius);
+    padding: 12px 18px;
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s var(--zen-ease);
+    box-shadow: var(--zen-shadow);
+  }
+  
+  .input-group .form-control:focus {
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 20px var(--ice-glow);
+    transform: translateY(-1px);
+  }
+  
+  .input-group .btn {
+    border-radius: var(--zen-radius);
+    padding: 12px 24px;
+    background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
+    border: none;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s var(--zen-ease);
+    box-shadow: var(--zen-shadow);
+  }
+  
+  .input-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--zen-glow);
+  }
+  
+  /* Zen Quick Actions */
+  .quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: var(--zen-spacing);
+    justify-content: center;
+  }
+  
+  .quick-action-btn {
+    background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s var(--zen-ease);
+    font-weight: 500;
+    box-shadow: var(--zen-shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .quick-action-btn::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+  }
+  
+  .quick-action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--zen-glow);
+  }
+  
+  .quick-action-btn:hover::before {
+    left: 100%;
+  }
+  
+  /* Zen Voice Controls */
+  .voice-controls {
+    margin-bottom: var(--zen-spacing);
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: var(--zen-radius);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border);
+  }
+  
+  .voice-controls .btn {
+    margin: 0 8px 8px 0;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-weight: 500;
+    transition: all 0.3s var(--zen-ease);
+    box-shadow: var(--zen-shadow);
+  }
+  
+  .voice-controls .btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Zen Personality Badge */
+  .personality-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #ff6b6b, #ffa500);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    margin-left: 10px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(255,107,107,0.3);
+    animation: zenPulse 3s ease-in-out infinite;
+  }
+  
+  /* Zen Greeting Section */
+  .greeting-section {
+    text-align: center;
+    margin-bottom: var(--zen-spacing);
+    padding: var(--zen-spacing);
+    background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
+    color: white;
+    border-radius: var(--zen-radius);
+    box-shadow: var(--zen-shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .greeting-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    animation: zenShine 3s ease-in-out infinite;
+  }
+  
+  .greeting-section h2 {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  
+  .greeting-section p {
+    position: relative;
+    z-index: 1;
+    opacity: 0.9;
+  }
+  
+  .greeting-section .btn {
+    position: relative;
+    z-index: 1;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s var(--zen-ease);
+  }
+  
+  .greeting-section .btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+  
+  /* Zen Scrollbar */
+  .chat-messages::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: var(--ice-primary);
+    border-radius: 4px;
+  }
+  
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(135,206,250,0.8);
+  }
+  
+  /* Zen Footer */
+  .footer {
+    background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
+    color: white;
+    padding: var(--zen-spacing) 0;
+    margin-top: var(--zen-spacing);
+    border-radius: var(--zen-radius) var(--zen-radius) 0 0;
+    box-shadow: var(--zen-shadow);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: zenShine 4s ease-in-out infinite;
+  }
+  
+  .footer-content {
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  
+  .footer-quote {
+    position: relative;
+    z-index: 1;
+    font-style: italic;
+    font-size: 1.1em;
+    margin-top: 8px;
+    opacity: 0.9;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    animation: zenPulse 3s ease-in-out infinite;
+  }
+  
+  .footer-quote i {
+    color: #ff6b6b;
+    margin: 0 5px;
+    animation: zenFloat 2s ease-in-out infinite;
+  }
+</style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi-music-note-beamed mr-1"></i>piBoom</a>
+    <div class="navbar-nav ml-auto">
+      <a class="nav-link" href="/"><i class="bi-house"></i> Home</a>
+      <a class="nav-link" href="/player.html"><i class="bi-volume-up"></i> Player</a>
+      <a class="nav-link" href="/music-research.html"><i class="bi-search"></i> Research</a>
+    </div>
+  </div>
+</nav>
+
+<div class="assistant-container">
+  <div class="greeting-section">
+    <h2><i class="bi-robot"></i> Meet Levi - Your Biker Hippie Music Assistant</h2>
+    <p>I'm a groovy 72-year-old biker hippie who lived through the 60s and 70s! I'm super stoked to chat about music with you! Ask me anything about artists, songs, or just say hi! 🎵✌️🏍️</p>
+    <button class="btn btn-light" onclick="getGreeting()">
+      <i class="bi-chat-dots"></i> Get a Greeting
+    </button>
+  </div>
+
+  <div class="quick-actions">
+    <button class="quick-action-btn" onclick="sendQuickMessage('What music should I listen to today?')">
+      <i class="bi-music-note-beamed"></i> Music Recommendations
+    </button>
+    <button class="quick-action-btn" onclick="sendQuickMessage('Tell me about my favorite artists')">
+      <i class="bi-person"></i> Artist Info
+    </button>
+    <button class="quick-action-btn" onclick="sendQuickMessage('What\'s the weather like?')">
+      <i class="bi-cloud-sun"></i> Weather
+    </button>
+    <button class="quick-action-btn" onclick="sendQuickMessage('Play some music')">
+      <i class="bi-play-circle"></i> Play Music
+    </button>
+    <button class="quick-action-btn" onclick="clearChat()">
+      <i class="bi-trash"></i> Clear Chat
+    </button>
+  </div>
+
+  <div class="voice-controls text-center mb-3">
+    <button class="btn btn-success mr-2" onclick="initVoice()" id="initVoiceBtn">
+      <i class="bi-mic"></i> Initialize Voice
+    </button>
+    <button class="btn btn-primary mr-2" onclick="startVoice()" id="startVoiceBtn" disabled>
+      <i class="bi-mic-fill"></i> Start Listening
+    </button>
+    <button class="btn btn-warning mr-2" onclick="stopVoice()" id="stopVoiceBtn" disabled>
+      <i class="bi-mic-mute"></i> Stop Listening
+    </button>
+    <button class="btn btn-info" onclick="makeDaveSpeak('Hello! I am Levi, your groovy biker hippie music assistant!')" id="testVoiceBtn" disabled>
+      <i class="bi-volume-up"></i> Test Voice
+    </button>
+  </div>
+
+  <div class="chat-messages" id="chatMessages">
+    <div class="message assistant-message dave">
+      <strong>Levi:</strong> Hey there! I'm Levi, your groovy 72-year-old biker hippie music assistant! 🎵✌️🏍️ What would you like to talk about today? I'm super stoked to help you discover amazing music! I've been riding and grooving since the 60s, man!
+      <span class="personality-badge">biker-hippie</span>
+    </div>
+  </div>
+
+  <div class="typing-indicator" id="typingIndicator">
+    Levi is thinking... <i class="bi-three-dots"></i>
+  </div>
+
+  <div class="input-group">
+    <input type="text" class="form-control" id="messageInput" placeholder="Ask Levi anything about music or just chat!" onkeypress="handleKeyPress(event)">
+    <div class="input-group-append">
+      <button class="btn btn-primary" onclick="sendMessage()">
+        <i class="bi-send"></i> Send
+      </button>
+    </div>
+  </div>
+
+  <div class="text-center">
+    <small class="text-muted">
+      <i class="bi-lightbulb"></i> Try saying things like "Tell me about The Beatles" or "What's good music for working out?"
+    </small>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>Levi's Music System</strong> — Powered by Cursor AI — <span id="dt"></span> — All Rights Reserved
+    </div>
+    <div class="footer-quote mt-2">
+      🍄 "Turn on, tune in, drop out" 🍄
+    </div>
+  </div>
+</footer>
+
+<script>
+let conversationCount = 0;
+let voiceEnabled = false;
+let voiceService = null;
+let recognition = null;
+let isListening = false;
+
+// Initialize voice service
+async function initVoice() {
+  try {
+    const response = await fetch('/api/voice/init', { method: 'POST' });
+    const data = await response.json();
+    
+    if (data.success) {
+      voiceEnabled = true;
+      console.log('Voice service initialized');
+      addMessage('🎤 Voice enabled! Levi can now speak to you!', 'assistant', 'enthusiastic');
+      
+      // Enable voice buttons
+      document.getElementById('startVoiceBtn').disabled = false;
+      document.getElementById('stopVoiceBtn').disabled = false;
+      document.getElementById('testVoiceBtn').disabled = false;
+      document.getElementById('initVoiceBtn').disabled = true;
+      
+      // Make Levi speak the confirmation
+      makeDaveSpeak('Voice enabled! Levi can now speak to you!');
+    } else {
+      console.log('Voice service not available');
+      addMessage('Voice service not available in current mode', 'assistant', 'informative');
+    }
+  } catch (error) {
+    console.error('Voice initialization error:', error);
+    addMessage('Failed to initialize voice service', 'assistant', 'apologetic');
+  }
+}
+
+// Start voice listening
+async function startVoice() {
+  if (!voiceEnabled) {
+    addMessage('Voice service not initialized. Please wait...', 'assistant', 'informative');
+    return;
+  }
+  
+  try {
+    // Check if browser supports speech recognition
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      addMessage('Sorry, your browser does not support voice recognition. Try Chrome or Edge.', 'assistant', 'apologetic');
+      return;
+    }
+    
+    // Initialize speech recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+    
+    recognition.onstart = function() {
+      isListening = true;
+      addMessage('🎤 Voice listening started! Speak now...', 'assistant', 'enthusiastic');
+      document.getElementById('startVoiceBtn').disabled = true;
+      document.getElementById('stopVoiceBtn').disabled = false;
+    };
+    
+    recognition.onresult = function(event) {
+      const transcript = event.results[event.results.length - 1][0].transcript;
+      console.log('Voice recognized:', transcript);
+      
+      // Add user message to chat
+      addMessage(transcript, 'user');
+      
+      // Send to Levi
+      sendVoiceMessage(transcript);
+    };
+    
+    recognition.onerror = function(event) {
+      console.error('Speech recognition error:', event.error);
+      addMessage('Voice recognition error: ' + event.error, 'assistant', 'apologetic');
+      isListening = false;
+      document.getElementById('startVoiceBtn').disabled = false;
+      document.getElementById('stopVoiceBtn').disabled = true;
+    };
+    
+    recognition.onend = function() {
+      isListening = false;
+      document.getElementById('startVoiceBtn').disabled = false;
+      document.getElementById('stopVoiceBtn').disabled = true;
+    };
+    
+    recognition.start();
+    
+  } catch (error) {
+    console.error('Voice start error:', error);
+    addMessage('Failed to start voice recognition', 'assistant', 'apologetic');
+  }
+}
+
+// Stop voice listening
+async function stopVoice() {
+  try {
+    if (recognition && isListening) {
+      recognition.stop();
+      isListening = false;
+      document.getElementById('startVoiceBtn').disabled = false;
+      document.getElementById('stopVoiceBtn').disabled = true;
+      addMessage('🔇 Voice listening stopped.', 'assistant', 'informative');
+    }
+  } catch (error) {
+    console.error('Voice stop error:', error);
+  }
+}
+
+// Send voice message to Levi
+async function sendVoiceMessage(message) {
+  try {
+    const response = await fetch('/api/chat/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message: message,
+        context: { source: 'voice_command' }
+      })
+    });
+    
+    const data = await response.json();
+    if (data.response) {
+      addMessage(data.response, 'assistant', data.personality);
+      // Make Levi speak his response
+      if (voiceEnabled) {
+        makeDaveSpeak(data.response);
+      }
+    } else {
+      addMessage('Sorry, I had trouble processing that. Try again!', 'assistant', 'apologetic');
+    }
+  } catch (error) {
+    console.error('Voice message error:', error);
+    addMessage('Oops! Something went wrong. I\'m still here to help though!', 'assistant', 'apologetic');
+  }
+}
+
+// Make Dave speak
+async function makeDaveSpeak(text) {
+  try {
+    const response = await fetch('/api/voice/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text })
+    });
+    
+    if (response.ok) {
+      console.log('Dave is speaking:', text);
+    }
+  } catch (error) {
+    console.error('Speech error:', error);
+  }
+}
+
+function handleKeyPress(event) {
+  if (event.key === 'Enter') {
+    sendMessage();
+  }
+}
+
+function sendMessage() {
+  const input = document.getElementById('messageInput');
+  const message = input.value.trim();
+  
+  if (!message) return;
+  
+  // Add user message to chat
+  addMessage(message, 'user');
+  input.value = '';
+  
+  // Show typing indicator
+  showTypingIndicator();
+  
+  // Send to assistant
+  fetch('/api/chat/chat', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: message,
+      context: { source: 'web_interface' }
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    hideTypingIndicator();
+    if (data.response) {
+      addMessage(data.response, 'assistant', data.personality);
+      // Make Dave speak his response
+      if (voiceEnabled) {
+        makeDaveSpeak(data.response);
+      }
+    } else {
+      addMessage('Sorry, I had trouble processing that. Try again!', 'assistant', 'apologetic');
+      if (voiceEnabled) {
+        makeDaveSpeak('Sorry, I had trouble processing that. Try again!');
+      }
+    }
+  })
+  .catch(error => {
+    hideTypingIndicator();
+    console.error('Error:', error);
+    addMessage('Oops! Something went wrong. I\'m still here to help though!', 'assistant', 'apologetic');
+  });
+}
+
+function sendQuickMessage(message) {
+  document.getElementById('messageInput').value = message;
+  sendMessage();
+}
+
+function addMessage(text, sender, personality = 'engaging') {
+  const chatMessages = document.getElementById('chatMessages');
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${sender}-message`;
+  
+  if (sender === 'assistant') {
+    messageDiv.classList.add('dave');
+    messageDiv.innerHTML = `<strong>Dave:</strong> ${text}`;
+    if (personality && personality !== 'engaging') {
+      messageDiv.innerHTML += ` <span class="personality-badge">${personality}</span>`;
+    }
+  } else {
+    messageDiv.innerHTML = `<strong>You:</strong> ${text}`;
+  }
+  
+  chatMessages.appendChild(messageDiv);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  conversationCount++;
+}
+
+function showTypingIndicator() {
+  document.getElementById('typingIndicator').style.display = 'block';
+  document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+}
+
+function hideTypingIndicator() {
+  document.getElementById('typingIndicator').style.display = 'none';
+}
+
+function clearChat() {
+  const chatMessages = document.getElementById('chatMessages');
+  chatMessages.innerHTML = `
+    <div class="message assistant-message dave">
+      <strong>Levi:</strong> Fresh start! What would you like to talk about? 🎵✌️
+      <span class="personality-badge">biker-hippie</span>
+    </div>
+  `;
+  conversationCount = 0;
+  
+  // Also clear server-side history
+  fetch('/api/chat/history', { method: 'DELETE' })
+    .then(response => response.json())
+    .then(data => console.log('Chat history cleared:', data));
+}
+
+function getGreeting() {
+  fetch('/api/chat/greeting')
+    .then(response => response.json())
+    .then(data => {
+      if (data.greeting) {
+        addMessage(data.greeting, 'assistant', data.personality);
+        // Make Dave speak the greeting
+        if (voiceEnabled) {
+          makeDaveSpeak(data.greeting);
+        }
+      }
+    })
+    .catch(error => console.error('Error getting greeting:', error));
+}
+
+// Auto-focus input and initialize voice
+document.getElementById('messageInput').focus();
+
+// Set date in footer
+document.getElementById('dt').textContent = new Date().toLocaleDateString();
+
+// Auto-initialize voice when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Try to initialize voice automatically
+  setTimeout(initVoice, 1000);
+});
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

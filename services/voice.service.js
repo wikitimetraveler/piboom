@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, exec } from 'child_process';
 import { run } from '../lib/exec.js';
 import { config } from '../config/index.js';
 import { SpeechClient } from '@google-cloud/speech';
@@ -127,20 +127,36 @@ export class VoiceService {
     
     if (config.mode === 'pi') {
       if (this.isWindows) {
-        // Use Windows built-in text-to-speech
+        // Use Windows built-in text-to-speech with better error handling
         try {
-          const { exec } = require('child_process');
-          exec(`powershell -Command "Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('${text.replace(/'/g, "''")}')"`, (error) => {
+          // Clean the text for Windows TTS
+          const cleanText = text
+            .replace(/[^\w\s.,!?;:'"-]/g, '') // Remove special characters that might cause issues
+            .replace(/'/g, "''") // Escape single quotes
+            .replace(/"/g, '""') // Escape double quotes
+            .substring(0, 200); // Shorter limit for better reliability
+          
+          // Use a simpler PowerShell command
+          const command = `powershell -Command "& {Add-Type -AssemblyName System.Speech; $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer; $synth.Speak('${cleanText}')}"`;
+          
+          console.log('🎤 Executing Windows TTS command...');
+          console.log('🎤 Text to speak:', cleanText);
+          
+          exec(command, { timeout: 15000 }, (error, stdout, stderr) => {
             if (error) {
-              console.log('Windows text-to-speech failed, using console fallback');
-              console.log('🎤 Voice feedback:', text);
+              console.log('Windows text-to-speech failed:', error.message);
+              console.log('🎤 Voice feedback (fallback):', text);
+              
+              // Try alternative method with espeak if available
+              this.tryEspeakFallback(text);
             } else {
-              console.log('🎤 Windows text-to-speech:', text);
+              console.log('🎤 Windows text-to-speech successful!');
             }
           });
         } catch (error) {
-          console.log('Windows text-to-speech not available, using console fallback');
-          console.log('🎤 Voice feedback:', text);
+          console.log('Windows text-to-speech not available:', error.message);
+          console.log('🎤 Voice feedback (fallback):', text);
+          this.tryEspeakFallback(text);
         }
       } else {
         // Use espeak on Linux Pi for better performance
@@ -218,6 +234,53 @@ export class VoiceService {
   setVoiceFeedback(enabled) {
     this.sayEnabled = enabled;
     console.log(`Voice feedback ${enabled ? 'enabled' : 'disabled'}`);
+  }
+
+  // Try espeak as fallback on Windows
+  tryEspeakFallback(text) {
+    try {
+      console.log('🎤 Trying espeak fallback...');
+      const espeak = spawn('espeak', [text, '--stdout']);
+      const aplay = spawn('aplay', ['-f', 'S16_LE', '-r', '22050', '-c', '1']);
+      
+      espeak.stdout.pipe(aplay.stdin);
+      
+      espeak.on('error', (error) => {
+        console.log('espeak not available, using console fallback');
+        console.log('🎤 Voice feedback:', text);
+      });
+      
+      aplay.on('error', (error) => {
+        console.log('aplay not available, using console fallback');
+        console.log('🎤 Voice feedback:', text);
+      });
+    } catch (error) {
+      console.log('espeak fallback failed:', error.message);
+      console.log('🎤 Voice feedback:', text);
+    }
+  }
+
+  // Speak longer text in chunks
+  speakChunked(text) {
+    if (!this.sayEnabled) return;
+    
+    // Split text into sentences
+    const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+    
+    if (sentences.length <= 1) {
+      this.speak(text);
+      return;
+    }
+    
+    // Speak first sentence immediately
+    this.speak(sentences[0].trim());
+    
+    // Speak remaining sentences with delay
+    sentences.slice(1).forEach((sentence, index) => {
+      setTimeout(() => {
+        this.speak(sentence.trim());
+      }, (index + 1) * 3000); // 3 second delay between chunks
+    });
   }
 
   // Get current status

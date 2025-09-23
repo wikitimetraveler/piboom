@@ -655,6 +655,136 @@ export async function searchMusicBrainz(req, res) {
   }
 }
 
+// Search albums by artist using MusicBrainz
+export async function searchAlbums(req, res) {
+  try {
+    const { artist } = req.body;
+    
+    if (!artist) {
+      return res.status(400).json({ error: 'Artist name is required' });
+    }
+
+    console.log('🎵 Searching MusicBrainz for albums by:', artist);
+
+    // First, find the artist
+    const searchResponse = await axios.get('https://musicbrainz.org/ws/2/artist', {
+      params: {
+        query: artist,
+        fmt: 'json',
+        limit: 1
+      },
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/your-repo)'
+      }
+    });
+
+    if (!searchResponse.data.artists || searchResponse.data.artists.length === 0) {
+      return res.json({ error: 'Artist not found in MusicBrainz' });
+    }
+
+    const artistData = searchResponse.data.artists[0];
+    console.log('🎵 Found artist:', artistData.name, 'ID:', artistData.id);
+
+    // Get albums for this artist
+    const albumsResponse = await axios.get(`https://musicbrainz.org/ws/2/release-group`, {
+      params: {
+        artist: artistData.id,
+        type: 'album',
+        fmt: 'json',
+        limit: 20
+      },
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/your-repo)'
+      }
+    });
+
+    const albums = albumsResponse.data['release-groups'].map(album => ({
+      id: album.id,
+      title: album.title,
+      year: album['first-release-date'] ? album['first-release-date'].substring(0, 4) : 'Unknown',
+      releaseDate: album['first-release-date'] || '9999-12-31', // Use far future date for unknown years
+      type: album['primary-type'] || 'Album',
+      coverArt: `https://coverartarchive.org/release-group/${album.id}/front-250`,
+      coverArtLarge: `https://coverartarchive.org/release-group/${album.id}/front-500`,
+      artist: artistData.name
+    }));
+
+    // Sort albums chronologically from first to last (oldest to newest)
+    albums.sort((a, b) => {
+      // Handle unknown years by putting them at the end
+      if (a.year === 'Unknown' && b.year === 'Unknown') return 0;
+      if (a.year === 'Unknown') return 1;
+      if (b.year === 'Unknown') return -1;
+      
+      // Sort by release date (oldest first)
+      return new Date(a.releaseDate) - new Date(b.releaseDate);
+    });
+
+    console.log('🎵 Found albums (sorted chronologically):', albums.length);
+
+    res.json({
+      artist: artistData.name,
+      albums: albums,
+      total: albums.length
+    });
+
+  } catch (error) {
+    console.error('Album search error:', error);
+    res.status(500).json({ error: 'Failed to search albums' });
+  }
+}
+
+// Search YouTube for album/artist
+export async function searchYouTubeForAlbum(req, res) {
+  try {
+    const { artist, album } = req.body;
+    
+    if (!artist || !album) {
+      return res.status(400).json({ error: 'Artist and album are required' });
+    }
+
+    console.log('🔍 Searching YouTube for:', `${artist} ${album}`);
+
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'YouTube API key not configured' });
+    }
+
+    const searchQuery = `${artist} ${album} album`;
+    const response = await axios.get('https://www.googleapis.com/youtube/v3/search', {
+      params: {
+        part: 'snippet',
+        q: searchQuery,
+        type: 'video',
+        maxResults: 10,
+        key: apiKey
+      }
+    });
+
+    const videos = response.data.items.map(item => ({
+      videoId: item.id.videoId,
+      title: item.snippet.title,
+      description: item.snippet.description,
+      thumbnail: item.snippet.thumbnails.medium.url,
+      channelTitle: item.snippet.channelTitle,
+      publishedAt: item.snippet.publishedAt,
+      url: `https://www.youtube.com/watch?v=${item.id.videoId}`
+    }));
+
+    console.log('🔍 Found YouTube videos:', videos.length);
+
+    res.json({
+      query: searchQuery,
+      videos: videos,
+      total: videos.length
+    });
+
+  } catch (error) {
+    console.error('YouTube search error:', error);
+    res.status(500).json({ error: 'Failed to search YouTube' });
+  }
+}
+
 // YouTube search
 export async function searchYouTube(req, res) {
   try {

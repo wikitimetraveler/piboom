@@ -13,7 +13,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
   <div class="container">
-    <a class="navbar-brand" href="#"><i class="bi-music-note-beamed mr-1"></i>The Glass Harp</a>
+    <a class="navbar-brand" href="#"><i class="bi-music-note-beamed mr-1"></i>Levi's Music System</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -56,6 +56,24 @@
         <div class="card-meta"><i class="bi-search"></i> Research tools</div>
       </a>
     </div>
+
+    <div class="col-lg-6 col-md-6 mb-4">
+      <a href="/assistant.html" class="tool-card fade-in">
+        <span class="card-icon">🤖</span>
+        <h3>Levi - AI Assistant</h3>
+        <p>Chat with Levi, your groovy biker hippie music assistant! Get recommendations, ask questions, and have fun conversations.</p>
+        <div class="card-meta"><i class="bi-chat-dots"></i> AI Assistant</div>
+      </a>
+    </div>
+
+    <div class="col-lg-6 col-md-6 mb-4">
+      <a href="/album-discovery.html" class="tool-card fade-in">
+        <span class="card-icon">💿</span>
+        <h3>Album Discovery</h3>
+        <p>Browse album covers, discover new music, and search YouTube for your favorite albums!</p>
+        <div class="card-meta"><i class="bi-disc"></i> Music Discovery</div>
+      </a>
+    </div>
   </div>
 </main>
 
@@ -68,7 +86,8 @@
     <li>Tune colors/animations in <code>styles.css</code>.</li>
     <li>API: <code>/api/audio/files</code>, <code>/api/audio/play/:file</code>, <code>/api/audio/stop</code>, <code>/api/audio/volume/:n</code>, <code>/api/audio/stream/:file</code>.</li>
     <li>Set <code>MODE=cloud</code> on Render; <code>MODE=pi</code> on the Raspberry Pi.</li>
-    <li><strong>Voice Commands:</strong> "search [artist]", "tell me about [artist]", "who is [artist]", "music research"</li>
+    <li><strong>Voice Commands:</strong> "search [artist]", "tell me about [artist]", "who is [artist]", "music research", "ask levi [question]"</li>
+    <li><strong>Levi Assistant:</strong> Visit the AI Assistant page to chat with Levi about music, get recommendations, and have engaging conversations!</li>
   </ul>
 </div>
 
@@ -76,6 +95,9 @@
   <div class="container text-center">
     <div class="footer-content">
       <strong>David E Lane</strong> — Powered by Cursor AI — <span id="dt"></span> — All Rights Reserved
+    </div>
+    <div class="footer-quote mt-2">
+      🍄 "Turn on, tune in, drop out" 🍄
     </div>
   </div>
 </footer>

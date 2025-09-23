@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Album Discovery - Levi's Music System</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    /* Zen Album Discovery Container */
+    .album-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--zen-spacing);
+      position: relative;
+      z-index: 2;
+    }
+    
+    /* Zen Search Section */
+    .search-section {
+      background: linear-gradient(135deg, var(--ice-light), rgba(240,248,255,0.9));
+      color: var(--text);
+      padding: var(--zen-spacing);
+      border-radius: var(--zen-radius);
+      margin-bottom: var(--zen-spacing);
+      box-shadow: var(--zen-shadow);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    
+    .search-section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: zenShine 3s ease-in-out infinite;
+    }
+    
+    .search-section h2 {
+      position: relative;
+      z-index: 1;
+      color: var(--text);
+      text-shadow: 0 2px 10px var(--ice-glow);
+    }
+    
+    .search-section .form-control {
+      position: relative;
+      z-index: 1;
+      background: rgba(255,255,255,0.9);
+      border: 1px solid var(--border);
+      color: var(--text);
+      backdrop-filter: blur(10px);
+    }
+    
+    .search-section .btn {
+      position: relative;
+      z-index: 1;
+      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+      border: none;
+      color: white;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s var(--zen-ease);
+      box-shadow: var(--zen-shadow);
+    }
+    
+    .search-section .btn:hover {
+      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+      transform: translateY(-2px);
+      box-shadow: var(--zen-glow);
+    }
+    
+    /* Zen Album Grid */
+    .album-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--zen-spacing);
+      margin-bottom: var(--zen-spacing);
+    }
+    
+    .album-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: var(--zen-radius);
+      padding: 15px;
+      box-shadow: var(--zen-shadow);
+      transition: all 0.3s var(--zen-ease);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+    }
+    
+    .album-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
+      transition: left 0.5s;
+    }
+    
+    .album-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--zen-glow);
+    }
+    
+    .album-card:hover::before {
+      left: 100%;
+    }
+    
+    .album-cover {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: var(--zen-radius);
+      margin-bottom: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: all 0.3s var(--zen-ease);
+    }
+    
+    .album-card:hover .album-cover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    
+    .album-info h5 {
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 5px;
+      font-size: 0.9em;
+      line-height: 1.3;
+    }
+    
+    .album-info p {
+      color: var(--muted);
+      font-size: 0.8em;
+      margin-bottom: 3px;
+    }
+    
+    .album-year {
+      background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.7em;
+      font-weight: 500;
+      display: inline-block;
+    }
+    
+    /* Zen Loading State */
+    .loading {
+      text-align: center;
+      padding: var(--zen-spacing);
+      color: var(--muted);
+    }
+    
+    .loading .spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--border);
+      border-top: 4px solid var(--ice-primary);
+      border-radius: 50%;
+      animation: zenSpin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+    
+    @keyframes zenSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Zen YouTube Results */
+    .youtube-results {
+      background: rgba(255,255,255,0.95);
+      border-radius: var(--zen-radius);
+      padding: var(--zen-spacing);
+      margin-top: var(--zen-spacing);
+      box-shadow: var(--zen-shadow);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+    }
+    
+    .youtube-video {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: rgba(255,255,255,0.5);
+      border-radius: var(--zen-radius);
+      transition: all 0.3s var(--zen-ease);
+      cursor: pointer;
+    }
+    
+    .youtube-video:hover {
+      background: rgba(255,255,255,0.8);
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .youtube-thumbnail {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: var(--zen-radius);
+      margin-right: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .youtube-info h6 {
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .youtube-info p {
+      color: var(--muted);
+      font-size: 0.9em;
+      margin-bottom: 0;
+    }
+    
+    /* Zen Empty State */
+    .empty-state {
+      text-align: center;
+      padding: var(--zen-spacing);
+      color: var(--muted);
+    }
+    
+    .empty-state i {
+      font-size: 4rem;
+      color: var(--ice-primary);
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+    
+    /* Google Knowledge Graph Widget Styles */
+    .kge-search-picker { 
+      width: 100%; 
+      max-width: 600px;
+      position: relative;
+      z-index: 10;
+    }
+    
+    .kg-widget-container {
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(20px);
+      border-radius: var(--zen-radius);
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: var(--zen-shadow);
+      position: relative;
+      z-index: 5;
+      border: 1px solid var(--border);
+    }
+    
+    .kg-widget-container::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
+      animation: zenShine 4s ease-in-out infinite;
+    }
+    
+    .kg-widget-container h2 {
+      position: relative;
+      z-index: 1;
+      color: var(--text);
+      text-shadow: 0 2px 10px var(--ice-glow);
+    }
+    
+    .search-box {
+      border: 1px solid var(--border);
+      border-radius: var(--zen-radius);
+      padding: 12px 18px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s var(--zen-ease);
+      box-shadow: var(--zen-shadow);
+    }
+    
+    .search-box:focus {
+      border-color: var(--ice-primary);
+      box-shadow: 0 0 20px var(--ice-glow);
+      transform: translateY(-1px);
+    }
+    
+    .kge-search-picker .kge-dropdown-item {
+      background-color: rgba(255,255,255,0.95) !important;
+      color: var(--text) !important;
+      border-bottom: 1px solid var(--border) !important;
+      transition: all 0.3s var(--zen-ease);
+    }
+    
+    .kge-search-picker .kge-dropdown-item:hover {
+      background-color: var(--ice-light) !important;
+      transform: translateX(5px);
+    }
+    
+    .kge-search-picker .kge-dropdown-item:last-child {
+      border-bottom: none !important;
+    }
+    
+    /* Zen Voice Controls */
+    .voice-controls {
+      margin-bottom: var(--zen-spacing);
+      padding: 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--zen-radius);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    
+    .voice-controls .btn {
+      margin: 0 8px 8px 0;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-weight: 500;
+      transition: all 0.3s var(--zen-ease);
+      box-shadow: var(--zen-shadow);
+    }
+    
+    .voice-controls .btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .voice-status {
+      margin-top: 10px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: 500;
+      transition: all 0.3s var(--zen-ease);
+    }
+    
+    .voice-status.listening {
+      background: linear-gradient(135deg, #ff6b6b, #ffa500);
+      color: white;
+      animation: zenPulse 1s ease-in-out infinite;
+    }
+    
+    .voice-status.ready {
+      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+      color: white;
+    }
+    
+    .voice-status.error {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <i class="bi-music-note-beamed"></i> Levi's Music System
+    </a>
+    <div class="navbar-nav ml-auto">
+      <a class="nav-link" href="/"><i class="bi-house"></i> Home</a>
+      <a class="nav-link" href="/assistant.html"><i class="bi-robot"></i> Levi</a>
+      <a class="nav-link" href="/music-research.html"><i class="bi-search"></i> Research</a>
+      <a class="nav-link active" href="/album-discovery.html"><i class="bi-disc"></i> Albums</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="album-container">
+    <!-- Album Discovery with Google Knowledge Graph -->
+    <div class="kg-widget-container">
+      <h2 class="text-center mb-4"><i class="bi-disc"></i> Album Discovery</h2>
+      <p class="text-center mb-4">Search for artists using Google Knowledge Graph to discover their albums!</p>
+      <div class="row">
+        <div class="col-md-8 mx-auto">
+          <!-- Google Knowledge Graph Search Widget -->
+          <div class="text-center mb-3">
+            <input id="kgBand" class="form-control search-box" placeholder="Search a band or artist…" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
+          </div>
+          
+          <!-- KG Widget Results Display -->
+          <div id="kgCard" class="mt-3"></div>
+          
+          <div class="text-center mt-3">
+            <span class="badge badge-info" id="modeBadge">
+              <i class="bi-cloud"></i> <span id="modeText">Loading...</span>
+            </span>
+            <div class="mt-2">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-sm btn-primary active" id="kgBtn" onclick="handleModeButtonClick('kg')">
+                  <i class="bi-google"></i> Knowledge Graph
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="wikiBtn" onclick="handleModeButtonClick('wiki')">
+                  <i class="bi-wikipedia"></i> Wikipedia
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-success" id="chatBtn" onclick="handleModeButtonClick('chat')">
+                  <i class="bi-robot"></i> ChatGPT
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice Controls -->
+    <div class="voice-controls">
+      <h5><i class="bi-mic"></i> Voice Search</h5>
+      <p class="mb-3">Use your voice to search for albums! Try saying "Search for The Beatles" or "Find Pink Floyd albums"</p>
+      <button class="btn btn-primary" id="initVoiceBtn" onclick="initVoice()">
+        <i class="bi-mic"></i> Initialize Voice
+      </button>
+      <button class="btn btn-success" id="startVoiceBtn" onclick="startVoice()" disabled>
+        <i class="bi-mic-fill"></i> Start Listening
+      </button>
+      <button class="btn btn-warning" id="stopVoiceBtn" onclick="stopVoice()" disabled>
+        <i class="bi-mic-mute"></i> Stop Listening
+      </button>
+      <button class="btn btn-info" id="testVoiceBtn" onclick="testVoice()" disabled>
+        <i class="bi-volume-up"></i> Test Voice
+      </button>
+      <div id="voiceStatus" class="voice-status ready" style="display: none;">
+        Voice ready - Click "Start Listening" to begin
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Searching for albums... 🎵</p>
+    </div>
+
+    <!-- Album Grid -->
+    <div id="albumGrid" class="album-grid"></div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <i class="bi-disc"></i>
+      <h4>No albums found</h4>
+      <p>Try searching for a different artist or check the spelling.</p>
+    </div>
+
+    <!-- YouTube Results -->
+    <div id="youtubeResults" class="youtube-results" style="display: none;">
+      <h4><i class="bi-youtube"></i> YouTube Results</h4>
+      <div id="youtubeVideos"></div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>Levi's Music System</strong> — Designed by David Edward Lane — <span id="dt"></span> — All Rights Reserved
+    </div>
+    <div class="footer-quote mt-2">
+      🍄 "Turn on, tune in, drop out" 🍄
+    </div>
+  </div>
+</footer>
+
+<script>
+let currentArtist = '';
+let voiceEnabled = false;
+let recognition = null;
+let isListening = false;
+let GOOGLE_API_KEY = null;
+
+// Initialize Google Knowledge Graph Widget (EXACT COPY FROM WORKING RESEARCH PAGE)
+function initializeKGWidget() {
+  try {
+    console.log('🔍 Initializing KG Widget...');
+    // Get the API key from the server first
+    fetch('/api/music-research/google-api-key')
+      .then(response => response.json())
+      .then(data => {
+        try {
+          console.log('🔍 API Key response:', data);
+          if (data.apiKey) {
+            GOOGLE_API_KEY = data.apiKey;
+            console.log('🔍 API Key loaded:', data.apiKey.substring(0, 10) + '...');
+            
+            // Initialize the KG widget only for KG and Wikipedia modes
+            const el = document.getElementById('kgBand');
+            console.log('🔍 Input element found:', el);
+            console.log('🔍 KGSearchWidget function available:', typeof KGSearchWidget);
+            
+            if (el && typeof KGSearchWidget === 'function') {
+              const cfg = {
+                limit: 10,
+                // Narrow to music-related entities (schema.org types)
+                types: ['MusicGroup','Person','MusicRecording'],
+                maxDescChars: 180,
+                selectHandler: (e) => {
+                  try {
+                    console.log('🔍 KG Widget selection:', e.row);
+                    renderCard(e.row);
+                    // Set current artist and automatically trigger album search
+                    currentArtist = e.row.name;
+                    searchAlbums();
+                  } catch (error) {
+                    console.error('❌ Error in selectHandler:', error);
+                  }
+                }
+              };
+              
+              // Store the original widget function for re-initialization
+              window.kgWidgetConfig = { apiKey: data.apiKey, config: cfg, element: el };
+              
+              // Initialize the widget
+              KGSearchWidget(data.apiKey, el, cfg);
+              console.log('✅ Google Knowledge Graph widget initialized successfully');
+            } else {
+              console.warn('❌ KG widget elements not found or KGSearchWidget not available');
+              console.warn('Element:', el, 'KGSearchWidget:', typeof KGSearchWidget);
+            }
+          } else {
+            console.warn('❌ Google API key not available for KG widget');
+          }
+        } catch (error) {
+          console.error('❌ Error in KG widget initialization:', error);
+        }
+      })
+      .catch(error => {
+        console.error('❌ Error loading Google API key for KG widget:', error);
+      });
+  } catch (error) {
+    console.error('❌ Error in initializeKGWidget:', error);
+  }
+}
+
+// Simple renderer using what KG already returns
+function renderCard(row) {
+  // When using the widget, "row" contains a summary of the chosen entity.
+  const name = row.name || '';
+  const desc = (row.detailedDescription && row.detailedDescription.articleBody) || row.description || '';
+  const img  = (row.image && row.image.contentUrl) || '';
+  const url  = (row.detailedDescription && row.detailedDescription.url) || row.url || '';
+
+  document.getElementById('kgCard').innerHTML = `
+    <div class="kg-result-card">
+      <div class="row g-0">
+        <div class="col-md-3">
+          <img src="${img}" class="img-fluid rounded-start" alt="${name}" style="width: 100%; height: 200px; object-fit: cover;">
+        </div>
+        <div class="col-md-9">
+          <div class="card-body">
+            <h5 class="card-title">${name}</h5>
+            <p class="card-text">${desc}</p>
+            <p class="card-text"><small class="text-muted">Type: ${row['@type'] ? row['@type'].join(', ') : 'Unknown'}</small></p>
+            ${url ? `<a href="${url}" target="_blank" class="btn btn-primary btn-sm"><i class="bi-external-link"></i> Learn More</a>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function handleSearchKeypress(event) {
+  if (event.key === 'Enter') {
+    searchArtist();
+  }
+}
+
+function searchArtist() {
+  const searchTerm = document.getElementById('kgBand').value.trim();
+  if (!searchTerm) {
+    alert('Please enter an artist name to search');
+    return;
+  }
+  
+  // Set current artist and trigger album search
+  currentArtist = searchTerm;
+  searchAlbums();
+}
+
+function updateModeButtonText() {
+  const kgWidget = document.getElementById('kgBand');
+  const hasText = kgWidget && kgWidget.value.trim().length > 0;
+  
+  const kgBtn = document.getElementById('kgBtn');
+  const wikiBtn = document.getElementById('wikiBtn');
+  const chatBtn = document.getElementById('chatBtn');
+  
+  if (hasText) {
+    // Show search functionality
+    kgBtn.innerHTML = '<i class="bi-google"></i> Search KG';
+    wikiBtn.innerHTML = '<i class="bi-wikipedia"></i> Search Wiki';
+    chatBtn.innerHTML = '<i class="bi-robot"></i> Ask AI';
+  } else {
+    // Show mode selection
+    kgBtn.innerHTML = '<i class="bi-google"></i> Knowledge Graph';
+    wikiBtn.innerHTML = '<i class="bi-wikipedia"></i> Wikipedia';
+    chatBtn.innerHTML = '<i class="bi-robot"></i> ChatGPT';
+  }
+}
+
+function handleModeButtonClick(mode) {
+  const kgWidget = document.getElementById('kgBand');
+  const hasText = kgWidget && kgWidget.value.trim().length > 0;
+  
+  if (hasText) {
+    // If there's text, perform search
+    const artist = kgWidget.value.trim();
+    currentArtist = artist;
+    searchAlbums();
+  } else {
+    // If no text, just switch the mode
+    switchSearchMode(mode);
+  }
+}
+
+function switchSearchMode(mode) {
+  searchMode = mode;
+  
+  // Update button states
+  document.getElementById('kgBtn').className = mode === 'kg' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary';
+  document.getElementById('wikiBtn').className = mode === 'wiki' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary';
+  document.getElementById('chatBtn').className = mode === 'chat' ? 'btn btn-sm btn-success' : 'btn btn-sm btn-outline-success';
+  
+  // Show/hide appropriate elements
+  const kgWidget = document.getElementById('kgBand');
+  const kgCard = document.getElementById('kgCard');
+  
+  // Always show the KG widget input, but change its behavior based on mode
+  if (kgWidget) {
+    kgWidget.style.display = 'block';
+    kgWidget.focus();
+    
+    // Update placeholder text based on mode
+    if (mode === 'chat') {
+      kgWidget.placeholder = 'Ask ChatGPT anything about music...';
+    } else if (mode === 'kg') {
+      kgWidget.placeholder = 'Search a band or artist… (Google Knowledge Graph)';
+    } else {
+      kgWidget.placeholder = 'Search a band or artist… (Wikipedia)';
+    }
+  }
+  
+  // Show/hide KG results card
+  if (kgCard) {
+    kgCard.style.display = mode === 'chat' ? 'none' : 'block';
+  }
+  
+  // Update button text to reflect current state
+  updateModeButtonText();
+}
+
+
+// Voice Recognition Functions
+function initVoice() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    updateVoiceStatus('Voice recognition not supported in this browser', 'error');
+    return;
+  }
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  
+  recognition.continuous = false;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+  
+  recognition.onstart = function() {
+    isListening = true;
+    updateVoiceStatus('Listening... Speak now!', 'listening');
+    updateVoiceButtons(true);
+  };
+  
+  recognition.onresult = function(event) {
+    const transcript = event.results[0][0].transcript;
+    console.log('Voice input:', transcript);
+    
+    // Process voice command
+    processVoiceCommand(transcript);
+    
+    isListening = false;
+    updateVoiceStatus('Voice ready - Click "Start Listening" to begin', 'ready');
+    updateVoiceButtons(false);
+  };
+  
+  recognition.onerror = function(event) {
+    console.error('Voice recognition error:', event.error);
+    isListening = false;
+    
+    let errorMessage = 'Voice recognition error';
+    if (event.error === 'no-speech') {
+      errorMessage = 'No speech detected - try again';
+    } else if (event.error === 'audio-capture') {
+      errorMessage = 'Microphone not accessible';
+    } else if (event.error === 'not-allowed') {
+      errorMessage = 'Microphone permission denied';
+    }
+    
+    updateVoiceStatus(errorMessage, 'error');
+    updateVoiceButtons(false);
+  };
+  
+  recognition.onend = function() {
+    isListening = false;
+    updateVoiceStatus('Voice ready - Click "Start Listening" to begin', 'ready');
+    updateVoiceButtons(false);
+  };
+  
+  voiceEnabled = true;
+  updateVoiceStatus('Voice initialized - Click "Start Listening" to begin', 'ready');
+  document.getElementById('initVoiceBtn').disabled = true;
+  document.getElementById('startVoiceBtn').disabled = false;
+  document.getElementById('testVoiceBtn').disabled = false;
+}
+
+function startVoice() {
+  if (!voiceEnabled || !recognition) {
+    updateVoiceStatus('Please initialize voice first', 'error');
+    return;
+  }
+  
+  if (isListening) {
+    stopVoice();
+    return;
+  }
+  
+  try {
+    recognition.start();
+  } catch (error) {
+    console.error('Error starting voice recognition:', error);
+    updateVoiceStatus('Error starting voice recognition', 'error');
+  }
+}
+
+function stopVoice() {
+  if (recognition && isListening) {
+    recognition.stop();
+  }
+}
+
+function testVoice() {
+  if (!voiceEnabled) {
+    updateVoiceStatus('Please initialize voice first', 'error');
+    return;
+  }
+  
+  // Test with a sample search
+  const testArtist = 'The Beatles';
+  document.getElementById('artistInput').value = testArtist;
+  updateVoiceStatus(`Testing with: "${testArtist}"`, 'ready');
+  
+  // Auto-search after a short delay
+  setTimeout(() => {
+    searchAlbums();
+  }, 1000);
+}
+
+function processVoiceCommand(transcript) {
+  const command = transcript.toLowerCase().trim();
+  console.log('Processing voice command:', command);
+  
+  // Extract artist name from various voice patterns
+  let artistName = '';
+  
+  // Patterns to match
+  const patterns = [
+    /search for (.+)/i,
+    /find (.+) albums/i,
+    /show me (.+) albums/i,
+    /albums by (.+)/i,
+    /(.+) albums/i,
+    /search (.+)/i,
+    /find (.+)/i,
+    /show (.+)/i
+  ];
+  
+  for (const pattern of patterns) {
+    const match = command.match(pattern);
+    if (match && match[1]) {
+      artistName = match[1].trim();
+      break;
+    }
+  }
+  
+  // If no pattern matched, try to use the whole command as artist name
+  if (!artistName) {
+    // Remove common words that might interfere
+    const commonWords = ['search', 'find', 'show', 'me', 'albums', 'by', 'for', 'the', 'a', 'an'];
+    const words = command.split(' ').filter(word => !commonWords.includes(word.toLowerCase()));
+    artistName = words.join(' ');
+  }
+  
+  if (artistName) {
+    document.getElementById('artistInput').value = artistName;
+    updateVoiceStatus(`Searching for: "${artistName}"`, 'ready');
+    
+    // Auto-search after a short delay
+    setTimeout(() => {
+      searchAlbums();
+    }, 500);
+  } else {
+    updateVoiceStatus('Could not understand artist name. Try saying "Search for The Beatles"', 'error');
+  }
+}
+
+function updateVoiceStatus(message, type) {
+  const statusEl = document.getElementById('voiceStatus');
+  statusEl.textContent = message;
+  statusEl.className = `voice-status ${type}`;
+  statusEl.style.display = 'block';
+  
+  // Hide status after 3 seconds for non-error messages
+  if (type !== 'error') {
+    setTimeout(() => {
+      if (statusEl.textContent === message) {
+        statusEl.style.display = 'none';
+      }
+    }, 3000);
+  }
+}
+
+function updateVoiceButtons(listening) {
+  document.getElementById('startVoiceBtn').disabled = listening;
+  document.getElementById('stopVoiceBtn').disabled = !listening;
+  
+  if (listening) {
+    document.getElementById('startVoiceBtn').innerHTML = '<i class="bi-mic-fill"></i> Listening...';
+  } else {
+    document.getElementById('startVoiceBtn').innerHTML = '<i class="bi-mic-fill"></i> Start Listening';
+  }
+}
+
+// Search for albums
+async function searchAlbums() {
+  // Use currentArtist if set, otherwise get from KG search input
+  let artist = currentArtist;
+  if (!artist) {
+    const kgInput = document.getElementById('kgBand');
+    artist = kgInput ? kgInput.value.trim() : '';
+  }
+  
+  if (!artist) {
+    alert('Please enter an artist name');
+    return;
+  }
+  
+  currentArtist = artist;
+  
+  // Show loading state
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('albumGrid').innerHTML = '';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('youtubeResults').style.display = 'none';
+  
+  try {
+    const response = await fetch('/api/music-research/albums', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ artist })
+    });
+    
+    const data = await response.json();
+    
+    // Hide loading state
+    document.getElementById('loadingState').style.display = 'none';
+    
+    if (data.error) {
+      document.getElementById('emptyState').style.display = 'block';
+      return;
+    }
+    
+    if (data.albums && data.albums.length > 0) {
+      displayAlbums(data.albums);
+    } else {
+      document.getElementById('emptyState').style.display = 'block';
+    }
+    
+  } catch (error) {
+    console.error('Error searching albums:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+  }
+}
+
+// Display albums in grid
+function displayAlbums(albums) {
+  const albumGrid = document.getElementById('albumGrid');
+  albumGrid.innerHTML = '';
+  
+  albums.forEach(album => {
+    const albumCard = document.createElement('div');
+    albumCard.className = 'album-card';
+    albumCard.onclick = () => searchYouTubeForAlbum(album.artist, album.title);
+    
+    albumCard.innerHTML = `
+      <img src="${album.coverArt}" alt="${album.title}" class="album-cover" 
+           onerror="this.src='https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Cover'">
+      <div class="album-info">
+        <h5>${album.title}</h5>
+        <p>${album.artist}</p>
+        <p>${album.type}</p>
+        <span class="album-year">${album.year}</span>
+      </div>
+    `;
+    
+    albumGrid.appendChild(albumCard);
+  });
+}
+
+// Search YouTube for album
+async function searchYouTubeForAlbum(artist, album) {
+  // Show loading state
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('youtubeResults').style.display = 'none';
+  
+  try {
+    const response = await fetch('/api/music-research/youtube-album', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ artist, album })
+    });
+    
+    const data = await response.json();
+    
+    // Hide loading state
+    document.getElementById('loadingState').style.display = 'none';
+    
+    if (data.videos && data.videos.length > 0) {
+      displayYouTubeResults(data.videos);
+    } else {
+      alert('No YouTube videos found for this album');
+    }
+    
+  } catch (error) {
+    console.error('Error searching YouTube:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    alert('Error searching YouTube');
+  }
+}
+
+// Display YouTube results
+function displayYouTubeResults(videos) {
+  const youtubeResults = document.getElementById('youtubeResults');
+  const youtubeVideos = document.getElementById('youtubeVideos');
+  
+  youtubeVideos.innerHTML = '';
+  
+  videos.forEach(video => {
+    const videoDiv = document.createElement('div');
+    videoDiv.className = 'youtube-video';
+    videoDiv.onclick = () => window.open(video.url, '_blank');
+    
+    videoDiv.innerHTML = `
+      <img src="${video.thumbnail}" alt="${video.title}" class="youtube-thumbnail">
+      <div class="youtube-info">
+        <h6>${video.title}</h6>
+        <p>${video.channelTitle}</p>
+        <p><small>${new Date(video.publishedAt).toLocaleDateString()}</small></p>
+      </div>
+    `;
+    
+    youtubeVideos.appendChild(videoDiv);
+  });
+  
+  youtubeResults.style.display = 'block';
+}
+
+// Auto-focus search input
+document.getElementById('kgBand').focus();
+
+// Set date in footer
+document.getElementById('dt').textContent = new Date().toLocaleDateString();
+
+// Allow Enter key to search (already handled by handleSearchKeypress)
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+  // Space bar to start/stop voice (when not in input field)
+  if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    if (voiceEnabled) {
+      if (isListening) {
+        stopVoice();
+      } else {
+        startVoice();
+      }
+    } else {
+      initVoice();
+    }
+  }
+  
+  // Escape to stop voice
+  if (e.code === 'Escape' && isListening) {
+    stopVoice();
+  }
+  
+  // Ctrl/Cmd + V to initialize voice
+  if ((e.ctrlKey || e.metaKey) && e.key === 'v') {
+    e.preventDefault();
+    if (!voiceEnabled) {
+      initVoice();
+    }
+  }
+});
+
+// Initialize page (copied from working research page)
+document.addEventListener('DOMContentLoaded', function() {
+  // Try to initialize KG widget, but don't let it break the page
+  try {
+    initializeKGWidget();
+  } catch (error) {
+    console.error('KG widget failed to initialize:', error);
+  }
+  
+  updateModeButtonText(); // Initialize button text
+  
+  // Try to initialize voice automatically after a short delay
+  setTimeout(() => {
+    if (!voiceEnabled) {
+      initVoice();
+    }
+  }, 1000);
+});
+</script>
+
+<!-- Google Knowledge Graph Widget -->
+<script src="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -33,36 +33,49 @@ async function executeVoiceCommand(command, io) {
     return;
   }
   
-  // Check for ChatGPT-powered commands
+  // Check for Dave-powered commands (enhanced assistant)
   if (command.startsWith('ask ') || command.startsWith('what ') || command.startsWith('how ') || 
-      command.startsWith('why ') || command.startsWith('explain ') || command.includes('recommend')) {
-    console.log('🤖 Voice command: ChatGPT query -', command);
+      command.startsWith('why ') || command.startsWith('explain ') || command.includes('recommend') ||
+      command.startsWith('tell me ') || command.startsWith('dave ') || command.includes('music')) {
+    console.log('🎤 Voice command: Dave assistant query -', command);
     
     try {
       const response = await axios.post('http://localhost:3000/api/chat/chat', {
         message: command,
-        context: { source: 'voice_command' }
+        context: { source: 'voice_command', mode: 'pi' }
       });
       
       const chatResponse = response.data.response;
-      console.log('🤖 ChatGPT response:', chatResponse);
+      const personality = response.data.personality || 'engaging';
+      console.log('🎤 Dave response:', chatResponse);
       
-      // Send response to frontend
+      // Send response to frontend with personality info
       if (io) {
         io.emit('voiceCommand', { 
           command: 'chatResponse', 
           response: chatResponse,
+          personality: personality,
           timestamp: Date.now(),
           action: 'chat'
         });
       }
       
+      // Make Levi speak his response through voice service
+      if (voiceService && voiceService.sayEnabled) {
+        // Use chunked speaking for longer responses
+        if (chatResponse.length > 200) {
+          voiceService.speakChunked(chatResponse);
+        } else {
+          voiceService.speak(chatResponse);
+        }
+      }
+      
     } catch (error) {
-      console.error('ChatGPT Error:', error.message);
+      console.error('Dave Assistant Error:', error.message);
       if (io) {
         io.emit('voiceCommand', { 
           command: 'chatError', 
-          error: 'Sorry, I could not process that request right now.',
+          error: 'Oops! I had a little trouble there, but I\'m still here to help! Try asking me something else!',
           timestamp: Date.now(),
           action: 'error'
         });
@@ -117,24 +130,44 @@ async function executeVoiceCommand(command, io) {
       
     default:
       console.log('❓ Voice command not recognized:', command);
-      // Try ChatGPT for unrecognized commands
+      // Try Dave assistant for unrecognized commands
       try {
         const response = await axios.post('http://localhost:3000/api/chat/chat', {
-          message: `I said "${command}" but I'm not sure what you want me to do. Can you help me understand?`,
-          context: { source: 'unrecognized_voice_command' }
+          message: `I said "${command}" but I'm not sure what you want me to do. Can you help me understand what you'd like?`,
+          context: { source: 'unrecognized_voice_command', mode: 'pi' }
         });
         
         const chatResponse = response.data.response;
+        const personality = response.data.personality || 'engaging';
         if (io) {
           io.emit('voiceCommand', { 
             command: 'chatResponse', 
             response: chatResponse,
+            personality: personality,
             timestamp: Date.now(),
             action: 'chat'
           });
         }
+        
+        // Make Levi speak his response through voice service
+        if (voiceService && voiceService.sayEnabled) {
+          // Use chunked speaking for longer responses
+          if (chatResponse.length > 200) {
+            voiceService.speakChunked(chatResponse);
+          } else {
+            voiceService.speak(chatResponse);
+          }
+        }
       } catch (error) {
-        console.error('ChatGPT fallback error:', error.message);
+        console.error('Dave assistant fallback error:', error.message);
+        if (io) {
+          io.emit('voiceCommand', { 
+            command: 'chatError', 
+            error: 'Hmm, I\'m not sure what you meant by that. Could you try saying it differently?',
+            timestamp: Date.now(),
+            action: 'error'
+          });
+        }
       }
   }
 }
@@ -143,6 +176,9 @@ export async function initVoice(req, res) {
   console.log('Voice init endpoint called');
   try {
     console.log('Current initialization status:', isInitialized);
+    console.log('Voice service sayEnabled:', voiceService.sayEnabled);
+    console.log('Current mode:', process.env.MODE || 'pi');
+    
     if (!isInitialized) {
       console.log('Attempting to initialize voice service...');
       const success = await voiceService.init();
@@ -151,6 +187,12 @@ export async function initVoice(req, res) {
       
       if (success) {
         console.log('Voice service initialized successfully');
+        console.log('Voice service sayEnabled after init:', voiceService.sayEnabled);
+        
+        // Test speaking immediately
+        console.log('Testing voice service...');
+        voiceService.speak('Voice service initialized successfully!');
+        
         res.json({ 
           success: true, 
           message: 'Voice service initialized successfully',
@@ -166,6 +208,12 @@ export async function initVoice(req, res) {
       }
     } else {
       console.log('Voice service already initialized');
+      console.log('Voice service sayEnabled:', voiceService.sayEnabled);
+      
+      // Test speaking even if already initialized
+      console.log('Testing already initialized voice service...');
+      voiceService.speak('Voice service was already initialized!');
+      
       res.json({ 
         success: true, 
         message: 'Voice service already initialized',
@@ -298,6 +346,10 @@ export function speakText(req, res) {
         message: 'Text parameter is required' 
       });
     }
+    
+    console.log('🎤 Speaking text:', text);
+    console.log('🎤 Voice service sayEnabled:', voiceService.sayEnabled);
+    console.log('🎤 Voice service mode:', process.env.MODE || 'pi');
     
     voiceService.speak(text);
     
