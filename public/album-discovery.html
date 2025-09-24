@@ -507,7 +507,8 @@ function initializeKGWidget() {
                 selectHandler: (e) => {
                   try {
                     console.log('🔍 KG Widget selection:', e.row);
-                    renderCard(e.row);
+                    // Fetch detailed information from Knowledge Graph API
+                    fetchDetailedArtistInfo(e.row.name);
                     // Set current artist and automatically trigger album search
                     currentArtist = e.row.name;
                     searchAlbums();
@@ -542,13 +543,40 @@ function initializeKGWidget() {
   }
 }
 
-// Simple renderer using what KG already returns
-function renderCard(row) {
-  // When using the widget, "row" contains a summary of the chosen entity.
-  const name = row.name || '';
-  const desc = (row.detailedDescription && row.detailedDescription.articleBody) || row.description || '';
-  const img  = (row.image && row.image.contentUrl) || '';
-  const url  = (row.detailedDescription && row.detailedDescription.url) || row.url || '';
+// Fetch detailed artist information from Knowledge Graph API
+async function fetchDetailedArtistInfo(artistName) {
+  try {
+    console.log('🔍 Fetching detailed info for:', artistName);
+    
+    const response = await fetch('/api/music-research/knowledge-graph', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ artist: artistName })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.name) {
+      renderDetailedCard(data);
+    } else {
+      // Fallback to basic info if API fails
+      renderBasicCard(artistName);
+    }
+  } catch (error) {
+    console.error('❌ Error fetching detailed artist info:', error);
+    renderBasicCard(artistName);
+  }
+}
+
+// Render detailed card with real API data
+function renderDetailedCard(data) {
+  const name = data.name || '';
+  const desc = data.detailedDescription || data.description || 'No description available';
+  const img = data.imageUrl || 'https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Image';
+  const url = data.url || '';
+  const type = data.type || 'Unknown';
 
   document.getElementById('kgCard').innerHTML = `
     <div class="kg-result-card">
@@ -560,8 +588,28 @@ function renderCard(row) {
           <div class="card-body">
             <h5 class="card-title">${name}</h5>
             <p class="card-text">${desc}</p>
-            <p class="card-text"><small class="text-muted">Type: ${row['@type'] ? row['@type'].join(', ') : 'Unknown'}</small></p>
+            <p class="card-text"><small class="text-muted">Type: ${type}</small></p>
             ${url ? `<a href="${url}" target="_blank" class="btn btn-primary btn-sm"><i class="bi-external-link"></i> Learn More</a>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Fallback basic card
+function renderBasicCard(artistName) {
+  document.getElementById('kgCard').innerHTML = `
+    <div class="kg-result-card">
+      <div class="row g-0">
+        <div class="col-md-3">
+          <img src="https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Image" class="img-fluid rounded-start" alt="${artistName}" style="width: 100%; height: 200px; object-fit: cover;">
+        </div>
+        <div class="col-md-9">
+          <div class="card-body">
+            <h5 class="card-title">${artistName}</h5>
+            <p class="card-text">Artist information will be loaded...</p>
+            <p class="card-text"><small class="text-muted">Type: Music Artist</small></p>
           </div>
         </div>
       </div>

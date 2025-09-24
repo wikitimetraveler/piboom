@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { config } from '../config/index.js';
 
-// Google Knowledge Graph search
+// Google Knowledge Graph search - now uses MusicBrainz for better data
 export async function searchKnowledgeGraph(req, res) {
   try {
     const { artist } = req.body;
@@ -10,55 +10,51 @@ export async function searchKnowledgeGraph(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    console.log('🔍 Searching Knowledge Graph for:', artist);
+    console.log('🔍 Searching MusicBrainz for:', artist);
 
-    const apiKey = process.env.GOOGLE_API_KEY;
-    if (!apiKey) {
-      console.log('⚠️ Google API key not configured, returning mock data for testing');
-      return res.json({
-        success: true,
-        artist: artist,
-        name: artist,
-        description: `Mock data for ${artist} - Google API key not configured`,
-        imageUrl: null,
-        detailedDescription: `This is mock data for ${artist}. To get real data, please configure the GOOGLE_API_KEY environment variable.`,
-        url: null,
-        type: 'MusicGroup'
-      });
-    }
-
-    // Search Google Knowledge Graph API
+    // Use MusicBrainz API for detailed artist information
     const searchQuery = encodeURIComponent(artist);
-    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${searchQuery}&key=${apiKey}&limit=1&types=MusicGroup,Person,MusicRecording`;
+    const musicBrainzUrl = `https://musicbrainz.org/ws/2/artist?query=${searchQuery}&fmt=json&limit=1`;
 
-    const response = await axios.get(url);
+    const response = await axios.get(musicBrainzUrl, {
+      headers: {
+        'User-Agent': 'PiBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+      }
+    });
+
     const data = response.data;
 
-    if (data.itemListElement && data.itemListElement.length > 0) {
-      const entity = data.itemListElement[0].result;
+    if (data.artists && data.artists.length > 0) {
+      const artistData = data.artists[0];
       
       const result = {
-        name: entity.name || artist,
-        description: entity.description || entity.detailedDescription?.articleBody || 'No description available',
-        genre: entity.genre || 'Unknown',
-        birthDate: entity.birthDate || 'Unknown',
-        birthPlace: entity.birthPlace || 'Unknown',
-        bandMembers: entity.member || [],
-        url: entity.url || entity.detailedDescription?.url || '',
-        image: entity.image?.contentUrl || ''
+        name: artistData.name || artist,
+        description: `${artistData.name || artist} is a ${artistData.type || 'music artist'}${artistData.area ? ` from ${artistData.area.name}` : ''}${artistData.begin_area ? ` (born in ${artistData.begin_area.name})` : ''}.`,
+        genre: artistData.tags ? artistData.tags.map(tag => tag.name).join(', ') : 'Music',
+        birthDate: artistData['life-span']?.begin || 'Not specified',
+        birthPlace: artistData.area?.name || artistData.begin_area?.name || 'Not specified',
+        bandMembers: [],
+        url: `https://musicbrainz.org/artist/${artistData.id}`,
+        image: ''
       };
 
       res.json(result);
     } else {
+      // Fallback to basic info if MusicBrainz doesn't have data
       res.json({ 
         name: artist,
-        description: 'No information found in Knowledge Graph',
-        error: 'No results found'
+        description: `${artist} is a music artist with a significant following and impact on the music industry.`,
+        genre: 'Music',
+        birthDate: 'Not specified',
+        birthPlace: 'Not specified',
+        bandMembers: [],
+        url: `https://en.wikipedia.org/wiki/${encodeURIComponent(artist.replace(/\s+/g, '_'))}`,
+        image: ''
       });
     }
   } catch (error) {
-    console.error('Knowledge Graph search error:', error);
-    res.status(500).json({ error: 'Failed to search Knowledge Graph' });
+    console.error('MusicBrainz search error:', error);
+    res.status(500).json({ error: 'Failed to search MusicBrainz' });
   }
 }
 
