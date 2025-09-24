@@ -9,6 +9,55 @@
 <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
 <link rel="stylesheet" href="/styles.css"/>
 <style>
+  /* Floating Musical Notes */
+  .floating-notes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+
+  .musical-note {
+    position: absolute;
+    font-size: 32px;
+    color: rgba(135, 206, 250, 0.6);
+    animation: floatNote 15s linear infinite;
+    opacity: 0;
+    z-index: 10;
+  }
+
+  .musical-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+  .musical-note:nth-child(2) { left: 20%; animation-delay: 3s; }
+  .musical-note:nth-child(3) { left: 30%; animation-delay: 6s; }
+  .musical-note:nth-child(4) { left: 40%; animation-delay: 9s; }
+  .musical-note:nth-child(5) { left: 50%; animation-delay: 12s; }
+  .musical-note:nth-child(6) { left: 60%; animation-delay: 15s; }
+  .musical-note:nth-child(7) { left: 70%; animation-delay: 18s; }
+  .musical-note:nth-child(8) { left: 80%; animation-delay: 21s; }
+  .musical-note:nth-child(9) { left: 90%; animation-delay: 24s; }
+
+  @keyframes floatNote {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+    5% {
+      opacity: 0.6;
+    }
+    95% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+</style>
+<style>
   .search-container {
     background: rgba(255,255,255,.95);
     backdrop-filter: blur(20px);
@@ -351,6 +400,19 @@
 <body>
 <div class="particles" id="particles"></div>
 
+<!-- Floating Musical Notes -->
+<div class="floating-notes">
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+</div>
+
 <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background: linear-gradient(135deg, rgba(135,206,250,0.9) 0%, rgba(144,238,144,0.9) 100%); backdrop-filter: blur(20px);">
   <div class="container">
     <a class="navbar-brand" href="/" style="color: #2c3e50; font-weight: 600;"><i class="bi-box mr-1"></i>piBoom</a>
@@ -360,7 +422,10 @@
     <div id="nav" class="collapse navbar-collapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item"><a class="nav-link" href="/" style="color: #2c3e50;"><i class="bi-house"></i> Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="/player.html" style="color: #2c3e50;"><i class="bi-music-note-beamed"></i> Player</a></li>
+        <li class="nav-item"><a class="nav-link" href="/music-research.html" style="color: #2c3e50;"><i class="bi-search"></i> Music Research</a></li>
+        <li class="nav-item"><a class="nav-link" href="/album-discovery.html" style="color: #2c3e50;"><i class="bi-disc"></i> Album Discovery</a></li>
+        <li class="nav-item"><a class="nav-link" href="/player.html" style="color: #2c3e50;"><i class="bi-volume-up"></i> Player</a></li>
+        <li class="nav-item"><a class="nav-link" href="/assistant.html" style="color: #2c3e50;"><i class="bi-robot"></i> Assistant</a></li>
         <li class="nav-item"><a class="nav-link" href="/debug.html" style="color: #2c3e50;"><i class="bi-bug"></i> Debug</a></li>
       </ul>
       <ul class="navbar-nav">
@@ -711,9 +776,25 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeKGWidget();
   updateModeButtonText(); // Initialize button text
   
+  // Preload artist from localStorage if available
+  preloadArtist();
+  
   // Initialize voice recognition if available
   initWebSpeechRecognition();
 });
+
+// Preload artist from localStorage
+function preloadArtist() {
+  const savedArtist = localStorage.getItem('selectedArtist');
+  if (savedArtist) {
+    console.log('💾 Preloading artist from localStorage:', savedArtist);
+    const kgInput = document.getElementById('kgBand');
+    if (kgInput) {
+      kgInput.value = savedArtist;
+      updateModeButtonText();
+    }
+  }
+}
 
 // Initialize Socket.IO connection (copied from working player page)
 function initSocketIO() {
@@ -890,20 +971,23 @@ function handleVoiceCommand(command) {
   
   // Music research commands
   if (cleanCommand.startsWith('search ') || cleanCommand.startsWith('look up ')) {
-    const artist = cleanCommand.replace(/^(search |look up )/, '');
-    document.getElementById('kgBand').value = artist;
-    searchArtistByName(artist);
-    speakText(`Searching for ${artist}`);
+  const artist = cleanCommand.replace(/^(search |look up )/, '');
+  document.getElementById('kgBand').value = artist;
+  localStorage.setItem('selectedArtist', artist);
+  searchArtistByName(artist);
+  speakText(`Searching for ${artist}`);
     
   } else if (cleanCommand.startsWith('tell me about ') || cleanCommand.startsWith('info about ')) {
     const artist = cleanCommand.replace(/^(tell me about |info about )/, '');
     document.getElementById('kgBand').value = artist;
+    localStorage.setItem('selectedArtist', artist);
     searchArtistByName(artist);
     speakText(`Getting information about ${artist}`);
     
   } else if (cleanCommand.startsWith('who is ') || cleanCommand.startsWith('who are ')) {
     const artist = cleanCommand.replace(/^(who is |who are )/, '');
     document.getElementById('kgBand').value = artist;
+    localStorage.setItem('selectedArtist', artist);
     searchArtistByName(artist);
     speakText(`Looking up ${artist}`);
     
@@ -992,6 +1076,9 @@ function initializeKGWidget() {
                   try {
                     console.log('🔍 KG Widget selection:', e.row);
                     renderCard(e.row);
+                    // Save selected artist to localStorage for persistence across pages
+                    localStorage.setItem('selectedArtist', e.row.name);
+                    console.log('💾 Saved artist to localStorage:', e.row.name);
                   } catch (error) {
                     console.error('❌ Error in selectHandler:', error);
                   }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Dave - piBoom Assistant</title>
+<title>Levi - piBoom Music Research Assistant</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/styles.css"/>
@@ -21,13 +21,13 @@
   .chat-messages {
     height: 450px;
     overflow-y: auto;
-    border: 1px solid var(--border);
-    border-radius: var(--zen-radius);
-    padding: var(--zen-spacing);
-    background: linear-gradient(135deg, var(--ice-light) 0%, rgba(240,248,255,0.8) 100%);
+    border: 1px solid rgba(226, 232, 240, 0.4);
+    border-radius: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.8) 100%);
     margin-bottom: var(--zen-spacing);
-    box-shadow: var(--zen-shadow);
-    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    backdrop-filter: blur(20px);
     position: relative;
     overflow: hidden;
   }
@@ -58,7 +58,6 @@
     word-wrap: break-word;
     position: relative;
     z-index: 1;
-    animation: zenFloat 6s ease-in-out infinite;
     transition: all 0.3s var(--zen-ease);
   }
   
@@ -76,18 +75,23 @@
   }
   
   .assistant-message {
-    background: rgba(255, 255, 255, 0.95);
-    color: var(--text);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
+    color: #2d3748;
     margin-right: auto;
-    border: 1px solid var(--border);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    font-size: 15px;
   }
   
-  .assistant-message.dave {
-    background: linear-gradient(135deg, #ff6b6b, #ffa500);
-    color: white;
-    font-weight: 500;
-    box-shadow: 0 4px 15px rgba(255,107,107,0.3);
+  .assistant-message.levi {
+    background: linear-gradient(135deg, rgba(74, 85, 104, 0.95), rgba(45, 55, 72, 0.9));
+    color: #f7fafc;
+    font-weight: 400;
+    box-shadow: 0 6px 25px rgba(45, 55, 72, 0.15);
+    border: 1px solid rgba(74, 85, 104, 0.3);
   }
   
   .assistant-message:hover {
@@ -338,28 +342,123 @@
   .footer-quote i {
     color: #ff6b6b;
     margin: 0 5px;
-    animation: zenFloat 2s ease-in-out infinite;
+  }
+
+  /* Quick Action Buttons */
+  .quick-actions {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .quick-actions .btn {
+    margin: 2px;
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+  .quick-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .quick-actions .btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .quick-actions .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* Floating Musical Notes */
+  .floating-notes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+
+  .musical-note {
+    position: absolute;
+    font-size: 32px;
+    color: rgba(135, 206, 250, 0.6);
+    animation: floatNote 15s linear infinite;
+    opacity: 0;
+    z-index: 10;
+  }
+
+  .musical-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+  .musical-note:nth-child(2) { left: 20%; animation-delay: 3s; }
+  .musical-note:nth-child(3) { left: 30%; animation-delay: 6s; }
+  .musical-note:nth-child(4) { left: 40%; animation-delay: 9s; }
+  .musical-note:nth-child(5) { left: 50%; animation-delay: 12s; }
+  .musical-note:nth-child(6) { left: 60%; animation-delay: 15s; }
+  .musical-note:nth-child(7) { left: 70%; animation-delay: 18s; }
+  .musical-note:nth-child(8) { left: 80%; animation-delay: 21s; }
+  .musical-note:nth-child(9) { left: 90%; animation-delay: 24s; }
+
+  @keyframes floatNote {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+    5% {
+      opacity: 0.6;
+    }
+    95% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
   }
 </style>
 </head>
 <body>
 <div class="particles" id="particles"></div>
 
+<!-- Floating Musical Notes -->
+<div class="floating-notes">
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+</div>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
   <div class="container">
     <a class="navbar-brand" href="/"><i class="bi-music-note-beamed mr-1"></i>piBoom</a>
     <div class="navbar-nav ml-auto">
       <a class="nav-link" href="/"><i class="bi-house"></i> Home</a>
+      <a class="nav-link" href="/music-research.html"><i class="bi-search"></i> Music Research</a>
+      <a class="nav-link" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a>
       <a class="nav-link" href="/player.html"><i class="bi-volume-up"></i> Player</a>
-      <a class="nav-link" href="/music-research.html"><i class="bi-search"></i> Research</a>
+      <a class="nav-link active" href="/assistant.html"><i class="bi-robot"></i> Assistant</a>
+      <a class="nav-link" href="/debug.html"><i class="bi-bug"></i> Debug</a>
     </div>
   </div>
 </nav>
 
 <div class="assistant-container">
   <div class="greeting-section">
-    <h2><i class="bi-robot"></i> Meet Levi - Your Biker Hippie Music Assistant</h2>
-    <p>I'm a groovy 72-year-old biker hippie who lived through the 60s and 70s! I'm super stoked to chat about music with you! Ask me anything about artists, songs, or just say hi! 🎵✌️🏍️</p>
+    <h2><i class="bi-music-note-beamed"></i> Meet Levi - Your Delta Blues Music Assistant</h2>
+    <p>I'm a soulful 75-year-old delta blues player who grew up in the Mississippi Delta! I'm mighty pleased to chat about music with you! Ask me anything about artists, songs, or just say hi! 🎸🎵🌊</p>
     <button class="btn btn-light" onclick="getGreeting()">
       <i class="bi-chat-dots"></i> Get a Greeting
     </button>
@@ -393,15 +492,15 @@
     <button class="btn btn-warning mr-2" onclick="stopVoice()" id="stopVoiceBtn" disabled>
       <i class="bi-mic-mute"></i> Stop Listening
     </button>
-    <button class="btn btn-info" onclick="makeDaveSpeak('Hello! I am Levi, your groovy biker hippie music assistant!')" id="testVoiceBtn" disabled>
+    <button class="btn btn-info" onclick="makeLeviSpeak('Hello! I am Levi, your soulful delta blues music assistant!')" id="testVoiceBtn" disabled>
       <i class="bi-volume-up"></i> Test Voice
     </button>
   </div>
 
   <div class="chat-messages" id="chatMessages">
-    <div class="message assistant-message dave">
-      <strong>Levi:</strong> Hey there! I'm Levi, your groovy 72-year-old biker hippie music assistant! 🎵✌️🏍️ What would you like to talk about today? I'm super stoked to help you discover amazing music! I've been riding and grooving since the 60s, man!
-      <span class="personality-badge">biker-hippie</span>
+    <div class="message assistant-message levi">
+      <strong>Levi:</strong> Hey there! I'm Levi, your soulful 75-year-old delta blues music research assistant! 🎸🎵🌊 What would you like to talk about today? I'm mighty pleased to help you discover amazing music through our voice-controlled system! I've been playing the blues since the 50s, child! The blues got soul, you know!
+      <span class="personality-badge">delta-blues</span>
     </div>
   </div>
 
@@ -431,7 +530,7 @@
       <strong>Levi's Music System</strong> — Powered by Cursor AI — <span id="dt"></span> — All Rights Reserved
     </div>
     <div class="footer-quote mt-2">
-      🍄 "Turn on, tune in, drop out" 🍄
+      🎸 "The blues got soul, you know" 🎸
     </div>
   </div>
 </footer>
@@ -461,7 +560,7 @@ async function initVoice() {
       document.getElementById('initVoiceBtn').disabled = true;
       
       // Make Levi speak the confirmation
-      makeDaveSpeak('Voice enabled! Levi can now speak to you!');
+      makeLeviSpeak('Voice enabled! Levi can now speak to you!');
     } else {
       console.log('Voice service not available');
       addMessage('Voice service not available in current mode', 'assistant', 'informative');
@@ -568,7 +667,7 @@ async function sendVoiceMessage(message) {
       addMessage(data.response, 'assistant', data.personality);
       // Make Levi speak his response
       if (voiceEnabled) {
-        makeDaveSpeak(data.response);
+        makeLeviSpeak(data.response);
       }
     } else {
       addMessage('Sorry, I had trouble processing that. Try again!', 'assistant', 'apologetic');
@@ -579,8 +678,8 @@ async function sendVoiceMessage(message) {
   }
 }
 
-// Make Dave speak
-async function makeDaveSpeak(text) {
+// Make Levi speak
+async function makeLeviSpeak(text) {
   try {
     const response = await fetch('/api/voice/speak', {
       method: 'POST',
@@ -633,12 +732,12 @@ function sendMessage() {
       addMessage(data.response, 'assistant', data.personality);
       // Make Dave speak his response
       if (voiceEnabled) {
-        makeDaveSpeak(data.response);
+        makeLeviSpeak(data.response);
       }
     } else {
       addMessage('Sorry, I had trouble processing that. Try again!', 'assistant', 'apologetic');
       if (voiceEnabled) {
-        makeDaveSpeak('Sorry, I had trouble processing that. Try again!');
+        makeLeviSpeak('Sorry, I had trouble processing that. Try again!');
       }
     }
   })
@@ -660,8 +759,8 @@ function addMessage(text, sender, personality = 'engaging') {
   messageDiv.className = `message ${sender}-message`;
   
   if (sender === 'assistant') {
-    messageDiv.classList.add('dave');
-    messageDiv.innerHTML = `<strong>Dave:</strong> ${text}`;
+    messageDiv.classList.add('levi');
+    messageDiv.innerHTML = `<strong>Levi:</strong> ${text}`;
     if (personality && personality !== 'engaging') {
       messageDiv.innerHTML += ` <span class="personality-badge">${personality}</span>`;
     }
@@ -686,12 +785,18 @@ function hideTypingIndicator() {
 function clearChat() {
   const chatMessages = document.getElementById('chatMessages');
   chatMessages.innerHTML = `
-    <div class="message assistant-message dave">
-      <strong>Levi:</strong> Fresh start! What would you like to talk about? 🎵✌️
-      <span class="personality-badge">biker-hippie</span>
+    <div class="message assistant-message levi">
+      <strong>Levi:</strong> Fresh start! What would you like to talk about? 🎸🎵
+      <span class="personality-badge">delta-blues</span>
     </div>
   `;
   conversationCount = 0;
+  
+  // Re-add quick action buttons if there's a saved artist
+  const savedArtist = localStorage.getItem('selectedArtist');
+  if (savedArtist) {
+    addQuickActionButtons(savedArtist);
+  }
   
   // Also clear server-side history
   fetch('/api/chat/history', { method: 'DELETE' })
@@ -705,9 +810,9 @@ function getGreeting() {
     .then(data => {
       if (data.greeting) {
         addMessage(data.greeting, 'assistant', data.personality);
-        // Make Dave speak the greeting
+        // Make Levi speak the greeting
         if (voiceEnabled) {
-          makeDaveSpeak(data.greeting);
+          makeLeviSpeak(data.greeting);
         }
       }
     })
@@ -722,9 +827,92 @@ document.getElementById('dt').textContent = new Date().toLocaleDateString();
 
 // Auto-initialize voice when page loads
 document.addEventListener('DOMContentLoaded', function() {
+  // Preload artist context from localStorage if available
+  preloadArtistContext();
+  
   // Try to initialize voice automatically
   setTimeout(initVoice, 1000);
 });
+
+// Preload artist context from localStorage
+function preloadArtistContext() {
+  const savedArtist = localStorage.getItem('selectedArtist');
+  if (savedArtist) {
+    console.log('💾 Preloading artist context from localStorage:', savedArtist);
+    // Add a message to show the current artist context
+    addMessage(`Well, well, well... I see you've been looking at ${savedArtist}! That's the real deal, honey! 🎸 You can ask me about this artist, get recommendations, or search for others. What would you like to know about ${savedArtist}?`, 'assistant', 'informative');
+    
+    // Add quick action buttons for the current artist
+    addQuickActionButtons(savedArtist);
+  }
+}
+
+// Add quick action buttons for the current artist
+function addQuickActionButtons(artist) {
+  const chatMessages = document.getElementById('chatMessages');
+  const buttonContainer = document.createElement('div');
+  buttonContainer.className = 'quick-actions mt-3';
+  buttonContainer.innerHTML = `
+    <div class="btn-group" role="group">
+      <button class="btn btn-sm btn-outline-primary" onclick="askAboutArtist('${artist}')">
+        <i class="bi-info-circle"></i> Tell me about ${artist}
+      </button>
+      <button class="btn btn-sm btn-outline-success" onclick="getRecommendations('${artist}')">
+        <i class="bi-music-note-list"></i> Get recommendations
+      </button>
+      <button class="btn btn-sm btn-outline-info" onclick="searchOtherArtist()">
+        <i class="bi-search"></i> Search other artist
+      </button>
+    </div>
+  `;
+  chatMessages.appendChild(buttonContainer);
+}
+
+// Ask about the current artist
+function askAboutArtist(artist) {
+  const message = `Tell me about ${artist}`;
+  addMessage(message, 'user');
+  
+  // Send the message to the chat API
+  sendQuickMessage(message);
+  
+  // Make Levi speak the response if voice is enabled
+  if (voiceEnabled) {
+    makeLeviSpeak(`Let me tell you about ${artist}, child!`);
+  }
+}
+
+// Get recommendations for the current artist
+function getRecommendations(artist) {
+  const message = `Give me music recommendations similar to ${artist}`;
+  addMessage(message, 'user');
+  
+  // Send the message to the chat API
+  sendQuickMessage(message);
+  
+  // Make Levi speak the response if voice is enabled
+  if (voiceEnabled) {
+    makeLeviSpeak(`I'll give you some mighty fine recommendations similar to ${artist}!`);
+  }
+}
+
+// Search for a different artist
+function searchOtherArtist() {
+  const newArtist = prompt('Enter the name of the artist you want to search for:');
+  if (newArtist && newArtist.trim()) {
+    localStorage.setItem('selectedArtist', newArtist.trim());
+    const message = `Search for ${newArtist.trim()}`;
+    addMessage(message, 'user');
+    
+    // Send the message to the chat API
+    sendQuickMessage(message);
+    
+    // Make Levi speak the response if voice is enabled
+    if (voiceEnabled) {
+      makeLeviSpeak(`Searching for ${newArtist.trim()}, honey!`);
+    }
+  }
+}
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

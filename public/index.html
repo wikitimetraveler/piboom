@@ -7,9 +7,91 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/styles.css"/>
+<style>
+  /* Floating Musical Notes */
+  .floating-notes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+  }
+
+  .musical-note {
+    position: absolute;
+    font-size: 32px;
+    color: rgba(135, 206, 250, 0.6);
+    animation: floatNote 15s linear infinite;
+    opacity: 0;
+    z-index: 10;
+  }
+
+  .musical-note:nth-child(1) { left: 5%; animation-delay: 0s; }
+  .musical-note:nth-child(2) { left: 10%; animation-delay: 1.5s; }
+  .musical-note:nth-child(3) { left: 15%; animation-delay: 3s; }
+  .musical-note:nth-child(4) { left: 20%; animation-delay: 4.5s; }
+  .musical-note:nth-child(5) { left: 25%; animation-delay: 6s; }
+  .musical-note:nth-child(6) { left: 30%; animation-delay: 7.5s; }
+  .musical-note:nth-child(7) { left: 35%; animation-delay: 9s; }
+  .musical-note:nth-child(8) { left: 40%; animation-delay: 10.5s; }
+  .musical-note:nth-child(9) { left: 45%; animation-delay: 12s; }
+  .musical-note:nth-child(10) { left: 50%; animation-delay: 13.5s; }
+  .musical-note:nth-child(11) { left: 55%; animation-delay: 15s; }
+  .musical-note:nth-child(12) { left: 60%; animation-delay: 16.5s; }
+  .musical-note:nth-child(13) { left: 65%; animation-delay: 18s; }
+  .musical-note:nth-child(14) { left: 70%; animation-delay: 19.5s; }
+  .musical-note:nth-child(15) { left: 75%; animation-delay: 21s; }
+  .musical-note:nth-child(16) { left: 80%; animation-delay: 22.5s; }
+  .musical-note:nth-child(17) { left: 85%; animation-delay: 24s; }
+  .musical-note:nth-child(18) { left: 90%; animation-delay: 25.5s; }
+  .musical-note:nth-child(19) { left: 95%; animation-delay: 27s; }
+
+  @keyframes floatNote {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+    5% {
+      opacity: 0.6;
+    }
+    95% {
+      opacity: 0.6;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+</style>
 </head>
 <body>
 <div class="particles" id="particles"></div>
+
+<!-- Floating Musical Notes (Doubled for Main Page) -->
+<div class="floating-notes">
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+</div>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
   <div class="container">
@@ -19,10 +101,12 @@
     </button>
     <div id="nav" class="collapse navbar-collapse">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item"><a class="nav-link" href="#"><i class="bi-house"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/music-research.html"><i class="bi-search"></i> Music Research</a></li>
+        <li class="nav-item"><a class="nav-link" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a></li>
+        <li class="nav-item"><a class="nav-link" href="/player.html"><i class="bi-volume-up"></i> Player</a></li>
+        <li class="nav-item"><a class="nav-link" href="/assistant.html"><i class="bi-robot"></i> Assistant</a></li>
         <li class="nav-item"><a class="nav-link" href="/debug.html"><i class="bi-bug"></i> Debug</a></li>
-        <li class="nav-item"><a class="nav-link" href="/test-audio.html"><i class="bi-volume-up"></i> Audio Test</a></li>
-        <li class="nav-item"><a class="nav-link" href="#" id="showHelp"><i class="bi-question-circle"></i> Help</a></li>
       </ul>
     </div>
   </div>

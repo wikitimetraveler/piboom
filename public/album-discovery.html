@@ -9,6 +9,55 @@
   <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
   <link rel="stylesheet" href="/styles.css"/>
   <style>
+    /* Floating Musical Notes */
+    .floating-notes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .musical-note {
+      position: absolute;
+      font-size: 32px;
+      color: rgba(135, 206, 250, 0.6);
+      animation: floatNote 15s linear infinite;
+      opacity: 0;
+      z-index: 10;
+    }
+
+    .musical-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .musical-note:nth-child(2) { left: 20%; animation-delay: 3s; }
+    .musical-note:nth-child(3) { left: 30%; animation-delay: 6s; }
+    .musical-note:nth-child(4) { left: 40%; animation-delay: 9s; }
+    .musical-note:nth-child(5) { left: 50%; animation-delay: 12s; }
+    .musical-note:nth-child(6) { left: 60%; animation-delay: 15s; }
+    .musical-note:nth-child(7) { left: 70%; animation-delay: 18s; }
+    .musical-note:nth-child(8) { left: 80%; animation-delay: 21s; }
+    .musical-note:nth-child(9) { left: 90%; animation-delay: 24s; }
+
+    @keyframes floatNote {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.6;
+      }
+      95% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+  </style>
+  <style>
     /* Zen Album Discovery Container */
     .album-container {
       max-width: 1200px;
@@ -364,6 +413,19 @@
 <body>
 <div class="particles" id="particles"></div>
 
+<!-- Floating Musical Notes -->
+<div class="floating-notes">
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+</div>
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
   <div class="container">
     <a class="navbar-brand" href="/">
@@ -371,9 +433,11 @@
     </a>
     <div class="navbar-nav ml-auto">
       <a class="nav-link" href="/"><i class="bi-house"></i> Home</a>
-      <a class="nav-link" href="/assistant.html"><i class="bi-robot"></i> Levi</a>
-      <a class="nav-link" href="/music-research.html"><i class="bi-search"></i> Research</a>
-      <a class="nav-link active" href="/album-discovery.html"><i class="bi-disc"></i> Albums</a>
+      <a class="nav-link" href="/music-research.html"><i class="bi-search"></i> Music Research</a>
+      <a class="nav-link active" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a>
+      <a class="nav-link" href="/player.html"><i class="bi-volume-up"></i> Player</a>
+      <a class="nav-link" href="/assistant.html"><i class="bi-robot"></i> Assistant</a>
+      <a class="nav-link" href="/debug.html"><i class="bi-bug"></i> Debug</a>
     </div>
   </div>
 </nav>
@@ -509,9 +573,15 @@ function initializeKGWidget() {
                     console.log('🔍 KG Widget selection:', e.row);
                     // Fetch detailed information from Knowledge Graph API
                     fetchDetailedArtistInfo(e.row.name);
-                    // Set current artist and automatically trigger album search
+                    // Set current artist and save to localStorage
                     currentArtist = e.row.name;
-                    searchAlbums();
+                    localStorage.setItem('selectedArtist', e.row.name);
+                    console.log('💾 Saved artist to localStorage:', e.row.name);
+                    // Preload the search box but don't auto-search
+                    const kgInput = document.getElementById('kgBand');
+                    if (kgInput) {
+                      kgInput.value = e.row.name;
+                    }
                   } catch (error) {
                     console.error('❌ Error in selectHandler:', error);
                   }
@@ -848,7 +918,9 @@ function processVoiceCommand(transcript) {
   }
   
   if (artistName) {
-    document.getElementById('artistInput').value = artistName;
+    document.getElementById('kgBand').value = artistName;
+    currentArtist = artistName;
+    localStorage.setItem('selectedArtist', artistName);
     updateVoiceStatus(`Searching for: "${artistName}"`, 'ready');
     
     // Auto-search after a short delay
@@ -1064,6 +1136,20 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+// Preload artist from localStorage
+function preloadArtist() {
+  const savedArtist = localStorage.getItem('selectedArtist');
+  if (savedArtist) {
+    console.log('💾 Preloading artist from localStorage:', savedArtist);
+    const kgInput = document.getElementById('kgBand');
+    if (kgInput) {
+      kgInput.value = savedArtist;
+      currentArtist = savedArtist;
+      updateModeButtonText();
+    }
+  }
+}
+
 // Initialize page (copied from working research page)
 document.addEventListener('DOMContentLoaded', function() {
   // Try to initialize KG widget, but don't let it break the page
@@ -1074,6 +1160,9 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   updateModeButtonText(); // Initialize button text
+  
+  // Preload artist from localStorage if available
+  preloadArtist();
   
   // Try to initialize voice automatically after a short delay
   setTimeout(() => {
