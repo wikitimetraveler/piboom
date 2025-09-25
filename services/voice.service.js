@@ -35,21 +35,19 @@ export class VoiceService {
     console.log('Platform:', process.platform);
     console.log('Mode:', config.mode);
     
-    if (config.mode === 'pi') {
-      try {
-        // Initialize Google Cloud Speech client
-        this.speechClient = new SpeechClient();
-        console.log('✅ Google Cloud Speech client initialized');
-        
-        // For Pi mode, we'll use a simplified approach that works on both Windows and Linux
+    try {
+      // Initialize Google Cloud Speech client for both pi and cloud modes
+      this.speechClient = new SpeechClient();
+      console.log('✅ Google Cloud Speech client initialized');
+      
+      if (config.mode === 'pi') {
         console.log('✅ Voice activation ready for Pi mode');
-        return true;
-      } catch (error) {
-        console.error('Voice activation initialization error:', error.message);
-        return false;
+      } else {
+        console.log('✅ Voice activation ready for Cloud mode');
       }
-    } else {
-      console.log('Voice activation not available in current mode');
+      return true;
+    } catch (error) {
+      console.error('Voice activation initialization error:', error.message);
       return false;
     }
   }
@@ -63,6 +61,9 @@ export class VoiceService {
     
     if (config.mode === 'pi') {
       this.startPiModeRecognition();
+    } else {
+      // Cloud mode - frontend handles voice recognition
+      console.log('✅ Cloud mode voice recognition ready - frontend will handle voice input');
     }
     
     this.speak('🎤 Voice activation enabled! I\'m listening for your commands. Say "help" to see what you can do!');
