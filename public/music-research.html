@@ -1500,21 +1500,29 @@ function initWebSpeechRecognition() {
   
   // Handle recognition errors
   recognition.onerror = function(event) {
-    console.error('Speech recognition error:', event.error);
+    console.error('🎤 Speech recognition error:', event.error);
+    console.error('🎤 Error details:', event);
     
     // Handle specific error types
     switch(event.error) {
       case 'not-allowed':
-        showVoiceNotification('Microphone access denied. Please allow microphone access.');
+        showVoiceNotification('Microphone access denied. Please allow microphone access and try again.', 'error');
         break;
       case 'no-speech':
-        showVoiceNotification('No speech detected. Please try again.');
+        showVoiceNotification('No speech detected. Please try speaking again.', 'warning');
+        // Auto-retry for no-speech errors
+        setTimeout(() => {
+          if (isListening) {
+            console.log('🎤 Retrying speech recognition...');
+            recognition.start();
+          }
+        }, 1000);
         break;
       case 'audio-capture':
-        showVoiceNotification('Microphone not found or in use by another application. Please close other apps using the microphone and try again.');
+        showVoiceNotification('Microphone not found or in use by another application. Please close other apps using the microphone and try again.', 'error');
         break;
       case 'not-supported':
-        showVoiceNotification('Speech recognition not supported in this browser.');
+        showVoiceNotification('Speech recognition not supported in this browser. Please use a modern browser like Chrome or Edge.', 'error');
         break;
       case 'service-not-allowed':
         showVoiceNotification('Speech recognition service not allowed.');

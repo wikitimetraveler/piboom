@@ -222,6 +222,54 @@ let ghost = document.getElementById('ghost'), canvas=document.getElementById('vu
 const audioStatus = $('#audioStatus'), audioMode = $('#audioMode'), currentFile = $('#currentFile');
 let audioCtx, analyser, data;
 
+// Notification system for user feedback
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <i class="bi ${type === 'error' ? 'bi-exclamation-triangle' : type === 'warning' ? 'bi-exclamation-circle' : 'bi-info-circle'}"></i>
+      <span>${message}</span>
+    </div>
+  `;
+  
+  // Add styles
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'error' ? '#dc3545' : type === 'warning' ? '#ffc107' : '#17a2b8'};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 9999;
+    max-width: 400px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    font-size: 14px;
+  `;
+  
+  // Add to page
+  document.body.appendChild(notification);
+  
+  // Animate in
+  setTimeout(() => {
+    notification.style.transform = 'translateX(0)';
+  }, 100);
+  
+  // Auto remove after 5 seconds
+  setTimeout(() => {
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 300);
+  }, 5000);
+}
+
 // Socket.IO connection for voice commands
 let socket = null;
 
@@ -699,13 +747,88 @@ voiceInit.onclick = async () => {
       };
       
       recognition.onerror = (event) => {
-        console.error('Voice recognition error:', event.error);
+        console.error('Speech recognition error:', event.error);
+        console.error('Error details:', event);
+        console.error('Environment:', window.location.hostname);
+        
+        // Check if we're on Render or cloud deployment
+        const isCloudDeployment = window.location.hostname.includes('render.com') || 
+                                 window.location.hostname.includes('herokuapp.com') ||
+                                 window.location.hostname.includes('vercel.app') ||
+                                 window.location.hostname.includes('netlify.app');
+        
+        // Handle different error types with specific messages
+        let errorMessage = '';
+        let errorColor = '#dc3545';
+        
+        switch (event.error) {
+          case 'not-allowed':
+            errorMessage = '<i class="bi-x-circle"></i> Microphone Access Denied';
+            console.log('User denied microphone permission');
+            break;
+          case 'no-speech':
+            errorMessage = '<i class="bi-mic-mute"></i> No Speech Detected';
+            errorColor = '#ffc107';
+            console.log('No speech detected, trying again...');
+            // Auto-retry for no-speech errors (but not on cloud deployments)
+            if (!isCloudDeployment) {
+              setTimeout(() => {
+                if (isListening) {
+                  console.log('Retrying speech recognition...');
+                  recognition.start();
+                }
+              }, 1000);
+            }
+            break;
+          case 'audio-capture':
+            errorMessage = '<i class="bi-mic"></i> Microphone Not Found';
+            console.log('No microphone found');
+            break;
+          case 'network':
+            errorMessage = '<i class="bi-wifi-off"></i> Network Error';
+            console.log('Network error during speech recognition');
+            break;
+          case 'service-not-allowed':
+            errorMessage = '<i class="bi-shield-x"></i> Service Not Allowed';
+            console.log('Speech recognition service not allowed');
+            break;
+          case 'bad-grammar':
+            errorMessage = '<i class="bi-exclamation-triangle"></i> Grammar Error';
+            console.log('Bad grammar in speech recognition');
+            break;
+          case 'language-not-supported':
+            errorMessage = '<i class="bi-translate"></i> Language Not Supported';
+            console.log('Language not supported');
+            break;
+          default:
+            errorMessage = `<i class="bi-x-circle"></i> Error: ${event.error}`;
+            console.log('Unknown speech recognition error:', event.error);
+        }
+        
+        voiceStatus.innerHTML = errorMessage;
+        voiceStatus.style.color = errorColor;
+        
+        // Show user-friendly error message
         if (event.error === 'not-allowed') {
-          voiceStatus.innerHTML = '<i class="bi-x-circle"></i> Microphone Access Denied';
-          voiceStatus.style.color = '#dc3545';
+          showNotification('Microphone access is required for voice commands. Please allow microphone access and try again.', 'error');
+        } else if (event.error === 'no-speech') {
+          if (isCloudDeployment) {
+            showNotification('Voice recognition may not work properly on cloud deployments. Please use the text input instead.', 'warning');
+          } else {
+            showNotification('No speech detected. Please try speaking again.', 'warning');
+          }
+        } else if (isCloudDeployment && ['service-not-allowed', 'network'].includes(event.error)) {
+          showNotification('Voice recognition is limited on cloud deployments. Please use the text input for commands.', 'warning');
         } else {
-          voiceStatus.innerHTML = '<i class="bi-x-circle"></i> Recognition Error';
-          voiceStatus.style.color = '#dc3545';
+          showNotification(`Voice recognition error: ${event.error}`, 'error');
+        }
+        
+        // Stop listening on critical errors
+        if (['not-allowed', 'audio-capture', 'service-not-allowed'].includes(event.error)) {
+          isListening = false;
+          voiceStart.disabled = false;
+          voiceStart.innerHTML = '<i class="bi-mic"></i> Start Listening';
+          voiceStart.style.background = 'var(--primary-color)';
         }
       };
       

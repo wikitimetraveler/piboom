@@ -661,10 +661,55 @@ async function startVoice() {
     
     recognition.onerror = function(event) {
       console.error('Speech recognition error:', event.error);
-      addMessage('Voice recognition error: ' + event.error, 'assistant', 'apologetic');
-      isListening = false;
-      document.getElementById('startVoiceBtn').disabled = false;
-      document.getElementById('stopVoiceBtn').disabled = true;
+      console.error('Error details:', event);
+      
+      // Handle different error types with specific messages
+      let errorMessage = '';
+      let messageType = 'apologetic';
+      
+      switch (event.error) {
+        case 'not-allowed':
+          errorMessage = 'I need microphone access to hear you. Please allow microphone access and try again.';
+          break;
+        case 'no-speech':
+          errorMessage = 'I didn\'t hear anything. Please try speaking again.';
+          messageType = 'helpful';
+          // Auto-retry for no-speech errors
+          setTimeout(() => {
+            if (isListening) {
+              console.log('Retrying speech recognition...');
+              recognition.start();
+            }
+          }, 1000);
+          break;
+        case 'audio-capture':
+          errorMessage = 'I can\'t find your microphone. Please check your audio settings.';
+          break;
+        case 'network':
+          errorMessage = 'I\'m having trouble connecting. Please check your internet connection.';
+          break;
+        case 'service-not-allowed':
+          errorMessage = 'Voice recognition service is not available. Please try again later.';
+          break;
+        case 'bad-grammar':
+          errorMessage = 'I had trouble understanding that. Could you try saying it differently?';
+          messageType = 'helpful';
+          break;
+        case 'language-not-supported':
+          errorMessage = 'I don\'t support that language yet. Please try English.';
+          break;
+        default:
+          errorMessage = `I encountered an error: ${event.error}. Please try again.`;
+      }
+      
+      addMessage(errorMessage, 'assistant', messageType);
+      
+      // Stop listening on critical errors
+      if (['not-allowed', 'audio-capture', 'service-not-allowed'].includes(event.error)) {
+        isListening = false;
+        document.getElementById('startVoiceBtn').disabled = false;
+        document.getElementById('stopVoiceBtn').disabled = true;
+      }
     };
     
     recognition.onend = function() {

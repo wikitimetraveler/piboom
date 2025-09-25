@@ -5,8 +5,13 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Easy mode switching - change this one value to switch modes
-const DEV_MODE = 'pi'; // Change to 'pi' when deploying to Raspberry Pi
+// Auto-detect deployment environment
+const isCloudDeployment = process.env.RENDER_EXTERNAL_URL || 
+                         process.env.HEROKU_APP_NAME || 
+                         process.env.VERCEL_URL ||
+                         process.env.NETLIFY_URL;
+
+const DEV_MODE = isCloudDeployment ? 'cloud' : 'pi';
 
 export const config = {
   port: Number(process.env.PORT || 3000),
