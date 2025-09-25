@@ -40,7 +40,8 @@ async function executeVoiceCommand(command, io) {
     console.log('🎤 Voice command: Dave assistant query -', command);
     
     try {
-      const response = await axios.post('http://localhost:3000/api/chat/chat', {
+      const baseUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
+      const response = await axios.post(`${baseUrl}/api/chat/chat`, {
         message: command,
         context: { source: 'voice_command', mode: 'pi' }
       });
@@ -50,7 +51,7 @@ async function executeVoiceCommand(command, io) {
       console.log('🎤 Dave response:', chatResponse);
       
       // Send response to frontend with personality info
-      if (io) {
+      if (io) {C
         io.emit('voiceCommand', { 
           command: 'chatResponse', 
           response: chatResponse,
@@ -132,7 +133,8 @@ async function executeVoiceCommand(command, io) {
       console.log('❓ Voice command not recognized:', command);
       // Try Dave assistant for unrecognized commands
       try {
-        const response = await axios.post('http://localhost:3000/api/chat/chat', {
+        const baseUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
+        const response = await axios.post(`${baseUrl}/api/chat/chat`, {
           message: `I said "${command}" but I'm not sure what you want me to do. Can you help me understand what you'd like?`,
           context: { source: 'unrecognized_voice_command', mode: 'pi' }
         });
@@ -350,13 +352,18 @@ export function speakText(req, res) {
     console.log('🎤 Speaking text:', text);
     console.log('🎤 Voice service sayEnabled:', voiceService.sayEnabled);
     console.log('🎤 Voice service mode:', process.env.MODE || 'pi');
+    console.log('🎤 Platform:', process.platform);
     
+    // Test TTS immediately
     voiceService.speak(text);
     
     res.json({ 
       success: true, 
       message: 'Text spoken successfully',
-      text 
+      text,
+      platform: process.platform,
+      mode: process.env.MODE || 'pi',
+      sayEnabled: voiceService.sayEnabled
     });
   } catch (error) {
     console.error('Speak text error:', error);

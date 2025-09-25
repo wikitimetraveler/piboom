@@ -34,11 +34,17 @@ export class VoiceService {
     console.log('VoiceService.init() called');
     console.log('Platform:', process.platform);
     console.log('Mode:', config.mode);
+    console.log('Environment:', process.env.NODE_ENV || 'development');
+    console.log('Render URL:', process.env.RENDER_EXTERNAL_URL || 'not set');
     
     try {
       // Initialize Google Cloud Speech client for both pi and cloud modes
       this.speechClient = new SpeechClient();
       console.log('✅ Google Cloud Speech client initialized');
+      
+      // Test TTS availability
+      console.log('🎤 Testing TTS availability...');
+      this.testTTSAvailability();
       
       if (config.mode === 'pi') {
         console.log('✅ Voice activation ready for Pi mode');
@@ -48,6 +54,7 @@ export class VoiceService {
       return true;
     } catch (error) {
       console.error('Voice activation initialization error:', error.message);
+      console.error('Full error:', error);
       return false;
     }
   }
@@ -126,26 +133,30 @@ export class VoiceService {
   speak(text) {
     if (!this.sayEnabled) return;
     
+    console.log('🎤 Attempting to speak:', text);
+    console.log('🎤 Platform:', process.platform);
+    console.log('🎤 Mode:', config.mode);
+    
     if (config.mode === 'pi') {
       if (this.isWindows) {
         // Use Windows built-in text-to-speech with better error handling
         try {
-          // Clean the text for Windows TTS
+          // Clean the text for Windows TTS - be more conservative with cleaning
           const cleanText = text
             .replace(/[^\w\s.,!?;:'"-]/g, '') // Remove special characters that might cause issues
             .replace(/'/g, "''") // Escape single quotes
             .replace(/"/g, '""') // Escape double quotes
             .substring(0, 200); // Shorter limit for better reliability
           
-          // Use a simpler PowerShell command
-          const command = `powershell -Command "& {Add-Type -AssemblyName System.Speech; $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer; $synth.Speak('${cleanText}')}"`;
+          // Use a simpler PowerShell command that we know works
+          const command = `powershell -Command "Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('${cleanText}')"`;
           
           console.log('🎤 Executing Windows TTS command...');
           console.log('🎤 Text to speak:', cleanText);
           
           exec(command, { timeout: 15000 }, (error, stdout, stderr) => {
             if (error) {
-              console.log('Windows text-to-speech failed:', error.message);
+              console.error('Windows text-to-speech failed:', error.message);
               console.log('🎤 Voice feedback (fallback):', text);
               
               // Try alternative method with espeak if available
@@ -155,25 +166,21 @@ export class VoiceService {
             }
           });
         } catch (error) {
-          console.log('Windows text-to-speech not available:', error.message);
+          console.error('Windows text-to-speech not available:', error.message);
           console.log('🎤 Voice feedback (fallback):', text);
           this.tryEspeakFallback(text);
         }
       } else {
         // Use espeak on Linux Pi for better performance
-        const espeak = spawn('espeak', [text, '--stdout']);
-        const aplay = spawn('aplay', ['-f', 'S16_LE', '-r', '22050', '-c', '1']);
-        
-        espeak.stdout.pipe(aplay.stdin);
-        
-        espeak.on('error', (error) => {
-          console.log('espeak not available, falling back to console log');
-          console.log('🎤 Voice feedback:', text);
-        });
+        this.tryEspeakTTS(text);
       }
     } else {
-      // Fallback for other platforms
-      console.log('🎤 Voice feedback:', text);
+      // Cloud mode - try espeak first, then fallback to web TTS or console
+      console.log('🎤 Cloud mode - attempting espeak TTS...');
+      this.tryEspeakTTS(text);
+      
+      // Also try web-based TTS as a fallback for cloud deployments
+      this.tryWebTTS(text);
     }
   }
 
@@ -237,6 +244,69 @@ export class VoiceService {
     console.log(`Voice feedback ${enabled ? 'enabled' : 'disabled'}`);
   }
 
+  // Try espeak TTS with proper error handling
+  tryEspeakTTS(text) {
+    try {
+      console.log('🎤 Attempting espeak TTS...');
+      
+      // Clean text for espeak
+      const cleanText = text
+        .replace(/[^\w\s.,!?;:'"-]/g, '') // Remove special characters
+        .substring(0, 200); // Limit length
+      
+      const espeak = spawn('espeak', [cleanText, '--stdout']);
+      
+      // Try to pipe to aplay if available (Linux)
+      const aplay = spawn('aplay', ['-f', 'S16_LE', '-r', '22050', '-c', '1']);
+      
+      espeak.stdout.pipe(aplay.stdin);
+      
+      espeak.on('error', (error) => {
+        console.log('🎤 espeak not available, falling back to console');
+        console.log('🎤 Voice feedback:', text);
+      });
+      
+      espeak.on('close', (code) => {
+        if (code === 0) {
+          console.log('🎤 espeak TTS successful!');
+        } else {
+          console.log('🎤 espeak TTS failed with code:', code);
+          console.log('🎤 Voice feedback (fallback):', text);
+        }
+      });
+      
+      aplay.on('error', (error) => {
+        console.log('🎤 aplay not available, espeak audio will not play');
+        console.log('🎤 Voice feedback:', text);
+      });
+      
+    } catch (error) {
+      console.log('🎤 espeak TTS failed:', error.message);
+      console.log('🎤 Voice feedback:', text);
+    }
+  }
+
+  // Try web-based TTS for cloud deployments
+  tryWebTTS(text) {
+    try {
+      console.log('🎤 Attempting web-based TTS for cloud deployment...');
+      
+      // For cloud deployments, we'll use a simple approach:
+      // 1. Log the text (always works)
+      // 2. Try to use the browser's Web Speech API via frontend
+      // 3. Provide clear feedback about TTS availability
+      
+      console.log('🎤 Voice feedback (cloud mode):', text);
+      
+      // In cloud mode, the frontend can handle TTS using Web Speech API
+      // This is more reliable than trying to install espeak on cloud platforms
+      
+    } catch (error) {
+      console.log('🎤 Web TTS failed:', error.message);
+      console.log('🎤 Voice feedback:', text);
+    }
+  }
+
   // Try espeak as fallback on Windows
   tryEspeakFallback(text) {
     try {
@@ -284,6 +354,31 @@ export class VoiceService {
     });
   }
 
+  // Test TTS availability
+  testTTSAvailability() {
+    console.log('🎤 Testing TTS availability...');
+    
+    if (this.isWindows) {
+      console.log('🎤 Windows platform detected - will use PowerShell TTS');
+    } else {
+      console.log('🎤 Linux platform detected - will try espeak');
+      
+      // Test if espeak is available
+      const testEspeak = spawn('espeak', ['--version']);
+      testEspeak.on('error', (error) => {
+        console.log('🎤 espeak not available:', error.message);
+        console.log('🎤 Will use console fallback for TTS');
+      });
+      testEspeak.on('close', (code) => {
+        if (code === 0) {
+          console.log('🎤 espeak is available and working');
+        } else {
+          console.log('🎤 espeak test failed with code:', code);
+        }
+      });
+    }
+  }
+
   // Get current status
   getStatus() {
     return {
@@ -291,7 +386,9 @@ export class VoiceService {
       isInitialized: !!this.speechClient,
       voiceFeedbackEnabled: this.sayEnabled,
       commandHistoryLength: this.commandHistory.length,
-      mode: config.mode
+      mode: config.mode,
+      platform: process.platform,
+      environment: process.env.NODE_ENV || 'development'
     };
   }
 }
