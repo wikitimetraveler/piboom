@@ -28,11 +28,9 @@ body{
 @keyframes zenBreath {
   0%, 100% { 
     background: linear-gradient(135deg, rgba(240,248,255,0.9) 0%, rgba(230,245,255,0.8) 50%, rgba(220,240,255,0.7) 100%);
-    transform: scale(1);
   }
   50% { 
     background: linear-gradient(135deg, rgba(235,245,255,0.95) 0%, rgba(225,240,255,0.85) 50%, rgba(215,235,255,0.75) 100%);
-    transform: scale(1.001);
   }
 }
 .header{background:rgba(255,255,255,.95); backdrop-filter:blur(20px);
@@ -75,11 +73,9 @@ body{
 @keyframes zenCardBreath {
   0%, 100% { 
     box-shadow: var(--zen-shadow);
-    transform: scale(1);
   }
   50% { 
     box-shadow: 0 6px 25px rgba(0,0,0,0.12), var(--zen-glow);
-    transform: scale(1.005);
   }
 }
 .tool-card:hover{

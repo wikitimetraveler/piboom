@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('mousemove', (e)=>{
     const mx = e.clientX / window.innerWidth, my = e.clientY / window.innerHeight;
     cards.forEach((card, idx) => {
-      const speed = (idx+1)*0.2; // Reduced speed for more zen feel
+      const speed = (idx+1)*0.05; // Much reduced speed to prevent layout issues
       const x = (mx-0.5)*speed, y=(my-0.5)*speed;
-      const rotation = (mx-0.5)*0.5; // Subtle rotation
+      const rotation = (mx-0.5)*0.1; // Very subtle rotation
       card.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
       card.style.transition = 'transform 0.1s var(--zen-ease)';
     });
