@@ -58,13 +58,62 @@
     }
   </style>
   <style>
+    /* Force page to be visible and properly sized */
+    * {
+      box-sizing: border-box !important;
+    }
+    
+    html, body {
+      width: 100% !important;
+      height: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      font-size: 16px !important;
+    }
+    
+    .container {
+      width: 100% !important;
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+      padding: 20px !important;
+      min-height: 100vh !important;
+    }
+    
     /* Zen Album Discovery Container */
     .album-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: var(--zen-spacing);
+      width: 100% !important;
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+      padding: 20px !important;
       position: relative;
       z-index: 2;
+      visibility: visible !important;
+      opacity: 1 !important;
+      min-height: 500px !important;
+      display: block !important;
+    }
+    
+    .kg-widget-container {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 auto !important;
+      padding: 20px !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    
+    .input-group {
+      width: 100% !important;
+      max-width: 900px !important;
+      margin: 0 auto !important;
+    }
+    
+    .input-group-lg {
+      width: 100% !important;
+      max-width: 900px !important;
     }
     
     /* Zen Search Section */
@@ -328,20 +377,44 @@
       text-shadow: 0 2px 10px var(--ice-glow);
     }
     
-    .search-box {
-      border: 1px solid var(--border);
-      border-radius: var(--zen-radius);
-      padding: 12px 18px;
-      background: rgba(255,255,255,0.9);
+    .search-input {
+      border: 2px solid var(--border) !important;
+      border-radius: var(--zen-radius) 0 0 var(--zen-radius) !important;
+      padding: 15px 20px !important;
+      background: rgba(255,255,255,0.9) !important;
       backdrop-filter: blur(10px);
       transition: all 0.3s var(--zen-ease);
       box-shadow: var(--zen-shadow);
+      font-size: 16px !important;
+      height: 50px !important;
+      min-height: 50px !important;
+      width: 100% !important;
+      max-width: 800px !important;
     }
     
-    .search-box:focus {
-      border-color: var(--ice-primary);
-      box-shadow: 0 0 20px var(--ice-glow);
+    .search-input:focus {
+      border-color: var(--ice-primary) !important;
+      box-shadow: 0 0 20px var(--ice-glow) !important;
       transform: translateY(-1px);
+      outline: none !important;
+    }
+    
+    .search-btn {
+      border-radius: 0 var(--zen-radius) var(--zen-radius) 0 !important;
+      padding: 15px 20px !important;
+      border: 2px solid var(--ice-primary) !important;
+      background: var(--ice-primary) !important;
+      transition: all 0.3s var(--zen-ease);
+      font-size: 16px !important;
+      height: 50px !important;
+      min-height: 50px !important;
+      font-weight: 600 !important;
+    }
+    
+    .search-btn:hover {
+      background: var(--ice-primary) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(135,206,250,0.4);
     }
     
     .kge-search-picker .kge-dropdown-item {
@@ -448,11 +521,18 @@
     <div class="kg-widget-container">
       <h2 class="text-center mb-4"><i class="bi-disc"></i> Album Discovery</h2>
       <p class="text-center mb-4">Search for artists using Google Knowledge Graph to discover their albums!</p>
-      <div class="row">
-        <div class="col-md-8 mx-auto">
+      <div class="row" style="width: 100%; margin: 0;">
+        <div class="col-12" style="width: 100%; padding: 0 15px;">
           <!-- Google Knowledge Graph Search Widget -->
           <div class="text-center mb-3">
-            <input id="kgBand" class="form-control search-box" placeholder="Search a band or artist…" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
+            <div class="input-group input-group-lg">
+              <input id="kgBand" class="form-control search-input" placeholder="Search a band or artist…" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
+              <div class="input-group-append">
+                <button class="btn btn-primary search-btn" type="button" onclick="searchAlbums()">
+                  <i class="bi-search"></i> Search Albums
+                </button>
+              </div>
+            </div>
           </div>
           
           <!-- KG Widget Results Display -->
@@ -577,11 +657,13 @@ function initializeKGWidget() {
                     currentArtist = e.row.name;
                     localStorage.setItem('selectedArtist', e.row.name);
                     console.log('💾 Saved artist to localStorage:', e.row.name);
-                    // Preload the search box but don't auto-search
+                    // Preload the search box
                     const kgInput = document.getElementById('kgBand');
                     if (kgInput) {
                       kgInput.value = e.row.name;
                     }
+                    // Auto-search for albums when artist is selected
+                    searchAlbums();
                   } catch (error) {
                     console.error('❌ Error in selectHandler:', error);
                   }
@@ -1150,19 +1232,51 @@ function preloadArtist() {
   }
 }
 
+// Force page to be visible immediately
+document.body.style.cssText = 'width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; visibility: visible !important; opacity: 1 !important; font-size: 16px !important;';
+document.documentElement.style.cssText = 'width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important;';
+
 // Initialize page (copied from working research page)
 document.addEventListener('DOMContentLoaded', function() {
-  // Try to initialize KG widget, but don't let it break the page
-  try {
-    initializeKGWidget();
-  } catch (error) {
-    console.error('KG widget failed to initialize:', error);
-  }
+  console.log('🚀 DOM Content Loaded - Starting initialization...');
+  
+  // Force all containers to be visible and properly sized
+  const containers = document.querySelectorAll('.container, .album-container, .kg-widget-container');
+  containers.forEach(container => {
+    container.style.cssText = 'width: 100% !important; max-width: 1200px !important; margin: 0 auto !important; padding: 20px !important; display: block !important; visibility: visible !important; opacity: 1 !important;';
+  });
   
   updateModeButtonText(); // Initialize button text
   
   // Preload artist from localStorage if available
   preloadArtist();
+  
+  // Try to initialize KG widget with retry mechanism
+  let kgRetryCount = 0;
+  const maxKgRetries = 10;
+  
+  function tryInitializeKG() {
+    try {
+      console.log(`🔍 Attempting KG widget initialization (attempt ${kgRetryCount + 1})...`);
+      if (typeof KGSearchWidget === 'function') {
+        initializeKGWidget();
+        console.log('✅ KG widget initialized successfully');
+      } else {
+        kgRetryCount++;
+        if (kgRetryCount < maxKgRetries) {
+          console.log('⏳ KGSearchWidget not ready, retrying in 500ms...');
+          setTimeout(tryInitializeKG, 500);
+        } else {
+          console.warn('❌ KGSearchWidget failed to load after maximum retries');
+        }
+      }
+    } catch (error) {
+      console.error('❌ KG widget initialization error:', error);
+    }
+  }
+  
+  // Start KG widget initialization
+  tryInitializeKG();
   
   // Try to initialize voice automatically after a short delay
   setTimeout(() => {

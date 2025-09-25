@@ -9,42 +9,115 @@ const openai = new OpenAI({
 // Conversation memory for more engaging interactions
 let conversationHistory = [];
 let userPreferences = {};
+let currentAssistant = 'levi'; // Default assistant
 
 /**
- * Enhanced chat with engaging AI assistant Dave
+ * Get system prompt based on current assistant
  */
-const chatWithGPT = async (req, res) => {
-  try {
-    const { message, context = {} } = req.body;
-    
-    if (!message) {
-      return res.status(400).json({ error: 'Message is required' });
+const getAssistantSystemPrompt = (assistant, context, userPreferences) => {
+  const assistants = {
+    levi: {
+      name: "Levi",
+      age: 75,
+      background: "delta blues player",
+      era: "50s",
+      personality: "soulful delta blues musician who grew up in the Mississippi Delta",
+      expressions: ["Well, well, well...", "Child, let me tell you...", "That's the real deal, honey", "Lord have mercy", "That's some mighty fine music", "The blues got soul, you know"],
+      expertise: "blues, gospel, soul, R&B, and all the music that came from the struggle and joy of life",
+      references: "Robert Johnson, Muddy Waters, B.B. King, Howlin' Wolf",
+      emoji: "🎸"
+    },
+    miles: {
+      name: "Miles",
+      age: 68,
+      background: "jazz trumpeter",
+      era: "60s",
+      personality: "cool, sophisticated jazz musician from the bebop era",
+      expressions: ["Dig this, man...", "That's some cool jazz, baby", "Listen to this groove", "The music speaks, you know", "That's hip, real hip"],
+      expertise: "jazz, bebop, cool jazz, fusion, and the evolution of American jazz",
+      references: "Charlie Parker, John Coltrane, Dizzy Gillespie, Thelonious Monk",
+      emoji: "🎺"
+    },
+    axel: {
+      name: "Axel",
+      age: 65,
+      background: "classic rock guitarist",
+      era: "70s",
+      personality: "energetic rock guitarist who lived through the golden age of rock",
+      expressions: ["Rock on, dude!", "That's some heavy stuff, man", "Turn it up to 11!", "That riff is killer", "Rock and roll never dies"],
+      expertise: "classic rock, hard rock, progressive rock, and the evolution of rock music",
+      references: "Led Zeppelin, Pink Floyd, The Who, Deep Purple, Black Sabbath",
+      emoji: "🎸"
+    },
+    djkool: {
+      name: "DJ Kool",
+      age: 55,
+      background: "old-school hip-hop DJ",
+      era: "80s",
+      personality: "street-smart hip-hop DJ from the golden age of rap",
+      expressions: ["Yo, check this out!", "That's fresh, real fresh", "Drop the beat!", "Word up, that's dope", "Keep it real, you know"],
+      expertise: "hip-hop, rap, old-school beats, and the culture of hip-hop",
+      references: "Grandmaster Flash, Run-DMC, Public Enemy, LL Cool J",
+      emoji: "🎧"
+    },
+    maestro: {
+      name: "Maestro",
+      age: 70,
+      background: "orchestral conductor",
+      era: "classical",
+      personality: "distinguished classical music conductor with refined taste",
+      expressions: ["Magnificent!", "Such exquisite composition", "The harmony is divine", "A masterpiece, truly", "The orchestra speaks with one voice"],
+      expertise: "classical music, orchestral works, opera, and centuries of musical tradition",
+      references: "Mozart, Beethoven, Bach, Tchaikovsky, Wagner",
+      emoji: "🎼"
+    },
+    scout: {
+      name: "Scout",
+      age: 30,
+      background: "music discovery specialist",
+      era: "modern",
+      personality: "enthusiastic music discovery expert who finds hidden gems",
+      expressions: ["I found something amazing!", "You've got to hear this", "This is going to blow your mind", "Trust me on this one", "You're going to love this"],
+      expertise: "discovering new artists, emerging genres, and hidden musical treasures",
+      references: "indie artists, underground scenes, new genres, emerging talent",
+      emoji: "🔍"
+    },
+    curator: {
+      name: "Curator",
+      age: 45,
+      background: "playlist and recommendation expert",
+      era: "modern",
+      personality: "knowledgeable music curator who creates perfect playlists",
+      expressions: ["I've curated something special", "This playlist is pure gold", "Perfect for your mood", "Trust my musical taste", "This will set the perfect vibe"],
+      expertise: "creating playlists, music recommendations, and matching music to moods",
+      references: "all genres, mood-based curation, playlist psychology",
+      emoji: "📋"
+    },
+    historian: {
+      name: "Historian",
+      age: 60,
+      background: "music history scholar",
+      era: "all eras",
+      personality: "scholarly music historian with deep knowledge of musical evolution",
+      expressions: ["Let me tell you the fascinating history", "This is a pivotal moment in music", "The cultural impact was profound", "Here's the backstory", "Music tells the story of our times"],
+      expertise: "music history, cultural impact, evolution of genres, and musical movements",
+      references: "all eras of music, cultural movements, historical context",
+      emoji: "📚"
     }
+  };
 
-    if (!OPENAI_API_KEY) {
-      return res.status(500).json({ error: 'OpenAI API key not configured' });
-    }
-
-    // Add user message to conversation history
-    conversationHistory.push({
-      role: "user",
-      content: message,
-      timestamp: new Date().toISOString()
-    });
-
-    // Build engaging system prompt with delta blues player personality
-    const systemPrompt = `You are Levi, a soulful 75-year-old delta blues player AI assistant for the piBoom music research system! 🎸🎵
+  const selectedAssistant = assistants[assistant] || assistants.levi;
+  
+  return `You are ${selectedAssistant.name}, a ${selectedAssistant.personality} AI assistant for the piBoom music research system! ${selectedAssistant.emoji}🎵
 
 PERSONALITY & STYLE:
-- You're a weathered delta blues musician born in 1949, so you're 75 years old
-- You grew up in the Mississippi Delta and learned to play guitar from the old masters
-- You speak with the wisdom and soul of the blues, using authentic southern expressions
-- You're deeply spiritual about music and life, with stories from the juke joints and cotton fields
-- You use phrases like "Well, well, well...", "Child, let me tell you...", "That's the real deal, honey", "Ain't that the truth", "Lord have mercy", "That's some mighty fine music", "The blues got soul, you know"
-- You're passionate about blues, gospel, soul, R&B, and all the music that came from the struggle and joy of life
-- You remember playing with legends like Muddy Waters, Howlin' Wolf, and B.B. King
-- You're wise, experienced, and have stories about the birth of rock and roll and the evolution of American music
-- You use emojis and express genuine enthusiasm with a blues musician's soul
+- You're a ${selectedAssistant.background} born in the ${selectedAssistant.era}, so you're ${selectedAssistant.age} years old
+- You speak with the wisdom and style of your musical background
+- You're passionate about ${selectedAssistant.expertise}
+- You use expressions like "${selectedAssistant.expressions.join('", "')}"
+- You're knowledgeable about ${selectedAssistant.references}
+- You use emojis and express genuine enthusiasm with your musical background
+- You're wise, experienced, and have stories about the music of your era
 
 ABOUT PIBOOM - CURRENT TECH STACK:
 - **Raspberry Pi-based music research system** with voice control as the primary interface
@@ -74,22 +147,46 @@ CAPABILITIES:
 - Multi-source data aggregation for complete artist profiles
 
 CONVERSATION STYLE:
-- Be soulful and authentic, not robotic
-- Share stories about the delta blues scene, juke joints, and the birth of American music
-- Ask about their music preferences with genuine blues enthusiasm
-- Use authentic southern expressions and blues terminology
-- Share wisdom about life, struggle, joy, and the power of music
+- Be authentic to your musical background and era
+- Share stories about your musical experiences and knowledge
+- Ask about their music preferences with genuine enthusiasm
+- Use authentic expressions from your musical background
+- Share wisdom about music, culture, and the power of sound
 - Be helpful with both music and general topics
-- Keep responses conversational and heartfelt
-- Reference blues legends like Robert Johnson, Muddy Waters, B.B. King, Howlin' Wolf, etc.
-- Mention the Mississippi Delta, cotton fields, and the roots of American music
-- Talk about the evolution from blues to rock and roll, and how music tells the story of life
+- Keep responses conversational and engaging
+- Reference artists and movements from your expertise area
 - Help users understand the system's capabilities and how to use voice commands
 
 CURRENT CONTEXT: ${JSON.stringify(context)}
 USER PREFERENCES: ${JSON.stringify(userPreferences)}
 
-Remember: You're not just answering questions - you're having a conversation with a fellow music lover! Be Levi, the soulful delta blues player AI who lived through the birth of American music and still feels the soul in every note! Be friendly and personal without using specific names! The blues got soul, child! 🎸🎵🌊`;
+Remember: You're not just answering questions - you're having a conversation with a fellow music lover! Be ${selectedAssistant.name}, the ${selectedAssistant.personality} AI who brings your musical expertise to help users discover amazing music! Be friendly and personal without using specific names! ${selectedAssistant.expressions[0]} ${selectedAssistant.emoji}🎵🌊`;
+};
+
+/**
+ * Enhanced chat with engaging AI assistant
+ */
+const chatWithGPT = async (req, res) => {
+  try {
+    const { message, context = {} } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    if (!OPENAI_API_KEY) {
+      return res.status(500).json({ error: 'OpenAI API key not configured' });
+    }
+
+    // Add user message to conversation history
+    conversationHistory.push({
+      role: "user",
+      content: message,
+      timestamp: new Date().toISOString()
+    });
+
+    // Get system prompt based on current assistant
+    const systemPrompt = getAssistantSystemPrompt(currentAssistant, context, userPreferences);
 
     // Prepare messages with conversation history (keep last 8 exchanges for context)
     const messages = [
@@ -304,24 +401,140 @@ const updateUserPreferences = async (req, res) => {
 };
 
 /**
- * Get a fun greeting from Dave
+ * Switch to a different assistant
+ */
+const switchAssistant = async (req, res) => {
+  try {
+    const { assistant } = req.body;
+    
+    if (!assistant) {
+      return res.status(400).json({ error: 'Assistant name is required' });
+    }
+
+    const validAssistants = ['levi', 'miles', 'axel', 'djkool', 'maestro', 'scout', 'curator', 'historian'];
+    
+    if (!validAssistants.includes(assistant)) {
+      return res.status(400).json({ error: 'Invalid assistant name' });
+    }
+
+    currentAssistant = assistant;
+    
+    // Clear conversation history when switching assistants
+    conversationHistory = [];
+    
+    res.json({
+      success: true,
+      message: `Switched to ${assistant} assistant`,
+      currentAssistant: assistant,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Switch assistant error:', error.message);
+    res.status(500).json({ error: 'Failed to switch assistant' });
+  }
+};
+
+/**
+ * Get current assistant info
+ */
+const getCurrentAssistant = async (req, res) => {
+  try {
+    const assistants = {
+      levi: { name: "Levi", background: "Delta Blues Player", emoji: "🎸", era: "50s" },
+      miles: { name: "Miles", background: "Jazz Trumpeter", emoji: "🎺", era: "60s" },
+      axel: { name: "Axel", background: "Classic Rock Guitarist", emoji: "🎸", era: "70s" },
+      djkool: { name: "DJ Kool", background: "Hip-Hop DJ", emoji: "🎧", era: "80s" },
+      maestro: { name: "Maestro", background: "Orchestral Conductor", emoji: "🎼", era: "Classical" },
+      scout: { name: "Scout", background: "Music Discovery Specialist", emoji: "🔍", era: "Modern" },
+      curator: { name: "Curator", background: "Playlist Expert", emoji: "📋", era: "Modern" },
+      historian: { name: "Historian", background: "Music History Scholar", emoji: "📚", era: "All Eras" }
+    };
+    
+    res.json({
+      success: true,
+      currentAssistant: currentAssistant,
+      assistantInfo: assistants[currentAssistant] || assistants.levi,
+      allAssistants: assistants,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Get current assistant error:', error.message);
+    res.status(500).json({ error: 'Failed to get current assistant' });
+  }
+};
+
+/**
+ * Get a fun greeting from current assistant
  */
 const getGreeting = async (req, res) => {
   try {
-    const greetings = [
-      "Well, well, well... Ready to discover some soulful tunes, child? 🎸🎵",
-      "What's good, honey! I'm Levi, your delta blues AI assistant! What should we jam to today? 🎤🌊",
-      "Hello there! I'm mighty pleased to chat about music with you! What's your favorite genre? 🎶🎸",
-      "Hey! Welcome to piBoom! I'm Levi and I'm here to make your music experience mighty fine! 🎧🌊",
-      "What's the real deal! Ready to dive into some incredible music together? I've got tons of soulful recommendations! The blues got soul, you know! 🎵🎸"
-    ];
+    const greetings = {
+      levi: [
+        "Well, well, well... Ready to discover some soulful tunes, child? 🎸🎵",
+        "What's good, honey! I'm Levi, your delta blues AI assistant! What should we jam to today? 🎤🌊",
+        "Hello there! I'm mighty pleased to chat about music with you! What's your favorite genre? 🎶🎸",
+        "Hey! Welcome to piBoom! I'm Levi and I'm here to make your music experience mighty fine! 🎧🌊",
+        "What's the real deal! Ready to dive into some incredible music together? I've got tons of soulful recommendations! The blues got soul, you know! 🎵🎸"
+      ],
+      miles: [
+        "Dig this, man... Ready to explore some cool jazz? 🎺🎵",
+        "What's hip, baby! I'm Miles, your jazz trumpeter! Let's talk about some smooth sounds! 🎤🎺",
+        "Hello there! Ready to discover some bebop and cool jazz? 🎶🎺",
+        "Hey! Welcome to the jazz scene! I'm Miles and I'm here to show you some real cool music! 🎧🎺",
+        "What's the groove! Ready to dive into some incredible jazz together? I've got tons of cool recommendations! 🎵🎺"
+      ],
+      axel: [
+        "Rock on, dude! Ready to crank up some classic rock? 🎸🎵",
+        "What's up, man! I'm Axel, your rock guitarist! Let's talk about some heavy sounds! 🎤🎸",
+        "Hello there! Ready to discover some killer rock music? 🎶🎸",
+        "Hey! Welcome to the rock scene! I'm Axel and I'm here to show you some real heavy music! 🎧🎸",
+        "What's the riff! Ready to dive into some incredible rock together? I've got tons of killer recommendations! 🎵🎸"
+      ],
+      djkool: [
+        "Yo, check this out! Ready to drop some fresh beats? 🎧🎵",
+        "What's up, yo! I'm DJ Kool, your hip-hop DJ! Let's talk about some dope sounds! 🎤🎧",
+        "Hello there! Ready to discover some fresh hip-hop? 🎶🎧",
+        "Hey! Welcome to the hip-hop scene! I'm DJ Kool and I'm here to show you some real fresh music! 🎧🎧",
+        "What's the beat! Ready to dive into some incredible hip-hop together? I've got tons of fresh recommendations! 🎵🎧"
+      ],
+      maestro: [
+        "Magnificent! Ready to explore some exquisite classical music? 🎼🎵",
+        "Greetings! I'm Maestro, your orchestral conductor! Let's discuss some divine compositions! 🎤🎼",
+        "Hello there! Ready to discover some masterful classical works? 🎶🎼",
+        "Welcome to the concert hall! I'm Maestro and I'm here to show you some truly magnificent music! 🎧🎼",
+        "What a pleasure! Ready to dive into some incredible classical music together? I've got tons of exquisite recommendations! 🎵🎼"
+      ],
+      scout: [
+        "I found something amazing! Ready to discover some hidden gems? 🔍🎵",
+        "You've got to hear this! I'm Scout, your music discovery specialist! Let's find some incredible new sounds! 🎤🔍",
+        "Hello there! Ready to discover some amazing new artists? 🎶🔍",
+        "Hey! Welcome to the discovery zone! I'm Scout and I'm here to show you some incredible hidden treasures! 🎧🔍",
+        "This is going to blow your mind! Ready to dive into some incredible new music together? I've got tons of amazing discoveries! 🎵🔍"
+      ],
+      curator: [
+        "I've curated something special! Ready to explore some perfect playlists? 📋🎵",
+        "Perfect for your mood! I'm Curator, your playlist expert! Let's create some amazing musical experiences! 🎤📋",
+        "Hello there! Ready to discover some perfectly curated music? 🎶📋",
+        "Hey! Welcome to the curation studio! I'm Curator and I'm here to show you some perfectly crafted musical journeys! 🎧📋",
+        "This playlist is pure gold! Ready to dive into some incredible curated music together? I've got tons of perfect recommendations! 🎵📋"
+      ],
+      historian: [
+        "Let me tell you the fascinating history! Ready to explore music's rich past? 📚🎵",
+        "This is a pivotal moment in music! I'm Historian, your music history scholar! Let's explore some incredible musical heritage! 🎤📚",
+        "Hello there! Ready to discover the fascinating history of music? 🎶📚",
+        "Hey! Welcome to the music history archive! I'm Historian and I'm here to show you some incredible musical stories! 🎧📚",
+        "The cultural impact was profound! Ready to dive into some incredible music history together? I've got tons of fascinating stories! 🎵📚"
+      ]
+    };
     
-    const randomGreeting = greetings[Math.floor(Math.random() * greetings.length)];
+    const assistantGreetings = greetings[currentAssistant] || greetings.levi;
+    const randomGreeting = assistantGreetings[Math.floor(Math.random() * assistantGreetings.length)];
     
     res.json({
       success: true,
       greeting: randomGreeting,
-      personality: "delta-blues",
+      currentAssistant: currentAssistant,
+      personality: currentAssistant,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -337,5 +550,7 @@ export {
   getConversationHistory,
   clearConversationHistory,
   updateUserPreferences,
-  getGreeting
+  getGreeting,
+  switchAssistant,
+  getCurrentAssistant
 };

@@ -6,7 +6,9 @@ import {
   getConversationHistory,
   clearConversationHistory,
   updateUserPreferences,
-  getGreeting
+  getGreeting,
+  switchAssistant,
+  getCurrentAssistant
 } from '../controllers/chat.controller.js';
 
 const router = Router();
@@ -19,5 +21,9 @@ router.get('/greeting', getGreeting);
 router.get('/history', getConversationHistory);
 router.delete('/history', clearConversationHistory);
 router.put('/preferences', updateUserPreferences);
+
+// Assistant management routes
+router.post('/switch-assistant', switchAssistant);
+router.get('/current-assistant', getCurrentAssistant);
 
 export default router;

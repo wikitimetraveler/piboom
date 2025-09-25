@@ -376,6 +376,38 @@
     cursor: not-allowed;
   }
 
+  /* Assistant Switcher */
+  .assistant-switcher {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: 20px;
+  }
+
+  .assistant-switcher .form-label {
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .assistant-switcher .form-control {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    border-radius: 8px;
+    padding: 12px 15px;
+    font-size: 16px;
+    font-weight: 500;
+    min-height: 45px;
+    transition: all 0.3s ease;
+  }
+
+  .assistant-switcher .form-control:focus {
+    background: rgba(255, 255, 255, 1);
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  }
+
   /* Floating Musical Notes */
   .floating-notes {
     position: fixed;
@@ -457,8 +489,24 @@
 
 <div class="assistant-container">
   <div class="greeting-section">
-    <h2><i class="bi-music-note-beamed"></i> Meet Levi - Your Delta Blues Music Assistant</h2>
-    <p>I'm a soulful 75-year-old delta blues player who grew up in the Mississippi Delta! I'm mighty pleased to chat about music with you! Ask me anything about artists, songs, or just say hi! 🎸🎵🌊</p>
+    <h2><i class="bi-music-note-beamed"></i> Meet Your Music Assistant</h2>
+    <p id="assistantDescription">I'm a soulful 75-year-old delta blues player who grew up in the Mississippi Delta! I'm mighty pleased to chat about music with you! Ask me anything about artists, songs, or just say hi! 🎸🎵🌊</p>
+    
+    <!-- Assistant Switcher -->
+    <div class="assistant-switcher mb-3">
+      <label for="assistantSelect" class="form-label">Choose Your Assistant:</label>
+      <select id="assistantSelect" class="form-control" onchange="switchAssistant()">
+        <option value="levi">🎸 Levi - Delta Blues Player (50s)</option>
+        <option value="miles">🎺 Miles - Jazz Trumpeter (60s)</option>
+        <option value="axel">🎸 Axel - Classic Rock Guitarist (70s)</option>
+        <option value="djkool">🎧 DJ Kool - Hip-Hop DJ (80s)</option>
+        <option value="maestro">🎼 Maestro - Orchestral Conductor (Classical)</option>
+        <option value="scout">🔍 Scout - Music Discovery Specialist (Modern)</option>
+        <option value="curator">📋 Curator - Playlist Expert (Modern)</option>
+        <option value="historian">📚 Historian - Music History Scholar (All Eras)</option>
+      </select>
+    </div>
+    
     <button class="btn btn-light" onclick="getGreeting()">
       <i class="bi-chat-dots"></i> Get a Greeting
     </button>
@@ -827,12 +875,92 @@ document.getElementById('dt').textContent = new Date().toLocaleDateString();
 
 // Auto-initialize voice when page loads
 document.addEventListener('DOMContentLoaded', function() {
+  // Load current assistant info
+  loadCurrentAssistant();
+  
   // Preload artist context from localStorage if available
   preloadArtistContext();
   
   // Try to initialize voice automatically
   setTimeout(initVoice, 1000);
 });
+
+// Load current assistant info
+async function loadCurrentAssistant() {
+  try {
+    const response = await fetch('/api/chat/current-assistant');
+    const data = await response.json();
+    
+    if (data.success) {
+      const assistantSelect = document.getElementById('assistantSelect');
+      const assistantDescription = document.getElementById('assistantDescription');
+      
+      // Set the dropdown to current assistant
+      assistantSelect.value = data.currentAssistant;
+      
+      // Update description based on current assistant
+      updateAssistantDescription(data.assistantInfo);
+    }
+  } catch (error) {
+    console.error('Error loading current assistant:', error);
+  }
+}
+
+// Update assistant description
+function updateAssistantDescription(assistantInfo) {
+  const descriptions = {
+    levi: "I'm a soulful 75-year-old delta blues player who grew up in the Mississippi Delta! I'm mighty pleased to chat about music with you! Ask me anything about artists, songs, or just say hi! 🎸🎵🌊",
+    miles: "I'm a cool 68-year-old jazz trumpeter from the bebop era! I'm here to show you some smooth sounds and cool jazz! Ask me about jazz, bebop, or any music that swings! 🎺🎵🎷",
+    axel: "I'm a 65-year-old classic rock guitarist who lived through the golden age of rock! I'm here to crank up some heavy sounds and killer riffs! Ask me about rock, metal, or anything that rocks! 🎸🎵🔥",
+    djkool: "I'm a 55-year-old hip-hop DJ from the golden age of rap! I'm here to drop some fresh beats and show you the culture! Ask me about hip-hop, rap, or anything that's fresh! 🎧🎵💯",
+    maestro: "I'm a distinguished 70-year-old orchestral conductor with refined taste! I'm here to show you some magnificent classical works! Ask me about classical music, opera, or orchestral masterpieces! 🎼🎵🎻",
+    scout: "I'm a 30-year-old music discovery specialist who finds hidden gems! I'm here to show you some amazing new artists and emerging sounds! Ask me about new music, indie artists, or hidden treasures! 🔍🎵✨",
+    curator: "I'm a 45-year-old playlist and recommendation expert! I'm here to create perfect playlists and match music to your mood! Ask me about playlists, recommendations, or musical curation! 📋🎵🎯",
+    historian: "I'm a 60-year-old music history scholar with deep knowledge of musical evolution! I'm here to tell you the fascinating stories behind music! Ask me about music history, cultural impact, or musical movements! 📚🎵🏛️"
+  };
+  
+  const description = descriptions[assistantInfo.name.toLowerCase()] || descriptions.levi;
+  document.getElementById('assistantDescription').textContent = description;
+}
+
+// Switch assistant
+async function switchAssistant() {
+  const assistantSelect = document.getElementById('assistantSelect');
+  const selectedAssistant = assistantSelect.value;
+  
+  try {
+    const response = await fetch('/api/chat/switch-assistant', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ assistant: selectedAssistant })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Update the description
+      const assistantInfo = {
+        name: selectedAssistant,
+        background: assistantSelect.options[assistantSelect.selectedIndex].text
+      };
+      updateAssistantDescription(assistantInfo);
+      
+      // Clear the chat and show new assistant greeting
+      clearChat();
+      
+      // Get a greeting from the new assistant
+      setTimeout(() => {
+        getGreeting();
+      }, 500);
+      
+      console.log('Switched to assistant:', selectedAssistant);
+    }
+  } catch (error) {
+    console.error('Error switching assistant:', error);
+  }
+}
 
 // Preload artist context from localStorage
 function preloadArtistContext() {
