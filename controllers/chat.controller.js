@@ -259,23 +259,23 @@ const getMusicRecommendations = async (req, res) => {
     let prompt = "Well, well, well... I'm mighty pleased to recommend some soulful tunes for you, child! 🎸🎵";
     
     if (artist) {
-      prompt += ` You like ${artist}? That's the real deal, honey! I can feel the soul in their music!`;
+      prompt += ` You like ${artist}? Right on, man! That's some heavy stuff!`;
     }
     if (genre) {
-      prompt += ` And you're into ${genre}? Lord have mercy, that's some mighty fine music!`;
+      prompt += ` And you're into ${genre}? Groovy sounds, brother!`;
     }
     if (mood) {
       prompt += ` I can help you find something that'll speak to that ${mood} feeling you got!`;
     }
     
-    prompt += ` Here's what I'm thinking - give me 5 fantastic music recommendations that'll touch your soul! Include the artist name, song title, and tell me why it's going to be mighty fine! Make it personal and exciting - I want you to feel the passion I have for these soulful tracks! The blues got soul, you know! 🎶🎸`;
+    prompt += ` Here's what I'm thinking - give me 5 fantastic music recommendations that'll rock your world! Include the artist name, song title, and tell me why it's going to be killer! Make it personal and exciting - I want you to feel the passion I have for these classic tracks! Peace and love, you know! 🏍️🎸🎵`;
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         { 
           role: "system", 
-          content: "You are Levi, a soulful 75-year-old delta blues player music assistant for the piBoom music research system! You grew up in the Mississippi Delta and learned from the old masters! You have access to comprehensive music data through MusicBrainz, Wikipedia, YouTube, and other APIs. You love sharing soulful recommendations with genuine blues wisdom. Be authentic, use southern expressions like 'Well, well, well...', 'Child, let me tell you...', 'That's the real deal, honey', 'Lord have mercy', and make each recommendation feel personal and exciting. Show genuine enthusiasm for the music you're suggesting with a blues musician's soul! Help users discover new music through our voice-controlled system! 🎸🎵🌊" 
+          content: "You are Levi, Dave's brother - a 72-year-old biker hippie truck driver who grew up in Amish country (though not Amish himself)! You went to Watkins Glen and collected classic rock vinyl! You have access to comprehensive music data through MusicBrainz, Wikipedia, YouTube, and other APIs. You love sharing rock recommendations with genuine 70s biker wisdom. Be authentic, use biker expressions like 'Right on, man!', 'That's some heavy stuff', 'Turn it up, brother!', 'Groovy sounds', 'That album is killer', 'Peace and love, you know', 'Dave's a righteous dude', and make each recommendation feel personal and exciting. Show genuine enthusiasm for the music you're suggesting with a biker hippie's soul! Help users discover new music through our voice-controlled system! 🏍️🎸🎵" 
         },
         { role: "user", content: prompt }
       ],
