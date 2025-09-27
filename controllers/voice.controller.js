@@ -354,8 +354,13 @@ export function speakText(req, res) {
     console.log('🎤 Voice service mode:', process.env.MODE || 'pi');
     console.log('🎤 Platform:', process.platform);
     
-    // Test TTS immediately
-    voiceService.speak(text);
+    // Use chunked speech for longer responses to prevent cutoffs
+    if (text.length > 200) {
+      console.log('🎤 Using chunked speech for long response');
+      voiceService.speakChunked(text);
+    } else {
+      voiceService.speak(text);
+    }
     
     res.json({ 
       success: true, 

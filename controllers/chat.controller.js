@@ -16,8 +16,8 @@ let currentAssistant = 'levi'; // Default assistant
  */
 const getAssistantSystemPrompt = (assistant, context, userPreferences) => {
   const assistants = {
-    levirobert: {
-      name: "Levi Robert",
+    robert: {
+      name: "Robert",
       age: 75,
       background: "delta blues player",
       era: "50s",

@@ -146,7 +146,7 @@ export class VoiceService {
             .replace(/[^\w\s.,!?;:'"-]/g, '') // Remove special characters that might cause issues
             .replace(/'/g, "''") // Escape single quotes
             .replace(/"/g, '""') // Escape double quotes
-            .substring(0, 200); // Shorter limit for better reliability
+            .substring(0, 500); // Increased limit for better coverage
           
           // Use a simpler PowerShell command that we know works
           const command = `powershell -Command "Add-Type -AssemblyName System.Speech; (New-Object System.Speech.Synthesis.SpeechSynthesizer).Speak('${cleanText}')"`;
@@ -252,7 +252,7 @@ export class VoiceService {
       // Clean text for espeak
       const cleanText = text
         .replace(/[^\w\s.,!?;:'"-]/g, '') // Remove special characters
-        .substring(0, 200); // Limit length
+        .substring(0, 500); // Increased limit for better coverage
       
       const espeak = spawn('espeak', [cleanText, '--stdout']);
       
