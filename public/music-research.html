@@ -369,6 +369,93 @@
     transform: rotate(180deg);
   }
   
+  /* Toast Notifications */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 400px;
+  }
+  
+  .toast {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    margin-bottom: 10px;
+    padding: 16px 20px;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    max-width: 100%;
+  }
+  
+  .toast.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  .toast.success {
+    border-left: 4px solid #28a745;
+  }
+  
+  .toast.info {
+    border-left: 4px solid #17a2b8;
+  }
+  
+  .toast.warning {
+    border-left: 4px solid #ffc107;
+  }
+  
+  .toast.error {
+    border-left: 4px solid #dc3545;
+  }
+  
+  .toast-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .toast-icon {
+    font-size: 1.2em;
+    margin-right: 8px;
+  }
+  
+  .toast-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  
+  .toast-body {
+    font-size: 0.9rem;
+    color: #6c757d;
+    line-height: 1.4;
+    margin: 0;
+  }
+  
+  .toast-close {
+    background: none;
+    border: none;
+    font-size: 1.2em;
+    color: #6c757d;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .toast-close:hover {
+    color: #495057;
+  }
+  
   .accordion .card-body {
     padding: 1.5rem;
   }
@@ -412,6 +499,9 @@
   <div class="musical-note">♫</div>
   <div class="musical-note">♪</div>
 </div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
 
 <nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background: linear-gradient(135deg, rgba(135,206,250,0.9) 0%, rgba(144,238,144,0.9) 100%); backdrop-filter: blur(20px);">
   <div class="container">
@@ -783,15 +873,53 @@ document.addEventListener('DOMContentLoaded', function() {
   initWebSpeechRecognition();
 });
 
-// Preload artist from localStorage
+// Preload artist from localStorage with context awareness
 function preloadArtist() {
-  const savedArtist = localStorage.getItem('selectedArtist');
-  if (savedArtist) {
-    console.log('💾 Preloading artist from localStorage:', savedArtist);
+  const referrer = document.referrer;
+  const isFromHomePage = referrer.includes('/') && !referrer.includes('/album-discovery.html') && !referrer.includes('/assistant.html') && !referrer.includes('/player.html');
+  
+  console.log('🔍 Page referrer:', referrer);
+  console.log('🏠 Is from home page:', isFromHomePage);
+  
+  if (isFromHomePage) {
+    // Clear search box if coming from home page
+    console.log('🧹 Clearing search box - launched from home page');
     const kgInput = document.getElementById('kgBand');
     if (kgInput) {
-      kgInput.value = savedArtist;
+      kgInput.value = '';
       updateModeButtonText();
+    }
+    // Clear localStorage to ensure fresh start
+    localStorage.removeItem('selectedArtist');
+  } else {
+    // Auto-select artist if coming from other pages
+    const savedArtist = localStorage.getItem('selectedArtist');
+    if (savedArtist) {
+      console.log('💾 Preloading artist from localStorage:', savedArtist);
+      const kgInput = document.getElementById('kgBand');
+      if (kgInput) {
+        kgInput.value = savedArtist;
+        updateModeButtonText();
+        
+        // Auto-trigger KG widget selection if available
+        setTimeout(() => {
+          if (typeof KGSearchWidget === 'function' && window.kgWidgetConfig) {
+            console.log('🎯 Auto-selecting artist in KG widget:', savedArtist);
+            // Simulate a selection event for the KG widget
+            const mockEvent = {
+              row: {
+                name: savedArtist,
+                description: `${savedArtist} - Selected from previous session`,
+                type: 'Music Artist'
+              }
+            };
+            // Trigger the selectHandler if it exists
+            if (window.kgWidgetConfig.config && window.kgWidgetConfig.config.selectHandler) {
+              window.kgWidgetConfig.config.selectHandler(mockEvent);
+            }
+          }
+        }, 1000);
+      }
     }
   }
 }
@@ -2790,6 +2918,63 @@ function initializeFallbackMap(artistName) {
       </div>
     </div>
   `;
+}
+
+// Toast notification system
+function showToast(type, title, message, duration = 5000) {
+  const toastContainer = document.getElementById('toastContainer');
+  if (!toastContainer) return;
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icons = {
+    success: 'bi-check-circle-fill',
+    info: 'bi-info-circle-fill',
+    warning: 'bi-exclamation-triangle-fill',
+    error: 'bi-x-circle-fill'
+  };
+  
+  const colors = {
+    success: '#28a745',
+    info: '#17a2b8',
+    warning: '#ffc107',
+    error: '#dc3545'
+  };
+  
+  toast.innerHTML = `
+    <div class="toast-header">
+      <i class="toast-icon ${icons[type]}" style="color: ${colors[type]}"></i>
+      <h6 class="toast-title">${title}</h6>
+      <button class="toast-close" onclick="closeToast(this)">&times;</button>
+    </div>
+    <div class="toast-body">${message}</div>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  // Trigger animation
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 100);
+  
+  // Auto-remove
+  setTimeout(() => {
+    closeToast(toast.querySelector('.toast-close'));
+  }, duration);
+}
+
+// Close toast function
+function closeToast(closeBtn) {
+  const toast = closeBtn.closest('.toast');
+  if (toast) {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        toast.parentNode.removeChild(toast);
+      }
+    }, 300);
+  }
 }
 
 // Global function for Google Maps callback
