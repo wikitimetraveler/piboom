@@ -28,7 +28,7 @@ export class VoiceService {
     this.recognitionStream = null;
     this.isWindows = process.platform === 'win32';
     this.isSpeaking = false;
-    this.speechQueue = [];
+    this.speechTimeout = null;
   }
 
   // Initialize voice recognition
@@ -131,9 +131,26 @@ export class VoiceService {
     }, 10000); // Update every 10 seconds
   }
 
-  // Speak text using text-to-speech
+  // Speak text using text-to-speech with debounce
   speak(text) {
     if (!this.sayEnabled) return;
+    
+    // Prevent overlapping speech
+    if (this.isSpeaking) {
+      console.log('🎤 Already speaking, skipping:', text);
+      return;
+    }
+    
+    // Clear any existing speech timeout
+    if (this.speechTimeout) {
+      clearTimeout(this.speechTimeout);
+    }
+    
+    // Set speaking flag and timeout
+    this.isSpeaking = true;
+    this.speechTimeout = setTimeout(() => {
+      this.isSpeaking = false;
+    }, 5000); // 5 second speech timeout
     
     console.log('🎤 Attempting to speak:', text);
     console.log('🎤 Platform:', process.platform);
@@ -166,6 +183,7 @@ export class VoiceService {
             } else {
               console.log('🎤 Windows text-to-speech successful!');
             }
+            
           });
         } catch (error) {
           console.error('Windows text-to-speech not available:', error.message);
@@ -183,6 +201,7 @@ export class VoiceService {
       
       // Also try web-based TTS as a fallback for cloud deployments
       this.tryWebTTS(text);
+      
     }
   }
 
@@ -393,6 +412,7 @@ export class VoiceService {
       environment: process.env.NODE_ENV || 'development'
     };
   }
+
 }
 
 export default VoiceService;

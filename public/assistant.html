@@ -632,6 +632,9 @@
     <button class="btn btn-warning mr-2" onclick="stopVoice()" id="stopVoiceBtn" disabled>
       <i class="bi-mic-mute"></i> Stop Listening
     </button>
+    <button class="btn btn-danger mr-2" onclick="stopSpeaking()" id="stopSpeakingBtn">
+      <i class="bi-stop-circle"></i> Stop Speaking
+    </button>
     <button class="btn btn-info" onclick="makeLeviSpeak('Hello! I am Levi, your soulful delta blues music assistant!')" id="testVoiceBtn" disabled>
       <i class="bi-volume-up"></i> Test Voice
     </button>
@@ -639,8 +642,8 @@
 
   <div class="chat-messages" id="chatMessages">
     <div class="message assistant-message levi">
-      <strong>Levi:</strong> Hey there! I'm Levi, your soulful 75-year-old delta blues music research assistant! 🎸🎵🌊 What would you like to talk about today? I'm mighty pleased to help you discover amazing music through our voice-controlled system! I've been playing the blues since the 50s, child! The blues got soul, you know!
-      <span class="personality-badge">delta-blues</span>
+      <strong>Levi:</strong> Right on, man! I'm Levi, Dave's brother - your 72-year-old biker hippie truck driver music assistant! 🏍️🎸🎵 What would you like to talk about today? I'm mighty pleased to help you discover amazing music through our voice-controlled system! I went to Watkins Glen and collected classic rock vinyl, brother! Peace and love, you know!
+      <span class="personality-badge">biker-hippie</span>
     </div>
   </div>
 
@@ -880,6 +883,22 @@ async function makeLeviSpeak(text) {
   }
 }
 
+async function stopSpeaking() {
+  try {
+    const response = await fetch('/api/voice/stop', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    
+    if (response.ok) {
+      console.log('Stopped speaking');
+      showToast('Speech stopped', 'info');
+    }
+  } catch (error) {
+    console.error('Error stopping speech:', error);
+  }
+}
+
 function handleKeyPress(event) {
   if (event.key === 'Enter') {
     sendMessage();
@@ -1046,7 +1065,7 @@ async function loadCurrentAssistant() {
 // Update assistant description
 function updateAssistantDescription(assistantInfo) {
   const descriptions = {
-    levi: "I'm a soulful 75-year-old delta blues player who grew up in the Mississippi Delta! I'm mighty pleased to chat about music with you! Ask me anything about artists, songs, or just say hi! 🎸🎵🌊",
+    levi: "I'm Levi, Dave's brother - a 72-year-old biker hippie truck driver who grew up in Amish country! I went to Watkins Glen and collected classic rock vinyl! Ready to rock out with some killer music? 🏍️🎸🎵",
     miles: "I'm a cool 68-year-old jazz trumpeter from the bebop era! I'm here to show you some smooth sounds and cool jazz! Ask me about jazz, bebop, or any music that swings! 🎺🎵🎷",
     axel: "I'm a 65-year-old classic rock guitarist who lived through the golden age of rock! I'm here to crank up some heavy sounds and killer riffs! Ask me about rock, metal, or anything that rocks! 🎸🎵🔥",
     djkool: "I'm a 55-year-old hip-hop DJ from the golden age of rap! I'm here to drop some fresh beats and show you the culture! Ask me about hip-hop, rap, or anything that's fresh! 🎧🎵💯",

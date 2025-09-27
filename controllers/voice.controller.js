@@ -473,3 +473,24 @@ export function processFrontendVoiceCommand(req, res) {
     });
   }
 }
+
+// Stop speaking function
+export function stopSpeaking(req, res) {
+  try {
+    console.log('🛑 Stopping speech...');
+    
+    // Stop the voice service speaking
+    voiceService.stopSpeaking();
+    
+    res.json({ 
+      success: true, 
+      message: 'Speech stopped successfully' 
+    });
+  } catch (error) {
+    console.error('Stop speaking error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+}
