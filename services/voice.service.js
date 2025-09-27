@@ -27,6 +27,8 @@ export class VoiceService {
     this.speechClient = null;
     this.recognitionStream = null;
     this.isWindows = process.platform === 'win32';
+    this.isSpeaking = false;
+    this.speechQueue = [];
   }
 
   // Initialize voice recognition
