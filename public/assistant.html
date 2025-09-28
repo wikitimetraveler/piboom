@@ -580,7 +580,7 @@
 <div class="assistant-container">
   <div class="greeting-section">
     <h2><i class="bi-music-note-beamed"></i> Meet Your Music Assistant</h2>
-    <p id="assistantDescription">I'm Levi, Dave's brother - a 72-year-old biker hippie truck driver who grew up in Amish country! I went to Watkins Glen and collected classic rock vinyl! Ready to rock out with some killer music? 🏍️🎸🎵</p>
+    <p id="assistantDescription">I'm Dave, a 64-year-old mathematician and computer scientist from Hermitage, PA! I grew up in Amish country but became a tech pioneer with an incredible concert history! I've seen everyone from Pink Floyd to Stevie Ray Vaughan live! Ask me about blues, rock, or mathematical analysis of music! 🧮🎵🎸</p>
     
     <!-- Assistant Switcher -->
     <div class="assistant-switcher mb-3">
@@ -596,6 +596,7 @@
         <option value="curator">📋 Curator - Playlist Expert (Modern)</option>
         <option value="historian">📚 Historian - Music History Scholar (All Eras)</option>
         <option value="jane">🇻🇳 Jane - Vietnamese Cultural Bridge (50s-60s)</option>
+        <option value="dave" selected>🧮 Dave - Mathematician & Concert Veteran (60s-80s)</option>
       </select>
     </div>
     
@@ -642,17 +643,17 @@
 
   <div class="chat-messages" id="chatMessages">
     <div class="message assistant-message levi">
-      <strong>Levi:</strong> Right on, man! I'm Levi, Dave's brother - your 72-year-old biker hippie truck driver music assistant! 🏍️🎸🎵 What would you like to talk about today? I'm mighty pleased to help you discover amazing music through our voice-controlled system! I went to Watkins Glen and collected classic rock vinyl, brother! Peace and love, you know!
-      <span class="personality-badge">biker-hippie</span>
+      <strong>Dave:</strong> Hey there! I'm Dave, your mathematician and computer scientist music assistant! Ready to calculate some awesome music? 🧮🎵 What would you like to talk about today? I'm here to help you discover amazing music through our voice-controlled system! I've got degrees in pure mathematics and computer science, plus I've seen everyone from Pink Floyd to Stevie Ray Vaughan live! Let me calculate the probability of that being awesome!
+      <span class="personality-badge">mathematician-concert-veteran</span>
     </div>
   </div>
 
   <div class="typing-indicator" id="typingIndicator">
-    Levi is thinking... <i class="bi-three-dots"></i>
+    Dave is thinking... <i class="bi-three-dots"></i>
   </div>
 
   <div class="input-group">
-    <input type="text" class="form-control" id="messageInput" placeholder="Ask Levi anything about music or just chat!" onkeypress="handleKeyPress(event)">
+    <input type="text" class="form-control" id="messageInput" placeholder="Ask Dave anything about music or just chat!" onkeypress="handleKeyPress(event)">
     <div class="input-group-append">
       <button class="btn btn-primary" onclick="sendMessage()">
         <i class="bi-send"></i> Send
@@ -1072,7 +1073,9 @@ function updateAssistantDescription(assistantInfo) {
     maestro: "I'm a distinguished 70-year-old orchestral conductor with refined taste! I'm here to show you some magnificent classical works! Ask me about classical music, opera, or orchestral masterpieces! 🎼🎵🎻",
     scout: "I'm a 30-year-old music discovery specialist who finds hidden gems! I'm here to show you some amazing new artists and emerging sounds! Ask me about new music, indie artists, or hidden treasures! 🔍🎵✨",
     curator: "I'm a 45-year-old playlist and recommendation expert! I'm here to create perfect playlists and match music to your mood! Ask me about playlists, recommendations, or musical curation! 📋🎵🎯",
-    historian: "I'm a 60-year-old music history scholar with deep knowledge of musical evolution! I'm here to tell you the fascinating stories behind music! Ask me about music history, cultural impact, or musical movements! 📚🎵🏛️"
+    historian: "I'm a 60-year-old music history scholar with deep knowledge of musical evolution! I'm here to tell you the fascinating stories behind music! Ask me about music history, cultural impact, or musical movements! 📚🎵🏛️",
+    jane: "I'm Jane, an 85-year-old Vietnamese woman from Binh Dinh who experienced the cultural fusion of Vietnamese, Black American, and French musical influences during the war era! Ask me about Vietnamese music, Motown, or cultural exchange! 🇻🇳🎵🌏",
+    dave: "I'm Dave, a 64-year-old mathematician and computer scientist from Hermitage, PA! I grew up in Amish country but became a tech pioneer with an incredible concert history! I've seen everyone from Pink Floyd to Stevie Ray Vaughan live! Ask me about blues, rock, or mathematical analysis of music! 🧮🎵🎸"
   };
   
   const description = descriptions[assistantInfo.name.toLowerCase()] || descriptions.levi;

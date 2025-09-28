@@ -753,6 +753,9 @@
   <div class="album-container">
     <!-- Album Discovery with Google Knowledge Graph -->
     <div class="kg-widget-container">
+      <button class="btn btn-sm btn-outline-secondary float-right" onclick="closeKGWidget()" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+        <i class="bi-x"></i>
+      </button>
       <h2 class="text-center mb-4"><i class="bi-disc"></i> Album Discovery</h2>
       <p class="text-center mb-4">Search for artists using Google Knowledge Graph to discover their albums!</p>
       <div class="row" style="width: 100%; margin: 0;">
@@ -771,6 +774,23 @@
           
           <!-- KG Widget Results Display -->
           <div id="kgCard" class="mt-3"></div>
+          
+          <!-- AI Album Analysis (moved into KG widget) -->
+          <div id="aiAlbumInfo" class="ai-album-info mt-3" style="display: none;">
+            <div class="ai-info-header">
+              <h5><i class="bi-robot"></i> AI Album Analysis</h5>
+              <button class="btn btn-sm btn-outline-secondary" onclick="toggleAIInfo()">
+                <i class="bi-chevron-up" id="aiToggleIcon"></i>
+              </button>
+            </div>
+            <div id="aiInfoContent" class="ai-info-content">
+              <div class="ai-loading" style="display: none;">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+                <span class="ml-2">Analyzing albums with AI...</span>
+              </div>
+              <div id="aiInfoText" class="ai-info-text"></div>
+            </div>
+          </div>
           
           <div class="text-center mt-3">
             <span class="badge badge-info" id="modeBadge">
@@ -815,22 +835,6 @@
       </div>
     </div>
 
-    <!-- AI Album Information -->
-    <div id="aiAlbumInfo" class="ai-album-info" style="display: none;">
-      <div class="ai-info-header">
-        <h4><i class="bi-robot"></i> AI Album Analysis</h4>
-        <button class="btn btn-sm btn-outline-secondary" onclick="toggleAIInfo()">
-          <i class="bi-chevron-up" id="aiToggleIcon"></i>
-        </button>
-      </div>
-      <div id="aiInfoContent" class="ai-info-content">
-        <div class="ai-loading" style="display: none;">
-          <div class="spinner-border spinner-border-sm" role="status"></div>
-          <span class="ml-2">Analyzing albums with AI...</span>
-        </div>
-        <div id="aiInfoText" class="ai-info-text"></div>
-      </div>
-    </div>
 
     <!-- Loading State -->
     <div id="loadingState" class="loading" style="display: none;">
@@ -915,10 +919,7 @@ function initializeKGWidget() {
                     }
                     // Auto-search for albums when artist is selected
                     searchAlbums();
-                    // Make the KG widget compact after selection
-                    setTimeout(() => {
-                      makeKGWidgetCompact();
-                    }, 500);
+                    // Keep KG widget open - don't auto-compact
                   } catch (error) {
                     console.error('❌ Error in selectHandler:', error);
                   }
@@ -1003,8 +1004,7 @@ function renderDetailedCard(data) {
     </div>
   `;
   
-  // Make the KG widget container compact after selection
-  makeKGWidgetCompact();
+  // Keep KG widget open - don't auto-compact
 }
 
 // Fallback basic card
@@ -1026,8 +1026,7 @@ function renderBasicCard(artistName) {
     </div>
   `;
   
-  // Make the KG widget container compact after selection
-  makeKGWidgetCompact();
+  // Keep KG widget open - don't auto-compact
 }
 
 // Make KG widget container compact after selection
@@ -1056,10 +1055,6 @@ function makeKGWidgetCompact() {
       voiceControls.style.display = 'none';
     }
     
-    const aiInfo = document.getElementById('aiAlbumInfo');
-    if (aiInfo) {
-      aiInfo.style.display = 'none';
-    }
   }
 }
 
@@ -1081,14 +1076,9 @@ function toggleKGWidgetExpansion() {
       kgCard.style.display = 'block';
     }
     
-    // Show voice controls and AI info when expanded
+    // Show voice controls when expanded
     if (voiceControls) {
       voiceControls.style.display = 'block';
-    }
-    
-    const aiInfo = document.getElementById('aiAlbumInfo');
-    if (aiInfo && aiInfo.style.display !== 'none') {
-      aiInfo.style.display = 'block';
     }
   } else {
     // Collapse
@@ -1105,6 +1095,15 @@ function toggleKGWidgetExpansion() {
     if (voiceControls) {
       voiceControls.style.display = 'none';
     }
+  }
+}
+
+// Close KG widget completely
+function closeKGWidget() {
+  const kgContainer = document.querySelector('.kg-widget-container');
+  if (kgContainer) {
+    kgContainer.style.display = 'none';
+    showToast('Search widget closed', 'info');
   }
 }
 
