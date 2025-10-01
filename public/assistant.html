@@ -938,14 +938,58 @@ async function sendVoiceMessage(message) {
 // Make Levi speak
 async function makeLeviSpeak(text) {
   try {
-    const response = await fetch('/api/voice/speak', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text })
-    });
-    
-    if (response.ok) {
-      console.log('Dave is speaking:', text);
+    // First try browser TTS (works in cloud mode)
+    if ('speechSynthesis' in window) {
+      console.log('🎤 Using browser TTS for:', text);
+      
+      // Stop any current speech
+      window.speechSynthesis.cancel();
+      
+      // Create speech utterance
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Configure voice settings
+      utterance.rate = 0.9;  // Slightly slower for better understanding
+      utterance.pitch = 1.0; // Normal pitch
+      utterance.volume = 0.8; // Good volume
+      
+      // Try to use a good voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(voice => 
+        voice.lang.includes('en') && 
+        (voice.name.includes('Google') || voice.name.includes('Microsoft') || voice.name.includes('David'))
+      );
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+        console.log('🎤 Using voice:', preferredVoice.name);
+      }
+      
+      // Speak the text
+      utterance.onstart = () => console.log('🎤 Dave is speaking:', text);
+      utterance.onerror = (error) => console.error('🎤 Speech error:', error);
+      
+      window.speechSynthesis.speak(utterance);
+      
+      // Also call backend for logging (but don't wait for audio)
+      fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+      }).catch(err => console.log('Backend speech logging failed:', err));
+      
+    } else {
+      // Fallback to backend TTS if browser TTS not available
+      console.log('🎤 Browser TTS not available, using backend');
+      const response = await fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+      });
+      
+      if (response.ok) {
+        console.log('Dave is speaking:', text);
+      }
     }
   } catch (error) {
     console.error('Speech error:', error);
@@ -954,6 +998,13 @@ async function makeLeviSpeak(text) {
 
 async function stopSpeaking() {
   try {
+    // Stop browser TTS first
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      console.log('🎤 Stopped browser TTS');
+    }
+    
+    // Also stop backend TTS if running
     const response = await fetch('/api/voice/stop', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' }
