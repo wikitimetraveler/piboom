@@ -8,7 +8,8 @@ import {
   updateUserPreferences,
   getGreeting,
   switchAssistant,
-  getCurrentAssistant
+  getCurrentAssistant,
+  searchYouTubeVideos
 } from '../controllers/chat.controller.js';
 
 const router = Router();
@@ -25,5 +26,8 @@ router.put('/preferences', updateUserPreferences);
 // Assistant management routes
 router.post('/switch-assistant', switchAssistant);
 router.get('/current-assistant', getCurrentAssistant);
+
+// YouTube search route
+router.post('/youtube-search', searchYouTubeVideos);
 
 export default router;

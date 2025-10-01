@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import axios from 'axios';
 
 // OpenAI configuration
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -129,11 +130,11 @@ const getAssistantSystemPrompt = (assistant, context, userPreferences) => {
     dave: {
       name: "Dave",
       age: 64,
-      background: "mathematician and computer scientist from Hermitage, PA, born in Amish country",
+      background: "cyclist , skier, mathematician and computer scientist from Hermitage, PA, born in Amish country",
       era: "60s-80s",
       personality: "brilliant mathematician and computer scientist who grew up in Amish country but became a tech pioneer, with an incredible concert history and deep love for blues and rock",
-      expressions: ["Let me calculate the probability of that being awesome", "That's mathematically perfect music", "I saw them live back in the day", "The algorithm of that song is flawless", "That's some serious mathematical precision in those chords"],
-      expertise: "blues, rock, mathematics in music, computer science applications, and extensive concert experience from the 70s-80s",
+      expressions: ["Keep on Partying - KOP", "Keggar up at Uncle Toms", "I saw them live back in the day", "That songs gives me some serious flashbacks", "Put this under your tongue", "Remember that time we got a sheet of blotter and you took a piece and liked cause he thought it was a stamp", "purple microdot", "remember when we scored that nickle bag"],
+      expertise: "blues, rock, mathematics in music, computer science applications, and extensive concert experience from the 70s-80s-9",
       references: "Allman Brothers, Outlaw, Ozzy Osbourne, Stevie Ray Vaughan, Pink Floyd, Muddy Waters, Kansas, Little Feat, Buddy Guy, Johnny Winter, Beyoncé, Eminem, and mathematical analysis of music",
       emoji: "🧮"
     }
@@ -590,6 +591,68 @@ const getGreeting = async (req, res) => {
     res.status(500).json({ error: 'Failed to get greeting' });
   }
 };
+
+// Search YouTube videos based on chat conversation
+export async function searchYouTubeVideos(req, res) {
+  try {
+    const { query } = req.body;
+    
+    if (!query || query.trim().length < 5) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Search query is required and must be at least 5 characters' 
+      });
+    }
+    
+    console.log('🔍 Searching YouTube for:', query);
+    
+    // Get YouTube API key from environment
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'YouTube API key not configured' });
+    }
+
+    // Search YouTube Data API
+    const searchQuery = encodeURIComponent(query);
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${searchQuery}&type=video&key=${apiKey}&maxResults=6`;
+
+    const response = await axios.get(url);
+    const data = response.data;
+
+    if (data.items && data.items.length > 0) {
+      const videos = data.items.map(item => ({
+        videoId: item.id.videoId,
+        title: item.snippet.title,
+        channel: item.snippet.channelTitle,
+        description: item.snippet.description,
+        thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url || '',
+        url: `https://www.youtube.com/watch?v=${item.id.videoId}`
+      }));
+
+      console.log('🔍 Found YouTube videos:', videos.length);
+
+      res.json({ 
+        success: true, 
+        videos: videos,
+        query: query 
+      });
+    } else {
+      res.json({ 
+        success: true, 
+        videos: [],
+        query: query,
+        message: 'No videos found for this query'
+      });
+    }
+    
+  } catch (error) {
+    console.error('YouTube search error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Failed to search YouTube videos' 
+    });
+  }
+}
 
 export {
   chatWithGPT,

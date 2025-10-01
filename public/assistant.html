@@ -375,6 +375,55 @@
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+  /* YouTube Section */
+  .youtube-section {
+    margin-top: 20px;
+  }
+
+  .youtube-results {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .youtube-video {
+    display: flex;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .youtube-video img {
+    width: 120px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 15px;
+  }
+
+  .youtube-video-info {
+    flex: 1;
+  }
+
+  .youtube-video-title {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+  }
+
+  .youtube-video-channel {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+  }
+
+  .youtube-video-description {
+    color: #777;
+    font-size: 0.8em;
+    line-height: 1.4;
+  }
   
   /* Toast Notifications */
   .toast-container {
@@ -612,11 +661,8 @@
     <button class="quick-action-btn" onclick="sendQuickMessage('Tell me about my favorite artists')">
       <i class="bi-person"></i> Artist Info
     </button>
-    <button class="quick-action-btn" onclick="sendQuickMessage('What\'s the weather like?')">
-      <i class="bi-cloud-sun"></i> Weather
-    </button>
-    <button class="quick-action-btn" onclick="sendQuickMessage('Play some music')">
-      <i class="bi-play-circle"></i> Play Music
+    <button class="quick-action-btn" onclick="findYouTubeVideos()">
+      <i class="bi-play-circle"></i> Find YouTube Videos
     </button>
     <button class="quick-action-btn" onclick="clearChat()">
       <i class="bi-trash"></i> Clear Chat
@@ -665,6 +711,28 @@
     <small class="text-muted">
       <i class="bi-lightbulb"></i> Try saying things like "Tell me about The Beatles" or "What's good music for working out?"
     </small>
+  </div>
+
+  <!-- YouTube Videos Section -->
+  <div class="youtube-section mt-4">
+    <div class="accordion" id="youtubeAccordion">
+      <div class="card">
+        <div class="card-header" id="youtubeHeader">
+          <h5 class="mb-0">
+            <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#youtubeCollapse" aria-expanded="false" aria-controls="youtubeCollapse">
+              <i class="bi-youtube text-danger"></i> Related YouTube Videos
+            </button>
+          </h5>
+        </div>
+        <div id="youtubeCollapse" class="collapse" aria-labelledby="youtubeHeader" data-parent="#youtubeAccordion">
+          <div class="card-body">
+            <div id="youtubeResults" class="youtube-results">
+              <p class="text-muted">Click "Find YouTube Videos" to search for videos related to your chat conversation.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -898,6 +966,157 @@ async function stopSpeaking() {
   } catch (error) {
     console.error('Error stopping speech:', error);
   }
+}
+
+// Find YouTube videos based on chat conversation
+async function findYouTubeVideos() {
+  try {
+    const chatMessages = document.getElementById('chatMessages');
+    const messages = chatMessages.querySelectorAll('.message');
+    
+    if (messages.length === 0) {
+      showToast('No chat messages found', 'warning');
+      return;
+    }
+    
+    // Extract text from chat messages to build search query
+    let searchQuery = '';
+    messages.forEach(message => {
+      const text = message.textContent || message.innerText;
+      if (text && !text.includes('Dave is thinking') && !text.includes('typing-indicator')) {
+        searchQuery += text + ' ';
+      }
+    });
+    
+    // Clean up the search query and extract key terms
+    searchQuery = searchQuery.replace(/Dave:|Levi:|User:/g, '').trim();
+    
+    // Remove common assistant phrases that aren't useful for search
+    searchQuery = searchQuery.replace(/\b(?:Hey there!|I'm Dave|your mathematician|computer scientist|music assistant|Ready to calculate|What would you like|I'm here to help|I've got degrees|pure mathematics|computer science|Let me calculate|probability of that being awesome|Voice enabled|Levi can now speak|enthusiastic|mathematician-concert-veteran)\b/gi, '');
+    
+    // Remove emojis and special characters
+    searchQuery = searchQuery.replace(/[🎵🎤🎸🧮💙✨🌌🎶]/g, '');
+    
+    // Clean up extra whitespace
+    searchQuery = searchQuery.replace(/\s+/g, ' ').trim();
+    
+    // Extract artist names, time, and location from the conversation
+    const artistMatches = searchQuery.match(/\b(?:tell me about|about|search for|find|play|listen to)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/gi);
+    
+    // Look for years (1985, 1977, etc.)
+    const yearMatches = searchQuery.match(/\b(19|20)\d{2}\b/g);
+    
+    // Look for locations (cities, states, venues)
+    const locationMatches = searchQuery.match(/\b(?:in|at|on)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/gi);
+    
+    // Build a focused search query
+    let focusedQuery = '';
+    let artistName = '';
+    
+    if (artistMatches && artistMatches.length > 0) {
+      // Extract the artist name from matches like "tell me about Muddy Waters"
+      artistName = artistMatches[0].replace(/\b(?:tell me about|about|search for|find|play|listen to)\s+/gi, '').trim();
+    } else {
+      // Fallback: look for capitalized words that might be artist names
+      const capitalizedWords = searchQuery.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g);
+      if (capitalizedWords && capitalizedWords.length > 0) {
+        // Take the first few capitalized words as potential artist names
+        artistName = capitalizedWords.slice(0, 2).join(' ');
+      }
+    }
+    
+    // Build the search query with available information
+    if (artistName) {
+      focusedQuery = artistName;
+      
+      // Add year if found
+      if (yearMatches && yearMatches.length > 0) {
+        focusedQuery += ` ${yearMatches[0]}`;
+      }
+      
+      // Add location if found
+      if (locationMatches && locationMatches.length > 0) {
+        const location = locationMatches[0].replace(/\b(?:in|at|on)\s+/gi, '').trim();
+        focusedQuery += ` ${location}`;
+      }
+    }
+    
+    // If we found a focused query, use it; otherwise use a truncated version
+    if (focusedQuery && focusedQuery.length > 2) {
+      searchQuery = focusedQuery;
+    } else {
+      // Truncate to first 50 characters to avoid overly long searches
+      searchQuery = searchQuery.substring(0, 50).trim();
+    }
+    
+    if (searchQuery.length < 10) {
+      showToast('Not enough chat content to search for videos', 'warning');
+      return;
+    }
+    
+    // Show loading state
+    const youtubeResults = document.getElementById('youtubeResults');
+    youtubeResults.innerHTML = '<div class="text-center"><div class="spinner-border spinner-border-sm" role="status"></div> <span class="ml-2">Searching for related videos...</span></div>';
+    
+    // Expand the accordion
+    const collapse = document.getElementById('youtubeCollapse');
+    if (!collapse.classList.contains('show')) {
+      collapse.classList.add('show');
+    }
+    
+    // Send search request to backend
+    const response = await fetch('/api/chat/youtube-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: searchQuery })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      console.log('YouTube search response:', data);
+      displayYouTubeResults(data.videos);
+      showToast('Found YouTube videos!', 'success');
+    } else {
+      console.error('YouTube search failed:', response.status, response.statusText);
+      throw new Error('Failed to search YouTube');
+    }
+    
+  } catch (error) {
+    console.error('Error finding YouTube videos:', error);
+    const youtubeResults = document.getElementById('youtubeResults');
+    youtubeResults.innerHTML = '<div class="text-danger"><i class="bi-exclamation-triangle"></i> Error searching for videos. Please try again.</div>';
+    showToast('Error searching for videos', 'error');
+  }
+}
+
+// Display YouTube search results
+function displayYouTubeResults(videos) {
+  console.log('displayYouTubeResults called with:', videos);
+  const youtubeResults = document.getElementById('youtubeResults');
+  
+  if (!videos || videos.length === 0) {
+    console.log('No videos to display');
+    youtubeResults.innerHTML = '<p class="text-muted">No videos found for this conversation.</p>';
+    return;
+  }
+  
+  let html = '';
+  videos.forEach(video => {
+    html += `
+      <div class="youtube-video">
+        <img src="${video.thumbnail}" alt="${video.title}" onclick="window.open('${video.url}', '_blank')">
+        <div class="youtube-video-info">
+          <div class="youtube-video-title" onclick="window.open('${video.url}', '_blank')" style="cursor: pointer;">
+            ${video.title}
+          </div>
+          <div class="youtube-video-channel">${video.channel}</div>
+          <div class="youtube-video-description">${video.description}</div>
+        </div>
+      </div>
+    `;
+  });
+  
+  youtubeResults.innerHTML = html;
 }
 
 function handleKeyPress(event) {
