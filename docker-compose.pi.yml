@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  pi-boom:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MODE=pi
+      - PORT=3000
+    env_file:
+      - .env
+    volumes:
+      # Mount music directory
+      - ./music:/app/music:ro
+      # Mount audio devices for Pi hardware access
+      - /dev/snd:/dev/snd:rw
+      # Mount ALSA configuration
+      - /etc/asound.conf:/etc/asound.conf:ro
+    devices:
+      # Access to audio devices on Pi
+      - /dev/snd:/dev/snd
+    privileged: true  # Required for hardware access on Pi
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Pi-specific settings
+    cap_add:
+      - SYS_RESOURCE
+      - SYS_ADMIN
+    security_opt:
+      - seccomp:unconfined

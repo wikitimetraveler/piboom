@@ -17,6 +17,9 @@ RUN apt-get update && apt-get install -y \
     # Additional utilities
     curl \
     wget \
+    # Pi-specific tools
+    python3 \
+    python3-pip \
     # Clean up
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean

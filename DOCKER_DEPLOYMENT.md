@@ -20,7 +20,7 @@ This guide explains how to deploy your Pi BOOM application using Docker, which i
 
 ## 🚀 Quick Start
 
-### Local Docker Development
+### Local Docker Development (Windows/Mac)
 
 1. **Build the Docker image:**
    ```bash
@@ -35,6 +35,25 @@ This guide explains how to deploy your Pi BOOM application using Docker, which i
 3. **Or use Docker Compose:**
    ```bash
    docker-compose up -d
+   ```
+
+### Raspberry Pi Docker Deployment
+
+1. **Setup Docker on Pi:**
+   ```bash
+   ./setup-docker-pi.sh
+   ```
+
+2. **Start Pi BOOM with Docker:**
+   ```bash
+   ./start-docker-pi.sh
+   ```
+
+3. **Or use npm scripts:**
+   ```bash
+   npm run docker:pi-build    # Build and start
+   npm run docker:pi-logs     # View logs
+   npm run docker:pi-stop     # Stop container
    ```
 
 ### Deploy to Render
@@ -96,21 +115,31 @@ docker-compose down
 docker-compose up --build -d
 ```
 
-## 🎤 Voice Functionality in Cloud
+## 🎤 Voice Functionality
 
-### What Works in Cloud Mode
-- **Text-to-Speech**: espeak-ng provides voice responses
+### What Works in Different Modes
+
+#### Cloud Mode (Render/Heroku)
+- **Text-to-Speech**: espeak-ng provides voice responses (console output)
 - **Voice Recognition**: Frontend Web Speech API handles input
 - **Chat Integration**: Full AI-powered responses
 - **Music Research**: Complete API integration
 
-### Cloud vs Pi Mode Differences
-| Feature | Pi Mode | Cloud Mode |
-|---------|---------|------------|
-| Voice Recognition | Backend processing | Frontend Web Speech API |
-| Text-to-Speech | espeak + aplay | espeak (no audio output) |
-| Audio Playback | Local files | Web-based playback |
-| Microphone Access | Direct hardware | Browser permissions |
+#### Pi Mode (Local Pi with Docker)
+- **Text-to-Speech**: espeak-ng with actual audio output through speakers
+- **Voice Recognition**: Frontend Web Speech API + backend processing
+- **Audio Playback**: Direct hardware access to speakers/headphones
+- **Microphone Access**: Direct hardware access to USB/built-in mics
+- **Music Playback**: Local file playback with hardware audio
+
+### Mode Comparison
+| Feature | Pi Mode (Docker) | Cloud Mode (Docker) |
+|---------|------------------|---------------------|
+| Voice Recognition | Frontend + Backend | Frontend Web Speech API |
+| Text-to-Speech | espeak + hardware audio | espeak (console only) |
+| Audio Playback | Local files + hardware | Web-based playback |
+| Microphone Access | Direct hardware access | Browser permissions |
+| Hardware Integration | Full Pi hardware access | No hardware access |
 
 ## 🔍 Troubleshooting
 
