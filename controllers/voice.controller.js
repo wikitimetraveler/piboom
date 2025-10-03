@@ -94,6 +94,13 @@ async function executeVoiceCommand(command, io) {
       console.log('⏸️ Voice command: Pausing playback');
       break;
       
+    case 'stop':
+      console.log('🛑 Voice command: Stopping speech');
+      if (voiceService) {
+        voiceService.stopSpeaking();
+      }
+      break;
+      
     case 'volume up':
       console.log('🔊 Voice command: Increasing volume');
       break;

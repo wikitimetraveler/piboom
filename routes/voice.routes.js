@@ -8,7 +8,8 @@ import {
   speakText,
   getVoiceCommands,
   getLastVoiceCommand,
-  processFrontendVoiceCommand
+  processFrontendVoiceCommand,
+  stopSpeaking
 } from '../controllers/voice.controller.js';
 
 const router = express.Router();
@@ -30,6 +31,9 @@ router.post('/feedback/toggle', toggleVoiceFeedback);
 
 // Speak text
 router.post('/speak', speakText);
+
+// Stop speaking
+router.post('/stop-speaking', stopSpeaking);
 
 // Get available voice commands
 router.get('/commands', getVoiceCommands);

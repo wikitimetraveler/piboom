@@ -7,7 +7,8 @@ let isListening = false;
 let recognitionProcess = null;
 let voiceCommands = {
   'play': ['play', 'start', 'begin', 'go'],
-  'pause': ['pause', 'stop', 'halt', 'wait'],
+  'pause': ['pause', 'halt', 'wait'],
+  'stop': ['stop', 'stop speaking', 'be quiet', 'shut up', 'silence'],
   'next': ['next', 'skip', 'forward', 'advance'],
   'previous': ['previous', 'back', 'rewind', 'last'],
   'volume up': ['volume up', 'louder', 'turn up', 'increase volume'],
@@ -356,6 +357,9 @@ export class VoiceService {
   speakChunked(text) {
     if (!this.sayEnabled) return;
     
+    // Stop any existing chunked speech
+    this.stopChunkedSpeech();
+    
     // Split text into sentences
     const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
     
@@ -364,15 +368,31 @@ export class VoiceService {
       return;
     }
     
+    // Store chunk timeouts so we can cancel them
+    this.chunkTimeouts = [];
+    
     // Speak first sentence immediately
     this.speak(sentences[0].trim());
     
     // Speak remaining sentences with delay
     sentences.slice(1).forEach((sentence, index) => {
-      setTimeout(() => {
-        this.speak(sentence.trim());
+      const timeout = setTimeout(() => {
+        // Check if we're still supposed to be speaking
+        if (this.sayEnabled && !this.isSpeaking) {
+          this.speak(sentence.trim());
+        }
       }, (index + 1) * 3000); // 3 second delay between chunks
+      
+      this.chunkTimeouts.push(timeout);
     });
+  }
+
+  // Stop chunked speech
+  stopChunkedSpeech() {
+    if (this.chunkTimeouts) {
+      this.chunkTimeouts.forEach(timeout => clearTimeout(timeout));
+      this.chunkTimeouts = [];
+    }
   }
 
   // Test TTS availability
@@ -398,6 +418,55 @@ export class VoiceService {
         }
       });
     }
+  }
+
+  // Stop speaking immediately
+  stopSpeaking() {
+    console.log('🛑 VoiceService: Stopping speech...');
+    
+    // Clear speaking flag immediately
+    this.isSpeaking = false;
+    
+    // Clear any speech timeout
+    if (this.speechTimeout) {
+      clearTimeout(this.speechTimeout);
+      this.speechTimeout = null;
+    }
+    
+    // Stop any chunked speech
+    this.stopChunkedSpeech();
+    
+    // On Windows, try to stop any running PowerShell TTS processes
+    if (this.isWindows) {
+      try {
+        // Kill any running PowerShell processes that might be doing TTS
+        exec('taskkill /f /im powershell.exe /fi "WINDOWTITLE eq *"', (error, stdout, stderr) => {
+          if (error) {
+            // Ignore errors - process might not exist
+            console.log('🛑 No PowerShell TTS processes to stop');
+          } else {
+            console.log('🛑 PowerShell TTS processes stopped');
+          }
+        });
+      } catch (error) {
+        console.log('🛑 Error stopping PowerShell processes:', error.message);
+      }
+    } else {
+      // On Linux/Pi, try to stop espeak processes
+      try {
+        exec('pkill -f espeak', (error, stdout, stderr) => {
+          if (error) {
+            console.log('🛑 No espeak processes to stop');
+          } else {
+            console.log('🛑 espeak processes stopped');
+          }
+        });
+      } catch (error) {
+        console.log('🛑 Error stopping espeak processes:', error.message);
+      }
+    }
+    
+    console.log('🛑 VoiceService: Speech stopped successfully');
   }
 
   // Get current status
