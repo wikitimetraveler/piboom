@@ -750,6 +750,86 @@
     <!-- YouTube embed will be inserted here -->
   </div>
 
+  <!-- AI Assistant Section -->
+  <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+    <div class="card-header" style="background: linear-gradient(135deg, rgba(255,182,193,0.8) 0%, rgba(221,160,221,0.8) 100%); color: #2c3e50; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0">
+        <i class="bi-robot"></i> AI Assistant
+        <button class="btn btn-sm btn-outline-light float-right" type="button" data-toggle="collapse" data-target="#aiAssistant" aria-expanded="false" style="border-color: rgba(44,62,80,0.3); color: #2c3e50;">
+          <i class="bi-chevron-down"></i>
+        </button>
+      </h5>
+    </div>
+    <div class="collapse" id="aiAssistant">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="ai-chat-container" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 1.5rem; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+              <h6><i class="bi-chat-dots"></i> Chat with AI</h6>
+              <div class="mb-3">
+                <textarea id="aiQuestion" class="form-control" rows="3" placeholder="Ask the AI about music, artists, genres, or any music-related topic..."></textarea>
+              </div>
+              <div class="btn-group mb-3" role="group">
+                <button class="btn btn-sm btn-primary" onclick="askAI()">
+                  <i class="bi-send"></i> Ask AI
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="clearAIChat()">
+                  <i class="bi-trash"></i> Clear
+                </button>
+              </div>
+              <div class="loading" id="aiLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>AI is thinking...</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-8">
+            <div class="ai-results-container" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 1.5rem; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+              <h6><i class="bi-lightbulb"></i> AI Response</h6>
+              <div id="aiResults" style="max-height: 400px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 8px; padding: 1rem; background: #f8f9fa;">
+                <p class="text-muted mb-0">Ask the AI a question to see responses here.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="ai-suggestions" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 1.5rem; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+              <h6><i class="bi-lightning"></i> Quick AI Suggestions</h6>
+              <div class="btn-group mb-2" role="group">
+                <button class="btn btn-sm btn-outline-primary" onclick="askAI('What are the key characteristics of progressive rock?')">
+                  <i class="bi-music-note-beamed"></i> Progressive Rock
+                </button>
+                <button class="btn btn-sm btn-outline-success" onclick="askAI('Recommend some underrated 70s bands')">
+                  <i class="bi-star"></i> 70s Recommendations
+                </button>
+                <button class="btn btn-sm btn-outline-info" onclick="askAI('Explain the difference between psychedelic and progressive rock')">
+                  <i class="bi-question-circle"></i> Genre Comparison
+                </button>
+                <button class="btn btn-sm btn-outline-warning" onclick="askAI('What makes Pink Floyd unique in rock music?')">
+                  <i class="bi-heart"></i> Pink Floyd Analysis
+                </button>
+              </div>
+              <div class="btn-group mb-2" role="group">
+                <button class="btn btn-sm btn-outline-danger" onclick="askAI('List the best concept albums of all time')">
+                  <i class="bi-disc"></i> Concept Albums
+                </button>
+                <button class="btn btn-sm btn-outline-dark" onclick="askAI('What are some influential guitarists in rock music?')">
+                  <i class="bi-guitar"></i> Guitarists
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="askAI('Explain the history of prog rock')">
+                  <i class="bi-clock-history"></i> Prog History
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Voice Commands Help Section -->
   <div class="card mb-4" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
     <div class="card-header" style="background: linear-gradient(135deg, rgba(135,206,250,0.8) 0%, rgba(144,238,144,0.8) 100%); color: #2c3e50; border-radius: 16px 16px 0 0;">
@@ -2071,39 +2151,33 @@ function searchArtistByName(artistName) {
   setTimeout(() => {
     const youtubeSection = document.getElementById('youtubeVideos');
     if (youtubeSection && !youtubeSection.classList.contains('show')) {
-      const collapse = new bootstrap.Collapse(youtubeSection, { show: true });
+      $('#youtubeVideos').collapse('show');
     }
   }, 2000);
   
   // Navigation toggle functions
   window.toggleVoiceSection = function() {
-    const voiceSection = document.getElementById('voiceCommandsHelp');
-    const collapse = new bootstrap.Collapse(voiceSection, { toggle: true });
+    $('#voiceCommandsHelp').collapse('toggle');
   };
   
   window.toggleSearchSection = function() {
-    const searchSection = document.getElementById('searchAndResults');
-    const collapse = new bootstrap.Collapse(searchSection, { toggle: true });
+    $('#searchAndResults').collapse('toggle');
   };
   
   window.toggleResults = function() {
-    const resultsSection = document.getElementById('searchAndResults');
-    const collapse = new bootstrap.Collapse(resultsSection, { toggle: true });
+    $('#searchAndResults').collapse('toggle');
   };
   
   window.toggleYouTube = function() {
-    const youtubeSection = document.getElementById('youtubeVideos');
-    const collapse = new bootstrap.Collapse(youtubeSection, { toggle: true });
+    $('#youtubeVideos').collapse('toggle');
   };
   
   window.toggleInstructions = function() {
-    const instructionsSection = document.getElementById('instructions');
-    const collapse = new bootstrap.Collapse(instructionsSection, { toggle: true });
+    $('#instructions').collapse('toggle');
   };
   
   window.toggleMap = function() {
-    const resultsSection = document.getElementById('searchAndResults');
-    const collapse = new bootstrap.Collapse(resultsSection, { show: true });
+    $('#searchAndResults').collapse('show');
     // Scroll to map section
     setTimeout(() => {
       const mapContainer = document.getElementById('mapContainer');
@@ -2114,8 +2188,7 @@ function searchArtistByName(artistName) {
   };
   
   window.toggleTimeline = function() {
-    const resultsSection = document.getElementById('searchAndResults');
-    const collapse = new bootstrap.Collapse(resultsSection, { show: true });
+    $('#searchAndResults').collapse('show');
     // Scroll to timeline section
     setTimeout(() => {
       const timelineContainer = document.getElementById('timelineContainer');
@@ -2988,6 +3061,219 @@ window.initMap = function() {
 window.addEventListener('load', function() {
   console.log('📄 Page fully loaded');
 });
+
+// AI Assistant Functions
+async function askAI(question = null) {
+  const questionTextarea = document.getElementById('aiQuestion');
+  const loadingDiv = document.getElementById('aiLoading');
+  const resultsDiv = document.getElementById('aiResults');
+  
+  let query = question || questionTextarea.value.trim();
+  
+  if (!query) {
+    showToast('warning', 'AI Assistant', 'Please enter a question first');
+    return;
+  }
+  
+  // Show loading state
+  loadingDiv.style.display = 'block';
+  resultsDiv.innerHTML = '<p class="text-muted">AI is thinking...</p>';
+  
+  // If called from suggestion buttons, update textarea
+  if (question) {
+    questionTextarea.value = question;
+  }
+  
+  try {
+    console.log('🤖 Asking AI:', query);
+    
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        message: query,
+        context: 'music-research'
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('🤖 AI Response:', data);
+    
+    if (data.success && data.response) {
+      displayAIResponse(data.response, query);
+      showToast('success', 'AI Assistant', 'Response received successfully');
+    } else {
+      throw new Error(data.error || 'AI response failed');
+    }
+    
+  } catch (error) {
+    console.error('❌ AI Error:', error);
+    
+    // Show mock response for testing
+    const mockResponse = generateMockAIResponse(query);
+    displayAIResponse(mockResponse, query);
+    showToast('info', 'AI Assistant', 'Using demo response (API not available)');
+  } finally {
+    loadingDiv.style.display = 'none';
+  }
+}
+
+function displayAIResponse(response, question) {
+  const resultsDiv = document.getElementById('aiResults');
+  
+  const timestamp = new Date().toLocaleTimeString();
+  
+  resultsDiv.innerHTML = `
+    <div class="ai-conversation">
+      <div class="ai-question mb-3">
+        <div class="d-flex align-items-start">
+          <div class="flex-shrink-0 me-2">
+            <i class="bi-person-circle text-primary" style="font-size: 1.5rem;"></i>
+          </div>
+          <div class="flex-grow-1">
+            <strong class="text-primary">You asked:</strong>
+            <p class="mb-1">"${question}"</p>
+            <small class="text-muted">${timestamp}</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="ai-answer">
+        <div class="d-flex align-items-start">
+          <div class="flex-shrink-0 me-2">
+            <i class="bi-robot text-success" style="font-size: 1.5rem;"></i>
+          </div>
+          <div class="flex-grow-1">
+            <strong class="text-success">AI Assistant:</strong>
+            <div class="mt-2">${formatAIResponse(response)}</div>
+            <small class="text-muted">${timestamp}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Scroll to bottom of results
+  resultsDiv.scrollTop = resultsDiv.scrollHeight;
+}
+
+function formatAIResponse(response) {
+  // Format the response with proper line breaks and styling
+  return response
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code class="bg-light px-1 rounded">$1</code>');
+}
+
+function generateMockAIResponse(question) {
+  const mockResponses = {
+    'progressive rock': `
+      <strong>Progressive Rock Characteristics:</strong><br><br>
+      • Complex time signatures and musical structures<br>
+      • Extended instrumental passages and solos<br>
+      • Conceptual themes and storytelling<br>
+      • Fusion of classical, jazz, and rock elements<br>
+      • Technical virtuosity and improvisation<br><br>
+      <em>Key bands: Pink Floyd, Genesis, Yes, King Crimson, Rush</em>
+    `,
+    '70s recommendations': `
+      <strong>Underrated 70s Bands:</strong><br><br>
+      • <strong>Camel</strong> - Atmospheric prog rock from England<br>
+      • <strong>Gentle Giant</strong> - Complex, polyphonic rock<br>
+      • <strong>Van der Graaf Generator</strong> - Dark, intense prog<br>
+      • <strong>Can</strong> - German experimental rock<br>
+      • <strong>Supertramp</strong> - Accessible prog with great melodies<br><br>
+      <em>These bands deserve more recognition for their innovative sound!</em>
+    `,
+    'genre comparison': `
+      <strong>Psychedelic vs Progressive Rock:</strong><br><br>
+      <strong>Psychedelic Rock:</strong><br>
+      • Focus on mind-altering experiences and trippy sounds<br>
+      • Heavy use of effects (reverb, echo, distortion)<br>
+      • Simpler song structures<br>
+      • Emphasis on atmosphere and mood<br><br>
+      <strong>Progressive Rock:</strong><br>
+      • Focus on musical complexity and technical skill<br>
+      • Complex time signatures and arrangements<br>
+      • Conceptual and intellectual themes<br>
+      • Classical and jazz influences<br><br>
+      <em>Both genres emerged in the late 60s but evolved differently!</em>
+    `,
+    'pink floyd': `
+      <strong>What Makes Pink Floyd Unique:</strong><br><br>
+      • <strong>Atmospheric Soundscapes</strong> - Created immersive sonic environments<br>
+      • <strong>Conceptual Albums</strong> - Each album tells a complete story<br>
+      • <strong>Innovative Production</strong> - Pioneered studio techniques and effects<br>
+      • <strong>Social Commentary</strong> - Addressed themes of alienation, war, and society<br>
+      • <strong>Visual Art Integration</strong> - Combined music with stunning visual elements<br><br>
+      <em>Their influence extends far beyond rock music into ambient, electronic, and progressive genres.</em>
+    `,
+    'concept albums': `
+      <strong>Best Concept Albums of All Time:</strong><br><br>
+      • <strong>Pink Floyd - "The Dark Side of the Moon"</strong> - Life, death, and madness<br>
+      • <strong>The Who - "Tommy"</strong> - Rock opera about a deaf, dumb, and blind boy<br>
+      • <strong>Genesis - "The Lamb Lies Down on Broadway"</strong> - Surreal journey through NYC<br>
+      • <strong>Yes - "Tales from Topographic Oceans"</strong> - Eastern philosophy meets prog<br>
+      • <strong>Rush - "2112"</strong> - Dystopian future and musical rebellion<br><br>
+      <em>These albums pushed the boundaries of what rock music could achieve!</em>
+    `,
+    'guitarists': `
+      <strong>Influential Guitarists in Rock Music:</strong><br><br>
+      • <strong>Jimi Hendrix</strong> - Revolutionary technique and effects usage<br>
+      • <strong>Eric Clapton</strong> - Blues mastery and emotional expression<br>
+      • <strong>Jimmy Page</strong> - Complex arrangements and studio innovation<br>
+      • <strong>David Gilmour</strong> - Melodic solos and atmospheric playing<br>
+      • <strong>Eddie Van Halen</strong> - Technical innovation and tapping technique<br>
+      • <strong>Steve Howe</strong> - Versatile style across multiple genres<br><br>
+      <em>Each guitarist brought something unique to the evolution of rock guitar!</em>
+    `,
+    'prog history': `
+      <strong>History of Progressive Rock:</strong><br><br>
+      <strong>1960s Origins:</strong> Emerged from psychedelic rock and classical influences<br>
+      <strong>1970s Golden Age:</strong> Peak creativity with bands like Yes, Genesis, and King Crimson<br>
+      <strong>1980s Decline:</strong> Punk and new wave overshadowed complex prog<br>
+      <strong>1990s Revival:</strong> Neo-prog bands like Dream Theater and Porcupine Tree<br>
+      <strong>2000s+ Evolution:</strong> Modern prog with heavier metal influences<br><br>
+      <em>Prog rock continues to evolve and influence music today!</em>
+    `
+  };
+  
+  // Find best matching response
+  const lowerQuestion = question.toLowerCase();
+  for (const [key, response] of Object.entries(mockResponses)) {
+    if (lowerQuestion.includes(key)) {
+      return response;
+    }
+  }
+  
+  // Default response
+  return `
+    <strong>Interesting question about music!</strong><br><br>
+    While I'm in demo mode, I can provide insights on various music topics including:<br>
+    • Progressive rock characteristics and history<br>
+    • Band recommendations and analysis<br>
+    • Genre comparisons and influences<br>
+    • Musical techniques and innovations<br><br>
+    <em>Try asking about specific artists, genres, or musical concepts!</em>
+  `;
+}
+
+function clearAIChat() {
+  const questionTextarea = document.getElementById('aiQuestion');
+  const resultsDiv = document.getElementById('aiResults');
+  
+  questionTextarea.value = '';
+  resultsDiv.innerHTML = '<p class="text-muted mb-0">Ask the AI a question to see responses here.</p>';
+  
+  showToast('info', 'AI Assistant', 'Chat cleared');
+}
 </script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>

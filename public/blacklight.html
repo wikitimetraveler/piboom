@@ -999,75 +999,117 @@
       </p>
     </div>
 
-    <!-- KG Search Widget -->
-    <div class="kg-search-widget">
-      <h3 class="neon-text mb-3">
-        <i class="bi-search mr-2"></i>Knowledge Graph Search
-      </h3>
-      <div class="text-center mb-3">
-        <div class="input-group input-group-lg">
-          <input id="kgSearchInput" 
-                 class="form-control search-box" 
-                 placeholder="Search for neon posters, art, or any topic…" 
-                 onkeypress="handleSearchKeypress(event)"
-                 autocomplete="off">
-          <div class="input-group-append">
-            <button id="kgSearchBtn" class="btn btn-primary search-btn" type="button">
-              <i class="bi-search mr-1"></i> Search
-            </button>
+    <!-- KG Search Widget and AI Assistant Side by Side -->
+    <div class="row">
+      <!-- KG Search Widget - 6 columns -->
+      <div class="col-lg-6 mb-4">
+        <div class="kg-search-widget">
+          <h3 class="neon-text mb-3">
+            <i class="bi-search mr-2"></i>Knowledge Graph Search
+          </h3>
+          <div class="text-center mb-3">
+            <div class="input-group input-group-lg">
+              <input id="kgSearchInput" 
+                     class="form-control search-box" 
+                     placeholder="Search for neon posters, art, or any topic…" 
+                     onkeypress="handleSearchKeypress(event)"
+                     autocomplete="off">
+              <div class="input-group-append">
+                <button id="kgSearchBtn" class="btn btn-primary search-btn" type="button">
+                  <i class="bi-search mr-1"></i> Search
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Search Filter Options -->
+          <div class="search-filters mb-3">
+            <h5 class="neon-text text-center mb-3">Search Filters:</h5>
+            <div class="row">
+              <div class="col-6 mb-2">
+                <button class="filter-btn active" data-type="all" onclick="setFilter('all')">
+                  <i class="bi-grid-3x3-gap mr-1"></i>All Types
+                </button>
+              </div>
+              <div class="col-6 mb-2">
+                <button class="filter-btn" data-type="music" onclick="setFilter('music')">
+                  <i class="bi-music-note-beamed mr-1"></i>Music Art
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-2">
+                <button class="filter-btn" data-type="neon" onclick="setFilter('neon')">
+                  <i class="bi-lightning mr-1"></i>Neon Art
+                </button>
+              </div>
+              <div class="col-6 mb-2">
+                <button class="filter-btn" data-type="cyberpunk" onclick="setFilter('cyberpunk')">
+                  <i class="bi-cpu mr-1"></i>Cyberpunk
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-2">
+                <button class="filter-btn" data-type="retro" onclick="setFilter('retro')">
+                  <i class="bi-clock-history mr-1"></i>Retro
+                </button>
+              </div>
+              <div class="col-6 mb-2">
+                <button class="filter-btn" data-type="psychedelic" onclick="setFilter('psychedelic')">
+                  <i class="bi-palette mr-1"></i>Psychedelic
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6 mb-2">
+                <button class="filter-btn" data-type="vintage" onclick="setFilter('vintage')">
+                  <i class="bi-star mr-1"></i>Vintage
+                </button>
+              </div>
+              <div class="col-6 mb-2">
+                <button class="filter-btn" data-type="abstract" onclick="setFilter('abstract')">
+                  <i class="bi-shapes mr-1"></i>Abstract
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
       
-      <!-- Search Filter Options -->
-      <div class="search-filters mb-3">
-        <h5 class="neon-text text-center mb-3">Search Filters:</h5>
-        <div class="row">
-          <div class="col-md-3 col-sm-6 mb-2">
-            <button class="filter-btn active" data-type="all" onclick="setFilter('all')">
-              <i class="bi-grid-3x3-gap mr-1"></i>All Types
-            </button>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-2">
-            <button class="filter-btn" data-type="music" onclick="setFilter('music')">
-              <i class="bi-music-note-beamed mr-1"></i>Music Art
-            </button>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-2">
-            <button class="filter-btn" data-type="neon" onclick="setFilter('neon')">
-              <i class="bi-lightning mr-1"></i>Neon Art
-            </button>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-2">
-            <button class="filter-btn" data-type="cyberpunk" onclick="setFilter('cyberpunk')">
-              <i class="bi-cpu mr-1"></i>Cyberpunk
-            </button>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-3 col-sm-6 mb-2">
-            <button class="filter-btn" data-type="retro" onclick="setFilter('retro')">
-              <i class="bi-clock-history mr-1"></i>Retro
-            </button>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-2">
-            <button class="filter-btn" data-type="psychedelic" onclick="setFilter('psychedelic')">
-              <i class="bi-palette mr-1"></i>Psychedelic
-            </button>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-2">
-            <button class="filter-btn" data-type="vintage" onclick="setFilter('vintage')">
-              <i class="bi-star mr-1"></i>Vintage
-            </button>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-2">
-            <button class="filter-btn" data-type="abstract" onclick="setFilter('abstract')">
-              <i class="bi-shapes mr-1"></i>Abstract
-            </button>
+      <!-- AI Assistant - 6 columns -->
+      <div class="col-lg-6 mb-4">
+        <div class="kg-search-widget">
+          <h3 class="neon-text mb-3">
+            <i class="bi-robot mr-2"></i>AI Assistant Levi
+          </h3>
+          <div class="ai-chat-container" style="background: rgba(0, 0, 0, 0.8); border: 2px solid #ff00ff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);">
+            <h6 style="color: #ff00ff; text-shadow: 0 0 10px #ff00ff; margin-bottom: 1rem;">
+              <i class="bi-chat-dots mr-1"></i>Chat with AI Levi
+            </h6>
+            <div class="mb-3">
+              <textarea id="aiQuestionBlacklight" class="form-control" rows="3" placeholder="Ask Levi about neon art, cyberpunk aesthetics, or any cosmic topic..." style="background: rgba(0, 0, 0, 0.8); border: 2px solid #00ff41; border-radius: 8px; color: #00ff41; font-family: 'Courier New', monospace; resize: none;"></textarea>
+            </div>
+            <div class="btn-group mb-3" role="group" style="width: 100%;">
+              <button class="btn btn-sm btn-primary" onclick="askAIBlacklight()" style="background: linear-gradient(135deg, #00ff41, #ff00ff); border: none; color: #000; font-weight: 600; flex: 1;">
+                <i class="bi-send mr-1"></i> Ask Levi
+              </button>
+              <button class="btn btn-sm btn-outline-secondary" onclick="clearAIBlacklight()" style="border: 2px solid #00ffff; color: #00ffff; flex: 1;">
+                <i class="bi-trash mr-1"></i> Clear
+              </button>
+            </div>
+            <div class="loading" id="aiLoadingBlacklight" style="display: none; text-align: center;">
+              <div class="spinner-border text-primary" role="status" style="color: #ff00ff !important; border-color: #ff00ff;">
+                <span class="sr-only">Loading...</span>
+              </div>
+              <p style="color: #00ffff; text-shadow: 0 0 5px #00ffff; margin-top: 0.5rem;">Levi is thinking...</p>
+            </div>
+            <div id="aiResultsBlacklight" style="max-height: 200px; overflow-y: auto; border: 1px solid #00ffff; border-radius: 8px; padding: 1rem; background: rgba(0, 0, 0, 0.9); min-height: 120px;">
+              <p class="text-muted mb-0" style="color: #00ffff; text-shadow: 0 0 5px #00ffff;">Ask Levi a question to see responses here.</p>
+            </div>
           </div>
         </div>
       </div>
-      
     </div>
 
     <!-- Section Toggle Buttons -->
@@ -1794,6 +1836,96 @@ function openFullImage(imageUrl, title) {
     document.body.removeChild(modal);
   };
 }
+
+// AI Assistant Functions for Blacklight Page
+async function askAIBlacklight() {
+  const question = document.getElementById('aiQuestionBlacklight').value.trim();
+  
+  if (!question) {
+    alert('Please enter a question for Levi');
+    return;
+  }
+  
+  console.log('🤖 Asking AI Levi:', question);
+  
+  // Show loading state
+  document.getElementById('aiLoadingBlacklight').style.display = 'block';
+  document.getElementById('aiResultsBlacklight').innerHTML = '<p style="color: #00ffff; text-shadow: 0 0 5px #00ffff;">Levi is processing your question...</p>';
+  
+  try {
+    const response = await fetch('/api/chat/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: question,
+        context: 'blacklight'
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Hide loading
+    document.getElementById('aiLoadingBlacklight').style.display = 'none';
+    
+    if (data.response) {
+      // Display AI response with cosmic styling
+      document.getElementById('aiResultsBlacklight').innerHTML = `
+        <div style="color: #00ff41; text-shadow: 0 0 8px #00ff41; margin-bottom: 1rem;">
+          <strong><i class="bi-robot mr-1"></i>Levi:</strong>
+        </div>
+        <div style="color: #00ffff; text-shadow: 0 0 5px #00ffff; line-height: 1.6; font-family: 'Courier New', monospace;">
+          ${data.response.replace(/\n/g, '<br>')}
+        </div>
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #ff00ff;">
+          <small style="color: #ff00ff; text-shadow: 0 0 5px #ff00ff;">
+            <i class="bi-lightning mr-1"></i>Cosmic AI Response
+          </small>
+        </div>
+      `;
+    } else {
+      throw new Error(data.error || 'No response received');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error asking AI:', error);
+    document.getElementById('aiLoadingBlacklight').style.display = 'none';
+    
+    // Show cosmic error message
+    document.getElementById('aiResultsBlacklight').innerHTML = `
+      <div style="color: #ff00ff; text-shadow: 0 0 10px #ff00ff; text-align: center;">
+        <i class="bi-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+        <p><strong>Cosmic Connection Error</strong></p>
+        <p style="color: #00ffff; text-shadow: 0 0 5px #00ffff; font-size: 0.9rem;">
+          Levi is having trouble connecting to the cosmic database.<br>
+          Please try again or check your cosmic internet connection.
+        </p>
+        <p style="color: #ff6600; text-shadow: 0 0 5px #ff6600; font-size: 0.8rem; margin-top: 1rem;">
+          Error: ${error.message}
+        </p>
+      </div>
+    `;
+  }
+}
+
+function clearAIBlacklight() {
+  document.getElementById('aiQuestionBlacklight').value = '';
+  document.getElementById('aiResultsBlacklight').innerHTML = '<p class="text-muted mb-0" style="color: #00ffff; text-shadow: 0 0 5px #00ffff;">Ask Levi a question to see responses here.</p>';
+  document.getElementById('aiLoadingBlacklight').style.display = 'none';
+}
+
+// Handle Enter key in AI textarea
+document.getElementById('aiQuestionBlacklight').addEventListener('keydown', function(event) {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    askAIBlacklight();
+  }
+});
 </script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
