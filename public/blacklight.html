@@ -1565,9 +1565,15 @@ async function performKGSearch() {
     
   } catch (error) {
     console.error('❌ Error searching for posters:', error);
-    // Show mock data for testing if API completely fails
-    console.log('🔄 Showing mock data as fallback...');
-    showMockDataInCarousel(query);
+    
+    // Show specific error message for YouTube API issues
+    if (error.message.includes('403') || error.message.includes('quota') || error.message.includes('API')) {
+      console.log('🔄 YouTube API issue detected, showing fallback content...');
+      showAPIErrorInCarousel('YouTube API temporarily unavailable. Showing cosmic mock data instead!');
+    } else {
+      console.log('🔄 Showing mock data as fallback...');
+      showMockDataInCarousel(query);
+    }
   }
 }
 
@@ -1789,6 +1795,34 @@ function showErrorInCarousel(errorMessage = '') {
             The universe is having connectivity issues. Please try again.
           </p>
           ${errorMessage ? `<p style="color: #ffff00; text-shadow: 0 0 5px #ffff00; font-size: 0.8rem; margin-top: 1rem;">Error: ${errorMessage}</p>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  updateCarouselIndicators(1);
+}
+
+function showAPIErrorInCarousel(message) {
+  const carouselInner = document.querySelector('#blacklightCarousel .carousel-inner');
+  carouselInner.innerHTML = `
+    <div class="carousel-item active">
+      <div class="poster-carousel-item">
+        <div class="search-result-poster">
+          <i class="bi-wifi-off" style="color: #ff6600; font-size: 4rem;"></i>
+          <h4 style="color: #ff6600; margin-top: 1rem;">
+            🌈 Cosmic API Temporarily Offline 🌈
+          </h4>
+          <p style="color: #00ffff; margin: 1rem 0;">
+            ${message}
+          </p>
+          <div style="margin-top: 2rem;">
+            <button class="btn btn-sm" onclick="showMockDataInCarousel('cosmic fallback')" style="background: linear-gradient(135deg, #00ff41, #ff00ff); border: none; color: #000; font-weight: 600; padding: 0.5rem 1rem;">
+              ✨ Show Cosmic Fallback Content ✨
+            </button>
+          </div>
+          <p style="color: #ffff00; font-size: 0.8rem; margin-top: 1rem;">
+            🚗 Keep on Truckin' with our groovy mock data! 🚗
+          </p>
         </div>
       </div>
     </div>
