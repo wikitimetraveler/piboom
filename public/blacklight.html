@@ -15,6 +15,31 @@
     font-family: 'Courier New', monospace;
     min-height: 100vh;
     overflow-x: hidden;
+    position: relative;
+  }
+
+  /* 60s/70s Psychedelic Background Pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 0, 0.05) 0%, transparent 70%);
+    animation: psychedelicShift 20s ease-in-out infinite;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  @keyframes psychedelicShift {
+    0%, 100% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+    25% { opacity: 0.6; transform: scale(1.1) rotate(90deg); }
+    50% { opacity: 0.4; transform: scale(0.9) rotate(180deg); }
+    75% { opacity: 0.7; transform: scale(1.05) rotate(270deg); }
   }
 
   /* Black Light Glow Effects */
@@ -27,12 +52,8 @@
   }
 
   .neon-text {
-    text-shadow: 
-      0 0 5px #00ff41,
-      0 0 10px #00ff41,
-      0 0 15px #00ff41,
-      0 0 20px #00ff41;
     color: #00ff41;
+    font-weight: bold;
   }
 
   .purple-glow {
@@ -112,19 +133,16 @@
 
   .navbar-brand-blacklight {
     color: #00ff41 !important;
-    text-shadow: 0 0 10px #00ff41;
     font-weight: bold;
   }
 
   .nav-link-blacklight {
     color: #00ff41 !important;
-    text-shadow: 0 0 5px #00ff41;
     transition: all 0.3s ease;
   }
 
   .nav-link-blacklight:hover {
     color: #ff00ff !important;
-    text-shadow: 0 0 10px #ff00ff;
     transform: translateY(-2px);
   }
 
@@ -288,7 +306,6 @@
     background: linear-gradient(135deg, #000, #1a1a2e, #000);
     border-top: 2px solid #00ff41;
     color: #00ff41;
-    text-shadow: 0 0 5px #00ff41;
     box-shadow: 0 0 20px #00ff41;
   }
 
@@ -389,6 +406,55 @@
     right: 0;
     bottom: 0;
     pointer-events: none;
+  }
+
+  /* 60s/70s Groovy Design Elements */
+  .groovy-border {
+    border: 3px solid;
+    border-image: linear-gradient(45deg, #ff00ff, #00ff41, #00ffff, #ffff00, #ff6600) 1;
+    border-radius: 15px;
+    position: relative;
+  }
+
+  .groovy-border::before {
+    content: '✌️ 🌸 ♥️ ☮️ 🌈 ✌️';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 0 15px;
+    font-size: 12px;
+    color: #ff00ff;
+    white-space: nowrap;
+  }
+
+  .peace-symbol {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    color: #ff00ff;
+    animation: peaceFloat 8s ease-in-out infinite;
+  }
+
+  @keyframes peaceFloat {
+    0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.7; }
+    50% { transform: rotate(180deg) scale(1.2); opacity: 1; }
+  }
+
+  .flower-power {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    font-size: 20px;
+    color: #ffff00;
+    animation: flowerSway 6s ease-in-out infinite;
+  }
+
+  @keyframes flowerSway {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(10deg); }
   }
 
   /* Individual Poster Themes */
@@ -989,14 +1055,21 @@
 </nav>
 
 <main class="container">
-  <div class="blacklight-container">
+  <div class="blacklight-container groovy-border">
+    <!-- 60s/70s Decorative Elements -->
+    <div class="peace-symbol">☮️</div>
+    <div class="flower-power">🌸</div>
+    
     <div class="text-center mb-4">
       <h1 class="neon-text mb-3">
         <i class="bi-lightning mr-2"></i>Black Light Zone
       </h1>
-      <p class="lead" style="color: #ff00ff; text-shadow: 0 0 10px #ff00ff;">
-        Groove into the cosmic knowledge with our KG search widget
+      <p class="lead" style="color: #ff00ff;">
+        ✌️ Groove into the cosmic knowledge with our KG search widget ✌️
       </p>
+      <div class="mt-2" style="font-size: 14px; color: #ffff00;">
+        🌈 Peace, Love & Music 🎵
+      </div>
     </div>
 
     <!-- KG Search Widget and AI Assistant Side by Side -->
@@ -1084,7 +1157,7 @@
             <h3 class="neon-text mb-0">
               <i class="bi-robot mr-2"></i>AI Assistant Levi
             </h3>
-            <button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#aiAssistantCollapse" aria-expanded="false" aria-controls="aiAssistantCollapse" style="border-color: rgba(255, 0, 255, 0.5); color: #ff00ff; text-shadow: 0 0 5px #ff00ff;">
+            <button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#aiAssistantCollapse" aria-expanded="false" aria-controls="aiAssistantCollapse" style="border-color: rgba(255, 0, 255, 0.5); color: #ff00ff;">
               <i class="bi-chevron-down" id="aiAssistantChevron"></i>
             </button>
           </div>
@@ -1093,8 +1166,8 @@
           <div id="aiAssistantCollapsed" class="ai-assistant-collapsed">
             <div class="d-flex align-items-center justify-content-between" style="background: rgba(0, 0, 0, 0.6); border: 2px solid #ff00ff; border-radius: 8px; padding: 0.75rem; box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);">
               <div class="d-flex align-items-center">
-                <i class="bi-robot mr-2" style="color: #ff00ff; text-shadow: 0 0 8px #ff00ff; font-size: 1.2rem;"></i>
-                <span style="color: #00ff41; text-shadow: 0 0 5px #00ff41; font-size: 0.9rem;">Levi is ready to help</span>
+                <i class="bi-robot mr-2" style="color: #ff00ff; font-size: 1.2rem;"></i>
+                <span style="color: #00ff41; font-size: 0.9rem;">Levi is ready to help</span>
               </div>
               <div class="d-flex gap-2">
                 <button class="btn btn-sm" onclick="askAIBlacklightQuick()" style="background: linear-gradient(135deg, #00ff41, #ff00ff); border: none; color: #000; font-weight: 600; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
@@ -1110,7 +1183,7 @@
           <!-- Expanded State (Collapsible) -->
           <div class="collapse" id="aiAssistantCollapse">
             <div class="ai-chat-container" style="background: rgba(0, 0, 0, 0.8); border: 2px solid #ff00ff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 0 20px rgba(255, 0, 255, 0.3); margin-top: 1rem;">
-              <h6 style="color: #ff00ff; text-shadow: 0 0 10px #ff00ff; margin-bottom: 1rem;">
+              <h6 style="color: #ff00ff; margin-bottom: 1rem;">
                 <i class="bi-chat-dots mr-1"></i>Chat with AI Levi
               </h6>
               <div class="mb-3">
@@ -1161,20 +1234,30 @@
       <!-- Carousel Scroll Controls -->
       <div class="text-center mb-3">
         <div class="btn-group" role="group" aria-label="Carousel Controls">
-          <button class="btn btn-sm" onclick="scrollCarousel('prev')" style="background: rgba(0, 255, 65, 0.2); border: 1px solid #00ff41; color: #00ff41; text-shadow: 0 0 5px #00ff41;">
+          <button class="btn btn-sm" onclick="scrollCarousel('prev')" style="background: rgba(0, 255, 65, 0.2); border: 1px solid #00ff41; color: #00ff41;">
             <i class="bi-arrow-left mr-1"></i>Previous
           </button>
-          <button class="btn btn-sm" onclick="scrollCarousel('next')" style="background: rgba(255, 0, 255, 0.2); border: 1px solid #ff00ff; color: #ff00ff; text-shadow: 0 0 5px #ff00ff;">
+          <button class="btn btn-sm" onclick="scrollCarousel('next')" style="background: rgba(255, 0, 255, 0.2); border: 1px solid #ff00ff; color: #ff00ff;">
             <i class="bi-arrow-right mr-1"></i>Next
           </button>
-          <button class="btn btn-sm" onclick="toggleCarouselAutoPlay()" id="autoPlayBtn" style="background: rgba(0, 255, 255, 0.2); border: 1px solid #00ffff; color: #00ffff; text-shadow: 0 0 5px #00ffff;">
+          <button class="btn btn-sm" onclick="toggleCarouselAutoPlay()" id="autoPlayBtn" style="background: rgba(0, 255, 255, 0.2); border: 1px solid #00ffff; color: #00ffff;">
             <i class="bi-pause mr-1"></i>Pause
           </button>
         </div>
         <div class="mt-2">
-          <small style="color: #00ffff; text-shadow: 0 0 5px #00ffff;">
+          <small style="color: #00ffff;">
             <i class="bi-keyboard mr-1"></i>Use ← → arrow keys or click buttons to navigate
           </small>
+        </div>
+        
+        <!-- Groovy Navigation Tips -->
+        <div class="mt-3 p-3" style="background: rgba(255, 255, 0, 0.1); border: 2px solid #ffff00; border-radius: 15px;">
+          <div class="text-center">
+            <div style="color: #ffff00; font-size: 18px; margin-bottom: 5px;">🎸 Far Out Navigation Tips 🎸</div>
+            <div style="color: #00ffff; font-size: 12px;">
+              ✨ Space = Toggle Auto-Play | 🎵 Swipe = Navigate | 🌈 Click = Manual Control ✨
+            </div>
+          </div>
         </div>
       </div>
       
@@ -1322,8 +1405,11 @@
     <div class="footer-content">
       <strong>David E Lane</strong> — Black Light Zone — <span id="dt"></span> — All Rights Reserved
     </div>
-    <div class="footer-quote mt-2" style="color: #ff00ff; text-shadow: 0 0 10px #ff00ff;">
+    <div class="footer-quote mt-2" style="color: #ff00ff;">
       🌟 "Turn on the black light, tune in the cosmic frequencies, drop out into digital dreams" 🌟
+    </div>
+    <div class="mt-2" style="color: #ffff00; font-size: 14px;">
+      ✌️ Peace & Love from the Cosmic Sixties ✌️ | 🌈 Make Love, Not War 🌈 | 🎵 Turn On, Tune In, Drop Out 🎵
     </div>
   </div>
 </footer>
