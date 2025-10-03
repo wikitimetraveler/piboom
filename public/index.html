@@ -49,6 +49,80 @@
   .musical-note:nth-child(18) { left: 90%; animation-delay: 25.5s; }
   .musical-note:nth-child(19) { left: 95%; animation-delay: 27s; }
 
+  /* Musical Symbols */
+  .musical-symbol {
+    position: absolute;
+    font-size: 24px;
+    color: rgba(52, 152, 219, 0.5);
+    animation: floatSymbol 18s linear infinite;
+    opacity: 0;
+    z-index: 10;
+  }
+
+  .musical-symbol:nth-child(21) { left: 8%; animation-delay: 2s; }
+  .musical-symbol:nth-child(22) { left: 18%; animation-delay: 5s; }
+  .musical-symbol:nth-child(23) { left: 28%; animation-delay: 8s; }
+  .musical-symbol:nth-child(24) { left: 38%; animation-delay: 11s; }
+  .musical-symbol:nth-child(25) { left: 48%; animation-delay: 14s; }
+  .musical-symbol:nth-child(26) { left: 58%; animation-delay: 17s; }
+  .musical-symbol:nth-child(27) { left: 68%; animation-delay: 20s; }
+  .musical-symbol:nth-child(28) { left: 78%; animation-delay: 23s; }
+  .musical-symbol:nth-child(29) { left: 88%; animation-delay: 26s; }
+  .musical-symbol:nth-child(30) { left: 98%; animation-delay: 29s; }
+
+  /* Clef Symbols */
+  .clef-symbol {
+    position: absolute;
+    font-size: 40px;
+    color: rgba(135, 206, 250, 0.4);
+    animation: floatClef 25s linear infinite;
+    opacity: 0;
+    z-index: 10;
+  }
+
+  .clef-symbol:nth-child(31) { left: 12%; animation-delay: 3s; }
+  .clef-symbol:nth-child(32) { left: 32%; animation-delay: 9s; }
+  .clef-symbol:nth-child(33) { left: 52%; animation-delay: 15s; }
+  .clef-symbol:nth-child(34) { left: 72%; animation-delay: 21s; }
+  .clef-symbol:nth-child(35) { left: 92%; animation-delay: 27s; }
+  .clef-symbol:nth-child(36) { left: 22%; animation-delay: 33s; }
+
+  /* Staff Lines */
+  .staff-line {
+    position: absolute;
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(135, 206, 250, 0.3), transparent);
+    animation: floatStaff 20s linear infinite;
+    opacity: 0;
+    z-index: 5;
+  }
+
+  .staff-line:nth-child(37) { left: 5%; animation-delay: 1s; }
+  .staff-line:nth-child(38) { left: 25%; animation-delay: 6s; }
+  .staff-line:nth-child(39) { left: 45%; animation-delay: 11s; }
+  .staff-line:nth-child(40) { left: 65%; animation-delay: 16s; }
+  .staff-line:nth-child(41) { left: 85%; animation-delay: 21s; }
+
+  /* Additional Music Symbols */
+  .music-symbol {
+    position: absolute;
+    font-size: 28px;
+    color: rgba(46, 204, 113, 0.4);
+    animation: floatMusic 22s linear infinite;
+    opacity: 0;
+    z-index: 10;
+  }
+
+  .music-symbol:nth-child(42) { left: 7%; animation-delay: 4s; }
+  .music-symbol:nth-child(43) { left: 17%; animation-delay: 7s; }
+  .music-symbol:nth-child(44) { left: 27%; animation-delay: 10s; }
+  .music-symbol:nth-child(45) { left: 37%; animation-delay: 13s; }
+  .music-symbol:nth-child(46) { left: 47%; animation-delay: 16s; }
+  .music-symbol:nth-child(47) { left: 57%; animation-delay: 19s; }
+  .music-symbol:nth-child(48) { left: 67%; animation-delay: 22s; }
+  .music-symbol:nth-child(49) { left: 77%; animation-delay: 25s; }
+
   @keyframes floatNote {
     0% {
       transform: translateY(100vh) rotate(0deg);
@@ -65,32 +139,139 @@
       opacity: 0;
     }
   }
+
+  @keyframes floatSymbol {
+    0% {
+      transform: translateY(100vh) rotate(0deg) scale(0.8);
+      opacity: 0;
+    }
+    5% {
+      opacity: 0.5;
+    }
+    95% {
+      opacity: 0.5;
+    }
+    100% {
+      transform: translateY(-100px) rotate(-360deg) scale(1.2);
+      opacity: 0;
+    }
+  }
+
+  @keyframes floatClef {
+    0% {
+      transform: translateY(100vh) rotate(0deg) scale(1);
+      opacity: 0;
+    }
+    3% {
+      opacity: 0.4;
+    }
+    97% {
+      opacity: 0.4;
+    }
+    100% {
+      transform: translateY(-150px) rotate(180deg) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  @keyframes floatStaff {
+    0% {
+      transform: translateY(100vh) translateX(-50px) rotate(0deg);
+      opacity: 0;
+    }
+    5% {
+      opacity: 0.3;
+    }
+    95% {
+      opacity: 0.3;
+    }
+    100% {
+      transform: translateY(-100px) translateX(50px) rotate(5deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes floatMusic {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+    4% {
+      opacity: 0.4;
+    }
+    96% {
+      opacity: 0.4;
+    }
+    100% {
+      transform: translateY(-120px) rotate(720deg);
+      opacity: 0;
+    }
+  }
 </style>
 </head>
 <body>
 <div class="particles" id="particles"></div>
 
-<!-- Floating Musical Notes (Doubled for Main Page) -->
+<!-- Enhanced Floating Musical Elements -->
 <div class="floating-notes">
+  <!-- Musical Notes -->
   <div class="musical-note">♪</div>
   <div class="musical-note">♫</div>
+  <div class="musical-note">♬</div>
+  <div class="musical-note">♩</div>
   <div class="musical-note">♪</div>
   <div class="musical-note">♫</div>
+  <div class="musical-note">♬</div>
+  <div class="musical-note">♩</div>
   <div class="musical-note">♪</div>
   <div class="musical-note">♫</div>
+  <div class="musical-note">♬</div>
+  <div class="musical-note">♩</div>
   <div class="musical-note">♪</div>
   <div class="musical-note">♫</div>
+  <div class="musical-note">♬</div>
+  <div class="musical-note">♩</div>
   <div class="musical-note">♪</div>
   <div class="musical-note">♫</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
-  <div class="musical-note">♪</div>
+  <div class="musical-note">♬</div>
+  <div class="musical-note">♩</div>
+  
+  <!-- Musical Symbols -->
+  <div class="musical-symbol">♭</div>
+  <div class="musical-symbol">♯</div>
+  <div class="musical-symbol">♮</div>
+  <div class="musical-symbol">♭</div>
+  <div class="musical-symbol">♯</div>
+  <div class="musical-symbol">♮</div>
+  <div class="musical-symbol">♭</div>
+  <div class="musical-symbol">♯</div>
+  <div class="musical-symbol">♮</div>
+  <div class="musical-symbol">♭</div>
+  
+  <!-- Treble and Bass Clefs -->
+  <div class="clef-symbol treble-clef">𝄞</div>
+  <div class="clef-symbol bass-clef">𝄢</div>
+  <div class="clef-symbol treble-clef">𝄞</div>
+  <div class="clef-symbol bass-clef">𝄢</div>
+  <div class="clef-symbol treble-clef">𝄞</div>
+  <div class="clef-symbol bass-clef">𝄢</div>
+  
+  <!-- Musical Staff Lines -->
+  <div class="staff-line"></div>
+  <div class="staff-line"></div>
+  <div class="staff-line"></div>
+  <div class="staff-line"></div>
+  <div class="staff-line"></div>
+  
+  <!-- Additional Music Symbols -->
+  <div class="music-symbol">𝄀</div>
+  <div class="music-symbol">𝄁</div>
+  <div class="music-symbol">𝄂</div>
+  <div class="music-symbol">𝄃</div>
+  <div class="music-symbol">𝄄</div>
+  <div class="music-symbol">𝄅</div>
+  <div class="music-symbol">𝄆</div>
+  <div class="music-symbol">𝄇</div>
 </div>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
@@ -106,6 +287,7 @@
         <li class="nav-item"><a class="nav-link" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a></li>
         <li class="nav-item"><a class="nav-link" href="/player.html"><i class="bi-volume-up"></i> Player</a></li>
         <li class="nav-item"><a class="nav-link" href="/assistant.html"><i class="bi-robot"></i> Assistant</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blacklight.html"><i class="bi-lightning"></i> Black Light</a></li>
         <li class="nav-item"><a class="nav-link" href="/debug.html"><i class="bi-bug"></i> Debug</a></li>
       </ul>
     </div>

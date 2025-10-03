@@ -19,8 +19,9 @@
   
   /* Zen Chat Messages */
   .chat-messages {
-    height: 450px;
+    height: 500px;
     overflow-y: auto;
+    overflow-x: hidden;
     border: 1px solid rgba(226, 232, 240, 0.4);
     border-radius: 16px;
     padding: 20px;
@@ -29,7 +30,7 @@
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
     backdrop-filter: blur(20px);
     position: relative;
-    overflow: hidden;
+    scroll-behavior: smooth;
   }
   
   .chat-messages::before {
@@ -40,7 +41,7 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
-    animation: zenShine 4s ease-in-out infinite;
+    /* animation: zenShine 4s ease-in-out infinite; */
   }
   
   @keyframes zenShine {
@@ -54,11 +55,14 @@
     margin-bottom: var(--zen-spacing);
     padding: 12px 18px;
     border-radius: var(--zen-radius);
-    max-width: 85%;
+    max-width: 95%;
     word-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
     position: relative;
     z-index: 1;
     transition: all 0.3s var(--zen-ease);
+    line-height: 1.5;
   }
   
   .user-message {
@@ -106,7 +110,7 @@
     font-style: italic;
     text-align: center;
     padding: 10px;
-    animation: zenPulse 2s ease-in-out infinite;
+    /* animation: zenPulse 2s ease-in-out infinite; */
   }
   
   /* Zen Input Group */
@@ -224,7 +228,7 @@
     margin-left: 10px;
     font-weight: 500;
     box-shadow: 0 2px 8px rgba(255,107,107,0.3);
-    animation: zenPulse 3s ease-in-out infinite;
+    /* animation: zenPulse 3s ease-in-out infinite; */
   }
   
   /* Zen Greeting Section */
@@ -318,7 +322,7 @@
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    animation: zenShine 4s ease-in-out infinite;
+    /* animation: zenShine 4s ease-in-out infinite; */
   }
   
   .footer-content {
@@ -336,7 +340,7 @@
     margin-top: 8px;
     opacity: 0.9;
     text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    animation: zenPulse 3s ease-in-out infinite;
+    /* animation: zenPulse 3s ease-in-out infinite; */
   }
   
   .footer-quote i {
@@ -577,7 +581,7 @@
 
   @keyframes floatNote {
     0% {
-      transform: translateY(100vh) rotate(0deg);
+      transform: translateY(100vh);
       opacity: 0;
     }
     5% {
@@ -587,7 +591,7 @@
       opacity: 0.6;
     }
     100% {
-      transform: translateY(-100px) rotate(360deg);
+      transform: translateY(-100vh);
       opacity: 0;
     }
   }
@@ -600,12 +604,12 @@
 <div class="floating-notes">
   <div class="musical-note">♪</div>
   <div class="musical-note">♫</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
+  <div class="musical-note">♩</div>
+  <div class="musical-note">♬</div>
+  <div class="musical-note">♭</div>
+  <div class="musical-note">♯</div>
+  <div class="musical-note">𝄞</div>
+  <div class="musical-note">🎸</div>
   <div class="musical-note">♪</div>
 </div>
 
@@ -1344,7 +1348,7 @@ function addMessage(text, sender, personality = 'engaging') {
   
   if (sender === 'assistant') {
     messageDiv.classList.add('levi');
-    messageDiv.innerHTML = `<strong>Levi:</strong> ${text}`;
+    messageDiv.innerHTML = `<strong>Dave:</strong> ${text}`;
     if (personality && personality !== 'engaging') {
       messageDiv.innerHTML += ` <span class="personality-badge">${personality}</span>`;
     }
@@ -1353,7 +1357,17 @@ function addMessage(text, sender, personality = 'engaging') {
   }
   
   chatMessages.appendChild(messageDiv);
+  
+  // Scroll to bottom to show the latest message
   chatMessages.scrollTop = chatMessages.scrollHeight;
+  
+  // If the message is very long, scroll to top after a brief delay to show the beginning
+  if (text.length > 300) {
+    setTimeout(() => {
+      chatMessages.scrollTop = 0;
+    }, 100);
+  }
+  
   conversationCount++;
 }
 
@@ -1370,8 +1384,8 @@ function clearChat() {
   const chatMessages = document.getElementById('chatMessages');
   chatMessages.innerHTML = `
     <div class="message assistant-message levi">
-      <strong>Levi:</strong> Fresh start! What would you like to talk about? 🎸🎵
-      <span class="personality-badge">delta-blues</span>
+      <strong>Dave:</strong> Fresh start! What would you like to talk about? 🧮🎵
+      <span class="personality-badge">mathematician-concert-veteran</span>
     </div>
   `;
   conversationCount = 0;

@@ -4,6 +4,7 @@ import voiceRoutes from './voice.routes.js';
 import musicResearchRoutes from './music-research.routes.js';
 import chatRoutes from './chat.routes.js';
 import albumDiscoveryRoutes from './album-discovery.routes.js';
+import blacklightRoutes from './blacklight.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -12,5 +13,6 @@ export default function buildRoutes(io) {
   api.use('/music-research', musicResearchRoutes);
   api.use('/chat', chatRoutes);
   api.use('/album-discovery', albumDiscoveryRoutes);
+  api.use('/blacklight', blacklightRoutes);
   return api;
 }
