@@ -1255,7 +1255,7 @@
           <div class="text-center">
             <div style="color: #ffff00; font-size: 18px; margin-bottom: 5px;">🎸 Far Out Navigation Tips 🎸</div>
             <div style="color: #00ffff; font-size: 12px;">
-              ✨ Space = Toggle Auto-Play | 🎵 Swipe = Navigate | 🌈 Click = Manual Control ✨
+              ✨ Space = Toggle Auto-Play (when not typing) | 🎵 Swipe = Navigate | 🌈 Click = Manual Control ✨
             </div>
           </div>
         </div>
@@ -1410,6 +1410,9 @@
     </div>
     <div class="mt-2" style="color: #ffff00; font-size: 14px;">
       ✌️ Peace & Love from the Cosmic Sixties ✌️ | 🌈 Make Love, Not War 🌈 | 🎵 Turn On, Tune In, Drop Out 🎵
+    </div>
+    <div class="mt-1" style="color: #00ffff; font-size: 12px; font-style: italic;">
+      🚗 Ass, Gas, or Grass - Nobody Rides for Free 🚗 | 🛣️ Keep on Truckin' 🛣️
     </div>
   </div>
 </footer>
@@ -2190,13 +2193,26 @@ let carouselAutoPlay = true;
 function initializeCarouselScrollControls() {
   // Add keyboard event listeners for carousel navigation
   document.addEventListener('keydown', function(event) {
+    // Only handle carousel controls if not typing in input fields
+    const activeElement = document.activeElement;
+    const isTyping = activeElement && (
+      activeElement.tagName === 'INPUT' || 
+      activeElement.tagName === 'TEXTAREA' || 
+      activeElement.contentEditable === 'true'
+    );
+    
+    // Don't interfere if user is typing in search boxes or text areas
+    if (isTyping) {
+      return;
+    }
+    
     if (event.key === 'ArrowLeft') {
       event.preventDefault();
       scrollCarousel('prev');
     } else if (event.key === 'ArrowRight') {
       event.preventDefault();
       scrollCarousel('next');
-    } else if (event.key === ' ') { // Spacebar to toggle autoplay
+    } else if (event.key === ' ') { // Spacebar to toggle autoplay (only when not typing)
       event.preventDefault();
       toggleCarouselAutoPlay();
     }
