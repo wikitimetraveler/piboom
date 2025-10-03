@@ -1080,32 +1080,59 @@
       <!-- AI Assistant - 6 columns -->
       <div class="col-lg-6 mb-4">
         <div class="kg-search-widget">
-          <h3 class="neon-text mb-3">
-            <i class="bi-robot mr-2"></i>AI Assistant Levi
-          </h3>
-          <div class="ai-chat-container" style="background: rgba(0, 0, 0, 0.8); border: 2px solid #ff00ff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);">
-            <h6 style="color: #ff00ff; text-shadow: 0 0 10px #ff00ff; margin-bottom: 1rem;">
-              <i class="bi-chat-dots mr-1"></i>Chat with AI Levi
-            </h6>
-            <div class="mb-3">
-              <textarea id="aiQuestionBlacklight" class="form-control" rows="3" placeholder="Ask Levi about neon art, cyberpunk aesthetics, or any cosmic topic..." style="background: rgba(0, 0, 0, 0.8); border: 2px solid #00ff41; border-radius: 8px; color: #00ff41; font-family: 'Courier New', monospace; resize: none;"></textarea>
-            </div>
-            <div class="btn-group mb-3" role="group" style="width: 100%;">
-              <button class="btn btn-sm btn-primary" onclick="askAIBlacklight()" style="background: linear-gradient(135deg, #00ff41, #ff00ff); border: none; color: #000; font-weight: 600; flex: 1;">
-                <i class="bi-send mr-1"></i> Ask Levi
-              </button>
-              <button class="btn btn-sm btn-outline-secondary" onclick="clearAIBlacklight()" style="border: 2px solid #00ffff; color: #00ffff; flex: 1;">
-                <i class="bi-trash mr-1"></i> Clear
-              </button>
-            </div>
-            <div class="loading" id="aiLoadingBlacklight" style="display: none; text-align: center;">
-              <div class="spinner-border text-primary" role="status" style="color: #ff00ff !important; border-color: #ff00ff;">
-                <span class="sr-only">Loading...</span>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="neon-text mb-0">
+              <i class="bi-robot mr-2"></i>AI Assistant Levi
+            </h3>
+            <button class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse" data-target="#aiAssistantCollapse" aria-expanded="false" aria-controls="aiAssistantCollapse" style="border-color: rgba(255, 0, 255, 0.5); color: #ff00ff; text-shadow: 0 0 5px #ff00ff;">
+              <i class="bi-chevron-down" id="aiAssistantChevron"></i>
+            </button>
+          </div>
+          
+          <!-- Collapsed State (Always Visible) -->
+          <div id="aiAssistantCollapsed" class="ai-assistant-collapsed">
+            <div class="d-flex align-items-center justify-content-between" style="background: rgba(0, 0, 0, 0.6); border: 2px solid #ff00ff; border-radius: 8px; padding: 0.75rem; box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);">
+              <div class="d-flex align-items-center">
+                <i class="bi-robot mr-2" style="color: #ff00ff; text-shadow: 0 0 8px #ff00ff; font-size: 1.2rem;"></i>
+                <span style="color: #00ff41; text-shadow: 0 0 5px #00ff41; font-size: 0.9rem;">Levi is ready to help</span>
               </div>
-              <p style="color: #00ffff; text-shadow: 0 0 5px #00ffff; margin-top: 0.5rem;">Levi is thinking...</p>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm" onclick="askAIBlacklightQuick()" style="background: linear-gradient(135deg, #00ff41, #ff00ff); border: none; color: #000; font-weight: 600; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                  <i class="bi-lightning mr-1"></i>Quick Ask
+                </button>
+                <button class="btn btn-sm" onclick="toggleAIExpanded()" style="border: 1px solid #00ffff; color: #00ffff; background: transparent; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                  <i class="bi-arrows-expand mr-1"></i>Expand
+                </button>
+              </div>
             </div>
-            <div id="aiResultsBlacklight" style="max-height: 200px; overflow-y: auto; border: 1px solid #00ffff; border-radius: 8px; padding: 1rem; background: rgba(0, 0, 0, 0.9); min-height: 120px;">
-              <p class="text-muted mb-0" style="color: #00ffff; text-shadow: 0 0 5px #00ffff;">Ask Levi a question to see responses here.</p>
+          </div>
+          
+          <!-- Expanded State (Collapsible) -->
+          <div class="collapse" id="aiAssistantCollapse">
+            <div class="ai-chat-container" style="background: rgba(0, 0, 0, 0.8); border: 2px solid #ff00ff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 0 20px rgba(255, 0, 255, 0.3); margin-top: 1rem;">
+              <h6 style="color: #ff00ff; text-shadow: 0 0 10px #ff00ff; margin-bottom: 1rem;">
+                <i class="bi-chat-dots mr-1"></i>Chat with AI Levi
+              </h6>
+              <div class="mb-3">
+                <textarea id="aiQuestionBlacklight" class="form-control" rows="4" placeholder="Ask Levi about neon art, cyberpunk aesthetics, or any cosmic topic..." style="background: rgba(0, 0, 0, 0.8); border: 2px solid #00ff41; border-radius: 8px; color: #00ff41; font-family: 'Courier New', monospace; resize: none;"></textarea>
+              </div>
+              <div class="btn-group mb-3" role="group" style="width: 100%;">
+                <button class="btn btn-sm btn-primary" onclick="askAIBlacklight()" style="background: linear-gradient(135deg, #00ff41, #ff00ff); border: none; color: #000; font-weight: 600; flex: 1;">
+                  <i class="bi-send mr-1"></i> Ask Levi
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="clearAIBlacklight()" style="border: 2px solid #00ffff; color: #00ffff; flex: 1;">
+                  <i class="bi-trash mr-1"></i> Clear
+                </button>
+              </div>
+              <div class="loading" id="aiLoadingBlacklight" style="display: none; text-align: center;">
+                <div class="spinner-border text-primary" role="status" style="color: #ff00ff !important; border-color: #ff00ff;">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <p style="color: #00ffff; text-shadow: 0 0 5px #00ffff; margin-top: 0.5rem;">Levi is thinking...</p>
+              </div>
+              <div id="aiResultsBlacklight" style="max-height: 600px; overflow-y: auto; border: 1px solid #00ffff; border-radius: 8px; padding: 1rem; background: rgba(0, 0, 0, 0.9); min-height: 360px;">
+                <p class="text-muted mb-0" style="color: #00ffff; text-shadow: 0 0 5px #00ffff;">Ask Levi a question to see responses here.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -1130,6 +1157,26 @@
       <h3 class="neon-text text-center mb-4">
         <i class="bi-images mr-2"></i>Black Light Poster Gallery
       </h3>
+      
+      <!-- Carousel Scroll Controls -->
+      <div class="text-center mb-3">
+        <div class="btn-group" role="group" aria-label="Carousel Controls">
+          <button class="btn btn-sm" onclick="scrollCarousel('prev')" style="background: rgba(0, 255, 65, 0.2); border: 1px solid #00ff41; color: #00ff41; text-shadow: 0 0 5px #00ff41;">
+            <i class="bi-arrow-left mr-1"></i>Previous
+          </button>
+          <button class="btn btn-sm" onclick="scrollCarousel('next')" style="background: rgba(255, 0, 255, 0.2); border: 1px solid #ff00ff; color: #ff00ff; text-shadow: 0 0 5px #ff00ff;">
+            <i class="bi-arrow-right mr-1"></i>Next
+          </button>
+          <button class="btn btn-sm" onclick="toggleCarouselAutoPlay()" id="autoPlayBtn" style="background: rgba(0, 255, 255, 0.2); border: 1px solid #00ffff; color: #00ffff; text-shadow: 0 0 5px #00ffff;">
+            <i class="bi-pause mr-1"></i>Pause
+          </button>
+        </div>
+        <div class="mt-2">
+          <small style="color: #00ffff; text-shadow: 0 0 5px #00ffff;">
+            <i class="bi-keyboard mr-1"></i>Use ← → arrow keys or click buttons to navigate
+          </small>
+        </div>
+      </div>
       
       <div id="blacklightCarousel" class="carousel slide" data-ride="carousel" data-interval="4000">
         <ol class="carousel-indicators">
@@ -1926,6 +1973,278 @@ document.getElementById('aiQuestionBlacklight').addEventListener('keydown', func
     askAIBlacklight();
   }
 });
+
+// AI Assistant Expand/Collapse Functions
+function toggleAIExpanded() {
+  const collapseElement = document.getElementById('aiAssistantCollapse');
+  const chevron = document.getElementById('aiAssistantChevron');
+  
+  if (collapseElement.classList.contains('show')) {
+    // Collapse
+    collapseElement.classList.remove('show');
+    chevron.style.transform = 'rotate(0deg)';
+  } else {
+    // Expand
+    collapseElement.classList.add('show');
+    chevron.style.transform = 'rotate(180deg)';
+  }
+}
+
+// Quick Ask function for collapsed state
+async function askAIBlacklightQuick() {
+  const question = prompt("Quick question for Levi:");
+  if (!question) return;
+  
+  // Show loading in collapsed state
+  const collapsedDiv = document.getElementById('aiAssistantCollapsed');
+  const originalContent = collapsedDiv.innerHTML;
+  
+  collapsedDiv.innerHTML = `
+    <div class="d-flex align-items-center justify-content-center" style="background: rgba(0, 0, 0, 0.6); border: 2px solid #ff00ff; border-radius: 8px; padding: 0.75rem; box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);">
+      <div class="spinner-border spinner-border-sm text-primary mr-2" role="status" style="color: #ff00ff !important; border-color: #ff00ff;">
+        <span class="sr-only">Loading...</span>
+      </div>
+      <span style="color: #00ffff; text-shadow: 0 0 5px #00ffff; font-size: 0.9rem;">Levi is thinking...</span>
+    </div>
+  `;
+  
+  try {
+    const response = await fetch('/api/chat/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: question,
+        context: 'blacklight'
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (data.response) {
+      // Show quick response in collapsed state
+      collapsedDiv.innerHTML = `
+        <div style="background: rgba(0, 0, 0, 0.6); border: 2px solid #00ff41; border-radius: 8px; padding: 0.75rem; box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);">
+          <div class="d-flex align-items-center mb-2">
+            <i class="bi-robot mr-2" style="color: #00ff41; text-shadow: 0 0 8px #00ff41;"></i>
+            <span style="color: #00ff41; text-shadow: 0 0 5px #00ff41; font-size: 0.9rem; font-weight: 600;">Levi:</span>
+          </div>
+          <p style="color: #00ffff; text-shadow: 0 0 5px #00ffff; font-size: 0.8rem; margin: 0; line-height: 1.4;">
+            ${data.response.length > 100 ? data.response.substring(0, 100) + '...' : data.response}
+          </p>
+          <div class="d-flex justify-content-end mt-2">
+            <button class="btn btn-sm" onclick="toggleAIExpanded()" style="border: 1px solid #ff00ff; color: #ff00ff; background: transparent; padding: 0.2rem 0.4rem; font-size: 0.7rem;">
+              <i class="bi-arrows-expand mr-1"></i>Full Chat
+            </button>
+            <button class="btn btn-sm ml-1" onclick="restoreCollapsedState()" style="border: 1px solid #00ffff; color: #00ffff; background: transparent; padding: 0.2rem 0.4rem; font-size: 0.7rem;">
+              <i class="bi-arrow-left mr-1"></i>Back
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      throw new Error('No response received');
+    }
+    
+  } catch (error) {
+    console.error('❌ Error in quick ask:', error);
+    collapsedDiv.innerHTML = `
+      <div style="background: rgba(0, 0, 0, 0.6); border: 2px solid #ff6600; border-radius: 8px; padding: 0.75rem; box-shadow: 0 0 15px rgba(255, 102, 0, 0.2);">
+        <div class="d-flex align-items-center">
+          <i class="bi-exclamation-triangle mr-2" style="color: #ff6600; text-shadow: 0 0 8px #ff6600;"></i>
+          <span style="color: #ff6600; text-shadow: 0 0 5px #ff6600; font-size: 0.9rem;">Connection Error</span>
+        </div>
+        <button class="btn btn-sm mt-2" onclick="restoreCollapsedState()" style="border: 1px solid #ff00ff; color: #ff00ff; background: transparent; padding: 0.2rem 0.4rem; font-size: 0.7rem;">
+          <i class="bi-arrow-left mr-1"></i>Try Again
+        </button>
+      </div>
+    `;
+  }
+}
+
+function restoreCollapsedState() {
+  const collapsedDiv = document.getElementById('aiAssistantCollapsed');
+  collapsedDiv.innerHTML = `
+    <div class="d-flex align-items-center justify-content-between" style="background: rgba(0, 0, 0, 0.6); border: 2px solid #ff00ff; border-radius: 8px; padding: 0.75rem; box-shadow: 0 0 15px rgba(255, 0, 255, 0.2);">
+      <div class="d-flex align-items-center">
+        <i class="bi-robot mr-2" style="color: #ff00ff; text-shadow: 0 0 8px #ff00ff; font-size: 1.2rem;"></i>
+        <span style="color: #00ff41; text-shadow: 0 0 5px #00ff41; font-size: 0.9rem;">Levi is ready to help</span>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm" onclick="askAIBlacklightQuick()" style="background: linear-gradient(135deg, #00ff41, #ff00ff); border: none; color: #000; font-weight: 600; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+          <i class="bi-lightning mr-1"></i>Quick Ask
+        </button>
+        <button class="btn btn-sm" onclick="toggleAIExpanded()" style="border: 1px solid #00ffff; color: #00ffff; background: transparent; padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+          <i class="bi-arrows-expand mr-1"></i>Expand
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Add chevron rotation animation
+document.addEventListener('DOMContentLoaded', function() {
+  const chevron = document.getElementById('aiAssistantChevron');
+  if (chevron) {
+    chevron.style.transition = 'transform 0.3s ease';
+  }
+  
+  // Initialize carousel scroll controls
+  initializeCarouselScrollControls();
+});
+
+// Carousel Scroll Control Functions
+let carouselAutoPlay = true;
+
+function initializeCarouselScrollControls() {
+  // Add keyboard event listeners for carousel navigation
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      scrollCarousel('prev');
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      scrollCarousel('next');
+    } else if (event.key === ' ') { // Spacebar to toggle autoplay
+      event.preventDefault();
+      toggleCarouselAutoPlay();
+    }
+  });
+  
+  // Add touch/swipe support for mobile Pi devices
+  let startX = 0;
+  let endX = 0;
+  
+  const carousel = document.getElementById('blacklightCarousel');
+  if (carousel) {
+    carousel.addEventListener('touchstart', function(event) {
+      startX = event.touches[0].clientX;
+    });
+    
+    carousel.addEventListener('touchend', function(event) {
+      endX = event.changedTouches[0].clientX;
+      handleSwipe();
+    });
+  }
+  
+  function handleSwipe() {
+    const threshold = 50; // Minimum swipe distance
+    const diff = startX - endX;
+    
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        // Swipe left - go to next
+        scrollCarousel('next');
+      } else {
+        // Swipe right - go to previous
+        scrollCarousel('prev');
+      }
+    }
+  }
+}
+
+function scrollCarousel(direction) {
+  const carousel = document.getElementById('blacklightCarousel');
+  if (!carousel) return;
+  
+  // Pause autoplay when manually navigating
+  if (carouselAutoPlay) {
+    toggleCarouselAutoPlay();
+  }
+  
+  // Use Bootstrap carousel methods
+  if (direction === 'next') {
+    $(carousel).carousel('next');
+  } else if (direction === 'prev') {
+    $(carousel).carousel('prev');
+  }
+  
+  // Visual feedback
+  showScrollFeedback(direction);
+}
+
+function toggleCarouselAutoPlay() {
+  const carousel = document.getElementById('blacklightCarousel');
+  const btn = document.getElementById('autoPlayBtn');
+  
+  if (!carousel || !btn) return;
+  
+  carouselAutoPlay = !carouselAutoPlay;
+  
+  if (carouselAutoPlay) {
+    $(carousel).carousel('cycle');
+    btn.innerHTML = '<i class="bi-pause mr-1"></i>Pause';
+    btn.style.background = 'rgba(0, 255, 255, 0.2)';
+    btn.style.borderColor = '#00ffff';
+    btn.style.color = '#00ffff';
+  } else {
+    $(carousel).carousel('pause');
+    btn.innerHTML = '<i class="bi-play mr-1"></i>Play';
+    btn.style.background = 'rgba(0, 255, 65, 0.2)';
+    btn.style.borderColor = '#00ff41';
+    btn.style.color = '#00ff41';
+  }
+}
+
+function showScrollFeedback(direction) {
+  // Create temporary feedback indicator
+  const feedback = document.createElement('div');
+  feedback.style.cssText = `
+    position: fixed;
+    top: 50%;
+    ${direction === 'next' ? 'right: 20px' : 'left: 20px'};
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid ${direction === 'next' ? '#ff00ff' : '#00ff41'};
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: ${direction === 'next' ? '#ff00ff' : '#00ff41'};
+    text-shadow: 0 0 10px ${direction === 'next' ? '#ff00ff' : '#00ff41'};
+    font-size: 1.5rem;
+    z-index: 9999;
+    animation: scrollFeedback 0.5s ease-out;
+    pointer-events: none;
+  `;
+  
+  feedback.innerHTML = direction === 'next' ? '<i class="bi-arrow-right"></i>' : '<i class="bi-arrow-left"></i>';
+  document.body.appendChild(feedback);
+  
+  // Remove after animation
+  setTimeout(() => {
+    if (document.body.contains(feedback)) {
+      document.body.removeChild(feedback);
+    }
+  }, 500);
+}
+
+// Add CSS for scroll feedback animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes scrollFeedback {
+    0% {
+      opacity: 0;
+      transform: translateY(-50%) scale(0.5);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.2);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-50%) scale(1);
+    }
+  }
+`;
+document.head.appendChild(style);
 </script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
