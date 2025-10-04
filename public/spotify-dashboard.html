@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Spotify Dashboard - Big Wave Dave's Music Box</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+<link rel="stylesheet" href="/styles.css"/>
+<style>
+  body {
+    background: linear-gradient(135deg, #1db954 0%, #191414 50%, #1db954 100%);
+    color: #fff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  
+  .spotify-container {
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    border: 2px solid #1db954;
+    max-width: 1200px;
+  }
+  
+  .spotify-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+  
+  .spotify-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1db954;
+    margin-bottom: 0.5rem;
+  }
+  
+  .spotify-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.8;
+    margin-bottom: 2rem;
+  }
+  
+  .auth-section {
+    text-align: center;
+    padding: 2rem;
+    background: rgba(29, 185, 84, 0.1);
+    border: 1px solid #1db954;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+  }
+  
+  .btn-spotify {
+    background: #1db954;
+    border: none;
+    color: #000;
+    padding: 1rem 2rem;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-spotify:hover {
+    background: #1ed760;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(29, 185, 84, 0.3);
+    color: #000;
+    text-decoration: none;
+  }
+  
+  .dashboard-section {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #1db954;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1db954;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .track-item, .artist-item, .playlist-item {
+    background: rgba(29, 185, 84, 0.1);
+    border: 1px solid rgba(29, 185, 84, 0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .track-item:hover, .artist-item:hover, .playlist-item:hover {
+    background: rgba(29, 185, 84, 0.2);
+    border-color: #1db954;
+    transform: translateY(-2px);
+  }
+  
+  .track-image, .artist-image, .playlist-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid #1db954;
+  }
+  
+  .track-info, .artist-info, .playlist-info {
+    flex: 1;
+  }
+  
+  .track-name, .artist-name, .playlist-name {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.25rem;
+  }
+  
+  .track-artist, .artist-genres, .playlist-tracks {
+    font-size: 0.9rem;
+    color: #1db954;
+    opacity: 0.8;
+  }
+  
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #1db954;
+  }
+  
+  .error {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid #dc3545;
+    border-radius: 10px;
+    padding: 1rem;
+    color: #dc3545;
+    text-align: center;
+  }
+  
+  .user-profile {
+    background: rgba(29, 185, 84, 0.1);
+    border: 1px solid #1db954;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+  
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #1db954;
+    margin: 0 auto 1rem;
+    display: block;
+  }
+  
+  .user-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1db954;
+    margin-bottom: 0.5rem;
+  }
+  
+  .user-details {
+    color: #fff;
+    opacity: 0.8;
+  }
+</style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, rgba(25, 20, 20, 0.9) 0%, rgba(29, 185, 84, 0.9) 100%);">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi-spotify mr-1"></i>Big Wave Dave's Music Box</a>
+    <div class="navbar-nav ml-auto">
+      <a class="nav-link" href="/"><i class="bi-house"></i> Home</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="spotify-container">
+    <div class="spotify-header">
+      <h1 class="spotify-title">Spotify Dashboard</h1>
+      <p class="spotify-subtitle">Your personal Spotify music data and insights</p>
+    </div>
+    
+    <!-- Authentication Section -->
+    <div class="auth-section" id="authSection">
+      <h3>Connect Your Spotify Account</h3>
+      <p>Connect your Spotify account to view your personal music data, top tracks, artists, and playlists.</p>
+      <button class="btn-spotify" onclick="connectSpotify()">
+        <i class="bi-spotify"></i> Connect Spotify
+      </button>
+    </div>
+    
+    <!-- User Profile Section -->
+    <div class="user-profile" id="userProfile" style="display: none;">
+      <img id="userAvatar" class="user-avatar" src="" alt="User Avatar">
+      <div class="user-name" id="userName"></div>
+      <div class="user-details" id="userDetails"></div>
+      <button class="btn btn-outline-danger mt-3" onclick="logoutSpotify()">
+        <i class="bi-box-arrow-right"></i> Disconnect
+      </button>
+    </div>
+    
+    <!-- Top Tracks Section -->
+    <div class="dashboard-section" id="topTracksSection" style="display: none;">
+      <h3 class="section-title">
+        <i class="bi-music-note-beamed"></i> Your Top Tracks
+      </h3>
+      <div class="row">
+        <div class="col-12">
+          <div class="btn-group mb-3" role="group">
+            <button class="btn btn-outline-success" onclick="loadTopTracks('short_term')">Last 4 Weeks</button>
+            <button class="btn btn-outline-success active" onclick="loadTopTracks('medium_term')">Last 6 Months</button>
+            <button class="btn btn-outline-success" onclick="loadTopTracks('long_term')">All Time</button>
+          </div>
+        </div>
+      </div>
+      <div id="topTracksContent">
+        <div class="loading">
+          <i class="bi-spotify"></i> Loading your top tracks...
+        </div>
+      </div>
+    </div>
+    
+    <!-- Top Artists Section -->
+    <div class="dashboard-section" id="topArtistsSection" style="display: none;">
+      <h3 class="section-title">
+        <i class="bi-person-heart"></i> Your Top Artists
+      </h3>
+      <div class="row">
+        <div class="col-12">
+          <div class="btn-group mb-3" role="group">
+            <button class="btn btn-outline-success" onclick="loadTopArtists('short_term')">Last 4 Weeks</button>
+            <button class="btn btn-outline-success active" onclick="loadTopArtists('medium_term')">Last 6 Months</button>
+            <button class="btn btn-outline-success" onclick="loadTopArtists('long_term')">All Time</button>
+          </div>
+        </div>
+      </div>
+      <div id="topArtistsContent">
+        <div class="loading">
+          <i class="bi-spotify"></i> Loading your top artists...
+        </div>
+      </div>
+    </div>
+    
+    <!-- Playlists Section -->
+    <div class="dashboard-section" id="playlistsSection" style="display: none;">
+      <h3 class="section-title">
+        <i class="bi-list-ul"></i> Your Playlists
+      </h3>
+      <div id="playlistsContent">
+        <div class="loading">
+          <i class="bi-spotify"></i> Loading your playlists...
+        </div>
+      </div>
+    </div>
+    
+    <!-- Currently Playing Section -->
+    <div class="dashboard-section" id="currentlyPlayingSection" style="display: none;">
+      <h3 class="section-title">
+        <i class="bi-play-circle"></i> Currently Playing
+      </h3>
+      <div id="currentlyPlayingContent">
+        <div class="loading">
+          <i class="bi-spotify"></i> Checking what's playing...
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let currentUserId = null;
+let currentUserProfile = null;
+
+// Check if user is authenticated
+async function checkAuthStatus() {
+  try {
+    // For demo purposes, we'll use a mock user ID
+    // In a real app, you'd get this from the OAuth flow
+    const mockUserId = 'demo-user-123';
+    
+    const response = await fetch(`/api/spotify/user/${mockUserId}/auth-status`);
+    const data = await response.json();
+    
+    if (data.success && data.authenticated) {
+      currentUserId = mockUserId;
+      currentUserProfile = data.user;
+      showAuthenticatedState();
+      loadUserData();
+    } else {
+      showUnauthenticatedState();
+    }
+  } catch (error) {
+    console.log('Auth check failed:', error);
+    showUnauthenticatedState();
+  }
+}
+
+// Show unauthenticated state
+function showUnauthenticatedState() {
+  document.getElementById('authSection').style.display = 'block';
+  document.getElementById('userProfile').style.display = 'none';
+  document.getElementById('topTracksSection').style.display = 'none';
+  document.getElementById('topArtistsSection').style.display = 'none';
+  document.getElementById('playlistsSection').style.display = 'none';
+  document.getElementById('currentlyPlayingSection').style.display = 'none';
+}
+
+// Show authenticated state
+function showAuthenticatedState() {
+  document.getElementById('authSection').style.display = 'none';
+  document.getElementById('userProfile').style.display = 'block';
+  document.getElementById('topTracksSection').style.display = 'block';
+  document.getElementById('topArtistsSection').style.display = 'block';
+  document.getElementById('playlistsSection').style.display = 'block';
+  document.getElementById('currentlyPlayingSection').style.display = 'block';
+  
+  if (currentUserProfile) {
+    document.getElementById('userName').textContent = currentUserProfile.display_name || 'Spotify User';
+    document.getElementById('userDetails').textContent = `Followers: ${currentUserProfile.followers?.total || 0}`;
+    
+    if (currentUserProfile.images && currentUserProfile.images.length > 0) {
+      document.getElementById('userAvatar').src = currentUserProfile.images[0].url;
+    }
+  }
+}
+
+// Connect to Spotify
+async function connectSpotify() {
+  try {
+    const response = await fetch('/api/spotify/auth');
+    const data = await response.json();
+    
+    if (data.success) {
+      window.location.href = data.authUrl;
+    } else {
+      alert('Failed to get Spotify authorization URL');
+    }
+  } catch (error) {
+    console.error('Spotify auth error:', error);
+    alert('Failed to connect to Spotify');
+  }
+}
+
+// Load user data
+async function loadUserData() {
+  if (!currentUserId) return;
+  
+  loadTopTracks('medium_term');
+  loadTopArtists('medium_term');
+  loadPlaylists();
+  loadCurrentlyPlaying();
+}
+
+// Load top tracks
+async function loadTopTracks(timeRange) {
+  if (!currentUserId) return;
+  
+  try {
+    document.getElementById('topTracksContent').innerHTML = '<div class="loading"><i class="bi-spotify"></i> Loading your top tracks...</div>';
+    
+    // Update active button
+    document.querySelectorAll('#topTracksSection .btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    const response = await fetch(`/api/spotify/user/${currentUserId}/top-tracks?time_range=${timeRange}`);
+    const data = await response.json();
+    
+    if (data.success) {
+      displayTopTracks(data.tracks);
+    } else {
+      document.getElementById('topTracksContent').innerHTML = '<div class="error">Failed to load top tracks</div>';
+    }
+  } catch (error) {
+    console.error('Top tracks error:', error);
+    document.getElementById('topTracksContent').innerHTML = '<div class="error">Failed to load top tracks</div>';
+  }
+}
+
+// Display top tracks
+function displayTopTracks(tracks) {
+  const content = document.getElementById('topTracksContent');
+  
+  if (tracks.length === 0) {
+    content.innerHTML = '<div class="error">No tracks found</div>';
+    return;
+  }
+  
+  let html = '';
+  tracks.forEach((track, index) => {
+    html += `
+      <div class="track-item">
+        <span style="color: #1db954; font-weight: bold; min-width: 30px;">${index + 1}</span>
+        <img src="${track.album.images[0]?.url || '/placeholder-album.png'}" 
+             alt="${track.name}" class="track-image">
+        <div class="track-info">
+          <div class="track-name">${track.name}</div>
+          <div class="track-artist">${track.artists.map(a => a.name).join(', ')}</div>
+        </div>
+        <div style="color: #1db954; font-size: 0.9rem;">
+          ${Math.floor(track.duration_ms / 60000)}:${String(Math.floor((track.duration_ms % 60000) / 1000)).padStart(2, '0')}
+        </div>
+      </div>
+    `;
+  });
+  
+  content.innerHTML = html;
+}
+
+// Load top artists
+async function loadTopArtists(timeRange) {
+  if (!currentUserId) return;
+  
+  try {
+    document.getElementById('topArtistsContent').innerHTML = '<div class="loading"><i class="bi-spotify"></i> Loading your top artists...</div>';
+    
+    // Update active button
+    document.querySelectorAll('#topArtistsSection .btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    const response = await fetch(`/api/spotify/user/${currentUserId}/top-artists?time_range=${timeRange}`);
+    const data = await response.json();
+    
+    if (data.success) {
+      displayTopArtists(data.artists);
+    } else {
+      document.getElementById('topArtistsContent').innerHTML = '<div class="error">Failed to load top artists</div>';
+    }
+  } catch (error) {
+    console.error('Top artists error:', error);
+    document.getElementById('topArtistsContent').innerHTML = '<div class="error">Failed to load top artists</div>';
+  }
+}
+
+// Display top artists
+function displayTopArtists(artists) {
+  const content = document.getElementById('topArtistsContent');
+  
+  if (artists.length === 0) {
+    content.innerHTML = '<div class="error">No artists found</div>';
+    return;
+  }
+  
+  let html = '';
+  artists.forEach((artist, index) => {
+    html += `
+      <div class="artist-item">
+        <span style="color: #1db954; font-weight: bold; min-width: 30px;">${index + 1}</span>
+        <img src="${artist.images[0]?.url || '/placeholder-artist.png'}" 
+             alt="${artist.name}" class="artist-image">
+        <div class="artist-info">
+          <div class="artist-name">${artist.name}</div>
+          <div class="artist-genres">${artist.genres.slice(0, 3).join(', ')}</div>
+        </div>
+        <div style="color: #1db954; font-size: 0.9rem;">
+          ${artist.followers.total.toLocaleString()} followers
+        </div>
+      </div>
+    `;
+  });
+  
+  content.innerHTML = html;
+}
+
+// Load playlists
+async function loadPlaylists() {
+  if (!currentUserId) return;
+  
+  try {
+    const response = await fetch(`/api/spotify/user/${currentUserId}/playlists`);
+    const data = await response.json();
+    
+    if (data.success) {
+      displayPlaylists(data.playlists);
+    } else {
+      document.getElementById('playlistsContent').innerHTML = '<div class="error">Failed to load playlists</div>';
+    }
+  } catch (error) {
+    console.error('Playlists error:', error);
+    document.getElementById('playlistsContent').innerHTML = '<div class="error">Failed to load playlists</div>';
+  }
+}
+
+// Display playlists
+function displayPlaylists(playlists) {
+  const content = document.getElementById('playlistsContent');
+  
+  if (playlists.length === 0) {
+    content.innerHTML = '<div class="error">No playlists found</div>';
+    return;
+  }
+  
+  let html = '';
+  playlists.forEach(playlist => {
+    html += `
+      <div class="playlist-item">
+        <img src="${playlist.images[0]?.url || '/placeholder-playlist.png'}" 
+             alt="${playlist.name}" class="playlist-image">
+        <div class="playlist-info">
+          <div class="playlist-name">${playlist.name}</div>
+          <div class="playlist-tracks">${playlist.tracks.total} tracks</div>
+        </div>
+        <div style="color: #1db954; font-size: 0.9rem;">
+          ${playlist.public ? 'Public' : 'Private'}
+        </div>
+      </div>
+    `;
+  });
+  
+  content.innerHTML = html;
+}
+
+// Load currently playing
+async function loadCurrentlyPlaying() {
+  if (!currentUserId) return;
+  
+  try {
+    const response = await fetch(`/api/spotify/user/${currentUserId}/currently-playing`);
+    const data = await response.json();
+    
+    if (data.success && data.currentlyPlaying.item) {
+      displayCurrentlyPlaying(data.currentlyPlaying);
+    } else {
+      document.getElementById('currentlyPlayingContent').innerHTML = '<div class="error">Nothing currently playing</div>';
+    }
+  } catch (error) {
+    console.error('Currently playing error:', error);
+    document.getElementById('currentlyPlayingContent').innerHTML = '<div class="error">Failed to get currently playing track</div>';
+  }
+}
+
+// Display currently playing
+function displayCurrentlyPlaying(currentlyPlaying) {
+  const content = document.getElementById('currentlyPlayingContent');
+  const track = currentlyPlaying.item;
+  
+  const html = `
+    <div class="track-item">
+      <img src="${track.album.images[0]?.url || '/placeholder-album.png'}" 
+           alt="${track.name}" class="track-image">
+      <div class="track-info">
+        <div class="track-name">${track.name}</div>
+        <div class="track-artist">${track.artists.map(a => a.name).join(', ')}</div>
+      </div>
+      <div style="color: #1db954; font-size: 0.9rem;">
+        ${Math.floor(track.duration_ms / 60000)}:${String(Math.floor((track.duration_ms % 60000) / 1000)).padStart(2, '0')}
+      </div>
+    </div>
+  `;
+  
+  content.innerHTML = html;
+}
+
+// Logout
+async function logoutSpotify() {
+  if (!currentUserId) return;
+  
+  try {
+    await fetch(`/api/spotify/user/${currentUserId}/logout`, { method: 'POST' });
+    showUnauthenticatedState();
+    currentUserId = null;
+    currentUserProfile = null;
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+}
+
+// Initialize dashboard
+document.addEventListener('DOMContentLoaded', function() {
+  checkAuthStatus();
+});
+</script>
+</body>
+</html>

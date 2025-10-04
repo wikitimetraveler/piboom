@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ouija Board - Big Wave Dave's Music Box</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+<link rel="stylesheet" href="/styles.css"/>
+<style>
+  /* Ouija Board Theme */
+  body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #00ff41;
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Ouija Board Container */
+  .ouija-container {
+    background: linear-gradient(135deg, #2d1b69 0%, #11052c 50%, #000000 100%);
+    border: 3px solid #ff6b35;
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem auto;
+    box-shadow: 
+      0 0 30px #ff6b35,
+      inset 0 0 30px rgba(255, 107, 53, 0.1);
+    position: relative;
+    max-width: 800px;
+  }
+
+  .ouija-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+    border-radius: 20px;
+    pointer-events: none;
+  }
+
+  /* Ouija Board Header */
+  .ouija-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ouija-title {
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 
+      0 0 10px #ff6b35,
+      0 0 20px #ff6b35,
+      0 0 30px #ff6b35;
+    color: #ff6b35;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+  }
+
+  .ouija-subtitle {
+    font-size: 1.2rem;
+    color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
+    margin-bottom: 1rem;
+  }
+
+  .houdini-intro {
+    color: #ffff00;
+    text-shadow: 0 0 8px #ffff00;
+    font-style: italic;
+    margin-bottom: 2rem;
+  }
+
+  /* Ouija Board Grid */
+  .ouija-board {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #00ff41;
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: 
+      0 0 20px #00ff41,
+      inset 0 0 20px rgba(0, 255, 65, 0.1);
+    position: relative;
+  }
+
+  .ouija-letters {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .ouija-letter {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ff41;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ouija-letter:hover {
+    border-color: #ff6b35;
+    color: #ff6b35;
+    text-shadow: 0 0 15px #ff6b35;
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #ff6b35;
+  }
+
+  .ouija-letter.materializing {
+    animation: materializeLetter 2s ease-in-out;
+  }
+
+  .ouija-letter.visible {
+    border-color: #ffff00;
+    color: #ffff00;
+    text-shadow: 0 0 15px #ffff00;
+    box-shadow: 0 0 20px #ffff00;
+  }
+
+  @keyframes materializeLetter {
+    0% {
+      opacity: 0;
+      transform: scale(0.5) rotateY(180deg);
+      border-color: transparent;
+      text-shadow: none;
+    }
+    50% {
+      opacity: 0.7;
+      transform: scale(1.1) rotateY(90deg);
+      border-color: #ff6b35;
+      text-shadow: 0 0 10px #ff6b35;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotateY(0deg);
+      border-color: #ffff00;
+      text-shadow: 0 0 15px #ffff00;
+    }
+  }
+
+  /* Numbers Row */
+  .ouija-numbers {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 0.3rem;
+    margin-bottom: 2rem;
+  }
+
+  .ouija-number {
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid #00ff41;
+    border-radius: 6px;
+    padding: 0.5rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #00ff41;
+    text-shadow: 0 0 8px #00ff41;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ouija-number:hover {
+    border-color: #ff6b35;
+    color: #ff6b35;
+    text-shadow: 0 0 12px #ff6b35;
+    transform: scale(1.05);
+  }
+
+  /* Special Words */
+  .ouija-words {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .ouija-word {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #ff6b35;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ff6b35;
+    text-shadow: 0 0 10px #ff6b35;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ouija-word:hover {
+    border-color: #ffff00;
+    color: #ffff00;
+    text-shadow: 0 0 15px #ffff00;
+    transform: scale(1.05);
+  }
+
+  /* Message Area */
+  .message-area {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00ff41;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    min-height: 100px;
+    position: relative;
+  }
+
+  .message-display {
+    color: #ffff00;
+    text-shadow: 0 0 10px #ffff00;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .message-display.typing {
+    animation: typewriter 0.5s ease-in-out;
+  }
+
+  @keyframes typewriter {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.8; }
+  }
+
+  /* Controls */
+  .ouija-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+  }
+
+  .ouija-btn {
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    border: 2px solid #ff6b35;
+    border-radius: 25px;
+    color: #000;
+    padding: 0.75rem 1.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.3);
+  }
+
+  .ouija-btn:hover {
+    background: linear-gradient(135deg, #ffff00, #ff6b35);
+    border-color: #ffff00;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 255, 0, 0.4);
+  }
+
+  .ouija-btn:active {
+    transform: translateY(0);
+  }
+
+  .ouija-btn.secondary {
+    background: linear-gradient(135deg, #00ff41, #00cc33);
+    border-color: #00ff41;
+  }
+
+  .ouija-btn.secondary:hover {
+    background: linear-gradient(135deg, #ffff00, #00ff41);
+    border-color: #ffff00;
+  }
+
+  /* Question Input */
+  .question-input {
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00ff41;
+    border-radius: 10px;
+    padding: 1rem;
+    color: #fff;
+    font-size: 1.1rem;
+    width: 100%;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 5px #00ff41;
+    box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
+  }
+
+  .question-input:focus {
+    border-color: #ff6b35;
+    box-shadow: 
+      0 0 20px rgba(255, 107, 53, 0.3),
+      inset 0 0 10px rgba(255, 107, 53, 0.1);
+    outline: none;
+  }
+
+  .question-input::placeholder {
+    color: #666;
+    text-shadow: none;
+  }
+
+  /* Houdini Spirit */
+  .houdini-spirit {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 3rem;
+    color: #ffff00;
+    text-shadow: 0 0 20px #ffff00;
+    animation: floatSpirit 4s ease-in-out infinite;
+    z-index: 3;
+  }
+
+  @keyframes floatSpirit {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+  }
+
+  /* Floating Elements */
+  .floating-elements {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .spirit-orb {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #ffff00;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #ffff00;
+    animation: floatOrb 8s linear infinite;
+    opacity: 0;
+  }
+
+  .spirit-orb:nth-child(1) { left: 10%; animation-delay: 0s; }
+  .spirit-orb:nth-child(2) { left: 30%; animation-delay: 2s; }
+  .spirit-orb:nth-child(3) { left: 50%; animation-delay: 4s; }
+  .spirit-orb:nth-child(4) { left: 70%; animation-delay: 6s; }
+  .spirit-orb:nth-child(5) { left: 90%; animation-delay: 8s; }
+
+  @keyframes floatOrb {
+    0% {
+      transform: translateY(100vh) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(90vh) scale(1);
+    }
+    90% {
+      opacity: 1;
+      transform: translateY(10vh) scale(1);
+    }
+    100% {
+      transform: translateY(0) scale(0);
+      opacity: 0;
+    }
+  }
+
+  /* Navbar Ouija Style */
+  .navbar-ouija {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%) !important;
+    backdrop-filter: blur(20px);
+    border-bottom: 2px solid #ff6b35;
+    box-shadow: 0 0 20px #ff6b35;
+  }
+
+  .navbar-brand-ouija {
+    color: #ff6b35 !important;
+    text-shadow: 0 0 10px #ff6b35;
+    font-weight: bold;
+  }
+
+  .nav-link-ouija {
+    color: #00ff41 !important;
+    text-shadow: 0 0 5px #00ff41;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link-ouija:hover {
+    color: #ffff00 !important;
+    text-shadow: 0 0 10px #ffff00;
+    transform: translateY(-2px);
+  }
+
+  /* Footer Ouija */
+  .footer-ouija {
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #1a1a2e);
+    border-top: 2px solid #ff6b35;
+    color: #ff6b35;
+    text-shadow: 0 0 5px #ff6b35;
+    box-shadow: 0 0 20px #ff6b35;
+  }
+</style>
+</head>
+<body>
+<div class="floating-elements">
+  <div class="spirit-orb"></div>
+  <div class="spirit-orb"></div>
+  <div class="spirit-orb"></div>
+  <div class="spirit-orb"></div>
+  <div class="spirit-orb"></div>
+</div>
+
+<div class="houdini-spirit">👻</div>
+
+<nav class="navbar navbar-expand-lg navbar-dark navbar-ouija shadow-lg">
+  <div class="container">
+    <a class="navbar-brand navbar-brand-ouija" href="#"><i class="bi-magic mr-1"></i>Big Wave Dave's Ouija Board</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/"><i class="bi-house"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/music-research.html"><i class="bi-search"></i> Music Research</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/player.html"><i class="bi-volume-up"></i> Player</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/assistant.html"><i class="bi-robot"></i> Assistant</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/blacklight.html"><i class="bi-lightning"></i> Black Light</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/ouija-board.html"><i class="bi-magic"></i> Ouija Board</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/spotify-dashboard.html"><i class="bi-spotify"></i> Spotify</a></li>
+        <li class="nav-item"><a class="nav-link nav-link-ouija" href="/debug.html"><i class="bi-bug"></i> Debug</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container">
+  <div class="ouija-container">
+    <div class="ouija-header">
+      <h1 class="ouija-title">Ouija Board</h1>
+      <p class="ouija-subtitle">Communicate with Houdini, the Spirit of Music</p>
+      <p class="houdini-intro">"Ask me anything about music, and I shall reveal the truth through the ancient art of spirit communication..."</p>
+    </div>
+
+    <!-- Question Input -->
+    <div class="mb-4">
+      <input id="questionInput" class="question-input" placeholder="Ask Houdini a question about music..." onkeypress="handleQuestionKeypress(event)">
+    </div>
+
+    <!-- Ouija Board -->
+    <div class="ouija-board">
+      <!-- Letters -->
+      <div class="ouija-letters" id="ouijaLetters">
+        <!-- Letters will be populated by JavaScript -->
+      </div>
+
+      <!-- Numbers -->
+      <div class="ouija-numbers" id="ouijaNumbers">
+        <!-- Numbers will be populated by JavaScript -->
+      </div>
+
+      <!-- Special Words -->
+      <div class="ouija-words" id="ouijaWords">
+        <!-- Words will be populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Message Area -->
+    <div class="message-area">
+      <div id="messageDisplay" class="message-display">
+        Place your fingers on the planchette and ask a question...
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="ouija-controls">
+      <button class="ouija-btn" onclick="askHoudini()">
+        <i class="bi-magic mr-1"></i> Ask Houdini
+      </button>
+      <button class="ouija-btn secondary" onclick="clearBoard()">
+        <i class="bi-arrow-clockwise mr-1"></i> Clear Board
+      </button>
+      <button class="ouija-btn secondary" onclick="showHistory()">
+        <i class="bi-clock-history mr-1"></i> History
+      </button>
+    </div>
+  </div>
+</main>
+
+<footer class="footer footer-ouija">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>David E Lane</strong> — Ouija Board — <span id="dt"></span> — All Rights Reserved
+    </div>
+    <div class="footer-quote mt-2" style="color: #ffff00; text-shadow: 0 0 10px #ffff00;">
+      🔮 "The spirits of music shall guide your path" 🔮
+    </div>
+  </div>
+</footer>
+
+<script src="/scripts.js"></script>
+<script>
+document.getElementById('dt').textContent = new Date().toLocaleDateString();
+
+// Ouija Board Configuration
+const ouijaLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+const ouijaNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+const ouijaWords = ['YES', 'NO', 'GOODBYE', 'HELLO'];
+
+let currentMessage = '';
+let messageHistory = [];
+let isAnimating = false;
+
+// Initialize Ouija Board
+function initializeOuijaBoard() {
+  console.log('🔮 Initializing Ouija Board...');
+  
+  // Populate letters
+  const lettersDiv = document.getElementById('ouijaLetters');
+  lettersDiv.innerHTML = '';
+  ouijaLetters.forEach(letter => {
+    const letterDiv = document.createElement('div');
+    letterDiv.className = 'ouija-letter';
+    letterDiv.textContent = letter;
+    letterDiv.onclick = () => selectLetter(letter);
+    lettersDiv.appendChild(letterDiv);
+  });
+
+  // Populate numbers
+  const numbersDiv = document.getElementById('ouijaNumbers');
+  numbersDiv.innerHTML = '';
+  ouijaNumbers.forEach(number => {
+    const numberDiv = document.createElement('div');
+    numberDiv.className = 'ouija-number';
+    numberDiv.textContent = number;
+    numberDiv.onclick = () => selectNumber(number);
+    numbersDiv.appendChild(numberDiv);
+  });
+
+  // Populate words
+  const wordsDiv = document.getElementById('ouijaWords');
+  wordsDiv.innerHTML = '';
+  ouijaWords.forEach(word => {
+    const wordDiv = document.createElement('div');
+    wordDiv.className = 'ouija-word';
+    wordDiv.textContent = word;
+    wordDiv.onclick = () => selectWord(word);
+    wordsDiv.appendChild(wordDiv);
+  });
+
+  console.log('🔮 Ouija Board initialized');
+}
+
+// Handle question input keypress
+function handleQuestionKeypress(event) {
+  if (event.key === 'Enter') {
+    askHoudini();
+  }
+}
+
+// Ask Houdini a question
+async function askHoudini() {
+  const questionInput = document.getElementById('questionInput');
+  const question = questionInput.value.trim();
+  
+  if (!question) {
+    showMessage('Please ask a question first...', 'warning');
+    return;
+  }
+
+  if (isAnimating) {
+    showMessage('Houdini is already responding...', 'info');
+    return;
+  }
+
+  console.log('🔮 Asking Houdini:', question);
+  
+  // Clear previous message
+  clearBoard();
+  
+  // Show initial message
+  showMessage('Houdini is consulting the spirits...', 'info');
+  
+  try {
+    // Call the API
+    const response = await fetch('/api/ouija-board', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        question: question
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('🔮 Houdini Response:', data);
+
+    if (data.success && data.answer) {
+      await materializeMessage(data.answer);
+      messageHistory.push({ question, answer: data.answer, timestamp: new Date() });
+    } else {
+      throw new Error(data.error || 'Houdini response failed');
+    }
+
+  } catch (error) {
+    console.error('❌ Houdini Error:', error);
+    
+    // Show mock response
+    const mockAnswer = generateMockAnswer(question);
+    await materializeMessage(mockAnswer);
+    messageHistory.push({ question, answer: mockAnswer, timestamp: new Date() });
+  }
+}
+
+// Materialize message letter by letter
+async function materializeMessage(message) {
+  console.log('🔮 Materializing message:', message);
+  
+  isAnimating = true;
+  currentMessage = '';
+  
+  // Clear message display
+  const messageDisplay = document.getElementById('messageDisplay');
+  messageDisplay.innerHTML = '';
+  
+  // Process each character
+  for (let i = 0; i < message.length; i++) {
+    const char = message[i];
+    
+    if (char === ' ') {
+      currentMessage += ' ';
+      messageDisplay.innerHTML = currentMessage + '<span class="cursor">|</span>';
+      await sleep(100);
+    } else if (ouijaLetters.includes(char.toUpperCase())) {
+      // Find and highlight the letter
+      const letterElement = Array.from(document.querySelectorAll('.ouija-letter'))
+        .find(el => el.textContent === char.toUpperCase());
+      
+      if (letterElement) {
+        letterElement.classList.add('materializing');
+        await sleep(800);
+        letterElement.classList.remove('materializing');
+        letterElement.classList.add('visible');
+        await sleep(300);
+        letterElement.classList.remove('visible');
+      }
+      
+      currentMessage += char;
+      messageDisplay.innerHTML = currentMessage + '<span class="cursor">|</span>';
+      await sleep(200);
+    } else if (ouijaNumbers.includes(char)) {
+      // Find and highlight the number
+      const numberElement = Array.from(document.querySelectorAll('.ouija-number'))
+        .find(el => el.textContent === char);
+      
+      if (numberElement) {
+        numberElement.classList.add('materializing');
+        await sleep(600);
+        numberElement.classList.remove('materializing');
+        numberElement.classList.add('visible');
+        await sleep(200);
+        numberElement.classList.remove('visible');
+      }
+      
+      currentMessage += char;
+      messageDisplay.innerHTML = currentMessage + '<span class="cursor">|</span>';
+      await sleep(150);
+    } else {
+      // Regular character
+      currentMessage += char;
+      messageDisplay.innerHTML = currentMessage + '<span class="cursor">|</span>';
+      await sleep(100);
+    }
+  }
+  
+  // Remove cursor and show final message
+  messageDisplay.innerHTML = currentMessage;
+  messageDisplay.classList.add('typing');
+  setTimeout(() => {
+    messageDisplay.classList.remove('typing');
+  }, 1000);
+  
+  isAnimating = false;
+  console.log('🔮 Message materialization complete');
+}
+
+// Generate mock answer for testing
+function generateMockAnswer(question) {
+  const lowerQuestion = question.toLowerCase();
+  
+  const mockAnswers = {
+    'pink floyd': 'THE DARK SIDE OF THE MOON IS MASTERPIECE',
+    'progressive rock': 'YES COMPLEX TIME SIGNATURES DEFINE PROG',
+    'best band': 'LED ZEPPELIN RULES THE ROCK KINGDOM',
+    'music genre': 'ALL GENRES HAVE SPIRITUAL ESSENCE',
+    'album': 'CONCEPT ALBUMS TELL STORIES',
+    'guitar': 'DAVID GILMOUR IS MASTER OF MELODY',
+    'drum': 'JOHN BONHAM BEATS STILL ECHO',
+    'bass': 'PAUL MCCARTNEY LAYS FOUNDATION',
+    'voice': 'ROBERT PLANT VOICE IS LEGENDARY',
+    'concert': 'WOODSTOCK WAS SPIRITUAL GATHERING',
+    'song': 'STAIRWAY TO HEAVEN IS DIVINE',
+    'lyrics': 'POETRY AND MUSIC ARE ONE',
+    'rhythm': 'RHYTHM IS HEARTBEAT OF MUSIC',
+    'melody': 'MELODY SPEAKS TO SOUL',
+    'harmony': 'HARMONY CREATES BEAUTY',
+    'beat': 'BEAT DRIVES THE SPIRIT',
+    'sound': 'SOUND VIBRATIONS HEAL',
+    'energy': 'MUSIC ENERGY IS INFINITE',
+    'feeling': 'MUSIC TOUCHES DEEP FEELINGS',
+    'emotion': 'EMOTIONS FLOW THROUGH SOUND'
+  };
+  
+  // Find best matching answer
+  for (const [key, answer] of Object.entries(mockAnswers)) {
+    if (lowerQuestion.includes(key)) {
+      return answer;
+    }
+  }
+  
+  // Default answers
+  const defaultAnswers = [
+    'MUSIC IS LANGUAGE OF SOUL',
+    'SPIRITS OF MUSIC GUIDE YOU',
+    'LISTEN WITH YOUR HEART',
+    'SOUND WAVES CARRY TRUTH',
+    'MUSIC TRANSCENDS ALL BOUNDARIES',
+    'EVERY NOTE HAS MEANING',
+    'RHYTHM CONNECTS ALL BEINGS',
+    'MELODY SPEAKS UNIVERSAL TRUTH'
+  ];
+  
+  return defaultAnswers[Math.floor(Math.random() * defaultAnswers.length)];
+}
+
+// Show message
+function showMessage(message, type = 'info') {
+  const messageDisplay = document.getElementById('messageDisplay');
+  messageDisplay.innerHTML = message;
+  
+  const colors = {
+    info: '#00ff41',
+    warning: '#ff6b35',
+    error: '#ff0000',
+    success: '#ffff00'
+  };
+  
+  messageDisplay.style.color = colors[type] || colors.info;
+  messageDisplay.style.textShadow = `0 0 10px ${colors[type] || colors.info}`;
+}
+
+// Clear board
+function clearBoard() {
+  currentMessage = '';
+  const messageDisplay = document.getElementById('messageDisplay');
+  messageDisplay.innerHTML = 'Place your fingers on the planchette and ask a question...';
+  messageDisplay.style.color = '#ffff00';
+  messageDisplay.style.textShadow = '0 0 10px #ffff00';
+  
+  // Clear all letter highlights
+  document.querySelectorAll('.ouija-letter, .ouija-number').forEach(el => {
+    el.classList.remove('visible', 'materializing');
+  });
+  
+  console.log('🔮 Board cleared');
+}
+
+// Show history
+function showHistory() {
+  if (messageHistory.length === 0) {
+    showMessage('No previous communications with Houdini...', 'info');
+    return;
+  }
+  
+  let historyText = 'PREVIOUS COMMUNICATIONS:\n\n';
+  messageHistory.slice(-5).forEach((item, index) => {
+    historyText += `${index + 1}. Q: ${item.question}\nA: ${item.answer}\n\n`;
+  });
+  
+  showMessage(historyText, 'info');
+}
+
+// Select letter
+function selectLetter(letter) {
+  console.log('🔮 Letter selected:', letter);
+  currentMessage += letter;
+  updateMessageDisplay();
+}
+
+// Select number
+function selectNumber(number) {
+  console.log('🔮 Number selected:', number);
+  currentMessage += number;
+  updateMessageDisplay();
+}
+
+// Select word
+function selectWord(word) {
+  console.log('🔮 Word selected:', word);
+  currentMessage += word + ' ';
+  updateMessageDisplay();
+}
+
+// Update message display
+function updateMessageDisplay() {
+  const messageDisplay = document.getElementById('messageDisplay');
+  messageDisplay.innerHTML = currentMessage || 'Place your fingers on the planchette and ask a question...';
+}
+
+// Sleep function
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🔮 Page loaded, initializing Ouija Board...');
+  initializeOuijaBoard();
+});
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

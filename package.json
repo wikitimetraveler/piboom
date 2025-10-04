@@ -26,7 +26,8 @@
     "socket.io": "^4.7.5",
     "node-record-lpcm16": "^1.0.1",
     "@google-cloud/speech": "^6.0.0",
-    "espeak": "^0.0.3"
+    "espeak": "^0.0.3",
+    "spotify-web-api-node": "^5.0.2"
   },
   "engines": {
     "node": ">=18.0.0"
