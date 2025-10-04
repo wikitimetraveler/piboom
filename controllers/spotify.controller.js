@@ -4,7 +4,9 @@ import SpotifyWebApi from 'spotify-web-api-node';
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  redirectUri: process.env.SPOTIFY_REDIRECT_URI || 'https://www.thelanefamily.us/callback'
+  redirectUri: process.env.NODE_ENV === 'production' 
+    ? process.env.SPOTIFY_REDIRECT_URI || 'https://www.thelanefamily.us/callback'
+    : 'http://localhost:3000/api/spotify/callback'
 });
 
 // Store user tokens (in production, use a proper database)
@@ -88,19 +90,8 @@ export const handleCallback = async (req, res) => {
     
     console.log('🎵 User authenticated:', userProfile.body.display_name || userProfile.body.id);
     
-    // Redirect to success page or return success response
-    res.json({
-      success: true,
-      user: {
-        id: userId,
-        display_name: userProfile.body.display_name,
-        email: userProfile.body.email,
-        country: userProfile.body.country,
-        followers: userProfile.body.followers?.total || 0
-      },
-      message: 'Spotify authentication successful',
-      redirectUrl: '/spotify-success.html'
-    });
+    // Redirect to dashboard with user ID
+    res.redirect(`/spotify-dashboard.html?userId=${userId}&connected=true`);
     
   } catch (error) {
     console.error('❌ Spotify Callback Error:', error);

@@ -293,18 +293,32 @@ let currentUserProfile = null;
 // Check if user is authenticated
 async function checkAuthStatus() {
   try {
-    // For demo purposes, we'll use a mock user ID
-    // In a real app, you'd get this from the OAuth flow
-    const mockUserId = 'demo-user-123';
+    // Check if we have a user ID from URL parameters or localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const userIdFromUrl = urlParams.get('userId');
+    const connectedFromUrl = urlParams.get('connected');
+    const userIdFromStorage = localStorage.getItem('spotifyUserId');
     
-    const response = await fetch(`/api/spotify/user/${mockUserId}/auth-status`);
-    const data = await response.json();
+    const userId = userIdFromUrl || userIdFromStorage;
     
-    if (data.success && data.authenticated) {
-      currentUserId = mockUserId;
-      currentUserProfile = data.user;
-      showAuthenticatedState();
-      loadUserData();
+    if (userId) {
+      // If just connected, show success message
+      if (connectedFromUrl === 'true') {
+        showSuccessMessage('Spotify connected successfully!');
+      }
+      
+      const response = await fetch(`/api/spotify/user/${userId}/auth-status`);
+      const data = await response.json();
+      
+      if (data.success && data.authenticated) {
+        currentUserId = userId;
+        currentUserProfile = data.user;
+        localStorage.setItem('spotifyUserId', userId);
+        showAuthenticatedState();
+        loadUserData();
+      } else {
+        showUnauthenticatedState();
+      }
     } else {
       showUnauthenticatedState();
     }
@@ -312,6 +326,35 @@ async function checkAuthStatus() {
     console.log('Auth check failed:', error);
     showUnauthenticatedState();
   }
+}
+
+// Show success message
+function showSuccessMessage(message) {
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'alert alert-success';
+  messageDiv.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    background: #1db954;
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  `;
+  messageDiv.innerHTML = `
+    <i class="bi-check-circle"></i> ${message}
+    <button type="button" class="btn-close" onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: white; font-size: 1.2rem; cursor: pointer;">&times;</button>
+  `;
+  document.body.appendChild(messageDiv);
+  
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    if (messageDiv.parentElement) {
+      messageDiv.remove();
+    }
+  }, 5000);
 }
 
 // Show unauthenticated state
