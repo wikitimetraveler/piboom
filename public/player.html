@@ -143,9 +143,12 @@
               <button id="voiceFeedback" class="btn btn-outline-info mr-2">
                 <i class="bi-volume-up"></i> Toggle Feedback
               </button>
-                             <button id="voiceTest" class="btn btn-outline-secondary">
+              <button id="voiceTest" class="btn btn-outline-secondary">
                  <i class="bi-chat"></i> Test Voice
-               </button>
+              </button>
+              <button id="stopSpeakingBtn" class="btn btn-outline-danger" onclick="stopSpeaking()">
+                 <i class="bi-stop-circle"></i> Stop Speech
+              </button>
                <button id="voiceDebug" class="btn btn-outline-warning ml-2">
                  <i class="bi-bug"></i> Debug Voice
                </button>
@@ -1357,6 +1360,64 @@ function isValidVoiceCommand(transcript) {
   return true;
 }
 
+// Backend Google TTS service
+async function speakViaBackend(text) {
+  try {
+    console.log('🔊 Using backend Google TTS for:', text);
+    
+    const response = await fetch('/api/voice/speak', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: text })
+    });
+    
+    const result = await response.json();
+    console.log('🔊 Backend TTS result:', result);
+    
+    if (result.success) {
+      console.log('🔊 Backend TTS successful');
+    } else {
+      console.error('🔊 Backend TTS failed:', result.message);
+      // Fallback to browser TTS
+      fallbackToBrowserTTS(text);
+    }
+  } catch (error) {
+    console.error('🔊 Backend TTS error:', error);
+    // Fallback to browser TTS
+    fallbackToBrowserTTS(text);
+  }
+}
+
+// Fallback to browser TTS if backend fails
+function fallbackToBrowserTTS(text) {
+  console.log('🔊 Falling back to browser TTS');
+  
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.volume = 0.8;
+    
+    utterance.onend = () => {
+      console.log('🔊 Browser TTS ended');
+    };
+    
+    utterance.onerror = (event) => {
+      console.error('🔊 Browser TTS error:', event.error);
+    };
+    
+    window.speechSynthesis.speak(utterance);
+    console.log('🔊 Browser TTS started');
+  } else {
+    console.error('🔊 No TTS available - neither backend nor browser');
+  }
+}
+
 // Function to speak text using browser's built-in speech synthesis or backend
 function speakText(text) {
   try {
@@ -1366,43 +1427,41 @@ function speakText(text) {
       return;
     }
     
-    if (useBackendVoice) {
-      // Use backend text-to-speech (Pi mode)
-      console.log('🎤 Using backend text-to-speech:', text);
-      fetch('/api/voice/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      }).catch(error => {
-        console.error('Backend speak error:', error);
-        // Fallback to console log
-        console.log('🎤 Voice feedback (fallback):', text);
-      });
-    } else {
-      // Use browser's built-in speech synthesis (Windows/Desktop)
-      if ('speechSynthesis' in window) {
-        // Cancel any ongoing speech
-        window.speechSynthesis.cancel();
-        
-        // Create a new speech utterance
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.9;
-        utterance.pitch = 1.0;
-        utterance.volume = 0.8;
-        
-        // Speak the text
-        window.speechSynthesis.speak(utterance);
-        console.log('🎤 Browser speech synthesis:', text);
-      } else {
-        console.log('🎤 Speech synthesis not available, using console fallback:', text);
-      }
-    }
+    // Always use backend Google TTS first
+    speakViaBackend(text);
   } catch (error) {
     console.error('Speech synthesis error:', error);
     console.log('🎤 Voice feedback fallback:', text);
   }
 }
+
+// Stop speaking - AGGRESSIVE STOP
+window.stopSpeaking = function() {
+  console.log('🛑 Stop Speaking button clicked');
+  
+  // Force stop everything immediately
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.cancel(); // Double cancel to be sure
+    console.log('🛑 Browser speech synthesis cancelled');
+  }
+  
+  // Stop backend TTS (don't wait for response)
+  fetch('/api/voice/stop-speaking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }).then(response => {
+    if (response.ok) {
+      console.log('🛑 Backend speech stopped successfully');
+    } else {
+      console.log('🛑 Backend speech stop failed:', response.status);
+    }
+  }).catch(error => {
+    console.log('🛑 Backend speech stop error:', error);
+  });
+  
+  console.log('🛑 Stop Speaking completed');
+};
 
 // Handle voice commands from server - improved and working
 async function handleVoiceCommand(command) {

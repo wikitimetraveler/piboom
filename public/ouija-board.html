@@ -8,27 +8,113 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/styles.css"/>
 <style>
-  /* Ouija Board Theme */
+  /* Ouija Board Theme - Dark Occult Fortune Teller */
   body {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    color: #00ff41;
-    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #000000 100%);
+    background-image: 
+      linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, transparent 50%, rgba(255, 20, 147, 0.05) 100%),
+      linear-gradient(0deg, rgba(255, 0, 0, 0.03) 0%, transparent 30%, rgba(255, 165, 0, 0.03) 100%),
+      radial-gradient(ellipse at 30% 20%, rgba(255, 0, 0, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 80%, rgba(255, 20, 147, 0.06) 0%, transparent 60%);
+    background-size: 200px 200px, 300px 300px, 600px 400px, 500px 350px;
+    color: #FFD700;
+    font-family: 'Comic Sans MS', 'Arial Black', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    position: relative;
+    animation: zonkersBackground 6s ease-in-out infinite alternate;
   }
 
-  /* Ouija Board Container */
+  @keyframes zonkersBackground {
+    0% { 
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #000000 100%);
+    }
+    100% { 
+      background: linear-gradient(45deg, #2d2d2d 0%, #1a1a1a 25%, #000000 50%, #1a1a1a 75%, #2d2d2d 100%);
+    }
+  }
+
+  /* Floating Zonkers Bubbles */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23FF0000' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='60' fill='%23FF4444' opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='40' fill='%23FF6666' opacity='0.8'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23FFFF00' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='60' fill='%23FFFF44' opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='40' fill='%23FFFF66' opacity='0.8'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%2300FFFF' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='60' fill='%2344FFFF' opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='40' fill='%2366FFFF' opacity='0.8'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23FF1493' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='60' fill='%23FF4493' opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='40' fill='%23FF6693' opacity='0.8'/%3E%3C/svg%3E");
+    background-size: 150px 150px, 120px 120px, 180px 180px, 140px 140px;
+    background-position: 15% 25%, 80% 15%, 25% 75%, 85% 80%;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 1;
+    animation: floatBubbles 10s ease-in-out infinite;
+  }
+
+  @keyframes floatBubbles {
+    0%, 100% { 
+      transform: translateY(0px) rotate(0deg) scale(1);
+      opacity: 0.4;
+    }
+    20% { 
+      transform: translateY(-25px) rotate(8deg) scale(1.2);
+      opacity: 0.6;
+    }
+    40% { 
+      transform: translateY(-15px) rotate(-5deg) scale(0.8);
+      opacity: 0.5;
+    }
+    60% { 
+      transform: translateY(-30px) rotate(6deg) scale(1.15);
+      opacity: 0.7;
+    }
+    80% { 
+      transform: translateY(-10px) rotate(-4deg) scale(0.9);
+      opacity: 0.6;
+    }
+  }
+
+  /* Ouija Board Container - Zonkers Style */
   .ouija-container {
-    background: linear-gradient(135deg, #2d1b69 0%, #11052c 50%, #000000 100%);
-    border: 3px solid #ff6b35;
-    border-radius: 20px;
+    background: linear-gradient(135deg, #FFFF00 0%, #FFD700 25%, #FFA500 50%, #FF8C00 75%, #FF6347 100%);
+    background-image: 
+      repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,0,0,.1) 2px, rgba(255,0,0,.1) 4px),
+      radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(255, 20, 147, 0.2) 0%, transparent 50%);
+    border: 6px solid #FF0000;
+    border-radius: 25px;
     padding: 2rem;
     margin: 2rem auto;
     box-shadow: 
-      0 0 30px #ff6b35,
-      inset 0 0 30px rgba(255, 107, 53, 0.1);
+      0 0 25px rgba(255, 0, 0, 0.5),
+      0 0 50px rgba(255, 215, 0, 0.3),
+      0 0 75px rgba(255, 20, 147, 0.2),
+      inset 0 2px 8px rgba(255, 255, 255, 0.3);
     position: relative;
     max-width: 800px;
+    z-index: 2;
+    animation: zonkersPulse 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes zonkersPulse {
+    0% { 
+      box-shadow: 
+        0 0 25px rgba(255, 0, 0, 0.5),
+        0 0 50px rgba(255, 215, 0, 0.3),
+        0 0 75px rgba(255, 20, 147, 0.2),
+        inset 0 2px 8px rgba(255, 255, 255, 0.3);
+    }
+    100% { 
+      box-shadow: 
+        0 0 35px rgba(255, 20, 147, 0.6),
+        0 0 60px rgba(255, 0, 0, 0.4),
+        0 0 85px rgba(255, 215, 0, 0.3),
+        inset 0 2px 8px rgba(255, 255, 255, 0.4);
+    }
   }
 
   .ouija-container::before {
@@ -39,10 +125,10 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 20% 20%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(0, 255, 65, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-    border-radius: 20px;
+      radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 20, 147, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+    border-radius: 25px;
     pointer-events: none;
   }
 
@@ -55,43 +141,325 @@
   }
 
   .ouija-title {
-    font-size: 3rem;
-    font-weight: bold;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #FF0000;
     text-shadow: 
-      0 0 10px #ff6b35,
-      0 0 20px #ff6b35,
-      0 0 30px #ff6b35;
-    color: #ff6b35;
+      3px 3px 0px #FFD700,
+      6px 6px 0px #FF1493,
+      9px 9px 0px #FF8C00,
+      12px 12px 20px rgba(0, 0, 0, 0.5);
     margin-bottom: 0.5rem;
+    font-family: 'Comic Sans MS', 'Arial Black', sans-serif;
+    position: relative;
+    animation: zonkersTitle 2s ease-in-out infinite alternate;
     text-transform: uppercase;
-    letter-spacing: 0.3em;
+    letter-spacing: 3px;
+  }
+
+  @keyframes zonkersTitle {
+    0% { 
+      text-shadow: 
+        3px 3px 0px #FFD700,
+        6px 6px 0px #FF1493,
+        9px 9px 0px #FF8C00,
+        12px 12px 20px rgba(0, 0, 0, 0.5);
+    }
+    100% { 
+      text-shadow: 
+        3px 3px 0px #FF1493,
+        6px 6px 0px #FFD700,
+        9px 9px 0px #FF6347,
+        12px 12px 20px rgba(255, 0, 0, 0.3);
+    }
+  }
+
+  .ouija-title::before {
+    content: '⚡';
+    position: absolute;
+    left: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
+    color: #FFD700;
+    text-shadow: 0 0 10px #FF0000;
+    animation: zonkersSymbol 1.5s ease-in-out infinite alternate;
+  }
+
+  .ouija-title::after {
+    content: '💥';
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
+    color: #FF1493;
+    text-shadow: 0 0 10px #FFD700;
+    animation: zonkersSymbol 1.5s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes zonkersSymbol {
+    0% { 
+      transform: translateY(-50%) scale(1) rotate(0deg);
+    }
+    100% { 
+      transform: translateY(-50%) scale(1.2) rotate(10deg);
+    }
+  }
+
+  @keyframes skullFloat {
+    0%, 100% { 
+      transform: translateY(-50%) rotate(0deg);
+      filter: hue-rotate(0deg);
+    }
+    33% { 
+      transform: translateY(-60%) rotate(-10deg);
+      filter: hue-rotate(120deg);
+    }
+    66% { 
+      transform: translateY(-40%) rotate(10deg);
+      filter: hue-rotate(240deg);
+    }
   }
 
   .ouija-subtitle {
-    font-size: 1.2rem;
-    color: #00ff41;
-    text-shadow: 0 0 10px #00ff41;
+    font-size: 1.4rem;
+    color: #FF8C00;
+    font-weight: 700;
     margin-bottom: 1rem;
+    text-shadow: 2px 2px 0px #FFD700;
+    animation: zonkersSubtitle 3s ease-in-out infinite alternate;
+  }
+
+  @keyframes zonkersSubtitle {
+    0% { 
+      color: #FF8C00;
+      text-shadow: 2px 2px 0px #FFD700;
+    }
+    100% { 
+      color: #FF1493;
+      text-shadow: 2px 2px 0px #FFFF00;
+    }
   }
 
   .houdini-intro {
-    color: #ffff00;
-    text-shadow: 0 0 8px #ffff00;
+    color: #FF0000;
+    font-weight: 600;
+    text-shadow: 1px 1px 0px #FFD700;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 20, 147, 0.3) 100%);
+    padding: 1rem;
+    border-radius: 15px;
+    border: 3px solid #FFD700;
+    box-shadow: 
+      0 0 15px rgba(255, 215, 0, 0.5),
+      inset 0 0 15px rgba(255, 255, 0, 0.2);
+    animation: zonkersIntro 4s ease-in-out infinite alternate;
     font-style: italic;
     margin-bottom: 2rem;
+    font-weight: 500;
   }
 
-  /* Ouija Board Grid */
+  @keyframes zonkersIntro {
+    0% { 
+      border-color: #FFD700;
+      box-shadow: 
+        0 0 15px rgba(255, 215, 0, 0.5),
+        inset 0 0 15px rgba(255, 255, 0, 0.2);
+    }
+    100% { 
+      border-color: #FF1493;
+      box-shadow: 
+        0 0 20px rgba(255, 20, 147, 0.6),
+        inset 0 0 20px rgba(255, 0, 255, 0.3);
+    }
+  }
+
+  @keyframes titlePulse {
+    0%, 100% { 
+      text-shadow: 
+        0 0 10px rgba(139, 0, 0, 0.8),
+        2px 2px 4px rgba(0,0,0,0.8);
+    }
+    50% { 
+      text-shadow: 
+        0 0 20px rgba(139, 0, 0, 1),
+        0 0 30px rgba(139, 0, 0, 0.5),
+        2px 2px 4px rgba(0,0,0,0.8);
+    }
+  }
+
+  @keyframes introGlow {
+    0%, 100% { 
+      text-shadow: 
+        0 0 6px rgba(220, 20, 60, 0.5),
+        1px 1px 2px rgba(0,0,0,0.5);
+    }
+    50% { 
+      text-shadow: 
+        0 0 12px rgba(220, 20, 60, 0.8),
+        0 0 18px rgba(220, 20, 60, 0.3),
+        1px 1px 2px rgba(0,0,0,0.5);
+    }
+  }
+
+  /* Ouija Board Grid - Zonkers Style */
   .ouija-board {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border: 2px solid #00ff41;
-    border-radius: 15px;
+    background: linear-gradient(135deg, #FFFF00 0%, #FFD700 25%, #FFA500 50%, #FF8C00 75%, #FF6347 100%);
+    background-image: 
+      repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,0,0,.1) 2px, rgba(255,0,0,.1) 4px),
+      radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.2) 0%, transparent 40%),
+      radial-gradient(circle at 80% 80%, rgba(255, 20, 147, 0.2) 0%, transparent 40%);
+    border: 4px solid #FF0000;
+    border-radius: 20px;
     padding: 2rem;
     margin: 2rem 0;
     box-shadow: 
-      0 0 20px #00ff41,
-      inset 0 0 20px rgba(0, 255, 65, 0.1);
+      0 0 20px rgba(255, 0, 0, 0.4),
+      0 0 40px rgba(255, 215, 0, 0.3),
+      inset 0 1px 4px rgba(255, 255, 255, 0.4);
     position: relative;
+    animation: zonkersBoard 5s ease-in-out infinite alternate;
+  }
+
+  @keyframes zonkersBoard {
+    0% { 
+      background: linear-gradient(135deg, #FFFF00 0%, #FFD700 25%, #FFA500 50%, #FF8C00 75%, #FF6347 100%);
+      border-color: #FF0000;
+    }
+    100% { 
+      background: linear-gradient(45deg, #FF6347 0%, #FF8C00 25%, #FFA500 50%, #FFD700 75%, #FFFF00 100%);
+      border-color: #FF1493;
+    }
+  }
+
+  @keyframes boardGlow {
+    0%, 100% { 
+      box-shadow: 
+        0 0 25px rgba(139, 0, 0, 0.4),
+        inset 0 0 15px rgba(139, 0, 0, 0.1),
+        0 4px 16px rgba(0, 0, 0, 0.6);
+    }
+    50% { 
+      box-shadow: 
+        0 0 35px rgba(139, 0, 0, 0.6),
+        0 0 45px rgba(139, 0, 0, 0.2),
+        inset 0 0 15px rgba(139, 0, 0, 0.15),
+        0 4px 16px rgba(0, 0, 0, 0.6);
+    }
+  }
+
+  /* Planchette - Zonkers Style */
+  .planchette {
+    position: absolute;
+    width: 60px;
+    height: 40px;
+    background: linear-gradient(135deg, #FFD700 0%, #FF1493 50%, #FF0000 100%);
+    border: 3px solid #FFFF00;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    box-shadow: 
+      0 0 20px rgba(255, 215, 0, 0.6),
+      0 0 40px rgba(255, 20, 147, 0.4),
+      0 0 60px rgba(255, 0, 0, 0.3),
+      inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    transition: all 1.5s ease-in-out;
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    animation: zonkersPlanchette 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes zonkersPlanchette {
+    0% { 
+      background: linear-gradient(135deg, #FFD700 0%, #FF1493 50%, #FF0000 100%);
+      border-color: #FFFF00;
+      box-shadow: 
+        0 0 20px rgba(255, 215, 0, 0.6),
+        0 0 40px rgba(255, 20, 147, 0.4),
+        0 0 60px rgba(255, 0, 0, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    }
+    100% { 
+      background: linear-gradient(135deg, #FF1493 0%, #FF0000 50%, #FFD700 100%);
+      border-color: #FF1493;
+      box-shadow: 
+        0 0 25px rgba(255, 20, 147, 0.7),
+        0 0 50px rgba(255, 0, 0, 0.5),
+        0 0 75px rgba(255, 215, 0, 0.4),
+        inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  @keyframes planchetteFloat {
+    0%, 100% { 
+      transform: translateY(0px) rotate(0deg);
+      box-shadow: 
+        0 0 15px rgba(139, 0, 0, 0.6),
+        inset 0 0 10px rgba(139, 0, 0, 0.2);
+    }
+    50% { 
+      transform: translateY(-3px) rotate(1deg);
+      box-shadow: 
+        0 0 20px rgba(139, 0, 0, 0.8),
+        0 0 30px rgba(139, 0, 0, 0.3),
+        inset 0 0 10px rgba(139, 0, 0, 0.3);
+    }
+  }
+
+  .planchette::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: #2F1B14;
+    border-radius: 50%;
+    box-shadow: 0 0 4px rgba(47, 27, 20, 0.5);
+  }
+
+  .planchette::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid #2F1B14;
+  }
+
+  @keyframes centerPulse {
+    0%, 100% { 
+      box-shadow: 
+        0 0 8px rgba(139, 0, 0, 0.8),
+        0 0 15px rgba(139, 0, 0, 0.4);
+    }
+    50% { 
+      box-shadow: 
+        0 0 12px rgba(139, 0, 0, 1),
+        0 0 20px rgba(139, 0, 0, 0.6);
+    }
+  }
+
+  .planchette.moving {
+    opacity: 1;
+    animation: planchetteGlow 0.5s ease-in-out;
+  }
+
+  @keyframes planchetteGlow {
+    0%, 100% { 
+      box-shadow: 
+        0 4px 12px rgba(47, 27, 20, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    }
+    50% { 
+      box-shadow: 
+        0 6px 20px rgba(47, 27, 20, 0.5),
+        inset 0 2px 4px rgba(255, 255, 255, 0.6);
+    }
   }
 
   .ouija-letters {
@@ -102,15 +470,17 @@
   }
 
   .ouija-letter {
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #00ff41;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #FFFFFF 0%, #FFFF00 100%);
+    border: 3px solid #FF0000;
+    border-radius: 12px;
     padding: 1rem;
     text-align: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #00ff41;
-    text-shadow: 0 0 10px #00ff41;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #FF0000;
+    text-shadow: 
+      2px 2px 0px #FFD700,
+      4px 4px 0px #FF1493;
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
@@ -118,14 +488,44 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: 'Comic Sans MS', 'Arial Black', sans-serif;
+    animation: zonkersLetter 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes zonkersLetter {
+    0% { 
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFFF00 100%);
+      border-color: #FF0000;
+      transform: scale(1);
+    }
+    100% { 
+      background: linear-gradient(135deg, #FFD700 0%, #FF1493 100%);
+      border-color: #FF1493;
+      transform: scale(1.05);
+    }
   }
 
   .ouija-letter:hover {
-    border-color: #ff6b35;
-    color: #ff6b35;
-    text-shadow: 0 0 15px #ff6b35;
-    transform: scale(1.05);
-    box-shadow: 0 0 20px #ff6b35;
+    border-color: #FFD700;
+    color: #FFD700;
+    text-shadow: 
+      3px 3px 0px #FF0000,
+      6px 6px 0px #FF1493;
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 
+      0 0 15px rgba(255, 215, 0, 0.6),
+      0 0 30px rgba(255, 0, 0, 0.4);
+    background: linear-gradient(135deg, #FFD700 0%, #FF1493 100%);
+    animation: zonkersLetterHover 0.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes zonkersLetterHover {
+    0% { 
+      transform: translateY(-3px) scale(1.1);
+    }
+    100% { 
+      transform: translateY(-5px) scale(1.15);
+    }
   }
 
   .ouija-letter.materializing {
@@ -133,10 +533,32 @@
   }
 
   .ouija-letter.visible {
-    border-color: #ffff00;
-    color: #ffff00;
-    text-shadow: 0 0 15px #ffff00;
-    box-shadow: 0 0 20px #ffff00;
+    border-color: #2F1B14;
+    color: #2F1B14;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 16px rgba(47, 27, 20, 0.4);
+    background: rgba(255, 255, 255, 0.95);
+    font-weight: 900;
+    animation: letterPossession 0.5s ease-in-out;
+  }
+
+  @keyframes letterPossession {
+    0% { 
+      transform: scale(1) rotate(0deg);
+      filter: hue-rotate(0deg);
+    }
+    25% { 
+      transform: scale(1.1) rotate(-2deg);
+      filter: hue-rotate(90deg);
+    }
+    75% { 
+      transform: scale(1.1) rotate(2deg);
+      filter: hue-rotate(270deg);
+    }
+    100% { 
+      transform: scale(1) rotate(0deg);
+      filter: hue-rotate(0deg);
+    }
   }
 
   @keyframes materializeLetter {
@@ -166,6 +588,96 @@
     grid-template-columns: repeat(10, 1fr);
     gap: 0.3rem;
     margin-bottom: 2rem;
+  }
+
+  .ouija-goodbye {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #2F1B14;
+    text-align: center;
+    font-family: 'Georgia', serif;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    letter-spacing: 0.2em;
+    margin-top: 1rem;
+  }
+
+  .ouija-instructions {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #2F1B14;
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 12px rgba(47, 27, 20, 0.2);
+  }
+
+  .instruction-text {
+    color: #2F1B14;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-align: center;
+    font-family: 'Georgia', serif;
+  }
+
+  .instruction-text p {
+    margin-bottom: 0.5rem;
+  }
+
+  .instruction-text strong {
+    color: #8B4513;
+  }
+
+  .instruction-text em {
+    color: #8B4513;
+    font-style: italic;
+  }
+
+  .voice-status {
+    background: rgba(139, 69, 19, 0.1);
+    border: 1px solid #8B4513;
+    border-radius: 5px;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    text-align: center;
+    color: #8B4513;
+    font-size: 0.9rem;
+    animation: voiceStatusPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes voiceStatusPulse {
+    0%, 100% { 
+      opacity: 0.7;
+    }
+    50% { 
+      opacity: 1;
+    }
+  }
+
+  /* Voice Button Styling */
+  .voice-btn {
+    background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+    border: 2px solid #2F1B14;
+    color: #F5F5DC !important;
+  }
+
+  .voice-btn:hover {
+    background: linear-gradient(135deg, #A0522D 0%, #8B4513 100%);
+    border-color: #8B4513;
+    color: #F5F5DC !important;
+  }
+
+  .voice-btn.listening {
+    background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+    border-color: #DC143C;
+    animation: voicePulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes voicePulse {
+    0%, 100% { 
+      box-shadow: 0 0 5px rgba(220, 20, 60, 0.5);
+    }
+    50% { 
+      box-shadow: 0 0 20px rgba(220, 20, 60, 0.8);
+    }
   }
 
   .ouija-number {
@@ -396,39 +908,122 @@
     }
   }
 
-  /* Navbar Ouija Style */
+  /* Navbar Ouija Style - Dark Occult Fortune Teller */
   .navbar-ouija {
-    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9) 0%, rgba(22, 33, 62, 0.9) 100%) !important;
+    background: linear-gradient(135deg, rgba(26, 13, 13, 0.95) 0%, rgba(13, 13, 13, 0.95) 100%) !important;
     backdrop-filter: blur(20px);
-    border-bottom: 2px solid #ff6b35;
-    box-shadow: 0 0 20px #ff6b35;
+    border-bottom: 2px solid #8B0000;
+    box-shadow: 
+      0 0 20px rgba(139, 0, 0, 0.4),
+      0 4px 16px rgba(0, 0, 0, 0.6);
   }
 
   .navbar-brand-ouija {
-    color: #ff6b35 !important;
-    text-shadow: 0 0 10px #ff6b35;
+    color: #8B0000 !important;
+    text-shadow: 
+      0 0 8px rgba(139, 0, 0, 0.6),
+      2px 2px 4px rgba(0,0,0,0.8);
     font-weight: bold;
+    font-family: 'Georgia', serif;
+    animation: brandGlow 3s ease-in-out infinite;
   }
 
   .nav-link-ouija {
-    color: #00ff41 !important;
-    text-shadow: 0 0 5px #00ff41;
+    color: #DC143C !important;
+    text-shadow: 
+      0 0 5px rgba(220, 20, 60, 0.5),
+      1px 1px 2px rgba(0,0,0,0.6);
     transition: all 0.3s ease;
+    font-weight: 500;
   }
 
   .nav-link-ouija:hover {
-    color: #ffff00 !important;
-    text-shadow: 0 0 10px #ffff00;
+    color: #FF4500 !important;
+    text-shadow: 
+      0 0 10px rgba(255, 69, 0, 0.8),
+      2px 2px 4px rgba(0,0,0,0.8);
     transform: translateY(-2px);
   }
 
-  /* Footer Ouija */
+  @keyframes brandGlow {
+    0%, 100% { 
+      text-shadow: 
+        0 0 8px rgba(139, 0, 0, 0.6),
+        2px 2px 4px rgba(0,0,0,0.8);
+    }
+    50% { 
+      text-shadow: 
+        0 0 15px rgba(139, 0, 0, 0.9),
+        0 0 25px rgba(139, 0, 0, 0.4),
+        2px 2px 4px rgba(0,0,0,0.8);
+    }
+  }
+
+  /* Footer Ouija - Dark Occult */
   .footer-ouija {
-    background: linear-gradient(135deg, #1a1a2e, #16213e, #1a1a2e);
-    border-top: 2px solid #ff6b35;
-    color: #ff6b35;
-    text-shadow: 0 0 5px #ff6b35;
-    box-shadow: 0 0 20px #ff6b35;
+    background: linear-gradient(135deg, #0d0d0d, #1a0d0d, #0d0d0d);
+    border-top: 2px solid #8B0000;
+    color: #8B0000;
+    text-shadow: 
+      0 0 8px rgba(139, 0, 0, 0.6),
+      1px 1px 2px rgba(0,0,0,0.8);
+    box-shadow: 
+      0 0 20px rgba(139, 0, 0, 0.4),
+      0 -4px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Dark Question Input */
+  .question-input {
+    background: rgba(26, 13, 13, 0.9) !important;
+    border: 2px solid #8B0000 !important;
+    color: #DC143C !important;
+    text-shadow: 0 0 5px rgba(220, 20, 60, 0.6);
+    box-shadow: 
+      0 0 15px rgba(139, 0, 0, 0.3),
+      inset 0 0 10px rgba(139, 0, 0, 0.1);
+  }
+
+  .question-input:focus {
+    border-color: #FF4500 !important;
+    box-shadow: 
+      0 0 20px rgba(255, 69, 0, 0.5),
+      inset 0 0 15px rgba(255, 69, 0, 0.1);
+  }
+
+  .question-input::placeholder {
+    color: #8B0000 !important;
+    opacity: 0.7;
+  }
+
+  /* Dark Message Display */
+  .message-display {
+    background: rgba(13, 13, 13, 0.9) !important;
+    border: 2px solid #8B0000 !important;
+    color: #DC143C !important;
+    text-shadow: 0 0 5px rgba(220, 20, 60, 0.6);
+    box-shadow: 
+      0 0 15px rgba(139, 0, 0, 0.3),
+      inset 0 0 10px rgba(139, 0, 0, 0.1);
+  }
+
+  /* Dark Buttons */
+  .btn-primary {
+    background: linear-gradient(135deg, #8B0000, #DC143C) !important;
+    border: 2px solid #8B0000 !important;
+    color: #FFFFFF !important;
+    text-shadow: 0 0 5px rgba(0,0,0,0.8);
+    box-shadow: 
+      0 0 10px rgba(139, 0, 0, 0.4),
+      inset 0 0 5px rgba(139, 0, 0, 0.2);
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #DC143C, #FF4500) !important;
+    border-color: #FF4500 !important;
+    box-shadow: 
+      0 0 15px rgba(255, 69, 0, 0.6),
+      inset 0 0 5px rgba(255, 69, 0, 0.2);
+    transform: translateY(-2px);
   }
 </style>
 </head>
@@ -480,6 +1075,7 @@
 
     <!-- Ouija Board -->
     <div class="ouija-board">
+      <div class="planchette" id="planchette"></div>
       <!-- Letters -->
       <div class="ouija-letters" id="ouijaLetters">
         <!-- Letters will be populated by JavaScript -->
@@ -494,12 +1090,30 @@
       <div class="ouija-words" id="ouijaWords">
         <!-- Words will be populated by JavaScript -->
       </div>
+      
+      <!-- Good Bye -->
+      <div class="row justify-content-center mt-4">
+        <div class="col-auto">
+          <div class="ouija-goodbye">GOOD BYE</div>
+        </div>
+      </div>
     </div>
 
     <!-- Message Area -->
     <div class="message-area">
       <div id="messageDisplay" class="message-display">
         Place your fingers on the planchette and ask a question...
+      </div>
+      <div id="voiceStatus" class="voice-status" style="display: none;">
+        <i class="bi-volume-up"></i> Houdini is speaking...
+      </div>
+    </div>
+    
+    <!-- Vintage Ouija Instructions -->
+    <div class="ouija-instructions">
+      <div class="instruction-text">
+        <p><strong>Instructions:</strong> Place your fingers lightly on the planchette and ask your question clearly. The spirits will guide the planchette to spell out their answer.</p>
+        <p><em>Always say "GOOD BYE" when finished to properly close the spiritual connection.</em></p>
       </div>
     </div>
 
@@ -514,6 +1128,12 @@
       <button class="ouija-btn secondary" onclick="showHistory()">
         <i class="bi-clock-history mr-1"></i> History
       </button>
+      <button id="voiceBtn" class="ouija-btn voice-btn" onclick="toggleVoice()">
+        <i class="bi-mic mr-1"></i> Enable Voice
+      </button>
+        <button class="ouija-btn danger" onclick="stopSpeaking()" id="stopSpeakingBtn">
+          <i class="bi-stop-circle mr-1"></i> Stop Speech
+        </button>
     </div>
   </div>
 </main>
@@ -634,6 +1254,9 @@ async function askHoudini() {
     if (data.success && data.answer) {
       await materializeMessage(data.answer);
       messageHistory.push({ question, answer: data.answer, timestamp: new Date() });
+      
+      // Always speak Houdini's response
+      speakText(data.answer);
     } else {
       throw new Error(data.error || 'Houdini response failed');
     }
@@ -645,6 +1268,9 @@ async function askHoudini() {
     const mockAnswer = generateMockAnswer(question);
     await materializeMessage(mockAnswer);
     messageHistory.push({ question, answer: mockAnswer, timestamp: new Date() });
+    
+    // Always speak mock response
+    speakText(mockAnswer);
   }
 }
 
@@ -672,35 +1298,55 @@ async function materializeMessage(message) {
       const letterElement = Array.from(document.querySelectorAll('.ouija-letter'))
         .find(el => el.textContent === char.toUpperCase());
       
-      if (letterElement) {
-        letterElement.classList.add('materializing');
-        await sleep(800);
-        letterElement.classList.remove('materializing');
-        letterElement.classList.add('visible');
-        await sleep(300);
-        letterElement.classList.remove('visible');
-      }
+        if (letterElement) {
+          console.log('🔮 Materializing letter:', letterElement.textContent);
+          
+          // Move planchette to the letter first
+          movePlanchetteToLetter(letterElement);
+          
+          // Wait for planchette to reach the letter, then flip it
+          setTimeout(() => {
+            letterElement.classList.add('materializing');
+            setTimeout(() => {
+              letterElement.classList.remove('materializing');
+              letterElement.classList.add('visible');
+              setTimeout(() => {
+                letterElement.classList.remove('visible');
+              }, 500);
+            }, 1000);
+          }, 1600); // Wait for planchette movement (1.5s + small buffer)
+        }
       
       currentMessage += char;
       messageDisplay.innerHTML = currentMessage + '<span class="cursor">|</span>';
-      await sleep(200);
+      await sleep(800); // Slower between letters for more realistic pace
     } else if (ouijaNumbers.includes(char)) {
       // Find and highlight the number
       const numberElement = Array.from(document.querySelectorAll('.ouija-number'))
         .find(el => el.textContent === char);
       
       if (numberElement) {
-        numberElement.classList.add('materializing');
-        await sleep(600);
-        numberElement.classList.remove('materializing');
-        numberElement.classList.add('visible');
-        await sleep(200);
-        numberElement.classList.remove('visible');
+        console.log('🔮 Materializing number:', numberElement.textContent);
+        
+        // Move planchette to the number first
+        movePlanchetteToLetter(numberElement);
+        
+        // Wait for planchette to reach the number, then flip it
+        setTimeout(() => {
+          numberElement.classList.add('materializing');
+          setTimeout(() => {
+            numberElement.classList.remove('materializing');
+            numberElement.classList.add('visible');
+            setTimeout(() => {
+              numberElement.classList.remove('visible');
+            }, 500);
+          }, 1000);
+        }, 1600); // Wait for planchette movement (1.5s + small buffer)
       }
       
       currentMessage += char;
       messageDisplay.innerHTML = currentMessage + '<span class="cursor">|</span>';
-      await sleep(150);
+      await sleep(800); // Slower between numbers for more realistic pace
     } else {
       // Regular character
       currentMessage += char;
@@ -717,8 +1363,306 @@ async function materializeMessage(message) {
   }, 1000);
   
   isAnimating = false;
+  
+  // Hide planchette when done
+  const planchette = document.getElementById('planchette');
+  setTimeout(() => {
+    planchette.style.opacity = '0';
+    planchette.classList.remove('moving');
+  }, 1000);
+  
   console.log('🔮 Message materialization complete');
 }
+
+// Voice Recognition System
+let recognition = null;
+let isVoiceListening = false;
+
+// Initialize voice recognition
+function initVoiceRecognition() {
+  if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    console.log('Voice recognition not supported in this browser');
+    return false;
+  }
+
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = true;
+  recognition.interimResults = false;
+  recognition.lang = 'en-US';
+
+  recognition.onstart = () => {
+    console.log('🎤 Voice recognition started');
+    updateVoiceButton(true);
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = Array.from(event.results)
+      .map(result => result[0])
+      .map(result => result.transcript)
+      .join('');
+    
+    console.log('🎤 Voice input:', transcript);
+    processVoiceInput(transcript);
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Voice recognition error:', event.error);
+    if (event.error === 'not-allowed') {
+      alert('Microphone access denied. Please allow microphone access to use voice features.');
+    }
+  };
+
+  recognition.onend = () => {
+    console.log('🎤 Voice recognition ended');
+    updateVoiceButton(false);
+    if (isVoiceListening) {
+      // Restart if we're supposed to be listening
+      setTimeout(() => {
+        if (isVoiceListening) {
+          recognition.start();
+        }
+      }, 100);
+    }
+  };
+
+  return true;
+}
+
+// Process voice input
+function processVoiceInput(transcript) {
+  const command = transcript.toLowerCase().trim();
+  
+  // Check for question patterns
+  if (command.includes('ask') || command.includes('tell me') || command.includes('what') || 
+      command.includes('how') || command.includes('why') || command.includes('who') ||
+      command.includes('when') || command.includes('where')) {
+    
+    // Extract the question part
+    let question = command;
+    if (command.includes('ask houdini')) {
+      question = command.replace('ask houdini', '').trim();
+    } else if (command.includes('ask')) {
+      question = command.replace('ask', '').trim();
+    }
+    
+    if (question.length > 3) {
+      console.log('🎤 Processing voice question:', question);
+      document.getElementById('questionInput').value = question;
+      askHoudini();
+      speakText('Processing your question through the spirit realm...');
+    }
+  } else if (command.includes('clear') || command.includes('reset')) {
+    clearBoard();
+    speakText('The board has been cleared.');
+  } else if (command.includes('goodbye') || command.includes('good bye')) {
+    speakText('Thank you for consulting the spirits. Goodbye.');
+    stopVoice();
+  } else {
+    speakText('I didn\'t understand that command. Try asking a question about music or saying clear to reset the board.');
+  }
+}
+
+// Toggle voice recognition
+function toggleVoice() {
+  if (!recognition) {
+    if (!initVoiceRecognition()) {
+      alert('Voice recognition is not supported in this browser.');
+      return;
+    }
+  }
+
+  if (isVoiceListening) {
+    stopVoice();
+  } else {
+    startVoice();
+  }
+}
+
+// Start voice recognition
+function startVoice() {
+  if (recognition && !isVoiceListening) {
+    try {
+      recognition.start();
+      isVoiceListening = true;
+      updateVoiceButton(true);
+      speakText('Voice activation enabled. I\'m listening for your questions about music.');
+    } catch (error) {
+      console.error('Error starting voice recognition:', error);
+      alert('Error starting voice recognition. Please try again.');
+    }
+  }
+}
+
+// Stop voice recognition
+function stopVoice() {
+  if (recognition && isVoiceListening) {
+    recognition.stop();
+    isVoiceListening = false;
+    updateVoiceButton(false);
+    speakText('Voice activation disabled. I\'ll stop listening now.');
+  }
+}
+
+// Update voice button appearance
+function updateVoiceButton(listening) {
+  const voiceBtn = document.getElementById('voiceBtn');
+  const icon = voiceBtn.querySelector('i');
+  const text = voiceBtn.querySelector('span') || voiceBtn.childNodes[voiceBtn.childNodes.length - 1];
+  
+  if (listening) {
+    voiceBtn.classList.add('listening');
+    icon.className = 'bi-mic-fill mr-1';
+    text.textContent = ' Listening...';
+  } else {
+    voiceBtn.classList.remove('listening');
+    icon.className = 'bi-mic mr-1';
+    text.textContent = ' Enable Voice';
+  }
+}
+
+// Text-to-speech function - Use backend Google service first
+function speakText(text) {
+  console.log('🔊 Attempting to speak:', text);
+  
+  // Always try backend Google TTS first
+  speakViaBackend(text);
+}
+
+// Backend Google TTS service
+async function speakViaBackend(text) {
+  try {
+    console.log('🔊 Using backend Google TTS for:', text);
+    showVoiceStatus(true);
+    
+    const response = await fetch('/api/voice/speak', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: text })
+    });
+    
+    const result = await response.json();
+    console.log('🔊 Backend TTS result:', result);
+    
+    if (result.success) {
+      console.log('🔊 Backend TTS successful');
+      // Show status for a few seconds to indicate speech is happening
+      setTimeout(() => {
+        showVoiceStatus(false);
+      }, text.length * 100 + 2000); // Estimate speech duration + 2 seconds
+    } else {
+      console.error('🔊 Backend TTS failed:', result.message);
+      showVoiceStatus(false);
+      // Fallback to browser TTS
+      fallbackToBrowserTTS(text);
+    }
+  } catch (error) {
+    console.error('🔊 Backend TTS error:', error);
+    showVoiceStatus(false);
+    // Fallback to browser TTS
+    fallbackToBrowserTTS(text);
+  }
+}
+
+// Fallback to browser TTS if backend fails
+function fallbackToBrowserTTS(text) {
+  console.log('🔊 Falling back to browser TTS');
+  
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.7;
+    utterance.pitch = 0.8;
+    utterance.volume = 1.0;
+    
+    utterance.onstart = () => {
+      console.log('🔊 Browser TTS started');
+      showVoiceStatus(true);
+    };
+    
+    utterance.onend = () => {
+      console.log('🔊 Browser TTS ended');
+      showVoiceStatus(false);
+    };
+    
+    utterance.onerror = (event) => {
+      console.error('🔊 Browser TTS error:', event.error);
+      showVoiceStatus(false);
+    };
+    
+    window.speechSynthesis.speak(utterance);
+  } else {
+    console.error('🔊 No TTS available - neither backend nor browser');
+    showVoiceStatus(false);
+  }
+}
+
+// Test speech function
+
+// Show/hide voice status indicator
+function showVoiceStatus(show) {
+  const voiceStatus = document.getElementById('voiceStatus');
+  if (voiceStatus) {
+    voiceStatus.style.display = show ? 'block' : 'none';
+  }
+}
+
+// Stop speaking - AGGRESSIVE STOP
+window.stopSpeaking = function() {
+  console.log('🛑 Stop Speaking button clicked');
+  
+  // Force stop everything immediately
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.cancel(); // Double cancel to be sure
+    console.log('🛑 Browser speech synthesis cancelled');
+  }
+  
+  // Stop backend TTS (don't wait for response)
+  fetch('/api/voice/stop-speaking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }).then(response => {
+    if (response.ok) {
+      console.log('🛑 Backend speech stopped successfully');
+    } else {
+      console.log('🛑 Backend speech stop failed:', response.status);
+    }
+  }).catch(error => {
+    console.log('🛑 Backend speech stop error:', error);
+  });
+  
+  // Hide voice status
+  showVoiceStatus(false);
+  
+  console.log('🛑 Stop Speaking completed');
+};
+
+// Move planchette to a specific letter
+  function movePlanchetteToLetter(letterElement) {
+    const planchette = document.getElementById('planchette');
+    const rect = letterElement.getBoundingClientRect();
+    const boardRect = document.querySelector('.ouija-board').getBoundingClientRect();
+    
+    // Calculate position relative to the board - center planchette precisely on letter
+    const x = rect.left - boardRect.left + (rect.width / 2) - 30; // Center planchette on letter
+    const y = rect.top - boardRect.top + (rect.height / 2) - 20;
+    
+    console.log('🎯 Moving planchette to:', letterElement.textContent, 'at position:', x, y);
+    
+    // Show planchette and move it
+    planchette.style.opacity = '1';
+    planchette.classList.add('moving');
+    
+    // Move planchette smoothly without wobble for accuracy
+    requestAnimationFrame(() => {
+      planchette.style.left = `${Math.max(0, Math.min(x, boardRect.width - 60))}px`;
+      planchette.style.top = `${Math.max(0, Math.min(y, boardRect.height - 40))}px`;
+    });
+  }
 
 // Generate mock answer for testing
 function generateMockAnswer(question) {

@@ -458,6 +458,33 @@
   }
 
   /* Individual Poster Themes */
+  .cosmic-turtle {
+    border-color: #FFD700;
+    box-shadow: 
+      0 0 20px #FFD700,
+      inset 0 0 20px rgba(255, 215, 0, 0.1);
+  }
+
+  .cosmic-turtle .poster-icon {
+    color: #FFD700;
+    text-shadow: 0 0 20px #FFD700;
+  }
+
+  .cosmic-turtle .poster-title {
+    color: #FFD700;
+    text-shadow: 0 0 15px #FFD700;
+  }
+
+  .cosmic-turtle .poster-subtitle {
+    color: #FFA500;
+    text-shadow: 0 0 10px #FFA500;
+  }
+
+  .cosmic-turtle .poster-tagline {
+    color: #FF1493;
+    text-shadow: 0 0 8px #FF1493;
+  }
+
   .cosmic-music {
     border-color: #00ff41;
     box-shadow: 
@@ -1198,6 +1225,9 @@
                 <button class="btn btn-sm btn-outline-secondary" onclick="clearAIBlacklight()" style="border: 2px solid #00ffff; color: #00ffff; flex: 1;">
                   <i class="bi-trash mr-1"></i> Clear
                 </button>
+                <button class="btn btn-sm" onclick="stopSpeaking()" style="border: 2px solid #ff0000; color: #ff0000; flex: 1;">
+                  <i class="bi-stop-circle mr-1"></i> Stop Speech
+                </button>
               </div>
               <div class="loading" id="aiLoadingBlacklight" style="display: none; text-align: center;">
                 <div class="spinner-border text-primary" role="status" style="color: #ff00ff !important; border-color: #ff00ff;">
@@ -1273,16 +1303,20 @@
         </ol>
         
         <div class="carousel-inner">
-          <!-- Poster 1: Cosmic Music -->
+          <!-- Poster 1: THE COSMIC TURTLE by David Lane -->
           <div class="carousel-item active">
-            <div class="blacklight-poster cosmic-music">
+            <div class="blacklight-poster cosmic-turtle">
               <div class="poster-content">
-                <div class="poster-icon">
-                  <i class="bi-music-note-beamed"></i>
+                <div class="poster-image-container" style="display: flex; justify-content: center; align-items: center; min-height: 350px;">
+                  <img src="/images/cosmic turtle.png" 
+                       alt="THE COSMIC TURTLE by David Lane" 
+                       class="expandable-image"
+                       style="max-width: 300px; max-height: 300px; border: 3px solid #FFD700; border-radius: 15px; box-shadow: 0 0 25px #FFD700; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;"
+                       onclick="toggleImageExpansion(this)">
                 </div>
-                <h2 class="poster-title">COSMIC MUSIC</h2>
-                <p class="poster-subtitle">Journey Through Sound</p>
-                <div class="poster-tagline">"Where frequencies meet infinity"</div>
+                <h2 class="poster-title">THE COSMIC TURTLE</h2>
+                <p class="poster-subtitle">by David Lane</p>
+                <div class="poster-tagline">"Journey through the cosmic realm of music"</div>
                 <div class="poster-effects">
                   <div class="effect-dot"></div>
                   <div class="effect-dot"></div>
@@ -2091,6 +2125,34 @@ function clearAIBlacklight() {
   document.getElementById('aiLoadingBlacklight').style.display = 'none';
 }
 
+// Stop speaking - AGGRESSIVE STOP
+window.stopSpeaking = function() {
+  console.log('🛑 Stop Speaking button clicked');
+  
+  // Force stop everything immediately
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.cancel(); // Double cancel to be sure
+    console.log('🛑 Browser speech synthesis cancelled');
+  }
+  
+  // Stop backend TTS (don't wait for response)
+  fetch('/api/voice/stop-speaking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }).then(response => {
+    if (response.ok) {
+      console.log('🛑 Backend speech stopped successfully');
+    } else {
+      console.log('🛑 Backend speech stop failed:', response.status);
+    }
+  }).catch(error => {
+    console.log('🛑 Backend speech stop error:', error);
+  });
+  
+  console.log('🛑 Stop Speaking completed');
+};
+
 // Handle Enter key in AI textarea
 document.getElementById('aiQuestionBlacklight').addEventListener('keydown', function(event) {
   if (event.key === 'Enter' && !event.shiftKey) {
@@ -2383,6 +2445,31 @@ style.textContent = `
   }
 `;
 document.head.appendChild(style);
+
+// Image expansion functionality
+function toggleImageExpansion(img) {
+  if (img.style.maxWidth === '300px') {
+    // Expand
+    img.style.maxWidth = '600px';
+    img.style.maxHeight = '600px';
+    img.style.zIndex = '1000';
+    img.style.position = 'relative';
+    img.title = 'Click to shrink';
+    img.style.transition = 'all 0.3s ease';
+    
+    // No overlay - keep colors vibrant!
+    
+  } else {
+    // Shrink back
+    img.style.maxWidth = '300px';
+    img.style.maxHeight = '300px';
+    img.style.zIndex = 'auto';
+    img.style.position = 'static';
+    img.title = 'Click to expand';
+    
+    // No overlay to remove
+  }
+}
 </script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>

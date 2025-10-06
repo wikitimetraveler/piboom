@@ -833,6 +833,12 @@
       <button class="btn btn-info" id="testVoiceBtn" onclick="testVoice()" disabled>
         <i class="bi-volume-up"></i> Test Voice
       </button>
+      <button class="btn btn-info" id="speakAnalysisBtn" onclick="speakCurrentAnalysis()" disabled>
+        <i class="bi-volume-up"></i> Speak Analysis
+      </button>
+      <button class="btn btn-danger" id="stopSpeakingBtn" onclick="stopSpeaking()">
+        <i class="bi-stop-circle"></i> Stop Speech
+      </button>
       <div id="voiceStatus" class="voice-status ready" style="display: none;">
         Voice ready - Click "Start Listening" to begin
       </div>
@@ -877,6 +883,136 @@
 <script>
 let currentArtist = '';
 let voiceEnabled = false;
+
+// Backend Google TTS service
+async function speakViaBackend(text, callback) {
+  try {
+    console.log('🔊 Using backend Google TTS for:', text);
+    
+    const response = await fetch('/api/voice/speak', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: text })
+    });
+    
+    const result = await response.json();
+    console.log('🔊 Backend TTS result:', result);
+    
+    if (result.success) {
+      console.log('🔊 Backend TTS successful');
+      // Estimate speech duration and call callback
+      setTimeout(() => {
+        if (callback) callback();
+      }, text.length * 100 + 2000); // Estimate + 2 seconds
+    } else {
+      console.error('🔊 Backend TTS failed:', result.message);
+      // Fallback to browser TTS
+      fallbackToBrowserTTS(text, callback);
+    }
+  } catch (error) {
+    console.error('🔊 Backend TTS error:', error);
+    // Fallback to browser TTS
+    fallbackToBrowserTTS(text, callback);
+  }
+}
+
+// Fallback to browser TTS if backend fails
+function fallbackToBrowserTTS(text, callback) {
+  console.log('🔊 Falling back to browser TTS');
+  
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.8;
+    utterance.pitch = 1.0;
+    utterance.volume = 0.8;
+    
+    utterance.onend = () => {
+      console.log('🔊 Browser TTS ended');
+      if (callback) callback();
+    };
+    
+    utterance.onerror = (event) => {
+      console.error('🔊 Browser TTS error:', event.error);
+      if (callback) callback();
+    };
+    
+    window.speechSynthesis.speak(utterance);
+    console.log('🔊 Browser TTS started');
+  } else {
+    console.error('🔊 No TTS available - neither backend nor browser');
+    if (callback) callback();
+  }
+}
+
+// Speak AI analysis text
+function speakAnalysis(text) {
+  try {
+    console.log('🔊 Speaking analysis:', text);
+    speakViaBackend(text);
+  } catch (error) {
+    console.error('🔊 Speech error:', error);
+  }
+}
+
+// Speak current analysis if available
+function speakCurrentAnalysis() {
+  try {
+    const aiInfoText = document.getElementById('aiInfoText');
+    if (aiInfoText && aiInfoText.innerHTML && !aiInfoText.innerHTML.includes('ai-error')) {
+      // Extract text content from the AI analysis
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = aiInfoText.innerHTML;
+      const textContent = tempDiv.textContent || tempDiv.innerText || '';
+      
+      if (textContent.trim()) {
+        console.log('🔊 Speaking current analysis');
+        speakAnalysis(textContent);
+      } else {
+        console.log('🔊 No analysis text to speak');
+        showToast('No analysis available to speak', 'warning');
+      }
+    } else {
+      console.log('🔊 No analysis available');
+      showToast('No analysis available to speak', 'warning');
+    }
+  } catch (error) {
+    console.error('🔊 Speech error:', error);
+    showToast('Error speaking analysis', 'error');
+  }
+}
+
+// Stop speaking - AGGRESSIVE STOP
+window.stopSpeaking = function() {
+  console.log('🛑 Stop Speaking button clicked');
+  
+  // Force stop everything immediately
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.cancel(); // Double cancel to be sure
+    console.log('🛑 Browser speech synthesis cancelled');
+  }
+  
+  // Stop backend TTS (don't wait for response)
+  fetch('/api/voice/stop-speaking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }).then(response => {
+    if (response.ok) {
+      console.log('🛑 Backend speech stopped successfully');
+    } else {
+      console.log('🛑 Backend speech stop failed:', response.status);
+    }
+  }).catch(error => {
+    console.log('🛑 Backend speech stop error:', error);
+  });
+  
+  console.log('🛑 Stop Speaking completed');
+};
 let recognition = null;
 let isListening = false;
 let GOOGLE_API_KEY = null;
@@ -1261,6 +1397,7 @@ function initVoice() {
   document.getElementById('initVoiceBtn').disabled = true;
   document.getElementById('startVoiceBtn').disabled = false;
   document.getElementById('testVoiceBtn').disabled = false;
+  document.getElementById('speakAnalysisBtn').disabled = false;
 }
 
 function startVoice() {
@@ -1450,6 +1587,10 @@ async function getAIAlbumInfo(artist, albums) {
         ${data.recommendations ? `<p><strong>Recommendations:</strong> ${data.recommendations}</p>` : ''}
       </div>
     `;
+    
+    // Speak the AI analysis using backend TTS
+    const analysisText = `Album analysis for ${artist}. Musical Evolution: ${data.evolution || 'Analysis not available'}. Key Albums: ${data.keyAlbums || 'Analysis not available'}. Musical Style: ${data.style || 'Analysis not available'}. Cultural Impact: ${data.impact || 'Analysis not available'}. ${data.recommendations ? `Recommendations: ${data.recommendations}` : ''}`;
+    speakAnalysis(analysisText);
     
     showToast(`AI analysis complete for ${artist}`, 'success');
     

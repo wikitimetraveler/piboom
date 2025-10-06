@@ -876,6 +876,9 @@
               <button class="btn btn-sm btn-outline-danger" id="voiceStopBtn" onclick="stopVoiceSystem()" disabled>
                 <i class="bi-mic-mute"></i> Stop Listening
               </button>
+              <button class="btn btn-sm btn-outline-danger" id="stopSpeakingBtn" onclick="stopSpeaking()">
+                <i class="bi-stop-circle"></i> Stop Speech
+              </button>
             </div>
             <div class="btn-group mb-2" role="group">
               <button class="btn btn-sm btn-outline-primary" onclick="testVoiceCommand('search Pink Floyd')">
@@ -1057,6 +1060,71 @@ function initSocketIO() {
   }
 }
 
+// Backend Google TTS service
+async function speakViaBackend(text, callback) {
+  try {
+    console.log('🔊 Using backend Google TTS for:', text);
+    
+    const response = await fetch('/api/voice/speak', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text: text })
+    });
+    
+    const result = await response.json();
+    console.log('🔊 Backend TTS result:', result);
+    
+    if (result.success) {
+      console.log('🔊 Backend TTS successful');
+      // Estimate speech duration and call callback
+      setTimeout(() => {
+        if (callback) callback();
+      }, text.length * 100 + 2000); // Estimate + 2 seconds
+    } else {
+      console.error('🔊 Backend TTS failed:', result.message);
+      // Fallback to browser TTS
+      fallbackToBrowserTTS(text, callback);
+    }
+  } catch (error) {
+    console.error('🔊 Backend TTS error:', error);
+    // Fallback to browser TTS
+    fallbackToBrowserTTS(text, callback);
+  }
+}
+
+// Fallback to browser TTS if backend fails
+function fallbackToBrowserTTS(text, callback) {
+  console.log('🔊 Falling back to browser TTS');
+  
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.volume = 0.8;
+    
+    utterance.onend = () => {
+      console.log('🔊 Browser TTS ended');
+      if (callback) callback();
+    };
+    
+    utterance.onerror = (event) => {
+      console.error('🔊 Browser TTS error:', event.error);
+      if (callback) callback();
+    };
+    
+    window.speechSynthesis.speak(utterance);
+    console.log('🔊 Browser TTS started');
+  } else {
+    console.error('🔊 No TTS available - neither backend nor browser');
+    if (callback) callback();
+  }
+}
+
 // Function to speak text using browser's built-in speech synthesis or backend
 function speakText(text) {
   try {
@@ -1066,68 +1134,16 @@ function speakText(text) {
       console.log('🔇 Temporarily stopped voice recognition to prevent feedback loop');
     }
     
-    if (useBackendVoice) {
-      // Use backend text-to-speech (Pi mode)
-      console.log('🎤 Using backend text-to-speech:', text);
-      fetch('/api/voice/speak', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text })
-      }).then(() => {
-        // Restart voice recognition after speaking
-        setTimeout(() => {
-          if (isListening && recognition) {
-            recognition.start();
-            console.log('🎤 Restarted voice recognition after speaking');
-          }
-        }, 2000); // Wait 2 seconds after speaking
-      }).catch(error => {
-        console.error('Backend speak error:', error);
-        // Restart voice recognition even on error
-        setTimeout(() => {
-          if (isListening && recognition) {
-            recognition.start();
-            console.log('🎤 Restarted voice recognition after error');
-          }
-        }, 2000);
-      });
-    } else {
-      // Use browser's built-in speech synthesis (Windows/Desktop)
-      if ('speechSynthesis' in window) {
-        // Cancel any ongoing speech
-        window.speechSynthesis.cancel();
-        
-        // Create a new speech utterance
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.9;
-        utterance.pitch = 1.0;
-        utterance.volume = 0.8;
-        
-        // Restart voice recognition after speaking
-        utterance.onend = () => {
-          setTimeout(() => {
-            if (isListening && recognition) {
-              recognition.start();
-              console.log('🎤 Restarted voice recognition after speaking');
-            }
-          }, 1000); // Wait 1 second after speaking
-        };
-        
-        // Speak the text
-        window.speechSynthesis.speak(utterance);
-        console.log('🎤 Browser speech synthesis:', text);
-      } else {
-        console.log('🎤 Speech synthesis not available, using console fallback:', text);
-        // Restart voice recognition even if no speech synthesis
-        setTimeout(() => {
-          if (isListening && recognition) {
-            recognition.start();
-            console.log('🎤 Restarted voice recognition after fallback');
-          }
-        }, 1000);
-      }
-    }
+    // Always use backend Google TTS first, then fallback to browser
+    speakViaBackend(text, () => {
+      // Restart voice recognition after speaking
+      setTimeout(() => {
+        if (isListening && recognition) {
+          recognition.start();
+          console.log('🎤 Restarted voice recognition after speaking');
+        }
+      }, 2000); // Wait 2 seconds after speaking
+    });
   } catch (error) {
     console.error('Speech synthesis error:', error);
     console.log('🎤 Voice feedback fallback:', text);
@@ -3277,6 +3293,34 @@ function clearAIChat() {
   
   showToast('info', 'AI Assistant', 'Chat cleared');
 }
+
+// Stop speaking - AGGRESSIVE STOP
+window.stopSpeaking = function() {
+  console.log('🛑 Stop Speaking button clicked');
+  
+  // Force stop everything immediately
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.cancel(); // Double cancel to be sure
+    console.log('🛑 Browser speech synthesis cancelled');
+  }
+  
+  // Stop backend TTS (don't wait for response)
+  fetch('/api/voice/stop-speaking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' }
+  }).then(response => {
+    if (response.ok) {
+      console.log('🛑 Backend speech stopped successfully');
+    } else {
+      console.log('🛑 Backend speech stop failed:', response.status);
+    }
+  }).catch(error => {
+    console.log('🛑 Backend speech stop error:', error);
+  });
+  
+  console.log('🛑 Stop Speaking completed');
+};
 </script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
