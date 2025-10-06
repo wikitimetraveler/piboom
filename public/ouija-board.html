@@ -542,6 +542,26 @@
     animation: letterPossession 0.5s ease-in-out;
   }
 
+  .ouija-letter.flipping {
+    animation: letterFlip 0.6s ease-in-out;
+  }
+
+  @keyframes letterFlip {
+    0% { 
+      transform: rotateY(0deg) scale(1);
+      border-color: #FF0000;
+    }
+    50% { 
+      transform: rotateY(90deg) scale(1.1);
+      border-color: #FFD700;
+      box-shadow: 0 0 20px #FFD700;
+    }
+    100% { 
+      transform: rotateY(0deg) scale(1);
+      border-color: #FF0000;
+    }
+  }
+
   @keyframes letterPossession {
     0% { 
       transform: scale(1) rotate(0deg);
@@ -1134,6 +1154,9 @@
         <button class="ouija-btn danger" onclick="stopSpeaking()" id="stopSpeakingBtn">
           <i class="bi-stop-circle mr-1"></i> Stop Speech
         </button>
+        <button class="ouija-btn secondary" onclick="testSpeech()" id="testSpeechBtn">
+          <i class="bi-volume-up mr-1"></i> Test Speech
+        </button>
     </div>
   </div>
 </main>
@@ -1520,87 +1543,97 @@ function updateVoiceButton(listening) {
   }
 }
 
-// Text-to-speech function - Use backend Google service first
+// Text-to-speech function - Use working assistant speech system
 function speakText(text) {
-  console.log('🔊 Attempting to speak:', text);
-  
-  // Always try backend Google TTS first
-  speakViaBackend(text);
+  console.log('🔊 Houdini speaking:', text);
+  makeHoudiniSpeak(text);
 }
 
-// Backend Google TTS service
-async function speakViaBackend(text) {
+// Make Houdini speak - using working assistant speech system
+async function makeHoudiniSpeak(text) {
   try {
-    console.log('🔊 Using backend Google TTS for:', text);
+    console.log('🔊 Making Houdini speak:', text);
     showVoiceStatus(true);
     
-    const response = await fetch('/api/voice/speak', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text: text })
-    });
-    
-    const result = await response.json();
-    console.log('🔊 Backend TTS result:', result);
-    
-    if (result.success) {
-      console.log('🔊 Backend TTS successful');
-      // Show status for a few seconds to indicate speech is happening
-      setTimeout(() => {
+    // First try browser TTS (works in cloud mode)
+    if ('speechSynthesis' in window) {
+      // Stop any current speech
+      window.speechSynthesis.cancel();
+      
+      // Create speech utterance
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Configure voice settings
+      utterance.rate = 0.8;  // Slightly slower for mystical effect
+      utterance.pitch = 0.7; // Lower pitch for Houdini
+      utterance.volume = 0.9; // Good volume
+      
+      // Try to use a good voice
+      const voices = window.speechSynthesis.getVoices();
+      const preferredVoice = voices.find(voice => 
+        voice.lang.includes('en') && 
+        (voice.name.includes('Google') || voice.name.includes('Microsoft') || voice.name.includes('David'))
+      );
+      
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+      
+      // Speak the text
+      utterance.onstart = () => {
+        console.log('🔊 Houdini speech started');
+        showVoiceStatus(true);
+      };
+      utterance.onend = () => {
+        console.log('🔊 Houdini speech ended');
         showVoiceStatus(false);
-      }, text.length * 100 + 2000); // Estimate speech duration + 2 seconds
+      };
+      utterance.onerror = (error) => {
+        if (error.error !== 'canceled') {
+          console.error('🔊 Houdini speech error:', error);
+        }
+        showVoiceStatus(false);
+      };
+      
+      window.speechSynthesis.speak(utterance);
+      
+      // Also call backend for logging (but don't wait for audio)
+      fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+      }).catch(err => console.log('Backend speech logging failed:', err));
+      
     } else {
-      console.error('🔊 Backend TTS failed:', result.message);
-      showVoiceStatus(false);
-      // Fallback to browser TTS
-      fallbackToBrowserTTS(text);
+      // Fallback to backend TTS if browser TTS not available
+      const response = await fetch('/api/voice/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text })
+      });
+      
+      if (response.ok) {
+        console.log('🔊 Backend TTS started for Houdini');
+        // Show status for estimated duration
+        setTimeout(() => {
+          showVoiceStatus(false);
+        }, text.length * 100 + 2000);
+      } else {
+        console.error('🔊 Backend TTS failed for Houdini');
+        showVoiceStatus(false);
+      }
     }
   } catch (error) {
-    console.error('🔊 Backend TTS error:', error);
-    showVoiceStatus(false);
-    // Fallback to browser TTS
-    fallbackToBrowserTTS(text);
-  }
-}
-
-// Fallback to browser TTS if backend fails
-function fallbackToBrowserTTS(text) {
-  console.log('🔊 Falling back to browser TTS');
-  
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'en-US';
-    utterance.rate = 0.7;
-    utterance.pitch = 0.8;
-    utterance.volume = 1.0;
-    
-    utterance.onstart = () => {
-      console.log('🔊 Browser TTS started');
-      showVoiceStatus(true);
-    };
-    
-    utterance.onend = () => {
-      console.log('🔊 Browser TTS ended');
-      showVoiceStatus(false);
-    };
-    
-    utterance.onerror = (event) => {
-      console.error('🔊 Browser TTS error:', event.error);
-      showVoiceStatus(false);
-    };
-    
-    window.speechSynthesis.speak(utterance);
-  } else {
-    console.error('🔊 No TTS available - neither backend nor browser');
+    console.error('🔊 Houdini speech error:', error);
     showVoiceStatus(false);
   }
 }
 
 // Test speech function
+function testSpeech() {
+  console.log('🧪 Testing speech system...');
+  speakText('The spirits are speaking through the ouija board. Can you hear me?');
+}
 
 // Show/hide voice status indicator
 function showVoiceStatus(show) {
@@ -1763,6 +1796,29 @@ function showHistory() {
 // Select letter
 function selectLetter(letter) {
   console.log('🔮 Letter selected:', letter);
+  
+  // Find the clicked letter element and add flip animation
+  const letterElements = document.querySelectorAll('.ouija-letter');
+  letterElements.forEach(el => {
+    if (el.textContent === letter) {
+      // Remove any existing animation classes
+      el.classList.remove('flipping', 'visible', 'materializing');
+      
+      // Add flip animation
+      el.classList.add('flipping');
+      
+      // Remove flip class after animation completes
+      setTimeout(() => {
+        el.classList.remove('flipping');
+      }, 600);
+      
+      // Add visible class to show it was selected
+      setTimeout(() => {
+        el.classList.add('visible');
+      }, 300);
+    }
+  });
+  
   currentMessage += letter;
   updateMessageDisplay();
 }
