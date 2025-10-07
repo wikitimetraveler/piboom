@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Psychedelic Visualizer | Pi BOOM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: 'Courier New', monospace;
+    }
+
+    #visualizer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #1a0033 0%, #000000 100%);
+    }
+
+    .controls {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 15px 25px;
+      border-radius: 50px;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      border: 2px solid rgba(255, 0, 255, 0.3);
+      box-shadow: 0 0 30px rgba(255, 0, 255, 0.5);
+    }
+
+    .control-btn {
+      background: linear-gradient(135deg, #ff00ff, #00ffff);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+
+    .control-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 30px rgba(255, 0, 255, 0.8);
+    }
+
+    .control-btn.active {
+      background: linear-gradient(135deg, #00ff00, #ffff00);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(0, 255, 0, 1); }
+    }
+
+    .mode-selector {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid rgba(255, 0, 255, 0.5);
+      color: #000;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .mode-selector option {
+      background: #fff;
+      color: #000;
+      padding: 10px;
+    }
+
+    .status {
+      color: #00ff00;
+      font-size: 0.9rem;
+      text-shadow: 0 0 10px #00ff00;
+    }
+
+    .home-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid rgba(255, 0, 255, 0.3);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .home-btn:hover {
+      color: #ff00ff;
+      border-color: #ff00ff;
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+    }
+
+    .info-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 15px;
+      border-radius: 15px;
+      color: #fff;
+      font-size: 0.8rem;
+      border: 2px solid rgba(255, 0, 255, 0.3);
+      max-width: 250px;
+    }
+
+    .info-panel h6 {
+      color: #ff00ff;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #ff00ff;
+    }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="home-btn">
+    <i class="bi-house-fill"></i> Home
+  </a>
+
+  <canvas id="visualizer"></canvas>
+
+  <div class="controls">
+    <button id="startBtn" class="control-btn">
+      <i class="bi-mic-fill"></i> Start Mic
+    </button>
+    <select id="modeSelector" class="mode-selector">
+      <option value="spectrum">Spectrum Bars</option>
+      <option value="circular">Circular Wave</option>
+      <option value="particles">Particle Storm</option>
+      <option value="kaleidoscope">Kaleidoscope</option>
+      <option value="wormhole">Wormhole</option>
+      <option value="mandala">Mandala</option>
+      <option value="lasers">Laser Magic</option>
+      <option value="matrix">Matrix Rain</option>
+    </select>
+    <span id="status" class="status">Ready</span>
+  </div>
+
+  <div class="info-panel">
+    <h6><i class="bi-stars"></i> Psychedelic Visualizer</h6>
+    <p><strong>Mode:</strong> <span id="currentMode">Spectrum Bars</span></p>
+    <p><strong>Audio Source:</strong> Microphone</p>
+    <p><strong>Tip:</strong> Make some noise, play music, or just vibe! 🎵</p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('visualizer');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    const modeSelector = document.getElementById('modeSelector');
+    const status = document.getElementById('status');
+    const currentModeText = document.getElementById('currentMode');
+
+    let audioContext;
+    let analyser;
+    let dataArray;
+    let bufferLength;
+    let isRunning = false;
+    let currentMode = 'spectrum';
+    let animationId;
+    let rotation = 0;
+
+    // Resize canvas to fill window
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Start microphone
+    async function startMicrophone() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(stream);
+        
+        source.connect(analyser);
+        analyser.fftSize = 256;
+        bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+
+        isRunning = true;
+        startBtn.classList.add('active');
+        startBtn.innerHTML = '<i class="bi-mic-mute-fill"></i> Stop Mic';
+        status.textContent = 'Listening...';
+        
+        visualize();
+      } catch (err) {
+        console.error('Microphone access denied:', err);
+        status.textContent = 'Mic Access Denied!';
+        status.style.color = '#ff0000';
+      }
+    }
+
+    // Stop everything
+    function stop() {
+      isRunning = false;
+      if (animationId) cancelAnimationFrame(animationId);
+      if (audioContext) audioContext.close();
+      startBtn.classList.remove('active');
+      startBtn.innerHTML = '<i class="bi-mic-fill"></i> Start Mic';
+      status.textContent = 'Stopped';
+      status.style.color = '#ffff00';
+    }
+
+    // Main visualization loop
+    function visualize() {
+      if (!isRunning) return;
+      
+      animationId = requestAnimationFrame(visualize);
+      analyser.getByteFrequencyData(dataArray);
+      
+      // Clear with fade effect for trails
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      rotation += 0.01;
+      
+      switch(currentMode) {
+        case 'spectrum':
+          drawSpectrum();
+          break;
+        case 'circular':
+          drawCircular();
+          break;
+        case 'particles':
+          drawParticles();
+          break;
+        case 'kaleidoscope':
+          drawKaleidoscope();
+          break;
+        case 'wormhole':
+          drawWormhole();
+          break;
+        case 'mandala':
+          drawMandala();
+          break;
+        case 'lasers':
+          drawLasers();
+          break;
+        case 'matrix':
+          drawMatrix();
+          break;
+      }
+    }
+
+    // Spectrum Bars
+    function drawSpectrum() {
+      const barWidth = canvas.width / bufferLength * 2.5;
+      let x = 0;
+      
+      for (let i = 0; i < bufferLength; i++) {
+        const barHeight = (dataArray[i] / 255) * canvas.height * 0.8;
+        const hue = (i / bufferLength) * 360 + rotation * 50;
+        
+        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+        ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+        
+        x += barWidth + 1;
+      }
+    }
+
+    // Circular Wave
+    function drawCircular() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const radius = Math.min(canvas.width, canvas.height) * 0.3;
+      
+      ctx.beginPath();
+      for (let i = 0; i < bufferLength; i++) {
+        const angle = (i / bufferLength) * Math.PI * 2 + rotation;
+        const amp = (dataArray[i] / 255) * radius;
+        const x = centerX + Math.cos(angle) * (radius + amp);
+        const y = centerY + Math.sin(angle) * (radius + amp);
+        
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      
+      const avgFreq = dataArray.reduce((a, b) => a + b) / bufferLength;
+      const hue = (avgFreq / 255) * 360 + rotation * 50;
+      
+      ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+      ctx.lineWidth = 3;
+      ctx.shadowBlur = 30;
+      ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+      ctx.stroke();
+    }
+
+    // Particle Storm
+    function drawParticles() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      
+      for (let i = 0; i < bufferLength; i += 2) {
+        const amp = dataArray[i] / 255;
+        const angle = (i / bufferLength) * Math.PI * 2 * 3 + rotation * 2;
+        const distance = amp * Math.min(canvas.width, canvas.height) * 0.4;
+        
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
+        
+        const hue = (i / bufferLength) * 360 + rotation * 100;
+        const size = amp * 10 + 2;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, size, 0, Math.PI * 2);
+        ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+        ctx.fill();
+      }
+    }
+
+    // Kaleidoscope
+    function drawKaleidoscope() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const segments = 8;
+      
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      
+      for (let seg = 0; seg < segments; seg++) {
+        ctx.save();
+        ctx.rotate((Math.PI * 2 / segments) * seg);
+        
+        for (let i = 0; i < bufferLength / 4; i++) {
+          const amp = dataArray[i] / 255;
+          const distance = i * 3;
+          const y = -distance;
+          
+          const hue = (i / bufferLength) * 360 + rotation * 50 + seg * 45;
+          const size = amp * 15 + 2;
+          
+          ctx.beginPath();
+          ctx.arc(0, y, size, 0, Math.PI * 2);
+          ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+          ctx.fill();
+        }
+        
+        ctx.restore();
+      }
+      
+      ctx.restore();
+    }
+
+    // Wormhole
+    function drawWormhole() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const maxRadius = Math.min(canvas.width, canvas.height) * 0.5;
+      
+      for (let i = bufferLength - 1; i >= 0; i--) {
+        const amp = dataArray[i] / 255;
+        const radius = (i / bufferLength) * maxRadius;
+        const thickness = amp * 20 + 2;
+        
+        const hue = (i / bufferLength) * 360 + rotation * 100;
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+        ctx.lineWidth = thickness;
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+        ctx.stroke();
+      }
+    }
+
+    // Mandala
+    function drawMandala() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const petals = 12;
+      
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      
+      for (let petal = 0; petal < petals; petal++) {
+        ctx.save();
+        ctx.rotate((Math.PI * 2 / petals) * petal + rotation);
+        
+        ctx.beginPath();
+        for (let i = 0; i < bufferLength / 2; i++) {
+          const amp = dataArray[i] / 255;
+          const angle = (i / bufferLength) * Math.PI;
+          const distance = amp * 200 + 50;
+          
+          const x = Math.cos(angle) * distance;
+          const y = Math.sin(angle) * distance;
+          
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        
+        const avgAmp = dataArray.reduce((a, b) => a + b) / bufferLength / 255;
+        const hue = petal * 30 + rotation * 50;
+        
+        ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${avgAmp})`;
+        ctx.lineWidth = 2;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+        ctx.stroke();
+        
+        ctx.restore();
+      }
+      
+      ctx.restore();
+    }
+
+    // Event listeners
+    startBtn.addEventListener('click', () => {
+      if (!isRunning) {
+        startMicrophone();
+      } else {
+        stop();
+      }
+    });
+
+    modeSelector.addEventListener('change', (e) => {
+      currentMode = e.target.value;
+      currentModeText.textContent = e.target.options[e.target.selectedIndex].text;
+    });
+
+    // Laser Magic - Flowing laser beams
+    let laserBeams = [];
+    function drawLasers() {
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      
+      // Create new laser beams based on audio
+      if (Math.random() < 0.1) {
+        const avgFreq = dataArray.reduce((a, b) => a + b) / bufferLength;
+        if (avgFreq > 50) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = (avgFreq / 255) * 10 + 2;
+          const hue = Math.random() * 360;
+          
+          laserBeams.push({
+            x: centerX,
+            y: centerY,
+            angle: angle,
+            speed: speed,
+            length: 0,
+            maxLength: Math.random() * 300 + 200,
+            hue: hue,
+            width: Math.random() * 3 + 1,
+            life: 1.0
+          });
+        }
+      }
+      
+      // Update and draw laser beams
+      for (let i = laserBeams.length - 1; i >= 0; i--) {
+        const laser = laserBeams[i];
+        
+        // Update position
+        laser.length += laser.speed;
+        laser.life -= 0.01;
+        laser.angle += Math.sin(rotation + i * 0.1) * 0.02; // Flow like magic
+        
+        // Remove dead lasers
+        if (laser.life <= 0 || laser.length > laser.maxLength) {
+          laserBeams.splice(i, 1);
+          continue;
+        }
+        
+        // Draw laser beam
+        const endX = laser.x + Math.cos(laser.angle) * laser.length;
+        const endY = laser.y + Math.sin(laser.angle) * laser.length;
+        
+        // Outer glow
+        ctx.beginPath();
+        ctx.moveTo(laser.x, laser.y);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = `hsla(${laser.hue}, 100%, 50%, ${laser.life * 0.3})`;
+        ctx.lineWidth = laser.width * 4;
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = `hsl(${laser.hue}, 100%, 50%)`;
+        ctx.stroke();
+        
+        // Inner bright line
+        ctx.beginPath();
+        ctx.moveTo(laser.x, laser.y);
+        ctx.lineTo(endX, endY);
+        ctx.strokeStyle = `hsla(${laser.hue}, 100%, 80%, ${laser.life})`;
+        ctx.lineWidth = laser.width;
+        ctx.shadowBlur = 20;
+        ctx.stroke();
+        
+        // Tip glow
+        ctx.beginPath();
+        ctx.arc(endX, endY, laser.width * 3, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${laser.hue}, 100%, 70%, ${laser.life * 0.8})`;
+        ctx.shadowBlur = 25;
+        ctx.fill();
+      }
+      
+      // Add pulsing rings for extra magic
+      for (let i = 0; i < bufferLength; i += 8) {
+        const amp = dataArray[i] / 255;
+        if (amp > 0.3) {
+          const angle = (i / bufferLength) * Math.PI * 2 + rotation * 2;
+          const distance = 150 + Math.sin(rotation * 3 + i) * 50;
+          const x = centerX + Math.cos(angle) * distance;
+          const y = centerY + Math.sin(angle) * distance;
+          const hue = (i / bufferLength) * 360 + rotation * 100;
+          
+          ctx.beginPath();
+          ctx.arc(x, y, amp * 20, 0, Math.PI * 2);
+          ctx.strokeStyle = `hsla(${hue}, 100%, 50%, ${amp})`;
+          ctx.lineWidth = 2;
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = `hsl(${hue}, 100%, 50%)`;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Matrix Rain
+    let matrixColumns = [];
+    let matrixInitialized = false;
+    function drawMatrix() {
+      if (!matrixInitialized) {
+        const columnCount = Math.floor(canvas.width / 20);
+        for (let i = 0; i < columnCount; i++) {
+          matrixColumns.push({
+            x: i * 20,
+            y: Math.random() * canvas.height - canvas.height,
+            speed: Math.random() * 3 + 2,
+            chars: [],
+            hue: Math.random() * 60 + 100 // Green-ish
+          });
+        }
+        matrixInitialized = true;
+      }
+      
+      // Darker fade for matrix effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Get average frequency for intensity
+      const avgFreq = dataArray.reduce((a, b) => a + b) / bufferLength / 255;
+      
+      ctx.font = '16px monospace';
+      
+      for (let col of matrixColumns) {
+        // Audio-reactive speed
+        col.speed = 2 + avgFreq * 5;
+        col.y += col.speed;
+        
+        // Reset column if off screen
+        if (col.y > canvas.height + 100) {
+          col.y = -100;
+          col.hue = 100 + Math.random() * 60;
+        }
+        
+        // Draw characters
+        const charCount = Math.floor(Math.random() * 20) + 10;
+        for (let i = 0; i < charCount; i++) {
+          const char = String.fromCharCode(Math.random() * 94 + 33);
+          const yPos = col.y - i * 20;
+          
+          if (yPos < canvas.height && yPos > 0) {
+            // Character brightness based on position
+            const brightness = Math.max(0, 1 - i / charCount);
+            const audioBoost = dataArray[i % bufferLength] / 255;
+            const alpha = brightness * 0.8 + audioBoost * 0.2;
+            
+            // Glow effect
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = `hsl(${col.hue}, 100%, 50%)`;
+            
+            // Leading character brighter
+            if (i === 0) {
+              ctx.fillStyle = `hsla(0, 0%, 100%, ${alpha})`;
+              ctx.shadowBlur = 25;
+            } else {
+              ctx.fillStyle = `hsla(${col.hue}, 100%, 50%, ${alpha})`;
+            }
+            
+            ctx.fillText(char, col.x, yPos);
+          }
+        }
+      }
+    }
+
+    // Start with a gradient background animation
+    (function animateBackground() {
+      if (!isRunning) {
+        ctx.fillStyle = `hsl(${rotation * 30}, 50%, 5%)`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        rotation += 0.01;
+      }
+      requestAnimationFrame(animateBackground);
+    })();
+  </script>
+</body>
+</html>
+
