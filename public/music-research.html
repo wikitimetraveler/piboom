@@ -608,8 +608,9 @@
     <div class="collapse show" id="searchAndResults">
       <div class="card-body">
         <!-- Search Results -->
-        <div class="row">
-          <div class="col-lg-3">
+        <!-- Row 1: Artist Info and Timeline -->
+        <div class="row mb-4">
+          <div class="col-lg-6">
             <div class="artist-info" id="artistInfo">
               <h4><i class="bi-person-circle"></i> Artist Information</h4>
               <div class="loading" id="artistLoading" style="display: none;">
@@ -622,42 +623,7 @@
             </div>
           </div>
           
-          <div class="col-lg-3">
-            <div class="band-members" id="bandMembers" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
-              <h4><i class="bi-people"></i> Band Members</h4>
-              <div class="loading" id="membersLoading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Loading members...</p>
-              </div>
-              <div id="membersContent">
-                <p class="text-muted">Band members and their locations will appear here after searching.</p>
-                <div id="membersList" style="max-height: 400px; overflow-y: auto;">
-                  <!-- Band members will be added here -->
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-lg-3">
-            <div class="map-container" id="mapContainer">
-              <h4><i class="bi-geo-alt"></i> Birth Places Map</h4>
-              <div class="loading" id="mapLoading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Loading map...</p>
-              </div>
-              <div id="mapContent">
-                <p class="text-muted">Artist birth places will appear on the map after searching.</p>
-                <div id="map" style="height: 400px; width: 100%; border-radius: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-                  <div class="text-center">
-                    <i class="bi-map" style="font-size: 3rem;"></i>
-                    <p class="mt-2">Map will load here</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-lg-3">
+          <div class="col-lg-6">
             <div class="timeline-container" id="timelineContainer">
               <h4><i class="bi-clock-history"></i> Timeline</h4>
               <div class="loading" id="timelineLoading" style="display: none;">
@@ -668,6 +634,44 @@
                 <p class="text-muted">Chronological events will appear here after searching.</p>
                 <div id="timeline" style="max-height: 400px; overflow-y: auto;">
                   <!-- Timeline events will be added here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Row 2: Band Members and Map -->
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="band-members" id="bandMembers" style="background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 6px 18px rgba(0,0,0,.08);">
+              <h4 class="mb-3"><i class="bi-people"></i> Band Members <small class="text-muted" style="font-size: 0.8rem;">(click to see on map)</small></h4>
+              <div class="loading" id="membersLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading members...</p>
+              </div>
+              <div id="membersContent">
+                <p class="text-muted">Band members and their locations will appear here after searching.</p>
+                <div id="membersList" class="row">
+                  <!-- Band members will be added here as cards -->
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-4">
+            <div class="map-container" id="mapContainer" style="position: sticky; top: 20px;">
+              <h4><i class="bi-geo-alt"></i> Birth Places Map</h4>
+              <div class="loading" id="mapLoading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Loading map...</p>
+              </div>
+              <div id="mapContent">
+                <p class="text-muted">Artist birth places will appear on the map after searching.</p>
+                <div id="map" style="height: 500px; width: 100%; border-radius: 8px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                  <div class="text-center">
+                    <i class="bi-map" style="font-size: 3rem;"></i>
+                    <p class="mt-2">Map will load here</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2517,7 +2521,7 @@ function displayBandMembers(data) {
   const membersList = document.getElementById('membersList');
   
   if (data.error || !data.bandMembers || data.bandMembers.length === 0) {
-    membersList.innerHTML = '<div class="alert alert-info">No band members found for this artist.</div>';
+    membersList.innerHTML = '<div class="col-12"><div class="alert alert-info">No band members found for this artist.</div></div>';
     return;
   }
   
@@ -2532,56 +2536,65 @@ function displayBandMembers(data) {
     const instrumentIcon = getInstrumentIcon(instrument);
     
     html += `
-      <div class="member-item mb-3 p-3" style="border: 1px solid #e9ecef; border-radius: 12px; background: rgba(248,249,250,0.5); cursor: pointer; transition: all 0.3s ease;" 
-           onclick="focusOnMemberLocation('${member.name.replace(/'/g, "\\'")}', '${location.replace(/'/g, "\\'")}')" 
-           onmouseover="this.style.background='rgba(52,152,219,0.1)'; this.style.borderColor='#3498db';" 
-           onmouseout="this.style.background='rgba(248,249,250,0.5)'; this.style.borderColor='#e9ecef';">
-        <div class="d-flex align-items-start">
-          <div class="flex-shrink-0 me-2">
-            ${member.imageUrl ? `
-              <img src="${member.imageUrl}" alt="${member.name}" 
-                   style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db;">
-            ` : `
-              <i class="bi-person-circle text-primary" style="font-size: 2.5rem;"></i>
-            `}
-          </div>
-          <div class="flex-grow-1">
-            <h6 class="mb-1 fw-bold">${member.name} ${isDeceased ? '<i class="bi-star-fill text-warning" style="font-size: 0.7rem;" title="Deceased"></i>' : ''}</h6>
-            
-            ${instrument !== 'Unknown' ? `
-            <div class="mb-2">
-              <span class="badge" style="font-size: 0.7rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <i class="${instrumentIcon}"></i> ${instrument}
-              </span>
+      <div class="col-lg-6 col-md-6 mb-3">
+        <div class="member-card h-100 p-3" style="border: 1px solid #e9ecef; border-radius: 12px; background: rgba(248,249,250,0.5); cursor: pointer; transition: all 0.3s ease;" 
+             onclick="focusOnMemberLocation('${member.name.replace(/'/g, "\\'")}', '${location.replace(/'/g, "\\'")}')" 
+             onmouseover="this.style.background='rgba(52,152,219,0.1)'; this.style.borderColor='#3498db'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';" 
+             onmouseout="this.style.background='rgba(248,249,250,0.5)'; this.style.borderColor='#e9ecef'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+          <div class="d-flex align-items-start">
+            <div class="flex-shrink-0 me-3">
+              ${member.imageUrl ? `
+                <img src="${member.imageUrl}" alt="${member.name}" 
+                     style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #3498db;">
+              ` : `
+                <i class="bi-person-circle text-primary" style="font-size: 3rem;"></i>
+              `}
             </div>
-            ` : ''}
-            
-            <div style="font-size: 0.85rem;">
-              <div class="mb-1">
-                <i class="bi-geo-alt text-primary" style="font-size: 0.9rem;"></i>
-                <small class="text-muted">Born: ${location}</small>
-              </div>
-              <div class="mb-1">
-                <i class="bi-calendar text-primary" style="font-size: 0.9rem;"></i>
-                <small class="text-muted">${birthYear}</small>
-                ${isDeceased ? `<small class="text-danger"> - ${member.deathDate}${member.deathPlace && member.deathPlace !== 'Unknown' ? ' (' + member.deathPlace + ')' : ''}</small>` : ''}
-              </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-1 fw-bold" style="font-size: 1rem;">${member.name} ${isDeceased ? '<i class="bi-star-fill text-warning" style="font-size: 0.7rem;" title="Deceased"></i>' : ''}</h6>
               
-              ${member.associatedActs && member.associatedActs.length > 0 ? `
-              <div class="mt-2">
-                <small class="text-muted d-block mb-1"><i class="bi-music-note-list"></i> Also in:</small>
-                ${member.associatedActs.slice(0, 3).map(act => `
-                  <span class="badge bg-secondary me-1" style="font-size: 0.65rem;">
-                    ${act.name}${act.years ? ` (${act.years})` : ''}
+              ${instrument !== 'Unknown' ? `
+              <div class="mb-2" style="display: flex; flex-wrap: wrap; gap: 4px;">
+                ${instrument.split(',').map(inst => `
+                  <span class="badge" style="font-size: 0.7rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <i class="${getInstrumentIcon(inst.trim())}"></i> ${inst.trim()}
                   </span>
                 `).join('')}
-                ${member.associatedActs.length > 3 ? `<small class="text-muted">+${member.associatedActs.length - 3} more</small>` : ''}
               </div>
               ` : ''}
+              
+              <div style="font-size: 0.8rem;">
+                <div class="mb-1">
+                  <i class="bi-geo-alt text-primary" style="font-size: 0.85rem;"></i>
+                  <small class="text-muted">${location}</small>
+                </div>
+                <div class="mb-1">
+                  <i class="bi-calendar text-primary" style="font-size: 0.85rem;"></i>
+                  <small class="text-muted">${birthYear}</small>
+                  ${isDeceased ? `<small class="text-danger"> - ${member.deathDate}</small>` : ''}
+                </div>
+                ${isDeceased && member.deathPlace && member.deathPlace !== 'Unknown' ? `
+                <div class="mb-1">
+                  <i class="bi-cross text-danger" style="font-size: 0.85rem;"></i>
+                  <small class="text-muted">${member.deathPlace}</small>
+                </div>
+                ` : ''}
+                
+                ${member.associatedActs && member.associatedActs.length > 0 ? `
+                <div class="mt-2">
+                  <small class="text-muted d-block mb-1" style="font-size: 0.75rem;"><i class="bi-music-note-list"></i> Also in:</small>
+                  <div>
+                    ${member.associatedActs.slice(0, 2).map(act => `
+                      <span class="badge bg-secondary me-1 mb-1" style="font-size: 0.65rem;">
+                        ${act.name}${act.years ? ` (${act.years})` : ''}
+                      </span>
+                    `).join('')}
+                    ${member.associatedActs.length > 2 ? `<span class="badge bg-secondary" style="font-size: 0.65rem;">+${member.associatedActs.length - 2}</span>` : ''}
+                  </div>
+                </div>
+                ` : ''}
+              </div>
             </div>
-          </div>
-          <div class="flex-shrink-0 align-self-center ms-2">
-            <i class="bi-arrow-right-circle text-muted" style="font-size: 1rem;"></i>
           </div>
         </div>
       </div>

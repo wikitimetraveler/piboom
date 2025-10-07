@@ -720,6 +720,37 @@ function extractInstrumentFromText(text, memberName) {
   return 'Unknown';
 }
 
+// Extract signature equipment from Wikipedia text
+function extractSignatureEquipment(text, memberName) {
+  const equipment = [];
+  
+  // Patterns for equipment mentions
+  const equipmentPatterns = [
+    // "John used a Fender Stratocaster"
+    new RegExp(`${memberName}[^.]*?(?:used|uses|played|plays|known for|favored|preferred)\\s+(?:a|an|the)?\\s*([A-Z][\\w\\s-]+(?:guitar|bass|drum|keyboard|piano|amp|amplifier|synthesizer|organ))`, 'gi'),
+    // Generic equipment mentions in context
+    /(?:Fender|Gibson|Gretsch|Rickenbacker|Martin|Yamaha|Roland|Moog|Hammond|Marshall|Vox|Orange)\s+[\w\s-]+/gi,
+    // Specific guitar models
+    /(?:Stratocaster|Telecaster|Les Paul|SG|Flying V|Explorer|Precision Bass|Jazz Bass|Thunderbird)/gi
+  ];
+  
+  for (const pattern of equipmentPatterns) {
+    const matches = text.matchAll(pattern);
+    for (const match of matches) {
+      const item = match[1] || match[0];
+      if (item && item.length > 3 && item.length < 50) {
+        // Clean up and add
+        const cleaned = item.trim().replace(/\s+/g, ' ');
+        if (!equipment.includes(cleaned)) {
+          equipment.push(cleaned);
+        }
+      }
+    }
+  }
+  
+  return equipment.slice(0, 3); // Limit to top 3
+}
+
 // Get band members from MusicBrainz
 async function getMusicBrainzMembers(artistName) {
   try {
