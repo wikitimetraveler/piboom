@@ -247,7 +247,11 @@ async function getWikidataInfo(pageTitle) {
                 ? memberInfo.instruments.join(', ') 
                 : 'Unknown', 
               birthPlace: memberInfo.birthPlace || 'Unknown',
-              birthDate: memberInfo.birthDate || 'Unknown'
+              birthDate: memberInfo.birthDate || 'Unknown',
+              deathDate: memberInfo.deathDate || null,
+              deathPlace: memberInfo.deathPlace || null,
+              associatedActs: memberInfo.associatedActs || [],
+              imageUrl: memberInfo.imageUrl || null
             });
           }
         }
@@ -303,13 +307,25 @@ async function getMemberInfoFromWikidata(memberId) {
     const entity = response.data.entities[memberId];
     
     if (!entity) {
-      return { birthDate: 'Unknown', birthPlace: 'Unknown', instruments: [] };
+      return { 
+        birthDate: 'Unknown', 
+        birthPlace: 'Unknown', 
+        deathDate: null, 
+        deathPlace: null,
+        instruments: [],
+        associatedActs: [],
+        imageUrl: null
+      };
     }
     
     const claims = entity.claims || {};
     let birthDate = 'Unknown';
     let birthPlace = 'Unknown';
+    let deathDate = null;
+    let deathPlace = null;
     let instruments = [];
+    let associatedActs = [];
+    let imageUrl = null;
     
     // Extract birth date (P569)
     if (claims.P569 && claims.P569[0]) {
@@ -327,6 +343,22 @@ async function getMemberInfoFromWikidata(memberId) {
       }
     }
     
+    // Extract death date (P570)
+    if (claims.P570 && claims.P570[0]) {
+      const dateValue = claims.P570[0].mainsnak?.datavalue?.value?.time;
+      if (dateValue) {
+        deathDate = formatWikidataDate(dateValue);
+      }
+    }
+    
+    // Extract death place (P20)
+    if (claims.P20 && claims.P20[0]) {
+      const placeId = claims.P20[0].mainsnak?.datavalue?.value?.id;
+      if (placeId) {
+        deathPlace = await getPlaceName(placeId);
+      }
+    }
+    
     // Extract instruments (P1303 - instrument played)
     if (claims.P1303) {
       for (const instrumentClaim of claims.P1303) {
@@ -340,10 +372,57 @@ async function getMemberInfoFromWikidata(memberId) {
       }
     }
     
-    return { birthDate, birthPlace, instruments };
+    // Extract associated acts/bands (P463 - member of)
+    if (claims.P463) {
+      const limitedActs = claims.P463.slice(0, 5); // Limit to 5 to avoid too many requests
+      for (const actClaim of limitedActs) {
+        const actId = actClaim.mainsnak?.datavalue?.value?.id;
+        if (actId) {
+          const actName = await getEntityLabel(actId);
+          if (actName) {
+            // Try to get years active from qualifiers
+            const startTime = actClaim.qualifiers?.P580?.[0]?.datavalue?.value?.time;
+            const endTime = actClaim.qualifiers?.P582?.[0]?.datavalue?.value?.time;
+            
+            const yearsActive = formatYearsActive(startTime, endTime);
+            associatedActs.push({
+              name: actName,
+              years: yearsActive
+            });
+          }
+        }
+      }
+    }
+    
+    // Extract image (P18)
+    if (claims.P18 && claims.P18[0]) {
+      const imageName = claims.P18[0].mainsnak?.datavalue?.value;
+      if (imageName) {
+        // Convert to Commons URL
+        imageUrl = await getWikimediaImageUrl(imageName);
+      }
+    }
+    
+    return { 
+      birthDate, 
+      birthPlace, 
+      deathDate,
+      deathPlace,
+      instruments,
+      associatedActs,
+      imageUrl
+    };
   } catch (error) {
     console.error('Error getting member info from Wikidata:', error);
-    return { birthDate: 'Unknown', birthPlace: 'Unknown', instruments: [] };
+    return { 
+      birthDate: 'Unknown', 
+      birthPlace: 'Unknown', 
+      deathDate: null,
+      deathPlace: null,
+      instruments: [],
+      associatedActs: [],
+      imageUrl: null
+    };
   }
 }
 
@@ -358,6 +437,31 @@ function formatWikidataDate(dateString) {
     return 'Unknown';
   } catch (error) {
     return 'Unknown';
+  }
+}
+
+// Format years active from start and end times
+function formatYearsActive(startTime, endTime) {
+  if (!startTime && !endTime) return '';
+  
+  const start = startTime ? formatWikidataDate(startTime) : '?';
+  const end = endTime ? formatWikidataDate(endTime) : 'present';
+  
+  if (start === end) return start;
+  return `${start}-${end}`;
+}
+
+// Get Wikimedia Commons image URL
+async function getWikimediaImageUrl(imageName) {
+  try {
+    // Convert spaces to underscores
+    const fileName = imageName.replace(/ /g, '_');
+    // Create thumbnail URL (250px width)
+    const url = `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(fileName)}?width=250`;
+    return url;
+  } catch (error) {
+    console.error('Error getting image URL:', error);
+    return null;
   }
 }
 
@@ -498,26 +602,44 @@ async function enrichBandMembersWithLocations(members) {
         const pageTitle = searchResponse.data.query.search[0].title;
         console.log(`📄 Found Wikipedia page for ${member.name}: ${pageTitle}`);
         
-        // Get the member's Wikidata information (includes instruments)
-        const memberWikidataInfo = await getWikidataInfo(pageTitle);
+        // Get the member's Wikidata ID
+        const wikidataIdResponse = await axios.get('https://en.wikipedia.org/w/api.php', {
+          params: {
+            action: 'query',
+            format: 'json',
+            prop: 'pageprops',
+            titles: pageTitle,
+            ppprop: 'wikibase_item'
+          }
+        });
         
-        // Get summary for additional context
+        const pages = wikidataIdResponse.data.query?.pages;
+        const pageId = Object.keys(pages)[0];
+        const wikidataId = pages[pageId]?.pageprops?.wikibase_item;
+        
+        let memberInfo = {};
+        if (wikidataId) {
+          // Get detailed member info from Wikidata
+          memberInfo = await getMemberInfoFromWikidata(wikidataId);
+        }
+        
+        // Get summary for additional context and image
         const summaryResponse = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
         const summaryData = summaryResponse.data;
         
         // Fallback: if Wikidata didn't find birth place, try extracting from description
-        if (memberWikidataInfo.birthPlace === 'Unknown' && summaryData.extract) {
+        if (memberInfo.birthPlace === 'Unknown' && summaryData.extract) {
           const extractedPlace = extractPlaceFromText(summaryData.extract);
           if (extractedPlace) {
-            memberWikidataInfo.birthPlace = extractedPlace;
+            memberInfo.birthPlace = extractedPlace;
             console.log(`📍 Fallback extraction for ${member.name}: ${extractedPlace}`);
           }
         }
         
         // Determine instrument - prefer existing data, then Wikidata, then extract from Wikipedia
         let instrument = member.instrument || 'Unknown';
-        if (memberWikidataInfo.bandMembers && memberWikidataInfo.bandMembers.length > 0 && memberWikidataInfo.bandMembers[0].instrument) {
-          instrument = memberWikidataInfo.bandMembers[0].instrument;
+        if (memberInfo.instruments && memberInfo.instruments.length > 0) {
+          instrument = memberInfo.instruments.join(', ');
         } else if (summaryData.extract) {
           // Try to extract instrument from Wikipedia summary
           const extractedInstrument = extractInstrumentFromText(summaryData.extract, member.name);
@@ -526,15 +648,22 @@ async function enrichBandMembersWithLocations(members) {
           }
         }
         
+        // Use Wikipedia thumbnail if no Wikidata image
+        const imageUrl = memberInfo.imageUrl || summaryData.thumbnail?.source || null;
+        
         // Update the member with found information
         enrichedMembers.push({
           name: member.name,
           instrument: instrument,
-          birthPlace: memberWikidataInfo.birthPlace || 'Unknown',
-          birthDate: memberWikidataInfo.birthDate || 'Unknown'
+          birthPlace: memberInfo.birthPlace || 'Unknown',
+          birthDate: memberInfo.birthDate || 'Unknown',
+          deathDate: memberInfo.deathDate || null,
+          deathPlace: memberInfo.deathPlace || null,
+          associatedActs: memberInfo.associatedActs || [],
+          imageUrl: imageUrl
         });
         
-        console.log(`✅ Enriched ${member.name}: ${instrument} from ${memberWikidataInfo.birthPlace} (${memberWikidataInfo.birthDate})`);
+        console.log(`✅ Enriched ${member.name}: ${instrument} from ${memberInfo.birthPlace} (${memberInfo.birthDate})`);
       } else {
         console.log(`❌ No Wikipedia page found for ${member.name}`);
         enrichedMembers.push(member); // Keep original data
@@ -644,6 +773,10 @@ async function getMusicBrainzMembers(artistName) {
             instrument: instrument,
             birthPlace: 'Unknown', // Will be enriched later
             birthDate: 'Unknown',  // Will be enriched later
+            deathDate: null,
+            deathPlace: null,
+            associatedActs: [],
+            imageUrl: null,
             mbid: member.id,
             type: member.type || 'Person'
           });
@@ -719,6 +852,10 @@ export async function searchMusicBrainz(req, res) {
             instrument: instrument,
             birthPlace: 'Unknown', // MusicBrainz doesn't have birth places
             birthDate: 'Unknown',
+            deathDate: null,
+            deathPlace: null,
+            associatedActs: [],
+            imageUrl: null,
             mbid: member.id,
             type: member.type || 'Person'
           });
