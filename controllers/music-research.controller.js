@@ -243,7 +243,9 @@ async function getWikidataInfo(pageTitle) {
             const memberInfo = await getMemberInfoFromWikidata(memberId);
             bandMembers.push({ 
               name: memberName, 
-              instrument: 'Unknown', 
+              instrument: memberInfo.instruments && memberInfo.instruments.length > 0 
+                ? memberInfo.instruments.join(', ') 
+                : 'Unknown', 
               birthPlace: memberInfo.birthPlace || 'Unknown',
               birthDate: memberInfo.birthDate || 'Unknown'
             });
@@ -301,12 +303,13 @@ async function getMemberInfoFromWikidata(memberId) {
     const entity = response.data.entities[memberId];
     
     if (!entity) {
-      return { birthDate: 'Unknown', birthPlace: 'Unknown' };
+      return { birthDate: 'Unknown', birthPlace: 'Unknown', instruments: [] };
     }
     
     const claims = entity.claims || {};
     let birthDate = 'Unknown';
     let birthPlace = 'Unknown';
+    let instruments = [];
     
     // Extract birth date (P569)
     if (claims.P569 && claims.P569[0]) {
@@ -324,10 +327,23 @@ async function getMemberInfoFromWikidata(memberId) {
       }
     }
     
-    return { birthDate, birthPlace };
+    // Extract instruments (P1303 - instrument played)
+    if (claims.P1303) {
+      for (const instrumentClaim of claims.P1303) {
+        const instrumentId = instrumentClaim.mainsnak?.datavalue?.value?.id;
+        if (instrumentId) {
+          const instrumentName = await getEntityLabel(instrumentId);
+          if (instrumentName) {
+            instruments.push(instrumentName);
+          }
+        }
+      }
+    }
+    
+    return { birthDate, birthPlace, instruments };
   } catch (error) {
     console.error('Error getting member info from Wikidata:', error);
-    return { birthDate: 'Unknown', birthPlace: 'Unknown' };
+    return { birthDate: 'Unknown', birthPlace: 'Unknown', instruments: [] };
   }
 }
 
@@ -423,14 +439,26 @@ function extractBandMembersFromText(text) {
       
       console.log('👥 All members after better splitting:', allMembers);
       
-      // Use the better splitting result
+      // Use the better splitting result and try to extract instruments
       allMembers.forEach(name => {
         if (name && name.length > 0) {
-          members.push({
-            name: name,
-            birthPlace: 'Unknown',
-            birthDate: 'Unknown'
-          });
+          // Try to extract instrument from parentheses like "John Doe (guitar)"
+          const instrumentMatch = name.match(/^(.+?)\s*\(([^)]+)\)$/);
+          if (instrumentMatch) {
+            members.push({
+              name: instrumentMatch[1].trim(),
+              instrument: instrumentMatch[2].trim(),
+              birthPlace: 'Unknown',
+              birthDate: 'Unknown'
+            });
+          } else {
+            members.push({
+              name: name,
+              instrument: 'Unknown',
+              birthPlace: 'Unknown',
+              birthDate: 'Unknown'
+            });
+          }
         }
       });
       
@@ -441,9 +469,9 @@ function extractBandMembersFromText(text) {
   return members;
 }
 
-// Enrich band members with individual location data
+// Enrich band members with individual location data and instruments
 async function enrichBandMembersWithLocations(members) {
-  console.log('🔍 Enriching band members with location data...');
+  console.log('🔍 Enriching band members with location data and instruments...');
   
   const enrichedMembers = [];
   
@@ -470,7 +498,7 @@ async function enrichBandMembersWithLocations(members) {
         const pageTitle = searchResponse.data.query.search[0].title;
         console.log(`📄 Found Wikipedia page for ${member.name}: ${pageTitle}`);
         
-        // Get the member's Wikidata information
+        // Get the member's Wikidata information (includes instruments)
         const memberWikidataInfo = await getWikidataInfo(pageTitle);
         
         // Get summary for additional context
@@ -486,14 +514,27 @@ async function enrichBandMembersWithLocations(members) {
           }
         }
         
+        // Determine instrument - prefer existing data, then Wikidata, then extract from Wikipedia
+        let instrument = member.instrument || 'Unknown';
+        if (memberWikidataInfo.bandMembers && memberWikidataInfo.bandMembers.length > 0 && memberWikidataInfo.bandMembers[0].instrument) {
+          instrument = memberWikidataInfo.bandMembers[0].instrument;
+        } else if (summaryData.extract) {
+          // Try to extract instrument from Wikipedia summary
+          const extractedInstrument = extractInstrumentFromText(summaryData.extract, member.name);
+          if (extractedInstrument && extractedInstrument !== 'Unknown') {
+            instrument = extractedInstrument;
+          }
+        }
+        
         // Update the member with found information
         enrichedMembers.push({
           name: member.name,
+          instrument: instrument,
           birthPlace: memberWikidataInfo.birthPlace || 'Unknown',
           birthDate: memberWikidataInfo.birthDate || 'Unknown'
         });
         
-        console.log(`✅ Enriched ${member.name}: ${memberWikidataInfo.birthPlace} (${memberWikidataInfo.birthDate})`);
+        console.log(`✅ Enriched ${member.name}: ${instrument} from ${memberWikidataInfo.birthPlace} (${memberWikidataInfo.birthDate})`);
       } else {
         console.log(`❌ No Wikipedia page found for ${member.name}`);
         enrichedMembers.push(member); // Keep original data
@@ -509,6 +550,45 @@ async function enrichBandMembersWithLocations(members) {
   }
   
   return enrichedMembers;
+}
+
+// Extract instrument from Wikipedia text
+function extractInstrumentFromText(text, memberName) {
+  // Look for patterns like "John is a guitarist" or "John (vocals)" or "John plays guitar"
+  const instrumentPatterns = [
+    new RegExp(`${memberName}[^.]*?\\(([^)]+)\\)`, 'i'),
+    new RegExp(`${memberName}[^.]*?(?:plays|played)\\s+(?:the\\s+)?([\\w\\s,]+?)(?:\\.|,|and)`, 'i'),
+    /(?:vocalist|singer|guitarist|bassist|drummer|keyboardist|pianist|saxophonist|trumpeter)/gi
+  ];
+  
+  // Check for patterns with member name
+  for (let i = 0; i < 2; i++) {
+    const match = text.match(instrumentPatterns[i]);
+    if (match && match[1]) {
+      return match[1].trim();
+    }
+  }
+  
+  // Check for common instrument keywords in the text
+  const commonInstruments = {
+    'vocalist': 'vocals',
+    'singer': 'vocals',
+    'guitarist': 'guitar',
+    'bassist': 'bass',
+    'drummer': 'drums',
+    'keyboardist': 'keyboards',
+    'pianist': 'piano',
+    'saxophonist': 'saxophone',
+    'trumpeter': 'trumpet'
+  };
+  
+  for (const [key, value] of Object.entries(commonInstruments)) {
+    if (text.toLowerCase().includes(key)) {
+      return value;
+    }
+  }
+  
+  return 'Unknown';
 }
 
 // Get band members from MusicBrainz
@@ -554,8 +634,14 @@ async function getMusicBrainzMembers(artistName) {
       for (const relation of detailedArtist.relations) {
         if (relation.type === 'member of band' && relation.artist) {
           const member = relation.artist;
+          // Try to get instrument from relationship attributes
+          let instrument = 'Unknown';
+          if (relation.attributes && relation.attributes.length > 0) {
+            instrument = relation.attributes.join(', ');
+          }
           bandMembers.push({
             name: member.name,
+            instrument: instrument,
             birthPlace: 'Unknown', // Will be enriched later
             birthDate: 'Unknown',  // Will be enriched later
             mbid: member.id,
@@ -623,8 +709,14 @@ export async function searchMusicBrainz(req, res) {
       for (const relation of detailedArtist.relations) {
         if (relation.type === 'member of band' && relation.artist) {
           const member = relation.artist;
+          // Try to get instrument from relationship attributes
+          let instrument = 'Unknown';
+          if (relation.attributes && relation.attributes.length > 0) {
+            instrument = relation.attributes.join(', ');
+          }
           bandMembers.push({
             name: member.name,
+            instrument: instrument,
             birthPlace: 'Unknown', // MusicBrainz doesn't have birth places
             birthDate: 'Unknown',
             mbid: member.id,

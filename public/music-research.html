@@ -2525,6 +2525,10 @@ function displayBandMembers(data) {
   data.bandMembers.forEach(member => {
     const location = member.birthPlace || 'Unknown location';
     const birthYear = member.birthDate || 'Unknown year';
+    const instrument = member.instrument || 'Unknown';
+    
+    // Get icon for instrument
+    const instrumentIcon = getInstrumentIcon(instrument);
     
     html += `
       <div class="member-item mb-3 p-2" style="border: 1px solid #e9ecef; border-radius: 8px; background: rgba(248,249,250,0.5); cursor: pointer; transition: all 0.3s ease;" 
@@ -2537,6 +2541,13 @@ function displayBandMembers(data) {
           </div>
           <div class="flex-grow-1 ms-2">
             <h6 class="mb-1">${member.name}</h6>
+            ${instrument !== 'Unknown' ? `
+            <div class="mb-1">
+              <span class="badge" style="font-size: 0.75rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <i class="${instrumentIcon}"></i> ${instrument}
+              </span>
+            </div>
+            ` : ''}
             <small class="text-muted">
               <i class="bi-geo-alt"></i> ${location}
             </small>
@@ -2554,6 +2565,21 @@ function displayBandMembers(data) {
   });
   
   membersList.innerHTML = html;
+}
+
+// Get icon for instrument type
+function getInstrumentIcon(instrument) {
+  const lowercaseInstrument = instrument.toLowerCase();
+  
+  if (lowercaseInstrument.includes('guitar')) return 'bi-soundwave';
+  if (lowercaseInstrument.includes('bass')) return 'bi-music-note-beamed';
+  if (lowercaseInstrument.includes('drum')) return 'bi-vinyl';
+  if (lowercaseInstrument.includes('vocal') || lowercaseInstrument.includes('sing')) return 'bi-mic';
+  if (lowercaseInstrument.includes('keyboard') || lowercaseInstrument.includes('piano')) return 'bi-music-note-list';
+  if (lowercaseInstrument.includes('trumpet') || lowercaseInstrument.includes('horn')) return 'bi-megaphone';
+  if (lowercaseInstrument.includes('sax')) return 'bi-music-note';
+  
+  return 'bi-music-player';
 }
 
 // Focus on a specific member's location on the map
