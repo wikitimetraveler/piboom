@@ -7,8 +7,6 @@ let lastVoiceCommand = null;
 
 // Execute voice commands with server-side actions
 async function executeVoiceCommand(command, io) {
-  console.log('Executing voice command:', command);
-  
   // Store the last command for fallback communication
   lastVoiceCommand = {
     command,
@@ -19,7 +17,6 @@ async function executeVoiceCommand(command, io) {
   // Check for music research commands first
   if (command.startsWith('search ') || command.startsWith('tell me about ') || command.startsWith('who is ')) {
     const artistName = command.replace(/^(search |tell me about |who is )/i, '').trim();
-    console.log('🔍 Voice command: Music research for', artistName);
     
     // Send to frontend to open music research page and search
     if (io) {
@@ -37,8 +34,6 @@ async function executeVoiceCommand(command, io) {
   if (command.startsWith('ask ') || command.startsWith('what ') || command.startsWith('how ') || 
       command.startsWith('why ') || command.startsWith('explain ') || command.includes('recommend') ||
       command.startsWith('tell me ') || command.startsWith('dave ') || command.includes('music')) {
-    console.log('🎤 Voice command: Dave assistant query -', command);
-    
     try {
       const baseUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
       const response = await axios.post(`${baseUrl}/api/chat/chat`, {
@@ -48,7 +43,6 @@ async function executeVoiceCommand(command, io) {
       
       const chatResponse = response.data.response;
       const personality = response.data.personality || 'engaging';
-      console.log('🎤 Dave response:', chatResponse);
       
       // Send response to frontend with personality info
       if (io) {C
@@ -87,35 +81,28 @@ async function executeVoiceCommand(command, io) {
   
   switch (command) {
     case 'play':
-      console.log('🎵 Voice command: Starting playback');
       break;
       
     case 'pause':
-      console.log('⏸️ Voice command: Pausing playback');
       break;
       
     case 'stop':
-      console.log('🛑 Voice command: Stopping speech');
       if (voiceService) {
         voiceService.stopSpeaking();
       }
       break;
       
     case 'volume up':
-      console.log('🔊 Voice command: Increasing volume');
       break;
       
     case 'volume down':
-      console.log('🔉 Voice command: Decreasing volume');
       break;
       
     case 'what song':
-      console.log('🎤 Voice command: Announcing current song');
       break;
       
     case 'music research':
     case 'open research':
-      console.log('🔍 Voice command: Opening music research');
       if (io) {
         io.emit('voiceCommand', { 
           command: 'openMusicResearch', 
@@ -126,7 +113,6 @@ async function executeVoiceCommand(command, io) {
       break;
       
     case 'help':
-      console.log('❓ Voice command: Showing help');
       if (io) {
         io.emit('voiceCommand', { 
           command: 'showHelp', 
@@ -137,7 +123,6 @@ async function executeVoiceCommand(command, io) {
       break;
       
     default:
-      console.log('❓ Voice command not recognized:', command);
       // Try Dave assistant for unrecognized commands
       try {
         const baseUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
@@ -182,24 +167,13 @@ async function executeVoiceCommand(command, io) {
 }
 
 export async function initVoice(req, res) {
-  console.log('Voice init endpoint called');
   try {
-    console.log('Current initialization status:', isInitialized);
-    console.log('Voice service sayEnabled:', voiceService.sayEnabled);
-    console.log('Current mode:', process.env.MODE || 'pi');
-    
     if (!isInitialized) {
-      console.log('Attempting to initialize voice service...');
       const success = await voiceService.init();
-      console.log('Voice service init result:', success);
       isInitialized = success;
       
       if (success) {
-        console.log('Voice service initialized successfully');
-        console.log('Voice service sayEnabled after init:', voiceService.sayEnabled);
-        
         // Test speaking immediately
-        console.log('Testing voice service...');
         voiceService.speak('Voice service initialized successfully!');
         
         res.json({ 
@@ -208,7 +182,6 @@ export async function initVoice(req, res) {
           available: true
         });
       } else {
-        console.log('Voice service not available');
         res.json({ 
           success: false, 
           message: 'Voice service not available in current mode',
@@ -216,11 +189,7 @@ export async function initVoice(req, res) {
         });
       }
     } else {
-      console.log('Voice service already initialized');
-      console.log('Voice service sayEnabled:', voiceService.sayEnabled);
-      
       // Test speaking even if already initialized
-      console.log('Testing already initialized voice service...');
       voiceService.speak('Voice service was already initialized!');
       
       res.json({ 
@@ -240,22 +209,17 @@ export async function initVoice(req, res) {
 }
 
 export function startVoice(req, res) {
-  console.log('startVoice endpoint called');
   try {
     voiceService.startListening(async (command) => {
-      console.log('Voice command recognized:', command);
       await executeVoiceCommand(command, req.app.locals.io);
       
       // Send command to frontend via Socket.IO for immediate action
       if (req.app.locals.io) {
-        console.log('Emitting voice command to frontend:', command);
         req.app.locals.io.emit('voiceCommand', { 
           command, 
           timestamp: Date.now(),
           action: 'execute'
         });
-      } else {
-        console.log('Socket.IO not available for frontend communication');
       }
     });
     
@@ -274,8 +238,7 @@ export function startVoice(req, res) {
 }
 
 export function stopVoice(req, res) {
-  console.log('stopVoice endpoint called');
-  try {
+  try{
     voiceService.stopListening();
     
     res.json({ 
@@ -356,14 +319,8 @@ export function speakText(req, res) {
       });
     }
     
-    console.log('🎤 Speaking text:', text);
-    console.log('🎤 Voice service sayEnabled:', voiceService.sayEnabled);
-    console.log('🎤 Voice service mode:', process.env.MODE || 'pi');
-    console.log('🎤 Platform:', process.platform);
-    
     // Use chunked speech for longer responses to prevent cutoffs
     if (text.length > 200) {
-      console.log('🎤 Using chunked speech for long response');
       voiceService.speakChunked(text);
     } else {
       voiceService.speak(text);
@@ -443,8 +400,6 @@ export function processFrontendVoiceCommand(req, res) {
       });
     }
     
-    console.log('🎤 Frontend voice command received:', command);
-    
     // Process the command through the voice service
     voiceService.processFrontendCommand(command);
     
@@ -458,7 +413,6 @@ export function processFrontendVoiceCommand(req, res) {
     
     // Send command to frontend via Socket.IO for immediate action
     if (req.app.locals.io) {
-      console.log('Emitting frontend voice command to frontend:', command);
       req.app.locals.io.emit('voiceCommand', { 
         command, 
         timestamp: Date.now(),
@@ -484,8 +438,6 @@ export function processFrontendVoiceCommand(req, res) {
 // Stop speaking function
 export function stopSpeaking(req, res) {
   try {
-    console.log('🛑 Stopping speech...');
-    
     // Stop the voice service speaking
     voiceService.stopSpeaking();
     

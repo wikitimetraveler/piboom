@@ -61,21 +61,16 @@ export async function setVolume(percent) {
   try {
     // Use amixer for volume control on Pi
     await run('amixer', ['sset', 'Master', `${level}%`]);
-    console.log(`Volume set to ${level}%`);
   } catch (error) {
-    console.log('Volume control not available:', error.message);
     // Fallback: try using pactl if amixer fails
     try {
       await run('pactl', ['set-sink-volume', '@DEFAULT_SINK@', `${level}%`]);
-      console.log(`Volume set to ${level}% using pactl`);
     } catch (pactlError) {
-      console.log('Pactl volume control also failed:', pactlError.message);
       // Final fallback: try using alsamixer
       try {
         await run('alsamixer', ['-c', '0', '-s', `${level}%`]);
-        console.log(`Volume set to ${level}% using alsamixer`);
       } catch (alsamixerError) {
-        console.log('All volume control methods failed:', alsamixerError.message);
+        // All volume control methods failed
       }
     }
   }

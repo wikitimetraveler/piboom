@@ -1,12 +1,23 @@
 import SpotifyWebApi from 'spotify-web-api-node';
 
-// Spotify OAuth Configuration
+// Spotify OAuth Configuration - dynamically set redirect URI based on environment
+const getRedirectUri = () => {
+  // Check if running on Render (or other cloud platform)
+  if (process.env.RENDER_EXTERNAL_URL) {
+    return `${process.env.RENDER_EXTERNAL_URL}/api/spotify/callback`;
+  }
+  // Check for custom production redirect URI
+  if (process.env.SPOTIFY_REDIRECT_URI) {
+    return process.env.SPOTIFY_REDIRECT_URI;
+  }
+  // Default to localhost for local development
+  return 'http://localhost:3000/api/spotify/callback';
+};
+
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_CLIENT_ID,
   clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  redirectUri: process.env.NODE_ENV === 'production' 
-    ? process.env.SPOTIFY_REDIRECT_URI || 'https://www.thelanefamily.us/callback'
-    : 'http://localhost:3000/api/spotify/callback'
+  redirectUri: getRedirectUri()
 });
 
 // Store user tokens (in production, use a proper database)
@@ -15,8 +26,6 @@ const userTokens = new Map();
 // Generate authorization URL for Spotify OAuth
 export const getAuthUrl = async (req, res) => {
   try {
-    console.log('🎵 Generating Spotify authorization URL...');
-    
     // Define the scopes you want to request
     const scopes = [
       'user-read-private',
@@ -34,7 +43,6 @@ export const getAuthUrl = async (req, res) => {
     // Generate the authorization URL
     const authUrl = spotifyApi.createAuthorizeURL(scopes, 'music-box-session');
     
-    console.log('🎵 Authorization URL generated:', authUrl);
     
     res.json({
       success: true,
@@ -57,7 +65,6 @@ export const handleCallback = async (req, res) => {
   try {
     const { code, state } = req.query;
     
-    console.log('🎵 Spotify callback received:', { code: code ? 'present' : 'missing', state });
     
     if (!code) {
       return res.status(400).json({
@@ -70,7 +77,6 @@ export const handleCallback = async (req, res) => {
     const data = await spotifyApi.authorizationCodeGrant(code);
     const { access_token, refresh_token, expires_in } = data.body;
     
-    console.log('🎵 Access token received, expires in:', expires_in, 'seconds');
     
     // Set the access token
     spotifyApi.setAccessToken(access_token);
@@ -88,7 +94,6 @@ export const handleCallback = async (req, res) => {
       profile: userProfile.body
     });
     
-    console.log('🎵 User authenticated:', userProfile.body.display_name || userProfile.body.id);
     
     // Redirect to dashboard with user ID
     res.redirect(`/spotify-dashboard.html?userId=${userId}&connected=true`);
@@ -108,7 +113,6 @@ export const getUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
     
-    console.log('🎵 Getting user profile for:', userId);
     
     // Get user tokens
     const userTokenData = userTokens.get(userId);
@@ -121,7 +125,6 @@ export const getUserProfile = async (req, res) => {
     
     // Check if token is expired and refresh if needed
     if (Date.now() > userTokenData.expiresAt) {
-      console.log('🎵 Token expired, refreshing...');
       await refreshUserToken(userId);
     }
     
@@ -152,7 +155,6 @@ export const getTopTracks = async (req, res) => {
     const { userId } = req.params;
     const { timeRange = 'medium_term', limit = 20 } = req.query;
     
-    console.log('🎵 Getting top tracks for:', userId, 'time range:', timeRange);
     
     // Get user tokens
     const userTokenData = userTokens.get(userId);
@@ -199,7 +201,6 @@ export const getTopArtists = async (req, res) => {
     const { userId } = req.params;
     const { timeRange = 'medium_term', limit = 20 } = req.query;
     
-    console.log('🎵 Getting top artists for:', userId, 'time range:', timeRange);
     
     // Get user tokens
     const userTokenData = userTokens.get(userId);
@@ -246,7 +247,6 @@ export const getUserPlaylists = async (req, res) => {
     const { userId } = req.params;
     const { limit = 20 } = req.query;
     
-    console.log('🎵 Getting playlists for:', userId);
     
     // Get user tokens
     const userTokenData = userTokens.get(userId);
@@ -297,7 +297,6 @@ export const searchSpotify = async (req, res) => {
       });
     }
     
-    console.log('🎵 Searching Spotify for:', q, 'type:', type);
     
     // Search doesn't require user authentication
     const searchResults = await spotifyApi.search(q, type.split(','), {
@@ -329,7 +328,6 @@ export const getCurrentlyPlaying = async (req, res) => {
   try {
     const { userId } = req.params;
     
-    console.log('🎵 Getting currently playing for:', userId);
     
     // Get user tokens
     const userTokenData = userTokens.get(userId);
@@ -374,7 +372,6 @@ async function refreshUserToken(userId) {
       throw new Error('No refresh token available');
     }
     
-    console.log('🎵 Refreshing token for user:', userId);
     
     spotifyApi.setRefreshToken(userTokenData.refreshToken);
     const data = await spotifyApi.refreshAccessToken();
@@ -389,7 +386,6 @@ async function refreshUserToken(userId) {
       expiresAt: newExpiresAt
     });
     
-    console.log('🎵 Token refreshed successfully');
     
   } catch (error) {
     console.error('❌ Token Refresh Error:', error);
@@ -428,7 +424,6 @@ export const logout = async (req, res) => {
   try {
     const { userId } = req.params;
     
-    console.log('🎵 Logging out user:', userId);
     
     // Remove user tokens
     userTokens.delete(userId);

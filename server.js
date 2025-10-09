@@ -30,17 +30,5 @@ app.get('*', (req,res)=>{
 });
 
 server.listen(config.port, ()=>{
-  console.log(`🎵 Pi BOOM Audio System listening on http://localhost:${config.port}`);
-  console.log(`🔧 Mode: ${config.mode} | Platform: ${process.platform}`);
-  console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`☁️  Cloud Deployment: ${process.env.RENDER_EXTERNAL_URL ? 'YES (Render)' : process.env.HEROKU_APP_NAME ? 'YES (Heroku)' : 'NO'}`);
-  console.log(`🎤 Music directory: ${config.musicDir}`);
-  console.log(`🔊 Voice activation: ${config.mode === 'pi' ? 'ENABLED' : 'CLOUD MODE'}`);
-  console.log(`📡 Socket.IO server ready for voice commands`);
-  
-  if (config.mode === 'pi') {
-    console.log(`🎯 Pi mode active - using local audio playback and voice recognition`);
-  } else {
-    console.log(`☁️  Cloud mode active - using frontend voice recognition and cloud TTS fallbacks`);
-  }
+  // Server started successfully
 });

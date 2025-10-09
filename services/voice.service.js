@@ -34,26 +34,13 @@ export class VoiceService {
 
   // Initialize voice recognition
   async init() {
-    console.log('VoiceService.init() called');
-    console.log('Platform:', process.platform);
-    console.log('Mode:', config.mode);
-    console.log('Environment:', process.env.NODE_ENV || 'development');
-    console.log('Render URL:', process.env.RENDER_EXTERNAL_URL || 'not set');
-    
     try {
       // Initialize Google Cloud Speech client for both pi and cloud modes
       this.speechClient = new SpeechClient();
-      console.log('✅ Google Cloud Speech client initialized');
       
       // Test TTS availability
-      console.log('🎤 Testing TTS availability...');
       this.testTTSAvailability();
       
-      if (config.mode === 'pi') {
-        console.log('✅ Voice activation ready for Pi mode');
-      } else {
-        console.log('✅ Voice activation ready for Cloud mode');
-      }
       return true;
     } catch (error) {
       console.error('Voice activation initialization error:', error.message);
@@ -73,7 +60,6 @@ export class VoiceService {
       this.startPiModeRecognition();
     } else {
       // Cloud mode - frontend handles voice recognition
-      console.log('✅ Cloud mode voice recognition ready - frontend will handle voice input');
     }
     
     this.speak('🎤 Voice activation enabled! I\'m listening for your commands. Say "help" to see what you can do!');
@@ -89,7 +75,7 @@ export class VoiceService {
       try {
         this.recognitionProcess.kill('SIGTERM');
       } catch (error) {
-        console.log('Process termination:', error.message);
+        // Silent termination
       }
       this.recognitionProcess = null;
     }
@@ -118,8 +104,6 @@ export class VoiceService {
 
   // Start command processor
   startCommandProcessor() {
-    console.log('🎯 Command processor ready');
-    
     // Set up periodic status updates
     this.statusInterval = setInterval(() => {
       if (!this.isListening) {
@@ -128,7 +112,6 @@ export class VoiceService {
       }
       
       // Keep the voice recognition active
-      console.log('🎤 Pi mode voice recognition active...');
     }, 10000); // Update every 10 seconds
   }
 
@@ -138,7 +121,6 @@ export class VoiceService {
     
     // Prevent overlapping speech
     if (this.isSpeaking) {
-      console.log('🎤 Already speaking, skipping:', text);
       return;
     }
     
@@ -152,10 +134,6 @@ export class VoiceService {
     this.speechTimeout = setTimeout(() => {
       this.isSpeaking = false;
     }, 5000); // 5 second speech timeout
-    
-    console.log('🎤 Attempting to speak:', text);
-    console.log('🎤 Platform:', process.platform);
-    console.log('🎤 Mode:', config.mode);
     
     if (config.mode === 'pi') {
       if (this.isWindows) {
@@ -177,18 +155,14 @@ export class VoiceService {
           exec(command, { timeout: 15000 }, (error, stdout, stderr) => {
             if (error) {
               console.error('Windows text-to-speech failed:', error.message);
-              console.log('🎤 Voice feedback (fallback):', text);
               
               // Try alternative method with espeak if available
               this.tryEspeakFallback(text);
-            } else {
-              console.log('🎤 Windows text-to-speech successful!');
             }
             
           });
         } catch (error) {
           console.error('Windows text-to-speech not available:', error.message);
-          console.log('🎤 Voice feedback (fallback):', text);
           this.tryEspeakFallback(text);
         }
       } else {
@@ -197,7 +171,6 @@ export class VoiceService {
       }
     } else {
       // Cloud mode - try espeak first, then fallback to web TTS or console
-      console.log('🎤 Cloud mode - attempting espeak TTS...');
       this.tryEspeakTTS(text);
       
       // Also try web-based TTS as a fallback for cloud deployments
@@ -209,7 +182,6 @@ export class VoiceService {
   // Process voice commands
   processCommand(command) {
     const normalizedCommand = command.toLowerCase().trim();
-    console.log('Processing command:', normalizedCommand);
     
     // Find matching command
     let matchedCommand = null;
@@ -221,7 +193,6 @@ export class VoiceService {
     }
     
     if (matchedCommand) {
-      console.log('✅ Command matched:', matchedCommand);
       this.commandHistory.push({
         command: matchedCommand,
         original: normalizedCommand,
@@ -232,15 +203,12 @@ export class VoiceService {
         this.onCommand(matchedCommand);
       }
     } else {
-      console.log('❌ Command not recognized:', normalizedCommand);
       this.speak(`I didn't understand "${normalizedCommand}". Say "help" for available commands.`);
     }
   }
 
   // Process voice commands from frontend (for Pi mode compatibility)
   processFrontendCommand(command) {
-    console.log('🎤 Frontend voice command received:', command);
-    
     // Process the command using the same logic
     this.processCommand(command);
     

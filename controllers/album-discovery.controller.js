@@ -16,8 +16,6 @@ export async function analyzeAlbumsWithAI(req, res) {
       return res.status(400).json({ error: 'Artist name and albums array are required' });
     }
 
-    console.log(`🤖 Analyzing ${albums.length} albums for ${artist} with AI`);
-
     // Prepare album information for AI analysis
     const albumList = albums.map(album => 
       `${album.title} (${album.year}) - ${album.genre}`
@@ -174,7 +172,6 @@ export async function getAlbums(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    console.log(`🎵 Searching for albums by: ${artist}`);
 
     // Use MusicBrainz API for album information
     const searchQuery = encodeURIComponent(artist);

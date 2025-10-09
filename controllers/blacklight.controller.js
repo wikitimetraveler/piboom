@@ -9,7 +9,6 @@ export async function searchPosters(req, res) {
       return res.status(400).json({ error: 'Search query is required' });
     }
 
-    console.log(`🎨 Searching for posters/album covers for: ${query} with filter: ${filter}`);
 
     const results = {
       query: query,
@@ -58,7 +57,6 @@ export async function searchPosters(req, res) {
       }
     }
 
-    console.log(`🎨 Found ${results.posters.length} posters from ${results.sources.length} sources`);
 
     res.json({
       success: true,
@@ -327,7 +325,6 @@ export async function getFeaturedPosters(req, res) {
 
     const randomArtist = featuredArtists[Math.floor(Math.random() * featuredArtists.length)];
     
-    console.log(`🎨 Getting featured posters for: ${randomArtist}`);
 
     // Get posters from MusicBrainz
     const musicBrainzResults = await searchMusicBrainzPosters(randomArtist);

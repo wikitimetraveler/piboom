@@ -258,8 +258,6 @@ const chatWithGPT = async (req, res) => {
     });
     
     // Debug: Log that we're about to try speaking
-    console.log('🎤 Chat response generated, attempting to speak...');
-    console.log('🎤 Response:', response);
 
   } catch (error) {
     console.error('ChatGPT API Error:', error.message);
@@ -604,7 +602,6 @@ export async function searchYouTubeVideos(req, res) {
       });
     }
     
-    console.log('🔍 Searching YouTube for:', query);
     
     // Get YouTube API key from environment
     const apiKey = process.env.GOOGLE_API_KEY;
@@ -629,7 +626,6 @@ export async function searchYouTubeVideos(req, res) {
         url: `https://www.youtube.com/watch?v=${item.id.videoId}`
       }));
 
-      console.log('🔍 Found YouTube videos:', videos.length);
 
       res.json({ 
         success: true, 

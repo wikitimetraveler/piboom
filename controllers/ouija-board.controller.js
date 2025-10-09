@@ -156,7 +156,6 @@ function addToSpiritQueue(spiritName, message, priority = 'normal') {
     return a.timestamp - b.timestamp;
   });
   
-  console.log(`🔮 Added ${spiritName} message to queue. Queue length: ${spiritQueue.length}`);
   
   // Process queue if not already speaking
   if (!isSpiritSpeaking) {
@@ -174,7 +173,6 @@ async function processSpiritQueue() {
   const spiritMessage = spiritQueue.shift();
   currentSpirit = spiritMessage.spirit;
   
-  console.log(`🔮 ${currentSpirit} is now speaking:`, spiritMessage.message);
   
   // Wait for message to complete before processing next
   setTimeout(() => {
@@ -191,7 +189,6 @@ async function processSpiritQueue() {
 // Check if spirit can speak (not interrupting another spirit)
 function canSpiritSpeak(spiritName) {
   if (isSpiritSpeaking && currentSpirit !== spiritName) {
-    console.log(`🔮 ${spiritName} cannot speak - ${currentSpirit} is currently speaking`);
     return false;
   }
   return true;
@@ -201,11 +198,9 @@ function canSpiritSpeak(spiritName) {
 async function getChatGPTResponse(question, spiritName = 'Houdini') {
   try {
     if (!process.env.OPENAI_API_KEY) {
-      console.log('🔮 No OpenAI API key found, skipping ChatGPT');
       return null;
     }
 
-    console.log(`🔮 Calling ChatGPT API for ${spiritName} response...`);
     
     let systemPrompt = '';
     
@@ -256,7 +251,6 @@ Respond in ALL CAPS in the style of a mystical spirit communicating through a Ou
     });
 
     const response = completion.choices[0]?.message?.content;
-    console.log(`🔮 ChatGPT response for ${spiritName}:`, response);
     
     return response || null;
     
@@ -268,7 +262,6 @@ Respond in ALL CAPS in the style of a mystical spirit communicating through a Ou
 
 // Fallback response function - ALWAYS use ChatGPT
 async function getFallbackResponse(question, spiritName = 'Houdini') {
-  console.log(`🔮 Fallback: Using ChatGPT for ${spiritName} response to:`, question);
   
   // Always try ChatGPT with different prompts if the first one fails
   const fallbackPrompts = [
@@ -301,7 +294,6 @@ export const askHoudini = async (req, res) => {
       });
     }
 
-    console.log('🔮 Houdini received question:', question);
     
     // Check if this is a blues rock question that should summon Janis Joplin
     const lowerQuestion = question.toLowerCase();
@@ -309,14 +301,12 @@ export const askHoudini = async (req, res) => {
         lowerQuestion.includes('janis') || lowerQuestion.includes('joplin') ||
         lowerQuestion.includes('piece of my heart') || lowerQuestion.includes('ball and chain')) {
       
-      console.log('🔮 Summoning Janis Joplin for blues rock guidance...');
       
       // Get Janis Joplin's response from ChatGPT
       let janisResponse = await getChatGPTResponse(question, 'Janis Joplin');
       
       // If ChatGPT fails, try again with a simpler prompt
       if (!janisResponse) {
-        console.log('🔮 ChatGPT failed for Janis Joplin, retrying with fallback prompt...');
         janisResponse = await getChatGPTResponse("Tell me about blues rock music", 'Janis Joplin');
       }
       
@@ -365,7 +355,6 @@ export const askHoudini = async (req, res) => {
     
     // If ChatGPT fails, try fallback prompts
     if (!answer) {
-      console.log('🔮 ChatGPT failed, trying fallback prompts');
       answer = await getFallbackResponse(question, 'Houdini');
     }
     
@@ -385,7 +374,6 @@ export const askHoudini = async (req, res) => {
       Math.floor(Math.random() * mysticalAnswers.length)
     ];
     
-    console.log('🔮 Houdini\'s response:', finalAnswer);
     
     // Add Houdini's response to spirit queue
     addToSpiritQueue('Houdini', finalAnswer, 'normal');
@@ -507,14 +495,12 @@ export const summonJanisJoplin = async (req, res) => {
   try {
     const { question } = req.body;
     
-    console.log('🔮 Summoning Janis Joplin for blues rock guidance...');
     
     // Get Janis Joplin's response from ChatGPT - NO hardcoded responses
     let janisResponse = await getChatGPTResponse(question || 'Tell me about blues rock music', 'Janis Joplin');
     
     // If ChatGPT fails, try fallback prompts
     if (!janisResponse) {
-      console.log('🔮 ChatGPT failed for Janis Joplin, trying fallback prompts');
       janisResponse = await getFallbackResponse(question || 'Tell me about blues rock music', 'Janis Joplin');
     }
     

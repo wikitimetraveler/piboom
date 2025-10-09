@@ -1037,13 +1037,27 @@ function initializeKGWidget() {
             console.log('🔍 KGSearchWidget function available:', typeof KGSearchWidget);
             
             if (el && typeof KGSearchWidget === 'function') {
+              // Blocklist of non-musicians to filter out
+              const nonMusicianBlocklist = [
+                'donald trump', 'trump'
+              ];
+              
               const cfg = {
                 limit: 10,
                 // Narrow to music-related entities (schema.org types)
-                types: ['MusicGroup','Person','MusicRecording'],
+                // Ordered by priority: MusicGroup first to prioritize bands/artists
+                types: ['MusicGroup','MusicRecording','MusicAlbum','MusicComposition','Person'],
                 maxDescChars: 180,
                 selectHandler: (e) => {
                   try {
+                    // Filter out non-musicians
+                    const name = e.row.name.toLowerCase();
+                    if (nonMusicianBlocklist.some(blocked => name.includes(blocked))) {
+                      console.log('🚫 Blocked non-musician:', e.row.name);
+                      alert(`"${e.row.name}" is not a musician. Please search for music artists or bands.`);
+                      return;
+                    }
+                    
                     console.log('🔍 KG Widget selection:', e.row);
                     // Fetch detailed information from Knowledge Graph API
                     fetchDetailedArtistInfo(e.row.name);

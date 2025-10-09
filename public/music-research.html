@@ -1192,13 +1192,27 @@ function initializeKGWidget() {
             console.log('🔍 KGSearchWidget function available:', typeof KGSearchWidget);
             
             if (el && typeof KGSearchWidget === 'function') {
+              // Blocklist of non-musicians to filter out
+              const nonMusicianBlocklist = [
+                'donald trump', 'trump'
+              ];
+              
               const cfg = {
                 limit: 10,
                 // Narrow to music-related entities (schema.org types)
-                types: ['MusicGroup','Person','MusicRecording'],
+                // Ordered by priority: MusicGroup first to prioritize bands/artists
+                types: ['MusicGroup','MusicRecording','MusicAlbum','MusicComposition','Person'],
                 maxDescChars: 180,
                 selectHandler: (e) => {
                   try {
+                    // Filter out non-musicians
+                    const name = e.row.name.toLowerCase();
+                    if (nonMusicianBlocklist.some(blocked => name.includes(blocked))) {
+                      console.log('🚫 Blocked non-musician:', e.row.name);
+                      alert(`"${e.row.name}" is not a musician. Please search for music artists or bands.`);
+                      return;
+                    }
+                    
                     console.log('🔍 KG Widget selection:', e.row);
                     renderCard(e.row);
                     // Save selected artist to localStorage for persistence across pages
@@ -1439,7 +1453,7 @@ function handleSearchKeypress(event) {
     }
   }
 }
-
+                                                                                
 function askChatGPT() {
   const question = document.getElementById('kgBand').value.trim();
   if (!question) {
@@ -2526,82 +2540,114 @@ function displayBandMembers(data) {
   }
   
   let html = '';
-  data.bandMembers.forEach(member => {
+  data.bandMembers.forEach((member, index) => {
     const location = member.birthPlace || 'Unknown location';
     const birthYear = member.birthDate || 'Unknown year';
     const instrument = member.instrument || 'Unknown';
     const isDeceased = member.deathDate !== null && member.deathDate !== undefined;
+    const hasEquipment = member.equipment && member.equipment.length > 0;
     
     // Get icon for instrument
     const instrumentIcon = getInstrumentIcon(instrument);
     
     html += `
       <div class="col-lg-6 col-md-6 mb-3">
-        <div class="member-card h-100 p-3" style="border: 1px solid #e9ecef; border-radius: 12px; background: rgba(248,249,250,0.5); cursor: pointer; transition: all 0.3s ease;" 
-             onclick="focusOnMemberLocation('${member.name.replace(/'/g, "\\'")}', '${location.replace(/'/g, "\\'")}')" 
-             onmouseover="this.style.background='rgba(52,152,219,0.1)'; this.style.borderColor='#3498db'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';" 
-             onmouseout="this.style.background='rgba(248,249,250,0.5)'; this.style.borderColor='#e9ecef'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-          <div class="d-flex align-items-start">
-            <div class="flex-shrink-0 me-3">
-              ${member.imageUrl ? `
-                <img src="${member.imageUrl}" alt="${member.name}" 
-                     style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #3498db;">
-              ` : `
-                <i class="bi-person-circle text-primary" style="font-size: 3rem;"></i>
-              `}
-            </div>
-            <div class="flex-grow-1">
-              <h6 class="mb-1 fw-bold" style="font-size: 1rem;">${member.name} ${isDeceased ? '<i class="bi-star-fill text-warning" style="font-size: 0.7rem;" title="Deceased"></i>' : ''}</h6>
-              
-              ${instrument !== 'Unknown' ? `
-              <div class="mb-2" style="display: flex; flex-wrap: wrap; gap: 4px;">
-                ${instrument.split(',').map(inst => `
-                  <span class="badge" style="font-size: 0.7rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <i class="${getInstrumentIcon(inst.trim())}"></i> ${inst.trim()}
-                  </span>
-                `).join('')}
-              </div>
-              ` : ''}
-              
-              <div style="font-size: 0.8rem;">
-                <div class="mb-1">
-                  <i class="bi-geo-alt text-primary" style="font-size: 0.85rem;"></i>
-                  <small class="text-muted">${location}</small>
+        <div class="member-card" style="min-height: 350px; border: 1px solid #e9ecef; border-radius: 12px; background: rgba(248,249,250,0.95); transition: all 0.3s ease; cursor: pointer; overflow: auto; position: relative;"
+             onclick="focusOnMemberLocation('${member.name.replace(/'/g, "\\'")}', '${location.replace(/'/g, "\\'")}')"
+             onmouseover="this.style.borderColor='#3498db'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';" 
+             onmouseout="this.style.borderColor='#e9ecef'; this.style.transform='translateY(0)'; this.style.boxShadow='none';"
+             title="Click to view ${member.name}'s birth place on map">
+              <div class="p-3 h-100">
+                <div style="position: absolute; top: 8px; right: 8px; opacity: 0.5;">
+                  <i class="bi-geo-alt-fill text-primary" style="font-size: 1.2rem;"></i>
                 </div>
-                <div class="mb-1">
-                  <i class="bi-calendar text-primary" style="font-size: 0.85rem;"></i>
-                  <small class="text-muted">${birthYear}</small>
-                  ${isDeceased ? `<small class="text-danger"> - ${member.deathDate}</small>` : ''}
+                <div class="d-flex align-items-start">
+                  <div class="flex-shrink-0 me-3">
+                    ${member.imageUrl ? `
+                      <img src="${member.imageUrl}" alt="${member.name}" 
+                           style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 3px solid #3498db;">
+                    ` : `
+                      <i class="bi-person-circle text-primary" style="font-size: 3rem;"></i>
+                    `}
+                  </div>
+                  <div class="flex-grow-1">
+                    <h6 class="mb-1 fw-bold" style="font-size: 1rem;">${member.name} ${isDeceased ? '<i class="bi-star-fill text-warning" style="font-size: 0.7rem;" title="Deceased"></i>' : ''}</h6>
+                    
+                    ${instrument !== 'Unknown' ? `
+                    <div class="mb-2" style="display: flex; flex-wrap: wrap; gap: 4px;">
+                      ${instrument.split(',').map(inst => `
+                        <span class="badge" style="font-size: 0.7rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                          <i class="${getInstrumentIcon(inst.trim())}"></i> ${inst.trim()}
+                        </span>
+                      `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <div style="font-size: 0.8rem;">
+                      <div class="mb-1">
+                        <i class="bi-geo-alt text-primary" style="font-size: 0.85rem;"></i>
+                        <small class="text-muted">${location}</small>
+                      </div>
+                      <div class="mb-1">
+                        <i class="bi-calendar text-primary" style="font-size: 0.85rem;"></i>
+                        <small class="text-muted">${birthYear}</small>
+                        ${isDeceased ? `<small class="text-danger"> - ${member.deathDate}</small>` : ''}
+                      </div>
+                      ${isDeceased && member.deathPlace && member.deathPlace !== 'Unknown' ? `
+                      <div class="mb-1">
+                        <i class="bi-cross text-danger" style="font-size: 0.85rem;"></i>
+                        <small class="text-muted">${member.deathPlace}</small>
+                      </div>
+                      ` : ''}
+                      
+                      ${member.associatedActs && member.associatedActs.length > 0 ? `
+                      <div class="mt-2">
+                        <small class="text-muted d-block mb-1" style="font-size: 0.75rem;"><i class="bi-music-note-list"></i> Also in:</small>
+                        <div>
+                          ${member.associatedActs.slice(0, 2).map(act => `
+                            <span class="badge bg-secondary me-1 mb-1" style="font-size: 0.65rem;">
+                              ${act.name}${act.years ? ` (${act.years})` : ''}
+                            </span>
+                          `).join('')}
+                          ${member.associatedActs.length > 2 ? `<span class="badge bg-secondary" style="font-size: 0.65rem;">+${member.associatedActs.length - 2}</span>` : ''}
+                        </div>
+                      </div>
+                      ` : ''}
+                    </div>
+                  </div>
                 </div>
-                ${isDeceased && member.deathPlace && member.deathPlace !== 'Unknown' ? `
-                <div class="mb-1">
-                  <i class="bi-cross text-danger" style="font-size: 0.85rem;"></i>
-                  <small class="text-muted">${member.deathPlace}</small>
-                </div>
-                ` : ''}
                 
-                ${member.associatedActs && member.associatedActs.length > 0 ? `
-                <div class="mt-2">
-                  <small class="text-muted d-block mb-1" style="font-size: 0.75rem;"><i class="bi-music-note-list"></i> Also in:</small>
-                  <div>
-                    ${member.associatedActs.slice(0, 2).map(act => `
-                      <span class="badge bg-secondary me-1 mb-1" style="font-size: 0.65rem;">
-                        ${act.name}${act.years ? ` (${act.years})` : ''}
+                ${hasEquipment ? `
+                <div class="mt-3" style="border-top: 1px solid #e9ecef; padding-top: 12px;">
+                  <h6 class="fw-bold mb-2" style="color: #3498db; font-size: 0.85rem;">
+                    <i class="bi-tools"></i> Signature Equipment
+                  </h6>
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    ${member.equipment.map(item => `
+                      <span class="badge bg-primary" style="font-size: 0.65rem;">
+                        <i class="bi-soundwave"></i> ${item}
                       </span>
                     `).join('')}
-                    ${member.associatedActs.length > 2 ? `<span class="badge bg-secondary" style="font-size: 0.65rem;">+${member.associatedActs.length - 2}</span>` : ''}
                   </div>
                 </div>
                 ` : ''}
               </div>
-            </div>
-          </div>
         </div>
       </div>
     `;
   });
   
   membersList.innerHTML = html;
+}
+
+// Flip card function
+function flipCard(index) {
+  const card = document.getElementById(`flipCard${index}`);
+  if (card.style.transform === 'rotateY(180deg)') {
+    card.style.transform = 'rotateY(0deg)';
+  } else {
+    card.style.transform = 'rotateY(180deg)';
+  }
 }
 
 // Get icon for instrument type

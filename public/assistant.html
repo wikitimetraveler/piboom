@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Levi - piBoom Music Research Assistant</title>
+<title>piBoom Music Assistant</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/styles.css"/>
@@ -90,7 +90,7 @@
     font-size: 15px;
   }
   
-  .assistant-message.levi {
+  .assistant-message.active {
     background: linear-gradient(135deg, rgba(74, 85, 104, 0.95), rgba(45, 55, 72, 0.9));
     color: #f7fafc;
     font-weight: 400;
@@ -636,7 +636,7 @@
 <div class="assistant-container">
   <div class="greeting-section">
     <h2><i class="bi-music-note-beamed"></i> Meet Your Music Assistant</h2>
-    <p id="assistantDescription">I'm Dave, a 64-year-old mathematician and computer scientist from Hermitage, PA! I grew up in Amish country but became a tech pioneer with an incredible concert history! I've seen everyone from Pink Floyd to Stevie Ray Vaughan live! Ask me about blues, rock, or mathematical analysis of music! 🧮🎵🎸</p>
+    <p id="assistantDescription">Your music assistant is ready to help! Select an assistant below to get started. 🎵</p>
     
     <!-- Assistant Switcher -->
     <div class="assistant-switcher mb-3">
@@ -689,24 +689,23 @@
     <button class="btn btn-danger mr-2" onclick="stopSpeaking()" id="stopSpeakingBtn">
       <i class="bi-stop-circle"></i> Stop Speaking
     </button>
-    <button class="btn btn-info" onclick="makeLeviSpeak('Hello! I am Levi, your soulful delta blues music assistant!')" id="testVoiceBtn" disabled>
+    <button class="btn btn-info" onclick="makeAssistantSpeak('Hello! I am your music assistant, ready to help!')" id="testVoiceBtn" disabled>
       <i class="bi-volume-up"></i> Test Voice
     </button>
   </div>
 
   <div class="chat-messages" id="chatMessages">
-    <div class="message assistant-message levi">
-      <strong>Dave:</strong> Hey there! I'm Dave, your mathematician and computer scientist music assistant! Ready to calculate some awesome music? 🧮🎵 What would you like to talk about today? I'm here to help you discover amazing music through our voice-controlled system! I've got degrees in pure mathematics and computer science, plus I've seen everyone from Pink Floyd to Stevie Ray Vaughan live! Let me calculate the probability of that being awesome!
-      <span class="personality-badge">mathematician-concert-veteran</span>
+    <div class="message assistant-message active" id="initialGreeting">
+      <strong>Assistant:</strong> Welcome! I'm your music assistant. Select an assistant from the dropdown above to get started, and I'll greet you properly! 🎵
     </div>
   </div>
 
   <div class="typing-indicator" id="typingIndicator">
-    Dave is thinking... <i class="bi-three-dots"></i>
+    Assistant is thinking... <i class="bi-three-dots"></i>
   </div>
 
   <div class="input-group">
-    <input type="text" class="form-control" id="messageInput" placeholder="Ask Dave anything about music or just chat!" onkeypress="handleKeyPress(event)">
+    <input type="text" class="form-control" id="messageInput" placeholder="Ask your assistant anything about music or just chat!" onkeypress="handleKeyPress(event)">
     <div class="input-group-append">
       <button class="btn btn-primary" onclick="sendMessage()">
         <i class="bi-send"></i> Send
@@ -746,7 +745,7 @@
 <footer class="footer">
   <div class="container text-center">
     <div class="footer-content">
-      <strong>Levi's Music System</strong> — Powered by Cursor AI — <span id="dt"></span> — All Rights Reserved
+      <strong>piBoom Music System</strong> — Powered by AI — <span id="dt"></span> — All Rights Reserved
     </div>
     <div class="footer-quote mt-2">
       🎸 "The blues got soul, you know" 🎸
@@ -786,8 +785,8 @@ async function initVoice() {
       document.getElementById('testVoiceBtn').disabled = false;
       document.getElementById('initVoiceBtn').disabled = true;
       
-      // Make Levi speak the confirmation
-      makeLeviSpeak('Voice enabled! Levi can now speak to you!');
+      // Make assistant speak the confirmation
+      makeAssistantSpeak('Voice enabled! Your assistant can now speak to you!');
     } else {
       console.log('Voice service not available');
       addMessage('Voice service not available in current mode', 'assistant', 'informative');
@@ -967,9 +966,9 @@ async function sendVoiceMessage(message) {
     const data = await response.json();
     if (data.response) {
       addMessage(data.response, 'assistant', data.personality);
-      // Make Levi speak his response
+      // Make assistant speak their response
       if (voiceEnabled) {
-        makeLeviSpeak(data.response);
+        makeAssistantSpeak(data.response);
       }
     } else {
       addMessage('Sorry, I had trouble processing that. Try again!', 'assistant', 'apologetic');
@@ -980,8 +979,8 @@ async function sendVoiceMessage(message) {
   }
 }
 
-// Make Levi speak
-async function makeLeviSpeak(text) {
+// Make Assistant speak
+async function makeAssistantSpeak(text) {
   try {
     // Set speaking flag to true (we want to speak)
     isCurrentlySpeaking = true;
@@ -1144,10 +1143,10 @@ async function findYouTubeVideos() {
     });
     
     // Clean up the search query and extract key terms
-    searchQuery = searchQuery.replace(/Dave:|Levi:|User:/g, '').trim();
+    searchQuery = searchQuery.replace(/Assistant:|User:|You:/g, '').trim();
     
     // Remove common assistant phrases that aren't useful for search
-    searchQuery = searchQuery.replace(/\b(?:Hey there!|I'm Dave|your mathematician|computer scientist|music assistant|Ready to calculate|What would you like|I'm here to help|I've got degrees|pure mathematics|computer science|Let me calculate|probability of that being awesome|Voice enabled|Levi can now speak|enthusiastic|mathematician-concert-veteran)\b/gi, '');
+    searchQuery = searchQuery.replace(/\b(?:Hey there|music assistant|Ready to|What would you like|I'm here to help|Voice enabled|enthusiastic)\b/gi, '');
     
     // Remove emojis and special characters
     searchQuery = searchQuery.replace(/[🎵🎤🎸🧮💙✨🌌🎶]/g, '');
@@ -1315,14 +1314,14 @@ function sendMessage() {
     hideTypingIndicator();
     if (data.response) {
       addMessage(data.response, 'assistant', data.personality);
-      // Make Dave speak his response
+      // Make assistant speak their response
       if (voiceEnabled) {
-        makeLeviSpeak(data.response);
+        makeAssistantSpeak(data.response);
       }
     } else {
       addMessage('Sorry, I had trouble processing that. Try again!', 'assistant', 'apologetic');
       if (voiceEnabled) {
-        makeLeviSpeak('Sorry, I had trouble processing that. Try again!');
+        makeAssistantSpeak('Sorry, I had trouble processing that. Try again!');
       }
     }
   })
@@ -1350,8 +1349,8 @@ function addMessage(text, sender, personality = 'engaging') {
   messageDiv.className = `message ${sender}-message`;
   
   if (sender === 'assistant') {
-    messageDiv.classList.add('levi');
-    messageDiv.innerHTML = `<strong>Dave:</strong> ${text}`;
+    messageDiv.classList.add('active');
+    messageDiv.innerHTML = `<strong>Assistant:</strong> ${text}`;
     if (personality && personality !== 'engaging') {
       messageDiv.innerHTML += ` <span class="personality-badge">${personality}</span>`;
     }
@@ -1386,9 +1385,8 @@ function hideTypingIndicator() {
 function clearChat() {
   const chatMessages = document.getElementById('chatMessages');
   chatMessages.innerHTML = `
-    <div class="message assistant-message levi">
-      <strong>Dave:</strong> Fresh start! What would you like to talk about? 🧮🎵
-      <span class="personality-badge">mathematician-concert-veteran</span>
+    <div class="message assistant-message active">
+      <strong>Assistant:</strong> Fresh start! What would you like to talk about? 🎵
     </div>
   `;
   conversationCount = 0;
@@ -1411,9 +1409,9 @@ function getGreeting() {
     .then(data => {
       if (data.greeting) {
         addMessage(data.greeting, 'assistant', data.personality);
-        // Make Levi speak the greeting
+        // Make assistant speak the greeting
         if (voiceEnabled) {
-          makeLeviSpeak(data.greeting);
+          makeAssistantSpeak(data.greeting);
         }
       }
     })
@@ -1590,7 +1588,7 @@ function preloadArtistContext() {
     // Clear artist context if coming from home page
     console.log('🧹 Clearing artist context - launched from home page');
     localStorage.removeItem('selectedArtist');
-    showToast('info', 'Welcome to Levi!', 'Your delta blues assistant is ready to help! 🎸', 4000);
+    showToast('info', 'Welcome!', 'Your music assistant is ready to help! 🎸', 4000);
   } else {
     // Load artist context if coming from other pages
     const savedArtist = localStorage.getItem('selectedArtist');
@@ -1603,7 +1601,7 @@ function preloadArtistContext() {
       addQuickActionButtons(savedArtist);
       showToast('success', 'Artist Context Loaded!', `Ready to chat about ${savedArtist}! 🎵`, 4000);
     } else {
-      showToast('info', 'Welcome to Levi!', 'Your delta blues assistant is ready to help! 🎸', 4000);
+      showToast('info', 'Welcome!', 'Your music assistant is ready to help! 🎸', 4000);
     }
   }
 }
@@ -1637,9 +1635,9 @@ function askAboutArtist(artist) {
   // Send the message to the chat API
   sendQuickMessage(message);
   
-  // Make Levi speak the response if voice is enabled
+  // Make assistant speak the response if voice is enabled
   if (voiceEnabled) {
-    makeLeviSpeak(`Let me tell you about ${artist}, child!`);
+    makeAssistantSpeak(`Let me tell you about ${artist}!`);
   }
 }
 
@@ -1651,9 +1649,9 @@ function getRecommendations(artist) {
   // Send the message to the chat API
   sendQuickMessage(message);
   
-  // Make Levi speak the response if voice is enabled
+  // Make assistant speak the response if voice is enabled
   if (voiceEnabled) {
-    makeLeviSpeak(`I'll give you some mighty fine recommendations similar to ${artist}!`);
+    makeAssistantSpeak(`I'll give you some recommendations similar to ${artist}!`);
   }
 }
 
@@ -1668,9 +1666,9 @@ function searchOtherArtist() {
     // Send the message to the chat API
     sendQuickMessage(message);
     
-    // Make Levi speak the response if voice is enabled
+    // Make assistant speak the response if voice is enabled
     if (voiceEnabled) {
-      makeLeviSpeak(`Searching for ${newArtist.trim()}, honey!`);
+      makeAssistantSpeak(`Searching for ${newArtist.trim()}!`);
     }
   }
 }

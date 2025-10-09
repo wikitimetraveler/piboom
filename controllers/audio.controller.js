@@ -16,7 +16,7 @@ export const AudioController = {
           console.error('Audio playback ended with error:', err);
           io.emit('audio:status', { playing: false, file: null, error: err.message });
         } else {
-          console.log('Audio playback ended normally');
+          // Audio playback ended normally
           io.emit('audio:status', { playing: false, file: null });
         }
       });

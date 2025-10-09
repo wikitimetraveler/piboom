@@ -10,8 +10,6 @@ export async function searchKnowledgeGraph(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    console.log('🔍 Searching MusicBrainz for:', artist);
-
     // Use MusicBrainz API for detailed artist information
     const searchQuery = encodeURIComponent(artist);
     const musicBrainzUrl = `https://musicbrainz.org/ws/2/artist?query=${searchQuery}&fmt=json&limit=1`;
@@ -67,10 +65,9 @@ export async function searchWikipedia(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    console.log('🔍 Searching Wikipedia/Wikidata for:', artist);
-
-    // First search for the page
-    const searchQuery = encodeURIComponent(artist);
+    // First search for the page with music context to avoid disambiguation
+    // Add "band" or "musician" to prioritize music results over non-music topics
+    const searchQuery = encodeURIComponent(`${artist} band music`);
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=1`;
     
     const searchResponse = await axios.get(searchUrl);
@@ -86,7 +83,6 @@ export async function searchWikipedia(req, res) {
     }
 
     const pageTitle = searchData.query.search[0].title;
-    console.log('📄 Found Wikipedia page:', pageTitle);
 
     // Get page summary for description first
     const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`;
@@ -101,7 +97,6 @@ export async function searchWikipedia(req, res) {
       const extractedPlace = extractPlaceFromText(summaryData.extract);
       if (extractedPlace) {
         wikidataInfo.birthPlace = extractedPlace;
-        console.log('📍 Fallback extraction from description:', extractedPlace);
       }
     }
     
@@ -111,14 +106,12 @@ export async function searchWikipedia(req, res) {
       const extractedMembers = extractBandMembersFromText(summaryData.extract);
       if (extractedMembers.length > 0) {
         wikidataInfo.bandMembers = extractedMembers;
-        console.log('👥 Text extraction of band members:', extractedMembers.length);
       }
       
       // Also try MusicBrainz as additional source
       try {
         const musicBrainzMembers = await getMusicBrainzMembers(artist);
         if (musicBrainzMembers.length > 0) {
-          console.log('🎵 MusicBrainz found additional members:', musicBrainzMembers.length);
           // Merge with existing members, avoiding duplicates
           const existingNames = wikidataInfo.bandMembers.map(m => m.name.toLowerCase());
           for (const mbMember of musicBrainzMembers) {
@@ -133,11 +126,9 @@ export async function searchWikipedia(req, res) {
       
       // Look up individual member information for all found members
       if (wikidataInfo.bandMembers.length > 0) {
-        console.log('🔄 Starting member enrichment process...');
         try {
           const enrichedMembers = await enrichBandMembersWithLocations(wikidataInfo.bandMembers);
           wikidataInfo.bandMembers = enrichedMembers;
-          console.log('📍 Enriched band members with locations:', enrichedMembers.length);
         } catch (error) {
           console.error('❌ Error during member enrichment:', error.message);
           // Keep the original members if enrichment fails
@@ -175,11 +166,8 @@ async function getWikidataInfo(pageTitle) {
     const wikidataId = pages[pageId]?.pageprops?.wikibase_item;
     
     if (!wikidataId) {
-      console.log('❌ No Wikidata ID found');
       return { birthDate: 'Unknown', birthPlace: 'Unknown', bandMembers: [] };
     }
-
-    console.log('🔍 Found Wikidata ID:', wikidataId);
 
     // Get structured data from Wikidata
     const dataUrl = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${wikidataId}&format=json&props=claims`;
@@ -251,14 +239,13 @@ async function getWikidataInfo(pageTitle) {
               deathDate: memberInfo.deathDate || null,
               deathPlace: memberInfo.deathPlace || null,
               associatedActs: memberInfo.associatedActs || [],
-              imageUrl: memberInfo.imageUrl || null
+              imageUrl: memberInfo.imageUrl || null,
+              equipment: []
             });
           }
         }
       }
     }
-
-    console.log('📍 Wikidata extracted:', { birthPlace, birthDate, members: bandMembers.length });
 
     return {
       birthDate,
@@ -514,7 +501,6 @@ function extractBandMembersFromText(text) {
     const match = text.match(pattern);
     if (match) {
       const memberText = match[1];
-      console.log('🎵 Found member text:', memberText);
       
       // Split by common separators and clean up
       const memberNames = memberText
@@ -541,11 +527,9 @@ function extractBandMembersFromText(text) {
         .map(name => name.trim())
         .filter(name => name.length > 0 && name.length < 50);
       
-      console.log('👥 All members after better splitting:', allMembers);
-      
       // Use the better splitting result and try to extract instruments
       allMembers.forEach(name => {
-        if (name && name.length > 0) {
+        if (name && name.length > 0 && isValidPersonName(name)) {
           // Try to extract instrument from parentheses like "John Doe (guitar)"
           const instrumentMatch = name.match(/^(.+?)\s*\(([^)]+)\)$/);
           if (instrumentMatch) {
@@ -553,14 +537,16 @@ function extractBandMembersFromText(text) {
               name: instrumentMatch[1].trim(),
               instrument: instrumentMatch[2].trim(),
               birthPlace: 'Unknown',
-              birthDate: 'Unknown'
+              birthDate: 'Unknown',
+              equipment: []
             });
           } else {
             members.push({
               name: name,
               instrument: 'Unknown',
               birthPlace: 'Unknown',
-              birthDate: 'Unknown'
+              birthDate: 'Unknown',
+              equipment: []
             });
           }
         }
@@ -573,20 +559,55 @@ function extractBandMembersFromText(text) {
   return members;
 }
 
+// Validate if a string looks like a real person name
+function isValidPersonName(name) {
+  // Remove common prefixes
+  const cleanName = name.trim();
+  
+  // Must start with capital letter (proper name)
+  if (!/^[A-Z]/.test(cleanName)) return false;
+  
+  // Filter out common non-person words
+  const invalidWords = [
+    'flour', 'water', 'sugar', 'salt', 'butter', 'milk', 'egg', 'eggs',
+    'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with',
+    'album', 'albums', 'song', 'songs', 'track', 'tracks', 'record', 'records',
+    'music', 'band', 'group', 'members', 'artists', 'musicians',
+    'guitar', 'bass', 'drums', 'vocals', 'keyboard', 'piano', // instruments alone
+    'lead', 'rhythm', 'backing', 'session', // roles alone
+    'american', 'british', 'canadian', 'australian', 'english', 'scottish', 'irish', 'welsh',
+    'rock', 'pop', 'jazz', 'blues', 'metal', 'punk', 'folk', 'country' // genres
+  ];
+  
+  const lowerName = cleanName.toLowerCase();
+  if (invalidWords.includes(lowerName)) return false;
+  
+  // Should have at least one space (first name + last name) or be a known single name
+  // Single names are usually stage names and should be capitalized throughout or have special chars
+  const wordCount = cleanName.split(/\s+/).length;
+  if (wordCount === 1 && cleanName.length < 3) return false; // Too short for a real name
+  
+  // Filter out sentences (too many words)
+  if (wordCount > 5) return false;
+  
+  // Must contain letters (not just numbers or special chars)
+  if (!/[a-zA-Z]{2,}/.test(cleanName)) return false;
+  
+  // Filter out things that look like dates or numbers
+  if (/^\d+/.test(cleanName)) return false;
+  
+  return true;
+}
+
 // Enrich band members with individual location data and instruments
 async function enrichBandMembersWithLocations(members) {
-  console.log('🔍 Enriching band members with location data and instruments...');
-  
   const enrichedMembers = [];
   
-  // Limit to first 5 members to avoid timeout but get more data
-  const membersToProcess = members.slice(0, 5);
-  console.log(`👥 Processing ${membersToProcess.length} members (limited to avoid timeout)`);
+  // Limit to first 10 members to avoid timeout but get more data
+  const membersToProcess = members.slice(0, 10);
   
   for (const member of membersToProcess) {
     try {
-      console.log(`👤 Looking up: ${member.name}`);
-      
       // Search for the individual member on Wikipedia
       const searchResponse = await axios.get('https://en.wikipedia.org/w/api.php', {
         params: {
@@ -600,7 +621,6 @@ async function enrichBandMembersWithLocations(members) {
       
       if (searchResponse.data.query.search.length > 0) {
         const pageTitle = searchResponse.data.query.search[0].title;
-        console.log(`📄 Found Wikipedia page for ${member.name}: ${pageTitle}`);
         
         // Get the member's Wikidata ID
         const wikidataIdResponse = await axios.get('https://en.wikipedia.org/w/api.php', {
@@ -632,7 +652,6 @@ async function enrichBandMembersWithLocations(members) {
           const extractedPlace = extractPlaceFromText(summaryData.extract);
           if (extractedPlace) {
             memberInfo.birthPlace = extractedPlace;
-            console.log(`📍 Fallback extraction for ${member.name}: ${extractedPlace}`);
           }
         }
         
@@ -651,6 +670,9 @@ async function enrichBandMembersWithLocations(members) {
         // Use Wikipedia thumbnail if no Wikidata image
         const imageUrl = memberInfo.imageUrl || summaryData.thumbnail?.source || null;
         
+        // Extract signature equipment from Wikipedia text
+        const equipment = summaryData.extract ? extractSignatureEquipment(summaryData.extract, member.name) : [];
+        
         // Update the member with found information
         enrichedMembers.push({
           name: member.name,
@@ -660,12 +682,10 @@ async function enrichBandMembersWithLocations(members) {
           deathDate: memberInfo.deathDate || null,
           deathPlace: memberInfo.deathPlace || null,
           associatedActs: memberInfo.associatedActs || [],
-          imageUrl: imageUrl
+          imageUrl: imageUrl,
+          equipment: equipment
         });
-        
-        console.log(`✅ Enriched ${member.name}: ${instrument} from ${memberInfo.birthPlace} (${memberInfo.birthDate})`);
       } else {
-        console.log(`❌ No Wikipedia page found for ${member.name}`);
         enrichedMembers.push(member); // Keep original data
       }
       
@@ -754,8 +774,6 @@ function extractSignatureEquipment(text, memberName) {
 // Get band members from MusicBrainz
 async function getMusicBrainzMembers(artistName) {
   try {
-    console.log('🎵 Searching MusicBrainz for band members:', artistName);
-    
     // Search for artist
     const searchResponse = await axios.get('https://musicbrainz.org/ws/2/artist', {
       params: {
@@ -773,7 +791,6 @@ async function getMusicBrainzMembers(artistName) {
     }
 
     const artistData = searchResponse.data.artists[0];
-    console.log('🎵 Found MusicBrainz artist:', artistData.name);
 
     // Get detailed artist info with relationships
     const detailResponse = await axios.get(`https://musicbrainz.org/ws/2/artist/${artistData.id}`, {
@@ -808,6 +825,7 @@ async function getMusicBrainzMembers(artistName) {
             deathPlace: null,
             associatedActs: [],
             imageUrl: null,
+            equipment: [],
             mbid: member.id,
             type: member.type || 'Person'
           });
@@ -815,7 +833,6 @@ async function getMusicBrainzMembers(artistName) {
       }
     }
 
-    console.log('👥 Found MusicBrainz band members:', bandMembers.length);
     return bandMembers;
 
   } catch (error) {
@@ -833,8 +850,6 @@ export async function searchMusicBrainz(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    console.log('🎵 Searching MusicBrainz for:', artist);
-    
     // Search for artist
     const searchResponse = await axios.get('https://musicbrainz.org/ws/2/artist', {
       params: {
@@ -852,7 +867,6 @@ export async function searchMusicBrainz(req, res) {
     }
 
     const artistData = searchResponse.data.artists[0];
-    console.log('🎵 Found MusicBrainz artist:', artistData.name, 'ID:', artistData.id);
 
     // Get detailed artist info with relationships
     const detailResponse = await axios.get(`https://musicbrainz.org/ws/2/artist/${artistData.id}`, {
@@ -887,14 +901,13 @@ export async function searchMusicBrainz(req, res) {
             deathPlace: null,
             associatedActs: [],
             imageUrl: null,
+            equipment: [],
             mbid: member.id,
             type: member.type || 'Person'
           });
         }
       }
     }
-
-    console.log('👥 Found MusicBrainz band members:', bandMembers.length);
 
     res.json({
       name: detailedArtist.name,
@@ -920,8 +933,6 @@ export async function searchAlbums(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    console.log('🎵 Searching MusicBrainz for albums by:', artist);
-
     // First, find the artist
     const searchResponse = await axios.get('https://musicbrainz.org/ws/2/artist', {
       params: {
@@ -939,7 +950,6 @@ export async function searchAlbums(req, res) {
     }
 
     const artistData = searchResponse.data.artists[0];
-    console.log('🎵 Found artist:', artistData.name, 'ID:', artistData.id);
 
     // Get albums for this artist
     const albumsResponse = await axios.get(`https://musicbrainz.org/ws/2/release-group`, {
@@ -976,8 +986,6 @@ export async function searchAlbums(req, res) {
       return new Date(a.releaseDate) - new Date(b.releaseDate);
     });
 
-    console.log('🎵 Found albums (sorted chronologically):', albums.length);
-
     res.json({
       artist: artistData.name,
       albums: albums,
@@ -998,8 +1006,6 @@ export async function searchYouTubeForAlbum(req, res) {
     if (!artist || !album) {
       return res.status(400).json({ error: 'Artist and album are required' });
     }
-
-    console.log('🔍 Searching YouTube for:', `${artist} ${album}`);
 
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) {
@@ -1027,8 +1033,6 @@ export async function searchYouTubeForAlbum(req, res) {
       url: `https://www.youtube.com/watch?v=${item.id.videoId}`
     }));
 
-    console.log('🔍 Found YouTube videos:', videos.length);
-
     res.json({
       query: searchQuery,
       videos: videos,
@@ -1049,8 +1053,6 @@ export async function searchYouTube(req, res) {
     if (!artist) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
-
-    console.log('🔍 Searching YouTube for:', artist);
 
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) {
@@ -1091,8 +1093,6 @@ export async function getMapData(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    console.log('🔍 Getting map data for:', artist);
-
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) {
       return res.status(500).json({ error: 'Google API key not configured' });
@@ -1132,7 +1132,8 @@ export async function getMapData(req, res) {
     if (artistInfo.bandMembers && artistInfo.bandMembers.length > 0) {
       for (const member of artistInfo.bandMembers) {
         if (member.birthPlace && member.birthPlace !== 'Unknown') {
-          const geocoded = await geocodeLocation(member.birthPlace, apiKey);
+          // Pass band's formation place as context to help geocode member locations
+          const geocoded = await geocodeLocation(member.birthPlace, apiKey, artistInfo.birthPlace);
           if (geocoded) {
             // Check if this location is already in mapData
             const exists = mapData.some(loc => 
@@ -1156,8 +1157,6 @@ export async function getMapData(req, res) {
   }
       }
     }
-
-    console.log('📍 Map data extracted:', { locations: mapData.length, events: timelineEvents.length });
 
     res.json({
       mapData,
@@ -1184,7 +1183,6 @@ async function getArtistInfoFromWikipedia(artist) {
     }
 
     const pageTitle = searchData.query.search[0].title;
-    console.log('📄 Found Wikipedia page for map data:', pageTitle);
 
     // Get Wikidata information
     const wikidataInfo = await getWikidataInfo(pageTitle);
@@ -1201,28 +1199,159 @@ async function getArtistInfoFromWikipedia(artist) {
   }
 }
 
-// Geocode a location using Google Maps API
-async function geocodeLocation(placeName, apiKey) {
+// Geocode a location using Google Maps API with context-aware fallback strategies
+async function geocodeLocation(placeName, apiKey, bandContext = null) {
   try {
-    const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(placeName)}&key=${apiKey}`;
+    // Try original place name first
+    let result = await tryGeocode(placeName, apiKey);
+    if (result) return result;
+    
+    // Build smart variations based on band context (country of origin)
+    const variations = [placeName]; // Always try original first
+    
+    // Check if placeName is incomplete (just a city, no country info)
+    const hasCountryInfo = placeName.includes(',') || 
+                          placeName.toLowerCase().includes('usa') ||
+                          placeName.toLowerCase().includes('uk') ||
+                          placeName.toLowerCase().includes('kingdom') ||
+                          placeName.toLowerCase().includes('korea') ||
+                          placeName.toLowerCase().includes('england') ||
+                          placeName.toLowerCase().includes('scotland');
+    
+    // Only use band context if location is incomplete (just city name)
+    if (!hasCountryInfo && bandContext) {
+      const contextCountry = detectCountryFromContext(bandContext);
+      if (contextCountry) {
+        // Add context country variations FIRST (most likely correct)
+        variations.push(
+          `${placeName}, ${contextCountry}`,
+          `${placeName} ${contextCountry}`
+        );
+        if (contextCountry.includes('United Kingdom') || contextCountry.includes('UK')) {
+          variations.push(`${placeName}, England`, `${placeName}, Scotland`, `${placeName}, Wales`);
+        }
+        if (contextCountry.includes('South Korea')) {
+          variations.push(`${placeName}-si, South Korea`, `${placeName}, Gyeonggi, South Korea`);
+        }
+      }
+    }
+    
+    // Then add standard fallbacks - UK and USA first (most popular music)
+    variations.push(
+      `${placeName}, United Kingdom`, // UK first - lots of classic rock bands
+      `${placeName}, UK`,
+      `${placeName}, England`,
+      `${placeName}, England, UK`,
+      `${placeName}, USA`, // USA second - lots of artists
+      `${placeName}, United States`,
+      `${placeName}, Scotland, UK`,
+      `${placeName}, Wales, UK`,
+      `${placeName}, Ireland`,
+      `${placeName}, Northern Ireland`,
+      `${placeName}, South Korea`, // K-pop
+      `${placeName}-si, South Korea`,
+      `${placeName}, Gyeonggi, South Korea`,
+      `${placeName}, Korea`,
+      `${placeName}, Japan`, // J-pop
+      `${placeName}, Tokyo, Japan`,
+      `${placeName}, Canada`,
+      `${placeName}, Australia`,
+      `${placeName}, Germany`,
+      `${placeName}, France`,
+      `${placeName}, Italy`,
+      `${placeName}, Sweden`,
+      `${placeName}, California, USA`,
+      `${placeName}, Texas, USA`,
+      `${placeName}, New York, USA`,
+      `${placeName}, London, UK`,
+      `${placeName}, Kent, England`,
+      placeName.replace(/,.*$/, ''),
+      placeName.split(',')[0] + ', UK',
+      placeName.split(',')[0] + ', USA',
+      placeName.split(',')[0] + ', South Korea'
+    );
+    
+    // Try each variation
+    for (const variation of variations) {
+      result = await tryGeocode(variation, apiKey);
+      if (result) {
+        result.name = placeName; // Keep original name
+        return result;
+      }
+    }
+    
+    return null;
+  } catch (error) {
+    console.error('Geocoding error for', placeName, ':', error);
+    return null;
+  }
+}
+
+// Detect country from band context (formation place)
+function detectCountryFromContext(context) {
+  if (!context || typeof context !== 'string') return null;
+  
+  const ctx = context.toLowerCase();
+  
+  // Check for countries in the context
+  if (ctx.includes('south korea') || ctx.includes('seoul') || ctx.includes('busan') || ctx.includes('korea')) {
+    return 'South Korea';
+  }
+  if (ctx.includes('united kingdom') || ctx.includes('london') || ctx.includes('england') || 
+      ctx.includes('liverpool') || ctx.includes('manchester') || ctx.includes('birmingham')) {
+    return 'United Kingdom';
+  }
+  if (ctx.includes('scotland') || ctx.includes('glasgow') || ctx.includes('edinburgh')) {
+    return 'United Kingdom';
+  }
+  if (ctx.includes('wales') || ctx.includes('cardiff')) {
+    return 'United Kingdom';
+  }
+  if (ctx.includes('united states') || ctx.includes('usa') || ctx.includes('california') || 
+      ctx.includes('new york') || ctx.includes('texas') || ctx.includes('los angeles')) {
+    return 'USA';
+  }
+  if (ctx.includes('japan') || ctx.includes('tokyo') || ctx.includes('osaka')) {
+    return 'Japan';
+  }
+  if (ctx.includes('canada') || ctx.includes('toronto') || ctx.includes('montreal')) {
+    return 'Canada';
+  }
+  if (ctx.includes('australia') || ctx.includes('sydney') || ctx.includes('melbourne')) {
+    return 'Australia';
+  }
+  if (ctx.includes('germany') || ctx.includes('berlin') || ctx.includes('hamburg')) {
+    return 'Germany';
+  }
+  if (ctx.includes('france') || ctx.includes('paris')) {
+    return 'France';
+  }
+  if (ctx.includes('sweden') || ctx.includes('stockholm')) {
+    return 'Sweden';
+  }
+  
+  return null;
+}
+
+// Helper function to attempt geocoding
+async function tryGeocode(address, apiKey) {
+  try {
+    const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
     
     const geoResponse = await axios.get(geocodingUrl);
     const geoData = geoResponse.data;
     
-    if (geoData.results && geoData.results.length > 0) {
+    if (geoData.results && geoData.results.length > 0 && geoData.status === 'OK') {
       const location = geoData.results[0].geometry.location;
-      console.log('📍 Geocoded:', placeName, '->', location);
       return {
-        name: placeName,
+        name: address,
         lat: location.lat,
         lng: location.lng
       };
     }
     
-    console.log('❌ Geocoding failed for:', placeName);
     return null;
   } catch (error) {
-    console.error('Geocoding error for', placeName, ':', error);
     return null;
   }
 }
@@ -1234,10 +1363,8 @@ export async function getGoogleApiKey(req, res) {
     const apiKey = process.env.GOOGLE_API_KEY;
     
     if (apiKey) {
-      console.log('🗺️ Using Google Maps API key from environment');
       res.json({ apiKey: apiKey });
     } else {
-      console.warn('❌ No Google Maps API key found in environment variables');
       res.json({ apiKey: null });
     }
   } catch (error) {
