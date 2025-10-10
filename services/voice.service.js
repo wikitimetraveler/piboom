@@ -2,6 +2,7 @@ import { spawn, exec } from 'child_process';
 import { run } from '../lib/exec.js';
 import { config } from '../config/index.js';
 import { SpeechClient } from '@google-cloud/speech';
+import textToSpeech from '@google-cloud/text-to-speech';
 
 let isListening = false;
 let recognitionProcess = null;
@@ -26,6 +27,7 @@ export class VoiceService {
     this.audioBuffer = [];
     this.commandHistory = [];
     this.speechClient = null;
+    this.ttsClient = null; // Google Cloud TTS client
     this.recognitionStream = null;
     this.isWindows = process.platform === 'win32';
     this.isSpeaking = false;
@@ -37,6 +39,9 @@ export class VoiceService {
     try {
       // Initialize Google Cloud Speech client for both pi and cloud modes
       this.speechClient = new SpeechClient();
+      
+      // Initialize Google Cloud Text-to-Speech client
+      this.ttsClient = new textToSpeech.TextToSpeechClient();
       
       // Test TTS availability
       this.testTTSAvailability();
@@ -115,8 +120,36 @@ export class VoiceService {
     }, 10000); // Update every 10 seconds
   }
 
+  // Speak using Google Cloud Text-to-Speech (NEW - high quality!)
+  async speakWithGoogle(text, voice = 'en-US-Standard-D') {
+    if (!this.ttsClient) return false;
+    
+    try {
+      const request = {
+        input: { text: text },
+        voice: { 
+          languageCode: 'en-US',
+          name: voice // Different voices available
+        },
+        audioConfig: { 
+          audioEncoding: 'MP3',
+          pitch: 0,
+          speakingRate: 1.0
+        },
+      };
+
+      const [response] = await this.ttsClient.synthesizeSpeech(request);
+      
+      // Return the audio content as base64 for frontend playback
+      return response.audioContent.toString('base64');
+    } catch (error) {
+      console.error('Google TTS error:', error);
+      return null;
+    }
+  }
+
   // Speak text using text-to-speech with debounce
-  speak(text) {
+  async speak(text) {
     if (!this.sayEnabled) return;
     
     // Prevent overlapping speech
@@ -135,6 +168,20 @@ export class VoiceService {
       this.isSpeaking = false;
     }, 5000); // 5 second speech timeout
     
+    // TRY GOOGLE CLOUD TTS FIRST (best quality!)
+    if (this.ttsClient) {
+      try {
+        const audioBase64 = await this.speakWithGoogle(text);
+        if (audioBase64) {
+          // Success! Google TTS worked
+          return;
+        }
+      } catch (error) {
+        // Fall through to local TTS
+      }
+    }
+    
+    // Fallback to local TTS methods
     if (config.mode === 'pi') {
       if (this.isWindows) {
         // Use Windows built-in text-to-speech with better error handling

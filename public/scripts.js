@@ -52,3 +52,100 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   `; document.head.appendChild(style);
 });
+
+// ===== UNIVERSAL GOOGLE CLOUD TTS SPEECH FUNCTION =====
+// Available to ALL pages in the app!
+let currentAudio = null; // Track currently playing audio
+
+async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
+  try {
+    // Stop any currently playing speech
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    
+    // Call backend Google TTS endpoint
+    const response = await fetch('/api/voice/synthesize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        text, 
+        voice,
+        pitch: options.pitch || 0,
+        speakingRate: options.speakingRate || 1.0
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.audio) {
+      // Convert base64 to audio and play
+      const audioBlob = base64ToBlob(data.audio, 'audio/mp3');
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      currentAudio = new Audio(audioUrl);
+      currentAudio.volume = options.volume || 0.8;
+      
+      // Clean up URL when done
+      currentAudio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+        currentAudio = null;
+      };
+      
+      await currentAudio.play();
+      return true;
+    } else {
+      // Fallback to local speech if Google TTS fails
+      console.warn('Google TTS not available, using fallback');
+      return false;
+    }
+  } catch (error) {
+    console.error('Speech error:', error);
+    return false;
+  }
+}
+
+// Stop current speech (ONE CLICK!) - handles ALL speech types
+function stopSpeech() {
+  // Stop Google TTS audio
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+  
+  // Stop browser speech synthesis (fallback)
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  
+  // Stop backend TTS (Pi mode)
+  fetch('/api/voice/stop-speaking', { method: 'POST' })
+    .catch(err => console.error('Failed to stop backend speech:', err));
+  
+  console.log('🛑 All speech stopped');
+}
+
+// Helper: Convert base64 to Blob
+function base64ToBlob(base64, contentType) {
+  const byteCharacters = atob(base64);
+  const byteArrays = [];
+  
+  for (let i = 0; i < byteCharacters.length; i += 512) {
+    const slice = byteCharacters.slice(i, i + 512);
+    const byteNumbers = new Array(slice.length);
+    
+    for (let j = 0; j < slice.length; j++) {
+      byteNumbers[j] = slice.charCodeAt(j);
+    }
+    
+    byteArrays.push(new Uint8Array(byteNumbers));
+  }
+  
+  return new Blob(byteArrays, { type: contentType });
+}
+
+// Make functions globally available
+window.speakWithGoogle = speakWithGoogle;
+window.stopSpeech = stopSpeech;

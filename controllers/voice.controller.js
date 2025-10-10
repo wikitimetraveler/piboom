@@ -343,6 +343,49 @@ export function speakText(req, res) {
   }
 }
 
+// NEW: Google Cloud TTS endpoint - returns audio for frontend playback
+export async function synthesizeSpeech(req, res) {
+  try {
+    const { text, voice, pitch, speakingRate } = req.body;
+    
+    if (!text) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Text parameter is required' 
+      });
+    }
+    
+    // Use Google Cloud TTS
+    const audioBase64 = await voiceService.speakWithGoogle(
+      text, 
+      voice || 'en-US-Standard-D'
+    );
+    
+    if (audioBase64) {
+      res.json({ 
+        success: true, 
+        audio: audioBase64,
+        format: 'mp3',
+        text: text
+      });
+    } else {
+      // Fallback: use local TTS
+      voiceService.speak(text);
+      res.json({ 
+        success: false, 
+        message: 'Google TTS not available, using local TTS',
+        fallback: true
+      });
+    }
+  } catch (error) {
+    console.error('Synthesize speech error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: error.message 
+    });
+  }
+}
+
 export function getVoiceCommands(req, res) {
   try {
     // Get available commands from the voiceService

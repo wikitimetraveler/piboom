@@ -6,6 +6,7 @@ import {
   getVoiceStatus,
   toggleVoiceFeedback,
   speakText,
+  synthesizeSpeech,
   getVoiceCommands,
   getLastVoiceCommand,
   processFrontendVoiceCommand,
@@ -31,6 +32,9 @@ router.post('/feedback/toggle', toggleVoiceFeedback);
 
 // Speak text
 router.post('/speak', speakText);
+
+// NEW: Google Cloud TTS - synthesize speech and return audio
+router.post('/synthesize', synthesizeSpeech);
 
 // Stop speaking
 router.post('/stop-speaking', stopSpeaking);

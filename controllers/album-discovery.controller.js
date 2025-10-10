@@ -192,7 +192,8 @@ export async function getAlbums(req, res) {
         genre: releaseGroup.tags ? releaseGroup.tags.map(tag => tag.name).join(', ') : 'Unknown',
         artist: artist,
         coverArt: `https://coverartarchive.org/release-group/${releaseGroup.id}/front-250`,
-        musicBrainzId: releaseGroup.id
+        musicBrainzId: releaseGroup.id,
+        type: 'Album'
       }));
 
       res.json({
@@ -216,4 +217,190 @@ export async function getAlbums(req, res) {
       message: error.message 
     });
   }
+}
+
+// Search for a specific album by name
+export async function searchAlbum(req, res) {
+  try {
+    const { albumName } = req.body;
+    
+    if (!albumName) {
+      return res.status(400).json({ error: 'Album name is required' });
+    }
+
+    console.log('🔍 Searching for album:', albumName);
+
+    // Use MusicBrainz API to search for specific album
+    const searchQuery = encodeURIComponent(albumName);
+    const musicBrainzUrl = `https://musicbrainz.org/ws/2/release-group?query=releasegroup:${searchQuery}&type=album&fmt=json&limit=5`;
+
+    const response = await axios.get(musicBrainzUrl, {
+      headers: {
+        'User-Agent': 'PiBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+      }
+    });
+
+    const data = response.data;
+
+    if (data['release-groups'] && data['release-groups'].length > 0) {
+      // Get the best match (first result)
+      const releaseGroup = data['release-groups'][0];
+      const artistName = releaseGroup['artist-credit'] && releaseGroup['artist-credit'][0] 
+        ? releaseGroup['artist-credit'][0].name 
+        : 'Unknown Artist';
+
+      const album = {
+        title: releaseGroup.title,
+        year: releaseGroup['first-release-date'] ? releaseGroup['first-release-date'].substring(0, 4) : 'Unknown',
+        genre: releaseGroup.tags ? releaseGroup.tags.map(tag => tag.name).join(', ') : 'Unknown',
+        artist: artistName,
+        coverArt: `https://coverartarchive.org/release-group/${releaseGroup.id}/front-250`,
+        musicBrainzId: releaseGroup.id,
+        type: 'Album'
+      };
+
+      res.json({
+        success: true,
+        album: album
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'Album not found'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error searching album:', error);
+    res.status(500).json({ 
+      error: 'Failed to search for album',
+      message: error.message 
+    });
+  }
+}
+
+// Identify album from image using OpenAI Vision
+export async function identifyAlbumFromImage(req, res) {
+  try {
+    const { imageData } = req.body;
+    
+    if (!imageData) {
+      return res.status(400).json({ error: 'Image data is required' });
+    }
+
+    console.log('🖼️ Analyzing album cover image with AI...');
+
+    // Use OpenAI Vision API to identify the album
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini", // Vision-capable model
+      messages: [
+        {
+          role: "system",
+          content: "You are an expert music historian and album cover identifier. When shown an album cover, you identify the album name, artist, and provide relevant details. Be precise and confident in your identification."
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: "Please identify this album cover. Provide the exact album name, artist name, release year, genre, and a brief description. Format your response as JSON with fields: albumName, artistName, year, genre, description."
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: imageData
+              }
+            }
+          ]
+        }
+      ],
+      max_tokens: 500,
+      temperature: 0.3 // Lower temperature for more precise identification
+    });
+
+    const aiResponse = completion.choices[0].message.content;
+    console.log('🤖 AI Response:', aiResponse);
+
+    // Parse the AI response (try to extract JSON or parse text)
+    let albumInfo;
+    try {
+      // Try to parse as JSON first
+      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        albumInfo = JSON.parse(jsonMatch[0]);
+      } else {
+        // Fallback: extract info from text
+        albumInfo = extractAlbumInfoFromText(aiResponse);
+      }
+    } catch (parseError) {
+      console.log('⚠️ JSON parse failed, extracting from text');
+      albumInfo = extractAlbumInfoFromText(aiResponse);
+    }
+
+    if (albumInfo && albumInfo.albumName && albumInfo.artistName) {
+      res.json({
+        success: true,
+        albumName: albumInfo.albumName,
+        artistName: albumInfo.artistName,
+        year: albumInfo.year || 'Unknown',
+        genre: albumInfo.genre || 'Unknown',
+        description: albumInfo.description || 'Album identified by AI vision'
+      });
+    } else {
+      res.json({
+        success: false,
+        message: 'Could not identify the album from this image'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error identifying album from image:', error);
+    
+    if (error.code === 'insufficient_quota') {
+      return res.status(503).json({ 
+        error: 'AI service temporarily unavailable',
+        message: 'OpenAI API quota exceeded. Please try again later.'
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to identify album from image',
+      message: error.message 
+    });
+  }
+}
+
+// Extract album info from text response (fallback)
+function extractAlbumInfoFromText(text) {
+  const info = {
+    albumName: '',
+    artistName: '',
+    year: '',
+    genre: '',
+    description: ''
+  };
+
+  // Try to extract album name
+  const albumMatch = text.match(/album[:\s]+["']?([^"'\n]+)["']?/i);
+  if (albumMatch) info.albumName = albumMatch[1].trim();
+
+  // Try to extract artist name
+  const artistMatch = text.match(/artist[:\s]+["']?([^"'\n]+)["']?/i);
+  if (artistMatch) info.artistName = artistMatch[1].trim();
+
+  // Try to extract year
+  const yearMatch = text.match(/(\d{4})/);
+  if (yearMatch) info.year = yearMatch[1];
+
+  // Try to extract genre
+  const genreMatch = text.match(/genre[:\s]+["']?([^"'\n]+)["']?/i);
+  if (genreMatch) info.genre = genreMatch[1].trim();
+
+  // Use first sentence as description
+  const sentences = text.split(/[.!?]/);
+  if (sentences.length > 0) {
+    info.description = sentences[0].trim();
+  }
+
+  return info;
 }

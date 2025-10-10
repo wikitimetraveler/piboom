@@ -760,16 +760,65 @@
         <i class="bi-x"></i>
       </button>
       <h2 class="text-center mb-4"><i class="bi-disc"></i> Album Discovery</h2>
-      <p class="text-center mb-4">Search for artists using Google Knowledge Graph to discover their albums!</p>
+      <p class="text-center mb-4">Search by band name, album name, or upload an album cover image!</p>
+      
+      <!-- Search Mode Tabs -->
+      <div class="text-center mb-3">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-primary" id="bandModeBtn" onclick="switchInputMode('band')">
+            <i class="bi-people-fill"></i> Search Band
+          </button>
+          <button type="button" class="btn btn-outline-primary" id="albumModeBtn" onclick="switchInputMode('album')">
+            <i class="bi-disc"></i> Search Album
+          </button>
+          <button type="button" class="btn btn-outline-success" id="imageModeBtn" onclick="switchInputMode('image')">
+            <i class="bi-image"></i> Upload Image
+          </button>
+        </div>
+      </div>
+      
       <div class="row" style="width: 100%; margin: 0;">
         <div class="col-12" style="width: 100%; padding: 0 15px;">
-          <!-- Google Knowledge Graph Search Widget -->
-          <div class="text-center mb-3">
+          <!-- Band/Artist Search (default) -->
+          <div id="bandSearchMode" class="text-center mb-3">
             <div class="input-group input-group-lg">
               <input id="kgBand" class="form-control search-input" placeholder="Search a band or artist…" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
               <div class="input-group-append">
                 <button class="btn btn-primary search-btn" type="button" onclick="searchAlbums()">
                   <i class="bi-search"></i> Search Albums
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Album Name Search -->
+          <div id="albumSearchMode" class="text-center mb-3" style="display: none;">
+            <div class="input-group input-group-lg">
+              <input id="albumNameInput" class="form-control search-input" placeholder="Enter album name (e.g., Dark Side of the Moon)…" onkeypress="handleAlbumKeypress(event)">
+              <div class="input-group-append">
+                <button class="btn btn-primary search-btn" type="button" onclick="searchByAlbumName()">
+                  <i class="bi-search"></i> Find Album
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Image Upload Search -->
+          <div id="imageSearchMode" class="text-center mb-3" style="display: none;">
+            <div class="mb-3">
+              <label for="albumImageInput" class="btn btn-lg btn-success" style="cursor: pointer;">
+                <i class="bi-cloud-upload"></i> Choose Album Cover Image
+                <input type="file" id="albumImageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+              </label>
+            </div>
+            <div id="imagePreview" style="display: none; margin-top: 15px;">
+              <img id="previewImg" src="" alt="Preview" style="max-width: 300px; max-height: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <div class="mt-3">
+                <button class="btn btn-primary" onclick="analyzeAlbumImage()">
+                  <i class="bi-magic"></i> Identify Album
+                </button>
+                <button class="btn btn-secondary" onclick="clearImageUpload()">
+                  <i class="bi-x-circle"></i> Clear
                 </button>
               </div>
             </div>
@@ -883,6 +932,8 @@
 <script>
 let currentArtist = '';
 let voiceEnabled = false;
+let currentInputMode = 'band'; // 'band', 'album', or 'image'
+let uploadedImageData = null;
 
 // Backend Google TTS service
 async function speakViaBackend(text, callback) {
@@ -1263,6 +1314,209 @@ function closeKGWidget() {
 function handleSearchKeypress(event) {
   if (event.key === 'Enter') {
     searchArtist();
+  }
+}
+
+function handleAlbumKeypress(event) {
+  if (event.key === 'Enter') {
+    searchByAlbumName();
+  }
+}
+
+// Switch between input modes (band, album, image)
+function switchInputMode(mode) {
+  currentInputMode = mode;
+  
+  // Update button states
+  document.getElementById('bandModeBtn').className = mode === 'band' ? 'btn btn-primary' : 'btn btn-outline-primary';
+  document.getElementById('albumModeBtn').className = mode === 'album' ? 'btn btn-primary' : 'btn btn-outline-primary';
+  document.getElementById('imageModeBtn').className = mode === 'image' ? 'btn btn-success' : 'btn btn-outline-success';
+  
+  // Show/hide appropriate search interfaces
+  document.getElementById('bandSearchMode').style.display = mode === 'band' ? 'block' : 'none';
+  document.getElementById('albumSearchMode').style.display = mode === 'album' ? 'block' : 'none';
+  document.getElementById('imageSearchMode').style.display = mode === 'image' ? 'block' : 'none';
+  
+  // Focus on the appropriate input
+  if (mode === 'band') {
+    document.getElementById('kgBand').focus();
+  } else if (mode === 'album') {
+    document.getElementById('albumNameInput').focus();
+  }
+}
+
+// Handle image upload
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  // Check file type
+  if (!file.type.startsWith('image/')) {
+    showToast('error', 'Invalid File', 'Please upload an image file', 3000);
+    return;
+  }
+  
+  // Check file size (max 10MB)
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('error', 'File Too Large', 'Please upload an image smaller than 10MB', 3000);
+    return;
+  }
+  
+  // Read the file
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedImageData = e.target.result;
+    
+    // Show preview
+    document.getElementById('previewImg').src = uploadedImageData;
+    document.getElementById('imagePreview').style.display = 'block';
+    
+    showToast('success', 'Image Loaded', 'Click "Identify Album" to analyze the cover', 4000);
+  };
+  reader.readAsDataURL(file);
+}
+
+// Clear image upload
+function clearImageUpload() {
+  uploadedImageData = null;
+  document.getElementById('albumImageInput').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('previewImg').src = '';
+}
+
+// Analyze album image using AI
+async function analyzeAlbumImage() {
+  if (!uploadedImageData) {
+    showToast('warning', 'No Image', 'Please upload an album cover image first', 3000);
+    return;
+  }
+  
+  // Show loading state
+  document.getElementById('loadingState').style.display = 'block';
+  showToast('info', 'Analyzing Image', 'Using AI to identify the album... 🔍', 5000);
+  
+  try {
+    const response = await fetch('/api/album-discovery/identify-image', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ 
+        imageData: uploadedImageData 
+      })
+    });
+    
+    const data = await response.json();
+    
+    // Hide loading state
+    document.getElementById('loadingState').style.display = 'none';
+    
+    if (data.success && data.albumName && data.artistName) {
+      showToast('success', 'Album Identified!', `Found: ${data.albumName} by ${data.artistName}`, 6000);
+      
+      // Display the identified album info
+      displayIdentifiedAlbum(data);
+      
+      // Set the artist and search for their albums
+      currentArtist = data.artistName;
+      document.getElementById('kgBand').value = data.artistName;
+      
+      // Wait a bit then search for all albums by this artist
+      setTimeout(() => {
+        searchAlbums();
+      }, 1500);
+      
+    } else {
+      showToast('warning', 'Could Not Identify', data.message || 'Unable to identify the album from this image', 5000);
+    }
+    
+  } catch (error) {
+    console.error('Error analyzing image:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    showToast('error', 'Analysis Failed', 'Error analyzing the image. Please try again.', 5000);
+  }
+}
+
+// Display identified album information
+function displayIdentifiedAlbum(data) {
+  const kgCard = document.getElementById('kgCard');
+  kgCard.innerHTML = `
+    <div class="kg-result-card" style="background: linear-gradient(135deg, rgba(135,206,250,0.1), rgba(144,238,144,0.1)); padding: 20px; border-radius: 15px; border: 2px solid #4CAF50;">
+      <div class="row g-0">
+        <div class="col-md-3">
+          <img src="${uploadedImageData}" class="img-fluid rounded-start" alt="${data.albumName}" style="width: 100%; height: 200px; object-fit: cover;">
+        </div>
+        <div class="col-md-9">
+          <div class="card-body">
+            <h4 class="card-title"><i class="bi-check-circle-fill text-success"></i> Album Identified!</h4>
+            <h5 class="card-title">${data.albumName}</h5>
+            <p class="card-text"><strong>Artist:</strong> ${data.artistName}</p>
+            ${data.year ? `<p class="card-text"><strong>Year:</strong> ${data.year}</p>` : ''}
+            ${data.genre ? `<p class="card-text"><strong>Genre:</strong> ${data.genre}</p>` : ''}
+            ${data.description ? `<p class="card-text">${data.description}</p>` : ''}
+            <p class="card-text"><small class="text-muted">Identified using AI vision</small></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Search by album name
+async function searchByAlbumName() {
+  const albumName = document.getElementById('albumNameInput').value.trim();
+  
+  if (!albumName) {
+    showToast('warning', 'Enter Album Name', 'Please enter an album name to search', 3000);
+    return;
+  }
+  
+  // Show loading state
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('albumGrid').innerHTML = '';
+  document.getElementById('emptyState').style.display = 'none';
+  
+  showToast('info', 'Searching', `Looking for "${albumName}"...`, 3000);
+  
+  try {
+    const response = await fetch('/api/album-discovery/search-album', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ albumName })
+    });
+    
+    const data = await response.json();
+    
+    // Hide loading state
+    document.getElementById('loadingState').style.display = 'none';
+    
+    if (data.success && data.album) {
+      // Display the found album
+      displayAlbums([data.album]);
+      showToast('success', 'Album Found!', `Found: ${data.album.title} by ${data.album.artist}`, 5000);
+      
+      // Also set the artist for further searches
+      currentArtist = data.album.artist;
+      document.getElementById('kgBand').value = data.album.artist;
+      
+      // Show all albums by this artist after a delay
+      setTimeout(() => {
+        showToast('info', 'Loading More', `Loading all albums by ${data.album.artist}...`, 3000);
+        searchAlbums();
+      }, 2000);
+      
+    } else {
+      document.getElementById('emptyState').style.display = 'block';
+      showToast('warning', 'Album Not Found', `Could not find "${albumName}". Try a different spelling or search by artist.`, 6000);
+    }
+    
+  } catch (error) {
+    console.error('Error searching album:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+    showToast('error', 'Search Failed', 'Error searching for album. Please try again.', 5000);
   }
 }
 

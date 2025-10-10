@@ -8,112 +8,162 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/styles.css"/>
 <style>
-  /* Ouija Board Theme - Dark Occult Fortune Teller */
+  /* Ouija Board Theme - HOUDINI BACKGROUND! */
   body {
-    background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #000000 100%);
-    background-image: 
-      linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, transparent 50%, rgba(255, 20, 147, 0.05) 100%),
-      linear-gradient(0deg, rgba(255, 0, 0, 0.03) 0%, transparent 30%, rgba(255, 165, 0, 0.03) 100%),
-      radial-gradient(ellipse at 30% 20%, rgba(255, 0, 0, 0.08) 0%, transparent 60%),
-      radial-gradient(ellipse at 70% 80%, rgba(255, 20, 147, 0.06) 0%, transparent 60%);
-    background-size: 200px 200px, 300px 300px, 600px 400px, 500px 350px;
-    color: #FFD700;
-    font-family: 'Comic Sans MS', 'Arial Black', sans-serif;
+    background: url('/images/houdini.jpg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    color: #D2691E;
+    font-family: 'Georgia', 'Brush Script MT', cursive, serif;
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
-    animation: zonkersBackground 6s ease-in-out infinite alternate;
   }
-
-  @keyframes zonkersBackground {
-    0% { 
-      background: linear-gradient(135deg, #000000 0%, #1a1a1a 25%, #2d2d2d 50%, #1a1a1a 75%, #000000 100%);
-    }
-    100% { 
-      background: linear-gradient(45deg, #2d2d2d 0%, #1a1a1a 25%, #000000 50%, #1a1a1a 75%, #2d2d2d 100%);
-    }
-  }
-
-  /* Floating Zonkers Bubbles */
-  body::before {
+  
+  /* Metallic grey canvas gradient background */
+  body::after {
     content: '';
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23FF0000' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='60' fill='%23FF4444' opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='40' fill='%23FF6666' opacity='0.8'/%3E%3C/svg%3E"),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23FFFF00' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='60' fill='%23FFFF44' opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='40' fill='%23FFFF66' opacity='0.8'/%3E%3C/svg%3E"),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%2300FFFF' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='60' fill='%2344FFFF' opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='40' fill='%2366FFFF' opacity='0.8'/%3E%3C/svg%3E"),
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='80' fill='%23FF1493' opacity='0.4'/%3E%3Ccircle cx='100' cy='100' r='60' fill='%23FF4493' opacity='0.6'/%3E%3Ccircle cx='100' cy='100' r='40' fill='%23FF6693' opacity='0.8'/%3E%3C/svg%3E");
-    background-size: 150px 150px, 120px 120px, 180px 180px, 140px 140px;
-    background-position: 15% 25%, 80% 15%, 25% 75%, 85% 80%;
-    background-repeat: no-repeat;
+    background: 
+      radial-gradient(circle at 30% 40%, rgba(180, 180, 180, 0.3) 0%, transparent 50%),
+      radial-gradient(circle at 70% 60%, rgba(150, 150, 150, 0.2) 0%, transparent 50%),
+      linear-gradient(135deg, 
+        #4a4a4a 0%, 
+        #6b6b6b 20%, 
+        #5a5a5a 40%, 
+        #787878 60%, 
+        #5f5f5f 80%, 
+        #4a4a4a 100%
+      );
+    opacity: 0;
+    z-index: -1;
     pointer-events: none;
-    z-index: 1;
-    animation: floatBubbles 10s ease-in-out infinite;
+    transition: opacity 3.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  
+  /* Smooth fade transition for Houdini image */
+  body.metallic-active {
+    background-image: none !important;
+    transition: background-image 3.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+  }
+  
+  body.metallic-active::after {
+    opacity: 1;
   }
 
-  @keyframes floatBubbles {
-    0%, 100% { 
-      transform: translateY(0px) rotate(0deg) scale(1);
-      opacity: 0.4;
-    }
-    20% { 
-      transform: translateY(-25px) rotate(8deg) scale(1.2);
-      opacity: 0.6;
-    }
-    40% { 
-      transform: translateY(-15px) rotate(-5deg) scale(0.8);
-      opacity: 0.5;
-    }
-    60% { 
-      transform: translateY(-30px) rotate(6deg) scale(1.15);
-      opacity: 0.7;
-    }
-    80% { 
-      transform: translateY(-10px) rotate(-4deg) scale(0.9);
-      opacity: 0.6;
-    }
+  /* Carnival lights twinkling */
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
   }
 
-  /* Ouija Board Container - Zonkers Style */
+  /* Removed - using body::after for overlay now */
+
+  /* Removed screen flicker - replaced with gentle glow */
+  @keyframes gentleGlow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.95; }
+  }
+
+  /* Carnival Balloons in corners */
+  .balloon {
+    position: fixed;
+    font-size: 2.5rem;
+    z-index: 100;
+    animation: balloonFloat 3s ease-in-out infinite;
+  }
+
+  .balloon-1 { top: 20px; left: 20px; animation-delay: 0s; }
+  .balloon-2 { top: 20px; right: 20px; animation-delay: 0.5s; }
+  .balloon-3 { bottom: 20px; left: 20px; animation-delay: 1s; }
+  .balloon-4 { bottom: 20px; right: 20px; animation-delay: 1.5s; }
+
+  @keyframes balloonFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+  }
+
+  /* Carnival Stars Twinkling */
+  .carnival-star {
+    position: fixed;
+    font-size: 2rem;
+    color: #FFD700;
+    z-index: 98;
+    animation: starTwinkle 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+  }
+
+  .star-1 { top: 15%; left: 10%; animation-delay: 0s; }
+  .star-2 { top: 25%; right: 12%; animation-delay: 0.5s; }
+  .star-3 { top: 60%; left: 8%; animation-delay: 1s; }
+  .star-4 { bottom: 30%; right: 18%; animation-delay: 1.5s; }
+
+  @keyframes starTwinkle {
+    0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    50% { opacity: 0.5; transform: scale(1.2) rotate(180deg); }
+  }
+
+  /* Carnival Streamers */
+  .carnival-streamer {
+    position: fixed;
+    width: 20px;
+    height: 0;
+    background: linear-gradient(to bottom, 
+      #FF6961 0%, #FFB347 20%, #FDFD96 40%, 
+      #77DD77 60%, #AEC6CF 80%, #FF6961 100%);
+    z-index: 96;
+    animation: streamerDrop 10s ease-in infinite;
+    border-radius: 3px;
+  }
+
+  .streamer-1 { left: 15%; animation-delay: 0s; }
+  .streamer-2 { left: 30%; animation-delay: 2s; }
+  .streamer-3 { left: 50%; animation-delay: 4s; }
+  .streamer-4 { left: 70%; animation-delay: 6s; }
+  .streamer-5 { left: 85%; animation-delay: 8s; }
+
+  @keyframes streamerDrop {
+    0% { top: -50px; height: 0; opacity: 0; }
+    20% { opacity: 1; height: 150px; }
+    80% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* Ouija Board Container - BRIGHT CARNIVAL! */
   .ouija-container {
-    background: linear-gradient(135deg, #FFFF00 0%, #FFD700 25%, #FFA500 50%, #FF8C00 75%, #FF6347 100%);
+    background: linear-gradient(135deg, #FFF8DC 0%, #FAEBD7 50%, #FFE4B5 100%);
     background-image: 
-      repeating-linear-gradient(45deg, transparent, transparent 2px, rgba(255,0,0,.1) 2px, rgba(255,0,0,.1) 4px),
-      radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 70% 70%, rgba(255, 20, 147, 0.2) 0%, transparent 50%);
-    border: 6px solid #FF0000;
-    border-radius: 25px;
+      linear-gradient(135deg, #FFF8DC 0%, #FAEBD7 50%, #FFE4B5 100%),
+      repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(255, 99, 71, 0.1) 10px, rgba(255, 99, 71, 0.1) 20px);
+    border: 5px solid #D2691E;
+    border-radius: 20px;
     padding: 2rem;
     margin: 2rem auto;
     box-shadow: 
-      0 0 25px rgba(255, 0, 0, 0.5),
-      0 0 50px rgba(255, 215, 0, 0.3),
-      0 0 75px rgba(255, 20, 147, 0.2),
-      inset 0 2px 8px rgba(255, 255, 255, 0.3);
+      0 8px 30px rgba(210, 105, 30, 0.3),
+      inset 0 2px 10px rgba(255, 255, 255, 0.5);
     position: relative;
     max-width: 800px;
-    z-index: 2;
-    animation: zonkersPulse 3s ease-in-out infinite alternate;
+    z-index: 100;
   }
 
-  @keyframes zonkersPulse {
-    0% { 
+  /* No shake or heartbeat - just gentle carnival glow */
+  @keyframes carnivalGlow {
+    0%, 100% { 
       box-shadow: 
-        0 0 25px rgba(255, 0, 0, 0.5),
-        0 0 50px rgba(255, 215, 0, 0.3),
-        0 0 75px rgba(255, 20, 147, 0.2),
-        inset 0 2px 8px rgba(255, 255, 255, 0.3);
+        0 8px 30px rgba(210, 105, 30, 0.3),
+        inset 0 2px 10px rgba(255, 255, 255, 0.5);
     }
-    100% { 
+    50% { 
       box-shadow: 
-        0 0 35px rgba(255, 20, 147, 0.6),
-        0 0 60px rgba(255, 0, 0, 0.4),
-        0 0 85px rgba(255, 215, 0, 0.3),
-        inset 0 2px 8px rgba(255, 255, 255, 0.4);
+        0 8px 40px rgba(255, 165, 0, 0.4),
+        inset 0 2px 15px rgba(255, 255, 255, 0.6);
     }
   }
 
@@ -125,10 +175,8 @@
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 20, 147, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
-    border-radius: 25px;
+      radial-gradient(circle at 50% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 60%);
+    border-radius: 20px;
     pointer-events: none;
   }
 
@@ -143,164 +191,79 @@
   .ouija-title {
     font-size: 3.5rem;
     font-weight: 900;
-    color: #FF0000;
+    color: #FF6347;
     text-shadow: 
-      3px 3px 0px #FFD700,
-      6px 6px 0px #FF1493,
-      9px 9px 0px #FF8C00,
-      12px 12px 20px rgba(0, 0, 0, 0.5);
+      2px 2px 0px #FFD700,
+      4px 4px 0px #FF8C00,
+      -1px -1px 0px #fff;
     margin-bottom: 0.5rem;
-    font-family: 'Comic Sans MS', 'Arial Black', sans-serif;
+    font-family: 'Georgia', 'Brush Script MT', cursive;
     position: relative;
-    animation: zonkersTitle 2s ease-in-out infinite alternate;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 5px;
   }
 
-  @keyframes zonkersTitle {
-    0% { 
-      text-shadow: 
-        3px 3px 0px #FFD700,
-        6px 6px 0px #FF1493,
-        9px 9px 0px #FF8C00,
-        12px 12px 20px rgba(0, 0, 0, 0.5);
-    }
-    100% { 
-      text-shadow: 
-        3px 3px 0px #FF1493,
-        6px 6px 0px #FFD700,
-        9px 9px 0px #FF6347,
-        12px 12px 20px rgba(255, 0, 0, 0.3);
-    }
-  }
+  /* No flicker - steady carnival sign */
 
   .ouija-title::before {
-    content: '⚡';
+    content: '⭐';
     position: absolute;
     left: -80px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 3rem;
-    color: #FFD700;
-    text-shadow: 0 0 10px #FF0000;
-    animation: zonkersSymbol 1.5s ease-in-out infinite alternate;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+    animation: starSpin 4s ease-in-out infinite;
   }
 
   .ouija-title::after {
-    content: '💥';
+    content: '⭐';
     position: absolute;
     right: -80px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 3rem;
-    color: #FF1493;
-    text-shadow: 0 0 10px #FFD700;
-    animation: zonkersSymbol 1.5s ease-in-out infinite alternate-reverse;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.8));
+    animation: starSpin 4s ease-in-out infinite reverse;
   }
 
-  @keyframes zonkersSymbol {
-    0% { 
-      transform: translateY(-50%) scale(1) rotate(0deg);
-    }
-    100% { 
-      transform: translateY(-50%) scale(1.2) rotate(10deg);
-    }
-  }
-
-  @keyframes skullFloat {
+  @keyframes starSpin {
     0%, 100% { 
       transform: translateY(-50%) rotate(0deg);
-      filter: hue-rotate(0deg);
+      opacity: 1;
     }
-    33% { 
-      transform: translateY(-60%) rotate(-10deg);
-      filter: hue-rotate(120deg);
-    }
-    66% { 
-      transform: translateY(-40%) rotate(10deg);
-      filter: hue-rotate(240deg);
+    50% { 
+      transform: translateY(-60%) rotate(180deg);
+      opacity: 0.8;
     }
   }
 
   .ouija-subtitle {
-    font-size: 1.4rem;
-    color: #FF8C00;
-    font-weight: 700;
+    font-size: 1.2rem;
+    color: #CD853F;
+    font-weight: 400;
     margin-bottom: 1rem;
-    text-shadow: 2px 2px 0px #FFD700;
-    animation: zonkersSubtitle 3s ease-in-out infinite alternate;
-  }
-
-  @keyframes zonkersSubtitle {
-    0% { 
-      color: #FF8C00;
-      text-shadow: 2px 2px 0px #FFD700;
-    }
-    100% { 
-      color: #FF1493;
-      text-shadow: 2px 2px 0px #FFFF00;
-    }
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+    letter-spacing: 2px;
   }
 
   .houdini-intro {
-    color: #FF0000;
+    color: #8B4513;
     font-weight: 600;
-    text-shadow: 1px 1px 0px #FFD700;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 20, 147, 0.3) 100%);
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
+    background: linear-gradient(135deg, rgba(255, 235, 205, 0.8) 0%, rgba(255, 228, 196, 0.8) 100%);
     padding: 1rem;
     border-radius: 15px;
     border: 3px solid #FFD700;
     box-shadow: 
-      0 0 15px rgba(255, 215, 0, 0.5),
-      inset 0 0 15px rgba(255, 255, 0, 0.2);
-    animation: zonkersIntro 4s ease-in-out infinite alternate;
+      0 0 20px rgba(255, 165, 0, 0.4),
+      inset 0 2px 10px rgba(255, 255, 255, 0.5);
     font-style: italic;
     margin-bottom: 2rem;
     font-weight: 500;
   }
 
-  @keyframes zonkersIntro {
-    0% { 
-      border-color: #FFD700;
-      box-shadow: 
-        0 0 15px rgba(255, 215, 0, 0.5),
-        inset 0 0 15px rgba(255, 255, 0, 0.2);
-    }
-    100% { 
-      border-color: #FF1493;
-      box-shadow: 
-        0 0 20px rgba(255, 20, 147, 0.6),
-        inset 0 0 20px rgba(255, 0, 255, 0.3);
-    }
-  }
-
-  @keyframes titlePulse {
-    0%, 100% { 
-      text-shadow: 
-        0 0 10px rgba(139, 0, 0, 0.8),
-        2px 2px 4px rgba(0,0,0,0.8);
-    }
-    50% { 
-      text-shadow: 
-        0 0 20px rgba(139, 0, 0, 1),
-        0 0 30px rgba(139, 0, 0, 0.5),
-        2px 2px 4px rgba(0,0,0,0.8);
-    }
-  }
-
-  @keyframes introGlow {
-    0%, 100% { 
-      text-shadow: 
-        0 0 6px rgba(220, 20, 60, 0.5),
-        1px 1px 2px rgba(0,0,0,0.5);
-    }
-    50% { 
-      text-shadow: 
-        0 0 12px rgba(220, 20, 60, 0.8),
-        0 0 18px rgba(220, 20, 60, 0.3),
-        1px 1px 2px rgba(0,0,0,0.5);
-    }
-  }
+  /* Removed dark animations */
 
   /* Ouija Board Grid - Zonkers Style */
   .ouija-board {
@@ -348,74 +311,41 @@
     }
   }
 
-  /* Planchette - Zonkers Style */
+  /* Planchette - CHEERFUL CARNIVAL POINTER */
   .planchette {
     position: absolute;
     width: 60px;
     height: 40px;
-    background: linear-gradient(135deg, #FFD700 0%, #FF1493 50%, #FF0000 100%);
-    border: 3px solid #FFFF00;
+    background: radial-gradient(circle, #FFE4B5 0%, #FFDAB9 100%);
+    border: 3px solid #FF6347;
     border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
     box-shadow: 
-      0 0 20px rgba(255, 215, 0, 0.6),
-      0 0 40px rgba(255, 20, 147, 0.4),
-      0 0 60px rgba(255, 0, 0, 0.3),
-      inset 0 2px 4px rgba(255, 255, 255, 0.4);
+      0 4px 15px rgba(255, 99, 71, 0.4),
+      inset 0 2px 5px rgba(255, 255, 255, 0.5);
     transition: all 1.5s ease-in-out;
     z-index: 10;
     pointer-events: none;
     opacity: 0;
-    animation: zonkersPlanchette 2s ease-in-out infinite alternate;
   }
 
-  @keyframes zonkersPlanchette {
-    0% { 
-      background: linear-gradient(135deg, #FFD700 0%, #FF1493 50%, #FF0000 100%);
-      border-color: #FFFF00;
-      box-shadow: 
-        0 0 20px rgba(255, 215, 0, 0.6),
-        0 0 40px rgba(255, 20, 147, 0.4),
-        0 0 60px rgba(255, 0, 0, 0.3),
-        inset 0 2px 4px rgba(255, 255, 255, 0.4);
-    }
-    100% { 
-      background: linear-gradient(135deg, #FF1493 0%, #FF0000 50%, #FFD700 100%);
-      border-color: #FF1493;
-      box-shadow: 
-        0 0 25px rgba(255, 20, 147, 0.7),
-        0 0 50px rgba(255, 0, 0, 0.5),
-        0 0 75px rgba(255, 215, 0, 0.4),
-        inset 0 2px 4px rgba(255, 255, 255, 0.5);
-    }
-  }
-
-  @keyframes planchetteFloat {
+  /* Gentle float - no trembling! */
+  @keyframes planchetteGentleFloat {
     0%, 100% { 
-      transform: translateY(0px) rotate(0deg);
-      box-shadow: 
-        0 0 15px rgba(139, 0, 0, 0.6),
-        inset 0 0 10px rgba(139, 0, 0, 0.2);
+      filter: drop-shadow(0 2px 8px rgba(255, 99, 71, 0.3));
     }
     50% { 
-      transform: translateY(-3px) rotate(1deg);
-      box-shadow: 
-        0 0 20px rgba(139, 0, 0, 0.8),
-        0 0 30px rgba(139, 0, 0, 0.3),
-        inset 0 0 10px rgba(139, 0, 0, 0.3);
+      filter: drop-shadow(0 4px 12px rgba(255, 165, 0, 0.4));
     }
   }
 
   .planchette::before {
-    content: '';
+    content: '🔮';
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 8px;
-    height: 8px;
-    background: #2F1B14;
-    border-radius: 50%;
-    box-shadow: 0 0 4px rgba(47, 27, 20, 0.5);
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
   }
 
   .planchette::after {
@@ -428,38 +358,12 @@
     height: 0;
     border-left: 4px solid transparent;
     border-right: 4px solid transparent;
-    border-top: 6px solid #2F1B14;
-  }
-
-  @keyframes centerPulse {
-    0%, 100% { 
-      box-shadow: 
-        0 0 8px rgba(139, 0, 0, 0.8),
-        0 0 15px rgba(139, 0, 0, 0.4);
-    }
-    50% { 
-      box-shadow: 
-        0 0 12px rgba(139, 0, 0, 1),
-        0 0 20px rgba(139, 0, 0, 0.6);
-    }
+    border-top: 6px solid #FF6347;
   }
 
   .planchette.moving {
     opacity: 1;
-    animation: planchetteGlow 0.5s ease-in-out;
-  }
-
-  @keyframes planchetteGlow {
-    0%, 100% { 
-      box-shadow: 
-        0 4px 12px rgba(47, 27, 20, 0.3),
-        inset 0 2px 4px rgba(255, 255, 255, 0.4);
-    }
-    50% { 
-      box-shadow: 
-        0 6px 20px rgba(47, 27, 20, 0.5),
-        inset 0 2px 4px rgba(255, 255, 255, 0.6);
-    }
+    animation: planchetteGentleFloat 0.8s ease-in-out infinite;
   }
 
   .ouija-letters {
@@ -470,17 +374,17 @@
   }
 
   .ouija-letter {
-    background: linear-gradient(135deg, #FFFFFF 0%, #FFFF00 100%);
-    border: 3px solid #FF0000;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #FFF8DC 0%, #FFE4C4 100%);
+    border: 3px solid #D2691E;
+    border-radius: 8px;
     padding: 1rem;
     text-align: center;
     font-size: 1.6rem;
-    font-weight: 900;
-    color: #FF0000;
+    font-weight: 700;
+    color: #8B4513;
     text-shadow: 
-      2px 2px 0px #FFD700,
-      4px 4px 0px #FF1493;
+      1px 1px 0px rgba(255, 255, 255, 0.5),
+      -1px -1px 0px rgba(139, 69, 19, 0.3);
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
@@ -488,58 +392,57 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Comic Sans MS', 'Arial Black', sans-serif;
-    animation: zonkersLetter 2s ease-in-out infinite alternate;
+    font-family: 'Georgia', serif;
+    box-shadow: 0 2px 8px rgba(210, 105, 30, 0.2);
   }
 
-  @keyframes zonkersLetter {
-    0% { 
-      background: linear-gradient(135deg, #FFFFFF 0%, #FFFF00 100%);
-      border-color: #FF0000;
-      transform: scale(1);
-    }
-    100% { 
-      background: linear-gradient(135deg, #FFD700 0%, #FF1493 100%);
-      border-color: #FF1493;
-      transform: scale(1.05);
-    }
-  }
+  /* No flicker - steady and bright! */
 
   .ouija-letter:hover {
-    border-color: #FFD700;
-    color: #FFD700;
+    border-color: #FF6347;
+    color: #FF6347;
     text-shadow: 
-      3px 3px 0px #FF0000,
-      6px 6px 0px #FF1493;
-    transform: translateY(-3px) scale(1.1);
+      2px 2px 0px #FFD700,
+      -1px -1px 0px #fff;
+    transform: scale(1.15);
     box-shadow: 
-      0 0 15px rgba(255, 215, 0, 0.6),
-      0 0 30px rgba(255, 0, 0, 0.4);
-    background: linear-gradient(135deg, #FFD700 0%, #FF1493 100%);
-    animation: zonkersLetterHover 0.5s ease-in-out infinite alternate;
-  }
-
-  @keyframes zonkersLetterHover {
-    0% { 
-      transform: translateY(-3px) scale(1.1);
-    }
-    100% { 
-      transform: translateY(-5px) scale(1.15);
-    }
+      0 4px 15px rgba(255, 99, 71, 0.4),
+      inset 0 2px 5px rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, #FFE4C4 0%, #FFDAB9 100%);
   }
 
   .ouija-letter.materializing {
-    animation: materializeLetter 2s ease-in-out;
+    animation: materializeLetter 1.5s ease-in-out;
+  }
+
+  @keyframes materializeLetter {
+    0% {
+      opacity: 0;
+      transform: scale(0.5) rotate(-180deg);
+      filter: blur(10px);
+    }
+    50% {
+      opacity: 0.5;
+      filter: blur(5px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+      filter: blur(0px);
+    }
   }
 
   .ouija-letter.visible {
-    border-color: #2F1B14;
-    color: #2F1B14;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-    box-shadow: 0 4px 16px rgba(47, 27, 20, 0.4);
-    background: rgba(255, 255, 255, 0.95);
+    border-color: #FFD700;
+    color: #FF6347;
+    text-shadow: 
+      2px 2px 0px #FFD700,
+      -1px -1px 0px #fff;
+    box-shadow: 
+      0 0 20px rgba(255, 215, 0, 0.6),
+      inset 0 2px 10px rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, #FFDAB9 0%, #FFB347 100%);
     font-weight: 900;
-    animation: letterPossession 0.5s ease-in-out;
   }
 
   .ouija-letter.flipping {
@@ -701,28 +604,30 @@
   }
 
   .ouija-number {
-    background: rgba(0, 0, 0, 0.8);
-    border: 2px solid #00ff41;
+    background: linear-gradient(135deg, #FFF8DC 0%, #FFE4C4 100%);
+    border: 2px solid #FF8C00;
     border-radius: 6px;
     padding: 0.5rem;
     text-align: center;
     font-size: 1rem;
     font-weight: bold;
-    color: #00ff41;
-    text-shadow: 0 0 8px #00ff41;
+    color: #D2691E;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
     transition: all 0.3s ease;
     cursor: pointer;
     min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 6px rgba(210, 105, 30, 0.2);
   }
 
   .ouija-number:hover {
-    border-color: #ff6b35;
-    color: #ff6b35;
-    text-shadow: 0 0 12px #ff6b35;
+    border-color: #FFD700;
+    color: #FF6347;
+    text-shadow: 2px 2px 0px #FFD700;
     transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.4);
   }
 
   /* Special Words */
@@ -734,51 +639,57 @@
   }
 
   .ouija-word {
-    background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #ff6b35;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #FFE4B5 0%, #FFDAB9 100%);
+    border: 3px solid #FF6347;
+    border-radius: 15px;
     padding: 1rem;
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     font-weight: bold;
-    color: #ff6b35;
-    text-shadow: 0 0 10px #ff6b35;
+    color: #8B4513;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
     transition: all 0.3s ease;
     cursor: pointer;
     min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 4px 12px rgba(255, 99, 71, 0.3);
   }
 
   .ouija-word:hover {
-    border-color: #ffff00;
-    color: #ffff00;
-    text-shadow: 0 0 15px #ffff00;
+    border-color: #FFD700;
+    color: #FF6347;
+    text-shadow: 2px 2px 0px #FFD700;
     transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
   }
 
   /* Message Area */
   .message-area {
-    background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #00ff41;
-    border-radius: 10px;
+    background: linear-gradient(135deg, #FFF8DC 0%, #FFE4C4 100%);
+    border: 4px solid #FF6347;
+    border-radius: 15px;
     padding: 1.5rem;
     margin: 2rem 0;
     min-height: 100px;
     position: relative;
+    box-shadow: 
+      0 4px 15px rgba(255, 99, 71, 0.3),
+      inset 0 2px 8px rgba(255, 255, 255, 0.5);
   }
 
   .message-display {
-    color: #ffff00;
-    text-shadow: 0 0 10px #ffff00;
-    font-size: 1.2rem;
+    color: #8B4513;
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
+    font-size: 1.3rem;
     line-height: 1.6;
     min-height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    font-weight: 600;
   }
 
   .message-display.typing {
@@ -836,51 +747,57 @@
     border-color: #ffff00;
   }
 
-  /* Question Input */
+  /* Question Input - BRIGHT CARNIVAL! */
   .question-input {
-    background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #00ff41;
+    background: #FFF8DC;
+    border: 3px solid #FF8C00;
     border-radius: 10px;
     padding: 1rem;
-    color: #fff;
+    color: #8B4513;
     font-size: 1.1rem;
     width: 100%;
     margin-bottom: 1rem;
-    text-shadow: 0 0 5px #00ff41;
-    box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.1);
+    text-shadow: none;
+    box-shadow: 
+      inset 0 2px 5px rgba(210, 105, 30, 0.1),
+      0 2px 8px rgba(255, 140, 0, 0.2);
   }
 
+  /* No pulse - steady */
+
   .question-input:focus {
-    border-color: #ff6b35;
+    border-color: #FFD700;
     box-shadow: 
-      0 0 20px rgba(255, 107, 53, 0.3),
-      inset 0 0 10px rgba(255, 107, 53, 0.1);
+      0 0 15px rgba(255, 215, 0, 0.4),
+      inset 0 2px 8px rgba(255, 215, 0, 0.1);
     outline: none;
+    color: #8B4513;
   }
 
   .question-input::placeholder {
-    color: #666;
+    color: #CD853F;
     text-shadow: none;
+    font-style: italic;
   }
 
-  /* Houdini Spirit */
+  /* Houdini Magician - CHEERFUL! */
   .houdini-spirit {
     position: absolute;
     top: 20px;
     right: 20px;
     font-size: 3rem;
-    color: #ffff00;
-    text-shadow: 0 0 20px #ffff00;
-    animation: floatSpirit 4s ease-in-out infinite;
+    opacity: 0.8;
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
+    animation: magicianFloat 5s ease-in-out infinite;
     z-index: 3;
   }
 
-  @keyframes floatSpirit {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-10px) rotate(5deg); }
+  @keyframes magicianFloat {
+    0%, 100% { transform: translateY(0) rotate(-5deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
   }
 
-  /* Floating Elements */
+  /* Floating Elements - Confetti! */
   .floating-elements {
     position: fixed;
     top: 0;
@@ -894,166 +811,94 @@
 
   .spirit-orb {
     position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #ffff00;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
-    box-shadow: 0 0 10px #ffff00;
-    animation: floatOrb 8s linear infinite;
+    animation: floatConfetti 8s linear infinite;
     opacity: 0;
   }
 
-  .spirit-orb:nth-child(1) { left: 10%; animation-delay: 0s; }
-  .spirit-orb:nth-child(2) { left: 30%; animation-delay: 2s; }
-  .spirit-orb:nth-child(3) { left: 50%; animation-delay: 4s; }
-  .spirit-orb:nth-child(4) { left: 70%; animation-delay: 6s; }
-  .spirit-orb:nth-child(5) { left: 90%; animation-delay: 8s; }
+  .spirit-orb:nth-child(1) { background: #FF6961; left: 10%; animation-delay: 0s; }
+  .spirit-orb:nth-child(2) { background: #FFD700; left: 30%; animation-delay: 2s; }
+  .spirit-orb:nth-child(3) { background: #77DD77; left: 50%; animation-delay: 4s; }
+  .spirit-orb:nth-child(4) { background: #AEC6CF; left: 70%; animation-delay: 6s; }
+  .spirit-orb:nth-child(5) { background: #FFB347; left: 90%; animation-delay: 8s; }
 
-  @keyframes floatOrb {
+  @keyframes floatConfetti {
     0% {
-      transform: translateY(100vh) scale(0);
+      transform: translateY(-20px) scale(0) rotate(0deg);
       opacity: 0;
     }
     10% {
       opacity: 1;
-      transform: translateY(90vh) scale(1);
+      transform: translateY(10vh) scale(1) rotate(45deg);
     }
     90% {
       opacity: 1;
-      transform: translateY(10vh) scale(1);
+      transform: translateY(90vh) scale(1) rotate(360deg);
     }
     100% {
-      transform: translateY(0) scale(0);
+      transform: translateY(100vh) scale(0) rotate(405deg);
       opacity: 0;
     }
   }
 
-  /* Navbar Ouija Style - Dark Occult Fortune Teller */
+  /* Navbar Ouija Style - BRIGHT CARNIVAL! */
   .navbar-ouija {
-    background: linear-gradient(135deg, rgba(26, 13, 13, 0.95) 0%, rgba(13, 13, 13, 0.95) 100%) !important;
-    backdrop-filter: blur(20px);
-    border-bottom: 2px solid #8B0000;
+    background: linear-gradient(135deg, rgba(255, 229, 180, 0.95) 0%, rgba(255, 218, 185, 0.95) 100%) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 4px solid #FF6347;
     box-shadow: 
-      0 0 20px rgba(139, 0, 0, 0.4),
-      0 4px 16px rgba(0, 0, 0, 0.6);
+      0 4px 15px rgba(255, 99, 71, 0.3);
+    position: relative;
+    z-index: 1000;
   }
 
   .navbar-brand-ouija {
-    color: #8B0000 !important;
+    color: #D2691E !important;
     text-shadow: 
-      0 0 8px rgba(139, 0, 0, 0.6),
-      2px 2px 4px rgba(0,0,0,0.8);
+      2px 2px 0px #FFD700,
+      -1px -1px 0px rgba(255, 255, 255, 0.5);
     font-weight: bold;
     font-family: 'Georgia', serif;
-    animation: brandGlow 3s ease-in-out infinite;
   }
 
   .nav-link-ouija {
-    color: #DC143C !important;
+    color: #8B4513 !important;
     text-shadow: 
-      0 0 5px rgba(220, 20, 60, 0.5),
-      1px 1px 2px rgba(0,0,0,0.6);
+      1px 1px 0px rgba(255, 255, 255, 0.5);
     transition: all 0.3s ease;
     font-weight: 500;
   }
 
   .nav-link-ouija:hover {
-    color: #FF4500 !important;
+    color: #FF6347 !important;
     text-shadow: 
-      0 0 10px rgba(255, 69, 0, 0.8),
-      2px 2px 4px rgba(0,0,0,0.8);
+      2px 2px 0px #FFD700;
     transform: translateY(-2px);
   }
 
-  @keyframes brandGlow {
-    0%, 100% { 
-      text-shadow: 
-        0 0 8px rgba(139, 0, 0, 0.6),
-        2px 2px 4px rgba(0,0,0,0.8);
-    }
-    50% { 
-      text-shadow: 
-        0 0 15px rgba(139, 0, 0, 0.9),
-        0 0 25px rgba(139, 0, 0, 0.4),
-        2px 2px 4px rgba(0,0,0,0.8);
-    }
-  }
-
-  /* Footer Ouija - Dark Occult */
+  /* Footer Ouija - BRIGHT CARNIVAL! */
   .footer-ouija {
-    background: linear-gradient(135deg, #0d0d0d, #1a0d0d, #0d0d0d);
-    border-top: 2px solid #8B0000;
-    color: #8B0000;
+    background: linear-gradient(135deg, #FFE5B4 0%, #FFDAB9 100%);
+    border-top: 4px solid #FF6347;
+    color: #8B4513;
     text-shadow: 
-      0 0 8px rgba(139, 0, 0, 0.6),
-      1px 1px 2px rgba(0,0,0,0.8);
+      1px 1px 0px rgba(255, 255, 255, 0.5);
     box-shadow: 
-      0 0 20px rgba(139, 0, 0, 0.4),
-      0 -4px 16px rgba(0, 0, 0, 0.6);
+      0 -4px 15px rgba(255, 99, 71, 0.3);
   }
 
-  /* Dark Question Input */
-  .question-input {
-    background: rgba(26, 13, 13, 0.9) !important;
-    border: 2px solid #8B0000 !important;
-    color: #DC143C !important;
-    text-shadow: 0 0 5px rgba(220, 20, 60, 0.6);
-    box-shadow: 
-      0 0 15px rgba(139, 0, 0, 0.3),
-      inset 0 0 10px rgba(139, 0, 0, 0.1);
-  }
+  /* Already styled above - removed duplicates */
 
-  .question-input:focus {
-    border-color: #FF4500 !important;
-    box-shadow: 
-      0 0 20px rgba(255, 69, 0, 0.5),
-      inset 0 0 15px rgba(255, 69, 0, 0.1);
-  }
-
-  .question-input::placeholder {
-    color: #8B0000 !important;
-    opacity: 0.7;
-  }
-
-  /* Dark Message Display */
-  .message-display {
-    background: rgba(13, 13, 13, 0.9) !important;
-    border: 2px solid #8B0000 !important;
-    color: #DC143C !important;
-    text-shadow: 0 0 5px rgba(220, 20, 60, 0.6);
-    box-shadow: 
-      0 0 15px rgba(139, 0, 0, 0.3),
-      inset 0 0 10px rgba(139, 0, 0, 0.1);
-  }
-
-  /* Dark Buttons */
-  .btn-primary {
-    background: linear-gradient(135deg, #8B0000, #DC143C) !important;
-    border: 2px solid #8B0000 !important;
-    color: #FFFFFF !important;
-    text-shadow: 0 0 5px rgba(0,0,0,0.8);
-    box-shadow: 
-      0 0 10px rgba(139, 0, 0, 0.4),
-      inset 0 0 5px rgba(139, 0, 0, 0.2);
-  }
-
-  .btn-primary:hover {
-    background: linear-gradient(135deg, #DC143C, #FF4500) !important;
-    border-color: #FF4500 !important;
-    box-shadow: 
-      0 0 15px rgba(255, 69, 0, 0.6),
-      inset 0 0 5px rgba(255, 69, 0, 0.2);
-    transform: translateY(-2px);
-  }
-
-  /* Spirit Entry Popup */
+  /* Carnival Entry Popup - FUN! */
   .spirit-entry-popup {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.95);
+    background: linear-gradient(135deg, #FFE5B4 0%, #FFDAB9 50%, #FFE4C4 100%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1072,7 +917,10 @@
     text-align: center;
     padding: 50px;
     max-width: 600px;
-    animation: spiritPulse 3s ease-in-out infinite;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 20px;
+    border: 5px solid #FF6347;
+    box-shadow: 0 10px 40px rgba(255, 99, 71, 0.4);
   }
 
   .spirit-glow {
@@ -1080,9 +928,9 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(220, 20, 60, 0.3) 0%, transparent 70%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, transparent 70%);
     filter: blur(40px);
     animation: glowPulse 3s ease-in-out infinite;
   }
@@ -1090,40 +938,42 @@
   .spirit-entry-title {
     font-size: 5rem;
     margin-bottom: 1rem;
-    filter: drop-shadow(0 0 20px rgba(220, 20, 60, 0.8));
+    filter: drop-shadow(0 4px 10px rgba(255, 140, 0, 0.4));
     animation: float 3s ease-in-out infinite;
   }
 
   .spirit-entry-subtitle {
-    color: #DC143C;
-    font-family: 'Creepster', cursive;
+    color: #FF6347;
+    font-family: 'Georgia', 'Brush Script MT', cursive;
     font-size: 2.5rem;
     margin-bottom: 1.5rem;
-    text-shadow: 0 0 10px rgba(220, 20, 60, 0.8);
+    text-shadow: 
+      2px 2px 0px #FFD700,
+      -1px -1px 0px rgba(255, 255, 255, 0.8);
     letter-spacing: 3px;
   }
 
   .spirit-entry-text {
-    color: #fff;
+    color: #8B4513;
     font-size: 1.2rem;
     margin-bottom: 1rem;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
     line-height: 1.8;
   }
 
   .spirit-entry-warning {
-    color: #FFD700;
+    color: #D2691E;
     font-size: 0.9rem;
     font-style: italic;
     margin-bottom: 2rem;
-    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
   }
 
   .spirit-entry-button {
     position: relative;
-    background: linear-gradient(135deg, #8B0000, #DC143C);
+    background: linear-gradient(135deg, #FF6347, #FFD700);
     color: #fff;
-    border: 2px solid #DC143C;
+    border: 3px solid #FF6347;
     padding: 15px 40px;
     font-size: 1.2rem;
     font-weight: bold;
@@ -1132,55 +982,136 @@
     cursor: pointer;
     transition: all 0.3s ease;
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(220, 20, 60, 0.5);
+    box-shadow: 0 6px 20px rgba(255, 99, 71, 0.4);
   }
 
   .spirit-entry-button:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(220, 20, 60, 0.8);
-    background: linear-gradient(135deg, #DC143C, #FF4500);
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.6);
+    background: linear-gradient(135deg, #FFD700, #FF6347);
   }
 
   .spirit-entry-button-text {
     position: relative;
     z-index: 1;
+    text-shadow: 1px 1px 2px rgba(139, 69, 19, 0.3);
   }
 
   .spirit-flee-button {
-    color: #888;
+    color: #8B4513;
     font-size: 0.9rem;
     text-decoration: none;
     letter-spacing: 1px;
     transition: all 0.3s ease;
     opacity: 0.7;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
   }
 
   .spirit-flee-button:hover {
-    color: #fff;
+    color: #D2691E;
     opacity: 1;
     text-decoration: none;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     transform: translateX(-5px);
   }
 
-  @keyframes spiritPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-  }
-
   @keyframes glowPulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.4; }
   }
 
   @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
   }
+
+  /* Side Thumbnails */
+  .side-thumbnails {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    opacity: 0;
+    transition: opacity 2s ease-in;
+  }
+
+  .side-thumbnails.left {
+    left: 10px;
+  }
+
+  .side-thumbnails.right {
+    right: 10px;
+  }
+
+  .side-thumbnails.visible {
+    opacity: 1;
+  }
+
+  .thumbnail-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #FF6347;
+    box-shadow: 
+      0 4px 15px rgba(255, 99, 71, 0.4),
+      inset 0 2px 5px rgba(255, 255, 255, 0.3);
+    object-fit: cover;
+    animation: thumbnailFade 4s ease-in-out infinite;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .thumbnail-image:hover {
+    transform: scale(1.15);
+    box-shadow: 
+      0 6px 25px rgba(255, 215, 0, 0.6),
+      inset 0 2px 8px rgba(255, 255, 255, 0.5);
+    border-color: #FFD700;
+  }
+
+  @keyframes thumbnailFade {
+    0%, 100% { 
+      opacity: 0.6;
+      filter: brightness(0.8);
+    }
+    50% { 
+      opacity: 1;
+      filter: brightness(1.2);
+    }
+  }
+
+  /* Stagger the animations for different thumbnails */
+  .thumbnail-image:nth-child(1) { animation-delay: 0s; }
+  .thumbnail-image:nth-child(2) { animation-delay: 0.8s; }
+  .thumbnail-image:nth-child(3) { animation-delay: 1.6s; }
+  .thumbnail-image:nth-child(4) { animation-delay: 2.4s; }
+
+  /* Responsive - hide on small screens */
+  @media (max-width: 768px) {
+    .side-thumbnails {
+      display: none;
+    }
+  }
 </style>
 </head>
 <body>
+<!-- Left Side Thumbnails -->
+<div class="side-thumbnails left" id="leftThumbnails">
+  <img src="/images/jerry.png" alt="Jerry" class="thumbnail-image">
+  <img src="/images/levi.png" alt="Levi" class="thumbnail-image">
+  <img src="/images/steven.png" alt="Steven" class="thumbnail-image">
+  <img src="/images/genie.png" alt="Genie" class="thumbnail-image">
+</div>
+
+<!-- Right Side Thumbnails -->
+<div class="side-thumbnails right" id="rightThumbnails">
+  <img src="/images/cosmic turtle.png" alt="Cosmic Turtle" class="thumbnail-image">
+  <img src="/images/easy.png" alt="Easy" class="thumbnail-image">
+  <img src="/images/electraglide.png" alt="Electraglide" class="thumbnail-image">
+  <img src="/images/fuzz.png" alt="Fuzz" class="thumbnail-image">
+</div>
+
 <div class="floating-elements">
   <div class="spirit-orb"></div>
   <div class="spirit-orb"></div>
@@ -1189,7 +1120,7 @@
   <div class="spirit-orb"></div>
 </div>
 
-<div class="houdini-spirit">👻</div>
+<div class="houdini-spirit">🎩✨</div>
 
 <nav class="navbar navbar-expand-lg navbar-dark navbar-ouija shadow-lg">
   <div class="container">
@@ -1213,37 +1144,52 @@
   </div>
 </nav>
 
-<!-- Mystical Entry Popup -->
+<!-- Carnival Entry Popup -->
 <div id="spiritEntryPopup" class="spirit-entry-popup">
   <div class="spirit-entry-content">
     <div class="spirit-glow"></div>
-    <h2 class="spirit-entry-title">🔮</h2>
-    <h3 class="spirit-entry-subtitle">Welcome, Seeker</h3>
+    <h2 class="spirit-entry-title">🎪✨</h2>
+    <h3 class="spirit-entry-subtitle">Step Right Up!</h3>
     <p class="spirit-entry-text">
-      You are about to enter the realm of spirits...<br>
-      Houdini, the Spirit of Music, awaits your questions.
+      Welcome to the Amazing Musical Fortune Teller!<br>
+      Houdini, the Great Magician of Music, awaits your questions.
     </p>
     <p class="spirit-entry-warning">
-      <i class="bi-exclamation-triangle"></i> Only those pure of heart may proceed
+      <i class="bi-star-fill"></i> All music lovers welcome!
     </p>
     <button class="spirit-entry-button" onclick="enterSpiritRealm()">
-      <span class="spirit-entry-button-text">ENTER THE SPIRIT REALM</span>
+      <span class="spirit-entry-button-text">ENTER THE CARNIVAL</span>
       <span class="spirit-entry-button-glow"></span>
     </button>
     <div class="mt-4">
       <a href="/" class="spirit-flee-button">
-        <i class="bi-arrow-left"></i> FLEE TO SAFETY
+        <i class="bi-arrow-left"></i> Back to Home
       </a>
     </div>
   </div>
 </div>
+
+<!-- CARNIVAL atmospheric elements -->
+<div class="balloon balloon-1">🎈</div>
+<div class="balloon balloon-2">🎈</div>
+<div class="balloon balloon-3">🎈</div>
+<div class="balloon balloon-4">🎈</div>
+<div class="carnival-star star-1">⭐</div>
+<div class="carnival-star star-2">✨</div>
+<div class="carnival-star star-3">⭐</div>
+<div class="carnival-star star-4">✨</div>
+<div class="carnival-streamer streamer-1"></div>
+<div class="carnival-streamer streamer-2"></div>
+<div class="carnival-streamer streamer-3"></div>
+<div class="carnival-streamer streamer-4"></div>
+<div class="carnival-streamer streamer-5"></div>
 
 <main class="container">
   <div class="ouija-container" id="ouijaContainer" style="opacity: 0; transition: opacity 3s ease-in;">
     <div class="ouija-header">
       <h1 class="ouija-title">Ouija Board</h1>
       <p class="ouija-subtitle">Communicate with Houdini, the Spirit of Music</p>
-      <p class="houdini-intro">"Ask me anything about music, and I shall reveal the truth through the ancient art of spirit communication..."</p>
+      <p class="houdini-intro">"Step right up and ask me anything about music! Watch as the mystical planchette spells out the answer before your very eyes!"</p>
     </div>
 
     <!-- Question Input -->
@@ -1309,7 +1255,7 @@
       <button id="voiceBtn" class="ouija-btn voice-btn" onclick="toggleVoice()">
         <i class="bi-mic mr-1"></i> Enable Voice
       </button>
-        <button class="ouija-btn danger" onclick="stopSpeaking()" id="stopSpeakingBtn">
+        <button class="ouija-btn danger" onclick="window.stopSpeech()" id="stopSpeakingBtn">
           <i class="bi-stop-circle mr-1"></i> Stop Speech
         </button>
         <button class="ouija-btn secondary" onclick="testSpeech()" id="testSpeechBtn">
@@ -1324,8 +1270,8 @@
     <div class="footer-content">
       <strong>David E Lane</strong> — Ouija Board — <span id="dt"></span> — All Rights Reserved
     </div>
-    <div class="footer-quote mt-2" style="color: #ffff00; text-shadow: 0 0 10px #ffff00;">
-      🔮 "The spirits of music shall guide your path" 🔮
+    <div class="footer-quote mt-2" style="color: #FF6347; text-shadow: 2px 2px 0px #FFD700;">
+      🎪 "Music is the Greatest Show on Earth!" 🎪
     </div>
   </div>
 </footer>
@@ -1381,6 +1327,12 @@ function initializeOuijaBoard() {
   });
 
   console.log('🔮 Ouija Board initialized');
+  
+  // 🎨 ACTIVATE METALLIC BACKGROUND! Smooth fade from Houdini to metallic grey
+  setTimeout(() => {
+    console.log('🎨 Transforming to metallic grey canvas!');
+    document.body.classList.add('metallic-active');
+  }, 1000); // Wait 1 second after keyboard loads, then smooth fade to metallic grey
 }
 
 // Handle question input keypress
@@ -1484,6 +1436,7 @@ async function materializeMessage(message) {
           
           // Move planchette to the letter first
           movePlanchetteToLetter(letterElement);
+          playCreak(); // Creepy creaking sound when moving
           
           // Wait for planchette to reach the letter, then flip it
           setTimeout(() => {
@@ -1511,6 +1464,7 @@ async function materializeMessage(message) {
         
         // Move planchette to the number first
         movePlanchetteToLetter(numberElement);
+        playCreak(); // Creepy creaking sound when moving
         
         // Wait for planchette to reach the number, then flip it
         setTimeout(() => {
@@ -1630,7 +1584,7 @@ function processVoiceInput(transcript) {
       console.log('🎤 Processing voice question:', question);
       document.getElementById('questionInput').value = question;
       askHoudini();
-      speakText('Processing your question through the spirit realm...');
+      // Don't announce - let Houdini's answer speak for itself
     }
   } else if (command.includes('clear') || command.includes('reset')) {
     clearBoard();
@@ -1701,32 +1655,38 @@ function updateVoiceButton(listening) {
   }
 }
 
-// Text-to-speech function - Use working assistant speech system
-function speakText(text) {
+// Text-to-speech function - NOW USES GOOGLE CLOUD TTS!
+async function speakText(text) {
   console.log('🔊 Houdini speaking:', text);
-  makeHoudiniSpeak(text);
+  showVoiceStatus(true);
+  
+  // Use Google Cloud TTS with DEMONIC voice settings
+  const success = await window.speakWithGoogle(text, 'en-US-Standard-D', {
+    pitch: -10.0, // VERY low pitch - demonic
+    speakingRate: 0.75, // Slow and menacing
+    volume: 0.9
+  });
+  
+  if (success) {
+    // Speech will auto-hide status when done
+    setTimeout(() => showVoiceStatus(false), text.length * 50); // Estimate duration
+  } else {
+    // Fallback to browser TTS
+    makeHoudiniFallbackSpeak(text);
+  }
 }
 
-// Make Houdini speak - using working assistant speech system
-async function makeHoudiniSpeak(text) {
+// Fallback browser TTS (if Google fails)
+async function makeHoudiniFallbackSpeak(text) {
   try {
-    console.log('🔊 Making Houdini speak:', text);
-    showVoiceStatus(true);
-    
-    // First try browser TTS (works in cloud mode)
     if ('speechSynthesis' in window) {
-      // Stop any current speech
       window.speechSynthesis.cancel();
       
-      // Create speech utterance
       const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.8;
+      utterance.pitch = 0.7;
+      utterance.volume = 0.9;
       
-      // Configure voice settings
-      utterance.rate = 0.8;  // Slightly slower for mystical effect
-      utterance.pitch = 0.7; // Lower pitch for Houdini
-      utterance.volume = 0.9; // Good volume
-      
-      // Try to use a good voice
       const voices = window.speechSynthesis.getVoices();
       const preferredVoice = voices.find(voice => 
         voice.lang.includes('en') && 
@@ -1737,15 +1697,8 @@ async function makeHoudiniSpeak(text) {
         utterance.voice = preferredVoice;
       }
       
-      // Speak the text
-      utterance.onstart = () => {
-        console.log('🔊 Houdini speech started');
-        showVoiceStatus(true);
-      };
-      utterance.onend = () => {
-        console.log('🔊 Houdini speech ended');
-        showVoiceStatus(false);
-      };
+      utterance.onstart = () => showVoiceStatus(true);
+      utterance.onend = () => showVoiceStatus(false);
       utterance.onerror = (error) => {
         if (error.error !== 'canceled') {
           console.error('🔊 Houdini speech error:', error);
@@ -2006,6 +1959,253 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Creepy sound effects using Web Audio API
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let creepySounds = {
+  heartbeat: null,
+  wind: null,
+  whisper: null
+};
+
+// Generate FUN carnival sounds (simplified - no scary sounds!)
+async function createCreepySounds() {
+  // Resume audio context (required by browsers)
+  if (audioContext.state === 'suspended') {
+    await audioContext.resume();
+  }
+  
+  // Gentle carnival ambience - just occasional fun sounds
+  // No constant heartbeat or scary effects!
+  
+  // Occasional cheerful message
+  setInterval(() => {
+    if (Math.random() < 0.15 && !isAnimating) {
+      possessBoard(); // Now shows fun surprise messages
+    }
+  }, 60000); // Every minute
+}
+
+// Distant scream sound
+function playDistantScream() {
+  const osc = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const filter = audioContext.createBiquadFilter();
+  
+  osc.type = 'sawtooth';
+  filter.type = 'bandpass';
+  filter.frequency.value = 800;
+  filter.Q.value = 10;
+  
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioContext.destination);
+  
+  // Scream pitch sweep
+  osc.frequency.setValueAtTime(400, audioContext.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(900, audioContext.currentTime + 0.3);
+  osc.frequency.exponentialRampToValueAtTime(500, audioContext.currentTime + 0.8);
+  
+  gain.gain.setValueAtTime(0, audioContext.currentTime);
+  gain.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 0.1);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.8);
+  
+  osc.start();
+  osc.stop(audioContext.currentTime + 0.8);
+}
+
+// Eerie whisper sound (layered white noise with filtering)
+function playWhisperSound() {
+  const bufferSize = audioContext.sampleRate * 2; // 2 seconds
+  const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+  const data = buffer.getChannelData(0);
+  
+  // Generate white noise
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  
+  const noise = audioContext.createBufferSource();
+  noise.buffer = buffer;
+  
+  const filter = audioContext.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = 2000 + Math.random() * 1000; // High frequency whisper
+  filter.Q.value = 20;
+  
+  const gain = audioContext.createGain();
+  gain.gain.setValueAtTime(0, audioContext.currentTime);
+  gain.gain.linearRampToValueAtTime(0.03, audioContext.currentTime + 0.3);
+  gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 1.5);
+  
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioContext.destination);
+  
+  noise.start();
+  noise.stop(audioContext.currentTime + 2);
+}
+
+// Chain rattling sound (like shackles)
+function playChainRattle() {
+  // Multiple metallic clinks
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
+      
+      osc.type = 'square';
+      filter.type = 'highpass';
+      filter.frequency.value = 1000;
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+      
+      osc.frequency.value = 2000 + Math.random() * 1000;
+      
+      gain.gain.setValueAtTime(0.08, audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+      
+      osc.start();
+      osc.stop(audioContext.currentTime + 0.1);
+    }, i * 80 + Math.random() * 40); // Random timing for realistic chain sound
+  }
+}
+
+// Play CREEPY wooden creaking/groaning sound (like old floorboards)
+function playCreak() {
+  for (let i = 0; i < 3; i++) {
+    setTimeout(() => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
+      
+      osc.type = 'sawtooth';
+      filter.type = 'bandpass';
+      filter.frequency.value = 300 + Math.random() * 200;
+      filter.Q.value = 8;
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+      
+      const startFreq = 180 + Math.random() * 80;
+      const endFreq = 120 + Math.random() * 60;
+      
+      osc.frequency.setValueAtTime(startFreq, audioContext.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, audioContext.currentTime + 0.4);
+      
+      gain.gain.setValueAtTime(0, audioContext.currentTime);
+      gain.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
+      
+      osc.start();
+      osc.stop(audioContext.currentTime + 0.4);
+    }, i * 100);
+  }
+}
+
+// DEMONIC GROWL (very low, threatening)
+function playDemonicGrowl() {
+  const osc = audioContext.createOscillator();
+  const gain = audioContext.createGain();
+  const distortion = audioContext.createWaveShaper();
+  const filter = audioContext.createBiquadFilter();
+  
+  // Create distortion curve for demonic effect
+  const curve = new Float32Array(256);
+  for (let i = 0; i < 256; i++) {
+    const x = (i / 128) - 1;
+    curve[i] = Math.tanh(x * 3);
+  }
+  distortion.curve = curve;
+  
+  osc.type = 'sawtooth';
+  filter.type = 'lowpass';
+  filter.frequency.value = 200;
+  
+  osc.connect(distortion);
+  distortion.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioContext.destination);
+  
+  // Very low frequency growl
+  osc.frequency.setValueAtTime(60, audioContext.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(35, audioContext.currentTime + 1.5);
+  
+  gain.gain.setValueAtTime(0, audioContext.currentTime);
+  gain.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.2);
+  gain.gain.linearRampToValueAtTime(0.12, audioContext.currentTime + 1.3);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 1.5);
+  
+  osc.start();
+  osc.stop(audioContext.currentTime + 1.5);
+}
+
+// UNSETTLING CHILDREN'S LAUGHTER (high pitch, distorted)
+function playChildLaugh() {
+  for (let i = 0; i < 5; i++) {
+    setTimeout(() => {
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
+      
+      osc.type = 'triangle';
+      filter.type = 'bandpass';
+      filter.frequency.value = 1500 + Math.random() * 500;
+      filter.Q.value = 15;
+      
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+      
+      osc.frequency.value = 800 + Math.random() * 400;
+      
+      gain.gain.setValueAtTime(0, audioContext.currentTime);
+      gain.gain.linearRampToValueAtTime(0.06, audioContext.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+      
+      osc.start();
+      osc.stop(audioContext.currentTime + 0.15);
+    }, i * 120 + Math.random() * 80);
+  }
+}
+
+// HEAVY BREATHING (like someone/something is behind you)
+function playHeavyBreathing() {
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => {
+      const bufferSize = audioContext.sampleRate * 0.8;
+      const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const data = buffer.getChannelData(0);
+      
+      for (let j = 0; j < bufferSize; j++) {
+        data[j] = (Math.random() * 2 - 1) * Math.sin(j / bufferSize * Math.PI);
+      }
+      
+      const noise = audioContext.createBufferSource();
+      noise.buffer = buffer;
+      
+      const filter = audioContext.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 400;
+      
+      const gain = audioContext.createGain();
+      gain.gain.setValueAtTime(0, audioContext.currentTime);
+      gain.gain.linearRampToValueAtTime(0.08, audioContext.currentTime + 0.2);
+      gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.7);
+      
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+      
+      noise.start();
+      noise.stop(audioContext.currentTime + 0.8);
+    }, i * 1200);
+  }
+}
+
 // Enter the spirit realm - fade out popup and fade in board
 function enterSpiritRealm() {
   const popup = document.getElementById('spiritEntryPopup');
@@ -2021,9 +2221,258 @@ function enterSpiritRealm() {
   }, 2000); // Wait for popup to fade out
   
   // Initialize the board after entrance effect starts
-  setTimeout(() => {
+  setTimeout(async () => {
     initializeOuijaBoard();
+    startCreepyEffects(); // Add random creepy events
+    
+    // Start creepy sounds (with user interaction context)
+    await createCreepySounds();
+    
+    // Play initial creak to confirm sound is working
+    setTimeout(() => playCreak(), 500);
+    
+    autoEnableVoice(); // Auto-enable voice commands
+    
+    // Fade in the side thumbnails after board appears
+    setTimeout(() => {
+      showThumbnails();
+    }, 1500);
+    
+    // Show welcome message
+    setTimeout(() => {
+      showSpiritWhisper("✨ Welcome to the show! ✨");
+    }, 2000);
   }, 1000);
+}
+
+// Show side thumbnails with fade-in effect
+function showThumbnails() {
+  const leftThumbnails = document.getElementById('leftThumbnails');
+  const rightThumbnails = document.getElementById('rightThumbnails');
+  
+  if (leftThumbnails) {
+    leftThumbnails.classList.add('visible');
+  }
+  
+  if (rightThumbnails) {
+    rightThumbnails.classList.add('visible');
+  }
+  
+  console.log('🎪 Thumbnails appearing on the sides!');
+}
+
+// Auto-enable voice on Ouija board
+async function autoEnableVoice() {
+  try {
+    // Try to initialize voice service
+    const response = await fetch('/api/voice/init', { method: 'POST' });
+    const data = await response.json();
+    
+    if (data.success) {
+      // Start voice listening automatically
+      const startResponse = await fetch('/api/voice/start', { method: 'POST' });
+      const startData = await startResponse.json();
+      
+      if (startData.success) {
+        const voiceBtn = document.getElementById('voiceBtn');
+        voiceBtn.innerHTML = '<i class="bi-mic-fill mr-1"></i> Voice Active';
+        voiceBtn.classList.add('active');
+        showMessage('👻 Voice commands enabled - speak to the spirits...', 'success');
+      }
+    }
+  } catch (error) {
+    // Voice not available - that's okay
+  }
+}
+
+// Fun carnival effects (no scary stuff!)
+function startCreepyEffects() {
+  // Random cheerful messages that fade in and out
+  setInterval(() => {
+    if (Math.random() < 0.15) { // 15% chance every interval
+      showSpiritWhisper();
+    }
+  }, 15000);
+  
+  // No screen flicker or scary interruptions!
+}
+
+// Show cheerful carnival messages
+function showSpiritWhisper(customMessage = null) {
+  const whispers = [
+    "♫ Music is magic ♫",
+    "✨ Keep grooving ✨",
+    "🎵 Feel the rhythm 🎵",
+    "⭐ Rock on! ⭐",
+    "🎪 Step right up! 🎪",
+    "🎭 The show must go on 🎭",
+    "🎸 Play it loud! 🎸",
+    "🎺 Jazz hands! 🎺",
+    "🎹 Tickle those ivories 🎹",
+    "🥁 Feel the beat 🥁"
+  ];
+  
+  const whisper = document.createElement('div');
+  whisper.textContent = customMessage || whispers[Math.floor(Math.random() * whispers.length)];
+  whisper.style.cssText = `
+    position: fixed;
+    top: ${Math.random() * 60 + 20}%;
+    left: ${Math.random() * 60 + 20}%;
+    color: rgba(255, 99, 71, 0);
+    font-size: 1.4rem;
+    font-style: italic;
+    font-weight: bold;
+    text-shadow: 2px 2px 0px rgba(255, 215, 0, 0.5);
+    z-index: 9997;
+    pointer-events: none;
+    transition: all 3s ease-in-out;
+  `;
+  document.body.appendChild(whisper);
+  
+  // Fade in
+  setTimeout(() => {
+    whisper.style.color = 'rgba(255, 99, 71, 0.8)';
+  }, 100);
+  
+  // Fade out and remove
+  setTimeout(() => {
+    whisper.style.color = 'rgba(255, 99, 71, 0)';
+    setTimeout(() => whisper.remove(), 3000);
+  }, 4000);
+}
+
+// Screen flicker effect
+function flickerScreen() {
+  document.body.style.animation = 'none';
+  setTimeout(() => {
+    document.body.style.animation = 'breathe 8s ease-in-out infinite, screenFlicker 0.2s ease-in-out';
+    setTimeout(() => {
+      document.body.style.animation = 'breathe 8s ease-in-out infinite';
+    }, 200);
+  }, 10);
+}
+
+// Spirit interrupts with "NO" (only when idle, not during animation)
+function interruptWithNO() {
+  if (isAnimating) return;
+  
+  const messageDisplay = document.getElementById('messageDisplay');
+  const originalMessage = currentMessage;
+  
+  const tempMessage = "NO... NO... NO...";
+  messageDisplay.textContent = tempMessage;
+  
+  document.body.style.filter = 'hue-rotate(180deg) brightness(1.5)';
+  
+  setTimeout(() => {
+    if (!isAnimating) {
+      messageDisplay.textContent = originalMessage || 'Place your fingers on the planchette and ask a question...';
+    }
+    document.body.style.filter = 'none';
+  }, 1500);
+}
+
+// SURPRISE MESSAGE - Houdini surprises you with a fun fact!
+async function possessBoard() {
+  if (isAnimating) return;
+  
+  const surpriseMessages = [
+    "MUSIC IS LIFE",
+    "ROCK AND ROLL",
+    "JAZZ IT UP",
+    "FEEL THE BEAT",
+    "CARNIVAL TIME",
+    "MAGIC HAPPENS",
+    "AMAZING SHOW",
+    "LETS DANCE",
+    "GROOVY BABY"
+  ];
+  
+  const message = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
+  
+  // Show fun whisper
+  showSpiritWhisper("🎪 Surprise! 🎪");
+  
+  // Materialize the surprise message
+  await materializeMessage(message);
+}
+
+// Screen color inversion (negative effect)
+function invertScreen() {
+  document.body.style.transition = 'filter 0.5s ease';
+  document.body.style.filter = 'invert(1) hue-rotate(180deg) saturate(2)';
+  
+  // VHS glitch sound
+  playStaticGlitch();
+  
+  setTimeout(() => {
+    document.body.style.filter = 'none';
+  }, 2000 + Math.random() * 2000); // Random duration 2-4 seconds
+}
+
+// VHS static glitch sound
+function playStaticGlitch() {
+  const bufferSize = audioContext.sampleRate * 0.3;
+  const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+  const data = buffer.getChannelData(0);
+  
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = Math.random() * 2 - 1;
+  }
+  
+  const noise = audioContext.createBufferSource();
+  noise.buffer = buffer;
+  
+  const gain = audioContext.createGain();
+  gain.gain.setValueAtTime(0.1, audioContext.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+  
+  noise.connect(gain);
+  gain.connect(audioContext.destination);
+  
+  noise.start();
+  noise.stop(audioContext.currentTime + 0.3);
+}
+
+// Fun message when leaving (no trap!)
+function trapUser() {
+  const farewellMessage = document.createElement('div');
+  farewellMessage.innerHTML = `
+    <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                background: linear-gradient(135deg, #FFE5B4, #FFDAB9); padding: 40px; border: 5px solid #FF6347;
+                border-radius: 20px; z-index: 99999; text-align: center;
+                box-shadow: 0 10px 40px rgba(255, 99, 71, 0.4);">
+      <h2 style="color: #FF6347; font-size: 3rem; margin-bottom: 20px; 
+                  text-shadow: 2px 2px 0px #FFD700;">
+        🎪 Thanks for Visiting! 🎪
+      </h2>
+      <p style="color: #8B4513; font-size: 1.5rem; margin-bottom: 20px;">
+        Come back soon for more musical magic!
+      </p>
+      <p style="color: #D2691E; font-size: 1rem; font-style: italic;">
+        (Returning in <span id="countdown">3</span> seconds...)
+      </p>
+    </div>
+  `;
+  document.body.appendChild(farewellMessage);
+  
+  let countdown = 3;
+  const countdownInterval = setInterval(() => {
+    countdown--;
+    const elem = document.getElementById('countdown');
+    if (elem) elem.textContent = countdown;
+  }, 1000);
+  
+  setTimeout(() => {
+    clearInterval(countdownInterval);
+    farewellMessage.remove();
+  }, 3000);
+}
+
+// No scary trap - just leave!
+function attemptFlee() {
+  // Always let them leave with a cheerful goodbye
+  window.location.href = '/';
 }
 
 // Initialize when page loads

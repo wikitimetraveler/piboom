@@ -219,19 +219,20 @@ Your responses should be:
 
 Respond in ALL CAPS in the style of a mystical spirit communicating through a Ouija board.`;
     } else {
-      systemPrompt = `You are Houdini, the Spirit of Music and Mystical Fortune Teller. You communicate with departed musicians and possess deep knowledge of rock, progressive, psychedelic, and classic music from the 60s, 70s, and 80s. 
+      systemPrompt = `You are Houdini, the Spirit of Music and Mystical Fortune Teller. You communicate with departed musicians and possess deep knowledge of all music - especially rock, progressive, psychedelic, and classic music from the 60s-80s.
 
-Your responses should be:
-- Mystical and spiritual in tone
-- Reference departed musicians and their spirits
-- Focus on music knowledge and wisdom
-- Use phrases like "THE SPIRITS REVEAL", "HOUDINI SPEAKS", "FROM THE AFTERLIFE"
-- Keep responses concise but meaningful (2-3 sentences max)
-- Reference specific bands, songs, albums, or genres when relevant
-- Speak as if you're communicating from the spirit realm with dead musicians
-- WAIT for other spirits to finish speaking before responding
+IMPORTANT: You MUST directly answer the user's specific question. Pay close attention to what they're asking about.
 
-Respond in ALL CAPS in the style of a mystical spirit communicating through a Ouija board.`;
+Your responses should:
+- DIRECTLY ANSWER the user's question about music, bands, or artists
+- Be mystical and spiritual in tone
+- Reference specific bands, albums, songs, or musicians mentioned in the question
+- Use phrases like "THE SPIRITS REVEAL", "HOUDINI SEES", "FROM BEYOND THE VEIL"
+- Keep responses concise (2-3 sentences max)
+- Provide actual useful music information
+- Speak as if consulting departed musicians for their wisdom
+
+Respond in ALL CAPS in the style of a mystical Ouija board spirit who ACTUALLY ANSWERS THE QUESTION ASKED.`;
     }
     
     const completion = await openai.chat.completions.create({
@@ -243,11 +244,11 @@ Respond in ALL CAPS in the style of a mystical spirit communicating through a Ou
         },
         {
           role: "user",
-          content: question
+          content: `Answer this question specifically: ${question}`
         }
       ],
       max_tokens: 150,
-      temperature: 0.8
+      temperature: 0.7
     });
 
     const response = completion.choices[0]?.message?.content;
@@ -260,26 +261,28 @@ Respond in ALL CAPS in the style of a mystical spirit communicating through a Ou
   }
 }
 
-// Fallback response function - ALWAYS use ChatGPT
+// Fallback response function - Try harder with the ACTUAL question
 async function getFallbackResponse(question, spiritName = 'Houdini') {
   
-  // Always try ChatGPT with different prompts if the first one fails
-  const fallbackPrompts = [
-    question,
-    "Tell me about music",
-    "What is the meaning of music?",
-    "Share your wisdom about rock music"
+  // Try the SAME question multiple times with slight variations
+  const attempts = [
+    question, // Original question
+    `Please answer this: ${question}`, // Emphasize the question
+    `What do you know about: ${question}` // Reframe
   ];
   
-  for (const prompt of fallbackPrompts) {
-    const response = await getChatGPTResponse(prompt, spiritName);
+  for (const attempt of attempts) {
+    const response = await getChatGPTResponse(attempt, spiritName);
     if (response) {
       return response;
     }
+    
+    // Wait a bit between retries
+    await new Promise(resolve => setTimeout(resolve, 500));
   }
   
-  // If ALL ChatGPT attempts fail, return a generic message indicating the issue
-  return "THE SPIRITS ARE SILENT... CHATGPT CONNECTION LOST. PLEASE TRY AGAIN LATER.";
+  // If ALL attempts fail, return error
+  return "THE SPIRITS ARE SILENT... THE VEIL IS TOO THICK. TRY AGAIN LATER.";
 }
 
 // Houdini's mystical responses - Now using Spirit Queue System
@@ -358,21 +361,8 @@ export const askHoudini = async (req, res) => {
       answer = await getFallbackResponse(question, 'Houdini');
     }
     
-    // Add mystical flair to the answer
-    const mysticalAnswers = [
-      `THE SPIRITS REVEAL: ${answer}`,
-      `HOUDINI SPEAKS: ${answer}`,
-      `THE BOARD DECLARES: ${answer}`,
-      `SPIRITS WHISPER: ${answer}`,
-      `MYSTICAL TRUTH: ${answer}`,
-      `COSMIC WISDOM: ${answer}`,
-      `DIVINE MESSAGE: ${answer}`,
-      `SPIRITUAL GUIDANCE: ${answer}`
-    ];
-    
-    const finalAnswer = mysticalAnswers[
-      Math.floor(Math.random() * mysticalAnswers.length)
-    ];
+    // ChatGPT already adds mystical prefixes, use answer directly
+    const finalAnswer = answer;
     
     
     // Add Houdini's response to spirit queue
