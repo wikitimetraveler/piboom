@@ -266,10 +266,27 @@ export async function deleteAlbum(req, res) {
       });
     }
 
-    const result = await pool.query(
-      'DELETE FROM records WHERE id = $1 AND (user_id = $2 OR (user_id IS NULL AND $2 IS NULL)) RETURNING artist, album',
-      [id, userId]
-    );
+    let result;
+    
+    if (userId === 'all') {
+      // When viewing all users, allow deletion of any album by id alone
+      result = await pool.query(
+        'DELETE FROM records WHERE id = $1 RETURNING artist, album, user_id',
+        [id]
+      );
+    } else if (userId) {
+      // When viewing specific user, only delete their albums
+      result = await pool.query(
+        'DELETE FROM records WHERE id = $1 AND user_id = $2 RETURNING artist, album, user_id',
+        [id, userId]
+      );
+    } else {
+      // Legacy support: no userId specified (old albums with NULL user_id)
+      result = await pool.query(
+        'DELETE FROM records WHERE id = $1 AND user_id IS NULL RETURNING artist, album, user_id',
+        [id]
+      );
+    }
 
     if (result.rows.length === 0) {
       return res.status(404).json({ 
@@ -278,7 +295,7 @@ export async function deleteAlbum(req, res) {
       });
     }
 
-    console.log('✅ Album deleted from collection:', result.rows[0].album);
+    console.log('✅ Album deleted from collection:', result.rows[0].album, 'by user:', result.rows[0].user_id);
 
     res.json({
       success: true,
