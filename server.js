@@ -13,9 +13,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Add middleware for parsing JSON request bodies
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Add middleware for parsing JSON request bodies (increased limit for image uploads)
+app.use(express.json({ limit: '50mb' })); // Support base64 image uploads
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Make io available to routes
 app.locals.io = io;

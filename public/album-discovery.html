@@ -774,6 +774,9 @@
           <button type="button" class="btn btn-outline-success" id="imageModeBtn" onclick="switchInputMode('image')">
             <i class="bi-image"></i> Upload Image
           </button>
+          <button type="button" class="btn btn-outline-success" id="cameraModeBtn" onclick="switchInputMode('camera')">
+            <i class="bi-camera"></i> Use Camera
+          </button>
         </div>
       </div>
       
@@ -819,6 +822,48 @@
                 </button>
                 <button class="btn btn-secondary" onclick="clearImageUpload()">
                   <i class="bi-x-circle"></i> Clear
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Camera Search -->
+          <div id="cameraSearchMode" class="text-center mb-3" style="display: none;">
+            <div class="mb-3">
+              <button class="btn btn-lg btn-success" onclick="startCamera()" id="startCameraBtn">
+                <i class="bi-camera-video"></i> Start Camera
+              </button>
+              <button class="btn btn-lg btn-danger" onclick="stopCamera()" id="stopCameraBtn" style="display: none;">
+                <i class="bi-camera-video-off"></i> Stop Camera
+              </button>
+            </div>
+            
+            <!-- Camera Preview -->
+            <div id="cameraPreview" style="display: none; margin-top: 15px;">
+              <div style="position: relative; display: inline-block;">
+                <video id="cameraVideo" autoplay playsinline style="max-width: 100%; max-height: 400px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);"></video>
+                <canvas id="cameraCanvas" style="display: none;"></canvas>
+                <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 10;">
+                  <button class="btn btn-primary btn-lg" onclick="captureFromCamera()" style="border-radius: 50%; width: 60px; height: 60px;">
+                    <i class="bi-camera-fill" style="font-size: 1.5rem;"></i>
+                  </button>
+                </div>
+              </div>
+              <p class="text-muted mt-2"><i class="bi-info-circle"></i> Point camera at album cover and click the button to capture</p>
+            </div>
+            
+            <!-- Captured Image Preview -->
+            <div id="capturedPreview" style="display: none; margin-top: 15px;">
+              <img id="capturedImg" src="" alt="Captured" style="max-width: 300px; max-height: 300px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+              <div class="mt-3">
+                <button class="btn btn-primary" onclick="analyzeAlbumImage()">
+                  <i class="bi-magic"></i> Identify Album
+                </button>
+                <button class="btn btn-secondary" onclick="retakePhoto()">
+                  <i class="bi-arrow-clockwise"></i> Retake
+                </button>
+                <button class="btn btn-danger" onclick="stopCamera()">
+                  <i class="bi-x-circle"></i> Close
                 </button>
               </div>
             </div>
@@ -932,8 +977,10 @@
 <script>
 let currentArtist = '';
 let voiceEnabled = false;
-let currentInputMode = 'band'; // 'band', 'album', or 'image'
+let currentInputMode = 'band'; // 'band', 'album', 'image', or 'camera'
 let uploadedImageData = null;
+let cameraStream = null;
+let cameraVideo = null;
 
 // Backend Google TTS service
 async function speakViaBackend(text, callback) {
@@ -1323,19 +1370,26 @@ function handleAlbumKeypress(event) {
   }
 }
 
-// Switch between input modes (band, album, image)
+// Switch between input modes (band, album, image, camera)
 function switchInputMode(mode) {
+  // Stop camera if switching away from camera mode
+  if (currentInputMode === 'camera' && mode !== 'camera') {
+    stopCamera();
+  }
+  
   currentInputMode = mode;
   
   // Update button states
   document.getElementById('bandModeBtn').className = mode === 'band' ? 'btn btn-primary' : 'btn btn-outline-primary';
   document.getElementById('albumModeBtn').className = mode === 'album' ? 'btn btn-primary' : 'btn btn-outline-primary';
   document.getElementById('imageModeBtn').className = mode === 'image' ? 'btn btn-success' : 'btn btn-outline-success';
+  document.getElementById('cameraModeBtn').className = mode === 'camera' ? 'btn btn-success' : 'btn btn-outline-success';
   
   // Show/hide appropriate search interfaces
   document.getElementById('bandSearchMode').style.display = mode === 'band' ? 'block' : 'none';
   document.getElementById('albumSearchMode').style.display = mode === 'album' ? 'block' : 'none';
   document.getElementById('imageSearchMode').style.display = mode === 'image' ? 'block' : 'none';
+  document.getElementById('cameraSearchMode').style.display = mode === 'camera' ? 'block' : 'none';
   
   // Focus on the appropriate input
   if (mode === 'band') {
@@ -1382,6 +1436,134 @@ function clearImageUpload() {
   document.getElementById('albumImageInput').value = '';
   document.getElementById('imagePreview').style.display = 'none';
   document.getElementById('previewImg').src = '';
+}
+
+// Start camera for live capture
+async function startCamera() {
+  try {
+    // Request camera access with high resolution
+    const constraints = {
+      video: {
+        facingMode: 'environment', // Use back camera on mobile
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      }
+    };
+    
+    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    cameraVideo = document.getElementById('cameraVideo');
+    cameraVideo.srcObject = cameraStream;
+    
+    // Show camera preview
+    document.getElementById('cameraPreview').style.display = 'block';
+    document.getElementById('startCameraBtn').style.display = 'none';
+    document.getElementById('stopCameraBtn').style.display = 'inline-block';
+    
+    showToast('success', 'Camera Started', 'Point at album cover and tap capture button', 5000);
+    
+  } catch (error) {
+    console.error('Error accessing camera:', error);
+    
+    let errorMessage = 'Could not access camera. ';
+    if (error.name === 'NotAllowedError') {
+      errorMessage += 'Please allow camera permissions.';
+    } else if (error.name === 'NotFoundError') {
+      errorMessage += 'No camera found on this device.';
+    } else {
+      errorMessage += 'Make sure your camera is connected and not in use.';
+    }
+    
+    showToast('error', 'Camera Error', errorMessage, 6000);
+  }
+}
+
+// Stop camera and release resources
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+  
+  if (cameraVideo) {
+    cameraVideo.srcObject = null;
+  }
+  
+  // Reset UI
+  document.getElementById('cameraPreview').style.display = 'none';
+  document.getElementById('capturedPreview').style.display = 'none';
+  document.getElementById('startCameraBtn').style.display = 'inline-block';
+  document.getElementById('stopCameraBtn').style.display = 'none';
+  
+  // Clear any captured image
+  uploadedImageData = null;
+  document.getElementById('capturedImg').src = '';
+}
+
+// Capture photo from camera
+function captureFromCamera() {
+  if (!cameraVideo || !cameraStream) {
+    showToast('error', 'Camera Not Active', 'Please start the camera first', 3000);
+    return;
+  }
+  
+  // Create canvas to capture the frame
+  const canvas = document.getElementById('cameraCanvas');
+  const context = canvas.getContext('2d');
+  
+  // Set canvas size to match video
+  canvas.width = cameraVideo.videoWidth;
+  canvas.height = cameraVideo.videoHeight;
+  
+  // Draw current video frame to canvas
+  context.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+  
+  // Convert canvas to base64 image
+  uploadedImageData = canvas.toDataURL('image/jpeg', 0.9);
+  
+  // Show captured image preview
+  document.getElementById('capturedImg').src = uploadedImageData;
+  document.getElementById('cameraPreview').style.display = 'none';
+  document.getElementById('capturedPreview').style.display = 'block';
+  
+  showToast('success', 'Photo Captured!', 'Click "Identify Album" to analyze', 4000);
+  
+  // Play a camera shutter sound effect (optional)
+  playShutterSound();
+}
+
+// Retake photo (go back to camera preview)
+function retakePhoto() {
+  uploadedImageData = null;
+  document.getElementById('capturedImg').src = '';
+  document.getElementById('capturedPreview').style.display = 'none';
+  document.getElementById('cameraPreview').style.display = 'block';
+  
+  showToast('info', 'Ready', 'Point at album cover and capture again', 3000);
+}
+
+// Play camera shutter sound (simple audio feedback)
+function playShutterSound() {
+  try {
+    // Create a simple beep sound using Web Audio API
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.1);
+  } catch (error) {
+    // Silent fail for audio
+    console.log('Audio feedback not available');
+  }
 }
 
 // Analyze album image using AI
