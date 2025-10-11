@@ -64,7 +64,7 @@ export async function addToCollection(req, res) {
 // Get all albums in collection
 export async function getCollection(req, res) {
   try {
-    const userId = req.query.userId || null; // For future multi-user support
+    const userId = req.query.userId || null; // Multi-user support
     const { sortBy = 'added_date', order = 'DESC', search } = req.query;
 
     const pool = getPool();
@@ -75,13 +75,26 @@ export async function getCollection(req, res) {
       });
     }
 
-    // Build query
-    let query = 'SELECT * FROM records WHERE (user_id = $1 OR (user_id IS NULL AND $1 IS NULL))';
-    const params = [userId];
+    // Build query based on userId
+    let query = '';
+    const params = [];
+    
+    if (userId === 'all') {
+      // Show all users' albums
+      query = 'SELECT * FROM records WHERE 1=1';
+    } else if (userId) {
+      // Show specific user's albums
+      query = 'SELECT * FROM records WHERE user_id = $1';
+      params.push(userId);
+    } else {
+      // Legacy support: no userId specified
+      query = 'SELECT * FROM records WHERE user_id IS NULL';
+    }
 
     // Add search filter if provided
     if (search) {
-      query += ' AND (LOWER(artist) LIKE $2 OR LOWER(album) LIKE $2 OR LOWER(genre) LIKE $2)';
+      const paramNum = params.length + 1;
+      query += ` AND (LOWER(artist) LIKE $${paramNum} OR LOWER(album) LIKE $${paramNum} OR LOWER(genre) LIKE $${paramNum})`;
       params.push(`%${search.toLowerCase()}%`);
     }
 
@@ -296,21 +309,34 @@ export async function getCollectionStats(req, res) {
       });
     }
 
+    // Build WHERE clause based on userId
+    let whereClause = '';
+    const params = [];
+    
+    if (userId === 'all') {
+      whereClause = 'WHERE 1=1';
+    } else if (userId) {
+      whereClause = 'WHERE user_id = $1';
+      params.push(userId);
+    } else {
+      whereClause = 'WHERE user_id IS NULL';
+    }
+
     // Get total count
     const countResult = await pool.query(
-      'SELECT COUNT(*) as total FROM records WHERE (user_id = $1 OR (user_id IS NULL AND $1 IS NULL))',
-      [userId]
+      `SELECT COUNT(*) as total FROM records ${whereClause}`,
+      params
     );
 
     // Get count by genre
     const genreResult = await pool.query(
       `SELECT genre, COUNT(*) as count 
        FROM records 
-       WHERE (user_id = $1 OR (user_id IS NULL AND $1 IS NULL)) AND genre IS NOT NULL
+       ${whereClause} AND genre IS NOT NULL
        GROUP BY genre 
        ORDER BY count DESC 
        LIMIT 10`,
-      [userId]
+      params
     );
 
     // Get count by decade
@@ -319,20 +345,20 @@ export async function getCollectionStats(req, res) {
          FLOOR(CAST(year AS INTEGER) / 10) * 10 as decade, 
          COUNT(*) as count 
        FROM records 
-       WHERE (user_id = $1 OR (user_id IS NULL AND $1 IS NULL)) AND year IS NOT NULL AND year ~ '^[0-9]+$'
+       ${whereClause} AND year IS NOT NULL AND year ~ '^[0-9]+$'
        GROUP BY decade 
        ORDER BY decade DESC`,
-      [userId]
+      params
     );
 
     // Get recent additions
     const recentResult = await pool.query(
       `SELECT artist, album, cover_url, added_date 
        FROM records 
-       WHERE (user_id = $1 OR (user_id IS NULL AND $1 IS NULL))
+       ${whereClause}
        ORDER BY added_date DESC 
        LIMIT 5`,
-      [userId]
+      params
     );
 
     res.json({

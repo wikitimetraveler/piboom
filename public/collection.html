@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/styles.css"/>
+  <script src="/user-selector.js"></script>
   <style>
     /* Collection Page Styles */
     .stats-container {
@@ -317,10 +318,13 @@
 </div>
 
 <div class="container">
+  <!-- User Selector -->
+  <div id="userSelectorContainer"></div>
+  
   <!-- Collection Header -->
   <div class="collection-header">
-    <h1><i class="bi-collection-fill"></i> My Album Collection</h1>
-    <p class="mb-0">Your personal music collection with <span id="totalCount">0</span> albums</p>
+    <h1><i class="bi-collection-fill"></i> <span id="collectionTitle">Album Collections</span></h1>
+    <p class="mb-0"><span id="collectionSubtitle">Viewing all users' collections with <span id="totalCount">0</span> albums</span></p>
   </div>
 
   <!-- Statistics -->
@@ -467,6 +471,15 @@ let currentCollection = [];
 
 // Load collection on page load
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize user selector
+  createUserSelector('userSelectorContainer', { 
+    title: 'View Collections:',
+    showAllOption: true // Show "All Users" option
+  });
+  
+  // Update header based on view mode
+  updateCollectionHeader();
+  
   loadCollection();
   loadStats();
   document.getElementById('dt').textContent = new Date().toLocaleDateString();
@@ -479,6 +492,27 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// Update collection header based on current view mode
+function updateCollectionHeader() {
+  const viewMode = localStorage.getItem('viewMode') || 'single';
+  const titleEl = document.getElementById('collectionTitle');
+  const subtitleEl = document.getElementById('collectionSubtitle');
+  
+  if (viewMode === 'all') {
+    titleEl.textContent = 'All Album Collections';
+    subtitleEl.innerHTML = 'Viewing all users\' collections with <span id="totalCount">0</span> albums';
+  } else {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      titleEl.textContent = `${currentUser.name}'s Collection`;
+      subtitleEl.innerHTML = `${currentUser.description} - <span id="totalCount">0</span> albums`;
+    } else {
+      titleEl.textContent = 'Album Collection';
+      subtitleEl.innerHTML = 'Your personal collection with <span id="totalCount">0</span> albums';
+    }
+  }
+}
+
 // Load collection from API
 async function loadCollection() {
   try {
@@ -490,9 +524,20 @@ async function loadCollection() {
     const sortBy = sortSelect[0];
     const order = sortSelect[1];
     const search = document.getElementById('searchInput').value;
+    const viewMode = localStorage.getItem('viewMode') || 'single';
     
     const params = new URLSearchParams({ sortBy, order });
     if (search) params.append('search', search);
+    
+    // Add userId parameter based on view mode
+    if (viewMode === 'all') {
+      params.append('userId', 'all');
+    } else {
+      const currentUser = getCurrentUser();
+      if (currentUser && currentUser.id) {
+        params.append('userId', currentUser.id);
+      }
+    }
     
     const response = await fetch(`/api/collection?${params}`);
     const data = await response.json();
@@ -518,7 +563,20 @@ async function loadCollection() {
 // Load statistics
 async function loadStats() {
   try {
-    const response = await fetch('/api/collection/stats');
+    const viewMode = localStorage.getItem('viewMode') || 'single';
+    let url = '/api/collection/stats';
+    
+    // Add userId parameter based on view mode
+    if (viewMode === 'all') {
+      url += `?userId=all`;
+    } else {
+      const currentUser = getCurrentUser();
+      if (currentUser && currentUser.id) {
+        url += `?userId=${currentUser.id}`;
+      }
+    }
+    
+    const response = await fetch(url);
     const data = await response.json();
     
     if (data.success && data.stats) {
@@ -558,10 +616,21 @@ function displayAlbums(albums) {
     const rating = album.rating ? '★'.repeat(album.rating) + '☆'.repeat(5 - album.rating) : '☆☆☆☆☆';
     const addedDate = new Date(album.added_date).toLocaleDateString();
     
+    // Get user info for this album
+    const albumUser = album.user_id ? getUserById(album.user_id) : USERS[0];
+    const viewMode = localStorage.getItem('viewMode') || 'single';
+    const showUserBadge = viewMode === 'all'; // Show user badge when viewing all collections
+    
     albumCard.innerHTML = `
       <div class="album-card-inner">
         <!-- FRONT OF CARD -->
         <div class="album-card-front">
+          ${showUserBadge ? `
+            <div style="position: absolute; top: 10px; left: 10px; z-index: 10; background: ${albumUser.color}; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 5px;">
+              <img src="${albumUser.avatar}" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;">
+              ${albumUser.name.split(' ').slice(-2).join(' ')}
+            </div>
+          ` : ''}
           <img src="${coverUrl}" alt="${album.album}" class="album-cover" 
                onerror="this.src='https://via.placeholder.com/220x220/87CEEB/FFFFFF?text=No+Cover'">
           <div class="album-info">
