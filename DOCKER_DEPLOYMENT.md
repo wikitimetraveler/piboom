@@ -71,11 +71,57 @@ This guide explains how to deploy your Pi BOOM application using Docker, which i
    OPENAI_API_KEY=your_openai_key
    GOOGLE_CLOUD_PROJECT_ID=your_project_id
    GOOGLE_APPLICATION_CREDENTIALS=/app/google-credentials.json
+   DATABASE_URL=<automatically set if using render.yaml>
    ```
+   
+   **Note:** If you created a database separately in Render, you'll need to manually add the `DATABASE_URL` environment variable with your external database URL.
 
 4. **Deploy:**
    - Render will automatically build and deploy using the Dockerfile
    - Your app will be available at the provided URL
+
+## 💾 Database Configuration
+
+### Local Development (Optional)
+
+**Your app works WITHOUT a database** - database features are optional. If `DATABASE_URL` is not set, the app will run normally but skip database features.
+
+To use the database locally, create a `.env` file:
+
+```bash
+# Option 1: Connect to Render's External Database
+DATABASE_URL=postgresql://user:password@dpg-xxx.oregon-postgres.render.com:5432/piboom
+
+# Option 2: Connect to Local PostgreSQL
+DATABASE_URL=postgresql://localhost:5432/piboom
+
+# Option 3: Leave blank (no database)
+# DATABASE_URL=
+```
+
+### Getting Render's External Database URL
+
+1. Go to your Render dashboard
+2. Click on your database service
+3. Find **External Database URL** in the dashboard
+4. Copy and paste it into your local `.env` file
+
+### Running Local PostgreSQL (Alternative)
+
+If you want to run PostgreSQL locally instead:
+
+```bash
+# Install PostgreSQL
+# Mac: brew install postgresql
+# Windows: Download from postgresql.org
+# Linux: sudo apt install postgresql
+
+# Start PostgreSQL and create database
+createdb piboom
+
+# Add to .env
+DATABASE_URL=postgresql://localhost:5432/piboom
+```
 
 ## 🔧 Docker Commands
 

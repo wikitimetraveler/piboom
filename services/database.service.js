@@ -1,0 +1,102 @@
+import pg from 'pg';
+const { Pool } = pg;
+
+let pool = null;
+
+export function initializeDatabase() {
+  // Only initialize if DATABASE_URL is provided
+  if (!process.env.DATABASE_URL) {
+    console.log('⚠️  No DATABASE_URL found - database features disabled');
+    return null;
+  }
+
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false // Required for Render PostgreSQL
+    },
+    // Connection pool settings
+    max: 20, // Maximum number of clients in the pool
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000, // Increased timeout
+  });
+
+  // Handle pool errors
+  pool.on('error', (err) => {
+    console.error('❌ Unexpected database pool error:', err.message);
+  });
+
+  console.log('✅ Database connection pool initialized');
+  return pool;
+}
+
+export async function createTables() {
+  if (!pool) {
+    console.log('⚠️  Database not initialized - skipping table creation');
+    return;
+  }
+
+  try {
+    console.log('🔧 Creating database tables...');
+    
+    // Test connection first
+    await pool.query('SELECT NOW()');
+    console.log('✅ Database connection verified');
+
+    // Create records table for vinyl/album collection
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS records (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100),
+        artist VARCHAR(255) NOT NULL,
+        album VARCHAR(255) NOT NULL,
+        year VARCHAR(50),
+        genre VARCHAR(100),
+        label VARCHAR(255),
+        notes TEXT,
+        cover_url TEXT,
+        spotify_id VARCHAR(100),
+        musicbrainz_id VARCHAR(100),
+        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+        added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(artist, album, user_id)
+      )
+    `);
+
+    // Create index on artist and album for faster searches
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_records_artist ON records(artist)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_records_album ON records(album)
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_records_user ON records(user_id)
+    `);
+
+    // Add story/provenance column if it doesn't exist (migration)
+    await pool.query(`
+      ALTER TABLE records 
+      ADD COLUMN IF NOT EXISTS story TEXT
+    `);
+
+    console.log('✅ Database tables created successfully');
+  } catch (error) {
+    console.error('❌ Error creating tables:', error.message);
+    console.error('   Database operations will be unavailable');
+  }
+}
+
+export function getPool() {
+  return pool;
+}
+
+export default {
+  initializeDatabase,
+  createTables,
+  getPool
+};
+

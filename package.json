@@ -18,16 +18,17 @@
     "docker:pi-logs": "docker-compose -f docker-compose.pi.yml logs -f"
   },
   "dependencies": {
-    "axios": "^1.6.0",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "openai": "^4.20.0",
-    "play-sound": "^1.1.6",
-    "socket.io": "^4.7.5",
-    "node-record-lpcm16": "^1.0.1",
     "@google-cloud/speech": "^6.0.0",
     "@google-cloud/text-to-speech": "^5.0.0",
+    "axios": "^1.6.0",
+    "dotenv": "^16.4.5",
     "espeak": "^0.0.3",
+    "express": "^4.19.2",
+    "node-record-lpcm16": "^1.0.1",
+    "openai": "^4.20.0",
+    "pg": "^8.16.3",
+    "play-sound": "^1.1.6",
+    "socket.io": "^4.7.5",
     "spotify-web-api-node": "^5.0.2"
   },
   "engines": {

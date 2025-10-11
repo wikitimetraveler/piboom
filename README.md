@@ -129,6 +129,20 @@ Click "Initialize Voice" button to start voice recognition for hands-free operat
 - **Rate Limiting**: Intelligent API usage to respect service limits
 - **Fallback Handling**: Graceful degradation when APIs are unavailable
 
+### Database Configuration (Optional)
+- **PostgreSQL**: Album collection storage (optional)
+- **Auto-creates tables**: Records table created on first run
+- **Cloud-ready**: Works with Render's external database
+- **Local development**: Works with or without database
+- **No database?**: App runs normally, database features are disabled
+
+To enable database features, add to your `.env` file:
+```bash
+DATABASE_URL=postgresql://user:password@host:port/database
+```
+
+See [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md#-database-configuration) for detailed setup instructions.
+
 ## 🔥 Multi-API Mashup Architecture
 
 This system creates a powerful music research platform by intelligently combining multiple APIs and data sources:

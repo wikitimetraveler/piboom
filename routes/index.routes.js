@@ -7,6 +7,7 @@ import albumDiscoveryRoutes from './album-discovery.routes.js';
 import blacklightRoutes from './blacklight.routes.js';
 import ouijaBoardRoutes from './ouija-board.routes.js';
 import spotifyRoutes from './spotify.routes.js';
+import collectionRoutes from './collection.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -18,5 +19,6 @@ export default function buildRoutes(io) {
   api.use('/blacklight', blacklightRoutes);
   api.use('/ouija-board', ouijaBoardRoutes);
   api.use('/spotify', spotifyRoutes);
+  api.use('/collection', collectionRoutes);
   return api;
 }

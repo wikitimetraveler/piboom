@@ -1637,11 +1637,47 @@ function displayIdentifiedAlbum(data) {
             ${data.genre ? `<p class="card-text"><strong>Genre:</strong> ${data.genre}</p>` : ''}
             ${data.description ? `<p class="card-text">${data.description}</p>` : ''}
             <p class="card-text"><small class="text-muted">Identified using AI vision</small></p>
+            <button class="btn btn-success btn-lg mt-3" onclick="addIdentifiedToCollection('${data.artistName.replace(/'/g, "\\'")}', '${data.albumName.replace(/'/g, "\\'")}', '${data.year || ''}', '${data.genre || ''}', '${uploadedImageData}')">
+              <i class="bi-plus-circle"></i> Add to My Collection
+            </button>
           </div>
         </div>
       </div>
     </div>
   `;
+}
+
+// Add identified album to collection
+async function addIdentifiedToCollection(artist, album, year, genre, coverImage) {
+  try {
+    showToast('info', 'Adding...', 'Adding identified album to your collection...', 2000);
+    
+    const response = await fetch('/api/collection/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        artist: artist,
+        album: album,
+        year: year,
+        genre: genre,
+        coverUrl: coverImage,
+        musicbrainzId: null
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showToast('success', 'Added!', `"${album}" by ${artist} added to your collection! 🎉`, 5000);
+    } else if (response.status === 409) {
+      showToast('warning', 'Already in Collection', `"${album}" is already in your collection`, 4000);
+    } else {
+      showToast('error', 'Failed', data.error || 'Failed to add album to collection', 4000);
+    }
+  } catch (error) {
+    console.error('Error adding identified album to collection:', error);
+    showToast('error', 'Error', 'Failed to add album. Check your database connection.', 5000);
+  }
 }
 
 // Search by album name
@@ -2130,21 +2166,57 @@ function displayAlbums(albums) {
   albums.forEach(album => {
     const albumCard = document.createElement('div');
     albumCard.className = 'album-card';
-    albumCard.onclick = () => searchYouTubeForAlbum(album.artist, album.title);
     
     albumCard.innerHTML = `
       <img src="${album.coverArt}" alt="${album.title}" class="album-cover" 
-           onerror="this.src='https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Cover'">
+           onerror="this.src='https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Cover'"
+           onclick="searchYouTubeForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.title.replace(/'/g, "\\'")}')">
       <div class="album-info">
         <h5>${album.title}</h5>
         <p>${album.artist}</p>
         <p>${album.type}</p>
         <span class="album-year">${album.year}</span>
+        <button class="btn btn-success btn-sm mt-2 w-100" onclick="event.stopPropagation(); addToCollection('${album.artist.replace(/'/g, "\\'")}', '${album.title.replace(/'/g, "\\'")}', '${album.year}', '${album.genre}', '${album.coverArt}', '${album.musicBrainzId}')">
+          <i class="bi-plus-circle"></i> Add to Collection
+        </button>
       </div>
     `;
     
     albumGrid.appendChild(albumCard);
   });
+}
+
+// Add album to collection
+async function addToCollection(artist, album, year, genre, coverUrl, musicbrainzId) {
+  try {
+    showToast('info', 'Adding...', 'Adding album to your collection...', 2000);
+    
+    const response = await fetch('/api/collection/add', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        artist: artist,
+        album: album,
+        year: year,
+        genre: genre,
+        coverUrl: coverUrl,
+        musicbrainzId: musicbrainzId
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showToast('success', 'Added!', `"${album}" added to your collection! 🎉`, 4000);
+    } else if (response.status === 409) {
+      showToast('warning', 'Already in Collection', `"${album}" is already in your collection`, 4000);
+    } else {
+      showToast('error', 'Failed', data.error || 'Failed to add album to collection', 4000);
+    }
+  } catch (error) {
+    console.error('Error adding to collection:', error);
+    showToast('error', 'Error', 'Failed to add album. Check your database connection.', 5000);
+  }
 }
 
 // Search YouTube for album
