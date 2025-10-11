@@ -184,15 +184,22 @@
     
     .album-actions {
       display: flex;
-      gap: 5px;
+      gap: 3px;
       margin-top: 10px;
+      flex-wrap: wrap;
     }
     
     .album-actions button {
       flex: 1;
-      padding: 5px;
-      font-size: 0.8rem;
+      min-width: 35px;
+      padding: 6px 8px;
+      font-size: 0.9rem;
       border-radius: 5px;
+      white-space: nowrap;
+    }
+    
+    .album-actions button i {
+      font-size: 1rem;
     }
     
     .rating-stars {
@@ -233,6 +240,46 @@
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
+    }
+    
+    /* YouTube Video Modal Styles */
+    .youtube-video-item {
+      display: flex;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: rgba(255,255,255,0.5);
+      border-radius: var(--zen-radius);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: 1px solid var(--border);
+    }
+    
+    .youtube-video-item:hover {
+      background: rgba(255,255,255,0.8);
+      transform: translateX(5px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .youtube-thumbnail {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: var(--zen-radius);
+      margin-right: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .youtube-video-info h6 {
+      color: var(--text);
+      font-weight: 600;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+    }
+    
+    .youtube-video-info p {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-bottom: 0;
     }
     
     /* Modal Styles */
@@ -397,6 +444,29 @@
     <button class="btn btn-primary btn-lg mt-3" onclick="goToDiscovery()">
       <i class="bi-plus-circle"></i> Discover Albums
     </button>
+  </div>
+</div>
+
+<!-- YouTube Videos Modal -->
+<div class="modal fade" id="youtubeModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi-youtube text-danger"></i> <span id="youtubeModalTitle">YouTube Videos</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="youtubeLoading" style="display: none; text-align: center; padding: 20px;">
+          <div class="spinner"></div>
+          <p>Searching for videos...</p>
+        </div>
+        <div id="youtubeVideosContainer"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -640,11 +710,14 @@ function displayAlbums(albums) {
             ${rating ? `<div class="rating-stars">${rating}</div>` : ''}
           </div>
           <div class="album-actions">
-            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); editAlbum(${album.id})">
-              <i class="bi-pencil"></i> Edit
+            <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); editAlbum(${album.id})" title="Edit Album">
+              <i class="bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-info" onclick="event.stopPropagation(); findVideosForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.album.replace(/'/g, "\\'")}')">
+              <i class="bi-youtube"></i>
             </button>
             <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteAlbum(${album.id}, '${album.album.replace(/'/g, "\\'")}')">
-              <i class="bi-trash"></i> Delete
+              <i class="bi-trash"></i>
             </button>
           </div>
           <div class="flip-hint">
@@ -811,6 +884,112 @@ async function deleteAlbum(id, albumName) {
 // Go to discovery page
 function goToDiscovery() {
   window.location.href = '/album-discovery.html';
+}
+
+// Find YouTube videos for an album
+async function findVideosForAlbum(artist, album) {
+  console.log('🎬 Finding videos for:', artist, '-', album);
+  
+  try {
+    // Show modal using Bootstrap 4 JS
+    const modal = document.getElementById('youtubeModal');
+    if (modal) {
+      // Use jQuery if available, otherwise Bootstrap's vanilla JS
+      if (typeof $ !== 'undefined') {
+        $('#youtubeModal').modal('show');
+      } else {
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+      }
+    }
+    
+    // Update modal title
+    const titleEl = document.getElementById('youtubeModalTitle');
+    if (titleEl) {
+      titleEl.textContent = `${album} by ${artist}`;
+    }
+    
+    // Show loading
+    const loadingEl = document.getElementById('youtubeLoading');
+    if (loadingEl) {
+      loadingEl.style.display = 'block';
+    }
+    
+    const containerEl = document.getElementById('youtubeVideosContainer');
+    if (containerEl) {
+      containerEl.innerHTML = '';
+    }
+    
+    console.log('🔍 Searching YouTube API...');
+    
+    // Search for videos
+    const response = await fetch('/api/music-research/youtube-album', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ artist, album })
+    });
+    
+    const data = await response.json();
+    console.log('✅ YouTube response:', data);
+    
+    // Hide loading
+    if (loadingEl) {
+      loadingEl.style.display = 'none';
+    }
+    
+    if (data.videos && data.videos.length > 0) {
+      displayYouTubeVideos(data.videos);
+    } else {
+      if (containerEl) {
+        containerEl.innerHTML = `
+          <div class="text-center text-muted" style="padding: 20px;">
+            <i class="bi-youtube" style="font-size: 3rem; opacity: 0.3;"></i>
+            <p>No YouTube videos found for this album.</p>
+          </div>
+        `;
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ Error finding videos:', error);
+    const loadingEl = document.getElementById('youtubeLoading');
+    if (loadingEl) {
+      loadingEl.style.display = 'none';
+    }
+    
+    const containerEl = document.getElementById('youtubeVideosContainer');
+    if (containerEl) {
+      containerEl.innerHTML = `
+        <div class="text-center text-danger" style="padding: 20px;">
+          <i class="bi-exclamation-triangle" style="font-size: 2rem;"></i>
+          <p>Error searching for videos. Please try again.</p>
+          <p style="font-size: 0.8rem; color: #666;">${error.message}</p>
+        </div>
+      `;
+    }
+  }
+}
+
+// Display YouTube videos in modal
+function displayYouTubeVideos(videos) {
+  const container = document.getElementById('youtubeVideosContainer');
+  
+  let html = '';
+  videos.forEach(video => {
+    html += `
+      <div class="youtube-video-item" onclick="window.open('${video.url}', '_blank')">
+        <img src="${video.thumbnail}" alt="${video.title}" class="youtube-thumbnail" 
+             onerror="this.src='https://via.placeholder.com/120x90/ff0000/ffffff?text=Video'">
+        <div class="youtube-video-info">
+          <h6>${video.title}</h6>
+          <p><strong>${video.channelTitle}</strong></p>
+          <p style="font-size: 0.75rem;">${new Date(video.publishedAt).toLocaleDateString()}</p>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
 }
 </script>
 
