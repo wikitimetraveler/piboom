@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/styles.css"/>
   <script src="/user-selector.js"></script>
+  <script src="/user-passwords.js"></script>
   <style>
     /* Collection Page Styles */
     .stats-container {
@@ -843,9 +844,19 @@ function searchCollection() {
 }
 
 // Edit album
-function editAlbum(id) {
+async function editAlbum(id) {
   const album = currentCollection.find(a => a.id === id);
   if (!album) return;
+  
+  // Check if album belongs to current user  
+  const albumUserId = album.user_id;
+  
+  // Verify password
+  const verified = await verifyUserPassword(albumUserId, 'edit this album');
+  if (!verified) {
+    console.log('Password verification cancelled');
+    return;
+  }
   
   document.getElementById('editAlbumId').value = id;
   document.getElementById('editNotes').value = album.notes || '';
@@ -921,7 +932,20 @@ let deleteAlbumId = null;
 let deleteAlbumInfo = null;
 
 // Show delete confirmation modal
-function deleteAlbum(id, albumName, artistName) {
+async function deleteAlbum(id, albumName, artistName) {
+  // Find album to check user
+  const album = currentCollection.find(a => a.id === id);
+  if (!album) return;
+  
+  const albumUserId = album.user_id;
+  
+  // Verify password
+  const verified = await verifyUserPassword(albumUserId, 'delete this album');
+  if (!verified) {
+    console.log('Password verification cancelled');
+    return;
+  }
+  
   // Store album info for deletion
   deleteAlbumId = id;
   deleteAlbumInfo = { id, albumName, artistName };

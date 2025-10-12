@@ -43,6 +43,31 @@ export async function createTables() {
     await pool.query('SELECT NOW()');
     console.log('✅ Database connection verified');
 
+    // Create users table with passwords
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id VARCHAR(100) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        avatar VARCHAR(255),
+        color VARCHAR(50),
+        description TEXT,
+        created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Insert default users with passwords if they don't exist
+    await pool.query(`
+      INSERT INTO users (id, name, password, avatar, color, description)
+      VALUES 
+        ('cosmic-turtle', 'The Cosmic Turtle', 'Dufus', '/images/cosmic turtle.png', '#00CED1', 'Cosmic explorer of sound'),
+        ('wizened-wizard', 'The Wizened Wizard', 'Giraffe Pizza', '/images/genie.png', '#9370DB', 'Master of musical mysteries'),
+        ('jerry-garcia', 'Jerry Garcia', 'Fooze', '/images/jerry.png', '#FF6347', 'Grateful for great tunes'),
+        ('easy-levi', 'Easy Rider Levi', 'Zip Knot', '/images/levi.png', '#4682B4', 'Biker hippie trucker'),
+        ('fuzz-maestro', 'Fuzz Maestro', 'Fly Dog', '/images/fuzz.png', '#FF8C00', 'Keeper of the fuzz')
+      ON CONFLICT (id) DO NOTHING
+    `);
+
     // Create records table for vinyl/album collection
     await pool.query(`
       CREATE TABLE IF NOT EXISTS records (

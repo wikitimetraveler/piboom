@@ -57,6 +57,17 @@ export async function searchPosters(req, res) {
       }
     }
 
+    // Add Unsplash for high-quality posters and art
+    if (filter === 'all' || ['neon', 'psychedelic', 'vintage', 'retro', 'abstract', 'cyberpunk'].includes(filter)) {
+      try {
+        const unsplashResults = await searchUnsplashPosters(query, filter);
+        results.posters.push(...unsplashResults);
+        results.sources.push('Unsplash');
+      } catch (error) {
+        console.error('Unsplash search error:', error.message);
+      }
+    }
+
 
     res.json({
       success: true,
@@ -315,6 +326,65 @@ async function searchKnowledgeGraphImages(query, filter = 'all') {
   return posters.slice(0, 4); // Limit to 4 KG images
 }
 
+// Search Unsplash for high-quality poster images
+async function searchUnsplashPosters(query, filter = 'all') {
+  const accessKey = process.env.UNSPLASH_ACCESS_KEY;
+  if (!accessKey) {
+    console.warn('Unsplash API key not configured - skipping Unsplash results');
+    return [];
+  }
+
+  // Enhance query based on filter
+  let enhancedQuery = query;
+  if (filter === 'neon') enhancedQuery += ' neon lights';
+  else if (filter === 'psychedelic') enhancedQuery += ' psychedelic art';
+  else if (filter === 'vintage') enhancedQuery += ' vintage poster';
+  else if (filter === 'retro') enhancedQuery += ' retro design';
+  else if (filter === 'cyberpunk') enhancedQuery += ' cyberpunk neon';
+  else if (filter === 'abstract') enhancedQuery += ' abstract art';
+  else enhancedQuery += ' poster art';
+
+  const posters = [];
+
+  try {
+    const response = await axios.get('https://api.unsplash.com/search/photos', {
+      params: {
+        query: enhancedQuery,
+        per_page: 12,
+        orientation: 'portrait',
+        order_by: 'relevant'
+      },
+      headers: {
+        'Authorization': `Client-ID ${accessKey}`
+      }
+    });
+
+    if (response.data.results && response.data.results.length > 0) {
+      for (const photo of response.data.results) {
+        posters.push({
+          id: photo.id,
+          title: photo.description || photo.alt_description || query,
+          artist: photo.user.name,
+          type: 'High-Quality Art',
+          source: 'Unsplash',
+          imageUrl: photo.urls.regular,
+          thumbnailUrl: photo.urls.small,
+          year: new Date(photo.created_at).getFullYear().toString(),
+          description: photo.description || photo.alt_description || `Art by ${photo.user.name}`,
+          artistUrl: photo.user.links.html,
+          photoUrl: photo.links.html,
+          color: photo.color,
+          confidence: 0.90
+        });
+      }
+    }
+  } catch (error) {
+    console.error(`Error searching Unsplash for ${enhancedQuery}:`, error.message);
+  }
+
+  return posters.slice(0, 12); // Return up to 12 Unsplash results
+}
+
 // Get random featured posters for the carousel
 export async function getFeaturedPosters(req, res) {
   try {
@@ -326,14 +396,14 @@ export async function getFeaturedPosters(req, res) {
     const randomArtist = featuredArtists[Math.floor(Math.random() * featuredArtists.length)];
     
 
-    // Get posters from MusicBrainz
+    // Get posters from multiple sources
     const musicBrainzResults = await searchMusicBrainzPosters(randomArtist);
-    
-    // Get posters from YouTube
     const youtubeResults = await searchYouTubePosters(randomArtist);
+    const unsplashResults = await searchUnsplashPosters(randomArtist);
 
     const featuredPosters = [
-      ...musicBrainzResults.slice(0, 3),
+      ...unsplashResults.slice(0, 4),  // Prioritize high-quality Unsplash images
+      ...musicBrainzResults.slice(0, 2),
       ...youtubeResults.slice(0, 2)
     ];
 

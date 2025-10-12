@@ -11,6 +11,7 @@
   <!-- EXIF.js for reading photo location data -->
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script src="/user-selector.js"></script>
+  <script src="/user-passwords.js"></script>
   <style>
     /* Floating Leaves */
     .floating-leaves {
@@ -388,12 +389,10 @@ function handleImageUpload(event) {
   if (!file) return;
   
   if (!file.type.startsWith('image/')) {
-    showToast('error', 'Invalid File', 'Please upload an image file');
     return;
   }
   
   if (file.size > 10 * 1024 * 1024) {
-    showToast('error', 'File Too Large', 'Please upload an image smaller than 10MB');
     return;
   }
   
@@ -409,7 +408,6 @@ function handleImageUpload(event) {
         currentLocation.latitude = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
         currentLocation.longitude = convertDMSToDD(lon[0], lon[1], lon[2], lonRef);
         console.log('📍 Location from photo:', currentLocation);
-        showToast('success', 'Location Found', `GPS coordinates extracted from photo: ${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}`);
       } else {
         console.log('No GPS data in photo');
         currentLocation.latitude = null;
@@ -512,7 +510,6 @@ async function startCamera() {
     } else if (error.name === 'NotFoundError') {
       errorMessage += 'No camera found on this device.';
     }
-    showToast('error', 'Camera Error', errorMessage);
   }
 }
 
@@ -539,7 +536,6 @@ function stopCamera() {
 // Capture from camera
 function captureFromCamera() {
   if (!cameraVideo || !cameraStream) {
-    showToast('error', 'Camera Not Active', 'Please start the camera first');
     return;
   }
   
@@ -550,7 +546,6 @@ function captureFromCamera() {
         currentLocation.latitude = position.coords.latitude;
         currentLocation.longitude = position.coords.longitude;
         console.log('📍 Location from device:', currentLocation);
-        showToast('success', 'Location Captured', `GPS: ${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}`);
       },
       (error) => {
         console.log('Could not get location:', error.message);
@@ -618,7 +613,6 @@ function playShutterSound() {
 // Identify tree from image
 async function identifyTree() {
   if (!uploadedImageData) {
-    showToast('warning', 'No Image', 'Please upload a tree photo first');
     return;
   }
   
@@ -637,14 +631,11 @@ async function identifyTree() {
     
     if (data.success && data.tree) {
       displayTreeResults(data.tree);
-    } else {
-      showToast('error', 'Identification Failed', data.error || 'Could not identify tree');
     }
     
   } catch (error) {
     console.error('Error identifying tree:', error);
     document.getElementById('loadingState').style.display = 'none';
-    showToast('error', 'Analysis Failed', 'Error analyzing the image. Please try again.');
   }
 }
 
@@ -756,14 +747,11 @@ async function learnMoreAboutTree(treeName) {
     
     if (data.success) {
       showSmokeyInfo(treeName, data.info);
-    } else {
-      showToast('error', 'Error', data.error || 'Failed to get tree information');
     }
     
   } catch (error) {
     console.error('Error getting tree info:', error);
     document.getElementById('loadingState').style.display = 'none';
-    showToast('error', 'Error', 'Failed to get tree information');
   }
 }
 
@@ -812,15 +800,12 @@ function identifyAnotherTree() {
   } else if (currentMode === 'image') {
     clearImageUpload();
   }
-  
-  showToast('info', 'Ready!', 'Take or upload another tree photo');
 }
 
 // Search for tree by name
 function searchTree() {
   const treeName = document.getElementById('treeSearchInput').value.trim();
   if (!treeName) {
-    showToast('warning', 'Enter Tree Name', 'Please enter a tree species to search');
     return;
   }
   
@@ -836,12 +821,10 @@ function handleSearchKeypress(event) {
 // Save tree to collection
 async function saveToCollection() {
   if (!currentTreeData) {
-    showToast('error', 'No Tree Data', 'Please identify a tree first');
     return;
   }
   
   if (!uploadedImageData) {
-    showToast('error', 'No Photo', 'Cannot save tree without a photo');
     return;
   }
   
@@ -849,6 +832,13 @@ async function saveToCollection() {
     // Get current user
     const currentUser = getCurrentUser ? getCurrentUser() : null;
     const userId = currentUser ? currentUser.id : null;
+    
+    // Verify password before saving
+    const verified = await verifyUserPassword(userId, 'add this tree to your collection');
+    if (!verified) {
+      console.log('Password verification cancelled');
+      return;
+    }
     
     // Prepare tree data for collection
     const treeData = {
@@ -876,21 +866,16 @@ async function saveToCollection() {
     const data = await response.json();
     
     if (data.success) {
-      showToast('success', 'Tree Saved! 🌲', `${currentTreeData.treeName} has been added to your collection!`);
-      
       // Show option to view collection
       setTimeout(() => {
         if (confirm('Would you like to view your tree collection?')) {
           window.location.href = '/tree-collection.html';
         }
       }, 1500);
-    } else {
-      showToast('error', 'Save Failed', data.error || 'Could not save tree to collection');
     }
     
   } catch (error) {
     console.error('Error saving tree:', error);
-    showToast('error', 'Save Failed', 'Error saving tree to collection. Please try again.');
   }
 }
 

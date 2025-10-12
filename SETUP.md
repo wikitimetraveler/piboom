@@ -39,7 +39,25 @@ GOOGLE_API_KEY=your_google_api_key_here
 
 # OpenAI API Key (for ChatGPT integration)
 OPENAI_API_KEY=your_openai_api_key_here
+
+# Unsplash API Key (for high-quality poster images in Black Light page)
+UNSPLASH_ACCESS_KEY=your_unsplash_access_key_here
 ```
+
+#### Getting API Keys
+
+**Unsplash API (Free)**
+1. Go to https://unsplash.com/developers
+2. Sign up for a developer account
+3. Create a new application
+4. Copy your "Access Key" and paste it as `UNSPLASH_ACCESS_KEY` in your `.env` file
+5. Free tier: 50 requests/hour
+
+**Google API Key**
+- Get from Google Cloud Console for Knowledge Graph, YouTube Data API, and Maps
+
+**OpenAI API Key**
+- Get from https://platform.openai.com/api-keys
 
 ### 4. Start Development Mode
 ```bash
