@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Live Concert Finder - See Your Artists Live!</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <script src="/user-selector.js"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      color: #eee;
+      min-height: 100vh;
+    }
+
+    .concert-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .concert-header {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, rgba(255, 68, 68, 0.2), rgba(252, 92, 125, 0.2));
+      border-radius: 20px;
+      margin-bottom: 30px;
+      border: 2px solid rgba(255, 68, 68, 0.3);
+    }
+
+    .concert-header h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #ff4444, #fc5c7d, #ff6b9d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .search-section {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .search-btn {
+      padding: 12px 40px;
+      background: linear-gradient(135deg, #ff4444, #fc5c7d);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(255, 68, 68, 0.5);
+    }
+
+    .concert-card {
+      background: linear-gradient(135deg, rgba(255, 68, 68, 0.2), rgba(252, 92, 125, 0.1));
+      border: 2px solid rgba(255, 68, 68, 0.3);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .concert-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(255, 68, 68, 0.3);
+      border-color: #ff4444;
+    }
+
+    .concert-artist {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #ff6b9d;
+      margin-bottom: 15px;
+    }
+
+    .concert-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .concert-detail {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 4px solid #ff4444;
+    }
+
+    .concert-detail-label {
+      font-size: 0.85rem;
+      color: #999;
+      margin-bottom: 5px;
+    }
+
+    .concert-detail-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .ticket-btn {
+      display: inline-block;
+      padding: 10px 25px;
+      background: #ff4444;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      margin-top: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .ticket-btn:hover {
+      background: #ff6b9d;
+      color: white;
+      text-decoration: none;
+      transform: scale(1.05);
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+      font-size: 1.5rem;
+      color: #ff4444;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
+  <div class="container">
+    <a class="navbar-brand" href="/index.html">
+      <i class="bi-music-note-beamed"></i> piBoom
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/music-research.html">Research</a></li>
+        <li class="nav-item"><a class="nav-link" href="/collection.html">Collection</a></li>
+        <li class="nav-item"><a class="nav-link" href="/music-time-machine.html">Time Machine</a></li>
+        <li class="nav-item active"><a class="nav-link" href="/concert-finder.html">Live Concerts</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="concert-container">
+  <!-- Header -->
+  <div class="concert-header">
+    <h1>🎸 Live Concert Finder</h1>
+    <p style="font-size: 1.2rem; color: #ccc; margin: 0;">Search for any artist and find their upcoming live concerts!</p>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <label style="display: block; margin-bottom: 10px; font-weight: 600; font-size: 1.1rem;">Search for Artist or Band</label>
+        <div class="input-group" style="margin-bottom: 15px;">
+          <input type="text" id="artistSearch" class="date-input" placeholder="Enter artist name (e.g., Pink Floyd, Led Zeppelin)" 
+                 onkeypress="if(event.key==='Enter') findConcerts()" style="flex: 1; margin-right: 10px;">
+          <button class="search-btn" onclick="findConcerts()">
+            <i class="bi-search"></i> Find Concerts
+          </button>
+        </div>
+        <div style="text-align: center; color: #999; font-size: 0.9rem;">
+          Search for any artist to see their upcoming live concerts
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="loadingState" style="display: none;">
+    <div class="loading-state">
+      <i class="bi-hourglass-split" style="animation: spin 2s linear infinite;"></i>
+      <div>Searching for concerts...</div>
+    </div>
+  </div>
+
+  <!-- Concerts List -->
+  <div id="concertsList">
+    <!-- Concert cards will be dynamically added here -->
+  </div>
+
+  <!-- Empty State -->
+  <div id="emptyState" class="empty-state">
+    <i class="bi-music-note-list" style="font-size: 4rem; color: #ff4444; margin-bottom: 20px;"></i>
+    <h3>Ready to find live concerts?</h3>
+    <p>Enter an artist name above to see their upcoming concerts!</p>
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+// Find concerts for searched artist
+async function findConcerts() {
+  const artistInput = document.getElementById('artistSearch').value.trim();
+  
+  if (!artistInput) {
+    alert('Please enter an artist name');
+    return;
+  }
+
+  // Show loading state
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('concertsList').innerHTML = '';
+  document.getElementById('emptyState').style.display = 'none';
+
+  try {
+    // Search for concerts for this artist
+    const concertsResponse = await fetch('/api/live-concerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ artists: [artistInput] })
+    });
+
+    const concertsData = await concertsResponse.json();
+
+    // Hide loading state
+    document.getElementById('loadingState').style.display = 'none';
+
+    if (concertsData.concerts && concertsData.concerts.length > 0) {
+      displayConcerts(concertsData.concerts, artistInput);
+    } else {
+      document.getElementById('emptyState').innerHTML = `
+        <i class="bi-calendar-x" style="font-size: 4rem; color: #ff4444; margin-bottom: 20px;"></i>
+        <h3>No upcoming concerts found</h3>
+        <p>${artistInput} doesn't have any announced concerts yet. Try another artist or check back later!</p>
+      `;
+      document.getElementById('emptyState').style.display = 'block';
+    }
+
+  } catch (error) {
+    console.error('Error finding concerts:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('emptyState').innerHTML = `
+      <i class="bi-exclamation-triangle" style="font-size: 4rem; color: #e74c3c; margin-bottom: 20px;"></i>
+      <h3>Error finding concerts</h3>
+      <p>Please try again later.</p>
+    `;
+    document.getElementById('emptyState').style.display = 'block';
+  }
+}
+
+// Display concerts
+function displayConcerts(concerts, searchedArtist) {
+  const list = document.getElementById('concertsList');
+  list.innerHTML = '';
+  
+  // Add header with artist name
+  const header = document.createElement('div');
+  header.style.cssText = 'text-align: center; margin-bottom: 30px; padding: 20px; background: rgba(255,68,68,0.1); border-radius: 15px;';
+  header.innerHTML = `
+    <h2 style="color: #ff6b9d; margin: 0;">
+      <i class="bi-calendar-event"></i> Upcoming Concerts
+    </h2>
+    <p style="color: #ccc; margin: 10px 0 0 0; font-size: 1.1rem;">Found ${concerts.length} concert${concerts.length > 1 ? 's' : ''} for ${searchedArtist}</p>
+  `;
+  list.appendChild(header);
+
+  concerts.forEach(concert => {
+    const card = document.createElement('div');
+    card.className = 'concert-card';
+    
+    const date = new Date(concert.date);
+    const dateStr = date.toLocaleDateString('en-US', { 
+      weekday: 'long',
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+    const timeStr = date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit'
+    });
+
+    card.innerHTML = `
+      <div class="concert-artist">
+        <i class="bi-mic-fill"></i> ${concert.artist}
+      </div>
+      <div class="concert-info">
+        <div class="concert-detail">
+          <div class="concert-detail-label">Date</div>
+          <div class="concert-detail-value">${dateStr}</div>
+        </div>
+        <div class="concert-detail">
+          <div class="concert-detail-label">Time</div>
+          <div class="concert-detail-value">${timeStr}</div>
+        </div>
+        <div class="concert-detail">
+          <div class="concert-detail-label">Venue</div>
+          <div class="concert-detail-value">${concert.venue}</div>
+        </div>
+        <div class="concert-detail">
+          <div class="concert-detail-label">Location</div>
+          <div class="concert-detail-value">${concert.location}</div>
+        </div>
+      </div>
+      ${concert.ticketUrl ? `<a href="${concert.ticketUrl}" target="_blank" class="ticket-btn"><i class="bi-ticket-perforated"></i> Get Tickets</a>` : ''}
+    `;
+
+    list.appendChild(card);
+  });
+}
+</script>
+
+</body>
+</html>
+

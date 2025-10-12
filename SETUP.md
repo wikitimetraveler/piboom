@@ -42,6 +42,9 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 # Unsplash API Key (for high-quality poster images in Black Light page)
 UNSPLASH_ACCESS_KEY=your_unsplash_access_key_here
+
+# Songkick API (for Live Concert Finder)
+SONGKICK_API_KEY=your_songkick_api_key_here
 ```
 
 #### Getting API Keys
@@ -52,6 +55,14 @@ UNSPLASH_ACCESS_KEY=your_unsplash_access_key_here
 3. Create a new application
 4. Copy your "Access Key" and paste it as `UNSPLASH_ACCESS_KEY` in your `.env` file
 5. Free tier: 50 requests/hour
+
+**Songkick API (Free)**
+1. Go to https://www.songkick.com/developer
+2. Click "Request an API key"
+3. Fill out the simple form (usually approved instantly)
+4. Copy your API key
+5. Add it as `SONGKICK_API_KEY` in your `.env` file
+6. Free tier: 5,000 requests/day
 
 **Google API Key**
 - Get from Google Cloud Console for Knowledge Graph, YouTube Data API, and Maps

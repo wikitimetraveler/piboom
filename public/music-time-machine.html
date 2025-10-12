@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Music Time Machine - Travel Through Music History</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    body {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #eee;
+      min-height: 100vh;
+    }
+
+    .time-machine-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .time-machine-header {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+      border-radius: 20px;
+      margin-bottom: 30px;
+      border: 2px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .time-machine-header h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .date-selector {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .date-input-group {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .date-input {
+      padding: 12px 20px;
+      border: 2px solid #667eea;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 1.1rem;
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    .time-travel-btn {
+      padding: 12px 40px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .time-travel-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .random-date-btn {
+      padding: 12px 30px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .timeline-container {
+      margin: 40px 0;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+    }
+
+    .current-date-display {
+      text-align: center;
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .history-card {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.1));
+      border: 2px solid rgba(102, 126, 234, 0.3);
+      border-radius: 15px;
+      padding: 25px;
+      transition: all 0.3s ease;
+    }
+
+    .history-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+      border-color: #667eea;
+    }
+
+    .history-card-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+    }
+
+    .history-card-icon {
+      font-size: 2rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .history-card-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    .history-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border-left: 4px solid #667eea;
+    }
+
+    .history-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .history-item-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+      color: #f093fb;
+    }
+
+    .history-item-details {
+      color: #ccc;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .album-cover-small {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid rgba(102, 126, 234, 0.5);
+      float: right;
+      margin-left: 15px;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+      font-size: 1.5rem;
+      color: #667eea;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .floating-notes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .musical-note {
+      position: absolute;
+      font-size: 32px;
+      color: rgba(102, 126, 234, 0.3);
+      animation: floatNote 15s linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes floatNote {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.6;
+      }
+      95% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .musical-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .musical-note:nth-child(2) { left: 25%; animation-delay: 3s; }
+    .musical-note:nth-child(3) { left: 40%; animation-delay: 6s; }
+    .musical-note:nth-child(4) { left: 55%; animation-delay: 9s; }
+    .musical-note:nth-child(5) { left: 70%; animation-delay: 12s; }
+    .musical-note:nth-child(6) { left: 85%; animation-delay: 15s; }
+  </style>
+</head>
+<body>
+
+<!-- Floating Musical Notes -->
+<div class="floating-notes">
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+</div>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
+  <div class="container">
+    <a class="navbar-brand" href="/index.html">
+      <i class="bi-music-note-beamed"></i> piBoom
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/music-research.html">Research</a></li>
+        <li class="nav-item"><a class="nav-link" href="/collection.html">Collection</a></li>
+        <li class="nav-item active"><a class="nav-link" href="/music-time-machine.html">Time Machine</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blacklight.html">Black Light</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="time-machine-container">
+  <!-- Header -->
+  <div class="time-machine-header">
+    <h1>🕰️ Music Time Machine</h1>
+    <p style="font-size: 1.2rem; color: #ccc; margin: 0;">Travel back in time and discover what was happening in music history</p>
+  </div>
+
+  <!-- Date Selector -->
+  <div class="date-selector">
+    <div class="date-input-group">
+      <div>
+        <label style="display: block; margin-bottom: 8px; color: #ccc; font-weight: 600;">Select a Date</label>
+        <input type="date" id="timeMachineDate" class="date-input" max="">
+      </div>
+      <button class="time-travel-btn" onclick="timeTravel()">
+        <i class="bi-clock-history"></i> Time Travel!
+      </button>
+      <button class="random-date-btn" onclick="randomDate()">
+        <i class="bi-shuffle"></i> Random Date
+      </button>
+    </div>
+  </div>
+
+  <!-- Current Date Display -->
+  <div class="current-date-display" id="currentDateDisplay" style="display: none;">
+    <!-- Date will be shown here -->
+  </div>
+
+  <!-- Loading State -->
+  <div id="loadingState" style="display: none;">
+    <div class="loading-state">
+      <i class="bi-hourglass-split" style="animation: spin 2s linear infinite;"></i>
+      <div>Traveling through time...</div>
+    </div>
+  </div>
+
+  <!-- History Grid -->
+  <div id="historyGrid" class="history-grid">
+    <!-- History cards will be dynamically added here -->
+  </div>
+
+  <!-- Google Map -->
+  <div id="mapSection" style="display: none; margin-top: 30px;">
+    <div style="background: rgba(102, 126, 234, 0.2); border: 2px solid rgba(102, 126, 234, 0.3); border-radius: 15px; padding: 25px;">
+      <h3 style="color: #667eea; margin-bottom: 20px;">
+        <i class="bi-geo-alt-fill"></i> Concert & Event Locations
+      </h3>
+      <div id="map" style="width: 100%; height: 500px; border-radius: 10px;"></div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div id="emptyState" class="empty-state" style="display: none;">
+    <i class="bi-calendar-x" style="font-size: 4rem; color: #667eea; margin-bottom: 20px;"></i>
+    <h3>Select a date to start your journey</h3>
+    <p>Discover what was happening in music history on any date!</p>
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+// Set max date to today
+document.getElementById('timeMachineDate').max = new Date().toISOString().split('T')[0];
+
+// Set default date to a fun historical date (e.g., Woodstock - August 15, 1969)
+document.getElementById('timeMachineDate').value = '1969-08-15';
+
+// Show empty state initially
+document.getElementById('emptyState').style.display = 'block';
+
+// Time travel function
+async function timeTravel() {
+  const dateInput = document.getElementById('timeMachineDate').value;
+  if (!dateInput) {
+    alert('Please select a date');
+    return;
+  }
+
+  // Fix timezone issue - parse date manually to avoid timezone conversion
+  const [year, month, day] = dateInput.split('-').map(Number);
+  const selectedDate = new Date(year, month - 1, day); // month is 0-indexed
+  await loadHistoryForDate(selectedDate);
+}
+
+// Random date generator
+function randomDate() {
+  const start = new Date(1950, 0, 1);
+  const end = new Date();
+  const randomTime = start.getTime() + Math.random() * (end.getTime() - start.getTime());
+  const randomDate = new Date(randomTime);
+  
+  // Format date manually to avoid timezone issues
+  const year = randomDate.getFullYear();
+  const month = String(randomDate.getMonth() + 1).padStart(2, '0');
+  const day = String(randomDate.getDate()).padStart(2, '0');
+  
+  document.getElementById('timeMachineDate').value = `${year}-${month}-${day}`;
+  timeTravel();
+}
+
+// Load history for a specific date
+async function loadHistoryForDate(date) {
+  // Show loading state
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('historyGrid').style.display = 'none';
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('currentDateDisplay').style.display = 'none';
+
+  try {
+    // Format date for display
+    const dateStr = date.toLocaleDateString('en-US', { 
+      weekday: 'long',
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+
+    // Get month and day for API calls
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const year = date.getFullYear();
+
+    // Fetch data from our backend
+    const response = await fetch(`/api/music-history?month=${month}&day=${day}&year=${year}`);
+    const data = await response.json();
+    
+    // Debug logging
+    console.log('📊 Received data:', data);
+    console.log('Albums:', data.albums?.length || 0);
+    console.log('Videos:', data.videos?.length || 0);
+    console.log('MapData:', data.mapData?.length || 0);
+
+    // Display the date
+    document.getElementById('currentDateDisplay').textContent = dateStr;
+    document.getElementById('currentDateDisplay').style.display = 'block';
+
+    // Hide loading state and show grid
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('historyGrid').style.display = 'grid';
+    document.getElementById('emptyState').style.display = 'none';
+
+    // Display the history
+    displayHistory(data);
+
+  } catch (error) {
+    console.error('Error loading history:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('emptyState').innerHTML = `
+      <i class="bi-exclamation-triangle" style="font-size: 4rem; color: #e74c3c; margin-bottom: 20px;"></i>
+      <h3>Error loading history</h3>
+      <p>Please try again or select a different date.</p>
+    `;
+  }
+}
+
+// Display history data
+function displayHistory(data) {
+  const grid = document.getElementById('historyGrid');
+  grid.innerHTML = '';
+
+  // Albums Released
+  if (data.albums && data.albums.length > 0) {
+    const albumsCard = createHistoryCard(
+      '💿 Albums Released',
+      'bi-vinyl-fill',
+      data.albums.map(album => ({
+        title: album.title,
+        details: `by ${album.artist}${album.label ? ` • ${album.label}` : ''}`,
+        image: album.coverUrl
+      }))
+    );
+    grid.appendChild(albumsCard);
+  }
+
+  // Chart Toppers
+  if (data.chartToppers && data.chartToppers.length > 0) {
+    const chartCard = createHistoryCard(
+      '📊 Chart Toppers',
+      'bi-trophy-fill',
+      data.chartToppers.map(song => ({
+        title: song.title,
+        details: `by ${song.artist} • #${song.position} on ${song.chart}`
+      }))
+    );
+    grid.appendChild(chartCard);
+  }
+
+  // YouTube Videos from that year
+  if (data.videos && data.videos.length > 0) {
+    const videosCard = createYouTubeCard(data.videos);
+    grid.appendChild(videosCard);
+  }
+
+  // Music History Events from map data (accordion style)
+  if (data.mapData && data.mapData.length > 0) {
+    const eventsCard = createEventsAccordion(data.mapData);
+    grid.appendChild(eventsCard);
+    
+    // Initialize map
+    initializeMap(data.mapData);
+  } else {
+    // Show map with default view even if no events
+    showDefaultMap();
+  }
+
+  // If no data
+  if (grid.innerHTML === '') {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #999;">
+        <i class="bi-inbox" style="font-size: 3rem; margin-bottom: 20px;"></i>
+        <h3>No historical data found for this date</h3>
+        <p>Try a different date or a random date!</p>
+      </div>
+    `;
+  }
+}
+
+// Create history card
+function createHistoryCard(title, icon, items) {
+  const card = document.createElement('div');
+  card.className = 'history-card';
+  
+  let itemsHtml = items.map(item => `
+    <div class="history-item">
+      ${item.image ? `<img src="${item.image}" class="album-cover-small" onerror="this.style.display='none'">` : ''}
+      <div class="history-item-title">${item.title}</div>
+      <div class="history-item-details">${item.details}</div>
+    </div>
+  `).join('');
+
+  card.innerHTML = `
+    <div class="history-card-header">
+      <i class="bi ${icon} history-card-icon"></i>
+      <div class="history-card-title">${title}</div>
+    </div>
+    ${itemsHtml}
+  `;
+
+  return card;
+}
+
+// Create YouTube video card
+function createYouTubeCard(videos) {
+  const card = document.createElement('div');
+  card.className = 'history-card';
+  card.style.gridColumn = '1 / -1'; // Full width
+  
+  let videosHtml = videos.map(video => `
+    <div style="display: inline-block; width: calc(33.333% - 15px); margin: 10px 7px; vertical-align: top;">
+      <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px;">
+        <iframe 
+          src="https://www.youtube.com/embed/${video.videoId}" 
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div style="margin-top: 10px; font-size: 0.9rem; color: #f093fb;">${video.title}</div>
+    </div>
+  `).join('');
+
+  card.innerHTML = `
+    <div class="history-card-header">
+      <i class="bi bi-youtube history-card-icon" style="color: #ff0000;"></i>
+      <div class="history-card-title">📺 Music Videos & Performances</div>
+    </div>
+    <div style="text-align: center;">
+      ${videosHtml}
+    </div>
+  `;
+
+  return card;
+}
+
+// Create events accordion
+function createEventsAccordion(events) {
+  const card = document.createElement('div');
+  card.className = 'history-card';
+  card.style.gridColumn = '1 / -1'; // Full width
+  
+  let accordionHtml = events.map((event, index) => `
+    <div style="border-bottom: 1px solid rgba(102, 126, 234, 0.2); margin-bottom: 10px;">
+      <div onclick="toggleAccordion('event-${index}')" 
+           style="padding: 15px; cursor: pointer; background: rgba(102, 126, 234, 0.1); border-radius: 8px; margin-bottom: 5px; transition: all 0.3s;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 1.2rem; font-weight: 600; color: #f093fb; margin-bottom: 5px;">
+              📍 ${event.title}
+            </div>
+            <div style="font-size: 0.9rem; color: #999;">
+              Click to view details • Show on map • Find videos
+            </div>
+          </div>
+          <i class="bi-chevron-down" id="icon-event-${index}" style="font-size: 1.5rem; color: #667eea; transition: transform 0.3s;"></i>
+        </div>
+      </div>
+      <div id="event-${index}" style="display: none; padding: 20px; background: rgba(255, 255, 255, 0.02); border-radius: 8px; margin-bottom: 10px;">
+        <p style="color: #ccc; line-height: 1.8; margin-bottom: 15px;">${event.description}</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button onclick="zoomToLocation(${event.lat}, ${event.lng}, '${event.title.replace(/'/g, "\\'")}', '${event.description.replace(/'/g, "\\'")}'))" 
+                  style="padding: 8px 16px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
+            <i class="bi-geo-alt-fill"></i> Show on Map
+          </button>
+          <button onclick="searchYouTubeFor('${event.title.replace(/'/g, "\\'")}')" 
+                  style="padding: 8px 16px; background: #ff0000; border: none; border-radius: 8px; color: white; cursor: pointer; font-weight: 600;">
+            <i class="bi-youtube"></i> Find Videos
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  card.innerHTML = `
+    <div class="history-card-header">
+      <i class="bi bi-calendar-event history-card-icon"></i>
+      <div class="history-card-title">🎭 Music History Events</div>
+    </div>
+    ${accordionHtml}
+  `;
+
+  return card;
+}
+
+// Toggle accordion
+function toggleAccordion(id) {
+  const content = document.getElementById(id);
+  const icon = document.getElementById('icon-' + id);
+  
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    icon.style.transform = 'rotate(180deg)';
+  } else {
+    content.style.display = 'none';
+    icon.style.transform = 'rotate(0deg)';
+  }
+}
+
+// Zoom to location on map
+function zoomToLocation(lat, lng, title, description) {
+  if (!map) {
+    alert('Map not loaded yet. Please wait a moment.');
+    return;
+  }
+  
+  // Scroll to map
+  document.getElementById('mapSection').scrollIntoView({ behavior: 'smooth' });
+  
+  // Zoom to location
+  map.setCenter({ lat, lng });
+  map.setZoom(12);
+  
+  // Find and click the marker
+  setTimeout(() => {
+    markers.forEach(marker => {
+      if (marker.getTitle() === title) {
+        google.maps.event.trigger(marker, 'click');
+      }
+    });
+  }, 500);
+}
+
+// Search YouTube for event
+function searchYouTubeFor(query) {
+  const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+  window.open(searchUrl, '_blank');
+}
+
+// Initialize Google Map
+let map = null;
+let markers = [];
+
+// Show default map with no events
+async function showDefaultMap() {
+  const mapSection = document.getElementById('mapSection');
+  mapSection.style.display = 'block';
+  
+  // Load Google Maps API if not already loaded
+  if (typeof google === 'undefined' || !google.maps) {
+    const response = await fetch('/api/music-research/google-api-key');
+    const data = await response.json();
+    
+    if (data.apiKey) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=initDefaultMap`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    }
+  } else {
+    initDefaultMap();
+  }
+}
+
+function initDefaultMap() {
+  const mapDiv = document.getElementById('map');
+  
+  // Show a default world view
+  map = new google.maps.Map(mapDiv, {
+    zoom: 2,
+    center: { lat: 40, lng: -95 }, // USA center
+    styles: [
+      { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] }
+    ]
+  });
+  
+  // Add info overlay
+  const infoDiv = document.createElement('div');
+  infoDiv.style.cssText = 'position: absolute; top: 10px; left: 50%; transform: translateX(-50%); background: rgba(102, 126, 234, 0.9); padding: 15px 25px; border-radius: 10px; color: white; font-weight: 600; z-index: 1000;';
+  infoDiv.textContent = 'No famous concerts on this date. Try Woodstock: August 15, 1969!';
+  mapDiv.appendChild(infoDiv);
+}
+
+async function initializeMap(locations) {
+  const mapSection = document.getElementById('mapSection');
+  mapSection.style.display = 'block';
+
+  // Load Google Maps API if not already loaded
+  if (typeof google === 'undefined' || !google.maps) {
+    const response = await fetch('/api/music-research/google-api-key');
+    const data = await response.json();
+    
+    if (data.apiKey) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=initMapWithData`;
+      script.async = true;
+      script.defer = true;
+      window.mapLocations = locations; // Store for callback
+      document.head.appendChild(script);
+    }
+  } else {
+    initMapWithData(locations);
+  }
+}
+
+function initMapWithData(locations) {
+  const mapDiv = document.getElementById('map');
+  
+  // Use stored locations if passed as callback
+  if (!locations && window.mapLocations) {
+    locations = window.mapLocations;
+  }
+  
+  if (!locations || locations.length === 0) return;
+
+  // Center map on first location
+  const center = locations[0];
+  
+  map = new google.maps.Map(mapDiv, {
+    zoom: 4,
+    center: { lat: center.lat, lng: center.lng },
+    styles: [
+      { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#746855' }] }
+    ]
+  });
+
+  // Add markers
+  const bounds = new google.maps.LatLngBounds();
+  
+  locations.forEach(location => {
+    const marker = new google.maps.Marker({
+      position: { lat: location.lat, lng: location.lng },
+      map: map,
+      title: location.title,
+      animation: google.maps.Animation.DROP
+    });
+
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
+        <div style="color: #2c3e50; padding: 10px;">
+          <h4 style="margin: 0 0 10px 0;">${location.title}</h4>
+          <p style="margin: 0;">${location.description}</p>
+        </div>
+      `
+    });
+
+    marker.addListener('click', () => {
+      infoWindow.open(map, marker);
+    });
+
+    bounds.extend(marker.getPosition());
+    markers.push(marker);
+  });
+
+  // Fit map to show all markers
+  if (locations.length > 1) {
+    map.fitBounds(bounds);
+  }
+}
+
+// Make all functions global for callbacks
+window.initMapWithData = initMapWithData;
+window.initDefaultMap = initDefaultMap;
+window.toggleAccordion = toggleAccordion;
+window.zoomToLocation = zoomToLocation;
+window.searchYouTubeFor = searchYouTubeFor;
+
+// Load Woodstock date on page load after a short delay
+setTimeout(() => {
+  timeTravel();
+}, 500);
+</script>
+
+</body>
+</html>
+
