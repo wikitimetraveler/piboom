@@ -914,15 +914,22 @@ function showToast(title, message, type = 'info') {
 // Load Google Maps dynamically
 (async function() {
   try {
-    // Try to get API key from environment or use a placeholder
-    // In production, you should set GOOGLE_API_KEY environment variable
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=Function.prototype`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
+    // Fetch API key from server
+    const response = await fetch('/api/music-research/google-api-key');
+    const data = await response.json();
+    
+    if (data.apiKey) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=Function.prototype`;
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+      console.log('🗺️ Google Maps API loading with key from server');
+    } else {
+      console.warn('Google Maps API key not available from server');
+    }
   } catch (error) {
-    console.warn('Google Maps API key not configured');
+    console.error('Error loading Google Maps API key:', error);
   }
 })();
 </script>
