@@ -89,6 +89,43 @@ export async function createTables() {
       ADD COLUMN IF NOT EXISTS valuation DECIMAL(10,2)
     `);
 
+    // Create trees table for tree collection
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS trees (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100),
+        tree_name VARCHAR(255) NOT NULL,
+        scientific_name VARCHAR(255),
+        confidence VARCHAR(50),
+        features TEXT[],
+        region VARCHAR(255),
+        fun_facts TEXT[],
+        conservation_status VARCHAR(100),
+        description TEXT,
+        photo_url TEXT,
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        location_name VARCHAR(255),
+        notes TEXT,
+        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+        added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create indexes on trees table
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_trees_name ON trees(tree_name)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_trees_user ON trees(user_id)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_trees_location ON trees(latitude, longitude)
+    `);
+
     console.log('✅ Database tables created successfully');
   } catch (error) {
     console.error('❌ Error creating tables:', error.message);

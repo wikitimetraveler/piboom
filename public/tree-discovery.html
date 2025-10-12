@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
   <link rel="stylesheet" href="/styles.css"/>
+  <!-- EXIF.js for reading photo location data -->
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <script src="/user-selector.js"></script>
   <style>
     /* Floating Leaves */
     .floating-leaves {
@@ -344,6 +347,12 @@ let uploadedImageData = null;
 let cameraStream = null;
 let cameraVideo = null;
 let GOOGLE_API_KEY = null;
+let currentTreeData = null;
+let currentLocation = {
+  latitude: null,
+  longitude: null,
+  locationName: null
+};
 
 // Switch between input modes
 function switchInputMode(mode) {
@@ -388,6 +397,27 @@ function handleImageUpload(event) {
     return;
   }
   
+  // Extract EXIF GPS data from photo
+  if (typeof EXIF !== 'undefined' && EXIF.getData) {
+    EXIF.getData(file, function() {
+      const lat = EXIF.getTag(this, "GPSLatitude");
+      const lon = EXIF.getTag(this, "GPSLongitude");
+      const latRef = EXIF.getTag(this, "GPSLatitudeRef") || "N";
+      const lonRef = EXIF.getTag(this, "GPSLongitudeRef") || "E";
+      
+      if (lat && lon) {
+        currentLocation.latitude = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
+        currentLocation.longitude = convertDMSToDD(lon[0], lon[1], lon[2], lonRef);
+        console.log('📍 Location from photo:', currentLocation);
+        showToast('success', 'Location Found', `GPS coordinates extracted from photo: ${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}`);
+      } else {
+        console.log('No GPS data in photo');
+        currentLocation.latitude = null;
+        currentLocation.longitude = null;
+      }
+    });
+  }
+  
   const reader = new FileReader();
   reader.onload = function(e) {
     uploadedImageData = e.target.result;
@@ -404,6 +434,15 @@ function handleImageUpload(event) {
     };
   };
   reader.readAsDataURL(file);
+}
+
+// Convert GPS DMS (degrees, minutes, seconds) to DD (decimal degrees)
+function convertDMSToDD(degrees, minutes, seconds, direction) {
+  let dd = degrees + minutes / 60 + seconds / 3600;
+  if (direction === "S" || direction === "W") {
+    dd = dd * -1;
+  }
+  return dd;
 }
 
 // Show crop guide overlay
@@ -504,6 +543,23 @@ function captureFromCamera() {
     return;
   }
   
+  // Get geolocation from browser
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        currentLocation.latitude = position.coords.latitude;
+        currentLocation.longitude = position.coords.longitude;
+        console.log('📍 Location from device:', currentLocation);
+        showToast('success', 'Location Captured', `GPS: ${currentLocation.latitude.toFixed(4)}, ${currentLocation.longitude.toFixed(4)}`);
+      },
+      (error) => {
+        console.log('Could not get location:', error.message);
+        currentLocation.latitude = null;
+        currentLocation.longitude = null;
+      }
+    );
+  }
+  
   const canvas = document.getElementById('cameraCanvas');
   const context = canvas.getContext('2d');
   
@@ -594,6 +650,9 @@ async function identifyTree() {
 
 // Display tree identification results
 function displayTreeResults(tree) {
+  // Store tree data globally
+  currentTreeData = tree;
+  
   const resultsDiv = document.getElementById('treeResults');
   
   const confidenceClass = tree.confidence === 'High' ? 'confidence-high' : 
@@ -659,11 +718,14 @@ function displayTreeResults(tree) {
           </div>
           
           <div class="mt-4">
-            <button class="btn btn-success" onclick="identifyAnotherTree()">
-              <i class="bi-camera"></i> Identify Another Tree
+            <button class="btn btn-success" onclick="saveToCollection()">
+              <i class="bi-plus-circle"></i> Save to My Collection
             </button>
             <button class="btn btn-primary" onclick="learnMoreAboutTree('${tree.treeName.replace(/'/g, "\\'")}')">
               <i class="bi-book"></i> Learn More from Smokey
+            </button>
+            <button class="btn btn-secondary" onclick="identifyAnotherTree()">
+              <i class="bi-camera"></i> Identify Another
             </button>
           </div>
         </div>
@@ -768,6 +830,67 @@ function searchTree() {
 function handleSearchKeypress(event) {
   if (event.key === 'Enter') {
     searchTree();
+  }
+}
+
+// Save tree to collection
+async function saveToCollection() {
+  if (!currentTreeData) {
+    showToast('error', 'No Tree Data', 'Please identify a tree first');
+    return;
+  }
+  
+  if (!uploadedImageData) {
+    showToast('error', 'No Photo', 'Cannot save tree without a photo');
+    return;
+  }
+  
+  try {
+    // Get current user
+    const currentUser = getCurrentUser ? getCurrentUser() : null;
+    const userId = currentUser ? currentUser.id : null;
+    
+    // Prepare tree data for collection
+    const treeData = {
+      treeName: currentTreeData.treeName,
+      scientificName: currentTreeData.scientificName,
+      confidence: currentTreeData.confidence,
+      features: currentTreeData.features,
+      region: currentTreeData.region,
+      funFacts: currentTreeData.funFacts,
+      conservationStatus: currentTreeData.conservationStatus,
+      description: currentTreeData.description,
+      photoUrl: uploadedImageData,
+      latitude: currentLocation.latitude,
+      longitude: currentLocation.longitude,
+      locationName: currentLocation.locationName
+    };
+    
+    const params = userId ? `?userId=${userId}` : '';
+    const response = await fetch(`/api/tree-collection/add${params}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(treeData)
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      showToast('success', 'Tree Saved! 🌲', `${currentTreeData.treeName} has been added to your collection!`);
+      
+      // Show option to view collection
+      setTimeout(() => {
+        if (confirm('Would you like to view your tree collection?')) {
+          window.location.href = '/tree-collection.html';
+        }
+      }, 1500);
+    } else {
+      showToast('error', 'Save Failed', data.error || 'Could not save tree to collection');
+    }
+    
+  } catch (error) {
+    console.error('Error saving tree:', error);
+    showToast('error', 'Save Failed', 'Error saving tree to collection. Please try again.');
   }
 }
 
