@@ -3,8 +3,8 @@ import { getPool } from '../services/database.service.js';
 // Add album to collection
 export async function addToCollection(req, res) {
   try {
-    const { artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating } = req.body;
-    const userId = req.query.userId || null; // For future multi-user support
+    const { artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation } = req.body;
+    const userId = req.query.userId || null; // Multi-user support
     
     if (!artist || !album) {
       return res.status(400).json({ 
@@ -23,7 +23,7 @@ export async function addToCollection(req, res) {
 
     // Check if album already exists for this user
     const existingCheck = await pool.query(
-      'SELECT id FROM records WHERE artist = $1 AND album = $2 AND (user_id = $3 OR (user_id IS NULL AND $3 IS NULL))',
+      'SELECT id FROM records WHERE artist = $1 AND album = $2 AND user_id = $3',
       [artist, album, userId]
     );
 
@@ -37,10 +37,10 @@ export async function addToCollection(req, res) {
 
     // Insert the album
     const result = await pool.query(
-      `INSERT INTO records (user_id, artist, album, year, genre, label, notes, cover_url, spotify_id, musicbrainz_id, rating)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      `INSERT INTO records (user_id, artist, album, year, genre, label, notes, cover_url, spotify_id, musicbrainz_id, rating, valuation)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
        RETURNING *`,
-      [userId, artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating]
+      [userId, artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation]
     );
 
     console.log('✅ Album added to collection:', album, 'by', artist);
@@ -99,10 +99,10 @@ export async function getCollection(req, res) {
     }
 
     // Add sorting
-    const validSortColumns = ['artist', 'album', 'year', 'added_date', 'rating'];
+    const validSortColumns = ['artist', 'album', 'year', 'added_date', 'rating', 'valuation'];
     const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'added_date';
     const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-    query += ` ORDER BY ${sortColumn} ${sortOrder}`;
+    query += ` ORDER BY ${sortColumn} ${sortOrder} NULLS LAST`;
 
     const result = await pool.query(query, params);
 
@@ -168,7 +168,7 @@ export async function updateAlbum(req, res) {
   try {
     const { id } = req.params;
     const userId = req.query.userId || null;
-    const { notes, rating, genre, label, year } = req.body;
+    const { notes, rating, genre, label, year, valuation } = req.body;
 
     const pool = getPool();
     if (!pool) {
@@ -206,6 +206,10 @@ export async function updateAlbum(req, res) {
     if (req.body.story !== undefined) {
       updates.push(`story = $${paramCount++}`);
       params.push(req.body.story);
+    }
+    if (valuation !== undefined) {
+      updates.push(`valuation = $${paramCount++}`);
+      params.push(valuation);
     }
 
     if (updates.length === 0) {

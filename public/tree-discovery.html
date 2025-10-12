@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Tree Discovery - Smokey's Forest Guide</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    /* Floating Leaves */
+    .floating-leaves {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .leaf {
+      position: absolute;
+      font-size: 32px;
+      color: rgba(34, 139, 34, 0.4);
+      animation: floatLeaf 15s linear infinite;
+      opacity: 0;
+      z-index: 10;
+    }
+
+    .leaf:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .leaf:nth-child(2) { left: 20%; animation-delay: 3s; }
+    .leaf:nth-child(3) { left: 30%; animation-delay: 6s; }
+    .leaf:nth-child(4) { left: 40%; animation-delay: 9s; }
+    .leaf:nth-child(5) { left: 50%; animation-delay: 12s; }
+    .leaf:nth-child(6) { left: 60%; animation-delay: 15s; }
+    .leaf:nth-child(7) { left: 70%; animation-delay: 18s; }
+    .leaf:nth-child(8) { left: 80%; animation-delay: 21s; }
+
+    @keyframes floatLeaf {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.6;
+      }
+      95% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Forest theme colors */
+    :root {
+      --forest-green: #228B22;
+      --forest-dark: #1B5E20;
+      --forest-light: #4CAF50;
+      --bark-brown: #8B4513;
+    }
+    
+    .tree-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .tree-widget-container {
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      border: 2px solid var(--forest-light);
+    }
+    
+    .search-mode-tabs {
+      margin-bottom: 20px;
+    }
+    
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      max-width: 400px;
+    }
+    
+    .toast {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      margin-bottom: 10px;
+      padding: 16px 20px;
+      transform: translateX(100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+    }
+    
+    .toast.show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    
+    .toast.success { border-left: 4px solid #28a745; }
+    .toast.error { border-left: 4px solid #dc3545; }
+    .toast.info { border-left: 4px solid #17a2b8; }
+    
+    .tree-result-card {
+      background: linear-gradient(135deg, rgba(34,139,34,0.1), rgba(76,175,80,0.1));
+      border: 2px solid var(--forest-light);
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 20px;
+    }
+    
+    .feature-tag {
+      display: inline-block;
+      background: var(--forest-light);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin: 5px;
+      font-size: 0.85rem;
+    }
+    
+    .confidence-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .confidence-high { background: #28a745; color: white; }
+    .confidence-medium { background: #ffc107; color: #333; }
+    .confidence-low { background: #dc3545; color: white; }
+  </style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<!-- Floating Leaves -->
+<div class="floating-leaves">
+  <div class="leaf">🍃</div>
+  <div class="leaf">🍂</div>
+  <div class="leaf">🍃</div>
+  <div class="leaf">🍂</div>
+  <div class="leaf">🍃</div>
+  <div class="leaf">🍂</div>
+  <div class="leaf">🍃</div>
+  <div class="leaf">🍂</div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Simple Basic Header -->
+<div class="simple-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="/" class="brand">piBoom</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/music-research.html">Research</a>
+        <a href="/album-discovery.html">Albums</a>
+        <a href="/tree-discovery.html" class="active">Trees</a>
+        <a href="/collection.html">Collection</a>
+        <a href="/player.html">Player</a>
+        <a href="/assistant.html">Assistant</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tree-container">
+    <!-- Tree Discovery Widget -->
+    <div class="tree-widget-container">
+      <h1 class="text-center mb-3" style="color: var(--forest-dark);">
+        <i class="bi-tree-fill"></i> Tree Discovery with Smokey 🐻
+      </h1>
+      <p class="text-center mb-4" style="color: #666;">
+        Identify trees by photo, search for tree species, or ask Smokey about North American forests!
+      </p>
+      
+      <!-- Search Mode Tabs -->
+      <div class="text-center mb-4 search-mode-tabs">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-success" id="searchModeBtn" onclick="switchInputMode('search')">
+            <i class="bi-search"></i> Search Trees
+          </button>
+          <button type="button" class="btn btn-success" id="imageModeBtn" onclick="switchInputMode('image')">
+            <i class="bi-image"></i> Upload Photo
+          </button>
+          <button type="button" class="btn btn-success" id="cameraModeBtn" onclick="switchInputMode('camera')">
+            <i class="bi-camera"></i> Use Camera
+          </button>
+        </div>
+      </div>
+      
+      <!-- Tree Search Mode -->
+      <div id="searchMode" class="text-center mb-3" style="display: none;">
+        <div class="input-group input-group-lg">
+          <input id="treeSearchInput" class="form-control" placeholder="Search for a tree species (e.g., Oak, Maple, Pine)..." onkeypress="handleSearchKeypress(event)">
+          <div class="input-group-append">
+            <button class="btn btn-success" type="button" onclick="searchTree()">
+              <i class="bi-search"></i> Search
+            </button>
+          </div>
+        </div>
+        <!-- KG Widget Results Display -->
+        <div id="kgCard" class="mt-3"></div>
+      </div>
+      
+      <!-- Image Upload Mode -->
+      <div id="imageMode" class="text-center mb-3" style="display: none;">
+        <div class="mb-3">
+          <label for="treeImageInput" class="btn btn-lg btn-success" style="cursor: pointer;">
+            <i class="bi-cloud-upload"></i> Choose Tree Photo
+            <input type="file" id="treeImageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+          </label>
+        </div>
+        <div id="imagePreview" style="display: none; margin-top: 15px;">
+          <div style="background: #f0f0f0; padding: 20px; border-radius: 15px; display: inline-block;">
+            <div style="position: relative; display: inline-block;">
+              <img id="previewImg" src="" alt="Preview" style="max-width: 600px; max-height: 600px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: block;">
+              <div id="cropGuide" style="position: absolute; border: 3px dashed #4CAF50; pointer-events: none; display: none;"></div>
+            </div>
+            <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+              <i class="bi-info-circle"></i> <span id="imageDimensions"></span>
+              <div style="margin-top: 5px; color: #4CAF50; font-weight: 600;">
+                <i class="bi-crop"></i> Green box shows AI analysis area
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-success btn-lg" onclick="identifyTree()">
+              <i class="bi-magic"></i> Identify Tree
+            </button>
+            <button class="btn btn-secondary" onclick="clearImageUpload()">
+              <i class="bi-x-circle"></i> Clear & Choose Another
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Camera Mode -->
+      <div id="cameraMode" class="text-center mb-3" style="display: none;">
+        <div class="mb-3">
+          <button class="btn btn-lg btn-success" onclick="startCamera()" id="startCameraBtn">
+            <i class="bi-camera-video"></i> Start Camera
+          </button>
+          <button class="btn btn-lg btn-danger" onclick="stopCamera()" id="stopCameraBtn" style="display: none;">
+            <i class="bi-camera-video-off"></i> Stop Camera
+          </button>
+        </div>
+        
+        <!-- Camera Preview -->
+        <div id="cameraPreview" style="display: none; margin-top: 15px;">
+          <div style="position: relative; display: inline-block; background: #000; border-radius: 15px; padding: 10px;">
+            <video id="cameraVideo" autoplay playsinline style="max-width: 100%; max-height: 600px; border-radius: 10px;"></video>
+            <!-- Square framing guide overlay -->
+            <div id="cameraFrameGuide" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 4px solid #4CAF50; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); pointer-events: none;"></div>
+            <canvas id="cameraCanvas" style="display: none;"></canvas>
+            <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
+              <button class="btn btn-success btn-lg" onclick="captureFromCamera()" style="border-radius: 50%; width: 70px; height: 70px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                <i class="bi-camera-fill" style="font-size: 1.8rem;"></i>
+              </button>
+            </div>
+          </div>
+          <p class="text-muted mt-2" style="font-size: 1rem;">
+            <i class="bi-info-circle"></i> <strong>Center tree features in the green square</strong> (leaves, bark, or full tree)
+          </p>
+        </div>
+        
+        <!-- Captured Image Preview -->
+        <div id="capturedPreview" style="display: none; margin-top: 15px;">
+          <div style="background: #f0f0f0; padding: 20px; border-radius: 15px; display: inline-block;">
+            <div style="position: relative; display: inline-block;">
+              <img id="capturedImg" src="" alt="Captured" style="max-width: 600px; max-height: 600px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: block;">
+              <div id="capturedCropGuide" style="position: absolute; border: 3px dashed #4CAF50; pointer-events: none; display: none;"></div>
+            </div>
+            <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+              <i class="bi-camera"></i> <span id="capturedDimensions"></span>
+              <div style="margin-top: 5px; color: #4CAF50; font-weight: 600;">
+                <i class="bi-crop"></i> Green box shows what Smokey will analyze
+              </div>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-success btn-lg" onclick="identifyTree()">
+              <i class="bi-magic"></i> Identify Tree
+            </button>
+            <button class="btn btn-secondary" onclick="retakePhoto()">
+              <i class="bi-arrow-clockwise"></i> Retake Photo
+            </button>
+            <button class="btn btn-danger" onclick="stopCamera()">
+              <i class="bi-x-circle"></i> Close Camera
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tree Identification Results -->
+      <div id="treeResults" style="display: none; margin-top: 30px;">
+        <!-- Results will be inserted here -->
+      </div>
+      
+      <!-- Loading State -->
+      <div id="loadingState" style="display: none; text-align: center; padding: 40px;">
+        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <p class="mt-3" style="color: var(--forest-green); font-size: 1.1rem;">
+          🐻 Smokey is analyzing your tree... 🌲
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>Smokey's Forest Guide</strong> — Only You Can Prevent Forest Fires! 🐻🌲 — <span id="dt"></span>
+    </div>
+    <div class="footer-quote mt-2">
+      🌲 "Remember - please be careful. Only you can prevent forest fires!" 🌲
+    </div>
+  </div>
+</footer>
+
+<script>
+let currentMode = 'search';
+let uploadedImageData = null;
+let cameraStream = null;
+let cameraVideo = null;
+let GOOGLE_API_KEY = null;
+
+// Switch between input modes
+function switchInputMode(mode) {
+  // Stop camera if switching away from camera mode
+  if (currentMode === 'camera' && mode !== 'camera') {
+    stopCamera();
+  }
+  
+  currentMode = mode;
+  
+  // Update button states
+  document.getElementById('searchModeBtn').className = mode === 'search' ? 'btn btn-success' : 'btn btn-outline-success';
+  document.getElementById('imageModeBtn').className = mode === 'image' ? 'btn btn-success' : 'btn btn-outline-success';
+  document.getElementById('cameraModeBtn').className = mode === 'camera' ? 'btn btn-success' : 'btn btn-outline-success';
+  
+  // Show/hide appropriate interfaces
+  document.getElementById('searchMode').style.display = mode === 'search' ? 'block' : 'none';
+  document.getElementById('imageMode').style.display = mode === 'image' ? 'block' : 'none';
+  document.getElementById('cameraMode').style.display = mode === 'camera' ? 'block' : 'none';
+  
+  // Clear results
+  document.getElementById('treeResults').style.display = 'none';
+  
+  // Focus on appropriate input
+  if (mode === 'search') {
+    document.getElementById('treeSearchInput').focus();
+  }
+}
+
+// Handle image upload
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  if (!file.type.startsWith('image/')) {
+    showToast('error', 'Invalid File', 'Please upload an image file');
+    return;
+  }
+  
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('error', 'File Too Large', 'Please upload an image smaller than 10MB');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedImageData = e.target.result;
+    
+    const img = document.getElementById('previewImg');
+    img.src = uploadedImageData;
+    document.getElementById('imagePreview').style.display = 'block';
+    
+    img.onload = function() {
+      const width = img.naturalWidth;
+      const height = img.naturalHeight;
+      document.getElementById('imageDimensions').textContent = `Original: ${width} × ${height}px`;
+      showCropGuide('cropGuide', img);
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+// Show crop guide overlay
+function showCropGuide(guideId, imgElement) {
+  const guide = document.getElementById(guideId);
+  if (!guide || !imgElement) return;
+  
+  const displayedWidth = imgElement.offsetWidth;
+  const displayedHeight = imgElement.offsetHeight;
+  const cropSize = Math.min(displayedWidth, displayedHeight) * 0.85;
+  const left = (displayedWidth - cropSize) / 2;
+  const top = (displayedHeight - cropSize) / 2;
+  
+  guide.style.left = left + 'px';
+  guide.style.top = top + 'px';
+  guide.style.width = cropSize + 'px';
+  guide.style.height = cropSize + 'px';
+  guide.style.display = 'block';
+}
+
+// Clear image upload
+function clearImageUpload() {
+  uploadedImageData = null;
+  document.getElementById('treeImageInput').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('previewImg').src = '';
+}
+
+// Start camera
+async function startCamera() {
+  try {
+    const constraints = {
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      }
+    };
+    
+    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    cameraVideo = document.getElementById('cameraVideo');
+    cameraVideo.srcObject = cameraStream;
+    
+    document.getElementById('cameraPreview').style.display = 'block';
+    document.getElementById('startCameraBtn').style.display = 'none';
+    document.getElementById('stopCameraBtn').style.display = 'inline-block';
+    
+    cameraVideo.onloadedmetadata = function() {
+      setTimeout(() => {
+        const guide = document.getElementById('cameraFrameGuide');
+        if (guide && cameraVideo) {
+          const videoWidth = cameraVideo.offsetWidth;
+          const videoHeight = cameraVideo.offsetHeight;
+          const guideSize = Math.min(videoWidth, videoHeight) * 0.7;
+          
+          guide.style.width = guideSize + 'px';
+          guide.style.height = guideSize + 'px';
+        }
+      }, 100);
+    };
+    
+  } catch (error) {
+    console.error('Error accessing camera:', error);
+    let errorMessage = 'Could not access camera. ';
+    if (error.name === 'NotAllowedError') {
+      errorMessage += 'Please allow camera permissions.';
+    } else if (error.name === 'NotFoundError') {
+      errorMessage += 'No camera found on this device.';
+    }
+    showToast('error', 'Camera Error', errorMessage);
+  }
+}
+
+// Stop camera
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+  
+  if (cameraVideo) {
+    cameraVideo.srcObject = null;
+  }
+  
+  document.getElementById('cameraPreview').style.display = 'none';
+  document.getElementById('capturedPreview').style.display = 'none';
+  document.getElementById('startCameraBtn').style.display = 'inline-block';
+  document.getElementById('stopCameraBtn').style.display = 'none';
+  
+  uploadedImageData = null;
+  document.getElementById('capturedImg').src = '';
+}
+
+// Capture from camera
+function captureFromCamera() {
+  if (!cameraVideo || !cameraStream) {
+    showToast('error', 'Camera Not Active', 'Please start the camera first');
+    return;
+  }
+  
+  const canvas = document.getElementById('cameraCanvas');
+  const context = canvas.getContext('2d');
+  
+  canvas.width = cameraVideo.videoWidth;
+  canvas.height = cameraVideo.videoHeight;
+  context.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+  
+  uploadedImageData = canvas.toDataURL('image/jpeg', 0.9);
+  
+  const capturedImg = document.getElementById('capturedImg');
+  capturedImg.src = uploadedImageData;
+  document.getElementById('cameraPreview').style.display = 'none';
+  document.getElementById('capturedPreview').style.display = 'block';
+  
+  capturedImg.onload = function() {
+    const width = capturedImg.naturalWidth;
+    const height = capturedImg.naturalHeight;
+    document.getElementById('capturedDimensions').textContent = `Captured: ${width} × ${height}px`;
+    showCropGuide('capturedCropGuide', capturedImg);
+  };
+  
+  playShutterSound();
+}
+
+// Retake photo
+function retakePhoto() {
+  uploadedImageData = null;
+  document.getElementById('capturedImg').src = '';
+  document.getElementById('capturedPreview').style.display = 'none';
+  document.getElementById('cameraPreview').style.display = 'block';
+}
+
+// Play camera shutter sound
+function playShutterSound() {
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.1);
+  } catch (error) {
+    console.log('Audio feedback not available');
+  }
+}
+
+// Identify tree from image
+async function identifyTree() {
+  if (!uploadedImageData) {
+    showToast('warning', 'No Image', 'Please upload a tree photo first');
+    return;
+  }
+  
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('treeResults').style.display = 'none';
+  
+  try {
+    const response = await fetch('/api/tree-discovery/identify-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageData: uploadedImageData })
+    });
+    
+    const data = await response.json();
+    document.getElementById('loadingState').style.display = 'none';
+    
+    if (data.success && data.tree) {
+      displayTreeResults(data.tree);
+    } else {
+      showToast('error', 'Identification Failed', data.error || 'Could not identify tree');
+    }
+    
+  } catch (error) {
+    console.error('Error identifying tree:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    showToast('error', 'Analysis Failed', 'Error analyzing the image. Please try again.');
+  }
+}
+
+// Display tree identification results
+function displayTreeResults(tree) {
+  const resultsDiv = document.getElementById('treeResults');
+  
+  const confidenceClass = tree.confidence === 'High' ? 'confidence-high' : 
+                         tree.confidence === 'Medium' ? 'confidence-medium' : 'confidence-low';
+  
+  let html = `
+    <div class="tree-result-card">
+      <div class="row">
+        <div class="col-md-4 text-center">
+          <img src="${uploadedImageData}" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        </div>
+        <div class="col-md-8">
+          <h3 style="color: var(--forest-dark); margin-bottom: 10px;">
+            <i class="bi-tree-fill"></i> ${tree.treeName}
+          </h3>
+          <h5 style="color: #666; font-style: italic; margin-bottom: 15px;">
+            ${tree.scientificName}
+          </h5>
+          
+          <span class="confidence-badge ${confidenceClass}">
+            Confidence: ${tree.confidence}
+          </span>
+          
+          <hr style="border-top: 2px solid var(--forest-light); margin: 20px 0;">
+          
+          <div class="mb-3">
+            <h6 style="color: var(--forest-dark);">
+              <i class="bi-geo-alt-fill"></i> Region:
+            </h6>
+            <p>${tree.region}</p>
+          </div>
+          
+          <div class="mb-3">
+            <h6 style="color: var(--forest-dark);">
+              <i class="bi-check2-square"></i> Key Features:
+            </h6>
+            ${tree.features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
+          </div>
+          
+          <div class="mb-3">
+            <h6 style="color: var(--forest-dark);">
+              <i class="bi-lightbulb-fill"></i> Fun Facts:
+            </h6>
+            <ul>
+              ${tree.funFacts.map(fact => `<li>${fact}</li>`).join('')}
+            </ul>
+          </div>
+          
+          ${tree.conservationStatus !== 'Unknown' && tree.conservationStatus !== 'Not Evaluated' ? `
+            <div class="mb-3">
+              <h6 style="color: var(--forest-dark);">
+                <i class="bi-shield-fill-check"></i> Conservation Status:
+              </h6>
+              <p><strong>${tree.conservationStatus}</strong></p>
+            </div>
+          ` : ''}
+          
+          <div style="background: rgba(34,139,34,0.1); padding: 15px; border-radius: 10px; border-left: 4px solid var(--forest-green); margin-top: 20px;">
+            <h6 style="color: var(--forest-dark);">
+              <i class="bi-chat-left-quote-fill"></i> Smokey Says:
+            </h6>
+            <p style="margin: 0; font-style: italic;">${tree.description}</p>
+          </div>
+          
+          <div class="mt-4">
+            <button class="btn btn-success" onclick="identifyAnotherTree()">
+              <i class="bi-camera"></i> Identify Another Tree
+            </button>
+            <button class="btn btn-primary" onclick="learnMoreAboutTree('${tree.treeName.replace(/'/g, "\\'")}')">
+              <i class="bi-book"></i> Learn More from Smokey
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  resultsDiv.innerHTML = html;
+  resultsDiv.style.display = 'block';
+  
+  // Scroll to results
+  resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Learn more about a tree from Smokey
+async function learnMoreAboutTree(treeName) {
+  try {
+    document.getElementById('loadingState').style.display = 'block';
+    
+    const response = await fetch('/api/tree-discovery/tree-info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ treeName })
+    });
+    
+    const data = await response.json();
+    document.getElementById('loadingState').style.display = 'none';
+    
+    if (data.success) {
+      showSmokeyInfo(treeName, data.info);
+    } else {
+      showToast('error', 'Error', data.error || 'Failed to get tree information');
+    }
+    
+  } catch (error) {
+    console.error('Error getting tree info:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    showToast('error', 'Error', 'Failed to get tree information');
+  }
+}
+
+// Show Smokey's detailed information
+function showSmokeyInfo(treeName, info) {
+  const resultsDiv = document.getElementById('treeResults');
+  
+  const infoHtml = `
+    <div class="tree-result-card" style="margin-top: 20px; background: linear-gradient(135deg, rgba(139,69,19,0.1), rgba(34,139,34,0.1));">
+      <h4 style="color: var(--bark-brown); margin-bottom: 20px;">
+        <i class="bi-book-fill"></i> Smokey's Guide to ${treeName}
+      </h4>
+      <div style="background: white; padding: 20px; border-radius: 10px; white-space: pre-wrap; line-height: 1.8;">
+        ${info}
+      </div>
+      <div class="text-center mt-3">
+        <button class="btn btn-success" onclick="identifyAnotherTree()">
+          <i class="bi-camera"></i> Identify Another Tree
+        </button>
+      </div>
+    </div>
+  `;
+  
+  resultsDiv.innerHTML += infoHtml;
+  resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// Identify another tree
+function identifyAnotherTree() {
+  // Clear results
+  document.getElementById('treeResults').style.display = 'none';
+  document.getElementById('treeResults').innerHTML = '';
+  
+  // Clear image data
+  uploadedImageData = null;
+  
+  // Reset to appropriate mode
+  if (currentMode === 'camera') {
+    document.getElementById('capturedImg').src = '';
+    document.getElementById('capturedPreview').style.display = 'none';
+    if (!cameraStream) {
+      document.getElementById('cameraPreview').style.display = 'none';
+    } else {
+      document.getElementById('cameraPreview').style.display = 'block';
+    }
+  } else if (currentMode === 'image') {
+    clearImageUpload();
+  }
+  
+  showToast('info', 'Ready!', 'Take or upload another tree photo');
+}
+
+// Search for tree by name
+function searchTree() {
+  const treeName = document.getElementById('treeSearchInput').value.trim();
+  if (!treeName) {
+    showToast('warning', 'Enter Tree Name', 'Please enter a tree species to search');
+    return;
+  }
+  
+  learnMoreAboutTree(treeName);
+}
+
+function handleSearchKeypress(event) {
+  if (event.key === 'Enter') {
+    searchTree();
+  }
+}
+
+// Toast notification system
+function showToast(type, title, message, duration = 5000) {
+  const toastContainer = document.getElementById('toastContainer');
+  if (!toastContainer) return;
+  
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  
+  const icons = {
+    success: 'bi-check-circle-fill',
+    info: 'bi-info-circle-fill',
+    warning: 'bi-exclamation-triangle-fill',
+    error: 'bi-x-circle-fill'
+  };
+  
+  const colors = {
+    success: '#28a745',
+    info: '#17a2b8',
+    warning: '#ffc107',
+    error: '#dc3545'
+  };
+  
+  toast.innerHTML = `
+    <div style="display: flex; align-items: flex-start; gap: 10px;">
+      <i class="${icons[type]}" style="color: ${colors[type]}; font-size: 1.2rem;"></i>
+      <div style="flex: 1;">
+        <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
+        <div style="font-size: 0.9rem; color: #6c757d;">${message}</div>
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #6c757d; cursor: pointer; font-size: 1.2rem; padding: 0;">&times;</button>
+    </div>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  setTimeout(() => toast.classList.add('show'), 100);
+  
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🌲 Tree Discovery page loaded');
+  
+  // Default to camera mode on mobile, search on desktop
+  const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  switchInputMode(isMobile ? 'camera' : 'search');
+  
+  // Set footer date
+  document.getElementById('dt').textContent = new Date().toLocaleDateString();
+  
+  // Load Google API key for Knowledge Graph (for tree species search)
+  fetch('/api/music-research/google-api-key')
+    .then(response => response.json())
+    .then(data => {
+      if (data.apiKey) {
+        GOOGLE_API_KEY = data.apiKey;
+        console.log('✅ Google API Key loaded for tree search');
+      }
+    })
+    .catch(error => {
+      console.error('Error loading API key:', error);
+    });
+});
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Google Knowledge Graph Widget -->
+<script src="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.js"></script>
+</body>
+</html>
+

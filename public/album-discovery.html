@@ -732,6 +732,51 @@
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- Add to Collection Modal -->
+<div class="modal fade" id="addToCollectionModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
+        <h5 class="modal-title">
+          <i class="bi-plus-circle"></i> Add to Collection
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" style="color: white;">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 1.1rem; margin-bottom: 15px;">
+          <strong id="addModalAlbumTitle"></strong><br>
+          <span id="addModalArtist" style="color: #666;"></span>
+        </p>
+        
+        <div class="form-group">
+          <label for="addValuation">
+            <i class="bi-cash-coin"></i> <strong>Estimated Value (Optional)</strong>
+          </label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input type="number" class="form-control" id="addValuation" placeholder="0.00" step="0.01" min="0">
+          </div>
+          <small class="form-text text-muted">
+            Track the value of your collection! Leave empty if unknown.
+          </small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          <i class="bi-x-circle"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-success" onclick="confirmAddToCollection()">
+          <i class="bi-plus-circle"></i> Add to Collection
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- User Selector Script -->
 <script src="/user-selector.js"></script>
 
@@ -744,12 +789,11 @@
         <a href="/">Home</a>
         <a href="/music-research.html">Research</a>
         <a href="/album-discovery.html" class="active">Albums</a>
+        <a href="/collection.html">Collection</a>
         <a href="/player.html">Player</a>
         <a href="/assistant.html">Assistant</a>
-        <a href="/blacklight.html">Black Light</a>
-        <a href="/ouija-board.html">Ouija Board</a>
-        <a href="/spotify-dashboard.html">Spotify</a>
-        <a href="/debug.html">Debug</a>
+        <a href="/ouija-board.html">Ouija</a>
+        <a href="/tree-discovery.html">Trees 🌲</a>
       </div>
     </div>
   </div>
@@ -1719,9 +1763,10 @@ function displayIdentifiedAlbum(data) {
             <p class="card-text"><strong>Artist:</strong> ${data.artistName}</p>
             ${data.year ? `<p class="card-text"><strong>Year:</strong> ${data.year}</p>` : ''}
             ${data.genre ? `<p class="card-text"><strong>Genre:</strong> ${data.genre}</p>` : ''}
+            ${data.estimatedValue ? `<p class="card-text"><strong><i class="bi-cash-coin text-success"></i> Est. Value:</strong> $${parseFloat(data.estimatedValue).toFixed(2)}</p>` : ''}
             ${data.description ? `<p class="card-text">${data.description}</p>` : ''}
-            <p class="card-text"><small class="text-muted">Identified using AI vision</small></p>
-            <button class="btn btn-success btn-lg mt-3" onclick="addIdentifiedToCollection('${data.artistName.replace(/'/g, "\\'")}', '${data.albumName.replace(/'/g, "\\'")}', '${data.year || ''}', '${data.genre || ''}', '${uploadedImageData}')">
+            <p class="card-text"><small class="text-muted">Identified using AI vision ${data.estimatedValue ? '· Value estimated by AI' : ''}</small></p>
+            <button class="btn btn-success btn-lg mt-3" onclick="showAddModal('${data.artistName.replace(/'/g, "\\'")}', '${data.albumName.replace(/'/g, "\\'")}', '${data.year || ''}', '${data.genre || ''}', '${uploadedImageData}', null, true, ${data.estimatedValue || 'null'})">
               <i class="bi-plus-circle"></i> Add to My Collection
             </button>
             <button class="btn btn-outline-primary btn-lg mt-3 ml-2" onclick="addAnotherAlbum()" id="addAnotherBtn" style="display: none;">
@@ -1732,48 +1777,6 @@ function displayIdentifiedAlbum(data) {
       </div>
     </div>
   `;
-}
-
-// Add identified album to collection
-async function addIdentifiedToCollection(artist, album, year, genre, coverImage) {
-  try {
-    const currentUser = getCurrentUser();
-    const response = await fetch(`/api/collection/add?userId=${currentUser.id}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        artist: artist,
-        album: album,
-        year: year,
-        genre: genre,
-        coverUrl: coverImage,
-        musicbrainzId: null
-      })
-    });
-    
-    const data = await response.json();
-    
-    if (data.success) {
-      showToast('success', 'Added!', `"${album}" by ${artist} added to your collection! 🎉`, 5000);
-      // Show "Add Another Album" button
-      const addAnotherBtn = document.getElementById('addAnotherBtn');
-      if (addAnotherBtn) {
-        addAnotherBtn.style.display = 'inline-block';
-      }
-    } else if (response.status === 409) {
-      showToast('warning', 'Already in Collection', `"${album}" is already in your collection`, 4000);
-      // Still show "Add Another Album" button for already added albums
-      const addAnotherBtn = document.getElementById('addAnotherBtn');
-      if (addAnotherBtn) {
-        addAnotherBtn.style.display = 'inline-block';
-      }
-    } else {
-      showToast('error', 'Failed', data.error || 'Failed to add album to collection', 4000);
-    }
-  } catch (error) {
-    console.error('Error adding identified album to collection:', error);
-    showToast('error', 'Error', 'Failed to add album. Check your database connection.', 5000);
-  }
 }
 
 // Add another album - clears current and goes back to camera/upload
@@ -2304,7 +2307,7 @@ function displayAlbums(albums) {
         <button class="btn btn-primary btn-sm mt-2 w-100" onclick="event.stopPropagation(); searchYouTubeForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.title.replace(/'/g, "\\'")}')">
           <i class="bi-youtube"></i> Find Videos
         </button>
-        <button class="btn btn-success btn-sm mt-2 w-100" onclick="event.stopPropagation(); addToCollection('${album.artist.replace(/'/g, "\\'")}', '${album.title.replace(/'/g, "\\'")}', '${album.year}', '${album.genre}', '${album.coverArt}', '${album.musicBrainzId}')">
+        <button class="btn btn-success btn-sm mt-2 w-100" onclick="event.stopPropagation(); showAddModal('${album.artist.replace(/'/g, "\\'")}', '${album.title.replace(/'/g, "\\'")}', '${album.year}', '${album.genre}', '${album.coverArt}', '${album.musicBrainzId}')">
           <i class="bi-plus-circle"></i> Add to Collection
         </button>
       </div>
@@ -2314,35 +2317,106 @@ function displayAlbums(albums) {
   });
 }
 
-// Add album to collection
-async function addToCollection(artist, album, year, genre, coverUrl, musicbrainzId) {
+// Global variables for add modal
+let pendingAlbumData = null;
+
+// Show add to collection modal
+function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId, isIdentified, estimatedValue) {
+  // Store album data
+  pendingAlbumData = {
+    artist,
+    album,
+    year,
+    genre,
+    coverUrl,
+    musicbrainzId: musicbrainzId || null,
+    isIdentified: isIdentified || false
+  };
+  
+  // Update modal content
+  document.getElementById('addModalAlbumTitle').textContent = album;
+  document.getElementById('addModalArtist').textContent = `by ${artist}`;
+  
+  // Pre-fill valuation if AI provided one
+  const valuationInput = document.getElementById('addValuation');
+  if (estimatedValue && estimatedValue !== 'null') {
+    valuationInput.value = parseFloat(estimatedValue).toFixed(2);
+    valuationInput.placeholder = `AI Estimated: $${parseFloat(estimatedValue).toFixed(2)}`;
+  } else {
+    valuationInput.value = '';
+    valuationInput.placeholder = '0.00';
+  }
+  
+  // Show modal
+  if (typeof $ !== 'undefined') {
+    $('#addToCollectionModal').modal('show');
+  } else {
+    const modal = new bootstrap.Modal(document.getElementById('addToCollectionModal'));
+    modal.show();
+  }
+}
+
+// Confirm add to collection
+async function confirmAddToCollection() {
+  if (!pendingAlbumData) return;
+  
   try {
+    // Hide modal
+    if (typeof $ !== 'undefined') {
+      $('#addToCollectionModal').modal('hide');
+    }
+    
+    // Get valuation from input
+    const valuationInput = document.getElementById('addValuation');
+    const valuation = valuationInput.value ? parseFloat(valuationInput.value) : null;
+    
     const currentUser = getCurrentUser();
     const response = await fetch(`/api/collection/add?userId=${currentUser.id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        artist: artist,
-        album: album,
-        year: year,
-        genre: genre,
-        coverUrl: coverUrl,
-        musicbrainzId: musicbrainzId
+        artist: pendingAlbumData.artist,
+        album: pendingAlbumData.album,
+        year: pendingAlbumData.year,
+        genre: pendingAlbumData.genre,
+        coverUrl: pendingAlbumData.coverUrl,
+        musicbrainzId: pendingAlbumData.musicbrainzId,
+        valuation: valuation
       })
     });
     
     const data = await response.json();
     
     if (data.success) {
-      showToast('success', 'Added!', `"${album}" added to your collection! 🎉`, 4000);
+      const valueText = valuation ? ` (valued at $${valuation.toFixed(2)})` : '';
+      showToast('success', 'Added!', `"${pendingAlbumData.album}" added to your collection${valueText}! 🎉`, 5000);
+      
+      // Show "Add Another Album" button if this was an identified album
+      if (pendingAlbumData.isIdentified) {
+        const addAnotherBtn = document.getElementById('addAnotherBtn');
+        if (addAnotherBtn) {
+          addAnotherBtn.style.display = 'inline-block';
+        }
+      }
     } else if (response.status === 409) {
-      showToast('warning', 'Already in Collection', `"${album}" is already in your collection`, 4000);
+      showToast('warning', 'Already in Collection', `"${pendingAlbumData.album}" is already in your collection`, 4000);
+      
+      // Still show "Add Another" button
+      if (pendingAlbumData.isIdentified) {
+        const addAnotherBtn = document.getElementById('addAnotherBtn');
+        if (addAnotherBtn) {
+          addAnotherBtn.style.display = 'inline-block';
+        }
+      }
     } else {
       showToast('error', 'Failed', data.error || 'Failed to add album to collection', 4000);
     }
   } catch (error) {
     console.error('Error adding to collection:', error);
     showToast('error', 'Error', 'Failed to add album. Check your database connection.', 5000);
+  } finally {
+    // Clear pending data
+    pendingAlbumData = null;
   }
 }
 

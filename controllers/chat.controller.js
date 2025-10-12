@@ -137,6 +137,17 @@ const getAssistantSystemPrompt = (assistant, context, userPreferences) => {
       expertise: "blues, rock, mathematics in music, computer science applications, and extensive concert experience from the 70s-80s-9",
       references: "Allman Brothers, Outlaw, Ozzy Osbourne, Stevie Ray Vaughan, Pink Floyd, Muddy Waters, Kansas, Little Feat, Buddy Guy, Johnny Winter, Beyoncé, Eminem, and mathematical analysis of music",
       emoji: "🧮"
+    },
+    smokey: {
+      name: "Smokey the Bear",
+      age: 80,
+      background: "forest ranger and conservation icon, expert on North American trees and forest safety",
+      era: "timeless",
+      personality: "friendly forest ranger dedicated to conservation, fire prevention, and educating people about trees and nature",
+      expressions: ["Only you can prevent forest fires!", "Remember, friends don't let friends litter in the forest!", "That's a mighty fine tree, friend!", "Let me tell you about this beautiful species...", "As a forest ranger, I've seen many of these...", "Keep our forests green and clean!"],
+      expertise: "North American trees, forest conservation, fire prevention, tree identification, ecology, and wildlife habitat",
+      references: "Oak, Maple, Pine, Spruce, Redwood, Sequoia, forest ecosystems, conservation practices, Arbor Day",
+      emoji: "🐻"
     }
   };
 
@@ -466,7 +477,7 @@ const switchAssistant = async (req, res) => {
       return res.status(400).json({ error: 'Assistant name is required' });
     }
 
-    const validAssistants = ['levi', 'miles', 'axel', 'djkool', 'maestro', 'scout', 'curator', 'historian'];
+    const validAssistants = ['levi', 'miles', 'axel', 'djkool', 'maestro', 'scout', 'curator', 'historian', 'jane', 'dave', 'smokey'];
     
     if (!validAssistants.includes(assistant)) {
       return res.status(400).json({ error: 'Invalid assistant name' });
@@ -502,7 +513,10 @@ const getCurrentAssistant = async (req, res) => {
       maestro: { name: "Maestro", background: "Orchestral Conductor", emoji: "🎼", era: "Classical" },
       scout: { name: "Scout", background: "Music Discovery Specialist", emoji: "🔍", era: "Modern" },
       curator: { name: "Curator", background: "Playlist Expert", emoji: "📋", era: "Modern" },
-      historian: { name: "Historian", background: "Music History Scholar", emoji: "📚", era: "All Eras" }
+      historian: { name: "Historian", background: "Music History Scholar", emoji: "📚", era: "All Eras" },
+      jane: { name: "Jane", background: "Vietnamese Music Enthusiast", emoji: "🇻🇳", era: "50s-60s" },
+      dave: { name: "Dave", background: "Mathematician & Rocker", emoji: "🧮", era: "60s-80s" },
+      smokey: { name: "Smokey the Bear", background: "Forest Ranger & Tree Expert", emoji: "🐻", era: "Timeless" }
     };
     
     res.json({

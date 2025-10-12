@@ -355,10 +355,8 @@
         <a href="/collection.html" class="active">Collection</a>
         <a href="/player.html">Player</a>
         <a href="/assistant.html">Assistant</a>
-        <a href="/blacklight.html">Black Light</a>
-        <a href="/ouija-board.html">Ouija Board</a>
-        <a href="/spotify-dashboard.html">Spotify</a>
-        <a href="/debug.html">Debug</a>
+        <a href="/ouija-board.html">Ouija</a>
+        <a href="/tree-discovery.html">Trees 🌲</a>
       </div>
     </div>
   </div>
@@ -380,6 +378,10 @@
       <div class="stat-number" id="statTotal">0</div>
       <div class="stat-label">Total Albums</div>
     </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, rgba(40,167,69,0.15), rgba(40,167,69,0.15));">
+      <div class="stat-number" id="statValue" style="color: #28a745;">$0</div>
+      <div class="stat-label">Collection Value</div>
+    </div>
     <div class="stat-card">
       <div class="stat-number" id="statGenres">0</div>
       <div class="stat-label">Genres</div>
@@ -387,10 +389,6 @@
     <div class="stat-card">
       <div class="stat-number" id="statDecades">0</div>
       <div class="stat-label">Decades</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-number" id="statRecent">0</div>
-      <div class="stat-label">This Month</div>
     </div>
   </div>
 
@@ -408,7 +406,7 @@
         </div>
       </div>
       <div class="col-md-3">
-        <select id="sortSelect" class="form-control" onchange="loadCollection()">
+          <select id="sortSelect" class="form-control" onchange="loadCollection()">
           <option value="added_date:DESC">Recently Added</option>
           <option value="artist:ASC">Artist (A-Z)</option>
           <option value="artist:DESC">Artist (Z-A)</option>
@@ -417,6 +415,8 @@
           <option value="year:DESC">Year (Newest)</option>
           <option value="year:ASC">Year (Oldest)</option>
           <option value="rating:DESC">Rating (High-Low)</option>
+          <option value="valuation:DESC">Value (High-Low)</option>
+          <option value="valuation:ASC">Value (Low-High)</option>
         </select>
       </div>
       <div class="col-md-3 text-right">
@@ -552,6 +552,16 @@
           <label>Year</label>
           <input type="text" id="editYear" class="form-control" placeholder="Release year">
         </div>
+        <div class="form-group">
+          <label><i class="bi-cash-coin text-success"></i> Estimated Value</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input type="number" id="editValuation" class="form-control" placeholder="0.00" step="0.01" min="0">
+          </div>
+          <small class="form-text text-muted">Track the value of your albums!</small>
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -578,7 +588,7 @@
 let currentCollection = [];
 
 // Load collection on page load
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
   // Initialize user selector
   createUserSelector('userSelectorContainer', { 
     title: 'View Collections:',
@@ -588,7 +598,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Update header based on view mode
   updateCollectionHeader();
   
-  loadCollection();
+  await loadCollection();
   loadStats();
   document.getElementById('dt').textContent = new Date().toLocaleDateString();
   
@@ -692,13 +702,15 @@ async function loadStats() {
       document.getElementById('statGenres').textContent = data.stats.byGenre?.length || 0;
       document.getElementById('statDecades').textContent = data.stats.byDecade?.length || 0;
       
-      // Calculate albums added this month
-      const thisMonth = data.stats.recentAdditions?.filter(album => {
-        const addedDate = new Date(album.added_date);
-        const now = new Date();
-        return addedDate.getMonth() === now.getMonth() && addedDate.getFullYear() === now.getFullYear();
-      }).length || 0;
-      document.getElementById('statRecent').textContent = thisMonth;
+      // Calculate total collection value from all albums
+      if (currentCollection && currentCollection.length > 0) {
+        const totalValue = currentCollection.reduce((sum, album) => {
+          return sum + (album.valuation ? parseFloat(album.valuation) : 0);
+        }, 0);
+        document.getElementById('statValue').textContent = totalValue > 0 ? `$${totalValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : '$0';
+      } else {
+        document.getElementById('statValue').textContent = '$0';
+      }
     }
   } catch (error) {
     console.error('Error loading stats:', error);
@@ -745,6 +757,7 @@ function displayAlbums(albums) {
             <h5>${album.album}</h5>
             <p><strong>${album.artist}</strong></p>
             <p>${album.year || 'Year Unknown'} · ${album.genre || 'Genre Unknown'}</p>
+            ${album.valuation ? `<p style="color: #28a745; font-weight: 600; margin-top: 8px;"><i class="bi-cash-coin"></i> $${parseFloat(album.valuation).toFixed(2)}</p>` : ''}
             ${rating ? `<div class="rating-stars">${rating}</div>` : ''}
           </div>
           <div class="album-actions">
@@ -792,6 +805,12 @@ function displayAlbums(albums) {
             <strong>⭐ Rating:</strong> ${rating}
           </div>
           
+          ${album.valuation ? `
+            <div class="metadata-item" style="background: linear-gradient(135deg, rgba(40,167,69,0.2), rgba(40,167,69,0.1)); border-left: 4px solid #28a745;">
+              <strong style="color: #28a745;"><i class="bi-cash-coin"></i> Valuation:</strong> $${parseFloat(album.valuation).toFixed(2)}
+            </div>
+          ` : ''}
+          
           ${album.notes ? `
             <div class="metadata-item">
               <strong>📝 Notes:</strong><br>
@@ -835,6 +854,7 @@ function editAlbum(id) {
   document.getElementById('editLabel').value = album.label || '';
   document.getElementById('editYear').value = album.year || '';
   document.getElementById('editRating').value = album.rating || '';
+  document.getElementById('editValuation').value = album.valuation || '';
   
   // Highlight rating buttons
   updateRatingButtons(album.rating || 0);
@@ -872,11 +892,12 @@ async function saveAlbumEdit() {
     const label = document.getElementById('editLabel').value;
     const year = document.getElementById('editYear').value;
     const rating = parseInt(document.getElementById('editRating').value) || null;
+    const valuation = document.getElementById('editValuation').value ? parseFloat(document.getElementById('editValuation').value) : null;
     
     const response = await fetch(`/api/collection/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes, story, genre, label, year, rating })
+      body: JSON.stringify({ notes, story, genre, label, year, rating, valuation })
     });
     
     const data = await response.json();
@@ -884,7 +905,7 @@ async function saveAlbumEdit() {
     if (data.success) {
       $('#editModal').modal('hide');
       showToast('Album Updated', 'Album details have been saved successfully', 'success');
-      loadCollection();
+      await loadCollection();
       loadStats();
     } else {
       showToast('Update Failed', data.error || 'Failed to update album', 'error');
@@ -952,7 +973,7 @@ async function confirmDelete() {
       showToast('Album Deleted', `"${deleteAlbumInfo.albumName}" has been removed from your collection`, 'success');
       
       // Reload collection and stats
-      loadCollection();
+      await loadCollection();
       loadStats();
     } else {
       showToast('Delete Failed', data.error || 'Failed to delete album', 'error');

@@ -83,6 +83,12 @@ export async function createTables() {
       ADD COLUMN IF NOT EXISTS story TEXT
     `);
 
+    // Add valuation column if it doesn't exist (migration)
+    await pool.query(`
+      ALTER TABLE records 
+      ADD COLUMN IF NOT EXISTS valuation DECIMAL(10,2)
+    `);
+
     console.log('✅ Database tables created successfully');
   } catch (error) {
     console.error('❌ Error creating tables:', error.message);

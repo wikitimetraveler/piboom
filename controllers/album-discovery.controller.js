@@ -303,7 +303,7 @@ export async function identifyAlbumFromImage(req, res) {
           content: [
             {
               type: "text",
-              text: "Please identify this album cover. Provide the exact album name, artist name, release year, genre, and a brief description. Format your response as JSON with fields: albumName, artistName, year, genre, description."
+              text: "Please identify this album cover and estimate its value. Provide the exact album name, artist name, release year, genre, a brief description, AND estimated market value in USD. Consider: original pressing vs reissue, condition (assume VG+ if visible), rarity, and current collector market. Format your response as JSON with fields: albumName, artistName, year, genre, description, estimatedValue (number, no $ sign)."
             },
             {
               type: "image_url",
@@ -344,7 +344,8 @@ export async function identifyAlbumFromImage(req, res) {
         artistName: albumInfo.artistName,
         year: albumInfo.year || 'Unknown',
         genre: albumInfo.genre || 'Unknown',
-        description: albumInfo.description || 'Album identified by AI vision'
+        description: albumInfo.description || 'Album identified by AI vision',
+        estimatedValue: albumInfo.estimatedValue || null
       });
     } else {
       res.json({
@@ -377,7 +378,8 @@ function extractAlbumInfoFromText(text) {
     artistName: '',
     year: '',
     genre: '',
-    description: ''
+    description: '',
+    estimatedValue: null
   };
 
   // Try to extract album name
@@ -395,6 +397,10 @@ function extractAlbumInfoFromText(text) {
   // Try to extract genre
   const genreMatch = text.match(/genre[:\s]+["']?([^"'\n]+)["']?/i);
   if (genreMatch) info.genre = genreMatch[1].trim();
+
+  // Try to extract estimated value
+  const valueMatch = text.match(/value[:\s]+\$?(\d+(?:\.\d{2})?)/i);
+  if (valueMatch) info.estimatedValue = parseFloat(valueMatch[1]);
 
   // Use first sentence as description
   const sentences = text.split(/[.!?]/);
