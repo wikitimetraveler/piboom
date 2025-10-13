@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Voice DJ - Talk to Your Music</title>
+  <title>Wolfman Dave - Talk to Your Music</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/styles.css"/>
@@ -84,6 +84,106 @@
       50% {
         transform: scale(1.15);
         box-shadow: 0 20px 60px rgba(0, 255, 136, 0.8);
+      }
+    }
+
+    /* User Selector Panel */
+    .user-selector-panel {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(236, 0, 140, 0.3);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .user-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .user-card-dj {
+      background: rgba(255, 255, 255, 0.08);
+      border: 3px solid rgba(200, 200, 200, 0.2);
+      border-radius: 16px;
+      padding: 20px 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .user-card-dj:hover {
+      transform: translateY(-8px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(236, 0, 140, 0.5);
+      border-color: rgba(236, 0, 140, 0.6);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .user-card-dj.active {
+      background: linear-gradient(135deg, rgba(236, 0, 140, 0.3), rgba(252, 103, 103, 0.2));
+      border-color: #ec008c;
+      border-width: 4px;
+      box-shadow: 0 6px 20px rgba(236, 0, 140, 0.6);
+      transform: scale(1.05);
+    }
+
+    .user-icon-dj {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 10px;
+      display: block;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid rgba(200, 200, 200, 0.3);
+      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    .user-card-dj:hover .user-icon-dj {
+      border-color: rgba(236, 0, 140, 0.6);
+      transform: scale(1.1);
+    }
+
+    .user-card-dj.active .user-icon-dj {
+      border-color: #ec008c;
+      border-width: 4px;
+      animation: djUserPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes djUserPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .user-name-dj {
+      font-weight: 600;
+      font-size: 15px;
+      color: #eee;
+      line-height: 1.3;
+    }
+
+    .user-card-dj.active .user-name-dj {
+      color: #ec008c;
+      font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+      .user-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+      }
+      
+      .user-icon-dj {
+        width: 60px;
+        height: 60px;
+      }
+      
+      .user-name-dj {
+        font-size: 13px;
       }
     }
 
@@ -247,14 +347,41 @@
 <div class="dj-container">
   <!-- Header -->
   <div class="dj-header">
-    <h1>🎤 Voice DJ</h1>
+    <h1>🎤 Wolfman Dave</h1>
     <p style="font-size: 1.3rem; color: #ccc; margin: 0;">
-      Just talk - I'll find the music you're looking for
+      Just talk - I'll search and show you the albums you're looking for
     </p>
   </div>
 
-  <!-- User Selector -->
-  <div id="userSelectorContainer"></div>
+  <!-- User Selector with LangChain Memory -->
+  <div class="user-selector-panel">
+    <h5 style="text-align: center; color: #ec008c; margin-bottom: 20px;">
+      <i class="bi-person-circle"></i> Select User (Each has their own conversation memory)
+    </h5>
+    <div class="user-grid">
+      <div class="user-card-dj active" data-user="cosmic-turtle" onclick="selectDJUser('cosmic-turtle')">
+        <img src="/images/cosmic turtle.png" alt="Cosmic Turtle" class="user-icon-dj">
+        <div class="user-name-dj">Cosmic Turtle</div>
+      </div>
+      <div class="user-card-dj" data-user="easy-levi" onclick="selectDJUser('easy-levi')">
+        <img src="/images/levi.png" alt="Easy Levi" class="user-icon-dj">
+        <div class="user-name-dj">Easy Levi</div>
+      </div>
+      <div class="user-card-dj" data-user="wizened-wizard" onclick="selectDJUser('wizened-wizard')">
+        <img src="/images/genie.png" alt="Wizened Wizard" class="user-icon-dj">
+        <div class="user-name-dj">Wizened Wizard</div>
+      </div>
+      <div class="user-card-dj" data-user="jerry-garcia" onclick="selectDJUser('jerry-garcia')">
+        <img src="/images/jerry.png" alt="Jerry Garcia" class="user-icon-dj">
+        <div class="user-name-dj">Jerry Garcia</div>
+      </div>
+      <div class="user-card-dj" data-user="fuzz-maestro" onclick="selectDJUser('fuzz-maestro')">
+        <img src="/images/fuzz.png" alt="Fuzz Maestro" class="user-icon-dj">
+        <div class="user-name-dj">Fuzz Maestro</div>
+      </div>
+    </div>
+    <input type="hidden" id="selectedUserId" value="cosmic-turtle">
+  </div>
 
   <!-- Voice Interface -->
   <div class="voice-interface">
@@ -272,18 +399,31 @@
 
     <!-- Suggestion Pills -->
     <div class="suggestion-pills">
-      <div class="suggestion-pill" onclick="useSuggestion('Play something funky from 1973')">
-        "Play something funky from 1973"
+      <div class="suggestion-pill" onclick="useSuggestion('Show me funky albums from 1973')">
+        "Show me funky albums from 1973"
       </div>
-      <div class="suggestion-pill" onclick="useSuggestion('Show me albums with blue covers')">
-        "Show me albums with blue covers"
+      <div class="suggestion-pill" onclick="useSuggestion('Find albums with blue covers')">
+        "Find albums with blue covers"
       </div>
-      <div class="suggestion-pill" onclick="useSuggestion('Find me some psychedelic rock')">
-        "Find me some psychedelic rock"
+      <div class="suggestion-pill" onclick="useSuggestion('Search for psychedelic rock')">
+        "Search for psychedelic rock"
       </div>
-      <div class="suggestion-pill" onclick="useSuggestion('What were the hits in 1969')">
-        "What were the hits in 1969?"
+      <div class="suggestion-pill" onclick="useSuggestion('What albums came out in 1969')">
+        "What albums came out in 1969?"
       </div>
+    </div>
+
+    <!-- Memory Controls -->
+    <div style="margin-top: 25px; text-align: center;">
+      <button class="btn btn-info btn-sm mr-2" onclick="showVoiceDJHistory()">
+        <i class="bi-clock-history"></i> Show History
+      </button>
+      <button class="btn btn-warning btn-sm mr-2" onclick="showVoiceDJStats()">
+        <i class="bi-graph-up"></i> Show Stats
+      </button>
+      <button class="btn btn-danger btn-sm" onclick="clearVoiceDJHistory()">
+        <i class="bi-trash"></i> Clear History
+      </button>
     </div>
   </div>
 
@@ -302,6 +442,18 @@
   <!-- Results Grid -->
   <div id="resultsGrid" class="results-grid">
     <!-- Results will be dynamically added here -->
+  </div>
+
+  <!-- YouTube Videos Section -->
+  <div id="youtubeSection" style="display: none; margin-top: 40px;">
+    <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(236, 0, 140, 0.3); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px);">
+      <h3 style="color: #ec008c; margin-bottom: 20px; text-align: center;">
+        <i class="bi-youtube" style="color: #ff0000;"></i> Watch on YouTube
+      </h3>
+      <div id="youtubeGrid" class="results-grid">
+        <!-- YouTube videos will be added here -->
+      </div>
+    </div>
   </div>
 </div>
 
@@ -381,18 +533,44 @@ function useSuggestion(text) {
   processVoiceCommand(text);
 }
 
+// Select user by clicking icon
+function selectDJUser(userId) {
+  // Remove active class from all user cards
+  document.querySelectorAll('.user-card-dj').forEach(card => {
+    card.classList.remove('active');
+  });
+  
+  // Add active class to selected user card
+  const selectedCard = document.querySelector(`[data-user="${userId}"]`);
+  if (selectedCard) {
+    selectedCard.classList.add('active');
+  }
+  
+  // Update hidden input
+  document.getElementById('selectedUserId').value = userId;
+  
+  // Update status
+  const userName = selectedCard ? selectedCard.querySelector('.user-name-dj').textContent : userId;
+  document.getElementById('voiceStatus').textContent = `Switched to ${userName} 🎵`;
+  
+  console.log(`👤 Voice DJ user changed to: ${userId}`);
+}
+
 // Process voice command
 async function processVoiceCommand(command) {
   document.getElementById('voiceStatus').textContent = 'Processing...';
   
   try {
-    // Send to backend for AI processing
+    // Get selected user for LangChain memory
+    const userId = document.getElementById('selectedUserId').value;
+    
+    // Send to backend for AI processing with LangChain memory
     const response = await fetch('/api/voice-dj/process', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         command: command,
-        userId: getCurrentUser().id
+        userId: userId
       })
     });
     
@@ -406,6 +584,9 @@ async function processVoiceCommand(command) {
       // Show results if any
       if (data.results && data.results.length > 0) {
         displayResults(data.results, data.resultType);
+        
+        // Automatically search YouTube for relevant videos
+        searchYouTubeForResults(data);
       }
       
       // Speak the response
@@ -459,6 +640,7 @@ function displayResults(results, type) {
 }
 
 // Speak response
+// Speak with Wolfman Dave's voice - deep, gravelly radio DJ style
 function speakResponse(text) {
   if ('speechSynthesis' in window) {
     // Stop any ongoing speech
@@ -468,11 +650,251 @@ function speakResponse(text) {
     const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
     
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.rate = 0.9;
-    utterance.pitch = 1.0;
-    utterance.volume = 0.8;
+    
+    // WOLFMAN DAVE VOICE SETTINGS - Deep, gravelly radio DJ voice
+    utterance.rate = 0.85;      // Slightly slower, more dramatic
+    utterance.pitch = 0.65;     // Much lower pitch - deep gravelly voice
+    utterance.volume = 1.0;     // Full volume for that radio presence
+    
+    // Try to find a deep male voice
+    const voices = window.speechSynthesis.getVoices();
+    const deepVoice = voices.find(voice => 
+      voice.name.toLowerCase().includes('male') ||
+      voice.name.toLowerCase().includes('daniel') ||
+      voice.name.toLowerCase().includes('david') ||
+      voice.name.toLowerCase().includes('alex')
+    );
+    
+    if (deepVoice) {
+      utterance.voice = deepVoice;
+      console.log('🐺 Wolfman Dave using voice:', deepVoice.name);
+    }
+    
+    // Add some wolfman attitude to the console
+    console.log('🐺 Wolfman Dave says:', cleanText);
     
     window.speechSynthesis.speak(utterance);
+  }
+}
+
+// Load voices when available (needed for voice selection)
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = () => {
+    const voices = window.speechSynthesis.getVoices();
+    console.log('🎤 Available voices for Wolfman Dave:', voices.length);
+  };
+}
+
+// Search YouTube based on Voice DJ results
+async function searchYouTubeForResults(data) {
+  try {
+    // Build search query from the results
+    let searchQuery = '';
+    
+    if (data.intent === 'search_artist' && data.results && data.results.length > 0) {
+      // Search for artist's top songs
+      searchQuery = `${data.results[0].artist} greatest hits live`;
+    } else if (data.intent === 'search_album' && data.results && data.results.length > 0) {
+      // Search for specific album
+      searchQuery = `${data.results[0].artist} ${data.results[0].album} full album`;
+    } else if (data.intent === 'search_year' && data.results && data.results.length > 0) {
+      // Search for hits from that year
+      const year = data.results[0].year;
+      searchQuery = `best songs ${year} hits`;
+    } else if (data.intent === 'search_genre') {
+      // Search for genre playlists
+      searchQuery = data.searchQuery || 'music';
+    } else {
+      // Default: use the search query
+      searchQuery = data.searchQuery || data.results[0]?.artist || 'music';
+    }
+    
+    console.log('🔍 Searching YouTube for:', searchQuery);
+    
+    // Call YouTube search API
+    const response = await fetch('/api/chat/youtube-search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: searchQuery })
+    });
+    
+    const youtubeData = await response.json();
+    
+    if (youtubeData.success && youtubeData.videos && youtubeData.videos.length > 0) {
+      displayYouTubeVideos(youtubeData.videos);
+    }
+  } catch (error) {
+    console.error('Error searching YouTube:', error);
+  }
+}
+
+// Display YouTube videos
+function displayYouTubeVideos(videos) {
+  const youtubeSection = document.getElementById('youtubeSection');
+  const youtubeGrid = document.getElementById('youtubeGrid');
+  
+  youtubeGrid.innerHTML = '';
+  
+  videos.slice(0, 6).forEach(video => {
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.style.cursor = 'pointer';
+    card.onclick = () => window.open(video.url, '_blank');
+    
+    card.innerHTML = `
+      <img src="${video.thumbnail}" alt="${video.title}" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+      <div style="font-weight: 600; margin-top: 10px; color: #fc6767; font-size: 0.95rem; line-height: 1.3;">
+        ${video.title}
+      </div>
+      <div style="font-size: 0.85rem; color: #ccc; margin-top: 5px;">
+        ${video.channel}
+      </div>
+      <div style="margin-top: 10px;">
+        <i class="bi-play-circle-fill" style="color: #ff0000; font-size: 1.5rem;"></i>
+      </div>
+    `;
+    
+    youtubeGrid.appendChild(card);
+  });
+  
+  // Show YouTube section
+  youtubeSection.style.display = 'block';
+  
+  console.log(`✅ Displayed ${videos.length} YouTube videos`);
+}
+
+// Show conversation history for Voice DJ
+async function showVoiceDJHistory() {
+  const userId = document.getElementById('selectedUserId').value;
+  
+  try {
+    const response = await fetch(`/api/chat/langchain/history?userId=${userId}&sessionId=voice-dj&limit=30`);
+    const data = await response.json();
+    
+    if (data.success && data.history.length > 0) {
+      let historyHTML = '<div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-top: 20px; max-height: 400px; overflow-y: auto;">';
+      historyHTML += '<h4 style="color: #ec008c; margin-bottom: 15px;"><i class="bi-clock-history"></i> Conversation History</h4>';
+      
+      data.history.forEach((msg, i) => {
+        const isUser = msg.role === 'user';
+        const bgColor = isUser ? 'rgba(52, 152, 219, 0.2)' : 'rgba(236, 0, 140, 0.2)';
+        const icon = isUser ? '👤' : '🐺';
+        const label = isUser ? 'You' : 'Wolfman Dave';
+        
+        historyHTML += `
+          <div style="background: ${bgColor}; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid ${isUser ? '#3498db' : '#ec008c'};">
+            <strong style="color: ${isUser ? '#3498db' : '#ec008c'};">${icon} ${label}:</strong>
+            <div style="color: #eee; margin-top: 5px; font-size: 0.95rem;">${msg.content.substring(0, 200)}${msg.content.length > 200 ? '...' : ''}</div>
+          </div>
+        `;
+      });
+      
+      historyHTML += `<p style="text-align: center; color: #999; margin-top: 15px;">Total: ${data.history.length} messages</p>`;
+      historyHTML += '</div>';
+      
+      // Show in DJ response section
+      document.getElementById('djResponseText').innerHTML = historyHTML;
+      document.getElementById('djResponseSection').style.display = 'block';
+      
+      console.log(`✅ Displayed ${data.history.length} messages from history`);
+    } else {
+      document.getElementById('djResponseText').innerHTML = '<p style="color: #ccc; text-align: center;">No conversation history found. Start talking to Wolfman Dave!</p>';
+      document.getElementById('djResponseSection').style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Error loading history:', error);
+    alert('Error loading conversation history');
+  }
+}
+
+// Show conversation statistics
+async function showVoiceDJStats() {
+  const userId = document.getElementById('selectedUserId').value;
+  
+  try {
+    const response = await fetch(`/api/chat/langchain/stats?userId=${userId}`);
+    const data = await response.json();
+    
+    if (data.success && data.stats) {
+      const stats = data.stats;
+      const lastActivity = stats.last_message_at 
+        ? new Date(stats.last_message_at).toLocaleString() 
+        : 'Never';
+      
+      const statsHTML = `
+        <div style="background: rgba(236, 0, 140, 0.2); padding: 30px; border-radius: 12px; margin-top: 20px; border: 2px solid #ec008c;">
+          <h4 style="color: #ec008c; margin-bottom: 20px; text-align: center;">
+            <i class="bi-graph-up"></i> 🐺 Wolfman Dave Stats for ${userId}
+          </h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center;">
+            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+              <div style="font-size: 2.5rem; color: #fc6767; font-weight: bold;">${stats.message_count || 0}</div>
+              <div style="color: #ccc; margin-top: 5px;">Total Messages</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+              <div style="font-size: 2.5rem; color: #00ff88; font-weight: bold;">${stats.conversation_count || 0}</div>
+              <div style="color: #ccc; margin-top: 5px;">Conversations</div>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
+              <div style="font-size: 1.2rem; color: #00ddff; font-weight: 600;">${lastActivity}</div>
+              <div style="color: #ccc; margin-top: 5px;">Last Activity</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('djResponseText').innerHTML = statsHTML;
+      document.getElementById('djResponseSection').style.display = 'block';
+      
+      console.log('📊 Stats displayed:', stats);
+    } else {
+      document.getElementById('djResponseText').innerHTML = '<p style="color: #ccc; text-align: center;">No stats available yet. Start talking to Wolfman Dave!</p>';
+      document.getElementById('djResponseSection').style.display = 'block';
+    }
+  } catch (error) {
+    console.error('Error getting stats:', error);
+    alert('Error loading conversation stats');
+  }
+}
+
+// Clear conversation history
+async function clearVoiceDJHistory() {
+  const userId = document.getElementById('selectedUserId').value;
+  
+  if (!confirm(`Clear all conversation history for ${userId}? This cannot be undone!`)) {
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/chat/langchain/history', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        userId: userId, 
+        sessionId: 'voice-dj' 
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      const clearHTML = `
+        <div style="background: rgba(0, 255, 136, 0.2); padding: 30px; border-radius: 12px; margin-top: 20px; text-align: center;">
+          <h4 style="color: #00ff88; margin-bottom: 15px;">
+            ✅ History Cleared!
+          </h4>
+          <p style="color: #eee;">Fresh start for ${userId}! All conversation history has been deleted from PostgreSQL. 🎵</p>
+        </div>
+      `;
+      
+      document.getElementById('djResponseText').innerHTML = clearHTML;
+      document.getElementById('djResponseSection').style.display = 'block';
+      
+      console.log('✅ Conversation history cleared for', userId);
+    }
+  } catch (error) {
+    console.error('Error clearing history:', error);
+    alert('Error clearing conversation history');
   }
 }
 </script>

@@ -151,7 +151,49 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_trees_location ON trees(latitude, longitude)
     `);
 
-    console.log('✅ Database tables created successfully');
+    // Create conversations table for LangChain memory
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS conversations (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100) NOT NULL,
+        session_id VARCHAR(255) NOT NULL,
+        assistant_type VARCHAR(50) DEFAULT 'levi',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, session_id)
+      )
+    `);
+
+    // Create messages table for conversation history
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        conversation_id INTEGER REFERENCES conversations(id) ON DELETE CASCADE,
+        user_id VARCHAR(100) NOT NULL,
+        role VARCHAR(20) NOT NULL CHECK (role IN ('system', 'user', 'assistant')),
+        content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create indexes for fast message retrieval
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_messages_user ON messages(user_id)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at DESC)
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations(user_id)
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory)');
   } catch (error) {
     console.error('❌ Error creating tables:', error.message);
     console.error('   Database operations will be unavailable');

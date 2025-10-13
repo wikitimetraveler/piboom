@@ -103,6 +103,113 @@
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
   }
   
+  /* System Messages */
+  .system-message {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1));
+    color: #2c3e50;
+    margin: 0 auto;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    border-left: 4px solid #3498db;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-style: italic;
+    text-align: center;
+    max-width: 90%;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+  }
+
+  /* User Icon Grid */
+  .user-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+
+  .user-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(248, 250, 252, 0.9));
+    border: 3px solid rgba(200, 200, 200, 0.4);
+    border-radius: 16px;
+    padding: 20px 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+  }
+
+  .user-card:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+    border-color: rgba(52, 152, 219, 0.6);
+  }
+
+  .user-card.active {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.2), rgba(41, 128, 185, 0.15));
+    border-color: #3498db;
+    border-width: 4px;
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+    transform: scale(1.05);
+  }
+
+  .user-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 10px;
+    display: block;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(200, 200, 200, 0.3);
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+  }
+
+  .user-card:hover .user-icon {
+    border-color: rgba(52, 152, 219, 0.6);
+    transform: scale(1.1);
+  }
+
+  .user-card.active .user-icon {
+    border-color: #3498db;
+    border-width: 4px;
+    animation: userPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes userPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .user-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: #2c3e50;
+    line-height: 1.3;
+  }
+
+  .user-card.active .user-name {
+    color: #3498db;
+    font-weight: 700;
+  }
+
+  @media (max-width: 768px) {
+    .user-grid {
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 12px;
+    }
+    
+    .user-icon {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .user-name {
+      font-size: 13px;
+    }
+  }
+  
   /* Zen Typing Indicator */
   .typing-indicator {
     display: none;
@@ -684,11 +791,40 @@
 <div class="assistant-container">
   <div class="greeting-section">
     <h2><i class="bi-music-note-beamed"></i> Meet Your Music Assistant</h2>
-    <p id="assistantDescription">Your music assistant is ready to help! Select an assistant below to get started. 🎵</p>
+    <p id="assistantDescription">Your music assistant is ready to help! Select a user and assistant below to get started. 🎵</p>
+    
+    <!-- User Selector - Icon Grid -->
+    <div class="user-switcher mb-3">
+      <label class="form-label mb-3">Select User (for conversation memory):</label>
+      <div class="user-grid">
+        <div class="user-card active" data-user="cosmic-turtle" onclick="selectUser('cosmic-turtle')">
+          <img src="/images/cosmic turtle.png" alt="Cosmic Turtle" class="user-icon">
+          <div class="user-name">Cosmic Turtle</div>
+        </div>
+        <div class="user-card" data-user="easy-levi" onclick="selectUser('easy-levi')">
+          <img src="/images/levi.png" alt="Easy Levi" class="user-icon">
+          <div class="user-name">Easy Levi</div>
+        </div>
+        <div class="user-card" data-user="wizened-wizard" onclick="selectUser('wizened-wizard')">
+          <img src="/images/genie.png" alt="Wizened Wizard" class="user-icon">
+          <div class="user-name">Wizened Wizard</div>
+        </div>
+        <div class="user-card" data-user="jerry-garcia" onclick="selectUser('jerry-garcia')">
+          <img src="/images/jerry.png" alt="Jerry Garcia" class="user-icon">
+          <div class="user-name">Jerry Garcia</div>
+        </div>
+        <div class="user-card" data-user="fuzz-maestro" onclick="selectUser('fuzz-maestro')">
+          <img src="/images/fuzz.png" alt="Fuzz Maestro" class="user-icon">
+          <div class="user-name">Fuzz Maestro</div>
+        </div>
+      </div>
+      <input type="hidden" id="userSelect" value="cosmic-turtle">
+      <small class="text-muted d-block mt-2">Click a user - each has their own conversation history saved in PostgreSQL</small>
+    </div>
     
     <!-- Assistant Switcher -->
     <div class="assistant-switcher mb-3">
-      <label for="assistantSelect" class="form-label">Choose Your Assistant:</label>
+      <label for="assistantSelect" class="form-label">Choose Your Assistant Personality:</label>
       <select id="assistantSelect" class="form-control" onchange="switchAssistant()">
         <option value="levi">🏍️ Levi - Biker Hippie (70s)</option>
         <option value="robert">🎸 Robert - Delta Blues Player (50s)</option>
@@ -704,9 +840,17 @@
       </select>
     </div>
     
+    <div class="btn-group" role="group">
     <button class="btn btn-light" onclick="getGreeting()">
       <i class="bi-chat-dots"></i> Get a Greeting
     </button>
+      <button class="btn btn-info" onclick="loadConversationHistory()">
+        <i class="bi-clock-history"></i> Load History
+      </button>
+      <button class="btn btn-warning" onclick="showConversationStats()">
+        <i class="bi-graph-up"></i> Show Stats
+    </button>
+    </div>
   </div>
 
   <div class="quick-actions">
@@ -726,13 +870,13 @@
 
   <div class="voice-controls text-center mb-3">
     <button class="btn btn-success mr-2" onclick="initVoice()" id="initVoiceBtn">
-      <i class="bi-mic"></i> Initialize Voice
+      <i class="bi-mic"></i> Enable Voice
     </button>
     <button class="btn btn-primary mr-2" onclick="startVoice()" id="startVoiceBtn" disabled>
-      <i class="bi-mic-fill"></i> Start Listening
+      <i class="bi-mic-fill"></i> Ask Question
     </button>
     <button class="btn btn-warning mr-2" onclick="stopVoice()" id="stopVoiceBtn" disabled>
-      <i class="bi-mic-mute"></i> Stop Listening
+      <i class="bi-mic-mute"></i> Stop
     </button>
     <button class="btn btn-danger mr-2" onclick="stopSpeaking()" id="stopSpeakingBtn">
       <i class="bi-stop-circle"></i> Stop Speaking
@@ -1000,13 +1144,20 @@ async function sendVoiceMessage(message) {
     }
     // Don't set isCurrentlySpeaking to false here - let new speech start
     
-    const response = await fetch('/api/chat/chat', {
+    // Get current user and assistant
+    const userId = document.getElementById('userSelect').value;
+    const assistant = document.getElementById('assistantSelect').value;
+    
+    const response = await fetch('/api/chat/langchain/chat', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         message: message,
+        userId: userId,
+        assistant: assistant,
+        sessionId: 'default',
         context: { source: 'voice_command' }
       })
     });
@@ -1339,6 +1490,10 @@ function sendMessage() {
   }
   // Don't set isCurrentlySpeaking to false here - let new speech start
   
+  // Get current user and assistant
+  const userId = document.getElementById('userSelect').value;
+  const assistant = document.getElementById('assistantSelect').value;
+  
   // Add user message to chat
   addMessage(message, 'user');
   input.value = '';
@@ -1346,14 +1501,17 @@ function sendMessage() {
   // Show typing indicator
   showTypingIndicator();
   
-  // Send to assistant
-  fetch('/api/chat/chat', {
+  // Send to LangChain assistant with PostgreSQL memory
+  fetch('/api/chat/langchain/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       message: message,
+      userId: userId,
+      assistant: assistant,
+      sessionId: 'default',
       context: { source: 'web_interface' }
     })
   })
@@ -1362,6 +1520,10 @@ function sendMessage() {
     hideTypingIndicator();
     if (data.response) {
       addMessage(data.response, 'assistant', data.personality);
+      // Update stats display if visible
+      if (data.messageCount) {
+        console.log(`💬 Total messages in conversation: ${data.messageCount}`);
+      }
       // Make assistant speak their response
       if (voiceEnabled) {
         makeAssistantSpeak(data.response);
@@ -1402,6 +1564,9 @@ function addMessage(text, sender, personality = 'engaging') {
     if (personality && personality !== 'engaging') {
       messageDiv.innerHTML += ` <span class="personality-badge">${personality}</span>`;
     }
+  } else if (sender === 'system') {
+    // System messages (for history loading, stats, etc.)
+    messageDiv.innerHTML = text;
   } else {
     messageDiv.innerHTML = `<strong>You:</strong> ${text}`;
   }
@@ -1445,10 +1610,115 @@ function clearChat() {
     addQuickActionButtons(savedArtist);
   }
   
-  // Also clear server-side history
-  fetch('/api/chat/history', { method: 'DELETE' })
+  // Clear LangChain PostgreSQL history
+  const userId = document.getElementById('userSelect').value;
+  fetch('/api/chat/langchain/history', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId: userId, sessionId: 'default' })
+  })
     .then(response => response.json())
-    .then(data => console.log('Chat history cleared:', data));
+    .then(data => {
+      console.log('✅ Chat history cleared:', data);
+      addMessage(`Conversation history cleared for ${userId}! Fresh start! 🎵`, 'system');
+    })
+    .catch(err => console.error('Error clearing history:', err));
+}
+
+// Load conversation history from PostgreSQL
+async function loadConversationHistory() {
+  const userId = document.getElementById('userSelect').value;
+  
+  try {
+    const response = await fetch(`/api/chat/langchain/history?userId=${userId}&sessionId=default&limit=20`);
+    const data = await response.json();
+    
+    if (data.success && data.history.length > 0) {
+      // Clear current chat
+      const chatMessages = document.getElementById('chatMessages');
+      chatMessages.innerHTML = '';
+      
+      // Display history
+      data.history.forEach(msg => {
+        if (msg.role === 'user') {
+          addMessage(msg.content, 'user');
+        } else if (msg.role === 'assistant') {
+          addMessage(msg.content, 'assistant');
+        }
+      });
+      
+      addMessage(`📜 Loaded ${data.history.length} messages from history`, 'system');
+      console.log(`✅ Loaded conversation history for ${userId}:`, data.stats);
+    } else {
+      addMessage('No conversation history found for this user. Start chatting!', 'system');
+    }
+  } catch (error) {
+    console.error('Error loading history:', error);
+    addMessage('Error loading conversation history', 'system');
+  }
+}
+
+// Show conversation statistics
+async function showConversationStats() {
+  const userId = document.getElementById('userSelect').value;
+  
+  try {
+    const response = await fetch(`/api/chat/langchain/stats?userId=${userId}`);
+    const data = await response.json();
+    
+    if (data.success && data.stats) {
+      const stats = data.stats;
+      const lastActivity = stats.last_message_at 
+        ? new Date(stats.last_message_at).toLocaleString() 
+        : 'Never';
+      
+      const statsMessage = `📊 Conversation Stats for ${userId}:\n` +
+        `💬 Total Messages: ${stats.message_count || 0}\n` +
+        `🗨️ Conversations: ${stats.conversation_count || 0}\n` +
+        `🕐 Last Activity: ${lastActivity}`;
+      
+      addMessage(statsMessage, 'system');
+      console.log('📊 Stats:', stats);
+    } else {
+      addMessage('No stats available for this user yet', 'system');
+    }
+  } catch (error) {
+    console.error('Error getting stats:', error);
+    addMessage('Error loading conversation stats', 'system');
+  }
+}
+
+// Handle user selection by clicking icon
+function selectUser(userId) {
+  // Remove active class from all user cards
+  document.querySelectorAll('.user-card').forEach(card => {
+    card.classList.remove('active');
+  });
+  
+  // Add active class to selected user card
+  const selectedCard = document.querySelector(`[data-user="${userId}"]`);
+  if (selectedCard) {
+    selectedCard.classList.add('active');
+  }
+  
+  // Update hidden input
+  document.getElementById('userSelect').value = userId;
+  
+  // Get user name for display
+  const userName = selectedCard ? selectedCard.querySelector('.user-name').textContent : userId;
+  
+  // Log and notify
+  console.log(`👤 User changed to: ${userId}`);
+  addMessage(`👤 Switched to ${userName}. Loading conversation history...`, 'system');
+  
+  // Load conversation history for this user
+  loadConversationHistory();
+}
+
+// Legacy function for compatibility
+function onUserChange() {
+  const userId = document.getElementById('userSelect').value;
+  selectUser(userId);
 }
 
 function getGreeting() {
@@ -1720,6 +1990,16 @@ function searchOtherArtist() {
     }
   }
 }
+
+// Load conversation history when page loads
+window.addEventListener('DOMContentLoaded', function() {
+  console.log('🎵 piBoom Assistant loaded with LangChain + PostgreSQL memory!');
+  const userId = document.getElementById('userSelect').value;
+  console.log(`👤 Current user: ${userId}`);
+  
+  // Optionally auto-load history on page load (commented out by default)
+  // loadConversationHistory();
+});
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

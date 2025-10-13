@@ -1,12 +1,23 @@
 import axios from 'axios';
+import OpenAI from 'openai';
+import { getUserConversationHistory } from '../services/langchain-memory.service.js';
+import { getPool } from '../services/database.service.js';
 
-// Process voice DJ command
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Process voice DJ command with LangChain memory
 export async function processVoiceCommand(req, res) {
   try {
-    const { command, userId } = req.body;
+    const { command, userId = 'cosmic-turtle' } = req.body;
     
     if (!command) {
       return res.status(400).json({ error: 'Command is required' });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required for conversation persistence' });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
@@ -17,53 +28,112 @@ export async function processVoiceCommand(req, res) {
       });
     }
 
-    console.log('🎤 Voice DJ command:', command);
+    console.log(`🎤 Voice DJ command from ${userId}:`, command);
 
-    // Use OpenAI to understand the command and extract intent
-    const aiResponse = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
+    // Get conversation history from PostgreSQL
+    const history = await getUserConversationHistory(userId, 'voice-dj', 10);
+    
+    // Build messages array with history
+    const messages = [
       {
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a groovy music DJ assistant. Parse user commands and extract:
-1. Intent: search_artist, search_album, search_year, search_genre, random_pick, general_question
-2. Parameters: artist name, album name, year, genre, color, mood
-3. A fun, conversational response (1-2 sentences, groovy DJ personality)
+        role: 'system',
+        content: `You are a groovy music DJ assistant with conversation memory! 
 
-Respond in JSON format:
+IMPORTANT: You SEARCH and SHOW albums - you don't actually play music. The user will see album covers and can click to explore.
+
+CRITICAL: You MUST respond with valid JSON that has both:
+1. A "response" field - groovy text that Wolfman Dave will SPEAK to the user
+2. "intent" and "parameters" - to trigger album searches and YouTube videos
+
+Parse user commands and extract:
+- Intent: search_artist, search_album, search_year, search_genre, random_pick, general_question
+- Parameters: artist name, album name, year, genre, mood
+- Response: What Wolfman Dave will SPEAK (make it groovy!)
+- SearchQuery: What to search for
+
+REMEMBER PAST CONVERSATIONS! If the user says "more like that" or "something similar", reference what they searched for before.
+
+ALWAYS return this JSON structure:
 {
-  "intent": "search_year",
-  "parameters": {"year": "1973", "genre": "funk"},
-  "response": "Far out! Let me spin you some funky grooves from '73!",
-  "searchQuery": "funk 1973"
+  "intent": "search_artist",
+  "parameters": {"artist": "Jimi Hendrix"},
+  "response": "Right on! Let me show you Jimi Hendrix - the guitar master! Albums and videos coming up!",
+  "searchQuery": "Jimi Hendrix"
 }
 
-Examples:
-- "Play something funky from 1973" → intent: search_year, parameters: {year: "1973", genre: "funk"}
-- "Show me albums with blue covers" → intent: search_color, parameters: {color: "blue"}
-- "Find Pink Floyd" → intent: search_artist, parameters: {artist: "Pink Floyd"}
-- "What were the hits in 1969" → intent: search_year, parameters: {year: "1969"}`
-          },
-          {
-            role: 'user',
-            content: command
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 300
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+The "response" field will be spoken by Wolfman Dave's deep voice.
+The "intent" and "parameters" will trigger album searches and YouTube videos.
 
-    const aiResult = JSON.parse(aiResponse.data.choices[0].message.content);
-    console.log('🤖 AI parsed:', aiResult);
+Examples:
+- "Find Jimi Hendrix" → {"intent": "search_artist", "parameters": {"artist": "Jimi Hendrix"}, "response": "Far out! Jimi Hendrix - the guitar legend! Check out these albums!", "searchQuery": "Jimi Hendrix"}
+- "Show me something from 1973" → {"intent": "search_year", "parameters": {"year": "1973"}, "response": "Groovy! Here are some killer albums from 1973!", "searchQuery": "1973"}
+- "Give me some songs" → {"intent": "random_pick", "parameters": {}, "response": "Right on! Here's some far out music for you!", "searchQuery": "classic rock"}
+
+RESPOND WITH ONLY VALID JSON!`
+      },
+      // Add conversation history
+      ...history.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      })),
+      {
+        role: 'user',
+        content: command
+      }
+    ];
+
+    // Call OpenAI with JSON mode
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages: messages,
+      temperature: 0.7,
+      max_tokens: 300,
+      response_format: { type: "json_object" }
+    });
+
+    const rawResponse = completion.choices[0].message.content;
+    console.log('🤖 Raw AI response:', rawResponse);
+
+    let aiResult;
+    try {
+      aiResult = JSON.parse(rawResponse);
+      console.log('✅ Parsed JSON:', aiResult);
+      
+      // Ensure required fields exist
+      if (!aiResult.intent) aiResult.intent = 'general_question';
+      if (!aiResult.response) aiResult.response = 'Right on! Let me search for that!';
+      if (!aiResult.searchQuery) aiResult.searchQuery = command;
+      if (!aiResult.parameters) aiResult.parameters = {};
+      
+    } catch (parseError) {
+      console.error('❌ JSON parsing failed. Raw response:', rawResponse);
+      
+      // Smart fallback - try to extract artist/year from command
+      const yearMatch = command.match(/\b(19\d{2}|20\d{2})\b/);
+      const artistKeywords = ['find', 'show', 'search', 'get'];
+      
+      if (yearMatch) {
+        // Command mentions a year
+        aiResult = {
+          intent: 'search_year',
+          parameters: { year: yearMatch[1] },
+          response: `Groovy! Here are some albums from ${yearMatch[1]}!`,
+          searchQuery: yearMatch[1]
+        };
+      } else {
+        // Default to general search
+        aiResult = {
+          intent: 'general_question',
+          parameters: {},
+          response: rawResponse.substring(0, 150) || 'Right on! Let me search for that!',
+          searchQuery: command
+        };
+      }
+    }
+
+    // Save this interaction to PostgreSQL for conversation history
+    await saveVoiceDJConversation(userId, command, JSON.stringify(aiResult));
+
 
     // Execute the intent
     let results = [];
@@ -289,6 +359,48 @@ async function searchAlbums(query) {
 async function getRandomAlbums(userId, limit = 12) {
   // This would query the user's collection - simplified for now
   return [];
+}
+
+// Save Voice DJ conversation to PostgreSQL
+async function saveVoiceDJConversation(userId, userMessage, assistantMessage) {
+  const pool = getPool();
+  
+  if (!pool) {
+    console.log('⚠️  Database not available - skipping conversation save');
+    return;
+  }
+
+  try {
+    // Get or create conversation
+    const conversationResult = await pool.query(
+      `INSERT INTO conversations (user_id, session_id, assistant_type, updated_at)
+       VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+       ON CONFLICT (user_id, session_id)
+       DO UPDATE SET updated_at = CURRENT_TIMESTAMP
+       RETURNING id`,
+      [userId, 'voice-dj', 'voice-dj']
+    );
+    
+    const conversationId = conversationResult.rows[0].id;
+
+    // Save user message
+    await pool.query(
+      `INSERT INTO messages (conversation_id, user_id, role, content)
+       VALUES ($1, $2, $3, $4)`,
+      [conversationId, userId, 'user', userMessage]
+    );
+
+    // Save assistant response
+    await pool.query(
+      `INSERT INTO messages (conversation_id, user_id, role, content)
+       VALUES ($1, $2, $3, $4)`,
+      [conversationId, userId, 'assistant', assistantMessage]
+    );
+
+    console.log(`✅ Saved Voice DJ conversation for ${userId}`);
+  } catch (error) {
+    console.error('❌ Error saving Voice DJ conversation:', error.message);
+  }
 }
 
 export default {

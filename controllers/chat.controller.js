@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import axios from 'axios';
+import { getConversationChain, getUserConversationHistory, clearUserConversationHistory, getUserConversationStats } from '../services/langchain-memory.service.js';
 
 // OpenAI configuration
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -7,7 +8,7 @@ const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,
 });
 
-// Conversation memory for more engaging interactions
+// Conversation memory for more engaging interactions (legacy - kept for compatibility)
 let conversationHistory = [];
 let userPreferences = {};
 let currentAssistant = 'dave'; // Default assistant
@@ -168,8 +169,10 @@ ABOUT PIBOOM - CURRENT TECH STACK:
 - **Raspberry Pi-based music research system** with voice control as the primary interface
 - **Node.js 18+ with Express.js** backend server
 - **PostgreSQL database on Render** for album collection storage (supports up to 5 users)
+- **LangChain + PostgreSQL** for persistent AI conversation memory - each user's chat history is saved and persists across sessions
 - **OpenAI GPT-4o-mini** for AI-powered music insights, recommendations, and AI Vision album identification
 - **OpenAI Vision API** for album cover identification from photos/camera
+- **Camera/Photo upload** for physical album scanning and AI identification
 - **Google Cloud Speech-to-Text** for voice recognition (primary interface)
 - **MusicBrainz API** for detailed artist information and album covers (genres, birth dates, birth places)
 - **Wikipedia API** for comprehensive artist biographies and history
@@ -182,11 +185,13 @@ ABOUT PIBOOM - CURRENT TECH STACK:
 - **Multi-API mashup architecture** - combines multiple data sources for comprehensive music research
 - **Responsive web interface** with collapsible sections and modern UI
 - **Album discovery system** with Google Knowledge Graph widget integration
-- **Camera/Photo upload** for physical album scanning and AI identification
+- **Enterprise-grade conversation memory** - LangChain framework with PostgreSQL backing for production-ready AI conversations
+
 
 CAPABILITIES:
 - Voice-activated music research and artist discovery
 - AI-powered music recommendations and insights
+- **Persistent conversation memory** - Your conversations are saved in PostgreSQL and remember context across sessions
 - AI Vision album cover identification from photos or camera
 - Personal album collection with PostgreSQL storage
 - Flip-card album display with metadata and personal stories
@@ -199,6 +204,7 @@ CAPABILITIES:
 - Real-time voice command processing
 - Multi-source data aggregation for complete artist profiles
 - Album ratings, notes, and detailed metadata management
+- **5 unique users** - Each user (Cosmic Turtle, Easy Levi, Wizened Wizard, Jerry Garcia, Fuzz Maestro) has their own isolated conversation history
 
 CONVERSATION STYLE:
 - Be authentic to your musical background and era
@@ -627,6 +633,144 @@ const getGreeting = async (req, res) => {
   }
 };
 
+/**
+ * Chat with LangChain + PostgreSQL memory (NEW!)
+ * Persists conversation history per user in database
+ */
+const chatWithLangChain = async (req, res) => {
+  try {
+    const { message, userId, context = {}, assistant = 'levi', sessionId = 'default' } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required for conversation persistence' });
+    }
+
+    if (!OPENAI_API_KEY) {
+      return res.status(500).json({ error: 'OpenAI API key not configured' });
+    }
+
+    // Get system prompt based on assistant
+    const systemPrompt = getAssistantSystemPrompt(assistant, context, userPreferences);
+
+    // Get or create conversation chain with PostgreSQL-backed memory
+    const { chain, memory, chatHistory } = await getConversationChain(userId, systemPrompt, sessionId);
+
+    // Call LangChain with conversation history
+    const result = await chain.call({
+      input: message,
+    });
+
+    const response = result.response;
+
+    // Get conversation stats
+    const stats = await getUserConversationStats(userId);
+
+    res.json({ 
+      response,
+      timestamp: new Date().toISOString(),
+      model: "gpt-4o-mini",
+      personality: assistant,
+      userId: userId,
+      sessionId: sessionId,
+      memoryType: "langchain-postgresql",
+      conversationStats: stats,
+      messageCount: stats?.message_count || 0
+    });
+
+  } catch (error) {
+    console.error('❌ LangChain Chat Error:', error.message);
+    res.status(500).json({ error: 'Failed to get chat response', details: error.message });
+  }
+};
+
+/**
+ * Get conversation history for a user (LangChain version)
+ */
+const getLangChainConversationHistory = async (req, res) => {
+  try {
+    const { userId, sessionId = 'default', limit = 50 } = req.query;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const history = await getUserConversationHistory(userId, sessionId, parseInt(limit));
+    const stats = await getUserConversationStats(userId);
+
+    res.json({
+      success: true,
+      userId: userId,
+      sessionId: sessionId,
+      history: history,
+      stats: stats,
+      count: history.length,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Get conversation history error:', error.message);
+    res.status(500).json({ error: 'Failed to get conversation history' });
+  }
+};
+
+/**
+ * Clear conversation history for a user (LangChain version)
+ */
+const clearLangChainConversationHistory = async (req, res) => {
+  try {
+    const { userId, sessionId = 'default' } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const success = await clearUserConversationHistory(userId, sessionId);
+
+    if (success) {
+      res.json({
+        success: true,
+        message: `Conversation history cleared for user ${userId}! Fresh start! 🎵`,
+        userId: userId,
+        sessionId: sessionId,
+        timestamp: new Date().toISOString()
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to clear conversation history' });
+    }
+  } catch (error) {
+    console.error('❌ Clear conversation history error:', error.message);
+    res.status(500).json({ error: 'Failed to clear conversation history' });
+  }
+};
+
+/**
+ * Get conversation stats for a user
+ */
+const getConversationStats = async (req, res) => {
+  try {
+    const { userId } = req.query;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    const stats = await getUserConversationStats(userId);
+
+    res.json({
+      success: true,
+      userId: userId,
+      stats: stats,
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('❌ Get conversation stats error:', error.message);
+    res.status(500).json({ error: 'Failed to get conversation stats' });
+  }
+};
+
 // Search YouTube videos based on chat conversation
 export async function searchYouTubeVideos(req, res) {
   try {
@@ -696,5 +840,10 @@ export {
   updateUserPreferences,
   getGreeting,
   switchAssistant,
-  getCurrentAssistant
+  getCurrentAssistant,
+  // New LangChain + PostgreSQL memory functions
+  chatWithLangChain,
+  getLangChainConversationHistory,
+  clearLangChainConversationHistory,
+  getConversationStats
 };

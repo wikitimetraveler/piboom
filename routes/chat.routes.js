@@ -9,12 +9,17 @@ import {
   getGreeting,
   switchAssistant,
   getCurrentAssistant,
-  searchYouTubeVideos
+  searchYouTubeVideos,
+  // New LangChain + PostgreSQL memory functions
+  chatWithLangChain,
+  getLangChainConversationHistory,
+  clearLangChainConversationHistory,
+  getConversationStats
 } from '../controllers/chat.controller.js';
 
 const router = Router();
 
-// Chat routes
+// Chat routes (legacy - in-memory)
 router.post('/chat', chatWithGPT);
 router.post('/recommendations', getMusicRecommendations);
 router.post('/artist-info', getArtistInfo);
@@ -22,6 +27,12 @@ router.get('/greeting', getGreeting);
 router.get('/history', getConversationHistory);
 router.delete('/history', clearConversationHistory);
 router.put('/preferences', updateUserPreferences);
+
+// NEW LangChain + PostgreSQL Memory Routes 
+router.post('/langchain/chat', chatWithLangChain);
+router.get('/langchain/history', getLangChainConversationHistory);
+router.delete('/langchain/history', clearLangChainConversationHistory);
+router.get('/langchain/stats', getConversationStats);
 
 // Assistant management routes
 router.post('/switch-assistant', switchAssistant);
