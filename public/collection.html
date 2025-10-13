@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/styles.css"/>
   <script src="/user-selector.js"></script>
-  <script src="/user-passwords.js"></script>
+  <script src="/user-login.js"></script>
   <style>
     /* Collection Page Styles */
     .stats-container {
@@ -356,9 +356,12 @@
         <a href="/collection.html" class="active">Collection</a>
         <a href="/music-time-machine.html">Time Machine</a>
         <a href="/poster-generator.html">Poster Gen</a>
-        <a href="/voice-dj.html">Voice DJ</a>
+        <a href="/voice-dj.html">Wolfman Dave</a>
         <a href="/blacklight.html">Gallery</a>
         <a href="/tree-discovery.html">Trees 🐻</a>
+        <button onclick="showLoginPopup()" id="mobileLoginBtn" style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; touch-action: manipulation;">
+          <i class="bi-person-circle"></i> <span id="mobileUserName">Login</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1192,6 +1195,24 @@ function displayYouTubeVideos(videos) {
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+// Update login button to show logged-in user
+window.addEventListener('DOMContentLoaded', () => {
+  const loggedInUser = getLoggedInUser();
+  const loginBtn = document.getElementById('mobileLoginBtn');
+  const userNameSpan = document.getElementById('mobileUserName');
+  
+  if (loggedInUser && loginBtn && userNameSpan) {
+    userNameSpan.textContent = loggedInUser.name.split(' ').slice(-1)[0];
+    loginBtn.style.background = loggedInUser.color;
+    loginBtn.innerHTML = `
+      <img src="${loggedInUser.avatar}" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; margin-right: 6px; vertical-align: middle;">
+      <span>${loggedInUser.name.split(' ').slice(-1)[0]}</span>
+    `;
+  }
+});
+</script>
 </body>
 </html>
 
