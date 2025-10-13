@@ -74,12 +74,17 @@ async function verifyUserPassword(userId, actionDescription = 'perform this acti
         </div>
         
         <div style="position: relative; margin-bottom: 15px;">
-          <input type="password" id="userPasswordInput" 
+          <input type="text" id="userPasswordInput" 
                  placeholder="Enter password..." 
-                 style="width: 100%; padding: 12px 45px 12px 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 1rem; box-sizing: border-box;"
-                 autocomplete="off">
+                 inputmode="text"
+                 autocomplete="off" 
+                 autocorrect="off" 
+                 autocapitalize="off" 
+                 spellcheck="false"
+                 style="width: 100%; padding: 14px 50px 14px 14px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.1rem; box-sizing: border-box; -webkit-appearance: none;"
+                 data-password-field="true">
           <button id="togglePasswordBtn" type="button"
-                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 5px; color: #666; font-size: 1.2rem;"
+                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 8px; color: #666; font-size: 1.3rem;"
                   title="Show/Hide Password">
             👁️
           </button>
@@ -110,8 +115,15 @@ async function verifyUserPassword(userId, actionDescription = 'perform this acti
     const cancelBtn = document.getElementById('cancelPasswordBtn');
     const toggleBtn = document.getElementById('togglePasswordBtn');
     
-    // Toggle password visibility
-    let passwordVisible = false;
+    // Password masking with toggle (starts visible for mobile)
+    let passwordVisible = true; // Start visible for easier mobile typing
+    let actualPassword = '';
+    
+    // Initially show as text for mobile
+    input.type = 'text';
+    toggleBtn.textContent = '🙈';
+    toggleBtn.title = 'Hide Password';
+    
     toggleBtn.addEventListener('click', () => {
       passwordVisible = !passwordVisible;
       input.type = passwordVisible ? 'text' : 'password';
