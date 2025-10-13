@@ -11,6 +11,8 @@ import ouijaBoardRoutes from './ouija-board.routes.js';
 import spotifyRoutes from './spotify.routes.js';
 import collectionRoutes from './collection.routes.js';
 import musicHistoryRoutes from './music-history.routes.js';
+import posterGeneratorRoutes from './poster-generator.routes.js';
+import voiceDjRoutes from './voice-dj.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -25,6 +27,8 @@ export default function buildRoutes(io) {
   api.use('/ouija-board', ouijaBoardRoutes);
   api.use('/spotify', spotifyRoutes);
   api.use('/collection', collectionRoutes);
+  api.use('/poster-generator', posterGeneratorRoutes);
+  api.use('/voice-dj', voiceDjRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

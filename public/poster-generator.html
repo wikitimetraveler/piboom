@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AI Poster Generator - Create Psychedelic Concert Posters</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <script src="/user-selector.js"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #2b0548 0%, #5c258d 50%, #8e44ad 100%);
+      color: #eee;
+      min-height: 100vh;
+    }
+
+    .poster-gen-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .poster-gen-header {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, rgba(142, 68, 173, 0.3), rgba(155, 89, 182, 0.2));
+      border-radius: 20px;
+      margin-bottom: 30px;
+      border: 2px solid rgba(142, 68, 173, 0.5);
+    }
+
+    .poster-gen-header h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      background: linear-gradient(135deg, #e74c3c, #f39c12, #f1c40f);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+
+    .style-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 30px 0;
+    }
+
+    .style-option {
+      background: rgba(255, 255, 255, 0.1);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .style-option:hover {
+      transform: translateY(-5px);
+      border-color: rgba(231, 76, 60, 0.8);
+      box-shadow: 0 10px 30px rgba(231, 76, 60, 0.3);
+    }
+
+    .style-option.selected {
+      border-color: #e74c3c;
+      background: rgba(231, 76, 60, 0.2);
+      box-shadow: 0 10px 30px rgba(231, 76, 60, 0.5);
+    }
+
+    .style-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .style-name {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #f39c12;
+    }
+
+    .style-desc {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-top: 8px;
+    }
+
+    .input-section {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .album-input-area {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .upload-box {
+      flex: 1;
+      min-width: 300px;
+      max-width: 400px;
+      border: 3px dashed rgba(231, 76, 60, 0.5);
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .upload-box:hover {
+      border-color: #e74c3c;
+      background: rgba(231, 76, 60, 0.1);
+    }
+
+    .upload-box i {
+      font-size: 4rem;
+      color: #e74c3c;
+      margin-bottom: 15px;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 10px;
+      border: 3px solid #e74c3c;
+    }
+
+    .generate-btn {
+      padding: 15px 50px;
+      background: linear-gradient(135deg, #e74c3c, #f39c12);
+      border: none;
+      border-radius: 15px;
+      color: white;
+      font-size: 1.3rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+    }
+
+    .generate-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(231, 76, 60, 0.6);
+    }
+
+    .generate-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result-section {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 30px;
+      border-radius: 15px;
+      margin-top: 30px;
+    }
+
+    .generated-poster {
+      max-width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      border: 5px solid #e74c3c;
+    }
+
+    .download-btn {
+      padding: 12px 30px;
+      background: #27ae60;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .download-btn:hover {
+      background: #2ecc71;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
+  <div class="container">
+    <a class="navbar-brand" href="/index.html">
+      <i class="bi-music-note-beamed"></i> piBoom
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
+        
+        <!-- Music Discovery Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="musicDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi-music-note-beamed"></i> Music Discovery
+          </a>
+          <div class="dropdown-menu" aria-labelledby="musicDropdown">
+            <a class="dropdown-item" href="/music-research.html"><i class="bi-search"></i> Music Research</a>
+            <a class="dropdown-item" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a>
+            <a class="dropdown-item" href="/collection.html"><i class="bi-collection-fill"></i> My Collection</a>
+            <a class="dropdown-item" href="/music-time-machine.html"><i class="bi-clock-history"></i> Time Machine</a>
+            <a class="dropdown-item" href="/spotify-dashboard.html"><i class="bi-spotify"></i> Spotify</a>
+          </div>
+        </li>
+
+        <!-- AI & Voice Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="aiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi-robot"></i> AI & Voice
+          </a>
+          <div class="dropdown-menu" aria-labelledby="aiDropdown">
+            <a class="dropdown-item" href="/voice-dj.html"><i class="bi-mic"></i> Voice DJ</a>
+            <a class="dropdown-item" href="/assistant.html"><i class="bi-chat-dots"></i> Levi Assistant</a>
+            <a class="dropdown-item active" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>
+          </div>
+        </li>
+
+        <!-- Entertainment Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="entertainmentDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi-stars"></i> Entertainment
+          </a>
+          <div class="dropdown-menu" aria-labelledby="entertainmentDropdown">
+            <a class="dropdown-item" href="/player.html"><i class="bi-volume-up"></i> The Boombox</a>
+            <a class="dropdown-item" href="/visualizer.html"><i class="bi-palette-fill"></i> Psychedelic Visualizer</a>
+            <a class="dropdown-item" href="/blacklight.html"><i class="bi-lightning"></i> Black Light Zone</a>
+            <a class="dropdown-item" href="/art-gallery.html"><i class="bi-image"></i> Art Gallery</a>
+            <a class="dropdown-item" href="/ouija-board.html"><i class="bi-magic"></i> Ouija Board</a>
+          </div>
+        </li>
+
+        <!-- Nature Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="natureDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="bi-tree-fill"></i> Nature
+          </a>
+          <div class="dropdown-menu" aria-labelledby="natureDropdown">
+            <a class="dropdown-item" href="/tree-discovery.html"><i class="bi-tree-fill"></i> Tree Discovery 🐻</a>
+            <a class="dropdown-item" href="/tree-collection.html"><i class="bi-trees"></i> Tree Collection 🌲</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="poster-gen-container">
+  <!-- Header -->
+  <div class="poster-gen-header">
+    <h1>🎨 AI Poster Generator</h1>
+    <p style="font-size: 1.2rem; color: #ccc; margin: 0;">Transform album covers into psychedelic concert posters!</p>
+  </div>
+
+  <!-- User Selector -->
+  <div id="userSelectorContainer"></div>
+
+  <!-- Input Section -->
+  <div class="input-section">
+    <h3 style="color: #f39c12; margin-bottom: 25px; text-align: center;">
+      <i class="bi-image"></i> 1. Choose Your Album
+    </h3>
+    
+    <div class="album-input-area">
+      <div class="upload-box" onclick="document.getElementById('albumUpload').click()">
+        <input type="file" id="albumUpload" accept="image/*" style="display: none;" onchange="handleAlbumUpload(event)">
+        <i class="bi-cloud-upload"></i>
+        <div style="font-size: 1.2rem; font-weight: 600; color: #e74c3c; margin-bottom: 10px;">Upload Album Cover</div>
+        <div style="font-size: 0.9rem; color: #ccc;">Click to select an image</div>
+      </div>
+      
+      <div style="flex: 1; min-width: 300px; text-align: center;">
+        <div style="font-weight: 600; color: #f39c12; margin-bottom: 15px;">OR</div>
+        <button class="btn btn-lg" onclick="openCollectionPicker()" 
+                style="background: rgba(142, 68, 173, 0.3); border: 2px solid #8e44ad; color: white; font-weight: 600;">
+          <i class="bi-collection-fill"></i> Pick from Collection
+        </button>
+      </div>
+    </div>
+
+    <!-- Preview Area -->
+    <div id="albumPreview" style="display: none; text-align: center; margin-top: 30px;">
+      <h5 style="color: #f39c12; margin-bottom: 15px;">Selected Album:</h5>
+      <img id="previewImage" class="preview-image">
+      <div id="albumInfo" style="margin-top: 15px; font-size: 1.1rem; color: #ccc;"></div>
+    </div>
+  </div>
+
+  <!-- Style Selection -->
+  <div class="input-section">
+    <h3 style="color: #f39c12; margin-bottom: 25px; text-align: center;">
+      <i class="bi-palette"></i> 2. Choose Poster Style
+    </h3>
+    
+    <div class="style-selector">
+      <div class="style-option" onclick="selectStyle('fillmore')" id="style-fillmore">
+        <div class="style-icon">🌸</div>
+        <div class="style-name">60s Fillmore</div>
+        <div class="style-desc">Swirling letters, Bill Graham style</div>
+      </div>
+      
+      <div class="style-option selected" onclick="selectStyle('blacklight')" id="style-blacklight">
+        <div class="style-icon">⚡</div>
+        <div class="style-name">70s Black Light</div>
+        <div class="style-desc">Neon colors, trippy effects</div>
+      </div>
+      
+      <div class="style-option" onclick="selectStyle('neon')" id="style-neon">
+        <div class="style-icon">💫</div>
+        <div class="style-name">Modern Neon</div>
+        <div class="style-desc">Synthwave, cyberpunk vibes</div>
+      </div>
+      
+      <div class="style-option" onclick="selectStyle('psychedelic')" id="style-psychedelic">
+        <div class="style-icon">🌀</div>
+        <div class="style-name">Psychedelic</div>
+        <div class="style-desc">Fractals, kaleidoscope, DMT</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generate Section -->
+  <div style="text-align: center; margin: 40px 0;">
+    <button class="generate-btn" onclick="generatePoster()" id="generateBtn" disabled>
+      <i class="bi-magic"></i> Generate Poster
+    </button>
+    <div style="margin-top: 15px; color: #999; font-size: 0.9rem;">
+      Upload an album cover or pick from your collection to start
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="loadingState" style="display: none; text-align: center; padding: 60px;">
+    <div style="font-size: 2rem; color: #f39c12; margin-bottom: 20px;">
+      <i class="bi-stars" style="animation: spin 2s linear infinite;"></i>
+    </div>
+    <div style="font-size: 1.5rem; color: #ccc;">Creating your psychedelic poster...</div>
+    <div style="color: #999; margin-top: 10px;">This may take 10-20 seconds</div>
+  </div>
+
+  <!-- Result Section -->
+  <div id="resultSection" class="result-section" style="display: none;">
+    <h3 style="color: #f39c12; margin-bottom: 25px; text-align: center;">
+      <i class="bi-stars"></i> Your Generated Poster
+    </h3>
+    
+    <div style="text-align: center;">
+      <img id="generatedPoster" class="generated-poster">
+      
+      <div style="margin-top: 25px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+        <button class="download-btn" onclick="downloadPoster()">
+          <i class="bi-download"></i> Download Poster
+        </button>
+        <button class="download-btn" onclick="generateAnother()" style="background: #8e44ad;">
+          <i class="bi-arrow-clockwise"></i> Generate Another
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+</style>
+
+<!-- Collection Picker Modal -->
+<div class="modal fade" id="collectionModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content" style="background: #2c3e50; color: white;">
+      <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <h5 class="modal-title"><i class="bi-collection-fill"></i> Pick Album from Collection</h5>
+        <button type="button" class="close" data-dismiss="modal" style="color: white;">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="collectionGrid" class="row">
+          <!-- Collection items will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+// State
+let selectedStyle = 'blacklight';
+let selectedAlbum = null;
+let uploadedImage = null;
+let generatedPosterUrl = null;
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+  createUserSelector('userSelectorContainer', {
+    title: 'Select Your Profile',
+    showAllOption: false
+  });
+});
+
+// Handle album upload
+function handleAlbumUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  if (!file.type.startsWith('image/')) return;
+  if (file.size > 10 * 1024 * 1024) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedImage = e.target.result;
+    selectedAlbum = {
+      artist: 'Unknown Artist',
+      album: file.name.replace(/\.\w+$/, ''),
+      imageData: uploadedImage
+    };
+    
+    showAlbumPreview(uploadedImage, selectedAlbum.artist, selectedAlbum.album);
+  };
+  
+  reader.readAsDataURL(file);
+}
+
+// Open collection picker
+async function openCollectionPicker() {
+  const currentUser = getCurrentUser();
+  
+  try {
+    const response = await fetch(`/api/collection?userId=${currentUser.id}`);
+    const data = await response.json();
+    
+    if (data.albums && data.albums.length > 0) {
+      const grid = document.getElementById('collectionGrid');
+      grid.innerHTML = '';
+      
+      data.albums.forEach(album => {
+        const col = document.createElement('div');
+        col.className = 'col-md-3 mb-3';
+        col.innerHTML = `
+          <div onclick="selectFromCollection('${album.id}')" 
+               style="cursor: pointer; background: rgba(255,255,255,0.1); border-radius: 10px; padding: 15px; text-align: center; transition: all 0.3s;">
+            ${album.cover_url ? `<img src="${album.cover_url}" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">` : '<div style="width: 100%; height: 200px; background: #34495e; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center;"><i class="bi-disc" style="font-size: 3rem;"></i></div>'}
+            <div style="font-weight: 600;">${album.album}</div>
+            <div style="font-size: 0.9rem; color: #ccc;">${album.artist}</div>
+          </div>
+        `;
+        grid.appendChild(col);
+      });
+      
+      $('#collectionModal').modal('show');
+    } else {
+      alert('No albums in collection. Add some albums first!');
+    }
+  } catch (error) {
+    console.error('Error loading collection:', error);
+    alert('Error loading collection');
+  }
+}
+
+// Select album from collection
+async function selectFromCollection(albumId) {
+  const currentUser = getCurrentUser();
+  const response = await fetch(`/api/collection?userId=${currentUser.id}`);
+  const data = await response.json();
+  
+  const album = data.albums.find(a => a.id == albumId);
+  if (album) {
+    selectedAlbum = album;
+    
+    // If album has cover URL, fetch it
+    if (album.cover_url) {
+      uploadedImage = album.cover_url;
+      showAlbumPreview(album.cover_url, album.artist, album.album);
+    } else {
+      // No cover, just use text
+      uploadedImage = null;
+      showAlbumPreview(null, album.artist, album.album);
+    }
+    
+    $('#collectionModal').modal('hide');
+  }
+}
+
+// Show album preview
+function showAlbumPreview(imageUrl, artist, album) {
+  const preview = document.getElementById('albumPreview');
+  const img = document.getElementById('previewImage');
+  const info = document.getElementById('albumInfo');
+  
+  if (imageUrl) {
+    img.src = imageUrl;
+    img.style.display = 'block';
+  } else {
+    img.style.display = 'none';
+  }
+  
+  info.innerHTML = `<strong>${album}</strong> by ${artist}`;
+  preview.style.display = 'block';
+  
+  // Enable generate button
+  document.getElementById('generateBtn').disabled = false;
+}
+
+// Select style
+function selectStyle(style) {
+  selectedStyle = style;
+  
+  // Update UI
+  document.querySelectorAll('.style-option').forEach(opt => {
+    opt.classList.remove('selected');
+  });
+  document.getElementById('style-' + style).classList.add('selected');
+}
+
+// Generate poster
+async function generatePoster() {
+  if (!selectedAlbum) {
+    alert('Please select an album first');
+    return;
+  }
+  
+  // Show loading
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('resultSection').style.display = 'none';
+  
+  try {
+    const response = await fetch('/api/poster-generator/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        artist: selectedAlbum.artist,
+        album: selectedAlbum.album,
+        style: selectedStyle,
+        albumCoverUrl: uploadedImage
+      })
+    });
+    
+    const data = await response.json();
+    
+    document.getElementById('loadingState').style.display = 'none';
+    
+    if (data.success && data.posterUrl) {
+      generatedPosterUrl = data.posterUrl;
+      document.getElementById('generatedPoster').src = data.posterUrl;
+      document.getElementById('resultSection').style.display = 'block';
+      
+      // Scroll to result
+      document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+    } else {
+      alert('Error generating poster: ' + (data.error || 'Unknown error'));
+    }
+    
+  } catch (error) {
+    console.error('Error generating poster:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    alert('Error generating poster. Please try again.');
+  }
+}
+
+// Download poster
+function downloadPoster() {
+  if (!generatedPosterUrl) return;
+  
+  const link = document.createElement('a');
+  link.href = generatedPosterUrl;
+  link.download = `poster-${selectedAlbum.artist}-${selectedAlbum.album}.png`;
+  link.click();
+}
+
+// Generate another
+function generateAnother() {
+  document.getElementById('resultSection').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+</body>
+</html>
+

@@ -512,17 +512,57 @@
     <div id="nav" class="collapse navbar-collapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item"><a class="nav-link" href="/" style="color: #2c3e50;"><i class="bi-house"></i> Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="/music-research.html" style="color: #2c3e50;"><i class="bi-search"></i> Music Research</a></li>
-        <li class="nav-item"><a class="nav-link" href="/album-discovery.html" style="color: #2c3e50;"><i class="bi-disc"></i> Album Discovery</a></li>
-        <li class="nav-item"><a class="nav-link" href="/collection.html" style="color: #2c3e50;"><i class="bi-collection-fill"></i> Collection</a></li>
-        <li class="nav-item"><a class="nav-link" href="/player.html" style="color: #2c3e50;"><i class="bi-volume-up"></i> Player</a></li>
-        <li class="nav-item"><a class="nav-link" href="/assistant.html" style="color: #2c3e50;"><i class="bi-robot"></i> Assistant</a></li>
-        <li class="nav-item"><a class="nav-link" href="/blacklight.html" style="color: #2c3e50;"><i class="bi-lightning"></i> Black Light</a></li>
-        <li class="nav-item"><a class="nav-link" href="/ouija-board.html" style="color: #2c3e50;"><i class="bi-magic"></i> Ouija Board</a></li>
-        <li class="nav-item"><a class="nav-link" href="/tree-discovery.html" style="color: #2c3e50;"><i class="bi-tree-fill"></i> Trees 🐻</a></li>
-        <li class="nav-item"><a class="nav-link" href="/tree-collection.html" style="color: #2c3e50;"><i class="bi-trees"></i> Forest 🌲</a></li>
-        <li class="nav-item"><a class="nav-link" href="/spotify-dashboard.html" style="color: #2c3e50;"><i class="bi-spotify"></i> Spotify</a></li>
-        <li class="nav-item"><a class="nav-link" href="/debug.html" style="color: #2c3e50;"><i class="bi-bug"></i> Debug</a></li>
+        
+        <!-- Music Discovery Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="musicDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #2c3e50;">
+            <i class="bi-music-note-beamed"></i> Music Discovery
+          </a>
+          <div class="dropdown-menu" aria-labelledby="musicDropdown" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <a class="dropdown-item" href="/music-research.html"><i class="bi-search"></i> Music Research</a>
+            <a class="dropdown-item" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a>
+            <a class="dropdown-item" href="/collection.html"><i class="bi-collection-fill"></i> My Collection</a>
+            <a class="dropdown-item" href="/music-time-machine.html"><i class="bi-clock-history"></i> Time Machine</a>
+            <a class="dropdown-item" href="/spotify-dashboard.html"><i class="bi-spotify"></i> Spotify</a>
+          </div>
+        </li>
+
+        <!-- AI & Voice Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="aiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #2c3e50;">
+            <i class="bi-robot"></i> AI & Voice
+          </a>
+          <div class="dropdown-menu" aria-labelledby="aiDropdown" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <a class="dropdown-item" href="/voice-dj.html"><i class="bi-mic"></i> Voice DJ</a>
+            <a class="dropdown-item" href="/assistant.html"><i class="bi-chat-dots"></i> Levi Assistant</a>
+            <a class="dropdown-item" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>
+          </div>
+        </li>
+
+        <!-- Entertainment Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="entertainmentDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #2c3e50;">
+            <i class="bi-stars"></i> Entertainment
+          </a>
+          <div class="dropdown-menu" aria-labelledby="entertainmentDropdown" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <a class="dropdown-item" href="/player.html"><i class="bi-volume-up"></i> The Boombox</a>
+            <a class="dropdown-item" href="/visualizer.html"><i class="bi-palette-fill"></i> Psychedelic Visualizer</a>
+            <a class="dropdown-item" href="/blacklight.html"><i class="bi-lightning"></i> Black Light Zone</a>
+            <a class="dropdown-item" href="/art-gallery.html"><i class="bi-image"></i> Art Gallery</a>
+            <a class="dropdown-item" href="/ouija-board.html"><i class="bi-magic"></i> Ouija Board</a>
+          </div>
+        </li>
+
+        <!-- Nature Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="natureDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #2c3e50;">
+            <i class="bi-tree-fill"></i> Nature
+          </a>
+          <div class="dropdown-menu" aria-labelledby="natureDropdown" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); border: none; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.1);">
+            <a class="dropdown-item" href="/tree-discovery.html"><i class="bi-tree-fill"></i> Tree Discovery 🐻</a>
+            <a class="dropdown-item" href="/tree-collection.html"><i class="bi-trees"></i> Tree Collection 🌲</a>
+          </div>
+        </li>
       </ul>
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
