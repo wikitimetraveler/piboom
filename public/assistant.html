@@ -1688,8 +1688,11 @@ async function showConversationStats() {
   }
 }
 
-// Handle user selection by clicking icon
-function selectUser(userId) {
+// Handle user selection by clicking icon - allow free switching for browsing
+async function selectUser(userId) {
+  // Free switching - no password needed for viewing conversations
+  // (Each user has their own isolated conversation history)
+  
   // Remove active class from all user cards
   document.querySelectorAll('.user-card').forEach(card => {
     card.classList.remove('active');

@@ -125,15 +125,19 @@ function createUserSelector(containerId, options = {}) {
   container.innerHTML = html;
 }
 
-// Select user handler
-function selectUser(userId) {
+// Select user handler - free browsing, no password needed for viewing
+async function selectUser(userId) {
   if (userId === 'all') {
     localStorage.setItem('viewMode', 'all');
     localStorage.removeItem('currentUserId');
-  } else {
-    localStorage.setItem('viewMode', 'single');
-    setCurrentUser(userId);
+    window.location.reload();
+    return;
   }
+  
+  // Free browsing - just change the view without password
+  // Password will be required when user tries to ADD/EDIT/DELETE
+  localStorage.setItem('viewMode', 'single');
+  setCurrentUser(userId);
   
   // Reload the page to apply changes
   window.location.reload();

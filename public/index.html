@@ -335,15 +335,6 @@
           </div>
         </li>
       </ul>
-      
-      <!-- User Login Button -->
-      <ul class="navbar-nav ml-2">
-        <li class="nav-item">
-          <a class="nav-link" href="#" id="navUserBtn" onclick="showLoginPopup(); return false;" style="background: rgba(52, 152, 219, 0.1); border-radius: 8px; padding: 8px 15px !important;">
-            <i class="bi-person-circle"></i> <span id="navUserName">Login</span>
-          </a>
-        </li>
-      </ul>
     </div>
   </div>
 </nav>
@@ -512,27 +503,9 @@
   </div>
 </footer>
 
-<script src="/user-login.js"></script>
 <script src="/scripts.js"></script>
 <script>
 document.getElementById('dt').textContent = new Date().toLocaleDateString();
-
-// Update navbar to show logged-in user
-window.addEventListener('DOMContentLoaded', () => {
-  const loggedInUser = getLoggedInUser();
-  const navUserBtn = document.getElementById('navUserBtn');
-  const navUserName = document.getElementById('navUserName');
-  
-  if (loggedInUser && navUserBtn && navUserName) {
-    navUserName.textContent = loggedInUser.name.split(' ').slice(-1)[0];
-    navUserBtn.style.background = `${loggedInUser.color}22`;
-    navUserBtn.style.borderLeft = `3px solid ${loggedInUser.color}`;
-    navUserBtn.innerHTML = `
-      <img src="${loggedInUser.avatar}" style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${loggedInUser.color}; margin-right: 8px; vertical-align: middle;">
-      <span>${loggedInUser.name.split(' ').slice(-1)[0]}</span>
-    `;
-  }
-});
 // Help panel functionality (if elements exist)
 const showHelpBtn = document.getElementById('showHelp');
 const closeHelpBtn = document.getElementById('closeHelp');

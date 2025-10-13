@@ -777,9 +777,8 @@
   </div>
 </div>
 
-<!-- User Login Script -->
+<!-- User Selector Script -->
 <script src="/user-selector.js"></script>
-<script src="/user-login.js"></script>
 
 <!-- Simple Basic Header -->
 <div class="simple-header">
@@ -796,9 +795,6 @@
         <a href="/voice-dj.html">Wolfman Dave</a>
         <a href="/blacklight.html">Black Light</a>
         <a href="/tree-discovery.html">Trees 🐻</a>
-        <button onclick="showLoginPopup()" id="mobileLoginBtn" style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; touch-action: manipulation;">
-          <i class="bi-person-circle"></i> <span id="mobileUserName">Login</span>
-        </button>
       </div>
     </div>
   </div>
@@ -2343,13 +2339,6 @@ async function confirmAddToCollection() {
   try {
     const currentUser = getCurrentUser();
     
-    // Verify password before adding
-    const verified = await verifyUserPassword(currentUser.id, 'add this album to your collection');
-    if (!verified) {
-      console.log('Password verification cancelled');
-      return;
-    }
-    
     // Hide modal
     if (typeof $ !== 'undefined') {
       $('#addToCollectionModal').modal('hide');
@@ -2375,6 +2364,9 @@ async function confirmAddToCollection() {
     const data = await response.json();
     
     if (data.success) {
+      // Show success toast
+      showToast('✅ Album Added!', `${pendingAlbumData.album} by ${pendingAlbumData.artist} added to ${currentUser.name}'s collection!`, 'success');
+      
       // Show "Add Another Album" button if this was an identified album
       if (pendingAlbumData.isIdentified) {
         const addAnotherBtn = document.getElementById('addAnotherBtn');
@@ -2384,6 +2376,7 @@ async function confirmAddToCollection() {
       }
     } else if (response.status === 409) {
       // Already in collection
+      showToast('⚠️ Already in Collection', `${pendingAlbumData.album} is already in ${currentUser.name}'s collection!`, 'warning');
       
       // Still show "Add Another" button
       if (pendingAlbumData.isIdentified) {
@@ -2392,14 +2385,96 @@ async function confirmAddToCollection() {
           addAnotherBtn.style.display = 'inline-block';
         }
       }
+    } else {
+      showToast('❌ Error', 'Failed to add album to collection', 'error');
     }
   } catch (error) {
     console.error('Error adding to collection:', error);
+    showToast('❌ Error', 'Failed to add album to collection', 'error');
   } finally {
     // Clear pending data
     pendingAlbumData = null;
   }
 }
+
+// Show toast notification
+function showToast(title, message, type = 'info') {
+  // Create toast container if it doesn't exist
+  let toastContainer = document.getElementById('toastContainer');
+  if (!toastContainer) {
+    toastContainer = document.createElement('div');
+    toastContainer.id = 'toastContainer';
+    toastContainer.style.cssText = `
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      max-width: 350px;
+    `;
+    document.body.appendChild(toastContainer);
+  }
+  
+  const colors = {
+    success: '#28a745',
+    warning: '#ffc107',
+    error: '#dc3545',
+    info: '#17a2b8'
+  };
+  
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    background: white;
+    border-left: 5px solid ${colors[type] || colors.info};
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out;
+  `;
+  
+  toast.innerHTML = `
+    <div style="font-weight: 600; color: #2c3e50; margin-bottom: 5px;">${title}</div>
+    <div style="font-size: 0.9rem; color: #666;">${message}</div>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  // Auto-remove after 3 seconds
+  setTimeout(() => {
+    toast.style.animation = 'slideOut 0.3s ease-in';
+    setTimeout(() => {
+      if (toastContainer.contains(toast)) {
+        toastContainer.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
+}
+
+// Add toast animations
+const toastStyle = document.createElement('style');
+toastStyle.textContent = `
+  @keyframes slideIn {
+    from {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  @keyframes slideOut {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(400px);
+      opacity: 0;
+    }
+  }
+`;
+document.head.appendChild(toastStyle);
 
 // Search YouTube for album
 async function searchYouTubeForAlbum(artist, album) {
@@ -2695,22 +2770,5 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script>
-// Update login button to show logged-in user
-window.addEventListener('DOMContentLoaded', () => {
-  const loggedInUser = getLoggedInUser();
-  const loginBtn = document.getElementById('mobileLoginBtn');
-  const userNameSpan = document.getElementById('mobileUserName');
-  
-  if (loggedInUser && loginBtn && userNameSpan) {
-    userNameSpan.textContent = loggedInUser.name.split(' ').slice(-1)[0];
-    loginBtn.style.background = loggedInUser.color;
-    loginBtn.innerHTML = `
-      <img src="${loggedInUser.avatar}" style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; margin-right: 6px; vertical-align: middle;">
-      <span>${loggedInUser.name.split(' ').slice(-1)[0]}</span>
-    `;
-  }
-});
-</script>
 </body>
 </html>
