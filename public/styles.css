@@ -60,6 +60,37 @@ body{
   border:1px solid rgba(255,255,255,.4); border-radius:16px; padding:1.25rem;
   box-shadow:0 6px 18px rgba(0,0,0,.08);
 }
+/* Accordion Sections */
+.accordion .card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+.accordion .card-header {
+  background: linear-gradient(135deg, rgba(52, 152, 219, 0.05), rgba(41, 128, 185, 0.05));
+  border: none;
+  padding: 0;
+}
+.accordion .card-header .btn-link {
+  padding: 20px 25px;
+  transition: all 0.3s ease;
+}
+.accordion .card-header .btn-link:hover {
+  background: rgba(52, 152, 219, 0.1);
+  text-decoration: none;
+}
+.accordion .card-header .btn-link:focus {
+  text-decoration: none;
+  box-shadow: none;
+}
+.accordion .card-body {
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.98);
+}
+
 .tool-card{background:rgba(255,255,255,.9); backdrop-filter:blur(15px);
   border:1px solid rgba(255,255,255,.3); border-radius:var(--zen-radius); padding:calc(var(--zen-spacing) * 0.75); margin-bottom:var(--zen-spacing);
   text-decoration:none; color:var(--text); display:block; transition:all .5s var(--zen-ease);

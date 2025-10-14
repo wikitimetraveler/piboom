@@ -349,7 +349,22 @@
 </nav>
 
 <main class="container">
-  <div class="row">
+  
+  <div class="accordion" id="mainAccordion">
+    
+    <!-- Music Discovery Section -->
+    <div class="card">
+      <div class="card-header" id="headingMusic">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseMusic" aria-expanded="true" aria-controls="collapseMusic" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
+            <i class="bi-music-note-beamed"></i> Music Discovery
+            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Explore, research, and discover music</small>
+          </button>
+        </h2>
+      </div>
+      <div id="collapseMusic" class="collapse show" aria-labelledby="headingMusic" data-parent="#mainAccordion">
+        <div class="card-body">
+          <div class="row mb-4">
     <div class="col-lg-4 col-md-6 mb-3">
       <a href="/music-research.html" class="tool-card fade-in">
         <span class="card-icon">🔍</span>
@@ -365,15 +380,6 @@
         <h3>Album Discovery</h3>
         <p>Browse album covers, discover new music, and search YouTube for your favorite albums!</p>
         <div class="card-meta"><i class="bi-disc"></i> Music Discovery</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/tree-discovery.html" class="tool-card fade-in">
-        <span class="card-icon">🌲</span>
-        <h3>Tree Discovery with Smokey 🐻</h3>
-        <p>Identify trees by photo with Smokey the Bear! Learn about North American trees, conservation, and forest ecology!</p>
-        <div class="card-meta"><i class="bi-tree-fill"></i> Nature Discovery</div>
       </a>
     </div>
 
@@ -396,14 +402,30 @@
     </div>
 
     <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/poster-generator.html" class="tool-card fade-in">
-        <span class="card-icon">🎨</span>
-        <h3>AI Poster Generator</h3>
-        <p>Transform album covers into psychedelic concert posters! Choose from 60s Fillmore, 70s blacklight, modern neon, or trippy psychedelic styles!</p>
-        <div class="card-meta"><i class="bi-palette"></i> AI Art Creation</div>
+      <a href="/spotify-dashboard.html" class="tool-card fade-in">
+        <span class="card-icon">🎵</span>
+        <h3>Spotify Dashboard</h3>
+        <p>Connect your Spotify account to view your top tracks, artists, playlists, and discover new music!</p>
+        <div class="card-meta"><i class="bi-spotify"></i> Music Discovery</div>
       </a>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- AI & Voice Section -->
+    <div class="card">
+      <div class="card-header" id="headingAI">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseAI" aria-expanded="false" aria-controls="collapseAI" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
+            <i class="bi-robot"></i> AI & Voice
+            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Smart assistants and AI-powered tools</small>
+          </button>
+        </h2>
+      </div>
+      <div id="collapseAI" class="collapse" aria-labelledby="headingAI" data-parent="#mainAccordion">
+        <div class="card-body">
+          <div class="row mb-4">
     <div class="col-lg-4 col-md-6 mb-3">
       <a href="/voice-dj.html" class="tool-card fade-in">
         <span class="card-icon">🎤</span>
@@ -423,11 +445,45 @@
     </div>
 
     <div class="col-lg-4 col-md-6 mb-3">
+      <a href="/poster-generator.html" class="tool-card fade-in">
+        <span class="card-icon">🎨</span>
+        <h3>AI Poster Generator</h3>
+        <p>Transform album covers into psychedelic concert posters! Choose from 60s Fillmore, 70s blacklight, modern neon, or trippy psychedelic styles!</p>
+        <div class="card-meta"><i class="bi-palette"></i> AI Art Creation</div>
+      </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Entertainment Section -->
+    <div class="card">
+      <div class="card-header" id="headingEntertainment">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseEntertainment" aria-expanded="false" aria-controls="collapseEntertainment" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
+            <i class="bi-stars"></i> Entertainment
+            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Visuals, music player, and cosmic experiences</small>
+          </button>
+        </h2>
+      </div>
+      <div id="collapseEntertainment" class="collapse" aria-labelledby="headingEntertainment" data-parent="#mainAccordion">
+        <div class="card-body">
+          <div class="row mb-4">
+    <div class="col-lg-4 col-md-6 mb-3">
       <a href="/player.html" class="tool-card fade-in">
         <span class="card-icon">📻</span>
         <h3>The Boombox</h3>
         <p>Audio player UI (works in cloud via browser stream; Pi does local playback).</p>
         <div class="card-meta"><i class="bi-music-note-beamed"></i> Audio tools</div>
+      </a>
+    </div>
+
+    <div class="col-lg-4 col-md-6 mb-3">
+      <a href="/visualizer.html" class="tool-card fade-in">
+        <span class="card-icon">🌀</span>
+        <h3>Psychedelic Visualizer</h3>
+        <p>Trippy DMT-inspired fractal animations and mind-bending visual effects. Experience the cosmos!</p>
+        <div class="card-meta"><i class="bi-stars"></i> Visual Journey</div>
       </a>
     </div>
 
@@ -456,35 +512,47 @@
         <p>Communicate with Houdini, the Spirit of Music. Ask questions and watch letters materialize on the mystical board.</p>
         <div class="card-meta"><i class="bi-magic"></i> Mystical Communication</div>
       </a>
+          </div>
+        </div>
+      </div>
     </div>
 
+    <!-- Nature Section -->
+    <div class="card">
+      <div class="card-header" id="headingNature">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseNature" aria-expanded="false" aria-controls="collapseNature" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
+            <i class="bi-tree-fill"></i> Nature
+            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Explore and identify trees with Smokey the Bear</small>
+          </button>
+        </h2>
+      </div>
+      <div id="collapseNature" class="collapse" aria-labelledby="headingNature" data-parent="#mainAccordion">
+        <div class="card-body">
+          <div class="row mb-4">
     <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/visualizer.html" class="tool-card fade-in">
-        <span class="card-icon">🌀</span>
-        <h3>Psychedelic Visualizer</h3>
-        <p>Trippy DMT-inspired fractal animations and mind-bending visual effects. Experience the cosmos!</p>
-        <div class="card-meta"><i class="bi-stars"></i> Visual Journey</div>
+      <a href="/tree-discovery.html" class="tool-card fade-in">
+        <span class="card-icon">🌲</span>
+        <h3>Tree Discovery with Smokey 🐻</h3>
+        <p>Identify trees by photo with Smokey the Bear! Learn about North American trees, conservation, and forest ecology!</p>
+        <div class="card-meta"><i class="bi-tree-fill"></i> Nature Discovery</div>
       </a>
     </div>
 
     <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/spotify-dashboard.html" class="tool-card fade-in">
-        <span class="card-icon">🎵</span>
-        <h3>Spotify Dashboard</h3>
-        <p>Connect your Spotify account to view your top tracks, artists, playlists, and discover new music!</p>
-        <div class="card-meta"><i class="bi-spotify"></i> Music Discovery</div>
+      <a href="/tree-collection.html" class="tool-card fade-in">
+        <span class="card-icon">🌲</span>
+        <h3>Tree Collection 🌲</h3>
+        <p>Your personal tree collection with photos, locations, and field notes!</p>
+        <div class="card-meta"><i class="bi-trees"></i> Forest Collection</div>
       </a>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="#" class="tool-card fade-in">
-        <span class="card-icon">🧮</span>
-        <h3>The Birdhouse</h3>
-        <p>Chirp Chirp</p>
-        <div class="card-meta"><i class="bi-clock"></i> Coming soon</div>
-      </a>
-    </div>
-  </div>
+    
+  </div><!-- End accordion -->
+  
 </main>
 
 <div class="voice-help" id="helpPanel">
