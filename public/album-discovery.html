@@ -777,8 +777,9 @@
   </div>
 </div>
 
-<!-- User Selector Script -->
+<!-- User Selector and Login Scripts -->
 <script src="/user-selector.js"></script>
+<script src="/user-login.js"></script>
 
 <!-- Simple Basic Header -->
 <div class="simple-header">
@@ -2338,6 +2339,25 @@ async function confirmAddToCollection() {
   
   try {
     const currentUser = getCurrentUser();
+    const loggedInUserId = localStorage.getItem('loggedInUserId');
+    
+    // Check if logged in
+    if (!loggedInUserId) {
+      alert('Please login from the home page to add albums!');
+      if (typeof $ !== 'undefined') {
+        $('#addToCollectionModal').modal('hide');
+      }
+      return;
+    }
+    
+    // Check if trying to add to their own collection
+    if (loggedInUserId !== currentUser.id) {
+      alert('You can only add albums to your own collection! Switch to your user first.');
+      if (typeof $ !== 'undefined') {
+        $('#addToCollectionModal').modal('hide');
+      }
+      return;
+    }
     
     // Hide modal
     if (typeof $ !== 'undefined') {
