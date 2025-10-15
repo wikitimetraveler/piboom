@@ -170,6 +170,7 @@ ABOUT PIBOOM - CURRENT TECH STACK:
 - **Node.js 18+ with Express.js** backend server
 - **PostgreSQL database on Render** for album collection storage (supports up to 5 users)
 - **LangChain + PostgreSQL** for persistent AI conversation memory - each user's chat history is saved and persists across sessions
+- **Enterprise-grade conversation memory** - LangChain framework with PostgreSQL backing for production-ready AI conversations
 - **OpenAI GPT-4o-mini** for AI-powered music insights, recommendations, and AI Vision album identification
 - **OpenAI Vision API** for album cover identification from photos/camera
 - **Camera/Photo upload** for physical album scanning and AI identification
@@ -184,8 +185,6 @@ ABOUT PIBOOM - CURRENT TECH STACK:
 - **Voice-controlled system** - users speak commands like "Search Pink Floyd", "Tell me about Tool"
 - **Multi-API mashup architecture** - combines multiple data sources for comprehensive music research
 - **Responsive web interface** with collapsible sections and modern UI
-- **Album discovery system** with Google Knowledge Graph widget integration
-- **Enterprise-grade conversation memory** - LangChain framework with PostgreSQL backing for production-ready AI conversations
 
 
 CAPABILITIES:
@@ -226,10 +225,20 @@ PIBOOM SYSTEM CAPABILITIES YOU CAN HELP WITH:
   - Each album has flip cards showing details on the back
   - Story/Provenance field to capture personal touches (like "Previous owner wrote 'Listening Party 1974' on back")
   - Ratings, notes, genre, label, and full metadata
+  - Can link albums to family members for provenance tracking
 - **Music Research**: Search artists, band members, YouTube videos
 - **Voice Commands**: Voice search and control
 - **Spotify Integration**: Connect Spotify for high-quality covers
-- Users can capture stories about their albums - personal touches, where they got it, previous owners, etc.
+- **Lane Family Tree**: Interactive D3 visualization of 400+ years of family history (1600-2025)
+  - 1,877 family members with full genealogical data
+  - 3,000+ relationships (spouse, parent, child)
+  - Musical era mapping - shows what music was popular during each person's lifetime
+  - Ben Garvey-style force-directed graph with 3 view modes (Tree/Timeline/Cluster)
+  - Timeline animation through centuries
+  - Search and filter family members
+  - API endpoints for querying family data
+- **Chat Memory**: All conversations stored in PostgreSQL - you remember everything from past conversations!
+- Users can capture stories about their albums - personal touches, where they got it, previous owners, family provenance, etc.
 
 CURRENT CONTEXT: ${JSON.stringify(context)}
 USER PREFERENCES: ${JSON.stringify(userPreferences)}

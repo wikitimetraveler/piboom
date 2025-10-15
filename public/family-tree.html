@@ -257,6 +257,28 @@
       </div>
     </div>
 
+    <!-- Voice Controls -->
+    <div class="options mb-3" style="background: linear-gradient(135deg, rgba(52,152,219,0.1), rgba(155,89,182,0.1)); border: 1px solid #3498db;">
+      <h6><i class="bi-mic-fill"></i> Voice Control</h6>
+      <button class="btn btn-sm btn-primary w-100 mb-2" id="initVoiceBtn" onclick="initVoiceControl()">
+        <i class="bi-mic"></i> Enable Voice
+      </button>
+      <button class="btn btn-sm btn-success w-100 mb-2" id="listenBtn" onclick="startListening()" disabled>
+        <i class="bi-mic-fill"></i> Listen
+      </button>
+      <div id="voiceStatus" class="text-center mt-2" style="font-size: 0.85rem; display: none;">
+        <span id="voiceStatusText"></span>
+      </div>
+      <div class="mt-2" style="font-size: 0.75rem; color: #666;">
+        <strong>Try saying:</strong><br>
+        • "Search for Dave"<br>
+        • "Show year 1972"<br>
+        • "Play timeline"<br>
+        • "Timeline view"<br>
+        • "Tree view"
+      </div>
+    </div>
+
     <!-- Controls -->
     <div class="options">
       <div class="checkbox mb-2">
@@ -473,6 +495,136 @@
           .catch(err => console.log('Could not fetch musical era'));
       }
     };
+
+    // Voice Control
+    let recognition = null;
+    let voiceEnabled = false;
+
+    function initVoiceControl() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Voice recognition not supported in this browser');
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onstart = function() {
+        updateVoiceStatus('Listening... 🎤', '#28a745');
+      };
+      
+      recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        console.log('Voice command:', transcript);
+        processVoiceCommand(transcript);
+        updateVoiceStatus('Ready', '#6c757d');
+      };
+      
+      recognition.onerror = function(event) {
+        console.error('Voice error:', event.error);
+        updateVoiceStatus('Error - try again', '#dc3545');
+      };
+      
+      recognition.onend = function() {
+        updateVoiceStatus('Ready', '#6c757d');
+      };
+      
+      voiceEnabled = true;
+      document.getElementById('initVoiceBtn').disabled = true;
+      document.getElementById('listenBtn').disabled = false;
+      updateVoiceStatus('Voice Ready! Click Listen', '#28a745');
+    }
+
+    function startListening() {
+      if (!voiceEnabled || !recognition) return;
+      try {
+        recognition.start();
+      } catch (error) {
+        console.error('Error starting voice:', error);
+      }
+    }
+
+    function updateVoiceStatus(text, color) {
+      const status = document.getElementById('voiceStatus');
+      const statusText = document.getElementById('voiceStatusText');
+      status.style.display = 'block';
+      statusText.textContent = text;
+      statusText.style.color = color;
+    }
+
+    function processVoiceCommand(command) {
+      console.log('Processing:', command);
+      
+      // Search commands
+      if (command.includes('search for') || command.includes('find')) {
+        const nameMatch = command.match(/(?:search for|find)\s+(.+)/);
+        if (nameMatch && nameMatch[1]) {
+          const name = nameMatch[1].trim();
+          document.getElementById('search').value = name;
+          speak(`Searching for ${name}`);
+        }
+      }
+      // Year commands
+      else if (command.includes('year')) {
+        const yearMatch = command.match(/(\d{4})/);
+        if (yearMatch) {
+          lineage.setYear(parseInt(yearMatch[1]));
+          speak(`Jumping to year ${yearMatch[1]}`);
+        }
+      }
+      // View mode commands
+      else if (command.includes('tree view') || command.includes('show tree')) {
+        lineage.setMode('tree');
+        speak('Switching to tree view');
+      }
+      else if (command.includes('timeline') || command.includes('time line')) {
+        lineage.setMode('timeline');
+        speak('Switching to timeline view');
+      }
+      else if (command.includes('cluster')) {
+        lineage.setMode('cluster');
+        speak('Switching to cluster view');
+      }
+      // Animation commands
+      else if (command.includes('play') || command.includes('start')) {
+        lineage.setYearIncrement(1);
+        speak('Playing timeline animation');
+      }
+      else if (command.includes('pause') || command.includes('stop')) {
+        lineage.setYearIncrement(0);
+        speak('Paused');
+      }
+      // Navigation
+      else if (command.includes('first') || command.includes('beginning')) {
+        lineage.setYear(1600);
+        speak('Going to the beginning - 1600');
+      }
+      else if (command.includes('last') || command.includes('end') || command.includes('now')) {
+        lineage.setYear(2025);
+        speak('Going to present day');
+      }
+      // Toggle menu
+      else if (command.includes('menu') || command.includes('toggle')) {
+        toggleMenu();
+        speak(menuStatus ? 'Menu opened' : 'Menu closed');
+      }
+      else {
+        speak("I didn't understand that command. Try saying 'search for Dave' or 'show year 1972'");
+      }
+    }
+
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
   </script>
 </body>
 </html>
