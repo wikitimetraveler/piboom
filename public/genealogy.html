@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Tree & Musical Timeline - piBoom</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    .family-tree-container {
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      min-height: 600px;
+    }
+    
+    #d3-visualization {
+      width: 100%;
+      height: 600px;
+      border: 2px dashed #ccc;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(135,206,250,0.05), rgba(144,238,144,0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .stat-card {
+      background: linear-gradient(135deg, rgba(135,206,250,0.15), rgba(144,238,144,0.15));
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #3498db;
+    }
+    
+    .stat-label {
+      color: #666;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .timeline-item {
+      background: rgba(255,255,255,0.95);
+      border-left: 4px solid #3498db;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .timeline-year {
+      font-weight: bold;
+      color: #3498db;
+      font-size: 1.2rem;
+    }
+    
+    .timeline-era {
+      color: #666;
+      font-style: italic;
+      margin-top: 5px;
+    }
+    
+    .person-card {
+      background: rgba(255,255,255,0.95);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .person-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    
+    .person-name {
+      font-weight: bold;
+      color: #2c3e50;
+      font-size: 1.1rem;
+    }
+    
+    .person-details {
+      color: #666;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<!-- Simple Header -->
+<div class="simple-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="/" class="brand">piBoom</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/music-research.html">Research</a>
+        <a href="/album-discovery.html">Albums</a>
+        <a href="/collection.html">Collection</a>
+        <a href="/genealogy.html" class="active">Family Tree</a>
+        <a href="/player.html">Player</a>
+        <a href="/assistant.html">Assistant</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4">
+  <!-- Header -->
+  <div class="family-tree-container">
+    <h1><i class="bi-diagram-3"></i> Lane Family Tree & Musical Timeline</h1>
+    <p class="text-muted">400+ years of family history mapped to musical eras</p>
+  </div>
+
+  <!-- Statistics -->
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card">
+      <div class="stat-number" id="statPeople">0</div>
+      <div class="stat-label">Family Members</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="statRelationships">0</div>
+      <div class="stat-label">Relationships</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="statYears">0</div>
+      <div class="stat-label">Years of History</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="statGenerations">0</div>
+      <div class="stat-label">Generations</div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4" id="genealogyTabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" id="tree-tab" data-toggle="tab" href="#tree" role="tab">
+        <i class="bi-diagram-3"></i> Family Tree
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="timeline-tab" data-toggle="tab" href="#timeline" role="tab">
+        <i class="bi-clock-history"></i> Musical Timeline
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="search-tab" data-toggle="tab" href="#search" role="tab">
+        <i class="bi-search"></i> Search Family
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" id="api-tab" data-toggle="tab" href="#api" role="tab">
+        <i class="bi-code-slash"></i> API Info
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab Content -->
+  <div class="tab-content" id="genealogyTabContent">
+    <!-- Family Tree Tab -->
+    <div class="tab-pane fade show active" id="tree" role="tabpanel">
+      <div class="family-tree-container">
+        <h3><i class="bi-diagram-3"></i> D3.js Family Tree Visualization</h3>
+        <p class="text-info"><i class="bi-info-circle"></i> Your Ben Garvey-style D3 visualization will embed here!</p>
+        
+        <!-- D3 Visualization Preview -->
+        <div id="d3-visualization">
+          <i class="bi-diagram-3" style="font-size: 4rem; color: #3498db; opacity: 0.5;"></i>
+          <h4 class="mt-3">Interactive D3 Family Tree Visualization</h4>
+          <p class="text-muted">Full-screen force-directed graph with timeline animation</p>
+          <p class="text-info"><strong>400+ years • 1,877 people • 3,000+ relationships</strong></p>
+        </div>
+        
+        <div class="mt-4">
+          <a href="/family-tree.html" class="btn btn-primary btn-lg">
+            <i class="bi-diagram-3"></i> Launch Full D3 Visualization
+          </a>
+          <button class="btn btn-success btn-lg ml-2" onclick="exportFamilyData()">
+            <i class="bi-download"></i> Export Data (JSON)
+          </button>
+          <button class="btn btn-info btn-lg ml-2" onclick="testAPI()">
+            <i class="bi-lightning"></i> Test API
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Musical Timeline Tab -->
+    <div class="tab-pane fade" id="timeline" role="tabpanel">
+      <div class="family-tree-container">
+        <h3><i class="bi-clock-history"></i> Family & Music Through Time</h3>
+        <div id="timelineContent">
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Tab -->
+    <div class="tab-pane fade" id="search" role="tabpanel">
+      <div class="family-tree-container">
+        <h3><i class="bi-search"></i> Search Family Members</h3>
+        <div class="input-group input-group-lg mb-4">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search by name...">
+          <div class="input-group-append">
+            <button class="btn btn-primary" onclick="searchFamily()">
+              <i class="bi-search"></i> Search
+            </button>
+          </div>
+        </div>
+        <div id="searchResults"></div>
+      </div>
+    </div>
+
+    <!-- API Info Tab -->
+    <div class="tab-pane fade" id="api" role="tabpanel">
+      <div class="family-tree-container">
+        <h3><i class="bi-code-slash"></i> Genealogy API Endpoints</h3>
+        <p>Use these API endpoints to integrate genealogy data:</p>
+        
+        <div class="list-group">
+          <div class="list-group-item">
+            <code>GET /api/genealogy/data</code>
+            <p>Get complete family data (nodes + links) for D3 visualization</p>
+          </div>
+          <div class="list-group-item">
+            <code>GET /api/genealogy/people</code>
+            <p>Get all family members</p>
+          </div>
+          <div class="list-group-item">
+            <code>GET /api/genealogy/:id</code>
+            <p>Get person by ID with relationships and musical era</p>
+          </div>
+          <div class="list-group-item">
+            <code>GET /api/genealogy/search?q=name</code>
+            <p>Search people by name</p>
+          </div>
+          <div class="list-group-item">
+            <code>GET /api/genealogy/year/:year/music</code>
+            <p>Get musical era and family members alive in that year</p>
+          </div>
+          <div class="list-group-item">
+            <code>GET /api/genealogy/musical-timeline</code>
+            <p>Get complete timeline of family births + musical eras</p>
+          </div>
+          <div class="list-group-item">
+            <code>GET /api/genealogy/stats</code>
+            <p>Get family tree statistics</p>
+          </div>
+        </div>
+        
+        <div class="mt-4">
+          <button class="btn btn-info" onclick="testAPI()">
+            <i class="bi-lightning"></i> Test API
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>Levi's Music System</strong> — Lane Family Tree Integration — <span id="dt"></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Load statistics on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadStats();
+  document.getElementById('dt').textContent = new Date().toLocaleDateString();
+});
+
+// Load family statistics
+async function loadStats() {
+  try {
+    const response = await fetch('/api/genealogy/stats');
+    const data = await response.json();
+    
+    if (data.success) {
+      document.getElementById('statPeople').textContent = data.stats.totalPeople;
+      document.getElementById('statRelationships').textContent = data.stats.totalRelationships;
+      document.getElementById('statYears').textContent = data.stats.timespan;
+      document.getElementById('statGenerations').textContent = Object.keys(data.stats.generationCounts).length;
+    }
+  } catch (error) {
+    console.error('Error loading stats:', error);
+  }
+}
+
+// Load D3 visualization
+async function loadD3Visualization() {
+  try {
+    const response = await fetch('/api/genealogy/data');
+    const data = await response.json();
+    
+    if (data.success) {
+      console.log('Family data loaded:', data.data);
+      alert(`Family data loaded:\n${data.stats.people} people\n${data.stats.relationships} relationships\n\nYour D3 visualization code goes here!`);
+      
+      // TODO: Integrate your Ben Garvey D3 visualization here
+      // Example: d3FamilyTree('#d3-visualization', data.data);
+    }
+  } catch (error) {
+    console.error('Error loading family data:', error);
+    alert('Error loading family data');
+  }
+}
+
+// Export family data as JSON
+async function exportFamilyData() {
+  try {
+    const response = await fetch('/api/genealogy/data');
+    const data = await response.json();
+    
+    if (data.success) {
+      const dataStr = JSON.stringify(data.data, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'family-tree-data.json';
+      link.click();
+    }
+  } catch (error) {
+    console.error('Error exporting data:', error);
+  }
+}
+
+// Load timeline when tab is shown
+$('#timeline-tab').on('shown.bs.tab', async function () {
+  await loadTimeline();
+});
+
+// Load musical timeline
+async function loadTimeline() {
+  try {
+    const response = await fetch('/api/genealogy/musical-timeline');
+    const data = await response.json();
+    
+    if (data.success) {
+      const timelineContent = document.getElementById('timelineContent');
+      timelineContent.innerHTML = '';
+      
+      // Show sample of timeline (first 20 events)
+      data.timeline.slice(0, 20).forEach(event => {
+        const item = document.createElement('div');
+        item.className = 'timeline-item';
+        item.innerHTML = `
+          <div class="timeline-year">${event.year}</div>
+          <div class="person-name">${event.name}</div>
+          <div class="timeline-era">
+            <i class="bi-music-note"></i> ${event.musicalPeriod}
+            ${event.music ? `<br><small>${event.music}</small>` : ''}
+          </div>
+        `;
+        timelineContent.appendChild(item);
+      });
+      
+      if (data.timeline.length > 20) {
+        timelineContent.innerHTML += `<p class="text-center text-muted">Showing first 20 of ${data.timeline.length} events...</p>`;
+      }
+    }
+  } catch (error) {
+    console.error('Error loading timeline:', error);
+  }
+}
+
+// Search family members
+async function searchFamily() {
+  const query = document.getElementById('searchInput').value;
+  if (!query) return;
+  
+  try {
+    const response = await fetch(`/api/genealogy/search?q=${encodeURIComponent(query)}`);
+    const data = await response.json();
+    
+    const resultsDiv = document.getElementById('searchResults');
+    resultsDiv.innerHTML = '';
+    
+    if (data.success && data.results.length > 0) {
+      data.results.forEach(person => {
+        const card = document.createElement('div');
+        card.className = 'person-card';
+        card.onclick = () => viewPerson(person.id);
+        card.innerHTML = `
+          <div class="person-name">${person.name}</div>
+          <div class="person-details">
+            ${person.birthYear} - ${person.deathYear || 'Present'}<br>
+            ${person.born || 'Unknown location'}<br>
+            Generation ${person.generation}
+          </div>
+        `;
+        resultsDiv.appendChild(card);
+      });
+    } else {
+      resultsDiv.innerHTML = '<p class="text-muted text-center">No results found</p>';
+    }
+  } catch (error) {
+    console.error('Error searching:', error);
+  }
+}
+
+// View person details
+async function viewPerson(id) {
+  try {
+    const response = await fetch(`/api/genealogy/${id}`);
+    const data = await response.json();
+    
+    if (data.success) {
+      const person = data.person;
+      const era = data.musicalEra;
+      
+      alert(`${person.name}\n\nBorn: ${person.birthYear} in ${person.born}\nDied: ${person.deathYear}\n\nMusical Era: ${era.period}\nMusic: ${era.music}\n\nParents: ${data.family.parents.length}\nChildren: ${data.family.children.length}\nSiblings: ${data.family.siblings.length}`);
+    }
+  } catch (error) {
+    console.error('Error viewing person:', error);
+  }
+}
+
+// Test API
+async function testAPI() {
+  try {
+    const response = await fetch('/api/genealogy/year/1972/music');
+    const data = await response.json();
+    
+    alert(`Testing API:\n\nYear: 1972\nMusical Era: ${data.musicalEra.period}\nFamily Members Alive: ${data.familyMembersAlive}\n\nAPI is working!`);
+  } catch (error) {
+    console.error('Error testing API:', error);
+    alert('API test failed');
+  }
+}
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+

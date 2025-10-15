@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lane Family Tree - 400 Years of History</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #fff;
+      transition: background-color 1s ease;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: crosshair;
+    }
+
+    #menu {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 350px;
+      height: 100%;
+      background: rgba(250, 250, 250, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      overflow-y: auto;
+      transition: left 0.5s ease;
+      z-index: 1000;
+      box-shadow: 2px 0 20px rgba(0,0,0,0.1);
+    }
+
+    #menu h5 {
+      color: #2c3e50;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    #menu a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    #menu a:hover {
+      text-decoration: underline;
+    }
+
+    .toggle__button {
+      position: fixed;
+      top: 20px;
+      left: 370px;
+      z-index: 1001;
+      background: #e7e7e7;
+      border: none;
+      padding: 10px 15px;
+      font-size: 1.5rem;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .toggle__button:hover {
+      background: #d0d0d0;
+    }
+
+    .options {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 10px;
+    }
+
+    .options__label {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .views {
+      margin-bottom: 15px;
+    }
+
+    .view__button {
+      width: 100%;
+      margin-bottom: 5px;
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+    }
+
+    .view__button:hover {
+      background: linear-gradient(135deg, #2980b9, #3498db);
+      color: white;
+    }
+
+    .time {
+      margin-bottom: 15px;
+    }
+
+    .time__button {
+      width: 100%;
+      margin-bottom: 5px;
+    }
+
+    #search {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    #year {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 5rem;
+      font-weight: bold;
+      color: #222;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      z-index: 500;
+      transition: color 1s ease;
+    }
+
+    #memberDetails {
+      position: fixed;
+      display: none;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      z-index: 1000;
+      pointer-events: none;
+      border: 2px solid #3498db;
+    }
+
+    #name {
+      font-weight: bold;
+      color: #2c3e50;
+      font-size: 1.1rem;
+    }
+
+    .birthYear {
+      color: #666;
+      font-size: 0.9rem;
+      font-weight: normal;
+    }
+
+    #legend {
+      background: rgba(255,255,255,0.9);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+
+    #legend legend {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #ff9933;
+      margin-bottom: 10px;
+    }
+
+    #legend label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+    }
+
+    .generation-section {
+      margin-bottom: 25px;
+      padding: 15px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 10px;
+      border-left: 4px solid #3498db;
+    }
+
+    .generation-section label:first-of-type {
+      font-weight: bold;
+      color: #2c3e50;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .generation-section label:nth-of-type(2) {
+      font-size: 0.85rem;
+      color: #666;
+      font-style: italic;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .generation-section ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .generation-section ul li {
+      padding: 5px 0;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    #yearSlider {
+      width: 100%;
+      margin: 15px 0;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1001;
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .back-button:hover {
+      background: #2980b9;
+      color: white;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body onload="start()">
+  <!-- Back Button -->
+  <a href="/" class="back-button">
+    <i class="bi-house-fill"></i> Back to piBoom
+  </a>
+
+  <!-- Left Menu Panel -->
+  <div id="menu">
+    <div class="row">
+      <div class="col-12">
+        <h5><i class="bi-diagram-3"></i> William Lane of Boston</h5>
+        <p style="font-size: 0.85rem;">
+          <a href='https://archive.org/details/lanegenealogies01chap'>Data Source</a>
+          - A document driven approach by Ben Garvey - modified by David Lane for the Lane Family
+        </p>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="options">
+      <div class="checkbox mb-2">
+        <label class="options__label">
+          <input type="checkbox" id="nightModeOn"> <i class="bi-moon-stars"></i> Night Mode
+        </label>
+      </div>
+    </div>
+
+    <!-- View Modes -->
+    <div class="views">
+      <button class="btn btn-primary view__button" onclick="lineage.setMode('tree');">
+        <i class="bi-diagram-3"></i> Tree View
+      </button>
+      <button class="btn btn-info view__button" onclick="lineage.setMode('timeline');">
+        <i class="bi-clock-history"></i> Timeline View
+      </button>
+      <button class="btn btn-success view__button" onclick="lineage.setMode('cluster');">
+        <i class="bi-grid-3x3"></i> Cluster View
+      </button>
+    </div>
+
+    <!-- Time Controls -->
+    <div class="time">
+      <button class="btn btn-outline-secondary time__button" onclick="lineage.setYear(1600)">
+        <i class="bi-skip-backward-fill"></i> First (1600)
+      </button>
+      <button class="btn btn-outline-primary time__button" onclick="lineage.setYearIncrement(1);">
+        <i class="bi-play-fill"></i> Play
+      </button>
+      <button class="btn btn-outline-secondary time__button" onclick="lineage.setYear(2014)">
+        <i class="bi-skip-forward-fill"></i> Last (2014)
+      </button>
+      <input type="range" id="yearSlider" min="0" max="100" value="0" class="form-control-range">
+    </div>
+
+    <!-- Search -->
+    <input id="search" class="form-control" placeholder="Search family members..." value="">
+
+    <!-- Generation Lists -->
+    <div class="generation-section">
+      <label id="lbl0a">Generation Zero</label>
+      <label id="lbl0">The Great Puritan Migration Begins</label>
+      <ul id="ul0"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl1a">Generation One</label>
+      <label id="lbl1">William E Lane arrives from England as the Puritan Migration accelerates</label>
+      <ul id="ul1"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl2a">Generation Two</label>
+      <label id="lbl2">This generation of Lanes is born in North America and two will fight in King Phillips War</label>
+      <ul id="ul2"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl3a">Generation Three</label>
+      <label id="lbl3">Lanes are farmers, tanners, sextons, and seamen</label>
+      <ul id="ul3"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl4a">Generation Four</label>
+      <label id="lbl4">The Revolution is approaching</label>
+      <ul id="ul4"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl5a">Generation Five</label>
+      <label id="lbl5">The Revolution is here and Lanes are involved in many ways, including as officers in the Continental and Revolutionary Wars</label>
+      <ul id="ul5"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl6a">Generation Six</label>
+      <label id="lbl6">This generation is the first born in the United States Of America</label>
+      <ul id="ul6"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl7a">Generation Seven</label>
+      <label id="lbl7"></label>
+      <ul id="ul7"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl8a">Generation Eight</label>
+      <label id="lbl8"></label>
+      <ul id="ul8"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl9a">Generation Nine</label>
+      <label id="lbl9"></label>
+      <ul id="ul9"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl10a">Generation Ten</label>
+      <label id="lbl10"></label>
+      <ul id="ul10"></ul>
+    </div>
+
+    <div class="generation-section">
+      <label id="lbl11a">Generation Eleven</label>
+      <label id="lbl11"></label>
+      <ul id="ul11"></ul>
+    </div>
+
+    <!-- Legend -->
+    <fieldset id="legend">
+      <legend style="color:#ff9933;"><i class="bi-info-circle"></i> Relationship of Nodes</legend>
+      <label style="color:#CC0"><strong>Yellow</strong> points to spouse</label>
+      <label style="color:#F39"><strong>Fuschia</strong> points to mother</label>
+      <label style="color:#39F"><strong>Blue</strong> points to father</label>
+      <label style="color:#663399"><strong>Purple</strong> links Native American Tribes</label>
+    </fieldset>
+
+    <!-- piBoom Integration Info -->
+    <div class="mt-4 p-3" style="background: linear-gradient(135deg, rgba(135,206,250,0.2), rgba(144,238,144,0.2)); border-radius: 10px;">
+      <h6><i class="bi-music-note-beamed"></i> Musical Era Integration</h6>
+      <p style="font-size: 0.85rem;">Click on any family member to see what music was popular during their lifetime!</p>
+    </div>
+  </div>
+
+  <!-- Toggle Menu Button -->
+  <button class="toggle__button" onclick="toggleMenu()">☰</button>
+
+  <!-- Year Display -->
+  <div id="year"></div>
+
+  <!-- Canvas for D3 Visualization -->
+  <canvas height="1000" width="1000"></canvas>
+
+  <!-- Member Details Tooltip -->
+  <div id="memberDetails">
+    <div id="name"></div>
+    <div id="musicalEra" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 0.85rem; color: #666;">
+      <i class="bi-music-note"></i> <span id="eraText"></span>
+    </div>
+  </div>
+
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/lineage.js"></script>
+
+  <script>
+    var lineage = null;
+    var menuStatus = true; // Start with menu open
+
+    function start() {
+      // Load from piBoom API instead of local file
+      fetch('/api/genealogy/data')
+        .then(response => response.json())
+        .then(apiData => {
+          if (apiData.success) {
+            const config = {
+              startYear: 1600,
+              endYear: 2025, // Updated to current year
+              speed: 500,
+              debug: false,
+              filter: ''
+            };
+            
+            lineage = new Lineage();
+            lineage(config);
+            lineage.loadData(apiData.data);
+            
+            console.log('✅ Lane Family Tree loaded:', apiData.stats.people, 'people');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading family data:', error);
+          alert('Error loading family tree data. Please check your server connection.');
+        });
+    }
+
+    function toggleMenu() {
+      menuStatus = !menuStatus;
+      menu = d3.select('#menu');
+      toggleBtn = d3.select('.toggle__button');
+      left = menuStatus ? '0px' : '-370px';
+      btnLeft = menuStatus ? '370px' : '20px';
+      menu.transition().duration(500).style('left', left);
+      toggleBtn.transition().duration(500).style('left', btnLeft);
+    }
+
+    // Enhanced highlightNode to show musical era
+    const originalHighlight = window.highlightNode;
+    window.highlightNode = function(d, m) {
+      d3.selectAll('#memberDetails')
+        .style('display', 'block')
+        .style('top', (m[1] - 20) + 'px')
+        .style('left', (m[0] + 20) + 'px');
+      
+      const birthYear = d.birthDate ? d.birthDate.substring(0,4) : 'Unknown';
+      d3.select('#name').html(d.name + "<br><span class='birthYear'>" + birthYear + "</span>");
+      
+      // Fetch musical era for this person
+      if (birthYear && birthYear !== 'Unknown') {
+        fetch(`/api/genealogy/year/${birthYear}/music`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success && data.musicalEra) {
+              d3.select('#eraText').html(
+                `<strong>${data.musicalEra.period}</strong><br>${data.musicalEra.music}`
+              );
+            }
+          })
+          .catch(err => console.log('Could not fetch musical era'));
+      }
+    };
+  </script>
+</body>
+</html>
+

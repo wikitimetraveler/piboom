@@ -12,7 +12,7 @@ const USERS = [
   {
     id: 'wizened-wizard',
     name: 'The Wizened Wizard',
-    avatar: '/images/genie.png',
+    avatar: '/images/steven.png',
     color: '#9370DB', // medium purple
     description: 'Master of musical mysteries'
   },

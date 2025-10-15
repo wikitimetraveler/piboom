@@ -114,6 +114,17 @@ export async function createTables() {
       ADD COLUMN IF NOT EXISTS valuation DECIMAL(10,2)
     `);
 
+    // Add family member link (genealogy integration)
+    await pool.query(`
+      ALTER TABLE records 
+      ADD COLUMN IF NOT EXISTS family_member_id INTEGER
+    `);
+
+    await pool.query(`
+      ALTER TABLE records 
+      ADD COLUMN IF NOT EXISTS family_member_name VARCHAR(255)
+    `);
+
     // Create trees table for tree collection
     await pool.query(`
       CREATE TABLE IF NOT EXISTS trees (
