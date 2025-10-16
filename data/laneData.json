@@ -1,0 +1,3026 @@
+{
+	"nodes": [{
+			"name": "Gordon Brewer",
+			"id": 0,
+			"text": "",
+			"generation": 0,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1600,
+			"deathYear": "1690",
+			"birthDate": "1600-01-01T00:00:00.000Z",
+			"deathDate": "1690-01-01T00:00:00.000Z",
+			"born": "Hampton, Rockingham, New Hampshire",
+			"deathPlace": "Hampton, Rockingham, New Hampshire",
+			"burial": "Hampton, Rockingham, New Hampshire"
+
+		}, {
+			"name": "Elizabeth Brewer(Graves)?",
+			"id": 1,
+			"text": "",
+			"generation": 0,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1600,
+			"deathYear": "1662",
+			"birthDate": "1600-01-01T00:00:00.000Z",
+			"deathDate": "1662-01-01T00:00:00.000Z",
+			"deathPlace": "Hampton, Rockingham, New Hampshire",
+			"born": "Hampton, Rockingham, New Hampshire, USA",
+			"burial": "Hampton, Rockingham, New Hampshire"
+		}, {
+			"name": "Mary Lane",
+			"id": 2,
+			"text": "",
+			"generation": 1,
+			"gender": "F",
+			"lastName": "First Wife of William ",
+			"birthYear": 1625,
+			"deathYear": "May 2, 1656",
+			"birthDate": "1625-01-01T00:00:00.000Z",
+			"deathDate": "1656-01-01T00:00:00.000Z",
+			"deathPlace": "Hampton, Rockingham, New Hampshire",
+			"born": "Hampton, Rockingham, New Hampshire",
+			"burial": "Hampton, Rockingham, New Hampshire"
+		}, {
+			"name": "Mary Brewer",
+			"id": 3,
+			"text": "",
+			"generation": 1,
+			"gender": "F",
+			"lastName": "Second Wife of William Lane  ",
+			"birthYear": 1635,
+			"deathYear": "1700",
+			"birthDate": "1635-01-01T00:00:00.000Z",
+			"deathDate": "1700-01-01T00:00:00.000Z",
+			"born": "Boston, Massachusetts., USA",
+			"burial": "Hampton, Rockingham, New Hampshire"
+		}, {
+			"name": "William Lane",
+			"id": 4,
+			"text": "",
+			"generation": 1,
+			"gender": "M",
+              "lastName": "cordwainer",
+			"birthYear": 1625,
+			"deathYear": "1690",
+			"birthDate": "1625-01-01T00:00:00.000Z",
+			"deathDate": "1690-01-01T00:00:00.000Z",
+			"born": "Boston, Massachusetts., USA",
+			"burial": "Hampton, Rockingham, New Hampshire"
+		}, {
+			"name": "Samuel Lane",
+			"id": 5,
+			"text": "died as an infant",
+			"generation": 2,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1648,
+			"deathYear": "1650?",
+			"birthDate": "1648-01-01T00:00:00.000Z",
+			"deathDate": "1650-01-01T00:00:00.000Z",
+			"born": "Boston, Massachusetts., USA",
+			"died": "Sufifield, Conn",
+			"burial": ""
+		}, {
+			"name": "Samuel Lane",
+			"id": 6,
+			"text": "In 1676 he was a soldier, under Captain Turner of the same company in which John Lane, in 1675, served under Capt. Poole in King Philip's War.",
+			"occupation": [{
+				"job": "tanner"
+			}, {
+				"job": "shoemaker"
+			}, {
+				"government": "selectman"
+			}, {
+				"service": [{
+					"wars": [{
+						"war": "King Philip's War",
+						"text": "King Philip's War, sometimes called the First Indian War, Metacom's War, Metacomet's War, or Metacom's Rebellion, was an armed conflict between Native American inhabitants of present-day New England and English colonists and their Native American allies in 1675–78. The war is named for the main leader of the Native American side, Metacomet, who had adopted the English name King Philip in honor of the previously-friendly relations between his father and the original Mayflower Pilgrims. The war continued in the most northern reaches of New England until the signing of the Treaty of Casco Bay in April 1678"
+					}]
+				}, {
+					"armyName": "Colonial Army"
+				}, {
+					"branch": "Colonial Army"
+				}, {
+					"battles": [{
+						"name": "n/a",
+						"place": "n/a",
+						"start": "n/a",
+						"end": "n/a"
+					}]
+				}],
+				"commanding officers": [{
+					"officer": "Capt. Poole"
+				}],
+
+				"text": "In 1676 he was a soldier, under Captain Turner of the same company in which John Lane, in 1675, served under Capt. Poole in King Philip's War."
+			}],
+			"generation": 2,
+			"gender": "M",
+			"lastName": "Soldier in King Phillips War. In records dated Exeter, 1677, is a petition to the King that they may be continued under the jurisdiction of Massachusetts, which is signed by 'Samuel Lane.'",
+			"birthYear": 1651,
+			"deathYear": "1690",
+			"birthDate": "1651-01-01T00:00:00.000Z",
+			"deathDate": "1690-01-01T00:00:00.000Z",
+			"born": "Boston, Mass, USA",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "John Lane",
+			"id": 7,
+			"text": "In Mar., 1675, when 22 years of age, he was a soldier in King Philip's war, in the same company where his brother Samuel served under Capt. Poole.",
+			"generation": 2,
+			"gender": "M",
+			"lastName": "Cordwainer and Soldier in King Phillips War",
+			"birthYear": 1653,
+			"deathYear": "1725?",
+			"birthDate": "1653-01-01T00:00:00.000Z",
+			"deathDate": "1725-01-01T00:00:00.000Z",
+			"born": "Boston, Mass, USA",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Mary Lane",
+			"id": 8,
+			"text": "",
+			"generation": 2,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1656,
+			"deathYear": "1725?",
+			"birthDate": "1656-01-01T00:00:00.000Z",
+			"deathDate": "1725-01-01T00:00:00.000Z",
+			"born": "Boston, Mass, USA",
+			"burial": ""
+		}, {
+			"name": "Sarah Lane",
+			"id": 9,
+			"text": "",
+			"generation": 2,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1657,
+			"deathYear": "1725?",
+			"birthDate": "1657-01-01T00:00:00.000Z",
+			"deathDate": "1725-01-01T00:00:00.000Z",
+			"born": "Boston, Mass, USA",
+			"burial": ""
+		}, {
+			"name": "William Lane",
+			"id": 10,
+			"text": "William-, b. i Oct., 1659, a tailor, m. 21 June, 1680, Sarah (dau. of Thomas) Webster, b. 22 Jan., 1660-1 ; joined the North ch., Boston in 1681 ; removed in 1686 to Hampton, settled on a grant of ten acres. ",
+			"generation": 2,
+			"gender": "M",
+			"lastName": "Willaim Lane - Tailor",
+			"birthYear": 1659,
+			"deathYear": "1749",
+			"birthDate": "1659-01-01T00:00:00.000Z",
+			"deathDate": "1749-01-01T00:00:00.000Z",
+			"born": "Boston, Mass, USA",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Elizabeth Lane",
+			"id": 11,
+			"text": "",
+			"generation": 2,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1661,
+			"deathYear": "1720?",
+			"birthDate": "1661-01-01T00:00:00.000Z",
+			"deathDate": "1720-01-01T00:00:00.000Z",
+			"born": "Boston, Mass, USA",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Ebenezer Lane",
+			"id": 12,
+			"text": "",
+			"generation": 2,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1666,
+			"deathYear": "1725?",
+			"birthDate": "1666-01-01T00:00:00.000Z",
+			"deathDate": "1725-01-01T00:00:00.000Z",
+			"born": "Boston, Mass, USA",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Sarah Dickinson",
+			"id": 13,
+			"text": "0n 27 Feb., 1691, Sarah, widow of Samuel Lane, re-married to Martin  Kellogg,  with four children they were taken, 10 Feb., 1704, bytheFrenchandIndians,andcarriedcaptivetoCanada. Aftersomemonths all were released and returned, except one daughter who had married an Indian chief.",
+			"generation": 2,
+			"gender": "F",
+			"lastName": "0n 27 Feb., 1691, Sarah, widow of Samuel Lane, re-married to Martin  Kellogg",
+			"birthYear": 1672,
+			"deathYear": "1731",
+			"birthDate": "1672-01-01T00:00:00.000Z",
+			"deathDate": "1731-01-01T00:00:00.000Z",
+			"born": "Hadley, Mass, USA",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Samuel Lane",
+			"id": 14,
+			"text": "",
+			"generation": 3,
+			"gender": "M",
+			"lastName": "Samuel Lane -  m. 6 Oct., 1709, Abigail Hovey of Suffield County",
+			"birthYear": 1680,
+			"deathYear": "1738",
+			"birthDate": "1680-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Suffield County, New Hampshire",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Sarah Lane",
+			"id": 15,
+			"text": "",
+			"generation": 3,
+			"gender": "F",
+			"lastName": "Sarah Lane",
+			"birthYear": 1680,
+			"deathYear": "1738",
+			"birthDate": "1680-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Hadley, Mass",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Mary Lane",
+			"id": 16,
+			"text": "",
+			"generation": 3,
+			"gender": "F",
+			"lastName": "Mary b. Suffield, Ct., 7 May, 1684, m. 11 Dec, 1707, Jonathan Sykes.",
+			"birthYear": 1684,
+			"deathYear": "1738",
+			"birthDate": "1684-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Suffield, Conn",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "John Lane",
+			"id": 17,
+			"text": "",
+			"generation": 3,
+			"gender": "M",
+			"lastName": "Settled in Connecticut.",
+			"birthYear": 1686,
+			"deathYear": "1738",
+			"birthDate": "1686-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Hadley, Mass",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Elizabeth Lane",
+			"id": 18,
+			"text": "",
+			"generation": 3,
+			"gender": "F",
+			"lastName": " m. 11 Nov., 1711, John Smith",
+			"birthYear": 1688,
+			"deathYear": "1738?",
+			"birthDate": "1688-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Hadley, Mass",
+			"burial": ""
+		}, {
+			"name": "Sarah Webster",
+			"id": 19,
+			"text": "",
+			"generation": 2,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1686,
+			"deathYear": "1738?",
+			"birthDate": "1688-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Boston, Mass",
+			"burial": ""
+		}, {
+			"name": "John Lane",
+			"id": 20,
+			"text": "After some years at home he went to sea again, and died at sea, leaving a widow and an only son :",
+			"generation": 3,
+			"gender": "F",
+			"lastName": "John Lane followed the sea, and was taken captive by pirates and held seven years.",
+			"birthYear": 1685,
+			"deathYear": "1738?",
+			"birthDate": "1688-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Boston, Mass",
+			"burial": "Sea"
+		}, {
+			"name": "Sarah Lane",
+			"id": 21,
+			"text": "We have no record of anyc hildren.",
+			"generation": 3,
+			"gender": "F",
+			"lastName": ", b. 6 Nov., 1688, m. 21 Dec, 1721, William Berry of Rye. Died.3J an.,1776",
+			"birthYear": 1688,
+			"deathYear": "1776",
+			"birthDate": "1688-01-01T00:00:00.000Z",
+			"deathDate": "1776-01-01T00:00:00.000Z",
+			"born": "Boston, Mass",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Elizabeth Lane",
+			"id": 22,
+			"text": "",
+			"generation": 3,
+			"gender": "F",
+			"lastName": ", b. 6 Nov., 1688, m. 21 Dec, 1721, William Berry of Rye. Died.3J an.,1776",
+			"birthYear": 1688,
+			"deathYear": "1776",
+			"birthDate": "1688-01-01T00:00:00.000Z",
+			"deathDate": "1776-01-01T00:00:00.000Z",
+			"born": "Boston, Mass",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Abigail Lane",
+			"id": 23,
+			"text": "",
+			"generation": 3,
+			"gender": "F",
+			"lastName": "b. 9 Dec, 1693, m. 14 Dec, 1715, Jn. Vittum.",
+			"birthYear": 1693,
+			"deathYear": "1776?",
+			"birthDate": "1693-01-01T00:00:00.000Z",
+			"deathDate": "1776-01-01T00:00:00.000Z",
+			"born": "Boston, Mass",
+			"burial": " "
+		}, {
+			"name": "Deacon Joshua Lane",
+			"id": 24,
+			"text": "He and his wife joined the ch. in Hampton, 10 Mar., 1718. Dea. Joshua resided on a farm on the road to North Hampton one-half a mile north of the present railroad station, and carried on the trade of a tanner and shoemaker.",
+			"generation": 3,
+			"gender": " M",
+			"lastName": "Deacon Joshua Lane While standing on his door-step after a shower, he was killed by lightning,",
+			"birthYear": 1696,
+			"deathYear": "1765",
+			"birthDate": "1696-01-01T00:00:00.000Z",
+			"deathDate": "1765-01-01T00:00:00.000Z",
+			"born": "Boston, Mass",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshie"
+		}, {
+			"name": "Samuel Lane",
+			"id": 25,
+			"text": "He and his wife joined the ch. in Hampton, 10 Mar., 1718. Dea. Joshua resided on a farm on the road to North Hampton one-half a mile north of the present railroad station, and carried on the trade of a tanner and shoemaker.",
+			"generation": 3,
+			"gender": " M",
+			"lastName": "Samuel Lane - A farmer and a respectable man, and had 7 ch.",
+			"birthYear": 1698,
+			"deathYear": "1776",
+			"birthDate": "1698-01-01T00:00:00.000Z",
+			"deathDate": "1776-01-01T00:00:00.000Z",
+			"born": "Hampton, Mass",
+			"burial": " "
+		}, {
+			"name": "Thomas Lane",
+			"id": 26,
+			"text": "",
+			"generation": 3,
+			"gender": " M",
+			"lastName": "Thomas Lane resided in Hampton, was sexton of the ch. and d. 30 Aug., 1775, ae. 74. He had 6 ch.",
+			"birthYear": 1701,
+			"deathYear": "1775",
+			"birthDate": "1701-01-01T00:00:00.000Z",
+			"deathDate": "1775-01-01T00:00:00.000Z",
+			"born": "Hampton, Mass",
+			"burial": " "
+		}, {
+			"name": "Abigail Hovey",
+			"id": 27,
+			"text": "",
+			"generation": 3,
+			"gender": "F",
+			"lastName": "Abigail Hovey",
+			"birthYear": 1701,
+			"deathYear": "1775",
+			"birthDate": "1701-01-01T00:00:00.000Z",
+			"deathDate": "1775-01-01T00:00:00.000Z",
+			"born": "Hampton, Mass",
+			"burial": " "
+		}, {
+			"name": "Sarah Lane",
+			"id": 28,
+			"text": "",
+			"generation": 4,
+			"gender": "F",
+			"lastName": "Sarah b. 18 Mar., 1710, m. 6 Nov., 1729, Nathan Worster, and d. 30 Nov., 1732.",
+			"birthYear": 1710,
+			"deathYear": "1732",
+			"birthDate": "1710-01-01T00:00:00.000Z",
+			"deathDate": "1732-01-01T00:00:00.000Z",
+			"born": "Suffield, Conn",
+			"burial": " "
+		}, {
+			"name": "Samuel Lane",
+			"id": 29,
+			"text": "",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "Samuel b. 27 Sept., 1712, m. 4 July, 1740, Elizabeth (dau. Jacob and Mercy) Adams,",
+			"birthYear": 1712,
+			"deathYear": "1762?",
+			"born": "Suffield, Conn",
+			"birthDate": "1712-01-01T00:00:00.000Z",
+			"deathDate": "1762-01-01T00:00:00.000Z",
+			"burial": "Pine Grove Cemetary, Hampton, New Hampshire"
+		}, {
+			"name": "Enos Lane",
+			"id": 30,
+			"text": "",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "m. 3 Nov., 1736, Elizabeth (dau. of Joseph and Eliz.) Harmon.",
+			"birthYear": 1715,
+			"deathYear": "1765?",
+			"born": "Suffield, Conn",
+			"birthDate": "1715-01-01T00:00:00.000Z",
+			"deathDate": "1765-01-01T00:00:00.000Z",
+			"burial": " "
+		}, {
+			"name": "Abigail Lane",
+			"id": 31,
+			"text": "",
+			"generation": 4,
+			"gender": "F",
+			"lastName": "m. 16 Dec, 1746, Samuel Remington.",
+			"birthYear": 1716,
+			"deathYear": "1765?",
+			"birthDate": "1716-01-01T00:00:00.000Z",
+			"deathDate": "1765-01-01T00:00:00.000Z",
+			"born": "Suffield, Conn",
+			"burial": " "
+		}, {
+			"name": "Ithamar Lane",
+			"id": 32,
+			"text": "",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "m, 24 Dec, 1747, Abi. Granger,",
+			"birthYear": 1720,
+			"deathYear": "1770?",
+			"birthDate": "1720-01-01T00:00:00.000Z",
+			"deathDate": "1770-01-01T00:00:00.000Z",
+			"born": "Suffield, Conn",
+			"burial": " "
+		}, {
+			"name": "Anthony Libbey",
+			"id": 33,
+			"text": "",
+			"generation": 2,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1662,
+			"deathYear": "1712?",
+			"birthDate": "1662-01-01T00:00:00.000Z",
+			"deathDate": "1712-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Sarah Drake",
+			"id": 34,
+			"text": "",
+			"generation": 2,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1665,
+			"deathYear": "1717?",
+			"birthDate": "1665-01-01T00:00:00.000Z",
+			"deathDate": "1717-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Mary Libbey",
+			"id": 35,
+			"text": "",
+			"generation": 3,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1685,
+			"deathYear": "1717?",
+			"birthDate": "1685-01-01T00:00:00.000Z",
+			"deathDate": "1717-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Coronet John Lane",
+			"id": 36,
+			"text": "",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1709,
+			"deathYear": "1784",
+			"birthDate": "1709-01-01T00:00:00.000Z",
+			"deathDate": "1784-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": ""
+		}, {
+			"name": "John Libbey",
+			"id": 37,
+			"text": "in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H.",
+			"generation": 1,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1633,
+			"deathYear": "1720?",
+			"birthDate": "1633-01-01T00:00:00.000Z",
+			"deathDate": "1720-01-01T00:00:00.000Z",
+			"born": "Scarboro , Maine,",
+			"burial": " "
+		}, {
+			"name": "John Libbey' wife",
+			"id": 38,
+			"text": "John Libbey' wife in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H.",
+			"generation": 1,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1645,
+			"deathYear": "1715?",
+			"birthDate": "1645-01-01T00:00:00.000Z",
+			"deathDate": "1715-01-01T00:00:00.000Z",
+			"born": "Scarboro , Maine",
+			"burial": " "
+		}, {
+			"name": "Nathanian Dickinson",
+			"id": 39,
+			"text": "Three of Nathaniel's sons, John, Joseph, and Azariah, were killed in King Philip's War in 1675 and 1676",
+			"generation": 0,
+			"gender": "M",
+			"lastName": " ",
+			"birthYear": 1600,
+			"deathYear": "1676",
+			"birthDate": "1600-01-01T00:00:00.000Z",
+			"deathDate": "1676-01-01T00:00:00.000Z",
+			"born": "Wethersfield, Connecticut",
+			"burial": "Nathanian Dickinson"
+		}, {
+			"name": "Anna Gull",
+			"id": 40,
+			"text": "Anna Gull - widow of William Gull",
+			"generation": 0,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1600,
+			"deathYear": "1670?",
+			"birthDate": "1600-01-01T00:00:00.000Z",
+			"deathDate": "1670-01-01T00:00:00.000Z",
+			"born": "Wethersfield, Connecticut",
+			"burial": " "
+		}, {
+			"name": "John Dickinson",
+			"id": 41,
+			"text": "John Dickinson",
+			"generation": 1,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1635,
+			"deathYear": "1670",
+			"birthDate": "1635-01-01T00:00:00.000Z",
+			"deathDate": "1670-01-01T00:00:00.000Z",
+			"born": "Wethersfield, Connecticut",
+			"burial": " "
+		}, {
+			"name": "John Dickinson's wife",
+			"id": 42,
+			"text": "John Dickinson",
+			"generation": 1,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1635,
+			"deathYear": "1670",
+			"birthDate": "1635-01-01T00:00:00.000Z",
+			"deathDate": "1670-01-01T00:00:00.000Z",
+			"born": "Wethersfield, Connecticut",
+			"burial": " "
+		}, {
+			"name": "Hannah Lamprey",
+			"id": 43,
+			"text": "",
+			"generation": 4,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1711,
+			"deathYear": "1761",
+			"birthDate": "1711-01-01T00:00:00.000Z",
+			"deathDate": "1761-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Lieutenant John Lane",
+			"id": 44,
+			"text": "July 21, 1777, as second lieutenant in S. Dearborn's Company, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777.Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant.",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "He settled, a farmer and shoemaker, on lot 130 Old Hundreds.",
+			"birthYear": 1733,
+			"deathYear": "1813",
+			"birthDate": "1733-01-01T00:00:00.000Z",
+			"deathDate": "1813-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Daniel Lane",
+			"id": 45,
+			"text": "He gave for a burying ground one-fourth of an acre of land, and David Lane, David Lane, Jr., Isaac Lane, Jonathan Lane, Josiah Lane, &c., agreed to keep it fenced.",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "He enlisted, 5 Aug., 1778, in Col. J. Gale's Regiment for New Jersey, and served 26 days.",
+			"birthYear": 1735,
+			"deathYear": "1825",
+			"birthDate": "1735-01-01T00:00:00.000Z",
+			"deathDate": "1825-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Lieutenant Ezekiel",
+			"id": 46,
+			"text": "He was Lieutenant in S. Dearborn's Company, T. Stickney's Regiment, and was killed in the battle of Bennington, 16 Aug., 1777.",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "Res. on Lot 128, Old Hundreds, farmer and carpenter, was select-man from 1765 to 1773,built a school house",
+			"birthYear": 1739,
+			"deathYear": "1777",
+			"birthDate": "1739-01-01T00:00:00.000Z",
+			"deathDate": "1777-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Lieutenant David Lane",
+			"id": 47,
+			"text": "farmer",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "farmer",
+			"birthYear": 1741,
+			"deathYear": "1824",
+			"birthDate": "1741-01-01T00:00:00.000Z",
+			"deathDate": "1824-01-01T00:00:00.000Z",
+			"born": "Raymond, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Mary Lane",
+			"id": 48,
+			"text": "",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "m. her cousin, Jn. Knowles, Jr., b. in Rye, 19 Feb., 1743-4, res. in Chester, a Revolutionary soldier of honorable record,",
+			"birthYear": 1743,
+			"deathYear": "1795",
+			"birthDate": "1743-01-01T00:00:00.000Z",
+			"deathDate": "1795-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Hannah Lane",
+			"id": 49,
+			"text": "farmer",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "married 16 Aug., 1 761, EzEKiEL Morse, res. at Raymond and New Hamilton, a soldier in the French and Indian war, 1756-8, and in the Revolutionary war, 1776.",
+			"birthYear": 1745,
+			"deathYear": "1831",
+			"birthDate": "1745-01-01T00:00:00.000Z",
+			"deathDate": "1831-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Nathan Lane",
+			"id": 50,
+			"text": "d. in the army, 26 Sept., 1776",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "a soldier in J, Dearborn's, Company, Col. Wyman's Regiment, in expedition against Canada",
+			"birthYear": 1747,
+			"deathYear": "1776",
+			"birthDate": "1747-01-01T00:00:00.000Z",
+			"deathDate": "1776-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Issac Lane",
+			"id": 51,
+			"text": "",
+			"generation": 5,
+			"gender": "M",
+			"lastName": " ",
+			"birthYear": 1749,
+			"deathYear": "1757",
+			"birthDate": "1749-01-01T00:00:00.000Z",
+			"deathDate": "17357-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Sarah Lane",
+			"id": 52,
+			"text": "",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "m. Levi Swain res. in Raymond, soldier in the Revolution,",
+			"birthYear": 1758,
+			"deathYear": "1839",
+			"birthDate": "1758-01-01T00:00:00.000Z",
+			"deathDate": "1839-01-01T00:00:00.000Z",
+			"born": "Raymond, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Cornet Isaac Lane",
+			"id": 53,
+			"text": "",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "He lived on West of Lot 20, Part 2, Division, a farmer, active in town and parish affairs.",
+			"birthYear": 1760,
+			"deathYear": "1843",
+			"birthDate": "1760-01-01T00:00:00.000Z",
+			"deathDate": "1843-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Jonathan Lane",
+			"id": 54,
+			"text": "",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "Enlisted in M. Leavitt's Company, Thos. Bart- lett's Regiment for West Point, July 1 780, discharged Oct., 1 780.",
+			"birthYear": 1763,
+			"deathYear": "1847",
+			"birthDate": "1763-01-01T00:00:00.000Z",
+			"deathDate": "1847-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Bathseheba Robie",
+			"id": 55,
+			"text": "",
+			"generation": 3,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1697,
+			"deathYear": "1777?",
+			"birthDate": "1697-01-01T00:00:00.000Z",
+			"deathDate": "1777-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Deacon Samuel Lane",
+			"id": 56,
+			"text": "Deacon Samuel Lane removed in June,1741,from Hampton to Stratham,where he continued the business of a tanner and shoe - maker,and purchased first a piece of wet land,on the east of the streamthen three acres of dry land,on the opposite side,where he built a house.He afterward bought eighty acres and added the business of farming to that of a mechanic.He was often called away from home to survey lands.The township of Bow and several others were surveyed by him.He was elected selectman in 1751",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "moved in June, 1741, from Hampton to Stratham, where he continued the business of a tanner and shoe- maker, and purchased first a piece of wet land, on the east of the stream,then three acres of dry land,on the opposite side, where he built a house.He afterward bought eighty acres and added the business of farming to that of a mechanic.He was often called awayfromhometosurveylands.ThetownshipofBowandseveral others were surveyed by him.He was elected selectman in 1751,and for several years afterward was justice of the peace.He was a member of the Provincial Assembly in 1766,and from 1774 on - ward,was town clerk.When seventeen years of age he united with the Congregational church and drew up certain rules to govern his conduct as a Christian,to which he firmly adhered through life.On 4 July,1765,he was elected deacon,and held the office till 28 May,1800",
+			"birthYear": 1718,
+			"deathYear": "1806",
+			"birthDate": "1718-01-01T00:00:00.000Z",
+			"deathDate": "1806-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Mary Lane",
+			"id": 57,
+			"text": "She m. (i) 7 Feb., 1740, Jacez (s. of Benjamin and Sus- anna) James, b. in Hampton, 18 , 171 7, who d. iS June, 1752, ae. 35, leaving 3 ch. She m.   20 May, 1755, Jonathan Shaw, b. Hampton, May, 1709, by whom she had 4 ch. He d. Hamp- ton, 30 May, 17S0, ae. 71.",
+			"generation": 4,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1720,
+			"deathYear": "1795",
+			"birthDate": "1729-01-01T00:00:00.000Z",
+			"deathDate": "1795-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Joshua Lane",
+			"id": 58,
+			"text": "She m. (i) 7 Feb., 1740, Jacez (s. of Benjamin and Sus- anna) James, b. in Hampton, 18 , 171 7, who d. iS June, 1752, ae. 35, leaving 3 ch. She m.   20 May, 1755, Jonathan Shaw, b. Hampton, May, 1709, by whom she had 4 ch. He d. Hamp- ton, 30 May, 17S0, ae. 71.",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1721,
+			"deathYear": "1723",
+			"birthDate": "1721-01-01T00:00:00.000Z",
+			"deathDate": "1723-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "William Lane",
+			"id": 59,
+			"text": "He and his son William were soldiers in the Continental army.",
+
+			"occupation": [{
+				"job": "tanner"
+			}, {
+				"job": "shoemaker"
+			}, {
+				"government": "selectman"
+			}, {
+				"service": [{
+					"war": "Revolutionary"
+				}, {
+					"armyName": "Continental"
+				}, {
+					"branch": "army"
+				}, {
+					"battles": [{
+						"name": "skirmish",
+						"place": "n/a",
+						"start": "n/a",
+						"end": "n/a"
+					}]
+				}]
+			}],
+			"generation": 4,
+			"gender": "M",
+			"lastName": "He was a tanner and shoemaker. As chairman of the selectmen, in June, 1776, he returned as signers of  The Association Test  the following names: Oliver Wellington Lane, Simon Lane  (Thos. ), William Lane Jr.  (Wm. ), Ebenezer Lane (Josh.^ ), Josiah Lane'' (Josh.^), his own name and that of his son. Ward Lane.",
+			"birthYear": 1723,
+			"deathYear": "1802",
+			"birthDate": "1723-01-01T00:00:00.000Z",
+			"deathDate": "1802-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Joshua Lane",
+			"id": 60,
+			"text": "",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "Resided in Hampton till abt. 1762, when he removed to Poplin (now Fremont) near to Epping, to the Sanborn farm, plain and meadow, occu])ied in 1890 by Jn. M. Fitts, his great-great-grandson. TheybelongedtotheCongregationalchurch in Hampton and removetl their relations to the church in Epping, under the care of Rev. Josiah Stearns, whose son John m. their dau. Sarah",
+			"birthYear": 1724,
+			"deathYear": "1794",
+			"born": "Hampton, New Hampshire",
+			"birthDate": "1724-01-01T00:00:00.000Z",
+			"deathDate": "1794-01-01T00:00:00.000Z",
+			"burial": " "
+		}, {
+			"name": "Josiah Lane",
+			"id": 61,
+			"text": "",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1724,
+			"deathYear": "1729",
+			"born": "Hampton, New Hampshire",
+			"birthDate": "1724-01-01T00:00:00.000Z",
+			"deathDate": "1729-01-01T00:00:00.000Z",
+			"burial": " "
+		}, {
+			"name": "Major John Lane",
+			"id": 62,
+			"text": " They had 8 ch. He joined the Hampt(m church, 23 Oct., 1748, but removed to Kensington, where he was selectman, and made return of the census in 1773. In May, 1773, he was cited to appear before the General Assembly and testify relative to a parish meeting in Hampton Falls, 9 Mar., 1773.",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "Aug. 24, 1775, he was chosen by the Provincial Congress, First Major in Col. J. Moulton's Third Regiment of Militia.",
+			"birthYear": 1724,
+			"deathYear": "1729",
+			"birthDate": "1724-01-01T00:00:00.000Z",
+			"deathDate": "1729-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+
+			"name": "Sarah Lane",
+			"id": 63,
+			"text": " They had 8 ch. He joined the Hampt(m church, 23 Oct., 1748, but removed to Kensington, where he was selectman, and made return of the census in 1773. In May, 1773, he was cited to appear before the General Assembly and testify relative to a parish meeting in Hampton Falls, 9 Mar., 1773.",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "Aug. 24, 1775, he was chosen by the Provincial Congress, First Major in Col. J. Moulton's Third Regiment of Militia.",
+			"birthYear": 1727,
+			"deathYear": "1786?",
+			"born": "Seabrook, New Hampshire",
+			"birthDate": "1727-01-01T00:00:00.000Z",
+			"deathDate": "1786-01-01T00:00:00.000Z",
+			"burial": " "
+		}, {
+
+			"name": "Bathsheda Lane",
+			"id": 64,
+			"text": "",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "b. 6 June, 1729, united with the church in 1744, and d., unm., of fever, 5 Sept., 1757, ae. 28. A devoted and useful Christian.",
+			"birthYear": 1729,
+			"deathYear": "1757?",
+			"birthDate": "1729-01-01T00:00:00.000Z",
+			"deathDate": "1757-01-01T00:00:00.000Z",
+			"born": "Seabrook, New Hampshire",
+			"burial": " "
+		}, {
+
+			"name": "Isaiah Lane",
+			"id": 65,
+			"text": "He was a farmer and shoemaker, and d. 23 Oct., 1815, ae. 85. On 26 Mar., 1770, he petitioned Gov. Wcntworth and the General Assembly for a committee to settle parish diffi- culties.",
+			"generation": 4,
+			"gender": "M",
+			"lastName": "b. 6 June, 1729, united with the church in 1744, and d., unm., of fever, 5 Sept., 1757, ae. 28. A devoted and useful Christian.",
+			"birthYear": 1730,
+			"deathYear": "1823",
+			"birthDate": "1730-01-01T00:00:00.000Z",
+			"deathDate": "1823-01-01T00:00:00.000Z",
+			"born": "Hampton Falls, New Hampshire",
+			"burial": " "
+		}, {
+
+			"name": "Mary James",
+			"id": 66,
+			"text": "",
+			"generation": 4,
+			"gender": "F",
+			"lastName": "(dau. Benj. and Susanna) James* of Han)pton, a Christian woman, b. 3 Mar., 1722, d. 30 Jan., 1769, leaving 8 children whom she had trained up in the principles of the gospel.",
+			"birthYear": 1722,
+			"deathYear": "1769",
+			"birthDate": "1722-01-01T00:00:00.000Z",
+			"deathDate": "1769-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+
+			"name": "Mrs. Rachel Parsons (widow of Gideon) ",
+			"id": 67,
+			"text": "",
+			"generation": 4,
+			"gender": "F",
+			"lastName": " (widow of Gideon) Colcord f of Newmarket, b. at Cape Ann, Mass., 29 June, 1726, and d. 18 Jan., 1S13. She was dau. of Jusiah and Eunice (Sargent) Parsons, and grand dau. of John Parsons, whose father, Jeffrey, was b. near Exeter in England, in 1631, and d. in Gloucester, Mass., Aug., 16S9.",
+			"birthYear": 1726,
+			"deathYear": "1813",
+			"birthDate": "1726-01-01T00:00:00.000Z",
+			"deathDate": "1813-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+
+			"name": "Mary Lane",
+			"id": 68,
+			"text": "John descended from Thomas Crocket of Kittery, Me., in 164S and of York in 1652. In 1633 he was one of five men, in the infant colony of Ne- vvichawanick (now Salmon Falls) and is said to have had a brother, Thomas, among whose descendants were the Crocketts of Kentucky",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "Mary , b. 14 July, 1744, d. 18 Sept., 1792, ae. 48. She m. 26 Oct., 1762, John Crocket*, b. in Stratham, 28 June. 1739. He settled in Stratham, but in 1777 rem. to Northwood, where he d. He m. (2) Widow Bryant of Newmarket. They had 7 ch.",
+			"birthYear": 1744,
+			"deathYear": "1792",
+			"born": "Stratham, New Hampshire",
+			"birthDate": "1744-01-01T00:00:00.000Z",
+			"deathDate": "1792-01-01T00:00:00.000Z",
+			"burial": " "
+		}, {
+			"name": "Samuel Lane",
+			"id": 69,
+			"text": "",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "Settled in Stratham, I 1-2 miles from his father's on the road to Portsmouth, a farmer, and carried on the trades of tanner and shoemaker. He joined the Gongregational church, 13 June, 1804, and was beloved and respected by all who knew him. He had 9 ch. and d. 24 Nov., 1820, in the 75th year of his age.",
+			"birthYear": 1746,
+			"deathYear": "1792",
+			"birthDate": "1746-01-01T00:00:00.000Z",
+			"deathDate": "1792-01-01T00:00:00.000Z",
+			"born": "Stratham, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Deacon Joshua Lane",
+			"id": 70,
+			"text": "He united with the church in Oct., 1 781, was chosen deacon, 28 May, 1800, and d. 28 Oct., 18 13, ae. 65. He was amiable, gentle, a devoted Ghristian, well beloved. He had12 children. His wife, a member of the church, spent the last of her long life in the family of her grandson, Joshua James Lane, who occupied the farm owned by her husband and afterward by her son, James Lane. She d. 31 Dec, 1841, in the ninety-second year of her age Deacon Joshua Lane was remarkable for his early piety and habitual devo- tion. When eleven years old being alone in a field, he was overcome by a view of his sins and fell to the ground. His conversion was instantaneous, but be- came permanent. He read his Bible and prayed habitually in his family and frequently visited the sick. He loved the house of God and rejoiced in the revivals of religion. He carefully instructed his children in the Sacred Scrip- tures and in the Catechism.",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "m. 15 Nov., 1769, Han- nah (dau. of Abraham) Tilton of Stratham, b. 28 Jan., 1750, settled two miles from his father's, on the Rocky Lane Road, leading to North Hampton.",
+			"birthYear": 1748,
+			"deathYear": "1792",
+			"born": "Stratham, New Hampshire",
+			"birthDate": "1748-01-01T00:00:00.000Z",
+			"deathDate": "1792-01-01T00:00:00.000Z",
+			"burial": " "
+		}, {
+			"name": "Susanna Lane",
+			"id": 71,
+			"text": "",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "b. 24 July, 1750, m. 4 Feb., 1773 Jonathan, (son of Joseph, grandson of John) Glark, b. in Stratham, 9 Jan., 1748, res. in Northwood. She d. there 10 June, 1801, ae. near 51. They had 5 ch. Jonathan Glark, farmer and cooper, d. at North- wood, 13 Feb., 181 5, ae. 67. His brother, Joseph, m. Bathsheba Lane, a sister of Susanna, his wife.",
+			"birthYear": 1750,
+			"deathYear": "1801",
+			"birthDate": "1750-01-01T00:00:00.000Z",
+			"deathDate": "1801-01-01T00:00:00.000Z",
+			"born": "Northwood, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Sarah Lane",
+			"id": 72,
+			"text": "Four brothers, Matthew, William, Jacob and John Thompson, are said to have come from England to Newburyport, prior to 1712, and three of them removed to Newmarket. Matthew settled in Stratham, and had 7 children. His eldest son Matthew resided in Stratham.",
+			"generation": 5,
+			"gender": "F",
+			"lastName": " b. 30 Sept., 1752, m. 20 Jan., 1783, Matthew THOMPSONf, b. 16 Aug., 1756. and res, in Sanbornton till her death, 16 Aug., 1834, ae. near 82. He was an industrious farmer of giant frame and great strength. They had b. in Sanbornton 8ch.",
+			"birthYear": 1722,
+			"deathYear": "1769",
+			"birthDate": "1722-01-01T00:00:00.000Z",
+			"deathDate": "1769-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Martha Lane",
+			"id": 73,
+			"text": " ",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "b. 22 Feb., 1655, d. 19 June, 1803, m. 25 April, 1 776, William (s. Deacon Stephen and Elizabeth VViggin) BoARDMAN, b. at Newmarket, 25 Aug., 1755, and res. near New- market on the Durham side of Lamprey River. He was an indus- trious and worthy citizen.",
+			"birthYear": 1755,
+			"deathYear": "1803",
+			"birthDate": "1755-01-01T00:00:00.000Z",
+			"deathDate": "1803-01-01T00:00:00.000Z",
+			"born": "New Market, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Bathsheua Lane",
+			"id": 74,
+			"text": "",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "b. 27 May, 1757, m, 15 Jan., 1777, Joseph (s. of Joseph-) Clarke,* b. 7. Jan., 1752, in Stratham, settled in Sanbornton (the part now Franklin) where he d. 25 June, 1810, ae. 58. Bathsheba. his widow d. 11 July, 1S25, ae. 68.",
+			"birthYear": 1757,
+			"deathYear": "1825",
+			"birthDate": "1757-01-01T00:00:00.000Z",
+			"deathDate": "1825-01-01T00:00:00.000Z",
+			"born": "Franklin , New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Jabez Lane",
+			"id": 75,
+			"text": " ",
+			"generation": 5,
+			"gender": "M",
+			"lastName": "b. 16 May, 1760, d. 3 April, 1810, res. on the homestead and continued the business of his father. Being of a weakly constitution, and from childhood lame, he commenced pre- paring for college, but the Revolutionary war led him to give up his studies and learn the trade of his father. On 2 Oct., 1783, he m. his step-sister, Eunice (dau. of Gideon and Rachel Parsons) Colcord, b. 25 Mar., 1763, d. 6 Apr., 1836, ae. 73. In Aug., 1 801, he united with the Congregational Church in Stratham, and was highly esteemed as a useful member. A few days before his death he called to his bedside a son eight years old to receive his dying counsel, ",
+
+			"birthYear": 1760,
+			"deathYear": "1810",
+			"birthDate": "1760-01-01T00:00:00.000Z",
+			"deathDate": "1810-01-01T00:00:00.000Z",
+			"born": "Hampton, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Hannah Tilton",
+			"id": 76,
+			"text": "Hannah a member of the church, spent the last of her long life in the family of her grandson, Joshua James Lane, who occupied the farm owned by her husband and afterward by her son, James Lane. She d. 31 Dec, 1841, in the ninety-second year of her age",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "m. 15 Nov., 1769, Han- nah (dau. of Abraham) Tilton of Stratham, b. 28 Jan., 1750, settled two miles from his father's, on the Rocky Lane Road, leading to North Hampton.",
+
+			"birthYear": 1750,
+			"deathYear": "1841",
+			"birthDate": "1750-01-01T00:00:00.000Z",
+			"deathDate": "1841-01-01T00:00:00.000Z",
+			"born": "Stratham, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "James Lane",
+			"id": 77,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": "b. 17 Sept., 1770, m. 23 Nov., 1794, Deborah (dau. of Josiah) Folsom of Exeter, b. 12 May, 1772, who d. 10 Mar., 1829, ae. abt. 57. He res. a few years in Pittsfield then in Stratham, and had 9 ch. He d. 31 Mar., 1833, ae. 62 yrs. and 6 mos. In addition to the care of his farm he carried on the trade ofa tanner and shoemaker. He and his wife were members of the Congregational church, he was a prominent citizen of Stratham, and a member of the Legislature, &c.",
+			"birthYear": 1770,
+			"deathYear": "1833",
+			"birthDate": "1770-01-01T00:00:00.000Z",
+			"deathDate": "1833-01-01T00:00:00.000Z",
+			"born": "Stratham, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Stephen Lane",
+			"id": 78,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": ". 8 Dec, 1771, d. 6 Dec, 1840, m. Lois Currier of Gilmanton, who d. 21 Aug., 1859. He was a joiner, lived in Stewartstown and Sanbornton, N. H., then in Moscow, N. Y., where he d, of dropsy, 6 Dec, 1840, ae. 69. Had 7 ch.",
+
+			"birthYear": 1771,
+			"deathYear": "1840",
+			"birthDate": "1771-01-01T00:00:00.000Z",
+			"deathDate": "1840-01-01T00:00:00.000Z",
+			"born": "Moscow, N. Y",
+			"burial": " "
+		}, {
+			"name": "Rev. Joshua Lane",
+			"id": 79,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": "b. 13 Jan., 1773, m. (i) 9 Sept., 1801, Elizabeth Eaton, m. (2) 22 Nov., 1807,. Charity Dickinson, b. 31 Oct., 1788, d. 28 Mar., 1873. His first marriage was unhappy, and after having two children he was divorced. He graduated at Harvard College, 1799, was ordained a Congregational minister, but never settled over a parish ; lived in several places in New York, then had charge of the light house at Portland Harbor on Lake Erie. He d. at Barcelona, town of VVestfield, N. Y., 21 Mar., 1846, ae. 73.",
+
+			"birthYear": 1773,
+			"deathYear": "1846",
+			"birthDate": "1733-01-01T00:00:00.000Z",
+			"deathDate": "1846-01-01T00:00:00.000Z",
+			"born": "Portland Harbor,Lake Erie, PA",
+			"burial": " "
+		}, {
+			"name": "Sarah Lane",
+			"id": 80,
+			"text": "",
+			"generation": 6,
+			"gender": "F",
+			"lastName": "b, 6 Sept., 1774, d. Aug., 1862, m. 29 Oct., 1795, Josiah Folsom ",
+			"birthYear": 1774,
+			"deathYear": "1862",
+			"birthDate": "1744-01-01T00:00:00.000Z",
+			"deathDate": "1862-01-01T00:00:00.000Z",
+			"born": "Exeter, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Daniel Lane",
+			"id": 81,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": "b. 15 June, 1776,111. 9 Nov., iSoo, Esther Fogg, b. 24 Mar. 1774, who d. 10 Aug., i860. He d. 10 July, 1858. HelivedinLoudon,Oilmanton,Laconiaandperhapsother places. They had 8 ch",
+
+			"birthYear": 1776,
+			"deathYear": "1858",
+			"birthDate": "1776-01-01T00:00:00.000Z",
+			"deathDate": "1858-01-01T00:00:00.000Z",
+			"born": "Loudon, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Josiah Lane",
+			"id": 82,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": "ni. (i) 8 Feb., 1801, Sally Pear- son, was divorced; m. (2) Dickinson. He was a doctor, and res. in Gihnanton, Dover, New York and Ohio, and d. in Penn- sylvania in i860",
+
+			"birthYear": 1776,
+			"deathYear": "1858",
+			"birthDate": "1766-01-01T00:00:00.000Z",
+			"deathDate": "1858-01-01T00:00:00.000Z",
+			"born": "Loudon, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Abraham Lane",
+			"id": 83,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": "b. 14 Aug., d. Dec, 1780",
+
+			"birthYear": 1780,
+			"deathYear": "1780",
+			"birthDate": "1780-01-01T00:00:00.000Z",
+			"deathDate": "1780-01-01T00:00:00.000Z",
+			"born": "Stratham, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Mary Lane",
+			"id": 84,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": "m. John Garind, cabinet maker, res. at Pittsfield. She was a member of the Congregational church. She left her husband on account of his intemperance. He d. in Apr., 1824. She rem. to Newmarket, then to Rye and d. there, 8 Apr., 1860",
+			"birthYear": 1782,
+			"deathYear": "1860",
+			"birthDate": "1782-01-01T00:00:00.000Z",
+			"deathDate": "1860-01-01T00:00:00.000Z",
+			"born": "Stratham, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Doe (john doe)   Lane",
+			"id": 85,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": "A son, b. 4 and d. 7 July, 1784",
+			"birthYear": 1784,
+			"deathYear": "1784",
+			"birthDate": "1784-01-01T00:00:00.000Z",
+			"deathDate": "1784-01-01T00:00:00.000Z",
+			"born": "Stratham, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Mark Lane",
+			"id": 86,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": "m. Henrieita Tenney of North- wood. He was a teacher in Stratham and vicinity, was lame for years in one arm, settled in Geneseo, Livingston Co., N. Y., then in or near Franklin, Venango Co., Penn., d. 16 Jan., 1844, ae. 56 yrs. He and his wife were members of the Congregational church.",
+			"birthYear": 1744,
+			"deathYear": "1788",
+			"birthDate": "1744-01-01T00:00:00.000Z",
+			"deathDate": "1788-01-01T00:00:00.000Z",
+			"born": "Stratham, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Abenaki People",
+			"id": 87,
+			"text": "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War.",
+			"generation": 0,
+			"gender": "M",
+			"lastName": "wikipedia - The Abenaki (Abnaki, Alnôbak) are a Native American tribe and a First Nations band government. They are one of the Algonquian-speaking peoples of northeastern North America. The Abenaki live in Quebec and the Maritimes of Canada and in the New England region of the United States, a region called Wabanahkik (Dawn Land) in the Eastern Algonquian languages. The Abenaki are one of the five members of the Wabanaki Confederacy. Abenaki is a linguistic and geographic grouping; historically there was not a strong central authority, but as listed below a large number of smaller bands and tribes who shared many cultural traits,[1] and who came together as a post-contact community after their original tribes were decimated by colonization, warfare and disease",
+			"birthYear": 1580,
+			"deathYear": "9999",
+			"birthDate": "1688-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Dawn Land",
+			"burial": " "
+		}, {
+			"name": "Pennacook People",
+			"id": 88,
+			"text": "One of the first tribes to encounter European colonists, the Pennacook were decimated by introduced diseases. In a weakened state, they were subject to raids by Mohawk and Micmac tribes, taking an additional toll of lives. Chief Passaconaway, despite his military advantage over the New England colonists, decided to make peace with them rather than lose even more lives through warfare. King Philip's War, however, would make their numbers fall even further. Although Wonalancet, the chief succeeding Passaconaway, tried to maintain neutrality, western bands in Massachusetts did not.",
+			"generation": 0,
+			"gender": "M",
+			"lastName": "The Pennacook, also known by the names Penacook, and Pennacock, were a North American people of the Wabanaki Confederacy that primarily inhabited the Merrimack River valley of present-day New Hampshire and Massachusetts, as well as portions of southern Maine.[1] They are also sometimes called the Merrimack people. An Algonquian-speaking tribe, they were more closely related to the Abenaki tribes to the west, north and east such as the Penobscot, Piguaket or Pawtucket than to the other Algonquian tribes to the south, such as the Massachusett or Wampanoag. This similarity was both linguistic and cultural. However, during the time of early European settlement, the Pennacook were a large confederacy that were politically distinct and at odds with their northern Abenaki neighbors.",
+			"birthYear": 1580,
+			"deathYear": "9999",
+			"birthDate": "1688-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Northeastern United States",
+			"burial": " "
+		}, {
+			"name": "Massachusett People",
+			"id": 89,
+			"text": "As one of the first groups of indigenous American peoples to encounter English colonists, the Massachusett had a rapid decline in population in the 17th and 18th centuries due to new infectious diseases. Descendants continue to inhabit the Greater Boston area but it is not a federally recognized tribe",
+			"generation": 0,
+			"gender": "M",
+			"lastName": "The Massachusett are a Native American people who historically lived in areas surrounding Massachusetts Bay, as well as northeast and southern Massachusetts in what is now the Commonwealth of Massachusetts, including present-day Greater Boston. Tribal members spoke the Massachusett language, part of the Algonquian family. The present-day U.S state Massachusetts is named after the tribe.The name Massachusett means “people of the great hills”, referring to the Blue Hills south of Boston Harbor.[1]As one of the first groups of indigenous American peoples to encounter English colonists, the Massachusett had a rapid decline in population in the 17th and 18th centuries due to new infectious diseases. Descendants continue to inhabit the Greater Boston area but it is not a federally recognized tribe.",
+			"birthYear": 1580,
+			"deathYear": "9999",
+			"birthDate": "1500-01T00:00:00.000Z",
+			"deathDate": "3000-01-01T00:00:00.000Z",
+			"born": "Northeastern United States.",
+			"burial": " "
+		}, {
+			"name": "Wampanoag People",
+			"id": 90,
+			"text": "In the beginning of the 17th century, at the time of first contact with the English, the Wampanoag lived in southeastern Massachusetts and Rhode Island, as well as within a territory that encompassed current day Martha's Vineyard and Nantucket. Their population numbered in the thousands due to the richness of the environment and their cultivation of corn, beans and squash. Three thousand Wampanoag lived on Martha's Vineyard alone.",
+			"generation": 0,
+			"gender": "M",
+			"lastName": "From 1615 to 1619 the Wampanoag suffered an epidemic, long suspected to be smallpox, but recent research alternatively theorizes that it was leptospirosis, a bacterial infection also known as Weil's syndrome or 7-day fever. It caused a high fatality rate and nearly destroyed the society. Researchers suggest that the losses from the epidemic were so large that English colonists were more easily able to found their settlements in the Massachusetts Bay Colony in later years.[2] More than 50 years later, King Philip's War (1675–1676) against the English colonists resulted in the deaths of 40 percent of the tribe. Most of the male survivors were sold into slavery in the West Indies. Many women and children were enslaved in New England.",
+			"birthYear": 1580,
+			"deathYear": "9999",
+			"birthDate": "1500-01-01T00:00:00.000Z",
+			"deathDate": "3000-01-01T00:00:00.000Z",
+			"born": "Northeastern United States",
+			"burial": " "
+		}, {
+			"name": "Nipmuck People",
+			"id": 91,
+			"text": "The Nipmuc or Nipmuck people are descendants of the indigenous Algonquian peoples of Nippenet, 'the freshwater pond place', which corresponds to central Massachusetts and immediately adjacent portions of Connecticut and Rhode Island. The tribe were first encountered by Europeans in 1630, when John Acquittamaug arrived with maize to sell to the starving colonists of Boston, Massachusetts.",
+			"generation": 0,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1580,
+			"deathYear": "9999",
+			"birthDate": "1500-01-01T00:00:00.000Z",
+			"deathDate": "3000-01-01T00:00:00.000Z",
+			"born": "Northeastern United State",
+			"burial": " "
+		}, {
+			"name": "Pocomtuc People",
+			"id": 92,
+			"text": "The Pocumtuck were originally allied with the Tunxis and Narragansett against Chief Uncas of the Mohegan and the Pequot. All these tribes united against the English colonists with the Wampanoag Confederacy in King Philip's War.[2]At the close of the war, many Pocumtuck, Nipmuc, and other tribes fled to Schaghticoke, a village on the Hudson River. They remained there until the outbreak of the Seven Years  War in 1754, when most joined and merged into the Abenaki tribes at Saint-François-du-Lac, Quebec or moved further west.[4] Small bands remained in Massachusetts as late as the 19th century, but most fled north or lost their tribal identity through intermarriage with other tribes and settlers. Many of the present-day Abenaki of New Hampshire, Vermont, and Canada are of part-Pocumtuck ancestry.",
+			"generation": 0,
+			"gender": "M",
+			"lastName": "The Pocumtuc (v. Pocomtuck) or Deerfield Indians were a prominent Native American tribe originally inhabiting western areas of what is now Massachusetts, especially around the confluence of the Deerfield and Connecticut Rivers in today's Franklin County. Their territory also included much of current-day Hampden and Hampshire Counties, plus areas now in northern Connecticut and southern Vermont. Their principal village, also known as Pocumtuck, was in the vicinity of the present day village of Deerfield.[1] Their language, now extinct, was an R-dialect of the Algonquian language family, most likely related to the Wappinger and nearby Mahican tribes of the Hudson River Valley.",
+			"birthYear": 1580,
+			"deathYear": "9999",
+			"birthDate": "1500-01-01T00:00:00.000Z",
+			"deathDate": "3000-01-01T00:00:00.000Z",
+			"born": "Northeastern United States",
+			"burial": " "
+		}, {
+			"name": "Henrieita Tenney",
+			"id": 93,
+			"text": "",
+			"generation": 6,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1778,
+			"deathYear": "1855?",
+			"birthDate": "1778-01-01T00:00:00.000Z",
+			"deathDate": "1855-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Jonathan Homer Lane",
+			"id": 94,
+			"text": "The crater Lane on the Moon is named after him.",
+			"generation": 7,
+			"gender": "M",
+			"lastName": "his education was at the Phillips Academy in Exeter, New Hampshire. He graduated from Yale University in 1846. He worked for the U.S. Patent Office, and became a principal examiner in 1851. In 1869 he joined the Office of Weights and Measures, a part of the Department of the Treasury that later became the National Bureau of Standards. Lane was particularly interested in astronomy, and was the first to perform a mathematical analysis of the Sun as a gaseous body. His investigations demonstrated the thermodynamic relations between pressure, temperature, and density of the gas within the Sun, and formed the foundation of what would in the future become the theory of stellar evolution (see Lane-Emden equation).",
+			"birthYear": 1819,
+			"deathYear": "1880",
+			"birthDate": "1819-01-01T00:00:00.000Z",
+			"deathDate": "1880-01T00:00:00.000Z",
+			"born": "Washington, DC",
+			"burial": " "
+		}, {
+			"name": "Elizabeth Swain Lane",
+			"id": 95,
+			"text": "",
+			"generation": 7,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1819,
+			"deathYear": "1879?",
+			"born": "Franklin, PA",
+			"birthDate": "1819-01-01T00:00:00.000Z",
+			"deathDate": "1879-01-01T00:00:00.000Z",
+			"burial": " "
+		}, {
+			"name": "John Mark Lane",
+			"id": 96,
+			"text": "",
+			"generation": 7,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1823,
+			"deathYear": "1879?",
+			"birthDate": "1823-01-01T00:00:00.000Z",
+			"deathDate": "1879-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "David Tenney  Lane",
+			"id": 97,
+			"text": "",
+			"generation": 7,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1826,
+			"deathYear": "1901?",
+			"birthDate": "1826-01-01T00:00:00.000Z",
+			"deathDate": "1901-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "James  Lane",
+			"id": 98,
+			"text": "",
+			"generation": 7,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1828,
+			"deathYear": "1890?",
+			"birthDate": "1828-01-01T00:00:00.000Z",
+			"deathDate": "1890-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Maria Lane",
+			"id": 99,
+			"text": "",
+			"generation": 7,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1830,
+			"deathYear": "1891?",
+			"birthDate": "1830-01-01T00:00:00.000Z",
+			"deathDate": "1891-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Edward E Lane",
+			"id": 100,
+			"text": "",
+			"generation": 7,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1832,
+			"deathYear": "1892?",
+			"birthDate": "1832-01-01T00:00:00.000Z",
+			"deathDate": "1892-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Hannah Louise Lane",
+			"id": 101,
+			"text": "",
+			"generation": 7,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1835,
+			"deathYear": "1895?",
+			"birthDate": "1835-01-01T00:00:00.000Z",
+			"deathDate": "1895-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Samuel Swain Lane",
+			"id": 102,
+			"text": "",
+			"generation": 7,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1838,
+			"deathYear": "1898?",
+			"birthDate": "1838-01-01T00:00:00.000Z",
+			"deathDate": "1898-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Sarah Folsom Lane",
+			"id": 103,
+			"text": "",
+			"generation": 7,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1838,
+			"deathYear": "1898?",
+			"birthDate": "1838-01-01T00:00:00.000Z",
+			"deathDate": "1898-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Lucy M. Smith",
+			"id": 104,
+			"text": "",
+			"generation": 7,
+			"gender": "F",
+			"lastName": "Marr: 1849 or 1859",
+			"birthYear": 1824,
+			"deathYear": "1910?",
+			"birthDate": "1824-01-01T00:00:00.000Z",
+			"deathDate": "19108-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Laura L. Carey",
+			"id": 105,
+			"text": "",
+			"generation": 7,
+			"gender": "F",
+			"lastName": " Marr: Mar 1882",
+			"birthYear": 1824,
+			"deathYear": "1910?",
+			"birthDate": "1824-01-01T00:00:00.000Z",
+			"deathDate": "1910-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Henrietta M Lane",
+			"id": 106,
+			"text": "",
+			"generation": 8,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1850,
+			"deathYear": "1920?",
+			"birthDate": "1850-01-01T00:00:00.000Z",
+			"deathDate": "1920-01-01T00:00:00.000Z",
+			"born": "Franklin, PA"
+		}, {
+			"name": "Frances Lane",
+			"id": 107,
+			"text": "",
+			"generation": 8,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1859,
+			"deathYear": "1928?",
+			"birthDate": "1859-01-01T00:00:00.000Z",
+			"deathDate": "1928-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}
+
+		, {
+			"name": "William Homer Lane",
+			"id": 108,
+			"text": "",
+			"generation": 8,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1851,
+			"deathYear": "1920?",
+			"birthDate": "1851-01-01T00:00:00.000Z",
+			"deathDate": "1920-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Ada Lane",
+			"id": 109,
+			"text": "",
+			"generation": 8,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1858,
+			"deathYear": "1928?",
+			"birthDate": "1858-01-01T00:00:00.000Z",
+			"deathDate": "1928-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}
+
+
+		, {
+			"name": "Clara Carrol",
+			"id": 110,
+			"text": "",
+			"generation": 8,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1852,
+			"deathYear": "1920?",
+			"born": "Franklin, PA",
+			"birthDate": "1852-01-01T00:00:00.000Z",
+			"deathDate": "1920-01-01T00:00:00.000Z",
+			"burial": " "
+		}, {
+			"name": "David E Lane",
+			"id": 111,
+			"text": "",
+			"generation": 9,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1886,
+			"deathYear": "1965?",
+			"birthDate": "1866-01-01T00:00:00.000Z",
+			"deathDate": "1965-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Alderman Homer R Lane",
+			"id": 112,
+			"text": "",
+			"generation": 9,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1893,
+			"deathYear": "1970?",
+			"birthDate": "1893-01-01T00:00:00.000Z",
+			"deathDate": "1970-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Ralph Lane",
+			"id": 113,
+			"text": "",
+			"generation": 9,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1881,
+			"deathYear": "1923?",
+			"birthDate": "1881-01-01T00:00:00.000Z",
+			"deathDate": "1738-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Frank S Lane",
+			"id": 114,
+			"text": "",
+			"generation": 9,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1895,
+			"deathYear": "1975?",
+			"birthDate": "1895-01-01T00:00:00.000Z",
+			"deathDate": "1975-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Mary Colby",
+			"id": 116,
+			"text": "",
+			"generation": 9,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1890,
+			"deathYear": "1950?",
+			"birthDate": "1890-01-01T00:00:00.000Z",
+			"deathDate": "1950-01-01T00:00:00.000Z",
+			"born": "Franklin, PA",
+			"burial": " "
+		}, {
+			"name": "Mary Colby",
+			"id": 117,
+			"text": "",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "dau. of Benaiah and Mary Websterof Chester",
+			"birthYear": 1734,
+			"deathYear": "1815?",
+			"birthDate": "1734-01-01T00:00:00.000Z",
+			"deathDate": "1815-01-01T00:00:00.000Z",
+			"born": "Chester, NH",
+			"burial": " "
+		}, {
+			"name": "Hannah Lane",
+			"id": 118,
+			"text": "m. 1782, Jeremiah (son of John) Awrt? of Chester and had a large family..",
+
+			"occupation": [{
+				"job": "housewife"
+			}],
+			"generation": 6,
+			"gender": "F",
+			"lastName": "b. in Chester, 20 Sept., 1756",
+			"birthYear": 1756,
+
+			"deathYear": "1826?",
+			"birthDate": "1756-01-01T00:00:00.000Z",
+			"deathDate": "1826-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "John Lane",
+			"id": 119,
+			"text": "b. 30 Jan., 175S. At 17 years of age he enlisted in Captain H. Hutchins' Company; was in the Battle of Bunker Mill; and March, 1777, in S. Blodgett's Company, Enoch Poor's Regiment, f(or three years. From July to Oct., 1 7S0, in Col. T. Bartlett's Regiment at West Boint, &c.",
+
+			"occupation": [{
+				"job": "professional soldier"
+			}, {
+				"service": [{
+					"war": "Revolutionary"
+				}, {
+					"armyName": "Continental"
+				}, {
+					"branch": [{
+						"name": "Army",
+						"company": "S. Blodgett's Company",
+						"regiment": "Enoch Poor's Regiment - Col. T. Bartlett's Regiment at West Point",
+
+						"description": "At 17 years of age he enlisted in Captain H. Hutchins Company; was in the Battle of Bunker Mill; and March, 1777, in S. Blodgett's Company, Enoch Poor's Regiment, f(or three years. From July to Oct., 1 7S0, in Col. T. Bartlett's Regiment at West Boint"
+					}]
+				}, {
+					"battles": [{
+						"company": "Captain H. Hutchins Company",
+						"name": "Battle of Bunker Hill",
+						"place": "Charlestown, Massachusetts",
+						"start": "June 17, 1775, 3:00PM",
+						"end": "June 17, 1775, 5:00PM",
+						"description": "The Battle of Bunker Hill was a battle fought on June 17, 1775, during the Siege of Boston in the early stages of the American Revolutionary War. The battle is named after Bunker Hill in Charlestown, Boston, which was peripherally involved in the battle, and was the original objective of both the colonial and British troops, though the vast majority of combat took place on the adjacent Breed's Hill.On June 13, 1775, the leaders of the colonial forces besieging Boston learned that the British were planning to send troops out from the city to fortify the unoccupied hills surrounding the city, giving them control of Boston Harbor. In response, 1,200 colonial troops under the command of William Prescott stealthily occupied Bunker Hill and Breed's Hill. The colonists constructed a strong redoubt on Breed's Hill, as well as smaller fortified lines across the Charlestown Peninsula. When the British were alerted to the presence of colonial forces on the Peninsula, they mounted an attack against them. After two assaults on the colonial positions were repulsed with significant British casualties, the third and final attack carried the redoubt after the defenders ran out of ammunition. The colonists retreated to Cambridge over Bunker Hill, leaving the British in control of the Peninsula.While the result was a victory for the British, the massive losses they encountered discouraged them from any further sorties against the siege lines; 226 men were killed with over 800 wounded, including a large number of officers. The battle at the time was considered to be a colonial defeat; however, the losses suffered by the British troops gave encouragement to the colonies, demonstrating that inexperienced militiamen were able to stand up to regular army troops in a pitched battle."
+					}]
+				}]
+			}],
+			"generation": 6,
+			"gender": "M",
+			"lastName": "At 17 years of age he enlisted in Captain H. Hutchins' Company; was in the Battle of Bunker Mill; and March, 1777, in S. Blodgett's Company, Enoch Poor's Regiment, f(or three years. From July to Oct., 1 7S0, in Col. T. Bartlett's Regiment at West Boint, &c.",
+			"birthYear": 1758,
+
+			"deathYear": "1828?",
+			"birthDate": "1758-01-01T00:00:00.000Z",
+			"deathDate": "1828-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Joseph Colby Lane",
+			"id": 120,
+			"text": "",
+
+			"generation": 6,
+			"gender": "M",
+			"lastName": "",
+			"birthYear": 1762,
+
+			"deathYear": "1835?",
+			"birthDate": "1762-01-01T00:00:00.000Z",
+			"deathDate": "1835-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Benaiah Lane",
+			"id": 121,
+			"text": "",
+
+			"generation": 6,
+			"gender": "M",
+			"lastName": ".Abigail(dau.ofStephen .",
+			"birthYear": 1764,
+
+			"deathYear": "1835?",
+			"birthDate": "1764-01-01T00:00:00.000Z",
+			"deathDate": "1835-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Webster Lane",
+			"id": 122,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"lastName": ".Abigail(dau.ofStephen Lufkin.",
+			"birthYear": 1764,
+
+			"deathYear": "1835?",
+			"birthDate": "1764-01-01T00:00:00.000Z",
+			"deathDate": "1835-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Mary Lane",
+			"id": 123,
+			"text": "",
+			"generation": 6,
+			"gender": "F",
+			"lastName": ".Abigail(dau.ofStephen Lufkin.",
+			"birthYear": 1768,
+
+			"deathYear": "1835?",
+			"birthDate": "1768-01-01T00:00:00.000Z",
+			"deathDate": "1835-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Captain Matthias",
+			"id": 124,
+			"text": "",
+			"generation": 6,
+			"occupation": [{
+				"job": "professional soldier"
+			}, {
+				"service": [{
+					"war": "War if 1812"
+				}, {
+					"armyName": "Regular"
+				}, {
+					"branch": [{
+						"name": "Army",
+
+						"description": "In the War of 1812, declined the office of Colonel"
+					}]
+				}]
+			}],
+			"gender": "M",
+			"lastName": "In the War of 1812, declined the office of Colonel. WilliamH.LaneofAyer,Mass.,1S83,washisgrandson.",
+			"birthYear": 1770,
+
+			"deathYear": "1835?",
+			"birthDate": "1770-01-01T00:00:00.000Z",
+			"deathDate": "1835-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Mary Butterfield",
+			"id": 125,
+			"text": "",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "m. (i) 20 June, 1756, Mary (dau. of Zachariah) Butter- FiELD, b. 12 Dec, 1739,",
+			"birthYear": 1739,
+
+			"deathYear": "1785?",
+			"birthDate": "1739-01-01T00:00:00.000Z",
+			"deathDate": "1785-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Abigail Batchelder",
+			"id": 126,
+			"text": "the largest woman in town",
+			"generation": 5,
+			"gender": "F",
+			"lastName": "m. (2) Abigail (widow of Jethro) Batch- elder, who with her husband was a member of the first church in Raymond, 1 791, the largest woman in town ; who died 28 Aug., 1818.",
+			"birthYear": 1740,
+
+			"deathYear": "1818?",
+			"birthDate": "1740-01-01T00:00:00.000Z",
+			"deathDate": "1818-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Jacob Lane",
+			"id": 127,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"occupation": [{
+				"job": "soldier"
+			}, {
+				"service": [{
+					"war": "The Revolution"
+				}, {
+					"armyName": "Regular"
+				}, {
+					"branch": [{
+						"name": "Army",
+
+						"commanding officer": "Col. L. Baldwin"
+					}]
+				}]
+			}],
+			"lastName": " b 15 Jan., 1757, d. 6 May, 1797, a soldier in the Revolution under Col. L. Baldwin.",
+			"birthYear": 1757,
+
+			"deathYear": "1897?",
+			"birthDate": "1757-01-01T00:00:00.000Z",
+			"deathDate": "1897-01-01T00:00:00.000Z",
+			"born": "Chester, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Hannah Lane",
+			"id": 128,
+			"text": "",
+			"generation": 6,
+			"gender": "F",
+			"lastName": "b. 15 Apr., 1759, m. Samuel (s. of John^) Lane.",
+			"birthYear": 1759,
+
+			"deathYear": "1818?",
+			"birthDate": "1759-01-01T00:00:00.000Z",
+			"deathDate": "1818-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Lydia Lane",
+			"id": 129,
+			"text": "",
+			"generation": 6,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1761,
+
+			"deathYear": "1818?",
+			"birthDate": "1761-01-01T00:00:00.000Z",
+			"deathDate": "1818-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Sarah Lane",
+			"id": 129,
+			"text": "",
+			"generation": 6,
+			"gender": "F",
+			"lastName": "",
+			"birthYear": 1764,
+
+			"deathYear": "1818?",
+			"birthDate": "1764-01-01T00:00:00.000Z",
+			"deathDate": "1818-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Peter Lane",
+			"id": 130,
+			"text": "",
+			"generation": 6,
+			"gender": "M",
+			"occupation": [{
+				"job": "blacksmith"
+			}],
+			"lastName": "b.20Oct.,1766,m.24Dec,1787,Susanna b.27Apr.1768, an attractive woman from down country. He was a blacksmithon lot 68, 30 Division, Candia, and had 8 ch.",
+			"birthYear": 1767,
+
+			"deathYear": "1840?",
+			"birthDate": "1767-01-01T00:00:00.000Z",
+			"deathDate": "1840-01-01T00:00:00.000Z",
+			"born": "Candia, New Hampshire",
+			"burial": " "
+		}, {
+			"name": "Molly Lane",
+			"id": 131,
+			"text": "",
+			"generation": 6,
+			"gender": "F",
+
+			"lastName": " b 19 Dec, 1768.",
+			"birthYear": 1768,
+
+			"deathYear": "1840?",
+			"birthDate": "1768-12-19T00:00:00.000Z",
+			"deathDate": "1840-01-01T00:00:00.000Z",
+			"born": "Rye, New Hampshire",
+			"burial": " "
+		}
+	],
+	"links": [{
+			"source": 0,
+			"target": 1,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 3,
+			"target": 1,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 3,
+			"target": 0,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 4,
+			"target": 3,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 5,
+			"target": 4,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 5,
+			"target": 2,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 6,
+			"target": 4,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 6,
+			"target": 2,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 7,
+			"target": 4,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 7,
+			"target": 2,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 8,
+			"target": 4,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 8,
+			"target": 2,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 9,
+			"target": 4,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 9,
+			"target": 3,
+			"color": "#39F",
+			"relation": "mother"
+		}, {
+			"source": 10,
+			"target": 3,
+			"color": "#F39",
+			"relation": "father"
+		}, {
+			"source": 10,
+			"target": 4,
+			"color": "#F39F",
+			"relation": "mother"
+		}, {
+			"source": 11,
+			"target": 3,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 11,
+			"target": 4,
+			"color": "#F39F",
+			"relation": "father"
+		}, {
+			"source": 12,
+			"target": 4,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 12,
+			"target": 3,
+			"color": "#F39F",
+			"relation": "father"
+		}, {
+			"source": 2,
+			"target": 4,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 6,
+			"target": 13,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 14,
+			"target": 6,
+			"color": "#F39F",
+			"relation": "father"
+		}, {
+			"source": 14,
+			"target": 13,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 15,
+			"target": 6,
+			"color": "#F39F",
+			"relation": "father"
+		}, {
+			"source": 15,
+			"target": 13,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 16,
+			"target": 6,
+			"color": "#F39F",
+			"relation": "father"
+		}, {
+			"source": 16,
+			"target": 13,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 17,
+			"target": 6,
+			"color": "#F39F",
+			"relation": "father"
+		}, {
+			"source": 17,
+			"target": 13,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 18,
+			"target": 6,
+			"color": "#F39F",
+			"relation": "father"
+		}, {
+			"source": 18,
+			"target": 13,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 10,
+			"target": 19,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 20,
+			"target": 19,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 20,
+			"target": 10,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 21,
+			"target": 19,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 21,
+			"target": 10,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 22,
+			"target": 19,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 22,
+			"target": 10,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 23,
+			"target": 19,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 23,
+			"target": 10,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 24,
+			"target": 19,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 24,
+			"target": 10,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 25,
+			"target": 19,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 25,
+			"target": 10,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 26,
+			"target": 19,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 26,
+			"target": 10,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 14,
+			"target": 27,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 28,
+			"target": 27,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 28,
+			"target": 14,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 29,
+			"target": 27,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 29,
+			"target": 14,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 30,
+			"target": 27,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 30,
+			"target": 14,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 31,
+			"target": 27,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 31,
+			"target": 14,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 32,
+			"target": 27,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 32,
+			"target": 14,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 33,
+			"target": 34,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 35,
+			"target": 34,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 35,
+			"target": 33,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 35,
+			"target": 20,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 36,
+			"target": 35,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 36,
+			"target": 20,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 37,
+			"target": 38,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 39,
+			"target": 40,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 41,
+			"target": 40,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 41,
+			"target": 39,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 41,
+			"target": 42,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 13,
+			"target": 42,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 13,
+			"target": 41,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 33,
+			"target": 38,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 33,
+			"target": 37,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 36,
+			"target": 43,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 44,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 44,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 45,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 45,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 46,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 46,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 47,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 47,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 48,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 48,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 49,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 49,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 50,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 50,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 51,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 51,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 52,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 52,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 52,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 52,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 53,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 53,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 54,
+			"target": 36,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 54,
+			"target": 43,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 24,
+			"target": 55,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 56,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 56,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 57,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 57,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 58,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 58,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 59,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 59,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 60,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 60,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 61,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 61,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 62,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 62,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 63,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 63,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 64,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 64,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 65,
+			"target": 55,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 65,
+			"target": 24,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 56,
+			"target": 66,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 56,
+			"target": 67,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 68,
+			"target": 66,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 68,
+			"target": 56,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 69,
+			"target": 66,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 69,
+			"target": 56,
+			"color": "#39F",
+			"relation": "father"
+		}
+
+		, {
+			"source": 70,
+			"target": 66,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 70,
+			"target": 56,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 71,
+			"target": 66,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 71,
+			"target": 56,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 72,
+			"target": 66,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 72,
+			"target": 56,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 73,
+			"target": 66,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 73,
+			"target": 56,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 74,
+			"target": 66,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 74,
+			"target": 56,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 75,
+			"target": 66,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 75,
+			"target": 56,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 87,
+			"target": 88,
+			"color": "#663399",
+			"relation": "spouse"
+		}, {
+			"source": 88,
+			"target": 89,
+			"color": "#663399",
+			"relation": "spouse"
+		}, {
+			"source": 89,
+			"target": 90,
+			"color": "#663399",
+			"relation": "spouse"
+		}, {
+			"source": 90,
+			"target": 91,
+			"color": "#663399",
+			"relation": "spouse"
+		}, {
+			"source": 91,
+			"target": 92,
+			"color": "#663399",
+			"relation": "spouse"
+		}, {
+			"source": 92,
+			"target": 87,
+			"color": "#663399",
+			"relation": "spouse"
+		}, {
+			"source": 86,
+			"target": 93,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 94,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 94,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 95,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 95,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 96,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 96,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 97,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 97,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 98,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 98,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 99,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 99,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 100,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 100,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 101,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 101,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 102,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 102,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 103,
+			"target": 93,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 103,
+			"target": 86,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 70,
+			"target": 76,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 77,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 77,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 78,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 78,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 79,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 79,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 80,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 80,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 81,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 81,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 82,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 82,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 83,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 83,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 84,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 84,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 85,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 85,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 86,
+			"target": 76,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 86,
+			"target": 70,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 97,
+			"target": 104,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 97,
+			"target": 105,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 106,
+			"target": 104,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 106,
+			"target": 97,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 107,
+			"target": 104,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 107,
+			"target": 97,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 108,
+			"target": 104,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 108,
+			"target": 97,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 109,
+			"target": 104,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 109,
+			"target": 97,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 108,
+			"target": 110,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 111,
+			"target": 110,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 111,
+			"target": 108,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 112,
+			"target": 110,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 112,
+			"target": 108,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 113,
+			"target": 110,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 113,
+			"target": 108,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 44,
+			"target": 117,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 118,
+			"target": 117,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 118,
+			"target": 44,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 119,
+			"target": 117,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 119,
+			"target": 44,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 120,
+			"target": 117,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 120,
+			"target": 44,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 121,
+			"target": 117,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 121,
+			"target": 44,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 122,
+			"target": 117,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 122,
+			"target": 44,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 123,
+			"target": 117,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 123,
+			"target": 44,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 124,
+			"target": 117,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 124,
+			"target": 44,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 45,
+			"target": 125,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 45,
+			"target": 126,
+			"color": "#CC0",
+			"relation": "spouse"
+		}, {
+			"source": 127,
+			"target": 125,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 127,
+			"target": 45,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 128,
+			"target": 125,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 128,
+			"target": 45,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 129,
+			"target": 125,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 129,
+			"target": 45,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 130,
+			"target": 125,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 130,
+			"target": 45,
+			"color": "#39F",
+			"relation": "father"
+		}, {
+			"source": 131,
+			"target": 125,
+			"color": "#F39",
+			"relation": "mother"
+		}, {
+			"source": 131,
+			"target": 45,
+			"color": "#39F",
+			"relation": "father"
+		}
+	]
+}

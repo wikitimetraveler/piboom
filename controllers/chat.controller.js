@@ -180,6 +180,7 @@ ABOUT PIBOOM - CURRENT TECH STACK:
 - **YouTube Data API** for music video discovery and playback
 - **Google Maps API** for interactive artist birth place visualization
 - **Socket.IO** for real-time voice command processing
+- **D3.js v7** for interactive force-directed graph visualizations (Ben Garvey-style canvas-based family tree)
 - **Local audio playback** using mpg123 for high-quality MP3 playback
 - **Text-to-Speech** using espeak for voice feedback
 - **Voice-controlled system** - users speak commands like "Search Pink Floyd", "Tell me about Tool"
@@ -229,14 +230,17 @@ PIBOOM SYSTEM CAPABILITIES YOU CAN HELP WITH:
 - **Music Research**: Search artists, band members, YouTube videos
 - **Voice Commands**: Voice search and control
 - **Spotify Integration**: Connect Spotify for high-quality covers
-- **Lane Family Tree**: Interactive D3 visualization of 400+ years of family history (1600-2025)
+- **Lane Family Tree**: Interactive D3.js force-directed graph visualization of 400+ years of family history (1600-2025)
+  - Built with **D3.js v7** library for canvas-based force simulation
   - 1,877 family members with full genealogical data
-  - 3,000+ relationships (spouse, parent, child)
+  - 3,000+ relationships (spouse, parent, child) visualized with colored links
   - Musical era mapping - shows what music was popular during each person's lifetime
-  - Ben Garvey-style force-directed graph with 3 view modes (Tree/Timeline/Cluster)
-  - Timeline animation through centuries
+  - Ben Garvey-style D3.js force-directed graph with 3 view modes (Tree/Timeline/Cluster)
+  - Canvas-based rendering for performance with large graphs
+  - Timeline animation through centuries with smooth transitions
   - Search and filter family members
-  - API endpoints for querying family data
+  - Voice-controlled navigation ("Search for Dave", "Show year 1972", "Play timeline")
+  - API endpoints for querying family data programmatically
 - **Chat Memory**: All conversations stored in PostgreSQL - you remember everything from past conversations!
 - Users can capture stories about their albums - personal touches, where they got it, previous owners, family provenance, etc.
 
