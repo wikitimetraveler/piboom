@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculations Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .test-group {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-group h3 {
+            margin-top: 0;
+            color: #2196F3;
+        }
+        .input-row {
+            margin: 10px 0;
+        }
+        label {
+            display: inline-block;
+            width: 120px;
+            font-weight: bold;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+        input[readonly] {
+            background-color: #e8f5e9;
+            font-weight: bold;
+        }
+        .description {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calculations Class Test Page</h1>
+
+    <div class="test-group">
+        <h3>1. Sum Inputs</h3>
+        <div class="description">Adds all input values together</div>
+        <div class="input-row">
+            <label>Value 1:</label>
+            <input type="number" id="sum-input1" value="10">
+        </div>
+        <div class="input-row">
+            <label>Value 2:</label>
+            <input type="number" id="sum-input2" value="20">
+        </div>
+        <div class="input-row">
+            <label>Value 3:</label>
+            <input type="number" id="sum-input3" value="30">
+        </div>
+        <div class="input-row">
+            <label>Result:</label>
+            <input type="text" id="sum-result" readonly>
+        </div>
+    </div>
+
+    <div class="test-group">
+        <h3>2. Subtract Inputs</h3>
+        <div class="description">Subtracts subsequent values from the first</div>
+        <div class="input-row">
+            <label>Value 1:</label>
+            <input type="number" id="subtract-input1" value="100">
+        </div>
+        <div class="input-row">
+            <label>Value 2:</label>
+            <input type="number" id="subtract-input2" value="25">
+        </div>
+        <div class="input-row">
+            <label>Value 3:</label>
+            <input type="number" id="subtract-input3" value="15">
+        </div>
+        <div class="input-row">
+            <label>Result:</label>
+            <input type="text" id="subtract-result" readonly>
+        </div>
+    </div>
+
+    <div class="test-group">
+        <h3>3. Truncate and Sum</h3>
+        <div class="description">Truncates decimal values then adds them</div>
+        <div class="input-row">
+            <label>Value 1:</label>
+            <input type="number" step="0.01" id="truncate-input1" value="10.99">
+        </div>
+        <div class="input-row">
+            <label>Value 2:</label>
+            <input type="number" step="0.01" id="truncate-input2" value="20.55">
+        </div>
+        <div class="input-row">
+            <label>Value 3:</label>
+            <input type="number" step="0.01" id="truncate-input3" value="30.77">
+        </div>
+        <div class="input-row">
+            <label>Result:</label>
+            <input type="text" id="truncate-result" readonly>
+        </div>
+    </div>
+
+    <div class="test-group">
+        <h3>4. Minimum Value</h3>
+        <div class="description">Finds the minimum value among inputs</div>
+        <div class="input-row">
+            <label>Value 1:</label>
+            <input type="number" id="min-input1" value="45">
+        </div>
+        <div class="input-row">
+            <label>Value 2:</label>
+            <input type="number" id="min-input2" value="12">
+        </div>
+        <div class="input-row">
+            <label>Value 3:</label>
+            <input type="number" id="min-input3" value="89">
+        </div>
+        <div class="input-row">
+            <label>Result:</label>
+            <input type="text" id="min-result" readonly>
+        </div>
+    </div>
+
+    <div class="test-group">
+        <h3>5. Max UFMP Amount</h3>
+        <div class="description">Complex calculation: (value1 - round((value1 * value2) / (1 + value2) * 100) / 100) * value2</div>
+        <div class="input-row">
+            <label>Value 1:</label>
+            <input type="number" step="0.01" id="ufmp-input1" value="200000">
+        </div>
+        <div class="input-row">
+            <label>Value 2:</label>
+            <input type="number" step="0.01" id="ufmp-input2" value="0.0175">
+        </div>
+        <div class="input-row">
+            <label>Result:</label>
+            <input type="text" id="ufmp-result" readonly>
+        </div>
+    </div>
+
+    <div class="test-group">
+        <h3>6. New UFMIP Factor</h3>
+        <div class="description">Returns 0.0100 if date before 2009-05-31, otherwise 0.0175</div>
+        <div class="input-row">
+            <label>Date:</label>
+            <input type="date" id="ufmip-input1" value="2009-06-01">
+        </div>
+        <div class="input-row">
+            <label>Result:</label>
+            <input type="text" id="ufmip-result" readonly>
+        </div>
+    </div>
+
+    <script src="calculations.js"></script>
+    <script>
+        // Initialize the calculations class with configuration
+        const calc = new calculations({
+            groups: [
+                {
+                    inputIds: ['sum-input1', 'sum-input2', 'sum-input3'],
+                    resultId: 'sum-result',
+                    calculation: 'sumInputs'
+                },
+                {
+                    inputIds: ['subtract-input1', 'subtract-input2', 'subtract-input3'],
+                    resultId: 'subtract-result',
+                    calculation: 'subtractInputs'
+                },
+                {
+                    inputIds: ['truncate-input1', 'truncate-input2', 'truncate-input3'],
+                    resultId: 'truncate-result',
+                    calculation: 'truncateAndSumInputs'
+                },
+                {
+                    inputIds: ['min-input1', 'min-input2', 'min-input3'],
+                    resultId: 'min-result',
+                    calculation: 'minInputs'
+                },
+                {
+                    inputIds: ['ufmp-input1', 'ufmp-input2'],
+                    resultId: 'ufmp-result',
+                    calculation: 'maxUFMPamount'
+                },
+                {
+                    inputIds: ['ufmip-input1'],
+                    resultId: 'ufmip-result',
+                    calculation: 'newUfmipFactor'
+                }
+            ]
+        });
+
+        // Trigger initial calculations
+        calc.recalculateAll();
+    </script>
+</body>
+</html>
+
