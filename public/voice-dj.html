@@ -10,8 +10,8 @@
   <script src="/user-selector.js"></script>
   <style>
     body {
-      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-      color: #eee;
+      background: linear-gradient(135deg, #e8f4f3 0%, #d4e7e5 50%, #c9ddd8 100%);
+      color: #4a5f5d;
       min-height: 100vh;
     }
 
@@ -24,24 +24,24 @@
     .dj-header {
       text-align: center;
       padding: 40px 20px;
-      background: linear-gradient(135deg, rgba(236, 0, 140, 0.3), rgba(252, 103, 103, 0.2));
+      background: linear-gradient(135deg, rgba(139, 187, 166, 0.2), rgba(169, 206, 195, 0.2));
       border-radius: 20px;
       margin-bottom: 30px;
-      border: 2px solid rgba(236, 0, 140, 0.4);
+      border: 2px solid rgba(139, 187, 166, 0.3);
     }
 
     .dj-header h1 {
       font-size: 3.5rem;
       font-weight: bold;
-      background: linear-gradient(135deg, #ec008c, #fc6767);
+      background: linear-gradient(135deg, #6b9d8a, #8bb9a6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 10px;
     }
 
     .voice-interface {
-      background: rgba(255, 255, 255, 0.05);
-      border: 3px solid rgba(236, 0, 140, 0.3);
+      background: rgba(255, 255, 255, 0.6);
+      border: 3px solid rgba(139, 187, 166, 0.4);
       border-radius: 20px;
       padding: 40px;
       text-align: center;
@@ -53,8 +53,8 @@
       width: 150px;
       height: 150px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ec008c, #fc6767);
-      border: 5px solid rgba(255, 255, 255, 0.3);
+      background: linear-gradient(135deg, #8bb9a6, #a9cec3);
+      border: 5px solid rgba(139, 187, 166, 0.3);
       color: white;
       font-size: 4rem;
       cursor: pointer;
@@ -63,34 +63,34 @@
       align-items: center;
       justify-content: center;
       margin: 0 auto 30px;
-      box-shadow: 0 10px 40px rgba(236, 0, 140, 0.4);
+      box-shadow: 0 10px 40px rgba(139, 187, 166, 0.3);
     }
 
     .mic-button:hover {
       transform: scale(1.1);
-      box-shadow: 0 15px 50px rgba(236, 0, 140, 0.6);
+      box-shadow: 0 15px 50px rgba(139, 187, 166, 0.5);
     }
 
     .mic-button.listening {
       animation: pulse 1.5s ease-in-out infinite;
-      background: linear-gradient(135deg, #00ff88, #00ddff);
+      background: linear-gradient(135deg, #7ec4a8, #96d4ba);
     }
 
     @keyframes pulse {
       0%, 100% {
         transform: scale(1);
-        box-shadow: 0 10px 40px rgba(0, 255, 136, 0.4);
+        box-shadow: 0 10px 40px rgba(126, 196, 168, 0.4);
       }
       50% {
         transform: scale(1.15);
-        box-shadow: 0 20px 60px rgba(0, 255, 136, 0.8);
+        box-shadow: 0 20px 60px rgba(126, 196, 168, 0.6);
       }
     }
 
     /* User Selector Panel */
     .user-selector-panel {
-      background: rgba(255, 255, 255, 0.05);
-      border: 2px solid rgba(236, 0, 140, 0.3);
+      background: rgba(255, 255, 255, 0.6);
+      border: 2px solid rgba(139, 187, 166, 0.4);
       border-radius: 20px;
       padding: 25px;
       margin-bottom: 30px;
@@ -105,29 +105,29 @@
     }
 
     .user-card-dj {
-      background: rgba(255, 255, 255, 0.08);
-      border: 3px solid rgba(200, 200, 200, 0.2);
+      background: rgba(255, 255, 255, 0.5);
+      border: 3px solid rgba(139, 187, 166, 0.3);
       border-radius: 16px;
       padding: 20px 15px;
       text-align: center;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 12px rgba(107, 157, 138, 0.2);
       backdrop-filter: blur(10px);
     }
 
     .user-card-dj:hover {
       transform: translateY(-8px) scale(1.05);
-      box-shadow: 0 8px 25px rgba(236, 0, 140, 0.5);
-      border-color: rgba(236, 0, 140, 0.6);
-      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 8px 25px rgba(139, 187, 166, 0.4);
+      border-color: rgba(139, 187, 166, 0.6);
+      background: rgba(255, 255, 255, 0.7);
     }
 
     .user-card-dj.active {
-      background: linear-gradient(135deg, rgba(236, 0, 140, 0.3), rgba(252, 103, 103, 0.2));
-      border-color: #ec008c;
+      background: linear-gradient(135deg, rgba(139, 187, 166, 0.3), rgba(169, 206, 195, 0.3));
+      border-color: #8bb9a6;
       border-width: 4px;
-      box-shadow: 0 6px 20px rgba(236, 0, 140, 0.6);
+      box-shadow: 0 6px 20px rgba(139, 187, 166, 0.5);
       transform: scale(1.05);
     }
 
@@ -138,18 +138,18 @@
       display: block;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid rgba(200, 200, 200, 0.3);
+      border: 3px solid rgba(139, 187, 166, 0.3);
       transition: all 0.3s ease;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      filter: drop-shadow(0 2px 4px rgba(107, 157, 138, 0.2));
     }
 
     .user-card-dj:hover .user-icon-dj {
-      border-color: rgba(236, 0, 140, 0.6);
+      border-color: rgba(139, 187, 166, 0.6);
       transform: scale(1.1);
     }
 
     .user-card-dj.active .user-icon-dj {
-      border-color: #ec008c;
+      border-color: #8bb9a6;
       border-width: 4px;
       animation: djUserPulse 2s ease-in-out infinite;
     }
@@ -162,12 +162,12 @@
     .user-name-dj {
       font-weight: 600;
       font-size: 15px;
-      color: #eee;
+      color: #4a5f5d;
       line-height: 1.3;
     }
 
     .user-card-dj.active .user-name-dj {
-      color: #ec008c;
+      color: #6b9d8a;
       font-weight: 700;
     }
 
@@ -190,25 +190,25 @@
     .voice-status {
       font-size: 1.5rem;
       font-weight: 600;
-      color: #ec008c;
+      color: #6b9d8a;
       margin-bottom: 15px;
       min-height: 40px;
     }
 
     .voice-transcript {
       font-size: 1.2rem;
-      color: #ccc;
+      color: #5a7370;
       font-style: italic;
       min-height: 60px;
       padding: 20px;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.5);
       border-radius: 10px;
       margin-bottom: 20px;
     }
 
     .dj-response {
-      background: linear-gradient(135deg, rgba(236, 0, 140, 0.2), rgba(252, 103, 103, 0.1));
-      border: 2px solid rgba(236, 0, 140, 0.3);
+      background: linear-gradient(135deg, rgba(139, 187, 166, 0.2), rgba(169, 206, 195, 0.2));
+      border: 2px solid rgba(139, 187, 166, 0.4);
       border-radius: 15px;
       padding: 25px;
       margin-bottom: 20px;
@@ -217,7 +217,7 @@
     .dj-response-text {
       font-size: 1.1rem;
       line-height: 1.8;
-      color: #fff;
+      color: #4a5f5d;
     }
 
     .results-grid {
@@ -228,7 +228,7 @@
     }
 
     .result-card {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.7);
       border-radius: 12px;
       padding: 15px;
       cursor: pointer;
@@ -238,8 +238,8 @@
 
     .result-card:hover {
       transform: translateY(-5px);
-      border-color: #ec008c;
-      box-shadow: 0 10px 30px rgba(236, 0, 140, 0.3);
+      border-color: #8bb9a6;
+      box-shadow: 0 10px 30px rgba(139, 187, 166, 0.4);
     }
 
     .result-card img {
@@ -258,26 +258,87 @@
 
     .suggestion-pill {
       padding: 10px 20px;
-      background: rgba(236, 0, 140, 0.2);
-      border: 2px solid rgba(236, 0, 140, 0.4);
+      background: rgba(139, 187, 166, 0.2);
+      border: 2px solid rgba(139, 187, 166, 0.4);
       border-radius: 20px;
-      color: #fc6767;
+      color: #6b9d8a;
       font-size: 0.95rem;
       cursor: pointer;
       transition: all 0.3s ease;
     }
 
     .suggestion-pill:hover {
-      background: rgba(236, 0, 140, 0.4);
-      border-color: #ec008c;
+      background: rgba(139, 187, 166, 0.4);
+      border-color: #8bb9a6;
       transform: scale(1.05);
+    }
+
+    /* Floating Musical Notes */
+    .floating-notes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .musical-note {
+      position: absolute;
+      font-size: 32px;
+      color: rgba(126, 196, 168, 0.5);
+      animation: floatNote 15s linear infinite;
+      opacity: 0;
+      z-index: 10;
+    }
+
+    .musical-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .musical-note:nth-child(2) { left: 20%; animation-delay: 3s; }
+    .musical-note:nth-child(3) { left: 30%; animation-delay: 6s; }
+    .musical-note:nth-child(4) { left: 40%; animation-delay: 9s; }
+    .musical-note:nth-child(5) { left: 50%; animation-delay: 12s; }
+    .musical-note:nth-child(6) { left: 60%; animation-delay: 15s; }
+    .musical-note:nth-child(7) { left: 70%; animation-delay: 18s; }
+    .musical-note:nth-child(8) { left: 80%; animation-delay: 21s; }
+    .musical-note:nth-child(9) { left: 90%; animation-delay: 24s; }
+
+    @keyframes floatNote {
+      0% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.5;
+      }
+      95% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(-100vh);
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
 
+<!-- Floating Musical Notes -->
+<div class="floating-notes">
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">♩</div>
+  <div class="musical-note">♬</div>
+  <div class="musical-note">♭</div>
+  <div class="musical-note">♯</div>
+  <div class="musical-note">𝄞</div>
+  <div class="musical-note">𝄢</div>
+  <div class="musical-note">♪</div>
+</div>
+
 <!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(0,0,0,0.3); backdrop-filter: blur(10px);">
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(139, 187, 166, 0.3); backdrop-filter: blur(10px);">
   <div class="container">
     <a class="navbar-brand" href="/index.html">
       <i class="bi-music-note-beamed"></i> piBoom
@@ -311,7 +372,6 @@
           <div class="dropdown-menu" aria-labelledby="aiDropdown">
             <a class="dropdown-item active" href="/voice-dj.html"><i class="bi-mic"></i> Voice DJ</a>
             <a class="dropdown-item" href="/assistant.html"><i class="bi-chat-dots"></i> Levi Assistant</a>
-            <a class="dropdown-item" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>
           </div>
         </li>
 
@@ -324,6 +384,7 @@
             <a class="dropdown-item" href="/player.html"><i class="bi-volume-up"></i> The Boombox</a>
             <a class="dropdown-item" href="/visualizer.html"><i class="bi-palette-fill"></i> Psychedelic Visualizer</a>
             <a class="dropdown-item" href="/blacklight.html"><i class="bi-lightning"></i> Black Light Zone</a>
+            <a class="dropdown-item" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>
             <a class="dropdown-item" href="/art-gallery.html"><i class="bi-image"></i> Art Gallery</a>
             <a class="dropdown-item" href="/ouija-board.html"><i class="bi-magic"></i> Ouija Board</a>
           </div>
@@ -348,14 +409,14 @@
   <!-- Header -->
   <div class="dj-header">
     <h1>🎤 Wolfman Dave</h1>
-    <p style="font-size: 1.3rem; color: #ccc; margin: 0;">
+    <p style="font-size: 1.3rem; color: #5a7370; margin: 0;">
       Just talk - I'll search and show you the albums you're looking for
     </p>
   </div>
 
   <!-- User Selector with LangChain Memory -->
   <div class="user-selector-panel">
-    <h5 style="text-align: center; color: #ec008c; margin-bottom: 20px;">
+    <h5 style="text-align: center; color: #6b9d8a; margin-bottom: 20px;">
       <i class="bi-person-circle"></i> Select User (Each has their own conversation memory)
     </h5>
     <div class="user-grid">
@@ -430,7 +491,7 @@
   <!-- DJ Response -->
   <div id="djResponseSection" style="display: none;">
     <div class="dj-response">
-      <div style="font-size: 1.3rem; font-weight: 600; color: #fc6767; margin-bottom: 15px;">
+      <div style="font-size: 1.3rem; font-weight: 600; color: #8bb9a6; margin-bottom: 15px;">
         <i class="bi-vinyl-fill"></i> DJ Response
       </div>
       <div class="dj-response-text" id="djResponseText">
@@ -446,8 +507,8 @@
 
   <!-- YouTube Videos Section -->
   <div id="youtubeSection" style="display: none; margin-top: 40px;">
-    <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(236, 0, 140, 0.3); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px);">
-      <h3 style="color: #ec008c; margin-bottom: 20px; text-align: center;">
+    <div style="background: rgba(255, 255, 255, 0.6); border: 2px solid rgba(139, 187, 166, 0.4); border-radius: 20px; padding: 30px; backdrop-filter: blur(10px);">
+      <h3 style="color: #6b9d8a; margin-bottom: 20px; text-align: center;">
         <i class="bi-youtube" style="color: #ff0000;"></i> Watch on YouTube
       </h3>
       <div id="youtubeGrid" class="results-grid">
@@ -616,18 +677,18 @@ function displayResults(results, type) {
     
     if (type === 'albums') {
       card.innerHTML = `
-        ${item.coverUrl ? `<img src="${item.coverUrl}" onerror="this.src='/images/ds.webp'">` : '<div style="height: 250px; background: #34495e; border-radius: 8px; display: flex; align-items: center; justify-content: center;"><i class="bi-disc" style="font-size: 3rem;"></i></div>'}
-        <div style="font-weight: 600; margin-top: 10px; color: #fc6767;">${item.album}</div>
-        <div style="font-size: 0.9rem; color: #ccc;">${item.artist}</div>
-        ${item.year ? `<div style="font-size: 0.85rem; color: #999; margin-top: 5px;">${item.year}</div>` : ''}
+        ${item.coverUrl ? `<img src="${item.coverUrl}" onerror="this.src='/images/ds.webp'">` : '<div style="height: 250px; background: #a9cec3; border-radius: 8px; display: flex; align-items: center; justify-content: center;"><i class="bi-disc" style="font-size: 3rem;"></i></div>'}
+        <div style="font-weight: 600; margin-top: 10px; color: #6b9d8a;">${item.album}</div>
+        <div style="font-size: 0.9rem; color: #5a7370;">${item.artist}</div>
+        ${item.year ? `<div style="font-size: 0.85rem; color: #7a8d8a; margin-top: 5px;">${item.year}</div>` : ''}
       `;
     } else if (type === 'artists') {
       card.innerHTML = `
-        <div style="height: 250px; background: linear-gradient(135deg, #ec008c, #fc6767); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+        <div style="height: 250px; background: linear-gradient(135deg, #8bb9a6, #a9cec3); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
           <i class="bi-person-circle" style="font-size: 5rem; color: white;"></i>
         </div>
-        <div style="font-weight: 600; margin-top: 10px; color: #fc6767;">${item.name}</div>
-        <div style="font-size: 0.9rem; color: #ccc;">${item.genre || 'Artist'}</div>
+        <div style="font-weight: 600; margin-top: 10px; color: #6b9d8a;">${item.name}</div>
+        <div style="font-size: 0.9rem; color: #5a7370;">${item.genre || 'Artist'}</div>
       `;
       
       card.onclick = () => {
@@ -743,10 +804,10 @@ function displayYouTubeVideos(videos) {
     
     card.innerHTML = `
       <img src="${video.thumbnail}" alt="${video.title}" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-      <div style="font-weight: 600; margin-top: 10px; color: #fc6767; font-size: 0.95rem; line-height: 1.3;">
+      <div style="font-weight: 600; margin-top: 10px; color: #6b9d8a; font-size: 0.95rem; line-height: 1.3;">
         ${video.title}
       </div>
-      <div style="font-size: 0.85rem; color: #ccc; margin-top: 5px;">
+      <div style="font-size: 0.85rem; color: #5a7370; margin-top: 5px;">
         ${video.channel}
       </div>
       <div style="margin-top: 10px;">
@@ -772,24 +833,24 @@ async function showVoiceDJHistory() {
     const data = await response.json();
     
     if (data.success && data.history.length > 0) {
-      let historyHTML = '<div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; margin-top: 20px; max-height: 400px; overflow-y: auto;">';
-      historyHTML += '<h4 style="color: #ec008c; margin-bottom: 15px;"><i class="bi-clock-history"></i> Conversation History</h4>';
+      let historyHTML = '<div style="background: rgba(255,255,255,0.5); padding: 20px; border-radius: 12px; margin-top: 20px; max-height: 400px; overflow-y: auto;">';
+      historyHTML += '<h4 style="color: #6b9d8a; margin-bottom: 15px;"><i class="bi-clock-history"></i> Conversation History</h4>';
       
       data.history.forEach((msg, i) => {
         const isUser = msg.role === 'user';
-        const bgColor = isUser ? 'rgba(52, 152, 219, 0.2)' : 'rgba(236, 0, 140, 0.2)';
+        const bgColor = isUser ? 'rgba(126, 196, 168, 0.2)' : 'rgba(139, 187, 166, 0.2)';
         const icon = isUser ? '👤' : '🐺';
         const label = isUser ? 'You' : 'Wolfman Dave';
         
         historyHTML += `
-          <div style="background: ${bgColor}; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid ${isUser ? '#3498db' : '#ec008c'};">
-            <strong style="color: ${isUser ? '#3498db' : '#ec008c'};">${icon} ${label}:</strong>
-            <div style="color: #eee; margin-top: 5px; font-size: 0.95rem;">${msg.content.substring(0, 200)}${msg.content.length > 200 ? '...' : ''}</div>
+          <div style="background: ${bgColor}; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid ${isUser ? '#7ec4a8' : '#8bb9a6'};">
+            <strong style="color: ${isUser ? '#7ec4a8' : '#6b9d8a'};">${icon} ${label}:</strong>
+            <div style="color: #4a5f5d; margin-top: 5px; font-size: 0.95rem;">${msg.content.substring(0, 200)}${msg.content.length > 200 ? '...' : ''}</div>
           </div>
         `;
       });
       
-      historyHTML += `<p style="text-align: center; color: #999; margin-top: 15px;">Total: ${data.history.length} messages</p>`;
+      historyHTML += `<p style="text-align: center; color: #7a8d8a; margin-top: 15px;">Total: ${data.history.length} messages</p>`;
       historyHTML += '</div>';
       
       // Show in DJ response section
@@ -798,7 +859,7 @@ async function showVoiceDJHistory() {
       
       console.log(`✅ Displayed ${data.history.length} messages from history`);
     } else {
-      document.getElementById('djResponseText').innerHTML = '<p style="color: #ccc; text-align: center;">No conversation history found. Start talking to Wolfman Dave!</p>';
+      document.getElementById('djResponseText').innerHTML = '<p style="color: #5a7370; text-align: center;">No conversation history found. Start talking to Wolfman Dave!</p>';
       document.getElementById('djResponseSection').style.display = 'block';
     }
   } catch (error) {
@@ -822,22 +883,22 @@ async function showVoiceDJStats() {
         : 'Never';
       
       const statsHTML = `
-        <div style="background: rgba(236, 0, 140, 0.2); padding: 30px; border-radius: 12px; margin-top: 20px; border: 2px solid #ec008c;">
-          <h4 style="color: #ec008c; margin-bottom: 20px; text-align: center;">
+        <div style="background: rgba(139, 187, 166, 0.2); padding: 30px; border-radius: 12px; margin-top: 20px; border: 2px solid #8bb9a6;">
+          <h4 style="color: #6b9d8a; margin-bottom: 20px; text-align: center;">
             <i class="bi-graph-up"></i> 🐺 Wolfman Dave Stats for ${userId}
           </h4>
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; text-align: center;">
-            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
-              <div style="font-size: 2.5rem; color: #fc6767; font-weight: bold;">${stats.message_count || 0}</div>
-              <div style="color: #ccc; margin-top: 5px;">Total Messages</div>
+            <div style="background: rgba(255,255,255,0.5); padding: 20px; border-radius: 10px;">
+              <div style="font-size: 2.5rem; color: #6b9d8a; font-weight: bold;">${stats.message_count || 0}</div>
+              <div style="color: #5a7370; margin-top: 5px;">Total Messages</div>
             </div>
-            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
-              <div style="font-size: 2.5rem; color: #00ff88; font-weight: bold;">${stats.conversation_count || 0}</div>
-              <div style="color: #ccc; margin-top: 5px;">Conversations</div>
+            <div style="background: rgba(255,255,255,0.5); padding: 20px; border-radius: 10px;">
+              <div style="font-size: 2.5rem; color: #7ec4a8; font-weight: bold;">${stats.conversation_count || 0}</div>
+              <div style="color: #5a7370; margin-top: 5px;">Conversations</div>
             </div>
-            <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 10px;">
-              <div style="font-size: 1.2rem; color: #00ddff; font-weight: 600;">${lastActivity}</div>
-              <div style="color: #ccc; margin-top: 5px;">Last Activity</div>
+            <div style="background: rgba(255,255,255,0.5); padding: 20px; border-radius: 10px;">
+              <div style="font-size: 1.2rem; color: #8bb9a6; font-weight: 600;">${lastActivity}</div>
+              <div style="color: #5a7370; margin-top: 5px;">Last Activity</div>
             </div>
           </div>
         </div>
@@ -848,7 +909,7 @@ async function showVoiceDJStats() {
       
       console.log('📊 Stats displayed:', stats);
     } else {
-      document.getElementById('djResponseText').innerHTML = '<p style="color: #ccc; text-align: center;">No stats available yet. Start talking to Wolfman Dave!</p>';
+      document.getElementById('djResponseText').innerHTML = '<p style="color: #5a7370; text-align: center;">No stats available yet. Start talking to Wolfman Dave!</p>';
       document.getElementById('djResponseSection').style.display = 'block';
     }
   } catch (error) {
@@ -879,11 +940,11 @@ async function clearVoiceDJHistory() {
     
     if (data.success) {
       const clearHTML = `
-        <div style="background: rgba(0, 255, 136, 0.2); padding: 30px; border-radius: 12px; margin-top: 20px; text-align: center;">
-          <h4 style="color: #00ff88; margin-bottom: 15px;">
+        <div style="background: rgba(126, 196, 168, 0.2); padding: 30px; border-radius: 12px; margin-top: 20px; text-align: center;">
+          <h4 style="color: #7ec4a8; margin-bottom: 15px;">
             ✅ History Cleared!
           </h4>
-          <p style="color: #eee;">Fresh start for ${userId}! All conversation history has been deleted from PostgreSQL. 🎵</p>
+          <p style="color: #4a5f5d;">Fresh start for ${userId}! All conversation history has been deleted from PostgreSQL. 🎵</p>
         </div>
       `;
       

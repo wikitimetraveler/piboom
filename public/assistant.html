@@ -33,22 +33,6 @@
     scroll-behavior: smooth;
   }
   
-  .chat-messages::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
-    /* animation: zenShine 4s ease-in-out infinite; */
-  }
-  
-  @keyframes zenShine {
-    0% { left: -100%; }
-    50% { left: 100%; }
-    100% { left: 100%; }
-  }
   
   /* Zen Messages */
   .message {
@@ -210,14 +194,13 @@
     }
   }
   
-  /* Zen Typing Indicator */
+  /* Typing Indicator */
   .typing-indicator {
     display: none;
     color: var(--muted);
     font-style: italic;
     text-align: center;
     padding: 10px;
-    /* animation: zenPulse 2s ease-in-out infinite; */
   }
   
   /* Zen Input Group */
@@ -324,70 +307,26 @@
     transform: translateY(-2px);
   }
   
-  /* Zen Personality Badge */
-  .personality-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #ff6b6b, #ffa500);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 0.8em;
-    margin-left: 10px;
-    font-weight: 500;
-    box-shadow: 0 2px 8px rgba(255,107,107,0.3);
-    /* animation: zenPulse 3s ease-in-out infinite; */
-  }
   
-  /* Zen Greeting Section */
+  /* Greeting Section */
   .greeting-section {
     text-align: center;
-    margin-bottom: var(--zen-spacing);
-    padding: var(--zen-spacing);
-    background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
-    color: white;
-    border-radius: var(--zen-radius);
-    box-shadow: var(--zen-shadow);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .greeting-section::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-    animation: zenShine 3s ease-in-out infinite;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.6);
   }
   
   .greeting-section h2 {
-    position: relative;
-    z-index: 1;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin-bottom: 10px;
   }
   
   .greeting-section p {
-    position: relative;
-    z-index: 1;
-    opacity: 0.9;
-  }
-  
-  .greeting-section .btn {
-    position: relative;
-    z-index: 1;
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s var(--zen-ease);
-  }
-  
-  .greeting-section .btn:hover {
-    background: rgba(255,255,255,0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    color: #4a5568;
+    font-size: 0.95rem;
   }
   
   /* Zen Scrollbar */
@@ -409,50 +348,25 @@
     background: rgba(135,206,250,0.8);
   }
   
-  /* Zen Footer */
+  /* Footer */
   .footer {
-    background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
-    color: white;
-    padding: var(--zen-spacing) 0;
-    margin-top: var(--zen-spacing);
-    border-radius: var(--zen-radius) var(--zen-radius) 0 0;
-    box-shadow: var(--zen-shadow);
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .footer::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-    /* animation: zenShine 4s ease-in-out infinite; */
+    background: rgba(255, 255, 255, 0.7);
+    color: #2d3748;
+    padding: 20px 0;
+    margin-top: 40px;
+    border-top: 1px solid rgba(226, 232, 240, 0.6);
   }
   
   .footer-content {
-    position: relative;
-    z-index: 1;
     font-weight: 500;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    font-size: 0.9rem;
   }
   
   .footer-quote {
-    position: relative;
-    z-index: 1;
     font-style: italic;
-    font-size: 1.1em;
-    margin-top: 8px;
-    opacity: 0.9;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    /* animation: zenPulse 3s ease-in-out infinite; */
-  }
-  
-  .footer-quote i {
-    color: #ff6b6b;
-    margin: 0 5px;
+    font-size: 0.95rem;
+    margin-top: 5px;
+    color: #4a5568;
   }
 
   /* Quick Action Buttons */
@@ -716,7 +630,7 @@
   <div class="musical-note">♭</div>
   <div class="musical-note">♯</div>
   <div class="musical-note">𝄞</div>
-  <div class="musical-note">🎸</div>
+  <div class="musical-note">𝄢</div>
   <div class="musical-note">♪</div>
 </div>
 
@@ -755,7 +669,6 @@
           <div class="dropdown-menu" aria-labelledby="aiDropdown">
             <a class="dropdown-item" href="/voice-dj.html"><i class="bi-mic"></i> Voice DJ</a>
             <a class="dropdown-item active" href="/assistant.html"><i class="bi-chat-dots"></i> Levi Assistant</a>
-            <a class="dropdown-item" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>
           </div>
         </li>
 
@@ -768,6 +681,7 @@
             <a class="dropdown-item" href="/player.html"><i class="bi-volume-up"></i> The Boombox</a>
             <a class="dropdown-item" href="/visualizer.html"><i class="bi-palette-fill"></i> Psychedelic Visualizer</a>
             <a class="dropdown-item" href="/blacklight.html"><i class="bi-lightning"></i> Black Light Zone</a>
+            <a class="dropdown-item" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>
             <a class="dropdown-item" href="/art-gallery.html"><i class="bi-image"></i> Art Gallery</a>
             <a class="dropdown-item" href="/ouija-board.html"><i class="bi-magic"></i> Ouija Board</a>
           </div>
@@ -790,12 +704,11 @@
 
 <div class="assistant-container">
   <div class="greeting-section">
-    <h2><i class="bi-music-note-beamed"></i> Meet Your Music Assistant</h2>
-    <p id="assistantDescription">Your music assistant is ready to help! Select a user and assistant below to get started. 🎵</p>
+    <h2><i class="bi-robot"></i> Music Assistant</h2>
     
     <!-- User Selector - Icon Grid -->
     <div class="user-switcher mb-3">
-      <label class="form-label mb-3">Select User (for conversation memory):</label>
+      <label class="form-label mb-2"><small>Select User:</small></label>
       <div class="user-grid">
         <div class="user-card active" data-user="cosmic-turtle" onclick="selectUser('cosmic-turtle')">
           <img src="/images/cosmic turtle.png" alt="Cosmic Turtle" class="user-icon">
@@ -819,12 +732,11 @@
         </div>
       </div>
       <input type="hidden" id="userSelect" value="cosmic-turtle">
-      <small class="text-muted d-block mt-2">Click a user - each has their own conversation history saved in PostgreSQL</small>
     </div>
     
     <!-- Assistant Switcher -->
     <div class="assistant-switcher mb-3">
-      <label for="assistantSelect" class="form-label">Choose Your Assistant Personality:</label>
+      <label for="assistantSelect" class="form-label"><small>Choose Assistant:</small></label>
       <select id="assistantSelect" class="form-control" onchange="switchAssistant()">
         <option value="levi">🏍️ Levi - Biker Hippie (70s)</option>
         <option value="robert">🎸 Robert - Delta Blues Player (50s)</option>
@@ -840,75 +752,56 @@
       </select>
     </div>
     
-    <div class="btn-group" role="group">
-    <button class="btn btn-light" onclick="getGreeting()">
-      <i class="bi-chat-dots"></i> Get a Greeting
-    </button>
-      <button class="btn btn-info" onclick="loadConversationHistory()">
-        <i class="bi-clock-history"></i> Load History
+    <div class="btn-group btn-group-sm" role="group">
+      <button class="btn btn-outline-secondary" onclick="getGreeting()">
+        <i class="bi-chat-dots"></i> Greeting
       </button>
-      <button class="btn btn-warning" onclick="showConversationStats()">
-        <i class="bi-graph-up"></i> Show Stats
-    </button>
+      <button class="btn btn-outline-secondary" onclick="loadConversationHistory()">
+        <i class="bi-clock-history"></i> History
+      </button>
+      <button class="btn btn-outline-secondary" onclick="showConversationStats()">
+        <i class="bi-graph-up"></i> Stats
+      </button>
+      <button class="btn btn-outline-secondary" onclick="clearChat()">
+        <i class="bi-trash"></i> Clear
+      </button>
     </div>
   </div>
 
-  <div class="quick-actions">
-    <button class="quick-action-btn" onclick="sendQuickMessage('What music should I listen to today?')">
-      <i class="bi-music-note-beamed"></i> Music Recommendations
-    </button>
-    <button class="quick-action-btn" onclick="sendQuickMessage('Tell me about my favorite artists')">
-      <i class="bi-person"></i> Artist Info
-    </button>
-    <button class="quick-action-btn" onclick="findYouTubeVideos()">
-      <i class="bi-play-circle"></i> Find YouTube Videos
-    </button>
-    <button class="quick-action-btn" onclick="clearChat()">
-      <i class="bi-trash"></i> Clear Chat
-    </button>
-  </div>
-
-  <div class="voice-controls text-center mb-3">
-    <button class="btn btn-success mr-2" onclick="initVoice()" id="initVoiceBtn">
-      <i class="bi-mic"></i> Enable Voice
-    </button>
-    <button class="btn btn-primary mr-2" onclick="startVoice()" id="startVoiceBtn" disabled>
-      <i class="bi-mic-fill"></i> Ask Question
-    </button>
-    <button class="btn btn-warning mr-2" onclick="stopVoice()" id="stopVoiceBtn" disabled>
-      <i class="bi-mic-mute"></i> Stop
-    </button>
-    <button class="btn btn-danger mr-2" onclick="stopSpeaking()" id="stopSpeakingBtn">
-      <i class="bi-stop-circle"></i> Stop Speaking
-    </button>
-    <button class="btn btn-info" onclick="makeAssistantSpeak('Hello! I am your music assistant, ready to help!')" id="testVoiceBtn" disabled>
-      <i class="bi-volume-up"></i> Test Voice
-    </button>
+  <div class="text-center mb-3">
+    <div class="btn-group btn-group-sm" role="group">
+      <button class="btn btn-success" onclick="initVoice()" id="initVoiceBtn">
+        <i class="bi-mic"></i> Enable Voice
+      </button>
+      <button class="btn btn-primary" onclick="startVoice()" id="startVoiceBtn" disabled>
+        <i class="bi-mic-fill"></i> Ask
+      </button>
+      <button class="btn btn-warning" onclick="stopVoice()" id="stopVoiceBtn" disabled>
+        <i class="bi-mic-mute"></i> Stop
+      </button>
+      <button class="btn btn-danger" onclick="stopSpeaking()" id="stopSpeakingBtn">
+        <i class="bi-stop-circle"></i> Stop Speaking
+      </button>
+    </div>
   </div>
 
   <div class="chat-messages" id="chatMessages">
     <div class="message assistant-message active" id="initialGreeting">
-      <strong>Assistant:</strong> Welcome! I'm your music assistant. Select an assistant from the dropdown above to get started, and I'll greet you properly! 🎵
+      <strong>Assistant:</strong> Welcome! Select an assistant and ask away! 🎵
     </div>
   </div>
 
   <div class="typing-indicator" id="typingIndicator">
-    Assistant is thinking... <i class="bi-three-dots"></i>
+    Assistant is thinking...
   </div>
 
   <div class="input-group">
-    <input type="text" class="form-control" id="messageInput" placeholder="Ask your assistant anything about music or just chat!" onkeypress="handleKeyPress(event)">
+    <input type="text" class="form-control" id="messageInput" placeholder="Ask about music..." onkeypress="handleKeyPress(event)">
     <div class="input-group-append">
       <button class="btn btn-primary" onclick="sendMessage()">
-        <i class="bi-send"></i> Send
+        <i class="bi-send"></i>
       </button>
     </div>
-  </div>
-
-  <div class="text-center">
-    <small class="text-muted">
-      <i class="bi-lightbulb"></i> Try saying things like "Tell me about The Beatles" or "What's good music for working out?"
-    </small>
   </div>
 
   <!-- YouTube Videos Section -->
@@ -1561,9 +1454,6 @@ function addMessage(text, sender, personality = 'engaging') {
   if (sender === 'assistant') {
     messageDiv.classList.add('active');
     messageDiv.innerHTML = `<strong>Assistant:</strong> ${text}`;
-    if (personality && personality !== 'engaging') {
-      messageDiv.innerHTML += ` <span class="personality-badge">${personality}</span>`;
-    }
   } else if (sender === 'system') {
     // System messages (for history loading, stats, etc.)
     messageDiv.innerHTML = text;
@@ -1595,7 +1485,33 @@ function hideTypingIndicator() {
   document.getElementById('typingIndicator').style.display = 'none';
 }
 
-function clearChat() {
+async function clearChat() {
+  const userId = document.getElementById('userSelect').value;
+  
+  // First, show warning confirmation
+  const confirmClear = confirm(
+    '⚠️ WARNING: This will permanently delete ALL conversation history!\n\n' +
+    'This includes:\n' +
+    '- All your messages\n' +
+    '- All assistant responses\n' +
+    '- Conversation context and memory\n\n' +
+    'This action CANNOT be undone!\n\n' +
+    'Are you sure you want to continue?'
+  );
+  
+  if (!confirmClear) {
+    return; // User cancelled
+  }
+  
+  // Require password verification
+  const verified = await verifyUserPassword(userId, 'clear conversation history');
+  
+  if (!verified) {
+    console.log('❌ Password verification failed - history not cleared');
+    return;
+  }
+  
+  // Password verified - proceed with clearing
   const chatMessages = document.getElementById('chatMessages');
   chatMessages.innerHTML = `
     <div class="message assistant-message active">
@@ -1611,7 +1527,6 @@ function clearChat() {
   }
   
   // Clear LangChain PostgreSQL history
-  const userId = document.getElementById('userSelect').value;
   fetch('/api/chat/langchain/history', {
     method: 'DELETE',
     headers: { 'Content-Type': 'application/json' },
@@ -1620,9 +1535,13 @@ function clearChat() {
     .then(response => response.json())
     .then(data => {
       console.log('✅ Chat history cleared:', data);
-      addMessage(`Conversation history cleared for ${userId}! Fresh start! 🎵`, 'system');
+      addMessage(`✅ Conversation history cleared for ${userId}! Fresh start! 🎵`, 'system');
+      showToast('success', 'History Cleared!', `All conversation history has been permanently deleted for ${userId}.`, 4000);
     })
-    .catch(err => console.error('Error clearing history:', err));
+    .catch(err => {
+      console.error('Error clearing history:', err);
+      showToast('error', 'Clear Failed', 'Failed to clear conversation history. Please try again.', 5000);
+    });
 }
 
 // Load conversation history from PostgreSQL
@@ -2005,6 +1924,7 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script src="/user-passwords.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
