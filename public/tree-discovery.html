@@ -947,6 +947,95 @@ document.addEventListener('DOMContentLoaded', function() {
       console.error('Error loading API key:', error);
     });
 });
+
+// =========================
+// ChatGPT Integration for Tree Discovery
+// =========================
+let lastChatResponse = '';
+
+async function askSmokeyAI(question) {
+  if (!question) {
+    question = prompt('Ask Smokey the Bear about trees and conservation:');
+    if (!question) return;
+  }
+  
+  console.log('🐻 Asking Smokey:', question);
+  showToast('info', 'Smokey the Bear', 'Thinking about your question...');
+  
+  try {
+    const response = await fetch('/api/chat/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: question,
+        context: { 
+          source: 'tree_discovery',
+          personality: 'Smokey the Bear - tree expert and conservation advocate'
+        }
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.response) {
+      lastChatResponse = data.response;
+      showToast('success', 'Smokey the Bear 🐻', data.response, 10000);
+      
+      // Speak response if Google TTS is available
+      if (typeof window.speakWithGoogle === 'function') {
+        window.speakWithGoogle(data.response, 'en-US-Standard-D', {
+          pitch: -2,
+          speakingRate: 0.9
+        });
+      }
+    } else {
+      throw new Error('No response from Smokey');
+    }
+  } catch (error) {
+    console.error('❌ Smokey AI Error:', error);
+    showToast('error', 'Error', 'Smokey is taking a break. Try again later.');
+  }
+}
+</script>
+
+<script src="/scripts.js"></script>
+<script src="/voice-widget.js"></script>
+<script>
+// Initialize voice widget for tree discovery
+window.addEventListener('DOMContentLoaded', () => {
+  initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'green',
+    onCommand: (command) => {
+      console.log('🎤 Tree Discovery Voice Command:', command);
+      
+      const lowerCommand = command.toLowerCase();
+      
+      // Handle tree-specific commands
+      if (lowerCommand.includes('identify') || lowerCommand.includes('what tree')) {
+        // Switch to camera mode
+        switchInputMode('camera');
+        showToast('info', 'Camera Ready', 'Point at a tree to identify it!');
+      } else if (lowerCommand.includes('search for') || lowerCommand.includes('find')) {
+        // Extract tree name and search
+        const treeName = command.replace(/search for|find/gi, '').trim();
+        document.getElementById('treeSearch').value = treeName;
+        searchTree();
+      } else if (lowerCommand.includes('ask smokey') || lowerCommand.includes('smokey')) {
+        // Ask Smokey AI
+        const question = command.replace(/ask smokey|smokey/gi, '').trim();
+        askSmokeyAI(question || command);
+      } else if (lowerCommand.includes('home') || lowerCommand.includes('go back')) {
+        window.location.href = '/index.html';
+      } else {
+        // Default: ask Smokey about it
+        askSmokeyAI(command);
+      }
+    }
+  });
+});
 </script>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>

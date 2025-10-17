@@ -29,5 +29,10 @@ export const config = {
   // Spotify OAuth
   spotifyClientId: process.env.SPOTIFY_CLIENT_ID,
   spotifyClientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  spotifyRedirectUri: process.env.SPOTIFY_REDIRECT_URI
+  spotifyRedirectUri: process.env.SPOTIFY_REDIRECT_URI,
+  
+  // ACRCloud Audio Fingerprinting
+  acrcloudHost: process.env.ACRCLOUD_HOST || 'identify-us-west-2.acrcloud.com',
+  acrcloudAccessKey: process.env.ACRCLOUD_ACCESS_KEY,
+  acrcloudAccessSecret: process.env.ACRCLOUD_ACCESS_SECRET
 };

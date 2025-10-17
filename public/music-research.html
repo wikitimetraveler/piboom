@@ -865,10 +865,30 @@
   </div>
 </footer>
 
+<script src="/voice-widget.js"></script>
 <script src="/scripts.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <!-- Google Knowledge Graph Widget -->
 <script src="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.js"></script>
+<script>
+// Initialize voice widget for music research
+window.addEventListener('DOMContentLoaded', () => {
+  initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'blue',
+    onCommand: (command) => {
+      // Extract artist name from voice command
+      const artistMatch = command.match(/(?:search|find|tell me about|show me)\s+(.+)/i);
+      if (artistMatch && artistMatch[1]) {
+        const artist = artistMatch[1].trim();
+        // Trigger search
+        document.getElementById('artistInput').value = artist;
+        document.getElementById('searchBtn').click();
+      }
+    }
+  });
+});
+</script>
 <!-- Google Maps API will be loaded dynamically with the correct API key -->
 <script>
 // Set date if element exists

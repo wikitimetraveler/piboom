@@ -961,6 +961,89 @@ function showToast(title, message, type = 'info') {
 })();
 </script>
 
+<script src="/scripts.js"></script>
+<script src="/voice-widget.js"></script>
+<script>
+// =========================
+// ChatGPT Integration for Tree Collection
+// =========================
+async function askSmokeyAboutCollection(question) {
+  if (!question) {
+    question = prompt('Ask Smokey about your tree collection:');
+    if (!question) return;
+  }
+  
+  console.log('🐻 Asking Smokey about collection:', question);
+  showToast('Smokey the Bear 🐻', 'Let me check your forest collection...', 'info');
+  
+  try {
+    const response = await fetch('/api/chat/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: question,
+        context: { 
+          source: 'tree_collection',
+          personality: 'Smokey the Bear - forest ranger and conservation expert',
+          treeCount: currentCollection.length
+        }
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.response) {
+      showToast('Smokey the Bear 🐻', data.response, 'success', 8000);
+      
+      // Speak response with deep voice
+      if (typeof window.speakWithGoogle === 'function') {
+        window.speakWithGoogle(data.response, 'en-US-Standard-D', {
+          pitch: -3,
+          speakingRate: 0.85
+        });
+      }
+    }
+  } catch (error) {
+    console.error('❌ Smokey AI Error:', error);
+    showToast('Error', 'Smokey is out on patrol. Try again later.', 'error');
+  }
+}
+
+// Initialize voice widget for tree collection
+window.addEventListener('DOMContentLoaded', () => {
+  initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'green',
+    onCommand: (command) => {
+      console.log('🎤 Tree Collection Voice Command:', command);
+      
+      const lowerCommand = command.toLowerCase();
+      
+      if (lowerCommand.includes('show map') || lowerCommand.includes('display map')) {
+        if (!mapVisible) toggleMap();
+        showToast('Map', 'Showing your tree locations', 'info');
+      } else if (lowerCommand.includes('hide map')) {
+        if (mapVisible) toggleMap();
+      } else if (lowerCommand.includes('search') || lowerCommand.includes('find')) {
+        const searchTerm = command.replace(/search|find/gi, '').trim();
+        document.getElementById('searchInput').value = searchTerm;
+        loadCollection();
+      } else if (lowerCommand.includes('smokey') || lowerCommand.includes('ask')) {
+        const question = command.replace(/smokey|ask/gi, '').trim();
+        askSmokeyAboutCollection(question || command);
+      } else if (lowerCommand.includes('home') || lowerCommand.includes('go back')) {
+        window.location.href = '/index.html';
+      } else {
+        // Default: ask Smokey
+        askSmokeyAboutCollection(command);
+      }
+    }
+  });
+});
+</script>
+
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

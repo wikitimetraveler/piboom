@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Voice Control Guide | piBoom</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    body {
+      background: linear-gradient(135deg, #e8f4f3 0%, #d4e7e5 50%, #c9ddd8 100%);
+      color: #4a5f5d;
+      font-family: 'Georgia', serif;
+      min-height: 100vh;
+    }
+
+    .guide-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .guide-header {
+      text-align: center;
+      padding: 40px 20px;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 12px;
+      border: 1px solid rgba(139, 187, 166, 0.3);
+      margin-bottom: 40px;
+    }
+
+    .guide-header h1 {
+      font-size: 3rem;
+      color: #6b9d8a;
+      font-weight: 300;
+      letter-spacing: 3px;
+      margin-bottom: 15px;
+    }
+
+    .guide-header p {
+      font-size: 1.2rem;
+      color: #5a7370;
+      font-style: italic;
+    }
+
+    .section-card {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(139, 187, 166, 0.3);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 40px rgba(107, 157, 138, 0.1);
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      color: #6b9d8a;
+      font-weight: 300;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid rgba(139, 187, 166, 0.3);
+      padding-bottom: 10px;
+    }
+
+    .command-example {
+      background: rgba(139, 187, 166, 0.1);
+      border-left: 4px solid #8bb9a6;
+      padding: 15px 20px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+
+    .command-text {
+      font-family: 'Courier New', monospace;
+      color: #6b9d8a;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .command-desc {
+      color: #5a7370;
+      font-size: 0.95rem;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(139, 187, 166, 0.2);
+      color: #4a5f5d;
+    }
+
+    .feature-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feature-list i {
+      color: #8bb9a6;
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+
+    .tip-box {
+      background: rgba(126, 196, 168, 0.2);
+      border: 1px solid rgba(126, 196, 168, 0.4);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .tip-box h4 {
+      color: #7ec4a8;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .page-link {
+      display: inline-block;
+      background: rgba(139, 187, 166, 0.2);
+      border: 1px solid rgba(139, 187, 166, 0.4);
+      border-radius: 20px;
+      padding: 8px 20px;
+      margin: 5px;
+      color: #6b9d8a;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+      background: rgba(139, 187, 166, 0.3);
+      transform: translateY(-2px);
+      text-decoration: none;
+      color: #6b9d8a;
+    }
+
+    /* Floating Musical Notes */
+    .floating-notes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .musical-note {
+      position: absolute;
+      font-size: 32px;
+      color: rgba(126, 196, 168, 0.3);
+      animation: floatNote 15s linear infinite;
+      opacity: 0;
+      z-index: 10;
+    }
+
+    .musical-note:nth-child(1) { left: 10%; animation-delay: 0s; }
+    .musical-note:nth-child(2) { left: 30%; animation-delay: 5s; }
+    .musical-note:nth-child(3) { left: 50%; animation-delay: 10s; }
+    .musical-note:nth-child(4) { left: 70%; animation-delay: 15s; }
+    .musical-note:nth-child(5) { left: 90%; animation-delay: 20s; }
+
+    @keyframes floatNote {
+      0% {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+      5% {
+        opacity: 0.3;
+      }
+      95% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(-100vh);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Floating Musical Notes -->
+<div class="floating-notes">
+  <div class="musical-note">♪</div>
+  <div class="musical-note">♫</div>
+  <div class="musical-note">𝄞</div>
+  <div class="musical-note">♯</div>
+  <div class="musical-note">♬</div>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi-music-note-beamed mr-1"></i>piBoom</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/voice-guide.html"><i class="bi-mic"></i> Voice Guide</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="guide-container">
+  <!-- Header -->
+  <div class="guide-header">
+    <h1>🎤 Voice Control Guide</h1>
+    <p>Master voice commands for Big Wave Dave's Music Box</p>
+  </div>
+
+  <!-- Quick Start -->
+  <div class="section-card">
+    <h2 class="section-title"><i class="bi-rocket"></i> Quick Start</h2>
+    <ol style="font-size: 1.1rem; line-height: 2; color: #4a5f5d;">
+      <li>Click the <strong style="color: #6b9d8a;">🎤 microphone button</strong> on any voice-enabled page</li>
+      <li>Allow microphone access when prompted by your browser</li>
+      <li>Speak your command clearly</li>
+      <li>Wait for the system to respond</li>
+    </ol>
+
+    <div class="tip-box">
+      <h4><i class="bi-lightbulb"></i> Pro Tip</h4>
+      <p style="color: #4a5f5d; margin: 0;">Speak naturally! The AI understands conversational language. You don't need to use exact commands.</p>
+    </div>
+  </div>
+
+  <!-- Wolfman Dave (Voice DJ) -->
+  <div class="section-card">
+    <h2 class="section-title"><i class="bi-mic-fill"></i> Wolfman Dave - Voice DJ</h2>
+    <p style="font-size: 1.1rem; color: #5a7370; margin-bottom: 20px;">
+      Your voice-controlled music search with that classic DJ voice! Just talk and Wolfman Dave will find what you're looking for.
+    </p>
+
+    <a href="/voice-dj.html" class="page-link"><i class="bi-arrow-right-circle"></i> Go to Wolfman Dave</a>
+
+    <h4 style="color: #6b9d8a; margin-top: 30px; margin-bottom: 15px;">Example Commands:</h4>
+    
+    <div class="command-example">
+      <div class="command-text">"Show me funky albums from 1973"</div>
+      <div class="command-desc">Searches for albums by year and genre</div>
+    </div>
+
+    <div class="command-example">
+      <div class="command-text">"Find albums with blue covers"</div>
+      <div class="command-desc">Visual search by album cover color</div>
+    </div>
+
+    <div class="command-example">
+      <div class="command-text">"Search for psychedelic rock"</div>
+      <div class="command-desc">Genre-based music discovery</div>
+    </div>
+
+    <div class="command-example">
+      <div class="command-text">"What albums came out in 1969?"</div>
+      <div class="command-desc">Historical album discovery by year</div>
+    </div>
+  </div>
+
+  <!-- Levi Assistant -->
+  <div class="section-card">
+    <h2 class="section-title"><i class="bi-chat-dots"></i> Levi - AI Assistant</h2>
+    <p style="font-size: 1.1rem; color: #5a7370; margin-bottom: 20px;">
+      Chat with multiple AI music assistants! Each has their own personality and musical expertise. Voice-enabled for natural conversations.
+    </p>
+
+    <a href="/assistant.html" class="page-link"><i class="bi-arrow-right-circle"></i> Go to Assistant</a>
+
+    <h4 style="color: #6b9d8a; margin-top: 30px; margin-bottom: 15px;">Available Assistants:</h4>
+    <ul class="feature-list">
+      <li><i class="bi-person"></i> <strong>Levi</strong> - Biker Hippie (70s)</li>
+      <li><i class="bi-person"></i> <strong>Robert</strong> - Delta Blues Player (50s)</li>
+      <li><i class="bi-person"></i> <strong>Miles</strong> - Jazz Trumpeter (60s)</li>
+      <li><i class="bi-person"></i> <strong>Axel</strong> - Classic Rock Guitarist (70s)</li>
+      <li><i class="bi-person"></i> <strong>DJ Kool</strong> - Hip-Hop DJ (80s)</li>
+      <li><i class="bi-person"></i> <strong>Dave</strong> - Mathematician & Concert Veteran (60s-80s)</li>
+    </ul>
+
+    <h4 style="color: #6b9d8a; margin-top: 30px; margin-bottom: 15px;">Example Commands:</h4>
+    
+    <div class="command-example">
+      <div class="command-text">"Tell me about Pink Floyd"</div>
+      <div class="command-desc">Get artist information and history</div>
+    </div>
+
+    <div class="command-example">
+      <div class="command-text">"What music should I listen to today?"</div>
+      <div class="command-desc">Personalized music recommendations</div>
+    </div>
+
+    <div class="command-example">
+      <div class="command-text">"Show me blues albums"</div>
+      <div class="command-desc">Genre-specific searches</div>
+    </div>
+  </div>
+
+  <!-- Voice Features -->
+  <div class="section-card">
+    <h2 class="section-title"><i class="bi-stars"></i> Voice Features</h2>
+    
+    <ul class="feature-list">
+      <li><i class="bi-mic"></i> <strong>Speech Recognition</strong> - Browser-based voice input (Chrome, Edge recommended)</li>
+      <li><i class="bi-volume-up"></i> <strong>Text-to-Speech</strong> - AI assistants speak their responses</li>
+      <li><i class="bi-database"></i> <strong>Conversation Memory</strong> - Each user's conversations saved in PostgreSQL</li>
+      <li><i class="bi-person-circle"></i> <strong>Multi-User Support</strong> - 5 unique users with separate history</li>
+      <li><i class="bi-youtube"></i> <strong>YouTube Integration</strong> - Automatic video search and playback</li>
+      <li><i class="bi-collection"></i> <strong>Collection Access</strong> - Voice commands to browse your albums</li>
+    </ul>
+  </div>
+
+  <!-- Tips & Tricks -->
+  <div class="section-card">
+    <h2 class="section-title"><i class="bi-lightbulb"></i> Tips & Tricks</h2>
+    
+    <div class="tip-box">
+      <h4><i class="bi-check-circle"></i> Best Practices</h4>
+      <ul style="margin: 10px 0 0 20px; color: #4a5f5d;">
+        <li>Speak clearly in a quiet environment</li>
+        <li>Wait for the listening indicator before speaking</li>
+        <li>Use natural, conversational language</li>
+        <li>Be specific with artist names and album titles</li>
+        <li>Try different phrasings if not understood</li>
+      </ul>
+    </div>
+
+    <div class="tip-box" style="background: rgba(139, 187, 166, 0.2); border-color: rgba(139, 187, 166, 0.4);">
+      <h4 style="color: #8bb9a6;"><i class="bi-keyboard"></i> Keyboard Shortcuts</h4>
+      <ul style="margin: 10px 0 0 20px; color: #4a5f5d;">
+        <li><code style="background: rgba(139, 187, 166, 0.2); padding: 2px 8px; border-radius: 4px;">Escape</code> - Stop assistant from speaking</li>
+        <li><code style="background: rgba(139, 187, 166, 0.2); padding: 2px 8px; border-radius: 4px;">Enter</code> - Send message in chat</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Supported Browsers -->
+  <div class="section-card">
+    <h2 class="section-title"><i class="bi-browser-chrome"></i> Browser Compatibility</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+      <div style="text-align: center; padding: 20px;">
+        <i class="bi-check-circle-fill" style="font-size: 2rem; color: #7ec4a8;"></i>
+        <h4 style="color: #6b9d8a; margin-top: 10px;">Chrome</h4>
+        <p style="color: #5a7370; font-size: 0.9rem;">Full Support ✓</p>
+      </div>
+      <div style="text-align: center; padding: 20px;">
+        <i class="bi-check-circle-fill" style="font-size: 2rem; color: #7ec4a8;"></i>
+        <h4 style="color: #6b9d8a; margin-top: 10px;">Edge</h4>
+        <p style="color: #5a7370; font-size: 0.9rem;">Full Support ✓</p>
+      </div>
+      <div style="text-align: center; padding: 20px;">
+        <i class="bi-exclamation-circle-fill" style="font-size: 2rem; color: #f39c12;"></i>
+        <h4 style="color: #6b9d8a; margin-top: 10px;">Safari</h4>
+        <p style="color: #5a7370; font-size: 0.9rem;">Limited Support</p>
+      </div>
+      <div style="text-align: center; padding: 20px;">
+        <i class="bi-x-circle-fill" style="font-size: 2rem; color: #e74c3c;"></i>
+        <h4 style="color: #6b9d8a; margin-top: 10px;">Firefox</h4>
+        <p style="color: #5a7370; font-size: 0.9rem;">Not Supported</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pages with Voice -->
+  <div class="section-card">
+    <h2 class="section-title"><i class="bi-collection"></i> Voice-Enabled Pages</h2>
+    
+    <div style="text-align: center; margin: 20px 0;">
+      <a href="/voice-dj.html" class="page-link">🎤 Wolfman Dave</a>
+      <a href="/assistant.html" class="page-link">🤖 Levi Assistant</a>
+      <a href="/music-research.html" class="page-link">🔍 Music Research</a>
+      <a href="/album-discovery.html" class="page-link">💿 Album Discovery</a>
+    </div>
+  </div>
+
+  <!-- Troubleshooting -->
+  <div class="section-card">
+    <h2 class="section-title"><i class="bi-tools"></i> Troubleshooting</h2>
+    
+    <div style="margin: 20px 0;">
+      <h4 style="color: #6b9d8a; margin-bottom: 15px;">Common Issues:</h4>
+      
+      <div class="command-example">
+        <div class="command-text" style="font-size: 1rem; color: #e74c3c;">❌ "Microphone not working"</div>
+        <div class="command-desc">
+          <strong>Solution:</strong> Check browser permissions. Click the lock icon in the address bar and enable microphone access.
+        </div>
+      </div>
+
+      <div class="command-example">
+        <div class="command-text" style="font-size: 1rem; color: #e74c3c;">❌ "Voice not recognized"</div>
+        <div class="command-desc">
+          <strong>Solution:</strong> Speak clearly and in a quiet environment. Try rephrasing your command.
+        </div>
+      </div>
+
+      <div class="command-example">
+        <div class="command-text" style="font-size: 1rem; color: #e74c3c;">❌ "Assistant won't stop talking"</div>
+        <div class="command-desc">
+          <strong>Solution:</strong> Press the <strong>Escape</strong> key or click the "Stop Speaking" button.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Getting Started -->
+  <div class="section-card" style="background: rgba(126, 196, 168, 0.2); border-color: #7ec4a8;">
+    <h2 class="section-title" style="color: #7ec4a8; border-color: #7ec4a8;"><i class="bi-play-circle"></i> Ready to Start?</h2>
+    <p style="font-size: 1.2rem; color: #4a5f5d; text-align: center; margin-bottom: 30px;">
+      Try these voice-enabled pages now!
+    </p>
+    
+    <div style="text-align: center;">
+      <a href="/voice-dj.html" class="btn btn-lg" style="background: rgba(139, 187, 166, 0.3); border: 2px solid #8bb9a6; color: #6b9d8a; font-weight: 600; margin: 10px;">
+        <i class="bi-mic"></i> Wolfman Dave
+      </a>
+      <a href="/assistant.html" class="btn btn-lg" style="background: rgba(139, 187, 166, 0.3); border: 2px solid #8bb9a6; color: #6b9d8a; font-weight: 600; margin: 10px;">
+        <i class="bi-robot"></i> Levi Assistant
+      </a>
+    </div>
+  </div>
+</div>
+
+<footer class="footer" style="background: rgba(255, 255, 255, 0.7); color: #4a5f5d; padding: 20px 0; margin-top: 40px; border-top: 1px solid rgba(139, 187, 166, 0.3);">
+  <div class="container text-center">
+    <div style="font-weight: 500; font-size: 0.9rem;">
+      <strong>piBoom Music System</strong> — Voice-Controlled Music Discovery — All Rights Reserved
+    </div>
+  </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+

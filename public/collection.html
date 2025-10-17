@@ -1272,6 +1272,26 @@ function displayYouTubeVideos(videos) {
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/voice-widget.js"></script>
+<script>
+// Initialize voice widget for collection
+window.addEventListener('DOMContentLoaded', () => {
+  initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'blue',
+    onCommand: (command) => {
+      // Voice commands for collection navigation
+      const lowerCommand = command.toLowerCase();
+      if (lowerCommand.includes('show') || lowerCommand.includes('find') || lowerCommand.includes('search')) {
+        // Extract artist/album name and trigger search
+        alert(`Voice command: "${command}"\n\nRedirecting to voice search...`);
+        sessionStorage.setItem('voiceCommand', command);
+        window.location.href = '/voice-dj.html';
+      }
+    }
+  });
+});
+</script>
 
 </body>
 </html>

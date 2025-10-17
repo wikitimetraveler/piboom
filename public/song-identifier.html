@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Song Identifier - Shazam Clone</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    .identifier-container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 30px;
+    }
+
+    .identify-button {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      color: white;
+      font-size: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 30px auto;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .identify-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
+    }
+
+    .identify-button:active {
+      transform: scale(0.95);
+    }
+
+    .identify-button.listening {
+      animation: pulse 2s ease-in-out infinite;
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 10px 40px rgba(240, 147, 251, 0.4);
+      }
+      50% {
+        transform: scale(1.1);
+        box-shadow: 0 20px 60px rgba(240, 147, 251, 0.8);
+      }
+    }
+
+    .song-result {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(135, 206, 250, 0.3);
+      border-radius: 15px;
+      padding: 30px;
+      margin-top: 30px;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .album-art {
+      width: 200px;
+      height: 200px;
+      border-radius: 15px;
+      object-fit: cover;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      margin-bottom: 20px;
+    }
+
+    .song-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--ice-primary);
+      margin-bottom: 10px;
+    }
+
+    .song-artist {
+      font-size: 1.5rem;
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+    }
+
+    .song-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .detail-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .detail-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .detail-value {
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .confidence-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.5s ease-out;
+    }
+
+    .external-links {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 25px;
+    }
+
+    .external-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(135, 206, 250, 0.1);
+      border: 2px solid rgba(135, 206, 250, 0.3);
+      border-radius: 8px;
+      color: var(--ice-primary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .external-link:hover {
+      background: rgba(135, 206, 250, 0.2);
+      border-color: var(--ice-primary);
+      transform: translateY(-2px);
+    }
+
+    .status-message {
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      margin: 20px 0;
+    }
+
+    .listening-animation {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .listening-bar {
+      width: 6px;
+      height: 40px;
+      background: linear-gradient(180deg, var(--ice-primary), transparent);
+      border-radius: 3px;
+      animation: listening 1.2s ease-in-out infinite;
+    }
+
+    .listening-bar:nth-child(2) { animation-delay: 0.2s; }
+    .listening-bar:nth-child(3) { animation-delay: 0.4s; }
+    .listening-bar:nth-child(4) { animation-delay: 0.6s; }
+    .listening-bar:nth-child(5) { animation-delay: 0.8s; }
+
+    @keyframes listening {
+      0%, 100% { height: 20px; }
+      50% { height: 60px; }
+    }
+
+    .alternative-matches {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(135, 206, 250, 0.2);
+    }
+
+    .alternative-match {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi-music-note-beamed mr-1"></i> Big Wave Dave's Music Box</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container identifier-container">
+  <div class="text-center">
+    <h1 class="mb-3">🎵 Song Identifier</h1>
+    <p class="lead">Identify any song playing around you - just like Shazam!</p>
+    <p class="text-muted">Click the button to start listening, or use voice command: "What song is this?"</p>
+  </div>
+
+  <button id="identifyBtn" class="identify-button" title="Click to identify song">
+    <i class="bi-music-note-beamed"></i>
+  </button>
+
+  <div id="statusMessage" class="status-message"></div>
+
+  <div id="listeningAnimation" class="listening-animation" style="display: none;">
+    <div class="listening-bar"></div>
+    <div class="listening-bar"></div>
+    <div class="listening-bar"></div>
+    <div class="listening-bar"></div>
+    <div class="listening-bar"></div>
+  </div>
+
+  <div id="songResult" style="display: none;"></div>
+</div>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>David E Lane</strong> — Audio Fingerprinting powered by ACRCloud — All Rights Reserved
+    </div>
+  </div>
+</footer>
+
+<script src="/user-login.js"></script>
+<script src="/voice-widget.js"></script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+// Initialize Socket.IO
+const socket = io();
+
+const identifyBtn = document.getElementById('identifyBtn');
+const statusMessage = document.getElementById('statusMessage');
+const listeningAnimation = document.getElementById('listeningAnimation');
+const songResult = document.getElementById('songResult');
+
+let isListening = false;
+
+// Initialize voice widget
+window.addEventListener('DOMContentLoaded', () => {
+  initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'blue'
+  });
+  
+  // Check if service is configured
+  checkServiceStatus();
+});
+
+// Check if audio fingerprinting is configured
+async function checkServiceStatus() {
+  try {
+    const response = await fetch('/api/audio-fingerprint/status');
+    const data = await response.json();
+    
+    if (!data.configured) {
+      statusMessage.innerHTML = `
+        <div class="alert alert-warning">
+          <i class="bi-exclamation-triangle"></i>
+          Audio fingerprinting not configured. Please add ACRCloud API credentials to your .env file.
+        </div>
+      `;
+      identifyBtn.disabled = true;
+    }
+  } catch (error) {
+    console.error('Status check error:', error);
+  }
+}
+
+// Identify song button
+identifyBtn.addEventListener('click', async () => {
+  if (isListening) return;
+  
+  isListening = true;
+  identifyBtn.classList.add('listening');
+  statusMessage.textContent = '🎧 Listening to the music... (10 seconds)';
+  listeningAnimation.style.display = 'flex';
+  songResult.style.display = 'none';
+  
+  try {
+    const response = await fetch('/api/audio-fingerprint/identify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ duration: 10 })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.song) {
+      displaySongResult(data);
+      statusMessage.textContent = '✅ Song identified!';
+    } else {
+      statusMessage.innerHTML = `
+        <div class="alert alert-info">
+          <i class="bi-info-circle"></i>
+          ${data.message || 'Could not identify the song. Make sure music is playing clearly.'}
+        </div>
+      `;
+      songResult.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Identification error:', error);
+    statusMessage.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="bi-x-circle"></i>
+        Error identifying song. Please try again.
+      </div>
+    `;
+    songResult.style.display = 'none';
+  } finally {
+    isListening = false;
+    identifyBtn.classList.remove('listening');
+    listeningAnimation.style.display = 'none';
+  }
+});
+
+// Display song result
+function displaySongResult(data) {
+  const song = data.song;
+  
+  let html = `
+    <div class="song-result text-center">
+      ${song.albumArt ? `<img src="${song.albumArt}" alt="Album Art" class="album-art">` : ''}
+      
+      <div class="song-title">${song.title}</div>
+      <div class="song-artist">${song.artist}</div>
+      
+      ${song.album ? `<div class="text-muted mb-2"><i class="bi-disc"></i> ${song.album}</div>` : ''}
+      
+      <div class="detail-label">Match Confidence</div>
+      <div class="confidence-bar">
+        <div class="confidence-fill" style="width: ${song.confidence}%"></div>
+      </div>
+      <div class="mt-2 text-muted">${song.confidence}% confident</div>
+      
+      <div class="song-details mt-4">
+        ${song.releaseDate ? `
+          <div class="detail-item">
+            <div class="detail-label">Release Date</div>
+            <div class="detail-value">${song.releaseDate}</div>
+          </div>
+        ` : ''}
+        
+        ${song.duration ? `
+          <div class="detail-item">
+            <div class="detail-label">Duration</div>
+            <div class="detail-value">${formatDuration(song.duration)}</div>
+          </div>
+        ` : ''}
+        
+        ${song.label ? `
+          <div class="detail-item">
+            <div class="detail-label">Label</div>
+            <div class="detail-value">${song.label}</div>
+          </div>
+        ` : ''}
+        
+        ${song.genres && song.genres.length > 0 ? `
+          <div class="detail-item">
+            <div class="detail-label">Genres</div>
+            <div class="detail-value">${song.genres.slice(0, 2).join(', ')}</div>
+          </div>
+        ` : ''}
+      </div>
+      
+      <div class="external-links">
+        ${song.spotify ? `
+          <a href="https://open.spotify.com/track/${song.spotify}" target="_blank" class="external-link">
+            <i class="bi-spotify"></i> Open in Spotify
+          </a>
+        ` : ''}
+        
+        ${song.youtube ? `
+          <a href="https://www.youtube.com/watch?v=${song.youtube}" target="_blank" class="external-link">
+            <i class="bi-youtube"></i> Watch on YouTube
+          </a>
+        ` : ''}
+      </div>
+      
+      ${data.alternativeMatches && data.alternativeMatches.length > 0 ? `
+        <div class="alternative-matches">
+          <h5>Alternative Matches:</h5>
+          ${data.alternativeMatches.map(match => `
+            <div class="alternative-match">
+              <div>
+                <strong>${match.title}</strong><br>
+                <small class="text-muted">${match.artist}</small>
+              </div>
+              <div class="text-muted">${match.score}%</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+  
+  songResult.innerHTML = html;
+  songResult.style.display = 'block';
+}
+
+// Format duration (seconds to mm:ss)
+function formatDuration(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Listen for voice command triggered identification
+socket.on('voiceCommand', (data) => {
+  if (data.command === 'identifySong' && !isListening) {
+    identifyBtn.click();
+  }
+});
+
+// Listen for song identified results from voice command
+socket.on('songIdentified', (data) => {
+  if (data.success && data.song) {
+    displaySongResult(data);
+    statusMessage.textContent = '✅ Song identified via voice command!';
+  }
+});
+</script>
+
+</body>
+</html>
+

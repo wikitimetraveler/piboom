@@ -11,6 +11,19 @@
             margin: 50px auto;
             padding: 20px;
             background-color: #f5f5f5;
+            position: relative;
+        }
+        .home-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 32px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .home-icon:hover {
+            transform: scale(1.2);
         }
         h1 {
             color: #333;
@@ -51,9 +64,104 @@
             margin-top: 5px;
             font-style: italic;
         }
+        .ai-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+        .ai-section h3 {
+            margin-top: 0;
+            color: white;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #2196F3;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #1976D2;
+            transform: scale(1.05);
+        }
+        .btn-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        .btn-warning {
+            background-color: #FF9800;
+            color: white;
+        }
+        .btn-warning:hover {
+            background-color: #F57C00;
+            transform: scale(1.05);
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            resize: vertical;
+        }
+        .response-box {
+            background: white;
+            color: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            min-height: 50px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #ddd;
+        }
+        .voice-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-ready {
+            background-color: #4CAF50;
+        }
+        .status-speaking {
+            background-color: #FF9800;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
+    <a href="/index.html" class="home-icon" title="Return to Home">🏠</a>
     <h1>Calculations Class Test Page</h1>
 
     <div class="test-group">
@@ -170,8 +278,325 @@
         </div>
     </div>
 
+    <!-- ChatGPT Test Section -->
+    <div class="ai-section">
+        <h3>🤖 ChatGPT Test</h3>
+        <div class="description" style="color: #ddd;">Ask ChatGPT anything about calculations, math, or general questions</div>
+        <textarea id="chatInput" rows="3" placeholder="Ask ChatGPT a question...">What is the sum of 10, 20, and 30?</textarea>
+        <div class="voice-controls">
+            <button class="btn btn-primary" onclick="askChatGPT()">💬 Ask ChatGPT</button>
+            <button class="btn btn-success" onclick="speakResponse()">🔊 Speak Response</button>
+        </div>
+        <div id="chatResponse" class="response-box" style="display: none;"></div>
+        <div id="chatLoading" class="loading" style="display: none;">🤔 ChatGPT is thinking...</div>
+    </div>
+
+    <!-- Google TTS (ATTS) Test Section -->
+    <div class="ai-section">
+        <h3>🔊 Google TTS (ATTS) Test</h3>
+        <div class="description" style="color: #ddd;">Test Google Cloud Text-to-Speech with different voices and settings</div>
+        <textarea id="ttsInput" rows="2" placeholder="Enter text to speak...">Hello! This is a test of Google Cloud Text to Speech. The calculations are working perfectly!</textarea>
+        <div class="input-row" style="margin: 10px 0;">
+            <label style="color: white;">Voice:</label>
+            <select id="voiceSelect" style="padding: 8px; border-radius: 4px; width: 220px;">
+                <option value="en-US-Standard-D">US Male (Standard-D)</option>
+                <option value="en-US-Standard-C">US Female (Standard-C)</option>
+                <option value="en-US-Wavenet-D">US Male (Wavenet-D)</option>
+                <option value="en-US-Wavenet-C">US Female (Wavenet-C)</option>
+                <option value="en-GB-Standard-A">UK Female (Standard-A)</option>
+                <option value="en-GB-Standard-B">UK Male (Standard-B)</option>
+            </select>
+        </div>
+        <div class="voice-controls">
+            <button class="btn btn-success" onclick="testGoogleTTS()">
+                <span id="ttsStatus" class="status-indicator status-ready"></span>
+                🎤 Speak with Google TTS
+            </button>
+            <button class="btn btn-warning" onclick="stopAllSpeech()">🛑 Stop Speaking</button>
+            <button class="btn btn-primary" onclick="testBackendTTS()">🔧 Test Backend TTS</button>
+        </div>
+        <div id="ttsStatus" class="response-box" style="display: none;"></div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script src="voice-widget.js"></script>
     <script src="calculations.js"></script>
     <script>
+        // Initialize voice widget with custom command handler
+        window.addEventListener('DOMContentLoaded', () => {
+            initVoiceWidget({
+                position: 'bottom-right',
+                theme: 'blue',
+                onCommand: (command) => {
+                    console.log('🎤 Voice command received:', command);
+                    
+                    const lowerCommand = command.toLowerCase();
+                    
+                    // Handle calculations-specific commands
+                    if (lowerCommand.includes('calculate') || lowerCommand.includes('what is')) {
+                        // Put the command in ChatGPT input and ask
+                        document.getElementById('chatInput').value = command;
+                        askChatGPT();
+                    } else if (lowerCommand.includes('speak') || lowerCommand.includes('read')) {
+                        // Speak the last response
+                        speakResponse();
+                    } else if (lowerCommand.includes('stop') || lowerCommand.includes('quiet')) {
+                        // Stop speaking
+                        stopAllSpeech();
+                    } else if (lowerCommand.includes('home') || lowerCommand.includes('go back')) {
+                        // Go home
+                        window.location.href = '/index.html';
+                    } else {
+                        // Default: ask ChatGPT
+                        document.getElementById('chatInput').value = command;
+                        askChatGPT();
+                    }
+                }
+            });
+        });
+    </script>
+    <script>
+        // =========================
+        // ChatGPT Integration
+        // =========================
+        let lastChatResponse = '';
+
+        async function askChatGPT() {
+            const question = document.getElementById('chatInput').value.trim();
+            if (!question) {
+                alert('Please enter a question for ChatGPT');
+                return;
+            }
+
+            console.log('🤖 Asking ChatGPT:', question);
+            
+            // Show loading
+            document.getElementById('chatLoading').style.display = 'block';
+            document.getElementById('chatResponse').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/chat/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: question,
+                        context: { source: 'calculations_test_page' }
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('🤖 ChatGPT Response:', data);
+
+                // Hide loading
+                document.getElementById('chatLoading').style.display = 'none';
+
+                if (data.response) {
+                    lastChatResponse = data.response;
+                    document.getElementById('chatResponse').innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <strong>💬 ChatGPT:</strong>
+                        </div>
+                        <div style="line-height: 1.6;">
+                            ${data.response.replace(/\n/g, '<br>')}
+                        </div>
+                    `;
+                    document.getElementById('chatResponse').style.display = 'block';
+                    
+                    // Auto-speak if response is short
+                    if (data.response.length < 200) {
+                        setTimeout(() => speakResponse(), 500);
+                    }
+                } else {
+                    throw new Error(data.error || 'No response received');
+                }
+
+            } catch (error) {
+                console.error('❌ ChatGPT Error:', error);
+                document.getElementById('chatLoading').style.display = 'none';
+                document.getElementById('chatResponse').innerHTML = `
+                    <div style="color: #d32f2f;">
+                        <strong>❌ Error:</strong> ${error.message}
+                        <br><br>
+                        <small>Make sure the backend server is running and the OpenAI API key is configured.</small>
+                    </div>
+                `;
+                document.getElementById('chatResponse').style.display = 'block';
+            }
+        }
+
+        function speakResponse() {
+            if (!lastChatResponse) {
+                alert('No ChatGPT response to speak');
+                return;
+            }
+            
+            console.log('🔊 Speaking ChatGPT response');
+            testGoogleTTS(lastChatResponse);
+        }
+
+        // Allow Enter key to submit ChatGPT question
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                askChatGPT();
+            }
+        });
+
+        // =========================
+        // Google TTS (ATTS) Integration
+        // =========================
+        let currentAudio = null;
+
+        async function testGoogleTTS(textOverride = null) {
+            const text = textOverride || document.getElementById('ttsInput').value.trim();
+            const voice = document.getElementById('voiceSelect').value;
+
+            if (!text) {
+                alert('Please enter text to speak');
+                return;
+            }
+
+            console.log('🔊 Testing Google TTS:', text, 'Voice:', voice);
+            
+            // Update status indicator
+            const statusIndicator = document.querySelector('#ttsStatus');
+            if (statusIndicator) {
+                statusIndicator.classList.remove('status-ready');
+                statusIndicator.classList.add('status-speaking');
+            }
+
+            try {
+                // Stop any currently playing audio
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                }
+
+                // Call Google TTS via scripts.js if available
+                if (typeof window.speakWithGoogle === 'function') {
+                    const success = await window.speakWithGoogle(text, voice, {
+                        pitch: 0,
+                        speakingRate: 1.0,
+                        volume: 0.9
+                    });
+
+                    if (success) {
+                        console.log('✅ Google TTS successful');
+                    } else {
+                        throw new Error('Google TTS returned false');
+                    }
+                } else {
+                    throw new Error('speakWithGoogle function not available');
+                }
+
+            } catch (error) {
+                console.error('❌ Google TTS Error:', error);
+                alert('Google TTS failed. Trying backend TTS...');
+                testBackendTTS();
+            } finally {
+                // Reset status indicator
+                setTimeout(() => {
+                    if (statusIndicator) {
+                        statusIndicator.classList.remove('status-speaking');
+                        statusIndicator.classList.add('status-ready');
+                    }
+                }, 3000);
+            }
+        }
+
+        async function testBackendTTS() {
+            const text = document.getElementById('ttsInput').value.trim();
+            
+            if (!text) {
+                alert('Please enter text to speak');
+                return;
+            }
+
+            console.log('🔧 Testing Backend TTS:', text);
+
+            try {
+                const response = await fetch('/api/voice/speak', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+                console.log('🔧 Backend TTS Result:', data);
+
+                if (data.success) {
+                    console.log('✅ Backend TTS successful');
+                    alert('Backend TTS successful!');
+                } else {
+                    throw new Error(data.message || 'Backend TTS failed');
+                }
+
+            } catch (error) {
+                console.error('❌ Backend TTS Error:', error);
+                alert(`Backend TTS Error: ${error.message}`);
+            }
+        }
+
+        function stopAllSpeech() {
+            console.log('🛑 Stopping all speech');
+            
+            // Stop Google TTS audio
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            // Stop browser speech synthesis
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+
+            // Stop via scripts.js if available
+            if (typeof window.stopSpeech === 'function') {
+                window.stopSpeech();
+            }
+
+            // Reset status
+            const statusIndicator = document.querySelector('#ttsStatus');
+            if (statusIndicator) {
+                statusIndicator.classList.remove('status-speaking');
+                statusIndicator.classList.add('status-ready');
+            }
+
+            console.log('✅ All speech stopped');
+        }
+
+        // Helper function for base64 to blob conversion
+        function base64ToBlob(base64, contentType) {
+            const byteCharacters = atob(base64);
+            const byteArrays = [];
+            
+            for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+                const slice = byteCharacters.slice(offset, offset + 512);
+                const byteNumbers = new Array(slice.length);
+                
+                for (let i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+                
+                const byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+            
+            return new Blob(byteArrays, { type: contentType });
+        }
+
+        // =========================
+        // Calculations Class Init
+        // =========================
         // Initialize the calculations class with configuration
         const calc = new calculations({
             groups: [

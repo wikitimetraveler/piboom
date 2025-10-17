@@ -99,6 +99,55 @@ async function executeVoiceCommand(command, io) {
       break;
       
     case 'what song':
+    case 'what song is this':
+    case 'identify song':
+    case 'name this song':
+    case 'what is this song':
+      // Trigger song identification
+      try {
+        if (io) {
+          io.emit('voiceCommand', { 
+            command: 'identifySong', 
+            timestamp: Date.now(),
+            action: 'identify'
+          });
+        }
+        
+        // Notify user that identification is starting
+        if (voiceService && voiceService.sayEnabled) {
+          voiceService.speak('Listening to identify the song. This will take about 10 seconds.');
+        }
+        
+        // Make API call to identify song
+        const baseUrl = process.env.RENDER_EXTERNAL_URL || `http://localhost:${process.env.PORT || 3000}`;
+        const response = await axios.post(`${baseUrl}/api/audio-fingerprint/identify`, {
+          duration: 10
+        });
+        
+        if (response.data.success && response.data.song) {
+          const song = response.data.song;
+          const announcement = `I found it! This is ${song.title} by ${song.artist}${song.album ? `, from the album ${song.album}` : ''}`;
+          
+          if (voiceService && voiceService.sayEnabled) {
+            voiceService.speak(announcement);
+          }
+          
+          // Send detailed results to frontend
+          if (io) {
+            io.emit('songIdentified', response.data);
+          }
+        } else {
+          const message = response.data.message || 'I couldn\'t identify the song. Make sure music is playing and try again.';
+          if (voiceService && voiceService.sayEnabled) {
+            voiceService.speak(message);
+          }
+        }
+      } catch (error) {
+        console.error('Song identification error:', error.message);
+        if (voiceService && voiceService.sayEnabled) {
+          voiceService.speak('Sorry, I had trouble identifying the song. Make sure the audio fingerprinting service is configured.');
+        }
+      }
       break;
       
     case 'music research':

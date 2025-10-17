@@ -27,6 +27,7 @@
     "dotenv": "^16.4.5",
     "espeak": "^0.0.3",
     "express": "^4.19.2",
+    "form-data": "^4.0.0",
     "langchain": "^0.3.35",
     "node-record-lpcm16": "^1.0.1",
     "openai": "^4.20.0",
