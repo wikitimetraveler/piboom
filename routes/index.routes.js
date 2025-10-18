@@ -15,6 +15,7 @@ import posterGeneratorRoutes from './poster-generator.routes.js';
 import voiceDjRoutes from './voice-dj.routes.js';
 import genealogyRoutes from './genealogy.routes.js';
 import audioFingerprintRoutes from './audio-fingerprint.routes.js';
+import sampleDetectionRoutes from './sample-detection.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -33,6 +34,7 @@ export default function buildRoutes(io) {
   api.use('/poster-generator', posterGeneratorRoutes);
   api.use('/voice-dj', voiceDjRoutes);
   api.use('/audio-fingerprint', audioFingerprintRoutes);
+  api.use('/sample-detection', sampleDetectionRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

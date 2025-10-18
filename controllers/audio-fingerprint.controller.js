@@ -13,7 +13,7 @@ export async function identifyCurrentSong(req, res) {
     if (!fingerprintService.isEnabled) {
       return res.status(503).json({
         success: false,
-        message: 'Audio fingerprinting not configured. Please add ACRCloud API credentials to .env file.',
+        message: 'Shazam API not configured. Please add SHAZAM_API_KEY to .env file.',
         configured: false
       });
     }
@@ -62,7 +62,7 @@ export async function identifyFromUpload(req, res) {
     if (!fingerprintService.isEnabled) {
       return res.status(503).json({
         success: false,
-        message: 'Audio fingerprinting not configured',
+        message: 'Shazam API not configured',
         configured: false
       });
     }
@@ -111,10 +111,10 @@ export function getServiceStatus(req, res) {
     success: true,
     configured: fingerprintService.isEnabled,
     available: fingerprintService.isEnabled,
-    provider: 'ACRCloud',
+    provider: 'Shazam API',
     message: fingerprintService.isEnabled ? 
-      'Audio fingerprinting service is ready' : 
-      'Audio fingerprinting not configured. Add ACRCloud credentials to .env'
+      'Audio fingerprinting service is ready (Shazam - 500/month free)' : 
+      'Audio fingerprinting not configured. Add SHAZAM_API_KEY to .env'
   });
 }
 

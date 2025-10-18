@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sample & Cover Detector 🔍</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    .search-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      border: 2px solid rgba(135, 206, 250, 0.3);
+    }
+
+    .results-container {
+      max-width: 1200px;
+      margin: 30px auto;
+    }
+
+    .network-node {
+      background: linear-gradient(135deg, rgba(135,206,250,0.15), rgba(144,238,144,0.15));
+      border: 2px solid var(--ice-primary);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .network-node:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(135, 206, 250, 0.4);
+    }
+
+    .node-original {
+      background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
+      border-color: #ffa500;
+    }
+
+    .node-cover {
+      background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(155,89,182,0.15));
+      border-color: #3498db;
+    }
+
+    .node-sample {
+      background: linear-gradient(135deg, rgba(231,76,60,0.15), rgba(192,57,43,0.15));
+      border-color: #e74c3c;
+    }
+
+    .connection-line {
+      display: flex;
+      align-items: center;
+      margin: 15px 0;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      border-left: 4px solid var(--ice-primary);
+    }
+
+    .connection-icon {
+      font-size: 1.5rem;
+      margin-right: 15px;
+      color: var(--ice-primary);
+    }
+
+    .stats-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      margin: 5px;
+    }
+
+    .badge-covers {
+      background: rgba(52,152,219,0.2);
+      color: #3498db;
+      border: 2px solid #3498db;
+    }
+
+    .badge-samples {
+      background: rgba(231,76,60,0.2);
+      color: #e74c3c;
+      border: 2px solid #e74c3c;
+    }
+
+    .loading-spinner {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(135,206,250,0.3);
+      border-top-color: var(--ice-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .connection-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .connection-card {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid rgba(135, 206, 250, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .connection-card:hover {
+      background: rgba(135, 206, 250, 0.1);
+      border-color: var(--ice-primary);
+      transform: translateX(5px);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state i {
+      font-size: 5rem;
+      color: var(--ice-primary);
+      opacity: 0.5;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container">
+    <a class="navbar-brand" href="/"><i class="bi-music-note-beamed mr-1"></i> Big Wave Dave's Music Box</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div id="nav" class="collapse navbar-collapse">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/music-research.html"><i class="bi-search"></i> Research</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="text-center mt-5">
+    <h1><i class="bi-diagram-3"></i> Sample & Cover Detector</h1>
+    <p class="lead">Discover who covered or sampled your favorite songs</p>
+    <p class="text-muted">Find hidden connections in the music universe</p>
+  </div>
+
+  <!-- Search Form -->
+  <div class="search-container">
+    <form onsubmit="searchNetwork(event)">
+      <div class="form-group">
+        <label for="songInput"><i class="bi-music-note"></i> Song Title</label>
+        <input type="text" id="songInput" class="form-control form-control-lg" 
+               placeholder="Enter song name (e.g., Yesterday)" required>
+      </div>
+      <div class="form-group">
+        <label for="artistInput"><i class="bi-person"></i> Artist Name</label>
+        <input type="text" id="artistInput" class="form-control form-control-lg" 
+               placeholder="Enter artist name (e.g., The Beatles)" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-block">
+        <i class="bi-search"></i> Find Samples & Covers
+      </button>
+    </form>
+    
+    <div class="mt-4 text-center">
+      <small class="text-muted">
+        <i class="bi-info-circle"></i> Data powered by MusicBrainz • Free & Open Source
+      </small>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div id="loadingState" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+    <p class="mt-3">Searching the music universe... 🕸️</p>
+  </div>
+
+  <!-- Results -->
+  <div id="resultsContainer" class="results-container" style="display: none;">
+    <!-- Original Song -->
+    <div id="originalNode" class="network-node node-original">
+      <h3><i class="bi-disc"></i> Original Song</h3>
+      <h2 id="originalTitle"></h2>
+      <h4 id="originalArtist"></h4>
+      <div class="mt-3">
+        <span id="coversCount" class="stats-badge badge-covers"></span>
+        <span id="samplesCount" class="stats-badge badge-samples"></span>
+      </div>
+    </div>
+
+    <!-- Covers Section -->
+    <div id="coversSection" style="display: none;">
+      <div class="network-node node-cover">
+        <h3><i class="bi-vinyl"></i> Cover Versions</h3>
+        <p class="text-muted">Other artists who performed this song</p>
+        <div id="coversList" class="connection-list"></div>
+      </div>
+    </div>
+
+    <!-- Sampled By Section -->
+    <div id="sampledBySection" style="display: none;">
+      <div class="network-node node-sample">
+        <h3><i class="bi-scissors"></i> Sampled By</h3>
+        <p class="text-muted">Songs that sampled this track</p>
+        <div id="sampledByList" class="connection-list"></div>
+      </div>
+    </div>
+
+    <!-- Samples Section -->
+    <div id="samplesSection" style="display: none;">
+      <div class="network-node node-sample">
+        <h3><i class="bi-arrow-left-right"></i> This Song Samples</h3>
+        <p class="text-muted">Original material sampled in this track</p>
+        <div id="samplesList" class="connection-list"></div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <i class="bi-inbox"></i>
+      <h3>No Connections Found</h3>
+      <p>We couldn't find any samples or covers in the MusicBrainz database.</p>
+      <p class="text-muted"><small>Note: Some songs may not have relationship data yet. MusicBrainz relies on community contributions.</small></p>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>David E Lane</strong> — Sample Detection powered by MusicBrainz — All Rights Reserved
+    </div>
+  </div>
+</footer>
+
+<script src="/user-login.js"></script>
+<script src="/voice-widget.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+// Initialize voice widget
+window.addEventListener('DOMContentLoaded', () => {
+  initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'blue'
+  });
+});
+
+// Search for sample/cover network
+async function searchNetwork(event) {
+  if (event) event.preventDefault();
+  
+  const song = document.getElementById('songInput').value.trim();
+  const artist = document.getElementById('artistInput').value.trim();
+  
+  if (!song || !artist) {
+    alert('Please enter both song and artist name');
+    return;
+  }
+  
+  // Show loading, hide results
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('resultsContainer').style.display = 'none';
+  
+  try {
+    const response = await fetch('/api/sample-detection/network', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ song, artist })
+    });
+    
+    const data = await response.json();
+    
+    document.getElementById('loadingState').style.display = 'none';
+    
+    if (data.success) {
+      displayResults(data);
+    } else {
+      alert('Error: ' + (data.message || 'Failed to search network'));
+    }
+  } catch (error) {
+    console.error('Search error:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    alert('Error searching network. Please try again.');
+  }
+}
+
+// Display results
+function displayResults(data) {
+  const resultsContainer = document.getElementById('resultsContainer');
+  resultsContainer.style.display = 'block';
+  
+  // Display original song
+  document.getElementById('originalTitle').textContent = data.original.title;
+  document.getElementById('originalArtist').textContent = `by ${data.original.artist}`;
+  
+  // Update stats
+  document.getElementById('coversCount').textContent = `${data.coverCount} Cover${data.coverCount !== 1 ? 's' : ''}`;
+  document.getElementById('samplesCount').textContent = `${data.sampleCount} Sample Connection${data.sampleCount !== 1 ? 's' : ''}`;
+  
+  // Display covers
+  const coversSection = document.getElementById('coversSection');
+  const coversList = document.getElementById('coversList');
+  
+  if (data.covers && data.covers.length > 0) {
+    coversSection.style.display = 'block';
+    coversList.innerHTML = data.covers.map(cover => `
+      <div class="connection-card">
+        <h6><i class="bi-vinyl-fill"></i> ${cover.title}</h6>
+        <p><strong>${cover.artist}</strong></p>
+        ${cover.year ? `<small class="text-muted">📅 ${cover.year}</small>` : ''}
+        ${cover.length ? `<small class="text-muted ml-2">⏱️ ${cover.length}</small>` : ''}
+      </div>
+    `).join('');
+  } else {
+    coversSection.style.display = 'none';
+  }
+  
+  // Display sampled by
+  const sampledBySection = document.getElementById('sampledBySection');
+  const sampledByList = document.getElementById('sampledByList');
+  
+  if (data.sampledBy && data.sampledBy.length > 0) {
+    sampledBySection.style.display = 'block';
+    sampledByList.innerHTML = data.sampledBy.map(sample => `
+      <div class="connection-card">
+        <h6><i class="bi-scissors"></i> ${sample.targetTitle}</h6>
+        <p><strong>${sample.targetArtist}</strong></p>
+        <small class="text-muted">Sampled this track</small>
+      </div>
+    `).join('');
+  } else {
+    sampledBySection.style.display = 'none';
+  }
+  
+  // Display samples (what this song samples)
+  const samplesSection = document.getElementById('samplesSection');
+  const samplesList = document.getElementById('samplesList');
+  
+  if (data.samples && data.samples.length > 0) {
+    samplesSection.style.display = 'block';
+    samplesList.innerHTML = data.samples.map(sample => `
+      <div class="connection-card">
+        <h6><i class="bi-arrow-left-right"></i> ${sample.targetTitle}</h6>
+        <p><strong>${sample.targetArtist}</strong></p>
+        <small class="text-muted">Sampled in this track</small>
+      </div>
+    `).join('');
+  } else {
+    samplesSection.style.display = 'none';
+  }
+  
+  // Show empty state if no connections
+  const hasConnections = data.coverCount > 0 || data.sampleCount > 0;
+  document.getElementById('emptyState').style.display = hasConnections ? 'none' : 'block';
+}
+
+// Example searches
+window.addEventListener('DOMContentLoaded', () => {
+  // You can add example searches here
+  console.log('🔍 Sample & Cover Detector loaded!');
+});
+</script>
+
+</body>
+</html>
+

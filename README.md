@@ -127,22 +127,20 @@ Click "Initialize Voice" button to start voice recognition for hands-free operat
 ### Multi-API Configuration
 - **Google APIs**: Knowledge Graph, Maps, and YouTube Data APIs
 - **OpenAI API**: ChatGPT integration for AI analysis
-- **ACRCloud API**: Audio fingerprinting for song identification (optional)
+- **Shazam API**: Audio fingerprinting for song identification (optional - 500/month free)
 - **Environment Variables**: All API keys stored securely in `.env` file
 - **Rate Limiting**: Intelligent API usage to respect service limits
 - **Fallback Handling**: Graceful degradation when APIs are unavailable
 
 ### Audio Fingerprinting Setup (Optional)
-The Shazam-like song identification feature requires ACRCloud API credentials:
-1. Sign up at [ACRCloud.com](https://www.acrcloud.com/) (free tier available - 500 queries/day)
-2. Create an "Audio & Video Recognition" project
-3. Add credentials to `.env`:
+The Shazam-like song identification feature requires a free Shazam API key:
+1. Sign up at [RapidAPI.com](https://rapidapi.com/apidojo/api/shazam) (free account)
+2. Subscribe to Shazam API "Basic" plan (FREE - 500/month)
+3. Add your API key to `.env`:
    ```bash
-   ACRCLOUD_HOST=identify-us-west-2.acrcloud.com
-   ACRCLOUD_ACCESS_KEY=your_access_key
-   ACRCLOUD_ACCESS_SECRET=your_access_secret
+   SHAZAM_API_KEY=your_rapidapi_key_here
    ```
-4. See [AUDIO_FINGERPRINT_SETUP.md](AUDIO_FINGERPRINT_SETUP.md) for detailed instructions
+4. See [SONG_IDENTIFIER_SETUP.md](SONG_IDENTIFIER_SETUP.md) for detailed instructions
 
 ### Database Configuration (Optional)
 - **PostgreSQL**: Album collection storage (optional)

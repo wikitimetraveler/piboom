@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
@@ -7,10 +6,12 @@ import { config } from '../config/index.js';
 
 class AudioFingerprintService {
   constructor() {
-    this.acrHost = config.acrcloudHost || 'identify-us-west-2.acrcloud.com';
-    this.accessKey = config.acrcloudAccessKey;
-    this.accessSecret = config.acrcloudAccessSecret;
-    this.isEnabled = !!(this.accessKey && this.accessSecret);
+    // Shazam API (via RapidAPI) - 500/month FREE forever!
+    this.shazamApiKey = config.shazamApiKey;
+    this.isEnabled = !!this.shazamApiKey;
+    
+    console.log('🎵 Audio Fingerprint Service initialized:');
+    console.log(`   Shazam API: ${this.isEnabled ? '✅ Enabled (500/month FREE)' : '❌ Disabled'}`);
   }
 
   /**
@@ -23,7 +24,7 @@ class AudioFingerprintService {
     
     try {
       // Record audio using arecord (ALSA)
-      // 16-bit, 44.1kHz, mono - optimal for ACRCloud
+      // 16-bit, 44.1kHz, mono - optimal for Shazam
       const args = [
         '-D', 'plughw:1,0',  // Default microphone
         '-f', 'S16_LE',      // 16-bit signed little-endian
@@ -48,153 +49,111 @@ class AudioFingerprintService {
   }
 
   /**
-   * Generate ACRCloud signature for authentication
-   * @param {string} method - HTTP method
-   * @param {string} uri - Request URI
-   * @param {Buffer} dataBuffer - Audio data buffer
-   * @returns {Object} - Headers for ACRCloud request
-   */
-  generateSignature(method, uri, dataBuffer) {
-    const timestamp = Math.floor(Date.now() / 1000);
-    const stringToSign = [method, uri, this.accessKey, 'audio', '1', timestamp].join('\n');
-    
-    const signature = crypto
-      .createHmac('sha1', this.accessSecret)
-      .update(Buffer.from(stringToSign, 'utf-8'))
-      .digest()
-      .toString('base64');
-
-    return {
-      access_key: this.accessKey,
-      sample_bytes: dataBuffer.length,
-      timestamp: timestamp,
-      signature: signature,
-      data_type: 'audio',
-      signature_version: '1'
-    };
-  }
-
-  /**
-   * Identify song using ACRCloud API
+   * Identify song using Shazam API (RapidAPI)
    * @param {string} audioFilePath - Path to audio file
    * @returns {Promise<Object>} - Song identification results
    */
-  async identifySong(audioFilePath) {
-    if (!this.isEnabled) {
-      throw new Error('ACRCloud API not configured. Please add ACRCLOUD_ACCESS_KEY and ACRCLOUD_ACCESS_SECRET to .env file');
-    }
-
+  async identifyWithShazam(audioFilePath) {
     try {
-      // Read audio file
+      // Read audio file and convert to base64
       const audioBuffer = fs.readFileSync(audioFilePath);
-      
-      // Generate signature
-      const method = 'POST';
-      const uri = '/v1/identify';
-      const signatureData = this.generateSignature(method, uri, audioBuffer);
+      const base64Audio = audioBuffer.toString('base64');
 
-      // Prepare form data
-      const FormData = (await import('form-data')).default;
-      const form = new FormData();
-      form.append('sample', audioBuffer, {
-        filename: 'sample.wav',
-        contentType: 'audio/wav'
-      });
-      form.append('access_key', signatureData.access_key);
-      form.append('sample_bytes', signatureData.sample_bytes);
-      form.append('timestamp', signatureData.timestamp);
-      form.append('signature', signatureData.signature);
-      form.append('data_type', signatureData.data_type);
-      form.append('signature_version', signatureData.signature_version);
-
-      // Make request to ACRCloud
-      const url = `https://${this.acrHost}${uri}`;
-      console.log('Sending audio to ACRCloud for identification...');
+      console.log('🎵 Sending audio to Shazam API for identification...');
       
-      const response = await axios.post(url, form, {
-        headers: form.getHeaders(),
-        timeout: 30000 // 30 second timeout
-      });
+      const response = await axios.post(
+        'https://shazam.p.rapidapi.com/songs/v2/detect',
+        base64Audio,
+        {
+          headers: {
+            'content-type': 'text/plain',
+            'X-RapidAPI-Key': this.shazamApiKey,
+            'X-RapidAPI-Host': 'shazam.p.rapidapi.com'
+          },
+          timeout: 30000
+        }
+      );
 
       // Clean up temp file
       if (fs.existsSync(audioFilePath)) {
         fs.unlinkSync(audioFilePath);
       }
 
-      return this.parseACRCloudResponse(response.data);
+      return this.parseShazamResponse(response.data);
     } catch (error) {
       // Clean up temp file on error
       if (fs.existsSync(audioFilePath)) {
         fs.unlinkSync(audioFilePath);
       }
       
-      console.error('ACRCloud identification error:', error.message);
+      console.error('Shazam identification error:', error.message);
       throw error;
     }
   }
 
   /**
-   * Parse ACRCloud API response into a clean format
-   * @param {Object} data - Raw ACRCloud response
-   * @returns {Object} - Parsed song information
+   * Identify song using Shazam API
+   * @param {string} audioFilePath - Path to audio file
+   * @returns {Promise<Object>} - Song identification results
    */
-  parseACRCloudResponse(data) {
-    if (data.status.code !== 0) {
-      return {
-        success: false,
-        message: data.status.msg || 'No music detected',
-        code: data.status.code
-      };
+  async identifySong(audioFilePath) {
+    if (!this.isEnabled) {
+      throw new Error('Shazam API not configured. Please add SHAZAM_API_KEY to .env file');
     }
 
-    const metadata = data.metadata;
-    
-    if (!metadata || !metadata.music || metadata.music.length === 0) {
+    return await this.identifyWithShazam(audioFilePath);
+  }
+
+  /**
+   * Parse Shazam API response into a clean format
+   * @param {Object} data - Raw Shazam response
+   * @returns {Object} - Parsed song information
+   */
+  parseShazamResponse(data) {
+    if (!data || !data.track) {
       return {
         success: false,
-        message: 'No match found',
+        message: 'No music detected',
         code: 1001
       };
     }
 
-    // Get the best match (first result)
-    const music = metadata.music[0];
+    const track = data.track;
     
     return {
       success: true,
       song: {
-        title: music.title,
-        artist: music.artists?.map(a => a.name).join(', ') || 'Unknown Artist',
-        album: music.album?.name || null,
-        releaseDate: music.release_date || null,
-        duration: music.duration_ms ? Math.floor(music.duration_ms / 1000) : null,
-        label: music.label || null,
-        genres: music.genres?.map(g => g.name) || [],
-        score: music.score || 0,
+        title: track.title || 'Unknown',
+        artist: track.subtitle || 'Unknown Artist',
+        album: track.sections?.[0]?.metadata?.find(m => m.title === 'Album')?.text || null,
+        releaseDate: track.sections?.[0]?.metadata?.find(m => m.title === 'Released')?.text || null,
+        duration: track.sections?.[0]?.metadata?.find(m => m.title === 'Duration')?.text || null,
+        label: track.sections?.[0]?.metadata?.find(m => m.title === 'Label')?.text || null,
+        genres: track.genres?.primary ? [track.genres.primary] : [],
+        score: 95, // Shazam doesn't provide score, assume high confidence
         
         // External IDs
-        spotify: music.external_metadata?.spotify?.track?.id || null,
-        youtube: music.external_metadata?.youtube?.vid || null,
-        deezer: music.external_metadata?.deezer?.track?.id || null,
-        isrc: music.external_ids?.isrc || null,
+        spotify: track.hub?.providers?.find(p => p.type === 'SPOTIFY')?.actions?.[0]?.uri?.split(':').pop() || null,
+        youtube: track.hub?.providers?.find(p => p.type === 'YOUTUBE')?.actions?.[0]?.uri || null,
+        shazamId: track.key || null,
+        isrc: track.isrc || null,
         
-        // Album art
-        albumArt: music.album?.name ? 
-          `https://e-cdns-images.dzcdn.net/images/cover/${music.external_metadata?.deezer?.album?.id || ''}/500x500-000000-80-0-0.jpg` :
-          null,
+        // Album art - use high quality image
+        albumArt: track.images?.coverarthq || track.images?.coverart || track.share?.image || null,
         
-        // Confidence score (0-100)
-        confidence: music.score || 0
+        // Confidence score (Shazam is very accurate when it finds a match)
+        confidence: 95
       },
       
-      // Include all matches if there are multiple possibilities
-      alternativeMatches: metadata.music.slice(1, 4).map(m => ({
-        title: m.title,
-        artist: m.artists?.map(a => a.name).join(', ') || 'Unknown',
-        score: m.score || 0
-      }))
+      // Shazam typically gives one confident result
+      alternativeMatches: [],
+      
+      // Additional Shazam data
+      shazamUrl: track.url || null,
+      appleMusicUrl: track.hub?.options?.find(o => o.caption === 'OPEN IN')?.actions?.[0]?.uri || null
     };
   }
+
 
   /**
    * Full identification process: record audio and identify
@@ -220,7 +179,7 @@ class AudioFingerprintService {
    */
   async identifyFromBuffer(audioBuffer) {
     if (!this.isEnabled) {
-      throw new Error('ACRCloud API not configured');
+      throw new Error('Shazam API not configured');
     }
 
     // Save buffer to temp file

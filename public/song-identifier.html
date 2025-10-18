@@ -257,7 +257,7 @@
 <footer class="footer">
   <div class="container text-center">
     <div class="footer-content">
-      <strong>David E Lane</strong> — Audio Fingerprinting powered by ACRCloud — All Rights Reserved
+      <strong>David E Lane</strong> — Song Identification powered by Shazam API — All Rights Reserved
     </div>
   </div>
 </footer>
@@ -301,7 +301,8 @@ async function checkServiceStatus() {
       statusMessage.innerHTML = `
         <div class="alert alert-warning">
           <i class="bi-exclamation-triangle"></i>
-          Audio fingerprinting not configured. Please add ACRCloud API credentials to your .env file.
+          Shazam API not configured. Please add SHAZAM_API_KEY to your .env file.
+          <br><small>Get your free key at <a href="https://rapidapi.com/apidojo/api/shazam" target="_blank">RapidAPI Shazam</a> (500/month free)</small>
         </div>
       `;
       identifyBtn.disabled = true;

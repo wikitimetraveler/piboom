@@ -31,8 +31,7 @@ export const config = {
   spotifyClientSecret: process.env.SPOTIFY_CLIENT_SECRET,
   spotifyRedirectUri: process.env.SPOTIFY_REDIRECT_URI,
   
-  // ACRCloud Audio Fingerprinting
-  acrcloudHost: process.env.ACRCLOUD_HOST || 'identify-us-west-2.acrcloud.com',
-  acrcloudAccessKey: process.env.ACRCLOUD_ACCESS_KEY,
-  acrcloudAccessSecret: process.env.ACRCLOUD_ACCESS_SECRET
+  // Audio Fingerprinting - Shazam API (via RapidAPI)
+  // 500 requests/month FREE forever!
+  shazamApiKey: process.env.SHAZAM_API_KEY
 };
