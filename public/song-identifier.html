@@ -335,13 +335,21 @@ identifyBtn.addEventListener('click', async () => {
   songResult.style.display = 'none';
   
   try {
-    // Request microphone access
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // Request microphone access with specific constraints for better quality
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+        sampleRate: 44100
+      }
+    });
     
-    // Record audio using Web Audio API
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const source = audioContext.createMediaStreamSource(stream);
-    const mediaRecorder = new MediaRecorder(stream);
+    // Record audio using MediaRecorder
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType: 'audio/webm',
+      audioBitsPerSecond: 128000
+    });
     const audioChunks = [];
     
     mediaRecorder.ondataavailable = (event) => {
@@ -353,13 +361,17 @@ identifyBtn.addEventListener('click', async () => {
       stream.getTracks().forEach(track => track.stop());
       
       // Create blob from chunks
-      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+      
+      console.log('📊 Recorded audio size:', (audioBlob.size / 1024).toFixed(2), 'KB');
       
       // Convert to base64
       const reader = new FileReader();
       reader.readAsDataURL(audioBlob);
       reader.onloadend = async () => {
         const base64Audio = reader.result.split(',')[1];
+        
+        console.log('🎵 Sending audio to Shazam (', (base64Audio.length / 1024).toFixed(2), 'KB base64)...');
         
         // Send to server
         try {
@@ -376,9 +388,17 @@ identifyBtn.addEventListener('click', async () => {
             statusMessage.textContent = '✅ Song identified!';
           } else {
             statusMessage.innerHTML = `
-              <div class="alert alert-info">
+              <div class="alert alert-warning">
                 <i class="bi-info-circle"></i>
-                ${data.message || 'Could not identify the song. Make sure music is playing clearly.'}
+                <strong>No music detected</strong><br>
+                <small>
+                  💡 Tips:<br>
+                  • Turn up your music volume (play it LOUD!)<br>
+                  • Play music through computer speakers (not headphones)<br>
+                  • Move speakers closer to microphone<br>
+                  • Use a popular, well-known song<br>
+                  • Make sure song is playing DURING the 10 second recording
+                </small>
               </div>
             `;
             songResult.style.display = 'none';

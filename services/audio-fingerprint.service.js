@@ -1,6 +1,7 @@
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { run } from '../lib/exec.js';
 import { config } from '../config/index.js';
 
@@ -25,7 +26,9 @@ class AudioFingerprintService {
       throw new Error('Server-side recording not supported on Windows. Use browser recording instead.');
     }
     
-    const tempFile = path.join('/tmp', `sample_${Date.now()}.wav`);
+    // Use OS temp directory (works on all platforms)
+    const tempDir = os.tmpdir();
+    const tempFile = path.join(tempDir, `sample_${Date.now()}.wav`);
     
     try {
       // Record audio using arecord (ALSA) on Pi
@@ -186,8 +189,9 @@ class AudioFingerprintService {
       throw new Error('Shazam API not configured');
     }
 
-    // Save buffer to temp file
-    const tempFile = path.join('/tmp', `upload_${Date.now()}.wav`);
+    // Save buffer to temp file (cross-platform)
+    const tempDir = os.tmpdir();
+    const tempFile = path.join(tempDir, `upload_${Date.now()}.wav`);
     fs.writeFileSync(tempFile, audioBuffer);
     
     // Identify the song
