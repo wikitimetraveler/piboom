@@ -346,43 +346,9 @@
 </nav>
 
 <style>
-  /* Elegant Hero Section */
-  .hero-section {
-    text-align: center;
-    padding: 60px 20px 40px;
-    background: linear-gradient(135deg, rgba(102,126,234,0.05), rgba(118,75,162,0.05));
-    border-radius: 20px;
-    margin: 30px auto;
-    max-width: 900px;
-  }
-  
-  .hero-title {
-    font-size: 3rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 20px;
-    animation: fadeInUp 0.8s ease-out;
-  }
-  
-  .hero-subtitle {
-    font-size: 1.3rem;
-    color: #666;
-    margin-bottom: 30px;
-    animation: fadeInUp 1s ease-out;
-  }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  /* Compact page spacing */
+  main.container {
+    padding-top: 20px;
   }
   
   /* Premium Accordion Sections */
@@ -478,12 +444,6 @@
 
 <main class="container">
   
-  <!-- Elegant Hero Section -->
-  <div class="hero-section">
-    <h1 class="hero-title">🎵 Big Wave Dave's Music Box</h1>
-    <p class="hero-subtitle">Explore music, discover artists, and experience the cosmos</p>
-  </div>
-  
   <div class="accordion premium-accordion" id="mainAccordion">
     
     <!-- Music Discovery Section -->
@@ -536,7 +496,7 @@
     </div>
 
     <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/sample-detector.html" class="tool-card fade-in" style="border: 2px solid rgba(231, 76, 60, 0.6);">
+      <a href="/sample-detector.html" class="tool-card fade-in">
         <span class="card-icon">🕸️</span>
         <h3>Sample & Cover Detector</h3>
         <p>Discover who sampled or covered your favorite songs! Explore hidden connections in the music universe.</p>
