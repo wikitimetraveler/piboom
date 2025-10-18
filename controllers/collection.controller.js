@@ -3,7 +3,7 @@ import { getPool } from '../services/database.service.js';
 // Add album to collection
 export async function addToCollection(req, res) {
   try {
-    const { artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation } = req.body;
+    const { artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation, aiAnalysis } = req.body;
     const userId = req.query.userId || null; // Multi-user support
     
     if (!artist || !album) {
@@ -37,10 +37,10 @@ export async function addToCollection(req, res) {
 
     // Insert the album
     const result = await pool.query(
-      `INSERT INTO records (user_id, artist, album, year, genre, label, notes, cover_url, spotify_id, musicbrainz_id, rating, valuation)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      `INSERT INTO records (user_id, artist, album, year, genre, label, notes, cover_url, spotify_id, musicbrainz_id, rating, valuation, ai_analysis)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
        RETURNING *`,
-      [userId, artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation]
+      [userId, artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation, aiAnalysis]
     );
 
     console.log('✅ Album added to collection:', album, 'by', artist);

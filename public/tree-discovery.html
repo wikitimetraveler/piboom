@@ -193,7 +193,10 @@
         <i class="bi-tree-fill"></i> Tree Discovery with Smokey 🐻
       </h1>
       <p class="text-center mb-4" style="color: #666;">
-        Identify trees by photo, search for tree species, or ask Smokey about North American forests!
+        Identify trees by photo, search for tree species, or ask Smokey about North American forests!<br>
+        <small style="color: var(--forest-dark); font-weight: 500;">
+          🏔️ <strong>Special Expertise:</strong> Southern California Mountains (San Gabriel, San Bernardino, San Jacinto) & High Desert (Hesperia/Victor Valley) 🌵
+        </small>
       </p>
       
       <!-- Search Mode Tabs -->
@@ -972,7 +975,7 @@ async function askSmokeyAI(question) {
         message: question,
         context: { 
           source: 'tree_discovery',
-          personality: 'Smokey the Bear - tree expert and conservation advocate'
+          personality: 'Smokey the Bear - tree expert and conservation advocate, with special expertise in Southern California mountain forests and High Desert (Hesperia area)'
         }
       })
     });

@@ -195,17 +195,83 @@
       border-left: 3px solid var(--ice-primary);
     }
     
-    .flip-hint {
+    /* AI Analysis - Inline Accordion Style (No Overlay!) */
+    .ai-analysis-section {
+      cursor: pointer;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      max-height: 150px;
+      overflow: hidden;
+    }
+    
+    .ai-analysis-section:hover {
+      box-shadow: 0 4px 20px rgba(52,152,219,0.25);
+      transform: translateY(-2px);
+    }
+    
+    .ai-analysis-section.expanded {
+      max-height: 2000px !important;
+      margin: 20px 0 !important;
+      padding: 20px !important;
+      background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(155,89,182,0.15)) !important;
+      border: 2px solid #3498db !important;
+      box-shadow: 0 8px 30px rgba(52, 152, 219, 0.4), 0 0 0 4px rgba(52, 152, 219, 0.1) !important;
+      animation: expandPulse 0.5s ease-out;
+    }
+    
+    @keyframes expandPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); box-shadow: 0 10px 40px rgba(52, 152, 219, 0.6); }
+      100% { transform: scale(1); }
+    }
+    
+    .ai-analysis-section.expanded strong {
+      color: #2c3e50 !important;
+      font-size: 1.05em;
+    }
+    
+    .ai-analysis-section.expanded div {
+      color: #34495e !important;
+      line-height: 1.7;
+    }
+    
+    .ai-analysis-overlay {
+      display: none !important;
+      /* No overlay needed - clean inline expansion! */
+    }
+    
+    .ai-expand-hint {
       position: absolute;
-      bottom: 10px;
+      top: 10px;
       right: 10px;
-      background: var(--ice-primary);
+      background: linear-gradient(135deg, #3498db, #2980b9);
       color: white;
-      padding: 5px 10px;
+      padding: 6px 14px;
       border-radius: 20px;
-      font-size: 0.7rem;
-      opacity: 0.8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
+      box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .ai-analysis-section:hover .ai-expand-hint {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+    
+    .ai-analysis-section.expanded .ai-expand-hint {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      opacity: 1;
+    }
+    
+    .flip-hint {
+      display: none !important;
+      /* Removed - card flip is intuitive without hint */
     }
     
     .album-cover {
@@ -426,6 +492,9 @@
 </div>
 
 <div class="container">
+  <!-- AI Analysis Overlay -->
+  <div class="ai-analysis-overlay" id="aiOverlay" onclick="collapseAIAnalysis()"></div>
+  
   <!-- User Selector -->
   <div id="userSelectorContainer"></div>
   
@@ -781,6 +850,57 @@ async function loadStats() {
 }
 
 // Display albums in grid with flip cards
+// Format AI analysis for display
+function formatAIAnalysis(aiAnalysisJson) {
+  try {
+    // Parse the JSON if it's a string
+    const analysis = typeof aiAnalysisJson === 'string' ? JSON.parse(aiAnalysisJson) : aiAnalysisJson;
+    
+    let html = '';
+    
+    if (analysis.evolution) {
+      html += `<div style="margin-bottom: 10px;">
+        <strong style="color: #2980b9;">🎵 Musical Evolution:</strong><br>
+        <span style="color: #34495e;">${analysis.evolution}</span>
+      </div>`;
+    }
+    
+    if (analysis.keyAlbums) {
+      html += `<div style="margin-bottom: 10px;">
+        <strong style="color: #2980b9;">💿 Key Albums:</strong><br>
+        <span style="color: #34495e;">${analysis.keyAlbums}</span>
+      </div>`;
+    }
+    
+    if (analysis.style) {
+      html += `<div style="margin-bottom: 10px;">
+        <strong style="color: #2980b9;">🎸 Musical Style:</strong><br>
+        <span style="color: #34495e;">${analysis.style}</span>
+      </div>`;
+    }
+    
+    if (analysis.impact) {
+      html += `<div style="margin-bottom: 10px;">
+        <strong style="color: #2980b9;">🌟 Cultural Impact:</strong><br>
+        <span style="color: #34495e;">${analysis.impact}</span>
+      </div>`;
+    }
+    
+    if (analysis.recommendations) {
+      html += `<div style="margin-bottom: 10px;">
+        <strong style="color: #2980b9;">💡 Recommendations:</strong><br>
+        <span style="color: #34495e;">${analysis.recommendations}</span>
+      </div>`;
+    }
+    
+    return html || '<em style="color: #7f8c8d;">AI analysis data format not recognized</em>';
+  } catch (error) {
+    console.error('Error formatting AI analysis:', error);
+    // If JSON parsing fails, display as plain text
+    return `<span style="color: #34495e;">${aiAnalysisJson}</span>`;
+  }
+}
+
 function displayAlbums(albums) {
   const albumGrid = document.getElementById('albumGrid');
   albumGrid.innerHTML = '';
@@ -844,14 +964,25 @@ function displayAlbums(albums) {
               <div style="font-size: 0.75rem; color: #999; font-style: italic; margin-top: 5px;">👁️ Read-only</div>
             ` : ''}
           </div>
-          <div class="flip-hint">
+          <div class="flip-hint" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
             <i class="bi-arrow-repeat"></i> Click to flip
+            ${album.ai_analysis ? '<span style="color: #3498db; font-weight: 600; font-size: 0.75rem;"><i class="bi-robot"></i> AI</span>' : ''}
           </div>
         </div>
         
         <!-- BACK OF CARD -->
         <div class="album-card-back">
           <h6><i class="bi-info-circle"></i> Album Details</h6>
+          
+          ${album.ai_analysis ? `
+            <div class="metadata-item ai-analysis-section" onclick="event.stopPropagation(); toggleAIAnalysis(this)" style="background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(155,89,182,0.15)); border-left: 4px solid #3498db; padding: 12px; margin-bottom: 15px; max-height: 200px; overflow-y: auto;">
+              <span class="ai-expand-hint"><i class="bi-arrows-fullscreen"></i> Click to expand</span>
+              <strong style="color: #2980b9; font-size: 0.95rem;"><i class="bi-robot"></i> AI Analysis:</strong><br>
+              <div style="color: #34495e; margin-top: 8px; line-height: 1.5; font-size: 0.85rem;">
+                ${formatAIAnalysis(album.ai_analysis)}
+              </div>
+            </div>
+          ` : ''}
           
           ${album.story ? `
             <div class="metadata-item" style="background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2)); border-left: 4px solid #ffa500; padding: 12px; margin-bottom: 15px;">
@@ -1266,6 +1397,56 @@ function displayYouTubeVideos(videos) {
   });
   
   container.innerHTML = html;
+}
+
+// Toggle AI Analysis expansion - Smooth Inline Accordion Style
+function toggleAIAnalysis(element) {
+  if (element.classList.contains('expanded')) {
+    // Collapse
+    element.classList.remove('expanded');
+    
+    // Update hint text
+    const hint = element.querySelector('.ai-expand-hint');
+    if (hint) {
+      hint.innerHTML = '<i class="bi-arrows-expand"></i> Expand';
+    }
+    
+    // Scroll back into view smoothly
+    setTimeout(() => {
+      element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  } else {
+    // Collapse any other expanded sections first
+    document.querySelectorAll('.ai-analysis-section.expanded').forEach(el => {
+      if (el !== element) {
+        el.classList.remove('expanded');
+        const h = el.querySelector('.ai-expand-hint');
+        if (h) h.innerHTML = '<i class="bi-arrows-expand"></i> Expand';
+      }
+    });
+    
+    // Expand
+    element.classList.add('expanded');
+    
+    // Update hint text
+    const hint = element.querySelector('.ai-expand-hint');
+    if (hint) {
+      hint.innerHTML = '<i class="bi-arrows-collapse"></i> Collapse';
+    }
+    
+    // Smooth scroll to show expanded content
+    setTimeout(() => {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+    }, 200);
+  }
+}
+
+// Collapse AI Analysis (no longer needed but kept for compatibility)
+function collapseAIAnalysis() {
+  const expandedElement = document.querySelector('.ai-analysis-section.expanded');
+  if (expandedElement) {
+    toggleAIAnalysis(expandedElement);
+  }
 }
 </script>
 

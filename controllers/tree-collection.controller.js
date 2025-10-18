@@ -6,7 +6,7 @@ export async function addToCollection(req, res) {
     const { 
       treeName, scientificName, confidence, features, region, 
       funFacts, conservationStatus, description, photoUrl,
-      latitude, longitude, locationName, notes, rating 
+      latitude, longitude, locationName, notes, rating, aiAnalysis 
     } = req.body;
     const userId = req.query.userId || null;
     
@@ -30,14 +30,14 @@ export async function addToCollection(req, res) {
       `INSERT INTO trees (
         user_id, tree_name, scientific_name, confidence, features, region,
         fun_facts, conservation_status, description, photo_url,
-        latitude, longitude, location_name, notes, rating
+        latitude, longitude, location_name, notes, rating, ai_analysis
       )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
        RETURNING *`,
       [
         userId, treeName, scientificName, confidence, features, region,
         funFacts, conservationStatus, description, photoUrl,
-        latitude, longitude, locationName, notes, rating
+        latitude, longitude, locationName, notes, rating, aiAnalysis
       ]
     );
 

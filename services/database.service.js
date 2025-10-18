@@ -114,6 +114,12 @@ export async function createTables() {
       ADD COLUMN IF NOT EXISTS valuation DECIMAL(10,2)
     `);
 
+    // Add AI analysis column if it doesn't exist (migration)
+    await pool.query(`
+      ALTER TABLE records 
+      ADD COLUMN IF NOT EXISTS ai_analysis TEXT
+    `);
+
     // Add family member link (genealogy integration)
     await pool.query(`
       ALTER TABLE records 
@@ -147,6 +153,12 @@ export async function createTables() {
         added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
+    `);
+
+    // Add AI analysis column to trees if it doesn't exist (migration)
+    await pool.query(`
+      ALTER TABLE trees 
+      ADD COLUMN IF NOT EXISTS ai_analysis TEXT
     `);
 
     // Create indexes on trees table

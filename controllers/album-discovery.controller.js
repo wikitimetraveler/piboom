@@ -56,14 +56,17 @@ Please keep each section concise but informative (2-3 sentences each). Focus on 
     });
 
     const aiResponse = completion.choices[0].message.content;
+    console.log('🤖 Raw AI Response:', aiResponse);
     
     // Parse the AI response into structured sections
     const analysis = parseAIResponse(aiResponse);
+    console.log('📊 Parsed Analysis:', analysis);
 
     res.json({
       success: true,
       artist: artist,
       albumCount: albums.length,
+      rawResponse: aiResponse, // Include raw response for debugging
       ...analysis
     });
 
@@ -95,46 +98,58 @@ function parseAIResponse(response) {
   };
 
   try {
-    // Split response into sections based on headers
+    console.log('🔍 Starting to parse AI response...');
+    
+    // Split response into sections based on headers (case-insensitive, flexible matching)
     const lines = response.split('\n');
     let currentSection = '';
     let currentContent = [];
 
     for (const line of lines) {
       const trimmedLine = line.trim();
+      const lowerLine = trimmedLine.toLowerCase();
       
-      if (trimmedLine.includes('**Musical Evolution**') || trimmedLine.includes('Musical Evolution')) {
+      // Match various formats: "1. **Musical Evolution**:", "Musical Evolution:", etc.
+      if (lowerLine.includes('musical evolution') && (lowerLine.includes('**') || lowerLine.includes(':') || lowerLine.includes('1'))) {
         if (currentSection && currentContent.length > 0) {
           sections[currentSection] = currentContent.join(' ').trim();
         }
         currentSection = 'evolution';
         currentContent = [];
-      } else if (trimmedLine.includes('**Key Albums**') || trimmedLine.includes('Key Albums')) {
+        console.log('  Found section: Musical Evolution');
+      } else if (lowerLine.includes('key album') && (lowerLine.includes('**') || lowerLine.includes(':') || lowerLine.includes('2'))) {
         if (currentSection && currentContent.length > 0) {
           sections[currentSection] = currentContent.join(' ').trim();
         }
         currentSection = 'keyAlbums';
         currentContent = [];
-      } else if (trimmedLine.includes('**Musical Style**') || trimmedLine.includes('Musical Style')) {
+        console.log('  Found section: Key Albums');
+      } else if (lowerLine.includes('musical style') && (lowerLine.includes('**') || lowerLine.includes(':') || lowerLine.includes('3'))) {
         if (currentSection && currentContent.length > 0) {
           sections[currentSection] = currentContent.join(' ').trim();
         }
         currentSection = 'style';
         currentContent = [];
-      } else if (trimmedLine.includes('**Cultural Impact**') || trimmedLine.includes('Cultural Impact')) {
+        console.log('  Found section: Musical Style');
+      } else if (lowerLine.includes('cultural impact') && (lowerLine.includes('**') || lowerLine.includes(':') || lowerLine.includes('4'))) {
         if (currentSection && currentContent.length > 0) {
           sections[currentSection] = currentContent.join(' ').trim();
         }
         currentSection = 'impact';
         currentContent = [];
-      } else if (trimmedLine.includes('**Recommendations**') || trimmedLine.includes('Recommendations')) {
+        console.log('  Found section: Cultural Impact');
+      } else if (lowerLine.includes('recommendation') && (lowerLine.includes('**') || lowerLine.includes(':') || lowerLine.includes('5'))) {
         if (currentSection && currentContent.length > 0) {
           sections[currentSection] = currentContent.join(' ').trim();
         }
         currentSection = 'recommendations';
         currentContent = [];
-      } else if (trimmedLine && !trimmedLine.startsWith('**') && currentSection) {
-        currentContent.push(trimmedLine);
+        console.log('  Found section: Recommendations');
+      } else if (trimmedLine && !trimmedLine.match(/^\d+\./) && currentSection) {
+        // Don't include header lines, just content
+        if (!trimmedLine.startsWith('**') || !trimmedLine.endsWith('**')) {
+          currentContent.push(trimmedLine);
+        }
       }
     }
 
@@ -143,19 +158,30 @@ function parseAIResponse(response) {
       sections[currentSection] = currentContent.join(' ').trim();
     }
 
-    // Clean up sections (remove numbers, bullets, etc.)
+    // Clean up sections (remove numbers, bullets, markdown, etc.)
     Object.keys(sections).forEach(key => {
       if (sections[key]) {
         sections[key] = sections[key]
           .replace(/^\d+\.\s*/, '') // Remove leading numbers
-          .replace(/^[-*]\s*/, '') // Remove bullets
+          .replace(/^[-*•]\s*/, '') // Remove bullets
           .replace(/\*\*/g, '') // Remove bold markers
+          .replace(/^:\s*/, '') // Remove leading colons
           .trim();
+        console.log(`  ✓ ${key}: ${sections[key].substring(0, 50)}...`);
+      } else {
+        console.log(`  ✗ ${key}: (empty)`);
       }
     });
 
+    // If all sections are empty, try a simpler split
+    if (!sections.evolution && !sections.keyAlbums && !sections.style && !sections.impact) {
+      console.log('⚠️ No sections found, using fallback...');
+      // Just put the whole response in evolution
+      sections.evolution = response.trim();
+    }
+
   } catch (error) {
-    console.error('Error parsing AI response:', error);
+    console.error('❌ Error parsing AI response:', error);
     // Fallback: put entire response in evolution section
     sections.evolution = response.substring(0, 500) + '...';
   }

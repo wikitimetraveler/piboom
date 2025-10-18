@@ -732,50 +732,7 @@
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- Add to Collection Modal -->
-<div class="modal fade" id="addToCollectionModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header" style="background: linear-gradient(135deg, #28a745, #20c997); color: white;">
-        <h5 class="modal-title">
-          <i class="bi-plus-circle"></i> Add to Collection
-        </h5>
-        <button type="button" class="close" data-dismiss="modal" style="color: white;">
-          <span>&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p style="font-size: 1.1rem; margin-bottom: 15px;">
-          <strong id="addModalAlbumTitle"></strong><br>
-          <span id="addModalArtist" style="color: #666;"></span>
-        </p>
-        
-        <div class="form-group">
-          <label for="addValuation">
-            <i class="bi-cash-coin"></i> <strong>Estimated Value (Optional)</strong>
-          </label>
-          <div class="input-group">
-            <div class="input-group-prepend">
-              <span class="input-group-text">$</span>
-            </div>
-            <input type="number" class="form-control" id="addValuation" placeholder="0.00" step="0.01" min="0">
-          </div>
-          <small class="form-text text-muted">
-            Track the value of your collection! Leave empty if unknown.
-          </small>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          <i class="bi-x-circle"></i> Cancel
-        </button>
-        <button type="button" class="btn btn-success" onclick="confirmAddToCollection()">
-          <i class="bi-plus-circle"></i> Add to Collection
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- No modal needed - direct add -->
 
 <!-- User Selector and Login Scripts -->
 <script src="/user-selector.js"></script>
@@ -1061,6 +1018,7 @@ let currentInputMode = 'band'; // 'band', 'album', 'image', or 'camera'
 let uploadedImageData = null;
 let cameraStream = null;
 let cameraVideo = null;
+let currentAIAnalysis = null; // Store current AI analysis for artist
 
 // Backend Google TTS service
 async function speakViaBackend(text, callback) {
@@ -2173,18 +2131,48 @@ async function getAIAlbumInfo(artist, albums) {
     
     const data = await response.json();
     
+    console.log('✅ AI Analysis received:', data);
+    
+    // Store AI analysis globally for use when adding albums
+    currentAIAnalysis = {
+      artist: artist,
+      evolution: data.evolution || 'Analysis not available',
+      keyAlbums: data.keyAlbums || 'Analysis not available',
+      style: data.style || 'Analysis not available',
+      impact: data.impact || 'Analysis not available',
+      recommendations: data.recommendations || ''
+    };
+    
     // Hide loading and show results
     aiLoading.style.display = 'none';
-    aiInfoText.innerHTML = `
-      <div class="ai-analysis">
-        <h5><i class="bi-music-note-beamed"></i> Album Analysis for ${artist}</h5>
-        <p><strong>Musical Evolution:</strong> ${data.evolution || 'Analysis not available'}</p>
-        <p><strong>Key Albums:</strong> ${data.keyAlbums || 'Analysis not available'}</p>
-        <p><strong>Musical Style:</strong> ${data.style || 'Analysis not available'}</p>
-        <p><strong>Cultural Impact:</strong> ${data.impact || 'Analysis not available'}</p>
-        ${data.recommendations ? `<p><strong>Recommendations:</strong> ${data.recommendations}</p>` : ''}
-      </div>
-    `;
+    
+    // Check if we have structured data or just raw response
+    const hasStructuredData = data.evolution || data.keyAlbums || data.style || data.impact;
+    
+    if (hasStructuredData) {
+      // Display structured analysis
+      aiInfoText.innerHTML = `
+        <div class="ai-analysis">
+          <h5><i class="bi-music-note-beamed"></i> Album Analysis for ${artist}</h5>
+          ${data.evolution ? `<p><strong>Musical Evolution:</strong> ${data.evolution}</p>` : ''}
+          ${data.keyAlbums ? `<p><strong>Key Albums:</strong> ${data.keyAlbums}</p>` : ''}
+          ${data.style ? `<p><strong>Musical Style:</strong> ${data.style}</p>` : ''}
+          ${data.impact ? `<p><strong>Cultural Impact:</strong> ${data.impact}</p>` : ''}
+          ${data.recommendations ? `<p><strong>Recommendations:</strong> ${data.recommendations}</p>` : ''}
+        </div>
+      `;
+    } else if (data.rawResponse) {
+      // Fallback: display raw response if structured parsing failed
+      console.log('⚠️ Using raw response as fallback');
+      aiInfoText.innerHTML = `
+        <div class="ai-analysis">
+          <h5><i class="bi-music-note-beamed"></i> Album Analysis for ${artist}</h5>
+          <div style="white-space: pre-wrap; line-height: 1.6;">${data.rawResponse}</div>
+        </div>
+      `;
+    } else {
+      throw new Error('No AI response data available');
+    }
     
     // Speak the AI analysis using backend TTS
     const analysisText = `Album analysis for ${artist}. Musical Evolution: ${data.evolution || 'Analysis not available'}. Key Albums: ${data.keyAlbums || 'Analysis not available'}. Musical Style: ${data.style || 'Analysis not available'}. Cultural Impact: ${data.impact || 'Analysis not available'}. ${data.recommendations ? `Recommendations: ${data.recommendations}` : ''}`;
@@ -2249,7 +2237,7 @@ async function searchAlbums() {
     if (data.albums && data.albums.length > 0) {
       displayAlbums(data.albums);
       
-      // Get AI analysis for the albums
+      // Get AI analysis for the albums and store it
       setTimeout(() => {
         getAIAlbumInfo(artist, data.albums);
       }, 1000);
@@ -2294,101 +2282,64 @@ function displayAlbums(albums) {
   });
 }
 
-// Global variables for add modal
-let pendingAlbumData = null;
-
-// Show add to collection modal
-function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId, isIdentified, estimatedValue) {
-  // Store album data
-  pendingAlbumData = {
-    artist,
-    album,
-    year,
-    genre,
-    coverUrl,
-    musicbrainzId: musicbrainzId || null,
-    isIdentified: isIdentified || false
-  };
-  
-  // Update modal content
-  document.getElementById('addModalAlbumTitle').textContent = album;
-  document.getElementById('addModalArtist').textContent = `by ${artist}`;
-  
-  // Pre-fill valuation if AI provided one
-  const valuationInput = document.getElementById('addValuation');
-  if (estimatedValue && estimatedValue !== 'null') {
-    valuationInput.value = parseFloat(estimatedValue).toFixed(2);
-    valuationInput.placeholder = `AI Estimated: $${parseFloat(estimatedValue).toFixed(2)}`;
-  } else {
-    valuationInput.value = '';
-    valuationInput.placeholder = '0.00';
-  }
-  
-  // Show modal
-  if (typeof $ !== 'undefined') {
-    $('#addToCollectionModal').modal('show');
-  } else {
-    const modal = new bootstrap.Modal(document.getElementById('addToCollectionModal'));
-    modal.show();
-  }
-}
-
-// Confirm add to collection
-async function confirmAddToCollection() {
-  if (!pendingAlbumData) return;
-  
+// Add album directly to collection (no modal popup)
+async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId, isIdentified, estimatedValue) {
   try {
     const currentUser = getCurrentUser();
     const loggedInUserId = localStorage.getItem('loggedInUserId');
     
     // Check if logged in
     if (!loggedInUserId) {
-      alert('Please login from the home page to add albums!');
-      if (typeof $ !== 'undefined') {
-        $('#addToCollectionModal').modal('hide');
-      }
+      showToast('🔒 Login Required', 'Please login from the home page to add albums!', 'warning');
       return;
     }
     
     // Check if trying to add to their own collection
     if (loggedInUserId !== currentUser.id) {
-      alert('You can only add albums to your own collection! Switch to your user first.');
-      if (typeof $ !== 'undefined') {
-        $('#addToCollectionModal').modal('hide');
-      }
+      showToast('⚠️ Switch User', 'You can only add albums to your own collection! Switch to your user first.', 'warning');
       return;
     }
     
-    // Hide modal
-    if (typeof $ !== 'undefined') {
-      $('#addToCollectionModal').modal('hide');
+    // Prepare AI analysis if available
+    let aiAnalysis = null;
+    if (currentAIAnalysis && currentAIAnalysis.artist === artist) {
+      aiAnalysis = JSON.stringify({
+        evolution: currentAIAnalysis.evolution,
+        keyAlbums: currentAIAnalysis.keyAlbums,
+        style: currentAIAnalysis.style,
+        impact: currentAIAnalysis.impact,
+        recommendations: currentAIAnalysis.recommendations
+      });
     }
     
-    // Get valuation from input
-    const valuationInput = document.getElementById('addValuation');
-    const valuation = valuationInput.value ? parseFloat(valuationInput.value) : null;
+    // Add album directly
     const response = await fetch(`/api/collection/add?userId=${currentUser.id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        artist: pendingAlbumData.artist,
-        album: pendingAlbumData.album,
-        year: pendingAlbumData.year,
-        genre: pendingAlbumData.genre,
-        coverUrl: pendingAlbumData.coverUrl,
-        musicbrainzId: pendingAlbumData.musicbrainzId,
-        valuation: valuation
+        artist: artist,
+        album: album,
+        year: year,
+        genre: genre,
+        coverUrl: coverUrl,
+        musicbrainzId: musicbrainzId || null,
+        valuation: estimatedValue && estimatedValue !== 'null' ? parseFloat(estimatedValue) : null,
+        aiAnalysis: aiAnalysis
       })
     });
     
     const data = await response.json();
     
     if (data.success) {
-      // Show success toast
-      showToast('✅ Album Added!', `${pendingAlbumData.album} by ${pendingAlbumData.artist} added to ${currentUser.name}'s collection!`, 'success');
+      // Show enhanced success toast with album details
+      showToast(
+        '✅ Album Added!', 
+        `<strong>${album}</strong> by ${artist}<br>Added to <strong>${currentUser.name}'s collection</strong>!${estimatedValue && estimatedValue !== 'null' ? `<br>💰 Estimated value: $${parseFloat(estimatedValue).toFixed(2)}` : ''}`, 
+        'success'
+      );
       
       // Show "Add Another Album" button if this was an identified album
-      if (pendingAlbumData.isIdentified) {
+      if (isIdentified) {
         const addAnotherBtn = document.getElementById('addAnotherBtn');
         if (addAnotherBtn) {
           addAnotherBtn.style.display = 'inline-block';
@@ -2396,10 +2347,14 @@ async function confirmAddToCollection() {
       }
     } else if (response.status === 409) {
       // Already in collection
-      showToast('⚠️ Already in Collection', `${pendingAlbumData.album} is already in ${currentUser.name}'s collection!`, 'warning');
+      showToast(
+        '📀 Already Collected', 
+        `<strong>${album}</strong> is already in ${currentUser.name}'s collection!`, 
+        'info'
+      );
       
       // Still show "Add Another" button
-      if (pendingAlbumData.isIdentified) {
+      if (isIdentified) {
         const addAnotherBtn = document.getElementById('addAnotherBtn');
         if (addAnotherBtn) {
           addAnotherBtn.style.display = 'inline-block';
@@ -2411,9 +2366,6 @@ async function confirmAddToCollection() {
   } catch (error) {
     console.error('Error adding to collection:', error);
     showToast('❌ Error', 'Failed to add album to collection', 'error');
-  } finally {
-    // Clear pending data
-    pendingAlbumData = null;
   }
 }
 
