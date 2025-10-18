@@ -1709,9 +1709,9 @@ function displayIdentifiedAlbum(data) {
             <p class="card-text"><strong>Artist:</strong> ${data.artistName}</p>
             ${data.year ? `<p class="card-text"><strong>Year:</strong> ${data.year}</p>` : ''}
             ${data.genre ? `<p class="card-text"><strong>Genre:</strong> ${data.genre}</p>` : ''}
-            ${data.estimatedValue ? `<p class="card-text"><strong><i class="bi-cash-coin text-success"></i> Est. Value:</strong> $${parseFloat(data.estimatedValue).toFixed(2)}</p>` : ''}
+            ${data.estimatedValue ? `<p class="card-text"><strong><i class="bi-cash-coin text-success"></i> Est. Value:</strong> <span style="text-decoration: line-through; opacity: 0.5;">$${parseFloat(data.estimatedValue).toFixed(2)}</span> → <strong style="color: #28a745;">$${(parseFloat(data.estimatedValue) / 2).toFixed(2)}</strong> <small class="text-muted">(÷2)</small></p>` : ''}
             ${data.description ? `<p class="card-text">${data.description}</p>` : ''}
-            <p class="card-text"><small class="text-muted">Identified using AI vision ${data.estimatedValue ? '· Value estimated by AI' : ''}</small></p>
+            <p class="card-text"><small class="text-muted">Identified using AI vision ${data.estimatedValue ? '· AI values cut in half' : ''}</small></p>
             <button class="btn btn-success btn-lg mt-3" onclick="showAddModal('${data.artistName.replace(/'/g, "\\'")}', '${data.albumName.replace(/'/g, "\\'")}', '${data.year || ''}', '${data.genre || ''}', '${uploadedImageData}', null, true, ${data.estimatedValue || 'null'})">
               <i class="bi-plus-circle"></i> Add to My Collection
             </button>
@@ -2323,7 +2323,8 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
         genre: genre,
         coverUrl: coverUrl,
         musicbrainzId: musicbrainzId || null,
-        valuation: estimatedValue && estimatedValue !== 'null' ? parseFloat(estimatedValue) : null,
+        // Automatically cut AI valuations in half (AI tends to overestimate)
+        valuation: estimatedValue && estimatedValue !== 'null' ? parseFloat(estimatedValue) / 2 : null,
         aiAnalysis: aiAnalysis
       })
     });
@@ -2334,7 +2335,7 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
       // Show enhanced success toast with album details
       showToast(
         '✅ Album Added!', 
-        `<strong>${album}</strong> by ${artist}<br>Added to <strong>${currentUser.name}'s collection</strong>!${estimatedValue && estimatedValue !== 'null' ? `<br>💰 Estimated value: $${parseFloat(estimatedValue).toFixed(2)}` : ''}`, 
+        `<strong>${album}</strong> by ${artist}<br>Added to <strong>${currentUser.name}'s collection</strong>!${estimatedValue && estimatedValue !== 'null' ? `<br>💰 Estimated value: $${(parseFloat(estimatedValue) / 2).toFixed(2)} <small class="text-muted">(AI÷2)</small>` : ''}`, 
         'success'
       );
       
