@@ -15,10 +15,12 @@ export function initializeDatabase() {
     ssl: {
       rejectUnauthorized: false // Required for Render PostgreSQL
     },
-    // Connection pool settings
-    max: 20, // Maximum number of clients in the pool
+    // Connection pool settings optimized for remote database
+    max: 10,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 10000, // Increased timeout
+    connectionTimeoutMillis: 20000, // 20 seconds for remote DB
+    query_timeout: 0, // No query timeout (remote DB can be slow)
+    statement_timeout: 30000 // 30 second statement timeout
   });
 
   // Handle pool errors
@@ -89,7 +91,7 @@ export async function createTables() {
       )
     `);
 
-    // Create index on artist and album for faster searches
+    // Create indexes on records for faster searches
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_records_artist ON records(artist)
     `);
@@ -100,6 +102,21 @@ export async function createTables() {
 
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_records_user ON records(user_id)
+    `);
+    
+    // Add composite index for common query pattern (user + sort by date)
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_records_user_date ON records(user_id, added_date DESC)
+    `);
+    
+    // Add index for sorting by date (most common sort)
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_records_added_date ON records(added_date DESC)
+    `);
+    
+    // Add index for year filtering
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_records_year ON records(year)
     `);
 
     // Add story/provenance column if it doesn't exist (migration)
@@ -161,7 +178,7 @@ export async function createTables() {
       ADD COLUMN IF NOT EXISTS ai_analysis TEXT
     `);
 
-    // Create indexes on trees table
+    // Create indexes on trees table for faster queries
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_trees_name ON trees(tree_name)
     `);
@@ -172,6 +189,16 @@ export async function createTables() {
     
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_trees_location ON trees(latitude, longitude)
+    `);
+    
+    // Add composite index for common query (user + sort by date)
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_trees_user_date ON trees(user_id, added_date DESC)
+    `);
+    
+    // Add index for sorting by date
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_trees_added_date ON trees(added_date DESC)
     `);
 
     // Create conversations table for LangChain memory

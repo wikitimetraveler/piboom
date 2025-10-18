@@ -2699,39 +2699,31 @@ document.addEventListener('DOMContentLoaded', function() {
   // Preload artist from localStorage if available
   preloadArtist();
   
-  // Try to initialize KG widget with retry mechanism
+  // Try to initialize KG widget with faster retry mechanism
   let kgRetryCount = 0;
-  const maxKgRetries = 10;
+  const maxKgRetries = 3; // Reduced from 10 to 3
   
   function tryInitializeKG() {
     try {
-      console.log(`🔍 Attempting KG widget initialization (attempt ${kgRetryCount + 1})...`);
       if (typeof KGSearchWidget === 'function') {
         initializeKGWidget();
-        console.log('✅ KG widget initialized successfully');
+        console.log('✅ KG widget ready');
       } else {
         kgRetryCount++;
         if (kgRetryCount < maxKgRetries) {
-          console.log('⏳ KGSearchWidget not ready, retrying in 500ms...');
-          setTimeout(tryInitializeKG, 500);
-        } else {
-          console.warn('❌ KGSearchWidget failed to load after maximum retries');
+          setTimeout(tryInitializeKG, 200); // Reduced from 500ms to 200ms
         }
       }
     } catch (error) {
-      console.error('❌ KG widget initialization error:', error);
+      console.error('❌ KG widget error:', error);
     }
   }
   
-  // Start KG widget initialization
-  tryInitializeKG();
+  // Start KG widget initialization (non-blocking)
+  setTimeout(tryInitializeKG, 100);
   
-  // Try to initialize voice automatically after a short delay
-  setTimeout(() => {
-    if (!voiceEnabled) {
-      initVoice();
-    }
-  }, 1000);
+  // Don't auto-initialize voice - let user click button
+  // Removed auto voice init for faster page load
 });
 </script>
 
