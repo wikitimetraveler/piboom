@@ -234,7 +234,8 @@
   <div class="text-center">
     <h1 class="mb-3">🎵 Song Identifier</h1>
     <p class="lead">Identify any song playing around you - just like Shazam!</p>
-    <p class="text-muted">Click the button to start listening, or use voice command: "What song is this?"</p>
+    <p class="text-muted">Click the button and allow microphone access when prompted</p>
+    <p class="text-muted"><small><i class="bi-info-circle"></i> Works on both Windows (browser mic) and Pi (hardware mic)</small></p>
   </div>
 
   <button id="identifyBtn" class="identify-button" title="Click to identify song">
@@ -316,6 +317,17 @@ async function checkServiceStatus() {
 identifyBtn.addEventListener('click', async () => {
   if (isListening) return;
   
+  // Check if microphone is available
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    statusMessage.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="bi-x-circle"></i>
+        Microphone access not available in your browser.
+      </div>
+    `;
+    return;
+  }
+  
   isListening = true;
   identifyBtn.classList.add('listening');
   statusMessage.textContent = '🎧 Listening to the music... (10 seconds)';
@@ -323,36 +335,88 @@ identifyBtn.addEventListener('click', async () => {
   songResult.style.display = 'none';
   
   try {
-    const response = await fetch('/api/audio-fingerprint/identify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ duration: 10 })
-    });
+    // Request microphone access
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     
-    const data = await response.json();
+    // Record audio using Web Audio API
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioContext.createMediaStreamSource(stream);
+    const mediaRecorder = new MediaRecorder(stream);
+    const audioChunks = [];
     
-    if (data.success && data.song) {
-      displaySongResult(data);
-      statusMessage.textContent = '✅ Song identified!';
-    } else {
-      statusMessage.innerHTML = `
-        <div class="alert alert-info">
-          <i class="bi-info-circle"></i>
-          ${data.message || 'Could not identify the song. Make sure music is playing clearly.'}
-        </div>
-      `;
-      songResult.style.display = 'none';
-    }
+    mediaRecorder.ondataavailable = (event) => {
+      audioChunks.push(event.data);
+    };
+    
+    mediaRecorder.onstop = async () => {
+      // Stop all tracks
+      stream.getTracks().forEach(track => track.stop());
+      
+      // Create blob from chunks
+      const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+      
+      // Convert to base64
+      const reader = new FileReader();
+      reader.readAsDataURL(audioBlob);
+      reader.onloadend = async () => {
+        const base64Audio = reader.result.split(',')[1];
+        
+        // Send to server
+        try {
+          const response = await fetch('/api/audio-fingerprint/identify/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ audio: base64Audio })
+          });
+          
+          const data = await response.json();
+          
+          if (data.success && data.song) {
+            displaySongResult(data);
+            statusMessage.textContent = '✅ Song identified!';
+          } else {
+            statusMessage.innerHTML = `
+              <div class="alert alert-info">
+                <i class="bi-info-circle"></i>
+                ${data.message || 'Could not identify the song. Make sure music is playing clearly.'}
+              </div>
+            `;
+            songResult.style.display = 'none';
+          }
+        } catch (error) {
+          console.error('Identification error:', error);
+          statusMessage.innerHTML = `
+            <div class="alert alert-danger">
+              <i class="bi-x-circle"></i>
+              Error identifying song: ${error.message}
+            </div>
+          `;
+          songResult.style.display = 'none';
+        } finally {
+          isListening = false;
+          identifyBtn.classList.remove('listening');
+          listeningAnimation.style.display = 'none';
+        }
+      };
+    };
+    
+    // Start recording
+    mediaRecorder.start();
+    
+    // Stop after 10 seconds
+    setTimeout(() => {
+      mediaRecorder.stop();
+    }, 10000);
+    
   } catch (error) {
-    console.error('Identification error:', error);
+    console.error('Microphone error:', error);
     statusMessage.innerHTML = `
       <div class="alert alert-danger">
         <i class="bi-x-circle"></i>
-        Error identifying song. Please try again.
+        Microphone access denied. Please allow microphone access and try again.
       </div>
     `;
     songResult.style.display = 'none';
-  } finally {
     isListening = false;
     identifyBtn.classList.remove('listening');
     listeningAnimation.style.display = 'none';

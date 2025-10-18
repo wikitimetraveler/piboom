@@ -18,8 +18,17 @@ export async function identifyCurrentSong(req, res) {
       });
     }
     
-    // Start identification
-    console.log('🎵 Identifying song from microphone...');
+    // Check platform - server-side recording only works on Pi
+    if (process.platform === 'win32') {
+      return res.status(400).json({
+        success: false,
+        message: 'Server-side recording not supported on Windows. Use browser microphone recording instead.',
+        useBrowserRecording: true
+      });
+    }
+    
+    // Start identification (Pi mode)
+    console.log('🎵 Identifying song from microphone (Pi mode)...');
     const result = await fingerprintService.identifyCurrentlyPlaying(duration);
     
     if (result.success) {

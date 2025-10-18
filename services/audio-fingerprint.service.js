@@ -15,16 +15,20 @@ class AudioFingerprintService {
   }
 
   /**
-   * Record audio from microphone for song identification
+   * Record audio from microphone for song identification (Pi only)
    * @param {number} duration - Duration in seconds (default 10)
    * @returns {Promise<string>} - Path to recorded audio file
    */
   async recordAudioSample(duration = 10) {
+    // Only works on Pi/Linux - Windows uses browser recording
+    if (process.platform === 'win32') {
+      throw new Error('Server-side recording not supported on Windows. Use browser recording instead.');
+    }
+    
     const tempFile = path.join('/tmp', `sample_${Date.now()}.wav`);
     
     try {
-      // Record audio using arecord (ALSA)
-      // 16-bit, 44.1kHz, mono - optimal for Shazam
+      // Record audio using arecord (ALSA) on Pi
       const args = [
         '-D', 'plughw:1,0',  // Default microphone
         '-f', 'S16_LE',      // 16-bit signed little-endian
@@ -34,7 +38,7 @@ class AudioFingerprintService {
         tempFile
       ];
       
-      console.log(`Recording ${duration} seconds of audio for song identification...`);
+      console.log(`📡 Recording ${duration} seconds of audio for song identification (Pi mode)...`);
       await run('arecord', args);
       
       if (fs.existsSync(tempFile)) {
