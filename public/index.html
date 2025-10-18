@@ -39,53 +39,37 @@
   .musical-note:nth-child(8) { left: 40%; animation-delay: 10.5s; }
   .musical-note:nth-child(9) { left: 45%; animation-delay: 12s; }
   .musical-note:nth-child(10) { left: 50%; animation-delay: 13.5s; }
-  .musical-note:nth-child(11) { left: 55%; animation-delay: 15s; }
-  .musical-note:nth-child(12) { left: 60%; animation-delay: 16.5s; }
-  .musical-note:nth-child(13) { left: 65%; animation-delay: 18s; }
-  .musical-note:nth-child(14) { left: 70%; animation-delay: 19.5s; }
-  .musical-note:nth-child(15) { left: 75%; animation-delay: 21s; }
-  .musical-note:nth-child(16) { left: 80%; animation-delay: 22.5s; }
-  .musical-note:nth-child(17) { left: 85%; animation-delay: 24s; }
-  .musical-note:nth-child(18) { left: 90%; animation-delay: 25.5s; }
-  .musical-note:nth-child(19) { left: 95%; animation-delay: 27s; }
+  /* Reduced notes for cleaner, more professional look */
 
-  /* Musical Symbols */
+  /* Musical Symbols - Reduced for professional look */
   .musical-symbol {
     position: absolute;
     font-size: 24px;
-    color: rgba(52, 152, 219, 0.5);
+    color: rgba(52, 152, 219, 0.3);
     animation: floatSymbol 18s linear infinite;
     opacity: 0;
     z-index: 10;
   }
 
-  .musical-symbol:nth-child(21) { left: 8%; animation-delay: 2s; }
-  .musical-symbol:nth-child(22) { left: 18%; animation-delay: 5s; }
-  .musical-symbol:nth-child(23) { left: 28%; animation-delay: 8s; }
-  .musical-symbol:nth-child(24) { left: 38%; animation-delay: 11s; }
-  .musical-symbol:nth-child(25) { left: 48%; animation-delay: 14s; }
-  .musical-symbol:nth-child(26) { left: 58%; animation-delay: 17s; }
-  .musical-symbol:nth-child(27) { left: 68%; animation-delay: 20s; }
-  .musical-symbol:nth-child(28) { left: 78%; animation-delay: 23s; }
-  .musical-symbol:nth-child(29) { left: 88%; animation-delay: 26s; }
-  .musical-symbol:nth-child(30) { left: 98%; animation-delay: 29s; }
+  .musical-symbol:nth-child(11) { left: 15%; animation-delay: 2s; }
+  .musical-symbol:nth-child(12) { left: 35%; animation-delay: 8s; }
+  .musical-symbol:nth-child(13) { left: 55%; animation-delay: 14s; }
+  .musical-symbol:nth-child(14) { left: 75%; animation-delay: 20s; }
+  .musical-symbol:nth-child(15) { left: 85%; animation-delay: 26s; }
 
-  /* Clef Symbols */
+  /* Clef Symbols - Elegant and subtle */
   .clef-symbol {
     position: absolute;
     font-size: 40px;
-    color: rgba(135, 206, 250, 0.4);
+    color: rgba(135, 206, 250, 0.25);
     animation: floatClef 25s linear infinite;
     opacity: 0;
     z-index: 10;
   }
 
-  .clef-symbol:nth-child(31) { left: 12%; animation-delay: 3s; }
-  .clef-symbol:nth-child(32) { left: 32%; animation-delay: 9s; }
-  .clef-symbol:nth-child(33) { left: 52%; animation-delay: 15s; }
-  .clef-symbol:nth-child(34) { left: 72%; animation-delay: 21s; }
-  .clef-symbol:nth-child(35) { left: 92%; animation-delay: 27s; }
-  .clef-symbol:nth-child(36) { left: 22%; animation-delay: 33s; }
+  .clef-symbol:nth-child(16) { left: 20%; animation-delay: 5s; }
+  .clef-symbol:nth-child(17) { left: 50%; animation-delay: 15s; }
+  .clef-symbol:nth-child(18) { left: 80%; animation-delay: 25s; }
 
   /* Staff Lines */
   .staff-line {
@@ -225,58 +209,67 @@
   <div class="musical-note">♩</div>
   <div class="musical-note">♪</div>
   <div class="musical-note">♫</div>
-  <div class="musical-note">♬</div>
-  <div class="musical-note">♩</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
-  <div class="musical-note">♬</div>
-  <div class="musical-note">♩</div>
-  <div class="musical-note">♪</div>
-  <div class="musical-note">♫</div>
-  <div class="musical-note">♬</div>
-  <div class="musical-note">♩</div>
   
-  <!-- Musical Symbols -->
+  <!-- Musical Symbols - Reduced -->
   <div class="musical-symbol">♭</div>
   <div class="musical-symbol">♯</div>
   <div class="musical-symbol">♮</div>
   <div class="musical-symbol">♭</div>
   <div class="musical-symbol">♯</div>
-  <div class="musical-symbol">♮</div>
-  <div class="musical-symbol">♭</div>
-  <div class="musical-symbol">♯</div>
-  <div class="musical-symbol">♮</div>
-  <div class="musical-symbol">♭</div>
   
-  <!-- Treble and Bass Clefs -->
+  <!-- Treble and Bass Clefs - Subtle -->
   <div class="clef-symbol treble-clef">𝄞</div>
   <div class="clef-symbol bass-clef">𝄢</div>
   <div class="clef-symbol treble-clef">𝄞</div>
-  <div class="clef-symbol bass-clef">𝄢</div>
-  <div class="clef-symbol treble-clef">𝄞</div>
-  <div class="clef-symbol bass-clef">𝄢</div>
   
-  <!-- Musical Staff Lines -->
-  <div class="staff-line"></div>
-  <div class="staff-line"></div>
-  <div class="staff-line"></div>
-  <div class="staff-line"></div>
-  <div class="staff-line"></div>
-  
-  <!-- Additional Music Symbols -->
-  <div class="music-symbol">𝄀</div>
-  <div class="music-symbol">𝄁</div>
-  <div class="music-symbol">𝄂</div>
-  <div class="music-symbol">𝄃</div>
-  <div class="music-symbol">𝄄</div>
-  <div class="music-symbol">𝄅</div>
-  <div class="music-symbol">𝄆</div>
-  <div class="music-symbol">𝄇</div>
+  <!-- Staff Lines removed for cleaner look -->
 </div>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<style>
+  /* Professional Modern Navigation */
+  .modern-navbar {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(135, 206, 250, 0.2);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+  }
+  
+  .modern-navbar.scrolled {
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+  }
+  
+  .navbar-brand-modern {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .nav-user-btn {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    border: 2px solid rgba(102, 126, 234, 0.3);
+    border-radius: 25px;
+    padding: 8px 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-user-btn:hover {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+    border-color: #667eea;
+    transform: translateY(-2px);
+  }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-light modern-navbar">
   <div class="container">
-    <a class="navbar-brand" href="#"><i class="bi-music-note-beamed mr-1"></i>Big Wave Dave's Music Box</a>
+    <a class="navbar-brand navbar-brand-modern" href="#"><i class="bi-music-note-beamed mr-2"></i>Big Wave Dave's Music Box</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -284,7 +277,7 @@
       <!-- User Login (LEFT SIDE) -->
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" href="#" id="navUserBtn" onclick="showLoginPopup(); return false;" style="background: rgba(52, 152, 219, 0.15); border-radius: 8px; padding: 8px 15px !important;">
+          <a class="nav-link nav-user-btn" href="#" id="navUserBtn" onclick="showLoginPopup(); return false;">
             <i class="bi-person-circle"></i> <span id="navUserName">Login</span>
           </a>
         </li>
@@ -352,16 +345,153 @@
   </div>
 </nav>
 
+<style>
+  /* Elegant Hero Section */
+  .hero-section {
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: linear-gradient(135deg, rgba(102,126,234,0.05), rgba(118,75,162,0.05));
+    border-radius: 20px;
+    margin: 30px auto;
+    max-width: 900px;
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.8s ease-out;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.3rem;
+    color: #666;
+    margin-bottom: 30px;
+    animation: fadeInUp 1s ease-out;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Premium Accordion Sections */
+  .premium-accordion .card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(135, 206, 250, 0.2);
+    margin-bottom: 20px;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .premium-accordion .card:hover {
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  .premium-accordion .card-header {
+    background: linear-gradient(135deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08));
+    border-bottom: 1px solid rgba(135, 206, 250, 0.2);
+    padding: 0;
+  }
+  
+  .premium-accordion .card-header .btn-link {
+    padding: 20px 25px;
+    width: 100%;
+    text-align: left;
+    position: relative;
+  }
+  
+  .premium-accordion .card-header .btn-link::after {
+    content: '▼';
+    position: absolute;
+    right: 25px;
+    top: 50%;
+    transform: translateY(-50%) rotate(0deg);
+    transition: transform 0.3s ease;
+    color: var(--ice-primary);
+    font-size: 0.8rem;
+  }
+  
+  .premium-accordion .card-header .btn-link[aria-expanded="true"]::after {
+    transform: translateY(-50%) rotate(180deg);
+  }
+  
+  .section-count-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 10px;
+    vertical-align: middle;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  }
+  
+  /* Modern Dropdown Menus */
+  .dropdown-menu {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    padding: 10px;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+  }
+  
+  .dropdown-item {
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+  }
+  
+  .dropdown-item:hover {
+    background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+    color: #667eea;
+    transform: translateX(5px);
+  }
+  
+  .dropdown-item i {
+    width: 20px;
+    margin-right: 10px;
+  }
+  
+  .dropdown-divider {
+    border-top-color: rgba(135, 206, 250, 0.2);
+  }
+</style>
+
 <main class="container">
   
-  <div class="accordion" id="mainAccordion">
+  <!-- Elegant Hero Section -->
+  <div class="hero-section">
+    <h1 class="hero-title">🎵 Big Wave Dave's Music Box</h1>
+    <p class="hero-subtitle">Explore music, discover artists, and experience the cosmos</p>
+  </div>
+  
+  <div class="accordion premium-accordion" id="mainAccordion">
     
     <!-- Music Discovery Section -->
     <div class="card">
       <div class="card-header" id="headingMusic">
         <h2 class="mb-0">
           <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseMusic" aria-expanded="true" aria-controls="collapseMusic" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-music-note-beamed"></i> Music Discovery
+            <i class="bi-music-note-beamed"></i> Music Discovery <span class="section-count-badge">7</span>
             <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Explore, research, and discover music</small>
           </button>
         </h2>
@@ -440,7 +570,7 @@
       <div class="card-header" id="headingAI">
         <h2 class="mb-0">
           <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseAI" aria-expanded="false" aria-controls="collapseAI" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-robot"></i> AI & Voice
+            <i class="bi-robot"></i> AI & Voice <span class="section-count-badge">4</span>
             <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Smart assistants and AI-powered tools</small>
           </button>
         </h2>
@@ -483,7 +613,7 @@
       <div class="card-header" id="headingEntertainment">
         <h2 class="mb-0">
           <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseEntertainment" aria-expanded="false" aria-controls="collapseEntertainment" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-stars"></i> Entertainment
+            <i class="bi-stars"></i> Entertainment <span class="section-count-badge">6</span>
             <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Visuals, music player, and cosmic experiences</small>
           </button>
         </h2>
@@ -553,7 +683,7 @@
       <div class="card-header" id="headingNature">
         <h2 class="mb-0">
           <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseNature" aria-expanded="false" aria-controls="collapseNature" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-tree-fill"></i> Nature
+            <i class="bi-tree-fill"></i> Nature <span class="section-count-badge">2</span>
             <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Explore and identify trees with Smokey the Bear</small>
           </button>
         </h2>
@@ -620,6 +750,16 @@ window.addEventListener('DOMContentLoaded', () => {
   initVoiceWidget({
     position: 'bottom-right',
     theme: 'blue'
+  });
+  
+  // Sticky navbar scroll effect
+  const navbar = document.querySelector('.modern-navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
   });
 });
 </script>
