@@ -262,6 +262,7 @@
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       max-height: 150px;
       overflow: hidden;
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
 
     .ai-analysis-section:hover {
@@ -277,6 +278,9 @@
       border: 2px solid var(--forest-green) !important;
       box-shadow: 0 8px 30px rgba(76, 175, 80, 0.4), 0 0 0 4px rgba(76, 175, 80, 0.1) !important;
       animation: expandPulse 0.5s ease-out;
+      overflow-y: auto !important; /* Allow scrolling when expanded */
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+      cursor: default; /* Don't show pointer when expanded */
     }
 
     @keyframes expandPulse {

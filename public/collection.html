@@ -202,6 +202,7 @@
       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       max-height: 150px;
       overflow: hidden;
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
     
     .ai-analysis-section:hover {
@@ -217,6 +218,9 @@
       border: 2px solid #3498db !important;
       box-shadow: 0 8px 30px rgba(52, 152, 219, 0.4), 0 0 0 4px rgba(52, 152, 219, 0.1) !important;
       animation: expandPulse 0.5s ease-out;
+      overflow-y: auto !important; /* Allow scrolling when expanded */
+      -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+      cursor: default; /* Don't show pointer when expanded and scrollable */
     }
     
     @keyframes expandPulse {
@@ -1453,6 +1457,8 @@ function collapseAIAnalysis() {
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/dark-mode.js"></script>
+<script src="/quick-actions.js"></script>
 <script src="/voice-widget.js"></script>
 <script>
 // Initialize voice widget for collection

@@ -2209,6 +2209,11 @@ async function searchAlbums() {
   
   currentArtist = artist;
   
+  // Add to search history
+  if (typeof addToSearchHistory === 'function') {
+    addToSearchHistory(artist, 'artist');
+  }
+  
   // Show loading state
   document.getElementById('loadingState').style.display = 'block';
   document.getElementById('albumGrid').innerHTML = '';
@@ -2734,14 +2739,26 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/dark-mode.js"></script>
+<script src="/search-history.js"></script>
+<script src="/quick-actions.js"></script>
 <script src="/voice-widget.js"></script>
 <script>
-// Initialize voice widget for album discovery
+// Initialize voice widget and search history
 window.addEventListener('DOMContentLoaded', () => {
   initVoiceWidget({
     position: 'bottom-right',
     theme: 'blue'
   });
+  
+  // Initialize search history chips
+  if (typeof createSearchHistoryChips === 'function') {
+    createSearchHistoryChips('searchHistoryChips', (query) => {
+      document.getElementById('kgBand').value = query;
+      currentArtist = query;
+      searchAlbums();
+    });
+  }
 });
 </script>
 
