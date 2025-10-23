@@ -23,15 +23,15 @@ export const config = {
   databaseUrl: process.env.DATABASE_URL,
   
   // API Keys
-  openaiApiKey: process.env.OPENAI_API_KEY,
-  googleApiKey: process.env.GOOGLE_API_KEY,
+  openaiApiKey: (process.env.OPENAI_API_KEY || '').trim(),
+  googleApiKey: (process.env.GOOGLE_API_KEY || '').trim(),
   
   // Spotify OAuth
-  spotifyClientId: process.env.SPOTIFY_CLIENT_ID,
-  spotifyClientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-  spotifyRedirectUri: process.env.SPOTIFY_REDIRECT_URI,
+  spotifyClientId: (process.env.SPOTIFY_CLIENT_ID || '').trim(),
+  spotifyClientSecret: (process.env.SPOTIFY_CLIENT_SECRET || '').trim(),
+  spotifyRedirectUri: (process.env.SPOTIFY_REDIRECT_URI || '').trim(),
   
   // Audio Fingerprinting - Shazam API (via RapidAPI)
   // 500 requests/month FREE forever!
-  shazamApiKey: process.env.SHAZAM_API_KEY
+  shazamApiKey: (process.env.SHAZAM_API_KEY || '').trim()
 };

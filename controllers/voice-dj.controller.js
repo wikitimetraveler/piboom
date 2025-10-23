@@ -4,7 +4,7 @@ import { getUserConversationHistory } from '../services/langchain-memory.service
 import { getPool } from '../services/database.service.js';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: (process.env.OPENAI_API_KEY || '').trim(),
 });
 
 // Process voice DJ command with LangChain memory

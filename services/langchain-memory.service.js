@@ -157,7 +157,7 @@ export async function getConversationChain(userId, systemPrompt, sessionId = 'de
     modelName: "gpt-4o-mini",
     temperature: 0.8,
     maxTokens: 600,
-    openAIApiKey: process.env.OPENAI_API_KEY,
+    openAIApiKey: (process.env.OPENAI_API_KEY || '').trim(),
   });
 
   // Create conversation chain

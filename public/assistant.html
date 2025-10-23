@@ -752,6 +752,7 @@
         <option value="jane">🇻🇳 Jane - Vietnamese Cultural Bridge (50s-60s)</option>
         <option value="dave" selected>🧮 Dave - Mathematician & Concert Veteran (60s-80s)</option>
       </select>
+      <div id="assistantDescription" class="mt-2 small text-muted" style="font-style: italic;">Select an assistant to see their description</div>
     </div>
     
     <div class="btn-group btn-group-sm" role="group">
@@ -869,7 +870,6 @@ async function initVoice() {
       // Enable voice buttons
       document.getElementById('startVoiceBtn').disabled = false;
       document.getElementById('stopVoiceBtn').disabled = false;
-      document.getElementById('testVoiceBtn').disabled = false;
       document.getElementById('initVoiceBtn').disabled = true;
       
       // Make assistant speak the confirmation
