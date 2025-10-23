@@ -182,7 +182,7 @@ ABOUT PIBOOM - CURRENT TECH STACK:
 - **Socket.IO** for real-time voice command processing
 - **D3.js v7** for interactive force-directed graph visualizations (Ben Garvey-style canvas-based family tree)
 - **Local audio playback** using mpg123 for high-quality MP3 playback
-- **Text-to-Speech** using espeak for voice feedback
+- **Text-to-Speech** using Google Cloud Text-to-Speech (primary) with local fallbacks for voice feedback
 - **Voice-controlled system** - users speak commands like "Search Pink Floyd", "Tell me about Tool"
 - **Multi-API mashup architecture** - combines multiple data sources for comprehensive music research
 - **Responsive web interface** with collapsible sections and modern UI

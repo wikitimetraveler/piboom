@@ -5,6 +5,19 @@ const voiceService = new VoiceService();
 let isInitialized = false;
 let lastVoiceCommand = null;
 
+// Initialize voice service on startup
+(async () => {
+  try {
+    const initialized = await voiceService.init();
+    if (initialized) {
+      isInitialized = true;
+      console.log('✅ VoiceService initialized on startup');
+    }
+  } catch (error) {
+    console.error('❌ Error initializing VoiceService on startup:', error.message);
+  }
+})();
+
 // Execute voice commands with server-side actions
 async function executeVoiceCommand(command, io) {
   // Store the last command for fallback communication

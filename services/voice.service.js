@@ -3,6 +3,9 @@ import { run } from '../lib/exec.js';
 import { config } from '../config/index.js';
 import { SpeechClient } from '@google-cloud/speech';
 import textToSpeech from '@google-cloud/text-to-speech';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 let isListening = false;
 let recognitionProcess = null;
@@ -171,16 +174,40 @@ export class VoiceService {
     // TRY GOOGLE CLOUD TTS FIRST (best quality!)
     if (this.ttsClient) {
       try {
+        console.log('🎤 Attempting Google Cloud TTS...');
         const audioBase64 = await this.speakWithGoogle(text);
         if (audioBase64) {
-          // Success! Google TTS worked
-          return;
+          // Success! Google TTS worked - play it on Windows
+          console.log('✅ Google TTS succeeded');
+          if (this.isWindows) {
+            try {
+              // Save audio to temp file and play it with Windows media player
+              const tmpDir = os.tmpdir();
+              const audioPath = path.join(tmpDir, `tts_${Date.now()}.mp3`);
+              const buffer = Buffer.from(audioBase64, 'base64');
+              fs.writeFileSync(audioPath, buffer);
+              
+              // Play the audio file
+              spawn('powershell', ['-Command', `(New-Object System.Media.SoundPlayer "${audioPath}").PlaySync()`]);
+              console.log('🎵 Playing Google TTS audio...');
+              return;
+            } catch (playError) {
+              console.error('Error playing Google TTS audio:', playError);
+              // Continue to fallback if playback fails
+            }
+          } else {
+            // On Linux, could play with ffplay or other tool
+            console.log('🎵 Google TTS audio ready (Linux deployment)');
+            return;
+          }
         }
       } catch (error) {
+        console.error('❌ Google TTS error:', error.message);
         // Fall through to local TTS
       }
     }
     
+    console.log('⚠️  Falling back to local TTS');
     // Fallback to local TTS methods
     if (config.mode === 'pi') {
       if (this.isWindows) {
@@ -413,17 +440,18 @@ export class VoiceService {
   // Test TTS availability
   testTTSAvailability() {
     console.log('🎤 Testing TTS availability...');
+    console.log('🎤 PRIMARY: Google Cloud Text-to-Speech (best quality)');
     
     if (this.isWindows) {
-      console.log('🎤 Windows platform detected - will use PowerShell TTS');
+      console.log('🎤 FALLBACK: Windows PowerShell TTS');
     } else {
-      console.log('🎤 Linux platform detected - will try espeak');
+      console.log('🎤 FALLBACK: Linux espeak TTS');
       
       // Test if espeak is available
       const testEspeak = spawn('espeak', ['--version']);
       testEspeak.on('error', (error) => {
         console.log('🎤 espeak not available:', error.message);
-        console.log('🎤 Will use console fallback for TTS');
+        console.log('🎤 FALLBACK 2: Console logging only');
       });
       testEspeak.on('close', (code) => {
         if (code === 0) {
