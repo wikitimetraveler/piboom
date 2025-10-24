@@ -22,6 +22,12 @@ class VoiceWidget {
       console.warn('Voice recognition not supported in this browser');
       return;
     }
+    
+    // Skip voice recognition on Pi - just use server TTS
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      console.log('Voice recognition disabled on Pi. Server TTS is working!');
+      return;
+    }
 
     // Create the floating button
     this.createButton();
@@ -132,7 +138,7 @@ class VoiceWidget {
 
     this.recognition.onerror = (event) => {
       console.error('Voice recognition error:', event.error);
-      this.tooltip.textContent = 'Error - Try again';
+      this.tooltip.textContent = 'Voice not available on Pi';
       setTimeout(() => {
         this.tooltip.style.display = 'none';
       }, 2000);

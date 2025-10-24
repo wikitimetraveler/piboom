@@ -1662,6 +1662,13 @@ function initWebSpeechRecognition() {
     return false;
   }
   
+  // Skip voice recognition on Pi - just use server TTS
+  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    console.log('Voice recognition disabled on Pi. Server TTS is working!');
+    showVoiceNotification('Voice recognition disabled on Pi. Server TTS is working!', 'info');
+    return false;
+  }
+  
   // Create speech recognition instance
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   recognition = new SpeechRecognition();
