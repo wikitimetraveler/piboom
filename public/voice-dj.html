@@ -537,11 +537,8 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // Initialize speech recognition
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-    // Skip voice recognition on Pi - just use server TTS
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-      console.log('Voice recognition disabled on Pi. Server TTS is working!');
-      return;
-    }
+    // Enable voice recognition on Pi - use Web Speech API
+    console.log('🎤 Initializing voice recognition...');
     
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();

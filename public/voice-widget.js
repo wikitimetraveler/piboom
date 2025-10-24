@@ -145,7 +145,7 @@ class VoiceWidget {
 
     this.recognition.onerror = (event) => {
       console.error('Voice recognition error:', event.error);
-      this.tooltip.textContent = 'Voice not available on Pi';
+      this.tooltip.textContent = 'Voice error - try again';
       setTimeout(() => {
         this.tooltip.style.display = 'none';
       }, 2000);

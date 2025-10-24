@@ -35,6 +35,7 @@ export class VoiceService {
     this.isWindows = process.platform === 'win32';
     this.isSpeaking = false;
     this.speechTimeout = null;
+    this.recognitionInterval = null;
   }
 
   // Initialize voice recognition
@@ -93,21 +94,100 @@ export class VoiceService {
       this.recognitionStream = null;
     }
     
+    if (this.recognitionInterval) {
+      clearInterval(this.recognitionInterval);
+      this.recognitionInterval = null;
+    }
+    
     this.speak('🔇 Voice activation disabled. I\'ll stop listening now.');
   }
 
-  // Start voice recognition for Pi mode (simplified)
+  // Start voice recognition for Pi mode
   startPiModeRecognition() {
     console.log('Starting Pi mode voice recognition...');
     
-    // In Pi mode, we'll use a simple command processor
-    // The frontend Web Speech API will handle voice recognition
-    // This backend will process the commands and provide feedback
+    if (this.isWindows) {
+      console.log('⚠️ Pi mode voice recognition not available on Windows');
+      return;
+    }
+    
+    // Start continuous voice recognition using arecord and Google Speech API
+    this.startContinuousRecognition();
     
     console.log('✅ Pi mode voice recognition started');
+  }
+  
+  // Start continuous voice recognition on Pi
+  startContinuousRecognition() {
+    if (this.recognitionProcess) {
+      this.recognitionProcess.kill();
+    }
     
-    // Set up a simple command processor
-    this.startCommandProcessor();
+    const tempDir = os.tmpdir();
+    const audioFile = path.join(tempDir, `voice_${Date.now()}.wav`);
+    
+    // Record audio continuously and process it
+    this.recognitionProcess = spawn('arecord', [
+      '-D', 'plughw:1,0',  // Default microphone
+      '-f', 'S16_LE',       // 16-bit signed little-endian
+      '-c', '1',            // Mono
+      '-r', '16000',        // 16kHz sample rate (Google Speech API requirement)
+      '-t', 'wav',          // WAV format
+      audioFile
+    ]);
+    
+    // Process audio every 3 seconds
+    this.recognitionInterval = setInterval(async () => {
+      if (fs.existsSync(audioFile)) {
+        try {
+          const transcript = await this.processAudioFile(audioFile);
+          if (transcript && transcript.trim()) {
+            console.log('🎤 Pi voice input:', transcript);
+            this.processVoiceCommand(transcript);
+          }
+        } catch (error) {
+          console.error('Voice processing error:', error);
+        }
+        
+        // Clean up old audio file
+        if (fs.existsSync(audioFile)) {
+          fs.unlinkSync(audioFile);
+        }
+      }
+    }, 3000);
+  }
+  
+  // Process audio file with Google Speech API
+  async processAudioFile(audioFilePath) {
+    if (!this.speechClient) {
+      console.log('⚠️ Google Speech API not initialized');
+      return null;
+    }
+    
+    try {
+      const audioBytes = fs.readFileSync(audioFilePath).toString('base64');
+      
+      const request = {
+        audio: {
+          content: audioBytes,
+        },
+        config: {
+          encoding: 'LINEAR16',
+          sampleRateHertz: 16000,
+          languageCode: 'en-US',
+        },
+      };
+      
+      const [response] = await this.speechClient.recognize(request);
+      const transcription = response.results
+        .map(result => result.alternatives[0].transcript)
+        .join('\n');
+      
+      return transcription;
+    } catch (error) {
+      console.error('Speech recognition error:', error);
+      return null;
+    }
   }
 
   // Start command processor
