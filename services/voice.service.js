@@ -202,12 +202,11 @@ export class VoiceService {
           }
         }
       } catch (error) {
-        console.error('❌ Google TTS error:', error.message);
+        // Silently fall back to local TTS - don't show error for Pi deployments
+        console.log('⚠️  Google TTS not available, using local TTS');
         // Fall through to local TTS
       }
     }
-    
-    console.log('⚠️  Falling back to local TTS');
     // Fallback to local TTS methods
     if (config.mode === 'pi') {
       if (this.isWindows) {

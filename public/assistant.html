@@ -898,6 +898,12 @@ async function startVoice() {
       return;
     }
     
+    // Skip voice recognition on Pi - just use server TTS
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      addMessage('Voice recognition disabled on Pi. Server TTS is working!', 'assistant', 'informative');
+      return;
+    }
+    
     // Initialize speech recognition
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     recognition = new SpeechRecognition();
