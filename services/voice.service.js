@@ -196,9 +196,33 @@ export class VoiceService {
               // Continue to fallback if playback fails
             }
           } else {
-            // On Linux, could play with ffplay or other tool
-            console.log('🎵 Google TTS audio ready (Linux deployment)');
-            return;
+            // On Linux/Pi, play the audio file
+            try {
+              const tmpDir = os.tmpdir();
+              const audioPath = path.join(tmpDir, `tts_${Date.now()}.mp3`);
+              const buffer = Buffer.from(audioBase64, 'base64');
+              fs.writeFileSync(audioPath, buffer);
+              
+              // Play the audio file on Linux/Pi
+              const mpg123 = spawn('mpg123', ['-q', audioPath]);
+              mpg123.on('error', (error) => {
+                console.error('mpg123 not available, trying espeak fallback');
+                this.tryEspeakTTS(text);
+              });
+              mpg123.on('close', (code) => {
+                if (code === 0) {
+                  console.log('🎵 Google TTS audio played successfully');
+                } else {
+                  console.log('🎵 Google TTS audio playback failed, trying espeak fallback');
+                  this.tryEspeakTTS(text);
+                }
+              });
+              console.log('🎵 Playing Google TTS audio on Pi...');
+              return;
+            } catch (playError) {
+              console.error('Error playing Google TTS audio on Pi:', playError);
+              // Continue to fallback if playback fails
+            }
           }
         }
       } catch (error) {

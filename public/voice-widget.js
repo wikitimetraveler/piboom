@@ -23,8 +23,15 @@ class VoiceWidget {
       return;
     }
     
-    // Skip voice recognition on Pi - just use server TTS
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    // Skip voice recognition on Pi - detect by hostname or user agent
+    const isPi = (window.location.hostname !== 'localhost' && 
+                  window.location.hostname !== '127.0.0.1' &&
+                  !window.location.hostname.includes('localhost')) ||
+                 navigator.userAgent.includes('Raspberry Pi') ||
+                 window.location.hostname.includes('192.168.') ||
+                 window.location.hostname.includes('10.0.');
+    
+    if (isPi) {
       console.log('Voice recognition disabled on Pi. Server TTS is working!');
       return;
     }
