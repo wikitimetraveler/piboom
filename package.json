@@ -24,6 +24,7 @@
     "@langchain/core": "^0.3.78",
     "@langchain/openai": "^0.6.15",
     "axios": "^1.6.0",
+    "cheerio": "^1.1.2",
     "dotenv": "^16.4.5",
     "espeak": "^0.0.3",
     "express": "^4.19.2",

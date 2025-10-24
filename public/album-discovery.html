@@ -2470,12 +2470,18 @@ async function searchYouTubeForAlbum(artist, album) {
     });
     
     const data = await response.json();
+    console.log('YouTube search response:', data);
     
     // Hide loading state
     document.getElementById('loadingState').style.display = 'none';
     
     if (data.videos && data.videos.length > 0) {
+      console.log('Found', data.videos.length, 'YouTube videos');
       displayYouTubeResults(data.videos);
+    } else {
+      console.log('No YouTube videos found or empty response');
+      document.getElementById('youtubeResults').innerHTML = '<div class="text-muted">No YouTube videos found for this album.</div>';
+      document.getElementById('youtubeResults').style.display = 'block';
     }
     
   } catch (error) {

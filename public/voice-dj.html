@@ -785,9 +785,13 @@ async function searchYouTubeForResults(data) {
     });
     
     const youtubeData = await response.json();
+    console.log('YouTube search response:', youtubeData);
     
     if (youtubeData.success && youtubeData.videos && youtubeData.videos.length > 0) {
+      console.log('Found', youtubeData.videos.length, 'YouTube videos');
       displayYouTubeVideos(youtubeData.videos);
+    } else {
+      console.log('No YouTube videos found or empty response');
     }
   } catch (error) {
     console.error('Error searching YouTube:', error);

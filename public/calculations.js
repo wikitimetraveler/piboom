@@ -117,8 +117,7 @@ class calculations {
 
     // Set the result based on the date comparison
     result.value = isBeforeComparisonDate ? .0100 : .0175;
-}
-
   }
+}
 
 

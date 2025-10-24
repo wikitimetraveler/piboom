@@ -451,7 +451,7 @@
         // =========================
         // Google TTS (ATTS) Integration
         // =========================
-        let currentAudio = null;
+        let currentTTSAudio = null;
 
         async function testGoogleTTS(textOverride = null) {
             const text = textOverride || document.getElementById('ttsInput').value.trim();
@@ -473,9 +473,9 @@
 
             try {
                 // Stop any currently playing audio
-                if (currentAudio) {
-                    currentAudio.pause();
-                    currentAudio = null;
+                if (currentTTSAudio) {
+                    currentTTSAudio.pause();
+                    currentTTSAudio = null;
                 }
 
                 // Call Google TTS via scripts.js if available
@@ -549,9 +549,9 @@
             console.log('🛑 Stopping all speech');
             
             // Stop Google TTS audio
-            if (currentAudio) {
-                currentAudio.pause();
-                currentAudio = null;
+            if (currentTTSAudio) {
+                currentTTSAudio.pause();
+                currentTTSAudio = null;
             }
 
             // Stop browser speech synthesis
@@ -597,44 +597,59 @@
         // =========================
         // Calculations Class Init
         // =========================
-        // Initialize the calculations class with configuration
-        const calc = new calculations({
-            groups: [
-                {
-                    inputIds: ['sum-input1', 'sum-input2', 'sum-input3'],
-                    resultId: 'sum-result',
-                    calculation: 'sumInputs'
-                },
-                {
-                    inputIds: ['subtract-input1', 'subtract-input2', 'subtract-input3'],
-                    resultId: 'subtract-result',
-                    calculation: 'subtractInputs'
-                },
-                {
-                    inputIds: ['truncate-input1', 'truncate-input2', 'truncate-input3'],
-                    resultId: 'truncate-result',
-                    calculation: 'truncateAndSumInputs'
-                },
-                {
-                    inputIds: ['min-input1', 'min-input2', 'min-input3'],
-                    resultId: 'min-result',
-                    calculation: 'minInputs'
-                },
-                {
-                    inputIds: ['ufmp-input1', 'ufmp-input2'],
-                    resultId: 'ufmp-result',
-                    calculation: 'maxUFMPamount'
-                },
-                {
-                    inputIds: ['ufmip-input1'],
-                    resultId: 'ufmip-result',
-                    calculation: 'newUfmipFactor'
-                }
-            ]
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the calculations class with configuration
+            console.log('Initializing calculations...');
+            console.log('calculations class available:', typeof calculations);
+            
+            if (typeof calculations === 'undefined') {
+                console.error('calculations class not found! Check if calculations.js is loaded properly.');
+                return;
+            }
+            
+            const calc = new calculations({
+                groups: [
+                    {
+                        inputIds: ['sum-input1', 'sum-input2', 'sum-input3'],
+                        resultId: 'sum-result',
+                        calculation: 'sumInputs'
+                    },
+                    {
+                        inputIds: ['subtract-input1', 'subtract-input2', 'subtract-input3'],
+                        resultId: 'subtract-result',
+                        calculation: 'subtractInputs'
+                    },
+                    {
+                        inputIds: ['truncate-input1', 'truncate-input2', 'truncate-input3'],
+                        resultId: 'truncate-result',
+                        calculation: 'truncateAndSumInputs'
+                    },
+                    {
+                        inputIds: ['min-input1', 'min-input2', 'min-input3'],
+                        resultId: 'min-result',
+                        calculation: 'minInputs'
+                    },
+                    {
+                        inputIds: ['ufmp-input1', 'ufmp-input2'],
+                        resultId: 'ufmp-result',
+                        calculation: 'maxUFMPamount'
+                    },
+                    {
+                        inputIds: ['ufmip-input1'],
+                        resultId: 'ufmip-result',
+                        calculation: 'newUfmipFactor'
+                    }
+                ]
+            });
 
-        // Trigger initial calculations
-        calc.recalculateAll();
+            // Trigger initial calculations
+            try {
+                calc.recalculateAll();
+                console.log('Calculations initialized successfully');
+            } catch (error) {
+                console.error('Error initializing calculations:', error);
+            }
+        });
     </script>
 </body>
 </html>

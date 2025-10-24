@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encompass AI Assistant - piBoom</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+    <link rel="stylesheet" href="/styles.css"/>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            max-width: 1200px;
+            overflow: hidden;
+            min-height: 80vh;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 22px;
+            margin-bottom: 3px;
+            font-weight: 600;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .message-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+        }
+
+        .btn-send {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+
+        .btn-send:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+
+        .btn-voice {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(40,167,69,0.3);
+        }
+
+        .btn-voice:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+        }
+
+        .btn-voice.listening {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 15px rgba(220,53,69,0.3); }
+            50% { box-shadow: 0 4px 25px rgba(220,53,69,0.6); }
+            100% { box-shadow: 0 4px 15px rgba(220,53,69,0.3); }
+        }
+
+        .chat-body {
+            display: flex;
+            height: 60vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            min-height: 400px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .ai-message {
+            background: white;
+            border: 1px solid #e9ecef;
+            margin-right: auto;
+        }
+
+        .quick-action {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            text-decoration: none;
+            color: #495057;
+            transition: all 0.3s;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .quick-action:hover {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            margin-right: auto;
+            max-width: 80%;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #007bff;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .welcome-accordion {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .accordion-header:hover {
+            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+        }
+
+        .accordion-icon {
+            transition: transform 0.3s;
+        }
+
+        .accordion-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            padding: 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .accordion-content.expanded {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .accordion-content ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .accordion-content li {
+            margin: 5px 0;
+            color: #495057;
+        }
+
+        /* Smooth scrolling for accordion content */
+        .accordion-content {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom scrollbar for accordion content */
+        .accordion-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .accordion-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .accordion-content::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .accordion-content::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Navigation Styles */
+        .modern-navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(135, 206, 250, 0.2);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+        }
+        
+        .navbar-brand-modern {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-user-btn {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 25px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-user-btn:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        .footer-content {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .footer-quote {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar navbar-expand-lg navbar-light modern-navbar">
+        <div class="container">
+            <a class="navbar-brand navbar-brand-modern" href="/"><i class="bi-bank mr-2"></i>Encompass AI Assistant</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div id="nav" class="collapse navbar-collapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link nav-user-btn" href="#" id="navUserBtn" onclick="showLoginPopup(); return false;">
+                            <i class="bi-person-circle"></i> <span id="navUserName">Login</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/assistant.html"><i class="bi-chat-dots"></i> Levi Assistant</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/voice-dj.html"><i class="bi-mic"></i> Wolfman Dave</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1><i class="bi-bank"></i> Encompass AI Assistant</h1>
+                <p>Your expert guide to Encompass Developer Connect APIs</p>
+            </div>
+            
+            <!-- Input Section -->
+            <div class="input-section">
+                <div class="input-group">
+                    <input type="text" class="message-input" id="messageInput" placeholder="Ask about Encompass APIs, authentication, workflows..." onkeypress="handleKeyPress(event)">
+                    <button class="btn-voice" id="voiceButton" onclick="toggleVoiceRecognition()" title="Voice Input">
+                        <i class="bi-mic" id="voiceIcon"></i>
+                    </button>
+                    <button class="btn-send" id="sendButton" onclick="sendMessage()">
+                        <i class="bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chat-body">
+                <div class="sidebar">
+                    <h4 class="section-title">🚀 Quick Actions</h4>
+                    <button class="quick-action" data-question="How do I authenticate with the Encompass API?">
+                        <i class="bi-shield-lock"></i> Authentication Help
+                    </button>
+                    <button class="quick-action" data-question="What are the main loan manufacturing workflows?">
+                        <i class="bi-gear"></i> Loan Manufacturing
+                    </button>
+                    <button class="quick-action" data-question="How do I set up webhooks?">
+                        <i class="bi-link-45deg"></i> Webhooks Setup
+                    </button>
+                    <button class="quick-action" data-question="What is TPO Connect?">
+                        <i class="bi-people"></i> TPO Connect
+                    </button>
+                    <button class="quick-action" data-question="How do I handle compliance requirements?">
+                        <i class="bi-check-circle"></i> Compliance
+                    </button>
+                    <button class="quick-action" data-question="What are the best practices for API usage?">
+                        <i class="bi-lightbulb"></i> Best Practices
+                    </button>
+                </div>
+
+                <div class="chat-main">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="welcome-accordion">
+                            <div class="accordion-header" onclick="toggleWelcomeAccordion()">
+                                <i class="bi-bank"></i> Welcome to Encompass AI Assistant
+                                <i class="bi-chevron-down accordion-icon rotated" id="welcomeIcon"></i>
+                            </div>
+                            <div class="accordion-content expanded" id="welcomeContent">
+                                <p>Hello! I'm your AI assistant for Encompass Developer Connect documentation. I can help you with:</p>
+                                <ul>
+                                    <li>API authentication and setup</li>
+                                    <li>Loan manufacturing workflows</li>
+                                    <li>Webhook configuration</li>
+                                    <li>Compliance requirements</li>
+                                    <li>Best practices and troubleshooting</li>
+                                </ul>
+                                <p><strong>What would you like to know about Encompass development?</strong></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Instructions Accordion at Bottom -->
+    <div class="container mt-4">
+        <div class="welcome-accordion">
+            <div class="accordion-header" onclick="toggleInstructionsAccordion()">
+                <i class="bi-info-circle"></i> How to Use This Assistant
+                <i class="bi-chevron-down accordion-icon rotated" id="instructionsIcon"></i>
+            </div>
+            <div class="accordion-content expanded" id="instructionsContent">
+                <div style="padding: 20px;">
+                    <h6><i class="bi-chat-dots"></i> Getting Started</h6>
+                    <ul>
+                        <li><strong>Ask specific questions:</strong> "How do I authenticate with OAuth2?"</li>
+                        <li><strong>Request examples:</strong> "Show me a loan creation API call"</li>
+                        <li><strong>Get workflow help:</strong> "Walk me through the loan manufacturing process"</li>
+                    </ul>
+                    
+                    <h6><i class="bi-mic"></i> Voice Commands</h6>
+                    <ul>
+                        <li>Click the microphone button to speak your question</li>
+                        <li>Speak clearly and naturally</li>
+                        <li>Use phrases like "How do I..." or "Show me..."</li>
+                    </ul>
+
+                    <h6><i class="bi-lightning"></i> Quick Actions</h6>
+                    <ul>
+                        <li>Use the sidebar buttons for common topics</li>
+                        <li>Import Postman collection for hands-on testing</li>
+                        <li>Check documentation status for latest updates</li>
+                    </ul>
+
+                    <h6><i class="bi-database"></i> Available Data Sources</h6>
+                    <ul>
+                        <li><strong>Encompass Developer Connect</strong> - Official API documentation</li>
+                        <li><strong>Postman Collections</strong> - Ready-to-use API examples</li>
+                        <li><strong>Knowledge Articles</strong> - Community solutions</li>
+                        <li><strong>Use Case Matrix</strong> - Real-world scenarios</li>
+                        <li><strong>API Reference Guides</strong> - Complete endpoint docs</li>
+                    </ul>
+
+                    <h6><i class="bi-collection"></i> Available Collections</h6>
+                    <ul>
+                        <li>Authentication & OAuth 2.0</li>
+                        <li>Loan Manufacturing Workflows</li>
+                        <li>Loan Pipeline Management</li>
+                        <li>Product & Pricing APIs</li>
+                        <li>Compliance & Regulatory</li>
+                        <li>Document Management</li>
+                        <li>Webhooks & Events</li>
+                        <li>TPO Connect Integration</li>
+                        <li>Custom Forms & Tools</li>
+                        <li>Best Practices & Security</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container text-center">
+            <div class="footer-content">
+                <strong>David E Lane</strong> — Powered by Cursor AI — <span id="dt"></span> — All Rights Reserved
+            </div>
+            <div class="footer-quote mt-2" id="secretQuote" style="cursor: default; transition: all 0.3s ease;">
+                🍄 "Turn on, tune in, drop out" 🍄
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let chatHistory = [];
+        let isListening = false;
+        let recognition = null;
+
+        // Initialize voice recognition
+        function initVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    console.log('🎤 Voice recognition started');
+                    isListening = true;
+                    updateVoiceButton();
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    console.log('🎤 Voice input:', transcript);
+                    document.getElementById('messageInput').value = transcript;
+                    sendMessage();
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('🎤 Voice recognition error:', event.error);
+                    isListening = false;
+                    updateVoiceButton();
+                    
+                    if (event.error === 'not-allowed') {
+                        alert('Microphone access denied. Please allow microphone access to use voice input.');
+                    }
+                };
+
+                recognition.onend = function() {
+                    console.log('🎤 Voice recognition ended');
+                    isListening = false;
+                    updateVoiceButton();
+                };
+            } else {
+                console.log('🎤 Voice recognition not supported');
+                document.getElementById('voiceButton').style.display = 'none';
+            }
+        }
+
+        // Toggle voice recognition
+        function toggleVoiceRecognition() {
+            if (!recognition) {
+                alert('Voice recognition not supported in this browser.');
+                return;
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        // Update voice button appearance
+        function updateVoiceButton() {
+            const voiceButton = document.getElementById('voiceButton');
+            const voiceIcon = document.getElementById('voiceIcon');
+            
+            if (isListening) {
+                voiceButton.classList.add('listening');
+                voiceIcon.className = 'bi-mic-fill';
+                voiceButton.title = 'Stop listening...';
+            } else {
+                voiceButton.classList.remove('listening');
+                voiceIcon.className = 'bi-mic';
+                voiceButton.title = 'Voice Input';
+            }
+        }
+
+        // Ask a question
+        function askQuestion(question) {
+            document.getElementById('messageInput').value = question;
+            sendMessage();
+        }
+
+        // Make askQuestion available globally
+        window.askQuestion = askQuestion;
+
+        // Handle key press
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Clear input
+            input.value = '';
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Disable send button
+            const sendButton = document.getElementById('sendButton');
+            sendButton.disabled = true;
+
+            try {
+                const response = await fetch('/api/encompass/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        context: chatHistory
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Add AI response to chat
+                    addMessage(data.message, 'ai', data.context);
+                    
+                    // Update chat history
+                    chatHistory.push(message);
+                    chatHistory.push(data.message);
+                    
+                    // Keep only last 10 messages in context
+                    if (chatHistory.length > 20) {
+                        chatHistory = chatHistory.slice(-20);
+                    }
+                } else {
+                    addMessage(`Error: ${data.error}`, 'ai');
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                addMessage('Sorry, I encountered an error. Please try again.', 'ai');
+            } finally {
+                // Hide typing indicator and re-enable send button
+                hideTypingIndicator();
+                sendButton.disabled = false;
+            }
+        }
+
+        // Add message to chat
+        function addMessage(content, sender, context = null) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}-message`;
+            
+            let messageContent = `<strong>${sender === 'user' ? 'You' : '🏦 Encompass AI'}:</strong><br>${content}`;
+            
+            if (context && context.length > 0) {
+                messageContent += '<div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px; padding: 12px; margin-top: 10px; font-size: 13px; color: #1565c0;">';
+                messageContent += '<h5>📚 Sources:</h5><ul>';
+                context.forEach((source, index) => {
+                    messageContent += `<li>${source.title} (${source.category})</li>`;
+                });
+                messageContent += '</ul></div>';
+            }
+            
+            messageDiv.innerHTML = messageContent;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Show typing indicator
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'block';
+        }
+
+        // Hide typing indicator
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        // Toggle welcome accordion
+        function toggleWelcomeAccordion() {
+            const content = document.getElementById('welcomeContent');
+            const icon = document.getElementById('welcomeIcon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+            }
+        }
+
+        // Toggle instructions accordion
+        function toggleInstructionsAccordion() {
+            const content = document.getElementById('instructionsContent');
+            const icon = document.getElementById('instructionsIcon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('rotated');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('rotated');
+            }
+        }
+
+        // Make functions globally available
+        window.toggleWelcomeAccordion = toggleWelcomeAccordion;
+        window.toggleInstructionsAccordion = toggleInstructionsAccordion;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initVoiceRecognition();
+            
+            // Update date
+            document.getElementById('dt').textContent = new Date().toLocaleDateString();
+            
+            // Focus at top of page
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+            
+            // Sticky navbar scroll effect
+            const navbar = document.querySelector('.modern-navbar');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+            
+            // Add event listeners to quick action buttons
+            document.querySelectorAll('.quick-action').forEach(button => {
+                button.addEventListener('click', function() {
+                    const question = this.getAttribute('data-question');
+                    if (question) {
+                        askQuestion(question);
+                    }
+                });
+            });
+        });
+
+        // Ensure page is at top when fully loaded
+        window.addEventListener('load', function() {
+            window.scrollTo(0, 0);
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        });
+    </script>
+
+    <script src="/user-login.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

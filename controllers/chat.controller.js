@@ -837,9 +837,11 @@ export async function searchYouTubeVideos(req, res) {
     
   } catch (error) {
     console.error('YouTube search error:', error);
+    console.error('Error details:', error.response?.data || error.message);
     res.status(500).json({ 
       success: false, 
-      message: 'Failed to search YouTube videos' 
+      message: 'Failed to search YouTube videos',
+      error: error.message
     });
   }
 }
