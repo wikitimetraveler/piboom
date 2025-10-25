@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>The History of the Blues: A Geographic Journey</name>
+    <description>Tracing the blues from Mississippi Delta cotton fields through the Great Migration to Chicago, Memphis, and beyond - chronologically organized</description>
+    
+    <Style id="bluesIcon">
+      <IconStyle>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/ltblu-circle.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+    </Style>
+
+    <!-- 1900: Origins -->
+    <Placemark>
+      <name>The Mississippi Delta - Where the Blues Was Born</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1890s-1920s<br/>
+          <b>Location:</b> Mississippi Delta Region<br/>
+          <b>Significance:</b> "The land where the blues began." The alluvial plain between Memphis and Vicksburg, bounded by the Mississippi and Yazoo rivers. Cotton plantations where African-Americans developed the blues from work songs, field hollers, spirituals, and African musical traditions. The most fertile ground in blues history.<br/>
+          <b>Origins:</b> Work songs, field hollers, African traditions<br/>
+          <b>Quote:</b> "The Delta blues is the original blues" - Muddy Waters
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.7243,33.7050,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1900</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1909: W.C. Handy and Memphis -->
+    <Placemark>
+      <name>Beale Street - Home of the Blues</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1900s-present<br/>
+          <b>Location:</b> Beale Street, Memphis, Tennessee<br/>
+          <b>Significance:</b> "Where the blues began" according to the sign. Memphis was the first city north of the Delta. Beale Street clubs hosted W.C. Handy (Father of the Blues), B.B. King started here, Muddy Waters and Howlin' Wolf passed through on their way to Chicago. The transition point from country Delta blues to city blues.<br/>
+          <b>Artists:</b> W.C. Handy, B.B. King, Howlin' Wolf, Bobby "Blue" Bland<br/>
+          <b>Status:</b> Still active music district
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.0489,35.1397,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1909</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1910: Dockery Farms -->
+    <Placemark>
+      <name>Dockery Farms - Birthplace of the Delta Blues</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1895-1940s<br/>
+          <b>Location:</b> Dockery, Mississippi (near Cleveland)<br/>
+          <b>Significance:</b> The cotton plantation where Charley Patton, the "Father of Delta Blues," worked and developed his sound. Robert Johnson, Howlin' Wolf, and many others passed through here. The cradle of Delta blues. A sign here reads: "Dockery Farms: Where the Blues Began." The commissary and buildings still stand as a museum.<br/>
+          <b>Artists:</b> Charley Patton (1891-1934), Howlin' Wolf, Willie Brown<br/>
+          <b>Status:</b> Now a historic site and museum
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.7837,33.7703,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1910</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1911: Robert Johnson Birth -->
+    <Placemark>
+      <name>Robert Johnson's Birthplace</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> May 8, 1911<br/>
+          <b>Location:</b> Hazlehurst, Mississippi<br/>
+          <b>Significance:</b> Birthplace of the "King of the Delta Blues." Robert Johnson (1911-1938) recorded only 29 songs but influenced rock and roll more than almost anyone. His guitar technique was so advanced that the "crossroads deal" legend grew. Eric Clapton, Keith Richards, Led Zeppelin all cite him as primary influence.<br/>
+          <b>Legacy:</b> 29 songs that changed music history<br/>
+          <b>Quote:</b> "Robert Johnson changed my life" - Eric Clapton
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.3968,31.8640,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1911-05-08</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1912: W.C. Handy -->
+    <Placemark>
+      <name>W.C. Handy House Museum</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> 352 Beale Street, Memphis<br/>
+          <b>Significance:</b> W.C. Handy (1873-1958) called "Father of the Blues" because he was first to publish blues compositions. Wrote "Memphis Blues" (1912), "St. Louis Blues" (1914), and "Beale Street Blues." His house is now a museum. He codified and popularized the blues, bringing it from oral tradition to written music.<br/>
+          <b>Compositions:</b> "St. Louis Blues," "Memphis Blues," "Beale Street Blues"<br/>
+          <b>Legacy:</b> Made blues respectable and commercial
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.0496,35.1398,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1912</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1930: The Crossroads -->
+    <Placemark>
+      <name>The Crossroads - Highway 61 & 49</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> Clarksdale, Mississippi<br/>
+          <b>Significance:</b> The mythical crossroads where Robert Johnson allegedly sold his soul to the devil in exchange for mastery of the guitar. Whether myth or reality, this intersection became the spiritual heart of the blues. Highway 61 runs from New Orleans to Minnesota. Highway 49 crosses the Delta. The crossroads of blues mythology.<br/>
+          <b>Legend:</b> Robert Johnson's devil deal<br/>
+          <b>Reality:</b> Actually multiple intersections claimed, but this one is the most famous<br/>
+          <b>Symbol:</b> Giant blue guitars mark the spot today
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.5711,34.2001,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1930</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1931: Skip James - Bentonia -->
+    <Placemark>
+      <name>Bentonia - Home of Bentonia Blues</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> Bentonia, Mississippi<br/>
+          <b>Significance:</b> Small town that developed its own blues style. Skip James (1902-1969) pioneered the "Bentonia blues" - haunting, minor-key style with unique open tunings. His song "Devil Got My Woman" influenced generations. Jack Owens continued the tradition. A distinct substyle of Delta blues from one small town.<br/>
+          <b>Artist:</b> Skip James - "Devil Got My Woman," "I'm So Glad"<br/>
+          <b>Sound:</b> Minor key, open tunings, eerie atmosphere
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.3312,32.6493,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1931</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1935: Piedmont Blues -->
+    <Placemark>
+      <name>Piedmont Blues Region - Durham, NC</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1920s-1940s<br/>
+          <b>Location:</b> North Carolina/Virginia Piedmont Region<br/>
+          <b>Significance:</b> East Coast blues developed differently from Delta blues. Blind Boy Fuller, Reverend Gary Davis, Brownie McGhee pioneered "Piedmont blues" - ragtime-influenced, fingerpicking style. Lighter, more melodic than Delta blues. Durham was the center. Different migration pattern - many stayed in the South or moved to East Coast cities.<br/>
+          <b>Style:</b> Fingerpicking, ragtime influence, melodic<br/>
+          <b>Artists:</b> Blind Boy Fuller, Reverend Gary Davis, Brownie McGhee
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-78.8986,35.9940,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1935</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1938: Robert Johnson Death -->
+    <Placemark>
+      <name>Three Forks Store - Robert Johnson's Death</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 16, 1938<br/>
+          <b>Location:</b> Three Forks (near Greenwood), Mississippi<br/>
+          <b>Significance:</b> Where Robert Johnson was allegedly poisoned by a jealous husband. He died at age 27. The juke joint where he performed his final show. One of three potential death sites claimed. His death added to his mythology. Member of the "27 Club" before it had a name.<br/>
+          <b>Circumstances:</b> Allegedly poisoned whiskey at a dance<br/>
+          <b>Age:</b> 27 years old
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.1809,33.5162,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1938-08-16</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1941: Muddy Waters Recording -->
+    <Placemark>
+      <name>Muddy Waters' Cabin - Stovall Plantation</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1915-1943<br/>
+          <b>Location:</b> Stovall Plantation, near Clarksdale, Mississippi<br/>
+          <b>Significance:</b> Where McKinley Morganfield (Muddy Waters) was raised by his grandmother. Alan Lomax recorded him here in 1941-1942 for the Library of Congress. These field recordings captured the pure Delta blues before electrification. The cabin was later moved to the Delta Blues Museum.<br/>
+          <b>Artist:</b> Muddy Waters (1913-1983)<br/>
+          <b>Historic Recording:</b> Library of Congress field recordings (1941)<br/>
+          <b>Status:</b> Cabin now at Delta Blues Museum
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.5434,34.1923,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1941</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1941: King Biscuit Time -->
+    <Placemark>
+      <name>Helena, Arkansas - King Biscuit Time</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1941-present<br/>
+          <b>Location:</b> Helena, Arkansas (on the Mississippi River)<br/>
+          <b>Significance:</b> Home of "King Biscuit Time," the longest-running daily radio show in history (1941-present). Hosted by Sonny Boy Williamson II (Rice Miller). The 15-minute daily blues show reached across the Delta and beyond, spreading the blues. Helena became a blues center rivaling Clarksdale.<br/>
+          <b>Radio:</b> KFFA 1360 AM - still broadcasts King Biscuit Time<br/>
+          <b>Festival:</b> Annual King Biscuit Blues Festival
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.5918,34.5295,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1941-11-21</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1943: Great Migration -->
+    <Placemark>
+      <name>The Great Migration - Highway 61 & Illinois Central Railroad</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1910-1970<br/>
+          <b>Route:</b> Mississippi Delta to Chicago, Detroit, St. Louis<br/>
+          <b>Significance:</b> Six million African Americans left the South for northern cities between 1910-1970. They carried the blues with them. Highway 61 and the Illinois Central Railroad were the main routes. Muddy Waters took the train to Chicago in 1943. The Great Migration transformed American culture and music, taking the blues north and electrifying it.<br/>
+          <b>Impact:</b> Delta blues became Chicago blues, then rock 'n' roll<br/>
+          <b>Route:</b> Mississippi → Memphis → St. Louis → Chicago
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-89.6501,35.9963,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1943</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1943: Chicago Arrival -->
+    <Placemark>
+      <name>Chicago Union Station - Gateway to the North</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> 225 South Canal Street, Chicago<br/>
+          <b>Significance:</b> Where thousands of blues musicians arrived from the South. The Illinois Central Railroad deposited them at Central Station (demolished), but Union Station symbolizes their arrival. Muddy Waters arrived in 1943 with $11 and a guitar. They brought acoustic Delta blues and transformed it into amplified Chicago blues.<br/>
+          <b>Arrivals:</b> Muddy Waters (1943), Howlin' Wolf (1954), and thousands more<br/>
+          <b>Transformation:</b> Acoustic becomes electric
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6398,41.8789,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1943</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1948: Maxwell Street -->
+    <Placemark>
+      <name>Maxwell Street Market - Chicago Blues Incubator</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1920s-1990s<br/>
+          <b>Location:</b> Maxwell Street, Chicago (South Side)<br/>
+          <b>Significance:</b> Open-air market where blues musicians busked on Sundays. Muddy Waters, Little Walter, Howlin' Wolf, Jimmy Rogers all played on street corners for tips. The laboratory where Delta blues met electricity. The amplified harmonica sound was pioneered here. The market was displaced by UIC campus expansion, but the legend lives on.<br/>
+          <b>Sound:</b> Electric blues, amplified harmonica, urban sound<br/>
+          <b>Status:</b> Historical site, market relocated
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6507,41.8645,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1948</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1948: John Lee Hooker Detroit -->
+    <Placemark>
+      <name>John Lee Hooker's Detroit</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1943-1970s<br/>
+          <b>Location:</b> Detroit, Michigan<br/>
+          <b>Significance:</b> John Lee Hooker (1917-2001) moved to Detroit in 1943. Worked at Ford by day, played blues clubs at night. His boogie style and hypnotic groove influenced rock and roll. "Boogie Chillen" (1948) was a massive hit. Detroit blues was grittier than Chicago. Hooker's one-chord grooves influenced rock guitarists worldwide.<br/>
+          <b>Style:</b> Boogie blues, one-chord grooves, hypnotic rhythms<br/>
+          <b>Hit:</b> "Boogie Chillen" (1948), "Boom Boom" (1962)
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-83.0458,42.3314,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1948</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1950: Texas Blues -->
+    <Placemark>
+      <name>Houston - Texas Blues Capital</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1940s-1960s<br/>
+          <b>Location:</b> Houston, Texas<br/>
+          <b>Significance:</b> Texas blues developed its own sound. Lightnin' Hopkins, T-Bone Walker, Albert Collins, Freddie King, Johnny Winter all from Texas. Texas blues guitar style is more rock-influenced - cleaner tone, jazzy chords, more single-note runs. Third Ward Houston was blues center. Influenced rock guitar more than any other regional style.<br/>
+          <b>Style:</b> Guitar-focused, jazzy, rock-influenced<br/>
+          <b>Artists:</b> T-Bone Walker (invented electric blues guitar), Lightnin' Hopkins, Albert Collins
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-95.3698,29.7604,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1950</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1951: Sun Studio -->
+    <Placemark>
+      <name>Sun Studio Memphis - Blues Goes Electric</name>
+      <description>
+        <![CDATA[
+          <b>Founded:</b> 1950<br/>
+          <b>Location:</b> 706 Union Avenue, Memphis<br/>
+          <b>Significance:</b> Sam Phillips recorded blues artists before discovering Elvis. Howlin' Wolf, B.B. King, Ike Turner, Junior Parker all recorded here. "Rocket 88" by Jackie Brenston (1951) recorded here - often called the first rock 'n' roll record. Where blues transformed into rock 'n' roll. Phillips famously said "If I could find a white man with the Negro sound..."<br/>
+          <b>Blues Artists:</b> Howlin' Wolf, B.B. King, Junior Parker, Ike Turner<br/>
+          <b>Transition:</b> Blues to rock 'n' roll
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.0253,35.1398,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1951</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1957: Chess Records -->
+    <Placemark>
+      <name>Chess Records - The Sound of Chicago Blues</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1950-1975<br/>
+          <b>Location:</b> 2120 South Michigan Avenue, Chicago<br/>
+          <b>Significance:</b> The most important blues label in history. Leonard and Phil Chess recorded Muddy Waters, Howlin' Wolf, Willie Dixon, Little Walter, Sonny Boy Williamson II, Chuck Berry, Etta James, Bo Diddley. The building where Chicago blues was defined. Muddy Waters' "Mannish Boy," "Hoochie Coochie Man," Wolf's "Smokestack Lightning" - all recorded here.<br/>
+          <b>House Band:</b> Willie Dixon (bass), producer, songwriter<br/>
+          <b>Status:</b> Now Willie Dixon's Blues Heaven Foundation<br/>
+          <b>Visitors:</b> Rolling Stones recorded here (1964)
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6240,41.8532,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1957</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1960: Pepper's Lounge -->
+    <Placemark>
+      <name>Pepper's Lounge - West Side Sound</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1950s-1971<br/>
+          <b>Location:</b> 503 East 43rd Street, Chicago<br/>
+          <b>Significance:</b> Where the "West Side sound" developed. Otis Rush, Magic Sam, Buddy Guy pioneered more aggressive, guitar-focused blues here. Different from the Chess Records sound. Faster, more rock-influenced. The West Side sound influenced rock guitarists like Hendrix and Clapton more directly than traditional Chicago blues.<br/>
+          <b>Sound:</b> West Side blues - faster, more aggressive, guitar-focused<br/>
+          <b>Artists:</b> Magic Sam, Otis Rush, Buddy Guy
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6160,41.8170,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1960</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1960: St. Louis -->
+    <Placemark>
+      <name>St. Louis Blues District - Gaslight Square</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1960s<br/>
+          <b>Location:</b> St. Louis, Missouri<br/>
+          <b>Significance:</b> St. Louis was midpoint between Mississippi and Chicago. "St. Louis Blues" by W.C. Handy made the city synonymous with blues. Gaslight Square entertainment district hosted blues clubs in the 1960s. Henry Townsend, Lonnie Johnson were St. Louis legends. Different style - more piano-based than Chicago or Delta.<br/>
+          <b>Artists:</b> Henry Townsend, Lonnie Johnson<br/>
+          <b>Style:</b> Piano blues, more jazz-influenced
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.1994,38.6270,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1960</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1964: Newport Folk Festival -->
+    <Placemark>
+      <name>Newport Folk Festival - Blues Preservation</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1960s<br/>
+          <b>Location:</b> Newport, Rhode Island<br/>
+          <b>Significance:</b> Newport's blues programs in the 1960s introduced forgotten Delta blues artists to new audiences. Son House, Skip James, Mississippi John Hurt were "rediscovered" and performed at Newport. The folk revival led to blues revival. Young white audience discovered the original blues artists. Dylan went electric here (1965), connecting blues to rock.<br/>
+          <b>Rediscoveries:</b> Son House, Skip James, Mississippi John Hurt<br/>
+          <b>Impact:</b> Folk revival sparked blues revival
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-71.3128,41.4901,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1964</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1965: British Blues -->
+    <Placemark>
+      <name>London - British Blues Invasion Returns</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1962-1969<br/>
+          <b>Location:</b> London, England<br/>
+          <b>Significance:</b> British musicians worshipped American blues. Alexis Korner, John Mayall, Eric Clapton, Rolling Stones, Yardbirds, Cream, Fleetwood Mac, Led Zeppelin all started as blues bands. They learned from Chicago blues records and brought the blues back to America via "British Invasion." White British bands popularized black American blues to white American audiences. Ironic but true.<br/>
+          <b>Impact:</b> Blues returned to America via Britain<br/>
+          <b>Artists:</b> Eric Clapton, Rolling Stones, Led Zeppelin, Fleetwood Mac
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-0.1276,51.5074,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1965: Theresa's Lounge -->
+    <Placemark>
+      <name>Theresa's Lounge - South Side Blues Club</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1949-1983<br/>
+          <b>Location:</b> 4801 South Indiana Avenue, Chicago<br/>
+          <b>Significance:</b> Junior Wells held a 20+ year residency here. Small South Side club where Chicago blues was played for the community, not tourists. Muddy Waters, Buddy Guy, Magic Sam all played here. Theresa Needham ran the club for decades. Closed in 1983. Represented the authentic neighborhood blues club.<br/>
+          <b>Resident:</b> Junior Wells (20+ year residency)<br/>
+          <b>Style:</b> Neighborhood club, authentic Chicago blues
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6212,41.8075,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1967: Monterey Pop -->
+    <Placemark>
+      <name>Monterey Pop Festival - Blues Goes Mainstream</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 16-18, 1967<br/>
+          <b>Location:</b> Monterey, California<br/>
+          <b>Significance:</b> Otis Redding's legendary performance. Big Brother & the Holding Company (with Janis Joplin) sang blues. The Who destroyed instruments. Jimi Hendrix burned his guitar. The festival where blues-influenced rock exploded into mainstream. The hippie generation discovered the blues roots of rock 'n' roll.<br/>
+          <b>Impact:</b> Blues influence reached peak cultural visibility<br/>
+          <b>Film:</b> "Monterey Pop" documentary preserved it
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-121.8947,36.6002,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1967-06-16</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1968: Kingston Mines -->
+    <Placemark>
+      <name>Kingston Mines - Chicago Blues Institution</name>
+      <description>
+        <![CDATA[
+          <b>Opened:</b> 1968<br/>
+          <b>Location:</b> 2548 North Halsted Street, Chicago<br/>
+          <b>Significance:</b> One of Chicago's last remaining authentic blues clubs. Two stages with continuous music. Buddy Guy, Junior Wells, Koko Taylor all played here regularly. Open until 4am on weekends. Where locals and tourists alike experience Chicago blues. Still operating as premier blues venue.<br/>
+          <b>Format:</b> Two stages, continuous blues<br/>
+          <b>Status:</b> Still operating nightly
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6492,41.9273,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1968</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1969: Ann Arbor -->
+    <Placemark>
+      <name>Ann Arbor Blues Festival</name>
+      <description>
+        <![CDATA[
+          <b>Era:</b> 1969-1973<br/>
+          <b>Location:</b> Ann Arbor, Michigan<br/>
+          <b>Significance:</b> Major blues festival that brought blues to white rock audience. B.B. King, Muddy Waters, Howlin' Wolf, John Lee Hooker, Freddie King all performed. Young white audiences discovered the blues. The festival helped spark blues revival of 1960s-70s. Introduced blues to counterculture audience.<br/>
+          <b>Impact:</b> Blues crossed over to rock audience<br/>
+          <b>Attendance:</b> Tens of thousands
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-83.7430,42.2808,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1969</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1975: Antone's -->
+    <Placemark>
+      <name>Antone's - Austin's Home of the Blues</name>
+      <description>
+        <![CDATA[
+          <b>Opened:</b> 1975<br/>
+          <b>Location:</b> Austin, Texas (multiple locations over the years)<br/>
+          <b>Significance:</b> Clifford Antone brought Chicago blues to Texas. Muddy Waters, B.B. King, Albert King, Buddy Guy all played here. The Fabulous Thunderbirds, Stevie Ray Vaughan got their start here. Texas blues hub. Kept traditional blues alive while nurturing new generation. Still operating.<br/>
+          <b>Scene:</b> Texas blues - blending Chicago blues with Texas rock<br/>
+          <b>Artists:</b> Stevie Ray Vaughan, Fabulous Thunderbirds, Jimmie Vaughan
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-97.7431,30.2672,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1975</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1979: Delta Blues Museum -->
+    <Placemark>
+      <name>Delta Blues Museum</name>
+      <description>
+        <![CDATA[
+          <b>Founded:</b> 1979<br/>
+          <b>Location:</b> 1 Blues Alley, Clarksdale, Mississippi<br/>
+          <b>Significance:</b> The oldest music museum in Mississippi. Houses Muddy Waters' cabin, displays on Robert Johnson, John Lee Hooker, and Delta blues history. Located in the historic Clarksdale freight depot. Essential pilgrimage site for blues fans. Clarksdale is the heart of Delta blues tourism.<br/>
+          <b>Collection:</b> Muddy Waters' cabin, artifacts, recordings<br/>
+          <b>Status:</b> Active museum and cultural center
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.5711,34.2001,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1979</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1980: Blues Foundation -->
+    <Placemark>
+      <name>The Blues Foundation & Blues Hall of Fame</name>
+      <description>
+        <![CDATA[
+          <b>Founded:</b> 1980<br/>
+          <b>Location:</b> Memphis, Tennessee<br/>
+          <b>Significance:</b> Organization dedicated to preserving blues heritage. Presents Blues Music Awards (formerly W.C. Handy Awards). Maintains Blues Hall of Fame. Runs HART Fund for blues musicians in need. Keeps the Blues Trail markers program. Ensures the blues legacy is preserved and celebrated.<br/>
+          <b>Mission:</b> Blues preservation and education<br/>
+          <b>Programs:</b> Blues Music Awards, Blues Hall of Fame, Blues Trail Markers
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.0489,35.1397,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1980</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1989: Buddy Guy's Legends -->
+    <Placemark>
+      <name>Buddy Guy's Legends</name>
+      <description>
+        <![CDATA[
+          <b>Opened:</b> 1989<br/>
+          <b>Location:</b> 700 South Wabash Avenue, Chicago<br/>
+          <b>Significance:</b> Buddy Guy's own club in the South Loop. The last living link to Chess Records era. Buddy still performs regularly when not touring. Walls covered in blues history photos and memorabilia. Eric Clapton calls it his favorite club in the world. Where blues legends perform and the tradition continues.<br/>
+          <b>Owner:</b> Buddy Guy (b. 1936) - living blues legend<br/>
+          <b>Status:</b> Active premier blues venue<br/>
+          <b>Special:</b> Buddy Guy still performs here monthly
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6264,41.8722,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1989</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 2001: Ground Zero -->
+    <Placemark>
+      <name>Ground Zero Blues Club</name>
+      <description>
+        <![CDATA[
+          <b>Opened:</b> 2001<br/>
+          <b>Location:</b> 0 Blues Alley, Clarksdale, Mississippi<br/>
+          <b>Significance:</b> Modern juke joint co-owned by Morgan Freeman. Keeps the Delta blues tradition alive. Live blues nightly. Authentic Delta blues atmosphere in old cotton warehouse. Has become a required stop on the blues trail. Shows that the blues still lives in the Delta.<br/>
+          <b>Owner:</b> Morgan Freeman (co-owner)<br/>
+          <b>Style:</b> Modern juke joint preserving tradition
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.5705,34.2002,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>2001</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 2008: B.B. King Museum -->
+    <Placemark>
+      <name>B.B. King Museum - Indianola</name>
+      <description>
+        <![CDATA[
+          <b>Opened:</b> 2008<br/>
+          <b>Location:</b> Indianola, Mississippi<br/>
+          <b>Significance:</b> Museum dedicated to Riley B. King (1925-2015), "The King of the Blues." B.B. King grew up near Indianola and returned here often. Worked as a cotton picker and tractor driver before becoming the most famous blues artist in the world. His guitar "Lucille" became iconic.<br/>
+          <b>Artist:</b> B.B. King (1925-2015)<br/>
+          <b>Quote:</b> "The beautiful thing about learning is nobody can take it away from you" - B.B. King
+        ]]>
+      </description>
+      <styleUrl>#bluesIcon</styleUrl>
+      <Point>
+        <coordinates>-90.6495,33.4507,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>2008</when>
+      </TimeStamp>
+    </Placemark>
+
+  </Document>
+</kml>

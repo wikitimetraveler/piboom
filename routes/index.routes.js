@@ -17,6 +17,7 @@ import genealogyRoutes from './genealogy.routes.js';
 import audioFingerprintRoutes from './audio-fingerprint.routes.js';
 import sampleDetectionRoutes from './sample-detection.routes.js';
 import encompassAssistantRoutes from './encompass-assistant.routes.js';
+import kmlRoutes from './kml.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -37,6 +38,7 @@ export default function buildRoutes(io) {
   api.use('/audio-fingerprint', audioFingerprintRoutes);
   api.use('/sample-detection', sampleDetectionRoutes);
   api.use('/encompass', encompassAssistantRoutes);
+  api.use('/kml', kmlRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

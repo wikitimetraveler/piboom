@@ -1,0 +1,978 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>The Grateful Dead: Endless Tour (1965-1995)</name>
+    <description>Fifty iconic shows from the Grateful Dead's legendary 30-year touring history, featuring milestone performances, legendary venues, and historic moments</description>
+    
+    <Style id="deadIcon">
+      <IconStyle>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+    </Style>
+
+    <!-- 1965: The Beginning -->
+    <Placemark>
+      <name>First Public Show as Grateful Dead</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> December 4, 1965<br/>
+          <b>Venue:</b> Fillmore Auditorium, San Francisco, CA<br/>
+          <b>Significance:</b> First show under the name "Grateful Dead" (previously "The Warlocks"). Bill Graham's venue would become their spiritual home.<br/>
+          <b>Era:</b> Early Years
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.4331,37.7837,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965-12-04</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1966: Acid Tests -->
+    <Placemark>
+      <name>The Acid Test Graduation</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> October 31, 1966<br/>
+          <b>Venue:</b> Winterland Ballroom, San Francisco, CA<br/>
+          <b>Significance:</b> Final "Acid Test" organized by Ken Kesey and the Merry Pranksters. The Dead were the house band for these legendary psychedelic events.<br/>
+          <b>Era:</b> Acid Test Era
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.4244,37.7838,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1966-10-31</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1967: Human Be-In -->
+    <Placemark>
+      <name>Human Be-In - The Gathering of the Tribes</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> January 14, 1967<br/>
+          <b>Venue:</b> Golden Gate Park, San Francisco, CA<br/>
+          <b>Significance:</b> Legendary counterculture gathering with 30,000+ attendees. The Dead performed alongside Jefferson Airplane, featuring Timothy Leary's "Turn on, tune in, drop out."<br/>
+          <b>Era:</b> Summer of Love
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.4783,37.7694,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1967-01-14</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1969: Woodstock -->
+    <Placemark>
+      <name>Woodstock Music Festival</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 16, 1969<br/>
+          <b>Venue:</b> Bethel, New York<br/>
+          <b>Significance:</b> Iconic performance at Woodstock. Ironically, the band felt their set was poor due to technical issues, but it became part of rock history.<br/>
+          <b>Era:</b> Festival Era<br/>
+          <b>Attendance:</b> 400,000+
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-74.8794,41.7012,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1969-08-16</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1970: New Orleans -->
+    <Placemark>
+      <name>Warehouse Run - New Orleans</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> January 30, 1970<br/>
+          <b>Venue:</b> The Warehouse, New Orleans, LA<br/>
+          <b>Significance:</b> Beginning of legendary New Orleans shows. "Truckin'" lyrics reference these shows: "Busted, down on Bourbon Street."<br/>
+          <b>Era:</b> American Beauty Era
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-90.0715,29.9511,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1970-01-30</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1971: Fillmore East Final Shows -->
+    <Placemark>
+      <name>Fillmore East Closing Weekend</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 27, 1971<br/>
+          <b>Venue:</b> Fillmore East, New York, NY<br/>
+          <b>Significance:</b> Part of the final weekend at Bill Graham's legendary Fillmore East. Four night run documented on live albums.<br/>
+          <b>Era:</b> Fillmore Era
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9874,40.7282,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1971-06-27</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1972: Bickershaw Festival -->
+    <Placemark>
+      <name>Bickershaw Festival</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> May 7, 1972<br/>
+          <b>Venue:</b> Bickershaw, England<br/>
+          <b>Significance:</b> Part of legendary Europe '72 tour. The band played through rain for hours, cementing their reputation in Europe.<br/>
+          <b>Era:</b> Europe '72
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-2.6200,53.5300,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1972-05-07</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1972: Veneta Oregon -->
+    <Placemark>
+      <name>Sunshine Daydream - Veneta</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 27, 1972<br/>
+          <b>Venue:</b> Springfield Creamery Benefit, Veneta, OR<br/>
+          <b>Significance:</b> "Sunshine Daydream" - one of the most famous shows ever. Hot summer day, outdoor benefit, peak performance. Released as concert film.<br/>
+          <b>Era:</b> Golden Era<br/>
+          <b>Attendance:</b> 25,000
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-123.3456,44.0465,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1972-08-27</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1973: Watkins Glen -->
+    <Placemark>
+      <name>Watkins Glen Summer Jam</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> July 28, 1973<br/>
+          <b>Venue:</b> Watkins Glen International Raceway, NY<br/>
+          <b>Significance:</b> Largest rock concert attendance in history at the time. The Dead, Allman Brothers, and The Band. Estimated 600,000+ attendees.<br/>
+          <b>Era:</b> Festival Peak<br/>
+          <b>Attendance:</b> 600,000+
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-76.9275,42.3373,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1973-07-28</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1974: Winterland -->
+    <Placemark>
+      <name>Winterland - Wall of Sound Debut</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> March 23, 1974<br/>
+          <b>Venue:</b> Winterland, San Francisco, CA<br/>
+          <b>Significance:</b> Debut of the legendary "Wall of Sound" PA system - 641 speakers weighing 75 tons. Revolutionary concert sound.<br/>
+          <b>Era:</b> Wall of Sound Era
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.4244,37.7838,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1974-03-23</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1974: Final Show Before Hiatus -->
+    <Placemark>
+      <name>Last Show Before Retirement</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> October 20, 1974<br/>
+          <b>Venue:</b> Winterland, San Francisco, CA<br/>
+          <b>Significance:</b> Final show before 20-month hiatus. Filmed as "The Grateful Dead Movie." Five-set marathon performance.<br/>
+          <b>Era:</b> Wall of Sound Finale
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.4244,37.7838,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1974-10-20</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1976: Return Show -->
+    <Placemark>
+      <name>Return from Hiatus</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 3, 1976<br/>
+          <b>Venue:</b> Paramount Theatre, Portland, OR<br/>
+          <b>Significance:</b> First show after 20-month retirement. Smaller, more intimate than pre-hiatus stadium shows.<br/>
+          <b>Era:</b> The Return
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.6795,45.5152,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1976-06-03</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1977: Cornell -->
+    <Placemark>
+      <name>Barton Hall - "The Best Show Ever"</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> May 8, 1977<br/>
+          <b>Venue:</b> Barton Hall, Cornell University, Ithaca, NY<br/>
+          <b>Significance:</b> Widely considered the greatest Grateful Dead show ever. Perfect "Scarlet Begonias > Fire on the Mountain." The Betty Board tape is legendary.<br/>
+          <b>Era:</b> 1977 Peak Year<br/>
+          <b>Setlist Highlight:</b> Morning Dew encore
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-76.4833,42.4487,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1977-05-08</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1977: Englishtown -->
+    <Placemark>
+      <name>Englishtown Raceway Park</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> September 3, 1977<br/>
+          <b>Venue:</b> Old Bridge Township Raceway Park, Englishtown, NJ<br/>
+          <b>Significance:</b> Largest Grateful Dead concert ever - 150,000 fans. Featured Marshall Tucker Band and New Riders.<br/>
+          <b>Era:</b> 1977 Peak<br/>
+          <b>Attendance:</b> 150,000
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-74.3632,40.3164,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1977-09-03</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1978: Egypt -->
+    <Placemark>
+      <name>Sound and Light Theater - Great Pyramids</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> September 16, 1978<br/>
+          <b>Venue:</b> Great Pyramid of Giza, Egypt<br/>
+          <b>Significance:</b> Three nights at the Pyramids during lunar eclipse. One of the most mystical and legendary performances in rock history. "Rocking the Cradle."<br/>
+          <b>Era:</b> Egypt Adventure<br/>
+          <b>Special:</b> Performed during full lunar eclipse
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>31.1342,29.9792,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1978-09-16</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1978: Winterland Closing -->
+    <Placemark>
+      <name>Winterland Final Night - New Year's Eve</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> December 31, 1978<br/>
+          <b>Venue:</b> Winterland, San Francisco, CA<br/>
+          <b>Significance:</b> Bill Graham's final show at Winterland. Epic 5+ hour show. Breakfast served at dawn. Filmed as "The Closing of Winterland."<br/>
+          <b>Era:</b> End of an Era<br/>
+          <b>Special:</b> Blues Brothers, breakfast at sunrise
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.4244,37.7838,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1978-12-31</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1979: Hampton Coliseum -->
+    <Placemark>
+      <name>Hampton Coliseum - "The Hampton Box"</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> November 21, 1979<br/>
+          <b>Venue:</b> Hampton Coliseum, Hampton, VA<br/>
+          <b>Significance:</b> First of legendary Hampton shows. Perfect acoustics. This run released as complete box set.<br/>
+          <b>Era:</b> Comeback Year
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-76.2913,37.0299,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1979-11-21</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1980: Radio City -->
+    <Placemark>
+      <name>Radio City Music Hall Acoustic</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> October 31, 1980<br/>
+          <b>Venue:</b> Radio City Music Hall, New York, NY<br/>
+          <b>Significance:</b> Rare acoustic sets at legendary venue. Halloween show with 8 night run. Intimate performances in ornate setting.<br/>
+          <b>Era:</b> Acoustic Era
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9799,40.7600,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1980-10-31</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1982: Greek Theatre -->
+    <Placemark>
+      <name>Greek Theatre Berkeley - Summer Residency</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 28, 1982<br/>
+          <b>Venue:</b> Greek Theatre, Berkeley, CA<br/>
+          <b>Significance:</b> One of many legendary Greek Theatre shows. Perfect outdoor amphitheater became annual tradition. Jerry's local stomping ground.<br/>
+          <b>Era:</b> Greek Theatre Era
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.2553,37.8732,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1982-08-28</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1983: Santa Fe -->
+    <Placemark>
+      <name>Santa Fe Downs</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 17, 1983<br/>
+          <b>Venue:</b> Santa Fe Downs, Santa Fe, NM<br/>
+          <b>Significance:</b> Legendary outdoor show at horse racing track. Hot desert performance captured on tape.<br/>
+          <b>Era:</b> Mid-80s Tour
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-105.9378,35.6870,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1983-06-17</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1984: Berkeley Community Theatre -->
+    <Placemark>
+      <name>Berkeley Community Theatre</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> April 6, 1984<br/>
+          <b>Venue:</b> Berkeley Community Theatre, Berkeley, CA<br/>
+          <b>Significance:</b> Intimate venue for Bay Area fans. Part of four-night run. Hometown shows always special.<br/>
+          <b>Era:</b> Mid-80s Renaissance
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.2708,37.8688,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1984-04-06</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1985: Moscone Center -->
+    <Placemark>
+      <name>Moscone Center - 20th Anniversary</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> March 16, 1985<br/>
+          <b>Venue:</b> Moscone Center, San Francisco, CA<br/>
+          <b>Significance:</b> 20th anniversary celebration in San Francisco. Special hometown show marking two decades.<br/>
+          <b>Era:</b> Anniversary Tour
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.4000,37.7844,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1985-03-16</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1985: Merriweather Post -->
+    <Placemark>
+      <name>Merriweather Post Pavilion</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 30, 1985<br/>
+          <b>Venue:</b> Merriweather Post Pavilion, Columbia, MD<br/>
+          <b>Significance:</b> East Coast outdoor venue became regular stop. Perfect summer setting for Deadheads.<br/>
+          <b>Era:</b> Summer Tour
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-76.8644,39.2037,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1985-06-30</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1987: Telluride -->
+    <Placemark>
+      <name>Telluride Town Park</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 8, 1987<br/>
+          <b>Venue:</b> Telluride Town Park, Telluride, CO<br/>
+          <b>Significance:</b> High altitude show in stunning Colorado mountain setting. One of few Telluride appearances.<br/>
+          <b>Era:</b> Mountain High<br/>
+          <b>Elevation:</b> 8,750 feet
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-107.8123,37.9375,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1987-08-08</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1987: Madison Square Garden -->
+    <Placemark>
+      <name>Madison Square Garden Fall Run</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> September 18, 1987<br/>
+          <b>Venue:</b> Madison Square Garden, New York, NY<br/>
+          <b>Significance:</b> MSG became regular venue for multi-night East Coast runs. This era marked peak arena touring.<br/>
+          <b>Era:</b> Arena Rock Era
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9934,40.7505,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1987-09-18</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1988: JFK Stadium -->
+    <Placemark>
+      <name>JFK Stadium with Bob Dylan</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> July 7, 1988<br/>
+          <b>Venue:</b> JFK Stadium, Philadelphia, PA<br/>
+          <b>Significance:</b> Dylan and the Dead tour. Collaboration between two legends. Massive stadium show.<br/>
+          <b>Era:</b> Dylan Collaboration<br/>
+          <b>Special:</b> Bob Dylan co-headliner
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-75.1652,39.9526,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1988-07-07</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1989: Alpine Valley -->
+    <Placemark>
+      <name>Alpine Valley Music Theatre</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 7, 1989<br/>
+          <b>Venue:</b> Alpine Valley Music Theatre, East Troy, WI<br/>
+          <b>Significance:</b> Midwest outdoor venue became Deadhead mecca. Beautiful natural amphitheater setting.<br/>
+          <b>Era:</b> Late 80s Tour
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-88.3923,42.7783,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1989-08-07</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1989: Oakland Coliseum -->
+    <Placemark>
+      <name>Oakland Coliseum New Year's Eve</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> December 31, 1989<br/>
+          <b>Venue:</b> Oakland-Alameda County Coliseum, Oakland, CA<br/>
+          <b>Significance:</b> New Year's Eve show to close the decade. Bay Area celebration. Massive production.<br/>
+          <b>Era:</b> Turn of Decade<br/>
+          <b>Special:</b> NYE countdown
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.2005,37.7516,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1989-12-31</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1990: Cal Expo -->
+    <Placemark>
+      <name>Cal Expo Amphitheatre</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 8, 1990<br/>
+          <b>Venue:</b> Cal Expo Amphitheatre, Sacramento, CA<br/>
+          <b>Significance:</b> California state fairgrounds show. Hot summer California tour stop.<br/>
+          <b>Era:</b> Final Years
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-121.4389,38.5816,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1990-06-08</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1991: MSG Spring -->
+    <Placemark>
+      <name>Madison Square Garden - 1000th Show at MSG</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> March 28, 1991<br/>
+          <b>Venue:</b> Madison Square Garden, New York, NY<br/>
+          <b>Significance:</b> Part of spring MSG run in their most-played venue. Over 50 shows at MSG throughout career.<br/>
+          <b>Era:</b> MSG Masters
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9934,40.7505,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1991-03-28</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1991: Shoreline Amphitheatre -->
+    <Placemark>
+      <name>Shoreline Amphitheatre</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> May 4, 1991<br/>
+          <b>Venue:</b> Shoreline Amphitheatre, Mountain View, CA<br/>
+          <b>Significance:</b> Silicon Valley venue in heart of Bay Area. Multiple legendary shows here in final years.<br/>
+          <b>Era:</b> Early 90s<br/>
+          <b>Location:</b> Near Stanford University
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.0808,37.4267,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1991-05-04</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1991: Buckeye Lake -->
+    <Placemark>
+      <name>Buckeye Lake Music Center</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 22, 1991<br/>
+          <b>Venue:</b> Buckeye Lake Music Center, Hebron, OH<br/>
+          <b>Significance:</b> Midwest lakeside venue. Summer tour stop beloved by traveling Deadheads.<br/>
+          <b>Era:</b> Summer Circuit
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-82.4985,39.9631,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1991-06-22</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1992: RFK Stadium -->
+    <Placemark>
+      <name>RFK Stadium</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 14, 1992<br/>
+          <b>Venue:</b> RFK Stadium, Washington, D.C.<br/>
+          <b>Significance:</b> Stadium show in the nation's capital. Massive Deadhead gathering on the East Coast.<br/>
+          <b>Era:</b> Stadium Tour
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-76.9722,38.8898,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1992-06-14</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1992: Autzen Stadium -->
+    <Placemark>
+      <name>Autzen Stadium - Oregon</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 22, 1992<br/>
+          <b>Venue:</b> Autzen Stadium, Eugene, OR<br/>
+          <b>Significance:</b> University of Oregon football stadium. Pacific Northwest summer show. 50,000+ Deadheads.<br/>
+          <b>Era:</b> Stadium Era<br/>
+          <b>Attendance:</b> 50,000+
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-123.0682,44.0583,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1992-08-22</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1993: Las Vegas -->
+    <Placemark>
+      <name>Las Vegas Silver Bowl</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> May 16, 1993<br/>
+          <b>Venue:</b> Sam Boyd Silver Bowl, Las Vegas, NV<br/>
+          <b>Significance:</b> Desert stadium show. Deadheads take over Vegas.<br/>
+          <b>Era:</b> Desert Tour
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-115.0117,36.0897,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1993-05-16</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1993: Soldier Field -->
+    <Placemark>
+      <name>Soldier Field Chicago</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 20, 1993<br/>
+          <b>Venue:</b> Soldier Field, Chicago, IL<br/>
+          <b>Significance:</b> First of what would become annual Soldier Field tradition. Chicago Deadheads' home venue.<br/>
+          <b>Era:</b> Chicago Connection
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6167,41.8623,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1993-06-20</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1993: Spectrum Philadelphia -->
+    <Placemark>
+      <name>The Spectrum</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> October 15, 1993<br/>
+          <b>Venue:</b> The Spectrum, Philadelphia, PA<br/>
+          <b>Significance:</b> Philly's premier arena, multiple shows throughout career. East Coast fans' regular destination.<br/>
+          <b>Era:</b> Arena Circuit
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-75.1719,39.9012,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1993-10-15</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1994: Boston Garden -->
+    <Placemark>
+      <name>Boston Garden - Final Run</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> September 28, 1994<br/>
+          <b>Venue:</b> Boston Garden, Boston, MA<br/>
+          <b>Significance:</b> Historic Boston Garden shows before venue closure. Played here 24 times over the years.<br/>
+          <b>Era:</b> Farewell Tour
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-71.0621,42.3662,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1994-09-28</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1994: Miami Arena -->
+    <Placemark>
+      <name>Miami Arena</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> October 19, 1994<br/>
+          <b>Venue:</b> Miami Arena, Miami, FL<br/>
+          <b>Significance:</b> Southern tour stop. Tropical Deadhead gathering.<br/>
+          <b>Era:</b> Final Tour
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-80.1918,25.7617,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1994-10-19</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1994: Oakland NYE -->
+    <Placemark>
+      <name>Oakland Coliseum - New Year's Eve 1994</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> December 31, 1994<br/>
+          <b>Venue:</b> Oakland-Alameda County Coliseum, Oakland, CA<br/>
+          <b>Significance:</b> Final New Year's Eve show. Bay Area homecoming celebration to ring in 1995.<br/>
+          <b>Era:</b> Final New Year<br/>
+          <b>Special:</b> Last NYE countdown
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-122.2005,37.7516,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1994-12-31</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1995: Delta Center -->
+    <Placemark>
+      <name>Delta Center</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> February 21, 1995<br/>
+          <b>Venue:</b> Delta Center, Salt Lake City, UT<br/>
+          <b>Significance:</b> Mountain West tour stop. One of the final shows of the winter tour.<br/>
+          <b>Era:</b> Final Winter
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-111.9011,40.7683,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1995-02-21</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1995: The Omni -->
+    <Placemark>
+      <name>The Omni - Atlanta</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> March 25, 1995<br/>
+          <b>Venue:</b> The Omni, Atlanta, GA<br/>
+          <b>Significance:</b> Southern arena show during final spring tour. Atlanta Deadheads' gathering place.<br/>
+          <b>Era:</b> Final Spring
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-84.3880,33.7490,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1995-03-25</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1995: Knickerbocker Arena -->
+    <Placemark>
+      <name>Knickerbocker Arena</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> March 28, 1995<br/>
+          <b>Venue:</b> Knickerbocker Arena, Albany, NY<br/>
+          <b>Significance:</b> Upstate New York show. Northeast corridor tour stop in final months.<br/>
+          <b>Era:</b> Final East Coast Run
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-73.7562,42.6526,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1995-03-28</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1995: Riverport -->
+    <Placemark>
+      <name>Riverport Amphitheatre</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 8, 1995<br/>
+          <b>Venue:</b> Riverport Amphitheatre, Maryland Heights, MO<br/>
+          <b>Significance:</b> St. Louis area show. Mississippi River venue during final summer tour.<br/>
+          <b>Era:</b> Last Summer
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-90.5050,38.7436,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1995-06-08</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1995: Three Rivers -->
+    <Placemark>
+      <name>Three Rivers Stadium</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> June 30, 1995<br/>
+          <b>Venue:</b> Three Rivers Stadium, Pittsburgh, PA<br/>
+          <b>Significance:</b> Baseball stadium show. Steel City Deadheads. Part of final tour.<br/>
+          <b>Era:</b> Final Shows
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-80.0158,40.4468,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1995-06-30</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 1995: Final Show -->
+    <Placemark>
+      <name>The Final Show - Soldier Field</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> July 9, 1995<br/>
+          <b>Venue:</b> Soldier Field, Chicago, IL<br/>
+          <b>Significance:</b> The very last Grateful Dead concert with Jerry Garcia. Show #2,318. "So Many Roads" encore was Jerry's final performance. He would pass away one month later on August 9, 1995.<br/>
+          <b>Era:</b> The End<br/>
+          <b>Final Song:</b> Box of Rain<br/>
+          <b>Special:</b> Jerry's last performance ever
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6167,41.8623,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1995-07-09</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- 2015: Fare Thee Well -->
+    <Placemark>
+      <name>Fare Thee Well - 50th Anniversary</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> July 5, 2015<br/>
+          <b>Venue:</b> Soldier Field, Chicago, IL<br/>
+          <b>Significance:</b> Final reunion shows with surviving members (Bob Weir, Phil Lesh, Mickey Hart, Bill Kreutzmann) and Trey Anastasio. Three nights celebrating 50 years. Over 70,000 per night. The last time the core four played together.<br/>
+          <b>Era:</b> Farewell Reunion<br/>
+          <b>Special:</b> 50th Anniversary, final goodbye<br/>
+          <b>Attendance:</b> 210,000 (3 nights)
+        ]]>
+      </description>
+      <styleUrl>#deadIcon</styleUrl>
+      <Point>
+        <coordinates>-87.6167,41.8623,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>2015-07-05</when>
+      </TimeStamp>
+    </Placemark>
+
+  </Document>
+</kml>
+

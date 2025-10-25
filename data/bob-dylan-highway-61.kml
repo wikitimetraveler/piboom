@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Bob Dylan: Highway 61 Revisited - A Geographic Journey</name>
+    <description>Following Bob Dylan's life story and the legendary Highway 61 from Duluth to New Orleans, with key locations from his career and the places that shaped American music history</description>
+    
+    <Style id="dylanIcon">
+      <IconStyle>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/blu-circle.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>1.0</scale>
+      </LabelStyle>
+    </Style>
+
+    <!-- Birth -->
+    <Placemark>
+      <name>Robert Zimmerman's Birthplace</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> May 24, 1941<br/>
+          <b>Location:</b> Duluth, Minnesota<br/>
+          <b>Significance:</b> Robert Allen Zimmerman born at St. Mary's Hospital. Duluth sits at the northern end of Highway 61, the legendary blues highway that would later inspire his famous album title.<br/>
+          <b>Address:</b> 519 North 3rd Avenue East (childhood home)
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-92.1005,46.7867,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1941-05-24</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Hibbing -->
+    <Placemark>
+      <name>Hibbing - The Formative Years</name>
+      <description>
+        <![CDATA[
+          <b>Period:</b> 1947-1959<br/>
+          <b>Location:</b> Hibbing, Minnesota<br/>
+          <b>Significance:</b> Raised in this small mining town on the Iron Range. Formed his first band here, Golden Chords. Graduated from Hibbing High School in 1959. The isolation and iron ore landscape shaped his early worldview.<br/>
+          <b>Notable:</b> Hibbing High School, where he performed at talent shows
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-92.9377,47.4271,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1947</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Highway 61 - Duluth Start -->
+    <Placemark>
+      <name>Highway 61 - Northern Terminus</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> Duluth, Minnesota - Highway 61 North End<br/>
+          <b>Significance:</b> The legendary "Blues Highway" begins here. U.S. Route 61 runs from Dylan's birthplace all the way to New Orleans, following the Mississippi River through the heart of American music history. This highway carried the Great Migration and the blues from south to north.<br/>
+          <b>Route:</b> Duluth → St. Paul → Memphis → Clarksdale → New Orleans
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-92.1005,46.7867,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- University of Minnesota -->
+    <Placemark>
+      <name>University of Minnesota - Dinkytown</name>
+      <description>
+        <![CDATA[
+          <b>Period:</b> 1959-1960<br/>
+          <b>Location:</b> Minneapolis/Dinkytown<br/>
+          <b>Significance:</b> Brief college stint at U of M. More importantly, discovered folk music scene in Dinkytown coffeehouses. Performed at Ten O'Clock Scholar. Started calling himself "Bob Dylan." Met folk musicians and began transforming into the artist he'd become.<br/>
+          <b>Venues:</b> Ten O'Clock Scholar, Purple Onion
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-93.2350,44.9803,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1959</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Highway 61 - St. Paul -->
+    <Placemark>
+      <name>Highway 61 Through St. Paul</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> St. Paul, Minnesota<br/>
+          <b>Significance:</b> Highway 61 passes through the Twin Cities. Dylan would have known this stretch well before heading east to New York. The road south from here follows the Mississippi River through American music history.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-93.0900,44.9537,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Madison, WI - On the way -->
+    <Placemark>
+      <name>Madison - Journey to New York</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> December 1960<br/>
+          <b>Location:</b> Madison, Wisconsin<br/>
+          <b>Significance:</b> Stopped here on his way to New York City to visit Woody Guthrie. Performed at coffee houses. The pilgrimage east was beginning.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-89.4012,43.0731,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1960-12</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Greystone Park - Woody Guthrie -->
+    <Placemark>
+      <name>Greystone Park Psychiatric Hospital</name>
+      <description>
+        <![CDATA[
+          <b>Period:</b> 1960-1961<br/>
+          <b>Location:</b> Morris Plains, New Jersey<br/>
+          <b>Significance:</b> Dylan visited his hero Woody Guthrie here multiple times. Guthrie was suffering from Huntington's disease. These visits profoundly influenced Dylan, who would later write "Song to Woody." The pilgrimage to meet his idol was a key moment in his development.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-74.4817,40.8570,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1961</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Greenwich Village -->
+    <Placemark>
+      <name>Greenwich Village - The Folk Scene</name>
+      <description>
+        <![CDATA[
+          <b>Period:</b> 1961-1964<br/>
+          <b>Location:</b> Greenwich Village, New York City<br/>
+          <b>Significance:</b> The epicenter of Dylan's emergence. Arrived in January 1961 with $20. Lived on West 4th Street. The Village folk scene was the crucible where Bob Dylan was forged.<br/>
+          <b>Key Venues:</b> Cafe Wha?, Gaslight Cafe, Gerde's Folk City, The Bitter End
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-74.0027,40.7308,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1961-01</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Cafe Wha? -->
+    <Placemark>
+      <name>Cafe Wha? - First Performances</name>
+      <description>
+        <![CDATA[
+          <b>Period:</b> 1961<br/>
+          <b>Location:</b> 115 MacDougal Street, Greenwich Village<br/>
+          <b>Significance:</b> One of Dylan's first regular gigs in NYC. Performed in the open mic sessions. The cafe was a launching pad for many artists. Still operating today as a music venue.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-74.0009,40.7298,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1961</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Gerde's Folk City -->
+    <Placemark>
+      <name>Gerde's Folk City - The Big Break</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> September 29, 1961<br/>
+          <b>Location:</b> 11 West 4th Street, Greenwich Village<br/>
+          <b>Significance:</b> Robert Shelton's legendary New York Times review was written after seeing Dylan open for the Greenbriar Boys here. The review launched Dylan's career. John Hammond read it and signed Dylan to Columbia Records shortly after.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9963,40.7297,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1961-09-29</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Columbia Recording Studios -->
+    <Placemark>
+      <name>Columbia Records Studio A</name>
+      <description>
+        <![CDATA[
+          <b>Period:</b> 1961-1970s<br/>
+          <b>Location:</b> 799 Seventh Avenue, New York<br/>
+          <b>Significance:</b> Where Dylan recorded his early groundbreaking albums. Studio A (now demolished) was where he laid down his first album in November 1961, and many subsequent masterpieces. John Hammond produced his first sessions here.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9815,40.7614,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1961-11</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Newport Folk Festival 1963 -->
+    <Placemark>
+      <name>Newport Folk Festival 1963</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> July 26-28, 1963<br/>
+          <b>Location:</b> Newport, Rhode Island<br/>
+          <b>Significance:</b> Triumphant appearance with Joan Baez. Became the voice of a generation with protest songs. The folk world embraced him as their prophet.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-71.3128,41.4901,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1963-07-26</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Carnegie Hall -->
+    <Placemark>
+      <name>Carnegie Hall Concert</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> October 26, 1963<br/>
+          <b>Location:</b> Carnegie Hall, New York<br/>
+          <b>Significance:</b> Solo concert at the prestigious Carnegie Hall. From coffeehouses to Carnegie in just over two years. This performance marked his arrival as a major artist.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9799,40.7650,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1963-10-26</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Highway 61 - Memphis -->
+    <Placemark>
+      <name>Highway 61 Through Memphis</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> Memphis, Tennessee<br/>
+          <b>Significance:</b> Highway 61 runs right through Memphis, home of Beale Street and the blues. This was the crossroads of American music - where blues, country, and rock 'n' roll intersected. Sun Studio and Stax Records are here. The highway carried countless musicians and musical traditions.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-90.0490,35.1495,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Woodstock -->
+    <Placemark>
+      <name>Woodstock - The Retreat</name>
+      <description>
+        <![CDATA[
+          <b>Period:</b> 1964-1969<br/>
+          <b>Location:</b> Woodstock, New York<br/>
+          <b>Significance:</b> Dylan's refuge and creative sanctuary. After his 1966 motorcycle accident, he retreated here to recover and record The Basement Tapes with The Band. The town became synonymous with the 1960s counterculture, though Dylan famously skipped the Woodstock Festival.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-74.1182,42.0409,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1964</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Newport 1965 - Going Electric -->
+    <Placemark>
+      <name>Newport Folk Festival 1965 - Going Electric</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> July 25, 1965<br/>
+          <b>Location:</b> Newport, Rhode Island<br/>
+          <b>Significance:</b> The most controversial moment in folk music history. Dylan plugged in his electric guitar with the Paul Butterfield Blues Band. The folk purists booed. Pete Seeger allegedly tried to cut the power cables. Rock and roll would never be the same.<br/>
+          <b>Impact:</b> Moment that split folk from rock
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-71.3128,41.4901,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965-07-25</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Nashville - Blonde on Blonde -->
+    <Placemark>
+      <name>Columbia Studio A Nashville</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> February 1966<br/>
+          <b>Location:</b> Nashville, Tennessee<br/>
+          <b>Significance:</b> Recorded "Blonde on Blonde" here with Nashville session musicians. The first double album in rock history. Dylan's poetic lyrics met Nashville's tight musicianship. Revolutionized recording practices.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-86.7816,36.1627,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1966-02</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Royal Albert Hall -->
+    <Placemark>
+      <name>Royal Albert Hall (Actually Free Trade Hall)</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> May 17, 1966<br/>
+          <b>Location:</b> Free Trade Hall, Manchester, England<br/>
+          <b>Significance:</b> The famous "Judas!" concert. A heckler yelled "Judas!" during the electric set. Dylan responded "I don't believe you... you're a liar" and told the band to "play it f***ing loud." The bootleg (mislabeled Royal Albert Hall) became legendary. This was the climax of the folk-vs-rock battle.<br/>
+          <b>Famous:</b> "Judas!" exchange
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-2.2426,53.4808,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1966-05-17</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Highway 61 - Clarksdale Crossroads -->
+    <Placemark>
+      <name>Highway 61 & 49 - The Crossroads</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> Clarksdale, Mississippi<br/>
+          <b>Significance:</b> The mythical crossroads where Highway 61 meets Highway 49. Blues legend says Robert Johnson sold his soul to the devil here. This intersection is the spiritual heart of the blues. Dylan's album title invokes this entire highway and its history of blues migration.<br/>
+          <b>Blues History:</b> Robert Johnson, Muddy Waters, John Lee Hooker all from this region
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-90.5711,34.2001,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Big Pink -->
+    <Placemark>
+      <name>Big Pink - The Basement Tapes</name>
+      <description>
+        <![CDATA[
+          <b>Period:</b> 1967<br/>
+          <b>Location:</b> West Saugerties, near Woodstock, NY<br/>
+          <b>Significance:</b> The pink house where Dylan and The Band recorded The Basement Tapes. After his motorcycle accident, Dylan retreated here for an extraordinarily creative period. These informal recordings influenced roots rock for decades. The house still stands.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-74.0382,42.0754,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1967</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Isle of Wight 1969 -->
+    <Placemark>
+      <name>Isle of Wight Festival</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 31, 1969<br/>
+          <b>Location:</b> Isle of Wight, England<br/>
+          <b>Significance:</b> Dylan's first major concert in three years after his motorcycle accident and seclusion. 150,000 fans crossed to the island. His return to the stage after the mysterious Woodstock years.<br/>
+          <b>Note:</b> Same weekend as Woodstock festival (which he skipped)
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-1.3047,50.6938,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1969-08-31</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Highway 61 - Vicksburg -->
+    <Placemark>
+      <name>Highway 61 Through Vicksburg</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> Vicksburg, Mississippi<br/>
+          <b>Significance:</b> Highway 61 follows the Mississippi River through historic Civil War battlegrounds. The road carried the Great Migration of African Americans from the South to northern cities, carrying blues music with them. This is the geography of American music history.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-90.8779,32.3526,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Madison Square Garden - Concert for Bangladesh -->
+    <Placemark>
+      <name>Concert for Bangladesh</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> August 1, 1971<br/>
+          <b>Location:</b> Madison Square Garden, New York<br/>
+          <b>Significance:</b> George Harrison organized this historic benefit concert. Dylan's rare appearance was a surprise. One of rock's first major charity concerts. Dylan performed acoustic set including "Blowin' in the Wind."
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9934,40.7505,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1971-08-01</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Highway 61 - Baton Rouge -->
+    <Placemark>
+      <name>Highway 61 Through Baton Rouge</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> Baton Rouge, Louisiana<br/>
+          <b>Significance:</b> As Highway 61 enters Louisiana, the blues transforms into Cajun, zydeco, and swamp rock. The final stretch before New Orleans. The cultural melting pot intensifies.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-91.1871,30.4515,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Highway 61 - New Orleans End -->
+    <Placemark>
+      <name>Highway 61 - Southern Terminus</name>
+      <description>
+        <![CDATA[
+          <b>Location:</b> New Orleans, Louisiana<br/>
+          <b>Significance:</b> Highway 61 ends in New Orleans, the birthplace of jazz. From Dylan's Minnesota birthplace to the Mississippi Delta blues to the jazz cradle of New Orleans - this highway traces the entire journey of American music. The road that carried blues north and brought culture south.<br/>
+          <b>Cultural Impact:</b> Birth of jazz, blues migration endpoint
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-90.0715,29.9511,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1965</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Rolling Thunder Revue - Quebec -->
+    <Placemark>
+      <name>Rolling Thunder Revue - Quebec</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> December 4, 1975<br/>
+          <b>Location:</b> Forum de Montreal, Quebec<br/>
+          <b>Significance:</b> The Rolling Thunder Revue tour was a traveling carnival of musicians. Dylan, Joan Baez, Allen Ginsberg, and others. Filmed extensively. Part theatrical troupe, part protest tour. Dylan wore white face paint and toured small venues.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-73.5698,45.5017,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1975-12-04</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- The Last Waltz -->
+    <Placemark>
+      <name>The Last Waltz - Winterland</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> November 25, 1976<br/>
+          <b>Location:</b> Winterland Ballroom, San Francisco<br/>
+          <b>Significance:</b> The Band's farewell concert. Dylan performed four songs with his old collaborators from the Basement Tapes era. Martin Scorsese filmed it. One of the greatest concert films ever made. Dylan's performance of "Forever Young" is iconic.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-122.4244,37.7838,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1976-11-25</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Budokan Tokyo -->
+    <Placemark>
+      <name>Nippon Budokan - Japan Tour</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> February-March 1978<br/>
+          <b>Location:</b> Budokan, Tokyo, Japan<br/>
+          <b>Significance:</b> Dylan's first tour of Japan. The "Live at Budokan" album captured his big band arrangements. Japanese audiences were wildly enthusiastic. Marked his expansion to true international superstar status.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>139.7507,35.6936,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1978-02</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Farm Aid -->
+    <Placemark>
+      <name>Farm Aid - Memorial Stadium</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> September 22, 1985<br/>
+          <b>Location:</b> Memorial Stadium, Champaign, Illinois<br/>
+          <b>Significance:</b> First Farm Aid concert organized by Willie Nelson, John Mellencamp, and Neil Young. Dylan performed, continuing his tradition of benefit concerts. Raised money for American farmers. Dylan has appeared at multiple Farm Aids over the years.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-88.2302,40.0995,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1985-09-22</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Toad's Place -->
+    <Placemark>
+      <name>Toad's Place - Surprise Small Show</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> January 12, 1990<br/>
+          <b>Location:</b> Toad's Place, New Haven, Connecticut<br/>
+          <b>Significance:</b> Dylan played this tiny 750-capacity club on his "Never Ending Tour." The contrast of a legend in an intimate venue was remarkable. Shows Dylan's commitment to playing anywhere, anytime. The Never Ending Tour began in 1988 and continues to this day.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-72.9279,41.3083,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1990-01-12</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Supper Club NYC -->
+    <Placemark>
+      <name>Supper Club - MTV Unplugged</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> November 17-18, 1994<br/>
+          <b>Location:</b> Supper Club, New York City<br/>
+          <b>Significance:</b> MTV Unplugged session where Dylan was already "unplugged" since he rarely used electric instruments by this point. Intimate performance introduced Dylan to a new MTV generation. Album became his best-selling release in years.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-73.9845,40.7614,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1994-11-17</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- White House -->
+    <Placemark>
+      <name>White House Performance</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> February 9, 2010<br/>
+          <b>Location:</b> The White House, Washington, D.C.<br/>
+          <b>Significance:</b> Dylan performed "The Times They Are a-Changin'" at a White House celebration of music from the Civil Rights Movement. President Obama hosted. Full circle from 1960s protest singer to honored guest at the White House.
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-77.0365,38.8977,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>2010-02-09</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Stockholm - Nobel Prize -->
+    <Placemark>
+      <name>Nobel Prize in Literature</name>
+      <description>
+        <![CDATA[
+          <b>Date:</b> December 10, 2016<br/>
+          <b>Location:</b> Stockholm, Sweden<br/>
+          <b>Significance:</b> Bob Dylan awarded the Nobel Prize in Literature "for having created new poetic expressions within the great American song tradition." First musician to win. Didn't attend ceremony but sent acceptance speech. The ultimate recognition of his literary impact.<br/>
+          <b>Historic:</b> First songwriter to win Nobel Prize in Literature
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>18.0686,59.3293,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>2016-12-10</when>
+      </TimeStamp>
+    </Placemark>
+
+    <!-- Wiltern Theater LA -->
+    <Placemark>
+      <name>Wiltern Theater - Never Ending Tour</name>
+      <description>
+        <![CDATA[
+          <b>Ongoing:</b> 1988-Present<br/>
+          <b>Location:</b> Los Angeles (Example venue)<br/>
+          <b>Significance:</b> The Never Ending Tour has continued for over 30 years with over 3,000 shows worldwide. Dylan plays constantly, never retiring, always on the road. The Wiltern is one of many venues on this endless journey. He's still traveling Highway 61 in spirit.<br/>
+          <b>Tour Stats:</b> 3,000+ shows since 1988
+        ]]>
+      </description>
+      <styleUrl>#dylanIcon</styleUrl>
+      <Point>
+        <coordinates>-118.2437,34.0522,0</coordinates>
+      </Point>
+      <TimeStamp>
+        <when>1988</when>
+      </TimeStamp>
+    </Placemark>
+
+  </Document>
+</kml>
+
