@@ -236,22 +236,22 @@ class ModernNavbar extends HTMLElement {
                   <i class="bi-music-note-beamed"></i> Music Discovery
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/music-research.html">
+                  <a class="dropdown-item" href="/music/music-research.html">
                     <i class="bi-search"></i> Music Research
                   </a>
-                  <a class="dropdown-item" href="/album-discovery.html">
+                  <a class="dropdown-item" href="/music/album-discovery.html">
                     <i class="bi-disc"></i> Album Discovery
                   </a>
-                  <a class="dropdown-item" href="/collection.html">
+                  <a class="dropdown-item" href="/music/collection.html">
                     <i class="bi-collection-fill"></i> My Collection
                   </a>
-                  <a class="dropdown-item" href="/music-time-machine.html">
+                  <a class="dropdown-item" href="/music/music-time-machine.html">
                     <i class="bi-clock-history"></i> Time Machine
                   </a>
-                  <a class="dropdown-item" href="/spotify-dashboard.html">
+                  <a class="dropdown-item" href="/music/spotify-dashboard.html">
                     <i class="bi-spotify"></i> Spotify
                   </a>
-                  <a class="dropdown-item" href="/song-identifier.html">
+                  <a class="dropdown-item" href="/music/song-identifier.html">
                     <i class="bi-soundwave"></i> Song Identifier
                   </a>
                 </div>
@@ -263,14 +263,14 @@ class ModernNavbar extends HTMLElement {
                   <i class="bi-robot"></i> AI & Voice
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/voice-dj.html">
+                  <a class="dropdown-item" href="/ai/voice-dj.html">
                     <i class="bi-mic"></i> Wolfman Dave
                   </a>
-                  <a class="dropdown-item" href="/assistant.html">
+                  <a class="dropdown-item" href="/ai/assistant.html">
                     <i class="bi-chat-dots"></i> Levi Assistant
                   </a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="/voice-guide.html">
+                  <a class="dropdown-item" href="/ai/voice-guide.html">
                     <i class="bi-book"></i> Voice Guide
                   </a>
                 </div>
@@ -282,26 +282,50 @@ class ModernNavbar extends HTMLElement {
                   <i class="bi-stars"></i> Entertainment
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/player.html">
+                  <a class="dropdown-item" href="/entertainment/player.html">
                     <i class="bi-volume-up"></i> The Boombox
                   </a>
-                  <a class="dropdown-item" href="/visualizer.html">
+                  <a class="dropdown-item" href="/entertainment/visualizer.html">
                     <i class="bi-palette-fill"></i> Psychedelic Visualizer
                   </a>
-                  <a class="dropdown-item" href="/blacklight.html">
+                  <a class="dropdown-item" href="/entertainment/blacklight.html">
                     <i class="bi-lightning"></i> Black Light Zone
                   </a>
-                  <a class="dropdown-item" href="/poster-generator.html">
+                  <a class="dropdown-item" href="/entertainment/poster-generator.html">
                     <i class="bi-palette"></i> Poster Generator
                   </a>
-                  <a class="dropdown-item" href="/family-tree.html">
-                    <i class="bi-diagram-3"></i> Lane Family Tree
-                  </a>
-                  <a class="dropdown-item" href="/art-gallery.html">
+                  <a class="dropdown-item" href="/entertainment/art-gallery.html">
                     <i class="bi-image"></i> Art Gallery
                   </a>
-                  <a class="dropdown-item" href="/ouija-board.html">
+                  <a class="dropdown-item" href="/entertainment/ouija-board.html">
                     <i class="bi-magic"></i> Ouija Board
+                  </a>
+                </div>
+              </li>
+
+              <!-- Finance Dropdown -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button">
+                  <i class="bi-bank"></i> Finance
+                </a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="/finance/encompass-assistant.html">
+                    <i class="bi-bank2"></i> Encompass Assistant
+                  </a>
+                </div>
+              </li>
+
+              <!-- Family & Genealogy Dropdown -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button">
+                  <i class="bi-people"></i> Family
+                </a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="/family/genealogy.html">
+                    <i class="bi-diagram-3"></i> Genealogy
+                  </a>
+                  <a class="dropdown-item" href="/family/family-tree.html">
+                    <i class="bi-tree"></i> Family Tree
                   </a>
                 </div>
               </li>
@@ -312,10 +336,10 @@ class ModernNavbar extends HTMLElement {
                   <i class="bi-tree-fill"></i> Nature
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/tree-discovery.html">
+                  <a class="dropdown-item" href="/nature/tree-discovery.html">
                     <i class="bi-tree-fill"></i> Tree Discovery 🐻
                   </a>
-                  <a class="dropdown-item" href="/tree-collection.html">
+                  <a class="dropdown-item" href="/nature/tree-collection.html">
                     <i class="bi-trees"></i> Tree Collection 🌲
                   </a>
                 </div>
