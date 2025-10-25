@@ -1,0 +1,177 @@
+warning: in the working copy of 'public/index.html', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/public/index.html b/public/index.html[m
+[1mindex 5b9c570..f087b97 100644[m
+[1m--- a/public/index.html[m
+[1m+++ b/public/index.html[m
+[36m@@ -7,6 +7,7 @@[m
+ <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>[m
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>[m
+ <link rel="stylesheet" href="/styles.css"/>[m
+[32m+[m[32m<script src="/modern-navbar.js"></script>[m
+ <style>[m
+   /* Floating Musical Notes */[m
+   .floating-notes {[m
+[36m@@ -225,125 +226,8 @@[m
+   <!-- Staff Lines removed for cleaner look -->[m
+ </div>[m
+ [m
+[31m-<style>[m
+[31m-  /* Professional Modern Navigation */[m
+[31m-  .modern-navbar {[m
+[31m-    background: rgba(255, 255, 255, 0.95);[m
+[31m-    backdrop-filter: blur(20px);[m
+[31m-    border-bottom: 1px solid rgba(135, 206, 250, 0.2);[m
+[31m-    padding: 1rem 0;[m
+[31m-    position: sticky;[m
+[31m-    top: 0;[m
+[31m-    z-index: 1000;[m
+[31m-    transition: all 0.3s ease;[m
+[31m-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);[m
+[31m-  }[m
+[31m-  [m
+[31m-  .modern-navbar.scrolled {[m
+[31m-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);[m
+[31m-  }[m
+[31m-  [m
+[31m-  .navbar-brand-modern {[m
+[31m-    font-size: 1.4rem;[m
+[31m-    font-weight: 700;[m
+[31m-    background: linear-gradient(135deg, #667eea, #764ba2);[m
+[31m-    -webkit-background-clip: text;[m
+[31m-    -webkit-text-fill-color: transparent;[m
+[31m-    background-clip: text;[m
+[31m-  }[m
+[31m-  [m
+[31m-  .nav-user-btn {[m
+[31m-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));[m
+[31m-    border: 2px solid rgba(102, 126, 234, 0.3);[m
+[31m-    border-radius: 25px;[m
+[31m-    padding: 8px 20px;[m
+[31m-    transition: all 0.3s ease;[m
+[31m-  }[m
+[31m-  [m
+[31m-  .nav-user-btn:hover {[m
+[31m-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));[m
+[31m-    border-color: #667eea;[m
+[31m-    transform: translateY(-2px);[m
+[31m-  }[m
+[31m-</style>[m
+[31m-[m
+[31m-<nav class="navbar navbar-expand-lg navbar-light modern-navbar">[m
+[31m-  <div class="container">[m
+[31m-    <a class="navbar-brand navbar-brand-modern" href="#"><i class="bi-music-note-beamed mr-2"></i>Big Wave Dave's Music Box</a>[m
+[31m-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">[m
+[31m-      <span class="navbar-toggler-icon"></span>[m
+[31m-    </button>[m
+[31m-    <div id="nav" class="collapse navbar-collapse">[m
+[31m-      <!-- User Login (LEFT SIDE) -->[m
+[31m-      <ul class="navbar-nav mr-auto">[m
+[31m-        <li class="nav-item">[m
+[31m-          <a class="nav-link nav-user-btn" href="#" id="navUserBtn" onclick="showLoginPopup(); return false;">[m
+[31m-            <i class="bi-person-circle"></i> <span id="navUserName">Login</span>[m
+[31m-          </a>[m
+[31m-        </li>[m
+[31m-      </ul>[m
+[31m-      [m
+[31m-      <ul class="navbar-nav ml-auto">[m
+[31m-        <li class="nav-item"><a class="nav-link" href="/"><i class="bi-house"></i> Home</a></li>[m
+[31m-        [m
+[31m-        <!-- Music Discovery Dropdown -->[m
+[31m-        <li class="nav-item dropdown">[m
+[31m-          <a class="nav-link dropdown-toggle" href="#" id="musicDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[m
+[31m-            <i class="bi-music-note-beamed"></i> Music Discovery[m
+[31m-          </a>[m
+[31m-          <div class="dropdown-menu" aria-labelledby="musicDropdown">[m
+[31m-            <a class="dropdown-item" href="/music-research.html"><i class="bi-search"></i> Music Research</a>[m
+[31m-            <a class="dropdown-item" href="/album-discovery.html"><i class="bi-disc"></i> Album Discovery</a>[m
+[31m-            <a class="dropdown-item" href="/collection.html"><i class="bi-collection-fill"></i> My Collection</a>[m
+[31m-            <a class="dropdown-item" href="/music-time-machine.html"><i class="bi-clock-history"></i> Time Machine</a>[m
+[31m-            <a class="dropdown-item" href="/spotify-dashboard.html"><i class="bi-spotify"></i> Spotify</a>[m
+[31m-            <a class="dropdown-item" href="/song-identifier.html"><i class="bi-soundwave"></i> Song Identifier</a>[m
+[31m-          </div>[m
+[31m-        </li>[m
+[31m-[m
+[31m-        <!-- AI & Voice Dropdown -->[m
+[31m-        <li class="nav-item dropdown">[m
+[31m-          <a class="nav-link dropdown-toggle" href="#" id="aiDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[m
+[31m-            <i class="bi-robot"></i> AI & Voice[m
+[31m-          </a>[m
+[31m-          <div class="dropdown-menu" aria-labelledby="aiDropdown">[m
+[31m-            <a class="dropdown-item" href="/voice-dj.html"><i class="bi-mic"></i> Wolfman Dave</a>[m
+[31m-            <a class="dropdown-item" href="/assistant.html"><i class="bi-chat-dots"></i> Levi Assistant</a>[m
+[31m-            <div class="dropdown-divider"></div>[m
+[31m-            <a class="dropdown-item" href="/voice-guide.html"><i class="bi-book"></i> Voice Guide</a>[m
+[31m-          </div>[m
+[31m-        </li>[m
+[31m-[m
+[31m-        <!-- Entertainment Dropdown -->[m
+[31m-        <li class="nav-item dropdown">[m
+[31m-          <a class="nav-link dropdown-toggle" href="#" id="entertainmentDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[m
+[31m-            <i class="bi-stars"></i> Entertainment[m
+[31m-          </a>[m
+[31m-          <div class="dropdown-menu" aria-labelledby="entertainmentDropdown">[m
+[31m-            <a class="dropdown-item" href="/player.html"><i class="bi-volume-up"></i> The Boombox</a>[m
+[31m-            <a class="dropdown-item" href="/visualizer.html"><i class="bi-palette-fill"></i> Psychedelic Visualizer</a>[m
+[31m-            <a class="dropdown-item" href="/blacklight.html"><i class="bi-lightning"></i> Black Light Zone</a>[m
+[31m-            <a class="dropdown-item" href="/poster-generator.html"><i class="bi-palette"></i> Poster Generator</a>[m
+[31m-            <a class="dropdown-item" href="/family-tree.html"><i class="bi-diagram-3"></i> Lane Family Tree</a>[m
+[31m-            <a class="dropdown-item" href="/art-gallery.html"><i class="bi-image"></i> Art Gallery</a>[m
+[31m-            <a class="dropdown-item" href="/ouija-board.html"><i class="bi-magic"></i> Ouija Board</a>[m
+[31m-          </div>[m
+[31m-        </li>[m
+[31m-[m
+[31m-        <!-- Nature Dropdown -->[m
+[31m-        <li class="nav-item dropdown">[m
+[31m-          <a class="nav-link dropdown-toggle" href="#" id="natureDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">[m
+[31m-            <i class="bi-tree-fill"></i> Nature[m
+[31m-          </a>[m
+[31m-          <div class="dropdown-menu" aria-labelledby="natureDropdown">[m
+[31m-            <a class="dropdown-item" href="/tree-discovery.html"><i class="bi-tree-fill"></i> Tree Discovery 🐻</a>[m
+[31m-            <a class="dropdown-item" href="/tree-collection.html"><i class="bi-trees"></i> Tree Collection 🌲</a>[m
+[31m-          </div>[m
+[31m-        </li>[m
+[31m-      </ul>[m
+[31m-    </div>[m
+[31m-  </div>[m
+[31m-</nav>[m
+[32m+[m[32m<!-- Modern Navbar Web Component -->[m
+[32m+[m[32m<modern-navbar></modern-navbar>[m
+ [m
+ <style>[m
+   /* Compact page spacing */[m
+[36m@@ -722,35 +606,11 @@[m [mwindow.addEventListener('DOMContentLoaded', () => {[m
+     position: 'bottom-right',[m
+     theme: 'blue'[m
+   });[m
+[31m-  [m
+[31m-  // Sticky navbar scroll effect[m
+[31m-  const navbar = document.querySelector('.modern-navbar');[m
+[31m-  window.addEventListener('scroll', () => {[m
+[31m-    if (window.scrollY > 50) {[m
+[31m-      navbar.classList.add('scrolled');[m
+[31m-    } else {[m
+[31m-      navbar.classList.remove('scrolled');[m
+[31m-    }[m
+[31m-  });[m
+ });[m
+ </script>[m
+ <script>[m
+ document.getElementById('dt').textContent = new Date().toLocaleDateString();[m
+ [m
+[31m-// Update navbar to show logged-in user[m
+[31m-window.addEventListener('DOMContentLoaded', () => {[m
+[31m-  const loggedInUser = getLoggedInUser();[m
+[31m-  const navUserBtn = document.getElementById('navUserBtn');[m
+[31m-  [m
+[31m-  if (loggedInUser && navUserBtn) {[m
+[31m-    navUserBtn.style.background = `${loggedInUser.color}22`;[m
+[31m-    navUserBtn.style.borderLeft = `3px solid ${loggedInUser.color}`;[m
+[31m-    navUserBtn.innerHTML = `[m
+[31m-      <img src="${loggedInUser.avatar}" style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid ${loggedInUser.color}; margin-right: 8px; vertical-align: middle;">[m
+[31m-      <span>${loggedInUser.name.split(' ').slice(-1)[0]}</span>[m
+[31m-    `;[m
+[31m-  }[m
+[31m-});[m
+ // Help panel functionality (if elements exist)[m
+ const showHelpBtn = document.getElementById('showHelp');[m
+ const closeHelpBtn = document.getElementById('closeHelp');[m

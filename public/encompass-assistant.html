@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
     <link rel="stylesheet" href="/styles.css"/>
+    <script src="/modern-navbar.js"></script>
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -379,8 +380,11 @@
     </style>
 </head>
 <body>
+    <!-- Modern Navbar Web Component -->
+    <modern-navbar></modern-navbar>
+    
     <!-- Navigation Header -->
-    <nav class="navbar navbar-expand-lg navbar-light modern-navbar">
+    <nav class="navbar navbar-expand-lg navbar-light modern-navbar" style="display: none;">
         <div class="container">
             <a class="navbar-brand navbar-brand-modern" href="/"><i class="bi-bank mr-2"></i>Encompass AI Assistant</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#nav">
