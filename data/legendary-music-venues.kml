@@ -14,6 +14,12 @@
       <LabelStyle>
         <scale>1.0</scale>
       </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[
+          <b>$[name]</b><br/>
+          $[description]
+        ]]></text>
+      </BalloonStyle>
     </Style>
 
     <!-- 1. 1927 Cotton Club -->
@@ -29,12 +35,17 @@
         ]]>
       </description>
       <styleUrl>#venueIcon</styleUrl>
+      <LookAt>
+        <longitude>-73.9418</longitude>
+        <latitude>40.8116</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>1000</range>
+      </LookAt>
       <Point>
         <coordinates>-73.9418,40.8116,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1927</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 2. 1935 Village Vanguard -->
@@ -50,12 +61,17 @@
         ]]>
       </description>
       <styleUrl>#venueIcon</styleUrl>
+      <LookAt>
+        <longitude>-74.0017</longitude>
+        <latitude>40.7357</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>1000</range>
+      </LookAt>
       <Point>
         <coordinates>-74.0017,40.7357,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1935</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 3. 1941 Minton's -->

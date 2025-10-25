@@ -14,6 +14,12 @@
       <LabelStyle>
         <scale>1.0</scale>
       </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[
+          <b>$[name]</b><br/>
+          $[description]
+        ]]></text>
+      </BalloonStyle>
     </Style>
 
     <!-- Event 1: Birth -->
@@ -27,12 +33,17 @@
         ]]>
       </description>
       <styleUrl>#swiftIcon</styleUrl>
+      <LookAt>
+        <longitude>-75.9270</longitude>
+        <latitude>40.3356</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>2000</range>
+      </LookAt>
       <Point>
         <coordinates>-75.9270,40.3356,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1989-12-13</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- Event 2: Move to Nashville -->

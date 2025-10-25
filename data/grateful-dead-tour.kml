@@ -14,6 +14,12 @@
       <LabelStyle>
         <scale>1.0</scale>
       </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[
+          <b>$[name]</b><br/>
+          $[description]
+        ]]></text>
+      </BalloonStyle>
     </Style>
 
     <!-- 1965: The Beginning -->
@@ -28,12 +34,17 @@
         ]]>
       </description>
       <styleUrl>#deadIcon</styleUrl>
+      <LookAt>
+        <longitude>-122.4331</longitude>
+        <latitude>37.7837</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>1000</range>
+      </LookAt>
       <Point>
         <coordinates>-122.4331,37.7837,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1965-12-04</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1966: Acid Tests -->
@@ -48,12 +59,17 @@
         ]]>
       </description>
       <styleUrl>#deadIcon</styleUrl>
+      <LookAt>
+        <longitude>-122.4244</longitude>
+        <latitude>37.7838</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>1000</range>
+      </LookAt>
       <Point>
         <coordinates>-122.4244,37.7838,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1966-10-31</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1967: Human Be-In -->
@@ -68,12 +84,17 @@
         ]]>
       </description>
       <styleUrl>#deadIcon</styleUrl>
+      <LookAt>
+        <longitude>-122.4783</longitude>
+        <latitude>37.7694</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>2000</range>
+      </LookAt>
       <Point>
         <coordinates>-122.4783,37.7694,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1967-01-14</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1969: Woodstock -->
@@ -89,12 +110,17 @@
         ]]>
       </description>
       <styleUrl>#deadIcon</styleUrl>
+      <LookAt>
+        <longitude>-74.8794</longitude>
+        <latitude>41.7012</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>2000</range>
+      </LookAt>
       <Point>
         <coordinates>-74.8794,41.7012,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1969-08-16</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1970: New Orleans -->
@@ -112,9 +138,6 @@
       <Point>
         <coordinates>-90.0715,29.9511,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1970-01-30</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1971: Fillmore East Final Shows -->
@@ -129,12 +152,17 @@
         ]]>
       </description>
       <styleUrl>#deadIcon</styleUrl>
+      <LookAt>
+        <longitude>-73.9874</longitude>
+        <latitude>40.7282</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>1000</range>
+      </LookAt>
       <Point>
         <coordinates>-73.9874,40.7282,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1971-06-27</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1972: Bickershaw Festival -->
@@ -152,9 +180,6 @@
       <Point>
         <coordinates>-2.6200,53.5300,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1972-05-07</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1972: Veneta Oregon -->
@@ -173,9 +198,6 @@
       <Point>
         <coordinates>-123.3456,44.0465,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1972-08-27</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1973: Watkins Glen -->
@@ -194,9 +216,6 @@
       <Point>
         <coordinates>-76.9275,42.3373,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1973-07-28</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1974: Winterland -->
@@ -214,9 +233,6 @@
       <Point>
         <coordinates>-122.4244,37.7838,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1974-03-23</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1974: Final Show Before Hiatus -->
@@ -234,9 +250,6 @@
       <Point>
         <coordinates>-122.4244,37.7838,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1974-10-20</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1976: Return Show -->
@@ -254,9 +267,6 @@
       <Point>
         <coordinates>-122.6795,45.5152,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1976-06-03</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1977: Cornell -->
@@ -275,9 +285,6 @@
       <Point>
         <coordinates>-76.4833,42.4487,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1977-05-08</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1977: Englishtown -->
@@ -296,9 +303,6 @@
       <Point>
         <coordinates>-74.3632,40.3164,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1977-09-03</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1978: Egypt -->
@@ -317,9 +321,6 @@
       <Point>
         <coordinates>31.1342,29.9792,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1978-09-16</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1978: Winterland Closing -->
@@ -338,9 +339,6 @@
       <Point>
         <coordinates>-122.4244,37.7838,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1978-12-31</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1979: Hampton Coliseum -->
@@ -358,9 +356,6 @@
       <Point>
         <coordinates>-76.2913,37.0299,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1979-11-21</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1980: Radio City -->
@@ -378,9 +373,6 @@
       <Point>
         <coordinates>-73.9799,40.7600,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1980-10-31</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1982: Greek Theatre -->
@@ -398,9 +390,6 @@
       <Point>
         <coordinates>-122.2553,37.8732,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1982-08-28</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1983: Santa Fe -->
@@ -418,9 +407,6 @@
       <Point>
         <coordinates>-105.9378,35.6870,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1983-06-17</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1984: Berkeley Community Theatre -->
@@ -438,9 +424,6 @@
       <Point>
         <coordinates>-122.2708,37.8688,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1984-04-06</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1985: Moscone Center -->
@@ -458,9 +441,6 @@
       <Point>
         <coordinates>-122.4000,37.7844,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1985-03-16</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1985: Merriweather Post -->
@@ -478,9 +458,6 @@
       <Point>
         <coordinates>-76.8644,39.2037,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1985-06-30</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1987: Telluride -->
@@ -499,9 +476,6 @@
       <Point>
         <coordinates>-107.8123,37.9375,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1987-08-08</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1987: Madison Square Garden -->
@@ -519,9 +493,6 @@
       <Point>
         <coordinates>-73.9934,40.7505,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1987-09-18</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1988: JFK Stadium -->
@@ -540,9 +511,6 @@
       <Point>
         <coordinates>-75.1652,39.9526,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1988-07-07</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1989: Alpine Valley -->
@@ -560,9 +528,6 @@
       <Point>
         <coordinates>-88.3923,42.7783,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1989-08-07</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1989: Oakland Coliseum -->
@@ -581,9 +546,6 @@
       <Point>
         <coordinates>-122.2005,37.7516,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1989-12-31</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1990: Cal Expo -->
@@ -601,9 +563,6 @@
       <Point>
         <coordinates>-121.4389,38.5816,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1990-06-08</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1991: MSG Spring -->
@@ -621,9 +580,6 @@
       <Point>
         <coordinates>-73.9934,40.7505,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1991-03-28</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1991: Shoreline Amphitheatre -->
@@ -642,9 +598,6 @@
       <Point>
         <coordinates>-122.0808,37.4267,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1991-05-04</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1991: Buckeye Lake -->
@@ -662,9 +615,6 @@
       <Point>
         <coordinates>-82.4985,39.9631,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1991-06-22</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1992: RFK Stadium -->
@@ -682,9 +632,6 @@
       <Point>
         <coordinates>-76.9722,38.8898,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1992-06-14</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1992: Autzen Stadium -->
@@ -703,9 +650,6 @@
       <Point>
         <coordinates>-123.0682,44.0583,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1992-08-22</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1993: Las Vegas -->
@@ -723,9 +667,6 @@
       <Point>
         <coordinates>-115.0117,36.0897,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1993-05-16</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1993: Soldier Field -->
@@ -743,9 +684,6 @@
       <Point>
         <coordinates>-87.6167,41.8623,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1993-06-20</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1993: Spectrum Philadelphia -->
@@ -763,9 +701,6 @@
       <Point>
         <coordinates>-75.1719,39.9012,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1993-10-15</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1994: Boston Garden -->
@@ -783,9 +718,6 @@
       <Point>
         <coordinates>-71.0621,42.3662,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1994-09-28</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1994: Miami Arena -->
@@ -803,9 +735,6 @@
       <Point>
         <coordinates>-80.1918,25.7617,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1994-10-19</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1994: Oakland NYE -->
@@ -824,9 +753,6 @@
       <Point>
         <coordinates>-122.2005,37.7516,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1994-12-31</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1995: Delta Center -->
@@ -844,9 +770,6 @@
       <Point>
         <coordinates>-111.9011,40.7683,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1995-02-21</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1995: The Omni -->
@@ -864,9 +787,6 @@
       <Point>
         <coordinates>-84.3880,33.7490,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1995-03-25</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1995: Knickerbocker Arena -->
@@ -884,9 +804,6 @@
       <Point>
         <coordinates>-73.7562,42.6526,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1995-03-28</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1995: Riverport -->
@@ -904,9 +821,6 @@
       <Point>
         <coordinates>-90.5050,38.7436,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1995-06-08</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1995: Three Rivers -->
@@ -924,9 +838,6 @@
       <Point>
         <coordinates>-80.0158,40.4468,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1995-06-30</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 1995: Final Show -->
@@ -946,9 +857,6 @@
       <Point>
         <coordinates>-87.6167,41.8623,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1995-07-09</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- 2015: Fare Thee Well -->
@@ -968,9 +876,6 @@
       <Point>
         <coordinates>-87.6167,41.8623,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>2015-07-05</when>
-      </TimeStamp>
     </Placemark>
 
   </Document>

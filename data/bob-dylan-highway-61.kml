@@ -14,6 +14,12 @@
       <LabelStyle>
         <scale>1.0</scale>
       </LabelStyle>
+      <BalloonStyle>
+        <text><![CDATA[
+          <b>$[name]</b><br/>
+          $[description]
+        ]]></text>
+      </BalloonStyle>
     </Style>
 
     <!-- Birth -->
@@ -28,12 +34,17 @@
         ]]>
       </description>
       <styleUrl>#dylanIcon</styleUrl>
+      <LookAt>
+        <longitude>-92.1005</longitude>
+        <latitude>46.7867</latitude>
+        <altitude>0</altitude>
+        <heading>0</heading>
+        <tilt>0</tilt>
+        <range>2000</range>
+      </LookAt>
       <Point>
         <coordinates>-92.1005,46.7867,0</coordinates>
       </Point>
-      <TimeStamp>
-        <when>1941-05-24</when>
-      </TimeStamp>
     </Placemark>
 
     <!-- Hibbing -->
