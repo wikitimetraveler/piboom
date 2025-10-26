@@ -18,6 +18,8 @@ import audioFingerprintRoutes from './audio-fingerprint.routes.js';
 import sampleDetectionRoutes from './sample-detection.routes.js';
 import encompassAssistantRoutes from './encompass-assistant.routes.js';
 import kmlRoutes from './kml.routes.js';
+import gratefulDeadTourRoutes from './grateful-dead-tour.routes.js';
+import userShowAttendanceRoutes from './user-show-attendance.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -39,6 +41,8 @@ export default function buildRoutes(io) {
   api.use('/sample-detection', sampleDetectionRoutes);
   api.use('/encompass', encompassAssistantRoutes);
   api.use('/kml', kmlRoutes);
+  api.use('/grateful-dead', gratefulDeadTourRoutes);
+  api.use('/user-attendance', userShowAttendanceRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

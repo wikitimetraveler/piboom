@@ -26,6 +26,7 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.locals.io = io;
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/data', express.static(path.join(__dirname, 'data'))); // Serve KML files
 app.use('/api', buildRoutes(io));
 
 app.get('/health', (req,res)=>res.json({ok:true, mode: config.mode, platform: process.platform}));

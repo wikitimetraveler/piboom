@@ -15,7 +15,8 @@
     "docker:pi": "docker-compose -f docker-compose.pi.yml up -d",
     "docker:pi-build": "docker-compose -f docker-compose.pi.yml up --build -d",
     "docker:pi-stop": "docker-compose -f docker-compose.pi.yml down",
-    "docker:pi-logs": "docker-compose -f docker-compose.pi.yml logs -f"
+    "docker:pi-logs": "docker-compose -f docker-compose.pi.yml logs -f",
+    "generate-gd-kml": "node scripts/generate-grateful-dead-kml.js"
   },
   "dependencies": {
     "@google-cloud/speech": "^6.0.0",

@@ -243,7 +243,71 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations(user_id)
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory)');
+    // Create grateful_dead_shows table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS grateful_dead_shows (
+        id SERIAL PRIMARY KEY,
+        show_date DATE NOT NULL,
+        venue_name VARCHAR(255) NOT NULL,
+        city VARCHAR(255),
+        state VARCHAR(100),
+        country VARCHAR(100),
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        setlist TEXT,
+        attendance INTEGER,
+        recording_available BOOLEAN DEFAULT false,
+        archive_identifier VARCHAR(255),
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(show_date, venue_name, city)
+      )
+    `);
+
+    // Create indexes for grateful_dead_shows
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_gd_shows_date ON grateful_dead_shows(show_date)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_gd_shows_venue ON grateful_dead_shows(venue_name)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_gd_shows_location ON grateful_dead_shows(latitude, longitude)
+    `);
+
+    // Create user_show_attendance table for "I Was There" feature
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_show_attendance (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        show_id INTEGER REFERENCES grateful_dead_shows(id) ON DELETE CASCADE,
+        was_there BOOLEAN DEFAULT true,
+        personal_notes TEXT,
+        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+        photos TEXT[],
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, show_id)
+      )
+    `);
+
+    // Create indexes for user_show_attendance
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_attendance_user ON user_show_attendance(user_id)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_attendance_show ON user_show_attendance(show_id)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_attendance_was_there ON user_show_attendance(was_there)
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory and Grateful Dead shows)');
   } catch (error) {
     console.error('❌ Error creating tables:', error.message);
     console.error('   Database operations will be unavailable');

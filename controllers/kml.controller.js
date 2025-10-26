@@ -1,6 +1,12 @@
 import fetch from 'node-fetch';
 import { DOMParser } from 'xmldom';
 import multer from 'multer';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Configure multer for file uploads
 const storage = multer.memoryStorage();
@@ -48,7 +54,7 @@ export async function uploadKML(req, res) {
 }
 
 /**
- * Load KML from URL
+ * Load KML from URL or local file
  */
 export async function loadKMLFromURL(req, res) {
   try {
@@ -61,13 +67,30 @@ export async function loadKMLFromURL(req, res) {
       });
     }
 
-    // Fetch KML content from URL
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch KML: ${response.statusText}`);
+    let kmlContent;
+
+    // Check if it's a local file path (starts with /data/)
+    if (url.startsWith('/data/')) {
+      // Load from local filesystem
+      const fileName = url.replace('/data/', '');
+      const filePath = path.join(__dirname, '..', 'data', fileName);
+      
+      console.log('Loading local KML file:', filePath);
+      
+      try {
+        kmlContent = await fs.readFile(filePath, 'utf-8');
+      } catch (readError) {
+        throw new Error(`Failed to read local KML file: ${readError.message}`);
+      }
+    } else {
+      // Fetch KML content from external URL
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch KML: ${response.statusText}`);
+      }
+      kmlContent = await response.text();
     }
 
-    const kmlContent = await response.text();
     const parsedData = parseKMLContent(kmlContent);
 
     res.json({

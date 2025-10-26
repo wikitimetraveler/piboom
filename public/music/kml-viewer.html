@@ -368,11 +368,94 @@
     <!-- Upload Section -->
     <div class="upload-section">
       <h3 class="section-title">
-        <i class="bi-cloud-upload"></i> Upload KML File
+        <i class="bi-music-note-list"></i> Select Music Timeline
+      </h3>
+      
+      <!-- Quick Load Timelines -->
+      <div class="mb-4">
+        <label class="form-label fw-bold">Featured Timelines:</label>
+        <div class="row g-2">
+          <div class="col-md-4">
+            <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('bob-dylan-highway-61')">
+              <i class="bi-vinyl"></i> Bob Dylan: Highway 61
+            </button>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('taylor-swift-timeline')">
+              <i class="bi-star-fill"></i> Taylor Swift Timeline
+            </button>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('grateful-dead-tour')">
+              <i class="bi-peace"></i> Grateful Dead Tour
+            </button>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('legendary-music-venues')">
+              <i class="bi-building"></i> Legendary Venues
+            </button>
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('blues-history')">
+              <i class="bi-music-note-beamed"></i> Blues History
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deadhead Features -->
+      <div class="mb-4 p-3 bg-light rounded">
+        <h6 class="text-muted mb-2">
+          <i class="bi-music-note-beamed"></i> Deadhead Features
+        </h6>
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <a href="/music/my-grateful-dead-shows.html" class="btn btn-sm btn-primary">
+            <i class="bi-person-check"></i> My Shows
+          </a>
+          <a href="/music/kml-viewer.html" class="btn btn-sm btn-outline-primary">
+            <i class="bi-globe"></i> Browse All Shows
+          </a>
+        </div>
+      </div>
+
+      <!-- Google Earth Links -->
+      <div class="mb-4 p-3 bg-light rounded">
+        <h6 class="text-muted mb-2">
+          <i class="bi-globe"></i> Open in Google Earth Desktop
+        </h6>
+        <div class="d-flex flex-wrap gap-2">
+          <a href="/data/bob-dylan-highway-61.kml" class="btn btn-sm btn-success" download>
+            <i class="bi-download"></i> Bob Dylan
+          </a>
+          <a href="/data/taylor-swift-timeline.kml" class="btn btn-sm btn-success" download>
+            <i class="bi-download"></i> Taylor Swift
+          </a>
+          <a href="/data/grateful-dead-tour.kml" class="btn btn-sm btn-success" download>
+            <i class="bi-download"></i> Grateful Dead
+          </a>
+          <a href="/data/grateful-dead-endless-tour.kml" class="btn btn-sm btn-success" download>
+            <i class="bi-download"></i> Grateful Dead Endless Tour
+          </a>
+          <a href="/data/legendary-music-venues.kml" class="btn btn-sm btn-success" download>
+            <i class="bi-download"></i> Venues
+          </a>
+          <a href="/data/blues-history.kml" class="btn btn-sm btn-success" download>
+            <i class="bi-download"></i> Blues
+          </a>
+        </div>
+        <small class="text-muted d-block mt-2">
+          <i class="bi-info-circle"></i> Download and open in Google Earth for the full 3D experience
+        </small>
+      </div>
+
+      <hr>
+
+      <h3 class="section-title">
+        <i class="bi-cloud-upload"></i> Or Upload Your Own KML
       </h3>
       <div class="mb-3">
         <input type="file" class="form-control" id="kmlFileInput" accept=".kml" onchange="handleKMLUpload()">
-        <div class="form-text">Upload a KML file to visualize geographic locations and timeline events</div>
+        <div class="form-text">Upload a custom KML file to visualize geographic locations and timeline events</div>
       </div>
       
       <div class="mb-3">
@@ -383,6 +466,51 @@
             <i class="bi-download"></i> Load
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Voice & AI Chat Section -->
+    <div class="upload-section">
+      <h3 class="section-title">
+        <i class="bi-mic-fill"></i> Voice Assistant & AI Chat
+      </h3>
+      
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <div class="d-grid gap-2">
+              <button class="btn btn-lg btn-primary" id="voiceButton" onclick="toggleVoiceRecognition()">
+                <i class="bi-mic-fill" id="micIcon"></i>
+                <span id="voiceButtonText">Start Voice Control</span>
+              </button>
+              <button class="btn btn-danger" id="stopSpeakingButton" onclick="stopSpeaking()">
+                <i class="bi-volume-mute-fill"></i> Stop Speaking
+              </button>
+            </div>
+            <div class="form-text">Say "Load Bob Dylan" or "Show Taylor Swift timeline"</div>
+          </div>
+          <div id="voiceStatus" class="alert alert-info" style="display: none;">
+            <i class="bi-volume-up-fill"></i> <span id="voiceStatusText">Listening...</span>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="aiChatInput" class="form-label">Ask AI About the Timeline:</label>
+            <div class="input-group">
+              <input type="text" class="form-control" id="aiChatInput" 
+                     placeholder="e.g., Tell me about Bob Dylan's Newport performance">
+              <button class="btn btn-primary" onclick="sendAIChat()">
+                <i class="bi-send-fill"></i> Ask
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="aiChatResponse" class="p-3 bg-light rounded" style="display: none;">
+        <h6 class="text-primary"><i class="bi-robot"></i> AI Assistant:</h6>
+        <div id="aiChatResponseText"></div>
       </div>
     </div>
 
@@ -497,6 +625,34 @@
           }
         ]
       });
+    }
+
+    // Load preset timeline
+    async function loadPresetTimeline(timelineName) {
+      showLoading();
+      
+      const url = `/data/${timelineName}.kml`;
+      
+      try {
+        const response = await fetch('/api/kml/load-url', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          processKMLData(data.data);
+        } else {
+          showError('Failed to load timeline: ' + data.error);
+        }
+      } catch (error) {
+        console.error('Load error:', error);
+        showError('Failed to load timeline');
+      }
     }
 
     // Handle KML file upload
@@ -802,6 +958,246 @@
       `;
       document.getElementById('timelineMessage').style.display = 'block';
     }
+
+    // Voice Recognition
+    let recognition = null;
+    let isListening = false;
+
+    function toggleVoiceRecognition() {
+      if (isListening) {
+        stopVoiceRecognition();
+      } else {
+        startVoiceRecognition();
+      }
+    }
+
+    function startVoiceRecognition() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Voice recognition is not supported in this browser. Please use Chrome or Edge.');
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isListening = true;
+        document.getElementById('voiceButton').classList.add('btn-danger');
+        document.getElementById('voiceButton').classList.remove('btn-primary');
+        document.getElementById('voiceButtonText').textContent = 'Stop Listening';
+        document.getElementById('micIcon').classList.add('bi-mic-mute-fill');
+        document.getElementById('micIcon').classList.remove('bi-mic-fill');
+        document.getElementById('voiceStatus').style.display = 'block';
+        document.getElementById('voiceStatusText').textContent = 'Listening...';
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+        
+        document.getElementById('voiceStatusText').textContent = `You said: "${transcript}"`;
+        
+        if (event.results[event.results.length - 1].isFinal) {
+          processVoiceCommand(transcript.toLowerCase());
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Voice recognition error:', event.error);
+        document.getElementById('voiceStatusText').textContent = `Error: ${event.error}`;
+      };
+
+      recognition.onend = () => {
+        if (isListening) {
+          recognition.start(); // Restart if we're still supposed to be listening
+        }
+      };
+
+      recognition.start();
+    }
+
+    function stopVoiceRecognition() {
+      if (recognition) {
+        isListening = false;
+        recognition.stop();
+        document.getElementById('voiceButton').classList.remove('btn-danger');
+        document.getElementById('voiceButton').classList.add('btn-primary');
+        document.getElementById('voiceButtonText').textContent = 'Start Voice Control';
+        document.getElementById('micIcon').classList.remove('bi-mic-mute-fill');
+        document.getElementById('micIcon').classList.add('bi-mic-fill');
+        document.getElementById('voiceStatus').style.display = 'none';
+      }
+    }
+
+    let isProcessingCommand = false;
+
+    async function processVoiceCommand(command) {
+      console.log('Processing command:', command);
+      
+      // Prevent processing multiple commands at once
+      if (isProcessingCommand) {
+        console.log('Already processing a command, ignoring...');
+        return;
+      }
+      
+      isProcessingCommand = true;
+      
+      // Pause voice recognition while processing
+      const wasListening = isListening;
+      if (wasListening && recognition) {
+        recognition.stop();
+      }
+      
+      // Load timeline commands
+      if (command.includes('load') || command.includes('show') || command.includes('open')) {
+        if (command.includes('bob dylan') || command.includes('dylan')) {
+          await speak('Loading Bob Dylan Highway 61 timeline');
+          loadPresetTimeline('bob-dylan-highway-61');
+        } else if (command.includes('taylor swift') || command.includes('swift')) {
+          await speak('Loading Taylor Swift timeline');
+          loadPresetTimeline('taylor-swift-timeline');
+        } else if (command.includes('grateful dead') || command.includes('dead')) {
+          await speak('Loading Grateful Dead tour timeline');
+          loadPresetTimeline('grateful-dead-tour');
+        } else if (command.includes('venue') || command.includes('legendary')) {
+          await speak('Loading legendary music venues');
+          loadPresetTimeline('legendary-music-venues');
+        } else if (command.includes('blues')) {
+          await speak('Loading blues history timeline');
+          loadPresetTimeline('blues-history');
+        }
+      }
+      
+      // Navigation commands
+      else if (command.includes('next event') || command.includes('next location')) {
+        if (currentEventIndex < timelineEvents.length - 1) {
+          selectTimelineEvent(currentEventIndex + 1);
+          await speak('Moving to next event');
+        }
+      }
+      
+      else if (command.includes('previous event') || command.includes('previous location')) {
+        if (currentEventIndex > 0) {
+          selectTimelineEvent(currentEventIndex - 1);
+          await speak('Moving to previous event');
+        }
+      }
+
+      // Help command
+      else if (command.includes('help') || command.includes('what can you do')) {
+        await speak('You can say: Load Bob Dylan, Show Taylor Swift, Next event, Previous event, or ask me questions about the timeline');
+      }
+      
+      // Wait a bit after speaking before resuming listening
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Resume voice recognition if it was active
+      if (wasListening && !isListening) {
+        startVoiceRecognition();
+      }
+      
+      isProcessingCommand = false;
+    }
+
+    function speak(text) {
+      return new Promise((resolve) => {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        utterance.onend = () => {
+          resolve();
+        };
+        
+        utterance.onerror = () => {
+          resolve();
+        };
+        
+        window.speechSynthesis.speak(utterance);
+      });
+    }
+
+    // Stop speaking function
+    function stopSpeaking() {
+      window.speechSynthesis.cancel();
+      console.log('Speech stopped');
+    }
+
+    // AI Chat functionality
+    async function sendAIChat() {
+      const input = document.getElementById('aiChatInput');
+      const question = input.value.trim();
+      
+      if (!question) {
+        alert('Please enter a question');
+        return;
+      }
+
+      const responseDiv = document.getElementById('aiChatResponse');
+      const responseText = document.getElementById('aiChatResponseText');
+      
+      responseDiv.style.display = 'block';
+      responseText.innerHTML = '<i class="spinner-border spinner-border-sm"></i> Thinking...';
+
+      try {
+        // Gather context from current timeline
+        let context = '';
+        if (kmlData) {
+          context = `Current timeline: ${kmlData.name || 'Unknown'}\n`;
+          context += `Events: ${timelineEvents.map(e => e.name).join(', ')}\n`;
+        }
+
+        const response = await fetch('/api/chat/message', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: question,
+            context: context,
+            systemPrompt: 'You are a knowledgeable music history assistant helping users explore geographic timelines of music history. Provide detailed, engaging answers about music events, artists, and locations.'
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.response) {
+          responseText.textContent = data.response;
+          
+          // Speak the response if voice is active
+          if (isListening) {
+            speak(data.response);
+          }
+        } else {
+          responseText.textContent = 'Sorry, I could not get a response. Please try again.';
+        }
+      } catch (error) {
+        console.error('AI Chat error:', error);
+        responseText.textContent = 'Error communicating with AI assistant.';
+      }
+      
+      input.value = '';
+    }
+
+    // Allow Enter key to send chat
+    document.addEventListener('DOMContentLoaded', () => {
+      const chatInput = document.getElementById('aiChatInput');
+      if (chatInput) {
+        chatInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            sendAIChat();
+          }
+        });
+      }
+    });
 
     // Initialize page on load
     window.addEventListener('load', () => {

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Grateful Dead Shows - piBoom</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .dead-header {
+      background: linear-gradient(135deg, #1a472a, #2d5a3d);
+      color: white;
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+    }
+    
+    .show-card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+      margin-bottom: 1rem;
+    }
+    
+    .show-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .show-date {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #1a472a;
+    }
+    
+    .venue-name {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #2d5a3d;
+    }
+    
+    .location {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    
+    .rating-stars {
+      color: #ffc107;
+    }
+    
+    .stats-card {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #1a472a;
+    }
+    
+    .was-there-btn {
+      background: linear-gradient(135deg, #1a472a, #2d5a3d);
+      border: none;
+      border-radius: 25px;
+      padding: 0.5rem 1rem;
+      color: white;
+      transition: all 0.3s ease;
+    }
+    
+    .was-there-btn:hover {
+      background: linear-gradient(135deg, #2d5a3d, #1a472a);
+      transform: scale(1.05);
+    }
+    
+    .was-there-btn.attended {
+      background: linear-gradient(135deg, #28a745, #20c997);
+    }
+    
+    .personal-notes {
+      background: #f8f9fa;
+      border-left: 4px solid #1a472a;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 0 10px 10px 0;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #666;
+    }
+    
+    .empty-state i {
+      font-size: 4rem;
+      color: #ddd;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-home">
+    <a href="/index.html">
+      <i class="bi-house-fill"></i> Home
+    </a>
+  </div>
+
+  <div class="dead-header">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h1><i class="bi-music-note-beamed"></i> My Grateful Dead Shows</h1>
+          <p class="mb-0">Track your tour history and relive the memories</p>
+        </div>
+        <div class="col-md-4 text-end">
+          <button class="btn btn-light" onclick="refreshData()">
+            <i class="bi-arrow-clockwise"></i> Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- User Stats -->
+    <div class="stats-card" id="statsCard" style="display: none;">
+      <div class="row text-center">
+        <div class="col-md-3">
+          <div class="stat-number" id="totalShows">0</div>
+          <div class="text-muted">Total Shows</div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-number" id="uniqueVenues">0</div>
+          <div class="text-muted">Unique Venues</div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-number" id="uniqueCities">0</div>
+          <div class="text-muted">Cities Visited</div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-number" id="yearsSpanned">0</div>
+          <div class="text-muted">Years Spanned</div>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <small class="text-muted">
+            <i class="bi-calendar-event"></i> First Show: <span id="firstShow">-</span>
+          </small>
+        </div>
+        <div class="col-md-6">
+          <small class="text-muted">
+            <i class="bi-calendar-check"></i> Last Show: <span id="lastShow">-</span>
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shows List -->
+    <div id="showsContainer">
+      <div class="empty-state" id="emptyState">
+        <i class="bi-music-note-beamed"></i>
+        <h3>No Shows Yet</h3>
+        <p>Start marking shows you attended to build your tour history!</p>
+        <a href="/music/kml-viewer.html" class="btn btn-primary">
+          <i class="bi-globe"></i> Browse All Shows
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="text-center" id="loadingState" style="display: none;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading your shows...</p>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // For demo purposes, using a hardcoded user ID
+    // In a real app, this would come from authentication
+    const CURRENT_USER_ID = 1;
+
+    // Load user's shows on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      loadMyShows();
+    });
+
+    async function loadMyShows() {
+      const loadingState = document.getElementById('loadingState');
+      const showsContainer = document.getElementById('showsContainer');
+      const emptyState = document.getElementById('emptyState');
+      const statsCard = document.getElementById('statsCard');
+
+      loadingState.style.display = 'block';
+      showsContainer.style.display = 'none';
+
+      try {
+        const response = await fetch(`/api/user-attendance/users/${CURRENT_USER_ID}/shows`);
+        const data = await response.json();
+
+        loadingState.style.display = 'none';
+        showsContainer.style.display = 'block';
+
+        if (data.success && data.shows.length > 0) {
+          displayShows(data.shows);
+          displayStats(data.stats);
+          statsCard.style.display = 'block';
+          emptyState.style.display = 'none';
+        } else {
+          emptyState.style.display = 'block';
+          statsCard.style.display = 'none';
+        }
+
+      } catch (error) {
+        console.error('Error loading shows:', error);
+        loadingState.style.display = 'none';
+        showsContainer.style.display = 'block';
+        emptyState.innerHTML = `
+          <i class="bi-exclamation-triangle"></i>
+          <h3>Error Loading Shows</h3>
+          <p>There was a problem loading your shows. Please try again.</p>
+          <button class="btn btn-primary" onclick="loadMyShows()">
+            <i class="bi-arrow-clockwise"></i> Try Again
+          </button>
+        `;
+      }
+    }
+
+    function displayShows(shows) {
+      const showsContainer = document.getElementById('showsContainer');
+      
+      let html = '<div class="row">';
+      
+      shows.forEach(show => {
+        const showDate = new Date(show.show_date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+
+        const ratingStars = show.rating ? 
+          '★'.repeat(show.rating) + '☆'.repeat(5 - show.rating) : 
+          'No rating';
+
+        html += `
+          <div class="col-md-6 col-lg-4">
+            <div class="card show-card">
+              <div class="card-body">
+                <div class="show-date">${showDate}</div>
+                <div class="venue-name">${show.venue_name}</div>
+                <div class="location">
+                  <i class="bi-geo-alt"></i> ${show.city}, ${show.state || show.country}
+                </div>
+                
+                ${show.rating ? `
+                  <div class="rating-stars mt-2">
+                    <i class="bi-star-fill"></i> ${ratingStars}
+                  </div>
+                ` : ''}
+                
+                ${show.personal_notes ? `
+                  <div class="personal-notes">
+                    <strong>My Notes:</strong><br>
+                    ${show.personal_notes}
+                  </div>
+                ` : ''}
+                
+                <div class="mt-3">
+                  <button class="btn btn-sm btn-outline-danger" onclick="removeShow(${show.show_id})">
+                    <i class="bi-x-circle"></i> Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      showsContainer.innerHTML = html;
+    }
+
+    function displayStats(stats) {
+      document.getElementById('totalShows').textContent = stats.total_shows || 0;
+      document.getElementById('uniqueVenues').textContent = stats.unique_venues || 0;
+      document.getElementById('uniqueCities').textContent = stats.unique_cities || 0;
+      document.getElementById('yearsSpanned').textContent = stats.years_spanned || 0;
+      
+      document.getElementById('firstShow').textContent = stats.first_show ? 
+        new Date(stats.first_show).toLocaleDateString() : '-';
+      document.getElementById('lastShow').textContent = stats.last_show ? 
+        new Date(stats.last_show).toLocaleDateString() : '-';
+    }
+
+    async function removeShow(showId) {
+      if (!confirm('Are you sure you want to remove this show from your list?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/user-attendance/users/${CURRENT_USER_ID}/shows/${showId}/attend`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          loadMyShows(); // Refresh the list
+        } else {
+          alert('Error removing show: ' + data.error);
+        }
+
+      } catch (error) {
+        console.error('Error removing show:', error);
+        alert('Error removing show');
+      }
+    }
+
+    function refreshData() {
+      loadMyShows();
+    }
+  </script>
+</body>
+</html>

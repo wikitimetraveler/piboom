@@ -1041,7 +1041,12 @@ export async function searchYouTubeForAlbum(req, res) {
 
   } catch (error) {
     console.error('YouTube search error:', error);
-    res.status(500).json({ error: 'Failed to search YouTube' });
+    console.error('Error details:', error.response?.data || error.message);
+    res.status(500).json({ 
+      error: 'Failed to search YouTube',
+      details: error.message,
+      response: error.response?.data
+    });
   }
 }
 
@@ -1068,13 +1073,14 @@ export async function searchYouTube(req, res) {
 
     if (data.items && data.items.length > 0) {
       const videos = data.items.map(item => ({
-      videoId: item.id.videoId,
-      title: item.snippet.title,
-      channelTitle: item.snippet.channelTitle,
-        thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url || ''
-    }));
+        videoId: item.id.videoId,
+        title: item.snippet.title,
+        channelTitle: item.snippet.channelTitle,
+        thumbnail: item.snippet.thumbnails.medium?.url || item.snippet.thumbnails.default?.url || '',
+        url: `https://www.youtube.com/watch?v=${item.id.videoId}`
+      }));
 
-    res.json({ videos });
+      res.json({ videos });
     } else {
       res.json({ videos: [] });
     }

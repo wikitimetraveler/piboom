@@ -17,3 +17,4 @@ router.post('/location-details', kmlController.getLocationDetails);
 
 export default router;
 
+
