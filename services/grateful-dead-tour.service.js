@@ -44,7 +44,7 @@ export async function fetchTourDataFromAPI() {
 
   while (page <= totalPages) {
     try {
-      const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=6faa7ca7-0d99-4a5e-bfa6-1fd5037520c6&p=${page}`;
+      const url = `https://api.setlist.fm/rest/1.0/search/setlists?artistMbid=6faa7ca7-0d99-4a5e-bfa6-1fd5037520c6&p=${page}&sort=eventDate`;
       
       const response = await fetch(url, {
         headers: {
@@ -329,6 +329,11 @@ export async function saveKMLToFile(kmlContent, filename = 'grateful-dead-endles
 export async function importTourData() {
   try {
     console.log('🎸 Starting Grateful Dead tour data import...');
+    
+    // Initialize database first
+    const { initializeDatabase, createTables } = await import('./database.service.js');
+    initializeDatabase();
+    await createTables();
     
     // Fetch data from API
     const shows = await fetchTourDataFromAPI();
