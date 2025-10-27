@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Grateful Dead Tour</name>
+    <description>Grateful Dead tour locations and history. This network link will load the data from your piBoom server.</description>
+    <NetworkLink>
+      <name>Grateful Dead Tour</name>
+      <description>View Grateful Dead tour locations and show history</description>
+      <refreshVisibility>0</refreshVisibility>
+      <flyToView>1</flyToView>
+      <Link>
+        <href>http://localhost:3000/data/grateful-dead-tour.kml</href>
+        <refreshMode>onInterval</refreshMode>
+        <refreshInterval>3600</refreshInterval>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>
+

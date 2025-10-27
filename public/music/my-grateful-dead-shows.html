@@ -114,6 +114,9 @@
           <p class="mb-0">Track your tour history and relive the memories</p>
         </div>
         <div class="col-md-4 text-end">
+          <button class="btn btn-light me-2" onclick="loadAllShows()">
+            <i class="bi-music-note-list"></i> Load All Shows
+          </button>
           <button class="btn btn-light" onclick="refreshData()">
             <i class="bi-arrow-clockwise"></i> Refresh
           </button>
@@ -163,9 +166,9 @@
         <i class="bi-music-note-beamed"></i>
         <h3>No Shows Yet</h3>
         <p>Start marking shows you attended to build your tour history!</p>
-        <a href="/music/kml-viewer.html" class="btn btn-primary">
-          <i class="bi-globe"></i> Browse All Shows
-        </a>
+        <button class="btn btn-primary" onclick="loadAllShows()">
+          <i class="bi-music-note-list"></i> Load All Shows
+        </button>
       </div>
     </div>
 
@@ -323,6 +326,154 @@
     function refreshData() {
       loadMyShows();
     }
+
+    // Load all Grateful Dead shows
+    async function loadAllShows() {
+      const loadingState = document.getElementById('loadingState');
+      const showsContainer = document.getElementById('showsContainer');
+      const emptyState = document.getElementById('emptyState');
+      const statsCard = document.getElementById('statsCard');
+
+      loadingState.style.display = 'block';
+      showsContainer.style.display = 'none';
+
+      try {
+        // Fetch all shows (with pagination to handle large dataset)
+        let allShows = [];
+        let page = 1;
+        let hasMore = true;
+
+        while (hasMore) {
+          const response = await fetch(`/api/grateful-dead/shows?page=${page}&limit=100`);
+          const data = await response.json();
+
+          if (data.success && data.data.shows.length > 0) {
+            allShows = allShows.concat(data.data.shows);
+            hasMore = data.data.pagination.page < data.data.pagination.pages;
+            page++;
+          } else {
+            hasMore = false;
+          }
+        }
+
+        loadingState.style.display = 'none';
+        showsContainer.style.display = 'block';
+
+        if (allShows.length > 0) {
+          displayAllShows(allShows);
+          statsCard.style.display = 'none';
+          emptyState.style.display = 'none';
+        } else {
+          emptyState.innerHTML = `
+            <i class="bi-exclamation-triangle"></i>
+            <h3>No Shows Found</h3>
+            <p>No shows available in the database.</p>
+          `;
+          emptyState.style.display = 'block';
+        }
+
+      } catch (error) {
+        console.error('Error loading all shows:', error);
+        loadingState.style.display = 'none';
+        showsContainer.style.display = 'block';
+        emptyState.innerHTML = `
+          <i class="bi-exclamation-triangle"></i>
+          <h3>Error Loading Shows</h3>
+          <p>There was a problem loading the shows. Please try again.</p>
+          <button class="btn btn-primary" onclick="loadAllShows()">
+            <i class="bi-arrow-clockwise"></i> Try Again
+          </button>
+        `;
+      }
+    }
+
+    function displayAllShows(shows) {
+      const showsContainer = document.getElementById('showsContainer');
+      
+      let html = '<div class="mb-3"><h4>All Grateful Dead Shows (' + shows.length + ')</h4></div>';
+      html += '<div class="row">';
+      
+      shows.forEach(show => {
+        const showDate = new Date(show.show_date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+
+        html += `
+          <div class="col-md-6 col-lg-4">
+            <div class="card show-card">
+              <div class="card-body">
+                <div class="show-date">${showDate}</div>
+                <div class="venue-name">${show.venue_name}</div>
+                <div class="location">
+                  <i class="bi-geo-alt"></i> ${show.city}, ${show.state || show.country}
+                </div>
+                
+                <div class="mt-3">
+                  <button class="btn btn-sm was-there-btn" onclick="markAttended(${show.id})">
+                    <i class="bi-check-circle"></i> I Was There!
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      showsContainer.innerHTML = html;
+    }
+
+    async function markAttended(showId) {
+      try {
+        const response = await fetch(`/api/user-attendance/users/${CURRENT_USER_ID}/shows/${showId}/attend`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            rating: null,
+            personalNotes: ''
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Show added to your list!');
+          loadMyShows(); // Switch back to personal shows view
+        } else {
+          alert('Error adding show: ' + data.error);
+        }
+
+      } catch (error) {
+        console.error('Error marking attendance:', error);
+        alert('Error adding show');
+      }
+    }
   </script>
+
+  <!-- Attribution Footer -->
+  <footer style="background: #f8f9fa; padding: 2rem 0; margin-top: 4rem; border-top: 2px solid #e9ecef;">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <p class="mb-2" style="color: #666; font-size: 0.9rem;">
+            <i class="bi-music-note-list"></i> 
+            <strong>Setlist data provided by <a href="https://www.setlist.fm" target="_blank" rel="noopener noreferrer" style="color: #1a472a; text-decoration: none; font-weight: bold;">setlist.fm</a></strong>
+          </p>
+          <p class="mb-0" style="color: #888; font-size: 0.85rem;">
+            Thanks to the amazing setlist.fm community contributors for documenting Grateful Dead concert history.
+          </p>
+          <p class="mt-2 mb-0" style="color: #999; font-size: 0.8rem;">
+            <a href="https://www.setlist.fm/setlists/grateful-dead-13d6dd1d.html" target="_blank" rel="noopener noreferrer" style="color: #666;">
+              View Grateful Dead on setlist.fm <i class="bi-box-arrow-up-right"></i>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>

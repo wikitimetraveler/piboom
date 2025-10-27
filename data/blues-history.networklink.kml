@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Blues History Timeline</name>
+    <description>Historic blues locations and timeline. This network link will load the data from your piBoom server.</description>
+    <NetworkLink>
+      <name>Blues History Timeline</name>
+      <description>View historic blues locations and timeline</description>
+      <refreshVisibility>0</refreshVisibility>
+      <flyToView>1</flyToView>
+      <Link>
+        <href>http://localhost:3000/data/blues-history.kml</href>
+        <refreshMode>onInterval</refreshMode>
+        <refreshInterval>3600</refreshInterval>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>
+

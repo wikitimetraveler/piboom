@@ -254,6 +254,44 @@
       to { transform: rotate(360deg); }
     }
 
+    .dancing-bear {
+      font-size: 4rem;
+      display: inline-block;
+      animation: dance 0.6s ease-in-out infinite;
+    }
+
+    @keyframes dance {
+      0%, 100% {
+        transform: translateY(0) rotate(-5deg);
+      }
+      25% {
+        transform: translateY(-15px) rotate(5deg);
+      }
+      50% {
+        transform: translateY(0) rotate(-5deg);
+      }
+      75% {
+        transform: translateY(-10px) rotate(5deg);
+      }
+    }
+
+    .bear-message {
+      font-size: 1.2rem;
+      color: #667eea;
+      margin-top: 15px;
+      font-weight: bold;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 0.7;
+      }
+      50% {
+        opacity: 1;
+      }
+    }
+
     .alert {
       border-radius: 10px;
       border: none;
@@ -391,6 +429,11 @@
             </button>
           </div>
           <div class="col-md-4">
+            <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('grateful-dead-endless-tour')">
+              <i class="bi-infinity"></i> GD Endless Tour
+            </button>
+          </div>
+          <div class="col-md-4">
             <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('legendary-music-venues')">
               <i class="bi-building"></i> Legendary Venues
             </button>
@@ -410,7 +453,7 @@
         </h6>
         <div class="d-flex flex-wrap gap-2 mb-3">
           <a href="/music/my-grateful-dead-shows.html" class="btn btn-sm btn-primary">
-            <i class="bi-person-check"></i> My Shows
+            <i class="bi-person-check"></i> My Grateful Dead Shows
           </a>
           <a href="/music/kml-viewer.html" class="btn btn-sm btn-outline-primary">
             <i class="bi-globe"></i> Browse All Shows
@@ -420,32 +463,100 @@
 
       <!-- Google Earth Links -->
       <div class="mb-4 p-3 bg-light rounded">
-        <h6 class="text-muted mb-2">
-          <i class="bi-globe"></i> Open in Google Earth Desktop
+        <h6 class="text-muted mb-3">
+          <i class="bi-globe"></i> Open in Google Earth Pro Desktop
         </h6>
-        <div class="d-flex flex-wrap gap-2">
-          <a href="/data/bob-dylan-highway-61.kml" class="btn btn-sm btn-success" download>
-            <i class="bi-download"></i> Bob Dylan
-          </a>
-          <a href="/data/taylor-swift-timeline.kml" class="btn btn-sm btn-success" download>
-            <i class="bi-download"></i> Taylor Swift
-          </a>
-          <a href="/data/grateful-dead-tour.kml" class="btn btn-sm btn-success" download>
-            <i class="bi-download"></i> Grateful Dead
-          </a>
-          <a href="/data/grateful-dead-endless-tour.kml" class="btn btn-sm btn-success" download>
-            <i class="bi-download"></i> Grateful Dead Endless Tour
-          </a>
-          <a href="/data/legendary-music-venues.kml" class="btn btn-sm btn-success" download>
-            <i class="bi-download"></i> Venues
-          </a>
-          <a href="/data/blues-history.kml" class="btn btn-sm btn-success" download>
-            <i class="bi-download"></i> Blues
-          </a>
+        
+        <div class="mb-3">
+          <strong class="d-block mb-2">Network Link URLs (Copy & Paste into Google Earth Pro):</strong>
+          <small class="text-muted d-block mb-2">In Google Earth Pro: File → Add → Network Link, then paste URL</small>
+          
+          <div class="list-group">
+            <div class="list-group-item">
+              <strong>Bob Dylan - Highway 61</strong>
+              <div class="input-group input-group-sm mt-2">
+                <input type="text" class="form-control" value="http://localhost:3000/data/bob-dylan-highway-61.kml" readonly onclick="this.select()">
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard('http://localhost:3000/data/bob-dylan-highway-61.kml')">
+                  <i class="bi-clipboard"></i> Copy
+                </button>
+              </div>
+            </div>
+            
+            <div class="list-group-item">
+              <strong>Taylor Swift Timeline</strong>
+              <div class="input-group input-group-sm mt-2">
+                <input type="text" class="form-control" value="http://localhost:3000/data/taylor-swift-timeline.kml" readonly onclick="this.select()">
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard('http://localhost:3000/data/taylor-swift-timeline.kml')">
+                  <i class="bi-clipboard"></i> Copy
+                </button>
+              </div>
+            </div>
+            
+            <div class="list-group-item">
+              <strong>Grateful Dead Tour</strong>
+              <div class="input-group input-group-sm mt-2">
+                <input type="text" class="form-control" value="http://localhost:3000/data/grateful-dead-tour.kml" readonly onclick="this.select()">
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard('http://localhost:3000/data/grateful-dead-tour.kml')">
+                  <i class="bi-clipboard"></i> Copy
+                </button>
+              </div>
+            </div>
+            
+            <div class="list-group-item">
+              <strong>Grateful Dead - Endless Tour (All Shows)</strong>
+              <div class="input-group input-group-sm mt-2">
+                <input type="text" class="form-control" value="http://localhost:3000/data/grateful-dead-endless-tour.kml" readonly onclick="this.select()">
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard('http://localhost:3000/data/grateful-dead-endless-tour.kml')">
+                  <i class="bi-clipboard"></i> Copy
+                </button>
+              </div>
+            </div>
+            
+            <div class="list-group-item">
+              <strong>Legendary Music Venues</strong>
+              <div class="input-group input-group-sm mt-2">
+                <input type="text" class="form-control" value="http://localhost:3000/data/legendary-music-venues.kml" readonly onclick="this.select()">
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard('http://localhost:3000/data/legendary-music-venues.kml')">
+                  <i class="bi-clipboard"></i> Copy
+                </button>
+              </div>
+            </div>
+            
+            <div class="list-group-item">
+              <strong>Blues History Timeline</strong>
+              <div class="input-group input-group-sm mt-2">
+                <input type="text" class="form-control" value="http://localhost:3000/data/blues-history.kml" readonly onclick="this.select()">
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard('http://localhost:3000/data/blues-history.kml')">
+                  <i class="bi-clipboard"></i> Copy
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <small class="text-muted d-block mt-2">
-          <i class="bi-info-circle"></i> Download and open in Google Earth for the full 3D experience
-        </small>
+        
+        <div>
+          <strong class="d-block mb-2">Or Download Static Files:</strong>
+          <div class="d-flex flex-wrap gap-2">
+            <a href="/data/bob-dylan-highway-61.kml" class="btn btn-sm btn-success" download>
+              <i class="bi-download"></i> Bob Dylan
+            </a>
+            <a href="/data/taylor-swift-timeline.kml" class="btn btn-sm btn-success" download>
+              <i class="bi-download"></i> Taylor Swift
+            </a>
+            <a href="/data/grateful-dead-tour.kml" class="btn btn-sm btn-success" download>
+              <i class="bi-download"></i> Grateful Dead
+            </a>
+            <a href="/data/grateful-dead-endless-tour.kml" class="btn btn-sm btn-success" download>
+              <i class="bi-download"></i> GD Endless Tour
+            </a>
+            <a href="/data/legendary-music-venues.kml" class="btn btn-sm btn-success" download>
+              <i class="bi-download"></i> Venues
+            </a>
+            <a href="/data/blues-history.kml" class="btn btn-sm btn-success" download>
+              <i class="bi-download"></i> Blues
+            </a>
+          </div>
+        </div>
       </div>
 
       <hr>
@@ -565,10 +676,12 @@
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
   
   <script>
     let map;
     let markers = [];
+    let clusterer = null;
     let kmlData = null;
     let timelineEvents = [];
     let youtubeVideos = [];
@@ -741,24 +854,45 @@
 
     // Display locations on map
     function displayLocationsOnMap(locations) {
-      // Clear existing markers
+      // Clear existing markers and clusterer
+      if (clusterer) {
+        clusterer.clearMarkers();
+      }
       markers.forEach(marker => marker.setMap(null));
       markers = [];
       
       if (locations.length === 0) return;
+      
+      // Trigger resize to ensure map is properly sized
+      if (map && google && google.maps && google.maps.event) {
+        google.maps.event.trigger(map, 'resize');
+      }
       
       const bounds = new google.maps.LatLngBounds();
       
       locations.forEach((location, index) => {
         const position = { lat: location.lat, lng: location.lng };
         
-        const marker = new google.maps.Marker({
+        // For large datasets, use smaller markers without labels
+        const markerOptions = {
           position: position,
-          map: map,
           title: location.name,
-          label: (index + 1).toString(),
-          animation: google.maps.Animation.DROP
-        });
+          icon: locations.length > 100 ? {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 6,
+            fillColor: '#667eea',
+            fillOpacity: 0.8,
+            strokeColor: '#ffffff',
+            strokeWeight: 2
+          } : undefined
+        };
+        
+        // Only add labels for small datasets
+        if (locations.length <= 100) {
+          markerOptions.label = (index + 1).toString();
+        }
+        
+        const marker = new google.maps.Marker(markerOptions);
         
         const infoWindow = new google.maps.InfoWindow({
           content: `
@@ -781,11 +915,28 @@
         });
         
         marker.infoWindow = infoWindow;
+        marker.eventIndex = index;
         markers.push(marker);
         bounds.extend(position);
       });
       
-      map.fitBounds(bounds);
+      // Use marker clustering for large datasets
+      if (locations.length > 100) {
+        clusterer = new markerClusterer.MarkerClusterer({ 
+          map,
+          markers,
+          gridSize: 50,
+          maxZoom: 12
+        });
+      } else {
+        // For small datasets, add markers directly to map
+        markers.forEach(marker => marker.setMap(map));
+      }
+      
+      // Fit bounds after a small delay to ensure everything is rendered
+      setTimeout(() => {
+        map.fitBounds(bounds);
+      }, 100);
     }
 
     // Display timeline
@@ -859,6 +1010,15 @@
       // Show YouTube section
       document.getElementById('youtubeSection').style.display = 'block';
       
+      // Show dancing bear while loading videos
+      const videosList = document.getElementById('youtubeVideosList');
+      videosList.innerHTML = `
+        <div class="loading-spinner">
+          <div class="dancing-bear">🐻</div>
+          <div class="bear-message">Finding groovy videos...</div>
+        </div>
+      `;
+      
       // Fetch YouTube videos for this event
       try {
         const response = await fetch('/api/kml/youtube-search', {
@@ -883,12 +1043,12 @@
           // Update stats
           document.getElementById('statVideos').textContent = data.videos.length;
         } else {
-          document.getElementById('youtubeVideosList').innerHTML = 
+          videosList.innerHTML = 
             '<div class="alert alert-info">No videos found for this event</div>';
         }
       } catch (error) {
         console.error('YouTube search error:', error);
-        document.getElementById('youtubeVideosList').innerHTML = 
+        videosList.innerHTML = 
           '<div class="alert alert-danger">Failed to load videos</div>';
       }
     }
@@ -935,13 +1095,21 @@
 
     // Show loading state
     function showLoading() {
-      document.getElementById('timelineMessage').innerHTML = `
+      const message = document.getElementById('timelineMessage');
+      const container = document.getElementById('timelineContainer');
+      
+      // Hide timeline container and show loading message
+      if (container) {
+        container.style.display = 'none';
+      }
+      
+      message.innerHTML = `
         <div class="loading-spinner">
-          <i class="bi-hourglass-split"></i>
-          <p>Loading KML data...</p>
+          <div class="dancing-bear">🐻</div>
+          <div class="bear-message">Loading your groovy timeline...</div>
         </div>
       `;
-      document.getElementById('timelineMessage').style.display = 'block';
+      message.style.display = 'block';
     }
 
     // Hide loading state
@@ -1187,6 +1355,27 @@
       input.value = '';
     }
 
+    // Copy to clipboard function
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        // Show temporary success message
+        const btn = event.target.closest('button');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="bi-check"></i> Copied!';
+        btn.classList.add('btn-success');
+        btn.classList.remove('btn-outline-secondary');
+        
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          btn.classList.remove('btn-success');
+          btn.classList.add('btn-outline-secondary');
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy to clipboard. Please select and copy manually.');
+      });
+    }
+
     // Allow Enter key to send chat
     document.addEventListener('DOMContentLoaded', () => {
       const chatInput = document.getElementById('aiChatInput');
@@ -1204,6 +1393,28 @@
       loadGoogleMapsAPI();
     });
   </script>
+
+  <!-- Attribution Footer -->
+  <footer style="background: rgba(255, 255, 255, 0.95); padding: 2rem 0; margin-top: 4rem; border-top: 2px solid rgba(135, 206, 250, 0.3); backdrop-filter: blur(10px);">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <p class="mb-2" style="color: #666; font-size: 0.9rem;">
+            <i class="bi-music-note-list"></i> 
+            <strong>Grateful Dead setlist data provided by <a href="https://www.setlist.fm" target="_blank" rel="noopener noreferrer" style="color: #667eea; text-decoration: none; font-weight: bold;">setlist.fm</a></strong>
+          </p>
+          <p class="mb-0" style="color: #888; font-size: 0.85rem;">
+            Thanks to the amazing setlist.fm community contributors for documenting concert history.
+          </p>
+          <p class="mt-2 mb-0" style="color: #999; font-size: 0.8rem;">
+            <a href="https://www.setlist.fm/setlists/grateful-dead-13d6dd1d.html" target="_blank" rel="noopener noreferrer" style="color: #667eea;">
+              View Grateful Dead on setlist.fm <i class="bi-box-arrow-up-right"></i>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
 
