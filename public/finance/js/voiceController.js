@@ -10,13 +10,13 @@ class VoiceController {
     this.isInitialized = false;
     
     this.toolCommands = {
-      'calculator': 'tools/tool1/index.html',
-      'parser': 'tools/tool2/index.html',
-      'mashup': 'tools/tool3/index.html',
-      'automator': 'tools/tool4/index.html',
-      'ruler': 'tools/tool5/index.html',
-      'transformer': 'tools/tool6/index.html',
-      'alchemist': 'tools/tool8/index.html'
+      'calculator': '/finance/fha-streamline-calculator.html',
+      'parser': '/finance/tool2.html',
+      'mashup': '/finance/tool3.html',
+      'automator': '/finance/tool4.html',
+      'ruler': '/finance/tool5.html',
+      'transformer': '/finance/tool6.html',
+      'alchemist': '/finance/tool8.html'
     };
     
     // Initialize voice control lazily when first needed

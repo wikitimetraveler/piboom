@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Pipeline Disaster Risk Analysis</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Maps API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI&libraries=places"></script>
+    <!-- Google API for YouTube -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    
+    <!-- Custom CSS -->
+    <link href="../shared/modern-navbar.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color) !important;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            font-weight: 600;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .risk-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .risk-low {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .risk-medium {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .risk-high {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .risk-not-analyzed {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+            border-color: #1d4ed8;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            border-color: var(--warning-color);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background-color: #f8fafc;
+            border-bottom: 2px solid #e5e7eb;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .loading-spinner {
+            display: none;
+        }
+
+        .loading-spinner.show {
+            display: inline-block;
+        }
+
+        .progress-bar {
+            border-radius: 4px;
+        }
+
+        .filter-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .milestone-progress {
+            height: 8px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer h5 {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .footer a {
+            color: #9ca3af;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <modern-navbar></modern-navbar>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h2 mb-1">Loan Pipeline Disaster Risk Analysis</h1>
+                        <p class="text-muted mb-0">Monitor and analyze disaster risk across your loan portfolio</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" onclick="generateTestLoans()">
+                            <i class="bi bi-plus-circle"></i> Generate Test Loans
+                        </button>
+                        <button class="btn btn-success" onclick="analyzeAllLoans()">
+                            <i class="bi bi-shield-check"></i> Analyze Risk
+                        </button>
+                        <button class="btn btn-info" onclick="downloadKML()">
+                            <i class="bi bi-download"></i> Download KML
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number text-primary" id="totalLoans">-</div>
+                    <div class="stat-label">Total Loans</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number text-success" id="analyzedLoans">-</div>
+                    <div class="stat-label">Analyzed</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number text-warning" id="pendingAnalysis">-</div>
+                    <div class="stat-label">Pending Analysis</div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-number text-danger" id="highRiskLoans">-</div>
+                    <div class="stat-label">High Risk</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Distribution -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Risk Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="riskDistributionChart">
+                            <div class="text-center text-muted">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-graph-up"></i> Pipeline Milestones</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="milestoneChart">
+                            <div class="text-center text-muted">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <h5 class="mb-3"><i class="bi bi-funnel"></i> Filters</h5>
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Milestone</label>
+                    <select class="form-select" id="milestoneFilter">
+                        <option value="">All Milestones</option>
+                        <option value="Application">Application</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Underwriting">Underwriting</option>
+                        <option value="Closing">Closing</option>
+                        <option value="Funded">Funded</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">State</label>
+                    <select class="form-select" id="stateFilter">
+                        <option value="">All States</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Risk Level</label>
+                    <select class="form-select" id="riskFilter">
+                        <option value="">All Risk Levels</option>
+                        <option value="low">Low Risk</option>
+                        <option value="medium">Medium Risk</option>
+                        <option value="high">High Risk</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3 d-flex align-items-end">
+                    <button class="btn btn-outline-primary w-100" onclick="applyFilters()">
+                        <i class="bi bi-search"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Progress -->
+        <div class="row mb-4" id="analysisProgress" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">Risk Analysis Progress</h6>
+                        <div class="progress mb-2">
+                            <div class="progress-bar" role="progressbar" style="width: 0%" id="progressBar"></div>
+                        </div>
+                        <small class="text-muted" id="progressText">Starting analysis...</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FEMA Disasters as Top Level -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> FEMA Disaster Declarations</h5>
+                        <small class="text-muted">Click on a disaster to view affected Encompass loans in that county</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="femaDisastersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Declaration Type</th>
+                                        <th>Incident Type</th>
+                                        <th>Disaster Title</th>
+                                        <th>State</th>
+                                        <th>County</th>
+                                        <th>IH Program</th>
+                                        <th>IA Program</th>
+                                        <th>PA Program</th>
+                                        <th>HM Program</th>
+                                        <th>Begin Date</th>
+                                        <th>End Date</th>
+                                        <th>Closeout Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- FEMA data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Encompass Loans (shown when FEMA disaster is selected) -->
+                <div class="card mt-3" id="encompassLoansCard" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-bank"></i> Encompass Loans in Affected County</h5>
+                        <small class="text-muted" id="encompassLoansSubtitle">Loans affected by selected disaster</small>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="encompassLoansTable">
+                                <thead>
+                                    <tr>
+                                        <th>Loan Number</th>
+                                        <th>Borrower</th>
+                                        <th>Property Address</th>
+                                        <th>City, State</th>
+                                        <th>Loan Amount</th>
+                                        <th>Milestone</th>
+                                        <th>Risk Level</th>
+                                        <th>Encompass GUID</th>
+                                        <th>Last Analysis</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Encompass loan data will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <!-- Google Maps Integration -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Disaster Areas & Loan Properties</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="map" style="height: 300px; width: 100%;"></div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <span class="badge bg-danger me-1">●</span> Disaster Areas<br>
+                                <span class="badge bg-primary me-1">●</span> Loan Properties
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YouTube Integration -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-youtube"></i> Disaster Videos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="youtubeResults">
+                            <div class="text-center text-muted">
+                                <i class="bi bi-youtube"></i><br>
+                                Click on a FEMA disaster to search for related videos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>piBoom Finance</h5>
+                    <p class="mb-0">Advanced loan pipeline disaster risk analysis powered by FEMA data and KML visualization.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5>Quick Links</h5>
+                    <div class="d-flex flex-column">
+                        <a href="/finance/index.html">Finance Hub</a>
+                        <a href="/finance/encompass-assistant.html">Encompass Assistant</a>
+                        <a href="/">Home</a>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="mb-0">&copy; 2024 David Lane's piBoom. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Shared Components -->
+    <script src="../shared/modern-navbar.js"></script>
+    <script src="../shared/user-login.js"></script>
+    <script src="../shared/user-passwords.js"></script>
+
+    <!-- Main Script -->
+    <script>
+        let femaDisastersTable;
+        let encompassLoansTable;
+        let currentFilters = {};
+        let map;
+        let markers = [];
+        let youtubeAPIReady = false;
+        let selectedDisaster = null;
+
+        // Initialize dashboard
+        $(document).ready(function() {
+            initializeUser();
+            loadFEMADisasters();
+            initializeFEMADataTable();
+            initializeEncompassDataTable();
+            populateStateFilter();
+            initializeGoogleMaps();
+            loadYouTubeAPI();
+        });
+
+        // Initialize user login
+        function initializeUser() {
+            if (typeof window.isLoggedIn === 'function' && window.isLoggedIn()) {
+                const user = window.getLoggedInUser();
+                updateNavbarUserDisplay(user);
+            }
+        }
+
+        // Load FEMA disaster data
+        async function loadFEMADisasters() {
+            try {
+                // Load FEMA disasters from our database (stored from previous analysis)
+                const response = await fetch('/api/loan-pipeline/fema-disasters');
+                const data = await response.json();
+                
+                if (data.success) {
+                    populateFEMATable(data.data.disasters);
+                    updateMapWithDisasters(data.data.disasters);
+                } else {
+                    // If no FEMA data in database, load sample data
+                    loadSampleFEMAData();
+                }
+            } catch (error) {
+                console.error('Error loading FEMA disasters:', error);
+                loadSampleFEMAData();
+            }
+        }
+
+        // Load sample FEMA data for demonstration
+        function loadSampleFEMAData() {
+            const sampleDisasters = [
+                {
+                    declarationType: 'DR',
+                    incidentType: 'Hurricane',
+                    declarationTitle: 'Hurricane Ian',
+                    state: 'FL',
+                    county: 'Orange',
+                    ihProgramDeclared: true,
+                    iaProgramDeclared: true,
+                    paProgramDeclared: true,
+                    hmProgramDeclared: true,
+                    incidentBeginDate: '2022-09-28',
+                    incidentEndDate: '2022-10-02',
+                    disasterCloseoutDate: '2023-12-31',
+                    latitude: 28.5383,
+                    longitude: -81.3792
+                },
+                {
+                    declarationType: 'DR',
+                    incidentType: 'Wildfire',
+                    declarationTitle: 'Camp Fire',
+                    state: 'CA',
+                    county: 'Butte',
+                    ihProgramDeclared: true,
+                    iaProgramDeclared: true,
+                    paProgramDeclared: true,
+                    hmProgramDeclared: false,
+                    incidentBeginDate: '2018-11-08',
+                    incidentEndDate: '2018-11-25',
+                    disasterCloseoutDate: '2021-06-30',
+                    latitude: 39.7285,
+                    longitude: -121.8375
+                },
+                {
+                    declarationType: 'DR',
+                    incidentType: 'Tornado',
+                    declarationTitle: 'Tornado Outbreak',
+                    state: 'TX',
+                    county: 'Harris',
+                    ihProgramDeclared: true,
+                    iaProgramDeclared: true,
+                    paProgramDeclared: false,
+                    hmProgramDeclared: true,
+                    incidentBeginDate: '2023-01-24',
+                    incidentEndDate: '2023-01-25',
+                    disasterCloseoutDate: null,
+                    latitude: 29.7604,
+                    longitude: -95.3698
+                }
+            ];
+            
+            populateFEMATable(sampleDisasters);
+            updateMapWithDisasters(sampleDisasters);
+        }
+
+        // Update statistics cards
+        function updateStatistics(stats) {
+            $('#totalLoans').text(stats.totalLoans || 0);
+            $('#analyzedLoans').text(stats.analysisStatus?.analyzed_loans || 0);
+            $('#pendingAnalysis').text(stats.analysisStatus?.pending_analysis || 0);
+            
+            // Calculate high risk loans
+            const highRiskCount = stats.riskLevels?.find(r => r.risk_level === 'High Risk')?.count || 0;
+            $('#highRiskLoans').text(highRiskCount);
+        }
+
+        // Update risk charts
+        function updateRiskCharts(data) {
+            // Risk Distribution Chart
+            const riskCtx = document.getElementById('riskDistributionChart');
+            if (riskCtx && data.riskDistribution) {
+                new Chart(riskCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: data.riskDistribution.map(r => r.risk_level),
+                        datasets: [{
+                            data: data.riskDistribution.map(r => r.count),
+                            backgroundColor: [
+                                '#10b981', // Low Risk - Green
+                                '#f59e0b', // Medium Risk - Yellow
+                                '#ef4444', // High Risk - Red
+                                '#6b7280'  // Not Analyzed - Gray
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Milestone Chart
+            const milestoneCtx = document.getElementById('milestoneChart');
+            if (milestoneCtx && data.milestoneChart) {
+                new Chart(milestoneCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.milestoneChart.map(m => m.milestone),
+                        datasets: [{
+                            label: 'Loans',
+                            data: data.milestoneChart.map(m => m.count),
+                            backgroundColor: '#2563eb'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize FEMA DataTable
+        function initializeFEMADataTable() {
+            femaDisastersTable = $('#femaDisastersTable').DataTable({
+                processing: true,
+                serverSide: false,
+                responsive: true,
+                pageLength: 25,
+                order: [[9, 'desc']], // Sort by begin date
+                columnDefs: [
+                    { targets: [12], orderable: false } // Actions column
+                ]
+            });
+
+            // Add click handler for FEMA disaster rows (like tool3)
+            $('#femaDisastersTable tbody').off('click', 'tr').on('click', 'tr', function() {
+                console.log('FEMA disaster row clicked!'); // Debug log
+                const disasterData = femaDisastersTable.row(this).data();
+                console.log('Disaster data:', disasterData); // Debug log
+                
+                // Get the full disaster object stored on the row element (for coordinates)
+                const disasterObj = $(this).data('disasterObj');
+                
+                if (disasterData && disasterData.length > 0) {
+                    // Pass both the array data and the full object
+                    selectFEMADisaster(disasterData, disasterObj);
+                }
+            });
+        }
+
+        // Initialize Encompass DataTable
+        function initializeEncompassDataTable() {
+            encompassLoansTable = $('#encompassLoansTable').DataTable({
+                processing: true,
+                serverSide: false,
+                responsive: true,
+                pageLength: 25,
+                order: [[0, 'desc']],
+                columnDefs: [
+                    { targets: [9], orderable: false } // Actions column
+                ]
+            });
+        }
+
+        // Populate state filter
+        async function populateStateFilter() {
+            try {
+                const response = await fetch('/api/loan-pipeline/stats');
+                const data = await response.json();
+                
+                if (data.success && data.data.topStates) {
+                    const stateSelect = $('#stateFilter');
+                    data.data.topStates.forEach(state => {
+                        stateSelect.append(`<option value="${state.state}">${state.state}</option>`);
+                    });
+                }
+            } catch (error) {
+                console.error('Error populating state filter:', error);
+            }
+        }
+
+        // Load loans
+        async function loadLoans() {
+            try {
+                const params = new URLSearchParams(currentFilters);
+                const response = await fetch(`/api/loan-pipeline/loans?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    populateLoansTable(data.data.loans);
+                } else {
+                    showAlert('Error loading loans', 'danger');
+                }
+            } catch (error) {
+                console.error('Error loading loans:', error);
+                showAlert('Error loading loans', 'danger');
+            }
+        }
+
+        // Populate loans table
+        function populateLoansTable(loans) {
+            loansTable.clear();
+            
+            loans.forEach(loan => {
+                const riskLevel = getRiskLevel(loan.disaster_risk_score);
+                const riskClass = getRiskClass(loan.disaster_risk_score);
+                const lastAnalysis = loan.last_risk_analysis ? 
+                    new Date(loan.last_risk_analysis).toLocaleDateString() : 'Not analyzed';
+                
+                loansTable.row.add([
+                    loan.loan_number,
+                    loan.borrower_name,
+                    loan.property_address,
+                    `${loan.city}, ${loan.state}`,
+                    `$${loan.loan_amount.toLocaleString()}`,
+                    loan.milestone,
+                    `<span class="risk-badge ${riskClass}">${riskLevel}</span>`,
+                    loan.disaster_risk_score || 0,
+                    loan.disaster_declaration_count || 0,
+                    lastAnalysis,
+                    `<button class="btn btn-sm btn-outline-primary" onclick="analyzeLoan(${loan.id})">
+                        <i class="bi bi-shield-check"></i>
+                    </button>`
+                ]);
+            });
+            
+            loansTable.draw();
+        }
+
+        // Get risk level text
+        function getRiskLevel(score) {
+            if (score === 0) return 'Not Analyzed';
+            if (score <= 2) return 'Low Risk';
+            if (score <= 5) return 'Medium Risk';
+            return 'High Risk';
+        }
+
+        // Get risk class
+        function getRiskClass(score) {
+            if (score === 0) return 'risk-not-analyzed';
+            if (score <= 2) return 'risk-low';
+            if (score <= 5) return 'risk-medium';
+            return 'risk-high';
+        }
+
+        // Apply filters
+        function applyFilters() {
+            currentFilters = {
+                milestone: $('#milestoneFilter').val(),
+                state: $('#stateFilter').val(),
+                riskLevel: $('#riskFilter').val()
+            };
+            
+            // Remove empty filters
+            Object.keys(currentFilters).forEach(key => {
+                if (!currentFilters[key]) {
+                    delete currentFilters[key];
+                }
+            });
+            
+            loadLoans();
+        }
+
+        // Generate test loans
+        async function generateTestLoans() {
+            try {
+                showAlert('Generating test loans...', 'info');
+                
+                const response = await fetch('/api/loan-pipeline/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ count: 100 })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`Generated ${data.data.count} test loans successfully!`, 'success');
+                    loadDashboardData();
+                } else {
+                    showAlert('Error generating test loans', 'danger');
+                }
+            } catch (error) {
+                console.error('Error generating test loans:', error);
+                showAlert('Error generating test loans', 'danger');
+            }
+        }
+
+        // Analyze all loans
+        async function analyzeAllLoans() {
+            try {
+                $('#analysisProgress').show();
+                updateProgress(0, 'Starting analysis...');
+                
+                const response = await fetch('/api/loan-pipeline/analyze', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateProgress(100, 'Analysis complete!');
+                    showAlert(`Analysis complete: ${data.data.successCount} successful, ${data.data.errorCount} errors`, 'success');
+                    
+                    setTimeout(() => {
+                        $('#analysisProgress').hide();
+                        loadDashboardData();
+                    }, 2000);
+                } else {
+                    showAlert('Error analyzing loans', 'danger');
+                    $('#analysisProgress').hide();
+                }
+            } catch (error) {
+                console.error('Error analyzing loans:', error);
+                showAlert('Error analyzing loans', 'danger');
+                $('#analysisProgress').hide();
+            }
+        }
+
+        // Analyze single loan
+        async function analyzeLoan(loanId) {
+            try {
+                const response = await fetch(`/api/loan-pipeline/analyze/${loanId}`, {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showAlert(`Risk analysis completed for loan ${data.data.loanNumber}`, 'success');
+                    loadLoans();
+                } else {
+                    showAlert('Error analyzing loan', 'danger');
+                }
+            } catch (error) {
+                console.error('Error analyzing loan:', error);
+                showAlert('Error analyzing loan', 'danger');
+            }
+        }
+
+        // Download KML
+        async function downloadKML() {
+            try {
+                const params = new URLSearchParams(currentFilters);
+                const response = await fetch(`/api/loan-pipeline/kml?${params}`);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'loan-pipeline-risk.kml';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    showAlert('KML file downloaded successfully!', 'success');
+                } else {
+                    showAlert('Error downloading KML file', 'danger');
+                }
+            } catch (error) {
+                console.error('Error downloading KML:', error);
+                showAlert('Error downloading KML file', 'danger');
+            }
+        }
+
+        // Update progress bar
+        function updateProgress(percent, text) {
+            $('#progressBar').css('width', `${percent}%`).attr('aria-valuenow', percent);
+            $('#progressText').text(text);
+        }
+
+        // Show alert
+        function showAlert(message, type) {
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            // Remove existing alerts
+            $('.alert').remove();
+            
+            // Add new alert
+            $('.container-fluid').prepend(alertHtml);
+            
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                $('.alert').alert('close');
+            }, 5000);
+        }
+
+        // Populate FEMA disasters table (store full object for coordinates access)
+        function populateFEMATable(disasters) {
+            femaDisastersTable.clear();
+            
+            disasters.forEach(disaster => {
+                // Store the row data as an array for display, but also keep the full object
+                const rowData = [
+                    disaster.declarationType,
+                    disaster.incidentType,
+                    disaster.declarationTitle,
+                    disaster.state,
+                    disaster.county,
+                    disaster.ihProgramDeclared ? 'Yes' : 'No',
+                    disaster.iaProgramDeclared ? 'Yes' : 'No',
+                    disaster.paProgramDeclared ? 'Yes' : 'No',
+                    disaster.hmProgramDeclared ? 'Yes' : 'No',
+                    disaster.incidentBeginDate,
+                    disaster.incidentEndDate || 'Ongoing',
+                    disaster.disasterCloseoutDate || 'N/A',
+                    `<button class="btn btn-sm btn-outline-primary" onclick="viewDisasterDetails('${disaster.declarationTitle}')">
+                        <i class="bi bi-eye"></i>
+                    </button>`
+                ];
+                
+                // Add row with data, storing full disaster object for later access
+                const rowNode = femaDisastersTable.row.add(rowData).node();
+                // Store the full disaster object on the row element for coordinate access
+                $(rowNode).data('disasterObj', disaster);
+            });
+            
+            femaDisastersTable.draw();
+        }
+
+        // Select FEMA disaster and show related data (like tool3)
+        function selectFEMADisaster(disasterData, disasterObj = null) {
+            selectedDisaster = disasterData;
+            
+            console.log('Selecting FEMA disaster:', disasterData, disasterObj); // Debug log
+            
+            // Show Encompass loans card
+            $('#encompassLoansCard').show();
+            if (disasterData[3] && disasterData[4]) {
+                $('#encompassLoansSubtitle').text(`Loans in ${disasterData[4]}, ${disasterData[3]} affected by ${disasterData[2]}`);
+            }
+            
+            // Load Encompass loans for this county
+            if (disasterData[3] && disasterData[4]) {
+                loadEncompassLoansForCounty(disasterData[3], disasterData[4]);
+            }
+            
+            // Search YouTube for disaster videos (like tool3)
+            if (disasterData[2]) {
+                const disasterTitle = disasterData[2];
+                const state = disasterData[3] || '';
+                const county = disasterData[4] || '';
+                console.log('Searching YouTube for:', disasterTitle, state, county); // Debug log
+                
+                // If we have coordinates, use location-based search (like tool3)
+                if (disasterObj && disasterObj.latitude && disasterObj.longitude) {
+                    searchYouTube(disasterTitle, disasterObj.latitude, disasterObj.longitude, '50mi');
+                } else {
+                    searchYouTubeForDisaster(disasterTitle, state, county);
+                }
+            }
+            
+            // Update map to focus on this disaster (pass full object for coordinates)
+            updateMapForDisaster(disasterData, disasterObj);
+        }
+
+        // Load Encompass loans for specific county
+        async function loadEncompassLoansForCounty(state, county) {
+            try {
+                const response = await fetch(`/api/loan-pipeline/loans?state=${state}&county=${county}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    populateEncompassLoansTable(data.data.loans);
+                }
+            } catch (error) {
+                console.error('Error loading Encompass loans:', error);
+            }
+        }
+
+        // Populate Encompass loans table
+        function populateEncompassLoansTable(loans) {
+            encompassLoansTable.clear();
+            
+            loans.forEach(loan => {
+                const riskLevel = getRiskLevel(loan.disaster_risk_score);
+                const riskClass = getRiskClass(loan.disaster_risk_score);
+                const lastAnalysis = loan.last_risk_analysis ? 
+                    new Date(loan.last_risk_analysis).toLocaleDateString() : 'Not analyzed';
+                
+                encompassLoansTable.row.add([
+                    loan.loan_number,
+                    loan.borrower_name,
+                    loan.property_address,
+                    `${loan.city}, ${loan.state}`,
+                    `$${loan.loan_amount.toLocaleString()}`,
+                    loan.milestone,
+                    `<span class="risk-badge ${riskClass}">${riskLevel}</span>`,
+                    loan.encompass_loan_guid || 'Not assigned',
+                    lastAnalysis,
+                    `<button class="btn btn-sm btn-outline-primary" onclick="analyzeLoan(${loan.id})">
+                        <i class="bi bi-shield-check"></i>
+                    </button>`
+                ]);
+            });
+            
+            encompassLoansTable.draw();
+        }
+
+        // Search YouTube for disaster videos (like tool3)
+        function searchYouTubeForDisaster(disasterTitle, state, county) {
+            console.log('Searching YouTube for disaster:', disasterTitle, state, county);
+            
+            if (!youtubeAPIReady) {
+                console.log('YouTube API not ready yet, retrying...');
+                // Retry after a short delay
+                setTimeout(() => {
+                    if (youtubeAPIReady) {
+                        const query = disasterTitle || `${state} ${county} disaster`;
+                        searchYouTube(query);
+                    }
+                }, 1000);
+                return;
+            }
+
+            const query = disasterTitle || `${state} ${county} disaster`;
+            console.log('YouTube query:', query);
+            searchYouTube(query);
+        }
+
+        // Initialize Google Maps
+        function initializeGoogleMaps() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 4,
+                center: { lat: 39.8283, lng: -98.5795 }, // Center of US
+                mapTypeId: 'terrain'
+            });
+        }
+
+        // Update map with disaster markers
+        function updateMapWithDisasters(disasters) {
+            // Clear existing markers
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+
+            disasters.forEach(disaster => {
+                if (disaster.latitude && disaster.longitude) {
+                    const marker = new google.maps.Marker({
+                        position: { lat: disaster.latitude, lng: disaster.longitude },
+                        map: map,
+                        title: disaster.declarationTitle,
+                        icon: {
+                            url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                            scaledSize: new google.maps.Size(30, 30)
+                        }
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `
+                            <div>
+                                <h6>${disaster.declarationTitle}</h6>
+                                <p><strong>Type:</strong> ${disaster.incidentType}</p>
+                                <p><strong>State:</strong> ${disaster.state}</p>
+                                <p><strong>County:</strong> ${disaster.county}</p>
+                                <p><strong>Begin Date:</strong> ${disaster.incidentBeginDate}</p>
+                            </div>
+                        `
+                    });
+
+                    // Store infoWindow on marker for later use
+                    marker.infoWindow = infoWindow;
+
+                    marker.addListener('click', () => {
+                        infoWindow.open(map, marker);
+                        // Also trigger YouTube search when marker is clicked
+                        searchYouTubeForDisaster(disaster.declarationTitle, disaster.state, disaster.county);
+                    });
+
+                    markers.push(marker);
+                }
+            });
+        }
+
+        // Update map to focus on selected disaster (like tool3)
+        function updateMapForDisaster(disasterData, disasterObj = null) {
+            if (!map) {
+                console.warn('Map not initialized');
+                return;
+            }
+
+            // disasterData is an array from DataTable: [declarationType, incidentType, declarationTitle, state, county, ...]
+            // disasterObj contains the full disaster object with coordinates
+            const disasterTitle = disasterData[2]; // declarationTitle is at index 2
+            const state = disasterData[3];
+            const county = disasterData[4];
+
+            // First, try to use coordinates from the disaster object
+            if (disasterObj && disasterObj.latitude && disasterObj.longitude) {
+                const position = { lat: parseFloat(disasterObj.latitude), lng: parseFloat(disasterObj.longitude) };
+                map.setCenter(position);
+                map.setZoom(10);
+                
+                // Find and highlight the corresponding marker
+                markers.forEach(marker => {
+                    if (marker.getTitle() === disasterTitle) {
+                        if (marker.infoWindow) {
+                            marker.infoWindow.open(map, marker);
+                        }
+                    }
+                });
+                return;
+            }
+
+            // Find the matching marker by title
+            let foundMarker = null;
+            markers.forEach(marker => {
+                if (marker.getTitle() === disasterTitle) {
+                    foundMarker = marker;
+                }
+            });
+
+            if (foundMarker) {
+                // Zoom to the marker
+                const position = foundMarker.getPosition();
+                map.setCenter(position);
+                map.setZoom(10);
+                
+                // Open the info window
+                if (foundMarker.infoWindow) {
+                    foundMarker.infoWindow.open(map, foundMarker);
+                }
+            } else if (county && state) {
+                // If no marker found, try geocoding the county/state
+                const geocoder = new google.maps.Geocoder();
+                const address = `${county}, ${state}`;
+                geocoder.geocode({ address: address }, (results, status) => {
+                    if (status === 'OK' && results[0]) {
+                        map.setCenter(results[0].geometry.location);
+                        map.setZoom(10);
+                    }
+                });
+            }
+        }
+
+        // Load YouTube API
+        function loadYouTubeAPI() {
+            if (typeof gapi === 'undefined') {
+                console.log("Waiting for Google API to load...");
+                setTimeout(loadYouTubeAPI, 500);
+                return;
+            }
+
+            gapi.load("client", () => {
+                gapi.client.init({
+                    apiKey: "AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI",
+                    discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"]
+                }).then(() => {
+                    console.log("YouTube API loaded successfully and ready!");
+                    youtubeAPIReady = true;
+                }).catch(error => {
+                    console.error("Error loading YouTube API:", error);
+                    youtubeAPIReady = false;
+                });
+            });
+        }
+
+        // Search YouTube (like tool3)
+        function searchYouTube(query, lat = null, lng = null, radius = null) {
+            if (!gapi.client || !gapi.client.youtube) {
+                console.error("YouTube API not loaded!");
+                // Retry YouTube API load
+                loadYouTubeAPI();
+                return;
+            }
+
+            console.log("Searching YouTube for:", query);
+
+            // Prepare the YouTube API request parameters (like tool3)
+            let requestParams = {
+                part: "snippet",
+                q: query,
+                type: "video",
+                maxResults: 5
+            };
+
+            // If latitude and longitude are provided, add location-based filters (like tool3)
+            if (lat && lng && radius) {
+                requestParams.location = `${lat},${lng}`;
+                requestParams.locationRadius = radius;
+            }
+
+            gapi.client.youtube.search.list(requestParams)
+                .then(response => {
+                    const results = response.result.items;
+                    console.log("YouTube results:", results);
+                    displayYouTubeResults(results);
+                })
+                .catch(error => {
+                    console.error("YouTube API error:", error);
+                    // Show error message to user
+                    const youtubeResultsDiv = document.getElementById("youtubeResults");
+                    if (youtubeResultsDiv) {
+                        youtubeResultsDiv.innerHTML = '<div class="text-center text-danger">Error searching YouTube. Please try again.</div>';
+                    }
+                });
+        }
+
+        // Display YouTube results
+        function displayYouTubeResults(videos) {
+            const youtubeResultsDiv = document.getElementById("youtubeResults");
+            if (videos && videos.length > 0) {
+                youtubeResultsDiv.innerHTML = videos.map(video => `
+                    <div class="card mb-2">
+                        <img src="${video.snippet.thumbnails.default.url}" class="card-img-top" alt="${video.snippet.title}">
+                        <div class="card-body p-2">
+                            <h6 class="card-title">${video.snippet.title}</h6>
+                            <p class="card-text small">${video.snippet.description.substring(0, 100)}...</p>
+                            <a href="https://www.youtube.com/watch?v=${video.id.videoId}" target="_blank" class="btn btn-sm btn-primary">Watch</a>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                youtubeResultsDiv.innerHTML = '<div class="text-center text-muted">No videos found</div>';
+            }
+        }
+    </script>
+</body>
+</html>

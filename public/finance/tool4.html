@@ -553,8 +553,8 @@
     <script src="https://cdn.elliemae.io/elliemae/core/ssf/1.0/elli.ssf.guest-with-polyfill.js"></script>
     
     <!-- Custom Scripts -->
-    <script type="text/javascript" src="../js/bindings.js"></script>
-    <script type="text/javascript" src="../js/voiceController.js"></script>
+    <script type="text/javascript" src="js/bindings.js"></script>
+    <script type="text/javascript" src="js/voiceController.js"></script>
 
     <script>
         // Set today's date in the footer
@@ -682,7 +682,7 @@
             // Add voice commands for automator
             if (typeof voiceController !== 'undefined') {
                 // Override the processCommand method to add automator-specific commands
-                const originalProcessCommand = voiceController.processCommand;
+                const originalProcessCommand = voiceController.processCommand.bind(voiceController);
                 voiceController.processCommand = function(command) {
                     console.log('Automator voice command received:', command);
                     

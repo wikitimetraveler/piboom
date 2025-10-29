@@ -411,7 +411,54 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_user_collections_concert ON user_concert_collections(concert_id)
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, and expandable concert collections)');
+    // Create loans table for loan pipeline disaster risk analysis
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS loans (
+        id SERIAL PRIMARY KEY,
+        loan_number VARCHAR(50) UNIQUE NOT NULL,
+        borrower_name VARCHAR(255) NOT NULL,
+        property_address VARCHAR(500) NOT NULL,
+        city VARCHAR(100) NOT NULL,
+        state VARCHAR(2) NOT NULL,
+        county VARCHAR(100) NOT NULL,
+        zip_code VARCHAR(10) NOT NULL,
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        loan_amount DECIMAL(12, 2) NOT NULL,
+        loan_type VARCHAR(50) DEFAULT 'Conventional',
+        milestone VARCHAR(100) NOT NULL,
+        disaster_risk_score INTEGER DEFAULT 0,
+        disaster_declaration_count INTEGER DEFAULT 0,
+        fema_data JSONB,
+        last_risk_analysis TIMESTAMP,
+        encompass_loan_guid VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create indexes for loans table
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_loans_state_county ON loans(state, county)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_loans_milestone ON loans(milestone)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_loans_risk_score ON loans(disaster_risk_score)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_loans_encompass_guid ON loans(encompass_loan_guid)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_fema_data ON loans USING GIN (fema_data)
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, and loan pipeline)');
     
     // Migrate existing Grateful Dead data to new structure (run in background)
     migrateGratefulDeadData().catch(error => {
