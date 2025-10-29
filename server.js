@@ -22,6 +22,13 @@ await createTables();
 app.use(express.json({ limit: '50mb' })); // Support base64 image uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// Allow iframe embedding for Encompass Assistant
+app.use('/finance/encompass-assistant.html', (req, res, next) => {
+  res.removeHeader('X-Frame-Options');
+  res.setHeader('X-Frame-Options', 'ALLOWALL');
+  next();
+});
+
 // Make io available to routes
 app.locals.io = io;
 

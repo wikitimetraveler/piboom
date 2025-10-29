@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Ruler - Professional Field Analyzer</title>
+
+    <!--
+    The Ruler - JSON FieldID-Label Analyzer Tool
+    Developed by: David Lane
+    Date: 3/5/2025
+    Description: Professional tool for analyzing JSON field definitions and labels
+    Technologies: HTML, CSS, JavaScript, Bootstrap
+    -->
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --ice-primary: #3498db;
+            --ice-secondary: #2ecc71;
+            --ice-dark: #1a1f35;
+            --ice-light: #e8f1ff;
+            --ice-glow: rgba(135, 206, 250, 0.3);
+            --ice-border: #3a4a6a;
+            --primary-blue: #2563eb;
+            --primary-blue-hover: #1d4ed8;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-light: #e5e7eb;
+            --background-light: #f9fafb;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(-10px, -10px) scale(1.05); }
+            50% { transform: translate(10px, -5px) scale(0.95); }
+            75% { transform: translate(-5px, 10px) scale(1.02); }
+        }
+
+        /* Professional Navbar */
+        .navbar {
+            background: var(--white) !important;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
+            animation: headerShine 3s ease-in-out infinite;
+        }
+
+        @keyframes headerShine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .navbar-brand {
+            color: var(--text-dark) !important;
+            font-weight: 600;
+            font-size: 1.25rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-link {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
+        }
+
+        /* Voice Control Button */
+        .voice-control {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .voice-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--ice-primary);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .voice-btn:hover {
+            background: var(--primary-blue-hover);
+            transform: scale(1.1);
+        }
+
+        .voice-btn.listening {
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+
+        .voice-btn.listening::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid #e74c3c;
+            animation: ripple 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .voice-status {
+            background: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--text-dark);
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .voice-status.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .voice-status.listening {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Professional Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        /* Professional Tool Cards */
+        .tool-card {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: cardFloat 6s ease-in-out infinite;
+        }
+
+        .tool-card:nth-child(odd) {
+            animation-delay: 0s;
+        }
+
+        .tool-card:nth-child(even) {
+            animation-delay: 3s;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(0.5deg); }
+            50% { transform: translateY(-2px) rotate(-0.5deg); }
+            75% { transform: translateY(-8px) rotate(0.3deg); }
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-lg), 0 0 30px var(--ice-glow);
+            border-color: var(--ice-primary);
+            animation-play-state: paused;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--ice-primary), var(--ice-secondary), var(--ice-glow));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .tool-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tool-card h3 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tool-card h3:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Professional Form Styling */
+        .form-label {
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            background: var(--white);
+            border-color: var(--primary-blue);
+            color: var(--text-dark);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .form-control:read-only {
+            background-color: var(--background-light);
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-hover);
+            border-color: var(--primary-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .btn-primary.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -10px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Custom Checkbox */
+        .custom-control-input:checked ~ .custom-control-label::before {
+            background-color: var(--primary-blue);
+            border-color: var(--primary-blue-hover);
+            box-shadow: 0 0 10px var(--ice-glow);
+        }
+
+        .custom-control-label {
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .custom-control-input:checked ~ .custom-control-label {
+            color: var(--primary-blue);
+        }
+
+        /* Results Styling */
+        #result {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        #result:hover {
+            border-color: var(--primary-blue);
+            box-shadow: var(--shadow-md);
+        }
+
+        #result.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #result pre {
+            margin: 0;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        /* Professional Footer */
+        .footer {
+            background: var(--white);
+            border-top: 1px solid var(--border-light);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ice-primary), transparent);
+            animation: footerGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes footerGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .footer-content {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            animation: footerFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes footerFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
+        .footer-content strong {
+            color: var(--text-dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tool-card {
+                padding: 1.5rem;
+            }
+            
+            .tool-card h3 {
+                font-size: 1.25rem;
+            }
+            
+            .form-label {
+                font-size: 0.9rem;
+            }
+
+            .voice-control {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .voice-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Loading Animation */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Particle effects */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--ice-glow);
+            border-radius: 50%;
+            animation: particleFloat 15s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle effects container -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Voice Control Button -->
+    <div class="voice-control">
+        <div class="voice-status" id="voiceStatus">Click to start voice control</div>
+        <button class="voice-btn" id="voiceBtn" title="Voice Control">
+            <i class="bi-mic"></i>
+        </button>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi-rulers me-2"></i>The Ruler
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../index.html">
+                            <i class="bi-house"></i> Back to Menu
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <!-- JSON Analyzer Tool Card -->
+            <div class="tool-card fade-in">
+                <h3>
+                    <span><i class="bi-search me-2"></i>JSON FieldID-Label Analyzer</span>
+                </h3>
+                
+                <div class="form-group">
+                    <label for="jsonInput" class="form-label">Paste JSON or Rules Sheet Here:</label>
+                    <textarea id="jsonInput" class="form-control" rows="10" placeholder="Paste your JSON data here..."></textarea>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" id="singleLabelOnly" onchange="analyzeJSON()">
+                            <label class="custom-control-label" for="singleLabelOnly">
+                                Show only FieldIDs with exactly one label
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" id="multipleLabelsOnly" onchange="analyzeJSON()">
+                            <label class="custom-control-label" for="multipleLabelsOnly">
+                                Show only FieldIDs with multiple labels
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button class="btn btn-primary" onclick="analyzeJSON()">
+                            <i class="bi-search me-2"></i>Analyze
+                        </button>
+                        <button class="btn btn-primary ml-2" onclick="copyToClipboard()">
+                            <i class="bi-clipboard me-2"></i>Copy Result
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="tool-card fade-in">
+                <h3>
+                    <span><i class="bi-file-text me-2"></i>Analysis Results</span>
+                </h3>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <strong>Design by David Lane</strong> - <span id="currentDate"></span> | Professional Analysis Tools
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Voice Control System
+        class VoiceController {
+            constructor() {
+                this.recognition = null;
+                this.synthesis = window.speechSynthesis;
+                this.isListening = false;
+                this.voiceBtn = document.getElementById('voiceBtn');
+                this.voiceStatus = document.getElementById('voiceStatus');
+                
+                this.init();
+            }
+            
+            init() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                    this.setupRecognition();
+                    this.setupEventListeners();
+                } else {
+                    this.voiceStatus.textContent = 'Voice not supported';
+                    this.voiceBtn.disabled = true;
+                    this.voiceBtn.style.opacity = '0.5';
+                }
+            }
+            
+            setupRecognition() {
+                this.recognition.continuous = false;
+                this.recognition.interimResults = false;
+                this.recognition.lang = 'en-US';
+                
+                this.recognition.onstart = () => {
+                    this.isListening = true;
+                    this.voiceBtn.classList.add('listening');
+                    this.voiceBtn.innerHTML = '<i class="bi-mic-mute"></i>';
+                    this.updateStatus('Listening...', true);
+                };
+                
+                this.recognition.onresult = (event) => {
+                    const command = event.results[0][0].transcript.toLowerCase();
+                    this.processCommand(command);
+                };
+                
+                this.recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    this.updateStatus('Error: ' + event.error, false);
+                    this.stopListening();
+                };
+                
+                this.recognition.onend = () => {
+                    this.stopListening();
+                };
+            }
+            
+            setupEventListeners() {
+                this.voiceBtn.addEventListener('click', () => {
+                    if (this.isListening) {
+                        this.stopListening();
+                    } else {
+                        this.startListening();
+                    }
+                });
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 'v') {
+                        e.preventDefault();
+                        if (this.isListening) {
+                            this.stopListening();
+                        } else {
+                            this.startListening();
+                        }
+                    }
+                });
+            }
+            
+            startListening() {
+                try {
+                    this.recognition.start();
+                } catch (error) {
+                    console.error('Error starting speech recognition:', error);
+                    this.updateStatus('Error starting voice control', false);
+                }
+            }
+            
+            stopListening() {
+                this.isListening = false;
+                this.voiceBtn.classList.remove('listening');
+                this.voiceBtn.innerHTML = '<i class="bi-mic"></i>';
+                this.updateStatus('Click to start voice control');
+                
+                try {
+                    this.recognition.stop();
+                } catch (error) {
+                    console.error('Error stopping speech recognition:', error);
+                }
+            }
+            
+            updateStatus(message, isListening = false) {
+                this.voiceStatus.textContent = message;
+                this.voiceStatus.classList.toggle('show', true);
+                this.voiceStatus.classList.toggle('listening', isListening);
+                
+                setTimeout(() => {
+                    this.voiceStatus.classList.remove('show');
+                }, 3000);
+            }
+            
+            processCommand(command) {
+                console.log('Voice command received:', command);
+                
+                if (command.includes('analyze') || command.includes('process')) {
+                    this.speak('Analyzing JSON data');
+                    analyzeJSON();
+                    return;
+                }
+                
+                if (command.includes('copy') || command.includes('copy result')) {
+                    this.speak('Copying results to clipboard');
+                    copyToClipboard();
+                    return;
+                }
+                
+                if (command.includes('clear') || command.includes('reset')) {
+                    this.speak('Clearing form');
+                    document.getElementById('jsonInput').value = '';
+                    document.getElementById('singleLabelOnly').checked = false;
+                    document.getElementById('multipleLabelsOnly').checked = false;
+                    document.getElementById('result').innerHTML = '';
+                    document.getElementById('result').classList.remove('visible');
+                    return;
+                }
+                
+                if (command.includes('go home') || command.includes('back to menu')) {
+                    this.speak('Navigating to home page');
+                    window.location.href = '../../index.html';
+                    return;
+                }
+                
+                this.speak('Command not recognized. Try saying "analyze" or "copy result"');
+                this.updateStatus('Command not recognized');
+            }
+            
+            speak(text) {
+                if (this.synthesis) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    this.synthesis.speak(utterance);
+                }
+            }
+        }
+
+        // Set today's date in the footer
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+
+        // Initialize voice controller
+        const voiceController = new VoiceController();
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 15;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                particle.style.width = particle.style.height = (Math.random() * 6 + 2) + 'px';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize particles on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+        });
+
+        // Analysis Functions
+        function analyzeJSON() {
+            const analyzeBtn = document.querySelector('button[onclick="analyzeJSON()"]');
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                // Add loading state
+                analyzeBtn.classList.add('loading');
+                analyzeBtn.innerHTML = '<i class="bi-hourglass-split me-2"></i>Analyzing...';
+                
+                let input = document.getElementById('jsonInput').value;
+                
+                // Replace Excel smart quotes with regular quotes
+                input = input.replace(/[""]/g, '"');
+                
+                // Extract valid JSON objects using regex
+                const jsonRegex = /\{[\s\S]*?\}/g;
+                const matches = input.match(jsonRegex);
+                
+                if (!matches) {
+                    throw new Error('No valid JSON objects found in input');
+                }
+
+                // Parse each JSON object
+                const jsonData = matches.map(match => {
+                    try {
+                        return JSON.parse(match);
+                    } catch (e) {
+                        console.error('Error parsing JSON object:', e);
+                        return null;
+                    }
+                }).filter(obj => obj !== null);
+
+                const singleLabelOnly = document.getElementById('singleLabelOnly').checked;
+                const multipleLabelsOnly = document.getElementById('multipleLabelsOnly').checked;
+                
+                // Create a new array to store transformed data
+                const transformedData = [];
+                
+                // First, find all unique FieldIDs and their labels
+                const fieldIdMap = {};
+                
+                // Process each item in sequence
+                for (let i = 0; i < jsonData.length; i++) {
+                    const item = jsonData[i];
+                    if (item.CType === 'Label') {
+                        // Look ahead for the next control
+                        for (let j = i + 1; j < jsonData.length; j++) {
+                            const nextItem = jsonData[j];
+                            if ((nextItem.CType === 'TextBox' || nextItem.CType === 'DropdownBox') && nextItem.FieldID) {
+                                // Found the matching control
+                                if (!fieldIdMap[nextItem.FieldID]) {
+                                    fieldIdMap[nextItem.FieldID] = {
+                                        labels: new Set(),
+                                        controlType: nextItem.CType
+                                    };
+                                }
+                                // Add the label to the Set
+                                fieldIdMap[nextItem.FieldID].labels.add(item.Text);
+                                break;
+                            }
+                        }
+                    } else if ((item.CType === 'TextBox' || item.CType === 'DropdownBox') && item.FieldID) {
+                        // If we find a control without a preceding label, add it to the map
+                        if (!fieldIdMap[item.FieldID]) {
+                            fieldIdMap[item.FieldID] = {
+                                labels: new Set(),
+                                controlType: item.CType
+                            };
+                        }
+                    }
+                }
+                
+                // Convert the map to our desired output format
+                Object.keys(fieldIdMap).sort().forEach(fieldId => {
+                    // Convert Set to Array for output
+                    const labels = Array.from(fieldIdMap[fieldId].labels);
+                    
+                    // Apply filters based on checkbox states
+                    let shouldInclude = true;
+                    if (singleLabelOnly && labels.length !== 1) {
+                        shouldInclude = false;
+                    }
+                    if (multipleLabelsOnly && labels.length <= 1) {
+                        shouldInclude = false;
+                    }
+                    
+                    if (shouldInclude) {
+                        transformedData.push({
+                            FieldID: fieldId,
+                            ControlType: fieldIdMap[fieldId].controlType,
+                            Labels: labels
+                        });
+                    }
+                });
+                
+                // Display the results with animation
+                resultDiv.innerHTML = `<pre>${JSON.stringify(transformedData, null, 2)}</pre>`;
+                resultDiv.classList.add('visible');
+                
+                // Scroll to result
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                voiceController.speak('Analysis completed');
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+                resultDiv.classList.add('visible');
+                voiceController.speak('Error during analysis');
+            } finally {
+                // Remove loading state
+                analyzeBtn.classList.remove('loading');
+                analyzeBtn.innerHTML = '<i class="bi-search me-2"></i>Analyze';
+            }
+        }
+
+        function copyToClipboard() {
+            const copyBtn = document.querySelector('button[onclick="copyToClipboard()"]');
+            const resultText = document.getElementById('result').textContent;
+            
+            // Add loading state
+            copyBtn.classList.add('loading');
+            
+            navigator.clipboard.writeText(resultText).then(() => {
+                // Show success feedback
+                copyBtn.innerHTML = '<i class="bi-check me-2"></i>Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="bi-clipboard me-2"></i>Copy Result';
+                }, 2000);
+                voiceController.speak('Results copied to clipboard');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                copyBtn.innerHTML = '<i class="bi-x me-2"></i>Failed';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="bi-clipboard me-2"></i>Copy Result';
+                }, 2000);
+                voiceController.speak('Failed to copy results');
+            }).finally(() => {
+                copyBtn.classList.remove('loading');
+            });
+        }
+
+        // Make voice controller globally accessible for debugging
+        window.voiceController = voiceController;
+    </script>
+</body>
+</html>

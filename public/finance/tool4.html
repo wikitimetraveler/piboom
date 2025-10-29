@@ -1,0 +1,734 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Automator - Professional Automation Tool</title>
+
+    <!--
+    The Automator - Automation Tool
+    Developed by: David Lane
+    Date: 3/5/2025
+    Description: Professional automation tool with zen UI design
+    Technologies: HTML, CSS, JavaScript, Bootstrap
+    -->
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --ice-primary: #3498db;
+            --ice-secondary: #2ecc71;
+            --ice-dark: #1a1f35;
+            --ice-light: #e8f1ff;
+            --ice-glow: rgba(135, 206, 250, 0.3);
+            --ice-border: #3a4a6a;
+            --primary-blue: #2563eb;
+            --primary-blue-hover: #1d4ed8;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-light: #e5e7eb;
+            --background-light: #f9fafb;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(-10px, -10px) scale(1.05); }
+            50% { transform: translate(10px, -5px) scale(0.95); }
+            75% { transform: translate(-5px, 10px) scale(1.02); }
+        }
+
+        /* Professional Navbar */
+        .navbar {
+            background: var(--white) !important;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
+            animation: headerShine 3s ease-in-out infinite;
+        }
+
+        @keyframes headerShine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .navbar-brand {
+            color: var(--text-dark) !important;
+            font-weight: 600;
+            font-size: 1.25rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-link {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
+        }
+
+        /* Voice Control Button */
+        .voice-control {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .voice-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--ice-primary);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .voice-btn:hover {
+            background: var(--primary-blue-hover);
+            transform: scale(1.1);
+        }
+
+        .voice-btn.listening {
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+
+        .voice-btn.listening::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid #e74c3c;
+            animation: ripple 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .voice-status {
+            background: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--text-dark);
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .voice-status.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .voice-status.listening {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Professional Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        /* Professional Tool Cards */
+        .tool-card {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: cardFloat 6s ease-in-out infinite;
+        }
+
+        .tool-card:nth-child(odd) {
+            animation-delay: 0s;
+        }
+
+        .tool-card:nth-child(even) {
+            animation-delay: 3s;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(0.5deg); }
+            50% { transform: translateY(-2px) rotate(-0.5deg); }
+            75% { transform: translateY(-8px) rotate(0.3deg); }
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-lg), 0 0 30px var(--ice-glow);
+            border-color: var(--ice-primary);
+            animation-play-state: paused;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--ice-primary), var(--ice-secondary), var(--ice-glow));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .tool-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tool-card h3 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tool-card h3:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Professional Form Styling */
+        .form-label {
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            background: var(--white);
+            border-color: var(--primary-blue);
+            color: var(--text-dark);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .form-control:read-only {
+            background-color: var(--background-light);
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-hover);
+            border-color: var(--primary-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-success {
+            background: var(--ice-secondary);
+            border-color: var(--ice-secondary);
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .btn-success:hover {
+            background: #27ae60;
+            border-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Professional Footer */
+        .footer {
+            background: var(--white);
+            border-top: 1px solid var(--border-light);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ice-primary), transparent);
+            animation: footerGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes footerGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .footer-content {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            animation: footerFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes footerFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
+        .footer-content strong {
+            color: var(--text-dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tool-card {
+                padding: 1.5rem;
+            }
+            
+            .tool-card h3 {
+                font-size: 1.25rem;
+            }
+            
+            .form-label {
+                font-size: 0.9rem;
+            }
+
+            .voice-control {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .voice-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Loading Animation */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Particle effects */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--ice-glow);
+            border-radius: 50%;
+            animation: particleFloat 15s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle effects container -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Voice Control Button -->
+    <div class="voice-control">
+        <div class="voice-status" id="voiceStatus">Click to start voice control</div>
+        <button class="voice-btn" id="voiceBtn" title="Voice Control">
+            <i class="bi-mic"></i>
+        </button>
+    </div>
+
+    <!-- Professional Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi-lightning me-2"></i>The Automator
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../index.html">
+                            <i class="bi-house"></i> Back to Menu
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <!-- Automation Tool Card -->
+            <div class="tool-card fade-in">
+                <h3>
+                    <span><i class="bi-lightning me-2"></i>Professional Automation Tool</span>
+                </h3>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="ruleInput">Rule Name</label>
+                    <input type="text" class="form-control" id="ruleInput" maxlength="20" placeholder="Enter rule name">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="appendInput">Description Override</label>
+                    <input type="text" class="form-control" id="appendInput" placeholder="Optional description override">
+                </div>
+            </div>
+        </div>
+        <div class="custom-control custom-checkbox mt-2">
+            <input type="checkbox" class="custom-control-input" id="ineligibleAudit">
+            <label class="custom-control-label" for="ineligibleAudit">Auto Ineligible</label>
+        </div>
+        <div class="form-group mt-3">
+            <label for="ruleOutput">Field Definitions</label>
+            <textarea class="form-control" id="ruleOutput" rows="8" readonly></textarea>
+        </div>
+        <div class="form-group">
+            <label for="ADOoutput">Generated JSON</label>
+            <textarea class="form-control" id="ADOoutput" rows="8" readonly></textarea>
+        </div>
+        <div class="btn-group w-100">
+            <button class="btn btn-primary" id="copyJsonBtn">Copy JSON</button>
+            <button class="btn btn-success" id="copyRulesBtn">Copy Field Definitions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <strong>Design by David Lane</strong> - <span id="currentDate"></span> | Professional Automation Tools
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- ICE Library -->
+    <script src="https://cdn.elliemae.io/elliemae/core/ssf/1.0/elli.ssf.guest-with-polyfill.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script type="text/javascript" src="../js/bindings.js"></script>
+    <script type="text/javascript" src="../js/voiceController.js"></script>
+
+    <script>
+        // Set today's date in the footer
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+
+        // Initialize voice controller
+        const voiceController = new VoiceController();
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 15;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                particle.style.width = particle.style.height = (Math.random() * 6 + 2) + 'px';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize particles on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+        });
+
+        // Utility functions
+        const copyToClipboard = async (text) => {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                return false;
+            }
+        };
+
+        // Core functions
+        function generateJSON() {
+            const ruleOutput = document.getElementById('ruleOutput').value;
+            if (!ruleOutput.trim()) return;
+
+            const rules = ruleOutput.trim().split('\n').map(rule => rule.split('\t'));
+            let jsonOutput = [];
+
+            rules.forEach(rule => {
+                const fieldId = rule[0].replace(/[\[\]]/g, '');
+                const format = rule[2].includes('String') ? 'string' : 
+                              rule[2].includes('Integer') ? 'integer' : 
+                              rule[2].includes('Decimal') ? 'decimal' : 'string';
+                
+                const ruleCode = document.getElementById('ruleInput').value
+                    .replace(/[^a-zA-Z0-9]/g, '');
+                
+                const jsonObj = {
+                    id: fieldId,
+                    description: rule[3],
+                    format: format.toLowerCase(),
+                    maxLength: format === 'string' ? rule[2].match(/\d+/)?.[0] : undefined,
+                    calculation: fieldId.startsWith('CX.R.') ? `IIf(false = true, "${ruleCode}(F)","")` : ''
+                };
+
+                if (jsonObj.maxLength === undefined) {
+                    delete jsonObj.maxLength;
+                }
+
+                jsonOutput.push(jsonObj);
+            });
+
+            document.getElementById('ADOoutput').value = JSON.stringify(jsonOutput, null, 4);
+        }
+
+        function generateRules() {
+            const inputParam = document.getElementById('ruleInput').value.trim();
+            const appendParam = document.getElementById('appendInput').value.trim();
+            const isIneligibleAudit = document.getElementById('ineligibleAudit').checked;
+           
+            if (!inputParam) return;
+
+            let processedInput = inputParam;
+            
+            if (!processedInput.startsWith('[') && !processedInput.startsWith('CX.')) {
+                processedInput = 'CX.R.' + processedInput;
+            }
+
+            processedInput = processedInput.replace(/[\[\]\s]/g, '');
+            const strResult = Math.max(processedInput.length, 16).toString();
+            const ruleLogicLength = `String(${strResult})`;
+
+            const rules = [
+                [`[${processedInput.toUpperCase()}]`, "New", ruleLogicLength, `${appendParam || inputParam} Logic${isIneligibleAudit ? ' - Auto Decline' : ''}`, "N"],
+                [`[${processedInput.replace(".R.", ".O.").toUpperCase()}]`, "New", "String(16)", `${appendParam || inputParam} Override`, "N"],
+                [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.BY]`, "New", "String(128)", `${appendParam || inputParam} Override By`, "N"],
+                [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.DT]`, "New", "String(40)", `${appendParam || inputParam} Override Date`, "N"],
+                [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.RN]`, "New", "String(256)", `${appendParam || inputParam} Override Reason`, "N"]
+            ];
+
+            document.getElementById('ruleOutput').value = rules.map(rule => rule.join('\t')).join('\n');
+            generateJSON();
+        }
+
+        // Event handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            const ruleInput = document.getElementById('ruleInput');
+            const appendInput = document.getElementById('appendInput');
+            const ineligibleAudit = document.getElementById('ineligibleAudit');
+            
+            ruleInput.addEventListener('input', generateRules);
+            appendInput.addEventListener('input', generateRules);
+            ineligibleAudit.addEventListener('change', generateRules);
+
+            document.getElementById('copyJsonBtn').addEventListener('click', async () => {
+                await copyToClipboard(document.getElementById('ADOoutput').value);
+            });
+
+            document.getElementById('copyRulesBtn').addEventListener('click', async () => {
+                await copyToClipboard(document.getElementById('ruleOutput').value);
+            });
+
+            // Add voice commands for automator
+            if (typeof voiceController !== 'undefined') {
+                // Override the processCommand method to add automator-specific commands
+                const originalProcessCommand = voiceController.processCommand;
+                voiceController.processCommand = function(command) {
+                    console.log('Automator voice command received:', command);
+                    
+                    // Automator-specific commands
+                    if (command.includes('generate rules') || command.includes('create rules')) {
+                        voiceController.speak('Generating automation rules');
+                        generateRules();
+                        return;
+                    }
+                    
+                    if (command.includes('copy json') || command.includes('copy generated json')) {
+                        voiceController.speak('Copying JSON to clipboard');
+                        copyToClipboard(document.getElementById('ADOoutput').value);
+                        return;
+                    }
+                    
+                    if (command.includes('copy rules') || command.includes('copy field definitions')) {
+                        voiceController.speak('Copying field definitions to clipboard');
+                        copyToClipboard(document.getElementById('ruleOutput').value);
+                        return;
+                    }
+                    
+                    if (command.includes('clear all') || command.includes('clear fields')) {
+                        voiceController.speak('Clearing all fields');
+                        document.getElementById('ruleInput').value = '';
+                        document.getElementById('appendInput').value = '';
+                        document.getElementById('ineligibleAudit').checked = false;
+                        document.getElementById('ruleOutput').value = '';
+                        document.getElementById('ADOoutput').value = '';
+                        return;
+                    }
+                    
+                    if (command.includes('go home') || command.includes('back to menu')) {
+                        voiceController.speak('Navigating to home page');
+                        window.location.href = '../../index.html';
+                        return;
+                    }
+                    
+                    // Call the original processCommand for other commands
+                    originalProcessCommand.call(this, command);
+                };
+            }
+        });
+
+        // Make voice controller globally accessible for debugging
+        window.voiceController = voiceController;
+    </script>
+</body>
+</html>

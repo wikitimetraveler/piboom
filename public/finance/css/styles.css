@@ -1,0 +1,44 @@
+/*
+  Author: David Lane
+  Date: November 14, 2023
+  Purpose: Styling
+*/
+/* Dark mode styles */
+.dark-mode {
+  background-color: #1c1c1c; /* Dark gray, easier on the eyes */
+  color: #dcdcdc; /* Soft light gray for text, ensuring good contrast and readability */
+  /* Add more styles as needed */
+}
+
+/* Fluorescent text when in dark mode */
+.dark-mode .fluorescent-text {
+  background-color: #1c1c1c; /* Dark gray, easier on the eyes */
+  color: #dcdcdc; /* Soft light gray for text, ensuring good contrast and readability */
+  /* Add more styles as needed */
+}
+
+.dark-mode .custom-navbar {
+  background-color: #1c1c1c; /* Dark gray, easier on the eyes */
+  color: #dcdcdc; /* Soft light gray for text, ensuring good contrast and readability */
+  /* Add more styles as needed */
+}
+.custom-row {
+    margin-bottom: 300px; /* Adjust this value to set the desired space between rows */
+}
+ 
+
+ 
+
+footer {
+  background-color: #f2f2f2;
+  padding: 10px;
+  text-align: center;
+}
+ 
+.dollar-sign::before {
+    content: "$***";
+    position: absolute;
+    padding-left: 18px; /* Adjust this value to set the space between the dollar sign and the input */
+}
+
+ 

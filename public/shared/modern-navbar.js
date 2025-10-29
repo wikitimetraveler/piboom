@@ -309,6 +309,10 @@ class ModernNavbar extends HTMLElement {
                   <i class="bi-bank"></i> Finance
                 </a>
                 <div class="dropdown-menu">
+                  <a class="dropdown-item" href="/finance/index.html">
+                    <i class="bi-calculator"></i> Finance Hub
+                  </a>
+                  <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="/finance/encompass-assistant.html">
                     <i class="bi-bank2"></i> Encompass Assistant
                   </a>

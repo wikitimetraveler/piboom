@@ -1,0 +1,218 @@
+/* Glow Effects CSS */
+:root {
+    --ice-primary: #3498db;
+    --ice-secondary: #2ecc71;
+    --ice-dark: #1a1f35;
+    --ice-light: #e8f1ff;
+    --ice-glow: rgba(135, 206, 250, 0.3);
+    --ice-border: #3a4a6a;
+    --ice-highlight: #1e90ff;
+    --ice-shadow: rgba(0, 149, 255, 0.2);
+}
+
+/* Header and Footer glow effects */
+.header, .footer {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    text-align: center;
+    color: var(--ice-light);
+}
+
+.header {
+    border-bottom: 2px solid var(--ice-border);
+    margin-bottom: 40px;
+}
+
+.footer {
+    border-top: 2px solid var(--ice-border);
+    margin-top: 40px;
+}
+
+/* Enhanced neon glow effects */
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-secondary),
+        var(--ice-glow),
+        transparent
+    );
+    animation: glowSlide 3s linear infinite;
+    animation-delay: -1.5s;
+    box-shadow: 
+        0 0 10px var(--ice-glow),
+        0 0 20px var(--ice-secondary),
+        0 0 30px var(--ice-primary);
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-secondary),
+        var(--ice-glow),
+        transparent
+    );
+    animation: 
+        glowSlide 3s linear infinite,
+        throb 2s ease-in-out infinite;
+    box-shadow: 
+        0 0 10px var(--ice-glow),
+        0 0 20px var(--ice-secondary),
+        0 0 30px var(--ice-primary);
+}
+
+@keyframes glowSlide {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Enhanced text glow */
+.header span, .footer span {
+    position: relative;
+    z-index: 1;
+    text-shadow: 
+        0 0 10px var(--ice-glow),
+        0 0 20px var(--ice-secondary),
+        0 0 30px var(--ice-primary);
+}
+
+/* Container glow effects */
+.container {
+    position: relative;
+    overflow: hidden;
+}
+
+.container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-highlight),
+        var(--ice-glow),
+        transparent
+    );
+    animation: glowSlide 3s linear infinite;
+    animation-delay: -0.75s;
+}
+
+.container::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-highlight),
+        var(--ice-glow),
+        transparent
+    );
+    animation: glowSlide 3s linear infinite;
+    animation-delay: -2.25s;
+}
+
+/* Button glow effects */
+.btn-custom {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-custom:hover {
+    box-shadow: 
+        0 0 10px var(--ice-glow),
+        0 0 20px var(--ice-secondary),
+        0 0 30px var(--ice-primary);
+}
+
+.btn-custom::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(82, 190, 255, 0.2),
+        transparent
+    );
+    animation: buttonGlow 2s linear infinite;
+}
+
+@keyframes buttonGlow {
+    0% {
+        left: -100%;
+    }
+    50% {
+        left: 100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Result area glow when not empty */
+#result:not(:empty) {
+    box-shadow: 
+        0 0 10px var(--ice-glow),
+        0 0 20px var(--ice-secondary),
+        0 0 30px var(--ice-primary);
+}
+
+/* Floating footer enhanced glow */
+.floating-footer {
+    box-shadow: 
+        0 -2px 10px var(--ice-glow),
+        0 -4px 20px var(--ice-secondary),
+        0 -6px 30px var(--ice-primary);
+    animation: throb 2s ease-in-out infinite;
+}
+
+/* Add throbbing animation */
+@keyframes throb {
+    0% {
+        box-shadow: 0 0 10px var(--ice-glow),
+                    0 0 20px var(--ice-secondary),
+                    0 0 30px var(--ice-primary);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--ice-glow),
+                    0 0 40px var(--ice-secondary),
+                    0 0 60px var(--ice-primary);
+    }
+    100% {
+        box-shadow: 0 0 10px var(--ice-glow),
+                    0 0 20px var(--ice-secondary),
+                    0 0 30px var(--ice-primary);
+    }
+} 

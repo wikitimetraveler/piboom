@@ -1,0 +1,1128 @@
+body {
+    background-color: var(--ice-dark);
+    color: var(--ice-light);
+    font-family: 'Courier New', monospace;
+    padding: 20px;
+}
+
+/* Override container glow from glow-effects.css */
+.container {
+    background-color: rgba(30, 40, 60, 0.9);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 20px;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    /* Remove box-shadow and override glow animations */
+    box-shadow: none;
+    position: relative;
+    overflow: visible;
+}
+
+/* Remove container glow animations */
+.container::before,
+.container::after {
+    display: none;
+}
+
+#xmlInput {
+    background-color: rgba(30, 40, 60, 0.95);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    color: var(--ice-light);
+    font-family: 'Courier New', monospace;
+    padding: 15px;
+    width: 100%;
+    height: 300px;
+    resize: vertical;
+}
+
+#result {
+    background-color: rgba(30, 40, 60, 0.95);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--ice-light) !important;
+    opacity: 1 !important;
+    min-height: 100px;
+}
+
+button {
+    background-color: rgba(44, 62, 80, 0.95);
+    border: 2px solid var(--ice-border);
+    color: var(--ice-light);
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--ice-primary);
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+/* Make scrollbars visible */
+#result::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+#result::-webkit-scrollbar-track {
+    background: rgba(30, 40, 60, 0.95);
+    border-radius: 6px;
+}
+
+#result::-webkit-scrollbar-thumb {
+    background-color: var(--ice-border);
+    border-radius: 6px;
+    border: 2px solid rgba(30, 40, 60, 0.95);
+}
+
+/* Add some visual feedback when content is present */
+#result:not(:empty) {
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+.navbar {
+    background-color: rgba(44, 62, 80, 0.95) !important;
+    border-bottom: 2px solid var(--ice-border);
+    box-shadow: 0 0 20px var(--ice-glow);
+    margin-bottom: 20px;
+}
+
+.menu-nav {
+    margin-bottom: 20px;
+}
+
+.container {
+    background-color: rgba(30, 40, 60, 0.9);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 20px;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+}
+
+#xmlInput {
+    background-color: rgba(30, 40, 60, 0.95);
+    border: 2px solid var(--ice-border);
+    color: var(--ice-light);
+}
+
+#result {
+    background-color: rgba(30, 40, 60, 0.95);
+    border: 2px solid var(--ice-border);
+    color: var(--ice-light) !important;
+}
+
+button {
+    background-color: rgba(20, 40, 80, 0.95);
+    border: 2px solid var(--ice-border);
+    color: var(--ice-light);
+    padding: 10px 20px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--ice-highlight);
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+/* Make scrollbars visible */
+#result::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+#result::-webkit-scrollbar-track {
+    background: rgba(20, 40, 80, 0.95);
+    border-radius: 6px;
+}
+
+#result::-webkit-scrollbar-thumb {
+    background-color: var(--ice-border);
+    border-radius: 6px;
+    border: 2px solid rgba(20, 40, 80, 0.95);
+}
+
+/* Add some visual feedback when content is present */
+#result:not(:empty) {
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+.form-control {
+    background-color: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    border: 2px solid var(--ice-border);
+    box-shadow: 0 0 20px var(--ice-glow);
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+    transform: translateY(0);
+}
+
+.form-control:focus {
+    background-color: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 30px var(--ice-glow);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.form-control:hover {
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 25px var(--ice-glow);
+}
+
+/* Add a subtle animation for the label */
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ice-light);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus + .form-group label {
+    color: var(--ice-primary);
+    text-shadow: 0 0 10px var(--ice-glow);
+}
+
+.btn-primary {
+    background-color: rgba(44, 62, 80, 0.95);
+    border-color: var(--ice-border);
+    color: var(--ice-light);
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-right: 10px;
+    transform: translateY(0);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary:active {
+    transform: translateY(1px);
+    box-shadow: 0 0 15px var(--ice-glow);
+}
+
+.btn-primary.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.btn-primary.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--ice-light);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.table {
+    color: var(--ice-light);
+}
+
+.table-bordered {
+    border-color: var(--ice-border);
+}
+
+.table-bordered td, .table-bordered th {
+    border-color: var(--ice-border);
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    padding: 15px 0;
+    background-color: rgba(44, 62, 80, 0.95);
+    color: var(--ice-light);
+    text-shadow: 0 0 5px var(--ice-glow);
+    border-top: 2px solid var(--ice-border);
+    box-shadow: 0 -5px 15px var(--ice-glow);
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Fix result visibility */
+#result pre {
+    color: var(--ice-light) !important; /* Force text color */
+    margin: 0;
+    font-family: 'Courier New', monospace;
+}
+
+/* Remove diagonal pattern from text boxes */
+textarea.form-control::before {
+    display: none;
+}
+
+h1 {
+    color: var(--ice-light);
+    text-shadow: 0 0 10px var(--ice-glow);
+    margin-bottom: 20px;
+}
+
+.nav-link {
+    color: var(--ice-light) !important;
+    text-shadow: 0 0 5px var(--ice-glow);
+}
+
+.nav-link:hover {
+    color: var(--ice-primary) !important;
+}
+
+.form-check-input {
+    background-color: rgba(30, 40, 60, 0.95);
+    border-color: var(--ice-border);
+    box-shadow: 0 0 20px var(--ice-glow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    transform: translateY(0);
+}
+
+.form-check-input:checked {
+    background-color: var(--ice-primary);
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 30px var(--ice-glow);
+    transform: translateY(-2px);
+}
+
+.form-check-input:hover {
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 25px var(--ice-glow);
+    transform: translateY(-1px);
+}
+
+.form-check-label {
+    color: var(--ice-light);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.form-check-input:checked + .form-check-label {
+    color: var(--ice-primary);
+    text-shadow: 0 0 10px var(--ice-glow);
+}
+
+.form-check:hover .form-check-label {
+    color: var(--ice-primary);
+    text-shadow: 0 0 5px var(--ice-glow);
+}
+
+/* Add smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Add glowing footer animation */
+.footer {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    margin-top: 40px;
+    border-top: 2px solid var(--ice-border);
+    text-align: center;
+    color: var(--ice-light);
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-secondary),
+        var(--ice-glow),
+        transparent
+    );
+    animation: glowSlide 3s linear infinite;
+}
+
+@keyframes glowSlide {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Make the footer text glow subtly too */
+.footer span {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 10px var(--ice-glow);
+}
+
+/* Header and Footer shared styles */
+.header, .footer {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    text-align: center;
+    color: var(--ice-light);
+}
+
+.header {
+    border-bottom: 2px solid var(--ice-border);
+    margin-bottom: 40px;
+}
+
+.footer {
+    border-top: 2px solid var(--ice-border);
+    margin-top: 40px;
+}
+
+/* Top glow effect */
+.header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-secondary),
+        var(--ice-glow),
+        transparent
+    );
+    animation: glowSlide 3s linear infinite;
+}
+
+/* Bottom glow effect */
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-secondary),
+        var(--ice-glow),
+        transparent
+    );
+    animation: glowSlide 3s linear infinite;
+}
+
+@keyframes glowSlide {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Make the text glow subtly too */
+.header span, .footer span {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 10px var(--ice-glow);
+}
+
+/* Offset the animations slightly so they don't sync */
+.header::after {
+    animation-delay: -1.5s;
+}
+
+/* Style the autocomplete input */
+#fieldIdSearch {
+    background-color: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 10px;
+    width: 100%;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+#fieldIdSearch:focus {
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 20px var(--ice-glow);
+    outline: none;
+}
+
+/* Style the datalist dropdown */
+input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.5;
+}
+
+/* Style for inline checkboxes */
+.form-check-inline {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    margin: 0;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.form-check-input {
+    background-color: rgba(30, 40, 60, 0.95);
+    border: 2px solid var(--ice-border);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-right: 8px;
+}
+
+.form-check-input:checked {
+    background-color: var(--ice-primary);
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 15px var(--ice-glow);
+}
+
+.form-check-label {
+    color: var(--ice-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.form-check-input:checked + .form-check-label {
+    color: var(--ice-primary);
+    text-shadow: 0 0 5px var(--ice-glow);
+}
+
+.form-check:hover .form-check-label {
+    color: var(--ice-primary);
+    text-shadow: 0 0 5px var(--ice-glow);
+}
+
+/* Add smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Add glowing footer animation */
+.footer {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    margin-top: 40px;
+    border-top: 2px solid var(--ice-border);
+    text-align: center;
+    color: var(--ice-light);
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-secondary),
+        var(--ice-glow),
+        transparent
+    );
+    animation: glowSlide 3s linear infinite;
+}
+
+@keyframes glowSlide {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Make the footer text glow subtly too */
+.footer span {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 10px var(--ice-glow);
+}
+
+/* Remove guide button styles and restore original styles */
+.half-width {
+    width: 50% !important;
+}
+
+.checkbox-container {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+#fieldCount {
+    font-size: 1.1em;
+    margin: 10px 0;
+    text-shadow: 0 0 5px var(--ice-glow);
+}
+
+/* Add ice theme styling for toasts */
+.toast {
+    background-color: rgba(30, 40, 60, 0.95);
+    border: 2px solid var(--ice-border);
+    color: var(--ice-light);
+    box-shadow: 0 0 15px var(--ice-glow);
+}
+
+.toast-body {
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 5px var(--ice-glow);
+}
+
+.toast.showing, .toast.show {
+    animation: toastFade 0.3s ease-in-out;
+}
+
+@keyframes toastFade {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+#milestoneOutput {
+    font-family: 'Courier New', monospace;
+    color: var(--ice-light);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+#milestoneOutput:not(:empty) {
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+/* Add dropdown specific styles */
+.field-select-container {
+    margin-bottom: 20px;
+    background-color: rgba(30, 40, 60, 0.95);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+.field-select {
+    width: 100%;
+    background-color: rgba(20, 30, 50, 0.95);
+    color: var(--ice-light);
+    border: 2px solid var(--ice-border);
+    border-radius: 4px;
+    padding: 8px;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+}
+
+.field-select:focus {
+    outline: none;
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 15px var(--ice-glow);
+}
+
+.field-select option {
+    background-color: rgba(20, 30, 50, 0.95);
+    color: var(--ice-light);
+    padding: 8px;
+}
+
+/* Simplified styles for search only */
+.field-search-container {
+    background: linear-gradient(135deg, 
+        rgba(30, 40, 60, 0.95), 
+        rgba(20, 30, 50, 0.95)
+    );
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+.field-search, .form-control {
+    width: 100%;
+    background-color: rgba(20, 30, 50, 0.95);
+    color: var(--ice-light);
+    border: 2px solid var(--ice-border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: 'Courier New', monospace;
+    transition: all 0.3s ease;
+    height: 38px;
+}
+
+.field-search:focus, .form-control:focus {
+    outline: none;
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 15px var(--ice-glow);
+}
+
+#fileName {
+    font-size: 0.85em;
+    margin-top: 4px;
+}
+
+/* Style for datalist options */
+datalist {
+    background-color: rgba(20, 30, 50, 0.95);
+    color: var(--ice-light);
+}
+
+/* Add DataTables specific styles */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+    color: var(--ice-light) !important;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    background-color: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    border: 2px solid var(--ice-border);
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    background-color: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    border: 2px solid var(--ice-border);
+    border-radius: 4px;
+    padding: 5px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: var(--ice-light) !important;
+    background: rgba(30, 40, 60, 0.95) !important;
+    border: 2px solid var(--ice-border) !important;
+    border-radius: 4px;
+    margin: 0 2px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: var(--ice-primary) !important;
+    border-color: var(--ice-primary) !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: var(--ice-highlight) !important;
+    border-color: var(--ice-highlight) !important;
+}
+
+table.dataTable {
+    border-collapse: collapse !important;
+    margin-top: 20px !important;
+}
+
+table.dataTable thead th {
+    background-color: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    border-bottom: 2px solid var(--ice-border);
+    padding: 10px;
+}
+
+table.dataTable tbody td {
+    background-color: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    border-bottom: 1px solid var(--ice-border);
+    padding: 10px;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: rgba(44, 62, 80, 0.95) !important;
+}
+
+/* Add accordion styles */
+.accordion {
+    background-color: rgba(30, 40, 60, 0.95);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+.accordion-item {
+    background-color: transparent;
+    border: none;
+}
+
+.accordion-button {
+    background-color: rgba(44, 62, 80, 0.95);
+    color: var(--ice-light);
+    border: none;
+    padding: 15px;
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--ice-glow);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: var(--ice-primary);
+    color: var(--ice-light);
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 20px var(--ice-glow);
+    border-color: var(--ice-primary);
+}
+
+.accordion-body {
+    background-color: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    padding: 20px;
+}
+
+/* Style for input and output sections */
+.input-section, .output-section {
+    margin-bottom: 20px;
+}
+
+.output-section {
+    display: none; /* Initially hidden */
+}
+
+.output-section.active {
+    display: block;
+}
+
+/* Remove floating footer styles */
+.floating-footer {
+    display: none;
+}
+
+/* Restore original container padding */
+.container {
+    padding-bottom: 20px;
+}
+
+/* Restore original footer styles */
+.footer {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    margin-top: 40px;
+    border-top: 2px solid var(--ice-border);
+    text-align: center;
+    color: var(--ice-light);
+}
+
+.footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--ice-glow),
+        var(--ice-secondary),
+        var(--ice-glow),
+        transparent
+    );
+    animation: glowSlide 3s linear infinite;
+}
+
+@keyframes glowSlide {
+    0% {
+        left: -100%;
+    }
+    100% {
+        left: 100%;
+    }
+}
+
+/* Make the footer text glow subtly too */
+.footer span {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 0 10px var(--ice-glow);
+}
+
+/* Enhanced visual feedback for active states */
+#xmlInput:focus {
+    background-color: rgba(30, 40, 60, 0.98);
+    border-color: var(--ice-primary);
+    box-shadow: 0 0 25px var(--ice-glow);
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.btn-custom {
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(30, 40, 60, 0.95));
+    border: 2px solid var(--ice-border);
+    color: var(--ice-light);
+    padding: 10px 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-custom:hover {
+    background: linear-gradient(135deg, var(--ice-primary), rgba(44, 62, 80, 0.95));
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--ice-glow);
+}
+
+.btn-custom:active {
+    transform: translateY(1px);
+}
+
+/* Loading spinner for transform button */
+.btn-custom.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--ice-light);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Visual improvements */
+.container {
+    background: linear-gradient(135deg, 
+        rgba(30, 40, 60, 0.95), 
+        rgba(20, 30, 50, 0.95)
+    );
+    border: 2px solid var(--ice-border);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.container:hover {
+    box-shadow: 0 0 40px var(--ice-glow);
+}
+
+/* Enhanced table styling */
+table.dataTable thead th {
+    background: linear-gradient(135deg, 
+        rgba(44, 62, 80, 0.95), 
+        rgba(30, 40, 60, 0.95)
+    );
+    color: var(--ice-light);
+    border-bottom: 2px solid var(--ice-border);
+    padding: 12px;
+    font-weight: bold;
+    text-shadow: 0 0 5px var(--ice-glow);
+}
+
+table.dataTable tbody tr {
+    transition: all 0.2s ease;
+}
+
+table.dataTable tbody tr:hover {
+    background-color: rgba(44, 62, 80, 0.95) !important;
+    transform: translateX(5px);
+}
+
+/* Smooth transitions for all interactive elements */
+button, input, textarea, select {
+    transition: all 0.3s ease;
+}
+
+/* Enhanced focus states */
+.form-control:focus, 
+.field-search:focus, 
+.field-select:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px var(--ice-glow);
+}
+
+/* Subtle pulse animation for important elements */
+@keyframes subtlePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.important {
+    animation: subtlePulse 2s infinite;
+}
+
+/* Improved layout styles */
+.field-search-container {
+    background: linear-gradient(135deg, 
+        rgba(30, 40, 60, 0.95), 
+        rgba(20, 30, 50, 0.95)
+    );
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-group .btn {
+    border-left: none;
+    background: rgba(30, 40, 60, 0.95);
+    transition: all 0.3s ease;
+}
+
+.input-group .btn:hover {
+    background: rgba(40, 50, 70, 0.95);
+    transform: scale(1.05);
+}
+
+#fileName {
+    font-style: italic;
+    transition: all 0.3s ease;
+}
+
+/* Guide section styling */
+.guide-section {
+    background: rgba(30, 40, 60, 0.7);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+}
+
+.guide-section:hover {
+    background: rgba(30, 40, 60, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px var(--ice-glow);
+}
+
+.guide-section h6 {
+    color: var(--ice-primary);
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.guide-section ul, .guide-section ol {
+    padding-left: 20px;
+}
+
+.guide-section li {
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.guide-section li:hover {
+    color: var(--ice-primary);
+    transform: translateX(5px);
+}
+
+/* Enhanced spacing */
+.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+/* Tooltip styling */
+[title] {
+    position: relative;
+}
+
+[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    background: rgba(30, 40, 60, 0.95);
+    color: var(--ice-light);
+    border-radius: 4px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 0 10px var(--ice-glow);
+}
+
+/* Clear button animations */
+.btn-outline-light {
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    transform: rotate(90deg);
+}
+
+/* Guide Info Button */
+.guide-info-btn {
+    z-index: 1000;
+    background: rgba(30, 40, 60, 0.7);
+    border: 2px solid var(--ice-border);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 0 20px var(--ice-glow);
+}
+
+.guide-info-btn .btn-outline-light {
+    background: transparent;
+    border: 2px solid var(--ice-border);
+    color: var(--ice-light);
+    transition: all 0.3s ease;
+}
+
+.guide-info-btn .btn-outline-light:hover {
+    background: rgba(44, 62, 80, 0.95);
+    transform: scale(1.05);
+    box-shadow: 0 0 15px var(--ice-glow);
+}
+
+/* Clear button animations */
+.btn-outline-light:not(.guide-info-btn .btn-outline-light) {
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:not(.guide-info-btn .btn-outline-light):hover {
+    transform: rotate(90deg);
+}

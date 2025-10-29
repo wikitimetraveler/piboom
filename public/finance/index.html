@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Tools - piBoom</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+  <style>
+    :root {
+        --ice-primary: #3498db;
+        --ice-secondary: #2ecc71;
+        --ice-dark: #1a1f35;
+        --ice-light: #e8f1ff;
+        --ice-glow: rgba(135, 206, 250, 0.3);
+        --ice-border: #3a4a6a;
+        --primary-blue: #2563eb;
+        --primary-blue-hover: #1d4ed8;
+        --text-dark: #1f2937;
+        --text-muted: #6b7280;
+        --border-light: #e5e7eb;
+        --background-light: #f9fafb;
+        --white: #ffffff;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+      color: var(--text-dark);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    /* Animated background particles */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 60% 60%, rgba(147, 51, 234, 0.05) 0%, transparent 50%);
+      animation: backgroundFloat 25s ease-in-out infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes backgroundFloat {
+      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+      25% { transform: translate(-15px, -15px) scale(1.08) rotate(1deg); }
+      50% { transform: translate(15px, -8px) scale(0.92) rotate(-1deg); }
+      75% { transform: translate(-8px, 15px) scale(1.05) rotate(0.5deg); }
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow-sm);
+      padding: 2rem 0;
+      margin-bottom: 3rem;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
+      animation: headerShine 3s ease-in-out infinite;
+    }
+
+    @keyframes headerShine {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+
+    .nav-home {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+    }
+
+    .nav-home a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ice-dark);
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-home a:hover {
+      background: var(--ice-primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .user-info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+    }
+
+    .user-info .user-display {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ice-dark);
+      border-radius: 25px;
+      font-weight: 600;
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(10px);
+    }
+
+    .user-info img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--ice-primary);
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+    }
+
+    .main-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      margin-bottom: 1rem;
+      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .subtitle {
+      font-size: 1.3rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 3rem;
+      font-weight: 400;
+    }
+
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .tool-card {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--ice-primary), var(--ice-secondary));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .tool-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .tool-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--ice-primary);
+    }
+
+    .tool-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tool-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--ice-dark);
+      margin-bottom: 1rem;
+    }
+
+    .tool-description {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .tool-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .tool-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+      color: white;
+      text-decoration: none;
+    }
+
+    .footer {
+      margin-top: 4rem;
+      padding: 2rem 0;
+      text-align: center;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .main-title {
+        font-size: 2.5rem;
+      }
+      
+      .subtitle {
+        font-size: 1.1rem;
+      }
+      
+      .tools-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .tool-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="nav-home">
+    <a href="/index.html">
+      <i class="bi-house-fill"></i> Home
+    </a>
+  </div>
+
+  <div class="user-info" id="userInfo" style="display: none;">
+    <div class="user-display" id="userDisplay">
+      <img id="userAvatar" src="" alt="User">
+      <span id="userName">User</span>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="container">
+      <h1 class="main-title">💰 Finance Tools</h1>
+      <p class="subtitle">Professional FHA Streamline calculators and financial analysis tools</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="tools-grid">
+      <!-- FHA Streamline Calculator -->
+      <div class="tool-card">
+        <div class="tool-icon">
+          <i class="bi-calculator"></i>
+        </div>
+        <h3 class="tool-title">FHA Streamline Worksheet</h3>
+        <p class="tool-description">
+          Professional FHA Streamline refinance calculator with comprehensive loan analysis and payment calculations.
+        </p>
+        <a href="fha-streamline-calculator.html" class="tool-link">
+          <i class="bi-arrow-right"></i> Open Calculator
+        </a>
+      </div>
+
+      <!-- The Parser -->
+      <div class="tool-card">
+        <div class="tool-icon">
+          <i class="bi-code-slash"></i>
+        </div>
+        <h3 class="tool-title">The Parser</h3>
+        <p class="tool-description">
+          Professional JSON tool for parsing and manipulating financial data structures.
+        </p>
+        <a href="tool2.html" class="tool-link">
+          <i class="bi-arrow-right"></i> Open Tool
+        </a>
+      </div>
+
+      <!-- The Mashup -->
+      <div class="tool-card">
+        <div class="tool-icon">
+          <i class="bi-globe"></i>
+        </div>
+        <h3 class="tool-title">The Mashup</h3>
+        <p class="tool-description">
+          FEMA Disaster Declarations tool for analyzing disaster-related financial impacts and relief data.
+        </p>
+        <a href="tool3.html" class="tool-link">
+          <i class="bi-arrow-right"></i> Open Tool
+        </a>
+      </div>
+
+      <!-- The Automator -->
+      <div class="tool-card">
+        <div class="tool-icon">
+          <i class="bi-gear"></i>
+        </div>
+        <h3 class="tool-title">The Automator</h3>
+        <p class="tool-description">
+          Professional automation tool for streamlining financial processes and workflows.
+        </p>
+        <a href="tool4.html" class="tool-link">
+          <i class="bi-arrow-right"></i> Open Tool
+        </a>
+      </div>
+
+      <!-- The Ruler -->
+      <div class="tool-card">
+        <div class="tool-icon">
+          <i class="bi-rulers"></i>
+        </div>
+        <h3 class="tool-title">The Ruler</h3>
+        <p class="tool-description">
+          Professional field analyzer for measuring and analyzing financial data fields and structures.
+        </p>
+        <a href="tool5.html" class="tool-link">
+          <i class="bi-arrow-right"></i> Open Tool
+        </a>
+      </div>
+
+      <!-- The Transformer -->
+      <div class="tool-card">
+        <div class="tool-icon">
+          <i class="bi-arrow-repeat"></i>
+        </div>
+        <h3 class="tool-title">The Transformer</h3>
+        <p class="tool-description">
+          Professional XML to JSON converter for transforming financial data formats.
+        </p>
+        <a href="tool6.html" class="tool-link">
+          <i class="bi-arrow-right"></i> Open Tool
+        </a>
+      </div>
+
+      <!-- The Alchemist -->
+      <div class="tool-card">
+        <div class="tool-icon">
+          <i class="bi-magic"></i>
+        </div>
+        <h3 class="tool-title">The Alchemist</h3>
+        <p class="tool-description">
+          Professional code converter for transforming financial code and data structures.
+        </p>
+        <a href="tool8.html" class="tool-link">
+          <i class="bi-arrow-right"></i> Open Tool
+        </a>
+      </div>
+
+      <!-- Encompass Assistant (Existing) -->
+      <div class="tool-card">
+        <div class="tool-icon">
+          <i class="bi-robot"></i>
+        </div>
+        <h3 class="tool-title">Encompass Assistant</h3>
+        <p class="tool-description">
+          AI-powered assistant for Encompass loan origination system integration and automation.
+        </p>
+        <a href="encompass-assistant.html" class="tool-link">
+          <i class="bi-arrow-right"></i> Open Assistant
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2025 piBoom Finance Tools. Professional financial analysis and calculation tools.</p>
+  </div>
+
+  <script src="/shared/user-login.js"></script>
+  <script src="/shared/user-passwords.js"></script>
+  <script>
+    // Initialize user display
+    function initializeUser() {
+      if (!isLoggedIn()) {
+        showLoginPopup();
+        return;
+      }
+      
+      const user = getLoggedInUser();
+      if (user) {
+        document.getElementById('userInfo').style.display = 'block';
+        document.getElementById('userAvatar').src = user.avatar;
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userAvatar').style.borderColor = user.color;
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeUser();
+    });
+  </script>
+</body>
+</html>

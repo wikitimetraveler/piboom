@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>FHA Streamline Worksheet - Professional Calculator</title>
+      <!-- Bootstrap CSS -->
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+      <!-- Custom Styles -->
+      <link rel="stylesheet" href="css/styles.css">
+      <style>
+         :root {
+            --elegant-primary: #4A90A4;    /* Subtle blue-green */
+            --elegant-secondary: #7FB3C7;   /* Soft blue-green */
+            --elegant-accent: #6B9E78;      /* Muted green */
+            --elegant-gold: #E67E22;        /* Mellow orange */
+            --elegant-dark: #2C3E50;        /* Deep charcoal */
+            --elegant-light: #FEFEFE;       /* Off-white */
+            --elegant-gray: #85929E;        /* Muted gray */
+            --elegant-border: #E8EDF2;      /* Soft border */
+            --elegant-shadow: rgba(74, 144, 164, 0.08);
+            --elegant-transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --elegant-gradient: linear-gradient(135deg, #4A90A4 0%, #6B9E78 100%);
+            
+            /* Legacy variables for compatibility */
+            --primary-blue: var(--elegant-primary);
+            --primary-blue-hover: var(--elegant-secondary);
+            --text-dark: var(--elegant-dark);
+            --text-muted: var(--elegant-gray);
+            --border-light: var(--elegant-border);
+            --background-light: var(--elegant-light);
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(74, 144, 164, 0.08);
+            --shadow-md: 0 4px 6px -1px rgba(74, 144, 164, 0.12), 0 2px 4px -1px rgba(74, 144, 164, 0.08);
+            --shadow-lg: 0 10px 15px -3px rgba(74, 144, 164, 0.12), 0 4px 6px -2px rgba(74, 144, 164, 0.08);
+         }
+
+         body {
+            background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%);
+            color: var(--elegant-dark);
+            font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.7;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-weight: 300;
+         }
+
+         /* Navigation */
+         .nav-home, .nav-finance {
+            position: absolute;
+            top: 20px;
+            z-index: 1000;
+         }
+
+         .nav-home {
+            right: 20px;
+         }
+
+         .nav-finance {
+            right: 180px;
+         }
+
+         .nav-home a, .nav-finance a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--elegant-dark);
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+         }
+
+         .nav-home a:hover, .nav-finance a:hover {
+            background: var(--elegant-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 144, 164, 0.3);
+         }
+
+         .user-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+         }
+
+         .user-info .user-display {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--elegant-dark);
+            border-radius: 25px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+         }
+
+         .user-info img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid var(--elegant-primary);
+         }
+
+         /* Simple Navbar - Basic Bootstrap */
+         .navbar {
+            margin-bottom: 20px;
+         }
+
+         /* Ensure navbar links are visible */
+         .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+         }
+
+         .navbar-nav .nav-link:hover {
+            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.1) !important;
+         }
+
+         .navbar-brand {
+            color: #ffffff !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+         }
+
+         /* Voice Commands Help */
+         .voice-help {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            max-width: 300px;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            border: 1px solid #e8edf2;
+         }
+
+         .voice-help.show {
+            transform: translateX(0);
+         }
+
+         .voice-help h4 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+         }
+
+         .voice-help ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+         }
+
+         .voice-help li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e8edf2;
+            font-size: 0.875rem;
+            color: #85929e;
+         }
+
+         .voice-help li:last-child {
+            border-bottom: none;
+         }
+
+         .voice-help .command {
+            color: #4A90A4;
+            font-weight: 600;
+         }
+
+         /* Zen Calculator Cards */
+         .calculator-card {
+            background: rgba(254, 254, 254, 0.98);
+            border: 1px solid var(--elegant-border);
+            border-radius: 24px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 60px var(--elegant-shadow);
+            backdrop-filter: blur(20px);
+            position: relative;
+            transition: var(--elegant-transition);
+         }
+
+         .calculator-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, 
+              rgba(74, 144, 164, 0.02) 25%, 
+              transparent 25%, 
+              transparent 50%, 
+              rgba(74, 144, 164, 0.02) 50%, 
+              rgba(74, 144, 164, 0.02) 75%, 
+              transparent 75%);
+            background-size: 60px 60px;
+            pointer-events: none;
+            border-radius: 24px;
+         }
+
+         .calculator-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px var(--elegant-shadow);
+         }
+
+         .calculator-card h3 {
+            color: var(--elegant-dark);
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--elegant-primary);
+            padding-bottom: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            letter-spacing: 0.3px;
+         }
+
+         .calculator-card h3:hover {
+            color: var(--elegant-primary);
+         }
+
+         .card-toggle {
+            background: none;
+            border: none;
+            color: var(--elegant-primary);
+            font-size: 1.2rem;
+            transition: var(--elegant-transition);
+         }
+
+         .card-toggle:hover {
+            color: var(--elegant-secondary);
+         }
+
+         /* Requirements List Styling */
+         .requirements-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+         }
+
+         .requirements-list::-webkit-scrollbar {
+            width: 6px;
+         }
+
+         .requirements-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+         }
+
+         .requirements-list::-webkit-scrollbar-thumb {
+            background: var(--elegant-primary);
+            border-radius: 3px;
+         }
+
+         .requirements-list::-webkit-scrollbar-thumb:hover {
+            background: var(--elegant-secondary);
+         }
+
+         .requirement-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+         }
+
+         .requirement-item:last-child {
+            border-bottom: none;
+         }
+
+         .requirement-item:hover {
+            background: rgba(74, 144, 164, 0.03);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 0 -10px 15px -10px;
+         }
+
+         .requirement-icon {
+            font-size: 1.1rem;
+            margin-right: 15px;
+            margin-top: 2px;
+            flex-shrink: 0;
+            width: 18px;
+            text-align: center;
+         }
+
+         .requirement-item:nth-child(1) .requirement-icon {
+            color: #28a745;
+         }
+
+         .requirement-item:nth-child(2) .requirement-icon,
+         .requirement-item:nth-child(3) .requirement-icon,
+         .requirement-item:nth-child(5) .requirement-icon {
+            color: #dc3545;
+         }
+
+         .requirement-item:nth-child(4) .requirement-icon,
+         .requirement-item:nth-child(12) .requirement-icon,
+         .requirement-item:nth-child(14) .requirement-icon {
+            color: #17a2b8;
+         }
+
+         .requirement-item:nth-child(6) .requirement-icon {
+            color: #ffc107;
+         }
+
+         .requirement-item:nth-child(7) .requirement-icon,
+         .requirement-item:nth-child(8) .requirement-icon,
+         .requirement-item:nth-child(9) .requirement-icon,
+         .requirement-item:nth-child(10) .requirement-icon,
+         .requirement-item:nth-child(11) .requirement-icon,
+         .requirement-item:nth-child(13) .requirement-icon {
+            color: var(--primary-blue);
+         }
+
+         .requirement-item span {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-dark);
+            font-weight: 400;
+         }
+
+         .requirement-item:hover span {
+            color: var(--text-dark);
+            font-weight: 500;
+         }
+
+         /* Responsive adjustments for requirements card */
+         @media (max-width: 768px) {
+            .requirements-list {
+               max-height: 300px;
+            }
+            
+            .requirement-item span {
+               font-size: 0.9rem;
+            }
+            
+                         .requirement-icon {
+                font-size: 1rem;
+                margin-right: 12px;
+             }
+          }
+
+         /* Instruction Cards Styling */
+         .instruction-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+         }
+
+         .instruction-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+         }
+
+         .instruction-header {
+            background: var(--elegant-gradient);
+            color: #ffffff;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--elegant-border);
+         }
+
+         .instruction-header h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 0.95rem;
+         }
+
+         .instruction-body {
+            padding: 16px;
+            background: #ffffff;
+         }
+
+         .instruction-body ul {
+            margin: 0;
+            padding: 0;
+         }
+
+         .instruction-body li {
+            margin-bottom: 8px;
+            padding: 4px 0;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            line-height: 1.4;
+         }
+
+         .instruction-body li:last-child {
+            margin-bottom: 0;
+         }
+
+         .instruction-body strong {
+            color: var(--elegant-primary);
+            font-weight: 600;
+         }
+
+         .alert-info {
+            background: linear-gradient(135deg, #F8FAFC 0%, #E8F4F8 100%);
+            border: 1px solid var(--elegant-border);
+            color: var(--elegant-dark);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px var(--elegant-shadow);
+         }
+
+         .alert-info h5 {
+            color: var(--elegant-dark);
+            font-weight: 500;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+         }
+
+         .alert-info p {
+            margin: 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+         }
+
+         .card-toggle.collapsed {
+            transform: rotate(-90deg);
+         }
+
+         .card-content {
+            transition: all 0.3s ease;
+         }
+
+         /* Professional Form Styling */
+         .form-label {
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+         }
+
+         .form-control {
+            background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%);
+            color: var(--elegant-dark);
+            border: 1px solid var(--elegant-border);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px var(--elegant-shadow);
+            transition: var(--elegant-transition);
+            font-weight: 400;
+         }
+
+         .form-control:focus {
+            background: linear-gradient(135deg, #FEFEFE 0%, #F0F4F8 100%);
+            color: var(--elegant-dark);
+            border-color: var(--elegant-primary);
+            box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.1), 0 4px 12px var(--elegant-shadow);
+            outline: none;
+            transform: translateY(-1px);
+         }
+
+         .form-control:hover {
+            border-color: var(--elegant-accent);
+            background: linear-gradient(135deg, #FEFEFE 0%, #F0F4F8 100%);
+            transform: translateY(-1px);
+         }
+
+         .form-control:read-only {
+            background: linear-gradient(135deg, #F7F9FC 0%, #E8EDF2 100%);
+            color: var(--elegant-gray);
+         }
+
+         .input-group-text {
+            background: linear-gradient(135deg, #F8FAFC 0%, #E8EDF2 100%);
+            border-color: var(--elegant-border);
+            color: var(--elegant-primary);
+            font-weight: 500;
+            border-radius: 12px 0 0 12px;
+         }
+
+         /* Zen Audit Card */
+         .audit-card {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+            border: 1px solid var(--elegant-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 8px 25px var(--elegant-shadow);
+            overflow: hidden;
+         }
+
+         .audit-card h4 {
+            color: var(--elegant-dark);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+         }
+
+         .table {
+            color: var(--elegant-dark);
+            background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
+            border: 1px solid var(--elegant-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 25px var(--elegant-shadow);
+            overflow: hidden;
+         }
+
+         .table-bordered {
+            border-color: var(--elegant-border);
+         }
+
+         .table-bordered td, .table-bordered th {
+            border-color: var(--elegant-border);
+            padding: 15px 20px;
+         }
+
+         .table th {
+            background: var(--elegant-gradient);
+            color: #ffffff;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+         }
+
+         .table td {
+            border-color: var(--elegant-border);
+            color: var(--elegant-dark);
+            padding: 15px 20px;
+         }
+
+         .badge {
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+         }
+
+         .badge.bg-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+         }
+
+         .badge.bg-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+         }
+
+         .badge.bg-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%) !important;
+         }
+
+         /* Zen Select Styling */
+         select.form-control {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F7F9FC 100%);
+            color: var(--elegant-dark);
+            border: 1px solid var(--elegant-border);
+            border-radius: 12px;
+            transition: var(--elegant-transition);
+         }
+
+         select.form-control:focus {
+            background: linear-gradient(135deg, #FFFFFF 0%, #F0F4F8 100%);
+            color: var(--elegant-dark);
+            border-color: var(--elegant-primary);
+            outline: none;
+            transform: translateY(-1px);
+         }
+
+         /* Zen Container */
+         .container {
+            background: rgba(254, 254, 254, 0.98);
+            border: 1px solid var(--elegant-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 60px var(--elegant-shadow);
+            backdrop-filter: blur(20px);
+            margin-bottom: 40px;
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+         }
+
+         .main-content {
+            padding: 2rem 0;
+         }
+
+         /* Voice Control */
+         .voice-control {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+         }
+
+         .voice-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--elegant-primary);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px var(--elegant-shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+         }
+
+         .voice-btn:hover {
+            background: var(--elegant-primary-hover);
+            transform: scale(1.1);
+         }
+
+         .voice-btn.listening {
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+         }
+
+         .voice-status {
+            background: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--elegant-dark);
+            box-shadow: 0 8px 25px var(--elegant-shadow);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+         }
+
+         .voice-status.show {
+            opacity: 1;
+            transform: translateY(0);
+         }
+
+         .voice-status.listening {
+            background: #e74c3c;
+            color: white;
+         }
+
+         @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+         }
+
+         /* Professional Row Spacing */
+         .row {
+            margin-bottom: 1.5rem;
+         }
+
+         .row:last-child {
+            margin-bottom: 0;
+         }
+
+         /* Responsive Design */
+         @media (max-width: 768px) {
+            .calculator-card {
+               padding: 1.5rem;
+            }
+            
+            .calculator-card h3 {
+               font-size: 1.25rem;
+            }
+            
+            .form-label {
+               font-size: 0.9rem;
+            }
+         }
+
+         /* Loading Animation */
+         .fade-in {
+            animation: fadeIn 0.6s ease-out;
+         }
+
+         @keyframes fadeIn {
+            from {
+               opacity: 0;
+               transform: translateY(20px);
+            }
+            to {
+               opacity: 1;
+               transform: translateY(0);
+            }
+         }
+      </style>
+   </head>
+   <body>
+      <!-- Navigation -->
+      <div class="nav-home">
+         <a href="/index.html">
+            <i class="bi-house-fill"></i> Home
+         </a>
+      </div>
+      
+      <div class="nav-finance">
+         <a href="index.html">
+            <i class="bi-arrow-left"></i> Finance Hub
+         </a>
+      </div>
+
+      <div class="user-info" id="userInfo" style="display: none;">
+         <div class="user-display" id="userDisplay">
+            <img id="userAvatar" src="" alt="User">
+            <span id="userName">User</span>
+         </div>
+      </div>
+
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+         <div class="container">
+            <a class="navbar-brand" href="#">
+               <i class="bi-calculator me-2"></i>FHA Streamline Worksheet
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+               <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+               <ul class="navbar-nav ml-auto">
+                  <li class="nav-item">
+                     <a class="nav-link" id="mergeChangedFieldsBtn" href="#">
+                        <i class="bi-arrow-merge"></i> Merge Fields
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" id="parseFieldsBtn" href="#">
+                        <i class="bi-code-slash"></i> Parse Fields
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" id="darkModeToggle" href="#">
+                        <i class="bi-moon"></i> Dark Mode
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="#" id="maxLoanTestLink">
+                        <i class="bi-shield-check"></i> Max Loan Test
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="#" id="populateButton">
+                        <i class="bi-download"></i> Load Scenarios
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="#">
+                        <i class="bi-envelope"></i> Contact
+                     </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="../../index.html" style="color: white !important; font-weight: bold !important; background-color: rgba(255, 255, 255, 0.2) !important; border-radius: 5px !important; padding: 8px 12px !important;">
+                        <i class="bi-house"></i> 🏠 Back to Menu
+                     </a>
+                  </li>
+               </ul>
+            </div>
+         </div>
+      </nav>
+
+      <div class="main-content">
+         <div class="container">
+            <!-- FHA Streamline Requirements -->
+            <div class="calculator-card fade-in">
+               <h3 data-toggle="collapse" data-target="#collapseRequirements" aria-expanded="true" aria-controls="collapseRequirements">
+                  <span><i class="bi-clipboard-list me-2"></i>FHA Streamline Requirements</span>
+                  <button class="card-toggle" type="button">
+                     <i class="bi-chevron-down"></i>
+                  </button>
+               </h3>
+               
+               <div class="collapse show card-content" id="collapseRequirements">
+                  <div class="requirements-list">
+                     <div class="requirement-item">
+                        <i class="bi-check-circle requirement-icon"></i>
+                        <span>No Appraisal required for FHA Streamline transactions (see State & Property Restrictions – HBFS Overlays in the FHA Product Description for multi-unit properties in IL, NJ & NY)</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-x-circle requirement-icon"></i>
+                        <span>Closing costs CANNOT be financed</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-x-circle requirement-icon"></i>
+                        <span>Use of TOTAL Scorecard is NOT permitted</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-info-circle requirement-icon"></i>
+                        <span>Credit Qualifying subject to FHA Manual Underwriting requirements</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-x-circle requirement-icon"></i>
+                        <span>The existing FHA lien cannot be a FHA "Secure" loan</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-currency-dollar requirement-icon"></i>
+                        <span>Maximum cash back to borrower at closing limited to $500.00</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-calendar-check requirement-icon"></i>
+                        <span>Loan must be current for month due (i.e., loan disbursing on or before September 30, 2015 must have the August 2015 payment made within the month of August)</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-clock requirement-icon"></i>
+                        <span>Length of existing FHA Loan (Mortgage Seasoning Requirements): Borrowers must have made six (6) payments on the FHA-insured mortgage that is being refinanced – AND – At least six (6) full months have passed since the 1st payment due date of the mortgage that is being refinanced – AND – At least 210 days have passed from the closing of the mortgage being refinanced; and, If the Borrower assumed the mortgage that is being refinanced, they must have made six (6) payments since the time of assumption</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-calendar requirement-icon"></i>
+                        <span>FHA Connection will not assign a case number for a streamline refinance transaction until the full six (6) month loan seasoning period has elapsed</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-calendar requirement-icon"></i>
+                        <span>FHA Connection will not assign a case number for a streamline refinance where the existing mortgage to be paid is a 203(k) mortgage and the rehabilitation escrow account has not been completed</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-person-check requirement-icon"></i>
+                        <span>The Borrower must have made all mortgage payments within the month due for the six (6) months prior to case number assignment and have no more than one (1) 30-day late payment for the previous six (6) months for all mortgages. The Borrower must have made the payments for all mortgages secured by the subject property within the month due for the month prior to the mortgage disbursement</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-person-plus requirement-icon"></i>
+                        <span>Individuals may be added to the Title and Mortgage on Non-Credit Qualifying Streamlines without a creditworthiness review</span>
+                     </div>
+                     <div class="requirement-item">
+                        <i class="bi-info-circle requirement-icon"></i>
+                        <span>Credit Qualifying ONLY needed when dropping a Borrower; otherwise process as Non-Credit Qualifying</span>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- Instructions Card -->
+            <div class="calculator-card fade-in">
+               <h3 data-toggle="collapse" data-target="#collapseInstructions" aria-expanded="true" aria-controls="collapseInstructions">
+                  <span><i class="bi-info-circle me-2"></i>FHA Streamline Worksheet Instructions</span>
+                  <button class="card-toggle" type="button">
+                     <i class="bi-chevron-down"></i>
+                  </button>
+               </h3>
+               
+               <div class="collapse show card-content" id="collapseInstructions">
+                  <div class="alert alert-info">
+                     <h5><i class="bi-lightbulb me-2"></i>Quick Start Guide</h5>
+                     <p>This worksheet helps calculate the maximum loan amount for FHA Streamline refinances. Follow the cards in order for best results.</p>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-6">
+                        <div class="instruction-card mb-3">
+                           <div class="instruction-header">
+                              <h6><i class="bi-calculator me-2"></i>Part One - Existing Loan Balance</h6>
+                           </div>
+                           <div class="instruction-body">
+                              <ul class="list-unstyled">
+                                 <li><strong>1.</strong> Enter outstanding principal balance</li>
+                                 <li><strong>2a.</strong> Add interest due (up to 60 days)</li>
+                                 <li><strong>2b.</strong> Select forbearance type if applicable</li>
+                                 <li><strong>3a.</strong> Add MIP due on existing mortgage</li>
+                                 <li><strong>4.</strong> Total outstanding balance (auto-calculated)</li>
+                                 <li><strong>5.</strong> Enter original principal balance</li>
+                                 <li><strong>6.</strong> Lesser of total outstanding or original (auto-calculated)</li>
+                              </ul>
+                           </div>
+                        </div>
+
+                        <div class="instruction-card mb-3">
+                           <div class="instruction-header">
+                              <h6><i class="bi-currency-dollar me-2"></i>Part Two - UFMIP Refund</h6>
+                           </div>
+                           <div class="instruction-body">
+                              <ul class="list-unstyled">
+                                 <li><strong>7.</strong> Enter unearned UFMIP refund amount</li>
+                                 <li><strong>8.</strong> Maximum applicable refund (auto-calculated)</li>
+                                 <li><strong>9.</strong> UFMIP refund (auto-calculated)</li>
+                              </ul>
+                           </div>
+                        </div>
+                     </div>
+
+                     <div class="col-md-6">
+                        <div class="instruction-card mb-3">
+                           <div class="instruction-header">
+                              <h6><i class="bi-graph-up me-2"></i>Part Three - Maximum Base Loan</h6>
+                           </div>
+                           <div class="instruction-body">
+                              <ul class="list-unstyled">
+                                 <li><strong>10.</strong> Maximum loan amount (auto-calculated)</li>
+                                 <li><strong>11.</strong> Maximum loan amount rounded (auto-calculated)</li>
+                                 <li><strong>12.</strong> Enter prior case number date</li>
+                                 <li><strong>13.</strong> New UFMIP factor (auto-calculated)</li>
+                                 <li><strong>14.</strong> New UFMIP amount (auto-calculated)</li>
+                              </ul>
+                           </div>
+                        </div>
+
+                        <div class="instruction-card mb-3">
+                           <div class="instruction-header">
+                              <h6><i class="bi-exclamation-triangle me-2"></i>Important Notes</h6>
+                           </div>
+                           <div class="instruction-body">
+                              <ul class="list-unstyled">
+                                 <li><i class="bi-exclamation-triangle text-warning me-2"></i>All calculations are automatic</li>
+                                 <li><i class="bi-exclamation-triangle text-warning me-2"></i>Verify all inputs before proceeding</li>
+                                 <li><i class="bi-exclamation-triangle text-warning me-2"></i>Use Max Loan Amount Test to validate</li>
+                                 <li><i class="bi-exclamation-triangle text-warning me-2"></i>Check audit results for compliance</li>
+                              </ul>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- Part One - Existing Loan Balance -->
+            <div class="calculator-card fade-in">
+               <h3 data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  <span><i class="bi-calculator me-2"></i>Part One - Existing Loan Balance</span>
+                  <button class="card-toggle" type="button">
+                     <i class="bi-chevron-down"></i>
+                  </button>
+               </h3>
+               
+               <div class="collapse show card-content" id="collapseOne">
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcA1_id" class="form-label">1. Outstanding principal balance of existing mortgage prior to mortgager disbursement</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcA1_id" emid="CX.FHA.SL.OUT.BAL" placeholder="0.00">
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcA2_id" class="form-label">2a. Plus Interest due on the existing mortgage (up to 60 days interest)</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcA2_id" emid="CX.FHA.SL.INT.DUE.EXST" placeholder="0.00">
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="forbearanceType" class="form-label">2b. Forbearance Type:</label>
+                     </div>
+                     <div class="col-md-4">
+                        <select title="Forbearance" id="forbearanceType" emid="CX.FHA.SL.FORBEARANCE" class="form-control">
+                           <option value="noForbearance">No Forbearance</option>
+                           <option value="noLateCharges">Forbearance - no late charges/escrow shortage</option>
+                           <option value="lateCharges">Forbearance - late charges/escrow shortage</option>
+                        </select>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-6">
+                        <label for="calcA3_id" class="form-label">Forbearance Late Charges</label>
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" id="calcA3_id" class="form-control calculator-input" emid="CX.FHA.SL.LATE.CHARGES" placeholder="0.00">
+                        </div>
+                     </div>
+                     <div class="col-md-6">
+                        <label for="calcA4_id" class="form-label">Forbearance Escrow Charges</label>
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" id="calcA4_id" class="form-control calculator-input" emid="CX.FHA.SL.ESCROW.SHORTAGES" placeholder="0.00">
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcA5_id" class="form-label">3a. Plus Interest due on the existing mortgage (up to 60 days interest)</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcA5_id" emid="CX.FHA.SL.MIP.DUE.EXST" placeholder="0.00">
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcA_result_id" class="form-label">4. Total outstanding balance</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcA_result_id" placeholder="0.00" emid="CX.FHA.SL.TOT.OUT.BAL" readonly>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcB2_id" class="form-label">5. Original Principal</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcB2_id" emid="CX.FHA.SL.ORG.PRIN.BAL" placeholder="0.00">
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcB_result_id" class="form-label">6. Lesser of Total Outstanding balance or original principal</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcB_result_id" emid="CX.FHA.SL.MIN.BAL" placeholder="0.00" readonly>
+                        </div>
+                     </div>
+                  </div>
+
+                  <!-- Audit Report Card -->
+                  <div class="audit-card">
+                     <h4><i class="bi-clipboard-check me-2"></i>Audit Report</h4>
+                     <div class="table-responsive">
+                        <table class="table table-bordered" id="auditTable">
+                           <thead>
+                              <tr>
+                                 <th>Test</th>
+                                 <th>Result</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <tr>
+                                 <td>MaxLoanAmount</td>
+                                 <td><span class="badge bg-secondary">Pending</span></td>
+                              </tr>
+                              <tr>
+                                 <td>Forbearance</td>
+                                 <td><span class="badge bg-secondary">Pending</span></td>
+                              </tr>
+                              <tr>
+                                 <td>MaxRefund</td>
+                                 <td><span class="badge bg-secondary">Pending</span></td>
+                              </tr>
+                              <tr>
+                                 <td>NetTangibleBenefit</td>
+                                 <td><span class="badge bg-secondary">Pending</span></td>
+                              </tr>
+                              <tr>
+                                 <td>PrincipalBalance</td>
+                                 <td><span class="badge bg-secondary">Pending</span></td>
+                              </tr>
+                              <tr>
+                                 <td>InterestDue</td>
+                                 <td><span class="badge bg-secondary">Pending</span></td>
+                              </tr>
+                              <tr>
+                                 <td>MipDue</td>
+                                 <td><span class="badge bg-secondary">Pending</span></td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- Part Two - UFMIP Refund -->
+            <div class="calculator-card fade-in">
+               <h3 data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                  <span><i class="bi-cash-stack me-2"></i>Part Two - UFMIP Refund</span>
+                  <button class="card-toggle collapsed" type="button">
+                     <i class="bi-chevron-down"></i>
+                  </button>
+               </h3>
+               
+               <div class="collapse card-content" id="collapseTwo">
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcD1_id" class="form-label">7. Unearned UFMIP refund</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcD1_id" placeholder="0.00" emid="1134">
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcC_result_id" class="form-label">8. Max Applicable Refund</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcC_result_id" placeholder="0.00" emid="CX.FHA.SL.UFMIP.MAX.APP" readonly>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcD_result_id" class="form-label">9. UFMIP refund</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcD_result_id" placeholder="0.00" emid="CX.FHA.SL.UFMIP.REFUND" readonly>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            <!-- Part Three - Maximum Base Loan Amount -->
+            <div class="calculator-card fade-in">
+               <h3 data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                  <span><i class="bi-graph-up me-2"></i>Part Three - Maximum Base Loan Amount</span>
+                  <button class="card-toggle collapsed" type="button">
+                     <i class="bi-chevron-down"></i>
+                  </button>
+               </h3>
+               
+               <div class="collapse card-content" id="collapseThree">
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="section3_id" class="form-label">Current Base Loan Amount</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="section3_id" placeholder="0.00" emid="1109" readonly>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcE_result_id" class="form-label">10. Maximum Loan Amount</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcE_result_id" placeholder="0.00" emid="CX.FHA.SL.UFMIP.MAX.APP" readonly>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcF_result_id" class="form-label">11. Maximum Loan Amount Rounded</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">$</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcF_result_id" placeholder="0.00" emid="CX.FHA.SL.UFMIP.MAX.APP" readonly>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcG_input_id" class="form-label">12. Prior Case Number Date</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text"><i class="bi-calendar"></i></span>
+                           </div>
+                           <input type="date" class="form-control calculator-input date-input" id="calcG_input_id" emid="3432">
+                        </div>
+                     </div>
+                  </div>
+
+                  <div class="row">
+                     <div class="col-md-8">
+                        <label for="calcC2_id" class="form-label">13. New UFMIP Factor</label>
+                     </div>
+                     <div class="col-md-4">
+                        <div class="input-group">
+                           <div class="input-group-prepend">
+                              <span class="input-group-text">%</span>
+                           </div>
+                           <input type="number" class="form-control calculator-input" id="calcC2_id" emid="CX.FHA.SL.UFMIP.MAX.APP" placeholder="0.00">
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+      
+      <!-- ICE Library -->
+      <script src="https://cdn.elliemae.io/elliemae/core/ssf/1.0/elli.ssf.guest-with-polyfill.js"></script>
+      
+      <!-- Custom Scripts -->
+      <script type="text/javascript" src="js/stylesJS.js"></script>
+      <script type="text/javascript" src="js/bindings.js"></script>
+      <script type="text/javascript" src="js/scenarios.js"></script>
+      <script type="text/javascript" src="/shared/calculations.js"></script>
+      <script type="text/javascript" src="js/fhaStreamlineAudit.js"></script>
+      <script type="text/javascript" src="js/voiceController.js"></script>
+      <script type="text/javascript" src="js/main.js"></script>
+      
+      <!-- Login Integration -->
+      <script src="/shared/user-login.js"></script>
+      <script src="/shared/user-passwords.js"></script>
+
+      <!-- Enhanced Card Control and Audit Script -->
+      <script>
+         $(document).ready(function() {
+
+            
+            // Setup Max Loan Test functionality
+            const maxLoanTestLink = document.getElementById('maxLoanTestLink');
+            if (maxLoanTestLink) {
+               maxLoanTestLink.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  executeMaxLoanTest();
+               });
+            }
+
+            // Max Loan Test execution function
+            function executeMaxLoanTest() {
+               try {
+                  // Use the FHA Streamline Audit engine
+                  if (typeof fhaAudit !== 'undefined') {
+                     const auditResults = fhaAudit.runAllAuditTests();
+                     console.log('Comprehensive audit tests executed:', auditResults);
+                     
+                     // Get audit summary
+                     const summary = fhaAudit.getAuditSummary();
+                     console.log('Audit summary:', summary);
+                  } else {
+                     console.warn('FHA Streamline Audit not available');
+                  }
+               } catch (error) {
+                  console.error('Error executing audit tests:', error);
+               }
+            }
+
+                         // Initialize the FHA Streamline Audit engine
+             console.log('Initializing FHA Streamline Audit...');
+             
+             // Wait for DOM to be fully loaded
+             setTimeout(() => {
+                try {
+                   // Create audit configuration - using the same pattern as calculation engine
+                   const auditConfig = {
+                      auditGroups: [
+                         {
+                            testKey: 'testMaxLoanAmount',
+                            inputIds: ['calcA_result_id', 'calcC_result_id'],
+                            resultId: 'auditTable'
+                         },
+                         {
+                            testKey: 'testForbearance',
+                            inputIds: ['forbearanceType', 'calcA3_id', 'calcA4_id'],
+                            resultId: 'auditTable'
+                         },
+                         {
+                            testKey: 'testMaxRefund',
+                            inputIds: ['calcD_result_id', 'calcB2_id'],
+                            resultId: 'auditTable'
+                         },
+                         {
+                            testKey: 'testNetTangibleBenefit',
+                            inputIds: ['calcA_result_id', 'calcE_result_id'],
+                            resultId: 'auditTable'
+                         },
+                         {
+                            testKey: 'testPrincipalBalance',
+                            inputIds: ['calcA1_id', 'calcB2_id'],
+                            resultId: 'auditTable'
+                         },
+                         {
+                            testKey: 'testInterestDue',
+                            inputIds: ['calcA2_id'],
+                            resultId: 'auditTable'
+                         },
+                         {
+                            testKey: 'testMipDue',
+                            inputIds: ['calcA5_id', 'calcA1_id'],
+                            resultId: 'auditTable'
+                         }
+                      ]
+                   };
+                   
+                   // Debug: Check if audit groups are properly configured
+                   console.log('Audit groups configured:', auditConfig.auditGroups);
+                   auditConfig.auditGroups.forEach(group => {
+                      console.log(`Audit group ${group.testKey}:`, {
+                         inputIds: group.inputIds,
+                         foundElements: group.inputIds.map(id => document.getElementById(id) ? 'FOUND' : 'NOT FOUND')
+                      });
+                   });
+                   
+                   // Initialize the audit engine - this will automatically set up field change listeners
+                   window.fhaAudit = new FhaStreamlineAudit(auditConfig);
+                   console.log('FHA Streamline Audit initialized successfully');
+                   
+                   // Force run all audit tests immediately
+                   console.log('Running initial audit tests...');
+                   fhaAudit.runAllAuditTests();
+                   
+                   // Test display update directly
+                   console.log('Testing display update...');
+                   fhaAudit.updateAuditDisplay('testMaxLoanAmount', 'Pass');
+                   fhaAudit.updateAuditDisplay('testForbearance', 'Warn');
+                   fhaAudit.updateAuditDisplay('testMaxRefund', 'Fail');
+                   
+                   // Add manual test button for debugging
+                   const testBtn = document.createElement('button');
+                   testBtn.textContent = 'TEST AUDIT';
+                   testBtn.style.cssText = 'position:fixed;top:10px;right:10px;z-index:9999;background:red;color:white;padding:10px;border:none;border-radius:5px;cursor:pointer;';
+                   testBtn.onclick = () => {
+                      console.log('Manual test button clicked');
+                      if (window.fhaAudit) {
+                         console.log('Running manual audit test...');
+                         const results = window.fhaAudit.runAllAuditTests();
+                         console.log('Audit results:', results);
+                      } else {
+                         console.error('fhaAudit not available');
+                      }
+                   };
+                   document.body.appendChild(testBtn);
+                   
+                } catch (error) {
+                   console.error('Error initializing FHA Streamline Audit:', error);
+                }
+             }, 2000); // Wait 2 seconds for everything to load
+
+             // Initialize voice controller
+             try {
+                window.voiceController = new VoiceController();
+                console.log('Voice controller initialized successfully');
+             } catch (error) {
+                console.error('Error initializing voice controller:', error);
+             }
+
+            // Handle toggle button rotation for Bootstrap collapse
+            $('[data-toggle="collapse"]').on('click', function() {
+               var target = $(this).data('target');
+               var button = $(this).find('.card-toggle');
+               
+               // Toggle the collapsed class for rotation
+               if ($(target).hasClass('show')) {
+                  button.addClass('collapsed');
+               } else {
+                  button.removeClass('collapsed');
+               }
+            });
+
+            // Initialize first card as expanded
+            $('#collapseOne').addClass('show');
+            $('[data-target="#collapseOne"] .card-toggle').removeClass('collapsed');
+         });
+      </script>
+
+      <!-- Voice Control Help -->
+      <div class="voice-help" id="voiceHelp">
+         <h4>🎤 Voice Commands</h4>
+         <ul>
+            <li><span class="command">"Calculate"</span> - Run all calculations</li>
+            <li><span class="command">"Run Audit"</span> - Execute audit tests</li>
+            <li><span class="command">"Load Scenarios"</span> - Load sample data</li>
+            <li><span class="command">"Clear All"</span> - Clear all fields</li>
+            <li><span class="command">"Show Help"</span> - Display this help</li>
+            <li><span class="command">"Hide Help"</span> - Hide this help</li>
+            <li><span class="command">"Go Home"</span> - Return to main menu</li>
+         </ul>
+      </div>
+
+      <!-- Voice Control Button -->
+      <div class="voice-control">
+         <div class="voice-status" id="voiceStatus">Click to start voice control</div>
+         <button class="voice-btn" id="voiceBtn" title="Voice Control">
+            <i class="bi-mic"></i>
+         </button>
+      </div>
+
+      <!-- Login Integration Script -->
+      <script>
+         // Initialize user display
+         function initializeUser() {
+            if (!isLoggedIn()) {
+               showLoginPopup();
+               return;
+            }
+            
+            const user = getLoggedInUser();
+            if (user) {
+               document.getElementById('userInfo').style.display = 'block';
+               document.getElementById('userAvatar').src = user.avatar;
+               document.getElementById('userName').textContent = user.name;
+               document.getElementById('userAvatar').style.borderColor = user.color;
+            }
+         }
+
+         // Initialize on page load
+         document.addEventListener('DOMContentLoaded', function() {
+            initializeUser();
+         });
+      </script>
+   </body>
+</html>

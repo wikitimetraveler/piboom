@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Mashup - FEMA Disaster Declarations</title>
+
+    <!--
+    The Mashup - FEMA Disaster Declarations Tool
+    Developed by: David Lane
+    Date: 3/5/2025
+    Description: Professional FEMA disaster declarations mashup with Google Maps integration
+    Technologies: HTML, CSS, JavaScript, Bootstrap, Google Maps API
+    -->
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+
+    <style>
+        :root {
+            --ice-primary: #3498db;
+            --ice-secondary: #2ecc71;
+            --ice-dark: #1a1f35;
+            --ice-light: #e8f1ff;
+            --ice-glow: rgba(135, 206, 250, 0.3);
+            --ice-border: #3a4a6a;
+            --primary-blue: #2563eb;
+            --primary-blue-hover: #1d4ed8;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border-light: #e5e7eb;
+            --background-light: #f9fafb;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-dark);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+            animation: backgroundFloat 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(-10px, -10px) scale(1.05); }
+            50% { transform: translate(10px, -5px) scale(0.95); }
+            75% { transform: translate(-5px, 10px) scale(1.02); }
+        }
+
+        /* Professional Navbar */
+        .navbar {
+            background: var(--white) !important;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
+            animation: headerShine 3s ease-in-out infinite;
+        }
+
+        @keyframes headerShine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .navbar-brand {
+            color: var(--text-dark) !important;
+            font-weight: 600;
+            font-size: 1.25rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-link {
+            color: var(--text-muted) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue) !important;
+        }
+
+        /* Voice Control Button */
+        .voice-control {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .voice-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--ice-primary);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .voice-btn:hover {
+            background: var(--primary-blue-hover);
+            transform: scale(1.1);
+        }
+
+        .voice-btn.listening {
+            background: #e74c3c;
+            animation: pulse 1.5s infinite;
+        }
+
+        .voice-btn.listening::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid #e74c3c;
+            animation: ripple 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .voice-status {
+            background: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            color: var(--text-dark);
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .voice-status.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .voice-status.listening {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Professional Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .main-content {
+            padding: 2rem 0;
+        }
+
+        /* Professional Tool Cards */
+        .tool-card {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: cardFloat 6s ease-in-out infinite;
+        }
+
+        .tool-card:nth-child(odd) {
+            animation-delay: 0s;
+        }
+
+        .tool-card:nth-child(even) {
+            animation-delay: 3s;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-5px) rotate(0.5deg); }
+            50% { transform: translateY(-2px) rotate(-0.5deg); }
+            75% { transform: translateY(-8px) rotate(0.3deg); }
+        }
+
+        .tool-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-lg), 0 0 30px var(--ice-glow);
+            border-color: var(--ice-primary);
+            animation-play-state: paused;
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--ice-primary), var(--ice-secondary), var(--ice-glow));
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .tool-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .tool-card h3 {
+            color: var(--text-dark);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .tool-card h3:hover {
+            color: var(--primary-blue);
+        }
+
+        /* Professional Form Styling */
+        .form-label {
+            color: var(--text-dark);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            color: var(--text-dark);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            background: var(--white);
+            border-color: var(--primary-blue);
+            color: var(--text-dark);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .form-control:read-only {
+            background-color: var(--background-light);
+            color: var(--text-muted);
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-blue-hover);
+            border-color: var(--primary-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Map Styling */
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        #map:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Table Styling */
+        .table {
+            color: var(--text-dark);
+            background: transparent;
+            font-size: 0.9rem;
+        }
+
+        .table th {
+            border-color: var(--border-light);
+            color: var(--text-dark);
+            font-weight: 600;
+            background: var(--white);
+            padding: 0.75rem;
+        }
+
+        .table td {
+            border-color: var(--border-light);
+            color: var(--text-dark);
+            padding: 0.75rem;
+        }
+
+        .table-bordered {
+            border-color: var(--border-light);
+        }
+
+        .table-bordered td, .table-bordered th {
+            border-color: var(--border-light);
+        }
+
+        /* YouTube Results Styling */
+        .youtube-card {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .youtube-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .youtube-card h5 {
+            color: var(--text-dark);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .youtube-card p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Professional Footer */
+        .footer {
+            background: var(--white);
+            border-top: 1px solid var(--border-light);
+            padding: 2rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--ice-primary), transparent);
+            animation: footerGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes footerGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .footer-content {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            animation: footerFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes footerFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
+        }
+
+        .footer-content strong {
+            color: var(--text-dark);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .tool-card {
+                padding: 1.5rem;
+            }
+            
+            .tool-card h3 {
+                font-size: 1.25rem;
+            }
+            
+            .form-label {
+                font-size: 0.9rem;
+            }
+
+            .voice-control {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .voice-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.25rem;
+            }
+
+            #map {
+                height: 300px;
+            }
+        }
+
+        /* Loading Animation */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Particle effects */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--ice-glow);
+            border-radius: 50%;
+            animation: particleFloat 15s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle effects container -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Voice Control Button -->
+    <div class="voice-control">
+        <div class="voice-status" id="voiceStatus">Click to start voice control</div>
+        <button class="voice-btn" id="voiceBtn" title="Voice Control">
+            <i class="bi-mic"></i>
+        </button>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi-arrow-repeat me-2"></i>The Mashup
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="../../index.html">
+                            <i class="bi-house"></i> Back to Menu
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="container">
+            <!-- FEMA Disaster Declarations Tool Card -->
+            <div class="tool-card fade-in">
+                <h3>
+                    <span><i class="bi-geo-alt me-2"></i>FEMA Disaster Declarations Mashup</span>
+                </h3>
+                
+                <div class="row">
+                    <!-- Form Section -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="street" class="form-label">Street Address</label>
+                            <input type="text" id="street" emid="urla.x73" class="form-control" placeholder="Enter street address">
+                        </div>
+                        <div class="mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" id="city" emid="12" class="form-control" placeholder="Enter city">
+                        </div>
+                        <div class="mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <input type="text" id="state" emid="14" class="form-control" placeholder="Enter state code (e.g., TX)" maxlength="2">
+                            <small class="text-danger" id="stateError">Invalid state code.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="county" class="form-label">County</label>
+                            <input type="text" id="county" emid="13" class="form-control" placeholder="Enter county name (for FEMA search)">
+                            <small class="text-danger" id="countyError">County name must start with a capital letter followed by lowercase letters.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="zip" class="form-label">ZIP Code</label>
+                            <input type="text" id="zip" emid="14" class="form-control" placeholder="Enter ZIP code">
+                        </div>
+                        <div class="mb-3">
+                            <label for="latitude" class="form-label">Latitude</label>
+                            <input type="text" id="latitude" class="form-control" placeholder="lat" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="longitude" class="form-label">Longitude</label>
+                            <input type="text" id="longitude" class="form-control" placeholder="lng" readonly>
+                        </div>
+
+                        <div class="d-grid">
+                            <button id="searchButton" class="btn btn-primary btn-lg">
+                                <i class="bi-search me-2"></i>Search
+                            </button>
+                        </div>
+                        <div class="text-center mt-4">
+                            <p id="searchTimestamp" class="text-muted">Last Search Performed At: N/A</p>
+                        </div>
+                    </div>
+
+                    <!-- Google Map Section -->
+                    <div class="col-md-6">
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="row">
+                <!-- Sidebar for YouTube Results -->
+                <div class="col-md-3">
+                    <div class="tool-card">
+                        <h4><i class="bi-youtube me-2"></i>YouTube Results</h4>
+                        <div id="youtubeResults">
+                            <!-- YouTube videos related to FEMA disaster declarations will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Main Content Area for FEMA Data -->
+                <div class="col-md-9">
+                    <div class="tool-card">
+                        <h4><i class="bi-table me-2"></i>Disaster Declarations Table</h4>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped" id="disasterTable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Declaration Type</th>
+                                        <th>Incident Type</th>
+                                        <th>Declaration Title</th>
+                                        <th>IH Program Declared</th>
+                                        <th>IA Program Declared</th>
+                                        <th>PA Program Declared</th>
+                                        <th>HM Program Declared</th>
+                                        <th>Incident Begin Date</th>
+                                        <th>Incident End Date</th>
+                                        <th>Disaster Closeout Date</th>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="text" id="inputDeclarationType" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputIncidentType" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputDeclarationTitle" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputIHProgramDeclared" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputIAProgramDeclared" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputPAProgramDeclared" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputHMProgramDeclared" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputIncidentBeginDate" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputIncidentEndDate" class="form-control" readonly></td>
+                                        <td><input type="text" id="inputDisasterCloseoutDate" class="form-control" readonly></td>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <strong>Design by David Lane</strong> - <span id="currentDate"></span> | Professional FEMA Tools
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+
+    <!-- ICE Library -->
+    <script src="https://cdn.elliemae.io/elliemae/core/ssf/1.0/elli.ssf.guest-with-polyfill.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script type="text/javascript" src="../js/bindings.js"></script>
+
+    <script>
+        // Voice Control System
+        class VoiceController {
+            constructor() {
+                this.recognition = null;
+                this.synthesis = window.speechSynthesis;
+                this.isListening = false;
+                this.voiceBtn = document.getElementById('voiceBtn');
+                this.voiceStatus = document.getElementById('voiceStatus');
+                
+                this.init();
+            }
+            
+            init() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    this.recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                    this.setupRecognition();
+                    this.setupEventListeners();
+                } else {
+                    this.voiceStatus.textContent = 'Voice not supported';
+                    this.voiceBtn.disabled = true;
+                    this.voiceBtn.style.opacity = '0.5';
+                }
+            }
+            
+            setupRecognition() {
+                this.recognition.continuous = false;
+                this.recognition.interimResults = false;
+                this.recognition.lang = 'en-US';
+                
+                this.recognition.onstart = () => {
+                    this.isListening = true;
+                    this.voiceBtn.classList.add('listening');
+                    this.voiceBtn.innerHTML = '<i class="bi-mic-mute"></i>';
+                    this.updateStatus('Listening...', true);
+                };
+                
+                this.recognition.onresult = (event) => {
+                    const command = event.results[0][0].transcript.toLowerCase();
+                    this.processCommand(command);
+                };
+                
+                this.recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    this.updateStatus('Error: ' + event.error, false);
+                    this.stopListening();
+                };
+                
+                this.recognition.onend = () => {
+                    this.stopListening();
+                };
+            }
+            
+            setupEventListeners() {
+                this.voiceBtn.addEventListener('click', () => {
+                    if (this.isListening) {
+                        this.stopListening();
+                    } else {
+                        this.startListening();
+                    }
+                });
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey && e.key === 'v') {
+                        e.preventDefault();
+                        if (this.isListening) {
+                            this.stopListening();
+                        } else {
+                            this.startListening();
+                        }
+                    }
+                });
+            }
+            
+            startListening() {
+                try {
+                    this.recognition.start();
+                } catch (error) {
+                    console.error('Error starting speech recognition:', error);
+                    this.updateStatus('Error starting voice control', false);
+                }
+            }
+            
+            stopListening() {
+                this.isListening = false;
+                this.voiceBtn.classList.remove('listening');
+                this.voiceBtn.innerHTML = '<i class="bi-mic"></i>';
+                this.updateStatus('Click to start voice control');
+                
+                try {
+                    this.recognition.stop();
+                } catch (error) {
+                    console.error('Error stopping speech recognition:', error);
+                }
+            }
+            
+            updateStatus(message, isListening = false) {
+                this.voiceStatus.textContent = message;
+                this.voiceStatus.classList.toggle('show', true);
+                this.voiceStatus.classList.toggle('listening', isListening);
+                
+                setTimeout(() => {
+                    this.voiceStatus.classList.remove('show');
+                }, 3000);
+            }
+            
+            processCommand(command) {
+                console.log('Voice command received:', command);
+                
+                if (command.includes('search') || command.includes('find')) {
+                    this.speak('Searching for disaster declarations');
+                    searchByAddress();
+                    return;
+                }
+                
+                if (command.includes('clear') || command.includes('reset')) {
+                    this.speak('Clearing form');
+                    document.getElementById('street').value = '';
+                    document.getElementById('city').value = '';
+                    document.getElementById('state').value = '';
+                    document.getElementById('county').value = '';
+                    document.getElementById('zip').value = '';
+                    document.getElementById('latitude').value = '';
+                    document.getElementById('longitude').value = '';
+                    return;
+                }
+                
+                if (command.includes('go home') || command.includes('back to menu')) {
+                    this.speak('Navigating to home page');
+                    window.location.href = '../../index.html';
+                    return;
+                }
+                
+                this.speak('Command not recognized. Try saying "search" or "clear"');
+                this.updateStatus('Command not recognized');
+            }
+            
+            speak(text) {
+                if (this.synthesis) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    this.synthesis.speak(utterance);
+                }
+            }
+        }
+
+        // Set today's date in the footer
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString();
+
+        // Initialize voice controller
+        const voiceController = new VoiceController();
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 15;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particle.style.opacity = Math.random() * 0.5 + 0.1;
+                particle.style.width = particle.style.height = (Math.random() * 6 + 2) + 'px';
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize particles on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+        });
+
+        // Google Maps and FEMA functionality
+        let map, autocomplete, usStates = {};
+
+        async function fetchStates() {
+            try {
+                const response = await fetch('./us_states.json');
+                usStates = await response.json();
+            } catch (error) {
+                console.error('Error fetching the state JSON:', error);
+                // Fallback: create a basic states object
+                usStates = {
+                    "AL": "Alabama", "AK": "Alaska", "AZ": "Arizona", "AR": "Arkansas", "CA": "California",
+                    "CO": "Colorado", "CT": "Connecticut", "DE": "Delaware", "FL": "Florida", "GA": "Georgia",
+                    "HI": "Hawaii", "ID": "Idaho", "IL": "Illinois", "IN": "Indiana", "IA": "Iowa",
+                    "KS": "Kansas", "KY": "Kentucky", "LA": "Louisiana", "ME": "Maine", "MD": "Maryland",
+                    "MA": "Massachusetts", "MI": "Michigan", "MN": "Minnesota", "MS": "Mississippi", "MO": "Missouri",
+                    "MT": "Montana", "NE": "Nebraska", "NV": "Nevada", "NH": "New Hampshire", "NJ": "New Jersey",
+                    "NM": "New Mexico", "NY": "New York", "NC": "North Carolina", "ND": "North Dakota", "OH": "Ohio",
+                    "OK": "Oklahoma", "OR": "Oregon", "PA": "Pennsylvania", "RI": "Rhode Island", "SC": "South Carolina",
+                    "SD": "South Dakota", "TN": "Tennessee", "TX": "Texas", "UT": "Utah", "VT": "Vermont",
+                    "VA": "Virginia", "WA": "Washington", "WV": "West Virginia", "WI": "Wisconsin", "WY": "Wyoming"
+                };
+            }
+        }
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), { 
+                center: { lat: 37.0902, lng: -95.7129 }, 
+                zoom: 5 
+            });
+
+            const streetInput = document.getElementById('street');
+            
+            try {
+                autocomplete = new google.maps.places.Autocomplete(streetInput, {
+                    types: ['address'],
+                    componentRestrictions: { country: 'us' }
+                });
+
+                autocomplete.addListener('place_changed', () => {
+                    const place = autocomplete.getPlace();
+                    if (place.geometry) {
+                        map.setCenter(place.geometry.location);
+                        map.setZoom(15);
+                        fillInAddress(place);
+                    }
+                });
+            } catch (error) {
+                console.warn('Google Places Autocomplete not available:', error);
+                streetInput.placeholder = 'Enter address manually (autocomplete disabled)';
+            }
+
+            document.getElementById('zip').addEventListener('input', handleZipInput);
+        }
+
+        function fillInAddress(place) {
+            let city = '', state = '', county = '', zip = '', lat = '', lng = '';
+
+            place.address_components.forEach(component => {
+                const types = component.types;
+                if (types.includes('locality')) { 
+                    city = component.long_name; 
+                } else if (types.includes('administrative_area_level_1')) { 
+                    state = component.short_name; 
+                } else if (types.includes('administrative_area_level_2')) { 
+                    county = component.long_name.replace(/ County$/, ''); 
+                } else if (types.includes('postal_code')) { 
+                    zip = component.long_name; 
+                }
+            });
+
+            if (place.geometry && place.geometry.location) {
+                lat = place.geometry.location.lat();
+                lng = place.geometry.location.lng();
+            }
+
+            document.getElementById('city').value = city;
+            document.getElementById('state').value = state;
+            document.getElementById('county').value = county;
+            document.getElementById('zip').value = zip;
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+        }
+
+        function handleZipInput() {
+            const zipField = document.getElementById('zip').value;
+            if (zipField.length === 5) { 
+                lockAddressFields(); 
+            } else { 
+                unlockAddressFields(); 
+            }
+        }
+
+        function lockAddressFields() {
+            // Implementation for locking address fields
+        }
+
+        function unlockAddressFields() {
+            // Implementation for unlocking address fields
+        }
+
+        document.getElementById('searchButton').addEventListener('click', () => {
+            searchByAddress();
+            updateTimestamp();
+        });
+
+        document.getElementById('state').addEventListener('input', (event) => {
+            event.target.value = event.target.value.toUpperCase();
+        });
+
+        function searchByAddress() {
+            const state = document.getElementById('state').value;
+            const county = document.getElementById('county').value;
+            updateTimestamp();
+            voiceController.speak('Searching for disaster declarations');
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('searchTimestamp').textContent = `Last Search Performed At: ${timeString}`;
+        }
+
+        // Fallback function if Google Maps fails to load
+        function initMapFallback() {
+            console.warn('Google Maps API failed to load, using fallback');
+            const mapDiv = document.getElementById('map');
+            if (mapDiv) {
+                mapDiv.innerHTML = '<div style="padding: 20px; text-align: center; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;"><p>Map not available</p><p>Please enter address manually</p></div>';
+            }
+        }
+
+        // Set a timeout for Google Maps loading
+        setTimeout(() => {
+            if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+                initMapFallback();
+            }
+        }, 10000);
+
+        fetchStates();
+
+        // Make voice controller globally accessible for debugging
+        window.voiceController = voiceController;
+    </script>
+
+    <!-- Google Maps and Places API -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI&libraries=places&loading=async&callback=initMap" async defer onerror="initMapFallback()"></script>
+    <!-- Google API for YouTube -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="script.js" defer></script>
+</body>
+</html>

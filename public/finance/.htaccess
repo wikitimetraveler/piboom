@@ -1,0 +1,20 @@
+# Allow iframe embedding for Encompass Assistant
+<Files "encompass-assistant.html">
+    Header always unset X-Frame-Options
+    Header set X-Frame-Options "ALLOWALL"
+</Files>
+
+# Alternative approach for specific directory
+<LocationMatch "^/finance/encompass-assistant\.html$">
+    Header always unset X-Frame-Options
+    Header set X-Frame-Options "ALLOWALL"
+</LocationMatch>
+
+# General rewrite engine
+RewriteEngine on
+
+# Optional: Allow iframe embedding for all finance tools if needed
+# <LocationMatch "^/finance/.*\.html$">
+#     Header always unset X-Frame-Options
+#     Header set X-Frame-Options "ALLOWALL"
+# </LocationMatch>

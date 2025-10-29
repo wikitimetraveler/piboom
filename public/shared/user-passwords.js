@@ -2,31 +2,36 @@
 // Simple password check to prevent accidental edits
 // Not for security - just to prevent mistakes on Pi app
 
-const USER_PASSWORDS = {
-  'cosmic-turtle': 'Dufus',
-  'wizened-wizard': 'Giraffe Pizza',
-  'jerry-garcia': 'Fooze',
-  'easy-levi': 'Zip Knot',
-  'fuzz-maestro': 'Fly Dog'
-};
+// Prevent redeclaration if script is loaded multiple times
+if (typeof window.USER_PASSWORDS === 'undefined') {
+  window.USER_PASSWORDS = {
+    'cosmic-turtle': 'Dufus',
+    'wizened-wizard': 'Giraffe Pizza',
+    'jerry-garcia': 'Fooze',
+    'easy-levi': 'Zip Knot',
+    'fuzz-maestro': 'Fly Dog'
+  };
+}
 
 // Session storage for verified users (expires when page closes)
-const sessionKey = 'verified_user_session';
+if (typeof window.sessionKey === 'undefined') {
+  window.sessionKey = 'verified_user_session';
+}
 
 // Check if user is verified in current session
 function isUserVerifiedInSession(userId) {
-  const verified = sessionStorage.getItem(sessionKey);
+  const verified = sessionStorage.getItem(window.sessionKey);
   return verified === userId;
 }
 
 // Mark user as verified for this session
 function markUserVerified(userId) {
-  sessionStorage.setItem(sessionKey, userId);
+  sessionStorage.setItem(window.sessionKey, userId);
 }
 
 // Clear verification (on logout or user switch)
 function clearVerification() {
-  sessionStorage.removeItem(sessionKey);
+  sessionStorage.removeItem(window.sessionKey);
 }
 
 // Verify user password with custom modal
@@ -38,7 +43,7 @@ async function verifyUserPassword(userId, actionDescription = 'perform this acti
   
   const user = getUserById ? getUserById(userId) : null;
   const userName = user ? user.name : 'User';
-  const expectedPassword = USER_PASSWORDS[userId];
+  const expectedPassword = window.USER_PASSWORDS[userId];
   
   if (!expectedPassword) {
     console.error('No password configured for user:', userId);
