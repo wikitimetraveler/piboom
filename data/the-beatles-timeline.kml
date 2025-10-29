@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>The Beatles - Historic Locations Timeline</name>
+    <description>The Beatles' journey from Liverpool to worldwide phenomenon (1957-1970)</description>
+    
+    <Style id="beatles-icon">
+      <IconStyle>
+        <scale>1.2</scale>
+        <Icon>
+          <href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+        </Icon>
+      </IconStyle>
+      <LabelStyle>
+        <scale>0.9</scale>
+      </LabelStyle>
+    </Style>
+
+    <!-- LIVERPOOL ORIGINS -->
+    <Placemark>
+      <name>The Cavern Club</name>
+      <description><![CDATA[
+        <b>Date:</b> 1961-1963<br>
+        <b>Location:</b> 10 Mathew Street, Liverpool<br>
+        <b>Significance:</b> The Beatles performed 292 times at The Cavern Club between 1961-1963. This underground venue became synonymous with the band's early success and where Brian Epstein first saw them perform on November 9, 1961.<br>
+        <b>Historic Moment:</b> First performance February 9, 1961. Final performance August 3, 1963.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-2.9867,53.4059,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Abbey Road Studios</name>
+      <description><![CDATA[
+        <b>Date:</b> 1962-1970<br>
+        <b>Location:</b> 3 Abbey Road, St John's Wood, London<br>
+        <b>Significance:</b> EMI Studios (later Abbey Road) where The Beatles recorded virtually all of their albums. Studio Two became their creative home. The zebra crossing outside became world-famous from the Abbey Road album cover (August 1969).<br>
+        <b>Historic Albums:</b> Please Please Me, Rubber Soul, Revolver, Sgt. Pepper's, The White Album, Abbey Road, and more.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-0.1774,51.5320,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>The Ed Sullivan Theater</name>
+      <description><![CDATA[
+        <b>Date:</b> February 9, 1964<br>
+        <b>Location:</b> 1697 Broadway, New York City<br>
+        <b>Significance:</b> The Beatles' first live appearance on The Ed Sullivan Show was watched by approximately 73 million people - the largest TV audience in history at that time. This performance launched Beatlemania in America.<br>
+        <b>Historic Moment:</b> They opened with "All My Loving" and performed five songs total.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-73.9830,40.7638,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Shea Stadium</name>
+      <description><![CDATA[
+        <b>Date:</b> August 15, 1965<br>
+        <b>Location:</b> Flushing Meadows, Queens, New York<br>
+        <b>Significance:</b> The Beatles played to 55,600 fans at Shea Stadium - the first stadium rock concert in history. The screaming was so loud the band couldn't hear themselves play. Set a world record for largest concert audience and highest gross for a single performance.<br>
+        <b>Historic Moment:</b> Arrived by helicopter, performed 12 songs in 30 minutes.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-73.8458,40.7571,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Candlestick Park</name>
+      <description><![CDATA[
+        <b>Date:</b> August 29, 1966<br>
+        <b>Location:</b> San Francisco, California<br>
+        <b>Significance:</b> The Beatles' final live concert. They performed to 25,000 fans and decided to stop touring forever. After this show, they became a studio-only band.<br>
+        <b>Final Song:</b> They closed with "Long Tall Sally"<br>
+        <b>Historic Note:</b> John Lennon took a camera on stage to document the historic final performance.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-122.3866,37.7138,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- HAMBURG YEARS -->
+    <Placemark>
+      <name>Star-Club Hamburg</name>
+      <description><![CDATA[
+        <b>Date:</b> 1962-1962<br>
+        <b>Location:</b> Große Freiheit 39, Hamburg, Germany<br>
+        <b>Significance:</b> The Beatles' final Hamburg residency in 1962. They had previously played at the Kaiserkeller and Top Ten Club. Hamburg is where they honed their craft, playing marathon 8-hour sets and developing their tight sound.<br>
+        <b>Historic Detail:</b> Their last Hamburg performance was December 31, 1962.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>9.9600,53.5504,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- ROOFTOP CONCERT -->
+    <Placemark>
+      <name>Apple Corps Rooftop</name>
+      <description><![CDATA[
+        <b>Date:</b> January 30, 1969<br>
+        <b>Location:</b> 3 Savile Row, London<br>
+        <b>Significance:</b> The Beatles' legendary unannounced rooftop concert - their final public performance. They played for 42 minutes on the roof of Apple Corps headquarters, stopping traffic and drawing crowds below until police shut it down.<br>
+        <b>Historic Songs:</b> Get Back, Don't Let Me Down, I've Got a Feeling<br>
+        <b>Famous Quote:</b> John's final words: "I'd like to say thank you on behalf of the group and ourselves, and I hope we passed the audition."
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-0.1410,51.5106,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- WASHINGTON DC FIRST US CONCERT -->
+    <Placemark>
+      <name>Washington Coliseum</name>
+      <description><![CDATA[
+        <b>Date:</b> February 11, 1964<br>
+        <b>Location:</b> Washington, D.C.<br>
+        <b>Significance:</b> The Beatles' first live concert in the United States, two days after their Ed Sullivan appearance. They performed in-the-round with 8,092 screaming fans. The stage had to rotate so they could face different sections of the audience.<br>
+        <b>Historic Note:</b> This launched the "British Invasion" of America.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-77.0129,38.9072,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- CARNEGIE HALL -->
+    <Placemark>
+      <name>Carnegie Hall</name>
+      <description><![CDATA[
+        <b>Date:</b> February 12, 1964<br>
+        <b>Location:</b> 881 7th Avenue, New York City<br>
+        <b>Significance:</b> The Beatles performed two shows in one day at the prestigious Carnegie Hall during their first US visit. A venue traditionally reserved for classical music opened its doors to rock and roll.<br>
+        <b>Historic Detail:</b> Tickets were nearly impossible to get, with fans camping out overnight.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-73.9799,40.7651,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- HOLLYWOOD BOWL -->
+    <Placemark>
+      <name>Hollywood Bowl</name>
+      <description><![CDATA[
+        <b>Date:</b> August 23, 1964 & August 29-30, 1965<br>
+        <b>Location:</b> 2301 N Highland Ave, Los Angeles<br>
+        <b>Significance:</b> The Beatles performed multiple times at the iconic Hollywood Bowl. These performances were recorded and later released as "The Beatles at the Hollywood Bowl" in 1977.<br>
+        <b>Historic Note:</b> 18,700 fans attended each show with deafening screams.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-118.3387,34.1128,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- PARIS OLYMPIA -->
+    <Placemark>
+      <name>L'Olympia</name>
+      <description><![CDATA[
+        <b>Date:</b> January 16-February 4, 1964<br>
+        <b>Location:</b> 28 Boulevard des Capucines, Paris<br>
+        <b>Significance:</b> The Beatles' extended residency in Paris at the legendary L'Olympia music hall. During this stay, they received the telegram that "I Want to Hold Your Hand" had reached #1 in America, changing everything.<br>
+        <b>Historic Moment:</b> They learned of their American breakthrough while in Paris.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>2.3283,48.8702,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- BUDOKAN TOKYO -->
+    <Placemark>
+      <name>Nippon Budokan</name>
+      <description><![CDATA[
+        <b>Date:</b> June 30 - July 2, 1966<br>
+        <b>Location:</b> Tokyo, Japan<br>
+        <b>Significance:</b> The Beatles were the first rock band to perform at the Budokan, a sacred martial arts hall. This was controversial in Japan but opened the door for Western rock music in Asia. They performed five shows to 10,000 fans each night.<br>
+        <b>Historic Note:</b> They stayed at the Tokyo Hilton under heavy security due to protests.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>139.7505,35.6938,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- MANILA DISASTER -->
+    <Placemark>
+      <name>Rizal Memorial Stadium</name>
+      <description><![CDATA[
+        <b>Date:</b> July 4, 1966<br>
+        <b>Location:</b> Manila, Philippines<br>
+        <b>Significance:</b> The Beatles' most dangerous concert. After unintentionally snubbing First Lady Imelda Marcos by not attending a palace reception, they faced an angry mob at the airport. Security was withdrawn and they barely escaped the country.<br>
+        <b>Historic Note:</b> This terrifying experience contributed to their decision to stop touring.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>120.9932,14.5750,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- KEY UK VENUES -->
+    <Placemark>
+      <name>Royal Albert Hall</name>
+      <description><![CDATA[
+        <b>Date:</b> April 18, 1963<br>
+        <b>Location:</b> Kensington Gore, London<br>
+        <b>Significance:</b> The Beatles performed at the prestigious Royal Albert Hall as part of a BBC radio show "Swinging Sound '63". This marked their arrival as serious artists worthy of the UK's premier concert venue.<br>
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-0.1772,51.5009,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Strawberry Field</name>
+      <description><![CDATA[
+        <b>Location:</b> Beaconsfield Road, Liverpool<br>
+        <b>Significance:</b> The Salvation Army children's home near John Lennon's childhood home. He played in these grounds as a child. Later immortalized in "Strawberry Fields Forever" (1967).<br>
+        <b>Historic Note:</b> The red gates became one of rock music's most famous landmarks.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-2.8708,53.3748,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <Placemark>
+      <name>Penny Lane</name>
+      <description><![CDATA[
+        <b>Location:</b> Liverpool, England<br>
+        <b>Significance:</b> A street in Liverpool where Paul McCartney and John Lennon would meet to catch a bus into the city center. The surrounding area (barber shop, bank, shelter, roundabout) was immortalized in the 1967 song "Penny Lane".<br>
+        <b>Historic Note:</b> The street signs are now protected because they were constantly stolen by fans.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>-2.9211,53.4018,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- MAHARISHI RETREAT -->
+    <Placemark>
+      <name>Maharishi Mahesh Yogi Ashram</name>
+      <description><![CDATA[
+        <b>Date:</b> February-April 1968<br>
+        <b>Location:</b> Rishikesh, India<br>
+        <b>Significance:</b> The Beatles traveled to this ashram to study Transcendental Meditation with Maharishi Mahesh Yogi. During this retreat, they wrote most of the songs for The White Album.<br>
+        <b>Creative Period:</b> One of their most productive songwriting periods, creating over 40 songs.<br>
+        <b>Historic Note:</b> George Harrison's influence brought Indian spirituality to Western popular culture.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>78.3076,30.1073,0</coordinates>
+      </Point>
+    </Placemark>
+
+    <!-- AUSTRALIA TOUR -->
+    <Placemark>
+      <name>Festival Hall Melbourne</name>
+      <description><![CDATA[
+        <b>Date:</b> June 15-17, 1964<br>
+        <b>Location:</b> Melbourne, Australia<br>
+        <b>Significance:</b> Part of The Beatles' Australian tour where they were greeted by an estimated 300,000 fans - the largest crowd ever assembled in Australia at that time. They performed six shows to packed audiences.<br>
+        <b>Historic Note:</b> Beatlemania in Australia was as intense as anywhere in the world.
+      ]]></description>
+      <styleUrl>#beatles-icon</styleUrl>
+      <Point>
+        <coordinates>144.9542,37.8229,0</coordinates>
+      </Point>
+    </Placemark>
+
+  </Document>
+</kml>
+
+

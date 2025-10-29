@@ -20,6 +20,7 @@ import encompassAssistantRoutes from './encompass-assistant.routes.js';
 import kmlRoutes from './kml.routes.js';
 import gratefulDeadTourRoutes from './grateful-dead-tour.routes.js';
 import userShowAttendanceRoutes from './user-show-attendance.routes.js';
+import concertCollectionRoutes from './concert-collection.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -43,6 +44,7 @@ export default function buildRoutes(io) {
   api.use('/kml', kmlRoutes);
   api.use('/grateful-dead', gratefulDeadTourRoutes);
   api.use('/user-attendance', userShowAttendanceRoutes);
+  api.use('/concert-collection', concertCollectionRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

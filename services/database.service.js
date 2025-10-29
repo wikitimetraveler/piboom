@@ -307,10 +307,260 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_attendance_was_there ON user_show_attendance(was_there)
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory and Grateful Dead shows)');
+    // Create artists table for expandable concert collections
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS artists (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL UNIQUE,
+        genre VARCHAR(100),
+        formed_year INTEGER,
+        disbanded_year INTEGER,
+        country VARCHAR(100),
+        bio TEXT,
+        image_url VARCHAR(500),
+        spotify_id VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create venues table for expandable concert collections
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS venues (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        city VARCHAR(255),
+        state VARCHAR(100),
+        country VARCHAR(100),
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        capacity INTEGER,
+        venue_type VARCHAR(100),
+        website VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(name, city, state)
+      )
+    `);
+
+    // Create concerts table for expandable concert collections
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS concerts (
+        id SERIAL PRIMARY KEY,
+        artist_id INTEGER REFERENCES artists(id) ON DELETE CASCADE,
+        venue_id INTEGER REFERENCES venues(id) ON DELETE CASCADE,
+        concert_date DATE NOT NULL,
+        tour_name VARCHAR(255),
+        setlist TEXT,
+        attendance INTEGER,
+        recording_available BOOLEAN DEFAULT false,
+        archive_identifier VARCHAR(255),
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(artist_id, venue_id, concert_date)
+      )
+    `);
+
+    // Create user_concert_collections table for user's personal concert history
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_concert_collections (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100) NOT NULL,
+        concert_id INTEGER REFERENCES concerts(id) ON DELETE CASCADE,
+        was_there BOOLEAN DEFAULT true,
+        personal_notes TEXT,
+        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+        photos TEXT[],
+        ticket_price DECIMAL(10, 2),
+        seat_location VARCHAR(255),
+        weather_notes TEXT,
+        companions TEXT[],
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, concert_id)
+      )
+    `);
+
+    // Create indexes for new tables
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_artists_name ON artists(name)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_venues_location ON venues(city, state, country)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_concerts_artist ON concerts(artist_id)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_concerts_venue ON concerts(venue_id)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_concerts_date ON concerts(concert_date)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_user_collections_user ON user_concert_collections(user_id)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_user_collections_concert ON user_concert_collections(concert_id)
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, and expandable concert collections)');
+    
+    // Migrate existing Grateful Dead data to new structure (run in background)
+    migrateGratefulDeadData().catch(error => {
+      console.error('❌ Error during Grateful Dead data migration:', error.message);
+      console.log('   Migration will be retried on next startup');
+    });
   } catch (error) {
     console.error('❌ Error creating tables:', error.message);
     console.error('   Database operations will be unavailable');
+  }
+}
+
+/**
+ * Migrate existing Grateful Dead data to the new expandable concert structure
+ */
+async function migrateGratefulDeadData() {
+  const pool = getPool();
+  if (!pool) return;
+
+  try {
+    console.log('🔄 Starting Grateful Dead data migration...');
+    
+    // Check if migration is already complete
+    const migrationCheck = await pool.query(`
+      SELECT COUNT(*) as count FROM concerts c 
+      JOIN artists a ON c.artist_id = a.id 
+      WHERE a.name = 'Grateful Dead'
+    `);
+    
+    if (parseInt(migrationCheck.rows[0].count) > 0) {
+      console.log('✅ Grateful Dead data already migrated, skipping...');
+      return;
+    }
+
+    // Check if Grateful Dead artist already exists
+    const artistResult = await pool.query(`
+      SELECT id FROM artists WHERE name = 'Grateful Dead'
+    `);
+
+    let gratefulDeadArtistId;
+    if (artistResult.rows.length === 0) {
+      // Create Grateful Dead artist
+      const newArtistResult = await pool.query(`
+        INSERT INTO artists (name, genre, formed_year, disbanded_year, country, bio)
+        VALUES ('Grateful Dead', 'Rock', 1965, 1995, 'United States', 'American rock band formed in 1965 in Palo Alto, California.')
+        RETURNING id
+      `);
+      gratefulDeadArtistId = newArtistResult.rows[0].id;
+      console.log('✅ Created Grateful Dead artist record');
+    } else {
+      gratefulDeadArtistId = artistResult.rows[0].id;
+      console.log('✅ Found existing Grateful Dead artist record');
+    }
+
+    // Check if grateful_dead_shows table exists and has data
+    const tableCheck = await pool.query(`
+      SELECT EXISTS (
+        SELECT FROM information_schema.tables 
+        WHERE table_name = 'grateful_dead_shows'
+      )
+    `);
+    
+    if (!tableCheck.rows[0].exists) {
+      console.log('ℹ️  No grateful_dead_shows table found, skipping migration');
+      return;
+    }
+
+    // Get count of shows to migrate
+    const countResult = await pool.query(`SELECT COUNT(*) as count FROM grateful_dead_shows`);
+    const totalShows = parseInt(countResult.rows[0].count);
+    
+    if (totalShows === 0) {
+      console.log('ℹ️  No Grateful Dead shows found to migrate');
+      return;
+    }
+
+    console.log(`🔄 Migrating ${totalShows} Grateful Dead shows...`);
+
+    // Migrate venues and concerts in batches
+    const batchSize = 100;
+    let processed = 0;
+
+    for (let offset = 0; offset < totalShows; offset += batchSize) {
+      const showsResult = await pool.query(`
+        SELECT * FROM grateful_dead_shows ORDER BY show_date LIMIT $1 OFFSET $2
+      `, [batchSize, offset]);
+
+      for (const show of showsResult.rows) {
+        try {
+          // Check if venue exists
+          let venueResult = await pool.query(`
+            SELECT id FROM venues 
+            WHERE name = $1 AND city = $2 AND (state = $3 OR (state IS NULL AND $3 IS NULL))
+          `, [show.venue_name, show.city, show.state]);
+
+          let venueId;
+          if (venueResult.rows.length === 0) {
+            // Create venue
+            const newVenueResult = await pool.query(`
+              INSERT INTO venues (name, city, state, country, latitude, longitude)
+              VALUES ($1, $2, $3, $4, $5, $6)
+              RETURNING id
+            `, [show.venue_name, show.city, show.state, show.country, show.latitude, show.longitude]);
+            venueId = newVenueResult.rows[0].id;
+          } else {
+            venueId = venueResult.rows[0].id;
+          }
+
+          // Check if concert exists
+          const concertResult = await pool.query(`
+            SELECT id FROM concerts 
+            WHERE artist_id = $1 AND venue_id = $2 AND concert_date = $3
+          `, [gratefulDeadArtistId, venueId, show.show_date]);
+
+          if (concertResult.rows.length === 0) {
+            // Create concert
+            await pool.query(`
+              INSERT INTO concerts (artist_id, venue_id, concert_date, setlist, attendance, recording_available, archive_identifier, notes)
+              VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            `, [
+              gratefulDeadArtistId, 
+              venueId, 
+              show.show_date, 
+              show.setlist, 
+              show.attendance, 
+              show.recording_available, 
+              show.archive_identifier, 
+              show.notes
+            ]);
+          }
+          
+          processed++;
+          
+          // Log progress every 50 shows
+          if (processed % 50 === 0) {
+            console.log(`🔄 Migrated ${processed}/${totalShows} shows...`);
+          }
+          
+        } catch (showError) {
+          console.error(`❌ Error migrating show ${show.id}:`, showError.message);
+          // Continue with next show
+        }
+      }
+    }
+
+    console.log(`✅ Grateful Dead data migration completed: ${processed} shows migrated`);
+  } catch (error) {
+    console.error('❌ Error migrating Grateful Dead data:', error.message);
+    throw error; // Re-throw to be caught by the caller
   }
 }
 

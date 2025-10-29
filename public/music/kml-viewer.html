@@ -414,6 +414,11 @@
         <label class="form-label fw-bold">Featured Timelines:</label>
         <div class="row g-2">
           <div class="col-md-4">
+            <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('the-beatles-timeline')">
+              <i class="bi-heart-fill"></i> The Beatles
+            </button>
+          </div>
+          <div class="col-md-4">
             <button class="btn btn-outline-primary w-100" onclick="loadPresetTimeline('bob-dylan-highway-61')">
               <i class="bi-vinyl"></i> Bob Dylan: Highway 61
             </button>
@@ -472,6 +477,16 @@
           <small class="text-muted d-block mb-2">In Google Earth Pro: File → Add → Network Link, then paste URL</small>
           
           <div class="list-group">
+            <div class="list-group-item">
+              <strong>The Beatles - Historic Locations Timeline</strong>
+              <div class="input-group input-group-sm mt-2">
+                <input type="text" class="form-control" value="http://localhost:3000/data/the-beatles-timeline.kml" readonly onclick="this.select()">
+                <button class="btn btn-outline-secondary" onclick="copyToClipboard('http://localhost:3000/data/the-beatles-timeline.kml')">
+                  <i class="bi-clipboard"></i> Copy
+                </button>
+              </div>
+            </div>
+            
             <div class="list-group-item">
               <strong>Bob Dylan - Highway 61</strong>
               <div class="input-group input-group-sm mt-2">
@@ -537,6 +552,9 @@
         <div>
           <strong class="d-block mb-2">Or Download Static Files:</strong>
           <div class="d-flex flex-wrap gap-2">
+            <a href="/data/the-beatles-timeline.kml" class="btn btn-sm btn-success" download>
+              <i class="bi-download"></i> The Beatles
+            </a>
             <a href="/data/bob-dylan-highway-61.kml" class="btn btn-sm btn-success" download>
               <i class="bi-download"></i> Bob Dylan
             </a>
@@ -598,7 +616,7 @@
                 <i class="bi-volume-mute-fill"></i> Stop Speaking
               </button>
             </div>
-            <div class="form-text">Say "Load Bob Dylan" or "Show Taylor Swift timeline"</div>
+            <div class="form-text">Say "Load The Beatles" or "Show Taylor Swift timeline"</div>
           </div>
           <div id="voiceStatus" class="alert alert-info" style="display: none;">
             <i class="bi-volume-up-fill"></i> <span id="voiceStatusText">Listening...</span>
@@ -1222,7 +1240,10 @@
       
       // Load timeline commands
       if (command.includes('load') || command.includes('show') || command.includes('open')) {
-        if (command.includes('bob dylan') || command.includes('dylan')) {
+        if (command.includes('beatles') || command.includes('fab four') || command.includes('fab 4')) {
+          await speak('Loading The Beatles timeline');
+          loadPresetTimeline('the-beatles-timeline');
+        } else if (command.includes('bob dylan') || command.includes('dylan')) {
           await speak('Loading Bob Dylan Highway 61 timeline');
           loadPresetTimeline('bob-dylan-highway-61');
         } else if (command.includes('taylor swift') || command.includes('swift')) {

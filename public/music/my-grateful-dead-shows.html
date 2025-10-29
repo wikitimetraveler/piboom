@@ -182,14 +182,85 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/shared/user-login.js"></script>
+  <script src="/shared/user-passwords.js"></script>
   <script>
-    // For demo purposes, using a hardcoded user ID
-    // In a real app, this would come from authentication
-    const CURRENT_USER_ID = 1;
+    // Get current user from login system
+    let CURRENT_USER_ID = null;
+    let GRATEFUL_DEAD_ARTIST_ID = null;
+    
+    // Get Grateful Dead artist ID
+    async function getGratefulDeadArtistId() {
+      try {
+        const response = await fetch('/api/concert-collection/artists/search?name=Grateful Dead');
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+          return data.data[0].id;
+        }
+        return null;
+      } catch (error) {
+        console.error('Error getting Grateful Dead artist ID:', error);
+        return null;
+      }
+    }
+    
+    // Initialize user on page load
+    async function initializeUser() {
+      if (!isLoggedIn()) {
+        showLoginPopup();
+        return;
+      }
+      
+      const user = getLoggedInUser();
+      if (user) {
+        CURRENT_USER_ID = user.id;
+        GRATEFUL_DEAD_ARTIST_ID = await getGratefulDeadArtistId();
+        updateUserDisplay();
+        loadMyShows();
+      } else {
+        showLoginPopup();
+      }
+    }
+    
+    function updateUserDisplay() {
+      const user = getLoggedInUser();
+      if (user) {
+        // Update header to show current user
+        const header = document.querySelector('.dead-header .container .row .col-md-8');
+        if (header) {
+          header.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <img src="${user.avatar}" style="width: 50px; height: 50px; border-radius: 50%; border: 3px solid ${user.color};">
+              <div>
+                <h1><i class="bi-music-note-beamed"></i> My Grateful Dead Shows</h1>
+                <p class="mb-0">Welcome back, ${user.name}! Track your tour history and relive the memories</p>
+              </div>
+            </div>
+          `;
+        }
+        
+        // Add logout button to header controls
+        const controls = document.querySelector('.dead-header .container .row .col-md-4');
+        if (controls) {
+          controls.innerHTML = `
+            <button class="btn btn-light me-2" onclick="loadAllShows()">
+              <i class="bi-music-note-list"></i> Load All Shows
+            </button>
+            <button class="btn btn-light me-2" onclick="refreshData()">
+              <i class="bi-arrow-clockwise"></i> Refresh
+            </button>
+            <button class="btn btn-outline-light" onclick="logout()">
+              <i class="bi-box-arrow-right"></i> Logout
+            </button>
+          `;
+        }
+      }
+    }
 
-    // Load user's shows on page load
+    // Initialize user and load shows on page load
     document.addEventListener('DOMContentLoaded', function() {
-      loadMyShows();
+      initializeUser();
     });
 
     async function loadMyShows() {
@@ -202,15 +273,28 @@
       showsContainer.style.display = 'none';
 
       try {
-        const response = await fetch(`/api/user-attendance/users/${CURRENT_USER_ID}/shows`);
-        const data = await response.json();
+        if (!CURRENT_USER_ID) {
+          throw new Error('User not logged in');
+        }
+        
+        if (!GRATEFUL_DEAD_ARTIST_ID) {
+          throw new Error('Grateful Dead artist not found');
+        }
+        
+        // Get user's Grateful Dead concerts
+        const concertsResponse = await fetch(`/api/concert-collection/users/${CURRENT_USER_ID}/concerts?artistId=${GRATEFUL_DEAD_ARTIST_ID}`);
+        const concertsData = await concertsResponse.json();
+        
+        // Get user's concert stats
+        const statsResponse = await fetch(`/api/concert-collection/users/${CURRENT_USER_ID}/stats?artistId=${GRATEFUL_DEAD_ARTIST_ID}`);
+        const statsData = await statsResponse.json();
 
         loadingState.style.display = 'none';
         showsContainer.style.display = 'block';
 
-        if (data.success && data.shows.length > 0) {
-          displayShows(data.shows);
-          displayStats(data.stats);
+        if (concertsData.success && concertsData.data.length > 0) {
+          displayShows(concertsData.data);
+          displayStats(statsData.data);
           statsCard.style.display = 'block';
           emptyState.style.display = 'none';
         } else {
@@ -233,20 +317,20 @@
       }
     }
 
-    function displayShows(shows) {
+    function displayShows(concerts) {
       const showsContainer = document.getElementById('showsContainer');
       
       let html = '<div class="row">';
       
-      shows.forEach(show => {
-        const showDate = new Date(show.show_date).toLocaleDateString('en-US', {
+      concerts.forEach(concert => {
+        const showDate = new Date(concert.concert_date).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric'
         });
 
-        const ratingStars = show.rating ? 
-          '★'.repeat(show.rating) + '☆'.repeat(5 - show.rating) : 
+        const ratingStars = concert.rating ? 
+          '★'.repeat(concert.rating) + '☆'.repeat(5 - concert.rating) : 
           'No rating';
 
         html += `
@@ -254,26 +338,47 @@
             <div class="card show-card">
               <div class="card-body">
                 <div class="show-date">${showDate}</div>
-                <div class="venue-name">${show.venue_name}</div>
+                <div class="venue-name">${concert.venue_name}</div>
                 <div class="location">
-                  <i class="bi-geo-alt"></i> ${show.city}, ${show.state || show.country}
+                  <i class="bi-geo-alt"></i> ${concert.city}, ${concert.state || concert.country}
                 </div>
                 
-                ${show.rating ? `
+                ${concert.tour_name ? `
+                  <div class="text-muted small mt-1">
+                    <i class="bi-music-note-list"></i> ${concert.tour_name}
+                  </div>
+                ` : ''}
+                
+                ${concert.rating ? `
                   <div class="rating-stars mt-2">
                     <i class="bi-star-fill"></i> ${ratingStars}
                   </div>
                 ` : ''}
                 
-                ${show.personal_notes ? `
+                ${concert.personal_notes ? `
                   <div class="personal-notes">
                     <strong>My Notes:</strong><br>
-                    ${show.personal_notes}
+                    ${concert.personal_notes}
                   </div>
                 ` : ''}
                 
-                <div class="mt-3">
-                  <button class="btn btn-sm btn-outline-danger" onclick="removeShow(${show.show_id})">
+                ${concert.ticket_price ? `
+                  <div class="text-muted small mt-1">
+                    <i class="bi-currency-dollar"></i> Ticket: $${concert.ticket_price}
+                  </div>
+                ` : ''}
+                
+                ${concert.seat_location ? `
+                  <div class="text-muted small">
+                    <i class="bi-geo"></i> ${concert.seat_location}
+                  </div>
+                ` : ''}
+                
+                <div class="mt-3 d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-primary" onclick="editConcertDetails(${concert.concert_id})">
+                    <i class="bi-pencil"></i> Edit
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" onclick="removeConcert(${concert.concert_id})">
                     <i class="bi-x-circle"></i> Remove
                   </button>
                 </div>
@@ -288,24 +393,29 @@
     }
 
     function displayStats(stats) {
-      document.getElementById('totalShows').textContent = stats.total_shows || 0;
+      document.getElementById('totalShows').textContent = stats.total_concerts || 0;
       document.getElementById('uniqueVenues').textContent = stats.unique_venues || 0;
       document.getElementById('uniqueCities').textContent = stats.unique_cities || 0;
       document.getElementById('yearsSpanned').textContent = stats.years_spanned || 0;
       
-      document.getElementById('firstShow').textContent = stats.first_show ? 
-        new Date(stats.first_show).toLocaleDateString() : '-';
-      document.getElementById('lastShow').textContent = stats.last_show ? 
-        new Date(stats.last_show).toLocaleDateString() : '-';
+      document.getElementById('firstShow').textContent = stats.first_concert ? 
+        new Date(stats.first_concert).toLocaleDateString() : '-';
+      document.getElementById('lastShow').textContent = stats.last_concert ? 
+        new Date(stats.last_concert).toLocaleDateString() : '-';
     }
 
-    async function removeShow(showId) {
-      if (!confirm('Are you sure you want to remove this show from your list?')) {
+    async function removeConcert(concertId) {
+      if (!CURRENT_USER_ID) {
+        alert('Please login first');
+        return;
+      }
+      
+      if (!confirm('Are you sure you want to remove this concert from your list?')) {
         return;
       }
 
       try {
-        const response = await fetch(`/api/user-attendance/users/${CURRENT_USER_ID}/shows/${showId}/attend`, {
+        const response = await fetch(`/api/concert-collection/users/${CURRENT_USER_ID}/concerts/${concertId}`, {
           method: 'DELETE'
         });
 
@@ -314,12 +424,12 @@
         if (data.success) {
           loadMyShows(); // Refresh the list
         } else {
-          alert('Error removing show: ' + data.error);
+          alert('Error removing concert: ' + data.error);
         }
 
       } catch (error) {
-        console.error('Error removing show:', error);
-        alert('Error removing show');
+        console.error('Error removing concert:', error);
+        alert('Error removing concert');
       }
     }
 
@@ -327,7 +437,7 @@
       loadMyShows();
     }
 
-    // Load all Grateful Dead shows
+    // Load all Grateful Dead concerts
     async function loadAllShows() {
       const loadingState = document.getElementById('loadingState');
       const showsContainer = document.getElementById('showsContainer');
@@ -338,48 +448,38 @@
       showsContainer.style.display = 'none';
 
       try {
-        // Fetch all shows (with pagination to handle large dataset)
-        let allShows = [];
-        let page = 1;
-        let hasMore = true;
-
-        while (hasMore) {
-          const response = await fetch(`/api/grateful-dead/shows?page=${page}&limit=100`);
-          const data = await response.json();
-
-          if (data.success && data.data.shows.length > 0) {
-            allShows = allShows.concat(data.data.shows);
-            hasMore = data.data.pagination.page < data.data.pagination.pages;
-            page++;
-          } else {
-            hasMore = false;
-          }
+        if (!GRATEFUL_DEAD_ARTIST_ID) {
+          throw new Error('Grateful Dead artist not found');
         }
+
+        // Fetch all concerts for Grateful Dead
+        const response = await fetch(`/api/concert-collection/artists/${GRATEFUL_DEAD_ARTIST_ID}/concerts?limit=1000`);
+        const data = await response.json();
 
         loadingState.style.display = 'none';
         showsContainer.style.display = 'block';
 
-        if (allShows.length > 0) {
-          displayAllShows(allShows);
+        if (data.success && data.data.length > 0) {
+          displayAllShows(data.data);
           statsCard.style.display = 'none';
           emptyState.style.display = 'none';
         } else {
           emptyState.innerHTML = `
             <i class="bi-exclamation-triangle"></i>
-            <h3>No Shows Found</h3>
-            <p>No shows available in the database.</p>
+            <h3>No Concerts Found</h3>
+            <p>No concerts available in the database.</p>
           `;
           emptyState.style.display = 'block';
         }
 
       } catch (error) {
-        console.error('Error loading all shows:', error);
+        console.error('Error loading all concerts:', error);
         loadingState.style.display = 'none';
         showsContainer.style.display = 'block';
         emptyState.innerHTML = `
           <i class="bi-exclamation-triangle"></i>
-          <h3>Error Loading Shows</h3>
-          <p>There was a problem loading the shows. Please try again.</p>
+          <h3>Error Loading Concerts</h3>
+          <p>There was a problem loading the concerts. Please try again.</p>
           <button class="btn btn-primary" onclick="loadAllShows()">
             <i class="bi-arrow-clockwise"></i> Try Again
           </button>
@@ -387,14 +487,14 @@
       }
     }
 
-    function displayAllShows(shows) {
+    function displayAllShows(concerts) {
       const showsContainer = document.getElementById('showsContainer');
       
-      let html = '<div class="mb-3"><h4>All Grateful Dead Shows (' + shows.length + ')</h4></div>';
+      let html = '<div class="mb-3"><h4>All Grateful Dead Concerts (' + concerts.length + ')</h4></div>';
       html += '<div class="row">';
       
-      shows.forEach(show => {
-        const showDate = new Date(show.show_date).toLocaleDateString('en-US', {
+      concerts.forEach(concert => {
+        const showDate = new Date(concert.concert_date).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric'
@@ -405,13 +505,19 @@
             <div class="card show-card">
               <div class="card-body">
                 <div class="show-date">${showDate}</div>
-                <div class="venue-name">${show.venue_name}</div>
+                <div class="venue-name">${concert.venue_name}</div>
                 <div class="location">
-                  <i class="bi-geo-alt"></i> ${show.city}, ${show.state || show.country}
+                  <i class="bi-geo-alt"></i> ${concert.city}, ${concert.state || concert.country}
                 </div>
                 
+                ${concert.tour_name ? `
+                  <div class="text-muted small mt-1">
+                    <i class="bi-music-note-list"></i> ${concert.tour_name}
+                  </div>
+                ` : ''}
+                
                 <div class="mt-3">
-                  <button class="btn btn-sm was-there-btn" onclick="markAttended(${show.id})">
+                  <button class="btn btn-sm was-there-btn" onclick="markConcertAttended(${concert.id})">
                     <i class="bi-check-circle"></i> I Was There!
                   </button>
                 </div>
@@ -425,31 +531,207 @@
       showsContainer.innerHTML = html;
     }
 
-    async function markAttended(showId) {
+    async function markConcertAttended(concertId) {
+      if (!CURRENT_USER_ID) {
+        alert('Please login first');
+        return;
+      }
+      
       try {
-        const response = await fetch(`/api/user-attendance/users/${CURRENT_USER_ID}/shows/${showId}/attend`, {
+        const response = await fetch(`/api/concert-collection/users/${CURRENT_USER_ID}/concerts/${concertId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            personalNotes: '',
             rating: null,
-            personalNotes: ''
+            photos: [],
+            ticketPrice: null,
+            seatLocation: null,
+            weatherNotes: null,
+            companions: []
           })
         });
 
         const data = await response.json();
 
         if (data.success) {
-          alert('Show added to your list!');
-          loadMyShows(); // Switch back to personal shows view
+          alert('Concert added to your collection!');
+          loadMyShows(); // Switch back to personal concerts view
         } else {
-          alert('Error adding show: ' + data.error);
+          alert('Error adding concert: ' + data.error);
         }
 
       } catch (error) {
-        console.error('Error marking attendance:', error);
-        alert('Error adding show');
+        console.error('Error marking concert attendance:', error);
+        alert('Error adding concert');
+      }
+    }
+
+    // Edit concert details modal
+    function editConcertDetails(concertId) {
+      if (!CURRENT_USER_ID) {
+        alert('Please login first');
+        return;
+      }
+
+      // Find the concert data
+      const concerts = document.querySelectorAll('.show-card');
+      let concertData = null;
+      
+      concerts.forEach(card => {
+        const editBtn = card.querySelector(`button[onclick="editConcertDetails(${concertId})"]`);
+        if (editBtn) {
+          // Extract data from the card
+          const dateElement = card.querySelector('.show-date');
+          const venueElement = card.querySelector('.venue-name');
+          const locationElement = card.querySelector('.location');
+          
+          concertData = {
+            id: concertId,
+            date: dateElement ? dateElement.textContent : '',
+            venue: venueElement ? venueElement.textContent : '',
+            location: locationElement ? locationElement.textContent.replace('📍 ', '') : ''
+          };
+        }
+      });
+
+      if (!concertData) {
+        alert('Concert data not found');
+        return;
+      }
+
+      // Create modal
+      const modal = document.createElement('div');
+      modal.id = 'editConcertModal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(8px);
+      `;
+      
+      modal.innerHTML = `
+        <div style="background: white; padding: 30px; border-radius: 20px; max-width: 500px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+          <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: #1a472a;">
+              <i class="bi-music-note-beamed"></i> Edit Concert Details
+            </h3>
+            <button onclick="closeEditModal()" style="background: none; border: none; font-size: 2rem; color: #999; cursor: pointer; line-height: 1;">×</button>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <strong>Date:</strong> ${concertData.date}<br>
+            <strong>Venue:</strong> ${concertData.venue}<br>
+            <strong>Location:</strong> ${concertData.location}
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Rating (1-5 stars):</label>
+            <select id="concertRating" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 8px;">
+              <option value="">No rating</option>
+              <option value="1">★☆☆☆☆ (1 star)</option>
+              <option value="2">★★☆☆☆ (2 stars)</option>
+              <option value="3">★★★☆☆ (3 stars)</option>
+              <option value="4">★★★★☆ (4 stars)</option>
+              <option value="5">★★★★★ (5 stars)</option>
+            </select>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Ticket Price:</label>
+            <input type="number" id="ticketPrice" placeholder="e.g., 25.00" step="0.01" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Seat Location:</label>
+            <input type="text" id="seatLocation" placeholder="e.g., Section 101, Row 5" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Weather Notes:</label>
+            <input type="text" id="weatherNotes" placeholder="e.g., Rainy night, perfect for indoor show" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Companions:</label>
+            <input type="text" id="companions" placeholder="e.g., John, Sarah, Mike" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600;">Personal Notes:</label>
+            <textarea id="personalNotes" placeholder="Share your memories of this show..." rows="3" style="width: 100%; padding: 8px; border: 2px solid #ddd; border-radius: 8px; resize: vertical;"></textarea>
+          </div>
+          
+          <div style="display: flex; gap: 10px;">
+            <button onclick="closeEditModal()" style="flex: 1; padding: 12px; border: 2px solid #ddd; background: white; color: #666; border-radius: 10px; cursor: pointer; font-weight: 600;">
+              Cancel
+            </button>
+            <button onclick="saveConcertDetails(${concertId})" style="flex: 1; padding: 12px; border: none; background: #1a472a; color: white; border-radius: 10px; cursor: pointer; font-weight: 600;">
+              Save Changes
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+    }
+
+    function closeEditModal() {
+      const modal = document.getElementById('editConcertModal');
+      if (modal) {
+        document.body.removeChild(modal);
+      }
+    }
+
+    async function saveConcertDetails(concertId) {
+      try {
+        const rating = document.getElementById('concertRating').value;
+        const ticketPrice = document.getElementById('ticketPrice').value;
+        const seatLocation = document.getElementById('seatLocation').value;
+        const weatherNotes = document.getElementById('weatherNotes').value;
+        const companions = document.getElementById('companions').value;
+        const personalNotes = document.getElementById('personalNotes').value;
+
+        const companionsArray = companions ? companions.split(',').map(c => c.trim()).filter(c => c) : [];
+
+        const response = await fetch(`/api/concert-collection/users/${CURRENT_USER_ID}/concerts/${concertId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            personalNotes,
+            rating: rating ? parseInt(rating) : null,
+            photos: [],
+            ticketPrice: ticketPrice ? parseFloat(ticketPrice) : null,
+            seatLocation,
+            weatherNotes,
+            companions: companionsArray
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          closeEditModal();
+          loadMyShows(); // Refresh the list
+          alert('Concert details updated successfully!');
+        } else {
+          alert('Error updating concert: ' + data.error);
+        }
+
+      } catch (error) {
+        console.error('Error saving concert details:', error);
+        alert('Error updating concert details');
       }
     }
   </script>

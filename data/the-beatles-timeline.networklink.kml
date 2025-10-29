@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>The Beatles - Historic Locations Timeline</name>
+    <description>The Beatles' journey from Liverpool to worldwide phenomenon. This network link will load the data from your piBoom server.</description>
+    <NetworkLink>
+      <name>The Beatles Timeline</name>
+      <description>Follow The Beatles from The Cavern Club to Abbey Road and around the world</description>
+      <refreshVisibility>0</refreshVisibility>
+      <flyToView>1</flyToView>
+      <Link>
+        <href>http://localhost:3000/data/the-beatles-timeline.kml</href>
+        <refreshMode>onInterval</refreshMode>
+        <refreshInterval>3600</refreshInterval>
+      </Link>
+    </NetworkLink>
+  </Document>
+</kml>
+
+
