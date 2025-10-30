@@ -152,6 +152,12 @@
             color: var(--dark-color);
         }
 
+        /* Improve row click UX */
+        #femaDisastersTable tbody tr,
+        #encompassLoansTable tbody tr {
+            cursor: pointer;
+        }
+
         .loading-spinner {
             display: none;
         }
@@ -306,6 +312,10 @@
                     </select>
                 </div>
                 <div class="col-md-3 mb-3">
+                    <label class="form-label">County</label>
+                    <input class="form-control" id="countyFilter" placeholder="e.g., Harris">
+                </div>
+                <div class="col-md-3 mb-3">
                     <label class="form-label">Risk Level</label>
                     <select class="form-select" id="riskFilter">
                         <option value="">All Risk Levels</option>
@@ -314,10 +324,16 @@
                         <option value="high">High Risk</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3 d-flex align-items-end">
+                <div class="col-md-3 mb-3 d-flex align-items-end gap-2">
                     <button class="btn btn-outline-primary w-100" onclick="applyFilters()">
-                        <i class="bi bi-search"></i> Apply Filters
+                        <i class="bi bi-funnel"></i> Apply Filters
                     </button>
+                </div>
+                <div class="col-12 mb-2 d-flex justify-content-end">
+                    <button type="button" class="btn btn-primary" id="loadFemaBtn" onclick="loadFEMADisastersDirect()">
+                        <i class="bi bi-cloud-download"></i> Load FEMA (Real-time)
+                    </button>
+                    <span id="femaLoadSpinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span>
                 </div>
             </div>
         </div>
@@ -388,6 +404,7 @@
                                         <th>Borrower</th>
                                         <th>Property Address</th>
                                         <th>City, State</th>
+                                        <th>County</th>
                                         <th>Loan Amount</th>
                                         <th>Milestone</th>
                                         <th>Risk Level</th>
@@ -487,13 +504,14 @@
         let currentFilters = {};
         let map;
         let markers = [];
+        let loanMarkers = [];
         let youtubeAPIReady = false;
         let selectedDisaster = null;
 
         // Initialize dashboard
         $(document).ready(function() {
             initializeUser();
-            loadFEMADisasters();
+            // Real-time only: wait for user to select State + County
             initializeFEMADataTable();
             initializeEncompassDataTable();
             populateStateFilter();
@@ -512,22 +530,53 @@
         // Load FEMA disaster data
         async function loadFEMADisasters() {
             try {
-                // Load FEMA disasters from our database (stored from previous analysis)
-                const response = await fetch('/api/loan-pipeline/fema-disasters');
-                const data = await response.json();
-                
-                if (data.success) {
-                    populateFEMATable(data.data.disasters);
-                    updateMapWithDisasters(data.data.disasters);
-                } else {
-                    // If no FEMA data in database, load sample data
-                    loadSampleFEMAData();
+                const state = ($('#stateFilter').val() || '').toString().trim();
+                const county = ($('#countyFilter').val() || '').toString().trim();
+                if (!state || !county) {
+                    populateFEMATable([]);
+                    updateMapWithDisasters([]);
+                    showAlert('Select a State and enter a County, then click "Load FEMA (Real-time)"', 'info');
+                    return;
                 }
+                await loadFEMADisastersDirect();
             } catch (error) {
                 console.error('Error loading FEMA disasters:', error);
-                loadSampleFEMAData();
+                populateFEMATable([]);
             }
         }
+
+        // Load FEMA disasters directly from FEMA API via backend proxy with 30-day window
+        async function loadFEMADisastersDirect() {
+            try {
+                console.log('Loading FEMA real-time...');
+                $('#femaLoadSpinner').show();
+                const state = ($('#stateFilter').val() || '').toString().trim();
+                const county = ($('#countyFilter').val() || '').toString().trim();
+                const qp = new URLSearchParams();
+                if (state) qp.set('state', state);
+                if (county) qp.set('county', county);
+                const resp = await fetch(`/api/loan-pipeline/query-fema?${qp.toString()}`);
+                const json = await resp.json();
+                if (json.success) {
+                    populateFEMATable(json.data.disasters);
+                    updateMapWithDisasters(json.data.disasters);
+                    showAlert(`Loaded ${json.data.count || json.data.disasters.length} FEMA records`, 'success');
+                } else {
+                    populateFEMATable([]);
+                    showAlert('FEMA request failed', 'danger');
+                }
+            } catch (e) {
+                console.error('Error loading FEMA direct:', e);
+                populateFEMATable([]);
+                showAlert('Error loading FEMA (check console)', 'danger');
+            } finally {
+                $('#femaLoadSpinner').hide();
+            }
+        }
+
+        // Expose functions for inline onclick safety
+        window.loadFEMADisastersDirect = loadFEMADisastersDirect;
+        window.applyFilters = applyFilters;
 
         // Load sample FEMA data for demonstration
         function loadSampleFEMAData() {
@@ -672,20 +721,21 @@
                 ]
             });
 
-            // Add click handler for FEMA disaster rows (like tool3)
-            $('#femaDisastersTable tbody').off('click', 'tr').on('click', 'tr', function() {
-                console.log('FEMA disaster row clicked!'); // Debug log
-                const disasterData = femaDisastersTable.row(this).data();
-                console.log('Disaster data:', disasterData); // Debug log
-                
-                // Get the full disaster object stored on the row element (for coordinates)
-                const disasterObj = $(this).data('disasterObj');
-                
-                if (disasterData && disasterData.length > 0) {
-                    // Pass both the array data and the full object
+            // Add robust click handler for FEMA disaster rows (handles responsive child rows)
+            function bindFemaRowClicks() {
+                $('#femaDisastersTable tbody').off('click.fema').on('click.fema', 'tr, td', function(e) {
+                    const $tr = $(e.target).closest('tr');
+                    const row = femaDisastersTable.row($tr.hasClass('child') ? $tr.prev() : $tr);
+                    if (!row || !row.data()) return;
+                    const disasterData = row.data();
+                    const disasterObj = ($tr.hasClass('child') ? $tr.prev() : $tr).data('disasterObj');
                     selectFEMADisaster(disasterData, disasterObj);
-                }
-            });
+                });
+            }
+            bindFemaRowClicks();
+
+            // Rebind click after any draw/redraw
+            femaDisastersTable.on('draw', function() { bindFemaRowClicks(); });
         }
 
         // Initialize Encompass DataTable
@@ -697,8 +747,29 @@
                 pageLength: 25,
                 order: [[0, 'desc']],
                 columnDefs: [
-                    { targets: [9], orderable: false } // Actions column
+                    { targets: [10], orderable: false } // Actions column
                 ]
+            });
+
+            // Click to focus map on loan
+            $('#encompassLoansTable tbody').off('click.loan').on('click.loan', 'tr, td', function(e) {
+                const $tr = $(e.target).closest('tr');
+                const row = encompassLoansTable.row($tr.hasClass('child') ? $tr.prev() : $tr);
+                const data = row.data();
+                const loanObj = ($tr.hasClass('child') ? $tr.prev() : $tr).data('loanObj');
+                if (loanObj && loanObj.latitude && loanObj.longitude) {
+                    const pos = { lat: parseFloat(loanObj.latitude), lng: parseFloat(loanObj.longitude) };
+                    map.setCenter(pos);
+                    map.setZoom(12);
+                    // find matching marker
+                    loanMarkers.forEach(m => {
+                        if (m.loanId === loanObj.id && m.marker) {
+                            new google.maps.InfoWindow({
+                                content: `<div><strong>${loanObj.loan_number}</strong><br>${loanObj.property_address}<br>${loanObj.city}, ${loanObj.state} ${loanObj.zip_code || ''}<br>County: ${loanObj.county || ''}</div>`
+                            }).open(map, m.marker);
+                        }
+                    });
+                }
             });
         }
 
@@ -953,7 +1024,7 @@
                     disaster.incidentBeginDate,
                     disaster.incidentEndDate || 'Ongoing',
                     disaster.disasterCloseoutDate || 'N/A',
-                    `<button class="btn btn-sm btn-outline-primary" onclick="viewDisasterDetails('${disaster.declarationTitle}')">
+                    `<button class="btn btn-sm btn-outline-primary" onclick="viewDisasterByTitle('${disaster.declarationTitle.replace(/'/g, "\'")}')">
                         <i class="bi bi-eye"></i>
                     </button>`
                 ];
@@ -965,6 +1036,24 @@
             });
             
             femaDisastersTable.draw();
+        }
+
+        // Helper: view disaster by title in Actions button
+        function viewDisasterByTitle(title, evt) {
+            if (evt) { evt.stopPropagation(); evt.preventDefault(); }
+            const rows = $('#femaDisastersTable').DataTable().rows({ page: 'current' }).nodes();
+            let found = null;
+            $(rows).each(function() {
+                const data = femaDisastersTable.row(this).data();
+                if (data && data[2] === title) {
+                    found = { node: this, data };
+                    return false;
+                }
+            });
+            if (found) {
+                const disasterObj = $(found.node).data('disasterObj');
+                selectFEMADisaster(found.data, disasterObj);
+            }
         }
 
         // Select FEMA disaster and show related data (like tool3)
@@ -1032,18 +1121,21 @@
                     loan.borrower_name,
                     loan.property_address,
                     `${loan.city}, ${loan.state}`,
+                    loan.county || '',
                     `$${loan.loan_amount.toLocaleString()}`,
                     loan.milestone,
-                    `<span class="risk-badge ${riskClass}">${riskLevel}</span>`,
+                    `<span class=\"risk-badge ${riskClass}\">${riskLevel}</span>`,
                     loan.encompass_loan_guid || 'Not assigned',
                     lastAnalysis,
-                    `<button class="btn btn-sm btn-outline-primary" onclick="analyzeLoan(${loan.id})">
-                        <i class="bi bi-shield-check"></i>
-                    </button>`
+                    `<button class=\"btn btn-sm btn-outline-primary\" onclick=\"analyzeLoan(${loan.id})\">\n                        <i class=\"bi bi-shield-check\"></i>\n                    </button>`
                 ]);
+                const rowNode = encompassLoansTable.row(':last').node();
+                $(rowNode).data('loanObj', loan);
             });
             
             encompassLoansTable.draw();
+
+            updateMapWithLoans(loans);
         }
 
         // Search YouTube for disaster videos (like tool3)
@@ -1116,6 +1208,37 @@
                     });
 
                     markers.push(marker);
+                }
+            });
+        }
+
+        // Plot loan markers on map
+        function updateMapWithLoans(loans) {
+            // Clear existing loan markers
+            loanMarkers.forEach(m => m.marker && m.marker.setMap(null));
+            loanMarkers = [];
+            loans.forEach(loan => {
+                if (loan.latitude && loan.longitude) {
+                    const marker = new google.maps.Marker({
+                        position: { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) },
+                        map: map,
+                        title: `${loan.loan_number}`,
+                        icon: {
+                            url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                            scaledSize: new google.maps.Size(30, 30)
+                        }
+                    });
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<div>
+                            <h6>Loan ${loan.loan_number}</h6>
+                            <div>${loan.property_address}</div>
+                            <div>${loan.city}, ${loan.state} ${loan.zip_code || ''}</div>
+                            <div>County: ${loan.county || ''}</div>
+                            <div>Risk: ${getRiskLevel(loan.disaster_risk_score)}</div>
+                        </div>`
+                    });
+                    marker.addListener('click', () => infoWindow.open(map, marker));
+                    loanMarkers.push({ loanId: loan.id, marker });
                 }
             });
         }

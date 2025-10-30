@@ -386,13 +386,6 @@ export async function geocodeLoans(req, res) {
 export async function queryFEMADirect(req, res) {
   try {
     const { state, county } = req.query;
-    
-    if (!state || !county) {
-      return res.status(400).json({
-        success: false,
-        error: 'State and county are required'
-      });
-    }
 
     // Calculate date one year ago (only show disasters from last year - pipeline loans only)
     const oneYearAgo = new Date();
@@ -402,8 +395,12 @@ export async function queryFEMADirect(req, res) {
     // Use FEMA API v2 (like tool3) for better compatibility
     // Filter for last year only (pipeline loans concern)
     const femaDisasterDeclUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
-    const filterParams = `$count=true&$filter=state eq '${state}' and designatedArea eq '${county} (County)' and incidentBeginDate ge ${oneYearAgoStr}`;
-    
+    const filters = [];
+    if (state) filters.push(`state eq '${state}'`);
+    if (county) filters.push(`designatedArea eq '${county} (County)'`);
+    filters.push(`incidentBeginDate ge ${oneYearAgoStr}`);
+    const filterParams = `$count=true&$top=1000&$filter=${filters.join(' and ')}`;
+
     const response = await fetch(`${femaDisasterDeclUrl}?${filterParams}`);
     const disasterDeclResults = await response.json();
 
@@ -445,15 +442,20 @@ export async function queryFEMADirect(req, res) {
       const geocodedDisasters = await Promise.all(disasters.map(async (item, index) => {
         // Rate limit geocoding
         if (index > 0) await new Promise(resolve => setTimeout(resolve, 100));
-        
-        const coords = await geocodeCountyState(county, state);
+        // Determine county/state per item
+        let itemCounty = county || (item.designatedArea ? item.designatedArea.replace(/\s*\(County\)$/i, '') : '');
+        const itemState = item.state || state || '';
+        let coords = { latitude: null, longitude: null };
+        if (itemCounty && itemState) {
+          coords = await geocodeCountyState(itemCounty, itemState);
+        }
         
         return {
           declarationType: item.declarationType,
           incidentType: item.incidentType,
           declarationTitle: item.declarationTitle,
-          state: item.state,
-          county: county,
+          state: itemState,
+          county: itemCounty,
           ihProgramDeclared: item.ihProgramDeclared || false,
           iaProgramDeclared: item.iaProgramDeclared || false,
           paProgramDeclared: item.paProgramDeclared || false,

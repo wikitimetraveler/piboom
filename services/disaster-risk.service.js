@@ -52,6 +52,53 @@ async function geocodeCountyState(county, state) {
 }
 
 /**
+ * Reverse geocode lat/lng to county and state
+ * @param {number} lat
+ * @param {number} lng
+ * @returns {Promise<{county: string|null, state: string|null}>}
+ */
+async function reverseGeocodeCountyState(lat, lng) {
+  const apiKey = process.env.GOOGLE_API_KEY;
+  if (!apiKey || !lat || !lng) return { county: null, state: null };
+  try {
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (data.status === 'OK' && data.results && data.results.length) {
+      const components = data.results[0].address_components || [];
+      const countyComp = components.find(c => c.types.includes('administrative_area_level_2'));
+      const stateComp = components.find(c => c.types.includes('administrative_area_level_1'));
+      const county = countyComp ? countyComp.long_name.replace(/\s*County$/i, '') : null;
+      const state = stateComp ? stateComp.short_name : null;
+      return { county, state };
+    }
+  } catch (e) {
+    console.warn('⚠️  reverseGeocodeCountyState error:', e.message);
+  }
+  return { county: null, state: null };
+}
+
+function normalizeCountyName(raw) {
+  if (!raw) return '';
+  let name = String(raw).trim();
+  name = name.replace(/\s*\(County\)$/i, '');
+  // If pattern like "Some County", strip trailing word County
+  const m = name.match(/(.+?)\s+County$/i);
+  if (m && m[1]) return m[1].trim();
+  return name;
+}
+
+function parseCountyFromTitle(title) {
+  if (!title) return '';
+  // Try patterns like "... in Harris County" or "Harris County ..."
+  const inMatch = title.match(/in\s+([A-Za-z\s]+?)\s+County/i);
+  if (inMatch && inMatch[1]) return normalizeCountyName(inMatch[1]);
+  const anyCounty = title.match(/([A-Za-z\s]+)\s+County/i);
+  if (anyCounty && anyCounty[1]) return normalizeCountyName(anyCounty[1]);
+  return '';
+}
+
+/**
  * Analyze disaster risk for a single loan using FEMA API
  * @param {Object} loan - Loan object with location data
  * @returns {Promise<Object>} Risk analysis result
@@ -155,24 +202,20 @@ export async function batchAnalyzeRisk(loans) {
  */
 async function queryFEMAApi(state, county) {
   try {
-    // FEMA API endpoint for disaster declarations
-    const baseUrl = 'https://www.fema.gov/api/open/v1/DisasterDeclarationsSummaries';
-    
-    // Calculate date one year ago (only show disasters from last year)
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-    
-    // Query parameters - filter by state, county, and only last year
-    const params = new URLSearchParams({
-      $filter: `state eq '${state}' and county eq '${county}' and incidentBeginDate ge ${oneYearAgoStr}`,
-      $top: 1000, // Get up to 1000 records
-      $format: 'json'
-    });
-    
-    const url = `${baseUrl}?${params}`;
-    
-    console.log(`🌐 Querying FEMA API (last year only): ${url}`);
+    // FEMA API v2 endpoint for disaster declarations (matches mashup logic)
+    const baseUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
+
+    // Calculate date one month ago (only show disasters from last 30 days)
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    const oneMonthAgoStr = oneMonthAgo.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    // designatedArea format example: "Harris (County)"; filter by designatedArea and state
+    // Note: FEMA API v2 uses designatedArea instead of county
+    const filter = `state eq '${state}' and designatedArea eq '${county} (County)' and incidentBeginDate ge ${oneMonthAgoStr}`;
+    const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$count=true`;
+
+    console.log(`🌐 Querying FEMA API v2 (last 30 days): ${url}`);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -187,16 +230,16 @@ async function queryFEMAApi(state, county) {
     }
     
     const data = await response.json();
-    
+
     // Extract disaster information
     let disasters = data.DisasterDeclarationsSummaries || [];
-    
-    // Additional filter to ensure we only get last year (API filter sometimes includes edge cases)
-    const lastYearDate = new Date(oneYearAgoStr);
+
+    // Extra guard: ensure only last 30 days
+    const lastMonthDate = new Date(oneMonthAgoStr);
     disasters = disasters.filter(disaster => {
       if (disaster.incidentBeginDate) {
         const disasterDate = new Date(disaster.incidentBeginDate);
-        return disasterDate >= lastYearDate;
+        return disasterDate >= lastMonthDate;
       }
       return false;
     });
@@ -205,23 +248,29 @@ async function queryFEMAApi(state, county) {
     const geocodedDisasters = await Promise.all(disasters.map(async disaster => {
       let latitude = null;
       let longitude = null;
-      
+
+      // Prefer county from designatedArea, fallback to county field, then parse from title
+      let countyFromApi = normalizeCountyName(
+        disaster.designatedArea || disaster.county || parseCountyFromTitle(disaster.declarationTitle || disaster.title) || county || ''
+      );
+      let stateFromApi = disaster.state || state || '';
+
       // Try to geocode if we have county and state
-      if (state && county) {
-        const coords = await geocodeCountyState(county, state);
+      if (stateFromApi && countyFromApi) {
+        const coords = await geocodeCountyState(countyFromApi, stateFromApi);
         latitude = coords.latitude;
         longitude = coords.longitude;
         // Rate limit geocoding requests
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      
+
       return {
         disasterNumber: disaster.disasterNumber,
-        state: disaster.state,
-        county: disaster.county,
+        state: stateFromApi,
+        county: countyFromApi,
         declarationDate: disaster.declarationDate,
         incidentType: disaster.incidentType,
-        title: disaster.title,
+        title: disaster.declarationTitle || disaster.title,
         incidentBeginDate: disaster.incidentBeginDate,
         incidentEndDate: disaster.incidentEndDate,
         ihProgramDeclared: disaster.ihProgramDeclared,
@@ -232,6 +281,18 @@ async function queryFEMAApi(state, county) {
         longitude
       };
     }));
+
+    // Second-pass enhancement: reverse-geocode any items still missing county/state but with coordinates
+    for (let i = 0; i < geocodedDisasters.length; i++) {
+      const d = geocodedDisasters[i];
+      if ((!d.county || !d.state) && d.latitude && d.longitude) {
+        const cg = await reverseGeocodeCountyState(d.latitude, d.longitude);
+        if (cg.county && !d.county) d.county = cg.county;
+        if (cg.state && !d.state) d.state = cg.state;
+        // be gentle with rate limits
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+    }
     
     return {
       disasterCount: geocodedDisasters.length,
@@ -241,7 +302,7 @@ async function queryFEMAApi(state, county) {
         county,
         queriedAt: new Date().toISOString(),
         totalRecords: geocodedDisasters.length,
-        filterYear: oneYearAgoStr
+        filterSince: oneMonthAgoStr
       }
     };
   } catch (error) {
