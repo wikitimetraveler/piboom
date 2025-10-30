@@ -57,7 +57,7 @@ async function geocodeCountyState(county, state) {
  * @param {number} lng
  * @returns {Promise<{county: string|null, state: string|null}>}
  */
-async function reverseGeocodeCountyState(lat, lng) {
+export async function reverseGeocodeCountyState(lat, lng) {
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey || !lat || !lng) return { county: null, state: null };
   try {

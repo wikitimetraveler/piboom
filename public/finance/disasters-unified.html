@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Disasters (30-day, Multi-Source)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <style>
+      body { background: #f8fafc; }
+      .container-xxl { max-width: 1280px; }
+      #map { height: 360px; width: 100%; border-radius: 8px; }
+      .filters .form-label { font-weight: 500; }
+    </style>
+  </head>
+  <body>
+    <div class="container-xxl py-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Unified Disasters (30-day, Multi-Source)</h1>
+        <a class="btn btn-outline-secondary" href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body filters">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label">State</label>
+              <input id="stateInput" class="form-control" placeholder="e.g., CA">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">County</label>
+              <input id="countyInput" class="form-control" placeholder="e.g., Harris">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Source</label>
+              <select id="sourceInput" class="form-select" multiple>
+                <option value="fema" selected>FEMA</option>
+                <option value="firms">NASA FIRMS</option>
+                <option value="usgs">USGS</option>
+                <option value="nws">NOAA/NWS</option>
+                <option value="nhc">NHC</option>
+                <option value="gdacs">GDACS</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Event</label>
+              <select id="eventInput" class="form-select" multiple>
+                <option value="wildfire">Wildfire</option>
+                <option value="earthquake">Earthquake</option>
+                <option value="hurricane">Hurricane</option>
+                <option value="flood">Flood</option>
+                <option value="severe">Severe</option>
+              </select>
+            </div>
+            <div class="col-12 d-flex gap-2 justify-content-end">
+              <button class="btn btn-outline-primary" id="applyBtn"><i class="bi-funnel"></i> Apply</button>
+              <button class="btn btn-primary" id="refreshBtn"><i class="bi-arrow-repeat"></i> Refresh Now</button>
+              <a class="btn btn-outline-secondary" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="card">
+            <div class="card-header"><strong>Disasters</strong></div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="disastersTable">
+                  <thead>
+                    <tr>
+                      <th>Source</th>
+                      <th>Event</th>
+                      <th>County</th>
+                      <th>State</th>
+                      <th>Start</th>
+                      <th>End</th>
+                      <th>Title</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card">
+            <div class="card-header"><strong>Map</strong></div>
+            <div class="card-body">
+              <div id="map"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI"></script>
+    <script>
+      let table, map, markers = [];
+      $(function init() {
+        table = $('#disastersTable').DataTable({ pageLength: 25, order: [[4, 'desc']] });
+        map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6} });
+        $('#applyBtn').on('click', loadDisasters);
+        $('#refreshBtn').on('click', refreshDisasters);
+        loadDisasters();
+      });
+
+      async function loadDisasters() {
+        const qp = new URLSearchParams();
+        const state = $('#stateInput').val().trim();
+        const county = $('#countyInput').val().trim();
+        const sources = $('#sourceInput').val() || [];
+        const events = $('#eventInput').val() || [];
+        if (state) qp.set('state', state);
+        if (county) qp.set('county', county);
+        if (sources.length === 1) qp.set('source', sources[0]);
+        if (events.length === 1) qp.set('event', events[0]);
+        qp.set('since', new Date(Date.now() - 30*24*3600*1000).toISOString());
+        const resp = await fetch(`/api/disasters?${qp.toString()}`);
+        const json = await resp.json();
+        const rows = json.success ? json.data.disasters : [];
+        renderTable(rows);
+        renderMap(rows);
+      }
+
+      async function refreshDisasters() {
+        const qp = new URLSearchParams();
+        const state = $('#stateInput').val().trim();
+        const county = $('#countyInput').val().trim();
+        if (state) qp.set('state', state);
+        if (county) qp.set('county', county);
+        await fetch(`/api/disasters/refresh?${qp.toString()}`, { method: 'POST' });
+        await loadDisasters();
+      }
+
+      function renderTable(rows) {
+        table.clear();
+        rows.forEach(r => {
+          table.row.add([
+            r.source,
+            r.event_type,
+            r.county_name || '',
+            r.state_abbr || '',
+            r.start_time ? new Date(r.start_time).toLocaleString() : '',
+            r.end_time ? new Date(r.end_time).toLocaleString() : '',
+            r.title || ''
+          ]);
+        });
+        table.draw();
+      }
+
+      function renderMap(rows) {
+        markers.forEach(m => m.setMap(null));
+        markers = [];
+        const bounds = new google.maps.LatLngBounds();
+        let any = false;
+        rows.forEach(r => {
+          if (r.lat && r.lng) {
+            const pos = { lat: parseFloat(r.lat), lng: parseFloat(r.lng) };
+            const marker = new google.maps.Marker({ position: pos, map, title: r.title || r.event_type });
+            const info = new google.maps.InfoWindow({ content: `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name||''}, ${r.state_abbr||''}<br>${r.start_time?new Date(r.start_time).toLocaleString():''}</div>` });
+            marker.addListener('click', () => info.open(map, marker));
+            markers.push(marker);
+            bounds.extend(pos);
+            any = true;
+          }
+        });
+        if (any) map.fitBounds(bounds);
+      }
+    </script>
+  </body>
+  </html>
+
+

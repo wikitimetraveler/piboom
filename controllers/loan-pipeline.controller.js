@@ -387,10 +387,10 @@ export async function queryFEMADirect(req, res) {
   try {
     const { state, county } = req.query;
 
-    // Calculate date one year ago (only show disasters from last year - pipeline loans only)
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    // Calculate date 30 days ago (real-time only view)
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
+    const oneMonthAgoStr = oneMonthAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
     // Use FEMA API v2 (like tool3) for better compatibility
     // Filter for last year only (pipeline loans concern)
@@ -398,7 +398,7 @@ export async function queryFEMADirect(req, res) {
     const filters = [];
     if (state) filters.push(`state eq '${state}'`);
     if (county) filters.push(`designatedArea eq '${county} (County)'`);
-    filters.push(`incidentBeginDate ge ${oneYearAgoStr}`);
+    filters.push(`incidentBeginDate ge ${oneMonthAgoStr}`);
     const filterParams = `$count=true&$top=1000&$filter=${filters.join(' and ')}`;
 
     const response = await fetch(`${femaDisasterDeclUrl}?${filterParams}`);
@@ -428,12 +428,12 @@ export async function queryFEMADirect(req, res) {
     if (disasterDeclResults.metadata && disasterDeclResults.metadata.count > 0) {
       let disasters = disasterDeclResults.DisasterDeclarationsSummaries || [];
       
-      // Additional filter to ensure we only get last year
-      const lastYearDate = new Date(oneYearAgoStr);
+      // Additional filter to ensure we only get last 30 days
+      const lastMonthDate = new Date(oneMonthAgoStr);
       disasters = disasters.filter(item => {
         if (item.incidentBeginDate) {
           const disasterDate = new Date(item.incidentBeginDate);
-          return disasterDate >= lastYearDate;
+          return disasterDate >= lastMonthDate;
         }
         return false;
       });
@@ -473,7 +473,7 @@ export async function queryFEMADirect(req, res) {
         data: {
           disasters: geocodedDisasters,
           count: geocodedDisasters.length,
-          filterYear: oneYearAgoStr
+          filterSince: oneMonthAgoStr
         }
       });
     } else {
