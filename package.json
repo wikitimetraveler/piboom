@@ -16,7 +16,8 @@
     "docker:pi-build": "docker-compose -f docker-compose.pi.yml up --build -d",
     "docker:pi-stop": "docker-compose -f docker-compose.pi.yml down",
     "docker:pi-logs": "docker-compose -f docker-compose.pi.yml logs -f",
-    "generate-gd-kml": "node scripts/generate-grateful-dead-kml.js"
+    "generate-gd-kml": "node scripts/generate-grateful-dead-kml.js",
+    "extract:asset-qualifier": "node scripts/extract-asset-qualifier.js \"data/30 Retail Lending - Asset Qualifier Calculator, August 10, 2022.xlsx\" > data/asset-qualifier.json"
   },
   "dependencies": {
     "@google-cloud/speech": "^6.0.0",
@@ -38,6 +39,7 @@
     "play-sound": "^1.1.6",
     "socket.io": "^4.7.5",
     "spotify-web-api-node": "^5.0.2",
+    "xlsx": "^0.18.5",
     "xmldom": "^0.6.0"
   },
   "engines": {
