@@ -316,6 +316,9 @@ class ModernNavbar extends HTMLElement {
                   <a class="dropdown-item" href="/finance/encompass-assistant.html">
                     <i class="bi-bank2"></i> Encompass Assistant
                   </a>
+                  <a class="dropdown-item" href="/finance/pipeline-risk-dashboard.html">
+                    <i class="bi-shield-check"></i> Pipeline Risk Dashboard
+                  </a>
                 </div>
               </li>
 
