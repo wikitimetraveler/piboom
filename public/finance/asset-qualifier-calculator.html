@@ -37,7 +37,11 @@
 
       <!-- Section: Borrower Profile & Controls (for formulas G17, C31, C32) -->
       <div class="calculator-card">
-        <h3><span><i class="bi-person-badge mr-2"></i>Borrower Profile</span></h3>
+        <h3 data-toggle="collapse" data-target="#collapseProfile" aria-expanded="true" aria-controls="collapseProfile">
+          <span><i class="bi-person-badge mr-2"></i>Borrower Profile</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseProfile">
         <div class="row">
           <div class="col-md-8"><label for="aq_dob" class="form-label">Borrower Date of Birth</label></div>
           <div class="col-md-4">
@@ -73,11 +77,16 @@
             <input type="text" class="form-control result" id="aq_messages" readonly>
           </div>
         </div>
+        </div>
       </div>
 
       <!-- Section: Borrower Assets -->
       <div class="calculator-card">
-        <h3><span><i class="bi-wallet2 mr-2"></i>Assets</span></h3>
+        <h3 data-toggle="collapse" data-target="#collapseAssets" aria-expanded="true" aria-controls="collapseAssets">
+          <span><i class="bi-wallet2 mr-2"></i>Assets</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseAssets">
         <div class="row">
           <div class="col-md-8"><label for="aq_liquid_assets" class="form-label">Liquid Assets (F15)</label></div>
           <div class="col-md-4">
@@ -178,11 +187,16 @@
             <input type="text" class="form-control result" id="aq_min_assets_result" readonly>
           </div>
         </div>
+        </div>
       </div>
 
       <!-- Section: Reserve Requirements -->
       <div class="calculator-card">
-        <h3><span><i class="bi-piggy-bank mr-2"></i>Reserves</span></h3>
+        <h3 data-toggle="collapse" data-target="#collapseReserves" aria-expanded="false" aria-controls="collapseReserves">
+          <span><i class="bi-piggy-bank mr-2"></i>Reserves</span>
+          <button class="card-toggle collapsed" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse card-content" id="collapseReserves">
         <div class="row">
           <div class="col-md-8"><label for="aq_reserve_months" class="form-label">Reserve Requirement (months)</label></div>
           <div class="col-md-4">
@@ -211,11 +225,16 @@
             <small class="text-muted" data-format-for="aq_required_reserves"></small>
           </div>
         </div>
+        </div>
       </div>
 
       <!-- Section: Result -->
       <div class="calculator-card">
-        <h3><span><i class="bi-graph-up-arrow mr-2"></i>Qualification Result</span></h3>
+        <h3 data-toggle="collapse" data-target="#collapseResult" aria-expanded="false" aria-controls="collapseResult">
+          <span><i class="bi-graph-up-arrow mr-2"></i>Qualification Result</span>
+          <button class="card-toggle collapsed" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse card-content" id="collapseResult">
         <div class="row">
           <div class="col-md-8"><label for="aq_net_eligible_assets" class="form-label">Net Eligible Assets after Reserves</label></div>
           <div class="col-md-4">
@@ -237,6 +256,7 @@
           </div>
         </div>
         <small class="text-muted d-block mt-2">Implements Excel refs: H15,H16,H17,H19,H22,H24,H28; messages from C31,C32.</small>
+        </div>
       </div>
     </div>
 
@@ -276,6 +296,17 @@
         document.addEventListener('input', () => {
           // slight delay to allow debounced calculations to complete
           setTimeout(renderFormats, 80);
+        });
+
+        // Accordion toggle rotation
+        $('[data-toggle="collapse"]').on('click', function() {
+          var target = $(this).data('target');
+          var button = $(this).find('.card-toggle');
+          if ($(target).hasClass('show')) {
+            button.addClass('collapsed');
+          } else {
+            button.removeClass('collapsed');
+          }
         });
       });
 
