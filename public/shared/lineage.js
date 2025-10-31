@@ -1,3 +1,44 @@
+/**
+ * Lineage Visualization System
+ * 
+ * @file       lineage.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Interactive family lineage/genealogy visualization system. Provides
+ * a dynamic interface for displaying family trees with timeline-based
+ * navigation, search functionality, and dark mode support.
+ * 
+ * Features:
+ * - Timeline-based family tree visualization
+ * - Search and filter functionality
+ * - Dark mode/night mode toggle
+ * - Year-based navigation slider
+ * - Interactive node selection and details
+ * - Responsive layout for different screen sizes
+ * 
+ * Configuration:
+ * - Accepts configuration object with startYear and filter options
+ * - Customizable year ranges and display settings
+ * - Search functionality for filtering lineage data
+ * 
+ * Technical Implementation:
+ * - Function-based module pattern
+ * - DOM manipulation for visualization
+ * - Event handlers for user interactions
+ * - localStorage integration for preferences
+ * - Slider component for year navigation
+ * 
+ * Integration Notes:
+ * - Initializes with configuration object
+ * - Requires DOM elements with specific IDs (search, etc.)
+ * - Supports external configuration injection
+ * 
+ * ==============================================================================
+ */
+
 function Lineage() {
 
   function lin(conf) {

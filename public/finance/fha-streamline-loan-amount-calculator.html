@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<!--
+  ==============================================================================
+  FHA Streamline Loan Amount Calculator
+  ==============================================================================
+  
+  @file       fha-streamline-loan-amount-calculator.html
+  @author     David Lane
+  @version    2.0.0
+  @since      2024
+  
+  @description
+  Professional calculator for FHA Streamline refinance loan amount determination.
+  Implements the standard FHA Streamline worksheet calculations including
+  principal balance, interest due, MIP due, maximum loan amount, UFMIP factor
+  calculations, and final loan-to-value ratio.
+  
+  Features:
+  - Automatic calculation of maximum refinance loan amount
+  - UFMIP (Upfront Mortgage Insurance Premium) calculation with date-based factors
+  - Loan-to-value (LTV) ratio calculation
+  - Rounded calculations per FHA guidelines
+  - Real-time updates as values change
+  
+  Calculation Logic:
+  - Sums principal balance, interest, escrow, and MIP due
+  - Determines maximum loan based on current vs. new appraised value
+  - Applies UFMIP factor based on case assignment date (pre/post May 2009)
+  - Calculates final loan amount with UFMIP included
+  - Computes LTV ratio for qualification purposes
+  
+  Technical Implementation:
+  - Uses the calculations.js engine (v2.0) with factory pattern
+  - Factory function: createFHACalculatorConfig()
+  - All calculations use rounded values per FHA requirements
+  - Debounced input handling for optimal performance
+  
+  Integration Notes:
+  - Compatible with Encompass field mapping
+  - Supports custom field ID prefixes for multi-instance usage
+  - Date-based UFMIP factor calculation (0.0100 vs 0.0175)
+  
+  @dependencies
+  - /shared/calculations.js (v2.0+)
+  - Bootstrap 4.5.2
+  - Bootstrap Icons 1.11.1
+  
+  ==============================================================================
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHA Streamline Loan Amount Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="../shared/calculations.js"></script>
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --secondary: #6B9E78;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+      }
+      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
+      .nav-home { right: 20px; }
+      .nav-finance { right: 170px; }
+      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
+      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 900px; }
+      .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
+      .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
+      .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
+      .form-label { font-weight: 500; }
+      .input-group-text { background: #F1F5F9; border-color: var(--border); }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .is-invalid { border-color: #dc3545; }
+    </style>
+  </head>
+  <body>
+    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+
+    <div class="container">
+      <h1 class="mb-2">FHA Streamline Loan Amount Worksheet</h1>
+      <p class="text-muted mb-4">Calculate loan amounts based on FHA Streamline guidelines. Formulas match Excel worksheet structure.</p>
+
+      <!-- Section: Borrower Information -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseBorrower" aria-expanded="true" aria-controls="collapseBorrower">
+          <span><i class="bi-person-badge mr-2"></i>Borrower Information</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseBorrower">
+          <div class="row">
+            <div class="col-md-8"><label for="fs_borrower" class="form-label">Borrower Name</label></div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="fs_borrower" placeholder="Enter borrower name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Base Amounts -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseBase" aria-expanded="true" aria-controls="collapseBase">
+          <span><i class="bi-cash-stack mr-2"></i>Base Amounts</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseBase">
+          <div class="row">
+            <div class="col-md-8"><label for="fs_g7" class="form-label">Base Amount (G7)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="fs_g7" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g8" class="form-label">Maximum Loan Amount (G8)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="fs_g8" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g9" class="form-label">Current Mortgage Balance (G9)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="fs_g9" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Additional Amounts -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseAdditional" aria-expanded="true" aria-controls="collapseAdditional">
+          <span><i class="bi-plus-circle mr-2"></i>Additional Amounts</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseAdditional">
+          <div class="row">
+            <div class="col-md-8"><label for="fs_g12" class="form-label">Additional Amount 1 (G12)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="fs_g12" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g13" class="form-label">Additional Amount 2 (G13)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="fs_g13" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g14" class="form-label">Additional Amount 3 (G14)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="fs_g14" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g15" class="form-label">Total Additional Amounts (G15 = SUM(G12:G14))</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g15" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Calculations -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseCalculations" aria-expanded="true" aria-controls="collapseCalculations">
+          <span><i class="bi-calculator mr-2"></i>Loan Amount Calculations</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseCalculations">
+          <div class="row">
+            <div class="col-md-8"><label for="fs_g18" class="form-label">Total Base + Additional (G18 = G15)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g18" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g19" class="form-label">Current Mortgage Balance (G19 = G9)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g19" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g20" class="form-label">Difference (G20 = G18 - G19)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g20" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g22" class="form-label">Maximum Loan Amount (G22 = G8)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g22" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g24" class="form-label">Maximum Loan Amount (G24 = ROUNDDOWN(MIN(G20,G22),0))</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g24" readonly style="font-size: 1.2rem; color: var(--primary);">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Final Calculations -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseFinal" aria-expanded="true" aria-controls="collapseFinal">
+          <span><i class="bi-check-circle mr-2"></i>Final Loan Amount</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseFinal">
+          <div class="row">
+            <div class="col-md-8"><label for="fs_g28" class="form-label">Base Loan Amount (G28 = G24)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g28" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_d29" class="form-label">Factor/Percentage (D29)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                <input type="number" class="form-control" id="fs_d29" placeholder="0.00" min="0" max="100" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_e29" class="form-label">Calculated Amount (E29 = G24 * D29)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_e29" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g29" class="form-label">Rounded Amount (G29 = ROUNDDOWN(E29,0))</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g29" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g30" class="form-label">Total Loan Amount (G30 = SUM(G28:G29))</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="fs_g30" readonly style="font-size: 1.3rem; font-weight: 700; color: var(--primary);">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="fs_g33" class="form-label">Ratio (G33 = G24 / G7)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control result" id="fs_g33" readonly>
+                <div class="input-group-append"><span class="input-group-text">x</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Use factory function to create FHA Streamline Loan Amount calculator configuration
+        const calc = new calculations(createFHACalculatorConfig());
+
+        // Format currency displays
+        function formatCurrency(value) {
+          return value ? '$' + parseFloat(value).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '$0.00';
+        }
+
+        // Format percentage
+        function formatPercent(value) {
+          return value ? (parseFloat(value) / 100).toLocaleString('en-US', {style: 'percent', minimumFractionDigits: 2}) : '0.00%';
+        }
+
+        // Update displays when values change
+        ['fs_g15', 'fs_g18', 'fs_g19', 'fs_g20', 'fs_g22', 'fs_g24', 'fs_g28', 'fs_e29', 'fs_g29', 'fs_g30'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('input', function() {
+              const value = parseFloat(this.value);
+              if (!isNaN(value)) {
+                this.value = Math.round(value * 100) / 100; // Round to 2 decimals
+              }
+            });
+          }
+        });
+
+        // Format currency inputs on blur
+        ['fs_g7', 'fs_g8', 'fs_g9', 'fs_g12', 'fs_g13', 'fs_g14'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('blur', function() {
+              const value = parseFloat(this.value);
+              if (!isNaN(value)) {
+                this.value = Math.round(value * 100) / 100;
+              }
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
+

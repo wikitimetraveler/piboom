@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<!--
+  ==============================================================================
+  Debt-to-Income (DTI) Calculator
+  ==============================================================================
+  
+  @file       dti-calculator.html
+  @author     David Lane
+  @version    2.0.0
+  @since      2024
+  
+  @description
+  Professional DTI calculator for mortgage lending professionals. Calculates
+  front-end and back-end debt-to-income ratios with support for both annual
+  and manual monthly income entry. Includes real-time qualification status
+  indicators based on FHA and conventional lending standards.
+  
+  Features:
+  - Front-end DTI calculation (housing costs vs income)
+  - Back-end DTI calculation (total monthly obligations vs income)
+  - Automatic annual-to-monthly income conversion
+  - Manual gross monthly income override capability
+  - Real-time qualification status (Pass/Fail/Warning)
+  - Visual indicators for DTI thresholds (28% front, 43% back)
+  - Minimum income requirement calculation
+  
+  Technical Implementation:
+  - Uses the calculations.js engine (v2.0) with factory pattern
+  - Reactive updates with 50ms debounce for performance
+  - Decoupled calculation methods for testability
+  - Bootstrap 4.5.2 for responsive UI
+  - Accessible form controls with proper ARIA labels
+  
+  Integration Notes:
+  - Compatible with Encompass field mapping via customIds option
+  - Factory function: createDTICalculatorConfig()
+  - Additional data source support via additionalInputIds
+  
+  @dependencies
+  - /shared/calculations.js (v2.0+)
+  - Bootstrap 4.5.2
+  - Bootstrap Icons 1.11.1
+  
+  ==============================================================================
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debt-to-Income (DTI) Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="../shared/calculations.js"></script>
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --secondary: #6B9E78;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+        --success: #28a745;
+        --warning: #ffc107;
+        --danger: #dc3545;
+      }
+      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
+      .nav-home { right: 20px; }
+      .nav-finance { right: 170px; }
+      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
+      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 1000px; }
+      .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
+      .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
+      .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
+      .form-label { font-weight: 500; }
+      .input-group-text { background: #F1F5F9; border-color: var(--border); }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .dti-result { font-size: 1.4rem; font-weight: 700; }
+      .dti-good { color: var(--success); }
+      .dti-warning { color: var(--warning); }
+      .dti-danger { color: var(--danger); }
+      .info-box { background: #E8F4F8; border-left: 4px solid var(--primary); padding: 12px; margin-top: 12px; border-radius: 4px; }
+      .info-box small { color: var(--dark); }
+    </style>
+  </head>
+  <body>
+    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+
+    <div class="container">
+      <h1 class="mb-2">Debt-to-Income (DTI) Calculator</h1>
+      <p class="text-muted mb-4">Calculate Front-End and Back-End DTI ratios for loan qualification. Industry standard calculations for mortgage underwriting.</p>
+
+      <!-- Section: Income Information -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseIncome" aria-expanded="true" aria-controls="collapseIncome">
+          <span><i class="bi-cash-stack mr-2"></i>Income Information</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseIncome">
+          <div class="row">
+            <div class="col-md-8"><label for="dti_gross_monthly" class="form-label">Gross Monthly Income</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_gross_monthly" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_annual_income" class="form-label">Or Annual Income (converts to monthly)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_annual_income" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_monthly_income_calc" class="form-label">Monthly Income (calculated)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="dti_monthly_income_calc" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Housing Costs -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseHousing" aria-expanded="true" aria-controls="collapseHousing">
+          <span><i class="bi-house mr-2"></i>Housing Costs (Front-End DTI)</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseHousing">
+          <div class="row">
+            <div class="col-md-8"><label for="dti_principal_interest" class="form-label">Principal & Interest (P&I)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_principal_interest" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_property_taxes" class="form-label">Property Taxes (Monthly)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_property_taxes" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_hazard_insurance" class="form-label">Hazard Insurance (Monthly)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_hazard_insurance" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_mortgage_insurance" class="form-label">Mortgage Insurance (MI/PMI) (Monthly)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_mortgage_insurance" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_hoa" class="form-label">HOA/Association Fees (Monthly)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_hoa" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_total_housing" class="form-label">Total Monthly Housing Payment</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="dti_total_housing" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_front_end" class="form-label">Front-End DTI Ratio</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control result dti-result" id="dti_front_end" readonly>
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+              <small id="dti_front_end_status" class="text-muted"></small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Monthly Debts -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseDebts" aria-expanded="true" aria-controls="collapseDebts">
+          <span><i class="bi-credit-card mr-2"></i>Monthly Debts (Back-End DTI)</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseDebts">
+          <div class="row">
+            <div class="col-md-8"><label for="dti_auto_loan" class="form-label">Auto Loan Payment</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_auto_loan" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_credit_cards" class="form-label">Credit Card Minimum Payments</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_credit_cards" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_student_loans" class="form-label">Student Loan Payments</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_student_loans" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_personal_loans" class="form-label">Personal Loan Payments</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_personal_loans" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_other_debts" class="form-label">Other Monthly Debt Payments</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="dti_other_debts" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_total_debts" class="form-label">Total Monthly Debts (excluding housing)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="dti_total_debts" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_total_monthly_payment" class="form-label">Total Monthly Payment (Housing + Debts)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="dti_total_monthly_payment" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_back_end" class="form-label">Back-End DTI Ratio</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control result dti-result" id="dti_back_end" readonly>
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+              <small id="dti_back_end_status" class="text-muted"></small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Results & Qualification -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseResults" aria-expanded="true" aria-controls="collapseResults">
+          <span><i class="bi-check-circle mr-2"></i>Qualification Results</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseResults">
+          <div class="info-box">
+            <strong>DTI Guidelines:</strong><br>
+            <small>
+              • <strong>Conventional:</strong> Front-End ≤ 28%, Back-End ≤ 36% (up to 45% with compensating factors)<br>
+              • <strong>FHA:</strong> Front-End ≤ 31%, Back-End ≤ 43% (up to 57% with compensating factors)<br>
+              • <strong>VA:</strong> Back-End typically ≤ 41% (no front-end requirement)<br>
+              • <strong>USDA:</strong> Front-End ≤ 29%, Back-End ≤ 41%
+            </small>
+          </div>
+          <div class="row mt-4">
+            <div class="col-md-8"><label for="dti_qualification_status" class="form-label">Qualification Status</label></div>
+            <div class="col-md-4">
+              <div id="dti_qualification_status" class="result" style="padding: 12px; text-align: center; border-radius: 8px; font-weight: 700;"></div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="dti_min_income_needed" class="form-label">Minimum Income Needed (based on total payment)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="dti_min_income_needed" readonly>
+              </div>
+              <small class="text-muted">Monthly income required for 43% Back-End DTI</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Use factory function to create DTI calculator configuration
+        const calc = new calculations(createDTICalculatorConfig());
+
+        // Handle manual entry of gross monthly income
+        const grossMonthlyInput = document.getElementById('dti_gross_monthly');
+        const monthlyIncomeCalc = document.getElementById('dti_monthly_income_calc');
+        const annualIncomeInput = document.getElementById('dti_annual_income');
+
+        grossMonthlyInput.addEventListener('input', function() {
+          const value = parseFloat(this.value) || 0;
+          monthlyIncomeCalc.value = Math.round(value * 100) / 100;
+          calc.recalculateAll();
+          updateDTIStatus();
+        });
+
+        annualIncomeInput.addEventListener('input', function() {
+          calc.recalculateAll();
+          updateDTIStatus();
+        });
+
+        // Update DTI status and colors
+        function updateDTIStatus() {
+          const frontEnd = parseFloat(document.getElementById('dti_front_end').value) || 0;
+          const backEnd = parseFloat(document.getElementById('dti_back_end').value) || 0;
+          const frontEndEl = document.getElementById('dti_front_end');
+          const backEndEl = document.getElementById('dti_back_end');
+          const frontEndStatus = document.getElementById('dti_front_end_status');
+          const backEndStatus = document.getElementById('dti_back_end_status');
+          const qualificationStatus = document.getElementById('dti_qualification_status');
+
+          // Front-End DTI Status
+          if (frontEnd <= 28) {
+            frontEndEl.className = 'form-control result dti-result dti-good';
+            frontEndStatus.textContent = '✓ Excellent (Conventional qualified)';
+            frontEndStatus.className = 'text-success';
+          } else if (frontEnd <= 31) {
+            frontEndEl.className = 'form-control result dti-result dti-warning';
+            frontEndStatus.textContent = '✓ Good (FHA qualified)';
+            frontEndStatus.className = 'text-warning';
+          } else {
+            frontEndEl.className = 'form-control result dti-result dti-danger';
+            frontEndStatus.textContent = '⚠ High (may need compensating factors)';
+            frontEndStatus.className = 'text-danger';
+          }
+
+          // Back-End DTI Status
+          if (backEnd <= 36) {
+            backEndEl.className = 'form-control result dti-result dti-good';
+            backEndStatus.textContent = '✓ Excellent (Conventional qualified)';
+            backEndStatus.className = 'text-success';
+          } else if (backEnd <= 43) {
+            backEndEl.className = 'form-control result dti-result dti-warning';
+            backEndStatus.textContent = '✓ Good (FHA qualified)';
+            backEndStatus.className = 'text-warning';
+          } else if (backEnd <= 50) {
+            backEndEl.className = 'form-control result dti-result dti-warning';
+            backEndStatus.textContent = '⚠ Acceptable (with compensating factors)';
+            backEndStatus.className = 'text-warning';
+          } else {
+            backEndEl.className = 'form-control result dti-result dti-danger';
+            backEndStatus.textContent = '✗ High (may not qualify)';
+            backEndStatus.className = 'text-danger';
+          }
+
+          // Overall Qualification Status
+          if (backEnd <= 36 && frontEnd <= 28) {
+            qualificationStatus.textContent = '✓ QUALIFIED - Conventional';
+            qualificationStatus.className = 'result dti-good';
+            qualificationStatus.style.background = '#d4edda';
+            qualificationStatus.style.border = '2px solid var(--success)';
+          } else if (backEnd <= 43 && frontEnd <= 31) {
+            qualificationStatus.textContent = '✓ QUALIFIED - FHA';
+            qualificationStatus.className = 'result dti-warning';
+            qualificationStatus.style.background = '#fff3cd';
+            qualificationStatus.style.border = '2px solid var(--warning)';
+          } else if (backEnd <= 50) {
+            qualificationStatus.textContent = '⚠ MAY QUALIFY - With Compensating Factors';
+            qualificationStatus.className = 'result dti-warning';
+            qualificationStatus.style.background = '#fff3cd';
+            qualificationStatus.style.border = '2px solid var(--warning)';
+          } else {
+            qualificationStatus.textContent = '✗ MAY NOT QUALIFY';
+            qualificationStatus.className = 'result dti-danger';
+            qualificationStatus.style.background = '#f8d7da';
+            qualificationStatus.style.border = '2px solid var(--danger)';
+          }
+        }
+
+        // Watch for changes
+        ['dti_front_end', 'dti_back_end'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('input', updateDTIStatus);
+            setInterval(updateDTIStatus, 500);
+          }
+        });
+
+        // Format currency inputs
+        ['dti_gross_monthly', 'dti_annual_income', 'dti_principal_interest', 'dti_property_taxes', 'dti_hazard_insurance', 
+         'dti_mortgage_insurance', 'dti_hoa', 'dti_auto_loan', 'dti_credit_cards', 'dti_student_loans', 
+         'dti_personal_loans', 'dti_other_debts'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('blur', function() {
+              const value = parseFloat(this.value);
+              if (!isNaN(value)) {
+                this.value = Math.round(value * 100) / 100;
+              }
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
+

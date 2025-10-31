@@ -1,5 +1,45 @@
-// Quick Actions Floating Menu (FAB)
-// Always accessible shortcuts to common actions
+/**
+ * Quick Actions Floating Menu (FAB)
+ * 
+ * @file       quick-actions.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Floating Action Button (FAB) menu providing always-accessible shortcuts
+ * to common actions throughout the application. Positioned in bottom-right
+ * corner with expandable menu of quick action buttons.
+ * 
+ * Features:
+ * - Floating action button with expandable menu
+ * - Always accessible from any page
+ * - Quick shortcuts to common actions
+ * - Smooth animations and transitions
+ * - Icon-based action buttons
+ * - Auto-collapse on action selection
+ * 
+ * Actions:
+ * - Navigation shortcuts
+ * - Common tool access
+ * - Quick settings access
+ * - Customizable action set
+ * 
+ * Technical Implementation:
+ * - Fixed positioning (bottom-right)
+ * - CSS transitions for smooth animations
+ * - Event delegation for action clicks
+ * - Dynamic HTML injection
+ * - Z-index management for layering
+ * 
+ * Positioning:
+ * - Default: bottom-right corner
+ * - Offset from bottom: 170px (to avoid voice widget)
+ * - Right offset: 20px
+ * - Z-index: 998 (below modals)
+ * 
+ * ==============================================================================
+ */
 
 const quickActionsHTML = `
 <style>

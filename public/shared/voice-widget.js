@@ -1,5 +1,51 @@
-// Global Voice Activation Widget
-// Add voice control to any page with a floating mic button
+/**
+ * Global Voice Activation Widget
+ * 
+ * @file       voice-widget.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Global voice control widget that adds voice activation capabilities to any
+ * page with a floating microphone button. Provides hands-free navigation and
+ * command execution through speech recognition API.
+ * 
+ * Features:
+ * - Floating microphone button (customizable position)
+ * - Speech recognition integration
+ * - Customizable command handlers
+ * - Multiple theme options (blue, green, gold)
+ * - Visual feedback during listening
+ * - Command execution callbacks
+ * 
+ * Configuration:
+ * - Position: bottom-right, bottom-left, top-right, top-left
+ * - Theme: blue, green, gold
+ * - Button size: customizable
+ * - Custom command handler function
+ * 
+ * Technical Implementation:
+ * - Web Speech API (SpeechRecognition)
+ * - Floating action button (FAB) pattern
+ * - CSS animations for visual feedback
+ * - Event-driven command processing
+ * - Browser compatibility handling
+ * 
+ * Browser Support:
+ * - Requires Web Speech API support
+ * - Chrome, Edge (Chromium), Safari
+ * - Fallback messaging for unsupported browsers
+ * 
+ * Usage:
+ * const widget = new VoiceWidget({
+ *   position: 'bottom-right',
+ *   theme: 'blue',
+ *   onCommand: (command) => { /* handle command */ }
+ * });
+ * 
+ * ==============================================================================
+ */
 
 class VoiceWidget {
   constructor(options = {}) {

@@ -1,3 +1,42 @@
+/**
+ * Tool Card Animation and Interaction Scripts
+ * 
+ * @file       scripts.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Provides enhanced animations and interactive effects for tool cards
+ * on the main dashboard. Includes staggered card animations, ripple effects
+ * on click, and smooth hover transitions for improved user experience.
+ * 
+ * Features:
+ * - Staggered card entrance animations
+ * - Ripple effect on card click interactions
+ * - Smooth hover transitions
+ * - Enhanced visual feedback for user interactions
+ * - Zen-style radial gradient ripple effects
+ * 
+ * Animation Details:
+ * - Cards animate in sequence with 120ms delay between each
+ * - Ripple effect creates expanding circle on click
+ * - Gradient-based visual feedback
+ * - CSS transform and opacity transitions
+ * 
+ * Technical Implementation:
+ * - DOMContentLoaded event listener for initialization
+ * - Dynamic style injection for ripple effects
+ * - Event delegation for card interactions
+ * - CSS custom properties for theming
+ * 
+ * Usage:
+ * Automatically initializes when page loads. Targets all elements
+ * with '.tool-card' class.
+ * 
+ * ==============================================================================
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
   const cards = document.querySelectorAll('.tool-card');
   cards.forEach((card, i) => {

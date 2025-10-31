@@ -1,5 +1,47 @@
-// Multi-User System for piBoom Collections
-// 5 users with their own collections, all can view all
+/**
+ * Multi-User System for piBoom Collections
+ * 
+ * @file       user-selector.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Multi-user collection management system supporting 5 users, each with their
+ * own collections. All users can view all collections, but can only edit their
+ * own. Provides user switching, collection filtering, and user-specific data
+ * management.
+ * 
+ * Features:
+ * - 5 distinct user accounts with avatars
+ * - User-specific collection ownership
+ * - Global collection visibility (all users can view all)
+ * - Edit permissions (users can only edit their own)
+ * - User switching interface
+ * - Collection filtering by user
+ * - Color-coded user identification
+ * 
+ * User Accounts:
+ * - cosmic-turtle: The Cosmic Turtle (turquoise)
+ * - wizened-wizard: The Wizened Wizard (purple)
+ * - jerry-garcia: Jerry Garcia (red)
+ * - easy-levi: Easy Levi (green)
+ * - fuzz-maestro: The Fuzz Maestro (gold)
+ * 
+ * Technical Implementation:
+ * - Array-based user database
+ * - localStorage for current user selection
+ * - Collection filtering logic
+ * - Permission checking for edit operations
+ * - UI rendering for user selection
+ * 
+ * Collection Permissions:
+ * - View: All users can view all collections
+ * - Edit: Users can only edit collections they own
+ * - Create: Users can create new collections
+ * 
+ * ==============================================================================
+ */
 
 const USERS = [
   {

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amortization Schedule Generator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --secondary: #6B9E78;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+      }
+      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
+      .nav-home { right: 20px; }
+      .nav-finance { right: 170px; }
+      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
+      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 1400px; }
+      .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
+      .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
+      .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
+      .form-label { font-weight: 500; }
+      .input-group-text { background: #F1F5F9; border-color: var(--border); }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .summary-card { background: linear-gradient(135deg, #E8F4F8 0%, #F0F8F0 100%); border: 2px solid var(--primary); padding: 20px; border-radius: 12px; margin-bottom: 24px; }
+      .summary-card h4 { color: var(--primary); margin-bottom: 16px; }
+      .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(74, 144, 164, 0.2); }
+      .summary-row:last-child { border-bottom: none; font-weight: 700; font-size: 1.1rem; }
+      #amortizationTable { margin-top: 20px; }
+      .principal-highlight { background-color: #d4edda !important; }
+      .interest-highlight { background-color: #fff3cd !important; }
+    </style>
+  </head>
+  <body>
+    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+
+    <div class="container">
+      <h1 class="mb-2">Amortization Schedule Generator</h1>
+      <p class="text-muted mb-4">Generate full payment breakdown over loan term showing principal vs. interest breakdown and impact of extra payments.</p>
+
+      <!-- Section: Loan Information -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseLoan" aria-expanded="true" aria-controls="collapseLoan">
+          <span><i class="bi-info-circle mr-2"></i>Loan Information</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseLoan">
+          <div class="row">
+            <div class="col-md-4">
+              <label for="amort_loan_amount" class="form-label">Loan Amount</label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="amort_loan_amount" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="amort_interest_rate" class="form-label">Annual Interest Rate (%)</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="amort_interest_rate" placeholder="0.00" min="0" max="100" step="0.01">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="amort_term_years" class="form-label">Loan Term (Years)</label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="amort_term_years" placeholder="30" min="1" max="50" step="1">
+                <div class="input-group-append"><span class="input-group-text">years</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-4">
+              <label for="amort_extra_payment" class="form-label">Extra Payment per Month (Optional)</label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="amort_extra_payment" placeholder="0.00" min="0" step="0.01" value="0">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="amort_start_date" class="form-label">Loan Start Date</label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text"><i class="bi-calendar"></i></span></div>
+                <input type="date" class="form-control" id="amort_start_date">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <label for="amort_monthly_payment" class="form-label">Monthly Payment (P&I)</label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="amort_monthly_payment" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <button class="btn btn-primary btn-lg" id="generateScheduleBtn" onclick="generateAmortizationSchedule()">
+                <i class="bi-calculator"></i> Generate Amortization Schedule
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Payment Summary -->
+      <div class="summary-card" id="summaryCard" style="display: none;">
+        <h4><i class="bi-graph-up mr-2"></i>Payment Summary</h4>
+        <div class="summary-row">
+          <span>Total Payments:</span>
+          <span id="summary_total_payments">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Total Principal:</span>
+          <span id="summary_total_principal">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Total Interest:</span>
+          <span id="summary_total_interest">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Time Saved:</span>
+          <span id="summary_time_saved">0 months</span>
+        </div>
+        <div class="summary-row">
+          <span>Interest Saved:</span>
+          <span id="summary_interest_saved">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Section: Amortization Schedule Table -->
+      <div class="calculator-card" id="scheduleCard" style="display: none;">
+        <h3>
+          <span><i class="bi-table mr-2"></i>Amortization Schedule</span>
+        </h3>
+        <div class="card-content">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover" id="amortizationTable">
+              <thead>
+                <tr>
+                  <th>Payment #</th>
+                  <th>Date</th>
+                  <th>Payment</th>
+                  <th>Principal</th>
+                  <th>Interest</th>
+                  <th>Extra Payment</th>
+                  <th>Remaining Balance</th>
+                </tr>
+              </thead>
+              <tbody id="amortizationTableBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+      let amortizationTable = null;
+
+      function calculateMonthlyPayment(principal, annualRate, years) {
+        if (!principal || !annualRate || !years) return 0;
+        const monthlyRate = annualRate / 100 / 12;
+        const numPayments = years * 12;
+        if (monthlyRate === 0) return principal / numPayments;
+        return principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+               (Math.pow(1 + monthlyRate, numPayments) - 1);
+      }
+
+      function calculatePayment() {
+        const principal = parseFloat(document.getElementById('amort_loan_amount').value) || 0;
+        const rate = parseFloat(document.getElementById('amort_interest_rate').value) || 0;
+        const years = parseFloat(document.getElementById('amort_term_years').value) || 30;
+        const payment = calculateMonthlyPayment(principal, rate, years);
+        document.getElementById('amort_monthly_payment').value = Math.round(payment * 100) / 100;
+      }
+
+      function generateAmortizationSchedule() {
+        const principal = parseFloat(document.getElementById('amort_loan_amount').value) || 0;
+        const annualRate = parseFloat(document.getElementById('amort_interest_rate').value) || 0;
+        const years = parseFloat(document.getElementById('amort_term_years').value) || 30;
+        const extraPayment = parseFloat(document.getElementById('amort_extra_payment').value) || 0;
+        const startDateStr = document.getElementById('amort_start_date').value || new Date().toISOString().split('T')[0];
+
+        if (!principal || !annualRate || !years) {
+          alert('Please enter loan amount, interest rate, and term.');
+          return;
+        }
+
+        const monthlyRate = annualRate / 100 / 12;
+        const numPayments = years * 12;
+        const basePayment = calculateMonthlyPayment(principal, annualRate, years);
+        const totalPayment = basePayment + extraPayment;
+
+        let balance = principal;
+        let totalPaid = 0;
+        let totalPrincipal = 0;
+        let totalInterest = 0;
+        let schedule = [];
+        const startDate = new Date(startDateStr);
+
+        // Calculate schedule without extra payments first
+        let standardTotalInterest = 0;
+        let standardBalance = principal;
+        for (let i = 0; i < numPayments; i++) {
+          const interestPayment = standardBalance * monthlyRate;
+          const principalPayment = basePayment - interestPayment;
+          standardTotalInterest += interestPayment;
+          standardBalance -= principalPayment;
+          if (standardBalance <= 0) break;
+        }
+
+        // Calculate schedule with extra payments
+        let paymentNum = 1;
+        while (balance > 0.01 && paymentNum <= numPayments * 2) {
+          const interestPayment = balance * monthlyRate;
+          let principalPayment = Math.min(basePayment - interestPayment, balance);
+          const actualExtraPayment = Math.min(extraPayment, balance - principalPayment);
+          
+          if (principalPayment < 0) principalPayment = 0;
+          
+          balance -= (principalPayment + actualExtraPayment);
+          if (balance < 0) balance = 0;
+
+          const paymentDate = new Date(startDate);
+          paymentDate.setMonth(paymentDate.getMonth() + (paymentNum - 1));
+
+          schedule.push({
+            paymentNum: paymentNum,
+            date: paymentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+            payment: basePayment.toFixed(2),
+            principal: principalPayment.toFixed(2),
+            interest: interestPayment.toFixed(2),
+            extraPayment: actualExtraPayment.toFixed(2),
+            balance: balance.toFixed(2)
+          });
+
+          totalPaid += (basePayment + actualExtraPayment);
+          totalPrincipal += (principalPayment + actualExtraPayment);
+          totalInterest += interestPayment;
+
+          paymentNum++;
+          if (balance <= 0) break;
+        }
+
+        // Update summary
+        document.getElementById('summary_total_payments').textContent = '$' + totalPaid.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('summary_total_principal').textContent = '$' + totalPrincipal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('summary_total_interest').textContent = '$' + totalInterest.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        
+        const timeSaved = extraPayment > 0 ? (numPayments - (paymentNum - 1)) : 0;
+        document.getElementById('summary_time_saved').textContent = timeSaved + ' months';
+        
+        const interestSaved = standardTotalInterest - totalInterest;
+        document.getElementById('summary_interest_saved').textContent = '$' + interestSaved.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        // Display summary and table
+        document.getElementById('summaryCard').style.display = 'block';
+        document.getElementById('scheduleCard').style.display = 'block';
+
+        // Populate table
+        const tbody = document.getElementById('amortizationTableBody');
+        tbody.innerHTML = '';
+        schedule.forEach(row => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row.paymentNum}</td>
+            <td>${row.date}</td>
+            <td>$${parseFloat(row.payment).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>$${parseFloat(row.principal).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>$${parseFloat(row.interest).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>$${parseFloat(row.extraPayment).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            <td>$${parseFloat(row.balance).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // Initialize DataTable if not already done
+        if (amortizationTable) {
+          amortizationTable.destroy();
+        }
+        amortizationTable = $('#amortizationTable').DataTable({
+          pageLength: 25,
+          order: [[0, 'asc']],
+          responsive: true
+        });
+      }
+
+      // Calculate payment on input
+      ['amort_loan_amount', 'amort_interest_rate', 'amort_term_years'].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+          input.addEventListener('input', calculatePayment);
+        }
+      });
+
+      // Set default date to today
+      document.getElementById('amort_start_date').value = new Date().toISOString().split('T')[0];
+
+      // Initial calculation
+      calculatePayment();
+    </script>
+  </body>
+</html>
+

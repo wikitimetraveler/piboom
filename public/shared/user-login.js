@@ -1,5 +1,46 @@
-// Global User Login System
-// Popup with 5 user icons for one-time login across all pages
+/**
+ * Global User Login System
+ * 
+ * @file       user-login.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Global user authentication system with icon-based login interface.
+ * Provides a one-time login popup with 5 user icons for authentication
+ * across all pages. Stores login state in sessionStorage and displays
+ * user information throughout the application.
+ * 
+ * Features:
+ * - Icon-based user selection interface
+ * - Password-protected user accounts
+ * - Session persistence across pages
+ * - User avatar and name display
+ * - Logout functionality
+ * - Login modal popup system
+ * 
+ * User Accounts:
+ * - cosmic-turtle: Dufus
+ * - wizened-wizard: Giraffe Pizza
+ * - jerry-garcia: Fooze
+ * - easy-levi: Zip Knot
+ * - fuzz-maestro: Fly Dog
+ * 
+ * Technical Implementation:
+ * - Password validation against predefined user database
+ * - SessionStorage for login state persistence
+ * - Modal popup UI with animated transitions
+ * - User avatar and name rendering
+ * - Event-driven authentication flow
+ * 
+ * Security Notes:
+ * - Passwords stored in client-side code (for demo purposes)
+ * - Session-based authentication (cleared on browser close)
+ * - No server-side validation in current implementation
+ * 
+ * ==============================================================================
+ */
 
 const USER_PASSWORDS = {
   'cosmic-turtle': 'Dufus',

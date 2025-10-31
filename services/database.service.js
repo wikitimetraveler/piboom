@@ -1,3 +1,52 @@
+/**
+ * Database Service - Connection Pool Manager
+ * 
+ * @file       database.service.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Centralized database connection pool management service using PostgreSQL.
+ * Provides singleton pattern for database connections, connection pooling,
+ * and graceful initialization with environment variable configuration.
+ * 
+ * Features:
+ * - PostgreSQL connection pooling via pg library
+ * - Singleton pattern for connection reuse
+ * - Environment-based configuration (DATABASE_URL)
+ * - Graceful initialization (continues without database if not configured)
+ * - Connection lifecycle management
+ * - Error handling for database operations
+ * 
+ * Configuration:
+ * - DATABASE_URL environment variable for connection string
+ * - Optional SSL configuration
+ * - Connection pool sizing and timeouts
+ * 
+ * Technical Implementation:
+ * - Uses pg (node-postgres) library
+ * - Pool-based connection management
+ * - Lazy initialization pattern
+ * - Export functions for database access
+ * 
+ * Usage:
+ * - Initialize: initializeDatabase()
+ * - Get pool: getPool()
+ * - Close connections: closePool()
+ * 
+ * Error Handling:
+ * - Gracefully handles missing DATABASE_URL
+ * - Returns null pool when database unavailable
+ * - Continues application execution without database
+ * 
+ * @dependencies
+ * - pg (node-postgres)
+ * - Environment variable: DATABASE_URL
+ * 
+ * ==============================================================================
+ */
+
 import pg from 'pg';
 const { Pool } = pg;
 

@@ -1,10 +1,155 @@
+/**
+ * Disaster Risk Service
+ * 
+ * @file       disaster-risk.service.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Service module for disaster risk assessment, FEMA API integration, and
+ * geographic risk visualization. Calculates disaster risk scores for loan
+ * properties based on historical disaster data, generates KML files for
+ * Google Earth visualization, and provides county-level risk assessment.
+ * 
+ * Features:
+ * - FEMA API integration for disaster declarations
+ * - Disaster risk scoring algorithm
+ * - Reverse geocoding for county/state lookup
+ * - KML file generation for Google Earth
+ * - County-level disaster history analysis
+ * - Loan risk assessment and scoring
+ * - Geographic coordinate processing
+ * 
+ * Risk Assessment:
+ * - Historical disaster frequency analysis
+ * - Disaster severity weighting
+ * - Time-based decay for older disasters
+ * - County and state-level risk aggregation
+ * - Loan property risk scoring
+ * 
+ * FEMA Integration:
+ * - FEMA disaster declaration API
+ * - Disaster type categorization
+ * - Date range filtering
+ * - Geographic region queries
+ * 
+ * KML Generation:
+ * - Google Earth compatible format
+ * - Coordinate plotting
+ * - Disaster event markers
+ * - Risk heat map visualization
+ * 
+ * Technical Implementation:
+ * - PostgreSQL database integration
+ * - Google Maps Geocoding API
+ * - HTTP client for FEMA API
+ * - XML/KML generation
+ * - Coordinate transformation
+ * 
+ * Integration:
+ * - Integrates with database.service.js for data persistence
+ * - Uses loan-pipeline.service.js for loan risk updates
+ * - FEMA public API endpoints
+ * 
+ * @dependencies
+ * - database.service.js (getPool)
+ * - loan-pipeline.service.js (getAllLoans, updateLoanRiskScore)
+ * - Google Maps Geocoding API
+ * - FEMA Disaster Declarations API
+ * 
+ * ==============================================================================
+ */
+
 import { getPool } from './database.service.js';
 import { getAllLoans, updateLoanRiskScore } from './loan-pipeline.service.js';
 
 /**
- * Disaster Risk Service
- * Handles FEMA API integration, risk scoring, and KML generation
+ * Geocode an address using Google Maps API with validation
+ * @param {string} address - Full address string
+ * @param {string} expectedState - Expected state abbreviation (optional, for validation)
+ * @param {string} expectedCounty - Expected county name (optional, for validation)
+ * @returns {Promise<Object>} Object with latitude, longitude, and validation info
  */
+async function geocodeAddressValidated(address, expectedState = null, expectedCounty = null) {
+  const apiKey = process.env.GOOGLE_API_KEY;
+  if (!apiKey) {
+    console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');
+    return { latitude: null, longitude: null, validated: false };
+  }
+
+  try {
+    // If we have expected state, try geocoding without zip code first (zip codes can cause mismatches)
+    let url;
+    const addressWithoutZip = address.replace(/\s+\d{5}(-\d{4})?$/, '').trim();
+    
+    if (expectedState) {
+      // Remove zip code from address if present to avoid zip code mismatches
+      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addressWithoutZip)}&key=${apiKey}&region=us`;
+    } else {
+      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+    }
+    
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.status === 'OK' && data.results.length > 0) {
+      // Try to find a result that matches the expected state/county
+      let bestResult = data.results[0];
+      let validated = false;
+      
+      for (const result of data.results) {
+        const addressComponents = result.address_components || [];
+        const stateComp = addressComponents.find(c => c.types.includes('administrative_area_level_1'));
+        const stateShort = stateComp ? stateComp.short_name : null;
+        
+        if (expectedState && stateShort && stateShort.toUpperCase() === expectedState.toUpperCase()) {
+          bestResult = result;
+          validated = true;
+          
+          if (expectedCounty) {
+            const countyComp = addressComponents.find(c => 
+              c.types.includes('administrative_area_level_2')
+            );
+            if (countyComp) {
+              const countyName = countyComp.long_name.replace(/\s*County$/i, '').trim();
+              if (countyName.toLowerCase().includes(expectedCounty.toLowerCase()) ||
+                  expectedCounty.toLowerCase().includes(countyName.toLowerCase())) {
+                validated = true;
+              } else {
+                validated = false;
+              }
+            }
+          }
+          break;
+        }
+      }
+      
+      // If no match found but we have expected state, reject the result
+      if (expectedState && !validated) {
+        const addressComponents = bestResult.address_components || [];
+        const stateComp = addressComponents.find(c => c.types.includes('administrative_area_level_1'));
+        const actualState = stateComp ? stateComp.short_name : 'unknown';
+        console.warn(`⚠️  Geocoding mismatch: Expected ${expectedState}, got ${actualState} for: ${address}`);
+        console.warn(`   Rejecting this result to prevent incorrect mapping`);
+        return { latitude: null, longitude: null, validated: false };
+      }
+      
+      const location = bestResult.geometry.location;
+      return {
+        latitude: location.lat,
+        longitude: location.lng,
+        validated: validated || !expectedState
+      };
+    } else {
+      console.warn(`⚠️  Geocoding failed for: ${address} (Status: ${data.status})`);
+      return { latitude: null, longitude: null, validated: false };
+    }
+  } catch (error) {
+    console.error(`❌ Geocoding error for ${address}:`, error.message);
+    return { latitude: null, longitude: null, validated: false };
+  }
+}
 
 /**
  * Geocode an address using Google Maps API
@@ -111,7 +256,9 @@ export async function analyzeLoanRisk(loan) {
     if (!loan.latitude || !loan.longitude) {
       console.log(`🌍 Geocoding loan ${loan.loan_number}...`);
       const fullAddress = `${loan.property_address}, ${loan.city}, ${loan.state} ${loan.zip_code || ''}`;
-      const coords = await geocodeAddress(fullAddress);
+      
+      // Use improved geocoding with validation
+      const coords = await geocodeAddressValidated(fullAddress, loan.state, loan.county);
       
       if (coords.latitude && coords.longitude) {
         // Update loan coordinates

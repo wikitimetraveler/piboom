@@ -386,23 +386,27 @@ export async function geocodeLoans(req, res) {
 export async function queryFEMADirect(req, res) {
   try {
     const { state, county } = req.query;
-
-    // Calculate date 30 days ago (real-time only view)
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setDate(oneMonthAgo.getDate() - 30);
-    const oneMonthAgoStr = oneMonthAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    
+    // Calculate date 6 months ago (expanded from 30 days)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
     // Use FEMA API v2 (like tool3) for better compatibility
-    // Filter for last year only (pipeline loans concern)
+    // Filter for last 6 months
     const femaDisasterDeclUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
     const filters = [];
     if (state) filters.push(`state eq '${state}'`);
     if (county) filters.push(`designatedArea eq '${county} (County)'`);
-    filters.push(`incidentBeginDate ge ${oneMonthAgoStr}`);
+    filters.push(`incidentBeginDate ge ${sixMonthsAgoStr}`);
     const filterParams = `$count=true&$top=1000&$filter=${filters.join(' and ')}`;
-
+    
+    console.log(`🌐 Querying FEMA API: state=${state || 'ALL'}, county=${county || 'ALL'}, since=${sixMonthsAgoStr}`);
+    
     const response = await fetch(`${femaDisasterDeclUrl}?${filterParams}`);
     const disasterDeclResults = await response.json();
+    
+    console.log(`📊 FEMA API returned ${disasterDeclResults.metadata?.count || 0} total records`);
 
     // Import geocoding function
     const geocodeCountyState = async (county, state) => {
@@ -428,16 +432,20 @@ export async function queryFEMADirect(req, res) {
     if (disasterDeclResults.metadata && disasterDeclResults.metadata.count > 0) {
       let disasters = disasterDeclResults.DisasterDeclarationsSummaries || [];
       
-      // Additional filter to ensure we only get last 30 days
-      const lastMonthDate = new Date(oneMonthAgoStr);
+      console.log(`📋 Processing ${disasters.length} disaster records`);
+      
+      // Additional filter to ensure we only get last 6 months
+      const sixMonthsDate = new Date(sixMonthsAgoStr);
       disasters = disasters.filter(item => {
         if (item.incidentBeginDate) {
           const disasterDate = new Date(item.incidentBeginDate);
-          return disasterDate >= lastMonthDate;
+          return disasterDate >= sixMonthsDate;
         }
         return false;
       });
-
+      
+      console.log(`✅ After date filter: ${disasters.length} disasters`);
+      
       // Geocode all disasters
       const geocodedDisasters = await Promise.all(disasters.map(async (item, index) => {
         // Rate limit geocoding
@@ -473,7 +481,7 @@ export async function queryFEMADirect(req, res) {
         data: {
           disasters: geocodedDisasters,
           count: geocodedDisasters.length,
-          filterSince: oneMonthAgoStr
+          filterSince: sixMonthsAgoStr
         }
       });
     } else {

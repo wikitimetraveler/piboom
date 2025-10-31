@@ -353,9 +353,9 @@
             </div>
         </div>
 
-        <!-- FEMA Disasters as Top Level -->
-        <div class="row">
-            <div class="col-md-8">
+        <!-- Section 1: FEMA Disasters (12 columns) -->
+        <div class="row mb-4">
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> FEMA Disaster Declarations</h5>
@@ -388,12 +388,51 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Encompass Loans (shown when FEMA disaster is selected) -->
-                <div class="card mt-3" id="encompassLoansCard" style="display: none;">
+        <!-- Section 2: Map and YouTube Side by Side (6 columns each) -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Disaster Areas & Loan Properties</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="map" style="height: 500px; width: 100%;"></div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                <span class="badge bg-danger me-1">●</span> Disaster Areas<br>
+                                <span class="badge bg-primary me-1">●</span> Loan Properties
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-youtube"></i> Disaster Videos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="youtubeResults">
+                            <div class="text-center text-muted">
+                                <i class="bi bi-youtube"></i><br>
+                                Click on a FEMA disaster to search for related videos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Encompass Loans (12 columns) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card" id="encompassLoansCard" style="display: none;">
                     <div class="card-header">
                         <h5 class="mb-0"><i class="bi bi-bank"></i> Encompass Loans in Affected County</h5>
-                        <small class="text-muted" id="encompassLoansSubtitle">Loans affected by selected disaster</small>
+                        <small class="text-muted" id="encompassLoansSubtitle">Loans affected by selected disaster (click loan to focus map)</small>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -417,38 +456,6 @@
                                     <!-- Encompass loan data will be loaded here -->
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <!-- Google Maps Integration -->
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Disaster Areas & Loan Properties</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="map" style="height: 300px; width: 100%;"></div>
-                        <div class="mt-2">
-                            <small class="text-muted">
-                                <span class="badge bg-danger me-1">●</span> Disaster Areas<br>
-                                <span class="badge bg-primary me-1">●</span> Loan Properties
-                            </small>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- YouTube Integration -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-youtube"></i> Disaster Videos</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="youtubeResults">
-                            <div class="text-center text-muted">
-                                <i class="bi bi-youtube"></i><br>
-                                Click on a FEMA disaster to search for related videos
-                            </div>
                         </div>
                     </div>
                 </div>

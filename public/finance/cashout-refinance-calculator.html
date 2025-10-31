@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cash-Out Refinance Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="../shared/calculations.js"></script>
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --secondary: #6B9E78;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+        --success: #28a745;
+        --warning: #ffc107;
+      }
+      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
+      .nav-home { right: 20px; }
+      .nav-finance { right: 170px; }
+      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
+      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 1000px; }
+      .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
+      .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
+      .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
+      .form-label { font-weight: 500; }
+      .input-group-text { background: #F1F5F9; border-color: var(--border); }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .highlight-result { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+      .info-box { background: #E8F4F8; border-left: 4px solid var(--primary); padding: 12px; margin-top: 12px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+
+    <div class="container">
+      <h1 class="mb-2">Cash-Out Refinance Calculator</h1>
+      <p class="text-muted mb-4">Calculate maximum cash-out amount, new payment, and compare savings. Includes tax implications analysis.</p>
+
+      <!-- Section: Current Mortgage -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseCurrent" aria-expanded="true" aria-controls="collapseCurrent">
+          <span><i class="bi-house mr-2"></i>Current Mortgage Information</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseCurrent">
+          <div class="row">
+            <div class="col-md-8"><label for="cashout_current_balance" class="form-label">Current Mortgage Balance</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="cashout_current_balance" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_current_payment" class="form-label">Current Monthly Payment</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="cashout_current_payment" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_current_rate" class="form-label">Current Interest Rate (%)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="cashout_current_rate" placeholder="0.00" min="0" max="100" step="0.01">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Property & New Loan -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseProperty" aria-expanded="true" aria-controls="collapseProperty">
+          <span><i class="bi-building mr-2"></i>Property & New Loan Details</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseProperty">
+          <div class="row">
+            <div class="col-md-8"><label for="cashout_property_value" class="form-label">Current Property Value</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="cashout_property_value" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_new_rate" class="form-label">New Interest Rate (%)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="cashout_new_rate" placeholder="0.00" min="0" max="100" step="0.01">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_new_term" class="form-label">New Loan Term (Years)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="cashout_new_term" placeholder="30" min="1" max="50" step="1">
+                <div class="input-group-append"><span class="input-group-text">years</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_max_ltv" class="form-label">Maximum LTV Allowed (%)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="cashout_max_ltv" placeholder="80" min="0" max="100" step="0.01" value="80">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+              <small class="text-muted">Typically 80% for conventional, 85% for FHA</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Closing Costs -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseCosts" aria-expanded="true" aria-controls="collapseCosts">
+          <span><i class="bi-receipt mr-2"></i>Closing Costs & Fees</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseCosts">
+          <div class="row">
+            <div class="col-md-8"><label for="cashout_closing_costs" class="form-label">Total Closing Costs</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="cashout_closing_costs" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_prepaid_items" class="form-label">Prepaid Items (Escrow, Taxes, Insurance)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="cashout_prepaid_items" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_total_costs" class="form-label">Total Costs (Closing + Prepaid)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="cashout_total_costs" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Cash-Out Calculations -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseCalculations" aria-expanded="true" aria-controls="collapseCalculations">
+          <span><i class="bi-calculator mr-2"></i>Cash-Out Calculations</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseCalculations">
+          <div class="row">
+            <div class="col-md-8"><label for="cashout_max_loan_amount" class="form-label">Maximum Loan Amount (Property Value × Max LTV)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="cashout_max_loan_amount" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_new_loan_amount" class="form-label">New Loan Amount (Current Balance + Cash-Out + Costs)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="cashout_new_loan_amount" placeholder="0.00" min="0" step="0.01">
+              </div>
+              <small class="text-muted">Adjust to see cash-out amount</small>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_cash_out_amount" class="form-label">Cash-Out Amount</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result highlight-result" id="cashout_cash_out_amount" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_new_monthly_payment" class="form-label">New Monthly Payment (P&I)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="cashout_new_monthly_payment" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_payment_change" class="form-label">Payment Change (vs Current)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="cashout_payment_change" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Tax Implications -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseTax" aria-expanded="true" aria-controls="collapseTax">
+          <span><i class="bi-receipt-cutoff mr-2"></i>Tax Implications</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseTax">
+          <div class="info-box">
+            <strong>Tax Considerations:</strong><br>
+            <small>
+              • Interest on cash-out refinance may be tax-deductible if used for home improvements<br>
+              • Consult a tax advisor for specific tax implications<br>
+              • Deductible interest is subject to loan limits and usage restrictions
+            </small>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_annual_interest" class="form-label">Estimated Annual Interest (First Year)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="cashout_annual_interest" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_marginal_tax_rate" class="form-label">Marginal Tax Rate (%)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="cashout_marginal_tax_rate" placeholder="22" min="0" max="50" step="0.1" value="22">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="cashout_tax_savings" class="form-label">Potential Tax Savings (Annual)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="cashout_tax_savings" readonly>
+              </div>
+              <small class="text-muted">If interest is deductible</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Calculate mortgage payment (P&I)
+        function calculateMortgagePayment(principal, annualRate, years) {
+          if (!principal || !annualRate || !years) return 0;
+          const monthlyRate = annualRate / 100 / 12;
+          const numPayments = years * 12;
+          if (monthlyRate === 0) return principal / numPayments;
+          const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                         (Math.pow(1 + monthlyRate, numPayments) - 1);
+          return payment;
+        }
+
+        // Calculate all values
+        function calculateCashOut() {
+          const currentBalance = parseFloat(document.getElementById('cashout_current_balance').value) || 0;
+          const currentPayment = parseFloat(document.getElementById('cashout_current_payment').value) || 0;
+          const propertyValue = parseFloat(document.getElementById('cashout_property_value').value) || 0;
+          const newRate = parseFloat(document.getElementById('cashout_new_rate').value) || 0;
+          const newTerm = parseFloat(document.getElementById('cashout_new_term').value) || 30;
+          const maxLTV = parseFloat(document.getElementById('cashout_max_ltv').value) || 80;
+          const closingCosts = parseFloat(document.getElementById('cashout_closing_costs').value) || 0;
+          const prepaidItems = parseFloat(document.getElementById('cashout_prepaid_items').value) || 0;
+          const newLoanAmount = parseFloat(document.getElementById('cashout_new_loan_amount').value) || 0;
+          const marginalTaxRate = parseFloat(document.getElementById('cashout_marginal_tax_rate').value) || 22;
+
+          // Total costs
+          const totalCosts = closingCosts + prepaidItems;
+          document.getElementById('cashout_total_costs').value = Math.round(totalCosts * 100) / 100;
+
+          // Maximum loan amount
+          const maxLoanAmount = propertyValue * (maxLTV / 100);
+          document.getElementById('cashout_max_loan_amount').value = Math.round(maxLoanAmount * 100) / 100;
+
+          // Cash-out amount = New Loan - Current Balance - Total Costs
+          const cashOutAmount = newLoanAmount > 0 ? newLoanAmount - currentBalance - totalCosts : 0;
+          document.getElementById('cashout_cash_out_amount').value = Math.round(cashOutAmount * 100) / 100;
+
+          // New monthly payment
+          const newPayment = calculateMortgagePayment(newLoanAmount, newRate, newTerm);
+          document.getElementById('cashout_new_monthly_payment').value = Math.round(newPayment * 100) / 100;
+
+          // Payment change
+          const paymentChange = newPayment - currentPayment;
+          document.getElementById('cashout_payment_change').value = Math.round(paymentChange * 100) / 100;
+
+          // Annual interest (first year approximation)
+          const annualInterest = newLoanAmount * (newRate / 100);
+          document.getElementById('cashout_annual_interest').value = Math.round(annualInterest * 100) / 100;
+
+          // Tax savings
+          const taxSavings = annualInterest * (marginalTaxRate / 100);
+          document.getElementById('cashout_tax_savings').value = Math.round(taxSavings * 100) / 100;
+        }
+
+        // Add event listeners
+        ['cashout_current_balance', 'cashout_current_payment', 'cashout_property_value', 'cashout_new_rate', 
+         'cashout_new_term', 'cashout_max_ltv', 'cashout_closing_costs', 'cashout_prepaid_items', 
+         'cashout_new_loan_amount', 'cashout_marginal_tax_rate'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('input', calculateCashOut);
+            input.addEventListener('blur', function() {
+              const value = parseFloat(this.value);
+              if (!isNaN(value) && value >= 0) {
+                if (this.type === 'number' && this.step === '0.01') {
+                  this.value = Math.round(value * 100) / 100;
+                } else if (this.type === 'number' && this.step === '1') {
+                  this.value = Math.round(value);
+                }
+              }
+            });
+          }
+        });
+
+        // Initial calculation
+        calculateCashOut();
+      });
+    </script>
+  </body>
+</html>
+

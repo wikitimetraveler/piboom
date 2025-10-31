@@ -1,6 +1,39 @@
-// User Password Protection System
-// Simple password check to prevent accidental edits
-// Not for security - just to prevent mistakes on Pi app
+/**
+ * User Password Protection System
+ * 
+ * @file       user-passwords.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Simple password protection system to prevent accidental edits and actions
+ * on the Pi application. Not intended for security purposes - designed as
+ * a safeguard against user mistakes and accidental modifications.
+ * 
+ * Features:
+ * - Password verification before critical actions
+ * - User-specific password storage
+ * - Prevention of accidental data modifications
+ * - Simple prompt-based authentication
+ * 
+ * Security Note:
+ * This is NOT a security feature - passwords are stored in client-side code.
+ * This is a convenience feature to prevent mistakes, not protect against
+ * malicious access.
+ * 
+ * Usage:
+ * - Prompts for password before allowing certain actions
+ * - Validates against predefined user passwords
+ * - Prevents redeclaration if script loaded multiple times
+ * 
+ * Technical Implementation:
+ * - Window-level variable for global access
+ * - Password lookup against user database
+ * - Simple string comparison validation
+ * 
+ * ==============================================================================
+ */
 
 // Prevent redeclaration if script is loaded multiple times
 if (typeof window.USER_PASSWORDS === 'undefined') {

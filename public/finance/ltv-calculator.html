@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan-to-Value (LTV) Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="../shared/calculations.js"></script>
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --secondary: #6B9E78;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+        --success: #28a745;
+        --warning: #ffc107;
+        --danger: #dc3545;
+      }
+      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
+      .nav-home { right: 20px; }
+      .nav-finance { right: 170px; }
+      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
+      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 1000px; }
+      .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
+      .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
+      .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
+      .form-label { font-weight: 500; }
+      .input-group-text { background: #F1F5F9; border-color: var(--border); }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .ltv-result { font-size: 1.4rem; font-weight: 700; }
+      .ltv-excellent { color: var(--success); }
+      .ltv-good { color: var(--warning); }
+      .ltv-high { color: var(--danger); }
+      .info-box { background: #E8F4F8; border-left: 4px solid var(--primary); padding: 12px; margin-top: 12px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+
+    <div class="container">
+      <h1 class="mb-2">Loan-to-Value (LTV) Calculator</h1>
+      <p class="text-muted mb-4">Calculate LTV ratio, equity position, and determine Mortgage Insurance (MI) requirements. Critical for refinancing decisions.</p>
+
+      <!-- Section: Property & Loan Information -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseProperty" aria-expanded="true" aria-controls="collapseProperty">
+          <span><i class="bi-building mr-2"></i>Property & Loan Information</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseProperty">
+          <div class="row">
+            <div class="col-md-8"><label for="ltv_property_value" class="form-label">Property Value / Appraised Value</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ltv_property_value" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_loan_amount" class="form-label">Loan Amount</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ltv_loan_amount" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_down_payment" class="form-label">Down Payment Amount</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ltv_down_payment" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: LTV Calculations -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseLTV" aria-expanded="true" aria-controls="collapseLTV">
+          <span><i class="bi-percent mr-2"></i>LTV Ratio & Equity</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseLTV">
+          <div class="row">
+            <div class="col-md-8"><label for="ltv_ratio" class="form-label">Loan-to-Value (LTV) Ratio</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control result ltv-result" id="ltv_ratio" readonly>
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+              <small id="ltv_ratio_status" class="text-muted"></small>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_equity_amount" class="form-label">Equity Amount</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="ltv_equity_amount" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_equity_percent" class="form-label">Equity Percentage</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control result" id="ltv_equity_percent" readonly>
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Mortgage Insurance Requirements -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseMI" aria-expanded="true" aria-controls="collapseMI">
+          <span><i class="bi-shield-check mr-2"></i>Mortgage Insurance Requirements</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseMI">
+          <div class="info-box">
+            <strong>Mortgage Insurance Guidelines:</strong><br>
+            <small>
+              • <strong>Conventional:</strong> PMI required if LTV > 80%. Can be removed at 78% LTV (automatic) or 80% LTV (request)<br>
+              • <strong>FHA:</strong> MIP required for all loans. Annual MIP for life of loan if LTV > 90% and term > 15 years<br>
+              • <strong>VA:</strong> No MI required (VA funding fee instead)<br>
+              • <strong>USDA:</strong> Guarantee fee required (similar to MI)
+            </small>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_mi_required" class="form-label">Mortgage Insurance Required?</label></div>
+            <div class="col-md-4">
+              <div id="ltv_mi_required" class="result" style="padding: 12px; text-align: center; border-radius: 8px; font-weight: 700;"></div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_loan_type" class="form-label">Loan Type</label></div>
+            <div class="col-md-4">
+              <select class="form-control" id="ltv_loan_type">
+                <option value="conventional">Conventional</option>
+                <option value="fha">FHA</option>
+                <option value="va">VA</option>
+                <option value="usda">USDA</option>
+              </select>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_mi_details" class="form-label">MI Details</label></div>
+            <div class="col-md-4">
+              <div id="ltv_mi_details" class="result" style="padding: 12px; text-align: center; border-radius: 8px; font-size: 0.9rem;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Refinancing Analysis -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseRefinance" aria-expanded="true" aria-controls="collapseRefinance">
+          <span><i class="bi-arrow-repeat mr-2"></i>Refinancing Analysis</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseRefinance">
+          <div class="row">
+            <div class="col-md-8"><label for="ltv_max_refinance_ltv" class="form-label">Maximum Refinance LTV</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="ltv_max_refinance_ltv" placeholder="80" min="0" max="100" step="0.01" value="80">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_max_refinance_amount" class="form-label">Maximum Refinance Loan Amount</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="ltv_max_refinance_amount" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ltv_available_cashout" class="form-label">Available Cash-Out Amount</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="ltv_available_cashout" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        function calculateLTV() {
+          const propertyValue = parseFloat(document.getElementById('ltv_property_value').value) || 0;
+          const loanAmount = parseFloat(document.getElementById('ltv_loan_amount').value) || 0;
+          const downPayment = parseFloat(document.getElementById('ltv_down_payment').value) || 0;
+          const maxRefinanceLTV = parseFloat(document.getElementById('ltv_max_refinance_ltv').value) || 80;
+          const loanType = document.getElementById('ltv_loan_type').value;
+
+          // Calculate LTV ratio
+          let ltvRatio = 0;
+          if (propertyValue > 0) {
+            // Use loan amount if provided, otherwise calculate from property value and down payment
+            const calculatedLoanAmount = loanAmount > 0 ? loanAmount : (propertyValue - downPayment);
+            ltvRatio = (calculatedLoanAmount / propertyValue) * 100;
+          }
+          document.getElementById('ltv_ratio').value = Math.round(ltvRatio * 100) / 100;
+
+          // Calculate equity
+          const actualLoanAmount = loanAmount > 0 ? loanAmount : (propertyValue - downPayment);
+          const equityAmount = propertyValue - actualLoanAmount;
+          document.getElementById('ltv_equity_amount').value = Math.round(equityAmount * 100) / 100;
+          
+          const equityPercent = propertyValue > 0 ? (equityAmount / propertyValue) * 100 : 0;
+          document.getElementById('ltv_equity_percent').value = Math.round(equityPercent * 100) / 100;
+
+          // Update LTV ratio status
+          const ltvRatioEl = document.getElementById('ltv_ratio');
+          const ltvStatusEl = document.getElementById('ltv_ratio_status');
+          
+          if (ltvRatio <= 80) {
+            ltvRatioEl.className = 'form-control result ltv-result ltv-excellent';
+            ltvStatusEl.textContent = '✓ Excellent - No PMI required (Conventional)';
+            ltvStatusEl.className = 'text-success';
+          } else if (ltvRatio <= 90) {
+            ltvRatioEl.className = 'form-control result ltv-result ltv-good';
+            ltvStatusEl.textContent = '✓ Good - MI required but can be removed';
+            ltvStatusEl.className = 'text-warning';
+          } else {
+            ltvRatioEl.className = 'form-control result ltv-result ltv-high';
+            ltvStatusEl.textContent = '⚠ High - MI required, may have restrictions';
+            ltvStatusEl.className = 'text-danger';
+          }
+
+          // Mortgage Insurance requirements
+          const miRequiredEl = document.getElementById('ltv_mi_required');
+          const miDetailsEl = document.getElementById('ltv_mi_details');
+          
+          if (loanType === 'conventional') {
+            if (ltvRatio > 80) {
+              miRequiredEl.textContent = 'YES - PMI Required';
+              miRequiredEl.style.background = '#fff3cd';
+              miRequiredEl.style.border = '2px solid var(--warning)';
+              miDetailsEl.textContent = `PMI can be removed at 78% LTV (automatic) or 80% LTV (request)`;
+            } else {
+              miRequiredEl.textContent = 'NO - PMI Not Required';
+              miRequiredEl.style.background = '#d4edda';
+              miRequiredEl.style.border = '2px solid var(--success)';
+              miDetailsEl.textContent = 'LTV is 80% or below';
+            }
+          } else if (loanType === 'fha') {
+            miRequiredEl.textContent = 'YES - MIP Required';
+            miRequiredEl.style.background = '#fff3cd';
+            miRequiredEl.style.border = '2px solid var(--warning)';
+            if (ltvRatio > 90) {
+              miDetailsEl.textContent = 'Annual MIP for life of loan (if term > 15 years)';
+            } else {
+              miDetailsEl.textContent = 'Annual MIP for 11 years (if term > 15 years)';
+            }
+          } else if (loanType === 'va') {
+            miRequiredEl.textContent = 'NO - MI Not Required';
+            miRequiredEl.style.background = '#d4edda';
+            miRequiredEl.style.border = '2px solid var(--success)';
+            miDetailsEl.textContent = 'VA loans use Funding Fee instead of MI';
+          } else if (loanType === 'usda') {
+            miRequiredEl.textContent = 'YES - Guarantee Fee Required';
+            miRequiredEl.style.background = '#fff3cd';
+            miRequiredEl.style.border = '2px solid var(--warning)';
+            miDetailsEl.textContent = 'USDA uses Guarantee Fee (similar to MI)';
+          }
+
+          // Refinancing analysis
+          const maxRefinanceAmount = propertyValue * (maxRefinanceLTV / 100);
+          document.getElementById('ltv_max_refinance_amount').value = Math.round(maxRefinanceAmount * 100) / 100;
+          
+          const availableCashout = maxRefinanceAmount - actualLoanAmount;
+          document.getElementById('ltv_available_cashout').value = Math.round(availableCashout * 100) / 100;
+        }
+
+        // Event listeners
+        ['ltv_property_value', 'ltv_loan_amount', 'ltv_down_payment', 'ltv_max_refinance_ltv'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('input', calculateLTV);
+            input.addEventListener('blur', function() {
+              const value = parseFloat(this.value);
+              if (!isNaN(value) && value >= 0) {
+                this.value = Math.round(value * 100) / 100;
+              }
+            });
+          }
+        });
+
+        document.getElementById('ltv_loan_type').addEventListener('change', calculateLTV);
+
+        // Initial calculation
+        calculateLTV();
+      });
+    </script>
+  </body>
+</html>
+

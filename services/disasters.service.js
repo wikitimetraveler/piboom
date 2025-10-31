@@ -1,13 +1,61 @@
+/**
+ * Disasters Service
+ * 
+ * @file       disasters.service.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Service module for managing disaster data from multiple sources (NOAA, NASA, FEMA).
+ * Handles schema initialization, data aggregation, and county-level disaster tracking
+ * with FIPS code lookups. Provides unified disaster data with a 30-day rolling window
+ * for recent disaster tracking.
+ * 
+ * Features:
+ * - Unified disasters table schema initialization
+ * - Multi-source disaster data integration (NOAA, NASA, FEMA)
+ * - County FIPS code lookups and geocoding
+ * - 30-day rolling window for recent disasters
+ * - Disaster risk assessment and aggregation
+ * - Geographic disaster data queries
+ * 
+ * Data Sources:
+ * - NOAA (National Oceanic and Atmospheric Administration)
+ * - NASA disaster data feeds
+ * - FEMA disaster declarations
+ * 
+ * Schema:
+ * - Unified disasters table with standardized fields
+ * - County FIPS code references
+ * - Timestamp-based filtering (30-day window)
+ * - Geographic coordinates for mapping
+ * 
+ * Technical Implementation:
+ * - PostgreSQL database integration
+ * - County-level FIPS code lookups
+ * - Optional JSON reference file for county data
+ * - Reverse geocoding integration
+ * - Database connection pooling
+ * 
+ * Integration:
+ * - Requires database.service.js for connection pooling
+ * - Integrates with disaster-risk.service.js for geocoding
+ * - File system access for county reference data
+ * 
+ * @dependencies
+ * - database.service.js (getPool)
+ * - disaster-risk.service.js (reverseGeocodeCountyState)
+ * - fs (file system)
+ * - path (path utilities)
+ * 
+ * ==============================================================================
+ */
+
 import { getPool } from './database.service.js';
 import { reverseGeocodeCountyState } from './disaster-risk.service.js';
 import fs from 'fs';
 import path from 'path';
-
-/**
- * Disasters Service
- * - Schema initialization for unified disasters table (30-day rolling window)
- * - Utilities for county FIPS lookups (optional JSON reference)
- */
 
 const CREATE_TABLE_SQL = `
 CREATE TABLE IF NOT EXISTS disasters (
@@ -191,11 +239,120 @@ export function normalizeFemaV2ToUnified(disasters) {
 
 /** NASA FIRMS (active fires) - VIIRS NRT GeoJSON **/
 export async function ingestFirmsNrt() {
-  const url = 'https://firms.modaps.eosdis.nasa.gov/active_fire/viirs/geojson/VNP14IMGTDL_NRT_USA_contiguous_and_Hawaii_24h.json';
+  // Get MAP_KEY (FIRMS-specific) or fallback to NASA_API_KEY
+  // MAP_KEY is the FIRMS-specific authentication key
+  let apiKey = process.env.MAP_KEY || process.env.FIRMS_MAP_KEY || process.env.NASA_API_KEY || process.env.NASA_FIRMS_API_KEY || process.env.FIRMS_API_KEY;
+  if (apiKey) {
+    apiKey = apiKey.trim().replace(/^["']|["']$/g, ''); // Remove surrounding quotes
+  }
+  
+  // NASA FIRMS API - Correct format: /api/area/csv/{API_KEY}/{source}/{bbox}/{days}
+  // API key goes in the URL path, not as query parameter!
+  // Bounding box: west, south, east, north (USA: -125.0,24.396308,-66.93457,49.384358)
+  let url;
+  let useAuth = false;
+  
+  if (apiKey) {
+    // Authenticated CSV endpoint (USA bounding box, last 2 days)
+    // Format: /api/area/csv/{API_KEY}/VIIRS_SNPP_NRT/{bbox}/{days}
+    const bbox = '-125.0,24.396308,-66.93457,49.384358'; // USA bounds
+    url = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${apiKey}/VIIRS_SNPP_NRT/${bbox}/2`;
+    useAuth = true;
+    console.log(`🔥 FIRMS: Using authenticated CSV endpoint with API key`);
+  } else {
+    // Fallback: Try GeoJSON public feed (may be rate-limited)
+    url = 'https://firms.modaps.eosdis.nasa.gov/api/country/v3/viirs/USA/1';
+    console.log('🔥 FIRMS: Using public GeoJSON feed (no API key found)');
+  }
+  
   let geo;
   try {
     const resp = await fetch(url);
-    geo = await resp.json();
+    const contentType = resp.headers.get('content-type') || '';
+    
+    if (!resp.ok) {
+      const text = await resp.text();
+      console.warn(`FIRMS fetch failed: HTTP ${resp.status} - ${text.substring(0, 200)}`);
+      return { inserted: 0, skipped: 0 };
+    }
+    
+    // Check for "Invalid MAP_KEY" error - key may need FIRMS registration
+    const text = await resp.text();
+    if (text.includes('Invalid MAP_KEY') || text.includes('Invalid API')) {
+      console.warn(`⚠️  FIRMS API key rejected. Key may need FIRMS-specific registration at earthdata.nasa.gov`);
+      console.warn(`   Falling back to public feed (if available)`);
+      // Try public GeoJSON feed as fallback
+      try {
+        const fallbackUrl = 'https://firms.modaps.eosdis.nasa.gov/api/country/v3/viirs/USA/1';
+        const fallbackResp = await fetch(fallbackUrl);
+        if (fallbackResp.ok) {
+          const fallbackContentType = fallbackResp.headers.get('content-type') || '';
+          if (fallbackContentType.includes('json')) {
+            geo = await fallbackResp.json();
+            console.log(`✅ Using public FIRMS GeoJSON feed`);
+          } else {
+            return { inserted: 0, skipped: 0 };
+          }
+        } else {
+          return { inserted: 0, skipped: 0 };
+        }
+      } catch (e) {
+        return { inserted: 0, skipped: 0 };
+      }
+    } else if (useAuth && (contentType.includes('csv') || contentType.includes('text/plain'))) {
+      // Parse CSV response
+      const csvText = text;
+      const lines = csvText.trim().split('\n');
+      if (lines.length < 2) {
+        console.log('🔥 FIRMS: No fire data found');
+        return { inserted: 0, skipped: 0 };
+      }
+      
+      // Parse CSV header
+      const headers = lines[0].split(',').map(h => h.trim());
+      const latIdx = headers.indexOf('latitude');
+      const lngIdx = headers.indexOf('longitude');
+      const dateIdx = headers.indexOf('acq_date');
+      const timeIdx = headers.indexOf('acq_time');
+      const brightIdx = headers.indexOf('brightness');
+      const confIdx = headers.indexOf('confidence');
+      
+      // Convert CSV to GeoJSON-like structure
+      geo = {
+        type: 'FeatureCollection',
+        features: []
+      };
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',');
+        const lat = parseFloat(values[latIdx]);
+        const lng = parseFloat(values[lngIdx]);
+        if (isNaN(lat) || isNaN(lng)) continue;
+        
+        geo.features.push({
+          type: 'Feature',
+          geometry: {
+            type: 'Point',
+            coordinates: [lng, lat]
+          },
+          properties: {
+            acq_date: values[dateIdx]?.trim() || '',
+            acq_time: values[timeIdx]?.trim() || '',
+            brightness: values[brightIdx] ? parseFloat(values[brightIdx]) : null,
+            confidence: values[confIdx] ? values[confIdx].trim() : '',
+            id: `${lat},${lng},${values[dateIdx] || Date.now()}`
+          }
+        });
+      }
+      
+      console.log(`🔥 FIRMS: Parsed ${geo.features.length} fire detections from CSV`);
+    } else if (contentType.includes('json')) {
+      geo = await resp.json();
+    } else {
+      const text = await resp.text();
+      console.warn(`FIRMS returned unexpected format: ${contentType} - ${text.substring(0, 200)}`);
+      return { inserted: 0, skipped: 0 };
+    }
   } catch (e) {
     console.warn('FIRMS fetch failed:', e.message);
     return { inserted: 0, skipped: 0 };
@@ -214,7 +371,20 @@ export async function ingestFirmsNrt() {
       await loadFipsReference();
       fips = mapCountyToFips(county, state);
     }
-    const start = props.acq_date ? new Date(`${props.acq_date}T${(props.acq_time||'0000').toString().padStart(4,'0').slice(0,2)}:${(props.acq_time||'0000').toString().padStart(4,'0').slice(2)}:00Z`).toISOString() : new Date().toISOString();
+    // Parse date/time from FIRMS CSV format (acq_date: YYYY-MM-DD, acq_time: HHMM)
+    let start = new Date().toISOString();
+    if (props.acq_date) {
+      const dateStr = props.acq_date.trim();
+      const timeStr = (props.acq_time || '0000').toString().padStart(4, '0');
+      const hour = timeStr.slice(0, 2);
+      const minute = timeStr.slice(2, 4);
+      try {
+        start = new Date(`${dateStr}T${hour}:${minute}:00Z`).toISOString();
+      } catch (e) {
+        // Fallback if date parsing fails
+        start = new Date().toISOString();
+      }
+    }
     const rec = {
       source: 'firms',
       event_type: 'wildfire',

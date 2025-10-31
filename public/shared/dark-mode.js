@@ -1,5 +1,37 @@
-// Dark Mode Toggle System
-// Saves preference and applies across all pages
+/**
+ * Dark Mode Toggle System
+ * 
+ * @file       dark-mode.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Global dark mode toggle system that saves user preference and applies
+ * dark mode styling across all pages in the application. Uses localStorage
+ * to persist the user's preference and automatically applies dark mode on
+ * page load if previously enabled.
+ * 
+ * Features:
+ * - Persistent dark mode preference via localStorage
+ * - Automatic application on page load
+ * - Toggle button for manual switching
+ * - Custom CSS variable support for theme colors
+ * - Smooth transitions between light and dark modes
+ * 
+ * Usage:
+ * - Automatically initializes when script is loaded
+ * - Dark mode preference key: 'piBoom_darkMode'
+ * - Applies 'dark-mode' class to body element
+ * 
+ * Technical Implementation:
+ * - Uses CSS custom properties (variables) for theming
+ * - Injects dark mode styles into document head
+ * - Event listeners for toggle functionality
+ * - localStorage API for persistence
+ * 
+ * ==============================================================================
+ */
 
 const DARK_MODE_KEY = 'piBoom_darkMode';
 

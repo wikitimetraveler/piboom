@@ -1,4 +1,61 @@
 <!DOCTYPE html>
+<!--
+  ==============================================================================
+  Asset Qualifier Calculator
+  ==============================================================================
+  
+  @file       asset-qualifier-calculator.html
+  @author     David Lane
+  @version    2.0.0
+  @since      2024
+  
+  @description
+  Professional asset-based qualification calculator for mortgage underwriting.
+  Calculates eligible assets from liquid, other, and retirement accounts with
+  age-based retirement factors. Determines supportable payment capacity and
+  validates minimum asset requirements per lending guidelines.
+  
+  Features:
+  - Category-based asset eligibility calculations
+  - Age-based retirement asset factor (57+ years = 100%, <57 = 70%)
+  - Required reserves calculation (months × monthly payment)
+  - Net eligible assets determination
+  - Supportable payment calculation using standard formula
+  - Minimum assets threshold validation ($500,000 minimum)
+  - Non-borrower asset validation messages
+  - 12-month account history requirement validation
+  
+  Calculation Logic:
+  - Category 1 & 2: Asset × Factor = Eligible Amount
+  - Retirement: Age-based factor applied to retirement assets
+  - Total Eligible = Sum of all eligible asset categories
+  - Net Eligible = Total Eligible - Required Reserves
+  - Supportable Payment = Net Eligible × ((0.0025 × 1.233354) / (1.233354 - 1))
+  - Minimum Assets Test: (Liquid + Other + Retirement) - Required ≥ $500,000
+  
+  Validation Rules:
+  - C31: Non-borrower asset confirmation required
+  - C32: 12-month account history validation
+  
+  Technical Implementation:
+  - Uses the calculations.js engine (v2.0) with factory pattern
+  - Factory function: createAssetQualifierConfig()
+  - Date of birth parsing for age calculations
+  - String-based validation message generation
+  
+  Integration Notes:
+  - Compatible with Encompass field mapping via customIds
+  - Supports dropdown/select inputs for validation fields
+  - Real-time PASS/FAIL indicators
+  
+  @dependencies
+  - /shared/calculations.js (v2.0+)
+  - Bootstrap 4.5.2
+  - Bootstrap Icons 1.11.1
+  - jQuery 3.5.1 (for accordion functionality)
+  
+  ==============================================================================
+-->
 <html lang="en">
   <head>
     <meta charset="UTF-8">
@@ -267,29 +324,8 @@
     <script src="/shared/calculations.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const calc = new calculations({
-          groups: [
-            // H15 = G15*F15 (rounded)
-            { inputIds: ['aq_cat1_factor', 'aq_liquid_assets'], resultId: 'aq_cat1_eligible', calculation: 'multiplyRounded' },
-            // H16 = G16*F16 (rounded)
-            { inputIds: ['aq_cat2_factor', 'aq_other_assets'], resultId: 'aq_cat2_eligible', calculation: 'multiplyRounded' },
-            // G17 depends on DOB; computed by ageBasedRetFactor, then H17 = F17*G17
-            { inputIds: ['aq_dob'], resultId: 'aq_ret_factor', calculation: 'ageBasedRetFactor' },
-            { inputIds: ['aq_retirement_assets', 'aq_ret_factor'], resultId: 'aq_ret_eligible', calculation: 'multiplyRounded' },
-            // H19 = SUM(H15:H17) (rounded)
-            { inputIds: ['aq_cat1_eligible', 'aq_cat2_eligible', 'aq_ret_eligible'], resultId: 'aq_total_eligible_assets', calculation: 'sumRounded' },
-            // F21 = months * payment (rounded)
-            { inputIds: ['aq_reserve_months', 'aq_monthly_payment'], resultId: 'aq_required_reserves', calculation: 'multiplyRounded' },
-            // H22 = PASS/FAIL minimum assets test
-            { inputIds: ['aq_liquid_assets', 'aq_other_assets', 'aq_retirement_assets', 'aq_required_reserves'], resultId: 'aq_min_assets_result', calculation: 'minAssetsPass' },
-            // H24 = H19 - F21 (rounded)
-            { inputIds: ['aq_total_eligible_assets', 'aq_required_reserves'], resultId: 'aq_net_eligible_assets', calculation: 'subtractRounded' },
-            // H28 = H24*((0.0025*1.233354)/(1.233354-1)) (rounded)
-            { inputIds: ['aq_net_eligible_assets'], resultId: 'aq_supportable_payment', calculation: 'supportablePaymentRounded' },
-            // C31/C32 messages
-            { inputIds: ['aq_non_borrower_assets', 'aq_12mo_history', 'aq_liquid_assets', 'aq_other_assets', 'aq_retirement_assets'], resultId: 'aq_messages', calculation: 'messagesC31C32' }
-          ]
-        });
+        // Use factory function to create Asset Qualifier calculator configuration
+        const calc = new calculations(createAssetQualifierConfig());
 
         try { calc.recalculateAll(); } catch (e) { console.error(e); }
         renderFormats();

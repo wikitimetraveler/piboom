@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<!--
+  ==============================================================================
+  Closing Cost Calculator
+  ==============================================================================
+  
+  @file       closing-cost-calculator.html
+  @author     David Lane
+  @version    2.0.0
+  @since      2024
+  
+  @description
+  Comprehensive closing cost calculator for mortgage transactions. Calculates
+  total closing costs across lender fees, title & escrow fees, and other costs.
+  Includes automatic prepaid interest calculation based on loan amount, rate,
+  and days until first payment.
+  
+  Features:
+  - Lender fees totaling (origination, underwriting, processing, etc.)
+  - Title & escrow fee calculation
+  - Prepaid interest automatic calculation
+  - Other costs tracking (inspections, surveys, etc.)
+  - Total closing cost summary
+  - Real-time updates as values change
+  
+  Fee Categories:
+  - Lender Fees: Origination, underwriting, processing, credit report, flood cert,
+                 appraisal, and other lender charges
+  - Title & Escrow: Title insurance, lender's title insurance, title search,
+                   recording fees, escrow funding, escrow insurance, prepaid
+                   interest, and other title-related fees
+  - Other Costs: Home inspection, survey, pest inspection, and miscellaneous costs
+  
+  Calculation Logic:
+  - Prepaid Interest = (Loan Amount × Rate / 100) / 365 × Days Until First Payment
+  - All totals rounded to 2 decimal places
+  - Automatic recalculation when loan amount, rate, or days change
+  
+  Technical Implementation:
+  - Uses the calculations.js engine (v2.0)
+  - Custom prepaid interest calculation function
+  - SumRounded method for all category totals
+  - Bootstrap 4.5.2 responsive layout
+  
+  Integration Notes:
+  - Compatible with Encompass field mapping
+  - Can integrate with loan origination systems
+  - Supports multiple fee categories for comprehensive cost analysis
+  
+  @dependencies
+  - /shared/calculations.js (v2.0+)
+  - Bootstrap 4.5.2
+  - Bootstrap Icons 1.11.1
+  
+  ==============================================================================
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Closing Cost Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="../shared/calculations.js"></script>
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --secondary: #6B9E78;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+      }
+      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
+      .nav-home { right: 20px; }
+      .nav-finance { right: 170px; }
+      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
+      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 1000px; }
+      .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
+      .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
+      .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
+      .form-label { font-weight: 500; }
+      .input-group-text { background: #F1F5F9; border-color: var(--border); }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .total-card { background: linear-gradient(135deg, #E8F4F8 0%, #F0F8F0 100%); border: 2px solid var(--primary); padding: 24px; border-radius: 12px; margin-top: 24px; }
+      .total-card h4 { color: var(--primary); margin-bottom: 20px; font-weight: 700; }
+      .total-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 2px solid rgba(74, 144, 164, 0.3); font-size: 1.1rem; }
+      .total-row:last-child { border-bottom: none; font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+    </style>
+  </head>
+  <body>
+    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+
+    <div class="container">
+      <h1 class="mb-2">Closing Cost Calculator</h1>
+      <p class="text-muted mb-4">Estimate total closing costs. Breaks down lender fees, title, escrow. Shows cash needed at closing for comparison shopping.</p>
+
+      <!-- Section: Loan Information -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseLoan" aria-expanded="true" aria-controls="collapseLoan">
+          <span><i class="bi-info-circle mr-2"></i>Loan Information</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseLoan">
+          <div class="row">
+            <div class="col-md-6">
+              <label for="closing_loan_amount" class="form-label">Loan Amount</label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_loan_amount" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="closing_property_value" class="form-label">Property Value</label>
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_property_value" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Lender Fees -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseLender" aria-expanded="true" aria-controls="collapseLender">
+          <span><i class="bi-bank mr-2"></i>Lender Fees</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseLender">
+          <div class="row">
+            <div class="col-md-8"><label for="closing_origination_fee" class="form-label">Origination Fee</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_origination_fee" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_underwriting_fee" class="form-label">Underwriting Fee</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_underwriting_fee" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_processing_fee" class="form-label">Processing Fee</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_processing_fee" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_credit_report" class="form-label">Credit Report Fee</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_credit_report" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_flood_cert" class="form-label">Flood Certificate</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_flood_cert" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_appraisal_fee" class="form-label">Appraisal Fee</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_appraisal_fee" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_other_lender_fees" class="form-label">Other Lender Fees</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_other_lender_fees" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_total_lender_fees" class="form-label">Total Lender Fees</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="closing_total_lender_fees" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Title & Escrow -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseTitle" aria-expanded="true" aria-controls="collapseTitle">
+          <span><i class="bi-file-earmark-text mr-2"></i>Title & Escrow</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseTitle">
+          <div class="row">
+            <div class="col-md-8"><label for="closing_title_insurance" class="form-label">Title Insurance (Owner's Policy)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_title_insurance" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_lender_title_insurance" class="form-label">Title Insurance (Lender's Policy)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_lender_title_insurance" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_title_search" class="form-label">Title Search & Exam</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_title_search" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_recording_fees" class="form-label">Recording Fees</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_recording_fees" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_escrow_funding" class="form-label">Escrow Funding (Property Taxes)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_escrow_funding" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_escrow_insurance" class="form-label">Escrow Funding (Insurance)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_escrow_insurance" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_prepaid_interest" class="form-label">Prepaid Interest (Days)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="closing_prepaid_interest_days" placeholder="15" min="0" max="30" step="1">
+                <div class="input-group-append"><span class="input-group-text">days</span></div>
+              </div>
+              <small class="text-muted">Usually 15-30 days</small>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_prepaid_interest_amount" class="form-label">Prepaid Interest Amount</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="closing_prepaid_interest_amount" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_other_title_fees" class="form-label">Other Title/Escrow Fees</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_other_title_fees" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_total_title_escrow" class="form-label">Total Title & Escrow</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="closing_total_title_escrow" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Other Costs -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseOther" aria-expanded="true" aria-controls="collapseOther">
+          <span><i class="bi-receipt mr-2"></i>Other Costs</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseOther">
+          <div class="row">
+            <div class="col-md-8"><label for="closing_home_inspection" class="form-label">Home Inspection</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_home_inspection" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_survey" class="form-label">Survey</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_survey" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_pest_inspection" class="form-label">Pest Inspection</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_pest_inspection" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_homeowners_insurance" class="form-label">Homeowner's Insurance (Annual)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_homeowners_insurance" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_property_taxes" class="form-label">Property Taxes (Annual)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_property_taxes" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_other_costs" class="form-label">Other Costs</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="closing_other_costs" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="closing_total_other_costs" class="form-label">Total Other Costs</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="closing_total_other_costs" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Total Closing Costs -->
+      <div class="total-card">
+        <h4><i class="bi-cash-stack mr-2"></i>Total Closing Costs Summary</h4>
+        <div class="total-row">
+          <span>Total Lender Fees:</span>
+          <span id="summary_lender_fees">$0.00</span>
+        </div>
+        <div class="total-row">
+          <span>Total Title & Escrow:</span>
+          <span id="summary_title_escrow">$0.00</span>
+        </div>
+        <div class="total-row">
+          <span>Total Other Costs:</span>
+          <span id="summary_other_costs">$0.00</span>
+        </div>
+        <div class="total-row">
+          <span>Cash Needed at Closing:</span>
+          <span id="summary_total_closing">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const calc = new calculations({
+          groups: [
+            // Total lender fees
+            { inputIds: ['closing_origination_fee', 'closing_underwriting_fee', 'closing_processing_fee', 'closing_credit_report', 'closing_flood_cert', 'closing_appraisal_fee', 'closing_other_lender_fees'], resultId: 'closing_total_lender_fees', calculation: 'sumRounded' },
+            // Total title & escrow
+            { inputIds: ['closing_title_insurance', 'closing_lender_title_insurance', 'closing_title_search', 'closing_recording_fees', 'closing_escrow_funding', 'closing_escrow_insurance', 'closing_prepaid_interest_amount', 'closing_other_title_fees'], resultId: 'closing_total_title_escrow', calculation: 'sumRounded' },
+            // Total other costs
+            { inputIds: ['closing_home_inspection', 'closing_survey', 'closing_pest_inspection', 'closing_other_costs'], resultId: 'closing_total_other_costs', calculation: 'sumRounded' }
+          ]
+        });
+
+        // Calculate prepaid interest
+        function calculatePrepaidInterest() {
+          const loanAmount = parseFloat(document.getElementById('closing_loan_amount').value) || 0;
+          const interestRate = parseFloat(document.getElementById('closing_interest_rate').value) || 0;
+          const days = parseFloat(document.getElementById('closing_prepaid_interest_days').value) || 15;
+          
+          if (loanAmount > 0 && interestRate > 0) {
+            const dailyInterest = (loanAmount * (interestRate / 100)) / 365;
+            const prepaidInterest = dailyInterest * days;
+            document.getElementById('closing_prepaid_interest_amount').value = Math.round(prepaidInterest * 100) / 100;
+          } else {
+            document.getElementById('closing_prepaid_interest_amount').value = '';
+          }
+          updateTotals();
+        }
+
+        // Update summary totals
+        function updateTotals() {
+          const lenderFees = parseFloat(document.getElementById('closing_total_lender_fees').value) || 0;
+          const titleEscrow = parseFloat(document.getElementById('closing_total_title_escrow').value) || 0;
+          const otherCosts = parseFloat(document.getElementById('closing_total_other_costs').value) || 0;
+          
+          const total = lenderFees + titleEscrow + otherCosts;
+          
+          document.getElementById('summary_lender_fees').textContent = '$' + lenderFees.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+          document.getElementById('summary_title_escrow').textContent = '$' + titleEscrow.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+          document.getElementById('summary_other_costs').textContent = '$' + otherCosts.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+          document.getElementById('summary_total_closing').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        // Add interest rate input for prepaid interest calculation
+        const loanSection = document.querySelector('#collapseLoan .card-content');
+        const interestRateRow = document.createElement('div');
+        interestRateRow.className = 'row mt-3';
+        interestRateRow.innerHTML = `
+          <div class="col-md-6">
+            <label for="closing_interest_rate" class="form-label">Interest Rate (%)</label>
+            <div class="input-group">
+              <input type="number" class="form-control" id="closing_interest_rate" placeholder="0.00" min="0" max="100" step="0.01">
+              <div class="input-group-append"><span class="input-group-text">%</span></div>
+            </div>
+          </div>
+        `;
+        loanSection.appendChild(interestRateRow);
+
+        // Watch for changes to result fields to update summary
+        const watchResultFields = () => {
+          ['closing_total_lender_fees', 'closing_total_title_escrow', 'closing_total_other_costs', 'closing_prepaid_interest_amount'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+              // Use MutationObserver to watch for value changes
+              const observer = new MutationObserver(updateTotals);
+              observer.observe(input, { attributes: true, attributeFilter: ['value'] });
+              input.addEventListener('input', updateTotals);
+            }
+          });
+        };
+
+        // Prepaid interest calculation
+        ['closing_loan_amount', 'closing_interest_rate', 'closing_prepaid_interest_days'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('input', calculatePrepaidInterest);
+          }
+        });
+
+        // Watch result fields after DOM is ready
+        setTimeout(watchResultFields, 100);
+        
+        // Also update totals periodically to catch calculation.js updates
+        setInterval(updateTotals, 500);
+
+        // Format all currency inputs
+        ['closing_loan_amount', 'closing_property_value', 'closing_origination_fee', 'closing_underwriting_fee', 
+         'closing_processing_fee', 'closing_credit_report', 'closing_flood_cert', 'closing_appraisal_fee', 
+         'closing_other_lender_fees', 'closing_title_insurance', 'closing_lender_title_insurance', 'closing_title_search',
+         'closing_recording_fees', 'closing_escrow_funding', 'closing_escrow_insurance', 'closing_other_title_fees',
+         'closing_home_inspection', 'closing_survey', 'closing_pest_inspection', 'closing_homeowners_insurance',
+         'closing_property_taxes', 'closing_other_costs'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('blur', function() {
+              const value = parseFloat(this.value);
+              if (!isNaN(value)) {
+                this.value = Math.round(value * 100) / 100;
+              }
+            });
+          }
+        });
+
+        // Initial calculation
+        updateTotals();
+      });
+    </script>
+  </body>
+</html>
+

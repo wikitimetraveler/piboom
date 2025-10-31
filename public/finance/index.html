@@ -7,489 +7,373 @@
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/modern-navbar.js"></script>
 
   <style>
-    :root {
-        --ice-primary: #3498db;
-        --ice-secondary: #2ecc71;
-        --ice-dark: #1a1f35;
-        --ice-light: #e8f1ff;
-        --ice-glow: rgba(135, 206, 250, 0.3);
-        --ice-border: #3a4a6a;
-        --primary-blue: #2563eb;
-        --primary-blue-hover: #1d4ed8;
-        --text-dark: #1f2937;
-        --text-muted: #6b7280;
-        --border-light: #e5e7eb;
-        --background-light: #f9fafb;
-        --white: #ffffff;
-        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    /* Compact page spacing */
+    main.container {
+      padding-top: 20px;
     }
-
-    body {
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
-      color: var(--text-dark);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      line-height: 1.6;
-      min-height: 100vh;
-      position: relative;
-      overflow-x: hidden;
+    
+    /* Premium Accordion Sections */
+    .premium-accordion .card {
+      background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(10px);
-    }
-
-    /* Animated background particles */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 60% 60%, rgba(147, 51, 234, 0.05) 0%, transparent 50%);
-      animation: backgroundFloat 25s ease-in-out infinite;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    @keyframes backgroundFloat {
-      0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
-      25% { transform: translate(-15px, -15px) scale(1.08) rotate(1deg); }
-      50% { transform: translate(15px, -8px) scale(0.92) rotate(-1deg); }
-      75% { transform: translate(-8px, 15px) scale(1.05) rotate(0.5deg); }
-    }
-
-    .header {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(20px);
-      box-shadow: var(--shadow-sm);
-      padding: 2rem 0;
-      margin-bottom: 3rem;
-      position: relative;
+      border: 1px solid rgba(135, 206, 250, 0.2);
+      margin-bottom: 20px;
+      border-radius: 15px;
       overflow: hidden;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .header::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
-      animation: headerShine 3s ease-in-out infinite;
-    }
-
-    @keyframes headerShine {
-      0% { left: -100%; }
-      50% { left: 100%; }
-      100% { left: 100%; }
-    }
-
-    .nav-home {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 10;
-    }
-
-    .nav-home a {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--ice-dark);
-      text-decoration: none;
-      border-radius: 25px;
-      font-weight: 600;
-      box-shadow: var(--shadow-md);
       transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
     }
-
-    .nav-home a:hover {
-      background: var(--ice-primary);
-      color: white;
+    
+    .premium-accordion .card:hover {
+      box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
       transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
     }
-
-    .user-info {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 10;
+    
+    .premium-accordion .card-header {
+      background: linear-gradient(135deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08));
+      border-bottom: 1px solid rgba(135, 206, 250, 0.2);
+      padding: 0;
     }
-
-    .user-info .user-display {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 20px;
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--ice-dark);
-      border-radius: 25px;
-      font-weight: 600;
-      box-shadow: var(--shadow-md);
-      backdrop-filter: blur(10px);
-    }
-
-    .user-info img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 2px solid var(--ice-primary);
-    }
-
-    .container {
+    
+    .premium-accordion .card-header .btn-link {
+      padding: 20px 25px;
+      width: 100%;
+      text-align: left;
       position: relative;
-      z-index: 2;
     }
-
-    .main-title {
-      font-size: 3.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      text-align: center;
-      margin-bottom: 1rem;
-      text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .subtitle {
-      font-size: 1.3rem;
-      color: var(--text-muted);
-      text-align: center;
-      margin-bottom: 3rem;
-      font-weight: 400;
-    }
-
-    .tools-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-      margin-top: 3rem;
-    }
-
-    .tool-card {
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: var(--shadow-md);
-      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(20px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .tool-card::before {
-      content: '';
+    
+    .premium-accordion .card-header .btn-link::after {
+      content: '▼';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--ice-primary), var(--ice-secondary));
-      transform: scaleX(0);
+      right: 25px;
+      top: 50%;
+      transform: translateY(-50%) rotate(0deg);
       transition: transform 0.3s ease;
+      color: var(--ice-primary);
+      font-size: 0.8rem;
     }
-
-    .tool-card:hover::before {
-      transform: scaleX(1);
+    
+    .premium-accordion .card-header .btn-link[aria-expanded="true"]::after {
+      transform: translateY(-50%) rotate(180deg);
     }
-
-    .tool-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--ice-primary);
-    }
-
-    .tool-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .tool-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--ice-dark);
-      margin-bottom: 1rem;
-    }
-
-    .tool-description {
-      color: var(--text-muted);
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
-
-    .tool-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      background: linear-gradient(135deg, var(--ice-primary), var(--ice-secondary));
+    
+    .section-count-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
       color: white;
-      text-decoration: none;
-      border-radius: 25px;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.75rem;
       font-weight: 600;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
-    }
-
-    .tool-link:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
-      color: white;
-      text-decoration: none;
-    }
-
-    .footer {
-      margin-top: 4rem;
-      padding: 2rem 0;
-      text-align: center;
-      color: var(--text-muted);
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    @media (max-width: 768px) {
-      .main-title {
-        font-size: 2.5rem;
-      }
-      
-      .subtitle {
-        font-size: 1.1rem;
-      }
-      
-      .tools-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-      
-      .tool-card {
-        padding: 1.5rem;
-      }
+      margin-left: 10px;
+      vertical-align: middle;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
   </style>
 </head>
 <body>
-  <div class="nav-home">
-    <a href="/index.html">
-      <i class="bi-house-fill"></i> Home
-    </a>
-  </div>
+<div class="particles" id="particles"></div>
 
-  <div class="user-info" id="userInfo" style="display: none;">
-    <div class="user-display" id="userDisplay">
-      <img id="userAvatar" src="" alt="User">
-      <span id="userName">User</span>
-    </div>
-  </div>
+<!-- Modern Navbar Web Component -->
+<modern-navbar></modern-navbar>
 
-  <div class="header">
-    <div class="container">
-      <h1 class="main-title">💰 Finance Tools</h1>
-      <p class="subtitle">Professional FHA Streamline calculators and financial analysis tools</p>
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="tools-grid">
-      <!-- Unified Disasters (Multi-Source) -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-shield-exclamation"></i>
-        </div>
-        <h3 class="tool-title">Unified Disasters (30-day)</h3>
-        <p class="tool-description">
-          Real-time multi-source disasters normalized by county FIPS with filters, grid, and map.
-        </p>
-        <a href="disasters-unified.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Dashboard
-        </a>
+<main class="container">
+  
+  <div class="accordion premium-accordion" id="mainAccordion">
+    
+    <!-- Calculators & Worksheets Section -->
+    <div class="card">
+      <div class="card-header" id="headingCalculators">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseCalculators" aria-expanded="false" aria-controls="collapseCalculators" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
+            <i class="bi-calculator"></i> Calculators & Worksheets <span class="section-count-badge">9</span>
+            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">FHA Streamline and Asset Qualifier calculators</small>
+          </button>
+        </h2>
       </div>
-      <!-- FHA Streamline Calculator -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-calculator"></i>
-        </div>
-
-          <!-- Asset Qualifier Calculator -->
-          <div class="tool-card">
-            <div class="tool-icon">
-              <i class="bi-wallet2"></i>
+      <div id="collapseCalculators" class="collapse" aria-labelledby="headingCalculators" data-parent="#mainAccordion">
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="fha-streamline-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">📊</span>
+                <h3>FHA Streamline Worksheet</h3>
+                <p>Professional FHA Streamline refinance calculator with comprehensive loan analysis and payment calculations.</p>
+                <div class="card-meta"><i class="bi-calculator"></i> Loan Calculator</div>
+              </a>
             </div>
-            <h3 class="tool-title">Asset Qualifier Calculator</h3>
-            <p class="tool-description">
-              Prototype for Asset Qualifier using shared calculation engine. Formulas to be wired from Excel.
-            </p>
-            <a href="asset-qualifier-calculator.html" class="tool-link">
-              <i class="bi-arrow-right"></i> Open Calculator
-            </a>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="asset-qualifier-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">💰</span>
+                <h3>Asset Qualifier Calculator</h3>
+                <p>30 Retail Lending - Asset Qualifier Calculator with age-based retirement factors and comprehensive asset analysis.</p>
+                <div class="card-meta"><i class="bi-wallet2"></i> Asset Analysis</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="fha-streamline-loan-amount-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">💵</span>
+                <h3>FHA Streamline Loan Amount</h3>
+                <p>Calculate loan amounts based on FHA Streamline guidelines with comprehensive worksheet calculations.</p>
+                <div class="card-meta"><i class="bi-cash-coin"></i> Loan Amount Calculator</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="fha-streamline-ntb-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">📈</span>
+                <h3>FHA Streamline NTB</h3>
+                <p>Calculate Net Tangible Benefit (NTB) for FHA Streamline refinances. Compare current vs new mortgage costs.</p>
+                <div class="card-meta"><i class="bi-graph-up"></i> Net Tangible Benefit</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="dti-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">📊</span>
+                <h3>Debt-to-Income (DTI) Calculator</h3>
+                <p>Calculate Front-End and Back-End DTI ratios for loan qualification. Industry standard calculations.</p>
+                <div class="card-meta"><i class="bi-percent"></i> Qualification Tool</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="cashout-refinance-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">💵</span>
+                <h3>Cash-Out Refinance Calculator</h3>
+                <p>Calculate max cash-out amount, new payment vs savings, and tax implications. High borrower value.</p>
+                <div class="card-meta"><i class="bi-cash-coin"></i> Cash-Out Analysis</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="amortization-schedule-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">📅</span>
+                <h3>Amortization Schedule Generator</h3>
+                <p>Full payment breakdown over loan term. Principal vs interest breakdown. Shows impact of extra payments.</p>
+                <div class="card-meta"><i class="bi-calendar"></i> Payment Timeline</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="closing-cost-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">💰</span>
+                <h3>Closing Cost Calculator</h3>
+                <p>Estimate total closing costs. Breaks down lender fees, title, escrow. Shows cash needed at closing.</p>
+                <div class="card-meta"><i class="bi-receipt"></i> Cost Estimation</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="ltv-calculator.html" class="tool-card fade-in">
+                <span class="card-icon">🏠</span>
+                <h3>Loan-to-Value (LTV) Calculator</h3>
+                <p>Calculate LTV ratio, equity position, and determine MI requirements. Critical for refinancing decisions.</p>
+                <div class="card-meta"><i class="bi-house-door"></i> Equity Analysis</div>
+              </a>
+            </div>
           </div>
-        <h3 class="tool-title">FHA Streamline Worksheet</h3>
-        <p class="tool-description">
-          Professional FHA Streamline refinance calculator with comprehensive loan analysis and payment calculations.
-        </p>
-        <a href="fha-streamline-calculator.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Calculator
-        </a>
-      </div>
-
-      <!-- The Parser -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-code-slash"></i>
         </div>
-        <h3 class="tool-title">The Parser</h3>
-        <p class="tool-description">
-          Professional JSON tool for parsing and manipulating financial data structures.
-        </p>
-        <a href="tool2.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Tool
-        </a>
-      </div>
-
-      <!-- The Mashup -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-globe"></i>
-        </div>
-        <h3 class="tool-title">The Mashup</h3>
-        <p class="tool-description">
-          FEMA Disaster Declarations tool for analyzing disaster-related financial impacts and relief data.
-        </p>
-        <a href="tool3.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Tool
-        </a>
-      </div>
-
-      <!-- The Automator -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-gear"></i>
-        </div>
-        <h3 class="tool-title">The Automator</h3>
-        <p class="tool-description">
-          Professional automation tool for streamlining financial processes and workflows.
-        </p>
-        <a href="tool4.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Tool
-        </a>
-      </div>
-
-      <!-- The Ruler -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-rulers"></i>
-        </div>
-        <h3 class="tool-title">The Ruler</h3>
-        <p class="tool-description">
-          Professional field analyzer for measuring and analyzing financial data fields and structures.
-        </p>
-        <a href="tool5.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Tool
-        </a>
-      </div>
-
-      <!-- The Transformer -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-arrow-repeat"></i>
-        </div>
-        <h3 class="tool-title">The Transformer</h3>
-        <p class="tool-description">
-          Professional XML to JSON converter for transforming financial data formats.
-        </p>
-        <a href="tool6.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Tool
-        </a>
-      </div>
-
-      <!-- The Alchemist -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-magic"></i>
-        </div>
-        <h3 class="tool-title">The Alchemist</h3>
-        <p class="tool-description">
-          Professional code converter for transforming financial code and data structures.
-        </p>
-        <a href="tool8.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Tool
-        </a>
-      </div>
-
-      <!-- Pipeline Risk Dashboard -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-shield-check"></i>
-        </div>
-        <h3 class="tool-title">Pipeline Risk Dashboard</h3>
-        <p class="tool-description">
-          Comprehensive disaster risk analysis for loan pipelines using FEMA data and KML visualization.
-        </p>
-        <a href="pipeline-risk-dashboard.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Dashboard
-        </a>
-      </div>
-
-      <!-- Encompass Assistant (Existing) -->
-      <div class="tool-card">
-        <div class="tool-icon">
-          <i class="bi-robot"></i>
-        </div>
-        <h3 class="tool-title">Encompass Assistant</h3>
-        <p class="tool-description">
-          AI-powered assistant for Encompass loan origination system integration and automation.
-        </p>
-        <a href="encompass-assistant.html" class="tool-link">
-          <i class="bi-arrow-right"></i> Open Assistant
-        </a>
       </div>
     </div>
+
+    <!-- Disaster Analysis Section -->
+    <div class="card">
+      <div class="card-header" id="headingDisasters">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseDisasters" aria-expanded="false" aria-controls="collapseDisasters" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
+            <i class="bi-shield-exclamation"></i> Disaster Analysis <span class="section-count-badge">2</span>
+            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">FEMA disaster tracking and loan pipeline risk analysis</small>
+          </button>
+        </h2>
+      </div>
+      <div id="collapseDisasters" class="collapse" aria-labelledby="headingDisasters" data-parent="#mainAccordion">
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="disasters-unified.html" class="tool-card fade-in">
+                <span class="card-icon">🌍</span>
+                <h3>Unified Disasters (30-day)</h3>
+                <p>Real-time multi-source disasters normalized by county FIPS with filters, grid, and map.</p>
+                <div class="card-meta"><i class="bi-globe"></i> Multi-Source Tracking</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="pipeline-risk-dashboard.html" class="tool-card fade-in">
+                <span class="card-icon">🛡️</span>
+                <h3>Pipeline Risk Dashboard</h3>
+                <p>Comprehensive disaster risk analysis for loan pipelines using FEMA data and KML visualization.</p>
+                <div class="card-meta"><i class="bi-shield-check"></i> Risk Analysis</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Encompass Tools Section -->
+    <div class="card">
+      <div class="card-header" id="headingEncompass">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseEncompass" aria-expanded="false" aria-controls="collapseEncompass" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
+            <i class="bi-bank"></i> Encompass Tools <span class="section-count-badge">1</span>
+            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">AI-powered Encompass integration and automation</small>
+          </button>
+        </h2>
+      </div>
+      <div id="collapseEncompass" class="collapse" aria-labelledby="headingEncompass" data-parent="#mainAccordion">
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="encompass-assistant.html" class="tool-card fade-in">
+                <span class="card-icon">🤖</span>
+                <h3>Encompass Assistant</h3>
+                <p>AI-powered assistant for Encompass Developer Connect documentation. Get help with APIs, authentication, workflows, and best practices!</p>
+                <div class="card-meta"><i class="bi-robot"></i> AI Assistant</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Developer Tools Section -->
+    <div class="card">
+      <div class="card-header" id="headingDevTools">
+        <h2 class="mb-0">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseDevTools" aria-expanded="false" aria-controls="collapseDevTools" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
+            <i class="bi-tools"></i> Developer Tools <span class="section-count-badge">7</span>
+            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Professional tools for data parsing, transformation, and analysis</small>
+          </button>
+        </h2>
+      </div>
+      <div id="collapseDevTools" class="collapse" aria-labelledby="headingDevTools" data-parent="#mainAccordion">
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="tool2.html" class="tool-card fade-in">
+                <span class="card-icon">🔧</span>
+                <h3>The Parser</h3>
+                <p>Professional JSON tool for parsing and manipulating financial data structures.</p>
+                <div class="card-meta"><i class="bi-code-slash"></i> JSON Parser</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="tool3.html" class="tool-card fade-in">
+                <span class="card-icon">🌐</span>
+                <h3>The Mashup</h3>
+                <p>FEMA Disaster Declarations tool for analyzing disaster-related financial impacts and relief data.</p>
+                <div class="card-meta"><i class="bi-globe"></i> Disaster Data</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="tool4.html" class="tool-card fade-in">
+                <span class="card-icon">⚙️</span>
+                <h3>The Automator</h3>
+                <p>Professional automation tool for streamlining financial processes and workflows.</p>
+                <div class="card-meta"><i class="bi-gear"></i> Automation</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="tool5.html" class="tool-card fade-in">
+                <span class="card-icon">📏</span>
+                <h3>The Ruler</h3>
+                <p>Professional field analyzer for measuring and analyzing financial data fields and structures.</p>
+                <div class="card-meta"><i class="bi-rulers"></i> Field Analyzer</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="tool6.html" class="tool-card fade-in">
+                <span class="card-icon">🔄</span>
+                <h3>The Transformer</h3>
+                <p>Professional XML to JSON converter for transforming financial data formats.</p>
+                <div class="card-meta"><i class="bi-arrow-repeat"></i> Data Converter</div>
+              </a>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="tool8.html" class="tool-card fade-in">
+                <span class="card-icon">✨</span>
+                <h3>The Alchemist</h3>
+                <p>Professional code converter for transforming financial code and data structures.</p>
+                <div class="card-meta"><i class="bi-magic"></i> Code Converter</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div><!-- End accordion -->
+  
+</main>
+
+<div class="voice-help" id="helpPanel">
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="m-0">Finance Tools</h4>
+    <button class="btn btn-link p-0" id="closeHelp"><i class="bi-x-circle"></i></button>
   </div>
+  <ul class="mb-0">
+    <li><strong>📊 Calculators:</strong> FHA Streamline and Asset Qualifier worksheets for loan analysis</li>
+    <li><strong>🛡️ Disaster Analysis:</strong> Track FEMA disasters and analyze loan pipeline risk</li>
+    <li><strong>🤖 Encompass:</strong> AI assistant for Encompass Developer Connect integration</li>
+    <li><strong>🔧 Developer Tools:</strong> Professional tools for data parsing and transformation</li>
+  </ul>
+</div>
 
-  <div class="footer">
-    <p>&copy; 2025 piBoom Finance Tools. Professional financial analysis and calculation tools.</p>
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>piBoom Finance Tools</strong> — Professional financial analysis and calculation tools — <span id="dt"></span> — All Rights Reserved
+    </div>
   </div>
+</footer>
 
-  <script src="/shared/user-login.js"></script>
-  <script src="/shared/user-passwords.js"></script>
-  <script>
-    // Initialize user display
-    function initializeUser() {
-      if (!isLoggedIn()) {
-        showLoginPopup();
-        return;
-      }
-      
-      const user = getLoggedInUser();
-      if (user) {
-        document.getElementById('userInfo').style.display = 'block';
-        document.getElementById('userAvatar').src = user.avatar;
-        document.getElementById('userName').textContent = user.name;
-        document.getElementById('userAvatar').style.borderColor = user.color;
-      }
-    }
-
-    // Initialize on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      initializeUser();
+<script src="/shared/user-login.js"></script>
+<script src="/shared/user-passwords.js"></script>
+<script src="/shared/voice-widget.js"></script>
+<script src="/shared/dark-mode.js"></script>
+<script>
+// Initialize voice widget
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof initVoiceWidget === 'function') {
+    initVoiceWidget({
+      position: 'bottom-right',
+      theme: 'blue'
     });
-  </script>
+  }
+});
+
+document.getElementById('dt').textContent = new Date().toLocaleDateString();
+
+// Help panel functionality
+const showHelpBtn = document.getElementById('showHelp');
+const closeHelpBtn = document.getElementById('closeHelp');
+const helpPanel = document.getElementById('helpPanel');
+
+if (showHelpBtn && helpPanel) {
+  showHelpBtn.onclick = (e) => {
+    e.preventDefault(); 
+    helpPanel.classList.add('show');
+  };
+}
+
+if (closeHelpBtn && helpPanel) {
+  closeHelpBtn.onclick = () => helpPanel.classList.remove('show');
+}
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

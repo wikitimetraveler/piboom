@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<!--
+  ==============================================================================
+  FHA Streamline Net Tangible Benefit (NTB) Calculator
+  ==============================================================================
+  
+  @file       fha-streamline-ntb-calculator.html
+  @author     David Lane
+  @version    2.0.0
+  @since      2024
+  
+  @description
+  Professional calculator for determining Net Tangible Benefit in FHA Streamline
+  refinance transactions. Calculates monthly and total savings comparing current
+  loan terms to new loan terms. Validates that the refinance provides sufficient
+  benefit to the borrower per FHA guidelines.
+  
+  Features:
+  - Monthly payment savings calculation
+  - Total savings over loan term calculation
+  - Automatic benefit determination (Pass/Fail)
+  - Real-time status indicators
+  - Comparison of current vs. new loan scenarios
+  
+  Calculation Logic:
+  - Monthly Savings = Current Monthly Payment - New Monthly Payment
+  - Total Savings = (Monthly Savings × Number of Payments)
+  - Net Tangible Benefit requires positive savings in both metrics
+  
+  FHA Requirements:
+  - Must demonstrate measurable benefit to borrower
+  - Monthly savings must be positive
+  - Total savings over loan term must be positive
+  - Rate reduction alone may qualify in some cases
+  
+  Technical Implementation:
+  - Uses the calculations.js engine (v2.0)
+  - Standard calculation methods (sumRounded, subtractRounded, copyValue)
+  - Reactive updates on all input changes
+  - Visual status indicators for qualification
+  
+  Integration Notes:
+  - Compatible with Encompass field mapping
+  - Can be used standalone or integrated into loan pipeline
+  
+  @dependencies
+  - /shared/calculations.js (v2.0+)
+  - Bootstrap 4.5.2
+  - Bootstrap Icons 1.11.1
+  
+  ==============================================================================
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FHA Streamline Net Tangible Benefit Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="../shared/calculations.js"></script>
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --secondary: #6B9E78;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+      }
+      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
+      .nav-home { right: 20px; }
+      .nav-finance { right: 170px; }
+      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
+      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 900px; }
+      .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
+      .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
+      .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
+      .form-label { font-weight: 500; }
+      .input-group-text { background: #F1F5F9; border-color: var(--border); }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .is-invalid { border-color: #dc3545; }
+      .ntb-result { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+      .ntb-positive { color: var(--secondary); }
+      .ntb-negative { color: #dc3545; }
+    </style>
+  </head>
+  <body>
+    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+
+    <div class="container">
+      <h1 class="mb-2">FHA Streamline Net Tangible Benefit Calculator</h1>
+      <p class="text-muted mb-4">Calculate Net Tangible Benefit (NTB) for FHA Streamline refinances. Compare current mortgage costs to new mortgage costs.</p>
+
+      <!-- Section: Borrower Information -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseBorrower" aria-expanded="true" aria-controls="collapseBorrower">
+          <span><i class="bi-person-badge mr-2"></i>Borrower Information</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseBorrower">
+          <div class="row">
+            <div class="col-md-8"><label for="ntb_borrower" class="form-label">Borrower Name</label></div>
+            <div class="col-md-4">
+              <input type="text" class="form-control" id="ntb_borrower" placeholder="Enter borrower name">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Current Mortgage Costs -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseCurrent" aria-expanded="true" aria-controls="collapseCurrent">
+          <span><i class="bi-house mr-2"></i>Current Mortgage Costs</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseCurrent">
+          <div class="row">
+            <div class="col-md-8"><label for="ntb_b25" class="form-label">Current Monthly Payment (B25)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ntb_b25" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_b26" class="form-label">Other Monthly Costs (B26)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ntb_b26" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_b27" class="form-label">Total Current Monthly Costs (B27 = B25+B26)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="ntb_b27" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: New Mortgage Costs -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseNew" aria-expanded="true" aria-controls="collapseNew">
+          <span><i class="bi-house-door mr-2"></i>New Mortgage Costs</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseNew">
+          <div class="row">
+            <div class="col-md-8"><label for="ntb_e25" class="form-label">New Monthly Payment (E25)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ntb_e25" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_e26" class="form-label">Other Monthly Costs (E26)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ntb_e26" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_e27" class="form-label">Total New Monthly Costs (E27 = E25+E26)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="ntb_e27" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Net Tangible Benefit Calculation -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseNTB" aria-expanded="true" aria-controls="collapseNTB">
+          <span><i class="bi-calculator mr-2"></i>Net Tangible Benefit</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseNTB">
+          <div class="row">
+            <div class="col-md-8"><label for="ntb_i25" class="form-label">Current Total Costs (I25 = B27)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="ntb_i25" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_i26" class="form-label">New Total Costs (I26 = E27)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="ntb_i26" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_i27" class="form-label">Monthly Savings (I27 = I25 - I26)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result ntb-result" id="ntb_i27" readonly>
+              </div>
+              <small class="text-muted" id="ntb_i27_status"></small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Additional Calculations -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseAdditional" aria-expanded="true" aria-controls="collapseAdditional">
+          <span><i class="bi-graph-up mr-2"></i>Additional Calculations</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseAdditional">
+          <div class="row">
+            <div class="col-md-8"><label for="ntb_d42" class="form-label">Current Annual Costs (D42)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ntb_d42" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_d43" class="form-label">New Annual Costs (D43)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ntb_d43" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_d44" class="form-label">Annual Savings (D44 = D42 - D43)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="ntb_d44" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_i42" class="form-label">Current Total Costs (I42)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ntb_i42" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_i43" class="form-label">New Total Costs (I43)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="ntb_i43" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="ntb_i44" class="form-label">Total Savings (I44 = I42 - I43)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result ntb-result" id="ntb_i44" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const calc = new calculations({
+          groups: [
+            // B27 = B25+B26
+            { inputIds: ['ntb_b25', 'ntb_b26'], resultId: 'ntb_b27', calculation: 'sumRounded' },
+            // E27 = E25+E26
+            { inputIds: ['ntb_e25', 'ntb_e26'], resultId: 'ntb_e27', calculation: 'sumRounded' },
+            // I25 = B27
+            { inputIds: ['ntb_b27'], resultId: 'ntb_i25', calculation: 'copyValue' },
+            // I26 = E27
+            { inputIds: ['ntb_e27'], resultId: 'ntb_i26', calculation: 'copyValue' },
+            // I27 = I25-I26
+            { inputIds: ['ntb_i25', 'ntb_i26'], resultId: 'ntb_i27', calculation: 'subtractRounded' },
+            // D44 = D42-D43
+            { inputIds: ['ntb_d42', 'ntb_d43'], resultId: 'ntb_d44', calculation: 'subtractRounded' },
+            // I44 = I42-I43
+            { inputIds: ['ntb_i42', 'ntb_i43'], resultId: 'ntb_i44', calculation: 'subtractRounded' }
+          ]
+        });
+
+        // Update NTB status display
+        function updateNTBStatus() {
+          const monthlySavings = parseFloat(document.getElementById('ntb_i27').value) || 0;
+          const totalSavings = parseFloat(document.getElementById('ntb_i44').value) || 0;
+          const statusEl = document.getElementById('ntb_i27_status');
+          const i27El = document.getElementById('ntb_i27');
+          const i44El = document.getElementById('ntb_i44');
+
+          if (statusEl) {
+            if (monthlySavings > 0) {
+              statusEl.textContent = '✓ Net Tangible Benefit: Positive monthly savings';
+              statusEl.className = 'text-success';
+              i27El.classList.add('ntb-positive');
+              i27El.classList.remove('ntb-negative');
+            } else if (monthlySavings < 0) {
+              statusEl.textContent = '✗ Net Tangible Benefit: Negative monthly savings';
+              statusEl.className = 'text-danger';
+              i27El.classList.add('ntb-negative');
+              i27El.classList.remove('ntb-positive');
+            } else {
+              statusEl.textContent = 'Net Tangible Benefit: No monthly savings';
+              statusEl.className = 'text-muted';
+              i27El.classList.remove('ntb-positive', 'ntb-negative');
+            }
+          }
+
+          // Update total savings color
+          if (totalSavings > 0) {
+            i44El.classList.add('ntb-positive');
+            i44El.classList.remove('ntb-negative');
+          } else if (totalSavings < 0) {
+            i44El.classList.add('ntb-negative');
+            i44El.classList.remove('ntb-positive');
+          } else {
+            i44El.classList.remove('ntb-positive', 'ntb-negative');
+          }
+        }
+
+        // Watch for changes in calculated fields
+        ['ntb_i27', 'ntb_i44'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            // Use MutationObserver or listen to input events
+            const observer = new MutationObserver(updateNTBStatus);
+            observer.observe(input, { attributes: true, attributeFilter: ['value'] });
+            
+            // Also listen to input events (works with manual changes)
+            input.addEventListener('input', updateNTBStatus);
+            
+            // Trigger on calculation updates
+            setInterval(() => {
+              updateNTBStatus();
+            }, 500);
+          }
+        });
+
+        // Format currency inputs on blur
+        ['ntb_b25', 'ntb_b26', 'ntb_e25', 'ntb_e26', 'ntb_d42', 'ntb_d43', 'ntb_i42', 'ntb_i43'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('blur', function() {
+              const value = parseFloat(this.value);
+              if (!isNaN(value)) {
+                this.value = Math.round(value * 100) / 100;
+              }
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
+

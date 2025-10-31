@@ -1,6 +1,42 @@
 /**
  * Modern Navbar Web Component
- * Usage: <modern-navbar></modern-navbar>
+ * 
+ * @file       modern-navbar.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Custom web component for modern navigation bar with responsive design,
+ * mobile menu support, and integrated search functionality. Uses Shadow DOM
+ * for style encapsulation and provides a reusable navigation component
+ * across the application.
+ * 
+ * Features:
+ * - Responsive navigation bar with mobile hamburger menu
+ * - Shadow DOM encapsulation for isolated styling
+ * - Search functionality integration
+ * - Smooth animations and transitions
+ * - Accessible ARIA labels and keyboard navigation
+ * - Custom styling via CSS custom properties
+ * 
+ * Usage:
+ * Simply include the custom element tag in HTML:
+ * <modern-navbar></modern-navbar>
+ * 
+ * Technical Implementation:
+ * - Extends HTMLElement for web component
+ * - Shadow DOM mode: open (for style encapsulation)
+ * - Event delegation for menu interactions
+ * - Responsive breakpoint handling
+ * - CSS Grid/Flexbox for layout
+ * 
+ * Browser Support:
+ * - Requires native Web Components support
+ * - Modern browsers (Chrome, Firefox, Safari, Edge)
+ * - Polyfill available for older browsers
+ * 
+ * ==============================================================================
  */
 class ModernNavbar extends HTMLElement {
   constructor() {

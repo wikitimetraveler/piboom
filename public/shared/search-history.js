@@ -1,5 +1,44 @@
-// Search History & Quick Access System
-// Tracks recent searches and provides quick chips
+/**
+ * Search History & Quick Access System
+ * 
+ * @file       search-history.js
+ * @author     David Lane
+ * @version    1.0.0
+ * @since      2024
+ * 
+ * @description
+ * Search history tracking and quick access system that stores recent searches
+ * in localStorage and provides quick access chips for frequently searched terms.
+ * Enhances user experience by reducing repetitive typing.
+ * 
+ * Features:
+ * - Automatic search history tracking
+ * - localStorage persistence
+ * - Quick access chips for recent searches
+ * - Configurable maximum history size
+ * - Duplicate prevention
+ * - Most recent searches shown first
+ * 
+ * Configuration:
+ * - Maximum history: 8 items (configurable)
+ * - Storage key: 'piBoom_searchHistory'
+ * - Auto-saves on each search
+ * 
+ * Technical Implementation:
+ * - localStorage API for persistence
+ * - JSON serialization for storage
+ * - Array manipulation (push, slice, filter)
+ * - Chip-based UI components
+ * - Event handlers for chip clicks
+ * 
+ * Usage:
+ * - addToHistory(searchTerm) - Add search to history
+ * - getSearchHistory() - Retrieve history array
+ * - clearSearchHistory() - Clear all history
+ * - renderSearchHistory(container) - Display history chips
+ * 
+ * ==============================================================================
+ */
 
 const HISTORY_KEY = 'piBoom_searchHistory';
 const MAX_HISTORY = 8;
