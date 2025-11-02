@@ -181,9 +181,12 @@ export async function upsertDisasters(batch) {
     ) VALUES (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
     ) ON CONFLICT (county_fips, source, source_id, start_time) DO NOTHING
+    RETURNING id
   `;
 
   let inserted = 0, skipped = 0;
+  const batchSize = batch.length;
+  
   for (const d of batch) {
     try {
       const values = [
@@ -208,6 +211,11 @@ export async function upsertDisasters(batch) {
       skipped += 1;
     }
   }
+  
+  if (batchSize > 0) {
+    console.log(`📊 upsertDisasters: ${inserted} inserted, ${skipped} skipped from ${batchSize} records`);
+  }
+  
   return { inserted, skipped };
 }
 
@@ -359,18 +367,29 @@ export async function ingestFirmsNrt() {
   }
   const feats = (geo && geo.features) ? geo.features : [];
   const batch = [];
+  let geocodeFailures = 0;
+  let noFipsCount = 0;
+  
   for (const f of feats) {
     const props = f.properties || {};
     const coords = (f.geometry && f.geometry.coordinates) || [];
     const lat = coords[1];
     const lng = coords[0];
     let county = null, state = null, fips = null;
+    
     if (lat && lng) {
-      const rev = await reverseGeocodeCountyState(lat, lng);
-      county = rev.county; state = rev.state;
-      await loadFipsReference();
-      fips = mapCountyToFips(county, state);
+      try {
+        const rev = await reverseGeocodeCountyState(lat, lng);
+        county = rev.county; 
+        state = rev.state;
+        await loadFipsReference();
+        fips = mapCountyToFips(county, state);
+      } catch (e) {
+        geocodeFailures++;
+        // Continue anyway - we'll try to use lat/lng only
+      }
     }
+    
     // Parse date/time from FIRMS CSV format (acq_date: YYYY-MM-DD, acq_time: HHMM)
     let start = new Date().toISOString();
     if (props.acq_date) {
@@ -385,10 +404,11 @@ export async function ingestFirmsNrt() {
         start = new Date().toISOString();
       }
     }
+    
     const rec = {
       source: 'firms',
       event_type: 'wildfire',
-      county_fips: fips,
+      county_fips: fips || '00000', // Use placeholder if no FIPS
       county_name: county,
       state_abbr: state,
       start_time: start,
@@ -399,9 +419,26 @@ export async function ingestFirmsNrt() {
       source_id: String(props.id || `${lat},${lng},${start}`),
       raw: props
     };
-    if (rec.county_fips) batch.push(rec);
+    
+    // Allow records without FIPS if we have lat/lng (they can be filtered/geocoded later)
+    if (rec.county_fips || (lat && lng)) {
+      batch.push(rec);
+    } else {
+      noFipsCount++;
+    }
   }
-  return upsertDisasters(batch);
+  
+  if (geocodeFailures > 0) {
+    console.log(`⚠️  FIRMS: ${geocodeFailures} geocoding failures (using lat/lng fallback)`);
+  }
+  if (noFipsCount > 0) {
+    console.log(`⚠️  FIRMS: ${noFipsCount} records skipped (no coordinates)`);
+  }
+  
+  console.log(`🔥 FIRMS: Prepared ${batch.length} records for database insertion`);
+  const result = await upsertDisasters(batch);
+  console.log(`🔥 FIRMS: Inserted ${result.inserted}, skipped ${result.skipped}`);
+  return result;
 }
 
 /** USGS Earthquakes GeoJSON (past day) **/

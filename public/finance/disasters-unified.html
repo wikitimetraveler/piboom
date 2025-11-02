@@ -125,7 +125,9 @@
         qp.set('since', new Date(Date.now() - 30*24*3600*1000).toISOString());
         const resp = await fetch(`/api/disasters?${qp.toString()}`);
         const json = await resp.json();
+        console.log('📊 API Response:', { success: json.success, count: json.data?.count, disasters: json.data?.disasters?.length || 0 });
         const rows = json.success ? json.data.disasters : [];
+        console.log('📊 Rows to render:', rows.length);
         renderTable(rows);
         renderMap(rows);
       }
@@ -141,19 +143,28 @@
       }
 
       function renderTable(rows) {
+        console.log('🔄 renderTable called with', rows.length, 'rows');
         table.clear();
-        rows.forEach(r => {
-          table.row.add([
-            r.source,
-            r.event_type,
-            r.county_name || '',
-            r.state_abbr || '',
-            r.start_time ? new Date(r.start_time).toLocaleString() : '',
-            r.end_time ? new Date(r.end_time).toLocaleString() : '',
-            r.title || ''
-          ]);
+        if (rows.length === 0) {
+          console.warn('⚠️  No rows to render - grid will be empty');
+        }
+        rows.forEach((r, idx) => {
+          try {
+            table.row.add([
+              r.source || '',
+              r.event_type || '',
+              r.county_name || '',
+              r.state_abbr || '',
+              r.start_time ? new Date(r.start_time).toLocaleString() : '',
+              r.end_time ? new Date(r.end_time).toLocaleString() : '',
+              r.title || ''
+            ]);
+          } catch (e) {
+            console.error(`❌ Error adding row ${idx}:`, e, r);
+          }
         });
         table.draw();
+        console.log('✅ DataTable drawn with', rows.length, 'rows');
       }
 
       function renderMap(rows) {

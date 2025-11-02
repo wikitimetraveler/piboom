@@ -281,6 +281,15 @@ class ModernNavbar extends HTMLElement {
                   <a class="dropdown-item" href="/music/collection.html">
                     <i class="bi-collection-fill"></i> My Collection
                   </a>
+                  <a class="dropdown-item" href="/music/kml-viewer.html">
+                    <i class="bi-globe"></i> Grateful Dead Timeline
+                  </a>
+                  <a class="dropdown-item" href="/music/my-grateful-dead-shows.html">
+                    <i class="bi-music-player-fill"></i> My Grateful Dead Shows
+                  </a>
+                  <a class="dropdown-item" href="/music/musical-google-earth-files.html">
+                    <i class="bi-globe"></i> Musical Google Earth Files
+                  </a>
                   <a class="dropdown-item" href="/music/music-time-machine.html">
                     <i class="bi-clock-history"></i> Time Machine
                   </a>
