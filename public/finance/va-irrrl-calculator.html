@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<!--
+  ==============================================================================
+  VA IRRRL (Interest Rate Reduction Refinance Loan) Calculator
+  ==============================================================================
+  
+  @file       va-irrrl-calculator.html
+  @author     David Lane
+  @version    1.0.0
+  @since      2024
+  
+  @description
+  Consumer-friendly calculator for VA IRRRL refinance loans. Helps veterans
+  understand potential savings, break-even point, and total interest savings
+  when refinancing their VA loan to a lower interest rate.
+  
+  Features:
+  - Monthly payment savings calculation
+  - Break-even analysis (months to recoup closing costs)
+  - Total savings over 5, 10 years and loan life
+  - VA Funding Fee calculation with waiver option for disabled veterans
+  - Simple, consumer-friendly language and visual indicators
+  
+  Calculation Logic:
+  - New monthly payment = mortgage payment formula with new rate
+  - Monthly savings = current payment - new payment
+  - Break-even = closing costs / monthly savings
+  - Total savings = monthly savings × number of months
+  
+  VA-Specific Features:
+  - Funding fee percentage input (typically 0.5% for IRRRL)
+  - Checkbox to waive funding fee for disabled veterans
+  - Funding fee added to loan amount
+  
+  ==============================================================================
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VA IRRRL Calculator - Refinance Savings</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="../shared/calculations.js"></script>
+    <style>
+      :root {
+        --primary: #4A90A4;
+        --secondary: #6B9E78;
+        --dark: #2C3E50;
+        --border: #E8EDF2;
+        --shadow: rgba(74, 144, 164, 0.1);
+        --success: #28a745;
+        --warning: #ffc107;
+        --danger: #dc3545;
+      }
+      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
+      .nav-home { right: 20px; }
+      .nav-finance { right: 170px; }
+      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
+      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 1000px; }
+      .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
+      .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
+      .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
+      .form-label { font-weight: 500; }
+      .input-group-text { background: #F1F5F9; border-color: var(--border); }
+      .result { background: #F7F9FC; font-weight: 600; }
+      .highlight-result { font-size: 1.5rem; font-weight: 700; color: var(--success); }
+      .info-box { background: #E8F4F8; border-left: 4px solid var(--primary); padding: 12px; margin-top: 12px; border-radius: 4px; }
+      .info-box small { color: var(--dark); }
+      .savings-box { background: #d4edda; border: 2px solid var(--success); border-radius: 8px; padding: 16px; margin-top: 12px; }
+      .savings-box h5 { color: var(--success); margin-bottom: 8px; }
+      .warning-box { background: #fff3cd; border: 2px solid var(--warning); border-radius: 8px; padding: 16px; margin-top: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+
+    <div class="container">
+      <h1 class="mb-2">VA IRRRL Calculator</h1>
+      <p class="text-muted mb-4">Calculate your potential savings when refinancing your VA loan to a lower interest rate. See how much you could save each month and when you'll break even on closing costs.</p>
+
+      <!-- Info Box -->
+      <div class="info-box mb-4">
+        <strong><i class="bi-info-circle"></i> What is a VA IRRRL?</strong><br>
+        <small>
+          An Interest Rate Reduction Refinance Loan (IRRRL) is a VA-backed refinance loan that helps you lower your monthly payment by reducing your interest rate. 
+          It's a simple, streamlined process - no appraisal needed, no income verification, and you can roll closing costs into your loan.
+        </small>
+      </div>
+
+      <!-- Section: Current Loan Information -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseCurrent" aria-expanded="true" aria-controls="collapseCurrent">
+          <span><i class="bi-house mr-2"></i>Your Current Loan</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseCurrent">
+          <div class="row">
+            <div class="col-md-8"><label for="irrrl_current_balance" class="form-label">Current Loan Balance</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="irrrl_current_balance" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_current_rate" class="form-label">Current Interest Rate</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="irrrl_current_rate" placeholder="0.00" min="0" max="100" step="0.01">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_current_payment" class="form-label">Current Monthly Payment (Principal & Interest)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="irrrl_current_payment" placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: New Loan Details -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseNew" aria-expanded="true" aria-controls="collapseNew">
+          <span><i class="bi-arrow-down-circle mr-2"></i>New Loan Details</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseNew">
+          <div class="row">
+            <div class="col-md-8"><label for="irrrl_new_rate" class="form-label">New Interest Rate</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="irrrl_new_rate" placeholder="0.00" min="0" max="100" step="0.01">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8">
+              <label for="irrrl_new_term" class="form-label">New Loan Term (Years)</label>
+              <small class="text-muted d-block">Leave blank to keep same term as current loan</small>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="irrrl_new_term" placeholder="30" min="10" max="30" step="1">
+                <div class="input-group-append"><span class="input-group-text">years</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_closing_costs" class="form-label">Closing Costs</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control" id="irrrl_closing_costs" placeholder="0.00" min="0" step="0.01">
+              </div>
+              <small class="text-muted">Can be rolled into loan</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: VA Funding Fee -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseFundingFee" aria-expanded="true" aria-controls="collapseFundingFee">
+          <span><i class="bi-shield-check mr-2"></i>VA Funding Fee</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseFundingFee">
+          <div class="info-box">
+            <small>
+              <strong>VA Funding Fee:</strong> The VA charges a funding fee for IRRRL loans, typically 0.5% of the loan amount. 
+              This fee can be waived if you receive VA disability compensation or if you're a surviving spouse of a veteran who died in service or from a service-connected disability.
+            </small>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8">
+              <label for="irrrl_funding_fee_rate" class="form-label">Funding Fee Percentage</label>
+              <small class="text-muted d-block">Typically 0.5% for IRRRL loans</small>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control" id="irrrl_funding_fee_rate" placeholder="0.50" min="0" max="5" step="0.01" value="0.50">
+                <div class="input-group-append"><span class="input-group-text">%</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="irrrl_waive_funding_fee">
+                <label class="form-check-label" for="irrrl_waive_funding_fee">
+                  I qualify to waive the funding fee (disabled veteran or surviving spouse)
+                </label>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="irrrl_funding_fee_amount" readonly>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Results -->
+      <div class="calculator-card">
+        <h3 data-toggle="collapse" data-target="#collapseResults" aria-expanded="true" aria-controls="collapseResults">
+          <span><i class="bi-calculator mr-2"></i>Your Savings & Results</span>
+          <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
+        </h3>
+        <div class="collapse show card-content" id="collapseResults">
+          <div class="row">
+            <div class="col-md-8"><label for="irrrl_new_loan_amount" class="form-label">New Loan Amount</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="irrrl_new_loan_amount" readonly>
+              </div>
+              <small class="text-muted">Current balance + closing costs + funding fee</small>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_new_payment" class="form-label">New Monthly Payment (Principal & Interest)</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="irrrl_new_payment" readonly>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Monthly Savings Highlight Box -->
+          <div class="savings-box" id="irrrl_savings_box" style="display: none;">
+            <h5><i class="bi-check-circle"></i> Monthly Savings</h5>
+            <div class="highlight-result" id="irrrl_monthly_savings_display">$0.00</div>
+            <small>You'll save this amount every month!</small>
+          </div>
+
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_monthly_savings" class="form-label">Monthly Savings</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="irrrl_monthly_savings" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_break_even" class="form-label">Break-Even Point</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input type="number" class="form-control result" id="irrrl_break_even" readonly>
+                <div class="input-group-append"><span class="input-group-text">months</span></div>
+              </div>
+              <small class="text-muted">Time to recoup closing costs</small>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_savings_5yr" class="form-label">Total Savings Over 5 Years</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="irrrl_savings_5yr" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_savings_10yr" class="form-label">Total Savings Over 10 Years</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="irrrl_savings_10yr" readonly>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-8"><label for="irrrl_total_interest_savings" class="form-label">Total Interest Savings Over Loan Life</label></div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <input type="number" class="form-control result" id="irrrl_total_interest_savings" readonly>
+              </div>
+            </div>
+          </div>
+
+          <!-- Warning Box for No Savings -->
+          <div class="warning-box" id="irrrl_warning_box" style="display: none;">
+            <strong><i class="bi-exclamation-triangle"></i> Notice:</strong>
+            <div id="irrrl_warning_text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Extend calculations class with VA IRRRL-specific methods
+      calculations.prototype.calculateMortgagePayment = function(values, options) {
+        if (!values || !options || !options.result) return;
+        const principal = typeof values[0] === 'number' ? values[0] : parseFloat(values[0]) || 0;
+        const annualRate = typeof values[1] === 'number' ? values[1] : parseFloat(values[1]) || 0;
+        
+        // Get term from input field, default to 30 if not provided
+        const termInput = document.getElementById('irrrl_new_term');
+        let years = 30;
+        if (termInput && termInput.value) {
+          const termValue = parseFloat(termInput.value);
+          if (!isNaN(termValue) && termValue > 0) {
+            years = termValue;
+          }
+        }
+        
+        if (!principal || !annualRate) {
+          options.result.value = '';
+          return;
+        }
+        
+        const monthlyRate = annualRate / 100 / 12;
+        const numPayments = years * 12;
+        if (monthlyRate === 0) {
+          options.result.value = Math.round((principal / numPayments) * 100) / 100;
+          return;
+        }
+        const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                       (Math.pow(1 + monthlyRate, numPayments) - 1);
+        options.result.value = Math.round(payment * 100) / 100;
+      };
+
+      calculations.prototype.calculateVAFundingFee = function(values, options) {
+        if (!values || !options || !options.result) return;
+        const balance = typeof values[0] === 'number' ? values[0] : parseFloat(values[0]) || 0;
+        const feeRate = typeof values[1] === 'number' ? values[1] : parseFloat(values[1]) || 0;
+        
+        // Access checkbox directly by ID (simplest approach)
+        const checkbox = document.getElementById('irrrl_waive_funding_fee');
+        const waiveFee = checkbox ? checkbox.checked : false;
+        
+        const feeAmount = waiveFee ? 0 : (balance * feeRate / 100);
+        options.result.value = Math.round(feeAmount * 100) / 100;
+      };
+
+      calculations.prototype.calculateIRRRLBreakEven = function(values, options) {
+        if (!values || !options || !options.result) return;
+        const closingCosts = typeof values[0] === 'number' ? values[0] : parseFloat(values[0]) || 0;
+        const monthlySavings = typeof values[1] === 'number' ? values[1] : parseFloat(values[1]) || 0;
+        
+        if (monthlySavings <= 0) {
+          options.result.value = '';
+          return;
+        }
+        const breakEven = closingCosts / monthlySavings;
+        options.result.value = Math.round(breakEven * 10) / 10;
+      };
+
+      calculations.prototype.calculateTotalInterestSavings = function(values, options) {
+        if (!values || !options || !options.result) return;
+        const currentBalance = typeof values[0] === 'number' ? values[0] : parseFloat(values[0]) || 0;
+        const currentRate = typeof values[1] === 'number' ? values[1] : parseFloat(values[1]) || 0;
+        const newLoanAmount = typeof values[2] === 'number' ? values[2] : parseFloat(values[2]) || 0;
+        const newRate = typeof values[3] === 'number' ? values[3] : parseFloat(values[3]) || 0;
+        
+        // Get term from input field, default to 30
+        const termInput = document.getElementById('irrrl_new_term');
+        let term = 30;
+        if (termInput && termInput.value) {
+          const termValue = parseFloat(termInput.value);
+          if (!isNaN(termValue) && termValue > 0) {
+            term = termValue;
+          }
+        }
+        
+        if (!currentBalance || !currentRate || !newLoanAmount || !newRate) {
+          options.result.value = '';
+          return;
+        }
+        
+        // Calculate mortgage payment helper
+        const calcPayment = (principal, rate, years) => {
+          const monthlyRate = rate / 100 / 12;
+          const numPayments = years * 12;
+          if (monthlyRate === 0) return principal / numPayments;
+          return principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                 (Math.pow(1 + monthlyRate, numPayments) - 1);
+        };
+        
+        const currentPayment = calcPayment(currentBalance, currentRate, term);
+        const newPayment = calcPayment(newLoanAmount, newRate, term);
+        
+        const currentTotalInterest = (currentPayment * term * 12) - currentBalance;
+        const newTotalInterest = (newPayment * term * 12) - newLoanAmount;
+        const savings = currentTotalInterest - newTotalInterest;
+        
+        options.result.value = Math.round(savings * 100) / 100;
+      };
+
+      document.addEventListener('DOMContentLoaded', function() {
+        // Initialize calculations engine
+        const calc = new calculations({
+          groups: [
+            // Funding fee calculation (with waiver checkbox)
+            {
+              inputIds: ['irrrl_current_balance', 'irrrl_funding_fee_rate'],
+              resultId: 'irrrl_funding_fee_amount',
+              calculation: 'calculateVAFundingFee',
+              additionalInputIds: { waiveFee: 'irrrl_waive_funding_fee' }
+            },
+            // New loan amount = balance + closing costs + funding fee
+            {
+              inputIds: ['irrrl_current_balance', 'irrrl_closing_costs', 'irrrl_funding_fee_amount'],
+              resultId: 'irrrl_new_loan_amount',
+              calculation: 'sumRounded'
+            },
+            // New monthly payment (needs term from additional inputs)
+            {
+              inputIds: ['irrrl_new_loan_amount', 'irrrl_new_rate'],
+              resultId: 'irrrl_new_payment',
+              calculation: 'calculateMortgagePayment',
+              additionalInputIds: { term: 'irrrl_new_term' }
+            },
+            // Monthly savings = current payment - new payment
+            {
+              inputIds: ['irrrl_current_payment', 'irrrl_new_payment'],
+              resultId: 'irrrl_monthly_savings',
+              calculation: 'subtractRounded'
+            },
+            // Break-even point
+            {
+              inputIds: ['irrrl_closing_costs', 'irrrl_monthly_savings'],
+              resultId: 'irrrl_break_even',
+              calculation: 'calculateIRRRLBreakEven'
+            },
+            // Savings over 5 years (60 months)
+            {
+              inputIds: ['irrrl_monthly_savings'],
+              resultId: 'irrrl_savings_5yr',
+              calculation: 'multiplyByMonths5yr'
+            },
+            // Savings over 10 years (120 months)
+            {
+              inputIds: ['irrrl_monthly_savings'],
+              resultId: 'irrrl_savings_10yr',
+              calculation: 'multiplyByMonths10yr'
+            },
+            // Total interest savings
+            {
+              inputIds: ['irrrl_current_balance', 'irrrl_current_rate', 'irrrl_new_loan_amount', 'irrrl_new_rate'],
+              resultId: 'irrrl_total_interest_savings',
+              calculation: 'calculateTotalInterestSavings',
+              additionalInputIds: { term: 'irrrl_new_term' }
+            }
+          ]
+        });
+
+        // Add custom calculation methods for time-based savings
+        calculations.prototype.multiplyByMonths5yr = function(values, options) {
+          if (!values || !options || !options.result) return;
+          const monthlySavings = typeof values[0] === 'number' ? values[0] : parseFloat(values[0]) || 0;
+          options.result.value = Math.round((monthlySavings * 60) * 100) / 100;
+        };
+
+        calculations.prototype.multiplyByMonths10yr = function(values, options) {
+          if (!values || !options || !options.result) return;
+          const monthlySavings = typeof values[0] === 'number' ? values[0] : parseFloat(values[0]) || 0;
+          options.result.value = Math.round((monthlySavings * 120) * 100) / 100;
+        };
+
+        // Handle term input - if empty, use default 30
+        const termInput = document.getElementById('irrrl_new_term');
+        if (termInput) {
+          termInput.addEventListener('input', function() {
+            if (!this.value) {
+              // Will use default in calculation
+              calc.recalculateAll();
+            }
+          });
+        }
+
+        // Update visual indicators and warnings
+        function updateVisualIndicators() {
+          const monthlySavings = parseFloat(document.getElementById('irrrl_monthly_savings').value) || 0;
+          const currentBalance = parseFloat(document.getElementById('irrrl_current_balance').value) || 0;
+          const currentRate = parseFloat(document.getElementById('irrrl_current_rate').value) || 0;
+          const newRate = parseFloat(document.getElementById('irrrl_new_rate').value) || 0;
+          
+          const savingsBox = document.getElementById('irrrl_savings_box');
+          const savingsDisplay = document.getElementById('irrrl_monthly_savings_display');
+          const warningBox = document.getElementById('irrrl_warning_box');
+          const warningText = document.getElementById('irrrl_warning_text');
+          
+          // Update savings highlight box
+          if (monthlySavings > 0) {
+            savingsDisplay.textContent = '$' + Math.round(monthlySavings * 100) / 100;
+            savingsBox.style.display = 'block';
+          } else {
+            savingsBox.style.display = 'none';
+          }
+          
+          // Update warnings
+          if (monthlySavings <= 0 && currentBalance > 0 && newRate > 0) {
+            warningBox.style.display = 'block';
+            if (newRate >= currentRate) {
+              warningText.textContent = 'The new interest rate is not lower than your current rate. You may not see monthly savings with this refinance.';
+            } else {
+              warningText.textContent = 'Due to closing costs and funding fee being added to the loan, your monthly payment may increase. Consider if the long-term interest savings are worth it.';
+            }
+          } else {
+            warningBox.style.display = 'none';
+          }
+        }
+
+        // Watch for changes and update visuals
+        ['irrrl_monthly_savings', 'irrrl_current_balance', 'irrrl_current_rate', 'irrrl_new_rate'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('input', updateVisualIndicators);
+            // Also trigger on calculation updates
+            const observer = new MutationObserver(updateVisualIndicators);
+            observer.observe(input, { attributes: true, attributeFilter: ['value'] });
+          }
+        });
+
+        // Handle checkbox change for funding fee waiver
+        document.getElementById('irrrl_waive_funding_fee').addEventListener('change', function() {
+          calc.recalculateAll();
+          updateVisualIndicators();
+        });
+
+        // Handle term input - need to pass as additional data
+        const termInput2 = document.getElementById('irrrl_new_term');
+        if (termInput2) {
+          termInput2.addEventListener('input', function() {
+            calc.recalculateAll();
+            updateVisualIndicators();
+          });
+        }
+
+        // Format currency inputs on blur
+        ['irrrl_current_balance', 'irrrl_current_payment', 'irrrl_closing_costs'].forEach(id => {
+          const input = document.getElementById(id);
+          if (input) {
+            input.addEventListener('blur', function() {
+              const value = parseFloat(this.value);
+              if (!isNaN(value) && value >= 0) {
+                this.value = Math.round(value * 100) / 100;
+              }
+            });
+          }
+        });
+
+        // Initial calculation and visual update
+        calc.recalculateAll();
+        setTimeout(updateVisualIndicators, 100);
+      });
+    </script>
+  </body>
+</html>
+
