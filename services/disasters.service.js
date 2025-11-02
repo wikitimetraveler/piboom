@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS disasters (
   event_type TEXT NOT NULL,
   county_fips CHAR(5) NOT NULL,
   county_name TEXT,
-  state_abbr CHAR(2),
+  state_abbr VARCHAR(3),
   start_time TIMESTAMPTZ NOT NULL,
   end_time TIMESTAMPTZ,
   severity TEXT,
@@ -97,6 +97,27 @@ export async function initDisastersSchema() {
     await pool.query('BEGIN');
     await pool.query(CREATE_TABLE_SQL);
     await pool.query(INDEXES_SQL);
+    
+    // Migrate existing state_abbr column from CHAR(2) to VARCHAR(3) for Canadian provinces
+    try {
+      await pool.query(`
+        DO $$
+        BEGIN
+          IF EXISTS (
+            SELECT 1 FROM information_schema.columns 
+            WHERE table_name = 'disasters' AND column_name = 'state_abbr'
+            AND character_maximum_length = 2
+          ) THEN
+            ALTER TABLE disasters ALTER COLUMN state_abbr TYPE VARCHAR(3);
+            RAISE NOTICE 'Migrated state_abbr column to VARCHAR(3)';
+          END IF;
+        END $$;
+      `);
+    } catch (migrateErr) {
+      // Migration might fail if column doesn't exist or already migrated - that's OK
+      console.log('📝 State abbreviation migration:', migrateErr.message);
+    }
+    
     await pool.query('COMMIT');
     console.log('✅ Disasters schema ensured');
   } catch (err) {
@@ -153,12 +174,27 @@ function mapCountyToFips(countyName, stateAbbr) {
   return rec ? rec.county_fips : null;
 }
 
+/**
+ * Calculate distance between two lat/lng points in kilometers (Haversine formula)
+ */
+function calculateDistance(lat1, lng1, lat2, lng2) {
+  const R = 6371; // Earth's radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
 export default {
   initDisastersSchema,
   loadFipsReference,
   lookupCountyByFips,
   upsertDisasters,
   normalizeFemaV2ToUnified,
+  ingestFema,
   ingestFirmsNrt,
   ingestUsgsQuakes,
   ingestNwsCap,
@@ -189,12 +225,26 @@ export async function upsertDisasters(batch) {
   
   for (const d of batch) {
     try {
+      // Normalize state_abbr: allow up to 3 characters for Canadian provinces, otherwise 2
+      let stateAbbr = null;
+      if (d.state_abbr) {
+        const stateStr = String(d.state_abbr).trim().toUpperCase();
+        // Canadian provinces can be 3 chars (e.g., "ON", "BC", "QC", "MB", "SK", "AB", "NS", "NB", "PE", "NL", "YT", "NT", "NU")
+        // Check if it's likely Canadian (3 chars) or US (2 chars)
+        if (stateStr.length <= 3) {
+          stateAbbr = stateStr;
+        } else {
+          // If longer than 3, truncate to 3 (in case of longer codes)
+          stateAbbr = stateStr.substring(0, 3);
+        }
+      }
+      
       const values = [
         d.source,
         d.event_type,
         d.county_fips,
         d.county_name || null,
-        d.state_abbr || null,
+        stateAbbr,
         d.start_time,
         d.end_time || null,
         d.severity || null,
@@ -366,28 +416,40 @@ export async function ingestFirmsNrt() {
     return { inserted: 0, skipped: 0 };
   }
   const feats = (geo && geo.features) ? geo.features : [];
-  const batch = [];
-  let geocodeFailures = 0;
-  let noFipsCount = 0;
+  
+  // Filter configuration for significant fires
+  const MIN_BRIGHTNESS = 350; // Kelvin - filters out small/inconsequential fires
+  const MIN_CONFIDENCE = 'nominal'; // 'low', 'nominal', 'high' - only nominal or high
+  const CLUSTER_RADIUS_KM = 5; // km - fires within this radius are considered a cluster
+  const MIN_CLUSTER_SIZE = 2; // Require at least 2 fires in cluster for significance
+  
+  // First pass: filter by confidence and brightness
+  const significantFires = [];
+  let filteredByConfidence = 0;
+  let filteredByBrightness = 0;
   
   for (const f of feats) {
     const props = f.properties || {};
     const coords = (f.geometry && f.geometry.coordinates) || [];
     const lat = coords[1];
     const lng = coords[0];
-    let county = null, state = null, fips = null;
     
-    if (lat && lng) {
-      try {
-        const rev = await reverseGeocodeCountyState(lat, lng);
-        county = rev.county; 
-        state = rev.state;
-        await loadFipsReference();
-        fips = mapCountyToFips(county, state);
-      } catch (e) {
-        geocodeFailures++;
-        // Continue anyway - we'll try to use lat/lng only
-      }
+    if (!lat || !lng) continue;
+    
+    // Get brightness and confidence
+    const brightness = props.brightness ? parseFloat(props.brightness) : null;
+    const confidence = (props.confidence || '').toLowerCase().trim();
+    
+    // Filter by confidence (skip 'low' confidence fires)
+    if (confidence === 'low') {
+      filteredByConfidence++;
+      continue;
+    }
+    
+    // Filter by brightness (skip fires below threshold)
+    if (brightness === null || brightness < MIN_BRIGHTNESS) {
+      filteredByBrightness++;
+      continue;
     }
     
     // Parse date/time from FIRMS CSV format (acq_date: YYYY-MM-DD, acq_time: HHMM)
@@ -400,27 +462,121 @@ export async function ingestFirmsNrt() {
       try {
         start = new Date(`${dateStr}T${hour}:${minute}:00Z`).toISOString();
       } catch (e) {
-        // Fallback if date parsing fails
         start = new Date().toISOString();
+      }
+    }
+    
+    significantFires.push({
+      lat,
+      lng,
+      brightness,
+      confidence,
+      start,
+      props,
+      coords: [lng, lat]
+    });
+  }
+  
+  console.log(`🔥 FIRMS: Filtered ${feats.length} detections:`);
+  console.log(`   - ${filteredByConfidence} filtered by low confidence`);
+  console.log(`   - ${filteredByBrightness} filtered by brightness < ${MIN_BRIGHTNESS}K`);
+  console.log(`   - ${significantFires.length} significant fires remaining`);
+  
+  // Second pass: Cluster detection to identify larger fire areas
+  const clusters = new Map(); // clusterId -> [fires]
+  const fireToCluster = new Map(); // fire index -> clusterId
+  
+  // Simple clustering: group fires within CLUSTER_RADIUS_KM
+  for (let i = 0; i < significantFires.length; i++) {
+    const fire1 = significantFires[i];
+    let assignedCluster = null;
+    
+    // Check if this fire is near any existing cluster
+    for (const [clusterId, clusterFires] of clusters.entries()) {
+      const clusterCenter = clusterFires[0];
+      const distance = calculateDistance(
+        fire1.lat, fire1.lng,
+        clusterCenter.lat, clusterCenter.lng
+      );
+      
+      if (distance <= CLUSTER_RADIUS_KM) {
+        assignedCluster = clusterId;
+        break;
+      }
+    }
+    
+    if (assignedCluster) {
+      clusters.get(assignedCluster).push(fire1);
+      fireToCluster.set(i, assignedCluster);
+    } else {
+      // Create new cluster
+      const newClusterId = `cluster_${i}`;
+      clusters.set(newClusterId, [fire1]);
+      fireToCluster.set(i, newClusterId);
+    }
+  }
+  
+  // Filter: only include fires that are in clusters of MIN_CLUSTER_SIZE or larger
+  // OR fires with very high brightness (single intense fires)
+  const HIGH_BRIGHTNESS_THRESHOLD = 450; // Very intense single fires
+  const finalFires = [];
+  let filteredByCluster = 0;
+  
+  for (let i = 0; i < significantFires.length; i++) {
+    const fire = significantFires[i];
+    const clusterId = fireToCluster.get(i);
+    const clusterSize = clusters.get(clusterId)?.length || 0;
+    
+    // Include if: part of cluster OR very high brightness
+    if (clusterSize >= MIN_CLUSTER_SIZE || fire.brightness >= HIGH_BRIGHTNESS_THRESHOLD) {
+      finalFires.push(fire);
+    } else {
+      filteredByCluster++;
+    }
+  }
+  
+  console.log(`🔥 FIRMS: Clustering analysis:`);
+  console.log(`   - ${clusters.size} fire clusters identified`);
+  console.log(`   - ${filteredByCluster} fires filtered (too isolated)`);
+  console.log(`   - ${finalFires.length} significant fires ready for ingestion`);
+  
+  // Third pass: Geocode and prepare records
+  const batch = [];
+  let geocodeFailures = 0;
+  let noFipsCount = 0;
+  
+  await loadFipsReference();
+  
+  for (const fire of finalFires) {
+    const { lat, lng, brightness, confidence, start, props } = fire;
+    let county = null, state = null, fips = null;
+    
+    if (lat && lng) {
+      try {
+        const rev = await reverseGeocodeCountyState(lat, lng);
+        county = rev.county; 
+        state = rev.state;
+        fips = mapCountyToFips(county, state);
+      } catch (e) {
+        geocodeFailures++;
       }
     }
     
     const rec = {
       source: 'firms',
       event_type: 'wildfire',
-      county_fips: fips || '00000', // Use placeholder if no FIPS
+      county_fips: fips || '00000',
       county_name: county,
       state_abbr: state,
       start_time: start,
       end_time: null,
-      severity: String(props.confidence || ''),
-      title: `Fire ${props.brightness ? `(${props.brightness})` : ''}`.trim(),
+      severity: `${confidence} (${brightness}K)`,
+      title: `Fire ${brightness ? `(${brightness}K)` : ''}`.trim(),
       lat, lng,
       source_id: String(props.id || `${lat},${lng},${start}`),
       raw: props
     };
     
-    // Allow records without FIPS if we have lat/lng (they can be filtered/geocoded later)
     if (rec.county_fips || (lat && lng)) {
       batch.push(rec);
     } else {
@@ -540,6 +696,110 @@ export async function ingestNwsCap() {
     if (rec.county_fips) batch.push(rec);
   }
   return upsertDisasters(batch);
+}
+
+/** FEMA Disaster Declarations (last 30 days) **/
+export async function ingestFema() {
+  const baseUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
+  
+  // Calculate date 30 days ago
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0]; // YYYY-MM-DD
+  
+  // Query FEMA API for disasters in last 30 days (no state/county filter to get all)
+  const filter = `incidentBeginDate ge ${thirtyDaysAgoStr}`;
+  const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$top=1000&$orderby=incidentBeginDate desc`;
+  
+  let data;
+  try {
+    console.log(`🏛️  FEMA: Querying disasters since ${thirtyDaysAgoStr}`);
+    const resp = await fetch(url, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'piBoom-Disasters/1.0'
+      }
+    });
+    
+    if (!resp.ok) {
+      throw new Error(`FEMA API error: ${resp.status} ${resp.statusText}`);
+    }
+    
+    data = await resp.json();
+  } catch (e) {
+    console.warn('⚠️  FEMA fetch failed:', e.message);
+    return { inserted: 0, skipped: 0 };
+  }
+  
+  const disasters = data.DisasterDeclarationsSummaries || [];
+  console.log(`🏛️  FEMA: Retrieved ${disasters.length} disaster declarations`);
+  
+  // Filter to ensure only last 30 days
+  const cutoffDate = new Date(thirtyDaysAgoStr);
+  const recentDisasters = disasters.filter(disaster => {
+    if (disaster.incidentBeginDate) {
+      const disasterDate = new Date(disaster.incidentBeginDate);
+      return disasterDate >= cutoffDate;
+    }
+    return false;
+  });
+  
+  console.log(`🏛️  FEMA: ${recentDisasters.length} disasters within 30-day window`);
+  
+  const batch = [];
+  await loadFipsReference();
+  
+  for (const item of recentDisasters) {
+    // Extract county from designatedArea (format: "Harris (County)")
+    let county = null;
+    if (item.designatedArea) {
+      county = item.designatedArea.replace(/\s*\(County\)$/i, '').trim();
+    }
+    
+    const state = item.state || null;
+    let fips = null;
+    
+    // Get FIPS code if we have county and state
+    if (county && state) {
+      fips = mapCountyToFips(county, state);
+    }
+    
+    // Get coordinates if available (some FEMA records have them)
+    let lat = null, lng = null;
+    if (item.latitude && item.longitude) {
+      lat = parseFloat(item.latitude);
+      lng = parseFloat(item.longitude);
+    }
+    
+    // Note: Skipping reverse geocoding for FEMA to avoid rate limits
+    // Coordinates will be populated if available in FEMA data, otherwise null
+    
+    const rec = {
+      source: 'fema',
+      event_type: (item.incidentType || 'disaster').toLowerCase(),
+      county_fips: fips || '00000', // Use placeholder if no FIPS
+      county_name: county,
+      state_abbr: state,
+      start_time: item.incidentBeginDate || item.declarationDate || new Date().toISOString(),
+      end_time: item.incidentEndDate || null,
+      severity: null,
+      title: item.declarationTitle || item.title || 'FEMA Disaster',
+      lat,
+      lng,
+      source_id: String(item.disasterNumber || item.id || item.declarationTitle || ''),
+      raw: item
+    };
+    
+    // Allow records without FIPS if we have county/state (they can be filtered later)
+    if (rec.county_fips || (rec.county_name && rec.state_abbr)) {
+      batch.push(rec);
+    }
+  }
+  
+  console.log(`🏛️  FEMA: Prepared ${batch.length} records for database insertion`);
+  const result = await upsertDisasters(batch);
+  console.log(`🏛️  FEMA: Inserted ${result.inserted}, skipped ${result.skipped}`);
+  return result;
 }
 
 /** NHC Active Cyclones (best available JSON proxy) — simple placeholder using NWS CAP hurricane events **/

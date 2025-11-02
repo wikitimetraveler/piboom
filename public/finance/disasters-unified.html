@@ -8,17 +8,331 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <style>
-      body { background: #f8fafc; }
-      .container-xxl { max-width: 1280px; }
-      #map { height: 360px; width: 100%; border-radius: 8px; }
-      .filters .form-label { font-weight: 500; }
+      :root {
+        --wildfire: linear-gradient(135deg, #ff6b35, #f7931e);
+        --earthquake: linear-gradient(135deg, #8b4513, #a0522d);
+        --hurricane: linear-gradient(135deg, #1e88e5, #1565c0);
+        --flood: linear-gradient(135deg, #29b6f6, #0277bd);
+        --severe: linear-gradient(135deg, #ef5350, #c62828);
+        --default-gradient: linear-gradient(135deg, #667eea, #764ba2);
+      }
+
+      body { 
+        background: #f5f7fa;
+        min-height: 100vh;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+      }
+
+      .container-xxl { 
+        max-width: 1400px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+      }
+
+      .page-header h1 {
+        color: #1f2937;
+        font-weight: 600;
+        font-size: 1.75rem;
+        margin-bottom: 0;
+      }
+
+      .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        background: white;
+        transition: all 0.2s ease;
+        overflow: hidden;
+      }
+
+      .card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #d1d5db;
+      }
+
+      .card-header {
+        background: #f9fafb;
+        color: #1f2937;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        border-bottom: 2px solid #e5e7eb;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      #map { 
+        height: 500px; 
+        width: 100%; 
+        border-radius: 12px;
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .filters .form-label { 
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e5e7eb;
+        transition: all 0.3s ease;
+        padding: 0.75rem 1rem;
+      }
+
+      .form-control:focus, .form-select:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        outline: none;
+      }
+
+      .btn {
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        transition: all 0.3s ease;
+        border: none;
+      }
+
+      .btn-primary {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+      }
+
+      .btn-primary:hover {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+      }
+
+      .btn-outline-primary {
+        border: 1px solid #2563eb;
+        color: #2563eb;
+        background: white;
+      }
+
+      .btn-outline-primary:hover {
+        background: #2563eb;
+        color: white;
+      }
+
+      .btn-outline-secondary {
+        border: 1px solid #6b7280;
+        color: #6b7280;
+        background: white;
+      }
+
+      .btn-outline-secondary:hover {
+        background: #6b7280;
+        color: white;
+      }
+
+      /* Disaster type row colors - subtle background tints */
+      #disastersTable tbody tr.disaster-wildfire { background-color: #fff7ed; }
+      #disastersTable tbody tr.disaster-earthquake { background-color: #fef3f2; }
+      #disastersTable tbody tr.disaster-hurricane { background-color: #eff6ff; }
+      #disastersTable tbody tr.disaster-flood { background-color: #f0f9ff; }
+      #disastersTable tbody tr.disaster-severe { background-color: #fef2f2; }
+
+      /* Table styling */
+      #disastersTable tbody tr {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-left: 4px solid transparent;
+      }
+
+      #disastersTable tbody tr:hover {
+        background-color: #f3f4f6 !important;
+        border-left-color: #2563eb;
+      }
+
+      #disastersTable thead th {
+        background: #f9fafb;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        color: #6b7280;
+        border-bottom: 2px solid #e5e7eb;
+        padding: 0.75rem 1rem;
+      }
+
+      /* Source badges - professional styling */
+      .source-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        border: 1px solid transparent;
+      }
+
+      .source-fema { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+      .source-firms { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+      .source-usgs { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+      .source-nws { background: #cffafe; color: #0e7490; border-color: #67e8f9; }
+      .source-nhc { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+
+      /* Event type icons */
+      .event-icon {
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+      }
+
+      /* YouTube results */
+      #youtubeResults .card {
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        transition: all 0.2s ease;
+      }
+
+      #youtubeResults .card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #d1d5db;
+      }
+
+      /* Encompass loans */
+      #encompassLoansCard {
+        animation: slideDown 0.5s ease;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Active disaster indicator - subtle */
+      .disaster-active {
+        position: relative;
+      }
+
+      .disaster-active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: #10b981;
+        animation: pulseIndicator 2s ease-in-out infinite;
+      }
+
+      @keyframes pulseIndicator {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+
+      /* Stats cards - professional */
+      .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        border: 1px solid #e5e7eb;
+      }
+
+      .stat-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #d1d5db;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        line-height: 1.2;
+      }
+
+      .stat-label {
+        color: #6b7280;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.5rem;
+      }
+
+      /* Loading animation */
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(102, 126, 234, 0.3);
+        border-top-color: #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      /* Map marker pulse */
+      .marker-pulse {
+        animation: markerPulse 2s ease-in-out infinite;
+      }
+
+      @keyframes markerPulse {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.2); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 1; }
+      }
     </style>
   </head>
   <body>
     <div class="container-xxl py-4">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h3 mb-0">Unified Disasters (30-day, Multi-Source)</h1>
-        <a class="btn btn-outline-secondary" href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a>
+      <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h1 class="mb-0"><i class="bi-fire"></i> Unified Disasters <small class="text-muted">(30-day, Multi-Source)</small></h1>
+          <a class="btn btn-outline-secondary" href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a>
+        </div>
+        <div class="row g-3" id="statsRow">
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="stat-number" id="totalDisasters">0</div>
+              <div class="stat-label">Total Disasters</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="stat-number" id="activeFires">0</div>
+              <div class="stat-label">Active Fires</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="stat-number" id="earthquakes">0</div>
+              <div class="stat-label">Earthquakes</div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="stat-card">
+              <div class="stat-number" id="affectedCounties">0</div>
+              <div class="stat-label">Affected Counties</div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="card mb-3">
@@ -36,10 +350,10 @@
               <label class="form-label">Source</label>
               <select id="sourceInput" class="form-select" multiple>
                 <option value="fema" selected>FEMA</option>
-                <option value="firms">NASA FIRMS</option>
-                <option value="usgs">USGS</option>
-                <option value="nws">NOAA/NWS</option>
-                <option value="nhc">NHC</option>
+                <option value="firms" selected>NASA FIRMS</option>
+                <option value="usgs" selected>USGS</option>
+                <option value="nws" selected>NOAA/NWS</option>
+                <option value="nhc" selected>NHC</option>
                 <option value="gdacs">GDACS</option>
               </select>
             </div>
@@ -62,10 +376,11 @@
         </div>
       </div>
 
-      <div class="row g-3">
-        <div class="col-lg-8">
+      <!-- Disasters Table -->
+      <div class="row g-3 mb-3">
+        <div class="col-12">
           <div class="card">
-            <div class="card-header"><strong>Disasters</strong></div>
+            <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos and loans)</small></div>
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-hover" id="disastersTable">
@@ -86,11 +401,61 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-4">
+      </div>
+
+      <!-- Map and YouTube Side by Side -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
           <div class="card">
-            <div class="card-header"><strong>Map</strong></div>
+            <div class="card-header"><strong><i class="bi-geo-alt"></i> Map</strong></div>
             <div class="card-body">
-              <div id="map"></div>
+              <div id="map" style="height: 500px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header"><strong><i class="bi-youtube"></i> Disaster Videos</strong></div>
+            <div class="card-body">
+              <div id="youtubeResults" style="max-height: 500px; overflow-y: auto;">
+                <div class="text-center text-muted">
+                  <i class="bi-youtube"></i><br>
+                  Click on a disaster to search for related videos
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Encompass Loans Section -->
+      <div class="row g-3">
+        <div class="col-12">
+          <div class="card" id="encompassLoansCard" style="display: none;">
+            <div class="card-header">
+              <strong><i class="bi-bank"></i> Encompass Loans in Affected County</strong>
+              <small class="text-muted d-block" id="encompassLoansSubtitle">Loans affected by selected disaster</small>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover" id="encompassLoansTable">
+                  <thead>
+                    <tr>
+                      <th>Loan Number</th>
+                      <th>Borrower</th>
+                      <th>Property Address</th>
+                      <th>City, State</th>
+                      <th>County</th>
+                      <th>Loan Amount</th>
+                      <th>Milestone</th>
+                      <th>Risk Level</th>
+                      <th>Encompass GUID</th>
+                      <th>Last Analysis</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -101,14 +466,30 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI&libraries=places"></script>
+    <!-- Google API for YouTube -->
+    <script src="https://apis.google.com/js/api.js"></script>
     <script>
-      let table, map, markers = [];
+      let table, map, markers = [], loanMarkers = [];
+      let encompassLoansTable;
+      let youtubeAPIReady = false;
+      let selectedDisaster = null;
+
       $(function init() {
         table = $('#disastersTable').DataTable({ pageLength: 25, order: [[4, 'desc']] });
+        encompassLoansTable = $('#encompassLoansTable').DataTable({ pageLength: 10, order: [[0, 'asc']] });
         map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6} });
         $('#applyBtn').on('click', loadDisasters);
         $('#refreshBtn').on('click', refreshDisasters);
+        
+        // Make table rows clickable
+        $('#disastersTable tbody').on('click', 'tr', function() {
+          const data = table.row(this).data();
+          const rowData = table.row(this).nodes().to$().data('disasterObj');
+          selectDisaster(data, rowData);
+        });
+        
+        loadYouTubeAPI();
         loadDisasters();
       });
 
@@ -120,14 +501,29 @@
         const events = $('#eventInput').val() || [];
         if (state) qp.set('state', state);
         if (county) qp.set('county', county);
+        // Note: API only supports single source/event filter
+        // If multiple sources selected, don't filter (show all) - otherwise filter by first selected
         if (sources.length === 1) qp.set('source', sources[0]);
         if (events.length === 1) qp.set('event', events[0]);
         qp.set('since', new Date(Date.now() - 30*24*3600*1000).toISOString());
-        const resp = await fetch(`/api/disasters?${qp.toString()}`);
+        const url = `/api/disasters?${qp.toString()}`;
+        console.log('📊 Loading disasters from:', url);
+        const resp = await fetch(url);
         const json = await resp.json();
-        console.log('📊 API Response:', { success: json.success, count: json.data?.count, disasters: json.data?.disasters?.length || 0 });
+        console.log('📊 API Response:', { 
+          success: json.success, 
+          count: json.data?.count, 
+          disasters: json.data?.disasters?.length || 0,
+          sample: json.data?.disasters?.slice(0, 3)
+        });
         const rows = json.success ? json.data.disasters : [];
         console.log('📊 Rows to render:', rows.length);
+        if (rows.length === 0) {
+          console.warn('⚠️  No disasters found. Check:');
+          console.warn('   - Database connection');
+          console.warn('   - Date filter (30 days)');
+          console.warn('   - Source/event filters');
+        }
         renderTable(rows);
         renderMap(rows);
       }
@@ -138,7 +534,10 @@
         const county = $('#countyInput').val().trim();
         if (state) qp.set('state', state);
         if (county) qp.set('county', county);
-        await fetch(`/api/disasters/refresh?${qp.toString()}`, { method: 'POST' });
+        console.log('🔄 Refreshing disasters...');
+        const refreshResp = await fetch(`/api/disasters/refresh?${qp.toString()}`, { method: 'POST' });
+        const refreshJson = await refreshResp.json();
+        console.log('🔄 Refresh response:', refreshJson);
         await loadDisasters();
       }
 
@@ -150,19 +549,45 @@
         }
         rows.forEach((r, idx) => {
           try {
-            table.row.add([
-              r.source || '',
-              r.event_type || '',
+            const eventType = r.event_type || '';
+            const source = r.source || '';
+            const icon = getEventIcon(eventType);
+            const sourceBadge = `<span class="source-badge source-${source}">${source.toUpperCase()}</span>`;
+            const eventBadge = `<span class="event-icon">${icon}</span>${eventType}`;
+            
+            const rowNode = table.row.add([
+              sourceBadge,
+              eventBadge,
               r.county_name || '',
               r.state_abbr || '',
               r.start_time ? new Date(r.start_time).toLocaleString() : '',
               r.end_time ? new Date(r.end_time).toLocaleString() : '',
               r.title || ''
-            ]);
+            ]).node();
+            
+            // Add event type class for row styling
+            if (eventType) {
+              $(rowNode).addClass(`disaster-${eventType}`);
+            }
+            
+            // Add active class if recent (within 24 hours)
+            if (r.start_time) {
+              const startTime = new Date(r.start_time);
+              const hoursAgo = (Date.now() - startTime.getTime()) / (1000 * 60 * 60);
+              if (hoursAgo < 24) {
+                $(rowNode).addClass('disaster-active');
+              }
+            }
+            
+            // Store full disaster object on row for later access
+            $(rowNode).data('disasterObj', r);
           } catch (e) {
             console.error(`❌ Error adding row ${idx}:`, e, r);
           }
         });
+        
+        // Update stats
+        updateStats(rows);
         table.draw();
         console.log('✅ DataTable drawn with', rows.length, 'rows');
       }
@@ -175,15 +600,305 @@
         rows.forEach(r => {
           if (r.lat && r.lng) {
             const pos = { lat: parseFloat(r.lat), lng: parseFloat(r.lng) };
-            const marker = new google.maps.Marker({ position: pos, map, title: r.title || r.event_type });
-            const info = new google.maps.InfoWindow({ content: `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name||''}, ${r.state_abbr||''}<br>${r.start_time?new Date(r.start_time).toLocaleString():''}</div>` });
-            marker.addListener('click', () => info.open(map, marker));
+            const marker = new google.maps.Marker({ 
+              position: pos, 
+              map, 
+              title: r.title || r.event_type,
+              icon: {
+                url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
+                scaledSize: new google.maps.Size(30, 30)
+              }
+            });
+            const info = new google.maps.InfoWindow({ 
+              content: `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name||''}, ${r.state_abbr||''}<br>${r.start_time?new Date(r.start_time).toLocaleString():''}</div>` 
+            });
+            marker.addListener('click', () => {
+              info.open(map, marker);
+              // Trigger YouTube search when marker clicked
+              selectDisaster([r.source, r.event_type, r.county_name, r.state_abbr, r.start_time, r.end_time, r.title], r);
+            });
             markers.push(marker);
             bounds.extend(pos);
             any = true;
           }
         });
         if (any) map.fitBounds(bounds);
+      }
+
+      // Select disaster and show YouTube/Encompass data
+      function selectDisaster(disasterData, disasterObj) {
+        selectedDisaster = disasterObj || disasterData;
+        const title = disasterObj?.title || disasterData[6] || '';
+        const state = disasterObj?.state_abbr || disasterData[3] || '';
+        const county = disasterObj?.county_name || disasterData[2] || '';
+        
+        console.log('Selecting disaster:', title, state, county);
+        
+        // Show Encompass loans card
+        $('#encompassLoansCard').show();
+        $('#encompassLoansSubtitle').text(`Loans in ${county}, ${state} affected by ${title}`);
+        
+        // Load Encompass loans
+        if (state && county) {
+          loadEncompassLoansForCounty(state, county);
+        }
+        
+        // Search YouTube
+        if (title) {
+          if (disasterObj && disasterObj.lat && disasterObj.lng) {
+            searchYouTube(title, disasterObj.lat, disasterObj.lng, '50mi');
+          } else {
+            searchYouTubeForDisaster(title, state, county);
+          }
+        }
+        
+        // Focus map on disaster
+        if (disasterObj && disasterObj.lat && disasterObj.lng) {
+          map.setCenter({ lat: parseFloat(disasterObj.lat), lng: parseFloat(disasterObj.lng) });
+          map.setZoom(10);
+        }
+      }
+
+      // Load Encompass loans for county
+      async function loadEncompassLoansForCounty(state, county) {
+        try {
+          const response = await fetch(`/api/loan-pipeline/loans?state=${state}&county=${county}`);
+          const data = await response.json();
+          
+          if (data.success) {
+            populateEncompassLoansTable(data.data.loans);
+            updateMapWithLoans(data.data.loans);
+          } else {
+            encompassLoansTable.clear().draw();
+          }
+        } catch (error) {
+          console.error('Error loading Encompass loans:', error);
+          encompassLoansTable.clear().draw();
+        }
+      }
+
+      // Populate Encompass loans table
+      function populateEncompassLoansTable(loans) {
+        encompassLoansTable.clear();
+        
+        if (!loans || loans.length === 0) {
+          encompassLoansTable.draw();
+          return;
+        }
+        
+        loans.forEach(loan => {
+          const riskLevel = getRiskLevel(loan.disaster_risk_score);
+          const riskClass = getRiskClass(loan.disaster_risk_score);
+          const lastAnalysis = loan.last_risk_analysis ? 
+            new Date(loan.last_risk_analysis).toLocaleDateString() : 'Not analyzed';
+          
+          encompassLoansTable.row.add([
+            loan.loan_number,
+            loan.borrower_name,
+            loan.property_address,
+            `${loan.city}, ${loan.state}`,
+            loan.county || '',
+            `$${loan.loan_amount ? loan.loan_amount.toLocaleString() : '0'}`,
+            loan.milestone,
+            `<span class="badge ${riskClass}">${riskLevel}</span>`,
+            loan.encompass_loan_guid || 'Not assigned',
+            lastAnalysis
+          ]);
+          
+          const rowNode = encompassLoansTable.row(':last').node();
+          $(rowNode).data('loanObj', loan);
+        });
+        
+        encompassLoansTable.draw();
+      }
+
+      // Get risk level text
+      function getRiskLevel(score) {
+        if (!score) return 'Not Analyzed';
+        if (score >= 7) return 'High';
+        if (score >= 4) return 'Medium';
+        return 'Low';
+      }
+
+      // Get risk class for badge
+      function getRiskClass(score) {
+        if (!score) return 'bg-secondary';
+        if (score >= 7) return 'bg-danger';
+        if (score >= 4) return 'bg-warning';
+        return 'bg-success';
+      }
+
+      // Update map with loan markers
+      function updateMapWithLoans(loans) {
+        loanMarkers.forEach(m => m.marker && m.marker.setMap(null));
+        loanMarkers = [];
+        
+        if (!loans) return;
+        
+        loans.forEach(loan => {
+          if (loan.latitude && loan.longitude) {
+            const marker = new google.maps.Marker({
+              position: { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) },
+              map: map,
+              title: `Loan ${loan.loan_number}`,
+              icon: {
+                url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                scaledSize: new google.maps.Size(30, 30)
+              }
+            });
+            const infoWindow = new google.maps.InfoWindow({
+              content: `<div>
+                <h6>Loan ${loan.loan_number}</h6>
+                <div>${loan.property_address}</div>
+                <div>${loan.city}, ${loan.state} ${loan.zip_code || ''}</div>
+                <div>County: ${loan.county || ''}</div>
+                <div>Risk: ${getRiskLevel(loan.disaster_risk_score)}</div>
+              </div>`
+            });
+            marker.addListener('click', () => infoWindow.open(map, marker));
+            loanMarkers.push({ loanId: loan.id, marker });
+          }
+        });
+      }
+
+      // Load YouTube API
+      function loadYouTubeAPI() {
+        if (typeof gapi === 'undefined') {
+          setTimeout(loadYouTubeAPI, 500);
+          return;
+        }
+
+        gapi.load("client", () => {
+          gapi.client.init({
+            apiKey: "AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI",
+            discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"]
+          }).then(() => {
+            console.log("YouTube API loaded successfully!");
+            youtubeAPIReady = true;
+          }).catch(error => {
+            console.error("Error loading YouTube API:", error);
+            youtubeAPIReady = false;
+          });
+        });
+      }
+
+      // Search YouTube for disaster
+      function searchYouTubeForDisaster(disasterTitle, state, county) {
+        if (!youtubeAPIReady) {
+          setTimeout(() => {
+            if (youtubeAPIReady) {
+              const query = disasterTitle || `${state} ${county} disaster`;
+              searchYouTube(query);
+            }
+          }, 1000);
+          return;
+        }
+
+        const query = disasterTitle || `${state} ${county} disaster`;
+        searchYouTube(query);
+      }
+
+      // Search YouTube
+      function searchYouTube(query, lat = null, lng = null, radius = null) {
+        if (!gapi.client || !gapi.client.youtube) {
+          loadYouTubeAPI();
+          return;
+        }
+
+        let requestParams = {
+          part: "snippet",
+          q: query,
+          type: "video",
+          maxResults: 5
+        };
+
+        if (lat && lng && radius) {
+          requestParams.location = `${lat},${lng}`;
+          requestParams.locationRadius = radius;
+        }
+
+        gapi.client.youtube.search.list(requestParams)
+          .then(response => {
+            const results = response.result.items;
+            displayYouTubeResults(results);
+          })
+          .catch(error => {
+            console.error("YouTube API error:", error);
+            const youtubeResultsDiv = document.getElementById("youtubeResults");
+            if (youtubeResultsDiv) {
+              youtubeResultsDiv.innerHTML = '<div class="text-center text-danger">Error searching YouTube. Please try again.</div>';
+            }
+          });
+      }
+
+      // Display YouTube results
+      function displayYouTubeResults(videos) {
+        const youtubeResultsDiv = document.getElementById("youtubeResults");
+        if (videos && videos.length > 0) {
+          youtubeResultsDiv.innerHTML = videos.map(video => `
+            <div class="card mb-2">
+              <img src="${video.snippet.thumbnails.default.url}" class="card-img-top" alt="${video.snippet.title}">
+              <div class="card-body p-2">
+                <h6 class="card-title small">${video.snippet.title}</h6>
+                <p class="card-text small">${(video.snippet.description || '').substring(0, 100)}...</p>
+                <a href="https://www.youtube.com/watch?v=${video.id.videoId}" target="_blank" class="btn btn-sm btn-primary"><i class="bi-play-circle"></i> Watch</a>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          youtubeResultsDiv.innerHTML = '<div class="text-center text-muted"><i class="bi-youtube"></i><br>No videos found</div>';
+        }
+      }
+
+      // Get event icon
+      function getEventIcon(eventType) {
+        const icons = {
+          'wildfire': '🔥',
+          'earthquake': '🌍',
+          'hurricane': '🌀',
+          'flood': '💧',
+          'severe': '⚡'
+        };
+        return icons[eventType?.toLowerCase()] || '⚠️';
+      }
+
+      // Update stats cards
+      function updateStats(rows) {
+        const total = rows.length;
+        const fires = rows.filter(r => r.event_type?.toLowerCase() === 'wildfire').length;
+        const quakes = rows.filter(r => r.event_type?.toLowerCase() === 'earthquake').length;
+        const counties = new Set(rows.filter(r => r.county_name).map(r => `${r.county_name}, ${r.state_abbr}`)).size;
+        
+        $('#totalDisasters').text(total).css('animation', 'none').offset().offset; // Trigger reflow
+        $('#activeFires').text(fires);
+        $('#earthquakes').text(quakes);
+        $('#affectedCounties').text(counties);
+        
+        // Animate numbers
+        animateNumber('#totalDisasters', total);
+        animateNumber('#activeFires', fires);
+        animateNumber('#earthquakes', quakes);
+        animateNumber('#affectedCounties', counties);
+      }
+
+      // Animate number counting
+      function animateNumber(selector, target) {
+        const $el = $(selector);
+        const current = parseInt($el.text()) || 0;
+        const duration = 1000;
+        const steps = 30;
+        const increment = (target - current) / steps;
+        let step = 0;
+        
+        const timer = setInterval(() => {
+          step++;
+          const value = Math.round(current + (increment * step));
+          $el.text(value);
+          if (step >= steps) {
+            clearInterval(timer);
+            $el.text(target);
+          }
+        }, duration / steps);
       }
     </script>
   </body>

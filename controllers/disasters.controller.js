@@ -1,5 +1,5 @@
 import { getPool } from '../services/database.service.js';
-import { initDisastersSchema, upsertDisasters, normalizeFemaV2ToUnified, ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc } from '../services/disasters.service.js';
+import { initDisastersSchema, upsertDisasters, normalizeFemaV2ToUnified, ingestFema, ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc } from '../services/disasters.service.js';
 
 // Ensure schema on startup (best-effort)
 initDisastersSchema().catch(() => {});
@@ -20,9 +20,12 @@ export async function listDisasters(req, res) {
 
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
     const sql = `SELECT * FROM disasters ${where} ORDER BY start_time DESC LIMIT 1000`;
+    console.log('📊 Querying disasters:', sql, 'Values:', values);
     const { rows } = await pool.query(sql, values);
+    console.log(`📊 Found ${rows.length} disasters in database`);
     res.json({ success: true, data: { disasters: rows, count: rows.length } });
   } catch (e) {
+    console.error('❌ Error listing disasters:', e);
     res.status(500).json({ success: false, error: 'Failed to list disasters', details: e.message });
   }
 }
@@ -30,6 +33,7 @@ export async function listDisasters(req, res) {
 export async function refreshDisasters(req, res) {
   try {
     const results = {};
+    results.fema = await ingestFema();
     results.firms = await ingestFirmsNrt();
     results.usgs = await ingestUsgsQuakes();
     results.nws = await ingestNwsCap();
