@@ -14,7 +14,13 @@ export async function listDisasters(req, res) {
     const values = [];
     if (state) { values.push(state); clauses.push(`state_abbr = $${values.length}`); }
     if (county) { values.push(county); clauses.push(`county_name ILIKE $${values.length}`); values[values.length-1] = `%${county}%`; }
-    if (source) { values.push(source); clauses.push(`source = $${values.length}`); }
+    if (source) { 
+      // Normalize source to lowercase for case-insensitive matching (FIRMS data stored as 'firms')
+      const normalizedSource = String(source).toLowerCase().trim();
+      values.push(normalizedSource); 
+      clauses.push(`source = $${values.length}`); 
+      console.log(`📊 Source filter: "${source}" → normalized to "${normalizedSource}"`);
+    }
     if (event) { values.push(event); clauses.push(`event_type = $${values.length}`); }
     if (since) { values.push(since); clauses.push(`start_time >= $${values.length}`); }
 
@@ -22,7 +28,17 @@ export async function listDisasters(req, res) {
     const sql = `SELECT * FROM disasters ${where} ORDER BY start_time DESC LIMIT 1000`;
     console.log('📊 Querying disasters:', sql, 'Values:', values);
     const { rows } = await pool.query(sql, values);
-    console.log(`📊 Found ${rows.length} disasters in database`);
+    
+    // Debug: Show source breakdown for FIRMS debugging
+    if (source) {
+      const sourceBreakdown = rows.reduce((acc, r) => {
+        acc[r.source] = (acc[r.source] || 0) + 1;
+        return acc;
+      }, {});
+      console.log(`📊 Found ${rows.length} disasters (source breakdown:`, sourceBreakdown, ')');
+    } else {
+      console.log(`📊 Found ${rows.length} disasters in database`);
+    }
     res.json({ success: true, data: { disasters: rows, count: rows.length } });
   } catch (e) {
     console.error('❌ Error listing disasters:', e);

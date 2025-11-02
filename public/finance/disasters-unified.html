@@ -145,15 +145,19 @@
       #disastersTable tbody tr.disaster-severe { background-color: #fef2f2; }
 
       /* Table styling */
+      #disastersTable {
+        width: 100% !important;
+        table-layout: auto;
+      }
+
       #disastersTable tbody tr {
         cursor: pointer;
         transition: all 0.2s ease;
-        border-left: 4px solid transparent;
+        border-left: none;
       }
 
       #disastersTable tbody tr:hover {
         background-color: #f3f4f6 !important;
-        border-left-color: #2563eb;
       }
 
       #disastersTable thead th {
@@ -165,30 +169,49 @@
         color: #6b7280;
         border-bottom: 2px solid #e5e7eb;
         padding: 0.75rem 1rem;
+        white-space: nowrap;
+        vertical-align: middle;
       }
 
-      /* Source badges - professional styling */
-      .source-badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        border: 1px solid transparent;
+      /* Ensure Source header matches Source column width - STRICT */
+      #disastersTable thead th:first-child {
+        width: 100px !important;
+        min-width: 100px !important;
+        max-width: 100px !important;
+        text-align: center !important;
       }
 
-      .source-fema { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
-      .source-firms { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-      .source-usgs { background: #fef3c7; color: #92400e; border-color: #fde68a; }
-      .source-nws { background: #cffafe; color: #0e7490; border-color: #67e8f9; }
-      .source-nhc { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+      #disastersTable tbody td {
+        vertical-align: middle;
+        padding: 0.75rem 1rem;
+        word-wrap: break-word;
+        overflow: visible;
+        position: relative;
+      }
+
+      
+      /* Ensure all source badges have consistent sizing - STRICT */
+      #disastersTable tbody td:first-child {
+        width: 100px !important;
+        min-width: 100px !important;
+        max-width: 100px !important;
+        text-align: center !important;
+        overflow: hidden !important;
+      }
+      
+      /* Force table layout to respect column widths */
+      #disastersTable {
+        table-layout: fixed;
+      }
+
 
       /* Event type icons */
       .event-icon {
         font-size: 1.2rem;
         margin-right: 0.5rem;
+        display: inline-block;
+        vertical-align: middle;
+        white-space: nowrap;
       }
 
       /* YouTube results */
@@ -220,26 +243,30 @@
         }
       }
 
-      /* Active disaster indicator - subtle */
-      .disaster-active {
-        position: relative;
+      /* Source badges - professional styling with fixed width */
+      .source-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        vertical-align: middle;
+        width: 90px;
+        text-align: center;
+        box-sizing: border-box;
       }
 
-      .disaster-active::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: #10b981;
-        animation: pulseIndicator 2s ease-in-out infinite;
-      }
+      .source-fema { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+      .source-firms { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+      .source-usgs { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+      .source-nws { background: #cffafe; color: #0e7490; border-color: #67e8f9; }
+      .source-nhc { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
 
-      @keyframes pulseIndicator {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-      }
+      /* Active disaster indicator - removed to prevent layout shift */
 
       /* Stats cards - professional */
       .stat-card {
@@ -476,7 +503,119 @@
       let selectedDisaster = null;
 
       $(function init() {
-        table = $('#disastersTable').DataTable({ pageLength: 25, order: [[4, 'desc']] });
+        // Ensure table exists and has exactly 7 headers
+        const headerCount = $('#disastersTable thead th').length;
+        if (headerCount !== 7) {
+          console.error(`❌ Table has ${headerCount} headers, expected 7!`);
+        }
+        
+        table = $('#disastersTable').DataTable({ 
+          pageLength: 25, 
+          order: [[4, 'desc']],
+          autoWidth: false,
+          fixedColumns: false,
+          scrollX: false,
+          destroy: false,
+          retrieve: true,
+          drawCallback: function(settings) {
+            // Force column adjustment on every draw - this fixes alignment issues
+            const api = this.api();
+            
+            // Preserve data-order attributes and badges after redraw
+            $('#disastersTable tbody tr').each(function() {
+              const $row = $(this);
+              const disasterObj = $row.data('disasterObj');
+              if (disasterObj) {
+                const cells = $row.find('td');
+                if (cells.length === 7) {
+                  // Restore data-order attributes for sorting
+                  const source = String(disasterObj.source || '').trim().toLowerCase();
+                  const rawStartTime = disasterObj.start_time ? new Date(disasterObj.start_time).getTime() : 0;
+                  const rawEndTime = disasterObj.end_time ? new Date(disasterObj.end_time).getTime() : 0;
+                  
+                  cells.eq(0).attr('data-order', source);
+                  cells.eq(4).attr('data-order', rawStartTime);
+                  cells.eq(5).attr('data-order', rawEndTime);
+                  
+                  // ALWAYS restore badge HTML with correct classes
+                  const $firstCell = cells.eq(0);
+                  const srcUpper = source.toUpperCase();
+                  $firstCell.html('<span class="source-badge source-' + source + '">' + srcUpper + '</span>');
+                }
+              }
+            });
+            
+            // Force Source column width immediately
+            $('#disastersTable thead th:first-child, #disastersTable tbody td:first-child').css({
+              'width': '100px',
+              'min-width': '100px',
+              'max-width': '100px'
+            });
+            
+            // Adjust columns - call multiple times to ensure it takes effect
+            api.columns.adjust();
+            
+            // Force another adjustment after a brief delay to catch any async rendering
+            setTimeout(() => {
+              api.columns.adjust();
+              $('#disastersTable thead th:first-child, #disastersTable tbody td:first-child').css({
+                'width': '100px',
+                'min-width': '100px',
+                'max-width': '100px'
+              });
+            }, 10);
+          },
+          columnDefs: [
+            { 
+              targets: 0, 
+              width: '100px', 
+              className: 'text-center', 
+              orderable: true,
+              type: 'string',
+              render: function(data, type, row, meta) {
+                // Always return HTML badge for display - badges are preserved
+                return data || '';
+              },
+              // Use data-order attribute on cell for sorting
+              orderDataType: 'dom-data'
+            }, // Source column fixed width
+            { 
+              targets: 4, // Start date column
+              className: 'text-start', 
+              orderable: true,
+              type: 'num',
+              render: function(data, type, row, meta) {
+                // Always return formatted date for display
+                return data || '';
+              },
+              // Use data-order attribute with numeric timestamp for proper date sorting
+              orderDataType: 'dom-data'
+            },
+            { 
+              targets: 5, // End date column
+              className: 'text-start', 
+              orderable: true,
+              type: 'num',
+              render: function(data, type, row, meta) {
+                // Always return formatted date for display
+                return data || '';
+              },
+              // Use data-order attribute with numeric timestamp for proper date sorting
+              orderDataType: 'dom-data'
+            },
+            { targets: [1,2,3,6], className: 'text-start', orderable: true } // Other columns
+          ]
+        });
+        
+        // Force Source column width after initialization
+        setTimeout(() => {
+          $('#disastersTable thead th:first-child, #disastersTable tbody td:first-child').css({
+            'width': '100px',
+            'min-width': '100px',
+            'max-width': '100px'
+          });
+          table.columns.adjust();
+        }, 50);
         encompassLoansTable = $('#encompassLoansTable').DataTable({ pageLength: 10, order: [[0, 'asc']] });
         map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6} });
         $('#applyBtn').on('click', loadDisasters);
@@ -543,27 +682,145 @@
 
       function renderTable(rows) {
         console.log('🔄 renderTable called with', rows.length, 'rows');
-        table.clear();
-        if (rows.length === 0) {
+        
+        // Filter out duplicates based on unique key (source + source_id + start_time)
+        const seen = new Set();
+        const uniqueRows = rows.filter(r => {
+          const key = `${r.source || ''}_${r.source_id || ''}_${r.start_time || ''}`;
+          if (seen.has(key)) {
+            console.warn(`⚠️  Duplicate row filtered: ${key}`);
+            return false;
+          }
+          seen.add(key);
+          return true;
+        });
+        
+        console.log(`📊 Filtered ${rows.length} rows to ${uniqueRows.length} unique rows`);
+        
+        // Completely clear the table - destroy and recreate if needed
+        table.clear().draw(false);
+        
+        if (uniqueRows.length === 0) {
           console.warn('⚠️  No rows to render - grid will be empty');
+          table.draw(); // Draw empty table
+          return; // Early return if no rows
         }
-        rows.forEach((r, idx) => {
+        
+        uniqueRows.forEach((r, idx) => {
           try {
-            const eventType = r.event_type || '';
-            const source = r.source || '';
-            const icon = getEventIcon(eventType);
-            const sourceBadge = `<span class="source-badge source-${source}">${source.toUpperCase()}</span>`;
-            const eventBadge = `<span class="event-icon">${icon}</span>${eventType}`;
+            // Extract and sanitize all values first
+            const eventType = String(r.event_type || '').trim();
+            const source = String(r.source || '').trim().toLowerCase();
+            const county = String(r.county_name || '').trim();
+            const state = String(r.state_abbr || '').trim();
+            // Store raw date values for sorting
+            const rawStartTime = r.start_time ? new Date(r.start_time).getTime() : 0;
+            const rawEndTime = r.end_time ? new Date(r.end_time).getTime() : 0;
+            // Format dates for display
+            const startTime = r.start_time ? new Date(r.start_time).toLocaleString() : '';
+            const endTime = r.end_time ? new Date(r.end_time).toLocaleString() : '';
+            // Clean title - remove any characters that might cause issues
+            let title = String(r.title || '').trim();
+            title = title.replace(/\s+/g, ' '); // Normalize whitespace
             
-            const rowNode = table.row.add([
-              sourceBadge,
-              eventBadge,
-              r.county_name || '',
-              r.state_abbr || '',
-              r.start_time ? new Date(r.start_time).toLocaleString() : '',
-              r.end_time ? new Date(r.end_time).toLocaleString() : '',
-              r.title || ''
-            ]).node();
+            // Build source badge with proper styling
+            const icon = getEventIcon(eventType);
+            function createSourceBadge(src) {
+              if (!src) return '';
+              const srcUpper = String(src).toUpperCase();
+              return '<span class="source-badge source-' + src + '">' + srcUpper + '</span>';
+            }
+            const sourceBadge = createSourceBadge(source);
+            // Build event badge
+            let eventBadge = '';
+            if (icon && eventType) {
+              eventBadge = `<span class="event-icon">${icon}</span>${eventType}`;
+            } else {
+              eventBadge = eventType || '';
+            }
+            
+            // Build rowData array - EXACTLY 7 elements, no more, no less
+            // Use array literal to ensure clean array with no undefined elements
+            const rowData = [
+              sourceBadge || '',    // Source (0) - HTML badge
+              eventBadge || '',       // Event (1)
+              county || '',           // County (2)
+              state || '',            // State (3)
+              startTime || '',        // Start (4) - formatted for display
+              endTime || '',          // End (5) - formatted for display
+              title || ''             // Title (6)
+            ];
+            
+            // CRITICAL: Ensure exactly 7 elements - no more, no less
+            if (rowData.length !== 7) {
+              console.error(`❌ Row ${idx} (${source}) has ${rowData.length} columns, expected 7:`, rowData);
+              // Force to exactly 7
+              while (rowData.length < 7) rowData.push('');
+              rowData.splice(7); // Remove any extras
+            }
+            
+            // Verify all elements are strings (no undefined/null)
+            for (let i = 0; i < 7; i++) {
+              if (rowData[i] === undefined || rowData[i] === null) {
+                rowData[i] = '';
+              }
+              rowData[i] = String(rowData[i]);
+            }
+            
+            // For FIRMS, log the exact data being added
+            if (source === 'firms') {
+              console.log(`🔥 FIRMS Row ${idx} - Columns:`, {
+                length: rowData.length,
+                columns: rowData.map((col, i) => `[${i}]: "${col}"`)
+              });
+            }
+            
+            // Use the array directly - no copy needed since we're being explicit
+            const rowDataCopy = rowData.slice(0, 7); // Ensure exactly 7
+            
+            // Add row to table with the copy - use apply to ensure clean array
+            const rowNode = table.row.add(rowDataCopy).node();
+            
+            // Store raw values for sorting on the cell elements using data-order attribute
+            if (rowNode) {
+              const cells = rowNode.getElementsByTagName('td');
+              if (cells.length === 7) {
+                // Store raw source in first cell (index 0) for sorting
+                const $firstCell = $(cells[0]);
+                $firstCell.attr('data-order', source);
+                
+                // Ensure badge is properly rendered with correct classes
+                const $badge = $firstCell.find('.source-badge');
+                const srcUpper = source.toUpperCase();
+                if ($badge.length === 0 || !$badge.hasClass('source-' + source)) {
+                  // Badge missing or incorrect - fix it immediately
+                  $firstCell.html('<span class="source-badge source-' + source + '">' + srcUpper + '</span>');
+                }
+                
+                // Store raw timestamps in date cells (indices 4 and 5) for numeric sorting
+                $(cells[4]).attr('data-order', rawStartTime);
+                $(cells[5]).attr('data-order', rawEndTime);
+              } else {
+                console.error(`❌ Row ${idx} (${source}) rendered with ${cells.length} cells, expected 7!`, {
+                  rowData: rowData,
+                  cells: Array.from(cells).map(c => c.innerHTML.substring(0, 30))
+                });
+              }
+              
+              if (source === 'firms') {
+                // Log FIRMS rows to verify they're correct
+                const cellCounts = Array.from(cells).map((c, i) => {
+                  const text = $(c).text().trim();
+                  return `[${i}]: "${text}"`;
+                });
+                console.log(`✅ FIRMS row ${idx} rendered with ${cells.length} cells:`, cellCounts.join(', '));
+                
+                // CRITICAL: Ensure no blank columns for FIRMS
+                if (cells.length !== 7) {
+                  console.error(`❌ FIRMS ERROR: Row has ${cells.length} cells instead of 7!`);
+                }
+              }
+            }
             
             // Add event type class for row styling
             if (eventType) {
@@ -572,8 +829,8 @@
             
             // Add active class if recent (within 24 hours)
             if (r.start_time) {
-              const startTime = new Date(r.start_time);
-              const hoursAgo = (Date.now() - startTime.getTime()) / (1000 * 60 * 60);
+              const startTimeObj = new Date(r.start_time);
+              const hoursAgo = (Date.now() - startTimeObj.getTime()) / (1000 * 60 * 60);
               if (hoursAgo < 24) {
                 $(rowNode).addClass('disaster-active');
               }
@@ -586,10 +843,57 @@
           }
         });
         
-        // Update stats
+        // Update stats with original rows count
         updateStats(rows);
-        table.draw();
-        console.log('✅ DataTable drawn with', rows.length, 'rows');
+        
+        // Draw table - ensure columns are properly adjusted
+        table.draw(false); // false = don't reset paging
+        
+        // Force badge fix after draw to ensure all badges are correct
+        setTimeout(() => {
+          $('#disastersTable tbody tr').each(function() {
+            const $row = $(this);
+            const disasterObj = $row.data('disasterObj');
+            if (disasterObj) {
+              const $firstCell = $row.find('td').eq(0);
+              const source = String(disasterObj.source || '').trim().toLowerCase();
+              const srcUpper = source.toUpperCase();
+              const $badge = $firstCell.find('.source-badge');
+              if ($badge.length === 0 || !$badge.hasClass('source-' + source)) {
+                $firstCell.html('<span class="source-badge source-' + source + '">' + srcUpper + '</span>');
+              } else {
+                $badge.removeClass().addClass('source-badge source-' + source).text(srcUpper);
+              }
+            }
+          });
+        }, 50);
+        
+        // Immediately force column adjustments after draw
+        setTimeout(() => {
+          // Force column adjustments - this is critical for proper rendering
+          table.columns.adjust();
+          
+          // Force Source column width
+          $('#disastersTable thead th:first-child, #disastersTable tbody td:first-child').css({
+            'width': '100px',
+            'min-width': '100px',
+            'max-width': '100px'
+          });
+          
+          // Trigger a redraw to ensure everything is aligned
+          table.columns.adjust();
+          table.draw(false);
+          
+          // Validate column count matches headers
+          const headerCount = $('#disastersTable thead th').length;
+          const firstRowCells = $('#disastersTable tbody tr:first td').length;
+          console.log(`✅ DataTable drawn with ${rows.length} rows`);
+          console.log(`📊 Column validation: ${headerCount} headers, first row has ${firstRowCells} cells`);
+          
+          if (headerCount !== firstRowCells && rows.length > 0) {
+            console.error(`❌ MISMATCH: Headers (${headerCount}) don't match cells (${firstRowCells})!`);
+          }
+        }, 100);
       }
 
       function renderMap(rows) {
