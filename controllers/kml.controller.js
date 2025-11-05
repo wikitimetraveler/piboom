@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { DOMParser } from 'xmldom';
+import { DOMParser } from '@xmldom/xmldom';
 import multer from 'multer';
 import fs from 'fs/promises';
 import path from 'path';

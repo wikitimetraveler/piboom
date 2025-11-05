@@ -7,6 +7,8 @@
     "start": "node server.js",
     "dev": "NODE_ENV=development node server.js",
     "pi": "MODE=pi node server.js",
+    "ts:dev": "tsx server.ts",
+    "ts:watch": "tsx watch server.ts",
     "build": "echo 'Setting up cloud deployment...' && echo 'MODE=cloud' > .env.production || echo 'Cloud deployment build complete'",
     "install-pi-deps": "sudo apt update && sudo apt install -y sox alsa-utils espeak-ng mpg123",
     "docker:build": "docker build -t pi-boom .",
@@ -25,6 +27,7 @@
     "@langchain/community": "^0.3.57",
     "@langchain/core": "^0.3.78",
     "@langchain/openai": "^0.6.15",
+    "@xmldom/xmldom": "^0.8.11",
     "axios": "^1.6.0",
     "cheerio": "^1.1.2",
     "dotenv": "^16.4.5",
@@ -39,8 +42,15 @@
     "play-sound": "^1.1.6",
     "socket.io": "^4.7.5",
     "spotify-web-api-node": "^5.0.2",
-    "xlsx": "^0.18.5",
-    "xmldom": "^0.6.0"
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/pg": "^8.10.9",
+    "@types/socket.io": "^3.0.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   },
   "engines": {
     "node": ">=18.0.0"
