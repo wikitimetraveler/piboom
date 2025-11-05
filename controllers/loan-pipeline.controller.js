@@ -380,6 +380,31 @@ export async function geocodeLoans(req, res) {
 }
 
 /**
+ * Re-geocode loans with incorrect coordinates
+ * POST /api/loan-pipeline/regeocode-loans?limit=100&forceAll=false
+ */
+export async function regeocodeLoans(req, res) {
+  try {
+    const limit = parseInt(req.query.limit) || 100;
+    const forceAll = req.query.forceAll === 'true';
+    
+    const result = await loanPipelineService.regeocodeIncorrectLoans(limit, forceAll);
+    
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('❌ Error re-geocoding loans:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to re-geocode loans',
+      details: error.message
+    });
+  }
+}
+
+/**
  * Query FEMA API directly for disaster declarations (like tool3)
  * GET /api/loan-pipeline/query-fema?state=TX&county=Harris
  */

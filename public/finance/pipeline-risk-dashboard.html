@@ -262,7 +262,7 @@
             </div>
         </div>
 
-        <!-- Risk Distribution -->
+        <!-- Charts Row 1: Risk Distribution & Milestones -->
         <div class="row mb-4">
             <div class="col-md-6 mb-3">
                 <div class="card">
@@ -270,9 +270,7 @@
                         <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Risk Distribution</h5>
                     </div>
                     <div class="card-body">
-                        <div id="riskDistributionChart">
-                            <div class="text-center text-muted">Loading...</div>
-                        </div>
+                        <canvas id="riskDistributionChart" style="max-height: 300px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -282,9 +280,55 @@
                         <h5 class="mb-0"><i class="bi bi-graph-up"></i> Pipeline Milestones</h5>
                     </div>
                     <div class="card-body">
-                        <div id="milestoneChart">
-                            <div class="text-center text-muted">Loading...</div>
-                        </div>
+                        <canvas id="milestoneChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 2: Loan Amount Distribution & State Distribution -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Loan Amount Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="loanAmountChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-map"></i> Loans by State</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="stateDistributionChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row 3: Milestone Timeline & Risk Score Distribution -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Milestone Progress Timeline</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="milestoneTimelineChart" style="max-height: 300px;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-speedometer2"></i> Risk Score Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="riskScoreChart" style="max-height: 300px;"></canvas>
                     </div>
                 </div>
             </div>
@@ -524,6 +568,8 @@
             populateStateFilter();
             initializeGoogleMaps();
             loadYouTubeAPI();
+            // Load dashboard charts
+            loadDashboardData();
         });
 
         // Initialize user login
@@ -645,74 +691,412 @@
         // Update statistics cards
         function updateStatistics(stats) {
             $('#totalLoans').text(stats.totalLoans || 0);
-            $('#analyzedLoans').text(stats.analysisStatus?.analyzed_loans || 0);
-            $('#pendingAnalysis').text(stats.analysisStatus?.pending_analysis || 0);
+            
+            // Calculate analyzed vs pending
+            const analyzed = stats.riskLevels?.filter(r => r.risk_level !== 'Not Analyzed')
+                .reduce((sum, r) => sum + parseInt(r.count || 0), 0) || 0;
+            const pending = stats.riskLevels?.find(r => r.risk_level === 'Not Analyzed')?.count || 0;
+            
+            $('#analyzedLoans').text(analyzed);
+            $('#pendingAnalysis').text(pending);
             
             // Calculate high risk loans
             const highRiskCount = stats.riskLevels?.find(r => r.risk_level === 'High Risk')?.count || 0;
             $('#highRiskLoans').text(highRiskCount);
         }
 
-        // Update risk charts
-        function updateRiskCharts(data) {
-            // Risk Distribution Chart
-            const riskCtx = document.getElementById('riskDistributionChart');
-            if (riskCtx && data.riskDistribution) {
-                new Chart(riskCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: data.riskDistribution.map(r => r.risk_level),
-                        datasets: [{
-                            data: data.riskDistribution.map(r => r.count),
-                            backgroundColor: [
-                                '#10b981', // Low Risk - Green
-                                '#f59e0b', // Medium Risk - Yellow
-                                '#ef4444', // High Risk - Red
-                                '#6b7280'  // Not Analyzed - Gray
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom'
-                            }
-                        }
-                    }
-                });
+        // Chart instances storage
+        let chartInstances = {
+            riskDistribution: null,
+            milestone: null,
+            loanAmount: null,
+            stateDistribution: null,
+            milestoneTimeline: null,
+            riskScore: null
+        };
+
+        // Load dashboard data and update all charts
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/loan-pipeline/stats');
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatistics(data.data);
+                    await updateAllCharts(data.data);
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
             }
+        }
+
+        // Update all charts with pipeline data
+        async function updateAllCharts(stats) {
+            // Get all loans for detailed charts
+            const loansResponse = await fetch('/api/loan-pipeline/loans');
+            const loansData = await loansResponse.json();
+            const loans = loansData.success ? loansData.data.loans : [];
+
+            // Risk Distribution Chart
+            updateRiskDistributionChart(stats.riskLevels);
 
             // Milestone Chart
-            const milestoneCtx = document.getElementById('milestoneChart');
-            if (milestoneCtx && data.milestoneChart) {
-                new Chart(milestoneCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.milestoneChart.map(m => m.milestone),
-                        datasets: [{
-                            label: 'Loans',
-                            data: data.milestoneChart.map(m => m.count),
-                            backgroundColor: '#2563eb'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
+            updateMilestoneChart(stats.milestones);
+
+            // Loan Amount Distribution Chart
+            updateLoanAmountChart(loans);
+
+            // State Distribution Chart
+            updateStateDistributionChart(stats.topStates);
+
+            // Milestone Timeline Chart
+            updateMilestoneTimelineChart(loans);
+
+            // Risk Score Distribution Chart
+            updateRiskScoreChart(loans);
+        }
+
+        // Risk Distribution Chart (Doughnut)
+        function updateRiskDistributionChart(riskData) {
+            const canvas = document.getElementById('riskDistributionChart');
+            if (!canvas || !riskData) return;
+
+            // Destroy existing chart if it exists
+            if (chartInstances.riskDistribution) {
+                chartInstances.riskDistribution.destroy();
+            }
+
+            chartInstances.riskDistribution = new Chart(canvas, {
+                type: 'doughnut',
+                data: {
+                    labels: riskData.map(r => r.risk_level),
+                    datasets: [{
+                        data: riskData.map(r => parseInt(r.count)),
+                        backgroundColor: [
+                            '#10b981', // Low Risk - Green
+                            '#f59e0b', // Medium Risk - Yellow
+                            '#ef4444', // High Risk - Red
+                            '#6b7280'  // Not Analyzed - Gray
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: { size: 12 }
                             }
                         },
-                        scales: {
-                            y: {
-                                beginAtZero: true
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
                             }
                         }
                     }
-                });
+                }
+            });
+        }
+
+        // Milestone Chart (Bar)
+        function updateMilestoneChart(milestoneData) {
+            const canvas = document.getElementById('milestoneChart');
+            if (!canvas || !milestoneData) return;
+
+            if (chartInstances.milestone) {
+                chartInstances.milestone.destroy();
             }
+
+            // Sort milestones in pipeline order
+            const milestoneOrder = ['Application', 'Processing', 'Underwriting', 'Closing', 'Funded'];
+            const sortedData = milestoneOrder.map(m => {
+                const found = milestoneData.find(d => d.milestone === m);
+                return found || { milestone: m, count: 0 };
+            });
+
+            chartInstances.milestone = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: sortedData.map(m => m.milestone),
+                    datasets: [{
+                        label: 'Loans',
+                        data: sortedData.map(m => parseInt(m.count)),
+                        backgroundColor: '#2563eb',
+                        borderColor: '#1d4ed8',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Loans: ${context.parsed.y}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Loan Amount Distribution Chart (Histogram)
+        function updateLoanAmountChart(loans) {
+            const canvas = document.getElementById('loanAmountChart');
+            if (!canvas || !loans || loans.length === 0) return;
+
+            if (chartInstances.loanAmount) {
+                chartInstances.loanAmount.destroy();
+            }
+
+            // Create buckets for loan amounts
+            const amounts = loans.map(l => parseFloat(l.loan_amount) || 0);
+            const maxAmount = Math.max(...amounts);
+            const bucketSize = Math.ceil(maxAmount / 10);
+            const buckets = Array(10).fill(0).map((_, i) => ({
+                range: `$${((i * bucketSize) / 1000).toFixed(0)}k-$${(((i + 1) * bucketSize) / 1000).toFixed(0)}k`,
+                count: 0
+            }));
+
+            amounts.forEach(amount => {
+                const bucketIndex = Math.min(Math.floor(amount / bucketSize), 9);
+                buckets[bucketIndex].count++;
+            });
+
+            chartInstances.loanAmount = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: buckets.map(b => b.range),
+                    datasets: [{
+                        label: 'Number of Loans',
+                        data: buckets.map(b => b.count),
+                        backgroundColor: 'rgba(37, 99, 235, 0.6)',
+                        borderColor: '#2563eb',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // State Distribution Chart (Bar)
+        function updateStateDistributionChart(stateData) {
+            const canvas = document.getElementById('stateDistributionChart');
+            if (!canvas || !stateData) return;
+
+            if (chartInstances.stateDistribution) {
+                chartInstances.stateDistribution.destroy();
+            }
+
+            chartInstances.stateDistribution = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: stateData.map(s => s.state),
+                    datasets: [{
+                        label: 'Loans',
+                        data: stateData.map(s => parseInt(s.count)),
+                        backgroundColor: '#10b981',
+                        borderColor: '#059669',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                font: { size: 11 }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Milestone Timeline Chart (Line showing progression over time)
+        function updateMilestoneTimelineChart(loans) {
+            const canvas = document.getElementById('milestoneTimelineChart');
+            if (!canvas || !loans || loans.length === 0) return;
+
+            if (chartInstances.milestoneTimeline) {
+                chartInstances.milestoneTimeline.destroy();
+            }
+
+            // Group loans by creation date and milestone
+            const timelineData = {};
+            loans.forEach(loan => {
+                if (loan.created_at) {
+                    const date = new Date(loan.created_at).toISOString().split('T')[0];
+                    if (!timelineData[date]) {
+                        timelineData[date] = {};
+                    }
+                    const milestone = loan.milestone || 'Unknown';
+                    timelineData[date][milestone] = (timelineData[date][milestone] || 0) + 1;
+                }
+            });
+
+            const dates = Object.keys(timelineData).sort();
+            const milestones = ['Application', 'Processing', 'Underwriting', 'Closing', 'Funded'];
+            
+            const datasets = milestones.map((milestone, index) => ({
+                label: milestone,
+                data: dates.map(date => timelineData[date][milestone] || 0),
+                borderColor: ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'][index],
+                backgroundColor: ['rgba(37, 99, 235, 0.1)', 'rgba(16, 185, 129, 0.1)', 'rgba(245, 158, 11, 0.1)', 'rgba(239, 68, 68, 0.1)', 'rgba(139, 92, 246, 0.1)'][index],
+                tension: 0.4,
+                fill: true
+            }));
+
+            chartInstances.milestoneTimeline = new Chart(canvas, {
+                type: 'line',
+                data: {
+                    labels: dates.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 10 },
+                                padding: 10
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            stacked: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Risk Score Distribution Chart (Histogram)
+        function updateRiskScoreChart(loans) {
+            const canvas = document.getElementById('riskScoreChart');
+            if (!canvas || !loans || loans.length === 0) return;
+
+            if (chartInstances.riskScore) {
+                chartInstances.riskScore.destroy();
+            }
+
+            const riskScores = loans.map(l => parseFloat(l.disaster_risk_score) || 0);
+            const buckets = [
+                { range: '0 (None)', count: 0 },
+                { range: '1-2', count: 0 },
+                { range: '3-4', count: 0 },
+                { range: '5-6', count: 0 },
+                { range: '7-8', count: 0 },
+                { range: '9+', count: 0 }
+            ];
+
+            riskScores.forEach(score => {
+                if (score === 0) buckets[0].count++;
+                else if (score <= 2) buckets[1].count++;
+                else if (score <= 4) buckets[2].count++;
+                else if (score <= 6) buckets[3].count++;
+                else if (score <= 8) buckets[4].count++;
+                else buckets[5].count++;
+            });
+
+            chartInstances.riskScore = new Chart(canvas, {
+                type: 'bar',
+                data: {
+                    labels: buckets.map(b => b.range),
+                    datasets: [{
+                        label: 'Loans',
+                        data: buckets.map(b => b.count),
+                        backgroundColor: buckets.map((b, i) => {
+                            if (i === 0) return '#6b7280'; // Gray for none
+                            if (i <= 2) return '#10b981'; // Green for low
+                            if (i <= 3) return '#f59e0b'; // Yellow for medium
+                            return '#ef4444'; // Red for high
+                        }),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // Initialize FEMA DataTable

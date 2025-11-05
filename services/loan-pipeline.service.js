@@ -70,31 +70,43 @@ async function geocodeAddress(address, expectedState = null, expectedCounty = nu
   }
 
   try {
-    // If we have expected state, try geocoding without zip code first (zip codes can cause mismatches)
-    let url;
-    if (expectedState) {
-      // Remove zip code from address if present to avoid zip code mismatches
-      // Format: "Street, City, State ZIP" -> "Street, City, State"
-      const addressWithoutZip = address.replace(/\s+\d{5}(-\d{4})?$/, '').trim();
-      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addressWithoutZip)}&key=${apiKey}&region=us`;
-    } else {
-      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-    }
+    // Always add "USA" to address to ensure we match FEMA data (US-only) and prevent wrong country matches
+    // Remove zip code from address if present to avoid zip code mismatches
+    const addressWithoutZip = address.replace(/\s+\d{5}(-\d{4})?$/, '').trim();
+    const addressWithCountry = addressWithoutZip.endsWith(', USA') || addressWithoutZip.endsWith(', US') 
+      ? addressWithoutZip 
+      : `${addressWithoutZip}, USA`;
+    
+    // Always use region=us and components=country:US to ensure US addresses only
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addressWithCountry)}&key=${apiKey}&region=us&components=country:US`;
     
     const response = await fetch(url);
     const data = await response.json();
 
     if (data.status === 'OK' && data.results.length > 0) {
-      // Try to find a result that matches the expected state/county
-      let bestResult = data.results[0]; // Default to first result
+      // Try to find a result that matches the expected state/county and is in the US
+      let bestResult = null;
       let validated = false;
       
       for (const result of data.results) {
         const addressComponents = result.address_components || [];
+        
+        // First check: Must be in US (country component)
+        const countryComp = addressComponents.find(c => c.types.includes('country'));
+        const countryCode = countryComp ? countryComp.short_name : null;
+        if (countryCode !== 'US') {
+          continue; // Skip non-US results
+        }
+        
+        // If we don't have a best result yet, use this one
+        if (!bestResult) {
+          bestResult = result;
+        }
+        
         const stateComp = addressComponents.find(c => c.types.includes('administrative_area_level_1'));
         const stateShort = stateComp ? stateComp.short_name : null;
         
-        // Check if state matches
+        // Check if state matches (if expected)
         if (expectedState && stateShort && stateShort.toUpperCase() === expectedState.toUpperCase()) {
           bestResult = result;
           validated = true;
@@ -115,19 +127,35 @@ async function geocodeAddress(address, expectedState = null, expectedCounty = nu
             }
           }
           break; // Found matching state
+        } else if (!expectedState) {
+          // No expected state, but we have a US result - accept it
+          validated = true;
+          break;
         }
       }
       
-      // If no match found but we have expected state, try again with full address
-      if (expectedState && !validated && addressWithoutZip !== address) {
-        console.log(`🔄 Retrying geocoding with full address for: ${address}`);
-        const retryUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}&region=us`;
+      // If no US result found, reject
+      if (!bestResult) {
+        console.warn(`⚠️  No US geocoding result found for: ${address}`);
+        return { latitude: null, longitude: null, validated: false };
+      }
+      
+      // If expected state but no match found, try again with full address (including zip)
+      if (expectedState && !validated && addressWithoutZip !== address.replace(/\s+\d{5}(-\d{4})?$/, '').trim()) {
+        const fullAddressWithCountry = address.endsWith(', USA') || address.endsWith(', US')
+          ? address
+          : `${address}, USA`;
+        console.log(`🔄 Retrying geocoding with full address for: ${fullAddressWithCountry}`);
+        const retryUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(fullAddressWithCountry)}&key=${apiKey}&region=us&components=country:US`;
         const retryResponse = await fetch(retryUrl);
         const retryData = await retryResponse.json();
         
         if (retryData.status === 'OK' && retryData.results.length > 0) {
           for (const result of retryData.results) {
             const addressComponents = result.address_components || [];
+            const countryComp = addressComponents.find(c => c.types.includes('country'));
+            if (countryComp && countryComp.short_name !== 'US') continue;
+            
             const stateComp = addressComponents.find(c => c.types.includes('administrative_area_level_1'));
             const stateShort = stateComp ? stateComp.short_name : null;
             
@@ -547,6 +575,172 @@ export async function geocodeMissingLoans(limit = 100) {
 }
 
 /**
+ * Check if coordinates are suspicious (likely incorrect)
+ * @param {number} lat - Latitude
+ * @param {number} lng - Longitude
+ * @param {string} expectedState - Expected state abbreviation
+ * @returns {boolean} True if coordinates seem incorrect
+ */
+function areCoordinatesSuspicious(lat, lng, expectedState) {
+  if (!lat || !lng || !expectedState) return false;
+  
+  // Approximate US state boundaries (simplified)
+  const stateBounds = {
+    'NC': { latMin: 33.8, latMax: 36.6, lngMin: -84.3, lngMax: -75.4 },
+    'CA': { latMin: 32.5, latMax: 42.0, lngMin: -124.5, lngMax: -114.1 },
+    'TX': { latMin: 25.8, latMax: 36.5, lngMin: -106.6, lngMax: -93.5 },
+    'FL': { latMin: 24.4, latMax: 31.0, lngMin: -87.6, lngMax: -80.0 },
+    'NY': { latMin: 40.5, latMax: 45.0, lngMin: -79.8, lngMax: -71.8 },
+    'IL': { latMin: 36.9, latMax: 42.5, lngMin: -91.5, lngMax: -87.0 },
+    'PA': { latMin: 39.7, latMax: 42.3, lngMin: -80.5, lngMax: -74.7 },
+    'OH': { latMin: 38.4, latMax: 42.0, lngMin: -84.8, lngMax: -80.5 },
+    'GA': { latMin: 30.3, latMax: 35.0, lngMin: -85.6, lngMax: -80.8 },
+    'MI': { latMin: 41.7, latMax: 48.3, lngMin: -90.4, lngMax: -82.1 },
+    'AZ': { latMin: 31.3, latMax: 37.0, lngMin: -114.8, lngMax: -109.0 },
+    'WA': { latMin: 45.5, latMax: 49.0, lngMin: -124.8, lngMax: -116.9 },
+    'MA': { latMin: 41.2, latMax: 42.9, lngMin: -73.5, lngMax: -69.9 },
+    'TN': { latMin: 35.0, latMax: 36.7, lngMin: -90.3, lngMax: -81.6 },
+    'IN': { latMin: 37.7, latMax: 41.8, lngMin: -88.1, lngMax: -84.8 },
+    'MO': { latMin: 36.0, latMax: 40.6, lngMin: -95.8, lngMax: -89.1 },
+    'MD': { latMin: 37.9, latMax: 39.7, lngMin: -79.5, lngMax: -75.0 },
+    'WI': { latMin: 42.4, latMax: 47.1, lngMin: -92.9, lngMax: -86.8 },
+    'CO': { latMin: 36.9, latMax: 41.0, lngMin: -109.1, lngMax: -102.0 },
+    'MN': { latMin: 43.5, latMax: 49.4, lngMin: -97.2, lngMax: -89.5 }
+  };
+  
+  const bounds = stateBounds[expectedState.toUpperCase()];
+  if (!bounds) return false; // Unknown state, can't validate
+  
+  // Check if coordinates are outside state bounds
+  const isOutsideBounds = lat < bounds.latMin || lat > bounds.latMax || 
+                          lng < bounds.lngMin || lng > bounds.lngMax;
+  
+  // Also check if coordinates are in Pacific (common error for NC addresses)
+  const isInPacific = (lng < -130 || lng > -110) && lat > 20 && lat < 50;
+  
+  return isOutsideBounds || isInPacific;
+}
+
+/**
+ * Re-geocode loans with incorrect or suspicious coordinates
+ * @param {number} limit - Maximum number of loans to re-geocode
+ * @param {boolean} forceAll - If true, re-geocode all loans with coordinates; if false, only suspicious ones
+ * @returns {Promise<Object>} Results with re-geocoded count
+ */
+export async function regeocodeIncorrectLoans(limit = 100, forceAll = false) {
+  const pool = getPool();
+  if (!pool) {
+    throw new Error('Database not initialized');
+  }
+
+  try {
+    let query;
+    let params;
+    
+    if (forceAll) {
+      // Re-geocode all loans with coordinates
+      query = `
+        SELECT id, property_address, city, state, county, zip_code, latitude, longitude
+        FROM loans
+        WHERE latitude IS NOT NULL 
+          AND longitude IS NOT NULL
+          AND property_address IS NOT NULL
+          AND city IS NOT NULL
+          AND state IS NOT NULL
+        ORDER BY updated_at ASC
+        LIMIT $1
+      `;
+      params = [limit];
+    } else {
+      // Only re-geocode loans with suspicious coordinates
+      // We'll filter in JavaScript since PostgreSQL doesn't have easy state boundary functions
+      query = `
+        SELECT id, property_address, city, state, county, zip_code, latitude, longitude
+        FROM loans
+        WHERE latitude IS NOT NULL 
+          AND longitude IS NOT NULL
+          AND property_address IS NOT NULL
+          AND city IS NOT NULL
+          AND state IS NOT NULL
+        ORDER BY updated_at ASC
+        LIMIT $1
+      `;
+      params = [limit * 2]; // Get more to filter suspicious ones
+    }
+    
+    const result = await pool.query(query, params);
+    
+    // Filter for suspicious coordinates if not forcing all
+    let loansToRegeocode = result.rows;
+    if (!forceAll) {
+      loansToRegeocode = result.rows.filter(loan => 
+        areCoordinatesSuspicious(loan.latitude, loan.longitude, loan.state)
+      ).slice(0, limit);
+    }
+    
+    if (loansToRegeocode.length === 0) {
+      return {
+        success: true,
+        message: forceAll ? 'No loans to re-geocode' : 'No loans with suspicious coordinates found',
+        regeocoded: 0,
+        total: 0,
+        suspicious: 0
+      };
+    }
+
+    console.log(`🌍 Re-geocoding ${loansToRegeocode.length} loans${forceAll ? '' : ' with suspicious coordinates'}...`);
+    let regeocoded = 0;
+    let failed = 0;
+    let unchanged = 0;
+
+    for (const loan of loansToRegeocode) {
+      try {
+        const fullAddress = `${loan.property_address}, ${loan.city}, ${loan.state} ${loan.zip_code || ''}`;
+        const coords = await geocodeAddress(fullAddress, loan.state, loan.county);
+
+        if (coords.latitude && coords.longitude && coords.validated) {
+          // Check if coordinates actually changed
+          const latChanged = Math.abs(parseFloat(coords.latitude) - parseFloat(loan.latitude)) > 0.001;
+          const lngChanged = Math.abs(parseFloat(coords.longitude) - parseFloat(loan.longitude)) > 0.001;
+          
+          if (latChanged || lngChanged) {
+            await pool.query(
+              'UPDATE loans SET latitude = $1, longitude = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3',
+              [coords.latitude, coords.longitude, loan.id]
+            );
+            regeocoded++;
+            console.log(`✅ Fixed coordinates for loan ${loan.id}: ${loan.city}, ${loan.state} (was: ${loan.latitude}, ${loan.longitude} → now: ${coords.latitude}, ${coords.longitude})`);
+          } else {
+            unchanged++;
+          }
+        } else {
+          failed++;
+          console.warn(`⚠️  Failed to re-geocode loan ${loan.id}: ${fullAddress}`);
+        }
+
+        // Rate limiting for geocoding
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error(`Error re-geocoding loan ${loan.id}:`, error.message);
+        failed++;
+      }
+    }
+
+    return {
+      success: true,
+      message: `Re-geocoded ${regeocoded} loans${forceAll ? '' : ' with suspicious coordinates'}`,
+      regeocoded,
+      failed,
+      unchanged,
+      total: loansToRegeocode.length
+    };
+  } catch (error) {
+    console.error('❌ Error re-geocoding loans:', error.message);
+    throw error;
+  }
+}
+
+/**
  * Get single loan by ID
  * @param {number} loanId - Loan ID
  * @returns {Promise<Object|null>} Loan object or null
@@ -699,7 +893,10 @@ export default {
   getAllLoans,
   getLoansByMilestone,
   getLoanById,
+  geocodeMissingLoans,
+  regeocodeIncorrectLoans,
   updateLoanRiskScore,
   getPipelineStats,
   deleteAllTestLoans
 };
+

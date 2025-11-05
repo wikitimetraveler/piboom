@@ -79,27 +79,39 @@ async function geocodeAddressValidated(address, expectedState = null, expectedCo
   }
 
   try {
-    // If we have expected state, try geocoding without zip code first (zip codes can cause mismatches)
-    let url;
+    // Always add "USA" to address to ensure we match FEMA data (US-only) and prevent wrong country matches
+    // Remove zip code from address if present to avoid zip code mismatches
     const addressWithoutZip = address.replace(/\s+\d{5}(-\d{4})?$/, '').trim();
+    const addressWithCountry = addressWithoutZip.endsWith(', USA') || addressWithoutZip.endsWith(', US') 
+      ? addressWithoutZip 
+      : `${addressWithoutZip}, USA`;
     
-    if (expectedState) {
-      // Remove zip code from address if present to avoid zip code mismatches
-      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addressWithoutZip)}&key=${apiKey}&region=us`;
-    } else {
-      url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-    }
+    // Always use region=us and components=country:US to ensure US addresses only
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(addressWithCountry)}&key=${apiKey}&region=us&components=country:US`;
     
     const response = await fetch(url);
     const data = await response.json();
 
     if (data.status === 'OK' && data.results.length > 0) {
-      // Try to find a result that matches the expected state/county
-      let bestResult = data.results[0];
+      // Try to find a result that matches the expected state/county and is in the US
+      let bestResult = null;
       let validated = false;
       
       for (const result of data.results) {
         const addressComponents = result.address_components || [];
+        
+        // First check: Must be in US (country component)
+        const countryComp = addressComponents.find(c => c.types.includes('country'));
+        const countryCode = countryComp ? countryComp.short_name : null;
+        if (countryCode !== 'US') {
+          continue; // Skip non-US results
+        }
+        
+        // If we don't have a best result yet, use this one
+        if (!bestResult) {
+          bestResult = result;
+        }
+        
         const stateComp = addressComponents.find(c => c.types.includes('administrative_area_level_1'));
         const stateShort = stateComp ? stateComp.short_name : null;
         
@@ -122,7 +134,17 @@ async function geocodeAddressValidated(address, expectedState = null, expectedCo
             }
           }
           break;
+        } else if (!expectedState) {
+          // No expected state, but we have a US result - accept it
+          validated = true;
+          break;
         }
+      }
+      
+      // If no US result found, reject
+      if (!bestResult) {
+        console.warn(`⚠️  No US geocoding result found for: ${address}`);
+        return { latitude: null, longitude: null, validated: false };
       }
       
       // If no match found but we have expected state, reject the result

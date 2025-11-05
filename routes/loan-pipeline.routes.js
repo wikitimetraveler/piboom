@@ -44,6 +44,9 @@ router.get('/query-fema', loanPipelineController.queryFEMADirect);
 // Geocode loans missing coordinates
 router.post('/geocode-loans', loanPipelineController.geocodeLoans);
 
+// Re-geocode loans with incorrect coordinates
+router.post('/regeocode-loans', loanPipelineController.regeocodeLoans);
+
 // Cleanup test loans
 router.delete('/cleanup', loanPipelineController.cleanupTestLoans);
 
