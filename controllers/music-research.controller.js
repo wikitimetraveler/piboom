@@ -70,7 +70,11 @@ export async function searchWikipedia(req, res) {
     const searchQuery = encodeURIComponent(`${artist} band music`);
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=1`;
     
-    const searchResponse = await axios.get(searchUrl);
+    const searchResponse = await axios.get(searchUrl, {
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+      }
+    });
     const searchData = searchResponse.data;
     
     if (!searchData.query?.search?.[0]) {
@@ -86,7 +90,11 @@ export async function searchWikipedia(req, res) {
 
     // Get page summary for description first
     const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`;
-    const summaryResponse = await axios.get(summaryUrl);
+    const summaryResponse = await axios.get(summaryUrl, {
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+      }
+    });
     const summaryData = summaryResponse.data;
 
     // Get Wikidata information for structured data
@@ -160,7 +168,11 @@ async function getWikidataInfo(pageTitle) {
     // Get Wikidata ID from Wikipedia page
     const wikidataUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=pageprops&titles=${encodeURIComponent(pageTitle)}&ppprop=wikibase_item`;
     
-    const wikidataResponse = await axios.get(wikidataUrl);
+    const wikidataResponse = await axios.get(wikidataUrl, {
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+      }
+    });
     const pages = wikidataResponse.data.query?.pages;
     const pageId = Object.keys(pages)[0];
     const wikidataId = pages[pageId]?.pageprops?.wikibase_item;
@@ -172,7 +184,11 @@ async function getWikidataInfo(pageTitle) {
     // Get structured data from Wikidata
     const dataUrl = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${wikidataId}&format=json&props=claims`;
     
-    const dataResponse = await axios.get(dataUrl);
+    const dataResponse = await axios.get(dataUrl, {
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+      }
+    });
     const entity = dataResponse.data.entities[wikidataId];
     
     if (!entity) {
@@ -264,7 +280,11 @@ async function getWikidataInfo(pageTitle) {
 async function getPlaceName(placeId) {
   try {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${placeId}&format=json&props=labels&languages=en`;
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+      }
+    });
     const entity = response.data.entities[placeId];
     return entity?.labels?.en?.value || 'Unknown';
   } catch (error) {
@@ -277,7 +297,11 @@ async function getPlaceName(placeId) {
 async function getEntityLabel(entityId) {
   try {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&format=json&props=labels&languages=en`;
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+      }
+    });
     const entity = response.data.entities[entityId];
     return entity?.labels?.en?.value || null;
   } catch (error) {
@@ -290,7 +314,11 @@ async function getEntityLabel(entityId) {
 async function getMemberInfoFromWikidata(memberId) {
   try {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${memberId}&format=json&props=claims`;
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+      }
+    });
     const entity = response.data.entities[memberId];
     
     if (!entity) {
@@ -616,6 +644,9 @@ async function enrichBandMembersWithLocations(members) {
           list: 'search',
           srsearch: member.name,
           srlimit: 1
+        },
+        headers: {
+          'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
         }
       });
       
@@ -630,6 +661,9 @@ async function enrichBandMembersWithLocations(members) {
             prop: 'pageprops',
             titles: pageTitle,
             ppprop: 'wikibase_item'
+          },
+          headers: {
+            'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
           }
         });
         
@@ -644,7 +678,11 @@ async function enrichBandMembersWithLocations(members) {
         }
         
         // Get summary for additional context and image
-        const summaryResponse = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`);
+        const summaryResponse = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`, {
+          headers: {
+            'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+          }
+        });
         const summaryData = summaryResponse.data;
         
         // Fallback: if Wikidata didn't find birth place, try extracting from description
@@ -880,12 +918,15 @@ export async function searchMusicBrainz(req, res) {
     });
 
     const detailedArtist = detailResponse.data;
-    const bandMembers = [];
+    let bandMembers = [];
 
     // Extract band members from relationships
+    // For bands, look for "member" type relationships (forward direction)
+    // For individuals, look for "member of band" type relationships (backward direction)
     if (detailedArtist.relations) {
       for (const relation of detailedArtist.relations) {
-        if (relation.type === 'member of band' && relation.artist) {
+        // Check for members of the band (type: "member", direction: forward)
+        if (relation.type === 'member' && relation.artist && (!relation.direction || relation.direction === 'forward')) {
           const member = relation.artist;
           // Try to get instrument from relationship attributes
           let instrument = 'Unknown';
@@ -906,6 +947,42 @@ export async function searchMusicBrainz(req, res) {
             type: member.type || 'Person'
           });
         }
+        // Also check "member of band" relationships (backward direction)
+        // This handles cases where the relationship is stored differently
+        if (relation.type === 'member of band' && relation.artist && relation.direction === 'backward') {
+          const member = relation.artist;
+          let instrument = 'Unknown';
+          if (relation.attributes && relation.attributes.length > 0) {
+            instrument = relation.attributes.join(', ');
+          }
+          // Avoid duplicates
+          if (!bandMembers.find(m => m.mbid === member.id)) {
+            bandMembers.push({
+              name: member.name,
+              instrument: instrument,
+              birthPlace: 'Unknown',
+              birthDate: 'Unknown',
+              deathDate: null,
+              deathPlace: null,
+              associatedActs: [],
+              imageUrl: null,
+              equipment: [],
+              mbid: member.id,
+              type: member.type || 'Person'
+            });
+          }
+        }
+      }
+    }
+
+    // Enrich band members with Wikipedia/Wikidata data to get birth places
+    if (bandMembers.length > 0) {
+      try {
+        const enrichedMembers = await enrichBandMembersWithLocations(bandMembers);
+        bandMembers = enrichedMembers;
+      } catch (error) {
+        console.error('Error enriching band members:', error);
+        // Continue with unenriched members if enrichment fails
       }
     }
 
@@ -1148,6 +1225,9 @@ export async function getMapData(req, res) {
             );
             
             if (!exists) {
+              // Add member name to geocoded data for marker matching
+              geocoded.memberName = member.name;
+              geocoded.memberInstrument = member.instrument;
               mapData.push(geocoded);
             }
             
@@ -1181,7 +1261,11 @@ async function getArtistInfoFromWikipedia(artist) {
     const searchQuery = encodeURIComponent(artist);
     const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&srsearch=${searchQuery}&srlimit=1`;
     
-    const searchResponse = await axios.get(searchUrl);
+    const searchResponse = await axios.get(searchUrl, {
+      headers: {
+        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+      }
+    });
     const searchData = searchResponse.data;
     
     if (!searchData.query?.search?.[0]) {

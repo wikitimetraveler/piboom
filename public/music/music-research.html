@@ -2285,8 +2285,9 @@ function searchYouTube(artistName) {
 }
 
 function searchBandMembers(artistName) {
-  // Get band members information
-  fetch('/api/music-research/wikipedia', {
+  // Get band members information from MusicBrainz
+  showLoading('membersLoading', true);
+  fetch('/api/music-research/musicbrainz', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -2328,32 +2329,20 @@ function searchMapData(artistName) {
       }
       initMapWithData(data.mapData, artistName);
     } else {
+      // Show message but keep the map - don't destroy it
       document.getElementById('timeline').innerHTML = 
-        '<div class="alert alert-info">No birth place data found for timeline.</div>';
-      // Show empty map state
-      document.getElementById('mapContent').innerHTML = `
-        <div id="map" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-          <div class="text-center">
-            <i class="bi-map" style="font-size: 3rem;"></i>
-            <p class="mt-2">No birth place data found</p>
-          </div>
-        </div>
-      `;
+        '<div class="alert alert-info">No birth place data found for timeline. Map will remain visible.</div>';
+      // Don't clear the map - keep it as is
+      // The map will stay in its current state (either initial state or previous search)
     }
   })
   .catch(error => {
     showLoading('timelineLoading', false);
     showLoading('mapLoading', false);
     document.getElementById('timeline').innerHTML = 
-      '<div class="alert alert-warning">Error loading timeline data. Please try again.</div>';
-    document.getElementById('mapContent').innerHTML = `
-      <div id="map" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-        <div class="text-center">
-          <i class="bi-exclamation-triangle" style="font-size: 3rem;"></i>
-          <p class="mt-2">Error loading map data</p>
-        </div>
-      </div>
-    `;
+      '<div class="alert alert-warning">Error loading timeline data. Please try again. Map will remain visible.</div>';
+    // Don't clear or replace the map - keep it as is
+    // The map will stay in its current state
     console.error('Error:', error);
   });
 }
@@ -2743,15 +2732,44 @@ function getInstrumentIcon(instrument) {
 function focusOnMemberLocation(memberName, location) {
   console.log(`🎯 Focusing on ${memberName} at ${location}`);
   
-  if (!window.map || !window.mapMarkers) {
-    console.warn('Map not initialized yet');
+  // Check if Google Maps is loaded
+  if (typeof google === 'undefined' || !google.maps) {
+    console.warn('Google Maps API not loaded yet');
     return;
   }
   
+  // Ensure map is initialized - if not, initialize it
+  if (!window.map) {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) {
+      console.error('Map element not found');
+      return;
+    }
+    
+    // Initialize map with default center (world view)
+    window.map = new google.maps.Map(mapElement, {
+      zoom: 2,
+      center: { lat: 20, lng: 0 },
+      mapTypeId: 'roadmap'
+    });
+    window.geocoder = new google.maps.Geocoder();
+    if (!window.mapMarkers) {
+      window.mapMarkers = [];
+    }
+    console.log('✅ Map initialized for member focus');
+  }
+  
   // Find the marker for this location
-  const marker = window.mapMarkers.find(m => 
-    m.name === location || m.name.toLowerCase().includes(location.toLowerCase())
-  );
+  let marker = null;
+  if (window.mapMarkers && window.mapMarkers.length > 0) {
+    // Try to match by member name first, then by location name
+    marker = window.mapMarkers.find(m => 
+      (m.memberName && m.memberName === memberName) ||
+      m.name === location || 
+      m.name.toLowerCase().includes(location.toLowerCase()) ||
+      location.toLowerCase().includes(m.name.toLowerCase())
+    );
+  }
   
   if (marker) {
     // Focus on the marker
@@ -2771,34 +2789,68 @@ function focusOnMemberLocation(memberName, location) {
     
     console.log(`✅ Focused on ${memberName} at ${location}`);
   } else {
-    console.warn(`❌ No marker found for location: ${location}`);
+    console.warn(`❌ No marker found for location: ${location}, geocoding...`);
     
     // Try to geocode the location if not found
-    if (window.geocoder) {
+    if (window.geocoder && location !== 'Unknown location' && location !== 'Unknown') {
       window.geocoder.geocode({ address: location }, (results, status) => {
         if (status === 'OK' && results[0]) {
           const position = results[0].geometry.location;
           window.map.setCenter(position);
           window.map.setZoom(10);
           
-          // Create a temporary marker
+          // Create a marker and add it to the map
           const tempMarker = new google.maps.Marker({
             position: position,
             map: window.map,
             title: `${memberName} - ${location}`,
             icon: {
               url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-            }
+            },
+            animation: google.maps.Animation.DROP
           });
           
-          // Remove the temporary marker after 5 seconds
-          setTimeout(() => {
-            tempMarker.setMap(null);
-          }, 5000);
+          // Create info window
+          const infoWindow = new google.maps.InfoWindow({
+            content: `
+              <div style="padding: 10px;">
+                <h6><i class="bi-geo-alt"></i> ${location}</h6>
+                <p class="mb-0">Birth place of ${memberName}</p>
+              </div>
+            `
+          });
           
-          console.log(`✅ Created temporary marker for ${memberName} at ${location}`);
+          tempMarker.addListener('click', () => {
+            infoWindow.open(window.map, tempMarker);
+          });
+          
+          // Store marker info
+          tempMarker.name = location;
+          tempMarker.infoWindow = infoWindow;
+          tempMarker.position = position;
+          
+          // Add to markers array
+          if (!window.mapMarkers) {
+            window.mapMarkers = [];
+          }
+          window.mapMarkers.push(tempMarker);
+          
+          // Open info window
+          infoWindow.open(window.map, tempMarker);
+          
+          // Add bounce animation
+          tempMarker.setAnimation(google.maps.Animation.BOUNCE);
+          setTimeout(() => {
+            tempMarker.setAnimation(null);
+          }, 2000);
+          
+          console.log(`✅ Created and focused marker for ${memberName} at ${location}`);
+        } else {
+          console.error(`❌ Geocoding failed for ${location}:`, status);
         }
       });
+    } else {
+      console.warn(`❌ Cannot geocode: location is "${location}" or geocoder not available`);
     }
   }
 }
@@ -2918,19 +2970,16 @@ function initBasicMap(artistName) {
 }
 
 function initMapWithData(mapData, artistName) {
-  // Clear existing markers
-  markers.forEach(marker => marker.setMap(null));
+  // Clear existing markers only if we have new data
+  if (markers && markers.length > 0) {
+    markers.forEach(marker => marker.setMap(null));
+  }
   markers = [];
   
   if (mapData.length === 0) {
-    document.getElementById('mapContent').innerHTML = `
-      <div id="map" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #6c757d;">
-        <div class="text-center">
-          <i class="bi-map" style="font-size: 3rem;"></i>
-          <p class="mt-2">No birth place data found</p>
-        </div>
-      </div>
-    `;
+    // Don't clear the map - just return and keep the existing map visible
+    // The map will stay in its current state (either initial state or previous search)
+    console.log('No map data to display, keeping existing map');
     return;
   }
   
@@ -2967,14 +3016,20 @@ function initMapWithData(mapData, artistName) {
       }
     });
     
-    // Add info window
-    const infoWindow = new google.maps.InfoWindow({
-      content: `
-        <div style="padding: 10px;">
+    // Create info window content - include member name if available
+    const infoContent = location.memberName 
+      ? `<div style="padding: 10px;">
+          <h6><i class="bi-geo-alt"></i> ${location.name}</h6>
+          <p class="mb-0">Birth place of ${location.memberName}${location.memberInstrument ? ` (${location.memberInstrument})` : ''}</p>
+        </div>`
+      : `<div style="padding: 10px;">
           <h6><i class="bi-geo-alt"></i> ${location.name}</h6>
           <p class="mb-0">Birth place of ${artistName} ${index > 0 ? 'band member' : ''}</p>
-        </div>
-      `
+        </div>`;
+    
+    // Add info window
+    const infoWindow = new google.maps.InfoWindow({
+      content: infoContent
     });
     
     marker.addListener('click', () => {
@@ -2983,6 +3038,7 @@ function initMapWithData(mapData, artistName) {
     
     // Store marker with additional info for member focus
     marker.name = location.name;
+    marker.memberName = location.memberName || null; // Store member name if available
     marker.infoWindow = infoWindow;
     marker.position = { lat: location.lat, lng: location.lng };
     
