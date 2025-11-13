@@ -52,7 +52,7 @@ setInterval(async () => {
   }
 }, 30 * 60 * 1000);
 
-// Nightly prune older than 30 days
+// Nightly prune older than 90 days
 setInterval(async () => {
   try {
     await pruneOldDisasters();

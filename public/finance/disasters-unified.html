@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unified Disasters (30-day, Multi-Source)</title>
+    <title>Unified Disasters (90-day, Multi-Source)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
@@ -331,7 +331,7 @@
     <div class="container-xxl py-4">
       <div class="page-header">
         <div class="d-flex justify-content-between align-items-center mb-3">
-          <h1 class="mb-0"><i class="bi-fire"></i> Unified Disasters <small class="text-muted">(30-day, Multi-Source)</small></h1>
+          <h1 class="mb-0"><i class="bi-fire"></i> Unified Disasters <small class="text-muted">(90-day, Multi-Source)</small></h1>
           <a class="btn btn-outline-secondary" href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a>
         </div>
         <div class="row g-3" id="statsRow">
@@ -362,92 +362,168 @@
         </div>
       </div>
 
-      <div class="card mb-3">
-        <div class="card-body filters">
-          <div class="row g-3">
-            <div class="col-md-3">
-              <label class="form-label">State</label>
-              <input id="stateInput" class="form-control" placeholder="e.g., CA">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">County</label>
-              <input id="countyInput" class="form-control" placeholder="e.g., Harris">
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Source</label>
-              <select id="sourceInput" class="form-select" multiple>
-                <option value="fema" selected>FEMA</option>
-                <option value="firms" selected>NASA FIRMS</option>
-                <option value="usgs" selected>USGS</option>
-                <option value="nws" selected>NOAA/NWS</option>
-                <option value="nhc" selected>NHC</option>
-                <option value="gdacs">GDACS</option>
-              </select>
-            </div>
-            <div class="col-md-3">
-              <label class="form-label">Event</label>
-              <select id="eventInput" class="form-select" multiple>
-                <option value="wildfire">Wildfire</option>
-                <option value="earthquake">Earthquake</option>
-                <option value="hurricane">Hurricane</option>
-                <option value="flood">Flood</option>
-                <option value="severe">Severe</option>
-              </select>
-            </div>
-            <div class="col-12 d-flex gap-2 justify-content-end">
-              <button class="btn btn-outline-primary" id="applyBtn"><i class="bi-funnel"></i> Apply</button>
-              <button class="btn btn-primary" id="refreshBtn"><i class="bi-arrow-repeat"></i> Refresh Now</button>
-              <a class="btn btn-outline-secondary" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Disasters Table -->
-      <div class="row g-3 mb-3">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos and loans)</small></div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-hover" id="disastersTable">
-                  <thead>
-                    <tr>
-                      <th>Source</th>
-                      <th>Event</th>
-                      <th>County</th>
-                      <th>State</th>
-                      <th>Start</th>
-                      <th>End</th>
-                      <th>Title</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
+      <!-- Bootstrap Accordion -->
+      <div class="accordion mb-4" id="disastersAccordion">
+        <!-- Accordion Item 1: Filters -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingFilters">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilters" aria-expanded="false" aria-controls="collapseFilters">
+              <i class="bi bi-funnel me-2"></i> Filters & Search
+            </button>
+          </h2>
+          <div id="collapseFilters" class="accordion-collapse collapse" aria-labelledby="headingFilters" data-bs-parent="#disastersAccordion">
+            <div class="accordion-body">
+              <div class="card">
+                <div class="card-body filters">
+                  <div class="row g-3">
+                    <div class="col-md-3">
+                      <label class="form-label">State</label>
+                      <input id="stateInput" class="form-control" placeholder="e.g., CA">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">County</label>
+                      <input id="countyInput" class="form-control" placeholder="e.g., Harris">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Source</label>
+                      <select id="sourceInput" class="form-select" multiple>
+                        <option value="fema" selected>FEMA</option>
+                        <option value="firms" selected>NASA FIRMS</option>
+                        <option value="usgs" selected>USGS</option>
+                        <option value="nws" selected>NOAA/NWS</option>
+                        <option value="nhc" selected>NHC</option>
+                        <option value="gdacs">GDACS</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label">Event</label>
+                      <select id="eventInput" class="form-select" multiple>
+                        <option value="wildfire">Wildfire</option>
+                        <option value="earthquake">Earthquake</option>
+                        <option value="hurricane">Hurricane</option>
+                        <option value="flood">Flood</option>
+                        <option value="severe">Severe</option>
+                      </select>
+                    </div>
+                    <div class="col-12 d-flex gap-2 justify-content-end">
+                      <button class="btn btn-outline-primary" id="applyBtn"><i class="bi-funnel"></i> Apply</button>
+                      <button class="btn btn-primary" id="refreshBtn"><i class="bi-arrow-repeat"></i> Refresh Now</button>
+                      <a class="btn btn-outline-secondary" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
+                      <button id="voiceControlBtn" class="btn btn-warning" onclick="toggleVoiceControl()" title="Voice Commands">
+                        <i class="bi bi-mic"></i> <span id="voiceControlText">Voice</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Map and YouTube Side by Side -->
-      <div class="row g-3 mb-3">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header"><strong><i class="bi-geo-alt"></i> Map</strong></div>
-            <div class="card-body">
-              <div id="map" style="height: 500px;"></div>
+        <!-- Accordion Item 2: Disasters Table -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingDisasters">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDisasters" aria-expanded="true" aria-controls="collapseDisasters">
+              <i class="bi bi-shield-exclamation me-2"></i> Disasters
+            </button>
+          </h2>
+          <div id="collapseDisasters" class="accordion-collapse collapse show" aria-labelledby="headingDisasters" data-bs-parent="#disastersAccordion">
+            <div class="accordion-body">
+              <div class="card">
+                <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos and loans)</small></div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover" id="disastersTable">
+                      <thead>
+                        <tr>
+                          <th>Source</th>
+                          <th>Event</th>
+                          <th>County</th>
+                          <th>State</th>
+                          <th>Start</th>
+                          <th>End</th>
+                          <th>Title</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header"><strong><i class="bi-youtube"></i> Disaster Videos</strong></div>
-            <div class="card-body">
-              <div id="youtubeResults" style="max-height: 500px; overflow-y: auto;">
-                <div class="text-center text-muted">
-                  <i class="bi-youtube"></i><br>
-                  Click on a disaster to search for related videos
+
+        <!-- Accordion Item 3: Map & YouTube -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingMapYouTube">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMapYouTube" aria-expanded="false" aria-controls="collapseMapYouTube">
+              <i class="bi bi-geo-alt me-2"></i> Map & Disaster Videos
+            </button>
+          </h2>
+          <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube" data-bs-parent="#disastersAccordion">
+            <div class="accordion-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header"><strong><i class="bi-geo-alt"></i> Map</strong></div>
+                    <div class="card-body">
+                      <div id="map" style="height: 500px;"></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header"><strong><i class="bi-youtube"></i> Disaster Videos</strong></div>
+                    <div class="card-body">
+                      <div id="youtubeResults" style="max-height: 500px; overflow-y: auto;">
+                        <div class="text-center text-muted">
+                          <i class="bi-youtube"></i><br>
+                          Click on a disaster to search for related videos
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion Item 4: Encompass Loans -->
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingLoans">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoans" aria-expanded="false" aria-controls="collapseLoans">
+              <i class="bi bi-bank me-2"></i> Encompass Loans
+            </button>
+          </h2>
+          <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans" data-bs-parent="#disastersAccordion">
+            <div class="accordion-body">
+              <div class="card" id="encompassLoansCard" style="display: none;">
+                <div class="card-header">
+                  <strong><i class="bi-bank"></i> Encompass Loans in Affected County</strong>
+                  <small class="text-muted d-block" id="encompassLoansSubtitle">Loans affected by selected disaster</small>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-hover" id="encompassLoansTable">
+                      <thead>
+                        <tr>
+                          <th>Loan Number</th>
+                          <th>Borrower</th>
+                          <th>Property Address</th>
+                          <th>City, State</th>
+                          <th>County</th>
+                          <th>Loan Amount</th>
+                          <th>Milestone</th>
+                          <th>Risk Level</th>
+                          <th>Encompass GUID</th>
+                          <th>Last Analysis</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -455,38 +531,6 @@
         </div>
       </div>
 
-      <!-- Encompass Loans Section -->
-      <div class="row g-3">
-        <div class="col-12">
-          <div class="card" id="encompassLoansCard" style="display: none;">
-            <div class="card-header">
-              <strong><i class="bi-bank"></i> Encompass Loans in Affected County</strong>
-              <small class="text-muted d-block" id="encompassLoansSubtitle">Loans affected by selected disaster</small>
-            </div>
-            <div class="card-body">
-              <div class="table-responsive">
-                <table class="table table-hover" id="encompassLoansTable">
-                  <thead>
-                    <tr>
-                      <th>Loan Number</th>
-                      <th>Borrower</th>
-                      <th>Property Address</th>
-                      <th>City, State</th>
-                      <th>County</th>
-                      <th>Loan Amount</th>
-                      <th>Milestone</th>
-                      <th>Risk Level</th>
-                      <th>Encompass GUID</th>
-                      <th>Last Analysis</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -501,8 +545,18 @@
       let encompassLoansTable;
       let youtubeAPIReady = false;
       let selectedDisaster = null;
+      let voiceRecognition = null;
+      let isVoiceListening = false;
+      let aiChatWidget = null;
+      let aiInsightsCard = null;
 
       $(function init() {
+        // Initialize AI components
+        initializeAIComponents();
+        // Initialize voice recognition
+        initializeVoiceRecognition();
+        // Generate initial insights
+        generateInitialInsights();
         // Ensure table exists and has exactly 7 headers
         const headerCount = $('#disastersTable thead th').length;
         if (headerCount !== 7) {
@@ -617,7 +671,7 @@
           table.columns.adjust();
         }, 50);
         encompassLoansTable = $('#encompassLoansTable').DataTable({ pageLength: 10, order: [[0, 'asc']] });
-        map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6} });
+        map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6}, mapTypeId: 'satellite' });
         $('#applyBtn').on('click', loadDisasters);
         $('#refreshBtn').on('click', refreshDisasters);
         
@@ -633,20 +687,72 @@
       });
 
       async function loadDisasters() {
-        const qp = new URLSearchParams();
         const state = $('#stateInput').val().trim();
         const county = $('#countyInput').val().trim();
         const sources = $('#sourceInput').val() || [];
         const events = $('#eventInput').val() || [];
+        
+        // Check if FEMA is the only source selected - use pipeline FEMA query logic
+        const isFemaOnly = sources.length === 1 && sources[0] === 'fema';
+        
+        if (isFemaOnly) {
+          // Use pipeline FEMA query logic (direct API call)
+          console.log('📊 Loading FEMA data using pipeline query logic...');
+          const qp = new URLSearchParams();
+          if (state) qp.set('state', state);
+          if (county) qp.set('county', county);
+          const url = `/api/loan-pipeline/query-fema?${qp.toString()}`;
+          console.log('📊 Loading FEMA from pipeline endpoint:', url);
+          
+          try {
+            const resp = await fetch(url);
+            const json = await resp.json();
+            console.log('📊 Pipeline FEMA Response:', { 
+              success: json.success, 
+              count: json.data?.count, 
+              disasters: json.data?.disasters?.length || 0,
+              sample: json.data?.disasters?.slice(0, 3)
+            });
+            
+            if (json.success && json.data.disasters) {
+              // Transform pipeline FEMA format to unified format
+              const transformedRows = json.data.disasters.map(disaster => ({
+                source: 'fema',
+                event_type: (disaster.incidentType || 'disaster').toLowerCase(),
+                county_name: disaster.county || '',
+                state_abbr: disaster.state || '',
+                start_time: disaster.incidentBeginDate || '',
+                end_time: disaster.incidentEndDate || null,
+                severity: null,
+                title: disaster.declarationTitle || disaster.incidentType || 'FEMA Disaster',
+                lat: disaster.latitude || null,
+                lng: disaster.longitude || null,
+                source_id: String(disaster.disasterNumber || disaster.declarationTitle || ''),
+                raw: disaster
+              }));
+              
+              console.log('📊 Transformed FEMA rows:', transformedRows.length);
+              renderTable(transformedRows);
+              renderMap(transformedRows);
+              return;
+            }
+          } catch (e) {
+            console.error('❌ Error loading FEMA from pipeline:', e);
+            // Fall through to regular API call
+          }
+        }
+        
+        // Regular database query for all other sources or when FEMA query fails
+        const qp = new URLSearchParams();
         if (state) qp.set('state', state);
         if (county) qp.set('county', county);
         // Note: API only supports single source/event filter
         // If multiple sources selected, don't filter (show all) - otherwise filter by first selected
         if (sources.length === 1) qp.set('source', sources[0]);
         if (events.length === 1) qp.set('event', events[0]);
-        qp.set('since', new Date(Date.now() - 30*24*3600*1000).toISOString());
+        qp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
         const url = `/api/disasters?${qp.toString()}`;
-        console.log('📊 Loading disasters from:', url);
+        console.log('📊 Loading disasters from database:', url);
         const resp = await fetch(url);
         const json = await resp.json();
         console.log('📊 API Response:', { 
@@ -660,7 +766,7 @@
         if (rows.length === 0) {
           console.warn('⚠️  No disasters found. Check:');
           console.warn('   - Database connection');
-          console.warn('   - Date filter (30 days)');
+          console.warn('   - Date filter (90 days)');
           console.warn('   - Source/event filters');
         }
         renderTable(rows);
@@ -939,7 +1045,12 @@
         console.log('Selecting disaster:', title, state, county);
         
         // Show Encompass loans card
+        // Show Encompass loans card and expand accordion
         $('#encompassLoansCard').show();
+        // Expand the Encompass Loans accordion
+        const loansCollapse = new bootstrap.Collapse(document.getElementById('collapseLoans'), {
+          show: true
+        });
         $('#encompassLoansSubtitle').text(`Loans in ${county}, ${state} affected by ${title}`);
         
         // Load Encompass loans
@@ -1203,6 +1314,162 @@
             $el.text(target);
           }
         }, duration / steps);
+      }
+
+      // Initialize AI Components
+      async function initializeAIComponents() {
+        // Import voice commands module
+        try {
+          const voiceCommands = await import('../shared/voice-commands.js');
+          window.parseVoiceCommand = voiceCommands.parseVoiceCommand;
+          window.executeVoiceCommand = voiceCommands.executeVoiceCommand;
+        } catch (error) {
+          console.warn('Failed to load voice commands:', error);
+        }
+        
+        const userId = 'anonymous'; // Could use logged in user if available
+        
+        // Initialize AI Chat Widget (disaster-focused)
+        if (window.AIChatWidget) {
+          aiChatWidget = new window.AIChatWidget({
+            apiEndpoint: '/api/loan-pipeline/ai/chat', // Using same endpoint, context will differ
+            userId: userId,
+            sessionId: 'disasters-unified',
+            getContext: () => ({
+              selectedDisaster: selectedDisaster,
+              filters: getCurrentFilters()
+            }),
+            onMessageSent: (message) => console.log('AI Chat message sent:', message),
+            onMessageReceived: (response, data) => console.log('AI Chat response received:', response)
+          });
+          window.aiChatWidget = aiChatWidget;
+        }
+        
+        // Initialize AI Insights Card
+        if (window.AIInsightsCard) {
+          aiInsightsCard = new window.AIInsightsCard({
+            apiEndpoint: '/api/loan-pipeline/ai/insights',
+            userId: userId,
+            containerId: 'aiInsightsContainer',
+            autoGenerate: true,
+            onInsightsGenerated: (insights, data) => console.log('AI Insights generated:', insights)
+          });
+          window.aiInsightsCard = aiInsightsCard;
+        }
+      }
+
+      // Generate initial insights
+      async function generateInitialInsights() {
+        if (aiInsightsCard) {
+          await aiInsightsCard.generateInsights(getCurrentFilters(), 'load', null);
+        }
+      }
+
+      // Get current filters
+      function getCurrentFilters() {
+        return {
+          state: $('#stateInput').val(),
+          county: $('#countyInput').val(),
+          sources: $('#sourceInput').val() || [],
+          events: $('#eventInput').val() || []
+        };
+      }
+
+      // Initialize Voice Recognition
+      function initializeVoiceRecognition() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          console.warn('Speech recognition not supported');
+          $('#voiceControlBtn').hide();
+          return;
+        }
+
+        voiceRecognition = new SpeechRecognition();
+        voiceRecognition.continuous = false;
+        voiceRecognition.interimResults = false;
+        voiceRecognition.lang = 'en-US';
+
+        voiceRecognition.onstart = function() {
+          isVoiceListening = true;
+          updateVoiceButton(true);
+        };
+
+        voiceRecognition.onresult = async function(event) {
+          const transcript = event.results[event.results.length - 1][0].transcript;
+          console.log('Voice command:', transcript);
+          
+          if (window.parseVoiceCommand && window.executeVoiceCommand) {
+            const action = window.parseVoiceCommand(transcript);
+            const context = {
+              applyFilters: loadDisasters,
+              setStateFilter: (state) => $('#stateInput').val(state),
+              setCountyFilter: (county) => $('#countyInput').val(county),
+              expandAccordion: (targetId) => {
+                const collapse = new bootstrap.Collapse(document.getElementById(targetId), { show: true });
+              }
+            };
+            
+            const result = await window.executeVoiceCommand(action, context);
+            if (result.success && aiInsightsCard) {
+              aiInsightsCard.generateInsights(getCurrentFilters(), 'filter', null);
+            }
+          }
+        };
+
+        voiceRecognition.onerror = function(event) {
+          console.error('Voice recognition error:', event.error);
+          isVoiceListening = false;
+          updateVoiceButton(false);
+        };
+
+        voiceRecognition.onend = function() {
+          isVoiceListening = false;
+          updateVoiceButton(false);
+        };
+
+        window.voiceRecognition = {
+          start: (callback) => {
+            if (callback) {
+              voiceRecognition.onresult = function(event) {
+                const transcript = event.results[event.results.length - 1][0].transcript;
+                callback(transcript);
+              };
+            }
+            voiceRecognition.start();
+          },
+          stop: () => voiceRecognition.stop(),
+          isListening: () => isVoiceListening
+        };
+      }
+
+      // Toggle voice control
+      function toggleVoiceControl() {
+        if (!voiceRecognition) {
+          alert('Voice recognition not available');
+          return;
+        }
+        if (isVoiceListening) {
+          voiceRecognition.stop();
+        } else {
+          voiceRecognition.start();
+        }
+      }
+
+      // Update voice button
+      function updateVoiceButton(listening) {
+        const btn = $('#voiceControlBtn');
+        const text = $('#voiceControlText');
+        const icon = btn.find('i');
+        
+        if (listening) {
+          btn.removeClass('btn-warning').addClass('btn-danger');
+          icon.removeClass('bi-mic').addClass('bi-mic-fill');
+          text.text(' Listening...');
+        } else {
+          btn.removeClass('btn-danger').addClass('btn-warning');
+          icon.removeClass('bi-mic-fill').addClass('bi-mic');
+          text.text(' Voice');
+        }
       }
     </script>
   </body>

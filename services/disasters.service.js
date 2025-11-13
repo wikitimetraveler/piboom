@@ -9,14 +9,14 @@
  * @description
  * Service module for managing disaster data from multiple sources (NOAA, NASA, FEMA).
  * Handles schema initialization, data aggregation, and county-level disaster tracking
- * with FIPS code lookups. Provides unified disaster data with a 30-day rolling window
+ * with FIPS code lookups. Provides unified disaster data with a 90-day rolling window
  * for recent disaster tracking.
  * 
  * Features:
  * - Unified disasters table schema initialization
  * - Multi-source disaster data integration (NOAA, NASA, FEMA)
  * - County FIPS code lookups and geocoding
- * - 30-day rolling window for recent disasters
+ * - 90-day rolling window for recent disasters
  * - Disaster risk assessment and aggregation
  * - Geographic disaster data queries
  * 
@@ -28,7 +28,7 @@
  * Schema:
  * - Unified disasters table with standardized fields
  * - County FIPS code references
- * - Timestamp-based filtering (30-day window)
+ * - Timestamp-based filtering (90-day window)
  * - Geographic coordinates for mapping
  * 
  * Technical Implementation:
@@ -127,12 +127,12 @@ export async function initDisastersSchema() {
   }
 }
 
-/** Prune disasters older than 30 days */
+/** Prune disasters older than 90 days */
 export async function pruneOldDisasters() {
   const pool = getPool();
   if (!pool) return;
   try {
-    await pool.query(`DELETE FROM disasters WHERE start_time < NOW() - INTERVAL '30 days'`);
+    await pool.query(`DELETE FROM disasters WHERE start_time < NOW() - INTERVAL '90 days'`);
   } catch (e) {
     console.warn('⚠️  pruneOldDisasters failed:', e.message);
   }
@@ -176,8 +176,16 @@ function mapCountyToFips(countyName, stateAbbr) {
 
 /**
  * Calculate distance between two lat/lng points in kilometers (Haversine formula)
+ * @param {number} lat1 - Latitude of first point
+ * @param {number} lng1 - Longitude of first point
+ * @param {number} lat2 - Latitude of second point
+ * @param {number} lng2 - Longitude of second point
+ * @returns {number} Distance in kilometers
  */
-function calculateDistance(lat1, lng1, lat2, lng2) {
+export function calculateDistance(lat1, lng1, lat2, lng2) {
+  if (!lat1 || !lng1 || !lat2 || !lng2) {
+    return null; // Return null if coordinates are missing
+  }
   const R = 6371; // Earth's radius in km
   const dLat = (lat2 - lat1) * Math.PI / 180;
   const dLng = (lng2 - lng1) * Math.PI / 180;
@@ -698,22 +706,22 @@ export async function ingestNwsCap() {
   return upsertDisasters(batch);
 }
 
-/** FEMA Disaster Declarations (last 30 days) **/
+/** FEMA Disaster Declarations (last 90 days) **/
 export async function ingestFema() {
   const baseUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
   
-  // Calculate date 30 days ago
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split('T')[0]; // YYYY-MM-DD
+  // Calculate date 90 days ago
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+  const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0]; // YYYY-MM-DD
   
-  // Query FEMA API for disasters in last 30 days (no state/county filter to get all)
-  const filter = `incidentBeginDate ge ${thirtyDaysAgoStr}`;
+  // Query FEMA API for disasters in last 90 days (no state/county filter to get all)
+  const filter = `incidentBeginDate ge ${ninetyDaysAgoStr}`;
   const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$top=1000&$orderby=incidentBeginDate desc`;
   
   let data;
   try {
-    console.log(`🏛️  FEMA: Querying disasters since ${thirtyDaysAgoStr}`);
+    console.log(`🏛️  FEMA: Querying disasters since ${ninetyDaysAgoStr}`);
     const resp = await fetch(url, {
       headers: {
         'Accept': 'application/json',
@@ -734,8 +742,8 @@ export async function ingestFema() {
   const disasters = data.DisasterDeclarationsSummaries || [];
   console.log(`🏛️  FEMA: Retrieved ${disasters.length} disaster declarations`);
   
-  // Filter to ensure only last 30 days
-  const cutoffDate = new Date(thirtyDaysAgoStr);
+  // Filter to ensure only last 90 days
+  const cutoffDate = new Date(ninetyDaysAgoStr);
   const recentDisasters = disasters.filter(disaster => {
     if (disaster.incidentBeginDate) {
       const disasterDate = new Date(disaster.incidentBeginDate);
@@ -744,7 +752,7 @@ export async function ingestFema() {
     return false;
   });
   
-  console.log(`🏛️  FEMA: ${recentDisasters.length} disasters within 30-day window`);
+  console.log(`🏛️  FEMA: ${recentDisasters.length} disasters within 90-day window`);
   
   const batch = [];
   await loadFipsReference();

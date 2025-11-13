@@ -737,6 +737,7 @@ function initDefaultMap() {
   map = new google.maps.Map(mapDiv, {
     zoom: 2,
     center: { lat: 40, lng: -95 }, // USA center
+    mapTypeId: 'satellite',
     styles: [
       { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
       { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },
@@ -789,6 +790,7 @@ function initMapWithData(locations) {
   map = new google.maps.Map(mapDiv, {
     zoom: 4,
     center: { lat: center.lat, lng: center.lng },
+    mapTypeId: 'satellite',
     styles: [
       { elementType: 'geometry', stylers: [{ color: '#242f3e' }] },
       { elementType: 'labels.text.stroke', stylers: [{ color: '#242f3e' }] },

@@ -20,6 +20,10 @@
     
     <!-- Custom CSS -->
     <link href="../shared/modern-navbar.css" rel="stylesheet">
+    <!-- Voice Commands & AI Components -->
+    <script type="module" src="../shared/voice-commands.js"></script>
+    <script type="module" src="../shared/ai-chat-widget.js"></script>
+    <script type="module" src="../shared/ai-insights-card.js"></script>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -158,6 +162,162 @@
             cursor: pointer;
         }
 
+        .table-active {
+            background-color: #e3f2fd !important;
+        }
+
+        /* Loan Info Panel Styles */
+        .loan-info-panel {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 450px;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 1050;
+            transition: right 0.3s ease-in-out;
+            overflow-y: auto;
+            color: white;
+        }
+
+        .loan-info-panel.open {
+            right: 0;
+        }
+
+        .loan-info-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .loan-info-header h5 {
+            color: white;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .loan-info-body {
+            padding: 1.5rem;
+        }
+
+        .loan-info-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .loan-info-section h6 {
+            color: #60a5fa;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loan-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .loan-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .loan-info-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .loan-info-value {
+            color: white;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .loan-info-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .loan-info-overlay.show {
+            display: block;
+        }
+
+        .distance-badge-large {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .distance-critical {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .distance-warning {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .distance-info {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: white;
+        }
+
+        .distance-safe {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        /* Accordion Styling */
+        .accordion-button {
+            font-weight: 600;
+            color: var(--dark-color);
+            background-color: #f8fafc;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .accordion-button:not(.collapsed)::after {
+            filter: brightness(0) invert(1);
+        }
+
+        .accordion-item {
+            border: 1px solid #e5e7eb;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .accordion-body {
+            padding: 1.5rem;
+        }
+
         .loading-spinner {
             display: none;
         }
@@ -229,283 +389,351 @@
                         <button class="btn btn-info" onclick="downloadKML()">
                             <i class="bi bi-download"></i> Download KML
                         </button>
+                        <button id="voiceControlBtn" class="btn btn-warning" onclick="toggleVoiceControl()" title="Voice Commands">
+                            <i class="bi bi-mic"></i> <span id="voiceControlText">Voice</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3 mb-3">
-                <div class="stat-card">
-                    <div class="stat-number text-primary" id="totalLoans">-</div>
-                    <div class="stat-label">Total Loans</div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="stat-card">
-                    <div class="stat-number text-success" id="analyzedLoans">-</div>
-                    <div class="stat-label">Analyzed</div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="stat-card">
-                    <div class="stat-number text-warning" id="pendingAnalysis">-</div>
-                    <div class="stat-label">Pending Analysis</div>
-                </div>
-            </div>
-            <div class="col-md-3 mb-3">
-                <div class="stat-card">
-                    <div class="stat-number text-danger" id="highRiskLoans">-</div>
-                    <div class="stat-label">High Risk</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row 1: Risk Distribution & Milestones -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Risk Distribution</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="riskDistributionChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-graph-up"></i> Pipeline Milestones</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="milestoneChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row 2: Loan Amount Distribution & State Distribution -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Loan Amount Distribution</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="loanAmountChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-map"></i> Loans by State</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="stateDistributionChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Charts Row 3: Milestone Timeline & Risk Score Distribution -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Milestone Progress Timeline</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="milestoneTimelineChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-speedometer2"></i> Risk Score Distribution</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="riskScoreChart" style="max-height: 300px;"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filters -->
-        <div class="filter-section">
-            <h5 class="mb-3"><i class="bi bi-funnel"></i> Filters</h5>
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Milestone</label>
-                    <select class="form-select" id="milestoneFilter">
-                        <option value="">All Milestones</option>
-                        <option value="Application">Application</option>
-                        <option value="Processing">Processing</option>
-                        <option value="Underwriting">Underwriting</option>
-                        <option value="Closing">Closing</option>
-                        <option value="Funded">Funded</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">State</label>
-                    <select class="form-select" id="stateFilter">
-                        <option value="">All States</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">County</label>
-                    <input class="form-control" id="countyFilter" placeholder="e.g., Harris">
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Risk Level</label>
-                    <select class="form-select" id="riskFilter">
-                        <option value="">All Risk Levels</option>
-                        <option value="low">Low Risk</option>
-                        <option value="medium">Medium Risk</option>
-                        <option value="high">High Risk</option>
-                    </select>
-                </div>
-                <div class="col-md-3 mb-3 d-flex align-items-end gap-2">
-                    <button class="btn btn-outline-primary w-100" onclick="applyFilters()">
-                        <i class="bi bi-funnel"></i> Apply Filters
+        <!-- Bootstrap Accordion -->
+        <div class="accordion mb-4" id="dashboardAccordion">
+            <!-- Accordion Item 1: Statistics & Charts -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingStatsCharts">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseStatsCharts" aria-expanded="true" aria-controls="collapseStatsCharts">
+                        <i class="bi bi-bar-chart-line me-2"></i> Statistics & Charts
                     </button>
+                </h2>
+                <div id="collapseStatsCharts" class="accordion-collapse collapse show" aria-labelledby="headingStatsCharts" data-bs-parent="#dashboardAccordion">
+                    <div class="accordion-body">
+                        <!-- Statistics Cards -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="stat-card">
+                                    <div class="stat-number text-primary" id="totalLoans">-</div>
+                                    <div class="stat-label">Total Loans</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stat-card">
+                                    <div class="stat-number text-success" id="analyzedLoans">-</div>
+                                    <div class="stat-label">Analyzed</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stat-card">
+                                    <div class="stat-number text-warning" id="pendingAnalysis">-</div>
+                                    <div class="stat-label">Pending Analysis</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="stat-card">
+                                    <div class="stat-number text-danger" id="highRiskLoans">-</div>
+                                    <div class="stat-label">High Risk</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row 1: Risk Distribution & Milestones -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Risk Distribution</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="riskDistributionChart" style="max-height: 300px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-graph-up"></i> Pipeline Milestones</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="milestoneChart" style="max-height: 300px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row 2: Loan Amount Distribution & State Distribution -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Loan Amount Distribution</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="loanAmountChart" style="max-height: 300px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-map"></i> Loans by State</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="stateDistributionChart" style="max-height: 300px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row 3: Milestone Timeline & Risk Score Distribution -->
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Milestone Progress Timeline</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="milestoneTimelineChart" style="max-height: 300px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-speedometer2"></i> Risk Score Distribution</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="riskScoreChart" style="max-height: 300px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-12 mb-2 d-flex justify-content-end">
-                    <button type="button" class="btn btn-primary" id="loadFemaBtn" onclick="loadFEMADisastersDirect()">
-                        <i class="bi bi-cloud-download"></i> Load FEMA (Real-time)
+            </div>
+
+            <!-- Accordion Item 2: Filters & Analysis Progress -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFilters">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilters" aria-expanded="false" aria-controls="collapseFilters">
+                        <i class="bi bi-funnel me-2"></i> Filters & Analysis
                     </button>
-                    <span id="femaLoadSpinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Analysis Progress -->
-        <div class="row mb-4" id="analysisProgress" style="display: none;">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Risk Analysis Progress</h6>
-                        <div class="progress mb-2">
-                            <div class="progress-bar" role="progressbar" style="width: 0%" id="progressBar"></div>
+                </h2>
+                <div id="collapseFilters" class="accordion-collapse collapse" aria-labelledby="headingFilters" data-bs-parent="#dashboardAccordion">
+                    <div class="accordion-body">
+                        <!-- Filters -->
+                        <div class="filter-section">
+                            <h5 class="mb-3"><i class="bi bi-funnel"></i> Filters</h5>
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Milestone</label>
+                                    <select class="form-select" id="milestoneFilter">
+                                        <option value="">All Milestones</option>
+                                        <option value="Application">Application</option>
+                                        <option value="Processing">Processing</option>
+                                        <option value="Underwriting">Underwriting</option>
+                                        <option value="Closing">Closing</option>
+                                        <option value="Funded">Funded</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">State</label>
+                                    <select class="form-select" id="stateFilter">
+                                        <option value="">All States</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">County</label>
+                                    <input class="form-control" id="countyFilter" placeholder="e.g., Harris">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Risk Level</label>
+                                    <select class="form-select" id="riskFilter">
+                                        <option value="">All Risk Levels</option>
+                                        <option value="low">Low Risk</option>
+                                        <option value="medium">Medium Risk</option>
+                                        <option value="high">High Risk</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3 d-flex align-items-end gap-2">
+                                    <button class="btn btn-outline-primary w-100" onclick="applyFilters()">
+                                        <i class="bi bi-funnel"></i> Apply Filters
+                                    </button>
+                                </div>
+                                <div class="col-12 mb-2 d-flex justify-content-end">
+                                    <button type="button" class="btn btn-primary" id="loadFemaBtn" onclick="loadFEMADisastersDirect()">
+                                        <i class="bi bi-cloud-download"></i> Load FEMA (Real-time)
+                                    </button>
+                                    <span id="femaLoadSpinner" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true" style="display:none;"></span>
+                                </div>
+                            </div>
                         </div>
-                        <small class="text-muted" id="progressText">Starting analysis...</small>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Section 1: FEMA Disasters (12 columns) -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> FEMA Disaster Declarations</h5>
-                        <small class="text-muted">Click on a disaster to view affected Encompass loans in that county</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="femaDisastersTable">
-                                <thead>
-                                    <tr>
-                                        <th>Declaration Type</th>
-                                        <th>Incident Type</th>
-                                        <th>Disaster Title</th>
-                                        <th>State</th>
-                                        <th>County</th>
-                                        <th>IH Program</th>
-                                        <th>IA Program</th>
-                                        <th>PA Program</th>
-                                        <th>HM Program</th>
-                                        <th>Begin Date</th>
-                                        <th>End Date</th>
-                                        <th>Closeout Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- FEMA data will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section 2: Map and YouTube Side by Side (6 columns each) -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Disaster Areas & Loan Properties</h5>
-                    </div>
-                    <div class="card-body">
-                        <div id="map" style="height: 500px; width: 100%;"></div>
-                        <div class="mt-2">
-                            <small class="text-muted">
-                                <span class="badge bg-danger me-1">●</span> Disaster Areas<br>
-                                <span class="badge bg-primary me-1">●</span> Loan Properties
-                            </small>
+                        <!-- Analysis Progress -->
+                        <div class="row mb-4" id="analysisProgress" style="display: none;">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Risk Analysis Progress</h6>
+                                        <div class="progress mb-2">
+                                            <div class="progress-bar" role="progressbar" style="width: 0%" id="progressBar"></div>
+                                        </div>
+                                        <small class="text-muted" id="progressText">Starting analysis...</small>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-youtube"></i> Disaster Videos</h5>
+
+            <!-- Accordion Item 3: FEMA Disasters -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFEMA">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFEMA" aria-expanded="false" aria-controls="collapseFEMA">
+                        <i class="bi bi-shield-exclamation me-2"></i> FEMA Disaster Declarations
+                    </button>
+                </h2>
+                <div id="collapseFEMA" class="accordion-collapse collapse" aria-labelledby="headingFEMA" data-bs-parent="#dashboardAccordion">
+                    <div class="accordion-body">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-shield-exclamation"></i> FEMA Disaster Declarations</h5>
+                                <small class="text-muted">Click on a disaster to view affected Encompass loans in that county</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="femaDisastersTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Declaration Type</th>
+                                                <th>Incident Type</th>
+                                                <th>Disaster Title</th>
+                                                <th>State</th>
+                                                <th>County</th>
+                                                <th>IH Program</th>
+                                                <th>IA Program</th>
+                                                <th>PA Program</th>
+                                                <th>HM Program</th>
+                                                <th>Begin Date</th>
+                                                <th>End Date</th>
+                                                <th>Closeout Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- FEMA data will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
-                        <div id="youtubeResults">
-                            <div class="text-center text-muted">
-                                <i class="bi bi-youtube"></i><br>
-                                Click on a FEMA disaster to search for related videos
+                </div>
+            </div>
+
+            <!-- Accordion Item 4: Map & YouTube -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingMapYouTube">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMapYouTube" aria-expanded="false" aria-controls="collapseMapYouTube">
+                        <i class="bi bi-geo-alt me-2"></i> Map & Disaster Videos
+                    </button>
+                </h2>
+                <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube" data-bs-parent="#dashboardAccordion">
+                    <div class="accordion-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Disaster Areas & Loan Properties</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="map" style="height: 1000px; width: 100%;"></div>
+                                        <div class="mt-2">
+                                            <small class="text-muted">
+                                                <span class="badge bg-danger me-1">●</span> Disaster Areas<br>
+                                                <span class="badge bg-primary me-1">●</span> Loan Properties
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="bi bi-youtube"></i> Disaster Videos</h5>
+                                    </div>
+                                    <div class="card-body" style="padding: 0;">
+                                        <div id="youtubeResults" style="height: 1000px; overflow-y: auto; padding: 1rem;">
+                                            <div class="text-center text-muted">
+                                                <i class="bi bi-youtube"></i><br>
+                                                Click on a FEMA disaster to search for related videos
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accordion Item 5: Encompass Loans -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingLoans">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoans" aria-expanded="false" aria-controls="collapseLoans">
+                        <i class="bi bi-bank me-2"></i> Encompass Loans
+                    </button>
+                </h2>
+                <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans" data-bs-parent="#dashboardAccordion">
+                    <div class="accordion-body">
+                        <div class="card" id="encompassLoansCard" style="display: none;">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-bank"></i> Encompass Loans in Affected County</h5>
+                                <small class="text-muted" id="encompassLoansSubtitle">Loans affected by selected disaster (click loan to focus map)</small>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="encompassLoansTable">
+                                        <thead>
+                                            <tr>
+                                                <th>Loan Number</th>
+                                                <th>Borrower</th>
+                                                <th>Property Address</th>
+                                                <th>City, State</th>
+                                                <th>County</th>
+                                                <th>Loan Amount</th>
+                                                <th>Milestone</th>
+                                                <th>Risk Level</th>
+                                                <th>Distance</th>
+                                                <th>Encompass GUID</th>
+                                                <th>Last Analysis</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Encompass loan data will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Section 3: Encompass Loans (12 columns) -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card" id="encompassLoansCard" style="display: none;">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-bank"></i> Encompass Loans in Affected County</h5>
-                        <small class="text-muted" id="encompassLoansSubtitle">Loans affected by selected disaster (click loan to focus map)</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="encompassLoansTable">
-                                <thead>
-                                    <tr>
-                                        <th>Loan Number</th>
-                                        <th>Borrower</th>
-                                        <th>Property Address</th>
-                                        <th>City, State</th>
-                                        <th>County</th>
-                                        <th>Loan Amount</th>
-                                        <th>Milestone</th>
-                                        <th>Risk Level</th>
-                                        <th>Encompass GUID</th>
-                                        <th>Last Analysis</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Encompass loan data will be loaded here -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Loan Info Panel (Slides in from right) -->
+    <div id="loanInfoPanel" class="loan-info-panel">
+        <div class="loan-info-header">
+            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Loan Details</h5>
+            <button type="button" class="btn-close btn-close-white" onclick="closeLoanInfoPanel()" aria-label="Close"></button>
+        </div>
+        <div class="loan-info-body" id="loanInfoContent">
+            <!-- Content will be populated dynamically -->
         </div>
     </div>
+    <div id="loanInfoOverlay" class="loan-info-overlay" onclick="closeLoanInfoPanel()"></div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -558,6 +786,8 @@
         let loanMarkers = [];
         let youtubeAPIReady = false;
         let selectedDisaster = null;
+        let selectedDisasterObj = null; // Store full disaster object with coordinates
+        let selectedLoan = null; // Store selected loan for info panel
 
         // Initialize dashboard
         $(document).ready(function() {
@@ -570,6 +800,12 @@
             loadYouTubeAPI();
             // Load dashboard charts
             loadDashboardData();
+            // Initialize AI components
+            initializeAIComponents();
+            // Initialize voice recognition
+            initializeVoiceRecognition();
+            // Generate initial insights
+            generateInitialInsights();
         });
 
         // Initialize user login
@@ -598,7 +834,7 @@
             }
         }
 
-        // Load FEMA disasters directly from FEMA API via backend proxy with 30-day window
+        // Load FEMA disasters directly from FEMA API via backend proxy with 90-day window
         async function loadFEMADisastersDirect() {
             try {
                 console.log('Loading FEMA real-time...');
@@ -1129,6 +1365,25 @@
             femaDisastersTable.on('draw', function() { bindFemaRowClicks(); });
         }
 
+        // Custom sorting function for distance column
+        $.fn.dataTable.ext.order['dom-distance'] = function(settings, col) {
+            return this.api().column(col, {order: 'index'}).nodes().map(function(td, i) {
+                // Try to get the sort value from data-sort attribute
+                const $span = $(td).find('span[data-sort]');
+                if ($span.length) {
+                    const sortValue = parseFloat($span.data('sort'));
+                    return isNaN(sortValue) ? 999999 : sortValue;
+                }
+                // Fallback: try to get from loan object
+                const row = $(td).closest('tr');
+                const loanObj = row.data('loanObj');
+                if (loanObj && loanObj._distanceValue !== undefined) {
+                    return loanObj._distanceValue;
+                }
+                return 999999; // Put N/A at the end
+            });
+        };
+
         // Initialize Encompass DataTable
         function initializeEncompassDataTable() {
             encompassLoansTable = $('#encompassLoansTable').DataTable({
@@ -1138,28 +1393,46 @@
                 pageLength: 25,
                 order: [[0, 'desc']],
                 columnDefs: [
-                    { targets: [10], orderable: false } // Actions column
+                    { 
+                        targets: [8], // Distance column
+                        type: 'dom-distance',
+                        orderDataType: 'dom-distance'
+                    },
+                    { targets: [11], orderable: false } // Actions column
                 ]
             });
 
-            // Click to focus map on loan
+            // Click to focus map on loan and show info panel
             $('#encompassLoansTable tbody').off('click.loan').on('click.loan', 'tr, td', function(e) {
+                // Don't trigger if clicking on action button
+                if ($(e.target).closest('button').length) return;
+                
                 const $tr = $(e.target).closest('tr');
                 const row = encompassLoansTable.row($tr.hasClass('child') ? $tr.prev() : $tr);
                 const data = row.data();
                 const loanObj = ($tr.hasClass('child') ? $tr.prev() : $tr).data('loanObj');
-                if (loanObj && loanObj.latitude && loanObj.longitude) {
-                    const pos = { lat: parseFloat(loanObj.latitude), lng: parseFloat(loanObj.longitude) };
-                    map.setCenter(pos);
-                    map.setZoom(12);
-                    // find matching marker
-                    loanMarkers.forEach(m => {
-                        if (m.loanId === loanObj.id && m.marker) {
-                            new google.maps.InfoWindow({
-                                content: `<div><strong>${loanObj.loan_number}</strong><br>${loanObj.property_address}<br>${loanObj.city}, ${loanObj.state} ${loanObj.zip_code || ''}<br>County: ${loanObj.county || ''}</div>`
-                            }).open(map, m.marker);
-                        }
-                    });
+                
+                if (loanObj) {
+                    selectedLoan = loanObj;
+                    showLoanInfoPanel(loanObj);
+                    
+                    // Highlight selected row
+                    $('#encompassLoansTable tbody tr').removeClass('table-active');
+                    $tr.addClass('table-active');
+                    
+                    if (loanObj.latitude && loanObj.longitude) {
+                        const pos = { lat: parseFloat(loanObj.latitude), lng: parseFloat(loanObj.longitude) };
+                        map.setCenter(pos);
+                        map.setZoom(12);
+                        // find matching marker
+                        loanMarkers.forEach(m => {
+                            if (m.loanId === loanObj.id && m.marker) {
+                                new google.maps.InfoWindow({
+                                    content: `<div><strong>${loanObj.loan_number}</strong><br>${loanObj.property_address}<br>${loanObj.city}, ${loanObj.state} ${loanObj.zip_code || ''}<br>County: ${loanObj.county || ''}</div>`
+                                }).open(map, m.marker);
+                            }
+                        });
+                    }
                 }
             });
         }
@@ -1250,6 +1523,7 @@
             currentFilters = {
                 milestone: $('#milestoneFilter').val(),
                 state: $('#stateFilter').val(),
+                county: $('#countyFilter').val(),
                 riskLevel: $('#riskFilter').val()
             };
             
@@ -1261,6 +1535,16 @@
             });
             
             loadLoans();
+            
+            // Update AI insights when filters change
+            if (aiInsightsCard) {
+                aiInsightsCard.generateInsights(currentFilters, 'filter', selectedDisasterObj);
+            }
+            
+            // Update AI chat context
+            if (aiChatWidget) {
+                aiChatWidget.updateContext({ filters: currentFilters });
+            }
         }
 
         // Generate test loans
@@ -1309,6 +1593,10 @@
                     setTimeout(() => {
                         $('#analysisProgress').hide();
                         loadDashboardData();
+                        // Generate insights after analysis
+                        if (aiInsightsCard) {
+                            aiInsightsCard.generateInsights(currentFilters, 'analysis', selectedDisasterObj);
+                        }
                     }, 2000);
                 } else {
                     showAlert('Error analyzing loans', 'danger');
@@ -1447,14 +1735,19 @@
             }
         }
 
-        // Select FEMA disaster and show related data (like tool3)
+            // Select FEMA disaster and show related data (like tool3)
         function selectFEMADisaster(disasterData, disasterObj = null) {
             selectedDisaster = disasterData;
+            selectedDisasterObj = disasterObj; // Store full object with coordinates
             
             console.log('Selecting FEMA disaster:', disasterData, disasterObj); // Debug log
             
-            // Show Encompass loans card
+            // Show Encompass loans card and expand accordion
             $('#encompassLoansCard').show();
+            // Expand the Encompass Loans accordion
+            const loansCollapse = new bootstrap.Collapse(document.getElementById('collapseLoans'), {
+                show: true
+            });
             if (disasterData[3] && disasterData[4]) {
                 $('#encompassLoansSubtitle').text(`Loans in ${disasterData[4]}, ${disasterData[3]} affected by ${disasterData[2]}`);
             }
@@ -1462,6 +1755,19 @@
             // Load Encompass loans for this county
             if (disasterData[3] && disasterData[4]) {
                 loadEncompassLoansForCounty(disasterData[3], disasterData[4]);
+            }
+            
+            // Generate AI insights for selected disaster
+            if (aiInsightsCard) {
+                aiInsightsCard.generateInsights(currentFilters, 'disaster', disasterObj);
+            }
+            
+            // Update AI chat context
+            if (aiChatWidget) {
+                aiChatWidget.updateContext({
+                    selectedDisaster: disasterObj,
+                    filters: currentFilters
+                });
             }
             
             // Search YouTube for disaster videos (like tool3)
@@ -1497,6 +1803,71 @@
             }
         }
 
+        // Calculate distance using Haversine formula
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            if (!lat1 || !lng1 || !lat2 || !lng2) return null;
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // Calculate distance value for sorting
+        function getDistanceValue(loan, disasterObj) {
+            if (!disasterObj || !disasterObj.latitude || !disasterObj.longitude) {
+                return 999999; // Put N/A values at the end
+            }
+            if (!loan.latitude || !loan.longitude) {
+                return 999998; // Put missing coordinates second to last
+            }
+            
+            const distanceKm = calculateDistance(
+                parseFloat(loan.latitude),
+                parseFloat(loan.longitude),
+                parseFloat(disasterObj.latitude),
+                parseFloat(disasterObj.longitude)
+            );
+            
+            return distanceKm !== null ? distanceKm : 999999;
+        }
+
+        // Format distance display
+        function formatDistance(loan, disasterObj) {
+            if (!disasterObj || !disasterObj.latitude || !disasterObj.longitude) {
+                return '<span class="text-muted">N/A</span>';
+            }
+            if (!loan.latitude || !loan.longitude) {
+                return '<span class="text-muted">No coordinates</span>';
+            }
+            
+            const distanceKm = calculateDistance(
+                parseFloat(loan.latitude),
+                parseFloat(loan.longitude),
+                parseFloat(disasterObj.latitude),
+                parseFloat(disasterObj.longitude)
+            );
+            
+            if (distanceKm === null) return '<span class="text-muted">N/A</span>';
+            
+            const distanceMiles = distanceKm * 0.621371;
+            const kmRounded = Math.round(distanceKm * 10) / 10;
+            const milesRounded = Math.round(distanceMiles * 10) / 10;
+            
+            // Color code by distance: < 10km = red, < 25km = orange, < 50km = yellow, else green
+            let distanceClass = 'text-success';
+            if (distanceKm < 10) distanceClass = 'text-danger fw-bold';
+            else if (distanceKm < 25) distanceClass = 'text-warning fw-bold';
+            else if (distanceKm < 50) distanceClass = 'text-info';
+            
+            return `<span class="${distanceClass}" data-sort="${distanceKm}" title="${kmRounded} km / ${milesRounded} mi">
+                <i class="bi bi-geo-alt"></i> ${milesRounded} mi
+            </span>`;
+        }
+
         // Populate Encompass loans table
         function populateEncompassLoansTable(loans) {
             encompassLoansTable.clear();
@@ -1507,6 +1878,12 @@
                 const lastAnalysis = loan.last_risk_analysis ? 
                     new Date(loan.last_risk_analysis).toLocaleDateString() : 'Not analyzed';
                 
+                const distanceDisplay = formatDistance(loan, selectedDisasterObj);
+                const distanceValue = getDistanceValue(loan, selectedDisasterObj);
+                
+                // Store distance value on loan object for sorting
+                loan._distanceValue = distanceValue;
+                
                 encompassLoansTable.row.add([
                     loan.loan_number,
                     loan.borrower_name,
@@ -1516,6 +1893,7 @@
                     `$${loan.loan_amount.toLocaleString()}`,
                     loan.milestone,
                     `<span class=\"risk-badge ${riskClass}\">${riskLevel}</span>`,
+                    distanceDisplay,
                     loan.encompass_loan_guid || 'Not assigned',
                     lastAnalysis,
                     `<button class=\"btn btn-sm btn-outline-primary\" onclick=\"analyzeLoan(${loan.id})\">\n                        <i class=\"bi bi-shield-check\"></i>\n                    </button>`
@@ -1527,6 +1905,197 @@
             encompassLoansTable.draw();
 
             updateMapWithLoans(loans);
+        }
+
+        // Show loan info panel
+        function showLoanInfoPanel(loan) {
+            if (!loan) return;
+            
+            const distanceKm = selectedDisasterObj && loan.latitude && loan.longitude && selectedDisasterObj.latitude && selectedDisasterObj.longitude
+                ? calculateDistance(
+                    parseFloat(loan.latitude),
+                    parseFloat(loan.longitude),
+                    parseFloat(selectedDisasterObj.latitude),
+                    parseFloat(selectedDisasterObj.longitude)
+                  )
+                : null;
+            
+            const distanceMiles = distanceKm ? (distanceKm * 0.621371) : null;
+            const kmRounded = distanceKm ? Math.round(distanceKm * 10) / 10 : null;
+            const milesRounded = distanceMiles ? Math.round(distanceMiles * 10) / 10 : null;
+            
+            // Determine distance badge class
+            let distanceBadgeClass = 'distance-safe';
+            let distanceLabel = 'Safe Distance';
+            if (distanceKm !== null) {
+                if (distanceKm < 10) {
+                    distanceBadgeClass = 'distance-critical';
+                    distanceLabel = 'CRITICAL - Very Close';
+                } else if (distanceKm < 25) {
+                    distanceBadgeClass = 'distance-warning';
+                    distanceLabel = 'WARNING - Close';
+                } else if (distanceKm < 50) {
+                    distanceBadgeClass = 'distance-info';
+                    distanceLabel = 'CAUTION - Moderate';
+                } else {
+                    distanceBadgeClass = 'distance-safe';
+                    distanceLabel = 'Safe Distance';
+                }
+            }
+            
+            const riskLevel = getRiskLevel(loan.disaster_risk_score);
+            const riskClass = getRiskClass(loan.disaster_risk_score);
+            const lastAnalysis = loan.last_risk_analysis ? 
+                new Date(loan.last_risk_analysis).toLocaleDateString() + ' ' + new Date(loan.last_risk_analysis).toLocaleTimeString() : 'Not analyzed';
+            
+            const content = `
+                <div class="loan-info-section">
+                    <h6><i class="bi bi-bank"></i> Loan Information</h6>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Loan Number</span>
+                        <span class="loan-info-value">${loan.loan_number || 'N/A'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Borrower</span>
+                        <span class="loan-info-value">${loan.borrower_name || 'N/A'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Loan Amount</span>
+                        <span class="loan-info-value">$${loan.loan_amount ? loan.loan_amount.toLocaleString() : '0'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Loan Type</span>
+                        <span class="loan-info-value">${loan.loan_type || 'N/A'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Milestone</span>
+                        <span class="loan-info-value">${loan.milestone || 'N/A'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Encompass GUID</span>
+                        <span class="loan-info-value" style="font-size: 0.75rem;">${loan.encompass_loan_guid || 'Not assigned'}</span>
+                    </div>
+                </div>
+
+                <div class="loan-info-section">
+                    <h6><i class="bi bi-geo-alt"></i> Property Location</h6>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Address</span>
+                        <span class="loan-info-value" style="text-align: right; font-size: 0.875rem;">${loan.property_address || 'N/A'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">City, State</span>
+                        <span class="loan-info-value">${loan.city || ''}, ${loan.state || ''}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">County</span>
+                        <span class="loan-info-value">${loan.county || 'N/A'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">ZIP Code</span>
+                        <span class="loan-info-value">${loan.zip_code || 'N/A'}</span>
+                    </div>
+                    ${loan.latitude && loan.longitude ? `
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Coordinates</span>
+                        <span class="loan-info-value" style="font-size: 0.75rem;">${parseFloat(loan.latitude).toFixed(6)}, ${parseFloat(loan.longitude).toFixed(6)}</span>
+                    </div>
+                    ` : ''}
+                </div>
+
+                ${selectedDisasterObj ? `
+                <div class="loan-info-section">
+                    <h6><i class="bi bi-exclamation-triangle"></i> Disaster Distance</h6>
+                    ${distanceKm !== null ? `
+                    <div style="text-align: center; margin-bottom: 1rem;">
+                        <div class="distance-badge-large ${distanceBadgeClass}">
+                            <i class="bi bi-geo-alt-fill"></i> ${milesRounded} mi
+                        </div>
+                        <div style="margin-top: 0.5rem; color: #94a3b8; font-size: 0.875rem;">${distanceLabel}</div>
+                        <div style="margin-top: 0.25rem; color: #64748b; font-size: 0.75rem;">${kmRounded} km</div>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Disaster</span>
+                        <span class="loan-info-value" style="text-align: right; font-size: 0.875rem;">${selectedDisasterObj.declarationTitle || selectedDisaster[2] || 'N/A'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Incident Type</span>
+                        <span class="loan-info-value">${selectedDisasterObj.incidentType || 'N/A'}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Begin Date</span>
+                        <span class="loan-info-value">${selectedDisasterObj.incidentBeginDate ? new Date(selectedDisasterObj.incidentBeginDate).toLocaleDateString() : 'N/A'}</span>
+                    </div>
+                    ` : `
+                    <div style="text-align: center; padding: 1rem; color: #94a3b8;">
+                        <i class="bi bi-info-circle" style="font-size: 2rem;"></i>
+                        <div style="margin-top: 0.5rem;">Distance calculation unavailable</div>
+                        <div style="font-size: 0.75rem; margin-top: 0.25rem;">Missing coordinates</div>
+                    </div>
+                    `}
+                </div>
+                ` : ''}
+
+                <div class="loan-info-section">
+                    <h6><i class="bi bi-shield-check"></i> Risk Assessment</h6>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Risk Level</span>
+                        <span class="loan-info-value"><span class="risk-badge ${riskClass}">${riskLevel}</span></span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Risk Score</span>
+                        <span class="loan-info-value">${loan.disaster_risk_score || 0}/10</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Disaster Count</span>
+                        <span class="loan-info-value">${loan.disaster_declaration_count || 0}</span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Last Analysis</span>
+                        <span class="loan-info-value" style="font-size: 0.875rem;">${lastAnalysis}</span>
+                    </div>
+                </div>
+
+                <div class="loan-info-section" style="text-align: center;">
+                    <button class="btn btn-primary w-100 mb-2" onclick="analyzeLoan(${loan.id})">
+                        <i class="bi bi-shield-check"></i> Re-analyze Risk
+                    </button>
+                    ${loan.latitude && loan.longitude ? `
+                    <button class="btn btn-outline-light w-100" onclick="focusLoanOnMap(${loan.id})">
+                        <i class="bi bi-geo-alt"></i> Focus on Map
+                    </button>
+                    ` : ''}
+                </div>
+            `;
+            
+            document.getElementById('loanInfoContent').innerHTML = content;
+            document.getElementById('loanInfoPanel').classList.add('open');
+            document.getElementById('loanInfoOverlay').classList.add('show');
+        }
+
+        // Close loan info panel
+        function closeLoanInfoPanel() {
+            document.getElementById('loanInfoPanel').classList.remove('open');
+            document.getElementById('loanInfoOverlay').classList.remove('show');
+            $('#encompassLoansTable tbody tr').removeClass('table-active');
+            selectedLoan = null;
+        }
+
+        // Focus loan on map
+        function focusLoanOnMap(loanId) {
+            const loan = selectedLoan;
+            if (loan && loan.latitude && loan.longitude) {
+                const pos = { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) };
+                map.setCenter(pos);
+                map.setZoom(14);
+                loanMarkers.forEach(m => {
+                    if (m.loanId === loan.id && m.marker) {
+                        new google.maps.InfoWindow({
+                            content: `<div><strong>${loan.loan_number}</strong><br>${loan.property_address}<br>${loan.city}, ${loan.state}</div>`
+                        }).open(map, m.marker);
+                    }
+                });
+            }
         }
 
         // Search YouTube for disaster videos (like tool3)
@@ -1555,7 +2124,7 @@
             map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 4,
                 center: { lat: 39.8283, lng: -98.5795 }, // Center of US
-                mapTypeId: 'terrain'
+                mapTypeId: 'satellite'
             });
         }
 
@@ -1775,6 +2344,206 @@
             } else {
                 youtubeResultsDiv.innerHTML = '<div class="text-center text-muted">No videos found</div>';
             }
+        }
+
+        // Initialize AI Components
+        async function initializeAIComponents() {
+            // Import voice commands module
+            try {
+                const voiceCommands = await import('../shared/voice-commands.js');
+                window.parseVoiceCommand = voiceCommands.parseVoiceCommand;
+                window.executeVoiceCommand = voiceCommands.executeVoiceCommand;
+            } catch (error) {
+                console.warn('Failed to load voice commands:', error);
+            }
+            
+            // Get user ID (use logged in user or generate anonymous ID)
+            const userId = (typeof window.getLoggedInUser === 'function' && window.getLoggedInUser()) 
+                ? window.getLoggedInUser().id || 'anonymous' 
+                : 'anonymous';
+            
+            // Initialize AI Chat Widget
+            if (window.AIChatWidget) {
+                aiChatWidget = new window.AIChatWidget({
+                    apiEndpoint: '/api/loan-pipeline/ai/chat',
+                    userId: userId,
+                    sessionId: 'loan-pipeline-dashboard',
+                    getContext: () => ({
+                        filters: currentFilters,
+                        selectedDisaster: selectedDisasterObj,
+                        stats: getCurrentStats()
+                    }),
+                    onMessageSent: (message) => {
+                        console.log('AI Chat message sent:', message);
+                    },
+                    onMessageReceived: (response, data) => {
+                        console.log('AI Chat response received:', response);
+                    }
+                });
+                window.aiChatWidget = aiChatWidget;
+            }
+            
+            // Initialize AI Insights Card
+            if (window.AIInsightsCard) {
+                aiInsightsCard = new window.AIInsightsCard({
+                    apiEndpoint: '/api/loan-pipeline/ai/insights',
+                    userId: userId,
+                    containerId: 'aiInsightsContainer',
+                    autoGenerate: true,
+                    onInsightsGenerated: (insights, data) => {
+                        console.log('AI Insights generated:', insights);
+                    }
+                });
+                window.aiInsightsCard = aiInsightsCard;
+            }
+        }
+
+        // Generate initial insights
+        async function generateInitialInsights() {
+            if (aiInsightsCard) {
+                const stats = await getCurrentStats();
+                await aiInsightsCard.generateInsights(currentFilters, 'load', null);
+            }
+        }
+
+        // Get current stats for AI context
+        async function getCurrentStats() {
+            try {
+                const response = await fetch('/api/loan-pipeline/stats');
+                const data = await response.json();
+                return data.success ? data.data : null;
+            } catch (error) {
+                console.error('Error getting stats:', error);
+                return null;
+            }
+        }
+
+        // Initialize Voice Recognition
+        function initializeVoiceRecognition() {
+            // Check if browser supports speech recognition
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                console.warn('Speech recognition not supported in this browser');
+                document.getElementById('voiceControlBtn').style.display = 'none';
+                return;
+            }
+
+            voiceRecognition = new SpeechRecognition();
+            voiceRecognition.continuous = false;
+            voiceRecognition.interimResults = false;
+            voiceRecognition.lang = 'en-US';
+
+            voiceRecognition.onstart = function() {
+                isVoiceListening = true;
+                updateVoiceButton(true);
+                showAlert('🎤 Listening... Speak your command', 'info');
+            };
+
+            voiceRecognition.onresult = async function(event) {
+                const transcript = event.results[event.results.length - 1][0].transcript;
+                console.log('Voice command:', transcript);
+                
+                showAlert(`Heard: "${transcript}"`, 'info');
+                
+                // Parse and execute command
+                if (window.parseVoiceCommand && window.executeVoiceCommand) {
+                    const action = window.parseVoiceCommand(transcript);
+                    const context = {
+                        applyFilters: applyFilters,
+                        setStateFilter: (state) => $('#stateFilter').val(state),
+                        setCountyFilter: (county) => $('#countyFilter').val(county),
+                        setRiskFilter: (risk) => $('#riskFilter').val(risk),
+                        setMilestoneFilter: (milestone) => $('#milestoneFilter').val(milestone),
+                        expandAccordion: (targetId) => {
+                            const collapse = new bootstrap.Collapse(document.getElementById(targetId), { show: true });
+                        },
+                        analyzeAllLoans: analyzeAllLoans,
+                        loadFEMADisastersDirect: loadFEMADisastersDirect
+                    };
+                    
+                    const result = await window.executeVoiceCommand(action, context);
+                    if (result.success) {
+                        showAlert(result.message, 'success');
+                        // Update insights if filters changed
+                        if (action.type === 'filter' && aiInsightsCard) {
+                            aiInsightsCard.generateInsights(action.filters, 'filter', null);
+                        }
+                    } else {
+                        showAlert(result.message || 'Command not recognized', 'warning');
+                    }
+                }
+            };
+
+            voiceRecognition.onerror = function(event) {
+                console.error('Voice recognition error:', event.error);
+                isVoiceListening = false;
+                updateVoiceButton(false);
+                showAlert('Voice recognition error. Please try again.', 'danger');
+            };
+
+            voiceRecognition.onend = function() {
+                isVoiceListening = false;
+                updateVoiceButton(false);
+            };
+
+            // Make available globally for AI chat widget
+            window.voiceRecognition = {
+                start: (callback) => {
+                    if (callback) {
+                        voiceRecognition.onresult = function(event) {
+                            const transcript = event.results[event.results.length - 1][0].transcript;
+                            callback(transcript);
+                        };
+                    }
+                    voiceRecognition.start();
+                },
+                stop: () => voiceRecognition.stop(),
+                isListening: () => isVoiceListening
+            };
+        }
+
+        // Toggle voice control
+        function toggleVoiceControl() {
+            if (!voiceRecognition) {
+                showAlert('Voice recognition not available in this browser', 'warning');
+                return;
+            }
+
+            if (isVoiceListening) {
+                voiceRecognition.stop();
+            } else {
+                try {
+                    voiceRecognition.start();
+                } catch (error) {
+                    console.error('Error starting voice recognition:', error);
+                    showAlert('Error starting voice recognition', 'danger');
+                }
+            }
+        }
+
+        // Update voice button appearance
+        function updateVoiceButton(listening) {
+            const btn = document.getElementById('voiceControlBtn');
+            const text = document.getElementById('voiceControlText');
+            const icon = btn.querySelector('i');
+            
+            if (listening) {
+                btn.classList.add('active');
+                btn.classList.remove('btn-warning');
+                btn.classList.add('btn-danger');
+                icon.className = 'bi bi-mic-fill';
+                if (text) text.textContent = ' Listening...';
+            } else {
+                btn.classList.remove('active', 'btn-danger');
+                btn.classList.add('btn-warning');
+                icon.className = 'bi bi-mic';
+                if (text) text.textContent = ' Voice';
+            }
+        }
+
+        // Expand accordion helper
+        function expandAccordion(targetId) {
+            const collapse = new bootstrap.Collapse(document.getElementById(targetId), { show: true });
         }
     </script>
 </body>

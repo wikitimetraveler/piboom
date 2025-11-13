@@ -63,6 +63,7 @@
 
 import { getPool } from './database.service.js';
 import { getAllLoans, updateLoanRiskScore } from './loan-pipeline.service.js';
+import { calculateDistance } from './disasters.service.js';
 
 /**
  * Geocode an address using Google Maps API with validation
@@ -299,18 +300,57 @@ export async function analyzeLoanRisk(loan) {
     // Query FEMA API for disaster declarations (last year only, with geocoding)
     const femaData = await queryFEMAApi(loan.state, loan.county);
     
+    // Calculate distances to disasters if loan has coordinates
+    let disastersWithDistance = femaData.disasters || [];
+    if (loan.latitude && loan.longitude) {
+      disastersWithDistance = disastersWithDistance.map(disaster => {
+        let distanceKm = null;
+        if (disaster.latitude && disaster.longitude) {
+          distanceKm = calculateDistance(
+            parseFloat(loan.latitude),
+            parseFloat(loan.longitude),
+            parseFloat(disaster.latitude),
+            parseFloat(disaster.longitude)
+          );
+        }
+        return {
+          ...disaster,
+          distanceKm: distanceKm !== null ? Math.round(distanceKm * 100) / 100 : null, // Round to 2 decimals
+          distanceMiles: distanceKm !== null ? Math.round((distanceKm * 0.621371) * 100) / 100 : null // Convert to miles
+        };
+      });
+      
+      // Sort by distance (closest first)
+      disastersWithDistance.sort((a, b) => {
+        if (a.distanceKm === null) return 1;
+        if (b.distanceKm === null) return -1;
+        return a.distanceKm - b.distanceKm;
+      });
+    }
+    
     // Calculate risk score
     const riskScore = calculateRiskScore(femaData);
     
+    // Find closest disaster
+    const closestDisaster = disastersWithDistance.find(d => d.distanceKm !== null) || null;
+    
     // Update loan in database
-    await updateLoanRiskScore(loan.id, riskScore, femaData.disasterCount, femaData);
+    await updateLoanRiskScore(loan.id, riskScore, femaData.disasterCount, {
+      ...femaData,
+      disasters: disastersWithDistance
+    });
     
     return {
       loanId: loan.id,
       loanNumber: loan.loan_number,
       riskScore,
       disasterCount: femaData.disasterCount,
-      femaData: femaData.disasters,
+      femaData: disastersWithDistance,
+      closestDisaster: closestDisaster ? {
+        ...closestDisaster,
+        distanceKm: closestDisaster.distanceKm,
+        distanceMiles: closestDisaster.distanceMiles
+      } : null,
       analyzedAt: new Date().toISOString()
     };
   } catch (error) {
@@ -374,17 +414,17 @@ async function queryFEMAApi(state, county) {
     // FEMA API v2 endpoint for disaster declarations (matches mashup logic)
     const baseUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
 
-    // Calculate date one month ago (only show disasters from last 30 days)
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    const oneMonthAgoStr = oneMonthAgo.toISOString().split('T')[0]; // YYYY-MM-DD
+    // Calculate date 90 days ago (only show disasters from last 90 days)
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0]; // YYYY-MM-DD
 
     // designatedArea format example: "Harris (County)"; filter by designatedArea and state
     // Note: FEMA API v2 uses designatedArea instead of county
-    const filter = `state eq '${state}' and designatedArea eq '${county} (County)' and incidentBeginDate ge ${oneMonthAgoStr}`;
+    const filter = `state eq '${state}' and designatedArea eq '${county} (County)' and incidentBeginDate ge ${ninetyDaysAgoStr}`;
     const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$count=true`;
 
-    console.log(`🌐 Querying FEMA API v2 (last 30 days): ${url}`);
+    console.log(`🌐 Querying FEMA API v2 (last 90 days): ${url}`);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -403,12 +443,12 @@ async function queryFEMAApi(state, county) {
     // Extract disaster information
     let disasters = data.DisasterDeclarationsSummaries || [];
 
-    // Extra guard: ensure only last 30 days
-    const lastMonthDate = new Date(oneMonthAgoStr);
+    // Extra guard: ensure only last 90 days
+    const lastNinetyDaysDate = new Date(ninetyDaysAgoStr);
     disasters = disasters.filter(disaster => {
       if (disaster.incidentBeginDate) {
         const disasterDate = new Date(disaster.incidentBeginDate);
-        return disasterDate >= lastMonthDate;
+        return disasterDate >= lastNinetyDaysDate;
       }
       return false;
     });
@@ -471,7 +511,7 @@ async function queryFEMAApi(state, county) {
         county,
         queriedAt: new Date().toISOString(),
         totalRecords: geocodedDisasters.length,
-        filterSince: oneMonthAgoStr
+        filterSince: ninetyDaysAgoStr
       }
     };
   } catch (error) {
@@ -489,6 +529,73 @@ async function queryFEMAApi(state, county) {
       }
     };
   }
+}
+
+/**
+ * Calculate distances between a loan and disasters
+ * @param {Object} loan - Loan object with latitude and longitude
+ * @param {Array} disasters - Array of disaster objects with latitude and longitude
+ * @returns {Array} Array of disasters with distanceKm and distanceMiles added
+ */
+export function calculateLoanToDisasterDistances(loan, disasters) {
+  if (!loan || !loan.latitude || !loan.longitude || !Array.isArray(disasters)) {
+    return disasters || [];
+  }
+  
+  const loanLat = parseFloat(loan.latitude);
+  const loanLng = parseFloat(loan.longitude);
+  
+  if (isNaN(loanLat) || isNaN(loanLng)) {
+    return disasters;
+  }
+  
+  return disasters.map(disaster => {
+    if (!disaster.latitude || !disaster.longitude) {
+      return {
+        ...disaster,
+        distanceKm: null,
+        distanceMiles: null
+      };
+    }
+    
+    const disasterLat = parseFloat(disaster.latitude);
+    const disasterLng = parseFloat(disaster.longitude);
+    
+    if (isNaN(disasterLat) || isNaN(disasterLng)) {
+      return {
+        ...disaster,
+        distanceKm: null,
+        distanceMiles: null
+      };
+    }
+    
+    const distanceKm = calculateDistance(loanLat, loanLng, disasterLat, disasterLng);
+    
+    return {
+      ...disaster,
+      distanceKm: distanceKm !== null ? Math.round(distanceKm * 100) / 100 : null,
+      distanceMiles: distanceKm !== null ? Math.round((distanceKm * 0.621371) * 100) / 100 : null
+    };
+  }).sort((a, b) => {
+    // Sort by distance (closest first), nulls last
+    if (a.distanceKm === null) return 1;
+    if (b.distanceKm === null) return -1;
+    return a.distanceKm - b.distanceKm;
+  });
+}
+
+/**
+ * Find disasters within a specified radius of a loan
+ * @param {Object} loan - Loan object with latitude and longitude
+ * @param {Array} disasters - Array of disaster objects
+ * @param {number} radiusKm - Radius in kilometers (default: 50km)
+ * @returns {Array} Array of disasters within the radius, sorted by distance
+ */
+export function findDisastersWithinRadius(loan, disasters, radiusKm = 50) {
+  const disastersWithDistance = calculateLoanToDisasterDistances(loan, disasters);
+  return disastersWithDistance.filter(disaster => 
+    disaster.distanceKm !== null && disaster.distanceKm <= radiusKm
+  );
 }
 
 /**
@@ -742,5 +849,7 @@ export default {
   batchAnalyzeRisk,
   calculateRiskScore,
   generateKMLForLoans,
-  analyzeAllLoans
+  analyzeAllLoans,
+  calculateLoanToDisasterDistances,
+  findDisastersWithinRadius
 };

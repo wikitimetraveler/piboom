@@ -412,21 +412,21 @@ export async function queryFEMADirect(req, res) {
   try {
     const { state, county } = req.query;
     
-    // Calculate date 6 months ago (expanded from 30 days)
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-    const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+    // Calculate date 90 days ago
+    const ninetyDaysAgo = new Date();
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0]; // Format: YYYY-MM-DD
 
     // Use FEMA API v2 (like tool3) for better compatibility
-    // Filter for last 6 months
+    // Filter for last 90 days
     const femaDisasterDeclUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
     const filters = [];
     if (state) filters.push(`state eq '${state}'`);
     if (county) filters.push(`designatedArea eq '${county} (County)'`);
-    filters.push(`incidentBeginDate ge ${sixMonthsAgoStr}`);
+    filters.push(`incidentBeginDate ge ${ninetyDaysAgoStr}`);
     const filterParams = `$count=true&$top=1000&$filter=${filters.join(' and ')}`;
     
-    console.log(`🌐 Querying FEMA API: state=${state || 'ALL'}, county=${county || 'ALL'}, since=${sixMonthsAgoStr}`);
+    console.log(`🌐 Querying FEMA API: state=${state || 'ALL'}, county=${county || 'ALL'}, since=${ninetyDaysAgoStr}`);
     
     const response = await fetch(`${femaDisasterDeclUrl}?${filterParams}`);
     const disasterDeclResults = await response.json();
@@ -459,12 +459,12 @@ export async function queryFEMADirect(req, res) {
       
       console.log(`📋 Processing ${disasters.length} disaster records`);
       
-      // Additional filter to ensure we only get last 6 months
-      const sixMonthsDate = new Date(sixMonthsAgoStr);
+      // Additional filter to ensure we only get last 90 days
+      const ninetyDaysDate = new Date(ninetyDaysAgoStr);
       disasters = disasters.filter(item => {
         if (item.incidentBeginDate) {
           const disasterDate = new Date(item.incidentBeginDate);
-          return disasterDate >= sixMonthsDate;
+          return disasterDate >= ninetyDaysDate;
         }
         return false;
       });
@@ -506,7 +506,7 @@ export async function queryFEMADirect(req, res) {
         data: {
           disasters: geocodedDisasters,
           count: geocodedDisasters.length,
-          filterSince: sixMonthsAgoStr
+          filterSince: ninetyDaysAgoStr
         }
       });
     } else {

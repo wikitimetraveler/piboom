@@ -1,5 +1,6 @@
 import express from 'express';
 import * as loanPipelineController from '../controllers/loan-pipeline.controller.js';
+import * as loanPipelineAIController from '../controllers/loan-pipeline-ai.controller.js';
 
 const router = express.Router();
 
@@ -49,5 +50,10 @@ router.post('/regeocode-loans', loanPipelineController.regeocodeLoans);
 
 // Cleanup test loans
 router.delete('/cleanup', loanPipelineController.cleanupTestLoans);
+
+// AI Chat and Insights
+router.post('/ai/chat', loanPipelineAIController.chatWithAI);
+router.post('/ai/insights', loanPipelineAIController.generateInsights);
+router.get('/ai/history', loanPipelineAIController.getConversationHistory);
 
 export default router;

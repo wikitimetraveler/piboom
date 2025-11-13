@@ -2750,7 +2750,7 @@ function focusOnMemberLocation(memberName, location) {
     window.map = new google.maps.Map(mapElement, {
       zoom: 2,
       center: { lat: 20, lng: 0 },
-      mapTypeId: 'roadmap'
+      mapTypeId: 'satellite'
     });
     window.geocoder = new google.maps.Geocoder();
     if (!window.mapMarkers) {
@@ -2925,7 +2925,7 @@ function initBasicMap(artistName) {
     map = new google.maps.Map(mapElement, {
       zoom: 8,
       center: ayersRock,
-      mapTypeId: 'roadmap'
+      mapTypeId: 'satellite'
     });
     
     // Add Ayers Rock marker
@@ -2988,7 +2988,7 @@ function initMapWithData(mapData, artistName) {
   map = new google.maps.Map(document.getElementById('map'), {
     zoom: 6,
     center: { lat: firstLocation.lat, lng: firstLocation.lng },
-    mapTypeId: 'roadmap',
+    mapTypeId: 'satellite',
     styles: [
       {
         featureType: 'poi',
