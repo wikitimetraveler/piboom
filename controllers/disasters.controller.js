@@ -1,5 +1,5 @@
 import { getPool } from '../services/database.service.js';
-import { initDisastersSchema, upsertDisasters, normalizeFemaV2ToUnified, ingestFema, ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc } from '../services/disasters.service.js';
+import { initDisastersSchema, upsertDisasters, normalizeFemaV2ToUnified, ingestFema, ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestCaFireCameras } from '../services/disasters.service.js';
 
 // Ensure schema on startup (best-effort)
 initDisastersSchema().catch(() => {});
@@ -55,6 +55,7 @@ export async function refreshDisasters(req, res) {
     results.usgs = await ingestUsgsQuakes();
     results.nws = await ingestNwsCap();
     results.nhc = await ingestNhc();
+    results.cameras = await ingestCaFireCameras();
     res.json({ success: true, message: 'Refreshed disasters', data: results });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Failed to refresh disasters', details: e.message });

@@ -207,6 +207,7 @@ export default {
   ingestUsgsQuakes,
   ingestNwsCap,
   ingestNhc,
+  ingestCaFireCameras,
 };
 
 /**
@@ -815,6 +816,352 @@ export async function ingestNhc() {
   // For now, derive from NWS CAP hurricane-related alerts to populate hurricane event_type
   const res = await ingestNwsCap();
   return res;
+}
+
+/**
+ * California Fire Cameras - ALERTCalifornia/ALERTWest camera network
+ * Fetches camera locations and metadata from ALERTCalifornia system
+ * Cameras provide real-time wildfire monitoring across California
+ */
+export async function ingestCaFireCameras() {
+  const pool = getPool();
+  if (!pool) {
+    console.warn('⚠️  Database pool not initialized; skipping CA fire cameras');
+    return { inserted: 0, skipped: 0 };
+  }
+
+  try {
+    console.log('📹 Starting CA Fire Cameras ingestion...');
+    
+    // ALERTCalifornia cameras are accessible via their API
+    // Try multiple endpoints - ALERTCalifornia uses ArcGIS services
+    const endpoints = [
+      'https://alertcalifornia.org/api/cameras', // Primary endpoint (if available)
+      'https://api.alertcalifornia.org/cameras', // Alternative API endpoint
+    ];
+
+    let cameraData = null;
+    let cameras = [];
+
+    // Try to fetch from ALERTCalifornia API
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetch(endpoint, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'piBoom-DisasterService/1.0'
+          }
+        });
+
+        if (response.ok) {
+          const contentType = response.headers.get('content-type') || '';
+          if (contentType.includes('json')) {
+            cameraData = await response.json();
+            console.log(`✅ Fetched camera data from ${endpoint}`);
+            break;
+          }
+        }
+      } catch (e) {
+        console.warn(`⚠️  Failed to fetch from ${endpoint}:`, e.message);
+        continue;
+      }
+    }
+
+    // Use the correct ALERTCalifornia Camera Feed endpoint
+    if (!cameraData) {
+      try {
+        const baseUrl = 'https://services8.arcgis.com/X84q166Srnyl4JMV/ArcGIS/rest/services/ALERTCalifornia_Camera_Feed/FeatureServer/0/query';
+        
+        // Check for optional ArcGIS API key (some services require it)
+        const arcgisApiKey = process.env.ARCGIS_API_KEY || process.env.ESRI_API_KEY || null;
+        
+        // Try query with geometry first (for mapping)
+        const params = new URLSearchParams({
+          where: '1=1',
+          outFields: '*',
+          returnGeometry: 'true',
+          f: 'json',
+          resultRecordCount: 2000 // Get up to 2000 cameras
+        });
+        
+        // Add API key if provided
+        if (arcgisApiKey) {
+          params.append('token', arcgisApiKey);
+          console.log(`📹 Using ArcGIS API key for authentication`);
+        } else {
+          console.log(`📹 No ArcGIS API key found - trying public access`);
+        }
+        
+        console.log(`📹 Querying ALERTCalifornia Camera Feed: ${baseUrl}`);
+        const response = await fetch(`${baseUrl}?${params.toString()}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'piBoom-DisasterService/1.0'
+          }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          
+          // Debug: Log response structure
+          console.log(`📹 API Response keys:`, Object.keys(result));
+          console.log(`📹 Response has features:`, !!result.features);
+          console.log(`📹 Features is array:`, Array.isArray(result.features));
+          if (result.features) {
+            console.log(`📹 Features count:`, result.features.length);
+            if (result.features.length > 0) {
+              console.log(`📹 Sample feature keys:`, Object.keys(result.features[0]));
+              console.log(`📹 Sample feature:`, JSON.stringify(result.features[0]).substring(0, 500));
+            }
+          }
+          if (result.objectIdFieldName) {
+            console.log(`📹 Object ID field:`, result.objectIdFieldName);
+          }
+          if (result.fields) {
+            console.log(`📹 Available fields:`, result.fields.map(f => f.name).join(', '));
+          }
+          
+          if (result.error) {
+            console.warn(`⚠️  ALERTCalifornia API error:`, result.error.message || result.error);
+            // Try without geometry as fallback
+            const paramsNoGeo = new URLSearchParams({
+              where: '1=1',
+              outFields: '*',
+              f: 'json',
+              resultRecordCount: 2000
+            });
+            
+            const fallbackResponse = await fetch(`${baseUrl}?${paramsNoGeo.toString()}`, {
+              method: 'GET',
+              headers: {
+                'Accept': 'application/json',
+                'User-Agent': 'piBoom-DisasterService/1.0'
+              }
+            });
+            
+            if (fallbackResponse.ok) {
+              const fallbackResult = await fallbackResponse.json();
+              console.log(`📹 Fallback response keys:`, Object.keys(fallbackResult));
+              if (fallbackResult.features && Array.isArray(fallbackResult.features)) {
+                console.log(`📹 Fallback features count:`, fallbackResult.features.length);
+                cameras = parseCameraFeatures(fallbackResult.features, fallbackResult.spatialReference);
+                console.log(`✅ Fetched ${cameras.length} cameras (without geometry)`);
+              }
+            }
+          } else if (result.features && Array.isArray(result.features)) {
+            // Pass spatial reference to parser for coordinate conversion
+            if (result.spatialReference) {
+              console.log(`📹 Spatial Reference:`, result.spatialReference);
+            }
+            cameras = parseCameraFeatures(result.features, result.spatialReference);
+            console.log(`✅ Parsed ${cameras.length} cameras from ${result.features.length} features`);
+          } else {
+            console.warn(`⚠️  Unexpected response format. Keys:`, Object.keys(result));
+            console.warn(`⚠️  Full response sample:`, JSON.stringify(result).substring(0, 1000));
+          }
+        } else {
+          const errorText = await response.text().catch(() => '');
+          console.warn(`⚠️  ALERTCalifornia API returned ${response.status}: ${errorText.substring(0, 200)}`);
+        }
+      } catch (apiError) {
+        console.warn('⚠️  ALERTCalifornia API error:', apiError.message);
+      }
+    }
+
+    // Helper function to convert Web Mercator (EPSG:3857) to WGS84 (EPSG:4326)
+    function webMercatorToWGS84(x, y) {
+      // Web Mercator to WGS84 conversion formula
+      const lon = (x / 20037508.34) * 180;
+      const lat = (2 * Math.atan(Math.exp(y * Math.PI / 20037508.34)) - Math.PI / 2) * 180 / Math.PI;
+      return { longitude: lon, latitude: lat };
+    }
+    
+    // Helper function to detect if coordinates are in Web Mercator projection
+    function isWebMercator(x, y) {
+      // Web Mercator coordinates are typically very large (millions)
+      // Valid lat/lng are between -180 to 180 for lon, -90 to 90 for lat
+      return Math.abs(x) > 180 || Math.abs(y) > 90;
+    }
+
+    // Helper function to parse camera features
+    function parseCameraFeatures(features, spatialReference = null) {
+      console.log(`📹 Parsing ${features.length} features...`);
+      
+      // Check if spatial reference indicates Web Mercator (EPSG:3857 or WKID:3857)
+      const isWebMercatorSR = spatialReference && (
+        spatialReference.wkid === 3857 || 
+        spatialReference.wkid === 102100 || 
+        spatialReference.latestWkid === 3857 ||
+        spatialReference.latestWkid === 102100
+      );
+      
+      return features.map((feature, idx) => {
+        // ArcGIS features can have attributes directly on the feature object, or in feature.attributes
+        const props = feature.attributes || feature.properties || feature || {};
+        const geometry = feature.geometry || {};
+        
+        // Handle different geometry formats
+        let coords = [];
+        if (geometry.coordinates && Array.isArray(geometry.coordinates)) {
+          coords = geometry.coordinates;
+        } else if (geometry.x !== undefined && geometry.y !== undefined) {
+          // ArcGIS point format: {x: lon, y: lat}
+          coords = [geometry.x, geometry.y];
+        } else if (geometry.longitude !== undefined && geometry.latitude !== undefined) {
+          coords = [geometry.longitude, geometry.latitude];
+        }
+        
+        // Convert Web Mercator to WGS84 if needed
+        let longitude = coords[0];
+        let latitude = coords[1];
+        
+        if (coords.length >= 2 && (isWebMercatorSR || isWebMercator(coords[0], coords[1]))) {
+          const converted = webMercatorToWGS84(coords[0], coords[1]);
+          longitude = converted.longitude;
+          latitude = converted.latitude;
+          if (idx === 0) {
+            console.log(`📹 Converted Web Mercator coords [${coords[0]}, ${coords[1]}] to WGS84 [${longitude}, ${latitude}]`);
+          }
+        }
+        
+        // Log first feature for debugging
+        if (idx === 0) {
+          console.log(`📹 Sample feature structure:`, {
+            hasAttributes: !!feature.attributes,
+            hasProperties: !!feature.properties,
+            hasGeometry: !!feature.geometry,
+            attributeKeys: feature.attributes ? Object.keys(feature.attributes) : [],
+            geometryType: geometry.type || 'unknown',
+            spatialReference: spatialReference,
+            originalCoords: coords,
+            convertedCoords: [longitude, latitude]
+          });
+        }
+        
+        const camera = {
+          camera_id: props.CAMERA_ID || props.camera_id || props.ID || props.OBJECTID || props.FID || props.CameraID || null,
+          name: props.NAME || props.name || props.CAMERA_NAME || props.DISPLAY_NAME || props.CameraName || props.cameraName || 'Unknown Camera',
+          location: props.LOCATION || props.location || props.SITE_NAME || props.Location || null,
+          county: props.COUNTY || props.county || props.County || null,
+          state: 'CA',
+          latitude: latitude || props.LATITUDE || props.latitude || props.Latitude || props.Y || null,
+          longitude: longitude || props.LONGITUDE || props.longitude || props.Longitude || props.X || null,
+          elevation: props.ELEVATION || props.elevation || props.Elevation || null,
+          status: props.STATUS || props.status || props.ACTIVE || props.Active || props.isActive || props.isOnline || 'active',
+          image_url: props.IMAGE_URL || props.image_url || props.imageURL || null,
+          camera_url: props.CAMERA_URL || props.cameraURL || props.CameraURL || null,
+          network_url: props.NETWORK_URL || props.networkURL || props.NetworkURL || null,
+          site_id: props.SITE_ID || props.siteId || props.SiteID || null,
+          metadata: props
+        };
+        
+        return camera;
+      }).filter((cam, filterIdx) => {
+        // Only include cameras with valid coordinates
+        const hasCoords = cam.latitude && cam.longitude && 
+                          !isNaN(parseFloat(cam.latitude)) && 
+                          !isNaN(parseFloat(cam.longitude)) &&
+                          Math.abs(parseFloat(cam.latitude)) <= 90 &&
+                          Math.abs(parseFloat(cam.longitude)) <= 180;
+        if (!hasCoords && filterIdx === 0) {
+          console.log(`📹 First camera missing or invalid coordinates:`, cam);
+        }
+        return hasCoords;
+      });
+    }
+    
+    // Parse camera data from direct API response (if we got data from direct endpoints)
+    if (cameraData && cameras.length === 0) {
+      if (Array.isArray(cameraData)) {
+        cameras = cameraData;
+      } else if (cameraData.cameras && Array.isArray(cameraData.cameras)) {
+        cameras = cameraData.cameras;
+      } else if (cameraData.features && Array.isArray(cameraData.features)) {
+        // GeoJSON format
+        cameras = cameraData.features.map(f => ({
+          ...f.properties,
+          latitude: f.geometry?.coordinates?.[1],
+          longitude: f.geometry?.coordinates?.[0]
+        }));
+      }
+    }
+
+    if (cameras.length === 0) {
+      console.log('📹 No CA fire cameras found (API may be unavailable or format changed)');
+      return { inserted: 0, skipped: 0 };
+    }
+
+    // Convert cameras to disaster-like records for unified table
+    // We'll store cameras as "camera" event_type with source "alertcalifornia"
+    const batch = [];
+    const now = new Date().toISOString();
+
+    for (const camera of cameras) {
+      if (!camera.latitude || !camera.longitude) continue;
+
+      // Try to get county from camera data or reverse geocode
+      let countyFips = null;
+      let countyName = camera.county || null;
+      const stateAbbr = 'CA';
+
+      // Try to lookup county FIPS if we have county name
+      if (countyName) {
+        const fipsLookup = await lookupCountyByFips(null, countyName, stateAbbr);
+        if (fipsLookup) {
+          countyFips = fipsLookup.fips;
+        }
+      }
+
+      // If no county found, try reverse geocoding
+      if (!countyFips && camera.latitude && camera.longitude) {
+        try {
+          const geo = await reverseGeocodeCountyState(camera.latitude, camera.longitude);
+          if (geo.county) {
+            countyName = geo.county;
+            const fipsLookup = await lookupCountyByFips(null, geo.county, geo.state || 'CA');
+            if (fipsLookup) {
+              countyFips = fipsLookup.fips;
+            }
+          }
+        } catch (e) {
+          // Skip reverse geocoding errors
+        }
+      }
+
+      const sourceId = camera.camera_id || camera.name || `camera_${camera.latitude}_${camera.longitude}`;
+      
+      batch.push({
+        source: 'alertcalifornia',
+        event_type: 'camera',
+        county_fips: countyFips || '06000', // Default to CA state FIPS if county unknown
+        county_name: countyName || 'Unknown',
+        state_abbr: stateAbbr,
+        start_time: now, // Use current time as "active" timestamp
+        end_time: null, // Cameras are ongoing
+        severity: camera.status || 'active',
+        title: `${camera.name || 'Fire Camera'} - ${camera.location || 'California'}`,
+        lat: parseFloat(camera.latitude),
+        lng: parseFloat(camera.longitude),
+        source_id: String(sourceId),
+        raw: {
+          ...camera,
+          camera_type: 'fire_monitoring',
+          network: 'ALERTCalifornia'
+        }
+      });
+    }
+
+    console.log(`📹 CA Fire Cameras: Prepared ${batch.length} camera records`);
+    const result = await upsertDisasters(batch);
+    console.log(`📹 CA Fire Cameras: Inserted ${result.inserted}, skipped ${result.skipped}`);
+    return result;
+
+  } catch (error) {
+    console.error('❌ Error ingesting CA fire cameras:', error.message);
+    return { inserted: 0, skipped: 0 };
+  }
 }
 
 

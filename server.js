@@ -6,7 +6,7 @@ import { Server } from 'socket.io';
 import { config } from './config/index.js';
 import buildRoutes from './routes/index.routes.js';
 import { initializeDatabase, createTables } from './services/database.service.js';
-import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
+import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +50,22 @@ try {
   process.exit(1);
 }
 
+// Initial data ingestion on startup (non-blocking)
+console.log('🔄 Starting initial data source ingestion...');
+(async () => {
+  try {
+    await ingestFirmsNrt();
+    await ingestUsgsQuakes();
+    await ingestNwsCap();
+    await ingestNhc();
+    await ingestFema();
+    await ingestCaFireCameras();
+    console.log('✅ Initial data ingestion complete');
+  } catch (e) {
+    console.warn('⚠️  Some data sources failed on initial ingestion (non-fatal):', e.message);
+  }
+})();
+
 // Add middleware for parsing JSON request bodies (increased limit for image uploads)
 app.use(express.json({ limit: '50mb' })); // Support base64 image uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -78,6 +94,7 @@ setInterval(async () => {
     await ingestNwsCap();
     await ingestNhc();
     await ingestFema();
+    await ingestCaFireCameras();
   } catch (e) {
     // non-fatal
   }

@@ -263,6 +263,7 @@
       .source-fema { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
       .source-firms { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
       .source-usgs { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+      .source-alertcalifornia { background: #fef3c7; color: #d97706; border-color: #fbbf24; }
       .source-nws { background: #cffafe; color: #0e7490; border-color: #67e8f9; }
       .source-nhc { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
       .source-floodzones { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
@@ -408,6 +409,7 @@
                         <option value="usgs" selected>USGS</option>
                         <option value="nws" selected>NOAA/NWS</option>
                         <option value="nhc" selected>NHC</option>
+                        <option value="alertcalifornia">CA Fire Cameras</option>
                         <option value="gdacs">GDACS</option>
                         <option value="floodzones">Flood Zones (NFHL)</option>
                       </select>
@@ -420,6 +422,7 @@
                         <option value="hurricane">Hurricane</option>
                         <option value="flood">Flood</option>
                         <option value="severe">Severe</option>
+                        <option value="camera">Fire Cameras</option>
                       </select>
                     </div>
                     <div class="col-12 d-flex gap-2 justify-content-end">
@@ -461,6 +464,7 @@
                           <th>End</th>
                           <th>Title</th>
                           <th>Risk Score</th>
+                          <th>Actions</th>
                         </tr>
                       </thead>
                       <tbody></tbody>
@@ -573,12 +577,59 @@
         initializeAIComponents();
         // Initialize voice recognition
         initializeVoiceRecognition();
+        // Initialize camera data store and functions BEFORE table is created
+        window.cameraDataStore = window.cameraDataStore || {};
+        
+        // Global function to open camera viewer from table button (must be defined early)
+        window.openCameraViewerFromTable = function(cameraDataKey) {
+          console.log('📹 openCameraViewerFromTable called with key:', cameraDataKey);
+          const cameraData = window.cameraDataStore[cameraDataKey];
+          if (cameraData) {
+            console.log('📹 Opening camera viewer from table button:', cameraData);
+            if (window.showCameraViewer) {
+              window.showCameraViewer(cameraData);
+            } else {
+              console.error('❌ showCameraViewer function not found');
+              alert('Error: Camera viewer function not available');
+            }
+          } else {
+            console.error('❌ Could not find camera data for key:', cameraDataKey);
+            console.log('📹 Available keys:', Object.keys(window.cameraDataStore || {}));
+          }
+          return false; // Prevent default
+        };
+        
+        // Global function to open camera viewer from marker info window
+        window.openCameraViewerFromMarker = function(cameraDataKey) {
+          const cameraData = window.cameraDataStore[cameraDataKey];
+          if (cameraData) {
+            console.log('📹 Opening camera viewer from marker:', cameraData);
+            if (window.showCameraViewer) {
+              window.showCameraViewer(cameraData);
+            } else {
+              console.error('❌ showCameraViewer function not found');
+            }
+          } else {
+            console.error('❌ Could not find camera data for key:', cameraDataKey);
+          }
+        };
+        
+        // Initialize showCameraViewer placeholder (will be defined later, but this prevents errors)
+        window.showCameraViewer = window.showCameraViewer || function(cameraData) {
+          console.warn('⚠️  showCameraViewer called before definition, will retry...');
+          setTimeout(() => {
+            if (window.showCameraViewer && typeof window.showCameraViewer === 'function') {
+              window.showCameraViewer(cameraData);
+            }
+          }, 100);
+        };
+        
         // Generate initial insights
         generateInitialInsights();
-        // Ensure table exists and has exactly 8 headers (added Risk Score)
+        // Ensure table exists and has exactly 9 headers (added Actions column)
         const headerCount = $('#disastersTable thead th').length;
-        if (headerCount !== 8) {
-          console.error(`❌ Table has ${headerCount} headers, expected 8!`);
+        if (headerCount !== 9) {
+          console.error(`❌ Table has ${headerCount} headers, expected 9!`);
         }
         
         table = $('#disastersTable').DataTable({ 
@@ -693,8 +744,12 @@
         $('#applyBtn').on('click', loadDisasters);
         $('#refreshBtn').on('click', refreshDisasters);
         
-        // Make table rows clickable
-        $('#disastersTable tbody').on('click', 'tr', function() {
+        // Make table rows clickable (but ignore clicks on buttons)
+        $('#disastersTable tbody').on('click', 'tr', function(e) {
+          // Don't trigger if clicking on a button or its children
+          if ($(e.target).closest('button').length > 0) {
+            return;
+          }
           const data = table.row(this).data();
           const rowData = table.row(this).nodes().to$().data('disasterObj');
           selectDisaster(data, rowData);
@@ -777,8 +832,30 @@
           }
         }
         
+        // Load CA Fire Cameras if selected
+        if (sources.includes('alertcalifornia')) {
+          try {
+            const cameraQp = new URLSearchParams();
+            if (state) cameraQp.set('state', state);
+            if (county) cameraQp.set('county', county);
+            cameraQp.set('source', 'alertcalifornia');
+            cameraQp.set('event', 'camera');
+            cameraQp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
+            const cameraUrl = `/api/disasters?${cameraQp.toString()}`;
+            console.log('📹 Loading CA Fire Cameras:', cameraUrl);
+            const cameraResp = await fetch(cameraUrl);
+            const cameraJson = await cameraResp.json();
+            if (cameraJson.success && cameraJson.data.disasters) {
+              console.log(`📹 Found ${cameraJson.data.disasters.length} cameras`);
+              allRows = allRows.concat(cameraJson.data.disasters);
+            }
+          } catch (e) {
+            console.error('❌ Error loading CA Fire Cameras:', e);
+          }
+        }
+        
         // Load other disaster sources from database (if FEMA is not the only source)
-        const otherSources = sources.filter(s => s !== 'fema' && s !== 'floodzones');
+        const otherSources = sources.filter(s => s !== 'fema' && s !== 'floodzones' && s !== 'alertcalifornia');
         if (otherSources.length > 0 || sources.length === 0) {
           // Regular database query for all other sources
           const qp = new URLSearchParams();
@@ -836,6 +913,7 @@
           'fema': 2.0,        // FEMA declarations are significant
           'firms': 1.5,       // Active fires are high risk
           'usgs': 1.5,        // Earthquakes are high risk
+          'alertcalifornia': 0.5, // Cameras are monitoring tools (lower risk weight)
           'nhc': 2.5,         // Hurricanes are very high risk
           'nws': 1.0,         // Weather warnings
           'floodzones': 1.0   // Flood zones add risk
@@ -1000,7 +1078,22 @@
             const riskScore = calculateDisasterRiskScore(r, uniqueRows);
             const riskBadge = getRiskBadge(riskScore);
             
-            // Build rowData array - EXACTLY 8 elements (added Risk Score)
+            // Check if this is a camera row
+            const isCamera = eventType === 'camera' || source === 'alertcalifornia' || 
+                            (title && title.toLowerCase().includes('camera'));
+            
+            // Build action buttons
+            let actionButtons = '';
+            if (isCamera) {
+              // Use onclick directly since delegated handlers might not work with DataTables
+              const cameraDataKey = `camera_table_${idx}_${Date.now()}`;
+              window.cameraDataStore[cameraDataKey] = r;
+              actionButtons = `<button class="btn btn-sm btn-warning camera-view-btn" onclick="window.openCameraViewerFromTable('${cameraDataKey}'); return false;" title="View Camera Feed" style="cursor: pointer;">
+                <i class="bi-camera-video"></i> View Feed
+              </button>`;
+            }
+            
+            // Build rowData array - EXACTLY 9 elements (added Actions column)
             // Use array literal to ensure clean array with no undefined elements
             const rowData = [
               sourceBadge || '',    // Source (0) - HTML badge
@@ -1010,19 +1103,20 @@
               startTime || '',        // Start (4) - formatted for display
               endTime || '',          // End (5) - formatted for display
               title || '',            // Title (6)
-              riskBadge || ''         // Risk Score (7)
+              riskBadge || '',        // Risk Score (7)
+              actionButtons || ''     // Actions (8)
             ];
             
-            // CRITICAL: Ensure exactly 8 elements - no more, no less
-            if (rowData.length !== 8) {
-              console.error(`❌ Row ${idx} (${source}) has ${rowData.length} columns, expected 8:`, rowData);
-              // Force to exactly 8
-              while (rowData.length < 8) rowData.push('');
-              rowData.splice(8); // Remove any extras
+            // CRITICAL: Ensure exactly 9 elements - no more, no less
+            if (rowData.length !== 9) {
+              console.error(`❌ Row ${idx} (${source}) has ${rowData.length} columns, expected 9:`, rowData);
+              // Force to exactly 9
+              while (rowData.length < 9) rowData.push('');
+              rowData.splice(9); // Remove any extras
             }
             
             // Verify all elements are strings (no undefined/null)
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 9; i++) {
               if (rowData[i] === undefined || rowData[i] === null) {
                 rowData[i] = '';
               }
@@ -1038,15 +1132,21 @@
             }
             
             // Use the array directly - no copy needed since we're being explicit
-            const rowDataCopy = rowData.slice(0, 8); // Ensure exactly 8
+            const rowDataCopy = rowData.slice(0, 9); // Ensure exactly 9
             
             // Add row to table with the copy - use apply to ensure clean array
             const rowNode = table.row.add(rowDataCopy).node();
             
+            // Store the full row data on the row node for camera viewer access (for all rows, not just cameras)
+            if (rowNode) {
+              $(rowNode).data('rowData', r);
+              $(rowNode).data('disasterObj', r); // Also store as disasterObj for row click handler
+            }
+            
             // Store raw values for sorting on the cell elements using data-order attribute
             if (rowNode) {
               const cells = rowNode.getElementsByTagName('td');
-              if (cells.length === 8) {
+              if (cells.length === 9) {
                 // Store raw source in first cell (index 0) for sorting
                 const $firstCell = $(cells[0]);
                 $firstCell.attr('data-order', source);
@@ -1063,7 +1163,7 @@
                 $(cells[4]).attr('data-order', rawStartTime);
                 $(cells[5]).attr('data-order', rawEndTime);
               } else {
-                console.error(`❌ Row ${idx} (${source}) rendered with ${cells.length} cells, expected 7!`, {
+                console.error(`❌ Row ${idx} (${source}) rendered with ${cells.length} cells, expected 9!`, {
                   rowData: rowData,
                   cells: Array.from(cells).map(c => c.innerHTML.substring(0, 30))
                 });
@@ -1158,11 +1258,16 @@
         }, 100);
       }
 
+      // Store camera data by index for marker info windows
+      window.cameraDataStore = window.cameraDataStore || {};
+      let cameraIndex = 0;
+      
       function renderMap(rows) {
         markers.forEach(m => m.setMap(null));
         markers = [];
         const bounds = new google.maps.LatLngBounds();
         let any = false;
+        cameraIndex = 0; // Reset camera index
         rows.forEach(r => {
           if (r.lat && r.lng) {
             const pos = { lat: parseFloat(r.lat), lng: parseFloat(r.lng) };
@@ -1175,13 +1280,39 @@
                 scaledSize: new google.maps.Size(30, 30)
               }
             });
+            // Check if this is a camera marker
+            const isCameraMarker = r.event_type === 'camera' || r.source === 'alertcalifornia' ||
+                                   (r.title && r.title.toLowerCase().includes('camera'));
+            
+            // Store camera data if it's a camera marker
+            let cameraDataKey = null;
+            if (isCameraMarker) {
+              cameraDataKey = `camera_${cameraIndex++}`;
+              window.cameraDataStore[cameraDataKey] = r;
+            }
+            
+            // Build info window content with camera button if applicable
+            let infoContent = `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name||''}, ${r.state_abbr||''}<br>${r.start_time?new Date(r.start_time).toLocaleString():''}`;
+            if (isCameraMarker && cameraDataKey) {
+              infoContent += `<br><br><button class="btn btn-sm btn-warning" onclick="window.openCameraViewerFromMarker('${cameraDataKey}')" style="margin-top: 8px;">
+                <i class="bi-camera-video"></i> View Camera Feed
+              </button>`;
+            }
+            infoContent += `</div>`;
+            
             const info = new google.maps.InfoWindow({ 
-              content: `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name||''}, ${r.state_abbr||''}<br>${r.start_time?new Date(r.start_time).toLocaleString():''}</div>` 
+              content: infoContent
             });
             marker.addListener('click', () => {
+              // Always show info window on marker click (camera button is in info window)
               info.open(map, marker);
-              // Trigger YouTube search when marker clicked
-              selectDisaster([r.source, r.event_type, r.county_name, r.state_abbr, r.start_time, r.end_time, r.title], r);
+              
+              // For non-camera markers, trigger YouTube search
+              const isCameraMarker = r.event_type === 'camera' || r.source === 'alertcalifornia' ||
+                                     (r.title && r.title.toLowerCase().includes('camera'));
+              if (!isCameraMarker) {
+                selectDisaster([r.source, r.event_type, r.county_name, r.state_abbr, r.start_time, r.end_time, r.title], r);
+              }
             });
             markers.push(marker);
             bounds.extend(pos);
@@ -1655,7 +1786,197 @@
           text.text(' Voice');
         }
       }
+
+      // Show camera viewer modal (make it globally accessible)
+      window.showCameraViewer = function showCameraViewer(cameraData) {
+        console.log('📹 showCameraViewer called with:', cameraData);
+        
+        if (!cameraData) {
+          console.error('❌ showCameraViewer called with no data');
+          alert('Error: No camera data available');
+          return;
+        }
+        
+        // Parse raw field if it's a JSON string
+        let raw = cameraData.raw || {};
+        if (typeof raw === 'string') {
+          try {
+            raw = JSON.parse(raw);
+          } catch (e) {
+            console.warn('⚠️  Could not parse raw field:', e);
+            raw = {};
+          }
+        }
+        
+        console.log('📹 Parsed raw data:', raw);
+        
+        // Extract camera URLs from raw metadata (check multiple possible field names)
+        const cameraUrl = raw.camera_url || raw.cameraURL || raw.CAMERA_URL || raw.cameraUrl || null;
+        const networkUrl = raw.network_url || raw.networkURL || raw.NETWORK_URL || raw.networkUrl || null;
+        const imageUrl = raw.image_url || raw.imageURL || raw.IMAGE_URL || raw.imageUrl || null;
+        const cameraName = cameraData.title || raw.name || raw.cameraName || raw.camera_name || 'Fire Camera';
+        const siteId = raw.site_id || raw.siteId || raw.SITE_ID || raw.siteId || null;
+        
+        // Determine which URL to use (prefer camera_url, then network_url, then image_url)
+        let feedUrl = cameraUrl || networkUrl || imageUrl;
+        
+        // If we have a siteId but no URL, construct ALERTCalifornia URL
+        if (!feedUrl && siteId) {
+          feedUrl = `https://cameras.alertcalifornia.org/?id=${siteId}`;
+        } else if (!feedUrl && networkUrl) {
+          feedUrl = networkUrl;
+        }
+        
+        // Update modal content
+        $('#cameraViewerTitle').text(cameraName);
+        $('#cameraViewerLocation').text(`${cameraData.county_name || ''}, ${cameraData.state_abbr || 'CA'}`);
+        $('#cameraViewerSiteId').text(siteId || 'N/A');
+        
+        // Update "Open in New Tab" link
+        const cameraViewerLink = document.getElementById('cameraViewerLink');
+        if (feedUrl) {
+          cameraViewerLink.href = feedUrl;
+          cameraViewerLink.style.display = 'inline-block';
+        } else {
+          cameraViewerLink.style.display = 'none';
+        }
+        
+        // Set up camera feed
+        const cameraFrame = document.getElementById('cameraFeedFrame');
+        const cameraImg = document.getElementById('cameraFeedImg');
+        const cameraError = document.getElementById('cameraFeedError');
+        
+        // Hide error initially
+        cameraError.style.display = 'none';
+        
+        if (feedUrl) {
+          // Try iframe first for interactive camera controls
+          if (cameraUrl || networkUrl) {
+            cameraFrame.src = feedUrl;
+            cameraFrame.style.display = 'block';
+            cameraImg.style.display = 'none';
+          } else if (imageUrl) {
+            // Use img tag for static images with auto-refresh
+            cameraFrame.style.display = 'none';
+            cameraImg.src = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+            cameraImg.style.display = 'block';
+            
+            // Auto-refresh image every 30 seconds
+            if (window.cameraRefreshInterval) {
+              clearInterval(window.cameraRefreshInterval);
+            }
+            window.cameraRefreshInterval = setInterval(() => {
+              cameraImg.src = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+            }, 30000);
+          } else {
+            cameraError.textContent = 'Camera feed URL not available';
+            cameraError.style.display = 'block';
+            cameraFrame.style.display = 'none';
+            cameraImg.style.display = 'none';
+          }
+        } else {
+          cameraError.textContent = 'No camera feed URL found for this camera';
+          cameraError.style.display = 'block';
+          cameraFrame.style.display = 'none';
+          cameraImg.style.display = 'none';
+        }
+        
+        // Show modal
+        const cameraModal = new bootstrap.Modal(document.getElementById('cameraViewerModal'));
+        cameraModal.show();
+      }
+      
+      // Clean up refresh interval when modal is closed
+      document.getElementById('cameraViewerModal').addEventListener('hidden.bs.modal', function() {
+        if (window.cameraRefreshInterval) {
+          clearInterval(window.cameraRefreshInterval);
+          window.cameraRefreshInterval = null;
+        }
+        // Clear iframe src to stop loading
+        document.getElementById('cameraFeedFrame').src = '';
+      });
+      
+      // Handle camera viewer button clicks from table (use delegated event handler)
+      $(document).on('click', '.camera-view-btn', function(e) {
+        e.stopPropagation(); // Prevent row click event
+        e.preventDefault(); // Prevent any default behavior
+        
+        console.log('📹 Camera button clicked!');
+        
+        // Find the row node that contains this button
+        const rowNode = $(this).closest('tr')[0];
+        console.log('📹 Row node found:', rowNode);
+        
+        if (!rowNode) {
+          console.error('❌ Could not find row node');
+          return;
+        }
+        
+        const rowData = $(rowNode).data('rowData') || $(rowNode).data('disasterObj');
+        console.log('📹 Row data:', rowData);
+        
+        if (rowData) {
+          console.log('📹 Opening camera viewer from table button:', rowData);
+          showCameraViewer(rowData);
+        } else {
+          console.error('❌ Could not find row data for camera viewer');
+          console.log('📹 Available data on row:', {
+            rowData: $(rowNode).data('rowData'),
+            disasterObj: $(rowNode).data('disasterObj'),
+            allData: $(rowNode).data()
+          });
+        }
+      });
+      
     </script>
+    
+    <!-- Camera Viewer Modal -->
+    <div class="modal fade" id="cameraViewerModal" tabindex="-1" aria-labelledby="cameraViewerModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-warning text-dark">
+            <h5 class="modal-title" id="cameraViewerModalLabel">
+              <i class="bi-camera-video"></i> <span id="cameraViewerTitle">Fire Camera</span>
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <p class="mb-1"><strong>Location:</strong> <span id="cameraViewerLocation"></span></p>
+              <p class="mb-0"><strong>Site ID:</strong> <span id="cameraViewerSiteId"></span></p>
+            </div>
+            <div class="camera-feed-container" style="position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 8px; overflow: hidden;">
+              <iframe 
+                id="cameraFeedFrame" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+                allowfullscreen
+                loading="lazy">
+              </iframe>
+              <img 
+                id="cameraFeedImg" 
+                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none;"
+                alt="Camera Feed"
+                onerror="this.style.display='none'; document.getElementById('cameraFeedError').style.display='block';">
+              <div id="cameraFeedError" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; text-align: center; display: none;">
+                <i class="bi-exclamation-triangle" style="font-size: 2rem;"></i>
+                <p class="mt-2">Unable to load camera feed</p>
+              </div>
+            </div>
+            <div class="mt-3 text-center">
+              <button class="btn btn-primary" onclick="document.getElementById('cameraFeedImg').src = document.getElementById('cameraFeedImg').src.split('&t=')[0] + '&t=' + Date.now();">
+                <i class="bi-arrow-clockwise"></i> Refresh Image
+              </button>
+              <a id="cameraViewerLink" href="#" target="_blank" class="btn btn-outline-primary ms-2">
+                <i class="bi-box-arrow-up-right"></i> Open in New Tab
+              </a>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
   </html>
 
