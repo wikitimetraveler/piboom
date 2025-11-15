@@ -358,11 +358,17 @@ class ModernNavbar extends HTMLElement {
                     <i class="bi-calculator"></i> Finance Hub
                   </a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="/finance/encompass-assistant.html">
-                    <i class="bi-bank2"></i> Encompass Assistant
+                  <div class="dropdown-item" style="font-weight: 600; color: #667eea; padding: 8px 15px;">
+                    <i class="bi-bank2"></i> Encompass Tools
+                  </div>
+                  <a class="dropdown-item" href="/finance/encompass-assistant.html" style="padding-left: 2.5rem;">
+                    <i class="bi-robot"></i> Encompass Assistant
                   </a>
-                  <a class="dropdown-item" href="/finance/pipeline-risk-dashboard.html">
+                  <a class="dropdown-item" href="/finance/pipeline-risk-dashboard.html" style="padding-left: 2.5rem;">
                     <i class="bi-shield-check"></i> Pipeline Risk Dashboard
+                  </a>
+                  <a class="dropdown-item" href="/finance/risk-analysis-dashboard.html" style="padding-left: 2.5rem;">
+                    <i class="bi-graph-up-arrow"></i> Risk Analysis Dashboard
                   </a>
                 </div>
               </li>

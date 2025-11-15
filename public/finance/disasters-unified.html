@@ -265,6 +265,22 @@
       .source-usgs { background: #fef3c7; color: #92400e; border-color: #fde68a; }
       .source-nws { background: #cffafe; color: #0e7490; border-color: #67e8f9; }
       .source-nhc { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+      .source-floodzones { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
+
+      /* Risk badges */
+      .risk-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .risk-low { background: #d1fae5; color: #065f46; }
+      .risk-medium { background: #fef3c7; color: #92400e; }
+      .risk-high { background: #fee2e2; color: #991b1b; }
+      .risk-critical { background: #7c2d12; color: #fee2e2; }
 
       /* Active disaster indicator - removed to prevent layout shift */
 
@@ -371,7 +387,7 @@
               <i class="bi bi-funnel me-2"></i> Filters & Search
             </button>
           </h2>
-          <div id="collapseFilters" class="accordion-collapse collapse" aria-labelledby="headingFilters" data-bs-parent="#disastersAccordion">
+          <div id="collapseFilters" class="accordion-collapse collapse" aria-labelledby="headingFilters">
             <div class="accordion-body">
               <div class="card">
                 <div class="card-body filters">
@@ -393,6 +409,7 @@
                         <option value="nws" selected>NOAA/NWS</option>
                         <option value="nhc" selected>NHC</option>
                         <option value="gdacs">GDACS</option>
+                        <option value="floodzones">Flood Zones (NFHL)</option>
                       </select>
                     </div>
                     <div class="col-md-3">
@@ -427,7 +444,7 @@
               <i class="bi bi-shield-exclamation me-2"></i> Disasters
             </button>
           </h2>
-          <div id="collapseDisasters" class="accordion-collapse collapse show" aria-labelledby="headingDisasters" data-bs-parent="#disastersAccordion">
+          <div id="collapseDisasters" class="accordion-collapse collapse show" aria-labelledby="headingDisasters">
             <div class="accordion-body">
               <div class="card">
                 <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos and loans)</small></div>
@@ -443,6 +460,7 @@
                           <th>Start</th>
                           <th>End</th>
                           <th>Title</th>
+                          <th>Risk Score</th>
                         </tr>
                       </thead>
                       <tbody></tbody>
@@ -461,7 +479,7 @@
               <i class="bi bi-geo-alt me-2"></i> Map & Disaster Videos
             </button>
           </h2>
-          <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube" data-bs-parent="#disastersAccordion">
+          <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube">
             <div class="accordion-body">
               <div class="row g-3">
                 <div class="col-md-6">
@@ -497,7 +515,7 @@
               <i class="bi bi-bank me-2"></i> Encompass Loans
             </button>
           </h2>
-          <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans" data-bs-parent="#disastersAccordion">
+          <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans">
             <div class="accordion-body">
               <div class="card" id="encompassLoansCard" style="display: none;">
                 <div class="card-header">
@@ -557,10 +575,10 @@
         initializeVoiceRecognition();
         // Generate initial insights
         generateInitialInsights();
-        // Ensure table exists and has exactly 7 headers
+        // Ensure table exists and has exactly 8 headers (added Risk Score)
         const headerCount = $('#disastersTable thead th').length;
-        if (headerCount !== 7) {
-          console.error(`❌ Table has ${headerCount} headers, expected 7!`);
+        if (headerCount !== 8) {
+          console.error(`❌ Table has ${headerCount} headers, expected 8!`);
         }
         
         table = $('#disastersTable').DataTable({ 
@@ -684,6 +702,8 @@
         
         loadYouTubeAPI();
         loadDisasters();
+        // Load all encompass loans on map on page load
+        loadAllLoansOnMap();
       });
 
       async function loadDisasters() {
@@ -692,19 +712,18 @@
         const sources = $('#sourceInput').val() || [];
         const events = $('#eventInput').val() || [];
         
-        // Check if FEMA is the only source selected - use pipeline FEMA query logic
-        const isFemaOnly = sources.length === 1 && sources[0] === 'fema';
+        let allRows = [];
         
-        if (isFemaOnly) {
-          // Use pipeline FEMA query logic (direct API call)
-          console.log('📊 Loading FEMA data using pipeline query logic...');
-          const qp = new URLSearchParams();
-          if (state) qp.set('state', state);
-          if (county) qp.set('county', county);
-          const url = `/api/loan-pipeline/query-fema?${qp.toString()}`;
-          console.log('📊 Loading FEMA from pipeline endpoint:', url);
-          
+        // Load FEMA data if FEMA is selected (even with other sources)
+        if (sources.includes('fema')) {
           try {
+            console.log('📊 Loading FEMA data using pipeline query logic...');
+            const qp = new URLSearchParams();
+            if (state) qp.set('state', state);
+            if (county) qp.set('county', county);
+            const url = `/api/loan-pipeline/query-fema?${qp.toString()}`;
+            console.log('📊 Loading FEMA from pipeline endpoint:', url);
+            
             const resp = await fetch(url);
             const json = await resp.json();
             console.log('📊 Pipeline FEMA Response:', { 
@@ -716,7 +735,7 @@
             
             if (json.success && json.data.disasters) {
               // Transform pipeline FEMA format to unified format
-              const transformedRows = json.data.disasters.map(disaster => ({
+              const femaRows = json.data.disasters.map(disaster => ({
                 source: 'fema',
                 event_type: (disaster.incidentType || 'disaster').toLowerCase(),
                 county_name: disaster.county || '',
@@ -731,46 +750,178 @@
                 raw: disaster
               }));
               
-              console.log('📊 Transformed FEMA rows:', transformedRows.length);
-              renderTable(transformedRows);
-              renderMap(transformedRows);
-              return;
+              console.log('📊 Transformed FEMA rows:', femaRows.length);
+              allRows = allRows.concat(femaRows);
             }
           } catch (e) {
             console.error('❌ Error loading FEMA from pipeline:', e);
-            // Fall through to regular API call
           }
         }
         
-        // Regular database query for all other sources or when FEMA query fails
-        const qp = new URLSearchParams();
-        if (state) qp.set('state', state);
-        if (county) qp.set('county', county);
-        // Note: API only supports single source/event filter
-        // If multiple sources selected, don't filter (show all) - otherwise filter by first selected
-        if (sources.length === 1) qp.set('source', sources[0]);
-        if (events.length === 1) qp.set('event', events[0]);
-        qp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
-        const url = `/api/disasters?${qp.toString()}`;
-        console.log('📊 Loading disasters from database:', url);
-        const resp = await fetch(url);
-        const json = await resp.json();
-        console.log('📊 API Response:', { 
-          success: json.success, 
-          count: json.data?.count, 
-          disasters: json.data?.disasters?.length || 0,
-          sample: json.data?.disasters?.slice(0, 3)
-        });
-        const rows = json.success ? json.data.disasters : [];
-        console.log('📊 Rows to render:', rows.length);
-        if (rows.length === 0) {
+        // Check if floodzones is selected - load flood zone data
+        if (sources.includes('floodzones')) {
+          try {
+            const floodZoneRows = await loadFloodZones(state, county);
+            if (floodZoneRows.length > 0) {
+              // If only floodzones selected, render just flood zones
+              if (sources.length === 1) {
+                renderTable(floodZoneRows);
+                renderMap(floodZoneRows);
+                return;
+              }
+              // Otherwise, combine with other sources
+              allRows = allRows.concat(floodZoneRows);
+            }
+          } catch (e) {
+            console.error('❌ Error loading flood zones:', e);
+          }
+        }
+        
+        // Load other disaster sources from database (if FEMA is not the only source)
+        const otherSources = sources.filter(s => s !== 'fema' && s !== 'floodzones');
+        if (otherSources.length > 0 || sources.length === 0) {
+          // Regular database query for all other sources
+          const qp = new URLSearchParams();
+          if (state) qp.set('state', state);
+          if (county) qp.set('county', county);
+          // Note: API only supports single source/event filter
+          // If multiple sources selected, don't filter (show all) - otherwise filter by first selected
+          if (otherSources.length === 1) qp.set('source', otherSources[0]);
+          if (events.length === 1) qp.set('event', events[0]);
+          qp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
+          const url = `/api/disasters?${qp.toString()}`;
+          console.log('📊 Loading disasters from database:', url);
+          const resp = await fetch(url);
+          const json = await resp.json();
+          console.log('📊 API Response:', { 
+            success: json.success, 
+            count: json.data?.count, 
+            disasters: json.data?.disasters?.length || 0,
+            sample: json.data?.disasters?.slice(0, 3)
+          });
+          const dbRows = json.success ? json.data.disasters : [];
+          console.log('📊 Rows from database:', dbRows.length);
+          allRows = allRows.concat(dbRows);
+        }
+        
+        if (allRows.length === 0) {
           console.warn('⚠️  No disasters found. Check:');
           console.warn('   - Database connection');
           console.warn('   - Date filter (90 days)');
           console.warn('   - Source/event filters');
         }
-        renderTable(rows);
-        renderMap(rows);
+        renderTable(allRows);
+        renderMap(allRows);
+      }
+      
+      // Calculate risk score for a disaster based on all data sources
+      function calculateDisasterRiskScore(disaster, allDisasters) {
+        let score = 0;
+        const state = disaster.state_abbr || '';
+        const county = disaster.county_name || '';
+        
+        if (!state && !county) return 0;
+        
+        // Count disasters in same county/state from all sources
+        const relatedDisasters = allDisasters.filter(d => 
+          (d.state_abbr === state && d.county_name === county) ||
+          (d.state_abbr === state && !d.county_name)
+        );
+        
+        // Base score: number of disasters in area
+        score += Math.min(relatedDisasters.length * 0.5, 5);
+        
+        // Source-specific risk weights
+        const sourceWeights = {
+          'fema': 2.0,        // FEMA declarations are significant
+          'firms': 1.5,       // Active fires are high risk
+          'usgs': 1.5,        // Earthquakes are high risk
+          'nhc': 2.5,         // Hurricanes are very high risk
+          'nws': 1.0,         // Weather warnings
+          'floodzones': 1.0   // Flood zones add risk
+        };
+        
+        // Add risk based on source
+        const sourceWeight = sourceWeights[disaster.source] || 1.0;
+        score += sourceWeight;
+        
+        // Recency bonus (more recent = higher risk)
+        if (disaster.start_time) {
+          const daysAgo = (Date.now() - new Date(disaster.start_time).getTime()) / (1000 * 60 * 60 * 24);
+          if (daysAgo < 7) score += 2;      // Last week
+          else if (daysAgo < 30) score += 1; // Last month
+          else if (daysAgo < 90) score += 0.5; // Last 90 days
+        }
+        
+        // Event type risk
+        const eventType = (disaster.event_type || '').toLowerCase();
+        if (eventType.includes('hurricane') || eventType.includes('tornado')) score += 2;
+        else if (eventType.includes('wildfire') || eventType.includes('fire')) score += 1.5;
+        else if (eventType.includes('earthquake')) score += 1.5;
+        else if (eventType.includes('flood')) score += 1;
+        
+        // Flood zone specific risk
+        if (disaster.flood_zone) {
+          const fz = disaster.flood_zone.toUpperCase();
+          if (fz.startsWith('A') || fz.startsWith('V')) score += 2;
+          else if (fz.includes('X')) score += 0.5;
+        }
+        
+        // High risk count from flood zones
+        if (disaster.high_risk_count && disaster.high_risk_count > 0) {
+          score += Math.min(disaster.high_risk_count * 0.1, 2);
+        }
+        
+        return Math.min(Math.round(score * 10) / 10, 15); // Cap at 15
+      }
+      
+      // Get risk badge HTML
+      function getRiskBadge(score) {
+        if (score === 0) return '<span class="risk-badge risk-low">None</span>';
+        if (score < 3) return `<span class="risk-badge risk-low">Low (${score.toFixed(1)})</span>`;
+        if (score < 6) return `<span class="risk-badge risk-medium">Med (${score.toFixed(1)})</span>`;
+        if (score < 10) return `<span class="risk-badge risk-high">High (${score.toFixed(1)})</span>`;
+        return `<span class="risk-badge risk-critical">Critical (${score.toFixed(1)})</span>`;
+      }
+      
+      // Load flood zones as disaster-like entries
+      async function loadFloodZones(state = null, county = null) {
+        try {
+          const qp = new URLSearchParams();
+          if (state) qp.set('state', state);
+          if (county) qp.set('county', county);
+          
+          const url = `/api/loan-pipeline/flood-zones-loans?${qp.toString()}`;
+          const resp = await fetch(url);
+          const json = await resp.json();
+          
+          if (!json.success || !json.data) {
+            return [];
+          }
+          
+          // Transform flood zone loan data to unified format
+          const floodZoneRows = json.data.map(item => ({
+            source: 'floodzones',
+            event_type: 'flood',
+            county_name: item.county || '',
+            state_abbr: item.state || '',
+            start_time: item.last_flood_zone_check || new Date().toISOString(),
+            end_time: null,
+            severity: item.high_risk_count || 0,
+            title: `Flood Zone ${item.flood_zone || 'Unknown'} - ${item.loan_count || 0} loans`,
+            lat: item.avg_latitude || null,
+            lng: item.avg_longitude || null,
+            source_id: `floodzone_${item.state}_${item.county}_${item.flood_zone || 'unknown'}`,
+            raw: item,
+            flood_zone: item.flood_zone,
+            loan_count: item.loan_count
+          }));
+          
+          return floodZoneRows;
+        } catch (error) {
+          console.error('❌ Error loading flood zones:', error);
+          return [];
+        }
       }
 
       async function refreshDisasters() {
@@ -845,7 +996,11 @@
               eventBadge = eventType || '';
             }
             
-            // Build rowData array - EXACTLY 7 elements, no more, no less
+            // Calculate risk score for this disaster
+            const riskScore = calculateDisasterRiskScore(r, uniqueRows);
+            const riskBadge = getRiskBadge(riskScore);
+            
+            // Build rowData array - EXACTLY 8 elements (added Risk Score)
             // Use array literal to ensure clean array with no undefined elements
             const rowData = [
               sourceBadge || '',    // Source (0) - HTML badge
@@ -854,19 +1009,20 @@
               state || '',            // State (3)
               startTime || '',        // Start (4) - formatted for display
               endTime || '',          // End (5) - formatted for display
-              title || ''             // Title (6)
+              title || '',            // Title (6)
+              riskBadge || ''         // Risk Score (7)
             ];
             
-            // CRITICAL: Ensure exactly 7 elements - no more, no less
-            if (rowData.length !== 7) {
-              console.error(`❌ Row ${idx} (${source}) has ${rowData.length} columns, expected 7:`, rowData);
-              // Force to exactly 7
-              while (rowData.length < 7) rowData.push('');
-              rowData.splice(7); // Remove any extras
+            // CRITICAL: Ensure exactly 8 elements - no more, no less
+            if (rowData.length !== 8) {
+              console.error(`❌ Row ${idx} (${source}) has ${rowData.length} columns, expected 8:`, rowData);
+              // Force to exactly 8
+              while (rowData.length < 8) rowData.push('');
+              rowData.splice(8); // Remove any extras
             }
             
             // Verify all elements are strings (no undefined/null)
-            for (let i = 0; i < 7; i++) {
+            for (let i = 0; i < 8; i++) {
               if (rowData[i] === undefined || rowData[i] === null) {
                 rowData[i] = '';
               }
@@ -882,7 +1038,7 @@
             }
             
             // Use the array directly - no copy needed since we're being explicit
-            const rowDataCopy = rowData.slice(0, 7); // Ensure exactly 7
+            const rowDataCopy = rowData.slice(0, 8); // Ensure exactly 8
             
             // Add row to table with the copy - use apply to ensure clean array
             const rowNode = table.row.add(rowDataCopy).node();
@@ -890,7 +1046,7 @@
             // Store raw values for sorting on the cell elements using data-order attribute
             if (rowNode) {
               const cells = rowNode.getElementsByTagName('td');
-              if (cells.length === 7) {
+              if (cells.length === 8) {
                 // Store raw source in first cell (index 0) for sorting
                 const $firstCell = $(cells[0]);
                 $firstCell.attr('data-order', source);
@@ -1041,8 +1197,14 @@
         const title = disasterObj?.title || disasterData[6] || '';
         const state = disasterObj?.state_abbr || disasterData[3] || '';
         const county = disasterObj?.county_name || disasterData[2] || '';
+        const riskScore = disasterObj?.risk_score || 0;
         
-        console.log('Selecting disaster:', title, state, county);
+        console.log('Selecting disaster:', title, state, county, 'Risk:', riskScore);
+        
+        // Update risk display if available
+        if (riskScore > 0) {
+          console.log(`⚠️  Risk Score: ${riskScore.toFixed(1)}`);
+        }
         
         // Show Encompass loans card
         // Show Encompass loans card and expand accordion
@@ -1071,6 +1233,28 @@
         if (disasterObj && disasterObj.lat && disasterObj.lng) {
           map.setCenter({ lat: parseFloat(disasterObj.lat), lng: parseFloat(disasterObj.lng) });
           map.setZoom(10);
+        }
+      }
+
+      // Load all encompass loans on map on page load
+      async function loadAllLoansOnMap() {
+        try {
+          // Wait for map to be initialized
+          if (!map) {
+            setTimeout(loadAllLoansOnMap, 500);
+            return;
+          }
+          
+          console.log('Loading all encompass loans on map...');
+          const response = await fetch('/api/loan-pipeline/loans');
+          const data = await response.json();
+          
+          if (data.success && data.data.loans) {
+            updateMapWithLoans(data.data.loans);
+            console.log(`Loaded ${data.data.loans.length} loans on map`);
+          }
+        } catch (error) {
+          console.error('Error loading all loans on map:', error);
         }
       }
 

@@ -328,8 +328,37 @@ export async function analyzeLoanRisk(loan) {
       });
     }
     
-    // Calculate risk score
-    const riskScore = calculateRiskScore(femaData);
+    // Get flood zone data if not already loaded - query and store it
+    let floodZoneData = null;
+    if (!loan.flood_zone && loan.latitude && loan.longitude) {
+      try {
+        // Query flood zone data
+        floodZoneData = await queryFloodZoneForPoint(
+          parseFloat(loan.latitude),
+          parseFloat(loan.longitude)
+        );
+        
+        // Store flood zone data (even if null/not found, record the check)
+        await updateLoanFloodZone(loan, floodZoneData);
+        
+        // Update loan object for risk calculation
+        if (floodZoneData) {
+          loan.flood_zone = floodZoneData.floodZone;
+          loan.flood_zone_type = floodZoneData.zoneType;
+        }
+      } catch (error) {
+        console.warn(`⚠️  Could not query/store flood zone for loan ${loan.loan_number}:`, error.message);
+        // Still record that we attempted the check
+        try {
+          await updateLoanFloodZone(loan, null);
+        } catch (storeError) {
+          console.error(`❌ Failed to record flood zone check attempt: ${storeError.message}`);
+        }
+      }
+    }
+    
+    // Calculate risk score (includes flood zone risk)
+    const riskScore = calculateRiskScore(femaData, loan);
     
     // Find closest disaster
     const closestDisaster = disastersWithDistance.find(d => d.distanceKm !== null) || null;
@@ -599,25 +628,50 @@ export function findDisastersWithinRadius(loan, disasters, radiusKm = 50) {
 }
 
 /**
- * Calculate risk score from FEMA data
+ * Calculate risk score from FEMA data and flood zone
  * @param {Object} femaData - FEMA API response data
+ * @param {Object} loan - Loan object with flood zone data (optional)
  * @returns {number} Risk score (0-10+)
  */
-function calculateRiskScore(femaData) {
-  if (!femaData || !femaData.disasters) {
-    return 0;
+function calculateRiskScore(femaData, loan = null) {
+  let baseScore = 0;
+  
+  // Calculate base score from disaster declarations
+  if (femaData && femaData.disasters) {
+    const disasterCount = femaData.disasterCount || 0;
+    // Simple scoring algorithm:
+    // 0-2 disasters: Low risk (0-2)
+    // 3-5 disasters: Medium risk (3-5)  
+    // 6+ disasters: High risk (6+)
+    baseScore = Math.min(disasterCount, 10); // Cap at 10 for display purposes
   }
   
-  const disasterCount = femaData.disasterCount || 0;
+  // Add flood zone risk if loan has flood zone data
+  if (loan && loan.flood_zone) {
+    const floodZone = loan.flood_zone.toUpperCase();
+    
+    // High-risk flood zones (A, AE, AO, AH, A99, V, VE, etc.)
+    if (floodZone.startsWith('A') || floodZone.startsWith('V')) {
+      // Add 2-4 points based on zone type
+      if (floodZone.includes('V') || floodZone.includes('AE') || floodZone.includes('AO')) {
+        baseScore += 4; // High-risk coastal or riverine flooding
+      } else if (floodZone.includes('AH') || floodZone.includes('A99')) {
+        baseScore += 3; // Moderate-high risk
+      } else {
+        baseScore += 2; // Standard high-risk zone
+      }
+    }
+    // Moderate-risk zones (X shaded, D)
+    else if (floodZone.includes('X') && loan.flood_zone_type && loan.flood_zone_type.includes('Shaded')) {
+      baseScore += 1; // Moderate risk
+    }
+    // Zone D (undetermined) adds minimal risk
+    else if (floodZone === 'D') {
+      baseScore += 0.5;
+    }
+  }
   
-  // Simple scoring algorithm:
-  // 0-2 disasters: Low risk (0-2)
-  // 3-5 disasters: Medium risk (3-5)  
-  // 6+ disasters: High risk (6+)
-  
-  // Future enhancement: Weight by recency and severity
-  // For now, just use the count as the score
-  return Math.min(disasterCount, 10); // Cap at 10 for display purposes
+  return Math.min(Math.round(baseScore * 10) / 10, 15); // Cap at 15, allow decimals
 }
 
 /**
@@ -853,3 +907,484 @@ export default {
   calculateLoanToDisasterDistances,
   findDisastersWithinRadius
 };
+
+/**
+ * Query FEMA NFHL for flood zone at specific coordinates (includes boundaries)
+ * @param {number} latitude - Latitude
+ * @param {number} longitude - Longitude
+ * @returns {Promise<Object|null>} Flood zone data with boundaries or null
+ */
+export async function queryFloodZoneForPoint(latitude, longitude) {
+  try {
+    if (!latitude || !longitude) {
+      return null;
+    }
+    
+    // Multiple FEMA NFHL REST API endpoints to try (in order of preference)
+    // Updated endpoint URLs based on FEMA's current service structure
+    // Layer 28 = "Flood Hazard Zones" - contains FLD_ZONE data
+    const endpoints = [
+      'https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer', // Updated endpoint (WORKING)
+      'https://hazards.fema.gov/gis/nfhl/rest/services/public/NFHL/MapServer', // Original endpoint (deprecated)
+      'https://hazards.fema.gov/gis/nfhl/rest/services?f=pjson' // Services directory
+    ];
+    
+    // Create a small bounding box around the point (0.01 degree ~= 1km)
+    const buffer = 0.01;
+    const geometry = {
+      xmin: longitude - buffer,
+      ymin: latitude - buffer,
+      xmax: longitude + buffer,
+      ymax: latitude + buffer,
+      spatialReference: { wkid: 4326 }
+    };
+    
+    // Try each endpoint
+    for (let endpointIndex = 0; endpointIndex < endpoints.length; endpointIndex++) {
+      const baseUrl = endpoints[endpointIndex];
+      
+      try {
+        // First, try to get service info to find correct layer
+        const serviceInfoUrl = `${baseUrl}?f=json`;
+        const serviceResponse = await fetch(serviceInfoUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'piBoom-LoanPipeline/1.0'
+          }
+        });
+        
+        if (serviceResponse.ok) {
+          const serviceInfo = await serviceResponse.json();
+          
+          // Handle services directory response (list of services)
+          if (serviceInfo.services) {
+            // Find NFHL service in the directory
+            const nfhlService = serviceInfo.services?.find(s => 
+              s.name?.toLowerCase().includes('nfhl') || 
+              s.url?.toLowerCase().includes('nfhl')
+            );
+            if (nfhlService && nfhlService.url) {
+              // Recursively try the found service URL
+              const recursiveResult = await queryFloodZoneAtEndpoint(nfhlService.url, latitude, longitude, geometry);
+              if (recursiveResult) return recursiveResult;
+              continue;
+            }
+          }
+          
+          // Find layer with flood zone data
+          // Layer 28 = "Flood Hazard Zones" - this is the correct layer for flood zone data
+          const floodLayer = serviceInfo.layers?.find(l => 
+            l.id === 28 || // Flood Hazard Zones - PRIMARY
+            (l.name?.toLowerCase().includes('flood') && l.name?.toLowerCase().includes('zone')) ||
+            l.name?.toLowerCase().includes('flood_hazard_zone')
+          );
+          
+          if (floodLayer) {
+            const actualLayerId = floodLayer.id;
+            console.log(`🌊 Using FEMA NFHL layer ${actualLayerId}: ${floodLayer.name || 'Unknown'} (endpoint ${endpointIndex + 1})`);
+            
+            const zoneResult = await queryFloodZoneAtEndpoint(baseUrl, latitude, longitude, geometry, actualLayerId);
+            
+            // Always query boundaries (Layer 27) when we have zone data, especially on first endpoint
+            if (zoneResult) {
+              if (endpointIndex === 0) {
+                console.log(`🌊 Querying Layer 27 (Flood Hazard Boundaries) for boundaries...`);
+                const boundaryResult = await queryFloodBoundariesAtEndpoint(baseUrl, latitude, longitude, geometry, 27);
+                
+                return {
+                  ...zoneResult,
+                  boundaries: boundaryResult?.boundaries || null,
+                  boundaryGeometry: boundaryResult?.boundaryGeometry || null,
+                  boundaryCount: boundaryResult?.boundaryCount || 0
+                };
+              }
+              // Return zone result even without boundaries if not first endpoint
+              return zoneResult;
+            }
+          }
+          
+          // If no flood layer found but service is accessible, try layer 28 directly
+          if (endpointIndex === 0) {
+            console.log(`🌊 Trying Layer 28 (Flood Hazard Zones) directly...`);
+            const zoneResult = await queryFloodZoneAtEndpoint(baseUrl, latitude, longitude, geometry, 28);
+            
+            // Also query Layer 27 (Flood Hazard Boundaries) for boundary geometry
+            console.log(`🌊 Querying Layer 27 (Flood Hazard Boundaries) for boundaries...`);
+            const boundaryResult = await queryFloodBoundariesAtEndpoint(baseUrl, latitude, longitude, geometry, 27);
+            
+            // Combine zone and boundary data
+            if (zoneResult || boundaryResult) {
+              return {
+                ...(zoneResult || {}),
+                boundaries: boundaryResult?.boundaries || null,
+                boundaryGeometry: boundaryResult?.boundaryGeometry || null
+              };
+            }
+          }
+        } else if (endpointIndex === 0) {
+          // Only log warning for first endpoint attempt
+          console.warn(`⚠️  FEMA NFHL endpoint ${endpointIndex + 1} returned ${serviceResponse.status}, trying next...`);
+        }
+      } catch (serviceError) {
+        if (endpointIndex === 0) {
+          console.warn(`⚠️  Could not get service info from endpoint ${endpointIndex + 1}: ${serviceError.message}`);
+        }
+      }
+      
+      // Fallback: try direct query with layer 28 (Flood Hazard Zones) first
+      if (endpointIndex === 0) {
+        const zoneResult = await queryFloodZoneAtEndpoint(baseUrl, latitude, longitude, geometry, 28);
+        const boundaryResult = await queryFloodBoundariesAtEndpoint(baseUrl, latitude, longitude, geometry, 27);
+        
+        if (zoneResult || boundaryResult) {
+          console.log(`🌊 Successfully queried flood data using layers 28/27 on endpoint ${endpointIndex + 1}`);
+          return {
+            ...(zoneResult || {}),
+            boundaries: boundaryResult?.boundaries || null,
+            boundaryGeometry: boundaryResult?.boundaryGeometry || null
+          };
+        }
+      }
+    }
+    
+    // All endpoints failed
+    console.warn(`⚠️  All FEMA NFHL API endpoints failed for point: ${latitude}, ${longitude}`);
+    return null;
+  } catch (error) {
+    console.error(`❌ Error querying flood zone: ${error.message}`);
+    return null;
+  }
+}
+
+/**
+ * Helper function to query flood boundaries at a specific endpoint
+ * @param {string} baseUrl - Base URL of the endpoint
+ * @param {number} latitude - Latitude
+ * @param {number} longitude - Longitude
+ * @param {Object} geometry - Geometry object for query
+ * @param {number} layerId - Layer ID (27 for boundaries)
+ * @returns {Promise<Object|null>} Boundary data or null
+ */
+async function queryFloodBoundariesAtEndpoint(baseUrl, latitude, longitude, geometry, layerId = 27) {
+  try {
+    const queryUrl = `${baseUrl}/${layerId}/query`;
+    // Layer 27 (Flood Hazard Boundaries) contains boundary geometry
+    const params = new URLSearchParams({
+      f: 'geojson',
+      where: '1=1',
+      outFields: '*',
+      returnGeometry: 'true', // Important: we want the geometry for boundaries
+      geometry: JSON.stringify(geometry),
+      geometryType: 'esriGeometryEnvelope',
+      inSR: '4326',
+      spatialRel: 'esriSpatialRelIntersects',
+      returnCountOnly: 'false'
+    });
+    
+    const response = await fetch(`${queryUrl}?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'piBoom-LoanPipeline/1.0'
+      }
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const data = await response.json();
+    
+    // Check for error in response
+    if (data.error) {
+      return null;
+    }
+    
+    // Extract boundary features
+    if (data.features && data.features.length > 0) {
+      // Return all boundary features with their geometry
+      return {
+        boundaries: data.features.map(feature => ({
+          properties: feature.properties || {},
+          geometry: feature.geometry || null
+        })),
+        boundaryGeometry: data.features.length === 1 ? data.features[0].geometry : null,
+        boundaryCount: data.features.length
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    // Silently fail - boundaries are optional
+    return null;
+  }
+}
+
+/**
+ * Helper function to query flood zone at a specific endpoint
+ * @param {string} baseUrl - Base URL of the endpoint
+ * @param {number} latitude - Latitude
+ * @param {number} longitude - Longitude
+ * @param {Object} geometry - Geometry object for query
+ * @param {number} layerId - Layer ID to query (default: 28 for zones)
+ * @returns {Promise<Object|null>} Flood zone data or null
+ */
+async function queryFloodZoneAtEndpoint(baseUrl, latitude, longitude, geometry, layerId = 28) {
+  try {
+    const queryUrl = `${baseUrl}/${layerId}/query`;
+    // Layer 28 (Flood Hazard Zones) uses these field names
+    // Use '*' to get all fields to ensure we don't miss anything
+    const params = new URLSearchParams({
+      f: 'geojson',
+      where: '1=1',
+      outFields: '*', // Get all fields to ensure we capture FLD_ZONE
+      returnGeometry: 'true',
+      geometry: JSON.stringify(geometry),
+      geometryType: 'esriGeometryEnvelope',
+      inSR: '4326',
+      spatialRel: 'esriSpatialRelIntersects',
+      returnCountOnly: 'false'
+    });
+    
+    const response = await fetch(`${queryUrl}?${params.toString()}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'piBoom-LoanPipeline/1.0'
+      }
+    });
+    
+    if (!response.ok) {
+      return null;
+    }
+    
+    const data = await response.json();
+    
+    // Check for error in response
+    if (data.error) {
+      return null;
+    }
+    
+    if (!data.features || data.features.length === 0) {
+      return null;
+    }
+    
+    // Find the feature that contains the point
+    if (data.features && data.features.length > 0) {
+      // Use the first feature (closest match)
+      const feature = data.features[0];
+      const props = feature.properties || {};
+      
+      // Check if we have flood zone data
+      // Layer 28 field names: FLD_ZONE, DFIRM_ID, ZONE_SUBTY, STATIC_BFE
+      // Note: STATIC_BFE can be -9999 which means "not available"
+      const floodZone = props.FLD_ZONE || props.flood_zone || props.ZONE || props.zone || null;
+      const zoneType = props.ZONE_SUBTY || props.zone_subty || props.ZONE_TYPE || props.zone_type || null;
+      const dfirmId = props.DFIRM_ID || props.dfirm_id || props.DFIRMID || props.dfirmid || null;
+      const staticBfe = props.STATIC_BFE;
+      const baseFloodElevation = (staticBfe !== undefined && staticBfe !== null && staticBfe !== -9999) 
+        ? parseFloat(staticBfe) 
+        : null;
+      
+      // Return data even if flood zone is null, as long as we have some flood-related data
+      // Some areas may have DFIRM_ID or FLD_AR_ID even without a zone designation
+      // IMPORTANT: Even if FLD_ZONE is empty string or "X" (which is a valid zone), we should return data
+      if (!floodZone && !dfirmId && !props.FLD_AR_ID) {
+        // No meaningful flood data found
+        return null;
+      }
+      
+      // FLOODWAY field may not exist in Layer 28, check SFHA_TF instead
+      // SFHA_TF = "T" means floodway, "F" means not floodway
+      const floodway = props.FLOODWAY || props.floodway || (props.SFHA_TF === 'T' ? 'Yes' : null) || null;
+      
+      return {
+        floodZone: floodZone,
+        zoneType: zoneType,
+        dfirmId: dfirmId,
+        baseFloodElevation: baseFloodElevation,
+        floodway: floodway,
+        fullData: props,
+        zoneGeometry: feature.geometry || null // Include zone geometry as well
+      };
+    }
+    
+    return null;
+  } catch (error) {
+    // Silently fail - will try next endpoint
+    return null;
+  }
+}
+
+/**
+ * Update flood zone for a single loan
+ * @param {Object} loan - Loan object with latitude/longitude
+ * @returns {Promise<Object|null>} Updated flood zone data
+ */
+export async function updateLoanFloodZone(loan, floodZoneData = null) {
+  const pool = getPool();
+  if (!pool) {
+    throw new Error('Database not initialized');
+  }
+  
+  try {
+    if (!loan.latitude || !loan.longitude) {
+      console.log(`⚠️  Loan ${loan.loan_number} has no coordinates, skipping flood zone check`);
+      return null;
+    }
+    
+    // Query flood zone if not provided
+    if (!floodZoneData) {
+      floodZoneData = await queryFloodZoneForPoint(
+        parseFloat(loan.latitude),
+        parseFloat(loan.longitude)
+      );
+    }
+    
+    // Always update last_flood_zone_check timestamp, even if API failed
+    if (floodZoneData) {
+      // Prepare complete flood zone data including boundaries
+      const completeFloodData = {
+        ...floodZoneData.fullData,
+        boundaries: floodZoneData.boundaries || null,
+        boundaryGeometry: floodZoneData.boundaryGeometry || null,
+        boundaryCount: floodZoneData.boundaryCount || 0,
+        zoneGeometry: floodZoneData.zoneGeometry || null
+      };
+      
+      // Update loan with flood zone data (including boundaries)
+      await pool.query(`
+        UPDATE loans 
+        SET 
+          flood_zone = $1,
+          flood_zone_type = $2,
+          dfirm_id = $3,
+          base_flood_elevation = $4,
+          flood_zone_data = $5,
+          last_flood_zone_check = CURRENT_TIMESTAMP,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = $6
+      `, [
+        floodZoneData.floodZone,
+        floodZoneData.zoneType,
+        floodZoneData.dfirmId,
+        floodZoneData.baseFloodElevation,
+        JSON.stringify(completeFloodData),
+        loan.id
+      ]);
+      
+      const boundaryInfo = floodZoneData.boundaries ? ` (${floodZoneData.boundaryCount || floodZoneData.boundaries.length} boundaries)` : '';
+      console.log(`✅ Stored flood zone for loan ${loan.loan_number}: ${floodZoneData.floodZone || 'None'}${boundaryInfo}`);
+      return floodZoneData;
+    } else {
+      // No flood zone found or API unavailable - still record the check attempt
+      await pool.query(`
+        UPDATE loans 
+        SET 
+          flood_zone = NULL,
+          flood_zone_type = NULL,
+          dfirm_id = NULL,
+          base_flood_elevation = NULL,
+          flood_zone_data = NULL,
+          last_flood_zone_check = CURRENT_TIMESTAMP,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = $1
+      `, [loan.id]);
+      
+      console.log(`✅ Recorded flood zone check for loan ${loan.loan_number} (no zone found or API unavailable)`);
+      return null;
+    }
+  } catch (error) {
+    console.error(`❌ Error storing flood zone for loan ${loan.loan_number}:`, error.message);
+    throw error;
+  }
+}
+
+/**
+ * Batch update flood zones for all loans
+ * @param {number} limit - Maximum number of loans to process (null for all)
+ * @param {boolean} forceUpdate - Force update even if already checked
+ * @returns {Promise<Object>} Results with updated count
+ */
+export async function batchUpdateFloodZones(limit = null, forceUpdate = false) {
+  const pool = getPool();
+  if (!pool) {
+    throw new Error('Database not initialized');
+  }
+  
+  try {
+    let query = `
+      SELECT id, loan_number, latitude, longitude, flood_zone, last_flood_zone_check
+      FROM loans
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+    `;
+    
+    if (!forceUpdate) {
+      query += ` AND (flood_zone IS NULL OR last_flood_zone_check IS NULL)`;
+    }
+    
+    query += ` ORDER BY id`;
+    
+    if (limit) {
+      query += ` LIMIT $1`;
+    }
+    
+    const result = await pool.query(query, limit ? [limit] : []);
+    const loans = result.rows;
+    
+    console.log(`🔄 Updating flood zones for ${loans.length} loans...`);
+    
+    let updated = 0;
+    let errors = 0;
+    
+    // Process in batches with rate limiting
+    // Reduced batch size to avoid database connection issues
+    const batchSize = 3; // Process 3 at a time to avoid overwhelming API and DB
+    for (let i = 0; i < loans.length; i += batchSize) {
+      const batch = loans.slice(i, i + batchSize);
+      
+      // Process sequentially within batch to avoid DB connection issues
+      for (const loan of batch) {
+        let retries = 3;
+        let success = false;
+        
+        while (retries > 0 && !success) {
+          try {
+            await updateLoanFloodZone(loan);
+            updated++;
+            success = true;
+            
+            // Rate limiting - wait 300ms between requests
+            await new Promise(resolve => setTimeout(resolve, 300));
+          } catch (error) {
+            retries--;
+            if (retries > 0) {
+              console.log(`⚠️  Retrying loan ${loan.loan_number} (${3 - retries + 1}/3)...`);
+              await new Promise(resolve => setTimeout(resolve, 1000)); // Wait before retry
+            } else {
+              console.error(`❌ Error updating loan ${loan.loan_number}:`, error.message);
+              errors++;
+            }
+          }
+        }
+      }
+      
+      // Progress update
+      if ((i + batchSize) % 50 === 0 || i + batchSize >= loans.length) {
+        console.log(`🔄 Processed ${Math.min(i + batchSize, loans.length)}/${loans.length} loans...`);
+      }
+    }
+    
+    console.log(`✅ Flood zone update complete: ${updated} updated, ${errors} errors`);
+    
+    return {
+      total: loans.length,
+      updated,
+      errors
+    };
+  } catch (error) {
+    console.error('❌ Error in batch flood zone update:', error.message);
+    throw error;
+  }
+}

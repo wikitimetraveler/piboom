@@ -42,6 +42,15 @@ router.get('/fema-disasters', loanPipelineController.getFEMADisasters);
 // Query FEMA API directly (like tool3)
 router.get('/query-fema', loanPipelineController.queryFEMADirect);
 
+// Get flood zones from FEMA NFHL
+router.get('/flood-zones', loanPipelineController.getFloodZones);
+
+// Get loans grouped by flood zones (for unified disasters page)
+router.get('/flood-zones-loans', loanPipelineController.getFloodZonesLoans);
+
+// Update flood zones for all loans
+router.post('/update-flood-zones', loanPipelineController.updateFloodZones);
+
 // Geocode loans missing coordinates
 router.post('/geocode-loans', loanPipelineController.geocodeLoans);
 
@@ -53,7 +62,9 @@ router.delete('/cleanup', loanPipelineController.cleanupTestLoans);
 
 // AI Chat and Insights
 router.post('/ai/chat', loanPipelineAIController.chatWithAI);
+router.post('/ai/chat-disaster-expert', loanPipelineAIController.chatWithDisasterExpert);
 router.post('/ai/insights', loanPipelineAIController.generateInsights);
+router.post('/ai/analyze', loanPipelineAIController.analyzeDashboardData);
 router.get('/ai/history', loanPipelineAIController.getConversationHistory);
 
 export default router;

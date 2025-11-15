@@ -53,10 +53,11 @@ const { Pool } = pg;
 let pool = null;
 
 export function initializeDatabase() {
-  // Only initialize if DATABASE_URL is provided
+  // DATABASE_URL is REQUIRED - fail if not provided
   if (!process.env.DATABASE_URL) {
-    console.log('⚠️  No DATABASE_URL found - database features disabled');
-    return null;
+    console.error('❌ DATABASE_URL environment variable is required');
+    console.error('   Application cannot start without database connection');
+    throw new Error('DATABASE_URL not configured');
   }
 
   pool = new Pool({
@@ -67,9 +68,12 @@ export function initializeDatabase() {
     // Connection pool settings optimized for remote database
     max: 10,
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 20000, // 20 seconds for remote DB
+    connectionTimeoutMillis: 60000, // Increased to 60 seconds for slow connections
     query_timeout: 0, // No query timeout (remote DB can be slow)
-    statement_timeout: 30000 // 30 second statement timeout
+    statement_timeout: 60000, // Increased to 60 second statement timeout
+    // Additional settings for better connection handling
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000
   });
 
   // Handle pool errors
@@ -83,16 +87,27 @@ export function initializeDatabase() {
 
 export async function createTables() {
   if (!pool) {
-    console.log('⚠️  Database not initialized - skipping table creation');
-    return;
+    throw new Error('Database pool not initialized - cannot create tables');
   }
 
   try {
     console.log('🔧 Creating database tables...');
     
-    // Test connection first
-    await pool.query('SELECT NOW()');
-    console.log('✅ Database connection verified');
+    // Test connection first with timeout handling
+    try {
+      await Promise.race([
+        pool.query('SELECT NOW()'),
+        new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Connection timeout after 30 seconds')), 30000)
+        )
+      ]);
+      console.log('✅ Database connection verified');
+    } catch (connError) {
+      if (connError.message.includes('timeout')) {
+        throw new Error('Database connection timeout - database is not available or too slow');
+      }
+      throw new Error(`Database connection failed: ${connError.message}`);
+    }
 
     // Create users table with passwords
     await pool.query(`
@@ -505,6 +520,42 @@ export async function createTables() {
     
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_fema_data ON loans USING GIN (fema_data)
+    `);
+    
+    // Add flood zone columns if they don't exist (migration)
+    await pool.query(`
+      DO $$ 
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                       WHERE table_name='loans' AND column_name='flood_zone') THEN
+          ALTER TABLE loans ADD COLUMN flood_zone VARCHAR(20);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                       WHERE table_name='loans' AND column_name='flood_zone_type') THEN
+          ALTER TABLE loans ADD COLUMN flood_zone_type VARCHAR(100);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                       WHERE table_name='loans' AND column_name='dfirm_id') THEN
+          ALTER TABLE loans ADD COLUMN dfirm_id VARCHAR(50);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                       WHERE table_name='loans' AND column_name='base_flood_elevation') THEN
+          ALTER TABLE loans ADD COLUMN base_flood_elevation DECIMAL(10, 2);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                       WHERE table_name='loans' AND column_name='flood_zone_data') THEN
+          ALTER TABLE loans ADD COLUMN flood_zone_data JSONB;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns 
+                       WHERE table_name='loans' AND column_name='last_flood_zone_check') THEN
+          ALTER TABLE loans ADD COLUMN last_flood_zone_check TIMESTAMP;
+        END IF;
+      END $$;
+    `);
+    
+    // Create index for flood zone
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_loans_flood_zone ON loans(flood_zone)
     `);
 
     console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, and loan pipeline)');

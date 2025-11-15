@@ -25,7 +25,8 @@ export async function listDisasters(req, res) {
     if (since) { values.push(since); clauses.push(`start_time >= $${values.length}`); }
 
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
-    const sql = `SELECT * FROM disasters ${where} ORDER BY start_time DESC LIMIT 1000`;
+    // Remove LIMIT to get all disasters - real-time data from database
+    const sql = `SELECT * FROM disasters ${where} ORDER BY start_time DESC`;
     console.log('📊 Querying disasters:', sql, 'Values:', values);
     const { rows } = await pool.query(sql, values);
     

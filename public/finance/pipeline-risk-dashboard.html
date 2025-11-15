@@ -343,6 +343,169 @@
             border-radius: 4px;
         }
 
+        /* Pipeline Analyst Loading Overlay - Cool & Modern */
+        .pipeline-loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .pipeline-loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .pipeline-container {
+            text-align: center;
+            color: #60a5fa;
+            position: relative;
+        }
+
+        .pipeline-icon {
+            font-size: 8rem;
+            animation: pipelinePulse 1.5s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(96, 165, 250, 0.6), 0 0 60px rgba(96, 165, 250, 0.3);
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 0 20px rgba(96, 165, 250, 0.5));
+        }
+
+        @keyframes pipelinePulse {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            25% {
+                transform: scale(1.1) rotate(-5deg);
+                opacity: 0.9;
+            }
+            50% {
+                transform: scale(1.2) rotate(0deg);
+                opacity: 0.8;
+            }
+            75% {
+                transform: scale(1.1) rotate(5deg);
+                opacity: 0.9;
+            }
+        }
+
+        .pipeline-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(96, 165, 250, 0.5);
+            margin-bottom: 0.5rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 2px;
+        }
+
+        .pipeline-subtitle {
+            font-size: 1.2rem;
+            color: #93c5fd;
+            margin-bottom: 2rem;
+            font-style: italic;
+            text-shadow: 0 0 10px rgba(147, 197, 253, 0.5);
+        }
+
+        .data-stream {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .data-icon {
+            font-size: 2.5rem;
+            animation: dataFlow 2s ease-in-out infinite;
+            animation-delay: calc(var(--delay) * 0.3s);
+            filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.6));
+        }
+
+        @keyframes dataFlow {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        .loading-progress-pipeline {
+            width: 400px;
+            height: 10px;
+            background: rgba(96, 165, 250, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-progress-bar-pipeline {
+            height: 100%;
+            background: linear-gradient(90deg, #60a5fa, #3b82f6, #2563eb, #3b82f6, #60a5fa);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            animation: progressShimmer 2s linear infinite;
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.6);
+        }
+
+        @keyframes progressShimmer {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .loading-status-pipeline {
+            color: #cbd5e1;
+            font-size: 1rem;
+            margin-top: 1rem;
+            font-weight: 500;
+            text-shadow: 0 0 10px rgba(203, 213, 225, 0.5);
+        }
+
+        .circuit-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .circuit-node {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #60a5fa;
+            box-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
+            animation: circuitPulse 1.5s ease-in-out infinite;
+            animation-delay: calc(var(--delay) * 0.2s);
+        }
+
+        @keyframes circuitPulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.5);
+                opacity: 1;
+            }
+        }
+
         .footer {
             background-color: var(--dark-color);
             color: white;
@@ -366,6 +529,40 @@
     </style>
 </head>
 <body>
+    <!-- Pipeline Analyst Loading Overlay -->
+    <div class="pipeline-loading-overlay" id="pipelineLoadingOverlay">
+        <div class="pipeline-container">
+            <div class="pipeline-icon">📊</div>
+            <div class="pipeline-title">The Analyst</div>
+            <div class="pipeline-subtitle">Analyzing Your Loan Pipeline...</div>
+            
+            <div class="data-stream">
+                <div class="data-icon" style="--delay: 0">💼</div>
+                <div class="data-icon" style="--delay: 1">🌊</div>
+                <div class="data-icon" style="--delay: 2">🔥</div>
+                <div class="data-icon" style="--delay: 3">⚡</div>
+                <div class="data-icon" style="--delay: 4">📈</div>
+            </div>
+
+            <div class="loading-progress-pipeline">
+                <div class="loading-progress-bar-pipeline" id="loadingProgressBarPipeline"></div>
+            </div>
+
+            <div class="loading-status-pipeline" id="loadingStatusPipeline">Initializing pipeline analysis...</div>
+
+            <div class="circuit-container">
+                <div class="circuit-node" style="--delay: 0"></div>
+                <div class="circuit-node" style="--delay: 1"></div>
+                <div class="circuit-node" style="--delay: 2"></div>
+                <div class="circuit-node" style="--delay: 3"></div>
+                <div class="circuit-node" style="--delay: 4"></div>
+                <div class="circuit-node" style="--delay: 5"></div>
+                <div class="circuit-node" style="--delay: 6"></div>
+                <div class="circuit-node" style="--delay: 7"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation -->
     <modern-navbar></modern-navbar>
 
@@ -406,7 +603,7 @@
                         <i class="bi bi-bar-chart-line me-2"></i> Statistics & Charts
                     </button>
                 </h2>
-                <div id="collapseStatsCharts" class="accordion-collapse collapse show" aria-labelledby="headingStatsCharts" data-bs-parent="#dashboardAccordion">
+                <div id="collapseStatsCharts" class="accordion-collapse collapse show" aria-labelledby="headingStatsCharts">
                     <div class="accordion-body">
                         <!-- Statistics Cards -->
                         <div class="row mb-4">
@@ -518,7 +715,7 @@
                         <i class="bi bi-funnel me-2"></i> Filters & Analysis
                     </button>
                 </h2>
-                <div id="collapseFilters" class="accordion-collapse collapse" aria-labelledby="headingFilters" data-bs-parent="#dashboardAccordion">
+                <div id="collapseFilters" class="accordion-collapse collapse" aria-labelledby="headingFilters">
                     <div class="accordion-body">
                         <!-- Filters -->
                         <div class="filter-section">
@@ -552,6 +749,16 @@
                                         <option value="low">Low Risk</option>
                                         <option value="medium">Medium Risk</option>
                                         <option value="high">High Risk</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label class="form-label">Flood Zone Risk</label>
+                                    <select class="form-select" id="floodZoneFilter">
+                                        <option value="">All Flood Zones</option>
+                                        <option value="high">High Risk (A/V zones)</option>
+                                        <option value="moderate">Moderate Risk (Shaded X)</option>
+                                        <option value="low">Low/Minimal Risk</option>
+                                        <option value="none">No Flood Zone</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3 mb-3 d-flex align-items-end gap-2">
@@ -593,7 +800,7 @@
                         <i class="bi bi-shield-exclamation me-2"></i> FEMA Disaster Declarations
                     </button>
                 </h2>
-                <div id="collapseFEMA" class="accordion-collapse collapse" aria-labelledby="headingFEMA" data-bs-parent="#dashboardAccordion">
+                <div id="collapseFEMA" class="accordion-collapse collapse" aria-labelledby="headingFEMA">
                     <div class="accordion-body">
                         <div class="card">
                             <div class="card-header">
@@ -638,7 +845,7 @@
                         <i class="bi bi-geo-alt me-2"></i> Map & Disaster Videos
                     </button>
                 </h2>
-                <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube" data-bs-parent="#dashboardAccordion">
+                <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube">
                     <div class="accordion-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -647,11 +854,18 @@
                                         <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Disaster Areas & Loan Properties</h5>
                                     </div>
                                     <div class="card-body">
+                                        <!-- Map Controls -->
+                                        <div class="mb-2 d-flex gap-2 flex-wrap">
+                                            <!-- Flood zone info is now shown via loan markers (color-coded) -->
+                                        </div>
                                         <div id="map" style="height: 1000px; width: 100%;"></div>
                                         <div class="mt-2">
                                             <small class="text-muted">
                                                 <span class="badge bg-danger me-1">●</span> Disaster Areas<br>
-                                                <span class="badge bg-primary me-1">●</span> Loan Properties
+                                                <span class="badge bg-primary me-1">●</span> Loan Properties<br>
+                                                <span class="badge bg-danger me-1">●</span> High Flood Risk (A/V zones)<br>
+                                                <span class="badge bg-warning me-1">●</span> Moderate Flood Risk (Shaded X)<br>
+                                                <span class="badge bg-primary me-1">●</span> Low/No Flood Risk
                                             </small>
                                         </div>
                                     </div>
@@ -684,7 +898,7 @@
                         <i class="bi bi-bank me-2"></i> Encompass Loans
                     </button>
                 </h2>
-                <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans" data-bs-parent="#dashboardAccordion">
+                <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans">
                     <div class="accordion-body">
                         <div class="card" id="encompassLoansCard" style="display: none;">
                             <div class="card-header">
@@ -791,6 +1005,13 @@
 
         // Initialize dashboard
         $(document).ready(function() {
+            // Show loading overlay on page load
+            const overlay = document.getElementById('pipelineLoadingOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                overlay.classList.remove('hidden');
+            }
+            
             initializeUser();
             // Real-time only: wait for user to select State + County
             initializeFEMADataTable();
@@ -800,12 +1021,18 @@
             loadYouTubeAPI();
             // Load dashboard charts
             loadDashboardData();
-            // Initialize AI components
-            initializeAIComponents();
+            // Initialize AI components (async - wait for it)
+            initializeAIComponents().then(() => {
+                // Generate initial insights after AI components are ready
+                generateInitialInsights();
+            }).catch(error => {
+                console.error('Error initializing AI components:', error);
+            });
             // Initialize voice recognition
             initializeVoiceRecognition();
-            // Generate initial insights
-            generateInitialInsights();
+            // Load all encompass loans and FEMA data on page load
+            loadAllLoansOnMap();
+            loadAllFEMADisastersOnMap();
         });
 
         // Initialize user login
@@ -951,18 +1178,62 @@
             riskScore: null
         };
 
+        // Update loading status
+        function updateLoadingStatusPipeline(message, progress = null) {
+            const statusEl = document.getElementById('loadingStatusPipeline');
+            const progressBar = document.getElementById('loadingProgressBarPipeline');
+            
+            if (statusEl) {
+                statusEl.textContent = message;
+            }
+            
+            if (progressBar && progress !== null) {
+                progressBar.style.width = `${progress}%`;
+            }
+        }
+
+        // Hide pipeline loading overlay
+        function hidePipelineLoading() {
+            const overlay = document.getElementById('pipelineLoadingOverlay');
+            if (overlay) {
+                setTimeout(() => {
+                    overlay.classList.add('hidden');
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 500);
+                }, 500);
+            }
+        }
+
         // Load dashboard data and update all charts
         async function loadDashboardData() {
             try {
+                updateLoadingStatusPipeline('Loading loan pipeline statistics...', 10);
+                
                 const response = await fetch('/api/loan-pipeline/stats');
                 const data = await response.json();
                 
                 if (data.success) {
+                    updateLoadingStatusPipeline('Updating statistics...', 40);
                     updateStatistics(data.data);
+                    
+                    updateLoadingStatusPipeline('Loading loan data for charts...', 60);
                     await updateAllCharts(data.data);
+                    
+                    updateLoadingStatusPipeline('Finalizing dashboard...', 90);
+                    updateLoadingStatusPipeline('Complete!', 100);
+                    
+                    // Hide loading overlay after a short delay
+                    setTimeout(() => {
+                        hidePipelineLoading();
+                    }, 800);
                 }
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
+                updateLoadingStatusPipeline('Error loading data. Please refresh.', 100);
+                setTimeout(() => {
+                    hidePipelineLoading();
+                }, 2000);
             }
         }
 
@@ -1457,18 +1728,77 @@
         // Load loans
         async function loadLoans() {
             try {
-                const params = new URLSearchParams(currentFilters);
+                // Remove floodZoneRisk from API params (we'll filter client-side)
+                const apiFilters = { ...currentFilters };
+                const floodZoneFilter = apiFilters.floodZoneRisk;
+                delete apiFilters.floodZoneRisk;
+                
+                const params = new URLSearchParams(apiFilters);
                 const response = await fetch(`/api/loan-pipeline/loans?${params}`);
                 const data = await response.json();
                 
                 if (data.success) {
-                    populateLoansTable(data.data.loans);
+                    let loans = data.data.loans;
+                    
+                    // Apply flood zone filter client-side
+                    if (floodZoneFilter) {
+                        loans = loans.filter(loan => {
+                            const loanFloodRisk = getFloodZoneRiskLevel(loan);
+                            return loanFloodRisk === floodZoneFilter;
+                        });
+                    }
+                    
+                    populateLoansTable(loans);
                 } else {
                     showAlert('Error loading loans', 'danger');
                 }
             } catch (error) {
                 console.error('Error loading loans:', error);
                 showAlert('Error loading loans', 'danger');
+            }
+        }
+
+        // Load all encompass loans on map on page load
+        async function loadAllLoansOnMap() {
+            try {
+                // Wait for map to be initialized
+                if (!map) {
+                    setTimeout(loadAllLoansOnMap, 500);
+                    return;
+                }
+                
+                console.log('Loading all encompass loans on map...');
+                const response = await fetch('/api/loan-pipeline/loans');
+                const data = await response.json();
+                
+                if (data.success && data.data.loans) {
+                    updateMapWithLoans(data.data.loans);
+                    console.log(`Loaded ${data.data.loans.length} loans on map`);
+                }
+            } catch (error) {
+                console.error('Error loading all loans on map:', error);
+            }
+        }
+
+        // Load all FEMA disasters on map on page load
+        async function loadAllFEMADisastersOnMap() {
+            try {
+                // Wait for map to be initialized
+                if (!map) {
+                    setTimeout(loadAllFEMADisastersOnMap, 500);
+                    return;
+                }
+                
+                console.log('Loading all FEMA disasters on map...');
+                const resp = await fetch('/api/loan-pipeline/query-fema');
+                const json = await resp.json();
+                
+                if (json.success && json.data.disasters) {
+                    updateMapWithDisasters(json.data.disasters);
+                    console.log(`Loaded ${json.data.disasters.length} FEMA disasters on map`);
+                }
+            } catch (error) {
+                console.error('Error loading FEMA disasters on map:', error);
             }
         }
 
@@ -1524,7 +1854,8 @@
                 milestone: $('#milestoneFilter').val(),
                 state: $('#stateFilter').val(),
                 county: $('#countyFilter').val(),
-                riskLevel: $('#riskFilter').val()
+                riskLevel: $('#riskFilter').val(),
+                floodZoneRisk: $('#floodZoneFilter').val()
             };
             
             // Remove empty filters
@@ -1544,6 +1875,21 @@
             // Update AI chat context
             if (aiChatWidget) {
                 aiChatWidget.updateContext({ filters: currentFilters });
+            }
+        }
+        
+        // Helper function to determine flood zone risk level
+        function getFloodZoneRiskLevel(loan) {
+            if (!loan.flood_zone) {
+                return 'none';
+            }
+            const fz = loan.flood_zone.toUpperCase();
+            if (fz.startsWith('A') || fz.startsWith('V')) {
+                return 'high';
+            } else if (fz.includes('X') && loan.flood_zone_type && loan.flood_zone_type.includes('Shaded')) {
+                return 'moderate';
+            } else {
+                return 'low';
             }
         }
 
@@ -2056,6 +2402,78 @@
                     </div>
                 </div>
 
+                <div class="loan-info-section">
+                    <h6><i class="bi bi-water"></i> Flood Zone Information</h6>
+                    ${loan.flood_zone ? `
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Flood Zone</span>
+                        <span class="loan-info-value">
+                            ${(() => {
+                                const fz = loan.flood_zone.toUpperCase();
+                                let floodRisk = 'Low';
+                                let floodColor = '#10b981'; // green
+                                if (fz.startsWith('A') || fz.startsWith('V')) {
+                                    floodRisk = 'High';
+                                    floodColor = '#ef4444'; // red
+                                } else if (fz.includes('X')) {
+                                    floodRisk = loan.flood_zone_type && loan.flood_zone_type.includes('Shaded') ? 'Moderate' : 'Minimal';
+                                    floodColor = loan.flood_zone_type && loan.flood_zone_type.includes('Shaded') ? '#f59e0b' : '#10b981';
+                                }
+                                return `<span style="color: ${floodColor}; font-weight: bold; font-size: 1.1em;">${loan.flood_zone}</span>`;
+                            })()}
+                        </span>
+                    </div>
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Flood Risk</span>
+                        <span class="loan-info-value">
+                            ${(() => {
+                                const fz = loan.flood_zone.toUpperCase();
+                                let floodRisk = 'Low';
+                                let floodColor = '#10b981';
+                                if (fz.startsWith('A') || fz.startsWith('V')) {
+                                    floodRisk = 'High';
+                                    floodColor = '#ef4444';
+                                } else if (fz.includes('X')) {
+                                    floodRisk = loan.flood_zone_type && loan.flood_zone_type.includes('Shaded') ? 'Moderate' : 'Minimal';
+                                    floodColor = loan.flood_zone_type && loan.flood_zone_type.includes('Shaded') ? '#f59e0b' : '#10b981';
+                                }
+                                return `<span style="color: ${floodColor}; font-weight: 600;">${floodRisk}</span>`;
+                            })()}
+                        </span>
+                    </div>
+                    ${loan.flood_zone_type ? `
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Zone Type</span>
+                        <span class="loan-info-value">${loan.flood_zone_type}</span>
+                    </div>
+                    ` : ''}
+                    ${loan.dfirm_id ? `
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">DFIRM ID</span>
+                        <span class="loan-info-value" style="font-size: 0.875rem;">${loan.dfirm_id}</span>
+                    </div>
+                    ` : ''}
+                    ${loan.base_flood_elevation ? `
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Base Flood Elevation</span>
+                        <span class="loan-info-value">${loan.base_flood_elevation} ft</span>
+                    </div>
+                    ` : ''}
+                    ${loan.last_flood_zone_check ? `
+                    <div class="loan-info-item">
+                        <span class="loan-info-label">Last Check</span>
+                        <span class="loan-info-value" style="font-size: 0.875rem;">${new Date(loan.last_flood_zone_check).toLocaleDateString()}</span>
+                    </div>
+                    ` : ''}
+                    ` : `
+                    <div style="text-align: center; padding: 1rem; color: #94a3b8;">
+                        <i class="bi bi-info-circle" style="font-size: 2rem;"></i>
+                        <div style="margin-top: 0.5rem;">Flood zone not analyzed</div>
+                        <div style="font-size: 0.75rem; margin-top: 0.25rem;">Click "Re-analyze Risk" to check</div>
+                    </div>
+                    `}
+                </div>
+
                 <div class="loan-info-section" style="text-align: center;">
                     <button class="btn btn-primary w-100 mb-2" onclick="analyzeLoan(${loan.id})">
                         <i class="bi bi-shield-check"></i> Re-analyze Risk
@@ -2127,6 +2545,9 @@
                 mapTypeId: 'satellite'
             });
         }
+        
+        // Flood zone information is now displayed via loan markers (color-coded by risk level)
+        // Red markers = High risk (A/V zones), Yellow = Moderate risk, Blue = Low/no risk
 
         // Update map with disaster markers
         function updateMapWithDisasters(disasters) {
@@ -2179,23 +2600,75 @@
             loanMarkers = [];
             loans.forEach(loan => {
                 if (loan.latitude && loan.longitude) {
+                    // Determine marker color based on flood zone risk
+                    let markerColor = 'blue'; // Default
+                    let markerIcon = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
+                    
+                    if (loan.flood_zone) {
+                        const fz = loan.flood_zone.toUpperCase();
+                        if (fz.startsWith('A') || fz.startsWith('V')) {
+                            markerColor = 'red'; // High risk flood zones
+                            markerIcon = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                        } else if (fz.includes('X') && loan.flood_zone_type && loan.flood_zone_type.includes('Shaded')) {
+                            markerColor = 'yellow'; // Moderate risk
+                            markerIcon = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
+                        }
+                    }
+                    
                     const marker = new google.maps.Marker({
                         position: { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) },
                         map: map,
-                        title: `${loan.loan_number}`,
+                        title: `Loan ${loan.loan_number}${loan.flood_zone ? ` - Zone ${loan.flood_zone}` : ''}`,
                         icon: {
-                            url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
+                            url: markerIcon,
                             scaledSize: new google.maps.Size(30, 30)
                         }
                     });
+                    
+                    // Build info window content with flood zone info
+                    let infoContent = `<div style="min-width:250px; padding: 5px;">`;
+                    infoContent += `<h6 style="margin: 0 0 10px 0; color: #2563eb;">Loan ${loan.loan_number}</h6>`;
+                    infoContent += `<p style="margin: 5px 0;"><strong>Address:</strong> ${loan.property_address || 'N/A'}</p>`;
+                    infoContent += `<p style="margin: 5px 0;"><strong>Location:</strong> ${loan.city || ''}, ${loan.state || ''} ${loan.zip_code || ''}</p>`;
+                    if (loan.county) {
+                        infoContent += `<p style="margin: 5px 0;"><strong>County:</strong> ${loan.county}</p>`;
+                    }
+                    infoContent += `<p style="margin: 5px 0;"><strong>Risk Level:</strong> ${getRiskLevel(loan.disaster_risk_score)}</p>`;
+                    
+                    // Add flood zone information
+                    if (loan.flood_zone) {
+                        const fz = loan.flood_zone.toUpperCase();
+                        let floodRisk = 'Low';
+                        let floodColor = '#10b981'; // green
+                        if (fz.startsWith('A') || fz.startsWith('V')) {
+                            floodRisk = 'High';
+                            floodColor = '#ef4444'; // red
+                        } else if (fz.includes('X')) {
+                            floodRisk = loan.flood_zone_type && loan.flood_zone_type.includes('Shaded') ? 'Moderate' : 'Minimal';
+                            floodColor = loan.flood_zone_type && loan.flood_zone_type.includes('Shaded') ? '#f59e0b' : '#10b981';
+                        }
+                        
+                        infoContent += `<hr style="margin: 10px 0; border-color: #ddd;">`;
+                        infoContent += `<p style="margin: 5px 0;"><strong>Flood Zone:</strong> <span style="color: ${floodColor}; font-weight: bold;">${loan.flood_zone}</span></p>`;
+                        infoContent += `<p style="margin: 5px 0;"><strong>Flood Risk:</strong> <span style="color: ${floodColor};">${floodRisk}</span></p>`;
+                        if (loan.flood_zone_type) {
+                            infoContent += `<p style="margin: 5px 0;"><strong>Zone Type:</strong> ${loan.flood_zone_type}</p>`;
+                        }
+                        if (loan.dfirm_id) {
+                            infoContent += `<p style="margin: 5px 0; font-size: 0.85em;"><strong>DFIRM ID:</strong> ${loan.dfirm_id}</p>`;
+                        }
+                        if (loan.base_flood_elevation) {
+                            infoContent += `<p style="margin: 5px 0; font-size: 0.85em;"><strong>Base Flood Elevation:</strong> ${loan.base_flood_elevation} ft</p>`;
+                        }
+                    } else {
+                        infoContent += `<hr style="margin: 10px 0; border-color: #ddd;">`;
+                        infoContent += `<p style="margin: 5px 0; color: #6b7280;"><strong>Flood Zone:</strong> Not analyzed</p>`;
+                    }
+                    
+                    infoContent += `</div>`;
+                    
                     const infoWindow = new google.maps.InfoWindow({
-                        content: `<div>
-                            <h6>Loan ${loan.loan_number}</h6>
-                            <div>${loan.property_address}</div>
-                            <div>${loan.city}, ${loan.state} ${loan.zip_code || ''}</div>
-                            <div>County: ${loan.county || ''}</div>
-                            <div>Risk: ${getRiskLevel(loan.disaster_risk_score)}</div>
-                        </div>`
+                        content: infoContent
                     });
                     marker.addListener('click', () => infoWindow.open(map, marker));
                     loanMarkers.push({ loanId: loan.id, marker });
@@ -2348,53 +2821,74 @@
 
         // Initialize AI Components
         async function initializeAIComponents() {
-            // Import voice commands module
             try {
-                const voiceCommands = await import('../shared/voice-commands.js');
-                window.parseVoiceCommand = voiceCommands.parseVoiceCommand;
-                window.executeVoiceCommand = voiceCommands.executeVoiceCommand;
+                // Import voice commands module
+                try {
+                    const voiceCommands = await import('../shared/voice-commands.js');
+                    window.parseVoiceCommand = voiceCommands.parseVoiceCommand;
+                    window.executeVoiceCommand = voiceCommands.executeVoiceCommand;
+                } catch (error) {
+                    console.warn('Failed to load voice commands:', error);
+                }
+                
+                // Get user ID (use logged in user or generate anonymous ID)
+                const userId = (typeof window.getLoggedInUser === 'function' && window.getLoggedInUser()) 
+                    ? window.getLoggedInUser().id || 'anonymous' 
+                    : 'anonymous';
+                
+                // Initialize AI Chat Widget - Disaster & Real Estate Expert
+                if (window.AIChatWidget) {
+                    aiChatWidget = new window.AIChatWidget({
+                        apiEndpoint: '/api/loan-pipeline/ai/chat-disaster-expert',
+                        userId: userId,
+                        sessionId: 'pipeline-disaster-expert',
+                        getContext: async () => {
+                            // Get current loans for context
+                            let loans = [];
+                            try {
+                                const loansResponse = await fetch('/api/loan-pipeline/loans');
+                                const loansData = await loansResponse.json();
+                                if (loansData.success && loansData.data.loans) {
+                                    loans = loansData.data.loans.slice(0, 20); // Include sample of loans
+                                }
+                            } catch (e) {
+                                console.warn('Could not load loans for AI context:', e);
+                            }
+                            
+                            return {
+                                filters: currentFilters,
+                                selectedDisaster: selectedDisasterObj,
+                                stats: getCurrentStats(),
+                                loans: loans
+                            };
+                        },
+                        onMessageSent: (message) => {
+                            console.log('Disaster Expert AI Chat message sent:', message);
+                        },
+                        onMessageReceived: (response, data) => {
+                            console.log('Disaster Expert AI Chat response received:', response);
+                        }
+                    });
+                    window.aiChatWidget = aiChatWidget;
+                    console.log('✅ AI Chat Widget initialized - Disaster & Real Estate Value Expert');
+                }
+                
+                // Initialize AI Insights Card
+                if (window.AIInsightsCard) {
+                    aiInsightsCard = new window.AIInsightsCard({
+                        apiEndpoint: '/api/loan-pipeline/ai/insights',
+                        userId: userId,
+                        containerId: 'aiInsightsContainer',
+                        autoGenerate: true,
+                        onInsightsGenerated: (insights, data) => {
+                            console.log('AI Insights generated:', insights);
+                        }
+                    });
+                    window.aiInsightsCard = aiInsightsCard;
+                }
             } catch (error) {
-                console.warn('Failed to load voice commands:', error);
-            }
-            
-            // Get user ID (use logged in user or generate anonymous ID)
-            const userId = (typeof window.getLoggedInUser === 'function' && window.getLoggedInUser()) 
-                ? window.getLoggedInUser().id || 'anonymous' 
-                : 'anonymous';
-            
-            // Initialize AI Chat Widget
-            if (window.AIChatWidget) {
-                aiChatWidget = new window.AIChatWidget({
-                    apiEndpoint: '/api/loan-pipeline/ai/chat',
-                    userId: userId,
-                    sessionId: 'loan-pipeline-dashboard',
-                    getContext: () => ({
-                        filters: currentFilters,
-                        selectedDisaster: selectedDisasterObj,
-                        stats: getCurrentStats()
-                    }),
-                    onMessageSent: (message) => {
-                        console.log('AI Chat message sent:', message);
-                    },
-                    onMessageReceived: (response, data) => {
-                        console.log('AI Chat response received:', response);
-                    }
-                });
-                window.aiChatWidget = aiChatWidget;
-            }
-            
-            // Initialize AI Insights Card
-            if (window.AIInsightsCard) {
-                aiInsightsCard = new window.AIInsightsCard({
-                    apiEndpoint: '/api/loan-pipeline/ai/insights',
-                    userId: userId,
-                    containerId: 'aiInsightsContainer',
-                    autoGenerate: true,
-                    onInsightsGenerated: (insights, data) => {
-                        console.log('AI Insights generated:', insights);
-                    }
-                });
-                window.aiInsightsCard = aiInsightsCard;
+                console.error('Error initializing AI components:', error);
+                throw error;
             }
         }
 

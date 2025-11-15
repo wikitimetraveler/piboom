@@ -644,6 +644,383 @@ export async function getFEMADisasters(req, res) {
   }
 }
 
+/**
+ * Get flood zones from FEMA NFHL (National Flood Hazard Layer)
+ * GET /api/loan-pipeline/flood-zones?state=TX&county=Harris&bbox=-95.5,29.5,-95.0,30.0
+ */
+export async function getFloodZones(req, res) {
+  try {
+    const { state, county, bbox } = req.query;
+    
+    // FEMA NFHL REST API endpoints to try (in order of preference)
+    // Updated endpoint URLs based on FEMA's current service structure
+    const endpoints = [
+      'https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer', // Updated endpoint (WORKING)
+      'https://hazards.fema.gov/gis/nfhl/rest/services/public/NFHL/MapServer'  // Original endpoint (deprecated, may return 404)
+    ];
+    
+    // If bbox provided, use it; otherwise try to get from state/county
+    let geometry = null;
+    if (bbox) {
+      const [minX, minY, maxX, maxY] = bbox.split(',').map(parseFloat);
+      
+      // Validate bounding box - FEMA API has limits on query size
+      // Limit to reasonable size (approximately 5 degrees = ~500km)
+      const maxSize = 5.0;
+      const width = Math.abs(maxX - minX);
+      const height = Math.abs(maxY - minY);
+      
+      if (width > maxSize || height > maxSize) {
+        return res.status(400).json({
+          success: false,
+          error: `Bounding box too large. Maximum size is ${maxSize} degrees (approximately 500km).`,
+          details: `Your bbox: width=${width.toFixed(2)}°, height=${height.toFixed(2)}°`,
+          suggestion: 'Please use a smaller bounding box or query multiple smaller areas.'
+        });
+      }
+      
+      // Validate coordinates are reasonable (US bounds approximately)
+      if (minX < -180 || maxX > 180 || minY < -90 || maxY > 90) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid bounding box coordinates',
+          details: 'Coordinates must be within valid range: longitude [-180, 180], latitude [-90, 90]'
+        });
+      }
+      
+      geometry = {
+        xmin: minX,
+        ymin: minY,
+        xmax: maxX,
+        ymax: maxY,
+        spatialReference: { wkid: 4326 }
+      };
+    } else if (state && county) {
+      // Try to geocode county to get bounding box
+      // For now, return a message suggesting bbox parameter
+      return res.status(400).json({
+        success: false,
+        error: 'Please provide bbox parameter (west,south,east,north) or use state and county with geocoding',
+        message: 'Example: ?state=TX&county=Harris&bbox=-95.5,29.5,-95.0,30.0'
+      });
+    }
+    
+    // Try each endpoint
+    for (let endpointIndex = 0; endpointIndex < endpoints.length; endpointIndex++) {
+      const baseUrl = endpoints[endpointIndex];
+      
+      // Use FEMA NFHL REST API to query flood zones
+      // Try Layer 28 (Flood Hazard Zones) first - this is the correct layer
+      let layerId = 28; // Default to Layer 28 (Flood Hazard Zones)
+      
+      // Try to get service info to verify layer exists
+      try {
+        const serviceInfoUrl = `${baseUrl}?f=json`;
+        const serviceResponse = await fetch(serviceInfoUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'piBoom-LoanPipeline/1.0'
+          }
+        });
+        
+        if (serviceResponse.ok) {
+          const serviceInfo = await serviceResponse.json();
+          
+          // Handle services directory response (list of services)
+          if (serviceInfo.services) {
+            // Find NFHL service in the directory
+            const nfhlService = serviceInfo.services?.find(s => 
+              s.name?.toLowerCase().includes('nfhl') || 
+              s.url?.toLowerCase().includes('nfhl')
+            );
+            if (nfhlService && nfhlService.url) {
+              // Update baseUrl to use the found service URL and continue
+              const foundBaseUrl = nfhlService.url;
+              // Try querying with the found service URL
+              const foundQueryUrl = `${foundBaseUrl}/${layerId}/query`;
+              const foundParams = new URLSearchParams({
+                f: 'geojson',
+                where: '1=1',
+                outFields: '*',
+                returnGeometry: 'true',
+                spatialRel: 'esriSpatialRelIntersects'
+              });
+              if (geometry) {
+                foundParams.append('geometry', JSON.stringify(geometry));
+                foundParams.append('geometryType', 'esriGeometryEnvelope');
+                foundParams.append('inSR', '4326');
+              }
+              const foundResponse = await fetch(`${foundQueryUrl}?${foundParams.toString()}`, {
+                headers: {
+                  'Accept': 'application/json',
+                  'User-Agent': 'piBoom-LoanPipeline/1.0'
+                }
+              });
+              if (foundResponse.ok) {
+                const foundData = await foundResponse.json();
+                return res.json({
+                  success: true,
+                  data: foundData,
+                  count: foundData.features?.length || 0
+                });
+              }
+            }
+          }
+          
+          // Find layer with flood zone data
+          const floodLayer = serviceInfo.layers?.find(l => 
+            l.id === 28 || // Flood Hazard Zones - PRIMARY
+            (l.name?.toLowerCase().includes('flood') && l.name?.toLowerCase().includes('zone')) ||
+            l.name?.toLowerCase().includes('flood_hazard_zone')
+          );
+          
+          if (floodLayer) {
+            layerId = floodLayer.id;
+            console.log(`🌊 Using FEMA NFHL layer ${layerId}: ${floodLayer.name} (endpoint ${endpointIndex + 1})`);
+          } else {
+            console.log(`🌊 Using default layer ${layerId} (Flood Hazard Zones) (endpoint ${endpointIndex + 1})`);
+          }
+        } else {
+          // If service info fails, try next endpoint
+          if (endpointIndex < endpoints.length - 1) {
+            console.warn(`⚠️  FEMA NFHL endpoint ${endpointIndex + 1} returned ${serviceResponse.status}, trying next...`);
+            continue;
+          }
+          // On last endpoint, try layer 28 directly anyway
+          console.log(`🌊 Service info unavailable, trying layer ${layerId} directly...`);
+        }
+      } catch (serviceError) {
+        // If service info fails, try next endpoint
+        if (endpointIndex < endpoints.length - 1) {
+          console.warn(`⚠️  FEMA NFHL endpoint ${endpointIndex + 1} error: ${serviceError.message}, trying next...`);
+          continue;
+        }
+        // On last endpoint, try layer 28 directly anyway
+        console.log(`🌊 Service info error, trying layer ${layerId} directly...`);
+      }
+      
+      // Query Layer 28 (Flood Hazard Zones) - use '*' to get all fields
+      const queryUrl = `${baseUrl}/${layerId}/query`;
+      
+      const params = new URLSearchParams({
+        f: 'geojson',
+        where: '1=1', // Get all features in the area
+        outFields: '*', // Get all fields to ensure we capture FLD_ZONE
+        returnGeometry: 'true',
+        spatialRel: 'esriSpatialRelIntersects'
+      });
+      
+      if (geometry) {
+        params.append('geometry', JSON.stringify(geometry));
+        params.append('geometryType', 'esriGeometryEnvelope');
+        params.append('inSR', '4326');
+      }
+      
+      console.log(`🌊 Querying FEMA NFHL flood zones: ${queryUrl}?${params.toString()}`);
+      
+      const response = await fetch(`${queryUrl}?${params.toString()}`, {
+        headers: {
+          'Accept': 'application/json',
+          'User-Agent': 'piBoom-LoanPipeline/1.0'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Check for error in response (some APIs return 200 with error object)
+        if (data.error) {
+          console.error(`❌ FEMA NFHL API error response:`, data.error);
+          if (endpointIndex < endpoints.length - 1) {
+            console.warn(`⚠️  Trying next endpoint...`);
+            continue;
+          }
+          throw new Error(`FEMA NFHL API error: ${JSON.stringify(data.error)}`);
+        }
+        
+        // Transform to GeoJSON format if needed
+        let geojson = data;
+        if (data.features) {
+          // Already GeoJSON
+          geojson = data;
+        } else if (data.geometries) {
+          // Transform from ArcGIS format
+          geojson = {
+            type: 'FeatureCollection',
+            features: data.geometries.map((geom, idx) => ({
+              type: 'Feature',
+              geometry: geom,
+              properties: data.attributes ? data.attributes[idx] : {}
+            }))
+          };
+        }
+        
+        // Add loan count for each flood zone if we have state/county
+        if (state && county) {
+          const pool = getPool();
+          if (pool) {
+            // Count loans in flood zones (simplified - would need point-in-polygon check)
+            const loanResult = await pool.query(`
+              SELECT COUNT(*) as count 
+              FROM loans 
+              WHERE state = $1 AND county = $2
+            `, [state, county]);
+            
+            geojson.properties = geojson.properties || {};
+            geojson.properties.loanCount = parseInt(loanResult.rows[0]?.count || 0);
+          }
+        }
+        
+        return res.json({
+          success: true,
+          data: geojson,
+          count: geojson.features?.length || 0
+        });
+      } else {
+        // Log the actual error response for debugging
+        let errorText = '';
+        try {
+          const errorData = await response.text();
+          errorText = errorData.substring(0, 200); // First 200 chars
+          console.error(`❌ FEMA NFHL API error ${response.status}: ${errorText}`);
+        } catch (e) {
+          console.error(`❌ FEMA NFHL API error ${response.status}: ${response.statusText}`);
+        }
+        
+        // If this endpoint fails, try next one
+        if (endpointIndex < endpoints.length - 1) {
+          console.warn(`⚠️  FEMA NFHL endpoint ${endpointIndex + 1} returned ${response.status}, trying next...`);
+          continue;
+        }
+        // If layer 28 fails, try layer 27 (Flood Hazard Boundaries) as fallback
+        if (layerId === 28) {
+          console.warn(`⚠️  Layer ${layerId} failed, trying layer 27 (Boundaries)...`);
+          const fallbackUrl = `${baseUrl}/27/query`;
+          const fallbackResponse = await fetch(`${fallbackUrl}?${params.toString()}`, {
+            headers: {
+              'Accept': 'application/json',
+              'User-Agent': 'piBoom-LoanPipeline/1.0'
+            }
+          });
+          if (fallbackResponse.ok) {
+            const fallbackData = await fallbackResponse.json();
+            return res.json({
+              success: true,
+              data: fallbackData,
+              count: fallbackData.features?.length || 0
+            });
+          }
+        }
+      }
+    }
+    
+    // All endpoints failed
+    throw new Error(`FEMA NFHL API error: All endpoints failed`);
+  } catch (error) {
+    console.error('❌ Error getting flood zones:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get flood zones',
+      details: error.message
+    });
+  }
+}
+
+/**
+ * Get loans grouped by flood zones (for unified disasters page)
+ * GET /api/loan-pipeline/flood-zones-loans?state=TX&county=Harris
+ */
+export async function getFloodZonesLoans(req, res) {
+  try {
+    const { state, county } = req.query;
+    const pool = getPool();
+    if (!pool) {
+      throw new Error('Database not initialized');
+    }
+    
+    let query = `
+      SELECT 
+        state,
+        county,
+        flood_zone,
+        COUNT(*) as loan_count,
+        COUNT(CASE WHEN flood_zone LIKE 'A%' OR flood_zone LIKE 'V%' THEN 1 END) as high_risk_count,
+        AVG(latitude) as avg_latitude,
+        AVG(longitude) as avg_longitude,
+        MAX(last_flood_zone_check) as last_flood_zone_check
+      FROM loans
+      WHERE flood_zone IS NOT NULL
+        AND latitude IS NOT NULL
+        AND longitude IS NOT NULL
+    `;
+    
+    const params = [];
+    let paramCount = 0;
+    
+    if (state) {
+      paramCount++;
+      query += ` AND state = $${paramCount}`;
+      params.push(state);
+    }
+    
+    if (county) {
+      paramCount++;
+      query += ` AND county ILIKE $${paramCount}`;
+      params.push(`%${county}%`);
+    }
+    
+    query += `
+      GROUP BY state, county, flood_zone
+      ORDER BY loan_count DESC, state, county
+    `;
+    
+    const result = await pool.query(query, params);
+    
+    res.json({
+      success: true,
+      data: result.rows,
+      count: result.rows.length
+    });
+  } catch (error) {
+    console.error('❌ Error getting flood zones loans:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get flood zones loans',
+      details: error.message
+    });
+  }
+}
+
+/**
+ * Update flood zones for all loans
+ * POST /api/loan-pipeline/update-flood-zones
+ */
+export async function updateFloodZones(req, res) {
+  try {
+    const { limit, forceUpdate } = req.body;
+    
+    console.log(`🔄 Starting flood zone update (limit: ${limit || 'all'}, force: ${forceUpdate || false})`);
+    
+    const results = await disasterRiskService.batchUpdateFloodZones(
+      limit || null,
+      forceUpdate || false
+    );
+    
+    res.json({
+      success: true,
+      message: `Updated flood zones for ${results.updated} loans`,
+      data: results
+    });
+  } catch (error) {
+    console.error('❌ Error updating flood zones:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update flood zones',
+      details: error.message
+    });
+  }
+}
+
 export default {
   generateTestLoans,
   getAllLoans,
@@ -657,5 +1034,8 @@ export default {
   getFEMADisasters,
   queryFEMADirect,
   geocodeLoans,
-  cleanupTestLoans
+  cleanupTestLoans,
+  getFloodZones,
+  updateFloodZones,
+  getFloodZonesLoans
 };

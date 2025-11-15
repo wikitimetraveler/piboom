@@ -6,7 +6,7 @@ import { Server } from 'socket.io';
 import { config } from './config/index.js';
 import buildRoutes from './routes/index.routes.js';
 import { initializeDatabase, createTables } from './services/database.service.js';
-import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
+import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,10 +15,40 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-// Initialize database if DATABASE_URL is provided
-initializeDatabase();
-await createTables();
-await initDisastersSchema();
+// Initialize database if DATABASE_URL is provided - REQUIRED
+let pool;
+try {
+  pool = initializeDatabase();
+  if (!pool) {
+    console.error('❌ Database connection failed - DATABASE_URL required');
+    console.error('   Application cannot start without database');
+    process.exit(1);
+  }
+} catch (err) {
+  console.error('❌ Database initialization failed:', err.message);
+  console.error('   Application cannot start without database');
+  process.exit(1);
+}
+
+// Create tables - REQUIRED for app to function
+try {
+  await createTables();
+  console.log('✅ Database tables ready');
+} catch (err) {
+  console.error('❌ Failed to create database tables:', err.message);
+  console.error('   Application cannot start without database');
+  process.exit(1);
+}
+
+// Initialize disasters schema - REQUIRED
+try {
+  await initDisastersSchema();
+  console.log('✅ Disasters schema ready');
+} catch (err) {
+  console.error('❌ Failed to initialize disasters schema:', err.message);
+  console.error('   Application cannot start without database');
+  process.exit(1);
+}
 
 // Add middleware for parsing JSON request bodies (increased limit for image uploads)
 app.use(express.json({ limit: '50mb' })); // Support base64 image uploads
@@ -47,6 +77,7 @@ setInterval(async () => {
     await ingestUsgsQuakes();
     await ingestNwsCap();
     await ingestNhc();
+    await ingestFema();
   } catch (e) {
     // non-fatal
   }
