@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Road Runner Weekly - Loading...</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --desert-sand: #f4e4bc;
+      --desert-tan: #d4a574;
+      --desert-orange: #e67e22;
+      --desert-brown: #8b4513;
+      --coyote-brown: #a0522d;
+      --road-runner-blue: #3498db;
+      --acme-red: #e74c3c;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f4e4bc 0%, #e8d5a3 50%, #d4a574 100%);
+      min-height: 100vh;
+      font-family: 'Comic Neue', 'Comic Sans MS', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Desert background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 20% 50%, rgba(212, 165, 116, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(230, 126, 34, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .loading-container {
+      text-align: center;
+      z-index: 1;
+      position: relative;
+    }
+
+    .title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 4rem;
+      color: var(--desert-brown);
+      text-shadow: 
+        3px 3px 0px var(--desert-tan),
+        6px 6px 0px rgba(139, 69, 19, 0.3);
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+      animation: bounce 2s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .subtitle {
+      font-size: 1.5rem;
+      color: var(--desert-orange);
+      margin-bottom: 3rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 0px rgba(255, 255, 255, 0.5);
+    }
+
+    .road-runner {
+      font-size: 8rem;
+      animation: run 1s steps(4) infinite;
+      display: inline-block;
+      margin-bottom: 2rem;
+      filter: drop-shadow(4px 4px 0px rgba(139, 69, 19, 0.3));
+    }
+
+    @keyframes run {
+      0% { transform: translateX(0) scaleX(1); }
+      25% { transform: translateX(10px) scaleX(1); }
+      50% { transform: translateX(20px) scaleX(-1); }
+      75% { transform: translateX(10px) scaleX(-1); }
+      100% { transform: translateX(0) scaleX(1); }
+    }
+
+    .coyote {
+      font-size: 6rem;
+      position: absolute;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: chase 2s ease-in-out infinite;
+      opacity: 0.7;
+    }
+
+    @keyframes chase {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-30px); }
+    }
+
+    .loading-text {
+      font-size: 1.2rem;
+      color: var(--desert-brown);
+      font-weight: 700;
+      margin-top: 2rem;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .dots {
+      display: inline-block;
+      margin-left: 0.5rem;
+    }
+
+    .dots span {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--acme-red);
+      margin: 0 3px;
+      animation: dotBounce 1.4s ease-in-out infinite;
+    }
+
+    .dots span:nth-child(1) { animation-delay: 0s; }
+    .dots span:nth-child(2) { animation-delay: 0.2s; }
+    .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes dotBounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-15px); }
+    }
+
+    .acme-box {
+      position: absolute;
+      top: 10%;
+      right: 10%;
+      width: 100px;
+      height: 100px;
+      background: var(--acme-red);
+      border: 4px solid var(--desert-brown);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.5rem;
+      color: white;
+      animation: shake 0.5s ease-in-out infinite;
+      box-shadow: 4px 4px 0px rgba(139, 69, 19, 0.3);
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
+    }
+
+    .clouds {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .cloud {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50px;
+      opacity: 0.4;
+    }
+
+    .cloud:before,
+    .cloud:after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 50px;
+    }
+
+    .cloud1 {
+      width: 100px;
+      height: 40px;
+      top: 20%;
+      left: 10%;
+      animation: drift 20s linear infinite;
+    }
+
+    .cloud1:before {
+      width: 50px;
+      height: 50px;
+      top: -25px;
+      left: 10px;
+    }
+
+    .cloud1:after {
+      width: 60px;
+      height: 40px;
+      top: -15px;
+      right: 10px;
+    }
+
+    .cloud2 {
+      width: 120px;
+      height: 50px;
+      top: 60%;
+      right: 15%;
+      animation: drift 25s linear infinite reverse;
+    }
+
+    .cloud2:before {
+      width: 60px;
+      height: 60px;
+      top: -30px;
+      left: 15px;
+    }
+
+    .cloud2:after {
+      width: 70px;
+      height: 50px;
+      top: -20px;
+      right: 15px;
+    }
+
+    @keyframes drift {
+      from { transform: translateX(-100px); }
+      to { transform: translateX(calc(100vw + 100px)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="clouds">
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+  </div>
+
+  <div class="acme-box">ACME</div>
+
+  <div class="loading-container">
+    <h1 class="title">ROAD RUNNER WEEKLY</h1>
+    <p class="subtitle">Disaster Watch</p>
+    <div class="road-runner">🐦</div>
+    <div class="coyote">🐺</div>
+    <p class="loading-text">
+      Loading disasters<span class="dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </p>
+  </div>
+
+  <script>
+    // Auto-redirect after 3 seconds (or remove this if you want manual navigation)
+    // setTimeout(() => {
+    //   window.location.href = 'disasters-unified.html';
+    // }, 3000);
+  </script>
+</body>
+</html>
+

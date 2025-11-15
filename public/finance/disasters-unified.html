@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
     <style>
       :root {
         --wildfire: linear-gradient(135deg, #ff6b35, #f7931e);
@@ -15,12 +16,184 @@
         --flood: linear-gradient(135deg, #29b6f6, #0277bd);
         --severe: linear-gradient(135deg, #ef5350, #c62828);
         --default-gradient: linear-gradient(135deg, #667eea, #764ba2);
+        --desert-sand: #f4e4bc;
+        --desert-tan: #d4a574;
+        --desert-orange: #e67e22;
+        --desert-brown: #8b4513;
+        --coyote-brown: #a0522d;
+        --road-runner-blue: #3498db;
+        --acme-red: #e74c3c;
       }
 
       body { 
         background: #f5f7fa;
         min-height: 100vh;
         font-family: 'Inter', 'Segoe UI', sans-serif;
+        position: relative;
+      }
+
+      /* Disaster Loading Overlay - Modern & Cool */
+      #roadRunnerLoading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+
+      #roadRunnerLoading.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      .loading-container {
+        text-align: center;
+        color: #60a5fa;
+        position: relative;
+      }
+
+      .disaster-icon {
+        font-size: 8rem;
+        animation: disasterPulse 1.5s ease-in-out infinite;
+        text-shadow: 0 0 30px rgba(96, 165, 250, 0.6), 0 0 60px rgba(96, 165, 250, 0.3);
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 0 20px rgba(96, 165, 250, 0.5));
+      }
+
+      @keyframes disasterPulse {
+        0%, 100% {
+          transform: scale(1) rotate(0deg);
+          opacity: 1;
+        }
+        25% {
+          transform: scale(1.1) rotate(-5deg);
+          opacity: 0.9;
+        }
+        50% {
+          transform: scale(1.2) rotate(0deg);
+          opacity: 0.8;
+        }
+        75% {
+          transform: scale(1.1) rotate(5deg);
+          opacity: 0.9;
+        }
+      }
+
+      .loading-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #60a5fa;
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(96, 165, 250, 0.5);
+        margin-bottom: 0.5rem;
+        font-family: 'Inter', sans-serif;
+        letter-spacing: 2px;
+      }
+
+      .loading-subtitle {
+        font-size: 1.2rem;
+        color: #93c5fd;
+        margin-bottom: 2rem;
+        font-style: italic;
+        text-shadow: 0 0 10px rgba(147, 197, 253, 0.5);
+      }
+
+      .data-stream {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+        flex-wrap: wrap;
+      }
+
+      .data-icon {
+        font-size: 2.5rem;
+        animation: dataFlow 2s ease-in-out infinite;
+        animation-delay: calc(var(--delay) * 0.3s);
+        filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.6));
+      }
+
+      @keyframes dataFlow {
+        0%, 100% {
+          transform: translateY(0) scale(1);
+          opacity: 0.7;
+        }
+        50% {
+          transform: translateY(-20px) scale(1.2);
+          opacity: 1;
+        }
+      }
+
+      .loading-progress-disaster {
+        width: 400px;
+        height: 10px;
+        background: rgba(96, 165, 250, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 2rem;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      .loading-progress-bar-disaster {
+        height: 100%;
+        background: linear-gradient(90deg, #60a5fa, #3b82f6, #2563eb, #3b82f6, #60a5fa);
+        background-size: 200% 100%;
+        border-radius: 10px;
+        transition: width 0.3s ease;
+        animation: progressShimmer 2s linear infinite;
+        box-shadow: 0 0 20px rgba(96, 165, 250, 0.6);
+        width: 0%;
+      }
+
+      @keyframes progressShimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      .loading-text {
+        color: #cbd5e1;
+        font-size: 1rem;
+        margin-top: 1rem;
+        font-weight: 500;
+        text-shadow: 0 0 10px rgba(203, 213, 225, 0.5);
+      }
+
+      .circuit-container {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .circuit-node {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #60a5fa;
+        box-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
+        animation: circuitPulse 1.5s ease-in-out infinite;
+        animation-delay: calc(var(--delay) * 0.2s);
+      }
+
+      @keyframes circuitPulse {
+        0%, 100% {
+          transform: scale(1);
+          opacity: 0.5;
+        }
+        50% {
+          transform: scale(1.5);
+          opacity: 1;
+        }
       }
 
       .container-xxl { 
@@ -345,6 +518,40 @@
     </style>
   </head>
   <body>
+    <!-- Disaster Loading Overlay -->
+    <div id="roadRunnerLoading">
+      <div class="loading-container">
+        <div class="disaster-icon">🌍</div>
+        <div class="loading-title">Disaster Watch</div>
+        <div class="loading-subtitle">Loading disaster data from multiple sources...</div>
+        
+        <div class="data-stream">
+          <div class="data-icon" style="--delay: 0">🔥</div>
+          <div class="data-icon" style="--delay: 1">🌊</div>
+          <div class="data-icon" style="--delay: 2">🌍</div>
+          <div class="data-icon" style="--delay: 3">🌀</div>
+          <div class="data-icon" style="--delay: 4">⚡</div>
+        </div>
+
+        <div class="loading-progress-disaster">
+          <div class="loading-progress-bar-disaster" id="loadingProgressBarDisaster"></div>
+        </div>
+
+        <div class="loading-text" id="loadingStatusDisaster">Initializing disaster monitoring...</div>
+
+        <div class="circuit-container">
+          <div class="circuit-node" style="--delay: 0"></div>
+          <div class="circuit-node" style="--delay: 1"></div>
+          <div class="circuit-node" style="--delay: 2"></div>
+          <div class="circuit-node" style="--delay: 3"></div>
+          <div class="circuit-node" style="--delay: 4"></div>
+          <div class="circuit-node" style="--delay: 5"></div>
+          <div class="circuit-node" style="--delay: 6"></div>
+          <div class="circuit-node" style="--delay: 7"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="container-xxl py-4">
       <div class="page-header">
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -572,7 +779,36 @@
       let aiChatWidget = null;
       let aiInsightsCard = null;
 
+      // Show/hide loading overlay
+      function showLoading() {
+        $('#roadRunnerLoading').removeClass('hidden');
+        updateLoadingStatusDisaster('Initializing disaster monitoring...', 0);
+      }
+
+      function hideLoading() {
+        setTimeout(() => {
+          $('#roadRunnerLoading').addClass('hidden');
+        }, 500);
+      }
+
+      // Update loading status and progress
+      function updateLoadingStatusDisaster(message, progress = null) {
+        const statusEl = document.getElementById('loadingStatusDisaster');
+        const progressBar = document.getElementById('loadingProgressBarDisaster');
+        
+        if (statusEl) {
+          statusEl.textContent = message;
+        }
+        
+        if (progressBar && progress !== null) {
+          progressBar.style.width = `${progress}%`;
+        }
+      }
+
       $(function init() {
+        // Show loading initially
+        showLoading();
+        
         // Initialize AI components
         initializeAIComponents();
         // Initialize voice recognition
@@ -762,6 +998,9 @@
       });
 
       async function loadDisasters() {
+        showLoading();
+        updateLoadingStatusDisaster('Loading disaster data from multiple sources...', 10);
+        
         const state = $('#stateInput').val().trim();
         const county = $('#countyInput').val().trim();
         const sources = $('#sourceInput').val() || [];
@@ -772,6 +1011,7 @@
         // Load FEMA data if FEMA is selected (even with other sources)
         if (sources.includes('fema')) {
           try {
+            updateLoadingStatusDisaster('Loading FEMA disaster declarations...', 20);
             console.log('📊 Loading FEMA data using pipeline query logic...');
             const qp = new URLSearchParams();
             if (state) qp.set('state', state);
@@ -816,12 +1056,16 @@
         // Check if floodzones is selected - load flood zone data
         if (sources.includes('floodzones')) {
           try {
+            updateLoadingStatusDisaster('Loading flood zone data...', 40);
             const floodZoneRows = await loadFloodZones(state, county);
             if (floodZoneRows.length > 0) {
               // If only floodzones selected, render just flood zones
               if (sources.length === 1) {
+                updateLoadingStatusDisaster('Rendering flood zone data...', 90);
                 renderTable(floodZoneRows);
                 renderMap(floodZoneRows);
+                updateLoadingStatusDisaster('Complete!', 100);
+                hideLoading();
                 return;
               }
               // Otherwise, combine with other sources
@@ -835,6 +1079,7 @@
         // Load CA Fire Cameras if selected
         if (sources.includes('alertcalifornia')) {
           try {
+            updateLoadingStatusDisaster('Loading fire camera feeds...', 50);
             const cameraQp = new URLSearchParams();
             if (state) cameraQp.set('state', state);
             if (county) cameraQp.set('county', county);
@@ -857,28 +1102,33 @@
         // Load other disaster sources from database (if FEMA is not the only source)
         const otherSources = sources.filter(s => s !== 'fema' && s !== 'floodzones' && s !== 'alertcalifornia');
         if (otherSources.length > 0 || sources.length === 0) {
-          // Regular database query for all other sources
-          const qp = new URLSearchParams();
-          if (state) qp.set('state', state);
-          if (county) qp.set('county', county);
-          // Note: API only supports single source/event filter
-          // If multiple sources selected, don't filter (show all) - otherwise filter by first selected
-          if (otherSources.length === 1) qp.set('source', otherSources[0]);
-          if (events.length === 1) qp.set('event', events[0]);
-          qp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
-          const url = `/api/disasters?${qp.toString()}`;
-          console.log('📊 Loading disasters from database:', url);
-          const resp = await fetch(url);
-          const json = await resp.json();
-          console.log('📊 API Response:', { 
-            success: json.success, 
-            count: json.data?.count, 
-            disasters: json.data?.disasters?.length || 0,
-            sample: json.data?.disasters?.slice(0, 3)
-          });
-          const dbRows = json.success ? json.data.disasters : [];
-          console.log('📊 Rows from database:', dbRows.length);
-          allRows = allRows.concat(dbRows);
+          try {
+            updateLoadingStatusDisaster('Loading disaster data from database...', 60);
+            // Regular database query for all other sources
+            const qp = new URLSearchParams();
+            if (state) qp.set('state', state);
+            if (county) qp.set('county', county);
+            // Note: API only supports single source/event filter
+            // If multiple sources selected, don't filter (show all) - otherwise filter by first selected
+            if (otherSources.length === 1) qp.set('source', otherSources[0]);
+            if (events.length === 1) qp.set('event', events[0]);
+            qp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
+            const url = `/api/disasters?${qp.toString()}`;
+            console.log('📊 Loading disasters from database:', url);
+            const resp = await fetch(url);
+            const json = await resp.json();
+            console.log('📊 API Response:', { 
+              success: json.success, 
+              count: json.data?.count, 
+              disasters: json.data?.disasters?.length || 0,
+              sample: json.data?.disasters?.slice(0, 3)
+            });
+            const dbRows = json.success ? json.data.disasters : [];
+            console.log('📊 Rows from database:', dbRows.length);
+            allRows = allRows.concat(dbRows);
+          } catch (e) {
+            console.error('❌ Error loading database disasters:', e);
+          }
         }
         
         if (allRows.length === 0) {
@@ -886,9 +1136,15 @@
           console.warn('   - Database connection');
           console.warn('   - Date filter (90 days)');
           console.warn('   - Source/event filters');
+          updateLoadingStatusDisaster('No disasters found. Check filters.', 100);
+        } else {
+          updateLoadingStatusDisaster('Rendering disaster data...', 80);
+          renderTable(allRows);
+          renderMap(allRows);
+          updateLoadingStatusDisaster('Complete!', 100);
         }
-        renderTable(allRows);
-        renderMap(allRows);
+        
+        hideLoading();
       }
       
       // Calculate risk score for a disaster based on all data sources
@@ -1003,6 +1259,7 @@
       }
 
       async function refreshDisasters() {
+        showLoading();
         const qp = new URLSearchParams();
         const state = $('#stateInput').val().trim();
         const county = $('#countyInput').val().trim();
