@@ -1,3 +1,5 @@
+
+
 /**
  * Disaster Risk Service
  * 
@@ -35,6 +37,7 @@
  * - Geographic region queries
  * 
  * KML Generation:
+ * 
  * - Google Earth compatible format
  * - Coordinate plotting
  * - Disaster event markers
@@ -73,6 +76,11 @@ import { calculateDistance } from './disasters.service.js';
  * @returns {Promise<Object>} Object with latitude, longitude, and validation info
  */
 async function geocodeAddressValidated(address, expectedState = null, expectedCounty = null) {
+  // AUTOMATIC GEOCODING DISABLED - Returns immediately without API calls
+  console.warn('🚫 Automatic geocoding disabled - skipping geocoding for:', address);
+  return { latitude: null, longitude: null, validated: false };
+  
+  /* DISABLED - Original geocoding code
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');
@@ -172,6 +180,7 @@ async function geocodeAddressValidated(address, expectedState = null, expectedCo
     console.error(`❌ Geocoding error for ${address}:`, error.message);
     return { latitude: null, longitude: null, validated: false };
   }
+  */
 }
 
 /**
@@ -180,6 +189,11 @@ async function geocodeAddressValidated(address, expectedState = null, expectedCo
  * @returns {Promise<Object>} Object with latitude and longitude
  */
 async function geocodeAddress(address) {
+  // AUTOMATIC GEOCODING DISABLED - Returns immediately without API calls
+  console.warn('🚫 Automatic geocoding disabled - skipping geocoding for:', address);
+  return { latitude: null, longitude: null };
+  
+  /* DISABLED - Original geocoding code
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');
@@ -206,6 +220,7 @@ async function geocodeAddress(address) {
     console.error(`❌ Geocoding error for ${address}:`, error.message);
     return { latitude: null, longitude: null };
   }
+  */
 }
 
 /**
@@ -226,6 +241,11 @@ async function geocodeCountyState(county, state) {
  * @returns {Promise<{county: string|null, state: string|null}>}
  */
 export async function reverseGeocodeCountyState(lat, lng) {
+  // AUTOMATIC GEOCODING DISABLED - Returns immediately without API calls
+  console.warn('🚫 Automatic reverse geocoding disabled - skipping for:', lat, lng);
+  return { county: null, state: null };
+  
+  /* DISABLED - Original reverse geocoding code
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey || !lat || !lng) return { county: null, state: null };
   try {
@@ -244,6 +264,7 @@ export async function reverseGeocodeCountyState(lat, lng) {
     console.warn('⚠️  reverseGeocodeCountyState error:', e.message);
   }
   return { county: null, state: null };
+  */
 }
 
 function normalizeCountyName(raw) {
@@ -275,27 +296,23 @@ export async function analyzeLoanRisk(loan) {
   try {
     console.log(`🔍 Analyzing risk for loan ${loan.loan_number} in ${loan.city}, ${loan.state}`);
 
-    // Ensure loan has coordinates (geocode if missing)
-    if (!loan.latitude || !loan.longitude) {
-      console.log(`🌍 Geocoding loan ${loan.loan_number}...`);
-      const fullAddress = `${loan.property_address}, ${loan.city}, ${loan.state} ${loan.zip_code || ''}`;
-      
-      // Use improved geocoding with validation
-      const coords = await geocodeAddressValidated(fullAddress, loan.state, loan.county);
-      
-      if (coords.latitude && coords.longitude) {
-        // Update loan coordinates
-        const pool = getPool();
-        if (pool) {
-          await pool.query(
-            'UPDATE loans SET latitude = $1, longitude = $2 WHERE id = $3',
-            [coords.latitude, coords.longitude, loan.id]
-          );
-          loan.latitude = coords.latitude;
-          loan.longitude = coords.longitude;
-        }
-      }
-    }
+    // 🚫🚫🚫 AUTOMATIC GEOCODING DISABLED - No geocoding of loans 🚫🚫🚫
+    // if (!loan.latitude || !loan.longitude) {
+    //   console.log(`🌍 Geocoding loan ${loan.loan_number}...`);
+    //   const fullAddress = `${loan.property_address}, ${loan.city}, ${loan.state} ${loan.zip_code || ''}`;
+    //   const coords = await geocodeAddressValidated(fullAddress, loan.state, loan.county);
+    //   if (coords.latitude && coords.longitude) {
+    //     const pool = getPool();
+    //     if (pool) {
+    //       await pool.query(
+    //         'UPDATE loans SET latitude = $1, longitude = $2 WHERE id = $3',
+    //         [coords.latitude, coords.longitude, loan.id]
+    //       );
+    //       loan.latitude = coords.latitude;
+    //       loan.longitude = coords.longitude;
+    //     }
+    //   }
+    // }
 
     // Query FEMA API for disaster declarations (last year only, with geocoding)
     const femaData = await queryFEMAApi(loan.state, loan.county);
@@ -482,7 +499,7 @@ async function queryFEMAApi(state, county) {
       return false;
     });
     
-    // Geocode disasters that don't have coordinates
+    // 🚫🚫🚫 AUTOMATIC GEOCODING DISABLED - No geocoding of disasters 🚫🚫🚫
     const geocodedDisasters = await Promise.all(disasters.map(async disaster => {
       let latitude = null;
       let longitude = null;
@@ -493,14 +510,13 @@ async function queryFEMAApi(state, county) {
       );
       let stateFromApi = disaster.state || state || '';
 
-      // Try to geocode if we have county and state
-      if (stateFromApi && countyFromApi) {
-        const coords = await geocodeCountyState(countyFromApi, stateFromApi);
-        latitude = coords.latitude;
-        longitude = coords.longitude;
-        // Rate limit geocoding requests
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
+      // 🚫 GEOCODING DISABLED - No API calls
+      // if (stateFromApi && countyFromApi) {
+      //   const coords = await geocodeCountyState(countyFromApi, stateFromApi);
+      //   latitude = coords.latitude;
+      //   longitude = coords.longitude;
+      //   await new Promise(resolve => setTimeout(resolve, 100));
+      // }
 
       return {
         disasterNumber: disaster.disasterNumber,
@@ -520,17 +536,16 @@ async function queryFEMAApi(state, county) {
       };
     }));
 
-    // Second-pass enhancement: reverse-geocode any items still missing county/state but with coordinates
-    for (let i = 0; i < geocodedDisasters.length; i++) {
-      const d = geocodedDisasters[i];
-      if ((!d.county || !d.state) && d.latitude && d.longitude) {
-        const cg = await reverseGeocodeCountyState(d.latitude, d.longitude);
-        if (cg.county && !d.county) d.county = cg.county;
-        if (cg.state && !d.state) d.state = cg.state;
-        // be gentle with rate limits
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-    }
+    // 🚫🚫🚫 REVERSE GEOCODING DISABLED - No reverse geocoding of disasters 🚫🚫🚫
+    // for (let i = 0; i < geocodedDisasters.length; i++) {
+    //   const d = geocodedDisasters[i];
+    //   if ((!d.county || !d.state) && d.latitude && d.longitude) {
+    //     const cg = await reverseGeocodeCountyState(d.latitude, d.longitude);
+    //     if (cg.county && !d.county) d.county = cg.county;
+    //     if (cg.state && !d.state) d.state = cg.state;
+    //     await new Promise(resolve => setTimeout(resolve, 100));
+    //   }
+    // }
     
     return {
       disasterCount: geocodedDisasters.length,

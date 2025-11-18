@@ -434,7 +434,11 @@ export async function queryFEMADirect(req, res) {
     console.log(`📊 FEMA API returned ${disasterDeclResults.metadata?.count || 0} total records`);
 
     // Import geocoding function
+    // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
     const geocodeCountyState = async (county, state) => {
+      console.warn('🚫 GEOCODING DISABLED - No API calls will be made for:', county, state);
+      return { latitude: null, longitude: null };
+      /* DISABLED TO PREVENT API CHARGES
       const apiKey = process.env.GOOGLE_API_KEY;
       if (!apiKey) return { latitude: null, longitude: null };
       
@@ -452,6 +456,7 @@ export async function queryFEMADirect(req, res) {
         console.error('Geocoding error:', error);
       }
       return { latitude: null, longitude: null };
+      */
     };
 
     if (disasterDeclResults.metadata && disasterDeclResults.metadata.count > 0) {

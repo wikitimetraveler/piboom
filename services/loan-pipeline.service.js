@@ -63,6 +63,11 @@ import { getPool } from './database.service.js';
  * @returns {Promise<Object>} Object with latitude, longitude, and validation info
  */
 async function geocodeAddress(address, expectedState = null, expectedCounty = null) {
+  // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
+  console.warn('🚫 GEOCODING DISABLED - No API calls will be made for:', address);
+  return { latitude: null, longitude: null, validated: false };
+  
+  /* DISABLED TO PREVENT API CHARGES
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');
@@ -192,6 +197,7 @@ async function geocodeAddress(address, expectedState = null, expectedCounty = nu
     console.error(`❌ Geocoding error for ${address}:`, error.message);
     return { latitude: null, longitude: null, validated: false };
   }
+  */
 }
 
 /**

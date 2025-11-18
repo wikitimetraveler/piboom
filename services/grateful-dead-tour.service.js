@@ -110,6 +110,11 @@ export async function fetchTourDataFromAPI() {
  * Geocode venue to get coordinates
  */
 export async function geocodeVenue(venue, city, state, country) {
+  // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
+  console.warn('🚫 GEOCODING DISABLED - No API calls will be made for venue:', venue);
+  return { latitude: null, longitude: null };
+  
+  /* DISABLED TO PREVENT API CHARGES
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');
@@ -137,6 +142,7 @@ export async function geocodeVenue(venue, city, state, country) {
     console.error(`❌ Geocoding error for ${venue}:`, error.message);
     return { latitude: null, longitude: null };
   }
+  */
 }
 
 /**

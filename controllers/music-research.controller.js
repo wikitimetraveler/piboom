@@ -1291,6 +1291,11 @@ async function getArtistInfoFromWikipedia(artist) {
 
 // Geocode a location using Google Maps API with context-aware fallback strategies
 async function geocodeLocation(placeName, apiKey, bandContext = null) {
+  // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
+  console.warn('🚫 GEOCODING DISABLED - No API calls will be made for location:', placeName);
+  return null;
+  
+  /* DISABLED TO PREVENT API CHARGES
   try {
     // Try original place name first
     let result = await tryGeocode(placeName, apiKey);
@@ -1375,6 +1380,7 @@ async function geocodeLocation(placeName, apiKey, bandContext = null) {
     console.error('Geocoding error for', placeName, ':', error);
     return null;
   }
+  */
 }
 
 // Detect country from band context (formation place)
@@ -1425,6 +1431,11 @@ function detectCountryFromContext(context) {
 
 // Helper function to attempt geocoding
 async function tryGeocode(address, apiKey) {
+  // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
+  console.warn('🚫 GEOCODING DISABLED - No API calls will be made for:', address);
+  return null;
+  
+  /* DISABLED TO PREVENT API CHARGES
   try {
     const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
     
@@ -1444,6 +1455,7 @@ async function tryGeocode(address, apiKey) {
   } catch (error) {
     return null;
   }
+  */
 }
 
 // Get Google API key
