@@ -9,6 +9,7 @@
     "pi": "MODE=pi node server.js",
     "ts:dev": "tsx server.ts",
     "ts:watch": "tsx watch server.ts",
+    "build:ice-knowledge": "node scripts/build-ice-knowledge.js",
     "build": "echo 'Setting up cloud deployment...' && echo 'MODE=cloud' > .env.production || echo 'Cloud deployment build complete'",
     "install-pi-deps": "sudo apt update && sudo apt install -y sox alsa-utils espeak-ng mpg123",
     "docker:build": "docker build -t pi-boom .",

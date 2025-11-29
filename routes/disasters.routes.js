@@ -9,6 +9,12 @@ router.get('/', disastersController.listDisasters);
 // Manual refresh (async)
 router.post('/refresh', disastersController.refreshDisasters);
 
+// Manual camera feed refresh (for review purposes)
+router.post('/refresh-cameras', disastersController.refreshCameras);
+
+// List camera records (for review)
+router.get('/cameras', disastersController.listCameras);
+
 // Stats
 router.get('/stats', disastersController.statsDisasters);
 

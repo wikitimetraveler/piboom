@@ -161,6 +161,7 @@ docker-compose up
 - **Context Awareness**: Understands current filters, selected disasters, portfolio composition
 - **Data Integration**: Direct access to loan pipeline and disaster data
 - **Operational Insights**: Process improvement and efficiency recommendations
+- **ICE Knowledge Base**: Keep `docs/ICE_KNOWLEDGE_SOURCES.md` synced and run `npm run build:ice-knowledge` to refresh Encompass references
 
 ## 🎤 Voice Commands (Raspberry Pi)
 

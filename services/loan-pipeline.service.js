@@ -54,6 +54,7 @@
  */
 
 import { getPool } from './database.service.js';
+import { geocodeAddressWithCache } from './geocoding-cache.service.js';
 
 /**
  * Geocode an address using Google Maps API with validation
@@ -63,11 +64,24 @@ import { getPool } from './database.service.js';
  * @returns {Promise<Object>} Object with latitude, longitude, and validation info
  */
 async function geocodeAddress(address, expectedState = null, expectedCounty = null) {
-  // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
-  console.warn('🚫 GEOCODING DISABLED - No API calls will be made for:', address);
-  return { latitude: null, longitude: null, validated: false };
+  // Using cache first, then FREE OpenStreetMap Nominatim API - minimal API calls!
+  try {
+    // Extract city from address for cache lookup
+    const cityMatch = address.match(/,?\s*([^,]+),\s*([A-Z]{2})/i);
+    const city = cityMatch ? cityMatch[1].trim() : null;
+    
+    const result = await geocodeAddressWithCache(address, expectedState, expectedCounty, city);
+    return {
+      latitude: result.latitude,
+      longitude: result.longitude,
+      validated: result.validated
+    };
+  } catch (error) {
+    console.error(`❌ Free geocoding error for ${address}:`, error.message);
+    return { latitude: null, longitude: null, validated: false };
+  }
   
-  /* DISABLED TO PREVENT API CHARGES
+  /* DISABLED - Original Google geocoding code (now using free service)
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');

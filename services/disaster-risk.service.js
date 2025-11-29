@@ -67,6 +67,8 @@
 import { getPool } from './database.service.js';
 import { getAllLoans, updateLoanRiskScore } from './loan-pipeline.service.js';
 import { calculateDistance } from './disasters.service.js';
+import { geocodeAddressFree, reverseGeocodeFree, geocodeCountyStateFree } from './free-geocoding.service.js';
+import { geocodeAddressWithCache, geocodeCountyStateWithCache, reverseGeocodeWithCache } from './geocoding-cache.service.js';
 
 /**
  * Geocode an address using Google Maps API with validation
@@ -76,11 +78,24 @@ import { calculateDistance } from './disasters.service.js';
  * @returns {Promise<Object>} Object with latitude, longitude, and validation info
  */
 async function geocodeAddressValidated(address, expectedState = null, expectedCounty = null) {
-  // AUTOMATIC GEOCODING DISABLED - Returns immediately without API calls
-  console.warn('🚫 Automatic geocoding disabled - skipping geocoding for:', address);
-  return { latitude: null, longitude: null, validated: false };
+  // Using cache first, then FREE OpenStreetMap Nominatim API - minimal API calls!
+  try {
+    // Extract city from address for cache lookup
+    const cityMatch = address.match(/,?\s*([^,]+),\s*([A-Z]{2})/i);
+    const city = cityMatch ? cityMatch[1].trim() : null;
+    
+    const result = await geocodeAddressWithCache(address, expectedState, expectedCounty, city);
+    return {
+      latitude: result.latitude,
+      longitude: result.longitude,
+      validated: result.validated
+    };
+  } catch (error) {
+    console.error(`❌ Free geocoding error for ${address}:`, error.message);
+    return { latitude: null, longitude: null, validated: false };
+  }
   
-  /* DISABLED - Original geocoding code
+  /* DISABLED - Original Google geocoding code (now using free service)
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');
@@ -189,11 +204,19 @@ async function geocodeAddressValidated(address, expectedState = null, expectedCo
  * @returns {Promise<Object>} Object with latitude and longitude
  */
 async function geocodeAddress(address) {
-  // AUTOMATIC GEOCODING DISABLED - Returns immediately without API calls
-  console.warn('🚫 Automatic geocoding disabled - skipping geocoding for:', address);
-  return { latitude: null, longitude: null };
+  // Using FREE OpenStreetMap Nominatim API - no charges!
+  try {
+    const result = await geocodeAddressFree(address);
+    return {
+      latitude: result.latitude,
+      longitude: result.longitude
+    };
+  } catch (error) {
+    console.error(`❌ Free geocoding error for ${address}:`, error.message);
+    return { latitude: null, longitude: null };
+  }
   
-  /* DISABLED - Original geocoding code
+  /* DISABLED - Original Google geocoding code (now using free service)
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');
@@ -230,8 +253,8 @@ async function geocodeAddress(address) {
  * @returns {Promise<Object>} Object with latitude and longitude
  */
 async function geocodeCountyState(county, state) {
-  const address = `${county}, ${state}`;
-  return geocodeAddress(address);
+  // Using cache first, then FREE OpenStreetMap Nominatim API - minimal API calls!
+  return await geocodeCountyStateWithCache(county, state);
 }
 
 /**
@@ -241,11 +264,19 @@ async function geocodeCountyState(county, state) {
  * @returns {Promise<{county: string|null, state: string|null}>}
  */
 export async function reverseGeocodeCountyState(lat, lng) {
-  // AUTOMATIC GEOCODING DISABLED - Returns immediately without API calls
-  console.warn('🚫 Automatic reverse geocoding disabled - skipping for:', lat, lng);
-  return { county: null, state: null };
+  // Using cache first, then FREE OpenStreetMap Nominatim API - minimal API calls!
+  try {
+    const result = await reverseGeocodeWithCache(lat, lng);
+    return {
+      county: result.county,
+      state: result.state
+    };
+  } catch (error) {
+    console.warn('⚠️  Free reverse geocoding error:', error.message);
+    return { county: null, state: null };
+  }
   
-  /* DISABLED - Original reverse geocoding code
+  /* DISABLED - Original Google reverse geocoding code (now using free service)
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey || !lat || !lng) return { county: null, state: null };
   try {
@@ -296,23 +327,23 @@ export async function analyzeLoanRisk(loan) {
   try {
     console.log(`🔍 Analyzing risk for loan ${loan.loan_number} in ${loan.city}, ${loan.state}`);
 
-    // 🚫🚫🚫 AUTOMATIC GEOCODING DISABLED - No geocoding of loans 🚫🚫🚫
-    // if (!loan.latitude || !loan.longitude) {
-    //   console.log(`🌍 Geocoding loan ${loan.loan_number}...`);
-    //   const fullAddress = `${loan.property_address}, ${loan.city}, ${loan.state} ${loan.zip_code || ''}`;
-    //   const coords = await geocodeAddressValidated(fullAddress, loan.state, loan.county);
-    //   if (coords.latitude && coords.longitude) {
-    //     const pool = getPool();
-    //     if (pool) {
-    //       await pool.query(
-    //         'UPDATE loans SET latitude = $1, longitude = $2 WHERE id = $3',
-    //         [coords.latitude, coords.longitude, loan.id]
-    //       );
-    //       loan.latitude = coords.latitude;
-    //       loan.longitude = coords.longitude;
-    //     }
-    //   }
-    // }
+    // Using FREE geocoding - OpenStreetMap Nominatim (no charges!)
+    if (!loan.latitude || !loan.longitude) {
+      console.log(`🌍 Geocoding loan ${loan.loan_number} using FREE service...`);
+      const fullAddress = `${loan.property_address}, ${loan.city}, ${loan.state} ${loan.zip_code || ''}`;
+      const coords = await geocodeAddressValidated(fullAddress, loan.state, loan.county);
+      if (coords.latitude && coords.longitude) {
+        const pool = getPool();
+        if (pool) {
+          await pool.query(
+            'UPDATE loans SET latitude = $1, longitude = $2 WHERE id = $3',
+            [coords.latitude, coords.longitude, loan.id]
+          );
+          loan.latitude = coords.latitude;
+          loan.longitude = coords.longitude;
+        }
+      }
+    }
 
     // Query FEMA API for disaster declarations (last year only, with geocoding)
     const femaData = await queryFEMAApi(loan.state, loan.county);
@@ -499,7 +530,7 @@ async function queryFEMAApi(state, county) {
       return false;
     });
     
-    // 🚫🚫🚫 AUTOMATIC GEOCODING DISABLED - No geocoding of disasters 🚫🚫🚫
+    // Using FREE geocoding - OpenStreetMap Nominatim (no charges!)
     const geocodedDisasters = await Promise.all(disasters.map(async disaster => {
       let latitude = null;
       let longitude = null;
@@ -510,13 +541,13 @@ async function queryFEMAApi(state, county) {
       );
       let stateFromApi = disaster.state || state || '';
 
-      // 🚫 GEOCODING DISABLED - No API calls
-      // if (stateFromApi && countyFromApi) {
-      //   const coords = await geocodeCountyState(countyFromApi, stateFromApi);
-      //   latitude = coords.latitude;
-      //   longitude = coords.longitude;
-      //   await new Promise(resolve => setTimeout(resolve, 100));
-      // }
+      // Geocode using FREE service (respects 1 req/sec limit)
+      if (stateFromApi && countyFromApi) {
+        const coords = await geocodeCountyState(countyFromApi, stateFromApi);
+        latitude = coords.latitude;
+        longitude = coords.longitude;
+        // Rate limiting - Nominatim requires 1 req/sec (free service already includes delay)
+      }
 
       return {
         disasterNumber: disaster.disasterNumber,
@@ -536,16 +567,24 @@ async function queryFEMAApi(state, county) {
       };
     }));
 
-    // 🚫🚫🚫 REVERSE GEOCODING DISABLED - No reverse geocoding of disasters 🚫🚫🚫
-    // for (let i = 0; i < geocodedDisasters.length; i++) {
-    //   const d = geocodedDisasters[i];
-    //   if ((!d.county || !d.state) && d.latitude && d.longitude) {
-    //     const cg = await reverseGeocodeCountyState(d.latitude, d.longitude);
-    //     if (cg.county && !d.county) d.county = cg.county;
-    //     if (cg.state && !d.state) d.state = cg.state;
-    //     await new Promise(resolve => setTimeout(resolve, 100));
-    //   }
-    // }
+    // Using FREE reverse geocoding - OpenStreetMap Nominatim (no charges!)
+    // Process sequentially with delays to respect rate limits
+    for (let i = 0; i < geocodedDisasters.length; i++) {
+      const d = geocodedDisasters[i];
+      if ((!d.county || !d.state) && d.latitude && d.longitude) {
+        try {
+          const cg = await reverseGeocodeCountyState(d.latitude, d.longitude);
+          if (cg.county && !d.county) d.county = cg.county;
+          if (cg.state && !d.state) d.state = cg.state;
+        } catch (error) {
+          // Silently skip on error - don't break the loop
+          console.warn(`⚠️  Skipping reverse geocode for disaster ${d.disasterNumber}:`, error.message);
+        }
+        // Additional delay between requests to avoid overwhelming the API
+        // Free service already includes 1.1 second delay, add 0.5 more for safety
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
     
     return {
       disasterCount: geocodedDisasters.length,

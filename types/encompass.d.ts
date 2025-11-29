@@ -19,7 +19,12 @@ export interface EncompassSearchResult {
   category: string;
   content: string;
   url: string;
+  sourceType?: string;
+  repo?: string;
+  path?: string;
+  tags?: string[];
   relevanceScore?: number;
+  score?: number;
 }
 
 export interface EncompassChatMessage {

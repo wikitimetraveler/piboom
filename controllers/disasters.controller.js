@@ -49,16 +49,78 @@ export async function listDisasters(req, res) {
 
 export async function refreshDisasters(req, res) {
   try {
+    const { includeCameras } = req.query; // Optional: ?includeCameras=true
     const results = {};
     results.fema = await ingestFema();
     results.firms = await ingestFirmsNrt();
     results.usgs = await ingestUsgsQuakes();
     results.nws = await ingestNwsCap();
     results.nhc = await ingestNhc();
-    results.cameras = await ingestCaFireCameras();
+    
+    // Camera feed only if explicitly requested (manual review)
+    if (includeCameras === 'true' || includeCameras === '1') {
+      console.log('📹 Camera feed requested for manual review');
+      results.cameras = await ingestCaFireCameras();
+    }
+    
     res.json({ success: true, message: 'Refreshed disasters', data: results });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Failed to refresh disasters', details: e.message });
+  }
+}
+
+export async function refreshCameras(req, res) {
+  try {
+    console.log('📹 Manual camera feed refresh requested');
+    const result = await ingestCaFireCameras();
+    res.json({ 
+      success: true, 
+      message: 'Camera feed refreshed', 
+      data: result,
+      warning: 'Camera feed creates many records. Use sparingly for review purposes only.'
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: 'Failed to refresh camera feed', details: e.message });
+  }
+}
+
+export async function listCameras(req, res) {
+  try {
+    const { limit = 100, offset = 0 } = req.query;
+    const pool = getPool();
+    if (!pool) throw new Error('Database not initialized');
+    
+    // Get camera records
+    const camerasResult = await pool.query(`
+      SELECT 
+        id, source, event_type, county_name, state_abbr,
+        start_time, title, lat, lng, source_id, raw
+      FROM disasters
+      WHERE source = 'alertcalifornia' AND event_type = 'camera'
+      ORDER BY start_time DESC
+      LIMIT $1 OFFSET $2
+    `, [parseInt(limit), parseInt(offset)]);
+    
+    // Get total count
+    const countResult = await pool.query(`
+      SELECT COUNT(*) as total
+      FROM disasters
+      WHERE source = 'alertcalifornia' AND event_type = 'camera'
+    `);
+    
+    res.json({ 
+      success: true, 
+      data: { 
+        cameras: camerasResult.rows, 
+        count: camerasResult.rows.length,
+        total: parseInt(countResult.rows[0].total),
+        limit: parseInt(limit),
+        offset: parseInt(offset)
+      } 
+    });
+  } catch (e) {
+    console.error('❌ Error listing cameras:', e);
+    res.status(500).json({ success: false, error: 'Failed to list cameras', details: e.message });
   }
 }
 
@@ -103,6 +165,8 @@ export async function exportCsv(req, res) {
 export default {
   listDisasters,
   refreshDisasters,
+  refreshCameras,
+  listCameras,
   statsDisasters,
   exportCsv,
 };

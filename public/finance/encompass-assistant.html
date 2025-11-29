@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -179,6 +180,33 @@
             background: white;
             border: 1px solid #e9ecef;
             margin-right: auto;
+        }
+
+        .source-list {
+            padding-left: 18px;
+            margin-bottom: 0;
+        }
+
+        .source-list li {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .source-meta {
+            font-size: 12px;
+            color: #1565c0;
+            margin-top: 2px;
+        }
+
+        .source-path {
+            font-size: 11px;
+            color: #6c757d;
+        }
+
+        .source-snippet {
+            margin-top: 4px;
+            font-size: 13px;
+            color: #0d47a1;
         }
 
         .quick-action {
@@ -559,6 +587,41 @@
         let isListening = false;
         let recognition = null;
 
+        const SOURCE_TYPE_LABELS = {
+            code_reference: 'Code Reference',
+            api_reference: 'API Reference',
+            official_doc: 'Developer Connect'
+        };
+
+        function formatSourceTypeLabel(type) {
+            if (!type) return '';
+            return SOURCE_TYPE_LABELS[type] || type;
+        }
+
+        function buildSourceMeta(source) {
+            if (!source) return '';
+            const parts = [];
+
+            if (source.repo) {
+                parts.push(source.repo);
+            }
+
+            const typeLabel = formatSourceTypeLabel(source.sourceType);
+            if (typeLabel && (!source.repo || typeLabel !== source.repo)) {
+                parts.push(typeLabel);
+            } else if (source.category) {
+                parts.push(source.category);
+            }
+
+            return parts.join(' • ');
+        }
+
+        function buildSourceSnippet(content) {
+            if (!content) return '';
+            const clean = content.replace(/\s+/g, ' ').trim();
+            return clean.length > 220 ? `${clean.slice(0, 220)}…` : clean;
+        }
+
         // Initialize voice recognition
         function initVoiceRecognition() {
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -718,9 +781,18 @@
             
             if (context && context.length > 0) {
                 messageContent += '<div style="background: #e3f2fd; border: 1px solid #90caf9; border-radius: 10px; padding: 12px; margin-top: 10px; font-size: 13px; color: #1565c0;">';
-                messageContent += '<h5>📚 Sources:</h5><ul>';
-                context.forEach((source, index) => {
-                    messageContent += `<li>${source.title} (${source.category})</li>`;
+                messageContent += '<h5>📚 Sources:</h5><ul class="source-list">';
+                context.forEach((source) => {
+                    const title = source.url
+                        ? `<a href="${source.url}" target="_blank" rel="noopener noreferrer">${source.title}</a>`
+                        : source.title;
+                    const meta = buildSourceMeta(source);
+                    const pathInfo = source.path ? `<div class="source-path">${source.path}</div>` : '';
+                    const snippet = buildSourceSnippet(source.content);
+                    const snippetHtml = snippet ? `<div class="source-snippet">${snippet}</div>` : '';
+                    const metaHtml = meta ? `<div class="source-meta">${meta}</div>` : '';
+
+                    messageContent += `<li>${title}${metaHtml}${pathInfo}${snippetHtml}</li>`;
                 });
                 messageContent += '</ul></div>';
             }

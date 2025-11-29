@@ -550,9 +550,12 @@ export async function ingestFirmsNrt() {
   console.log(`   - ${finalFires.length} significant fires ready for ingestion`);
   
   // Third pass: Geocode and prepare records
+  // SAFETY: Limit geocoding to prevent excessive API calls (max 100 per ingestion)
+  const MAX_GEOCODING_CALLS = 100;
   const batch = [];
   let geocodeFailures = 0;
   let noFipsCount = 0;
+  let geocodingCalls = 0;
   
   await loadFipsReference();
   
@@ -560,15 +563,26 @@ export async function ingestFirmsNrt() {
     const { lat, lng, brightness, confidence, start, props } = fire;
     let county = null, state = null, fips = null;
     
-    if (lat && lng) {
+    // Only geocode if we haven't exceeded the limit (prevents runaway costs)
+    if (lat && lng && geocodingCalls < MAX_GEOCODING_CALLS) {
       try {
         const rev = await reverseGeocodeCountyState(lat, lng);
         county = rev.county; 
         state = rev.state;
         fips = mapCountyToFips(county, state);
+        geocodingCalls++;
+        
+        // Rate limiting: Wait 1.1 seconds between geocoding calls (Nominatim requires 1 req/sec)
+        // This prevents overwhelming the free API and respects rate limits
+        if (geocodingCalls < MAX_GEOCODING_CALLS) {
+          await new Promise(resolve => setTimeout(resolve, 1100));
+        }
       } catch (e) {
         geocodeFailures++;
       }
+    } else if (geocodingCalls >= MAX_GEOCODING_CALLS) {
+      // Skip geocoding for remaining fires if we've hit the limit
+      console.log(`⚠️  FIRMS: Reached geocoding limit (${MAX_GEOCODING_CALLS}), skipping remaining geocoding calls`);
     }
     
     const rec = {
@@ -619,6 +633,9 @@ export async function ingestUsgsQuakes() {
   }
   const feats = (geo && geo.features) ? geo.features : [];
   const batch = [];
+  const MAX_GEOCODING_CALLS = 50; // Limit for earthquakes (usually fewer)
+  let geocodingCalls = 0;
+  
   for (const f of feats) {
     const props = f.properties || {};
     const coords = (f.geometry && f.geometry.coordinates) || [];
@@ -626,12 +643,25 @@ export async function ingestUsgsQuakes() {
     const lat = coords[1];
     const start = props.time ? new Date(props.time).toISOString() : new Date().toISOString();
     let county = null, state = null, fips = null;
-    if (lat && lng) {
-      const rev = await reverseGeocodeCountyState(lat, lng);
-      county = rev.county; state = rev.state;
-      await loadFipsReference();
-      fips = mapCountyToFips(county, state);
+    
+    // Only geocode if under limit (prevents excessive API calls)
+    if (lat && lng && geocodingCalls < MAX_GEOCODING_CALLS) {
+      try {
+        const rev = await reverseGeocodeCountyState(lat, lng);
+        county = rev.county; state = rev.state;
+        geocodingCalls++;
+        
+        // Rate limiting: Wait 1.1 seconds between calls (Nominatim: 1 req/sec)
+        if (geocodingCalls < MAX_GEOCODING_CALLS) {
+          await new Promise(resolve => setTimeout(resolve, 1100));
+        }
+      } catch (e) {
+        // Skip on error
+      }
     }
+    
+    await loadFipsReference();
+    fips = mapCountyToFips(county, state);
     const rec = {
       source: 'usgs',
       event_type: 'earthquake',
@@ -664,6 +694,9 @@ export async function ingestNwsCap() {
   }
   const feats = (data && data.features) ? data.features : [];
   const batch = [];
+  const MAX_GEOCODING_CALLS = 50; // Limit for NWS alerts
+  let geocodingCalls = 0;
+  
   for (const f of feats) {
     const props = f.properties || {};
     // Try to use areaDesc to get county/state; may include multiple areas
@@ -671,7 +704,7 @@ export async function ingestNwsCap() {
     const area = props.areaDesc || '';
     const m = area.match(/([A-Za-z .'-]+) County,\s*([A-Z]{2})/);
     if (m) { county = m[1]; state = m[2]; }
-    // Fallback: reverse geocode centroid if present
+    // Fallback: reverse geocode centroid if present (only if needed and under limit)
     let lat = null, lng = null;
     if (f.geometry && f.geometry.type === 'Polygon') {
       const coords = f.geometry.coordinates[0];
@@ -681,9 +714,20 @@ export async function ingestNwsCap() {
         lng = mid[0]; lat = mid[1];
       }
     }
-    if ((!county || !state) && lat && lng) {
-      const rev = await reverseGeocodeCountyState(lat, lng);
-      county = county || rev.county; state = state || rev.state;
+    // Only geocode if we don't have county/state AND we're under the limit
+    if ((!county || !state) && lat && lng && geocodingCalls < MAX_GEOCODING_CALLS) {
+      try {
+        const rev = await reverseGeocodeCountyState(lat, lng);
+        county = county || rev.county; state = state || rev.state;
+        geocodingCalls++;
+        
+        // Rate limiting: Wait 1.1 seconds between calls (Nominatim: 1 req/sec)
+        if (geocodingCalls < MAX_GEOCODING_CALLS) {
+          await new Promise(resolve => setTimeout(resolve, 1100));
+        }
+      } catch (e) {
+        // Skip on error
+      }
     }
     await loadFipsReference();
     fips = mapCountyToFips(county, state);
@@ -1114,21 +1158,21 @@ export async function ingestCaFireCameras() {
         }
       }
 
-      // If no county found, try reverse geocoding
-      if (!countyFips && camera.latitude && camera.longitude) {
-        try {
-          const geo = await reverseGeocodeCountyState(camera.latitude, camera.longitude);
-          if (geo.county) {
-            countyName = geo.county;
-            const fipsLookup = await lookupCountyByFips(null, geo.county, geo.state || 'CA');
-            if (fipsLookup) {
-              countyFips = fipsLookup.fips;
-            }
-          }
-        } catch (e) {
-          // Skip reverse geocoding errors
-        }
-      }
+      // 🚫 GEOCODING DISABLED FOR CAMERA FEEDS - No reverse geocoding
+      // if (!countyFips && camera.latitude && camera.longitude) {
+      //   try {
+      //     const geo = await reverseGeocodeCountyState(camera.latitude, camera.longitude);
+      //     if (geo.county) {
+      //       countyName = geo.county;
+      //       const fipsLookup = await lookupCountyByFips(null, geo.county, geo.state || 'CA');
+      //       if (fipsLookup) {
+      //         countyFips = fipsLookup.fips;
+      //       }
+      //     }
+      //   } catch (e) {
+      //     // Skip reverse geocoding errors
+      //   }
+      // }
 
       const sourceId = camera.camera_id || camera.name || `camera_${camera.latitude}_${camera.longitude}`;
       

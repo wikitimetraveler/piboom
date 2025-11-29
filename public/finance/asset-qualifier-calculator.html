@@ -85,7 +85,7 @@
       .is-invalid { border-color: #dc3545; }
     </style>
   </head>
-  <body>
+  <body data-calculator="asset-qualifier">
     <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
     <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
 
@@ -322,6 +322,8 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="/shared/calculations.js"></script>
+    <script src="js/encompass-test-loans.js"></script>
+    <script src="js/calculator-scenario-runner.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         // Use factory function to create Asset Qualifier calculator configuration

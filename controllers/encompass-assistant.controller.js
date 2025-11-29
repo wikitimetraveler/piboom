@@ -2,6 +2,7 @@ import express from 'express';
 import encompassDocsService from '../services/encompass-docs.service.js';
 import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
+import iceKnowledgeService from '../lib/knowledge/ice-knowledge.service.js';
 
 const router = express.Router();
 
@@ -125,6 +126,8 @@ Always provide:
 8. **Tech stack integration** - When relevant, suggest how solutions can leverage piBoom's existing tech stack (PostgreSQL, LangChain, Socket.IO, etc.)
 9. **API access reference** - Mention that full Encompass API access is available through another repository when discussing API integrations
 
+When a user asks about the ICE GitHub repositories or “what do the ICE repos have,” explicitly enumerate each cloned repository or collection we maintain (Developer Connect bindings, integration samples, LO Connect custom tool sample, token exchange, IFB scripting demo, EPC data docs mock investor, EXP24 custom form, NYSE CloudStreaming, and the Postman collections) and summarize what each provides before moving on to other guidance. Use the latest metadata from our knowledge base to keep the descriptions accurate.
+
 ### Solution Design Approach:
 - **Leverage existing infrastructure** - Suggest using PostgreSQL for data storage, LangChain for AI features, Socket.IO for real-time updates
 - **Use calculations class for financial calculations** - When building mortgage calculators, loan amount calculators, DTI calculators, or any financial calculation features, leverage the existing calculations class with factory functions (createDTICalculatorConfig, createFHACalculatorConfig, createAssetQualifierConfig) and use customIds to map to Encompass field IDs
@@ -175,16 +178,31 @@ router.post('/chat', async (req, res) => {
 
     console.log(`💬 Encompass AI Chat: "${message}"`);
     
-    // Search for relevant documentation
-    const searchResults = await encompassDocsService.searchDocs(message, 3);
+    // Search for relevant documentation + knowledge base entries
+    const [docResultsRaw, knowledgeResults] = await Promise.all([
+      encompassDocsService.searchDocs(message, 3),
+      iceKnowledgeService.search(message, 10)
+    ]);
+
+    const docResults = docResultsRaw.map(result => ({
+      ...result,
+      sourceType: 'official_doc',
+      repo: 'developer-connect'
+    }));
+
+    const combinedResults = [...docResults, ...knowledgeResults];
     
     // Build context from search results
     let docsContext = '';
-    if (searchResults.length > 0) {
+    if (combinedResults.length > 0) {
       docsContext = '\n\nRelevant Documentation:\n';
-      searchResults.forEach((result, index) => {
-        docsContext += `${index + 1}. ${result.title} (${result.category})\n`;
-        docsContext += `   ${result.content.substring(0, 1000)}...\n\n`;
+      combinedResults.slice(0, 5).forEach((result, index) => {
+        const label = result.repo
+          ? `${result.title} (${result.repo})`
+          : `${result.title} (${result.category})`;
+        const snippet = (result.content || '').substring(0, 1000);
+        docsContext += `${index + 1}. ${label}\n`;
+        docsContext += `   ${snippet}...\n\n`;
       });
     }
 
@@ -202,7 +220,7 @@ router.post('/chat', async (req, res) => {
     // Return response with context
     res.json({
       message: aiMessage,
-      context: searchResults,
+      context: combinedResults,
       timestamp: new Date().toISOString()
     });
 

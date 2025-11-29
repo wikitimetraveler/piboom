@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { geocodeVenueWithCache } from './geocoding-cache.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -107,14 +108,18 @@ export async function fetchTourDataFromAPI() {
 }
 
 /**
- * Geocode venue to get coordinates
+ * Geocode venue to get coordinates using FREE OpenStreetMap Nominatim API
  */
 export async function geocodeVenue(venue, city, state, country) {
-  // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
-  console.warn('🚫 GEOCODING DISABLED - No API calls will be made for venue:', venue);
-  return { latitude: null, longitude: null };
+  // Using cache first, then FREE OpenStreetMap Nominatim API - minimal API calls!
+  try {
+    return await geocodeVenueWithCache(venue, city, state, country);
+  } catch (error) {
+    console.error(`❌ Free geocoding error for venue ${venue}:`, error.message);
+    return { latitude: null, longitude: null };
+  }
   
-  /* DISABLED TO PREVENT API CHARGES
+  /* DISABLED - Original Google geocoding code (now using free service)
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('⚠️  GOOGLE_API_KEY not set - skipping geocoding');

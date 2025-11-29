@@ -13,28 +13,40 @@
 **What to say in your request:**
 
 ```
-Subject: Request for Billing Credit - Unintended API Usage During Research
+Subject: Request for Billing Credit - Unintended Geocoding Charges During Research ($2,000)
 
-Dear Google Cloud Billing Support,
+Dear Google Cloud Billing Support Team,
 
 I am requesting a review and potential credit for unexpected charges incurred 
-while conducting research using the Google Maps Geocoding API.
+during a research project using the Google Maps Geocoding API.
 
-Situation:
-- I was conducting research/testing on my personal project
-- The charges ($14,500+) were unintentional and resulted from automatic 
-  geocoding functions that were inadvertently left running
-- I have now completely disabled all automatic geocoding to prevent future 
-  charges
+Situation Details:
+- Research project: Personal disaster risk analysis project (NOT commercial)
+- Usage: 145,000 geocoding API calls over past 2 months
+- Charges: $2,000
+- Cause: Automatic geocoding functions inadvertently left running
 - This was NOT for production/commercial use - purely research/testing
 
+Immediate Actions Taken:
+- ✅ All automatic geocoding completely disabled in code
+- ✅ Server restarted with geocoding disabled
+- ✅ Migrated to FREE OpenStreetMap Nominatim API
+- ✅ Implemented geocoding cache to prevent duplicate calls
+- ✅ All changes committed and documented
+
 I respectfully request:
-1. A review of the charges
-2. Consideration for a credit/refund given this was research activity
-3. Assistance in preventing future unintended charges
+1. A review of these charges given this was research activity
+2. Consideration for a credit/refund based on:
+   - Research/non-commercial nature of the project
+   - Unintended nature of the usage (automatic functions left running)
+   - Immediate action taken to prevent future charges
+   - Migration to free alternative service
+3. Any assistance possible in reducing this charge
 
 I understand Google Cloud's billing policies, but would appreciate any 
-consideration you can provide given the circumstances.
+consideration given the circumstances. I have ensured no further charges will 
+occur from geocoding, as the application now uses the free OpenStreetMap 
+service exclusively.
 
 Thank you for your time and consideration.
 

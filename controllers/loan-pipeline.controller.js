@@ -433,30 +433,17 @@ export async function queryFEMADirect(req, res) {
     
     console.log(`📊 FEMA API returned ${disasterDeclResults.metadata?.count || 0} total records`);
 
-    // Import geocoding function
-    // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
+    // Import geocoding function with cache
+    // Using cache first, then FREE OpenStreetMap Nominatim API - minimal API calls!
+    const { geocodeCountyStateWithCache } = await import('../services/geocoding-cache.service.js');
     const geocodeCountyState = async (county, state) => {
-      console.warn('🚫 GEOCODING DISABLED - No API calls will be made for:', county, state);
-      return { latitude: null, longitude: null };
-      /* DISABLED TO PREVENT API CHARGES
-      const apiKey = process.env.GOOGLE_API_KEY;
-      if (!apiKey) return { latitude: null, longitude: null };
-      
       try {
-        const address = `${county}, ${state}`;
-        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-        const geoResponse = await fetch(url);
-        const geoData = await geoResponse.json();
-        
-        if (geoData.status === 'OK' && geoData.results.length > 0) {
-          const location = geoData.results[0].geometry.location;
-          return { latitude: location.lat, longitude: location.lng };
-        }
+        const result = await geocodeCountyStateWithCache(county, state);
+        return { latitude: result.latitude, longitude: result.longitude };
       } catch (error) {
-        console.error('Geocoding error:', error);
+        console.error('Free geocoding error:', error);
+        return { latitude: null, longitude: null };
       }
-      return { latitude: null, longitude: null };
-      */
     };
 
     if (disasterDeclResults.metadata && disasterDeclResults.metadata.count > 0) {

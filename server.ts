@@ -29,7 +29,8 @@ console.log('🔄 Starting initial data source ingestion...');
     await ingestNwsCap();
     await ingestNhc();
     await ingestFema();
-    await ingestCaFireCameras();
+    // Camera feed disabled - too many records (198k+)
+    // await ingestCaFireCameras();
     console.log('✅ Initial data ingestion complete');
   } catch (e) {
     console.warn('⚠️  Some data sources failed on initial ingestion (non-fatal):', e.message);
@@ -58,7 +59,7 @@ app.get('/health', (req: Request, res: Response) => {
   res.json({ ok: true, mode: config.mode, platform: process.platform });
 });
 
-// Simple scheduler (every 30 minutes) for real-time sources
+// Simple scheduler (once per day) for disaster data sources
 setInterval(async () => {
   try {
     await ingestFirmsNrt();
@@ -66,11 +67,12 @@ setInterval(async () => {
     await ingestNwsCap();
     await ingestNhc();
     await ingestFema();
-    await ingestCaFireCameras();
+    // Camera feed disabled - too many records (198k+)
+    // await ingestCaFireCameras();
   } catch (e) {
     // non-fatal - ignore errors
   }
-}, 30 * 60 * 1000);
+}, 24 * 60 * 60 * 1000); // Once per day (24 hours)
 
 // Nightly prune older than 90 days
 setInterval(async () => {

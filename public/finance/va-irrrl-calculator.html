@@ -73,7 +73,7 @@
       .warning-box { background: #fff3cd; border: 2px solid var(--warning); border-radius: 8px; padding: 16px; margin-top: 12px; }
     </style>
   </head>
-  <body>
+  <body data-calculator="va-irrrl">
     <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
     <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
 
@@ -305,6 +305,8 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="js/encompass-test-loans.js"></script>
+    <script src="js/calculator-scenario-runner.js"></script>
     <script>
       // Extend calculations class with VA IRRRL-specific methods
       calculations.prototype.calculateMortgagePayment = function(values, options) {

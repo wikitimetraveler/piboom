@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { config } from '../config/index.js';
+import { geocodeAddressFree } from '../services/free-geocoding.service.js';
 
 // Google Knowledge Graph search - now uses MusicBrainz for better data
 export async function searchKnowledgeGraph(req, res) {
@@ -1289,16 +1290,12 @@ async function getArtistInfoFromWikipedia(artist) {
   }
 }
 
-// Geocode a location using Google Maps API with context-aware fallback strategies
+// Geocode a location using FREE OpenStreetMap Nominatim API with context-aware fallback strategies
 async function geocodeLocation(placeName, apiKey, bandContext = null) {
-  // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
-  console.warn('🚫 GEOCODING DISABLED - No API calls will be made for location:', placeName);
-  return null;
-  
-  /* DISABLED TO PREVENT API CHARGES
+  // Using FREE OpenStreetMap Nominatim API - no charges!
   try {
-    // Try original place name first
-    let result = await tryGeocode(placeName, apiKey);
+    // Try original place name first using free service
+    let result = await tryGeocode(placeName);
     if (result) return result;
     
     // Build smart variations based on band context (country of origin)
@@ -1366,21 +1363,22 @@ async function geocodeLocation(placeName, apiKey, bandContext = null) {
       placeName.split(',')[0] + ', South Korea'
     );
     
-    // Try each variation
+    // Try each variation using free service
     for (const variation of variations) {
-      result = await tryGeocode(variation, apiKey);
+      result = await tryGeocode(variation);
       if (result) {
         result.name = placeName; // Keep original name
         return result;
       }
+      // Rate limiting - Nominatim requires 1 req/sec
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
     
     return null;
   } catch (error) {
-    console.error('Geocoding error for', placeName, ':', error);
+    console.error('Free geocoding error for', placeName, ':', error);
     return null;
   }
-  */
 }
 
 // Detect country from band context (formation place)
@@ -1429,33 +1427,22 @@ function detectCountryFromContext(context) {
   return null;
 }
 
-// Helper function to attempt geocoding
-async function tryGeocode(address, apiKey) {
-  // 🚫🚫🚫 AUTOMATIC GEOCODING COMPLETELY DISABLED TO PREVENT API CHARGES 🚫🚫🚫
-  console.warn('🚫 GEOCODING DISABLED - No API calls will be made for:', address);
-  return null;
-  
-  /* DISABLED TO PREVENT API CHARGES
+// Helper function to attempt geocoding using FREE service
+async function tryGeocode(address) {
+  // Using FREE OpenStreetMap Nominatim API - no charges!
   try {
-    const geocodingUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-    
-    const geoResponse = await axios.get(geocodingUrl);
-    const geoData = geoResponse.data;
-    
-    if (geoData.results && geoData.results.length > 0 && geoData.status === 'OK') {
-      const location = geoData.results[0].geometry.location;
+    const result = await geocodeAddressFree(address);
+    if (result && result.latitude && result.longitude) {
       return {
         name: address,
-        lat: location.lat,
-        lng: location.lng
+        lat: result.latitude,
+        lng: result.longitude
       };
     }
-    
     return null;
   } catch (error) {
     return null;
   }
-  */
 }
 
 // Get Google API key
