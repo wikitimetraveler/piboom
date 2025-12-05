@@ -10,6 +10,7 @@
   <script src="/shared/modern-navbar.js"></script>
   <script src="/shared/user-selector.js"></script>
   <script src="/shared/user-login.js"></script>
+  <script src="https://apis.google.com/js/api.js"></script>
   <style>
     /* Floating Musical Notes */
     .floating-notes {
@@ -726,6 +727,81 @@
 
 <script>
 let currentCollection = [];
+let GOOGLE_API_KEY = null;
+let youtubeAPIReady = false;
+let youtubeInitInProgress = false;
+let youtubeApiScriptLoading = false;
+
+function loadYouTubeAPI() {
+  if (!GOOGLE_API_KEY) {
+    console.warn('❌ Cannot initialize YouTube API without Google API key');
+    return;
+  }
+  if (youtubeAPIReady || youtubeInitInProgress) {
+    return;
+  }
+
+  const initClient = () => {
+    if (youtubeAPIReady || youtubeInitInProgress) {
+      return;
+    }
+    youtubeInitInProgress = true;
+    gapi.load('client', () => {
+      gapi.client.init({
+        apiKey: GOOGLE_API_KEY,
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest']
+      }).then(() => {
+        youtubeAPIReady = true;
+        console.log('🎬 YouTube Data API ready for collection page');
+      }).catch(error => {
+        console.error('❌ Error initializing YouTube API:', error);
+      }).finally(() => {
+        youtubeInitInProgress = false;
+      });
+    });
+  };
+
+  if (typeof gapi === 'undefined') {
+    if (youtubeApiScriptLoading) {
+      return;
+    }
+    youtubeApiScriptLoading = true;
+    const script = document.createElement('script');
+    script.src = 'https://apis.google.com/js/api.js';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      youtubeApiScriptLoading = false;
+      initClient();
+    };
+    script.onerror = () => {
+      youtubeApiScriptLoading = false;
+      console.error('❌ Failed to load Google API client library');
+    };
+    document.head.appendChild(script);
+    return;
+  }
+
+  initClient();
+}
+
+async function fetchGoogleApiKey() {
+  if (GOOGLE_API_KEY) {
+    return GOOGLE_API_KEY;
+  }
+  try {
+    const response = await fetch('/api/music-research/google-api-key');
+    const data = await response.json();
+    if (data.apiKey) {
+      GOOGLE_API_KEY = data.apiKey;
+      loadYouTubeAPI();
+      return GOOGLE_API_KEY;
+    }
+  } catch (error) {
+    console.error('❌ Error retrieving Google API key:', error);
+  }
+  return null;
+}
 
 // Load collection on page load
 document.addEventListener('DOMContentLoaded', async function() {
@@ -734,6 +810,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     title: 'View Collections:',
     showAllOption: true // Show "All Users" option
   });
+
+  fetchGoogleApiKey();
   
   // Update header based on view mode
   updateCollectionHeader();
@@ -1302,7 +1380,7 @@ function goToDiscovery() {
 }
 
 // Find YouTube videos for an album
-async function findVideosForAlbum(artist, album) {
+async function findVideosForAlbum(artist, album, attempt = 0) {
   console.log('🎬 Finding videos for:', artist, '-', album);
   
   try {
@@ -1335,44 +1413,69 @@ async function findVideosForAlbum(artist, album) {
       containerEl.innerHTML = '';
     }
     
-    console.log('🔍 Searching YouTube API...');
-    
-    // Search for videos
-    const response = await fetch('/api/music-research/youtube-album', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ artist, album })
-    });
-    
-    const data = await response.json();
-    console.log('✅ YouTube response:', data);
-    
-    // Hide loading
-    if (loadingEl) {
-      loadingEl.style.display = 'none';
-    }
-    
-    if (data.videos && data.videos.length > 0) {
-      displayYouTubeVideos(data.videos);
-    } else {
+    const apiKey = await fetchGoogleApiKey();
+    if (!apiKey) {
+      if (loadingEl) loadingEl.style.display = 'none';
       if (containerEl) {
         containerEl.innerHTML = `
-          <div class="text-center text-muted" style="padding: 20px;">
-            <i class="bi-youtube" style="font-size: 3rem; opacity: 0.3;"></i>
-            <p>No YouTube videos found for this album.</p>
+          <div class="text-center text-danger" style="padding: 20px;">
+            <p>Google API key not configured. Unable to search YouTube.</p>
           </div>
         `;
       }
+      return;
+    }
+
+    if (!youtubeAPIReady) {
+      loadYouTubeAPI();
+      if (attempt < 6) {
+        setTimeout(() => findVideosForAlbum(artist, album, attempt + 1), 600);
+      } else if (containerEl) {
+        if (loadingEl) loadingEl.style.display = 'none';
+        containerEl.innerHTML = `
+          <div class="text-center text-muted" style="padding: 20px;">
+            <p>YouTube API is still initializing. Please try again in a moment.</p>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    console.log('🔍 Searching YouTube API (client-side)...');
+    const query = `${artist} ${album} full album`;
+    const response = await gapi.client.youtube.search.list({
+      part: 'snippet',
+      q: query,
+      type: 'video',
+      maxResults: 6
+    });
+    
+    const videos = (response.result.items || []).map(item => ({
+      videoId: item.id?.videoId,
+      title: item.snippet?.title || 'Untitled Video',
+      channelTitle: item.snippet?.channelTitle || 'Unknown Channel',
+      thumbnail: item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url || '',
+      publishedAt: item.snippet?.publishedAt || '',
+      url: item.id?.videoId ? `https://www.youtube.com/watch?v=${item.id.videoId}` : ''
+    })).filter(video => video.videoId);
+    
+    if (videos.length > 0) {
+      displayYouTubeVideos(videos);
+    } else if (containerEl) {
+      containerEl.innerHTML = `
+        <div class="text-center text-muted" style="padding: 20px;">
+          <i class="bi-youtube" style="font-size: 3rem; opacity: 0.3;"></i>
+          <p>No YouTube videos found for this album.</p>
+        </div>
+      `;
     }
     
   } catch (error) {
     console.error('❌ Error finding videos:', error);
-    const loadingEl = document.getElementById('youtubeLoading');
     if (loadingEl) {
       loadingEl.style.display = 'none';
     }
     
-    const containerEl = document.getElementById('youtubeVideosContainer');
     if (containerEl) {
       containerEl.innerHTML = `
         <div class="text-center text-danger" style="padding: 20px;">
@@ -1381,6 +1484,11 @@ async function findVideosForAlbum(artist, album) {
           <p style="font-size: 0.8rem; color: #666;">${error.message}</p>
         </div>
       `;
+    }
+  } finally {
+    const loadingEl = document.getElementById('youtubeLoading');
+    if (loadingEl) {
+      loadingEl.style.display = 'none';
     }
   }
 }
