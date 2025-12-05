@@ -27,6 +27,7 @@ export const config = {
   googleApiKey: (process.env.GOOGLE_API_KEY || '').trim(),
   googleBrowserApiKey: (process.env.GOOGLE_BROWSER_API_KEY || process.env.GOOGLE_API_KEY || '').trim(),
   googleServerApiKey: (process.env.GOOGLE_SERVER_API_KEY || process.env.GOOGLE_API_KEY || '').trim(),
+  autoIngestDisasters: (process.env.AUTO_INGEST_DISASTERS || '').toLowerCase() === 'true',
   
   // Spotify OAuth
   spotifyClientId: (process.env.SPOTIFY_CLIENT_ID || '').trim(),

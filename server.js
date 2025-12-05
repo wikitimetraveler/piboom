@@ -50,22 +50,25 @@ try {
   process.exit(1);
 }
 
-// Initial data ingestion on startup (non-blocking)
-console.log('🔄 Starting initial data source ingestion...');
-(async () => {
-  try {
-    await ingestFirmsNrt();
-    await ingestUsgsQuakes();
-    await ingestNwsCap();
-    await ingestNhc();
-    await ingestFema();
-    // Camera feed disabled - too many records (198k+)
-    // await ingestCaFireCameras();
-    console.log('✅ Initial data ingestion complete');
-  } catch (e) {
-    console.warn('⚠️  Some data sources failed on initial ingestion (non-fatal):', e.message);
-  }
-})();
+if (config.autoIngestDisasters) {
+  console.log('🔄 Starting initial data source ingestion...');
+  (async () => {
+    try {
+      await ingestFirmsNrt();
+      await ingestUsgsQuakes();
+      await ingestNwsCap();
+      await ingestNhc();
+      await ingestFema();
+      // Camera feed disabled - too many records (198k+)
+      // await ingestCaFireCameras();
+      console.log('✅ Initial data ingestion complete');
+    } catch (e) {
+      console.warn('⚠️  Some data sources failed on initial ingestion (non-fatal):', e.message);
+    }
+  })();
+} else {
+  console.log('⏸️ Automatic disaster ingestion disabled (enable AUTO_INGEST_DISASTERS to re-activate)');
+}
 
 // Add middleware for parsing JSON request bodies (increased limit for image uploads)
 app.use(express.json({ limit: '50mb' })); // Support base64 image uploads
@@ -87,20 +90,24 @@ app.use('/api', buildRoutes(io));
 
 app.get('/health', (req,res)=>res.json({ok:true, mode: config.mode, platform: process.platform}));
 
-// Simple scheduler (once per day) for disaster data sources
-setInterval(async () => {
-  try {
-    await ingestFirmsNrt();
-    await ingestUsgsQuakes();
-    await ingestNwsCap();
-    await ingestNhc();
-    await ingestFema();
-    // Camera feed disabled - too many records (198k+)
-    // await ingestCaFireCameras();
-  } catch (e) {
-    // non-fatal
-  }
-}, 24 * 60 * 60 * 1000); // Once per day (24 hours)
+if (config.autoIngestDisasters) {
+  // Simple scheduler (once per day) for disaster data sources
+  setInterval(async () => {
+    try {
+      await ingestFirmsNrt();
+      await ingestUsgsQuakes();
+      await ingestNwsCap();
+      await ingestNhc();
+      await ingestFema();
+      // Camera feed disabled - too many records (198k+)
+      // await ingestCaFireCameras();
+    } catch (e) {
+      // non-fatal
+    }
+  }, 24 * 60 * 60 * 1000); // Once per day (24 hours)
+} else {
+  console.log('⏸️ Skipping automatic disaster refresh scheduler');
+}
 
 // Nightly prune older than 90 days
 setInterval(async () => {

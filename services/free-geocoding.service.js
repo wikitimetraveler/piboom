@@ -1,14 +1,136 @@
+import axios from 'axios';
+import { getGoogleServerApiKey } from '../lib/google-api-key.js';
+
 /**
- * Free Geocoding Service
+ * Geocoding Service
  * 
- * Uses OpenStreetMap Nominatim API - 100% FREE, no API key required
- * Rate limit: 1 request per second (be respectful)
+ * Primary: Google Geocoding API (server key)
+ * Fallback: OpenStreetMap Nominatim (free) to avoid downtime
  * 
- * Alternatives included:
- * - Nominatim (OpenStreetMap) - Primary free option
- * - Geocode.maps.co - Alternative free option
- * - LocationIQ - 5,000 requests/day free tier
+ * Rate limits:
+ * - Google Geocoding: per Google quotas
+ * - Nominatim: 1 request per second (only used as fallback)
+ * 
+ * Alternative Free providers included for last-resort fallback.
  */
+
+function extractComponent(components = [], type) {
+  return components.find(c => c.types.includes(type));
+}
+
+function normalizeCountyName(name) {
+  if (!name) return null;
+  return name.replace(/\s*County$/i, '').trim();
+}
+
+async function geocodeWithGoogle(address, expectedState, expectedCounty) {
+  const apiKey = getGoogleServerApiKey();
+  if (!apiKey || !address) return null;
+
+  try {
+    const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        address,
+        key: apiKey,
+        region: 'us',
+        components: 'country:US'
+      },
+      timeout: 10000
+    });
+
+    if (response.data.status !== 'OK' || !response.data.results?.length) {
+      return null;
+    }
+
+    const candidates = response.data.results;
+    let fallbackResult = null;
+
+    for (const candidate of candidates) {
+      const geometry = candidate.geometry?.location;
+      if (!geometry) continue;
+
+      const state = extractComponent(candidate.address_components, 'administrative_area_level_1')?.short_name;
+      const county = normalizeCountyName(
+        extractComponent(candidate.address_components, 'administrative_area_level_2')?.long_name
+      );
+
+      let stateMatches = true;
+      let countyMatches = true;
+
+      if (expectedState) {
+        stateMatches = state?.toUpperCase() === expectedState.toUpperCase();
+      }
+
+      if (expectedCounty) {
+        if (county) {
+          countyMatches = county.toLowerCase() === expectedCounty.toLowerCase();
+        } else {
+          countyMatches = false;
+        }
+      }
+
+      const resultPayload = {
+        latitude: geometry.lat,
+        longitude: geometry.lng,
+        validated: stateMatches && countyMatches,
+        display_name: candidate.formatted_address,
+        placeId: candidate.place_id,
+        source: 'google',
+        address_components: candidate.address_components
+      };
+
+      if (!fallbackResult) {
+        fallbackResult = resultPayload;
+      }
+
+      if (resultPayload.validated || (!expectedState && !expectedCounty)) {
+        return resultPayload;
+      }
+    }
+
+    return fallbackResult;
+  } catch (error) {
+    console.warn('⚠️  Google geocoding error:', error.message);
+    return null;
+  }
+}
+
+async function reverseGeocodeWithGoogle(lat, lng) {
+  const apiKey = getGoogleServerApiKey();
+  if (!apiKey || !lat || !lng) return null;
+
+  try {
+    const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+      params: {
+        latlng: `${lat},${lng}`,
+        key: apiKey,
+        result_type: 'administrative_area_level_2|administrative_area_level_1|locality',
+        location_type: 'APPROXIMATE'
+      },
+      timeout: 10000
+    });
+
+    if (response.data.status !== 'OK' || !response.data.results?.length) {
+      return null;
+    }
+
+    const result = response.data.results[0];
+    const county = normalizeCountyName(
+      extractComponent(result.address_components, 'administrative_area_level_2')?.long_name
+    );
+    const state = extractComponent(result.address_components, 'administrative_area_level_1')?.short_name;
+
+    return {
+      county: county || null,
+      state: state ? state.toUpperCase() : null,
+      address: result.formatted_address,
+      source: 'google'
+    };
+  } catch (error) {
+    console.warn('⚠️  Google reverse geocoding error:', error.message);
+    return null;
+  }
+}
 
 /**
  * Geocode an address using FREE OpenStreetMap Nominatim API
@@ -18,6 +140,13 @@
  * @returns {Promise<Object>} Object with latitude, longitude, and validation info
  */
 export async function geocodeAddressFree(address, expectedState = null, expectedCounty = null) {
+  // Primary: Google Geocoding API
+  const googleResult = await geocodeWithGoogle(address, expectedState, expectedCounty);
+  if (googleResult) {
+    return googleResult;
+  }
+
+  // Fallback: Nominatim (free)
   try {
     // Use Nominatim - completely free, no API key needed
     // Rate limit: 1 request per second (be respectful!)
@@ -133,6 +262,11 @@ export async function geocodeAddressFree(address, expectedState = null, expected
 export async function reverseGeocodeFree(lat, lng, retries = 2) {
   if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
     return { county: null, state: null, address: null };
+  }
+
+  const googleResult = await reverseGeocodeWithGoogle(lat, lng);
+  if (googleResult) {
+    return googleResult;
   }
   
   // Rate limiting - be respectful to Nominatim (1 req/sec)
