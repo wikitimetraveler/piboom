@@ -4,6 +4,7 @@ import multer from 'multer';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -319,7 +320,7 @@ export async function searchYouTube(req, res) {
       });
     }
 
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getGoogleServerApiKey();
     if (!apiKey) {
       return res.status(500).json({
         success: false,
@@ -388,7 +389,7 @@ export async function getLocationDetails(req, res) {
       });
     }
 
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getGoogleServerApiKey();
     if (!apiKey) {
       return res.status(500).json({
         success: false,

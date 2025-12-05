@@ -21,6 +21,8 @@ export interface Config {
   databaseUrl: string | undefined;
   openaiApiKey: string;
   googleApiKey: string;
+  googleBrowserApiKey: string;
+  googleServerApiKey: string;
   spotifyClientId: string;
   spotifyClientSecret: string;
   spotifyRedirectUri: string;
@@ -39,6 +41,8 @@ export const config: Config = {
   // API Keys
   openaiApiKey: (process.env.OPENAI_API_KEY || '').trim(),
   googleApiKey: (process.env.GOOGLE_API_KEY || '').trim(),
+  googleBrowserApiKey: (process.env.GOOGLE_BROWSER_API_KEY || process.env.GOOGLE_API_KEY || '').trim(),
+  googleServerApiKey: (process.env.GOOGLE_SERVER_API_KEY || process.env.GOOGLE_API_KEY || '').trim(),
   
   // Spotify OAuth
   spotifyClientId: (process.env.SPOTIFY_CLIENT_ID || '').trim(),

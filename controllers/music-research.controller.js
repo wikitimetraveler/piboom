@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { config } from '../config/index.js';
 import { geocodeAddressFree } from '../services/free-geocoding.service.js';
+import { getGoogleBrowserApiKey, getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 // Google Knowledge Graph search - now uses MusicBrainz for better data
 export async function searchKnowledgeGraph(req, res) {
@@ -1085,7 +1085,7 @@ export async function searchYouTubeForAlbum(req, res) {
       return res.status(400).json({ error: 'Artist and album are required' });
     }
 
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getGoogleServerApiKey();
     if (!apiKey) {
       return res.status(500).json({ error: 'YouTube API key not configured' });
     }
@@ -1137,7 +1137,7 @@ export async function searchYouTube(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getGoogleServerApiKey();
     if (!apiKey) {
       return res.status(500).json({ error: 'Google API key not configured' });
     }
@@ -1177,7 +1177,7 @@ export async function getMapData(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getGoogleServerApiKey();
     if (!apiKey) {
       return res.status(500).json({ error: 'Google API key not configured' });
     }
@@ -1449,7 +1449,7 @@ async function tryGeocode(address) {
 export async function getGoogleApiKey(req, res) {
   try {
     // Get API key from environment variable
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getGoogleBrowserApiKey();
     
     if (apiKey) {
       res.json({ apiKey: apiKey });

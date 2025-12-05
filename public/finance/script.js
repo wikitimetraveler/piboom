@@ -1,4 +1,14 @@
-
+/**
+ * FEMA Disaster Search Script
+ *
+ * @file        script.js
+ * @author      David Lane
+ * @version     1.0.0
+ * @since       2024
+ *
+ * Powers the FEMA disaster lookup utility, wiring the UI to FEMA APIs, DataTables,
+ * and Encompass binding helpers.
+ */
 
 const screenBindings = new ScreenBindings();
 screenBindings.bindFieldValues();

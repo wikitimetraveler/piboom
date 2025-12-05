@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import axios from 'axios';
 import { getConversationChain, getUserConversationHistory, clearUserConversationHistory, getUserConversationStats } from '../services/langchain-memory.service.js';
+import { getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 // OpenAI configuration
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
@@ -798,7 +799,7 @@ export async function searchYouTubeVideos(req, res) {
     
     
     // Get YouTube API key from environment
-    const apiKey = process.env.GOOGLE_API_KEY;
+    const apiKey = getGoogleServerApiKey();
     if (!apiKey) {
       return res.status(500).json({ error: 'YouTube API key not configured' });
     }

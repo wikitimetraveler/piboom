@@ -1,4 +1,13 @@
-// Voice Control System
+/**
+ * Voice Control System
+ *
+ * @file        voiceController.js
+ * @author      David Lane
+ * @version     1.0.0
+ * @since       2024
+ *
+ * Provides shared voice navigation and speech synthesis across the finance hub.
+ */
 class VoiceController {
   constructor() {
     this.recognition = null;

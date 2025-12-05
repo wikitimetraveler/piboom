@@ -1,3 +1,15 @@
+/**
+ * Tool 6 Utilities
+ *
+ * @file        tool6.js
+ * @author      David Lane
+ * @version     1.0.0
+ * @since       2024
+ *
+ * Supports the Tool 6 automation experience by loading reference metadata,
+ * allowing loan officers to inspect dropdown/borr-specific fields, and wiring
+ * UI interactions for Encompass diagnostics.
+ */
 // Global variables
     let fieldIds = new Set();
     let dropdownFields = new Set();

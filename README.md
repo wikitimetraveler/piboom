@@ -57,7 +57,10 @@ chmod +x setup-pi.sh
 Create a `.env` file with your API keys:
 ```bash
 # Google APIs
-GOOGLE_API_KEY=your_google_api_key
+GOOGLE_BROWSER_API_KEY=your_browser_key   # HTTP referrer restricted (Maps JS)
+GOOGLE_SERVER_API_KEY=your_server_key     # Server-side (YouTube, geocoding)
+# Legacy fallback (optional, used if the above aren't set)
+# GOOGLE_API_KEY=your_google_api_key
 
 # OpenAI (for AI assistants)
 OPENAI_API_KEY=your_openai_api_key
@@ -71,6 +74,8 @@ SHAZAM_API_KEY=your_shazam_api_key
 # Optional: ArcGIS API (for some disaster services)
 ARCGIS_API_KEY=your_arcgis_api_key
 ```
+
+> ℹ️ Keep two separate Google API keys: one locked to browser referrers (`GOOGLE_BROWSER_API_KEY`) so the public pages like `music-research.html` can load Maps, and one server-side key (`GOOGLE_SERVER_API_KEY`) for backend calls to YouTube Data API, Places, etc. The code still falls back to `GOOGLE_API_KEY` if you only have a single key, but splitting them prevents referer restrictions from blocking server requests.
 
 ### 3. Start the System
 ```bash

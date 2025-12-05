@@ -1,4 +1,14 @@
-// Tool 8 JavaScript
+/**
+ * Tool 8 JavaScript
+ *
+ * @file        tool8.js
+ * @author      David Lane
+ * @version     1.0.0
+ * @since       2024
+ *
+ * Provides the logic for Tool 8’s Encompass automation lab, including field
+ * dictionaries, condition conversion helpers, and event bindings.
+ */
 
 // Global variables
 let fieldIds = new Set();

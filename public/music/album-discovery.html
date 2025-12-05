@@ -586,6 +586,73 @@
     background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: white;
   }
+
+  .camera-status {
+    margin: 10px auto;
+    padding: 12px 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    width: fit-content;
+    max-width: 100%;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid var(--border);
+    box-shadow: var(--zen-shadow);
+  }
+
+  .camera-status i {
+    font-size: 1.2rem;
+  }
+
+  .camera-status--info {
+    border-left: 4px solid #17a2b8;
+    color: #0b7285;
+  }
+
+  .camera-status--success {
+    border-left: 4px solid #28a745;
+    color: #0f5132;
+    background: rgba(40,167,69,0.08);
+  }
+
+  .camera-status--warning {
+    border-left: 4px solid #ffc107;
+    color: #664d03;
+    background: rgba(255,193,7,0.15);
+  }
+
+  .camera-status--error {
+    border-left: 4px solid #dc3545;
+    color: #842029;
+    background: rgba(220,53,69,0.1);
+  }
+
+  .camera-instructions {
+    margin: 10px auto 15px;
+    background: rgba(0,0,0,0.03);
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px dashed var(--border);
+    max-width: 700px;
+    font-size: 0.9rem;
+    color: #4b4b4b;
+  }
+
+  .camera-instructions ul {
+    padding-left: 18px;
+    margin-bottom: 0;
+  }
+
+  .camera-loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    margin: 10px 0;
+    color: #0b7285;
+  }
   
   /* Toast Notifications */
   .toast-container {
@@ -827,6 +894,18 @@
                 <input type="file" id="albumImageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
               </label>
             </div>
+            <div id="imageStatus" class="camera-status camera-status--info" style="display: inline-flex;">
+              <i class="bi-image"></i>
+              <span>No image selected yet. Upload an album cover to begin.</span>
+            </div>
+            <div class="camera-instructions">
+              <strong>Best results when:</strong>
+              <ul>
+                <li>The photo is clear and taken straight-on.</li>
+                <li>The entire album artwork is visible.</li>
+                <li>The file size is under 10 MB.</li>
+              </ul>
+            </div>
             <div id="imagePreview" style="display: none; margin-top: 15px;">
               <div style="background: #f0f0f0; padding: 20px; border-radius: 15px; display: inline-block;">
                 <div style="position: relative; display: inline-block;">
@@ -861,6 +940,22 @@
               <button class="btn btn-lg btn-danger" onclick="stopCamera()" id="stopCameraBtn" style="display: none;">
                 <i class="bi-camera-video-off"></i> Stop Camera
               </button>
+            </div>
+            <div id="cameraStatus" class="camera-status camera-status--info">
+              <i class="bi-camera-video"></i>
+              <span>Camera not initialized. Click “Start Camera” to capture an album cover.</span>
+            </div>
+            <div class="camera-instructions">
+              <strong>Tips for clearer identification:</strong>
+              <ul>
+                <li>Allow camera permissions when prompted.</li>
+                <li>Fill the green square with the album art and avoid glare.</li>
+                <li>Use steady hands or rest the album on a flat surface.</li>
+              </ul>
+            </div>
+            <div id="cameraLoadingIndicator" class="camera-loading" style="display:none;">
+              <div class="spinner-border text-info" role="status" aria-hidden="true"></div>
+              <span>Connecting to your camera…</span>
             </div>
             
             <!-- Camera Preview -->
@@ -1022,7 +1117,56 @@ let currentInputMode = 'band'; // 'band', 'album', 'image', or 'camera'
 let uploadedImageData = null;
 let cameraStream = null;
 let cameraVideo = null;
+let cameraSupported = false;
 let currentAIAnalysis = null; // Store current AI analysis for artist
+const CAMERA_STATUS_ICONS = {
+  info: 'bi-info-circle',
+  success: 'bi-check-circle',
+  warning: 'bi-exclamation-triangle',
+  error: 'bi-exclamation-octagon'
+};
+
+function updateCameraStatus(message, type = 'info') {
+  const statusEl = document.getElementById('cameraStatus');
+  if (!statusEl) return;
+  statusEl.className = `camera-status camera-status--${type}`;
+  const icon = CAMERA_STATUS_ICONS[type] || CAMERA_STATUS_ICONS.info;
+  statusEl.innerHTML = `<i class="bi ${icon}"></i><span>${message}</span>`;
+}
+
+function setCameraLoading(isLoading) {
+  const loadingEl = document.getElementById('cameraLoadingIndicator');
+  if (!loadingEl) return;
+  loadingEl.style.display = isLoading ? 'flex' : 'none';
+}
+
+function updateImageStatus(message, type = 'info') {
+  const statusEl = document.getElementById('imageStatus');
+  if (!statusEl) return;
+  statusEl.className = `camera-status camera-status--${type}`;
+  const icon = CAMERA_STATUS_ICONS[type] || CAMERA_STATUS_ICONS.info;
+  statusEl.style.display = 'inline-flex';
+  statusEl.innerHTML = `<i class="bi ${icon}"></i><span>${message}</span>`;
+}
+
+function initCameraSupportStatus() {
+  const startBtn = document.getElementById('startCameraBtn');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    cameraSupported = false;
+    if (startBtn) startBtn.disabled = true;
+    updateCameraStatus('Camera access is not supported in this browser or device.', 'error');
+    return;
+  }
+  cameraSupported = true;
+  if (startBtn) startBtn.disabled = false;
+  updateCameraStatus('Camera ready. Click “Start Camera” to begin scanning an album cover.', 'info');
+}
+
+function handleVisibilityChange() {
+  if (document.hidden && cameraStream) {
+    stopCamera({ reason: 'hidden' });
+  }
+}
 
 // Backend Google TTS service
 async function speakViaBackend(text, callback) {
@@ -1507,44 +1651,48 @@ function clearImageUpload() {
 
 // Start camera for live capture
 async function startCamera() {
+  if (cameraStream) {
+    updateCameraStatus('Camera is already running.', 'info');
+    return;
+  }
+  if (!cameraSupported) {
+    updateCameraStatus('Camera access is not supported in this browser.', 'error');
+    return;
+  }
   try {
-    // Request camera access with high resolution
+    setCameraLoading(true);
+    updateCameraStatus('Requesting camera access…', 'info');
     const constraints = {
       video: {
-        facingMode: 'environment', // Use back camera on mobile
+        facingMode: 'environment',
         width: { ideal: 1920 },
         height: { ideal: 1080 }
       }
     };
-    
     cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
     cameraVideo = document.getElementById('cameraVideo');
     cameraVideo.srcObject = cameraStream;
-    
-    // Show camera preview
     document.getElementById('cameraPreview').style.display = 'block';
     document.getElementById('startCameraBtn').style.display = 'none';
     document.getElementById('stopCameraBtn').style.display = 'inline-block';
-    
-    // Once video starts playing, set up the frame guide
+    updateCameraStatus('Camera connected. Center the album in the green square.', 'success');
+    setCameraLoading(false);
+
     cameraVideo.onloadedmetadata = function() {
       setTimeout(() => {
         const guide = document.getElementById('cameraFrameGuide');
         if (guide && cameraVideo) {
-          // Make square guide 70% of video size
           const videoWidth = cameraVideo.offsetWidth;
           const videoHeight = cameraVideo.offsetHeight;
           const guideSize = Math.min(videoWidth, videoHeight) * 0.7;
-          
           guide.style.width = guideSize + 'px';
           guide.style.height = guideSize + 'px';
         }
       }, 100);
     };
-    
   } catch (error) {
     console.error('Error accessing camera:', error);
-    
+    setCameraLoading(false);
     let errorMessage = 'Could not access camera. ';
     if (error.name === 'NotAllowedError') {
       errorMessage += 'Please allow camera permissions.';
@@ -1553,11 +1701,13 @@ async function startCamera() {
     } else {
       errorMessage += 'Make sure your camera is connected and not in use.';
     }
+    updateCameraStatus(errorMessage, 'error');
   }
 }
 
 // Stop camera and release resources
-function stopCamera() {
+function stopCamera(options = {}) {
+  const { silent = false, reason = '' } = typeof options === 'object' ? options : {};
   if (cameraStream) {
     cameraStream.getTracks().forEach(track => track.stop());
     cameraStream = null;
@@ -1567,13 +1717,20 @@ function stopCamera() {
     cameraVideo.srcObject = null;
   }
   
-  // Reset UI
   document.getElementById('cameraPreview').style.display = 'none';
   document.getElementById('capturedPreview').style.display = 'none';
   document.getElementById('startCameraBtn').style.display = 'inline-block';
   document.getElementById('stopCameraBtn').style.display = 'none';
+  setCameraLoading(false);
   
-  // Clear any captured image
+  if (!silent) {
+    const message = reason === 'hidden'
+      ? 'Camera paused because the tab is inactive.'
+      : 'Camera stopped.';
+    const type = reason === 'hidden' ? 'info' : 'warning';
+    updateCameraStatus(message, type);
+  }
+  
   uploadedImageData = null;
   document.getElementById('capturedImg').src = '';
 }
@@ -1616,6 +1773,7 @@ function captureFromCamera() {
   
   // Play a camera shutter sound effect (optional)
   playShutterSound();
+  updateCameraStatus('Photo captured. Tap “Identify Album” to analyze.', 'success');
 }
 
 // Retake photo (go back to camera preview)
@@ -1624,6 +1782,7 @@ function retakePhoto() {
   document.getElementById('capturedImg').src = '';
   document.getElementById('capturedPreview').style.display = 'none';
   document.getElementById('cameraPreview').style.display = 'block';
+  updateCameraStatus('Ready for another capture. Align the album and press the shutter.', 'info');
 }
 
 // Play camera shutter sound (simple audio feedback)
@@ -2706,6 +2865,14 @@ document.addEventListener('DOMContentLoaded', function() {
   createUserSelector('userSelectorContainer', { 
     title: 'Adding Albums As:',
     showAllOption: false // Only show current user for adding albums
+  });
+  
+  initCameraSupportStatus();
+  document.addEventListener('visibilitychange', handleVisibilityChange);
+  window.addEventListener('beforeunload', () => {
+    if (cameraStream) {
+      stopCamera({ silent: true });
+    }
   });
   
   // Basic container initialization

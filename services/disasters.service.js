@@ -1137,6 +1137,12 @@ export async function ingestCaFireCameras() {
       return { inserted: 0, skipped: 0 };
     }
 
+    const beforeDedup = cameras.length;
+    cameras = dedupeCamerasByLocation(cameras);
+    if (beforeDedup !== cameras.length) {
+      console.log(`📹 CA Fire Cameras: deduplicated ${beforeDedup} ➜ ${cameras.length} unique cameras`);
+    }
+
     // Convert cameras to disaster-like records for unified table
     // We'll store cameras as "camera" event_type with source "alertcalifornia"
     const batch = [];
@@ -1208,6 +1214,45 @@ export async function ingestCaFireCameras() {
   }
 }
 
+/**
+ * Deduplicate camera records by camera_id (when present) or by rounded lat/lng.
+ * Prefers records with richer metadata (ID, name, county, status, URLs).
+ */
+function dedupeCamerasByLocation(cameras) {
+  if (!Array.isArray(cameras)) return [];
+  const bestByKey = new Map();
 
+  const toNumber = (value) => {
+    if (typeof value === 'number') return value;
+    const parsed = parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  };
 
+  const scoreCamera = (cam) => {
+    let score = 0;
+    if (cam.camera_id) score += 5;
+    if (cam.name && cam.name !== 'Unknown Camera') score += 2;
+    if (cam.county && cam.county !== 'Unknown') score += 2;
+    if (cam.status) score += 1;
+    if (cam.camera_url || cam.image_url) score += 1;
+    return score;
+  };
 
+  for (const cam of cameras) {
+    const lat = toNumber(cam.latitude);
+    const lng = toNumber(cam.longitude);
+    if (lat === null || lng === null) continue;
+
+    const idKey = cam.camera_id ? `id:${String(cam.camera_id).trim()}` : null;
+    const geoKey = `geo:${lat.toFixed(3)}:${lng.toFixed(3)}`;
+    const key = idKey || geoKey;
+    const currentScore = scoreCamera(cam);
+
+    const existing = bestByKey.get(key);
+    if (!existing || currentScore > existing.score) {
+      bestByKey.set(key, { ...cam, score: currentScore });
+    }
+  }
+
+  return Array.from(bestByKey.values()).map(({ score, ...cam }) => cam);
+}

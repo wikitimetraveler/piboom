@@ -1,14 +1,27 @@
 import 'dotenv/config';
+import { getGoogleBrowserApiKey, getGoogleServerApiKey } from './lib/google-api-key.js';
 
-console.log('🔑 Testing Google API Key...');
+console.log('🔑 Testing Google API Key setup...');
 console.log('MODE:', process.env.MODE);
-console.log('GOOGLE_API_KEY:', process.env.GOOGLE_API_KEY ? '✅ Found' : '❌ Not found');
-console.log('Key length:', process.env.GOOGLE_API_KEY?.length || 0);
+console.log('GOOGLE_BROWSER_API_KEY env:', process.env.GOOGLE_BROWSER_API_KEY ? '✅ Found' : '❌ Not set');
+console.log('GOOGLE_SERVER_API_KEY env:', process.env.GOOGLE_SERVER_API_KEY ? '✅ Found' : '❌ Not set');
+console.log('Legacy GOOGLE_API_KEY env:', process.env.GOOGLE_API_KEY ? '✅ Found' : '❌ Not set');
 
-if (process.env.GOOGLE_API_KEY) {
-  console.log('🎉 Google API key is configured!');
+const browserKey = getGoogleBrowserApiKey();
+const serverKey = getGoogleServerApiKey();
+
+console.log('Resolved browser key length:', browserKey.length);
+console.log('Resolved server key length:', serverKey.length);
+
+if (browserKey && serverKey) {
+  console.log('🎉 Browser + server Google API keys are configured!');
 } else {
-  console.log('❌ Google API key is missing!');
-  console.log('Make sure your .env file exists and contains:');
-  console.log('GOOGLE_API_KEY=your_actual_api_key_here');
+  console.log('❌ Missing Google API keys!');
+  if (!browserKey) {
+    console.log('   - Add GOOGLE_BROWSER_API_KEY (HTTP referrer restricted) to your .env');
+  }
+  if (!serverKey) {
+    console.log('   - Add GOOGLE_SERVER_API_KEY (server-side key) to your .env');
+  }
+  console.log('Legacy fallback: set GOOGLE_API_KEY if you only have one key (not recommended).');
 }

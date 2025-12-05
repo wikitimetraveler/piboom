@@ -1,6 +1,11 @@
 /**
  * Calculator Scenario Runner
  *
+ * @file        calculator-scenario-runner.js
+ * @author      David Lane
+ * @version     1.0.0
+ * @since       2024
+ *
  * Injects a lightweight control panel so each calculator can quickly load
  * prebuilt Encompass sample loans (defined inside encompass-test-loans.js).
  * Selecting a scenario automatically populates the matching calculator inputs,

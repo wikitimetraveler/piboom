@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import axios from 'axios';
+import { getGoogleServerApiKey } from './lib/google-api-key.js';
 
 const WIKIPEDIA_SEARCH_URL = 'https://en.wikipedia.org/w/api.php';
 
@@ -79,12 +80,13 @@ async function testMapData() {
 
     console.log('Extracted birth place:', birthPlace);
 
-    if (birthPlace && process.env.GOOGLE_API_KEY) {
+    const googleApiKey = getGoogleServerApiKey();
+    if (birthPlace && googleApiKey) {
       // Test geocoding
       const geocodeResponse = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
         params: {
           address: birthPlace,
-          key: process.env.GOOGLE_API_KEY
+          key: googleApiKey
         }
       });
 
@@ -95,7 +97,7 @@ async function testMapData() {
         console.log('❌ Geocoding failed');
       }
     } else {
-      console.log('❌ No birth place found or no API key');
+      console.log('❌ No birth place found or no Google server API key');
     }
 
   } catch (error) {

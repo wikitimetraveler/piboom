@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 // Search for posters/album covers from multiple data sources
 export async function searchPosters(req, res) {
@@ -153,7 +154,7 @@ async function searchMusicBrainzPosters(query, filter = 'all') {
 
 // Search YouTube for diverse neon-themed content
 async function searchYouTubePosters(query, filter = 'all') {
-  const apiKey = process.env.GOOGLE_API_KEY;
+  const apiKey = getGoogleServerApiKey();
   if (!apiKey) {
     throw new Error('YouTube API key not configured');
   }
@@ -271,7 +272,7 @@ async function searchWikipediaImages(query, filter = 'all') {
 
 // Search Google Knowledge Graph for neon-themed entities
 async function searchKnowledgeGraphImages(query, filter = 'all') {
-  const apiKey = process.env.GOOGLE_API_KEY;
+  const apiKey = getGoogleServerApiKey();
   if (!apiKey) {
     throw new Error('Google API key not configured');
   }

@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
 <link rel="stylesheet" href="/shared/styles.css"/>
 <script src="/shared/modern-navbar.js"></script>
+<!-- Google API for YouTube (client-side search) -->
+<script src="https://apis.google.com/js/api.js"></script>
 <style>
   /* Floating Musical Notes */
   .floating-notes {
@@ -908,6 +910,9 @@ let searchMode = 'kg'; // 'kg' for Knowledge Graph, 'wiki' for Wikipedia
 
 // Google API Key will be loaded from server
 let GOOGLE_API_KEY = null;
+let youtubeAPIReady = false;
+let youtubeInitInProgress = false;
+let youtubeApiScriptLoading = false;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
@@ -1217,6 +1222,8 @@ function loadGoogleMapsAPI() {
       if (data.apiKey) {
         GOOGLE_API_KEY = data.apiKey;
         useGoogleMaps = true;
+        // Initialize client-side YouTube API once key is available
+        loadYouTubeAPI();
         // Load Google Maps API with the correct key
         const script = document.createElement('script');
         script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=initMap`;
@@ -1237,6 +1244,61 @@ function loadGoogleMapsAPI() {
       // Initialize fallback map on error
       initializeFallbackMap('Ready for search');
     });
+}
+
+// Load Google API client for YouTube Data API (browser-side)
+function loadYouTubeAPI() {
+  if (!GOOGLE_API_KEY) {
+    console.warn('❌ Cannot init YouTube API without Google API key');
+    return;
+  }
+
+  if (youtubeAPIReady || youtubeInitInProgress) {
+    return;
+  }
+
+  const initClient = () => {
+    if (youtubeAPIReady || youtubeInitInProgress) {
+      return;
+    }
+    youtubeInitInProgress = true;
+    gapi.load('client', () => {
+      gapi.client.init({
+        apiKey: GOOGLE_API_KEY,
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest']
+      }).then(() => {
+        console.log('📺 YouTube Data API ready (client-side)');
+        youtubeAPIReady = true;
+      }).catch(error => {
+        console.error('❌ Error initializing YouTube API:', error);
+      }).finally(() => {
+        youtubeInitInProgress = false;
+      });
+    });
+  };
+
+  if (typeof gapi === 'undefined') {
+    if (youtubeApiScriptLoading) {
+      return;
+    }
+    youtubeApiScriptLoading = true;
+    const script = document.createElement('script');
+    script.src = 'https://apis.google.com/js/api.js';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      youtubeApiScriptLoading = false;
+      initClient();
+    };
+    script.onerror = () => {
+      youtubeApiScriptLoading = false;
+      console.error('❌ Failed to load Google API client library');
+    };
+    document.head.appendChild(script);
+    return;
+  }
+
+  initClient();
 }
 
 // Initialize Google Knowledge Graph Widget
@@ -2262,26 +2324,54 @@ function searchWikipedia(artistName) {
   });
 }
 
-function searchYouTube(artistName) {
-  // This will be implemented with your YouTube API
-  fetch('/api/music-research/youtube', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ artist: artistName })
-  })
-  .then(response => response.json())
-  .then(data => {
+function searchYouTube(artistName, attempt = 0) {
+  if (!artistName) return;
+  showLoading('youtubeLoading', true);
+
+  if (!GOOGLE_API_KEY) {
+    console.warn('❌ Google API key unavailable for YouTube search');
     showLoading('youtubeLoading', false);
-    displayYouTubeVideos(data);
-  })
-  .catch(error => {
-    showLoading('youtubeLoading', false);
-    document.getElementById('videoGrid').innerHTML = 
-      '<div class="alert alert-warning">Error loading videos. Please try again.</div>';
-    console.error('Error:', error);
-  });
+    document.getElementById('videoGrid').innerHTML =
+      '<div class="alert alert-warning">YouTube search is not configured yet.</div>';
+    return;
+  }
+
+  if (!youtubeAPIReady) {
+    loadYouTubeAPI();
+    if (attempt < 6) {
+      setTimeout(() => searchYouTube(artistName, attempt + 1), 600);
+    } else {
+      showLoading('youtubeLoading', false);
+      document.getElementById('videoGrid').innerHTML =
+        '<div class="alert alert-warning">YouTube API is still loading. Please try again.</div>';
+    }
+    return;
+  }
+
+  const requestParams = {
+    part: 'snippet',
+    q: `${artistName} live music`,
+    type: 'video',
+    maxResults: 6
+  };
+
+  gapi.client.youtube.search.list(requestParams)
+    .then(response => {
+      const videos = (response.result.items || []).map(item => ({
+        videoId: item.id?.videoId,
+        title: item.snippet?.title || 'Untitled Video',
+        channelTitle: item.snippet?.channelTitle || 'Unknown Channel'
+      }));
+      displayYouTubeVideos({ videos });
+    })
+    .catch(error => {
+      console.error('YouTube API error:', error);
+      document.getElementById('videoGrid').innerHTML =
+        '<div class="alert alert-warning">Unable to load YouTube videos right now.</div>';
+    })
+    .finally(() => {
+      showLoading('youtubeLoading', false);
+    });
 }
 
 function searchBandMembers(artistName) {

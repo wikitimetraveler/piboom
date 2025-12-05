@@ -1,3 +1,14 @@
+/**
+ * FHA Streamline Calculations
+ *
+ * @file        fhaStreamlineCalculations.js
+ * @author      David Lane
+ * @version     1.0.0
+ * @since       2024
+ *
+ * Core calculation engine backing the FHA Streamline worksheet, wiring DOM
+ * inputs to reusable math helpers and keeping results in sync with user edits.
+ */
 class FhaStreamlineCalculations {
   constructor(config) {
     this.groups = config.groups;

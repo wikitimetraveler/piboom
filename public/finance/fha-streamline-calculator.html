@@ -1,4 +1,18 @@
 <!DOCTYPE html>
+<!--
+  ==============================================================================
+  FHA Streamline Worksheet
+  ==============================================================================
+  
+  @file       fha-streamline-calculator.html
+  @author     David Lane
+  @version    1.0.0
+  @since      2024
+  
+  @description
+  Interactive FHA Streamline calculator mirroring HUD worksheet logic, complete
+  with audit tests, voice controls, and modern UI enhancements.
+-->
 <html lang="en">
    <head>
       <meta charset="UTF-8">
@@ -748,6 +762,14 @@
                      <a class="nav-link" id="parseFieldsBtn" href="#">
                         <i class="bi-code-slash"></i> Parse Fields
                      </a>
+                  </li>
+                  <li class="nav-item">
+                     <a class="nav-link" href="#" id="saveToEncompassBtn">
+                        <i class="bi-cloud-upload"></i> Save to Encompass
+                     </a>
+                  </li>
+                  <li class="nav-item d-flex align-items-center">
+                     <span class="badge badge-pill badge-light text-dark mt-2 mt-lg-0" id="saveStatusBadge" style="font-weight:600;">Ready</span>
                   </li>
                   <li class="nav-item">
                      <a class="nav-link" id="darkModeToggle" href="#">

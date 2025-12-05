@@ -252,6 +252,57 @@ function setupFieldProcessing() {
         screenBindings.generateElements();
         screenBindings.bindFieldValues2();
     });
+
+    const saveBtn = document.getElementById("saveToEncompassBtn");
+    if (saveBtn) {
+        saveBtn.addEventListener("click", (event) => {
+            event.preventDefault();
+            handleSaveToEncompass();
+        });
+    }
 }
 
 // Additional functions and logic to be added here.
+
+let saveStatusResetTimeout = null;
+
+function handleSaveToEncompass() {
+    if (!screenBindings || typeof screenBindings.processLoanObject !== 'function') {
+        updateSaveStatus('Unavailable', 'badge-secondary');
+        console.error('Screen bindings are not initialized.');
+        return;
+    }
+
+    if (!screenBindings.loanObject) {
+        updateSaveStatus('Not Connected', 'badge-danger');
+        console.warn('Cannot save to Encompass: loan object not available.');
+        return;
+    }
+
+    updateSaveStatus('Saving...', 'badge-warning text-dark');
+
+    try {
+        screenBindings.processLoanObject();
+        updateSaveStatus('Saved', 'badge-success');
+        if (saveStatusResetTimeout) {
+            clearTimeout(saveStatusResetTimeout);
+        }
+        saveStatusResetTimeout = setTimeout(() => updateSaveStatus('Ready', 'badge-light text-dark'), 4000);
+    } catch (error) {
+        console.error('Error saving to Encompass:', error);
+        updateSaveStatus('Error', 'badge-danger');
+    }
+}
+
+function updateSaveStatus(text, additionalClasses) {
+    const badge = document.getElementById('saveStatusBadge');
+    if (!badge) return;
+    const classes = ['badge', 'badge-pill'];
+    if (additionalClasses) {
+        classes.push(...additionalClasses.split(' '));
+    } else {
+        classes.push('badge-light', 'text-dark');
+    }
+    badge.className = classes.join(' ');
+    badge.textContent = text;
+}

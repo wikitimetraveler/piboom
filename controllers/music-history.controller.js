@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 // Get music history for a specific date
 export async function getMusicHistory(req, res) {
@@ -176,7 +177,7 @@ async function getMusicEventsFromWikipedia(month, day) {
 // Get YouTube videos from a specific year
 async function getYouTubeVideosFromYear(year) {
   const videos = [];
-  const apiKey = process.env.GOOGLE_API_KEY;
+  const apiKey = getGoogleServerApiKey();
   
   if (!apiKey) {
     console.warn('Google API key not available');
