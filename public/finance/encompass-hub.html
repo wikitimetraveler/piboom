@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encompass Hub – Pipeline & Loan APIs</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/shared/styles.css">
+    <script src="/shared/modern-navbar.js" defer></script>
+    <style>
+      body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e6ecff 100%);
+        min-height: 100vh;
+      }
+
+      .hero {
+        padding: 4rem 0 2rem;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-size: 2.75rem;
+        font-weight: 700;
+        color: #1a2856;
+      }
+
+      .hero p {
+        color: #516082;
+        max-width: 760px;
+        margin: 0.5rem auto 0;
+      }
+
+      .hub-card {
+        border-radius: 20px;
+        border: 1px solid rgba(102, 126, 234, 0.15);
+        box-shadow: 0 20px 45px rgba(26, 32, 72, 0.08);
+        background: #ffffff;
+      }
+
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.35rem 0.85rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 600;
+      }
+
+      .status-chip.ok {
+        background: rgba(46, 204, 113, 0.15);
+        color: #1e8449;
+      }
+
+      .status-chip.warn {
+        background: rgba(241, 196, 15, 0.2);
+        color: #9c7100;
+      }
+
+      .status-chip.err {
+        background: rgba(231, 76, 60, 0.2);
+        color: #922b21;
+      }
+
+      .filter-chips span {
+        background: rgba(102, 126, 234, 0.12);
+        border-radius: 999px;
+        padding: 0.2rem 0.75rem;
+        font-size: 0.8rem;
+        color: #2c3e50;
+      }
+
+      table {
+        font-size: 0.9rem;
+      }
+
+      #pipelineResults tbody tr {
+        cursor: pointer;
+        transition: background 0.2s ease;
+      }
+
+      #pipelineResults tbody tr:hover {
+        background: rgba(102, 126, 234, 0.08);
+      }
+
+      #pipelineResults tbody tr.selected {
+        background: rgba(102, 126, 234, 0.15);
+      }
+
+      .empty-state {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: #6c7a99;
+      }
+    </style>
+  </head>
+  <body>
+    <modern-navbar></modern-navbar>
+
+    <section class="hero">
+      <div class="container">
+        <span class="badge badge-pill badge-primary mb-2"><i class="bi-cloud"></i> Encompass Developer Connect</span>
+        <h1>Encompass Hub</h1>
+        <p>
+          Monitor live pipeline data, drill into individual loans, and validate field level values directly from Encompass
+          Developer Connect APIs. All calls stay server-side so credentials remain secured in the existing .env file.
+        </p>
+      </div>
+    </section>
+
+    <main class="container pb-5">
+      <div class="row">
+        <div class="col-lg-4 mb-4">
+          <div class="hub-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="mb-1">Connection Status</h5>
+                <small class="text-muted">OAuth password grant token</small>
+              </div>
+              <span id="statusChip" class="status-chip warn">
+                <i class="bi bi-clock-history"></i>
+                Checking...
+              </span>
+            </div>
+            <button class="btn btn-outline-primary btn-sm mb-4" id="refreshStatusBtn">
+              <i class="bi-arrow-clockwise"></i> Refresh Status
+            </button>
+
+            <form id="pipelineForm">
+              <div class="form-group">
+                <label for="stateFilter">Property State</label>
+                <input type="text" id="stateFilter" name="state" class="form-control" placeholder="e.g. CA">
+              </div>
+              <div class="form-group">
+                <label for="countyFilter">Counties</label>
+                <input type="text" id="countyFilter" name="counties" class="form-control" placeholder="Los Angeles, Orange">
+                <small class="form-text text-muted">Comma separated</small>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-6">
+                  <label for="loanFolderFilter">Folder</label>
+                  <select id="loanFolderFilter" name="loanFolder" class="form-control">
+                    <option value="Pipeline" selected>Pipeline</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Underwriting">Underwriting</option>
+                    <option value="Funding">Funding</option>
+                  </select>
+                </div>
+                <div class="form-group col-6">
+                  <label for="loanTypeFilter">Doc Type</label>
+                  <select id="loanTypeFilter" name="loanType" class="form-control">
+                    <option value="">Any</option>
+                    <option value="Conventional" selected>Conventional</option>
+                    <option value="FHA Full Doc">FHA Full Doc</option>
+                    <option value="FHA Streamline">FHA Streamline</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="limitFilter">Record Limit</label>
+                <input type="number" min="1" max="100" id="limitFilter" name="limit" class="form-control" value="25">
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">
+                <i class="bi-cloud-download"></i>
+                Load Pipeline
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-8 mb-4">
+          <div class="hub-card p-3 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="mb-1">Pipeline Results</h5>
+                <small class="text-muted">Click any row to pull the full loan record</small>
+              </div>
+              <div class="text-right">
+                <div class="filter-chips mb-2" id="activeFilters"></div>
+                <small id="resultMeta" class="text-muted">No data loaded yet</small>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0" id="pipelineResults">
+                <thead>
+                  <tr>
+                    <th>Loan #</th>
+                    <th>Borrower</th>
+                    <th>County</th>
+                    <th>State</th>
+                    <th>Amount</th>
+                    <th>Doc Type</th>
+                  </tr>
+                </thead>
+                <tbody id="pipelineResultsBody">
+                  <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                      Use the filters to load pipeline data from Encompass.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="hub-card p-3" id="loanDetailsCard">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="mb-1">Loan Details</h5>
+                <small class="text-muted">Live data direct from Developer Connect</small>
+              </div>
+              <span class="badge badge-pill badge-light" id="loanGuidDisplay">Select a loan</span>
+            </div>
+            <div id="loanDetailsBody" class="empty-state">
+              Select a loan from the table to load borrower, property, and milestone data.
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/shared/user-login.js"></script>
+    <script src="/shared/user-passwords.js"></script>
+    <script src="js/encompassHub.js" type="module"></script>
+  </body>
+</html>
+
