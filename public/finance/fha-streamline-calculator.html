@@ -130,6 +130,18 @@
             margin-bottom: 20px;
          }
 
+         /* Keep hamburger toggle away from the far right edge so it doesn't hide under the quick nav links */
+         .navbar .navbar-toggler {
+            margin-left: 1rem;
+            margin-right: auto;
+         }
+
+         @media (min-width: 992px) {
+            .navbar .navbar-toggler {
+               display: none;
+            }
+         }
+
          /* Ensure navbar links are visible */
          .navbar-nav .nav-link {
             color: rgba(255, 255, 255, 0.9) !important;
@@ -595,7 +607,7 @@
          }
 
          /* Zen Container */
-         .container {
+         .main-content > .container {
             background: rgba(254, 254, 254, 0.98);
             border: 1px solid var(--elegant-border);
             border-radius: 24px;
