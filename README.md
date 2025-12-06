@@ -98,9 +98,10 @@ docker-compose up
 
 ## 🛠️ Tech Stack
 
-### Backend
+-### Backend
 - **Node.js** - Runtime environment
 - **Express.js** - Web server framework
+- **ICE Encompass Developer Connect** - OAuth-secured access to loan pipeline/loan objects via the Encompass Hub service and ScreenBindings class
 - **PostgreSQL** - Relational database for loans, disasters, and AI memory
 - **Socket.IO** - Real-time communication for voice commands
 - **LangChain** - AI conversation framework with memory
@@ -114,6 +115,7 @@ docker-compose up
 - **Chart.js** - Data visualization
 
 ### APIs & Services
+- **ICE Encompass Developer Connect**: Loan Pipeline, Loan, and OAuth token APIs powering Encompass Hub + binding workflows
 - **Google APIs**: Maps, Geocoding, Knowledge Graph, YouTube
 - **FEMA API**: Disaster declarations and flood zone data
 - **NASA FIRMS**: Fire detection data
@@ -159,12 +161,13 @@ docker-compose up
 - **Risk Visualization**: Color-coded markers and heat maps
 - **Distance Calculations**: Proximity analysis between loans and disasters
 
-### 🤖 AI Assistant Features
+-### 🤖 AI Assistant Features
 - **Mortgage Operations Expert**: Specialized knowledge in correspondent and retail lending
 - **Disaster Risk Expert**: Expertise in disaster impact on real estate values
 - **Conversation Memory**: PostgreSQL-backed conversation persistence
 - **Context Awareness**: Understands current filters, selected disasters, portfolio composition
 - **Data Integration**: Direct access to loan pipeline and disaster data
+- **Encompass Hub Awareness**: Knows how to hit Encompass loan objects both through the ScreenBindings class (in-app binding) and the new Encompass Hub APIs for server-side workflows
 - **Operational Insights**: Process improvement and efficiency recommendations
 - **ICE Knowledge Base**: Keep `docs/ICE_KNOWLEDGE_SOURCES.md` synced and run `npm run build:ice-knowledge` to refresh Encompass references
 
