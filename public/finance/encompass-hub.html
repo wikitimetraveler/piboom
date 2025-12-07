@@ -1,41 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Encompass Hub – Pipeline & Loan APIs</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="/shared/styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
     <script src="/shared/modern-navbar.js" defer></script>
     <style>
+      :root {
+        --zen-primary: #4a90a4;
+        --zen-secondary: #7fb3c7;
+        --zen-dark: #1a2856;
+        --zen-muted: #647196;
+        --zen-card-bg: rgba(255, 255, 255, 0.98);
+        --zen-border: rgba(99, 112, 189, 0.2);
+        --zen-shadow: 0 25px 65px rgba(13, 32, 83, 0.15);
+        --zen-gradient: linear-gradient(135deg, #6bb7c7 0%, #4a90a4 100%);
+      }
+
       body {
-        background: linear-gradient(135deg, #f5f7fa 0%, #e6ecff 100%);
         min-height: 100vh;
+        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #f5f7fa 0%, #dfe8ff 60%, #f8fbff 100%);
+        color: var(--zen-dark);
+        position: relative;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(111, 168, 255, 0.18), transparent 40%),
+          radial-gradient(circle at 20% 20%, rgba(74, 144, 164, 0.08), transparent 45%);
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      .nav-home,
+      .nav-finance {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+        display: flex;
+        gap: 12px;
+      }
+
+      .nav-finance {
+        right: auto;
+        left: 20px;
+      }
+
+      .nav-home a,
+      .nav-finance a {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 18px;
+        border-radius: 999px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.92);
+        color: var(--zen-dark);
+        text-decoration: none;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
+        transition: transform 0.2s ease, background 0.2s ease;
+      }
+
+      .nav-home a:hover,
+      .nav-finance a:hover {
+        transform: translateY(-2px);
+        background: var(--zen-gradient);
+        color: #fff;
+      }
+
+      .user-info {
+        position: fixed;
+        top: 90px;
+        left: 20px;
+        display: none;
+        z-index: 1040;
+      }
+
+      .user-info .user-display {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
+      }
+
+      .user-info img {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 2px solid var(--zen-primary);
       }
 
       .hero {
-        padding: 4rem 0 2rem;
+        padding: 5rem 1rem 2.5rem;
         text-align: center;
       }
 
+      .hero .container {
+        max-width: 960px;
+      }
+
+      .hero .badge {
+        font-size: 0.85rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        background: rgba(255, 255, 255, 0.9);
+        color: var(--zen-dark);
+        border: 1px solid rgba(99, 112, 189, 0.2);
+      }
+
       .hero h1 {
-        font-size: 2.75rem;
+        font-size: clamp(2.4rem, 4vw, 3rem);
         font-weight: 700;
-        color: #1a2856;
+        margin-top: 1rem;
       }
 
       .hero p {
-        color: #516082;
+        color: var(--zen-muted);
         max-width: 760px;
-        margin: 0.5rem auto 0;
+        margin: 0.75rem auto 0;
+        font-size: 1.05rem;
+        line-height: 1.65;
+      }
+
+      .hero-insights {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin: 1.75rem auto 0;
+      }
+
+      .insight-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.5rem 1.1rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid var(--zen-border);
+        color: var(--zen-dark);
+        font-weight: 600;
+        box-shadow: 0 12px 35px rgba(15, 23, 42, 0.12);
+      }
+
+      .hero-actions {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .hero-actions .btn {
+        min-width: 220px;
+        border-radius: 999px;
+        padding: 0.85rem 1.75rem;
+        font-weight: 600;
+        box-shadow: 0 18px 40px rgba(74, 144, 164, 0.3);
+      }
+
+      .hero-actions .btn-outline-light {
+        color: var(--zen-dark);
+        border-color: rgba(255, 255, 255, 0.7);
+        background: rgba(255, 255, 255, 0.75);
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+      }
+
+      main.main-shell {
+        position: relative;
+        z-index: 1;
       }
 
       .hub-card {
         border-radius: 20px;
-        border: 1px solid rgba(102, 126, 234, 0.15);
-        box-shadow: 0 20px 45px rgba(26, 32, 72, 0.08);
-        background: #ffffff;
+        border: 1px solid var(--zen-border);
+        box-shadow: var(--zen-shadow);
+        background: var(--zen-card-bg);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      .hub-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 35px 70px rgba(13, 32, 83, 0.18);
       }
 
       .status-chip {
@@ -46,20 +202,18 @@
         border-radius: 999px;
         font-size: 0.85rem;
         font-weight: 600;
+        background: rgba(241, 196, 15, 0.18);
+        color: #8a6d00;
+        transition: background 0.2s ease, color 0.2s ease;
       }
 
       .status-chip.ok {
-        background: rgba(46, 204, 113, 0.15);
-        color: #1e8449;
-      }
-
-      .status-chip.warn {
-        background: rgba(241, 196, 15, 0.2);
-        color: #9c7100;
+        background: rgba(46, 204, 113, 0.17);
+        color: #1a7a43;
       }
 
       .status-chip.err {
-        background: rgba(231, 76, 60, 0.2);
+        background: rgba(231, 76, 60, 0.18);
         color: #922b21;
       }
 
@@ -68,48 +222,173 @@
         border-radius: 999px;
         padding: 0.2rem 0.75rem;
         font-size: 0.8rem;
-        color: #2c3e50;
+        color: var(--zen-dark);
+        margin-left: 0.35rem;
       }
 
       table {
         font-size: 0.9rem;
       }
 
+      #pipelineResults thead th {
+        border-top: none;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--zen-muted);
+        font-size: 0.78rem;
+        letter-spacing: 0.06em;
+      }
+
       #pipelineResults tbody tr {
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: background 0.2s ease, transform 0.2s ease;
       }
 
       #pipelineResults tbody tr:hover {
-        background: rgba(102, 126, 234, 0.08);
+        background: rgba(102, 126, 234, 0.06);
       }
 
       #pipelineResults tbody tr.selected {
-        background: rgba(102, 126, 234, 0.15);
+        background: rgba(102, 126, 234, 0.12);
+        box-shadow: inset 0 0 0 1px rgba(74, 144, 164, 0.4);
       }
 
       .empty-state {
         padding: 2rem 1rem;
         text-align: center;
-        color: #6c7a99;
+        color: var(--zen-muted);
+      }
+
+      #loanDetailsBody pre {
+        background: #0f172a;
+        border-radius: 16px;
+        color: #e2e8f0;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .voice-help-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .voice-help-drawer {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
+        width: min(360px, 90vw);
+        background: rgba(15, 23, 42, 0.95);
+        color: #fff;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 35px 65px rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transform: translateY(150%);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        z-index: 1045;
+      }
+
+      .voice-help-drawer.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .voice-help-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .voice-command-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+      }
+
+      .voice-command-list li {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.9rem;
+      }
+
+      .voice-command-list span {
+        font-weight: 600;
+        color: #9edbff;
+      }
+
+      @media (max-width: 992px) {
+        .nav-home,
+        .nav-finance,
+        .user-info {
+          position: static;
+          margin: 10px auto;
+          justify-content: center;
+        }
+
+        .hero {
+          padding-top: 3.5rem;
+        }
+
+        .voice-help-drawer {
+          right: 16px;
+          left: 16px;
+          width: auto;
+        }
       }
     </style>
   </head>
-  <body>
+  <body data-page="encompass-hub">
     <modern-navbar></modern-navbar>
+
+    <div class="nav-finance">
+      <a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a>
+    </div>
+    <div class="nav-home">
+      <a href="/index.html"><i class="bi-house"></i> Home</a>
+    </div>
+    <div class="user-info" id="userInfo">
+      <div class="user-display">
+        <img id="userAvatar" src="" alt="User avatar" />
+        <span id="userName">Loan Pro</span>
+      </div>
+    </div>
 
     <section class="hero">
       <div class="container">
-        <span class="badge badge-pill badge-primary mb-2"><i class="bi-cloud"></i> Encompass Developer Connect</span>
+        <span class="badge badge-pill mb-2"><i class="bi-cloud"></i> Encompass Developer Connect</span>
         <h1>Encompass Hub</h1>
         <p>
-          Monitor live pipeline data, drill into individual loans, and validate field level values directly from Encompass
-          Developer Connect APIs. All calls stay server-side so credentials remain secured in the existing .env file.
+          Monitor live pipeline data, drill into individual loans, and validate field-level values directly from Encompass
+          Developer Connect APIs. Every call stays server-side so your credentials remain secure inside the .env vault.
         </p>
+
+        <div class="hero-insights">
+          <span class="insight-chip"><i class="bi-lightning-charge"></i>Live Pipeline Slice</span>
+          <span class="insight-chip"><i class="bi-diagram-3"></i>Loan Task Visibility</span>
+          <span class="insight-chip"><i class="bi-cpu"></i>Voice Activated</span>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="loadPipelineCta">
+            <i class="bi-cloud-arrow-down"></i> Refresh Pipeline
+          </button>
+          <button class="btn btn-outline-light voice-help-toggle" id="toggleVoiceHelp">
+            <i class="bi-mic"></i> Voice Commands
+          </button>
+          <a class="btn btn-light" href="encompass-analytics.html">
+            <i class="bi-graph-up"></i> Open Analytics Dashboard
+          </a>
+        </div>
       </div>
     </section>
 
-    <main class="container pb-5">
+    <main class="container pb-5 main-shell">
       <div class="row">
         <div class="col-lg-4 mb-4">
           <div class="hub-card p-4 h-100">
@@ -130,18 +409,19 @@
             <form id="pipelineForm">
               <div class="form-group">
                 <label for="stateFilter">Property State</label>
-                <input type="text" id="stateFilter" name="state" class="form-control" placeholder="e.g. CA">
+                <input type="text" id="stateFilter" name="state" class="form-control" placeholder="e.g. CA" />
               </div>
               <div class="form-group">
                 <label for="countyFilter">Counties</label>
-                <input type="text" id="countyFilter" name="counties" class="form-control" placeholder="Los Angeles, Orange">
+                <input type="text" id="countyFilter" name="counties" class="form-control" placeholder="Los Angeles, Orange" />
                 <small class="form-text text-muted">Comma separated</small>
               </div>
               <div class="form-row">
                 <div class="form-group col-6">
                   <label for="loanFolderFilter">Folder</label>
                   <select id="loanFolderFilter" name="loanFolder" class="form-control">
-                    <option value="Pipeline" selected>Pipeline</option>
+                    <option value="My Pipeline" selected>My Pipeline</option>
+                    <option value="Pipeline">Pipeline</option>
                     <option value="Processing">Processing</option>
                     <option value="Underwriting">Underwriting</option>
                     <option value="Funding">Funding</option>
@@ -159,13 +439,47 @@
               </div>
               <div class="form-group">
                 <label for="limitFilter">Record Limit</label>
-                <input type="number" min="1" max="100" id="limitFilter" name="limit" class="form-control" value="25">
+                <input type="number" min="1" max="100" id="limitFilter" name="limit" class="form-control" value="25" />
               </div>
               <button type="submit" class="btn btn-primary btn-block">
                 <i class="bi-cloud-download"></i>
                 Load Pipeline
               </button>
             </form>
+            <button class="btn btn-link text-decoration-none px-0 mt-3" id="clearFiltersBtn">
+              <i class="bi-eraser"></i> Clear Filters
+            </button>
+          </div>
+          <div class="hub-card p-4">
+            <h5 class="mb-3">API Shortcuts</h5>
+            <p class="text-muted mb-3">Open the raw JSON feeds powering calculators and 3D visualizations.</p>
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2">
+                <a href="/api/encompass-hub/analytics/calc-summary" target="_blank" rel="noreferrer">
+                  <i class="bi-graph-up"></i> Calculator Summary
+                </a>
+              </li>
+              <li class="mb-2">
+                <a href="/api/encompass-hub/analytics/ratios" target="_blank" rel="noreferrer">
+                  <i class="bi-percent"></i> Ratio Analytics
+                </a>
+              </li>
+              <li class="mb-2">
+                <a href="/api/encompass-hub/visualizations/map3d" target="_blank" rel="noreferrer">
+                  <i class="bi-geo"></i> 3D Map Dataset
+                </a>
+              </li>
+              <li class="mb-2">
+                <a href="/api/encompass-hub/visualizations/stacked-cubes" target="_blank" rel="noreferrer">
+                  <i class="bi-layers"></i> Stacked Cubes Dataset
+                </a>
+              </li>
+              <li>
+                <a href="/api/encompass-hub/visualizations/timeline" target="_blank" rel="noreferrer">
+                  <i class="bi-calendar3"></i> Timeline Dataset
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -174,7 +488,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
                 <h5 class="mb-1">Pipeline Results</h5>
-                <small class="text-muted">Click any row to pull the full loan record</small>
+                <small class="text-muted">Click or say “Select first loan” to drill in</small>
               </div>
               <div class="text-right">
                 <div class="filter-chips mb-2" id="activeFilters"></div>
@@ -220,9 +534,45 @@
       </div>
     </main>
 
+    <div class="voice-help-drawer" id="voiceHelp">
+      <div class="voice-help-header">
+        <h4 class="mb-0"><i class="bi-mic"></i> Voice Shortcuts</h4>
+        <button class="btn btn-link text-white p-0" id="closeVoiceHelp" aria-label="Close voice help">
+          <i class="bi-x-lg"></i>
+        </button>
+      </div>
+      <ul class="voice-command-list">
+        <li>
+          <span>"Refresh status"</span>
+          Checks the Encompass OAuth token health.
+        </li>
+        <li>
+          <span>"Load pipeline"</span>
+          Runs the current filter set against Developer Connect.
+        </li>
+        <li>
+          <span>"Set state to California"</span>
+          Updates the state filter (also works for counties & limits).
+        </li>
+        <li>
+          <span>"Select first loan"</span>
+          Highlights a specific row and loads its details.
+        </li>
+        <li>
+          <span>"Clear filters"</span>
+          Resets filters back to their defaults.
+        </li>
+        <li>
+          <span>"Show commands" / "Hide commands"</span>
+          Opens or closes this reference.
+        </li>
+      </ul>
+    </div>
+
     <script src="/shared/user-login.js"></script>
     <script src="/shared/user-passwords.js"></script>
+    <script src="/shared/dark-mode.js"></script>
+    <script src="/shared/voice-widget.js"></script>
     <script src="js/encompassHub.js" type="module"></script>
   </body>
 </html>
-

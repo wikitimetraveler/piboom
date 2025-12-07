@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encompass Analytics Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <script src="/shared/modern-navbar.js" defer></script>
+    <style>
+      :root {
+        --zen-primary: #4a90a4;
+        --zen-dark: #1a2856;
+        --zen-muted: #647196;
+        --zen-card-bg: rgba(255, 255, 255, 0.96);
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(125deg, #f3f6ff 0%, #dfe9ff 50%, #fefefe 100%);
+      }
+
+      .nav-shortcut {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1050;
+      }
+
+      .analytics-hero {
+        padding: 4rem 1rem 2rem;
+        text-align: center;
+      }
+
+      .analytics-hero .badge {
+        font-size: 0.85rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .analytics-hero h1 {
+        font-size: clamp(2.4rem, 5vw, 3.2rem);
+        font-weight: 700;
+        margin: 1rem 0 0.75rem;
+      }
+
+      .analytics-card {
+        border-radius: 20px;
+        border: 1px solid rgba(28, 54, 117, 0.08);
+        background: var(--zen-card-bg);
+        box-shadow: 0 25px 60px rgba(15, 23, 42, 0.12);
+      }
+
+      .kpi-card {
+        min-width: 180px;
+      }
+
+      #mapCanvas {
+        width: 100%;
+        height: 420px;
+        border-radius: 16px;
+        overflow: hidden;
+      }
+
+      #cubeCanvas {
+        width: 100%;
+        height: 360px;
+        display: block;
+        border-radius: 16px;
+        background: radial-gradient(circle at top, rgba(74, 144, 164, 0.1), rgba(26, 40, 86, 0.6));
+      }
+
+      .ratio-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.35rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        border: 1px solid rgba(74, 144, 164, 0.25);
+        margin: 0.25rem;
+      }
+
+      .status-toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        min-width: 260px;
+        border-radius: 14px;
+        box-shadow: 0 15px 40px rgba(15, 23, 42, 0.25);
+        display: none;
+      }
+
+      .status-toast.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body data-page="encompass-analytics">
+    <modern-navbar></modern-navbar>
+    <div class="nav-shortcut">
+      <a href="encompass-hub.html" class="btn btn-light shadow-sm">
+        <i class="bi-arrow-left"></i> Back to Hub
+      </a>
+    </div>
+
+    <section class="analytics-hero">
+      <div class="container">
+        <span class="badge badge-pill badge-light text-uppercase text-muted">
+          <i class="bi-graph-up"></i> Pipeline Intelligence
+        </span>
+        <h1>Encompass Analytics</h1>
+        <p class="text-muted lead">
+          Live calculator metrics, ratio breakdowns, and 3D ready datasets for spatial loan operations.
+        </p>
+        <form id="analyticsFilters" class="row justify-content-center mt-4">
+          <div class="col-md-3 mb-2">
+            <input
+              type="text"
+              class="form-control"
+              id="analyticsState"
+              name="state"
+              placeholder="Filter by state (e.g. CA)"
+            />
+          </div>
+          <div class="col-md-3 mb-2">
+            <input
+              type="number"
+              min="10"
+              max="300"
+              class="form-control"
+              id="analyticsLimit"
+              name="limit"
+              value="150"
+              placeholder="Record limit"
+            />
+          </div>
+          <div class="col-md-2 mb-2">
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="bi-arrow-repeat"></i> Refresh Data
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <main class="container pb-5">
+      <div class="row">
+        <div class="col-lg-4 mb-4">
+          <div class="analytics-card p-4 h-100">
+            <h5 class="mb-3">Calculator Snapshot</h5>
+            <div id="calcSummary" class="d-flex flex-column gap-3"></div>
+          </div>
+        </div>
+        <div class="col-lg-8 mb-4">
+          <div class="analytics-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="mb-1">Ratio Distribution</h5>
+                <small class="text-muted">Housing vs total DTI buckets from the current filter set.</small>
+              </div>
+              <span id="ratioMeta" class="badge badge-light">Loading…</span>
+            </div>
+            <div id="ratioBuckets" class="mb-3"></div>
+            <div id="ratioChartPlaceholder" class="text-muted small">
+              Data populates automatically when ratios are returned.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 class="mb-1">3D Map – Loan Footprint</h5>
+            <small class="text-muted">Columns reflect loan volume, color shows credit cohort.</small>
+          </div>
+          <div id="mapMeta" class="text-muted small">Awaiting data…</div>
+        </div>
+        <div id="mapCanvas"></div>
+      </div>
+
+      <div class="analytics-card p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h5 class="mb-1">Stacked Payment Cubes</h5>
+            <small class="text-muted">Payment components aggregated per state / county cluster.</small>
+          </div>
+          <div id="cubeMeta" class="text-muted small">Awaiting data…</div>
+        </div>
+        <canvas id="cubeCanvas"></canvas>
+      </div>
+    </main>
+
+    <div id="statusToast" class="status-toast alert alert-danger mb-0" role="alert">
+      <strong>Warning:</strong> <span id="statusToastMessage">Unable to load data.</span>
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/deck.gl@8.9.27/dist.min.js"></script>
+    <script src="https://unpkg.com/three@0.161.0/build/three.min.js"></script>
+    <script src="/shared/user-login.js"></script>
+    <script src="/shared/user-passwords.js"></script>
+    <script src="/shared/dark-mode.js"></script>
+    <script src="/shared/voice-widget.js"></script>
+    <script src="js/encompassAnalytics.js"></script>
+  </body>
+</html>
+

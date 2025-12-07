@@ -6,6 +6,19 @@ const activeFilters = document.getElementById('activeFilters');
 const resultMeta = document.getElementById('resultMeta');
 const loanDetailsBody = document.getElementById('loanDetailsBody');
 const loanGuidDisplay = document.getElementById('loanGuidDisplay');
+const stateInput = document.getElementById('stateFilter');
+const countyInput = document.getElementById('countyFilter');
+const loanFolderSelect = document.getElementById('loanFolderFilter');
+const loanTypeSelect = document.getElementById('loanTypeFilter');
+const limitInput = document.getElementById('limitFilter');
+const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+const loadPipelineCta = document.getElementById('loadPipelineCta');
+const voiceHelpPanel = document.getElementById('voiceHelp');
+const voiceHelpToggle = document.getElementById('toggleVoiceHelp');
+const voiceHelpClose = document.getElementById('closeVoiceHelp');
+const userInfoShell = document.getElementById('userInfo');
+const userAvatar = document.getElementById('userAvatar');
+const userName = document.getElementById('userName');
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -14,6 +27,38 @@ const currencyFormatter = new Intl.NumberFormat('en-US', {
 });
 
 let currentLoans = [];
+let selectedPipelineLoan = null;
+let voiceWidgetInstance = null;
+
+function formatCurrency(value) {
+  if (value === null || value === undefined) return '—';
+  return currencyFormatter.format(value);
+}
+
+function formatPercent(value) {
+  if (value === null || value === undefined) return '—';
+  return `${Number(value).toFixed(1)}%`;
+}
+
+function renderActorList(pipelineLoan) {
+  const actors = pipelineLoan?.normalized?.actors;
+  if (!actors) {
+    return '<li class="text-muted">Loan team data not available</li>';
+  }
+  const roles = [
+    { key: 'loanOfficer', label: 'Loan Officer' },
+    { key: 'processor', label: 'Processor' },
+    { key: 'underwriter', label: 'Underwriter' },
+    { key: 'closer', label: 'Closer' },
+  ];
+  const items = roles.map((role) => {
+    const actor = actors[role.key];
+    const name = actor?.name || 'Unassigned';
+    return `<li><strong>${role.label}:</strong> ${name}</li>`;
+  });
+
+  return items.join('');
+}
 
 function setStatusChip(text, status = 'warn', icon = 'bi-clock-history') {
   if (!statusChip) return;
@@ -120,15 +165,18 @@ function renderPipelineRows(loans) {
 }
 
 async function loadPipeline(event) {
-  event.preventDefault();
+  if (event) {
+    event.preventDefault();
+  }
   loanDetailsBody.innerHTML = 'Select a loan to load the full record.';
+  selectedPipelineLoan = null;
 
   const formData = new FormData(pipelineForm);
-  formData.set('state', document.getElementById('stateFilter').value);
-  formData.set('counties', document.getElementById('countyFilter').value);
-  formData.set('loanFolder', document.getElementById('loanFolderFilter').value);
-  formData.set('loanType', document.getElementById('loanTypeFilter').value);
-  formData.set('limit', document.getElementById('limitFilter').value);
+  formData.set('state', stateInput.value);
+  formData.set('counties', countyInput.value);
+  formData.set('loanFolder', loanFolderSelect.value);
+  formData.set('loanType', loanTypeSelect.value);
+  formData.set('limit', limitInput.value);
 
   const filters = buildQueryParams(formData);
   updateFilterBadges(filters);
@@ -164,7 +212,7 @@ async function loadPipeline(event) {
   }
 }
 
-function renderLoanDetails(loan) {
+function renderLoanDetails(loan, pipelineLoan) {
   if (!loan) {
     loanDetailsBody.innerHTML = '<div class="empty-state">Loan details unavailable.</div>';
     return;
@@ -197,6 +245,26 @@ function renderLoanDetails(loan) {
         )
         .join('')
     : '<li class="text-muted">No milestone data available</li>';
+
+  const pipelineMetrics = pipelineLoan?.normalized?.metrics || {};
+  const metricsMarkup = `
+    <div class="d-flex flex-wrap gap-3">
+      <div>
+        <small class="text-muted text-uppercase">Housing Ratio</small>
+        <div class="h5 mb-0">${formatPercent(pipelineMetrics.housingRatio)}</div>
+      </div>
+      <div>
+        <small class="text-muted text-uppercase">Total DTI</small>
+        <div class="h5 mb-0">${formatPercent(pipelineMetrics.totalDTI)}</div>
+      </div>
+      <div>
+        <small class="text-muted text-uppercase">Funds Required</small>
+        <div class="h5 mb-0">${formatCurrency(pipelineMetrics.fundsRequired)}</div>
+      </div>
+    </div>
+  `;
+
+  const actorList = renderActorList(pipelineLoan);
 
   loanDetailsBody.innerHTML = `
     <div class="row">
@@ -239,6 +307,16 @@ function renderLoanDetails(loan) {
     </div>
     <div class="row">
       <div class="col-md-6">
+        <h6 class="text-uppercase text-muted">Pipeline Metrics</h6>
+        ${pipelineLoan ? metricsMarkup : '<p class="text-muted mb-3">No pipeline metrics captured for this loan.</p>'}
+      </div>
+      <div class="col-md-6">
+        <h6 class="text-uppercase text-muted">Loan Team</h6>
+        <ul class="pl-3 mb-3">${actorList}</ul>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
         <h6 class="text-uppercase text-muted">Milestones</h6>
         <ul class="pl-3">${milestoneList}</ul>
       </div>
@@ -275,7 +353,7 @@ async function handleLoanSelection(loanGuid) {
       throw new Error(`Loan fetch failed (${response.status})`);
     }
     const loan = await response.json();
-    renderLoanDetails(loan);
+    renderLoanDetails(loan, selectedPipelineLoan);
   } catch (error) {
     console.error('Unable to load loan details', error);
     loanDetailsBody.innerHTML = `
@@ -294,11 +372,172 @@ pipelineTableBody.addEventListener('click', (event) => {
   row.classList.add('selected');
 
   const loanGuid = row.getAttribute('data-guid');
+  selectedPipelineLoan = currentLoans.find((loan) => (loan.loanGuid || loan.guid) === loanGuid) || null;
   handleLoanSelection(loanGuid);
 });
 
 refreshStatusBtn?.addEventListener('click', refreshStatus);
 pipelineForm?.addEventListener('submit', loadPipeline);
+clearFiltersBtn?.addEventListener('click', () => clearFilters(true));
+loadPipelineCta?.addEventListener('click', (e) => {
+  e.preventDefault();
+  loadPipeline();
+});
 
+voiceHelpToggle?.addEventListener('click', () => toggleVoiceHelp(true));
+voiceHelpClose?.addEventListener('click', () => toggleVoiceHelp(false));
+
+hydrateUserBadge();
+initializeVoiceWidget();
 refreshStatus();
 
+function hydrateUserBadge() {
+  if (!userInfoShell || typeof isLoggedIn !== 'function' || typeof getLoggedInUser !== 'function') return;
+  if (!isLoggedIn()) return;
+  const user = getLoggedInUser();
+  if (!user) return;
+  userInfoShell.style.display = 'block';
+  userAvatar.src = user.avatar;
+  userAvatar.style.borderColor = user.color;
+  userName.textContent = user.name;
+}
+
+function clearFilters(notify = false) {
+  stateInput.value = '';
+  countyInput.value = '';
+  loanFolderSelect.value = 'My Pipeline';
+  loanTypeSelect.value = '';
+  limitInput.value = '25';
+  activeFilters.innerHTML = '<small class="text-muted">No filters</small>';
+  if (notify) {
+    speak('Filters cleared');
+  }
+}
+
+function toggleVoiceHelp(forceShow) {
+  if (!voiceHelpPanel) return;
+  const show = typeof forceShow === 'boolean' ? forceShow : !voiceHelpPanel.classList.contains('show');
+  voiceHelpPanel.classList.toggle('show', show);
+}
+
+function initializeVoiceWidget() {
+  if (typeof initVoiceWidget !== 'function') return;
+  voiceWidgetInstance = initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'blue',
+    onCommand: handleVoiceCommand,
+  });
+}
+
+function handleVoiceCommand(rawCommand = '') {
+  const command = rawCommand.toLowerCase().trim();
+  console.log('Voice command:', command);
+
+  if (!command) return;
+
+  if (command.includes('refresh status')) {
+    speak('Refreshing Encompass status');
+    refreshStatus();
+    return;
+  }
+
+  if (command.includes('load pipeline') || command.includes('run pipeline') || command.includes('fetch loans')) {
+    speak('Loading pipeline');
+    loadPipeline();
+    return;
+  }
+
+  if (command.includes('clear filters') || command.includes('reset filters')) {
+    clearFilters(true);
+    return;
+  }
+
+  if (command.includes('show commands') || command.includes('voice help')) {
+    toggleVoiceHelp(true);
+    speak('Showing voice commands');
+    return;
+  }
+
+  if (command.includes('hide commands') || command.includes('close help')) {
+    toggleVoiceHelp(false);
+    speak('Closing voice help');
+    return;
+  }
+
+  const stateMatch = command.match(/state(?: to)? ([a-z]+)/);
+  if (stateMatch) {
+    const stateValue = stateMatch[1].slice(0, 2).toUpperCase();
+    stateInput.value = stateValue;
+    speak(`State set to ${stateValue}`);
+    return;
+  }
+
+  const countyMatch = command.match(/count(?:y|ies)(?: to)? (.+)/);
+  if (countyMatch) {
+    const countyValue = countyMatch[1]
+      .replace(/\band\b/gi, ',')
+      .replace(/[^a-z,\s]/gi, '')
+      .trim();
+    countyInput.value = countyValue;
+    speak('Counties updated');
+    return;
+  }
+
+  const limitMatch = command.match(/limit(?: to)? (\d{1,3})/);
+  if (limitMatch) {
+    const limitValue = Math.min(100, Math.max(1, Number(limitMatch[1])));
+    limitInput.value = String(limitValue);
+    speak(`Limit set to ${limitValue}`);
+    return;
+  }
+
+  const selectMatch = command.match(/select (?:loan )?(first|second|third|fourth|fifth|\d+)/);
+  if (selectMatch) {
+    const ordinal = selectMatch[1];
+    const map = { first: 1, second: 2, third: 3, fourth: 4, fifth: 5 };
+    const index = map[ordinal] || Number(ordinal);
+    if (Number.isFinite(index)) {
+      selectLoanByIndex(index);
+    } else {
+      speak('Please specify a valid loan number');
+    }
+    return;
+  }
+
+  speak('Command not recognized for Encompass Hub');
+}
+
+function selectLoanByIndex(index) {
+  if (!currentLoans.length) {
+    speak('No pipeline data loaded yet');
+    return;
+  }
+  const normalized = index - 1;
+  if (normalized < 0 || normalized >= currentLoans.length) {
+    speak('That loan number is outside the result set');
+    return;
+  }
+  const loan = currentLoans[normalized];
+  if (!loan?.loanGuid) {
+    speak('Unable to locate that loan');
+    return;
+  }
+  const rows = pipelineTableBody.querySelectorAll('tr[data-guid]');
+  rows.forEach((row) => row.classList.remove('selected'));
+  const targetRow = Array.from(rows).find((row) => row.dataset.guid === loan.loanGuid);
+  if (targetRow) {
+    targetRow.classList.add('selected');
+    targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  speak(`Opening loan ${index}`);
+  handleLoanSelection(loan.loanGuid);
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
