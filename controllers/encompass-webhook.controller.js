@@ -5,12 +5,21 @@ import crypto from 'crypto';
 const LOG_DIR = path.resolve(process.cwd(), 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'encompass-webhooks.log');
 const SIGNING_KEY = (process.env.ENCOMPASS_WEBHOOK_SIGNING_KEY || '').trim();
+const DEBUG =
+  (process.env.ENCOMPASS_WEBHOOK_DEBUG || '').trim().toLowerCase() === 'true';
+
+function logDebug(payload) {
+  if (DEBUG) {
+    console.log('[EncompassWebhook][debug]', payload);
+  }
+}
 
 function unauthorized(res) {
   return res.status(401).json({ success: false, error: 'Unauthorized' });
 }
 
 function invalidSignature(res, message) {
+  logDebug({ step: 'invalidSignature', message });
   console.warn(message);
   return unauthorized(res);
 }
@@ -30,6 +39,13 @@ function verifySignature(req, res) {
     return invalidSignature(res, 'Missing raw body for signature verification');
   }
 
+  const rawHash = crypto.createHash('sha256').update(rawBody).digest('hex');
+  logDebug({
+    step: 'received',
+    rawLength: rawBody.length,
+    rawSha256: rawHash
+  });
+
   const expected = crypto
     .createHmac('sha256', SIGNING_KEY)
     .update(rawBody)
@@ -39,14 +55,33 @@ function verifySignature(req, res) {
   const providedBuf = Buffer.from(signatureHeader, 'utf8');
 
   if (expectedBuf.length !== providedBuf.length) {
+    logDebug({
+      step: 'length-mismatch',
+      expectedLength: expectedBuf.length,
+      providedLength: providedBuf.length,
+      expectedPreview: `${expected.slice(0, 6)}...`,
+      providedPreview: `${signatureHeader.slice(0, 6)}...`
+    });
     return invalidSignature(res, 'Signature length mismatch');
   }
 
   const matches = crypto.timingSafeEqual(expectedBuf, providedBuf);
   if (!matches) {
+    logDebug({
+      step: 'mismatch',
+      expectedLength: expectedBuf.length,
+      providedLength: providedBuf.length,
+      expectedPreview: `${expected.slice(0, 6)}...`,
+      providedPreview: `${signatureHeader.slice(0, 6)}...`
+    });
     return invalidSignature(res, 'Invalid Elli-Signature');
   }
 
+  logDebug({
+    step: 'verified',
+    providedLength: providedBuf.length,
+    providedPreview: `${signatureHeader.slice(0, 6)}...`
+  });
   return true;
 }
 
