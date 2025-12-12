@@ -1,53 +1,65 @@
 import fs from 'fs/promises';
 import path from 'path';
+import crypto from 'crypto';
 
 const LOG_DIR = path.resolve(process.cwd(), 'logs');
 const LOG_FILE = path.join(LOG_DIR, 'encompass-webhooks.log');
-
-// Prefer webhook-specific creds; fall back to general Encompass creds.
-const BASIC_USER =
-  process.env.ENCOMPASS_WEBHOOK_USER || process.env.ENCOMPASS_USERNAME || '';
-const BASIC_PASS =
-  process.env.ENCOMPASS_WEBHOOK_PASS || process.env.ENCOMPASS_PASSWORD || '';
+const SIGNING_KEY = (process.env.ENCOMPASS_WEBHOOK_SIGNING_KEY || '').trim();
 
 function unauthorized(res) {
-  res.set('WWW-Authenticate', 'Basic realm="Encompass Webhook"');
   return res.status(401).json({ success: false, error: 'Unauthorized' });
 }
 
-function checkBasicAuth(req, res) {
-  if (!BASIC_USER || !BASIC_PASS) {
-    console.warn('Encompass webhook credentials not configured; rejecting');
-    return unauthorized(res);
+function invalidSignature(res, message) {
+  console.warn(message);
+  return unauthorized(res);
+}
+
+function verifySignature(req, res) {
+  if (!SIGNING_KEY) {
+    return invalidSignature(res, 'Encompass webhook signing key not configured');
   }
-  const authHeader = req.headers.authorization || '';
-  if (!authHeader.startsWith('Basic ')) {
-    return unauthorized(res);
+
+  const signatureHeader = (req.headers['elli-signature'] || '').trim();
+  if (!signatureHeader) {
+    return invalidSignature(res, 'Missing Elli-Signature header');
   }
-  const base64 = authHeader.slice('Basic '.length);
-  let decoded = '';
-  try {
-    decoded = Buffer.from(base64, 'base64').toString('utf8');
-  } catch {
-    return unauthorized(res);
+
+  const rawBody = req.rawBody;
+  if (!rawBody) {
+    return invalidSignature(res, 'Missing raw body for signature verification');
   }
-  const [user, pass] = decoded.split(':');
-  if (user !== BASIC_USER || pass !== BASIC_PASS) {
-    return unauthorized(res);
+
+  const expected = crypto
+    .createHmac('sha256', SIGNING_KEY)
+    .update(rawBody)
+    .digest('base64');
+
+  const expectedBuf = Buffer.from(expected, 'utf8');
+  const providedBuf = Buffer.from(signatureHeader, 'utf8');
+
+  if (expectedBuf.length !== providedBuf.length) {
+    return invalidSignature(res, 'Signature length mismatch');
   }
+
+  const matches = crypto.timingSafeEqual(expectedBuf, providedBuf);
+  if (!matches) {
+    return invalidSignature(res, 'Invalid Elli-Signature');
+  }
+
   return true;
 }
 
 /**
  * Receive Encompass/ICE webhook payloads.
- * - Requires Basic Auth (401 if missing or misconfigured).
+ * - Requires HMAC signature (Elli-Signature) using ENCOMPASS_WEBHOOK_SIGNING_KEY.
  * - Accepts JSON, logs to console, and appends raw payloads to a local log file.
  * - Keeps response lightweight to avoid retries/timeouts.
  */
 export async function receive(req, res) {
   const { headers, body } = req;
 
-  if (checkBasicAuth(req, res) !== true) {
+  if (verifySignature(req, res) !== true) {
     return; // Response already sent
   }
 
@@ -76,5 +88,4 @@ export async function receive(req, res) {
 
   res.json({ success: true });
 }
-// TODO: Add IP allowlisting or shared-secret signature verification when provided by Encompass/ICE.
-
+// TODO: Add IP allowlisting when provided by Encompass/ICE.

@@ -71,7 +71,15 @@ if (config.autoIngestDisasters) {
 }
 
 // Add middleware for parsing JSON request bodies (increased limit for image uploads)
-app.use(express.json({ limit: '50mb' })); // Support base64 image uploads
+// Capture raw body for webhook signature verification
+app.use(
+  express.json({
+    limit: '50mb',
+    verify: (req, res, buf) => {
+      req.rawBody = buf;
+    }
+  })
+); // Support base64 image uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Allow iframe embedding for Encompass Assistant
