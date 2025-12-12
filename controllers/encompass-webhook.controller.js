@@ -7,6 +7,10 @@ const LOG_FILE = path.join(LOG_DIR, 'encompass-webhooks.log');
 const SIGNING_KEY = (process.env.ENCOMPASS_WEBHOOK_SIGNING_KEY || '').trim();
 const DEBUG =
   (process.env.ENCOMPASS_WEBHOOK_DEBUG || '').trim().toLowerCase() === 'true';
+const BYPASS_SIGNATURE =
+  (process.env.ENCOMPASS_WEBHOOK_BYPASS_SIGNATURE || '')
+    .trim()
+    .toLowerCase() === 'true';
 
 function logDebug(payload) {
   if (DEBUG) {
@@ -25,6 +29,14 @@ function invalidSignature(res, message) {
 }
 
 function verifySignature(req, res) {
+  if (BYPASS_SIGNATURE) {
+    console.warn(
+      'Encompass webhook signature verification is bypassed via ENCOMPASS_WEBHOOK_BYPASS_SIGNATURE'
+    );
+    logDebug({ step: 'bypass-signature' });
+    return true;
+  }
+
   if (!SIGNING_KEY) {
     return invalidSignature(res, 'Encompass webhook signing key not configured');
   }
