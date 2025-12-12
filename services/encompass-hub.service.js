@@ -29,6 +29,10 @@ const PIPELINE_FIELDS = [
   'Loan.HousingRatio',
   'Loan.DebtRatio',
   'Loan.TotalDTI',
+  'Loan.TotalExpenseRatio',
+  'Loan.BackRatio',
+  'Loan.TopRatioPercent',
+  'Loan.BottomRatioPercent',
   'Loan.FundsRequiredClose',
   'Loan.ReservesRequiredVerified',
   'Loan.TotalFundsVerified',
@@ -122,6 +126,92 @@ function parseDate(value) {
   }
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+function coercePositiveInteger(value, fallback) {
+  const parsed = Number(value);
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return Math.floor(parsed);
+  }
+  return fallback;
+}
+
+function normalizeUserProfile(user = {}) {
+  const personaIds = Array.isArray(user.personaIds)
+    ? user.personaIds.filter((id) => id !== null && id !== undefined)
+    : [];
+  const personaNames = Array.isArray(user.personas)
+    ? user.personas.map((p) => p?.entityName).filter(Boolean)
+    : [];
+  const workingFolders = Array.isArray(user.workingFolders)
+    ? user.workingFolders.filter(Boolean)
+    : user.workingFolder
+      ? [user.workingFolder].filter(Boolean)
+      : [];
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+  const indicators = Array.isArray(user.userIndicators) ? user.userIndicators.filter(Boolean) : [];
+  const orgName = user.organization?.entityName || user.organizationName || null;
+  const orgId = user.organization?.entityId || user.organizationId || null;
+
+  return {
+    id: user.id ?? null,
+    userId: user.userId ?? user.id ?? null,
+    loginName: user.loginName || null,
+    firstName: user.firstName || null,
+    lastName: user.lastName || null,
+    name: fullName || user.userName || user.loginName || 'Unknown',
+    email: user.email || null,
+    title: user.title || user.jobTitle || null,
+    enabled: user.enabled !== false,
+    personaIds,
+    personaNames,
+    workingFolders,
+    organization: orgName || orgId
+      ? {
+          id: orgId,
+          name: orgName,
+          uri: user.organization?.entityUri || null,
+        }
+      : null,
+    indicators,
+    access: {
+      subordinate: user.subordinateLoanAccess || null,
+      peer: user.peerLoanAccess || null,
+    },
+    personalStatusOnline: Boolean(user.personalStatusOnline),
+    lastLogin: parseDate(user.lastLogin) || null,
+    encompassVersion: user.encompassVersion || null,
+    aclPath: user.aclPath || null,
+    createdAt: user.createdDateTime || user.createdDate || null,
+    updatedAt: user.updatedDateTime || user.lastUpdatedDateTime || null,
+    eFolderUser: Boolean(user.eFolderUser),
+    comments: user.comments || null,
+  };
+}
+
+function filterUsersList(users, filters = {}) {
+  const { search, enabled, personaId } = filters;
+  let filtered = [...users];
+
+  if (enabled === true || enabled === false) {
+    filtered = filtered.filter((user) => user.enabled === enabled);
+  }
+
+  if (personaId !== undefined && personaId !== null && personaId !== '') {
+    const personaKey = `${personaId}`.trim();
+    filtered = filtered.filter((user) => user.personaIds.some((id) => `${id}` === personaKey));
+  }
+
+  if (search) {
+    const term = search.toLowerCase();
+    filtered = filtered.filter((user) =>
+      [user.name, user.loginName, user.email, user.title].some((value) =>
+        value?.toLowerCase().includes(term),
+      ),
+    );
+  }
+
+  return filtered;
 }
 
 function normalizeListParam(input) {
@@ -229,8 +319,19 @@ function buildNormalizedLoan(item) {
 
   const metrics = {
     loanAmount: parseNumber(getValue('Loan.LoanAmount')),
-    housingRatio: parseNumber(getValue('Loan.HousingRatio')),
-    totalDTI: parseNumber(getValue('Loan.TotalDTI') ?? getValue('Loan.DebtRatio')),
+    housingRatio: parseNumber(
+      getValue('Loan.HousingRatio') ??
+        getValue('Loan.TopRatioPercent') ?? // front ratio
+        getValue('Loan.BottomRatioPercent') ?? // some exports store front ratio here
+        getValue('Loan.TotalExpenseRatio'),
+    ),
+    totalDTI: parseNumber(
+      getValue('Loan.TotalDTI') ??
+        getValue('Loan.DebtRatio') ??
+        getValue('Loan.TotalExpenseRatio') ??
+        getValue('Loan.BackRatio') ??
+        getValue('Loan.BottomRatioPercent'),
+    ),
     ltv: parseNumber(getValue('Loan.LTV')),
     cltv: parseNumber(getValue('Loan.CLTV')),
     fundsRequired: parseNumber(getValue('Loan.FundsRequiredClose')),
@@ -468,6 +569,60 @@ function applyAdvancedFilters(loans, filters = {}) {
   });
 }
 
+export async function fetchCompanyUsers(options = {}) {
+  const {
+    search,
+    groupId,
+    roleId,
+    personaId,
+    featureId,
+    organizationId,
+    includeEmailSignature = false,
+    start = 1,
+    limit = 200,
+    enabled,
+  } = options;
+
+  const token = await ensureEncompassToken();
+  const safeStart = coercePositiveInteger(start, 1) ?? 1;
+  const safeLimit = Math.min(coercePositiveInteger(limit, 200) ?? 200, 1000);
+
+  let response;
+  try {
+    response = await axios.get(`${API_BASE_URL}/company/users`, {
+      params: {
+        viewEmailSignature: includeEmailSignature ? 'true' : undefined,
+        groupId,
+        roleId,
+        personaId,
+        featureId,
+        organizationId,
+        userName: search || undefined,
+        start: safeStart,
+        limit: safeLimit,
+      },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass company users request failed', {
+      status,
+      data,
+      message: error.message,
+    });
+    const detail = data?.message || data?.error || error.message;
+    throw new Error(`Encompass users ${status || 'error'}: ${detail}`);
+  }
+
+  const rawUsers = Array.isArray(response.data) ? response.data : response.data?.items || [];
+  const normalized = rawUsers.map(normalizeUserProfile);
+  return filterUsersList(normalized, { search, enabled, personaId });
+}
+
 function coerceNumber(value) {
   if (value === null || value === undefined || value === '') {
     return undefined;
@@ -537,29 +692,42 @@ export async function fetchPipelineLoans(options = {}) {
     });
   }
 
-  const response = await axios.post(
-    `${API_BASE_URL}/loanPipeline`,
-    {
-      filter: {
-        terms,
+  let response;
+  try {
+    response = await axios.post(
+      `${API_BASE_URL}/loanPipeline`,
+      {
+        filter: {
+          terms,
+        },
+        fields: PIPELINE_FIELDS,
+        sortOrder: [
+          { canonicalName: 'Loan.LoanNumber', order: 'desc' },
+          { canonicalName: 'Fields.4000', order: 'desc' },
+        ],
       },
-      fields: PIPELINE_FIELDS,
-      sortOrder: [
-        { canonicalName: 'Loan.LoanNumber', order: 'desc' },
-        { canonicalName: 'Fields.4000', order: 'desc' },
-      ],
-    },
-    {
-      params: {
-        cursortype: 'randomAccess',
-        limit: parsedLimit,
+      {
+        params: {
+          cursortype: 'randomAccess',
+          limit: parsedLimit,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       },
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    },
-  );
+    );
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass loanPipeline request failed', {
+      status,
+      data,
+      message: error.message,
+    });
+    const detail = data?.message || data?.error || error.message;
+    throw new Error(`Encompass loanPipeline ${status || 'error'}: ${detail}`);
+  }
 
   const items = normalizePipelineItems(response.data).map(enrichLoanRecord);
   const filteredItems = applyAdvancedFilters(items, {

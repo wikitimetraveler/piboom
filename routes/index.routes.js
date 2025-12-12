@@ -24,6 +24,7 @@ import concertCollectionRoutes from './concert-collection.routes.js';
 import loanPipelineRoutes from './loan-pipeline.routes.js';
 import disastersRoutes from './disasters.routes.js';
 import encompassHubRoutes from './encompass-hub.routes.js';
+import encompassWebhookRoutes from './encompass-webhook.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -51,6 +52,7 @@ export default function buildRoutes(io) {
   api.use('/loan-pipeline', loanPipelineRoutes);
   api.use('/encompass-hub', encompassHubRoutes);
   api.use('/disasters', disastersRoutes);
+  api.use('/webhooks', encompassWebhookRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

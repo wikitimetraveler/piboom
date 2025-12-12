@@ -1,4 +1,4 @@
-import { fetchPipelineLoans, fetchLoanDetails } from '../services/encompass-hub.service.js';
+import { fetchPipelineLoans, fetchLoanDetails, fetchCompanyUsers } from '../services/encompass-hub.service.js';
 import {
   ensureEncompassToken,
   getEncompassEnvStatus,
@@ -89,6 +89,34 @@ function parseFilters(query = {}, overrides = {}) {
   };
 }
 
+function parseUserFilters(query = {}) {
+  const parseIntValue = (val, fallback) => {
+    const parsed = Number(val);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+  };
+
+  const parseEnabled = (val) => {
+    if (val === undefined || val === null || val === '') return undefined;
+    const normalized = `${val}`.toLowerCase();
+    if (['true', '1', 'yes', 'y', 'active'].includes(normalized)) return true;
+    if (['false', '0', 'no', 'n', 'inactive', 'disabled'].includes(normalized)) return false;
+    return undefined;
+  };
+
+  return {
+    search: query.search?.trim() || undefined,
+    personaId: query.personaId || query.personaIds,
+    groupId: query.groupId,
+    roleId: query.roleId,
+    featureId: query.featureId,
+    organizationId: query.organizationId,
+    includeEmailSignature: query.viewEmailSignature === 'true' || query.includeEmailSignature === 'true',
+    start: parseIntValue(query.start, 1),
+    limit: parseIntValue(query.limit, 200),
+    enabled: parseEnabled(query.enabled),
+  };
+}
+
 export async function getPipeline(req, res) {
   try {
     const filters = parseFilters(req.query);
@@ -102,6 +130,24 @@ export async function getPipeline(req, res) {
     console.error('Error fetching Encompass pipeline:', error.message);
     return res.status(500).json({
       error: 'Failed to fetch Encompass pipeline data',
+      details: error.message,
+    });
+  }
+}
+
+export async function getCompanyUsers(req, res) {
+  try {
+    const filters = parseUserFilters(req.query);
+    const users = await fetchCompanyUsers(filters);
+
+    return res.json({
+      count: users.length,
+      items: users,
+    });
+  } catch (error) {
+    console.error('Error fetching Encompass users:', error.message);
+    return res.status(500).json({
+      error: 'Failed to fetch Encompass users',
       details: error.message,
     });
   }

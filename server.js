@@ -110,11 +110,15 @@ if (config.autoIngestDisasters) {
 }
 
 // Nightly prune older than 90 days
-setInterval(async () => {
-  try {
-    await pruneOldDisasters();
-  } catch {}
-}, 24 * 60 * 60 * 1000);
+if (config.autoIngestDisasters) {
+  setInterval(async () => {
+    try {
+      await pruneOldDisasters();
+    } catch {}
+  }, 24 * 60 * 60 * 1000);
+} else {
+  console.log('⏸️ Skipping disaster pruning (auto ingestion disabled)');
+}
 
 app.get('*', (req,res)=>{
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

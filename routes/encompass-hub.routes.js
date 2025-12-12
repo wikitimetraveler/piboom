@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   getHubStatus,
+  getCompanyUsers,
   getPipeline,
   getLoan,
   getCalculatorSummary,
@@ -13,6 +14,7 @@ import {
 const router = Router();
 
 router.get('/status', getHubStatus);
+router.get('/users', getCompanyUsers);
 router.get('/pipeline', getPipeline);
 router.get('/loans/:loanGuid', getLoan);
 router.get('/analytics/calc-summary', getCalculatorSummary);

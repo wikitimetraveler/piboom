@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encompass Users Directory</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <script src="/shared/modern-navbar.js" defer></script>
+    <style>
+      :root {
+        --zen-primary: #4a90a4;
+        --zen-dark: #1a2856;
+        --zen-muted: #647196;
+        --zen-card-bg: rgba(255, 255, 255, 0.97);
+        --zen-border: rgba(74, 144, 164, 0.18);
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: linear-gradient(135deg, #f5f8ff 0%, #e6eefb 50%, #fdfefe 100%);
+      }
+
+      .users-hero {
+        padding: 4.5rem 1rem 2rem;
+        text-align: center;
+      }
+
+      .users-hero h1 {
+        font-weight: 700;
+        margin-top: 0.8rem;
+      }
+
+      .users-hero .lead {
+        color: var(--zen-muted);
+        max-width: 760px;
+        margin: 0.5rem auto 1rem;
+      }
+
+      .users-hero .hero-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .card {
+        border-radius: 18px;
+        border: 1px solid var(--zen-border);
+        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+        background: var(--zen-card-bg);
+      }
+
+      .filters-card label {
+        font-weight: 600;
+        color: var(--zen-dark);
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+
+      .badge-soft {
+        background: rgba(74, 144, 164, 0.12);
+        color: var(--zen-dark);
+        border: 1px solid var(--zen-border);
+        border-radius: 10px;
+        padding: 0.35rem 0.75rem;
+        font-weight: 600;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      .status-pill.active {
+        background: rgba(46, 204, 113, 0.16);
+        color: #1a7a43;
+      }
+
+      .status-pill.disabled {
+        background: rgba(108, 117, 125, 0.18);
+        color: #424b52;
+      }
+
+      @media (max-width: 768px) {
+        .users-hero {
+          padding-top: 4rem;
+        }
+      }
+    </style>
+  </head>
+  <body data-page="encompass-users">
+    <modern-navbar></modern-navbar>
+
+    <div class="nav-shortcut" style="position: fixed; top: 20px; right: 20px; z-index: 1050;">
+      <a href="encompass-hub.html" class="btn btn-light shadow-sm mb-2 d-block">
+        <i class="bi-arrow-left"></i> Back to Hub
+      </a>
+      <a href="index.html" class="btn btn-outline-secondary btn-sm shadow-sm d-block">
+        <i class="bi-bank"></i> Finance Hub
+      </a>
+    </div>
+
+    <section class="users-hero">
+      <div class="container">
+        <span class="badge badge-pill badge-light text-uppercase text-muted">
+          <i class="bi-people"></i> Encompass Directory
+        </span>
+        <h1>Encompass Users</h1>
+        <p class="lead">
+          Browse company users from the Developer Connect <code>/company/users</code> endpoint. Filters are processed
+          server-side so your credentials stay in the backend.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#usersTableShell"><i class="bi-list-check"></i> View Directory</a>
+          <a class="btn btn-outline-primary" href="encompass-analytics.html"><i class="bi-graph-up"></i> Analytics</a>
+        </div>
+      </div>
+    </section>
+
+    <main class="container pb-5">
+      <div class="row">
+        <div class="col-lg-4 mb-4">
+          <div class="card p-4 h-100 filters-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="mb-1">Filters</h5>
+                <small class="text-muted">Search by name, login, or persona</small>
+              </div>
+              <span class="badge-soft" id="usersMeta">Loading…</span>
+            </div>
+            <form id="userFilters">
+              <div class="form-group">
+                <label for="userSearch">Search</label>
+                <input
+                  id="userSearch"
+                  type="text"
+                  class="form-control"
+                  placeholder="Name, login, or email"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-group">
+                <label for="personaId">Persona ID (optional)</label>
+                <input
+                  id="personaId"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. 15"
+                  autocomplete="off"
+                />
+                <small class="form-text text-muted">Matches any personaId on a user</small>
+              </div>
+              <div class="form-group">
+                <label for="userLimit">Record limit</label>
+                <input id="userLimit" type="number" min="1" max="1000" class="form-control" value="200" />
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <div class="d-flex align-items-center gap-3">
+                  <div class="form-check mr-3">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="statusAll" value="all" checked />
+                    <label class="form-check-label" for="statusAll">All</label>
+                  </div>
+                  <div class="form-check mr-3">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="statusActive" value="active" />
+                    <label class="form-check-label" for="statusActive">Active</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="statusFilter" id="statusDisabled" value="disabled" />
+                    <label class="form-check-label" for="statusDisabled">Disabled</label>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary mr-2 w-100">
+                  <i class="bi-cloud-download"></i> Refresh
+                </button>
+                <button type="button" id="resetFilters" class="btn btn-outline-secondary w-100">
+                  <i class="bi-eraser"></i> Clear
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-8 mb-4">
+          <div class="card p-4 mb-3">
+            <h5 class="mb-3">Directory Stats</h5>
+            <div class="row text-center">
+              <div class="col-sm-4 mb-3">
+                <div class="stat-value" id="statTotal">—</div>
+                <div class="text-muted">Total</div>
+              </div>
+              <div class="col-sm-4 mb-3">
+                <div class="stat-value text-success" id="statActive">—</div>
+                <div class="text-muted">Active</div>
+              </div>
+              <div class="col-sm-4 mb-3">
+                <div class="stat-value text-secondary" id="statDisabled">—</div>
+                <div class="text-muted">Disabled</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card p-3" id="usersTableShell">
+            <div class="d-flex justify-content-between align-items-center px-2 pt-2 pb-1">
+              <h5 class="mb-0">User Directory</h5>
+              <span class="badge-soft"><i class="bi-shield-lock"></i> Server-side fetch</span>
+            </div>
+            <div id="usersError" class="alert alert-danger mt-3 mb-0" role="alert" style="display: none;"></div>
+            <div class="table-responsive mt-3">
+              <table class="table table-hover align-middle" id="usersTable">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Login</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Personas</th>
+                    <th scope="col">Folder(s)</th>
+                    <th scope="col">Org</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Last Login</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr id="usersLoading">
+                    <td colspan="8" class="text-center text-muted py-4">
+                      <div class="spinner-border text-primary spinner-border-sm mr-2" role="status"></div>
+                      Loading users...
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="/finance/js/encompassUsers.js"></script>
+  </body>
+</html>
+
