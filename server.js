@@ -70,7 +70,10 @@ if (config.autoIngestDisasters) {
   console.log('⏸️ Automatic disaster ingestion disabled (enable AUTO_INGEST_DISASTERS to re-activate)');
 }
 
+import { captureRawBody } from './middleware/verify-encompass-webhook.js';
+
 // Add middleware for parsing JSON request bodies (increased limit for image uploads)
+app.use(captureRawBody);
 app.use(express.json({ limit: '50mb' })); // Support base64 image uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
