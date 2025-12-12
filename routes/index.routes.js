@@ -24,6 +24,7 @@ import concertCollectionRoutes from './concert-collection.routes.js';
 import loanPipelineRoutes from './loan-pipeline.routes.js';
 import disastersRoutes from './disasters.routes.js';
 import encompassHubRoutes from './encompass-hub.routes.js';
+import encompassWebhookRoutes from './encompass-webhook.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -44,6 +45,7 @@ export default function buildRoutes(io) {
   api.use('/audio-fingerprint', audioFingerprintRoutes);
   api.use('/sample-detection', sampleDetectionRoutes);
   api.use('/encompass', encompassAssistantRoutes);
+  api.use('/encompass-webhooks', encompassWebhookRoutes);
   api.use('/kml', kmlRoutes);
   api.use('/grateful-dead', gratefulDeadTourRoutes);
   api.use('/user-attendance', userShowAttendanceRoutes);
