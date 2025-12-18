@@ -230,7 +230,7 @@ piBoom/
 ├── docker-compose.yml      # Docker Compose setup
 ├── render.yaml            # Render deployment config
 ├── .dockerignore          # Files to exclude from Docker build
-├── DOCKER_DEPLOYMENT.md   # This guide
+├── docs/DOCKER_DEPLOYMENT.md   # This guide
 └── ...
 ```
 

@@ -120,10 +120,8 @@ tests/
 *.spec.js
 
 # Documentation
+docs/
 README.md
-SETUP.md
-VOICE_SETUP.md
-PARTS_LIST.md
 LICENSE
 
 # Pi-specific files (not needed in cloud deployment)

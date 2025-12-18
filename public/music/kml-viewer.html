@@ -372,9 +372,49 @@
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       background: white;
     }
+
+    /* Toasts */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast-notice {
+      min-width: 260px;
+      max-width: 340px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: fadeInUp 0.25s ease, fadeOut 0.25s ease 4.25s;
+    }
+
+    .toast-notice.info { background: linear-gradient(135deg, #4dabf7, #1c7ed6); }
+    .toast-notice.success { background: linear-gradient(135deg, #51cf66, #2b8a3e); }
+    .toast-notice.warning { background: linear-gradient(135deg, #ffd43b, #f08c00); color: #4a3b00; }
+    .toast-notice.danger { background: linear-gradient(135deg, #ff6b6b, #c92a2a); }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
   </style>
 </head>
 <body>
+  <div class="toast-container" id="toastContainer"></div>
   <div class="nav-home">
     <a href="/index.html">
       <i class="bi-house-fill"></i> Home
@@ -586,6 +626,8 @@
   <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
   
   <script>
+    // Global state
+    let GOOGLE_API_KEY = '';
     let map;
     let markers = [];
     let clusterer = null;
@@ -594,6 +636,24 @@
     let youtubeVideos = [];
     let currentEventIndex = -1;
     let googleMapsLoaded = false;
+    let youtubeAPIReady = false;
+    let youtubeApiScriptLoading = false;
+    let youtubeInitInProgress = false;
+    let toastCounter = 0;
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const id = `toast-${++toastCounter}`;
+      const div = document.createElement('div');
+      div.id = id;
+      div.className = `toast-notice ${type}`;
+      div.innerHTML = `<i class="bi-info-circle"></i><span>${message}</span>`;
+      container.appendChild(div);
+      setTimeout(() => {
+        div.style.opacity = '0';
+        setTimeout(() => div.remove(), 250);
+      }, 4500);
+    }
 
     // Load Google Maps API with key from server
     async function loadGoogleMapsAPI() {
@@ -602,12 +662,16 @@
         const data = await response.json();
         
         if (data.apiKey) {
+          GOOGLE_API_KEY = data.apiKey;
           const script = document.createElement('script');
           script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places&loading=async&callback=initMap`;
           script.async = true;
           script.defer = true;
           document.head.appendChild(script);
           console.log('🗺️ Google Maps API loading with key from server');
+
+          // Kick off YouTube client init with the same key
+          loadYouTubeAPI();
         } else {
           console.warn('Google Maps API key not available from server');
           showMapError();
@@ -620,6 +684,7 @@
 
     // Show map error
     function showMapError() {
+      showToast('Google Maps API key not configured', 'danger');
       document.getElementById('map').innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">
           <div class="text-center">
@@ -668,10 +733,12 @@
           processKMLData(data.data);
         } else {
           showError('Failed to load timeline: ' + data.error);
+          showToast('Failed to load timeline', 'danger');
         }
       } catch (error) {
         console.error('Load error:', error);
         showError('Failed to load timeline');
+        showToast('Failed to load timeline', 'danger');
       }
     }
 
@@ -699,10 +766,12 @@
           processKMLData(data.data);
         } else {
           showError('Failed to parse KML file: ' + data.error);
+          showToast('Failed to parse KML file', 'danger');
         }
       } catch (error) {
         console.error('Upload error:', error);
         showError('Failed to upload KML file');
+        showToast('Failed to upload KML file', 'danger');
       }
     }
 
@@ -711,7 +780,7 @@
       const url = document.getElementById('kmlUrl').value.trim();
       
       if (!url) {
-        alert('Please enter a KML URL');
+        showToast('Please enter a KML URL', 'warning');
         return;
       }
       
@@ -732,10 +801,12 @@
           processKMLData(data.data);
         } else {
           showError('Failed to load KML from URL: ' + data.error);
+          showToast('Failed to load KML from URL', 'danger');
         }
       } catch (error) {
         console.error('Load error:', error);
         showError('Failed to load KML from URL');
+        showToast('Failed to load KML from URL', 'danger');
       }
     }
 
@@ -846,6 +917,83 @@
       }, 100);
     }
 
+    // ---------- YouTube (client-side) ----------
+    function loadYouTubeAPI() {
+      if (!GOOGLE_API_KEY) return;
+      if (youtubeAPIReady || youtubeInitInProgress) return;
+
+      const initClient = () => {
+        if (youtubeAPIReady || youtubeInitInProgress) return;
+        youtubeInitInProgress = true;
+        gapi.load('client', () => {
+          gapi.client.init({
+            apiKey: GOOGLE_API_KEY,
+            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest']
+          }).then(() => {
+            youtubeAPIReady = true;
+            console.log('📺 YouTube Data API ready (client-side)');
+          }).catch(err => {
+            console.error('YouTube API init error:', err);
+          }).finally(() => {
+            youtubeInitInProgress = false;
+          });
+        });
+      };
+
+      if (typeof gapi === 'undefined') {
+        if (youtubeApiScriptLoading) return;
+        youtubeApiScriptLoading = true;
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/api.js';
+        script.async = true;
+        script.defer = true;
+        script.onload = () => {
+          youtubeApiScriptLoading = false;
+          initClient();
+        };
+        script.onerror = () => {
+          youtubeApiScriptLoading = false;
+          console.error('Failed to load Google API client library');
+        };
+        document.head.appendChild(script);
+        return;
+      }
+
+      initClient();
+    }
+
+    async function searchYouTubeVideos(query) {
+      if (!GOOGLE_API_KEY) {
+        throw new Error('Missing Google API key');
+      }
+      if (!youtubeAPIReady) {
+        // Wait a short time if init is in progress
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+      if (!youtubeAPIReady) {
+        throw new Error('YouTube API not ready');
+      }
+
+      const resp = await gapi.client.youtube.search.list({
+        part: 'snippet',
+        q: query,
+        maxResults: 10,
+        type: 'video',
+        relevanceLanguage: 'en',
+        safeSearch: 'moderate'
+      });
+
+      const items = resp.result.items || [];
+      return items.map(item => ({
+        videoId: item.id.videoId,
+        title: item.snippet.title,
+        description: item.snippet.description,
+        thumbnail: item.snippet.thumbnails && item.snippet.thumbnails.medium
+          ? item.snippet.thumbnails.medium.url
+          : '',
+      }));
+    }
+
     // Display timeline
     function displayTimeline(events) {
       const container = document.getElementById('timelineContainer');
@@ -928,35 +1076,44 @@
       
       // Fetch YouTube videos for this event
       try {
-        const response = await fetch('/api/kml/youtube-search', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `${event.name} ${event.location || ''} ${event.date || ''}`,
-            location: event.location,
-            date: event.date
-          })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success && data.videos.length > 0) {
-          youtubeVideos = data.videos;
-          displayYouTubeVideos(data.videos);
-          playYouTubeVideo(data.videos[0].videoId);
-          
-          // Update stats
-          document.getElementById('statVideos').textContent = data.videos.length;
+        const query = `${event.name} ${event.location || ''} ${event.date || ''}`.trim();
+        let videos = [];
+
+        // Prefer client-side YouTube search (gapi) with browser key
+        if (GOOGLE_API_KEY) {
+          try {
+            videos = await searchYouTubeVideos(query);
+          } catch (clientErr) {
+            console.warn('Client YouTube search failed, falling back to server:', clientErr);
+          }
+        }
+
+        // Fallback to server endpoint if client search failed or returned empty
+        if (!videos || videos.length === 0) {
+          const response = await fetch('/api/kml/youtube-search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, location: event.location, date: event.date })
+          });
+          const data = await response.json();
+          if (data.success && data.videos.length > 0) {
+            videos = data.videos;
+          }
+        }
+
+        if (videos && videos.length > 0) {
+          youtubeVideos = videos;
+          displayYouTubeVideos(videos);
+          playYouTubeVideo(videos[0].videoId);
+          document.getElementById('statVideos').textContent = videos.length;
         } else {
-          videosList.innerHTML = 
-            '<div class="alert alert-info">No videos found for this event</div>';
+          videosList.innerHTML = '<div class="alert alert-info">No videos found for this event</div>';
         }
       } catch (error) {
         console.error('YouTube search error:', error);
         videosList.innerHTML = 
           '<div class="alert alert-danger">Failed to load videos</div>';
+        showToast('Failed to load videos', 'danger');
       }
     }
 
@@ -1032,6 +1189,7 @@
         </div>
       `;
       document.getElementById('timelineMessage').style.display = 'block';
+      showToast(message, 'danger');
     }
 
     // Voice Recognition
@@ -1048,7 +1206,7 @@
 
     function startVoiceRecognition() {
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert('Voice recognition is not supported in this browser. Please use Chrome or Edge.');
+        showToast('Voice recognition is not supported. Please use Chrome or Edge.', 'warning');
         return;
       }
 
@@ -1215,7 +1373,7 @@
       const question = input.value.trim();
       
       if (!question) {
-        alert('Please enter a question');
+        showToast('Please enter a question', 'warning');
         return;
       }
 
@@ -1282,7 +1440,7 @@
         }, 2000);
       }).catch(err => {
         console.error('Failed to copy:', err);
-        alert('Failed to copy to clipboard. Please select and copy manually.');
+        showToast('Failed to copy. Please select and copy manually.', 'danger');
       });
     }
 

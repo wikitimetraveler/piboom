@@ -96,6 +96,20 @@ docker-compose up
 - **Encompass Assistant**: `http://localhost:3000/finance/encompass-assistant.html`
 - **Main Hub**: `http://localhost:3000/`
 
+## Documentation
+
+- All guides now live under `docs/` to keep the repo root clean.
+- Setup: [`docs/SETUP.md`](docs/SETUP.md) and [`docs/DATABASE_SETUP.md`](docs/DATABASE_SETUP.md)
+- Deployment: [`docs/DOCKER_DEPLOYMENT.md`](docs/DOCKER_DEPLOYMENT.md)
+- Domain guides & notes: [`docs/VOICE_SETUP.md`](docs/VOICE_SETUP.md), [`docs/GRATEFUL_DEAD_SETUP.md`](docs/GRATEFUL_DEAD_SETUP.md), [`docs/ICE_KNOWLEDGE_SOURCES.md`](docs/ICE_KNOWLEDGE_SOURCES.md), [`docs/CHANGES_SUMMARY.md`](docs/CHANGES_SUMMARY.md)
+
+## Scripts & Tests Layout
+
+- Bash entrypoints remain in the repo root as thin wrappers; primary scripts live under `scripts/pi/` and `scripts/docker/`.
+- Windows helpers live under `scripts/windows/`; utility batch scripts under `scripts/tools/`.
+- Maintenance/check scripts live under `scripts/maintenance/` and `scripts/checks/`.
+- Manual test runners are under `tests/manual/` (e.g., `tests/manual/test-mapbox-geocoding.js`).
+
 ## 🛠️ Tech Stack
 
 -### Backend
@@ -218,10 +232,10 @@ docker-compose up
 ## 🔧 Configuration
 
 ### Database Setup
-See [DATABASE_SETUP.md](DATABASE_SETUP.md) for detailed PostgreSQL setup instructions.
+See [docs/DATABASE_SETUP.md](docs/DATABASE_SETUP.md) for detailed PostgreSQL setup instructions.
 
 ### Docker Deployment
-See [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md) for containerized deployment.
+See [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for containerized deployment.
 
 ### API Keys Setup
 - **Google API**: [Google Cloud Console](https://console.cloud.google.com/)
@@ -266,7 +280,7 @@ docker-compose up -d
 ```
 
 ### Production (Render/Heroku)
-See [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md) for cloud deployment instructions.
+See [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for cloud deployment instructions.
 
 ## 📄 License
 
