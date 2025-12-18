@@ -8,7 +8,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
-  <script src="/shared/modern-navbar.js"></script>
+<script src="/shared/modern-navbar.js"></script>
+<script src="/shared/music-mini-nav.js"></script>
   <script src="https://apis.google.com/js/api.js"></script>
   <style>
     /* Floating Musical Notes */
@@ -742,47 +743,14 @@
     color: #495057;
   }
   
-  /* Simple Basic Header */
-  .simple-header {
-    background: #f8f9fa;
-    border-bottom: 1px solid #dee2e6;
-    padding: 8px 0;
-    margin-bottom: 0;
-  }
-  
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .brand {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #495057;
-    text-decoration: none;
-  }
-  
-  .nav-links {
-    display: flex;
-    gap: 15px;
-  }
-  
-  .nav-links a {
-    font-size: 0.85rem;
-    color: #6c757d;
-    text-decoration: none;
-    padding: 2px 5px;
-    transition: color 0.2s;
-  }
-  
-  .nav-links a:hover,
-  .nav-links a.active {
-    color: #007bff;
-  }
   </style>
 </head>
 <body>
+<div class="music-mini-nav" data-music-mini-nav>
+  <a href="/music/music-research.html"><i class="bi bi-search"></i> Music Research</a>
+  <a href="/music/album-discovery.html"><i class="bi bi-disc"></i> Album Discovery</a>
+  <a href="/music/collection.html"><i class="bi bi-collection-fill"></i> My Collection</a>
+</div>
 <div class="particles" id="particles"></div>
 
 <!-- Floating Musical Notes -->
@@ -809,26 +777,6 @@
 <!-- User Selector and Login Scripts -->
 <script src="/shared/user-selector.js"></script>
 <script src="/shared/user-login.js"></script>
-
-<!-- Simple Basic Header -->
-<div class="simple-header">
-  <div class="container">
-    <div class="header-content">
-      <a href="/" class="brand">piBoom</a>
-      <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/music-research.html">Research</a>
-        <a href="/album-discovery.html" class="active">Albums</a>
-        <a href="/collection.html">Collection</a>
-        <a href="/music-time-machine.html">Time Machine</a>
-        <a href="/poster-generator.html">Poster Gen</a>
-        <a href="/voice-dj.html">Wolfman Dave</a>
-        <a href="/blacklight.html">Black Light</a>
-        <a href="/tree-discovery.html">Trees 🐻</a>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div class="container">
   <div class="album-container">
