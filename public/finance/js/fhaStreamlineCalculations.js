@@ -73,62 +73,37 @@ class FhaStreamlineCalculations {
   sumInputs(inputs, result) {
     if (!inputs || !result) return;
     const values = this.getNumericValues(inputs);
-    const total = values.reduce((acc, value) => acc + value, 0);
-    result.value = total;
+    result.value = MathLib.sum(values);
   }
 
   subtractInputs(inputs, result) {
     if (!inputs || !result) return;
     const values = this.getNumericValues(inputs);
-    const total = values.reduce((acc, value) => acc - value);
-    result.value = total;
+    result.value = MathLib.subtract(values);
   }
 
   truncateAndSumInputs(inputs, result) {
     if (!inputs || !result) return;
-    const truncatedValues = this.getNumericValues(inputs).map(Math.trunc);
-    const total = truncatedValues.reduce((acc, value) => acc + value, 0);
-    result.value = total;
+    const values = this.getNumericValues(inputs);
+    result.value = MathLib.truncateAndSum(values);
   }
 
   minInputs(inputs, result) {
     if (!inputs || !result) return;
     const values = this.getNumericValues(inputs);
-    const min = Math.min(...values);
-    result.value = isFinite(min) ? min : '';
+    const min = MathLib.min(values);
+    result.value = min === null ? '' : min;
   }
 
   maxUFMPamount(inputs, result) {
     if (!inputs || !result) return;
     const [inputValue1, inputValue2] =  this.getNumericValues(inputs);
-    const adjustedValue1 = inputValue1 - Math.round(inputValue1 * inputValue2 / (1 + inputValue2) * 100) / 100;
-    result.value = Math.trunc(adjustedValue1) * inputValue2;
+    result.value = MathLib.maxUFMPamount(inputValue1, inputValue2);
   }
 
   newUfmipFactor(inputs, result) {
     if (!inputs || !result) return;
-
-    // Define the date to compare against (January 1, 2024)
-    const comparisonDate = new Date('2009-05-31');
-
-    // Get the input date value
-    const inputDateValue = inputs[0].value;
-
-    // Check if the input date is empty or invalid
-    if (!inputDateValue || isNaN(Date.parse(inputDateValue))) {
-        result.value = 0;
-        return;
-    }
-
-    // Convert the input date to a Date object
-    const inputDateObj = new Date(inputDateValue);
-
-    // Check if the input date is before or after January 1, 2024
-    const isBeforeComparisonDate = inputDateObj < comparisonDate;
-
-    // Set the result based on the date comparison
-    result.value = isBeforeComparisonDate ? .0100 : .0175;
-}
-
+    const inputDate = new Date(inputs[0].value);
+    result.value = MathLib.newUfmipFactor(inputDate);
   }
-
+}
