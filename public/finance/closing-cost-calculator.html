@@ -37,7 +37,7 @@
   - Automatic recalculation when loan amount, rate, or days change
   
   Technical Implementation:
-  - Uses the calculations.js engine (v2.0)
+  - Uses the calculationEngine.js engine (v2.0)
   - Custom prepaid interest calculation function
   - SumRounded method for all category totals
   - Bootstrap 4.5.2 responsive layout
@@ -48,7 +48,7 @@
   - Supports multiple fee categories for comprehensive cost analysis
   
   @dependencies
-  - /shared/calculations.js (v2.0+)
+  - /shared/calculationEngine.js (v2.0+)
   - Bootstrap 4.5.2
   - Bootstrap Icons 1.11.1
   
@@ -61,7 +61,8 @@
     <title>Closing Cost Calculator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="../shared/calculations.js"></script>
+    <script src="../shared/calcEngineLibrary.js"></script>
+    <script src="../shared/calculationEngine.js"></script>
     <style>
       :root {
         --primary: #4A90A4;
@@ -405,7 +406,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const calc = new calculations({
+        const calc = new CalculationsEngine({
           groups: [
             // Total lender fees
             { inputIds: ['closing_origination_fee', 'closing_underwriting_fee', 'closing_processing_fee', 'closing_credit_report', 'closing_flood_cert', 'closing_appraisal_fee', 'closing_other_lender_fees'], resultId: 'closing_total_lender_fees', calculation: 'sumRounded' },

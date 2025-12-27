@@ -41,7 +41,8 @@
     <title>VA IRRRL Calculator - Refinance Savings</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="../shared/calculations.js"></script>
+    <script src="../shared/calcEngineLibrary.js"></script>
+    <script src="../shared/calculationEngine.js"></script>
     <style>
       :root {
         --primary: #4A90A4;
@@ -409,7 +410,7 @@
 
       document.addEventListener('DOMContentLoaded', function() {
         // Initialize calculations engine
-        const calc = new calculations({
+        const calc = new CalculationsEngine({
           groups: [
             // Funding fee calculation (with waiver checkbox)
             {

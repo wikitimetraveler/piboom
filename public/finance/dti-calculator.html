@@ -25,7 +25,7 @@
   - Minimum income requirement calculation
   
   Technical Implementation:
-  - Uses the calculations.js engine (v2.0) with factory pattern
+  - Uses the calculationEngine.js engine (v2.0) with factory pattern
   - Reactive updates with 50ms debounce for performance
   - Decoupled calculation methods for testability
   - Bootstrap 4.5.2 for responsive UI
@@ -37,7 +37,7 @@
   - Additional data source support via additionalInputIds
   
   @dependencies
-  - /shared/calculations.js (v2.0+)
+  - /shared/calculationEngine.js (v2.0+)
   - Bootstrap 4.5.2
   - Bootstrap Icons 1.11.1
   
@@ -50,7 +50,8 @@
     <title>Debt-to-Income (DTI) Calculator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="../shared/calculations.js"></script>
+    <script src="../shared/calcEngineLibrary.js"></script>
+    <script src="../shared/calculationEngine.js"></script>
     <style>
       :root {
         --primary: #4A90A4;
@@ -323,12 +324,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="/shared/calcEngineLibrary.js"></script>
+    <script src="/shared/calculationEngine.js"></script>
     <script src="js/encompass-test-loans.js"></script>
     <script src="js/calculator-scenario-runner.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         // Use factory function to create DTI calculator configuration
-        const calc = new calculations(createDTICalculatorConfig());
+        const calc = new CalculationsEngine(createDTICalculatorConfig());
 
         // Handle manual entry of gross monthly income
         const grossMonthlyInput = document.getElementById('dti_gross_monthly');

@@ -30,7 +30,7 @@
   - Computes LTV ratio for qualification purposes
   
   Technical Implementation:
-  - Uses the calculations.js engine (v2.0) with factory pattern
+  - Uses the calculationEngine.js engine (v2.0) with factory pattern
   - Factory function: createFHACalculatorConfig()
   - All calculations use rounded values per FHA requirements
   - Debounced input handling for optimal performance
@@ -41,7 +41,7 @@
   - Date-based UFMIP factor calculation (0.0100 vs 0.0175)
   
   @dependencies
-  - /shared/calculations.js (v2.0+)
+  - /shared/calculationEngine.js (v2.0+)
   - Bootstrap 4.5.2
   - Bootstrap Icons 1.11.1
   
@@ -54,7 +54,8 @@
     <title>FHA Streamline Loan Amount Calculator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="../shared/calculations.js"></script>
+    <script src="../shared/calcEngineLibrary.js"></script>
+    <script src="../shared/calculationEngine.js"></script>
     <style>
       :root {
         --primary: #4A90A4;
@@ -311,7 +312,7 @@
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         // Use factory function to create FHA Streamline Loan Amount calculator configuration
-        const calc = new calculations(createFHACalculatorConfig());
+        const calc = new CalculationsEngine(createFHACalculatorConfig());
 
         // Format currency displays
         function formatCurrency(value) {

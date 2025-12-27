@@ -125,8 +125,8 @@ const globalConfig = {
     }
 };
 
-/** @type {calculations} Instance of calculations class. */
-const fhaStreamlineCalculator = new calculations(globalConfig.fhaStreamline);
+/** @type {CalculationsEngine} Instance of calculations class. */
+const fhaStreamlineCalculator = new CalculationsEngine(globalConfig.fhaStreamline);
 
 /**
  * Initialize audit fields from configuration

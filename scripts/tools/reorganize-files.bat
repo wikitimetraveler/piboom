@@ -53,7 +53,7 @@ git mv public/quick-actions.js public/shared/
 git mv public/scripts.js public/shared/
 git mv public/search-history.js public/shared/
 git mv public/lineage.js public/shared/
-git mv public/calculations.js public/shared/
+git mv public/calculationEngine.js public/shared/
 git mv public/styles.css public/shared/
 echo Shared files moved!
 

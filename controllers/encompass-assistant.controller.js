@@ -91,7 +91,7 @@ const ENCOMPASS_SYSTEM_PROMPT = `You are an expert AI assistant for Encompass De
 - **Environment variable management** - .env file for API keys and configuration
 
 ### Financial Calculation Engine:
-- **calculations Class** - Reusable, decoupled calculation framework for financial calculators (located in public/shared/calculations.js)
+- **CalculationsEngine Class** - Reusable, decoupled calculation framework for financial calculators (located in public/shared/calculationEngine.js)
   - **Reactive calculation framework** - Input fields automatically trigger calculations when values change
   - **Debounced for performance** - 50ms default debounce to optimize calculation performance
   - **Decoupled from DOM** - Calculations receive values, not elements, making them testable and reusable
@@ -107,7 +107,7 @@ const ENCOMPASS_SYSTEM_PROMPT = `You are an expert AI assistant for Encompass De
     - createFHACalculatorConfig() - FHA Streamline loan amount calculator configuration
     - createAssetQualifierConfig() - Asset-based qualification calculator configuration
   - **Encompass integration ready** - Factory functions support customIds option for mapping to Encompass field IDs
-  - **Usage pattern**: const calc = new calculations({ groups: [...] }) or use factory functions like createDTICalculatorConfig({ customIds: { annualIncome: 'field_4002' } })
+  - **Usage pattern**: const calc = new CalculationsEngine({ groups: [...] }) or use factory functions like createDTICalculatorConfig({ customIds: { annualIncome: 'field_4002' } })
 
 ### Encompass Platform Context:
 - **Encompass is web/cloud/phone-based** - Encompass is a cloud-based lending platform accessible via web browser or mobile app. All Encompass integrations must be designed for web/cloud/phone deployment, NOT local hardware deployments.

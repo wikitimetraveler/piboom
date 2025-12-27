@@ -13,7 +13,7 @@
  * - Scenario management (create, store, load, execute scenarios)
  * - Input population from Encompass field mappings or direct field IDs
  * - Test execution with expected vs actual result validation
- * - Integration with calculations.js engine for automated testing
+ * - Integration with calculationEngine.js engine for automated testing
  * - Support for all calculator types (DTI, FHA Streamline, VA IRRRL, Asset Qualifier, etc.)
  */
 class Scenarios {

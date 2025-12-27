@@ -320,7 +320,8 @@
 
     <script src="scripts.js"></script>
     <script src="voice-widget.js"></script>
-    <script src="calculations.js"></script>
+    <script src="/shared/calcEngineLibrary.js"></script>
+    <script src="/shared/calculationEngine.js"></script>
     <script>
         // Initialize voice widget with custom command handler
         window.addEventListener('DOMContentLoaded', () => {
@@ -600,14 +601,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize the calculations class with configuration
             console.log('Initializing calculations...');
-            console.log('calculations class available:', typeof calculations);
+            console.log('CalculationsEngine available:', typeof CalculationsEngine);
             
-            if (typeof calculations === 'undefined') {
-                console.error('calculations class not found! Check if calculations.js is loaded properly.');
+            if (typeof CalculationsEngine === 'undefined') {
+                console.error('CalculationsEngine not found! Check if calculationEngine.js and calcEngineLibrary.js are loaded properly.');
                 return;
             }
             
-            const calc = new calculations({
+            const calc = new CalculationsEngine({
                 groups: [
                     {
                         inputIds: ['sum-input1', 'sum-input2', 'sum-input3'],

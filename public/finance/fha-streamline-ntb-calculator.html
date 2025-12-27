@@ -34,7 +34,7 @@
   - Rate reduction alone may qualify in some cases
   
   Technical Implementation:
-  - Uses the calculations.js engine (v2.0)
+  - Uses the calculationEngine.js engine (v2.0)
   - Standard calculation methods (sumRounded, subtractRounded, copyValue)
   - Reactive updates on all input changes
   - Visual status indicators for qualification
@@ -44,7 +44,7 @@
   - Can be used standalone or integrated into loan pipeline
   
   @dependencies
-  - /shared/calculations.js (v2.0+)
+  - /shared/calculationEngine.js (v2.0+)
   - Bootstrap 4.5.2
   - Bootstrap Icons 1.11.1
   
@@ -57,7 +57,8 @@
     <title>FHA Streamline Net Tangible Benefit Calculator</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="../shared/calculations.js"></script>
+    <script src="../shared/calcEngineLibrary.js"></script>
+    <script src="../shared/calculationEngine.js"></script>
     <style>
       :root {
         --primary: #4A90A4;
@@ -290,7 +291,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const calc = new calculations({
+        const calc = new CalculationsEngine({
           groups: [
             // B27 = B25+B26
             { inputIds: ['ntb_b25', 'ntb_b26'], resultId: 'ntb_b27', calculation: 'sumRounded' },

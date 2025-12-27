@@ -38,7 +38,7 @@
   - C32: 12-month account history validation
   
   Technical Implementation:
-  - Uses the calculations.js engine (v2.0) with factory pattern
+  - Uses the calculationEngine.js engine (v2.0) with factory pattern
   - Factory function: createAssetQualifierConfig()
   - Date of birth parsing for age calculations
   - String-based validation message generation
@@ -49,7 +49,7 @@
   - Real-time PASS/FAIL indicators
   
   @dependencies
-  - /shared/calculations.js (v2.0+)
+  - /shared/calculationEngine.js (v2.0+)
   - Bootstrap 4.5.2
   - Bootstrap Icons 1.11.1
   - jQuery 3.5.1 (for accordion functionality)
@@ -321,13 +321,14 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="/shared/calculations.js"></script>
+    <script src="/shared/calcEngineLibrary.js"></script>
+    <script src="/shared/calculationEngine.js"></script>
     <script src="js/encompass-test-loans.js"></script>
     <script src="js/calculator-scenario-runner.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         // Use factory function to create Asset Qualifier calculator configuration
-        const calc = new calculations(createAssetQualifierConfig());
+        const calc = new CalculationsEngine(createAssetQualifierConfig());
 
         try { calc.recalculateAll(); } catch (e) { console.error(e); }
         renderFormats();
