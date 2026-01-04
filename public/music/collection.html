@@ -955,6 +955,11 @@ function displayAlbums(albums) {
     const coverUrl = album.cover_url || 'https://via.placeholder.com/220x220/87CEEB/FFFFFF?text=No+Cover';
     const rating = album.rating ? '★'.repeat(album.rating) + '☆'.repeat(5 - album.rating) : '☆☆☆☆☆';
     const addedDate = new Date(album.added_date).toLocaleDateString();
+    const locationLabel = album.location_label || '';
+    const locationCoords = album.latitude && album.longitude
+      ? `${parseFloat(album.latitude).toFixed(4)}, ${parseFloat(album.longitude).toFixed(4)}`
+      : '';
+    const locationDisplay = locationLabel || locationCoords;
     
     // Get user info for this album
     const albumUser = album.user_id ? getUserById(album.user_id) : USERS[0];
@@ -977,6 +982,7 @@ function displayAlbums(albums) {
             <h5>${album.album}</h5>
             <p><strong>${album.artist}</strong></p>
             <p>${album.year || 'Year Unknown'} · ${album.genre || 'Genre Unknown'}</p>
+            ${locationDisplay ? `<p style="margin: 4px 0 8px 0; font-size: 0.9rem; color: #2c3e50;"><i class="bi-geo-alt"></i> ${locationDisplay}</p>` : ''}
             ${album.valuation ? `<p style="color: #28a745; font-weight: 600; margin-top: 8px;"><i class="bi-cash-coin"></i> $${parseFloat(album.valuation).toFixed(2)}</p>` : ''}
             ${rating ? `<div class="rating-stars">${rating}</div>` : ''}
           </div>
@@ -1038,6 +1044,8 @@ function displayAlbums(albums) {
           ${album.genre ? `<div class="metadata-item"><strong>🎸 Genre:</strong> ${album.genre}</div>` : ''}
           
           ${album.label ? `<div class="metadata-item"><strong>🏷️ Label:</strong> ${album.label}</div>` : ''}
+          
+          ${locationDisplay ? `<div class="metadata-item"><strong>📍 Location:</strong> ${locationDisplay}</div>` : ''}
           
           <div class="metadata-item">
             <strong>⭐ Rating:</strong> ${rating}

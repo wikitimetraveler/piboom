@@ -286,82 +286,82 @@
     <script src="js/encompass-test-loans.js"></script>
     <script src="js/calculator-scenario-runner.js"></script>
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Calculate mortgage payment (P&I)
-        function calculateMortgagePayment(principal, annualRate, years) {
-          if (!principal || !annualRate || !years) return 0;
+      // Reuse shared calcEngineLibrary helpers; extend only if missing
+      const math = (typeof calcMath !== 'undefined') ? calcMath : {};
+      const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
+
+      if (!math.calculateMortgagePayment) {
+        math.calculateMortgagePayment = function(values, ctx) {
+          const principal = Number(values?.[0]) || 0;
+          const annualRate = Number(values?.[1]) || 0;
+          const termRaw = ctx?.additionalData?.term;
+          const years = (termRaw !== undefined && termRaw !== null && termRaw !== '')
+            ? (parseFloat(termRaw) || 0)
+            : 30;
+          if (!principal || !annualRate) return '';
+          const termYears = years > 0 ? years : 30;
           const monthlyRate = annualRate / 100 / 12;
-          const numPayments = years * 12;
-          if (monthlyRate === 0) return principal / numPayments;
-          const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+          const numPayments = termYears * 12;
+          if (monthlyRate === 0) return round2(principal / numPayments);
+          const payment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
                          (Math.pow(1 + monthlyRate, numPayments) - 1);
-          return payment;
-        }
+          return round2(payment);
+        };
+      }
 
-        // Calculate all values
-        function calculateCashOut() {
-          const currentBalance = parseFloat(document.getElementById('cashout_current_balance').value) || 0;
-          const currentPayment = parseFloat(document.getElementById('cashout_current_payment').value) || 0;
-          const propertyValue = parseFloat(document.getElementById('cashout_property_value').value) || 0;
-          const newRate = parseFloat(document.getElementById('cashout_new_rate').value) || 0;
-          const newTerm = parseFloat(document.getElementById('cashout_new_term').value) || 30;
-          const maxLTV = parseFloat(document.getElementById('cashout_max_ltv').value) || 80;
-          const closingCosts = parseFloat(document.getElementById('cashout_closing_costs').value) || 0;
-          const prepaidItems = parseFloat(document.getElementById('cashout_prepaid_items').value) || 0;
-          const newLoanAmount = parseFloat(document.getElementById('cashout_new_loan_amount').value) || 0;
-          const marginalTaxRate = parseFloat(document.getElementById('cashout_marginal_tax_rate').value) || 22;
+      if (!math.cashOutAmount) {
+        math.cashOutAmount = function(values) {
+          const newLoan = Number(values?.[0]) || 0;
+          const currentBalance = Number(values?.[1]) || 0;
+          const totalCosts = Number(values?.[2]) || 0;sdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdx+0-*-c-.
+          3
+          if (newLoan <= 0) return 0;
+          return round2(newLoan - currentBalance - totalCosts);
+        };
+      }
 
-          // Total costs
-          const totalCosts = closingCosts + prepaidItems;
-          document.getElementById('cashout_total_costs').value = Math.round(totalCosts * 100) / 100;
+      document.addEventListener('DOMContentLoaded', function() {
+        const calc = new CalculationsEngine({
+          groups: [
+            { inputIds: ['cashout_closing_costs', 'cashout_prepaid_items'], resultId: 'cashout_total_costs', calculation: 'sumRounded' },
+            { inputIds: ['cashout_property_value', 'cashout_max_ltv'], resultId: 'cashout_max_loan_amount', calculation: 'multiplyPercentage' },
+            { inputIds: ['cashout_new_loan_amount', 'cashout_current_balance', 'cashout_total_costs'], resultId: 'cashout_cash_out_amount', calculation: 'cashOutAmount' },
+            {
+              inputIds: ['cashout_new_loan_amount', 'cashout_new_rate'],
+              resultId: 'cashout_new_monthly_payment',
+              calculation: 'calculateMortgagePayment',
+              additionalInputIds: { term: 'cashout_new_term' }
+            },
+            { inputIds: ['cashout_new_monthly_payment', 'cashout_current_payment'], resultId: 'cashout_payment_change', calculation: 'subtractRounded' },
+            { inputIds: ['cashout_new_loan_amount', 'cashout_new_rate'], resultId: 'cashout_annual_interest', calculation: 'multiplyPercentage' },
+            { inputIds: ['cashout_annual_interest', 'cashout_marginal_tax_rate'], resultId: 'cashout_tax_savings', calculation: 'multiplyPercentage' }
+          ]
+        });
 
-          // Maximum loan amount
-          const maxLoanAmount = propertyValue * (maxLTV / 100);
-          document.getElementById('cashout_max_loan_amount').value = Math.round(maxLoanAmount * 100) / 100;
+        // Format inputs on blur for nicer UX
+        document.addEventListener('blur', function(e) {
+          const t = e.target;
+          if (t && t.matches('input[type="number"]')) {
+            const val = parseFloat(t.value);
+            if (!isNaN(val) && val >= 0) {
+              if (t.step === '0.01') t.value = round2(val);
+              else if (t.step === '1') t.value = Math.round(val);
+            }
+          }
+        }, true);
 
-          // Cash-out amount = New Loan - Current Balance - Total Costs
-          const cashOutAmount = newLoanAmount > 0 ? newLoanAmount - currentBalance - totalCosts : 0;
-          document.getElementById('cashout_cash_out_amount').value = Math.round(cashOutAmount * 100) / 100;
-
-          // New monthly payment
-          const newPayment = calculateMortgagePayment(newLoanAmount, newRate, newTerm);
-          document.getElementById('cashout_new_monthly_payment').value = Math.round(newPayment * 100) / 100;
-
-          // Payment change
-          const paymentChange = newPayment - currentPayment;
-          document.getElementById('cashout_payment_change').value = Math.round(paymentChange * 100) / 100;
-
-          // Annual interest (first year approximation)
-          const annualInterest = newLoanAmount * (newRate / 100);
-          document.getElementById('cashout_annual_interest').value = Math.round(annualInterest * 100) / 100;
-
-          // Tax savings
-          const taxSavings = annualInterest * (marginalTaxRate / 100);
-          document.getElementById('cashout_tax_savings').value = Math.round(taxSavings * 100) / 100;
-        }
-
-        // Add event listeners
-        ['cashout_current_balance', 'cashout_current_payment', 'cashout_property_value', 'cashout_new_rate', 
-         'cashout_new_term', 'cashout_max_ltv', 'cashout_closing_costs', 'cashout_prepaid_items', 
-         'cashout_new_loan_amount', 'cashout_marginal_tax_rate'].forEach(id => {
-          const input = document.getElementById(id);
-          if (input) {
-            input.addEventListener('input', calculateCashOut);
-            input.addEventListener('blur', function() {
-              const value = parseFloat(this.value);
-              if (!isNaN(value) && value >= 0) {
-                if (this.type === 'number' && this.step === '0.01') {
-                  this.value = Math.round(value * 100) / 100;
-                } else if (this.type === 'number' && this.step === '1') {
-                  this.value = Math.round(value);
-                }
-              }
-            });
+        // Accordion toggle rotation
+        $('[data-toggle="collapse"]').on('click', function() {
+          var target = $(this).data('target');
+          var button = $(this).find('.card-toggle');
+          if ($(target).hasClass('show')) {
+            button.addClass('collapsed');
+          } else {
+            button.removeClass('collapsed');
           }
         });
 
-        // Initial calculation
-        calculateCashOut();
+        try { calc.recalculateAll(); } catch (e) { console.error(e); }
       });
     </script>
   </body>

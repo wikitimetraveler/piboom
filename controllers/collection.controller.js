@@ -3,7 +3,7 @@ import { getPool } from '../services/database.service.js';
 // Add album to collection
 export async function addToCollection(req, res) {
   try {
-    const { artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation, aiAnalysis } = req.body;
+    const { artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation, aiAnalysis, locationLat, locationLng, locationLabel } = req.body;
     const userId = req.query.userId || null; // Multi-user support
     
     if (!artist || !album) {
@@ -37,10 +37,10 @@ export async function addToCollection(req, res) {
 
     // Insert the album
     const result = await pool.query(
-      `INSERT INTO records (user_id, artist, album, year, genre, label, notes, cover_url, spotify_id, musicbrainz_id, rating, valuation, ai_analysis)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      `INSERT INTO records (user_id, artist, album, year, genre, label, notes, cover_url, spotify_id, musicbrainz_id, rating, valuation, ai_analysis, latitude, longitude, location_label)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
        RETURNING *`,
-      [userId, artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation, aiAnalysis]
+      [userId, artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation, aiAnalysis, locationLat ?? null, locationLng ?? null, locationLabel ?? null]
     );
 
     console.log('✅ Album added to collection:', album, 'by', artist);
@@ -168,7 +168,7 @@ export async function updateAlbum(req, res) {
   try {
     const { id } = req.params;
     const userId = req.query.userId || null;
-    const { notes, rating, genre, label, year, valuation } = req.body;
+    const { notes, rating, genre, label, year, valuation, locationLat, locationLng, locationLabel } = req.body;
 
     const pool = getPool();
     if (!pool) {
@@ -210,6 +210,18 @@ export async function updateAlbum(req, res) {
     if (valuation !== undefined) {
       updates.push(`valuation = $${paramCount++}`);
       params.push(valuation);
+    }
+    if (locationLat !== undefined) {
+      updates.push(`latitude = $${paramCount++}`);
+      params.push(locationLat);
+    }
+    if (locationLng !== undefined) {
+      updates.push(`longitude = $${paramCount++}`);
+      params.push(locationLng);
+    }
+    if (locationLabel !== undefined) {
+      updates.push(`location_label = $${paramCount++}`);
+      params.push(locationLabel);
     }
 
     if (updates.length === 0) {

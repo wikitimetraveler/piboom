@@ -10,6 +10,8 @@
   <link rel="stylesheet" href="/shared/styles.css"/>
 <script src="/shared/modern-navbar.js"></script>
 <script src="/shared/music-mini-nav.js"></script>
+<!-- EXIF.js for reading photo GPS metadata -->
+<script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script src="https://apis.google.com/js/api.js"></script>
   <style>
     /* Floating Musical Notes */
@@ -1064,6 +1066,7 @@ let currentArtist = '';
 let voiceEnabled = false;
 let currentInputMode = 'band'; // 'band', 'album', 'image', or 'camera'
 let uploadedImageData = null;
+const photoLocation = { lat: null, lng: null, label: '' };
 let cameraStream = null;
 let cameraVideo = null;
 let cameraSupported = false;
@@ -1087,6 +1090,40 @@ function setCameraLoading(isLoading) {
   const loadingEl = document.getElementById('cameraLoadingIndicator');
   if (!loadingEl) return;
   loadingEl.style.display = isLoading ? 'flex' : 'none';
+}
+
+function resetPhotoLocation() {
+  photoLocation.lat = null;
+  photoLocation.lng = null;
+  photoLocation.label = '';
+}
+
+function convertDMSToDD(degrees, minutes, seconds, direction) {
+  let dd = degrees + minutes / 60 + seconds / 3600;
+  if (direction === 'S' || direction === 'W') {
+    dd *= -1;
+  }
+  return dd;
+}
+
+function extractGpsFromFile(file) {
+  if (typeof EXIF === 'undefined' || !EXIF.getData) {
+    resetPhotoLocation();
+    return;
+  }
+  EXIF.getData(file, function() {
+    const lat = EXIF.getTag(this, 'GPSLatitude');
+    const lon = EXIF.getTag(this, 'GPSLongitude');
+    const latRef = EXIF.getTag(this, 'GPSLatitudeRef') || 'N';
+    const lonRef = EXIF.getTag(this, 'GPSLongitudeRef') || 'E';
+    if (lat && lon) {
+      photoLocation.lat = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
+      photoLocation.lng = convertDMSToDD(lon[0], lon[1], lon[2], lonRef);
+      photoLocation.label = `${photoLocation.lat.toFixed(5)}, ${photoLocation.lng.toFixed(5)}`;
+    } else {
+      resetPhotoLocation();
+    }
+  });
 }
 
 function updateImageStatus(message, type = 'info') {
@@ -1611,6 +1648,8 @@ function handleImageUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   
+  resetPhotoLocation();
+  
   // Check file type
   if (!file.type.startsWith('image/')) {
     return;
@@ -1620,6 +1659,9 @@ function handleImageUpload(event) {
   if (file.size > 10 * 1024 * 1024) {
     return;
   }
+
+  // Attempt to pull GPS from EXIF
+  extractGpsFromFile(file);
   
   // Read the file
   const reader = new FileReader();
@@ -1669,6 +1711,7 @@ function showCropGuide(guideId, imgElement) {
 // Clear image upload
 function clearImageUpload() {
   uploadedImageData = null;
+  resetPhotoLocation();
   document.getElementById('albumImageInput').value = '';
   document.getElementById('imagePreview').style.display = 'none';
   document.getElementById('previewImg').src = '';
@@ -1690,8 +1733,8 @@ async function startCamera() {
     const constraints = {
       video: {
         facingMode: 'environment',
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
+        width: { ideal: 2560 },
+        height: { ideal: 1440 }
       }
     };
     cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -1747,6 +1790,7 @@ function stopCamera(options = {}) {
   document.getElementById('startCameraBtn').style.display = 'inline-block';
   document.getElementById('stopCameraBtn').style.display = 'none';
   setCameraLoading(false);
+  resetPhotoLocation();
   
   if (!silent) {
     const message = reason === 'hidden'
@@ -1765,6 +1809,8 @@ function captureFromCamera() {
   if (!cameraVideo || !cameraStream) {
     return;
   }
+  
+  resetPhotoLocation(); // camera capture has no EXIF; allow manual fallback later
   
   // Create canvas to capture the frame
   const canvas = document.getElementById('cameraCanvas');
@@ -1804,6 +1850,7 @@ function captureFromCamera() {
 // Retake photo (go back to camera preview)
 function retakePhoto() {
   uploadedImageData = null;
+  resetPhotoLocation();
   document.getElementById('capturedImg').src = '';
   document.getElementById('capturedPreview').style.display = 'none';
   document.getElementById('cameraPreview').style.display = 'block';
@@ -2505,6 +2552,22 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
       });
     }
     
+    // Build location payload (EXIF first, manual fallback if image present)
+    let locationLat = photoLocation.lat;
+    let locationLng = photoLocation.lng;
+    let locationLabel = photoLocation.label;
+
+    if (uploadedImageData && !locationLat && !locationLng) {
+      const manual = prompt('Where did you pick up this album? (store or address)', '');
+      if (manual && manual.trim()) {
+        locationLabel = manual.trim();
+      }
+    }
+
+    if ((locationLat || locationLng) && !locationLabel) {
+      locationLabel = `${Number(locationLat).toFixed(5)}, ${Number(locationLng).toFixed(5)}`;
+    }
+
     // Add album directly
     const response = await fetch(`/api/collection/add?userId=${currentUser.id}`, {
       method: 'POST',
@@ -2516,6 +2579,9 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
         genre: genre,
         coverUrl: coverUrl,
         musicbrainzId: musicbrainzId || null,
+        locationLat: locationLat ?? null,
+        locationLng: locationLng ?? null,
+        locationLabel: locationLabel ?? null,
         // Automatically cut AI valuations in half (AI tends to overestimate)
         valuation: estimatedValue && estimatedValue !== 'null' ? parseFloat(estimatedValue) / 2 : null,
         aiAnalysis: aiAnalysis
@@ -2531,6 +2597,7 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
         `<strong>${album}</strong> by ${artist}<br>Added to <strong>${currentUser.name}'s collection</strong>!${estimatedValue && estimatedValue !== 'null' ? `<br>💰 Estimated value: $${(parseFloat(estimatedValue) / 2).toFixed(2)} <small class="text-muted">(AI÷2)</small>` : ''}`, 
         'success'
       );
+      resetPhotoLocation();
       
       // Show "Add Another Album" button if this was an identified album
       if (isIdentified) {

@@ -188,6 +188,38 @@ export async function createTables(): Promise<void> {
       ADD COLUMN IF NOT EXISTS ai_analysis TEXT
     `);
 
+    // Add location fields if they don't exist
+    await pool.query(`
+      ALTER TABLE records
+      ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION,
+      ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION,
+      ADD COLUMN IF NOT EXISTS location_label TEXT
+    `);
+
+    // Create catches table for fish logging
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS catches (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100),
+        species VARCHAR(255) NOT NULL,
+        description TEXT,
+        notes TEXT,
+        image_url TEXT,
+        latitude DOUBLE PRECISION,
+        longitude DOUBLE PRECISION,
+        location_label TEXT,
+        caught_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_catches_user ON catches(user_id)
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_catches_caught_at ON catches(caught_at DESC)
+    `);
+
     // Add family member link (genealogy integration)
     await pool.query(`
       ALTER TABLE records 
