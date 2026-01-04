@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School of Fish - Collection Map</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f3fbff 0%, #e3f2fd 100%); color: #1c2833; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+    .container { max-width: 1100px; }
+    .hero { background: #0d6efd; color: #fff; padding: 28px 24px; border-radius: 20px; box-shadow: 0 12px 30px rgba(13,110,253,0.25); position: relative; overflow: hidden; }
+    .hero:after { content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; background: rgba(255,255,255,0.12); border-radius: 50%; }
+    .card-pane { border: 1px solid #e5eef5; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+    #fishMap { width: 100%; height: 480px; border-radius: 12px; border: 1px solid #e5eef5; }
+    .chat-area { height: 240px; overflow-y: auto; background: #f8fbff; border: 1px solid #e5eef5; border-radius: 12px; padding: 12px; }
+  </style>
+</head>
+<body>
+  <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+  <div class="nav-finance"><a href="/nature/index.html"><i class="bi-arrow-left"></i> Nature Hub</a></div>
+
+  <div class="container mt-5 mb-5">
+    <div class="hero mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="mb-2"><i class="bi-droplet"></i> School of Fish</h1>
+          <p class="mb-1">View your saved catches on the map. Per-user collection only.</p>
+          <span class="badge badge-light text-primary badge-assistant">Collection Map 🐟</span>
+        </div>
+        <div id="userSelectorContainer"></div>
+      </div>
+    </div>
+
+    <div class="row" id="map">
+      <div class="col-lg-8 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0"><i class="bi-geo-alt"></i> School of Fish (Your Collection)</h5>
+              <div class="btn-group btn-group-sm" role="group">
+                <button class="btn btn-outline-secondary" onclick="toggleMapStyle()" title="Toggle light/dark map"><i class="bi-moon-stars"></i></button>
+                <button class="btn btn-outline-secondary" onclick="fitAllMarkers()" title="Fit all markers"><i class="bi-arrows-fullscreen"></i></button>
+              </div>
+            </div>
+            <div id="fishMap"></div>
+            <small class="text-muted d-block mt-2">Markers show your saved catches. Select a user (top right) to load.</small>
+            <div id="mapStatus" class="text-muted mt-2" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0"><i class="bi-list-ul"></i> Your Catches <span id="catchCount" class="badge badge-primary" style="font-size:0.8rem;">0</span></h5>
+              <button class="btn btn-sm btn-outline-secondary" onclick="downloadCSV()" title="Download CSV"><i class="bi-download"></i></button>
+            </div>
+            <div id="catchList" style="max-height: 520px; overflow-y: auto;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="row">
+      <div class="col-lg-7 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-robot"></i> Ask Marina (AI)</h5>
+            <div class="form-group">
+              <label for="fishQuery">Ask about your catches or local conditions</label>
+              <textarea id="fishQuery" class="form-control" rows="3" placeholder="Example: Which of my catches are surf species?"></textarea>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <button class="btn btn-primary mr-2" onclick="askFishAI()"><i class="bi-robot"></i> Ask</button>
+              <button class="btn btn-outline-secondary mr-2" onclick="clearChat()"><i class="bi-x-circle"></i> Clear</button>
+              <button class="btn btn-success mr-2" id="startVoiceBtn" onclick="startVoice()"><i class="bi-mic-fill"></i> Voice</button>
+              <button class="btn btn-warning mr-2" id="stopVoiceBtn" onclick="stopVoice()" disabled><i class="bi-mic-mute"></i> Stop</button>
+              <button class="btn btn-info" onclick="speakLast()"><i class="bi-volume-up"></i> Speak Last</button>
+            </div>
+            <div id="voiceStatus" class="text-muted" style="display:none;"></div>
+            <small class="text-muted d-block">Marina is tuned for California freshwater and saltwater fish.</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-chat-dots"></i> AI Replies</h5>
+            <div id="chatArea" class="chat-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <script>
+    let map;
+    let catches = [];
+    let markers = [];
+    let markerInfos = [];
+    let mapStatusTimer = null;
+    let selectedCatchId = null;
+    let recognition = null;
+    let listening = false;
+    let lastAIResponse = '';
+    let darkMode = false;
+    const mapStylesDark = [
+      { elementType: 'geometry', stylers: [{ color: '#1f1f1f' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#1f1f1f' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#f5f5f5' }] },
+      { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+      { featureType: 'road', stylers: [{ color: '#2c2c2c' }] },
+      { featureType: 'water', stylers: [{ color: '#0b3d91' }] }
+    ];
+
+    function setMapStatus(msg, type = 'info', persist = false) {
+      const el = document.getElementById('mapStatus');
+      if (!el) return;
+      el.style.display = msg ? 'block' : 'none';
+      el.className = type === 'error' ? 'text-danger mt-2' : 'text-muted mt-2';
+      el.textContent = msg || '';
+      if (!persist && msg) {
+        clearTimeout(mapStatusTimer);
+        mapStatusTimer = setTimeout(() => { el.style.display = 'none'; }, 3000);
+      }
+    }
+
+    async function loadGoogleMaps() {
+      try {
+        const res = await fetch('/api/fish-catches/google-api-key');
+        const data = await res.json();
+        const apiKey = data.apiKey;
+        if (!apiKey) {
+          setMapStatus('No Google Maps API key available.', 'error', true);
+          return;
+        }
+        return new Promise(resolve => {
+          window.initFishMap = () => { initMap(); resolve(); };
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initFishMap`;
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        });
+      } catch (err) {
+        console.error('Failed to load Google Maps', err);
+        setMapStatus('Failed to load Google Maps.', 'error', true);
+      }
+    }
+
+    function initMap() {
+      const caCenter = { lat: 36.7783, lng: -119.4179 };
+      const fishIcon = {
+        url: 'https://maps.google.com/mapfiles/kml/shapes/fishing.png',
+        scaledSize: new google.maps.Size(32, 32),
+        anchor: new google.maps.Point(16, 32)
+      };
+      map = new google.maps.Map(document.getElementById('fishMap'), {
+        center: caCenter,
+        zoom: 6,
+      });
+
+      map.__fishIcon = fishIcon;
+      fetchCatches();
+    }
+
+    function toggleMapStyle() {
+      darkMode = !darkMode;
+      map.setOptions({ styles: darkMode ? mapStylesDark : null });
+    }
+
+    function fitAllMarkers() {
+      if (!markers.length || !map) return;
+      const bounds = new google.maps.LatLngBounds();
+      markers.forEach(m => bounds.extend(m.getPosition()));
+      map.fitBounds(bounds);
+    }
+
+    async function fetchCatches() {
+      try {
+        const currentUser = getCurrentUser?.();
+        if (!currentUser || !currentUser.id) {
+          setMapStatus('Select a user (top right) to view your catches.', 'error', true);
+          return;
+        }
+        setMapStatus('');
+        const res = await fetch(`/api/fish-catches?userId=${encodeURIComponent(currentUser.id)}`);
+        const data = await res.json();
+        if (!data.success) {
+          setMapStatus('Failed to load catches.', 'error', true);
+          return;
+        }
+        catches = data.catches || [];
+        markers.forEach(m => m.setMap(null));
+        markers = [];
+        markerInfos = [];
+        const bounds = new google.maps.LatLngBounds();
+        catches.forEach((c, idx) => {
+          if (c.latitude && c.longitude) {
+            const pos = { lat: parseFloat(c.latitude), lng: parseFloat(c.longitude) };
+            const marker = new google.maps.Marker({
+              position: pos,
+              map,
+              title: c.species || 'Fish',
+              icon: map?.__fishIcon
+            });
+            const label = c.location_label || '';
+            const info = new google.maps.InfoWindow({
+              content: `
+                <div style="max-width:240px;">
+                  <strong>${c.species || 'Fish'}</strong><br>
+                  ${label ? `<div>${label}</div>` : ''}
+                  ${c.notes ? `<div style="margin-top:6px;">${c.notes}</div>` : ''}
+                  <div style="margin-top:6px; color:#555;">${c.caught_at ? new Date(c.caught_at).toLocaleString() : ''}</div>
+                </div>
+              `
+            });
+            marker.addListener('click', () => info.open(map, marker));
+            markers.push(marker);
+            markerInfos.push({ marker, info, catch: c, index: idx });
+            bounds.extend(pos);
+          }
+        });
+        if (markers.length) {
+          map.fitBounds(bounds);
+        }
+        renderCatchList();
+      } catch (err) {
+        console.error('Failed to fetch catches', err);
+        setMapStatus('Error loading catches.', 'error', true);
+      }
+    }
+
+    function renderCatchList() {
+      const list = document.getElementById('catchList');
+      if (!list) return;
+      const countEl = document.getElementById('catchCount');
+      if (countEl) countEl.textContent = catches.length || 0;
+      if (!catches.length) {
+        list.innerHTML = '<div class="text-muted">No catches yet for this user.</div>';
+        return;
+      }
+      list.innerHTML = catches.map((c, idx) => {
+        const label = c.location_label || '';
+        const coords = (c.latitude && c.longitude)
+          ? `${parseFloat(c.latitude).toFixed(4)}, ${parseFloat(c.longitude).toFixed(4)}`
+          : '';
+        const time = c.caught_at ? new Date(c.caught_at).toLocaleString() : '';
+        const isSelected = selectedCatchId === c.id;
+        return `
+          <div class="card mb-2" style="border:1px solid ${isSelected ? '#0d6efd' : '#e5eef5'}; border-radius:10px; box-shadow:${isSelected ? '0 4px 12px rgba(13,110,253,0.15)' : 'none'};">
+            <div class="card-body p-2">
+              <div class="d-flex justify-content-between align-items-start">
+                <div style="width: 100%;">
+                  <div style="font-weight:700; color:#0d6efd;">${c.species || 'Fish'}</div>
+                  ${label ? `<div style="font-size:0.9rem; color:#2c3e50;"><i class="bi-geo-alt"></i> ${label}</div>` : ''}
+                  ${coords ? `<div style="font-size:0.85rem; color:#6c757d;">${coords}</div>` : ''}
+                  ${time ? `<div style="font-size:0.85rem; color:#6c757d;">${time}</div>` : ''}
+                  ${c.notes ? `<div style="font-size:0.9rem; margin-top:4px;">${c.notes}</div>` : ''}
+                </div>
+                <button class="btn btn-sm btn-outline-primary" onclick="locateCatch(${idx})" title="Locate on map">
+                  <i class="bi-geo"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.locateCatch = function(idx) {
+      const item = markerInfos[idx];
+      if (!item || !map) return;
+      map.panTo(item.marker.getPosition());
+      map.setZoom(Math.max(map.getZoom(), 10));
+      item.info?.open(map, item.marker);
+      selectedCatchId = item.catch.id;
+      renderCatchList();
+      prefillAI(item.catch);
+    };
+
+    function prefillAI(c) {
+      const promptBox = document.getElementById('fishQuery');
+      if (!promptBox || !c) return;
+      const label = c.location_label ? ` at ${c.location_label}` : '';
+      const coords = (c.latitude && c.longitude) ? ` (coords: ${parseFloat(c.latitude).toFixed(4)}, ${parseFloat(c.longitude).toFixed(4)})` : '';
+      promptBox.value = `About my catch: ${c.species || 'Fish'}${label}${coords}. Please give insights or tips.`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGoogleMaps();
+    });
+
+    // --- AI chat + voice ---
+    function appendMessage(text, type = 'ai') {
+      const chat = document.getElementById('chatArea');
+      if (!chat) return;
+      const div = document.createElement('div');
+      div.className = type === 'user' ? 'text-right mb-2' : 'mb-2';
+      div.innerHTML = text.replace(/\n/g, '<br>');
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      if (type === 'ai') lastAIResponse = text;
+    }
+
+    async function askFishAI() {
+      const prompt = document.getElementById('fishQuery').value.trim();
+      const currentUser = getCurrentUser?.();
+      if (!prompt) {
+        appendMessage('Please enter a question first.', 'ai');
+        return;
+      }
+      if (!currentUser || !currentUser.id) {
+        appendMessage('Select a user (top right) before asking.', 'ai');
+        return;
+      }
+      appendMessage(`<strong>You:</strong> ${prompt}`, 'user');
+      try {
+        const res = await fetch('/api/chat/langchain/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: `Act as Marina, a California fisheries biologist. User context: their catches map. Question: ${prompt}`,
+            userId: currentUser.id,
+            assistant: 'calfish',
+            sessionId: 'fish-collection',
+            context: { domain: 'california fish collection' }
+          })
+        });
+        const data = await res.json();
+        if (data.response) {
+          appendMessage(data.response, 'ai');
+        } else {
+          appendMessage('No response from AI.', 'ai');
+        }
+      } catch (err) {
+        console.error(err);
+        appendMessage('Error contacting AI.', 'ai');
+      }
+    }
+
+    function clearChat() {
+      const chat = document.getElementById('chatArea');
+      if (chat) chat.innerHTML = '';
+      lastAIResponse = '';
+    }
+
+    function speak(text) {
+      if (!text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    function speakLast() { speak(lastAIResponse); }
+
+    function startVoice() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        appendMessage('Voice recognition not supported in this browser.', 'ai');
+        return;
+      }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => {
+        listening = true;
+        document.getElementById('startVoiceBtn').disabled = true;
+        document.getElementById('stopVoiceBtn').disabled = false;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) { vs.style.display = 'block'; vs.textContent = 'Listening...'; }
+      };
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('fishQuery').value = transcript;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) vs.textContent = `Heard: "${transcript}"`;
+        askFishAI();
+      };
+      recognition.onerror = (event) => {
+        const vs = document.getElementById('voiceStatus');
+        if (vs) vs.textContent = `Voice error: ${event.error}`;
+      };
+      recognition.onend = () => {
+        listening = false;
+        document.getElementById('startVoiceBtn').disabled = false;
+        document.getElementById('stopVoiceBtn').disabled = true;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) setTimeout(() => { vs.style.display = 'none'; }, 1200);
+      };
+      recognition.start();
+    }
+
+    function stopVoice() {
+      if (recognition && listening) recognition.stop();
+    }
+
+    function downloadCSV() {
+      if (!catches.length) return;
+      const headers = ['species','notes','location_label','latitude','longitude','caught_at'];
+      const rows = catches.map(c => [
+        `"${(c.species || '').replace(/"/g,'""')}"`,
+        `"${(c.notes || '').replace(/"/g,'""')}"`,
+        `"${(c.location_label || '').replace(/"/g,'""')}"`,
+        c.latitude ?? '',
+        c.longitude ?? '',
+        c.caught_at ? new Date(c.caught_at).toISOString() : ''
+      ].join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'fish-catches.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
+

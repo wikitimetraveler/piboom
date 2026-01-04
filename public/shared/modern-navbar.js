@@ -409,7 +409,7 @@ class ModernNavbar extends HTMLElement {
                 <a class="dropdown-item" href="/nature/fish-identification.html">
                   <i class="bi-droplet"></i> Fish Identification 🐟
                 </a>
-                <a class="dropdown-item" href="/nature/fish-identification.html#map">
+                <a class="dropdown-item" href="/nature/fish-collection.html#map">
                   <i class="bi-geo-alt"></i> Fish Collection (Map) 🎣
                 </a>
                 </div>

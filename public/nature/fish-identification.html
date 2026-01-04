@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fish Identification - California Fresh & Saltwater</title>
+   <title>School of Fish - Collection Map</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="/shared/styles.css">
@@ -16,13 +16,8 @@
     .hero:after { content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; background: rgba(255,255,255,0.12); border-radius: 50%; }
     .card-pane { border: 1px solid #e5eef5; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
     .chat-area { height: 320px; overflow-y: auto; background: #f8fbff; border: 1px solid #e5eef5; border-radius: 12px; padding: 12px; }
-    .chat-bubble { padding: 10px 12px; border-radius: 12px; margin-bottom: 10px; }
-    .user-msg { background: #d1e7ff; color: #0b3c75; align-self: flex-end; }
-    .ai-msg { background: #e8f5e9; color: #1b4332; }
-    .voice-status { font-size: 0.9rem; color: #0d6efd; display: none; }
     .badge-assistant { background: #0d6efd; }
     #fishMap { width: 100%; height: 420px; border-radius: 12px; border: 1px solid #e5eef5; }
-    #cameraPreview { display: none; width: 100%; border-radius: 12px; border: 1px solid #e5eef5; }
   </style>
 </head>
 <body>
@@ -33,11 +28,32 @@
     <div class="hero mb-4">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <h1 class="mb-2"><i class="bi-droplet"></i> California Fish Identification</h1>
-          <p class="mb-1">AI + voice help from “Marina” — a California fisheries biologist for freshwater and saltwater species.</p>
-          <span class="badge badge-light text-primary badge-assistant">Assistant: Marina (calfish) 🐟</span>
+           <h1 class="mb-2"><i class="bi-droplet"></i> School of Fish</h1>
+           <p class="mb-1">View your saved catches on the map. Per-user collection only.</p>
+           <span class="badge badge-light text-primary badge-assistant">Collection Map 🐟</span>
         </div>
         <div id="userSelectorContainer"></div>
+      </div>
+    </div>
+
+    <div class="row" id="map">
+      <div class="col-lg-8 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-geo-alt"></i> School of Fish (Your Collection)</h5>
+            <div id="fishMap"></div>
+            <small class="text-muted d-block mt-2">Markers show your saved catches. Select a user (top right) to load.</small>
+            <div id="mapStatus" class="text-muted mt-2" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-list-ul"></i> Your Catches</h5>
+            <div id="catchList" style="max-height: 500px; overflow-y: auto;"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -74,6 +90,7 @@
       </div>
     </div>
 
+
     <div class="row">
       <div class="col-lg-7 mb-4">
         <div class="card card-pane h-100">
@@ -107,62 +124,9 @@
       </div>
     </div>
 
-    <div class="row" id="map">
-      <div class="col-lg-8 mb-4">
-        <div class="card card-pane">
-          <div class="card-body">
-            <h5 class="card-title mb-3"><i class="bi-geo-alt"></i> Map of Catches (click map to set location)</h5>
-            <div id="fishMap"></div>
-            <small class="text-muted d-block mt-2">Markers show saved catches. Click the map to set a new catch location, then save with the form.</small>
-            <div id="mapStatus" class="text-muted mt-2" style="display:none;"></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 mb-4">
-        <div class="card card-pane h-100">
-          <div class="card-body">
-            <h5 class="card-title mb-3"><i class="bi-journal-plus"></i> Log a Catch</h5>
-            <div class="form-group">
-              <label for="catchSpecies">Species</label>
-              <input id="catchSpecies" type="text" class="form-control" placeholder="e.g., Blue Rockfish">
-            </div>
-            <div class="form-group">
-              <label for="catchNotes">Notes</label>
-              <textarea id="catchNotes" rows="3" class="form-control" placeholder="Size, gear, depth, regs notes..."></textarea>
-            </div>
-            <div class="form-row">
-              <div class="form-group col-6">
-                <label for="catchLat">Latitude</label>
-                <input id="catchLat" type="number" step="0.000001" class="form-control" placeholder="Set by map click">
-              </div>
-              <div class="form-group col-6">
-                <label for="catchLng">Longitude</label>
-                <input id="catchLng" type="number" step="0.000001" class="form-control" placeholder="Set by map click">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="catchLabel">Location Label (optional)</label>
-              <input id="catchLabel" type="text" class="form-control" placeholder="Pier, jetty, lake name...">
-            </div>
-            <button class="btn btn-primary btn-block" onclick="saveCatch()"><i class="bi-save"></i> Save Catch</button>
-            <small class="text-muted d-block mt-2">Select a user (top right). Lat/Lng required; click the map to set them.</small>
-            <div id="saveStatus" class="text-muted mt-2" style="display:none;"></div>
-          </div>
-        </div>
-        <div class="card card-pane h-100 mt-3">
-          <div class="card-body">
-            <h5 class="card-title mb-3"><i class="bi-list-ul"></i> Your Catches</h5>
-            <div id="catchList" style="max-height: 380px; overflow-y: auto;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <script>
-    let recognition = null;
-    let listening = false;
-    let lastAIResponse = '';
     let map;
     let catches = [];
     let markers = [];
@@ -171,6 +135,7 @@
     let uploadedImageData = null;
     let cameraStream = null;
     let mapStatusTimer = null;
+    let selectedCatchId = null;
 
     function appendMessage(text, type = 'ai') {
       const chat = document.getElementById('chatArea');
@@ -180,98 +145,6 @@
       chat.appendChild(bubble);
       chat.scrollTop = chat.scrollHeight;
       if (type === 'ai') lastAIResponse = text;
-    }
-
-    async function askFishAI() {
-      const prompt = document.getElementById('fishQuery').value.trim();
-      const currentUser = getCurrentUser?.();
-      if (!prompt) {
-        appendMessage('Please describe the fish or ask a question.', 'ai');
-        return;
-      }
-      if (!currentUser || !currentUser.id) {
-        appendMessage('Select a user before asking (top right).', 'ai');
-        return;
-      }
-
-      appendMessage(`<strong>You:</strong> ${prompt}`, 'user');
-      try {
-        const res = await fetch('/api/chat/langchain/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: `Act as Marina, a California fisheries biologist. Identify and advise on this: ${prompt}`,
-            userId: currentUser.id,
-            assistant: 'calfish',
-            sessionId: 'fish-id',
-            context: { domain: 'california fish id' }
-          })
-        });
-        const data = await res.json();
-        if (data.response) {
-          appendMessage(data.response, 'ai');
-        } else {
-          appendMessage('Sorry, I could not get a response.', 'ai');
-        }
-      } catch (err) {
-        console.error(err);
-        appendMessage('Error contacting AI. Try again.', 'ai');
-      }
-    }
-
-    function clearChat() {
-      document.getElementById('chatArea').innerHTML = '';
-      lastAIResponse = '';
-    }
-
-    function speak(text) {
-      if (!text) return;
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = 'en-US';
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-    }
-    function speakLast() { speak(lastAIResponse); }
-
-    function startVoice() {
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        appendMessage('Voice recognition not supported in this browser.', 'ai');
-        return;
-      }
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SR();
-      recognition.lang = 'en-US';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-      recognition.onstart = () => {
-        listening = true;
-        document.getElementById('startVoiceBtn').disabled = true;
-        document.getElementById('stopVoiceBtn').disabled = false;
-        document.getElementById('voiceStatus').style.display = 'block';
-        document.getElementById('voiceStatus').textContent = 'Listening...';
-      };
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        document.getElementById('fishQuery').value = transcript;
-        document.getElementById('voiceStatus').textContent = `Heard: "${transcript}"`;
-        askFishAI();
-      };
-      recognition.onerror = (event) => {
-        document.getElementById('voiceStatus').textContent = `Voice error: ${event.error}`;
-      };
-      recognition.onend = () => {
-        listening = false;
-        document.getElementById('startVoiceBtn').disabled = false;
-        document.getElementById('stopVoiceBtn').disabled = true;
-        setTimeout(() => { document.getElementById('voiceStatus').style.display = 'none'; }, 1500);
-      };
-      recognition.start();
-    }
-
-    function stopVoice() {
-      if (recognition && listening) {
-        recognition.stop();
-      }
     }
 
     function setPhotoStatus(msg, type = 'info') {
@@ -425,6 +298,11 @@
 
     function initMap() {
       const caCenter = { lat: 36.7783, lng: -119.4179 };
+      const fishIcon = {
+        url: 'https://maps.google.com/mapfiles/kml/shapes/fishing.png',
+        scaledSize: new google.maps.Size(32, 32),
+        anchor: new google.maps.Point(16, 32)
+      };
       map = new google.maps.Map(document.getElementById('fishMap'), {
         center: caCenter,
         zoom: 6,
@@ -435,6 +313,7 @@
       });
 
       fetchCatches();
+      map.__fishIcon = fishIcon;
     }
 
     function setNewCatchLocation(latLng) {
@@ -477,6 +356,7 @@
               position: pos,
               map,
               title: c.species || 'Fish',
+              icon: map?.__fishIcon
             });
             const label = c.location_label || '';
             const info = new google.maps.InfoWindow({
@@ -517,20 +397,34 @@
           ? `${parseFloat(c.latitude).toFixed(4)}, ${parseFloat(c.longitude).toFixed(4)}`
           : '';
         const time = c.caught_at ? new Date(c.caught_at).toLocaleString() : '';
+        const isSelected = selectedCatchId === c.id;
         return `
-          <div class="card mb-2" style="border:1px solid #e5eef5; border-radius:10px;">
+          <div class="card mb-2" style="border:1px solid ${isSelected ? '#0d6efd' : '#e5eef5'}; border-radius:10px; box-shadow:${isSelected ? '0 4px 12px rgba(13,110,253,0.15)' : 'none'};">
             <div class="card-body p-2">
               <div class="d-flex justify-content-between align-items-start">
-                <div>
-                  <div style="font-weight:700; color:#0d6efd;">${c.species || 'Fish'}</div>
-                  ${label ? `<div style="font-size:0.9rem; color:#2c3e50;"><i class="bi-geo-alt"></i> ${label}</div>` : ''}
-                  ${coords ? `<div style="font-size:0.85rem; color:#6c757d;">${coords}</div>` : ''}
-                  ${time ? `<div style="font-size:0.85rem; color:#6c757d;">${time}</div>` : ''}
-                  ${c.notes ? `<div style="font-size:0.9rem; margin-top:4px;">${c.notes}</div>` : ''}
+                <div style="width: 100%;">
+                  <div class="d-flex align-items-center mb-1" style="gap:6px;">
+                    <input id="species-${idx}" class="form-control form-control-sm" value="${c.species || ''}" disabled>
+                    <button class="btn btn-sm btn-outline-primary" onclick="locateCatch(${idx})" title="Locate on map">
+                      <i class="bi-geo"></i>
+                    </button>
+                  </div>
+                  <input id="label-${idx}" class="form-control form-control-sm mb-1" placeholder="Location label" value="${label}" disabled>
+                  <div class="form-row">
+                    <div class="col">
+                      <input id="lat-${idx}" type="number" step="0.000001" class="form-control form-control-sm mb-1" placeholder="Lat" value="${c.latitude || ''}" disabled>
+                    </div>
+                    <div class="col">
+                      <input id="lng-${idx}" type="number" step="0.000001" class="form-control form-control-sm mb-1" placeholder="Lng" value="${c.longitude || ''}" disabled>
+                    </div>
+                  </div>
+                  <textarea id="notes-${idx}" class="form-control form-control-sm" rows="2" placeholder="Notes" disabled>${c.notes || ''}</textarea>
+                  <div style="font-size:0.8rem; color:#6c757d; margin-top:4px;">${time || ''}</div>
+                  <div class="mt-2 d-flex" style="gap:6px;">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="startEditCatch(${idx})">Edit</button>
+                    <button id="save-${idx}" class="btn btn-sm btn-primary" onclick="saveCatchEdits(${idx})" disabled>Save</button>
+                  </div>
                 </div>
-                <button class="btn btn-sm btn-outline-primary" onclick="locateCatch(${idx})" title="Locate on map">
-                  <i class="bi-geo"></i>
-                </button>
               </div>
             </div>
           </div>
@@ -544,6 +438,59 @@
       map.panTo(item.marker.getPosition());
       map.setZoom(Math.max(map.getZoom(), 10));
       item.info?.open(map, item.marker);
+      selectedCatchId = item.catch.id;
+      renderCatchList();
+    };
+
+    window.startEditCatch = function(idx) {
+      const enable = (id) => { const el = document.getElementById(id); if (el) el.disabled = false; };
+      enable(`species-${idx}`);
+      enable(`label-${idx}`);
+      enable(`lat-${idx}`);
+      enable(`lng-${idx}`);
+      enable(`notes-${idx}`);
+      const saveBtn = document.getElementById(`save-${idx}`);
+      if (saveBtn) saveBtn.disabled = false;
+    };
+
+    window.saveCatchEdits = async function(idx) {
+      const currentUser = getCurrentUser?.();
+      if (!currentUser || !currentUser.id) {
+        setSaveStatus('Select a user before saving.', 'error');
+        return;
+      }
+      const c = catches[idx];
+      if (!c) return;
+      const species = document.getElementById(`species-${idx}`)?.value?.trim() || '';
+      const label = document.getElementById(`label-${idx}`)?.value?.trim() || null;
+      const latVal = document.getElementById(`lat-${idx}`)?.value;
+      const lngVal = document.getElementById(`lng-${idx}`)?.value;
+      const notes = document.getElementById(`notes-${idx}`)?.value?.trim() || null;
+      const latitude = latVal ? parseFloat(latVal) : null;
+      const longitude = lngVal ? parseFloat(lngVal) : null;
+
+      if (!species) {
+        setSaveStatus('Species is required.', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/fish-catches/${encodeURIComponent(c.id)}?userId=${encodeURIComponent(currentUser.id)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ species, notes, latitude, longitude, locationLabel: label || null })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setSaveStatus('Catch updated.');
+          fetchCatches();
+        } else {
+          setSaveStatus(data.error || 'Failed to update catch.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        setSaveStatus('Error updating catch.', 'error');
+      }
     };
 
     async function saveCatch() {
