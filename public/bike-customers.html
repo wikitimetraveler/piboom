@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bike Customers</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f7fbff 0%, #eef4ff 100%); color: #1f2a44; font-family: 'Inter','Segoe UI',Arial,sans-serif; }
+    .container { max-width: 1100px; }
+    .hero { background: #0d6efd; color: #fff; padding: 26px 22px; border-radius: 18px; box-shadow: 0 12px 30px rgba(13,110,253,0.25); }
+    .card-pane { border: 1px solid #e5eef5; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+    .chat-area { height: 220px; overflow-y: auto; background: #f8fbff; border: 1px solid #e5eef5; border-radius: 12px; padding: 12px; }
+    .bike-nav-pills .nav-link { border: 1px solid #d8e2ef; border-radius: 999px; margin-right: 8px; margin-bottom: 8px; color: #0d2f66; font-weight: 600; background: #f7fbff; transition: all 0.18s ease; padding: 10px 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
+    .bike-nav-pills .nav-link:hover { background: #e8f1ff; color: #0b2452; box-shadow: 0 6px 16px rgba(13,110,253,0.12); transform: translateY(-1px); }
+    .bike-nav-pills .nav-link.active { background: linear-gradient(135deg, #0d6efd 0%, #2563eb 100%); color: #fff !important; border-color: #0d6efd; box-shadow: 0 8px 20px rgba(13,110,253,0.25); }
+    .bike-nav-wrap { margin-bottom: 22px; }
+  </style>
+</head>
+<body>
+  <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+  <div class="nav-finance"><a href="/bike-store-home.html"><i class="bi-bicycle"></i> Bike Store</a></div>
+
+  <div class="container mt-4 mb-5">
+    <div class="hero mb-4 d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="mb-2"><i class="bi-people"></i> Customers</h1>
+        <p class="mb-0">Track buyers and their notes; attach to bike sales later.</p>
+      </div>
+      <div id="userSelectorContainer"></div>
+    </div>
+
+    <div class="bike-nav-wrap">
+      <ul class="nav nav-pills bike-nav-pills flex-wrap">
+        <li class="nav-item"><a class="nav-link" href="/bike-store-home.html"><i class="bi-house"></i> Store Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-discover.html"><i class="bi-search"></i> Discover</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-collection.html"><i class="bi-grid"></i> The Peloton</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-customers.html"><i class="bi-people"></i> Customers</a></li>
+      </ul>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-5 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-person-plus"></i> Add / Update Customer</h5>
+            <div class="form-group"><label>Name</label><input id="custName" class="form-control"></div>
+            <div class="form-group"><label>Email</label><input id="custEmail" class="form-control"></div>
+            <div class="form-group"><label>Phone</label><input id="custPhone" class="form-control"></div>
+            <div class="form-group"><label>Photo URL</label><input id="custPhoto" class="form-control"></div>
+            <div class="form-group"><label>Notes</label><textarea id="custNotes" rows="3" class="form-control"></textarea></div>
+            <div class="d-flex">
+              <button class="btn btn-primary mr-2" onclick="saveCustomer()"><i class="bi-save"></i> Save</button>
+              <button class="btn btn-secondary" onclick="resetForm()"><i class="bi-arrow-clockwise"></i> Reset</button>
+            </div>
+            <div id="saveStatus" class="text-muted mt-2" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-7 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-list-ul"></i> Customer List</h5>
+            <div id="customerList" style="max-height:520px; overflow-y:auto;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-pane">
+      <div class="card-body">
+        <h5 class="card-title mb-3"><i class="bi-robot"></i> AI Assist</h5>
+        <div class="form-group">
+          <label for="aiPrompt">Prompt</label>
+          <textarea id="aiPrompt" class="form-control" rows="3" placeholder="Example: Suggest follow-up for a commuter bike buyer."></textarea>
+        </div>
+        <div class="d-flex flex-wrap gap-2 mb-2">
+          <button class="btn btn-primary mr-2" onclick="askAI()"><i class="bi-robot"></i> Ask</button>
+          <button class="btn btn-outline-secondary mr-2" onclick="clearChat()"><i class="bi-x-circle"></i> Clear</button>
+          <button class="btn btn-success mr-2" id="startVoiceBtn" onclick="startVoice()"><i class="bi-mic-fill"></i> Voice</button>
+          <button class="btn btn-warning mr-2" id="stopVoiceBtn" onclick="stopVoice()" disabled><i class="bi-mic-mute"></i> Stop</button>
+          <button class="btn btn-info" onclick="speakLast()"><i class="bi-volume-up"></i> Speak Last</button>
+        </div>
+        <div id="voiceStatus" class="text-muted" style="display:none;"></div>
+        <div id="chatArea" class="chat-area"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let customers = [];
+    let editingId = null;
+    let recognition = null;
+    let listening = false;
+    let lastAIResponse = '';
+
+    function setActivePill() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.bike-nav-pills .nav-link').forEach(link => {
+        const href = link.getAttribute('href') || '';
+        if (path.endsWith(href.split('/').pop())) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    function setSaveStatus(msg, type='info') {
+      const el = document.getElementById('saveStatus');
+      el.style.display = 'block';
+      el.className = type === 'error' ? 'text-danger' : 'text-success';
+      el.textContent = msg;
+      setTimeout(()=>{ el.style.display='none'; }, 2500);
+    }
+
+    function resetForm() {
+      editingId = null;
+      document.getElementById('custName').value = '';
+      document.getElementById('custEmail').value = '';
+      document.getElementById('custPhone').value = '';
+      document.getElementById('custPhoto').value = '';
+      document.getElementById('custNotes').value = '';
+    }
+
+    async function fetchCustomers() {
+      const user = getCurrentUser?.();
+      if (!user || !user.id) return;
+      try {
+        const res = await fetch(`/api/customers?userId=${encodeURIComponent(user.id)}`);
+        const data = await res.json();
+        if (data.success) {
+          customers = data.customers || [];
+          renderCustomers();
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    function renderCustomers() {
+      const list = document.getElementById('customerList');
+      if (!customers.length) {
+        list.innerHTML = '<div class="text-muted">No customers yet.</div>';
+        return;
+      }
+      list.innerHTML = customers.map(c => `
+        <div class="card mb-2" style="border-radius:12px; border:1px solid #e5eef5;">
+          <div class="card-body p-2">
+            <div class="d-flex align-items-center">
+              <img src="${c.photo_url || 'https://placehold.co/48x48'}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;margin-right:10px;">
+              <div style="flex:1;">
+                <div style="font-weight:700;">${c.name || ''}</div>
+                <div style="font-size:0.9rem; color:#6c757d;">${c.email || ''} ${c.phone ? ' · '+c.phone : ''}</div>
+                ${c.notes ? `<div style="font-size:0.9rem; margin-top:4px;">${c.notes}</div>` : ''}
+              </div>
+              <button class="btn btn-sm btn-outline-primary" onclick="editCustomer(${c.id})"><i class="bi-pencil"></i></button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function editCustomer(id) {
+      const c = customers.find(x => x.id === id);
+      if (!c) return;
+      editingId = id;
+      document.getElementById('custName').value = c.name || '';
+      document.getElementById('custEmail').value = c.email || '';
+      document.getElementById('custPhone').value = c.phone || '';
+      document.getElementById('custPhoto').value = c.photo_url || '';
+      document.getElementById('custNotes').value = c.notes || '';
+    }
+
+    async function saveCustomer() {
+      const user = getCurrentUser?.();
+      if (!user || !user.id) { setSaveStatus('Select a user.', 'error'); return; }
+      const payload = {
+        name: document.getElementById('custName').value.trim(),
+        email: document.getElementById('custEmail').value.trim(),
+        phone: document.getElementById('custPhone').value.trim(),
+        photoUrl: document.getElementById('custPhoto').value.trim(),
+        notes: document.getElementById('custNotes').value.trim()
+      };
+      if (!payload.name) { setSaveStatus('Name required.', 'error'); return; }
+      const isUpdate = !!editingId;
+      const url = isUpdate
+        ? `/api/customers/${encodeURIComponent(editingId)}?userId=${encodeURIComponent(user.id)}`
+        : `/api/customers?userId=${encodeURIComponent(user.id)}`;
+      const method = isUpdate ? 'PUT' : 'POST';
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          setSaveStatus(isUpdate ? 'Customer updated.' : 'Customer added.');
+          resetForm();
+          fetchCustomers();
+        } else {
+          setSaveStatus(data.error || 'Failed to save.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        setSaveStatus('Error saving customer.', 'error');
+      }
+    }
+
+    function appendMessage(text, type='ai') {
+      const chat = document.getElementById('chatArea');
+      const div = document.createElement('div');
+      div.className = type === 'user' ? 'text-right mb-2' : 'mb-2';
+      div.innerHTML = text.replace(/\n/g, '<br>');
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      if (type === 'ai') lastAIResponse = text;
+    }
+
+    async function askAI() {
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      const user = getCurrentUser?.();
+      if (!prompt) { appendMessage('Enter a prompt.', 'ai'); return; }
+      if (!user || !user.id) { appendMessage('Select a user.', 'ai'); return; }
+      appendMessage(`<strong>You:</strong> ${prompt}`, 'user');
+      try {
+        const res = await fetch('/api/chat/langchain/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: `Bike customer context. Prompt: ${prompt}`,
+            userId: user.id,
+            assistant: 'calfish',
+            sessionId: 'bike-customers',
+            context: { domain: 'bike customers' }
+          })
+        });
+        const data = await res.json();
+        if (data.response) appendMessage(data.response, 'ai');
+        else appendMessage('No response.', 'ai');
+      } catch (err) {
+        console.error(err);
+        appendMessage('Error contacting AI.', 'ai');
+      }
+    }
+
+    function clearChat() {
+      const chat = document.getElementById('chatArea');
+      if (chat) chat.innerHTML = '';
+      lastAIResponse = '';
+    }
+
+    function speak(text) {
+      if (!text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    function speakLast() { speak(lastAIResponse); }
+
+    function startVoice() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        appendMessage('Voice not supported.', 'ai'); return;
+      }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => {
+        listening = true;
+        document.getElementById('startVoiceBtn').disabled = true;
+        document.getElementById('stopVoiceBtn').disabled = false;
+        const vs = document.getElementById('voiceStatus'); if (vs) { vs.style.display='block'; vs.textContent='Listening...'; }
+      };
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('aiPrompt').value = transcript;
+        const vs = document.getElementById('voiceStatus'); if (vs) vs.textContent = `Heard: "${transcript}"`;
+        askAI();
+      };
+      recognition.onerror = (event) => {
+        const vs = document.getElementById('voiceStatus'); if (vs) vs.textContent = `Voice error: ${event.error}`;
+      };
+      recognition.onend = () => {
+        listening = false;
+        document.getElementById('startVoiceBtn').disabled = false;
+        document.getElementById('stopVoiceBtn').disabled = true;
+        const vs = document.getElementById('voiceStatus'); if (vs) setTimeout(()=>{vs.style.display='none';},1200);
+      };
+      recognition.start();
+    }
+    function stopVoice() { if (recognition && listening) recognition.stop(); }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchCustomers();
+      setActivePill();
+    });
+  </script>
+</body>
+</html>
+

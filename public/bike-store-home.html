@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bike Store Home</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f7fbff 0%, #eef4ff 100%); color: #1f2a44; font-family: 'Inter','Segoe UI',Arial,sans-serif; }
+    .container { max-width: 1100px; }
+    .hero { background: #0d6efd; color: #fff; padding: 28px 24px; border-radius: 20px; box-shadow: 0 12px 30px rgba(13,110,253,0.25); position: relative; overflow: hidden; }
+    .hero:after { content: ""; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; background: rgba(255,255,255,0.12); border-radius: 50%; }
+    .card-pane { border: 1px solid #e5eef5; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+    #storeMap { width: 100%; height: 420px; border-radius: 12px; border: 1px solid #e5eef5; }
+    .chat-area { height: 240px; overflow-y: auto; background: #f8fbff; border: 1px solid #e5eef5; border-radius: 12px; padding: 12px; }
+    .bike-nav-pills .nav-link { border: 1px solid #d8e2ef; border-radius: 999px; margin-right: 8px; margin-bottom: 8px; color: #0d2f66; font-weight: 600; background: #f7fbff; transition: all 0.18s ease; padding: 10px 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
+    .bike-nav-pills .nav-link:hover { background: #e8f1ff; color: #0b2452; box-shadow: 0 6px 16px rgba(13,110,253,0.12); transform: translateY(-1px); }
+    .bike-nav-pills .nav-link.active { background: linear-gradient(135deg, #0d6efd 0%, #2563eb 100%); color: #fff !important; border-color: #0d6efd; box-shadow: 0 8px 20px rgba(13,110,253,0.25); }
+    .bike-nav-wrap { margin-bottom: 22px; }
+  </style>
+</head>
+<body>
+  <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+  <div class="nav-finance"><a href="/bike-store-home.html"><i class="bi-bicycle"></i> Bike Store</a></div>
+
+  <div class="container mt-5 mb-5">
+    <div class="hero mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="mb-2"><i class="bi-bicycle"></i> Bike Store</h1>
+          <p class="mb-1">Discover, manage, and sell bikes with AI, voice, and maps.</p>
+          <span class="badge badge-light text-primary">Store Overview</span>
+        </div>
+        <div id="userSelectorContainer"></div>
+      </div>
+    </div>
+
+    <div class="bike-nav-wrap">
+      <ul class="nav nav-pills bike-nav-pills flex-wrap">
+        <li class="nav-item"><a class="nav-link" href="/bike-store-home.html"><i class="bi-house"></i> Store Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-discover.html"><i class="bi-search"></i> Discover</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-collection.html"><i class="bi-grid"></i> The Peloton</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-customers.html"><i class="bi-people"></i> Customers</a></li>
+      </ul>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-lg-7">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-2"><i class="bi-geo-alt"></i> Store Map</h5>
+            <div id="storeMap"></div>
+            <small class="text-muted d-block mt-2">Store location and delivery markers (optional).</small>
+            <div id="mapStatus" class="text-muted mt-2" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-robot"></i> Ask the Bike Assistant</h5>
+            <div class="form-group">
+              <label for="storeQuery">Ask about inventory, sales, or delivery</label>
+              <textarea id="storeQuery" class="form-control" rows="3" placeholder="Example: Which bikes are available under $2,000?"></textarea>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <button class="btn btn-primary mr-2" onclick="askStoreAI()"><i class="bi-robot"></i> Ask</button>
+              <button class="btn btn-outline-secondary mr-2" onclick="clearChat()"><i class="bi-x-circle"></i> Clear</button>
+              <button class="btn btn-success mr-2" id="startVoiceBtn" onclick="startVoice()"><i class="bi-mic-fill"></i> Voice</button>
+              <button class="btn btn-warning mr-2" id="stopVoiceBtn" onclick="stopVoice()" disabled><i class="bi-mic-mute"></i> Stop</button>
+              <button class="btn btn-info" onclick="speakLast()"><i class="bi-volume-up"></i> Speak Last</button>
+            </div>
+            <div id="voiceStatus" class="text-muted" style="display:none;"></div>
+            <div id="chatArea" class="chat-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-pane">
+      <div class="card-body">
+        <h5 class="card-title mb-2"><i class="bi-grid"></i> Quick Links</h5>
+        <div class="d-flex flex-wrap" style="gap:12px;">
+          <a class="btn btn-outline-primary" href="/bike-discover.html"><i class="bi-search"></i> Bike Discover</a>
+          <a class="btn btn-outline-primary" href="/bike-collection.html"><i class="bi-grid"></i> The Peloton (Collection)</a>
+          <a class="btn btn-outline-primary" href="/bike-customers.html"><i class="bi-people"></i> Customers</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map;
+    let mapStatusTimer = null;
+    let recognition = null;
+    let listening = false;
+    let lastAIResponse = '';
+
+    function setActivePill() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.bike-nav-pills .nav-link').forEach(link => {
+        const href = link.getAttribute('href') || '';
+        if (path.endsWith(href.split('/').pop())) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    function setMapStatus(msg, type = 'info', persist = false) {
+      const el = document.getElementById('mapStatus');
+      if (!el) return;
+      el.style.display = msg ? 'block' : 'none';
+      el.className = type === 'error' ? 'text-danger mt-2' : 'text-muted mt-2';
+      el.textContent = msg || '';
+      if (!persist && msg) {
+        clearTimeout(mapStatusTimer);
+        mapStatusTimer = setTimeout(() => { el.style.display = 'none'; }, 3000);
+      }
+    }
+
+    async function loadGoogleMaps() {
+      try {
+        const res = await fetch('/api/bikes/google-api-key');
+        const data = await res.json();
+        if (!data.apiKey) {
+          setMapStatus('No Google Maps API key available.', 'error', true);
+          return;
+        }
+        return new Promise(resolve => {
+          window.initBikeStoreMap = () => { initMap(); resolve(); };
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=initBikeStoreMap`;
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        });
+      } catch (err) {
+        console.error(err);
+        setMapStatus('Failed to load map.', 'error', true);
+      }
+    }
+
+    function initMap() {
+      const storePos = { lat: 34.0522, lng: -118.2437 }; // placeholder: LA
+      map = new google.maps.Map(document.getElementById('storeMap'), {
+        center: storePos,
+        zoom: 11
+      });
+      new google.maps.Marker({
+        position: storePos,
+        map,
+        title: 'Bike Store',
+        icon: 'https://maps.google.com/mapfiles/kml/shapes/cycling.png'
+      });
+    }
+
+    function appendMessage(text, type = 'ai') {
+      const chat = document.getElementById('chatArea');
+      const div = document.createElement('div');
+      div.className = type === 'user' ? 'text-right mb-2' : 'mb-2';
+      div.innerHTML = text.replace(/\n/g, '<br>');
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      if (type === 'ai') lastAIResponse = text;
+    }
+
+    async function askStoreAI() {
+      const prompt = document.getElementById('storeQuery').value.trim();
+      const currentUser = getCurrentUser?.();
+      if (!prompt) { appendMessage('Please enter a question.', 'ai'); return; }
+      if (!currentUser || !currentUser.id) { appendMessage('Select a user (top right).', 'ai'); return; }
+      appendMessage(`<strong>You:</strong> ${prompt}`, 'user');
+      try {
+        const res = await fetch('/api/chat/langchain/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: `Bike store context. Answer succinctly. Question: ${prompt}`,
+            userId: currentUser.id,
+            assistant: 'calfish',
+            sessionId: 'bike-store',
+            context: { domain: 'bike store home' }
+          })
+        });
+        const data = await res.json();
+        if (data.response) appendMessage(data.response, 'ai');
+        else appendMessage('No response from AI.', 'ai');
+      } catch (err) {
+        console.error(err);
+        appendMessage('Error contacting AI.', 'ai');
+      }
+    }
+
+    function clearChat() {
+      const chat = document.getElementById('chatArea');
+      if (chat) chat.innerHTML = '';
+      lastAIResponse = '';
+    }
+
+    function speak(text) {
+      if (!text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    function speakLast() { speak(lastAIResponse); }
+
+    function startVoice() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        appendMessage('Voice recognition not supported.', 'ai');
+        return;
+      }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => {
+        listening = true;
+        document.getElementById('startVoiceBtn').disabled = true;
+        document.getElementById('stopVoiceBtn').disabled = false;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) { vs.style.display = 'block'; vs.textContent = 'Listening...'; }
+      };
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('storeQuery').value = transcript;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) vs.textContent = `Heard: "${transcript}"`;
+        askStoreAI();
+      };
+      recognition.onerror = (event) => {
+        const vs = document.getElementById('voiceStatus');
+        if (vs) vs.textContent = `Voice error: ${event.error}`;
+      };
+      recognition.onend = () => {
+        listening = false;
+        document.getElementById('startVoiceBtn').disabled = false;
+        document.getElementById('stopVoiceBtn').disabled = true;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) setTimeout(() => { vs.style.display = 'none'; }, 1200);
+      };
+      recognition.start();
+    }
+
+    function stopVoice() {
+      if (recognition && listening) recognition.stop();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGoogleMaps();
+      setActivePill();
+    });
+  </script>
+</body>
+</html>
+

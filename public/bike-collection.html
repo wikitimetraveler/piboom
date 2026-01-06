@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Peloton - Bike Collection</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f3fbff 0%, #e3f2fd 100%); color: #1c2833; font-family: 'Inter','Segoe UI',Arial,sans-serif; }
+    .container { max-width: 1100px; }
+    .hero { background: #0d6efd; color: #fff; padding: 26px 22px; border-radius: 18px; box-shadow: 0 12px 30px rgba(13,110,253,0.25); }
+    .card-pane { border: 1px solid #e5eef5; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+    #bikeMap { width: 100%; height: 440px; border-radius: 12px; border: 1px solid #e5eef5; }
+    .chat-area { height: 220px; overflow-y: auto; background: #f8fbff; border: 1px solid #e5eef5; border-radius: 12px; padding: 12px; }
+    .bike-nav-pills .nav-link { border: 1px solid #d8e2ef; border-radius: 999px; margin-right: 8px; margin-bottom: 8px; color: #0d2f66; font-weight: 600; background: #f7fbff; transition: all 0.18s ease; padding: 10px 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
+    .bike-nav-pills .nav-link:hover { background: #e8f1ff; color: #0b2452; box-shadow: 0 6px 16px rgba(13,110,253,0.12); transform: translateY(-1px); }
+    .bike-nav-pills .nav-link.active { background: linear-gradient(135deg, #0d6efd 0%, #2563eb 100%); color: #fff !important; border-color: #0d6efd; box-shadow: 0 8px 20px rgba(13,110,253,0.25); }
+    .bike-nav-wrap { margin-bottom: 22px; }
+  </style>
+</head>
+<body>
+  <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+  <div class="nav-finance"><a href="/bike-store-home.html"><i class="bi-bicycle"></i> Bike Store</a></div>
+
+  <div class="container mt-4 mb-5">
+    <div class="hero mb-4 d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="mb-2"><i class="bi-grid"></i> The Peloton</h1>
+        <p class="mb-0">Manage bike inventory, mark sold, and explore on the map.</p>
+      </div>
+      <div id="userSelectorContainer"></div>
+    </div>
+
+    <div class="bike-nav-wrap">
+      <ul class="nav nav-pills bike-nav-pills flex-wrap">
+        <li class="nav-item"><a class="nav-link" href="/bike-store-home.html"><i class="bi-house"></i> Store Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-discover.html"><i class="bi-search"></i> Discover</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-collection.html"><i class="bi-grid"></i> The Peloton</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-customers.html"><i class="bi-people"></i> Customers</a></li>
+      </ul>
+    </div>
+
+    <div class="row" id="map">
+      <div class="col-lg-8 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0"><i class="bi-geo-alt"></i> Map of Bikes</h5>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-secondary" onclick="toggleMapStyle()" title="Toggle light/dark map"><i class="bi-moon-stars"></i></button>
+                <button class="btn btn-outline-secondary" onclick="fitAllMarkers()" title="Fit all markers"><i class="bi-arrows-fullscreen"></i></button>
+              </div>
+            </div>
+            <div id="bikeMap"></div>
+            <small class="text-muted d-block mt-2">Select a user (top right) to load their Peloton.</small>
+            <div id="mapStatus" class="text-muted mt-2" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0"><i class="bi-list-ul"></i> Bikes <span id="bikeCount" class="badge badge-primary" style="font-size:0.8rem;">0</span></h5>
+              <button class="btn btn-sm btn-outline-secondary" onclick="downloadCSV()" title="Download CSV"><i class="bi-download"></i></button>
+            </div>
+            <div id="bikeList" style="max-height: 520px; overflow-y: auto;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-robot"></i> Ask Marina (AI)</h5>
+            <div class="form-group">
+              <label for="aiPrompt">Prompt</label>
+              <textarea id="aiPrompt" class="form-control" rows="3" placeholder="Example: Which bikes are best for commuters?"></textarea>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <button class="btn btn-primary mr-2" onclick="askAI()"><i class="bi-robot"></i> Ask</button>
+              <button class="btn btn-outline-secondary mr-2" onclick="clearChat()"><i class="bi-x-circle"></i> Clear</button>
+              <button class="btn btn-success mr-2" id="startVoiceBtn" onclick="startVoice()"><i class="bi-mic-fill"></i> Voice</button>
+              <button class="btn btn-warning mr-2" id="stopVoiceBtn" onclick="stopVoice()" disabled><i class="bi-mic-mute"></i> Stop</button>
+              <button class="btn btn-info" onclick="speakLast()"><i class="bi-volume-up"></i> Speak Last</button>
+            </div>
+            <div id="voiceStatus" class="text-muted" style="display:none;"></div>
+            <div id="chatArea" class="chat-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let map;
+    let bikes = [];
+    let markers = [];
+    let markerInfos = [];
+    let mapStatusTimer = null;
+    let selectedBikeId = null;
+    let recognition = null;
+    let listening = false;
+    let lastAIResponse = '';
+    let darkMode = false;
+    const mapStylesDark = [
+      { elementType: 'geometry', stylers: [{ color: '#1f1f1f' }] },
+      { elementType: 'labels.text.stroke', stylers: [{ color: '#1f1f1f' }] },
+      { elementType: 'labels.text.fill', stylers: [{ color: '#f5f5f5' }] },
+      { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+      { featureType: 'road', stylers: [{ color: '#2c2c2c' }] },
+      { featureType: 'water', stylers: [{ color: '#0b3d91' }] }
+    ];
+
+    function setActivePill() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.bike-nav-pills .nav-link').forEach(link => {
+        const href = link.getAttribute('href') || '';
+        if (path.endsWith(href.split('/').pop())) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    function setMapStatus(msg, type = 'info', persist = false) {
+      const el = document.getElementById('mapStatus');
+      if (!el) return;
+      el.style.display = msg ? 'block' : 'none';
+      el.className = type === 'error' ? 'text-danger mt-2' : 'text-muted mt-2';
+      el.textContent = msg || '';
+      if (!persist && msg) {
+        clearTimeout(mapStatusTimer);
+        mapStatusTimer = setTimeout(() => { el.style.display = 'none'; }, 3000);
+      }
+    }
+
+    async function loadGoogleMaps() {
+      try {
+        const res = await fetch('/api/bikes/google-api-key');
+        const data = await res.json();
+        if (!data.apiKey) { setMapStatus('No Google Maps API key.', 'error', true); return; }
+        return new Promise(resolve => {
+          window.initBikeMap = () => { initMap(); resolve(); };
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=initBikeMap`;
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        });
+      } catch (err) {
+        console.error(err);
+        setMapStatus('Failed to load map.', 'error', true);
+      }
+    }
+
+    function initMap() {
+      const center = { lat: 36.7783, lng: -119.4179 };
+      const bikeIcon = {
+        url: 'https://maps.google.com/mapfiles/kml/shapes/cycling.png',
+        scaledSize: new google.maps.Size(32, 32),
+        anchor: new google.maps.Point(16, 32)
+      };
+      map = new google.maps.Map(document.getElementById('bikeMap'), { center, zoom: 6 });
+      map.__bikeIcon = bikeIcon;
+      fetchBikes();
+    }
+
+    function toggleMapStyle() {
+      darkMode = !darkMode;
+      map.setOptions({ styles: darkMode ? mapStylesDark : null });
+    }
+
+    function fitAllMarkers() {
+      if (!markers.length || !map) return;
+      const bounds = new google.maps.LatLngBounds();
+      markers.forEach(m => bounds.extend(m.getPosition()));
+      map.fitBounds(bounds);
+    }
+
+    async function fetchBikes() {
+      try {
+        const user = getCurrentUser?.();
+        if (!user || !user.id) { setMapStatus('Select a user to load bikes.', 'error', true); return; }
+        setMapStatus('');
+        const res = await fetch(`/api/bikes?userId=${encodeURIComponent(user.id)}`);
+        const data = await res.json();
+        if (!data.success) { setMapStatus('Failed to load bikes.', 'error', true); return; }
+        bikes = data.bikes || [];
+        renderBikes();
+      } catch (err) {
+        console.error(err);
+        setMapStatus('Error loading bikes.', 'error', true);
+      }
+    }
+
+    function renderBikes() {
+      const list = document.getElementById('bikeList');
+      const countEl = document.getElementById('bikeCount');
+      if (countEl) countEl.textContent = bikes.length || 0;
+      if (!list) return;
+      if (!bikes.length) {
+        list.innerHTML = '<div class="text-muted">No bikes yet for this user.</div>';
+      } else {
+        list.innerHTML = bikes.map((b, idx) => {
+          const coords = (b.latitude && b.longitude) ? `${parseFloat(b.latitude).toFixed(4)}, ${parseFloat(b.longitude).toFixed(4)}` : '';
+          const statusBadge = b.status === 'sold'
+            ? '<span class="badge badge-danger">Sold</span>'
+            : '<span class="badge badge-success">Available</span>';
+          return `
+            <div class="card mb-2" style="border:1px solid ${selectedBikeId===b.id?'#0d6efd':'#e5eef5'}; border-radius:10px; box-shadow:${selectedBikeId===b.id?'0 4px 12px rgba(13,110,253,0.15)':'none'};">
+              <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div style="width:100%;">
+                    <div style="font-weight:700; color:#0d6efd;">${b.brand || ''} ${b.model || ''} ${statusBadge}</div>
+                    ${b.price ? `<div style="color:#28a745; font-weight:600;">$${Number(b.price).toFixed(2)}</div>` : ''}
+                    ${coords ? `<div style="font-size:0.85rem; color:#6c757d;"><i class="bi-geo-alt"></i> ${coords}</div>` : ''}
+                    ${b.description ? `<div style="margin-top:4px;">${b.description}</div>` : ''}
+                  </div>
+                  <div class="btn-group btn-group-sm flex-shrink-0">
+                    <button class="btn btn-outline-primary" onclick="locateBike(${idx})" title="Locate"><i class="bi-geo"></i></button>
+                    ${b.status !== 'sold'
+                      ? `<button class="btn btn-outline-success" onclick="markSold(${idx})" title="Mark sold"><i class="bi-cash"></i></button>`
+                      : `<button class="btn btn-outline-secondary" onclick="markAvailable(${idx})" title="Mark available"><i class="bi-arrow-counterclockwise"></i></button>`
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      markers.forEach(m => m.setMap(null));
+      markers = [];
+      markerInfos = [];
+      const bounds = new google.maps.LatLngBounds();
+      bikes.forEach((b, idx) => {
+        if (b.latitude && b.longitude) {
+          const pos = { lat: parseFloat(b.latitude), lng: parseFloat(b.longitude) };
+          const marker = new google.maps.Marker({
+            position: pos,
+            map,
+            title: `${b.brand || ''} ${b.model || ''}`,
+            icon: map?.__bikeIcon
+          });
+          const info = new google.maps.InfoWindow({
+            content: `
+              <div style="max-width:240px;">
+                <strong>${b.brand || ''} ${b.model || ''}</strong><br>
+                ${b.status ? `<div>Status: ${b.status}</div>` : ''}
+                ${b.price ? `<div>Price: $${Number(b.price).toFixed(2)}</div>` : ''}
+                ${b.description ? `<div style="margin-top:6px;">${b.description}</div>` : ''}
+              </div>
+            `
+          });
+          marker.addListener('click', () => {
+            info.open(map, marker);
+            selectedBikeId = b.id;
+            prefillAI(b);
+            renderBikes();
+          });
+          markers.push(marker);
+          markerInfos.push({ marker, info, bike: b, index: idx });
+          bounds.extend(pos);
+        }
+      });
+      if (markers.length) map.fitBounds(bounds);
+    }
+
+    window.locateBike = function(idx) {
+      const item = markerInfos[idx];
+      if (!item || !map) return;
+      map.panTo(item.marker.getPosition());
+      map.setZoom(Math.max(map.getZoom(), 10));
+      item.info?.open(map, item.marker);
+      selectedBikeId = item.bike.id;
+      prefillAI(item.bike);
+      renderBikes();
+    };
+
+    async function markSold(idx) {
+      const user = getCurrentUser?.();
+      if (!user || !user.id) { setMapStatus('Select a user.', 'error'); return; }
+      const b = bikes[idx];
+      if (!b) return;
+      try {
+        const res = await fetch(`/api/bikes/${encodeURIComponent(b.id)}?userId=${encodeURIComponent(user.id)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'sold', sold_date: new Date().toISOString() })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setMapStatus('Marked sold.', 'info');
+          fetchBikes();
+        } else {
+          setMapStatus(data.error || 'Failed to mark sold.', 'error', true);
+        }
+      } catch (err) {
+        console.error(err);
+        setMapStatus('Error marking sold.', 'error', true);
+      }
+    }
+
+    async function markAvailable(idx) {
+      const user = getCurrentUser?.();
+      if (!user || !user.id) { setMapStatus('Select a user.', 'error'); return; }
+      const b = bikes[idx];
+      if (!b) return;
+      try {
+        const res = await fetch(`/api/bikes/${encodeURIComponent(b.id)}?userId=${encodeURIComponent(user.id)}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            status: 'available',
+            sold_date: null,
+            sold_price: null,
+            sold_customer_id: null
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setMapStatus('Reverted to available.', 'info');
+          fetchBikes();
+        } else {
+          setMapStatus(data.error || 'Failed to revert.', 'error', true);
+        }
+      } catch (err) {
+        console.error(err);
+        setMapStatus('Error reverting.', 'error', true);
+      }
+    }
+
+    function prefillAI(b) {
+      const promptBox = document.getElementById('aiPrompt');
+      if (!promptBox || !b) return;
+      const coords = (b.latitude && b.longitude) ? `coords: ${parseFloat(b.latitude).toFixed(4)}, ${parseFloat(b.longitude).toFixed(4)}` : '';
+      promptBox.value = `Bike: ${b.brand || ''} ${b.model || ''} (${b.status || 'available'}) ${coords}. Suggest sales tips, target customer, or accessories.`;
+    }
+
+    function appendMessage(text, type='ai') {
+      const chat = document.getElementById('chatArea');
+      const div = document.createElement('div');
+      div.className = type === 'user' ? 'text-right mb-2' : 'mb-2';
+      div.innerHTML = text.replace(/\n/g, '<br>');
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      if (type === 'ai') lastAIResponse = text;
+    }
+
+    async function askAI() {
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      const user = getCurrentUser?.();
+      if (!prompt) { appendMessage('Enter a prompt.', 'ai'); return; }
+      if (!user || !user.id) { appendMessage('Select a user.', 'ai'); return; }
+      appendMessage(`<strong>You:</strong> ${prompt}`, 'user');
+      try {
+        const res = await fetch('/api/chat/langchain/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: `Bike collection context. Prompt: ${prompt}`,
+            userId: user.id,
+            assistant: 'calfish',
+            sessionId: 'bike-collection',
+            context: { domain: 'bike collection' }
+          })
+        });
+        const data = await res.json();
+        if (data.response) appendMessage(data.response, 'ai');
+        else appendMessage('No response.', 'ai');
+      } catch (err) {
+        console.error(err);
+        appendMessage('Error contacting AI.', 'ai');
+      }
+    }
+
+    function clearChat() {
+      const chat = document.getElementById('chatArea');
+      if (chat) chat.innerHTML = '';
+      lastAIResponse = '';
+    }
+
+    function speak(text) {
+      if (!text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    function speakLast() { speak(lastAIResponse); }
+
+    function startVoice() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        appendMessage('Voice not supported.', 'ai'); return;
+      }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => {
+        listening = true;
+        document.getElementById('startVoiceBtn').disabled = true;
+        document.getElementById('stopVoiceBtn').disabled = false;
+        const vs = document.getElementById('voiceStatus'); if (vs) { vs.style.display='block'; vs.textContent='Listening...'; }
+      };
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('aiPrompt').value = transcript;
+        const vs = document.getElementById('voiceStatus'); if (vs) vs.textContent = `Heard: "${transcript}"`;
+        askAI();
+      };
+      recognition.onerror = (event) => {
+        const vs = document.getElementById('voiceStatus'); if (vs) vs.textContent = `Voice error: ${event.error}`;
+      };
+      recognition.onend = () => {
+        listening = false;
+        document.getElementById('startVoiceBtn').disabled = false;
+        document.getElementById('stopVoiceBtn').disabled = true;
+        const vs = document.getElementById('voiceStatus'); if (vs) setTimeout(()=>{vs.style.display='none';},1200);
+      };
+      recognition.start();
+    }
+    function stopVoice() { if (recognition && listening) recognition.stop(); }
+
+    function downloadCSV() {
+      if (!bikes.length) return;
+      const headers = ['brand','model','size','color','motor','battery','price','status','location_label','latitude','longitude','sold_price','sold_date'];
+      const rows = bikes.map(b => [
+        `"${(b.brand||'').replace(/"/g,'""')}"`,
+        `"${(b.model||'').replace(/"/g,'""')}"`,
+        `"${(b.size||'').replace(/"/g,'""')}"`,
+        `"${(b.color||'').replace(/"/g,'""')}"`,
+        `"${(b.motor||'').replace(/"/g,'""')}"`,
+        `"${(b.battery||'').replace(/"/g,'""')}"`,
+        b.price ?? '',
+        `"${(b.status||'').replace(/"/g,'""')}"`,
+        `"${(b.location_label||'').replace(/"/g,'""')}"`,
+        b.latitude ?? '',
+        b.longitude ?? '',
+        b.sold_price ?? '',
+        b.sold_date ? new Date(b.sold_date).toISOString() : ''
+      ].join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bikes.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadGoogleMaps();
+      setActivePill();
+    });
+  </script>
+</body>
+</html>
+

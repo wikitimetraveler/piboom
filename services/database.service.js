@@ -233,6 +233,52 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_catches_caught_at ON catches(caught_at DESC)
     `);
 
+    // Bikes inventory
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS bikes (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100),
+        model VARCHAR(255),
+        brand VARCHAR(255),
+        size VARCHAR(100),
+        color VARCHAR(100),
+        motor VARCHAR(255),
+        battery VARCHAR(255),
+        price DECIMAL(12,2),
+        status VARCHAR(50) DEFAULT 'available',
+        photos JSONB,
+        description TEXT,
+        latitude DOUBLE PRECISION,
+        longitude DOUBLE PRECISION,
+        location_label TEXT,
+        sold_customer_id INTEGER,
+        sold_price DECIMAL(12,2),
+        sold_date TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_bikes_user ON bikes(user_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_bikes_status ON bikes(status)`);
+
+    // Customers table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS customers (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100),
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255),
+        phone VARCHAR(100),
+        photo_url TEXT,
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_customers_user ON customers(user_id)`);
+
     // Add family member link (genealogy integration)
     await pool.query(`
       ALTER TABLE records 

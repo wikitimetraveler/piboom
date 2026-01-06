@@ -302,6 +302,27 @@ class ModernNavbar extends HTMLElement {
                 </div>
               </li>
 
+            <!-- Bike Store Dropdown -->
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button">
+                <i class="bi-bicycle"></i> Bike Store
+              </a>
+              <div class="dropdown-menu">
+                <a class="dropdown-item" href="/bike-store-home.html">
+                  <i class="bi-house"></i> Store Home
+                </a>
+                <a class="dropdown-item" href="/bike-discover.html">
+                  <i class="bi-search"></i> Bike Discover
+                </a>
+                <a class="dropdown-item" href="/bike-collection.html#map">
+                  <i class="bi-grid"></i> The Peloton (Collection)
+                </a>
+                <a class="dropdown-item" href="/bike-customers.html">
+                  <i class="bi-people"></i> Customers
+                </a>
+              </div>
+            </li>
+
               <!-- AI & Voice Dropdown -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button">

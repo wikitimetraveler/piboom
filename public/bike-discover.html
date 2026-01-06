@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bike Discover</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f7fbff 0%, #eef4ff 100%); color: #1f2a44; font-family: 'Inter','Segoe UI',Arial,sans-serif; }
+    .container { max-width: 1100px; }
+    .hero { background: #0d6efd; color: #fff; padding: 26px 22px; border-radius: 18px; box-shadow: 0 12px 30px rgba(13,110,253,0.25); }
+    .card-pane { border: 1px solid #e5eef5; border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.05); }
+    .chat-area { height: 240px; overflow-y: auto; background: #f8fbff; border: 1px solid #e5eef5; border-radius: 12px; padding: 12px; }
+    .bike-nav-pills .nav-link { border: 1px solid #d8e2ef; border-radius: 999px; margin-right: 8px; margin-bottom: 8px; color: #0d2f66; font-weight: 600; background: #f7fbff; transition: all 0.18s ease; padding: 10px 16px; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
+    .bike-nav-pills .nav-link:hover { background: #e8f1ff; color: #0b2452; box-shadow: 0 6px 16px rgba(13,110,253,0.12); transform: translateY(-1px); }
+    .bike-nav-pills .nav-link.active { background: linear-gradient(135deg, #0d6efd 0%, #2563eb 100%); color: #fff !important; border-color: #0d6efd; box-shadow: 0 8px 20px rgba(13,110,253,0.25); }
+    .bike-nav-wrap { margin-bottom: 22px; }
+  </style>
+</head>
+<body>
+  <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
+  <div class="nav-finance"><a href="/bike-store-home.html"><i class="bi-bicycle"></i> Bike Store</a></div>
+
+  <div class="container mt-4 mb-5">
+    <div class="hero mb-4 d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="mb-2"><i class="bi-search"></i> Bike Discover</h1>
+        <p class="mb-0">Use camera/upload + AI to ID bikes, then add to Peloton.</p>
+      </div>
+      <div id="userSelectorContainer"></div>
+    </div>
+
+    <div class="bike-nav-wrap">
+      <ul class="nav nav-pills bike-nav-pills flex-wrap">
+        <li class="nav-item"><a class="nav-link" href="/bike-store-home.html"><i class="bi-house"></i> Store Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-discover.html"><i class="bi-search"></i> Discover</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-collection.html"><i class="bi-grid"></i> The Peloton</a></li>
+        <li class="nav-item"><a class="nav-link" href="/bike-customers.html"><i class="bi-people"></i> Customers</a></li>
+      </ul>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-7 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-camera"></i> Photo Capture / Upload</h5>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <label class="btn btn-outline-primary mr-2 mb-2">
+                <i class="bi-upload"></i> Upload Photo
+                <input type="file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)">
+              </label>
+              <button class="btn btn-success mr-2 mb-2" onclick="startCamera()"><i class="bi-camera-video"></i> Start Camera</button>
+              <button class="btn btn-info mr-2 mb-2" onclick="capturePhoto()"><i class="bi-camera-fill"></i> Capture</button>
+              <button class="btn btn-secondary mr-2 mb-2" onclick="stopCamera()"><i class="bi-stop-circle"></i> Stop</button>
+              <button class="btn btn-primary mb-2" onclick="identifyBikePhoto()"><i class="bi-magic"></i> Identify with AI</button>
+            </div>
+            <video id="cameraPreview" autoplay playsinline style="display:none; width:100%; border-radius:12px; border:1px solid #e5eef5;"></video>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+            <img id="photoPreview" class="img-fluid rounded mt-2" style="display:none; border:1px solid #e5eef5;"/>
+            <div id="photoStatus" class="text-muted mt-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-robot"></i> AI / Voice</h5>
+            <div class="form-group">
+              <label for="aiPrompt">Prompt</label>
+              <textarea id="aiPrompt" class="form-control" rows="3" placeholder="Example: Identify this e-bike and suggest specs to capture."></textarea>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <button class="btn btn-primary mr-2" onclick="askAI()"><i class="bi-robot"></i> Ask</button>
+              <button class="btn btn-outline-secondary mr-2" onclick="clearChat()"><i class="bi-x-circle"></i> Clear</button>
+              <button class="btn btn-success mr-2" id="startVoiceBtn" onclick="startVoice()"><i class="bi-mic-fill"></i> Voice</button>
+              <button class="btn btn-warning mr-2" id="stopVoiceBtn" onclick="stopVoice()" disabled><i class="bi-mic-mute"></i> Stop</button>
+              <button class="btn btn-info" onclick="speakLast()"><i class="bi-volume-up"></i> Speak Last</button>
+            </div>
+            <div id="voiceStatus" class="text-muted" style="display:none;"></div>
+            <div id="chatArea" class="chat-area"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-pane">
+      <div class="card-body">
+        <h5 class="card-title mb-3"><i class="bi-grid"></i> New Bike Details</h5>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group"><label>Model</label><input id="bikeModel" class="form-control"></div>
+            <div class="form-group"><label>Brand</label><input id="bikeBrand" class="form-control"></div>
+            <div class="form-group"><label>Size</label><input id="bikeSize" class="form-control"></div>
+            <div class="form-group"><label>Color</label><input id="bikeColor" class="form-control"></div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group"><label>Motor</label><input id="bikeMotor" class="form-control"></div>
+            <div class="form-group"><label>Battery</label><input id="bikeBattery" class="form-control"></div>
+            <div class="form-group"><label>Price</label><input id="bikePrice" type="number" step="0.01" class="form-control"></div>
+            <div class="form-group"><label>Description</label><textarea id="bikeDescription" rows="2" class="form-control"></textarea></div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveBike()"><i class="bi-save"></i> Add to Peloton</button>
+        <div id="saveStatus" class="text-muted mt-2" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let uploadedImageData = null;
+    let cameraStream = null;
+    let recognition = null;
+    let listening = false;
+    let lastAIResponse = '';
+
+    function setActivePill() {
+      const path = window.location.pathname;
+      document.querySelectorAll('.bike-nav-pills .nav-link').forEach(link => {
+        const href = link.getAttribute('href') || '';
+        if (path.endsWith(href.split('/').pop())) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    function setPhotoStatus(msg, type='info') {
+      const el = document.getElementById('photoStatus');
+      el.className = type === 'error' ? 'text-danger' : 'text-muted';
+      el.textContent = msg || '';
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        uploadedImageData = e.target.result;
+        const img = document.getElementById('photoPreview');
+        img.src = uploadedImageData;
+        img.style.display = 'block';
+        setPhotoStatus('Photo loaded. Run Identify to extract hints.');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function startCamera() {
+      try {
+        stopCamera();
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 2560 }, height: { ideal: 1440 } } });
+        cameraStream = stream;
+        const video = document.getElementById('cameraPreview');
+        video.srcObject = stream;
+        video.style.display = 'block';
+        setPhotoStatus('Camera ready. Capture to use this frame.');
+      } catch (err) {
+        console.error(err);
+        setPhotoStatus('Unable to start camera.', 'error');
+      }
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById('cameraPreview');
+      if (!video || !cameraStream) { setPhotoStatus('Start the camera first.', 'error'); return; }
+      const canvas = document.getElementById('cameraCanvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      uploadedImageData = canvas.toDataURL('image/jpeg', 0.9);
+      const img = document.getElementById('photoPreview');
+      img.src = uploadedImageData;
+      img.style.display = 'block';
+      setPhotoStatus('Captured. Run Identify to extract hints.');
+    }
+
+    function stopCamera() {
+      if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+      cameraStream = null;
+      const video = document.getElementById('cameraPreview');
+      if (video) video.style.display = 'none';
+    }
+
+    async function identifyBikePhoto() {
+      const currentUser = getCurrentUser?.();
+      if (!currentUser || !currentUser.id) { setPhotoStatus('Select a user.', 'error'); return; }
+      if (!uploadedImageData) { setPhotoStatus('Upload or capture a photo first.', 'error'); return; }
+      setPhotoStatus('Running vision analysis...');
+      try {
+        const res = await fetch('/api/bikes/vision-id', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageData: uploadedImageData,
+            prompt: 'Identify this bike and extract model, brand, size, color, motor, battery, and estimated price.'
+          })
+        });
+        const data = await res.json();
+        if (!data.success) {
+          setPhotoStatus(data.error || 'Vision failed.', 'error');
+          return;
+        }
+        const resultText = data.result || 'No response from AI.';
+        document.getElementById('aiPrompt').value = resultText;
+
+        // Apply structured hints if provided
+        if (data.structured) {
+          const s = data.structured;
+          const setIfEmpty = (id, val) => {
+            const el = document.getElementById(id);
+            if (el && !el.value && val) el.value = val;
+          };
+          setIfEmpty('bikeBrand', s.brand);
+          setIfEmpty('bikeModel', s.model);
+          setIfEmpty('bikeSize', s.size);
+          setIfEmpty('bikeColor', s.color);
+          setIfEmpty('bikeMotor', s.motor);
+          setIfEmpty('bikeBattery', s.battery);
+          const est = Number(s.priceEstimate);
+          if (!Number.isNaN(est)) {
+            const priceEl = document.getElementById('bikePrice');
+            if (priceEl && !priceEl.value) priceEl.value = est;
+          }
+          if (s.notes) {
+            const desc = document.getElementById('bikeDescription');
+            if (desc && !desc.value) desc.value = s.notes;
+          }
+        }
+        setPhotoStatus('Vision result ready.');
+      } catch (err) {
+        console.error(err);
+        setPhotoStatus('Vision request failed.', 'error');
+      }
+    }
+
+    function appendMessage(text, type='ai') {
+      const chat = document.getElementById('chatArea');
+      const div = document.createElement('div');
+      div.className = type === 'user' ? 'text-right mb-2' : 'mb-2';
+      div.innerHTML = text.replace(/\n/g, '<br>');
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      if (type === 'ai') lastAIResponse = text;
+    }
+
+    async function askAI() {
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      const currentUser = getCurrentUser?.();
+      if (!prompt) { appendMessage('Enter a prompt.', 'ai'); return; }
+      if (!currentUser || !currentUser.id) { appendMessage('Select a user.', 'ai'); return; }
+      appendMessage(`<strong>You:</strong> ${prompt}`, 'user');
+      try {
+        const res = await fetch('/api/chat/langchain/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: `Bike identification help. If photo was uploaded, suggest likely model/brand/size/color/motor/battery and price guidance. User prompt: ${prompt}`,
+            userId: currentUser.id,
+            assistant: 'calfish',
+            sessionId: 'bike-discover',
+            context: { domain: 'bike discover' }
+          })
+        });
+        const data = await res.json();
+        if (data.response) appendMessage(data.response, 'ai');
+        else appendMessage('No response.', 'ai');
+      } catch (err) {
+        console.error(err);
+        appendMessage('Error contacting AI.', 'ai');
+      }
+    }
+
+    function clearChat() {
+      const chat = document.getElementById('chatArea');
+      if (chat) chat.innerHTML = '';
+      lastAIResponse = '';
+    }
+
+    function speak(text) {
+      if (!text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+    function speakLast() { speak(lastAIResponse); }
+
+    function startVoice() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        appendMessage('Voice not supported.', 'ai'); return;
+      }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = () => {
+        listening = true;
+        document.getElementById('startVoiceBtn').disabled = true;
+        document.getElementById('stopVoiceBtn').disabled = false;
+        const vs = document.getElementById('voiceStatus'); if (vs) { vs.style.display='block'; vs.textContent='Listening...'; }
+      };
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('aiPrompt').value = transcript;
+        const vs = document.getElementById('voiceStatus'); if (vs) vs.textContent = `Heard: "${transcript}"`;
+        askAI();
+      };
+      recognition.onerror = (event) => {
+        const vs = document.getElementById('voiceStatus'); if (vs) vs.textContent = `Voice error: ${event.error}`;
+      };
+      recognition.onend = () => {
+        listening = false;
+        document.getElementById('startVoiceBtn').disabled = false;
+        document.getElementById('stopVoiceBtn').disabled = true;
+        const vs = document.getElementById('voiceStatus'); if (vs) setTimeout(()=>{vs.style.display='none';},1200);
+      };
+      recognition.start();
+    }
+    function stopVoice() { if (recognition && listening) recognition.stop(); }
+
+    async function saveBike() {
+      const currentUser = getCurrentUser?.();
+      if (!currentUser || !currentUser.id) { setSaveStatus('Select a user.', 'error'); return; }
+      const payload = {
+        model: document.getElementById('bikeModel').value.trim(),
+        brand: document.getElementById('bikeBrand').value.trim(),
+        size: document.getElementById('bikeSize').value.trim(),
+        color: document.getElementById('bikeColor').value.trim(),
+        motor: document.getElementById('bikeMotor').value.trim(),
+        battery: document.getElementById('bikeBattery').value.trim(),
+        price: parseFloat(document.getElementById('bikePrice').value) || null,
+        description: document.getElementById('bikeDescription').value.trim(),
+        status: 'available',
+        photos: uploadedImageData ? [uploadedImageData] : null
+      };
+      try {
+        const res = await fetch(`/api/bikes?userId=${encodeURIComponent(currentUser.id)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          setSaveStatus('Bike saved to Peloton.');
+        } else {
+          setSaveStatus(data.error || 'Failed to save.', 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        setSaveStatus('Error saving bike.', 'error');
+      }
+    }
+
+    function setSaveStatus(msg, type='info') {
+      const el = document.getElementById('saveStatus');
+      el.style.display = 'block';
+      el.className = type === 'error' ? 'text-danger' : 'text-success';
+      el.textContent = msg;
+      setTimeout(() => { el.style.display = 'none'; }, 2500);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      setActivePill();
+    });
+  </script>
+</body>
+</html>
+
