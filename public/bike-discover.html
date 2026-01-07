@@ -19,6 +19,14 @@
     .bike-nav-pills .nav-link:hover { background: #e8f1ff; color: #0b2452; box-shadow: 0 6px 16px rgba(13,110,253,0.12); transform: translateY(-1px); }
     .bike-nav-pills .nav-link.active { background: linear-gradient(135deg, #0d6efd 0%, #2563eb 100%); color: #fff !important; border-color: #0d6efd; box-shadow: 0 8px 20px rgba(13,110,253,0.25); }
     .bike-nav-wrap { margin-bottom: 22px; }
+    .experts { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+    .expert-card { border: 1px solid #e5eef5; border-radius: 14px; padding: 14px; background: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.05); }
+    .expert-card h6 { margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+    .expert-tag { font-size: 0.8rem; color: #0d6efd; font-weight: 600; }
+    .expert-blurb { margin: 6px 0 10px; color: #4b5563; font-size: 0.92rem; }
+    .expert-highlights { margin: 0; padding-left: 18px; color: #334155; font-size: 0.9rem; }
+    .assistant-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 999px; background: #e8f1ff; color: #0d2f66; font-weight: 600; font-size: 0.9rem; }
+    .assistant-badge .dot { width: 10px; height: 10px; border-radius: 50%; background: #0d6efd; display: inline-block; }
   </style>
 </head>
 <body>
@@ -33,6 +41,34 @@
       </div>
       <div id="userSelectorContainer"></div>
     </div>
+
+    <div class="experts mb-2">
+      <div class="expert-card" data-assistant="eddie">
+        <h6><i class="bi-speedometer2 text-danger"></i> Eddie <span class="expert-tag">Road Racer</span></h6>
+        <div class="expert-blurb">Points to aero frames, fast tires, and fit tweaks.</div>
+        <ul class="expert-highlights">
+          <li>Suggests 28–30mm tubeless and mid-depth wheels for speed.</li>
+          <li>Looks for clean cable routing and power data for analysis.</li>
+        </ul>
+      </div>
+      <div class="expert-card" data-assistant="tinker">
+        <h6><i class="bi-mountains text-success"></i> Tinker <span class="expert-tag">Mountain Biker</span></h6>
+        <div class="expert-blurb">Focuses on suspension setup, traction, and durability.</div>
+        <ul class="expert-highlights">
+          <li>Dials trail/enduro builds with correct sag and rebound.</li>
+          <li>Checks tire casing/compound and wide bars for control.</li>
+        </ul>
+      </div>
+      <div class="expert-card" data-assistant="electra">
+        <h6><i class="bi-lightning-charge text-info"></i> Electra <span class="expert-tag">E-Bike Enthusiast</span></h6>
+        <div class="expert-blurb">Guides motor/battery choices and commuter add-ons.</div>
+        <ul class="expert-highlights">
+          <li>Compares range, torque, and mid-drive vs hub options.</li>
+          <li>Recommends racks, lights, and safety for urban riding.</li>
+        </ul>
+      </div>
+    </div>
+    <small id="expertStatus" class="text-muted d-block mb-4">Select an assistant to use for tips.</small>
 
     <div class="bike-nav-wrap">
       <ul class="nav nav-pills bike-nav-pills flex-wrap">
@@ -69,7 +105,12 @@
       <div class="col-lg-5 mb-4">
         <div class="card card-pane h-100">
           <div class="card-body">
-            <h5 class="card-title mb-3"><i class="bi-robot"></i> AI / Voice</h5>
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="card-title mb-0"><i class="bi-robot"></i> AI / Voice</h5>
+              <span id="assistantPersonaBadge" class="assistant-badge" title="Selected assistant">
+                <span class="dot"></span><span id="assistantPersonaText">Eddie — Road Racer</span>
+              </span>
+            </div>
             <div class="form-group">
               <label for="aiPrompt">Prompt</label>
               <textarea id="aiPrompt" class="form-control" rows="3" placeholder="Example: Identify this e-bike and suggest specs to capture."></textarea>
@@ -254,17 +295,24 @@
       const currentUser = getCurrentUser?.();
       if (!prompt) { appendMessage('Enter a prompt.', 'ai'); return; }
       if (!currentUser || !currentUser.id) { appendMessage('Select a user.', 'ai'); return; }
+      const assistantId = currentAssistant();
+      const personaMap = {
+        eddie: 'Eddie (Road Racer): concise, practical, loves aero/fit/tire tips.',
+        tinker: 'Tinker (Mountain Biker): trail-focused, suspension/traction, durable picks.',
+        electra: 'Electra (E-Bike Enthusiast): range/torque/compliance, commuter add-ons.'
+      };
+      const personaDesc = personaMap[assistantId] || personaMap.eddie;
       appendMessage(`<strong>You:</strong> ${prompt}`, 'user');
       try {
         const res = await fetch('/api/chat/langchain/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message: `Bike identification help. If photo was uploaded, suggest likely model/brand/size/color/motor/battery and price guidance. User prompt: ${prompt}`,
+            message: `Persona: ${personaDesc}\nContext: Bike discovery, identification, adding to Peloton. If photo provided, guess model/brand/size/color/motor/battery and price. Respond in persona voice and be concise.\nUser prompt: ${prompt}`,
             userId: currentUser.id,
-            assistant: 'calfish',
+            assistant: `bike-${assistantId}`,
             sessionId: 'bike-discover',
-            context: { domain: 'bike discover' }
+            context: { domain: 'bike discover', persona: assistantId }
           })
         });
         const data = await res.json();
@@ -366,8 +414,60 @@
       setTimeout(() => { el.style.display = 'none'; }, 2500);
     }
 
+    // Assistant selection (shared pattern)
+    function setSelectedAssistant(assistantId) {
+      document.querySelectorAll('.expert-card').forEach(card => {
+        const isActive = card.dataset.assistant === assistantId;
+        card.classList.toggle('active', isActive);
+      });
+      const status = document.getElementById('expertStatus');
+      if (status) {
+        status.textContent = assistantId
+          ? `Assistant selected: ${assistantId.charAt(0).toUpperCase()}${assistantId.slice(1)}`
+          : 'Select an assistant to use for tips.';
+      }
+      if (assistantId) {
+        localStorage.setItem('bikeDiscoverAssistant', assistantId);
+      } else {
+        localStorage.removeItem('bikeDiscoverAssistant');
+      }
+      updateAssistantBadge(assistantId);
+    }
+
+    function initExpertCards() {
+      const saved = localStorage.getItem('bikeDiscoverAssistant');
+      if (saved) setSelectedAssistant(saved);
+      document.querySelectorAll('.expert-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const id = card.dataset.assistant || '';
+          setSelectedAssistant(id);
+        });
+      });
+    }
+
+    function currentAssistant() {
+      return localStorage.getItem('bikeDiscoverAssistant') || 'eddie';
+    }
+
+    function updateAssistantBadge(id) {
+      const personaText = document.getElementById('assistantPersonaText');
+      const dot = document.querySelector('#assistantPersonaBadge .dot');
+      const map = {
+        eddie: { label: 'Eddie — Road Racer', color: '#dc3545', placeholder: 'Eddie: Need fast road bikes or aero wheelsets?' },
+        tinker: { label: 'Tinker — Mountain Biker', color: '#198754', placeholder: 'Tinker: Trail, enduro, or XC—what do you ride?' },
+        electra: { label: 'Electra — E-Bike Enthusiast', color: '#0dcaf0', placeholder: 'Electra: Looking for range, torque, or commuter gear?' }
+      };
+      const persona = map[id] || map.eddie;
+      if (personaText) personaText.textContent = persona.label;
+      if (dot) dot.style.background = persona.color;
+      const ta = document.getElementById('aiPrompt');
+      if (ta && !ta.value) ta.placeholder = persona.placeholder;
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       setActivePill();
+      initExpertCards();
+      updateAssistantBadge(currentAssistant());
     });
   </script>
 </body>
