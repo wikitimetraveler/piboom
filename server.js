@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs/promises';
 import { fileURLToPath } from 'url';
 import express from 'express';
 import http from 'http';
@@ -95,6 +96,47 @@ app.locals.io = io;
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/data', express.static(path.join(__dirname, 'data'))); // Serve KML files
 app.use('/api', buildRoutes(io));
+
+app.get('/share/poster/:id', async (req, res) => {
+  try {
+    const shareStorePath = path.join(__dirname, 'data', 'poster-shares.json');
+    const raw = await fs.readFile(shareStorePath, 'utf8');
+    const store = JSON.parse(raw);
+    const share = store[req.params.id];
+
+    if (!share) {
+      return res.status(404).send('Share not found');
+    }
+
+    res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${share.title}</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f6f8; margin: 0; padding: 24px; }
+    .card { max-width: 640px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 12px 30px rgba(0,0,0,0.15); }
+    img { width: 100%; border-radius: 12px; display: block; }
+    h1 { font-size: 1.2rem; margin: 0 0 12px; }
+    .actions { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+    a.button { padding: 10px 16px; border-radius: 8px; background: #2c7be5; color: white; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>${share.title}</h1>
+    <img src="${share.imageUrl}" alt="${share.title}" />
+    <div class="actions">
+      <a class="button" href="${share.imageUrl}" download>Download PNG</a>
+    </div>
+  </div>
+</body>
+</html>`);
+  } catch (error) {
+    res.status(404).send('Share not found');
+  }
+});
 
 app.get('/health', (req,res)=>res.json({ok:true, mode: config.mode, platform: process.platform}));
 

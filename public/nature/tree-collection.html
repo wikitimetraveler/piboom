@@ -229,6 +229,99 @@
       color: white;
     }
 
+    /* Poster Modal */
+    .poster-layout {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .poster-preview {
+      flex: 0 0 320px;
+      max-width: 320px;
+    }
+
+    .poster-frame {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 2px solid rgba(76, 175, 80, 0.4);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .poster-frame .poster-cover {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      background: #f0f0f0;
+    }
+
+    .poster-frame .poster-body {
+      padding: 16px;
+      text-align: left;
+    }
+
+    .poster-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .poster-subtitle {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .poster-meta {
+      display: grid;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .poster-section {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(76, 175, 80, 0.12);
+      border-left: 3px solid var(--forest-green);
+      font-size: 0.82rem;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .poster-section h6 {
+      margin: 0 0 6px 0;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--forest-dark);
+    }
+
+    .poster-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .poster-actions button {
+      flex: 1 1 auto;
+      min-width: 140px;
+    }
+
+    .poster-share-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .poster-share-row input {
+      flex: 1 1 auto;
+    }
+
     .tree-actions .btn-delete {
       border-color: #dc3545;
       color: #dc3545;
@@ -620,6 +713,51 @@
   </div>
 </div>
 
+<!-- Poster Modal -->
+<div class="modal fade" id="posterModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header" style="background: linear-gradient(135deg, var(--forest-green), var(--forest-light)); color: white;">
+        <h5 class="modal-title"><i class="bi-image"></i> Tree Poster</h5>
+        <button type="button" class="close" data-dismiss="modal" style="color: white;">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="poster-layout">
+          <div class="poster-preview">
+            <div id="posterContent" class="poster-frame"></div>
+          </div>
+          <div style="flex: 1 1 260px;">
+            <p style="margin-bottom: 10px;">Create a shareable poster for this tree.</p>
+            <div class="poster-actions">
+              <button class="btn btn-success" onclick="downloadTreePosterPng()">
+                <i class="bi-download"></i> Download PNG
+              </button>
+              <button class="btn btn-secondary" onclick="downloadTreePosterPdf()">
+                <i class="bi-filetype-pdf"></i> Download PDF
+              </button>
+              <button class="btn btn-primary" onclick="shareTreePoster()">
+                <i class="bi-share"></i> Share
+              </button>
+            </div>
+            <div class="poster-share-row">
+              <input id="posterShareLink" class="form-control" placeholder="Share link will appear here" readonly>
+              <button class="btn btn-outline-primary" onclick="copyPosterShareLink()">
+                <i class="bi-clipboard"></i>
+              </button>
+            </div>
+            <small class="text-muted">Tip: tap Share on your phone to text it to friends.</small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
 
@@ -795,6 +933,9 @@ function displayTrees(trees) {
               <button onclick="event.stopPropagation(); editTree(${tree.id})">
                 <i class="bi-pencil"></i>
               </button>
+              <button onclick="event.stopPropagation(); openTreePoster(${tree.id})">
+                <i class="bi-image"></i>
+              </button>
               <button onclick="event.stopPropagation(); viewOnMap(${tree.latitude}, ${tree.longitude})">
                 <i class="bi-map"></i>
               </button>
@@ -860,6 +1001,128 @@ function displayTrees(trees) {
     
     treeGrid.appendChild(treeCard);
   });
+}
+
+let currentPosterTree = null;
+let treePosterCanvas = null;
+
+function buildTreePosterHtml(tree) {
+  const photoUrl = tree.photo_url || 'https://via.placeholder.com/320x320/4CAF50/FFFFFF?text=Tree';
+  const locationDisplay = tree.location_name
+    || (tree.latitude && tree.longitude ? `${tree.latitude.toFixed(4)}, ${tree.longitude.toFixed(4)}` : '');
+  const rating = tree.rating ? '★'.repeat(tree.rating) + '☆'.repeat(5 - tree.rating) : '';
+  const addedDate = tree.added_date ? new Date(tree.added_date).toLocaleDateString() : '';
+
+  const metaRows = [
+    tree.scientific_name ? `Scientific: ${tree.scientific_name}` : null,
+    tree.region ? `Region: ${tree.region}` : null,
+    tree.confidence ? `Confidence: ${tree.confidence}` : null,
+    locationDisplay ? `Location: ${locationDisplay}` : null,
+    rating ? `Rating: ${rating}` : null,
+    addedDate ? `Added: ${addedDate}` : null
+  ].filter(Boolean);
+
+  const metaHtml = metaRows.map(row => `<div>${row}</div>`).join('');
+  const featuresHtml = tree.features && tree.features.length
+    ? `<div class="poster-section"><h6>Features</h6><div>${tree.features.join(', ')}</div></div>`
+    : '';
+  const descriptionHtml = tree.description
+    ? `<div class="poster-section"><h6>Description</h6><div>${tree.description}</div></div>`
+    : '';
+  const funFactsHtml = tree.fun_facts
+    ? `<div class="poster-section"><h6>Fun Facts</h6><div>${tree.fun_facts}</div></div>`
+    : '';
+  const conservationHtml = tree.conservation_status
+    ? `<div class="poster-section"><h6>Conservation</h6><div>${tree.conservation_status}</div></div>`
+    : '';
+  const aiHtml = tree.ai_analysis
+    ? `<div class="poster-section"><h6>AI Insights</h6><div>${tree.ai_analysis}</div></div>`
+    : '';
+  const notesHtml = tree.notes
+    ? `<div class="poster-section"><h6>Notes</h6><div>${tree.notes}</div></div>`
+    : '';
+
+  return `
+    <img class="poster-cover" src="${photoUrl}" alt="${tree.tree_name}">
+    <div class="poster-body">
+      <div class="poster-title">${tree.tree_name}</div>
+      <div class="poster-subtitle">${tree.scientific_name || 'Unknown species'}</div>
+      <div class="poster-meta">${metaHtml || '<div>Info: Not available</div>'}</div>
+      ${featuresHtml}
+      ${descriptionHtml}
+      ${funFactsHtml}
+      ${conservationHtml}
+      ${aiHtml}
+      ${notesHtml}
+    </div>
+  `;
+}
+
+function openTreePoster(id) {
+  const tree = currentCollection.find(item => item.id === id);
+  if (!tree) return;
+  currentPosterTree = tree;
+  treePosterCanvas = null;
+  document.getElementById('posterContent').innerHTML = buildTreePosterHtml(tree);
+  document.getElementById('posterShareLink').value = '';
+  if (typeof $ !== 'undefined') {
+    $('#posterModal').modal('show');
+  }
+}
+
+async function getTreePosterCanvas() {
+  if (treePosterCanvas) {
+    return treePosterCanvas;
+  }
+  const posterElement = document.getElementById('posterContent');
+  treePosterCanvas = await window.posterUtils.renderPosterCanvas(posterElement);
+  return treePosterCanvas;
+}
+
+async function downloadTreePosterPng() {
+  if (!currentPosterTree) return;
+  const canvas = await getTreePosterCanvas();
+  const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+  const safeName = (currentPosterTree.tree_name || 'tree').replace(/[^a-z0-9]+/gi, '-');
+  window.posterUtils.downloadDataUrl(dataUrl, `tree-poster-${safeName}.png`);
+}
+
+async function downloadTreePosterPdf() {
+  if (!currentPosterTree) return;
+  const canvas = await getTreePosterCanvas();
+  const safeName = (currentPosterTree.tree_name || 'tree').replace(/[^a-z0-9]+/gi, '-');
+  await window.posterUtils.downloadPdfFromCanvas(canvas, `tree-poster-${safeName}.pdf`);
+}
+
+async function shareTreePoster() {
+  if (!currentPosterTree) return;
+  const canvas = await getTreePosterCanvas();
+  const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+  const title = `${currentPosterTree.tree_name} Poster`;
+  const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'tree');
+  const shareUrl = shareData.shareUrl;
+  document.getElementById('posterShareLink').value = shareUrl;
+
+  const shared = await window.posterUtils.sharePoster({
+    canvas,
+    title,
+    text: `Check out this tree poster for ${currentPosterTree.tree_name}.`,
+    fileName: `${currentPosterTree.tree_name}.png`,
+    shareUrl
+  });
+
+  if (!shared) {
+    showToast('Share Link Ready', 'Copy the share link to text it.', 'success');
+  }
+}
+
+function copyPosterShareLink() {
+  const input = document.getElementById('posterShareLink');
+  if (!input.value) return;
+  input.select();
+  input.setSelectionRange(0, input.value.length);
+  document.execCommand('copy');
+  showToast('Copied', 'Share link copied to clipboard', 'success');
 }
 
 // Load statistics
@@ -1204,6 +1467,9 @@ function toggleAIAnalysis(element) {
 })();
 </script>
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="/shared/poster-utils.js"></script>
 <script src="/shared/scripts.js"></script>
 <script src="/shared/voice-widget.js"></script>
 <script>

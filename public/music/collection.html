@@ -421,6 +421,99 @@
       border-top-left-radius: var(--zen-radius);
       border-top-right-radius: var(--zen-radius);
     }
+
+    /* Poster Modal */
+    .poster-layout {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .poster-preview {
+      flex: 0 0 320px;
+      max-width: 320px;
+    }
+
+    .poster-frame {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 2px solid rgba(135, 206, 250, 0.4);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .poster-frame .poster-cover {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      background: #f0f0f0;
+    }
+
+    .poster-frame .poster-body {
+      padding: 16px;
+      text-align: left;
+    }
+
+    .poster-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .poster-subtitle {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .poster-meta {
+      display: grid;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .poster-section {
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(135, 206, 250, 0.12);
+      border-left: 3px solid var(--ice-primary);
+      font-size: 0.82rem;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .poster-section h6 {
+      margin: 0 0 6px 0;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--ice-primary);
+    }
+
+    .poster-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .poster-actions button {
+      flex: 1 1 auto;
+      min-width: 140px;
+    }
+
+    .poster-share-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .poster-share-row input {
+      flex: 1 1 auto;
+    }
     
   </style>
 </head>
@@ -657,6 +750,51 @@
         <button type="button" class="btn btn-primary" onclick="saveAlbumEdit()">
           <i class="bi-save"></i> Save Changes
         </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Poster Modal -->
+<div class="modal fade" id="posterModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi-image"></i> Album Poster</h5>
+        <button type="button" class="close text-white" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="poster-layout">
+          <div class="poster-preview">
+            <div id="posterContent" class="poster-frame"></div>
+          </div>
+          <div style="flex: 1 1 260px;">
+            <p style="margin-bottom: 10px;">Create a shareable poster for this album.</p>
+            <div class="poster-actions">
+              <button class="btn btn-primary" onclick="downloadAlbumPosterPng()">
+                <i class="bi-download"></i> Download PNG
+              </button>
+              <button class="btn btn-secondary" onclick="downloadAlbumPosterPdf()">
+                <i class="bi-filetype-pdf"></i> Download PDF
+              </button>
+              <button class="btn btn-success" onclick="shareAlbumPoster()">
+                <i class="bi-share"></i> Share
+              </button>
+            </div>
+            <div class="poster-share-row">
+              <input id="posterShareLink" class="form-control" placeholder="Share link will appear here" readonly>
+              <button class="btn btn-outline-primary" onclick="copyPosterShareLink()">
+                <i class="bi-clipboard"></i>
+              </button>
+            </div>
+            <small class="text-muted">Tip: tap Share on your phone to text it to friends.</small>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -992,6 +1130,9 @@ function displayAlbums(albums) {
                 <i class="bi-pencil"></i>
               </button>
             ` : ''}
+            <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); openAlbumPoster(${album.id})" title="Create Poster">
+              <i class="bi-image"></i>
+            </button>
             <button class="btn btn-sm btn-info" onclick="event.stopPropagation(); findVideosForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.album.replace(/'/g, "\\'")}')">
               <i class="bi-youtube"></i>
             </button>
@@ -1081,6 +1222,120 @@ function displayAlbums(albums) {
     
     albumGrid.appendChild(albumCard);
   });
+}
+
+let currentPosterAlbum = null;
+let albumPosterCanvas = null;
+
+function buildAlbumPosterHtml(album) {
+  const coverUrl = album.cover_url || 'https://via.placeholder.com/320x320/87CEEB/FFFFFF?text=No+Cover';
+  const locationCoords = album.latitude && album.longitude
+    ? `${parseFloat(album.latitude).toFixed(4)}, ${parseFloat(album.longitude).toFixed(4)}`
+    : '';
+  const locationDisplay = album.location_label || locationCoords;
+  const rating = album.rating ? '★'.repeat(album.rating) + '☆'.repeat(5 - album.rating) : '';
+  const addedDate = album.added_date ? new Date(album.added_date).toLocaleDateString() : '';
+  const metaRows = [
+    album.year ? `Year: ${album.year}` : null,
+    album.genre ? `Genre: ${album.genre}` : null,
+    album.label ? `Label: ${album.label}` : null,
+    locationDisplay ? `Location: ${locationDisplay}` : null,
+    album.valuation ? `Value: $${parseFloat(album.valuation).toFixed(2)}` : null,
+    rating ? `Rating: ${rating}` : null,
+    addedDate ? `Added: ${addedDate}` : null
+  ].filter(Boolean);
+
+  const metaHtml = metaRows.map(row => `<div>${row}</div>`).join('');
+  const storyHtml = album.story
+    ? `<div class="poster-section"><h6>Story</h6><div>${album.story}</div></div>`
+    : '';
+  const notesHtml = album.notes
+    ? `<div class="poster-section"><h6>Notes</h6><div>${album.notes}</div></div>`
+    : '';
+  const aiHtml = album.ai_analysis
+    ? `<div class="poster-section"><h6>AI Insights</h6><div>${formatAIAnalysis(album.ai_analysis)}</div></div>`
+    : '';
+
+  return `
+    <img class="poster-cover" src="${coverUrl}" alt="${album.album}">
+    <div class="poster-body">
+      <div class="poster-title">${album.album}</div>
+      <div class="poster-subtitle">${album.artist}</div>
+      <div class="poster-meta">${metaHtml || '<div>Info: Not available</div>'}</div>
+      ${storyHtml}
+      ${notesHtml}
+      ${aiHtml}
+    </div>
+  `;
+}
+
+function openAlbumPoster(id) {
+  const album = currentCollection.find(item => item.id === id);
+  if (!album) return;
+  currentPosterAlbum = album;
+  albumPosterCanvas = null;
+  document.getElementById('posterContent').innerHTML = buildAlbumPosterHtml(album);
+  document.getElementById('posterShareLink').value = '';
+  if (typeof $ !== 'undefined') {
+    $('#posterModal').modal('show');
+  }
+}
+
+async function getAlbumPosterCanvas() {
+  if (albumPosterCanvas) {
+    return albumPosterCanvas;
+  }
+  const posterElement = document.getElementById('posterContent');
+  albumPosterCanvas = await window.posterUtils.renderPosterCanvas(posterElement);
+  return albumPosterCanvas;
+}
+
+async function downloadAlbumPosterPng() {
+  if (!currentPosterAlbum) return;
+  const canvas = await getAlbumPosterCanvas();
+  const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+  const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
+  const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
+  window.posterUtils.downloadDataUrl(dataUrl, `album-poster-${safeArtist}-${safeAlbum}.png`);
+}
+
+async function downloadAlbumPosterPdf() {
+  if (!currentPosterAlbum) return;
+  const canvas = await getAlbumPosterCanvas();
+  const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
+  const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
+  await window.posterUtils.downloadPdfFromCanvas(canvas, `album-poster-${safeArtist}-${safeAlbum}.pdf`);
+}
+
+async function shareAlbumPoster() {
+  if (!currentPosterAlbum) return;
+  const canvas = await getAlbumPosterCanvas();
+  const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+  const title = `${currentPosterAlbum.album} Poster`;
+  const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'album');
+  const shareUrl = shareData.shareUrl;
+  document.getElementById('posterShareLink').value = shareUrl;
+
+  const shared = await window.posterUtils.sharePoster({
+    canvas,
+    title,
+    text: `Check out this album poster for ${currentPosterAlbum.album} by ${currentPosterAlbum.artist}.`,
+    fileName: `${currentPosterAlbum.album}.png`,
+    shareUrl
+  });
+
+  if (!shared) {
+    showToast('Share Link Ready', 'Copy the share link to text it.', 'info');
+  }
+}
+
+function copyPosterShareLink() {
+  const input = document.getElementById('posterShareLink');
+  if (!input.value) return;
+  input.select();
+  input.setSelectionRange(0, input.value.length);
+  document.execCommand('copy');
+  showToast('Copied', 'Share link copied to clipboard', 'success');
 }
 
 // Search collection
@@ -1527,6 +1782,9 @@ function collapseAIAnalysis() {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="/shared/dark-mode.js"></script>
 <script src="/shared/quick-actions.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="/shared/poster-utils.js"></script>
 <script src="/shared/voice-widget.js"></script>
 <script>
 // Initialize voice widget for collection

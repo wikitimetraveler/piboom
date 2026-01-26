@@ -1,4 +1,27 @@
 import axios from 'axios';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const SHARE_STORE_PATH = path.join(__dirname, '..', 'data', 'poster-shares.json');
+const POSTER_DIR = path.join(__dirname, '..', 'public', 'shared', 'posters');
+
+async function loadShareStore() {
+  try {
+    const data = await fs.readFile(SHARE_STORE_PATH, 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    return {};
+  }
+}
+
+async function saveShareStore(store) {
+  await fs.mkdir(path.dirname(SHARE_STORE_PATH), { recursive: true });
+  await fs.writeFile(SHARE_STORE_PATH, JSON.stringify(store, null, 2), 'utf8');
+}
 
 // Generate concert poster using OpenAI DALL-E
 export async function generatePoster(req, res) {
@@ -97,4 +120,59 @@ export async function generatePoster(req, res) {
 export default {
   generatePoster
 };
+
+export async function createPosterShare(req, res) {
+  try {
+    const { imageData, title, type } = req.body;
+    if (!imageData || typeof imageData !== 'string') {
+      return res.status(400).json({ success: false, error: 'imageData is required' });
+    }
+
+    const match = imageData.match(/^data:image\/png;base64,(.+)$/);
+    if (!match) {
+      return res.status(400).json({ success: false, error: 'Only PNG data URLs are supported' });
+    }
+
+    const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+    const fileName = `${id}.png`;
+    const buffer = Buffer.from(match[1], 'base64');
+
+    await fs.mkdir(POSTER_DIR, { recursive: true });
+    await fs.writeFile(path.join(POSTER_DIR, fileName), buffer);
+
+    const store = await loadShareStore();
+    store[id] = {
+      id,
+      title: title || 'Shared Poster',
+      type: type || 'poster',
+      imageUrl: `/shared/posters/${fileName}`,
+      createdAt: new Date().toISOString()
+    };
+    await saveShareStore(store);
+
+    return res.json({
+      success: true,
+      shareId: id,
+      shareUrl: `/share/poster/${id}`,
+      imageUrl: store[id].imageUrl
+    });
+  } catch (error) {
+    console.error('❌ Error creating poster share:', error);
+    return res.status(500).json({ success: false, error: 'Failed to create share link' });
+  }
+}
+
+export async function getPosterShare(req, res) {
+  try {
+    const { id } = req.params;
+    const store = await loadShareStore();
+    if (!store[id]) {
+      return res.status(404).json({ success: false, error: 'Share not found' });
+    }
+    return res.json({ success: true, share: store[id] });
+  } catch (error) {
+    console.error('❌ Error loading poster share:', error);
+    return res.status(500).json({ success: false, error: 'Failed to load share' });
+  }
+}
 
