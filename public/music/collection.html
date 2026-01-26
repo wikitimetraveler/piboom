@@ -1083,7 +1083,6 @@ function displayAlbums(albums) {
   albums.forEach(album => {
     const albumCard = document.createElement('div');
     albumCard.className = 'album-card';
-    albumCard.dataset.albumId = String(album.id);
     albumCard.onclick = (e) => {
       // Don't flip if clicking on buttons
       if (!e.target.closest('button')) {
@@ -1091,7 +1090,7 @@ function displayAlbums(albums) {
       }
     };
     
-    const coverUrl = album.cover_url || 'https://via.placeholder.com/220x220/87CEEB/FFFFFF?text=No+Cover';
+    const coverUrl = album.cover_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><rect width="100%" height="100%" fill="%2387CEEB"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="20" font-family="Arial">No Cover</text></svg>';
     const rating = album.rating ? '★'.repeat(album.rating) + '☆'.repeat(5 - album.rating) : '☆☆☆☆☆';
     const addedDate = new Date(album.added_date).toLocaleDateString();
     const locationLabel = album.location_label || '';
@@ -1116,7 +1115,7 @@ function displayAlbums(albums) {
             </div>
           ` : ''}
           <img src="${coverUrl}" alt="${album.album}" class="album-cover" 
-               onerror="this.src='https://via.placeholder.com/220x220/87CEEB/FFFFFF?text=No+Cover'">
+               onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;220&quot; height=&quot;220&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%2387CEEB&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;white&quot; font-size=&quot;20&quot; font-family=&quot;Arial&quot;>No Cover</text></svg>'">
           <div class="album-info">
             <h5>${album.album}</h5>
             <p><strong>${album.artist}</strong></p>
@@ -1127,18 +1126,18 @@ function displayAlbums(albums) {
           </div>
           <div class="album-actions">
             ${loggedInUserId && loggedInUserId === album.user_id ? `
-              <button class="btn btn-sm btn-primary" data-action="edit" data-album-id="${album.id}" onclick="event.stopPropagation(); editAlbum(${album.id})" title="Edit Album">
+              <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); editAlbum(${album.id})" title="Edit Album">
                 <i class="bi-pencil"></i>
               </button>
             ` : ''}
-            <button class="btn btn-sm btn-secondary" data-action="poster" data-album-id="${album.id}" onclick="event.stopPropagation(); openAlbumPoster(${album.id})" title="Create Poster">
+            <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); openAlbumPoster(${album.id})" title="Create Poster">
               <i class="bi-image"></i>
             </button>
-            <button class="btn btn-sm btn-info" data-action="youtube" data-album-id="${album.id}" onclick="event.stopPropagation(); findVideosForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.album.replace(/'/g, "\\'")}')">
+            <button class="btn btn-sm btn-info" onclick="event.stopPropagation(); findVideosForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.album.replace(/'/g, "\\'")}')">
               <i class="bi-youtube"></i>
             </button>
             ${loggedInUserId && loggedInUserId === album.user_id ? `
-              <button class="btn btn-sm btn-danger" data-action="delete" data-album-id="${album.id}" onclick="event.stopPropagation(); deleteAlbum(${album.id}, '${album.album.replace(/'/g, "\\'")}', '${album.artist.replace(/'/g, "\\'")}')">
+              <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteAlbum(${album.id}, '${album.album.replace(/'/g, "\\'")}', '${album.artist.replace(/'/g, "\\'")}')">
                 <i class="bi-trash"></i>
               </button>
             ` : ''}
@@ -1224,63 +1223,13 @@ function displayAlbums(albums) {
     albumGrid.appendChild(albumCard);
   });
 
-  if (!albumActionsBound) {
-    bindAlbumActionHandlers();
-    albumActionsBound = true;
-  }
 }
 
 let currentPosterAlbum = null;
 let albumPosterCanvas = null;
-let albumActionsBound = false;
 
-function bindAlbumActionHandlers() {
-  const albumGrid = document.getElementById('albumGrid');
-  if (!albumGrid) return;
-  let lastTouchTime = 0;
-
-  const handleAction = (event) => {
-    const button = event.target.closest('button[data-action]');
-    if (!button) return;
-    event.stopPropagation();
-
-    const action = button.dataset.action;
-    const albumId = Number(button.dataset.albumId);
-    const album = currentCollection.find(item => item.id === albumId);
-    if (!album) return;
-
-    if (action === 'edit') {
-      editAlbum(albumId);
-      return;
-    }
-    if (action === 'poster') {
-      openAlbumPoster(albumId);
-      return;
-    }
-    if (action === 'youtube') {
-      findVideosForAlbum(album.artist, album.album);
-      return;
-    }
-    if (action === 'delete') {
-      deleteAlbum(albumId, album.album, album.artist);
-    }
-  };
-
-  albumGrid.addEventListener('click', (event) => {
-    if (Date.now() - lastTouchTime < 400) return;
-    handleAction(event);
-  });
-
-  albumGrid.addEventListener('touchend', (event) => {
-    lastTouchTime = Date.now();
-    event.preventDefault();
-    handleAction(event);
-  }, { passive: false });
-}
-
-function buildAlbumPosterHtml(album, coverOverride) {
-  const fallbackCover = album.cover_url || 'https://via.placeholder.com/320x320/87CEEB/FFFFFF?text=No+Cover';
-  const coverUrl = resolvePosterImageUrl(coverOverride || fallbackCover);
+function buildAlbumPosterHtml(album) {
+  const coverUrl = resolvePosterImageUrl(album.cover_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320"><rect width="100%" height="100%" fill="%2387CEEB"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="24" font-family="Arial">No Cover</text></svg>');
   const locationCoords = album.latitude && album.longitude
     ? `${parseFloat(album.latitude).toFixed(4)}, ${parseFloat(album.longitude).toFixed(4)}`
     : '';
@@ -1324,12 +1273,9 @@ function buildAlbumPosterHtml(album, coverOverride) {
 function openAlbumPoster(id) {
   const album = currentCollection.find(item => item.id === id);
   if (!album) return;
-  const card = document.querySelector(`.album-card[data-album-id="${id}"]`);
-  const cardImg = card ? card.querySelector('.album-cover') : null;
-  const coverOverride = cardImg && cardImg.src ? cardImg.src : null;
   currentPosterAlbum = album;
   albumPosterCanvas = null;
-  document.getElementById('posterContent').innerHTML = buildAlbumPosterHtml(album, coverOverride);
+  document.getElementById('posterContent').innerHTML = buildAlbumPosterHtml(album);
   document.getElementById('posterShareLink').value = '';
   if (typeof $ !== 'undefined') {
     $('#posterModal').modal('show');
@@ -1364,57 +1310,57 @@ async function getAlbumPosterCanvas() {
 }
 
 async function downloadAlbumPosterPng() {
-  if (!currentPosterAlbum) return;
-  try {
-    const canvas = await getAlbumPosterCanvas();
-    const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
-    const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
-    const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
-    window.posterUtils.downloadDataUrl(dataUrl, `album-poster-${safeArtist}-${safeAlbum}.png`);
-  } catch (error) {
-    console.error('Poster PNG failed:', error);
-    showToast('Poster Error', 'Could not download PNG. Try again.', 'error');
+  if (!currentPosterAlbum) {
+    return;
   }
+  if (!window.posterUtils || !window.html2canvas) {
+    return;
+  }
+  const canvas = await getAlbumPosterCanvas();
+  const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+  const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
+  const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
+  window.posterUtils.downloadDataUrl(dataUrl, `album-poster-${safeArtist}-${safeAlbum}.png`);
 }
 
 async function downloadAlbumPosterPdf() {
-  if (!currentPosterAlbum) return;
-  try {
-    const canvas = await getAlbumPosterCanvas();
-    const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
-    const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
-    await window.posterUtils.downloadPdfFromCanvas(canvas, `album-poster-${safeArtist}-${safeAlbum}.pdf`);
-  } catch (error) {
-    console.error('Poster PDF failed:', error);
-    showToast('Poster Error', 'Could not download PDF. Try again.', 'error');
+  if (!currentPosterAlbum) {
+    return;
   }
+  if (!window.posterUtils || !window.jspdf) {
+    return;
+  }
+  const canvas = await getAlbumPosterCanvas();
+  const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
+  const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
+  await window.posterUtils.downloadPdfFromCanvas(canvas, `album-poster-${safeArtist}-${safeAlbum}.pdf`);
 }
 
 async function shareAlbumPoster() {
-  if (!currentPosterAlbum) return;
-  try {
-    const canvas = await getAlbumPosterCanvas();
-    const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
-    const title = `${currentPosterAlbum.album} Poster`;
-    const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'album');
-    const shareUrl = new URL(shareData.shareUrl, window.location.origin).toString();
-    document.getElementById('posterShareLink').value = shareUrl;
-    const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
+  if (!currentPosterAlbum) {
+    return;
+  }
+  if (!window.posterUtils || !window.html2canvas) {
+    return;
+  }
+  const canvas = await getAlbumPosterCanvas();
+  const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+  const title = `${currentPosterAlbum.album} Poster`;
+  const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'album');
+  const shareUrl = new URL(shareData.shareUrl, window.location.origin).toString();
+  document.getElementById('posterShareLink').value = shareUrl;
+  const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
 
-    const shared = await window.posterUtils.sharePoster({
-      canvas,
-      title,
-      text: `Check out this album poster for ${currentPosterAlbum.album} by ${currentPosterAlbum.artist}.`,
-      fileName: `${safeAlbum}.png`,
-      shareUrl
-    });
+  const shared = await window.posterUtils.sharePoster({
+    canvas,
+    title,
+    text: `Check out this album poster for ${currentPosterAlbum.album} by ${currentPosterAlbum.artist}.`,
+    fileName: `${safeAlbum}.png`,
+    shareUrl
+  });
 
-    if (!shared) {
-      showToast('Share Link Ready', 'Copy the share link to text it.', 'info');
-    }
-  } catch (error) {
-    console.error('Poster share failed:', error);
-    showToast('Share Error', 'Could not share poster. Try again.', 'error');
+  if (!shared) {
+    showToast('Share Link Ready', 'Copy the share link to text it.', 'info');
   }
 }
 
@@ -1892,6 +1838,7 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
+
 });
 </script>
 
