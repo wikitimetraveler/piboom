@@ -1,5 +1,5 @@
 import express from 'express';
-import { generatePoster, createPosterShare, getPosterShare } from '../controllers/poster-generator.controller.js';
+import { generatePoster, createPosterShare, getPosterShare, proxyPosterImage } from '../controllers/poster-generator.controller.js';
 
 const router = express.Router();
 
@@ -7,6 +7,7 @@ const router = express.Router();
 router.post('/generate', generatePoster);
 router.post('/share', createPosterShare);
 router.get('/share/:id', getPosterShare);
+router.get('/proxy-image', proxyPosterImage);
 
 export default router;
 

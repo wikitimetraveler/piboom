@@ -176,3 +176,23 @@ export async function getPosterShare(req, res) {
   }
 }
 
+export async function proxyPosterImage(req, res) {
+  try {
+    const imageUrl = req.query.url;
+    if (!imageUrl) {
+      return res.status(400).send('Missing url');
+    }
+
+    const response = await axios.get(imageUrl, {
+      responseType: 'arraybuffer',
+      timeout: 15000
+    });
+
+    res.setHeader('Content-Type', response.headers['content-type'] || 'image/jpeg');
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    return res.send(Buffer.from(response.data));
+  } catch (error) {
+    return res.status(404).send('Image not available');
+  }
+}
+

@@ -1083,6 +1083,7 @@ function displayAlbums(albums) {
   albums.forEach(album => {
     const albumCard = document.createElement('div');
     albumCard.className = 'album-card';
+    albumCard.dataset.albumId = String(album.id);
     albumCard.onclick = (e) => {
       // Don't flip if clicking on buttons
       if (!e.target.closest('button')) {
@@ -1227,8 +1228,9 @@ function displayAlbums(albums) {
 let currentPosterAlbum = null;
 let albumPosterCanvas = null;
 
-function buildAlbumPosterHtml(album) {
-  const coverUrl = album.cover_url || 'https://via.placeholder.com/320x320/87CEEB/FFFFFF?text=No+Cover';
+function buildAlbumPosterHtml(album, coverOverride) {
+  const fallbackCover = album.cover_url || 'https://via.placeholder.com/320x320/87CEEB/FFFFFF?text=No+Cover';
+  const coverUrl = resolvePosterImageUrl(coverOverride || fallbackCover);
   const locationCoords = album.latitude && album.longitude
     ? `${parseFloat(album.latitude).toFixed(4)}, ${parseFloat(album.longitude).toFixed(4)}`
     : '';
@@ -1257,7 +1259,7 @@ function buildAlbumPosterHtml(album) {
     : '';
 
   return `
-    <img class="poster-cover" src="${coverUrl}" alt="${album.album}">
+    <img class="poster-cover" src="${coverUrl}" alt="${album.album}" crossorigin="anonymous">
     <div class="poster-body">
       <div class="poster-title">${album.album}</div>
       <div class="poster-subtitle">${album.artist}</div>
@@ -1272,13 +1274,33 @@ function buildAlbumPosterHtml(album) {
 function openAlbumPoster(id) {
   const album = currentCollection.find(item => item.id === id);
   if (!album) return;
+  const card = document.querySelector(`.album-card[data-album-id="${id}"]`);
+  const cardImg = card ? card.querySelector('.album-cover') : null;
+  const coverOverride = cardImg && cardImg.src ? cardImg.src : null;
   currentPosterAlbum = album;
   albumPosterCanvas = null;
-  document.getElementById('posterContent').innerHTML = buildAlbumPosterHtml(album);
+  document.getElementById('posterContent').innerHTML = buildAlbumPosterHtml(album, coverOverride);
   document.getElementById('posterShareLink').value = '';
   if (typeof $ !== 'undefined') {
     $('#posterModal').modal('show');
   }
+}
+
+function resolvePosterImageUrl(url) {
+  if (!url) return url;
+  if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+  if (url.startsWith('/') || url.startsWith(window.location.origin)) return url;
+  return `/api/poster-generator/proxy-image?url=${encodeURIComponent(url)}`;
+}
+
+function waitForPosterImages(container) {
+  const images = Array.from(container.querySelectorAll('img'));
+  return Promise.all(images.map(img => (
+    img.complete ? Promise.resolve() : new Promise(resolve => {
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+    })
+  )));
 }
 
 async function getAlbumPosterCanvas() {
@@ -1286,46 +1308,63 @@ async function getAlbumPosterCanvas() {
     return albumPosterCanvas;
   }
   const posterElement = document.getElementById('posterContent');
+  await waitForPosterImages(posterElement);
   albumPosterCanvas = await window.posterUtils.renderPosterCanvas(posterElement);
   return albumPosterCanvas;
 }
 
 async function downloadAlbumPosterPng() {
   if (!currentPosterAlbum) return;
-  const canvas = await getAlbumPosterCanvas();
-  const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
-  const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
-  const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
-  window.posterUtils.downloadDataUrl(dataUrl, `album-poster-${safeArtist}-${safeAlbum}.png`);
+  try {
+    const canvas = await getAlbumPosterCanvas();
+    const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+    const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
+    const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
+    window.posterUtils.downloadDataUrl(dataUrl, `album-poster-${safeArtist}-${safeAlbum}.png`);
+  } catch (error) {
+    console.error('Poster PNG failed:', error);
+    showToast('Poster Error', 'Could not download PNG. Try again.', 'error');
+  }
 }
 
 async function downloadAlbumPosterPdf() {
   if (!currentPosterAlbum) return;
-  const canvas = await getAlbumPosterCanvas();
-  const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
-  const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
-  await window.posterUtils.downloadPdfFromCanvas(canvas, `album-poster-${safeArtist}-${safeAlbum}.pdf`);
+  try {
+    const canvas = await getAlbumPosterCanvas();
+    const safeArtist = (currentPosterAlbum.artist || 'artist').replace(/[^a-z0-9]+/gi, '-');
+    const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
+    await window.posterUtils.downloadPdfFromCanvas(canvas, `album-poster-${safeArtist}-${safeAlbum}.pdf`);
+  } catch (error) {
+    console.error('Poster PDF failed:', error);
+    showToast('Poster Error', 'Could not download PDF. Try again.', 'error');
+  }
 }
 
 async function shareAlbumPoster() {
   if (!currentPosterAlbum) return;
-  const canvas = await getAlbumPosterCanvas();
-  const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
-  const title = `${currentPosterAlbum.album} Poster`;
-  const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'album');
-  const shareUrl = shareData.shareUrl;
-  document.getElementById('posterShareLink').value = shareUrl;
+  try {
+    const canvas = await getAlbumPosterCanvas();
+    const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+    const title = `${currentPosterAlbum.album} Poster`;
+    const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'album');
+    const shareUrl = new URL(shareData.shareUrl, window.location.origin).toString();
+    document.getElementById('posterShareLink').value = shareUrl;
+    const safeAlbum = (currentPosterAlbum.album || 'album').replace(/[^a-z0-9]+/gi, '-');
 
-  const shared = await window.posterUtils.sharePoster({
-    canvas,
-    title,
-    text: `Check out this album poster for ${currentPosterAlbum.album} by ${currentPosterAlbum.artist}.`,
-    fileName: `${currentPosterAlbum.album}.png`,
-    shareUrl
-  });
+    const shared = await window.posterUtils.sharePoster({
+      canvas,
+      title,
+      text: `Check out this album poster for ${currentPosterAlbum.album} by ${currentPosterAlbum.artist}.`,
+      fileName: `${safeAlbum}.png`,
+      shareUrl
+    });
 
-  if (!shared) {
-    showToast('Share Link Ready', 'Copy the share link to text it.', 'info');
+    if (!shared) {
+      showToast('Share Link Ready', 'Copy the share link to text it.', 'info');
+    }
+  } catch (error) {
+    console.error('Poster share failed:', error);
+    showToast('Share Error', 'Could not share poster. Try again.', 'error');
   }
 }
 

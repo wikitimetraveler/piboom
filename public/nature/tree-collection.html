@@ -1007,7 +1007,7 @@ let currentPosterTree = null;
 let treePosterCanvas = null;
 
 function buildTreePosterHtml(tree) {
-  const photoUrl = tree.photo_url || 'https://via.placeholder.com/320x320/4CAF50/FFFFFF?text=Tree';
+  const photoUrl = resolvePosterImageUrl(tree.photo_url || 'https://via.placeholder.com/320x320/4CAF50/FFFFFF?text=Tree');
   const locationDisplay = tree.location_name
     || (tree.latitude && tree.longitude ? `${tree.latitude.toFixed(4)}, ${tree.longitude.toFixed(4)}` : '');
   const rating = tree.rating ? '★'.repeat(tree.rating) + '☆'.repeat(5 - tree.rating) : '';
@@ -1043,7 +1043,7 @@ function buildTreePosterHtml(tree) {
     : '';
 
   return `
-    <img class="poster-cover" src="${photoUrl}" alt="${tree.tree_name}">
+    <img class="poster-cover" src="${photoUrl}" alt="${tree.tree_name}" crossorigin="anonymous">
     <div class="poster-body">
       <div class="poster-title">${tree.tree_name}</div>
       <div class="poster-subtitle">${tree.scientific_name || 'Unknown species'}</div>
@@ -1070,11 +1070,29 @@ function openTreePoster(id) {
   }
 }
 
+function resolvePosterImageUrl(url) {
+  if (!url) return url;
+  if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+  if (url.startsWith('/') || url.startsWith(window.location.origin)) return url;
+  return `/api/poster-generator/proxy-image?url=${encodeURIComponent(url)}`;
+}
+
+function waitForPosterImages(container) {
+  const images = Array.from(container.querySelectorAll('img'));
+  return Promise.all(images.map(img => (
+    img.complete ? Promise.resolve() : new Promise(resolve => {
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+    })
+  )));
+}
+
 async function getTreePosterCanvas() {
   if (treePosterCanvas) {
     return treePosterCanvas;
   }
   const posterElement = document.getElementById('posterContent');
+  await waitForPosterImages(posterElement);
   treePosterCanvas = await window.posterUtils.renderPosterCanvas(posterElement);
   return treePosterCanvas;
 }
@@ -1100,14 +1118,15 @@ async function shareTreePoster() {
   const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
   const title = `${currentPosterTree.tree_name} Poster`;
   const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'tree');
-  const shareUrl = shareData.shareUrl;
+  const shareUrl = new URL(shareData.shareUrl, window.location.origin).toString();
   document.getElementById('posterShareLink').value = shareUrl;
+  const safeName = (currentPosterTree.tree_name || 'tree').replace(/[^a-z0-9]+/gi, '-');
 
   const shared = await window.posterUtils.sharePoster({
     canvas,
     title,
     text: `Check out this tree poster for ${currentPosterTree.tree_name}.`,
-    fileName: `${currentPosterTree.tree_name}.png`,
+    fileName: `${safeName}.png`,
     shareUrl
   });
 
