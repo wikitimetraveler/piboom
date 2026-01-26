@@ -1127,18 +1127,18 @@ function displayAlbums(albums) {
           </div>
           <div class="album-actions">
             ${loggedInUserId && loggedInUserId === album.user_id ? `
-              <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); editAlbum(${album.id})" title="Edit Album">
+              <button class="btn btn-sm btn-primary" data-action="edit" data-album-id="${album.id}" onclick="event.stopPropagation(); editAlbum(${album.id})" title="Edit Album">
                 <i class="bi-pencil"></i>
               </button>
             ` : ''}
-            <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); openAlbumPoster(${album.id})" title="Create Poster">
+            <button class="btn btn-sm btn-secondary" data-action="poster" data-album-id="${album.id}" onclick="event.stopPropagation(); openAlbumPoster(${album.id})" title="Create Poster">
               <i class="bi-image"></i>
             </button>
-            <button class="btn btn-sm btn-info" onclick="event.stopPropagation(); findVideosForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.album.replace(/'/g, "\\'")}')">
+            <button class="btn btn-sm btn-info" data-action="youtube" data-album-id="${album.id}" onclick="event.stopPropagation(); findVideosForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.album.replace(/'/g, "\\'")}')">
               <i class="bi-youtube"></i>
             </button>
             ${loggedInUserId && loggedInUserId === album.user_id ? `
-              <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteAlbum(${album.id}, '${album.album.replace(/'/g, "\\'")}', '${album.artist.replace(/'/g, "\\'")}')">
+              <button class="btn btn-sm btn-danger" data-action="delete" data-album-id="${album.id}" onclick="event.stopPropagation(); deleteAlbum(${album.id}, '${album.album.replace(/'/g, "\\'")}', '${album.artist.replace(/'/g, "\\'")}')">
                 <i class="bi-trash"></i>
               </button>
             ` : ''}
@@ -1223,10 +1223,60 @@ function displayAlbums(albums) {
     
     albumGrid.appendChild(albumCard);
   });
+
+  if (!albumActionsBound) {
+    bindAlbumActionHandlers();
+    albumActionsBound = true;
+  }
 }
 
 let currentPosterAlbum = null;
 let albumPosterCanvas = null;
+let albumActionsBound = false;
+
+function bindAlbumActionHandlers() {
+  const albumGrid = document.getElementById('albumGrid');
+  if (!albumGrid) return;
+  let lastTouchTime = 0;
+
+  const handleAction = (event) => {
+    const button = event.target.closest('button[data-action]');
+    if (!button) return;
+    event.stopPropagation();
+
+    const action = button.dataset.action;
+    const albumId = Number(button.dataset.albumId);
+    const album = currentCollection.find(item => item.id === albumId);
+    if (!album) return;
+
+    if (action === 'edit') {
+      editAlbum(albumId);
+      return;
+    }
+    if (action === 'poster') {
+      openAlbumPoster(albumId);
+      return;
+    }
+    if (action === 'youtube') {
+      findVideosForAlbum(album.artist, album.album);
+      return;
+    }
+    if (action === 'delete') {
+      deleteAlbum(albumId, album.album, album.artist);
+    }
+  };
+
+  albumGrid.addEventListener('click', (event) => {
+    if (Date.now() - lastTouchTime < 400) return;
+    handleAction(event);
+  });
+
+  albumGrid.addEventListener('touchend', (event) => {
+    lastTouchTime = Date.now();
+    event.preventDefault();
+    handleAction(event);
+  }, { passive: false });
+}
 
 function buildAlbumPosterHtml(album, coverOverride) {
   const fallbackCover = album.cover_url || 'https://via.placeholder.com/320x320/87CEEB/FFFFFF?text=No+Cover';

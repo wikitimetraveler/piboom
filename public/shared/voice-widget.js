@@ -41,7 +41,7 @@
  * const widget = new VoiceWidget({
  *   position: 'bottom-right',
  *   theme: 'blue',
- *   onCommand: (command) => { /* handle command */ }
+ *   onCommand: (command) => { console.log(command); }
  * });
  * 
  * ==============================================================================

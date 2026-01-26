@@ -182,11 +182,16 @@ function initQuickActions() {
   // Add FAB to page
   const fabContainer = document.createElement('div');
   fabContainer.innerHTML = quickActionsHTML;
-  document.body.appendChild(fabContainer.firstElementChild);
+  Array.from(fabContainer.children).forEach(child => {
+    document.body.appendChild(child);
+  });
   
   // Setup toggle
   const fabMain = document.getElementById('fabMain');
   const fabActions = document.getElementById('fabActions');
+  if (!fabMain || !fabActions) {
+    return;
+  }
   let isOpen = false;
   
   fabMain.addEventListener('click', () => {

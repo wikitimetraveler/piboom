@@ -51,15 +51,13 @@ const USER_PASSWORDS = {
 };
 
 // Use USERS from user-selector.js if already loaded, otherwise define it here
-if (typeof USERS === 'undefined') {
-  var USERS = [
-    { id: 'cosmic-turtle', name: 'The Cosmic Turtle', avatar: '/images/cosmic turtle.png', color: '#00CED1' },
-    { id: 'wizened-wizard', name: 'The Wizened Wizard', avatar: '/images/steven.png', color: '#9370DB' },
-    { id: 'jerry-garcia', name: 'Jerry Garcia', avatar: '/images/jerry.png', color: '#FF6347' },
-    { id: 'easy-levi', name: 'Easy Rider Levi', avatar: '/images/levi.png', color: '#4682B4' },
-    { id: 'fuzz-maestro', name: 'Fuzz Maestro', avatar: '/images/fuzz.png', color: '#FF8C00' }
-  ];
-}
+window.USERS = window.USERS || [
+  { id: 'cosmic-turtle', name: 'The Cosmic Turtle', avatar: '/images/cosmic turtle.png', color: '#00CED1' },
+  { id: 'wizened-wizard', name: 'The Wizened Wizard', avatar: '/images/steven.png', color: '#9370DB' },
+  { id: 'jerry-garcia', name: 'Jerry Garcia', avatar: '/images/jerry.png', color: '#FF6347' },
+  { id: 'easy-levi', name: 'Easy Rider Levi', avatar: '/images/levi.png', color: '#4682B4' },
+  { id: 'fuzz-maestro', name: 'Fuzz Maestro', avatar: '/images/fuzz.png', color: '#FF8C00' }
+];
 
 // Check if logged in
 function isLoggedIn() {
@@ -69,7 +67,7 @@ function isLoggedIn() {
 // Get logged in user
 function getLoggedInUser() {
   const userId = localStorage.getItem('loggedInUserId');
-  return USERS.find(u => u.id === userId) || null;
+  return window.USERS.find(u => u.id === userId) || null;
 }
 
 // Show login popup
@@ -100,7 +98,7 @@ function showLoginPopup() {
       <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 0.95rem;">Click your icon to login</p>
       
       <div id="userIconGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; margin-bottom: 20px;">
-        ${USERS.map(user => `
+        ${window.USERS.map(user => `
           <div class="login-user-card" data-user="${user.id}" onclick="selectUserForLogin('${user.id}', '${user.name}', '${user.color}')">
             <img src="${user.avatar}" alt="${user.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto; display: block; border: 4px solid ${user.color}; cursor: pointer; transition: all 0.3s ease; touch-action: manipulation;">
             <div style="text-align: center; font-size: 0.85rem; margin-top: 8px; font-weight: 600; color: #2c3e50; line-height: 1.2;">${user.name.split(' ').slice(-1)}</div>
