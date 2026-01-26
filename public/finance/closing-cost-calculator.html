@@ -89,7 +89,7 @@
       .total-row:last-child { border-bottom: none; font-size: 1.4rem; font-weight: 700; color: var(--primary); }
     </style>
   </head>
-  <body>
+  <body data-calculator="closing-cost">
     <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
     <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
 
@@ -404,6 +404,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="js/calculator-pills.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const calc = new CalculationsEngine({
@@ -511,6 +512,7 @@
         updateTotals();
       });
     </script>
+  <script src="/shared/finance-auth-guard.js"></script>
   </body>
 </html>
 

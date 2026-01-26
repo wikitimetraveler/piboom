@@ -7,12 +7,27 @@ let cachedToken = null;
 let tokenExpiresAt = 0;
 let inflightRequest = null;
 
+const ENV_KEYS = {
+  username: ['ENCOMPASS_USERNAME', 'username'],
+  password: ['ENCOMPASS_PASSWORD', 'password'],
+  clientId: ['ENCOMPASS_CLIENT_ID', 'clientId'],
+  clientSecret: ['ENCOMPASS_CLIENT_SECRET', 'clientSecret'],
+};
+
+function readEnv(keys = []) {
+  for (const key of keys) {
+    const value = process.env[key];
+    if (value) return value;
+  }
+  return undefined;
+}
+
 function collectEnvConfig() {
   return {
-    username: process.env.ENCOMPASS_USERNAME,
-    password: process.env.ENCOMPASS_PASSWORD,
-    clientId: process.env.ENCOMPASS_CLIENT_ID,
-    clientSecret: process.env.ENCOMPASS_CLIENT_SECRET,
+    username: readEnv(ENV_KEYS.username),
+    password: readEnv(ENV_KEYS.password),
+    clientId: readEnv(ENV_KEYS.clientId),
+    clientSecret: readEnv(ENV_KEYS.clientSecret),
     oauthUrl: process.env.ENCOMPASS_OAUTH_URL || DEFAULT_OAUTH_URL,
   };
 }
@@ -41,7 +56,7 @@ async function requestToken() {
   if (missing && missing.length) {
     throw new Error(
       `Missing Encompass credentials: ${missing
-        .map((key) => `process.env.${key}`)
+        .map((key) => `process.env.${ENV_KEYS[key]?.[0] || key}`)
         .join(', ')}`,
     );
   }

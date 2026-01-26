@@ -133,6 +133,46 @@
             color: var(--primary-blue) !important;
         }
 
+        /* Tool switcher pills */
+        .tool-pills {
+            background: var(--white);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tool-pills .nav {
+            flex-wrap: wrap;
+        }
+
+        .tool-pills .nav-link {
+            border: 1px solid var(--border-light);
+            border-radius: 999px;
+            font-weight: 600;
+            color: var(--text-dark);
+            background: var(--background-light);
+            padding: 0.4rem 0.95rem;
+            margin: 0.2rem 0.35rem 0.2rem 0;
+            transition: all 0.2s ease;
+        }
+
+        .tool-pills .nav-link:hover {
+            background: var(--ice-light);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            box-shadow: var(--shadow-sm);
+            transform: translateY(-1px);
+        }
+
+        .tool-pills .nav-link.active {
+            background: var(--primary-blue);
+            border-color: var(--primary-blue);
+            color: #fff;
+            box-shadow: var(--shadow-md);
+        }
+
         /* Voice Control Button */
         .voice-control {
             position: fixed;
@@ -601,6 +641,21 @@
 
     <div class="main-content">
         <div class="container">
+            <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
+                <div class="d-flex align-items-center mb-2 mb-lg-0 text-muted">
+                    <i class="bi-grid-3x3-gap-fill text-primary mr-2"></i>
+                    <span class="font-weight-bold">Switch tools</span>
+                </div>
+                <ul class="nav nav-pills" id="toolPillNav">
+                    <li class="nav-item"><a class="nav-link" href="tool2.html"><i class="bi-code-slash mr-1"></i>Parser</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool3.html"><i class="bi-globe mr-1"></i>Mashup</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool4.html"><i class="bi-gear mr-1"></i>Automator</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool5.html"><i class="bi-rulers mr-1"></i>Ruler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool6.html"><i class="bi-arrow-repeat mr-1"></i>Transformer</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool8.html"><i class="bi-magic mr-1"></i>Alchemist</a></li>
+                </ul>
+            </div>
+
             <!-- XML Input Tool Card -->
             <div class="tool-card fade-in">
                 <h3>
@@ -949,7 +1004,21 @@
         // Initialize particles on page load
         document.addEventListener('DOMContentLoaded', function() {
             createParticles();
+            setActiveToolPill();
         });
+
+        // Highlight the current tool in the pill bar
+        function setActiveToolPill() {
+            const current = window.location.pathname.split('/').pop();
+            const links = document.querySelectorAll('#toolPillNav .nav-link');
+            links.forEach(link => {
+                const target = (link.getAttribute('href') || '').split('/').pop();
+                if (target === current) {
+                    link.classList.add('active');
+                    link.setAttribute('aria-current', 'page');
+                }
+            });
+        }
 
         // Utility Functions
         function scrollToGuide() {
@@ -1017,5 +1086,6 @@
         // Make voice controller globally accessible for debugging
         window.voiceController = voiceController;
     </script>
-</body>
+  <script src="/shared/finance-auth-guard.js"></script>
+  </body>
 </html>

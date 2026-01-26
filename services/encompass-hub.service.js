@@ -5,6 +5,8 @@ import {
 } from './loan-analytics.service.js';
 
 const API_BASE_URL = process.env.ENCOMPASS_API_BASE || 'https://api.elliemae.com/encompass/v1';
+const API_SERVER = API_BASE_URL.replace(/\/encompass\/v\d+\/?$/i, '');
+const API_V3_BASE = `${API_SERVER}/encompass/v3`;
 const DEFAULT_LIMIT = Number(process.env.ENCOMPASS_PIPELINE_LIMIT || 50);
 
 const PIPELINE_FIELDS = [
@@ -621,6 +623,70 @@ export async function fetchCompanyUsers(options = {}) {
   const rawUsers = Array.isArray(response.data) ? response.data : response.data?.items || [];
   const normalized = rawUsers.map(normalizeUserProfile);
   return filterUsersList(normalized, { search, enabled, personaId });
+}
+
+function normalizeFieldsPayload(data) {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  return (
+    data.items ||
+    data.fields ||
+    data.standardFields ||
+    data.customFields ||
+    data.fieldDefinitions ||
+    []
+  );
+}
+
+export async function fetchNativeFields() {
+  const token = await ensureEncompassToken();
+
+  try {
+    const response = await axios.get(`${API_V3_BASE}/schemas/loan/standardFields`, {
+      params: { start: 0, limit: 10000 },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    const items = normalizeFieldsPayload(response.data);
+    return { count: items.length, items };
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass native fields request failed', {
+      status,
+      data,
+      message: error.message,
+    });
+    const detail = data?.message || data?.error || error.message;
+    throw new Error(`Encompass native fields ${status || 'error'}: ${detail}`);
+  }
+}
+
+export async function fetchCustomFields() {
+  const token = await ensureEncompassToken();
+
+  try {
+    const response = await axios.get(`${API_V3_BASE}/settings/loan/customFields`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+    const items = normalizeFieldsPayload(response.data);
+    return { count: items.length, items };
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass custom fields request failed', {
+      status,
+      data,
+      message: error.message,
+    });
+    const detail = data?.message || data?.error || error.message;
+    throw new Error(`Encompass custom fields ${status || 'error'}: ${detail}`);
+  }
 }
 
 function coerceNumber(value) {

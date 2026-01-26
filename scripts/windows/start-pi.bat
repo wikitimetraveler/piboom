@@ -1,4 +1,7 @@
 @echo off
+set SCRIPT_DIR=%~dp0
+cd /d "%SCRIPT_DIR%..\\.."
+
 REM Pi BOOM Audio System Startup Script for Windows
 REM This script sets up the environment for Pi mode operation
 

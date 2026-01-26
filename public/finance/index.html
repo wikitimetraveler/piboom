@@ -86,6 +86,7 @@
       vertical-align: middle;
       box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
+
   </style>
 </head>
 <body>
@@ -245,7 +246,7 @@
       <div class="card-header" id="headingEncompass">
         <h2 class="mb-0">
           <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseEncompass" aria-expanded="false" aria-controls="collapseEncompass" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-bank"></i> Encompass Tools <span class="section-count-badge">3</span>
+            <i class="bi-bank"></i> Encompass Tools <span class="section-count-badge">5</span>
             <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">AI-powered Encompass integration and automation</small>
           </button>
         </h2>
@@ -275,6 +276,22 @@
                 <h3>Encompass Users</h3>
                 <p>Browse company users, personas, and working folders via the Developer Connect directory endpoint.</p>
                 <div class="card-meta"><i class="bi-people"></i> User Directory</div>
+              </a>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="encompass-native-fields.html" class="tool-card fade-in">
+                <span class="card-icon">📋</span>
+                <h3>Native Loan Fields</h3>
+                <p>Search Encompass standard field definitions, data types, and validation metadata.</p>
+                <div class="card-meta"><i class="bi-list-columns"></i> Native Fields</div>
+              </a>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="encompass-custom-fields.html" class="tool-card fade-in">
+                <span class="card-icon">🧩</span>
+                <h3>Custom Loan Fields</h3>
+                <p>Audit custom field configurations, required flags, and active status in your Encompass instance.</p>
+                <div class="card-meta"><i class="bi-sliders"></i> Custom Fields</div>
               </a>
             </div>
           </div>
@@ -414,5 +431,6 @@ if (closeHelpBtn && helpPanel) {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="/shared/finance-auth-guard.js"></script>
 </body>
 </html>

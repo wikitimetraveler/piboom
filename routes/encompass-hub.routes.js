@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import {
   getHubStatus,
+  getCustomFields,
+  getNativeFields,
   getCompanyUsers,
   getPipeline,
   getLoan,
@@ -22,6 +24,8 @@ router.get('/analytics/ratios', getRatioAnalytics);
 router.get('/visualizations/map3d', getMapVisualization);
 router.get('/visualizations/stacked-cubes', getStackedVisualization);
 router.get('/visualizations/timeline', getTimelineVisualization);
+router.get('/native-fields', getNativeFields);
+router.get('/custom-fields', getCustomFields);
 
 export default router;
 

@@ -1,4 +1,10 @@
-import { fetchPipelineLoans, fetchLoanDetails, fetchCompanyUsers } from '../services/encompass-hub.service.js';
+import {
+  fetchPipelineLoans,
+  fetchLoanDetails,
+  fetchCompanyUsers,
+  fetchNativeFields,
+  fetchCustomFields,
+} from '../services/encompass-hub.service.js';
 import {
   ensureEncompassToken,
   getEncompassEnvStatus,
@@ -153,6 +159,32 @@ export async function getCompanyUsers(req, res) {
   }
 }
 
+export async function getNativeFields(req, res) {
+  try {
+    const payload = await fetchNativeFields();
+    return res.json(payload);
+  } catch (error) {
+    console.error('Error fetching Encompass native fields:', error.message);
+    return res.status(500).json({
+      error: 'Failed to fetch Encompass native fields',
+      details: error.message,
+    });
+  }
+}
+
+export async function getCustomFields(req, res) {
+  try {
+    const payload = await fetchCustomFields();
+    return res.json(payload);
+  } catch (error) {
+    console.error('Error fetching Encompass custom fields:', error.message);
+    return res.status(500).json({
+      error: 'Failed to fetch Encompass custom fields',
+      details: error.message,
+    });
+  }
+}
+
 export async function getLoan(req, res) {
   try {
     const { loanGuid } = req.params;
@@ -270,3 +302,4 @@ export async function getTimelineVisualization(req, res) {
     });
   }
 }
+

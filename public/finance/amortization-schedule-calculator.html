@@ -50,7 +50,7 @@
       .interest-highlight { background-color: #fff3cd !important; }
     </style>
   </head>
-  <body>
+  <body data-calculator="amortization-schedule">
     <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
     <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
 
@@ -178,6 +178,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="js/calculator-pills.js"></script>
     <script>
       let amortizationTable = null;
 
@@ -323,6 +324,7 @@
       // Initial calculation
       calculatePayment();
     </script>
+  <script src="/shared/finance-auth-guard.js"></script>
   </body>
 </html>
 
