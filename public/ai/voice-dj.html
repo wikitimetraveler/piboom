@@ -712,37 +712,54 @@ function displayResults(results, type) {
 // Speak response
 // Speak with Wolfman Dave's voice - deep, gravelly radio DJ style
 function speakResponse(text) {
+  // Clean HTML tags
+  const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+  if (typeof window.speakWithGoogle === 'function') {
+    window.speakWithGoogle(cleanText, 'en-US-Standard-D', {
+      pitch: -2,
+      speakingRate: 0.85,
+      volume: 1.0
+    }).then((success) => {
+      if (!success) {
+        speakWithBrowser(cleanText);
+      }
+    }).catch(() => speakWithBrowser(cleanText));
+    return;
+  }
+
+  speakWithBrowser(cleanText);
+}
+
+function speakWithBrowser(cleanText) {
   if ('speechSynthesis' in window) {
     // Stop any ongoing speech
     window.speechSynthesis.cancel();
-    
-    // Clean HTML tags
-    const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-    
+
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    
+
     // WOLFMAN DAVE VOICE SETTINGS - Deep, gravelly radio DJ voice
     utterance.rate = 0.85;      // Slightly slower, more dramatic
     utterance.pitch = 0.65;     // Much lower pitch - deep gravelly voice
     utterance.volume = 1.0;     // Full volume for that radio presence
-    
+
     // Try to find a deep male voice
     const voices = window.speechSynthesis.getVoices();
-    const deepVoice = voices.find(voice => 
+    const deepVoice = voices.find(voice =>
       voice.name.toLowerCase().includes('male') ||
       voice.name.toLowerCase().includes('daniel') ||
       voice.name.toLowerCase().includes('david') ||
       voice.name.toLowerCase().includes('alex')
     );
-    
+
     if (deepVoice) {
       utterance.voice = deepVoice;
       console.log('🐺 Wolfman Dave using voice:', deepVoice.name);
     }
-    
+
     // Add some wolfman attitude to the console
     console.log('🐺 Wolfman Dave says:', cleanText);
-    
+
     window.speechSynthesis.speak(utterance);
   }
 }
@@ -972,6 +989,7 @@ async function clearVoiceDJHistory() {
   }
 }
 </script>
+<script src="/shared/tts.js"></script>
 
 </body>
 </html>

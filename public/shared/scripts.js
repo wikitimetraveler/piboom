@@ -95,6 +95,40 @@ document.addEventListener('DOMContentLoaded', () => {
 // ===== UNIVERSAL GOOGLE CLOUD TTS SPEECH FUNCTION =====
 // Available to ALL pages in the app!
 let currentAudio = null; // Track currently playing audio
+let audioUnlocked = false;
+
+function initAudioUnlock() {
+  if (audioUnlocked) return;
+
+  const unlock = async () => {
+    document.removeEventListener('click', unlock, true);
+    document.removeEventListener('touchstart', unlock, true);
+    document.removeEventListener('keydown', unlock, true);
+
+    try {
+      const unlockAudio = new Audio(
+        'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA='
+      );
+      unlockAudio.volume = 0;
+      await unlockAudio.play();
+      unlockAudio.pause();
+      unlockAudio.currentTime = 0;
+      audioUnlocked = true;
+    } catch (error) {
+      console.warn('Audio unlock skipped:', error);
+    }
+  };
+
+  document.addEventListener('click', unlock, true);
+  document.addEventListener('touchstart', unlock, true);
+  document.addEventListener('keydown', unlock, true);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAudioUnlock);
+} else {
+  initAudioUnlock();
+}
 
 async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
   try {
@@ -132,7 +166,13 @@ async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
         currentAudio = null;
       };
       
-      await currentAudio.play();
+      try {
+        await currentAudio.play();
+        audioUnlocked = true;
+      } catch (playError) {
+        console.warn('Audio play blocked; user interaction required.', playError);
+        return false;
+      }
       return true;
     } else {
       // Fallback to local speech if Google TTS fails
@@ -158,11 +198,7 @@ function stopSpeech() {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
   }
-  
-  // Stop backend TTS (Pi mode)
-  fetch('/api/voice/stop-speaking', { method: 'POST' })
-    .catch(err => console.error('Failed to stop backend speech:', err));
-  
+
   console.log('🛑 All speech stopped');
 }
 

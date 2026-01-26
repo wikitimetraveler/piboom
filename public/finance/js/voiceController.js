@@ -228,6 +228,21 @@ class VoiceController {
   }
   
   speak(text) {
+    if (typeof window.speakWithGoogle === 'function') {
+      window.speakWithGoogle(text).then((success) => {
+        if (!success) {
+          this.speakWithBrowser(text);
+        }
+      }).catch(() => {
+        this.speakWithBrowser(text);
+      });
+      return;
+    }
+
+    this.speakWithBrowser(text);
+  }
+
+  speakWithBrowser(text) {
     if (this.synthesis) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.9;

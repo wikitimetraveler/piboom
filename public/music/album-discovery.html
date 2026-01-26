@@ -1067,6 +1067,7 @@ let voiceEnabled = false;
 let currentInputMode = 'band'; // 'band', 'album', 'image', or 'camera'
 let uploadedImageData = null;
 const photoLocation = { lat: null, lng: null, label: '' };
+const deviceLocation = { lat: null, lng: null };
 let cameraStream = null;
 let cameraVideo = null;
 let cameraSupported = false;
@@ -1096,6 +1097,23 @@ function resetPhotoLocation() {
   photoLocation.lat = null;
   photoLocation.lng = null;
   photoLocation.label = '';
+}
+
+function requestDeviceLocationOnLoad() {
+  if (!navigator.geolocation) {
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      deviceLocation.lat = position.coords.latitude;
+      deviceLocation.lng = position.coords.longitude;
+    },
+    () => {
+      deviceLocation.lat = null;
+      deviceLocation.lng = null;
+    }
+  );
 }
 
 function convertDMSToDD(degrees, minutes, seconds, direction) {
@@ -1158,6 +1176,14 @@ function handleVisibilityChange() {
 async function speakViaBackend(text, callback) {
   try {
     console.log('🔊 Using backend Google TTS for:', text);
+
+    if (typeof window.speakWithGoogle === 'function') {
+      const success = await window.speakWithGoogle(text, 'en-US-Standard-D', { speakingRate: 0.9 });
+      if (success) {
+        if (callback) callback();
+        return;
+      }
+    }
     
     const response = await fetch('/api/voice/speak', {
       method: 'POST',
@@ -2552,10 +2578,15 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
       });
     }
     
-    // Build location payload (EXIF first, manual fallback if image present)
+    // Build location payload (EXIF first, device fallback, manual fallback if image present)
     let locationLat = photoLocation.lat;
     let locationLng = photoLocation.lng;
     let locationLabel = photoLocation.label;
+
+    if (!locationLat && !locationLng && deviceLocation.lat && deviceLocation.lng) {
+      locationLat = deviceLocation.lat;
+      locationLng = deviceLocation.lng;
+    }
 
     if (uploadedImageData && !locationLat && !locationLng) {
       const manual = prompt('Where did you pick up this album? (store or address)', '');
@@ -3003,6 +3034,8 @@ document.addEventListener('DOMContentLoaded', function() {
       stopCamera({ silent: true });
     }
   });
+
+  requestDeviceLocationOnLoad();
   
   // Basic container initialization
   
@@ -3048,6 +3081,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="/shared/dark-mode.js"></script>
 <script src="/shared/search-history.js"></script>
 <script src="/shared/quick-actions.js"></script>
+<script src="/shared/tts.js"></script>
 <script src="/shared/voice-widget.js"></script>
 <script>
 // Initialize voice widget and search history

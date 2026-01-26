@@ -1090,6 +1090,24 @@ async function makeAssistantSpeak(text) {
         recognition.stop();
       }
     
+    if (typeof window.speakWithGoogle === 'function') {
+      const success = await window.speakWithGoogle(text, 'en-US-Standard-D', {
+        speakingRate: 0.9,
+        volume: 0.8
+      });
+
+      if (success) {
+        const estimateMs = Math.min(12000, text.length * 60 + 1200);
+        setTimeout(() => {
+          isCurrentlySpeaking = false;
+          if (wasListening && voiceEnabled && recognition) {
+            recognition.start();
+          }
+        }, estimateMs);
+        return;
+      }
+    }
+
     // First try browser TTS (works in cloud mode)
     if ('speechSynthesis' in window) {
       
@@ -1931,6 +1949,7 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <script src="/shared/user-passwords.js"></script>
+<script src="/shared/tts.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

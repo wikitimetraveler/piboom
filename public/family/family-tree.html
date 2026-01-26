@@ -622,6 +622,19 @@
     }
 
     function speak(text) {
+      if (typeof window.speakWithGoogle === 'function') {
+        window.speakWithGoogle(text, 'en-US-Standard-D', { speakingRate: 0.9 })
+          .then((success) => {
+            if (!success) speakWithBrowser(text);
+          })
+          .catch(() => speakWithBrowser(text));
+        return;
+      }
+
+      speakWithBrowser(text);
+    }
+
+    function speakWithBrowser(text) {
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = 0.9;
@@ -630,6 +643,7 @@
       }
     }
   </script>
+  <script src="/shared/tts.js"></script>
 </body>
 </html>
 

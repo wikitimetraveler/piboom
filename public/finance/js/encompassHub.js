@@ -534,6 +534,21 @@ function selectLoanByIndex(index) {
 }
 
 function speak(text) {
+  if (typeof window.speakWithGoogle === 'function') {
+    window.speakWithGoogle(text, 'en-US-Standard-D', { speakingRate: 0.95 })
+      .then((success) => {
+        if (!success) {
+          speakWithBrowser(text);
+        }
+      })
+      .catch(() => speakWithBrowser(text));
+    return;
+  }
+
+  speakWithBrowser(text);
+}
+
+function speakWithBrowser(text) {
   if (!('speechSynthesis' in window)) return;
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = 0.95;

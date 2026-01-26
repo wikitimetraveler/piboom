@@ -837,6 +837,21 @@
             }
             
             speak(text) {
+                if (typeof window.speakWithGoogle === 'function') {
+                    window.speakWithGoogle(text, 'en-US-Standard-D', { speakingRate: 0.9 })
+                        .then((success) => {
+                            if (!success) {
+                                this.speakWithBrowser(text);
+                            }
+                        })
+                        .catch(() => this.speakWithBrowser(text));
+                    return;
+                }
+
+                this.speakWithBrowser(text);
+            }
+
+            speakWithBrowser(text) {
                 if (this.synthesis) {
                     const utterance = new SpeechSynthesisUtterance(text);
                     utterance.rate = 0.9;
@@ -1026,6 +1041,7 @@
     <!-- Google API for YouTube -->
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="script.js" defer></script>
+  <script src="/shared/tts.js"></script>
   <script src="/shared/finance-auth-guard.js"></script>
   </body>
 </html>

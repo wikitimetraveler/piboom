@@ -417,6 +417,31 @@ let currentLocation = {
   longitude: null,
   locationName: null
 };
+const deviceLocation = {
+  latitude: null,
+  longitude: null
+};
+
+function requestDeviceLocationOnLoad() {
+  if (!navigator.geolocation) {
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      deviceLocation.latitude = position.coords.latitude;
+      deviceLocation.longitude = position.coords.longitude;
+      if (currentLocation.latitude == null && currentLocation.longitude == null) {
+        currentLocation.latitude = deviceLocation.latitude;
+        currentLocation.longitude = deviceLocation.longitude;
+      }
+    },
+    () => {
+      deviceLocation.latitude = null;
+      deviceLocation.longitude = null;
+    }
+  );
+}
 
 // Switch between input modes
 function switchInputMode(mode) {
@@ -472,9 +497,14 @@ function handleImageUpload(event) {
         currentLocation.longitude = convertDMSToDD(lon[0], lon[1], lon[2], lonRef);
         console.log('📍 Location from photo:', currentLocation);
       } else {
-        console.log('No GPS data in photo');
-        currentLocation.latitude = null;
-        currentLocation.longitude = null;
+        console.log('No GPS data in photo, using device fallback when available');
+        if (deviceLocation.latitude != null && deviceLocation.longitude != null) {
+          currentLocation.latitude = deviceLocation.latitude;
+          currentLocation.longitude = deviceLocation.longitude;
+        } else {
+          currentLocation.latitude = null;
+          currentLocation.longitude = null;
+        }
       }
     });
   }
@@ -606,8 +636,10 @@ function captureFromCamera() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        currentLocation.latitude = position.coords.latitude;
-        currentLocation.longitude = position.coords.longitude;
+        deviceLocation.latitude = position.coords.latitude;
+        deviceLocation.longitude = position.coords.longitude;
+        currentLocation.latitude = deviceLocation.latitude;
+        currentLocation.longitude = deviceLocation.longitude;
         console.log('📍 Location from device:', currentLocation);
       },
       (error) => {
@@ -992,6 +1024,8 @@ document.addEventListener('DOMContentLoaded', function() {
   // Default to camera mode on mobile, search on desktop
   const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
   switchInputMode(isMobile ? 'camera' : 'search');
+
+  requestDeviceLocationOnLoad();
   
   // Set footer date
   document.getElementById('dt').textContent = new Date().toLocaleDateString();

@@ -93,6 +93,21 @@
         }
         
         function speakText(text) {
+            if (typeof window.speakWithGoogle === 'function') {
+                window.speakWithGoogle(text, 'en-US-Standard-D', { speakingRate: 0.9 })
+                    .then((success) => {
+                        if (!success) {
+                            speakWithBrowser(text);
+                        }
+                    })
+                    .catch(() => speakWithBrowser(text));
+                return;
+            }
+
+            speakWithBrowser(text);
+        }
+        
+        function speakWithBrowser(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
@@ -280,6 +295,7 @@
             addResult('Page loaded, ready for voice recognition test', 'info');
         };
     </script>
+    <script src="/shared/tts.js"></script>
 </body>
 </html>
 

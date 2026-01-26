@@ -1408,6 +1408,13 @@ function isValidVoiceCommand(transcript) {
 async function speakViaBackend(text) {
   try {
     console.log('🔊 Using backend Google TTS for:', text);
+
+    if (typeof window.speakWithGoogle === 'function') {
+      const success = await window.speakWithGoogle(text, 'en-US-Standard-D', { speakingRate: 0.95 });
+      if (success) {
+        return;
+      }
+    }
     
     const response = await fetch('/api/voice/speak', {
       method: 'POST',

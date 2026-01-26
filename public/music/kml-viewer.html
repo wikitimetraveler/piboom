@@ -1341,28 +1341,46 @@
 
     function speak(text) {
       return new Promise((resolve) => {
-        // Cancel any ongoing speech
-        window.speechSynthesis.cancel();
-        
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        
-        utterance.onend = () => {
-          resolve();
-        };
-        
-        utterance.onerror = () => {
-          resolve();
-        };
-        
-        window.speechSynthesis.speak(utterance);
+        if (typeof window.speakWithGoogle === 'function') {
+          window.speakWithGoogle(text).then((success) => {
+            if (success) {
+              resolve();
+            } else {
+              speakWithBrowser(text, resolve);
+            }
+          }).catch(() => speakWithBrowser(text, resolve));
+          return;
+        }
+
+        speakWithBrowser(text, resolve);
       });
+    }
+
+    function speakWithBrowser(text, done) {
+      if (!('speechSynthesis' in window)) {
+        done();
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      utterance.onend = () => done();
+      utterance.onerror = () => done();
+
+      window.speechSynthesis.speak(utterance);
     }
 
     // Stop speaking function
     function stopSpeaking() {
+      if (typeof window.stopSpeech === 'function') {
+        window.stopSpeech();
+        return;
+      }
       window.speechSynthesis.cancel();
       console.log('Speech stopped');
     }
@@ -1461,6 +1479,7 @@
       loadGoogleMapsAPI();
     });
   </script>
+  <script src="/shared/tts.js"></script>
 
   <!-- Attribution Footer -->
   <footer style="background: rgba(255, 255, 255, 0.95); padding: 2rem 0; margin-top: 4rem; border-top: 2px solid rgba(135, 206, 250, 0.3); backdrop-filter: blur(10px);">

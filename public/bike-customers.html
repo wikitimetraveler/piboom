@@ -255,6 +255,17 @@
 
     function speak(text) {
       if (!text) return;
+      if (typeof window.speakWithGoogle === 'function') {
+        window.speakWithGoogle(text).then((success) => {
+          if (!success) speakWithBrowser(text);
+        }).catch(() => speakWithBrowser(text));
+        return;
+      }
+
+      speakWithBrowser(text);
+    }
+    function speakWithBrowser(text) {
+      if (!('speechSynthesis' in window)) return;
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'en-US';
       speechSynthesis.cancel();
@@ -301,6 +312,7 @@
       setActivePill();
     });
   </script>
+  <script src="/shared/tts.js"></script>
 </body>
 </html>
 
