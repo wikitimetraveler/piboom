@@ -1,6 +1,7 @@
 const resultsMeta = document.getElementById('resultsMeta');
 const statusChip = document.getElementById('statusChip');
 const refreshBtn = document.getElementById('refreshBtn');
+const exportBtn = document.getElementById('exportBtn');
 const gridRoot = document.getElementById('fieldsGrid');
 
 const filters = {
@@ -252,6 +253,18 @@ function setGridRows(rows) {
   }
 }
 
+function exportGrid() {
+  if (!gridApi || typeof gridApi.exportDataAsCsv !== 'function') {
+    console.warn('CSV export unavailable for custom fields grid');
+    return;
+  }
+
+  gridApi.exportDataAsCsv({
+    fileName: 'encompass-custom-fields.csv',
+    onlyFiltered: true,
+  });
+}
+
 async function loadFields() {
   try {
     setStatus('Loading', 'ok', 'bi-clock-history');
@@ -289,6 +302,11 @@ async function loadFields() {
 refreshBtn.addEventListener('click', (event) => {
   event.preventDefault();
   loadFields();
+});
+
+exportBtn?.addEventListener('click', (event) => {
+  event.preventDefault();
+  exportGrid();
 });
 
 wireFilterEvents();
