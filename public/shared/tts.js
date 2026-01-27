@@ -16,9 +16,9 @@
     if (audioUnlocked) return;
 
     const unlock = async () => {
-      audioUnlocked = true;
       document.removeEventListener('click', unlock, true);
       document.removeEventListener('touchstart', unlock, true);
+      document.removeEventListener('pointerdown', unlock, true);
       document.removeEventListener('keydown', unlock, true);
 
       try {
@@ -29,6 +29,7 @@
         await unlockAudio.play();
         unlockAudio.pause();
         unlockAudio.currentTime = 0;
+        audioUnlocked = true;
       } catch (error) {
         console.warn('Audio unlock skipped:', error);
       }
@@ -36,6 +37,7 @@
 
     document.addEventListener('click', unlock, true);
     document.addEventListener('touchstart', unlock, true);
+    document.addEventListener('pointerdown', unlock, true);
     document.addEventListener('keydown', unlock, true);
   }
 
@@ -77,19 +79,20 @@
           currentAudio = null;
         };
 
-        if (!audioUnlocked) {
-          console.warn('Audio not unlocked yet; user interaction required.');
-          return false;
+        try {
+          await currentAudio.play();
+          audioUnlocked = true;
+          return true;
+        } catch (playError) {
+          console.warn('Audio play blocked; user interaction required.', playError);
+          return speakWithBrowser(text, options);
         }
-
-        await currentAudio.play();
-        return true;
       }
 
-      return false;
+      return speakWithBrowser(text, options);
     } catch (error) {
       console.error('Speech error:', error);
-      return false;
+      return speakWithBrowser(text, options);
     }
   }
 
@@ -121,6 +124,25 @@
     }
 
     return new Blob(byteArrays, { type: contentType });
+  }
+
+  function speakWithBrowser(text, options = {}) {
+    if (!('speechSynthesis' in window)) {
+      return false;
+    }
+
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = options.speakingRate || 1.0;
+      utterance.pitch = typeof options.pitch === 'number' ? options.pitch : 1.0;
+      utterance.volume = typeof options.volume === 'number' ? options.volume : 0.8;
+      window.speechSynthesis.speak(utterance);
+      return true;
+    } catch (error) {
+      console.error('Browser speech error:', error);
+      return false;
+    }
   }
 
   if (!window.speakWithGoogle) {
