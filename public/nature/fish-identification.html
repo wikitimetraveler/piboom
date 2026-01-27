@@ -58,6 +58,42 @@
     </div>
 
     <div class="row">
+      <div class="col-lg-8 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-plus-circle"></i> Add a Catch</h5>
+            <div class="form-group">
+              <label for="catchSpecies">Species</label>
+              <input id="catchSpecies" class="form-control" placeholder="e.g., Striped Bass">
+            </div>
+            <div class="form-group">
+              <label for="catchNotes">Notes</label>
+              <textarea id="catchNotes" class="form-control" rows="2" placeholder="Size, bait, conditions, handling notes..."></textarea>
+            </div>
+            <div class="form-group">
+              <label for="catchLabel">Location Label</label>
+              <input id="catchLabel" class="form-control" placeholder="e.g., Santa Cruz Jetty">
+            </div>
+            <div class="form-row">
+              <div class="col">
+                <input id="catchLat" class="form-control" placeholder="Latitude" readonly>
+              </div>
+              <div class="col">
+                <input id="catchLng" class="form-control" placeholder="Longitude" readonly>
+              </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mt-3">
+              <button class="btn btn-outline-primary mr-2" onclick="useMyLocation()"><i class="bi-geo-alt"></i> Use My Location</button>
+              <button class="btn btn-success" onclick="saveCatch()"><i class="bi-check-circle"></i> Save Catch</button>
+            </div>
+            <small class="text-muted d-block mt-2">Tip: tap the map to set a precise location.</small>
+            <div id="saveStatus" class="text-muted mt-2" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
       <div class="col-lg-7 mb-4">
         <div class="card card-pane">
           <div class="card-body">
@@ -126,6 +162,7 @@
 
   </div>
 
+  <script src="/shared/tts.js"></script>
   <script>
     let map;
     let catches = [];
@@ -136,6 +173,7 @@
     let cameraStream = null;
     let mapStatusTimer = null;
     let selectedCatchId = null;
+    let lastAIResponse = '';
 
     function appendMessage(text, type = 'ai') {
       const chat = document.getElementById('chatArea');
@@ -331,6 +369,48 @@
       map.panTo(latLng);
       document.getElementById('catchLat').value = latLng.lat().toFixed(6);
       document.getElementById('catchLng').value = latLng.lng().toFixed(6);
+      const labelInput = document.getElementById('catchLabel');
+      if (labelInput && !labelInput.value) {
+        labelInput.value = `${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}`;
+      }
+    }
+
+    function requestDeviceLocationNow() {
+      return new Promise((resolve) => {
+        if (!navigator.geolocation) {
+          resolve(null);
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            });
+          },
+          () => resolve(null),
+          { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+        );
+      });
+    }
+
+    async function useMyLocation() {
+      const coords = await requestDeviceLocationNow();
+      if (!coords) {
+        setSaveStatus('Unable to get your location. Check permissions.', 'error');
+        return;
+      }
+      if (map && window.google && google.maps) {
+        const latLng = new google.maps.LatLng(coords.lat, coords.lng);
+        setNewCatchLocation(latLng);
+      } else {
+        document.getElementById('catchLat').value = coords.lat.toFixed(6);
+        document.getElementById('catchLng').value = coords.lng.toFixed(6);
+      }
+      if (!document.getElementById('catchLabel').value) {
+        document.getElementById('catchLabel').value = `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
+      }
     }
 
     async function fetchCatches() {
@@ -475,10 +555,10 @@
       }
 
       try {
-        const res = await fetch(`/api/fish-catches/${encodeURIComponent(c.id)}?userId=${encodeURIComponent(currentUser.id)}`, {
+        const res = await fetch(`/api/fish-catches/${encodeURIComponent(c.id)}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ species, notes, latitude, longitude, locationLabel: label || null })
+          body: JSON.stringify({ userId: currentUser.id, species, notes, latitude, longitude, locationLabel: label || null })
         });
         const data = await res.json();
         if (data.success) {
@@ -501,13 +581,26 @@
       }
       const species = document.getElementById('catchSpecies').value.trim();
       const notes = document.getElementById('catchNotes').value.trim();
-      const lat = parseFloat(document.getElementById('catchLat').value);
-      const lng = parseFloat(document.getElementById('catchLng').value);
+      let lat = parseFloat(document.getElementById('catchLat').value);
+      let lng = parseFloat(document.getElementById('catchLng').value);
       const label = document.getElementById('catchLabel').value.trim();
 
       if (!species) {
         setSaveStatus('Species is required.', 'error');
         return;
+      }
+
+      if (!isFinite(lat) || !isFinite(lng)) {
+        const coords = await requestDeviceLocationNow();
+        if (coords) {
+          lat = coords.lat;
+          lng = coords.lng;
+          document.getElementById('catchLat').value = lat.toFixed(6);
+          document.getElementById('catchLng').value = lng.toFixed(6);
+          if (!document.getElementById('catchLabel').value) {
+            document.getElementById('catchLabel').value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          }
+        }
       }
       if (!isFinite(lat) || !isFinite(lng)) {
         setSaveStatus('Click the map to set latitude/longitude.', 'error');
@@ -559,6 +652,30 @@
       setFishAssistant();
       loadGoogleMaps();
     });
+
+    function speak(text) {
+      if (!text) return;
+      if (typeof window.speakWithGoogle === 'function') {
+        window.speakWithGoogle(text).then((success) => {
+          if (!success) speakWithBrowser(text);
+        }).catch(() => speakWithBrowser(text));
+        return;
+      }
+
+      speakWithBrowser(text);
+    }
+
+    function speakWithBrowser(text) {
+      if (!('speechSynthesis' in window)) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    }
+
+    function speakLast() {
+      speak(lastAIResponse);
+    }
   </script>
 </body>
 </html>
