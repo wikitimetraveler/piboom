@@ -483,6 +483,30 @@
       color: #2c3e50;
       margin-bottom: 10px;
       line-height: 1.4;
+      position: relative;
+    }
+
+    .poster-section::after {
+      content: attr(data-hint);
+      position: absolute;
+      left: 12px;
+      bottom: calc(100% + 6px);
+      background: rgba(44, 62, 80, 0.92);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(4px);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 2;
+    }
+
+    .poster-section:hover::after {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .poster-section h6 {
@@ -723,6 +747,13 @@
           <small class="form-text text-muted">Capture things like "Former owner wrote 'Listening Party 1974' on back" or "Bought at yard sale, has price sticker"</small>
         </div>
         <div class="form-group">
+          <label><i class="bi-geo-alt"></i> Location</label>
+          <input type="text" id="editLocationName" class="form-control" placeholder="Search for a place or address">
+          <input type="hidden" id="editLocationLat">
+          <input type="hidden" id="editLocationLng">
+          <small class="form-text text-muted">Select a location to store coordinates.</small>
+        </div>
+        <div class="form-group">
           <label>Genre</label>
           <input type="text" id="editGenre" class="form-control" placeholder="Rock, Jazz, Hip Hop, etc.">
         </div>
@@ -817,6 +848,9 @@ let GOOGLE_API_KEY = null;
 let youtubeAPIReady = false;
 let youtubeInitInProgress = false;
 let youtubeApiScriptLoading = false;
+let placesApiScriptLoading = false;
+let placesApiReady = false;
+let editLocationAutocomplete = null;
 
 function loadYouTubeAPI() {
   if (!GOOGLE_API_KEY) {
@@ -889,6 +923,70 @@ async function fetchGoogleApiKey() {
   return null;
 }
 
+async function loadGooglePlacesApi() {
+  if (placesApiReady || placesApiScriptLoading) {
+    return;
+  }
+
+  const apiKey = await fetchGoogleApiKey();
+  if (!apiKey) {
+    return;
+  }
+
+  if (window.google && window.google.maps && window.google.maps.places) {
+    placesApiReady = true;
+    initEditLocationAutocomplete();
+    return;
+  }
+
+  placesApiScriptLoading = true;
+  const script = document.createElement('script');
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=Function.prototype`;
+  script.async = true;
+  script.defer = true;
+  script.onload = () => {
+    placesApiScriptLoading = false;
+    placesApiReady = true;
+    initEditLocationAutocomplete();
+  };
+  script.onerror = () => {
+    placesApiScriptLoading = false;
+    console.warn('❌ Failed to load Google Places API');
+  };
+  document.head.appendChild(script);
+}
+
+function initEditLocationAutocomplete() {
+  const input = document.getElementById('editLocationName');
+  if (!input || editLocationAutocomplete || !window.google || !google.maps || !google.maps.places) {
+    return;
+  }
+
+  try {
+    editLocationAutocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['geocode']
+    });
+
+    editLocationAutocomplete.addListener('place_changed', () => {
+      const place = editLocationAutocomplete.getPlace();
+      const label = place.formatted_address || place.name || input.value;
+      input.value = label;
+
+      if (place.geometry && place.geometry.location) {
+        document.getElementById('editLocationLat').value = place.geometry.location.lat();
+        document.getElementById('editLocationLng').value = place.geometry.location.lng();
+      }
+    });
+
+    input.addEventListener('input', () => {
+      document.getElementById('editLocationLat').value = '';
+      document.getElementById('editLocationLng').value = '';
+    });
+  } catch (error) {
+    console.warn('Google Places Autocomplete not available:', error);
+  }
+}
+
 // Load collection on page load
 document.addEventListener('DOMContentLoaded', async function() {
   // Initialize user selector
@@ -898,6 +996,7 @@ document.addEventListener('DOMContentLoaded', async function() {
   });
 
   fetchGoogleApiKey();
+  loadGooglePlacesApi();
   
   // Update header based on view mode
   updateCollectionHeader();
@@ -1248,13 +1347,13 @@ function buildAlbumPosterHtml(album) {
 
   const metaHtml = metaRows.map(row => `<div>${row}</div>`).join('');
   const storyHtml = album.story
-    ? `<div class="poster-section"><h6>Story</h6><div>${album.story}</div></div>`
+    ? `<div class="poster-section" data-hint="Story from the back of the card"><h6>Story</h6><div>${album.story}</div></div>`
     : '';
   const notesHtml = album.notes
-    ? `<div class="poster-section"><h6>Notes</h6><div>${album.notes}</div></div>`
+    ? `<div class="poster-section" data-hint="Personal notes and observations"><h6>Notes</h6><div>${album.notes}</div></div>`
     : '';
   const aiHtml = album.ai_analysis
-    ? `<div class="poster-section"><h6>AI Insights</h6><div>${formatAIAnalysis(album.ai_analysis)}</div></div>`
+    ? `<div class="poster-section" data-hint="AI insights and highlights"><h6>AI Insights</h6><div>${formatAIAnalysis(album.ai_analysis)}</div></div>`
     : '';
 
   return `
@@ -1400,6 +1499,9 @@ async function editAlbum(id) {
   document.getElementById('editAlbumId').value = id;
   document.getElementById('editNotes').value = album.notes || '';
   document.getElementById('editStory').value = album.story || '';
+  document.getElementById('editLocationName').value = album.location_label || '';
+  document.getElementById('editLocationLat').value = album.latitude ?? '';
+  document.getElementById('editLocationLng').value = album.longitude ?? '';
   document.getElementById('editGenre').value = album.genre || '';
   document.getElementById('editLabel').value = album.label || '';
   document.getElementById('editYear').value = album.year || '';
@@ -1409,6 +1511,8 @@ async function editAlbum(id) {
   // Highlight rating buttons
   updateRatingButtons(album.rating || 0);
   
+  loadGooglePlacesApi();
+  initEditLocationAutocomplete();
   $('#editModal').modal('show');
 }
 
@@ -1438,6 +1542,12 @@ async function saveAlbumEdit() {
     const id = document.getElementById('editAlbumId').value;
     const notes = document.getElementById('editNotes').value;
     const story = document.getElementById('editStory').value;
+    const locationLabelRaw = document.getElementById('editLocationName').value;
+    const locationLabel = locationLabelRaw ? locationLabelRaw.trim() : '';
+    const locationLatRaw = document.getElementById('editLocationLat').value;
+    const locationLngRaw = document.getElementById('editLocationLng').value;
+    const locationLat = locationLabel === '' ? null : (locationLatRaw ? parseFloat(locationLatRaw) : null);
+    const locationLng = locationLabel === '' ? null : (locationLngRaw ? parseFloat(locationLngRaw) : null);
     const genre = document.getElementById('editGenre').value;
     const label = document.getElementById('editLabel').value;
     const year = document.getElementById('editYear').value;
@@ -1447,7 +1557,7 @@ async function saveAlbumEdit() {
     const response = await fetch(`/api/collection/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes, story, genre, label, year, rating, valuation })
+      body: JSON.stringify({ notes, story, genre, label, year, rating, valuation, locationLabel: locationLabel || null, locationLat, locationLng })
     });
     
     const data = await response.json();

@@ -290,6 +290,30 @@
       color: #2c3e50;
       margin-bottom: 10px;
       line-height: 1.4;
+      position: relative;
+    }
+
+    .poster-section::after {
+      content: attr(data-hint);
+      position: absolute;
+      left: 12px;
+      bottom: calc(100% + 6px);
+      background: rgba(27, 94, 32, 0.9);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(4px);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+      z-index: 2;
+    }
+
+    .poster-section:hover::after {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .poster-section h6 {
@@ -701,6 +725,8 @@
         <div class="form-group">
           <label>Location Name</label>
           <input type="text" id="editLocationName" class="form-control" placeholder="e.g., Backyard, City Park...">
+          <input type="hidden" id="editLocationLat">
+          <input type="hidden" id="editLocationLng">
         </div>
       </div>
       <div class="modal-footer">
@@ -767,6 +793,38 @@ let currentTreeId = null;
 let map = null;
 let markers = [];
 let mapVisible = false;
+let editLocationAutocomplete = null;
+
+function initEditLocationAutocomplete() {
+  const input = document.getElementById('editLocationName');
+  if (!input || editLocationAutocomplete || !window.google || !google.maps || !google.maps.places) {
+    return;
+  }
+
+  try {
+    editLocationAutocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['geocode']
+    });
+
+    editLocationAutocomplete.addListener('place_changed', () => {
+      const place = editLocationAutocomplete.getPlace();
+      const label = place.formatted_address || place.name || input.value;
+      input.value = label;
+
+      if (place.geometry && place.geometry.location) {
+        document.getElementById('editLocationLat').value = place.geometry.location.lat();
+        document.getElementById('editLocationLng').value = place.geometry.location.lng();
+      }
+    });
+
+    input.addEventListener('input', () => {
+      document.getElementById('editLocationLat').value = '';
+      document.getElementById('editLocationLng').value = '';
+    });
+  } catch (error) {
+    console.warn('Google Places Autocomplete not available:', error);
+  }
+}
 
 // Load collection on page load
 document.addEventListener('DOMContentLoaded', async function() {
@@ -1024,22 +1082,22 @@ function buildTreePosterHtml(tree) {
 
   const metaHtml = metaRows.map(row => `<div>${row}</div>`).join('');
   const featuresHtml = tree.features && tree.features.length
-    ? `<div class="poster-section"><h6>Features</h6><div>${tree.features.join(', ')}</div></div>`
+    ? `<div class="poster-section" data-hint="Key features from the card"><h6>Features</h6><div>${tree.features.join(', ')}</div></div>`
     : '';
   const descriptionHtml = tree.description
-    ? `<div class="poster-section"><h6>Description</h6><div>${tree.description}</div></div>`
+    ? `<div class="poster-section" data-hint="Card description"><h6>Description</h6><div>${tree.description}</div></div>`
     : '';
   const funFactsHtml = tree.fun_facts
-    ? `<div class="poster-section"><h6>Fun Facts</h6><div>${tree.fun_facts}</div></div>`
+    ? `<div class="poster-section" data-hint="Highlights and fun facts"><h6>Fun Facts</h6><div>${tree.fun_facts}</div></div>`
     : '';
   const conservationHtml = tree.conservation_status
-    ? `<div class="poster-section"><h6>Conservation</h6><div>${tree.conservation_status}</div></div>`
+    ? `<div class="poster-section" data-hint="Conservation status"><h6>Conservation</h6><div>${tree.conservation_status}</div></div>`
     : '';
   const aiHtml = tree.ai_analysis
-    ? `<div class="poster-section"><h6>AI Insights</h6><div>${tree.ai_analysis}</div></div>`
+    ? `<div class="poster-section" data-hint="AI insights and highlights"><h6>AI Insights</h6><div>${tree.ai_analysis}</div></div>`
     : '';
   const notesHtml = tree.notes
-    ? `<div class="poster-section"><h6>Notes</h6><div>${tree.notes}</div></div>`
+    ? `<div class="poster-section" data-hint="Personal notes and observations"><h6>Notes</h6><div>${tree.notes}</div></div>`
     : '';
 
   return `
@@ -1213,7 +1271,10 @@ async function editTree(id) {
   document.getElementById('editRating').value = tree.rating || '';
   document.getElementById('editNotes').value = tree.notes || '';
   document.getElementById('editLocationName').value = tree.location_name || '';
+  document.getElementById('editLocationLat').value = tree.latitude ?? '';
+  document.getElementById('editLocationLng').value = tree.longitude ?? '';
   
+  initEditLocationAutocomplete();
   $('#editModal').modal('show');
 }
 
@@ -1222,12 +1283,17 @@ async function saveTreeEdit() {
   try {
     const rating = document.getElementById('editRating').value ? parseInt(document.getElementById('editRating').value) : null;
     const notes = document.getElementById('editNotes').value;
-    const locationName = document.getElementById('editLocationName').value;
+    const locationNameRaw = document.getElementById('editLocationName').value;
+    const locationName = locationNameRaw ? locationNameRaw.trim() : '';
+    const locationLatRaw = document.getElementById('editLocationLat').value;
+    const locationLngRaw = document.getElementById('editLocationLng').value;
+    const latitude = locationName === '' ? null : (locationLatRaw ? parseFloat(locationLatRaw) : null);
+    const longitude = locationName === '' ? null : (locationLngRaw ? parseFloat(locationLngRaw) : null);
     
     const response = await fetch(`/api/tree-collection/${currentTreeId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes, rating, locationName })
+      body: JSON.stringify({ notes, rating, locationName: locationName || null, latitude, longitude })
     });
     
     const data = await response.json();
@@ -1472,9 +1538,12 @@ function toggleAIAnalysis(element) {
     
     if (data.apiKey) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=Function.prototype`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places&callback=Function.prototype`;
       script.async = true;
       script.defer = true;
+      script.onload = () => {
+        initEditLocationAutocomplete();
+      };
       document.head.appendChild(script);
       console.log('🗺️ Google Maps API loading with key from server');
     } else {

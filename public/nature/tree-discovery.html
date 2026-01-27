@@ -439,8 +439,34 @@ function requestDeviceLocationOnLoad() {
     () => {
       deviceLocation.latitude = null;
       deviceLocation.longitude = null;
-    }
+    },
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
   );
+}
+
+function requestDeviceLocationNow() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        deviceLocation.latitude = position.coords.latitude;
+        deviceLocation.longitude = position.coords.longitude;
+        if (currentLocation.latitude == null && currentLocation.longitude == null) {
+          currentLocation.latitude = deviceLocation.latitude;
+          currentLocation.longitude = deviceLocation.longitude;
+        }
+        resolve(true);
+      },
+      () => {
+        resolve(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    );
+  });
 }
 
 // Switch between input modes
@@ -935,6 +961,17 @@ async function saveToCollection() {
       return;
     }
     
+    if (currentLocation.latitude == null && currentLocation.longitude == null) {
+      await requestDeviceLocationNow();
+    }
+
+    if (currentLocation.latitude == null && currentLocation.longitude == null) {
+      if (deviceLocation.latitude != null && deviceLocation.longitude != null) {
+        currentLocation.latitude = deviceLocation.latitude;
+        currentLocation.longitude = deviceLocation.longitude;
+      }
+    }
+
     // Prepare tree data for collection
     const treeData = {
       treeName: currentTreeData.treeName,

@@ -1116,6 +1116,27 @@ function requestDeviceLocationOnLoad() {
   );
 }
 
+function requestDeviceLocationNow() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      resolve(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        deviceLocation.lat = position.coords.latitude;
+        deviceLocation.lng = position.coords.longitude;
+        resolve(true);
+      },
+      () => {
+        resolve(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    );
+  });
+}
+
 function convertDMSToDD(degrees, minutes, seconds, direction) {
   let dd = degrees + minutes / 60 + seconds / 3600;
   if (direction === 'S' || direction === 'W') {
@@ -2582,6 +2603,10 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
     let locationLat = photoLocation.lat;
     let locationLng = photoLocation.lng;
     let locationLabel = photoLocation.label;
+
+    if (!locationLat && !locationLng && !deviceLocation.lat && !deviceLocation.lng) {
+      await requestDeviceLocationNow();
+    }
 
     if (!locationLat && !locationLng && deviceLocation.lat && deviceLocation.lng) {
       locationLat = deviceLocation.lat;

@@ -121,6 +121,7 @@ function initAudioUnlock() {
 
   document.addEventListener('click', unlock, true);
   document.addEventListener('touchstart', unlock, true);
+  document.addEventListener('pointerdown', unlock, true);
   document.addEventListener('keydown', unlock, true);
 }
 
@@ -169,19 +170,19 @@ async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
       try {
         await currentAudio.play();
         audioUnlocked = true;
+        return true;
       } catch (playError) {
         console.warn('Audio play blocked; user interaction required.', playError);
-        return false;
+        return speakWithBrowser(text, options);
       }
-      return true;
     } else {
       // Fallback to local speech if Google TTS fails
       console.warn('Google TTS not available, using fallback');
-      return false;
+      return speakWithBrowser(text, options);
     }
   } catch (error) {
     console.error('Speech error:', error);
-    return false;
+    return speakWithBrowser(text, options);
   }
 }
 
@@ -219,6 +220,25 @@ function base64ToBlob(base64, contentType) {
   }
   
   return new Blob(byteArrays, { type: contentType });
+}
+
+function speakWithBrowser(text, options = {}) {
+  if (!('speechSynthesis' in window)) {
+    return false;
+  }
+
+  try {
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = options.speakingRate || 1.0;
+    utterance.pitch = typeof options.pitch === 'number' ? options.pitch : 1.0;
+    utterance.volume = typeof options.volume === 'number' ? options.volume : 0.8;
+    window.speechSynthesis.speak(utterance);
+    return true;
+  } catch (error) {
+    console.error('Browser speech error:', error);
+    return false;
+  }
 }
 
 // Make functions globally available

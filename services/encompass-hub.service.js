@@ -650,6 +650,30 @@ export async function fetchNativeFields() {
       },
     });
     const items = normalizeFieldsPayload(response.data);
+    const hasBaseLoanAmount = items.some((item) => (
+      item?.jsonPath === '$.baseLoanAmount' ||
+      item?.contractPath === 'loan.baseLoanAmount' ||
+      item?.id === '2' ||
+      item?.fieldId === '2'
+    ));
+    if (!hasBaseLoanAmount) {
+      items.push({
+        id: '2',
+        fieldId: '2',
+        fieldName: 'baseLoanAmount',
+        description: 'Trans Details Total Loan Amt (w/ MIP/FF)',
+        format: 'DECIMAL_2',
+        readOnly: true,
+        fieldLock: true,
+        nullable: true,
+        category: 'Common',
+        dataType: 'Decimal',
+        maxLength: 14,
+        multiInstance: false,
+        contractPath: 'loan.baseLoanAmount',
+        jsonPath: '$.baseLoanAmount',
+      });
+    }
     return { count: items.length, items };
   } catch (error) {
     const status = error.response?.status;
