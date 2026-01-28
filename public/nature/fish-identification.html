@@ -18,6 +18,7 @@
     .chat-area { height: 320px; overflow-y: auto; background: #f8fbff; border: 1px solid #e5eef5; border-radius: 12px; padding: 12px; }
     .badge-assistant { background: #0d6efd; }
     #fishMap { width: 100%; height: 420px; border-radius: 12px; border: 1px solid #e5eef5; }
+    .pac-container { z-index: 20000; }
   </style>
 </head>
 <body>
@@ -74,12 +75,36 @@
               <label for="catchLabel">Location Label</label>
               <input id="catchLabel" class="form-control" placeholder="e.g., Santa Cruz Jetty">
             </div>
+            <div class="form-group">
+              <label><i class="bi-geo-alt"></i> Address Entry</label>
+              <input type="text" id="catchStreet" class="form-control mb-2" placeholder="Start typing an address">
+              <div class="form-row">
+                <div class="col">
+                  <input id="catchCity" class="form-control" placeholder="City">
+                </div>
+                <div class="col-3">
+                  <input id="catchState" class="form-control" placeholder="CA" maxlength="2">
+                </div>
+                <div class="col-3">
+                  <input id="catchZip" class="form-control" placeholder="Zip">
+                </div>
+              </div>
+              <input id="catchCounty" class="form-control mt-2" placeholder="County">
+            </div>
             <div class="form-row">
               <div class="col">
                 <input id="catchLat" class="form-control" placeholder="Latitude" readonly>
               </div>
               <div class="col">
                 <input id="catchLng" class="form-control" placeholder="Longitude" readonly>
+              </div>
+            </div>
+            <div class="form-row mt-2">
+              <div class="col">
+                <input id="catchAddressLat" class="form-control" placeholder="Address lat" readonly>
+              </div>
+              <div class="col">
+                <input id="catchAddressLng" class="form-control" placeholder="Address lng" readonly>
               </div>
             </div>
             <div class="d-flex flex-wrap gap-2 mt-3">
@@ -169,6 +194,7 @@
     let markers = [];
     let markerInfos = [];
     let newCatchMarker = null;
+    let catchAddressAutocomplete = null;
     let uploadedImageData = null;
     let cameraStream = null;
     let mapStatusTimer = null;
@@ -324,7 +350,7 @@
         return new Promise(resolve => {
           window.initFishMap = () => { initMap(); resolve(); };
           const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initFishMap`;
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initFishMap`;
           script.async = true;
           script.defer = true;
           document.head.appendChild(script);
@@ -352,6 +378,89 @@
 
       fetchCatches();
       map.__fishIcon = fishIcon;
+      initCatchAddressAutocomplete();
+    }
+
+    function buildCatchAddressLabel() {
+      const street = document.getElementById('catchStreet')?.value?.trim() || '';
+      const city = document.getElementById('catchCity')?.value?.trim() || '';
+      const state = document.getElementById('catchState')?.value?.trim() || '';
+      const zip = document.getElementById('catchZip')?.value?.trim() || '';
+      return [street, city, state, zip].filter(Boolean).join(', ');
+    }
+
+    function fillCatchAddressFieldsFromPlace(place) {
+      let city = '';
+      let state = '';
+      let county = '';
+      let zip = '';
+      if (Array.isArray(place.address_components)) {
+        place.address_components.forEach(component => {
+          const types = component.types || [];
+          if (types.includes('locality')) {
+            city = component.long_name;
+          } else if (types.includes('administrative_area_level_1')) {
+            state = component.short_name;
+          } else if (types.includes('administrative_area_level_2')) {
+            county = component.long_name.replace(/ County$/, '');
+          } else if (types.includes('postal_code')) {
+            zip = component.long_name;
+          }
+        });
+      }
+
+      const streetInput = document.getElementById('catchStreet');
+      const label = place.formatted_address || place.name || streetInput?.value || '';
+      if (streetInput) streetInput.value = label;
+      const cityInput = document.getElementById('catchCity');
+      if (cityInput) cityInput.value = city;
+      const stateInput = document.getElementById('catchState');
+      if (stateInput) stateInput.value = state;
+      const countyInput = document.getElementById('catchCounty');
+      if (countyInput) countyInput.value = county;
+      const zipInput = document.getElementById('catchZip');
+      if (zipInput) zipInput.value = zip;
+
+      if (place.geometry && place.geometry.location) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        document.getElementById('catchAddressLat').value = lat;
+        document.getElementById('catchAddressLng').value = lng;
+        document.getElementById('catchLat').value = lat.toFixed(6);
+        document.getElementById('catchLng').value = lng.toFixed(6);
+      }
+
+      if (label) {
+        document.getElementById('catchLabel').value = label;
+      }
+    }
+
+    function initCatchAddressAutocomplete() {
+      const input = document.getElementById('catchStreet');
+      if (!input || catchAddressAutocomplete || !window.google || !google.maps || !google.maps.places) {
+        return;
+      }
+      try {
+        catchAddressAutocomplete = new google.maps.places.Autocomplete(input, {
+          types: ['address'],
+          componentRestrictions: { country: 'us' }
+        });
+        catchAddressAutocomplete.addListener('place_changed', () => {
+          const place = catchAddressAutocomplete.getPlace();
+          fillCatchAddressFieldsFromPlace(place);
+        });
+        input.addEventListener('input', () => {
+          const latInput = document.getElementById('catchAddressLat');
+          const lngInput = document.getElementById('catchAddressLng');
+          if (latInput) latInput.value = '';
+          if (lngInput) lngInput.value = '';
+          document.getElementById('catchLat').value = '';
+          document.getElementById('catchLng').value = '';
+        });
+      } catch (error) {
+        console.warn('Google Places Autocomplete not available:', error);
+        input.placeholder = 'Enter address manually (autocomplete disabled)';
+      }
     }
 
     function setNewCatchLocation(latLng) {
@@ -369,6 +478,8 @@
       map.panTo(latLng);
       document.getElementById('catchLat').value = latLng.lat().toFixed(6);
       document.getElementById('catchLng').value = latLng.lng().toFixed(6);
+      document.getElementById('catchAddressLat').value = latLng.lat();
+      document.getElementById('catchAddressLng').value = latLng.lng();
       const labelInput = document.getElementById('catchLabel');
       if (labelInput && !labelInput.value) {
         labelInput.value = `${latLng.lat().toFixed(5)}, ${latLng.lng().toFixed(5)}`;
@@ -407,6 +518,8 @@
       } else {
         document.getElementById('catchLat').value = coords.lat.toFixed(6);
         document.getElementById('catchLng').value = coords.lng.toFixed(6);
+        document.getElementById('catchAddressLat').value = coords.lat;
+        document.getElementById('catchAddressLng').value = coords.lng;
       }
       if (!document.getElementById('catchLabel').value) {
         document.getElementById('catchLabel').value = `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
@@ -583,7 +696,23 @@
       const notes = document.getElementById('catchNotes').value.trim();
       let lat = parseFloat(document.getElementById('catchLat').value);
       let lng = parseFloat(document.getElementById('catchLng').value);
-      const label = document.getElementById('catchLabel').value.trim();
+      let label = document.getElementById('catchLabel').value.trim();
+      const addressLabel = buildCatchAddressLabel();
+      const addressLatRaw = document.getElementById('catchAddressLat').value;
+      const addressLngRaw = document.getElementById('catchAddressLng').value;
+      const addressLat = addressLatRaw ? parseFloat(addressLatRaw) : null;
+      const addressLng = addressLngRaw ? parseFloat(addressLngRaw) : null;
+
+      if (addressLabel) {
+        label = addressLabel;
+        document.getElementById('catchLabel').value = addressLabel;
+      }
+      if (Number.isFinite(addressLat) && Number.isFinite(addressLng)) {
+        lat = addressLat;
+        lng = addressLng;
+        document.getElementById('catchLat').value = addressLat.toFixed(6);
+        document.getElementById('catchLng').value = addressLng.toFixed(6);
+      }
 
       if (!species) {
         setSaveStatus('Species is required.', 'error');
@@ -625,6 +754,15 @@
           document.getElementById('catchSpecies').value = '';
           document.getElementById('catchNotes').value = '';
           document.getElementById('catchLabel').value = '';
+          document.getElementById('catchStreet').value = '';
+          document.getElementById('catchCity').value = '';
+          document.getElementById('catchState').value = '';
+          document.getElementById('catchCounty').value = '';
+          document.getElementById('catchZip').value = '';
+          document.getElementById('catchLat').value = '';
+          document.getElementById('catchLng').value = '';
+          document.getElementById('catchAddressLat').value = '';
+          document.getElementById('catchAddressLng').value = '';
           fetchCatches();
         } else {
           setSaveStatus(data.error || 'Failed to save catch.', 'error');
@@ -651,26 +789,28 @@
     document.addEventListener('DOMContentLoaded', () => {
       setFishAssistant();
       loadGoogleMaps();
+      const stateInput = document.getElementById('catchState');
+      if (stateInput) {
+        stateInput.addEventListener('input', (event) => {
+          event.target.value = event.target.value.toUpperCase();
+        });
+      }
     });
 
-    function speak(text) {
+    async function speak(text) {
       if (!text) return;
-      if (typeof window.speakWithGoogle === 'function') {
-        window.speakWithGoogle(text).then((success) => {
-          if (!success) speakWithBrowser(text);
-        }).catch(() => speakWithBrowser(text));
-        return;
+      if (typeof window.stopSpeech === 'function') {
+        window.stopSpeech();
       }
-
-      speakWithBrowser(text);
-    }
-
-    function speakWithBrowser(text) {
+      if (typeof window.speakWithGoogle === 'function') {
+        const success = await window.speakWithGoogle(text);
+        if (success) return;
+      }
       if (!('speechSynthesis' in window)) return;
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'en-US';
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
     }
 
     function speakLast() {

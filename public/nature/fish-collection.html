@@ -245,6 +245,39 @@
             <input type="hidden" id="editLocationLat">
             <input type="hidden" id="editLocationLng">
           </div>
+          <div class="form-group">
+            <label><i class="bi-geo-alt"></i> Address Entry</label>
+            <input type="text" id="editAddressStreet" class="form-control mb-2" placeholder="Start typing an address">
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="editAddressCity">City</label>
+                <input type="text" id="editAddressCity" class="form-control" placeholder="City">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="editAddressState">State</label>
+                <input type="text" id="editAddressState" class="form-control" placeholder="CA" maxlength="2">
+              </div>
+              <div class="form-group col-md-3">
+                <label for="editAddressZip">Zip</label>
+                <input type="text" id="editAddressZip" class="form-control" placeholder="Zip">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="editAddressCounty">County</label>
+              <input type="text" id="editAddressCounty" class="form-control" placeholder="County">
+            </div>
+            <div class="form-row">
+              <div class="form-group col-md-6">
+                <label for="editAddressLat">Latitude</label>
+                <input type="text" id="editAddressLat" class="form-control" placeholder="lat" readonly>
+              </div>
+              <div class="form-group col-md-6">
+                <label for="editAddressLng">Longitude</label>
+                <input type="text" id="editAddressLng" class="form-control" placeholder="lng" readonly>
+              </div>
+            </div>
+            <small class="form-text text-muted">Autocomplete fills address + coordinates.</small>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -316,6 +349,7 @@
     let currentEditCatch = null;
     let currentPosterCatch = null;
     let fishPosterCanvas = null;
+    let googleMapsLoadingPromise = null;
     const mapStylesDark = [
       { elementType: 'geometry', stylers: [{ color: '#1f1f1f' }] },
       { elementType: 'labels.text.stroke', stylers: [{ color: '#1f1f1f' }] },
@@ -337,27 +371,31 @@
       }
     }
 
-    async function loadGoogleMaps() {
-      try {
-        const res = await fetch('/api/fish-catches/google-api-key');
-        const data = await res.json();
-        const apiKey = data.apiKey;
-        if (!apiKey) {
-          setMapStatus('No Google Maps API key available.', 'error', true);
-          return;
+    function loadGoogleMaps() {
+      if (googleMapsLoadingPromise) return googleMapsLoadingPromise;
+      googleMapsLoadingPromise = (async () => {
+        try {
+          const res = await fetch('/api/fish-catches/google-api-key');
+          const data = await res.json();
+          const apiKey = data.apiKey;
+          if (!apiKey) {
+            setMapStatus('No Google Maps API key available.', 'error', true);
+            return;
+          }
+          return new Promise(resolve => {
+            window.initFishMap = () => { initMap(); resolve(); };
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initFishMap`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+          });
+        } catch (err) {
+          console.error('Failed to load Google Maps', err);
+          setMapStatus('Failed to load Google Maps.', 'error', true);
         }
-        return new Promise(resolve => {
-          window.initFishMap = () => { initMap(); resolve(); };
-          const script = document.createElement('script');
-          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initFishMap`;
-          script.async = true;
-          script.defer = true;
-          document.head.appendChild(script);
-        });
-      } catch (err) {
-        console.error('Failed to load Google Maps', err);
-        setMapStatus('Failed to load Google Maps.', 'error', true);
-      }
+      })();
+      return googleMapsLoadingPromise;
     }
 
     function initMap() {
@@ -373,6 +411,7 @@
       });
 
       map.__fishIcon = fishIcon;
+      initEditLocationAutocomplete();
       fetchCatches();
     }
 
@@ -409,34 +448,100 @@
     }
 
     function initEditLocationAutocomplete() {
-      const input = document.getElementById('editLocationName');
+      const input = document.getElementById('editAddressStreet');
       if (!input || editLocationAutocomplete || !window.google || !google.maps || !google.maps.places) {
         return;
       }
 
       try {
         editLocationAutocomplete = new google.maps.places.Autocomplete(input, {
-          types: ['geocode']
+          types: ['address'],
+          componentRestrictions: { country: 'us' }
         });
 
         editLocationAutocomplete.addListener('place_changed', () => {
           const place = editLocationAutocomplete.getPlace();
-          const label = place.formatted_address || place.name || input.value;
-          input.value = label;
-
-          if (place.geometry && place.geometry.location) {
-            document.getElementById('editLocationLat').value = place.geometry.location.lat();
-            document.getElementById('editLocationLng').value = place.geometry.location.lng();
-          }
+          fillEditAddressFieldsFromPlace(place);
         });
 
         input.addEventListener('input', () => {
+          const latInput = document.getElementById('editAddressLat');
+          const lngInput = document.getElementById('editAddressLng');
+          if (latInput) latInput.value = '';
+          if (lngInput) lngInput.value = '';
           document.getElementById('editLocationLat').value = '';
           document.getElementById('editLocationLng').value = '';
         });
       } catch (error) {
         console.warn('Google Places Autocomplete not available:', error);
       }
+    }
+
+    function buildEditAddressLabel() {
+      const street = document.getElementById('editAddressStreet')?.value?.trim() || '';
+      const city = document.getElementById('editAddressCity')?.value?.trim() || '';
+      const state = document.getElementById('editAddressState')?.value?.trim() || '';
+      const zip = document.getElementById('editAddressZip')?.value?.trim() || '';
+      return [street, city, state, zip].filter(Boolean).join(', ');
+    }
+
+    function fillEditAddressFieldsFromPlace(place) {
+      let city = '';
+      let state = '';
+      let county = '';
+      let zip = '';
+      if (Array.isArray(place.address_components)) {
+        place.address_components.forEach(component => {
+          const types = component.types || [];
+          if (types.includes('locality')) {
+            city = component.long_name;
+          } else if (types.includes('administrative_area_level_1')) {
+            state = component.short_name;
+          } else if (types.includes('administrative_area_level_2')) {
+            county = component.long_name.replace(/ County$/, '');
+          } else if (types.includes('postal_code')) {
+            zip = component.long_name;
+          }
+        });
+      }
+
+      const streetInput = document.getElementById('editAddressStreet');
+      const label = place.formatted_address || place.name || streetInput?.value || '';
+      if (streetInput) streetInput.value = label;
+      const cityInput = document.getElementById('editAddressCity');
+      if (cityInput) cityInput.value = city;
+      const stateInput = document.getElementById('editAddressState');
+      if (stateInput) stateInput.value = state;
+      const countyInput = document.getElementById('editAddressCounty');
+      if (countyInput) countyInput.value = county;
+      const zipInput = document.getElementById('editAddressZip');
+      if (zipInput) zipInput.value = zip;
+
+      if (place.geometry && place.geometry.location) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        document.getElementById('editAddressLat').value = lat;
+        document.getElementById('editAddressLng').value = lng;
+        document.getElementById('editLocationLat').value = lat;
+        document.getElementById('editLocationLng').value = lng;
+      }
+
+      if (label) {
+        document.getElementById('editLocationName').value = label;
+      }
+    }
+
+    async function ensureEditLocationAutocomplete() {
+      if (window.google && google.maps && google.maps.places) {
+        initEditLocationAutocomplete();
+        return;
+      }
+      try {
+        await loadGoogleMaps();
+      } catch (err) {
+        console.warn('Unable to load Google Maps for edit autocomplete.', err);
+      }
+      initEditLocationAutocomplete();
     }
 
     async function fetchCatches() {
@@ -556,6 +661,12 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       loadGoogleMaps();
+      const editStateInput = document.getElementById('editAddressState');
+      if (editStateInput) {
+        editStateInput.addEventListener('input', (event) => {
+          event.target.value = event.target.value.toUpperCase();
+        });
+      }
     });
 
     function resolvePosterImageUrl(url) {
@@ -677,7 +788,7 @@
       document.execCommand('copy');
     }
 
-    function openEditCatch(idx) {
+    async function openEditCatch(idx) {
       const catchItem = catches[idx];
       if (!catchItem) return;
       currentEditCatch = catchItem;
@@ -687,8 +798,15 @@
       document.getElementById('editLocationName').value = catchItem.location_label || '';
       document.getElementById('editLocationLat').value = catchItem.latitude ?? '';
       document.getElementById('editLocationLng').value = catchItem.longitude ?? '';
+      document.getElementById('editAddressStreet').value = catchItem.location_label || '';
+      document.getElementById('editAddressCity').value = '';
+      document.getElementById('editAddressState').value = '';
+      document.getElementById('editAddressCounty').value = '';
+      document.getElementById('editAddressZip').value = '';
+      document.getElementById('editAddressLat').value = catchItem.latitude ?? '';
+      document.getElementById('editAddressLng').value = catchItem.longitude ?? '';
 
-      initEditLocationAutocomplete();
+      await ensureEditLocationAutocomplete();
 
       const locationInput = document.getElementById('editLocationName');
       const latInput = document.getElementById('editLocationLat');
@@ -701,6 +819,14 @@
           }
           latInput.value = coords.lat;
           lngInput.value = coords.lng;
+          const addrLatInput = document.getElementById('editAddressLat');
+          const addrLngInput = document.getElementById('editAddressLng');
+          const addrStreetInput = document.getElementById('editAddressStreet');
+          if (addrStreetInput && !addrStreetInput.value) {
+            addrStreetInput.value = `${coords.lat.toFixed(5)}, ${coords.lng.toFixed(5)}`;
+          }
+          if (addrLatInput) addrLatInput.value = coords.lat;
+          if (addrLngInput) addrLngInput.value = coords.lng;
         });
       }
 
@@ -720,9 +846,18 @@
       const species = document.getElementById('editSpecies').value.trim();
       const notes = document.getElementById('editNotes').value.trim();
       const locationNameRaw = document.getElementById('editLocationName').value;
-      const locationName = locationNameRaw ? locationNameRaw.trim() : '';
-      const locationLatRaw = document.getElementById('editLocationLat').value;
-      const locationLngRaw = document.getElementById('editLocationLng').value;
+      let locationName = locationNameRaw ? locationNameRaw.trim() : '';
+      const addressLabel = buildEditAddressLabel();
+      if (addressLabel) {
+        locationName = addressLabel;
+        document.getElementById('editLocationName').value = addressLabel;
+      }
+      let locationLatRaw = document.getElementById('editLocationLat').value;
+      let locationLngRaw = document.getElementById('editLocationLng').value;
+      const addressLatRaw = document.getElementById('editAddressLat').value;
+      const addressLngRaw = document.getElementById('editAddressLng').value;
+      if (addressLatRaw) locationLatRaw = addressLatRaw;
+      if (addressLngRaw) locationLngRaw = addressLngRaw;
       const latitude = locationName === '' ? null : (locationLatRaw ? parseFloat(locationLatRaw) : null);
       const longitude = locationName === '' ? null : (locationLngRaw ? parseFloat(locationLngRaw) : null);
 
@@ -813,23 +948,20 @@
       lastAIResponse = '';
     }
 
-    function speak(text) {
+    async function speak(text) {
       if (!text) return;
-      if (typeof window.speakWithGoogle === 'function') {
-        window.speakWithGoogle(text).then((success) => {
-          if (!success) speakWithBrowser(text);
-        }).catch(() => speakWithBrowser(text));
-        return;
+      if (typeof window.stopSpeech === 'function') {
+        window.stopSpeech();
       }
-
-      speakWithBrowser(text);
-    }
-    function speakWithBrowser(text) {
+      if (typeof window.speakWithGoogle === 'function') {
+        const success = await window.speakWithGoogle(text);
+        if (success) return;
+      }
       if (!('speechSynthesis' in window)) return;
       const u = new SpeechSynthesisUtterance(text);
       u.lang = 'en-US';
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
     }
     function speakLast() { speak(lastAIResponse); }
 

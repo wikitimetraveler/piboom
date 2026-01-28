@@ -746,6 +746,11 @@
   }
   
   </style>
+  <style>
+    .pac-container {
+      z-index: 20000;
+    }
+  </style>
 </head>
 <body>
 <div class="music-mini-nav" data-music-mini-nav>
@@ -784,6 +789,45 @@
   <div class="album-container">
     <!-- User Selector -->
     <div id="userSelectorContainer"></div>
+
+    <div class="card mt-3 mb-4" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
+      <div class="card-body">
+        <h5 class="card-title mb-3"><i class="bi-geo-alt"></i> Collection Address</h5>
+        <div class="form-group">
+          <label for="addStreet">Street Address</label>
+          <input type="text" id="addStreet" class="form-control" placeholder="Start typing an address">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="addCity">City</label>
+            <input type="text" id="addCity" class="form-control" placeholder="City">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="addState">State</label>
+            <input type="text" id="addState" class="form-control" placeholder="CA" maxlength="2">
+          </div>
+          <div class="form-group col-md-3">
+            <label for="addZip">Zip</label>
+            <input type="text" id="addZip" class="form-control" placeholder="Zip">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="addCounty">County</label>
+          <input type="text" id="addCounty" class="form-control" placeholder="County">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="addLatitude">Latitude</label>
+            <input type="text" id="addLatitude" class="form-control" placeholder="lat" readonly>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="addLongitude">Longitude</label>
+            <input type="text" id="addLongitude" class="form-control" placeholder="lng" readonly>
+          </div>
+        </div>
+        <small class="form-text text-muted">Used as the default location when adding albums to your collection.</small>
+      </div>
+    </div>
     
     <!-- Album Discovery with Google Knowledge Graph -->
     <div class="kg-widget-container">
@@ -1068,6 +1112,9 @@ let currentInputMode = 'band'; // 'band', 'album', 'image', or 'camera'
 let uploadedImageData = null;
 const photoLocation = { lat: null, lng: null, label: '' };
 const deviceLocation = { lat: null, lng: null };
+let addAddressAutocomplete = null;
+let placesApiScriptLoading = false;
+let placesApiReady = false;
 let cameraStream = null;
 let cameraVideo = null;
 let cameraSupported = false;
@@ -1135,6 +1182,85 @@ function requestDeviceLocationNow() {
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
     );
   });
+}
+
+function buildAddressLabel(prefix) {
+  const street = document.getElementById(`${prefix}Street`)?.value?.trim() || '';
+  const city = document.getElementById(`${prefix}City`)?.value?.trim() || '';
+  const state = document.getElementById(`${prefix}State`)?.value?.trim() || '';
+  const zip = document.getElementById(`${prefix}Zip`)?.value?.trim() || '';
+  const parts = [street, city, state, zip].filter(Boolean);
+  return parts.join(', ');
+}
+
+function fillAddressFieldsFromPlace(place, prefix) {
+  let city = '';
+  let state = '';
+  let county = '';
+  let zip = '';
+  if (Array.isArray(place.address_components)) {
+    place.address_components.forEach(component => {
+      const types = component.types || [];
+      if (types.includes('locality')) {
+        city = component.long_name;
+      } else if (types.includes('administrative_area_level_1')) {
+        state = component.short_name;
+      } else if (types.includes('administrative_area_level_2')) {
+        county = component.long_name.replace(/ County$/, '');
+      } else if (types.includes('postal_code')) {
+        zip = component.long_name;
+      }
+    });
+  }
+
+  const streetInput = document.getElementById(`${prefix}Street`);
+  if (streetInput) {
+    streetInput.value = place.formatted_address || place.name || streetInput.value;
+  }
+  const cityInput = document.getElementById(`${prefix}City`);
+  if (cityInput) cityInput.value = city;
+  const stateInput = document.getElementById(`${prefix}State`);
+  if (stateInput) stateInput.value = state;
+  const countyInput = document.getElementById(`${prefix}County`);
+  if (countyInput) countyInput.value = county;
+  const zipInput = document.getElementById(`${prefix}Zip`);
+  if (zipInput) zipInput.value = zip;
+
+  if (place.geometry && place.geometry.location) {
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    const latInput = document.getElementById(`${prefix}Latitude`);
+    const lngInput = document.getElementById(`${prefix}Longitude`);
+    if (latInput) latInput.value = lat;
+    if (lngInput) lngInput.value = lng;
+  }
+}
+
+function initAddAddressAutocomplete() {
+  const input = document.getElementById('addStreet');
+  if (!input || addAddressAutocomplete || !window.google || !google.maps || !google.maps.places) {
+    return;
+  }
+  try {
+    addAddressAutocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['address'],
+      componentRestrictions: { country: 'us' }
+    });
+    addAddressAutocomplete.addListener('place_changed', () => {
+      const place = addAddressAutocomplete.getPlace();
+      fillAddressFieldsFromPlace(place, 'add');
+    });
+
+    input.addEventListener('input', () => {
+      const latInput = document.getElementById('addLatitude');
+      const lngInput = document.getElementById('addLongitude');
+      if (latInput) latInput.value = '';
+      if (lngInput) lngInput.value = '';
+    });
+  } catch (error) {
+    console.warn('Google Places Autocomplete not available:', error);
+    input.placeholder = 'Enter address manually (autocomplete disabled)';
+  }
 }
 
 function convertDMSToDD(degrees, minutes, seconds, direction) {
@@ -1404,6 +1530,39 @@ async function ensureGoogleApiKey() {
     console.error('❌ Error retrieving Google API key:', error);
   }
   return null;
+}
+
+async function loadGooglePlacesApi() {
+  if (placesApiReady || placesApiScriptLoading) {
+    return;
+  }
+
+  const apiKey = await ensureGoogleApiKey();
+  if (!apiKey) {
+    return;
+  }
+
+  if (window.google && window.google.maps && window.google.maps.places) {
+    placesApiReady = true;
+    initAddAddressAutocomplete();
+    return;
+  }
+
+  placesApiScriptLoading = true;
+  const script = document.createElement('script');
+  script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=Function.prototype`;
+  script.async = true;
+  script.defer = true;
+  script.onload = () => {
+    placesApiScriptLoading = false;
+    placesApiReady = true;
+    initAddAddressAutocomplete();
+  };
+  script.onerror = () => {
+    placesApiScriptLoading = false;
+    console.warn('❌ Failed to load Google Places API');
+  };
+  document.head.appendChild(script);
 }
 
 // Initialize Google Knowledge Graph Widget (EXACT COPY FROM WORKING RESEARCH PAGE)
@@ -2599,10 +2758,23 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
       });
     }
     
-    // Build location payload (EXIF first, device fallback, manual fallback if image present)
+    // Build location payload (address fields first, then EXIF/device fallback)
     let locationLat = photoLocation.lat;
     let locationLng = photoLocation.lng;
     let locationLabel = photoLocation.label;
+    const addressLatRaw = document.getElementById('addLatitude')?.value;
+    const addressLngRaw = document.getElementById('addLongitude')?.value;
+    const addressLabel = buildAddressLabel('add');
+    const addressLat = addressLatRaw ? parseFloat(addressLatRaw) : null;
+    const addressLng = addressLngRaw ? parseFloat(addressLngRaw) : null;
+
+    if (Number.isFinite(addressLat) && Number.isFinite(addressLng)) {
+      locationLat = addressLat;
+      locationLng = addressLng;
+    }
+    if (addressLabel) {
+      locationLabel = addressLabel;
+    }
 
     if (!locationLat && !locationLng && !deviceLocation.lat && !deviceLocation.lng) {
       await requestDeviceLocationNow();
@@ -2611,13 +2783,6 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
     if (!locationLat && !locationLng && deviceLocation.lat && deviceLocation.lng) {
       locationLat = deviceLocation.lat;
       locationLng = deviceLocation.lng;
-    }
-
-    if (uploadedImageData && !locationLat && !locationLng) {
-      const manual = prompt('Where did you pick up this album? (store or address)', '');
-      if (manual && manual.trim()) {
-        locationLabel = manual.trim();
-      }
     }
 
     if ((locationLat || locationLng) && !locationLabel) {
@@ -3061,6 +3226,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   requestDeviceLocationOnLoad();
+  loadGooglePlacesApi();
+  const addStateInput = document.getElementById('addState');
+  if (addStateInput) {
+    addStateInput.addEventListener('input', (event) => {
+      event.target.value = event.target.value.toUpperCase();
+    });
+  }
   
   // Basic container initialization
   

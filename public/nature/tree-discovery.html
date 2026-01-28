@@ -202,6 +202,10 @@
       color: white;
       font-weight: 600;
     }
+
+    .pac-container {
+      z-index: 20000;
+    }
   </style>
 </head>
 <body>
@@ -257,6 +261,45 @@
           🏔️ <strong>Special Expertise:</strong> Southern California Mountains (San Gabriel, San Bernardino, San Jacinto) & High Desert (Hesperia/Victor Valley) 🌵
         </small>
       </p>
+
+      <div class="card mb-4" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
+        <div class="card-body">
+          <h5 class="card-title"><i class="bi-geo-alt"></i> Collection Address</h5>
+          <div class="form-group">
+            <label for="addTreeStreet">Street Address</label>
+            <input type="text" id="addTreeStreet" class="form-control" placeholder="Start typing an address">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="addTreeCity">City</label>
+              <input type="text" id="addTreeCity" class="form-control" placeholder="City">
+            </div>
+            <div class="form-group col-md-3">
+              <label for="addTreeState">State</label>
+              <input type="text" id="addTreeState" class="form-control" placeholder="CA" maxlength="2">
+            </div>
+            <div class="form-group col-md-3">
+              <label for="addTreeZip">Zip</label>
+              <input type="text" id="addTreeZip" class="form-control" placeholder="Zip">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="addTreeCounty">County</label>
+            <input type="text" id="addTreeCounty" class="form-control" placeholder="County">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="addTreeLatitude">Latitude</label>
+              <input type="text" id="addTreeLatitude" class="form-control" placeholder="lat" readonly>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="addTreeLongitude">Longitude</label>
+              <input type="text" id="addTreeLongitude" class="form-control" placeholder="lng" readonly>
+            </div>
+          </div>
+          <small class="form-text text-muted">Used when saving the tree to your collection.</small>
+        </div>
+      </div>
       
       <!-- Search Mode Tabs -->
       <div class="text-center mb-4 search-mode-tabs">
@@ -417,6 +460,9 @@ let currentLocation = {
   longitude: null,
   locationName: null
 };
+let treeAddressAutocomplete = null;
+let placesApiScriptLoading = false;
+let placesApiReady = false;
 const deviceLocation = {
   latitude: null,
   longitude: null
@@ -467,6 +513,121 @@ function requestDeviceLocationNow() {
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
     );
   });
+}
+
+function buildTreeAddressLabel() {
+  const street = document.getElementById('addTreeStreet')?.value?.trim() || '';
+  const city = document.getElementById('addTreeCity')?.value?.trim() || '';
+  const state = document.getElementById('addTreeState')?.value?.trim() || '';
+  const zip = document.getElementById('addTreeZip')?.value?.trim() || '';
+  return [street, city, state, zip].filter(Boolean).join(', ');
+}
+
+function fillTreeAddressFieldsFromPlace(place) {
+  let city = '';
+  let state = '';
+  let county = '';
+  let zip = '';
+  if (Array.isArray(place.address_components)) {
+    place.address_components.forEach(component => {
+      const types = component.types || [];
+      if (types.includes('locality')) {
+        city = component.long_name;
+      } else if (types.includes('administrative_area_level_1')) {
+        state = component.short_name;
+      } else if (types.includes('administrative_area_level_2')) {
+        county = component.long_name.replace(/ County$/, '');
+      } else if (types.includes('postal_code')) {
+        zip = component.long_name;
+      }
+    });
+  }
+
+  const streetInput = document.getElementById('addTreeStreet');
+  const label = place.formatted_address || place.name || streetInput?.value || '';
+  if (streetInput) streetInput.value = label;
+  const cityInput = document.getElementById('addTreeCity');
+  if (cityInput) cityInput.value = city;
+  const stateInput = document.getElementById('addTreeState');
+  if (stateInput) stateInput.value = state;
+  const countyInput = document.getElementById('addTreeCounty');
+  if (countyInput) countyInput.value = county;
+  const zipInput = document.getElementById('addTreeZip');
+  if (zipInput) zipInput.value = zip;
+
+  if (place.geometry && place.geometry.location) {
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    document.getElementById('addTreeLatitude').value = lat;
+    document.getElementById('addTreeLongitude').value = lng;
+    currentLocation.latitude = lat;
+    currentLocation.longitude = lng;
+  }
+  if (label) {
+    currentLocation.locationName = label;
+  }
+}
+
+function initTreeAddressAutocomplete() {
+  const input = document.getElementById('addTreeStreet');
+  if (!input || treeAddressAutocomplete || !window.google || !google.maps || !google.maps.places) {
+    return;
+  }
+  try {
+    treeAddressAutocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['address'],
+      componentRestrictions: { country: 'us' }
+    });
+    treeAddressAutocomplete.addListener('place_changed', () => {
+      const place = treeAddressAutocomplete.getPlace();
+      fillTreeAddressFieldsFromPlace(place);
+    });
+    input.addEventListener('input', () => {
+      const latInput = document.getElementById('addTreeLatitude');
+      const lngInput = document.getElementById('addTreeLongitude');
+      if (latInput) latInput.value = '';
+      if (lngInput) lngInput.value = '';
+    });
+  } catch (error) {
+    console.warn('Google Places Autocomplete not available:', error);
+    input.placeholder = 'Enter address manually (autocomplete disabled)';
+  }
+}
+
+async function loadTreePlacesApi() {
+  if (placesApiReady || placesApiScriptLoading) {
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/music-research/google-api-key');
+    const data = await response.json();
+    if (!data.apiKey) {
+      return;
+    }
+    if (window.google && window.google.maps && window.google.maps.places) {
+      placesApiReady = true;
+      initTreeAddressAutocomplete();
+      return;
+    }
+    placesApiScriptLoading = true;
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places&callback=Function.prototype`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      placesApiScriptLoading = false;
+      placesApiReady = true;
+      initTreeAddressAutocomplete();
+    };
+    script.onerror = () => {
+      placesApiScriptLoading = false;
+      console.warn('❌ Failed to load Google Places API');
+    };
+    document.head.appendChild(script);
+  } catch (error) {
+    console.error('Error loading Google Places API:', error);
+  }
 }
 
 // Switch between input modes
@@ -965,6 +1126,19 @@ async function saveToCollection() {
       await requestDeviceLocationNow();
     }
 
+    const addressLabel = buildTreeAddressLabel();
+    const addressLatRaw = document.getElementById('addTreeLatitude')?.value;
+    const addressLngRaw = document.getElementById('addTreeLongitude')?.value;
+    const addressLat = addressLatRaw ? parseFloat(addressLatRaw) : null;
+    const addressLng = addressLngRaw ? parseFloat(addressLngRaw) : null;
+    if (Number.isFinite(addressLat) && Number.isFinite(addressLng)) {
+      currentLocation.latitude = addressLat;
+      currentLocation.longitude = addressLng;
+    }
+    if (addressLabel) {
+      currentLocation.locationName = addressLabel;
+    }
+
     if (currentLocation.latitude == null && currentLocation.longitude == null) {
       if (deviceLocation.latitude != null && deviceLocation.longitude != null) {
         currentLocation.latitude = deviceLocation.latitude;
@@ -1063,6 +1237,13 @@ document.addEventListener('DOMContentLoaded', function() {
   switchInputMode(isMobile ? 'camera' : 'search');
 
   requestDeviceLocationOnLoad();
+  loadTreePlacesApi();
+  const addStateInput = document.getElementById('addTreeState');
+  if (addStateInput) {
+    addStateInput.addEventListener('input', (event) => {
+      event.target.value = event.target.value.toUpperCase();
+    });
+  }
   
   // Set footer date
   document.getElementById('dt').textContent = new Date().toLocaleDateString();

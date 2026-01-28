@@ -643,7 +643,7 @@ export async function fetchNativeFields() {
 
   try {
     const response = await axios.get(`${API_V3_BASE}/schemas/loan/standardFields`, {
-      params: { start: 0, limit: 10000 },
+      params: { start: 0, limit: 30000 },
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
