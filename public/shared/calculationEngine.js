@@ -1,4 +1,4 @@
-﻿// calculations.js
+// calculations.js
 // ============================================================================
 // Calculations Engine - Reusable Calculator Framework (DAG-lite enabled)
 // ============================================================================
@@ -362,10 +362,11 @@ function createAssetQualifierConfig(options = {}) {
   };
 }
 
-// Expose globals for browser usage
-if (typeof window !== 'undefined') {
-  window.CalculationsEngine = CalculationsEngine;
-  window.createDTICalculatorConfig = createDTICalculatorConfig;
-  window.createFHACalculatorConfig = createFHACalculatorConfig;
-  window.createAssetQualifierConfig = createAssetQualifierConfig;
+// Expose globals for browser usage (and Node tests)
+const __calcGlobal = typeof window !== 'undefined' ? window : globalThis;
+if (__calcGlobal) {
+  __calcGlobal.CalculationsEngine = CalculationsEngine;
+  __calcGlobal.createDTICalculatorConfig = createDTICalculatorConfig;
+  __calcGlobal.createFHACalculatorConfig = createFHACalculatorConfig;
+  __calcGlobal.createAssetQualifierConfig = createAssetQualifierConfig;
 }

@@ -11,7 +11,9 @@ const isCloudDeployment = process.env.RENDER_EXTERNAL_URL ||
                          process.env.VERCEL_URL ||
                          process.env.NETLIFY_URL;
 
-const DEV_MODE = isCloudDeployment ? 'cloud' : 'pi';
+const DEV_MODE = isCloudDeployment
+  ? 'cloud'
+  : (process.platform === 'linux' ? 'pi' : 'cloud');
 
 export const config = {
   port: Number(process.env.PORT || 3000),

@@ -29,6 +29,58 @@
     main.container {
       padding-top: 20px;
     }
+
+    /* Floating Finance Symbols */
+    .floating-cash {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .cash-symbol {
+      position: absolute;
+      font-size: 28px;
+      animation: floatCash 18s linear infinite;
+      opacity: 0;
+      z-index: 6;
+    }
+
+    .cash-symbol.dollar {
+      color: rgba(52, 199, 89, 0.55);
+    }
+
+    .cash-symbol.coin {
+      color: rgba(240, 196, 15, 0.6);
+    }
+
+    .cash-symbol:nth-child(1) { left: 8%; animation-delay: 0s; }
+    .cash-symbol:nth-child(2) { left: 18%; animation-delay: 2s; }
+    .cash-symbol:nth-child(3) { left: 28%; animation-delay: 4s; }
+    .cash-symbol:nth-child(4) { left: 38%; animation-delay: 6s; }
+    .cash-symbol:nth-child(5) { left: 48%; animation-delay: 8s; }
+    .cash-symbol:nth-child(6) { left: 58%; animation-delay: 10s; }
+    .cash-symbol:nth-child(7) { left: 68%; animation-delay: 12s; }
+    .cash-symbol:nth-child(8) { left: 78%; animation-delay: 14s; }
+    .cash-symbol:nth-child(9) { left: 88%; animation-delay: 16s; }
+
+    @keyframes floatCash {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      8% {
+        opacity: 0.65;
+      }
+      92% {
+        opacity: 0.65;
+      }
+      100% {
+        transform: translateY(-120px) rotate(360deg);
+        opacity: 0;
+      }
+    }
     
     /* Premium Accordion Sections */
     .premium-accordion .card {
@@ -91,6 +143,17 @@
 </head>
 <body>
 <div class="particles" id="particles"></div>
+<div class="floating-cash" aria-hidden="true">
+  <div class="cash-symbol dollar">$</div>
+  <div class="cash-symbol coin">¢</div>
+  <div class="cash-symbol dollar">$</div>
+  <div class="cash-symbol coin">¢</div>
+  <div class="cash-symbol dollar">$</div>
+  <div class="cash-symbol coin">¢</div>
+  <div class="cash-symbol dollar">$</div>
+  <div class="cash-symbol coin">¢</div>
+  <div class="cash-symbol dollar">$</div>
+</div>
 
 <!-- Modern Navbar Web Component -->
 <modern-navbar></modern-navbar>
@@ -246,7 +309,7 @@
       <div class="card-header" id="headingEncompass">
         <h2 class="mb-0">
           <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseEncompass" aria-expanded="false" aria-controls="collapseEncompass" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-bank"></i> Encompass Tools <span class="section-count-badge">5</span>
+            <i class="bi-bank"></i> Encompass Tools <span class="section-count-badge">6</span>
             <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">AI-powered Encompass integration and automation</small>
           </button>
         </h2>
@@ -292,6 +355,14 @@
                 <h3>Custom Loan Fields</h3>
                 <p>Audit custom field configurations, required flags, and active status in your Encompass instance.</p>
                 <div class="card-meta"><i class="bi-sliders"></i> Custom Fields</div>
+              </a>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-3">
+              <a href="unit-tests.html" class="tool-card fade-in">
+                <span class="card-icon">✅</span>
+                <h3>Unit Test Runner</h3>
+                <p>Upload XLSX test sheets, load sample files, and validate loan fields in the browser.</p>
+                <div class="card-meta"><i class="bi-check2-circle"></i> Browser Tests</div>
               </a>
             </div>
           </div>

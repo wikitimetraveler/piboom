@@ -347,12 +347,13 @@ export class VoiceService {
         this.tryEspeakTTS(text);
       }
     } else {
-      // Cloud mode - try espeak first, then fallback to web TTS or console
-      this.tryEspeakTTS(text);
-      
+      // Cloud mode - prefer web TTS; only use espeak on non-Windows hosts
+      if (!this.isWindows) {
+        this.tryEspeakTTS(text);
+      }
+
       // Also try web-based TTS as a fallback for cloud deployments
       this.tryWebTTS(text);
-      
     }
   }
 
@@ -413,6 +414,11 @@ export class VoiceService {
 
   // Try espeak TTS with proper error handling
   tryEspeakTTS(text) {
+    if (this.isWindows) {
+      console.log('🎤 espeak skipped on Windows');
+      console.log('🎤 Voice feedback:', text);
+      return;
+    }
     try {
       console.log('🎤 Attempting espeak TTS...');
       
@@ -476,26 +482,8 @@ export class VoiceService {
 
   // Try espeak as fallback on Windows
   tryEspeakFallback(text) {
-    try {
-      console.log('🎤 Trying espeak fallback...');
-      const espeak = spawn('espeak', [text, '--stdout']);
-      const aplay = spawn('aplay', ['-f', 'S16_LE', '-r', '22050', '-c', '1']);
-      
-      espeak.stdout.pipe(aplay.stdin);
-      
-      espeak.on('error', (error) => {
-        console.log('espeak not available, using console fallback');
-        console.log('🎤 Voice feedback:', text);
-      });
-      
-      aplay.on('error', (error) => {
-        console.log('aplay not available, using console fallback');
-        console.log('🎤 Voice feedback:', text);
-      });
-    } catch (error) {
-      console.log('espeak fallback failed:', error.message);
-      console.log('🎤 Voice feedback:', text);
-    }
+    console.log('🎤 Windows fallback: console only');
+    console.log('🎤 Voice feedback:', text);
   }
 
   // Speak longer text in chunks

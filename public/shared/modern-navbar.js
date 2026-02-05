@@ -388,6 +388,9 @@ class ModernNavbar extends HTMLElement {
                   <a class="dropdown-item" href="/finance/encompass-hub.html" style="padding-left: 2.5rem;">
                     <i class="bi-columns-gap"></i> Encompass Hub
                   </a>
+                  <a class="dropdown-item" href="/finance/unit-tests.html" style="padding-left: 2.5rem;">
+                    <i class="bi-clipboard-check"></i> Unit Tests
+                  </a>
                   <a class="dropdown-item" href="/finance/encompass-users.html" style="padding-left: 2.5rem;">
                     <i class="bi-people"></i> Encompass Users
                   </a>
