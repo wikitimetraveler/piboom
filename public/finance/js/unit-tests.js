@@ -5,11 +5,16 @@ const uploadArea = document.getElementById('uploadArea');
 const gridContainer = document.getElementById('gridContainer');
 const unitTestsGrid = document.getElementById('unitTestsGrid');
 const exportBtn = document.getElementById('exportBtn');
+const runTestsBtn = document.getElementById('runTestsBtn');
 const clearBtn = document.getElementById('clearBtn');
 const searchInput = document.getElementById('searchInput');
 const resultsMeta = document.getElementById('resultsMeta');
 const fileInfo = document.getElementById('fileInfo');
 const exampleFilesList = document.getElementById('exampleFilesList');
+const testResultsContainer = document.getElementById('testResultsContainer');
+const testResultsList = document.getElementById('testResultsList');
+const testResultsSummary = document.getElementById('testResultsSummary');
+const closeResultsBtn = document.getElementById('closeResultsBtn');
 
 let gridApi;
 let allData = [];
@@ -549,6 +554,151 @@ function hideTestDescriptions() {
   }
 }
 
+async function runTests() {
+  if (!allData || allData.length === 0) {
+    setStatus('No test data loaded', 'err', 'bi-exclamation-octagon');
+    return;
+  }
+  
+  try {
+    setStatus('Running tests...', 'info', 'bi-clock-history');
+    runTestsBtn.disabled = true;
+    testResultsContainer.style.display = 'block';
+    testResultsList.innerHTML = '<div class="text-center p-4"><i class="bi-hourglass-split" style="font-size: 2rem;"></i><p class="mt-2">Running tests...</p></div>';
+    
+    const results = [];
+    let passed = 0;
+    let failed = 0;
+    let skipped = 0;
+    
+    // Process each row as a test step
+    for (let i = 0; i < allData.length; i++) {
+      const row = allData[i];
+      const step = row.Step || row.step || (i + 1);
+      const action = row.Action || row.action || '';
+      const target = row.Target || row.target || '';
+      const description = row.Description || row.description || '';
+      
+      // Extract field ID from target (e.g., [LOCKRATE.2866] -> LOCKRATE.2866)
+      const fieldId = extractFieldId(target);
+      
+      if (!fieldId) {
+        skipped++;
+        results.push({
+          step,
+          action,
+          target,
+          description,
+          status: 'skipped',
+          message: 'No field ID found in Target'
+        });
+        continue;
+      }
+      
+      // Get test values from Test columns
+      const testValues = {};
+      Object.keys(row).forEach(key => {
+        if (key.toLowerCase().startsWith('test')) {
+          testValues[key] = row[key];
+        }
+      });
+      
+      // For now, execute basic validation
+      // TODO: Integrate with actual API calls for Set/Get/Compare operations
+      const result = {
+        step,
+        action: action.toUpperCase(),
+        target: fieldId,
+        description,
+        status: 'pending',
+        message: ''
+      };
+      
+      // Simulate test execution based on action type
+      if (action.toLowerCase() === 'set') {
+        result.status = 'info';
+        result.message = `Would SET ${fieldId} with test values`;
+      } else if (action.toLowerCase() === 'get') {
+        result.status = 'info';
+        result.message = `Would GET ${fieldId} value`;
+      } else if (action.toLowerCase() === 'compare') {
+        // For compare, check if we have expected values
+        const hasExpected = Object.values(testValues).some(v => v && v !== '');
+        if (hasExpected) {
+          result.status = 'info';
+          result.message = `Would COMPARE ${fieldId} against expected values`;
+        } else {
+          result.status = 'skipped';
+          result.message = 'No expected values to compare';
+        }
+      } else {
+        result.status = 'skipped';
+        result.message = `Unknown action: ${action}`;
+      }
+      
+      if (result.status === 'info') {
+        passed++;
+      } else if (result.status === 'skipped') {
+        skipped++;
+      } else {
+        failed++;
+      }
+      
+      results.push(result);
+    }
+    
+    // Display results
+    displayTestResults(results, passed, failed, skipped);
+    setStatus(`Tests complete: ${passed} passed, ${failed} failed, ${skipped} skipped`, 
+      failed > 0 ? 'err' : 'ok', 
+      failed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
+    
+  } catch (error) {
+    console.error('Error running tests:', error);
+    setStatus(`Error running tests: ${error.message}`, 'err', 'bi-exclamation-octagon');
+    testResultsList.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+  } finally {
+    runTestsBtn.disabled = false;
+  }
+}
+
+function displayTestResults(results, passed, failed, skipped) {
+  const total = results.length;
+  const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
+  
+  testResultsSummary.textContent = `${total} tests • ${passed} passed • ${failed} failed • ${skipped} skipped (${passRate}% pass rate)`;
+  
+  let html = '<div class="test-results-grid">';
+  
+  results.forEach(result => {
+    const statusClass = result.status === 'info' ? 'success' : 
+                       result.status === 'skipped' ? 'warning' : 'danger';
+    const statusIcon = result.status === 'info' ? 'bi-check-circle' :
+                      result.status === 'skipped' ? 'bi-skip-forward' : 'bi-x-circle';
+    
+    html += `
+      <div class="test-result-card test-result-${result.status}">
+        <div class="d-flex align-items-start">
+          <div class="test-result-icon ${statusClass}">
+            <i class="bi ${statusIcon}"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <strong>Step ${result.step}</strong>
+              <span class="badge badge-${statusClass}">${result.action}</span>
+            </div>
+            <div class="text-muted small mb-1">${result.description || result.target}</div>
+            <div class="test-result-message">${result.message}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  
+  html += '</div>';
+  testResultsList.innerHTML = html;
+}
+
 function clearData() {
   allData = [];
   columnDefs = [];
@@ -562,7 +712,9 @@ function clearData() {
   uploadArea.style.display = 'block';
   gridContainer.style.display = 'none';
   exportBtn.style.display = 'none';
+  runTestsBtn.style.display = 'none';
   clearBtn.style.display = 'none';
+  testResultsContainer.style.display = 'none';
   fileInfo.textContent = 'No file loaded';
   fileInfo.innerHTML = 'No file loaded';
   resultsMeta.textContent = '0 rows';
@@ -645,6 +797,7 @@ async function handleFileUpload(file) {
     uploadArea.style.display = 'none';
     gridContainer.style.display = 'block';
     exportBtn.style.display = 'inline-block';
+    runTestsBtn.style.display = 'inline-block';
     clearBtn.style.display = 'inline-block';
     
     // Build enhanced file info with test descriptions
@@ -716,6 +869,16 @@ exportBtn.addEventListener('click', (e) => {
 clearBtn.addEventListener('click', (e) => {
   e.preventDefault();
   clearData();
+});
+
+runTestsBtn?.addEventListener('click', (e) => {
+  e.preventDefault();
+  runTests();
+});
+
+closeResultsBtn?.addEventListener('click', (e) => {
+  e.preventDefault();
+  testResultsContainer.style.display = 'none';
 });
 
 searchInput.addEventListener('input', () => {

@@ -206,6 +206,69 @@
         border-color: var(--zen-primary);
       }
 
+      /* Test Results Styling */
+      .test-results-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      .test-result-card {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(74, 144, 164, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+        transition: all 0.2s ease;
+      }
+
+      .test-result-card:hover {
+        box-shadow: 0 4px 12px rgba(74, 144, 164, 0.1);
+        border-color: rgba(74, 144, 164, 0.4);
+      }
+
+      .test-result-card.test-result-info {
+        border-left: 4px solid rgba(46, 204, 113, 0.6);
+      }
+
+      .test-result-card.test-result-skipped {
+        border-left: 4px solid rgba(255, 193, 7, 0.6);
+      }
+
+      .test-result-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 0.75rem;
+        flex-shrink: 0;
+        font-size: 1.1rem;
+      }
+
+      .test-result-icon.success {
+        background-color: rgba(46, 204, 113, 0.15);
+        color: #1a7a43;
+      }
+
+      .test-result-icon.warning {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #856404;
+      }
+
+      .test-result-icon.danger {
+        background-color: rgba(231, 76, 60, 0.15);
+        color: #a93226;
+      }
+
+      .test-result-message {
+        font-size: 0.85rem;
+        color: var(--zen-muted);
+        margin-top: 0.25rem;
+      }
+
       /* Test Descriptions UI */
       .test-descriptions-grid {
         display: grid;
@@ -478,6 +541,9 @@
           <button class="btn btn-outline-primary" id="exportBtn" style="display: none;">
             <i class="bi-download"></i> Export CSV
           </button>
+          <button class="btn btn-success" id="runTestsBtn" style="display: none;">
+            <i class="bi-play-circle"></i> Run Tests
+          </button>
           <button class="btn btn-outline-secondary" id="clearBtn" style="display: none;">
             <i class="bi-x-circle"></i> Clear Data
           </button>
@@ -546,6 +612,22 @@
               </div>
               <div class="table-responsive">
                 <div id="unitTestsGrid" class="ag-theme-alpine unit-tests-grid"></div>
+              </div>
+            </div>
+            
+            <!-- Test Results Panel -->
+            <div id="testResultsContainer" style="display: none;" class="mt-4">
+              <div class="card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h5 class="mb-1"><i class="bi-clipboard-check"></i> Test Results</h5>
+                    <small class="text-muted" id="testResultsSummary">Running tests...</small>
+                  </div>
+                  <button class="btn btn-sm btn-outline-secondary" id="closeResultsBtn">
+                    <i class="bi-x"></i> Close
+                  </button>
+                </div>
+                <div id="testResultsList" class="test-results-list"></div>
               </div>
             </div>
           </div>
