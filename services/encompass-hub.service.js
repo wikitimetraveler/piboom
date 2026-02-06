@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ensureEncompassToken } from './encompass-auth.service.js';
+import { clearEncompassTokenCache, ensureEncompassToken } from './encompass-auth.service.js';
 import {
   buildLoanAnalytics,
 } from './loan-analytics.service.js';
@@ -93,6 +93,37 @@ const BASE_TERMS = [
     matchType: 'isNotEmpty',
   },
 ];
+
+async function requestWithAuth(config, { retryOn401 = true } = {}) {
+  const token = await ensureEncompassToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(config.headers || {}),
+    Authorization: `Bearer ${token}`,
+  };
+
+  const requestConfig = {
+    ...config,
+    headers,
+  };
+
+  try {
+    return await axios(requestConfig);
+  } catch (error) {
+    if (retryOn401 && error.response?.status === 401) {
+      clearEncompassTokenCache();
+      const refreshedToken = await ensureEncompassToken();
+      return axios({
+        ...requestConfig,
+        headers: {
+          ...headers,
+          Authorization: `Bearer ${refreshedToken}`,
+        },
+      });
+    }
+    throw error;
+  }
+}
 
 function normalizePipelineItems(payload) {
   if (!payload) {
@@ -585,13 +616,14 @@ export async function fetchCompanyUsers(options = {}) {
     enabled,
   } = options;
 
-  const token = await ensureEncompassToken();
   const safeStart = coercePositiveInteger(start, 1) ?? 1;
   const safeLimit = Math.min(coercePositiveInteger(limit, 200) ?? 200, 1000);
 
   let response;
   try {
-    response = await axios.get(`${API_BASE_URL}/company/users`, {
+    response = await requestWithAuth({
+      method: 'get',
+      url: `${API_BASE_URL}/company/users`,
       params: {
         viewEmailSignature: includeEmailSignature ? 'true' : undefined,
         groupId,
@@ -602,10 +634,6 @@ export async function fetchCompanyUsers(options = {}) {
         userName: search || undefined,
         start: safeStart,
         limit: safeLimit,
-      },
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
       },
     });
   } catch (error) {
@@ -639,15 +667,11 @@ function normalizeFieldsPayload(data) {
 }
 
 export async function fetchNativeFields() {
-  const token = await ensureEncompassToken();
-
   try {
-    const response = await axios.get(`${API_V3_BASE}/schemas/loan/standardFields`, {
+    const response = await requestWithAuth({
+      method: 'get',
+      url: `${API_V3_BASE}/schemas/loan/standardFields`,
       params: { start: 0, limit: 30000 },
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
     });
     const items = normalizeFieldsPayload(response.data);
     const hasBaseLoanAmount = items.some((item) => (
@@ -689,14 +713,10 @@ export async function fetchNativeFields() {
 }
 
 export async function fetchCustomFields() {
-  const token = await ensureEncompassToken();
-
   try {
-    const response = await axios.get(`${API_V3_BASE}/settings/loan/customFields`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
+    const response = await requestWithAuth({
+      method: 'get',
+      url: `${API_V3_BASE}/settings/loan/customFields`,
     });
     const items = normalizeFieldsPayload(response.data);
     return { count: items.length, items };
@@ -753,7 +773,6 @@ export async function fetchPipelineLoans(options = {}) {
     closerId,
   } = options;
 
-  const token = await ensureEncompassToken();
   const terms = [...BASE_TERMS];
   const parsedLimit = Number(limit) > 0 ? Number(limit) : DEFAULT_LIMIT;
 
@@ -784,9 +803,10 @@ export async function fetchPipelineLoans(options = {}) {
 
   let response;
   try {
-    response = await axios.post(
-      `${API_BASE_URL}/loanPipeline`,
-      {
+    response = await requestWithAuth({
+      method: 'post',
+      url: `${API_BASE_URL}/loanPipeline`,
+      data: {
         filter: {
           terms,
         },
@@ -796,17 +816,11 @@ export async function fetchPipelineLoans(options = {}) {
           { canonicalName: 'Fields.4000', order: 'desc' },
         ],
       },
-      {
-        params: {
-          cursortype: 'randomAccess',
-          limit: parsedLimit,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      params: {
+        cursortype: 'randomAccess',
+        limit: parsedLimit,
       },
-    );
+    });
   } catch (error) {
     const status = error.response?.status;
     const data = error.response?.data;
@@ -857,12 +871,9 @@ export async function fetchLoanDetails(loanGuid) {
     throw new Error('loanGuid is required');
   }
 
-  const token = await ensureEncompassToken();
-  const response = await axios.get(`${API_BASE_URL}/loans/${loanGuid}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
+  const response = await requestWithAuth({
+    method: 'get',
+    url: `${API_BASE_URL}/loans/${loanGuid}`,
   });
 
   return response.data;
