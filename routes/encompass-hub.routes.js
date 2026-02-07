@@ -6,6 +6,8 @@ import {
   getCompanyUsers,
   getPipeline,
   getLoan,
+  setLoanFields,
+  getLoanFields,
   getCalculatorSummary,
   getRatioAnalytics,
   getMapVisualization,
@@ -19,6 +21,8 @@ router.get('/status', getHubStatus);
 router.get('/users', getCompanyUsers);
 router.get('/pipeline', getPipeline);
 router.get('/loans/:loanGuid', getLoan);
+router.post('/loans/:loanId/field-writer', setLoanFields);
+router.post('/loans/:loanGuid/field-reader', getLoanFields);
 router.get('/analytics/calc-summary', getCalculatorSummary);
 router.get('/analytics/ratios', getRatioAnalytics);
 router.get('/visualizations/map3d', getMapVisualization);

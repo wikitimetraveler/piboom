@@ -306,6 +306,17 @@
         border-color: var(--zen-primary);
       }
 
+      .test-description-card.test-scenario-active {
+        border-color: rgba(255, 193, 7, 0.8);
+        box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.12) 0%, rgba(74, 144, 164, 0.06) 100%);
+      }
+
+      .test-description-card.test-scenario-active::before {
+        background: linear-gradient(180deg, rgba(255, 193, 7, 0.9) 0%, rgba(255, 193, 7, 0.6) 100%);
+        width: 6px;
+      }
+
       .test-number-badge {
         flex-shrink: 0;
         width: 48px;
@@ -328,6 +339,83 @@
         line-height: 1.6;
         font-weight: 500;
         padding-top: 4px;
+      }
+
+      .test-description-card {
+        cursor: pointer;
+      }
+
+      .tested-by-label {
+        font-size: 0.75rem;
+        color: var(--zen-muted);
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+        display: block;
+      }
+
+      .tested-by-select {
+        font-size: 0.85rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        border: 1px solid rgba(74, 144, 164, 0.3);
+        background-color: white;
+        color: #1a2856;
+        max-width: 200px;
+      }
+
+      .tested-by-select:focus {
+        border-color: var(--zen-primary);
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(74, 144, 164, 0.2);
+      }
+
+      .tested-by-badge {
+        display: inline-block;
+        margin-left: 0.5rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .tested-by-developer {
+        background-color: rgba(46, 204, 113, 0.15);
+        color: #1a7a43;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+      }
+
+      .tested-by-uat-tester {
+        background-color: rgba(255, 193, 7, 0.15);
+        color: #856404;
+        border: 1px solid rgba(255, 193, 7, 0.3);
+      }
+
+      .tested-by-post-release-tester {
+        background-color: rgba(74, 144, 164, 0.15);
+        color: #1a2856;
+        border: 1px solid rgba(74, 144, 164, 0.3);
+      }
+
+      /* Column highlighting styles */
+      .ag-theme-alpine .ag-header-cell.column-highlighted,
+      .ag-theme-alpine .ag-cell.column-highlighted {
+        background-color: rgba(255, 193, 7, 0.3) !important;
+        animation: columnPulse 0.5s ease-in-out;
+        border: 2px solid rgba(255, 193, 7, 0.6) !important;
+      }
+
+      @keyframes columnPulse {
+        0% {
+          background-color: rgba(255, 193, 7, 0.5);
+        }
+        50% {
+          background-color: rgba(255, 193, 7, 0.7);
+        }
+        100% {
+          background-color: rgba(255, 193, 7, 0.3);
+        }
       }
 
       @media (max-width: 768px) {
@@ -504,9 +592,266 @@
         transform: translateY(0);
       }
 
+      /* Accordion Styling */
+      .accordion .card {
+        border: none;
+        border-radius: 0;
+        border-bottom: 1px solid var(--zen-border);
+      }
+
+      .accordion .card:first-child {
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+      }
+
+      .accordion .card:last-child {
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 18px;
+        border-bottom: none;
+      }
+
+      .accordion .card-header {
+        background-color: rgba(74, 144, 164, 0.08);
+        border-bottom: 1px solid var(--zen-border);
+        padding: 0;
+      }
+
+      .accordion .card-header .btn-link {
+        color: #1a2856;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .accordion .card-header .btn-link:hover {
+        color: var(--zen-primary);
+        background-color: rgba(74, 144, 164, 0.12);
+      }
+
+      .accordion .card-header .btn-link:focus {
+        box-shadow: none;
+        outline: none;
+      }
+
+      .accordion .card-header .btn-link .bi-chevron-down {
+        transition: transform 0.3s ease;
+      }
+
+      .accordion .card-header .btn-link[aria-expanded="true"] .bi-chevron-down {
+        transform: rotate(180deg);
+      }
+
+      .accordion .card-body {
+        padding: 1.5rem;
+        background-color: var(--zen-card-bg);
+      }
+
+      .accordion .collapse.show {
+        border-bottom: 1px solid var(--zen-border);
+      }
+
+      /* AI Chat Styling */
+      .ai-chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 500px;
+        border: 1px solid var(--zen-border);
+        border-radius: 12px;
+        background: var(--zen-card-bg);
+        overflow: hidden;
+      }
+
+      .ai-chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .ai-chat-message {
+        display: flex;
+        gap: 0.75rem;
+        animation: fadeIn 0.3s ease-in;
+      }
+
+      .ai-chat-message.user {
+        flex-direction: row-reverse;
+      }
+
+      .ai-chat-message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 1.2rem;
+      }
+
+      .ai-chat-message.user .ai-chat-message-avatar {
+        background: linear-gradient(135deg, var(--zen-primary) 0%, rgba(74, 144, 164, 0.8) 100%);
+        color: white;
+      }
+
+      .ai-chat-message.assistant .ai-chat-message-avatar {
+        background: linear-gradient(135deg, rgba(46, 204, 113, 0.2) 0%, rgba(46, 204, 113, 0.1) 100%);
+        color: #1a7a43;
+      }
+
+      .ai-chat-message-content {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        max-width: 75%;
+        line-height: 1.6;
+      }
+
+      .ai-chat-message.user .ai-chat-message-content {
+        background: rgba(74, 144, 164, 0.1);
+        color: #1a2856;
+      }
+
+      .ai-chat-message.assistant .ai-chat-message-content {
+        background: rgba(46, 204, 113, 0.08);
+        color: #1a2856;
+        border: 1px solid rgba(46, 204, 113, 0.2);
+      }
+
+      .ai-chat-message-content pre {
+        background: rgba(0, 0, 0, 0.05);
+        padding: 0.5rem;
+        border-radius: 6px;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        margin: 0.5rem 0;
+      }
+
+      .ai-chat-message-content code {
+        background: rgba(0, 0, 0, 0.05);
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+
+      .ai-chat-message-timestamp {
+        font-size: 0.7rem;
+        color: var(--zen-muted);
+        margin-top: 0.25rem;
+      }
+
+      .ai-chat-input-container {
+        border-top: 1px solid var(--zen-border);
+        padding: 1rem;
+        background: rgba(74, 144, 164, 0.04);
+      }
+
+      .ai-chat-loading {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--zen-muted);
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+      }
+
+      .ai-chat-loading .spinner-border-sm {
+        width: 1rem;
+        height: 1rem;
+        border-width: 0.15em;
+      }
+
+      .voice-help-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+
+      .voice-help-drawer {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
+        width: min(360px, 90vw);
+        background: rgba(15, 23, 42, 0.95);
+        color: #fff;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 35px 65px rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        transform: translateY(150%);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        z-index: 1045;
+      }
+
+      .voice-help-drawer.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .voice-help-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .voice-command-list {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+      }
+
+      .voice-command-list li {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        font-size: 0.9rem;
+      }
+
+      .voice-command-list span {
+        font-weight: 600;
+        color: #9edbff;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      #ttsToggleBtn.active {
+        background-color: var(--zen-primary);
+        color: white;
+        border-color: var(--zen-primary);
+      }
+
       @media (max-width: 768px) {
         .hero {
           padding-top: 4rem;
+        }
+        
+        .ai-chat-message-content {
+          max-width: 85%;
+        }
+
+        .voice-help-drawer {
+          right: 16px;
+          left: 16px;
+          width: auto;
         }
       }
     </style>
@@ -541,11 +886,11 @@
           <button class="btn btn-outline-primary" id="exportBtn" style="display: none;">
             <i class="bi-download"></i> Export CSV
           </button>
-          <button class="btn btn-success" id="runTestsBtn" style="display: none;">
-            <i class="bi-play-circle"></i> Run Tests
-          </button>
           <button class="btn btn-outline-secondary" id="clearBtn" style="display: none;">
             <i class="bi-x-circle"></i> Clear Data
+          </button>
+          <button class="btn btn-outline-light voice-help-toggle" id="toggleVoiceHelp">
+            <i class="bi-mic"></i> Voice Guide
           </button>
         </div>
       </div>
@@ -574,25 +919,86 @@
           </div>
         </div>
         
-        <!-- Test Descriptions Card -->
-        <div class="col-12 mb-4" id="testDescriptionsCard" style="display: none;">
-          <div class="card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <h5 class="mb-1"><i class="bi-list-check"></i> Test Scenarios</h5>
-                <small class="text-muted">Descriptions of each test scenario</small>
+        <!-- Accordion Container -->
+        <div class="col-12 mb-4" id="accordionContainer" style="display: none;">
+          <div class="card">
+            <div class="card-header p-0">
+              <div class="accordion" id="testAccordion">
+                <!-- Test Scenarios Accordion -->
+                <div class="card">
+                  <div class="card-header" id="headingTestScenarios">
+                    <h5 class="mb-0">
+                      <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseTestScenarios" aria-expanded="true" aria-controls="collapseTestScenarios">
+                        <i class="bi-list-check"></i> Test Scenarios
+                        <span class="badge badge-primary ml-2" id="testScenariosCount"></span>
+                        <i class="bi-chevron-down float-right"></i>
+                      </button>
+                    </h5>
+                  </div>
+                  <div id="collapseTestScenarios" class="collapse show" aria-labelledby="headingTestScenarios" data-parent="#testAccordion">
+                    <div class="card-body">
+                      <p class="text-muted mb-3"><small>Click a scenario to highlight its column. Select tester to track execution.</small></p>
+                      <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Test Grid Accordion -->
+                <div class="card">
+                  <div class="card-header" id="headingTestGrid">
+                    <h5 class="mb-0">
+                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
+                        <i class="bi-table"></i> Test Grid
+                        <span class="badge badge-info ml-2" id="testGridCount"></span>
+                        <i class="bi-chevron-down float-right"></i>
+                      </button>
+                    </h5>
+                  </div>
+                  <div id="collapseTestGrid" class="collapse" aria-labelledby="headingTestGrid" data-parent="#testAccordion">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                          <span class="badge-soft" id="resultsMeta">0 rows</span>
+                        </div>
+                        <div>
+                          <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." style="max-width: 300px;" />
+                        </div>
+                      </div>
+                      <div class="table-responsive">
+                        <div id="unitTestsGrid" class="ag-theme-alpine unit-tests-grid"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
           </div>
         </div>
         
+        <!-- File Upload Card -->
         <div class="col-12 mb-4">
           <div class="card p-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
                 <h5 class="mb-1">Unit Test Data</h5>
-                <div id="fileInfo" class="file-info-display">No file loaded</div>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                  <div id="fileInfo" class="file-info-display">No file loaded</div>
+                  <span class="badge badge-pill badge-light" id="testGuidDisplay">No GUID</span>
+                </div>
+                <div class="mt-2" id="loanGuidRow" style="display: none;">
+                  <label for="loanGuidInput" class="mb-1 text-muted"><small>Loan GUID</small></label>
+                  <div class="input-group input-group-sm" style="max-width: 520px;">
+                    <input type="text" class="form-control" id="loanGuidInput" placeholder="Enter Loan GUID for API Set calls" />
+                    <div class="input-group-append">
+                      <button class="btn btn-success" id="runTestsBtn" style="display: none;">
+                        <i class="bi-play-circle"></i> Run
+                      </button>
+                      <button class="btn btn-outline-secondary" type="button" id="clearLoanGuidBtn">
+                        <i class="bi-x-circle"></i> Clear
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
               <span class="status-chip info" id="statusChip"><i class="bi-info-circle"></i> Ready</span>
             </div>
@@ -600,19 +1006,6 @@
               <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
               <h5>Drop Excel file here or click to browse</h5>
               <p class="text-muted mb-0">Supports .xlsx and .xls formats</p>
-            </div>
-            <div id="gridContainer" style="display: none;">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                  <span class="badge-soft" id="resultsMeta">0 rows</span>
-                </div>
-                <div>
-                  <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." style="max-width: 300px;" />
-                </div>
-              </div>
-              <div class="table-responsive">
-                <div id="unitTestsGrid" class="ag-theme-alpine unit-tests-grid"></div>
-              </div>
             </div>
             
             <!-- Test Results Panel -->
@@ -635,11 +1028,97 @@
       </div>
     </main>
 
+    <!-- AI Assistant Accordion -->
+    <div class="col-12 mb-4" id="aiAssistantCard" style="display: none;">
+      <div class="card">
+        <div class="card-header p-0">
+          <div class="accordion" id="aiAccordion">
+            <div class="card">
+              <div class="card-header" id="headingAIAssistant">
+                <h5 class="mb-0">
+                  <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseAIAssistant" aria-expanded="false" aria-controls="collapseAIAssistant">
+                    <i class="bi-robot"></i> Encompass Unit Testing AI Assistant
+                    <i class="bi-chevron-down float-right"></i>
+                  </button>
+                </h5>
+              </div>
+              <div id="collapseAIAssistant" class="collapse" aria-labelledby="headingAIAssistant" data-parent="#aiAccordion">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                      <p class="text-muted mb-0"><small>Ask questions about unit testing, test scenarios, Encompass APIs, and test automation.</small></p>
+                    </div>
+                    <div class="btn-group" role="group">
+                      <button class="btn btn-sm btn-outline-secondary" id="clearChatBtn" title="Clear Chat History">
+                        <i class="bi-trash"></i> Clear
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div id="aiChatContainer" class="ai-chat-container">
+                    <div id="aiChatMessages" class="ai-chat-messages"></div>
+                    <div class="ai-chat-input-container">
+                      <div class="input-group">
+                        <input type="text" class="form-control" id="aiChatInput" placeholder="Ask about unit testing, test scenarios, Encompass APIs..." />
+                        <div class="input-group-append">
+                          <button class="btn btn-primary" id="aiChatSendBtn" type="button">
+                            <i class="bi-send"></i> Send
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="voice-help-drawer" id="voiceHelp">
+      <div class="voice-help-header">
+        <h4 class="mb-0"><i class="bi-mic"></i> Voice Shortcuts</h4>
+        <button class="btn btn-link text-white p-0" id="closeVoiceHelp" aria-label="Close voice help">
+          <i class="bi-x-lg"></i>
+        </button>
+      </div>
+      <ul class="voice-command-list">
+        <li>
+          <span>"Show grid"</span>
+          Opens the Test Grid accordion.
+        </li>
+        <li>
+          <span>"Show scenarios"</span>
+          Opens the Test Scenarios accordion.
+        </li>
+        <li>
+          <span>"Run tests"</span>
+          Executes the current test run.
+        </li>
+        <li>
+          <span>"Clear data"</span>
+          Clears the loaded test data.
+        </li>
+        <li>
+          <span>"Search for [term]"</span>
+          Filters the grid by the spoken term.
+        </li>
+        <li>
+          <span>"Show commands" / "Hide commands"</span>
+          Opens or closes this reference.
+        </li>
+      </ul>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="/shared/tts.js"></script>
+    <script src="/shared/voice-widget.js"></script>
     <script src="/finance/js/unit-tests.js"></script>
+    <script src="/finance/js/unit-tests-ai.js"></script>
     <script src="/shared/finance-auth-guard.js"></script>
   </body>
 </html>

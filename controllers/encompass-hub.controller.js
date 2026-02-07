@@ -1,6 +1,8 @@
 import {
   fetchPipelineLoans,
   fetchLoanDetails,
+  writeLoanFields,
+  readLoanFields,
   fetchCompanyUsers,
   fetchNativeFields,
   fetchCustomFields,
@@ -196,6 +198,53 @@ export async function getLoan(req, res) {
     const status = error.response?.status === 404 ? 404 : 500;
     return res.status(status).json({
       error: status === 404 ? 'Loan not found' : 'Failed to fetch loan details',
+      details: error.message,
+    });
+  }
+}
+
+export async function setLoanFields(req, res) {
+  try {
+    const { loanId } = req.params;
+    const payload = req.body;
+    if (!loanId) {
+      return res.status(400).json({ error: 'Loan ID is required' });
+    }
+    if (!Array.isArray(payload) || payload.length === 0) {
+      return res.status(400).json({ error: 'Request body must be a non-empty array' });
+    }
+    const result = await writeLoanFields(loanId, payload);
+    return res.json(result ?? { success: true });
+  } catch (error) {
+    console.error('Error writing Encompass loan fields:', error.message);
+    const status = error.response?.status || 500;
+    return res.status(status).json({
+      error: 'Failed to write Encompass loan fields',
+      details: error.message,
+    });
+  }
+}
+
+export async function getLoanFields(req, res) {
+  try {
+    const { loanGuid } = req.params;
+    const { invalidFieldBehavior = 'Include' } = req.query;
+    const fieldIds = req.body;
+
+    if (!loanGuid) {
+      return res.status(400).json({ error: 'Loan GUID is required' });
+    }
+    if (!Array.isArray(fieldIds) || fieldIds.length === 0) {
+      return res.status(400).json({ error: 'Request body must be a non-empty array of field IDs' });
+    }
+
+    const result = await readLoanFields(loanGuid, fieldIds, invalidFieldBehavior);
+    return res.json(result ?? []);
+  } catch (error) {
+    console.error('Error reading Encompass loan fields:', error.message);
+    const status = error.response?.status || 500;
+    return res.status(status).json({
+      error: 'Failed to read Encompass loan fields',
       details: error.message,
     });
   }

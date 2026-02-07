@@ -2,7 +2,6 @@ const statusChip = document.getElementById('statusChip');
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
 const uploadArea = document.getElementById('uploadArea');
-const gridContainer = document.getElementById('gridContainer');
 const unitTestsGrid = document.getElementById('unitTestsGrid');
 const exportBtn = document.getElementById('exportBtn');
 const runTestsBtn = document.getElementById('runTestsBtn');
@@ -15,10 +14,20 @@ const testResultsContainer = document.getElementById('testResultsContainer');
 const testResultsList = document.getElementById('testResultsList');
 const testResultsSummary = document.getElementById('testResultsSummary');
 const closeResultsBtn = document.getElementById('closeResultsBtn');
+const voiceHelpPanel = document.getElementById('voiceHelp');
+const voiceHelpToggle = document.getElementById('toggleVoiceHelp');
+const voiceHelpClose = document.getElementById('closeVoiceHelp');
+const loanGuidRow = document.getElementById('loanGuidRow');
+const loanGuidInput = document.getElementById('loanGuidInput');
+const clearLoanGuidBtn = document.getElementById('clearLoanGuidBtn');
 
 let gridApi;
 let allData = [];
 let columnDefs = [];
+let testDescriptionsData = []; // Store test descriptions with testedBy field
+let currentFileName = ''; // Store current file name for database operations
+let voiceWidgetInstance = null;
+let currentLoanGuid = '';
 
 /**
  * Extract field ID from bracket notation (e.g., "[LOCKRATE.2866]" -> "LOCKRATE.2866")
@@ -145,9 +154,12 @@ function parseExcelFile(file) {
           
           // Check if first column is a test number (1-11) and second has description
           if (col1 && col2 && /^\d+$/.test(col1) && parseInt(col1) >= 1 && parseInt(col1) <= 11 && col2.length > 3) {
+            // Check if we already have this test description with testedBy
+            const existingTest = testDescriptionsData.find(t => t.testNumber === col1);
             testDescriptions.push({
               testNumber: col1,
-              description: col2
+              description: col2,
+              testedBy: existingTest ? existingTest.testedBy : ''
             });
           }
         }
@@ -171,9 +183,12 @@ function parseExcelFile(file) {
                 const testNum = normalizeValue(testRow[0]);
                 const testDesc = normalizeValue(testRow[1]);
                 if (testNum && testDesc && testNum.toLowerCase() !== 'null' && /^\d+$/.test(testNum)) {
+                  // Check if we already have this test description with testedBy
+                  const existingTest = testDescriptionsData.find(t => t.testNumber === testNum);
                   testDescriptions.push({
                     testNumber: testNum,
-                    description: testDesc
+                    description: testDesc,
+                    testedBy: existingTest ? existingTest.testedBy : ''
                   });
                 }
               });
@@ -277,8 +292,9 @@ function generateColumnDefs(headers, rows) {
     
     // Special handling for Step column (first column)
     if (headerLower === 'step' || index === 0) {
-      colDef.minWidth = 80;
-      colDef.flex = 0.6;
+      colDef.minWidth = 60;
+      colDef.maxWidth = 90;
+      colDef.flex = 0.3;
       colDef.cellClass = 'step-cell';
       colDef.headerClass = 'step-header';
       // If it's numeric, treat as step number
@@ -442,10 +458,15 @@ function initializeGrid() {
       flex: 1,
       minWidth: 120,
     },
+    columnTypes: {
+      dateColumn: {},
+    },
+    rowSelection: {
+      mode: 'singleRow',
+      enableClickSelection: true,
+    },
     animateRows: true,
     overlayNoRowsTemplate: '<span class="text-muted">No data available. Upload an Excel file to get started.</span>',
-    enableRangeSelection: true,
-    suppressRowClickSelection: false,
   };
   
   if (typeof agGrid.createGrid === 'function') {
@@ -453,6 +474,13 @@ function initializeGrid() {
   } else {
     new agGrid.Grid(unitTestsGrid, gridOptions);
     gridApi = gridOptions.api;
+  }
+
+  const testGridCollapse = document.getElementById('collapseTestGrid');
+  if (testGridCollapse) {
+    testGridCollapse.addEventListener('shown.bs.collapse', () => {
+      safeSizeColumnsToFit();
+    });
   }
 }
 
@@ -473,11 +501,17 @@ function setGridRows(rows) {
   }
   
   // Auto-size columns
-  if (typeof gridApi.sizeColumnsToFit === 'function') {
-    setTimeout(() => {
+  safeSizeColumnsToFit();
+}
+
+function safeSizeColumnsToFit() {
+  if (!gridApi || typeof gridApi.sizeColumnsToFit !== 'function') return;
+  if (!unitTestsGrid || unitTestsGrid.offsetWidth === 0) return;
+  setTimeout(() => {
+    if (unitTestsGrid.offsetWidth > 0) {
       gridApi.sizeColumnsToFit();
-    }, 100);
-  }
+    }
+  }, 100);
 }
 
 function updateResultsMeta() {
@@ -510,6 +544,28 @@ function applySearch() {
   updateResultsMeta();
 }
 
+function pickTestValue(testValues) {
+  const entries = Object.entries(testValues);
+  for (const [, value] of entries) {
+    if (value !== '' && value !== null && value !== undefined) {
+      return value;
+    }
+  }
+  return null;
+}
+
+function buildFieldWriterPayload(fieldId, value, row) {
+  const payload = [{ id: fieldId, value }];
+  const lockValue = row.Lock ?? row.lock ?? row.Locked ?? row.locked;
+  if (lockValue !== undefined && lockValue !== '') {
+    const lockNormalized = String(lockValue).toLowerCase().trim();
+    if (['true', 'yes', 'y', '1'].includes(lockNormalized)) {
+      payload[0].lock = true;
+    }
+  }
+  return payload;
+}
+
 function exportToCSV() {
   if (!gridApi || typeof gridApi.exportDataAsCsv !== 'function') {
     console.warn('CSV export unavailable');
@@ -525,32 +581,341 @@ function exportToCSV() {
 
 function displayTestDescriptions(testDescriptions) {
   const container = document.getElementById('testDescriptionsContainer');
-  const card = document.getElementById('testDescriptionsCard');
+  const accordionContainer = document.getElementById('accordionContainer');
+  const testScenariosCount = document.getElementById('testScenariosCount');
   
-  if (!container || !card) return;
+  if (!container || !accordionContainer) return;
   
   container.innerHTML = '';
-  card.style.display = 'block';
+  accordionContainer.style.display = 'block';
+  
+  // Update test scenarios count badge
+  if (testScenariosCount) {
+    testScenariosCount.textContent = testDescriptions.length;
+  }
   
   testDescriptions.forEach(test => {
     const cardElement = document.createElement('div');
     cardElement.className = 'test-description-card';
+    cardElement.setAttribute('data-test-number', test.testNumber);
+    
+    // Get or initialize testedBy value
+    if (!test.testedBy) {
+      test.testedBy = '';
+    }
+    
     cardElement.innerHTML = `
       <div class="test-number-badge">${test.testNumber}</div>
-      <div class="test-description-text">${test.description}</div>
+      <div class="flex-grow-1">
+        <div class="test-description-text">${test.description}</div>
+        <div class="mt-2">
+          <label class="tested-by-label">Tested By:</label>
+          <select class="tested-by-select form-control form-control-sm" data-test-number="${test.testNumber}">
+            <option value="">Not Tested</option>
+            <option value="DEVELOPER" ${test.testedBy === 'DEVELOPER' ? 'selected' : ''}>Developer</option>
+            <option value="UAT TESTER" ${test.testedBy === 'UAT TESTER' ? 'selected' : ''}>UAT Tester</option>
+            <option value="POST RELEASE TESTER" ${test.testedBy === 'POST RELEASE TESTER' ? 'selected' : ''}>Post Release Tester</option>
+          </select>
+        </div>
+      </div>
     `;
+    
+    // Add click handler to highlight associated column
+    cardElement.addEventListener('click', (e) => {
+      // Don't trigger if clicking on the select dropdown
+      if (e.target.classList.contains('tested-by-select') || e.target.closest('.tested-by-select')) {
+        return;
+      }
+      
+      // Remove active class from all cards
+      document.querySelectorAll('.test-description-card').forEach(card => {
+        card.classList.remove('test-scenario-active');
+      });
+      
+      // Add active class to clicked card
+      cardElement.classList.add('test-scenario-active');
+      
+      highlightTestColumn(test.testNumber);
+    });
+    
+    // Add change handler for testedBy select
+    const selectElement = cardElement.querySelector('.tested-by-select');
+    selectElement.addEventListener('change', async (e) => {
+      const newTestedBy = e.target.value;
+      test.testedBy = newTestedBy;
+      
+      // Update in global storage
+      const globalTest = testDescriptionsData.find(t => t.testNumber === test.testNumber);
+      if (globalTest) {
+        globalTest.testedBy = newTestedBy;
+      }
+      
+      // Get testedAt from the test object
+      const testedAt = test.testedAt || null;
+      updateTestedByBadge(cardElement, test.testedBy, testedAt);
+      
+      // Save to database if testedBy is set
+      if (newTestedBy && currentFileName) {
+        await saveTestExecutionToDatabase(currentFileName, test.testNumber, newTestedBy);
+      }
+    });
+    
+    // Update badge on initial render with timestamp if available
+    updateTestedByBadge(cardElement, test.testedBy, test.testedAt);
+    
     container.appendChild(cardElement);
   });
 }
 
+function updateTestedByBadge(cardElement, testedBy, testedAt = null) {
+  // Remove existing badge
+  const existingBadge = cardElement.querySelector('.tested-by-badge');
+  if (existingBadge) {
+    existingBadge.remove();
+  }
+  
+  // Add badge if testedBy has a value
+  if (testedBy) {
+    const badge = document.createElement('span');
+    badge.className = `tested-by-badge tested-by-${testedBy.toLowerCase().replace(/\s+/g, '-')}`;
+    
+    if (testedAt) {
+      const date = new Date(testedAt);
+      const dateStr = date.toLocaleDateString();
+      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      badge.textContent = `${testedBy} (${dateStr} ${timeStr})`;
+      badge.title = `Tested on ${date.toLocaleString()}`;
+    } else {
+      badge.textContent = testedBy;
+    }
+    
+    const descriptionText = cardElement.querySelector('.test-description-text');
+    if (descriptionText) {
+      descriptionText.appendChild(badge);
+    }
+  }
+}
+
+function highlightTestColumn(testNumber) {
+  if (!gridApi) return;
+  
+  // Remove existing highlights
+  removeColumnHighlight();
+  
+  // Find the column that matches this test number
+  // Test columns are typically named "Test 1", "Test1", "Test #1", etc.
+  const testColumnPatterns = [
+    `Test ${testNumber}`,
+    `Test${testNumber}`,
+    `Test #${testNumber}`,
+    `Test#${testNumber}`,
+    `Test-${testNumber}`,
+    `Test_${testNumber}`
+  ];
+  
+  let columnIdToHighlight = null;
+  
+  // Try to find matching column in columnDefs first
+  for (const colDef of columnDefs) {
+    const headerName = colDef.headerName || colDef.field || '';
+    const field = colDef.field || '';
+    
+    // Check if this column matches any pattern
+    const matches = testColumnPatterns.some(pattern => {
+      const patternLower = pattern.toLowerCase();
+      const headerLower = String(headerName || '').toLowerCase();
+      const fieldLower = String(field || '').toLowerCase();
+      return headerLower.includes(patternLower) || fieldLower.includes(patternLower);
+    });
+    
+    if (matches) {
+      columnIdToHighlight = colDef.field;
+      break;
+    }
+  }
+  
+  // If no exact match, try to find by test number in column header
+  if (!columnIdToHighlight) {
+    for (const colDef of columnDefs) {
+      const headerName = String(colDef.headerName || colDef.field || '').toLowerCase();
+      
+      // Check if header contains the test number
+      if (headerName.includes('test') && headerName.includes(testNumber)) {
+        columnIdToHighlight = colDef.field;
+        break;
+      }
+    }
+  }
+  
+  if (columnIdToHighlight) {
+    // Ensure column is visible
+    if (typeof gridApi.setColumnVisible === 'function') {
+      gridApi.setColumnVisible(columnIdToHighlight, true);
+    }
+    
+    // Scroll to column
+    if (typeof gridApi.ensureColumnVisible === 'function') {
+      gridApi.ensureColumnVisible(columnIdToHighlight);
+    }
+    
+    // Add CSS class for highlighting using ag-grid's column API
+    setTimeout(() => {
+      // Find header element by col-id attribute
+      const headerElements = document.querySelectorAll(`[col-id="${columnIdToHighlight}"]`);
+      
+      if (headerElements.length > 0) {
+        headerElements.forEach(element => {
+          element.classList.add('column-highlighted');
+        });
+      } else {
+        // Fallback: find by header text or field name
+        const allHeaders = document.querySelectorAll('.ag-header-cell');
+        allHeaders.forEach(header => {
+          const headerText = header.textContent || '';
+          const headerLower = headerText.toLowerCase();
+          const colId = header.getAttribute('col-id') || '';
+          
+          // Check if this header matches our column
+          if (colId === columnIdToHighlight || 
+              (headerLower.includes('test') && headerLower.includes(testNumber))) {
+            header.classList.add('column-highlighted');
+            
+            // Find and highlight all cells in this column
+            const colIndex = header.getAttribute('aria-colindex');
+            if (colIndex) {
+              const cells = document.querySelectorAll(`[aria-colindex="${colIndex}"]`);
+              cells.forEach(cell => cell.classList.add('column-highlighted'));
+            }
+            
+            // Also try by col-id on cells
+            const cellsByColId = document.querySelectorAll(`[col-id="${columnIdToHighlight}"]`);
+            cellsByColId.forEach(cell => cell.classList.add('column-highlighted'));
+          }
+        });
+      }
+      
+      // Remove highlight after 3 seconds
+      setTimeout(() => {
+        removeColumnHighlight();
+      }, 3000);
+    }, 100);
+  } else {
+    // If column not found, show a brief message
+    const originalStatus = statusChip.textContent;
+    setStatus(`Test ${testNumber} column not found`, 'info', 'bi-info-circle');
+    setTimeout(() => {
+      setStatus(originalStatus, 'ok', 'bi-check-circle');
+    }, 2000);
+  }
+}
+
+function removeColumnHighlight() {
+  const highlightedElements = document.querySelectorAll('.column-highlighted');
+  highlightedElements.forEach(el => {
+    el.classList.remove('column-highlighted');
+  });
+}
+
+/**
+ * Save test execution to database
+ */
+async function saveTestExecutionToDatabase(fileName, testNumber, testedBy) {
+  try {
+    const response = await fetch('/api/unit-tests/executions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        fileName,
+        testNumber,
+        testedBy
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('Failed to save test execution:', error);
+      return;
+    }
+
+    const result = await response.json();
+    console.log('Test execution saved:', result);
+    
+    // Update the test description with timestamp
+    const test = testDescriptionsData.find(t => t.testNumber === testNumber);
+    if (test && result.execution) {
+      test.testedAt = result.execution.tested_at;
+      // Update the badge to show timestamp
+      updateTestedByBadgeWithTimestamp(testNumber, testedBy, result.execution.tested_at);
+    }
+  } catch (error) {
+    console.error('Error saving test execution:', error);
+  }
+}
+
+/**
+ * Load test executions from database
+ */
+async function loadTestExecutionsFromDatabase(fileName) {
+  if (!fileName) return {};
+  
+  try {
+    const response = await fetch(`/api/unit-tests/executions?fileName=${encodeURIComponent(fileName)}`);
+    
+    if (!response.ok) {
+      console.error('Failed to load test executions');
+      return {};
+    }
+
+    const result = await response.json();
+    return result.executions || {};
+  } catch (error) {
+    console.error('Error loading test executions:', error);
+    return {};
+  }
+}
+
+/**
+ * Update testedBy badge with timestamp
+ */
+function updateTestedByBadgeWithTimestamp(testNumber, testedBy, testedAt) {
+  const cardElement = document.querySelector(`[data-test-number="${testNumber}"]`);
+  if (!cardElement) return;
+  
+  // Remove existing badge
+  const existingBadge = cardElement.querySelector('.tested-by-badge');
+  if (existingBadge) {
+    existingBadge.remove();
+  }
+  
+  // Add badge with timestamp
+  if (testedBy && testedAt) {
+    const badge = document.createElement('span');
+    badge.className = `tested-by-badge tested-by-${testedBy.toLowerCase().replace(/\s+/g, '-')}`;
+    
+    const date = new Date(testedAt);
+    const dateStr = date.toLocaleDateString();
+    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    badge.textContent = `${testedBy} (${dateStr} ${timeStr})`;
+    badge.title = `Tested on ${date.toLocaleString()}`;
+    
+    const descriptionText = cardElement.querySelector('.test-description-text');
+    if (descriptionText) {
+      descriptionText.appendChild(badge);
+    }
+  }
+}
+
 function hideTestDescriptions() {
   const container = document.getElementById('testDescriptionsContainer');
-  const card = document.getElementById('testDescriptionsCard');
+  const testScenariosCount = document.getElementById('testScenariosCount');
   if (container) {
-    container.innerHTML = '';
+    container.innerHTML = '<div class="text-muted"><small>No test scenario descriptions found in this file.</small></div>';
   }
-  if (card) {
-    card.style.display = 'none';
+  if (testScenariosCount) {
+    testScenariosCount.textContent = '0';
   }
 }
 
@@ -614,13 +979,76 @@ async function runTests() {
         message: ''
       };
       
-      // Simulate test execution based on action type
+      // Execute test based on action type
       if (action.toLowerCase() === 'set') {
-        result.status = 'info';
-        result.message = `Would SET ${fieldId} with test values`;
+        if (!currentLoanGuid) {
+          result.status = 'skipped';
+          result.message = 'Missing Loan GUID for Set call';
+        } else {
+          const testValue = pickTestValue(testValues);
+          if (testValue === null) {
+            result.status = 'skipped';
+            result.message = 'No test value found for Set';
+          } else {
+            try {
+              const body = buildFieldWriterPayload(fieldId, testValue, row);
+              const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-writer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+              });
+              if (!response.ok) {
+                const errorText = await response.text();
+                result.status = 'err';
+                result.message = `Set failed (${response.status}): ${errorText || 'Unknown error'}`;
+              } else {
+                result.status = 'info';
+                result.message = `SET ${fieldId} succeeded`;
+              }
+            } catch (error) {
+              result.status = 'err';
+              result.message = `Set error: ${error.message}`;
+            }
+          }
+        }
       } else if (action.toLowerCase() === 'get') {
-        result.status = 'info';
-        result.message = `Would GET ${fieldId} value`;
+        if (!currentLoanGuid) {
+          result.status = 'skipped';
+          result.message = 'Missing Loan GUID for Get call';
+        } else {
+          try {
+            const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify([fieldId])
+            });
+            if (!response.ok) {
+              const errorText = await response.text();
+              result.status = 'err';
+              result.message = `Get failed (${response.status}): ${errorText || 'Unknown error'}`;
+            } else {
+              const data = await response.json();
+              let value = null;
+
+              if (Array.isArray(data)) {
+                const match =
+                  data.find((item) => item?.id === fieldId) ||
+                  data.find((item) => item?.fieldId === fieldId) ||
+                  data[0];
+                value = match?.value ?? match?.Value ?? match?.fieldValue ?? match?.field_value ?? null;
+              } else if (data && typeof data === 'object') {
+                value = data[fieldId] ?? data[fieldId.toUpperCase()] ?? data[fieldId.toLowerCase()] ?? null;
+              }
+
+              const displayValue = value === null || value === undefined ? 'No value returned' : JSON.stringify(value);
+              result.status = 'info';
+              result.message = `GET ${fieldId}: ${displayValue}`;
+            }
+          } catch (error) {
+            result.status = 'err';
+            result.message = `Get error: ${error.message}`;
+          }
+        }
       } else if (action.toLowerCase() === 'compare') {
         // For compare, check if we have expected values
         const hasExpected = Object.values(testValues).some(v => v && v !== '');
@@ -702,6 +1130,9 @@ function displayTestResults(results, passed, failed, skipped) {
 function clearData() {
   allData = [];
   columnDefs = [];
+  testDescriptionsData = [];
+  currentFileName = '';
+  currentLoanGuid = '';
   
   if (gridApi) {
     setGridRows([]);
@@ -710,7 +1141,6 @@ function clearData() {
   fileInput.value = '';
   searchInput.value = '';
   uploadArea.style.display = 'block';
-  gridContainer.style.display = 'none';
   exportBtn.style.display = 'none';
   runTestsBtn.style.display = 'none';
   clearBtn.style.display = 'none';
@@ -719,6 +1149,25 @@ function clearData() {
   fileInfo.innerHTML = 'No file loaded';
   resultsMeta.textContent = '0 rows';
   hideTestDescriptions();
+  removeColumnHighlight();
+  if (loanGuidRow) {
+    loanGuidRow.style.display = 'none';
+  }
+  if (loanGuidInput) {
+    loanGuidInput.value = '';
+  }
+  
+  // Hide accordion container
+  const accordionContainer = document.getElementById('accordionContainer');
+  if (accordionContainer) {
+    accordionContainer.style.display = 'none';
+  }
+  
+  // Hide AI Assistant
+  if (window.unitTestsAI && window.unitTestsAI.hide) {
+    window.unitTestsAI.hide();
+  }
+  
   setStatus('Ready', 'info', 'bi-info-circle');
 }
 
@@ -786,19 +1235,70 @@ async function handleFileUpload(file) {
       return headerLower.startsWith('test') || /^test\s*\d+/i.test(headerLower);
     });
     
+    // Store test descriptions globally for persistence
+    testDescriptionsData = testDescriptions || [];
+    
+    // Store current file name
+    currentFileName = parsedFileName;
+    
+    // Load test executions from database
+    const executions = await loadTestExecutionsFromDatabase(parsedFileName);
+    
+    // Merge database executions with test descriptions
+    if (executions && Object.keys(executions).length > 0) {
+      testDescriptionsData.forEach(test => {
+        const testExecutions = executions[test.testNumber];
+        if (testExecutions) {
+          // Find the most recent execution for each tester type
+          // Priority: POST RELEASE TESTER > UAT TESTER > DEVELOPER
+          const testerPriority = ['POST RELEASE TESTER', 'UAT TESTER', 'DEVELOPER'];
+          let latestTestedBy = null;
+          let latestTestedAt = null;
+          
+          testerPriority.forEach(tester => {
+            if (testExecutions[tester]) {
+              const testedAt = new Date(testExecutions[tester].testedAt);
+              if (!latestTestedAt || testedAt > latestTestedAt) {
+                latestTestedBy = tester;
+                latestTestedAt = testedAt;
+              }
+            }
+          });
+          
+          if (latestTestedBy) {
+            test.testedBy = latestTestedBy;
+            test.testedAt = latestTestedAt.toISOString();
+          }
+        }
+      });
+    }
+    
+    // Ensure accordion container is visible for grid/scenarios
+    const accordionContainer = document.getElementById('accordionContainer');
+    if (accordionContainer) {
+      accordionContainer.style.display = 'block';
+    }
+
     // Display test descriptions if available
     if (testDescriptions && testDescriptions.length > 0) {
-      displayTestDescriptions(testDescriptions);
+      displayTestDescriptions(testDescriptionsData);
     } else {
       hideTestDescriptions();
     }
     
     // Update UI
     uploadArea.style.display = 'none';
-    gridContainer.style.display = 'block';
     exportBtn.style.display = 'inline-block';
     runTestsBtn.style.display = 'inline-block';
     clearBtn.style.display = 'inline-block';
+    if (loanGuidRow) {
+      loanGuidRow.style.display = 'block';
+    }
+    
+    // Show AI Assistant
+    if (window.unitTestsAI && window.unitTestsAI.show) {
+      window.unitTestsAI.show();
+    }
     
     // Build enhanced file info with test descriptions
     let fileInfoHTML = `<strong>${parsedFileName}</strong>`;
@@ -871,6 +1371,17 @@ clearBtn.addEventListener('click', (e) => {
   clearData();
 });
 
+loanGuidInput?.addEventListener('input', (e) => {
+  currentLoanGuid = e.target.value.trim();
+});
+
+clearLoanGuidBtn?.addEventListener('click', () => {
+  currentLoanGuid = '';
+  if (loanGuidInput) {
+    loanGuidInput.value = '';
+  }
+});
+
 runTestsBtn?.addEventListener('click', (e) => {
   e.preventDefault();
   runTests();
@@ -880,6 +1391,9 @@ closeResultsBtn?.addEventListener('click', (e) => {
   e.preventDefault();
   testResultsContainer.style.display = 'none';
 });
+
+voiceHelpToggle?.addEventListener('click', () => toggleVoiceHelp());
+voiceHelpClose?.addEventListener('click', () => toggleVoiceHelp(false));
 
 searchInput.addEventListener('input', () => {
   applySearch();
@@ -896,7 +1410,128 @@ if (exampleFilesList) {
   });
 }
 
+function initializeVoiceWidget() {
+  if (typeof initVoiceWidget !== 'function') return;
+  voiceWidgetInstance = initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'blue',
+    onCommand: handleVoiceCommand,
+  });
+}
+
+function handleVoiceCommand(rawCommand = '') {
+  const command = rawCommand.toLowerCase().trim();
+  if (!command) return;
+
+  if (command.includes('show grid') || command.includes('open grid') || command.includes('show test grid')) {
+    showAccordionSection('collapseTestGrid');
+    speak('Showing test grid');
+    return;
+  }
+
+  if (command.includes('show scenarios') || command.includes('show test scenarios') || command.includes('show tests')) {
+    showAccordionSection('collapseTestScenarios');
+    speak('Showing test scenarios');
+    return;
+  }
+
+  if (command.includes('show commands') || command.includes('voice guide') || command.includes('show guide')) {
+    toggleVoiceHelp(true);
+    speak('Showing voice commands');
+    return;
+  }
+
+  if (command.includes('hide commands') || command.includes('hide guide')) {
+    toggleVoiceHelp(false);
+    speak('Closing voice guide');
+    return;
+  }
+
+  if (command.includes('run tests') || command.includes('run test')) {
+    speak('Running tests');
+    runTests();
+    return;
+  }
+
+  if (command.includes('clear data') || command.includes('clear tests') || command.includes('reset data')) {
+    speak('Clearing data');
+    clearData();
+    return;
+  }
+
+  if (command.includes('search for')) {
+    const term = command.split('search for')[1]?.trim();
+    if (!term) {
+      speak('Please say search for followed by your term');
+      return;
+    }
+    if (searchInput) {
+      searchInput.value = term;
+      applySearch();
+      showAccordionSection('collapseTestGrid');
+      speak(`Searching for ${term}`);
+    }
+    return;
+  }
+
+  // Fallback: route to AI assistant
+  if (window.unitTestsAI && typeof window.unitTestsAI.sendMessage === 'function') {
+    showAccordionSection('collapseAIAssistant');
+    window.unitTestsAI.sendMessage(rawCommand);
+    speak('Sending your question to the assistant');
+    return;
+  }
+
+  speak('Command not recognized for Unit Tests');
+}
+
+function showAccordionSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+  const trigger = document.querySelector(`[data-target="#${sectionId}"]`);
+  if (trigger) {
+    trigger.setAttribute('aria-expanded', 'true');
+    trigger.classList.remove('collapsed');
+  }
+  if (window.$ && typeof window.$.fn?.collapse === 'function') {
+    window.$(section).collapse('show');
+  } else {
+    section.classList.add('show');
+  }
+}
+
+function toggleVoiceHelp(forceShow) {
+  if (!voiceHelpPanel) return;
+  const show = typeof forceShow === 'boolean' ? forceShow : !voiceHelpPanel.classList.contains('show');
+  voiceHelpPanel.classList.toggle('show', show);
+}
+
+function speak(text) {
+  if (typeof window.speakWithGoogle === 'function') {
+    window.speakWithGoogle(text, 'en-US-Standard-D', { speakingRate: 0.95 })
+      .then((success) => {
+        if (!success) {
+          speakWithBrowser(text);
+        }
+      })
+      .catch(() => speakWithBrowser(text));
+    return;
+  }
+
+  speakWithBrowser(text);
+}
+
+function speakWithBrowser(text) {
+  if (!('speechSynthesis' in window)) return;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+
 // Initialize grid on load
 document.addEventListener('DOMContentLoaded', () => {
   initializeGrid();
+  initializeVoiceWidget();
 });

@@ -28,6 +28,7 @@ import encompassWebhookRoutes from './encompass-webhook.routes.js';
 import fishCatchesRoutes from './fish-catches.routes.js';
 import bikesRoutes from './bikes.routes.js';
 import customersRoutes from './customers.routes.js';
+import unitTestsRoutes from './unit-tests.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -59,6 +60,7 @@ export default function buildRoutes(io) {
   api.use('/fish-catches', fishCatchesRoutes);
   api.use('/bikes', bikesRoutes);
   api.use('/customers', customersRoutes);
+  api.use('/unit-tests', unitTestsRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

@@ -636,7 +636,38 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_loans_flood_zone ON loans(flood_zone)
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, and loan pipeline)');
+    // Create test_executions table for unit test tracking
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS test_executions (
+        id SERIAL PRIMARY KEY,
+        file_name VARCHAR(255) NOT NULL,
+        test_number VARCHAR(50) NOT NULL,
+        tested_by VARCHAR(50) NOT NULL CHECK (tested_by IN ('DEVELOPER', 'UAT TESTER', 'POST RELEASE TESTER')),
+        tested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(file_name, test_number, tested_by)
+      )
+    `);
+
+    // Create indexes for test_executions
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_test_executions_file_name ON test_executions(file_name)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_test_executions_test_number ON test_executions(test_number)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_test_executions_tested_by ON test_executions(tested_by)
+    `);
+    
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_test_executions_tested_at ON test_executions(tested_at DESC)
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, and test executions)');
     
     // Migrate existing Grateful Dead data to new structure (run in background)
     migrateGratefulDeadData().catch(error => {

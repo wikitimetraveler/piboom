@@ -879,6 +879,63 @@ export async function fetchLoanDetails(loanGuid) {
   return response.data;
 }
 
+export async function writeLoanFields(loanId, fieldsPayload = []) {
+  if (!loanId) {
+    throw new Error('loanId is required');
+  }
+  if (!Array.isArray(fieldsPayload) || fieldsPayload.length === 0) {
+    throw new Error('fieldsPayload must be a non-empty array');
+  }
+
+  try {
+    const response = await requestWithAuth({
+      method: 'post',
+      url: `${API_V3_BASE}/loans/${encodeURIComponent(loanId)}/fieldWriter`,
+      data: fieldsPayload,
+    });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass fieldWriter request failed', {
+      status,
+      data,
+      message: error.message,
+    });
+    const detail = data?.message || data?.error || error.message;
+    throw new Error(`Encompass fieldWriter ${status || 'error'}: ${detail}`);
+  }
+}
+
+export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavior = 'Include') {
+  if (!loanGuid) {
+    throw new Error('loanGuid is required');
+  }
+  if (!Array.isArray(fieldIds) || fieldIds.length === 0) {
+    throw new Error('fieldIds must be a non-empty array');
+  }
+
+  try {
+    const response = await requestWithAuth({
+      method: 'post',
+      url: `${API_V3_BASE}/loans/${encodeURIComponent(loanGuid)}/fieldReader`,
+      params: { invalidFieldBehavior },
+      data: fieldIds,
+    });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass fieldReader request failed', {
+      status,
+      data,
+      message: error.message,
+    });
+    const detail = data?.message || data?.error || error.message;
+    throw new Error(`Encompass fieldReader ${status || 'error'}: ${detail}`);
+  }
+}
+
 export {
   normalizePipelineItems,
   parseNumber,
