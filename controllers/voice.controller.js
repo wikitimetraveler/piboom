@@ -58,7 +58,7 @@ async function executeVoiceCommand(command, io) {
       const personality = response.data.personality || 'engaging';
       
       // Send response to frontend with personality info
-      if (io) {C
+      if (io) {
         io.emit('voiceCommand', { 
           command: 'chatResponse', 
           response: chatResponse,

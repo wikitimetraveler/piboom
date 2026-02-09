@@ -839,6 +839,105 @@
         border-color: var(--zen-primary);
       }
 
+      .sticky-action-bar {
+        position: sticky;
+        top: 16px;
+        z-index: 1020;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(74, 144, 164, 0.2);
+        border-radius: 12px;
+        padding: 0.75rem;
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: flex-end;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        backdrop-filter: blur(6px);
+      }
+
+      .sticky-action-left {
+        display: flex;
+        align-items: flex-end;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .sticky-action-right {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .loan-guid-group {
+        min-width: 280px;
+      }
+
+      .loan-guid-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(74, 144, 164, 0.12);
+        color: #1a2856;
+        font-weight: 600;
+        font-size: 0.8rem;
+        border: 1px solid rgba(74, 144, 164, 0.25);
+        max-width: 240px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .run-summary-card {
+        border: 1px solid rgba(74, 144, 164, 0.2);
+        border-radius: 12px;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+      }
+
+      .scenario-status-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+      }
+
+      .scenario-status-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        text-transform: uppercase;
+      }
+
+      .scenario-status-badge.success {
+        background: rgba(46, 204, 113, 0.18);
+        color: #1e824c;
+        border: 1px solid rgba(46, 204, 113, 0.35);
+      }
+
+      .scenario-status-badge.warn {
+        background: rgba(255, 193, 7, 0.18);
+        color: #b07d00;
+        border: 1px solid rgba(255, 193, 7, 0.35);
+      }
+
+      .scenario-status-badge.fail {
+        background: rgba(231, 76, 60, 0.18);
+        color: #a93226;
+        border: 1px solid rgba(231, 76, 60, 0.35);
+      }
+
+      .scenario-status-badge.empty {
+        background: rgba(148, 163, 184, 0.2);
+        color: #475569;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+      }
+
       @media (max-width: 768px) {
         .hero {
           padding-top: 4rem;
@@ -852,6 +951,10 @@
           right: 16px;
           left: 16px;
           width: auto;
+        }
+
+        .sticky-action-bar {
+          top: 8px;
         }
       }
     </style>
@@ -885,9 +988,6 @@
           </div>
           <button class="btn btn-outline-primary" id="exportBtn" style="display: none;">
             <i class="bi-download"></i> Export CSV
-          </button>
-          <button class="btn btn-outline-secondary" id="clearBtn" style="display: none;">
-            <i class="bi-x-circle"></i> Clear Data
           </button>
           <button class="btn btn-outline-light voice-help-toggle" id="toggleVoiceHelp">
             <i class="bi-mic"></i> Voice Guide
@@ -960,9 +1060,6 @@
                         <div>
                           <span class="badge-soft" id="resultsMeta">0 rows</span>
                         </div>
-                        <div>
-                          <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." style="max-width: 300px;" />
-                        </div>
                       </div>
                       <div class="table-responsive">
                         <div id="unitTestsGrid" class="ag-theme-alpine unit-tests-grid"></div>
@@ -985,10 +1082,15 @@
                   <div id="fileInfo" class="file-info-display">No file loaded</div>
                   <span class="badge badge-pill badge-light" id="testGuidDisplay">No GUID</span>
                 </div>
-                <div class="mt-2" id="loanGuidRow" style="display: none;">
+              </div>
+              <span class="status-chip info" id="statusChip"><i class="bi-info-circle"></i> Ready</span>
+            </div>
+            <div class="sticky-action-bar" id="stickyActionBar" style="display: none;">
+              <div class="sticky-action-left">
+                <div class="loan-guid-group">
                   <label for="loanGuidInput" class="mb-1 text-muted"><small>Loan GUID</small></label>
-                  <div class="input-group input-group-sm" style="max-width: 520px;">
-                    <input type="text" class="form-control" id="loanGuidInput" placeholder="Enter Loan GUID for API Set calls" />
+                  <div class="input-group input-group-sm">
+                    <input type="text" class="form-control" id="loanGuidInput" placeholder="Enter Loan GUID for API calls" />
                     <div class="input-group-append">
                       <button class="btn btn-success" id="runTestsBtn" style="display: none;">
                         <i class="bi-play-circle"></i> Run
@@ -999,13 +1101,39 @@
                     </div>
                   </div>
                 </div>
+                <span class="loan-guid-chip" id="loanGuidChip">No Loan GUID</span>
               </div>
-              <span class="status-chip info" id="statusChip"><i class="bi-info-circle"></i> Ready</span>
+              <div class="sticky-action-right">
+                <select class="form-control form-control-sm" id="recentRunsSelect">
+                  <option value="">Recent runs…</option>
+                </select>
+                <button class="btn btn-outline-danger btn-sm" id="failFirstBtn">
+                  <i class="bi-exclamation-triangle"></i> Fail First
+                </button>
+                <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." />
+                <button class="btn btn-outline-secondary btn-sm" id="clearBtn" style="display: none;">
+                  <i class="bi-x-circle"></i> Clear Data
+                </button>
+              </div>
             </div>
             <div id="uploadArea" class="file-upload-area">
               <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
               <h5>Drop Excel file here or click to browse</h5>
               <p class="text-muted mb-0">Supports .xlsx and .xls formats</p>
+            </div>
+            <div class="run-summary-card mt-4" id="runSummaryCard" style="display: none;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                  <h6 class="mb-1">Last Run Summary</h6>
+                  <small class="text-muted" id="runSummaryTime">Not run yet</small>
+                </div>
+                <span class="badge badge-light" id="runSummaryCounts">0 total</span>
+              </div>
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar bg-success" id="runSummaryPassBar" role="progressbar" style="width: 0%"></div>
+                <div class="progress-bar bg-warning" id="runSummarySkipBar" role="progressbar" style="width: 0%"></div>
+                <div class="progress-bar bg-danger" id="runSummaryFailBar" role="progressbar" style="width: 0%"></div>
+              </div>
             </div>
             
             <!-- Test Results Panel -->

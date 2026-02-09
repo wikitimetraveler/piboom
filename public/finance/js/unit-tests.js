@@ -17,9 +17,18 @@ const closeResultsBtn = document.getElementById('closeResultsBtn');
 const voiceHelpPanel = document.getElementById('voiceHelp');
 const voiceHelpToggle = document.getElementById('toggleVoiceHelp');
 const voiceHelpClose = document.getElementById('closeVoiceHelp');
-const loanGuidRow = document.getElementById('loanGuidRow');
+const stickyActionBar = document.getElementById('stickyActionBar');
 const loanGuidInput = document.getElementById('loanGuidInput');
 const clearLoanGuidBtn = document.getElementById('clearLoanGuidBtn');
+const loanGuidChip = document.getElementById('loanGuidChip');
+const recentRunsSelect = document.getElementById('recentRunsSelect');
+const failFirstBtn = document.getElementById('failFirstBtn');
+const runSummaryCard = document.getElementById('runSummaryCard');
+const runSummaryTime = document.getElementById('runSummaryTime');
+const runSummaryCounts = document.getElementById('runSummaryCounts');
+const runSummaryPassBar = document.getElementById('runSummaryPassBar');
+const runSummarySkipBar = document.getElementById('runSummarySkipBar');
+const runSummaryFailBar = document.getElementById('runSummaryFailBar');
 
 let gridApi;
 let allData = [];
@@ -28,6 +37,10 @@ let testDescriptionsData = []; // Store test descriptions with testedBy field
 let currentFileName = ''; // Store current file name for database operations
 let voiceWidgetInstance = null;
 let currentLoanGuid = '';
+let lastRunResults = [];
+let lastRunSummary = null;
+
+const RECENT_RUNS_KEY = 'unitTestsRecentRuns';
 
 /**
  * Extract field ID from bracket notation (e.g., "[LOCKRATE.2866]" -> "LOCKRATE.2866")
@@ -544,11 +557,110 @@ function applySearch() {
   updateResultsMeta();
 }
 
+function extractTestNumberFromKey(key) {
+  if (!key) return null;
+  const match = String(key).match(/test\s*#?\s*(\d+)/i);
+  return match ? match[1] : null;
+}
+
+function getActiveTestNumber() {
+  const activeCard = document.querySelector('.test-description-card.test-scenario-active');
+  if (!activeCard) return null;
+  return activeCard.getAttribute('data-test-number');
+}
+
+function findTestColumnByNumber(testNumber) {
+  if (!Array.isArray(columnDefs)) return null;
+  const descriptionIndex = columnDefs.findIndex((colDef) => {
+    const header = String(colDef.headerName || colDef.field || '').trim().toLowerCase();
+    return header === 'description';
+  });
+  if (descriptionIndex >= 0) {
+    if (testNumber) {
+      const offset = parseInt(testNumber, 10);
+      if (!Number.isNaN(offset)) {
+        const targetIndex = descriptionIndex + offset + 1;
+        const targetCol = columnDefs[targetIndex];
+        if (targetCol?.field) {
+          return { field: targetCol.field, testNumber: String(testNumber) };
+        }
+      }
+    } else {
+      const resetCol = columnDefs[descriptionIndex + 1];
+      if (resetCol?.field) {
+        return { field: resetCol.field, testNumber: 'RESET' };
+      }
+    }
+  }
+
+  if (!testNumber) return null;
+  const patterns = [
+    `Test ${testNumber}`,
+    `Test${testNumber}`,
+    `Test #${testNumber}`,
+    `Test#${testNumber}`,
+    `Test-${testNumber}`,
+    `Test_${testNumber}`
+  ];
+  const match = columnDefs.find((colDef) => {
+    const header = String(colDef.headerName || colDef.field || '').trim();
+    return patterns.some(pattern => header.toLowerCase() === pattern.toLowerCase());
+  });
+  return match ? { field: match.field, testNumber: String(testNumber) } : null;
+}
+
+function findFallbackTestColumn() {
+  if (!Array.isArray(columnDefs)) return null;
+  const resetCol = columnDefs.find((colDef) => {
+    const header = String(colDef.headerName || colDef.field || '').trim().toLowerCase();
+    return header === 'reset';
+  });
+  if (resetCol?.field) {
+    return { field: resetCol.field, testNumber: 'RESET' };
+  }
+  const match = columnDefs.find((colDef) => {
+    const header = String(colDef.headerName || colDef.field || '').trim();
+    return header.toLowerCase().startsWith('test');
+  });
+  if (!match) return null;
+  return { field: match.field, testNumber: extractTestNumberFromKey(match.headerName || match.field) };
+}
+
+function getOrderedTestColumns() {
+  if (!Array.isArray(columnDefs)) return [];
+  const descriptionIndex = columnDefs.findIndex((colDef) => {
+    const header = String(colDef.headerName || colDef.field || '').trim().toLowerCase();
+    return header === 'description';
+  });
+  const startIndex = descriptionIndex >= 0 ? descriptionIndex + 1 : 0;
+  return columnDefs.slice(startIndex).filter((colDef) => {
+    const header = String(colDef.headerName || colDef.field || '').trim().toLowerCase();
+    return header === 'reset' || header.startsWith('test');
+  }).map((colDef) => ({
+    field: colDef.field,
+    testNumber: extractTestNumberFromKey(colDef.headerName || colDef.field) || (String(colDef.headerName || colDef.field).toLowerCase() === 'reset' ? 'RESET' : null)
+  }));
+}
+
+function pickTestColumnForRow(row) {
+  const testColumns = getOrderedTestColumns();
+  if (!testColumns.length) return null;
+  const nonEmpty = testColumns.find((col) => {
+    const value = row[col.field];
+    return value !== null && value !== undefined && String(value).trim() !== '';
+  });
+  return nonEmpty || testColumns[0];
+}
+
 function pickTestValue(testValues) {
   const entries = Object.entries(testValues);
-  for (const [, value] of entries) {
+  for (const [key, value] of entries) {
     if (value !== '' && value !== null && value !== undefined) {
-      return value;
+      return {
+        value,
+        key,
+        testNumber: extractTestNumberFromKey(key)
+      };
     }
   }
   return null;
@@ -617,6 +729,7 @@ function displayTestDescriptions(testDescriptions) {
             <option value="POST RELEASE TESTER" ${test.testedBy === 'POST RELEASE TESTER' ? 'selected' : ''}>Post Release Tester</option>
           </select>
         </div>
+        <div class="scenario-status-badges" data-test-number="${test.testNumber}"></div>
       </div>
     `;
     
@@ -693,6 +806,149 @@ function updateTestedByBadge(cardElement, testedBy, testedAt = null) {
     if (descriptionText) {
       descriptionText.appendChild(badge);
     }
+  }
+}
+
+function updateLoanGuidChipDisplay(value) {
+  if (!loanGuidChip) return;
+  const displayValue = value ? value : 'No Loan GUID';
+  loanGuidChip.textContent = displayValue;
+  loanGuidChip.title = value || '';
+}
+
+function updateRunSummary(passed, failed, skipped, total) {
+  if (!runSummaryCard) return;
+  const timestamp = new Date();
+  runSummaryCard.style.display = 'block';
+  if (runSummaryTime) {
+    runSummaryTime.textContent = `Last run ${timestamp.toLocaleString()}`;
+  }
+  if (runSummaryCounts) {
+    runSummaryCounts.textContent = `${total} total • ${passed} passed • ${failed} failed • ${skipped} skipped`;
+  }
+
+  const passPercent = total ? Math.round((passed / total) * 100) : 0;
+  const skipPercent = total ? Math.round((skipped / total) * 100) : 0;
+  const failPercent = total ? Math.max(0, 100 - passPercent - skipPercent) : 0;
+
+  if (runSummaryPassBar) runSummaryPassBar.style.width = `${passPercent}%`;
+  if (runSummarySkipBar) runSummarySkipBar.style.width = `${skipPercent}%`;
+  if (runSummaryFailBar) runSummaryFailBar.style.width = `${failPercent}%`;
+
+  lastRunSummary = {
+    timestamp: timestamp.toISOString(),
+    passed,
+    failed,
+    skipped,
+    total
+  };
+}
+
+function getRecentRuns() {
+  try {
+    const stored = localStorage.getItem(RECENT_RUNS_KEY);
+    const parsed = stored ? JSON.parse(stored) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    console.warn('Unable to read recent runs', error);
+    return [];
+  }
+}
+
+function saveRecentRun() {
+  if (!currentLoanGuid || !lastRunSummary) return;
+  try {
+    const runs = getRecentRuns().filter(run => run.loanGuid !== currentLoanGuid);
+    runs.unshift({
+      loanGuid: currentLoanGuid,
+      ...lastRunSummary
+    });
+    const trimmed = runs.slice(0, 5);
+    localStorage.setItem(RECENT_RUNS_KEY, JSON.stringify(trimmed));
+    renderRecentRunsSelect(trimmed);
+  } catch (error) {
+    console.warn('Unable to save recent run', error);
+  }
+}
+
+function renderRecentRunsSelect(runs = getRecentRuns()) {
+  if (!recentRunsSelect) return;
+  recentRunsSelect.innerHTML = '<option value="">Recent runs…</option>';
+  runs.forEach(run => {
+    const option = document.createElement('option');
+    option.value = run.loanGuid;
+    const stamp = run.timestamp ? new Date(run.timestamp).toLocaleString() : 'Unknown time';
+    const summary = `${run.passed}/${run.total} passed`;
+    option.textContent = `${run.loanGuid} • ${stamp} • ${summary}`;
+    recentRunsSelect.appendChild(option);
+  });
+}
+
+function summarizeStatus(bucket) {
+  if (!bucket || bucket.total === 0) return 'empty';
+  if (bucket.failed > 0) return 'fail';
+  if (bucket.passed > 0 && bucket.skipped === 0) return 'success';
+  if (bucket.passed > 0 || bucket.skipped > 0) return 'warn';
+  return 'empty';
+}
+
+function buildBadge(action, status) {
+  const labelMap = {
+    success: `${action} OK`,
+    warn: `${action} WARN`,
+    fail: `${action} FAIL`,
+    empty: `${action} N/A`
+  };
+  return `<span class="scenario-status-badge ${status}">${labelMap[status]}</span>`;
+}
+
+function updateScenarioBadges(results = []) {
+  const perTest = {};
+  const global = {
+    SET: { passed: 0, failed: 0, skipped: 0, total: 0 },
+    GET: { passed: 0, failed: 0, skipped: 0, total: 0 }
+  };
+
+  results.forEach(result => {
+    const action = (result.action || '').toUpperCase();
+    if (!global[action]) return;
+    const bucketKey = result.status === 'info' ? 'passed' : result.status === 'skipped' ? 'skipped' : 'failed';
+    global[action][bucketKey] += 1;
+    global[action].total += 1;
+
+    if (action === 'SET' && result.testNumber) {
+      if (!perTest[result.testNumber]) {
+        perTest[result.testNumber] = { passed: 0, failed: 0, skipped: 0, total: 0 };
+      }
+      perTest[result.testNumber][bucketKey] += 1;
+      perTest[result.testNumber].total += 1;
+    }
+  });
+
+  document.querySelectorAll('.scenario-status-badges').forEach(container => {
+    const testNumber = container.getAttribute('data-test-number');
+    const setBucket = perTest[testNumber] || global.SET;
+    const getBucket = global.GET;
+    const setStatus = summarizeStatus(setBucket);
+    const getStatus = summarizeStatus(getBucket);
+    container.innerHTML = `${buildBadge('SET', setStatus)}${buildBadge('GET', getStatus)}`;
+  });
+}
+
+function focusFirstFailedStep() {
+  if (!gridApi || !lastRunResults.length) return;
+  const failed = lastRunResults.find(result => result.status === 'err');
+  if (!failed || failed.rowIndex === undefined) {
+    setStatus('No failed steps found', 'ok', 'bi-check-circle');
+    return;
+  }
+  showAccordionSection('collapseTestGrid');
+  if (typeof gridApi.ensureIndexVisible === 'function') {
+    gridApi.ensureIndexVisible(failed.rowIndex, 'middle');
+  }
+  if (typeof gridApi.getDisplayedRowAtIndex === 'function') {
+    const rowNode = gridApi.getDisplayedRowAtIndex(failed.rowIndex);
+    rowNode?.setSelected(true);
   }
 }
 
@@ -976,7 +1232,9 @@ async function runTests() {
         target: fieldId,
         description,
         status: 'pending',
-        message: ''
+        message: '',
+        rowIndex: i,
+        testNumber: null
       };
       
       // Execute test based on action type
@@ -990,8 +1248,9 @@ async function runTests() {
             result.status = 'skipped';
             result.message = 'No test value found for Set';
           } else {
+            result.testNumber = testValue.testNumber || null;
             try {
-              const body = buildFieldWriterPayload(fieldId, testValue, row);
+              const body = buildFieldWriterPayload(fieldId, testValue.value, row);
               const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-writer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -1043,6 +1302,26 @@ async function runTests() {
               const displayValue = value === null || value === undefined ? 'No value returned' : JSON.stringify(value);
               result.status = 'info';
               result.message = `GET ${fieldId}: ${displayValue}`;
+
+              // Populate grid value into the most likely test column
+              if (value !== null && value !== undefined) {
+                const targetColumns = getOrderedTestColumns();
+                if (targetColumns.length > 0) {
+                  if (gridApi?.getDisplayedRowAtIndex) {
+                    const rowNode = gridApi.getDisplayedRowAtIndex(i);
+                    targetColumns.forEach((column) => {
+                      row[column.field] = value;
+                      if (rowNode) {
+                        rowNode.setDataValue(column.field, value);
+                      }
+                    });
+                  } else {
+                    targetColumns.forEach((column) => {
+                      row[column.field] = value;
+                    });
+                  }
+                }
+              }
             }
           } catch (error) {
             result.status = 'err';
@@ -1077,6 +1356,13 @@ async function runTests() {
     
     // Display results
     displayTestResults(results, passed, failed, skipped);
+    updateRunSummary(passed, failed, skipped, results.length);
+    updateScenarioBadges(results);
+    lastRunResults = results;
+    saveRecentRun();
+    if (failFirstBtn) {
+      failFirstBtn.disabled = failed === 0;
+    }
     setStatus(`Tests complete: ${passed} passed, ${failed} failed, ${skipped} skipped`, 
       failed > 0 ? 'err' : 'ok', 
       failed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
@@ -1133,6 +1419,8 @@ function clearData() {
   testDescriptionsData = [];
   currentFileName = '';
   currentLoanGuid = '';
+  lastRunResults = [];
+  lastRunSummary = null;
   
   if (gridApi) {
     setGridRows([]);
@@ -1150,11 +1438,18 @@ function clearData() {
   resultsMeta.textContent = '0 rows';
   hideTestDescriptions();
   removeColumnHighlight();
-  if (loanGuidRow) {
-    loanGuidRow.style.display = 'none';
+  if (stickyActionBar) {
+    stickyActionBar.style.display = 'none';
   }
   if (loanGuidInput) {
     loanGuidInput.value = '';
+  }
+  updateLoanGuidChipDisplay('');
+  if (runSummaryCard) {
+    runSummaryCard.style.display = 'none';
+  }
+  if (failFirstBtn) {
+    failFirstBtn.disabled = true;
   }
   
   // Hide accordion container
@@ -1291,9 +1586,12 @@ async function handleFileUpload(file) {
     exportBtn.style.display = 'inline-block';
     runTestsBtn.style.display = 'inline-block';
     clearBtn.style.display = 'inline-block';
-    if (loanGuidRow) {
-      loanGuidRow.style.display = 'block';
+    if (stickyActionBar) {
+      stickyActionBar.style.display = 'flex';
     }
+    updateLoanGuidChipDisplay(currentLoanGuid);
+    renderRecentRunsSelect();
+    updateScenarioBadges([]);
     
     // Show AI Assistant
     if (window.unitTestsAI && window.unitTestsAI.show) {
@@ -1373,6 +1671,7 @@ clearBtn.addEventListener('click', (e) => {
 
 loanGuidInput?.addEventListener('input', (e) => {
   currentLoanGuid = e.target.value.trim();
+  updateLoanGuidChipDisplay(currentLoanGuid);
 });
 
 clearLoanGuidBtn?.addEventListener('click', () => {
@@ -1380,11 +1679,27 @@ clearLoanGuidBtn?.addEventListener('click', () => {
   if (loanGuidInput) {
     loanGuidInput.value = '';
   }
+  updateLoanGuidChipDisplay('');
+});
+
+recentRunsSelect?.addEventListener('change', (e) => {
+  const selected = e.target.value;
+  if (!selected) return;
+  currentLoanGuid = selected;
+  if (loanGuidInput) {
+    loanGuidInput.value = selected;
+  }
+  updateLoanGuidChipDisplay(selected);
 });
 
 runTestsBtn?.addEventListener('click', (e) => {
   e.preventDefault();
   runTests();
+});
+
+failFirstBtn?.addEventListener('click', (e) => {
+  e.preventDefault();
+  focusFirstFailedStep();
 });
 
 closeResultsBtn?.addEventListener('click', (e) => {
@@ -1534,4 +1849,9 @@ function speakWithBrowser(text) {
 document.addEventListener('DOMContentLoaded', () => {
   initializeGrid();
   initializeVoiceWidget();
+  updateLoanGuidChipDisplay(currentLoanGuid);
+  renderRecentRunsSelect();
+  if (failFirstBtn) {
+    failFirstBtn.disabled = true;
+  }
 });

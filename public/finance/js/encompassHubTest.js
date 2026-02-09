@@ -8,11 +8,27 @@ const stateInput = document.getElementById('stateInput');
 const countyInput = document.getElementById('countyInput');
 const limitInput = document.getElementById('limitInput');
 const loanGuidInput = document.getElementById('loanGuidInput');
+const requestBodyInput = document.getElementById('requestBodyInput');
+const payloadPresetSelect = document.getElementById('payloadPresetSelect');
 
 const endpoints = [
   { label: 'Status', value: '/api/encompass-hub/status', method: 'GET' },
   { label: 'Pipeline', value: '/api/encompass-hub/pipeline', method: 'GET', needsFilters: true },
   { label: 'Loan Details', value: '/api/encompass-hub/loans/{loanGuid}', method: 'GET', needsLoanGuid: true },
+  {
+    label: 'Field Reader',
+    value: '/api/encompass-hub/loans/{loanGuid}/field-reader?invalidFieldBehavior=Include',
+    method: 'POST',
+    needsLoanGuid: true,
+    needsBody: true
+  },
+  {
+    label: 'Field Writer',
+    value: '/api/encompass-hub/loans/{loanGuid}/field-writer',
+    method: 'POST',
+    needsLoanGuid: true,
+    needsBody: true
+  },
   { label: 'Calculator Summary', value: '/api/encompass-hub/analytics/calc-summary', method: 'GET', needsFilters: true },
   { label: 'Ratio Analytics', value: '/api/encompass-hub/analytics/ratios', method: 'GET', needsFilters: true },
   { label: '3D Map Dataset', value: '/api/encompass-hub/visualizations/map3d', method: 'GET', needsFilters: true },
@@ -21,6 +37,28 @@ const endpoints = [
   { label: 'Native Fields', value: '/api/encompass-hub/native-fields', method: 'GET' },
   { label: 'Custom Fields', value: '/api/encompass-hub/custom-fields', method: 'GET' },
   { label: 'Users Directory', value: '/api/encompass-hub/users', method: 'GET' },
+];
+
+const payloadPresets = [
+  {
+    label: 'Field Reader – Sample IDs',
+    value: JSON.stringify(
+      ['1401', '4002', '4000#2', '1109', 'CUST02FV', 'LR.1500', 'BE0139x'],
+      null,
+      2
+    ),
+  },
+  {
+    label: 'Field Writer – Sample Set',
+    value: JSON.stringify(
+      [
+        { id: '4002', value: 'Doe' },
+        { id: '4000#2', value: 'John' },
+      ],
+      null,
+      2
+    ),
+  },
 ];
 
 function populateEndpoints() {
@@ -44,6 +82,16 @@ function populateQuickButtons() {
       runTest();
     });
     quickButtons.appendChild(button);
+  });
+}
+
+function populatePayloadPresets() {
+  if (!payloadPresetSelect) return;
+  payloadPresets.forEach((preset) => {
+    const option = document.createElement('option');
+    option.value = preset.value;
+    option.textContent = preset.label;
+    payloadPresetSelect.appendChild(option);
   });
 }
 
@@ -85,7 +133,17 @@ async function runTest(event) {
   responseBody.textContent = 'Loading...';
 
   try {
-    const response = await fetch(url);
+    const requestOptions = { method: selected.method || 'GET' };
+    if (selected.method && selected.method !== 'GET') {
+      const body = requestBodyInput?.value?.trim();
+      if (selected.needsBody && !body) {
+        throw new Error('Request body is required for this endpoint.');
+      }
+      requestOptions.headers = { 'Content-Type': 'application/json' };
+      requestOptions.body = body || null;
+    }
+
+    const response = await fetch(url, requestOptions);
     const contentType = response.headers.get('content-type') || '';
     const text = await response.text();
     let payload = text;
@@ -116,5 +174,11 @@ async function copyResponse() {
 
 populateEndpoints();
 populateQuickButtons();
+populatePayloadPresets();
 testForm.addEventListener('submit', runTest);
 copyBtn.addEventListener('click', copyResponse);
+
+payloadPresetSelect?.addEventListener('change', () => {
+  if (!requestBodyInput) return;
+  requestBodyInput.value = payloadPresetSelect.value;
+});

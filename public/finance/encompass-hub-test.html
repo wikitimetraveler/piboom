@@ -99,6 +99,14 @@
                   <input type="text" class="form-control" id="loanGuidInput" placeholder="Paste a loan GUID" />
                   <small class="form-text text-muted">Required for loan detail calls.</small>
                 </div>
+                <div class="form-group">
+                  <label for="requestBodyInput">Request Body (JSON)</label>
+                  <select class="form-control mb-2" id="payloadPresetSelect">
+                    <option value="">Select a saved payload…</option>
+                  </select>
+                  <textarea class="form-control" id="requestBodyInput" rows="6" placeholder='["4002","4000#2","1109"]'></textarea>
+                  <small class="form-text text-muted">Used for POST endpoints like fieldReader/fieldWriter.</small>
+                </div>
                 <button type="submit" class="btn btn-primary btn-block">
                   <i class="bi-play-fill"></i> Run Test
                 </button>

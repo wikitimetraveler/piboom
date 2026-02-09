@@ -55,12 +55,6 @@
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   },
-  "jest": {
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/tests/unit/**/*.test.js"
-    ]
-  },
   "engines": {
     "node": ">=18.0.0"
   }
