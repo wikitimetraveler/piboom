@@ -33,7 +33,7 @@ const runSummaryFailBar = document.getElementById('runSummaryFailBar');
 let gridApi;
 let allData = [];
 let columnDefs = [];
-let testDescriptionsData = []; // Store test descriptions with testedBy field
+let testDescriptionsData = []; // Store test descriptions (scenario metadata)
 let currentFileName = ''; // Store current file name for database operations
 let voiceWidgetInstance = null;
 let currentLoanGuid = '';
@@ -167,12 +167,9 @@ function parseExcelFile(file) {
           
           // Check if first column is a test number (1-11) and second has description
           if (col1 && col2 && /^\d+$/.test(col1) && parseInt(col1) >= 1 && parseInt(col1) <= 11 && col2.length > 3) {
-            // Check if we already have this test description with testedBy
-            const existingTest = testDescriptionsData.find(t => t.testNumber === col1);
             testDescriptions.push({
               testNumber: col1,
-              description: col2,
-              testedBy: existingTest ? existingTest.testedBy : ''
+              description: col2
             });
           }
         }
@@ -196,12 +193,9 @@ function parseExcelFile(file) {
                 const testNum = normalizeValue(testRow[0]);
                 const testDesc = normalizeValue(testRow[1]);
                 if (testNum && testDesc && testNum.toLowerCase() !== 'null' && /^\d+$/.test(testNum)) {
-                  // Check if we already have this test description with testedBy
-                  const existingTest = testDescriptionsData.find(t => t.testNumber === testNum);
                   testDescriptions.push({
                     testNumber: testNum,
-                    description: testDesc,
-                    testedBy: existingTest ? existingTest.testedBy : ''
+                    description: testDesc
                   });
                 }
               });
@@ -723,103 +717,26 @@ function displayTestDescriptions(testDescriptions) {
     const cardElement = document.createElement('div');
     cardElement.className = 'test-description-card';
     cardElement.setAttribute('data-test-number', test.testNumber);
-    
-    // Get or initialize testedBy value
-    if (!test.testedBy) {
-      test.testedBy = '';
-    }
-    
+
     cardElement.innerHTML = `
       <div class="test-number-badge">${test.testNumber}</div>
       <div class="flex-grow-1">
         <div class="test-description-text">${test.description}</div>
-        <div class="mt-2">
-          <label class="tested-by-label">Tested By:</label>
-          <select class="tested-by-select form-control form-control-sm" data-test-number="${test.testNumber}">
-            <option value="">Not Tested</option>
-            <option value="DEVELOPER" ${test.testedBy === 'DEVELOPER' ? 'selected' : ''}>Developer</option>
-            <option value="UAT TESTER" ${test.testedBy === 'UAT TESTER' ? 'selected' : ''}>UAT Tester</option>
-            <option value="POST RELEASE TESTER" ${test.testedBy === 'POST RELEASE TESTER' ? 'selected' : ''}>Post Release Tester</option>
-          </select>
-        </div>
         <div class="scenario-status-badges" data-test-number="${test.testNumber}"></div>
       </div>
     `;
-    
+
     // Add click handler to highlight associated column
-    cardElement.addEventListener('click', (e) => {
-      // Don't trigger if clicking on the select dropdown
-      if (e.target.classList.contains('tested-by-select') || e.target.closest('.tested-by-select')) {
-        return;
-      }
-      
-      // Remove active class from all cards
+    cardElement.addEventListener('click', () => {
       document.querySelectorAll('.test-description-card').forEach(card => {
         card.classList.remove('test-scenario-active');
       });
-      
-      // Add active class to clicked card
       cardElement.classList.add('test-scenario-active');
-      
       highlightTestColumn(test.testNumber);
     });
-    
-    // Add change handler for testedBy select
-    const selectElement = cardElement.querySelector('.tested-by-select');
-    selectElement.addEventListener('change', async (e) => {
-      const newTestedBy = e.target.value;
-      test.testedBy = newTestedBy;
-      
-      // Update in global storage
-      const globalTest = testDescriptionsData.find(t => t.testNumber === test.testNumber);
-      if (globalTest) {
-        globalTest.testedBy = newTestedBy;
-      }
-      
-      // Get testedAt from the test object
-      const testedAt = test.testedAt || null;
-      updateTestedByBadge(cardElement, test.testedBy, testedAt);
-      
-      // Save to database if testedBy is set
-      if (newTestedBy && currentFileName) {
-        await saveTestExecutionToDatabase(currentFileName, test.testNumber, newTestedBy);
-      }
-    });
-    
-    // Update badge on initial render with timestamp if available
-    updateTestedByBadge(cardElement, test.testedBy, test.testedAt);
-    
+
     container.appendChild(cardElement);
   });
-}
-
-function updateTestedByBadge(cardElement, testedBy, testedAt = null) {
-  // Remove existing badge
-  const existingBadge = cardElement.querySelector('.tested-by-badge');
-  if (existingBadge) {
-    existingBadge.remove();
-  }
-  
-  // Add badge if testedBy has a value
-  if (testedBy) {
-    const badge = document.createElement('span');
-    badge.className = `tested-by-badge tested-by-${testedBy.toLowerCase().replace(/\s+/g, '-')}`;
-    
-    if (testedAt) {
-      const date = new Date(testedAt);
-      const dateStr = date.toLocaleDateString();
-      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      badge.textContent = `${testedBy} (${dateStr} ${timeStr})`;
-      badge.title = `Tested on ${date.toLocaleString()}`;
-    } else {
-      badge.textContent = testedBy;
-    }
-    
-    const descriptionText = cardElement.querySelector('.test-description-text');
-    if (descriptionText) {
-      descriptionText.appendChild(badge);
-    }
-  }
 }
 
 function updateLoanGuidChipDisplay(value) {
@@ -1089,6 +1006,7 @@ function removeColumnHighlight() {
 
 /**
  * Save test execution to database
+ * @returns {Promise<{execution?: {tested_at: string}}|null>} Result on success, null on failure
  */
 async function saveTestExecutionToDatabase(fileName, testNumber, testedBy) {
   try {
@@ -1107,21 +1025,16 @@ async function saveTestExecutionToDatabase(fileName, testNumber, testedBy) {
     if (!response.ok) {
       const error = await response.json();
       console.error('Failed to save test execution:', error);
-      return;
+      return null;
     }
 
     const result = await response.json();
     console.log('Test execution saved:', result);
-    
-    // Update the test description with timestamp
-    const test = testDescriptionsData.find(t => t.testNumber === testNumber);
-    if (test && result.execution) {
-      test.testedAt = result.execution.tested_at;
-      // Update the badge to show timestamp
-      updateTestedByBadgeWithTimestamp(testNumber, testedBy, result.execution.tested_at);
-    }
+
+    return result;
   } catch (error) {
     console.error('Error saving test execution:', error);
+    return null;
   }
 }
 
@@ -1130,10 +1043,10 @@ async function saveTestExecutionToDatabase(fileName, testNumber, testedBy) {
  */
 async function loadTestExecutionsFromDatabase(fileName) {
   if (!fileName) return {};
-  
+
   try {
     const response = await fetch(`/api/unit-tests/executions?fileName=${encodeURIComponent(fileName)}`);
-    
+
     if (!response.ok) {
       console.error('Failed to load test executions');
       return {};
@@ -1147,35 +1060,77 @@ async function loadTestExecutionsFromDatabase(fileName) {
   }
 }
 
+/** Tester options for Overall Sign-off (file-level) */
+const OVERALL_SIGNOFF_TESTERS = [
+  { value: 'DEVELOPER', label: 'Developer' },
+  { value: 'UAT TESTER', label: 'UAT Tester' },
+  { value: 'POST RELEASE TESTER', label: 'Post Release Tester' }
+];
+
 /**
- * Update testedBy badge with timestamp
+ * Display Overall Test Sign-off section (file-level, one sign-off per tester with timestamp)
  */
-function updateTestedByBadgeWithTimestamp(testNumber, testedBy, testedAt) {
-  const cardElement = document.querySelector(`[data-test-number="${testNumber}"]`);
-  if (!cardElement) return;
-  
-  // Remove existing badge
-  const existingBadge = cardElement.querySelector('.tested-by-badge');
-  if (existingBadge) {
-    existingBadge.remove();
-  }
-  
-  // Add badge with timestamp
-  if (testedBy && testedAt) {
-    const badge = document.createElement('span');
-    badge.className = `tested-by-badge tested-by-${testedBy.toLowerCase().replace(/\s+/g, '-')}`;
-    
-    const date = new Date(testedAt);
-    const dateStr = date.toLocaleDateString();
-    const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    
-    badge.textContent = `${testedBy} (${dateStr} ${timeStr})`;
-    badge.title = `Tested on ${date.toLocaleString()}`;
-    
-    const descriptionText = cardElement.querySelector('.test-description-text');
-    if (descriptionText) {
-      descriptionText.appendChild(badge);
+function displayOverallSignOff(executions) {
+  const container = document.getElementById('overallSignOffContainer');
+  if (!container) return;
+
+  const overall = (executions && executions['overall']) || {};
+
+  container.innerHTML = '';
+
+  OVERALL_SIGNOFF_TESTERS.forEach(({ value, label }) => {
+    const exec = overall[value];
+    const testedAt = exec && exec.testedAt ? exec.testedAt : null;
+
+    const row = document.createElement('div');
+    row.className = 'overall-signoff-row' + (testedAt ? ' confirmed' : '');
+    row.setAttribute('data-tester', value);
+
+    const labelEl = document.createElement('span');
+    labelEl.className = 'tester-label';
+    labelEl.textContent = label;
+
+    const right = document.createElement('div');
+    right.className = 'd-flex align-items-center gap-2';
+
+    if (testedAt) {
+      const date = new Date(testedAt);
+      const dateStr = date.toLocaleDateString();
+      const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const ts = document.createElement('span');
+      ts.className = 'tester-timestamp';
+      ts.textContent = `Confirmed ${dateStr} ${timeStr}`;
+      ts.title = date.toLocaleString();
+      right.appendChild(ts);
+    } else {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-sm btn-primary btn-confirm';
+      btn.innerHTML = '<i class="bi-check2"></i> Confirm';
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+        const result = await saveTestExecutionToDatabase(currentFileName, 'overall', value);
+        if (result && result.execution) {
+          displayOverallSignOff({ ...(executions || {}), overall: { ...(overall || {}), [value]: { testedAt: result.execution.tested_at } } });
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi-check2"></i> Confirm';
+        }
+      });
+      right.appendChild(btn);
     }
+
+    row.appendChild(labelEl);
+    row.appendChild(right);
+    container.appendChild(row);
+  });
+
+  // Update sign-off complete badge on accordion header
+  const confirmedCount = OVERALL_SIGNOFF_TESTERS.filter(({ value }) => overall[value]?.testedAt).length;
+  const badgeEl = document.getElementById('signOffCompleteBadge');
+  if (badgeEl) {
+    badgeEl.style.display = confirmedCount >= 3 ? 'inline-block' : 'none';
   }
 }
 
@@ -1201,6 +1156,8 @@ async function runTests() {
     runTestsBtn.disabled = true;
     testResultsContainer.style.display = 'block';
     testResultsList.innerHTML = '<div class="text-center p-4"><i class="bi-hourglass-split" style="font-size: 2rem;"></i><p class="mt-2">Running tests...</p></div>';
+    const scrollToTopBtnEl = document.getElementById('scrollToTopBtn');
+    if (scrollToTopBtnEl) scrollToTopBtnEl.style.display = 'none';
     
     const results = [];
     let passed = 0;
@@ -1441,6 +1398,8 @@ async function runTests() {
     console.error('Error running tests:', error);
     setStatus(`Error running tests: ${error.message}`, 'err', 'bi-exclamation-octagon');
     testResultsList.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+    const scrollToTopBtnEl = document.getElementById('scrollToTopBtn');
+    if (scrollToTopBtnEl) scrollToTopBtnEl.style.display = 'none';
   } finally {
     runTestsBtn.disabled = false;
   }
@@ -1453,7 +1412,10 @@ function displayTestResults(results, passed, failed, skipped) {
 
   testResultsSummary.textContent = `${total} tests • ${passed} passed • ${failed} failed • ${skipped} skipped (${passRate}% pass rate)`;
 
-  let html = '<div class="test-results-grid">';
+  const SCROLL_THRESHOLD = 10;
+  const showScrollBtn = results.length > SCROLL_THRESHOLD;
+
+  let html = '<div class="test-results-grid" id="testResultsGrid">';
 
   results.forEach(result => {
     const statusClass = result.status === 'info' ? 'success' :
@@ -1483,6 +1445,11 @@ function displayTestResults(results, passed, failed, skipped) {
   
   html += '</div>';
   testResultsList.innerHTML = html;
+
+  const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+  if (scrollToTopBtn) {
+    scrollToTopBtn.style.display = showScrollBtn ? 'inline-flex' : 'none';
+  }
 }
 
 function clearData() {
@@ -1611,43 +1578,17 @@ async function handleFileUpload(file) {
     
     // Load test executions from database
     const executions = await loadTestExecutionsFromDatabase(parsedFileName);
-    
-    // Merge database executions with test descriptions
-    if (executions && Object.keys(executions).length > 0) {
-      testDescriptionsData.forEach(test => {
-        const testExecutions = executions[test.testNumber];
-        if (testExecutions) {
-          // Find the most recent execution for each tester type
-          // Priority: POST RELEASE TESTER > UAT TESTER > DEVELOPER
-          const testerPriority = ['POST RELEASE TESTER', 'UAT TESTER', 'DEVELOPER'];
-          let latestTestedBy = null;
-          let latestTestedAt = null;
-          
-          testerPriority.forEach(tester => {
-            if (testExecutions[tester]) {
-              const testedAt = new Date(testExecutions[tester].testedAt);
-              if (!latestTestedAt || testedAt > latestTestedAt) {
-                latestTestedBy = tester;
-                latestTestedAt = testedAt;
-              }
-            }
-          });
-          
-          if (latestTestedBy) {
-            test.testedBy = latestTestedBy;
-            test.testedAt = latestTestedAt.toISOString();
-          }
-        }
-      });
-    }
-    
+
     // Ensure accordion container is visible for grid/scenarios
     const accordionContainer = document.getElementById('accordionContainer');
     if (accordionContainer) {
       accordionContainer.style.display = 'block';
     }
 
-    // Display test descriptions if available
+    // Display Overall Test Sign-off (file-level; always show when file is loaded)
+    displayOverallSignOff(executions);
+
+    // Display test descriptions (scenarios) if available
     if (testDescriptions && testDescriptions.length > 0) {
       displayTestDescriptions(testDescriptionsData);
     } else {
@@ -1778,6 +1719,11 @@ failFirstBtn?.addEventListener('click', (e) => {
 closeResultsBtn?.addEventListener('click', (e) => {
   e.preventDefault();
   testResultsContainer.style.display = 'none';
+});
+
+document.getElementById('scrollToTopBtn')?.addEventListener('click', () => {
+  const grid = document.getElementById('testResultsGrid');
+  if (grid) grid.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 voiceHelpToggle?.addEventListener('click', () => toggleVoiceHelp());
