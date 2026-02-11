@@ -210,9 +210,20 @@ function parseExcelFile(file) {
           }
         }
         
-        // Extract headers from the Step row
-        const headers = jsonData[headerRowIndex].map(normalizeHeader);
-        
+        // Extract headers from the Step row; ensure unique keys so each scenario column has its own field
+        const rawHeaders = jsonData[headerRowIndex].map(normalizeHeader);
+        const seen = {};
+        const headers = rawHeaders.map((h, idx) => {
+          const base = h && String(h).trim() ? h : `Scenario_${idx + 1}`;
+          if (seen[base]) {
+            const unique = `${base}_${idx}`;
+            seen[unique] = true;
+            return unique;
+          }
+          seen[base] = true;
+          return base;
+        });
+
         // IMPORTANT: Skip ALL rows before the Step row - these are notes/comments
         // Only process rows AFTER the header row as data
         const dataRows = jsonData.slice(headerRowIndex + 1);
@@ -254,15 +265,11 @@ function parseExcelFile(file) {
 function generateColumnDefs(headers, rows) {
   const defs = [];
   
-  // Identify test columns (columns that start with "Test" or contain test numbers)
-  const testColumns = headers.filter(h => {
-    const headerLower = h.toLowerCase().trim();
-    return headerLower.startsWith('test') || /^test\s*\d+/i.test(headerLower);
-  });
-  
-  // Pin non-test columns to the left (Reset is included but Test columns are not)
+  const descriptionIndex = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
+
+  // Pin fixed columns to the left; all columns after Description are scenarios (Reset first, then numbered)
   const pinnedColumns = ['Step', 'Action', 'Target', 'Description', 'Reset'];
-  
+
   headers.forEach((header, index) => {
     if (!header || header.trim() === '') {
       header = `Column ${index + 1}`;
@@ -273,7 +280,7 @@ function generateColumnDefs(headers, rows) {
     const columnType = detectColumnType(columnData);
     
     const headerLower = header.toLowerCase().trim();
-    const isTestColumn = headerLower.startsWith('test') || /^test\s*\d+/i.test(headerLower);
+    const isTestColumn = descriptionIndex >= 0 && index > descriptionIndex;
     const isPinnedColumn = pinnedColumns.some(p => headerLower.includes(p.toLowerCase()));
     
     const colDef = {
@@ -559,8 +566,11 @@ function applySearch() {
 
 function extractTestNumberFromKey(key) {
   if (!key) return null;
-  const match = String(key).match(/test\s*#?\s*(\d+)/i);
-  return match ? match[1] : null;
+  const str = String(key).trim();
+  const testMatch = str.match(/test\s*#?\s*(\d+)/i);
+  if (testMatch) return testMatch[1];
+  const numMatch = str.match(/(\d+)$/);
+  return numMatch ? numMatch[1] : null;
 }
 
 function getActiveTestNumber() {
@@ -633,13 +643,16 @@ function getOrderedTestColumns() {
     return header === 'description';
   });
   const startIndex = descriptionIndex >= 0 ? descriptionIndex + 1 : 0;
+  const pinned = ['step', 'action', 'target', 'description'];
   return columnDefs.slice(startIndex).filter((colDef) => {
     const header = String(colDef.headerName || colDef.field || '').trim().toLowerCase();
-    return header === 'reset' || header.startsWith('test');
-  }).map((colDef) => ({
-    field: colDef.field,
-    testNumber: extractTestNumberFromKey(colDef.headerName || colDef.field) || (String(colDef.headerName || colDef.field).toLowerCase() === 'reset' ? 'RESET' : null)
-  }));
+    return !pinned.some((p) => header.includes(p));
+  }).map((colDef, idx) => {
+    const raw = colDef.headerName || colDef.field || '';
+    const headerLower = String(raw).trim().toLowerCase();
+    const testNum = extractTestNumberFromKey(raw) || (headerLower === 'reset' ? 'RESET' : String(idx + 1));
+    return { field: colDef.field, testNumber: testNum };
+  });
 }
 
 function pickTestColumnForRow(row) {
@@ -916,19 +929,21 @@ function updateScenarioBadges(results = []) {
     global[action][bucketKey] += 1;
     global[action].total += 1;
 
-    if (action === 'SET' && result.testNumber) {
+    if (result.testNumber) {
       if (!perTest[result.testNumber]) {
-        perTest[result.testNumber] = { passed: 0, failed: 0, skipped: 0, total: 0 };
+        perTest[result.testNumber] = { SET: { passed: 0, failed: 0, skipped: 0, total: 0 }, GET: { passed: 0, failed: 0, skipped: 0, total: 0 } };
       }
-      perTest[result.testNumber][bucketKey] += 1;
-      perTest[result.testNumber].total += 1;
+      if (perTest[result.testNumber][action]) {
+        perTest[result.testNumber][action][bucketKey] += 1;
+        perTest[result.testNumber][action].total += 1;
+      }
     }
   });
 
   document.querySelectorAll('.scenario-status-badges').forEach(container => {
     const testNumber = container.getAttribute('data-test-number');
-    const setBucket = perTest[testNumber] || global.SET;
-    const getBucket = global.GET;
+    const setBucket = (perTest[testNumber] && perTest[testNumber].SET) ? perTest[testNumber].SET : global.SET;
+    const getBucket = (perTest[testNumber] && perTest[testNumber].GET) ? perTest[testNumber].GET : global.GET;
     const setStatus = summarizeStatus(setBucket);
     const getStatus = summarizeStatus(getBucket);
     container.innerHTML = `${buildBadge('SET', setStatus)}${buildBadge('GET', getStatus)}`;
@@ -1191,78 +1206,136 @@ async function runTests() {
     let passed = 0;
     let failed = 0;
     let skipped = 0;
-    
-    // Process each row as a test step
-    for (let i = 0; i < allData.length; i++) {
-      const row = allData[i];
-      const step = row.Step || row.step || (i + 1);
-      const action = row.Action || row.action || '';
-      const target = row.Target || row.target || '';
-      const description = row.Description || row.description || '';
-      
-      // Extract field ID from target (e.g., [LOCKRATE.2866] -> LOCKRATE.2866)
-      const fieldId = extractFieldId(target);
-      
-      if (!fieldId) {
-        skipped++;
-        results.push({
-          step,
-          action,
-          target,
-          description,
-          status: 'skipped',
-          message: 'No field ID found in Target'
-        });
-        continue;
-      }
-      
-      // Get test values from Test columns
-      const testValues = {};
-      Object.keys(row).forEach(key => {
-        if (key.toLowerCase().startsWith('test')) {
-          testValues[key] = row[key];
+
+    // Run per scenario (Test 1, Test 2, ...) so each column gets its own results; exclude Reset
+    const scenarioColumns = getOrderedTestColumns().filter((c) => c.testNumber && c.testNumber !== 'RESET');
+    const columnsToRun = scenarioColumns.length > 0 ? scenarioColumns : [null];
+
+    const getCache = {}; // key: `${scenario}-${rowIndex}-${fieldId}` — loan state differs per scenario (each runs its own SETs)
+
+    for (const testColumn of columnsToRun) {
+      for (let i = 0; i < allData.length; i++) {
+        const row = allData[i];
+        const step = row.Step || row.step || (i + 1);
+        const action = row.Action || row.action || '';
+        const target = row.Target || row.target || '';
+        const description = row.Description || row.description || '';
+
+        const fieldId = extractFieldId(target);
+
+        if (!fieldId) {
+          skipped++;
+          results.push({
+            step,
+            action,
+            target,
+            description,
+            status: 'skipped',
+            message: 'No field ID found in Target',
+            rowIndex: i,
+            testNumber: testColumn ? testColumn.testNumber : null
+          });
+          continue;
         }
-      });
-      
-      // For now, execute basic validation
-      // TODO: Integrate with actual API calls for Set/Get/Compare operations
-      const result = {
-        step,
-        action: action.toUpperCase(),
-        target: fieldId,
-        description,
-        status: 'pending',
-        message: '',
-        rowIndex: i,
-        testNumber: null
-      };
-      
-      // Execute test based on action type
-      if (action.toLowerCase() === 'set') {
-        if (!currentLoanGuid) {
-          result.status = 'skipped';
-          result.message = 'Missing Loan GUID for Set call';
-        } else {
-          const testValue = pickTestValue(testValues);
-          if (testValue === null) {
+
+        const testValues = {};
+        Object.keys(row).forEach(key => {
+          if (key.toLowerCase().startsWith('test')) {
+            testValues[key] = row[key];
+          }
+        });
+
+        const result = {
+          step,
+          action: String(action || '').trim().toUpperCase(),
+          target: fieldId,
+          description,
+          status: 'pending',
+          message: '',
+          rowIndex: i,
+          testNumber: testColumn ? testColumn.testNumber : null
+        };
+
+        const actionNorm = String(action || '').trim().toLowerCase();
+        const currentCol = testColumn || pickTestColumnForRow(row);
+
+        if (actionNorm === 'set') {
+          if (!currentLoanGuid) {
             result.status = 'skipped';
-            result.message = 'No test value found for Set';
+            result.message = 'Missing Loan GUID for Set call';
           } else {
-            result.testNumber = testValue.testNumber || null;
+            const setValue = currentCol ? row[currentCol.field] : null;
+            const hasValue = setValue !== null && setValue !== undefined && String(setValue).trim() !== '';
+            if (!currentCol || !hasValue) {
+              result.status = 'skipped';
+              result.message = 'Skipped (no value to set — field left as-is)';
+            } else {
             try {
-              const body = buildFieldWriterPayload(fieldId, testValue.value, row);
+              const body = buildFieldWriterPayload(fieldId, setValue, row);
               const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-writer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
               });
               if (!response.ok) {
-                const errorText = await response.text();
-                result.status = 'err';
-                result.message = `Set failed (${response.status}): ${errorText || 'Unknown error'}`;
+                let errMsg = '';
+                let isReadOnlyField = false;
+                try {
+                  const errJson = await response.json();
+                  const errors = errJson.upstream?.errors || errJson.errors || [];
+                  const detailsStr = [errJson.details, errJson.summary]
+                    .concat(errors.map((e) => e && (e.details || e.message || e.detail || e.error)))
+                    .filter(Boolean)
+                    .join(' ');
+                  if (/can not be updated|Calculated field|read.?only|cannot be (written|updated)/i.test(detailsStr)) {
+                    isReadOnlyField = true;
+                  }
+                  if (!isReadOnlyField) {
+                    const parts = [errJson.details, errJson.summary];
+                    if (Array.isArray(errors) && errors.length) {
+                      parts.push(errors.map((e) => (e && (e.details || e.message || e.detail || e.error)) || JSON.stringify(e)).join('; '));
+                    }
+                    errMsg = parts.filter(Boolean).join(' — ');
+                  }
+                } catch (_) {
+                  errMsg = await response.text();
+                }
+                if (isReadOnlyField) {
+                  result.status = 'skipped';
+                  result.message = `Skipped: calculated/read-only field — cannot be set by API`;
+                } else {
+                  result.status = 'err';
+                  result.message = `Set failed (${response.status}): ${errMsg || 'Unknown error'}`;
+                }
               } else {
-                result.status = 'info';
-                result.message = `SET ${fieldId} succeeded`;
+                // Verify value was actually written (Set can return 200 but write null/wrong value)
+                let readBack = null;
+                try {
+                  const getRes = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([fieldId])
+                  });
+                  if (getRes.ok) {
+                    const getData = await getRes.json();
+                    const match = Array.isArray(getData)
+                      ? (getData.find((item) => item?.id === fieldId || item?.fieldId === fieldId) || getData[0])
+                      : getData;
+                    readBack = match?.value ?? match?.Value ?? match?.fieldValue ?? match?.field_value ?? null;
+                  }
+                } catch (_) {
+                  readBack = null;
+                }
+                const setStr = String(setValue).trim();
+                const readStr = readBack === null || readBack === undefined ? '' : String(readBack).trim();
+                const same = setStr === readStr || (Number(setStr) === Number(readStr) && readStr !== '' && setStr !== '');
+                if (same) {
+                  result.status = 'info';
+                  result.message = `SET ${fieldId} succeeded • Value: ${JSON.stringify(setValue)}`;
+                } else {
+                  result.status = 'err';
+                  result.message = `Set returned OK but value mismatch: set ${JSON.stringify(setValue)}, got ${readBack === null || readBack === undefined ? 'null' : JSON.stringify(readBack)}`;
+                }
               }
             } catch (error) {
               result.status = 'err';
@@ -1270,65 +1343,61 @@ async function runTests() {
             }
           }
         }
-      } else if (action.toLowerCase() === 'get') {
+      } else if (actionNorm === 'get') {
         if (!currentLoanGuid) {
           result.status = 'skipped';
           result.message = 'Missing Loan GUID for Get call';
         } else {
-          try {
-            const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify([fieldId])
-            });
-            if (!response.ok) {
-              const errorText = await response.text();
-              result.status = 'err';
-              result.message = `Get failed (${response.status}): ${errorText || 'Unknown error'}`;
-            } else {
-              const data = await response.json();
+          const scenarioKey = testColumn ? testColumn.testNumber : 'single';
+          const getCacheKey = `${scenarioKey}-${i}-${fieldId}`;
+          if (!getCache[getCacheKey]) {
+            try {
+              const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify([fieldId])
+              });
               let value = null;
-
-              if (Array.isArray(data)) {
-                const match =
-                  data.find((item) => item?.id === fieldId) ||
-                  data.find((item) => item?.fieldId === fieldId) ||
-                  data[0];
-                value = match?.value ?? match?.Value ?? match?.fieldValue ?? match?.field_value ?? null;
-              } else if (data && typeof data === 'object') {
-                value = data[fieldId] ?? data[fieldId.toUpperCase()] ?? data[fieldId.toLowerCase()] ?? null;
-              }
-
-              const displayValue = value === null || value === undefined ? 'No value returned' : JSON.stringify(value);
-              result.status = 'info';
-              result.message = `GET ${fieldId}: ${displayValue}`;
-
-              // Populate grid value into the most likely test column
-              if (value !== null && value !== undefined) {
-                const targetColumns = getOrderedTestColumns();
-                if (targetColumns.length > 0) {
+              if (!response.ok) {
+                const errorText = await response.text();
+                getCache[getCacheKey] = { status: 'err', message: `Get failed (${response.status}): ${errorText || 'Unknown error'}` };
+              } else {
+                const data = await response.json();
+                if (Array.isArray(data)) {
+                  const match =
+                    data.find((item) => item?.id === fieldId) ||
+                    data.find((item) => item?.fieldId === fieldId) ||
+                    data[0];
+                  value = match?.value ?? match?.Value ?? match?.fieldValue ?? match?.field_value ?? null;
+                } else if (data && typeof data === 'object') {
+                  value = data[fieldId] ?? data[fieldId.toUpperCase()] ?? data[fieldId.toLowerCase()] ?? null;
+                }
+                const displayValue = value === null || value === undefined ? 'No value returned' : JSON.stringify(value);
+                getCache[getCacheKey] = { status: 'info', message: `GET ${fieldId}: ${displayValue}`, value };
+                if (value !== null && value !== undefined && currentCol) {
+                  row[currentCol.field] = value;
                   if (gridApi?.getDisplayedRowAtIndex) {
                     const rowNode = gridApi.getDisplayedRowAtIndex(i);
-                    targetColumns.forEach((column) => {
-                      row[column.field] = value;
-                      if (rowNode) {
-                        rowNode.setDataValue(column.field, value);
-                      }
-                    });
-                  } else {
-                    targetColumns.forEach((column) => {
-                      row[column.field] = value;
-                    });
+                    if (rowNode) rowNode.setDataValue(currentCol.field, value);
                   }
                 }
               }
+            } catch (error) {
+              getCache[getCacheKey] = { status: 'err', message: `Get error: ${error.message}` };
             }
-          } catch (error) {
-            result.status = 'err';
-            result.message = `Get error: ${error.message}`;
+          }
+          const cached = getCache[getCacheKey];
+          result.status = cached.status;
+          result.message = cached.message;
+          if (cached.value !== null && cached.value !== undefined && currentCol) {
+            row[currentCol.field] = cached.value;
+            if (gridApi?.getDisplayedRowAtIndex) {
+              const rowNode = gridApi.getDisplayedRowAtIndex(i);
+              if (rowNode) rowNode.setDataValue(currentCol.field, cached.value);
+            }
           }
         }
-      } else if (action.toLowerCase() === 'compare') {
+      } else if (actionNorm === 'compare') {
         // For compare, check if we have expected values
         const hasExpected = Object.values(testValues).some(v => v && v !== '');
         if (hasExpected) {
@@ -1352,8 +1421,9 @@ async function runTests() {
       }
       
       results.push(result);
+      }
     }
-    
+
     // Display results
     displayTestResults(results, passed, failed, skipped);
     updateRunSummary(passed, failed, skipped, results.length);
@@ -1379,17 +1449,19 @@ async function runTests() {
 function displayTestResults(results, passed, failed, skipped) {
   const total = results.length;
   const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
-  
+  const hasMultipleScenarios = new Set(results.map((r) => r.testNumber).filter(Boolean)).size > 1;
+
   testResultsSummary.textContent = `${total} tests • ${passed} passed • ${failed} failed • ${skipped} skipped (${passRate}% pass rate)`;
-  
+
   let html = '<div class="test-results-grid">';
-  
+
   results.forEach(result => {
-    const statusClass = result.status === 'info' ? 'success' : 
+    const statusClass = result.status === 'info' ? 'success' :
                        result.status === 'skipped' ? 'warning' : 'danger';
     const statusIcon = result.status === 'info' ? 'bi-check-circle' :
                       result.status === 'skipped' ? 'bi-skip-forward' : 'bi-x-circle';
-    
+    const scenarioLabel = hasMultipleScenarios && result.testNumber ? `<span class="badge badge-light mr-1">Test ${result.testNumber}</span>` : '';
+
     html += `
       <div class="test-result-card test-result-${result.status}">
         <div class="d-flex align-items-start">
@@ -1399,7 +1471,7 @@ function displayTestResults(results, passed, failed, skipped) {
           <div class="flex-grow-1">
             <div class="d-flex justify-content-between align-items-start mb-1">
               <strong>Step ${result.step}</strong>
-              <span class="badge badge-${statusClass}">${result.action}</span>
+              ${scenarioLabel}<span class="badge badge-${statusClass}">${result.action}</span>
             </div>
             <div class="text-muted small mb-1">${result.description || result.target}</div>
             <div class="test-result-message">${result.message}</div>
@@ -1524,11 +1596,12 @@ async function handleFileUpload(file) {
     // Populate grid
     setGridRows(allData);
     
-    // Count test scenario columns
-    const testColumns = headers.filter(h => {
-      const headerLower = h.toLowerCase().trim();
-      return headerLower.startsWith('test') || /^test\s*\d+/i.test(headerLower);
-    });
+    // Count scenario columns (all after Description except pinned)
+    const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
+    const pinned = ['step', 'action', 'target', 'description'];
+    const scenarioColumns = descIdx >= 0
+      ? headers.slice(descIdx + 1).filter((h) => !pinned.some((p) => String(h || '').toLowerCase().includes(p)))
+      : [];
     
     // Store test descriptions globally for persistence
     testDescriptionsData = testDescriptions || [];
@@ -1608,8 +1681,8 @@ async function handleFileUpload(file) {
         `<span class="badge badge-light mr-1" title="${test.description}">Test ${test.testNumber}</span>`
       ).join('');
       fileInfoHTML += testList + `</div>`;
-    } else if (testColumns.length > 0) {
-      fileInfoHTML += ` <span class="text-muted">• ${testColumns.length} test scenario${testColumns.length !== 1 ? 's' : ''}</span>`;
+    } else if (scenarioColumns.length > 0) {
+      fileInfoHTML += ` <span class="text-muted">• ${scenarioColumns.length} test scenario${scenarioColumns.length !== 1 ? 's' : ''}</span>`;
     }
     
     fileInfo.innerHTML = fileInfoHTML;

@@ -216,11 +216,13 @@ export async function setLoanFields(req, res) {
     const result = await writeLoanFields(loanId, payload);
     return res.json(result ?? { success: true });
   } catch (error) {
-    console.error('Error writing Encompass loan fields:', error.message);
     const status = error.response?.status || 500;
+    const upstream = error.response?.data;
+    console.error('Error writing Encompass loan fields:', error.message, upstream ? { upstream } : '');
     return res.status(status).json({
       error: 'Failed to write Encompass loan fields',
       details: error.message,
+      upstream: upstream ? { summary: upstream.summary, details: upstream.details, errors: upstream.errors } : null,
     });
   }
 }

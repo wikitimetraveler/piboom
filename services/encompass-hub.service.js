@@ -897,13 +897,17 @@ export async function writeLoanFields(loanId, fieldsPayload = []) {
   } catch (error) {
     const status = error.response?.status;
     const data = error.response?.data;
+    const errorsJson = data?.errors ? JSON.stringify(data.errors) : '';
     console.error('Encompass fieldWriter request failed', {
       status,
-      data,
+      summary: data?.summary,
+      details: data?.details,
+      errors: data?.errors,
       message: error.message,
     });
-    const detail = data?.message || data?.error || error.message;
-    throw new Error(`Encompass fieldWriter ${status || 'error'}: ${detail}`);
+    const detail = data?.details || data?.message || data?.error || error.message;
+    const fullDetail = errorsJson ? `${detail} | errors: ${errorsJson}` : detail;
+    throw new Error(`Encompass fieldWriter ${status || 'error'}: ${fullDetail}`);
   }
 }
 
