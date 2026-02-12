@@ -110,23 +110,10 @@
         --ag-border-color: rgba(74, 144, 164, 0.2);
       }
 
-      /* Test scenario columns styling - values for Set operations */
+      /* Test scenario columns - no borders/::after that could shift header vs body */
       .ag-theme-alpine .ag-header-cell.test-scenario-column {
         background-color: rgba(74, 144, 164, 0.12) !important;
         font-weight: 600;
-        border-left: 2px solid var(--zen-primary);
-        position: relative;
-      }
-
-      .ag-theme-alpine .ag-header-cell.test-scenario-column::after {
-        content: 'Set Values';
-        position: absolute;
-        bottom: 2px;
-        left: 50%;
-        transform: translateX(-50%);
-        font-size: 0.7rem;
-        color: var(--zen-muted);
-        font-weight: 400;
       }
 
       .ag-theme-alpine .ag-cell.test-scenario-cell {
@@ -547,10 +534,10 @@
         color: var(--zen-muted);
       }
 
-      /* Pinned columns styling */
-      .ag-theme-alpine .ag-pinned-left-cols-container {
-        border-right: 2px solid var(--zen-primary);
-        background-color: rgba(255, 255, 255, 0.98);
+      /* Force identical box model for header and body - 1:1 alignment */
+      .ag-theme-alpine .ag-header-cell,
+      .ag-theme-alpine .ag-cell {
+        box-sizing: border-box !important;
       }
 
       .unit-tests-grid {

@@ -261,8 +261,8 @@ function generateColumnDefs(headers, rows) {
   
   const descriptionIndex = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
 
-  // Pin fixed columns to the left; all columns after Description are scenarios (Reset first, then numbered)
-  const pinnedColumns = ['Step', 'Action', 'Target', 'Description', 'Reset'];
+  // No pinning - all columns scroll together to avoid header/body alignment issues at pinned boundary
+  const pinnedColumns = [];
 
   headers.forEach((header, index) => {
     if (!header || header.trim() === '') {
@@ -277,14 +277,16 @@ function generateColumnDefs(headers, rows) {
     const isTestColumn = descriptionIndex >= 0 && index > descriptionIndex;
     const isPinnedColumn = pinnedColumns.some(p => headerLower.includes(p.toLowerCase()));
     
+    // Strict 1:1 — one header per column, explicit colId for ag-Grid
     const colDef = {
+      colId: `col_${index}`,
       headerName: header,
       field: header,
       sortable: true,
       filter: true,
       resizable: true,
-      minWidth: 120,
-      flex: header === 'Description' ? 2 : 1,
+      minWidth: 90,
+      width: 120,
     };
     
     // Pin important columns to the left
@@ -307,8 +309,7 @@ function generateColumnDefs(headers, rows) {
     // Special handling for Step column (first column)
     if (headerLower === 'step' || index === 0) {
       colDef.minWidth = 60;
-      colDef.maxWidth = 90;
-      colDef.flex = 0.3;
+      colDef.width = 70;
       colDef.cellClass = 'step-cell';
       colDef.headerClass = 'step-header';
       // If it's numeric, treat as step number
@@ -327,8 +328,8 @@ function generateColumnDefs(headers, rows) {
     // Special handling for Target column (column 3) - contains field IDs in brackets
     // These values can be populated via API
     if (headerLower.includes('target')) {
-      colDef.minWidth = 250;
-      colDef.flex = 1.8;
+      colDef.minWidth = 200;
+      colDef.width = 220;
       colDef.headerClass = 'target-header';
       colDef.cellClass = 'target-cell';
       // Extract and highlight field IDs in brackets
@@ -368,8 +369,8 @@ function generateColumnDefs(headers, rows) {
     
     // Special handling for Description column (column 4)
     if (headerLower.includes('description')) {
-      colDef.minWidth = 300;
-      colDef.flex = 2.5;
+      colDef.minWidth = 250;
+      colDef.width = 280;
       colDef.headerClass = 'description-header';
       colDef.cellClass = 'description-cell';
       colDef.wrapText = true;
@@ -381,8 +382,8 @@ function generateColumnDefs(headers, rows) {
     // Special handling for Test columns - contain values for Set operations
     // These are test scenario values that will be used when Action = "Set"
     if (isTestColumn) {
-      colDef.minWidth = 120;
-      colDef.flex = 1;
+      colDef.minWidth = 90;
+      colDef.width = 110;
       colDef.headerClass = 'test-scenario-column';
       colDef.cellClass = 'test-scenario-cell';
       
@@ -426,8 +427,8 @@ function generateColumnDefs(headers, rows) {
     
     // Action column styling - handles Get, Set, Compare
     if (headerLower === 'action') {
-      colDef.minWidth = 120;
-      colDef.flex = 0.8;
+      colDef.minWidth = 90;
+      colDef.width = 100;
       colDef.cellClass = 'action-cell';
       colDef.headerClass = 'action-header';
       // Add cell renderer to style different action types
@@ -469,8 +470,8 @@ function initializeGrid() {
       sortable: true,
       filter: true,
       resizable: true,
-      flex: 1,
-      minWidth: 120,
+      minWidth: 90,
+      width: 120,
     },
     columnTypes: {
       dateColumn: {},
@@ -481,6 +482,7 @@ function initializeGrid() {
     },
     animateRows: true,
     overlayNoRowsTemplate: '<span class="text-muted">No data available. Upload an Excel file to get started.</span>',
+    onFirstDataRendered: () => safeSizeColumnsToFit(),
   };
   
   if (typeof agGrid.createGrid === 'function') {
@@ -521,11 +523,14 @@ function setGridRows(rows) {
 function safeSizeColumnsToFit() {
   if (!gridApi || typeof gridApi.sizeColumnsToFit !== 'function') return;
   if (!unitTestsGrid || unitTestsGrid.offsetWidth === 0) return;
-  setTimeout(() => {
+  const run = () => {
     if (unitTestsGrid.offsetWidth > 0) {
       gridApi.sizeColumnsToFit();
+      // Second pass after layout settles - helps header/body alignment
+      setTimeout(() => gridApi.sizeColumnsToFit?.(), 250);
     }
-  }, 100);
+  };
+  setTimeout(run, 100);
 }
 
 function updateResultsMeta() {
