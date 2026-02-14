@@ -58,7 +58,7 @@ The generated index powers `lib/knowledge/ice-knowledge.service.js`, which the E
 
 As long as you keep `ice-sources.json` current, the assistant will cite both the official Dev Connect docs and the ICE sample repos/Postman examples in responses.
 
-**Note:** The Code Clairvoyant (`tool9.html`) is a separate form-code review assistant that analyzes manifest XML directly; it does not use the ICE knowledge index.
+**Note:** The Screen Test (`tool9.html`) is a separate form-code review assistant that analyzes manifest XML directly; it does not use the ICE knowledge index.
 
 ## Related Documentation
 

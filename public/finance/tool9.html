@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <!--
-  The Code Clairvoyant - Legacy Encompass Form Code & Web Forms Expert
+  The Screen Test - Legacy Encompass Form Code & Web Forms Expert
   AI-powered review of form code with voice activation. Zen design.
 -->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Code Clairvoyant - Encompass Form Code Expert</title>
+  <title>The Screen Test - Encompass Form Code Expert</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="/shared/styles.css">
@@ -85,10 +85,147 @@
     .nav-finance a:hover, .nav-home a:hover {
       background: linear-gradient(135deg, #6bb7c7 0%, #4a90a4 100%); color: #fff;
     }
+    /* Splash screen - ICE theme (lightened, zen-contrast) */
+    .splash-screen {
+      position: fixed; inset: 0; z-index: 10000;
+      background: linear-gradient(160deg, #1e3a5f 0%, #2a4a72 30%, #243d62 60%, #1a3252 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 1.6s ease, visibility 1.6s ease; overflow: hidden;
+    }
+    .splash-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    .splash-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% 20%, rgba(74, 144, 164, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(107, 183, 199, 0.12) 0%, transparent 45%),
+        radial-gradient(ellipse 50% 30% at 20% 70%, rgba(100, 180, 255, 0.1) 0%, transparent 40%);
+      animation: iceGlow 6s ease-in-out infinite;
+    }
+    @keyframes iceGlow { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+    .splash-crystals {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .splash-crystal {
+      position: absolute; width: 4px; height: 4px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      box-shadow: 0 0 8px rgba(74, 144, 164, 0.6);
+      animation: crystalFloat 8s linear infinite;
+    }
+    .splash-crystal:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 10s; }
+    .splash-crystal:nth-child(2) { left: 25%; animation-delay: 1.5s; animation-duration: 9s; width: 3px; height: 3px; }
+    .splash-crystal:nth-child(3) { left: 40%; animation-delay: 3s; animation-duration: 11s; }
+    .splash-crystal:nth-child(4) { left: 55%; animation-delay: 0.5s; animation-duration: 8s; width: 2px; height: 2px; }
+    .splash-crystal:nth-child(5) { left: 70%; animation-delay: 2s; animation-duration: 12s; }
+    .splash-crystal:nth-child(6) { left: 85%; animation-delay: 4s; animation-duration: 9s; width: 3px; height: 3px; }
+    .splash-crystal:nth-child(7) { left: 15%; animation-delay: 2.5s; animation-duration: 10s; top: 20%; }
+    .splash-crystal:nth-child(8) { left: 90%; animation-delay: 1s; animation-duration: 11s; top: 30%; }
+    @keyframes crystalFloat {
+      0% { transform: translateY(-10px) scale(1); opacity: 0; }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.4; }
+      100% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+    }
+    .splash-snowflakes {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .splash-snowflake {
+      position: absolute;
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      text-shadow: 0 0 6px rgba(74, 144, 164, 0.6);
+      animation: snowflakeFall 12s linear infinite;
+    }
+    .splash-snowflake::before { content: '❄'; }
+    .splash-snowflake:nth-child(1) { left: 5%; font-size: 0.9rem; animation-delay: 0s; animation-duration: 14s; }
+    .splash-snowflake:nth-child(2) { left: 18%; font-size: 1.2rem; animation-delay: 2s; animation-duration: 11s; }
+    .splash-snowflake:nth-child(3) { left: 32%; font-size: 0.75rem; animation-delay: 5s; animation-duration: 16s; }
+    .splash-snowflake:nth-child(4) { left: 48%; font-size: 1.1rem; animation-delay: 1s; animation-duration: 13s; }
+    .splash-snowflake:nth-child(5) { left: 62%; font-size: 0.85rem; animation-delay: 4s; animation-duration: 15s; }
+    .splash-snowflake:nth-child(6) { left: 78%; font-size: 1.15rem; animation-delay: 3s; animation-duration: 12s; }
+    .splash-snowflake:nth-child(7) { left: 92%; font-size: 0.8rem; animation-delay: 6s; animation-duration: 14s; }
+    .splash-snowflake:nth-child(8) { left: 12%; font-size: 1rem; animation-delay: 1.5s; animation-duration: 11s; top: 10%; }
+    .splash-snowflake:nth-child(9) { left: 55%; font-size: 0.7rem; animation-delay: 3.5s; animation-duration: 17s; top: 5%; }
+    .splash-snowflake:nth-child(10) { left: 88%; font-size: 0.95rem; animation-delay: 0.5s; animation-duration: 13s; top: 15%; }
+    @keyframes snowflakeFall {
+      0% { transform: translateY(-20px) translateX(0) rotate(0deg); opacity: 0; }
+      8% { opacity: 0.85; }
+      92% { opacity: 0.4; }
+      100% { transform: translateY(100vh) translateX(30px) rotate(360deg); opacity: 0; }
+    }
+    .splash-shimmer {
+      position: absolute; inset: 0;
+      background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.06) 50%, transparent 70%);
+      background-size: 200% 100%;
+      animation: shimmer 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes shimmer {
+      0%, 100% { background-position: 200% 0; }
+      50% { background-position: -200% 0; }
+    }
+    .splash-content {
+      position: relative; z-index: 2; text-align: center; padding: 2rem;
+      animation: splashFadeIn 2.5s ease-out 1s forwards; opacity: 0;
+    }
+    @keyframes splashFadeIn { to { opacity: 1; } }
+    .splash-icon {
+      width: 64px; height: 64px; margin: 0 auto 1rem;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='none' stroke='rgba(74,144,164,0.9)' stroke-width='1.5' d='M32 4l0 56M4 32l56 0M12 12l40 40M12 52l40-40M52 12L12 52'/%3E%3Cpath fill='rgba(74,144,164,0.25)' stroke='rgba(107,183,199,0.8)' stroke-width='1' d='M32 8l8 16 16 8-16 8-8 16-8-16-16-8 16-8z'/%3E%3Cpath fill='none' stroke='rgba(255,255,255,0.5)' stroke-width='0.8' d='M32 16l4 8 8 4-8 4-4 8-4-8-8-4 8-4z'/%3E%3C/svg%3E") center/contain no-repeat;
+      filter: drop-shadow(0 0 12px rgba(74, 144, 164, 0.5));
+      animation: iconFloat 3s ease-in-out 1.5s infinite;
+    }
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0) scale(1); opacity: 0.95; }
+      50% { transform: translateY(-4px) scale(1.02); opacity: 1; }
+    }
+    .splash-title {
+      font-size: 2.2rem; font-weight: 800; color: #e8f4fc;
+      text-shadow: 0 0 20px rgba(74, 144, 164, 0.5), 0 0 40px rgba(74, 144, 164, 0.25), 0 2px 4px rgba(26, 40, 86, 0.4);
+      letter-spacing: 0.2em; text-transform: uppercase;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      animation: titleIcePulse 3s ease-in-out 2s infinite;
+    }
+    @keyframes titleIcePulse {
+      0%, 100% { text-shadow: 0 0 20px rgba(74, 144, 164, 0.5), 0 0 40px rgba(74, 144, 164, 0.25); }
+      50% { text-shadow: 0 0 30px rgba(107, 183, 199, 0.6), 0 0 50px rgba(74, 144, 164, 0.35); }
+    }
+    .splash-subtitle {
+      font-size: 0.85rem; color: rgba(232, 244, 252, 0.95);
+      text-shadow: 0 1px 3px rgba(26, 40, 86, 0.5);
+      letter-spacing: 0.4em; text-transform: uppercase; margin-top: 0.5rem;
+    }
+    .splash-credits { font-size: 0.75rem; color: rgba(200, 230, 255, 0.9); letter-spacing: 0.25em; margin-top: 1rem; }
+    .splash-hint { position: absolute; bottom: 2.5rem; font-size: 0.7rem; color: rgba(180, 220, 245, 0.7); letter-spacing: 0.15em; }
   </style>
 </head>
 <body data-page="reviewer">
   <modern-navbar></modern-navbar>
+
+  <!-- Splash Screen - ICE theme -->
+  <div class="splash-screen" id="splashScreen">
+    <div class="splash-bg"></div>
+    <div class="splash-crystals">
+      <span class="splash-crystal"></span><span class="splash-crystal"></span><span class="splash-crystal"></span>
+      <span class="splash-crystal"></span><span class="splash-crystal"></span><span class="splash-crystal"></span>
+      <span class="splash-crystal"></span><span class="splash-crystal"></span>
+    </div>
+    <div class="splash-snowflakes">
+      <span class="splash-snowflake" aria-hidden="true"></span><span class="splash-snowflake" aria-hidden="true"></span>
+      <span class="splash-snowflake" aria-hidden="true"></span><span class="splash-snowflake" aria-hidden="true"></span>
+      <span class="splash-snowflake" aria-hidden="true"></span><span class="splash-snowflake" aria-hidden="true"></span>
+      <span class="splash-snowflake" aria-hidden="true"></span><span class="splash-snowflake" aria-hidden="true"></span>
+      <span class="splash-snowflake" aria-hidden="true"></span><span class="splash-snowflake" aria-hidden="true"></span>
+    </div>
+    <div class="splash-shimmer"></div>
+    <div class="splash-content">
+      <div class="splash-icon" aria-hidden="true"></div>
+      <h1 class="splash-title">The Screen Test</h1>
+      <p class="splash-subtitle">Form Code Review</p>
+      <p class="splash-credits">David Lane, Developer • ICE Mortgage Technology • Cursor AI</p>
+    </div>
+    <span class="splash-hint">Click or wait to continue</span>
+  </div>
   <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
   <div class="nav-home"><a href="/index.html"><i class="bi-house"></i> Home</a></div>
 
@@ -98,7 +235,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
     <div class="container">
-      <a class="navbar-brand" href="#"><i class="bi-eye me-2"></i>The Code Clairvoyant</a>
+      <a class="navbar-brand" href="#"><i class="bi-camera-reels me-2"></i>The Screen Test</a>
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi-house"></i> Finance Hub</a></li>
@@ -111,11 +248,12 @@
     <div class="tool-pills d-flex flex-wrap align-items-center justify-content-between mb-4 p-3 bg-white rounded shadow-sm">
       <span class="font-weight-bold text-muted mr-2"><i class="bi-grid-3x3-gap text-primary"></i> Switch tools</span>
       <ul class="nav nav-pills mb-0">
+        <li class="nav-item"><a class="nav-link" href="unit-tests.html"><i class="bi-check2-circle mr-1"></i>Unit Test</a></li>
         <li class="nav-item"><a class="nav-link" href="tool4.html"><i class="bi-gear mr-1"></i>Automator</a></li>
         <li class="nav-item"><a class="nav-link" href="tool5.html"><i class="bi-rulers mr-1"></i>Ruler</a></li>
         <li class="nav-item"><a class="nav-link" href="tool6.html"><i class="bi-arrow-repeat mr-1"></i>Transformer</a></li>
         <li class="nav-item"><a class="nav-link" href="tool8.html"><i class="bi-magic mr-1"></i>Alchemist</a></li>
-        <li class="nav-item"><a class="nav-link active" href="tool9.html"><i class="bi-eye mr-1"></i>Clairvoyant</a></li>
+        <li class="nav-item"><a class="nav-link active" href="tool9.html"><i class="bi-camera-reels mr-1"></i>Screen Test</a></li>
       </ul>
     </div>
 
@@ -140,12 +278,68 @@
         <h6 class="mb-2"><i class="bi-list-check me-1"></i>Extracted</h6>
         <pre id="extractResultText" class="mb-0 small" style="max-height: 200px; overflow: auto;"></pre>
       </div>
+
+      <!-- Form Overview Panel -->
+      <div id="formOverviewPanel" class="mt-4" style="display: none;">
+        <h5 class="mb-3"><i class="bi-diagram-3 me-2"></i>Form Overview</h5>
+
+        <!-- Summary & Functionality -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h6 class="text-muted text-uppercase small mb-3">Summary</h6>
+                <div id="overviewSummary" class="d-flex flex-wrap"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100">
+              <div class="card-body">
+                <h6 class="text-muted text-uppercase small mb-3">Functionality</h6>
+                <div id="overviewFunctionality" class="small"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Fields Table -->
+        <div class="card border-0 shadow-sm mb-4">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0"><i class="bi-table me-1"></i>Custom Fields</h6>
+            <input type="search" id="fieldSearchInput" class="form-control form-control-sm w-auto" placeholder="Search fields..." />
+          </div>
+          <div class="card-body p-0 overflow-auto" style="max-height: 340px;">
+            <table class="table table-sm table-hover mb-0" id="fieldsTable">
+              <thead class="thead-light sticky-top">
+                <tr>
+                  <th>Field ID</th>
+                  <th>Description</th>
+                  <th>Type</th>
+                  <th>Options / Logic</th>
+                </tr>
+              </thead>
+              <tbody id="fieldsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Calculations -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white">
+            <h6 class="mb-0"><i class="bi-calculator me-1"></i>Calculations</h6>
+          </div>
+          <div class="card-body p-0 overflow-auto" style="max-height: 280px;">
+            <div id="calculationsList" class="list-group list-group-flush"></div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- AI Chat Panel -->
     <div class="card p-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="mb-0"><i class="bi-robot me-2"></i>The Code Clairvoyant AI</h5>
+        <h5 class="mb-0"><i class="bi-robot me-2"></i>The Screen Test AI</h5>
         <div class="btn-group">
           <button class="btn btn-sm btn-outline-secondary" id="ttsToggleBtn" title="Speak AI responses"><i class="bi-volume-up"></i> Speak</button>
           <button class="btn btn-sm btn-outline-secondary" id="clearChatBtn" title="Clear chat"><i class="bi-trash"></i> Clear</button>
@@ -161,10 +355,11 @@
               <button class="btn btn-primary" id="aiChatSendBtn"><i class="bi-send"></i> Send</button>
             </div>
           </div>
-          <div class="mt-2 d-flex flex-wrap gap-2">
-            <button class="btn btn-sm btn-outline-primary" id="extractFieldsBtn"><i class="bi-list-ul me-1"></i>Extract Field IDs</button>
-            <button class="btn btn-sm btn-outline-primary" id="askReviewBtn"><i class="bi-search me-1"></i>Ask Clairvoyant</button>
-            <button class="btn btn-sm btn-outline-warning" id="checkIssuesBtn"><i class="bi-exclamation-triangle me-1"></i>Check for Issues</button>
+          <div class="mt-2 d-flex flex-wrap">
+            <button class="btn btn-sm btn-outline-primary mr-2 mb-2" id="extractFieldsBtn"><i class="bi-list-ul me-1"></i>Extract &amp; Overview</button>
+            <button class="btn btn-sm btn-outline-primary mr-2 mb-2" id="askReviewBtn"><i class="bi-search me-1"></i>Ask Screen Test</button>
+            <button class="btn btn-sm btn-outline-info mr-2 mb-2" id="summarizeFuncBtn"><i class="bi-lightning me-1"></i>Summarize Functionality</button>
+            <button class="btn btn-sm btn-outline-warning mr-2 mb-2" id="checkIssuesBtn"><i class="bi-exclamation-triangle me-1"></i>Check for Issues</button>
           </div>
         </div>
       </div>
@@ -183,6 +378,21 @@
     </ul>
   </div>
 
+  <script>
+    (function() {
+      var splash = document.getElementById('splashScreen');
+      function hideSplash() {
+        if (splash && !splash.classList.contains('hidden')) {
+          splash.classList.add('hidden');
+          setTimeout(function() { splash.style.display = 'none'; }, 1700);
+        }
+      }
+      if (splash) {
+        splash.addEventListener('click', hideSplash);
+        setTimeout(hideSplash, 5000);
+      }
+    })();
+  </script>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
   <script src="/shared/voice-widget.js"></script>

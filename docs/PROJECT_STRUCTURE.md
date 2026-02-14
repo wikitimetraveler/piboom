@@ -19,7 +19,7 @@ piBoom/
 │   │
 │   ├── finance/                # 🏦 Finance Domain
 │   │   ├── encompass-assistant.html
-│   │   ├── tool9.html          # The Code Clairvoyant (manifest form code review)
+│   │   ├── tool9.html          # The Screen Test (manifest form code review)
 │   │   └── ...
 │   │
 │   ├── nature/                 # 🌳 Nature Domain

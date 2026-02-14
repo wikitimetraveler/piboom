@@ -94,7 +94,7 @@ docker-compose up
 - **Mortgage Pipeline**: `http://localhost:3000/finance/pipeline-risk-dashboard.html`
 - **Disaster Dashboard**: `http://localhost:3000/finance/disasters-unified.html`
 - **Encompass Assistant**: `http://localhost:3000/finance/encompass-assistant.html`
-- **The Code Clairvoyant** (form code review): `http://localhost:3000/finance/tool9.html`
+- **The Screen Test** (form code review): `http://localhost:3000/finance/tool9.html`
 - **Main Hub**: `http://localhost:3000/`
 
 ## Documentation
@@ -191,7 +191,7 @@ docker-compose up
 - **Encompass Hub Awareness**: Knows how to hit Encompass loan objects both through the ScreenBindings class (in-app binding) and the new Encompass Hub APIs for server-side workflows
 - **Operational Insights**: Process improvement and efficiency recommendations
 - **ICE Knowledge Base**: Keep `docs/ICE_KNOWLEDGE_SOURCES.md` synced and run `npm run build:ice-knowledge` to refresh Encompass references
-- **The Code Clairvoyant**: Manifest XML form code review (tool9) — extract field IDs, check calculations, AI issue detection
+- **The Screen Test**: Manifest XML form code review (tool9) — extract field IDs, check calculations, AI issue detection
 
 ## 🎤 Voice Commands (Raspberry Pi)
 

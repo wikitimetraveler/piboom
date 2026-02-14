@@ -99,9 +99,9 @@ Encompass field browsers and unit-test grids use **AG Grid Community** (theme: a
 | `encompass-users.html` | User management |
 | `encompass-analytics.html` | Analytics |
 | `pipeline-risk-dashboard.html` | Loan pipeline + risk |
-| `tool9.html` | **The Code Clairvoyant** — Manifest XML form code review, issue detection |
+| `tool9.html` | **The Screen Test** — Manifest XML form code review, issue detection |
 
-### The Code Clairvoyant (`tool9.html`)
+### The Screen Test (`tool9.html`)
 
 AI-powered review of Encompass manifest XML form code:
 

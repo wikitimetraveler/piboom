@@ -28,8 +28,8 @@ class VoiceController {
       'alchemist': '/finance/tool8.html',
       'reviewer': '/finance/tool9.html',
       'clairvoyant': '/finance/tool9.html',
-      'code clairvoyant': '/finance/tool9.html',
-      'the code clairvoyant': '/finance/tool9.html'
+      'screen test': '/finance/tool9.html',
+      'the screen test': '/finance/tool9.html'
     };
     
     // Initialize voice control lazily when first needed

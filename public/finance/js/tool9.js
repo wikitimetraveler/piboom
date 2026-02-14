@@ -1,5 +1,5 @@
 /**
- * The Code Clairvoyant - tool9.js
+ * The Screen Test - tool9.js
  * Encompass manifest XML review. Form objects only (CustomFieldList, Field, Calculation).
  * Voice activated. Zen design.
  */
@@ -13,9 +13,16 @@
   const ttsToggleBtn = document.getElementById('ttsToggleBtn');
   const askReviewBtn = document.getElementById('askReviewBtn');
   const extractFieldsBtn = document.getElementById('extractFieldsBtn');
+  const summarizeFuncBtn = document.getElementById('summarizeFuncBtn');
   const checkIssuesBtn = document.getElementById('checkIssuesBtn');
   const extractResult = document.getElementById('extractResult');
   const extractResultText = document.getElementById('extractResultText');
+  const formOverviewPanel = document.getElementById('formOverviewPanel');
+  const overviewSummary = document.getElementById('overviewSummary');
+  const overviewFunctionality = document.getElementById('overviewFunctionality');
+  const fieldsTableBody = document.getElementById('fieldsTableBody');
+  const fieldSearchInput = document.getElementById('fieldSearchInput');
+  const calculationsList = document.getElementById('calculationsList');
   const voiceHelp = document.getElementById('voiceHelp');
   const closeVoiceHelp = document.getElementById('closeVoiceHelp');
   const toggleVoiceHelp = document.getElementById('toggleVoiceHelp');
@@ -24,13 +31,14 @@
   let lastParsed = null;
 
   /**
-   * Parse Encompass manifest XML. Extract field IDs and form logic (Calculations).
+   * Parse Encompass manifest XML. Extract full field structure and form logic.
    * Manifest format: <package><CustomFieldList><Field id="..." /><Calculation>...</Calculation>
    */
   function parseManifest(xmlText) {
     const fieldIds = new Set();
     const calculations = [];
     const refsFromCalcs = new Set();
+    const customFields = [];
 
     try {
       const parser = new DOMParser();
@@ -39,14 +47,24 @@
         return { error: 'Invalid XML' };
       }
 
-      const fields = doc.querySelectorAll('Field[id]');
+      const formList = doc.querySelectorAll('Form[id]');
+      const formNames = Array.from(formList).map((f) => f.getAttribute('mname') || f.getAttribute('id')).filter(Boolean);
+
+      const fields = doc.querySelectorAll('CustomFieldList Field[id]');
       fields.forEach((field) => {
         const id = field.getAttribute('id');
-        if (id) fieldIds.add(id);
+        if (!id) return;
+        fieldIds.add(id);
 
-        const calc = field.querySelector('Calculation');
-        if (calc) {
-          const expr = calc.textContent.trim();
+        const options = Array.from(field.querySelectorAll(':scope > Option')).map((o) => o.textContent.trim());
+        const calcEl = field.querySelector(':scope > Calculation');
+        const expr = calcEl ? calcEl.textContent.trim() : null;
+        const audits = Array.from(field.querySelectorAll(':scope > Audit[fieldid]')).map((a) => ({
+          fieldid: a.getAttribute('fieldid'),
+          data: a.getAttribute('data') || 'Timestamp',
+        }));
+
+        if (expr) {
           calculations.push({ fieldId: id, expr });
           const matches = expr.match(/\[([^\]]+)\]/g);
           if (matches) {
@@ -54,22 +72,32 @@
           }
         }
 
-        field.querySelectorAll('Audit[fieldid]').forEach((audit) => {
-          const fid = audit.getAttribute('fieldid');
-          if (fid) fieldIds.add(fid);
+        audits.forEach((a) => a.fieldid && fieldIds.add(a.fieldid));
+
+        customFields.push({
+          id,
+          desc: field.getAttribute('desc') || '',
+          type: field.getAttribute('type') || 'STRING',
+          maxlength: field.getAttribute('maxlength'),
+          options: options.length ? options : null,
+          calculation: expr,
+          audit: audits.length ? audits : null,
         });
       });
 
-      const allRefs = new Set([...refsFromCalcs]);
-      refsFromCalcs.forEach((r) => {
-        const base = r.replace(/^[#@]/, '').split('#')[0].split('@')[0];
-        if (base && !fieldIds.has(base)) allRefs.add(base);
+      const typeCounts = {};
+      customFields.forEach((f) => {
+        const t = f.type.split(/[\s(]/)[0] || 'OTHER';
+        typeCounts[t] = (typeCounts[t] || 0) + 1;
       });
 
       return {
         fieldIds: Array.from(fieldIds).sort(),
         calcRefs: Array.from(refsFromCalcs).sort(),
         calculations,
+        customFields,
+        formNames,
+        typeCounts,
         summary: `${fieldIds.size} fields, ${calculations.length} with calculations`,
       };
     } catch (e) {
@@ -150,6 +178,85 @@
     if (msg) sendToReviewer(msg);
   }
 
+  function renderOverview(parsed) {
+    if (!parsed || parsed.error || !formOverviewPanel) return;
+
+    formOverviewPanel.style.display = 'block';
+
+    // Summary badges
+    const badges = [
+      { label: 'Fields', value: parsed.customFields?.length || parsed.fieldIds?.length || 0, cls: 'badge-primary' },
+      { label: 'Calculations', value: parsed.calculations?.length || 0, cls: 'badge-info' },
+      { label: 'Forms', value: (parsed.formNames || []).length || 1, cls: 'badge-secondary' },
+    ];
+    (parsed.typeCounts || {}).DROPDOWN && badges.push({ label: 'Dropdowns', value: parsed.typeCounts.DROPDOWN, cls: 'badge-success' });
+    (parsed.typeCounts || {}).DATE && badges.push({ label: 'Dates', value: parsed.typeCounts.DATE, cls: 'badge-warning' });
+
+    if (overviewSummary) {
+      overviewSummary.innerHTML = badges
+        .map((b) => `<span class="badge ${b.cls} mr-2 mb-2">${b.label}: ${b.value}</span>`)
+        .join('');
+    }
+
+    // Functionality summary
+    const func = [];
+    if (parsed.formNames?.length) func.push(`<strong>Forms:</strong> ${parsed.formNames.join(', ')}`);
+    if (parsed.calculations?.length) {
+      const calcRefs = new Set();
+      (parsed.calculations || []).forEach((c) => (c.expr.match(/\[([^\]]+)\]/g) || []).forEach((m) => calcRefs.add(m.slice(1, -1))));
+      func.push(`<strong>Calculated fields:</strong> ${parsed.calculations.map((c) => c.fieldId).join(', ')}`);
+      if (calcRefs.size) func.push(`<strong>References in calcs:</strong> ${[...calcRefs].slice(0, 12).join(', ')}${calcRefs.size > 12 ? '…' : ''}`);
+    }
+    const auditFields = (parsed.customFields || []).filter((f) => f.audit?.length);
+    if (auditFields.length) func.push(`<strong>Audit fields:</strong> ${auditFields.map((f) => f.id).join(', ')}`);
+    if (overviewFunctionality) overviewFunctionality.innerHTML = func.length ? func.join('<br class="my-1">') : '<em>No additional metadata</em>';
+
+    // Custom fields table (fallback: build from fieldIds if no customFields)
+    let fields = parsed.customFields || [];
+    if (!fields.length && parsed.fieldIds?.length) {
+      fields = parsed.fieldIds.map((id) => ({ id, desc: '', type: '—', options: null, calculation: null, audit: null }));
+    }
+    function filterAndRenderFields() {
+      const q = (fieldSearchInput?.value || '').toLowerCase();
+      const filtered = q ? fields.filter((f) => `${f.id} ${f.desc} ${f.type}`.toLowerCase().includes(q)) : fields;
+      if (!fieldsTableBody) return;
+      fieldsTableBody.innerHTML = filtered
+        .map(
+          (f) => `
+        <tr>
+          <td><code class="small">${escapeHtml(f.id)}</code></td>
+          <td class="small">${escapeHtml(f.desc || '—')}</td>
+          <td><span class="badge badge-light border text-dark">${escapeHtml(f.type)}</span></td>
+          <td class="small">${f.options ? `<span class="text-muted" title="${escapeHtml(f.options.slice(0, 5).join(', ') + (f.options.length > 5 ? ' …' : ''))}">${f.options.length} options</span>` : f.audit ? `<span class="text-info">Audit: ${escapeHtml(f.audit.map((a) => a.fieldid).join(', '))}</span>` : f.calculation ? '<span class="text-success">Has calc</span>' : '—'}</td>
+        </tr>`
+        )
+        .join('');
+    }
+    filterAndRenderFields();
+    if (fieldSearchInput) fieldSearchInput.oninput = fieldSearchInput.onsearch = filterAndRenderFields;
+
+    // Calculations list
+    const calcs = parsed.calculations || [];
+    if (calculationsList) {
+      calculationsList.innerHTML = calcs
+        .map(
+          (c) => {
+            const refs = (c.expr.match(/\[([^\]]+)\]/g) || []).map((m) => m.slice(1, -1));
+            return `
+          <div class="list-group-item d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start">
+              <code class="small font-weight-bold">${escapeHtml(c.fieldId)}</code>
+              ${refs.length ? `<span class="badge badge-light text-dark small">${refs.length} refs</span>` : ''}
+            </div>
+            <pre class="small mt-1 mb-0 text-muted" style="white-space: pre-wrap; max-height: 4rem; overflow: hidden;">${escapeHtml(c.expr)}</pre>
+            ${refs.length ? `<div class="mt-1"><small class="text-info">Refs: ${refs.slice(0, 8).map((r) => escapeHtml(r)).join(', ')}${refs.length > 8 ? '…' : ''}</small></div>` : ''}
+          </div>`;
+          }
+        )
+        .join('');
+    }
+  }
+
   function handleExtract() {
     const code = getFormCode();
     if (!code) {
@@ -173,7 +280,8 @@
     ];
     if (extractResultText) extractResultText.textContent = lines.filter(Boolean).join('\n');
     if (extractResult) extractResult.style.display = 'block';
-    addMessage('assistant', `Extracted ${parsed.fieldIds.length} field IDs and ${parsed.calculations.length} calculations. Review the extracted list above or ask me to analyze.`);
+    renderOverview(parsed);
+    addMessage('assistant', `Extracted ${parsed.fieldIds.length} field IDs and ${parsed.calculations.length} calculations. Review the Form Overview above or ask me to analyze.`);
   }
 
   function handleAskReview() {
@@ -187,6 +295,29 @@
       msg += `\n\nExtracted: ${lastParsed.fieldIds.length} fields, ${lastParsed.calculations.length} calculations.`;
     }
     sendToReviewer(msg, code);
+  }
+
+  function handleSummarizeFunctionality() {
+    const code = getFormCode();
+    if (!code) {
+      addMessage('assistant', 'Please paste or upload manifest XML first.');
+      return;
+    }
+    if (!lastParsed || lastParsed.error) {
+      const parsed = parseManifest(code);
+      lastParsed = parsed;
+      if (parsed.error) {
+        addMessage('assistant', `Could not parse manifest: ${parsed.error}`);
+        return;
+      }
+      renderOverview(parsed);
+    }
+    const msg = 'Summarize the overall functionality of this form. What business logic does it implement? Group by: (1) calculated fields and their purpose, (2) dropdown/option-driven behavior, (3) audit trails, (4) any workflows or dependencies between fields. Be concise and actionable.';
+    if (lastParsed && !lastParsed.error) {
+      sendToReviewer(msg + ` Extracted: ${lastParsed.customFields?.length || lastParsed.fieldIds?.length || 0} fields, ${lastParsed.calculations?.length || 0} calculations.`, code);
+    } else {
+      sendToReviewer(msg, code);
+    }
   }
 
   function handleCheckIssues() {
@@ -242,12 +373,13 @@
   aiChatInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } });
   askReviewBtn?.addEventListener('click', handleAskReview);
   extractFieldsBtn?.addEventListener('click', handleExtract);
+  summarizeFuncBtn?.addEventListener('click', handleSummarizeFunctionality);
   checkIssuesBtn?.addEventListener('click', handleCheckIssues);
 
   clearChatBtn?.addEventListener('click', () => {
     chatContext = [];
     if (aiChatMessages) aiChatMessages.innerHTML = '';
-    addMessage('assistant', 'Hi! I\'m The Code Clairvoyant — form-code-specific. Paste manifest XML, extract field IDs, then ask me to analyze or check for issues.');
+    addMessage('assistant', 'Hi! I\'m The Screen Test — form-code-specific. Paste manifest XML, extract field IDs, then ask me to analyze or check for issues.');
   });
 
   ttsToggleBtn?.addEventListener('click', () => {
@@ -258,6 +390,6 @@
   closeVoiceHelp?.addEventListener('click', () => voiceHelp?.classList.remove('show'));
   toggleVoiceHelp?.addEventListener('click', () => voiceHelp?.classList.toggle('show'));
 
-  addMessage('assistant', 'Hi! I\'m The Code Clairvoyant — form-code-specific. Paste manifest XML, extract field IDs, then click "Check for Issues" or ask me to analyze.');
+  addMessage('assistant', 'Hi! I\'m The Screen Test — form-code-specific. Paste manifest XML, extract field IDs, then click "Check for Issues" or ask me to analyze.');
   initVoice();
 })();

@@ -11,7 +11,7 @@ const openai = new ChatOpenAI({
   maxTokens: 4096,
 });
 
-const REVIEWER_SYSTEM_PROMPT = `You are The Code Clairvoyant — a form-code-specific AI assistant for Encompass manifest XML and form objects (ICE Mortgage Technology). Your primary role is to identify issues.
+const REVIEWER_SYSTEM_PROMPT = `You are The Screen Test — a form-code-specific AI assistant for Encompass manifest XML and form objects (ICE Mortgage Technology). Your primary role is to identify issues.
 
 ## Scope: Form Code Only
 
@@ -55,7 +55,7 @@ router.post('/chat', async (req, res) => {
     if (!apiKey) {
       return res.status(503).json({
         error: 'OpenAI API not configured',
-        message: 'Add OPENAI_API_KEY to your .env file to use The Code Clairvoyant.',
+        message: 'Add OPENAI_API_KEY to your .env file to use The Screen Test.',
       });
     }
 

@@ -423,7 +423,7 @@ class ModernNavbar extends HTMLElement {
                     <i class="bi-magic"></i> Alchemist
                   </a>
                   <a class="dropdown-item" href="/finance/tool9.html" style="padding-left: 2.5rem;">
-                    <i class="bi-eye"></i> The Code Clairvoyant
+                    <i class="bi-camera-reels"></i> The Screen Test
                   </a>
                 </div>
               </li>
