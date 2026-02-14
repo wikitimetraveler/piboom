@@ -99,6 +99,17 @@ Encompass field browsers and unit-test grids use **AG Grid Community** (theme: a
 | `encompass-users.html` | User management |
 | `encompass-analytics.html` | Analytics |
 | `pipeline-risk-dashboard.html` | Loan pipeline + risk |
+| `tool9.html` | **The Code Clairvoyant** — Manifest XML form code review, issue detection |
+
+### The Code Clairvoyant (`tool9.html`)
+
+AI-powered review of Encompass manifest XML form code:
+
+- **Input**: Paste or upload manifest XML (CustomFieldList, Field, Calculation, Option, Audit)
+- **Extract**: Field IDs and calculation expressions
+- **Check for Issues**: AI analyzes for calculation syntax, type mismatches, deprecated patterns, [#] vs [@] misuse. Does NOT flag "field not in manifest" — Encompass form code can reference all native fields (e.g. [19]) and custom fields from other packages.
+- **Endpoints**: `POST /api/reviewer/ai/chat`
+- **Controller**: `controllers/reviewer-ai.controller.js`, `routes/reviewer.routes.js`
 
 ## Developer Connect References
 

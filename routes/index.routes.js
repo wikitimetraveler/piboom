@@ -29,6 +29,7 @@ import fishCatchesRoutes from './fish-catches.routes.js';
 import bikesRoutes from './bikes.routes.js';
 import customersRoutes from './customers.routes.js';
 import unitTestsRoutes from './unit-tests.routes.js';
+import reviewerRoutes from './reviewer.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -61,6 +62,7 @@ export default function buildRoutes(io) {
   api.use('/bikes', bikesRoutes);
   api.use('/customers', customersRoutes);
   api.use('/unit-tests', unitTestsRoutes);
+  api.use('/reviewer', reviewerRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

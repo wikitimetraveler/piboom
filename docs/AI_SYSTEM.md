@@ -34,6 +34,16 @@ Overview of piBoom's AI integration for assistants, memory, and retrieval. Use t
 - **Context**: FEMA, disasters, flood zones, real estate impact
 - **Data**: Disaster and loan pipeline services
 
+### 4. The Code Clairvoyant (Form Code Review)
+
+- **Controller**: `controllers/reviewer-ai.controller.js`
+- **UI**: `public/finance/tool9.html`
+- **Model**: GPT-4o (128K context for large manifests)
+- **Scope**: Encompass manifest XML — CustomFieldList, Field definitions, Calculation, Option, Audit
+- **Behavior**: Parses manifest, extracts field IDs and calculations; AI reviews for syntax errors, type mismatches, deprecated patterns. Does NOT flag "field not in manifest" — Encompass form code can access all native and custom fields.
+- **Endpoints**: `POST /api/reviewer/ai/chat`
+- **Voice**: "Open clairvoyant", "Open code clairvoyant", "Check for issues"
+
 ## Memory & Persistence
 
 - **LangChain + PostgreSQL** – Conversations persisted across restarts

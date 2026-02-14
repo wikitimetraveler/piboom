@@ -18,7 +18,9 @@ piBoom/
 │   │   └── sample-detector.html
 │   │
 │   ├── finance/                # 🏦 Finance Domain
-│   │   └── encompass-assistant.html
+│   │   ├── encompass-assistant.html
+│   │   ├── tool9.html          # The Code Clairvoyant (manifest form code review)
+│   │   └── ...
 │   │
 │   ├── nature/                 # 🌳 Nature Domain
 │   │   ├── tree-discovery.html

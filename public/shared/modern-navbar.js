@@ -400,6 +400,31 @@ class ModernNavbar extends HTMLElement {
                   <a class="dropdown-item" href="/finance/risk-analysis-dashboard.html" style="padding-left: 2.5rem;">
                     <i class="bi-graph-up-arrow"></i> Risk Analysis Dashboard
                   </a>
+                  <div class="dropdown-divider"></div>
+                  <div class="dropdown-item" style="font-weight: 600; color: #667eea; padding: 8px 15px;">
+                    <i class="bi-tools"></i> Tools
+                  </div>
+                  <a class="dropdown-item" href="/finance/tool2.html" style="padding-left: 2.5rem;">
+                    <i class="bi-code-slash"></i> Parser
+                  </a>
+                  <a class="dropdown-item" href="/finance/tool3.html" style="padding-left: 2.5rem;">
+                    <i class="bi-globe"></i> Mashup
+                  </a>
+                  <a class="dropdown-item" href="/finance/tool4.html" style="padding-left: 2.5rem;">
+                    <i class="bi-gear"></i> Automator
+                  </a>
+                  <a class="dropdown-item" href="/finance/tool5.html" style="padding-left: 2.5rem;">
+                    <i class="bi-rulers"></i> Ruler
+                  </a>
+                  <a class="dropdown-item" href="/finance/tool6.html" style="padding-left: 2.5rem;">
+                    <i class="bi-arrow-repeat"></i> Transformer
+                  </a>
+                  <a class="dropdown-item" href="/finance/tool8.html" style="padding-left: 2.5rem;">
+                    <i class="bi-magic"></i> Alchemist
+                  </a>
+                  <a class="dropdown-item" href="/finance/tool9.html" style="padding-left: 2.5rem;">
+                    <i class="bi-eye"></i> The Code Clairvoyant
+                  </a>
                 </div>
               </li>
 

@@ -13,3 +13,5 @@ Short definitions for AI agents and developers working with Encompass and mortga
 | TPO Connect | Third-Party Originator Connect – workflows for correspondent/wholesale lending |
 | Encompass | ICE Mortgage Technology loan origination system (LOS) |
 | ice-sources.json | Generated index of ICE repos, Postman, docs; built by `npm run build:ice-knowledge` |
+| The Code Clairvoyant | AI tool (tool9) for reviewing Encompass manifest XML form code; extracts field IDs, checks calculations, flags syntax/type/deprecated issues |
+| tool9 | Finance developer tool — The Code Clairvoyant, manifest form code review |

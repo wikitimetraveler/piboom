@@ -1,0 +1,278 @@
+<package>
+  <FormList>
+    <Form id="4e4b9fb5-6888-41ba-ad89-9a70ae4dde71" mname="Loan Information (C)" fname="Loan Information (C).emfrm" />
+  </FormList>
+  <AssemblyList />
+  <PluginList />
+  <CustomDataObjectList />
+  <CustomFieldList>
+    <Field id="CX.MSR.LAST.NET.ESCROW.DT" desc="MSR Settlement Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.LI.NETPAYOFF.DATE" desc="Net Payoff Date Marked" type="DATE (mm/dd/yy)" />
+    <Field id="CX.APPR.NOT.NEEDED.REASON" desc="Appraisal Not Needed Reason" type="DROPDOWN">
+      <Option>Appraisal Not Needed</Option>
+      <Option>Appraisal Waived</Option>
+    </Field>
+    <Field id="CX.PREAPPROVALEXP" desc="Crediit Approval Expiration Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.LEAD.OVERRIDE.REQ.DT" desc="Lead Override Requested Date" type="AUDIT">
+      <Audit fieldid="CX.SALES.LEAD.OVERRIDE" data="Timestamp" />
+    </Field>
+    <Field id="CX.APPR.ORDER.ID" desc="Appraisal Order ID" type="STRING" maxlength="50" />
+    <Field id="CX.APPR.PRODUCT.WESTVM" desc="West VM Appriasal Product" type="DROPDOWN">
+      <Option>1004</Option>
+      <Option>1004|1007</Option>
+      <Option>1073</Option>
+      <Option>1073|1007</Option>
+      <Option>1025</Option>
+      <Option>1025|216</Option>
+      <Option>1025_3U</Option>
+      <Option>1025_3U|216</Option>
+      <Option>1025_4U</Option>
+      <Option>1025_4U|216</Option>
+    </Field>
+    <Field id="CX.CAMPAIGN.LENDER.CREDIT.BP" desc="Campaign Lender Credit Basis Points" type="INTEGER" />
+    <Field id="CX.CASHOUT.INELIGIBLE" desc="Ineligible C/O Amount" type="DECIMAL_2 (x,xxx.xx)">
+      <Calculation>IIf([19].Contains("Refi") AndAlso [#CX.CASHOUT.ALLOWED] &lt; [#CX.CASHOUT.AMOUNT], [#CX.CASHOUT.AMOUNT] - [#CX.CASHOUT.ALLOWED], 0)</Calculation>
+    </Field>
+    <Field id="CX.CONTRACTCLOSINGDT" desc="Contract Closing Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.HIGH.DEPOSIT.CUSTOMER" desc="high-deposit customer" type="Y/N" />
+    <Field id="CX.DISASTER.NO.END.DT.OK" desc="Disaster No End Date Approved" type="DROPDOWN">
+      <Option>Inspection Ordered</Option>
+      <Option>Inspection Report Received</Option>
+      <Option>Not needed</Option>
+    </Field>
+    <Field id="CX.PRINCRED.PREFUND.AMOUNT" desc="Principal Reduction Pre-Funding Amount" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.PROPERTY.TYPE" desc="Property Type Master" type="DROPDOWN">
+      <Option>1 Unit SFR - Detached</Option>
+      <Option>1 Unit SFR - Attached</Option>
+      <Option>2 Unit - Detached</Option>
+      <Option>2 Unit - Attached</Option>
+      <Option>3 Unit - Detached</Option>
+      <Option>3 Unit - Attached</Option>
+      <Option>4 Unit - Detached</Option>
+      <Option>4 Unit - Attached</Option>
+      <Option>PUD 1 Unit - Detached</Option>
+      <Option>PUD 1 Unit - Attached</Option>
+      <Option>PUD 2 Unit - Detached</Option>
+      <Option>PUD 3 Unit - Detached</Option>
+      <Option>PUD 4 Unit - Detached</Option>
+      <Option>Condominium - Unknown</Option>
+      <Option>Condominium - Detached</Option>
+      <Option>Condominium - Highrise</Option>
+      <Option>Condominium - Lowrise/Garden Project</Option>
+      <Option>Condominium - Midrise Project</Option>
+      <Option>Townhouse - Unknown</Option>
+      <Option>Townhouse/Rowhouse - Attached</Option>
+      <Option>Townhouse/Rowhouse - Semi Detached</Option>
+      <Option>Manufactured</Option>
+    </Field>
+    <Field id="CX.FICO.PRIMARY.EARN.MANUAL" desc="Primary Earner Manual Selection" type="DROPDOWN">
+      <Option>Borrower 1</Option>
+      <Option>CoBorrower 1</Option>
+      <Option>Borrower 2</Option>
+      <Option>CoBorrower 2</Option>
+      <Option>Borrower 3</Option>
+      <Option>CoBorrower 3</Option>
+    </Field>
+    <Field id="CX.VELOCIFY.SHARETOREALTOR" desc="Borrower consent to share information with realtor" type="DROPDOWN">
+      <Option>Yes</Option>
+      <Option>No</Option>
+    </Field>
+    <Field id="CX.APPR.VALUE.SOURCE" desc="Calculated Appraised Value Source" type="STRING" maxlength="75" />
+    <Field id="CX.APPR.CONTINGENCIES.WAIVED" desc="Appraisal Contingencies Waived" type="Y/N" />
+    <Field id="CX.DELAYED.FINANCING" desc="Delayed Financing Indicator" type="Y/N" />
+    <Field id="CX.LEAD.OVERRIDE.REQ.BY" desc="Lead Override Requested By" type="AUDIT">
+      <Audit fieldid="CX.SALES.LEAD.OVERRIDE" data="UserName" />
+    </Field>
+    <Field id="CX.EMPLOYEELOAN" desc="Employee Loan Indicator" type="Y/N" />
+    <Field id="CX.O.LOCK" desc="Float Rate Control Override" type="Y/N" />
+    <Field id="CX.DISASTER.FEMATYPE" desc="FEMA Disaster Type" type="STRING" maxlength="64" />
+    <Field id="CX.PREAPPROVAL.RESUBMIT.DATE" desc="Resubmit Date for Credit Approval " type="DATE (mm/dd/yy)" />
+    <Field id="CX.FINANCE.CONTINGENCY.OFF" desc="Finance Contingency Offset" type="INTEGER" />
+    <Field id="CX.DISASTER.END" desc="Disaster end date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.CASHOUT.QUAL.PAYOFF" desc="Qualified non-lien payoffs" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.FICO.MODEL" desc="Decision Score Model" type="DROPDOWN">
+      <Option>Lowest Mid-Score</Option>
+      <Option>Primary Earner Mid-Score</Option>
+    </Field>
+    <Field id="CX.LAST.1647" desc="Last Disclosed Lender Credit" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.HIGH.DEPOSIT.CUSTOMER.DT" desc="high-deposit customer date time" type="AUDIT">
+      <Audit fieldid="CX.HIGH.DEPOSIT.CUSTOMER" data="Timestamp" />
+    </Field>
+    <Field id="CX.PREAPPROVAL.RETURN.DATE" desc="Credit Approval  Returned to Sales" type="DATE (mm/dd/yy)" />
+    <Field id="CX.CASHOUT.ALLOWED.EX.BY" desc="Exception to Max C/O Granted By" type="STRING" maxlength="64" />
+    <Field id="CX.DISASTER.ACTION.BOOL" desc="Disaster action required" type="Y/N">
+      <Calculation>IIf ([1393] &lt;&gt; "" OrElse Not IsDate([CX.DISASTER.DATE]) OrElse 
+  DateDiff("d", [@CX.DISASTER.DATE], [@3142]) &gt; 90 OrElse 
+  ([MORNET.X67] = "StreamlineRefinance" AndAlso DateDiff("d", [@CX.DISASTER.DATE], [@L770]) &gt; 90) OrElse 
+  [@CX.DISASTER.CLEAR.DT] &gt; [@CX.DISASTER.DATE], 
+  "N", "Y")</Calculation>
+    </Field>
+    <Field id="CX.SMARTFEE.DATETIME" desc="Smart Fee Results Date &amp; Time Stamp" type="STRING" maxlength="50" />
+    <Field id="CX.LOANNUMBER.AMHC" desc="AmeriHome Existing Loan Number for Refi" type="STRING" maxlength="10" />
+    <Field id="CX.APPR.REGGORA.ORDER.DATE" desc="Reggora Auto Order Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.APPR.AUTO.ORDER.BLOCK" desc="Appraisal Auto Order Block	" type="Y/N" />
+    <Field id="CX.SALES.LEAD.OVERRIDE" desc="Field that documents where the sales dictate lead source to manager	" type="Y/N" />
+    <Field id="CX.CASHOUT.NQ.LIEN.AMT" desc="Non-Qualified Lien payoffs" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.COC.LOANREADYTOREDISC" desc="COC Loan is Ready to Re disclose" type="CHECK BOX" />
+    <Field id="CX.PREAPPROVAL.SUBMIT.COUNT" desc="Submit Count for Credit Approval " type="INTEGER" />
+    <Field id="CX.SELLER.CREDIT.AMOUNT" desc="Contract Seller Credit Flat Amount" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.APPRAISALCONTINGENCY" desc="Appraisal Contingency Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.DISASTER.TYPE" desc="Disaster Type" type="DROPDOWN">
+      <Option>Declared</Option>
+      <Option>Predicted</Option>
+    </Field>
+    <Field id="CX.CASHOUT.AMOUNT" desc="Cash Out Amount" type="DECIMAL_2 (x,xxx.xx)">
+      <Calculation>IIF([#CX.CASHOUT.AMOUNT.CALC] &gt; 0 AndAlso [19].Contains("Refi"), [CX.CASHOUT.AMOUNT.CALC], 0)</Calculation>
+    </Field>
+    <Field id="CX.DISASTER.COMMENT" desc="Disaster Comment" type="STRING" maxlength="500" />
+    <Field id="CX.BRANCH.CLOSING" desc="Closing Branch" type="DROPDOWN">
+      <Option>Irvine</Option>
+      <Option>Dallas</Option>
+    </Field>
+    <Field id="CX.TX50A6" desc="Texas 50(A)(6) Indicator" type="DROPDOWN">
+      <Option>Yes</Option>
+      <Option>No</Option>
+    </Field>
+    <Field id="CX.LI.NETPAYOFF" desc="Net Payoff" type="CHECK BOX" />
+    <Field id="CX.LOANNUMBER.CENLAR" desc="Cenlar Loan Number for existing AmeriHome Loan" type="STRING" maxlength="10" />
+    <Field id="CX.OVERRIDE.CASH.OUT.SEASON" desc="Override cash out seasoning" type="Y/N" />
+    <Field id="CX.CAMPAIGN.MESSAGE" desc="Campaign Message" type="STRING" maxlength="200" />
+    <Field id="CX.RWR.EMPLOY.INIT" desc="Rep &amp; Warrant Relief for Employment Initial" type="DROPDOWN">
+      <Calculation>"None"</Calculation>
+      <Option>All</Option>
+      <Option>Some</Option>
+      <Option>None</Option>
+    </Field>
+    <Field id="CX.RWR.INCOME.INIT" desc="Rep &amp; Warrant Relief for Income Initial" type="DROPDOWN">
+      <Option>All</Option>
+      <Option>Some</Option>
+      <Option>None</Option>
+    </Field>
+    <Field id="CX.CLOSINGMAILAWAY" desc="Closing Mail Away" type="Y/N" />
+    <Field id="CX.TX50A6.REQUIRED" desc="User Selection of TX 50(a)(6) status required" type="Y/N" />
+    <Field id="CX.DISASTER.BEGIN" desc="Disaster begin date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.CBC.CREDIT.REPORTTYPE" desc="Factual Data Report Type" type="DROPDOWN">
+      <Calculation>"Decision Report"</Calculation>
+      <Option>Decision Report</Option>
+      <Option>Mortgage Only</Option>
+    </Field>
+    <Field id="CX.CASHOUT.ALLOWED" desc="Max Allowed Cash-Out" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.DISASTER.LOG" desc="Disaster Log" type="STRING" maxlength="1024" />
+    <Field id="CX.TX50A6.PROMPT" desc="Prompt User for TX 50(A)(6) Indicator" type="Y/N" />
+    <Field id="CX.CAMPAIGN.PROMO.SELECTED" desc="Campaign Item Selected" type="DROPDOWN - Editable" maxlength="256" />
+    <Field id="CX.DISASTER.VERBIAGE" desc="Disaster verbiage selector" type="DROPDOWN">
+      <Option>Appraisal</Option>
+      <Option>Reinspection</Option>
+      <Option>Other</Option>
+    </Field>
+    <Field id="CX.DISASTER.NO.END.DT.OKD.BY" desc="Disaster No End Date Approved By" type="STRING" maxlength="60" />
+    <Field id="CX.FIN.CONTINGENCIES.WAIVED" desc="Finance Contingencies Waived" type="Y/N" />
+    <Field id="CX.DSCR" desc="Debt Service Coverage Ratio" type="DECIMAL_3 (x,xxx.xxx)">
+      <Calculation>[#1005] / [#CX.QUALRATE.PITIA.PMT]</Calculation>
+    </Field>
+    <Field id="CX.APPR.PRODUCT.MANUAL" desc="Manual Appraisal Order" type="DROPDOWN">
+      <Option>SFR / PUD (1004)</Option>
+      <Option>SFR / PUD (1004) + Rents (1007)</Option>
+      <Option>Condo (1073)</Option>
+      <Option>Condo (1073) + Rents (1007)</Option>
+      <Option>2-4 Unit (1025)</Option>
+      <Option>2-4 Unit (1025) + Income (216)</Option>
+      <Option>Block Auto Order</Option>
+    </Field>
+    <Field id="CX.AFFORDABLE.PROVIDER" desc="Affordable Housing Providers" type="DROPDOWN">
+      <Option>WAB WISH Grant Funds</Option>
+    </Field>
+    <Field id="CX.BRANCH.PROCESSING" desc="Processing Branch" type="DROPDOWN">
+      <Option>Irvine</Option>
+      <Option>Dallas</Option>
+    </Field>
+    <Field id="CX.APPRAISAL.CONTINGENCY.OFF" desc="Appraisal Contingency Offset" type="INTEGER" />
+    <Field id="CX.CASHOUT.ALLOWED.EX.ON" desc="Exception to Max C/O Granted On" type="STRING" maxlength="32" />
+    <Field id="CX.CASHOUT.ALLOWED.EX" desc="Exception to Max Allowed C/O" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CUST05FV" desc="Refi to Existing AmeriHome Loan" type="CHECK BOX" />
+    <Field id="CX.FLOATRATE" desc="Float Rate" type="Y/N" />
+    <Field id="CX.1177.AUS" desc="Interest-Only AUS Temp Storage" type="INTEGER" />
+    <Field id="CX.LANGUAGE" desc="Alternate Language Spoken" type="DROPDOWN">
+      <Option>Spanish</Option>
+    </Field>
+    <Field id="CX.FICO.PRIMARY.EARN" desc="Primary Earner" type="DROPDOWN">
+      <Option>Borrower 1</Option>
+      <Option>CoBorrower 1</Option>
+      <Option>Borrower 2</Option>
+      <Option>CoBorrower 2</Option>
+      <Option>Borrower 3</Option>
+      <Option>CoBorrower 3</Option>
+    </Field>
+    <Field id="CX.LEADGEN" desc="Field that documents where the sales lead source generated" type="DROPDOWN">
+      <Option>CompanyGen</Option>
+      <Option>SelfGen</Option>
+    </Field>
+    <Field id="CX.BRANCH.SALES" desc="Sales Branch" type="DROPDOWN">
+      <Option>Irvine</Option>
+      <Option>Dallas</Option>
+      <Option>Westlake</Option>
+    </Field>
+    <Field id="CX.DISASTER.NO.END.DT.OK.DT" desc="No Disaster End Date Ok Datetime" type="STRING" maxlength="50" />
+    <Field id="CX.PREAPPROVAL.SUBMIT.DATE" desc="Request Date Credit Approval" type="DATE (mm/dd/yy)" />
+    <Field id="CX.RWR.ASSETS.INIT" desc="Rep &amp; Warrant Relief for Assets Initial" type="DROPDOWN">
+      <Calculation>"None"</Calculation>
+      <Option>All</Option>
+      <Option>Some</Option>
+      <Option>None</Option>
+    </Field>
+    <Field id="CX.APPR.ORDER.WESTVM.STATUS" desc="WestVM API Order Status" type="STRING" maxlength="50" />
+    <Field id="CX.ESTCOMPLETIONDT" desc="Estimated Completion Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.SELLER.CREDIT.PER" desc="Contract Seller Credit Percent" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.CONSTRUCTION.BUILDER.LOAN" desc="Construction Builder Loan" type="Y/N" />
+    <Field id="CX.WHATIFSCENARIO" desc="What If Scenario" type="Y/N" />
+    <Field id="CX.APPR.PRODUCT.CALCULATED" desc="Recommended Appraisal Order" type="DROPDOWN">
+      <Option>SFR / PUD (1004)</Option>
+      <Option>SFR / PUD (1004) + Rents (1007)</Option>
+      <Option>Condo (1073)</Option>
+      <Option>Condo (1073) + Rents (1007)</Option>
+      <Option>2-4 Unit (1025)</Option>
+      <Option>2-4 Unit (1025) + Income (216)</Option>
+      <Option>Insufficient Info</Option>
+    </Field>
+    <Field id="CX.DISASTER.CLEAR.DT" desc="Date disaster was cleared" type="DATE (mm/dd/yy)">
+      <Calculation>IIf(Not IsDate([CX.DISASTER.DATE]), Nothing,
+  IIf([@ULDD.X30]&gt;[@CX.APPR.1004D] AndAlso [@ULDD.X30]&gt;[@CX.DISASTER.UW.CLEAR.DT],[ULDD.X30],
+  IIf([@CX.APPR.1004D]&gt;[@CX.DISASTER.UW.CLEAR.DT],[CX.APPR.1004D],
+  IIf(IsDate([CX.DISASTER.UW.CLEAR.DT]),[CX.DISASTER.UW.CLEAR.DT],
+  Nothing))))</Calculation>
+    </Field>
+    <Field id="CX.RH.CREDITORDER.C" desc="Rule Hard Stop - Credit Order Count" type="INTEGER" />
+    <Field id="CX.CAMPAIGN.CREDIT.APPR" desc="Marketing Campaign Appraisal  Credit" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.SELLER.CREDIT.TOTAL" desc="Contract Seller Credit Total" type="DECIMAL_2 (x,xxx.xx)">
+      <Calculation>[#CX.SELLER.CREDIT.AMOUNT] + Math.Min(IIF([#CX.SELLER.CREDIT.MAX] &lt;= 0, Decimal.MaxValue, [#CX.SELLER.CREDIT.MAX]), [#2] * [#CX.SELLER.CREDIT.PER] / 100)</Calculation>
+    </Field>
+    <Field id="CX.INFO.DISCLOSURE" desc="Loan is Ready to Disclose" type="CHECK BOX" />
+    <Field id="CX.LEAD.SOURCE" desc="Campaign Lead Source" type="STRING" maxlength="100" />
+    <Field id="CX.CASHOUT.ALLOWED.RSN" desc="Max Allowed C/O Reason" type="STRING" maxlength="128" />
+    <Field id="CX.DISASTER.UW.CLEAR" desc="Date UW Cleared disaster" type="DATE (mm/dd/yy)" />
+    <Field id="CX.CAMPAIGN.NAME" desc="Marketing Campaign Name" type="STRING" maxlength="100" />
+    <Field id="CX.DISASTER.DATE" desc="Disaster Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.FINANCECONTINGENCY" desc="Finance Contingency Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.EXPECTEDDOCDT" desc="Expected Doc Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.VESTING.LLC" desc="Vesting LLC" type="Y/N" />
+    <Field id="CX.CAMPAIGN.VERIFY" desc="Mktg Campaign Verification" type="Y/N" />
+    <Field id="CX.SELLER.CREDIT.MAX" desc="Contract Seller Credit Max Percent Amount" type="DECIMAL_2 (x,xxx.xx)" />
+    <Field id="CX.APPRAISAL.TYPE" desc="Appraisal Type" type="DROPDOWN">
+      <Option>Appraisal Not Needed</Option>
+      <Option>Appraisal Waived (FNMA-PIW)</Option>
+      <Option>Appraisal Waived (FHLMC-ACE)</Option>
+      <Option>FNM 1004 / FRE 70 = Uniform Residential Appraisal Report</Option>
+      <Option>FNM 1004 Desktop / FRE 70D = Uniform Appraisal Report (Desktop)</Option>
+      <Option>FNM 1073 / FRE 465 = Individual Condominium Unit Appraisal Report</Option>
+      <Option>FNM 1025 / FRE 72 = Small Residential Income Property Appraisal Report</Option>
+      <Option>FNM 2055 / FRE 2055 = Exterior Only Inspection Residential Appraisal Report</Option>
+      <Option>FNM 1075 / FRE 466 = Exterior Only Inspection Individual Condominium Unit Appraisal Report</Option>
+    </Field>
+    <Field id="CX.UPDATEDCOEDT" desc="Updated COE Date" type="DATE (mm/dd/yy)" />
+    <Field id="CX.NEWCONSTRUCTION" desc="NEW CONSTRUCTION" type="CHECK BOX" />
+    <Field id="CX.HIGH.DEPOSIT.CUSTOMER.BY" desc="high-deposit customer check by" type="AUDIT">
+      <Audit fieldid="CX.HIGH.DEPOSIT.CUSTOMER" data="UserName" />
+    </Field>
+    <Field id="CX.WESTVM.DATETIME" desc="WestVM Time and Date Last Imported" type="STRING" maxlength="50" />
+  </CustomFieldList>
+</package>

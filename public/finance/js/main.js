@@ -106,7 +106,11 @@ const globalConfig = {
             'automator': '/finance/tool4.html',
             'ruler': '/finance/tool5.html',
             'transformer': '/finance/tool6.html',
-            'alchemist': '/finance/tool8.html'
+            'alchemist': '/finance/tool8.html',
+            'reviewer': '/finance/tool9.html',
+            'clairvoyant': '/finance/tool9.html',
+            'code clairvoyant': '/finance/tool9.html',
+            'the code clairvoyant': '/finance/tool9.html'
         }
     },
     

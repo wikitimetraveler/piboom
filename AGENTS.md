@@ -34,6 +34,7 @@ The mortgage/Encompass and AI domains are the main focus for ongoing development
   - **Encompass Assistant** – Mortgage/Encompass Q&A, uses ICE knowledge + Encompass docs
   - **Loan Pipeline AI** – Mortgage operations, correspondent/retail lending
   - **Disaster Risk AI** – Disaster impact on real estate
+  - **The Code Clairvoyant** – Manifest XML form code review (tool9), issue detection
 - Knowledge retrieval: `lib/knowledge/ice-knowledge.service.js` for Encompass
 - Detailed docs: `docs/AI_SYSTEM.md`, `docs/LANGCHAIN_MEMORY.md`
 
@@ -45,7 +46,8 @@ The mortgage/Encompass and AI domains are the main focus for ongoing development
 | Encompass Assistant (AI) | `controllers/encompass-assistant.controller.js`, `services/encompass-docs.service.js` |
 | ICE Knowledge | `lib/knowledge/ice-knowledge.service.js`, `knowledge-sources/ice/`, `data/knowledge/ice-sources.json` |
 | AI Chat / Memory | `controllers/unit-tests-ai.controller.js`, `controllers/loan-pipeline-ai.controller.js` |
-| Finance UI | `public/finance/` (encompass-assistant.html, pipeline-risk-dashboard.html, etc.) |
+| The Code Clairvoyant | `controllers/reviewer-ai.controller.js`, `routes/reviewer.routes.js`, `public/finance/tool9.html` |
+| Finance UI | `public/finance/` (encompass-assistant.html, tool9.html, pipeline-risk-dashboard.html, etc.) |
 | Financial calculations | `public/shared/calculationEngine.js` (DTI, FHA, asset qualifier) |
 | AG Grid | `unit-tests.html`, `encompass-custom-fields.html`, `encompass-native-fields.html` (ag-grid-community, theme alpine) |
 

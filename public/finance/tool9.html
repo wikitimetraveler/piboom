@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<!--
+  The Code Clairvoyant - Legacy Encompass Form Code & Web Forms Expert
+  AI-powered review of form code with voice activation. Zen design.
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Code Clairvoyant - Encompass Form Code Expert</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/modern-navbar.js" defer></script>
+  <style>
+    :root {
+      --zen-primary: #4a90a4;
+      --zen-muted: #647196;
+      --zen-border: rgba(74, 144, 164, 0.18);
+      --zen-card-bg: rgba(255, 255, 255, 0.97);
+    }
+    body {
+      min-height: 100vh;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #f5f8ff 0%, #e6eefb 50%, #fdfefe 100%);
+    }
+    .card {
+      border-radius: 18px;
+      border: 1px solid var(--zen-border);
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+      background: var(--zen-card-bg);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--zen-primary) 0%, rgba(74, 144, 164, 0.8) 100%);
+      border-color: var(--zen-primary);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, rgba(74, 144, 164, 0.9) 0%, rgba(74, 144, 164, 0.7) 100%);
+      border-color: var(--zen-primary);
+    }
+    .form-control:focus {
+      border-color: var(--zen-primary);
+      box-shadow: 0 0 0 0.2rem rgba(74, 144, 164, 0.2);
+    }
+    .tool-pills .nav-link {
+      border-radius: 999px;
+      font-weight: 600;
+      color: #1a2856;
+    }
+    .tool-pills .nav-link:hover, .tool-pills .nav-link.active {
+      color: var(--zen-primary);
+    }
+    .voice-control { position: fixed; bottom: 2rem; right: 2rem; z-index: 1000; }
+    .voice-btn {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--zen-primary); border: none; color: white;
+      font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(74, 144, 164, 0.4);
+    }
+    .voice-btn.listening { background: #e74c3c; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    .voice-help-drawer {
+      position: fixed; right: 30px; bottom: 30px; width: min(360px, 90vw);
+      background: rgba(15, 23, 42, 0.95); color: #fff; border-radius: 20px; padding: 1.5rem;
+      transform: translateY(150%); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; z-index: 1045;
+    }
+    .voice-help-drawer.show { transform: translateY(0); opacity: 1; }
+    .ai-chat-container { display: flex; flex-direction: column; height: 420px; border: 1px solid var(--zen-border); border-radius: 12px; overflow: hidden; }
+    .ai-chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+    .ai-chat-message { display: flex; gap: 0.75rem; }
+    .ai-chat-message.user { flex-direction: row-reverse; }
+    .ai-chat-message-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--zen-primary); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ai-chat-message.user .ai-chat-message-avatar { background: #647196; }
+    .ai-chat-message-content { max-width: 85%; padding: 0.75rem; border-radius: 12px; background: rgba(74, 144, 164, 0.08); }
+    .ai-chat-message.user .ai-chat-message-content { background: rgba(100, 113, 150, 0.12); }
+    .ai-chat-message-content pre { background: rgba(0,0,0,0.05); padding: 0.5rem; border-radius: 6px; overflow-x: auto; font-size: 0.85rem; }
+    .ai-chat-message-timestamp { font-size: 0.7rem; color: var(--zen-muted); margin-top: 0.25rem; }
+    .nav-finance, .nav-home { position: fixed; top: 20px; z-index: 1050; display: flex; gap: 12px; }
+    .nav-finance { left: 20px; }
+    .nav-home { right: 20px; }
+    .nav-finance a, .nav-home a {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 999px;
+      font-weight: 600; background: rgba(255, 255, 255, 0.92); color: #1a2856; text-decoration: none;
+    }
+    .nav-finance a:hover, .nav-home a:hover {
+      background: linear-gradient(135deg, #6bb7c7 0%, #4a90a4 100%); color: #fff;
+    }
+  </style>
+</head>
+<body data-page="reviewer">
+  <modern-navbar></modern-navbar>
+  <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Finance Hub</a></div>
+  <div class="nav-home"><a href="/index.html"><i class="bi-house"></i> Home</a></div>
+
+  <div class="voice-control">
+    <button class="btn btn-sm btn-outline-primary" id="toggleVoiceHelp"><i class="bi-mic"></i> Voice Guide</button>
+  </div>
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="bi-eye me-2"></i>The Code Clairvoyant</a>
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi-house"></i> Finance Hub</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container pb-5">
+    <div class="tool-pills d-flex flex-wrap align-items-center justify-content-between mb-4 p-3 bg-white rounded shadow-sm">
+      <span class="font-weight-bold text-muted mr-2"><i class="bi-grid-3x3-gap text-primary"></i> Switch tools</span>
+      <ul class="nav nav-pills mb-0">
+        <li class="nav-item"><a class="nav-link" href="tool4.html"><i class="bi-gear mr-1"></i>Automator</a></li>
+        <li class="nav-item"><a class="nav-link" href="tool5.html"><i class="bi-rulers mr-1"></i>Ruler</a></li>
+        <li class="nav-item"><a class="nav-link" href="tool6.html"><i class="bi-arrow-repeat mr-1"></i>Transformer</a></li>
+        <li class="nav-item"><a class="nav-link" href="tool8.html"><i class="bi-magic mr-1"></i>Alchemist</a></li>
+        <li class="nav-item"><a class="nav-link active" href="tool9.html"><i class="bi-eye mr-1"></i>Clairvoyant</a></li>
+      </ul>
+    </div>
+
+    <!-- Form Code Input -->
+    <div class="card p-4 mb-4">
+      <h5><i class="bi-file-earmark-code me-2"></i>Manifest XML</h5>
+      <p class="text-muted small mb-3">Form-code-specific. Paste or upload manifest XML to extract field IDs, parse form logic, and check for issues. Form objects only — not business rules.</p>
+      <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#pasteTab">Paste</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#uploadTab">Upload File</a></li>
+      </ul>
+      <div class="tab-content">
+        <div id="pasteTab" class="tab-pane fade show active">
+          <textarea id="formCodeInput" class="form-control font-monospace" rows="12" placeholder="Paste your Encompass form code, XML, scripts, or HTML here..."></textarea>
+        </div>
+        <div id="uploadTab" class="tab-pane fade">
+          <input type="file" id="formCodeFile" class="form-control-file" accept=".xml" />
+          <small class="text-muted">Manifest XML only (.xml)</small>
+        </div>
+      </div>
+      <div id="extractResult" class="mt-3 p-3 rounded bg-light border" style="display: none;">
+        <h6 class="mb-2"><i class="bi-list-check me-1"></i>Extracted</h6>
+        <pre id="extractResultText" class="mb-0 small" style="max-height: 200px; overflow: auto;"></pre>
+      </div>
+    </div>
+
+    <!-- AI Chat Panel -->
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0"><i class="bi-robot me-2"></i>The Code Clairvoyant AI</h5>
+        <div class="btn-group">
+          <button class="btn btn-sm btn-outline-secondary" id="ttsToggleBtn" title="Speak AI responses"><i class="bi-volume-up"></i> Speak</button>
+          <button class="btn btn-sm btn-outline-secondary" id="clearChatBtn" title="Clear chat"><i class="bi-trash"></i> Clear</button>
+        </div>
+      </div>
+      <p class="text-muted small mb-3">Ask to find issues, explain calculations, validate field references, or check for deprecated patterns.</p>
+      <div class="ai-chat-container">
+        <div id="aiChatMessages" class="ai-chat-messages"></div>
+        <div class="p-3 border-top">
+          <div class="input-group">
+            <input type="text" class="form-control" id="aiChatInput" placeholder="Ask about form code, field bindings, migration..." />
+            <div class="input-group-append">
+              <button class="btn btn-primary" id="aiChatSendBtn"><i class="bi-send"></i> Send</button>
+            </div>
+          </div>
+          <div class="mt-2 d-flex flex-wrap gap-2">
+            <button class="btn btn-sm btn-outline-primary" id="extractFieldsBtn"><i class="bi-list-ul me-1"></i>Extract Field IDs</button>
+            <button class="btn btn-sm btn-outline-primary" id="askReviewBtn"><i class="bi-search me-1"></i>Ask Clairvoyant</button>
+            <button class="btn btn-sm btn-outline-warning" id="checkIssuesBtn"><i class="bi-exclamation-triangle me-1"></i>Check for Issues</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="voice-help-drawer" id="voiceHelp">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0"><i class="bi-mic"></i> Voice Shortcuts</h4>
+      <button class="btn btn-link text-white p-0" id="closeVoiceHelp"><i class="bi-x-lg"></i></button>
+    </div>
+    <ul class="list-unstyled mb-0">
+      <li class="mb-2"><strong>"Check for issues"</strong> — Run issue detection on form code</li>
+      <li class="mb-2"><strong>"Review form"</strong> — Send form code to AI for analysis</li>
+      <li class="mb-2"><strong>"Show commands"</strong> — Open this help</li>
+    </ul>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script src="/shared/voice-widget.js"></script>
+  <script src="/finance/js/tool9.js"></script>
+  <script src="/shared/finance-auth-guard.js"></script>
+</body>
+</html>
