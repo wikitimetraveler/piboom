@@ -3,7 +3,9 @@ const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
 const uploadArea = document.getElementById('uploadArea');
 const unitTestsGrid = document.getElementById('unitTestsGrid');
-const exportBtn = document.getElementById('exportBtn');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
+const exportExcelBtn = document.getElementById('exportExcelBtn');
+const clearAndReloadBtn = document.getElementById('clearAndReloadBtn');
 const runTestsBtn = document.getElementById('runTestsBtn');
 const clearBtn = document.getElementById('clearBtn');
 const searchInput = document.getElementById('searchInput');
@@ -39,6 +41,7 @@ let voiceWidgetInstance = null;
 let currentLoanGuid = '';
 let lastRunResults = [];
 let lastRunSummary = null;
+let lastRunCellResults = {}; // { 'rowIndex-field': 'pass'|'fail' } for cell shading
 
 const RECENT_RUNS_KEY = 'unitTestsRecentRuns';
 
@@ -62,6 +65,17 @@ function hasFieldId(value) {
 function setStatus(text, status = 'info', icon = 'bi-info-circle') {
   statusChip.className = `status-chip ${status}`;
   statusChip.innerHTML = `<i class="bi ${icon}"></i> ${text}`;
+}
+
+function showToast(message, type = 'info', duration = 2500) {
+  const el = document.getElementById('unitTestsToast');
+  if (!el) return;
+  el.textContent = message;
+  el.className = `unit-tests-toast ${type} show`;
+  clearTimeout(el._toastTimer);
+  el._toastTimer = setTimeout(() => {
+    el.classList.remove('show');
+  }, duration);
 }
 
 function detectColumnType(columnData) {
@@ -204,11 +218,11 @@ function parseExcelFile(file) {
           }
         }
         
-        // Extract headers from the Step row; ensure unique keys so each scenario column has its own field
+        // Extract headers from the Step row; ensure unique keys so each column has its own field
         const rawHeaders = jsonData[headerRowIndex].map(normalizeHeader);
         const seen = {};
         const headers = rawHeaders.map((h, idx) => {
-          const base = h && String(h).trim() ? h : `Scenario_${idx + 1}`;
+          const base = h && String(h).trim() ? h : `Col_${idx + 1}`;
           if (seen[base]) {
             const unique = `${base}_${idx}`;
             seen[unique] = true;
@@ -256,15 +270,96 @@ function parseExcelFile(file) {
   });
 }
 
+/**
+ * True if header is a scenario column: Reset or Test 1, Test 2, ... Test N.
+ * Blank or other names (e.g. Scenario_N, Column_N, Notes) = not a scenario = end.
+ */
+function isScenarioColumnHeader(header) {
+  const h = String(header || '').trim().toLowerCase();
+  if (!h) return false;
+  if (h === 'reset' || /^reset_\d+$/.test(h)) return true;
+  return /^test\s*#?\s*\d+(_\d+)?$/.test(h) || /^test\d+(_\d+)?$/.test(h); // Test 1, Test 2_6, Test#3, etc.
+}
+
+/**
+ * Check if header looks like Name+Number (e.g. Jim1). Returns { prefix, num } or null.
+ * Excludes auto-named blanks: Scenario_N, Col_N — not real test scenario columns.
+ */
+function parseScenarioStyleHeader(header) {
+  const h = String(header || '').trim();
+  if (!h) return null;
+  const m = h.match(/^([a-zA-Z_]+)(\d+)(_\d+)?$/);
+  if (!m) return null;
+  const prefix = m[1].toLowerCase();
+  if (prefix === 'scenario' || prefix === 'col') return null; // auto-named blanks, stop
+  return { prefix, num: parseInt(m[2], 10) };
+}
+
+/**
+ * True if header is an auto-generated extra column (Col_N, Scenario_N, Column N) — never include these.
+ */
+function isExtraColumn(header) {
+  const h = String(header || '').trim().toLowerCase();
+  return /^col_?\d+$/.test(h) || /^scenario_?\d+$/.test(h) || /^column\s+\d+$/.test(h);
+}
+
+/**
+ * Last column index that is a scenario. Stop after last Test N, or after last consecutive Name+Number.
+ * Never include Col_N, Scenario_N, or other auto-generated junk columns.
+ */
+function getLastScenarioIndex(headers, descriptionIndex) {
+  const startIndex = descriptionIndex >= 0
+    ? descriptionIndex + 1
+    : Math.max(0, headers.findIndex((h) => /^target$/i.test(String(h || '').trim())) + 1);
+  let last = startIndex - 1;
+  let prevPrefix = null;
+  let prevNum = 0;
+
+  for (let i = startIndex; i < headers.length; i++) {
+    const h = headers[i];
+    if (isExtraColumn(h)) break; // never include Col_17, Scenario_12, etc.
+    if (isScenarioColumnHeader(h)) {
+      last = i;
+      prevPrefix = null; // reset for next style
+    } else {
+      const parsed = parseScenarioStyleHeader(h);
+      if (parsed) {
+        const isConsecutive = prevPrefix === parsed.prefix && parsed.num === prevNum + 1;
+        const isFirst = prevPrefix === null;
+        if (isFirst || isConsecutive) {
+          last = i;
+          prevPrefix = parsed.prefix;
+          prevNum = parsed.num;
+        } else break; // different prefix or non-consecutive — stop
+      } else break; // not Test N and not Name+Number — stop
+    }
+  }
+  return last;
+}
+
 function generateColumnDefs(headers, rows) {
   const defs = [];
   
   const descriptionIndex = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
+  const lastScenarioIndex = getLastScenarioIndex(headers, descriptionIndex);
+
+  // Only include columns up to and including the last Test # — never include Col_N, Scenario_N, etc.
+  let maxColumnIndex = lastScenarioIndex >= 0 ? lastScenarioIndex : -1;
+  if (maxColumnIndex < 0) {
+    for (let i = headers.length - 1; i >= 0; i--) {
+      if (!isExtraColumn(headers[i])) {
+        maxColumnIndex = i;
+        break;
+      }
+    }
+    if (maxColumnIndex < 0) maxColumnIndex = headers.length - 1;
+  }
+  const headersToUse = headers.slice(0, maxColumnIndex + 1).filter((h) => !isExtraColumn(h));
 
   // No pinning - all columns scroll together to avoid header/body alignment issues at pinned boundary
   const pinnedColumns = [];
 
-  headers.forEach((header, index) => {
+  headersToUse.forEach((header, index) => {
     if (!header || header.trim() === '') {
       header = `Column ${index + 1}`;
     }
@@ -274,7 +369,7 @@ function generateColumnDefs(headers, rows) {
     const columnType = detectColumnType(columnData);
     
     const headerLower = header.toLowerCase().trim();
-    const isTestColumn = descriptionIndex >= 0 && index > descriptionIndex;
+    const isTestColumn = descriptionIndex >= 0 && index > descriptionIndex && index <= lastScenarioIndex;
     const isPinnedColumn = pinnedColumns.some(p => headerLower.includes(p.toLowerCase()));
     
     // Strict 1:1 — one header per column, explicit colId for ag-Grid
@@ -385,7 +480,14 @@ function generateColumnDefs(headers, rows) {
       colDef.minWidth = 90;
       colDef.width = 110;
       colDef.headerClass = 'test-scenario-column';
-      colDef.cellClass = 'test-scenario-cell';
+      colDef.cellClass = (params) => {
+        let cls = 'test-scenario-cell';
+        const key = `${params.rowIndex}-${params.colDef?.field || ''}`;
+        const result = lastRunCellResults[key];
+        if (result === 'pass') cls += ' cell-pass';
+        else if (result === 'fail') cls += ' cell-fail';
+        return cls;
+      };
       
       // Detect value types and style accordingly
       colDef.cellRenderer = (params) => {
@@ -642,16 +744,15 @@ function getOrderedTestColumns() {
     return header === 'description';
   });
   const startIndex = descriptionIndex >= 0 ? descriptionIndex + 1 : 0;
-  const pinned = ['step', 'action', 'target', 'description'];
-  return columnDefs.slice(startIndex).filter((colDef) => {
-    const header = String(colDef.headerName || colDef.field || '').trim().toLowerCase();
-    return !pinned.some((p) => header.includes(p));
-  }).map((colDef, idx) => {
-    const raw = colDef.headerName || colDef.field || '';
-    const headerLower = String(raw).trim().toLowerCase();
-    const testNum = extractTestNumberFromKey(raw) || (headerLower === 'reset' ? 'RESET' : String(idx + 1));
-    return { field: colDef.field, testNumber: testNum };
-  });
+  const result = [];
+  for (let i = startIndex; i < columnDefs.length; i++) {
+    const colDef = columnDefs[i];
+    const raw = String(colDef.headerName || colDef.field || '').trim();
+    if (!isScenarioColumnHeader(raw)) break; // blank or non-Test = end, do not add more
+    const testNum = extractTestNumberFromKey(raw) || (raw.toLowerCase() === 'reset' ? 'RESET' : String(result.length + 1));
+    result.push({ field: colDef.field, testNumber: testNum });
+  }
+  return result;
 }
 
 function pickTestColumnForRow(row) {
@@ -678,6 +779,46 @@ function pickTestValue(testValues) {
   return null;
 }
 
+/**
+ * Extract field value from Encompass field-reader API response.
+ * Handles array of LoanFieldDataContract, PascalCase (FieldId/Value), loose id matching, wrapped responses.
+ */
+function extractFieldValueFromReaderResponse(data, fieldId) {
+  if (!data) return null;
+  const fid = String(fieldId || '').trim();
+  const sameId = (item, key) => {
+    const v = item?.[key];
+    return v !== undefined && v !== null && String(v).trim() === fid;
+  };
+  const getValue = (item) => {
+    if (item == null) return null;
+    const v = item.value ?? item.Value ?? item.fieldValue ?? item.field_value ?? item.stringValue ?? item.StringValue;
+    if (v !== undefined && v !== null) return v;
+    const arr = item.values ?? item.Values;
+    if (Array.isArray(arr) && arr.length) return arr[0];
+    return null;
+  };
+
+  if (Array.isArray(data)) {
+    const match =
+      data.find((item) => typeof item === 'object' && (sameId(item, 'id') || sameId(item, 'fieldId') || sameId(item, 'FieldId'))) ||
+      (data.length === 1 && typeof data[0] === 'object' ? data[0] : null);
+    if (match) return getValue(match);
+    if (data.length === 1 && (typeof data[0] === 'string' || typeof data[0] === 'number')) return data[0];
+    return null;
+  }
+  if (typeof data === 'object') {
+    const arr = data.fields ?? data.items ?? data.data ?? data.results;
+    if (Array.isArray(arr)) return extractFieldValueFromReaderResponse(arr, fieldId);
+    const direct = data[fid] ?? data[fid?.toUpperCase?.()] ?? data[fid?.toLowerCase?.()];
+    if (direct !== undefined && direct !== null) {
+      return typeof direct === 'object' ? (direct.value ?? direct.Value ?? direct) : direct;
+    }
+    return null;
+  }
+  return null;
+}
+
 function buildFieldWriterPayload(fieldId, value, row) {
   const payload = [{ id: fieldId, value }];
   const lockValue = row.Lock ?? row.lock ?? row.Locked ?? row.locked;
@@ -695,12 +836,31 @@ function exportToCSV() {
     console.warn('CSV export unavailable');
     return;
   }
-  
-  const fileName = fileInfo.textContent.replace('File: ', '').replace('.xlsx', '').replace('.xls', '') || 'unit-tests';
+  const baseName = (currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '');
   gridApi.exportDataAsCsv({
-    fileName: `${fileName}-export.csv`,
+    fileName: `${baseName}-export.csv`,
     onlyFiltered: false,
   });
+}
+
+function exportToExcel() {
+  if (!allData || allData.length === 0 || typeof XLSX === 'undefined') {
+    console.warn('Excel export unavailable');
+    setStatus('No data to export or XLSX library not loaded', 'err', 'bi-exclamation-octagon');
+    return;
+  }
+  const headers = columnDefs
+    .filter((col) => col.field)
+    .map((col) => col.field);
+  if (headers.length === 0) {
+    headers.push(...Object.keys(allData[0] || {}));
+  }
+  const worksheet = XLSX.utils.json_to_sheet(allData, { header: headers });
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Test Cases');
+  const baseName = (currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '');
+  XLSX.writeFile(workbook, `${baseName}-export.xlsx`);
+  setStatus(`Exported to ${baseName}-export.xlsx`, 'ok', 'bi-check-circle');
 }
 
 function displayTestDescriptions(testDescriptions) {
@@ -740,8 +900,37 @@ function displayTestDescriptions(testDescriptions) {
       highlightTestColumn(test.testNumber);
     });
 
+    // Right-click context menu: Run this scenario only
+    cardElement.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      hideScenarioContextMenu();
+      const menu = document.createElement('div');
+      menu.className = 'scenario-context-menu';
+      menu.style.left = `${e.clientX}px`;
+      menu.style.top = `${e.clientY}px`;
+      const runBtn = document.createElement('button');
+      runBtn.innerHTML = '<i class="bi-play-circle mr-2"></i> Run this scenario only';
+      runBtn.addEventListener('click', () => {
+        hideScenarioContextMenu();
+        runTests(test.testNumber);
+      });
+      menu.appendChild(runBtn);
+      menu.dataset.scenarioMenu = '1';
+      document.body.appendChild(menu);
+
+      const close = () => {
+        hideScenarioContextMenu();
+        document.removeEventListener('click', close);
+      };
+      setTimeout(() => document.addEventListener('click', close), 0);
+    });
+
     container.appendChild(cardElement);
   });
+}
+
+function hideScenarioContextMenu() {
+  document.querySelectorAll('.scenario-context-menu').forEach((m) => m.remove());
 }
 
 function updateLoanGuidChipDisplay(value) {
@@ -1150,30 +1339,46 @@ function hideTestDescriptions() {
   }
 }
 
-async function runTests() {
+async function runTests(singleTestNumber) {
   if (!allData || allData.length === 0) {
     setStatus('No test data loaded', 'err', 'bi-exclamation-octagon');
     return;
   }
-  
+
+  const isSingleRun = !!singleTestNumber;
+
   try {
     setStatus('Running tests...', 'info', 'bi-clock-history');
     runTestsBtn.disabled = true;
-    testResultsContainer.style.display = 'block';
-    testResultsList.innerHTML = '<div class="text-center p-4"><i class="bi-hourglass-split" style="font-size: 2rem;"></i><p class="mt-2">Running tests...</p></div>';
-    const scrollToTopBtnEl = document.getElementById('scrollToTopBtn');
-    if (scrollToTopBtnEl) scrollToTopBtnEl.style.display = 'none';
-    
+    if (!isSingleRun) {
+      testResultsContainer.style.display = 'block';
+      testResultsList.innerHTML = '<div class="text-center p-4"><i class="bi-hourglass-split" style="font-size: 2rem;"></i><p class="mt-2">Running tests...</p></div>';
+      const scrollToTopBtnEl = document.getElementById('scrollToTopBtn');
+      if (scrollToTopBtnEl) scrollToTopBtnEl.style.display = 'none';
+    }
+
     const results = [];
     let passed = 0;
     let failed = 0;
     let skipped = 0;
 
-    // Run per scenario (Test 1, Test 2, ...) so each column gets its own results; exclude Reset
-    const scenarioColumns = getOrderedTestColumns().filter((c) => c.testNumber && c.testNumber !== 'RESET');
-    const columnsToRun = scenarioColumns.length > 0 ? scenarioColumns : [null];
+    // Run per scenario (Test 1, Test 2, ...); if singleTestNumber provided, run only that one
+    let columnsToRun;
+    if (isSingleRun) {
+      const col = findTestColumnByNumber(String(singleTestNumber));
+      if (!col) {
+        showToast(`Scenario ${singleTestNumber} not found`, 'warning');
+        runTestsBtn.disabled = false;
+        return;
+      }
+      columnsToRun = [col];
+    } else {
+      const scenarioColumns = getOrderedTestColumns().filter((c) => c.testNumber && c.testNumber !== 'RESET');
+      columnsToRun = scenarioColumns.length > 0 ? scenarioColumns : [null];
+    }
 
     const getCache = {}; // key: `${scenario}-${rowIndex}-${fieldId}` — loan state differs per scenario (each runs its own SETs)
+    lastRunCellResults = {}; // Clear previous run; build incrementally as each scenario completes
 
     for (const testColumn of columnsToRun) {
       for (let i = 0; i < allData.length; i++) {
@@ -1270,34 +1475,8 @@ async function runTests() {
                   result.message = `Set failed (${response.status}): ${errMsg || 'Unknown error'}`;
                 }
               } else {
-                // Verify value was actually written (Set can return 200 but write null/wrong value)
-                let readBack = null;
-                try {
-                  const getRes = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify([fieldId])
-                  });
-                  if (getRes.ok) {
-                    const getData = await getRes.json();
-                    const match = Array.isArray(getData)
-                      ? (getData.find((item) => item?.id === fieldId || item?.fieldId === fieldId) || getData[0])
-                      : getData;
-                    readBack = match?.value ?? match?.Value ?? match?.fieldValue ?? match?.field_value ?? null;
-                  }
-                } catch (_) {
-                  readBack = null;
-                }
-                const setStr = String(setValue).trim();
-                const readStr = readBack === null || readBack === undefined ? '' : String(readBack).trim();
-                const same = setStr === readStr || (Number(setStr) === Number(readStr) && readStr !== '' && setStr !== '');
-                if (same) {
-                  result.status = 'info';
-                  result.message = `SET ${fieldId} succeeded • Value: ${JSON.stringify(setValue)}`;
-                } else {
-                  result.status = 'err';
-                  result.message = `Set returned OK but value mismatch: set ${JSON.stringify(setValue)}, got ${readBack === null || readBack === undefined ? 'null' : JSON.stringify(readBack)}`;
-                }
+                result.status = 'info';
+                result.message = `SET ${fieldId} succeeded • Value: ${JSON.stringify(setValue)}`;
               }
             } catch (error) {
               result.status = 'err';
@@ -1325,15 +1504,7 @@ async function runTests() {
                 getCache[getCacheKey] = { status: 'err', message: `Get failed (${response.status}): ${errorText || 'Unknown error'}` };
               } else {
                 const data = await response.json();
-                if (Array.isArray(data)) {
-                  const match =
-                    data.find((item) => item?.id === fieldId) ||
-                    data.find((item) => item?.fieldId === fieldId) ||
-                    data[0];
-                  value = match?.value ?? match?.Value ?? match?.fieldValue ?? match?.field_value ?? null;
-                } else if (data && typeof data === 'object') {
-                  value = data[fieldId] ?? data[fieldId.toUpperCase()] ?? data[fieldId.toLowerCase()] ?? null;
-                }
+                value = extractFieldValueFromReaderResponse(data, fieldId);
                 const displayValue = value === null || value === undefined ? 'No value returned' : JSON.stringify(value);
                 getCache[getCacheKey] = { status: 'info', message: `GET ${fieldId}: ${displayValue}`, value };
                 if (value !== null && value !== undefined && currentCol) {
@@ -1360,14 +1531,53 @@ async function runTests() {
           }
         }
       } else if (actionNorm === 'compare') {
-        // For compare, check if we have expected values
-        const hasExpected = Object.values(testValues).some(v => v && v !== '');
-        if (hasExpected) {
-          result.status = 'info';
-          result.message = `Would COMPARE ${fieldId} against expected values`;
-        } else {
+        if (!currentLoanGuid) {
           result.status = 'skipped';
-          result.message = 'No expected values to compare';
+          result.message = 'Missing Loan GUID for Compare';
+        } else if (!currentCol) {
+          result.status = 'skipped';
+          result.message = 'No test column for Compare';
+        } else {
+          const expectedValue = row[currentCol.field];
+          const hasExpected = expectedValue !== null && expectedValue !== undefined && String(expectedValue).trim() !== '';
+          if (!hasExpected) {
+            result.status = 'skipped';
+            result.message = 'No expected value in column for Compare';
+          } else {
+            try {
+              const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify([fieldId])
+              });
+              if (!response.ok) {
+                const errorText = await response.text();
+                result.status = 'err';
+                result.message = `Compare GET failed (${response.status}): ${errorText || 'Unknown error'}`;
+              } else {
+                const data = await response.json();
+                const actualValue = extractFieldValueFromReaderResponse(data, fieldId);
+                const expectedStr = String(expectedValue).trim();
+                const actualStr = actualValue === null || actualValue === undefined ? '' : String(actualValue).trim();
+                const numExpected = Number(expectedStr);
+                const numActual = Number(actualStr);
+                const bothNumeric = actualStr !== '' && expectedStr !== '' && !Number.isNaN(numExpected) && !Number.isNaN(numActual);
+                const same = expectedStr === actualStr
+                  || (bothNumeric && numExpected === numActual)
+                  || (expectedStr.toLowerCase() === actualStr.toLowerCase());
+                if (same) {
+                  result.status = 'info';
+                  result.message = `COMPARE ${fieldId} passed • Expected: ${JSON.stringify(expectedValue)}`;
+                } else {
+                  result.status = 'err';
+                  result.message = `Compare mismatch: expected ${JSON.stringify(expectedValue)}, got ${actualValue === null || actualValue === undefined ? 'null' : JSON.stringify(actualValue)}`;
+                }
+              }
+            } catch (error) {
+              result.status = 'err';
+              result.message = `Compare error: ${error.message}`;
+            }
+          }
         }
       } else {
         result.status = 'skipped';
@@ -1384,27 +1594,68 @@ async function runTests() {
       
       results.push(result);
       }
+
+      // After each scenario: update cell shading and refresh grid so results appear immediately
+    for (const r of results) {
+      if (r.rowIndex == null || !r.testNumber) continue;
+      if (testColumn && r.testNumber !== testColumn.testNumber) continue;
+      const col = findTestColumnByNumber(r.testNumber);
+      if (!col?.field) continue;
+      const key = `${r.rowIndex}-${col.field}`;
+      if (r.status === 'info') lastRunCellResults[key] = 'pass';
+      else if (r.status === 'err') lastRunCellResults[key] = 'fail';
+    }
+    if (gridApi?.refreshCells) {
+      gridApi.refreshCells({ force: true });
+    }
     }
 
-    // Display results
-    displayTestResults(results, passed, failed, skipped);
-    updateRunSummary(passed, failed, skipped, results.length);
+    // lastRunCellResults already built incrementally; ensure final state
+    for (const r of results) {
+      if (r.rowIndex == null || !r.testNumber) continue;
+      const col = findTestColumnByNumber(r.testNumber);
+      if (!col?.field) continue;
+      const key = `${r.rowIndex}-${col.field}`;
+      if (r.status === 'info') lastRunCellResults[key] = 'pass';
+      else if (r.status === 'err') lastRunCellResults[key] = 'fail';
+    }
+    if (gridApi?.refreshCells) {
+      gridApi.refreshCells({ force: true });
+    }
+
     updateScenarioBadges(results);
     lastRunResults = results;
     saveRecentRun();
     if (failFirstBtn) {
       failFirstBtn.disabled = failed === 0;
     }
-    setStatus(`Tests complete: ${passed} passed, ${failed} failed, ${skipped} skipped`, 
-      failed > 0 ? 'err' : 'ok', 
-      failed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
-    
+
+    if (isSingleRun) {
+      const msg = `Test ${singleTestNumber}: ${passed} passed, ${failed} failed, ${skipped} skipped`;
+      showToast(msg, failed > 0 ? 'warning' : 'success');
+      setStatus(msg, failed > 0 ? 'err' : 'ok', failed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
+    } else {
+      displayTestResults(results, passed, failed, skipped);
+      updateRunSummary(passed, failed, skipped, results.length);
+      setStatus(`Tests complete: ${passed} passed, ${failed} failed, ${skipped} skipped`,
+        failed > 0 ? 'err' : 'ok',
+        failed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
+      const summary = failed > 0
+        ? `Tests complete. ${passed} passed, ${failed} failed, ${skipped} skipped.`
+        : `All tests passed. ${passed} passed, ${skipped} skipped.`;
+      speak(summary);
+    }
+
   } catch (error) {
     console.error('Error running tests:', error);
     setStatus(`Error running tests: ${error.message}`, 'err', 'bi-exclamation-octagon');
-    testResultsList.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
-    const scrollToTopBtnEl = document.getElementById('scrollToTopBtn');
-    if (scrollToTopBtnEl) scrollToTopBtnEl.style.display = 'none';
+    if (isSingleRun) {
+      showToast(`Error: ${error.message}`, 'error');
+    } else {
+      testResultsList.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+      const scrollToTopBtnEl = document.getElementById('scrollToTopBtn');
+      if (scrollToTopBtnEl) scrollToTopBtnEl.style.display = 'none';
+    }
   } finally {
     runTestsBtn.disabled = false;
   }
@@ -1465,6 +1716,7 @@ function clearData() {
   currentLoanGuid = '';
   lastRunResults = [];
   lastRunSummary = null;
+  lastRunCellResults = {};
   
   if (gridApi) {
     setGridRows([]);
@@ -1473,7 +1725,9 @@ function clearData() {
   fileInput.value = '';
   searchInput.value = '';
   uploadArea.style.display = 'block';
-  exportBtn.style.display = 'none';
+  if (exportCsvBtn) exportCsvBtn.style.display = 'none';
+  if (exportExcelBtn) exportExcelBtn.style.display = 'none';
+  if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'none';
   runTestsBtn.style.display = 'none';
   clearBtn.style.display = 'none';
   testResultsContainer.style.display = 'none';
@@ -1561,19 +1815,23 @@ async function handleFileUpload(file) {
     // Generate column definitions
     columnDefs = generateColumnDefs(headers, rows);
     allData = rows;
-    
+    lastRunCellResults = {};
+
     // Initialize grid if not already done
     initializeGrid();
     
     // Populate grid
     setGridRows(allData);
     
-    // Count scenario columns (all after Description except pinned)
+    // Count scenario columns: Reset, Test 1..N only; stop at first blank or non-Test
     const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
-    const pinned = ['step', 'action', 'target', 'description'];
-    const scenarioColumns = descIdx >= 0
-      ? headers.slice(descIdx + 1).filter((h) => !pinned.some((p) => String(h || '').toLowerCase().includes(p)))
-      : [];
+    const scenarioColumns = [];
+    if (descIdx >= 0) {
+      for (let i = descIdx + 1; i < headers.length; i++) {
+        if (!isScenarioColumnHeader(headers[i])) break;
+        scenarioColumns.push(headers[i]);
+      }
+    }
     
     // Store test descriptions globally for persistence
     testDescriptionsData = testDescriptions || [];
@@ -1602,7 +1860,9 @@ async function handleFileUpload(file) {
     
     // Update UI
     uploadArea.style.display = 'none';
-    exportBtn.style.display = 'inline-block';
+    if (exportCsvBtn) exportCsvBtn.style.display = 'inline-block';
+    if (exportExcelBtn) exportExcelBtn.style.display = 'inline-block';
+    if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'inline-block';
     runTestsBtn.style.display = 'inline-block';
     clearBtn.style.display = 'inline-block';
     if (stickyActionBar) {
@@ -1678,9 +1938,19 @@ uploadArea.addEventListener('click', () => {
   fileInput.click();
 });
 
-exportBtn.addEventListener('click', (e) => {
+exportCsvBtn?.addEventListener('click', (e) => {
   e.preventDefault();
   exportToCSV();
+});
+
+exportExcelBtn?.addEventListener('click', (e) => {
+  e.preventDefault();
+  exportToExcel();
+});
+
+clearAndReloadBtn?.addEventListener('click', (e) => {
+  e.preventDefault();
+  clearData();
 });
 
 clearBtn.addEventListener('click', (e) => {
@@ -1809,6 +2079,27 @@ function handleVoiceCommand(rawCommand = '') {
       applySearch();
       showAccordionSection('collapseTestGrid');
       speak(`Searching for ${term}`);
+    }
+    return;
+  }
+
+  if ((command.includes('analyze failures') || command.includes('analyse failures')) && lastRunResults?.length) {
+    const failures = lastRunResults.filter((r) => r.status === 'err');
+    if (failures.length === 0) {
+      speak('No failures to analyze. All tests passed.');
+      return;
+    }
+    showAccordionSection('collapseAIAssistant');
+    if (window.unitTestsAI?.sendMessageWithContext) {
+      window.unitTestsAI.sendMessageWithContext(
+        'Analyze these test failures and suggest possible causes and fixes.',
+        { results: lastRunResults, failures }
+      );
+      speak(`Sending ${failures.length} failure${failures.length === 1 ? '' : 's'} to the assistant for analysis.`);
+    } else {
+      const summary = failures.map((f) => `Step ${f.step} ${f.action}: ${f.message}`).join('. ');
+      window.unitTestsAI?.sendMessage?.(`Analyze these test failures: ${summary}`);
+      speak('Sending failures to the assistant.');
     }
     return;
   }

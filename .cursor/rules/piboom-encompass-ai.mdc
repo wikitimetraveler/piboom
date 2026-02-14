@@ -1,0 +1,16 @@
+---
+description: PiBoom Encompass & AI context — use when working on mortgage, Encompass, or AI assistants
+globs: "**/encompass*.{js,html},**/ice*.{js,json},**/loan-pipeline*.{js,html},**/unit-tests*.{js,html},**/knowledge/**/*.{js,json},controllers/encompass*.js,services/encompass*.js,lib/knowledge/**/*.js"
+alwaysApply: false
+---
+
+# PiBoom Encompass & AI
+
+When editing Encompass or AI-related code:
+
+1. **Read first**: `AGENTS.md`, `docs/ENCOMPASS.md`, `docs/AI_SYSTEM.md`, `docs/ICE_KNOWLEDGE_SOURCES.md`
+2. **Encompass**: Web/cloud/phone only. Use `encompass-hub.service.js` for API, `encompass-auth.service.js` for OAuth.
+3. **Calculations**: Use `public/shared/calculationEngine.js`; map to Encompass via `customIds` (e.g. `createDTICalculatorConfig`, `createAssetQualifierConfig`).
+4. **Knowledge**: ICE repos live in `knowledge-sources/ice/repos/`. Run `npm run build:ice-knowledge` to refresh `data/knowledge/ice-sources.json`.
+5. **AI**: Encompass Assistant uses `ice-knowledge.service.js` + `encompass-docs.service.js`; system prompt is in `encompass-assistant.controller.js`.
+6. **AG Grid**: Used for unit-test grid, Encompass custom/native field browsers. ag-grid-community, theme alpine. Use `agGrid.createGrid()` or `new agGrid.Grid()`; set explicit `colId` per column.

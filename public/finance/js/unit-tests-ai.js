@@ -31,9 +31,18 @@ function initializeAIAssistant() {
   });
   
   clearChatBtn?.addEventListener('click', clearChat);
+
+  const ttsToggleBtn = document.getElementById('ttsToggleBtn');
+  if (ttsToggleBtn) {
+    ttsToggleBtn.addEventListener('click', () => {
+      window.unitTestsSpeakResponses = !window.unitTestsSpeakResponses;
+      ttsToggleBtn.classList.toggle('active', !!window.unitTestsSpeakResponses);
+      ttsToggleBtn.title = window.unitTestsSpeakResponses ? 'Speaking AI responses (click to disable)' : 'Speak AI responses aloud';
+    });
+  }
 }
 
-function addAIMessage(role, content, timestamp = null) {
+function addAIMessage(role, content, timestamp = null, options = {}) {
   if (!aiChatMessages) return;
   
   const messageDiv = document.createElement('div');
@@ -62,7 +71,16 @@ function addAIMessage(role, content, timestamp = null) {
   
   // Scroll to bottom
   aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
-  
+
+  // TTS: Speak assistant response when enabled
+  if (role === 'assistant' && options.speakResponse && content && typeof window.speakWithGoogle === 'function') {
+    window.speakWithGoogle(content.substring(0, 500), 'en-US-Standard-D', { speakingRate: 0.9 })
+      .catch(() => {});
+  } else if (role === 'assistant' && options.speakResponse && content && 'speechSynthesis' in window) {
+    const u = new SpeechSynthesisUtterance(content.substring(0, 500));
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+  }
 }
 
 function formatMessageContent(content) {
@@ -82,12 +100,13 @@ function formatMessageContent(content) {
   return formatted;
 }
 
-async function sendAIMessage() {
-  const message = aiChatInput?.value.trim();
-  if (!message || !aiChatInput) return;
+async function sendAIMessage(opts = null) {
+  const message = (opts && typeof opts === 'object' && opts.message) ? opts.message.trim() : aiChatInput?.value?.trim();
+  const testContext = opts && typeof opts === 'object' ? opts.testContext : null;
+  if (!message) return;
 
   const normalized = message.toLowerCase();
-  if (normalized.includes('run tests') || normalized.includes('run test')) {
+  if ((normalized.includes('run tests') || normalized.includes('run test')) && !testContext) {
     addAIMessage('user', message);
     aiChatInput.value = '';
     if (typeof window.runTests === 'function') {
@@ -109,22 +128,30 @@ async function sendAIMessage() {
   aiChatMessages.appendChild(loadingDiv);
   aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
   
-  // Clear input
-  aiChatInput.value = '';
+  // Clear input unless we were called with opts
+  if (!opts || !opts.message) aiChatInput.value = '';
   
   // Add to context
   chatContext.push(message);
   
   try {
+    const body = {
+      message,
+      context: chatContext.slice(-10)
+    };
+    if (testContext && (testContext.results || testContext.failures)) {
+      body.testContext = {
+        results: testContext.results || [],
+        failures: testContext.failures || [],
+        summary: testContext.failures
+          ? `${testContext.failures.length} failed, ${(testContext.results || []).filter((r) => r.status === 'info').length} passed`
+          : null
+      };
+    }
     const response = await fetch('/api/unit-tests/ai/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message,
-        context: chatContext.slice(-10) // Keep last 10 messages for context
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
     });
     
     if (!response.ok) {
@@ -137,7 +164,7 @@ async function sendAIMessage() {
     loadingDiv.remove();
     
     // Add assistant response
-    addAIMessage('assistant', data.message, new Date(data.timestamp).toLocaleTimeString());
+    addAIMessage('assistant', data.message, new Date(data.timestamp).toLocaleTimeString(), { speakResponse: !!window.unitTestsSpeakResponses });
     
     // Add to context (limit context size)
     if (chatContext.length > 20) {
@@ -180,6 +207,9 @@ window.unitTestsAI = {
     if (!aiChatInput) return;
     aiChatInput.value = message;
     sendAIMessage();
+  },
+  sendMessageWithContext: (message, testContext) => {
+    sendAIMessage({ message: String(message).trim(), testContext });
   },
   show: () => {
     if (aiAssistantCard) {

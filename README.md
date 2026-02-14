@@ -98,10 +98,15 @@ docker-compose up
 
 ## Documentation
 
-- All guides now live under `docs/` to keep the repo root clean.
-- Setup: [`docs/SETUP.md`](docs/SETUP.md) and [`docs/DATABASE_SETUP.md`](docs/DATABASE_SETUP.md)
+- **AI Agents** (system self-knowledge): [`AGENTS.md`](AGENTS.md) — read this first for Encompass & AI context
+- All guides now live under `docs/` to keep the repo root clean
+- **Encompass**: [`docs/ENCOMPASS.md`](docs/ENCOMPASS.md), [`docs/ICE_KNOWLEDGE_SOURCES.md`](docs/ICE_KNOWLEDGE_SOURCES.md)
+- **AI**: [`docs/AI_SYSTEM.md`](docs/AI_SYSTEM.md), [`docs/LANGCHAIN_MEMORY.md`](docs/LANGCHAIN_MEMORY.md)
+- Setup: [`docs/SETUP.md`](docs/SETUP.md), [`docs/DATABASE_SETUP.md`](docs/DATABASE_SETUP.md)
 - Deployment: [`docs/DOCKER_DEPLOYMENT.md`](docs/DOCKER_DEPLOYMENT.md)
-- Domain guides & notes: [`docs/VOICE_SETUP.md`](docs/VOICE_SETUP.md), [`docs/GRATEFUL_DEAD_SETUP.md`](docs/GRATEFUL_DEAD_SETUP.md), [`docs/ICE_KNOWLEDGE_SOURCES.md`](docs/ICE_KNOWLEDGE_SOURCES.md), [`docs/CHANGES_SUMMARY.md`](docs/CHANGES_SUMMARY.md)
+- **Glossary**: [`docs/GLOSSARY.md`](docs/GLOSSARY.md)
+- **Development workflow**: [`docs/DEVELOPMENT_WORKFLOW.md`](docs/DEVELOPMENT_WORKFLOW.md)
+- Domain guides & notes: [`docs/VOICE_SETUP.md`](docs/VOICE_SETUP.md), [`docs/GRATEFUL_DEAD_SETUP.md`](docs/GRATEFUL_DEAD_SETUP.md), [`docs/CHANGES_SUMMARY.md`](docs/CHANGES_SUMMARY.md)
 
 ## Scripts & Tests Layout
 
@@ -123,7 +128,8 @@ docker-compose up
 
 ### Frontend
 - **Bootstrap 5** - UI framework
-- **DataTables** - Advanced table functionality
+- **AG Grid** - Interactive grids (unit-test execution, Encompass custom/native field browsers)
+- **DataTables** - Advanced tables (pipeline, disasters, risk dashboards, tools)
 - **Google Maps API** - Interactive mapping and geocoding
 - **YouTube Data API** - Video integration
 - **Chart.js** - Data visualization

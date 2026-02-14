@@ -1,0 +1,19 @@
+---
+description: PiBoom services layer — env usage, error handling, exports for services/
+globs: "services/**/*.js"
+alwaysApply: false
+---
+
+# PiBoom Services
+
+When editing files under `services/`:
+
+1. **Env usage** — Read from `process.env.VAR` with fallback: `process.env.ENCOMPASS_API_BASE || 'https://api.elliemae.com/encompass/v1'`. Check required vars early (e.g. DATABASE_URL, OPENAI_API_KEY) and fail clearly.
+
+2. **Error handling** — Catch axios errors; extract `error.response?.status`, `error.response?.data`; throw `new Error('Context message: ' + detail)`. On 401 for Encompass, call `clearEncompassTokenCache()` and retry once.
+
+3. **Exports** — Services use default export (e.g. `export default { ... }` or class instance). Controllers import and call; services do not import controllers.
+
+4. **Async** — Services are async; let errors propagate to controller for HTTP status mapping.
+
+5. **Reference** — AGENTS.md for paths; docs/ENCOMPASS.md for Encompass services.

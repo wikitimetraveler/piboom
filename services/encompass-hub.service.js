@@ -926,7 +926,16 @@ export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavi
       params: { invalidFieldBehavior },
       data: fieldIds,
     });
-    return response.data;
+    const data = response.data;
+    if (Array.isArray(data) && data.length > 0 && data.every((i) => i && typeof i === 'object')) {
+      return data.map((item) => ({
+        ...item,
+        id: item.id ?? item.fieldId ?? item.FieldId,
+        fieldId: item.fieldId ?? item.FieldId ?? item.id,
+        value: item.value ?? item.Value ?? item.fieldValue ?? item.field_value ?? item.stringValue,
+      }));
+    }
+    return data;
   } catch (error) {
     const status = error.response?.status;
     const data = error.response?.data;

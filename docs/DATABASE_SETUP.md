@@ -183,6 +183,13 @@ The `records` table stores your vinyl/album collection:
 - Check your External Database URL is correct
 - Make sure the database is running in Render dashboard
 
+**Error: "ETIMEDOUT" or "connect ETIMEDOUT"**
+- The connection to the database host timed out (often due to firewall or network)
+- **Firewall**: Ensure outbound port 5432 is allowed from your network
+- **Cloud SQL (GCP)**: Add your IP to "Authorized networks" in the Cloud SQL instance, or use the [Cloud SQL Auth Proxy](https://cloud.google.com/sql/docs/postgres/connect-auth-proxy)
+- **Render external DB**: Render's external URL should work from most networks; try from a different network (e.g. mobile hotspot) to rule out corporate firewall
+- **Wrong host**: If using a proxy or tunnel, verify the host/port in `DATABASE_URL`
+
 **Error: "SSL required"**
 - This is normal - the app automatically enables SSL for production
 

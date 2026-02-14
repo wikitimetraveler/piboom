@@ -677,6 +677,7 @@ export async function createTables() {
   } catch (error) {
     console.error('❌ Error creating tables:', error.message);
     console.error('   Database operations will be unavailable');
+    throw error;
   }
 }
 

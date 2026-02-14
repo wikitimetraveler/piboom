@@ -56,5 +56,11 @@ The generated index powers `lib/knowledge/ice-knowledge.service.js`, which the E
 - `repo` / `path` for traceability
 - `executionAllowed=false` flag so the assistant never tries to run live calls
 
-As long as you keep `ice-sources.json` current, the assistant will cite both the official Dev Connect docs and the ICE sample repos/Postman examples in responses.***
+As long as you keep `ice-sources.json` current, the assistant will cite both the official Dev Connect docs and the ICE sample repos/Postman examples in responses.
+
+## Related Documentation
+
+- **Encompass integration overview**: [`ENCOMPASS.md`](ENCOMPASS.md)
+- **AI system architecture**: [`AI_SYSTEM.md`](AI_SYSTEM.md)
+- **System self-knowledge for AI agents**: [`AGENTS.md`](../AGENTS.md)
 

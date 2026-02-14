@@ -112,7 +112,7 @@ Be helpful, accurate, and always reference the official Encompass Developer Conn
 // Chat with Unit Testing AI Assistant
 router.post('/chat', async (req, res) => {
   try {
-    const { message, context = [] } = req.body;
+    const { message, context = [], testContext } = req.body;
     
     if (!message) {
       return res.status(400).json({ 
@@ -120,7 +120,22 @@ router.post('/chat', async (req, res) => {
       });
     }
 
-    console.log(`💬 Unit Testing AI Chat: "${message}"`);
+    console.log(`💬 Unit Testing AI Chat: "${message}"${testContext ? ' (with test context)' : ''}`);
+    
+    // Build test context for AI when user sends failures or asks for analysis
+    let testRunContext = '';
+    if (testContext && (testContext.failures?.length || testContext.results?.length)) {
+      const failures = testContext.failures || (testContext.results || []).filter((r) => r.status === 'err');
+      if (failures.length > 0) {
+        testRunContext = '\n\n**Current Test Run (user just ran tests):**\n';
+        testRunContext += `Summary: ${testContext.summary || `${failures.length} failed`}\n`;
+        testRunContext += 'Failures:\n';
+        failures.forEach((f, i) => {
+          testRunContext += `- Step ${f.step} ${f.action} (${f.target || 'field'}): ${f.message || 'Error'}\n`;
+        });
+        testRunContext += '\nUse this context to analyze failures, suggest fixes, or explain what might have gone wrong.\n';
+      }
+    }
     
     // Search for relevant documentation + knowledge base entries
     const [docResultsRaw, knowledgeResults] = await Promise.all([
@@ -151,8 +166,9 @@ router.post('/chat', async (req, res) => {
     }
 
     // Prepare messages
+    const systemContent = UNIT_TESTING_SYSTEM_PROMPT + docsContext + testRunContext;
     const messages = [
-      new SystemMessage(UNIT_TESTING_SYSTEM_PROMPT + docsContext),
+      new SystemMessage(systemContent),
       ...context.map(msg => new HumanMessage(msg)),
       new HumanMessage(message)
     ];
