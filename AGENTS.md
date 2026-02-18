@@ -69,7 +69,14 @@ The mortgage/Encompass and AI domains are the main focus for ongoing development
 - **Project overview**: `README.md`
 - **Encompass**: `docs/ENCOMPASS.md`, `docs/ICE_KNOWLEDGE_SOURCES.md`
 - **AI**: `docs/AI_SYSTEM.md`, `docs/LANGCHAIN_MEMORY.md`
+- **Calculations**: `docs/CALCULATION_ENGINE.md`
+- **The Screen Test**: `docs/SCREEN_TEST.md`
+- **Disaster & risk**: `docs/DISASTER_RISK.md`
+- **API routes**: `docs/API_ROUTES.md`
+- **Config & env**: `docs/CONFIG.md`
+- **Frontend patterns**: `docs/FRONTEND_PATTERNS.md`
 - **Structure**: `docs/PROJECT_STRUCTURE.md`
 - **Deployment**: `docs/DOCKER_DEPLOYMENT.md`, `docs/DATABASE_SETUP.md`
 - **Glossary**: `docs/GLOSSARY.md`
 - **Development workflow**: `docs/DEVELOPMENT_WORKFLOW.md`
+- **ICE docs folder**: `knowledge-sources/ice/docs/README.md`

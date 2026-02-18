@@ -122,6 +122,13 @@ function normalizeValue(value) {
   return String(value).trim();
 }
 
+/** In unit tests, "null" in compare/set columns means blank/empty. */
+function isBlankForTest(val) {
+  if (val === null || val === undefined) return true;
+  const s = String(val).trim().toLowerCase();
+  return s === '' || s === 'null' || s === 'undefined';
+}
+
 function parseExcelFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -755,6 +762,36 @@ function getOrderedTestColumns() {
   return result;
 }
 
+function getNonTestColumnFields() {
+  if (!Array.isArray(columnDefs)) return [];
+  const testFields = new Set(getOrderedTestColumns().map((c) => c.field));
+  return columnDefs
+    .filter((col) => {
+      const field = col.field || col.colId;
+      return field && !testFields.has(field);
+    })
+    .map((col) => col.field || col.colId);
+}
+
+function hideNonTestColumns() {
+  if (!gridApi || typeof gridApi.setColumnVisible !== 'function') return;
+  const testCols = getOrderedTestColumns();
+  if (testCols.length === 0) return;
+  const nonTestFields = getNonTestColumnFields();
+  nonTestFields.forEach((field) => {
+    if (field) gridApi.setColumnVisible(field, false);
+  });
+}
+
+function showAllColumns() {
+  if (!gridApi || typeof gridApi.setColumnVisible !== 'function') return;
+  if (!Array.isArray(columnDefs)) return;
+  columnDefs.forEach((col) => {
+    const field = col.field || col.colId;
+    if (field) gridApi.setColumnVisible(field, true);
+  });
+}
+
 function pickTestColumnForRow(row) {
   const testColumns = getOrderedTestColumns();
   if (!testColumns.length) return null;
@@ -863,6 +900,17 @@ function exportToExcel() {
   setStatus(`Exported to ${baseName}-export.xlsx`, 'ok', 'bi-check-circle');
 }
 
+function escapeHtml(str) {
+  if (str == null) return '';
+  const s = String(str);
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function displayTestDescriptions(testDescriptions) {
   const container = document.getElementById('testDescriptionsContainer');
   const accordionContainer = document.getElementById('accordionContainer');
@@ -884,15 +932,47 @@ function displayTestDescriptions(testDescriptions) {
     cardElement.setAttribute('data-test-number', test.testNumber);
 
     cardElement.innerHTML = `
-      <div class="test-number-badge">${test.testNumber}</div>
-      <div class="flex-grow-1">
-        <div class="test-description-text">${test.description}</div>
-        <div class="scenario-status-badges" data-test-number="${test.testNumber}"></div>
+      <div class="scenario-card-inner">
+        <div class="scenario-card-face scenario-card-front">
+          <div class="scenario-card-header">
+            <div class="test-number-badge">${escapeHtml(String(test.testNumber))}</div>
+            <div class="test-description-text">${escapeHtml(test.description || '')}</div>
+            <button type="button" class="btn btn-link btn-sm p-0 text-muted scenario-edit-toggle ml-auto" title="Edit scenario"><i class="bi-pencil"></i></button>
+          </div>
+          <button type="button" class="scenario-run-btn" data-run-scenario="${test.testNumber}">
+            <i class="bi-play-fill"></i> Run
+          </button>
+        </div>
+        <div class="scenario-card-face scenario-card-back">
+          <div class="scenario-card-back-header">
+            <label class="text-muted small mb-0">Edit scenario</label>
+            <button type="button" class="scenario-flip-back-btn scenario-edit-cancel" title="Back to front"><i class="bi-arrow-left"></i> Back</button>
+          </div>
+          <textarea class="scenario-edit-input" rows="2" placeholder="Scenario description...">${escapeHtml(test.description || '')}</textarea>
+          <div class="scenario-card-back-actions">
+            <button type="button" class="btn btn-outline-secondary btn-sm scenario-edit-cancel">Cancel</button>
+            <button type="button" class="btn btn-primary btn-sm scenario-edit-save">Save</button>
+          </div>
+        </div>
       </div>
     `;
 
-    // Add click handler to highlight associated column
-    cardElement.addEventListener('click', () => {
+    const frontFace = cardElement.querySelector('.scenario-card-front');
+    const editInput = cardElement.querySelector('.scenario-edit-input');
+    const runBtn = cardElement.querySelector('.scenario-run-btn');
+    const saveBtn = cardElement.querySelector('.scenario-edit-save');
+
+    function flipToBack() {
+      cardElement.classList.add('flipped');
+      setTimeout(() => editInput?.focus(), 100);
+    }
+
+    function flipToFront() {
+      cardElement.classList.remove('flipped');
+    }
+
+    frontFace.addEventListener('click', (e) => {
+      if (e.target.closest('.scenario-run-btn') || e.target.closest('.scenario-edit-toggle')) return;
       document.querySelectorAll('.test-description-card').forEach(card => {
         card.classList.remove('test-scenario-active');
       });
@@ -900,29 +980,32 @@ function displayTestDescriptions(testDescriptions) {
       highlightTestColumn(test.testNumber);
     });
 
-    // Right-click context menu: Run this scenario only
-    cardElement.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      hideScenarioContextMenu();
-      const menu = document.createElement('div');
-      menu.className = 'scenario-context-menu';
-      menu.style.left = `${e.clientX}px`;
-      menu.style.top = `${e.clientY}px`;
-      const runBtn = document.createElement('button');
-      runBtn.innerHTML = '<i class="bi-play-circle mr-2"></i> Run this scenario only';
-      runBtn.addEventListener('click', () => {
-        hideScenarioContextMenu();
-        runTests(test.testNumber);
-      });
-      menu.appendChild(runBtn);
-      menu.dataset.scenarioMenu = '1';
-      document.body.appendChild(menu);
+    runBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      runTests(test.testNumber);
+    });
 
-      const close = () => {
-        hideScenarioContextMenu();
-        document.removeEventListener('click', close);
-      };
-      setTimeout(() => document.addEventListener('click', close), 0);
+    const editIcon = cardElement.querySelector('.scenario-edit-toggle');
+    editIcon.addEventListener('click', (e) => {
+      e.stopPropagation();
+      flipToBack();
+    });
+
+    saveBtn.addEventListener('click', () => {
+      const newDesc = (editInput?.value || '').trim();
+      const idx = testDescriptionsData.findIndex(t => t.testNumber === test.testNumber);
+      if (idx >= 0) testDescriptionsData[idx].description = newDesc;
+      const textEl = cardElement.querySelector('.test-description-text');
+      if (textEl) textEl.textContent = newDesc || '(No description)';
+      flipToFront();
+    });
+
+    cardElement.querySelectorAll('.scenario-edit-cancel').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        editInput.value = test.description || '';
+        flipToFront();
+      });
     });
 
     container.appendChild(cardElement);
@@ -1350,6 +1433,7 @@ async function runTests(singleTestNumber) {
   try {
     setStatus('Running tests...', 'info', 'bi-clock-history');
     runTestsBtn.disabled = true;
+    hideNonTestColumns();
     if (!isSingleRun) {
       testResultsContainer.style.display = 'block';
       testResultsList.innerHTML = '<div class="text-center p-4"><i class="bi-hourglass-split" style="font-size: 2rem;"></i><p class="mt-2">Running tests...</p></div>';
@@ -1431,8 +1515,9 @@ async function runTests(singleTestNumber) {
             result.status = 'skipped';
             result.message = 'Missing Loan GUID for Set call';
           } else {
-            const setValue = currentCol ? row[currentCol.field] : null;
-            const hasValue = setValue !== null && setValue !== undefined && String(setValue).trim() !== '';
+            const rawSetValue = currentCol ? row[currentCol.field] : null;
+            const hasValue = rawSetValue !== null && rawSetValue !== undefined && String(rawSetValue).trim() !== '';
+            const setValue = hasValue && isBlankForTest(rawSetValue) ? '' : rawSetValue;
             if (!currentCol || !hasValue) {
               result.status = 'skipped';
               result.message = 'Skipped (no value to set — field left as-is)';
@@ -1559,10 +1644,13 @@ async function runTests(singleTestNumber) {
                 const actualValue = extractFieldValueFromReaderResponse(data, fieldId);
                 const expectedStr = String(expectedValue).trim();
                 const actualStr = actualValue === null || actualValue === undefined ? '' : String(actualValue).trim();
+                const expectedBlank = isBlankForTest(expectedStr);
+                const actualBlank = isBlankForTest(actualStr);
                 const numExpected = Number(expectedStr);
                 const numActual = Number(actualStr);
                 const bothNumeric = actualStr !== '' && expectedStr !== '' && !Number.isNaN(numExpected) && !Number.isNaN(numActual);
                 const same = expectedStr === actualStr
+                  || (expectedBlank && actualBlank)
                   || (bothNumeric && numExpected === numActual)
                   || (expectedStr.toLowerCase() === actualStr.toLowerCase());
                 if (same) {
@@ -1822,7 +1910,8 @@ async function handleFileUpload(file) {
     
     // Populate grid
     setGridRows(allData);
-    
+    showAllColumns();
+
     // Count scenario columns: Reset, Test 1..N only; stop at first blank or non-Test
     const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
     const scenarioColumns = [];
@@ -1989,6 +2078,12 @@ runTestsBtn?.addEventListener('click', (e) => {
 failFirstBtn?.addEventListener('click', (e) => {
   e.preventDefault();
   focusFirstFailedStep();
+});
+
+document.getElementById('showAllColumnsBtn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  showAllColumns();
+  showToast('All columns shown', 'info');
 });
 
 closeResultsBtn?.addEventListener('click', (e) => {
