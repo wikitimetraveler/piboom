@@ -2,6 +2,8 @@
  * Shared Text-to-Speech helper
  *
  * Provides a Google TTS-first helper with safe browser fallback.
+ * Mobile/iOS: call ensureAudioUnlock() and primeSpeechSynthesis() during user
+ * gesture (e.g. mic click) before async speech to avoid "user gesture required" blocks.
  * Safe to include on any page; will not override existing helpers.
  */
 
@@ -11,28 +13,33 @@
 
   let currentAudio = null;
   let audioUnlocked = false;
+  let speechPrimed = false;
+
+  function doUnlock() {
+    if (audioUnlocked) return true;
+    try {
+      const unlockAudio = new Audio(
+        'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA='
+      );
+      unlockAudio.volume = 0;
+      unlockAudio.play().then(() => {
+        unlockAudio.pause();
+        unlockAudio.currentTime = 0;
+      }).catch(() => {});
+      audioUnlocked = true;
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 
   function initAudioUnlock() {
-    if (audioUnlocked) return;
-
     const unlock = async () => {
       document.removeEventListener('click', unlock, true);
       document.removeEventListener('touchstart', unlock, true);
       document.removeEventListener('pointerdown', unlock, true);
       document.removeEventListener('keydown', unlock, true);
-
-      try {
-        const unlockAudio = new Audio(
-          'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA='
-        );
-        unlockAudio.volume = 0;
-        await unlockAudio.play();
-        unlockAudio.pause();
-        unlockAudio.currentTime = 0;
-        audioUnlocked = true;
-      } catch (error) {
-        console.warn('Audio unlock skipped:', error);
-      }
+      doUnlock();
     };
 
     document.addEventListener('click', unlock, true);
@@ -45,6 +52,25 @@
     document.addEventListener('DOMContentLoaded', initAudioUnlock);
   } else {
     initAudioUnlock();
+  }
+
+  /** Call during user gesture (mic click, etc.) to unlock audio on mobile before async speak */
+  function ensureAudioUnlock() {
+    return doUnlock();
+  }
+
+  /** Call during user gesture to prime speechSynthesis on iOS (required for async speak) */
+  function primeSpeechSynthesis() {
+    if (!('speechSynthesis' in window) || speechPrimed) return;
+    try {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance('');
+      u.volume = 0;
+      window.speechSynthesis.speak(u);
+      speechPrimed = true;
+    } catch (e) {
+      console.warn('Speech prime skipped:', e);
+    }
   }
 
   async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
@@ -127,16 +153,20 @@
   }
 
   function speakWithBrowser(text, options = {}) {
-    if (!('speechSynthesis' in window)) {
-      return false;
-    }
+    if (!('speechSynthesis' in window)) return false;
 
     try {
       window.speechSynthesis.cancel();
+      try { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); } catch (_) {}
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = options.speakingRate || 1.0;
       utterance.pitch = typeof options.pitch === 'number' ? options.pitch : 1.0;
       utterance.volume = typeof options.volume === 'number' ? options.volume : 0.8;
+      const voices = window.speechSynthesis.getVoices();
+      const deep = voices.find(v =>
+        /male|daniel|david|alex/i.test(v.name)
+      );
+      if (deep) utterance.voice = deep;
       window.speechSynthesis.speak(utterance);
       return true;
     } catch (error) {
@@ -145,10 +175,8 @@
     }
   }
 
-  if (!window.speakWithGoogle) {
-    window.speakWithGoogle = speakWithGoogle;
-  }
-  if (!window.stopSpeech) {
-    window.stopSpeech = stopSpeech;
-  }
+  if (!window.speakWithGoogle) window.speakWithGoogle = speakWithGoogle;
+  if (!window.stopSpeech) window.stopSpeech = stopSpeech;
+  if (!window.ensureAudioUnlock) window.ensureAudioUnlock = ensureAudioUnlock;
+  if (!window.primeSpeechSynthesis) window.primeSpeechSynthesis = primeSpeechSynthesis;
 })();

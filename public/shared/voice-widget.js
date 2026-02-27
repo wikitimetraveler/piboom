@@ -118,6 +118,10 @@ class VoiceWidget {
     `;
 
     this.button.addEventListener('click', () => this.toggleListening());
+    this.button.addEventListener('touchstart', () => {
+      if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+      if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+    }, { passive: true });
     this.button.addEventListener('mouseenter', () => {
       if (!this.isListening) {
         this.button.style.transform = 'scale(1.1)';
@@ -214,6 +218,8 @@ class VoiceWidget {
 
   toggleListening() {
     if (!this.recognition) return;
+    if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+    if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
 
     if (this.isListening) {
       this.recognition.stop();

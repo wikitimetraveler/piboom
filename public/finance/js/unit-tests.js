@@ -12,6 +12,7 @@ const searchInput = document.getElementById('searchInput');
 const resultsMeta = document.getElementById('resultsMeta');
 const fileInfo = document.getElementById('fileInfo');
 const exampleFilesList = document.getElementById('exampleFilesList');
+const exampleFilesContainer = document.getElementById('exampleFilesContainer');
 const testResultsContainer = document.getElementById('testResultsContainer');
 const testResultsList = document.getElementById('testResultsList');
 const testResultsSummary = document.getElementById('testResultsSummary');
@@ -940,7 +941,7 @@ function displayTestDescriptions(testDescriptions) {
           <div class="scenario-card-header">
             <div class="test-number-badge">${escapeHtml(String(test.testNumber))}</div>
             <div class="test-description-text">${escapeHtml(test.description || '')}</div>
-            <button type="button" class="btn btn-link btn-sm p-0 text-muted scenario-edit-toggle ml-auto" title="Edit scenario"><i class="bi-pencil"></i></button>
+            <button type="button" class="btn btn-sm scenario-edit-toggle ml-auto" title="Edit scenario"><i class="bi-pencil mr-1"></i>Edit</button>
           </div>
           <button type="button" class="scenario-run-btn" data-run-scenario="${test.testNumber}">
             <i class="bi-play-fill"></i> Run
@@ -2116,6 +2117,47 @@ if (exampleFilesList) {
     }
   });
 }
+
+// Example Files: drag-and-drop and paste support
+if (exampleFilesContainer) {
+  exampleFilesContainer.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const hasFile = e.dataTransfer?.types?.includes('Files');
+    if (hasFile) exampleFilesContainer.classList.add('dragover');
+  });
+  exampleFilesContainer.addEventListener('dragleave', (e) => {
+    if (!exampleFilesContainer.contains(e.relatedTarget)) {
+      exampleFilesContainer.classList.remove('dragover');
+    }
+  });
+  exampleFilesContainer.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    exampleFilesContainer.classList.remove('dragover');
+    const file = e.dataTransfer?.files?.[0];
+    if (file && /\.(xlsx|xls)$/i.test(file.name)) {
+      handleFileUpload(file);
+    } else if (file) {
+      setStatus('Please drop an Excel file (.xlsx or .xls)', 'err', 'bi-exclamation-octagon');
+    }
+  });
+}
+
+// Paste Excel file from clipboard (Ctrl+V when file copied)
+document.addEventListener('paste', (e) => {
+  const files = e.clipboardData?.files;
+  if (!files?.length) return;
+  const file = Array.from(files).find(f => /\.(xlsx|xls)$/i.test(f.name));
+  if (!file) return;
+  // Don't intercept if user is typing in an input/textarea
+  const active = document.activeElement;
+  if (active?.tagName === 'INPUT' || active?.tagName === 'TEXTAREA' || active?.isContentEditable) {
+    return;
+  }
+  e.preventDefault();
+  handleFileUpload(file);
+});
 
 function initializeVoiceWidget() {
   if (typeof initVoiceWidget !== 'function') return;

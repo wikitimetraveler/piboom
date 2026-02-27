@@ -527,7 +527,7 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<script src="/shared/tts.js"></script>
 <script>
 let recognition = null;
 let isListening = false;
@@ -538,7 +538,14 @@ document.addEventListener('DOMContentLoaded', () => {
     title: 'Your DJ Profile',
     showAllOption: false
   });
-  
+  const micBtn = document.getElementById('micButton');
+  if (micBtn) {
+    micBtn.addEventListener('touchstart', () => {
+      if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+      if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+    }, { passive: true });
+  }
+
   // Initialize speech recognition
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
     // Enable voice recognition on Pi - use Web Speech API
@@ -586,7 +593,9 @@ document.addEventListener('DOMContentLoaded', () => {
 // Toggle voice listening
 function toggleVoiceListening() {
   if (!recognition) return;
-  
+  if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+  if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+
   if (isListening) {
     recognition.stop();
     isListening = false;
@@ -599,6 +608,8 @@ function toggleVoiceListening() {
 
 // Use a suggestion
 function useSuggestion(text) {
+  if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+  if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
   document.getElementById('voiceTranscript').textContent = `"${text}"`;
   processVoiceCommand(text);
 }
@@ -989,8 +1000,6 @@ async function clearVoiceDJHistory() {
   }
 }
 </script>
-<script src="/shared/tts.js"></script>
-
 </body>
 </html>
 

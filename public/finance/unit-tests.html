@@ -34,7 +34,32 @@
         line-height: 1.6;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         color: var(--text-dark);
-        background: linear-gradient(135deg, #f5f8ff 0%, #e6eefb 50%, #fdfefe 100%);
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Blue zen animated background (matches tool3) */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
+          radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+          radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
+        animation: backgroundFloat 20s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -1;
+      }
+      @keyframes backgroundFloat {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        25% { transform: translate(-10px, -10px) scale(1.05); }
+        50% { transform: translate(10px, -5px) scale(0.95); }
+        75% { transform: translate(-5px, 10px) scale(1.02); }
       }
 
       /* Navbar - exact copy from tool4 */
@@ -384,8 +409,18 @@
         flex-shrink: 0;
       }
 
-      .scenario-edit-toggle:hover {
+      .scenario-edit-toggle {
         color: var(--zen-primary) !important;
+        font-weight: 600;
+        border: 1px solid rgba(74, 144, 164, 0.3);
+        border-radius: 6px;
+        padding: 0.25rem 0.5rem !important;
+        background: rgba(74, 144, 164, 0.08);
+      }
+      .scenario-edit-toggle:hover {
+        background: rgba(74, 144, 164, 0.18);
+        border-color: var(--zen-primary);
+        color: #1a2856 !important;
       }
 
       .test-number-badge {
@@ -875,6 +910,19 @@
         border-style: solid;
       }
 
+      .example-files-drop-zone {
+        border: 2px dashed transparent;
+        border-radius: 12px;
+        padding: 0.5rem 0;
+        transition: all 0.2s ease;
+        outline: none;
+      }
+      .example-files-drop-zone.dragover {
+        border-color: var(--zen-primary);
+        background: rgba(74, 144, 164, 0.1);
+        border-style: solid;
+      }
+
       .file-upload-area h5 {
         font-weight: 600;
         color: #1a2856;
@@ -1154,9 +1202,20 @@
         border-color: var(--zen-primary);
       }
 
-      .sticky-action-bar {
+      /* Unit Test Data: header wrapper stays visible when test results scroll below */
+      .unit-test-data-header {
         position: sticky;
-        top: 16px;
+        top: 0;
+        z-index: 1019;
+        background: var(--zen-card-bg);
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid var(--zen-border);
+      }
+
+      .sticky-action-bar {
+        position: relative;
+        top: 0;
         z-index: 1020;
         background: rgba(255, 255, 255, 0.96);
         border: 1px solid rgba(74, 144, 164, 0.2);
@@ -1317,7 +1376,7 @@
           width: auto;
         }
 
-        .sticky-action-bar {
+        .unit-test-data-header {
           top: 8px;
         }
       }
@@ -1490,44 +1549,50 @@
           </div>
         </div>
 
-        <div class="col-12 mb-4">
-          <div class="card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <h5 class="mb-1">Example Files</h5>
-                <small class="text-muted">Load example Excel files from the data directory</small>
-              </div>
-            </div>
-            <div id="exampleFilesContainer" class="mb-4">
-              <div class="d-flex flex-wrap gap-2" id="exampleFilesList">
-                <button class="btn btn-sm btn-outline-primary example-file-btn" data-file="BSA TASK 579580.xlsx">
-                  <i class="bi-file-earmark-spreadsheet"></i> BSA TASK 579580
-                </button>
-                <button class="btn btn-sm btn-outline-primary example-file-btn" data-file="BSA-602512 (1).xlsx">
-                  <i class="bi-file-earmark-spreadsheet"></i> BSA-602512
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
         
         <!-- Accordion Container -->
         <div class="col-12 mb-4" id="accordionContainer">
           <div class="card">
             <div class="card-header p-0">
               <div class="accordion" id="testAccordion">
+                <!-- Example Files -->
+                <div class="card">
+                  <div class="card-header" id="headingExampleFiles">
+                    <h5 class="mb-0">
+                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseExampleFiles" aria-expanded="false" aria-controls="collapseExampleFiles">
+                        <i class="bi-folder2-open"></i> Example Files
+                        <i class="bi-chevron-down float-right"></i>
+                      </button>
+                    </h5>
+                  </div>
+                  <div id="collapseExampleFiles" class="collapse" aria-labelledby="headingExampleFiles">
+                    <div class="card-body">
+                      <p class="text-muted mb-3"><small>Load example Excel files from the data directory. Or drag and drop an Excel file here, or paste (Ctrl+V) a copied file.</small></p>
+                      <div id="exampleFilesContainer" class="example-files-drop-zone" tabindex="0">
+                        <div class="d-flex flex-wrap gap-2" id="exampleFilesList">
+                          <button class="btn btn-sm btn-outline-primary example-file-btn" data-file="BSA TASK 579580.xlsx">
+                            <i class="bi-file-earmark-spreadsheet"></i> BSA TASK 579580
+                          </button>
+                          <button class="btn btn-sm btn-outline-primary example-file-btn" data-file="BSA-602512 (1).xlsx">
+                            <i class="bi-file-earmark-spreadsheet"></i> BSA-602512
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <!-- Overall Test Sign-off -->
                 <div class="card">
                   <div class="card-header" id="headingOverallSignOff">
                     <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseOverallSignOff" aria-expanded="true" aria-controls="collapseOverallSignOff">
+                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
                         <i class="bi-check2-all"></i> Test Sign-off
                         <span class="badge badge-success ml-2" id="signOffCompleteBadge" style="display: none;">3/3</span>
                         <i class="bi-chevron-down float-right"></i>
                       </button>
                     </h5>
                   </div>
-                  <div id="collapseOverallSignOff" class="collapse show" aria-labelledby="headingOverallSignOff">
+                  <div id="collapseOverallSignOff" class="collapse" aria-labelledby="headingOverallSignOff">
                     <div class="card-body">
                       <p class="text-muted mb-3"><small>Each tester confirms the overall test passed. Timestamps are recorded when you confirm.</small></p>
                       <div id="overallSignOffContainer" class="overall-signoff-grid"></div>
@@ -1538,16 +1603,16 @@
                 <div class="card">
                   <div class="card-header" id="headingTestScenarios">
                     <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseTestScenarios" aria-expanded="true" aria-controls="collapseTestScenarios">
+                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
                         <i class="bi-list-check"></i> Test Scenarios
                         <span class="badge badge-primary ml-2" id="testScenariosCount"></span>
                         <i class="bi-chevron-down float-right"></i>
                       </button>
                     </h5>
                   </div>
-                  <div id="collapseTestScenarios" class="collapse show" aria-labelledby="headingTestScenarios">
+                  <div id="collapseTestScenarios" class="collapse" aria-labelledby="headingTestScenarios">
                     <div class="card-body">
-                      <p class="text-muted mb-3"><small>Click a scenario to highlight its column. Use <strong>Run</strong> to execute it. Click <i class="bi-pencil"></i> to edit.</small></p>
+                      <p class="text-muted mb-3"><small>Click a scenario to highlight its column. Use <strong>Run</strong> to execute it. Click the <strong>Edit</strong> button on a scenario card to edit its description.</small></p>
                       <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
                     </div>
                   </div>
@@ -1589,16 +1654,18 @@
                   </div>
                   <div id="collapseUnitTestData" class="collapse show" aria-labelledby="headingUnitTestData">
                     <div class="card-body">
-                      <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                          <div class="d-flex flex-wrap align-items-center gap-2">
-                            <div id="fileInfo" class="file-info-display">No file loaded</div>
-                            <span class="badge badge-pill badge-light" id="testGuidDisplay">No GUID</span>
+                      <!-- Wrapper keeps file info + action bar together so they are not overwritten by test results below -->
+                      <div class="unit-test-data-header" id="unitTestDataHeader">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                          <div>
+                            <div class="d-flex flex-wrap align-items-center gap-2">
+                              <div id="fileInfo" class="file-info-display">No file loaded</div>
+                              <span class="badge badge-pill badge-light" id="testGuidDisplay">No GUID</span>
+                            </div>
                           </div>
+                          <span class="status-chip info" id="statusChip" role="status" aria-live="polite"><i class="bi-info-circle"></i> Ready</span>
                         </div>
-                        <span class="status-chip info" id="statusChip" role="status" aria-live="polite"><i class="bi-info-circle"></i> Ready</span>
-                      </div>
-                      <div class="sticky-action-bar" id="stickyActionBar" style="display: none;">
+                        <div class="sticky-action-bar" id="stickyActionBar" style="display: none;">
                         <div class="sticky-action-left">
                           <div class="loan-guid-group">
                             <label for="loanGuidInput" class="mb-1 text-muted"><small>Loan GUID</small></label>
@@ -1632,6 +1699,7 @@
                           </button>
                         </div>
                       </div>
+                      </div><!-- /unit-test-data-header -->
                       <div id="uploadArea" class="file-upload-area">
                         <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
                         <h5>Drop Excel file here or click to browse</h5>
