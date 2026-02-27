@@ -1,6 +1,6 @@
 # Configuration & Environment
 
-Central reference for environment variables used by piBoom. **Never commit secrets.** Use `.env` locally and configure secrets in your deployment provider (e.g. Render).
+Central reference for environment variables used by DevConnect Labs. **Never commit secrets.** Use `.env` locally and configure secrets in your deployment provider (e.g. Render).
 
 ## Required (Core)
 

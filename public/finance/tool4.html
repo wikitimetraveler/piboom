@@ -600,10 +600,14 @@
             <label for="ADOoutput">Generated JSON</label>
             <textarea class="form-control" id="ADOoutput" rows="8" readonly></textarea>
         </div>
-        <div class="btn-group w-100">
+        <div class="btn-group w-100 flex-wrap">
             <button class="btn btn-primary" id="copyJsonBtn">Copy JSON</button>
             <button class="btn btn-success" id="copyRulesBtn">Copy Field Definitions</button>
-                </div>
+            <button class="btn btn-outline-success" id="createFieldsBtn" title="Create fields in Encompass via API">
+                <i class="bi-cloud-upload"></i> Create Fields in Encompass
+            </button>
+        </div>
+        <div id="createFieldsStatus" class="mt-2 small" style="display: none;"></div>
             </div>
         </div>
     </div>
@@ -762,6 +766,63 @@
 
             document.getElementById('copyRulesBtn').addEventListener('click', async () => {
                 await copyToClipboard(document.getElementById('ruleOutput').value);
+            });
+
+            document.getElementById('createFieldsBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('createFieldsBtn');
+                const statusEl = document.getElementById('createFieldsStatus');
+                const jsonStr = document.getElementById('ADOoutput').value.trim();
+                if (!jsonStr) {
+                    statusEl.textContent = 'Generate JSON first (enter a rule name).';
+                    statusEl.className = 'mt-2 small text-warning';
+                    statusEl.style.display = 'block';
+                    return;
+                }
+                let fields;
+                try {
+                    fields = JSON.parse(jsonStr);
+                } catch (e) {
+                    statusEl.textContent = 'Invalid JSON: ' + e.message;
+                    statusEl.className = 'mt-2 small text-danger';
+                    statusEl.style.display = 'block';
+                    return;
+                }
+                if (!Array.isArray(fields) || fields.length === 0) {
+                    statusEl.textContent = 'JSON must be a non-empty array of field definitions.';
+                    statusEl.className = 'mt-2 small text-warning';
+                    statusEl.style.display = 'block';
+                    return;
+                }
+                btn.disabled = true;
+                statusEl.textContent = 'Creating fields in Encompass...';
+                statusEl.className = 'mt-2 small text-info';
+                statusEl.style.display = 'block';
+                try {
+                    const res = await fetch('/api/encompass-hub/create-fields', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(fields),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        statusEl.textContent = (data.error || 'Request failed') + ': ' + (data.details || res.status);
+                        statusEl.className = 'mt-2 small text-danger';
+                        return;
+                    }
+                    const { created, failed } = data;
+                    if (failed && failed.length > 0) {
+                        statusEl.innerHTML = `Created ${created} field(s). Failed: ${failed.map(f => f.id + ': ' + f.error).join('; ')}`;
+                        statusEl.className = 'mt-2 small text-warning';
+                    } else {
+                        statusEl.textContent = `Successfully created ${created} field(s) in Encompass.`;
+                        statusEl.className = 'mt-2 small text-success';
+                    }
+                } catch (err) {
+                    statusEl.textContent = 'Error: ' + err.message;
+                    statusEl.className = 'mt-2 small text-danger';
+                } finally {
+                    btn.disabled = false;
+                }
             });
 
             // Add voice commands for automator

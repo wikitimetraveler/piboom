@@ -50,6 +50,8 @@ class ModernNavbar extends HTMLElement {
   }
 
   render() {
+    const brand = this.getAttribute('brand') || 'DevConnect Labs';
+    const compact = this.hasAttribute('compact');
     this.shadowRoot.innerHTML = `
       <style>
         /* Professional Modern Navigation */
@@ -57,7 +59,7 @@ class ModernNavbar extends HTMLElement {
           background: rgba(255, 255, 255, 0.95);
           backdrop-filter: blur(20px);
           border-bottom: 1px solid rgba(135, 206, 250, 0.2);
-          padding: 1rem 0;
+          padding: 0.4rem 0;
           position: sticky;
           top: 0;
           z-index: 1000;
@@ -70,7 +72,7 @@ class ModernNavbar extends HTMLElement {
         }
         
         .navbar-brand-modern {
-          font-size: 1.4rem;
+          font-size: 1.2rem;
           font-weight: 700;
           background: linear-gradient(135deg, #667eea, #764ba2);
           -webkit-background-clip: text;
@@ -79,14 +81,14 @@ class ModernNavbar extends HTMLElement {
           text-decoration: none;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.4rem;
         }
         
         .nav-user-btn {
           background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
           border: 2px solid rgba(102, 126, 234, 0.3);
-          border-radius: 25px;
-          padding: 8px 20px;
+          border-radius: 20px;
+          padding: 5px 14px;
           transition: all 0.3s ease;
           cursor: pointer;
           text-decoration: none;
@@ -125,7 +127,8 @@ class ModernNavbar extends HTMLElement {
         
         .dropdown-item {
           border-radius: 8px;
-          padding: 10px 15px;
+          padding: 8px 14px;
+          font-size: 0.9rem;
           transition: all 0.2s ease;
           margin-bottom: 2px;
           display: flex;
@@ -156,6 +159,12 @@ class ModernNavbar extends HTMLElement {
           justify-content: space-between;
         }
         
+        .navbar-collapse {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        
         /* Navigation Lists */
         .navbar-nav {
           display: flex;
@@ -163,7 +172,7 @@ class ModernNavbar extends HTMLElement {
           margin: 0;
           padding: 0;
           align-items: center;
-          gap: 1rem;
+          gap: 0.5rem;
         }
         
         .nav-item {
@@ -173,10 +182,11 @@ class ModernNavbar extends HTMLElement {
         .nav-link {
           text-decoration: none;
           color: #333;
-          padding: 0.5rem 1rem;
+          padding: 0.35rem 0.75rem;
+          font-size: 0.95rem;
           display: flex;
           align-items: center;
-          gap: 0.5rem;
+          gap: 0.4rem;
           transition: all 0.3s ease;
         }
         
@@ -241,7 +251,7 @@ class ModernNavbar extends HTMLElement {
         <div class="container">
           <a class="navbar-brand-modern" href="/">
             <i class="bi-music-note-beamed"></i>
-            Big Wave Dave's Music Box
+            ${brand}
           </a>
           
           <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
@@ -265,11 +275,38 @@ class ModernNavbar extends HTMLElement {
                   <i class="bi-house"></i> Home
                 </a>
               </li>
-              
-              <!-- Music Discovery Dropdown -->
+
+              <!-- Finance Dropdown (Hub + Essentials) -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button">
-                  <i class="bi-music-note-beamed"></i> Music Discovery
+                  <i class="bi-bank"></i> Finance
+                </a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="/finance/index.html">
+                    <i class="bi-calculator"></i> Finance Hub
+                  </a>
+                  <a class="dropdown-item" href="/finance/encompass-assistant.html">
+                    <i class="bi-robot"></i> Encompass Assistant
+                  </a>
+                  <a class="dropdown-item" href="/finance/encompass-hub.html">
+                    <i class="bi-columns-gap"></i> Encompass Hub
+                  </a>
+                  <a class="dropdown-item" href="/finance/pipeline-risk-dashboard.html">
+                    <i class="bi-shield-check"></i> Pipeline Risk Dashboard
+                  </a>
+                  <a class="dropdown-item" href="/finance/unit-tests.html">
+                    <i class="bi-clipboard-check"></i> Unit Tests
+                  </a>
+                  <a class="dropdown-item" href="/finance/tool9.html">
+                    <i class="bi-camera-reels"></i> The Screen Test
+                  </a>
+                </div>
+              </li>
+
+              <!-- Music Discovery Dropdown (Trimmed + Hub Link) -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button">
+                  <i class="bi-music-note-beamed"></i> Music
                 </a>
                 <div class="dropdown-menu">
                   <a class="dropdown-item" href="/music/music-research.html">
@@ -281,186 +318,52 @@ class ModernNavbar extends HTMLElement {
                   <a class="dropdown-item" href="/music/collection.html">
                     <i class="bi-collection-fill"></i> My Collection
                   </a>
-                  <a class="dropdown-item" href="/music/kml-viewer.html">
-                    <i class="bi-globe"></i> Grateful Dead Timeline
-                  </a>
-                  <a class="dropdown-item" href="/music/my-grateful-dead-shows.html">
-                    <i class="bi-music-player-fill"></i> My Grateful Dead Shows
-                  </a>
-                  <a class="dropdown-item" href="/music/musical-google-earth-files.html">
-                    <i class="bi-globe"></i> Musical Google Earth Files
-                  </a>
-                  <a class="dropdown-item" href="/music/music-time-machine.html">
-                    <i class="bi-clock-history"></i> Time Machine
+                  <a class="dropdown-item" href="/music/song-identifier.html">
+                    <i class="bi-soundwave"></i> Song Identifier
                   </a>
                   <a class="dropdown-item" href="/music/spotify-dashboard.html">
                     <i class="bi-spotify"></i> Spotify
                   </a>
-                  <a class="dropdown-item" href="/music/song-identifier.html">
-                    <i class="bi-soundwave"></i> Song Identifier
+                  <a class="dropdown-item" href="/music/music-time-machine.html">
+                    <i class="bi-clock-history"></i> Time Machine
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="/#headingMusic">
+                    <i class="bi-grid-3x3-gap"></i> All Music Tools
                   </a>
                 </div>
               </li>
 
-            <!-- Bike Store Dropdown -->
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button">
-                <i class="bi-bicycle"></i> Bike Store
-              </a>
-              <div class="dropdown-menu">
-                <a class="dropdown-item" href="/bike-store-home.html">
-                  <i class="bi-house"></i> Store Home
-                </a>
-                <a class="dropdown-item" href="/bike-discover.html">
-                  <i class="bi-search"></i> Bike Discover
-                </a>
-                <a class="dropdown-item" href="/bike-collection.html#map">
-                  <i class="bi-grid"></i> The Peloton (Collection)
-                </a>
-                <a class="dropdown-item" href="/bike-customers.html">
-                  <i class="bi-people"></i> Customers
-                </a>
-              </div>
-            </li>
+              ${compact ? '' : `<!-- Entertainment Dropdown -->\n              <li class="nav-item dropdown">\n                <a class="nav-link dropdown-toggle" href="#" role="button">\n                  <i class="bi-stars"></i> Entertainment\n                </a>\n                <div class="dropdown-menu">\n                  <a class="dropdown-item" href="/entertainment/player.html">\n                    <i class="bi-volume-up"></i> The Boombox\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/visualizer.html">\n                    <i class="bi-palette-fill"></i> Psychedelic Visualizer\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/blacklight.html">\n                    <i class="bi-lightning"></i> Black Light Zone\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/poster-generator.html">\n                    <i class="bi-palette"></i> Poster Generator\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/art-gallery.html">\n                    <i class="bi-image"></i> Art Gallery\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/ouija-board.html">\n                    <i class="bi-magic"></i> Ouija Board\n                  </a>\n                  <div class="dropdown-divider"></div>\n                  <a class="dropdown-item" href="/#headingEntertainment">\n                    <i class="bi-grid-3x3-gap"></i> All Entertainment\n                  </a>\n                </div>\n              </li>\n              `}
 
-              <!-- AI & Voice Dropdown -->
+              <!-- More Dropdown (Bike, AI, Family, Nature) -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button">
-                  <i class="bi-robot"></i> AI & Voice
+                  <i class="bi-three-dots"></i> More
                 </a>
                 <div class="dropdown-menu">
+                  <a class="dropdown-item" href="/bike-store-home.html">
+                    <i class="bi-bicycle"></i> Bike Store
+                  </a>
                   <a class="dropdown-item" href="/ai/voice-dj.html">
                     <i class="bi-mic"></i> Wolfman Dave
                   </a>
                   <a class="dropdown-item" href="/ai/assistant.html">
                     <i class="bi-chat-dots"></i> Levi Assistant
                   </a>
-                  <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="/ai/voice-guide.html">
                     <i class="bi-book"></i> Voice Guide
                   </a>
-                </div>
-              </li>
-
-              <!-- Entertainment Dropdown -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button">
-                  <i class="bi-stars"></i> Entertainment
-                </a>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/entertainment/player.html">
-                    <i class="bi-volume-up"></i> The Boombox
-                  </a>
-                  <a class="dropdown-item" href="/entertainment/visualizer.html">
-                    <i class="bi-palette-fill"></i> Psychedelic Visualizer
-                  </a>
-                  <a class="dropdown-item" href="/entertainment/blacklight.html">
-                    <i class="bi-lightning"></i> Black Light Zone
-                  </a>
-                  <a class="dropdown-item" href="/entertainment/poster-generator.html">
-                    <i class="bi-palette"></i> Poster Generator
-                  </a>
-                  <a class="dropdown-item" href="/entertainment/art-gallery.html">
-                    <i class="bi-image"></i> Art Gallery
-                  </a>
-                  <a class="dropdown-item" href="/entertainment/ouija-board.html">
-                    <i class="bi-magic"></i> Ouija Board
-                  </a>
-                </div>
-              </li>
-
-              <!-- Finance Dropdown -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button">
-                  <i class="bi-bank"></i> Finance
-                </a>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/finance/index.html">
-                    <i class="bi-calculator"></i> Finance Hub
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <div class="dropdown-item" style="font-weight: 600; color: #667eea; padding: 8px 15px;">
-                    <i class="bi-bank2"></i> Encompass Tools
-                  </div>
-                  <a class="dropdown-item" href="/finance/encompass-assistant.html" style="padding-left: 2.5rem;">
-                    <i class="bi-robot"></i> Encompass Assistant
-                  </a>
-                  <a class="dropdown-item" href="/finance/encompass-hub.html" style="padding-left: 2.5rem;">
-                    <i class="bi-columns-gap"></i> Encompass Hub
-                  </a>
-                  <a class="dropdown-item" href="/finance/unit-tests.html" style="padding-left: 2.5rem;">
-                    <i class="bi-clipboard-check"></i> Unit Tests
-                  </a>
-                  <a class="dropdown-item" href="/finance/encompass-users.html" style="padding-left: 2.5rem;">
-                    <i class="bi-people"></i> Encompass Users
-                  </a>
-                  <a class="dropdown-item" href="/finance/pipeline-risk-dashboard.html" style="padding-left: 2.5rem;">
-                    <i class="bi-shield-check"></i> Pipeline Risk Dashboard
-                  </a>
-                  <a class="dropdown-item" href="/finance/risk-analysis-dashboard.html" style="padding-left: 2.5rem;">
-                    <i class="bi-graph-up-arrow"></i> Risk Analysis Dashboard
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <div class="dropdown-item" style="font-weight: 600; color: #667eea; padding: 8px 15px;">
-                    <i class="bi-tools"></i> Tools
-                  </div>
-                  <a class="dropdown-item" href="/finance/tool2.html" style="padding-left: 2.5rem;">
-                    <i class="bi-code-slash"></i> Parser
-                  </a>
-                  <a class="dropdown-item" href="/finance/tool3.html" style="padding-left: 2.5rem;">
-                    <i class="bi-globe"></i> Mashup
-                  </a>
-                  <a class="dropdown-item" href="/finance/tool4.html" style="padding-left: 2.5rem;">
-                    <i class="bi-gear"></i> Automator
-                  </a>
-                  <a class="dropdown-item" href="/finance/tool5.html" style="padding-left: 2.5rem;">
-                    <i class="bi-rulers"></i> Ruler
-                  </a>
-                  <a class="dropdown-item" href="/finance/tool6.html" style="padding-left: 2.5rem;">
-                    <i class="bi-arrow-repeat"></i> Transformer
-                  </a>
-                  <a class="dropdown-item" href="/finance/tool8.html" style="padding-left: 2.5rem;">
-                    <i class="bi-magic"></i> Alchemist
-                  </a>
-                  <a class="dropdown-item" href="/finance/tool9.html" style="padding-left: 2.5rem;">
-                    <i class="bi-camera-reels"></i> The Screen Test
-                  </a>
-                </div>
-              </li>
-
-              <!-- Family & Genealogy Dropdown -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button">
-                  <i class="bi-people"></i> Family
-                </a>
-                <div class="dropdown-menu">
                   <a class="dropdown-item" href="/family/genealogy.html">
-                    <i class="bi-diagram-3"></i> Genealogy
+                    <i class="bi-diagram-3"></i> Family
                   </a>
-                  <a class="dropdown-item" href="/family/family-tree.html">
-                    <i class="bi-tree"></i> Family Tree
-                  </a>
-                </div>
-              </li>
-
-              <!-- Nature Dropdown -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button">
-                  <i class="bi-tree-fill"></i> Nature
-                </a>
-                <div class="dropdown-menu">
                   <a class="dropdown-item" href="/nature/tree-discovery.html">
-                    <i class="bi-tree-fill"></i> Tree Discovery 🐻
+                    <i class="bi-tree-fill"></i> Nature
                   </a>
-                  <a class="dropdown-item" href="/nature/tree-collection.html">
-                    <i class="bi-trees"></i> Tree Collection 🌲
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="/">
+                    <i class="bi-house"></i> Hub (All Tools)
                   </a>
-                <a class="dropdown-item" href="/nature/fish-identification.html">
-                  <i class="bi-droplet"></i> Fish Identification 🐟
-                </a>
-                <a class="dropdown-item" href="/nature/fish-collection.html#map">
-                  <i class="bi-geo-alt"></i> Fish Collection (Map) 🎣
-                </a>
                 </div>
               </li>
             </ul>

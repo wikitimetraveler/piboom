@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: pi-boom
+    name: devconnect-labs
     env: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -18,13 +18,13 @@ services:
         value: 3000
       - key: DATABASE_URL
         fromDatabase:
-          name: pi-boom-db
+          name: devconnect-labs-db
           property: connectionString
     healthCheckPath: /health
     autoDeploy: true
 
   - type: pserv
-    name: pi-boom-db
+    name: devconnect-labs-db
     env: docker
     plan: starter
     region: oregon

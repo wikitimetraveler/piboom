@@ -2,7 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>Taylor Swift Timeline</name>
-    <description>Taylor Swift's tour and career timeline. This network link will load the data from your piBoom server.</description>
+    <description>Taylor Swift's tour and career timeline. This network link will load the data from your DevConnect Labs server.</description>
     <NetworkLink>
       <name>Taylor Swift Timeline</name>
       <description>View Taylor Swift's tour locations and career milestones</description>

@@ -1,6 +1,6 @@
 # AI System Architecture
 
-Overview of piBoom's AI integration for assistants, memory, and retrieval. Use this when working on Encompass AI, loan pipeline AI, or disaster risk AI.
+Overview of DevConnect Labs's AI integration for assistants, memory, and retrieval. Use this when working on Encompass AI, loan pipeline AI, or disaster risk AI.
 
 ## Stack
 
@@ -20,7 +20,7 @@ Overview of piBoom's AI integration for assistants, memory, and retrieval. Use t
 - **UI**: `public/finance/encompass-assistant.html`
 - **Sources**: Encompass docs + ICE knowledge (repos, Postman)
 - **Model**: GPT-4
-- **Context**: piBoom tech stack, calculation engine, Encompass Hub/ScreenBindings
+- **Context**: DevConnect Labs tech stack, calculation engine, Encompass Hub/ScreenBindings
 - **Endpoints**: `/api/encompass-assistant/search`, `/chat`, `/summary`
 
 ### 2. Loan Pipeline AI
@@ -70,7 +70,7 @@ Overview of piBoom's AI integration for assistants, memory, and retrieval. Use t
 
 - Encompass Assistant – Large system prompt in `encompass-assistant.controller.js` covering:
   - Documentation sources
-  - piBoom tech stack
+  - DevConnect Labs tech stack
   - Calculation engine
   - Encompass Hub/ScreenBindings
   - Solution design approach

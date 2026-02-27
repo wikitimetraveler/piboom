@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  pi-boom:
+  devconnect-labs:
     build: .
     ports:
       - "3000:3000"
@@ -30,5 +30,5 @@ services:
   #   volumes:
   #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
   #   depends_on:
-  #     - pi-boom
+  #     - devconnect-labs
   #   restart: unless-stopped

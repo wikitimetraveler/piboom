@@ -6,6 +6,7 @@ import {
   fetchCompanyUsers,
   fetchNativeFields,
   fetchCustomFields,
+  createCustomFields,
 } from '../services/encompass-hub.service.js';
 import {
   ensureEncompassToken,
@@ -182,6 +183,25 @@ export async function getCustomFields(req, res) {
     console.error('Error fetching Encompass custom fields:', error.message);
     return res.status(500).json({
       error: 'Failed to fetch Encompass custom fields',
+      details: error.message,
+    });
+  }
+}
+
+export async function postCreateFields(req, res) {
+  try {
+    const fields = req.body;
+    if (!Array.isArray(fields) || fields.length === 0) {
+      return res.status(400).json({
+        error: 'Request body must be a non-empty array of field definitions',
+      });
+    }
+    const result = await createCustomFields(fields);
+    return res.json(result);
+  } catch (error) {
+    console.error('Error creating Encompass custom fields:', error.message);
+    return res.status(500).json({
+      error: 'Failed to create Encompass custom fields',
       details: error.message,
     });
   }

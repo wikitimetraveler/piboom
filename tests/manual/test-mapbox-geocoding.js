@@ -80,7 +80,7 @@ async function testNominatimGeocoding(address) {
     const startTime = Date.now();
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'piBoom-Test/1.0 (testing geocoding services)'
+        'User-Agent': 'DevConnectLabs-Test/1.0 (testing geocoding services)'
       }
     });
     const duration = Date.now() - startTime;

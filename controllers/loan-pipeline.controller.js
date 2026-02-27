@@ -711,7 +711,7 @@ export async function getFloodZones(req, res) {
         const serviceResponse = await fetch(serviceInfoUrl, {
           headers: {
             'Accept': 'application/json',
-            'User-Agent': 'piBoom-LoanPipeline/1.0'
+            'User-Agent': 'DevConnectLabs-LoanPipeline/1.0'
           }
         });
         
@@ -745,7 +745,7 @@ export async function getFloodZones(req, res) {
               const foundResponse = await fetch(`${foundQueryUrl}?${foundParams.toString()}`, {
                 headers: {
                   'Accept': 'application/json',
-                  'User-Agent': 'piBoom-LoanPipeline/1.0'
+                  'User-Agent': 'DevConnectLabs-LoanPipeline/1.0'
                 }
               });
               if (foundResponse.ok) {
@@ -813,7 +813,7 @@ export async function getFloodZones(req, res) {
       const response = await fetch(`${queryUrl}?${params.toString()}`, {
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'piBoom-LoanPipeline/1.0'
+          'User-Agent': 'DevConnectLabs-LoanPipeline/1.0'
         }
       });
       
@@ -891,7 +891,7 @@ export async function getFloodZones(req, res) {
           const fallbackResponse = await fetch(`${fallbackUrl}?${params.toString()}`, {
             headers: {
               'Accept': 'application/json',
-              'User-Agent': 'piBoom-LoanPipeline/1.0'
+              'User-Agent': 'DevConnectLabs-LoanPipeline/1.0'
             }
           });
           if (fallbackResponse.ok) {

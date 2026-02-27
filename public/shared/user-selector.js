@@ -1,5 +1,5 @@
 /**
- * Multi-User System for piBoom Collections
+ * Multi-User System for DevConnect Labs Collections
  * 
  * @file       user-selector.js
  * @author     David Lane

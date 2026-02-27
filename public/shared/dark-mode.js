@@ -21,7 +21,7 @@
  * 
  * Usage:
  * - Automatically initializes when script is loaded
- * - Dark mode preference key: 'piBoom_darkMode'
+ * - Dark mode preference key: 'devConnectLabs_darkMode'
  * - Applies 'dark-mode' class to body element
  * 
  * Technical Implementation:
@@ -33,7 +33,7 @@
  * ==============================================================================
  */
 
-const DARK_MODE_KEY = 'piBoom_darkMode';
+const DARK_MODE_KEY = 'devConnectLabs_darkMode';
 
 // CSS for dark mode
 const darkModeStyles = `

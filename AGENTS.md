@@ -1,10 +1,10 @@
-# PiBoom – System Self-Knowledge for AI Agents
+# DevConnect Labs – System Self-Knowledge for AI Agents
 
-This document helps AI coding assistants (Cursor, Copilot, etc.) understand what piBoom is, how it’s structured, and how Encompass and AI are integrated.
+This document helps AI coding assistants (Cursor, Copilot, etc.) understand what DevConnect Labs is, how it’s structured, and how Encompass and AI are integrated.
 
-## What Is PiBoom?
+## What Is DevConnect Labs?
 
-**PiBoom** is a multi-domain platform built for **Raspberry Pi** and **Windows/Docker**. It combines:
+**DevConnect Labs** is a multi-domain platform built for **Raspberry Pi** and **Windows/Docker**. It combines:
 
 - **Music research** – Voice-activated search, audio fingerprinting, AI recommendations
 - **Mortgage & finance** – Loan pipeline, Encompass integration, disaster risk assessment
@@ -16,7 +16,7 @@ The mortgage/Encompass and AI domains are the main focus for ongoing development
 ## Encompass & ICE Mortgage Technology
 
 - **Encompass** is ICE Mortgage Technology’s loan origination system (LOS).
-- piBoom uses **Encompass Developer Connect** (OAuth, REST APIs).
+- DevConnect Labs uses **Encompass Developer Connect** (OAuth, REST APIs).
 - Integration points:
   - **Encompass Hub** – `services/encompass-hub.service.js`, `controllers/encompass-hub.controller.js`
   - **Encompass Assistant** – `controllers/encompass-assistant.controller.js`, AI-backed Q&A

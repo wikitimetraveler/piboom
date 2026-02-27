@@ -4,7 +4,7 @@ class SampleDetectionService {
   constructor() {
     this.musicBrainzBaseUrl = 'https://musicbrainz.org/ws/2';
     this.headers = {
-      'User-Agent': 'piBoom/1.0.0 (https://github.com/wikitimetraveler/piboom)',
+      'User-Agent': 'DevConnectLabs/1.0.0 (https://github.com/wikitimetraveler/devconnect-labs)',
       'Accept': 'application/json'
     };
   }

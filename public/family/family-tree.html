@@ -246,7 +246,7 @@
   
   <!-- Back Button -->
   <a href="/" class="back-button">
-    <i class="bi-house-fill"></i> Back to piBoom
+    <i class="bi-house-fill"></i> Back to DevConnect Labs
   </a>
 
   <!-- Left Menu Panel -->
@@ -404,7 +404,7 @@
       <label style="color:#663399"><strong>Purple</strong> links Native American Tribes</label>
     </fieldset>
 
-    <!-- piBoom Integration Info -->
+    <!-- DevConnect Labs Integration Info -->
     <div class="mt-4 p-3" style="background: linear-gradient(135deg, rgba(135,206,250,0.2), rgba(144,238,144,0.2)); border-radius: 10px;">
       <h6><i class="bi-music-note-beamed"></i> Musical Era Integration</h6>
       <p style="font-size: 0.85rem;">Click on any family member to see what music was popular during their lifetime!</p>
@@ -438,7 +438,7 @@
     var menuStatus = true; // Start with menu open
 
     function start() {
-      // Load from piBoom API instead of local file
+      // Load from DevConnect Labs API instead of local file
       fetch('/api/genealogy/data')
         .then(response => response.json())
         .then(apiData => {

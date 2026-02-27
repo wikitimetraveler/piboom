@@ -154,7 +154,7 @@ export async function geocodeAddressFree(address, expectedState = null, expected
     
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'piBoom-Research/1.0 (research project)' // Required by Nominatim
+        'User-Agent': 'DevConnectLabs-Research/1.0 (research project)' // Required by Nominatim
       }
     });
     
@@ -284,7 +284,7 @@ export async function reverseGeocodeFree(lat, lng, retries = 2) {
       
       const response = await fetch(url, {
         headers: {
-          'User-Agent': 'piBoom-Research/1.0 (research project)' // Required by Nominatim
+          'User-Agent': 'DevConnectLabs-Research/1.0 (research project)' // Required by Nominatim
         },
         signal: controller.signal
       });

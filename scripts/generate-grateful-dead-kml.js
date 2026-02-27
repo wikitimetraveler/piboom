@@ -44,7 +44,7 @@ async function main() {
     console.log('💡 You can now:');
     console.log('   - Open the KML file in Google Earth');
     console.log('   - Upload it to Google My Maps');
-    console.log('   - Use it in your piBoom application');
+    console.log('   - Use it in your DevConnect Labs application');
 
   } catch (error) {
     console.error('❌ Error:', error.message);

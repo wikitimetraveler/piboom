@@ -128,7 +128,7 @@ DATABASE_URL=postgresql://localhost:5432/piboom
 ### Build Commands
 ```bash
 # Build the Docker image
-docker build -t pi-boom .
+docker build -t devconnect-labs .
 
 # Build with npm script
 npm run docker:build
@@ -137,13 +137,13 @@ npm run docker:build
 ### Run Commands
 ```bash
 # Run container with environment file
-docker run -p 3000:3000 --env-file .env pi-boom
+docker run -p 3000:3000 --env-file .env devconnect-labs
 
 # Run with npm script
 npm run docker:run
 
 # Run in background
-docker run -d -p 3000:3000 --env-file .env --name pi-boom-container pi-boom
+docker run -d -p 3000:3000 --env-file .env --name devconnect-labs-container devconnect-labs
 ```
 
 ### Docker Compose
@@ -210,13 +210,13 @@ docker-compose up --build -d
 ### Debug Commands
 ```bash
 # Check container logs
-docker logs pi-boom-container
+docker logs devconnect-labs-container
 
 # Enter container shell
-docker exec -it pi-boom-container /bin/bash
+docker exec -it devconnect-labs-container /bin/bash
 
 # Test voice functionality
-docker exec pi-boom-container espeak "Test message"
+docker exec devconnect-labs-container espeak "Test message"
 
 # Check health endpoint
 curl http://localhost:3000/health
@@ -225,7 +225,7 @@ curl http://localhost:3000/health
 ## 📁 File Structure
 
 ```
-piBoom/
+devconnect-labs/
 ├── Dockerfile              # Docker configuration
 ├── docker-compose.yml      # Docker Compose setup
 ├── render.yaml            # Render deployment config

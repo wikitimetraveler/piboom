@@ -2,7 +2,7 @@
 set SCRIPT_DIR=%~dp0
 cd /d "%SCRIPT_DIR%..\\.."
 
-echo Starting PiBoom Audio System for Windows...
+echo Starting DevConnect Labs Audio System for Windows...
 echo.
 echo This will start the server with voice commands enabled
 echo Voice recognition will work using your browser's built-in capabilities

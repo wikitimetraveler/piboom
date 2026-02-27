@@ -41,6 +41,35 @@ Conventions for tables, grids, shared components, and themes. Use this when buil
 | `public/shared/calculationEngine.js` | Calculation engine |
 | `public/shared/calcEngineLibrary.js` | calcMath library |
 
+## Navigation (modern-navbar)
+
+The shared navbar (`public/shared/modern-navbar.js`) uses a hub-first structure with 5 top-level items: Home, Finance, Music, Entertainment, More.
+
+### Nav structure
+
+| Nav item | Contents |
+|----------|----------|
+| **Home** | Link to `/` |
+| **Finance** | Finance Hub, Encompass Assistant, Encompass Hub, Pipeline Risk, Unit Tests, The Screen Test |
+| **Music** | Music Research, Album Discovery, My Collection, Song Identifier, Spotify, Time Machine, All Music Tools |
+| **Entertainment** | Boombox, Visualizer, Black Light, Poster Generator, Art Gallery, Ouija Board, All Entertainment |
+| **More** | Bike Store, Wolfman Dave, Levi Assistant, Voice Guide, Family, Nature, Hub (All Tools) |
+
+Additional tools (Parser, Mashup, Automator, Ruler, Transformer, Alchemist, Encompass Users, Risk Analysis, Grateful Dead Timeline, etc.) are reachable via **Finance Hub** (`/finance/index.html`) or **Hub** (`/`).
+
+### Attributes
+
+| Attribute | Purpose |
+|-----------|---------|
+| `brand="Custom Name"` | Override brand text (default: `DevConnect Labs`) |
+| `compact` | Hide Entertainment as top-level; show only Home, Finance, Music, More |
+
+Example: `<modern-navbar brand="My App" compact></modern-navbar>`
+
+### Hub deep-links
+
+The index hub page supports hash-based deep-links that auto-expand accordion sections: `/#headingMusic`, `/#headingEntertainment`, `/#headingBike`, `/#headingAI`, `/#headingNature`.
+
 ## Finance UI Structure
 
 ```

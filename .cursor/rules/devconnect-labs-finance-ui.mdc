@@ -1,10 +1,10 @@
 ---
-description: PiBoom Finance UI — Bootstrap, grids, calculations, shared scripts for public/finance
+description: DevConnect Labs Finance UI — Bootstrap, grids, calculations, shared scripts for public/finance
 globs: "public/finance/**/*.{js,html,css}"
 alwaysApply: false
 ---
 
-# PiBoom Finance UI
+# DevConnect Labs Finance UI
 
 When editing pages under `public/finance/`:
 
@@ -18,4 +18,4 @@ When editing pages under `public/finance/`:
 
 4. **Shared scripts** — Include `/shared/modern-navbar.js`, `/shared/styles.css`. Add `finance-auth-guard.js`, `user-login.js`, `user-passwords.js`, `voice-widget.js`, `dark-mode.js` as needed (see index.html, encompass-hub.html).
 
-5. **Encompass pages** — For encompass-*, also see piboom-encompass-ai rule and docs/ENCOMPASS.md.
+5. **Encompass pages** — For encompass-*, also see devconnect-labs-encompass-ai rule and docs/ENCOMPASS.md.

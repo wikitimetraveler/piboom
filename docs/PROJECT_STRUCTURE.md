@@ -1,11 +1,11 @@
-# piBoom - Multi-Domain Project Structure
+# DevConnect Labs - Multi-Domain Project Structure
 
 ## 📁 New Organization
 
 Your project is now organized by domain for better scalability and AI integration:
 
 ```
-piBoom/
+devconnect-labs/
 ├── public/
 │   ├── music/                  # 🎵 Music Domain
 │   │   ├── music-research.html

@@ -748,5 +748,27 @@ if (closeHelpBtn && helpPanel) {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+// Expand accordion section when navigating with hash (e.g. /#headingMusic, /#headingEntertainment)
+(function() {
+  var hash = window.location.hash;
+  if (!hash) return;
+  var collapseMap = {
+    'headingMusic': 'collapseMusic',
+    'headingBike': 'collapseBike',
+    'headingAI': 'collapseAI',
+    'headingEntertainment': 'collapseEntertainment',
+    'headingNature': 'collapseNature'
+  };
+  var id = hash.replace('#', '');
+  var collapseId = collapseMap[id];
+  if (collapseId) {
+    var el = document.getElementById(collapseId);
+    if (el && typeof $ !== 'undefined' && $.fn.collapse) {
+      $(el).collapse('show');
+    }
+  }
+})();
+</script>
 </body>
 </html>

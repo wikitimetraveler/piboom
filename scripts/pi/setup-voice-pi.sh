@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Voice Recognition Setup Script for PiBoom on Raspberry Pi
+# Voice Recognition Setup Script for DevConnect Labs on Raspberry Pi
 # This script installs all necessary dependencies for voice recognition
 
-echo "🎤 Setting up Voice Recognition for PiBoom..."
+echo "🎤 Setting up Voice Recognition for DevConnect Labs..."
 
 # Update package list
 echo "📦 Updating package list..."

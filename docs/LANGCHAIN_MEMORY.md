@@ -2,7 +2,7 @@
 
 ## Overview
 
-Your piBoom system now has **persistent conversation memory** using LangChain with PostgreSQL backing. Each of your 5 users can have their own conversation history that persists across sessions and server restarts.
+Your DevConnect Labs system now has **persistent conversation memory** using LangChain with PostgreSQL backing. Each of your 5 users can have their own conversation history that persists across sessions and server restarts.
 
 ## Features
 

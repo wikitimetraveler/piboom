@@ -1,6 +1,6 @@
 # Google Earth Network Links
 
-This project includes Google Earth Network Link files that allow you to load KML data directly from your piBoom server into Google Earth.
+This project includes Google Earth Network Link files that allow you to load KML data directly from your DevConnect Labs server into Google Earth.
 
 ## What are Network Links?
 
@@ -31,7 +31,7 @@ All network link files are located in the `data/` directory:
 
 ### Direct File Access
 
-1. Navigate to your piBoom `data/` directory
+1. Navigate to your DevConnect Labs `data/` directory
 2. Double-click any `.networklink.kml` file
 3. It will open in Google Earth and load the data from your server
 
@@ -77,7 +77,7 @@ When deploying to your Raspberry Pi, remember to update the network link URLs:
 ## Troubleshooting
 
 **Network link not loading in Google Earth:**
-- Make sure your piBoom server is running
+- Make sure your DevConnect Labs server is running
 - Check that you can access the KML file directly in a browser (e.g., `http://localhost:3000/data/grateful-dead-tour.kml`)
 - Verify the URL in the network link file is correct
 

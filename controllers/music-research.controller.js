@@ -17,7 +17,7 @@ export async function searchKnowledgeGraph(req, res) {
 
     const response = await axios.get(musicBrainzUrl, {
       headers: {
-        'User-Agent': 'PiBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
       }
     });
 
@@ -73,7 +73,7 @@ export async function searchWikipedia(req, res) {
     
     const searchResponse = await axios.get(searchUrl, {
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
       }
     });
     const searchData = searchResponse.data;
@@ -93,7 +93,7 @@ export async function searchWikipedia(req, res) {
     const summaryUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`;
     const summaryResponse = await axios.get(summaryUrl, {
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
       }
     });
     const summaryData = summaryResponse.data;
@@ -171,7 +171,7 @@ async function getWikidataInfo(pageTitle) {
     
     const wikidataResponse = await axios.get(wikidataUrl, {
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
       }
     });
     const pages = wikidataResponse.data.query?.pages;
@@ -187,7 +187,7 @@ async function getWikidataInfo(pageTitle) {
     
     const dataResponse = await axios.get(dataUrl, {
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
       }
     });
     const entity = dataResponse.data.entities[wikidataId];
@@ -283,7 +283,7 @@ async function getPlaceName(placeId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${placeId}&format=json&props=labels&languages=en`;
     const response = await axios.get(url, {
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
       }
     });
     const entity = response.data.entities[placeId];
@@ -300,7 +300,7 @@ async function getEntityLabel(entityId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&format=json&props=labels&languages=en`;
     const response = await axios.get(url, {
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
       }
     });
     const entity = response.data.entities[entityId];
@@ -317,7 +317,7 @@ async function getMemberInfoFromWikidata(memberId) {
     const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${memberId}&format=json&props=claims`;
     const response = await axios.get(url, {
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
       }
     });
     const entity = response.data.entities[memberId];
@@ -647,7 +647,7 @@ async function enrichBandMembersWithLocations(members) {
           srlimit: 1
         },
         headers: {
-          'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+          'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
         }
       });
       
@@ -664,7 +664,7 @@ async function enrichBandMembersWithLocations(members) {
             ppprop: 'wikibase_item'
           },
           headers: {
-            'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+            'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
           }
         });
         
@@ -681,7 +681,7 @@ async function enrichBandMembersWithLocations(members) {
         // Get summary for additional context and image
         const summaryResponse = await axios.get(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`, {
           headers: {
-            'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+            'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
           }
         });
         const summaryData = summaryResponse.data;
@@ -821,7 +821,7 @@ async function getMusicBrainzMembers(artistName) {
         limit: 1
       },
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
       }
     });
 
@@ -838,7 +838,7 @@ async function getMusicBrainzMembers(artistName) {
         fmt: 'json'
       },
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
       }
     });
 
@@ -897,7 +897,7 @@ export async function searchMusicBrainz(req, res) {
         limit: 1
       },
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
       }
     });
 
@@ -914,7 +914,7 @@ export async function searchMusicBrainz(req, res) {
         fmt: 'json'
       },
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
       }
     });
 
@@ -1019,7 +1019,7 @@ export async function searchAlbums(req, res) {
         limit: 1
       },
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/your-repo)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/your-repo)'
       }
     });
 
@@ -1038,7 +1038,7 @@ export async function searchAlbums(req, res) {
         limit: 20
       },
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/your-repo)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/your-repo)'
       }
     });
 
@@ -1264,7 +1264,7 @@ async function getArtistInfoFromWikipedia(artist) {
     
     const searchResponse = await axios.get(searchUrl, {
       headers: {
-        'User-Agent': 'piBoom/1.0 (https://github.com/wikitimetraveler/piboom; contact@example.com)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
       }
     });
     const searchData = searchResponse.data;

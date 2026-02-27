@@ -1,10 +1,10 @@
 ---
-description: PiBoom Encompass & AI context — use when working on mortgage, Encompass, or AI assistants
+description: DevConnect Labs Encompass & AI context — use when working on mortgage, Encompass, or AI assistants
 globs: "**/encompass*.{js,html},**/ice*.{js,json},**/loan-pipeline*.{js,html},**/unit-tests*.{js,html},**/knowledge/**/*.{js,json},controllers/encompass*.js,services/encompass*.js,lib/knowledge/**/*.js"
 alwaysApply: false
 ---
 
-# PiBoom Encompass & AI
+# DevConnect Labs Encompass & AI
 
 When editing Encompass or AI-related code:
 

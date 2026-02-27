@@ -1,10 +1,10 @@
 ---
-description: PiBoom services layer — env usage, error handling, exports for services/
+description: DevConnect Labs services layer — env usage, error handling, exports for services/
 globs: "services/**/*.js"
 alwaysApply: false
 ---
 
-# PiBoom Services
+# DevConnect Labs Services
 
 When editing files under `services/`:
 

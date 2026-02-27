@@ -1,6 +1,6 @@
 # Encompass Integration
 
-Comprehensive guide to piBoom's Encompass (ICE Mortgage Technology) integration. Use this when building or modifying Encompass features.
+Comprehensive guide to DevConnect Labs's Encompass (ICE Mortgage Technology) integration. Use this when building or modifying Encompass features.
 
 ## Overview
 
@@ -28,7 +28,7 @@ AI assistant for Encompass Developer Connect:
 
 - Uses **encompass-docs.service.js** – Search official docs
 - Uses **ice-knowledge.service.js** – Search ICE repos, Postman, sample code
-- System prompt includes piBoom tech stack, calculations class, Encompass context
+- System prompt includes DevConnect Labs tech stack, calculations class, Encompass context
 - Endpoints: `/search`, `/chat`, `/summary`
 
 ### 3. Knowledge Sources (`knowledge-sources/ice/`)

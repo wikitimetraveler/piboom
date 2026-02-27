@@ -205,7 +205,7 @@ export async function getAlbums(req, res) {
 
     const response = await axios.get(musicBrainzUrl, {
       headers: {
-        'User-Agent': 'PiBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
       }
     });
 
@@ -262,7 +262,7 @@ export async function searchAlbum(req, res) {
 
     const response = await axios.get(musicBrainzUrl, {
       headers: {
-        'User-Agent': 'PiBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
       }
     });
 

@@ -310,14 +310,13 @@
 
       .test-description-card {
         perspective: 600px;
-        min-height: 120px;
+        min-height: 180px;
       }
 
       .scenario-card-inner {
         position: relative;
         width: 100%;
-        height: 100%;
-        min-height: 120px;
+        min-height: 180px;
         transition: transform 0.35s ease;
         transform-style: preserve-3d;
       }
@@ -333,7 +332,8 @@
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
         border-radius: 8px;
-        overflow: hidden;
+        overflow-y: auto;
+        overflow-x: hidden;
       }
 
       .scenario-card-front {
@@ -409,6 +409,9 @@
         font-size: 0.85rem;
         line-height: 1.4;
         font-weight: 500;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        min-height: 0;
       }
 
       .scenario-run-btn {
@@ -1250,6 +1253,54 @@
         border: 1px solid rgba(148, 163, 184, 0.35);
       }
 
+      /* Custom field combobox - editable input + dropdown */
+      .custom-field-combobox-wrapper .input-group {
+        border-radius: 8px;
+      }
+      .custom-field-combobox-wrapper .input-group .form-control {
+        border-radius: 8px 0 0 8px;
+      }
+      .custom-field-combobox-wrapper .input-group-append .btn {
+        border-radius: 0 8px 8px 0;
+        border-left: none;
+      }
+      .custom-field-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        max-height: 280px;
+        overflow-y: auto;
+        background: #fff;
+        border: 1px solid var(--border-light);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 1050;
+      }
+      .custom-field-dropdown-item {
+        padding: 0.6rem 0.85rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        font-size: 0.85rem;
+        line-height: 1.4;
+      }
+      .custom-field-dropdown-item:hover,
+      .custom-field-dropdown-item.selected {
+        background: rgba(74, 144, 164, 0.1);
+      }
+      .custom-field-dropdown-item .field-id {
+        font-weight: 600;
+        color: #1a2856;
+      }
+      .custom-field-dropdown-item .field-calc {
+        display: block;
+        color: var(--zen-muted);
+        font-size: 0.8rem;
+        margin-top: 0.2rem;
+        word-break: break-all;
+      }
+
       @media (max-width: 768px) {
         .hero {
           flex-direction: column;
@@ -1330,6 +1381,58 @@
             <button class="btn btn-outline-secondary btn-sm voice-help-toggle" id="toggleVoiceHelp">
               <i class="bi-mic"></i> Voice Guide
             </button>
+            <button class="btn btn-outline-primary btn-sm" id="generateFromCustomFieldBtn" title="Generate unit test from an Encompass custom field with a calculation">
+              <i class="bi-magic"></i> Generate from Custom Field
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generate from Custom Field Modal -->
+    <div class="modal fade" id="generateFromCustomFieldModal" tabindex="-1" role="dialog" aria-labelledby="generateFromCustomFieldModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="generateFromCustomFieldModalLabel">
+              <i class="bi-magic mr-2"></i>Generate Unit Test from Custom Field
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted mb-3">
+              Select an Encompass custom field with a calculation (e.g. <code>[CX.TEST] = 1 + [353]</code>).
+              We will generate SET and COMPARE steps to test it.
+            </p>
+            <div id="generateCustomFieldStatus" class="mb-2 small text-muted"></div>
+            <div class="form-group">
+              <label for="customFieldSearchInput">Calculated custom field</label>
+              <div class="position-relative custom-field-combobox-wrapper">
+                <div class="input-group">
+                  <input type="text" class="form-control" id="customFieldSearchInput" placeholder="Type or select custom field..." autocomplete="off" />
+                  <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="customFieldDropdownToggle" aria-label="Show dropdown" title="Show list">
+                      <i class="bi-chevron-down"></i>
+                    </button>
+                  </div>
+                </div>
+                <input type="hidden" id="customFieldSelect" />
+                <div id="customFieldDropdown" class="custom-field-dropdown" style="display: none;"></div>
+              </div>
+              <small class="form-text text-muted">Type to search or click the dropdown arrow. Selected field shows full calculation below.</small>
+            </div>
+            <div id="generateCustomFieldPreview" class="mt-3 p-3 bg-light rounded" style="display: none;">
+              <strong>Preview:</strong>
+              <pre id="generateCustomFieldPreviewContent" class="mb-0 mt-2 small"></pre>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="generateCustomFieldConfirmBtn" disabled>
+              <i class="bi-plus-circle mr-1"></i> Generate & Load
+            </button>
           </div>
         </div>
       </div>
@@ -1409,7 +1512,7 @@
         </div>
         
         <!-- Accordion Container -->
-        <div class="col-12 mb-4" id="accordionContainer" style="display: none;">
+        <div class="col-12 mb-4" id="accordionContainer">
           <div class="card">
             <div class="card-header p-0">
               <div class="accordion" id="testAccordion">
@@ -1474,94 +1577,101 @@
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- File Upload Card -->
-        <div class="col-12 mb-4">
-          <div class="card p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-              <div>
-                <h5 class="mb-1">Unit Test Data</h5>
-                <div class="d-flex flex-wrap align-items-center gap-2">
-                  <div id="fileInfo" class="file-info-display">No file loaded</div>
-                  <span class="badge badge-pill badge-light" id="testGuidDisplay">No GUID</span>
-                </div>
-              </div>
-              <span class="status-chip info" id="statusChip" role="status" aria-live="polite"><i class="bi-info-circle"></i> Ready</span>
-            </div>
-            <div class="sticky-action-bar" id="stickyActionBar" style="display: none;">
-              <div class="sticky-action-left">
-                <div class="loan-guid-group">
-                  <label for="loanGuidInput" class="mb-1 text-muted"><small>Loan GUID</small></label>
-                  <div class="input-group input-group-sm">
-                    <input type="text" class="form-control" id="loanGuidInput" placeholder="Enter Loan GUID for API calls" />
-                    <div class="input-group-append">
-                      <button class="btn btn-success" id="runTestsBtn" style="display: none;">
-                        <i class="bi-play-circle"></i> Run
+                <!-- Unit Test Data (bottom) -->
+                <div class="card">
+                  <div class="card-header" id="headingUnitTestData">
+                    <h5 class="mb-0">
+                      <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseUnitTestData" aria-expanded="true" aria-controls="collapseUnitTestData">
+                        <i class="bi-database"></i> Unit Test Data
+                        <i class="bi-chevron-down float-right"></i>
                       </button>
-                      <button class="btn btn-outline-secondary" type="button" id="clearLoanGuidBtn">
-                        <i class="bi-x-circle"></i> Clear
-                      </button>
+                    </h5>
+                  </div>
+                  <div id="collapseUnitTestData" class="collapse show" aria-labelledby="headingUnitTestData">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                          <div class="d-flex flex-wrap align-items-center gap-2">
+                            <div id="fileInfo" class="file-info-display">No file loaded</div>
+                            <span class="badge badge-pill badge-light" id="testGuidDisplay">No GUID</span>
+                          </div>
+                        </div>
+                        <span class="status-chip info" id="statusChip" role="status" aria-live="polite"><i class="bi-info-circle"></i> Ready</span>
+                      </div>
+                      <div class="sticky-action-bar" id="stickyActionBar" style="display: none;">
+                        <div class="sticky-action-left">
+                          <div class="loan-guid-group">
+                            <label for="loanGuidInput" class="mb-1 text-muted"><small>Loan GUID</small></label>
+                            <div class="input-group input-group-sm">
+                              <input type="text" class="form-control" id="loanGuidInput" placeholder="Enter Loan GUID for API calls" />
+                              <div class="input-group-append">
+                                <button class="btn btn-success" id="runTestsBtn" style="display: none;">
+                                  <i class="bi-play-circle"></i> Run
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" id="clearLoanGuidBtn">
+                                  <i class="bi-x-circle"></i> Clear
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                          <span class="loan-guid-chip" id="loanGuidChip">No Loan GUID</span>
+                        </div>
+                        <div class="sticky-action-right">
+                          <button class="btn btn-outline-secondary btn-sm" id="showAllColumnsBtn" title="Show Step, Action, Description, Target columns">
+                            <i class="bi-layout-three-columns"></i> All Columns
+                          </button>
+                          <select class="form-control form-control-sm" id="recentRunsSelect">
+                            <option value="">Recent runs…</option>
+                          </select>
+                          <button class="btn btn-outline-danger btn-sm" id="failFirstBtn">
+                            <i class="bi-exclamation-triangle"></i> Fail First
+                          </button>
+                          <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." />
+                          <button class="btn btn-outline-secondary btn-sm" id="clearBtn" style="display: none;">
+                            <i class="bi-x-circle"></i> Clear Data
+                          </button>
+                        </div>
+                      </div>
+                      <div id="uploadArea" class="file-upload-area">
+                        <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
+                        <h5>Drop Excel file here or click to browse</h5>
+                        <p class="text-muted mb-0">Supports .xlsx and .xls formats</p>
+                      </div>
+                      <div class="run-summary-card mt-4" id="runSummaryCard" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <div>
+                            <h6 class="mb-1">Last Run Summary</h6>
+                            <small class="text-muted" id="runSummaryTime">Not run yet</small>
+                          </div>
+                          <span class="badge badge-light" id="runSummaryCounts">0 total</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                          <div class="progress-bar bg-success" id="runSummaryPassBar" role="progressbar" style="width: 0%"></div>
+                          <div class="progress-bar bg-warning" id="runSummarySkipBar" role="progressbar" style="width: 0%"></div>
+                          <div class="progress-bar bg-danger" id="runSummaryFailBar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                      </div>
+                      <!-- Test Results Panel -->
+                      <div id="testResultsContainer" style="display: none;" class="mt-4">
+                        <div class="card p-4">
+                          <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                              <h5 class="mb-1"><i class="bi-clipboard-check"></i> Test Results</h5>
+                              <small class="text-muted" id="testResultsSummary">Running tests...</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary" id="closeResultsBtn">
+                              <i class="bi-x"></i> Close
+                            </button>
+                          </div>
+                          <div id="testResultsList" class="test-results-list"></div>
+                          <button class="btn btn-sm btn-outline-secondary mt-3 d-inline-flex align-items-center" id="scrollToTopBtn" style="display: none;">
+                            <i class="bi-arrow-up mr-1"></i> Scroll to top
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-                <span class="loan-guid-chip" id="loanGuidChip">No Loan GUID</span>
-              </div>
-              <div class="sticky-action-right">
-                <button class="btn btn-outline-secondary btn-sm" id="showAllColumnsBtn" title="Show Step, Action, Description, Target columns">
-                  <i class="bi-layout-three-columns"></i> All Columns
-                </button>
-                <select class="form-control form-control-sm" id="recentRunsSelect">
-                  <option value="">Recent runs…</option>
-                </select>
-                <button class="btn btn-outline-danger btn-sm" id="failFirstBtn">
-                  <i class="bi-exclamation-triangle"></i> Fail First
-                </button>
-                <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." />
-                <button class="btn btn-outline-secondary btn-sm" id="clearBtn" style="display: none;">
-                  <i class="bi-x-circle"></i> Clear Data
-                </button>
-              </div>
-            </div>
-            <div id="uploadArea" class="file-upload-area">
-              <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
-              <h5>Drop Excel file here or click to browse</h5>
-              <p class="text-muted mb-0">Supports .xlsx and .xls formats</p>
-            </div>
-            <div class="run-summary-card mt-4" id="runSummaryCard" style="display: none;">
-              <div class="d-flex justify-content-between align-items-center mb-2">
-                <div>
-                  <h6 class="mb-1">Last Run Summary</h6>
-                  <small class="text-muted" id="runSummaryTime">Not run yet</small>
-                </div>
-                <span class="badge badge-light" id="runSummaryCounts">0 total</span>
-              </div>
-              <div class="progress" style="height: 10px;">
-                <div class="progress-bar bg-success" id="runSummaryPassBar" role="progressbar" style="width: 0%"></div>
-                <div class="progress-bar bg-warning" id="runSummarySkipBar" role="progressbar" style="width: 0%"></div>
-                <div class="progress-bar bg-danger" id="runSummaryFailBar" role="progressbar" style="width: 0%"></div>
-              </div>
-            </div>
-            
-            <!-- Test Results Panel -->
-            <div id="testResultsContainer" style="display: none;" class="mt-4">
-              <div class="card p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <div>
-                    <h5 class="mb-1"><i class="bi-clipboard-check"></i> Test Results</h5>
-                    <small class="text-muted" id="testResultsSummary">Running tests...</small>
-                  </div>
-                  <button class="btn btn-sm btn-outline-secondary" id="closeResultsBtn">
-                    <i class="bi-x"></i> Close
-                  </button>
-                </div>
-                <div id="testResultsList" class="test-results-list"></div>
-                <button class="btn btn-sm btn-outline-secondary mt-3 d-inline-flex align-items-center" id="scrollToTopBtn" style="display: none;">
-                  <i class="bi-arrow-up mr-1"></i> Scroll to top
-                </button>
               </div>
             </div>
           </div>
@@ -1614,6 +1724,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="/shared/customFieldCalcParser.js"></script>
     <script src="/shared/tts.js"></script>
     <script src="/shared/voice-widget.js"></script>
     <script>

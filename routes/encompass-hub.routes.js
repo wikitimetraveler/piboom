@@ -13,6 +13,7 @@ import {
   getMapVisualization,
   getStackedVisualization,
   getTimelineVisualization,
+  postCreateFields,
 } from '../controllers/encompass-hub.controller.js';
 
 const router = Router();
@@ -30,6 +31,7 @@ router.get('/visualizations/stacked-cubes', getStackedVisualization);
 router.get('/visualizations/timeline', getTimelineVisualization);
 router.get('/native-fields', getNativeFields);
 router.get('/custom-fields', getCustomFields);
+router.post('/create-fields', postCreateFields);
 
 export default router;
 

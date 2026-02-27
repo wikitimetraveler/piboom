@@ -1,6 +1,6 @@
 # Development Workflow
 
-Documentation for running, testing, and maintaining piBoom. No pre-commit hooks or automated script changes are used; workflow is manual.
+Documentation for running, testing, and maintaining DevConnect Labs. No pre-commit hooks or automated script changes are used; workflow is manual.
 
 ## Start the Server
 

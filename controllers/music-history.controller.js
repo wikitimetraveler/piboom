@@ -77,7 +77,7 @@ async function getAlbumsReleasedOnDate(month, day, year) {
     
     const response = await axios.get(searchUrl, {
       headers: {
-        'User-Agent': 'PiBoom/1.0 (https://github.com/wikitimetraveler/piboom)'
+        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
       }
     });
 

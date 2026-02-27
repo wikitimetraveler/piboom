@@ -2,7 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>Legendary Music Venues</name>
-    <description>Historic and legendary music venues around the world. This network link will load the data from your piBoom server.</description>
+    <description>Historic and legendary music venues around the world. This network link will load the data from your DevConnect Labs server.</description>
     <NetworkLink>
       <name>Legendary Music Venues</name>
       <description>View legendary music venues and their locations</description>

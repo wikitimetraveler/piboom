@@ -1,4 +1,4 @@
-# 🎵 Pi BOOM - Multi-Domain Platform
+# DevConnect Labs - Multi-Domain Platform
 
 A comprehensive multi-domain platform featuring **music research**, **mortgage loan pipeline management**, **disaster risk assessment**, and **AI-powered assistants**. Originally designed for Raspberry Pi with voice activation, now expanded to support web-based mortgage operations and disaster monitoring.
 
@@ -48,7 +48,7 @@ A comprehensive multi-domain platform featuring **music research**, **mortgage l
 ### 1. Clone and Setup
 ```bash
 git clone <your-repo-url>
-cd piBoom
+cd devconnect-labs
 chmod +x setup-pi.sh
 ./setup-pi.sh
 ```
@@ -253,7 +253,7 @@ See [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for containerized dep
 ## 📁 Project Structure
 
 ```
-piBoom/
+devconnect-labs/
 ├── config/              # Configuration files
 ├── controllers/         # API controllers
 │   ├── loan-pipeline-ai.controller.js    # AI mortgage assistant
@@ -305,4 +305,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**🎵 Pi BOOM - Your Multi-Domain Platform for Music, Mortgages, and Disaster Monitoring! 🎵**
+**DevConnect Labs - Your Multi-Domain Platform for Music, Mortgages, and Disaster Monitoring**

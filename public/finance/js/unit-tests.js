@@ -481,12 +481,15 @@ function generateColumnDefs(headers, rows) {
       colDef.cellStyle = { whiteSpace: 'normal', lineHeight: '1.5' };
     }
     
-    // Special handling for Test columns - contain values for Set operations
-    // These are test scenario values that will be used when Action = "Set"
+    // Special handling for Test columns - contain values for SET/COMPARE; editable for those rows
     if (isTestColumn) {
       colDef.minWidth = 90;
       colDef.width = 110;
       colDef.headerClass = 'test-scenario-column';
+      colDef.editable = (params) => {
+        const action = (params.data && params.data.Action) ? String(params.data.Action).trim().toUpperCase() : '';
+        return action === 'SET' || action === 'COMPARE';
+      };
       colDef.cellClass = (params) => {
         let cls = 'test-scenario-cell';
         const key = `${params.rowIndex}-${params.colDef?.field || ''}`;
@@ -522,10 +525,10 @@ function generateColumnDefs(headers, rows) {
         return `<span class="test-value-text" title="Test value for Set operation">${value}</span>`;
       };
       
-      // Tooltip to indicate these are Set operation values
+      // Tooltip to indicate these are Set/Compare values (editable for SET and COMPARE rows)
       colDef.tooltipValueGetter = (params) => {
-        if (!params.value) return 'Empty - No test value';
-        return `Test Value: ${params.value}\n\nUsed when Action = "Set"`;
+        if (!params.value) return 'Empty - Click to edit (SET/COMPARE rows)';
+        return `Test Value: ${params.value}\n\nEditable for SET and COMPARE rows`;
       };
       
       // Make test columns searchable
@@ -2255,10 +2258,277 @@ function speakWithBrowser(text) {
   window.speechSynthesis.speak(utterance);
 }
 
+/**
+ * Load generated unit test data (from custom field calculation) into the grid.
+ * Mirrors handleFileUpload flow but for programmatically generated data.
+ */
+function loadGeneratedTestData(headers, rows, testDescriptions, sourceName) {
+  if (!rows || rows.length === 0) return;
+
+  columnDefs = generateColumnDefs(headers, rows);
+  allData = rows;
+  lastRunCellResults = {};
+
+  initializeGrid();
+  setGridRows(allData);
+  showAllColumns();
+
+  const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
+  const scenarioColumns = [];
+  if (descIdx >= 0) {
+    for (let i = descIdx + 1; i < headers.length; i++) {
+      if (!isScenarioColumnHeader(headers[i])) break;
+      scenarioColumns.push(headers[i]);
+    }
+  }
+
+  testDescriptionsData = testDescriptions || [];
+  currentFileName = sourceName || 'Generated from Custom Field';
+
+  const accordionContainer = document.getElementById('accordionContainer');
+  if (accordionContainer) accordionContainer.style.display = 'block';
+
+  loadTestExecutionsFromDatabase(currentFileName).then((executions) => {
+    displayOverallSignOff(executions);
+  });
+
+  if (testDescriptions && testDescriptions.length > 0) {
+    displayTestDescriptions(testDescriptionsData);
+  } else {
+    hideTestDescriptions();
+  }
+
+  uploadArea.style.display = 'none';
+  if (exportCsvBtn) exportCsvBtn.style.display = 'inline-block';
+  if (exportExcelBtn) exportExcelBtn.style.display = 'inline-block';
+  if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'inline-block';
+  runTestsBtn.style.display = 'inline-block';
+  if (clearBtn) clearBtn.style.display = 'inline-block';
+  if (stickyActionBar) stickyActionBar.style.display = 'flex';
+
+  updateLoanGuidChipDisplay(currentLoanGuid);
+  renderRecentRunsSelect();
+  updateScenarioBadges([]);
+
+  if (window.unitTestsAI && window.unitTestsAI.show) {
+    window.unitTestsAI.show();
+  }
+
+  let fileInfoHTML = `<strong>${currentFileName}</strong>`;
+  fileInfoHTML += ` <span class="text-muted">(${rows.length} test step${rows.length !== 1 ? 's' : ''}, ${headers.length} columns)</span>`;
+  if (testDescriptions && testDescriptions.length > 0) {
+    fileInfoHTML += `<div class="mt-2"><small class="text-muted">Test Scenarios:</small> `;
+    fileInfoHTML += testDescriptions.map((t) => `<span class="badge badge-light mr-1" title="${t.description}">Test ${t.testNumber}</span>`).join('');
+    fileInfoHTML += `</div>`;
+  } else if (scenarioColumns.length > 0) {
+    fileInfoHTML += ` <span class="text-muted">• ${scenarioColumns.length} test scenario${scenarioColumns.length !== 1 ? 's' : ''}</span>`;
+  }
+  fileInfo.innerHTML = fileInfoHTML;
+
+  updateResultsMeta();
+  setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
+}
+
+/**
+ * Initialize Generate from Custom Field modal and handlers.
+ */
+function initializeGenerateFromCustomField() {
+  const btn = document.getElementById('generateFromCustomFieldBtn');
+  const modal = document.getElementById('generateFromCustomFieldModal');
+  const searchInput = document.getElementById('customFieldSearchInput');
+  const hiddenSelect = document.getElementById('customFieldSelect');
+  const dropdown = document.getElementById('customFieldDropdown');
+  const dropdownToggle = document.getElementById('customFieldDropdownToggle');
+  const preview = document.getElementById('generateCustomFieldPreview');
+  const previewContent = document.getElementById('generateCustomFieldPreviewContent');
+  const confirmBtn = document.getElementById('generateCustomFieldConfirmBtn');
+  const statusEl = document.getElementById('generateCustomFieldStatus');
+
+  if (!btn || !modal || !searchInput || !hiddenSelect || !dropdown) return;
+
+  let calculatedFields = [];
+
+  function getFieldDisplay(f) {
+    const id = f.fieldId || f.id || f.Id || f.fieldName || f.name || '';
+    const calc = f.calculation || f.calculationExpression || f.Calculation || f.calculatedExpression || f.expression || f.formula || '';
+    return { id, calc };
+  }
+
+  function renderDropdown(filter) {
+    const term = (filter || '').toLowerCase().trim();
+    const filtered = term
+      ? calculatedFields.filter((f) => {
+          const { id, calc } = getFieldDisplay(f);
+          return id.toLowerCase().includes(term) || calc.toLowerCase().includes(term);
+        })
+      : calculatedFields;
+
+    dropdown.innerHTML = '';
+    if (filtered.length === 0) {
+      dropdown.innerHTML = '<div class="custom-field-dropdown-item text-muted">No matching fields</div>';
+    } else {
+      filtered.forEach((f) => {
+        const { id, calc } = getFieldDisplay(f);
+        const item = document.createElement('div');
+        item.className = 'custom-field-dropdown-item';
+        item.setAttribute('data-field-id', id);
+        item.innerHTML = `<span class="field-id">[${id}]</span><span class="field-calc">${(calc || '(no calculation)').replace(/</g, '&lt;')}</span>`;
+        item.addEventListener('click', () => {
+          hiddenSelect.value = id;
+          searchInput.value = id ? `[${id}] ${calc || ''}` : '';
+          dropdown.style.display = 'none';
+          updatePreview();
+        });
+        dropdown.appendChild(item);
+      });
+    }
+    dropdown.style.display = 'block';
+  }
+
+  function updatePreview() {
+    const val = hiddenSelect.value;
+    if (!val) {
+      preview.style.display = 'none';
+      confirmBtn.disabled = true;
+      return;
+    }
+    const field = calculatedFields.find((f) => (f.fieldId || f.id || f.Id) === val);
+    if (!field || !window.customFieldCalcParser) {
+      preview.style.display = 'none';
+      confirmBtn.disabled = true;
+      return;
+    }
+    const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field);
+    if (!result) {
+      preview.style.display = 'none';
+      confirmBtn.disabled = true;
+      return;
+    }
+    previewContent.textContent = result.rows.map((r) => `${r.Step}. ${r.Action} [${(r.Target || '').replace(/[\[\]]/g, '')}] → ${r['Test 1'] ?? ''}`).join('\n');
+    preview.style.display = 'block';
+    confirmBtn.disabled = false;
+  }
+
+  function showDropdown() {
+    if (calculatedFields.length) renderDropdown(searchInput.value);
+  }
+
+  searchInput.addEventListener('focus', showDropdown);
+  searchInput.addEventListener('input', () => {
+    renderDropdown(searchInput.value);
+    if (!searchInput.value.trim()) {
+      hiddenSelect.value = '';
+      updatePreview();
+    } else {
+      // Try to match typed value to a field (e.g. [CX.XXX] or CX.XXX)
+      const match = searchInput.value.match(/\[?([A-Za-z0-9_.]+)\]?/);
+      const typedId = match ? match[1] : searchInput.value.trim();
+      const field = calculatedFields.find((f) => {
+        const id = f.fieldId || f.id || f.Id || '';
+        return id === typedId || id.toLowerCase() === typedId.toLowerCase();
+      });
+      if (field) {
+        hiddenSelect.value = field.fieldId || field.id || field.Id;
+        updatePreview();
+      } else {
+        hiddenSelect.value = '';
+        updatePreview();
+      }
+    }
+  });
+  searchInput.addEventListener('blur', (e) => {
+    const related = e.relatedTarget;
+    if (related && (related === dropdownToggle || dropdown.contains(related))) return;
+    setTimeout(() => { dropdown.style.display = 'none'; }, 200);
+  });
+
+  if (dropdownToggle) {
+    dropdownToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      searchInput.focus();
+      const isVisible = dropdown.style.display === 'block';
+      if (isVisible) {
+        dropdown.style.display = 'none';
+      } else {
+        showDropdown();
+      }
+    });
+  }
+
+  btn.addEventListener('click', async () => {
+    statusEl.textContent = 'Loading custom fields...';
+    searchInput.value = '';
+    hiddenSelect.value = '';
+    searchInput.placeholder = 'Loading...';
+    dropdown.style.display = 'none';
+    confirmBtn.disabled = true;
+    preview.style.display = 'none';
+
+    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
+      window.$(modal).modal('show');
+    } else {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
+
+    try {
+      const response = await fetch('/api/encompass-hub/custom-fields');
+      if (!response.ok) throw new Error(`API failed (${response.status})`);
+      const data = await response.json();
+      const items = Array.isArray(data) ? data : data.items || data.fields || [];
+      calculatedFields = items.filter((item) => {
+        const calc =
+          item.calculation ||
+          item.calculationExpression ||
+          item.calculatedExpression ||
+          item.expression ||
+          item.formula ||
+          '';
+        return (item.isCalculatedField || item.isCalculated) && calc && calc.trim();
+      });
+
+      searchInput.placeholder = 'Type to search custom fields...';
+
+      if (calculatedFields.length === 0) {
+        statusEl.textContent = 'No calculated custom fields in your Encompass instance.';
+        return;
+      }
+
+      statusEl.textContent = `${calculatedFields.length} calculated field${calculatedFields.length !== 1 ? 's' : ''} found. Type to search.`;
+    } catch (err) {
+      statusEl.textContent = 'Error: ' + err.message;
+      searchInput.placeholder = 'Type to search custom fields...';
+    }
+  });
+
+  confirmBtn.addEventListener('click', () => {
+    const val = hiddenSelect.value;
+    if (!val) return;
+    const field = calculatedFields.find((f) => (f.fieldId || f.id || f.Id) === val);
+    if (!field || !window.customFieldCalcParser) return;
+
+    const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field);
+    if (!result) {
+      showToast('Could not parse calculation formula', 'warning');
+      return;
+    }
+
+    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, `Generated: [${field.fieldId || field.id || field.Id}]`);
+    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
+      window.$(modal).modal('hide');
+    } else {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+    showToast('Unit test generated and loaded', 'success');
+  });
+}
+
 // Initialize grid on load
 document.addEventListener('DOMContentLoaded', () => {
   initializeGrid();
   initializeVoiceWidget();
+  initializeGenerateFromCustomField();
   updateLoanGuidChipDisplay(currentLoanGuid);
   renderRecentRunsSelect();
   if (failFirstBtn) {

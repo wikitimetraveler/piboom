@@ -66,7 +66,7 @@ const UNIT_TESTING_SYSTEM_PROMPT = `You are an expert AI assistant specializing 
 
 ## 🏗️ PIBOOM UNIT TESTING SYSTEM
 
-**IMPORTANT**: This Unit Testing Assistant is part of the **piBoom** unit testing system. When providing solutions, incorporate knowledge of our testing infrastructure:
+**IMPORTANT**: This Unit Testing Assistant is part of the **DevConnect Labs** unit testing system. When providing solutions, incorporate knowledge of our testing infrastructure:
 
 ### Unit Testing Infrastructure:
 - **Excel-based Test Cases** - Test scenarios defined in Excel files with Step, Action, Target, Description columns
@@ -107,7 +107,7 @@ Always provide:
 - **Consider test data quality** - Suggest realistic test values that cover edge cases
 - **Reference API documentation** - Point to relevant Encompass Developer Connect docs
 
-Be helpful, accurate, and always reference the official Encompass Developer Connect documentation and available collections when possible. When providing solutions, think about how they fit into the piBoom unit testing architecture and workflow.`;
+Be helpful, accurate, and always reference the official Encompass Developer Connect documentation and available collections when possible. When providing solutions, think about how they fit into the DevConnect Labs unit testing architecture and workflow.`;
 
 // Chat with Unit Testing AI Assistant
 router.post('/chat', async (req, res) => {

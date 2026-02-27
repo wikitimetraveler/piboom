@@ -2,7 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>Grateful Dead Tour</name>
-    <description>Grateful Dead tour locations and history. This network link will load the data from your piBoom server.</description>
+    <description>Grateful Dead tour locations and history. This network link will load the data from your DevConnect Labs server.</description>
     <NetworkLink>
       <name>Grateful Dead Tour</name>
       <description>View Grateful Dead tour locations and show history</description>

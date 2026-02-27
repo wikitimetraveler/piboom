@@ -686,7 +686,7 @@ export async function ingestNwsCap() {
   const url = 'https://api.weather.gov/alerts/active?status=actual&message_type=alert';
   let data;
   try {
-    const resp = await fetch(url, { headers: { 'Accept': 'application/geo+json', 'User-Agent': 'piBoom/1.0' } });
+    const resp = await fetch(url, { headers: { 'Accept': 'application/geo+json', 'User-Agent': 'DevConnectLabs/1.0' } });
     data = await resp.json();
   } catch (e) {
     console.warn('NWS CAP fetch failed:', e.message);
@@ -770,7 +770,7 @@ export async function ingestFema() {
     const resp = await fetch(url, {
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'piBoom-Disasters/1.0'
+        'User-Agent': 'DevConnectLabs-Disasters/1.0'
       }
     });
     
@@ -894,7 +894,7 @@ export async function ingestCaFireCameras() {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
-            'User-Agent': 'piBoom-DisasterService/1.0'
+            'User-Agent': 'DevConnectLabs-DisasterService/1.0'
           }
         });
 
@@ -942,7 +942,7 @@ export async function ingestCaFireCameras() {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
-            'User-Agent': 'piBoom-DisasterService/1.0'
+            'User-Agent': 'DevConnectLabs-DisasterService/1.0'
           }
         });
         
@@ -981,7 +981,7 @@ export async function ingestCaFireCameras() {
               method: 'GET',
               headers: {
                 'Accept': 'application/json',
-                'User-Agent': 'piBoom-DisasterService/1.0'
+                'User-Agent': 'DevConnectLabs-DisasterService/1.0'
               }
             });
             

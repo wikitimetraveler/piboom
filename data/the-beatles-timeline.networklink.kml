@@ -2,7 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>The Beatles - Historic Locations Timeline</name>
-    <description>The Beatles' journey from Liverpool to worldwide phenomenon. This network link will load the data from your piBoom server.</description>
+    <description>The Beatles' journey from Liverpool to worldwide phenomenon. This network link will load the data from your DevConnect Labs server.</description>
     <NetworkLink>
       <name>The Beatles Timeline</name>
       <description>Follow The Beatles from The Cavern Club to Abbey Road and around the world</description>

@@ -20,10 +20,10 @@ Your local machine and Render will both connect to the same Render PostgreSQL da
 
 ### Step 2: Create Local `.env` File
 
-Create a file named `.env` in your project root (`c:\projects\piBoom\.env`):
+Create a file named `.env` in your project root:
 
 ```bash
-# Pi BOOM Environment Configuration
+# DevConnect Labs Environment Configuration
 
 # ===== DATABASE (REQUIRED for album collection) =====
 # Paste your Render External Database URL here:
@@ -52,7 +52,7 @@ Update your `render.yaml` to connect to the database:
 ```yaml
 services:
   - type: web
-    name: pi-boom
+    name: devconnect-labs
     env: docker
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -70,13 +70,13 @@ services:
         value: 3000
       - key: DATABASE_URL
         fromDatabase:
-          name: pi-boom-db
+          name: devconnect-labs-db
           property: connectionString
     healthCheckPath: /health
     autoDeploy: true
 
   - type: pserv
-    name: pi-boom-db
+    name: devconnect-labs-db
     env: docker
     plan: starter
     region: oregon

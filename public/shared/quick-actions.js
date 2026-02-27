@@ -150,19 +150,19 @@ const quickActionsHTML = `
 
 <div class="fab-menu" id="fabMenu">
   <div class="fab-actions" id="fabActions">
-    <button class="fab-action" onclick="window.location.href='/album-discovery.html'" title="Discover Albums">
+    <button class="fab-action" onclick="window.location.href='/music/album-discovery.html'" title="Discover Albums">
       <i class="bi-disc"></i>
       <span class="fab-action-label">Discover Albums</span>
     </button>
-    <button class="fab-action" onclick="window.location.href='/music-research.html'" title="Research Music">
+    <button class="fab-action" onclick="window.location.href='/music/music-research.html'" title="Research Music">
       <i class="bi-search"></i>
       <span class="fab-action-label">Research Music</span>
     </button>
-    <button class="fab-action" onclick="window.location.href='/collection.html'" title="My Collection">
+    <button class="fab-action" onclick="window.location.href='/music/collection.html'" title="My Collection">
       <i class="bi-collection-fill"></i>
       <span class="fab-action-label">My Collection</span>
     </button>
-    <button class="fab-action" onclick="window.location.href='/song-identifier.html'" title="Identify Song">
+    <button class="fab-action" onclick="window.location.href='/music/song-identifier.html'" title="Identify Song">
       <i class="bi-soundwave"></i>
       <span class="fab-action-label">Identify Song</span>
     </button>

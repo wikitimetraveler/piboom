@@ -2,7 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>Grateful Dead - The Endless Tour</name>
-    <description>The complete Grateful Dead tour history - all shows. This network link will load the data from your piBoom server.</description>
+    <description>The complete Grateful Dead tour history - all shows. This network link will load the data from your DevConnect Labs server.</description>
     <NetworkLink>
       <name>Grateful Dead - The Endless Tour</name>
       <description>View all Grateful Dead shows and tour locations</description>

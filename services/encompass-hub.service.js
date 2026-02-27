@@ -7,6 +7,7 @@ import {
 const API_BASE_URL = process.env.ENCOMPASS_API_BASE || 'https://api.elliemae.com/encompass/v1';
 const API_SERVER = API_BASE_URL.replace(/\/encompass\/v\d+\/?$/i, '');
 const API_V3_BASE = `${API_SERVER}/encompass/v3`;
+const API_V1_BASE = `${API_SERVER}/encompass/v1`;
 const DEFAULT_LIMIT = Number(process.env.ENCOMPASS_PIPELINE_LIMIT || 50);
 
 const PIPELINE_FIELDS = [
@@ -733,6 +734,78 @@ export async function fetchCustomFields() {
   }
 }
 
+/**
+ * Create or update custom fields in Encompass via the settings API.
+ * Passes payload exactly as received - no transformation.
+ * Uses: PATCH /encompass/v3/settings/loan/customFields?action=add&view=entity
+ * @param {Array<object>} fields - Array of field definitions (tool4 JSON format)
+ * @returns {Promise<{ created: number, failed: Array<{id: string, error: string}> }>}
+ */
+export async function createCustomFields(fields) {
+  if (!Array.isArray(fields) || fields.length === 0) {
+    throw new Error('fields must be a non-empty array');
+  }
+  const payloads = fields.filter((f) => f && (f.id || f.Id || f.fieldId));
+  if (payloads.length === 0) {
+    return { created: 0, failed: fields.map((f) => ({ id: f?.id || f?.Id || 'unknown', error: 'Missing field id' })) };
+  }
+
+  const baseUrl = `${API_V3_BASE}/settings/loan/customFields?action=add&view=entity`;
+
+  // Helper to extract readable error message from Encompass response
+  function extractErrorMessage(err) {
+    const data = err.response?.data;
+    if (!data) return err.message;
+    if (typeof data === 'string') return data;
+    const msg = data.message || data.error;
+    if (typeof msg === 'string') return msg;
+    if (Array.isArray(data.errors) && data.errors[0]) {
+      const e = data.errors[0];
+      return typeof e === 'string' ? e : (e.message || e.code || JSON.stringify(e));
+    }
+    return JSON.stringify(data);
+  }
+
+  function captureError(err, fieldId = 'batch') {
+    const status = err.response?.status;
+    const data = err.response?.data;
+    const msg = extractErrorMessage(err);
+    console.error('[Encompass create-fields]', { fieldId, status, encompassResponse: data });
+    return `${status || 'error'}: ${msg}`;
+  }
+
+  // Try batch: PATCH all fields in one request (matches Postman)
+  try {
+    await requestWithAuth({
+      method: 'patch',
+      url: baseUrl,
+      data: payloads,
+    });
+    return { created: payloads.length, failed: [] };
+  } catch (batchError) {
+    const msg = captureError(batchError, 'batch');
+    if (batchError.response?.status !== 405 && batchError.response?.status !== 404) {
+      return { created: 0, failed: payloads.map((p) => ({ id: p.id, error: msg })) };
+    }
+  }
+
+  // Fallback: one field per request
+  const results = { created: 0, failed: [] };
+  for (const payload of payloads) {
+    try {
+      await requestWithAuth({
+        method: 'patch',
+        url: baseUrl,
+        data: payload,
+      });
+      results.created += 1;
+    } catch (error) {
+      results.failed.push({ id: payload.id, error: captureError(error, payload.id) });
+    }
+  }
+  return results;
+}
+
 function coerceNumber(value) {
   if (value === null || value === undefined || value === '') {
     return undefined;
@@ -804,7 +877,7 @@ export async function fetchPipelineLoans(options = {}) {
   let response;
   try {
     response = await requestWithAuth({
-      method: 'post',
+      method: 'patch',
       url: `${API_BASE_URL}/loanPipeline`,
       data: {
         filter: {
@@ -889,7 +962,7 @@ export async function writeLoanFields(loanId, fieldsPayload = []) {
 
   try {
     const response = await requestWithAuth({
-      method: 'post',
+      method: 'patch',
       url: `${API_V3_BASE}/loans/${encodeURIComponent(loanId)}/fieldWriter`,
       data: fieldsPayload,
     });
@@ -921,7 +994,7 @@ export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavi
 
   try {
     const response = await requestWithAuth({
-      method: 'post',
+      method: 'patch',
       url: `${API_V3_BASE}/loans/${encodeURIComponent(loanGuid)}/fieldReader`,
       params: { invalidFieldBehavior },
       data: fieldIds,

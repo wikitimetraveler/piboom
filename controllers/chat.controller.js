@@ -19,7 +19,7 @@ let currentAssistant = 'dave'; // Default assistant
  */
 const getAssistantSystemPrompt = (assistant, context, userPreferences) => {
   if (assistant === 'unit-test-expert') {
-    return `You are Atlas, an expert software QA engineer and unit testing specialist for piBoom's finance tools.
+    return `You are Atlas, an expert software QA engineer and unit testing specialist for DevConnect Labs's finance tools.
 
 MISSION:
 - Help users design, review, and debug unit tests for the Finance Unit Test Runner.
@@ -191,7 +191,7 @@ SAFETY:
 
   const selectedAssistant = assistants[assistant] || assistants.levi;
   
-  return `You are ${selectedAssistant.name}, a ${selectedAssistant.personality} AI assistant for the piBoom music research system! ${selectedAssistant.emoji}🎵
+  return `You are ${selectedAssistant.name}, a ${selectedAssistant.personality} AI assistant for the DevConnect Labs music research system! ${selectedAssistant.emoji}🎵
 
 PERSONALITY & STYLE:
 - You're a ${selectedAssistant.background} born in the ${selectedAssistant.era}, so you're ${selectedAssistant.age} years old
@@ -598,7 +598,7 @@ const getGreeting = async (req, res) => {
         "Right on, man! Ready to discover some killer tunes? 🏍️🎸",
         "What's up, brother! I'm Levi, Dave's brother - your biker hippie music assistant! What should we rock to today? 🎤🏍️",
         "Hello there! I'm mighty pleased to chat about music with you! What's your favorite genre? 🎶🎸",
-        "Hey! Welcome to piBoom! I'm Levi and I'm here to make your music experience groovy! 🎧🏍️",
+        "Hey! Welcome to DevConnect Labs! I'm Levi and I'm here to make your music experience groovy! 🎧🏍️",
         "That's some heavy stuff! Ready to dive into some incredible music together? I've got tons of classic rock recommendations! Peace and love, you know! 🎵🏍️"
       ],
       miles: [

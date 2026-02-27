@@ -21,7 +21,7 @@
  * 
  * Configuration:
  * - Maximum history: 8 items (configurable)
- * - Storage key: 'piBoom_searchHistory'
+ * - Storage key: 'devConnectLabs_searchHistory'
  * - Auto-saves on each search
  * 
  * Technical Implementation:
@@ -40,7 +40,7 @@
  * ==============================================================================
  */
 
-const HISTORY_KEY = 'piBoom_searchHistory';
+const HISTORY_KEY = 'devConnectLabs_searchHistory';
 const MAX_HISTORY = 8;
 
 // Get search history

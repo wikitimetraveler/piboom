@@ -19,6 +19,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/encompass-hub/visualizations/timeline` | Timeline dataset |
 | GET | `/api/encompass-hub/native-fields` | Native fields |
 | GET | `/api/encompass-hub/custom-fields` | Custom fields |
+| POST | `/api/encompass-hub/create-fields` | Create custom fields (tool4 JSON payload) |
 | * | `/api/encompass/*` | Encompass Assistant (search, chat, summary) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |

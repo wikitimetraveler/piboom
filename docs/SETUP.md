@@ -20,7 +20,7 @@ cp /path/to/your/music/*.mp3 ./music/
 ### 3. Configure Environment Variables
 Create a `.env` file in the project root:
 ```bash
-# piBoom Environment Variables
+# DevConnect Labs Environment Variables
 
 # Mode: 'pi' for Raspberry Pi, 'cloud' for cloud deployment
 MODE=pi
