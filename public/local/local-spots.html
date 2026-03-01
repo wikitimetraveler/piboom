@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Local Spots - DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/modern-navbar.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f3fbff 0%, #e3f2fd 100%); color: #1c2833; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+    .container-fluid { max-width: 100%; padding: 0 1rem; }
+    .hero { background: linear-gradient(135deg, #4a90a4 0%, #6b9d8a 100%); color: #fff; padding: 20px 24px; border-radius: 16px; box-shadow: 0 8px 24px rgba(74,144,164,0.25); margin-bottom: 1rem; }
+    .hero h1 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .hero p { font-size: 0.9rem; opacity: 0.95; margin: 0; }
+    #localSpotsMap { width: 100%; height: 480px; border-radius: 12px; border: 1px solid #e5eef5; }
+    .sidebar-card { border: 1px solid #e5eef5; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .category-pill { cursor: pointer; transition: all 0.2s ease; }
+    .category-pill.active { background: #4a90a4 !important; color: white !important; border-color: #4a90a4 !important; }
+    .spot-list-item { cursor: pointer; padding: 0.5rem 0.75rem; border-radius: 8px; transition: background 0.2s; }
+    .spot-list-item:hover { background: rgba(74,144,164,0.1); }
+    .spot-list-item .category-icon { font-size: 1rem; }
+    .pac-container { z-index: 1050; }
+    .ai-chat-container { display: flex; flex-direction: column; height: 320px; border: 1px solid #e5eef5; border-radius: 12px; background: #f8fbff; overflow: hidden; }
+    .ai-chat-messages { flex: 1; overflow-y: auto; padding: 1rem; }
+    .ai-chat-message { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .ai-chat-message.user { flex-direction: row-reverse; }
+    .ai-chat-message-avatar { width: 28px; height: 28px; border-radius: 50%; background: #4a90a4; color: white; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+    .ai-chat-message.user .ai-chat-message-avatar { background: #6b9d8a; }
+    .ai-chat-message-content { padding: 0.5rem 0.75rem; border-radius: 10px; max-width: 85%; font-size: 0.9rem; }
+    .ai-chat-message.user .ai-chat-message-content { background: rgba(74,144,164,0.15); }
+    .ai-chat-message.assistant .ai-chat-message-content { background: white; border: 1px solid #e5eef5; }
+    .spot-photo-preview { max-width: 120px; max-height: 80px; border-radius: 8px; object-fit: cover; }
+    .poster-layout { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-start; }
+    .poster-preview { flex: 0 0 320px; max-width: 320px; }
+    .poster-frame { background: #fff; border-radius: 16px; border: 2px solid rgba(74,144,164,0.4); box-shadow: 0 12px 30px rgba(0,0,0,0.15); overflow: hidden; }
+    .poster-frame .poster-cover { width: 100%; height: 240px; object-fit: cover; background: #e3f2fd; }
+    .poster-frame .poster-body { padding: 16px; text-align: left; }
+    .poster-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
+    .poster-subtitle { font-size: 0.95rem; color: #555; margin-bottom: 10px; }
+    .poster-meta { font-size: 0.85rem; color: #333; margin-bottom: 10px; }
+    .poster-section { padding: 10px 12px; border-radius: 10px; background: rgba(74,144,164,0.12); border-left: 3px solid #4a90a4; font-size: 0.82rem; margin-bottom: 10px; }
+    .poster-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .poster-share-row { display: flex; gap: 8px; }
+    .poster-share-row input { flex: 1; }
+    .star-fav { cursor: pointer; color: #ddd; }
+    .star-fav.active, .star-fav:hover { color: #f1c40f; }
+    /* Voice Control (tool8 standard) */
+    .voice-control { position: fixed; bottom: 2rem; right: 2rem; z-index: 1000; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .voice-btn { width: 60px; height: 60px; border-radius: 50%; background: #4a90a4; border: none; color: white; font-size: 1.5rem; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
+    .voice-btn:hover { background: #3d7a8a; transform: scale(1.1); }
+    .voice-btn.listening { background: #e74c3c; animation: voicePulse 1.5s infinite; }
+    .voice-btn.listening::before { content: ''; position: absolute; width: 100%; height: 100%; border-radius: 50%; border: 3px solid #e74c3c; animation: voiceRipple 1.5s infinite; }
+    @keyframes voicePulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    @keyframes voiceRipple { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2); opacity: 0; } }
+    .voice-status { background: #fff; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.875rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); opacity: 0; transform: translateY(10px); transition: all 0.3s ease; white-space: nowrap; }
+    .voice-status.show { opacity: 1; transform: translateY(0); }
+    .voice-status.listening { background: #e74c3c; color: white; }
+    .accordion .card { border: 1px solid #e5eef5; border-radius: 12px; overflow: hidden; }
+    .accordion .card-header { background: rgba(74,144,164,0.08); border-bottom: 1px solid #e5eef5; }
+    .accordion .card-header .btn-link { color: #1c2833; text-decoration: none; font-weight: 600; }
+    .accordion .card-header .btn-link:hover { color: #4a90a4; }
+    .accordion .card-body { padding: 1rem; }
+  </style>
+</head>
+<body>
+  <modern-navbar></modern-navbar>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/local/local-spots.html"><i class="bi-geo-alt-fill"></i> My Local Spots</a>
+      <div class="navbar-collapse">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/index.html"><i class="bi-house mr-1"></i> Back to Menu</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="hero">
+      <h1><i class="bi-map"></i> My Local Spots</h1>
+      <p>Thrift shops, taco trucks, gardens, bike trails, fishing, kayak, and concert venues.</p>
+    </div>
+
+    <!-- Local Expert AI (accordion) -->
+    <div class="accordion mb-4" id="localExpertAccordion">
+      <div class="card sidebar-card">
+        <div class="card-header p-0" id="headingLocalExpert">
+          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseLocalExpert" aria-expanded="false" aria-controls="collapseLocalExpert">
+            <i class="bi-robot"></i> Local Expert AI
+            <i class="bi-chevron-down float-right"></i>
+          </button>
+        </div>
+        <div id="collapseLocalExpert" class="collapse" aria-labelledby="headingLocalExpert" data-parent="#localExpertAccordion">
+          <div class="card-body">
+            <p class="text-muted small mb-3">Ask about thrift shops, taco trucks, gardens, bike trails, fishing, kayak, concerts. Use the mic to speak!</p>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <button class="btn btn-sm btn-outline-secondary" id="localExpertTtsBtn" title="Speak AI responses"><i class="bi-volume-up"></i> Speak</button>
+              <button class="btn btn-sm btn-outline-secondary" id="localExpertClearBtn"><i class="bi-trash"></i> Clear</button>
+            </div>
+            <div class="ai-chat-container">
+              <div id="localExpertMessages" class="ai-chat-messages"></div>
+              <div class="p-2 border-top bg-white">
+                <div class="input-group input-group-sm">
+                  <input type="text" class="form-control" id="localExpertInput" placeholder="Ask the local expert..." />
+                  <div class="input-group-append">
+                    <button class="btn btn-primary" id="localExpertSendBtn" type="button"><i class="bi-send"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice Control (tool8 standard mic) -->
+    <div class="voice-control">
+      <div class="voice-status" id="voiceStatus">Click to start voice control</div>
+      <button class="voice-btn" id="voiceBtn" title="Voice Control">
+        <i class="bi-mic"></i>
+      </button>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-4 col-md-5 mb-4">
+        <div class="card sidebar-card">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-funnel"></i> Filter by Category</h5>
+            <div class="d-flex flex-wrap gap-2 mb-3" id="categoryFilters">
+              <span class="badge badge-light category-pill active" data-category="all">All</span>
+              <span class="badge badge-light category-pill" data-category="favorites"><i class="bi-star-fill"></i> Favorites</span>
+              <span class="badge badge-light category-pill" data-category="thrift"><i class="bi-shop"></i> Thrift</span>
+              <span class="badge badge-light category-pill" data-category="taco_truck"><i class="bi-truck"></i> Taco</span>
+              <span class="badge badge-light category-pill" data-category="garden"><i class="bi-flower2"></i> Garden</span>
+              <span class="badge badge-light category-pill" data-category="bike_trail"><i class="bi-bicycle"></i> Bike</span>
+              <span class="badge badge-light category-pill" data-category="fishing"><i class="bi-geo-alt"></i> Fishing</span>
+              <span class="badge badge-light category-pill" data-category="kayak"><i class="bi-water"></i> Kayak</span>
+              <span class="badge badge-light category-pill" data-category="concert"><i class="bi-music-note-beamed"></i> Concert</span>
+            </div>
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <button class="btn btn-sm btn-outline-secondary" onclick="sortByNearby()" title="Sort by distance from you"><i class="bi-geo-alt"></i> Near me</button>
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown"><i class="bi-download"></i> Export</button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="#" onclick="exportSpotsJson();return false;">JSON</a>
+                  <a class="dropdown-item" href="#" onclick="exportSpotsCsv();return false;">CSV</a>
+                </div>
+              </div>
+              <label class="btn btn-sm btn-outline-secondary mb-0" style="cursor:pointer;"><i class="bi-upload"></i> Import<input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importSpotsFile(this)"></label>
+            </div>
+            <button class="btn btn-primary btn-block mb-3" onclick="openAddModal()"><i class="bi-plus-circle"></i> Add Spot</button>
+            <h6 class="mb-2"><i class="bi-list-ul"></i> Spots <span id="spotCount" class="badge badge-secondary">0</span></h6>
+            <div id="spotList" style="max-height: 320px; overflow-y: auto;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8 col-md-7 mb-4">
+        <div class="card sidebar-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0"><i class="bi-map"></i> Map</h5>
+              <button class="btn btn-sm btn-outline-secondary" onclick="fitAllMarkers()" title="Fit all markers"><i class="bi-arrows-fullscreen"></i></button>
+            </div>
+            <div id="localSpotsMap"></div>
+            <div id="mapStatus" class="text-muted mt-2 small" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Spot Modal -->
+  <div class="modal fade" id="spotModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header" style="background: #4a90a4; color: white;">
+          <h5 class="modal-title" id="spotModalTitle"><i class="bi-plus-circle"></i> Add Spot</h5>
+          <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="spotId">
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" id="spotName" class="form-control" placeholder="e.g. Goodwill on Main">
+          </div>
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="spotCategory" class="form-control">
+              <option value="thrift">Thrift Shop</option>
+              <option value="taco_truck">Taco Truck</option>
+              <option value="garden">Garden</option>
+              <option value="bike_trail">Bike Trail</option>
+              <option value="fishing">Fishing Spot</option>
+              <option value="kayak">Kayak Spot</option>
+              <option value="concert">Concert Venue</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Address * (search for place)</label>
+            <input type="text" id="spotAddress" class="form-control" placeholder="Start typing an address">
+            <input type="hidden" id="spotLat">
+            <input type="hidden" id="spotLng">
+          </div>
+          <div class="form-group">
+            <label>Notes</label>
+            <textarea id="spotNotes" class="form-control" rows="3" placeholder="Best time to go, tips..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Tags (comma-separated)</label>
+            <input type="text" id="spotTags" class="form-control" placeholder="vintage, clothing">
+          </div>
+          <div class="form-group">
+            <div class="custom-control custom-checkbox">
+              <input type="checkbox" class="custom-control-input" id="spotFavorite" checked>
+              <label class="custom-control-label" for="spotFavorite"><i class="bi-star-fill text-warning"></i> Favorite</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label><i class="bi-camera"></i> Photo</label>
+            <input type="file" id="spotPhotoInput" class="form-control-file" accept="image/*" onchange="previewSpotPhoto(this)">
+            <div id="spotPhotoPreview" class="mt-2" style="display:none;">
+              <img id="spotPhotoImg" class="spot-photo-preview" alt="Preview">
+              <button type="button" class="btn btn-sm btn-outline-danger ml-2" onclick="clearSpotPhoto()">Remove</button>
+            </div>
+            <small class="form-text text-muted">Add a photo of the spot</small>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="spotSaveBtn" onclick="saveSpot()"><i class="bi-check2"></i> Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Poster Modal -->
+  <div class="modal fade" id="posterModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header" style="background: linear-gradient(135deg, #4a90a4, #6b9d8a); color: white;">
+          <h5 class="modal-title"><i class="bi-image"></i> Spot Poster</h5>
+          <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="poster-layout">
+            <div class="poster-preview">
+              <div id="posterContent" class="poster-frame"></div>
+            </div>
+            <div style="flex: 1 1 260px;">
+              <p style="margin-bottom: 10px;">Create a shareable poster for this spot.</p>
+              <div class="poster-actions">
+                <button class="btn btn-primary" onclick="downloadSpotPosterPng()"><i class="bi-download"></i> Download PNG</button>
+                <button class="btn btn-secondary" onclick="downloadSpotPosterPdf()"><i class="bi-filetype-pdf"></i> Download PDF</button>
+                <button class="btn btn-success" onclick="shareSpotPoster()"><i class="bi-share"></i> Share</button>
+              </div>
+              <div class="poster-share-row">
+                <input id="posterShareLink" class="form-control" placeholder="Share link will appear here" readonly>
+                <button class="btn btn-outline-primary" onclick="copyPosterShareLink()"><i class="bi-clipboard"></i></button>
+              </div>
+              <small class="text-muted">Tip: tap Share on your phone to text it to friends.</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script src="/shared/tts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="/shared/poster-utils.js"></script>
+  <script>
+    let map;
+    let markers = [];
+    let markerInfos = [];
+    let spots = [];
+    let activeCategory = 'all';
+    let userLocation = null;
+    let currentPosterSpot = null;
+    let spotPosterCanvas = null;
+    let placeAutocomplete;
+    let localExpertChatContext = [];
+    let localExpertSpeakResponses = false;
+    let spotPhotoDataUrl = null;
+
+    const CATEGORY_LABELS = {
+      thrift: 'Thrift',
+      taco_truck: 'Taco Truck',
+      garden: 'Garden',
+      bike_trail: 'Bike Trail',
+      fishing: 'Fishing',
+      kayak: 'Kayak',
+      concert: 'Concert'
+    };
+
+    const CATEGORY_COLORS = {
+      thrift: '#e74c3c',
+      taco_truck: '#f39c12',
+      garden: '#27ae60',
+      bike_trail: '#3498db',
+      fishing: '#0984e3',
+      kayak: '#00b894',
+      concert: '#9b59b6'
+    };
+
+    function setMapStatus(msg, persist) {
+      const el = document.getElementById('mapStatus');
+      if (!el) return;
+      el.style.display = msg ? 'block' : 'none';
+      el.textContent = msg || '';
+    }
+
+    async function loadGoogleMaps() {
+      try {
+        const res = await fetch('/api/local-spots/google-api-key');
+        const data = await res.json();
+        const apiKey = data.apiKey;
+        if (!apiKey) {
+          setMapStatus('No Google Maps API key available.', true);
+          return;
+        }
+        return new Promise((resolve) => {
+          window.initLocalSpotsMap = () => { initMap(); resolve(); };
+          const script = document.createElement('script');
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initLocalSpotsMap`;
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        });
+      } catch (err) {
+        console.error('Failed to load Google Maps', err);
+        setMapStatus('Failed to load Google Maps.', true);
+      }
+    }
+
+    function initMap() {
+      const defaultCenter = { lat: 36.7783, lng: -119.4179 };
+      map = new google.maps.Map(document.getElementById('localSpotsMap'), {
+        center: defaultCenter,
+        zoom: 8
+      });
+      initPlaceAutocomplete();
+      fetchSpots();
+    }
+
+    function initPlaceAutocomplete() {
+      const input = document.getElementById('spotAddress');
+      if (!input || !window.google?.maps?.places) return;
+      try {
+        placeAutocomplete = new google.maps.places.Autocomplete(input, {
+          types: ['establishment', 'geocode'],
+          componentRestrictions: { country: 'us' }
+        });
+        placeAutocomplete.addListener('place_changed', () => {
+          const place = placeAutocomplete.getPlace();
+          if (place.geometry?.location) {
+            document.getElementById('spotLat').value = place.geometry.location.lat();
+            document.getElementById('spotLng').value = place.geometry.location.lng();
+            document.getElementById('spotAddress').value = place.formatted_address || place.name || '';
+          }
+        });
+      } catch (e) {
+        console.warn('Places Autocomplete init failed:', e);
+      }
+    }
+
+    async function fetchSpots() {
+      try {
+        let url = '/api/local-spots';
+        if (activeCategory === 'favorites') {
+          url += '?favorite=true';
+        } else if (activeCategory !== 'all') {
+          url += `?category=${encodeURIComponent(activeCategory)}`;
+        }
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.success) {
+          setMapStatus('Failed to load spots.', true);
+          return;
+        }
+        spots = data.spots || [];
+        if (userLocation) sortSpotsByDistance(spots, userLocation);
+        renderMarkers();
+        renderSpotList();
+        document.getElementById('spotCount').textContent = spots.length;
+      } catch (err) {
+        console.error('Failed to fetch spots', err);
+        setMapStatus('Error loading spots.', true);
+      }
+    }
+
+    function renderMarkers() {
+      markers.forEach(m => m.setMap(null));
+      markers = [];
+      markerInfos = [];
+      if (!map) return;
+
+      const bounds = new google.maps.LatLngBounds();
+      spots.forEach((spot, idx) => {
+        const pos = { lat: parseFloat(spot.lat), lng: parseFloat(spot.lng) };
+        const color = CATEGORY_COLORS[spot.category] || '#4a90a4';
+        const marker = new google.maps.Marker({
+          position: pos,
+          map,
+          title: spot.name,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 12,
+            fillColor: color,
+            fillOpacity: 1,
+            strokeColor: '#fff',
+            strokeWeight: 2
+          }
+        });
+        const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`;
+        const photoHtml = spot.imageUrl ? `<div style="margin-top:6px;"><img src="${spot.imageUrl.replace(/"/g, '&quot;')}" style="max-width:200px;max-height:120px;border-radius:8px;object-fit:cover;"></div>` : '';
+        const favStar = spot.favorite ? '★' : '☆';
+        const info = new google.maps.InfoWindow({
+          content: `
+            <div style="max-width:280px;">
+              <strong>${escapeHtml(spot.name)}</strong> <span class="star-fav" onclick="toggleFavoriteById('${spot.id}')" title="Toggle favorite">${favStar}</span><br>
+              <span style="color:#666;">${CATEGORY_LABELS[spot.category] || spot.category}</span><br>
+              ${spot.address ? `<div style="margin-top:4px;font-size:0.9rem;">${escapeHtml(spot.address)}</div>` : ''}
+              ${photoHtml}
+              ${spot.notes ? `<div style="margin-top:6px;">${escapeHtml(spot.notes)}</div>` : ''}
+              <div style="margin-top:8px;">
+                <a href="${dirUrl}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">Directions</a>
+                <button class="btn btn-sm btn-outline-secondary ml-1" onclick="openSpotPoster('${spot.id}')">Poster</button>
+                <button class="btn btn-sm btn-outline-secondary ml-1" onclick="editSpotById('${spot.id}')">Edit</button>
+                <button class="btn btn-sm btn-outline-danger ml-1" onclick="deleteSpotById('${spot.id}')">Delete</button>
+              </div>
+            </div>
+          `
+        });
+        marker.addListener('click', () => info.open(map, marker));
+        markers.push(marker);
+        markerInfos.push({ marker, info, spot, index: idx });
+        bounds.extend(pos);
+      });
+      if (markers.length) {
+        map.fitBounds(bounds);
+      }
+    }
+
+    function escapeHtml(s) {
+      if (!s) return '';
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function renderSpotList() {
+      const list = document.getElementById('spotList');
+      list.innerHTML = '';
+      if (!spots.length) {
+        list.innerHTML = '<p class="text-muted small">No spots yet. Click Add Spot to add one.</p>';
+        return;
+      }
+      spots.forEach((spot) => {
+        const color = CATEGORY_COLORS[spot.category] || '#4a90a4';
+        const icon = getCategoryIcon(spot.category);
+        const starClass = spot.favorite ? 'star-fav active' : 'star-fav';
+        const item = document.createElement('div');
+        item.className = 'spot-list-item d-flex align-items-center';
+        const thumb = spot.imageUrl ? `<img src="${(spot.imageUrl || '').replace(/"/g, '&quot;')}" class="spot-photo-preview mr-2" alt="">` : '';
+        item.innerHTML = `
+          <span class="${starClass} mr-1" onclick="event.stopPropagation();toggleFavoriteById('${spot.id}')" title="Toggle favorite"><i class="bi-star-fill"></i></span>
+          <span class="category-icon mr-2" style="color:${color};">${icon}</span>
+          ${thumb}
+          <div class="flex-grow-1">
+            <strong>${escapeHtml(spot.name)}</strong><br>
+            <small class="text-muted">${CATEGORY_LABELS[spot.category] || spot.category}</small>
+          </div>
+          <button class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation();openSpotPoster('${spot.id}')" title="Create poster"><i class="bi-image"></i></button>
+        `;
+        item.onclick = () => {
+          const m = markerInfos.find(mi => mi.spot.id === spot.id);
+          if (m) {
+            map.setCenter(m.marker.getPosition());
+            map.setZoom(14);
+            google.maps.event.trigger(m.marker, 'click');
+          }
+        };
+        list.appendChild(item);
+      });
+    }
+
+    function getCategoryIcon(cat) {
+      const icons = { thrift: '<i class="bi-shop"></i>', taco_truck: '<i class="bi-truck"></i>', garden: '<i class="bi-flower2"></i>', bike_trail: '<i class="bi-bicycle"></i>', fishing: '<i class="bi-geo-alt"></i>', kayak: '<i class="bi-water"></i>', concert: '<i class="bi-music-note-beamed"></i>' };
+      return icons[cat] || '<i class="bi-geo-alt"></i>';
+    }
+
+    function fitAllMarkers() {
+      if (!markers.length || !map) return;
+      const bounds = new google.maps.LatLngBounds();
+      markers.forEach(m => bounds.extend(m.getPosition()));
+      map.fitBounds(bounds);
+    }
+
+    document.getElementById('categoryFilters').addEventListener('click', (e) => {
+      const pill = e.target.closest('.category-pill');
+      if (!pill) return;
+      document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      activeCategory = pill.dataset.category || 'all';
+      fetchSpots();
+    });
+
+    function openAddModal() {
+      document.getElementById('spotModalTitle').innerHTML = '<i class="bi-plus-circle"></i> Add Spot';
+      document.getElementById('spotId').value = '';
+      document.getElementById('spotName').value = '';
+      document.getElementById('spotCategory').value = 'thrift';
+      document.getElementById('spotAddress').value = '';
+      document.getElementById('spotLat').value = '';
+      document.getElementById('spotLng').value = '';
+      document.getElementById('spotNotes').value = '';
+      document.getElementById('spotTags').value = '';
+      document.getElementById('spotFavorite').checked = true;
+      clearSpotPhoto();
+      $('#spotModal').modal('show');
+    }
+
+    function compressImage(dataUrl, maxWidth, quality) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxWidth) {
+            h = (h * maxWidth) / w;
+            w = maxWidth;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality || 0.8));
+        };
+        img.onerror = () => resolve(dataUrl);
+        img.src = dataUrl;
+      });
+    }
+
+    function previewSpotPhoto(input) {
+      const file = input?.files?.[0];
+      if (!file || !file.type.startsWith('image/')) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        let dataUrl = e.target.result;
+        if (file.size > 500 * 1024) {
+          dataUrl = await compressImage(dataUrl, 1200, 0.8);
+        }
+        spotPhotoDataUrl = dataUrl;
+        const preview = document.getElementById('spotPhotoPreview');
+        const img = document.getElementById('spotPhotoImg');
+        if (preview && img) {
+          img.src = spotPhotoDataUrl;
+          preview.style.display = 'block';
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearSpotPhoto() {
+      spotPhotoDataUrl = null;
+      const input = document.getElementById('spotPhotoInput');
+      const preview = document.getElementById('spotPhotoPreview');
+      if (input) input.value = '';
+      if (preview) preview.style.display = 'none';
+    }
+
+    function editSpotById(id) {
+      const spot = spots.find(s => s.id === id);
+      if (!spot) return;
+      document.getElementById('spotModalTitle').innerHTML = '<i class="bi-pencil-square"></i> Edit Spot';
+      document.getElementById('spotId').value = spot.id;
+      document.getElementById('spotName').value = spot.name;
+      document.getElementById('spotCategory').value = spot.category;
+      document.getElementById('spotAddress').value = spot.address || '';
+      document.getElementById('spotLat').value = spot.lat;
+      document.getElementById('spotLng').value = spot.lng;
+      document.getElementById('spotNotes').value = spot.notes || '';
+      document.getElementById('spotTags').value = Array.isArray(spot.tags) ? spot.tags.join(', ') : (spot.tags || '');
+      document.getElementById('spotFavorite').checked = spot.favorite === true;
+      spotPhotoDataUrl = spot.imageUrl || null;
+      const preview = document.getElementById('spotPhotoPreview');
+      const img = document.getElementById('spotPhotoImg');
+      if (spot.imageUrl && preview && img) {
+        img.src = spot.imageUrl;
+        preview.style.display = 'block';
+      } else {
+        clearSpotPhoto();
+      }
+      $('#spotModal').modal('show');
+    }
+
+    function saveSpot() {
+      const id = document.getElementById('spotId').value;
+      const name = document.getElementById('spotName').value.trim();
+      const category = document.getElementById('spotCategory').value;
+      const address = document.getElementById('spotAddress').value.trim();
+      const lat = document.getElementById('spotLat').value;
+      const lng = document.getElementById('spotLng').value;
+      const notes = document.getElementById('spotNotes').value.trim();
+      const tagsStr = document.getElementById('spotTags').value.trim();
+      const tags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+      if (!name) {
+        alert('Name is required.');
+        return;
+      }
+      if (!lat || !lng) {
+        alert('Please select an address from the dropdown to get coordinates.');
+        return;
+      }
+
+      const btn = document.getElementById('spotSaveBtn');
+      btn.disabled = true;
+
+      const url = id ? `/api/local-spots/${id}` : '/api/local-spots';
+      const method = id ? 'PUT' : 'POST';
+      const imageUrl = spotPhotoDataUrl || (id ? (spots.find(s => s.id === id)?.imageUrl || null) : null);
+      const favorite = document.getElementById('spotFavorite').checked;
+      const body = JSON.stringify({ name, category, lat: parseFloat(lat), lng: parseFloat(lng), address: address || null, notes: notes || null, tags, imageUrl, favorite });
+
+      fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body })
+        .then(r => r.json())
+        .then((data) => {
+          if (data.success) {
+            $('#spotModal').modal('hide');
+            fetchSpots();
+          } else {
+            alert(data.error || 'Failed to save.');
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          alert('Failed to save spot.');
+        })
+        .finally(() => { btn.disabled = false; });
+    }
+
+    function deleteSpotById(id) {
+      if (!confirm('Delete this spot?')) return;
+      fetch(`/api/local-spots/${id}`, { method: 'DELETE' })
+        .then(r => r.json())
+        .then((data) => {
+          if (data.success) {
+            fetchSpots();
+          } else {
+            alert(data.error || 'Failed to delete.');
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          alert('Failed to delete spot.');
+        });
+    }
+
+    async function toggleFavoriteById(id) {
+      const spot = spots.find(s => s.id === id);
+      if (!spot) return;
+      const fav = !spot.favorite;
+      try {
+        const res = await fetch(`/api/local-spots/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ favorite: fav })
+        });
+        const data = await res.json();
+        if (data.success) {
+          spot.favorite = fav;
+          renderMarkers();
+          renderSpotList();
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function sortSpotsByDistance(arr, loc) {
+      arr.sort((a, b) => {
+        const dA = Math.hypot(a.lat - loc.lat, a.lng - loc.lng);
+        const dB = Math.hypot(b.lat - loc.lat, b.lng - loc.lng);
+        return dA - dB;
+      });
+    }
+
+    async function sortByNearby() {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported.');
+        return;
+      }
+      try {
+        const pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 10000 });
+        });
+        userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        sortSpotsByDistance(spots, userLocation);
+        renderSpotList();
+        renderMarkers();
+        if (map && spots.length) {
+          map.setCenter({ lat: userLocation.lat, lng: userLocation.lng });
+          map.setZoom(12);
+        }
+      } catch (e) {
+        alert('Could not get your location.');
+      }
+    }
+
+    function exportSpotsJson() {
+      const blob = new Blob([JSON.stringify({ spots }, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'local-spots.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function exportSpotsCsv() {
+      const headers = ['name', 'category', 'lat', 'lng', 'address', 'notes', 'tags', 'favorite'];
+      const rows = spots.map(s => [
+        `"${(s.name || '').replace(/"/g, '""')}"`,
+        s.category || '',
+        s.lat ?? '',
+        s.lng ?? '',
+        `"${(s.address || '').replace(/"/g, '""')}"`,
+        `"${(s.notes || '').replace(/"/g, '""')}"`,
+        `"${(Array.isArray(s.tags) ? s.tags.join(', ') : '').replace(/"/g, '""')}"`,
+        s.favorite ? '1' : '0'
+      ].join(','));
+      const csv = [headers.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'local-spots.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    async function importSpotsFile(input) {
+      const file = input?.files?.[0];
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const json = JSON.parse(text);
+        const arr = json.spots || (Array.isArray(json) ? json : []);
+        if (!arr.length) {
+          alert('No spots found in file.');
+          return;
+        }
+        const res = await fetch('/api/local-spots/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ spots: arr })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(`Imported ${data.imported} spots.`);
+          input.value = '';
+          fetchSpots();
+        } else {
+          alert(data.error || 'Import failed.');
+        }
+      } catch (e) {
+        alert('Invalid JSON file.');
+      }
+    }
+
+    function buildSpotPosterHtml(spot) {
+      const photoUrl = resolvePosterImageUrl(spot.imageUrl || 'https://via.placeholder.com/320x240/4a90a4/FFFFFF?text=' + encodeURIComponent(spot.name || 'Spot'));
+      const meta = [
+        spot.address ? `Address: ${spot.address}` : null,
+        spot.notes ? `Notes: ${spot.notes}` : null,
+        spot.tags?.length ? `Tags: ${spot.tags.join(', ')}` : null
+      ].filter(Boolean).map(r => `<div>${escapeHtml(r)}</div>`).join('');
+      return `
+        <img class="poster-cover" src="${photoUrl}" alt="${escapeHtml(spot.name)}" crossorigin="anonymous">
+        <div class="poster-body">
+          <div class="poster-title">${escapeHtml(spot.name)}</div>
+          <div class="poster-subtitle">${CATEGORY_LABELS[spot.category] || spot.category}</div>
+          <div class="poster-meta">${meta || '<div>My Local Spot</div>'}</div>
+          ${spot.notes ? `<div class="poster-section"><h6>Notes</h6><div>${escapeHtml(spot.notes)}</div></div>` : ''}
+        </div>
+      `;
+    }
+
+    function resolvePosterImageUrl(url) {
+      if (!url) return url;
+      if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+      if (url.startsWith('/') || url.startsWith(window.location.origin)) return url;
+      return `/api/poster-generator/proxy-image?url=${encodeURIComponent(url)}`;
+    }
+
+    function waitForPosterImages(container) {
+      const images = Array.from(container.querySelectorAll('img'));
+      return Promise.all(images.map(img => (
+        img.complete ? Promise.resolve() : new Promise(resolve => {
+          img.onload = () => resolve();
+          img.onerror = () => resolve();
+        })
+      )));
+    }
+
+    function openSpotPoster(id) {
+      const spot = spots.find(s => s.id === id);
+      if (!spot) return;
+      currentPosterSpot = spot;
+      spotPosterCanvas = null;
+      document.getElementById('posterContent').innerHTML = buildSpotPosterHtml(spot);
+      document.getElementById('posterShareLink').value = '';
+      $('#posterModal').modal('show');
+    }
+
+    async function getSpotPosterCanvas() {
+      if (spotPosterCanvas) return spotPosterCanvas;
+      const el = document.getElementById('posterContent');
+      await waitForPosterImages(el);
+      spotPosterCanvas = await window.posterUtils.renderPosterCanvas(el);
+      return spotPosterCanvas;
+    }
+
+    async function downloadSpotPosterPng() {
+      if (!currentPosterSpot) return;
+      const canvas = await getSpotPosterCanvas();
+      const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+      const safe = (currentPosterSpot.name || 'spot').replace(/[^a-z0-9]+/gi, '-');
+      window.posterUtils.downloadDataUrl(dataUrl, `spot-poster-${safe}.png`);
+    }
+
+    async function downloadSpotPosterPdf() {
+      if (!currentPosterSpot) return;
+      const canvas = await getSpotPosterCanvas();
+      const safe = (currentPosterSpot.name || 'spot').replace(/[^a-z0-9]+/gi, '-');
+      await window.posterUtils.downloadPdfFromCanvas(canvas, `spot-poster-${safe}.pdf`);
+    }
+
+    async function shareSpotPoster() {
+      if (!currentPosterSpot) return;
+      const btn = document.querySelector('#posterModal .btn-success');
+      if (btn) btn.disabled = true;
+      try {
+        const canvas = await getSpotPosterCanvas();
+        const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+        const title = `${currentPosterSpot.name} Poster`;
+        const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'local-spot');
+        const shareUrl = new URL(shareData.shareUrl, window.location.origin).toString();
+        const input = document.getElementById('posterShareLink');
+        if (input) input.value = shareUrl;
+
+        const safe = (currentPosterSpot.name || 'spot').replace(/[^a-z0-9]+/gi, '-');
+        let shared = false;
+        try {
+          shared = await window.posterUtils.sharePoster({
+            canvas,
+            title,
+            text: `Check out ${currentPosterSpot.name} - my local spot!`,
+            fileName: `${safe}.png`,
+            shareUrl
+          });
+        } catch (shareErr) {
+          console.warn('Native share failed:', shareErr);
+        }
+
+        if (!shared) {
+          if (input?.value && navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(input.value);
+            alert('Link copied to clipboard! Paste to share with friends.');
+          } else if (input?.value) {
+            input.select();
+            document.execCommand('copy');
+            alert('Link copied! Paste to share with friends.');
+          } else {
+            alert('Share link ready. Copy it to text or share.');
+          }
+        }
+      } catch (err) {
+        console.error('Share error:', err);
+        alert('Share failed: ' + (err.message || 'Please try again.'));
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    function copyPosterShareLink() {
+      const input = document.getElementById('posterShareLink');
+      if (input?.value) {
+        input.select();
+        document.execCommand('copy');
+        alert('Link copied!');
+      }
+    }
+
+    window.editSpotById = editSpotById;
+    window.deleteSpotById = deleteSpotById;
+    window.toggleFavoriteById = toggleFavoriteById;
+    window.openSpotPoster = openSpotPoster;
+
+    // Local Expert AI
+    function addLocalExpertMessage(role, content) {
+      const el = document.getElementById('localExpertMessages');
+      if (!el) return;
+      const div = document.createElement('div');
+      div.className = `ai-chat-message ${role}`;
+      div.innerHTML = `
+        <div class="ai-chat-message-avatar"><i class="bi-${role === 'user' ? 'person' : 'robot'}"></i></div>
+        <div class="ai-chat-message-content">${content.replace(/\n/g, '<br>')}</div>
+      `;
+      el.appendChild(div);
+      el.scrollTop = el.scrollHeight;
+    }
+
+    async function sendLocalExpertMessage(msg) {
+      const message = (typeof msg === 'string' ? msg : document.getElementById('localExpertInput')?.value?.trim()) || '';
+      if (!message) return;
+
+      addLocalExpertMessage('user', message);
+      document.getElementById('localExpertInput').value = '';
+      localExpertChatContext.push(message);
+
+      const loading = document.createElement('div');
+      loading.className = 'ai-chat-message assistant';
+      loading.innerHTML = '<div class="ai-chat-message-avatar"><i class="bi-robot"></i></div><div class="ai-chat-message-content">Thinking...</div>';
+      document.getElementById('localExpertMessages').appendChild(loading);
+
+      try {
+        const res = await fetch('/api/local-spots/ai/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, context: localExpertChatContext.slice(-6), spotsContext: spots })
+        });
+        const data = await res.json();
+        loading.remove();
+        addLocalExpertMessage('assistant', data.message || data.error || 'Sorry, I had trouble responding.');
+        if (data.message && localExpertSpeakResponses && typeof window.speakWithGoogle === 'function') {
+          window.speakWithGoogle(data.message.substring(0, 400), 'en-US-Standard-D', { speakingRate: 0.9 }).catch(() => {});
+        }
+      } catch (err) {
+        loading.remove();
+        addLocalExpertMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+      }
+    }
+
+    document.getElementById('localExpertSendBtn')?.addEventListener('click', () => sendLocalExpertMessage());
+    document.getElementById('localExpertInput')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); sendLocalExpertMessage(); }
+    });
+    document.getElementById('localExpertTtsBtn')?.addEventListener('click', () => {
+      localExpertSpeakResponses = !localExpertSpeakResponses;
+      document.getElementById('localExpertTtsBtn').classList.toggle('active', localExpertSpeakResponses);
+    });
+    document.getElementById('localExpertClearBtn')?.addEventListener('click', () => {
+      localExpertChatContext = [];
+      document.getElementById('localExpertMessages').innerHTML = '';
+      addLocalExpertMessage('assistant', 'Hi! I\'m your Local Expert. Ask me about thrift shops, taco trucks, gardens, bike trails, fishing, kayak spots, or concert venues!');
+    });
+
+    addLocalExpertMessage('assistant', 'Hi! I\'m your Local Expert. Ask me about thrift shops, taco trucks, gardens, bike trails, fishing, kayak spots, or concert venues!');
+
+    // Voice Control (tool8 standard) - sends commands to Local Expert AI
+    (function initVoiceControl() {
+      const voiceBtn = document.getElementById('voiceBtn');
+      const voiceStatus = document.getElementById('voiceStatus');
+      if (!voiceBtn || !voiceStatus) return;
+
+      let recognition = null;
+      let isListening = false;
+
+      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+        recognition.onstart = () => {
+          isListening = true;
+          voiceBtn.classList.add('listening');
+          voiceBtn.innerHTML = '<i class="bi-mic-mute"></i>';
+          voiceStatus.textContent = 'Listening...';
+          voiceStatus.classList.add('show', 'listening');
+        };
+        recognition.onresult = (e) => {
+          const cmd = e.results[0][0].transcript;
+          if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+          if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+          sendLocalExpertMessage(cmd);
+        };
+        recognition.onerror = () => { voiceStatus.textContent = 'Error'; voiceStatus.classList.remove('listening'); };
+        recognition.onend = () => {
+          isListening = false;
+          voiceBtn.classList.remove('listening');
+          voiceBtn.innerHTML = '<i class="bi-mic"></i>';
+          voiceStatus.textContent = 'Click to start voice control';
+          voiceStatus.classList.remove('listening');
+          setTimeout(() => voiceStatus.classList.remove('show'), 3000);
+        };
+      } else {
+        voiceStatus.textContent = 'Voice not supported';
+        voiceBtn.disabled = true;
+        voiceBtn.style.opacity = '0.5';
+        return;
+      }
+
+      voiceBtn.addEventListener('click', () => {
+        if (isListening) recognition.stop();
+        else recognition.start();
+      });
+    })();
+
+    loadGoogleMaps();
+  </script>
+</body>
+</html>

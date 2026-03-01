@@ -360,6 +360,9 @@ class ModernNavbar extends HTMLElement {
                   <a class="dropdown-item" href="/nature/tree-discovery.html">
                     <i class="bi-tree-fill"></i> Nature
                   </a>
+                  <a class="dropdown-item" href="/local/local-spots.html">
+                    <i class="bi-geo-alt-fill"></i> Local Spots
+                  </a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="/">
                     <i class="bi-house"></i> Hub (All Tools)
