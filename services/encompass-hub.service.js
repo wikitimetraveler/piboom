@@ -877,8 +877,8 @@ export async function fetchPipelineLoans(options = {}) {
   let response;
   try {
     response = await requestWithAuth({
-      method: 'patch',
-      url: `${API_BASE_URL}/loanPipeline`,
+      method: 'post',
+      url: `${API_V1_BASE}/loanPipeline`,
       data: {
         filter: {
           terms,
@@ -962,7 +962,7 @@ export async function writeLoanFields(loanId, fieldsPayload = []) {
 
   try {
     const response = await requestWithAuth({
-      method: 'patch',
+      method: 'post',
       url: `${API_V3_BASE}/loans/${encodeURIComponent(loanId)}/fieldWriter`,
       data: fieldsPayload,
     });
@@ -994,7 +994,7 @@ export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavi
 
   try {
     const response = await requestWithAuth({
-      method: 'patch',
+      method: 'post',
       url: `${API_V3_BASE}/loans/${encodeURIComponent(loanGuid)}/fieldReader`,
       params: { invalidFieldBehavior },
       data: fieldIds,
