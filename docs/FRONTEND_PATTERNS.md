@@ -57,6 +57,13 @@ The shared navbar (`public/shared/modern-navbar.js`) uses a hub-first structure 
 
 Additional tools (Parser, Mashup, Automator, Ruler, Transformer, Alchemist, Encompass Users, Risk Analysis, Grateful Dead Timeline, etc.) are reachable via **Finance Hub** (`/finance/index.html`) or **Hub** (`/`).
 
+### Global Tool Search
+
+- **Ctrl+K** (or Cmd+K on Mac) opens the tool search overlay from any page with the navbar.
+- **Search button** in the navbar also opens the overlay.
+- Search by tool name or keyword (e.g. "unit test", "encompass", "parser").
+- Tool index: `public/shared/tool-search-index.js` — add new tools here.
+
 ### Attributes
 
 | Attribute | Purpose |

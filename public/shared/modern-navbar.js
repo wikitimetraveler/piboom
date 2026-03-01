@@ -47,6 +47,19 @@ class ModernNavbar extends HTMLElement {
   connectedCallback() {
     this.render();
     this.attachEventListeners();
+    this.injectToolSearchScripts();
+  }
+
+  injectToolSearchScripts() {
+    if (window.openGlobalToolSearch) return;
+    const idx = document.createElement('script');
+    idx.src = '/shared/tool-search-index.js';
+    document.head.appendChild(idx);
+    idx.onload = () => {
+      const search = document.createElement('script');
+      search.src = '/shared/global-tool-search.js';
+      document.head.appendChild(search);
+    };
   }
 
   render() {
@@ -259,6 +272,14 @@ class ModernNavbar extends HTMLElement {
           </button>
           
           <div class="navbar-collapse">
+            <!-- Search (Ctrl+K) -->
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <button class="nav-link" id="navSearchBtn" type="button" aria-label="Search tools (Ctrl+K)" title="Search tools (Ctrl+K)" style="background:none;border:none;cursor:pointer;padding:0.35rem 0.75rem;">
+                  <i class="bi-search"></i> Search
+                </button>
+              </li>
+            </ul>
             <!-- User Login (LEFT SIDE) -->
             <ul class="navbar-nav">
               <li class="nav-item">
@@ -421,6 +442,13 @@ class ModernNavbar extends HTMLElement {
           menu.classList.remove('show');
         });
       }
+    });
+
+    // Search button (triggers global tool search)
+    const searchBtn = this.shadowRoot.querySelector('#navSearchBtn');
+    searchBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.dispatchEvent(new CustomEvent('open-tool-search', { bubbles: true }));
     });
 
     // User login button
