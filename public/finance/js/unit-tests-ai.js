@@ -78,7 +78,10 @@ function addAIMessage(role, content, timestamp = null, options = {}) {
       .catch(() => {});
   } else if (role === 'assistant' && options.speakResponse && content && 'speechSynthesis' in window) {
     const u = new SpeechSynthesisUtterance(content.substring(0, 500));
-    u.rate = 0.9;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+    u.rate = isMobile ? 1.0 : 0.9;
+    u.pitch = 1;
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(u);
   }
 }

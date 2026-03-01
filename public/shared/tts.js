@@ -61,11 +61,14 @@
 
   /** Call during user gesture to prime speechSynthesis on iOS (required for async speak) */
   function primeSpeechSynthesis() {
-    if (!('speechSynthesis' in window) || speechPrimed) return;
+    if (!('speechSynthesis' in window)) return;
     try {
       window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance('');
+      window.speechSynthesis.getVoices(); // Wake up iOS - voices empty until first call
+      const u = new SpeechSynthesisUtterance(' ');
       u.volume = 0;
+      u.rate = 1;
+      u.pitch = 1;
       window.speechSynthesis.speak(u);
       speechPrimed = true;
     } catch (e) {
@@ -75,6 +78,11 @@
 
   async function speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
     try {
+      // Mobile: prefer browser TTS - audio.play() often blocked without user gesture
+      if (isMobile()) {
+        return speakWithBrowser(text, options);
+      }
+
       if (currentAudio) {
         currentAudio.pause();
         currentAudio = null;
@@ -152,6 +160,10 @@
     return new Blob(byteArrays, { type: contentType });
   }
 
+  function isMobile() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+  }
+
   function speakWithBrowser(text, options = {}) {
     if (!('speechSynthesis' in window)) return false;
 
@@ -159,14 +171,15 @@
       window.speechSynthesis.cancel();
       try { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); } catch (_) {}
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = options.speakingRate || 1.0;
-      utterance.pitch = typeof options.pitch === 'number' ? options.pitch : 1.0;
+      // Mobile/iOS: use rate=1, pitch=1 for reliability (some iOS versions buggy with other values)
+      const mobile = isMobile();
+      utterance.rate = mobile ? 1.0 : (options.speakingRate || 1.0);
+      utterance.pitch = mobile ? 1.0 : (typeof options.pitch === 'number' ? options.pitch : 1.0);
       utterance.volume = typeof options.volume === 'number' ? options.volume : 0.8;
       const voices = window.speechSynthesis.getVoices();
-      const deep = voices.find(v =>
-        /male|daniel|david|alex/i.test(v.name)
-      );
+      const deep = voices.find(v => /male|daniel|david|alex/i.test(v.name));
       if (deep) utterance.voice = deep;
+      // Don't set voice if empty (iOS) - use default
       window.speechSynthesis.speak(utterance);
       return true;
     } catch (error) {

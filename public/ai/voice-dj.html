@@ -497,8 +497,11 @@
   <!-- DJ Response -->
   <div id="djResponseSection" style="display: none;">
     <div class="dj-response">
-      <div style="font-size: 1.3rem; font-weight: 600; color: #8bb9a6; margin-bottom: 15px;">
-        <i class="bi-vinyl-fill"></i> DJ Response
+      <div style="font-size: 1.3rem; font-weight: 600; color: #8bb9a6; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <span><i class="bi-vinyl-fill"></i> DJ Response</span>
+        <button id="tapToHearBtn" class="btn btn-sm btn-outline-success" style="display: none;" onclick="tapToHearResponse()" title="Tap to hear">
+          <i class="bi-volume-up-fill"></i> Tap to hear
+        </button>
       </div>
       <div class="dj-response-text" id="djResponseText">
         <!-- Response will appear here -->
@@ -543,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
     micBtn.addEventListener('touchstart', () => {
       if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
       if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
-    }, { passive: true });
+    }, { passive: true, capture: true });
   }
 
   // Initialize speech recognition
@@ -661,6 +664,12 @@ async function processVoiceCommand(command) {
       // Show DJ response
       document.getElementById('djResponseText').innerHTML = data.response;
       document.getElementById('djResponseSection').style.display = 'block';
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+      const tapBtn = document.getElementById('tapToHearBtn');
+      if (tapBtn) {
+        tapBtn.style.display = isMobile && data.response ? 'inline-block' : 'none';
+        tapBtn.dataset.responseText = data.response ? data.response.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+      }
       
       // Show results if any
       if (data.results && data.results.length > 0) {
@@ -720,6 +729,17 @@ function displayResults(results, type) {
   });
 }
 
+// Tap-to-hear fallback for mobile (user gesture required for iOS)
+function tapToHearResponse() {
+  const btn = document.getElementById('tapToHearBtn');
+  const text = btn && btn.dataset.responseText ? btn.dataset.responseText : '';
+  if (text) {
+    if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+    if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+    speakResponse(text);
+  }
+}
+
 // Speak response
 // Speak with Wolfman Dave's voice - deep, gravelly radio DJ style
 function speakResponse(text) {
@@ -749,9 +769,10 @@ function speakWithBrowser(cleanText) {
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
 
-    // WOLFMAN DAVE VOICE SETTINGS - Deep, gravelly radio DJ voice
-    utterance.rate = 0.85;      // Slightly slower, more dramatic
-    utterance.pitch = 0.65;     // Much lower pitch - deep gravelly voice
+    // Mobile/iOS: use rate=1, pitch=1 for reliability (some iOS versions buggy with other values)
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+    utterance.rate = isMobile ? 1.0 : 0.85;   // Slightly slower on desktop
+    utterance.pitch = isMobile ? 1.0 : 0.65;   // Deep gravelly on desktop
     utterance.volume = 1.0;     // Full volume for that radio presence
 
     // Try to find a deep male voice
@@ -897,11 +918,15 @@ async function showVoiceDJHistory() {
       // Show in DJ response section
       document.getElementById('djResponseText').innerHTML = historyHTML;
       document.getElementById('djResponseSection').style.display = 'block';
+      const tapBtn = document.getElementById('tapToHearBtn');
+      if (tapBtn) tapBtn.style.display = 'none';
       
       console.log(`✅ Displayed ${data.history.length} messages from history`);
     } else {
       document.getElementById('djResponseText').innerHTML = '<p style="color: #5a7370; text-align: center;">No conversation history found. Start talking to Wolfman Dave!</p>';
       document.getElementById('djResponseSection').style.display = 'block';
+      const tapBtn = document.getElementById('tapToHearBtn');
+      if (tapBtn) tapBtn.style.display = 'none';
     }
   } catch (error) {
     console.error('Error loading history:', error);
@@ -947,11 +972,15 @@ async function showVoiceDJStats() {
       
       document.getElementById('djResponseText').innerHTML = statsHTML;
       document.getElementById('djResponseSection').style.display = 'block';
+      const tapBtn = document.getElementById('tapToHearBtn');
+      if (tapBtn) tapBtn.style.display = 'none';
       
       console.log('📊 Stats displayed:', stats);
     } else {
       document.getElementById('djResponseText').innerHTML = '<p style="color: #5a7370; text-align: center;">No stats available yet. Start talking to Wolfman Dave!</p>';
       document.getElementById('djResponseSection').style.display = 'block';
+      const tapBtn = document.getElementById('tapToHearBtn');
+      if (tapBtn) tapBtn.style.display = 'none';
     }
   } catch (error) {
     console.error('Error getting stats:', error);
@@ -991,6 +1020,8 @@ async function clearVoiceDJHistory() {
       
       document.getElementById('djResponseText').innerHTML = clearHTML;
       document.getElementById('djResponseSection').style.display = 'block';
+      const tapBtn = document.getElementById('tapToHearBtn');
+      if (tapBtn) tapBtn.style.display = 'none';
       
       console.log('✅ Conversation history cleared for', userId);
     }

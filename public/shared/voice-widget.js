@@ -118,10 +118,10 @@ class VoiceWidget {
     `;
 
     this.button.addEventListener('click', () => this.toggleListening());
-    this.button.addEventListener('touchstart', () => {
+    this.button.addEventListener('touchstart', (e) => {
       if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
       if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
-    }, { passive: true });
+    }, { passive: true, capture: true });
     this.button.addEventListener('mouseenter', () => {
       if (!this.isListening) {
         this.button.style.transform = 'scale(1.1)';

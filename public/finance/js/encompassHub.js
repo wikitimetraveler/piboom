@@ -551,7 +551,8 @@ function speak(text) {
 function speakWithBrowser(text) {
   if (!('speechSynthesis' in window)) return;
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate = 0.95;
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+  utterance.rate = isMobile ? 1.0 : 0.95;
   utterance.pitch = 1;
   window.speechSynthesis.cancel();
   window.speechSynthesis.speak(utterance);

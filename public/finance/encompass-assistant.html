@@ -465,6 +465,9 @@
                     <button class="btn-voice" id="voiceButton" onclick="toggleVoiceRecognition()" title="Voice Input">
                         <i class="bi-mic" id="voiceIcon"></i>
                     </button>
+                    <button id="tapToHearBtn" class="btn btn-sm btn-outline-light ml-2" style="display: none;" onclick="tapToHearResponse()" title="Tap to hear">
+                        <i class="bi-volume-up-fill"></i> Tap to hear
+                    </button>
                     <button class="btn-send" id="sendButton" onclick="sendMessage()">
                         <i class="bi-arrow-right"></i>
                     </button>
@@ -741,6 +744,8 @@
             
             // Show typing indicator
             showTypingIndicator();
+            const tapBtn = document.getElementById('tapToHearBtn');
+            if (tapBtn) tapBtn.style.display = 'none';
             
             // Disable send button
             const sendButton = document.getElementById('sendButton');
@@ -763,6 +768,11 @@
                 if (response.ok) {
                     // Add AI response to chat
                     addMessage(data.message, 'ai', data.context);
+                    lastAiResponse = data.message || '';
+                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+                    const tapBtn = document.getElementById('tapToHearBtn');
+                    if (tapBtn) tapBtn.style.display = isMobile && lastAiResponse ? 'inline-block' : 'none';
+                    speakAiResponse(lastAiResponse);
                     
                     // Update chat history
                     chatHistory.push(message);
@@ -858,9 +868,39 @@
         window.toggleWelcomeAccordion = toggleWelcomeAccordion;
         window.toggleInstructionsAccordion = toggleInstructionsAccordion;
 
+        // Mobile TTS: tap-to-hear and priming
+        let lastAiResponse = '';
+        function tapToHearResponse() {
+            if (!lastAiResponse) return;
+            if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+            if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+            speakAiResponse(lastAiResponse);
+        }
+        function speakAiResponse(text) {
+            const clean = (text || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            if (!clean) return;
+            if (typeof window.speakWithGoogle === 'function') {
+                window.speakWithGoogle(clean.substring(0, 500), 'en-US-Standard-D', { speakingRate: 0.9 })
+                    .catch(() => {});
+            } else if ('speechSynthesis' in window) {
+                const u = new SpeechSynthesisUtterance(clean.substring(0, 500));
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+                u.rate = isMobile ? 1 : 0.9;
+                u.pitch = isMobile ? 1 : 1;
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(u);
+            }
+        }
+        window.tapToHearResponse = tapToHearResponse;
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initVoiceRecognition();
+            const vb = document.getElementById('voiceButton');
+            if (vb) vb.addEventListener('touchstart', function() {
+                if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+                if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+            }, { passive: true, capture: true });
             
             // Update date
             document.getElementById('dt').textContent = new Date().toLocaleDateString();
@@ -899,6 +939,7 @@
         });
     </script>
 
+    <script src="/shared/tts.js"></script>
     <script src="/shared/user-login.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>

@@ -987,8 +987,10 @@
             speakWithBrowser(text) {
                 if (this.synthesis) {
                     const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = 0.9;
+                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 768);
+                    utterance.rate = isMobile ? 1.0 : 0.9;
                     utterance.pitch = 1;
+                    this.synthesis.cancel();
                     this.synthesis.speak(utterance);
                 }
             }
