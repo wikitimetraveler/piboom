@@ -47,13 +47,17 @@ let lastRunCellResults = {}; // { 'rowIndex-field': 'pass'|'fail' } for cell sha
 const RECENT_RUNS_KEY = 'unitTestsRecentRuns';
 
 /**
- * Extract field ID from bracket notation (e.g., "[LOCKRATE.2866]" -> "LOCKRATE.2866")
+ * Extract field ID from bracket notation (e.g., "[LOCKRATE.2866]" -> "LOCKRATE.2866").
+ * Strips trailing "@" (Encompass date typecast) so API calls use the base field ID.
  */
 function extractFieldId(value) {
   if (!value) return null;
   const str = String(value).trim();
   const match = str.match(/\[([^\]]+)\]/);
-  return match ? match[1] : null;
+  if (!match) return null;
+  let id = match[1].trim();
+  if (id.endsWith('@')) id = id.slice(0, -1);
+  return id || null;
 }
 
 /**
@@ -872,16 +876,30 @@ function buildFieldWriterPayload(fieldId, value, row) {
   return payload;
 }
 
+function escapeCsvCell(val) {
+  const v = val === null || val === undefined ? '' : String(val);
+  return v.includes(',') || v.includes('"') || v.includes('\n') ? '"' + v.replace(/"/g, '""') + '"' : v;
+}
+
 function exportToCSV() {
-  if (!gridApi || typeof gridApi.exportDataAsCsv !== 'function') {
-    console.warn('CSV export unavailable');
+  if (!allData || allData.length === 0) {
+    console.warn('No data to export');
     return;
   }
-  const baseName = (currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '');
-  gridApi.exportDataAsCsv({
-    fileName: `${baseName}-export.csv`,
-    onlyFiltered: false,
-  });
+  const headers = columnDefs.filter((col) => col.field).map((col) => col.field);
+  if (headers.length === 0) headers.push(...Object.keys(allData[0] || {}));
+  const rows = allData;
+  const lines = [
+    headers.map(escapeCsvCell).join(','),
+    ...rows.map((r) => headers.map((h) => escapeCsvCell(r[h])).join(',')),
+  ];
+  const csv = lines.join('\n') + '\n';
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = ((currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '') + '-export.csv');
+  link.click();
+  URL.revokeObjectURL(link.href);
 }
 
 function exportToExcel() {
@@ -1475,6 +1493,9 @@ async function runTests(singleTestNumber) {
         const action = row.Action || row.action || '';
         const target = row.Target || row.target || '';
         const description = row.Description || row.description || '';
+
+        // Skip EOF marker row (X in Step column)
+        if (String(step).trim().toUpperCase() === 'X') continue;
 
         const fieldId = extractFieldId(target);
 

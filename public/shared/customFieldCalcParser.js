@@ -119,28 +119,17 @@
     const outField = outputField || fieldId;
     if (!outField) return null;
 
-    // Default: 5 scenarios with varied input values
-    const defaultScenarios = inputFields.length
-      ? [1, 2, 3, 4, 5].map(function (mult) {
-          return Object.fromEntries(inputFields.map(function (f, i) {
-            return [f, (i + 1) * mult * 2];
-          }));
-        })
-      : [{ '': 1 }];
-
-    const scenarioList = Array.isArray(scenarios) && scenarios.length > 0 ? scenarios : defaultScenarios;
-
+    // 5 scenarios — leave values blank; user fills in 100% of the time
+    const scenarioCount = 5;
     const headers = ['Step', 'Action', 'Target', 'Description', 'Test 1'];
-    if (scenarioList.length > 1) {
-      for (let i = 2; i <= scenarioList.length; i++) {
-        headers.push('Test ' + i);
-      }
+    for (let i = 2; i <= scenarioCount; i++) {
+      headers.push('Test ' + i);
     }
 
     const rows = [];
     let step = 1;
 
-    // SET rows: one per input field, with values from each scenario
+    // SET rows: one per input field — blank values for user to fill
     for (let k = 0; k < inputFields.length; k++) {
       const inputField = inputFields[k];
       const row = {
@@ -149,36 +138,36 @@
         Target: '[' + inputField + ']',
         Description: 'Set input ' + inputField + ' for calculated field [' + outField + ']',
       };
-      for (let idx = 0; idx < scenarioList.length; idx++) {
-        const vals = scenarioList[idx];
-        const col = 'Test ' + (idx + 1);
-        const keys = Object.keys(vals);
-        row[col] = vals[inputField] !== undefined ? vals[inputField] : (keys.length ? vals[keys[0]] : '');
+      for (let idx = 0; idx < scenarioCount; idx++) {
+        row['Test ' + (idx + 1)] = '';
       }
       rows.push(row);
       step++;
     }
 
-    // COMPARE row: expected result for each scenario
+    // COMPARE row — blank expected values for user to fill
     const compareRow = {
       Step: step,
       Action: 'COMPARE',
       Target: '[' + outField + ']',
       Description: 'Verify calculated result for [' + outField + '] = ' + expression,
     };
-    for (let idx = 0; idx < scenarioList.length; idx++) {
-      const vals = scenarioList[idx];
-      const col = 'Test ' + (idx + 1);
-      const expected = evaluateSimpleExpression(expression, vals);
-      compareRow[col] = expected !== null ? expected : '';
+    for (let idx = 0; idx < scenarioCount; idx++) {
+      compareRow['Test ' + (idx + 1)] = '';
     }
     rows.push(compareRow);
 
-    const testDescriptions = scenarioList.map(function (vals, idx) {
-      const parts = inputFields.map(function (f) { return '[' + f + ']=' + (vals[f] !== undefined ? vals[f] : '?'); });
+    // EOF marker row (X in Step, Test Results in Description) for export
+    const eofRow = {};
+    headers.forEach((h) => { eofRow[h] = ''; });
+    eofRow['Step'] = 'X';
+    eofRow['Description'] = 'Test Results';
+    rows.push(eofRow);
+
+    const testDescriptions = Array.from({ length: scenarioCount }, function (_, idx) {
       return {
         testNumber: String(idx + 1),
-        description: 'Inputs: ' + parts.join(', ') + ' → [' + outField + ']',
+        description: 'Scenario ' + (idx + 1),
       };
     });
 
