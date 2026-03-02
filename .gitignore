@@ -16,7 +16,6 @@ google-credentials.json
 *.json
 !package.json
 !package-lock.json
-!data/local-spots.json
 
 # Logs
 logs
