@@ -5,6 +5,7 @@ const uploadArea = document.getElementById('uploadArea');
 const unitTestsGrid = document.getElementById('unitTestsGrid');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 const exportExcelBtn = document.getElementById('exportExcelBtn');
+const scanSetFieldsBtn = document.getElementById('scanSetFieldsBtn');
 const clearAndReloadBtn = document.getElementById('clearAndReloadBtn');
 const runTestsBtn = document.getElementById('runTestsBtn');
 const clearBtn = document.getElementById('clearBtn');
@@ -1978,6 +1979,7 @@ function clearData() {
   if (exportCsvBtn) exportCsvBtn.style.display = 'none';
   if (exportExcelBtn) exportExcelBtn.style.display = 'none';
   if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'none';
+  if (scanSetFieldsBtn) scanSetFieldsBtn.style.display = 'none';
   runTestsBtn.style.display = 'none';
   clearBtn.style.display = 'none';
   testResultsContainer.style.display = 'none';
@@ -2114,6 +2116,7 @@ async function handleFileUpload(file) {
     if (exportCsvBtn) exportCsvBtn.style.display = 'inline-block';
     if (exportExcelBtn) exportExcelBtn.style.display = 'inline-block';
     if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'inline-block';
+    if (scanSetFieldsBtn) scanSetFieldsBtn.style.display = 'inline-block';
     runTestsBtn.style.display = 'inline-block';
     clearBtn.style.display = 'inline-block';
     if (stickyActionBar) {
@@ -2512,6 +2515,7 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
   if (exportCsvBtn) exportCsvBtn.style.display = 'inline-block';
   if (exportExcelBtn) exportExcelBtn.style.display = 'inline-block';
   if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'inline-block';
+  if (scanSetFieldsBtn) scanSetFieldsBtn.style.display = 'inline-block';
   runTestsBtn.style.display = 'inline-block';
   if (clearBtn) clearBtn.style.display = 'inline-block';
   if (stickyActionBar) stickyActionBar.style.display = 'flex';
@@ -2537,6 +2541,126 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
 
   updateResultsMeta();
   setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
+}
+
+/**
+ * Initialize Scan SET Fields button and modal.
+ * Scans SET rows for read-only or calculated fields that will fail if not addressed.
+ */
+function initializeScanSetFields() {
+  const btn = scanSetFieldsBtn;
+  const modal = document.getElementById('scanSetFieldsModal');
+  const statusEl = document.getElementById('scanSetFieldsStatus');
+  const resultsEl = document.getElementById('scanSetFieldsResults');
+
+  if (!btn || !modal || !resultsEl) return;
+
+  btn.addEventListener('click', async () => {
+    if (!allData || allData.length === 0) {
+      showToast('Load or generate a test first', 'warning');
+      return;
+    }
+
+    const setRows = allData.filter((r) => {
+      const action = String(r.Action || r.action || '').trim().toUpperCase();
+      return action === 'SET';
+    });
+    if (setRows.length === 0) {
+      if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
+        window.$(modal).modal('show');
+      } else {
+        modal.classList.add('show');
+        modal.style.display = 'block';
+      }
+      statusEl.textContent = 'No SET rows found in this test.';
+      resultsEl.innerHTML = '<p class="text-muted small mb-0">No action needed.</p>';
+      return;
+    }
+
+    statusEl.textContent = 'Loading field metadata from Encompass...';
+    resultsEl.innerHTML = '';
+    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
+      window.$(modal).modal('show');
+    } else {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
+
+    try {
+      const [customRes, nativeRes] = await Promise.all([
+        fetch('/api/encompass-hub/custom-fields'),
+        fetch('/api/encompass-hub/native-fields'),
+      ]);
+      const customItems = customRes.ok
+        ? (await customRes.json())
+        : [];
+      const customList = Array.isArray(customItems) ? customItems : customItems.items || customItems.fields || [];
+      const nativeItems = nativeRes.ok
+        ? (await nativeRes.json())
+        : [];
+      const nativeList = Array.isArray(nativeItems) ? nativeItems : nativeItems.items || nativeItems.fields || nativeItems.standardFields || [];
+
+      const fieldMeta = {};
+      const addMeta = (item, source) => {
+        const id = String(item.fieldId || item.id || item.Id || item.fieldName || item.name || '').trim();
+        if (!id) return;
+        const baseId = id.replace(/^[@#]+/, '');
+        const readOnly = !!(item.readOnly ?? item.isReadOnly ?? false);
+        const isCalc = !!(item.isCalculatedField ?? item.isCalculated ?? item.calculated ?? item.isCalculation ?? false);
+        for (const key of [baseId, id]) {
+          if (!key) continue;
+          if (!fieldMeta[key]) fieldMeta[key] = { id: baseId, readOnly: false, isCalculated: false, source: '' };
+          fieldMeta[key].readOnly = fieldMeta[key].readOnly || readOnly;
+          fieldMeta[key].isCalculated = fieldMeta[key].isCalculated || isCalc;
+          if (!fieldMeta[key].source) fieldMeta[key].source = source;
+        }
+      };
+      customList.forEach((item) => addMeta(item, 'custom'));
+      nativeList.forEach((item) => addMeta(item, 'native'));
+
+      const problems = [];
+      const checked = new Set();
+      setRows.forEach((row) => {
+        const target = row.Target || row.target || '';
+        const fid = extractFieldId(target);
+        if (!fid || checked.has(fid)) return;
+        checked.add(fid);
+        const meta = fieldMeta[fid];
+        if (!meta) return;
+        if (meta.readOnly || meta.isCalculated) {
+          problems.push({
+            step: row.Step,
+            target: target,
+            fieldId: fid,
+            reason: meta.readOnly && meta.isCalculated ? 'Read-only and Calculated' : meta.readOnly ? 'Read-only' : 'Calculated',
+            description: row.Description || row.description || '',
+          });
+        }
+      });
+
+      statusEl.textContent = '';
+      if (problems.length === 0) {
+        resultsEl.innerHTML = '<p class="text-success mb-0"><i class="bi-check-circle mr-1"></i>No read-only or calculated fields found in SET rows. All SET targets should work.</p>';
+        return;
+      }
+
+      let html = '<div class="alert alert-warning mb-3"><strong>' + problems.length + ' field(s) will fail SET operations:</strong></div>';
+      html += '<ul class="list-group">';
+      problems.forEach((p) => {
+        html += '<li class="list-group-item d-flex flex-column align-items-start">';
+        html += '<span class="font-weight-bold text-danger">Step ' + (p.step || '?') + ': ' + (p.target || p.fieldId) + '</span>';
+        html += '<span class="badge badge-warning mt-1">' + (p.reason || '') + '</span>';
+        if (p.description) html += '<small class="text-muted mt-1">' + (p.description || '').replace(/</g, '&lt;') + '</small>';
+        html += '</li>';
+      });
+      html += '</ul>';
+      html += '<p class="text-muted small mt-3 mb-0">Remove or change these SET steps, or use fields that are writable.</p>';
+      resultsEl.innerHTML = html;
+    } catch (err) {
+      statusEl.textContent = '';
+      resultsEl.innerHTML = '<p class="text-danger mb-0">Error: ' + (err.message || 'Failed to scan') + '</p>';
+    }
+  });
 }
 
 /**
@@ -2769,6 +2893,7 @@ function initializeGenerateFromCustomField() {
 document.addEventListener('DOMContentLoaded', () => {
   initializeGrid();
   initializeVoiceWidget();
+  initializeScanSetFields();
   initializeGenerateFromCustomField();
   updateLoanGuidChipDisplay(currentLoanGuid);
   renderRecentRunsSelect();

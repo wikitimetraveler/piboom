@@ -1326,6 +1326,12 @@
         opacity: 0.7;
       }
 
+      /* Scan SET Fields button - more visible when shown */
+      .scan-set-fields-btn {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
       /* Custom field combobox - editable input + dropdown */
       .custom-field-combobox-wrapper .input-group {
         border-radius: 8px;
@@ -1458,6 +1464,33 @@
             <button class="btn btn-outline-primary btn-sm" id="generateFromCustomFieldBtn" title="Generate unit test from an Encompass custom field with a calculation">
               <i class="bi-magic"></i> Generate from Custom Field
             </button>
+            <button class="btn btn-outline-warning btn-sm scan-set-fields-btn" id="scanSetFieldsBtn" style="display: none;" title="Scan SET rows for read-only or calculated fields that will fail if not addressed">
+              <i class="bi-exclamation-triangle"></i> Scan SET Fields
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scan SET Fields Modal -->
+    <div class="modal fade" id="scanSetFieldsModal" tabindex="-1" role="dialog" aria-labelledby="scanSetFieldsModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="scanSetFieldsModalLabel">
+              <i class="bi-exclamation-triangle text-warning mr-2"></i>SET Fields Scan
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted mb-3">Fields marked read-only or calculated cannot be set via the API and will cause test failures.</p>
+            <div id="scanSetFieldsStatus" class="mb-2 small text-muted"></div>
+            <div id="scanSetFieldsResults" class="mb-0"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
           </div>
         </div>
       </div>
