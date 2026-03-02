@@ -160,7 +160,10 @@ const processPostmanCollections = async () => {
   const jsonFiles = entries.filter((name) => name.toLowerCase().endsWith('.json'));
   if (jsonFiles.length === 0) {
     warn('No Postman collection JSON files found.');
+    return;
   }
+
+  log(`Indexing Postman: ${jsonFiles.join(', ')}`);
 
   for (const file of jsonFiles) {
     const absPath = path.join(postmanDir, file);
@@ -284,7 +287,9 @@ const main = async () => {
   };
 
   await fsp.writeFile(OUTPUT_FILE, JSON.stringify(payload, null, 2), 'utf8');
+  const postmanCount = records.filter((r) => r.category === 'Postman Collection').length;
   log(`Wrote ${records.length} knowledge records to ${OUTPUT_FILE}`);
+  if (postmanCount > 0) log(`  Postman: ${postmanCount} requests | Repos: ${payload.counts.code_reference || 0} | Docs: ${payload.counts.official_doc || 0}`);
 };
 
 main().catch((err) => {

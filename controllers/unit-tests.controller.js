@@ -52,18 +52,19 @@ export async function saveTestExecution(req, res) {
 /**
  * Get test executions for a file
  * GET /api/unit-tests/executions?fileName=...
+ * Returns empty executions on DB failure so the UI can still load.
  */
 export async function getTestExecutions(req, res) {
+  const { fileName } = req.query;
+
+  if (!fileName) {
+    return res.status(400).json({ error: 'fileName query parameter is required' });
+  }
+
   try {
     const pool = getPool();
     if (!pool) {
-      return res.status(503).json({ error: 'Database not available' });
-    }
-
-    const { fileName } = req.query;
-
-    if (!fileName) {
-      return res.status(400).json({ error: 'fileName query parameter is required' });
+      return res.json({ success: true, executions: {}, dbUnavailable: true });
     }
 
     const result = await pool.query(`
@@ -97,10 +98,8 @@ export async function getTestExecutions(req, res) {
     });
   } catch (error) {
     console.error('Error getting test executions:', error);
-    return res.status(500).json({ 
-      error: 'Failed to get test executions',
-      message: error.message 
-    });
+    // Return empty executions so UI still loads; don't fail the page
+    return res.json({ success: true, executions: {}, dbUnavailable: true });
   }
 }
 

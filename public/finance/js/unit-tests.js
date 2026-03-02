@@ -48,7 +48,7 @@ const RECENT_RUNS_KEY = 'unitTestsRecentRuns';
 
 /**
  * Extract field ID from bracket notation (e.g., "[LOCKRATE.2866]" -> "LOCKRATE.2866").
- * Strips trailing "@" (Encompass date typecast) so API calls use the base field ID.
+ * Strips leading "@" (date typecast) and "#" (number typecast) so API calls use the base field ID.
  */
 function extractFieldId(value) {
   if (!value) return null;
@@ -56,7 +56,7 @@ function extractFieldId(value) {
   const match = str.match(/\[([^\]]+)\]/);
   if (!match) return null;
   let id = match[1].trim();
-  if (id.endsWith('@')) id = id.slice(0, -1);
+  id = id.replace(/^[@#]+/, '');
   return id || null;
 }
 
@@ -66,6 +66,73 @@ function extractFieldId(value) {
 function hasFieldId(value) {
   return extractFieldId(value) !== null;
 }
+
+/**
+ * Get raw field ID from Target (with @ or # prefix) for type inference.
+ * e.g. "[@748]" -> "@748", "[748]" -> "748"
+ */
+function getRawFieldIdFromTarget(target) {
+  if (!target) return null;
+  const match = String(target).trim().match(/\[([^\]]+)\]/);
+  return match ? match[1].trim() : null;
+}
+
+/**
+ * Custom date picker cell editor - uses HTML5 date/time inputs for reliable date picker.
+ * AG Grid's agDateStringCellEditor can be unreliable; this ensures date picker always works.
+ */
+function DatePickerCellEditor() {}
+DatePickerCellEditor.prototype.init = function(params) {
+  this.params = params;
+  const cp = params.cellEditorParams || params;
+  this.includeTime = !!(cp.includeTime);
+  const val = params.value;
+  let datePart = '';
+  let timePart = '00:00';
+  if (val && String(val).trim()) {
+    const s = String(val).trim();
+    const isoMatch = s.match(/^(\d{4}-\d{2}-\d{2})/);
+    const usMatch = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    const tmMatch = s.match(/T(\d{2}:\d{2}(?::\d{2})?)/) || s.match(/\s+(\d{1,2}:\d{2}(?::\d{2})?)/);
+    if (isoMatch) datePart = isoMatch[1];
+    else if (usMatch) datePart = usMatch[3] + '-' + usMatch[1].padStart(2, '0') + '-' + usMatch[2].padStart(2, '0');
+    timePart = tmMatch ? tmMatch[1] : '00:00';
+  }
+  this.gui = document.createElement('div');
+  this.gui.className = 'ag-cell-edit-input date-picker-cell-editor';
+  this.gui.style.display = 'flex';
+  this.gui.style.gap = '4px';
+  this.gui.style.alignItems = 'center';
+  this.gui.style.padding = '2px';
+  this.gui.style.minWidth = '140px';
+  this.dateInput = document.createElement('input');
+  this.dateInput.type = 'date';
+  this.dateInput.value = datePart;
+  this.dateInput.style.flex = '1';
+  this.dateInput.min = cp.min || '1900-01-01';
+  this.dateInput.max = cp.max || '2100-12-31';
+  this.gui.appendChild(this.dateInput);
+  if (this.includeTime) {
+    this.timeInput = document.createElement('input');
+    this.timeInput.type = 'time';
+    this.timeInput.value = timePart;
+    this.timeInput.step = '1';
+    this.timeInput.style.width = '90px';
+    this.gui.appendChild(this.timeInput);
+  }
+};
+DatePickerCellEditor.prototype.getGui = function() { return this.gui; };
+DatePickerCellEditor.prototype.getValue = function() {
+  const d = this.dateInput.value;
+  if (!d) return '';
+  return this.includeTime && this.timeInput
+    ? d + 'T' + (this.timeInput.value || '00:00:00')
+    : d;
+};
+DatePickerCellEditor.prototype.afterGuiAttached = function() {
+  this.dateInput.focus();
+};
+DatePickerCellEditor.prototype.destroy = function() {};
 
 function setStatus(text, status = 'info', icon = 'bi-info-circle') {
   statusChip.className = `status-chip ${status}`;
@@ -417,6 +484,7 @@ function generateColumnDefs(headers, rows) {
     if (headerLower === 'step' || index === 0) {
       colDef.minWidth = 60;
       colDef.width = 70;
+      colDef.editable = true;
       colDef.cellClass = 'step-cell';
       colDef.headerClass = 'step-header';
       // If it's numeric, treat as step number
@@ -437,6 +505,7 @@ function generateColumnDefs(headers, rows) {
     if (headerLower.includes('target')) {
       colDef.minWidth = 200;
       colDef.width = 220;
+      colDef.editable = true;
       colDef.headerClass = 'target-header';
       colDef.cellClass = 'target-cell';
       // Extract and highlight field IDs in brackets
@@ -486,14 +555,63 @@ function generateColumnDefs(headers, rows) {
       colDef.cellStyle = { whiteSpace: 'normal', lineHeight: '1.5' };
     }
     
-    // Special handling for Test columns - contain values for SET/COMPARE; editable for those rows
+    // Special handling for Test columns - all cells editable; type-aware editors from row metadata
     if (isTestColumn) {
       colDef.minWidth = 90;
       colDef.width = 110;
       colDef.headerClass = 'test-scenario-column';
-      colDef.editable = (params) => {
-        const action = (params.data && params.data.Action) ? String(params.data.Action).trim().toUpperCase() : '';
-        return action === 'SET' || action === 'COMPARE';
+      colDef.editable = true;
+      // Type-aware cell editors based on row metadata (from Encompass field definitions)
+      colDef.cellEditorSelector = (params) => {
+        let meta = params.data && params.data._fieldMetadata;
+        if (!meta && params.data && params.data.Target && typeof currentFieldMetadata === 'object') {
+          const fieldId = extractFieldId(params.data.Target);
+          meta = fieldId ? (currentFieldMetadata[fieldId] || currentFieldMetadata[params.data.Target]) : null;
+        }
+        // Infer from field ID suffix (.DT, .date, .dttm) when no API metadata
+        if (!meta && params.data && params.data.Target) {
+          const fieldId = extractFieldId(params.data.Target);
+          const inferred = fieldId && window.customFieldCalcParser?.inferDateTypeFromFieldId?.(fieldId);
+          if (inferred) meta = inferred;
+        }
+        // Infer from @ notation in Target (e.g. [@748] = date/DateTime) - Excel rows lack _fieldMetadata
+        if (!meta && params.data && params.data.Target && window.customFieldCalcParser?.isDateFieldByNotation) {
+          const rawId = getRawFieldIdFromTarget(params.data.Target);
+          if (rawId && window.customFieldCalcParser.isDateFieldByNotation(rawId)) {
+            const desc = String(params.data.Description || '').toLowerCase();
+            meta = desc.includes('(datetime)')
+              ? { dataType: 'DateTime', format: '', description: 'DateTime (from @)' }
+              : { dataType: 'Date', format: '', description: 'Date (from @)' };
+          }
+        }
+        // Fallback: parse Description for (DateTime) or (Date) or datetime/date keywords
+        if (!meta && params.data && params.data.Description) {
+          const desc = String(params.data.Description || '').toLowerCase();
+          if (desc.includes('(datetime)') || /\bdatetime\b/.test(desc)) meta = { dataType: 'DateTime', format: '', description: 'DateTime (from Description)' };
+          else if (desc.includes('(date)') || /\bdate\b/.test(desc)) meta = { dataType: 'Date', format: '', description: 'Date (from Description)' };
+        }
+        const dt = (meta && meta.dataType) ? String(meta.dataType).toLowerCase() : '';
+        if (/integer/i.test(dt)) {
+          return { component: 'agNumberCellEditor', params: { precision: 0, step: 1 } };
+        }
+        if (/decimal|number/i.test(dt) || (meta?.format && String(meta.format).toLowerCase().includes('decimal'))) {
+          return { component: 'agNumberCellEditor', params: { precision: 2 } };
+        }
+        if (/date|datetime/i.test(dt) || (meta?.format && String(meta.format).toLowerCase().includes('date'))) {
+          const isDateTime = /datetime/i.test(dt);
+          return {
+            component: 'DatePickerCellEditor',
+            params: {
+              min: '1900-01-01',
+              max: '2100-12-31',
+              includeTime: !!isDateTime,
+            },
+          };
+        }
+        if (/boolean|yesno/i.test(dt)) {
+          return { component: 'agSelectCellEditor', params: { values: ['Y', 'N'] } };
+        }
+        return null; // default text editor
       };
       colDef.cellClass = (params) => {
         let cls = 'test-scenario-cell';
@@ -530,10 +648,10 @@ function generateColumnDefs(headers, rows) {
         return `<span class="test-value-text" title="Test value for Set operation">${value}</span>`;
       };
       
-      // Tooltip to indicate these are Set/Compare values (editable for SET and COMPARE rows)
+      // Tooltip to indicate these are test values (all editable; Target column is overwritten by API)
       colDef.tooltipValueGetter = (params) => {
-        if (!params.value) return 'Empty - Click to edit (SET/COMPARE rows)';
-        return `Test Value: ${params.value}\n\nEditable for SET and COMPARE rows`;
+        if (!params.value) return 'Empty - Click to edit';
+        return `Test Value: ${params.value}\n\nAll cells editable. Target column values are overwritten by API.`;
       };
       
       // Make test columns searchable
@@ -546,6 +664,9 @@ function generateColumnDefs(headers, rows) {
     if (headerLower === 'action') {
       colDef.minWidth = 90;
       colDef.width = 100;
+      colDef.editable = true;
+      colDef.cellEditor = 'agSelectCellEditor';
+      colDef.cellEditorParams = { values: ['GET', 'SET', 'COMPARE'] };
       colDef.cellClass = 'action-cell';
       colDef.headerClass = 'action-header';
       // Add cell renderer to style different action types
@@ -582,11 +703,14 @@ function initializeGrid() {
   const gridOptions = {
     columnDefs: columnDefs,
     rowData: [],
+    components: { DatePickerCellEditor: DatePickerCellEditor },
     theme: 'legacy',
+    singleClickEdit: true,
     defaultColDef: {
       sortable: true,
       filter: true,
       resizable: true,
+      editable: true,
       minWidth: 90,
       width: 120,
     },
@@ -1338,24 +1462,28 @@ async function saveTestExecutionToDatabase(fileName, testNumber, testedBy) {
 }
 
 /**
- * Load test executions from database
+ * Load test executions from database.
+ * Returns { executions, dbUnavailable } - dbUnavailable true when DB was unreachable.
  */
 async function loadTestExecutionsFromDatabase(fileName) {
-  if (!fileName) return {};
+  if (!fileName) return { executions: {}, dbUnavailable: false };
 
   try {
     const response = await fetch(`/api/unit-tests/executions?fileName=${encodeURIComponent(fileName)}`);
 
     if (!response.ok) {
-      console.error('Failed to load test executions');
-      return {};
+      console.warn('Test executions unavailable, using empty state');
+      return { executions: {}, dbUnavailable: true };
     }
 
     const result = await response.json();
-    return result.executions || {};
+    return {
+      executions: result.executions || {},
+      dbUnavailable: !!result.dbUnavailable
+    };
   } catch (error) {
-    console.error('Error loading test executions:', error);
-    return {};
+    console.warn('Error loading test executions:', error);
+    return { executions: {}, dbUnavailable: true };
   }
 }
 
@@ -1368,14 +1496,23 @@ const OVERALL_SIGNOFF_TESTERS = [
 
 /**
  * Display Overall Test Sign-off section (file-level, one sign-off per tester with timestamp)
+ * @param {object} executions - { overall: { DEVELOPER: { testedAt }, ... } }
+ * @param {boolean} [dbUnavailable] - when true, show hint that DB was unreachable
  */
-function displayOverallSignOff(executions) {
+function displayOverallSignOff(executions, dbUnavailable) {
   const container = document.getElementById('overallSignOffContainer');
   if (!container) return;
 
   const overall = (executions && executions['overall']) || {};
 
   container.innerHTML = '';
+
+  if (dbUnavailable) {
+    const hint = document.createElement('div');
+    hint.className = 'text-muted small mb-2';
+    hint.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Database temporarily unavailable — sign-off status may be outdated';
+    container.appendChild(hint);
+  }
 
   OVERALL_SIGNOFF_TESTERS.forEach(({ value, label }) => {
     const exec = overall[value];
@@ -1411,7 +1548,7 @@ function displayOverallSignOff(executions) {
         btn.textContent = 'Saving...';
         const result = await saveTestExecutionToDatabase(currentFileName, 'overall', value);
         if (result && result.execution) {
-          displayOverallSignOff({ ...(executions || {}), overall: { ...(overall || {}), [value]: { testedAt: result.execution.tested_at } } });
+          displayOverallSignOff({ ...(executions || {}), overall: { ...(overall || {}), [value]: { testedAt: result.execution.tested_at } } }, false);
         } else {
           btn.disabled = false;
           btn.innerHTML = '<i class="bi-check2"></i> Confirm';
@@ -1954,7 +2091,7 @@ async function handleFileUpload(file) {
     currentFileName = parsedFileName;
     
     // Load test executions from database
-    const executions = await loadTestExecutionsFromDatabase(parsedFileName);
+    const execResult = await loadTestExecutionsFromDatabase(parsedFileName);
 
     // Ensure accordion container is visible for grid/scenarios
     const accordionContainer = document.getElementById('accordionContainer');
@@ -1963,7 +2100,7 @@ async function handleFileUpload(file) {
     }
 
     // Display Overall Test Sign-off (file-level; always show when file is loaded)
-    displayOverallSignOff(executions);
+    displayOverallSignOff(execResult.executions, execResult.dbUnavailable);
 
     // Display test descriptions (scenarios) if available
     if (testDescriptions && testDescriptions.length > 0) {
@@ -2322,13 +2459,22 @@ function speakWithBrowser(text) {
   window.speechSynthesis.speak(utterance);
 }
 
+/** Field metadata from Encompass (dataType, format, description) keyed by field ID. Used for scenario builder. */
+let currentFieldMetadata = {};
+
 /**
  * Load generated unit test data (from custom field calculation) into the grid.
  * Mirrors handleFileUpload flow but for programmatically generated data.
+ * @param {string[]} headers
+ * @param {object[]} rows
+ * @param {object[]} testDescriptions
+ * @param {string} sourceName
+ * @param {Record<string,{dataType,format,description}>} [fieldMetadata] - optional Encompass field metadata
  */
-function loadGeneratedTestData(headers, rows, testDescriptions, sourceName) {
+function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fieldMetadata) {
   if (!rows || rows.length === 0) return;
 
+  currentFieldMetadata = fieldMetadata || {};
   columnDefs = generateColumnDefs(headers, rows);
   allData = rows;
   lastRunCellResults = {};
@@ -2352,8 +2498,8 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName) {
   const accordionContainer = document.getElementById('accordionContainer');
   if (accordionContainer) accordionContainer.style.display = 'block';
 
-  loadTestExecutionsFromDatabase(currentFileName).then((executions) => {
-    displayOverallSignOff(executions);
+  loadTestExecutionsFromDatabase(currentFileName).then((result) => {
+    displayOverallSignOff(result.executions, result.dbUnavailable);
   });
 
   if (testDescriptions && testDescriptions.length > 0) {
@@ -2411,6 +2557,8 @@ function initializeGenerateFromCustomField() {
   if (!btn || !modal || !searchInput || !hiddenSelect || !dropdown) return;
 
   let calculatedFields = [];
+  let cachedCustomFieldsForMetadata = [];
+  let cachedNativeFieldsForMetadata = [];
 
   function getFieldDisplay(f) {
     const id = f.fieldId || f.id || f.Id || f.fieldName || f.name || '';
@@ -2437,12 +2585,23 @@ function initializeGenerateFromCustomField() {
         item.className = 'custom-field-dropdown-item';
         item.setAttribute('data-field-id', id);
         item.innerHTML = `<span class="field-id">[${id}]</span><span class="field-calc">${(calc || '(no calculation)').replace(/</g, '&lt;')}</span>`;
-        item.addEventListener('click', () => {
+        const selectField = () => {
           hiddenSelect.value = id;
           searchInput.value = id ? `[${id}] ${calc || ''}` : '';
           dropdown.style.display = 'none';
           updatePreview();
+        };
+        // Use mousedown so selection runs before input blur hides dropdown (mousedown fires before blur)
+        item.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          selectField();
         });
+        // Touch: touchstart fires before blur; handle tap to select
+        item.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          selectField();
+        }, { passive: false });
         dropdown.appendChild(item);
       });
     }
@@ -2462,7 +2621,10 @@ function initializeGenerateFromCustomField() {
       confirmBtn.disabled = true;
       return;
     }
-    const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field);
+    const fieldMetadata = window.customFieldCalcParser.buildFieldMetadataLookup
+      ? window.customFieldCalcParser.buildFieldMetadataLookup(cachedCustomFieldsForMetadata, cachedNativeFieldsForMetadata)
+      : {};
+    const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field, { fieldMetadata });
     if (!result) {
       preview.style.display = 'none';
       confirmBtn.disabled = true;
@@ -2503,6 +2665,7 @@ function initializeGenerateFromCustomField() {
   searchInput.addEventListener('blur', (e) => {
     const related = e.relatedTarget;
     if (related && (related === dropdownToggle || dropdown.contains(related))) return;
+    // Delay hide to allow mousedown on dropdown item to fire first (mousedown fires before blur)
     setTimeout(() => { dropdown.style.display = 'none'; }, 200);
   });
 
@@ -2536,11 +2699,15 @@ function initializeGenerateFromCustomField() {
     }
 
     try {
-      const response = await fetch('/api/encompass-hub/custom-fields');
-      if (!response.ok) throw new Error(`API failed (${response.status})`);
-      const data = await response.json();
-      const items = Array.isArray(data) ? data : data.items || data.fields || [];
-      calculatedFields = items.filter((item) => {
+      const [customRes, nativeRes] = await Promise.all([
+        fetch('/api/encompass-hub/custom-fields'),
+        fetch('/api/encompass-hub/native-fields'),
+      ]);
+      if (!customRes.ok) throw new Error(`Custom fields API failed (${customRes.status})`);
+      const customData = await customRes.json();
+      const customItems = Array.isArray(customData) ? customData : customData.items || customData.fields || [];
+      cachedCustomFieldsForMetadata = customItems;
+      calculatedFields = customItems.filter((item) => {
         const calc =
           item.calculation ||
           item.calculationExpression ||
@@ -2550,6 +2717,13 @@ function initializeGenerateFromCustomField() {
           '';
         return (item.isCalculatedField || item.isCalculated) && calc && calc.trim();
       });
+
+      let nativeItems = [];
+      if (nativeRes.ok) {
+        const nativeData = await nativeRes.json();
+        nativeItems = Array.isArray(nativeData) ? nativeData : nativeData.items || nativeData.fields || nativeData.standardFields || [];
+      }
+      cachedNativeFieldsForMetadata = nativeItems;
 
       searchInput.placeholder = 'Type to search custom fields...';
 
@@ -2571,13 +2745,16 @@ function initializeGenerateFromCustomField() {
     const field = calculatedFields.find((f) => (f.fieldId || f.id || f.Id) === val);
     if (!field || !window.customFieldCalcParser) return;
 
-    const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field);
+    const fieldMetadata = window.customFieldCalcParser.buildFieldMetadataLookup
+      ? window.customFieldCalcParser.buildFieldMetadataLookup(cachedCustomFieldsForMetadata, cachedNativeFieldsForMetadata)
+      : {};
+    const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field, { fieldMetadata });
     if (!result) {
       showToast('Could not parse calculation formula', 'warning');
       return;
     }
 
-    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, `Generated: [${field.fieldId || field.id || field.Id}]`);
+    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, `Generated: [${field.fieldId || field.id || field.Id}]`, result.fieldMetadata);
     if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
       window.$(modal).modal('hide');
     } else {

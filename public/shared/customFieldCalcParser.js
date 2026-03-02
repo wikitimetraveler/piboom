@@ -88,12 +88,91 @@
   }
 
   /**
+   * Normalize field ID for metadata lookup (strip leading @ date typecast, # number typecast).
+   * @param {string} fieldId - e.g. "353", "@353", "#4002", "CX.TEST"
+   * @returns {string}
+   */
+  function normalizeFieldIdForLookup(fieldId) {
+    if (!fieldId || typeof fieldId !== 'string') return '';
+    return String(fieldId).trim().replace(/^[@#]+/, '');
+  }
+
+  /**
+   * True if field ID uses Encompass date notation (@ prefix).
+   * Used to infer Date metadata when API lookup has no dataType.
+   * @param {string} fieldId - e.g. "@353", "353"
+   * @returns {boolean}
+   */
+  function isDateFieldByNotation(fieldId) {
+    if (!fieldId || typeof fieldId !== 'string') return false;
+    return String(fieldId).trim().startsWith('@');
+  }
+
+  /**
+   * True if field ID uses Encompass number typecast (# prefix).
+   * Used to infer Number metadata when API lookup has no dataType.
+   * @param {string} fieldId - e.g. "#4002", "353"
+   * @returns {boolean}
+   */
+  function isNumberFieldByNotation(fieldId) {
+    if (!fieldId || typeof fieldId !== 'string') return false;
+    return String(fieldId).trim().startsWith('#');
+  }
+
+  /**
+   * Infer date/dateTime from custom field naming: .DT, .date, .dttm suffix (case-insensitive).
+   * @param {string} fieldId - e.g. "CX.CLOSING.DT", "FI.SOMEDATE", "CX.EVENT.dttm"
+   * @returns {{ dataType: 'Date'|'DateTime' }|null}
+   */
+  function inferDateTypeFromFieldId(fieldId) {
+    if (!fieldId || typeof fieldId !== 'string') return null;
+    const s = String(fieldId).trim();
+    const lower = s.toLowerCase();
+    if (lower.endsWith('.dttm')) return { dataType: 'DateTime', format: '', description: 'DateTime field (from .dttm suffix)' };
+    if (lower.endsWith('.dt') || lower.endsWith('.date')) return { dataType: 'Date', format: '', description: 'Date field (from .DT/.date suffix)' };
+    return null;
+  }
+
+  /** Fallback metadata for widely used fields when not in API response. */
+  const FALLBACK_FIELD_METADATA = {
+    'CX.TYPE': { dataType: 'String', format: '', description: 'Loan Category (Purchase, Refinance, etc.)' },
+  };
+
+  /**
+   * Build metadata lookup from custom + native field lists.
+   * @param {Array} customFields - from Encompass custom fields API
+   * @param {Array} nativeFields - from Encompass native/standard fields API
+   * @returns {Record<string, { dataType: string, format: string, description: string }>}
+   */
+  function buildFieldMetadataLookup(customFields, nativeFields) {
+    const lookup = { ...FALLBACK_FIELD_METADATA };
+    const add = (item) => {
+      const id = item.fieldId ?? item.id ?? item.fieldName ?? item.name ?? '';
+      const meta = {
+        dataType: item.dataType || item.dataTypeName || item.valueType || '',
+        format: item.format || item.formatType || item.displayFormat || '',
+        description: item.description || item.longDescription || item.shortDescription || item.label || '',
+      };
+      const keys = [String(id).trim(), normalizeFieldIdForLookup(String(id))];
+      keys.forEach((k) => { if (k) lookup[k] = meta; });
+      if (item.contractPath) {
+        const pathId = item.contractPath.split('.').pop();
+        if (pathId && !lookup[pathId]) lookup[pathId] = meta;
+      }
+      if (typeof item.id === 'number') lookup[String(item.id)] = meta;
+    };
+    (customFields || []).forEach(add);
+    (nativeFields || []).forEach(add);
+    return lookup;
+  }
+
+  /**
    * Generate unit test rows from a custom field with a calculation.
    * @param {object} customField - { id, fieldId, calculation, calculationExpression, ... }
-   * @param {Array<Record<string, number|string>>} [scenarios] - optional array of input value maps for each scenario
-   * @returns {{ headers: string[], rows: object[], testDescriptions: object[] }|null}
+   * @param {object} [options] - optional { fieldMetadata: Record<fieldId, {dataType, format, description}> }
+   * @returns {{ headers: string[], rows: object[], testDescriptions: object[], fieldMetadata?: object }|null}
    */
-  function generateUnitTestFromCustomField(customField, scenarios) {
+  function generateUnitTestFromCustomField(customField, options) {
     const fieldId =
       customField.fieldId ||
       customField.id ||
@@ -119,6 +198,8 @@
     const outField = outputField || fieldId;
     if (!outField) return null;
 
+    const fieldMetadata = (options && typeof options === 'object' && options.fieldMetadata) ? options.fieldMetadata : {};
+
     // 5 scenarios — leave values blank; user fills in 100% of the time
     const scenarioCount = 5;
     const headers = ['Step', 'Action', 'Target', 'Description', 'Test 1'];
@@ -129,15 +210,37 @@
     const rows = [];
     let step = 1;
 
+    const getMetaForField = (fid) => {
+      const n = normalizeFieldIdForLookup(fid);
+      const meta = fieldMetadata[n] || fieldMetadata[fid] || null;
+      if (meta && meta.dataType) return meta;
+      // Encompass typecasts: @ = date, # = number
+      if (isDateFieldByNotation(fid)) {
+        return { dataType: 'Date', format: '', description: 'Date field (from @ notation)' };
+      }
+      // Custom field naming: .DT, .date, .dttm suffix = date/dateTime
+      const dateFromSuffix = inferDateTypeFromFieldId(n) || inferDateTypeFromFieldId(fid);
+      if (dateFromSuffix) return dateFromSuffix;
+      if (isNumberFieldByNotation(fid)) {
+        return { dataType: 'Decimal', format: '', description: 'Number field (from # notation)' };
+      }
+      return meta;
+    };
+
     // SET rows: one per input field — blank values for user to fill
     for (let k = 0; k < inputFields.length; k++) {
       const inputField = inputFields[k];
+      const displayId = normalizeFieldIdForLookup(inputField);
+      const meta = getMetaForField(inputField);
+      let desc = 'Set input ' + inputField + ' for calculated field [' + outField + ']';
+      if (meta && meta.dataType) desc += ' (' + meta.dataType + ')';
       const row = {
         Step: step,
         Action: 'SET',
-        Target: '[' + inputField + ']',
-        Description: 'Set input ' + inputField + ' for calculated field [' + outField + ']',
+        Target: '[' + displayId + ']',
+        Description: desc,
       };
+      if (meta) row._fieldMetadata = meta;
       for (let idx = 0; idx < scenarioCount; idx++) {
         row['Test ' + (idx + 1)] = '';
       }
@@ -146,12 +249,17 @@
     }
 
     // COMPARE row — blank expected values for user to fill
+    const outDisplayId = normalizeFieldIdForLookup(outField);
+    const outMeta = getMetaForField(outField);
+    let compareDesc = 'Verify calculated result for [' + outField + '] = ' + expression;
+    if (outMeta && outMeta.dataType) compareDesc += ' (' + outMeta.dataType + ')';
     const compareRow = {
       Step: step,
       Action: 'COMPARE',
-      Target: '[' + outField + ']',
-      Description: 'Verify calculated result for [' + outField + '] = ' + expression,
+      Target: '[' + outDisplayId + ']',
+      Description: compareDesc,
     };
+    if (outMeta) compareRow._fieldMetadata = outMeta;
     for (let idx = 0; idx < scenarioCount; idx++) {
       compareRow['Test ' + (idx + 1)] = '';
     }
@@ -171,16 +279,23 @@
       };
     });
 
-    return {
+    const result = {
       headers: headers,
       rows: rows,
       testDescriptions: testDescriptions,
     };
+    if (Object.keys(fieldMetadata).length > 0) result.fieldMetadata = fieldMetadata;
+    return result;
   }
 
   global.customFieldCalcParser = {
     parseCalculationFormula: parseCalculationFormula,
     evaluateSimpleExpression: evaluateSimpleExpression,
     generateUnitTestFromCustomField: generateUnitTestFromCustomField,
+    buildFieldMetadataLookup: buildFieldMetadataLookup,
+    normalizeFieldIdForLookup: normalizeFieldIdForLookup,
+    isDateFieldByNotation: isDateFieldByNotation,
+    isNumberFieldByNotation: isNumberFieldByNotation,
+    inferDateTypeFromFieldId: inferDateTypeFromFieldId,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
