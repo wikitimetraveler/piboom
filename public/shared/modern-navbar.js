@@ -258,6 +258,46 @@ class ModernNavbar extends HTMLElement {
         
         /* Bootstrap Icons CDN compatibility */
         @import url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css');
+        
+        /* Encompass dark mode - when body has encompass-dark-mode */
+        :host-context(body.encompass-dark-mode) .modern-navbar {
+          background: #161b22 !important;
+          border-bottom-color: #30363d !important;
+          box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+        :host-context(body.encompass-dark-mode) .navbar-brand-modern {
+          -webkit-text-fill-color: #e6edf3;
+          color: #e6edf3;
+        }
+        :host-context(body.encompass-dark-mode) .nav-link {
+          color: #e6edf3 !important;
+        }
+        :host-context(body.encompass-dark-mode) .nav-link:hover {
+          color: #58a6ff !important;
+        }
+        :host-context(body.encompass-dark-mode) .dropdown-menu {
+          background: #161b22 !important;
+          border: 1px solid #30363d;
+        }
+        :host-context(body.encompass-dark-mode) .dropdown-item {
+          color: #e6edf3 !important;
+        }
+        :host-context(body.encompass-dark-mode) .dropdown-item:hover {
+          background: #21262d !important;
+          color: #58a6ff !important;
+        }
+        :host-context(body.encompass-dark-mode) .navbar-collapse {
+          background: #161b22 !important;
+        }
+        :host-context(body.encompass-dark-mode) .nav-user-btn {
+          background: #21262d !important;
+          border-color: #30363d !important;
+          color: #e6edf3 !important;
+        }
+        :host-context(body.encompass-dark-mode) .navbar-toggler {
+          border-color: #30363d !important;
+          color: #e6edf3 !important;
+        }
       </style>
       
       <nav class="modern-navbar">

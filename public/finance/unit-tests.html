@@ -939,6 +939,9 @@
         font-family: 'Courier New', monospace;
         font-size: 0.9rem;
         padding: 6px 8px;
+        white-space: normal !important;
+        overflow: visible !important;
+        line-height: 1.4;
       }
 
       .field-id-badge {
@@ -949,6 +952,9 @@
         font-weight: 700;
         font-family: 'Courier New', monospace;
         border: 1px solid rgba(74, 144, 164, 0.4);
+        white-space: normal !important;
+        display: inline-block;
+        max-width: none;
       }
 
       /* Description column styling (column 4) */
@@ -961,6 +967,8 @@
         padding: 8px;
         line-height: 1.5;
         color: var(--zen-muted);
+        white-space: normal !important;
+        overflow: visible !important;
       }
 
       /* Force identical box model for header and body - 1:1 alignment */
@@ -1522,6 +1530,47 @@
           top: 8px;
         }
       }
+
+    </style>
+    <style id="unit-tests-night-theme">
+      /* Unit Tests Night Mode - self-contained, loads last */
+      body.unit-tests-night-theme{background:#0d1117!important;color:#e6edf3!important}
+      body.unit-tests-night-theme::before{background:radial-gradient(circle at 20% 80%,rgba(46,204,113,0.08) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(74,144,164,0.06) 0%,transparent 50%)!important}
+      body.unit-tests-night-theme .navbar{background:#161b22!important;border-color:#30363d!important}
+      body.unit-tests-night-theme .navbar .navbar-brand,body.unit-tests-night-theme .navbar .nav-link{color:#e6edf3!important}
+      body.unit-tests-night-theme .navbar .nav-link:hover{color:#58a6ff!important}
+      body.unit-tests-night-theme .main-content,body.unit-tests-night-theme .container{color:#e6edf3}
+      body.unit-tests-night-theme .card{background:#161b22!important;border-color:#30363d!important;color:#e6edf3!important}
+      body.unit-tests-night-theme .card-header{background:#21262d!important;border-color:#30363d!important;color:#e6edf3!important}
+      body.unit-tests-night-theme .card-header .btn-link{color:#e6edf3!important}
+      body.unit-tests-night-theme .card-header .btn-link:hover{color:#58a6ff!important;background:#161b22!important}
+      body.unit-tests-night-theme .card-body{background:#161b22!important;color:#e6edf3!important;border-color:#30363d!important}
+      body.unit-tests-night-theme .accordion .card{background:#161b22!important;border-color:#30363d!important}
+      body.unit-tests-night-theme .accordion .card-header{background:#21262d!important;border-color:#30363d!important}
+      body.unit-tests-night-theme .accordion .card-header .btn-link{color:#e6edf3!important}
+      body.unit-tests-night-theme .accordion .card-body{background:#161b22!important;color:#e6edf3!important}
+      body.unit-tests-night-theme .accordion .collapse.show{border-color:#30363d!important}
+      body.unit-tests-night-theme .text-muted{color:#8b949e!important}
+      body.unit-tests-night-theme .badge,body.unit-tests-night-theme .badge-soft{background:#21262d!important;color:#e6edf3!important;border-color:#30363d!important}
+      body.unit-tests-night-theme h5,body.unit-tests-night-theme .h5{color:#e6edf3!important}
+      body.unit-tests-night-theme .form-control{background:#0d1117!important;border-color:#30363d!important;color:#e6edf3!important}
+      body.unit-tests-night-theme .btn-outline-secondary{border-color:#30363d!important;color:#8b949e!important}
+      body.unit-tests-night-theme .btn-outline-secondary:hover{background:#21262d!important;color:#e6edf3!important}
+      body.unit-tests-night-theme .btn-primary,body.unit-tests-night-theme .btn-success{background:#238636!important;border-color:#238636!important}
+      body.unit-tests-night-theme .tool-pills{background:#161b22!important;border-color:#30363d!important}
+      body.unit-tests-night-theme .tool-pills .nav-link{color:#8b949e!important}
+      body.unit-tests-night-theme .tool-pills .nav-link.active{background:#238636!important;color:#fff!important}
+      body.unit-tests-night-theme .ag-theme-alpine{--ag-background-color:#0d1117!important;--ag-foreground-color:#e6edf3!important;--ag-header-background-color:#161b22!important;--ag-header-foreground-color:#e6edf3!important;--ag-odd-row-background-color:#0d1117!important;--ag-row-hover-color:#21262d!important;--ag-border-color:#30363d!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-root,body.unit-tests-night-theme .ag-theme-alpine .ag-body-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-center-cols-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-row{background:#0d1117!important;color:#e6edf3!important;border-color:#30363d!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell{background:#161b22!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-row-hover .ag-cell{background:#21262d!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell{background:#161b22!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-pass{background:rgba(46,204,113,0.2)!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-fail{background:rgba(248,81,73,0.2)!important}
+      body.unit-tests-night-theme .test-description-card .scenario-card-front,body.unit-tests-night-theme .test-description-card .scenario-card-back{background:#21262d!important;border-color:#30363d!important}
+      body.unit-tests-night-theme .overall-signoff-grid .card{background:#21262d!important;border-color:#30363d!important}
+      body.unit-tests-night-theme .field-id-badge{background:rgba(74,144,164,0.3)!important;color:#e6edf3!important;border-color:rgba(74,144,164,0.5)!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell{white-space:normal!important;overflow:visible!important}
     </style>
   </head>
   <body data-page="unit-tests">
@@ -1965,7 +2014,25 @@
     <script src="/shared/customFieldCalcParser.js"></script>
     <script src="/shared/tts.js"></script>
     <script src="/shared/voice-widget.js"></script>
-    <script src="/shared/dark-mode.js"></script>
+    <script>
+      (function(){
+        var KEY='unitTestsNightMode';
+        function isOn(){try{return localStorage.getItem(KEY)==='true'}catch(e){return false}}
+        function set(on){try{localStorage.setItem(KEY,on?'true':'false')}catch(e){}document.body.classList.toggle('unit-tests-night-theme',on)}
+        function init(){
+          set(isOn());
+          if(!document.getElementById('unitTestsNightToggle')){
+            var b=document.createElement('button');b.id='unitTestsNightToggle';b.type='button';b.title='Toggle night mode';b.setAttribute('aria-label','Toggle night mode');
+            b.style.cssText='position:fixed;top:70px;right:16px;z-index:999;width:40px;height:40px;border-radius:8px;border:1px solid #dee2e6;background:#fff;color:#1f2937;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
+            function updateBtn(){var on=document.body.classList.contains('unit-tests-night-theme');b.innerHTML=on?'☀️':'🌙';b.title=on?'Switch to light mode':'Switch to night mode';b.style.background=on?'#161b22':'#fff';b.style.color=on?'#e6edf3':'#1f2937';b.style.borderColor=on?'#30363d':'#dee2e6';}
+            updateBtn();
+            b.onclick=function(){set(!document.body.classList.contains('unit-tests-night-theme'));updateBtn();};
+            document.body.appendChild(b);
+          }
+        }
+        if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+      })();
+    </script>
     <script>
       (function() {
         var current = window.location.pathname.split('/').pop();

@@ -11,7 +11,7 @@
     if (document.getElementById('encompassEnvSwitcher')) return;
     const div = document.createElement('div');
     div.id = 'encompassEnvSwitcher';
-    div.style.cssText = 'position:fixed;top:70px;right:16px;z-index:999;background:#fff;border:1px solid #dee2e6;border-radius:8px;padding:8px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);font-size:0.85rem;';
+    div.style.cssText = 'position:fixed;top:70px;right:70px;z-index:999;background:#fff;border:1px solid #dee2e6;border-radius:8px;padding:8px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);font-size:0.85rem;';
     div.innerHTML = '<label style="margin-right:6px;font-weight:600;">Env:</label><select id="encompassEnvSelectGlobal" style="padding:4px 8px;border-radius:4px;border:1px solid #ced4da;"><option value="correspondent">Correspondent</option><option value="retail">Retail</option></select>';
     document.body.appendChild(div);
     const sel = document.getElementById('encompassEnvSelectGlobal');

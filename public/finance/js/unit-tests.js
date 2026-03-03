@@ -504,8 +504,11 @@ function generateColumnDefs(headers, rows) {
     // Special handling for Target column (column 3) - contains field IDs in brackets
     // These values can be populated via API
     if (headerLower.includes('target')) {
-      colDef.minWidth = 200;
-      colDef.width = 220;
+      colDef.minWidth = 220;
+      colDef.width = 280;
+      colDef.wrapText = true;
+      colDef.autoHeight = true;
+      colDef.cellStyle = { whiteSpace: 'normal', lineHeight: '1.4' };
       colDef.editable = true;
       colDef.headerClass = 'target-header';
       colDef.cellClass = 'target-cell';
@@ -547,12 +550,11 @@ function generateColumnDefs(headers, rows) {
     // Special handling for Description column (column 4)
     if (headerLower.includes('description')) {
       colDef.minWidth = 250;
-      colDef.width = 280;
+      colDef.width = 300;
       colDef.headerClass = 'description-header';
       colDef.cellClass = 'description-cell';
       colDef.wrapText = true;
-      colDef.autoHeight = false;
-      // Description can be longer, so allow wrapping
+      colDef.autoHeight = true;
       colDef.cellStyle = { whiteSpace: 'normal', lineHeight: '1.5' };
     }
     
