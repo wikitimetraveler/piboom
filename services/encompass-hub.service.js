@@ -984,7 +984,7 @@ export async function writeLoanFields(loanId, fieldsPayload = []) {
   }
 }
 
-export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavior = 'Include') {
+export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavior = 'Include', includeMetadata) {
   if (!loanGuid) {
     throw new Error('loanGuid is required');
   }
@@ -992,11 +992,16 @@ export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavi
     throw new Error('fieldIds must be a non-empty array');
   }
 
+  const params = { invalidFieldBehavior };
+  if (includeMetadata === 'true' || includeMetadata === true) {
+    params.includeMetadata = 'true';
+  }
+
   try {
     const response = await requestWithAuth({
       method: 'post',
       url: `${API_V3_BASE}/loans/${encodeURIComponent(loanGuid)}/fieldReader`,
-      params: { invalidFieldBehavior },
+      params,
       data: fieldIds,
     });
     const data = response.data;

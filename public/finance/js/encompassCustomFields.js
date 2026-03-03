@@ -269,7 +269,7 @@ async function loadFields() {
   try {
     setStatus('Loading', 'ok', 'bi-clock-history');
     initializeGrid();
-    const response = await fetch('/api/encompass-hub/custom-fields');
+    const response = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/custom-fields');
     if (!response.ok) {
       throw new Error(`Request failed (${response.status})`);
     }

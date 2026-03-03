@@ -69,7 +69,7 @@ function setStatusChip(text, status = 'warn', icon = 'bi-clock-history') {
 async function refreshStatus() {
   try {
     setStatusChip('Checking...', 'warn', 'bi-clock-history');
-    const response = await fetch('/api/encompass-hub/status');
+    const response = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/status');
     if (!response.ok) {
       throw new Error(`Status request failed (${response.status})`);
     }
@@ -191,7 +191,7 @@ async function loadPipeline(event) {
   `;
 
   try {
-    const response = await fetch(`/api/encompass-hub/pipeline?${filters.toString()}`);
+    const response = await (window.encompassApi?.encompassFetch || fetch)(`/api/encompass-hub/pipeline?${filters.toString()}`);
     if (!response.ok) {
       throw new Error(`Pipeline request failed (${response.status})`);
     }
@@ -348,7 +348,7 @@ async function handleLoanSelection(loanGuid) {
   `;
 
   try {
-    const response = await fetch(`/api/encompass-hub/loans/${loanGuid}`);
+    const response = await (window.encompassApi?.encompassFetch || fetch)(`/api/encompass-hub/loans/${loanGuid}`);
     if (!response.ok) {
       throw new Error(`Loan fetch failed (${response.status})`);
     }
@@ -386,6 +386,16 @@ loadPipelineCta?.addEventListener('click', (e) => {
 
 voiceHelpToggle?.addEventListener('click', () => toggleVoiceHelp(true));
 voiceHelpClose?.addEventListener('click', () => toggleVoiceHelp(false));
+
+// Encompass env dropdown (Correspondent Dev | Retail Dev)
+const encompassEnvSelect = document.getElementById('encompassEnvSelect');
+if (encompassEnvSelect && window.encompassApi) {
+  encompassEnvSelect.value = window.encompassApi.getEncompassEnv();
+  encompassEnvSelect.addEventListener('change', () => {
+    window.encompassApi.setEncompassEnv(encompassEnvSelect.value);
+    refreshStatus();
+  });
+}
 
 hydrateUserBadge();
 initializeVoiceWidget();

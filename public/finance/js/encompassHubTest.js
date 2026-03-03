@@ -143,7 +143,7 @@ async function runTest(event) {
       requestOptions.body = body || null;
     }
 
-    const response = await fetch(url, requestOptions);
+    const response = await (window.encompassApi?.encompassFetch || fetch)(url, requestOptions);
     const contentType = response.headers.get('content-type') || '';
     const text = await response.text();
     let payload = text;

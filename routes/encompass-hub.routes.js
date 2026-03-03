@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { encompassEnvStorage } from '../services/encompass-auth.service.js';
 import {
   getHubStatus,
   getCustomFields,
@@ -17,6 +18,13 @@ import {
 } from '../controllers/encompass-hub.controller.js';
 
 const router = Router();
+
+/** Set request-scoped Encompass env from X-Encompass-Env header (correspondent | retail). Default: correspondent. */
+router.use((req, res, next) => {
+  const raw = (req.headers['x-encompass-env'] || '').toString().toLowerCase().trim();
+  const env = raw === 'retail' ? 'retail' : 'correspondent';
+  encompassEnvStorage.run({ env }, () => next());
+});
 
 router.get('/status', getHubStatus);
 router.get('/users', getCompanyUsers);

@@ -250,7 +250,7 @@ export async function setLoanFields(req, res) {
 export async function getLoanFields(req, res) {
   try {
     const { loanGuid } = req.params;
-    const { invalidFieldBehavior = 'Include' } = req.query;
+    const { invalidFieldBehavior = 'Include', includeMetadata } = req.query;
     const fieldIds = req.body;
 
     if (!loanGuid) {
@@ -260,7 +260,7 @@ export async function getLoanFields(req, res) {
       return res.status(400).json({ error: 'Request body must be a non-empty array of field IDs' });
     }
 
-    const result = await readLoanFields(loanGuid, fieldIds, invalidFieldBehavior);
+    const result = await readLoanFields(loanGuid, fieldIds, invalidFieldBehavior, includeMetadata);
     return res.json(result ?? []);
   } catch (error) {
     console.error('Error reading Encompass loan fields:', error.message);

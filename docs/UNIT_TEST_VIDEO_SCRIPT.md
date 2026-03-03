@@ -15,6 +15,8 @@
 - Show unit-tests page (Finance → Unit Tests)
 - Brief view of the grid and toolbar
 
+**Screenshot:** `screenshots/01-unit-tests-overview.png` – Full page, grid + toolbar visible
+
 ---
 
 ## Scene 1: Load Test Data (0:30–1:15)
@@ -30,6 +32,8 @@
 
 **Narration:**
 > "The tool creates SET steps for each input field and a COMPARE step for the output. You fill in test values for each scenario."
+
+**Screenshot:** `screenshots/02-generate-from-field-modal.png` – Modal with field expression and preview
 
 ---
 
@@ -47,6 +51,8 @@
 **Narration:**
 > "Step, Target, and Action can be edited too. The grid infers field types from the Description or from Encompass metadata."
 
+**Screenshot:** `screenshots/03-editable-cells-date-picker.png` – Date picker open; `screenshots/04-action-dropdown.png` – Action column dropdown
+
 ---
 
 ## Scene 3: Run Tests Against Encompass (2:15–3:30)
@@ -63,6 +69,8 @@
 **Narration:**
 > "Pass means the calculated value matches your expected value. Fail means it doesn't—so you can fix the formula or the test."
 
+**Screenshot:** `screenshots/05-run-results-pass-fail.png` – Grid with green/red shading; `screenshots/06-results-panel.png` – Results summary panel
+
 ---
 
 ## Scene 4: Export & Import (3:30–4:00)
@@ -73,6 +81,8 @@
 **Actions:**
 1. Click Export → JSON or CSV
 2. Briefly show the Import option
+
+**Screenshot:** `screenshots/07-export-import.png` – Export dropdown or Import dialog
 
 ---
 
@@ -96,6 +106,8 @@
 - Ask a sample question (e.g. "How do I test a date field?")
 - Show a short response
 
+**Screenshot:** `screenshots/08-ai-assistant.png` – AI panel expanded with Q&A
+
 ---
 
 ## Key Phrases for Captions/Subtitles
@@ -106,6 +118,22 @@
 - Run tests against real loan data
 - Pass/fail results
 - Export to Excel or CSV
+
+---
+
+## Screenshot Checklist (for future videos)
+
+| # | Screenshot | Captures |
+|---|------------|----------|
+| 1 | `01-unit-tests-overview.png` | Full page, grid + toolbar |
+| 2 | `02-generate-from-field-modal.png` | Generate modal, field expression |
+| 3 | `03-editable-cells-date-picker.png` | Date picker open |
+| 4 | `04-action-dropdown.png` | GET/SET/COMPARE dropdown |
+| 5 | `05-run-results-pass-fail.png` | Green/red pass-fail grid |
+| 6 | `06-results-panel.png` | Results summary |
+| 7 | `07-export-import.png` | Export dropdown |
+
+**Folder:** `docs/screenshots/` or `docs/unit-test-video/`
 
 ---
 

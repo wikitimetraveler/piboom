@@ -228,12 +228,12 @@
     };
 
     // SET rows: one per input field — blank values for user to fill
+    // Description is just "Field {id}" — will be enriched from API when field-reader runs
     for (let k = 0; k < inputFields.length; k++) {
       const inputField = inputFields[k];
       const displayId = normalizeFieldIdForLookup(inputField);
       const meta = getMetaForField(inputField);
-      let desc = 'Set input ' + inputField + ' for calculated field [' + outField + ']';
-      if (meta && meta.dataType) desc += ' (' + meta.dataType + ')';
+      const desc = 'Field ' + displayId;
       const row = {
         Step: step,
         Action: 'SET',
@@ -251,8 +251,7 @@
     // COMPARE row — blank expected values for user to fill
     const outDisplayId = normalizeFieldIdForLookup(outField);
     const outMeta = getMetaForField(outField);
-    let compareDesc = 'Verify calculated result for [' + outField + '] = ' + expression;
-    if (outMeta && outMeta.dataType) compareDesc += ' (' + outMeta.dataType + ')';
+    const compareDesc = 'Field ' + outDisplayId;
     const compareRow = {
       Step: step,
       Action: 'COMPARE',

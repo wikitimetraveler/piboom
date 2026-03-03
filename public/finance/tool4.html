@@ -798,7 +798,7 @@
                 statusEl.className = 'mt-2 small text-info';
                 statusEl.style.display = 'block';
                 try {
-                    const res = await fetch('/api/encompass-hub/create-fields', {
+                    const res = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/create-fields', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(fields),
@@ -876,6 +876,7 @@
         // Make voice controller globally accessible for debugging
         window.voiceController = voiceController;
     </script>
+  <script src="/shared/encompass-api.js"></script>
   <script src="/shared/tts.js"></script>
   <script src="/shared/finance-auth-guard.js"></script>
   </body>

@@ -80,7 +80,7 @@ function buildQuery() {
 }
 
 async function fetchJSON(url) {
-  const response = await fetch(url);
+  const response = await (window.encompassApi?.encompassFetch || fetch)(url);
   if (!response.ok) {
     throw new Error(`Request failed (${response.status})`);
   }

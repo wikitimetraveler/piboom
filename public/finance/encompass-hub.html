@@ -462,6 +462,13 @@
                 Checking...
               </span>
             </div>
+            <div class="form-group mb-3">
+              <label for="encompassEnvSelect">Environment</label>
+              <select id="encompassEnvSelect" class="form-control form-control-sm">
+                <option value="correspondent">Correspondent Dev</option>
+                <option value="retail">Retail Dev</option>
+              </select>
+            </div>
             <button class="btn btn-outline-primary btn-sm mb-4" id="refreshStatusBtn">
               <i class="bi-arrow-clockwise"></i> Refresh Status
             </button>
@@ -629,6 +636,7 @@
       </ul>
     </div>
 
+    <script src="/shared/encompass-api.js"></script>
     <script src="/shared/user-login.js"></script>
     <script src="/shared/user-passwords.js"></script>
     <script src="/shared/dark-mode.js"></script>

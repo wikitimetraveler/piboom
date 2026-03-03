@@ -1,17 +1,29 @@
+import { AsyncLocalStorage } from 'async_hooks';
 import axios from 'axios';
 
 const DEFAULT_OAUTH_URL = 'https://api.elliemae.com/oauth2/v1/token';
 const TOKEN_SKEW_MS = 60 * 1000; // refresh 1 min before actual expiry
 
-let cachedToken = null;
-let tokenExpiresAt = 0;
-let inflightRequest = null;
+/** Request-scoped Encompass env (correspondent | retail). Set by routes middleware. */
+export const encompassEnvStorage = new AsyncLocalStorage();
 
-const ENV_KEYS = {
-  username: ['ENCOMPASS_USERNAME', 'username'],
-  password: ['ENCOMPASS_PASSWORD', 'password'],
-  clientId: ['ENCOMPASS_CLIENT_ID', 'clientId'],
-  clientSecret: ['ENCOMPASS_CLIENT_SECRET', 'clientSecret'],
+const ENV_KEYS_CORRESPONDENT = {
+  username: ['ENCOMPASS_USERNAME'],
+  password: ['ENCOMPASS_PASSWORD'],
+  clientId: ['ENCOMPASS_CLIENT_ID'],
+  clientSecret: ['ENCOMPASS_CLIENT_SECRET'],
+};
+
+const ENV_KEYS_RETAIL = {
+  username: ['ENCOMPASS_RETAIL_USERNAME'],
+  password: ['ENCOMPASS_RETAIL_PASSWORD'],
+  clientId: ['ENCOMPASS_RETAIL_CLIENT_ID'],
+  clientSecret: ['ENCOMPASS_RETAIL_CLIENT_SECRET'],
+};
+
+const TOKEN_CACHES = {
+  correspondent: { token: null, expiresAt: 0, inflight: null },
+  retail: { token: null, expiresAt: 0, inflight: null },
 };
 
 function readEnv(keys = []) {
@@ -22,17 +34,22 @@ function readEnv(keys = []) {
   return undefined;
 }
 
-function collectEnvConfig() {
+function getEnvKeys(env) {
+  return env === 'retail' ? ENV_KEYS_RETAIL : ENV_KEYS_CORRESPONDENT;
+}
+
+function collectEnvConfig(env = 'correspondent') {
+  const keys = getEnvKeys(env);
   return {
-    username: readEnv(ENV_KEYS.username),
-    password: readEnv(ENV_KEYS.password),
-    clientId: readEnv(ENV_KEYS.clientId),
-    clientSecret: readEnv(ENV_KEYS.clientSecret),
-    oauthUrl: process.env.ENCOMPASS_OAUTH_URL || DEFAULT_OAUTH_URL,
+    username: readEnv(keys.username),
+    password: readEnv(keys.password),
+    clientId: readEnv(keys.clientId),
+    clientSecret: readEnv(keys.clientSecret),
+    oauthUrl: process.env.ENCOMPASS_AUTH_URL || process.env.ENCOMPASS_OAUTH_URL || DEFAULT_OAUTH_URL,
   };
 }
 
-function validateConfig(config = collectEnvConfig()) {
+function validateConfig(config) {
   const missing = Object.entries(config)
     .filter(([key, value]) => !value && key !== 'oauthUrl')
     .map(([key]) => key);
@@ -44,21 +61,12 @@ function validateConfig(config = collectEnvConfig()) {
   };
 }
 
-async function requestToken() {
-  const { config, missing } = (() => {
-    const result = validateConfig();
-    if (!result.ok) {
-      return { missing: result.missing };
-    }
-    return { config: result.config };
-  })();
-
-  if (missing && missing.length) {
-    throw new Error(
-      `Missing Encompass credentials: ${missing
-        .map((key) => `process.env.${ENV_KEYS[key]?.[0] || key}`)
-        .join(', ')}`,
-    );
+async function requestToken(env) {
+  const config = collectEnvConfig(env);
+  const { ok, missing } = validateConfig(config);
+  if (!ok) {
+    const keyNames = missing.map((k) => getEnvKeys(env)[k]?.[0] || k).join(', ');
+    throw new Error(`Missing Encompass credentials (${env}): ${keyNames}`);
   }
 
   const params = new URLSearchParams({
@@ -75,33 +83,46 @@ async function requestToken() {
     },
   });
 
-  cachedToken = response.data?.access_token || null;
+  const token = response.data?.access_token || null;
   const expiresInSeconds = Number(response.data?.expires_in ?? 3600);
-  tokenExpiresAt = Date.now() + expiresInSeconds * 1000;
-  inflightRequest = null;
-  return cachedToken;
+  const cache = TOKEN_CACHES[env] || TOKEN_CACHES.correspondent;
+  cache.token = token;
+  cache.expiresAt = Date.now() + expiresInSeconds * 1000;
+  cache.inflight = null;
+  return token;
 }
 
-export async function ensureEncompassToken() {
+function getCache(env) {
+  const key = env === 'retail' ? 'retail' : 'correspondent';
+  return TOKEN_CACHES[key];
+}
+
+export async function ensureEncompassToken(envOverride) {
+  const env = envOverride ?? encompassEnvStorage.getStore()?.env ?? 'correspondent';
+  const cache = getCache(env);
+
   const now = Date.now();
-  if (cachedToken && now < tokenExpiresAt - TOKEN_SKEW_MS) {
-    return cachedToken;
+  if (cache.token && now < cache.expiresAt - TOKEN_SKEW_MS) {
+    return cache.token;
   }
 
-  if (!inflightRequest) {
-    inflightRequest = requestToken().catch((error) => {
-      cachedToken = null;
-      tokenExpiresAt = 0;
-      inflightRequest = null;
+  if (!cache.inflight) {
+    cache.inflight = requestToken(env).catch((error) => {
+      cache.token = null;
+      cache.expiresAt = 0;
+      cache.inflight = null;
       throw error;
     });
   }
 
-  return inflightRequest;
+  return cache.inflight;
 }
 
-export function getEncompassTokenStatus() {
-  if (!cachedToken) {
+export function getEncompassTokenStatus(envOverride) {
+  const env = envOverride ?? encompassEnvStorage.getStore()?.env ?? 'correspondent';
+  const cache = getCache(env);
+
+  if (!cache.token) {
     return {
       connected: false,
       expiresAt: null,
@@ -109,21 +130,32 @@ export function getEncompassTokenStatus() {
     };
   }
 
-  const secondsRemaining = Math.max(0, Math.floor((tokenExpiresAt - Date.now()) / 1000));
+  const secondsRemaining = Math.max(0, Math.floor((cache.expiresAt - Date.now()) / 1000));
   return {
     connected: true,
-    expiresAt: new Date(tokenExpiresAt).toISOString(),
+    expiresAt: new Date(cache.expiresAt).toISOString(),
     secondsRemaining,
   };
 }
 
-export function clearEncompassTokenCache() {
-  cachedToken = null;
-  tokenExpiresAt = 0;
-  inflightRequest = null;
+export function clearEncompassTokenCache(envOverride) {
+  if (envOverride) {
+    const cache = getCache(envOverride);
+    cache.token = null;
+    cache.expiresAt = 0;
+    cache.inflight = null;
+  } else {
+    Object.values(TOKEN_CACHES).forEach((c) => {
+      c.token = null;
+      c.expiresAt = 0;
+      c.inflight = null;
+    });
+  }
 }
 
-export function getEncompassEnvStatus() {
-  return validateConfig();
+/** Validate config for default (correspondent) env. Used by getEncompassEnvStatus. */
+export function getEncompassEnvStatus(envOverride) {
+  const env = envOverride ?? encompassEnvStorage.getStore()?.env ?? 'correspondent';
+  const config = collectEnvConfig(env);
+  return validateConfig(config);
 }
-

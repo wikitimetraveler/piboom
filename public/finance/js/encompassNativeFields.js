@@ -255,7 +255,7 @@ async function loadFields() {
   try {
     setStatus('Loading', 'ok', 'bi-clock-history');
     initializeGrid();
-    const response = await fetch('/api/encompass-hub/native-fields');
+    const response = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/native-fields');
     if (!response.ok) {
       throw new Error(`Request failed (${response.status})`);
     }

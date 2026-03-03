@@ -292,6 +292,136 @@
         border-left: 4px solid rgba(255, 193, 7, 0.6);
       }
 
+      /* Scenario results layout - light mode */
+      .scenario-results-layout {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        align-items: flex-start;
+      }
+      .scenario-results-list {
+        flex: 1 1 280px;
+        min-width: 0;
+      }
+      .scenario-result-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+      .scenario-results-light .scenario-result-item {
+        background: rgba(248, 250, 252, 0.9);
+        border: 1px solid rgba(74, 144, 164, 0.2);
+      }
+      .scenario-results-light .scenario-result-pass {
+        background: rgba(46, 204, 113, 0.12);
+        border-color: rgba(46, 204, 113, 0.35);
+      }
+      .scenario-results-light .scenario-result-fail {
+        background: rgba(231, 76, 60, 0.12);
+        border-color: rgba(231, 76, 60, 0.35);
+      }
+      .scenario-results-light .scenario-result-skip {
+        background: rgba(148, 163, 184, 0.12);
+        border-color: rgba(148, 163, 184, 0.25);
+      }
+      .scenario-id {
+        font-weight: 600;
+        color: var(--zen-muted);
+        min-width: 2.5rem;
+      }
+      .scenario-name {
+        flex: 1;
+        color: var(--text-dark);
+      }
+      .scenario-status-badge {
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+      }
+      .scenario-status-pass {
+        background: #27ae60;
+        color: white;
+      }
+      .scenario-status-fail {
+        background: #e74c3c;
+        color: white;
+      }
+      .scenario-status-skip {
+        background: #95a5a6;
+        color: white;
+      }
+      .scenario-results-summary {
+        flex: 0 0 200px;
+        padding: 1rem;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(74, 144, 164, 0.2);
+      }
+      .scenario-summary-title {
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--zen-muted);
+        margin-bottom: 0.75rem;
+      }
+      .scenario-summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+      }
+      .scenario-summary-label {
+        color: var(--muted, #6b7280);
+      }
+      .scenario-summary-value {
+        font-weight: 700;
+        color: var(--text-dark);
+      }
+      .scenario-summary-pass { color: #27ae60; }
+      .scenario-summary-fail { color: #e74c3c; }
+      .scenario-debug-details { font-size: 0.9rem; }
+      .scenario-debug-summary { cursor: pointer; padding: 0.5rem 0; }
+
+      /* Dark mode overrides */
+      body.dark-mode .scenario-results-dark .scenario-result-item {
+        background: rgba(30, 41, 59, 0.8);
+        border-color: rgba(148, 163, 184, 0.2);
+      }
+      body.dark-mode .scenario-results-dark .scenario-result-pass {
+        background: rgba(46, 204, 113, 0.2);
+        border-color: rgba(46, 204, 113, 0.4);
+      }
+      body.dark-mode .scenario-results-dark .scenario-result-fail {
+        background: rgba(231, 76, 60, 0.2);
+        border-color: rgba(231, 76, 60, 0.4);
+      }
+      body.dark-mode .scenario-results-dark .scenario-result-skip {
+        background: rgba(148, 163, 184, 0.15);
+        border-color: rgba(148, 163, 184, 0.3);
+      }
+      body.dark-mode .scenario-results-dark .scenario-id,
+      body.dark-mode .scenario-results-dark .scenario-name {
+        color: #e2e8f0;
+      }
+      body.dark-mode .scenario-results-dark .scenario-results-summary {
+        background: rgba(30, 41, 59, 0.9);
+        border-color: rgba(148, 163, 184, 0.25);
+      }
+      body.dark-mode .scenario-results-dark .scenario-summary-title {
+        color: #94a3b8;
+      }
+      body.dark-mode .scenario-results-dark .scenario-summary-label {
+        color: #94a3b8;
+      }
+      body.dark-mode .scenario-results-dark .scenario-summary-value {
+        color: #f1f5f9;
+      }
+
       .test-result-icon {
         width: 32px;
         height: 32px;
@@ -1326,7 +1456,7 @@
         opacity: 0.7;
       }
 
-      /* Scan SET Fields button - more visible when shown */
+      /* Scan SET Fields button - always yellow background */
       .scan-set-fields-btn {
         font-weight: 600;
         font-size: 0.95rem;
@@ -1464,7 +1594,7 @@
             <button class="btn btn-outline-primary btn-sm" id="generateFromCustomFieldBtn" title="Generate unit test from an Encompass custom field with a calculation">
               <i class="bi-magic"></i> Generate from Custom Field
             </button>
-            <button class="btn btn-outline-warning btn-sm scan-set-fields-btn" id="scanSetFieldsBtn" style="display: none;" title="Scan SET rows for read-only or calculated fields that will fail if not addressed">
+            <button class="btn btn-warning btn-sm scan-set-fields-btn" id="scanSetFieldsBtn" style="display: none;" title="Scan SET rows for read-only or calculated fields that will fail if not addressed">
               <i class="bi-exclamation-triangle"></i> Scan SET Fields
             </button>
           </div>
@@ -1840,9 +1970,11 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <script src="/shared/encompass-api.js"></script>
     <script src="/shared/customFieldCalcParser.js"></script>
     <script src="/shared/tts.js"></script>
     <script src="/shared/voice-widget.js"></script>
+    <script src="/shared/dark-mode.js"></script>
     <script>
       (function() {
         var current = window.location.pathname.split('/').pop();

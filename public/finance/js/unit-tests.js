@@ -989,6 +989,60 @@ function extractFieldValueFromReaderResponse(data, fieldId) {
   return null;
 }
 
+/**
+ * Extract field metadata (Description, Type, Format) from field-reader API response.
+ * @param {Array|object} data - API response
+ * @param {string} fieldId
+ * @returns {{ description?: string, type?: string, format?: string }|null}
+ */
+function extractFieldMetadataFromReaderResponse(data, fieldId) {
+  if (!data) return null;
+  const fid = String(fieldId || '').trim();
+  const sameId = (item, key) => {
+    const v = item?.[key];
+    return v !== undefined && v !== null && String(v).trim() === fid;
+  };
+  let match = null;
+  if (Array.isArray(data)) {
+    match = data.find((item) => typeof item === 'object' && (sameId(item, 'id') || sameId(item, 'fieldId') || sameId(item, 'FieldId')));
+  } else if (typeof data === 'object') {
+    const arr = data.fields ?? data.items ?? data.data ?? data.results;
+    if (Array.isArray(arr)) return extractFieldMetadataFromReaderResponse(arr, fieldId);
+  }
+  if (!match || typeof match !== 'object') return null;
+  const desc = match.description ?? match.Description ?? match.longDescription ?? match.shortDescription ?? '';
+  const type = match.type ?? match.Type ?? match.dataType ?? match.dataTypeName ?? match.valueType ?? '';
+  const format = match.format ?? match.Format ?? match.formatType ?? match.displayFormat ?? '';
+  if (!desc && !type && !format) return null;
+  return { description: desc, type: type, format: format };
+}
+
+/**
+ * If row.Description matches "Field X" and API has metadata, update the row with API description.
+ * @param {object} row - grid row
+ * @param {string} fieldId
+ * @param {Array|object} apiData - field-reader response
+ * @param {object} gridApi - AG Grid api
+ * @param {number} rowIndex
+ */
+function maybeUpdateDescriptionFromApi(row, fieldId, apiData, gridApi, rowIndex) {
+  const desc = String(row.Description || row.description || '').trim();
+  if (!/^Field\s+.+$/i.test(desc)) return;
+  const meta = extractFieldMetadataFromReaderResponse(apiData, fieldId);
+  if (!meta || (!meta.description && !meta.type)) return;
+  const parts = [];
+  if (meta.description) parts.push(meta.description);
+  if (meta.type) parts.push('(' + meta.type + ')');
+  const newDesc = parts.length ? parts.join(' ') : desc;
+  row.Description = newDesc;
+  row.description = newDesc;
+  const descCol = columnDefs.find((c) => (c.headerName || c.field || '').toLowerCase() === 'description');
+  if (gridApi && descCol?.field && rowIndex != null) {
+    const rowNode = gridApi.getDisplayedRowAtIndex(rowIndex);
+    if (rowNode) rowNode.setDataValue(descCol.field, newDesc);
+  }
+}
+
 function buildFieldWriterPayload(fieldId, value, row) {
   const payload = [{ id: fieldId, value }];
   const lockValue = row.Lock ?? row.lock ?? row.Locked ?? row.locked;
@@ -1178,7 +1232,7 @@ function updateRunSummary(passed, failed, skipped, total) {
     runSummaryTime.textContent = `Last run ${timestamp.toLocaleString()}`;
   }
   if (runSummaryCounts) {
-    runSummaryCounts.textContent = `${total} total • ${passed} passed • ${failed} failed • ${skipped} skipped`;
+    runSummaryCounts.textContent = `${total} scenarios • ${passed} passed • ${failed} failed`;
   }
 
   const passPercent = total ? Math.round((passed / total) * 100) : 0;
@@ -1678,6 +1732,9 @@ async function runTests(singleTestNumber) {
             result.status = 'skipped';
             result.message = 'Missing Loan GUID for Set call';
           } else {
+            if (typeof console !== 'undefined' && console.debug) {
+              console.debug(`[UnitTest SET] Step ${step} | ${fieldId} | Test ${result.testNumber || 'N/A'}`);
+            }
             const rawSetValue = currentCol ? row[currentCol.field] : null;
             const hasValue = rawSetValue !== null && rawSetValue !== undefined && String(rawSetValue).trim() !== '';
             const setValue = hasValue && isBlankForTest(rawSetValue) ? '' : rawSetValue;
@@ -1686,8 +1743,23 @@ async function runTests(singleTestNumber) {
               result.message = 'Skipped (no value to set — field left as-is)';
             } else {
             try {
+              // If description is "Field X", do a read first to enrich from API (we need metadata anyway)
+              const desc = String(row.Description || row.description || '').trim();
+              if (/^Field\s+.+$/i.test(desc)) {
+                try {
+                  const readResp = await (window.encompassApi?.encompassFetch || fetch)(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include&includeMetadata=true`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([fieldId])
+                  });
+                  if (readResp.ok) {
+                    const readData = await readResp.json();
+                    maybeUpdateDescriptionFromApi(row, fieldId, readData, gridApi, i);
+                  }
+                } catch (_) { /* ignore read failure */ }
+              }
               const body = buildFieldWriterPayload(fieldId, setValue, row);
-              const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-writer`, {
+              const response = await (window.encompassApi?.encompassFetch || fetch)(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-writer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(body)
@@ -1741,7 +1813,7 @@ async function runTests(singleTestNumber) {
           const getCacheKey = `${scenarioKey}-${i}-${fieldId}`;
           if (!getCache[getCacheKey]) {
             try {
-              const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include`, {
+              const response = await (window.encompassApi?.encompassFetch || fetch)(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include&includeMetadata=true`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify([fieldId])
@@ -1755,6 +1827,7 @@ async function runTests(singleTestNumber) {
                 value = extractFieldValueFromReaderResponse(data, fieldId);
                 const displayValue = value === null || value === undefined ? 'No value returned' : JSON.stringify(value);
                 getCache[getCacheKey] = { status: 'info', message: `GET ${fieldId}: ${displayValue}`, value };
+                maybeUpdateDescriptionFromApi(row, fieldId, data, gridApi, i);
                 if (value !== null && value !== undefined && currentCol) {
                   row[currentCol.field] = value;
                   if (gridApi?.getDisplayedRowAtIndex) {
@@ -1770,6 +1843,9 @@ async function runTests(singleTestNumber) {
           const cached = getCache[getCacheKey];
           result.status = cached.status;
           result.message = cached.message;
+          if (typeof console !== 'undefined' && console.debug) {
+            console.debug(`[UnitTest GET] Step ${step} | ${fieldId} | Test ${result.testNumber || 'N/A'} | ${cached.status}`);
+          }
           if (cached.value !== null && cached.value !== undefined && currentCol) {
             row[currentCol.field] = cached.value;
             if (gridApi?.getDisplayedRowAtIndex) {
@@ -1793,7 +1869,7 @@ async function runTests(singleTestNumber) {
             result.message = 'No expected value in column for Compare';
           } else {
             try {
-              const response = await fetch(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include`, {
+              const response = await (window.encompassApi?.encompassFetch || fetch)(`/api/encompass-hub/loans/${encodeURIComponent(currentLoanGuid)}/field-reader?invalidFieldBehavior=Include&includeMetadata=true`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify([fieldId])
@@ -1804,6 +1880,7 @@ async function runTests(singleTestNumber) {
                 result.message = `Compare GET failed (${response.status}): ${errorText || 'Unknown error'}`;
               } else {
                 const data = await response.json();
+                maybeUpdateDescriptionFromApi(row, fieldId, data, gridApi, i);
                 const actualValue = extractFieldValueFromReaderResponse(data, fieldId);
                 const expectedStr = String(expectedValue).trim();
                 const actualStr = actualValue === null || actualValue === undefined ? '' : String(actualValue).trim();
@@ -1881,19 +1958,25 @@ async function runTests(singleTestNumber) {
       failFirstBtn.disabled = failed === 0;
     }
 
+    const scenarioSummary = aggregateResultsByScenario(results);
+    const scenarioPassed = scenarioSummary.filter(s => s.passed).length;
+    const scenarioFailed = scenarioSummary.filter(s => !s.passed && !s.skipped).length;
+    const scenarioSkipped = scenarioSummary.filter(s => s.skipped).length;
+    const scenarioTotal = scenarioSummary.length;
+
     if (isSingleRun) {
       const msg = `Test ${singleTestNumber}: ${passed} passed, ${failed} failed, ${skipped} skipped`;
       showToast(msg, failed > 0 ? 'warning' : 'success');
       setStatus(msg, failed > 0 ? 'err' : 'ok', failed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
     } else {
-      displayTestResults(results, passed, failed, skipped);
-      updateRunSummary(passed, failed, skipped, results.length);
-      setStatus(`Tests complete: ${passed} passed, ${failed} failed, ${skipped} skipped`,
+      displayTestResults(results, scenarioSummary, scenarioPassed, scenarioFailed, scenarioSkipped, scenarioTotal);
+      updateRunSummary(scenarioPassed, scenarioFailed, scenarioSkipped, scenarioTotal);
+      setStatus(`Tests complete: ${scenarioPassed} passed, ${scenarioFailed} failed`,
         failed > 0 ? 'err' : 'ok',
         failed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
-      const summary = failed > 0
-        ? `Tests complete. ${passed} passed, ${failed} failed, ${skipped} skipped.`
-        : `All tests passed. ${passed} passed, ${skipped} skipped.`;
+      const summary = scenarioFailed > 0
+        ? `Tests complete. ${scenarioPassed} scenarios passed, ${scenarioFailed} failed.`
+        : `All scenarios passed. ${scenarioPassed} passed.`;
       speak(summary);
     }
 
@@ -1912,50 +1995,95 @@ async function runTests(singleTestNumber) {
   }
 }
 
-function displayTestResults(results, passed, failed, skipped) {
-  const total = results.length;
-  const passRate = total > 0 ? ((passed / total) * 100).toFixed(1) : 0;
-  const hasMultipleScenarios = new Set(results.map((r) => r.testNumber).filter(Boolean)).size > 1;
+function aggregateResultsByScenario(results) {
+  const byScenario = {};
+  results.forEach((r) => {
+    const key = r.testNumber != null ? String(r.testNumber) : 'single';
+    if (!byScenario[key]) {
+      byScenario[key] = { testNumber: r.testNumber, steps: [] };
+    }
+    byScenario[key].steps.push(r);
+  });
+  const descMap = {};
+  (testDescriptionsData || []).forEach((t) => {
+    descMap[String(t.testNumber)] = t.description || '';
+  });
+  return Object.keys(byScenario)
+    .sort((a, b) => (a === 'single' ? 1 : 0) - (b === 'single' ? 1 : 0) || String(a).localeCompare(String(b), undefined, { numeric: true }))
+    .map((key) => {
+      const s = byScenario[key];
+      const steps = s.steps;
+      const hasFail = steps.some((r) => r.status === 'err');
+      const hasPass = steps.some((r) => r.status === 'info');
+      const allSkipped = steps.every((r) => r.status === 'skipped');
+      const passed = !hasFail && hasPass && !allSkipped;
+      const skipped = allSkipped;
+      return {
+        testNumber: s.testNumber,
+        key,
+        description: descMap[key] || (key === 'single' ? 'Single run' : `Test ${s.testNumber}`),
+        passed,
+        skipped,
+        steps
+      };
+    });
+}
 
-  testResultsSummary.textContent = `${total} tests • ${passed} passed • ${failed} failed • ${skipped} skipped (${passRate}% pass rate)`;
+function displayTestResults(results, scenarioSummary, scenarioPassed, scenarioFailed, scenarioSkipped, scenarioTotal) {
+  const passRate = scenarioTotal > 0 ? ((scenarioPassed / scenarioTotal) * 100).toFixed(1) : 0;
+  testResultsSummary.textContent = `${scenarioTotal} scenarios • ${scenarioPassed} passed • ${scenarioFailed} failed (${passRate}% pass rate)`;
 
-  const SCROLL_THRESHOLD = 10;
-  const showScrollBtn = results.length > SCROLL_THRESHOLD;
+  const isDark = document.body.classList.contains('dark-mode');
+  const layoutClass = isDark ? 'scenario-results-dark' : 'scenario-results-light';
 
-  let html = '<div class="test-results-grid" id="testResultsGrid">';
-
-  results.forEach(result => {
-    const statusClass = result.status === 'info' ? 'success' :
-                       result.status === 'skipped' ? 'warning' : 'danger';
-    const statusIcon = result.status === 'info' ? 'bi-check-circle' :
-                      result.status === 'skipped' ? 'bi-skip-forward' : 'bi-x-circle';
-    const scenarioLabel = hasMultipleScenarios && result.testNumber ? `<span class="badge badge-light mr-1">Test ${result.testNumber}</span>` : '';
-
+  let html = `<div class="scenario-results-layout ${layoutClass}" id="testResultsGrid">`;
+  html += '<div class="scenario-results-list">';
+  scenarioSummary.forEach((s, idx) => {
+    const id = String(idx + 1).padStart(3, '0');
+    const name = s.description || `Test ${s.testNumber}`;
+    const status = s.skipped ? 'SKIP' : s.passed ? 'PASS' : 'FAIL';
+    const statusClass = s.passed ? 'pass' : s.skipped ? 'skip' : 'fail';
     html += `
-      <div class="test-result-card test-result-${result.status}">
+      <div class="scenario-result-item scenario-result-${statusClass}">
+        <span class="scenario-id">${escapeHtml(id)}</span>
+        <span class="scenario-name">${escapeHtml(name)}</span>
+        <span class="scenario-status-badge scenario-status-${statusClass}">${status}</span>
+      </div>
+    `;
+  });
+  html += '</div>';
+  html += '<div class="scenario-results-summary">';
+  html += '<div class="scenario-summary-title">SUMMARY</div>';
+  html += '<div class="scenario-summary-row"><span class="scenario-summary-label">Total Tests</span><span class="scenario-summary-value">' + scenarioTotal + '</span></div>';
+  html += '<div class="scenario-summary-row"><span class="scenario-summary-label">Passed</span><span class="scenario-summary-value scenario-summary-pass">' + scenarioPassed + '</span></div>';
+  html += '<div class="scenario-summary-row"><span class="scenario-summary-label">Failed</span><span class="scenario-summary-value scenario-summary-fail">' + scenarioFailed + '</span></div>';
+  html += '</div>';
+  html += '</div>';
+
+  html += '<details class="scenario-debug-details mt-3"><summary class="scenario-debug-summary">Debug: all SET/GET steps</summary><div class="test-results-grid mt-2">';
+  results.forEach((result) => {
+    const statusClass = result.status === 'info' ? 'success' : result.status === 'skipped' ? 'warning' : 'danger';
+    const scenarioLabel = result.testNumber ? ` <span class="badge badge-light mr-1">Test ${result.testNumber}</span>` : '';
+    html += `
+      <div class="test-result-card test-result-${result.status} small">
         <div class="d-flex align-items-start">
-          <div class="test-result-icon ${statusClass}">
-            <i class="bi ${statusIcon}"></i>
-          </div>
+          <span class="badge badge-${statusClass} mr-2">${result.action}</span>
           <div class="flex-grow-1">
-            <div class="d-flex justify-content-between align-items-start mb-1">
-              <strong>Step ${result.step}</strong>
-              ${scenarioLabel}<span class="badge badge-${statusClass}">${result.action}</span>
-            </div>
-            <div class="text-muted small mb-1">${result.description || result.target}</div>
-            <div class="test-result-message">${result.message}</div>
+            <div><strong>Step ${result.step}</strong>${scenarioLabel}</div>
+            <div class="text-muted small">${escapeHtml(result.description || result.target)}</div>
+            <div class="test-result-message">${escapeHtml(result.message)}</div>
           </div>
         </div>
       </div>
     `;
   });
-  
-  html += '</div>';
+  html += '</div></details>';
+
   testResultsList.innerHTML = html;
 
   const scrollToTopBtn = document.getElementById('scrollToTopBtn');
   if (scrollToTopBtn) {
-    scrollToTopBtn.style.display = showScrollBtn ? 'inline-flex' : 'none';
+    scrollToTopBtn.style.display = results.length > 10 ? 'inline-flex' : 'none';
   }
 }
 
@@ -2588,8 +2716,8 @@ function initializeScanSetFields() {
 
     try {
       const [customRes, nativeRes] = await Promise.all([
-        fetch('/api/encompass-hub/custom-fields'),
-        fetch('/api/encompass-hub/native-fields'),
+        (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/custom-fields'),
+        (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/native-fields'),
       ]);
       const customItems = customRes.ok
         ? (await customRes.json())
@@ -2824,8 +2952,8 @@ function initializeGenerateFromCustomField() {
 
     try {
       const [customRes, nativeRes] = await Promise.all([
-        fetch('/api/encompass-hub/custom-fields'),
-        fetch('/api/encompass-hub/native-fields'),
+        (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/custom-fields'),
+        (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/native-fields'),
       ]);
       if (!customRes.ok) throw new Error(`Custom fields API failed (${customRes.status})`);
       const customData = await customRes.json();
