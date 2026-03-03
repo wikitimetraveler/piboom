@@ -2033,10 +2033,7 @@ function displayTestResults(results, scenarioSummary, scenarioPassed, scenarioFa
   const passRate = scenarioTotal > 0 ? ((scenarioPassed / scenarioTotal) * 100).toFixed(1) : 0;
   testResultsSummary.textContent = `${scenarioTotal} scenarios • ${scenarioPassed} passed • ${scenarioFailed} failed (${passRate}% pass rate)`;
 
-  const isDark = document.body.classList.contains('dark-mode');
-  const layoutClass = isDark ? 'scenario-results-dark' : 'scenario-results-light';
-
-  let html = `<div class="scenario-results-layout ${layoutClass}" id="testResultsGrid">`;
+  let html = `<div class="scenario-results-layout scenario-results-dark" id="testResultsGrid">`;
   html += '<div class="scenario-results-list">';
   scenarioSummary.forEach((s, idx) => {
     const id = String(idx + 1).padStart(3, '0');

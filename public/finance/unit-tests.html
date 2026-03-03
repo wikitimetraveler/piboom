@@ -292,12 +292,13 @@
         border-left: 4px solid rgba(255, 193, 7, 0.6);
       }
 
-      /* Scenario results layout - light mode */
+      /* Scenario results layout - black background, white font (like reference image) */
       .scenario-results-layout {
         display: flex;
         flex-wrap: wrap;
         gap: 1.5rem;
         align-items: flex-start;
+        color: #fff;
       }
       .scenario-results-list {
         flex: 1 1 280px;
@@ -312,61 +313,69 @@
         margin-bottom: 0.5rem;
         font-size: 0.9rem;
       }
-      .scenario-results-light .scenario-result-item {
-        background: rgba(248, 250, 252, 0.9);
-        border: 1px solid rgba(74, 144, 164, 0.2);
+      .scenario-results-dark .scenario-result-pass {
+        background: #1b4332;
+        border: none;
       }
-      .scenario-results-light .scenario-result-pass {
-        background: rgba(46, 204, 113, 0.12);
-        border-color: rgba(46, 204, 113, 0.35);
+      .scenario-results-dark .scenario-result-pass .scenario-id,
+      .scenario-results-dark .scenario-result-pass .scenario-name {
+        color: #fff;
       }
-      .scenario-results-light .scenario-result-fail {
-        background: rgba(231, 76, 60, 0.12);
-        border-color: rgba(231, 76, 60, 0.35);
+      .scenario-results-dark .scenario-result-fail {
+        background: #5c2d2d;
+        border: none;
       }
-      .scenario-results-light .scenario-result-skip {
-        background: rgba(148, 163, 184, 0.12);
-        border-color: rgba(148, 163, 184, 0.25);
+      .scenario-results-dark .scenario-result-fail .scenario-id,
+      .scenario-results-dark .scenario-result-fail .scenario-name {
+        color: #fff;
+      }
+      .scenario-results-dark .scenario-result-skip {
+        background: #2d3748;
+        border: none;
+      }
+      .scenario-results-dark .scenario-result-skip .scenario-id,
+      .scenario-results-dark .scenario-result-skip .scenario-name {
+        color: #e2e8f0;
       }
       .scenario-id {
         font-weight: 600;
-        color: var(--zen-muted);
+        color: #e2e8f0;
         min-width: 2.5rem;
       }
       .scenario-name {
         flex: 1;
-        color: var(--text-dark);
+        color: #fff;
       }
       .scenario-status-badge {
         font-size: 0.75rem;
         font-weight: 700;
-        padding: 0.2rem 0.5rem;
+        padding: 0.25rem 0.6rem;
         border-radius: 6px;
       }
       .scenario-status-pass {
-        background: #27ae60;
+        background: #22c55e;
         color: white;
       }
       .scenario-status-fail {
-        background: #e74c3c;
+        background: #ef4444;
         color: white;
       }
       .scenario-status-skip {
-        background: #95a5a6;
+        background: #64748b;
         color: white;
       }
       .scenario-results-summary {
         flex: 0 0 200px;
         padding: 1rem;
         border-radius: 12px;
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(74, 144, 164, 0.2);
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
       .scenario-summary-title {
         font-size: 0.75rem;
         font-weight: 700;
         letter-spacing: 0.05em;
-        color: var(--zen-muted);
+        color: #fff;
         margin-bottom: 0.75rem;
       }
       .scenario-summary-row {
@@ -376,50 +385,32 @@
         font-size: 0.9rem;
       }
       .scenario-summary-label {
-        color: var(--muted, #6b7280);
+        color: #94a3b8;
       }
       .scenario-summary-value {
         font-weight: 700;
-        color: var(--text-dark);
+        color: #fff;
       }
-      .scenario-summary-pass { color: #27ae60; }
-      .scenario-summary-fail { color: #e74c3c; }
+      .scenario-summary-pass { color: #22c55e; }
+      .scenario-summary-fail { color: #ef4444; }
       .scenario-debug-details { font-size: 0.9rem; }
-      .scenario-debug-summary { cursor: pointer; padding: 0.5rem 0; }
+      .scenario-debug-summary { cursor: pointer; padding: 0.5rem 0; color: #94a3b8; }
 
-      /* Dark mode overrides */
-      body.dark-mode .scenario-results-dark .scenario-result-item {
-        background: rgba(30, 41, 59, 0.8);
-        border-color: rgba(148, 163, 184, 0.2);
+      .test-results-dark-card {
+        background: #0d1117 !important;
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #fff;
       }
-      body.dark-mode .scenario-results-dark .scenario-result-pass {
-        background: rgba(46, 204, 113, 0.2);
-        border-color: rgba(46, 204, 113, 0.4);
-      }
-      body.dark-mode .scenario-results-dark .scenario-result-fail {
-        background: rgba(231, 76, 60, 0.2);
-        border-color: rgba(231, 76, 60, 0.4);
-      }
-      body.dark-mode .scenario-results-dark .scenario-result-skip {
-        background: rgba(148, 163, 184, 0.15);
-        border-color: rgba(148, 163, 184, 0.3);
-      }
-      body.dark-mode .scenario-results-dark .scenario-id,
-      body.dark-mode .scenario-results-dark .scenario-name {
+      .test-results-dark-card .text-muted { color: #94a3b8 !important; }
+      .test-results-dark-card h5, .test-results-dark-card .h5 { color: #fff !important; }
+      .test-results-dark-card .btn-outline-secondary {
+        border-color: rgba(255, 255, 255, 0.3);
         color: #e2e8f0;
       }
-      body.dark-mode .scenario-results-dark .scenario-results-summary {
-        background: rgba(30, 41, 59, 0.9);
-        border-color: rgba(148, 163, 184, 0.25);
-      }
-      body.dark-mode .scenario-results-dark .scenario-summary-title {
-        color: #94a3b8;
-      }
-      body.dark-mode .scenario-results-dark .scenario-summary-label {
-        color: #94a3b8;
-      }
-      body.dark-mode .scenario-results-dark .scenario-summary-value {
-        color: #f1f5f9;
+      .test-results-dark-card .btn-outline-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.5);
+        color: #fff;
       }
 
       .test-result-icon {
@@ -1899,7 +1890,7 @@
                       </div>
                       <!-- Test Results Panel -->
                       <div id="testResultsContainer" style="display: none;" class="mt-4">
-                        <div class="card p-4">
+                        <div class="card p-4 test-results-dark-card">
                           <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                               <h5 class="mb-1"><i class="bi-clipboard-check"></i> Test Results</h5>
