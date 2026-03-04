@@ -133,10 +133,8 @@
     return null;
   }
 
-  /** Fallback metadata for widely used fields when not in API response. */
-  const FALLBACK_FIELD_METADATA = {
-    'CX.TYPE': { dataType: 'String', format: '', description: 'Loan Category (Purchase, Refinance, etc.)' },
-  };
+  /** Fallback metadata for widely used fields when not in API response. No hardcoded options - use API only. */
+  const FALLBACK_FIELD_METADATA = {};
 
   /**
    * Build metadata lookup from custom + native field lists.
@@ -153,6 +151,10 @@
         format: item.format || item.formatType || item.displayFormat || '',
         description: item.description || item.longDescription || item.shortDescription || item.label || '',
       };
+      const fmt = String(meta.format || '').toUpperCase();
+      if ((fmt === 'DROPDOWNLIST' || fmt === 'DROPDOWN') && Array.isArray(item.options) && item.options.length > 0) {
+        meta.options = item.options.map((o) => (o && typeof o === 'object' ? (o.value ?? o.key ?? o.label ?? String(o)) : String(o)));
+      }
       const keys = [String(id).trim(), normalizeFieldIdForLookup(String(id))];
       keys.forEach((k) => { if (k) lookup[k] = meta; });
       if (item.contractPath) {
@@ -287,11 +289,16 @@
     return result;
   }
 
+  function getFallbackFieldMetadata() {
+    return { ...FALLBACK_FIELD_METADATA };
+  }
+
   global.customFieldCalcParser = {
     parseCalculationFormula: parseCalculationFormula,
     evaluateSimpleExpression: evaluateSimpleExpression,
     generateUnitTestFromCustomField: generateUnitTestFromCustomField,
     buildFieldMetadataLookup: buildFieldMetadataLookup,
+    getFallbackFieldMetadata: getFallbackFieldMetadata,
     normalizeFieldIdForLookup: normalizeFieldIdForLookup,
     isDateFieldByNotation: isDateFieldByNotation,
     isNumberFieldByNotation: isNumberFieldByNotation,

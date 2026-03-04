@@ -594,6 +594,9 @@ function generateColumnDefs(headers, rows) {
           else if (desc.includes('(date)') || /\bdate\b/.test(desc)) meta = { dataType: 'Date', format: '', description: 'Date (from Description)' };
         }
         const dt = (meta && meta.dataType) ? String(meta.dataType).toLowerCase() : '';
+        if (meta && Array.isArray(meta.options) && meta.options.length > 0) {
+          return { component: 'agSelectCellEditor', params: { values: meta.options } };
+        }
         if (/integer/i.test(dt)) {
           return { component: 'agNumberCellEditor', params: { precision: 0, step: 1 } };
         }
@@ -2287,6 +2290,9 @@ async function handleFileUpload(file) {
     
     // Populate grid
     setGridRows(allData);
+    if (gridApi && typeof gridApi.refreshCells === 'function') {
+      gridApi.refreshCells({ force: true });
+    }
     showAllColumns();
 
     // Count scenario columns: Reset, Test 1..N only; stop at first blank or non-Test
@@ -2690,7 +2696,8 @@ let currentFieldMetadata = {};
 function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fieldMetadata) {
   if (!rows || rows.length === 0) return;
 
-  currentFieldMetadata = fieldMetadata || {};
+  const fallback = window.customFieldCalcParser?.getFallbackFieldMetadata?.() || {};
+  currentFieldMetadata = { ...fallback, ...(fieldMetadata || {}) };
   columnDefs = generateColumnDefs(headers, rows);
   allData = rows;
   lastRunCellResults = {};
@@ -2820,16 +2827,41 @@ function initializeScanSetFields() {
         const baseId = id.replace(/^[@#]+/, '');
         const readOnly = !!(item.readOnly ?? item.isReadOnly ?? false);
         const isCalc = !!(item.isCalculatedField ?? item.isCalculated ?? item.calculated ?? item.isCalculation ?? false);
+        const fmt = String(item.format || item.formatType || '').toUpperCase();
+        const rawOpts = item.options ?? item.Options ?? item.values ?? item.Values ?? item.enum ?? item.Enum;
+        const options = Array.isArray(rawOpts) && rawOpts.length > 0
+          ? rawOpts.map((o) => (o && typeof o === 'object' ? (o.Value ?? o.value ?? o.Key ?? o.key ?? o.Label ?? o.label ?? o.Text ?? o.text ?? String(o)) : String(o)))
+          : null;
         for (const key of [baseId, id]) {
           if (!key) continue;
           if (!fieldMeta[key]) fieldMeta[key] = { id: baseId, readOnly: false, isCalculated: false, source: '' };
           fieldMeta[key].readOnly = fieldMeta[key].readOnly || readOnly;
           fieldMeta[key].isCalculated = fieldMeta[key].isCalculated || isCalc;
           if (!fieldMeta[key].source) fieldMeta[key].source = source;
+          const isDropdownFormat = /^(DROPDOWN|DROPDOWNLIST|SELECT|LIST|COMBO)$/i.test(fmt);
+          if (options && isDropdownFormat) {
+            fieldMeta[key].options = options;
+            fieldMeta[key].dataType = fieldMeta[key].dataType || 'String';
+          }
         }
       };
       customList.forEach((item) => addMeta(item, 'custom'));
       nativeList.forEach((item) => addMeta(item, 'native'));
+
+      // Merge enumerated options into currentFieldMetadata so grid uses dropdowns for SET rows (API only, no fallback)
+      if (typeof currentFieldMetadata === 'object') {
+        Object.keys(fieldMeta).forEach((k) => {
+          const opts = fieldMeta[k].options;
+          if (opts && opts.length > 0) {
+            if (!currentFieldMetadata[k]) currentFieldMetadata[k] = {};
+            currentFieldMetadata[k].options = opts;
+            if (!currentFieldMetadata[k].dataType) currentFieldMetadata[k].dataType = 'String';
+          }
+        });
+        if (gridApi && typeof gridApi.refreshCells === 'function') {
+          gridApi.refreshCells({ force: true });
+        }
+      }
 
       const problems = [];
       const checked = new Set();
@@ -2852,8 +2884,14 @@ function initializeScanSetFields() {
       });
 
       statusEl.textContent = '';
+      const fieldsWithOptions = Object.keys(fieldMeta).filter((k) => fieldMeta[k].options && fieldMeta[k].options.length > 0);
+      const uniqueOptFields = [...new Set(fieldsWithOptions.map((k) => fieldMeta[k].id))];
       if (problems.length === 0) {
-        resultsEl.innerHTML = '<p class="text-success mb-0"><i class="bi-check-circle mr-1"></i>No read-only or calculated fields found in SET rows. All SET targets should work.</p>';
+        let msg = '<p class="text-success mb-0"><i class="bi-check-circle mr-1"></i>No read-only or calculated fields found in SET rows. All SET targets should work.</p>';
+        if (uniqueOptFields.length > 0) {
+          msg += `<p class="text-muted small mt-2 mb-0"><i class="bi-list-ul mr-1"></i>Added dropdowns for ${uniqueOptFields.length} custom field(s) with enumerated values. Edit Test columns to use them.</p>`;
+        }
+        resultsEl.innerHTML = msg;
         return;
       }
 
@@ -2868,6 +2906,9 @@ function initializeScanSetFields() {
       });
       html += '</ul>';
       html += '<p class="text-muted small mt-3 mb-0">Remove or change these SET steps, or use fields that are writable.</p>';
+      if (uniqueOptFields.length > 0) {
+        html += `<p class="text-muted small mt-2 mb-0"><i class="bi-list-ul mr-1"></i>Added dropdowns for ${uniqueOptFields.length} custom field(s) with enumerated values.</p>`;
+      }
       resultsEl.innerHTML = html;
     } catch (err) {
       statusEl.textContent = '';

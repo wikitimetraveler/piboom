@@ -1533,71 +1533,70 @@
 
     </style>
     <style id="unit-tests-night-theme">
-      /* Unit Tests Night Mode - self-contained, loads last */
-      body.unit-tests-night-theme{background:#0d1117!important;color:#e6edf3!important}
-      body.unit-tests-night-theme::before{background:radial-gradient(circle at 20% 80%,rgba(46,204,113,0.08) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(74,144,164,0.06) 0%,transparent 50%)!important}
-      body.unit-tests-night-theme .navbar{background:#161b22!important;border-color:#30363d!important}
-      body.unit-tests-night-theme .navbar .navbar-brand,body.unit-tests-night-theme .navbar .nav-link{color:#e6edf3!important}
-      body.unit-tests-night-theme .navbar .nav-link:hover{color:#58a6ff!important}
-      body.unit-tests-night-theme .main-content,body.unit-tests-night-theme .container{color:#e6edf3}
-      body.unit-tests-night-theme .card{background:#161b22!important;border-color:#30363d!important;color:#e6edf3!important}
-      body.unit-tests-night-theme .card-header{background:#21262d!important;border-color:#30363d!important;color:#e6edf3!important}
-      body.unit-tests-night-theme .card-header .btn-link{color:#e6edf3!important}
-      body.unit-tests-night-theme .card-header .btn-link:hover{color:#58a6ff!important;background:#161b22!important}
-      body.unit-tests-night-theme .card-body{background:#161b22!important;color:#e6edf3!important;border-color:#30363d!important}
-      body.unit-tests-night-theme .accordion .card{background:#161b22!important;border-color:#30363d!important}
-      body.unit-tests-night-theme .accordion .card-header{background:#21262d!important;border-color:#30363d!important}
-      body.unit-tests-night-theme .accordion .card-header .btn-link{color:#e6edf3!important}
-      body.unit-tests-night-theme .accordion .card-body{background:#161b22!important;color:#e6edf3!important}
-      body.unit-tests-night-theme .accordion .collapse.show{border-color:#30363d!important}
-      body.unit-tests-night-theme .text-muted{color:#8b949e!important}
-      body.unit-tests-night-theme .badge,body.unit-tests-night-theme .badge-soft{background:#21262d!important;color:#e6edf3!important;border-color:#30363d!important}
-      body.unit-tests-night-theme h5,body.unit-tests-night-theme .h5{color:#e6edf3!important}
-      body.unit-tests-night-theme .form-control{background:#0d1117!important;border-color:#30363d!important;color:#e6edf3!important}
-      body.unit-tests-night-theme .btn-outline-secondary{border-color:#30363d!important;color:#8b949e!important}
-      body.unit-tests-night-theme .btn-outline-secondary:hover{background:#21262d!important;color:#e6edf3!important}
-      body.unit-tests-night-theme .btn-primary,body.unit-tests-night-theme .btn-success{background:#238636!important;border-color:#238636!important}
-      body.unit-tests-night-theme .tool-pills{background:#161b22!important;border-color:#30363d!important}
-      body.unit-tests-night-theme .tool-pills .nav-link{color:#8b949e!important}
-      body.unit-tests-night-theme .tool-pills .nav-link.active{background:#238636!important;color:#fff!important}
-      body.unit-tests-night-theme .ag-theme-alpine{--ag-background-color:#0d1117!important;--ag-foreground-color:#e6edf3!important;--ag-header-background-color:#161b22!important;--ag-header-foreground-color:#e6edf3!important;--ag-odd-row-background-color:#0d1117!important;--ag-row-hover-color:#21262d!important;--ag-border-color:#30363d!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-root,body.unit-tests-night-theme .ag-theme-alpine .ag-body-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-center-cols-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-row{background:#0d1117!important;color:#e6edf3!important;border-color:#30363d!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell{background:#161b22!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell.test-scenario-column{background:rgba(74,144,164,0.2)!important;color:#e6edf3!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-row-hover .ag-cell{background:#21262d!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell{background:#161b22!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-pass{background:rgba(46,204,113,0.2)!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-fail{background:rgba(255,182,193,0.45)!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-row:hover .ag-cell.test-scenario-cell.cell-fail{background:rgba(255,182,193,0.6)!important}
-      body.unit-tests-night-theme .test-description-card .scenario-card-front,body.unit-tests-night-theme .test-description-card .scenario-card-back{background:#21262d!important;border-color:#30363d!important;color:#e6edf3!important}
-      body.unit-tests-night-theme .test-description-card .test-description-text{color:#e6edf3!important}
-      body.unit-tests-night-theme .test-description-card .scenario-edit-toggle{color:#58a6ff!important;background:rgba(88,166,255,0.15)!important;border-color:rgba(88,166,255,0.4)!important}
-      body.unit-tests-night-theme .test-description-card .scenario-edit-toggle:hover{background:rgba(88,166,255,0.25)!important;color:#79c0ff!important}
-      body.unit-tests-night-theme .test-description-card .scenario-run-btn{background:linear-gradient(135deg,#238636 0%,#2ea043 100%)!important;color:#fff!important}
-      body.unit-tests-night-theme .test-description-card .scenario-run-btn:hover{background:linear-gradient(135deg,#2ea043 0%,#3fb950 100%)!important;box-shadow:0 2px 8px rgba(46,204,113,0.35)!important}
-      body.unit-tests-night-theme .test-description-card .test-number-badge{background:linear-gradient(135deg,#238636 0%,#2ea043 100%)!important;color:#fff!important;box-shadow:0 2px 6px rgba(46,204,113,0.3)!important}
-      body.unit-tests-night-theme .test-description-card.test-scenario-active .scenario-card-front{border-color:rgba(210,153,34,0.8)!important;box-shadow:0 4px 12px rgba(210,153,34,0.25)!important;background:linear-gradient(135deg,rgba(210,153,34,0.2) 0%,rgba(210,153,34,0.08) 100%)!important}
-      body.unit-tests-night-theme .test-description-card.test-scenario-active .scenario-card-front::before{background:linear-gradient(180deg,rgba(210,153,34,0.9) 0%,rgba(210,153,34,0.6) 100%)!important}
-      body.unit-tests-night-theme .scenario-card-back textarea{background:#0d1117!important;border-color:#30363d!important;color:#e6edf3!important}
-      body.unit-tests-night-theme .scenario-flip-back-btn{color:#58a6ff!important}
-      body.unit-tests-night-theme .scenario-context-menu{background:#161b22!important;border-color:#30363d!important}
-      body.unit-tests-night-theme .scenario-context-menu button{color:#e6edf3!important}
-      body.unit-tests-night-theme .scenario-context-menu button:hover{background:#21262d!important}
-      body.unit-tests-night-theme .scenario-status-badge.success{background:rgba(46,204,113,0.35)!important;color:#7ee787!important}
-      body.unit-tests-night-theme .scenario-status-badge.fail{background:rgba(248,81,73,0.35)!important;color:#f85149!important}
-      body.unit-tests-night-theme .scenario-status-badge.warn{background:rgba(210,153,34,0.35)!important;color:#d29922!important}
-      body.unit-tests-night-theme .scenario-status-badge.empty{background:rgba(139,148,158,0.25)!important;color:#8b949e!important}
-      body.unit-tests-night-theme .overall-signoff-grid .card{background:#21262d!important;border-color:#30363d!important}
-      body.unit-tests-night-theme .field-id-badge{background:rgba(74,144,164,0.3)!important;color:#e6edf3!important;border-color:rgba(74,144,164,0.5)!important}
+      /* Unit Tests Dark Mode - professional slate/charcoal palette */
+      body.unit-tests-night-theme{background:#0f172a!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .navbar{background:#1e293b!important;border-color:#475569!important}
+      body.unit-tests-night-theme .navbar .navbar-brand,body.unit-tests-night-theme .navbar .nav-link{color:#f1f5f9!important}
+      body.unit-tests-night-theme .navbar .nav-link:hover{color:#38bdf8!important}
+      body.unit-tests-night-theme .main-content,body.unit-tests-night-theme .container{color:#f1f5f9}
+      body.unit-tests-night-theme .card{background:#1e293b!important;border:1px solid rgba(255,255,255,0.06)!important;color:#f1f5f9!important;box-shadow:0 1px 3px rgba(0,0,0,0.2)!important}
+      body.unit-tests-night-theme .card-header{background:#334155!important;border-color:rgba(255,255,255,0.06)!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .card-header .btn-link{color:#f1f5f9!important}
+      body.unit-tests-night-theme .card-header .btn-link:hover{color:#38bdf8!important;background:#1e293b!important}
+      body.unit-tests-night-theme .card-body{background:#1e293b!important;color:#f1f5f9!important;border-color:rgba(255,255,255,0.06)!important}
+      body.unit-tests-night-theme .accordion .card{background:#1e293b!important;border:1px solid rgba(255,255,255,0.06)!important;box-shadow:0 1px 3px rgba(0,0,0,0.2)!important}
+      body.unit-tests-night-theme .accordion .card-header{background:#334155!important;border-color:rgba(255,255,255,0.06)!important}
+      body.unit-tests-night-theme .accordion .card-header .btn-link{color:#f1f5f9!important}
+      body.unit-tests-night-theme .accordion .card-body{background:#1e293b!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .accordion .collapse.show{border-color:rgba(255,255,255,0.06)!important}
+      body.unit-tests-night-theme .text-muted{color:#94a3b8!important}
+      body.unit-tests-night-theme .badge,body.unit-tests-night-theme .badge-soft{background:#334155!important;color:#f1f5f9!important;border-color:#475569!important}
+      body.unit-tests-night-theme h5,body.unit-tests-night-theme .h5{color:#f1f5f9!important}
+      body.unit-tests-night-theme .form-control{background:#0f172a!important;border-color:#475569!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .btn-outline-secondary{border-color:#475569!important;color:#94a3b8!important}
+      body.unit-tests-night-theme .btn-outline-secondary:hover{background:#334155!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .btn-primary,body.unit-tests-night-theme .btn-success{background:#059669!important;border-color:#059669!important}
+      body.unit-tests-night-theme .tool-pills{background:#1e293b!important;border-color:#475569!important}
+      body.unit-tests-night-theme .tool-pills .nav-link{color:#94a3b8!important}
+      body.unit-tests-night-theme .tool-pills .nav-link.active{background:#059669!important;color:#fff!important}
+      body.unit-tests-night-theme .ag-theme-alpine{--ag-background-color:#0f172a!important;--ag-foreground-color:#f1f5f9!important;--ag-header-background-color:#1e293b!important;--ag-header-foreground-color:#f1f5f9!important;--ag-odd-row-background-color:#0f172a!important;--ag-row-hover-color:#334155!important;--ag-border-color:#475569!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-root,body.unit-tests-night-theme .ag-theme-alpine .ag-body-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-center-cols-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-row{background:#0f172a!important;color:#f1f5f9!important;border-color:#475569!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell{background:#1e293b!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell.test-scenario-column{background:rgba(56,189,248,0.15)!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-row-hover .ag-cell{background:#334155!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell{background:#1e293b!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-pass{background:rgba(52,211,153,0.2)!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-fail{background:rgba(248,113,113,0.3)!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-row:hover .ag-cell.test-scenario-cell.cell-fail{background:rgba(248,113,113,0.4)!important}
+      body.unit-tests-night-theme .test-description-card .scenario-card-front,body.unit-tests-night-theme .test-description-card .scenario-card-back{background:#334155!important;border:1px solid rgba(255,255,255,0.06)!important;color:#f1f5f9!important;box-shadow:0 1px 3px rgba(0,0,0,0.2)!important}
+      body.unit-tests-night-theme .test-description-card .test-description-text{color:#f1f5f9!important}
+      body.unit-tests-night-theme .test-description-card .scenario-edit-toggle{color:#38bdf8!important;background:rgba(56,189,248,0.15)!important;border-color:rgba(56,189,248,0.4)!important}
+      body.unit-tests-night-theme .test-description-card .scenario-edit-toggle:hover{background:rgba(56,189,248,0.25)!important;color:#7dd3fc!important}
+      body.unit-tests-night-theme .test-description-card .scenario-run-btn{background:linear-gradient(135deg,#059669 0%,#10b981 100%)!important;color:#fff!important}
+      body.unit-tests-night-theme .test-description-card .scenario-run-btn:hover{background:linear-gradient(135deg,#10b981 0%,#34d399 100%)!important;box-shadow:0 2px 8px rgba(5,150,105,0.35)!important}
+      body.unit-tests-night-theme .test-description-card .test-number-badge{background:linear-gradient(135deg,#059669 0%,#10b981 100%)!important;color:#fff!important;box-shadow:0 2px 6px rgba(5,150,105,0.3)!important}
+      body.unit-tests-night-theme .test-description-card.test-scenario-active .scenario-card-front{border-color:rgba(251,191,36,0.6)!important;box-shadow:0 4px 12px rgba(251,191,36,0.2)!important;background:linear-gradient(135deg,rgba(251,191,36,0.15) 0%,rgba(251,191,36,0.06) 100%)!important}
+      body.unit-tests-night-theme .test-description-card.test-scenario-active .scenario-card-front::before{background:linear-gradient(180deg,rgba(251,191,36,0.8) 0%,rgba(251,191,36,0.5) 100%)!important}
+      body.unit-tests-night-theme .scenario-card-back textarea{background:#0f172a!important;border-color:#475569!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .scenario-flip-back-btn{color:#38bdf8!important}
+      body.unit-tests-night-theme .scenario-context-menu{background:#1e293b!important;border-color:#475569!important;box-shadow:0 4px 12px rgba(0,0,0,0.3)!important}
+      body.unit-tests-night-theme .scenario-context-menu button{color:#f1f5f9!important}
+      body.unit-tests-night-theme .scenario-context-menu button:hover{background:#334155!important}
+      body.unit-tests-night-theme .scenario-status-badge.success{background:rgba(52,211,153,0.25)!important;color:#34d399!important}
+      body.unit-tests-night-theme .scenario-status-badge.fail{background:rgba(248,81,73,0.25)!important;color:#f87171!important}
+      body.unit-tests-night-theme .scenario-status-badge.warn{background:rgba(251,191,36,0.25)!important;color:#fbbf24!important}
+      body.unit-tests-night-theme .scenario-status-badge.empty{background:rgba(148,163,184,0.2)!important;color:#94a3b8!important}
+      body.unit-tests-night-theme .overall-signoff-grid .card{background:#334155!important;border:1px solid rgba(255,255,255,0.06)!important;box-shadow:0 1px 3px rgba(0,0,0,0.2)!important}
+      body.unit-tests-night-theme .field-id-badge{background:rgba(56,189,248,0.2)!important;color:#f1f5f9!important;border-color:rgba(56,189,248,0.4)!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-cell{white-space:normal!important;overflow:visible!important}
-      body.unit-tests-night-theme .action-badge.action-set{background:rgba(46,204,113,0.35)!important;color:#7ee787!important;border-color:rgba(46,204,113,0.5)!important}
-      body.unit-tests-night-theme .action-badge.action-get{background:rgba(88,166,255,0.35)!important;color:#58a6ff!important;border-color:rgba(88,166,255,0.5)!important}
-      body.unit-tests-night-theme .action-badge.action-compare{background:rgba(210,153,34,0.35)!important;color:#d29922!important;border-color:rgba(210,153,34,0.5)!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-badge.test-value-yes{background:rgba(46,204,113,0.35)!important;color:#7ee787!important;border-color:rgba(46,204,113,0.5)!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-badge.test-value-no{background:rgba(248,81,73,0.35)!important;color:#f85149!important;border-color:rgba(248,81,73,0.5)!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-numeric{color:#e6edf3!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-text{color:#e6edf3!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .text-muted{color:#8b949e!important}
+      body.unit-tests-night-theme .action-badge.action-set{background:rgba(52,211,153,0.25)!important;color:#34d399!important;border-color:rgba(52,211,153,0.4)!important}
+      body.unit-tests-night-theme .action-badge.action-get{background:rgba(56,189,248,0.25)!important;color:#38bdf8!important;border-color:rgba(56,189,248,0.4)!important}
+      body.unit-tests-night-theme .action-badge.action-compare{background:rgba(251,191,36,0.25)!important;color:#fbbf24!important;border-color:rgba(251,191,36,0.4)!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-badge.test-value-yes{background:rgba(52,211,153,0.25)!important;color:#34d399!important;border-color:rgba(52,211,153,0.4)!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-badge.test-value-no{background:rgba(248,81,73,0.25)!important;color:#f87171!important;border-color:rgba(248,81,73,0.4)!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-numeric{color:#f1f5f9!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-text{color:#f1f5f9!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .text-muted{color:#94a3b8!important}
     </style>
   </head>
   <body data-page="unit-tests">
@@ -2049,9 +2048,9 @@
         function init(){
           set(isOn());
           if(!document.getElementById('unitTestsNightToggle')){
-            var b=document.createElement('button');b.id='unitTestsNightToggle';b.type='button';b.title='Toggle night mode';b.setAttribute('aria-label','Toggle night mode');
-            b.style.cssText='position:fixed;top:70px;right:16px;z-index:999;width:40px;height:40px;border-radius:8px;border:1px solid #dee2e6;background:#fff;color:#1f2937;cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
-            function updateBtn(){var on=document.body.classList.contains('unit-tests-night-theme');b.innerHTML=on?'☀️':'🌙';b.title=on?'Switch to light mode':'Switch to night mode';b.style.background=on?'#161b22':'#fff';b.style.color=on?'#e6edf3':'#1f2937';b.style.borderColor=on?'#30363d':'#dee2e6';}
+            var b=document.createElement('button');b.id='unitTestsNightToggle';b.type='button';b.className='dark-mode-toggle';
+            b.style.cssText='position:fixed;top:70px;right:16px;z-index:999;width:40px;height:40px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#1e293b;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
+            function updateBtn(){var on=document.body.classList.contains('unit-tests-night-theme');b.innerHTML=on?'<i class="bi bi-sun-fill"></i>':'<i class="bi bi-moon-stars-fill"></i>';b.title=on?'Switch to light mode':'Switch to dark mode';b.setAttribute('aria-label',on?'Switch to light mode':'Switch to dark mode');b.style.background=on?'#1e293b':'#fff';b.style.color=on?'#f1f5f9':'#1e293b';b.style.borderColor=on?'#475569':'#e2e8f0';}
             updateBtn();
             b.onclick=function(){set(!document.body.classList.contains('unit-tests-night-theme'));updateBtn();};
             document.body.appendChild(b);
