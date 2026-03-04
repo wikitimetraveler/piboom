@@ -1062,18 +1062,109 @@ function escapeCsvCell(val) {
   return v.includes(',') || v.includes('"') || v.includes('\n') ? '"' + v.replace(/"/g, '""') + '"' : v;
 }
 
+/**
+ * Build export rows in the standard format: scenarios at top, buffer lines, header, data grouped by action.
+ * Returns { aoa: number[][] for Excel, headers: string[] }.
+ */
+function buildExportRowsInFormat() {
+  const headers = columnDefs.filter((col) => col.field).map((col) => col.field);
+  if (headers.length === 0 && allData && allData[0]) {
+    headers.push(...Object.keys(allData[0]));
+  }
+  const numCols = Math.max(headers.length, 1);
+
+  const emptyRow = () => Array(numCols).fill('');
+  const rowFromObj = (obj) => headers.map((h) => {
+    const v = obj[h];
+    return v === null || v === undefined ? '' : String(v);
+  });
+
+  const aoa = [];
+
+  // 1. Scenario rows at top (one per test scenario) - count matches loaded scenarios
+  let scenarios = testDescriptionsData && testDescriptionsData.length > 0 ? testDescriptionsData : [];
+  if (scenarios.length === 0) {
+    const testHeaders = headers.filter((h) => /^test\s*#?\s*\d+$/i.test(h) || /^test\d+$/i.test(h));
+    scenarios = testHeaders.map((h) => {
+      const m = String(h).match(/^test\s*#?\s*(\d+)$/i) || String(h).match(/^test(\d+)$/i);
+      return { testNumber: m ? m[1] : '', description: '' };
+    }).filter((s) => s.testNumber);
+  }
+  if (scenarios.length > 0) {
+    scenarios.forEach((s) => {
+      const r = emptyRow();
+      r[0] = `Scenario ${s.testNumber}`;
+      aoa.push(r);
+    });
+  }
+
+  // 2. Buffer rows (2 empty lines)
+  aoa.push(emptyRow());
+  aoa.push(emptyRow());
+
+  // 3. Header row
+  aoa.push([...headers]);
+
+  // 4. Partition data rows by action
+  const setRows = [];
+  const getRows = [];
+  const compareRows = [];
+  const otherRows = [];
+  (allData || []).forEach((r) => {
+    const action = String(r.Action || r.action || '').trim().toUpperCase();
+    const step = String(r.Step || r.step || '').trim().toUpperCase();
+    if (step === 'X' || step === '') {
+      otherRows.push(r);
+    } else if (action === 'SET') {
+      setRows.push(r);
+    } else if (action === 'GET') {
+      getRows.push(r);
+    } else if (action === 'COMPARE') {
+      compareRows.push(r);
+    } else {
+      otherRows.push(r);
+    }
+  });
+
+  // 5. SET rows
+  setRows.forEach((r) => aoa.push(rowFromObj(r)));
+
+  // 6. Buffer (2 lines) between SET and GET
+  aoa.push(emptyRow());
+  aoa.push(emptyRow());
+
+  // 7. GET rows
+  getRows.forEach((r) => aoa.push(rowFromObj(r)));
+
+  // 8. Buffer + "Actual Results" section (if we have COMPARE rows)
+  if (compareRows.length > 0) {
+    aoa.push(emptyRow());
+    const actualHeader = emptyRow();
+    actualHeader[0] = 'Actual Results';
+    aoa.push(actualHeader);
+    compareRows.forEach((r) => aoa.push(rowFromObj(r)));
+  }
+
+  // 9. Buffer + "Overall Test Results" section
+  aoa.push(emptyRow());
+  aoa.push(emptyRow());
+  const overallHeader = emptyRow();
+  overallHeader[0] = 'Overall Test Results';
+  aoa.push(overallHeader);
+
+  // 10. Other rows (e.g. loan GET, Test Results)
+  otherRows.forEach((r) => aoa.push(rowFromObj(r)));
+
+  return { aoa, headers };
+}
+
 function exportToCSV() {
   if (!allData || allData.length === 0) {
     console.warn('No data to export');
     return;
   }
-  const headers = columnDefs.filter((col) => col.field).map((col) => col.field);
-  if (headers.length === 0) headers.push(...Object.keys(allData[0] || {}));
-  const rows = allData;
-  const lines = [
-    headers.map(escapeCsvCell).join(','),
-    ...rows.map((r) => headers.map((h) => escapeCsvCell(r[h])).join(',')),
-  ];
+  const { aoa, headers } = buildExportRowsInFormat();
+  const lines = aoa.map((row) => row.map(escapeCsvCell).join(','));
   const csv = lines.join('\n') + '\n';
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
@@ -1089,13 +1180,8 @@ function exportToExcel() {
     setStatus('No data to export or XLSX library not loaded', 'err', 'bi-exclamation-octagon');
     return;
   }
-  const headers = columnDefs
-    .filter((col) => col.field)
-    .map((col) => col.field);
-  if (headers.length === 0) {
-    headers.push(...Object.keys(allData[0] || {}));
-  }
-  const worksheet = XLSX.utils.json_to_sheet(allData, { header: headers });
+  const { aoa } = buildExportRowsInFormat();
+  const worksheet = XLSX.utils.aoa_to_sheet(aoa);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Test Cases');
   const baseName = (currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '');
