@@ -35,37 +35,37 @@
 
 const DARK_MODE_KEY = 'devConnectLabs_darkMode';
 
-// CSS for dark mode
+// CSS for dark mode - professional grey palette
 const darkModeStyles = `
   body.dark-mode {
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #16213e;
-    --text-primary: #eee;
-    --text-secondary: #bbb;
-    --muted: #888;
-    --border: rgba(255, 255, 255, 0.1);
+    --bg-primary: #374151;
+    --bg-secondary: #4b5563;
+    --text-primary: #f3f4f6;
+    --text-secondary: #d1d5db;
+    --muted: #9ca3af;
+    --border: rgba(255, 255, 255, 0.12);
     --ice-primary: #667eea;
     --ice-secondary: #764ba2;
     --ice-light: rgba(102, 126, 234, 0.1);
     --ice-glow: rgba(102, 126, 234, 0.3);
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    background: linear-gradient(135deg, #374151, #4b5563, #6b7280);
     color: var(--text-primary);
   }
   
   body.dark-mode .navbar,
   body.dark-mode .modern-navbar {
-    background: rgba(26, 26, 46, 0.95) !important;
-    border-bottom-color: rgba(102, 126, 234, 0.3);
+    background: rgba(75, 85, 99, 0.98) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.12);
   }
   
   body.dark-mode .tool-card {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(102, 126, 234, 0.2);
+    background: rgba(75, 85, 99, 0.8);
+    border-color: rgba(255, 255, 255, 0.12);
     color: var(--text-primary);
   }
   
   body.dark-mode .tool-card:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(107, 114, 128, 0.9);
     border-color: var(--ice-primary);
   }
   
@@ -75,21 +75,21 @@ const darkModeStyles = `
   }
   
   body.dark-mode .premium-accordion .card {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(102, 126, 234, 0.2);
+    background: rgba(75, 85, 99, 0.8);
+    border-color: rgba(255, 255, 255, 0.12);
   }
   
   body.dark-mode .premium-accordion .card-header {
-    background: rgba(102, 126, 234, 0.1);
+    background: rgba(107, 114, 128, 0.9);
   }
   
   body.dark-mode .card-body {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(75, 85, 99, 0.6);
   }
   
   body.dark-mode .dropdown-menu {
-    background: rgba(26, 26, 46, 0.98);
-    border-color: rgba(102, 126, 234, 0.3);
+    background: rgba(75, 85, 99, 0.98);
+    border-color: rgba(255, 255, 255, 0.12);
   }
   
   body.dark-mode .dropdown-item {
@@ -97,18 +97,18 @@ const darkModeStyles = `
   }
   
   body.dark-mode .dropdown-item:hover {
-    background: rgba(102, 126, 234, 0.2);
+    background: rgba(107, 114, 128, 0.9);
     color: white;
   }
   
   body.dark-mode .footer {
-    background: linear-gradient(135deg, #0f0c29, #302b63);
-    border-top-color: rgba(102, 126, 234, 0.3);
+    background: linear-gradient(135deg, #374151, #4b5563);
+    border-top-color: rgba(255, 255, 255, 0.12);
   }
   
   body.dark-mode .user-selector {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border-color: rgba(102, 126, 234, 0.3) !important;
+    background: rgba(75, 85, 99, 0.8) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
   }
   
   /* Dark mode toggle button */

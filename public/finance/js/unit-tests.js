@@ -12,8 +12,6 @@ const clearBtn = document.getElementById('clearBtn');
 const searchInput = document.getElementById('searchInput');
 const resultsMeta = document.getElementById('resultsMeta');
 const fileInfo = document.getElementById('fileInfo');
-const exampleFilesList = document.getElementById('exampleFilesList');
-const exampleFilesContainer = document.getElementById('exampleFilesContainer');
 const testResultsContainer = document.getElementById('testResultsContainer');
 const testResultsList = document.getElementById('testResultsList');
 const testResultsSummary = document.getElementById('testResultsSummary');
@@ -2248,25 +2246,6 @@ function clearData() {
   setStatus('Ready', 'info', 'bi-info-circle');
 }
 
-async function loadExampleFile(fileName) {
-  try {
-    setStatus('Loading example file...', 'info', 'bi-clock-history');
-    
-    const response = await fetch(`/finance/data/${encodeURIComponent(fileName)}`);
-    if (!response.ok) {
-      throw new Error(`Failed to load file: ${response.status} ${response.statusText}`);
-    }
-    
-    const blob = await response.blob();
-    const file = new File([blob], fileName, { type: blob.type });
-    
-    await handleFileUpload(file);
-  } catch (error) {
-    console.error('Error loading example file:', error);
-    setStatus(`Error loading file: ${error.message}`, 'err', 'bi-exclamation-octagon');
-  }
-}
-
 async function handleFileUpload(file) {
   if (!file) return;
   
@@ -2639,43 +2618,6 @@ searchInput.addEventListener('input', () => {
   applySearch();
 });
 
-// Example file buttons
-if (exampleFilesList) {
-  exampleFilesList.addEventListener('click', (e) => {
-    const button = e.target.closest('button[data-file]');
-    if (button) {
-      const fileName = button.getAttribute('data-file');
-      loadExampleFile(fileName);
-    }
-  });
-}
-
-// Example Files: drag-and-drop and paste support
-if (exampleFilesContainer) {
-  exampleFilesContainer.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const hasFile = e.dataTransfer?.types?.includes('Files');
-    if (hasFile) exampleFilesContainer.classList.add('dragover');
-  });
-  exampleFilesContainer.addEventListener('dragleave', (e) => {
-    if (!exampleFilesContainer.contains(e.relatedTarget)) {
-      exampleFilesContainer.classList.remove('dragover');
-    }
-  });
-  exampleFilesContainer.addEventListener('drop', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    exampleFilesContainer.classList.remove('dragover');
-    const file = e.dataTransfer?.files?.[0];
-    if (file && /\.(xlsx|xls)$/i.test(file.name)) {
-      handleFileUpload(file);
-    } else if (file) {
-      setStatus('Please drop an Excel file (.xlsx or .xls)', 'err', 'bi-exclamation-octagon');
-    }
-  });
-}
-
 // Paste Excel file from clipboard (Ctrl+V when file copied)
 document.addEventListener('paste', (e) => {
   const files = e.clipboardData?.files;
@@ -2713,6 +2655,12 @@ function handleVoiceCommand(rawCommand = '') {
   if (command.includes('show scenarios') || command.includes('show test scenarios') || command.includes('show tests')) {
     showAccordionSection('collapseTestScenarios');
     speak('Showing test scenarios');
+    return;
+  }
+
+  if (command.includes('show library') || command.includes('show test library')) {
+    showAccordionSection('collapseTestLibrary');
+    speak('Showing test library');
     return;
   }
 

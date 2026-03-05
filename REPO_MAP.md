@@ -1,5 +1,7 @@
 # REPO_MAP.md — DevConnect Labs (Architecture Snapshot)
 
+**Source of truth:** Use `REPO_MAP.md` + `AGENTS.md` as the source of truth for project structure, conventions, and behavior.
+
 ## Runtime entrypoints
 - Server: `server.js`
 - TypeScript server (alt): `server.ts` (run via `npm run ts:dev`)

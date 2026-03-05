@@ -1046,19 +1046,6 @@
         border-style: solid;
       }
 
-      .example-files-drop-zone {
-        border: 2px dashed transparent;
-        border-radius: 12px;
-        padding: 0.5rem 0;
-        transition: all 0.2s ease;
-        outline: none;
-      }
-      .example-files-drop-zone.dragover {
-        border-color: var(--zen-primary);
-        background: rgba(74, 144, 164, 0.1);
-        border-style: solid;
-      }
-
       .file-upload-area h5 {
         font-weight: 600;
         color: #1a2856;
@@ -1076,19 +1063,6 @@
         width: 100%;
         height: 100%;
         cursor: pointer;
-      }
-
-      .example-file-btn {
-        transition: all 0.2s ease;
-      }
-
-      .example-file-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(74, 144, 164, 0.2);
-      }
-
-      .example-file-btn:active {
-        transform: translateY(0);
       }
 
       /* Accordion Styling */
@@ -1540,43 +1514,43 @@
 
     </style>
     <style id="unit-tests-night-theme">
-      /* Unit Tests Dark Mode - professional slate/charcoal palette */
-      body.unit-tests-night-theme{background:#0f172a!important;color:#f1f5f9!important}
-      body.unit-tests-night-theme .navbar{background:#1e293b!important;border-color:#475569!important}
-      body.unit-tests-night-theme .navbar .navbar-brand,body.unit-tests-night-theme .navbar .nav-link{color:#f1f5f9!important}
+      /* Unit Tests Dark Mode - professional grey palette (softer than black) */
+      body.unit-tests-night-theme{background:#374151!important;color:#f3f4f6!important}
+      body.unit-tests-night-theme .navbar{background:#4b5563!important;border-color:#6b7280!important}
+      body.unit-tests-night-theme .navbar .navbar-brand,body.unit-tests-night-theme .navbar .nav-link{color:#f9fafb!important}
       body.unit-tests-night-theme .navbar .nav-link:hover{color:#38bdf8!important}
-      body.unit-tests-night-theme .main-content,body.unit-tests-night-theme .container{color:#f1f5f9}
-      body.unit-tests-night-theme .card{background:#1e293b!important;border:1px solid rgba(255,255,255,0.06)!important;color:#f1f5f9!important;box-shadow:0 1px 3px rgba(0,0,0,0.2)!important}
-      body.unit-tests-night-theme .card-header{background:#334155!important;border-color:rgba(255,255,255,0.06)!important;color:#f1f5f9!important}
-      body.unit-tests-night-theme .card-header .btn-link{color:#f1f5f9!important}
-      body.unit-tests-night-theme .card-header .btn-link:hover{color:#38bdf8!important;background:#1e293b!important}
-      body.unit-tests-night-theme .card-body{background:#1e293b!important;color:#f1f5f9!important;border-color:rgba(255,255,255,0.06)!important}
-      body.unit-tests-night-theme .accordion .card{background:#1e293b!important;border:1px solid rgba(255,255,255,0.06)!important;box-shadow:0 1px 3px rgba(0,0,0,0.2)!important}
-      body.unit-tests-night-theme .accordion .card-header{background:#334155!important;border-color:rgba(255,255,255,0.06)!important}
-      body.unit-tests-night-theme .accordion .card-header .btn-link{color:#f1f5f9!important}
-      body.unit-tests-night-theme .accordion .card-body{background:#1e293b!important;color:#f1f5f9!important}
-      body.unit-tests-night-theme .accordion .collapse.show{border-color:rgba(255,255,255,0.06)!important}
-      body.unit-tests-night-theme .text-muted{color:#94a3b8!important}
-      body.unit-tests-night-theme .badge,body.unit-tests-night-theme .badge-soft{background:#334155!important;color:#f1f5f9!important;border-color:#475569!important}
-      body.unit-tests-night-theme h5,body.unit-tests-night-theme .h5{color:#f1f5f9!important}
-      body.unit-tests-night-theme .form-control{background:#0f172a!important;border-color:#475569!important;color:#f1f5f9!important}
-      body.unit-tests-night-theme .btn-outline-secondary{border-color:#475569!important;color:#94a3b8!important}
-      body.unit-tests-night-theme .btn-outline-secondary:hover{background:#334155!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .main-content,body.unit-tests-night-theme .container{color:#f3f4f6}
+      body.unit-tests-night-theme .card{background:#4b5563!important;border:1px solid rgba(255,255,255,0.12)!important;color:#f3f4f6!important;box-shadow:0 1px 3px rgba(0,0,0,0.15)!important}
+      body.unit-tests-night-theme .card-header{background:#6b7280!important;border-color:rgba(255,255,255,0.1)!important;color:#f9fafb!important}
+      body.unit-tests-night-theme .card-header .btn-link{color:#f9fafb!important}
+      body.unit-tests-night-theme .card-header .btn-link:hover{color:#38bdf8!important;background:#4b5563!important}
+      body.unit-tests-night-theme .card-body{background:#4b5563!important;color:#f3f4f6!important;border-color:rgba(255,255,255,0.1)!important}
+      body.unit-tests-night-theme .accordion .card{background:#4b5563!important;border:1px solid rgba(255,255,255,0.12)!important;box-shadow:0 1px 3px rgba(0,0,0,0.15)!important}
+      body.unit-tests-night-theme .accordion .card-header{background:#6b7280!important;border-color:rgba(255,255,255,0.1)!important}
+      body.unit-tests-night-theme .accordion .card-header .btn-link{color:#f9fafb!important}
+      body.unit-tests-night-theme .accordion .card-body{background:#4b5563!important;color:#f3f4f6!important}
+      body.unit-tests-night-theme .accordion .collapse.show{border-color:rgba(255,255,255,0.1)!important}
+      body.unit-tests-night-theme .text-muted{color:#9ca3af!important}
+      body.unit-tests-night-theme .badge,body.unit-tests-night-theme .badge-soft{background:#6b7280!important;color:#f9fafb!important;border-color:#9ca3af!important}
+      body.unit-tests-night-theme h5,body.unit-tests-night-theme .h5{color:#f9fafb!important}
+      body.unit-tests-night-theme .form-control{background:#4b5563!important;border-color:#6b7280!important;color:#f3f4f6!important}
+      body.unit-tests-night-theme .btn-outline-secondary{border-color:#6b7280!important;color:#9ca3af!important}
+      body.unit-tests-night-theme .btn-outline-secondary:hover{background:#6b7280!important;color:#f9fafb!important}
       body.unit-tests-night-theme .btn-primary,body.unit-tests-night-theme .btn-success{background:#059669!important;border-color:#059669!important}
-      body.unit-tests-night-theme .tool-pills{background:#1e293b!important;border-color:#475569!important}
-      body.unit-tests-night-theme .tool-pills .nav-link{color:#94a3b8!important}
+      body.unit-tests-night-theme .tool-pills{background:#4b5563!important;border-color:#6b7280!important}
+      body.unit-tests-night-theme .tool-pills .nav-link{color:#9ca3af!important}
       body.unit-tests-night-theme .tool-pills .nav-link.active{background:#059669!important;color:#fff!important}
-      body.unit-tests-night-theme .ag-theme-alpine{--ag-background-color:#0f172a!important;--ag-foreground-color:#f1f5f9!important;--ag-header-background-color:#1e293b!important;--ag-header-foreground-color:#f1f5f9!important;--ag-odd-row-background-color:#0f172a!important;--ag-row-hover-color:#334155!important;--ag-border-color:#475569!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-root,body.unit-tests-night-theme .ag-theme-alpine .ag-body-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-center-cols-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-row{background:#0f172a!important;color:#f1f5f9!important;border-color:#475569!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell{background:#1e293b!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell.test-scenario-column{background:rgba(56,189,248,0.15)!important;color:#f1f5f9!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-row-hover .ag-cell{background:#334155!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell{background:#1e293b!important}
+      body.unit-tests-night-theme .ag-theme-alpine{--ag-background-color:#374151!important;--ag-foreground-color:#f3f4f6!important;--ag-header-background-color:#4b5563!important;--ag-header-foreground-color:#f9fafb!important;--ag-odd-row-background-color:#374151!important;--ag-row-hover-color:#4b5563!important;--ag-border-color:#6b7280!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-root,body.unit-tests-night-theme .ag-theme-alpine .ag-body-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-center-cols-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-row{background:#374151!important;color:#f3f4f6!important;border-color:#6b7280!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell{background:#4b5563!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell.test-scenario-column{background:rgba(56,189,248,0.2)!important;color:#f9fafb!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-row-hover .ag-cell{background:#4b5563!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell{background:#4b5563!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-pass{background:rgba(52,211,153,0.2)!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-fail{background:rgba(248,113,113,0.3)!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-row:hover .ag-cell.test-scenario-cell.cell-fail{background:rgba(248,113,113,0.4)!important}
-      body.unit-tests-night-theme .test-description-card .scenario-card-front,body.unit-tests-night-theme .test-description-card .scenario-card-back{background:#334155!important;border:1px solid rgba(255,255,255,0.06)!important;color:#f1f5f9!important;box-shadow:0 1px 3px rgba(0,0,0,0.2)!important}
-      body.unit-tests-night-theme .test-description-card .test-description-text{color:#f1f5f9!important}
+      body.unit-tests-night-theme .test-description-card .scenario-card-front,body.unit-tests-night-theme .test-description-card .scenario-card-back{background:#6b7280!important;border:1px solid rgba(255,255,255,0.12)!important;color:#f9fafb!important;box-shadow:0 1px 3px rgba(0,0,0,0.15)!important}
+      body.unit-tests-night-theme .test-description-card .test-description-text{color:#f9fafb!important}
       body.unit-tests-night-theme .test-description-card .scenario-edit-toggle{color:#38bdf8!important;background:rgba(56,189,248,0.15)!important;border-color:rgba(56,189,248,0.4)!important}
       body.unit-tests-night-theme .test-description-card .scenario-edit-toggle:hover{background:rgba(56,189,248,0.25)!important;color:#7dd3fc!important}
       body.unit-tests-night-theme .test-description-card .scenario-run-btn{background:linear-gradient(135deg,#059669 0%,#10b981 100%)!important;color:#fff!important}
@@ -1584,26 +1558,37 @@
       body.unit-tests-night-theme .test-description-card .test-number-badge{background:linear-gradient(135deg,#059669 0%,#10b981 100%)!important;color:#fff!important;box-shadow:0 2px 6px rgba(5,150,105,0.3)!important}
       body.unit-tests-night-theme .test-description-card.test-scenario-active .scenario-card-front{border-color:rgba(251,191,36,0.6)!important;box-shadow:0 4px 12px rgba(251,191,36,0.2)!important;background:linear-gradient(135deg,rgba(251,191,36,0.15) 0%,rgba(251,191,36,0.06) 100%)!important}
       body.unit-tests-night-theme .test-description-card.test-scenario-active .scenario-card-front::before{background:linear-gradient(180deg,rgba(251,191,36,0.8) 0%,rgba(251,191,36,0.5) 100%)!important}
-      body.unit-tests-night-theme .scenario-card-back textarea{background:#0f172a!important;border-color:#475569!important;color:#f1f5f9!important}
+      body.unit-tests-night-theme .scenario-card-back textarea{background:#4b5563!important;border-color:#6b7280!important;color:#f3f4f6!important}
       body.unit-tests-night-theme .scenario-flip-back-btn{color:#38bdf8!important}
-      body.unit-tests-night-theme .scenario-context-menu{background:#1e293b!important;border-color:#475569!important;box-shadow:0 4px 12px rgba(0,0,0,0.3)!important}
-      body.unit-tests-night-theme .scenario-context-menu button{color:#f1f5f9!important}
-      body.unit-tests-night-theme .scenario-context-menu button:hover{background:#334155!important}
+      body.unit-tests-night-theme .scenario-context-menu{background:#4b5563!important;border-color:#6b7280!important;box-shadow:0 4px 12px rgba(0,0,0,0.2)!important}
+      body.unit-tests-night-theme .scenario-context-menu button{color:#f9fafb!important}
+      body.unit-tests-night-theme .scenario-context-menu button:hover{background:#6b7280!important}
       body.unit-tests-night-theme .scenario-status-badge.success{background:rgba(52,211,153,0.25)!important;color:#34d399!important}
       body.unit-tests-night-theme .scenario-status-badge.fail{background:rgba(248,81,73,0.25)!important;color:#f87171!important}
       body.unit-tests-night-theme .scenario-status-badge.warn{background:rgba(251,191,36,0.25)!important;color:#fbbf24!important}
       body.unit-tests-night-theme .scenario-status-badge.empty{background:rgba(148,163,184,0.2)!important;color:#94a3b8!important}
-      body.unit-tests-night-theme .overall-signoff-grid .card{background:#334155!important;border:1px solid rgba(255,255,255,0.06)!important;box-shadow:0 1px 3px rgba(0,0,0,0.2)!important}
-      body.unit-tests-night-theme .field-id-badge{background:rgba(56,189,248,0.2)!important;color:#f1f5f9!important;border-color:rgba(56,189,248,0.4)!important}
+      body.unit-tests-night-theme .overall-signoff-grid .card{background:#6b7280!important;border:1px solid rgba(255,255,255,0.12)!important;box-shadow:0 1px 3px rgba(0,0,0,0.15)!important}
+      body.unit-tests-night-theme .field-id-badge{background:rgba(56,189,248,0.25)!important;color:#f9fafb!important;border-color:rgba(56,189,248,0.4)!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-cell{white-space:normal!important;overflow:visible!important}
       body.unit-tests-night-theme .action-badge.action-set{background:rgba(52,211,153,0.25)!important;color:#34d399!important;border-color:rgba(52,211,153,0.4)!important}
       body.unit-tests-night-theme .action-badge.action-get{background:rgba(56,189,248,0.25)!important;color:#38bdf8!important;border-color:rgba(56,189,248,0.4)!important}
       body.unit-tests-night-theme .action-badge.action-compare{background:rgba(251,191,36,0.25)!important;color:#fbbf24!important;border-color:rgba(251,191,36,0.4)!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-badge.test-value-yes{background:rgba(52,211,153,0.25)!important;color:#34d399!important;border-color:rgba(52,211,153,0.4)!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-badge.test-value-no{background:rgba(248,81,73,0.25)!important;color:#f87171!important;border-color:rgba(248,81,73,0.4)!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-numeric{color:#f1f5f9!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-text{color:#f1f5f9!important}
-      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .text-muted{color:#94a3b8!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-numeric{color:#f3f4f6!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .test-value-text{color:#f3f4f6!important}
+      body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell .text-muted{color:#9ca3af!important}
+      body.unit-tests-night-theme .test-results-dark-card{background:#4b5563!important;border-color:rgba(255,255,255,0.15)!important;color:#f9fafb!important}
+      body.unit-tests-night-theme .test-results-dark-card .text-muted{color:#9ca3af!important}
+      body.unit-tests-night-theme .test-results-dark-card .btn-outline-secondary{border-color:#6b7280!important;color:#d1d5db!important}
+      body.unit-tests-night-theme .test-results-dark-card .btn-outline-secondary:hover{background:#6b7280!important;border-color:#9ca3af!important;color:#fff!important}
+      body.unit-tests-night-theme .sticky-action-bar{background:rgba(75,85,99,0.98)!important;border-color:rgba(255,255,255,0.15)!important}
+      body.unit-tests-night-theme .file-upload-area{background:rgba(75,85,99,0.4)!important;border-color:rgba(255,255,255,0.2)!important}
+      body.unit-tests-night-theme .file-upload-area:hover{background:rgba(75,85,99,0.6)!important;border-color:rgba(56,189,248,0.5)!important}
+      body.unit-tests-night-theme .file-upload-area h5{color:#f9fafb!important}
+      body.unit-tests-night-theme .run-summary-card{background:#4b5563!important;border-color:rgba(255,255,255,0.15)!important}
+      body.unit-tests-night-theme .unit-test-data-header{background:#4b5563!important;border-color:rgba(255,255,255,0.1)!important}
+      body.unit-tests-night-theme .badge-light{background:#6b7280!important;color:#f9fafb!important;border-color:#9ca3af!important}
     </style>
   </head>
   <body data-page="unit-tests">
@@ -1810,28 +1795,32 @@
           <div class="card">
             <div class="card-header p-0">
               <div class="accordion" id="testAccordion">
-                <!-- Example Files -->
+                <!-- Test Library -->
                 <div class="card">
-                  <div class="card-header" id="headingExampleFiles">
+                  <div class="card-header" id="headingTestLibrary">
                     <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseExampleFiles" aria-expanded="false" aria-controls="collapseExampleFiles">
-                        <i class="bi-folder2-open"></i> Example Files
+                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTestLibrary" aria-expanded="false" aria-controls="collapseTestLibrary">
+                        <i class="bi-folder2-open"></i> Test Library
                         <i class="bi-chevron-down float-right"></i>
                       </button>
                     </h5>
                   </div>
-                  <div id="collapseExampleFiles" class="collapse" aria-labelledby="headingExampleFiles">
+                  <div id="collapseTestLibrary" class="collapse" aria-labelledby="headingTestLibrary">
                     <div class="card-body">
-                      <p class="text-muted mb-3"><small>Load example Excel files from the data directory. Or drag and drop an Excel file here, or paste (Ctrl+V) a copied file.</small></p>
-                      <div id="exampleFilesContainer" class="example-files-drop-zone" tabindex="0">
-                        <div class="d-flex flex-wrap gap-2" id="exampleFilesList">
-                          <button class="btn btn-sm btn-outline-primary example-file-btn" data-file="BSA TASK 579580.xlsx">
-                            <i class="bi-file-earmark-spreadsheet"></i> BSA TASK 579580
-                          </button>
-                          <button class="btn btn-sm btn-outline-primary example-file-btn" data-file="BSA-602512 (1).xlsx">
-                            <i class="bi-file-earmark-spreadsheet"></i> BSA-602512
-                          </button>
-                        </div>
+                      <p class="text-muted mb-3"><small>Load saved Excel tests from the library. Search by Encompass field ID (e.g. CX.TYPE, 353) to find which tests use a field.</small></p>
+                      <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                        <input type="text" class="form-control form-control-sm" id="fieldIdSearchInput" placeholder="Search by field ID (e.g. CX.TYPE, 353)" style="max-width: 220px;" />
+                        <button class="btn btn-outline-primary btn-sm" id="fieldIdSearchBtn">
+                          <i class="bi-search"></i> Search
+                        </button>
+                      </div>
+                      <div id="testLibraryList" class="small">
+                        <p class="text-muted mb-0">Loading library...</p>
+                      </div>
+                      <div id="fieldSearchResults" class="mt-2" style="display: none;">
+                        <hr class="my-2" />
+                        <strong>Search results for field:</strong> <span id="fieldSearchTerm" class="text-primary"></span>
+                        <div id="fieldSearchResultsList" class="mt-2"></div>
                       </div>
                     </div>
                   </div>
@@ -1955,32 +1944,6 @@
                         </div>
                       </div>
                       </div><!-- /unit-test-data-header -->
-                      <!-- Test Library & Field Search -->
-                      <div class="card mb-3" id="testLibraryCard">
-                        <div class="card-header py-2 d-flex justify-content-between align-items-center">
-                          <a class="btn btn-link btn-sm p-0 text-dark font-weight-600" data-toggle="collapse" href="#testLibraryCollapse" aria-expanded="false">
-                            <i class="bi-folder2-open mr-1"></i> Test Library
-                          </a>
-                          <div class="d-flex align-items-center" style="gap: 0.5rem;">
-                            <input type="text" class="form-control form-control-sm" id="fieldIdSearchInput" placeholder="Search by field ID (e.g. CX.TYPE, 353)" style="max-width: 220px;" />
-                            <button class="btn btn-outline-primary btn-sm" id="fieldIdSearchBtn">
-                              <i class="bi-search"></i> Search
-                            </button>
-                          </div>
-                        </div>
-                        <div class="collapse" id="testLibraryCollapse">
-                          <div class="card-body py-2">
-                            <div id="testLibraryList" class="small">
-                              <p class="text-muted mb-0">Loading library...</p>
-                            </div>
-                            <div id="fieldSearchResults" class="mt-2" style="display: none;">
-                              <hr class="my-2" />
-                              <strong>Search results for field:</strong> <span id="fieldSearchTerm" class="text-primary"></span>
-                              <div id="fieldSearchResultsList" class="mt-2"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                       <div id="uploadArea" class="file-upload-area">
                         <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
                         <h5>Drop Excel file here or click to browse</h5>
@@ -2045,6 +2008,10 @@
           Opens the Test Scenarios accordion.
         </li>
         <li>
+          <span>"Show library"</span>
+          Opens the Test Library accordion.
+        </li>
+        <li>
           <span>"Run tests"</span>
           Executes the current test run.
         </li>
@@ -2087,7 +2054,7 @@
           if(!document.getElementById('unitTestsNightToggle')){
             var b=document.createElement('button');b.id='unitTestsNightToggle';b.type='button';b.className='dark-mode-toggle';
             b.style.cssText='position:fixed;top:70px;right:16px;z-index:999;width:40px;height:40px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#1e293b;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
-            function updateBtn(){var on=document.body.classList.contains('unit-tests-night-theme');b.innerHTML=on?'<i class="bi bi-sun-fill"></i>':'<i class="bi bi-moon-stars-fill"></i>';b.title=on?'Switch to light mode':'Switch to dark mode';b.setAttribute('aria-label',on?'Switch to light mode':'Switch to dark mode');b.style.background=on?'#1e293b':'#fff';b.style.color=on?'#f1f5f9':'#1e293b';b.style.borderColor=on?'#475569':'#e2e8f0';}
+            function updateBtn(){var on=document.body.classList.contains('unit-tests-night-theme');b.innerHTML=on?'<i class="bi bi-sun-fill"></i>':'<i class="bi bi-moon-stars-fill"></i>';b.title=on?'Switch to light mode':'Switch to dark mode';b.setAttribute('aria-label',on?'Switch to light mode':'Switch to dark mode');b.style.background=on?'#4b5563':'#fff';b.style.color=on?'#f9fafb':'#374151';b.style.borderColor=on?'#6b7280':'#e2e8f0';}
             updateBtn();
             b.onclick=function(){set(!document.body.classList.contains('unit-tests-night-theme'));updateBtn();};
             document.body.appendChild(b);

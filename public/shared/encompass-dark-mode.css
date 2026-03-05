@@ -2,10 +2,11 @@
  * Shared Encompass Dark Mode Theme
  * Used across unit-tests, tool9, encompass-assistant, custom/native fields, hub, etc.
  * Toggle via encompass-api.js; preference stored in localStorage.
+ * Professional grey palette (softer than black).
  */
 .encompass-dark-mode {
-  background: #0d1117 !important;
-  color: #e6edf3;
+  background: #374151 !important;
+  color: #f3f4f6;
 }
 .encompass-dark-mode::before {
   background: radial-gradient(circle at 20% 80%, rgba(46, 204, 113, 0.08) 0%, transparent 50%),
@@ -14,12 +15,12 @@
 
 /* Navbar */
 .encompass-dark-mode .navbar {
-  background: #161b22 !important;
-  border-color: #30363d !important;
+  background: #4b5563 !important;
+  border-color: #6b7280 !important;
 }
 .encompass-dark-mode .navbar .navbar-brand,
 .encompass-dark-mode .navbar .nav-link {
-  color: #e6edf3 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .navbar .nav-link:hover {
   color: #58a6ff !important;
@@ -27,31 +28,31 @@
 
 /* Hero / main headers */
 .encompass-dark-mode .hero {
-  background: #161b22 !important;
-  border-color: #30363d;
+  background: #4b5563 !important;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .hero h1,
 .encompass-dark-mode .hero .hero-brand,
 .encompass-dark-mode .hero .lead {
-  color: #e6edf3 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .hero .btn-outline-light {
-  border-color: #30363d;
-  color: #8b949e;
+  border-color: #6b7280;
+  color: #9ca3af;
 }
 .encompass-dark-mode .hero .btn-outline-light:hover {
-  background: #21262d;
-  color: #e6edf3;
+  background: #6b7280;
+  color: #f9fafb;
 }
 
 /* Tool pills / nav pills */
 .encompass-dark-mode .tool-pills {
-  background: #161b22;
-  border-color: #30363d;
+  background: #4b5563;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .tool-pills .nav-link {
-  color: #8b949e !important;
-  border-color: #30363d;
+  color: #9ca3af !important;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .tool-pills .nav-link.active {
   background: #238636 !important;
@@ -61,93 +62,93 @@
 
 /* Cards */
 .encompass-dark-mode .card {
-  background: #161b22;
-  border-color: #30363d;
+  background: #4b5563;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .card-header {
-  background: #21262d !important;
-  border-color: #30363d;
+  background: #6b7280 !important;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .card-header .btn-link {
-  color: #e6edf3 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .accordion .card-header {
-  background: #21262d !important;
+  background: #6b7280 !important;
 }
 .encompass-dark-mode .accordion .card-header .btn-link {
-  color: #e6edf3 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .accordion .card-header .btn-link:hover {
   color: #58a6ff !important;
-  background: #161b22 !important;
+  background: #4b5563 !important;
 }
 .encompass-dark-mode .accordion .collapse.show {
-  border-color: #30363d;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .card-body {
-  background: #161b22;
-  color: #e6edf3;
+  background: #4b5563;
+  color: #f3f4f6;
 }
 
 /* Typography */
 .encompass-dark-mode .text-muted {
-  color: #8b949e !important;
+  color: #9ca3af !important;
 }
 
 /* Forms */
 .encompass-dark-mode .form-control {
-  background: #0d1117;
-  border-color: #30363d;
-  color: #e6edf3;
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #f3f4f6;
 }
 .encompass-dark-mode .form-control::placeholder {
-  color: #6e7681;
+  color: #9ca3af;
 }
 .encompass-dark-mode .input-group-text {
-  background: #21262d;
-  border-color: #30363d;
-  color: #8b949e;
+  background: #6b7280;
+  border-color: #6b7280;
+  color: #9ca3af;
 }
 .encompass-dark-mode .small {
-  color: #8b949e !important;
+  color: #9ca3af !important;
 }
 .encompass-dark-mode select.form-control {
-  background: #0d1117;
-  color: #e6edf3;
+  background: #4b5563;
+  color: #f3f4f6;
 }
 .encompass-dark-mode textarea.form-control {
-  background: #0d1117;
-  border-color: #30363d;
-  color: #e6edf3;
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #f3f4f6;
 }
 
 /* File upload, sticky bars */
 .encompass-dark-mode .file-upload-area {
-  background: #21262d;
-  border-color: #30363d;
-  color: #8b949e;
+  background: #6b7280;
+  border-color: #6b7280;
+  color: #9ca3af;
 }
 .encompass-dark-mode .file-upload-area h5 {
-  color: #e6edf3;
+  color: #f9fafb;
 }
 .encompass-dark-mode .sticky-action-bar {
-  background: #161b22;
-  border-color: #30363d;
+  background: #4b5563;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .run-summary-card {
-  background: #161b22;
-  border-color: #30363d;
+  background: #4b5563;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .unit-test-data-header {
-  background: #0d1117;
-  border-color: #30363d;
+  background: #4b5563;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .file-info-display {
-  color: #e6edf3;
+  color: #f9fafb;
 }
 .encompass-dark-mode .loan-guid-chip {
-  background: #21262d;
-  border-color: #30363d;
+  background: #6b7280;
+  border-color: #6b7280;
   color: #58a6ff;
 }
 
@@ -170,29 +171,29 @@
 }
 .encompass-dark-mode .badge-light,
 .encompass-dark-mode .badge-soft {
-  background: #21262d !important;
-  color: #e6edf3 !important;
+  background: #6b7280 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .progress {
-  background: #21262d;
+  background: #6b7280;
 }
 
 /* Unit test scenario cards */
 .encompass-dark-mode .test-description-card .scenario-card-front {
-  background: #21262d;
-  border-color: #30363d;
+  background: #6b7280;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .test-description-card .scenario-card-back {
-  background: #161b22;
-  border-color: #30363d;
+  background: #4b5563;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .test-description-card .test-number-badge {
-  background: #0d1117;
+  background: #4b5563;
   color: #58a6ff;
-  border-color: #30363d;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .test-description-card .test-description-text {
-  color: #e6edf3;
+  color: #f9fafb;
 }
 
 /* Buttons */
@@ -227,14 +228,14 @@
 
 /* Dropdowns */
 .encompass-dark-mode .dropdown-menu {
-  background: #161b22;
-  border-color: #30363d;
+  background: #4b5563;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .dropdown-item {
-  color: #e6edf3;
+  color: #f3f4f6;
 }
 .encompass-dark-mode .dropdown-item:hover {
-  background: #21262d;
+  background: #6b7280;
 }
 
 /* Scenario status badges */
@@ -253,37 +254,37 @@
 
 /* Voice help drawer */
 .encompass-dark-mode .voice-help-drawer {
-  background: #161b22;
-  border-color: #30363d;
+  background: #4b5563;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .voice-help-drawer .voice-help-header {
-  border-color: #30363d;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .voice-help-drawer h4,
 .encompass-dark-mode .voice-help-drawer li {
-  color: #e6edf3;
+  color: #f9fafb;
 }
 .encompass-dark-mode .unit-tests-toast {
-  background: #21262d;
-  border-color: #30363d;
-  color: #e6edf3;
+  background: #6b7280;
+  border-color: #6b7280;
+  color: #f9fafb;
 }
 
-/* AG Grid - when body has encompass-dark-mode, override alpine to dark (#0d1117, #161b22) */
+/* AG Grid - professional grey palette */
 .encompass-dark-mode .ag-theme-alpine {
-  --ag-background-color: #0d1117;
-  --ag-foreground-color: #e6edf3;
-  --ag-header-foreground-color: #e6edf3;
-  --ag-header-background-color: #161b22;
-  --ag-odd-row-background-color: #0d1117;
-  --ag-even-row-background-color: #0d1117;
-  --ag-row-hover-color: #21262d;
-  --ag-border-color: #30363d;
-  --ag-row-border-color: #21262d;
+  --ag-background-color: #374151;
+  --ag-foreground-color: #f3f4f6;
+  --ag-header-foreground-color: #f9fafb;
+  --ag-header-background-color: #4b5563;
+  --ag-odd-row-background-color: #374151;
+  --ag-even-row-background-color: #374151;
+  --ag-row-hover-color: #4b5563;
+  --ag-border-color: #6b7280;
+  --ag-row-border-color: #6b7280;
   --ag-selected-row-background-color: rgba(35, 134, 54, 0.25);
-  --ag-input-border-color: #30363d;
+  --ag-input-border-color: #6b7280;
   --ag-input-focus-border-color: #58a6ff;
-  --ag-checkbox-background-color: #0d1117;
+  --ag-checkbox-background-color: #4b5563;
   --ag-checkbox-checked-background-color: #238636;
   --ag-range-selection-background-color: rgba(35, 134, 54, 0.2);
 }
@@ -294,65 +295,65 @@
 .encompass-dark-mode .ag-theme-alpine .ag-center-cols-container,
 .encompass-dark-mode .ag-theme-alpine .ag-pinned-left-cols-container,
 .encompass-dark-mode .ag-theme-alpine .ag-pinned-right-cols-container {
-  background-color: #0d1117 !important;
+  background-color: #374151 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-header,
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell,
 .encompass-dark-mode .ag-theme-alpine .ag-pinned-left-header,
 .encompass-dark-mode .ag-theme-alpine .ag-pinned-right-header {
-  background-color: #161b22 !important;
-  border-color: #30363d !important;
-  color: #e6edf3 !important;
+  background-color: #4b5563 !important;
+  border-color: #6b7280 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-cell,
 .encompass-dark-mode .ag-theme-alpine .ag-row {
-  background-color: #0d1117 !important;
-  border-color: #30363d !important;
-  color: #e6edf3 !important;
+  background-color: #374151 !important;
+  border-color: #6b7280 !important;
+  color: #f3f4f6 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-row-odd .ag-cell {
-  background-color: #0d1117 !important;
+  background-color: #374151 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-row-even .ag-cell {
-  background-color: #0d1117 !important;
+  background-color: #374151 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-row-hover .ag-cell {
-  background-color: #21262d !important;
+  background-color: #4b5563 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-ltr .ag-cell {
-  border-right-color: #21262d !important;
+  border-right-color: #6b7280 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell-label,
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell-text {
-  color: #e6edf3 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .ag-theme-alpine input,
 .encompass-dark-mode .ag-theme-alpine select,
 .encompass-dark-mode .ag-theme-alpine .ag-input-field-input {
-  background-color: #0d1117 !important;
-  border-color: #30363d !important;
-  color: #e6edf3 !important;
+  background-color: #4b5563 !important;
+  border-color: #6b7280 !important;
+  color: #f3f4f6 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-popup-child {
-  background-color: #161b22 !important;
-  border-color: #30363d !important;
+  background-color: #4b5563 !important;
+  border-color: #6b7280 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-menu,
 .encompass-dark-mode .ag-theme-alpine .ag-tool-panel-wrapper {
-  background-color: #161b22 !important;
-  border-color: #30363d !important;
+  background-color: #4b5563 !important;
+  border-color: #6b7280 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-overlay-no-rows-center {
-  color: #8b949e !important;
+  color: #9ca3af !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell.test-scenario-column {
-  background-color: #21262d !important;
+  background-color: #6b7280 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-cell.test-scenario-cell {
-  background-color: #161b22 !important;
+  background-color: #4b5563 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-row:hover .ag-cell.test-scenario-cell {
-  background-color: #21262d !important;
+  background-color: #6b7280 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-cell.test-scenario-cell.cell-pass {
   background-color: rgba(46, 204, 113, 0.2) !important;
@@ -361,25 +362,25 @@
   background-color: rgba(248, 81, 73, 0.2) !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell.step-header {
-  background-color: #21262d !important;
-  border-color: #30363d;
+  background-color: #6b7280 !important;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-cell.step-cell {
-  background-color: #161b22 !important;
-  color: #e6edf3 !important;
+  background-color: #4b5563 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell.action-header,
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell.target-header,
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell.description-header {
-  background-color: #21262d !important;
+  background-color: #6b7280 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-cell.action-cell,
 .encompass-dark-mode .ag-theme-alpine .ag-cell.target-cell,
 .encompass-dark-mode .ag-theme-alpine .ag-cell.description-cell {
-  color: #e6edf3 !important;
+  color: #f3f4f6 !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-cell.description-cell {
-  color: #8b949e !important;
+  color: #9ca3af !important;
 }
 .encompass-dark-mode .ag-theme-alpine .ag-header-cell.column-highlighted,
 .encompass-dark-mode .ag-theme-alpine .ag-cell.column-highlighted {
@@ -419,7 +420,7 @@
 .encompass-dark-mode .ag-theme-alpine .ag-pinned-right-header,
 .encompass-dark-mode .ag-theme-alpine .ag-center-cols-viewport,
 .encompass-dark-mode .ag-theme-alpine .ag-body-viewport {
-  background: #0d1117 !important;
+  background: #374151 !important;
 }
 
 /* Encompass Assistant - chat container */
@@ -468,34 +469,34 @@
 
 /* Hero insights, insight chips */
 .encompass-dark-mode .insight-chip {
-  background: #21262d !important;
-  border-color: #30363d !important;
-  color: #e6edf3 !important;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode .hero p,
 .encompass-dark-mode .hero .badge {
-  color: #8b949e !important;
+  color: #9ca3af !important;
 }
 .encompass-dark-mode .hero h1 {
-  color: #e6edf3 !important;
+  color: #f9fafb !important;
 }
 
 /* Form labels, code, main content */
 .encompass-dark-mode label,
 .encompass-dark-mode .form-group label {
-  color: #e6edf3 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode code {
-  background: #21262d !important;
+  background: #6b7280 !important;
   color: #58a6ff !important;
-  border-color: #30363d;
+  border-color: #6b7280;
 }
 .encompass-dark-mode main,
 .encompass-dark-mode section,
 .encompass-dark-mode .main-content,
 .encompass-dark-mode .container,
 .encompass-dark-mode .container-fluid {
-  color: #e6edf3;
+  color: #f3f4f6;
 }
 
 /* Buttons - outline and light variants */
@@ -521,9 +522,9 @@
 
 /* Test results, scenario cards */
 .encompass-dark-mode .test-result-card {
-  background: #161b22 !important;
-  border-color: #30363d !important;
-  color: #e6edf3 !important;
+  background: #4b5563 !important;
+  border-color: #6b7280 !important;
+  color: #f3f4f6 !important;
 }
 .encompass-dark-mode .test-result-card.test-result-info {
   border-left-color: rgba(46, 204, 113, 0.6) !important;
@@ -547,8 +548,8 @@
   color: #f85149 !important;
 }
 .encompass-dark-mode .scenario-results-summary {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: #30363d !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: #6b7280 !important;
 }
 .encompass-dark-mode .filter-grid,
 .encompass-dark-mode .fields-grid {
@@ -556,38 +557,38 @@
 }
 .encompass-dark-mode .badge-pill,
 .encompass-dark-mode .badge {
-  background: #21262d !important;
-  color: #e6edf3 !important;
-  border-color: #30363d;
+  background: #6b7280 !important;
+  color: #f9fafb !important;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .rounded,
 .encompass-dark-mode .border {
-  border-color: #30363d !important;
+  border-color: #6b7280 !important;
 }
 .encompass-dark-mode #extractResult,
 .encompass-dark-mode .extract-result {
-  background: #21262d !important;
-  border-color: #30363d !important;
-  color: #e6edf3 !important;
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+  color: #f3f4f6 !important;
 }
 
 /* Tab content, bg-light */
 .encompass-dark-mode .bg-light {
-  background: #21262d !important;
-  border-color: #30363d;
+  background: #6b7280 !important;
+  border-color: #6b7280;
 }
 .encompass-dark-mode .nav-tabs .nav-link {
-  color: #8b949e !important;
+  color: #9ca3af !important;
 }
 .encompass-dark-mode .nav-tabs .nav-link.active {
-  background: #161b22 !important;
-  border-color: #30363d #30363d #161b22 !important;
-  color: #e6edf3 !important;
+  background: #4b5563 !important;
+  border-color: #6b7280 #6b7280 #4b5563 !important;
+  color: #f9fafb !important;
 }
 .encompass-dark-mode pre {
-  background: #0d1117 !important;
-  color: #e6edf3 !important;
-  border-color: #30363d;
+  background: #4b5563 !important;
+  color: #f3f4f6 !important;
+  border-color: #6b7280;
 }
 
 /* Tables, list groups, modals */
@@ -639,24 +640,34 @@
 
 /* DataTables */
 .encompass-dark-mode .dataTables_wrapper {
-  color: #e6edf3;
+  color: #f3f4f6;
 }
 .encompass-dark-mode .dataTables_wrapper .dataTables_length select,
 .encompass-dark-mode .dataTables_wrapper .dataTables_filter input {
-  background: #0d1117;
-  border-color: #30363d;
-  color: #e6edf3;
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #f3f4f6;
 }
 .encompass-dark-mode .dataTables_wrapper .dataTables_info,
 .encompass-dark-mode .dataTables_wrapper .dataTables_paginate {
-  color: #8b949e;
+  color: #9ca3af;
 }
 .encompass-dark-mode .dataTables_wrapper .dataTables_paginate .page-link {
-  background: #21262d;
-  border-color: #30363d;
-  color: #e6edf3;
+  background: #6b7280;
+  border-color: #6b7280;
+  color: #f9fafb;
 }
 .encompass-dark-mode .dataTables_wrapper .dataTables_paginate .page-item.active .page-link {
   background: #238636;
   border-color: #238636;
+}
+
+/* Page-specific overrides for inline dark backgrounds */
+.encompass-dark-mode #loanDetailsBody pre {
+  background: #4b5563 !important;
+  color: #f3f4f6 !important;
+  border-color: #6b7280 !important;
+}
+.encompass-dark-mode .loan-info-panel {
+  background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%) !important;
 }

@@ -2,6 +2,8 @@
 
 This file tells AI coding assistants (Cursor Agent, Copilot, etc.) how to operate in this repo.
 
+**Source of truth:** Use `REPO_MAP.md` + `AGENTS.md` as the source of truth for project structure, conventions, and behavior.
+
 ---
 
 # Repo Identity (high level)
