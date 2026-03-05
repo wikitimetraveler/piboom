@@ -6,7 +6,6 @@ Documentation for running, testing, and maintaining DevConnect Labs. No pre-comm
 
 - **Standard:** `npm start` or `npm run dev` (with NODE_ENV=development)
 - **Raspberry Pi:** `npm run pi`
-- **Docker:** `docker-compose up` (or `docker-compose up -d` for background)
 
 ## Tests
 
@@ -38,6 +37,5 @@ No automated hooks are configured by default.
 ## Reference
 
 - Setup: [docs/SETUP.md](SETUP.md), [docs/DATABASE_SETUP.md](DATABASE_SETUP.md)
-- Deployment: [docs/DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
 - Encompass: [docs/ENCOMPASS.md](ENCOMPASS.md)
 - Glossary: [docs/GLOSSARY.md](GLOSSARY.md)

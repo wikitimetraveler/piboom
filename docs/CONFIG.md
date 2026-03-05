@@ -64,5 +64,4 @@ Create `.env` from `.env.example` if present, or add variables as needed. Ensure
 ## Related
 
 - **docs/DATABASE_SETUP.md** – Database setup
-- **docs/DOCKER_DEPLOYMENT.md** – Deployment
 - **docs/ENCOMPASS.md** – Encompass auth and API

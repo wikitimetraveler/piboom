@@ -79,14 +79,11 @@ ARCGIS_API_KEY=your_arcgis_api_key
 
 ### 3. Start the System
 ```bash
+# For Development
+npm run dev
+
 # For Raspberry Pi
 npm run pi
-
-# For Windows/Development
-npm run windows
-
-# For Docker
-docker-compose up
 ```
 
 ### 4. Access Web Interfaces
@@ -104,14 +101,13 @@ docker-compose up
 - **Encompass**: [`docs/ENCOMPASS.md`](docs/ENCOMPASS.md), [`docs/ICE_KNOWLEDGE_SOURCES.md`](docs/ICE_KNOWLEDGE_SOURCES.md)
 - **AI**: [`docs/AI_SYSTEM.md`](docs/AI_SYSTEM.md), [`docs/LANGCHAIN_MEMORY.md`](docs/LANGCHAIN_MEMORY.md)
 - Setup: [`docs/SETUP.md`](docs/SETUP.md), [`docs/DATABASE_SETUP.md`](docs/DATABASE_SETUP.md)
-- Deployment: [`docs/DOCKER_DEPLOYMENT.md`](docs/DOCKER_DEPLOYMENT.md)
 - **Glossary**: [`docs/GLOSSARY.md`](docs/GLOSSARY.md)
 - **Development workflow**: [`docs/DEVELOPMENT_WORKFLOW.md`](docs/DEVELOPMENT_WORKFLOW.md)
 - Domain guides & notes: [`docs/VOICE_SETUP.md`](docs/VOICE_SETUP.md), [`docs/GRATEFUL_DEAD_SETUP.md`](docs/GRATEFUL_DEAD_SETUP.md), [`docs/CHANGES_SUMMARY.md`](docs/CHANGES_SUMMARY.md)
 
 ## Scripts & Tests Layout
 
-- Bash entrypoints remain in the repo root as thin wrappers; primary scripts live under `scripts/pi/` and `scripts/docker/`.
+- Bash entrypoints remain in the repo root as thin wrappers; primary scripts live under `scripts/pi/`.
 - Windows helpers live under `scripts/windows/`; utility batch scripts under `scripts/tools/`.
 - Maintenance/check scripts live under `scripts/maintenance/` and `scripts/checks/`.
 - Manual test runners are under `tests/manual/` (e.g., `tests/manual/test-mapbox-geocoding.js`).
@@ -242,9 +238,6 @@ docker-compose up
 ### Database Setup
 See [docs/DATABASE_SETUP.md](docs/DATABASE_SETUP.md) for detailed PostgreSQL setup instructions.
 
-### Docker Deployment
-See [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for containerized deployment.
-
 ### API Keys Setup
 - **Google API**: [Google Cloud Console](https://console.cloud.google.com/)
 - **OpenAI API**: [OpenAI Platform](https://platform.openai.com/)
@@ -282,13 +275,8 @@ devconnect-labs/
 npm run pi
 ```
 
-### Docker
-```bash
-docker-compose up -d
-```
-
 ### Production (Render/Heroku)
-See [docs/DOCKER_DEPLOYMENT.md](docs/DOCKER_DEPLOYMENT.md) for cloud deployment instructions.
+See [docs/SETUP.md](docs/SETUP.md) and [docs/CONFIG.md](docs/CONFIG.md) for deployment prerequisites and environment setup.
 
 ## 📄 License
 
