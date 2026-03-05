@@ -1,4 +1,124 @@
 import { getPool } from '../services/database.service.js';
+import {
+  saveUnitTestFile,
+  listUnitTestFiles,
+  getUnitTestFile,
+  searchByFieldId,
+  deleteUnitTestFile,
+} from '../services/unit-tests-file.service.js';
+
+/**
+ * Upload unit test Excel file to library
+ * POST /api/unit-tests/files
+ */
+export async function uploadUnitTestFile(req, res) {
+  try {
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const record = await saveUnitTestFile(req.file.buffer, req.file.originalname);
+    return res.status(201).json({
+      success: true,
+      file: {
+        id: record.id,
+        file_name: record.file_name,
+        original_name: record.original_name,
+        field_ids: record.field_ids,
+        row_count: record.row_count,
+        uploaded_at: record.uploaded_at,
+      },
+    });
+  } catch (error) {
+    console.error('Error uploading unit test file:', error);
+    return res.status(500).json({
+      error: 'Failed to upload unit test file',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * List all stored unit test files
+ * GET /api/unit-tests/files
+ */
+export async function listUnitTestFilesHandler(req, res) {
+  try {
+    const files = await listUnitTestFiles();
+    return res.json({ success: true, files });
+  } catch (error) {
+    console.error('Error listing unit test files:', error);
+    return res.status(500).json({
+      error: 'Failed to list unit test files',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * Get unit test file by id (download)
+ * GET /api/unit-tests/files/:id
+ */
+export async function getUnitTestFileHandler(req, res) {
+  try {
+    const { id } = req.params;
+    const result = await getUnitTestFile(parseInt(id, 10));
+    if (!result) {
+      return res.status(404).json({ error: 'Unit test file not found' });
+    }
+    const fileName = result.original_name || result.file_name;
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+    res.send(result.buffer);
+  } catch (error) {
+    console.error('Error getting unit test file:', error);
+    return res.status(500).json({
+      error: 'Failed to get unit test file',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * Search unit test files by field ID
+ * GET /api/unit-tests/search?fieldId=...
+ */
+export async function searchUnitTestsByFieldId(req, res) {
+  try {
+    const { fieldId } = req.query;
+    if (!fieldId || !String(fieldId).trim()) {
+      return res.status(400).json({ error: 'fieldId query parameter is required' });
+    }
+    const files = await searchByFieldId(String(fieldId).trim());
+    return res.json({ success: true, files });
+  } catch (error) {
+    console.error('Error searching unit test files:', error);
+    return res.status(500).json({
+      error: 'Failed to search unit test files',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * Delete unit test file from library
+ * DELETE /api/unit-tests/files/:id
+ */
+export async function deleteUnitTestFileHandler(req, res) {
+  try {
+    const { id } = req.params;
+    const deleted = await deleteUnitTestFile(parseInt(id, 10));
+    if (!deleted) {
+      return res.status(404).json({ error: 'Unit test file not found' });
+    }
+    return res.json({ success: true, message: 'Unit test file deleted' });
+  } catch (error) {
+    console.error('Error deleting unit test file:', error);
+    return res.status(500).json({
+      error: 'Failed to delete unit test file',
+      message: error.message,
+    });
+  }
+}
 
 /**
  * Save or update test execution record

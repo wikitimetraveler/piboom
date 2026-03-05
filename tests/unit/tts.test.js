@@ -41,7 +41,8 @@ const setupBrowserGlobals = () => {
   };
   global.speechSynthesis = {
     cancel: jest.fn(),
-    speak: jest.fn()
+    speak: jest.fn(),
+    getVoices: jest.fn(() => [])
   };
 };
 

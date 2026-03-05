@@ -667,7 +667,22 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_test_executions_tested_at ON test_executions(tested_at DESC)
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, and test executions)');
+    // Create unit_test_files table for stored unit test Excel library
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS unit_test_files (
+        id SERIAL PRIMARY KEY,
+        file_name VARCHAR(255) NOT NULL UNIQUE,
+        original_name VARCHAR(255),
+        field_ids JSONB DEFAULT '[]',
+        row_count INTEGER,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_unit_test_files_field_ids ON unit_test_files USING GIN (field_ids)
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, and unit test files)');
     
     // Migrate existing Grateful Dead data to new structure (run in background)
     migrateGratefulDeadData().catch(error => {

@@ -67,6 +67,9 @@ jspm_packages/
 ehthumbs.db
 Thumbs.db
 
+# Unit test library (uploaded Excel files)
+data/unit-tests/
+
 # Audio files (optional - remove if you want to track them)
 # music/*.mp3
 # music/*.wav

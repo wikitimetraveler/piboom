@@ -229,26 +229,52 @@
       return meta;
     };
 
-    // SET rows: one per input field — blank values for user to fill
-    // Description is just "Field {id}" — will be enriched from API when field-reader runs
+    // SET rows: all input fields first
     for (let k = 0; k < inputFields.length; k++) {
       const inputField = inputFields[k];
       const displayId = normalizeFieldIdForLookup(inputField);
       const meta = getMetaForField(inputField);
       const desc = 'Field ' + displayId;
-      const row = {
+      const setRow = {
         Step: step,
         Action: 'SET',
         Target: '[' + displayId + ']',
         Description: desc,
       };
-      if (meta) row._fieldMetadata = meta;
+      if (meta) setRow._fieldMetadata = meta;
       for (let idx = 0; idx < scenarioCount; idx++) {
-        row['Test ' + (idx + 1)] = '';
+        setRow['Test ' + (idx + 1)] = '';
       }
-      rows.push(row);
+      rows.push(setRow);
       step++;
     }
+
+    // GET rows: all input fields (corresponding to SETs above)
+    for (let k = 0; k < inputFields.length; k++) {
+      const inputField = inputFields[k];
+      const displayId = normalizeFieldIdForLookup(inputField);
+      const meta = getMetaForField(inputField);
+      const desc = 'Field ' + displayId;
+      const getRow = {
+        Step: step,
+        Action: 'GET',
+        Target: '[' + displayId + ']',
+        Description: desc,
+      };
+      if (meta) getRow._fieldMetadata = meta;
+      for (let idx = 0; idx < scenarioCount; idx++) {
+        getRow['Test ' + (idx + 1)] = '';
+      }
+      rows.push(getRow);
+      step++;
+    }
+
+    // Placeholder row: Actual Results (display only, for readability)
+    const actualResultsRow = { Step: '', Action: '', Target: '', Description: 'Actual Results' };
+    for (let idx = 0; idx < scenarioCount; idx++) {
+      actualResultsRow['Test ' + (idx + 1)] = '';
+    }
+    rows.push(actualResultsRow);
 
     // COMPARE row — blank expected values for user to fill
     const outDisplayId = normalizeFieldIdForLookup(outField);
@@ -265,6 +291,13 @@
       compareRow['Test ' + (idx + 1)] = '';
     }
     rows.push(compareRow);
+
+    // Placeholder row: Overall Test Results (display only, for readability)
+    const overallResultsRow = { Step: '', Action: '', Target: '', Description: 'Overall Test Results' };
+    for (let idx = 0; idx < scenarioCount; idx++) {
+      overallResultsRow['Test ' + (idx + 1)] = '';
+    }
+    rows.push(overallResultsRow);
 
     // EOF marker row (X in Step, Test Results in Description) for export
     const eofRow = {};

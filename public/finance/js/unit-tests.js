@@ -33,6 +33,14 @@ const runSummaryCounts = document.getElementById('runSummaryCounts');
 const runSummaryPassBar = document.getElementById('runSummaryPassBar');
 const runSummarySkipBar = document.getElementById('runSummarySkipBar');
 const runSummaryFailBar = document.getElementById('runSummaryFailBar');
+const uploadToLibraryBtn = document.getElementById('uploadToLibraryBtn');
+const libraryFileInput = document.getElementById('libraryFileInput');
+const testLibraryList = document.getElementById('testLibraryList');
+const fieldIdSearchInput = document.getElementById('fieldIdSearchInput');
+const fieldIdSearchBtn = document.getElementById('fieldIdSearchBtn');
+const fieldSearchResults = document.getElementById('fieldSearchResults');
+const fieldSearchTerm = document.getElementById('fieldSearchTerm');
+const fieldSearchResultsList = document.getElementById('fieldSearchResultsList');
 
 let gridApi;
 let allData = [];
@@ -730,6 +738,11 @@ function initializeGrid() {
     animateRows: true,
     overlayNoRowsTemplate: '<span class="text-muted">No data available. Upload an Excel file to get started.</span>',
     onFirstDataRendered: () => safeSizeColumnsToFit(),
+    getRowClass: (params) => {
+      const desc = String(params.data?.Description || params.data?.description || '').trim();
+      if (desc === 'Actual Results' || desc === 'Overall Test Results') return 'placeholder-section-row';
+      return '';
+    },
   };
   
   if (typeof agGrid.createGrid === 'function') {
@@ -1780,6 +1793,9 @@ async function runTests(singleTestNumber) {
         // Skip EOF marker row (X in Step column)
         if (String(step).trim().toUpperCase() === 'X') continue;
 
+        // Skip display-only placeholder rows (Actual Results, Overall Test Results)
+        if (!action || String(action).trim() === '') continue;
+
         const fieldId = extractFieldId(target);
 
         if (!fieldId) {
@@ -2375,9 +2391,145 @@ async function handleFileUpload(file) {
   }
 }
 
+// Test Library
+async function loadTestLibrary() {
+  if (!testLibraryList) return;
+  try {
+    const res = await fetch('/api/unit-tests/files');
+    const data = await res.json();
+    if (!data.success || !Array.isArray(data.files)) {
+      testLibraryList.innerHTML = '<p class="text-muted mb-0">No tests in library.</p>';
+      return;
+    }
+    if (data.files.length === 0) {
+      testLibraryList.innerHTML = '<p class="text-muted mb-0">No tests in library. Use "Save to Library" to add Excel files.</p>';
+      return;
+    }
+    testLibraryList.innerHTML = data.files
+      .map(
+        (f) =>
+          `<div class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+            <span class="text-truncate" style="max-width: 200px;" title="${(f.original_name || f.file_name || '').replace(/"/g, '&quot;')}">${(f.original_name || f.file_name || 'Untitled').replace(/</g, '&lt;')}</span>
+            <span class="text-muted small ml-2">${f.row_count || 0} rows, ${Array.isArray(f.field_ids) ? f.field_ids.length : 0} fields</span>
+            <span class="ml-2">
+              <button class="btn btn-sm btn-outline-primary load-from-library" data-id="${f.id}" data-name="${(f.original_name || f.file_name || '').replace(/"/g, '&quot;')}" title="Load into grid"><i class="bi-folder2"></i> Load</button>
+              <button class="btn btn-sm btn-outline-danger delete-from-library ml-1" data-id="${f.id}" title="Remove from library"><i class="bi-trash"></i></button>
+            </span>
+          </div>`
+      )
+      .join('');
+    testLibraryList.querySelectorAll('.load-from-library').forEach((btn) => {
+      btn.addEventListener('click', () => loadFileFromLibrary(btn.dataset.id, btn.dataset.name));
+    });
+    testLibraryList.querySelectorAll('.delete-from-library').forEach((btn) => {
+      btn.addEventListener('click', () => deleteFileFromLibrary(btn.dataset.id));
+    });
+  } catch (err) {
+    testLibraryList.innerHTML = '<p class="text-danger mb-0">Failed to load library.</p>';
+  }
+}
+
+async function loadFileFromLibrary(id, originalName) {
+  try {
+    const res = await fetch(`/api/unit-tests/files/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch');
+    const blob = await res.blob();
+    const file = new File([blob], originalName || 'unit-test.xlsx', { type: blob.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    await handleFileUpload(file);
+  } catch (err) {
+    showToast('Failed to load from library', 'err');
+  }
+}
+
+async function deleteFileFromLibrary(id) {
+  if (!confirm('Remove this test from the library?')) return;
+  try {
+    const res = await fetch(`/api/unit-tests/files/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete');
+    await loadTestLibrary();
+    if (fieldSearchResults && fieldSearchResults.style.display !== 'none') {
+      const term = fieldIdSearchInput?.value?.trim();
+      if (term) searchByFieldId(term);
+    }
+    showToast('Removed from library', 'ok');
+  } catch (err) {
+    showToast('Failed to remove', 'err');
+  }
+}
+
+async function searchByFieldId(fieldId) {
+  if (!fieldId || !fieldSearchResults || !fieldSearchTerm || !fieldSearchResultsList) return;
+  try {
+    const res = await fetch(`/api/unit-tests/search?fieldId=${encodeURIComponent(fieldId)}`);
+    const data = await res.json();
+    if (!data.success || !Array.isArray(data.files)) {
+      fieldSearchResults.style.display = 'block';
+      fieldSearchTerm.textContent = fieldId;
+      fieldSearchResultsList.innerHTML = '<p class="text-muted mb-0">No tests found.</p>';
+      return;
+    }
+    fieldSearchResults.style.display = 'block';
+    fieldSearchTerm.textContent = fieldId;
+    if (data.files.length === 0) {
+      fieldSearchResultsList.innerHTML = '<p class="text-muted mb-0">No tests contain this field.</p>';
+    } else {
+      fieldSearchResultsList.innerHTML = data.files
+        .map(
+          (f) =>
+            `<div class="d-flex justify-content-between align-items-center py-1">
+              <span class="text-truncate" style="max-width: 180px;">${(f.original_name || f.file_name || 'Untitled').replace(/</g, '&lt;')}</span>
+              <button class="btn btn-sm btn-outline-primary load-from-library" data-id="${f.id}" data-name="${(f.original_name || f.file_name || '').replace(/"/g, '&quot;')}"><i class="bi-folder2"></i> Load</button>
+            </div>`
+        )
+        .join('');
+      fieldSearchResultsList.querySelectorAll('.load-from-library').forEach((btn) => {
+        btn.addEventListener('click', () => loadFileFromLibrary(btn.dataset.id, btn.dataset.name));
+      });
+    }
+  } catch (err) {
+    fieldSearchResults.style.display = 'block';
+    fieldSearchTerm.textContent = fieldId;
+    fieldSearchResultsList.innerHTML = '<p class="text-danger mb-0">Search failed.</p>';
+  }
+}
+
 // Event listeners
 uploadBtn.addEventListener('click', () => {
   fileInput.click();
+});
+
+uploadToLibraryBtn?.addEventListener('click', () => {
+  libraryFileInput?.click();
+});
+
+libraryFileInput?.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/unit-tests/files', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Upload failed');
+    await loadTestLibrary();
+    showToast('Saved to library', 'ok');
+  } catch (err) {
+    showToast(err.message || 'Failed to save to library', 'err');
+  }
+});
+
+fieldIdSearchBtn?.addEventListener('click', () => {
+  const term = fieldIdSearchInput?.value?.trim();
+  if (term) searchByFieldId(term);
+});
+
+fieldIdSearchInput?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const term = fieldIdSearchInput?.value?.trim();
+    if (term) searchByFieldId(term);
+  }
 });
 
 fileInput.addEventListener('change', (e) => {
@@ -3151,6 +3303,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeGenerateFromCustomField();
   updateLoanGuidChipDisplay(currentLoanGuid);
   renderRecentRunsSelect();
+  loadTestLibrary();
   if (failFirstBtn) {
     failFirstBtn.disabled = true;
   }

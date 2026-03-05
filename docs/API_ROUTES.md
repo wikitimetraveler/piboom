@@ -23,6 +23,11 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | * | `/api/encompass/*` | Encompass Assistant (search, chat, summary) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |
+| POST | `/api/unit-tests/files` | Upload unit test Excel to library |
+| GET | `/api/unit-tests/files` | List stored unit test files |
+| GET | `/api/unit-tests/files/:id` | Download unit test file |
+| DELETE | `/api/unit-tests/files/:id` | Delete unit test file from library |
+| GET | `/api/unit-tests/search` | Search tests by field ID (query: fieldId) |
 | POST | `/api/unit-tests/executions` | Save test execution |
 | GET | `/api/unit-tests/executions` | Get executions (by fileName) |
 | GET | `/api/unit-tests/executions/all` | All executions |

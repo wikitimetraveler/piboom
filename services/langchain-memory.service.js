@@ -1,7 +1,7 @@
 import { ChatOpenAI } from "@langchain/openai";
-import { BufferMemory } from "langchain/memory";
-import { ConversationChain } from "langchain/chains";
-import { ChatMessageHistory } from "langchain/stores/message/in_memory";
+import { BufferMemory } from "@langchain/classic/memory";
+import { ConversationChain } from "@langchain/classic/chains";
+import { ChatMessageHistory } from "@langchain/classic/stores/message/in_memory";
 import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { getPool } from './database.service.js';
 

@@ -901,6 +901,13 @@
         padding: 4px 8px;
       }
 
+      .ag-theme-alpine .ag-row.placeholder-section-row .ag-cell {
+        background-color: rgba(74, 144, 164, 0.12) !important;
+        font-weight: 600;
+        font-style: italic;
+        color: var(--zen-muted, #647196);
+      }
+
       .action-badge {
         display: inline-block;
         padding: 4px 12px;
@@ -1645,6 +1652,10 @@
               </button>
               <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" />
             </div>
+            <button class="btn btn-outline-secondary btn-sm" id="uploadToLibraryBtn" title="Save Excel file to Test Library for later use">
+              <i class="bi-folder-plus"></i> Save to Library
+            </button>
+            <input type="file" id="libraryFileInput" accept=".xlsx,.xls" style="display: none;" />
             <button class="btn btn-outline-primary btn-sm" id="exportCsvBtn" style="display: none;">
               <i class="bi-download"></i> Export CSV
             </button>
@@ -1944,6 +1955,32 @@
                         </div>
                       </div>
                       </div><!-- /unit-test-data-header -->
+                      <!-- Test Library & Field Search -->
+                      <div class="card mb-3" id="testLibraryCard">
+                        <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                          <a class="btn btn-link btn-sm p-0 text-dark font-weight-600" data-toggle="collapse" href="#testLibraryCollapse" aria-expanded="false">
+                            <i class="bi-folder2-open mr-1"></i> Test Library
+                          </a>
+                          <div class="d-flex align-items-center" style="gap: 0.5rem;">
+                            <input type="text" class="form-control form-control-sm" id="fieldIdSearchInput" placeholder="Search by field ID (e.g. CX.TYPE, 353)" style="max-width: 220px;" />
+                            <button class="btn btn-outline-primary btn-sm" id="fieldIdSearchBtn">
+                              <i class="bi-search"></i> Search
+                            </button>
+                          </div>
+                        </div>
+                        <div class="collapse" id="testLibraryCollapse">
+                          <div class="card-body py-2">
+                            <div id="testLibraryList" class="small">
+                              <p class="text-muted mb-0">Loading library...</p>
+                            </div>
+                            <div id="fieldSearchResults" class="mt-2" style="display: none;">
+                              <hr class="my-2" />
+                              <strong>Search results for field:</strong> <span id="fieldSearchTerm" class="text-primary"></span>
+                              <div id="fieldSearchResultsList" class="mt-2"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                       <div id="uploadArea" class="file-upload-area">
                         <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
                         <h5>Drop Excel file here or click to browse</h5>

@@ -16,7 +16,7 @@ await jest.unstable_mockModule('@langchain/openai', () => ({
   }
 }));
 
-await jest.unstable_mockModule('langchain/memory', () => ({
+await jest.unstable_mockModule('@langchain/classic/memory', () => ({
   BufferMemory: class {
     constructor(options) {
       this.options = options;
@@ -24,7 +24,7 @@ await jest.unstable_mockModule('langchain/memory', () => ({
   }
 }));
 
-await jest.unstable_mockModule('langchain/chains', () => ({
+await jest.unstable_mockModule('@langchain/classic/chains', () => ({
   ConversationChain: class {
     constructor({ llm, memory }) {
       this.llm = llm;
@@ -33,7 +33,7 @@ await jest.unstable_mockModule('langchain/chains', () => ({
   }
 }));
 
-await jest.unstable_mockModule('langchain/stores/message/in_memory', () => ({
+await jest.unstable_mockModule('@langchain/classic/stores/message/in_memory', () => ({
   ChatMessageHistory: class {
     constructor() {
       this.messages = [];
