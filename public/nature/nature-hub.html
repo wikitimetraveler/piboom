@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Nature Hub - Trees & Critters</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { font-family: 'Nunito', sans-serif; background: linear-gradient(180deg, rgba(139,195,74,0.05) 0%, transparent 300px); }
+    :root { --jungle-green: #2E7D32; --jungle-dark: #1B5E20; --leaf-lime: #8BC34A; --critter-amber: #7CB342; }
+    .hub-header { background: linear-gradient(135deg, var(--jungle-green), var(--jungle-dark)); color: white; padding: 24px 0; margin-bottom: 30px; }
+    .hub-tabs { margin-bottom: 20px; }
+    .hub-tabs .nav-link { color: var(--jungle-green); font-weight: 600; }
+    .hub-tabs .nav-link.active { background: var(--jungle-green); color: white; }
+    #map { height: 500px; border-radius: 16px; border: 2px solid var(--leaf-lime); }
+    .photo-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+    .gallery-item { border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; }
+    .gallery-item img { width: 100%; height: 160px; object-fit: cover; }
+    .gallery-item .caption { padding: 8px; font-size: 0.85rem; background: white; }
+    .field-guide-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .field-guide-card { border-radius: 12px; overflow: hidden; border: 2px solid var(--leaf-lime); background: white; }
+    .field-guide-card img { width: 100%; height: 140px; object-fit: cover; }
+    .field-guide-card .body { padding: 12px; }
+  </style>
+</head>
+<body>
+<modern-navbar></modern-navbar>
+<div class="hub-header">
+  <div class="container">
+    <h1><i class="bi-globe2"></i> Nature Hub</h1>
+    <p class="mb-0">Unified map, photo gallery, field guide & share</p>
+  </div>
+</div>
+<div class="container">
+  <div id="userSelectorContainer"></div>
+  <ul class="nav nav-pills hub-tabs" role="tablist">
+    <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tabMap"><i class="bi-map"></i> Map</a></li>
+    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tabGallery"><i class="bi-images"></i> Photo Gallery</a></li>
+    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tabFieldGuide"><i class="bi-book"></i> Field Guide</a></li>
+    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tabShare"><i class="bi-share"></i> Share Collection</a></li>
+  </ul>
+  <div class="tab-content">
+    <div id="tabMap" class="tab-pane active">
+      <div id="map"></div>
+      <p class="text-muted mt-2"><i class="bi-info-circle"></i> Green markers = trees, Amber markers = critters</p>
+    </div>
+    <div id="tabGallery" class="tab-pane">
+      <div id="photoGallery" class="photo-gallery"></div>
+      <div id="galleryEmpty" class="text-center py-5 text-muted" style="display: none;">No photos in your collection yet.</div>
+    </div>
+    <div id="tabFieldGuide" class="tab-pane">
+      <p class="mb-3">Common species reference — works offline once loaded.</p>
+      <div id="fieldGuideGrid" class="field-guide-grid"></div>
+    </div>
+    <div id="tabShare" class="tab-pane">
+      <div class="card">
+        <div class="card-body">
+          <h5><i class="bi-link-45deg"></i> Share Your Full Collection</h5>
+          <p>Create a public link to share all your trees and critters with friends.</p>
+          <button class="btn btn-success" id="shareCollectionBtn" onclick="createShareLink()">
+            <i class="bi-share"></i> Create Share Link
+          </button>
+          <div id="shareLinkResult" class="mt-3" style="display: none;">
+            <label>Share link (copy and send):</label>
+            <div class="input-group">
+              <input type="text" id="shareLinkInput" class="form-control" readonly>
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" onclick="copyShareLink()"><i class="bi-clipboard"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+let map = null;
+let treeMarkers = [];
+let critterMarkers = [];
+let trees = [];
+let critters = [];
+let fieldGuideSpecies = [];
+
+function getUserId() {
+  if (localStorage.getItem('viewMode') === 'all') return 'all';
+  const u = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+  return u && u.id ? u.id : null;
+}
+
+async function loadData() {
+  const userId = getUserId();
+  const tParams = userId ? `?userId=${userId}` : '';
+  const cParams = userId ? `?userId=${userId}` : '';
+  const [tRes, cRes] = await Promise.all([
+    fetch(`/api/tree-collection${tParams}`),
+    fetch(`/api/critter-collection${cParams}`)
+  ]);
+  const tData = await tRes.json();
+  const cData = await cRes.json();
+  trees = (tData.trees || []).filter(t => t.latitude && t.longitude);
+  critters = (cData.critters || []).filter(c => c.latitude && c.longitude);
+  renderMap();
+  renderGallery();
+}
+
+function renderMap() {
+  if (!window.google?.maps) return;
+  const mapEl = document.getElementById('map');
+  if (!mapEl) return;
+  if (!map) {
+    map = new google.maps.Map(mapEl, {
+      center: { lat: 39.8283, lng: -98.5795 },
+      zoom: 4,
+      mapTypeId: 'roadmap'
+    });
+  }
+  treeMarkers.forEach(m => m.setMap(null));
+  critterMarkers.forEach(m => m.setMap(null));
+  treeMarkers = [];
+  critterMarkers = [];
+  const bounds = new google.maps.LatLngBounds();
+  trees.forEach(t => {
+    const m = new google.maps.Marker({
+      position: { lat: parseFloat(t.latitude), lng: parseFloat(t.longitude) },
+      map,
+      title: t.tree_name,
+      icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#2E7D32', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
+    });
+    treeMarkers.push(m);
+    bounds.extend(m.getPosition());
+  });
+  critters.forEach(c => {
+    const m = new google.maps.Marker({
+      position: { lat: parseFloat(c.latitude), lng: parseFloat(c.longitude) },
+      map,
+      title: c.animal_name,
+      icon: { path: google.maps.SymbolPath.CIRCLE, scale: 10, fillColor: '#7CB342', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 }
+    });
+    critterMarkers.push(m);
+    bounds.extend(m.getPosition());
+  });
+  if (treeMarkers.length + critterMarkers.length > 1) map.fitBounds(bounds);
+  else if (treeMarkers.length + critterMarkers.length === 1) {
+    const pos = treeMarkers[0]?.getPosition() || critterMarkers[0]?.getPosition();
+    if (pos) { map.setCenter(pos); map.setZoom(12); }
+  }
+}
+
+function renderGallery() {
+  const items = [
+    ...trees.filter(t => t.photo_url).map(t => ({ type: 'tree', name: t.tree_name, photo: t.photo_url })),
+    ...critters.filter(c => c.photo_url).map(c => ({ type: 'critter', name: c.animal_name, photo: c.photo_url }))
+  ];
+  const el = document.getElementById('photoGallery');
+  const empty = document.getElementById('galleryEmpty');
+  if (items.length === 0) {
+    el.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  el.innerHTML = items.map((item, i) => `
+    <div class="gallery-item">
+      <img src="${item.photo}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/180x160/8BC34A/fff?text=?'">
+      <div class="caption">${item.type === 'tree' ? '🌲' : '🐾'} ${item.name || 'Unknown'}</div>
+    </div>
+  `).join('');
+}
+
+async function loadFieldGuide() {
+  try {
+    const res = await fetch('/nature/field-guide-species.json');
+    fieldGuideSpecies = await res.json();
+  } catch {
+    fieldGuideSpecies = [
+      { type: 'tree', name: 'Coast Live Oak', scientific: 'Quercus agrifolia', habitat: 'Coastal California' },
+      { type: 'tree', name: 'California Sycamore', scientific: 'Platanus racemosa', habitat: 'Streams, canyons' },
+      { type: 'critter', name: 'Western Fence Lizard', scientific: 'Sceloporus occidentalis', habitat: 'Rocks, wood' },
+      { type: 'critter', name: 'Anna\'s Hummingbird', scientific: 'Calypte anna', habitat: 'Gardens, coastal' }
+    ];
+  }
+  const grid = document.getElementById('fieldGuideGrid');
+  grid.innerHTML = fieldGuideSpecies.map(s => `
+    <div class="field-guide-card">
+      <div style="height:140px;background:linear-gradient(135deg,#8BC34A,#2E7D32);display:flex;align-items:center;justify-content:center;font-size:3rem;">${s.type === 'tree' ? '🌲' : '🐾'}</div>
+      <div class="body">
+        <strong>${s.name}</strong>
+        <br><em class="text-muted small">${s.scientific || ''}</em>
+        ${s.habitat ? `<br><span class="small">${s.habitat}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function createShareLink() {
+  const btn = document.getElementById('shareCollectionBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Creating...';
+  try {
+    const userId = getUserId();
+    const res = await fetch('/api/nature-collection/share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: userId || null })
+    });
+    const data = await res.json();
+    if (data.success && data.shareUrl) {
+      const url = new URL(data.shareUrl, window.location.origin).toString();
+      document.getElementById('shareLinkInput').value = url;
+      document.getElementById('shareLinkResult').style.display = 'block';
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="bi-share"></i> Create Share Link';
+}
+
+function copyShareLink() {
+  const input = document.getElementById('shareLinkInput');
+  input.select();
+  document.execCommand('copy');
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+  createUserSelector('userSelectorContainer', { title: 'View collection:', showAllOption: true });
+  await loadData();
+  loadFieldGuide();
+  window.addEventListener('userChanged', loadData);
+
+  fetch('/api/music-research/google-api-key')
+    .then(r => r.json())
+    .then(data => {
+      if (data.apiKey && !window.google) {
+        const s = document.createElement('script');
+        s.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&callback=loadData`;
+        s.async = true;
+        document.head.appendChild(s);
+      }
+    })
+    .catch(() => loadData());
+});
+</script>
+</body>
+</html>

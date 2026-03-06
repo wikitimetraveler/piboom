@@ -1127,6 +1127,13 @@
         border-bottom: 1px solid var(--zen-border);
       }
 
+      .selected-field-details {
+        font-size: 1.05rem;
+      }
+      .selected-field-details pre {
+        font-size: 1rem;
+      }
+
       /* AI Chat Styling */
       .ai-chat-container {
         display: flex;
@@ -1861,7 +1868,24 @@
                     </div>
                   </div>
                 </div>
-                
+                <!-- Selected Field (when generated from custom field) -->
+                <div class="card" id="selectedFieldAccordionCard" style="display: none;">
+                  <div class="card-header" id="headingSelectedField">
+                    <h5 class="mb-0">
+                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
+                        <i class="bi-field"></i> Selected Field
+                        <i class="bi-chevron-down float-right"></i>
+                      </button>
+                    </h5>
+                  </div>
+                  <div id="collapseSelectedField" class="collapse" aria-labelledby="headingSelectedField">
+                    <div class="card-body">
+                      <div id="selectedFieldContent" class="selected-field-details">
+                        <!-- Populated by loadGeneratedTestData when source is custom field -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <!-- Test Grid Accordion -->
                 <div class="card">
                   <div class="card-header" id="headingTestGrid">
@@ -2042,6 +2066,10 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <script src="/shared/encompass-api.js"></script>
     <script src="/shared/customFieldCalcParser.js"></script>
+    <script type="module">
+      import * as u from '/shared/unit-tests-utils.js';
+      window.unitTestsUtils = u;
+    </script>
     <script src="/shared/tts.js"></script>
     <script src="/shared/voice-widget.js"></script>
     <script>
@@ -2072,8 +2100,8 @@
         });
       })();
     </script>
-    <script src="/finance/js/unit-tests.js"></script>
-    <script src="/finance/js/unit-tests-ai.js"></script>
+    <script defer src="/finance/js/unit-tests.js"></script>
+    <script defer src="/finance/js/unit-tests-ai.js"></script>
     <script src="/shared/finance-auth-guard.js"></script>
   </body>
 </html>

@@ -368,6 +368,7 @@
           <button class="btn btn-lg btn-success" onclick="startCamera()" id="startCameraBtn">
             <i class="bi-camera-video"></i> Start Camera
           </button>
+          <p class="small text-muted mt-2 mb-0"><i class="bi-info-circle"></i> Allow camera permissions when prompted.</p>
           <button class="btn btn-lg btn-danger" onclick="stopCamera()" id="stopCameraBtn" style="display: none;">
             <i class="bi-camera-video-off"></i> Stop Camera
           </button>
@@ -751,7 +752,12 @@ function clearImageUpload() {
 
 // Start camera
 async function startCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showToast('error', 'Camera Error', 'Camera access is not supported in this browser or device.', 8000);
+    return;
+  }
   try {
+    showToast('info', 'Camera', 'Requesting camera access…');
     const constraints = {
       video: {
         facingMode: 'environment',
@@ -786,10 +792,13 @@ async function startCamera() {
     console.error('Error accessing camera:', error);
     let errorMessage = 'Could not access camera. ';
     if (error.name === 'NotAllowedError') {
-      errorMessage += 'Please allow camera permissions.';
+      errorMessage += 'Please allow camera permissions when prompted.';
     } else if (error.name === 'NotFoundError') {
       errorMessage += 'No camera found on this device.';
+    } else {
+      errorMessage += 'Make sure your camera is connected and not in use by another app.';
     }
+    showToast('error', 'Camera Error', errorMessage, 8000);
   }
 }
 

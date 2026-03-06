@@ -1,0 +1,583 @@
+import '../../public/shared/customFieldCalcParser.js';
+
+const {
+  parseIIfScenarios,
+  parseAllIIfScenarios,
+  splitByTopLevelAmpersand,
+  expandOrElseScenarios,
+  extractComparisonValues,
+  extractConditionValues,
+  extractStringComparisons,
+  getSuggestedValuesForScenario,
+  generateUnitTestFromCustomField,
+  parseCalculationFormula,
+  normalizeFieldIdForLookup,
+  isSunriseField,
+  formatDateWithOffset,
+} = globalThis.customFieldCalcParser;
+
+describe('customFieldCalcParser', () => {
+  describe('parseIIfScenarios', () => {
+    test('returns null for non-IIf expression', () => {
+      expect(parseIIfScenarios('[4002] + [4003]')).toBeNull();
+      expect(parseIIfScenarios('')).toBeNull();
+      expect(parseIIfScenarios(null)).toBeNull();
+    });
+
+    test('parses simple IIf with two branches', () => {
+      const result = parseIIfScenarios('IIf([#60#1] <= 200, [#1415#1], 0)');
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({
+        condition: '[#60#1] <= 200',
+        result: '[#1415#1]',
+        isElse: false,
+      });
+      expect(result[1]).toEqual({
+        condition: null,
+        result: '0',
+        isElse: true,
+      });
+    });
+
+    test('parses nested IIf with four branches', () => {
+      const formula =
+        'IIf([#60#1] <= 200 And [#1452#1] <= 200, [#1415#1],' +
+        'IIf([#60#1] <= 200 And [#1415#1] <= 200,[#1452#1],' +
+        'IIf([#1452#1] <= 200 And [#1415#1] <= 200,[#60#1],' +
+        'LMedian([60#1], [1452#1], [1415#1]))))';
+      const result = parseIIfScenarios(formula);
+      expect(result).toHaveLength(4);
+      expect(result[0].condition).toBe('[#60#1] <= 200 And [#1452#1] <= 200');
+      expect(result[0].result).toBe('[#1415#1]');
+      expect(result[1].condition).toBe('[#60#1] <= 200 And [#1415#1] <= 200');
+      expect(result[1].result).toBe('[#1452#1]');
+      expect(result[2].condition).toBe('[#1452#1] <= 200 And [#1415#1] <= 200');
+      expect(result[2].result).toBe('[#60#1]');
+      expect(result[3].isElse).toBe(true);
+      expect(result[3].result).toContain('LMedian');
+    });
+
+    test('handles IIF case insensitively', () => {
+      const result = parseIIfScenarios('IIF([x] > 0, 1, 0)');
+      expect(result).toHaveLength(2);
+      expect(result[0].condition).toBe('[x] > 0');
+    });
+  });
+
+  describe('splitByTopLevelAmpersand', () => {
+    test('returns empty for empty or invalid input', () => {
+      expect(splitByTopLevelAmpersand('')).toEqual([]);
+      expect(splitByTopLevelAmpersand(null)).toEqual([]);
+    });
+
+    test('returns single segment when no &', () => {
+      const result = splitByTopLevelAmpersand('IIf([a]=1,"x","")');
+      expect(result).toEqual(['IIf([a]=1,"x","")']);
+    });
+
+    test('splits by top-level & only', () => {
+      const expr = 'IIf([a]=1,"x","") & IIf([b]=2,"y","") & IIf([c]=3,"z","")';
+      const result = splitByTopLevelAmpersand(expr);
+      expect(result).toHaveLength(3);
+      expect(result[0]).toBe('IIf([a]=1,"x","")');
+      expect(result[1]).toBe('IIf([b]=2,"y","")');
+      expect(result[2]).toBe('IIf([c]=3,"z","")');
+    });
+
+    test('ignores & inside parentheses', () => {
+      const expr = 'IIf([a] & [b] = "xy", "ok", "no")';
+      const result = splitByTopLevelAmpersand(expr);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toBe('IIf([a] & [b] = "xy", "ok", "no")');
+    });
+
+    test('ignores & inside quotes', () => {
+      const expr = 'IIf([a]="x&y","ok","no")';
+      const result = splitByTopLevelAmpersand(expr);
+      expect(result).toHaveLength(1);
+      expect(result[0]).toBe('IIf([a]="x&y","ok","no")');
+    });
+  });
+
+  describe('parseAllIIfScenarios (concatenated IIf)', () => {
+    test('returns null for non-IIf expression', () => {
+      expect(parseAllIIfScenarios('[4002] + [4003]')).toBeNull();
+      expect(parseAllIIfScenarios('')).toBeNull();
+    });
+
+    test('parses single IIf same as parseIIfScenarios', () => {
+      const expr = 'IIf([#60#1] <= 200, [#1415#1], 0)';
+      const single = parseIIfScenarios(expr);
+      const all = parseAllIIfScenarios(expr);
+      expect(all).toHaveLength(single.length);
+      expect(all[0]).toEqual(single[0]);
+      expect(all[1]).toEqual(single[1]);
+    });
+
+    test('merges scenarios from concatenated IIf blocks', () => {
+      const expr = 'IIf([a]=1,"x","") & IIf([b]=2,"y","") & IIf([c]=3,"z","")';
+      const result = parseAllIIfScenarios(expr);
+      expect(result).not.toBeNull();
+      expect(result.length).toBeGreaterThanOrEqual(6);
+      const conds = result.map((r) => r.condition).filter(Boolean);
+      expect(conds).toContain('[a]=1');
+      expect(conds).toContain('[b]=2');
+      expect(conds).toContain('[c]=3');
+    });
+
+    test('generateUnitTestFromCustomField uses concatenated scenarios', () => {
+      const customField = {
+        fieldId: 'CX.OUT',
+        calculation: 'IIf([a]=1,"x","") & IIf([b]=2,"y","")',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      expect(result.testDescriptions.length).toBeGreaterThanOrEqual(2);
+      const setRows = result.rows.filter((r) => r.Action === 'SET');
+      const rowA = setRows.find((r) => r.Target === '[a]');
+      const rowB = setRows.find((r) => r.Target === '[b]');
+      expect(rowA).toBeDefined();
+      expect(rowB).toBeDefined();
+    });
+
+    test('concatenated IIf with Y conditions generates N and blank for else scenarios', () => {
+      const formula =
+        'IIf([4002#1] <> Nothing AndAlso ([FE0154#1] = "Y" OrElse [FE0354#1] = "Y"), "B1, ", "") & ' +
+        'IIf([4006#1] <> Nothing AndAlso [FE0254#1] = "Y", "C1, ", "")';
+      const customField = { fieldId: 'CX.OUT', calculation: formula };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const setRows = result.rows.filter((r) => r.Action === 'SET');
+      const rowFE0154 = setRows.find((r) => r.Target === '[FE0154#1]');
+      const rowFE0354 = setRows.find((r) => r.Target === '[FE0354#1]');
+      expect(rowFE0154).toBeDefined();
+      expect(rowFE0354).toBeDefined();
+      const values0154 = [rowFE0154['Test 1'], rowFE0154['Test 2'], rowFE0154['Test 3'], rowFE0154['Test 4'], rowFE0154['Test 5']].filter((v) => v !== undefined);
+      const values0354 = [rowFE0354['Test 1'], rowFE0354['Test 2'], rowFE0354['Test 3'], rowFE0354['Test 4'], rowFE0354['Test 5']].filter((v) => v !== undefined);
+      const hasN = values0154.some((v) => v === 'N') || values0354.some((v) => v === 'N');
+      const hasBlank = values0154.some((v) => v === '') || values0354.some((v) => v === '');
+      expect(hasN || hasBlank).toBe(true);
+    });
+  });
+
+  describe('extractComparisonValues', () => {
+    test('returns empty array for empty or invalid input', () => {
+      expect(extractComparisonValues('')).toEqual([]);
+      expect(extractComparisonValues(null)).toEqual([]);
+    });
+
+    test('extracts <= comparisons', () => {
+      const result = extractComparisonValues('[#60#1] <= 200 And [#1452#1] <= 200');
+      expect(result).toEqual([
+        { fieldId: '#60#1', op: '<=', value: 200 },
+        { fieldId: '#1452#1', op: '<=', value: 200 },
+      ]);
+    });
+
+    test('extracts >=, <, >, = operators', () => {
+      const result = extractComparisonValues('[a] >= 10 And [b] < 5 And [c] > 0 And [d] = 100');
+      expect(result).toEqual([
+        { fieldId: 'a', op: '>=', value: 10 },
+        { fieldId: 'b', op: '<', value: 5 },
+        { fieldId: 'c', op: '>', value: 0 },
+        { fieldId: 'd', op: '=', value: 100 },
+      ]);
+    });
+
+    test('handles decimal values', () => {
+      const result = extractComparisonValues('[x] <= 199.5');
+      expect(result).toEqual([{ fieldId: 'x', op: '<=', value: 199.5 }]);
+    });
+  });
+
+  describe('getSuggestedValuesForScenario', () => {
+    test('returns suggested values for <= condition', () => {
+      const scenario = { condition: '[#60#1] <= 200 And [#1452#1] <= 200', result: '[#1415#1]', isElse: false };
+      const inputFields = ['#60#1', '#1452#1', '#1415#1'];
+      const result = getSuggestedValuesForScenario(scenario, inputFields);
+      expect(result['60#1']).toBe(100);
+      expect(result['1452#1']).toBe(100);
+      expect(result['1415#1']).toBeUndefined();
+    });
+
+    test('returns empty for non-matching input fields', () => {
+      const scenario = { condition: '[#60#1] <= 200', result: '[#1415#1]', isElse: false };
+      const inputFields = ['#999#1'];
+      const result = getSuggestedValuesForScenario(scenario, inputFields);
+      expect(result).toEqual({});
+    });
+
+    test('returns empty for scenario without condition', () => {
+      const scenario = { condition: null, result: '0', isElse: true };
+      const result = getSuggestedValuesForScenario(scenario, ['#60#1']);
+      expect(result).toEqual({});
+    });
+  });
+
+  describe('generateUnitTestFromCustomField with IIf', () => {
+    test('generates scenario-based test descriptions for IIf formula', () => {
+      const customField = {
+        fieldId: 'CX.CR.COBORR.MEDIAN',
+        calculation:
+          'IIf([#60#1] <= 200 And [#1452#1] <= 200, [#1415#1],' +
+          'IIf([#60#1] <= 200 And [#1415#1] <= 200,[#1452#1],' +
+          'IIf([#1452#1] <= 200 And [#1415#1] <= 200,[#60#1],' +
+          'LMedian([60#1], [1452#1], [1415#1]))))',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      expect(result.testDescriptions).toHaveLength(4);
+      expect(result.testDescriptions[0].description).toContain('[#60#1] <= 200');
+      expect(result.testDescriptions[0].description).toContain('[#1415#1]');
+      expect(result.headers).toContain('Test 1');
+      expect(result.headers).toContain('Test 4');
+    });
+
+    test('excludes output field from inputFields', () => {
+      const customField = {
+        fieldId: 'CX.TEST',
+        calculation: 'IIf([CX.TEST] > 0, [CX.TEST], [4002])',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const setTargets = result.rows.filter((r) => r.Action === 'SET').map((r) => r.Target);
+      expect(setTargets).not.toContain('[CX.TEST]');
+      expect(setTargets).toContain('[4002]');
+    });
+
+    test('falls back to 5 generic scenarios for non-IIf formula', () => {
+      const customField = {
+        fieldId: 'CX.SUM',
+        calculation: '[4002] + [4003]',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      expect(result.testDescriptions).toHaveLength(5);
+      expect(result.testDescriptions[0].description).toBe('Scenario 1');
+    });
+
+    test('pre-fills SET cells with suggested values for IIf scenarios', () => {
+      const customField = {
+        fieldId: 'CX.CR.COBORR.MEDIAN',
+        calculation: 'IIf([#60#1] <= 200 And [#1452#1] <= 200, [#1415#1], 0)',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const setRows = result.rows.filter((r) => r.Action === 'SET');
+      const row60 = setRows.find((r) => r.Target === '[60#1]');
+      const row1452 = setRows.find((r) => r.Target === '[1452#1]');
+      expect(row60).toBeDefined();
+      expect(row60['Test 1']).toBe('100');
+      expect(row1452).toBeDefined();
+      expect(row1452['Test 1']).toBe('100');
+    });
+
+    test('pre-fills COMPARE when result is single field ref from condition', () => {
+      const customField = {
+        fieldId: 'CX.OUT',
+        calculation: 'IIf([#60#1] <= 200, [#60#1], 0)',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const compareRow = result.rows.find((r) => r.Action === 'COMPARE');
+      expect(compareRow).toBeDefined();
+      expect(compareRow['Test 1']).toBe('100');
+    });
+
+    test('expands OrElse into separate scenarios with different [19] values', () => {
+      const formula =
+        '[CX.299.REFI.FIELD.BOOL] IIf (([19] = "NoCash-Out Refinance" OrElse [19] = "Cash-Out Refinance" OrElse ([19] = "ConstructionToPermanent" AndAlso [CONSTR.REFI] = "Y")) AndAlso [299] = "", "Y", "N")';
+      const customField = { fieldId: 'CX.299.REFI.FIELD.BOOL', calculation: formula };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      expect(result.testDescriptions.length).toBeGreaterThanOrEqual(3);
+      const setRows = result.rows.filter((r) => r.Action === 'SET');
+      const row19 = setRows.find((r) => r.Target === '[19]');
+      expect(row19).toBeDefined();
+      expect(row19['Test 1']).toBe('NoCash-Out Refinance');
+      expect(row19['Test 2']).toBe('Cash-Out Refinance');
+      expect(row19['Test 3']).toBe('ConstructionToPermanent');
+    });
+  });
+
+  describe('extractStringComparisons', () => {
+    test('extracts string equality', () => {
+      const result = extractStringComparisons('[19] = "NoCash-Out Refinance"');
+      expect(result).toEqual([{ fieldId: '19', op: '=', value: 'NoCash-Out Refinance' }]);
+    });
+    test('extracts empty string', () => {
+      const result = extractStringComparisons('[299] = ""');
+      expect(result).toEqual([{ fieldId: '299', op: '=', value: '' }]);
+    });
+  });
+
+  describe('extractConditionValues (Phase 2)', () => {
+    test('returns empty for empty or invalid input', () => {
+      expect(extractConditionValues('')).toEqual([]);
+      expect(extractConditionValues(null)).toEqual([]);
+    });
+
+    test('extracts IsDate([field])', () => {
+      const result = extractConditionValues('IsDate([CX.DISASTER.DATE])');
+      expect(result).toEqual([{ type: 'isDate', fieldId: 'CX.DISASTER.DATE', negated: false }]);
+    });
+
+    test('extracts Not IsDate([field])', () => {
+      const result = extractConditionValues('Not IsDate([CX.DISASTER.DATE])');
+      expect(result).toEqual([{ type: 'isDate', fieldId: 'CX.DISASTER.DATE', negated: true }]);
+    });
+
+    test('extracts DateDiff("d", [field1], [field2]) > N', () => {
+      const result = extractConditionValues('DateDiff("d", [@CX.DISASTER.DATE], [@3142]) > 90');
+      expect(result).toEqual([
+        { type: 'dateDiff', field1: '@CX.DISASTER.DATE', field2: '@3142', op: '>', value: 90 },
+      ]);
+    });
+
+    test('extracts DateDiff with <= operator', () => {
+      const result = extractConditionValues('DateDiff("d", [@field1], [@field2]) <= 90');
+      expect(result).toEqual([
+        { type: 'dateDiff', field1: '@field1', field2: '@field2', op: '<=', value: 90 },
+      ]);
+    });
+
+    test('extracts [field].Contains("literal")', () => {
+      const result = extractConditionValues('[19].Contains("Refi")');
+      expect(result).toEqual([{ type: 'contains', fieldId: '19', substring: 'Refi' }]);
+    });
+
+    test('extracts multiple condition types', () => {
+      const cond = 'IsDate([CX.DATE]) And [19].Contains("Refi") And DateDiff("d", [@A], [@B]) > 30';
+      const result = extractConditionValues(cond);
+      expect(result).toHaveLength(3);
+      expect(result).toContainEqual({ type: 'isDate', fieldId: 'CX.DATE', negated: false });
+      expect(result).toContainEqual({ type: 'contains', fieldId: '19', substring: 'Refi' });
+      expect(result).toContainEqual({ type: 'dateDiff', field1: '@A', field2: '@B', op: '>', value: 30 });
+    });
+
+    test('extracts [field].StartsWith("literal")', () => {
+      const result = extractConditionValues('[CX.APPRAISAL.TYPE].StartsWith ("Appraisal Waived")');
+      expect(result).toEqual([{ type: 'startsWith', fieldId: 'CX.APPRAISAL.TYPE', prefix: 'Appraisal Waived' }]);
+    });
+
+    test('extracts [field] <> Nothing', () => {
+      const result = extractConditionValues('[CX.DATE] <> Nothing');
+      expect(result).toEqual([{ type: 'nothing', fieldId: 'CX.DATE', negated: true }]);
+    });
+
+    test('extracts [field] = Nothing', () => {
+      const result = extractConditionValues('[299] = Nothing');
+      expect(result).toEqual([{ type: 'nothing', fieldId: '299', negated: false }]);
+    });
+  });
+
+  describe('getSuggestedValuesForScenario (Phase 2)', () => {
+    test('suggests valid date for IsDate([x])', () => {
+      const scenario = { condition: 'IsDate([CX.DISASTER.DATE])', result: '"Y"', isElse: false };
+      const result = getSuggestedValuesForScenario(scenario, ['CX.DISASTER.DATE']);
+      expect(result['CX.DISASTER.DATE']).toBe('01/15/2025');
+    });
+
+    test('suggests empty for Not IsDate([x])', () => {
+      const scenario = { condition: 'Not IsDate([CX.DISASTER.DATE])', result: '"N"', isElse: false };
+      const result = getSuggestedValuesForScenario(scenario, ['CX.DISASTER.DATE']);
+      expect(result['CX.DISASTER.DATE']).toBe('');
+    });
+
+    test('suggests substring for Contains', () => {
+      const scenario = { condition: '[19].Contains("Refi")', result: '"Y"', isElse: false };
+      const result = getSuggestedValuesForScenario(scenario, ['19']);
+      expect(result['19']).toBe('Refi');
+    });
+
+    test('suggests different dropdown values for Contains across scenarios', () => {
+      const scenario = {
+        condition: '[CX.TYPE].Contains ("Fha")',
+        result: '"Y"',
+        isElse: false,
+      };
+      const fieldMetadata = {
+        'CX.TYPE': {
+          options: ['FHA', 'FHA 203k', 'FHA Streamline', 'VA', 'Conventional'],
+        },
+      };
+      const r0 = getSuggestedValuesForScenario(scenario, ['CX.TYPE'], { fieldMetadata, scenarioIndex: 0 });
+      const r1 = getSuggestedValuesForScenario(scenario, ['CX.TYPE'], { fieldMetadata, scenarioIndex: 1 });
+      expect(r0['CX.TYPE']).toBe('FHA');
+      expect(r1['CX.TYPE']).toBe('FHA 203k');
+    });
+
+    test('suggests two dates for DateDiff > 90', () => {
+      const scenario = {
+        condition: 'DateDiff("d", [@CX.DISASTER.DATE], [@3142]) > 90',
+        result: '"Y"',
+        isElse: false,
+      };
+      const result = getSuggestedValuesForScenario(scenario, ['CX.DISASTER.DATE', '3142']);
+      expect(result['CX.DISASTER.DATE']).toBe('01/01/2025');
+      expect(result['3142']).toBe('04/15/2025');
+    });
+
+    test('suggests different dropdown values for StartsWith across scenarios', () => {
+      const scenario = {
+        condition: '[CX.APPRAISAL.TYPE].StartsWith ("Appraisal Waived")',
+        result: '"Y"',
+        isElse: false,
+      };
+      const fieldMetadata = {
+        'CX.APPRAISAL.TYPE': {
+          options: ['Appraisal Waived', 'Appraisal Waived - Other', 'Desktop Appraisal', 'Full Appraisal'],
+        },
+      };
+      const r0 = getSuggestedValuesForScenario(scenario, ['CX.APPRAISAL.TYPE'], { fieldMetadata, scenarioIndex: 0 });
+      const r1 = getSuggestedValuesForScenario(scenario, ['CX.APPRAISAL.TYPE'], { fieldMetadata, scenarioIndex: 1 });
+      expect(r0['CX.APPRAISAL.TYPE']).toBe('Appraisal Waived');
+      expect(r1['CX.APPRAISAL.TYPE']).toBe('Appraisal Waived - Other');
+    });
+
+    test('falls back to prefix when no options for StartsWith', () => {
+      const scenario = {
+        condition: '[CX.APPRAISAL.TYPE].StartsWith ("Appraisal Waived")',
+        result: '"Y"',
+        isElse: false,
+      };
+      const result = getSuggestedValuesForScenario(scenario, ['CX.APPRAISAL.TYPE']);
+      expect(result['CX.APPRAISAL.TYPE']).toBe('Appraisal Waived');
+    });
+
+    test('cycles Y, N, blank for [field] = "Y" across scenarios', () => {
+      const scenario = { condition: '[FLAG] = "Y"', result: '"ok"', isElse: false };
+      const r0 = getSuggestedValuesForScenario(scenario, ['FLAG'], { scenarioIndex: 0 });
+      const r1 = getSuggestedValuesForScenario(scenario, ['FLAG'], { scenarioIndex: 1 });
+      const r2 = getSuggestedValuesForScenario(scenario, ['FLAG'], { scenarioIndex: 2 });
+      expect(r0['FLAG']).toBe('Y');
+      expect(r1['FLAG']).toBe('N');
+      expect(r2['FLAG']).toBe('');
+    });
+
+    test('cycles N, Y, blank for [field] = "N" across scenarios', () => {
+      const scenario = { condition: '[FLAG] = "N"', result: '"no"', isElse: false };
+      const r0 = getSuggestedValuesForScenario(scenario, ['FLAG'], { scenarioIndex: 0 });
+      const r1 = getSuggestedValuesForScenario(scenario, ['FLAG'], { scenarioIndex: 1 });
+      const r2 = getSuggestedValuesForScenario(scenario, ['FLAG'], { scenarioIndex: 2 });
+      expect(r0['FLAG']).toBe('N');
+      expect(r1['FLAG']).toBe('Y');
+      expect(r2['FLAG']).toBe('');
+    });
+
+    test('suggests blank for [field] = Nothing', () => {
+      const scenario = { condition: '[CX.DATE] = Nothing', result: '"N"', isElse: false };
+      const result = getSuggestedValuesForScenario(scenario, ['CX.DATE']);
+      expect(result['CX.DATE']).toBe('');
+    });
+
+    test('suggests Y for [field] <> Nothing', () => {
+      const scenario = { condition: '[CX.DATE] <> Nothing', result: '"Y"', isElse: false };
+      const result = getSuggestedValuesForScenario(scenario, ['CX.DATE']);
+      expect(result['CX.DATE']).toBe('Y');
+    });
+  });
+
+  describe('isSunriseField', () => {
+    test('returns true for CX.SUNRISE and CX.SUNRISE.* fields', () => {
+      expect(isSunriseField('CX.SUNRISE')).toBe(true);
+      expect(isSunriseField('cx.sunrise')).toBe(true);
+      expect(isSunriseField('CX.SUNRISE.DATE')).toBe(true);
+      expect(isSunriseField('CX.SUNRISE.XXXX')).toBe(true);
+      expect(isSunriseField('cx.sunrise.anything')).toBe(true);
+    });
+    test('returns false for non-Sunrise fields', () => {
+      expect(isSunriseField('CX.OTHER.FIELD')).toBe(false);
+      expect(isSunriseField('SUNRISE')).toBe(false);
+    });
+  });
+
+  describe('formatDateWithOffset', () => {
+    test('returns MM/DD/YYYY format', () => {
+      const result = formatDateWithOffset(0);
+      expect(result).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+    });
+    test('applies day offset correctly', () => {
+      const today = formatDateWithOffset(0);
+      const tomorrow = formatDateWithOffset(1);
+      expect(today).not.toBe(tomorrow);
+    });
+  });
+
+  describe('generateUnitTestFromCustomField (Phase 2)', () => {
+    test('pre-fills CX.SUNRISE.* with today ± 2 for 5 scenarios', () => {
+      const customField = {
+        fieldId: 'CX.OUT',
+        calculation: '[CX.SUNRISE.DATE]',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const setRows = result.rows.filter((r) => r.Action === 'SET');
+      const row = setRows.find((r) => r.Target === '[CX.SUNRISE.DATE]');
+      expect(row).toBeDefined();
+      expect(result.testDescriptions).toHaveLength(5);
+      const t1 = row['Test 1'];
+      const t2 = row['Test 2'];
+      const t3 = row['Test 3'];
+      const t4 = row['Test 4'];
+      const t5 = row['Test 5'];
+      expect(t1).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+      expect(t2).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+      expect(t3).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+      expect(t4).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+      expect(t5).toMatch(/^\d{2}\/\d{2}\/\d{4}$/);
+      expect(new Set([t1, t2, t3, t4, t5]).size).toBe(5);
+    });
+
+    test('pre-fills CX.TYPE with different FHA values for Contains across scenarios', () => {
+      const customField = {
+        fieldId: 'CX.OUT',
+        calculation: 'IIf([CX.TYPE].Contains ("Fha"), "Y", "N")',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const setRows = result.rows.filter((r) => r.Action === 'SET');
+      const row = setRows.find((r) => r.Target === '[CX.TYPE]');
+      expect(row).toBeDefined();
+      const values = [row['Test 1'], row['Test 2'], row['Test 3'], row['Test 4'], row['Test 5']].filter(Boolean);
+      expect(values.length).toBeGreaterThanOrEqual(1);
+      values.forEach((v) => expect(v.toLowerCase().includes('fha')).toBe(true));
+    });
+
+    test('pre-fills CX.APPRAISAL.TYPE with different values for StartsWith across scenarios', () => {
+      const customField = {
+        fieldId: 'CX.OUT',
+        calculation: 'IIf([CX.APPRAISAL.TYPE].StartsWith ("Appraisal Waived"), "Y", "N")',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const setRows = result.rows.filter((r) => r.Action === 'SET');
+      const row = setRows.find((r) => r.Target === '[CX.APPRAISAL.TYPE]');
+      expect(row).toBeDefined();
+      const values = [row['Test 1'], row['Test 2'], row['Test 3'], row['Test 4'], row['Test 5']].filter(Boolean);
+      expect(values.length).toBeGreaterThanOrEqual(1);
+      values.forEach((v) => expect(v.startsWith('Appraisal Waived')).toBe(true));
+    });
+
+    test('pre-fills SET cells for IsDate/Contains/DateDiff conditions', () => {
+      const customField = {
+        fieldId: 'CX.OUT',
+        calculation:
+          'IIf(IsDate([CX.DISASTER.DATE]), "Y", IIf([19].Contains("Refi"), "Y", IIf(DateDiff("d", [@CX.DISASTER.DATE], [@3142]) > 90, "Y", "N")))',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const setRows = result.rows.filter((r) => r.Action === 'SET');
+      const rowDate = setRows.find((r) => r.Target === '[CX.DISASTER.DATE]');
+      const row19 = setRows.find((r) => r.Target === '[19]');
+      expect(rowDate).toBeDefined();
+      expect(rowDate['Test 1']).toBe('01/15/2025');
+      expect(row19).toBeDefined();
+      expect(row19['Test 2']).toBe('Refi');
+      expect(rowDate['Test 3']).toBe('01/01/2025');
+      const row3142 = setRows.find((r) => r.Target === '[3142]');
+      expect(row3142).toBeDefined();
+      expect(row3142['Test 3']).toBe('04/15/2025');
+    });
+  });
+});

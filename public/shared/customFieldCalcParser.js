@@ -88,6 +88,538 @@
   }
 
   /**
+   * Split expression by top-level & (concatenation). Respects parens and quotes.
+   * @param {string} expression - e.g. "IIf(A,\"x\",\"\") & IIf(B,\"y\",\"\")"
+   * @returns {string[]} - trimmed segments
+   */
+  function splitByTopLevelAmpersand(expression) {
+    if (!expression || typeof expression !== 'string') return [];
+    const str = expression.trim();
+    if (!str) return [];
+    const segments = [];
+    let depth = 0;
+    let inQuote = false;
+    let start = 0;
+    for (let i = 0; i < str.length; i++) {
+      const c = str[i];
+      if (c === '"' && (i === 0 || str[i - 1] !== '\\')) {
+        inQuote = !inQuote;
+        continue;
+      }
+      if (!inQuote) {
+        if (c === '(') depth++;
+        else if (c === ')') depth--;
+        else if (c === '&' && depth === 0) {
+          segments.push(str.substring(start, i).trim());
+          start = i + 1;
+        }
+      }
+    }
+    const last = str.substring(start).trim();
+    if (last) segments.push(last);
+    return segments;
+  }
+
+  /**
+   * Parse nested IIf(condition, thenValue, elseValue) into an array of scenarios.
+   * @param {string} expression - e.g. "IIf([#60#1] <= 200 And [#1452#1] <= 200, [#1415#1], IIf(...))"
+   * @returns {Array<{ condition: string|null, result: string, isElse: boolean }>|null} - scenarios or null if no IIf
+   */
+  function parseIIfScenarios(expression) {
+    if (!expression || typeof expression !== 'string') return null;
+    const str = expression.trim();
+    const iifMatch = str.match(/IIf\s*\(/i);
+    if (!iifMatch) return null;
+
+    const start = iifMatch.index + iifMatch[0].length;
+    let depth = 1;
+    let firstComma = -1;
+    let secondComma = -1;
+    let i = start;
+    let inQuote = false;
+
+    let closeParen = -1;
+    while (i < str.length) {
+      const c = str[i];
+      if (c === '"' && (i === 0 || str[i - 1] !== '\\')) {
+        inQuote = !inQuote;
+        i++;
+        continue;
+      }
+      if (!inQuote) {
+        if (c === '(') {
+          depth++;
+        } else if (c === ')') {
+          depth--;
+          if (depth === 0) {
+            closeParen = i;
+            break;
+          }
+        } else if (c === ',' && depth === 1) {
+          if (firstComma < 0) {
+            firstComma = i;
+          } else {
+            secondComma = i;
+          }
+        }
+      }
+      i++;
+    }
+
+    if (firstComma < 0 || secondComma < 0 || closeParen < 0) return null;
+
+    const condition = str.substring(start, firstComma).trim();
+    const thenValue = str.substring(firstComma + 1, secondComma).trim();
+    const elseValue = str.substring(secondComma + 1, closeParen).trim();
+
+    const scenarios = [{ condition, result: thenValue, isElse: false }];
+
+    if (/IIf\s*\(/i.test(elseValue)) {
+      const rest = parseIIfScenarios(elseValue);
+      if (rest) {
+        scenarios.push(...rest);
+      } else {
+        scenarios.push({ condition: null, result: elseValue, isElse: true });
+      }
+    } else {
+      scenarios.push({ condition: null, result: elseValue, isElse: true });
+    }
+
+    return scenarios;
+  }
+
+  /**
+   * Parse all IIf blocks from a concatenated expression (A & B & C).
+   * Merges scenarios from each IIf segment.
+   * @param {string} expression - e.g. "IIf(A,\"x\",\"\") & IIf(B,\"y\",\"\")"
+   * @returns {Array<{ condition: string|null, result: string, isElse: boolean }>|null} - merged scenarios or null if no IIf
+   */
+  function parseAllIIfScenarios(expression) {
+    if (!expression || typeof expression !== 'string') return null;
+    const str = expression.trim();
+    if (!str) return null;
+    if (!/IIf\s*\(/i.test(str)) return null;
+
+    const segments = splitByTopLevelAmpersand(str);
+    const allScenarios = [];
+    for (let i = 0; i < segments.length; i++) {
+      const seg = segments[i].trim();
+      if (!seg) continue;
+      const scenarios = parseIIfScenarios(seg);
+      if (scenarios && scenarios.length > 0) {
+        allScenarios.push(...scenarios);
+      }
+    }
+    return allScenarios.length > 0 ? allScenarios : null;
+  }
+
+  /**
+   * Extract string comparisons [field] = "value" from a condition for suggested test values.
+   * @param {string} conditionString - e.g. '[19] = "NoCash-Out Refinance"'
+   * @returns {Array<{ fieldId: string, op: string, value: string }>}
+   */
+  function extractStringComparisons(conditionString) {
+    if (!conditionString || typeof conditionString !== 'string') return [];
+    const results = [];
+    const re = /\[([^\]]+)\]\s*=\s*"([^"]*)"/g;
+    let m;
+    while ((m = re.exec(conditionString)) !== null) {
+      results.push({ fieldId: m[1].trim(), op: '=', value: m[2] });
+    }
+    return results;
+  }
+
+  /**
+   * Split a condition by OrElse at shallowest depth (respecting parens and quotes).
+   * @param {string} condition - e.g. '([19] = "A" OrElse [19] = "B") AndAlso [299] = ""'
+   * @returns {string[]} - array of sub-conditions, or [condition] if no OrElse
+   */
+  function splitOrElseBranches(condition) {
+    if (!condition || typeof condition !== 'string') return [];
+    const trimmed = condition.trim();
+    if (!trimmed) return [];
+
+    const andAlsoMatch = trimmed.match(/^(.+?)\s+AndAlso\s+(.+)$/);
+    let orGroup = trimmed;
+    let suffix = '';
+    if (andAlsoMatch) {
+      orGroup = andAlsoMatch[1].trim();
+      suffix = ' AndAlso ' + andAlsoMatch[2].trim();
+    }
+
+    let minOrElseDepth = -1;
+    const orElse = ' OrElse ';
+    let depth = 0;
+    let inQuote = false;
+    for (let i = 0; i < orGroup.length; i++) {
+      const c = orGroup[i];
+      if (c === '"' && (i === 0 || orGroup[i - 1] !== '\\')) inQuote = !inQuote;
+      if (!inQuote) {
+        if (c === '(') depth++;
+        else if (c === ')') depth--;
+        else if (orGroup.substring(i, i + orElse.length) === orElse && (minOrElseDepth < 0 || depth < minOrElseDepth)) {
+          minOrElseDepth = depth;
+        }
+      }
+    }
+    if (minOrElseDepth < 0) return [trimmed];
+
+    const parts = [];
+    depth = 0;
+    inQuote = false;
+    let current = '';
+    let i = 0;
+    while (i < orGroup.length) {
+      const c = orGroup[i];
+      if (c === '"' && (i === 0 || orGroup[i - 1] !== '\\')) {
+        inQuote = !inQuote;
+        current += c;
+        i++;
+        continue;
+      }
+      if (!inQuote) {
+        if (c === '(') {
+          depth++;
+          current += c;
+          i++;
+          continue;
+        }
+        if (c === ')') {
+          depth--;
+          current += c;
+          i++;
+          continue;
+        }
+        if (depth === minOrElseDepth && orGroup.substring(i, i + orElse.length) === orElse) {
+          parts.push(current.trim());
+          current = '';
+          i += orElse.length;
+          continue;
+        }
+      }
+      current += c;
+      i++;
+    }
+    if (current.trim()) parts.push(current.trim());
+
+    if (parts.length <= 1) return [trimmed];
+    return parts.map((p) => (suffix ? p + suffix : p));
+  }
+
+  /**
+   * Expand scenarios: when a condition has OrElse, split into one scenario per branch.
+   * @param {Array<{ condition: string|null, result: string, isElse: boolean }>} scenarios
+   * @returns {Array<{ condition: string|null, result: string, isElse: boolean }>}
+   */
+  function expandOrElseScenarios(scenarios) {
+    if (!scenarios || scenarios.length === 0) return scenarios;
+    const expanded = [];
+    for (let i = 0; i < scenarios.length; i++) {
+      const s = scenarios[i];
+      if (s.isElse || !s.condition) {
+        expanded.push(s);
+        continue;
+      }
+      const branches = splitOrElseBranches(s.condition);
+      for (let j = 0; j < branches.length; j++) {
+        expanded.push({
+          condition: branches[j],
+          result: s.result,
+          isElse: false,
+        });
+      }
+    }
+    return expanded;
+  }
+
+  /**
+   * Extract IsDate, DateDiff, Contains condition parts for scenario suggested values.
+   * @param {string} conditionString - e.g. "Not IsDate([CX.DISASTER.DATE])" or "[19].Contains(\"Refi\")"
+   * @returns {Array<{ type: string, fieldId?: string, field1?: string, field2?: string, op?: string, value?: number, substring?: string, negated?: boolean }>}
+   */
+  function extractConditionValues(conditionString) {
+    if (!conditionString || typeof conditionString !== 'string') return [];
+    const results = [];
+
+    // IsDate([field]) or Not IsDate([field]) — (Not\s+)? captures optional "Not "
+    const isDateRe = /(Not\s+)?IsDate\s*\(\s*\[([^\]]+)\]\s*\)/gi;
+    let m;
+    while ((m = isDateRe.exec(conditionString)) !== null) {
+      results.push({ type: 'isDate', fieldId: m[2].trim(), negated: !!m[1] });
+    }
+
+    // DateDiff("d", [field1], [field2]) op N
+    const dateDiffRe = /DateDiff\s*\(\s*"d"\s*,\s*\[([^\]]+)\]\s*,\s*\[([^\]]+)\]\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+)/gi;
+    while ((m = dateDiffRe.exec(conditionString)) !== null) {
+      const value = parseInt(m[4], 10);
+      if (Number.isFinite(value)) {
+        results.push({
+          type: 'dateDiff',
+          field1: m[1].trim(),
+          field2: m[2].trim(),
+          op: m[3],
+          value,
+        });
+      }
+    }
+
+    // [field].Contains("literal")
+    const containsRe = /\[([^\]]+)\]\.Contains\s*\(\s*"([^"]*)"\s*\)/gi;
+    while ((m = containsRe.exec(conditionString)) !== null) {
+      results.push({ type: 'contains', fieldId: m[1].trim(), substring: m[2] });
+    }
+
+    // [field].StartsWith("literal")
+    const startsWithRe = /\[([^\]]+)\]\.StartsWith\s*\(\s*"([^"]*)"\s*\)/gi;
+    while ((m = startsWithRe.exec(conditionString)) !== null) {
+      results.push({ type: 'startsWith', fieldId: m[1].trim(), prefix: m[2] });
+    }
+
+    // [field] <> Nothing or [field] = Nothing (VB null checks)
+    const nothingRe = /\[([^\]]+)\]\s*(<>|=)\s*Nothing\b/gi;
+    while ((m = nothingRe.exec(conditionString)) !== null) {
+      const op = (m[2] || '').trim();
+      results.push({
+        type: 'nothing',
+        fieldId: m[1].trim(),
+        negated: op === '<>',
+      });
+    }
+
+    return results;
+  }
+
+  /**
+   * Extract numeric comparisons from a condition string for suggested test values.
+   * @param {string} conditionString - e.g. "[#60#1] <= 200 And [#1452#1] <= 200"
+   * @returns {Array<{ fieldId: string, op: string, value: number }>}
+   */
+  function extractComparisonValues(conditionString) {
+    if (!conditionString || typeof conditionString !== 'string') return [];
+    const results = [];
+    const re = /\[([^\]]+)\]\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)/g;
+    let m;
+    while ((m = re.exec(conditionString)) !== null) {
+      const value = parseFloat(m[3]);
+      if (Number.isFinite(value)) {
+        results.push({ fieldId: m[1].trim(), op: m[2], value });
+      }
+    }
+    return results;
+  }
+
+  /**
+   * Compute suggested test value from a numeric comparison (for condition=true branch).
+   * @param {{ fieldId: string, op: string, value: number }} comp
+   * @returns {number}
+   */
+  function suggestedValueForComparison(comp) {
+    const v = comp.value;
+    switch (comp.op) {
+      case '<=':
+        return v > 100 ? Math.max(0, v - 100) : Math.floor(v / 2);
+      case '>=':
+        return v;
+      case '<':
+        return Math.max(0, v - 1);
+      case '>':
+        return v >= 0 ? v + 1 : v - 1;
+      case '=':
+        return v;
+      case '<>':
+        return v !== 0 ? 0 : 1;
+      default:
+        return v;
+    }
+  }
+
+  /**
+   * Get suggested value for a DateDiff condition (true branch).
+   * DateDiff > 90: 105 days apart. DateDiff <= 90: within 90 days.
+   * @param {{ field1: string, field2: string, op: string, value: number }} cond
+   * @returns {{ field1: string, val1: string, field2: string, val2: string }}
+   */
+  function suggestedValuesForDateDiff(cond) {
+    const n = cond.value;
+    const op = cond.op;
+    let d1 = '01/01/2025';
+    let d2 = '01/02/2025'; // 1 day apart for <= / <
+    if (op === '>' || op === '>=') {
+      d2 = '04/15/2025'; // 105 days apart
+    } else if (op === '<' || op === '<=') {
+      d2 = n <= 1 ? '01/01/2025' : '01/02/2025';
+    } else if (op === '=') {
+      d2 = n <= 1 ? '01/01/2025' : '01/' + String(Math.min(1 + n, 28)).padStart(2, '0') + '/2025';
+    } else if (op === '<>') {
+      d2 = n === 0 ? '01/02/2025' : '01/01/2025';
+    }
+    return { field1: cond.field1, val1: d1, field2: cond.field2, val2: d2 };
+  }
+
+  /**
+   * Collect field IDs that have [field] = "Y" or [field] = "N" or [field] <> Nothing in any scenario condition.
+   * Used to suggest N/blank for else scenarios (condition false).
+   */
+  function collectYNAndNothingFieldsFromScenarios(scenarios) {
+    const yFields = new Set();
+    const nFields = new Set();
+    const notNothingFields = new Set();
+    if (!scenarios || !Array.isArray(scenarios)) return { yFields, nFields, notNothingFields };
+    for (let i = 0; i < scenarios.length; i++) {
+      const cond = scenarios[i] && scenarios[i].condition;
+      if (!cond) continue;
+      const strComps = extractStringComparisons(cond);
+      for (let j = 0; j < strComps.length; j++) {
+        const v = (strComps[j].value || '').toUpperCase();
+        const norm = normalizeFieldIdForLookup(strComps[j].fieldId);
+        if (norm) {
+          if (v === 'Y') yFields.add(norm);
+          else if (v === 'N') nFields.add(norm);
+        }
+      }
+      const condVals = extractConditionValues(cond);
+      for (let k = 0; k < condVals.length; k++) {
+        if (condVals[k].type === 'nothing' && condVals[k].negated) {
+          const norm = normalizeFieldIdForLookup(condVals[k].fieldId);
+          if (norm) notNothingFields.add(norm);
+        }
+      }
+    }
+    return { yFields, nFields, notNothingFields };
+  }
+
+  /**
+   * Get suggested input values for a scenario so the condition evaluates true.
+   * @param {{ condition: string|null, result: string, isElse: boolean }} scenario
+   * @param {string[]} inputFields - field IDs referenced in formula
+   * @param {{ fieldMetadata?: Record<string, {options?: string[]}>, scenarioIndex?: number, allScenarios?: array }} [opts] - optional metadata and scenario index for dropdown/StartsWith
+   * @returns {Record<string, string|number>} - normalized field ID -> suggested value
+   */
+  function getSuggestedValuesForScenario(scenario, inputFields, opts) {
+    const suggested = {};
+    const scenarioIndex = typeof (opts && opts.scenarioIndex) === 'number' ? opts.scenarioIndex : 0;
+    const fieldMetadata = (opts && opts.fieldMetadata) || {};
+
+    if (!scenario.condition) {
+      if (scenario.isElse && opts && opts.allScenarios && opts.allScenarios.length > 0) {
+        const { yFields, nFields, notNothingFields } = collectYNAndNothingFieldsFromScenarios(opts.allScenarios);
+        const elseCycle = ['N', 'Y', ''];
+        const val = elseCycle[scenarioIndex % 3];
+        for (const norm of yFields) {
+          if (inputFields.some((f) => normalizeFieldIdForLookup(f) === norm)) {
+            suggested[norm] = val;
+          }
+        }
+        const nElseCycle = ['', 'N', 'Y'];
+        const nVal = nElseCycle[scenarioIndex % 3];
+        for (const norm of nFields) {
+          if (inputFields.some((f) => normalizeFieldIdForLookup(f) === norm)) {
+            suggested[norm] = nVal;
+          }
+        }
+        for (const norm of notNothingFields) {
+          if (inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+            suggested[norm] = '';
+          }
+        }
+      }
+      return suggested;
+    }
+
+    const comps = extractComparisonValues(scenario.condition);
+    for (let i = 0; i < comps.length; i++) {
+      const c = comps[i];
+      const norm = normalizeFieldIdForLookup(c.fieldId);
+      if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm)) {
+        const val = suggestedValueForComparison(c);
+        suggested[norm] = Number.isFinite(val) ? val : '';
+      }
+    }
+    const strComps = extractStringComparisons(scenario.condition);
+    for (let i = 0; i < strComps.length; i++) {
+      const sc = strComps[i];
+      const norm = normalizeFieldIdForLookup(sc.fieldId);
+      if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm)) {
+        const val = (sc.value || '').toUpperCase();
+        if (val === 'Y') {
+          const yNEmpty = ['Y', 'N', ''];
+          suggested[norm] = yNEmpty[scenarioIndex % 3];
+        } else if (val === 'N') {
+          const nYEmpty = ['N', 'Y', ''];
+          suggested[norm] = nYEmpty[scenarioIndex % 3];
+        } else {
+          suggested[norm] = sc.value;
+        }
+      }
+    }
+
+    // Phase 2: IsDate, DateDiff, Contains
+    const condValues = extractConditionValues(scenario.condition);
+    for (let i = 0; i < condValues.length; i++) {
+      const cv = condValues[i];
+      if (cv.type === 'isDate') {
+        const norm = normalizeFieldIdForLookup(cv.fieldId);
+        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+          suggested[norm] = cv.negated ? '' : '01/15/2025';
+        }
+      } else if (cv.type === 'contains') {
+        const norm = normalizeFieldIdForLookup(cv.fieldId);
+        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+          const meta = fieldMetadata[norm] || fieldMetadata[cv.fieldId];
+          const options = meta && Array.isArray(meta.options) ? meta.options : [];
+          const substr = (cv.substring || '').toLowerCase();
+          const matching = substr ? options.filter((o) => String(o).toLowerCase().includes(substr)) : options;
+          if (matching.length > 0) {
+            suggested[norm] = matching[scenarioIndex % matching.length];
+          } else {
+            suggested[norm] = cv.substring !== undefined && cv.substring !== '' ? cv.substring : 'Refi';
+          }
+        }
+      } else if (cv.type === 'startsWith') {
+        const norm = normalizeFieldIdForLookup(cv.fieldId);
+        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+          const meta = fieldMetadata[norm] || fieldMetadata[cv.fieldId];
+          const options = meta && Array.isArray(meta.options) ? meta.options : [];
+          const prefix = (cv.prefix || '').toLowerCase();
+          const matching = prefix ? options.filter((o) => String(o).toLowerCase().startsWith(prefix)) : options;
+          if (matching.length > 0) {
+            suggested[norm] = matching[scenarioIndex % matching.length];
+          } else {
+            suggested[norm] = cv.prefix !== undefined && cv.prefix !== '' ? cv.prefix : '';
+          }
+        }
+      } else if (cv.type === 'dateDiff') {
+        const sv = suggestedValuesForDateDiff(cv);
+        const norm1 = normalizeFieldIdForLookup(sv.field1);
+        const norm2 = normalizeFieldIdForLookup(sv.field2);
+        if (norm1 && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm1) && suggested[norm1] === undefined) {
+          suggested[norm1] = sv.val1;
+        }
+        if (norm2 && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm2) && suggested[norm2] === undefined) {
+          suggested[norm2] = sv.val2;
+        }
+      } else if (cv.type === 'nothing') {
+        const norm = normalizeFieldIdForLookup(cv.fieldId);
+        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+          suggested[norm] = cv.negated ? 'Y' : '';
+        }
+      }
+    }
+    return suggested;
+  }
+
+  /**
+   * Extract single field ref from result if it is a pass-through (e.g. "[#1415#1]").
+   * @param {string} result - e.g. "[#1415#1]" or "[4002] + [4003]"
+   * @returns {string|null} - normalized field ID or null
+   */
+  function extractSingleResultField(result) {
+    if (!result || typeof result !== 'string') return null;
+    const m = result.trim().match(/^\[([^\]]+)\]$/);
+    return m ? normalizeFieldIdForLookup(m[1]) : null;
+  }
+
+  /**
    * Normalize field ID for metadata lookup (strip leading @ date typecast, # number typecast).
    * @param {string} fieldId - e.g. "353", "@353", "#4002", "CX.TEST"
    * @returns {string}
@@ -120,21 +652,75 @@
   }
 
   /**
-   * Infer date/dateTime from custom field naming: .DT, .date, .dttm suffix (case-insensitive).
-   * @param {string} fieldId - e.g. "CX.CLOSING.DT", "FI.SOMEDATE", "CX.EVENT.dttm"
+   * Infer date/dateTime from custom field naming: .DT, .date, .dttm suffix, or CX.SUNRISE / CX.SUNRISE.* prefix.
+   * @param {string} fieldId - e.g. "CX.CLOSING.DT", "FI.SOMEDATE", "CX.EVENT.dttm", "CX.SUNRISE", "CX.SUNRISE.DATE"
    * @returns {{ dataType: 'Date'|'DateTime' }|null}
    */
   function inferDateTypeFromFieldId(fieldId) {
     if (!fieldId || typeof fieldId !== 'string') return null;
     const s = String(fieldId).trim();
     const lower = s.toLowerCase();
+    if (lower === 'cx.sunrise' || lower.startsWith('cx.sunrise.')) return { dataType: 'Date', format: '', description: 'Date field (CX.SUNRISE)' };
     if (lower.endsWith('.dttm')) return { dataType: 'DateTime', format: '', description: 'DateTime field (from .dttm suffix)' };
     if (lower.endsWith('.dt') || lower.endsWith('.date')) return { dataType: 'Date', format: '', description: 'Date field (from .DT/.date suffix)' };
     return null;
   }
 
-  /** Fallback metadata for widely used fields when not in API response. No hardcoded options - use API only. */
-  const FALLBACK_FIELD_METADATA = {};
+  /**
+   * True if field ID is CX.SUNRISE or CX.SUNRISE.* (always a date field).
+   * @param {string} fieldId - e.g. "CX.SUNRISE", "CX.SUNRISE.DATE", "CX.SUNRISE.XXXX"
+   * @returns {boolean}
+   */
+  function isSunriseField(fieldId) {
+    if (!fieldId || typeof fieldId !== 'string') return false;
+    const s = String(fieldId).trim().toLowerCase();
+    return s === 'cx.sunrise' || s.startsWith('cx.sunrise.');
+  }
+
+  /**
+   * Format date as MM/DD/YYYY with optional day offset from today.
+   * @param {number} daysOffset - e.g. -2, 0, 2
+   * @returns {string}
+   */
+  function formatDateWithOffset(daysOffset) {
+    const d = new Date();
+    d.setDate(d.getDate() + daysOffset);
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const y = d.getFullYear();
+    return m + '/' + day + '/' + y;
+  }
+
+  /** Fallback metadata for widely used fields when not in API response. */
+  const FALLBACK_FIELD_METADATA = {
+    'CX.APPRAISAL.TYPE': {
+      dataType: 'String',
+      format: 'DROPDOWNLIST',
+      description: 'Appraisal type',
+      options: [
+        'Appraisal Waived',
+        'Appraisal Waived - Other',
+        'Desktop Appraisal',
+        'Full Appraisal',
+        'Hybrid Appraisal',
+        'Exterior-Only Inspection',
+      ],
+    },
+    'CX.TYPE': {
+      dataType: 'String',
+      format: 'DROPDOWNLIST',
+      description: 'Loan type',
+      options: [
+        'FHA',
+        'FHA 203k',
+        'FHA Streamline',
+        'VA',
+        'Conventional',
+        'USDA',
+        'Jumbo',
+      ],
+    },
+  };
 
   /**
    * Build metadata lookup from custom + native field lists.
@@ -194,16 +780,26 @@
     const parsed = parseCalculationFormula(calculation);
     if (!parsed) return null;
 
-    const outputField = parsed.outputField;
-    const inputFields = parsed.inputFields;
     const expression = parsed.expression;
-    const outField = outputField || fieldId;
+    const outField = fieldId;
     if (!outField) return null;
 
-    const fieldMetadata = (options && typeof options === 'object' && options.fieldMetadata) ? options.fieldMetadata : {};
+    let inputFields = parsed.inputFields;
+    const outNorm = normalizeFieldIdForLookup(outField);
+    inputFields = inputFields.filter((f) => normalizeFieldIdForLookup(f) !== outNorm);
 
-    // 5 scenarios — leave values blank; user fills in 100% of the time
-    const scenarioCount = 5;
+    const fieldMetadata = Object.assign(
+      {},
+      FALLBACK_FIELD_METADATA,
+      (options && typeof options === 'object' && options.fieldMetadata) ? options.fieldMetadata : {}
+    );
+
+    let scenarios = parseAllIIfScenarios(expression);
+    if (scenarios) scenarios = expandOrElseScenarios(scenarios);
+    const maxScenarios = 10;
+    const scenarioCount = scenarios && scenarios.length > 0
+      ? Math.min(Math.max(1, scenarios.length), maxScenarios)
+      : 5;
     const headers = ['Step', 'Action', 'Target', 'Description', 'Test 1'];
     for (let i = 2; i <= scenarioCount; i++) {
       headers.push('Test ' + i);
@@ -214,7 +810,7 @@
 
     const getMetaForField = (fid) => {
       const n = normalizeFieldIdForLookup(fid);
-      const meta = fieldMetadata[n] || fieldMetadata[fid] || null;
+      const meta = fieldMetadata[n] || fieldMetadata[fid] || FALLBACK_FIELD_METADATA[n] || FALLBACK_FIELD_METADATA[fid] || null;
       if (meta && meta.dataType) return meta;
       // Encompass typecasts: @ = date, # = number
       if (isDateFieldByNotation(fid)) {
@@ -228,6 +824,8 @@
       }
       return meta;
     };
+
+    const scenarioList = scenarios ? scenarios.slice(0, scenarioCount) : [];
 
     // SET rows: all input fields first
     for (let k = 0; k < inputFields.length; k++) {
@@ -243,7 +841,14 @@
       };
       if (meta) setRow._fieldMetadata = meta;
       for (let idx = 0; idx < scenarioCount; idx++) {
-        setRow['Test ' + (idx + 1)] = '';
+        const s = scenarioList[idx];
+        const suggested = s ? getSuggestedValuesForScenario(s, inputFields, { fieldMetadata, scenarioIndex: idx, allScenarios: scenarioList }) : {};
+        let val = suggested[displayId];
+        if ((val === undefined || val === '') && isSunriseField(displayId)) {
+          const daysOffset = idx - Math.floor((scenarioCount - 1) / 2);
+          val = formatDateWithOffset(daysOffset);
+        }
+        setRow['Test ' + (idx + 1)] = val !== undefined && val !== '' ? String(val) : '';
       }
       rows.push(setRow);
       step++;
@@ -276,7 +881,7 @@
     }
     rows.push(actualResultsRow);
 
-    // COMPARE row — blank expected values for user to fill
+    // COMPARE row — pre-fill when result is single field ref (pass-through)
     const outDisplayId = normalizeFieldIdForLookup(outField);
     const outMeta = getMetaForField(outField);
     const compareDesc = 'Field ' + outDisplayId;
@@ -288,7 +893,17 @@
     };
     if (outMeta) compareRow._fieldMetadata = outMeta;
     for (let idx = 0; idx < scenarioCount; idx++) {
-      compareRow['Test ' + (idx + 1)] = '';
+      const s = scenarioList[idx];
+      let suggested = '';
+      if (s && s.result) {
+        const resultField = extractSingleResultField(s.result);
+        if (resultField && inputFields.some((f) => normalizeFieldIdForLookup(f) === resultField)) {
+          const suggestedMap = getSuggestedValuesForScenario(s, inputFields, { fieldMetadata, scenarioIndex: idx });
+          const val = suggestedMap[resultField];
+          suggested = val !== undefined && val !== '' ? String(val) : '';
+        }
+      }
+      compareRow['Test ' + (idx + 1)] = suggested;
     }
     rows.push(compareRow);
 
@@ -306,12 +921,19 @@
     eofRow['Description'] = 'Test Results';
     rows.push(eofRow);
 
-    const testDescriptions = Array.from({ length: scenarioCount }, function (_, idx) {
-      return {
-        testNumber: String(idx + 1),
-        description: 'Scenario ' + (idx + 1),
-      };
-    });
+    const maxDescLen = 80;
+    const testDescriptions = scenarios && scenarios.length > 0
+      ? scenarios.slice(0, scenarioCount).map((s, idx) => {
+          const cond = s.condition ? s.condition.trim() : 'else';
+          const result = s.result ? s.result.trim() : '';
+          let desc = s.isElse ? `else → ${result}` : `${cond} → ${result}`;
+          if (desc.length > maxDescLen) desc = desc.substring(0, maxDescLen - 3) + '...';
+          return { testNumber: String(idx + 1), description: desc };
+        })
+      : Array.from({ length: scenarioCount }, (_, idx) => ({
+          testNumber: String(idx + 1),
+          description: 'Scenario ' + (idx + 1),
+        }));
 
     const result = {
       headers: headers,
@@ -328,6 +950,14 @@
 
   global.customFieldCalcParser = {
     parseCalculationFormula: parseCalculationFormula,
+    splitByTopLevelAmpersand: splitByTopLevelAmpersand,
+    parseIIfScenarios: parseIIfScenarios,
+    parseAllIIfScenarios: parseAllIIfScenarios,
+    expandOrElseScenarios: expandOrElseScenarios,
+    extractComparisonValues: extractComparisonValues,
+    extractConditionValues: extractConditionValues,
+    extractStringComparisons: extractStringComparisons,
+    getSuggestedValuesForScenario: getSuggestedValuesForScenario,
     evaluateSimpleExpression: evaluateSimpleExpression,
     generateUnitTestFromCustomField: generateUnitTestFromCustomField,
     buildFieldMetadataLookup: buildFieldMetadataLookup,
@@ -336,5 +966,7 @@
     isDateFieldByNotation: isDateFieldByNotation,
     isNumberFieldByNotation: isNumberFieldByNotation,
     inferDateTypeFromFieldId: inferDateTypeFromFieldId,
+    isSunriseField: isSunriseField,
+    formatDateWithOffset: formatDateWithOffset,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Shared Nature Collection</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <style>
+    body { font-family: 'Nunito', sans-serif; background: linear-gradient(180deg, rgba(139,195,74,0.08) 0%, #f8f9fa 200px); min-height: 100vh; }
+    .share-header { background: linear-gradient(135deg, #2E7D32, #1B5E20); color: white; padding: 24px 0; margin-bottom: 30px; }
+    .photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+    .photo-card { border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .photo-card img { width: 100%; height: 180px; object-fit: cover; }
+    .photo-card .info { padding: 12px; font-size: 0.9rem; }
+    .badge-tree { background: #2E7D32; color: white; }
+    .badge-critter { background: #7CB342; color: white; }
+  </style>
+</head>
+<body>
+<div class="share-header">
+  <div class="container">
+    <h1><i class="bi-share"></i> Shared Nature Collection</h1>
+    <p class="mb-0" id="shareSubtitle">Loading...</p>
+  </div>
+</div>
+<div class="container">
+  <div id="loadingState" class="text-center py-5">
+    <div class="spinner-border text-success"></div>
+    <p class="mt-3">Loading shared collection...</p>
+  </div>
+  <div id="contentState" style="display: none;">
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <h4><i class="bi-tree"></i> Trees <span id="treeCount" class="badge badge-tree">0</span></h4>
+      </div>
+      <div class="col-md-6">
+        <h4><i class="bi-bug"></i> Critters <span id="critterCount" class="badge badge-critter">0</span></h4>
+      </div>
+    </div>
+    <div id="photoGrid" class="photo-grid"></div>
+  </div>
+  <div id="errorState" class="text-center py-5" style="display: none;">
+    <i class="bi-exclamation-triangle text-warning" style="font-size: 3rem;"></i>
+    <p class="mt-3">This share link may have expired or doesn't exist.</p>
+  </div>
+</div>
+<script>
+(async function() {
+  const id = window.location.pathname.split('/').pop();
+  if (!id) { document.getElementById('errorState').style.display = 'block'; document.getElementById('loadingState').style.display = 'none'; return; }
+  try {
+    const res = await fetch(`/api/nature-collection/share/${id}`);
+    const data = await res.json();
+    document.getElementById('loadingState').style.display = 'none';
+    if (!data.success || !data.share) {
+      document.getElementById('errorState').style.display = 'block';
+      return;
+    }
+    const { trees, critters } = data.share;
+    document.getElementById('shareSubtitle').textContent = `${trees.length} trees, ${critters.length} critters`;
+    document.getElementById('treeCount').textContent = trees.length;
+    document.getElementById('critterCount').textContent = critters.length;
+    document.getElementById('contentState').style.display = 'block';
+
+    const items = [
+      ...trees.map(t => ({ type: 'tree', name: t.tree_name, scientific: t.scientific_name, photo: t.photo_url })),
+      ...critters.map(c => ({ type: 'critter', name: c.animal_name, scientific: c.scientific_name, photo: c.photo_url }))
+    ].sort((a,b) => (b.photo ? 1 : 0) - (a.photo ? 1 : 0));
+
+    const grid = document.getElementById('photoGrid');
+    grid.innerHTML = items.map(item => `
+      <div class="photo-card">
+        <img src="${item.photo || 'https://via.placeholder.com/200x180/8BC34A/fff?text=' + (item.type === 'tree' ? '🌲' : '🐾')}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/200x180/8BC34A/fff?text=?'">
+        <div class="info">
+          <span class="badge badge-${item.type}">${item.type}</span>
+          <strong>${item.name || 'Unknown'}</strong>
+          ${item.scientific ? `<br><em class="text-muted small">${item.scientific}</em>` : ''}
+        </div>
+      </div>
+    `).join('');
+  } catch (e) {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('errorState').style.display = 'block';
+  }
+})();
+</script>
+</body>
+</html>

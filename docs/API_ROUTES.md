@@ -94,6 +94,14 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | * | `/api/sample-detection/*` | Covers, samples |
 | * | `/api/tree-discovery/*` | Tree identification |
 | * | `/api/tree-collection/*` | Tree collection |
+| POST | `/api/critter-discovery/identify-image` | Identify animal from photo (Vision AI) |
+| POST | `/api/critter-discovery/critter-info` | Get critter/animal info (body: animalName, optional expert: socal or desert or reptile) |
+| POST | `/api/critter-discovery/chat` | Chat with critter expert (body: message, expert: socal or desert or reptile) |
+| POST | `/api/critter-collection/add` | Add critter to collection |
+| GET | `/api/critter-collection` | List critters (query: userId, sortBy, order, search) |
+| GET | `/api/critter-collection/stats` | Critter collection stats |
+| PUT | `/api/critter-collection/:id` | Update critter |
+| DELETE | `/api/critter-collection/:id` | Delete critter |
 | * | `/api/genealogy/*` | Family data, people, stats |
 | * | `/api/grateful-dead/*` | Shows, KML, geocoding |
 | * | `/api/concert-collection/*` | Concert collection |

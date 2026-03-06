@@ -343,6 +343,38 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_trees_added_date ON trees(added_date DESC)
     `);
 
+    // Create critters table for critter collection (animals)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS critters (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100),
+        animal_name VARCHAR(255) NOT NULL,
+        scientific_name VARCHAR(255),
+        confidence VARCHAR(50),
+        features TEXT[],
+        habitat VARCHAR(255),
+        fun_facts TEXT[],
+        conservation_status VARCHAR(100),
+        description TEXT,
+        photo_url TEXT,
+        latitude DECIMAL(10, 8),
+        longitude DECIMAL(11, 8),
+        location_name VARCHAR(255),
+        notes TEXT,
+        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+        added_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      ALTER TABLE critters 
+      ADD COLUMN IF NOT EXISTS ai_analysis TEXT
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_critters_name ON critters(animal_name)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_critters_user ON critters(user_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_critters_location ON critters(latitude, longitude)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_critters_added_date ON critters(added_date DESC)`);
+
     // Create conversations table for LangChain memory
     await pool.query(`
       CREATE TABLE IF NOT EXISTS conversations (

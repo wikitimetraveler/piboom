@@ -141,6 +141,12 @@ app.get('/share/poster/:id', async (req, res) => {
   }
 });
 
+app.get('/share/collection/:id', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'nature', 'share-collection.html'), (err) => {
+    if (err) res.status(404).send('Share not found');
+  });
+});
+
 app.get('/health', (req,res)=>res.json({ok:true, mode: config.mode, platform: process.platform}));
 
 if (config.autoIngestDisasters) {

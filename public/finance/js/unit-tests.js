@@ -53,11 +53,7 @@ let lastRunCellResults = {}; // { 'rowIndex-field': 'pass'|'fail' } for cell sha
 
 const RECENT_RUNS_KEY = 'unitTestsRecentRuns';
 
-/**
- * Extract field ID from bracket notation (e.g., "[LOCKRATE.2866]" -> "LOCKRATE.2866").
- * Strips leading "@" (date typecast) and "#" (number typecast) so API calls use the base field ID.
- */
-function extractFieldId(value) {
+const extractFieldId = window.unitTestsUtils?.extractFieldId || function(value) {
   if (!value) return null;
   const str = String(value).trim();
   const match = str.match(/\[([^\]]+)\]/);
@@ -65,24 +61,13 @@ function extractFieldId(value) {
   let id = match[1].trim();
   id = id.replace(/^[@#]+/, '');
   return id || null;
-}
-
-/**
- * Check if a value contains a field ID in brackets
- */
-function hasFieldId(value) {
-  return extractFieldId(value) !== null;
-}
-
-/**
- * Get raw field ID from Target (with @ or # prefix) for type inference.
- * e.g. "[@748]" -> "@748", "[748]" -> "748"
- */
-function getRawFieldIdFromTarget(target) {
+};
+const hasFieldId = window.unitTestsUtils?.hasFieldId || function(value) { return extractFieldId(value) !== null; };
+const getRawFieldIdFromTarget = window.unitTestsUtils?.getRawFieldIdFromTarget || function(target) {
   if (!target) return null;
   const match = String(target).trim().match(/\[([^\]]+)\]/);
   return match ? match[1].trim() : null;
-}
+};
 
 /**
  * Custom date picker cell editor - uses HTML5 date/time inputs for reliable date picker.
@@ -201,12 +186,11 @@ function normalizeValue(value) {
   return String(value).trim();
 }
 
-/** In unit tests, "null" in compare/set columns means blank/empty. */
-function isBlankForTest(val) {
+const isBlankForTest = window.unitTestsUtils?.isBlankForTest || function(val) {
   if (val === null || val === undefined) return true;
   const s = String(val).trim().toLowerCase();
-  return s === '' || s === 'null' || s === 'undefined';
-}
+  return s === '' || s === 'null' || s === 'undefined' || s === 'nothing';
+};
 
 function parseExcelFile(file) {
   return new Promise((resolve, reject) => {
@@ -2232,11 +2216,13 @@ function clearData() {
     failFirstBtn.disabled = true;
   }
   
-  // Hide accordion container
+  // Hide accordion container and Selected Field
   const accordionContainer = document.getElementById('accordionContainer');
   if (accordionContainer) {
     accordionContainer.style.display = 'none';
   }
+  const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
+  if (selectedFieldCard) selectedFieldCard.style.display = 'none';
   
   // Hide AI Assistant
   if (window.unitTestsAI && window.unitTestsAI.hide) {
@@ -2314,6 +2300,9 @@ async function handleFileUpload(file) {
     if (accordionContainer) {
       accordionContainer.style.display = 'block';
     }
+    // Hide Selected Field accordion when loading from file (only shown for generated-from-custom-field)
+    const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
+    if (selectedFieldCard) selectedFieldCard.style.display = 'none';
 
     // Display Overall Test Sign-off (file-level; always show when file is loaded)
     displayOverallSignOff(execResult.executions, execResult.dbUnavailable);
@@ -2792,8 +2781,9 @@ let currentFieldMetadata = {};
  * @param {object[]} testDescriptions
  * @param {string} sourceName
  * @param {Record<string,{dataType,format,description}>} [fieldMetadata] - optional Encompass field metadata
+ * @param {object} [field] - optional custom field object (fieldId, calculation, description, color) for Selected Field accordion
  */
-function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fieldMetadata) {
+function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fieldMetadata, field) {
   if (!rows || rows.length === 0) return;
 
   const fallback = window.customFieldCalcParser?.getFallbackFieldMetadata?.() || {};
@@ -2839,6 +2829,38 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
   runTestsBtn.style.display = 'inline-block';
   if (clearBtn) clearBtn.style.display = 'inline-block';
   if (stickyActionBar) stickyActionBar.style.display = 'flex';
+
+  const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
+  const selectedFieldContent = document.getElementById('selectedFieldContent');
+  const collapseSelectedField = document.getElementById('collapseSelectedField');
+  if (field && selectedFieldCard && selectedFieldContent) {
+    const fieldId = field.fieldId || field.id || field.Id || field.fieldName || '';
+    const calc = field.calculation || field.calculationExpression || field.calculatedExpression || field.expression || field.formula || '';
+    const desc = field.description || field.longDescription || field.shortDescription || field.comments || '';
+    const color = field.color || field.backgroundColor || field.foregroundColor || '';
+    let html = `<div class="mb-2"><strong>Field:</strong> <code>[${fieldId}]</code></div>`;
+    if (calc) {
+      html += `<div class="mb-2"><strong>Calculation:</strong><pre class="mb-0 mt-1 p-2 bg-light rounded" style="max-height: 200px; overflow: auto; font-size: 1rem;">${escapeHtml(calc)}</pre></div>`;
+    }
+    if (desc) {
+      html += `<div class="mb-2"><strong>Comments:</strong> <span class="text-muted">${escapeHtml(desc)}</span></div>`;
+    }
+    if (color) {
+      const colorStr = String(color).trim();
+      const isHex = /^#([0-9a-fA-F]{3}){1,2}$/.test(colorStr) || /^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(colorStr);
+      const swatch = isHex ? `<span class="d-inline-block rounded border" style="width: 1.2em; height: 1.2em; background: ${colorStr.startsWith('#') ? colorStr : '#' + colorStr}; vertical-align: middle;"></span> ` : '';
+      html += `<div><strong>Color:</strong> ${swatch}<code>${escapeHtml(colorStr)}</code></div>`;
+    }
+    selectedFieldContent.innerHTML = html || '<span class="text-muted">No details</span>';
+    selectedFieldCard.style.display = 'block';
+    if (collapseSelectedField && typeof window.$ !== 'undefined' && window.$.fn?.collapse) {
+      window.$(collapseSelectedField).collapse('show');
+    } else if (collapseSelectedField?.classList) {
+      collapseSelectedField.classList.add('show');
+    }
+  } else if (selectedFieldCard) {
+    selectedFieldCard.style.display = 'none';
+  }
 
   updateLoanGuidChipDisplay(currentLoanGuid);
   renderRecentRunsSelect();
@@ -3232,7 +3254,7 @@ function initializeGenerateFromCustomField() {
       return;
     }
 
-    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, `Generated: [${field.fieldId || field.id || field.Id}]`, result.fieldMetadata);
+    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, `Generated: [${field.fieldId || field.id || field.Id}]`, result.fieldMetadata, field);
     if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
       window.$(modal).modal('hide');
     } else {

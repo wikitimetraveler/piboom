@@ -419,7 +419,16 @@ class ModernNavbar extends HTMLElement {
                     <i class="bi-diagram-3"></i> Family
                   </a>
                   <a class="dropdown-item" href="/nature/tree-discovery.html">
-                    <i class="bi-tree-fill"></i> Nature
+                    <i class="bi-tree-fill"></i> Tree Discovery
+                  </a>
+                  <a class="dropdown-item" href="/nature/tree-collection.html">
+                    <i class="bi-trees"></i> Tree Collection
+                  </a>
+                  <a class="dropdown-item" href="/nature/critter-discovery.html">
+                    <i class="bi-bug-fill"></i> Critter Discovery
+                  </a>
+                  <a class="dropdown-item" href="/nature/critter-collection.html">
+                    <i class="bi-bug"></i> Critter Collection
                   </a>
                   <a class="dropdown-item" href="/local/local-spots.html">
                     <i class="bi-geo-alt-fill"></i> Local Spots

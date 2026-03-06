@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Critter Discovery - Jungle Explorer</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <script src="/shared/user-passwords.js"></script>
+  <!-- EXIF.js for reading photo location data -->
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <style>
+    /* Jungle theme - kid-friendly */
+    body { font-family: 'Nunito', sans-serif; background: linear-gradient(180deg, rgba(139,195,74,0.05) 0%, transparent 300px); }
+
+    /* Floating jungle critters & leaves */
+    .floating-critters {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .critter-float {
+      position: absolute;
+      font-size: 32px;
+      opacity: 0.4;
+      animation: floatCritter 18s linear infinite;
+      z-index: 10;
+    }
+
+    .critter-float:nth-child(1) { left: 5%; animation-delay: 0s; }
+    .critter-float:nth-child(2) { left: 20%; animation-delay: 3s; }
+    .critter-float:nth-child(3) { left: 40%; animation-delay: 6s; }
+    .critter-float:nth-child(4) { left: 60%; animation-delay: 9s; }
+    .critter-float:nth-child(5) { left: 75%; animation-delay: 12s; }
+    .critter-float:nth-child(6) { left: 90%; animation-delay: 15s; }
+
+    @keyframes floatCritter {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      5% { opacity: 0.5; }
+      95% { opacity: 0.5; }
+      100% { transform: translateY(-80px) rotate(360deg); opacity: 0; }
+    }
+
+    /* Jungle colors */
+    :root {
+      --jungle-green: #2E7D32;
+      --jungle-dark: #1B5E20;
+      --jungle-light: #66BB6A;
+      --leaf-lime: #8BC34A;
+      --vine: #7CB342;
+      --banana: #FFEB3B;
+      --critter-amber: #7CB342;
+      --critter-dark: #1B5E20;
+      --critter-light: #8BC34A;
+      --earth-brown: #5D4037;
+    }
+
+    .critter-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .critter-widget-container {
+      background: linear-gradient(180deg, rgba(255,255,255,0.97) 0%, rgba(139,195,74,0.08) 100%);
+      border-radius: 24px;
+      padding: 30px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(30,125,50,0.15);
+      border: 3px solid var(--leaf-lime);
+      position: relative;
+    }
+
+    .critter-widget-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      background: linear-gradient(90deg, var(--jungle-green), var(--leaf-lime), var(--jungle-green));
+      border-radius: 24px 24px 0 0;
+    }
+
+    .search-mode-tabs { margin-bottom: 20px; }
+
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      max-width: 400px;
+    }
+
+    .toast {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      margin-bottom: 10px;
+      padding: 16px 20px;
+      transform: translateX(100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+    }
+
+    .toast.show { transform: translateX(0); opacity: 1; }
+    .toast.success { border-left: 4px solid #28a745; }
+    .toast.error { border-left: 4px solid #dc3545; }
+    .toast.info { border-left: 4px solid #17a2b8; }
+
+    .critter-result-card {
+      background: linear-gradient(135deg, rgba(139,195,74,0.15), rgba(46,125,50,0.1));
+      border: 3px solid var(--leaf-lime);
+      border-radius: 20px;
+      padding: 30px;
+      margin-top: 20px;
+      box-shadow: 0 6px 20px rgba(30,125,50,0.12);
+    }
+
+    .feature-tag {
+      display: inline-block;
+      background: var(--jungle-green);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin: 5px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .confidence-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .confidence-high { background: #28a745; color: white; }
+    .confidence-medium { background: #ffc107; color: #333; }
+    .confidence-low { background: #dc3545; color: white; }
+
+    .simple-header {
+      background: linear-gradient(135deg, var(--jungle-green), var(--jungle-dark));
+      color: white;
+      padding: 18px 0;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 16px rgba(27,94,32,0.4);
+      border-bottom: 4px solid var(--leaf-lime);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .brand:hover { color: rgba(255,255,255,0.9); text-decoration: none; }
+
+    .nav-links { display: flex; gap: 20px; flex-wrap: wrap; }
+
+    .nav-links a {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover { background: rgba(255,255,255,0.15); color: white; }
+    .nav-links a.active { background: rgba(255,255,255,0.25); color: white; font-weight: 600; }
+    .nav-links { align-items: center; }
+    .dark-mode-toggle {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.6);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); }
+    /* Dark mode */
+    html[data-theme="dark"] body { background: #1a1d21; }
+    html[data-theme="dark"] .container, html[data-theme="dark"] .critter-container { color: #e4e6eb; }
+    html[data-theme="dark"] .critter-widget-container,
+    html[data-theme="dark"] .critter-result-card,
+    html[data-theme="dark"] .card,
+    html[data-theme="dark"] .card-body { background: #242628 !important; border-color: #3a3d42 !important; color: #e4e6eb; }
+    html[data-theme="dark"] h1, html[data-theme="dark"] h5, html[data-theme="dark"] .card-title { color: #8BC34A !important; }
+    html[data-theme="dark"] .form-control, html[data-theme="dark"] input, html[data-theme="dark"] select { background: #3a3d42 !important; border-color: #4a4d52 !important; color: #e4e6eb !important; }
+    html[data-theme="dark"] .toast { background: #242628 !important; border-color: #3a3d42 !important; color: #e4e6eb; }
+    html[data-theme="dark"] .text-muted, html[data-theme="dark"] label { color: #b0b3b8 !important; }
+
+    .pac-container { z-index: 20000; }
+  </style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<div class="floating-critters">
+  <div class="critter-float">🌿</div>
+  <div class="critter-float">🦜</div>
+  <div class="critter-float">🐸</div>
+  <div class="critter-float">🍃</div>
+  <div class="critter-float">🦋</div>
+  <div class="critter-float">🐵</div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<modern-navbar></modern-navbar>
+
+<div class="simple-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="/" class="brand">🌿 Jungle Critter Explorer</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/nature/nature-hub.html">Nature Hub</a>
+        <a href="/nature/tree-discovery.html">Trees</a>
+        <a href="/nature/critter-discovery.html" class="active">Critters</a>
+        <a href="/nature/critter-collection.html">My Collection</a>
+        <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()" title="Toggle dark mode for night/outdoor use">
+          <i class="bi-moon-stars-fill" id="darkModeIcon"></i> <span id="darkModeLabel">Dark</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="critter-container">
+    <div class="critter-widget-container">
+      <h1 class="text-center mb-3" style="color: var(--jungle-dark); font-family: 'Fredoka', sans-serif; font-size: 2.2rem;">
+        🌿 Jungle Critter Explorer 🌿
+      </h1>
+      <p class="text-center mb-4" style="color: #2E7D32; font-size: 1.1rem;">
+        <strong>Discover the wild animals in your backyard!</strong> Take a photo or upload one, and we'll tell you what critter you found!<br>
+        <small style="color: var(--jungle-dark); font-weight: 600;">
+          🐸 Frogs, birds, lizards, bugs & more — explore like a real jungle scientist!
+        </small>
+      </p>
+
+      <div class="card mb-4" style="border-radius: 16px; border: 2px solid var(--leaf-lime); box-shadow: 0 6px 20px rgba(46,125,50,0.12);">
+        <div class="card-body">
+          <h5 class="card-title" style="color: var(--jungle-dark); font-weight: 700;"><i class="bi-geo-alt-fill"></i> Where did you spot it?</h5>
+          <div class="form-group">
+            <label for="addCritterStreet">Street Address</label>
+            <input type="text" id="addCritterStreet" class="form-control" placeholder="Start typing an address">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="addCritterCity">City</label>
+              <input type="text" id="addCritterCity" class="form-control" placeholder="City">
+            </div>
+            <div class="form-group col-md-3">
+              <label for="addCritterState">State</label>
+              <input type="text" id="addCritterState" class="form-control" placeholder="CA" maxlength="2">
+            </div>
+            <div class="form-group col-md-3">
+              <label for="addCritterZip">Zip</label>
+              <input type="text" id="addCritterZip" class="form-control" placeholder="Zip">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="addCritterCounty">County</label>
+            <input type="text" id="addCritterCounty" class="form-control" placeholder="County">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="addCritterLatitude">Latitude</label>
+              <input type="text" id="addCritterLatitude" class="form-control" placeholder="lat" readonly>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="addCritterLongitude">Longitude</label>
+              <input type="text" id="addCritterLongitude" class="form-control" placeholder="lng" readonly>
+            </div>
+          </div>
+          <small class="form-text text-muted">Used when saving the critter to your collection. Also read from photo EXIF when available.</small>
+        </div>
+      </div>
+
+      <!-- AI Experts -->
+      <div class="card mb-4" style="border-radius: 16px; border: 2px solid var(--leaf-lime); box-shadow: 0 6px 20px rgba(46,125,50,0.12);">
+        <div class="card-body">
+          <h5 class="card-title" style="color: var(--jungle-dark); font-weight: 700;"><i class="bi-chat-dots-fill"></i> Ask the Jungle Experts!</h5>
+          <p class="text-muted small mb-3">Pick an expert and ask anything about animals — snakes, spiders, desert critters, or backyard wildlife!</p>
+          <div class="btn-group mb-3" role="group">
+            <button type="button" class="btn btn-success expert-btn active" data-expert="socal" onclick="selectCritterExpert('socal')">
+              <i class="bi-geo-alt-fill"></i> SoCal Wildlife
+            </button>
+            <button type="button" class="btn btn-outline-success expert-btn" data-expert="desert" onclick="selectCritterExpert('desert')">
+              <i class="bi-sun-fill"></i> Desert Critters
+            </button>
+            <button type="button" class="btn btn-outline-success expert-btn" data-expert="reptile" onclick="selectCritterExpert('reptile')">
+              <i class="bi-bug-fill"></i> Snakes & Spiders
+            </button>
+          </div>
+          <div class="input-group">
+            <input type="text" id="critterExpertInput" class="form-control" placeholder="Ask anything about animals! What does a snake look like? Where do frogs live?" onkeypress="if(event.key==='Enter')askCritterExpert()">
+            <div class="input-group-append">
+              <button class="btn btn-success" type="button" onclick="askCritterExpert()">
+                <i class="bi-send-fill"></i> Ask
+              </button>
+            </div>
+          </div>
+          <div id="critterExpertResponse" class="mt-3" style="display: none;">
+            <div class="alert alert-light border" style="border-left: 4px solid var(--leaf-lime) !important;">
+              <h6 id="critterExpertResponseTitle" class="mb-2"></h6>
+              <div id="critterExpertResponseBody" style="white-space: pre-wrap; line-height: 1.6;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mb-4 search-mode-tabs">
+          <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-success" id="searchModeBtn" onclick="switchInputMode('search')">
+            <i class="bi-search"></i> Search Animal
+          </button>
+          <button type="button" class="btn btn-success" id="imageModeBtn" onclick="switchInputMode('image')">
+            <i class="bi-image"></i> Upload Photo
+          </button>
+          <button type="button" class="btn btn-success" id="cameraModeBtn" onclick="switchInputMode('camera')">
+            <i class="bi-camera"></i> Use Camera
+          </button>
+        </div>
+      </div>
+
+      <!-- Search Mode -->
+      <div id="searchMode" class="text-center mb-3" style="display: none;">
+        <div class="input-group input-group-lg">
+          <input id="critterSearchInput" class="form-control" placeholder="Search for an animal! Try: Red-tailed Hawk, Monarch Butterfly, Gopher Snake..." onkeypress="handleSearchKeypress(event)">
+          <div class="input-group-append">
+            <button class="btn btn-success" type="button" onclick="searchCritter()">
+              <i class="bi-search"></i> Learn More
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Upload Mode -->
+      <div id="imageMode" class="text-center mb-3" style="display: none;">
+        <div class="mb-3">
+          <label for="critterImageInput" class="btn btn-lg btn-success mr-2" style="cursor: pointer;">
+            <i class="bi-cloud-upload"></i> Choose Photo
+            <input type="file" id="critterImageInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+          </label>
+          <label for="critterGalleryInput" class="btn btn-lg btn-outline-success" style="cursor: pointer;">
+            <i class="bi-images"></i> Quick Add from Gallery
+            <input type="file" id="critterGalleryInput" accept="image/*" multiple style="display: none;" onchange="handleGalleryBatch(event)">
+          </label>
+        </div>
+        <div id="imagePreview" style="display: none; margin-top: 15px;">
+          <div style="background: #f0f0f0; padding: 20px; border-radius: 15px; display: inline-block;">
+            <div style="position: relative; display: inline-block;">
+              <img id="previewImg" src="" alt="Preview" style="max-width: 600px; max-height: 600px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: block;">
+              <div id="cropGuide" style="position: absolute; border: 3px dashed var(--leaf-lime); pointer-events: none; display: none;"></div>
+            </div>
+            <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+              <i class="bi-info-circle"></i> <span id="imageDimensions"></span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-success btn-lg" onclick="identifyCritter()">
+              <i class="bi-magic"></i> Identify Critter!
+            </button>
+            <button class="btn btn-secondary" onclick="clearImageUpload()">
+              <i class="bi-x-circle"></i> Clear & Choose Another
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Camera Mode -->
+      <div id="cameraMode" class="text-center mb-3" style="display: none;">
+        <div class="mb-3">
+          <button class="btn btn-lg btn-success" onclick="startCamera()" id="startCameraBtn">
+            <i class="bi-camera-video"></i> Start Camera
+          </button>
+          <p class="small text-muted mt-2 mb-0"><i class="bi-info-circle"></i> Allow camera permissions when prompted.</p>
+          <button class="btn btn-lg btn-danger" onclick="stopCamera()" id="stopCameraBtn" style="display: none;">
+            <i class="bi-camera-video-off"></i> Stop Camera
+          </button>
+        </div>
+        <div id="cameraPreview" style="display: none; margin-top: 15px;">
+          <div style="position: relative; display: inline-block; background: #000; border-radius: 15px; padding: 10px;">
+            <video id="cameraVideo" autoplay playsinline style="max-width: 100%; max-height: 600px; border-radius: 10px;"></video>
+            <div id="cameraFrameGuide" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 4px solid var(--leaf-lime); box-shadow: 0 0 0 9999px rgba(0,0,0,0.5); pointer-events: none;"></div>
+            <canvas id="cameraCanvas" style="display: none;"></canvas>
+            <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10;">
+              <button class="btn btn-success btn-lg" onclick="captureFromCamera()" style="border-radius: 50%; width: 70px; height: 70px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                <i class="bi-camera-fill" style="font-size: 1.8rem;"></i>
+              </button>
+            </div>
+          </div>
+          <p class="text-muted mt-2"><i class="bi-info-circle"></i> Center the animal in the frame for best results</p>
+        </div>
+        <div id="capturedPreview" style="display: none; margin-top: 15px;">
+          <div style="background: #f0f0f0; padding: 20px; border-radius: 15px; display: inline-block;">
+            <div style="position: relative; display: inline-block;">
+              <img id="capturedImg" src="" alt="Captured" style="max-width: 600px; max-height: 600px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: block;">
+              <div id="capturedCropGuide" style="position: absolute; border: 3px dashed var(--leaf-lime); pointer-events: none; display: none;"></div>
+            </div>
+            <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+              <i class="bi-camera"></i> <span id="capturedDimensions"></span>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button class="btn btn-success btn-lg" onclick="identifyCritter()">
+              <i class="bi-magic"></i> Identify Critter!
+            </button>
+            <button class="btn btn-secondary" onclick="retakePhoto()">
+              <i class="bi-arrow-clockwise"></i> Retake Photo
+            </button>
+            <button class="btn btn-danger" onclick="stopCamera()">
+              <i class="bi-x-circle"></i> Close Camera
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="critterResults" style="display: none; margin-top: 30px;"></div>
+
+      <div id="loadingState" style="display: none; text-align: center; padding: 40px;">
+        <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <p class="mt-3" style="color: var(--critter-amber); font-size: 1.1rem;">
+          Identifying your critter...
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Gallery Batch Modal -->
+<div class="modal fade" id="galleryBatchModal" tabindex="-1" role="dialog" data-backdrop="static">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" style="border: 3px solid var(--leaf-lime); border-radius: 16px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, var(--jungle-green), var(--jungle-dark)); color: white;">
+        <h5 class="modal-title"><i class="bi-images"></i> Quick Add from Gallery</h5>
+      </div>
+      <div class="modal-body">
+        <p id="galleryBatchStatus">Preparing...</p>
+        <div class="progress mb-2" style="height: 24px; border-radius: 12px;">
+          <div id="galleryBatchProgress" class="progress-bar bg-success" role="progressbar" style="width: 0%;">0%</div>
+        </div>
+        <div id="galleryBatchLog" style="max-height: 200px; overflow-y: auto; font-size: 0.9rem; margin-top: 15px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="galleryBatchCloseBtn" onclick="closeGalleryBatchModal()" style="display: none;">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer" style="background: linear-gradient(135deg, var(--jungle-dark), var(--jungle-green)); color: white; padding: 20px 0; margin-top: 30px;">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>🌿 Jungle Critter Explorer</strong> — Discover the wild animals around you! — <span id="dt"></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+let currentMode = 'image';
+let uploadedImageData = null;
+let cameraStream = null;
+let cameraVideo = null;
+let currentCritterData = null;
+let currentLocation = { latitude: null, longitude: null, locationName: null };
+let critterAddressAutocomplete = null;
+let placesApiScriptLoading = false;
+let placesApiReady = false;
+const deviceLocation = { latitude: null, longitude: null };
+
+function requestDeviceLocationOnLoad() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      deviceLocation.latitude = pos.coords.latitude;
+      deviceLocation.longitude = pos.coords.longitude;
+      if (currentLocation.latitude == null && currentLocation.longitude == null) {
+        currentLocation.latitude = deviceLocation.latitude;
+        currentLocation.longitude = deviceLocation.longitude;
+      }
+    },
+    () => { deviceLocation.latitude = null; deviceLocation.longitude = null; },
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+  );
+}
+
+function requestDeviceLocationNow() {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) { resolve(false); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        deviceLocation.latitude = pos.coords.latitude;
+        deviceLocation.longitude = pos.coords.longitude;
+        if (currentLocation.latitude == null && currentLocation.longitude == null) {
+          currentLocation.latitude = deviceLocation.latitude;
+          currentLocation.longitude = deviceLocation.longitude;
+        }
+        resolve(true);
+      },
+      () => resolve(false),
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    );
+  });
+}
+
+function buildCritterAddressLabel() {
+  const street = document.getElementById('addCritterStreet')?.value?.trim() || '';
+  const city = document.getElementById('addCritterCity')?.value?.trim() || '';
+  const state = document.getElementById('addCritterState')?.value?.trim() || '';
+  const zip = document.getElementById('addCritterZip')?.value?.trim() || '';
+  return [street, city, state, zip].filter(Boolean).join(', ');
+}
+
+function fillCritterAddressFieldsFromPlace(place) {
+  let city = '', state = '', county = '', zip = '';
+  if (Array.isArray(place.address_components)) {
+    place.address_components.forEach(c => {
+      const t = c.types || [];
+      if (t.includes('locality')) city = c.long_name;
+      else if (t.includes('administrative_area_level_1')) state = c.short_name;
+      else if (t.includes('administrative_area_level_2')) county = c.long_name.replace(/ County$/, '');
+      else if (t.includes('postal_code')) zip = c.long_name;
+    });
+  }
+  const streetInput = document.getElementById('addCritterStreet');
+  const label = place.formatted_address || place.name || streetInput?.value || '';
+  if (streetInput) streetInput.value = label;
+  const cityInput = document.getElementById('addCritterCity');
+  if (cityInput) cityInput.value = city;
+  const stateInput = document.getElementById('addCritterState');
+  if (stateInput) stateInput.value = state;
+  const countyInput = document.getElementById('addCritterCounty');
+  if (countyInput) countyInput.value = county;
+  const zipInput = document.getElementById('addCritterZip');
+  if (zipInput) zipInput.value = zip;
+  if (place.geometry?.location) {
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+    document.getElementById('addCritterLatitude').value = lat;
+    document.getElementById('addCritterLongitude').value = lng;
+    currentLocation.latitude = lat;
+    currentLocation.longitude = lng;
+  }
+  if (label) currentLocation.locationName = label;
+}
+
+function initCritterAddressAutocomplete() {
+  const input = document.getElementById('addCritterStreet');
+  if (!input || critterAddressAutocomplete || !window.google?.maps?.places) return;
+  try {
+    critterAddressAutocomplete = new google.maps.places.Autocomplete(input, {
+      types: ['address'],
+      componentRestrictions: { country: 'us' }
+    });
+    critterAddressAutocomplete.addListener('place_changed', () => {
+      fillCritterAddressFieldsFromPlace(critterAddressAutocomplete.getPlace());
+    });
+    input.addEventListener('input', () => {
+      const lat = document.getElementById('addCritterLatitude');
+      const lng = document.getElementById('addCritterLongitude');
+      if (lat) lat.value = '';
+      if (lng) lng.value = '';
+    });
+  } catch (e) {
+    console.warn('Google Places not available:', e);
+  }
+}
+
+async function loadCritterPlacesApi() {
+  if (placesApiReady || placesApiScriptLoading) return;
+  try {
+    const res = await fetch('/api/music-research/google-api-key');
+    const data = await res.json();
+    if (!data.apiKey) return;
+    if (window.google?.maps?.places) {
+      placesApiReady = true;
+      initCritterAddressAutocomplete();
+      return;
+    }
+    placesApiScriptLoading = true;
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${data.apiKey}&libraries=places&callback=Function.prototype`;
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      placesApiScriptLoading = false;
+      placesApiReady = true;
+      initCritterAddressAutocomplete();
+    };
+    script.onerror = () => { placesApiScriptLoading = false; };
+    document.head.appendChild(script);
+  } catch (e) { console.error(e); }
+}
+
+function switchInputMode(mode) {
+  if (currentMode === 'camera' && mode !== 'camera') stopCamera();
+  currentMode = mode;
+  document.getElementById('searchModeBtn').className = mode === 'search' ? 'btn btn-success' : 'btn btn-outline-success';
+  document.getElementById('imageModeBtn').className = mode === 'image' ? 'btn btn-success' : 'btn btn-outline-success';
+  document.getElementById('cameraModeBtn').className = mode === 'camera' ? 'btn btn-success' : 'btn btn-outline-success';
+  document.getElementById('searchMode').style.display = mode === 'search' ? 'block' : 'none';
+  document.getElementById('imageMode').style.display = mode === 'image' ? 'block' : 'none';
+  document.getElementById('cameraMode').style.display = mode === 'camera' ? 'block' : 'none';
+  document.getElementById('critterResults').style.display = 'none';
+  if (mode === 'search') document.getElementById('critterSearchInput').focus();
+}
+
+function convertDMSToDD(deg, min, sec, dir) {
+  let dd = deg + min / 60 + sec / 3600;
+  if (dir === 'S' || dir === 'W') dd = -dd;
+  return dd;
+}
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file || !file.type.startsWith('image/') || file.size > 10 * 1024 * 1024) return;
+  if (typeof EXIF !== 'undefined' && EXIF.getData) {
+    EXIF.getData(file, function() {
+      const lat = EXIF.getTag(this, 'GPSLatitude');
+      const lon = EXIF.getTag(this, 'GPSLongitude');
+      const latRef = EXIF.getTag(this, 'GPSLatitudeRef') || 'N';
+      const lonRef = EXIF.getTag(this, 'GPSLongitudeRef') || 'E';
+      if (lat && lon) {
+        currentLocation.latitude = convertDMSToDD(lat[0], lat[1], lat[2], latRef);
+        currentLocation.longitude = convertDMSToDD(lon[0], lon[1], lon[2], lonRef);
+      } else if (deviceLocation.latitude != null) {
+        currentLocation.latitude = deviceLocation.latitude;
+        currentLocation.longitude = deviceLocation.longitude;
+      } else {
+        currentLocation.latitude = null;
+        currentLocation.longitude = null;
+      }
+    });
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    uploadedImageData = e.target.result;
+    const img = document.getElementById('previewImg');
+    img.src = uploadedImageData;
+    document.getElementById('imagePreview').style.display = 'block';
+    img.onload = () => {
+      document.getElementById('imageDimensions').textContent = `Original: ${img.naturalWidth} × ${img.naturalHeight}px`;
+      showCropGuide('cropGuide', img);
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+function showCropGuide(guideId, img) {
+  const guide = document.getElementById(guideId);
+  if (!guide || !img) return;
+  const w = img.offsetWidth, h = img.offsetHeight;
+  const size = Math.min(w, h) * 0.85;
+  guide.style.left = (w - size) / 2 + 'px';
+  guide.style.top = (h - size) / 2 + 'px';
+  guide.style.width = size + 'px';
+  guide.style.height = size + 'px';
+  guide.style.display = 'block';
+}
+
+function clearImageUpload() {
+  uploadedImageData = null;
+  document.getElementById('critterImageInput').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('previewImg').src = '';
+}
+
+async function handleGalleryBatch(event) {
+  const files = Array.from(event.target.files || []);
+  event.target.value = '';
+  const validFiles = files.filter(f => f.type.startsWith('image/') && f.size <= 10 * 1024 * 1024);
+  if (validFiles.length === 0) {
+    showToast('warning', 'No Photos', 'Please select one or more image files (max 10MB each).');
+    return;
+  }
+  const currentUser = getCurrentUser ? getCurrentUser() : null;
+  const userId = currentUser ? currentUser.id : null;
+  const verified = await verifyUserPassword(userId, 'add critters to your collection');
+  if (!verified) return;
+  if (currentLocation.latitude == null && currentLocation.longitude == null) await requestDeviceLocationNow();
+  const addressLabel = buildCritterAddressLabel();
+  const latRaw = document.getElementById('addCritterLatitude')?.value;
+  const lngRaw = document.getElementById('addCritterLongitude')?.value;
+  let lat = latRaw ? parseFloat(latRaw) : null;
+  let lng = lngRaw ? parseFloat(lngRaw) : null;
+  if (Number.isFinite(lat) && Number.isFinite(lng)) {
+    currentLocation.latitude = lat;
+    currentLocation.longitude = lng;
+  }
+  if (addressLabel) currentLocation.locationName = addressLabel;
+  if (currentLocation.latitude == null && deviceLocation.latitude != null) {
+    currentLocation.latitude = deviceLocation.latitude;
+    currentLocation.longitude = deviceLocation.longitude;
+  }
+  const batchLocation = { lat: currentLocation.latitude, lng: currentLocation.longitude, name: currentLocation.locationName };
+
+  document.getElementById('galleryBatchStatus').textContent = `Processing ${validFiles.length} photo(s)...`;
+  document.getElementById('galleryBatchProgress').style.width = '0%';
+  document.getElementById('galleryBatchProgress').textContent = '0%';
+  document.getElementById('galleryBatchLog').innerHTML = '';
+  document.getElementById('galleryBatchCloseBtn').style.display = 'none';
+  if (typeof $ !== 'undefined') $('#galleryBatchModal').modal('show');
+
+  let added = 0;
+  let failed = 0;
+  const log = [];
+
+  for (let i = 0; i < validFiles.length; i++) {
+    const file = validFiles[i];
+    const pct = Math.round(((i + 1) / validFiles.length) * 100);
+    document.getElementById('galleryBatchStatus').textContent = `Processing ${i + 1} of ${validFiles.length}...`;
+    document.getElementById('galleryBatchProgress').style.width = pct + '%';
+    document.getElementById('galleryBatchProgress').textContent = pct + '%';
+
+    const imageData = await new Promise((resolve) => {
+      const r = new FileReader();
+      r.onload = (e) => resolve(e.target.result);
+      r.readAsDataURL(file);
+    });
+
+    if (typeof EXIF !== 'undefined' && EXIF.getData) {
+      await new Promise((resolve) => {
+        EXIF.getData(file, function() {
+          const gpsLat = EXIF.getTag(this, 'GPSLatitude');
+          const gpsLon = EXIF.getTag(this, 'GPSLongitude');
+          const latRef = EXIF.getTag(this, 'GPSLatitudeRef') || 'N';
+          const lonRef = EXIF.getTag(this, 'GPSLongitudeRef') || 'E';
+          if (gpsLat && gpsLon) {
+            batchLocation.lat = convertDMSToDD(gpsLat[0], gpsLat[1], gpsLat[2], latRef);
+            batchLocation.lng = convertDMSToDD(gpsLon[0], gpsLon[1], gpsLon[2], lonRef);
+          }
+          resolve();
+        });
+      });
+    }
+
+    try {
+      const res = await fetch('/api/critter-discovery/identify-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageData })
+      });
+      const data = await res.json();
+      if (!data.success || !data.critter) {
+        log.push(`<span style="color:#dc3545;">✗ ${file.name}: ${data.error || 'Could not identify'}</span>`);
+        failed++;
+        continue;
+      }
+      const critter = data.critter;
+      const critterData = {
+        animalName: critter.animalName,
+        scientificName: critter.scientificName,
+        confidence: critter.confidence,
+        features: critter.features || [],
+        habitat: critter.habitat,
+        funFacts: critter.funFacts || [],
+        conservationStatus: critter.conservationStatus,
+        description: critter.description,
+        photoUrl: imageData,
+        latitude: batchLocation.lat,
+        longitude: batchLocation.lng,
+        locationName: batchLocation.name
+      };
+      const params = userId ? `?userId=${userId}` : '';
+      const addRes = await fetch(`/api/critter-collection/add${params}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(critterData)
+      });
+      const addData = await addRes.json();
+      if (addData.success) {
+        log.push(`<span style="color:#28a745;">✓ ${critter.animalName || 'Unknown'}</span><br>`);
+        added++;
+      } else {
+        log.push(`<span style="color:#dc3545;">✗ ${critter.animalName || file.name}: ${addData.error || 'Could not save'}</span><br>`);
+        failed++;
+      }
+    } catch (e) {
+      console.error(e);
+      log.push(`<span style="color:#dc3545;">✗ ${file.name}: ${e.message || 'Error'}</span><br>`);
+      failed++;
+    }
+    document.getElementById('galleryBatchLog').innerHTML = log.join('');
+  }
+
+  document.getElementById('galleryBatchStatus').textContent = `Done! ${added} added, ${failed} failed.`;
+  document.getElementById('galleryBatchProgress').style.width = '100%';
+  document.getElementById('galleryBatchProgress').textContent = '100%';
+  document.getElementById('galleryBatchCloseBtn').style.display = 'inline-block';
+  document.getElementById('galleryBatchCloseBtn').dataset.batchAdded = added;
+  showToast('success', 'Gallery Complete', `${added} critter(s) added to your collection.`);
+}
+
+function closeGalleryBatchModal() {
+  if (typeof $ !== 'undefined') $('#galleryBatchModal').modal('hide');
+  const added = parseInt(document.getElementById('galleryBatchCloseBtn')?.dataset?.batchAdded || '0', 10);
+  if (added > 0 && confirm('View your critter collection?')) {
+    window.location.href = '/nature/critter-collection.html';
+  }
+}
+
+async function startCamera() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showToast('error', 'Camera', 'Camera access is not supported in this browser or device.', 8000);
+    return;
+  }
+  try {
+    showToast('info', 'Camera', 'Requesting camera access…');
+    const constraints = {
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      }
+    };
+    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    cameraVideo = document.getElementById('cameraVideo');
+    cameraVideo.srcObject = cameraStream;
+    document.getElementById('cameraPreview').style.display = 'block';
+    document.getElementById('startCameraBtn').style.display = 'none';
+    document.getElementById('stopCameraBtn').style.display = 'inline-block';
+    cameraVideo.onloadedmetadata = () => {
+      setTimeout(() => {
+        const g = document.getElementById('cameraFrameGuide');
+        if (g && cameraVideo) {
+          const s = Math.min(cameraVideo.offsetWidth, cameraVideo.offsetHeight) * 0.7;
+          g.style.width = s + 'px';
+          g.style.height = s + 'px';
+        }
+      }, 100);
+    };
+  } catch (e) {
+    console.error(e);
+    let msg = 'Could not access camera. ';
+    if (e.name === 'NotAllowedError') msg += 'Please allow camera permissions when prompted.';
+    else if (e.name === 'NotFoundError') msg += 'No camera found on this device.';
+    else msg += 'Make sure your camera is connected and not in use by another app.';
+    showToast('error', 'Camera Error', msg, 8000);
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  if (cameraVideo) cameraVideo.srcObject = null;
+  document.getElementById('cameraPreview').style.display = 'none';
+  document.getElementById('capturedPreview').style.display = 'none';
+  document.getElementById('startCameraBtn').style.display = 'inline-block';
+  document.getElementById('stopCameraBtn').style.display = 'none';
+  uploadedImageData = null;
+  document.getElementById('capturedImg').src = '';
+}
+
+function captureFromCamera() {
+  if (!cameraVideo || !cameraStream) return;
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        deviceLocation.latitude = p.coords.latitude;
+        deviceLocation.longitude = p.coords.longitude;
+        currentLocation.latitude = deviceLocation.latitude;
+        currentLocation.longitude = deviceLocation.longitude;
+      },
+      () => { currentLocation.latitude = null; currentLocation.longitude = null; }
+    );
+  }
+  const canvas = document.getElementById('cameraCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = cameraVideo.videoWidth;
+  canvas.height = cameraVideo.videoHeight;
+  ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
+  uploadedImageData = canvas.toDataURL('image/jpeg', 0.9);
+  const img = document.getElementById('capturedImg');
+  img.src = uploadedImageData;
+  document.getElementById('cameraPreview').style.display = 'none';
+  document.getElementById('capturedPreview').style.display = 'block';
+  img.onload = () => {
+    document.getElementById('capturedDimensions').textContent = `Captured: ${img.naturalWidth} × ${img.naturalHeight}px`;
+    showCropGuide('capturedCropGuide', img);
+  };
+}
+
+function retakePhoto() {
+  uploadedImageData = null;
+  document.getElementById('capturedImg').src = '';
+  document.getElementById('capturedPreview').style.display = 'none';
+  document.getElementById('cameraPreview').style.display = 'block';
+}
+
+async function identifyCritter() {
+  if (!uploadedImageData) {
+    showToast('warning', 'No Photo', 'Please take or upload a photo first.');
+    return;
+  }
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('critterResults').style.display = 'none';
+  try {
+    const res = await fetch('/api/critter-discovery/identify-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageData: uploadedImageData })
+    });
+    const data = await res.json();
+    document.getElementById('loadingState').style.display = 'none';
+    if (data.success && data.critter) displayCritterResults(data.critter);
+    else showToast('error', 'Error', data.error || 'Could not identify critter.');
+  } catch (e) {
+    console.error(e);
+    document.getElementById('loadingState').style.display = 'none';
+    showToast('error', 'Error', 'Failed to identify critter.');
+  }
+}
+
+function displayCritterResults(critter) {
+  currentCritterData = critter;
+  const conf = critter.confidence || 'Low';
+  const confClass = conf === 'High' ? 'confidence-high' : conf === 'Medium' ? 'confidence-medium' : 'confidence-low';
+  const features = Array.isArray(critter.features) ? critter.features : [];
+  const funFacts = Array.isArray(critter.funFacts) ? critter.funFacts : [];
+  const resultsDiv = document.getElementById('critterResults');
+  const photoHtml = uploadedImageData
+    ? `<img src="${uploadedImageData}" style="max-width: 100%; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">`
+    : '';
+  resultsDiv.innerHTML = `
+    <div class="critter-result-card">
+      <div class="row">
+        <div class="col-md-4 text-center">${photoHtml}</div>
+        <div class="col-md-8">
+          <h3 style="color: var(--critter-dark); margin-bottom: 10px;">
+            <i class="bi-bug-fill"></i> ${critter.animalName || 'Unknown'}
+          </h3>
+          <h5 style="color: #666; font-style: italic;">${critter.scientificName || ''}</h5>
+          <span class="confidence-badge ${confClass}">Confidence: ${conf}</span>
+          <hr style="border-top: 2px solid var(--critter-light); margin: 20px 0;">
+          <div class="mb-3">
+            <h6 style="color: var(--critter-dark);"><i class="bi-geo-alt-fill"></i> Habitat:</h6>
+            <p>${critter.habitat || 'Unknown'}</p>
+          </div>
+          ${features.length ? `
+            <div class="mb-3">
+              <h6 style="color: var(--critter-dark);"><i class="bi-check2-square"></i> Key Features:</h6>
+              ${features.map(f => `<span class="feature-tag">${f}</span>`).join('')}
+            </div>
+          ` : ''}
+          ${funFacts.length ? `
+            <div class="mb-3">
+              <h6 style="color: var(--critter-dark);"><i class="bi-lightbulb-fill"></i> Fun Facts:</h6>
+              <ul>${funFacts.map(f => `<li>${f}</li>`).join('')}</ul>
+            </div>
+          ` : ''}
+          ${critter.conservationStatus && critter.conservationStatus !== 'Unknown' && critter.conservationStatus !== 'Not Evaluated' ? `
+            <div class="mb-3">
+              <h6 style="color: var(--critter-dark);"><i class="bi-shield-fill-check"></i> Conservation:</h6>
+              <p><strong>${critter.conservationStatus}</strong></p>
+            </div>
+          ` : ''}
+          <div style="background: rgba(139,195,74,0.15); padding: 15px; border-radius: 10px; border-left: 4px solid var(--leaf-lime); margin-top: 20px;">
+            <h6 style="color: var(--critter-dark);"><i class="bi-chat-left-quote-fill"></i> Description:</h6>
+            <p style="margin: 0; font-style: italic;">${critter.description || ''}</p>
+          </div>
+          <div class="mt-4">
+            <button class="btn btn-success" onclick="saveToCollection()">
+              <i class="bi-plus-circle"></i> Add to Collection
+            </button>
+            <button class="btn btn-primary" onclick="learnMoreAboutCritter('${(critter.animalName || '').replace(/'/g, "\\'")}')">
+              <i class="bi-book"></i> Learn More
+            </button>
+            <button class="btn btn-secondary" onclick="identifyAnotherCritter()">
+              <i class="bi-camera"></i> Identify Another
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  resultsDiv.style.display = 'block';
+  resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function inferExpertFromCritter(animalName, habitat) {
+  const name = (animalName || '').toLowerCase();
+  const hab = (habitat || '').toLowerCase();
+  const reptileKeywords = ['snake', 'spider', 'lizard', 'turtle', 'tortoise', 'iguana', 'gecko', 'scorpion', 'tarantula', 'rattlesnake', 'coral snake', 'gopher snake', 'king snake', 'garter snake', 'widow', 'recluse', 'chuckwalla', 'alligator lizard', 'skink'];
+  const desertKeywords = ['desert tortoise', 'roadrunner', 'chuckwalla', 'sidewinder', 'kangaroo rat', 'kit fox', 'desert iguana', 'desert bighorn', 'cactus wren', 'mojave', 'hesperia', 'victor valley', 'joshua tree'];
+  if (reptileKeywords.some(k => name.includes(k) || hab.includes(k))) return 'reptile';
+  if (desertKeywords.some(k => name.includes(k) || hab.includes(k))) return 'desert';
+  return 'socal';
+}
+
+async function learnMoreAboutCritter(animalName) {
+  if (!animalName) return;
+  const expert = currentCritterData ? inferExpertFromCritter(animalName, currentCritterData.habitat) : inferExpertFromCritter(animalName, '');
+  document.getElementById('loadingState').style.display = 'block';
+  try {
+    const res = await fetch('/api/critter-discovery/critter-info', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ animalName, expert })
+    });
+    const data = await res.json();
+    document.getElementById('loadingState').style.display = 'none';
+    if (data.success) showCritterExpertInfo(animalName, data.info);
+    else showToast('error', 'Error', data.error || 'Could not get info.');
+  } catch (e) {
+    console.error(e);
+    document.getElementById('loadingState').style.display = 'none';
+    showToast('error', 'Error', 'Failed to get critter info.');
+  }
+}
+
+function showCritterExpertInfo(animalName, info) {
+  const resultsDiv = document.getElementById('critterResults');
+  const html = `
+    <div class="critter-result-card" style="margin-top: 20px; background: linear-gradient(135deg, rgba(139,195,74,0.15), rgba(46,125,50,0.1));">
+      <h4 style="color: var(--jungle-dark); margin-bottom: 20px; font-family: 'Fredoka', sans-serif;">
+        <i class="bi-book-fill"></i> All About ${animalName}
+      </h4>
+      <div style="background: white; padding: 20px; border-radius: 12px; white-space: pre-wrap; line-height: 1.8;">${info}</div>
+      <div class="text-center mt-3">
+        <button class="btn btn-success" onclick="identifyAnotherCritter()">
+          <i class="bi-camera"></i> Find Another Critter!
+        </button>
+      </div>
+    </div>
+  `;
+  resultsDiv.innerHTML += html;
+  resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function identifyAnotherCritter() {
+  document.getElementById('critterResults').style.display = 'none';
+  document.getElementById('critterResults').innerHTML = '';
+  uploadedImageData = null;
+  if (currentMode === 'camera') {
+    document.getElementById('capturedImg').src = '';
+    document.getElementById('capturedPreview').style.display = 'none';
+    document.getElementById('cameraPreview').style.display = cameraStream ? 'block' : 'none';
+  } else if (currentMode === 'image') clearImageUpload();
+}
+
+function searchCritter() {
+  const name = document.getElementById('critterSearchInput').value.trim();
+  if (!name) {
+    showToast('info', 'Search', 'Enter an animal name to learn more.');
+    return;
+  }
+  learnMoreAboutCritter(name);
+}
+
+function handleSearchKeypress(e) {
+  if (e.key === 'Enter') searchCritter();
+}
+
+async function saveToCollection() {
+  if (!currentCritterData || !uploadedImageData) return;
+  try {
+    const currentUser = getCurrentUser ? getCurrentUser() : null;
+    const userId = currentUser ? currentUser.id : null;
+    const verified = await verifyUserPassword(userId, 'add this critter to your collection');
+    if (!verified) return;
+    if (currentLocation.latitude == null && currentLocation.longitude == null) await requestDeviceLocationNow();
+    const addressLabel = buildCritterAddressLabel();
+    const latRaw = document.getElementById('addCritterLatitude')?.value;
+    const lngRaw = document.getElementById('addCritterLongitude')?.value;
+    const lat = latRaw ? parseFloat(latRaw) : null;
+    const lng = lngRaw ? parseFloat(lngRaw) : null;
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      currentLocation.latitude = lat;
+      currentLocation.longitude = lng;
+    }
+    if (addressLabel) currentLocation.locationName = addressLabel;
+    if (currentLocation.latitude == null && deviceLocation.latitude != null) {
+      currentLocation.latitude = deviceLocation.latitude;
+      currentLocation.longitude = deviceLocation.longitude;
+    }
+    const critterData = {
+      animalName: currentCritterData.animalName,
+      scientificName: currentCritterData.scientificName,
+      confidence: currentCritterData.confidence,
+      features: currentCritterData.features || [],
+      habitat: currentCritterData.habitat,
+      funFacts: currentCritterData.funFacts || [],
+      conservationStatus: currentCritterData.conservationStatus,
+      description: currentCritterData.description,
+      photoUrl: uploadedImageData,
+      latitude: currentLocation.latitude,
+      longitude: currentLocation.longitude,
+      locationName: currentLocation.locationName
+    };
+    const params = userId ? `?userId=${userId}` : '';
+    const res = await fetch(`/api/critter-collection/add${params}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(critterData)
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast('success', 'Added!', 'Critter added to your collection.');
+      setTimeout(() => {
+        if (confirm('View your critter collection?')) window.location.href = '/nature/critter-collection.html';
+      }, 1500);
+    } else showToast('error', 'Error', data.error || 'Could not save.');
+  } catch (e) {
+    console.error(e);
+    showToast('error', 'Error', 'Failed to save to collection.');
+  }
+}
+
+let selectedCritterExpert = 'socal';
+
+function selectCritterExpert(expert) {
+  selectedCritterExpert = expert;
+  document.querySelectorAll('.expert-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.expert === expert);
+    btn.classList.toggle('btn-success', btn.dataset.expert === expert);
+    btn.classList.toggle('btn-outline-success', btn.dataset.expert !== expert);
+  });
+}
+
+async function askCritterExpert(question, expertKey) {
+  const expert = expertKey || selectedCritterExpert;
+  const msg = (typeof question === 'string' ? question : '').trim() || document.getElementById('critterExpertInput')?.value?.trim();
+  if (!msg) {
+    showToast('info', 'Ask the Experts', 'Type a question and click Ask, or use voice.');
+    return;
+  }
+  showToast('info', 'Thinking...', 'Your expert is considering your question.');
+  document.getElementById('critterExpertResponse').style.display = 'none';
+  try {
+    const res = await fetch('/api/critter-discovery/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg, expert })
+    });
+    const data = await res.json();
+    if (data.success && data.response) {
+      document.getElementById('critterExpertResponseTitle').textContent = data.assistant + ' says:';
+      document.getElementById('critterExpertResponseBody').textContent = data.response;
+      document.getElementById('critterExpertResponse').style.display = 'block';
+      document.getElementById('critterExpertInput').value = '';
+      showToast('success', data.assistant, 'Response ready.');
+    } else {
+      throw new Error(data.error || 'No response');
+    }
+  } catch (e) {
+    console.error(e);
+    showToast('error', 'Error', 'Expert is taking a break. Try again later.');
+  }
+}
+
+function showToast(type, title, message, duration = 5000) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = { success: 'bi-check-circle-fill', info: 'bi-info-circle-fill', warning: 'bi-exclamation-triangle-fill', error: 'bi-x-circle-fill' };
+  const colors = { success: '#28a745', info: '#17a2b8', warning: '#ffc107', error: '#dc3545' };
+  toast.innerHTML = `
+    <div style="display: flex; align-items: flex-start; gap: 10px;">
+      <i class="${icons[type]}" style="color: ${colors[type]}; font-size: 1.2rem;"></i>
+      <div style="flex: 1;">
+        <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
+        <div style="font-size: 0.9rem; color: #6c757d;">${message}</div>
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #6c757d; cursor: pointer; font-size: 1.2rem; padding: 0;">&times;</button>
+    </div>
+  `;
+  container.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 100);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, duration);
+}
+
+function toggleDarkMode() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('natureDarkMode', '0');
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('natureDarkMode', '1');
+  }
+  updateDarkModeUI();
+}
+function updateDarkModeUI() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const icon = document.getElementById('darkModeIcon');
+  const label = document.getElementById('darkModeLabel');
+  if (icon) icon.className = isDark ? 'bi-sun-fill' : 'bi-moon-stars-fill';
+  if (label) label.textContent = isDark ? 'Light' : 'Dark';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (localStorage.getItem('natureDarkMode') === '1') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  updateDarkModeUI();
+  const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  switchInputMode(isMobile ? 'camera' : 'image');
+  requestDeviceLocationOnLoad();
+  loadCritterPlacesApi();
+  const stateInput = document.getElementById('addCritterState');
+  if (stateInput) stateInput.addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase(); });
+  document.getElementById('dt').textContent = new Date().toLocaleDateString();
+});
+</script>
+
+<script src="/shared/scripts.js"></script>
+<script src="/shared/voice-widget.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  initVoiceWidget({
+    position: 'bottom-right',
+    theme: 'gold',
+    onCommand: (command) => {
+      const lower = command.toLowerCase();
+      if (lower.includes('identify') || lower.includes('what animal') || lower.includes('what critter')) {
+        switchInputMode('camera');
+        showToast('info', 'Camera Ready', 'Point at an animal to identify it!');
+      } else if (lower.includes('upload') || lower.includes('photo')) {
+        switchInputMode('image');
+        showToast('info', 'Upload', 'Choose a photo to identify.');
+      } else if (lower.includes('ask socal') || lower.includes('socal expert') || lower.includes('socal wildlife')) {
+        selectCritterExpert('socal');
+        const q = command.replace(/ask socal|socal expert|socal wildlife/gi, '').trim();
+        if (q) askCritterExpert(q, 'socal'); else showToast('info', 'SoCal Expert', 'Ask your question in the Experts box.');
+      } else if (lower.includes('ask desert') || lower.includes('desert expert') || lower.includes('hesperia')) {
+        selectCritterExpert('desert');
+        const q = command.replace(/ask desert|desert expert|hesperia/gi, '').trim();
+        if (q) askCritterExpert(q, 'desert'); else showToast('info', 'Desert Expert', 'Ask your question in the Experts box.');
+      } else if (lower.includes('ask reptile') || lower.includes('reptile expert') || lower.includes('snake') || lower.includes('spider')) {
+        selectCritterExpert('reptile');
+        const q = command.replace(/ask reptile|reptile expert|snake|spider/gi, '').trim();
+        if (q) askCritterExpert(q, 'reptile'); else showToast('info', 'Reptile Expert', 'Ask your question in the Experts box.');
+      } else if (lower.includes('search') || lower.includes('learn about')) {
+        const name = command.replace(/search for|learn about|find/gi, '').trim();
+        document.getElementById('critterSearchInput').value = name;
+        searchCritter();
+      } else if (lower.includes('collection')) {
+        window.location.href = '/nature/critter-collection.html';
+      } else if (lower.includes('home')) {
+        window.location.href = '/index.html';
+      } else {
+        const trimmed = command.trim();
+        if (trimmed) {
+          document.getElementById('critterExpertInput').value = trimmed;
+          askCritterExpert(trimmed, selectedCritterExpert);
+        }
+      }
+    }
+  });
+});
+</script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

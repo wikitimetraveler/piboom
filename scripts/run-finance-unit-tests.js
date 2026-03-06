@@ -1,6 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import XLSX from 'xlsx';
+import { getFieldPath, coerce as coerceUtil } from '../public/shared/unit-tests-utils.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const headerAliases = {
   loanguid: ['loanguid', 'loan guid', 'loan_guid', 'loanid', 'loan id', 'loan_id', 'guid'],
@@ -57,14 +61,8 @@ function pickValue(row, keys) {
 }
 
 function extractFieldId(value) {
-  if (value === null || value === undefined) return '';
-  const text = String(value).trim();
-  if (!text) return '';
-  const match = text.match(/\[([^\]]+)\]/);
-  if (match && match[1]) {
-    return match[1].trim();
-  }
-  return text;
+  const fieldPath = getFieldPath(value);
+  return fieldPath ?? '';
 }
 
 function toOperator(value) {
@@ -82,17 +80,7 @@ function toOperator(value) {
 }
 
 function coerce(value) {
-  if (typeof value === 'number') return value;
-  if (value === null || value === undefined) return value;
-  const trimmed = String(value).trim();
-  if (trimmed === '') return '';
-  const asNumber = Number(trimmed);
-  if (!Number.isNaN(asNumber) && trimmed.match(/^-?\d+(\.\d+)?$/)) {
-    return asNumber;
-  }
-  if (trimmed.toLowerCase() === 'true') return true;
-  if (trimmed.toLowerCase() === 'false') return false;
-  return trimmed;
+  return coerceUtil(value);
 }
 
 function getValueByPath(obj, pathValue) {
