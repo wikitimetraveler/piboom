@@ -16,6 +16,7 @@
 | `IsDate([field])` | `Not IsDate([CX.DISASTER.DATE])` | True if field is valid date |
 | `DateDiff("d", [@field1], [@field2]) > N` | `DateDiff("d", [@CX.DISASTER.DATE], [@3142]) > 90` | Days between two date fields |
 | `[field].Contains("literal")` | `[19].Contains("Refi")` | String contains substring |
+| `[field].StartsWith("literal")` | `[CX.TYPE].StartsWith("Conv")` | String starts with substring |
 
 ### Implementation
 
@@ -105,3 +106,24 @@ Formulas like `IIf(A,"x","") & IIf(B,"y","") & IIf(C,"z","")` are supported:
 - **OrElse / AndAlso:** Use first matching pattern per field; if conflicting, prefer the one that suggests a value.
 - **Result is expression:** e.g. `[#CX.CASHOUT.AMOUNT] - [#CX.CASHOUT.ALLOWED]` — leave COMPARE blank.
 - **Result is single field:** e.g. `[#1415#1]` — COMPARE suggested = same as SET for that field.
+
+---
+
+## Part E: Special Fields
+
+Special fields with known value sets get improved suggestions:
+
+| Field | Example values | Notes |
+|-------|----------------|-------|
+| `CX.SUNRISE` | Date strings | Sunrise/sunset date field |
+| `CX.APPRAISAL.TYPE` | Appraisal type codes | e.g. 2055, 1004, etc. |
+| `CX.TYPE` | `"Conv"`, `"FHA"`, `"VA"`, etc. | Loan type; `StartsWith("Conv")` → suggest `"Conv"` or `"Conventional"` |
+
+---
+
+## Part F: Else-Scenario N/Blank
+
+For else branches (when condition is false), suggest N or blank for Y/N fields:
+
+- **`collectYNAndNothingFieldsFromScenarios(allScenarios)`** — gathers fields that use Y/N or Nothing in any scenario.
+- **`getSuggestedValuesForScenario`** — when `isElse` is true, suggests N or blank for those fields when no other condition applies.

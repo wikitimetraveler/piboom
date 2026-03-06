@@ -15,3 +15,8 @@ Short definitions for AI agents and developers working with Encompass and mortga
 | ice-sources.json | Generated index of ICE repos, Postman, docs; built by `npm run build:ice-knowledge` |
 | The Screen Test | AI tool (tool9) for reviewing Encompass manifest XML form code; extracts field IDs, checks calculations, flags syntax/type/deprecated issues |
 | tool9 | Finance developer tool — The Screen Test, manifest form code review |
+| customFieldCalcParser | Parser in `public/shared/customFieldCalcParser.js` for Encompass IIf formulas; extracts scenarios, suggested values, Nothing/Y/N handling |
+| unit-tests-utils | Shared helpers in `public/shared/unit-tests-utils.js` for unit test parsing (extractFieldId, coerce, isBlankForTest, etc.); used by browser and Node |
+| Unit Tests tool | Finance tool at `unit-tests.html` for running Excel-based Encompass field tests; uses customFieldCalcParser for scenario generation |
+| Unit Test Library | Excel files stored in PostgreSQL `unit_test_files.file_content` (BYTEA); available from any machine sharing the same DB; run `npm run migrate:unit-tests` to backfill legacy disk files |
+| Test Case Search | Searchable database of unit tests by Encompass field ID; `GET /api/unit-tests/search?fieldId=CX.TYPE` returns all tests that use that field; JSONB `field_ids` + GIN index for fast lookup; key feature for finding which tests cover a field |

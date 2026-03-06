@@ -2364,7 +2364,16 @@ async function loadTestLibrary() {
   if (!testLibraryList) return;
   try {
     const res = await fetch('/api/unit-tests/files');
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseErr) {
+      throw new Error(res.ok ? 'Invalid response from server' : `Server error (${res.status})`);
+    }
+    if (!res.ok) {
+      const msg = data?.message || data?.error || `Server error (${res.status})`;
+      throw new Error(msg);
+    }
     if (!data.success || !Array.isArray(data.files)) {
       testLibraryList.innerHTML = '<p class="text-muted mb-0">No tests in library.</p>';
       return;
@@ -2393,19 +2402,45 @@ async function loadTestLibrary() {
       btn.addEventListener('click', () => deleteFileFromLibrary(btn.dataset.id));
     });
   } catch (err) {
-    testLibraryList.innerHTML = '<p class="text-danger mb-0">Failed to load library.</p>';
+    const msg = err?.message || 'Failed to load library.';
+    testLibraryList.innerHTML = `<p class="text-danger mb-0">${msg.replace(/</g, '&lt;')}</p><button class="btn btn-sm btn-outline-secondary mt-1" id="retryLoadLibrary">Retry</button>`;
+    document.getElementById('retryLoadLibrary')?.addEventListener('click', () => loadTestLibrary());
   }
 }
 
 async function loadFileFromLibrary(id, originalName) {
+  const btn = document.querySelector(`.load-from-library[data-id="${id}"]`);
+  if (btn) btn.disabled = true;
   try {
     const res = await fetch(`/api/unit-tests/files/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch');
+    const contentType = (res.headers.get('content-type') || '').toLowerCase();
+    if (!res.ok) {
+      let errMsg = `Failed to load (${res.status})`;
+      if (contentType.includes('application/json')) {
+        try {
+          const errData = await res.json();
+          errMsg = errData?.message || errData?.error || errMsg;
+        } catch (_) {}
+      }
+      throw new Error(errMsg);
+    }
+    if (!contentType.includes('spreadsheet') && !contentType.includes('excel') && !contentType.includes('octet-stream')) {
+      const text = await res.text();
+      let errMsg = 'Server returned non-Excel response';
+      try {
+        const parsed = JSON.parse(text);
+        errMsg = parsed?.message || parsed?.error || errMsg;
+      } catch (_) {}
+      throw new Error(errMsg);
+    }
     const blob = await res.blob();
     const file = new File([blob], originalName || 'unit-test.xlsx', { type: blob.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     await handleFileUpload(file);
+    showToast('Loaded from library', 'ok');
   } catch (err) {
-    showToast('Failed to load from library', 'err');
+    showToast(err?.message || 'Failed to load from library', 'err');
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 

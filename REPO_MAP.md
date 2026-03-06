@@ -34,9 +34,13 @@
 
 ### Finance tools
 - UI: `public/finance/`
-- Unit Tests: `public/finance/unit-tests.html`, `public/finance/js/unit-tests.js`, `services/unit-tests-file.service.js`
+- Unit Tests: `public/finance/unit-tests.html`, `public/finance/js/unit-tests.js`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js`, `services/unit-tests-file.service.js`
 - Screen Test: `public/finance/tool9.html`, `controllers/reviewer-ai.controller.js`
 - Encompass field browsers: `encompass-custom-fields.html`, `encompass-native-fields.html`
+
+### Nature
+- UI: `public/nature/` (nature-hub.html, tree-discovery.html, critter-discovery.html, critter-collection.html, share-collection.html)
+- Routes: `routes/nature-collection.routes.js`, `routes/critter-collection.routes.js`, `routes/critter-discovery.routes.js`
 
 ## Commands (source of truth)
 - Dev: `npm run dev`

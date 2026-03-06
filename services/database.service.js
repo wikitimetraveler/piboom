@@ -700,6 +700,7 @@ export async function createTables() {
     `);
 
     // Create unit_test_files table for stored unit test Excel library
+    // file_content BYTEA stores Excel bytes so library works from any machine (shared DB)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS unit_test_files (
         id SERIAL PRIMARY KEY,
@@ -707,11 +708,21 @@ export async function createTables() {
         original_name VARCHAR(255),
         field_ids JSONB DEFAULT '[]',
         row_count INTEGER,
+        file_content BYTEA,
         uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
     await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_unit_test_files_field_ids ON unit_test_files USING GIN (field_ids)
+    `);
+    // Migration: add file_content column if table existed without it (old installs)
+    await pool.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'unit_test_files' AND column_name = 'file_content') THEN
+          ALTER TABLE unit_test_files ADD COLUMN file_content BYTEA;
+        END IF;
+      END $$
     `);
 
     console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, and unit test files)');

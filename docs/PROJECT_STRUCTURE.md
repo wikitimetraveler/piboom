@@ -23,8 +23,11 @@ devconnect-labs/
 │   │   └── ...
 │   │
 │   ├── nature/                 # 🌳 Nature Domain
+│   │   ├── nature-hub.html
 │   │   ├── tree-discovery.html
-│   │   └── tree-collection.html
+│   │   ├── critter-discovery.html
+│   │   ├── critter-collection.html
+│   │   └── share-collection.html
 │   │
 │   ├── family/                 # 👨‍👩‍👧‍👦 Family/Genealogy Domain
 │   │   ├── genealogy.html

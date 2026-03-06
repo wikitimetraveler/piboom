@@ -102,6 +102,8 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/critter-collection/stats` | Critter collection stats |
 | PUT | `/api/critter-collection/:id` | Update critter |
 | DELETE | `/api/critter-collection/:id` | Delete critter |
+| POST | `/api/nature-collection/share` | Share nature collection |
+| GET | `/api/nature-collection/share/:id` | Get shared nature collection |
 | * | `/api/genealogy/*` | Family data, people, stats |
 | * | `/api/grateful-dead/*` | Shows, KML, geocoding |
 | * | `/api/concert-collection/*` | Concert collection |
@@ -122,6 +124,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | `routes/encompass-webhook.routes.js` | `/api/webhooks` |
 | `routes/reviewer.routes.js` | `/api/reviewer` |
 | `routes/unit-tests.routes.js` | `/api/unit-tests` |
+| `routes/nature-collection.routes.js` | `/api/nature-collection` |
 | `routes/loan-pipeline.routes.js` | `/api/loan-pipeline` |
 | `routes/disasters.routes.js` | `/api/disasters` |
 | `routes/chat.routes.js` | `/api/chat` |

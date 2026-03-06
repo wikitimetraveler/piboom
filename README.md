@@ -92,6 +92,7 @@ npm run pi
 - **Disaster Dashboard**: `http://localhost:3000/finance/disasters-unified.html`
 - **Encompass Assistant**: `http://localhost:3000/finance/encompass-assistant.html`
 - **The Screen Test** (form code review): `http://localhost:3000/finance/tool9.html`
+- **Unit Tests**: `http://localhost:3000/finance/unit-tests.html`
 - **Main Hub**: `http://localhost:3000/`
 
 ## Documentation
@@ -114,7 +115,7 @@ npm run pi
 
 ## 🛠️ Tech Stack
 
--### Backend
+### Backend
 - **Node.js** - Runtime environment
 - **Express.js** - Web server framework
 - **ICE Encompass Developer Connect** - OAuth-secured access to loan pipeline/loan objects via the Encompass Hub service and ScreenBindings class
@@ -178,7 +179,7 @@ npm run pi
 - **Risk Visualization**: Color-coded markers and heat maps
 - **Distance Calculations**: Proximity analysis between loans and disasters
 
--### 🤖 AI Assistant Features
+### 🤖 AI Assistant Features
 - **Mortgage Operations Expert**: Specialized knowledge in correspondent and retail lending
 - **Disaster Risk Expert**: Expertise in disaster impact on real estate values
 - **Conversation Memory**: PostgreSQL-backed conversation persistence

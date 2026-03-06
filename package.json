@@ -12,6 +12,7 @@
     "build:ice-knowledge": "node scripts/build-ice-knowledge.js",
     "test:finance": "node scripts/run-finance-unit-tests.js --file test/fixtures/finance/BSA_TASK_579580.xlsx",
     "test:finance:local": "node scripts/run-finance-unit-tests.js --file \"public/unitTests/BSA TASK 579580.xlsx\"",
+    "migrate:unit-tests": "node scripts/migrate-unit-tests-to-db.js",
     "pi": "MODE=pi node server.js",
     "ts:dev": "tsx server.ts",
     "ts:watch": "tsx watch server.ts",

@@ -28,6 +28,17 @@ export function hasFieldId(value) {
 }
 
 /**
+ * Extract all field IDs from a Target cell (e.g. "[CX.TYPE] and [353]" -> ["CX.TYPE", "353"]).
+ * Strips @ and # prefix. Returns empty array if none.
+ */
+export function extractFieldIdsFromTarget(value) {
+  if (!value) return [];
+  const str = String(value).trim();
+  const matches = [...str.matchAll(/\[([^\]]+)\]/g)];
+  return matches.map((m) => m[1].trim().replace(/^[@#]+/, '')).filter(Boolean);
+}
+
+/**
  * Get raw field ID from Target (with @ or # prefix) for type inference.
  * e.g. "[@748]" -> "@748", "[748]" -> "748"
  */

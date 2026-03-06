@@ -4,22 +4,12 @@ import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import XLSX from 'xlsx';
 import { getPool } from './database.service.js';
+import { extractFieldIdsFromTarget } from '../public/shared/unit-tests-utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const UNIT_TESTS_DIR = path.join(__dirname, '..', 'data', 'unit-tests');
-
-/**
- * Extract field IDs from a Target cell value (e.g. "[CX.TYPE]", "[353]", "[@748]").
- * Returns array of normalized IDs (strips @ and # prefix).
- */
-function extractFieldIdsFromTarget(value) {
-  if (!value) return [];
-  const str = String(value).trim();
-  const matches = [...str.matchAll(/\[([^\]]+)\]/g)];
-  return matches.map((m) => m[1].trim().replace(/^[@#]+/, '')).filter(Boolean);
-}
 
 /**
  * Parse Excel buffer and extract headers, rows, and field IDs from Target column.
@@ -79,25 +69,15 @@ function parseUnitTestExcel(buffer) {
 }
 
 /**
- * Ensure data/unit-tests directory exists.
- */
-async function ensureDir() {
-  await fs.mkdir(UNIT_TESTS_DIR, { recursive: true });
-}
-
-/**
- * Save uploaded unit test file to disk and DB.
+ * Save uploaded unit test file to DB (file_content BYTEA).
+ * Stored in database so library works from any machine sharing the same DB.
  * @param {Buffer} buffer - Excel file buffer
  * @param {string} originalName - User's original filename
  * @returns {Promise<object>} Saved record
  */
 export async function saveUnitTestFile(buffer, originalName) {
-  await ensureDir();
   const fileName = `${crypto.randomUUID()}.xlsx`;
-  const filePath = path.join(UNIT_TESTS_DIR, fileName);
-
   const { fieldIds, rowCount } = parseUnitTestExcel(buffer);
-  await fs.writeFile(filePath, buffer);
 
   const pool = getPool();
   if (!pool) {
@@ -105,10 +85,10 @@ export async function saveUnitTestFile(buffer, originalName) {
   }
 
   const result = await pool.query(
-    `INSERT INTO unit_test_files (file_name, original_name, field_ids, row_count)
-     VALUES ($1, $2, $3, $4)
+    `INSERT INTO unit_test_files (file_name, original_name, field_ids, row_count, file_content)
+     VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
-    [fileName, originalName || fileName, JSON.stringify(fieldIds), rowCount]
+    [fileName, originalName || fileName, JSON.stringify(fieldIds), rowCount, buffer]
   );
 
   return result.rows[0];
@@ -131,13 +111,14 @@ export async function listUnitTestFiles() {
 
 /**
  * Get unit test file by id. Returns metadata and file buffer.
+ * Reads from DB file_content first (portable across machines); falls back to disk for legacy records.
  */
 export async function getUnitTestFile(id) {
   const pool = getPool();
   if (!pool) throw new Error('Database not available');
 
   const result = await pool.query(
-    `SELECT id, file_name, original_name, field_ids, row_count FROM unit_test_files WHERE id = $1`,
+    `SELECT id, file_name, original_name, field_ids, row_count, file_content FROM unit_test_files WHERE id = $1`,
     [id]
   );
   if (result.rows.length === 0) {
@@ -145,13 +126,22 @@ export async function getUnitTestFile(id) {
   }
 
   const record = result.rows[0];
-  const filePath = path.join(UNIT_TESTS_DIR, record.file_name);
-  const buffer = await fs.readFile(filePath);
+  let buffer = record.file_content ? Buffer.from(record.file_content) : null;
 
-  return {
-    ...record,
-    buffer,
-  };
+  if (!buffer) {
+    const filePath = path.join(UNIT_TESTS_DIR, record.file_name);
+    try {
+      buffer = await fs.readFile(filePath);
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        throw new Error(`File not found. Re-upload or use "Save to Library" to restore.`);
+      }
+      throw err;
+    }
+  }
+
+  const { file_content, ...meta } = record;
+  return { ...meta, buffer };
 }
 
 /**
@@ -172,27 +162,30 @@ export async function searchByFieldId(fieldId) {
 }
 
 /**
- * Delete unit test file from DB and disk.
+ * Delete unit test file from DB (and disk if legacy record).
  */
 export async function deleteUnitTestFile(id) {
   const pool = getPool();
   if (!pool) throw new Error('Database not available');
 
   const result = await pool.query(
-    `SELECT file_name FROM unit_test_files WHERE id = $1`,
+    `SELECT file_name, file_content FROM unit_test_files WHERE id = $1`,
     [id]
   );
   if (result.rows.length === 0) {
     return false;
   }
 
-  const filePath = path.join(UNIT_TESTS_DIR, result.rows[0].file_name);
   await pool.query(`DELETE FROM unit_test_files WHERE id = $1`, [id]);
 
-  try {
-    await fs.unlink(filePath);
-  } catch (err) {
-    console.warn('Could not delete file from disk:', filePath, err.message);
+  const row = result.rows[0];
+  if (!row.file_content) {
+    const filePath = path.join(UNIT_TESTS_DIR, row.file_name);
+    try {
+      await fs.unlink(filePath);
+    } catch (err) {
+      console.warn('Could not delete legacy file from disk:', filePath, err.message);
+    }
   }
 
   return true;
