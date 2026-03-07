@@ -235,454 +235,86 @@
     padding-top: 20px;
   }
   
-  /* Premium Accordion Sections */
-  .premium-accordion .card {
-    background: rgba(255, 255, 255, 0.8);
+  /* Domain Icon Grid */
+  .domain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1.25rem;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+  .domain-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(135, 206, 250, 0.2);
-    margin-bottom: 20px;
-    border-radius: 15px;
-    overflow: hidden;
-    transition: all 0.3s ease;
+    border: 1px solid rgba(135, 206, 250, 0.25);
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s ease;
+    min-height: 140px;
   }
-  
-  .premium-accordion .card:hover {
-    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
-    transform: translateY(-2px);
+  .domain-tile:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.5);
   }
-  
-  .premium-accordion .card-header {
-    background: linear-gradient(135deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08));
-    border-bottom: 1px solid rgba(135, 206, 250, 0.2);
-    padding: 0;
-  }
-  
-  .premium-accordion .card-header .btn-link {
-    padding: 20px 25px;
-    width: 100%;
-    text-align: left;
-    position: relative;
-  }
-  
-  .premium-accordion .card-header .btn-link::after {
-    content: '▼';
-    position: absolute;
-    right: 25px;
-    top: 50%;
-    transform: translateY(-50%) rotate(0deg);
-    transition: transform 0.3s ease;
-    color: var(--ice-primary);
-    font-size: 0.8rem;
-  }
-  
-  .premium-accordion .card-header .btn-link[aria-expanded="true"]::after {
-    transform: translateY(-50%) rotate(180deg);
-  }
-  
-  .section-count-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    padding: 4px 12px;
-    border-radius: 15px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-left: 10px;
-    vertical-align: middle;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
-  }
-  
-  /* Modern Dropdown Menus */
-  .dropdown-menu {
-    border: none;
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    padding: 10px;
-    margin-top: 10px;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(20px);
-  }
-  
-  .dropdown-item {
-    border-radius: 8px;
-    padding: 10px 15px;
-    transition: all 0.2s ease;
-    margin-bottom: 2px;
-  }
-  
-  .dropdown-item:hover {
-    background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
+  .domain-tile i {
+    font-size: 2.5rem;
     color: #667eea;
-    transform: translateX(5px);
+    margin-bottom: 0.5rem;
   }
-  
-  .dropdown-item i {
-    width: 20px;
-    margin-right: 10px;
-  }
-  
-  .dropdown-divider {
-    border-top-color: rgba(135, 206, 250, 0.2);
+  .domain-tile span {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.2;
   }
 </style>
 
 <main class="container">
   
-  <div class="accordion premium-accordion" id="mainAccordion">
-    
-    <!-- Music Discovery Section -->
-    <div class="card">
-      <div class="card-header" id="headingMusic">
-        <h2 class="mb-0">
-          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseMusic" aria-expanded="false" aria-controls="collapseMusic" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-music-note-beamed"></i> Music Discovery <span class="section-count-badge">9</span>
-            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Explore, research, and discover music</small>
-          </button>
-        </h2>
-      </div>
-      <div id="collapseMusic" class="collapse" aria-labelledby="headingMusic">
-        <div class="card-body">
-          <div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/music-research.html" class="tool-card fade-in">
-        <span class="card-icon">🔍</span>
-        <h3>Music Research</h3>
-        <p>Search artists, view band members, birth places, and YouTube videos.</p>
-        <div class="card-meta"><i class="bi-search"></i> Research tools</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/album-discovery.html" class="tool-card fade-in">
-        <span class="card-icon">💿</span>
-        <h3>Album Discovery</h3>
-        <p>Browse album covers, discover new music, and search YouTube for your favorite albums!</p>
-        <div class="card-meta"><i class="bi-disc"></i> Music Discovery</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/collection.html" class="tool-card fade-in">
-        <span class="card-icon">📚</span>
-        <h3>My Album Collection</h3>
-        <p>Your personal music collection with flip cards showing album details, ratings, and notes!</p>
-        <div class="card-meta"><i class="bi-collection-fill"></i> Collection Manager</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/kml-viewer.html" class="tool-card fade-in">
-        <span class="card-icon">🗺️</span>
-        <h3>Music Geographic Timeline</h3>
-        <p>Visualize artist journeys and music history events on interactive maps with timeline exploration and YouTube videos.</p>
-        <div class="card-meta"><i class="bi-map"></i> Maps & Timeline</div>
-      </a>
-          </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/my-grateful-dead-shows.html" class="tool-card fade-in">
-        <span class="card-icon">⚡</span>
-        <h3>My Grateful Dead Shows</h3>
-        <p>Track and explore the Grateful Dead shows you've attended! Browse the endless tour and mark your shows on the timeline.</p>
-        <div class="card-meta"><i class="bi-lightning-fill"></i> Deadhead Collection</div>
-      </a>
-          </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/music-time-machine.html" class="tool-card fade-in">
-        <span class="card-icon">🕰️</span>
-        <h3>Music Time Machine</h3>
-        <p>Travel back in time! See what albums were released, concerts happened, and music history was made on any date!</p>
-        <div class="card-meta"><i class="bi-clock-history"></i> Historical Discovery</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/sample-detector.html" class="tool-card fade-in">
-        <span class="card-icon">🕸️</span>
-        <h3>Sample & Cover Detector</h3>
-        <p>Discover who sampled or covered your favorite songs! Explore hidden connections in the music universe.</p>
-        <div class="card-meta"><i class="bi-diagram-3"></i> Sample Detection</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/spotify-dashboard.html" class="tool-card fade-in">
-        <span class="card-icon">🎵</span>
-        <h3>Spotify Dashboard</h3>
-        <p>Connect your Spotify account to view your top tracks, artists, playlists, and discover new music!</p>
-        <div class="card-meta"><i class="bi-spotify"></i> Music Discovery</div>
-      </a>
-          </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/music/song-identifier.html" class="tool-card fade-in">
-        <span class="card-icon">🎵</span>
-        <h3>Song Identifier</h3>
-        <p>Shazam-like song recognition! Just say "What song is this?" or click the button to identify any music playing around you.</p>
-        <div class="card-meta"><i class="bi-soundwave"></i> Audio Fingerprinting</div>
-      </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bike Shop Section -->
-    <div class="card">
-      <div class="card-header" id="headingBike">
-        <h2 class="mb-0">
-          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseBike" aria-expanded="false" aria-controls="collapseBike" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-bicycle"></i> Bike Shop <span class="section-count-badge">4</span>
-            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Explore bikes, routes, and your peloton</small>
-          </button>
-        </h2>
-      </div>
-      <div id="collapseBike" class="collapse" aria-labelledby="headingBike">
-        <div class="card-body">
-          <div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/bike-store-home.html" class="tool-card fade-in">
-        <span class="card-icon">🚲</span>
-        <h3>Bike Store Home</h3>
-        <p>Jump into the shop hub with featured bikes, routes, and quick links.</p>
-        <div class="card-meta"><i class="bi-house"></i> Store Hub</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/bike-discover.html" class="tool-card fade-in">
-        <span class="card-icon">🔍</span>
-        <h3>Bike Discover</h3>
-        <p>Browse and search the fleet to find the perfect ride and specs.</p>
-        <div class="card-meta"><i class="bi-search"></i> Shop Catalog</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/bike-collection.html#map" class="tool-card fade-in">
-        <span class="card-icon">🗺️</span>
-        <h3>The Peloton</h3>
-        <p>View the collection on the map, track locations, and plan rides.</p>
-        <div class="card-meta"><i class="bi-geo-alt"></i> Collection Map</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/bike-customers.html" class="tool-card fade-in">
-        <span class="card-icon">👥</span>
-        <h3>Customers</h3>
-        <p>See customer profiles, favorite bikes, and the latest shop activity.</p>
-        <div class="card-meta"><i class="bi-people"></i> Community</div>
-      </a>
-    </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- AI & Voice Section -->
-    <div class="card">
-      <div class="card-header" id="headingAI">
-        <h2 class="mb-0">
-          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseAI" aria-expanded="false" aria-controls="collapseAI" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-robot"></i> AI & Voice <span class="section-count-badge">5</span>
-            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Smart assistants and AI-powered tools</small>
-          </button>
-        </h2>
-      </div>
-      <div id="collapseAI" class="collapse" aria-labelledby="headingAI">
-        <div class="card-body">
-          <div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/ai/voice-dj.html" class="tool-card fade-in">
-        <span class="card-icon">🎤</span>
-        <h3>Wolfman Dave</h3>
-        <p>Just talk! Say things like "Show me funky albums from 1973" or "Find psychedelic rock" - your voice-controlled music search with that classic DJ voice! 🐺</p>
-        <div class="card-meta"><i class="bi-mic"></i> Voice Search</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/ai/assistant.html" class="tool-card fade-in">
-        <span class="card-icon">🤖</span>
-        <h3>Levi - AI Assistant</h3>
-        <p>Chat with Levi, your groovy biker hippie music assistant! Get recommendations, ask questions, and have fun conversations.</p>
-        <div class="card-meta"><i class="bi-chat-dots"></i> AI Assistant</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/finance/encompass-assistant.html" class="tool-card fade-in" style="border: 2px solid rgba(52, 152, 219, 0.6);">
-        <span class="card-icon">🏦</span>
-        <h3>Encompass AI Assistant</h3>
-        <p>Expert AI assistant for Encompass Developer Connect documentation. Get help with APIs, authentication, workflows, and best practices!</p>
-        <div class="card-meta"><i class="bi-bank"></i> Mortgage Tech</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/ai/voice-guide.html" class="tool-card fade-in" style="border: 2px solid rgba(135, 206, 250, 0.6);">
-        <span class="card-icon">📖</span>
-        <h3>Voice Control Guide</h3>
-        <p>Learn how to use voice commands! Master Wolfman Dave, voice-activated search, and AI conversations.</p>
-        <div class="card-meta"><i class="bi-book"></i> User Guide</div>
-      </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Entertainment Section -->
-    <div class="card">
-      <div class="card-header" id="headingEntertainment">
-        <h2 class="mb-0">
-          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseEntertainment" aria-expanded="false" aria-controls="collapseEntertainment" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-stars"></i> Entertainment <span class="section-count-badge">6</span>
-            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Visuals, music player, and cosmic experiences</small>
-          </button>
-        </h2>
-      </div>
-      <div id="collapseEntertainment" class="collapse" aria-labelledby="headingEntertainment">
-        <div class="card-body">
-          <div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/entertainment/player.html" class="tool-card fade-in">
-        <span class="card-icon">📻</span>
-        <h3>The Boombox</h3>
-        <p>Audio player UI (works in cloud via browser stream; Pi does local playback).</p>
-        <div class="card-meta"><i class="bi-music-note-beamed"></i> Audio tools</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/entertainment/visualizer.html" class="tool-card fade-in">
-        <span class="card-icon">🌀</span>
-        <h3>Psychedelic Visualizer</h3>
-        <p>Trippy DMT-inspired fractal animations and mind-bending visual effects. Experience the cosmos!</p>
-        <div class="card-meta"><i class="bi-stars"></i> Visual Journey</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/entertainment/blacklight.html" class="tool-card fade-in">
-        <span class="card-icon">⚡</span>
-        <h3>Black Light Zone</h3>
-        <p>Cosmic knowledge search with neon vibes and cosmic posters.</p>
-        <div class="card-meta"><i class="bi-lightning"></i> Cosmic Search</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/entertainment/poster-generator.html" class="tool-card fade-in">
-        <span class="card-icon">🎨</span>
-        <h3>AI Poster Generator</h3>
-        <p>Transform album covers into psychedelic concert posters! Choose from 60s Fillmore, 70s blacklight, modern neon, or trippy psychedelic styles!</p>
-        <div class="card-meta"><i class="bi-palette"></i> AI Art Creation</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/entertainment/art-gallery.html" class="tool-card fade-in">
-        <span class="card-icon">🎨</span>
-        <h3>The Art Gallery</h3>
-        <p>A refined gallery experience with museum-quality presentation of fine art and music.</p>
-        <div class="card-meta"><i class="bi-image"></i> Fine Art Gallery</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/entertainment/ouija-board.html" class="tool-card fade-in">
-        <span class="card-icon">🔮</span>
-        <h3>Ouija Board</h3>
-        <p>Communicate with Houdini, the Spirit of Music. Ask questions and watch letters materialize on the mystical board.</p>
-        <div class="card-meta"><i class="bi-magic"></i> Mystical Communication</div>
-      </a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Nature Section -->
-    <div class="card">
-      <div class="card-header" id="headingNature">
-        <h2 class="mb-0">
-          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseNature" aria-expanded="false" aria-controls="collapseNature" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-tree-fill"></i> Nature <span class="section-count-badge">4</span>
-            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Trees with Smokey & wildlife critter discovery</small>
-          </button>
-        </h2>
-      </div>
-      <div id="collapseNature" class="collapse" aria-labelledby="headingNature">
-        <div class="card-body">
-          <div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/nature/tree-discovery.html" class="tool-card fade-in">
-        <span class="card-icon">🌲</span>
-        <h3>Tree Discovery with Smokey 🐻</h3>
-        <p>Identify trees by photo with Smokey the Bear! Learn about North American trees, conservation, and forest ecology!</p>
-        <div class="card-meta"><i class="bi-tree-fill"></i> Nature Discovery</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/nature/tree-collection.html" class="tool-card fade-in">
-        <span class="card-icon">🌲</span>
-        <h3>Tree Collection 🌲</h3>
-        <p>Your personal tree collection with photos, locations, and field notes!</p>
-        <div class="card-meta"><i class="bi-trees"></i> Forest Collection</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/nature/critter-discovery.html" class="tool-card fade-in">
-        <span class="card-icon">🦎</span>
-        <h3>Critter Discovery</h3>
-        <p>Identify animals from photos! Spot wildlife, record locations, and add to your collection.</p>
-        <div class="card-meta"><i class="bi-bug-fill"></i> Wildlife Discovery</div>
-      </a>
-    </div>
-
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/nature/critter-collection.html" class="tool-card fade-in">
-        <span class="card-icon">🦊</span>
-        <h3>Critter Collection</h3>
-        <p>Your wildlife sightings with photos, habitats, and spotting locations!</p>
-        <div class="card-meta"><i class="bi-bug"></i> Wildlife Collection</div>
-      </a>
-    </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Local Section -->
-    <div class="card">
-      <div class="card-header" id="headingLocal">
-        <h2 class="mb-0">
-          <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseLocal" aria-expanded="false" aria-controls="collapseLocal" style="font-size: 1.5rem; color: var(--ice-primary); text-decoration: none; font-weight: 600;">
-            <i class="bi-geo-alt-fill"></i> Local <span class="section-count-badge">1</span>
-            <small style="font-size: 0.9rem; color: var(--muted); display: block; margin-top: 5px; font-weight: 400;">Your favorite local spots on the map</small>
-          </button>
-        </h2>
-      </div>
-      <div id="collapseLocal" class="collapse" aria-labelledby="headingLocal">
-        <div class="card-body">
-          <div class="row mb-4">
-    <div class="col-lg-4 col-md-6 mb-3">
-      <a href="/local/local-spots.html" class="tool-card fade-in">
-        <span class="card-icon">📍</span>
-        <h3>My Local Spots</h3>
-        <p>Thrift shops, taco trucks, gardens, bike trails, fishing, kayak, and concert venues.</p>
-        <div class="card-meta"><i class="bi-geo-alt"></i> Local Map</div>
-      </a>
-    </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-  </div><!-- End accordion -->
-  
+  <div class="domain-grid">
+    <a href="/music/music-research.html" class="domain-tile" title="Music research, albums, Spotify, song ID">
+      <i class="bi-music-note-beamed"></i>
+      <span>Music</span>
+    </a>
+    <a href="/finance/index.html" class="domain-tile" title="Encompass, calculators, unit tests">
+      <i class="bi-bank"></i>
+      <span>Finance</span>
+    </a>
+    <a href="/nature/nature-hub.html" class="domain-tile" title="Trees, critters, field guide">
+      <i class="bi-tree-fill"></i>
+      <span>Nature</span>
+    </a>
+    <a href="/bike-store-home.html" class="domain-tile" title="Bike shop, peloton, discover">
+      <i class="bi-bicycle"></i>
+      <span>Bike</span>
+    </a>
+    <a href="/ai/voice-dj.html" class="domain-tile" title="Wolfman Dave, Levi, voice guide">
+      <i class="bi-robot"></i>
+      <span>AI & Voice</span>
+    </a>
+    <a href="/entertainment/player.html" class="domain-tile" title="Boombox, visualizer, posters">
+      <i class="bi-stars"></i>
+      <span>Entertainment</span>
+    </a>
+    <a href="/local/local-spots.html" class="domain-tile" title="Local spots map">
+      <i class="bi-geo-alt-fill"></i>
+      <span>Local</span>
+    </a>
+    <a href="/family/genealogy.html" class="domain-tile" title="Family tree">
+      <i class="bi-people-fill"></i>
+      <span>Family</span>
+    </a>
+  </div>
+  <p class="text-center text-muted mt-3 mb-4 small">Click a domain to explore. Press <kbd>Ctrl+K</kbd> to search all tools.</p>
 </main>
 
 <div class="voice-help" id="helpPanel">
@@ -793,27 +425,5 @@ if (closeHelpBtn && helpPanel) {
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-// Expand accordion section when navigating with hash (e.g. /#headingMusic, /#headingEntertainment)
-(function() {
-  var hash = window.location.hash;
-  if (!hash) return;
-  var collapseMap = {
-    'headingMusic': 'collapseMusic',
-    'headingBike': 'collapseBike',
-    'headingAI': 'collapseAI',
-    'headingEntertainment': 'collapseEntertainment',
-    'headingNature': 'collapseNature'
-  };
-  var id = hash.replace('#', '');
-  var collapseId = collapseMap[id];
-  if (collapseId) {
-    var el = document.getElementById(collapseId);
-    if (el && typeof $ !== 'undefined' && $.fn.collapse) {
-      $(el).collapse('show');
-    }
-  }
-})();
-</script>
 </body>
 </html>

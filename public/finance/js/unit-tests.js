@@ -611,7 +611,8 @@ function generateColumnDefs(headers, rows) {
       };
       colDef.cellClass = (params) => {
         let cls = 'test-scenario-cell';
-        const key = `${params.rowIndex}-${params.colDef?.field || ''}`;
+        const rowId = params.data?.__rowIndex ?? params.node?.id ?? params.rowIndex;
+        const key = `${rowId}-${params.colDef?.field || ''}`;
         const result = lastRunCellResults[key];
         if (result === 'pass') cls += ' cell-pass';
         else if (result === 'fail') cls += ' cell-fail';
@@ -699,6 +700,7 @@ function initializeGrid() {
   const gridOptions = {
     columnDefs: columnDefs,
     rowData: [],
+    getRowId: (params) => String(params.data?.__rowIndex ?? params.rowIndex ?? ''),
     components: { DatePickerCellEditor: DatePickerCellEditor },
     theme: 'legacy',
     singleClickEdit: true,
@@ -822,42 +824,13 @@ function getActiveTestNumber() {
 
 function findTestColumnByNumber(testNumber) {
   if (!Array.isArray(columnDefs)) return null;
-  const descriptionIndex = columnDefs.findIndex((colDef) => {
-    const header = String(colDef.headerName || colDef.field || '').trim().toLowerCase();
-    return header === 'description';
-  });
-  if (descriptionIndex >= 0) {
-    if (testNumber) {
-      const offset = parseInt(testNumber, 10);
-      if (!Number.isNaN(offset)) {
-        const targetIndex = descriptionIndex + offset + 1;
-        const targetCol = columnDefs[targetIndex];
-        if (targetCol?.field) {
-          return { field: targetCol.field, testNumber: String(testNumber) };
-        }
-      }
-    } else {
-      const resetCol = columnDefs[descriptionIndex + 1];
-      if (resetCol?.field) {
-        return { field: resetCol.field, testNumber: 'RESET' };
-      }
-    }
+  const ordered = getOrderedTestColumns();
+  if (testNumber) {
+    const match = ordered.find((c) => c.testNumber === String(testNumber));
+    return match || null;
   }
-
-  if (!testNumber) return null;
-  const patterns = [
-    `Test ${testNumber}`,
-    `Test${testNumber}`,
-    `Test #${testNumber}`,
-    `Test#${testNumber}`,
-    `Test-${testNumber}`,
-    `Test_${testNumber}`
-  ];
-  const match = columnDefs.find((colDef) => {
-    const header = String(colDef.headerName || colDef.field || '').trim();
-    return patterns.some(pattern => header.toLowerCase() === pattern.toLowerCase());
-  });
-  return match ? { field: match.field, testNumber: String(testNumber) } : null;
+  const resetCol = ordered.find((c) => c.testNumber === 'RESET');
+  return resetCol || null;
 }
 
 function findFallbackTestColumn() {
@@ -933,6 +906,27 @@ function pickTestColumnForRow(row) {
     return value !== null && value !== undefined && String(value).trim() !== '';
   });
   return nonEmpty || testColumns[0];
+}
+
+/**
+ * Copy one scenario column's values to the next column (e.g. Test #1 → Test #2).
+ * @param {string} testNumber - Source test number (e.g. "1")
+ * @returns {boolean} true if copy succeeded
+ */
+function copyColumnToNext(testNumber) {
+  if (!allData || allData.length === 0) return false;
+  const ordered = getOrderedTestColumns().filter((c) => c.testNumber && c.testNumber !== 'RESET');
+  const idx = ordered.findIndex((c) => c.testNumber === String(testNumber));
+  if (idx < 0 || idx >= ordered.length - 1) return false;
+  const srcCol = ordered[idx];
+  const dstCol = ordered[idx + 1];
+  if (!srcCol?.field || !dstCol?.field) return false;
+  allData.forEach((row) => {
+    const val = row[srcCol.field];
+    row[dstCol.field] = val !== undefined && val !== null ? val : '';
+  });
+  setGridRows(allData);
+  return true;
 }
 
 function pickTestValue(testValues) {
@@ -1226,9 +1220,14 @@ function displayTestDescriptions(testDescriptions) {
             <div class="test-description-text">${escapeHtml(test.description || '')}</div>
             <button type="button" class="btn btn-sm scenario-edit-toggle ml-auto" title="Edit scenario"><i class="bi-pencil mr-1"></i>Edit</button>
           </div>
-          <button type="button" class="scenario-run-btn" data-run-scenario="${test.testNumber}">
-            <i class="bi-play-fill"></i> Run
-          </button>
+          <div class="scenario-card-actions">
+            <button type="button" class="btn btn-sm btn-outline-secondary scenario-copy-to-next-btn" data-copy-from="${test.testNumber}" title="Copy this column to next scenario">
+              <i class="bi-arrow-right-circle"></i> Copy to Next
+            </button>
+            <button type="button" class="scenario-run-btn" data-run-scenario="${test.testNumber}">
+              <i class="bi-play-fill"></i> Run
+            </button>
+          </div>
         </div>
         <div class="scenario-card-face scenario-card-back">
           <div class="scenario-card-back-header">
@@ -1259,7 +1258,7 @@ function displayTestDescriptions(testDescriptions) {
     }
 
     frontFace.addEventListener('click', (e) => {
-      if (e.target.closest('.scenario-run-btn') || e.target.closest('.scenario-edit-toggle')) return;
+      if (e.target.closest('.scenario-run-btn') || e.target.closest('.scenario-edit-toggle') || e.target.closest('.scenario-copy-to-next-btn')) return;
       document.querySelectorAll('.test-description-card').forEach(card => {
         card.classList.remove('test-scenario-active');
       });
@@ -1271,6 +1270,18 @@ function displayTestDescriptions(testDescriptions) {
       e.stopPropagation();
       runTests(test.testNumber);
     });
+
+    const copyToNextBtn = cardElement.querySelector('.scenario-copy-to-next-btn');
+    if (copyToNextBtn) {
+      copyToNextBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (copyColumnToNext(test.testNumber)) {
+          showToast(`Copied Test ${test.testNumber} to next column`, 'success');
+        } else {
+          showToast('No next column to copy to', 'warning');
+        }
+      });
+    }
 
     const editIcon = cardElement.querySelector('.scenario-edit-toggle');
     editIcon.addEventListener('click', (e) => {
@@ -2055,8 +2066,8 @@ async function runTests(singleTestNumber) {
 
     if (isSingleRun) {
       const msg = `Test ${singleTestNumber}: ${passed} passed, ${failed} failed, ${skipped} skipped`;
-      showToast(msg, failed > 0 ? 'warning' : 'success');
-      setStatus(msg, failed > 0 ? 'err' : 'ok', failed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
+      showToast(msg, scenarioFailed > 0 ? 'warning' : 'success');
+      setStatus(msg, scenarioFailed > 0 ? 'err' : 'ok', scenarioFailed > 0 ? 'bi-exclamation-octagon' : 'bi-check-circle');
     } else {
       displayTestResults(results, scenarioSummary, scenarioPassed, scenarioFailed, scenarioSkipped, scenarioTotal);
       updateRunSummary(scenarioPassed, scenarioFailed, scenarioSkipped, scenarioTotal);
@@ -2102,10 +2113,11 @@ function aggregateResultsByScenario(results) {
     .map((key) => {
       const s = byScenario[key];
       const steps = s.steps;
-      const hasFail = steps.some((r) => r.status === 'err');
+      const compareSteps = steps.filter((r) => (r.action || '').toUpperCase() === 'COMPARE');
+      const hasComparePass = compareSteps.some((r) => r.status === 'info');
       const hasPass = steps.some((r) => r.status === 'info');
       const allSkipped = steps.every((r) => r.status === 'skipped');
-      const passed = !hasFail && hasPass && !allSkipped;
+      const passed = compareSteps.length === 0 ? (hasPass && !allSkipped) : hasComparePass;
       const skipped = allSkipped;
       return {
         testNumber: s.testNumber,
@@ -2263,7 +2275,7 @@ async function handleFileUpload(file) {
     
     // Generate column definitions
     columnDefs = generateColumnDefs(headers, rows);
-    allData = rows;
+    allData = rows.map((r, i) => ({ ...r, __rowIndex: i }));
     lastRunCellResults = {};
 
     // Initialize grid if not already done
@@ -2275,6 +2287,13 @@ async function handleFileUpload(file) {
       gridApi.refreshCells({ force: true });
     }
     showAllColumns();
+
+    // Load Encompass metadata for SET rows (dropdowns, date pickers) - same as custom field generation
+    loadMetadataForSetRowsFromEncompass().then(({ dropdownCount }) => {
+      if (dropdownCount > 0) {
+        showToast(`Loaded metadata: ${dropdownCount} field(s) with dropdowns`, 'info');
+      }
+    }).catch(() => { /* API may be unavailable; grid still works with text editors */ });
 
     // Count scenario columns: Reset, Test 1..N only; stop at first blank or non-Test
     const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
@@ -2824,7 +2843,7 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
   const fallback = window.customFieldCalcParser?.getFallbackFieldMetadata?.() || {};
   currentFieldMetadata = { ...fallback, ...(fieldMetadata || {}) };
   columnDefs = generateColumnDefs(headers, rows);
-  allData = rows;
+  allData = rows.map((r, i) => ({ ...r, __rowIndex: i }));
   lastRunCellResults = {};
 
   initializeGrid();
@@ -2921,6 +2940,81 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
 }
 
 /**
+ * Load Encompass field metadata for SET rows and merge into currentFieldMetadata.
+ * Enables dropdowns (enumerated) and date pickers based on field definitions.
+ * @returns {Promise<{fieldMeta: object, dropdownCount: number}>}
+ */
+async function loadMetadataForSetRowsFromEncompass() {
+  if (!allData || allData.length === 0) return { fieldMeta: {}, dropdownCount: 0 };
+  const setRows = allData.filter((r) => {
+    const action = String(r.Action || r.action || '').trim().toUpperCase();
+    return action === 'SET';
+  });
+  if (setRows.length === 0) return { fieldMeta: {}, dropdownCount: 0 };
+
+  const [customRes, nativeRes] = await Promise.all([
+    (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/custom-fields'),
+    (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/native-fields'),
+  ]);
+  const customItems = customRes.ok ? (await customRes.json()) : [];
+  const customList = Array.isArray(customItems) ? customItems : customItems.items || customItems.fields || [];
+  const nativeItems = nativeRes.ok ? (await nativeRes.json()) : [];
+  const nativeList = Array.isArray(nativeItems) ? nativeItems : nativeItems.items || nativeItems.fields || nativeItems.standardFields || [];
+
+  const fieldMeta = {};
+  const addMeta = (item, source) => {
+    const id = String(item.fieldId || item.id || item.Id || item.fieldName || item.name || '').trim();
+    if (!id) return;
+    const baseId = id.replace(/^[@#]+/, '');
+    const readOnly = !!(item.readOnly ?? item.isReadOnly ?? false);
+    const isCalc = !!(item.isCalculatedField ?? item.isCalculated ?? item.calculated ?? item.isCalculation ?? false);
+    const fmt = String(item.format || item.formatType || item.Format || '').toUpperCase();
+    const dt = String(item.dataType || item.DataType || item.type || '').toUpperCase();
+    const rawOpts = item.options ?? item.Options ?? item.values ?? item.Values ?? item.enum ?? item.Enum;
+    const options = Array.isArray(rawOpts) && rawOpts.length > 0
+      ? rawOpts.map((o) => (o && typeof o === 'object' ? (o.Value ?? o.value ?? o.Key ?? o.key ?? o.Label ?? o.label ?? o.Text ?? o.text ?? String(o)) : String(o)))
+      : null;
+    for (const key of [baseId, id]) {
+      if (!key) continue;
+      if (!fieldMeta[key]) fieldMeta[key] = { id: baseId, readOnly: false, isCalculated: false, source: '' };
+      fieldMeta[key].readOnly = fieldMeta[key].readOnly || readOnly;
+      fieldMeta[key].isCalculated = fieldMeta[key].isCalculated || isCalc;
+      if (!fieldMeta[key].source) fieldMeta[key].source = source;
+      const isDropdownFormat = /^(DROPDOWN|DROPDOWNLIST|SELECT|LIST|COMBO)$/i.test(fmt);
+      if (options && isDropdownFormat) {
+        fieldMeta[key].options = options;
+        fieldMeta[key].dataType = fieldMeta[key].dataType || 'String';
+      }
+      if (/^(DATE|DATETIME|DATETIMEOFFSET)$/i.test(fmt) || /^(DATE|DATETIME)$/i.test(dt)) {
+        fieldMeta[key].dataType = fieldMeta[key].dataType || (/DATETIME/i.test(fmt) || /DATETIME/i.test(dt) ? 'DateTime' : 'Date');
+      }
+    }
+  };
+  customList.forEach((item) => addMeta(item, 'custom'));
+  nativeList.forEach((item) => addMeta(item, 'native'));
+
+  if (typeof currentFieldMetadata !== 'object') currentFieldMetadata = {};
+  const fallback = window.customFieldCalcParser?.getFallbackFieldMetadata?.() || {};
+  Object.assign(currentFieldMetadata, fallback);
+  const uniqueDropdownIds = new Set();
+  Object.keys(fieldMeta).forEach((k) => {
+    const m = fieldMeta[k];
+    if (!currentFieldMetadata[k]) currentFieldMetadata[k] = {};
+    if (m.options && m.options.length > 0) {
+      currentFieldMetadata[k].options = m.options;
+      currentFieldMetadata[k].dataType = currentFieldMetadata[k].dataType || 'String';
+      uniqueDropdownIds.add(m.id || k);
+    }
+    if (m.dataType) currentFieldMetadata[k].dataType = currentFieldMetadata[k].dataType || m.dataType;
+  });
+  const dropdownCount = uniqueDropdownIds.size;
+  if (gridApi && typeof gridApi.refreshCells === 'function') {
+    gridApi.refreshCells({ force: true });
+  }
+  return { fieldMeta, dropdownCount };
+}
+
+/**
  * Initialize Scan SET Fields button and modal.
  * Scans SET rows for read-only or calculated fields that will fail if not addressed.
  */
@@ -2964,61 +3058,7 @@ function initializeScanSetFields() {
     }
 
     try {
-      const [customRes, nativeRes] = await Promise.all([
-        (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/custom-fields'),
-        (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/native-fields'),
-      ]);
-      const customItems = customRes.ok
-        ? (await customRes.json())
-        : [];
-      const customList = Array.isArray(customItems) ? customItems : customItems.items || customItems.fields || [];
-      const nativeItems = nativeRes.ok
-        ? (await nativeRes.json())
-        : [];
-      const nativeList = Array.isArray(nativeItems) ? nativeItems : nativeItems.items || nativeItems.fields || nativeItems.standardFields || [];
-
-      const fieldMeta = {};
-      const addMeta = (item, source) => {
-        const id = String(item.fieldId || item.id || item.Id || item.fieldName || item.name || '').trim();
-        if (!id) return;
-        const baseId = id.replace(/^[@#]+/, '');
-        const readOnly = !!(item.readOnly ?? item.isReadOnly ?? false);
-        const isCalc = !!(item.isCalculatedField ?? item.isCalculated ?? item.calculated ?? item.isCalculation ?? false);
-        const fmt = String(item.format || item.formatType || '').toUpperCase();
-        const rawOpts = item.options ?? item.Options ?? item.values ?? item.Values ?? item.enum ?? item.Enum;
-        const options = Array.isArray(rawOpts) && rawOpts.length > 0
-          ? rawOpts.map((o) => (o && typeof o === 'object' ? (o.Value ?? o.value ?? o.Key ?? o.key ?? o.Label ?? o.label ?? o.Text ?? o.text ?? String(o)) : String(o)))
-          : null;
-        for (const key of [baseId, id]) {
-          if (!key) continue;
-          if (!fieldMeta[key]) fieldMeta[key] = { id: baseId, readOnly: false, isCalculated: false, source: '' };
-          fieldMeta[key].readOnly = fieldMeta[key].readOnly || readOnly;
-          fieldMeta[key].isCalculated = fieldMeta[key].isCalculated || isCalc;
-          if (!fieldMeta[key].source) fieldMeta[key].source = source;
-          const isDropdownFormat = /^(DROPDOWN|DROPDOWNLIST|SELECT|LIST|COMBO)$/i.test(fmt);
-          if (options && isDropdownFormat) {
-            fieldMeta[key].options = options;
-            fieldMeta[key].dataType = fieldMeta[key].dataType || 'String';
-          }
-        }
-      };
-      customList.forEach((item) => addMeta(item, 'custom'));
-      nativeList.forEach((item) => addMeta(item, 'native'));
-
-      // Merge enumerated options into currentFieldMetadata so grid uses dropdowns for SET rows (API only, no fallback)
-      if (typeof currentFieldMetadata === 'object') {
-        Object.keys(fieldMeta).forEach((k) => {
-          const opts = fieldMeta[k].options;
-          if (opts && opts.length > 0) {
-            if (!currentFieldMetadata[k]) currentFieldMetadata[k] = {};
-            currentFieldMetadata[k].options = opts;
-            if (!currentFieldMetadata[k].dataType) currentFieldMetadata[k].dataType = 'String';
-          }
-        });
-        if (gridApi && typeof gridApi.refreshCells === 'function') {
-          gridApi.refreshCells({ force: true });
-        }
-      }
+      const { fieldMeta } = await loadMetadataForSetRowsFromEncompass();
 
       const problems = [];
       const checked = new Set();

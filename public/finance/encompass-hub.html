@@ -42,7 +42,7 @@
       }
 
       .hero {
-        padding: 5rem 1rem 2.5rem;
+        padding: 3.5rem 1rem 2rem;
         text-align: center;
       }
 
@@ -74,27 +74,6 @@
         margin: 0.75rem auto 0;
         font-size: 1.05rem;
         line-height: 1.65;
-      }
-
-      .hero-insights {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        margin: 1.25rem auto 0;
-      }
-
-      .insight-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 0.4rem 1rem;
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(135, 206, 250, 0.2);
-        color: var(--ice-dark, #2c3e50);
-        font-size: 0.9rem;
-        font-weight: 600;
       }
 
       .hero-actions {
@@ -134,19 +113,6 @@
         background: rgba(255, 255, 255, 1);
         border-color: rgba(102, 126, 234, 0.5);
         color: #667eea;
-      }
-
-      .hero-actions-secondary {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 1rem;
-      }
-
-      .hero-actions-secondary .btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
       }
 
       main.main-shell {
@@ -340,35 +306,9 @@
         color: #764ba2;
       }
 
-      .floating-cash {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: -1;
-        overflow: hidden;
-      }
-
-      .cash-symbol {
-        position: absolute;
-        font-size: 26px;
-        animation: floatCash 18s linear infinite;
-        opacity: 0;
-        z-index: 1;
-      }
-
-      .cash-symbol.dollar { color: rgba(52, 199, 89, 0.4); }
-      .cash-symbol.coin { color: rgba(240, 196, 15, 0.45); }
-      .cash-symbol:nth-child(1) { left: 8%; animation-delay: 0s; }
-      .cash-symbol:nth-child(2) { left: 20%; animation-delay: 2s; }
-      .cash-symbol:nth-child(3) { left: 35%; animation-delay: 4s; }
-      .cash-symbol:nth-child(4) { left: 50%; animation-delay: 6s; }
-      .cash-symbol:nth-child(5) { left: 65%; animation-delay: 8s; }
-      .cash-symbol:nth-child(6) { left: 80%; animation-delay: 10s; }
-      @keyframes floatCash {
-        0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-        8% { opacity: 0.5; }
-        92% { opacity: 0.5; }
-        100% { transform: translateY(-120px) rotate(360deg); opacity: 0; }
+      .status-chip.warn {
+        background: rgba(241, 196, 15, 0.18);
+        color: #8a6d00;
       }
 
       @media (max-width: 992px) {
@@ -386,31 +326,15 @@
   </head>
   <body data-page="encompass-hub">
     <div class="particles" id="particles"></div>
-    <div class="floating-cash" aria-hidden="true">
-      <div class="cash-symbol dollar">$</div>
-      <div class="cash-symbol coin">¢</div>
-      <div class="cash-symbol dollar">$</div>
-      <div class="cash-symbol coin">¢</div>
-      <div class="cash-symbol dollar">$</div>
-      <div class="cash-symbol coin">¢</div>
-    </div>
-
     <modern-navbar></modern-navbar>
 
     <section class="hero">
       <div class="container">
-        <span class="badge badge-pill mb-2"><i class="bi-cloud"></i> Encompass Developer Connect</span>
+        <span class="badge badge-pill mb-2"><i class="bi-cloud"></i> Developer Connect</span>
         <h1>Encompass Hub</h1>
         <p>
-          Monitor live pipeline data, drill into individual loans, and validate field-level values directly from Encompass
-          Developer Connect APIs. Every call stays server-side so your credentials remain secure inside the .env vault.
+          Monitor live pipeline data, drill into loans, and validate field values from Encompass APIs. All calls stay server-side.
         </p>
-
-        <div class="hero-insights">
-          <span class="insight-chip"><i class="bi-lightning-charge"></i>Live Pipeline Slice</span>
-          <span class="insight-chip"><i class="bi-diagram-3"></i>Loan Task Visibility</span>
-          <span class="insight-chip"><i class="bi-cpu"></i>Voice Activated</span>
-        </div>
 
         <div class="hero-actions">
           <button class="btn btn-primary btn-lg" id="loadPipelineCta">
@@ -420,25 +344,15 @@
             <i class="bi-mic"></i> Voice Commands
           </button>
           <a class="btn btn-light" href="encompass-analytics.html">
-            <i class="bi-graph-up"></i> Analytics Dashboard
+            <i class="bi-graph-up"></i> Analytics
           </a>
-          <div class="hero-actions-secondary">
-            <a class="btn btn-outline-light" href="encompass-hub-test.html">
-              <i class="bi-clipboard-check"></i> Test Endpoints
-            </a>
-            <a class="btn btn-outline-light" href="unit-tests.html">
-              <i class="bi-check2-circle"></i> Unit Tests
-            </a>
-            <a class="btn btn-outline-light" href="encompass-users.html">
-              <i class="bi-people"></i> Users
-            </a>
-            <a class="btn btn-outline-light" href="encompass-native-fields.html">
-              <i class="bi-list-columns"></i> Native Fields
-            </a>
-            <a class="btn btn-outline-light" href="encompass-custom-fields.html">
-              <i class="bi-sliders"></i> Custom Fields
-            </a>
-          </div>
+        </div>
+        <div class="domain-grid domain-grid-sm mt-3" style="max-width: 520px; margin-left: auto; margin-right: auto;">
+          <a href="encompass-hub-test.html" class="domain-tile" title="Test API endpoints"><i class="bi-clipboard-check"></i><span>Test Endpoints</span></a>
+          <a href="unit-tests.html" class="domain-tile" title="Unit test runner"><i class="bi-check2-circle"></i><span>Unit Tests</span></a>
+          <a href="encompass-users.html" class="domain-tile" title="User directory"><i class="bi-people"></i><span>Users</span></a>
+          <a href="encompass-native-fields.html" class="domain-tile" title="Native field definitions"><i class="bi-list-columns"></i><span>Native Fields</span></a>
+          <a href="encompass-custom-fields.html" class="domain-tile" title="Custom field config"><i class="bi-sliders"></i><span>Custom Fields</span></a>
         </div>
       </div>
     </section>
@@ -518,35 +432,14 @@
               <i class="bi-eraser"></i> Clear Filters
             </button>
           </div>
-          <div class="hub-card p-4">
-            <h5 class="mb-3">API Shortcuts</h5>
-            <p class="text-muted mb-3">Open the raw JSON feeds powering calculators and 3D visualizations.</p>
-            <ul class="list-unstyled mb-0">
-              <li class="mb-2">
-                <a href="/api/encompass-hub/analytics/calc-summary" target="_blank" rel="noreferrer">
-                  <i class="bi-graph-up"></i> Calculator Summary
-                </a>
-              </li>
-              <li class="mb-2">
-                <a href="/api/encompass-hub/analytics/ratios" target="_blank" rel="noreferrer">
-                  <i class="bi-percent"></i> Ratio Analytics
-                </a>
-              </li>
-              <li class="mb-2">
-                <a href="/api/encompass-hub/visualizations/map3d" target="_blank" rel="noreferrer">
-                  <i class="bi-geo"></i> 3D Map Dataset
-                </a>
-              </li>
-              <li class="mb-2">
-                <a href="/api/encompass-hub/visualizations/stacked-cubes" target="_blank" rel="noreferrer">
-                  <i class="bi-layers"></i> Stacked Cubes Dataset
-                </a>
-              </li>
-              <li>
-                <a href="/api/encompass-hub/visualizations/timeline" target="_blank" rel="noreferrer">
-                  <i class="bi-calendar3"></i> Timeline Dataset
-                </a>
-              </li>
+          <div class="hub-card p-3 mt-3">
+            <h6 class="mb-2">API Shortcuts</h6>
+            <ul class="list-unstyled mb-0 small">
+              <li class="mb-1"><a href="/api/encompass-hub/analytics/calc-summary" target="_blank" rel="noreferrer"><i class="bi-graph-up"></i> Calc Summary</a></li>
+              <li class="mb-1"><a href="/api/encompass-hub/analytics/ratios" target="_blank" rel="noreferrer"><i class="bi-percent"></i> Ratios</a></li>
+              <li class="mb-1"><a href="/api/encompass-hub/visualizations/map3d" target="_blank" rel="noreferrer"><i class="bi-geo"></i> 3D Map</a></li>
+              <li class="mb-1"><a href="/api/encompass-hub/visualizations/stacked-cubes" target="_blank" rel="noreferrer"><i class="bi-layers"></i> Stacked Cubes</a></li>
+              <li><a href="/api/encompass-hub/visualizations/timeline" target="_blank" rel="noreferrer"><i class="bi-calendar3"></i> Timeline</a></li>
             </ul>
           </div>
         </div>
