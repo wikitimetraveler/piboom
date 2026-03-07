@@ -1,9 +1,9 @@
 /**
  * Music mini-navigation (Research / Album Discovery / My Collection)
- * Lightweight, self-contained, with graceful fallback.
+ * Uses MENU_CONFIG.MUSIC_TOOLS when available; fallback to local data.
  */
 (function () {
-  const NAV_ITEMS = [
+  const FALLBACK_ITEMS = [
     { href: '/music/music-research.html', label: 'Music Research', icon: 'bi-search', title: 'Search albums, artists, Spotify' },
     { href: '/music/album-discovery.html', label: 'Album Discovery', icon: 'bi-disc', title: 'Discover albums' },
     { href: '/music/collection.html', label: 'My Collection', icon: 'bi-collection-fill', title: 'Your music collection' },
@@ -12,6 +12,10 @@
     { href: '/music/music-time-machine.html', label: 'Time Machine', icon: 'bi-clock-history', title: 'Music time machine' },
   ];
 
+  function getNavItems() {
+    return (window.MENU_CONFIG && window.MENU_CONFIG.MUSIC_TOOLS) || FALLBACK_ITEMS;
+  }
+
   function renderMiniNav(container) {
     if (!container) return;
 
@@ -19,7 +23,7 @@
     const nav = document.createElement('div');
     nav.className = 'domain-grid domain-grid-sm music-mini-nav';
 
-    NAV_ITEMS.forEach(item => {
+    getNavItems().forEach(item => {
       const link = document.createElement('a');
       link.href = item.href;
       link.className = 'domain-tile';

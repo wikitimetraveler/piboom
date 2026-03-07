@@ -45,9 +45,22 @@ class ModernNavbar extends HTMLElement {
   }
 
   connectedCallback() {
-    this.render();
-    this.attachEventListeners();
-    this.injectToolSearchScripts();
+    this.ensureMenuConfig().then(() => {
+      this.render();
+      this.attachEventListeners();
+      this.injectToolSearchScripts();
+    });
+  }
+
+  ensureMenuConfig() {
+    if (window.MENU_CONFIG) return Promise.resolve();
+    return new Promise(function (resolve) {
+      const s = document.createElement('script');
+      s.src = '/shared/menu-config.js';
+      s.onload = resolve;
+      s.onerror = resolve;
+      document.head.appendChild(s);
+    });
   }
 
   injectToolSearchScripts() {
@@ -62,9 +75,38 @@ class ModernNavbar extends HTMLElement {
     };
   }
 
+  isDemoMode() {
+    const q = new URLSearchParams(location.search).get('demo');
+    if (q === '1') {
+      try { localStorage.setItem('demoMode', '1'); } catch (_) {}
+      return true;
+    }
+    if (q === '0') {
+      try { localStorage.removeItem('demoMode'); } catch (_) {}
+      return false;
+    }
+    try { return localStorage.getItem('demoMode') === '1'; } catch (_) { return false; }
+  }
+
+  renderDropdownItems(items) {
+    if (!items || !items.length) return '';
+    const cfg = window.MENU_CONFIG;
+    if (!cfg) return '';
+    return items.map(function (it) {
+      if (it.divider) return '<div class="dropdown-divider"></div>';
+      return '<a class="dropdown-item" href="' + it.href + '"><i class="bi ' + it.icon + '"></i> ' + it.label + '</a>';
+    }).join('\n                  ');
+  }
+
   render() {
     const brand = this.getAttribute('brand') || 'DevConnect Labs';
     const compact = this.hasAttribute('compact');
+    const demoMode = this.isDemoMode();
+    const cfg = window.MENU_CONFIG || {};
+    const navFinance = cfg.NAV_FINANCE || [];
+    const navMusic = cfg.NAV_MUSIC || [];
+    const navEnt = cfg.NAV_ENTERTAINMENT || [];
+    const navMore = cfg.NAV_MORE || [];
     this.shadowRoot.innerHTML = `
       <style>
         /* Professional Modern Navigation */
@@ -343,59 +385,38 @@ class ModernNavbar extends HTMLElement {
                   <i class="bi-bank"></i> Finance
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/finance/index.html">
-                    <i class="bi-calculator"></i> Finance Hub
-                  </a>
-                  <a class="dropdown-item" href="/finance/encompass-assistant.html">
-                    <i class="bi-robot"></i> Encompass Assistant
-                  </a>
-                  <a class="dropdown-item" href="/finance/encompass-hub.html">
-                    <i class="bi-columns-gap"></i> Encompass Hub
-                  </a>
-                  <a class="dropdown-item" href="/finance/pipeline-risk-dashboard.html">
-                    <i class="bi-shield-check"></i> Pipeline Risk Dashboard
-                  </a>
-                  <a class="dropdown-item" href="/finance/unit-tests.html">
-                    <i class="bi-clipboard-check"></i> Unit Tests
-                  </a>
-                  <a class="dropdown-item" href="/finance/tool9.html">
-                    <i class="bi-camera-reels"></i> The Screen Test
-                  </a>
+                  ${this.renderDropdownItems(navFinance)}
                 </div>
               </li>
 
-              <!-- Music Discovery Dropdown (Trimmed + Hub Link) -->
+              ${demoMode ? `
+              <li class="nav-item">
+                <a class="nav-link" href="/?demo=0" style="font-size:0.8rem;color:var(--muted,#888);" title="Show all domains">
+                  <i class="bi-grid-3x3-gap"></i> Show all
+                </a>
+              </li>
+              ` : ''}
+
+              ${!demoMode ? `<!-- Music Discovery Dropdown (Trimmed + Hub Link) -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button">
                   <i class="bi-music-note-beamed"></i> Music
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/music/music-research.html">
-                    <i class="bi-search"></i> Music Research
-                  </a>
-                  <a class="dropdown-item" href="/music/album-discovery.html">
-                    <i class="bi-disc"></i> Album Discovery
-                  </a>
-                  <a class="dropdown-item" href="/music/collection.html">
-                    <i class="bi-collection-fill"></i> My Collection
-                  </a>
-                  <a class="dropdown-item" href="/music/song-identifier.html">
-                    <i class="bi-soundwave"></i> Song Identifier
-                  </a>
-                  <a class="dropdown-item" href="/music/spotify-dashboard.html">
-                    <i class="bi-spotify"></i> Spotify
-                  </a>
-                  <a class="dropdown-item" href="/music/music-time-machine.html">
-                    <i class="bi-clock-history"></i> Time Machine
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="/#headingMusic">
-                    <i class="bi-grid-3x3-gap"></i> All Music Tools
-                  </a>
+                  ${this.renderDropdownItems(navMusic)}
                 </div>
               </li>
 
-              ${compact ? '' : `<!-- Entertainment Dropdown -->\n              <li class="nav-item dropdown">\n                <a class="nav-link dropdown-toggle" href="#" role="button">\n                  <i class="bi-stars"></i> Entertainment\n                </a>\n                <div class="dropdown-menu">\n                  <a class="dropdown-item" href="/entertainment/player.html">\n                    <i class="bi-volume-up"></i> The Boombox\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/visualizer.html">\n                    <i class="bi-palette-fill"></i> Psychedelic Visualizer\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/blacklight.html">\n                    <i class="bi-lightning"></i> Black Light Zone\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/poster-generator.html">\n                    <i class="bi-palette"></i> Poster Generator\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/art-gallery.html">\n                    <i class="bi-image"></i> Art Gallery\n                  </a>\n                  <a class="dropdown-item" href="/entertainment/ouija-board.html">\n                    <i class="bi-magic"></i> Ouija Board\n                  </a>\n                  <div class="dropdown-divider"></div>\n                  <a class="dropdown-item" href="/#headingEntertainment">\n                    <i class="bi-grid-3x3-gap"></i> All Entertainment\n                  </a>\n                </div>\n              </li>\n              `}
+              ${compact ? '' : `<!-- Entertainment Dropdown -->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button">
+                  <i class="bi-stars"></i> Entertainment
+                </a>
+                <div class="dropdown-menu">
+                  ${this.renderDropdownItems(navEnt)}
+                </div>
+              </li>
+              `}
 
               <!-- More Dropdown (Bike, AI, Family, Nature) -->
               <li class="nav-item dropdown">
@@ -403,42 +424,10 @@ class ModernNavbar extends HTMLElement {
                   <i class="bi-three-dots"></i> More
                 </a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="/bike-store-home.html">
-                    <i class="bi-bicycle"></i> Bike Store
-                  </a>
-                  <a class="dropdown-item" href="/ai/voice-dj.html">
-                    <i class="bi-mic"></i> Wolfman Dave
-                  </a>
-                  <a class="dropdown-item" href="/ai/assistant.html">
-                    <i class="bi-chat-dots"></i> Levi Assistant
-                  </a>
-                  <a class="dropdown-item" href="/ai/voice-guide.html">
-                    <i class="bi-book"></i> Voice Guide
-                  </a>
-                  <a class="dropdown-item" href="/family/genealogy.html">
-                    <i class="bi-diagram-3"></i> Family
-                  </a>
-                  <a class="dropdown-item" href="/nature/tree-discovery.html">
-                    <i class="bi-tree-fill"></i> Tree Discovery
-                  </a>
-                  <a class="dropdown-item" href="/nature/tree-collection.html">
-                    <i class="bi-trees"></i> Tree Collection
-                  </a>
-                  <a class="dropdown-item" href="/nature/critter-discovery.html">
-                    <i class="bi-bug-fill"></i> Critter Discovery
-                  </a>
-                  <a class="dropdown-item" href="/nature/critter-collection.html">
-                    <i class="bi-bug"></i> Critter Collection
-                  </a>
-                  <a class="dropdown-item" href="/local/local-spots.html">
-                    <i class="bi-geo-alt-fill"></i> Local Spots
-                  </a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="/">
-                    <i class="bi-house"></i> Hub (All Tools)
-                  </a>
+                  ${this.renderDropdownItems(navMore)}
                 </div>
               </li>
+              ` : ''}
             </ul>
           </div>
         </div>

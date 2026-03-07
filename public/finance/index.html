@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/menu-config.js"></script>
   <script src="/shared/modern-navbar.js"></script>
 
   <style>
@@ -104,33 +105,7 @@
 
 <main class="container">
   
-  <div class="domain-grid domain-grid-sm finance-grid" id="financeToolGrid">
-    <a href="fha-streamline-calculator.html" class="domain-tile" title="FHA Streamline refinance calculator"><i class="bi-calculator"></i><span>FHA Streamline</span></a>
-    <a href="asset-qualifier-calculator.html" class="domain-tile" title="Asset Qualifier Calculator"><i class="bi-wallet2"></i><span>Asset Qualifier</span></a>
-    <a href="fha-streamline-loan-amount-calculator.html" class="domain-tile" title="FHA Streamline Loan Amount"><i class="bi-cash-coin"></i><span>FHA Loan Amount</span></a>
-    <a href="fha-streamline-ntb-calculator.html" class="domain-tile" title="FHA Streamline NTB"><i class="bi-graph-up"></i><span>FHA NTB</span></a>
-    <a href="dti-calculator.html" class="domain-tile" title="Debt-to-Income Calculator"><i class="bi-percent"></i><span>DTI Calculator</span></a>
-    <a href="cashout-refinance-calculator.html" class="domain-tile" title="Cash-Out Refinance"><i class="bi-cash-coin"></i><span>Cash-Out</span></a>
-    <a href="amortization-schedule-calculator.html" class="domain-tile" title="Amortization Schedule"><i class="bi-calendar"></i><span>Amortization</span></a>
-    <a href="closing-cost-calculator.html" class="domain-tile" title="Closing Cost Calculator"><i class="bi-receipt"></i><span>Closing Cost</span></a>
-    <a href="ltv-calculator.html" class="domain-tile" title="Loan-to-Value Calculator"><i class="bi-house-door"></i><span>LTV</span></a>
-    <a href="va-irrrl-calculator.html" class="domain-tile" title="VA IRRRL Calculator"><i class="bi-calculator"></i><span>VA IRRRL</span></a>
-    <a href="disasters-unified.html" class="domain-tile" title="Unified Disasters (90-day)"><i class="bi-globe"></i><span>Unified Disasters</span></a>
-    <a href="pipeline-risk-dashboard.html" class="domain-tile" title="Pipeline Risk Dashboard"><i class="bi-shield-check"></i><span>Pipeline Risk</span></a>
-    <a href="encompass-assistant.html" class="domain-tile" title="Encompass AI Assistant"><i class="bi-robot"></i><span>Encompass Assistant</span></a>
-    <a href="encompass-hub.html" class="domain-tile" title="Encompass Hub"><i class="bi-cloud-arrow-down"></i><span>Encompass Hub</span></a>
-    <a href="encompass-users.html" class="domain-tile" title="Encompass Users"><i class="bi-people"></i><span>Encompass Users</span></a>
-    <a href="encompass-native-fields.html" class="domain-tile" title="Native Loan Fields"><i class="bi-list-columns"></i><span>Native Fields</span></a>
-    <a href="encompass-custom-fields.html" class="domain-tile" title="Custom Loan Fields"><i class="bi-sliders"></i><span>Custom Fields</span></a>
-    <a href="unit-tests.html" class="domain-tile" title="Unit Test Runner"><i class="bi-check2-circle"></i><span>Unit Tests</span></a>
-    <a href="tool2.html" class="domain-tile" title="The Parser"><i class="bi-code-slash"></i><span>Parser</span></a>
-    <a href="tool3.html" class="domain-tile" title="The Mashup"><i class="bi-globe"></i><span>Mashup</span></a>
-    <a href="tool4.html" class="domain-tile" title="The Automator"><i class="bi-gear"></i><span>Automator</span></a>
-    <a href="tool5.html" class="domain-tile" title="The Ruler"><i class="bi-rulers"></i><span>Ruler</span></a>
-    <a href="tool6.html" class="domain-tile" title="The Transformer"><i class="bi-arrow-repeat"></i><span>Transformer</span></a>
-    <a href="tool8.html" class="domain-tile" title="The Alchemist"><i class="bi-magic"></i><span>Alchemist</span></a>
-    <a href="tool9.html" class="domain-tile" title="The Screen Test"><i class="bi-camera-reels"></i><span>Screen Test</span></a>
-  </div>
+  <div class="domain-grid domain-grid-sm finance-grid" id="financeToolGrid"><!-- populated by menu-config --></div>
   
 </main>
 
@@ -160,6 +135,14 @@
 <script src="/shared/voice-widget.js"></script>
 <script src="/shared/dark-mode.js"></script>
 <script>
+// Populate finance tool grid from menu config
+window.addEventListener('DOMContentLoaded', () => {
+  const grid = document.getElementById('financeToolGrid');
+  if (grid && window.MENU_CONFIG && window.MENU_CONFIG.FINANCE_TOOLS) {
+    grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.FINANCE_TOOLS);
+  }
+});
+
 // Initialize voice widget
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof initVoiceWidget === 'function') {

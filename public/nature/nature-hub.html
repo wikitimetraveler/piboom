@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <script src="/shared/menu-config.js"></script>
   <script src="/shared/modern-navbar.js"></script>
   <script src="/shared/user-selector.js"></script>
   <style>
@@ -37,15 +38,7 @@
 </div>
 <div class="container">
   <div id="userSelectorContainer"></div>
-  <div class="domain-grid domain-grid-sm mb-4">
-    <a href="tree-discovery.html" class="domain-tile" title="Discover trees"><i class="bi-tree"></i><span>Tree Discovery</span></a>
-    <a href="tree-collection.html" class="domain-tile" title="Your tree collection"><i class="bi-collection"></i><span>Tree Collection</span></a>
-    <a href="critter-discovery.html" class="domain-tile" title="Discover critters"><i class="bi-bug"></i><span>Critter Discovery</span></a>
-    <a href="critter-collection.html" class="domain-tile" title="Your critter collection"><i class="bi-collection"></i><span>Critter Collection</span></a>
-    <a href="fish-identification.html" class="domain-tile" title="Identify fish"><i class="bi-droplet"></i><span>Fish ID</span></a>
-    <a href="fish-collection.html" class="domain-tile" title="Your fish collection"><i class="bi-collection"></i><span>Fish Collection</span></a>
-    <a href="share-collection.html" class="domain-tile" title="Share your collection"><i class="bi-share"></i><span>Share Collection</span></a>
-  </div>
+  <div class="domain-grid domain-grid-sm mb-4" id="natureToolGrid"><!-- populated by menu-config --></div>
   <ul class="nav nav-pills hub-tabs" role="tablist">
     <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#tabMap"><i class="bi-map"></i> Map</a></li>
     <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#tabGallery"><i class="bi-images"></i> Photo Gallery</a></li>
@@ -240,6 +233,10 @@ function copyShareLink() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+  const ng = document.getElementById('natureToolGrid');
+  if (ng && window.MENU_CONFIG && window.MENU_CONFIG.NATURE_TOOLS) {
+    ng.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.NATURE_TOOLS);
+  }
   createUserSelector('userSelectorContainer', { title: 'View collection:', showAllOption: true });
   await loadData();
   loadFieldGuide();
