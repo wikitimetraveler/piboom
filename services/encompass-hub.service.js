@@ -886,7 +886,7 @@ export async function fetchPipelineLoans(options = {}) {
       loanOwnership: 'AllLoans',
     };
   } else {
-    // Correspondent: v1 loanPipeline with terms
+    // Correspondent: v3 loanPipeline with terms (operator + terms)
     let terms = [...BASE_TERMS];
     if (loanFolder && loanFolder !== 'My Pipeline') {
       terms[0] = {
@@ -910,19 +910,19 @@ export async function fetchPipelineLoans(options = {}) {
       });
     }
     requestData = {
-      filter: { terms },
+      filter: { operator: 'and', terms },
       fields: PIPELINE_FIELDS,
       sortOrder: [
-        { canonicalName: 'Loan.LoanNumber', order: 'desc' },
-        { canonicalName: 'Fields.4000', order: 'desc' },
+        { canonicalName: 'Loan.LoanNumber', order: 'Descending' },
+        { canonicalName: 'Fields.4000', order: 'Descending' },
       ],
+      orgType: 'Internal',
+      loanOwnership: 'AllLoans',
     };
   }
 
-  const pipelineUrl = isRetail ? `${API_V3_BASE}/loanPipeline` : `${API_V1_BASE}/loanPipeline`;
-  const pipelineParams = isRetail
-    ? { start: 0, limit: Math.min(Math.max(parsedLimit, 1), 100) }
-    : { cursortype: 'randomAccess', limit: parsedLimit };
+  const pipelineUrl = `${API_V3_BASE}/loanPipeline`;
+  const pipelineParams = { start: 0, limit: Math.min(Math.max(parsedLimit, 1), 100) };
 
   let response;
   try {
@@ -946,7 +946,7 @@ export async function fetchPipelineLoans(options = {}) {
 
   let rawItems = normalizePipelineItems(response.data);
   // v3 API: normalize item shape for parsing (loanId→loanGuid, fields/fieldData)
-  if (isRetail && rawItems.length > 0) {
+  if (rawItems.length > 0) {
     rawItems = rawItems.map((item) => {
       const loanGuid = item.loanGuid ?? item.loanId ?? null;
       let fields = item.fields ?? item.fieldData;
@@ -962,8 +962,8 @@ export async function fetchPipelineLoans(options = {}) {
       return { ...item, loanGuid, fields };
     });
   }
-  if (isRetail && rawItems.length === 0 && response.data != null) {
-    console.warn('[Encompass retail pipeline] 0 items; response:', Array.isArray(response.data) ? `array[${response.data.length}]` : Object.keys(response.data));
+  if (rawItems.length === 0 && response.data != null) {
+    console.warn('[Encompass v3 pipeline] 0 items; response:', Array.isArray(response.data) ? `array[${response.data.length}]` : Object.keys(response.data));
   }
   const items = rawItems
     .map((item) => {
@@ -1007,15 +1007,6 @@ export async function fetchPipelineLoans(options = {}) {
     underwriterId,
     closerId,
   });
-
-  if (isRetail) {
-    console.info(
-      '[Encompass retail pipeline] rawItems:', rawItems.length,
-      '| parsed:', items.length,
-      '| afterFilter:', filteredItems.length,
-      '| sampleGuids:', filteredItems.slice(0, 3).map((l) => l?.normalized?.guid || l?.loanGuid || l?.loanId).filter(Boolean)
-    );
-  }
 
   return filteredItems;
 }
