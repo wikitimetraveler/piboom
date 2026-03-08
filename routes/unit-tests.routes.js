@@ -21,9 +21,8 @@ const unitTestFileUpload = multer({
   fileFilter: (req, file, cb) => {
     const ok =
       file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-      file.mimetype === 'application/vnd.ms-excel' ||
       file.mimetype === 'application/octet-stream' ||
-      /\.(xlsx|xls)$/i.test(file.originalname || '');
+      /\.xlsx$/i.test(file.originalname || '');
     cb(null, !!ok);
   },
 });
@@ -37,7 +36,7 @@ const unitTestFileUpload = multer({
 router.post('/files', (req, res, next) => {
   unitTestFileUpload.single('file')(req, res, (err) => {
     if (err) {
-      return res.status(400).json({ error: err.message || 'Invalid file (use .xlsx or .xls)' });
+      return res.status(400).json({ error: err.message || 'Invalid file (use .xlsx)' });
     }
     next();
   });

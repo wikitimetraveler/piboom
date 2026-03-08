@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
-import XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { getPool } from './database.service.js';
 import { extractFieldIdsFromTarget } from '../public/shared/unit-tests-utils.js';
 
@@ -15,11 +15,28 @@ const UNIT_TESTS_DIR = path.join(__dirname, '..', 'data', 'unit-tests');
  * Parse Excel buffer and extract headers, rows, and field IDs from Target column.
  * Matches unit-tests.js format: Step, Action, Target, Description.
  */
-function parseUnitTestExcel(buffer) {
-  const workbook = XLSX.read(buffer, { type: 'buffer' });
-  const sheetName = workbook.SheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
-  const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
+async function parseUnitTestExcel(buffer) {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer);
+  const sheet = workbook.worksheets[0];
+  if (!sheet) throw new Error('Workbook has no worksheets');
+  // ExcelJS row.values truncates trailing empty cells (issue #1456); use getCell to preserve all columns
+  const jsonData = [];
+  let maxCol = sheet.columnCount || 0;
+  sheet.eachRow({ includeEmpty: true }, (row) => {
+    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+      if (colNumber > maxCol) maxCol = colNumber;
+    });
+  });
+  const colCount = Math.max(maxCol, 50);
+  sheet.eachRow({ includeEmpty: true }, (row, rowNum) => {
+    const rowData = [];
+    for (let c = 1; c <= colCount; c++) {
+      const v = row.getCell(c).value;
+      rowData.push(v == null ? '' : v);
+    }
+    jsonData.push(rowData);
+  });
 
   if (!jsonData.length) {
     throw new Error('Excel file is empty');
@@ -77,7 +94,7 @@ function parseUnitTestExcel(buffer) {
  */
 export async function saveUnitTestFile(buffer, originalName) {
   const fileName = `${crypto.randomUUID()}.xlsx`;
-  const { fieldIds, rowCount } = parseUnitTestExcel(buffer);
+  const { fieldIds, rowCount } = await parseUnitTestExcel(buffer);
 
   const pool = getPool();
   if (!pool) {

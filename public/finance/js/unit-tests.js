@@ -195,23 +195,57 @@ const isBlankForTest = window.unitTestsUtils?.isBlankForTest || function(val) {
 function parseExcelFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
-    reader.onload = function(e) {
+
+    reader.onload = async function(e) {
       try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        
-        // Get the first sheet
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        
-        // Convert to JSON - get all rows first
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
-          header: 1,
-          defval: '',
-          raw: false
+        const ExcelJS = window.ExcelJS;
+        if (!ExcelJS) {
+          reject(new Error('ExcelJS library not loaded'));
+          return;
+        }
+        const buffer = e.target.result;
+        const workbook = new ExcelJS.Workbook();
+        await workbook.xlsx.load(buffer);
+        const worksheet = workbook.worksheets[0];
+        if (!worksheet) {
+          reject(new Error('Excel file is empty'));
+          return;
+        }
+        // ExcelJS row.values truncates trailing empty cells (issue #1456); read via getCell to preserve all columns
+        const jsonData = [];
+        const COL_LIMIT = 150;
+        function safeCellValue(row, col) {
+          try {
+            const cell = row.getCell(col);
+            const v = cell && cell.value;
+            return v == null ? '' : v;
+          } catch (_) {
+            return '';
+          }
+        }
+        worksheet.eachRow({ includeEmpty: true }, (row) => {
+          const rowData = [];
+          for (let c = 1; c <= COL_LIMIT; c++) {
+            rowData.push(safeCellValue(row, c));
+          }
+          jsonData.push(rowData);
         });
-        
+        // Trim all rows to last non-empty column (avoid 150 empty cols)
+        let lastUsedCol = 0;
+        jsonData.forEach((r) => {
+          for (let i = r.length - 1; i >= 0; i--) {
+            if (String(r[i] || '').trim() !== '') {
+              if (i > lastUsedCol) lastUsedCol = i;
+              break;
+            }
+          }
+        });
+        if (lastUsedCol > 0) {
+          for (let i = 0; i < jsonData.length; i++) {
+            jsonData[i] = jsonData[i].slice(0, lastUsedCol + 1);
+          }
+        }
+
         if (jsonData.length === 0) {
           reject(new Error('Excel file is empty'));
           return;
@@ -239,51 +273,32 @@ function parseExcelFile(file) {
         }
         
         // Extract test descriptions from rows before Step header
-        // Look for columns like "Test #" and "Test Plan" descriptions
+        // Look for Test # and Test Plan columns (may be in cols 0,1 or elsewhere)
         const testDescriptions = [];
         const rowsBeforeStep = jsonData.slice(0, headerRowIndex);
-        
-        // Find rows with test numbers (1-11) in first column and descriptions in second column
-        for (let rowIdx = 0; rowIdx < rowsBeforeStep.length; rowIdx++) {
-          const row = rowsBeforeStep[rowIdx];
-          const col1 = normalizeValue(row[0]);
-          const col2 = normalizeValue(row[1]);
-          
-          // Check if first column is a test number (1-11) and second has description
-          if (col1 && col2 && /^\d+$/.test(col1) && parseInt(col1) >= 1 && parseInt(col1) <= 11 && col2.length > 3) {
-            testDescriptions.push({
-              testNumber: col1,
-              description: col2
-            });
+        let testNumCol = 0;
+        let testPlanCol = 1;
+        if (rowsBeforeStep.length > 0) {
+          const firstRow = rowsBeforeStep[0];
+          const firstLower = firstRow.map((c) => String(c || '').toLowerCase().trim());
+          const numIdx = firstLower.findIndex((c) => c.includes('test') && (c.includes('#') || c.includes('number')));
+          const planIdx = firstLower.findIndex((c) => c.includes('test') && c.includes('plan'));
+          if (numIdx >= 0 && planIdx >= 0 && numIdx !== planIdx) {
+            testNumCol = numIdx;
+            testPlanCol = planIdx;
+          } else if (numIdx >= 0 && planIdx < 0 && numIdx + 1 < firstRow.length) {
+            testNumCol = numIdx;
+            testPlanCol = numIdx + 1;
           }
         }
-        
-        // Also check for header row pattern (Test #, Test Plan, etc.)
-        if (testDescriptions.length === 0 && rowsBeforeStep.length > 0) {
-          for (let rowIdx = 0; rowIdx < rowsBeforeStep.length; rowIdx++) {
-            const row = rowsBeforeStep[rowIdx];
-            const rowLower = row.map(cell => String(cell).toLowerCase().trim());
-            
-            // Check if this row has test-related headers
-            const hasTestHeader = rowLower.some(cell => 
-              (cell.includes('test') && (cell.includes('#') || cell.includes('number'))) ||
-              (cell.includes('test') && cell.includes('plan'))
-            );
-            
-            if (hasTestHeader && rowIdx + 1 < rowsBeforeStep.length) {
-              // Process rows after this header
-              const testDataRows = rowsBeforeStep.slice(rowIdx + 1);
-              testDataRows.forEach(testRow => {
-                const testNum = normalizeValue(testRow[0]);
-                const testDesc = normalizeValue(testRow[1]);
-                if (testNum && testDesc && testNum.toLowerCase() !== 'null' && /^\d+$/.test(testNum)) {
-                  testDescriptions.push({
-                    testNumber: testNum,
-                    description: testDesc
-                  });
-                }
-              });
-              break;
+        for (let rowIdx = 0; rowIdx < rowsBeforeStep.length; rowIdx++) {
+          const row = rowsBeforeStep[rowIdx];
+          const col1 = normalizeValue(row[testNumCol]);
+          const col2 = normalizeValue(row[testPlanCol]);
+          if (col1 && col2 && /^\d+$/.test(String(col1)) && parseInt(col1, 10) >= 1 && parseInt(col1, 10) <= 30) {
+            const desc = String(col2).trim();
+            if (desc.length > 0 && desc.toLowerCase() !== 'null') {
+              testDescriptions.push({ testNumber: String(col1), description: desc });
             }
           }
         }
@@ -1166,19 +1181,30 @@ function exportToCSV() {
   URL.revokeObjectURL(link.href);
 }
 
-function exportToExcel() {
-  if (!allData || allData.length === 0 || typeof XLSX === 'undefined') {
+async function exportToExcel() {
+  const ExcelJS = window.ExcelJS;
+  if (!allData || allData.length === 0 || !ExcelJS) {
     console.warn('Excel export unavailable');
-    setStatus('No data to export or XLSX library not loaded', 'err', 'bi-exclamation-octagon');
+    setStatus('No data to export or ExcelJS library not loaded', 'err', 'bi-exclamation-octagon');
     return;
   }
-  const { aoa } = buildExportRowsInFormat();
-  const worksheet = XLSX.utils.aoa_to_sheet(aoa);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Test Cases');
-  const baseName = (currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '');
-  XLSX.writeFile(workbook, `${baseName}-export.xlsx`);
-  setStatus(`Exported to ${baseName}-export.xlsx`, 'ok', 'bi-check-circle');
+  try {
+    const { aoa } = buildExportRowsInFormat();
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Test Cases');
+    worksheet.addRows(aoa);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = ((currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '') + '-export.xlsx');
+    link.click();
+    URL.revokeObjectURL(url);
+    setStatus(`Exported to ${link.download}`, 'ok', 'bi-check-circle');
+  } catch (err) {
+    setStatus('Export failed: ' + (err.message || 'Unknown error'), 'err', 'bi-exclamation-octagon');
+  }
 }
 
 function escapeHtml(str) {
@@ -2247,18 +2273,17 @@ function clearData() {
 async function handleFileUpload(file) {
   if (!file) return;
   
-  // Validate file type
+  // Validate file type (.xlsx only - exceljs does not support legacy .xls)
   const validTypes = [
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-    'application/vnd.ms-excel', // .xls
   ];
   
-  const validExtensions = ['.xlsx', '.xls'];
+  const validExtensions = ['.xlsx'];
   const fileName = file.name.toLowerCase();
   const hasValidExtension = validExtensions.some(ext => fileName.endsWith(ext));
   
   if (!hasValidExtension && !validTypes.includes(file.type)) {
-    setStatus('Invalid file type. Please upload .xlsx or .xls files.', 'err', 'bi-exclamation-octagon');
+    setStatus('Invalid file type. Please upload .xlsx files.', 'err', 'bi-exclamation-octagon');
     return;
   }
   
@@ -2295,18 +2320,27 @@ async function handleFileUpload(file) {
       }
     }).catch(() => { /* API may be unavailable; grid still works with text editors */ });
 
-    // Count scenario columns: Reset, Test 1..N only; stop at first blank or non-Test
+    // Count scenario columns: Reset, Test 1..N; start after Description or Target
     const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
+    const targetIdx = headers.findIndex((h) => /^target$/i.test(String(h || '').trim()));
+    const scenarioStart = descIdx >= 0 ? descIdx + 1 : (targetIdx >= 0 ? targetIdx + 1 : 0);
     const scenarioColumns = [];
-    if (descIdx >= 0) {
-      for (let i = descIdx + 1; i < headers.length; i++) {
-        if (!isScenarioColumnHeader(headers[i])) break;
-        scenarioColumns.push(headers[i]);
-      }
+    for (let i = scenarioStart; i < headers.length; i++) {
+      if (!isScenarioColumnHeader(headers[i])) break;
+      scenarioColumns.push(headers[i]);
     }
     
+    // Use Excel Test #/Test Plan if found; fill missing from actual column headers so we have one card per scenario
+    const testCols = scenarioColumns.filter((h) => String(h || '').toLowerCase().trim() !== 'reset');
+    const byNum = new Map((testDescriptions || []).map((t) => [String(t.testNumber), t.description]));
+    const finalDescriptions = testCols.map((h) => {
+      const testNum = extractTestNumberFromKey(h) || '';
+      const desc = byNum.get(testNum) || (h || `Test ${testNum}`).trim();
+      return { testNumber: testNum, description: desc };
+    }).filter((t) => t.testNumber);
+    
     // Store test descriptions globally for persistence
-    testDescriptionsData = testDescriptions || [];
+    testDescriptionsData = finalDescriptions;
     
     // Store current file name
     currentFileName = parsedFileName;
@@ -2327,7 +2361,7 @@ async function handleFileUpload(file) {
     displayOverallSignOff(execResult.executions, execResult.dbUnavailable);
 
     // Display test descriptions (scenarios) if available
-    if (testDescriptions && testDescriptions.length > 0) {
+    if (testDescriptionsData.length > 0) {
       displayTestDescriptions(testDescriptionsData);
     } else {
       hideTestDescriptions();
@@ -2357,9 +2391,9 @@ async function handleFileUpload(file) {
     let fileInfoHTML = `<strong>${parsedFileName}</strong>`;
     fileInfoHTML += ` <span class="text-muted">(${rows.length} test step${rows.length !== 1 ? 's' : ''}, ${headers.length} columns)</span>`;
     
-    if (testDescriptions && testDescriptions.length > 0) {
+    if (testDescriptionsData.length > 0) {
       fileInfoHTML += `<div class="mt-2"><small class="text-muted">Test Scenarios:</small> `;
-      const testList = testDescriptions.map(test => 
+      const testList = testDescriptionsData.map(test =>
         `<span class="badge badge-light mr-1" title="${test.description}">Test ${test.testNumber}</span>`
       ).join('');
       fileInfoHTML += testList + `</div>`;
@@ -2665,7 +2699,7 @@ searchInput.addEventListener('input', () => {
 document.addEventListener('paste', (e) => {
   const files = e.clipboardData?.files;
   if (!files?.length) return;
-  const file = Array.from(files).find(f => /\.(xlsx|xls)$/i.test(f.name));
+  const file = Array.from(files).find(f => /\.xlsx$/i.test(f.name));
   if (!file) return;
   // Don't intercept if user is typing in an input/textarea
   const active = document.activeElement;
@@ -2851,15 +2885,22 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
   showAllColumns();
 
   const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
+  const targetIdx = headers.findIndex((h) => /^target$/i.test(String(h || '').trim()));
+  const scenarioStart = descIdx >= 0 ? descIdx + 1 : (targetIdx >= 0 ? targetIdx + 1 : 0);
   const scenarioColumns = [];
-  if (descIdx >= 0) {
-    for (let i = descIdx + 1; i < headers.length; i++) {
-      if (!isScenarioColumnHeader(headers[i])) break;
-      scenarioColumns.push(headers[i]);
-    }
+  for (let i = scenarioStart; i < headers.length; i++) {
+    if (!isScenarioColumnHeader(headers[i])) break;
+    scenarioColumns.push(headers[i]);
   }
 
-  testDescriptionsData = testDescriptions || [];
+  // Merge Excel descriptions with actual column headers so we have one card per scenario
+  const testCols = scenarioColumns.filter((h) => String(h || '').toLowerCase().trim() !== 'reset');
+  const byNum = new Map((testDescriptions || []).map((t) => [String(t.testNumber), t.description]));
+  testDescriptionsData = testCols.map((h) => {
+    const testNum = extractTestNumberFromKey(h) || '';
+    const desc = byNum.get(testNum) || (h || `Test ${testNum}`).trim();
+    return { testNumber: testNum, description: desc };
+  }).filter((t) => t.testNumber);
   currentFileName = sourceName || 'Generated from Custom Field';
 
   const accordionContainer = document.getElementById('accordionContainer');
@@ -2869,7 +2910,7 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
     displayOverallSignOff(result.executions, result.dbUnavailable);
   });
 
-  if (testDescriptions && testDescriptions.length > 0) {
+  if (testDescriptionsData.length > 0) {
     displayTestDescriptions(testDescriptionsData);
   } else {
     hideTestDescriptions();
@@ -3340,12 +3381,153 @@ function initializeGenerateFromCustomField() {
   });
 }
 
+/**
+ * Initialize Generate from BR Rule modal and handlers.
+ */
+function initializeGenerateFromBRRule() {
+  const btn = document.getElementById('generateFromBRRuleBtn');
+  const modal = document.getElementById('generateFromBRRuleModal');
+  const brXmlInput = document.getElementById('brXmlInput');
+  const brXmlFile = document.getElementById('brXmlFile');
+  const brExtractBtn = document.getElementById('brExtractBtn');
+  const brCreateTestBtn = document.getElementById('brCreateTestBtn');
+  const brExtractStatus = document.getElementById('brExtractStatus');
+  const brExtractResults = document.getElementById('brExtractResults');
+  const brExtractContent = document.getElementById('brExtractContent');
+
+  if (!btn || !modal || !brXmlInput) return;
+
+  let lastParsed = null;
+
+  function getXmlText() {
+    return (brXmlInput && brXmlInput.value ? String(brXmlInput.value).trim() : '') || '';
+  }
+
+  function renderExtract(parsed) {
+    if (!parsed || parsed.error) {
+      brExtractContent.innerHTML = '<p class="text-danger mb-0">' + (parsed ? parsed.error : 'No data') + '</p>';
+      return;
+    }
+    const { rule, mainCondition, advancedConditions, requiredFields } = parsed;
+    let html = '';
+
+    html += '<div class="mb-3"><strong>' + (rule.name || rule.ruleType || 'Rule') + '</strong> (' + (rule.ruleType || '') + ')</div>';
+
+    if (mainCondition) {
+      html += '<div class="condition-block mb-2 p-2 rounded" style="background: rgba(74,144,164,0.08); border-left: 4px solid #4a90a4;">';
+      html += '<strong>Rule condition</strong><pre class="mb-0 mt-1 small" style="white-space: pre-wrap;">' + escapeHtml(mainCondition.expression) + '</pre>';
+      if (mainCondition.fields && mainCondition.fields.length) {
+        html += '<div class="mt-1"><span class="badge badge-secondary mr-1">Fields</span> ';
+        mainCondition.fields.forEach((f) => { html += '<span class="field-chip">[' + escapeHtml(f.entityId) + ']</span> '; });
+        html += '</div></div>';
+      } else html += '</div>';
+    }
+
+    if (advancedConditions && advancedConditions.length) {
+      html += '<div class="mb-2"><strong>Advanced conditions</strong></div>';
+      advancedConditions.forEach((ac, i) => {
+        const ms = ac.milestone ? ac.milestone.entityUid || ac.milestone.entityId : '';
+        html += '<div class="condition-block mb-2 p-2 rounded" style="background: rgba(74,144,164,0.08); border-left: 4px solid #4a90a4;">';
+        html += '<span class="milestone-badge">' + escapeHtml(ms || 'Milestone') + '</span>';
+        html += '<pre class="mb-1 mt-1 small" style="white-space: pre-wrap;">' + escapeHtml(ac.value) + '</pre>';
+        if (ac.fields && ac.fields.length) {
+          html += '<div><span class="badge badge-secondary mr-1">Fields</span> ';
+          ac.fields.forEach((f) => { html += '<span class="field-chip">[' + escapeHtml(f.entityId) + ']</span> '; });
+          html += '</div>';
+        }
+        html += '</div>';
+      });
+    }
+
+    if (requiredFields && requiredFields.length) {
+      html += '<div class="mb-2"><strong>Required fields</strong></div><ul class="small mb-0">';
+      requiredFields.forEach((rf) => {
+        html += '<li><span class="milestone-badge">' + escapeHtml(rf.milestone) + '</span> [' + escapeHtml(rf.fieldId) + '] ' + escapeHtml(rf.fieldUid || '') + '</li>';
+      });
+      html += '</ul>';
+    }
+
+    brExtractContent.innerHTML = html || '<span class="text-muted">No advanced conditions</span>';
+  }
+
+  btn.addEventListener('click', () => {
+    brXmlInput.value = '';
+    if (brXmlFile) brXmlFile.value = '';
+    lastParsed = null;
+    brExtractStatus.textContent = '';
+    brExtractResults.style.display = 'none';
+    brCreateTestBtn.disabled = true;
+    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
+      window.$(modal).modal('show');
+    } else {
+      modal.classList.add('show');
+      modal.style.display = 'block';
+    }
+  });
+
+  brXmlFile.addEventListener('change', (e) => {
+    const f = e.target && e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      brXmlInput.value = r.result || '';
+    };
+    r.readAsText(f);
+  });
+
+  brExtractBtn.addEventListener('click', () => {
+    const xml = getXmlText();
+    if (!xml) {
+      brExtractStatus.textContent = 'Paste or upload BR XML first.';
+      brExtractResults.style.display = 'none';
+      brCreateTestBtn.disabled = true;
+      return;
+    }
+    if (!window.brRuleParser) {
+      brExtractStatus.textContent = 'BR parser not loaded.';
+      return;
+    }
+    lastParsed = window.brRuleParser.parseBRXml(xml);
+    brExtractResults.style.display = 'block';
+    renderExtract(lastParsed);
+    const hasAdvanced = lastParsed && !lastParsed.error && lastParsed.advancedConditions && lastParsed.advancedConditions.length > 0;
+    brCreateTestBtn.disabled = !hasAdvanced;
+    brExtractStatus.textContent = lastParsed.error
+      ? lastParsed.error
+      : (lastParsed.advancedConditions ? lastParsed.advancedConditions.length : 0) + ' advanced condition(s), ' +
+        (lastParsed.requiredFields ? lastParsed.requiredFields.length : 0) + ' required field(s)';
+  });
+
+  brCreateTestBtn.addEventListener('click', () => {
+    if (!lastParsed || lastParsed.error || !window.brRuleParser) return;
+    const result = window.brRuleParser.generateUnitTestFromBRRule(lastParsed);
+    if (!result || !result.rows || result.rows.length === 0) {
+      showToast('No test rows generated (need advanced conditions)', 'warning');
+      return;
+    }
+    const sourceName = 'Generated: BR ' + (lastParsed.rule ? lastParsed.rule.name || lastParsed.rule.ruleType : 'Rule');
+    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, sourceName, null, {
+      fieldId: '',
+      calculation: lastParsed.mainCondition ? lastParsed.mainCondition.expression : '',
+      description: 'BR Rule: ' + (lastParsed.rule ? lastParsed.rule.name : ''),
+    });
+    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
+      window.$(modal).modal('hide');
+    } else {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+    }
+    showToast('Unit test generated from BR rule', 'success');
+  });
+}
+
 // Initialize grid on load
 document.addEventListener('DOMContentLoaded', () => {
   initializeGrid();
   initializeVoiceWidget();
   initializeScanSetFields();
   initializeGenerateFromCustomField();
+  initializeGenerateFromBRRule();
   updateLoanGuidChipDisplay(currentLoanGuid);
   renderRecentRunsSelect();
   loadTestLibrary();

@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import { getFieldPath, coerce as coerceUtil } from '../public/shared/unit-tests-utils.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -109,11 +109,16 @@ function findHeaderRow(rows) {
   return -1;
 }
 
-function parseWorkbook(buffer) {
-  const workbook = XLSX.read(buffer, { type: 'buffer' });
-  const sheetName = workbook.SheetNames[0];
-  const sheet = workbook.Sheets[sheetName];
-  const rows = XLSX.utils.sheet_to_json(sheet, { defval: '', header: 1 });
+async function parseWorkbook(buffer) {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer);
+  const sheet = workbook.worksheets[0];
+  if (!sheet) throw new Error('Workbook has no worksheets');
+  const rows = [];
+  sheet.eachRow({ includeEmpty: true }, (row, rowNum) => {
+    const vals = row.values;
+    rows.push((vals && vals.length > 1 ? vals.slice(1) : []).map((v) => (v == null ? '' : v)));
+  });
   const headerRowIndex = findHeaderRow(rows);
   if (headerRowIndex === -1) {
     throw new Error('Missing required columns (field + expected). Update the sheet headers.');
@@ -231,7 +236,7 @@ async function run() {
     ? filePath
     : path.resolve(process.cwd(), filePath);
   const buffer = await fs.readFile(absolutePath);
-  const rows = parseWorkbook(buffer);
+  const rows = await parseWorkbook(buffer);
   const tests = createTestCases(rows);
 
   if (!tests.length) {

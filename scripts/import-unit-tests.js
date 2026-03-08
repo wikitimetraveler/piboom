@@ -4,7 +4,7 @@
  * Usage: node scripts/import-unit-tests.js <directory>
  * Example: node scripts/import-unit-tests.js ./public/unitTests
  *
- * Reads all .xlsx and .xls files from the directory, saves to data/unit-tests/,
+ * Reads all .xlsx files from the directory, saves to data/unit-tests/,
  * extracts field IDs, and inserts into unit_test_files table.
  */
 import 'dotenv/config';
@@ -43,11 +43,11 @@ async function main() {
   }
 
   const files = entries
-    .filter((e) => e.isFile() && /\.(xlsx|xls)$/i.test(e.name))
+    .filter((e) => e.isFile() && /\.xlsx$/i.test(e.name))
     .map((e) => path.join(resolvedDir, e.name));
 
   if (files.length === 0) {
-    console.log('No .xlsx or .xls files found in', resolvedDir);
+    console.log('No .xlsx files found in', resolvedDir);
     process.exit(0);
   }
 

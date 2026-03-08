@@ -95,8 +95,8 @@ app.locals.io = io;
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/data', express.static(path.join(__dirname, 'data'))); // Serve KML files
-app.get('/vendor/xlsx.full.min.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'node_modules', 'xlsx', 'dist', 'xlsx.full.min.js'));
+app.get('/vendor/exceljs.min.js', (req, res) => {
+  res.sendFile(path.join(__dirname, 'node_modules', 'exceljs', 'dist', 'exceljs.min.js'));
 });
 app.use('/api', buildRoutes(io));
 

@@ -131,6 +131,9 @@ export async function getPipeline(req, res) {
     const filters = parseFilters(req.query);
     const loans = await fetchPipelineLoans(filters);
 
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
     return res.json({
       count: loans.length,
       items: loans,

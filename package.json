@@ -32,7 +32,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "langchain": "^1.2.29",
-    "multer": "^1.4.5-lts.1",
+    "multer": "^2.1.1",
     "node-fetch": "^3.3.0",
     "node-record-lpcm16": "^1.0.1",
     "openai": "^4.20.0",
@@ -40,7 +40,7 @@
     "play-sound": "^1.1.6",
     "socket.io": "^4.7.5",
     "spotify-web-api-node": "^5.0.2",
-    "xlsx": "^0.18.5"
+    "exceljs": "^4.4.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
@@ -54,5 +54,12 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "overrides": {
+    "protobufjs": ">=7.2.5",
+    "@tootallnate/once": ">=3.0.1",
+    "rimraf": "^5.0.0",
+    "glob": "^10.0.0",
+    "superagent": "^10.2.2"
   }
 }

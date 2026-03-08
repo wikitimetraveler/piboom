@@ -594,11 +594,11 @@
         </div>
         <div class="form-group mt-3">
             <label for="ruleOutput">Field Definitions</label>
-            <textarea class="form-control" id="ruleOutput" rows="8" readonly></textarea>
+            <textarea class="form-control" id="ruleOutput" rows="8"></textarea>
         </div>
         <div class="form-group">
             <label for="ADOoutput">Generated JSON</label>
-            <textarea class="form-control" id="ADOoutput" rows="8" readonly></textarea>
+            <textarea class="form-control" id="ADOoutput" rows="8"></textarea>
         </div>
         <div class="btn-group w-100 flex-wrap">
             <button class="btn btn-primary" id="copyJsonBtn">Copy JSON</button>
@@ -708,7 +708,7 @@
                     description: rule[3],
                     format: format.toLowerCase(),
                     maxLength: format === 'string' ? rule[2].match(/\d+/)?.[0] : undefined,
-                    calculation: fieldId.startsWith('CX.R.') ? `IIf(false = true, "${ruleCode}(F)","")` : ''
+                    calculation: fieldId.startsWith('CX.R.') ? `IIf(false = true, "(F)","")` : ''
                 };
 
                 if (jsonObj.maxLength === undefined) {
@@ -735,8 +735,7 @@
             }
 
             processedInput = processedInput.replace(/[\[\]\s]/g, '');
-            const strResult = Math.max(processedInput.length, 16).toString();
-            const ruleLogicLength = `String(${strResult})`;
+            const ruleLogicLength = 'String(3)';  // R field length 3 as (F)
 
             const rules = [
                 [`[${processedInput.toUpperCase()}]`, "New", ruleLogicLength, `${appendParam || inputParam} Logic${isIneligibleAudit ? ' - Auto Decline' : ''}`, "N"],

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { clearEncompassTokenCache, ensureEncompassToken } from './encompass-auth.service.js';
+import { clearEncompassTokenCache, ensureEncompassToken, encompassEnvStorage } from './encompass-auth.service.js';
 import {
   buildLoanAnalytics,
 } from './loan-analytics.service.js';
@@ -135,15 +135,18 @@ function normalizePipelineItems(payload) {
     return payload;
   }
 
-  if (Array.isArray(payload.items)) {
-    return payload.items;
+  if (typeof payload !== 'object') {
+    return [];
   }
 
-  if (Array.isArray(payload.pipelineData)) {
-    return payload.pipelineData;
-  }
-
-  return [];
+  const arr =
+    payload.items ??
+    payload.pipelineData ??
+    payload.data ??
+    payload.loans ??
+    payload.results ??
+    payload.pipeline;
+  return Array.isArray(arr) ? arr : [];
 }
 
 function parseNumber(value) {
@@ -846,53 +849,88 @@ export async function fetchPipelineLoans(options = {}) {
     closerId,
   } = options;
 
-  const terms = [...BASE_TERMS];
+  const env = encompassEnvStorage.getStore()?.env ?? 'correspondent';
   const parsedLimit = Number(limit) > 0 ? Number(limit) : DEFAULT_LIMIT;
+  const resolvedLoanProgram = loanProgram || loanType || null;
 
-  if (loanFolder && loanFolder !== 'My Pipeline') {
-    terms[0] = {
-      canonicalName: 'Loan.LoanFolder',
-      value: loanFolder,
-      matchType: 'exact',
+  const isRetail = env === 'retail';
+  let requestData;
+
+  if (isRetail) {
+    // Retail: v3 loanPipeline — body from working Postman request
+    // v3 uses "Pipeline" not "My Pipeline" for the default folder
+    const folderValue = (loanFolder === 'My Pipeline' ? 'Pipeline' : loanFolder) || 'Pipeline';
+    requestData = {
+      fields: [
+        'Loan.LoanGuid',
+        'Loan.LoanFolder',
+        'Fields.4000',
+        'Loan.LoanNumber',
+        'Loan.LoanRate',
+        'Loan.LoanAmount',
+        'Loan.LastModified',
+        'Loan.BorrowerName',
+      ],
+      sortOrder: [
+        {
+          canonicalName: 'Loan.LastModified',
+          order: 'Descending',
+        },
+      ],
+      filter: {
+        canonicalName: 'Loan.LoanFolder',
+        value: folderValue,
+        matchType: 'exact',
+      },
+      orgType: 'Internal',
+      loanOwnership: 'AllLoans',
+    };
+  } else {
+    // Correspondent: v1 loanPipeline with terms
+    let terms = [...BASE_TERMS];
+    if (loanFolder && loanFolder !== 'My Pipeline') {
+      terms[0] = {
+        canonicalName: 'Loan.LoanFolder',
+        value: loanFolder,
+        matchType: 'exact',
+      };
+    }
+    if (resolvedLoanProgram) {
+      terms.push({
+        canonicalName: 'Fields.1172',
+        value: resolvedLoanProgram,
+        matchType: 'exact',
+      });
+    }
+    if (docType) {
+      terms.push({
+        canonicalName: 'Fields.4000',
+        value: docType,
+        matchType: 'exact',
+      });
+    }
+    requestData = {
+      filter: { terms },
+      fields: PIPELINE_FIELDS,
+      sortOrder: [
+        { canonicalName: 'Loan.LoanNumber', order: 'desc' },
+        { canonicalName: 'Fields.4000', order: 'desc' },
+      ],
     };
   }
 
-  const resolvedLoanProgram = loanProgram || loanType || null;
-  if (resolvedLoanProgram) {
-    terms.push({
-      canonicalName: 'Fields.1172',
-      value: resolvedLoanProgram,
-      matchType: 'exact',
-    });
-  }
-
-  if (docType) {
-    terms.push({
-      canonicalName: 'Fields.4000',
-      value: docType,
-      matchType: 'exact',
-    });
-  }
+  const pipelineUrl = isRetail ? `${API_V3_BASE}/loanPipeline` : `${API_V1_BASE}/loanPipeline`;
+  const pipelineParams = isRetail
+    ? { start: 0, limit: Math.min(Math.max(parsedLimit, 1), 100) }
+    : { cursortype: 'randomAccess', limit: parsedLimit };
 
   let response;
   try {
     response = await requestWithAuth({
       method: 'post',
-      url: `${API_V1_BASE}/loanPipeline`,
-      data: {
-        filter: {
-          terms,
-        },
-        fields: PIPELINE_FIELDS,
-        sortOrder: [
-          { canonicalName: 'Loan.LoanNumber', order: 'desc' },
-          { canonicalName: 'Fields.4000', order: 'desc' },
-        ],
-      },
-      params: {
-        cursortype: 'randomAccess',
-        limit: parsedLimit,
-      },
+      url: pipelineUrl,
+      data: requestData,
+      params: pipelineParams,
     });
   } catch (error) {
     const status = error.response?.status;
@@ -906,11 +944,45 @@ export async function fetchPipelineLoans(options = {}) {
     throw new Error(`Encompass loanPipeline ${status || 'error'}: ${detail}`);
   }
 
-  const items = normalizePipelineItems(response.data).map(enrichLoanRecord);
+  let rawItems = normalizePipelineItems(response.data);
+  // v3 API: normalize item shape for parsing (loanId→loanGuid, fields/fieldData)
+  if (isRetail && rawItems.length > 0) {
+    rawItems = rawItems.map((item) => {
+      const loanGuid = item.loanGuid ?? item.loanId ?? null;
+      let fields = item.fields ?? item.fieldData;
+      if (!fields || typeof fields !== 'object') {
+        // Fields may be at top level (Loan.X, Fields.X)
+        fields = {};
+        for (const [k, v] of Object.entries(item)) {
+          if (k.startsWith('Loan.') || k.startsWith('Fields.')) {
+            fields[k] = v;
+          }
+        }
+      }
+      return { ...item, loanGuid, fields };
+    });
+  }
+  if (isRetail && rawItems.length === 0 && response.data != null) {
+    console.warn('[Encompass retail pipeline] 0 items; response:', Array.isArray(response.data) ? `array[${response.data.length}]` : Object.keys(response.data));
+  }
+  const items = rawItems
+    .map((item) => {
+      try {
+        return enrichLoanRecord(item);
+      } catch (err) {
+        console.warn('[Encompass pipeline] Failed to parse item:', item?.loanId ?? item?.loanGuid, err.message);
+        return null;
+      }
+    })
+    .filter(Boolean);
+  // Retail uses "Pipeline" not "My Pipeline"; filter must match API response
+  const effectiveLoanFolder = isRetail
+    ? ((loanFolder === 'My Pipeline' ? 'Pipeline' : loanFolder) || 'Pipeline')
+    : loanFolder;
   const filteredItems = applyAdvancedFilters(items, {
     state: toUpper(state),
     counties: normalizeCounties(counties),
-    loanFolder,
+    loanFolder: effectiveLoanFolder,
     loanProgram: resolvedLoanProgram || undefined,
     docType,
     loanPurpose,
@@ -935,6 +1007,15 @@ export async function fetchPipelineLoans(options = {}) {
     underwriterId,
     closerId,
   });
+
+  if (isRetail) {
+    console.info(
+      '[Encompass retail pipeline] rawItems:', rawItems.length,
+      '| parsed:', items.length,
+      '| afterFilter:', filteredItems.length,
+      '| sampleGuids:', filteredItems.slice(0, 3).map((l) => l?.normalized?.guid || l?.loanGuid || l?.loanId).filter(Boolean)
+    );
+  }
 
   return filteredItems;
 }
