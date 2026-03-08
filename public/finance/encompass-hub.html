@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="/shared/styles.css" />
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <script src="/shared/menu-config.js"></script>
     <script src="/shared/modern-navbar.js" defer></script>
     <style>
       body {
@@ -347,13 +348,7 @@
             <i class="bi-graph-up"></i> Analytics
           </a>
         </div>
-        <div class="domain-grid domain-grid-sm mt-3" style="max-width: 520px; margin-left: auto; margin-right: auto;">
-          <a href="encompass-hub-test.html" class="domain-tile" title="Test API endpoints"><i class="bi-clipboard-check"></i><span>Test Endpoints</span></a>
-          <a href="unit-tests.html" class="domain-tile" title="Unit test runner"><i class="bi-check2-circle"></i><span>Unit Tests</span></a>
-          <a href="encompass-users.html" class="domain-tile" title="User directory"><i class="bi-people"></i><span>Users</span></a>
-          <a href="encompass-native-fields.html" class="domain-tile" title="Native field definitions"><i class="bi-list-columns"></i><span>Native Fields</span></a>
-          <a href="encompass-custom-fields.html" class="domain-tile" title="Custom field config"><i class="bi-sliders"></i><span>Custom Fields</span></a>
-        </div>
+        <div class="domain-grid domain-grid-sm mt-3 encompass-tool-grid" id="encompassToolGrid" style="max-width: 900px; margin-left: auto; margin-right: auto;"><!-- populated by menu-config --></div>
       </div>
     </section>
 
@@ -538,5 +533,13 @@
     <script src="/shared/voice-widget.js"></script>
     <script src="js/encompassHub.js" type="module"></script>
     <script src="/shared/finance-auth-guard.js"></script>
+    <script>
+      (function () {
+        var grid = document.getElementById('encompassToolGrid');
+        if (grid && window.MENU_CONFIG && window.MENU_CONFIG.ENCOMPASS_TOOLS) {
+          grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.ENCOMPASS_TOOLS);
+        }
+      })();
+    </script>
   </body>
 </html>

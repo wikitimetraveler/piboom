@@ -1,19 +1,24 @@
-# FREE Geocoding & Reverse Geocoding Guide
+# Geocoding Guide
 
-## 🆓 100% FREE Alternatives to Google Maps API
+## Primary: Mapbox (Paid, Non-Google)
 
-All options below are **completely free** with no API key required (or generous free tiers).
+When `MAPBOX_ACCESS_TOKEN` is set in `.env`, geocoding uses **Mapbox** first:
+- **100,000 requests/month FREE**
+- **$0.75 per 1,000** after free tier
+- High quality, predictable pricing
+- No rate limit for normal use
+
+**Setup:** Add `MAPBOX_ACCESS_TOKEN=your_token` to `.env` (get one at [mapbox.com](https://account.mapbox.com/)).
 
 ---
 
-## ✅ BEST OPTION: OpenStreetMap Nominatim
+## Fallback: OpenStreetMap Nominatim (Free)
 
-### **Why it's best:**
+When Mapbox is not configured or fails, **Nominatim** is used:
 - ✅ **100% FREE** - No API key, no charges ever
-- ✅ Unlimited requests (be respectful - 1 req/sec)
-- ✅ Global coverage
-- ✅ Reverse geocoding included
-- ✅ Open source community project
+- Unlimited requests (be respectful - 1 req/sec)
+- Global coverage
+- Reverse geocoding included
 
 ### **Usage:**
 I've created `services/free-geocoding.service.js` with ready-to-use functions:

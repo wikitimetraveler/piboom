@@ -1,21 +1,17 @@
 import axios from 'axios';
-import { getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 /**
  * Geocoding Service
- * 
- * Primary: Google Geocoding API (server key)
- * Fallback: OpenStreetMap Nominatim (free) to avoid downtime
- * 
- * Rate limits:
- * - Google Geocoding: per Google quotas
- * - Nominatim: 1 request per second (only used as fallback)
- * 
- * Alternative Free providers included for last-resort fallback.
+ *
+ * Primary: Mapbox Geocoding API (100k free/month, then $0.75/1k)
+ * Fallback: OpenStreetMap Nominatim (free, 1 req/sec)
+ * Last resort: geocode.maps.co (free)
+ *
+ * Set MAPBOX_ACCESS_TOKEN in .env for Mapbox. Without it, uses Nominatim.
  */
 
-function extractComponent(components = [], type) {
-  return components.find(c => c.types.includes(type));
+function getMapboxAccessToken() {
+  return (process.env.MAPBOX_ACCESS_TOKEN || process.env.MAPBOX_API_KEY || '').trim();
 }
 
 function normalizeCountyName(name) {
@@ -23,111 +19,146 @@ function normalizeCountyName(name) {
   return name.replace(/\s*County$/i, '').trim();
 }
 
-async function geocodeWithGoogle(address, expectedState, expectedCounty) {
-  const apiKey = getGoogleServerApiKey();
-  if (!apiKey || !address) return null;
+/** Infer ISO country code from address hints (for Mapbox/Nominatim country filter) */
+function inferCountryFromAddress(address) {
+  if (!address || typeof address !== 'string') return null;
+  const lower = address.toLowerCase();
+  if (/\b(uk|united kingdom|england|scotland|wales|northern ireland)\b/.test(lower)) return 'gb';
+  if (/\b(usa|united states|u\.?s\.?a?)\b/.test(lower)) return 'us';
+  if (/\b(south korea|korea)\b/.test(lower)) return 'kr';
+  if (/\bjapan\b/.test(lower)) return 'jp';
+  if (/\bcanada\b/.test(lower)) return 'ca';
+  if (/\baustralia\b/.test(lower)) return 'au';
+  if (/\b(germany|deutschland)\b/.test(lower)) return 'de';
+  if (/\bfrance\b/.test(lower)) return 'fr';
+  if (/\bireland\b/.test(lower)) return 'ie';
+  return null;
+}
+
+/** Cap "no results" warnings to avoid log spam */
+const NO_RESULTS_WARN_LIMIT = 5;
+let noResultsWarnCount = 0;
+
+function warnNoResults(address) {
+  if (noResultsWarnCount < NO_RESULTS_WARN_LIMIT) {
+    noResultsWarnCount += 1;
+    console.warn(`⚠️  No geocoding results found for: ${address}`);
+  } else if (noResultsWarnCount === NO_RESULTS_WARN_LIMIT) {
+    noResultsWarnCount += 1;
+    console.warn(`⚠️  (Further geocoding "no results" warnings suppressed)`);
+  }
+}
+
+/** Extract state/county from Mapbox feature context array */
+function extractFromMapboxContext(context = []) {
+  let state = null;
+  let county = null;
+  for (const c of context) {
+    const id = (c.id || '').toLowerCase();
+    const shortCode = (c.short_code || '').toUpperCase();
+    const text = (c.text || '').trim();
+    if (id.includes('region') && shortCode.startsWith('US-')) {
+      state = shortCode.replace('US-', '');
+    }
+    if (id.includes('district') || id.includes('county')) {
+      county = normalizeCountyName(text) || text;
+    }
+  }
+  return { state, county };
+}
+
+async function geocodeWithMapbox(address, expectedState, expectedCounty) {
+  const token = getMapboxAccessToken();
+  if (!token || !address) return null;
+
+  const countryHint = inferCountryFromAddress(address);
+  const params = {
+    access_token: token,
+    limit: 5,
+    types: 'address,place,locality,region'
+  };
+  if (countryHint) params.country = countryHint;
 
   try {
-    const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
-      params: {
-        address,
-        key: apiKey,
-        region: 'us',
-        components: 'country:US'
-      },
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(address)}.json`;
+    const response = await axios.get(url, {
+      params,
       timeout: 10000
     });
 
-    if (response.data.status !== 'OK' || !response.data.results?.length) {
-      return null;
-    }
+    const features = response.data?.features || [];
+    if (features.length === 0) return null;
 
-    const candidates = response.data.results;
     let fallbackResult = null;
 
-    for (const candidate of candidates) {
-      const geometry = candidate.geometry?.location;
-      if (!geometry) continue;
+    for (const f of features) {
+      const coords = f.geometry?.coordinates || f.center;
+      if (!coords || coords.length < 2) continue;
 
-      const state = extractComponent(candidate.address_components, 'administrative_area_level_1')?.short_name;
-      const county = normalizeCountyName(
-        extractComponent(candidate.address_components, 'administrative_area_level_2')?.long_name
-      );
+      const [lng, lat] = coords;
+      const context = f.context || [];
+      const { state, county } = extractFromMapboxContext(context);
 
       let stateMatches = true;
       let countyMatches = true;
-
       if (expectedState) {
         stateMatches = state?.toUpperCase() === expectedState.toUpperCase();
       }
-
       if (expectedCounty) {
-        if (county) {
-          countyMatches = county.toLowerCase() === expectedCounty.toLowerCase();
-        } else {
-          countyMatches = false;
-        }
+        countyMatches = county
+          ? county.toLowerCase() === expectedCounty.toLowerCase().replace(/\s*County$/i, '').trim()
+          : false;
       }
 
-      const resultPayload = {
-        latitude: geometry.lat,
-        longitude: geometry.lng,
+      const result = {
+        latitude: lat,
+        longitude: lng,
         validated: stateMatches && countyMatches,
-        display_name: candidate.formatted_address,
-        placeId: candidate.place_id,
-        source: 'google',
-        address_components: candidate.address_components
+        display_name: f.place_name || f.text,
+        source: 'mapbox'
       };
 
-      if (!fallbackResult) {
-        fallbackResult = resultPayload;
-      }
-
-      if (resultPayload.validated || (!expectedState && !expectedCounty)) {
-        return resultPayload;
-      }
+      if (!fallbackResult) fallbackResult = result;
+      if (result.validated || (!expectedState && !expectedCounty)) return result;
     }
 
     return fallbackResult;
   } catch (error) {
-    console.warn('⚠️  Google geocoding error:', error.message);
+    console.warn('⚠️  Mapbox geocoding error:', error.message);
     return null;
   }
 }
 
-async function reverseGeocodeWithGoogle(lat, lng) {
-  const apiKey = getGoogleServerApiKey();
-  if (!apiKey || !lat || !lng) return null;
+async function reverseGeocodeWithMapbox(lat, lng) {
+  const token = getMapboxAccessToken();
+  if (!token || !lat || !lng) return null;
 
   try {
-    const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`;
+    const response = await axios.get(url, {
       params: {
-        latlng: `${lat},${lng}`,
-        key: apiKey,
-        result_type: 'administrative_area_level_2|administrative_area_level_1|locality',
-        location_type: 'APPROXIMATE'
+        access_token: token,
+        limit: 3
       },
       timeout: 10000
     });
 
-    if (response.data.status !== 'OK' || !response.data.results?.length) {
-      return null;
-    }
+    const features = response.data?.features || [];
+    if (features.length === 0) return null;
 
-    const result = response.data.results[0];
-    const county = normalizeCountyName(
-      extractComponent(result.address_components, 'administrative_area_level_2')?.long_name
-    );
-    const state = extractComponent(result.address_components, 'administrative_area_level_1')?.short_name;
+    // Use first feature; it has context with region (state) and district (county)
+    const f = features[0];
+    const context = f.context || [];
+    const { state, county } = extractFromMapboxContext(context);
 
     return {
       county: county || null,
       state: state ? state.toUpperCase() : null,
-      address: result.formatted_address,
-      source: 'google'
+      address: f.place_name || f.text || null,
+      source: 'mapbox'
     };
   } catch (error) {
-    console.warn('⚠️  Google reverse geocoding error:', error.message);
+    console.warn('⚠️  Mapbox reverse geocoding error:', error.message);
     return null;
   }
 }
@@ -140,17 +171,19 @@ async function reverseGeocodeWithGoogle(lat, lng) {
  * @returns {Promise<Object>} Object with latitude, longitude, and validation info
  */
 export async function geocodeAddressFree(address, expectedState = null, expectedCounty = null) {
-  // Primary: Google Geocoding API
-  const googleResult = await geocodeWithGoogle(address, expectedState, expectedCounty);
-  if (googleResult) {
-    return googleResult;
+  // Primary: Mapbox Geocoding API (when MAPBOX_ACCESS_TOKEN is set)
+  const mapboxResult = await geocodeWithMapbox(address, expectedState, expectedCounty);
+  if (mapboxResult) {
+    return mapboxResult;
   }
 
   // Fallback: Nominatim (free)
   try {
     // Use Nominatim - completely free, no API key needed
     // Rate limit: 1 request per second (be respectful!)
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=5&countrycodes=us`;
+    const countryHint = inferCountryFromAddress(address);
+    const countryParam = countryHint ? `&countrycodes=${countryHint}` : '';
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=5${countryParam}`;
     
     const response = await fetch(url, {
       headers: {
@@ -166,7 +199,7 @@ export async function geocodeAddressFree(address, expectedState = null, expected
     const data = await response.json();
     
     if (!data || data.length === 0) {
-      console.warn(`⚠️  No geocoding results found for: ${address}`);
+      warnNoResults(address);
       return { latitude: null, longitude: null, validated: false };
     }
     
@@ -174,6 +207,8 @@ export async function geocodeAddressFree(address, expectedState = null, expected
     let bestResult = null;
     let validated = false;
     
+    const isUsSearch = expectedState || countryHint === 'us';
+
     for (const result of data) {
       const addressParts = result.display_name || '';
       const lat = parseFloat(result.lat);
@@ -181,14 +216,15 @@ export async function geocodeAddressFree(address, expectedState = null, expected
       
       if (isNaN(lat) || isNaN(lon)) continue;
       
-      // Check if it's in the US (Nominatim countrycodes filter helps, but verify)
-      if (!addressParts.toLowerCase().includes('united states') && 
-          !addressParts.toLowerCase().includes(', usa') &&
-          !addressParts.toLowerCase().includes(', us')) {
-        continue;
+      // When US-specific search, verify result is in US (Nominatim countrycodes helps but verify)
+      if (isUsSearch) {
+        const lower = addressParts.toLowerCase();
+        if (!lower.includes('united states') && !lower.includes(', usa') && !lower.includes(', us')) {
+          continue;
+        }
       }
       
-      // If no expected state, use first US result
+      // If no expected state, use first matching result
       if (!expectedState) {
         bestResult = { lat, lon, display_name: addressParts };
         validated = true;
@@ -221,7 +257,7 @@ export async function geocodeAddressFree(address, expectedState = null, expected
     }
     
     if (!bestResult) {
-      console.warn(`⚠️  No valid geocoding result found for: ${address}`);
+      warnNoResults(address);
       return { latitude: null, longitude: null, validated: false };
     }
     
@@ -264,11 +300,11 @@ export async function reverseGeocodeFree(lat, lng, retries = 2) {
     return { county: null, state: null, address: null };
   }
 
-  const googleResult = await reverseGeocodeWithGoogle(lat, lng);
-  if (googleResult) {
-    return googleResult;
+  const mapboxResult = await reverseGeocodeWithMapbox(lat, lng);
+  if (mapboxResult) {
+    return mapboxResult;
   }
-  
+
   // Rate limiting - be respectful to Nominatim (1 req/sec)
   // Wait before attempting (helps with bulk operations)
   await new Promise(resolve => setTimeout(resolve, 1100));

@@ -22,11 +22,25 @@
   /** Navbar Finance dropdown items */
   const NAV_FINANCE = [
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Finance Hub' },
-    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
-    { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk Dashboard' },
+  ];
+
+  /** Navbar Encompass dropdown items (under Finance or standalone) */
+  const NAV_ENCOMPASS = [
+    { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub' },
+    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
+    { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk' },
     { href: '/finance/unit-tests.html', icon: 'bi-clipboard-check', label: 'Unit Tests' },
-    { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'The Screen Test' },
+    { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test' },
+    { href: '/finance/encompass-users.html', icon: 'bi-people', label: 'Users' },
+    { href: '/finance/encompass-native-fields.html', icon: 'bi-list-columns', label: 'Native Fields' },
+    { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields' },
+    { href: '/finance/tool2.html', icon: 'bi-code-slash', label: 'Parser' },
+    { href: '/finance/tool3.html', icon: 'bi-globe', label: 'Mashup' },
+    { href: '/finance/tool4.html', icon: 'bi-gear', label: 'Automator' },
+    { href: '/finance/tool5.html', icon: 'bi-rulers', label: 'Ruler' },
+    { href: '/finance/tool6.html', icon: 'bi-arrow-repeat', label: 'Transformer' },
+    { href: '/finance/tool8.html', icon: 'bi-magic', label: 'Alchemist' },
   ];
 
   /** Navbar Music dropdown items */
@@ -69,8 +83,9 @@
     { href: '/', icon: 'bi-house', label: 'Hub (All Tools)' },
   ];
 
-  /** Finance hub tool grid (domain-grid-sm) */
+  /** Finance hub tool grid (calculators + disasters only) */
   const FINANCE_TOOLS = [
+    { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', title: 'Encompass Hub, pipeline, loan APIs' },
     { href: '/finance/fha-streamline-calculator.html', icon: 'bi-calculator', label: 'FHA Streamline', title: 'FHA Streamline refinance calculator' },
     { href: '/finance/asset-qualifier-calculator.html', icon: 'bi-wallet2', label: 'Asset Qualifier', title: 'Asset Qualifier Calculator' },
     { href: '/finance/fha-streamline-loan-amount-calculator.html', icon: 'bi-cash-coin', label: 'FHA Loan Amount', title: 'FHA Streamline Loan Amount' },
@@ -82,20 +97,26 @@
     { href: '/finance/ltv-calculator.html', icon: 'bi-house-door', label: 'LTV', title: 'Loan-to-Value Calculator' },
     { href: '/finance/va-irrrl-calculator.html', icon: 'bi-calculator', label: 'VA IRRRL', title: 'VA IRRRL Calculator' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters', title: 'Unified Disasters (90-day)' },
-    { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk', title: 'Pipeline Risk Dashboard' },
-    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant' },
+  ];
+
+  /** Encompass hub tool grid (Encompass Assistant, pipeline, fields, tools) */
+  const ENCOMPASS_TOOLS = [
+    { href: '/finance/index.html', icon: 'bi-calculator', label: 'Finance Hub', title: 'Finance Hub, calculators, disasters' },
     { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub', title: 'Encompass Hub' },
-    { href: '/finance/encompass-users.html', icon: 'bi-people', label: 'Encompass Users', title: 'Encompass Users' },
+    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant' },
+    { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk', title: 'Pipeline Risk Dashboard' },
+    { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests', title: 'Unit Test Runner' },
+    { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test', title: 'The Screen Test' },
+    { href: '/finance/encompass-users.html', icon: 'bi-people', label: 'Users', title: 'Encompass Users' },
     { href: '/finance/encompass-native-fields.html', icon: 'bi-list-columns', label: 'Native Fields', title: 'Native Loan Fields' },
     { href: '/finance/encompass-custom-fields.html', icon: 'bi-sliders', label: 'Custom Fields', title: 'Custom Loan Fields' },
-    { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests', title: 'Unit Test Runner' },
+    { href: '/finance/encompass-hub-test.html', icon: 'bi-clipboard-check', label: 'Test Endpoints', title: 'Test API endpoints' },
     { href: '/finance/tool2.html', icon: 'bi-code-slash', label: 'Parser', title: 'The Parser' },
     { href: '/finance/tool3.html', icon: 'bi-globe', label: 'Mashup', title: 'The Mashup' },
     { href: '/finance/tool4.html', icon: 'bi-gear', label: 'Automator', title: 'The Automator' },
     { href: '/finance/tool5.html', icon: 'bi-rulers', label: 'Ruler', title: 'The Ruler' },
     { href: '/finance/tool6.html', icon: 'bi-arrow-repeat', label: 'Transformer', title: 'The Transformer' },
     { href: '/finance/tool8.html', icon: 'bi-magic', label: 'Alchemist', title: 'The Alchemist' },
-    { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test', title: 'The Screen Test' },
   ];
 
   /** Nature hub tool grid */
@@ -152,10 +173,12 @@
     getDomainTiles,
     renderDomainGridItems,
     NAV_FINANCE,
+    NAV_ENCOMPASS,
     NAV_MUSIC,
     NAV_ENTERTAINMENT,
     NAV_MORE,
     FINANCE_TOOLS,
+    ENCOMPASS_TOOLS,
     NATURE_TOOLS,
     BIKE_TOOLS,
     MUSIC_TOOLS,
