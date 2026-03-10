@@ -226,7 +226,7 @@ describe('customFieldCalcParser', () => {
       };
       const result = generateUnitTestFromCustomField(customField);
       expect(result).not.toBeNull();
-      expect(result.testDescriptions).toHaveLength(4);
+      expect(result.testDescriptions).toHaveLength(5);
       expect(result.testDescriptions[0].description).toContain('[#60#1] <= 200');
       expect(result.testDescriptions[0].description).toContain('[#1415#1]');
       expect(result.headers).toContain('Test 1');
@@ -578,6 +578,38 @@ describe('customFieldCalcParser', () => {
       const row3142 = setRows.find((r) => r.Target === '[3142]');
       expect(row3142).toBeDefined();
       expect(row3142['Test 3']).toBe('04/15/2025');
+    });
+
+    test('includes output field dataType in metadata from custom field definition', () => {
+      const customField = {
+        fieldId: 'CX.R.ALTPROPTAX',
+        dataType: 'String',
+        calculation:
+          'IIf ([CX.TAXESCROW.EXCEEDS12] = "Y" AndAlso [CX.TAXESCROWCOLLECT.OPT] <> "Opt-In" AndAlso [CX.TAXESCROW.TYPE] <> "Alternate" , "AltPropTax(F)", "")',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      expect(result.fieldMetadata).toBeDefined();
+      const outMeta = result.fieldMetadata['CX.R.ALTPROPTAX'];
+      expect(outMeta).toBeDefined();
+      expect(outMeta.dataType).toBe('String');
+    });
+
+    test('pre-fills COMPARE row with literal string results (String/Y-N fields)', () => {
+      const customField = {
+        fieldId: 'CX.R.ALTPROPTAX',
+        dataType: 'String',
+        calculation:
+          'IIf ([CX.TAXESCROW.EXCEEDS12] = "Y" AndAlso [CX.TAXESCROWCOLLECT.OPT] <> "Opt-In" AndAlso [CX.TAXESCROW.TYPE] <> "Alternate" , "AltPropTax(F)", "")',
+      };
+      const result = generateUnitTestFromCustomField(customField);
+      expect(result).not.toBeNull();
+      const compareRow = result.rows.find((r) => r.Action === 'COMPARE' && r.Target === '[CX.R.ALTPROPTAX]');
+      expect(compareRow).toBeDefined();
+      // Scenario 1: condition true → "AltPropTax(F)"
+      expect(compareRow['Test 1']).toBe('AltPropTax(F)');
+      // Scenario 2: else → ""
+      expect(compareRow['Test 2']).toBe('');
     });
   });
 });

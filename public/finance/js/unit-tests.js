@@ -2261,6 +2261,9 @@ function clearData() {
   }
   const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
   if (selectedFieldCard) selectedFieldCard.style.display = 'none';
+  currentScenarioBuilderField = null;
+  const builderContainer = document.getElementById('liveScenarioBuilderContainer');
+  if (builderContainer) builderContainer.style.display = 'none';
   
   // Hide AI Assistant
   if (window.unitTestsAI && window.unitTestsAI.hide) {
@@ -2861,6 +2864,227 @@ function speakWithBrowser(text) {
 /** Field metadata from Encompass (dataType, format, description) keyed by field ID. Used for scenario builder. */
 let currentFieldMetadata = {};
 
+/** Current custom field for Live Scenario Builder (when generated from custom field). */
+let currentScenarioBuilderField = null;
+
+/**
+ * Get metadata for a field (from currentFieldMetadata or infer from ID).
+ * @param {string} fieldId - e.g. "353", "@353", "CX.TEST"
+ * @returns {{ dataType?: string, options?: string[] }|null}
+ */
+function getScenarioBuilderFieldMeta(fieldId) {
+  const norm = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(fieldId) || String(fieldId || '').replace(/^[@#]+/, '');
+  let meta = (currentFieldMetadata && currentFieldMetadata[norm]) || (currentFieldMetadata && currentFieldMetadata[fieldId]);
+  if (!meta && fieldId && window.customFieldCalcParser?.inferDateTypeFromFieldId) {
+    meta = window.customFieldCalcParser.inferDateTypeFromFieldId(norm) || window.customFieldCalcParser.inferDateTypeFromFieldId(fieldId);
+  }
+  if (!meta && fieldId && window.customFieldCalcParser?.isDateFieldByNotation?.(fieldId)) {
+    meta = { dataType: 'Date', format: '', description: 'Date (from @)' };
+  }
+  if (!meta && fieldId && window.customFieldCalcParser?.isNumberFieldByNotation?.(fieldId)) {
+    meta = { dataType: 'Decimal', format: '', description: 'Number (from #)' };
+  }
+  return meta || null;
+}
+
+/**
+ * Create an input element for the scenario builder based on field metadata.
+ * @param {string} fieldId
+ * @param {string} initialValue
+ * @param {string} dataAttr - data attribute for lookup
+ * @returns {HTMLInputElement|HTMLSelectElement}
+ */
+function createScenarioBuilderInput(fieldId, initialValue, dataAttr) {
+  const meta = getScenarioBuilderFieldMeta(fieldId);
+  const dt = (meta && meta.dataType) ? String(meta.dataType).toLowerCase() : '';
+  const val = initialValue !== undefined && initialValue !== null ? String(initialValue) : '';
+
+  if (meta && Array.isArray(meta.options) && meta.options.length > 0) {
+    const sel = document.createElement('select');
+    sel.className = 'form-control form-control-sm';
+    sel.setAttribute('data-field-id', dataAttr);
+    const empty = document.createElement('option');
+    empty.value = '';
+    empty.textContent = '—';
+    sel.appendChild(empty);
+    meta.options.forEach((opt) => {
+      const o = document.createElement('option');
+      o.value = opt;
+      o.textContent = opt;
+      if (String(opt) === val) o.selected = true;
+      sel.appendChild(o);
+    });
+    return sel;
+  }
+  if (/integer/i.test(dt)) {
+    const inp = document.createElement('input');
+    inp.type = 'number';
+    inp.className = 'form-control form-control-sm';
+    inp.step = '1';
+    inp.value = val;
+    inp.setAttribute('data-field-id', dataAttr);
+    return inp;
+  }
+  if (/decimal|number/i.test(dt)) {
+    const inp = document.createElement('input');
+    inp.type = 'number';
+    inp.className = 'form-control form-control-sm';
+    inp.step = '0.01';
+    inp.value = val;
+    inp.setAttribute('data-field-id', dataAttr);
+    return inp;
+  }
+  if (/date|datetime/i.test(dt)) {
+    const inp = document.createElement('input');
+    inp.type = /datetime/i.test(dt) ? 'datetime-local' : 'date';
+    inp.className = 'form-control form-control-sm';
+    inp.setAttribute('data-field-id', dataAttr);
+    if (val) {
+      const usMatch = val.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+      const isoMatch = val.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (usMatch) {
+        inp.value = usMatch[3] + '-' + usMatch[1].padStart(2, '0') + '-' + usMatch[2].padStart(2, '0');
+        if (inp.type === 'datetime-local') inp.value += 'T00:00:00';
+      } else if (isoMatch) {
+        inp.value = val.substring(0, 10);
+        if (inp.type === 'datetime-local' && val.length > 10) inp.value += val.substring(10, 19);
+      } else {
+        inp.value = val;
+      }
+    }
+    return inp;
+  }
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'form-control form-control-sm';
+  inp.value = val;
+  inp.setAttribute('data-field-id', dataAttr);
+  return inp;
+}
+
+/**
+ * Collect current values from scenario builder inputs.
+ * @returns {Record<string, string|number>}
+ */
+function getScenarioBuilderValues() {
+  const container = document.getElementById('liveScenarioBuilderContainer');
+  if (!container) return {};
+  const inputs = container.querySelectorAll('[data-field-id]');
+  const values = {};
+  inputs.forEach((el) => {
+    const fid = el.getAttribute('data-field-id');
+    if (!fid) return;
+    const norm = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(fid) || fid.replace(/^[@#]+/, '');
+    let v = el.value;
+    if (el.type === 'number') v = el.value === '' ? '' : parseFloat(el.value);
+    values[norm] = v;
+    values[fid] = v;
+  });
+  return values;
+}
+
+/**
+ * Run scenario calculation and display result.
+ */
+function runScenarioCalculation() {
+  const field = currentScenarioBuilderField;
+  const resultEl = document.getElementById('scenarioBuilderResult');
+  if (!field || !resultEl) return;
+
+  const calc = field.calculation || field.calculationExpression || field.calculatedExpression || field.expression || field.formula || '';
+  if (!calc.trim()) {
+    resultEl.textContent = '—';
+    return;
+  }
+
+  const parsed = window.customFieldCalcParser?.parseCalculationFormula?.(calc);
+  if (!parsed) {
+    resultEl.textContent = '—';
+    return;
+  }
+
+  const values = getScenarioBuilderValues();
+  const result = window.customFieldCalcParser?.evaluateExpression?.(parsed.expression, values);
+
+  if (result === null || result === undefined) {
+    resultEl.textContent = '—';
+    return;
+  }
+
+  if (typeof result === 'number') {
+    const rounded = Number.isInteger(result) ? result : Math.round((result + Number.EPSILON) * 100) / 100;
+    resultEl.textContent = String(rounded);
+  } else {
+    resultEl.textContent = String(result);
+  }
+}
+
+/**
+ * Render the Live Scenario Builder grid for the given custom field.
+ * @param {object} field - { fieldId, calculation, ... }
+ */
+function renderScenarioBuilder(field) {
+  const container = document.getElementById('liveScenarioBuilderContainer');
+  const tbody = document.getElementById('scenarioBuilderGridBody');
+  const resultEl = document.getElementById('scenarioBuilderResult');
+  if (!container || !tbody || !field) return;
+
+  const calc = field.calculation || field.calculationExpression || field.calculatedExpression || field.expression || field.formula || '';
+  if (!calc.trim()) {
+    container.style.display = 'none';
+    return;
+  }
+
+  const parsed = window.customFieldCalcParser?.parseCalculationFormula?.(calc);
+  if (!parsed) {
+    container.style.display = 'none';
+    return;
+  }
+
+  const outNorm = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(field.fieldId || field.id || '') || '';
+  let inputFields = (parsed.inputFields || []).filter((f) => {
+    const n = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(f) || f.replace(/^[@#]+/, '');
+    return n !== outNorm;
+  });
+
+  if (inputFields.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+
+  const scenarios = window.customFieldCalcParser?.parseAllIIfScenarios?.(parsed.expression);
+  const expanded = scenarios ? (window.customFieldCalcParser?.expandOrElseScenarios?.(scenarios) || scenarios) : scenarios;
+  const firstScenario = expanded && expanded.length > 0 ? expanded[0] : null;
+  const fieldMetadata = currentFieldMetadata || {};
+
+  tbody.innerHTML = '';
+  inputFields.forEach((fid) => {
+    const displayId = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(fid) || fid.replace(/^[@#]+/, '');
+    let initialVal = '';
+    if (firstScenario) {
+      const suggested = window.customFieldCalcParser?.getSuggestedValuesForScenario?.(firstScenario, inputFields, { fieldMetadata, scenarioIndex: 0, allScenarios: expanded }) || {};
+      initialVal = suggested[displayId] !== undefined ? suggested[displayId] : '';
+    }
+    const tr = document.createElement('tr');
+    const tdId = document.createElement('td');
+    tdId.className = 'field-id-cell';
+    tdId.textContent = '[' + displayId + ']';
+    tr.appendChild(tdId);
+    const tdVal = document.createElement('td');
+    tdVal.className = 'value-cell';
+    const input = createScenarioBuilderInput(fid, initialVal, displayId);
+    const onChange = () => runScenarioCalculation();
+    input.addEventListener('input', onChange);
+    input.addEventListener('change', onChange);
+    tdVal.appendChild(input);
+    tr.appendChild(tdVal);
+    tbody.appendChild(tr);
+  });
+
+  container.style.display = 'block';
+  runScenarioCalculation();
+}
+
 /**
  * Load generated unit test data (from custom field calculation) into the grid.
  * Mirrors handleFileUpload flow but for programmatically generated data.
@@ -2948,6 +3172,8 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
     }
     selectedFieldContent.innerHTML = html || '<span class="text-muted">No details</span>';
     selectedFieldCard.style.display = 'block';
+    currentScenarioBuilderField = field;
+    renderScenarioBuilder(field);
     if (collapseSelectedField && typeof window.$ !== 'undefined' && window.$.fn?.collapse) {
       window.$(collapseSelectedField).collapse('show');
     } else if (collapseSelectedField?.classList) {
@@ -2955,6 +3181,9 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
     }
   } else if (selectedFieldCard) {
     selectedFieldCard.style.display = 'none';
+    currentScenarioBuilderField = null;
+    const builderContainer = document.getElementById('liveScenarioBuilderContainer');
+    if (builderContainer) builderContainer.style.display = 'none';
   }
 
   updateLoanGuidChipDisplay(currentLoanGuid);

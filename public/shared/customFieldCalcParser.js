@@ -620,6 +620,18 @@
   }
 
   /**
+   * Extract literal string from result if it is a quoted string (e.g. "AltPropTax(F)" or "").
+   * Used for COMPARE row expected values when output is String, not a pass-through.
+   * @param {string} result - e.g. "\"AltPropTax(F)\"" or "\"\""
+   * @returns {string|null} - unquoted string or null if not a quoted literal
+   */
+  function extractLiteralResult(result) {
+    if (!result || typeof result !== 'string') return null;
+    const m = result.trim().match(/^"([^"]*)"$/);
+    return m ? m[1] : null;
+  }
+
+  /**
    * Normalize field ID for metadata lookup (strip leading @ date typecast, # number typecast).
    * @param {string} fieldId - e.g. "353", "@353", "#4002", "CX.TEST"
    * @returns {string}
@@ -794,12 +806,27 @@
       (options && typeof options === 'object' && options.fieldMetadata) ? options.fieldMetadata : {}
     );
 
+    // Ensure output field's dataType is in metadata from custom field definition (String, Decimal, Date, Y/N, etc.)
+    const outMetaFromField = {
+      dataType: customField.dataType || customField.dataTypeName || customField.valueType || customField.fieldType || '',
+      format: customField.format || customField.formatType || customField.displayFormat || '',
+      description: customField.description || customField.longDescription || customField.shortDescription || customField.label || '',
+    };
+    if (outMetaFromField.dataType || outMetaFromField.format || outMetaFromField.description) {
+      const existing = fieldMetadata[outNorm] || fieldMetadata[outField] || {};
+      fieldMetadata[outNorm] = {
+        ...existing,
+        dataType: outMetaFromField.dataType || existing.dataType,
+        format: outMetaFromField.format || existing.format,
+        description: outMetaFromField.description || existing.description,
+      };
+      fieldMetadata[outField] = fieldMetadata[outNorm];
+    }
+
     let scenarios = parseAllIIfScenarios(expression);
     if (scenarios) scenarios = expandOrElseScenarios(scenarios);
-    const maxScenarios = 10;
-    const scenarioCount = scenarios && scenarios.length > 0
-      ? Math.min(Math.max(1, scenarios.length), maxScenarios)
-      : 5;
+    const maxScenarios = 20;
+    const scenarioCount = Math.min(Math.max(5, (scenarios && scenarios.length) || 0), maxScenarios);
     const headers = ['Step', 'Action', 'Target', 'Description', 'Test 1'];
     for (let i = 2; i <= scenarioCount; i++) {
       headers.push('Test ' + i);
@@ -897,10 +924,14 @@
       let suggested = '';
       if (s && s.result) {
         const resultField = extractSingleResultField(s.result);
+        const literalResult = extractLiteralResult(s.result);
         if (resultField && inputFields.some((f) => normalizeFieldIdForLookup(f) === resultField)) {
           const suggestedMap = getSuggestedValuesForScenario(s, inputFields, { fieldMetadata, scenarioIndex: idx });
           const val = suggestedMap[resultField];
           suggested = val !== undefined && val !== '' ? String(val) : '';
+        } else if (literalResult !== null) {
+          // String/Date/Y-N literal result (e.g. "AltPropTax(F)" or "") — use as-is per output field dataType
+          suggested = literalResult;
         }
       }
       compareRow['Test ' + (idx + 1)] = suggested;
@@ -922,7 +953,7 @@
     rows.push(eofRow);
 
     const maxDescLen = 80;
-    const testDescriptions = scenarios && scenarios.length > 0
+    const scenarioDescs = scenarios && scenarios.length > 0
       ? scenarios.slice(0, scenarioCount).map((s, idx) => {
           const cond = s.condition ? s.condition.trim() : 'else';
           const result = s.result ? s.result.trim() : '';
@@ -930,10 +961,10 @@
           if (desc.length > maxDescLen) desc = desc.substring(0, maxDescLen - 3) + '...';
           return { testNumber: String(idx + 1), description: desc };
         })
-      : Array.from({ length: scenarioCount }, (_, idx) => ({
-          testNumber: String(idx + 1),
-          description: 'Scenario ' + (idx + 1),
-        }));
+      : [];
+    const testDescriptions = Array.from({ length: scenarioCount }, (_, idx) =>
+      scenarioDescs[idx] || { testNumber: String(idx + 1), description: 'Scenario ' + (idx + 1) }
+    );
 
     const result = {
       headers: headers,
@@ -948,6 +979,227 @@
     return { ...FALLBACK_FIELD_METADATA };
   }
 
+  /**
+   * Get value for a field from values map (supports normalized and raw IDs).
+   * @param {string} fieldId - e.g. "353", "@353", "#4002"
+   * @param {Record<string, string|number>} values - fieldId -> value
+   * @returns {string|number}
+   */
+  function getFieldValue(fieldId, values) {
+    if (!values || typeof values !== 'object') return '';
+    const raw = String(fieldId || '').trim();
+    const norm = normalizeFieldIdForLookup(raw);
+    return values[norm] ?? values[raw] ?? values[fieldId] ?? '';
+  }
+
+  /**
+   * Evaluate a single atomic condition (no AndAlso/OrElse).
+   * @param {string} cond - e.g. "[353] <= 200", "[19] = \"Y\"", "IsDate([@CX.DT])"
+   * @param {Record<string, string|number>} values
+   * @returns {boolean}
+   */
+  function evaluateAtomicCondition(cond, values) {
+    if (!cond || typeof cond !== 'string') return false;
+    const c = cond.trim();
+    if (!c) return false;
+
+    const comps = extractComparisonValues(c);
+    if (comps.length > 0) {
+      for (let i = 0; i < comps.length; i++) {
+        const comp = comps[i];
+        const val = getFieldValue(comp.fieldId, values);
+        const num = (val === '' || val === null || val === undefined) ? 0 : (typeof val === 'number' ? val : parseFloat(val));
+        const target = comp.value;
+        let result = false;
+        switch (comp.op) {
+          case '<=': result = num <= target; break;
+          case '>=': result = num >= target; break;
+          case '<': result = num < target; break;
+          case '>': result = num > target; break;
+          case '=': result = num === target; break;
+          case '<>': result = num !== target; break;
+          default: result = false;
+        }
+        if (!result) return false;
+      }
+      return true;
+    }
+
+    const strComps = extractStringComparisons(c);
+    if (strComps.length > 0) {
+      for (let i = 0; i < strComps.length; i++) {
+        const sc = strComps[i];
+        const val = String(getFieldValue(sc.fieldId, values) ?? '').trim();
+        const target = (sc.value ?? '').trim();
+        if (val !== target) return false;
+      }
+      return true;
+    }
+
+    const condVals = extractConditionValues(c);
+    for (let i = 0; i < condVals.length; i++) {
+      const cv = condVals[i];
+      if (cv.type === 'isDate') {
+        const val = String(getFieldValue(cv.fieldId, values) ?? '');
+        const d = new Date(val);
+        const valid = !Number.isNaN(d.getTime()) && val.trim() !== '';
+        if (valid !== !cv.negated) return false;
+      } else if (cv.type === 'contains') {
+        const val = String(getFieldValue(cv.fieldId, values) ?? '').toLowerCase();
+        const sub = (cv.substring ?? '').toLowerCase();
+        if (!val.includes(sub)) return false;
+      } else if (cv.type === 'startsWith') {
+        const val = String(getFieldValue(cv.fieldId, values) ?? '').toLowerCase();
+        const prefix = (cv.prefix ?? '').toLowerCase();
+        if (!val.startsWith(prefix)) return false;
+      } else if (cv.type === 'nothing') {
+        const val = String(getFieldValue(cv.fieldId, values) ?? '').trim();
+        const isEmpty = val === '';
+        if (cv.negated ? isEmpty : !isEmpty) return false;
+      } else if (cv.type === 'dateDiff') {
+        const v1 = String(getFieldValue(cv.field1, values) ?? '');
+        const v2 = String(getFieldValue(cv.field2, values) ?? '');
+        const d1 = new Date(v1);
+        const d2 = new Date(v2);
+        if (Number.isNaN(d1.getTime()) || Number.isNaN(d2.getTime())) return false;
+        const diff = Math.floor((d2 - d1) / (24 * 60 * 60 * 1000));
+        let result = false;
+        switch (cv.op) {
+          case '<=': result = diff <= cv.value; break;
+          case '>=': result = diff >= cv.value; break;
+          case '<': result = diff < cv.value; break;
+          case '>': result = diff > cv.value; break;
+          case '=': result = diff === cv.value; break;
+          case '<>': result = diff !== cv.value; break;
+          default: result = false;
+        }
+        if (!result) return false;
+      }
+    }
+    return condVals.length > 0 || (c === 'true' || c === 'True');
+  }
+
+  /**
+   * Evaluate a full condition (supports AndAlso, OrElse).
+   * @param {string} condition - e.g. "[353] <= 200 AndAlso [19] = \"Y\""
+   * @param {Record<string, string|number>} values
+   * @returns {boolean}
+   */
+  function evaluateCondition(condition, values) {
+    if (!condition || typeof condition !== 'string') return false;
+    const c = condition.trim();
+    if (!c) return false;
+
+    const orParts = splitOrElseBranches(c);
+    if (orParts.length > 1) {
+      return orParts.some((p) => evaluateCondition(p, values));
+    }
+
+    const andMatch = c.match(/^(.+?)\s+AndAlso\s+(.+)$/);
+    if (andMatch) {
+      return evaluateCondition(andMatch[1].trim(), values) && evaluateCondition(andMatch[2].trim(), values);
+    }
+
+    return evaluateAtomicCondition(c, values);
+  }
+
+  /**
+   * Resolve a result segment: replace [field] with value, or return literal.
+   * @param {string} result - e.g. "[#1415#1]" or "\"Y\"" or "123"
+   * @param {Record<string, string|number>} values
+   * @returns {string}
+   */
+  function resolveResultValue(result, values) {
+    if (!result || typeof result !== 'string') return '';
+    const r = result.trim();
+    const quoted = r.match(/^"([^"]*)"$/);
+    if (quoted) return quoted[1];
+    const fieldRef = r.match(/^\[([^\]]+)\]$/);
+    if (fieldRef) {
+      const val = getFieldValue(fieldRef[1], values);
+      return val === null || val === undefined ? '' : String(val);
+    }
+    return r;
+  }
+
+  /**
+   * Evaluate a single IIf(cond, thenVal, elseVal) segment.
+   * @param {string} segment - e.g. "IIf([353] <= 200, \"Y\", \"N\")"
+   * @param {Record<string, string|number>} values
+   * @returns {string}
+   */
+  function evaluateIIfSegment(segment, values) {
+    if (!segment || typeof segment !== 'string') return '';
+    const str = segment.trim();
+    const iifMatch = str.match(/IIf\s*\(/i);
+    if (!iifMatch) return resolveResultValue(str, values);
+
+    const start = iifMatch.index + iifMatch[0].length;
+    let depth = 1;
+    let firstComma = -1;
+    let secondComma = -1;
+    let i = start;
+    let inQuote = false;
+
+    while (i < str.length) {
+      const ch = str[i];
+      if (ch === '"' && (i === 0 || str[i - 1] !== '\\')) {
+        inQuote = !inQuote;
+        i++;
+        continue;
+      }
+      if (!inQuote) {
+        if (ch === '(') depth++;
+        else if (ch === ')') {
+          depth--;
+          if (depth === 0) break;
+        } else if (ch === ',' && depth === 1) {
+          if (firstComma < 0) firstComma = i;
+          else secondComma = i;
+        }
+      }
+      i++;
+    }
+
+    if (firstComma < 0 || secondComma < 0) return '';
+    const condition = str.substring(start, firstComma).trim();
+    const thenVal = str.substring(firstComma + 1, secondComma).trim();
+    const elseVal = str.substring(secondComma + 1, i).trim();
+
+    const condResult = evaluateCondition(condition, values);
+    if (condResult) {
+      if (/IIf\s*\(/i.test(thenVal)) return evaluateIIfSegment(thenVal, values);
+      return resolveResultValue(thenVal, values);
+    }
+    if (/IIf\s*\(/i.test(elseVal)) return evaluateIIfSegment(elseVal, values);
+    return resolveResultValue(elseVal, values);
+  }
+
+  /**
+   * Evaluate an Encompass calculation expression (IIf or simple arithmetic).
+   * @param {string} expression - e.g. "[4002] + [4003]" or "IIf([19] = \"Refi\", \"Y\", \"N\")"
+   * @param {Record<string, string|number>} values - fieldId (normalized) -> value
+   * @returns {string|number|null}
+   */
+  function evaluateExpression(expression, values) {
+    values = values || {};
+    if (!expression || typeof expression !== 'string') return null;
+    const expr = expression.trim();
+    if (!expr) return null;
+
+    if (/IIf\s*\(/i.test(expr)) {
+      const segments = splitByTopLevelAmpersand(expr);
+      const parts = [];
+      for (let i = 0; i < segments.length; i++) {
+        const seg = segments[i].trim();
+        if (seg) parts.push(evaluateIIfSegment(seg, values));
+      }
+      return parts.join('');
+    }
+
+    return evaluateSimpleExpression(expr, values);
+  }
+
   global.customFieldCalcParser = {
     parseCalculationFormula: parseCalculationFormula,
     splitByTopLevelAmpersand: splitByTopLevelAmpersand,
@@ -959,6 +1211,9 @@
     extractStringComparisons: extractStringComparisons,
     getSuggestedValuesForScenario: getSuggestedValuesForScenario,
     evaluateSimpleExpression: evaluateSimpleExpression,
+    evaluateExpression: evaluateExpression,
+    evaluateCondition: evaluateCondition,
+    getFieldValue: getFieldValue,
     generateUnitTestFromCustomField: generateUnitTestFromCustomField,
     buildFieldMetadataLookup: buildFieldMetadataLookup,
     getFallbackFieldMetadata: getFallbackFieldMetadata,
@@ -968,5 +1223,7 @@
     inferDateTypeFromFieldId: inferDateTypeFromFieldId,
     isSunriseField: isSunriseField,
     formatDateWithOffset: formatDateWithOffset,
+    extractSingleResultField: extractSingleResultField,
+    extractLiteralResult: extractLiteralResult,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
