@@ -246,8 +246,49 @@
           <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
         </div>
         <div class="modal-body">
-          <div class="poster-layout">
-            <div class="poster-preview">
+          <div class="mb-3">
+            <label class="small font-weight-bold">Mode</label>
+            <div class="d-flex gap-2 mt-1">
+              <button type="button" class="btn btn-sm btn-outline-primary" id="spotPosterModeSimple" onclick="setSpotPosterMode('simple')">Simple</button>
+              <button type="button" class="btn btn-sm btn-outline-primary" id="spotPosterModeTemplate" onclick="setSpotPosterMode('template')">Template</button>
+            </div>
+          </div>
+          <div id="spotPosterTemplateOpts" class="mb-3" style="display: none;">
+            <label class="small font-weight-bold">Template</label>
+            <div class="d-flex flex-wrap gap-2 mt-1 mb-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary spot-template-btn" data-id="single" onclick="selectSpotPosterTemplate('single')">Single</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary spot-template-btn" data-id="vintage" onclick="selectSpotPosterTemplate('vintage')">Vintage</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary spot-template-btn" data-id="split" onclick="selectSpotPosterTemplate('split')">Split</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary spot-template-btn" data-id="grid" onclick="selectSpotPosterTemplate('grid')">Grid</button>
+            </div>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+              <div>
+                <label class="small">Font</label>
+                <select id="spotPosterFont" class="form-control form-control-sm" style="max-width: 160px;" onchange="rebuildSpotPoster()">
+                  <option value="Georgia, serif">Serif</option>
+                  <option value="'Helvetica Neue', Arial, sans-serif">Sans</option>
+                  <option value="'Impact', 'Arial Black', sans-serif">Display</option>
+                  <option value="'Brush Script MT', cursive">Script</option>
+                  <option value="'Courier New', monospace">Mono</option>
+                </select>
+              </div>
+              <div>
+                <label class="small">Frame</label>
+                <select id="spotPosterFrame" class="form-control form-control-sm" style="max-width: 140px;" onchange="rebuildSpotPoster()">
+                  <option value="none">None</option>
+                  <option value="thin_gold">Thin Gold</option>
+                  <option value="thick_vintage">Thick Vintage</option>
+                  <option value="neon_glow">Neon Glow</option>
+                </select>
+              </div>
+              <div class="form-check align-self-end">
+                <input type="checkbox" class="form-check-input" id="spotPosterQr" onchange="rebuildSpotPoster()">
+                <label class="form-check-label small" for="spotPosterQr">QR code</label>
+              </div>
+            </div>
+          </div>
+          <div class="poster-layout mt-3">
+            <div class="poster-preview" style="overflow: auto; max-height: 420px;">
               <div id="posterContent" class="poster-frame"></div>
             </div>
             <div style="flex: 1 1 260px;">
@@ -277,7 +318,9 @@
   <script src="/shared/tts.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   <script src="/shared/poster-utils.js"></script>
+  <script src="/shared/poster-templates.js"></script>
   <script>
     let map;
     let markers = [];
@@ -285,8 +328,11 @@
     let spots = [];
     let activeCategory = 'all';
     let userLocation = null;
+    const deviceLocation = { lat: null, lng: null };
     let currentPosterSpot = null;
     let spotPosterCanvas = null;
+    let spotPosterMode = 'simple';
+    let spotPosterTemplate = 'single';
     let placeAutocomplete;
     let localExpertChatContext = [];
     let localExpertSpeakResponses = false;
@@ -342,8 +388,31 @@
       }
     }
 
+    function requestDeviceLocationOnLoad() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          deviceLocation.lat = pos.coords.latitude;
+          deviceLocation.lng = pos.coords.longitude;
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      );
+    }
+
+    function syncDeviceLocationToSpotInputs() {
+      if (deviceLocation.lat != null && deviceLocation.lng != null) {
+        const latEl = document.getElementById('spotLat');
+        const lngEl = document.getElementById('spotLng');
+        if (latEl) latEl.value = deviceLocation.lat.toFixed(6);
+        if (lngEl) lngEl.value = deviceLocation.lng.toFixed(6);
+      }
+    }
+
     function initMap() {
-      const defaultCenter = { lat: 36.7783, lng: -119.4179 };
+      const defaultCenter = deviceLocation.lat != null && deviceLocation.lng != null
+        ? { lat: deviceLocation.lat, lng: deviceLocation.lng }
+        : { lat: 36.7783, lng: -119.4179 };
       map = new google.maps.Map(document.getElementById('localSpotsMap'), {
         center: defaultCenter,
         zoom: 8
@@ -527,6 +596,7 @@
       document.getElementById('spotTags').value = '';
       document.getElementById('spotFavorite').checked = true;
       clearSpotPhoto();
+      syncDeviceLocationToSpotInputs();
       $('#spotModal').modal('show');
     }
 
@@ -795,6 +865,68 @@
       `;
     }
 
+    function setSpotPosterMode(mode) {
+      spotPosterMode = mode;
+      document.getElementById('spotPosterModeSimple').classList.toggle('active', mode === 'simple');
+      document.getElementById('spotPosterModeTemplate').classList.toggle('active', mode === 'template');
+      document.getElementById('spotPosterTemplateOpts').style.display = mode === 'template' ? 'block' : 'none';
+      rebuildSpotPoster();
+    }
+
+    function selectSpotPosterTemplate(id) {
+      spotPosterTemplate = id;
+      document.querySelectorAll('.spot-template-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.id === id);
+      });
+      rebuildSpotPoster();
+    }
+
+    function generateSpotPosterQr(url) {
+      if (!window.QRCode || !url) return null;
+      const div = document.createElement('div');
+      div.style.cssText = 'position:absolute;left:-9999px;width:128px;height:128px;';
+      document.body.appendChild(div);
+      try {
+        new window.QRCode(div, { text: url, width: 128, height: 128 });
+        const canvas = div.querySelector('canvas');
+        const img = div.querySelector('img');
+        const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+        document.body.removeChild(div);
+        return dataUrl;
+      } catch (e) {
+        if (div.parentNode) document.body.removeChild(div);
+        return null;
+      }
+    }
+
+    function rebuildSpotPoster() {
+      if (!currentPosterSpot) return;
+      spotPosterCanvas = null;
+      if (spotPosterMode === 'template' && window.posterTemplates) {
+        const imageUrl = resolvePosterImageUrl(currentPosterSpot.imageUrl || '');
+        const qrUrl = currentPosterSpot.address
+          ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(currentPosterSpot.address)
+          : 'https://www.google.com/search?q=' + encodeURIComponent(currentPosterSpot.name || '');
+        const addQr = document.getElementById('spotPosterQr')?.checked;
+        const qrDataUrl = addQr ? generateSpotPosterQr(qrUrl) : null;
+        const data = {
+          imageUrl: imageUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="%234a90a4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="24">No Photo</text></svg>',
+          artist: CATEGORY_LABELS[currentPosterSpot.category] || currentPosterSpot.category || '',
+          album: currentPosterSpot.name || '',
+          title: currentPosterSpot.name || '',
+          subtitle: CATEGORY_LABELS[currentPosterSpot.category] || currentPosterSpot.category || 'Local Spot',
+          venue: currentPosterSpot.address || null,
+          date: null,
+          fontFamily: document.getElementById('spotPosterFont')?.value || 'Georgia, serif',
+          qrDataUrl: qrDataUrl || undefined,
+          frame: document.getElementById('spotPosterFrame')?.value || 'none'
+        };
+        document.getElementById('posterContent').innerHTML = window.posterTemplates.render(spotPosterTemplate, data);
+      } else {
+        document.getElementById('posterContent').innerHTML = buildSpotPosterHtml(currentPosterSpot);
+      }
+    }
+
     function resolvePosterImageUrl(url) {
       if (!url) return url;
       if (url.startsWith('data:') || url.startsWith('blob:')) return url;
@@ -817,7 +949,16 @@
       if (!spot) return;
       currentPosterSpot = spot;
       spotPosterCanvas = null;
-      document.getElementById('posterContent').innerHTML = buildSpotPosterHtml(spot);
+      spotPosterMode = 'simple';
+      spotPosterTemplate = 'single';
+      document.getElementById('spotPosterModeSimple').classList.add('active');
+      document.getElementById('spotPosterModeTemplate').classList.remove('active');
+      document.getElementById('spotPosterTemplateOpts').style.display = 'none';
+      document.querySelectorAll('.spot-template-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.id === 'single');
+      });
+      document.getElementById('spotPosterQr').checked = false;
+      rebuildSpotPoster();
       document.getElementById('posterShareLink').value = '';
       $('#posterModal').modal('show');
     }
@@ -1016,6 +1157,7 @@
       });
     })();
 
+    requestDeviceLocationOnLoad();
     loadGoogleMaps();
   </script>
 </body>

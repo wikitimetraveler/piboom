@@ -24,10 +24,26 @@ Conventions for tables, grids, shared components, and themes. Use this when buil
 - Bootstrap 5 integration: `dataTables.bootstrap5.min.css`
 - Used for pipeline loans, disaster lists, risk summaries
 
+## Geolocation Auto-Fill (Discovery Pages)
+
+Discovery and collection pages auto-fill latitude/longitude from the device when on mobile:
+
+| Page | Inputs | When |
+|------|--------|------|
+| Tree Discovery | `addTreeLatitude`, `addTreeLongitude` | On load, camera capture, EXIF fallback |
+| Critter Discovery | `addCritterLatitude`, `addCritterLongitude` | On load, camera capture, EXIF fallback |
+| Album Discovery | `addLatitude`, `addLongitude` | On load |
+| Fish Identification | `catchLat`, `catchLng` | On load |
+| My Local Spots | `spotLat`, `spotLng` | When opening Add Spot modal |
+
+Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` and `maximumAge: 60000`. Sync device location to inputs via a `syncDeviceLocationTo*Inputs()` helper called after position is obtained.
+
 ## Shared Resources
 
 | Path | Purpose |
 |------|---------|
+| `public/shared/collection-styles.css` | Shared collection page styles (stats, cards, map, empty/loading, toast) |
+| `public/shared/collection-utils.js` | Shared collection utilities (showToast, resolvePosterImageUrl, waitForPosterImages, requestDeviceLocation) |
 | `public/shared/modern-navbar.js` | Web component navbar |
 | `public/shared/styles.css` | Shared styles |
 | `public/shared/user-login.js` | User login |

@@ -1146,6 +1146,15 @@ function resetPhotoLocation() {
   photoLocation.label = '';
 }
 
+function syncDeviceLocationToAlbumInputs() {
+  if (deviceLocation.lat != null && deviceLocation.lng != null) {
+    const latEl = document.getElementById('addLatitude');
+    const lngEl = document.getElementById('addLongitude');
+    if (latEl) latEl.value = deviceLocation.lat.toFixed(6);
+    if (lngEl) lngEl.value = deviceLocation.lng.toFixed(6);
+  }
+}
+
 function requestDeviceLocationOnLoad() {
   if (!navigator.geolocation) {
     return;
@@ -1155,6 +1164,7 @@ function requestDeviceLocationOnLoad() {
     (position) => {
       deviceLocation.lat = position.coords.latitude;
       deviceLocation.lng = position.coords.longitude;
+      syncDeviceLocationToAlbumInputs();
     },
     () => {
       deviceLocation.lat = null;
@@ -1174,6 +1184,7 @@ function requestDeviceLocationNow() {
       (position) => {
         deviceLocation.lat = position.coords.latitude;
         deviceLocation.lng = position.coords.longitude;
+        syncDeviceLocationToAlbumInputs();
         resolve(true);
       },
       () => {

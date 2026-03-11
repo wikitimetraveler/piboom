@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/collection-styles.css"/>
   <script src="/shared/modern-navbar.js"></script>
   <script src="/shared/user-selector.js"></script>
   <script src="/shared/user-passwords.js"></script>
@@ -582,19 +583,17 @@
 <modern-navbar></modern-navbar>
 
 <!-- Simple Header -->
-<div class="simple-header">
+<div class="collection-simple-header">
   <div class="container">
-    <div class="header-content">
-      <a href="/" class="brand">🌲 DevConnect Labs Forest</a>
-      <div class="nav-links">
+    <div class="collection-header-content">
+      <a href="/" class="collection-brand">🌲 Smokey's Forest</a>
+      <div class="collection-nav-links">
         <a href="/">Home</a>
-        <a href="/music-research.html">Research</a>
-        <a href="/album-discovery.html">Albums</a>
-        <a href="/collection.html">Collection</a>
-        <a href="/music-time-machine.html">Time Machine</a>
-        <a href="/poster-generator.html">Poster Gen</a>
-        <a href="/voice-dj.html">Voice DJ</a>
-        <a href="/tree-collection.html" class="active">Forest 🌲</a>
+        <a href="/nature/nature-hub.html">Nature Hub</a>
+        <a href="/nature/tree-discovery.html">Trees</a>
+        <a href="/nature/critter-discovery.html">Discover Critters</a>
+        <a href="/nature/critter-collection.html">Critters</a>
+        <a href="/nature/tree-collection.html" class="active">My Forest</a>
       </div>
     </div>
   </div>
@@ -675,7 +674,7 @@
     <i class="bi-tree"></i>
     <h3>Your Forest is Empty</h3>
     <p class="text-muted">Start discovering and documenting trees to build your collection!</p>
-    <button class="btn btn-success btn-lg mt-3" onclick="window.location.href='/tree-discovery.html'">
+    <button class="btn btn-success btn-lg mt-3" onclick="window.location.href='/nature/tree-discovery.html'">
       <i class="bi-camera"></i> Discover Your First Tree
     </button>
   </div>
@@ -788,8 +787,49 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="poster-layout">
-          <div class="poster-preview">
+        <div class="mb-3">
+          <label class="small font-weight-bold">Mode</label>
+          <div class="d-flex gap-2 mt-1">
+            <button type="button" class="btn btn-sm btn-outline-success" id="treePosterModeSimple" onclick="setTreePosterMode('simple')">Simple</button>
+            <button type="button" class="btn btn-sm btn-outline-success" id="treePosterModeTemplate" onclick="setTreePosterMode('template')">Template</button>
+          </div>
+        </div>
+        <div id="treePosterTemplateOpts" class="mb-3" style="display: none;">
+          <label class="small font-weight-bold">Template</label>
+          <div class="d-flex flex-wrap gap-2 mt-1 mb-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary tree-template-btn" data-id="single" onclick="selectTreePosterTemplate('single')">Single</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary tree-template-btn" data-id="vintage" onclick="selectTreePosterTemplate('vintage')">Vintage</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary tree-template-btn" data-id="split" onclick="selectTreePosterTemplate('split')">Split</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary tree-template-btn" data-id="grid" onclick="selectTreePosterTemplate('grid')">Grid</button>
+          </div>
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div>
+              <label class="small">Font</label>
+              <select id="treePosterFont" class="form-control form-control-sm" style="max-width: 160px;" onchange="rebuildTreePoster()">
+                <option value="Georgia, serif">Serif</option>
+                <option value="'Helvetica Neue', Arial, sans-serif">Sans</option>
+                <option value="'Impact', 'Arial Black', sans-serif">Display</option>
+                <option value="'Brush Script MT', cursive">Script</option>
+                <option value="'Courier New', monospace">Mono</option>
+              </select>
+            </div>
+            <div>
+              <label class="small">Frame</label>
+              <select id="treePosterFrame" class="form-control form-control-sm" style="max-width: 140px;" onchange="rebuildTreePoster()">
+                <option value="none">None</option>
+                <option value="thin_gold">Thin Gold</option>
+                <option value="thick_vintage">Thick Vintage</option>
+                <option value="neon_glow">Neon Glow</option>
+              </select>
+            </div>
+            <div class="form-check align-self-end">
+              <input type="checkbox" class="form-check-input" id="treePosterQr" onchange="rebuildTreePoster()">
+              <label class="form-check-label small" for="treePosterQr">QR code</label>
+            </div>
+          </div>
+        </div>
+        <div class="poster-layout mt-3">
+          <div class="poster-preview" style="overflow: auto; max-height: 420px;">
             <div id="posterContent" class="poster-frame"></div>
           </div>
           <div style="flex: 1 1 260px;">
@@ -1283,6 +1323,8 @@ function displayTrees(trees) {
 
 let currentPosterTree = null;
 let treePosterCanvas = null;
+let treePosterMode = 'simple';
+let treePosterTemplate = 'single';
 
 function buildTreePosterHtml(tree) {
   const photoUrl = resolvePosterImageUrl(tree.photo_url || 'https://via.placeholder.com/320x320/4CAF50/FFFFFF?text=Tree');
@@ -1336,12 +1378,81 @@ function buildTreePosterHtml(tree) {
   `;
 }
 
+function setTreePosterMode(mode) {
+  treePosterMode = mode;
+  document.getElementById('treePosterModeSimple').classList.toggle('active', mode === 'simple');
+  document.getElementById('treePosterModeTemplate').classList.toggle('active', mode === 'template');
+  document.getElementById('treePosterTemplateOpts').style.display = mode === 'template' ? 'block' : 'none';
+  rebuildTreePoster();
+}
+
+function selectTreePosterTemplate(id) {
+  treePosterTemplate = id;
+  document.querySelectorAll('.tree-template-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.id === id);
+  });
+  rebuildTreePoster();
+}
+
+function generateTreePosterQr(url) {
+  if (!window.QRCode || !url) return null;
+  const div = document.createElement('div');
+  div.style.cssText = 'position:absolute;left:-9999px;width:128px;height:128px;';
+  document.body.appendChild(div);
+  try {
+    new window.QRCode(div, { text: url, width: 128, height: 128 });
+    const canvas = div.querySelector('canvas');
+    const img = div.querySelector('img');
+    const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+    document.body.removeChild(div);
+    return dataUrl;
+  } catch (e) {
+    if (div.parentNode) document.body.removeChild(div);
+    return null;
+  }
+}
+
+function rebuildTreePoster() {
+  if (!currentPosterTree) return;
+  treePosterCanvas = null;
+  if (treePosterMode === 'template' && window.posterTemplates) {
+    const imageUrl = resolvePosterImageUrl(currentPosterTree.photo_url || '');
+    const qrUrl = 'https://www.google.com/search?q=' + encodeURIComponent((currentPosterTree.tree_name || '') + ' ' + (currentPosterTree.scientific_name || ''));
+    const addQr = document.getElementById('treePosterQr')?.checked;
+    const qrDataUrl = addQr ? generateTreePosterQr(qrUrl) : null;
+    const data = {
+      imageUrl: imageUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="%23228B22"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="24">No Photo</text></svg>',
+      artist: currentPosterTree.scientific_name || '',
+      album: currentPosterTree.tree_name || '',
+      title: currentPosterTree.tree_name || '',
+      subtitle: currentPosterTree.scientific_name || 'Unknown species',
+      venue: currentPosterTree.location_name || null,
+      date: currentPosterTree.added_date ? new Date(currentPosterTree.added_date).toLocaleDateString() : null,
+      fontFamily: document.getElementById('treePosterFont')?.value || 'Georgia, serif',
+      qrDataUrl: qrDataUrl || undefined,
+      frame: document.getElementById('treePosterFrame')?.value || 'none'
+    };
+    document.getElementById('posterContent').innerHTML = window.posterTemplates.render(treePosterTemplate, data);
+  } else {
+    document.getElementById('posterContent').innerHTML = buildTreePosterHtml(currentPosterTree);
+  }
+}
+
 function openTreePoster(id) {
   const tree = currentCollection.find(item => item.id === id);
   if (!tree) return;
   currentPosterTree = tree;
   treePosterCanvas = null;
-  document.getElementById('posterContent').innerHTML = buildTreePosterHtml(tree);
+  treePosterMode = 'simple';
+  treePosterTemplate = 'single';
+  document.getElementById('treePosterModeSimple').classList.add('active');
+  document.getElementById('treePosterModeTemplate').classList.remove('active');
+  document.getElementById('treePosterTemplateOpts').style.display = 'none';
+  document.querySelectorAll('.tree-template-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.id === 'single');
+  });
+  document.getElementById('treePosterQr').checked = false;
+  rebuildTreePoster();
   document.getElementById('posterShareLink').value = '';
   if (typeof $ !== 'undefined') {
     $('#posterModal').modal('show');
@@ -1816,7 +1927,10 @@ function toggleAIAnalysis(element) {
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
 <script src="/shared/poster-utils.js"></script>
+<script src="/shared/poster-templates.js"></script>
+<script src="/shared/collection-utils.js"></script>
 <script src="/shared/scripts.js"></script>
 <script src="/shared/voice-widget.js"></script>
 <script>

@@ -35,6 +35,13 @@ A comprehensive multi-domain platform featuring **music research**, **mortgage l
 - **🎯 Geographic Filtering**: State, county, and event type filtering
 - **📈 Risk Score Calculation**: Automated risk scoring based on disaster frequency and severity
 
+### 📍 Discovery & Local Spots (Mobile-Friendly)
+- **🌳 Tree Discovery**: Identify trees from photos; lat/long auto-fills from your phone
+- **🦎 Critter Discovery**: Identify wildlife; coordinates auto-fill from device location
+- **💿 Album Discovery**: Identify album covers; location auto-fills when adding to collection
+- **🐟 Fish Identification**: Log catches; lat/long auto-fills from device on page load
+- **📍 My Local Spots**: Thrift shops, taco trucks, gardens, bike trails; coordinates auto-fill when adding a spot on mobile
+
 ### 🤖 AI Assistant Domain
 - **💬 LangChain Integration**: Conversational AI with PostgreSQL memory persistence
 - **🏦 Mortgage Operations AI**: Expert assistant for correspondent and retail lending operations

@@ -506,6 +506,32 @@
       });
     }
 
+    function requestDeviceLocationOnLoad() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const latEl = document.getElementById('catchLat');
+          const lngEl = document.getElementById('catchLng');
+          const addrLatEl = document.getElementById('catchAddressLat');
+          const addrLngEl = document.getElementById('catchAddressLng');
+          const labelEl = document.getElementById('catchLabel');
+          if (latEl) latEl.value = lat.toFixed(6);
+          if (lngEl) lngEl.value = lng.toFixed(6);
+          if (addrLatEl) addrLatEl.value = lat;
+          if (addrLngEl) addrLngEl.value = lng;
+          if (labelEl && !labelEl.value) labelEl.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+          if (map && window.google && google.maps) {
+            const latLng = new google.maps.LatLng(lat, lng);
+            setNewCatchLocation(latLng);
+          }
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      );
+    }
+
     async function useMyLocation() {
       const coords = await requestDeviceLocationNow();
       if (!coords) {
@@ -789,6 +815,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       setFishAssistant();
       loadGoogleMaps();
+      requestDeviceLocationOnLoad();
       const stateInput = document.getElementById('catchState');
       if (stateInput) {
         stateInput.addEventListener('input', (event) => {

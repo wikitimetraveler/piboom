@@ -178,8 +178,8 @@
 **Purpose:** Stores tree identification and location data
 
 **Columns with Coordinates:**
-- `latitude` (DECIMAL 10,8) - Tree location latitude ✅ **MANUALLY ENTERED** (no auto-geocoding)
-- `longitude` (DECIMAL 11,8) - Tree location longitude ✅ **MANUALLY ENTERED**
+- `latitude` (DECIMAL 10,8) - Tree location latitude ✅ **Auto-fills from device GPS on mobile** (or address/EXIF)
+- `longitude` (DECIMAL 11,8) - Tree location longitude ✅ **Auto-fills from device GPS on mobile** (or address/EXIF)
 
 **Location Data:**
 - `location_name` (VARCHAR 255) - Descriptive location name
@@ -205,7 +205,7 @@
 - `ai_analysis` (TEXT) - AI-generated analysis
 
 **Geocoding Status:**
-- ❌ **NO AUTO-GEOCODING** - Coordinates manually entered by users
+- ✅ **Auto-fills from device GPS** on Album Discovery page when adding to collection (or address/EXIF)
 - Coordinates used for mapping only
 
 ---
@@ -400,8 +400,8 @@
 ### ❌ **Geocoding DISABLED:**
 - **Camera feeds** in disasters table (reverse geocoding disabled)
 
-### 📍 **Tables with Coordinates (Manual Entry):**
-- **`trees`** - Coordinates manually entered, no auto-geocoding
+### 📍 **Tables with Coordinates (Device GPS Auto-Fill):**
+- **`trees`**, **critters**, **fish_catches**, **records** (locationLat/lng) - Auto-fill from device GPS on mobile discovery pages
 
 ### 🔄 **Geocoding Service:**
 - **ALL geocoding uses FREE OpenStreetMap Nominatim API**

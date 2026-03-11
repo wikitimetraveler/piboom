@@ -98,8 +98,8 @@
 
     .style-selector {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
       margin: 30px 0;
       max-width: 1200px;
       margin-left: auto;
@@ -472,8 +472,23 @@
     </div>
   </div>
 
-  <!-- Style Selection -->
+  <!-- Mode Selection -->
   <div class="input-section">
+    <h3 class="section-title">
+      <i class="bi-sliders"></i> Mode
+    </h3>
+    <div class="d-flex justify-content-center gap-3 mb-3">
+      <button type="button" class="btn mode-btn active" id="modeAi" onclick="selectMode('ai')" style="background: rgba(30,30,30,0.9); border: 2px solid #d4af37; color: #d4af37; padding: 10px 24px;">
+        <i class="bi-stars"></i> AI Generate
+      </button>
+      <button type="button" class="btn mode-btn" id="modeTemplate" onclick="selectMode('template')" style="background: rgba(30,30,30,0.9); border: 2px solid rgba(212,175,55,0.4); color: #b0b0b0; padding: 10px 24px;">
+        <i class="bi-layout-text-window"></i> Template
+      </button>
+    </div>
+  </div>
+
+  <!-- AI Style Selection (shown when mode=ai) -->
+  <div class="input-section" id="aiStyleSection">
     <h3 class="section-title">
       <i class="bi-palette"></i> Poster Style
     </h3>
@@ -484,23 +499,122 @@
         <div class="style-name">60s Fillmore</div>
         <div class="style-desc">Swirling letters, Bill Graham style</div>
       </div>
-      
       <div class="style-option selected" onclick="selectStyle('blacklight')" id="style-blacklight">
         <div class="style-icon">⚡</div>
         <div class="style-name">70s Black Light</div>
         <div class="style-desc">Neon colors, trippy effects</div>
       </div>
-      
       <div class="style-option" onclick="selectStyle('neon')" id="style-neon">
         <div class="style-icon">💫</div>
         <div class="style-name">Modern Neon</div>
         <div class="style-desc">Synthwave, cyberpunk vibes</div>
       </div>
-      
       <div class="style-option" onclick="selectStyle('psychedelic')" id="style-psychedelic">
         <div class="style-icon">🌀</div>
         <div class="style-name">Psychedelic</div>
         <div class="style-desc">Fractals, kaleidoscope, DMT</div>
+      </div>
+      <div class="style-option" onclick="selectStyle('art_deco')" id="style-art_deco">
+        <div class="style-icon">✨</div>
+        <div class="style-name">Art Deco</div>
+        <div class="style-desc">Gold/black, geometric, elegant</div>
+      </div>
+      <div class="style-option" onclick="selectStyle('minimalist')" id="style-minimalist">
+        <div class="style-icon">▢</div>
+        <div class="style-name">Minimalist</div>
+        <div class="style-desc">Clean, negative space</div>
+      </div>
+      <div class="style-option" onclick="selectStyle('vintage')" id="style-vintage">
+        <div class="style-icon">📜</div>
+        <div class="style-name">Vintage</div>
+        <div class="style-desc">Sepia, letterpress, worn</div>
+      </div>
+      <div class="style-option" onclick="selectStyle('grunge')" id="style-grunge">
+        <div class="style-icon">🖤</div>
+        <div class="style-name">Grunge</div>
+        <div class="style-desc">Distressed, punk, raw</div>
+      </div>
+    </div>
+
+    <!-- Quality & Size (AI only) -->
+    <div class="d-flex flex-wrap gap-3 justify-content-center mt-3" style="gap: 1rem;">
+      <div>
+        <label class="text-muted small" style="letter-spacing: 1px;">Quality</label>
+        <select id="posterQuality" class="form-control" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #d4af37; min-width: 120px;">
+          <option value="standard">Standard</option>
+          <option value="hd">HD</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-muted small" style="letter-spacing: 1px;">Size</label>
+        <select id="posterSize" class="form-control" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #d4af37; min-width: 140px;">
+          <option value="1024x1792">Portrait (1024×1792)</option>
+          <option value="1792x1024">Landscape (1792×1024)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Template Selection (shown when mode=template) -->
+  <div class="input-section" id="templateSection" style="display: none;">
+    <h3 class="section-title">
+      <i class="bi-layout-text-window"></i> Template
+    </h3>
+    <div class="style-selector" id="templateSelector">
+      <!-- Filled by JS -->
+    </div>
+    <div class="mt-3 d-flex flex-wrap gap-4 align-items-end">
+      <div>
+        <label class="text-muted small" style="letter-spacing: 1px;">Font</label>
+        <select id="posterFont" class="form-control d-inline-block" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #d4af37; max-width: 200px;">
+          <option value="Georgia, serif">Serif</option>
+          <option value="'Helvetica Neue', Arial, sans-serif">Sans</option>
+          <option value="'Impact', 'Arial Black', sans-serif">Display</option>
+          <option value="'Brush Script MT', cursive">Script</option>
+          <option value="'Courier New', monospace">Mono</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-muted small" style="letter-spacing: 1px;">Frame</label>
+        <select id="posterFrame" class="form-control d-inline-block" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #d4af37; max-width: 180px;">
+          <option value="none">None</option>
+          <option value="thin_gold">Thin Gold</option>
+          <option value="thick_vintage">Thick Vintage</option>
+          <option value="neon_glow">Neon Glow</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Text Overlays (shared) -->
+  <div class="input-section">
+    <h6 class="text-muted mb-3" style="letter-spacing: 2px; font-weight: 300;">Text Overlays (optional)</h6>
+    <div class="form-check mb-3">
+      <input type="checkbox" class="form-check-input" id="addQrCode" style="accent-color: #d4af37;">
+      <label class="form-check-label text-muted small" for="addQrCode" style="letter-spacing: 1px;">Add QR code (Spotify link for template; in prompt for AI)</label>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-2">
+        <input type="text" id="overlayTitle" class="form-control" placeholder="Title (default: album)" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #e8e8e8;">
+      </div>
+      <div class="col-md-6 mb-2">
+        <input type="text" id="overlaySubtitle" class="form-control" placeholder="Subtitle (default: artist)" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #e8e8e8;">
+      </div>
+      <div class="col-md-6 mb-2">
+        <input type="text" id="overlayVenue" class="form-control" placeholder="Venue" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #e8e8e8;">
+      </div>
+      <div class="col-md-6 mb-2">
+        <input type="text" id="overlayDate" class="form-control" placeholder="Date" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #e8e8e8;">
+      </div>
+    </div>
+
+    <!-- Advanced: Custom Prompt (AI only) -->
+    <div class="mt-4 pt-3" style="border-top: 1px solid rgba(212,175,55,0.2);">
+      <button class="btn btn-link p-0 text-muted small" type="button" data-toggle="collapse" data-target="#advancedPromptCollapse" style="letter-spacing: 1px;">
+        <i class="bi-chevron-down"></i> Advanced: Custom prompt (AI mode)
+      </button>
+      <div class="collapse mt-2" id="advancedPromptCollapse">
+        <textarea id="customPrompt" class="form-control" rows="3" placeholder="Add extra instructions to the style prompt (e.g. 'Include a moon and stars')" style="background: rgba(30,30,30,0.9); border: 1px solid rgba(212,175,55,0.3); color: #e8e8e8;"></textarea>
       </div>
     </div>
   </div>
@@ -523,6 +637,9 @@
     <div style="font-size: 1.3rem; color: #d4af37; letter-spacing: 2px; font-weight: 300;">Crafting your poster...</div>
     <div style="color: #b0b0b0; margin-top: 10px; font-style: italic;">This may take 10-20 seconds</div>
   </div>
+
+  <!-- Template render container (hidden, for html2canvas) -->
+  <div id="templateRenderContainer" style="position: absolute; left: -9999px; top: 0;"></div>
 
   <!-- Result Section -->
   <div id="resultSection" class="result-section" style="display: none;">
@@ -576,6 +693,10 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
+<script src="/shared/poster-utils.js"></script>
+<script src="/shared/poster-templates.js"></script>
 
 <script>
 // State
@@ -583,6 +704,8 @@ let selectedStyle = 'blacklight';
 let selectedAlbum = null;
 let uploadedImage = null;
 let generatedPosterUrl = null;
+let posterMode = 'ai';
+let selectedTemplate = 'single';
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -590,7 +713,41 @@ document.addEventListener('DOMContentLoaded', () => {
     title: 'Select Your Profile',
     showAllOption: false
   });
+  initTemplateSelector();
 });
+
+function selectMode(mode) {
+  posterMode = mode;
+  document.getElementById('modeAi').classList.toggle('active', mode === 'ai');
+  document.getElementById('modeAi').style.borderColor = mode === 'ai' ? '#d4af37' : 'rgba(212,175,55,0.4)';
+  document.getElementById('modeAi').style.color = mode === 'ai' ? '#d4af37' : '#b0b0b0';
+  document.getElementById('modeTemplate').classList.toggle('active', mode === 'template');
+  document.getElementById('modeTemplate').style.borderColor = mode === 'template' ? '#d4af37' : 'rgba(212,175,55,0.4)';
+  document.getElementById('modeTemplate').style.color = mode === 'template' ? '#d4af37' : '#b0b0b0';
+  document.getElementById('aiStyleSection').style.display = mode === 'ai' ? 'block' : 'none';
+  document.getElementById('templateSection').style.display = mode === 'template' ? 'block' : 'none';
+  document.getElementById('generateBtn').innerHTML = mode === 'ai' ? '<i class="bi-stars"></i> Generate Poster' : '<i class="bi-layout-text-window"></i> Create Poster';
+}
+
+function initTemplateSelector() {
+  const list = window.posterTemplates?.list?.() || [];
+  const el = document.getElementById('templateSelector');
+  if (!el) return;
+  el.innerHTML = list.map((t) => `
+    <div class="style-option" onclick="selectTemplate('${t.id}')" id="template-${t.id}">
+      <div class="style-name">${t.name}</div>
+      <div class="style-desc">${t.desc}</div>
+    </div>
+  `).join('');
+  if (list.length) selectTemplate(list[0].id);
+}
+
+function selectTemplate(id) {
+  selectedTemplate = id;
+  document.querySelectorAll('#templateSelector .style-option').forEach((o) => o.classList.remove('selected'));
+  const opt = document.getElementById('template-' + id);
+  if (opt) opt.classList.add('selected');
+}
 
 // Handle album upload
 function handleAlbumUpload(event) {
@@ -695,8 +852,12 @@ function showAlbumPreview(imageUrl, artist, album) {
   
   info.innerHTML = `<strong>${album}</strong> by ${artist}`;
   preview.style.display = 'block';
-  
-  // Enable generate button
+
+  const titleEl = document.getElementById('overlayTitle');
+  const subtitleEl = document.getElementById('overlaySubtitle');
+  if (titleEl && !titleEl.value) titleEl.placeholder = album;
+  if (subtitleEl && !subtitleEl.value) subtitleEl.placeholder = artist;
+
   document.getElementById('generateBtn').disabled = false;
 }
 
@@ -717,21 +878,40 @@ async function generatePoster() {
     alert('Please select an album first');
     return;
   }
-  
-  // Show loading
+
+  if (posterMode === 'template') {
+    await generateTemplatePoster();
+    return;
+  }
+
   document.getElementById('loadingState').style.display = 'block';
   document.getElementById('resultSection').style.display = 'none';
-  
+
   try {
+    const body = {
+      artist: selectedAlbum.artist,
+      album: selectedAlbum.album,
+      style: selectedStyle,
+      quality: document.getElementById('posterQuality')?.value || 'standard',
+      size: document.getElementById('posterSize')?.value || '1024x1792',
+      customPrompt: document.getElementById('customPrompt')?.value?.trim() || undefined,
+      title: document.getElementById('overlayTitle')?.value?.trim() || undefined,
+      subtitle: document.getElementById('overlaySubtitle')?.value?.trim() || undefined,
+      venue: document.getElementById('overlayVenue')?.value?.trim() || undefined,
+      date: document.getElementById('overlayDate')?.value?.trim() || undefined,
+      addQrCode: document.getElementById('addQrCode')?.checked || false
+    };
+    if (uploadedImage) {
+      if (uploadedImage.startsWith('data:')) {
+        body.albumCoverData = uploadedImage;
+      } else {
+        body.albumCoverUrl = uploadedImage;
+      }
+    }
     const response = await fetch('/api/poster-generator/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        artist: selectedAlbum.artist,
-        album: selectedAlbum.album,
-        style: selectedStyle,
-        albumCoverUrl: uploadedImage
-      })
+      body: JSON.stringify(body)
     });
     
     const data = await response.json();
@@ -756,14 +936,91 @@ async function generatePoster() {
   }
 }
 
+function generateQrDataUrl(url) {
+  if (!window.QRCode || !url) return null;
+  const div = document.createElement('div');
+  div.style.cssText = 'position:absolute;left:-9999px;width:128px;height:128px;';
+  document.body.appendChild(div);
+  try {
+    new window.QRCode(div, { text: url, width: 128, height: 128 });
+    const canvas = div.querySelector('canvas');
+    const img = div.querySelector('img');
+    const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+    document.body.removeChild(div);
+    return dataUrl;
+  } catch (e) {
+    if (div.parentNode) document.body.removeChild(div);
+    return null;
+  }
+}
+
+async function generateTemplatePoster() {
+  let imageUrl = uploadedImage;
+  if (!imageUrl) {
+    alert('Template mode requires an album cover image. Please upload or select from collection.');
+    return;
+  }
+  if (imageUrl.startsWith('data:')) {
+    imageUrl = imageUrl;
+  } else if (imageUrl && !imageUrl.startsWith(window.location.origin) && !imageUrl.startsWith('/')) {
+    imageUrl = '/api/poster-generator/proxy-image?url=' + encodeURIComponent(imageUrl);
+  }
+
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('resultSection').style.display = 'none';
+
+  try {
+    const addQr = document.getElementById('addQrCode')?.checked;
+    const spotifyUrl = 'https://open.spotify.com/search/' + encodeURIComponent((selectedAlbum.artist || '') + ' ' + (selectedAlbum.album || ''));
+    const qrDataUrl = addQr ? generateQrDataUrl(spotifyUrl) : null;
+
+    const data = {
+      imageUrl,
+      artist: selectedAlbum.artist,
+      album: selectedAlbum.album,
+      title: document.getElementById('overlayTitle')?.value?.trim() || selectedAlbum.album,
+      subtitle: document.getElementById('overlaySubtitle')?.value?.trim() || selectedAlbum.artist,
+      venue: document.getElementById('overlayVenue')?.value?.trim() || undefined,
+      date: document.getElementById('overlayDate')?.value?.trim() || undefined,
+      fontFamily: document.getElementById('posterFont')?.value || 'Georgia, serif',
+      qrDataUrl: qrDataUrl || undefined,
+      frame: document.getElementById('posterFrame')?.value || 'none'
+    };
+
+    const container = document.getElementById('templateRenderContainer');
+    container.innerHTML = window.posterTemplates.render(selectedTemplate, data);
+
+    const posterEl = container.firstElementChild;
+    if (!posterEl) throw new Error('Template render failed');
+
+    const canvas = await window.posterUtils.renderPosterCanvas(posterEl, { scale: 2, backgroundColor: '#ffffff' });
+    generatedPosterUrl = window.posterUtils.canvasToDataUrl(canvas);
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('generatedPoster').src = generatedPosterUrl;
+    document.getElementById('resultSection').style.display = 'block';
+    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+    container.innerHTML = '';
+  } catch (err) {
+    console.error('Template poster error:', err);
+    document.getElementById('loadingState').style.display = 'none';
+    alert('Error creating poster: ' + (err.message || 'Please try again.'));
+  }
+}
+
 // Download poster
 function downloadPoster() {
   if (!generatedPosterUrl) return;
-  
-  const link = document.createElement('a');
-  link.href = generatedPosterUrl;
-  link.download = `poster-${selectedAlbum.artist}-${selectedAlbum.album}.png`;
-  link.click();
+  const name = (selectedAlbum?.artist || 'artist') + '-' + (selectedAlbum?.album || 'album');
+  if (generatedPosterUrl.startsWith('data:')) {
+    window.posterUtils.downloadDataUrl(generatedPosterUrl, `poster-${name.replace(/[^a-z0-9]+/gi, '-')}.png`);
+  } else {
+    const link = document.createElement('a');
+    link.href = generatedPosterUrl;
+    link.download = `poster-${name.replace(/[^a-z0-9]+/gi, '-')}.png`;
+    link.target = '_blank';
+    link.click();
+  }
 }
 
 // Generate another

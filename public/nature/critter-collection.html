@@ -8,7 +8,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/collection-styles.css"/>
   <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/collection-utils.js"></script>
   <script src="/shared/user-selector.js"></script>
   <script src="/shared/user-passwords.js"></script>
   <style>
@@ -430,11 +432,11 @@
 
 <modern-navbar></modern-navbar>
 
-<div class="simple-header">
+<div class="collection-simple-header">
   <div class="container">
-    <div class="header-content">
-      <a href="/" class="brand">🌿 Jungle Critter Collection</a>
-      <div class="nav-links">
+    <div class="collection-header-content">
+      <a href="/" class="collection-brand">🌿 Jungle Critter Collection</a>
+      <div class="collection-nav-links">
         <a href="/">Home</a>
         <a href="/nature/nature-hub.html">Nature Hub</a>
         <a href="/nature/tree-discovery.html">Trees</a>
@@ -587,8 +589,49 @@
         <button type="button" class="close" data-dismiss="modal" style="color: white;"><span>&times;</span></button>
       </div>
       <div class="modal-body">
-        <div class="poster-layout">
-          <div class="poster-preview">
+        <div class="mb-3">
+          <label class="small font-weight-bold">Mode</label>
+          <div class="d-flex gap-2 mt-1">
+            <button type="button" class="btn btn-sm btn-outline-success" id="critterPosterModeSimple" onclick="setCritterPosterMode('simple')">Simple</button>
+            <button type="button" class="btn btn-sm btn-outline-success" id="critterPosterModeTemplate" onclick="setCritterPosterMode('template')">Template</button>
+          </div>
+        </div>
+        <div id="critterPosterTemplateOpts" class="mb-3" style="display: none;">
+          <label class="small font-weight-bold">Template</label>
+          <div class="d-flex flex-wrap gap-2 mt-1 mb-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary critter-template-btn" data-id="single" onclick="selectCritterPosterTemplate('single')">Single</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary critter-template-btn" data-id="vintage" onclick="selectCritterPosterTemplate('vintage')">Vintage</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary critter-template-btn" data-id="split" onclick="selectCritterPosterTemplate('split')">Split</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary critter-template-btn" data-id="grid" onclick="selectCritterPosterTemplate('grid')">Grid</button>
+          </div>
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div>
+              <label class="small">Font</label>
+              <select id="critterPosterFont" class="form-control form-control-sm" style="max-width: 160px;" onchange="rebuildCritterPoster()">
+                <option value="Georgia, serif">Serif</option>
+                <option value="'Helvetica Neue', Arial, sans-serif">Sans</option>
+                <option value="'Impact', 'Arial Black', sans-serif">Display</option>
+                <option value="'Brush Script MT', cursive">Script</option>
+                <option value="'Courier New', monospace">Mono</option>
+              </select>
+            </div>
+            <div>
+              <label class="small">Frame</label>
+              <select id="critterPosterFrame" class="form-control form-control-sm" style="max-width: 140px;" onchange="rebuildCritterPoster()">
+                <option value="none">None</option>
+                <option value="thin_gold">Thin Gold</option>
+                <option value="thick_vintage">Thick Vintage</option>
+                <option value="neon_glow">Neon Glow</option>
+              </select>
+            </div>
+            <div class="form-check align-self-end">
+              <input type="checkbox" class="form-check-input" id="critterPosterQr" onchange="rebuildCritterPoster()">
+              <label class="form-check-label small" for="critterPosterQr">QR code</label>
+            </div>
+          </div>
+        </div>
+        <div class="poster-layout mt-3">
+          <div class="poster-preview" style="overflow: auto; max-height: 420px;">
             <div id="posterContent" class="poster-frame"></div>
           </div>
           <div style="flex: 1 1 260px;">
@@ -638,6 +681,8 @@ let currentCollection = [];
 let currentCritterId = null;
 let currentPosterCritter = null;
 let critterPosterCanvas = null;
+let critterPosterMode = 'simple';
+let critterPosterTemplate = 'single';
 let map = null;
 let markers = [];
 let mapVisible = false;
@@ -802,6 +847,66 @@ async function loadStats() {
 
 function searchCollection() { loadCollection(); }
 
+function setCritterPosterMode(mode) {
+  critterPosterMode = mode;
+  document.getElementById('critterPosterModeSimple').classList.toggle('active', mode === 'simple');
+  document.getElementById('critterPosterModeTemplate').classList.toggle('active', mode === 'template');
+  document.getElementById('critterPosterTemplateOpts').style.display = mode === 'template' ? 'block' : 'none';
+  rebuildCritterPoster();
+}
+
+function selectCritterPosterTemplate(id) {
+  critterPosterTemplate = id;
+  document.querySelectorAll('.critter-template-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.id === id);
+  });
+  rebuildCritterPoster();
+}
+
+function generateCritterPosterQr(url) {
+  if (!window.QRCode || !url) return null;
+  const div = document.createElement('div');
+  div.style.cssText = 'position:absolute;left:-9999px;width:128px;height:128px;';
+  document.body.appendChild(div);
+  try {
+    new window.QRCode(div, { text: url, width: 128, height: 128 });
+    const canvas = div.querySelector('canvas');
+    const img = div.querySelector('img');
+    const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+    document.body.removeChild(div);
+    return dataUrl;
+  } catch (e) {
+    if (div.parentNode) document.body.removeChild(div);
+    return null;
+  }
+}
+
+function rebuildCritterPoster() {
+  if (!currentPosterCritter) return;
+  critterPosterCanvas = null;
+  if (critterPosterMode === 'template' && window.posterTemplates) {
+    const imageUrl = resolvePosterImageUrl(currentPosterCritter.photo_url || '');
+    const qrUrl = 'https://www.google.com/search?q=' + encodeURIComponent((currentPosterCritter.animal_name || '') + ' ' + (currentPosterCritter.scientific_name || ''));
+    const addQr = document.getElementById('critterPosterQr')?.checked;
+    const qrDataUrl = addQr ? generateCritterPosterQr(qrUrl) : null;
+    const data = {
+      imageUrl: imageUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="%238BC34A"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="24">No Photo</text></svg>',
+      artist: currentPosterCritter.scientific_name || '',
+      album: currentPosterCritter.animal_name || '',
+      title: currentPosterCritter.animal_name || '',
+      subtitle: currentPosterCritter.scientific_name || 'Unknown species',
+      venue: currentPosterCritter.location_name || null,
+      date: currentPosterCritter.added_date ? new Date(currentPosterCritter.added_date).toLocaleDateString() : null,
+      fontFamily: document.getElementById('critterPosterFont')?.value || 'Georgia, serif',
+      qrDataUrl: qrDataUrl || undefined,
+      frame: document.getElementById('critterPosterFrame')?.value || 'none'
+    };
+    document.getElementById('posterContent').innerHTML = window.posterTemplates.render(critterPosterTemplate, data);
+  } else {
+    document.getElementById('posterContent').innerHTML = buildCritterPosterHtml(currentPosterCritter);
+  }
+}
+
 function resolvePosterImageUrl(url) {
   if (!url) return url;
   if (url.startsWith('data:') || url.startsWith('blob:')) return url;
@@ -879,7 +984,16 @@ function openCritterPoster(id) {
   if (!critter) return;
   currentPosterCritter = critter;
   critterPosterCanvas = null;
-  document.getElementById('posterContent').innerHTML = buildCritterPosterHtml(critter);
+  critterPosterMode = 'simple';
+  critterPosterTemplate = 'single';
+  document.getElementById('critterPosterModeSimple').classList.add('active');
+  document.getElementById('critterPosterModeTemplate').classList.remove('active');
+  document.getElementById('critterPosterTemplateOpts').style.display = 'none';
+  document.querySelectorAll('.critter-template-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.id === 'single');
+  });
+  document.getElementById('critterPosterQr').checked = false;
+  rebuildCritterPoster();
   document.getElementById('posterShareLink').value = '';
   if (typeof $ !== 'undefined') {
     $('#posterModal').modal('show');
@@ -1152,6 +1266,10 @@ function viewOnMap(lat, lng) {
 }
 
 function showToast(title, message, type) {
+  if (window.collectionUtils && window.collectionUtils.showToast) {
+    window.collectionUtils.showToast(title, message, type || 'info');
+    return;
+  }
   const container = document.getElementById('toastContainer');
   if (!container) return;
   const toast = document.createElement('div');
@@ -1221,6 +1339,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
 <script src="/shared/poster-utils.js"></script>
+<script src="/shared/poster-templates.js"></script>
 </body>
 </html>

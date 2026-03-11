@@ -7,7 +7,9 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="/shared/styles.css">
+  <link rel="stylesheet" href="/shared/collection-styles.css">
   <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/collection-utils.js"></script>
   <script src="/shared/user-selector.js"></script>
   <style>
     body { background: linear-gradient(135deg, #f3fbff 0%, #e3f2fd 100%); color: #1c2833; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
@@ -143,7 +145,7 @@
 </head>
 <body>
   <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
-  <div class="nav-finance"><a href="/nature/index.html"><i class="bi-arrow-left"></i> Nature Hub</a></div>
+  <div class="nav-finance"><a href="/nature/nature-hub.html"><i class="bi-arrow-left"></i> Nature Hub</a></div>
 
   <div class="container mt-5 mb-5">
     <div class="hero mb-4">
@@ -300,8 +302,49 @@
           </button>
         </div>
         <div class="modal-body">
-          <div class="poster-layout">
-            <div class="poster-preview">
+          <div class="mb-3">
+            <label class="small font-weight-bold">Mode</label>
+            <div class="d-flex gap-2 mt-1">
+              <button type="button" class="btn btn-sm btn-outline-primary" id="fishPosterModeSimple" onclick="setFishPosterMode('simple')">Simple</button>
+              <button type="button" class="btn btn-sm btn-outline-primary" id="fishPosterModeTemplate" onclick="setFishPosterMode('template')">Template</button>
+            </div>
+          </div>
+          <div id="fishPosterTemplateOpts" class="mb-3" style="display: none;">
+            <label class="small font-weight-bold">Template</label>
+            <div class="d-flex flex-wrap gap-2 mt-1 mb-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary fish-template-btn" data-id="single" onclick="selectFishPosterTemplate('single')">Single</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary fish-template-btn" data-id="vintage" onclick="selectFishPosterTemplate('vintage')">Vintage</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary fish-template-btn" data-id="split" onclick="selectFishPosterTemplate('split')">Split</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary fish-template-btn" data-id="grid" onclick="selectFishPosterTemplate('grid')">Grid</button>
+            </div>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+              <div>
+                <label class="small">Font</label>
+                <select id="fishPosterFont" class="form-control form-control-sm" style="max-width: 160px;" onchange="rebuildFishPoster()">
+                  <option value="Georgia, serif">Serif</option>
+                  <option value="'Helvetica Neue', Arial, sans-serif">Sans</option>
+                  <option value="'Impact', 'Arial Black', sans-serif">Display</option>
+                  <option value="'Brush Script MT', cursive">Script</option>
+                  <option value="'Courier New', monospace">Mono</option>
+                </select>
+              </div>
+              <div>
+                <label class="small">Frame</label>
+                <select id="fishPosterFrame" class="form-control form-control-sm" style="max-width: 140px;" onchange="rebuildFishPoster()">
+                  <option value="none">None</option>
+                  <option value="thin_gold">Thin Gold</option>
+                  <option value="thick_vintage">Thick Vintage</option>
+                  <option value="neon_glow">Neon Glow</option>
+                </select>
+              </div>
+              <div class="form-check align-self-end">
+                <input type="checkbox" class="form-check-input" id="fishPosterQr" onchange="rebuildFishPoster()">
+                <label class="form-check-label small" for="fishPosterQr">QR code</label>
+              </div>
+            </div>
+          </div>
+          <div class="poster-layout mt-3">
+            <div class="poster-preview" style="overflow: auto; max-height: 420px;">
               <div id="posterContent" class="poster-frame"></div>
             </div>
             <div style="flex: 1 1 260px;">
@@ -349,6 +392,8 @@
     let currentEditCatch = null;
     let currentPosterCatch = null;
     let fishPosterCanvas = null;
+    let fishPosterMode = 'simple';
+    let fishPosterTemplate = 'single';
     let googleMapsLoadingPromise = null;
     const mapStylesDark = [
       { elementType: 'geometry', stylers: [{ color: '#1f1f1f' }] },
@@ -669,6 +714,67 @@
       }
     });
 
+    function setFishPosterMode(mode) {
+      fishPosterMode = mode;
+      document.getElementById('fishPosterModeSimple').classList.toggle('active', mode === 'simple');
+      document.getElementById('fishPosterModeTemplate').classList.toggle('active', mode === 'template');
+      document.getElementById('fishPosterTemplateOpts').style.display = mode === 'template' ? 'block' : 'none';
+      rebuildFishPoster();
+    }
+
+    function selectFishPosterTemplate(id) {
+      fishPosterTemplate = id;
+      document.querySelectorAll('.fish-template-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.id === id);
+      });
+      rebuildFishPoster();
+    }
+
+    function generateFishPosterQr(url) {
+      if (!window.QRCode || !url) return null;
+      const div = document.createElement('div');
+      div.style.cssText = 'position:absolute;left:-9999px;width:128px;height:128px;';
+      document.body.appendChild(div);
+      try {
+        new window.QRCode(div, { text: url, width: 128, height: 128 });
+        const canvas = div.querySelector('canvas');
+        const img = div.querySelector('img');
+        const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+        document.body.removeChild(div);
+        return dataUrl;
+      } catch (e) {
+        if (div.parentNode) document.body.removeChild(div);
+        return null;
+      }
+    }
+
+    function rebuildFishPoster() {
+      if (!currentPosterCatch) return;
+      fishPosterCanvas = null;
+      if (fishPosterMode === 'template' && window.posterTemplates) {
+        const imageUrl = resolvePosterImageUrl(currentPosterCatch.image_url || '');
+        const qrUrl = 'https://www.google.com/search?q=' + encodeURIComponent((currentPosterCatch.species || '') + ' fish');
+        const addQr = document.getElementById('fishPosterQr')?.checked;
+        const qrDataUrl = addQr ? generateFishPosterQr(qrUrl) : null;
+        const caughtDate = currentPosterCatch.caught_at ? new Date(currentPosterCatch.caught_at).toLocaleDateString() : null;
+        const data = {
+          imageUrl: imageUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="%230d6efd"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="24">No Photo</text></svg>',
+          artist: 'School of Fish Collection',
+          album: currentPosterCatch.species || 'Fish Catch',
+          title: currentPosterCatch.species || 'Fish Catch',
+          subtitle: 'School of Fish Collection',
+          venue: currentPosterCatch.location_label || null,
+          date: caughtDate,
+          fontFamily: document.getElementById('fishPosterFont')?.value || 'Georgia, serif',
+          qrDataUrl: qrDataUrl || undefined,
+          frame: document.getElementById('fishPosterFrame')?.value || 'none'
+        };
+        document.getElementById('posterContent').innerHTML = window.posterTemplates.render(fishPosterTemplate, data);
+      } else {
+        document.getElementById('posterContent').innerHTML = buildFishPosterHtml(currentPosterCatch);
+      }
+    }
+
     function resolvePosterImageUrl(url) {
       if (!url) return url;
       if (url.startsWith('data:') || url.startsWith('blob:')) return url;
@@ -725,7 +831,16 @@
       if (!catchItem) return;
       currentPosterCatch = catchItem;
       fishPosterCanvas = null;
-      document.getElementById('posterContent').innerHTML = buildFishPosterHtml(catchItem);
+      fishPosterMode = 'simple';
+      fishPosterTemplate = 'single';
+      document.getElementById('fishPosterModeSimple').classList.add('active');
+      document.getElementById('fishPosterModeTemplate').classList.remove('active');
+      document.getElementById('fishPosterTemplateOpts').style.display = 'none';
+      document.querySelectorAll('.fish-template-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.id === 'single');
+      });
+      document.getElementById('fishPosterQr').checked = false;
+      rebuildFishPoster();
       document.getElementById('posterShareLink').value = '';
       if (typeof $ !== 'undefined') {
         $('#posterModal').modal('show');
@@ -1033,7 +1148,9 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   <script src="/shared/poster-utils.js"></script>
+  <script src="/shared/poster-templates.js"></script>
   <script src="/shared/tts.js"></script>
 </body>
 </html>

@@ -27,7 +27,11 @@ devconnect-labs/
 │   │   ├── tree-discovery.html
 │   │   ├── critter-discovery.html
 │   │   ├── critter-collection.html
+│   │   ├── fish-identification.html
 │   │   └── share-collection.html
+│   │
+│   ├── local/                  # 📍 Local Spots Domain
+│   │   └── local-spots.html     # Thrift, taco trucks, gardens, bike trails (lat/lng auto-fill on mobile)
 │   │
 │   ├── family/                 # 👨‍👩‍👧‍👦 Family/Genealogy Domain
 │   │   ├── genealogy.html

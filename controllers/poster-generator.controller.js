@@ -2,9 +2,12 @@ import axios from 'axios';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import OpenAI from 'openai';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 
 const SHARE_STORE_PATH = path.join(__dirname, '..', 'data', 'poster-shares.json');
 const POSTER_DIR = path.join(__dirname, '..', 'public', 'shared', 'posters');
@@ -26,36 +29,119 @@ async function saveShareStore(store) {
 // Generate concert poster using OpenAI DALL-E
 export async function generatePoster(req, res) {
   try {
-    const { artist, album, style, albumCoverUrl } = req.body;
-    
+    const {
+      artist,
+      album,
+      style,
+      albumCoverUrl,
+      albumCoverData,
+      customPrompt,
+      quality = 'standard',
+      size = '1024x1792',
+      title,
+      subtitle,
+      venue,
+      date,
+      addQrCode
+    } = req.body;
+
     if (!artist || !album) {
       return res.status(400).json({ error: 'Artist and album are required' });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
-    
+
     if (!apiKey) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: 'OpenAI API key not configured',
-        message: 'Please add OPENAI_API_KEY to your .env file' 
+        message: 'Please add OPENAI_API_KEY to your .env file'
       });
     }
 
     // Build the prompt based on style
     const stylePrompts = {
-      'fillmore': `1960s Fillmore Auditorium concert poster style with swirling psychedelic lettering, ornate decorative borders, vibrant flowing colors (orange, pink, purple), art nouveau influence, Bill Graham style. Concert poster for "${album}" by ${artist}. Include ornate decorative text, peacock feathers, flowing hair motifs.`,
-      
-      'blacklight': `1970s black light poster style with Day-Glo neon colors (hot pink, electric blue, lime green, orange), bold outlines, cosmic imagery, stars and planets, peace symbols. Psychedelic concert poster for "${album}" by ${artist}. Glowing under black light effect, trippy mushrooms, yin-yang symbols.`,
-      
-      'neon': `Modern neon synthwave concert poster with vibrant electric colors, grid lines, sunset gradient (purple to pink), futuristic typography, chrome effects, vapor wave aesthetic. Concert poster for "${album}" by ${artist}. Miami Vice colors, geometric shapes, retro-futuristic.`,
-      
-      'psychedelic': `Intense psychedelic concert poster with fractal patterns, kaleidoscope effects, melting colors, DMT-inspired visuals, sacred geometry, third eye imagery, mandala patterns. Trippy poster for "${album}" by ${artist}. Cosmic consciousness, infinite spirals, vibrant rainbow colors.`
+      fillmore: `1960s Fillmore Auditorium concert poster style with swirling psychedelic lettering, ornate decorative borders, vibrant flowing colors (orange, pink, purple), art nouveau influence, Bill Graham style. Concert poster for "${album}" by ${artist}. Include ornate decorative text, peacock feathers, flowing hair motifs.`,
+      blacklight: `1970s black light poster style with Day-Glo neon colors (hot pink, electric blue, lime green, orange), bold outlines, cosmic imagery, stars and planets, peace symbols. Psychedelic concert poster for "${album}" by ${artist}. Glowing under black light effect, trippy mushrooms, yin-yang symbols.`,
+      neon: `Modern neon synthwave concert poster with vibrant electric colors, grid lines, sunset gradient (purple to pink), futuristic typography, chrome effects, vapor wave aesthetic. Concert poster for "${album}" by ${artist}. Miami Vice colors, geometric shapes, retro-futuristic.`,
+      psychedelic: `Intense psychedelic concert poster with fractal patterns, kaleidoscope effects, melting colors, DMT-inspired visuals, sacred geometry, third eye imagery, mandala patterns. Trippy poster for "${album}" by ${artist}. Cosmic consciousness, infinite spirals, vibrant rainbow colors.`,
+      art_deco: `1920s Art Deco concert poster with geometric patterns, gold and black color scheme, elegant typography, symmetrical design, sunburst motifs, streamlined forms. Concert poster for "${album}" by ${artist}. Luxurious, glamorous, Great Gatsby aesthetic.`,
+      minimalist: `Minimalist concert poster with clean design, single-color or subtle gradient background, bold sans-serif typography, lots of negative space, modern and understated. Concert poster for "${album}" by ${artist}. Simple, elegant, no clutter.`,
+      vintage: `Vintage concert poster with worn paper texture, sepia tones, letterpress typography, aged edges, nostalgic feel. Concert poster for "${album}" by ${artist}. Classic rock poster aesthetic, faded colors, retro charm.`,
+      grunge: `Grunge concert poster with torn edges, distressed textures, punk aesthetic, raw and edgy typography, dark moody colors. Concert poster for "${album}" by ${artist}. 90s alternative rock vibe, gritty, rebellious.`
     };
 
-    const prompt = stylePrompts[style] || stylePrompts['blacklight'];
+    let prompt = stylePrompts[style] || stylePrompts.blacklight;
+    if (customPrompt && typeof customPrompt === 'string' && customPrompt.trim()) {
+      prompt = prompt + ' ' + customPrompt.trim();
+    }
 
-    console.log('🎨 Generating poster with DALL-E...');
-    console.log('Style:', style);
+    // Inject overlay text into prompt when provided
+    const overlayParts = [];
+    if (title && title !== album) overlayParts.push(`Title: "${title}"`);
+    if (subtitle && subtitle !== artist) overlayParts.push(`Subtitle: "${subtitle}"`);
+    if (venue) overlayParts.push(`Venue: "${venue}"`);
+    if (date) overlayParts.push(`Date: "${date}"`);
+    if (overlayParts.length > 0) {
+      prompt += ' Include these text elements: ' + overlayParts.join(', ') + '.';
+    }
+
+    // Image reference: use GPT-4 Vision to describe album cover when available, then inject into prompt
+    let coverImageData = null;
+    if (albumCoverData && albumCoverData.startsWith('data:image')) {
+      coverImageData = albumCoverData;
+    } else if (albumCoverUrl) {
+      try {
+        const imgRes = await axios.get(albumCoverUrl, { responseType: 'arraybuffer' });
+        const base64 = Buffer.from(imgRes.data).toString('base64');
+        const contentType = imgRes.headers['content-type'] || 'image/jpeg';
+        coverImageData = `data:${contentType};base64,${base64}`;
+      } catch (e) {
+        console.warn('Could not fetch album cover for vision:', e.message);
+      }
+    }
+
+    if (coverImageData && openai) {
+      try {
+        const visionRes = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: 'Describe this album cover in 2-3 sentences: colors, mood, visual style, typography, and any distinctive elements. Be concise.' },
+                { type: 'image_url', image_url: { url: coverImageData } }
+              ]
+            }
+          ],
+          max_tokens: 150,
+          temperature: 0.3
+        });
+        const description = visionRes.choices?.[0]?.message?.content?.trim();
+        if (description) {
+          prompt = `Concert poster in a style inspired by this album's visual mood and color palette. Album cover description: ${description}. ${prompt}`;
+        } else {
+          prompt = `Concert poster in a style inspired by this album's visual mood and color palette. ${prompt}`;
+        }
+      } catch (e) {
+        console.warn('Vision description failed, using fallback:', e.message);
+        prompt = `Concert poster in a style inspired by this album's visual mood and color palette. ${prompt}`;
+      }
+    } else if (coverImageData && !openai) {
+      prompt = `Concert poster in a style inspired by this album's visual mood and color palette. ${prompt}`;
+    }
+
+    // QR code in prompt when requested
+    if (addQrCode) {
+      const spotifyUrl = `https://open.spotify.com/search/${encodeURIComponent(artist + ' ' + album)}`;
+      prompt += ` Include a small QR code in the bottom corner linking to: ${spotifyUrl}.`;
+    }
+
+    const validSizes = ['1024x1024', '1024x1792', '1792x1024'];
+    const posterSize = validSizes.includes(size) ? size : '1024x1792';
+    const posterQuality = quality === 'hd' ? 'hd' : 'standard';
+
+    console.log('Generating poster with DALL-E...');
+    console.log('Style:', style, 'Quality:', posterQuality, 'Size:', posterSize);
     console.log('Album:', album, 'by', artist);
 
     // Call OpenAI DALL-E API
@@ -63,10 +149,10 @@ export async function generatePoster(req, res) {
       'https://api.openai.com/v1/images/generations',
       {
         model: 'dall-e-3',
-        prompt: prompt,
+        prompt,
         n: 1,
-        size: '1024x1792', // Portrait poster size
-        quality: 'standard',
+        size: posterSize,
+        quality: posterQuality,
         style: 'vivid'
       },
       {

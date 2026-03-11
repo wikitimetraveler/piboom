@@ -498,6 +498,15 @@ let placesApiScriptLoading = false;
 let placesApiReady = false;
 const deviceLocation = { latitude: null, longitude: null };
 
+function syncDeviceLocationToCritterInputs() {
+  if (deviceLocation.latitude != null && deviceLocation.longitude != null) {
+    const latEl = document.getElementById('addCritterLatitude');
+    const lngEl = document.getElementById('addCritterLongitude');
+    if (latEl) latEl.value = deviceLocation.latitude.toFixed(6);
+    if (lngEl) lngEl.value = deviceLocation.longitude.toFixed(6);
+  }
+}
+
 function requestDeviceLocationOnLoad() {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(
@@ -508,6 +517,7 @@ function requestDeviceLocationOnLoad() {
         currentLocation.latitude = deviceLocation.latitude;
         currentLocation.longitude = deviceLocation.longitude;
       }
+      syncDeviceLocationToCritterInputs();
     },
     () => { deviceLocation.latitude = null; deviceLocation.longitude = null; },
     { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
@@ -525,6 +535,7 @@ function requestDeviceLocationNow() {
           currentLocation.latitude = deviceLocation.latitude;
           currentLocation.longitude = deviceLocation.longitude;
         }
+        syncDeviceLocationToCritterInputs();
         resolve(true);
       },
       () => resolve(false),
@@ -656,6 +667,7 @@ function handleImageUpload(event) {
       } else if (deviceLocation.latitude != null) {
         currentLocation.latitude = deviceLocation.latitude;
         currentLocation.longitude = deviceLocation.longitude;
+        syncDeviceLocationToCritterInputs();
       } else {
         currentLocation.latitude = null;
         currentLocation.longitude = null;
@@ -892,6 +904,7 @@ function captureFromCamera() {
         deviceLocation.longitude = p.coords.longitude;
         currentLocation.latitude = deviceLocation.latitude;
         currentLocation.longitude = deviceLocation.longitude;
+        syncDeviceLocationToCritterInputs();
       },
       () => { currentLocation.latitude = null; currentLocation.longitude = null; }
     );

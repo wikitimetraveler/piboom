@@ -7,7 +7,9 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
-<script src="/shared/modern-navbar.js"></script>
+  <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <script src="/shared/modern-navbar.js"></script>
+<script src="/shared/collection-utils.js"></script>
 <script src="/shared/music-mini-nav.js"></script>
   <script src="/shared/user-selector.js"></script>
   <script src="/shared/user-login.js"></script>
@@ -833,8 +835,51 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="poster-layout">
-          <div class="poster-preview">
+        <!-- Mode: Simple | Template -->
+        <div class="mb-3">
+          <label class="small font-weight-bold">Mode</label>
+          <div class="d-flex gap-2 mt-1">
+            <button type="button" class="btn btn-sm btn-outline-primary" id="posterModeSimple" onclick="setCollectionPosterMode('simple')">Simple</button>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="posterModeTemplate" onclick="setCollectionPosterMode('template')">Template</button>
+          </div>
+        </div>
+        <!-- Template options (shown when mode=template) -->
+        <div id="collectionPosterTemplateOpts" class="mb-3" style="display: none;">
+          <label class="small font-weight-bold">Template</label>
+          <div class="d-flex flex-wrap gap-2 mt-1 mb-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary collection-template-btn" data-id="single" onclick="selectCollectionPosterTemplate('single')">Single</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary collection-template-btn" data-id="vintage" onclick="selectCollectionPosterTemplate('vintage')">Vintage</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary collection-template-btn" data-id="split" onclick="selectCollectionPosterTemplate('split')">Split</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary collection-template-btn" data-id="grid" onclick="selectCollectionPosterTemplate('grid')">Grid</button>
+          </div>
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div>
+              <label class="small">Font</label>
+              <select id="collectionPosterFont" class="form-control form-control-sm" style="max-width: 160px;" onchange="rebuildCollectionPoster()">
+                <option value="Georgia, serif">Serif</option>
+                <option value="'Helvetica Neue', Arial, sans-serif">Sans</option>
+                <option value="'Impact', 'Arial Black', sans-serif">Display</option>
+                <option value="'Brush Script MT', cursive">Script</option>
+                <option value="'Courier New', monospace">Mono</option>
+              </select>
+            </div>
+            <div>
+              <label class="small">Frame</label>
+              <select id="collectionPosterFrame" class="form-control form-control-sm" style="max-width: 140px;" onchange="rebuildCollectionPoster()">
+                <option value="none">None</option>
+                <option value="thin_gold">Thin Gold</option>
+                <option value="thick_vintage">Thick Vintage</option>
+                <option value="neon_glow">Neon Glow</option>
+              </select>
+            </div>
+            <div class="form-check align-self-end">
+              <input type="checkbox" class="form-check-input" id="collectionPosterQr" onchange="rebuildCollectionPoster()">
+              <label class="form-check-label small" for="collectionPosterQr">QR code</label>
+            </div>
+          </div>
+        </div>
+        <div class="poster-layout mt-3">
+          <div class="poster-preview" style="overflow: auto; max-height: 420px;">
             <div id="posterContent" class="poster-frame"></div>
           </div>
           <div style="flex: 1 1 260px;">
@@ -857,6 +902,7 @@
               </button>
             </div>
             <small class="text-muted">Tip: tap Share on your phone to text it to friends.</small>
+            <p class="mt-2 mb-0 small"><a href="/entertainment/poster-generator.html" target="_blank"><i class="bi-stars"></i> Want AI-generated art? Open Poster Atelier</a></p>
           </div>
         </div>
       </div>
@@ -1441,6 +1487,68 @@ function displayAlbums(albums) {
 
 let currentPosterAlbum = null;
 let albumPosterCanvas = null;
+let collectionPosterMode = 'simple';
+let collectionPosterTemplate = 'single';
+
+function setCollectionPosterMode(mode) {
+  collectionPosterMode = mode;
+  document.getElementById('posterModeSimple').classList.toggle('active', mode === 'simple');
+  document.getElementById('posterModeTemplate').classList.toggle('active', mode === 'template');
+  document.getElementById('collectionPosterTemplateOpts').style.display = mode === 'template' ? 'block' : 'none';
+  rebuildCollectionPoster();
+}
+
+function selectCollectionPosterTemplate(id) {
+  collectionPosterTemplate = id;
+  document.querySelectorAll('.collection-template-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.id === id);
+  });
+  rebuildCollectionPoster();
+}
+
+function generateCollectionPosterQr(url) {
+  if (!window.QRCode || !url) return null;
+  const div = document.createElement('div');
+  div.style.cssText = 'position:absolute;left:-9999px;width:128px;height:128px;';
+  document.body.appendChild(div);
+  try {
+    new window.QRCode(div, { text: url, width: 128, height: 128 });
+    const canvas = div.querySelector('canvas');
+    const img = div.querySelector('img');
+    const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+    document.body.removeChild(div);
+    return dataUrl;
+  } catch (e) {
+    if (div.parentNode) document.body.removeChild(div);
+    return null;
+  }
+}
+
+function rebuildCollectionPoster() {
+  if (!currentPosterAlbum) return;
+  albumPosterCanvas = null;
+  if (collectionPosterMode === 'template' && window.posterTemplates) {
+    const imageUrl = resolvePosterImageUrl(currentPosterAlbum.cover_url || '');
+    const spotifyUrl = 'https://open.spotify.com/search/' + encodeURIComponent((currentPosterAlbum.artist || '') + ' ' + (currentPosterAlbum.album || ''));
+    const addQr = document.getElementById('collectionPosterQr')?.checked;
+    const qrDataUrl = addQr ? generateCollectionPosterQr(spotifyUrl) : null;
+    const data = {
+      imageUrl: imageUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="%2387CEEB"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="24">No Cover</text></svg>',
+      artist: currentPosterAlbum.artist,
+      album: currentPosterAlbum.album,
+      title: currentPosterAlbum.album,
+      subtitle: currentPosterAlbum.artist,
+      venue: null,
+      date: null,
+      fontFamily: document.getElementById('collectionPosterFont')?.value || 'Georgia, serif',
+      qrDataUrl: qrDataUrl || undefined,
+      frame: document.getElementById('collectionPosterFrame')?.value || 'none'
+    };
+    document.getElementById('posterContent').innerHTML = window.posterTemplates.render(collectionPosterTemplate, data);
+  } else {
+    document.getElementById('posterContent').innerHTML = buildAlbumPosterHtml(currentPosterAlbum);
+  }
+}
 
 function buildAlbumPosterHtml(album) {
   const coverUrl = resolvePosterImageUrl(album.cover_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320"><rect width="100%" height="100%" fill="%2387CEEB"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="24" font-family="Arial">No Cover</text></svg>');
@@ -1489,7 +1597,16 @@ function openAlbumPoster(id) {
   if (!album) return;
   currentPosterAlbum = album;
   albumPosterCanvas = null;
-  document.getElementById('posterContent').innerHTML = buildAlbumPosterHtml(album);
+  collectionPosterMode = 'simple';
+  collectionPosterTemplate = 'single';
+  document.getElementById('posterModeSimple').classList.add('active');
+  document.getElementById('posterModeTemplate').classList.remove('active');
+  document.getElementById('collectionPosterTemplateOpts').style.display = 'none';
+  document.querySelectorAll('.collection-template-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.id === 'single');
+  });
+  document.getElementById('collectionPosterQr').checked = false;
+  rebuildCollectionPoster();
   document.getElementById('posterShareLink').value = '';
   if (typeof $ !== 'undefined') {
     $('#posterModal').modal('show');
@@ -1821,6 +1938,10 @@ async function confirmDelete() {
 
 // Toast notification system
 function showToast(title, message, type = 'info') {
+  if (window.collectionUtils && window.collectionUtils.showToast) {
+    window.collectionUtils.showToast(title, message, type, 5000);
+    return;
+  }
   // Create toast container if it doesn't exist
   let container = document.getElementById('toastContainer');
   if (!container) {
@@ -1885,7 +2006,7 @@ function showToast(title, message, type = 'info') {
 
 // Go to discovery page
 function goToDiscovery() {
-  window.location.href = '/album-discovery.html';
+  window.location.href = '/music/album-discovery.html';
 }
 
 // Find YouTube videos for an album
@@ -2082,7 +2203,9 @@ function collapseAIAnalysis() {
 <script src="/shared/quick-actions.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
 <script src="/shared/poster-utils.js"></script>
+<script src="/shared/poster-templates.js"></script>
 <script src="/shared/voice-widget.js"></script>
 <script>
 // Initialize voice widget for collection
