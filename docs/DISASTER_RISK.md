@@ -6,7 +6,7 @@ Disaster data feeds, loan pipeline risk analysis, and the Disaster Risk AI assis
 
 | Area | Purpose |
 |------|---------|
-| **Disasters Service** | Multi-source disaster data (FEMA, NASA FIRMS, USGS, NWS, NHC, CA fire cameras) |
+| **Disasters Service** | Multi-source disaster data (FEMA, NASA FIRMS, USGS, NWS, NHC) |
 | **Loan Pipeline + Risk** | Pipeline loans, geocoding, FEMA overlap, flood zones, risk summaries |
 | **Disaster Risk AI** | AI assistant for disaster impact on real estate |
 | **Pipeline Risk Dashboard** | `public/finance/pipeline-risk-dashboard.html` – map, tables, AI widgets |
@@ -20,7 +20,6 @@ Disaster data feeds, loan pipeline risk analysis, and the Disaster Risk AI assis
 | **USGS** | Earthquakes | USGS earthquake feeds |
 | **NWS** | Weather alerts | `https://api.weather.gov/alerts/active?status=actual&message_type=alert` |
 | **NHC** | Hurricanes | NHC feeds |
-| **AlertCalifornia** | Fire cameras | `https://alertcalifornia.org/api/cameras` |
 
 Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng, etc.).
 
@@ -42,9 +41,7 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/` | List disasters (query: state, county, source, event, since) |
-| POST | `/refresh` | Refresh from all sources (optional `?includeCameras=true`) |
-| POST | `/refresh-cameras` | Refresh CA fire camera feed only |
-| GET | `/cameras` | List camera records |
+| POST | `/refresh` | Refresh from all sources (FEMA, FIRMS, USGS, NWS, NHC) |
 | GET | `/stats` | Stats |
 | GET | `/export.csv` | CSV export |
 
@@ -82,7 +79,21 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 
 - `NASA_API_KEY` – NASA FIRMS fire data
 - `DATABASE_URL` – PostgreSQL (disasters table)
-- `GOOGLE_API_KEY` or `MAP_KEY` – Geocoding (loan addresses, reverse geocoding)
+- `MAPBOX_ACCESS_TOKEN` – Geocoding (loan addresses, disaster county/state lookup)
+
+## Daily Refresh
+
+Run disaster data pull once per day:
+
+```bash
+npm run refresh-disasters
+```
+
+Cron example (6 AM daily):
+
+```
+0 6 * * * cd /path/to/piBoom && npm run refresh-disasters
+```
 
 ## Related
 

@@ -54,6 +54,7 @@
 
 import { getPool } from './database.service.js';
 import { reverseGeocodeCountyState } from './disaster-risk.service.js';
+import { geocodeCountyStateWithCache } from './geocoding-cache.service.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -381,7 +382,8 @@ export async function ingestFirmsNrt() {
       const lngIdx = headers.indexOf('longitude');
       const dateIdx = headers.indexOf('acq_date');
       const timeIdx = headers.indexOf('acq_time');
-      const brightIdx = headers.indexOf('brightness');
+      // VIIRS CSV uses bright_ti4; MODIS uses brightness
+      const brightIdx = headers.indexOf('bright_ti4') >= 0 ? headers.indexOf('bright_ti4') : headers.indexOf('brightness');
       const confIdx = headers.indexOf('confidence');
       
       // Convert CSV to GeoJSON-like structure
@@ -427,10 +429,10 @@ export async function ingestFirmsNrt() {
   const feats = (geo && geo.features) ? geo.features : [];
   
   // Filter configuration for significant fires
-  const MIN_BRIGHTNESS = 350; // Kelvin - filters out small/inconsequential fires
+  const MIN_BRIGHTNESS = 300; // Kelvin - lowered to capture more fires (VIIRS typical range ~300-500K)
   const MIN_CONFIDENCE = 'nominal'; // 'low', 'nominal', 'high' - only nominal or high
   const CLUSTER_RADIUS_KM = 5; // km - fires within this radius are considered a cluster
-  const MIN_CLUSTER_SIZE = 2; // Require at least 2 fires in cluster for significance
+  const MIN_CLUSTER_SIZE = 1; // Allow single fires (was 2 - too strict when no major fires)
   
   // First pass: filter by confidence and brightness
   const significantFires = [];
@@ -525,9 +527,8 @@ export async function ingestFirmsNrt() {
     }
   }
   
-  // Filter: only include fires that are in clusters of MIN_CLUSTER_SIZE or larger
-  // OR fires with very high brightness (single intense fires)
-  const HIGH_BRIGHTNESS_THRESHOLD = 450; // Very intense single fires
+  // Filter: include fires in clusters OR single fires with sufficient brightness
+  const HIGH_BRIGHTNESS_THRESHOLD = 350; // Single fires at/above this are included
   const finalFires = [];
   let filteredByCluster = 0;
   
@@ -550,8 +551,8 @@ export async function ingestFirmsNrt() {
   console.log(`   - ${finalFires.length} significant fires ready for ingestion`);
   
   // Third pass: Geocode and prepare records
-  // SAFETY: Limit geocoding to prevent excessive API calls (max 100 per ingestion)
-  const MAX_GEOCODING_CALLS = 100;
+  // Limit: 500 with Mapbox (was 100 for Nominatim 1 req/sec). Override via FIRMS_GEOCODE_LIMIT env.
+  const MAX_GEOCODING_CALLS = parseInt(process.env.FIRMS_GEOCODE_LIMIT || '500', 10) || 500;
   const batch = [];
   let geocodeFailures = 0;
   let noFipsCount = 0;
@@ -572,10 +573,10 @@ export async function ingestFirmsNrt() {
         fips = mapCountyToFips(county, state);
         geocodingCalls++;
         
-        // Rate limiting: Wait 1.1 seconds between geocoding calls (Nominatim requires 1 req/sec)
-        // This prevents overwhelming the free API and respects rate limits
+        // Rate limiting: 100ms with Mapbox, 1.1s with Nominatim fallback
+        const delayMs = (process.env.MAPBOX_ACCESS_TOKEN || process.env.MAPBOX_API_KEY) ? 100 : 1100;
         if (geocodingCalls < MAX_GEOCODING_CALLS) {
-          await new Promise(resolve => setTimeout(resolve, 1100));
+          await new Promise(resolve => setTimeout(resolve, delayMs));
         }
       } catch (e) {
         geocodeFailures++;
@@ -632,6 +633,7 @@ export async function ingestUsgsQuakes() {
     return { inserted: 0, skipped: 0 };
   }
   const feats = (geo && geo.features) ? geo.features : [];
+  console.log(`🌍 USGS: Fetched ${feats.length} earthquakes`);
   const batch = [];
   const MAX_GEOCODING_CALLS = 50; // Limit for earthquakes (usually fewer)
   let geocodingCalls = 0;
@@ -662,6 +664,8 @@ export async function ingestUsgsQuakes() {
     
     await loadFipsReference();
     fips = mapCountyToFips(county, state);
+    // Use '00000' when geocoding fails but we have coordinates (e.g. offshore quakes) so it appears on map
+    if (!fips && lat && lng) fips = '00000';
     const rec = {
       source: 'usgs',
       event_type: 'earthquake',
@@ -678,6 +682,7 @@ export async function ingestUsgsQuakes() {
     };
     if (rec.county_fips) batch.push(rec);
   }
+  console.log(`🌍 USGS: Prepared ${batch.length} records for database insertion`);
   return upsertDisasters(batch);
 }
 
@@ -693,28 +698,38 @@ export async function ingestNwsCap() {
     return { inserted: 0, skipped: 0 };
   }
   const feats = (data && data.features) ? data.features : [];
+  console.log(`🌤️  NWS: Fetched ${feats.length} active alerts`);
   const batch = [];
+  const coordCache = new Map(); // county|state -> {lat,lng}
   const MAX_GEOCODING_CALLS = 50; // Limit for NWS alerts
   let geocodingCalls = 0;
   
   for (const f of feats) {
     const props = f.properties || {};
-    // Try to use areaDesc to get county/state; may include multiple areas
+    // Try to use areaDesc to get county/state; NWS formats: "County, ST" or "County1; County2 Counties, ST"
     let county = null, state = null, fips = null;
-    const area = props.areaDesc || '';
-    const m = area.match(/([A-Za-z .'-]+) County,\s*([A-Z]{2})/);
-    if (m) { county = m[1]; state = m[2]; }
+    const area = (props.areaDesc || '').trim();
+    // Match "Counties, ST" or "County, ST" at end - extract state, then first county from preceding text
+    const stateMatch = area.match(/Count(?:y|ies),\s*([A-Z]{2})\s*$/);
+    if (stateMatch) {
+      state = stateMatch[1];
+      const beforeCounties = area.slice(0, area.indexOf(stateMatch[0])).trim();
+      county = beforeCounties.split(/[;]/)[0].trim().replace(/\s+Count(?:y|ies)?\s*$/i, '');
+    }
     // Fallback: reverse geocode centroid if present (only if needed and under limit)
     let lat = null, lng = null;
-    if (f.geometry && f.geometry.type === 'Polygon') {
-      const coords = f.geometry.coordinates[0];
-      if (coords && coords.length) {
-        // rough centroid
-        const mid = coords[Math.floor(coords.length/2)];
-        lng = mid[0]; lat = mid[1];
+    const geom = f.geometry;
+    if (geom && geom.coordinates) {
+      let ring = geom.coordinates;
+      if (geom.type === 'MultiPolygon') ring = ring[0]?.[0] || ring[0];
+      else if (geom.type === 'Polygon') ring = ring[0];
+      if (ring && ring.length) {
+        const sum = ring.reduce((a, p) => [a[0] + p[0], a[1] + p[1]], [0, 0]);
+        lng = sum[0] / ring.length;
+        lat = sum[1] / ring.length;
       }
     }
-    // Only geocode if we don't have county/state AND we're under the limit
+    // Reverse geocode when we have lat/lng but need county/state
     if ((!county || !state) && lat && lng && geocodingCalls < MAX_GEOCODING_CALLS) {
       try {
         const rev = await reverseGeocodeCountyState(lat, lng);
@@ -729,14 +744,37 @@ export async function ingestNwsCap() {
         // Skip on error
       }
     }
+    // Forward geocode when we have county/state but no lat/lng (needed for map display)
+    if ((!lat || !lng) && county && state && geocodingCalls < MAX_GEOCODING_CALLS) {
+      const cacheKey = `${county}|${state}`;
+      let coords = coordCache.get(cacheKey);
+      if (!coords) {
+        try {
+          const res = await geocodeCountyStateWithCache(county, state);
+          if (res?.latitude && res?.longitude) {
+            coords = { lat: res.latitude, lng: res.longitude };
+            coordCache.set(cacheKey, coords);
+            geocodingCalls++;
+          }
+        } catch (e) {
+          // Skip on error
+        }
+      }
+      if (coords?.lat && coords?.lng) {
+        lat = coords.lat;
+        lng = coords.lng;
+      }
+    }
     await loadFipsReference();
     fips = mapCountyToFips(county, state);
+    // Use '00000' when we have coordinates but no county (e.g. marine zones) so alert still appears on map
+    if (!fips && (lat || lng)) fips = '00000';
     const start = props.effective || props.onset || props.sent || new Date().toISOString();
     const rec = {
       source: 'nws',
       event_type: (props.event || 'severe').toLowerCase(),
       county_fips: fips,
-      county_name: county,
+      county_name: county || 'Unknown',
       state_abbr: state,
       start_time: start,
       end_time: props.ends || null,
@@ -748,6 +786,7 @@ export async function ingestNwsCap() {
     };
     if (rec.county_fips) batch.push(rec);
   }
+  console.log(`🌤️  NWS: Prepared ${batch.length} records for database insertion`);
   return upsertDisasters(batch);
 }
 
@@ -800,6 +839,7 @@ export async function ingestFema() {
   console.log(`🏛️  FEMA: ${recentDisasters.length} disasters within 90-day window`);
   
   const batch = [];
+  const coordCache = new Map(); // county|state -> {lat,lng} to avoid duplicate geocoding
   await loadFipsReference();
   
   for (const item of recentDisasters) {
@@ -823,9 +863,28 @@ export async function ingestFema() {
       lat = parseFloat(item.latitude);
       lng = parseFloat(item.longitude);
     }
-    
-    // Note: Skipping reverse geocoding for FEMA to avoid rate limits
-    // Coordinates will be populated if available in FEMA data, otherwise null
+    // Geocode county/state when coordinates missing (needed for map display)
+    if ((!lat || !lng) && county && state) {
+      const cacheKey = `${county}|${state}`;
+      let coords = coordCache.get(cacheKey);
+      if (!coords) {
+        try {
+          coords = await geocodeCountyStateWithCache(county, state);
+          if (coords?.latitude && coords?.longitude) {
+            coordCache.set(cacheKey, { lat: coords.latitude, lng: coords.longitude });
+          }
+        } catch (e) {
+          // Continue without coords - record still useful for table view
+        }
+      }
+      if (coords?.lat && coords?.lng) {
+        lat = coords.lat;
+        lng = coords.lng;
+      } else if (coords?.latitude && coords?.longitude) {
+        lat = coords.latitude;
+        lng = coords.longitude;
+      }
+    }
     
     const rec = {
       source: 'fema',

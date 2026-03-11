@@ -49,9 +49,13 @@ export async function listDisasters(req, res) {
 
 export async function refreshDisasters(req, res) {
   try {
-    const { includeCameras } = req.query; // Optional: ?includeCameras=true
+    const { includeCameras, skipFema } = req.query; // Optional: ?includeCameras=true&skipFema=1
     const results = {};
-    results.fema = await ingestFema();
+    if (skipFema !== '1' && skipFema !== 'true') {
+      results.fema = await ingestFema();
+    } else {
+      results.fema = { inserted: 0, skipped: 'skipped' };
+    }
     results.firms = await ingestFirmsNrt();
     results.usgs = await ingestUsgsQuakes();
     results.nws = await ingestNwsCap();

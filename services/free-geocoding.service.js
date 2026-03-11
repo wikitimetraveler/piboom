@@ -19,6 +19,30 @@ function normalizeCountyName(name) {
   return name.replace(/\s*County$/i, '').trim();
 }
 
+/** US state abbreviation → full name (for matching "KY" vs "Kentucky") */
+const US_STATE_NAMES = {
+  AL: 'Alabama', AK: 'Alaska', AZ: 'Arizona', AR: 'Arkansas', CA: 'California',
+  CO: 'Colorado', CT: 'Connecticut', DE: 'Delaware', FL: 'Florida', GA: 'Georgia',
+  HI: 'Hawaii', ID: 'Idaho', IL: 'Illinois', IN: 'Indiana', IA: 'Iowa',
+  KS: 'Kansas', KY: 'Kentucky', LA: 'Louisiana', ME: 'Maine', MD: 'Maryland',
+  MA: 'Massachusetts', MI: 'Michigan', MN: 'Minnesota', MS: 'Mississippi', MO: 'Missouri',
+  MT: 'Montana', NE: 'Nebraska', NV: 'Nevada', NH: 'New Hampshire', NJ: 'New Jersey',
+  NM: 'New Mexico', NY: 'New York', NC: 'North Carolina', ND: 'North Dakota', OH: 'Ohio',
+  OK: 'Oklahoma', OR: 'Oregon', PA: 'Pennsylvania', RI: 'Rhode Island', SC: 'South Carolina',
+  SD: 'South Dakota', TN: 'Tennessee', TX: 'Texas', UT: 'Utah', VT: 'Vermont',
+  VA: 'Virginia', WA: 'Washington', WV: 'West Virginia', WI: 'Wisconsin', WY: 'Wyoming',
+  DC: 'District of Columbia'
+};
+
+function stateMatchesInAddress(expectedState, addressParts) {
+  if (!expectedState || !addressParts) return false;
+  const abbr = expectedState.toUpperCase().trim();
+  const lower = addressParts.toLowerCase();
+  if (new RegExp(`\\b${abbr}\\b`, 'i').test(addressParts)) return true;
+  const fullName = US_STATE_NAMES[abbr];
+  return fullName ? lower.includes(fullName.toLowerCase()) : false;
+}
+
 /** Infer ISO country code from address hints (for Mapbox/Nominatim country filter) */
 function inferCountryFromAddress(address) {
   if (!address || typeof address !== 'string') return null;
@@ -38,6 +62,24 @@ function inferCountryFromAddress(address) {
 /** Cap "no results" warnings to avoid log spam */
 const NO_RESULTS_WARN_LIMIT = 5;
 let noResultsWarnCount = 0;
+
+/** Nominatim rate limit: 1 request per second. Global lock for all Nominatim calls. */
+let lastNominatimRequest = 0;
+const NOMINATIM_MIN_INTERVAL_MS = 1100;
+
+/** Log Mapbox token status once per process */
+let mapboxTokenLogged = false;
+let mapboxNoResultsCount = 0;
+let mapboxReverse422Logged = false;
+const MAPBOX_NO_RESULTS_LOG_MAX = 5;
+
+async function waitForNominatimRateLimit() {
+  const elapsed = Date.now() - lastNominatimRequest;
+  if (elapsed < NOMINATIM_MIN_INTERVAL_MS) {
+    await new Promise(resolve => setTimeout(resolve, NOMINATIM_MIN_INTERVAL_MS - elapsed));
+  }
+  lastNominatimRequest = Date.now();
+}
 
 function warnNoResults(address) {
   if (noResultsWarnCount < NO_RESULTS_WARN_LIMIT) {
@@ -67,15 +109,21 @@ function extractFromMapboxContext(context = []) {
   return { state, county };
 }
 
-async function geocodeWithMapbox(address, expectedState, expectedCounty) {
+async function geocodeWithMapbox(address, expectedState, expectedCounty, options = {}) {
   const token = getMapboxAccessToken();
-  if (!token || !address) return null;
+  if (!token || !address) {
+    if (!token && !mapboxTokenLogged) {
+      mapboxTokenLogged = true;
+      console.log('📍 Mapbox skipped: MAPBOX_ACCESS_TOKEN (or MAPBOX_API_KEY) not set in .env');
+    }
+    return null;
+  }
 
   const countryHint = inferCountryFromAddress(address);
   const params = {
     access_token: token,
     limit: 5,
-    types: 'address,place,locality,region'
+    ...(options.omitTypes ? {} : { types: 'address,place,locality,region,district' })
   };
   if (countryHint) params.country = countryHint;
 
@@ -87,7 +135,20 @@ async function geocodeWithMapbox(address, expectedState, expectedCounty) {
     });
 
     const features = response.data?.features || [];
-    if (features.length === 0) return null;
+    if (features.length === 0 && !options.omitTypes && /County,\s*[A-Z]{2}/i.test(address)) {
+      // County-style query: retry without types filter (Mapbox may return region/district)
+      return geocodeWithMapbox(address, expectedState, expectedCounty, { omitTypes: true });
+    }
+    if (features.length === 0) {
+      if (mapboxNoResultsCount < MAPBOX_NO_RESULTS_LOG_MAX) {
+        mapboxNoResultsCount++;
+        console.log(`📍 Mapbox returned no results for: ${address}`);
+      } else if (mapboxNoResultsCount === MAPBOX_NO_RESULTS_LOG_MAX) {
+        mapboxNoResultsCount++;
+        console.log(`📍 Mapbox: (further "no results" logs suppressed)`);
+      }
+      return null;
+    }
 
     let fallbackResult = null;
 
@@ -119,9 +180,15 @@ async function geocodeWithMapbox(address, expectedState, expectedCounty) {
       };
 
       if (!fallbackResult) fallbackResult = result;
-      if (result.validated || (!expectedState && !expectedCounty)) return result;
+      if (result.validated || (!expectedState && !expectedCounty)) {
+        console.log(`✅ Mapbox geocoded: ${address} → ${result.latitude}, ${result.longitude}`);
+        return result;
+      }
     }
 
+    if (fallbackResult) {
+      console.log(`✅ Mapbox geocoded: ${address} → ${fallbackResult.latitude}, ${fallbackResult.longitude}`);
+    }
     return fallbackResult;
   } catch (error) {
     console.warn('⚠️  Mapbox geocoding error:', error.message);
@@ -133,12 +200,18 @@ async function reverseGeocodeWithMapbox(lat, lng) {
   const token = getMapboxAccessToken();
   if (!token || !lat || !lng) return null;
 
+  // Validate coordinates - Mapbox returns 422 for out-of-range values
+  const latNum = parseFloat(lat);
+  const lngNum = parseFloat(lng);
+  if (isNaN(latNum) || isNaN(lngNum) || latNum < -90 || latNum > 90 || lngNum < -180 || lngNum > 180) {
+    return null;
+  }
+
   try {
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json`;
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lngNum},${latNum}.json`;
     const response = await axios.get(url, {
       params: {
-        access_token: token,
-        limit: 3
+        access_token: token
       },
       timeout: 10000
     });
@@ -151,6 +224,7 @@ async function reverseGeocodeWithMapbox(lat, lng) {
     const context = f.context || [];
     const { state, county } = extractFromMapboxContext(context);
 
+    console.log(`✅ Mapbox reverse geocoded: ${lat},${lng} → ${county || '?'}, ${state || '?'}`);
     return {
       county: county || null,
       state: state ? state.toUpperCase() : null,
@@ -158,7 +232,13 @@ async function reverseGeocodeWithMapbox(lat, lng) {
       source: 'mapbox'
     };
   } catch (error) {
-    console.warn('⚠️  Mapbox reverse geocoding error:', error.message);
+    const status = error.response?.status;
+    if (status === 422 && !mapboxReverse422Logged) {
+      mapboxReverse422Logged = true;
+      console.log('📍 Mapbox reverse 422 (invalid coords or limit+types) - falling back to Nominatim');
+    } else if (status !== 422) {
+      console.warn('⚠️  Mapbox reverse geocoding error:', error.message);
+    }
     return null;
   }
 }
@@ -174,29 +254,48 @@ export async function geocodeAddressFree(address, expectedState = null, expected
   // Primary: Mapbox Geocoding API (when MAPBOX_ACCESS_TOKEN is set)
   const mapboxResult = await geocodeWithMapbox(address, expectedState, expectedCounty);
   if (mapboxResult) {
+    console.log(`✅ Mapbox geocoding succeeded for: ${address}`);
     return mapboxResult;
   }
 
-  // Fallback: Nominatim (free)
-  try {
-    // Use Nominatim - completely free, no API key needed
-    // Rate limit: 1 request per second (be respectful!)
-    const countryHint = inferCountryFromAddress(address);
-    const countryParam = countryHint ? `&countrycodes=${countryHint}` : '';
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=5${countryParam}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'DevConnectLabs-Research/1.0 (research project)' // Required by Nominatim
+  // Fallback: Nominatim (free) with rate limiting and 429 retry
+  const countryHint = inferCountryFromAddress(address);
+  const countryParam = countryHint ? `&countrycodes=${countryHint}` : '';
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=5${countryParam}`;
+  const retries = 2;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      await waitForNominatimRateLimit();
+
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'DevConnectLabs-Research/1.0 (research project)' // Required by Nominatim
+        }
+      });
+
+      if (response.status === 429 || response.status >= 500) {
+        // On rate limit: try alternative service immediately (avoids more Nominatim hammering)
+        const alt = await geocodeAddressAlternative(address);
+        if (alt.latitude && alt.longitude) {
+          return { latitude: alt.latitude, longitude: alt.longitude, validated: false };
+        }
+        if (attempt < retries) {
+          const waitMs = (attempt + 1) * 3000;
+          console.warn(`⚠️  Nominatim rate limited (${response.status}), retrying in ${waitMs}ms...`);
+          await new Promise(resolve => setTimeout(resolve, waitMs));
+          continue;
+        }
+        console.warn(`⚠️  Nominatim geocoding failed for: ${address} (Status: ${response.status})`);
+        return { latitude: null, longitude: null, validated: false };
       }
-    });
-    
-    if (!response.ok) {
-      console.warn(`⚠️  Nominatim geocoding failed for: ${address} (Status: ${response.status})`);
-      return { latitude: null, longitude: null, validated: false };
-    }
-    
-    const data = await response.json();
+
+      if (!response.ok) {
+        console.warn(`⚠️  Nominatim geocoding failed for: ${address} (Status: ${response.status})`);
+        return { latitude: null, longitude: null, validated: false };
+      }
+
+      const data = await response.json();
     
     if (!data || data.length === 0) {
       warnNoResults(address);
@@ -231,8 +330,8 @@ export async function geocodeAddressFree(address, expectedState = null, expected
         break;
       }
       
-      // Check if state matches
-      const stateMatch = new RegExp(`\\b${expectedState}\\b`, 'i').test(addressParts);
+      // Check if state matches (abbreviation or full name, e.g. KY or Kentucky)
+      const stateMatch = stateMatchesInAddress(expectedState, addressParts);
       if (stateMatch) {
         bestResult = { lat, lon, display_name: addressParts };
         validated = true;
@@ -282,9 +381,10 @@ export async function geocodeAddressFree(address, expectedState = null, expected
       validated: validated || !expectedState,
       display_name: bestResult.display_name
     };
-  } catch (error) {
-    console.error(`❌ Free geocoding error for ${address}:`, error.message);
-    return { latitude: null, longitude: null, validated: false };
+    } catch (error) {
+      console.error(`❌ Free geocoding error for ${address}:`, error.message);
+      return { latitude: null, longitude: null, validated: false };
+    }
   }
 }
 

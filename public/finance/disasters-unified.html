@@ -646,7 +646,11 @@
                         <option value="camera">Fire Cameras</option>
                       </select>
                     </div>
-                    <div class="col-12 d-flex gap-2 justify-content-end">
+                    <div class="col-12 d-flex gap-2 justify-content-end align-items-center flex-wrap">
+                      <div class="form-check form-check-inline me-2">
+                        <input type="checkbox" id="skipFemaCheck" class="form-check-input">
+                        <label class="form-check-label small text-muted" for="skipFemaCheck">Skip FEMA</label>
+                      </div>
                       <button class="btn btn-outline-primary" id="applyBtn"><i class="bi-funnel"></i> Apply</button>
                       <button class="btn btn-primary" id="refreshBtn"><i class="bi-arrow-repeat"></i> Refresh Now</button>
                       <a class="btn btn-outline-secondary" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
@@ -1013,7 +1017,7 @@
 
       async function loadDisasters() {
         showLoading();
-        updateLoadingStatusDisaster('Loading disaster data from multiple sources...', 10);
+        updateLoadingStatusDisaster('Loading disaster data...', 10);
         
         const state = $('#stateInput').val().trim();
         const county = $('#countyInput').val().trim();
@@ -1022,48 +1026,28 @@
         
         let allRows = [];
         
-        // Load FEMA data if FEMA is selected (even with other sources)
-        if (sources.includes('fema')) {
+        // Build database query params - use /api/disasters for ALL sources (fast DB query, no external API)
+        const dbSources = sources.filter(s => s !== 'floodzones' && s !== 'alertcalifornia');
+        const needsDb = dbSources.length > 0 || sources.length === 0;
+        
+        if (needsDb) {
           try {
-            updateLoadingStatusDisaster('Loading FEMA disaster declarations...', 20);
-            console.log('📊 Loading FEMA data using pipeline query logic...');
+            updateLoadingStatusDisaster('Loading disasters from database...', 30);
             const qp = new URLSearchParams();
             if (state) qp.set('state', state);
             if (county) qp.set('county', county);
-            const url = `/api/loan-pipeline/query-fema?${qp.toString()}`;
-            console.log('📊 Loading FEMA from pipeline endpoint:', url);
-            
+            if (dbSources.length === 1) qp.set('source', dbSources[0]);
+            if (events.length === 1) qp.set('event', events[0]);
+            qp.set('since', new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString());
+            const url = `/api/disasters?${qp.toString()}`;
             const resp = await fetch(url);
             const json = await resp.json();
-            console.log('📊 Pipeline FEMA Response:', { 
-              success: json.success, 
-              count: json.data?.count, 
-              disasters: json.data?.disasters?.length || 0,
-              sample: json.data?.disasters?.slice(0, 3)
-            });
-            
-            if (json.success && json.data.disasters) {
-              // Transform pipeline FEMA format to unified format
-              const femaRows = json.data.disasters.map(disaster => ({
-                source: 'fema',
-                event_type: (disaster.incidentType || 'disaster').toLowerCase(),
-                county_name: disaster.county || '',
-                state_abbr: disaster.state || '',
-                start_time: disaster.incidentBeginDate || '',
-                end_time: disaster.incidentEndDate || null,
-                severity: null,
-                title: disaster.declarationTitle || disaster.incidentType || 'FEMA Disaster',
-                lat: disaster.latitude || null,
-                lng: disaster.longitude || null,
-                source_id: String(disaster.disasterNumber || disaster.declarationTitle || ''),
-                raw: disaster
-              }));
-              
-              console.log('📊 Transformed FEMA rows:', femaRows.length);
-              allRows = allRows.concat(femaRows);
+            if (json.success && json.data?.disasters) {
+              allRows = allRows.concat(json.data.disasters);
+              console.log('📊 Loaded', json.data.disasters.length, 'disasters from database');
             }
           } catch (e) {
-            console.error('❌ Error loading FEMA from pipeline:', e);
+            console.error('❌ Error loading disasters:', e);
           }
         }
         
@@ -1110,38 +1094,6 @@
             }
           } catch (e) {
             console.error('❌ Error loading CA Fire Cameras:', e);
-          }
-        }
-        
-        // Load other disaster sources from database (if FEMA is not the only source)
-        const otherSources = sources.filter(s => s !== 'fema' && s !== 'floodzones' && s !== 'alertcalifornia');
-        if (otherSources.length > 0 || sources.length === 0) {
-          try {
-            updateLoadingStatusDisaster('Loading disaster data from database...', 60);
-            // Regular database query for all other sources
-            const qp = new URLSearchParams();
-            if (state) qp.set('state', state);
-            if (county) qp.set('county', county);
-            // Note: API only supports single source/event filter
-            // If multiple sources selected, don't filter (show all) - otherwise filter by first selected
-            if (otherSources.length === 1) qp.set('source', otherSources[0]);
-            if (events.length === 1) qp.set('event', events[0]);
-            qp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
-            const url = `/api/disasters?${qp.toString()}`;
-            console.log('📊 Loading disasters from database:', url);
-            const resp = await fetch(url);
-            const json = await resp.json();
-            console.log('📊 API Response:', { 
-              success: json.success, 
-              count: json.data?.count, 
-              disasters: json.data?.disasters?.length || 0,
-              sample: json.data?.disasters?.slice(0, 3)
-            });
-            const dbRows = json.success ? json.data.disasters : [];
-            console.log('📊 Rows from database:', dbRows.length);
-            allRows = allRows.concat(dbRows);
-          } catch (e) {
-            console.error('❌ Error loading database disasters:', e);
           }
         }
         
@@ -1279,6 +1231,7 @@
         const county = $('#countyInput').val().trim();
         if (state) qp.set('state', state);
         if (county) qp.set('county', county);
+        if ($('#skipFemaCheck').is(':checked')) qp.set('skipFema', '1');
         console.log('🔄 Refreshing disasters...');
         const refreshResp = await fetch(`/api/disasters/refresh?${qp.toString()}`, { method: 'POST' });
         const refreshJson = await refreshResp.json();
