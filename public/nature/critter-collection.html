@@ -1237,13 +1237,17 @@ function updateMap(critters) {
   if (withLocation.length === 0) return;
 
   const bounds = new google.maps.LatLngBounds();
+  const critterIcon = window.mapIcons && window.mapIcons.getCollectionIconForMarker
+    ? window.mapIcons.getCollectionIconForMarker('critter')
+    : null;
   withLocation.forEach(c => {
     const lat = parseFloat(c.latitude);
     const lng = parseFloat(c.longitude);
     const marker = new google.maps.Marker({
       position: { lat, lng },
       map,
-      title: c.animal_name
+      title: c.animal_name,
+      icon: critterIcon
     });
     markers.push(marker);
     bounds.extend({ lat, lng });
@@ -1342,5 +1346,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
 <script src="/shared/poster-utils.js"></script>
 <script src="/shared/poster-templates.js"></script>
+<script src="/shared/map-icons.js"></script>
 </body>
 </html>

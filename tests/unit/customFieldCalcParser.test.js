@@ -6,12 +6,15 @@ const {
   splitByTopLevelAmpersand,
   expandOrElseScenarios,
   extractComparisonValues,
+  extractArithmeticComparisons,
   extractConditionValues,
   extractStringComparisons,
   getSuggestedValuesForScenario,
   generateUnitTestFromCustomField,
   parseCalculationFormula,
   normalizeFieldIdForLookup,
+  evaluateExpression,
+  evaluateCondition,
   isSunriseField,
   formatDateWithOffset,
 } = globalThis.customFieldCalcParser;
@@ -160,6 +163,20 @@ describe('customFieldCalcParser', () => {
     });
   });
 
+  describe('splitOrElseBranches (Or and And)', () => {
+    test('splits on Or (Encompass style) in addition to OrElse', () => {
+      const cond = '([#FR0112#2] + ([#FR0124#2] / 12)) >= 2 Or ([#FR0312#2] + ([#FR0324#2] / 12)) >= 2';
+      const parts = expandOrElseScenarios([{ condition: cond, result: '"Yes"', isElse: false }]);
+      expect(parts.length).toBeGreaterThanOrEqual(2);
+    });
+
+    test('splits on And in addition to AndAlso', () => {
+      const cond = '[a] >= 1 And [b] >= 2';
+      const result = evaluateCondition(cond, { a: 1, b: 2 });
+      expect(result).toBe(true);
+    });
+  });
+
   describe('extractComparisonValues', () => {
     test('returns empty array for empty or invalid input', () => {
       expect(extractComparisonValues('')).toEqual([]);
@@ -187,6 +204,67 @@ describe('customFieldCalcParser', () => {
     test('handles decimal values', () => {
       const result = extractComparisonValues('[x] <= 199.5');
       expect(result).toEqual([{ fieldId: 'x', op: '<=', value: 199.5 }]);
+    });
+  });
+
+  describe('extractArithmeticComparisons', () => {
+    test('extracts arithmetic expr comparisons', () => {
+      const result = extractArithmeticComparisons('([#FR0112#2] + ([#FR0124#2] / 12)) >= 2');
+      expect(result).toHaveLength(1);
+      expect(result[0].op).toBe('>=');
+      expect(result[0].value).toBe(2);
+      expect(result[0].fieldIds).toContain('#FR0112#2');
+      expect(result[0].fieldIds).toContain('#FR0124#2');
+    });
+
+    test('does not match DateDiff (no arithmetic operators)', () => {
+      const result = extractArithmeticComparisons('DateDiff("d", [@A], [@B]) > 90');
+      expect(result).toHaveLength(0);
+    });
+  });
+
+  describe('normalizeFieldIdForLookup (borrower pair)', () => {
+    test('strips leading # typecast, keeps borrower pair #n by default', () => {
+      expect(normalizeFieldIdForLookup('#FR0112#2')).toBe('FR0112#2');
+    });
+
+    test('strips trailing #n when stripBorrowerPair option is true', () => {
+      expect(normalizeFieldIdForLookup('#FR0112#2', { stripBorrowerPair: true })).toBe('FR0112');
+    });
+  });
+
+  describe('evaluateExpression (arithmetic conditions, Or, borrower pair)', () => {
+    const formula =
+      'IIf(([#FR0112#2] + ([#FR0124#2] / 12)) >= 2 Or ([#FR0312#2] + ([#FR0324#2] / 12)) >= 2, "Yes", "")';
+
+    test('returns "Yes" when first arithmetic branch is true', () => {
+      const values = { 'FR0112#2': 2, 'FR0124#2': 0, 'FR0312#2': 0, 'FR0324#2': 0 };
+      expect(evaluateExpression(formula, values)).toBe('Yes');
+    });
+
+    test('returns "Yes" when second arithmetic branch is true', () => {
+      const values = { 'FR0112#2': 0, 'FR0124#2': 0, 'FR0312#2': 2, 'FR0324#2': 0 };
+      expect(evaluateExpression(formula, values)).toBe('Yes');
+    });
+
+    test('returns "" when both branches are false', () => {
+      const values = { 'FR0112#2': 0, 'FR0124#2': 0, 'FR0312#2': 0, 'FR0324#2': 0 };
+      expect(evaluateExpression(formula, values)).toBe('');
+    });
+
+    test('builder mode: values keyed without #n suffix still resolve', () => {
+      const values = { FR0112: 2, FR0124: 0, FR0312: 0, FR0324: 0 };
+      expect(evaluateExpression(formula, values)).toBe('Yes');
+    });
+
+    test('full FR/BR formula: all four Or branches', () => {
+      const fullFormula =
+        'IIf(([#FR0112#2] + ([#FR0124#2] / 12)) >= 2 Or ([#BR0112#2] + [#BR0212#2]) + (([#BR0124#2] + [#BR0224#2]) / 12) >= 2 Or ([#FR0312#2] + ([#FR0324#2] / 12)) >= 2 Or ([#FR0112#2] + ([#FR0124#2] / 12)) + ([#FR0312#2] + ([#FR0324#2] / 12)) >= 2, "Yes", "")';
+      expect(evaluateExpression(fullFormula, { FR0112: 2, FR0124: 0 })).toBe('Yes');
+      expect(evaluateExpression(fullFormula, { BR0112: 1, BR0212: 1, BR0124: 0, BR0224: 0 })).toBe('Yes');
+      expect(evaluateExpression(fullFormula, { FR0312: 2, FR0324: 0 })).toBe('Yes');
+      expect(evaluateExpression(fullFormula, { FR0112: 1, FR0124: 0, FR0312: 1, FR0324: 0 })).toBe('Yes');
+      expect(evaluateExpression(fullFormula, {})).toBe('');
     });
   });
 

@@ -1778,18 +1778,14 @@ function updateMap(trees) {
       
       const position = { lat: parseFloat(tree.latitude), lng: parseFloat(tree.longitude) };
       
+      const treeIcon = window.mapIcons && window.mapIcons.getCollectionIconForMarker
+        ? window.mapIcons.getCollectionIconForMarker('tree')
+        : { path: google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: '#4CAF50', fillOpacity: 0.9, strokeColor: '#1B5E20', strokeWeight: 2 };
       const marker = new google.maps.Marker({
         position: position,
         map: map,
         title: tree.tree_name,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: '#4CAF50',
-          fillOpacity: 0.9,
-          strokeColor: '#1B5E20',
-          strokeWeight: 2
-        }
+        icon: treeIcon
       });
       
       const infoWindow = new google.maps.InfoWindow({
@@ -1930,6 +1926,7 @@ function toggleAIAnalysis(element) {
 <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
 <script src="/shared/poster-utils.js"></script>
 <script src="/shared/poster-templates.js"></script>
+<script src="/shared/map-icons.js"></script>
 <script src="/shared/collection-utils.js"></script>
 <script src="/shared/scripts.js"></script>
 <script src="/shared/voice-widget.js"></script>

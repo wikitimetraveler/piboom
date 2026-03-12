@@ -1,17 +1,31 @@
 import { getPool } from '../services/database.service.js';
 import { initDisastersSchema, upsertDisasters, normalizeFemaV2ToUnified, ingestFema, ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestCaFireCameras } from '../services/disasters.service.js';
+import { geocodeCountyStateWithCache } from '../services/geocoding-cache.service.js';
 
 // Ensure schema on startup (best-effort)
 initDisastersSchema().catch(() => {});
 
+/** US state FIPS codes (first 2 digits of county_fips) */
+const US_STATE_FIPS = ['01','02','04','05','06','08','09','10','11','12','13','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','44','45','46','47','48','49','50','51','53','54','55','56','60','66','69','72','78'];
+/** US state abbreviations - for records with county_fips=00000 (FIPS lookup failed) */
+const US_STATE_ABBR = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','PEN','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','AS','GU','MP','PR','VI'];
+
 export async function listDisasters(req, res) {
   try {
-    const { state, county, source, event, since } = req.query;
+    const { state, county, source, event, since, usOnly } = req.query;
     const pool = getPool();
     if (!pool) throw new Error('Database not initialized');
 
     const clauses = [];
     const values = [];
+    // Default: US-only (excludes international e.g. USGS Tibet earthquakes)
+    // Include: county_fips starts with US state FIPS, OR state_abbr is a US state (relaxed for records with odd county_fips)
+    const filterUsOnly = usOnly !== 'false' && usOnly !== '0';
+    if (filterUsOnly) {
+      const fipsList = US_STATE_FIPS.map(f => `'${f}'`).join(',');
+      const abbrList = US_STATE_ABBR.map(a => `'${a}'`).join(',');
+      clauses.push(`(LEFT(county_fips, 2) IN (${fipsList}) OR (UPPER(TRIM(COALESCE(state_abbr,''))) IN (${abbrList})))`);
+    }
     if (state) { values.push(state); clauses.push(`state_abbr = $${values.length}`); }
     if (county) { values.push(county); clauses.push(`county_name ILIKE $${values.length}`); values[values.length-1] = `%${county}%`; }
     if (source) { 
@@ -28,8 +42,66 @@ export async function listDisasters(req, res) {
     // Remove LIMIT to get all disasters - real-time data from database
     const sql = `SELECT * FROM disasters ${where} ORDER BY start_time DESC`;
     console.log('📊 Querying disasters:', sql, 'Values:', values);
-    const { rows } = await pool.query(sql, values);
-    
+    let rows = (await pool.query(sql, values)).rows;
+
+    // Optional: geocode rows missing lat/lng but with county+state
+    const doGeocode = req.query.geocode === 'true' || req.query.geocode === '1';
+    if (doGeocode && rows.length > 0) {
+      const needsGeocode = (r) => {
+        const hasCoords = (r.lat != null && r.lng != null && !isNaN(parseFloat(r.lat)) && !isNaN(parseFloat(r.lng)));
+        const hasLocation = (r.county_name || '').trim() && (r.state_abbr || '').trim();
+        return !hasCoords && hasLocation;
+      };
+      const toGeocode = rows.filter(needsGeocode);
+      const uniqueKeys = new Set();
+      const coordCache = new Map();
+      const maxGeocodes = 40;
+      let geocodeCount = 0;
+
+      for (const r of toGeocode) {
+        if (geocodeCount >= maxGeocodes) break;
+        const county = (r.county_name || '').replace(/\s*County$/i, '').trim();
+        const state = (r.state_abbr || '').trim().toUpperCase();
+        if (!county || !state) continue;
+        const key = `${county}|${state}`;
+        if (uniqueKeys.has(key)) continue;
+        uniqueKeys.add(key);
+
+        try {
+          const coords = await geocodeCountyStateWithCache(county, state);
+          if (coords?.latitude != null && coords?.longitude != null) {
+            coordCache.set(key, { lat: coords.latitude, lng: coords.longitude });
+            geocodeCount++;
+            if (!coords?.cached) {
+              await new Promise(resolve => setTimeout(resolve, 1100));
+              await pool.query(
+                `UPDATE disasters SET lat = $1, lng = $2 WHERE LOWER(REPLACE(COALESCE(county_name,''), ' County', '')) = $3 AND UPPER(TRIM(COALESCE(state_abbr,''))) = $4 AND (lat IS NULL OR lng IS NULL)`,
+                [coords.latitude, coords.longitude, county.toLowerCase(), state]
+              );
+            }
+          }
+        } catch (e) {
+          console.warn(`⚠️  Geocode failed for ${county}, ${state}:`, e.message);
+        }
+      }
+
+      rows = rows.map(r => {
+        if (needsGeocode(r)) {
+          const county = (r.county_name || '').replace(/\s*County$/i, '').trim();
+          const state = (r.state_abbr || '').trim().toUpperCase();
+          const key = `${county}|${state}`;
+          const coords = coordCache.get(key);
+          if (coords) {
+            return { ...r, lat: coords.lat, lng: coords.lng };
+          }
+        }
+        return r;
+      });
+      if (geocodeCount > 0) {
+        console.log(`📍 Geocoded ${geocodeCount} unique county/state locations for map display`);
+      }
+    }
+
     // Debug: Show source breakdown for FIRMS debugging
     if (source) {
       const sourceBreakdown = rows.reduce((acc, r) => {

@@ -418,6 +418,9 @@
       #encompassLoansCard {
         animation: slideDown 0.5s ease;
       }
+      #encompassLoansTable tbody tr {
+        cursor: pointer;
+      }
 
       @keyframes slideDown {
         from {
@@ -785,6 +788,7 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI&libraries=places"></script>
+    <script src="/shared/map-icons.js"></script>
     <!-- Google API for YouTube -->
     <script src="https://apis.google.com/js/api.js"></script>
     <script>
@@ -898,14 +902,14 @@
             // Force column adjustment on every draw - this fixes alignment issues
             const api = this.api();
             
-            // Preserve data-order attributes and badges after redraw
+            // Preserve data-order attributes and badges after redraw (table has 9 columns)
             $('#disastersTable tbody tr').each(function() {
               const $row = $(this);
               const disasterObj = $row.data('disasterObj');
               if (disasterObj) {
                 const cells = $row.find('td');
-                if (cells.length === 7) {
-                  // Restore data-order attributes for sorting
+                if (cells.length >= 6) {
+                  // Restore data-order attributes for proper date sorting (Start=4, End=5)
                   const source = String(disasterObj.source || '').trim().toLowerCase();
                   const rawStartTime = disasterObj.start_time ? new Date(disasterObj.start_time).getTime() : 0;
                   const rawEndTime = disasterObj.end_time ? new Date(disasterObj.end_time).getTime() : 0;
@@ -957,28 +961,30 @@
               orderDataType: 'dom-data'
             }, // Source column fixed width
             { 
-              targets: 4, // Start date column
+              targets: 4, // Start date column - orthogonal data for proper date sort
               className: 'text-start', 
               orderable: true,
               type: 'num',
               render: function(data, type, row, meta) {
-                // Always return formatted date for display
-                return data || '';
-              },
-              // Use data-order attribute with numeric timestamp for proper date sorting
-              orderDataType: 'dom-data'
+                if (type === 'sort' || type === 'filter') {
+                  return (data && typeof data === 'object' && typeof data.sort === 'number') ? data.sort : 0;
+                }
+                if (data && typeof data === 'object' && '_' in data) return String(data._ != null ? data._ : '');
+                return typeof data === 'string' ? data : '';
+              }
             },
             { 
-              targets: 5, // End date column
+              targets: 5, // End date column - orthogonal data for proper date sort
               className: 'text-start', 
               orderable: true,
               type: 'num',
               render: function(data, type, row, meta) {
-                // Always return formatted date for display
-                return data || '';
-              },
-              // Use data-order attribute with numeric timestamp for proper date sorting
-              orderDataType: 'dom-data'
+                if (type === 'sort' || type === 'filter') {
+                  return (data && typeof data === 'object' && typeof data.sort === 'number') ? data.sort : 0;
+                }
+                if (data && typeof data === 'object' && '_' in data) return String(data._ != null ? data._ : '');
+                return typeof data === 'string' ? data : '';
+              }
             },
             { targets: [1,2,3,6], className: 'text-start', orderable: true } // Other columns
           ]
@@ -1009,6 +1015,16 @@
           selectDisaster(data, rowData);
         });
         
+        // Encompass loans: click row to pan map to loan address (zoom 10)
+        $('#encompassLoansTable tbody').on('click', 'tr', function() {
+          const loan = $(this).data('loanObj');
+          if (loan && loan.latitude && loan.longitude && map) {
+            const pos = { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) };
+            map.setCenter(pos);
+            map.setZoom(10);
+          }
+        });
+        
         loadYouTubeAPI();
         loadDisasters();
         // Load all encompass loans on map on page load
@@ -1032,13 +1048,14 @@
         
         if (needsDb) {
           try {
-            updateLoadingStatusDisaster('Loading disasters from database...', 30);
+            updateLoadingStatusDisaster('Loading disasters (geocoding for map)...', 30);
             const qp = new URLSearchParams();
             if (state) qp.set('state', state);
             if (county) qp.set('county', county);
             if (dbSources.length === 1) qp.set('source', dbSources[0]);
             if (events.length === 1) qp.set('event', events[0]);
             qp.set('since', new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString());
+            qp.set('geocode', 'true');
             const url = `/api/disasters?${qp.toString()}`;
             const resp = await fetch(url);
             const json = await resp.json();
@@ -1084,6 +1101,7 @@
             cameraQp.set('source', 'alertcalifornia');
             cameraQp.set('event', 'camera');
             cameraQp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
+            cameraQp.set('geocode', 'true');
             const cameraUrl = `/api/disasters?${cameraQp.toString()}`;
             console.log('📹 Loading CA Fire Cameras:', cameraUrl);
             const cameraResp = await fetch(cameraUrl);
@@ -1318,14 +1336,14 @@
             }
             
             // Build rowData array - EXACTLY 9 elements (added Actions column)
-            // Use array literal to ensure clean array with no undefined elements
+            // Use orthogonal data for date columns: { _: display, sort: timestamp } for correct date sorting
             const rowData = [
               sourceBadge || '',    // Source (0) - HTML badge
               eventBadge || '',       // Event (1)
               county || '',           // County (2)
               state || '',            // State (3)
-              startTime || '',        // Start (4) - formatted for display
-              endTime || '',          // End (5) - formatted for display
+              { _: startTime || '', sort: rawStartTime },  // Start (4) - display + numeric sort
+              { _: endTime || '', sort: rawEndTime },       // End (5) - display + numeric sort
               title || '',            // Title (6)
               riskBadge || '',        // Risk Score (7)
               actionButtons || ''     // Actions (8)
@@ -1339,8 +1357,9 @@
               rowData.splice(9); // Remove any extras
             }
             
-            // Verify all elements are strings (no undefined/null)
+            // Verify all elements are strings (no undefined/null) - skip indices 4,5 (date objects)
             for (let i = 0; i < 9; i++) {
+              if (i === 4 || i === 5) continue; // Keep orthogonal date objects for proper sort
               if (rowData[i] === undefined || rowData[i] === null) {
                 rowData[i] = '';
               }
@@ -1493,16 +1512,20 @@
         let any = false;
         cameraIndex = 0; // Reset camera index
         rows.forEach(r => {
-          if (r.lat && r.lng) {
-            const pos = { lat: parseFloat(r.lat), lng: parseFloat(r.lng) };
+          // Support lat/lng, latitude/longitude, avg_latitude/avg_longitude
+          const lat = r.lat ?? r.latitude ?? r.avg_latitude;
+          const lng = r.lng ?? r.longitude ?? r.avg_longitude;
+          if (lat != null && lng != null && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))) {
+            const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
+            // Always use red for disaster markers so they're distinct from blue loan markers (24px to match loan dot size)
+            const redSvg = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#E53935" stroke="#B71C1C" stroke-width="2"/></svg>');
+            const disasterIcon = { url: redSvg, scaledSize: new google.maps.Size(24, 24) };
             const marker = new google.maps.Marker({ 
               position: pos, 
               map, 
               title: r.title || r.event_type,
-              icon: {
-                url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                scaledSize: new google.maps.Size(30, 30)
-              }
+              icon: disasterIcon,
+              zIndex: 100
             });
             // Check if this is a camera marker
             const isCameraMarker = r.event_type === 'camera' || r.source === 'alertcalifornia' ||
@@ -1691,14 +1714,15 @@
         
         loans.forEach(loan => {
           if (loan.latitude && loan.longitude) {
+            const loanIcon = window.mapIcons && window.mapIcons.getLoanIconForMarker
+              ? window.mapIcons.getLoanIconForMarker(loan.disaster_risk_score)
+              : { url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png', scaledSize: new google.maps.Size(24, 24) };
             const marker = new google.maps.Marker({
               position: { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) },
               map: map,
               title: `Loan ${loan.loan_number}`,
-              icon: {
-                url: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                scaledSize: new google.maps.Size(30, 30)
-              }
+              icon: loanIcon,
+              zIndex: 10
             });
             const infoWindow = new google.maps.InfoWindow({
               content: `<div>

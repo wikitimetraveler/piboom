@@ -745,7 +745,7 @@ export async function generateKMLForLoans(loans) {
     <Style id="lowRisk">
       <IconStyle>
         <Icon>
-          <href>http://maps.google.com/mapfiles/ms/icons/green-dot.png</href>
+          <href>https://maps.google.com/mapfiles/ms/icons/green-dot.png</href>
         </Icon>
         <scale>1.0</scale>
       </IconStyle>
@@ -753,7 +753,7 @@ export async function generateKMLForLoans(loans) {
     <Style id="mediumRisk">
       <IconStyle>
         <Icon>
-          <href>http://maps.google.com/mapfiles/ms/icons/yellow-dot.png</href>
+          <href>https://maps.google.com/mapfiles/ms/icons/yellow-dot.png</href>
         </Icon>
         <scale>1.0</scale>
       </IconStyle>
@@ -761,7 +761,7 @@ export async function generateKMLForLoans(loans) {
     <Style id="highRisk">
       <IconStyle>
         <Icon>
-          <href>http://maps.google.com/mapfiles/ms/icons/red-dot.png</href>
+          <href>https://maps.google.com/mapfiles/ms/icons/red-dot.png</href>
         </Icon>
         <scale>1.0</scale>
       </IconStyle>
@@ -769,7 +769,7 @@ export async function generateKMLForLoans(loans) {
     <Style id="notAnalyzed">
       <IconStyle>
         <Icon>
-          <href>http://maps.google.com/mapfiles/ms/icons/gray-dot.png</href>
+          <href>https://maps.google.com/mapfiles/ms/icons/gray-dot.png</href>
         </Icon>
         <scale>1.0</scale>
       </IconStyle>

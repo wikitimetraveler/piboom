@@ -2031,13 +2031,13 @@
                 if (lat && lng && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))) {
                     markersAdded++;
                     // Use different icons/colors based on source
-                    let iconUrl = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                    let iconUrl = 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
                     if (source === 'firms') {
-                        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/fire.png';
+                        iconUrl = 'https://maps.google.com/mapfiles/ms/icons/fire.png';
                     } else if (source === 'usgs') {
-                        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/earthquake.png';
+                        iconUrl = 'https://maps.google.com/mapfiles/ms/icons/earthquake.png';
                     } else if (source === 'nws' || source === 'nhc') {
-                        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/storm.png';
+                        iconUrl = 'https://maps.google.com/mapfiles/ms/icons/storm.png';
                     }
                     
                     const marker = new google.maps.Marker({

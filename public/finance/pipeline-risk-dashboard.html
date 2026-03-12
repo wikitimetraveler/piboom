@@ -29,6 +29,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Google Maps API -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI&libraries=places"></script>
+    <script src="/shared/map-icons.js"></script>
     <!-- Google API for YouTube -->
     <script src="https://apis.google.com/js/api.js"></script>
     
@@ -2572,14 +2573,14 @@
 
             disasters.forEach(disaster => {
                 if (disaster.latitude && disaster.longitude) {
+                    const disasterIcon = window.mapIcons && window.mapIcons.getDisasterIconForMarker
+                        ? window.mapIcons.getDisasterIconForMarker(disaster.incidentType || disaster.event_type, disaster.source)
+                        : { url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', scaledSize: new google.maps.Size(30, 30) };
                     const marker = new google.maps.Marker({
                         position: { lat: disaster.latitude, lng: disaster.longitude },
                         map: map,
                         title: disaster.declarationTitle,
-                        icon: {
-                            url: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png',
-                            scaledSize: new google.maps.Size(30, 30)
-                        }
+                        icon: disasterIcon
                     });
 
                     const infoWindow = new google.maps.InfoWindow({
@@ -2615,29 +2616,14 @@
             loanMarkers = [];
             loans.forEach(loan => {
                 if (loan.latitude && loan.longitude) {
-                    // Determine marker color based on flood zone risk
-                    let markerColor = 'blue'; // Default
-                    let markerIcon = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png';
-                    
-                    if (loan.flood_zone) {
-                        const fz = loan.flood_zone.toUpperCase();
-                        if (fz.startsWith('A') || fz.startsWith('V')) {
-                            markerColor = 'red'; // High risk flood zones
-                            markerIcon = 'http://maps.google.com/mapfiles/ms/icons/red-dot.png';
-                        } else if (fz.includes('X') && loan.flood_zone_type && loan.flood_zone_type.includes('Shaded')) {
-                            markerColor = 'yellow'; // Moderate risk
-                            markerIcon = 'http://maps.google.com/mapfiles/ms/icons/yellow-dot.png';
-                        }
-                    }
-                    
+                    const loanIcon = window.mapIcons && window.mapIcons.getLoanIconByFloodZoneForMarker
+                        ? window.mapIcons.getLoanIconByFloodZoneForMarker(loan.flood_zone, loan.flood_zone_type)
+                        : { url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png', scaledSize: new google.maps.Size(30, 30) };
                     const marker = new google.maps.Marker({
                         position: { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) },
                         map: map,
                         title: `Loan ${loan.loan_number}${loan.flood_zone ? ` - Zone ${loan.flood_zone}` : ''}`,
-                        icon: {
-                            url: markerIcon,
-                            scaledSize: new google.maps.Size(30, 30)
-                        }
+                        icon: loanIcon
                     });
                     
                     // Build info window content with flood zone info

@@ -230,25 +230,27 @@
   }
 
   /**
-   * Split a condition by OrElse at shallowest depth (respecting parens and quotes).
-   * @param {string} condition - e.g. '([19] = "A" OrElse [19] = "B") AndAlso [299] = ""'
-   * @returns {string[]} - array of sub-conditions, or [condition] if no OrElse
+   * Split a condition by OrElse or Or at shallowest depth (respecting parens and quotes).
+   * Encompass uses both "Or" and "OrElse"; treat them the same.
+   * @param {string} condition - e.g. '([19] = "A" OrElse [19] = "B")' or '(A >= 2 Or B >= 2)'
+   * @returns {string[]} - array of sub-conditions, or [condition] if no Or/OrElse
    */
   function splitOrElseBranches(condition) {
     if (!condition || typeof condition !== 'string') return [];
     const trimmed = condition.trim();
     if (!trimmed) return [];
 
-    const andAlsoMatch = trimmed.match(/^(.+?)\s+AndAlso\s+(.+)$/);
+    const andAlsoMatch = trimmed.match(/^(.+?)\s+(?:AndAlso|And)\s+(.+)$/);
     let orGroup = trimmed;
     let suffix = '';
     if (andAlsoMatch) {
       orGroup = andAlsoMatch[1].trim();
-      suffix = ' AndAlso ' + andAlsoMatch[2].trim();
+      suffix = ' ' + (trimmed.includes('AndAlso') ? 'AndAlso' : 'And') + ' ' + andAlsoMatch[2].trim();
     }
 
-    let minOrElseDepth = -1;
+    let minOrDepth = -1;
     const orElse = ' OrElse ';
+    const orOnly = ' Or ';
     let depth = 0;
     let inQuote = false;
     for (let i = 0; i < orGroup.length; i++) {
@@ -257,12 +259,17 @@
       if (!inQuote) {
         if (c === '(') depth++;
         else if (c === ')') depth--;
-        else if (orGroup.substring(i, i + orElse.length) === orElse && (minOrElseDepth < 0 || depth < minOrElseDepth)) {
-          minOrElseDepth = depth;
+        else {
+          const matchOrElse = orGroup.substring(i, i + orElse.length) === orElse;
+          const matchOr = orGroup.substring(i, i + orOnly.length) === orOnly &&
+            orGroup.substring(i, i + orElse.length) !== orElse;
+          if ((matchOrElse || matchOr) && (minOrDepth < 0 || depth < minOrDepth)) {
+            minOrDepth = depth;
+          }
         }
       }
     }
-    if (minOrElseDepth < 0) return [trimmed];
+    if (minOrDepth < 0) return [trimmed];
 
     const parts = [];
     depth = 0;
@@ -290,10 +297,13 @@
           i++;
           continue;
         }
-        if (depth === minOrElseDepth && orGroup.substring(i, i + orElse.length) === orElse) {
+        const matchOrElse = orGroup.substring(i, i + orElse.length) === orElse;
+        const matchOr = orGroup.substring(i, i + orOnly.length) === orOnly &&
+          orGroup.substring(i, i + orElse.length) !== orElse;
+        if (depth === minOrDepth && (matchOrElse || matchOr)) {
           parts.push(current.trim());
           current = '';
-          i += orElse.length;
+          i += matchOrElse ? orElse.length : orOnly.length;
           continue;
         }
       }
@@ -403,6 +413,29 @@
       const value = parseFloat(m[3]);
       if (Number.isFinite(value)) {
         results.push({ fieldId: m[1].trim(), op: m[2], value });
+      }
+    }
+    return results;
+  }
+
+  /**
+   * Extract arithmetic expression comparisons (expr) op N for suggested values.
+   * Only matches when expr contains arithmetic operators (excludes DateDiff, IsDate, etc.).
+   * @param {string} conditionString - e.g. "([#FR0112#2] + ([#FR0124#2] / 12)) >= 2"
+   * @returns {Array<{ type: 'arithmetic', expr: string, op: string, value: number, fieldIds: string[] }>}
+   */
+  function extractArithmeticComparisons(conditionString) {
+    if (!conditionString || typeof conditionString !== 'string') return [];
+    const results = [];
+    const re = /\(\s*([^()]*(?:\([^()]*\)[^()]*)*)\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)/g;
+    let m;
+    while ((m = re.exec(conditionString)) !== null) {
+      const expr = m[1].trim();
+      if (!/[+\-*\/]/.test(expr)) continue;
+      const value = parseFloat(m[3]);
+      if (Number.isFinite(value)) {
+        const fieldIds = [...expr.matchAll(/\[([^\]]+)\]/g)].map((f) => f[1].trim());
+        results.push({ type: 'arithmetic', expr, op: m[2], value, fieldIds });
       }
     }
     return results;
@@ -535,6 +568,17 @@
         suggested[norm] = Number.isFinite(val) ? val : '';
       }
     }
+    const arithComps = extractArithmeticComparisons(scenario.condition);
+    for (let i = 0; i < arithComps.length; i++) {
+      const ac = arithComps[i];
+      for (let j = 0; j < ac.fieldIds.length; j++) {
+        const fid = ac.fieldIds[j];
+        const norm = normalizeFieldIdForLookup(fid);
+        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+          suggested[norm] = (ac.op === '>=' || ac.op === '>') && j === 0 ? ac.value : 0;
+        }
+      }
+    }
     const strComps = extractStringComparisons(scenario.condition);
     for (let i = 0; i < strComps.length; i++) {
       const sc = strComps[i];
@@ -633,12 +677,18 @@
 
   /**
    * Normalize field ID for metadata lookup (strip leading @ date typecast, # number typecast).
-   * @param {string} fieldId - e.g. "353", "@353", "#4002", "CX.TEST"
+   * Optionally strip trailing #n (Encompass borrower pair suffix) for builder/live scenario.
+   * @param {string} fieldId - e.g. "353", "@353", "#FR0112#2", "CX.TEST"
+   * @param {{ stripBorrowerPair?: boolean }} [opts] - if true, strip trailing #1..#6 (borrower pair)
    * @returns {string}
    */
-  function normalizeFieldIdForLookup(fieldId) {
+  function normalizeFieldIdForLookup(fieldId, opts) {
     if (!fieldId || typeof fieldId !== 'string') return '';
-    return String(fieldId).trim().replace(/^[@#]+/, '');
+    let s = String(fieldId).trim().replace(/^[@#]+/, '');
+    if (opts && opts.stripBorrowerPair) {
+      s = s.replace(/#[1-6]$/, '');
+    }
+    return s;
   }
 
   /**
@@ -981,7 +1031,8 @@
 
   /**
    * Get value for a field from values map (supports normalized and raw IDs).
-   * @param {string} fieldId - e.g. "353", "@353", "#4002"
+   * Fallback: if not found, tries lookup with borrower pair suffix stripped (for builder/live).
+   * @param {string} fieldId - e.g. "353", "@353", "#FR0112#2"
    * @param {Record<string, string|number>} values - fieldId -> value
    * @returns {string|number}
    */
@@ -989,12 +1040,48 @@
     if (!values || typeof values !== 'object') return '';
     const raw = String(fieldId || '').trim();
     const norm = normalizeFieldIdForLookup(raw);
-    return values[norm] ?? values[raw] ?? values[fieldId] ?? '';
+    let v = values[norm] ?? values[raw] ?? values[fieldId];
+    if (v === undefined || v === '') {
+      const normNoPair = normalizeFieldIdForLookup(raw, { stripBorrowerPair: true });
+      if (normNoPair !== norm) v = values[normNoPair];
+    }
+    return v ?? '';
+  }
+
+  /**
+   * Evaluate an arithmetic expression with [field] refs, substituting values.
+   * Used for conditions like ([#FR0112#2] + ([#FR0124#2] / 12)) >= 2.
+   * @param {string} expr - e.g. "[#FR0112#2] + ([#FR0124#2] / 12)"
+   * @param {Record<string, string|number>} values
+   * @returns {number|null} - numeric result or null if invalid
+   */
+  function evaluateArithmeticInCondition(expr, values) {
+    if (!expr || typeof expr !== 'string') return null;
+    let e = expr.trim();
+    if (!e) return null;
+    const fieldRefs = [...e.matchAll(/\[([^\]]+)\]/g)];
+    for (let i = 0; i < fieldRefs.length; i++) {
+      const m = fieldRefs[i];
+      const fieldId = m[1].trim();
+      const val = getFieldValue(fieldId, values);
+      const num = (val === '' || val === null || val === undefined)
+        ? 0
+        : typeof val === 'number' ? val : parseFloat(val);
+      const replacement = Number.isFinite(num) ? String(num) : '0';
+      e = e.replace(m[0], replacement);
+    }
+    if (!/^[\d\s+\-*/().]+$/.test(e)) return null;
+    try {
+      const result = Function('"use strict"; return (' + e + ')')();
+      return typeof result === 'number' && Number.isFinite(result) ? result : null;
+    } catch (err) {
+      return null;
+    }
   }
 
   /**
    * Evaluate a single atomic condition (no AndAlso/OrElse).
-   * @param {string} cond - e.g. "[353] <= 200", "[19] = \"Y\"", "IsDate([@CX.DT])"
+   * @param {string} cond - e.g. "[353] <= 200", "([#FR0112#2] + ([#FR0124#2]/12)) >= 2"
    * @param {Record<string, string|number>} values
    * @returns {boolean}
    */
@@ -1002,6 +1089,24 @@
     if (!cond || typeof cond !== 'string') return false;
     const c = cond.trim();
     if (!c) return false;
+
+    // Arithmetic expression comparison: (expr) op number
+    const arithMatch = c.match(/^\(\s*(.+)\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if (arithMatch) {
+      const num = evaluateArithmeticInCondition(arithMatch[1].trim(), values);
+      if (num === null) return false;
+      const target = parseFloat(arithMatch[3]);
+      if (!Number.isFinite(target)) return false;
+      switch (arithMatch[2]) {
+        case '<=': return num <= target;
+        case '>=': return num >= target;
+        case '<': return num < target;
+        case '>': return num > target;
+        case '=': return num === target;
+        case '<>': return num !== target;
+        default: return false;
+      }
+    }
 
     const comps = extractComparisonValues(c);
     if (comps.length > 0) {
@@ -1095,7 +1200,7 @@
       return orParts.some((p) => evaluateCondition(p, values));
     }
 
-    const andMatch = c.match(/^(.+?)\s+AndAlso\s+(.+)$/);
+    const andMatch = c.match(/^(.+?)\s+(?:AndAlso|And)\s+(.+)$/);
     if (andMatch) {
       return evaluateCondition(andMatch[1].trim(), values) && evaluateCondition(andMatch[2].trim(), values);
     }
@@ -1207,12 +1312,14 @@
     parseAllIIfScenarios: parseAllIIfScenarios,
     expandOrElseScenarios: expandOrElseScenarios,
     extractComparisonValues: extractComparisonValues,
+    extractArithmeticComparisons: extractArithmeticComparisons,
     extractConditionValues: extractConditionValues,
     extractStringComparisons: extractStringComparisons,
     getSuggestedValuesForScenario: getSuggestedValuesForScenario,
     evaluateSimpleExpression: evaluateSimpleExpression,
     evaluateExpression: evaluateExpression,
     evaluateCondition: evaluateCondition,
+    evaluateArithmeticInCondition: evaluateArithmeticInCondition,
     getFieldValue: getFieldValue,
     generateUnitTestFromCustomField: generateUnitTestFromCustomField,
     buildFieldMetadataLookup: buildFieldMetadataLookup,

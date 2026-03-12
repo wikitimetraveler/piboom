@@ -247,7 +247,7 @@ export function generateKMLFromShows(shows) {
       <IconStyle>
         <scale>1.2</scale>
         <Icon>
-          <href>http://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
+          <href>https://maps.google.com/mapfiles/kml/paddle/red-circle.png</href>
         </Icon>
       </IconStyle>
       <LabelStyle>
