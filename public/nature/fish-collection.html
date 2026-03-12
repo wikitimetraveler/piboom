@@ -278,7 +278,10 @@
                 <input type="text" id="editAddressLng" class="form-control" placeholder="lng" readonly>
               </div>
             </div>
-            <small class="form-text text-muted">Autocomplete fills address + coordinates.</small>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="useMyLocationFish()">
+              <i class="bi-geo-alt-fill"></i> Use my phone's location
+            </button>
+            <small class="form-text text-muted d-block mt-2">Autocomplete fills address + coordinates. Location is requested when you open the page.</small>
           </div>
         </div>
         <div class="modal-footer">
@@ -472,6 +475,44 @@
       map.fitBounds(bounds);
     }
 
+    const deviceLocationFish = { lat: null, lng: null };
+
+    function syncDeviceLocationToFishInputs() {
+      if (deviceLocationFish.lat == null || deviceLocationFish.lng == null) return;
+      const latVal = deviceLocationFish.lat.toFixed(6);
+      const lngVal = deviceLocationFish.lng.toFixed(6);
+      [['catchLat', latVal], ['catchLng', lngVal], ['editAddressLat', latVal], ['editAddressLng', lngVal]].forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+      });
+    }
+
+    function requestDeviceLocationOnLoad() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          deviceLocationFish.lat = pos.coords.latitude;
+          deviceLocationFish.lng = pos.coords.longitude;
+          syncDeviceLocationToFishInputs();
+          setMapStatus('Using your phone\'s location.');
+        },
+        () => {},
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+      );
+    }
+
+    async function useMyLocationFish() {
+      const coords = await requestDeviceLocationNow();
+      if (coords) {
+        deviceLocationFish.lat = coords.lat;
+        deviceLocationFish.lng = coords.lng;
+        syncDeviceLocationToFishInputs();
+        setMapStatus('Location found! Coordinates updated.');
+      } else {
+        setMapStatus('Could not get your location.', 'error', true);
+      }
+    }
+
     function requestDeviceLocationNow() {
       return new Promise((resolve) => {
         if (!navigator.geolocation) {
@@ -487,7 +528,7 @@
             });
           },
           () => resolve(null),
-          { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
         );
       });
     }
@@ -705,6 +746,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+      requestDeviceLocationOnLoad();
       loadGoogleMaps();
       const editStateInput = document.getElementById('editAddressState');
       if (editStateInput) {

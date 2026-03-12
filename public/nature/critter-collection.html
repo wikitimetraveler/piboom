@@ -569,6 +569,19 @@
           <label>Location Name</label>
           <input type="text" id="editLocationName" class="form-control" placeholder="e.g., Backyard, City Park...">
         </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="editAddressLat">Latitude</label>
+            <input type="text" id="editAddressLat" class="form-control" placeholder="lat" readonly>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="editAddressLng">Longitude</label>
+            <input type="text" id="editAddressLng" class="form-control" placeholder="lng" readonly>
+          </div>
+        </div>
+        <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="useMyLocationCritter()">
+          <i class="bi-geo-alt-fill"></i> Use my phone's location
+        </button>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -679,6 +692,7 @@
 <script>
 let currentCollection = [];
 let currentCritterId = null;
+const deviceLocationCritter = { latitude: null, longitude: null };
 let currentPosterCritter = null;
 let critterPosterCanvas = null;
 let critterPosterMode = 'simple';
@@ -1144,8 +1158,60 @@ async function editCritter(id) {
   document.getElementById('editRating').value = critter.rating || '';
   document.getElementById('editNotes').value = critter.notes || '';
   document.getElementById('editLocationName').value = critter.location_name || '';
+  document.getElementById('editAddressLat').value = critter.latitude != null ? String(critter.latitude) : '';
+  document.getElementById('editAddressLng').value = critter.longitude != null ? String(critter.longitude) : '';
 
   if (typeof $ !== 'undefined') $('#editModal').modal('show');
+}
+
+function syncDeviceLocationToCritterInputs() {
+  if (deviceLocationCritter.latitude != null && deviceLocationCritter.longitude != null) {
+    const latEl = document.getElementById('editAddressLat');
+    const lngEl = document.getElementById('editAddressLng');
+    if (latEl) latEl.value = deviceLocationCritter.latitude.toFixed(6);
+    if (lngEl) lngEl.value = deviceLocationCritter.longitude.toFixed(6);
+  }
+}
+
+function requestDeviceLocationOnLoad() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      deviceLocationCritter.latitude = pos.coords.latitude;
+      deviceLocationCritter.longitude = pos.coords.longitude;
+      syncDeviceLocationToCritterInputs();
+      if (typeof showToast === 'function') showToast('Location', 'Got your location.', 'success');
+    },
+    () => {
+      deviceLocationCritter.latitude = null;
+      deviceLocationCritter.longitude = null;
+      if (typeof showToast === 'function') showToast('Location', 'Could not get location.', 'info');
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+  );
+}
+
+async function useMyLocationCritter() {
+  if (!navigator.geolocation) {
+    if (typeof showToast === 'function') showToast('Location', 'Geolocation not supported.', 'error');
+    return;
+  }
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        deviceLocationCritter.latitude = pos.coords.latitude;
+        deviceLocationCritter.longitude = pos.coords.longitude;
+        syncDeviceLocationToCritterInputs();
+        if (typeof showToast === 'function') showToast('Location', 'Got your location.', 'success');
+        resolve(true);
+      },
+      () => {
+        if (typeof showToast === 'function') showToast('Location', 'Could not get location.', 'error');
+        resolve(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+    );
+  });
 }
 
 async function saveCritterEdit() {
@@ -1153,12 +1219,18 @@ async function saveCritterEdit() {
   const notes = document.getElementById('editNotes').value;
   const rating = document.getElementById('editRating').value;
   const locationName = document.getElementById('editLocationName').value;
+  const latRaw = document.getElementById('editAddressLat')?.value?.trim();
+  const lngRaw = document.getElementById('editAddressLng')?.value?.trim();
+  const latitude = latRaw ? parseFloat(latRaw) : undefined;
+  const longitude = lngRaw ? parseFloat(lngRaw) : undefined;
 
   try {
     const body = {};
     if (notes !== undefined) body.notes = notes;
     if (rating !== undefined) body.rating = rating ? parseInt(rating) : null;
     if (locationName !== undefined) body.locationName = locationName;
+    if (latitude !== undefined) body.latitude = latitude;
+    if (longitude !== undefined) body.longitude = longitude;
 
     const response = await fetch(`/api/critter-collection/${currentCritterId}`, {
       method: 'PUT',
@@ -1303,6 +1375,7 @@ function updateDarkModeUI() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+  requestDeviceLocationOnLoad();
   if (localStorage.getItem('natureDarkMode') === '1') {
     document.documentElement.setAttribute('data-theme', 'dark');
   }

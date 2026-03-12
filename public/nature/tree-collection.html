@@ -756,7 +756,10 @@
               <input type="text" id="editAddressLng" class="form-control" placeholder="lng" readonly>
             </div>
           </div>
-          <small class="form-text text-muted">Autocomplete fills address + coordinates.</small>
+          <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="useMyLocationTree()">
+            <i class="bi-geo-alt-fill"></i> Use my phone's location
+          </button>
+          <small class="form-text text-muted d-block mt-2">Autocomplete fills address + coordinates. Location is requested when you open the page.</small>
         </div>
 
         <div class="form-group">
@@ -890,9 +893,46 @@ function requestDeviceLocationNow() {
         });
       },
       () => resolve(null),
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
     );
   });
+}
+
+const deviceLocationTree = { lat: null, lng: null };
+
+function syncDeviceLocationToTreeEditInputs() {
+  if (deviceLocationTree.lat == null || deviceLocationTree.lng == null) return;
+  const latVal = deviceLocationTree.lat.toFixed(6);
+  const lngVal = deviceLocationTree.lng.toFixed(6);
+  const latEl = document.getElementById('editAddressLat');
+  const lngEl = document.getElementById('editAddressLng');
+  const locLatEl = document.getElementById('editLocationLat');
+  const locLngEl = document.getElementById('editLocationLng');
+  if (latEl) latEl.value = latVal;
+  if (lngEl) lngEl.value = lngVal;
+  if (locLatEl) locLatEl.value = latVal;
+  if (locLngEl) locLngEl.value = lngVal;
+}
+
+function requestDeviceLocationOnLoad() {
+  if (!navigator.geolocation) return;
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      deviceLocationTree.lat = pos.coords.latitude;
+      deviceLocationTree.lng = pos.coords.longitude;
+    },
+    () => {},
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+  );
+}
+
+async function useMyLocationTree() {
+  const coords = await requestDeviceLocationNow();
+  if (coords) {
+    deviceLocationTree.lat = coords.lat;
+    deviceLocationTree.lng = coords.lng;
+    syncDeviceLocationToTreeEditInputs();
+  }
 }
 
 function initEditLocationAutocomplete() {
@@ -1061,6 +1101,7 @@ function fillEditAddressFieldsFromPlace(place) {
 
 // Load collection on page load
 document.addEventListener('DOMContentLoaded', async function() {
+  requestDeviceLocationOnLoad();
   // Initialize user selector
   createUserSelector('userSelectorContainer', { 
     title: 'View Tree Collections:',

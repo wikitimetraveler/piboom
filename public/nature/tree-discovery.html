@@ -297,7 +297,10 @@
               <input type="text" id="addTreeLongitude" class="form-control" placeholder="lng" readonly>
             </div>
           </div>
-          <small class="form-text text-muted">Used when saving the tree to your collection.</small>
+          <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="useMyLocationTree()" id="useMyLocationTreeBtn">
+            <i class="bi-geo-alt-fill"></i> Use my phone's location
+          </button>
+          <small class="form-text text-muted d-block mt-2">Used when saving the tree to your collection. Location is requested automatically when you open the page.</small>
         </div>
       </div>
       
@@ -480,9 +483,9 @@ function syncDeviceLocationToTreeInputs() {
 
 function requestDeviceLocationOnLoad() {
   if (!navigator.geolocation) {
+    showToast('info', 'Location', 'Your browser does not support location. Enter an address or use "Use my phone\'s location" if available.');
     return;
   }
-
   navigator.geolocation.getCurrentPosition(
     (position) => {
       deviceLocation.latitude = position.coords.latitude;
@@ -492,13 +495,24 @@ function requestDeviceLocationOnLoad() {
         currentLocation.longitude = deviceLocation.longitude;
       }
       syncDeviceLocationToTreeInputs();
+      showToast('success', 'Location found', 'Using your phone\'s coordinates for tree spots.');
     },
     () => {
       deviceLocation.latitude = null;
       deviceLocation.longitude = null;
+      showToast('info', 'Location', 'Tap "Use my phone\'s location" to get your coordinates when you\'re ready.');
     },
-    { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
   );
+}
+
+async function useMyLocationTree() {
+  const btn = document.getElementById('useMyLocationTreeBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="bi-hourglass-split"></i> Getting location...'; }
+  const ok = await requestDeviceLocationNow();
+  if (btn) { btn.disabled = false; btn.innerHTML = '<i class="bi-geo-alt-fill"></i> Use my phone\'s location'; }
+  if (ok) showToast('success', 'Location found', 'Latitude and longitude updated from your phone.');
+  else showToast('error', 'Location unavailable', 'Could not get your location. Check that location is enabled and you\'ve allowed this site.');
 }
 
 function requestDeviceLocationNow() {
@@ -522,7 +536,7 @@ function requestDeviceLocationNow() {
       () => {
         resolve(false);
       },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
     );
   });
 }

@@ -825,7 +825,10 @@
             <input type="text" id="addLongitude" class="form-control" placeholder="lng" readonly>
           </div>
         </div>
-        <small class="form-text text-muted">Used as the default location when adding albums to your collection.</small>
+        <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="useMyLocationAlbum()">
+          <i class="bi-geo-alt-fill"></i> Use my phone's location
+        </button>
+        <small class="form-text text-muted d-block mt-2">Used as the default location when adding albums to your collection. Location is requested when you open the page.</small>
       </div>
     </div>
     
@@ -1156,21 +1159,31 @@ function syncDeviceLocationToAlbumInputs() {
 }
 
 function requestDeviceLocationOnLoad() {
-  if (!navigator.geolocation) {
-    return;
-  }
-
+  if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition(
     (position) => {
       deviceLocation.lat = position.coords.latitude;
       deviceLocation.lng = position.coords.longitude;
       syncDeviceLocationToAlbumInputs();
+      if (typeof showToast === 'function') showToast('Location', 'Got your location.', 'success');
     },
     () => {
       deviceLocation.lat = null;
       deviceLocation.lng = null;
-    }
+      if (typeof showToast === 'function') showToast('Location', 'Could not get location.', 'info');
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
   );
+}
+
+async function useMyLocationAlbum() {
+  if (!navigator.geolocation) {
+    if (typeof showToast === 'function') showToast('Location', 'Geolocation not supported.', 'error');
+    return false;
+  }
+  const ok = await requestDeviceLocationNow();
+  if (typeof showToast === 'function') showToast('Location', ok ? 'Got your location.' : 'Could not get location.', ok ? 'success' : 'error');
+  return ok;
 }
 
 function requestDeviceLocationNow() {
@@ -1190,7 +1203,7 @@ function requestDeviceLocationNow() {
       () => {
         resolve(false);
       },
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
     );
   });
 }

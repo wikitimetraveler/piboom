@@ -1002,15 +1002,11 @@
     eofRow['Description'] = 'Test Results';
     rows.push(eofRow);
 
-    const maxDescLen = 80;
     const scenarioDescs = scenarios && scenarios.length > 0
-      ? scenarios.slice(0, scenarioCount).map((s, idx) => {
-          const cond = s.condition ? s.condition.trim() : 'else';
-          const result = s.result ? s.result.trim() : '';
-          let desc = s.isElse ? `else → ${result}` : `${cond} → ${result}`;
-          if (desc.length > maxDescLen) desc = desc.substring(0, maxDescLen - 3) + '...';
-          return { testNumber: String(idx + 1), description: desc };
-        })
+      ? scenarios.slice(0, scenarioCount).map((s, idx) => ({
+          testNumber: String(idx + 1),
+          description: 'Scenario ' + (idx + 1)
+        }))
       : [];
     const testDescriptions = Array.from({ length: scenarioCount }, (_, idx) =>
       scenarioDescs[idx] || { testNumber: String(idx + 1), description: 'Scenario ' + (idx + 1) }

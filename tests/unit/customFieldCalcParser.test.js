@@ -305,8 +305,8 @@ describe('customFieldCalcParser', () => {
       const result = generateUnitTestFromCustomField(customField);
       expect(result).not.toBeNull();
       expect(result.testDescriptions).toHaveLength(5);
-      expect(result.testDescriptions[0].description).toContain('[#60#1] <= 200');
-      expect(result.testDescriptions[0].description).toContain('[#1415#1]');
+      expect(result.testDescriptions[0].description).toBe('Scenario 1');
+      expect(result.testDescriptions[1].description).toBe('Scenario 2');
       expect(result.headers).toContain('Test 1');
       expect(result.headers).toContain('Test 4');
     });

@@ -204,6 +204,9 @@
             <input type="text" id="spotAddress" class="form-control" placeholder="Start typing an address">
             <input type="hidden" id="spotLat">
             <input type="hidden" id="spotLng">
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="useMyLocationSpots()">
+              <i class="bi-geo-alt-fill"></i> Use my phone's location
+            </button>
           </div>
           <div class="form-group">
             <label>Notes</label>
@@ -389,15 +392,43 @@
     }
 
     function requestDeviceLocationOnLoad() {
-      if (!navigator.geolocation) return;
+      if (!navigator.geolocation) {
+        setMapStatus('Location not supported. Use address search when adding spots.');
+        return;
+      }
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           deviceLocation.lat = pos.coords.latitude;
           deviceLocation.lng = pos.coords.longitude;
+          syncDeviceLocationToSpotInputs();
+          if (map) {
+            map.setCenter({ lat: deviceLocation.lat, lng: deviceLocation.lng });
+            map.setZoom(12);
+          }
+          setMapStatus('Using your phone\'s location.');
         },
-        () => {},
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
+        () => { setMapStatus('Tap "Use my location" when adding a spot to get coordinates.'); },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
       );
+    }
+
+    async function useMyLocationSpots() {
+      if (!navigator.geolocation) { alert('Geolocation is not supported.'); return; }
+      try {
+        const pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000 });
+        });
+        deviceLocation.lat = pos.coords.latitude;
+        deviceLocation.lng = pos.coords.longitude;
+        syncDeviceLocationToSpotInputs();
+        if (map) {
+          map.setCenter({ lat: deviceLocation.lat, lng: deviceLocation.lng });
+          map.setZoom(12);
+        }
+        alert('Location found! Coordinates updated.');
+      } catch (e) {
+        alert('Could not get your location. Check that location is enabled.');
+      }
     }
 
     function syncDeviceLocationToSpotInputs() {
