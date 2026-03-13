@@ -76,12 +76,14 @@
     }
     
     .tree-widget-container {
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-radius: 15px;
       padding: 30px;
       margin-bottom: 20px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-      border: 2px solid var(--forest-light);
+      border: 1px solid rgba(255,255,255,0.4);
     }
     
     .search-mode-tabs {
@@ -120,6 +122,8 @@
     
     .tree-result-card {
       background: linear-gradient(135deg, rgba(34,139,34,0.1), rgba(76,175,80,0.1));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 2px solid var(--forest-light);
       border-radius: 15px;
       padding: 30px;

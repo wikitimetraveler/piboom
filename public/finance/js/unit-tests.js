@@ -2975,10 +2975,12 @@ function getScenarioBuilderValues() {
     const fid = el.getAttribute('data-field-id');
     if (!fid) return;
     const norm = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(fid) || fid.replace(/^[@#]+/, '');
+    const raw = el.getAttribute('data-field-id-raw');
     let v = el.value;
     if (el.type === 'number') v = el.value === '' ? '' : parseFloat(el.value);
     values[norm] = v;
     values[fid] = v;
+    if (raw && raw !== fid) values[raw] = v;
   });
   return values;
 }
@@ -3073,6 +3075,7 @@ function renderScenarioBuilder(field) {
     const tdVal = document.createElement('td');
     tdVal.className = 'value-cell';
     const input = createScenarioBuilderInput(fid, initialVal, displayId);
+    input.setAttribute('data-field-id-raw', fid);
     const onChange = () => runScenarioCalculation();
     input.addEventListener('input', onChange);
     input.addEventListener('change', onChange);

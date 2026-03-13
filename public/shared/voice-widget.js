@@ -105,7 +105,9 @@ class VoiceWidget {
       height: ${this.options.buttonSize}px;
       border-radius: 50%;
       background: ${theme.color};
-      border: 3px solid white;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 2px solid rgba(255,255,255,0.6);
       color: white;
       font-size: 1.5rem;
       cursor: pointer;
@@ -142,7 +144,9 @@ class VoiceWidget {
       position: fixed;
       ${position.includes('right') ? 'right: 100px;' : 'left: 100px;'}
       ${position.includes('bottom') ? 'bottom: 45px;' : 'top: 115px;'}
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       color: white;
       padding: 10px 15px;
       border-radius: 8px;
@@ -150,7 +154,6 @@ class VoiceWidget {
       z-index: 9998;
       display: none;
       white-space: nowrap;
-      backdrop-filter: blur(10px);
     `;
     this.tooltip.textContent = 'Click to activate voice';
     document.body.appendChild(this.tooltip);

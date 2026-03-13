@@ -59,12 +59,12 @@
     let expr = expression.trim();
     if (!expr) return null;
 
-    // Replace each [fieldId] with the value
+    // Replace each [fieldId] with the value (use getFieldValue for consistent lookup)
     const fieldRefs = [...expr.matchAll(/\[([^\]]+)\]/g)];
     for (let i = 0; i < fieldRefs.length; i++) {
       const m = fieldRefs[i];
       const fieldId = m[1].trim();
-      const val = values[fieldId];
+      const val = getFieldValue(fieldId, values);
       const num = val === '' || val === null || val === undefined
         ? 0
         : typeof val === 'number'
@@ -232,6 +232,7 @@
   /**
    * Split a condition by OrElse or Or at shallowest depth (respecting parens and quotes).
    * Encompass uses both "Or" and "OrElse"; treat them the same.
+   * Matches flexible whitespace (including newlines) around Or/OrElse for Encompass-formatted expressions.
    * @param {string} condition - e.g. '([19] = "A" OrElse [19] = "B")' or '(A >= 2 Or B >= 2)'
    * @returns {string[]} - array of sub-conditions, or [condition] if no Or/OrElse
    */
@@ -240,17 +241,17 @@
     const trimmed = condition.trim();
     if (!trimmed) return [];
 
-    const andAlsoMatch = trimmed.match(/^(.+?)\s+(?:AndAlso|And)\s+(.+)$/);
+    const andAlsoMatch = trimmed.match(/^(.+?)\s+(?:AndAlso|And)\s+(.+)$/i);
     let orGroup = trimmed;
     let suffix = '';
     if (andAlsoMatch) {
       orGroup = andAlsoMatch[1].trim();
-      suffix = ' ' + (trimmed.includes('AndAlso') ? 'AndAlso' : 'And') + ' ' + andAlsoMatch[2].trim();
+      suffix = ' ' + (/AndAlso/i.test(trimmed) ? 'AndAlso' : 'And') + ' ' + andAlsoMatch[2].trim();
     }
 
     let minOrDepth = -1;
-    const orElse = ' OrElse ';
-    const orOnly = ' Or ';
+    const orElseRe = /^\s+OrElse\s+/i;
+    const orOnlyRe = /^\s+Or\b\s*/i;
     let depth = 0;
     let inQuote = false;
     for (let i = 0; i < orGroup.length; i++) {
@@ -260,9 +261,9 @@
         if (c === '(') depth++;
         else if (c === ')') depth--;
         else {
-          const matchOrElse = orGroup.substring(i, i + orElse.length) === orElse;
-          const matchOr = orGroup.substring(i, i + orOnly.length) === orOnly &&
-            orGroup.substring(i, i + orElse.length) !== orElse;
+          const chunk = orGroup.substring(i);
+          const matchOrElse = orElseRe.test(chunk);
+          const matchOr = !matchOrElse && orOnlyRe.test(chunk);
           if ((matchOrElse || matchOr) && (minOrDepth < 0 || depth < minOrDepth)) {
             minOrDepth = depth;
           }
@@ -297,13 +298,14 @@
           i++;
           continue;
         }
-        const matchOrElse = orGroup.substring(i, i + orElse.length) === orElse;
-        const matchOr = orGroup.substring(i, i + orOnly.length) === orOnly &&
-          orGroup.substring(i, i + orElse.length) !== orElse;
-        if (depth === minOrDepth && (matchOrElse || matchOr)) {
+        const chunk = orGroup.substring(i);
+        const orElseMatch = chunk.match(/^(\s+OrElse\s+)/i);
+        const orMatch = !orElseMatch && chunk.match(/^(\s+Or\b\s*)/i);
+        const match = orElseMatch || orMatch;
+        if (depth === minOrDepth && match) {
           parts.push(current.trim());
           current = '';
-          i += matchOrElse ? orElse.length : orOnly.length;
+          i += match[1].length;
           continue;
         }
       }
@@ -421,12 +423,28 @@
   /**
    * Extract arithmetic expression comparisons (expr) op N for suggested values.
    * Only matches when expr contains arithmetic operators (excludes DateDiff, IsDate, etc.).
+   * When the whole condition is (expr) op N, capture the full expr so divide-by-12 and
+   * other sub-expressions are included (e.g. (BR*12 sum) + ((BR*24 sum) / 12) >= 2).
    * @param {string} conditionString - e.g. "([#FR0112#2] + ([#FR0124#2] / 12)) >= 2"
    * @returns {Array<{ type: 'arithmetic', expr: string, op: string, value: number, fieldIds: string[] }>}
    */
   function extractArithmeticComparisons(conditionString) {
     if (!conditionString || typeof conditionString !== 'string') return [];
     const results = [];
+    const trimmed = conditionString.trim();
+    // When the whole condition is (expr) op N with arithmetic, capture full expr first
+    // so we get all field IDs including those in divide-by-12 sub-expressions
+    const fullMatch = trimmed.match(/^\(\s*([\s\S]+)\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if (fullMatch && /[+\-*\/]/.test(fullMatch[1]) && /\[[^\]]+\]/.test(fullMatch[1])) {
+      const expr = fullMatch[1].trim();
+      const value = parseFloat(fullMatch[3]);
+      if (Number.isFinite(value)) {
+        const fieldIds = [...expr.matchAll(/\[([^\]]+)\]/g)].map((f) => f[1].trim());
+        results.push({ type: 'arithmetic', expr, op: fullMatch[2], value, fieldIds });
+        return results;
+      }
+    }
+    // Fallback: find inner (expr) op N patterns for non-wrapped conditions
     const re = /\(\s*([^()]*(?:\([^()]*\)[^()]*)*)\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)/g;
     let m;
     while ((m = re.exec(conditionString)) !== null) {
@@ -1086,14 +1104,31 @@
     const c = cond.trim();
     if (!c) return false;
 
-    // Arithmetic expression comparison: (expr) op number
-    const arithMatch = c.match(/^\(\s*(.+)\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/);
-    if (arithMatch) {
-      const num = evaluateArithmeticInCondition(arithMatch[1].trim(), values);
+    // Arithmetic expression comparison: (expr) op number  OR  expr op number (e.g. (A) + (B) >= 2)
+    // Use [\s\S] instead of . so newlines (Encompass paste) are matched
+    const arithMatchParen = c.match(/^\(\s*([\s\S]+)\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if (arithMatchParen) {
+      const num = evaluateArithmeticInCondition(arithMatchParen[1].trim(), values);
       if (num === null) return false;
-      const target = parseFloat(arithMatch[3]);
+      const target = parseFloat(arithMatchParen[3]);
       if (!Number.isFinite(target)) return false;
-      switch (arithMatch[2]) {
+      switch (arithMatchParen[2]) {
+        case '<=': return num <= target;
+        case '>=': return num >= target;
+        case '<': return num < target;
+        case '>': return num > target;
+        case '=': return num === target;
+        case '<>': return num !== target;
+        default: return false;
+      }
+    }
+    const arithMatchNoParen = c.match(/^([\s\S]+)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/);
+    if (arithMatchNoParen && /[+\-*\/]/.test(arithMatchNoParen[1]) && /\[[^\]]+\]/.test(arithMatchNoParen[1])) {
+      const num = evaluateArithmeticInCondition(arithMatchNoParen[1].trim(), values);
+      if (num === null) return false;
+      const target = parseFloat(arithMatchNoParen[3]);
+      if (!Number.isFinite(target)) return false;
+      switch (arithMatchNoParen[2]) {
         case '<=': return num <= target;
         case '>=': return num >= target;
         case '<': return num < target;
@@ -1196,7 +1231,7 @@
       return orParts.some((p) => evaluateCondition(p, values));
     }
 
-    const andMatch = c.match(/^(.+?)\s+(?:AndAlso|And)\s+(.+)$/);
+    const andMatch = c.match(/^(.+?)\s+(?:AndAlso|And)\s+(.+)$/i);
     if (andMatch) {
       return evaluateCondition(andMatch[1].trim(), values) && evaluateCondition(andMatch[2].trim(), values);
     }

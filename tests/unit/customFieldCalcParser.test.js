@@ -175,6 +175,18 @@ describe('customFieldCalcParser', () => {
       const result = evaluateCondition(cond, { a: 1, b: 2 });
       expect(result).toBe(true);
     });
+
+    test('handles And/AndAlso case-insensitively (Encompass style)', () => {
+      expect(evaluateCondition('[a] >= 1 and [b] >= 2', { a: 1, b: 2 })).toBe(true);
+      expect(evaluateCondition('[a] >= 1 AND [b] >= 2', { a: 1, b: 2 })).toBe(true);
+      expect(evaluateCondition('[a] >= 1 andalso [b] >= 2', { a: 1, b: 2 })).toBe(true);
+    });
+
+    test('handles Or/OrElse case-insensitively (Encompass style)', () => {
+      expect(evaluateExpression('IIf([a] >= 1 or [b] >= 2, "Yes", "")', { a: 0, b: 2 })).toBe('Yes');
+      expect(evaluateExpression('IIf([a] >= 1 OR [b] >= 2, "Yes", "")', { a: 0, b: 2 })).toBe('Yes');
+      expect(evaluateExpression('IIf([a] >= 1 orelse [b] >= 2, "Yes", "")', { a: 0, b: 2 })).toBe('Yes');
+    });
   });
 
   describe('extractComparisonValues', () => {
@@ -265,6 +277,37 @@ describe('customFieldCalcParser', () => {
       expect(evaluateExpression(fullFormula, { FR0312: 2, FR0324: 0 })).toBe('Yes');
       expect(evaluateExpression(fullFormula, { FR0112: 1, FR0124: 0, FR0312: 1, FR0324: 0 })).toBe('Yes');
       expect(evaluateExpression(fullFormula, {})).toBe('');
+    });
+
+    test('user formula with #1 borrower and four Or branches', () => {
+      const formula =
+        'IIf(([#FR0112#1] + ([#FR0124#1] / 12)) >= 2 Or ([#BR0112#1] + [#BR0212#1] + [#BR0312#1] + [#BR0412#1] + [#BR0512#1] + [#BR0612#1] + [#BR0712#1] + [#BR0812#1] + [#BR0912#1]) + (([#BR0124#1] + [#BR0224#1] + [#BR0324#1] + [#BR0424#1] + [#BR0524#1] + [#BR0624#1] + [#BR0724#1] + [#BR0824#1] + [#BR0924#1]) / 12) >= 2 Or ([#FR0312#1] + ([#FR0324#1] / 12)) >= 2 Or ([#FR0112#1] + ([#FR0124#1] / 12)) + ([#FR0312#1] + ([#FR0324#1] / 12)) >= 2, "Yes", "")';
+      expect(evaluateExpression(formula, { FR0112: 2, FR0124: 0 })).toBe('Yes');
+      expect(evaluateExpression(formula, { FR0312: 2, FR0324: 0 })).toBe('Yes');
+      expect(evaluateExpression(formula, { FR0112: 1, FR0124: 0, FR0312: 1, FR0324: 0 })).toBe('Yes');
+      expect(evaluateExpression(formula, { BR0112: 1, BR0212: 1, BR0124: 0, BR0224: 0 })).toBe('Yes');
+      expect(evaluateExpression(formula, {})).toBe('');
+    });
+
+    test('all four Or branches evaluated independently (branches 3 and 4)', () => {
+      const formula =
+        'IIf(([#FR0112#1] + ([#FR0124#1] / 12)) >= 2 Or ([#BR0112#1] + [#BR0212#1] + [#BR0312#1] + [#BR0412#1] + [#BR0512#1] + [#BR0612#1] + [#BR0712#1] + [#BR0812#1] + [#BR0912#1]) + (([#BR0124#1] + [#BR0224#1] + [#BR0324#1] + [#BR0424#1] + [#BR0524#1] + [#BR0624#1] + [#BR0724#1] + [#BR0824#1] + [#BR0924#1]) / 12) >= 2 Or ([#FR0312#1] + ([#FR0324#1] / 12)) >= 2 Or ([#FR0112#1] + ([#FR0124#1] / 12)) + ([#FR0312#1] + ([#FR0324#1] / 12)) >= 2, "Yes", "")';
+      expect(evaluateExpression(formula, { FR0312: 2, FR0324: 0 })).toBe('Yes');
+      expect(evaluateExpression(formula, { FR0112: 1, FR0124: 0, FR0312: 1, FR0324: 0 })).toBe('Yes');
+      expect(evaluateExpression(formula, { BR0112: 2, BR0124: 0 })).toBe('Yes');
+    });
+
+    test('formula with newline (Encompass paste) still evaluates all four Or branches', () => {
+      const formulaWithNewline =
+        'IIf(([#FR0112#1] + ([#FR0124#1] / 12)) >= 2 Or ([#BR0112#1] + [#BR0212#1] + [#BR0312#1] + [#BR0412#1] + [#BR0512#1] + [#BR0612#1] + [#BR0712#1] + [#BR0812#1] +\n[#BR0912#1]) + (([#BR0124#1] + [#BR0224#1] + [#BR0324#1] + [#BR0424#1] + [#BR0524#1] + [#BR0624#1] + [#BR0724#1] + [#BR0824#1] +\n[#BR0924#1]) / 12) >= 2 Or ([#FR0312#1] + ([#FR0324#1] / 12)) >= 2 Or ([#FR0112#1] + ([#FR0124#1] / 12)) + ([#FR0312#1] + ([#FR0324#1] / 12)) >= 2, "Yes", "")';
+      expect(evaluateExpression(formulaWithNewline, { FR0312: 2, FR0324: 0 })).toBe('Yes');
+    });
+
+    test('branch 2 only (BR fields) and branch 3 only (FR0312) both return Yes', () => {
+      const formula =
+        'IIf(([#FR0112#1] + ([#FR0124#1] / 12)) >= 2 Or ([#BR0112#1] + [#BR0212#1] + [#BR0312#1] + [#BR0412#1] + [#BR0512#1] + [#BR0612#1] + [#BR0712#1] + [#BR0812#1] + [#BR0912#1]) + (([#BR0124#1] + [#BR0224#1] + [#BR0324#1] + [#BR0424#1] + [#BR0524#1] + [#BR0624#1] + [#BR0724#1] + [#BR0824#1] + [#BR0924#1]) / 12) >= 2 Or ([#FR0312#1] + ([#FR0324#1] / 12)) >= 2 Or ([#FR0112#1] + ([#FR0124#1] / 12)) + ([#FR0312#1] + ([#FR0324#1] / 12)) >= 2, "Yes", "")';
+      expect(evaluateExpression(formula, { BR0112: 2, BR0212: 0, BR0312: 0, BR0412: 0, BR0512: 0, BR0612: 0, BR0712: 0, BR0812: 0, BR0912: 0, BR0124: 0, BR0224: 0, BR0324: 0, BR0424: 0, BR0524: 0, BR0624: 0, BR0724: 0, BR0824: 0, BR0924: 0 })).toBe('Yes');
+      expect(evaluateExpression(formula, { FR0312: 2, FR0324: 0 })).toBe('Yes');
     });
   });
 

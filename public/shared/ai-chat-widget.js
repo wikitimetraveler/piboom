@@ -81,9 +81,11 @@ class AIChatWidget {
                     width: 60px;
                     height: 60px;
                     border-radius: 50%;
-                    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                    background: rgba(37, 99, 235, 0.9);
+                    backdrop-filter: blur(12px);
+                    -webkit-backdrop-filter: blur(12px);
                     color: white;
-                    border: none;
+                    border: 1px solid rgba(255,255,255,0.4);
                     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
                     cursor: pointer;
                     z-index: 1000;
@@ -99,7 +101,12 @@ class AIChatWidget {
                     right: 0;
                     width: 400px;
                     height: 600px;
-                    background: white;
+                    background: rgba(255,255,255,0.92);
+                    backdrop-filter: blur(20px);
+                    -webkit-backdrop-filter: blur(20px);
+                    border: 1px solid rgba(255,255,255,0.5);
+                    border-bottom: none;
+                    border-right: none;
                     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
                     z-index: 1001;
                     display: flex;
@@ -124,7 +131,9 @@ class AIChatWidget {
                     flex: 1;
                     overflow-y: auto;
                     padding: 1rem;
-                    background: #f8fafc;
+                    background: rgba(248,250,252,0.8);
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
                 }
                 .ai-chat-welcome {
                     text-align: center;
@@ -164,7 +173,9 @@ class AIChatWidget {
                 }
                 .ai-chat-input-container {
                     padding: 1rem;
-                    background: white;
+                    background: rgba(255,255,255,0.9);
+                    backdrop-filter: blur(8px);
+                    -webkit-backdrop-filter: blur(8px);
                     border-top: 1px solid #e5e7eb;
                 }
                 .ai-chat-input-wrapper {

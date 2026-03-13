@@ -72,12 +72,14 @@
     }
 
     .critter-widget-container {
-      background: linear-gradient(180deg, rgba(255,255,255,0.97) 0%, rgba(139,195,74,0.08) 100%);
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-radius: 24px;
       padding: 30px;
       margin-bottom: 20px;
       box-shadow: 0 8px 24px rgba(30,125,50,0.15);
-      border: 3px solid var(--leaf-lime);
+      border: 1px solid rgba(255,255,255,0.5);
       position: relative;
     }
 
@@ -122,6 +124,8 @@
 
     .critter-result-card {
       background: linear-gradient(135deg, rgba(139,195,74,0.15), rgba(46,125,50,0.1));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 3px solid var(--leaf-lime);
       border-radius: 20px;
       padding: 30px;

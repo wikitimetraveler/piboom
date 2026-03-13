@@ -119,6 +119,17 @@ public/finance/
     └── ...
 ```
 
+## Boolean / Yes-No Display
+
+**Rule:** All sections and columns that display boolean or yes-no values must produce **Yes** when true and **No** when false. Do not use "Y"/"N" or raw `true`/`false` for user-facing display.
+
+| Context | Display |
+|---------|---------|
+| Boolean true | Yes |
+| Boolean false | No |
+
+Use `value ? 'Yes' : 'No'` or equivalent. AG Grid/DataTables cell renderers and inline templates should follow this convention.
+
 ## Bootstrap & Styling
 
 - Bootstrap 5 for layout and components
