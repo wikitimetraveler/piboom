@@ -129,7 +129,7 @@ class ModernNavbar extends HTMLElement {
         .navbar-brand-modern {
           font-size: 1.2rem;
           font-weight: 700;
-          background: linear-gradient(135deg, #667eea, #764ba2);
+          background: linear-gradient(135deg, #3498db, #2980b9);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -140,8 +140,8 @@ class ModernNavbar extends HTMLElement {
         }
         
         .nav-user-btn {
-          background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-          border: 2px solid rgba(102, 126, 234, 0.3);
+          background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1));
+          border: 2px solid rgba(52, 152, 219, 0.3);
           border-radius: 20px;
           padding: 5px 14px;
           transition: all 0.3s ease;
@@ -154,8 +154,8 @@ class ModernNavbar extends HTMLElement {
         }
         
         .nav-user-btn:hover {
-          background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
-          border-color: #667eea;
+          background: linear-gradient(135deg, rgba(52, 152, 219, 0.2), rgba(41, 128, 185, 0.2));
+          border-color: #3498db;
           transform: translateY(-2px);
         }
         
@@ -194,8 +194,8 @@ class ModernNavbar extends HTMLElement {
         }
         
         .dropdown-item:hover {
-          background: linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.1));
-          color: #667eea;
+          background: linear-gradient(135deg, rgba(52,152,219,0.1), rgba(41,128,185,0.1));
+          color: #3498db;
           transform: translateX(5px);
         }
         
@@ -246,7 +246,13 @@ class ModernNavbar extends HTMLElement {
         }
         
         .nav-link:hover {
-          color: #667eea;
+          color: #3498db;
+        }
+        
+        .nav-item.dropdown.open .nav-link {
+          color: #3498db;
+          background: rgba(52, 152, 219, 0.08);
+          border-radius: 8px;
         }
         
         .dropdown-toggle::after {
@@ -258,11 +264,12 @@ class ModernNavbar extends HTMLElement {
         .navbar-toggler {
           display: none;
           background: none;
-          border: 2px solid rgba(102, 126, 234, 0.3);
+          border: 2px solid rgba(52, 152, 219, 0.3);
           border-radius: 8px;
           padding: 8px 12px;
           cursor: pointer;
           font-size: 1.2rem;
+          color: #3498db;
         }
         
         @media (max-width: 991px) {
@@ -380,8 +387,8 @@ class ModernNavbar extends HTMLElement {
               </li>
 
               <!-- Finance Dropdown (Hub + Essentials) -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button">
+              <li class="nav-item dropdown" id="navFinanceDropdown">
+                <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Finance menu">
                   <i class="bi-bank"></i> Finance
                 </a>
                 <div class="dropdown-menu">
@@ -399,7 +406,7 @@ class ModernNavbar extends HTMLElement {
 
               ${!demoMode ? `<!-- Music Discovery Dropdown (Trimmed + Hub Link) -->
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button">
+                <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Music menu">
                   <i class="bi-music-note-beamed"></i> Music
                 </a>
                 <div class="dropdown-menu">
@@ -409,7 +416,7 @@ class ModernNavbar extends HTMLElement {
 
               ${compact ? '' : `<!-- Entertainment Dropdown -->
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button">
+                <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Entertainment menu">
                   <i class="bi-stars"></i> Entertainment
                 </a>
                 <div class="dropdown-menu">
@@ -420,7 +427,7 @@ class ModernNavbar extends HTMLElement {
 
               <!-- More Dropdown (Bike, AI, Family, Nature) -->
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button">
+                <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="More menu">
                   <i class="bi-three-dots"></i> More
                 </a>
                 <div class="dropdown-menu">
@@ -461,24 +468,29 @@ class ModernNavbar extends HTMLElement {
       
       toggle?.addEventListener('click', (e) => {
         e.preventDefault();
+        const isOpen = menu?.classList.contains('show');
         
         // Close other dropdowns
         dropdowns.forEach(other => {
           if (other !== dropdown) {
             other.querySelector('.dropdown-menu')?.classList.remove('show');
+            other.querySelector('.dropdown-toggle')?.setAttribute('aria-expanded', 'false');
+            other.classList.remove('open');
           }
         });
         
         menu?.classList.toggle('show');
+        toggle?.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+        dropdown.classList.toggle('open', !isOpen);
       });
     });
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
       if (!this.contains(e.target)) {
-        this.shadowRoot.querySelectorAll('.dropdown-menu').forEach(menu => {
-          menu.classList.remove('show');
-        });
+        this.shadowRoot.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+        this.shadowRoot.querySelectorAll('.dropdown-toggle').forEach(t => t.setAttribute('aria-expanded', 'false'));
+        this.shadowRoot.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
       }
     });
 

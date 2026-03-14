@@ -23,6 +23,12 @@
   const NAV_FINANCE = [
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Finance Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
+    { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
+    { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests' },
+    { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test' },
+    { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk' },
+    { divider: true },
+    { href: '/finance/index.html', icon: 'bi-grid-3x3-gap', label: 'All Finance Tools' },
   ];
 
   /** Navbar Encompass dropdown items (under Finance or standalone) */

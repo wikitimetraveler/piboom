@@ -1096,66 +1096,79 @@
         cursor: pointer;
       }
 
-      /* Accordion Styling */
-      .accordion .card {
-        border: none;
-        border-radius: 0;
-        border-bottom: 1px solid var(--zen-border);
+      /* Modern expandable section cards - multiple can stay open */
+      .section-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
       }
 
-      .accordion .card:first-child {
-        border-top-left-radius: 18px;
-        border-top-right-radius: 18px;
+      .section-card {
+        background: var(--zen-card-bg);
+        border: 1px solid var(--zen-border);
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease;
       }
 
-      .accordion .card:last-child {
-        border-bottom-left-radius: 18px;
-        border-bottom-right-radius: 18px;
-        border-bottom: none;
+      .section-card:hover {
+        box-shadow: 0 6px 20px rgba(74, 144, 164, 0.1);
+        border-color: rgba(74, 144, 164, 0.3);
       }
 
-      .accordion .card-header {
-        background-color: rgba(74, 144, 164, 0.08);
-        border-bottom: 1px solid var(--zen-border);
-        padding: 0;
-      }
-
-      .accordion .card-header .btn-link {
-        color: #1a2856;
-        text-decoration: none;
-        font-weight: 600;
-        padding: 1rem 1.5rem;
-        width: 100%;
+      .section-card-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        padding: 1rem 1.25rem;
+        background: rgba(74, 144, 164, 0.06);
+        border-bottom: 1px solid transparent;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        user-select: none;
       }
 
-      .accordion .card-header .btn-link:hover {
+      .section-card-header:hover {
+        background: rgba(74, 144, 164, 0.12);
+      }
+
+      .section-card-header[aria-expanded="true"] {
+        background: rgba(74, 144, 164, 0.1);
+        border-bottom-color: var(--zen-border);
+      }
+
+      .section-card-header .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #1a2856;
+        font-size: 1rem;
+      }
+
+      .section-card-header .section-title i {
+        font-size: 1.1rem;
         color: var(--zen-primary);
-        background-color: rgba(74, 144, 164, 0.12);
       }
 
-      .accordion .card-header .btn-link:focus {
-        box-shadow: none;
-        outline: none;
+      .section-card-header .bi-chevron-down {
+        font-size: 1.1rem;
+        color: var(--zen-muted);
+        transition: transform 0.25s ease;
       }
 
-      .accordion .card-header .btn-link .bi-chevron-down {
-        transition: transform 0.3s ease;
-      }
-
-      .accordion .card-header .btn-link[aria-expanded="true"] .bi-chevron-down {
+      .section-card-header[aria-expanded="true"] .bi-chevron-down {
         transform: rotate(180deg);
       }
 
-      .accordion .card-body {
-        padding: 1.5rem;
-        background-color: var(--zen-card-bg);
+      .section-card-body {
+        padding: 1.25rem 1.5rem;
+        background: var(--zen-card-bg);
       }
 
-      .accordion .collapse.show {
-        border-bottom: 1px solid var(--zen-border);
+      .section-card-body.collapse:not(.show) {
+        display: none;
       }
 
       .selected-field-details {
@@ -1600,11 +1613,11 @@
       body.unit-tests-night-theme .card-header .btn-link{color:#f9fafb!important}
       body.unit-tests-night-theme .card-header .btn-link:hover{color:#38bdf8!important;background:#4b5563!important}
       body.unit-tests-night-theme .card-body{background:#4b5563!important;color:#f3f4f6!important;border-color:rgba(255,255,255,0.1)!important}
-      body.unit-tests-night-theme .accordion .card{background:#4b5563!important;border:1px solid rgba(255,255,255,0.12)!important;box-shadow:0 1px 3px rgba(0,0,0,0.15)!important}
-      body.unit-tests-night-theme .accordion .card-header{background:#6b7280!important;border-color:rgba(255,255,255,0.1)!important}
-      body.unit-tests-night-theme .accordion .card-header .btn-link{color:#f9fafb!important}
-      body.unit-tests-night-theme .accordion .card-body{background:#4b5563!important;color:#f3f4f6!important}
-      body.unit-tests-night-theme .accordion .collapse.show{border-color:rgba(255,255,255,0.1)!important}
+      body.unit-tests-night-theme .section-card{background:#4b5563!important;border:1px solid rgba(255,255,255,0.12)!important;box-shadow:0 1px 3px rgba(0,0,0,0.15)!important}
+      body.unit-tests-night-theme .section-card-header{background:#6b7280!important;border-color:rgba(255,255,255,0.1)!important}
+      body.unit-tests-night-theme .section-card-header .section-title{color:#f9fafb!important}
+      body.unit-tests-night-theme .section-card-header .section-title i{color:#38bdf8!important}
+      body.unit-tests-night-theme .section-card-body{background:#4b5563!important;color:#f3f4f6!important}
       body.unit-tests-night-theme .text-muted{color:#9ca3af!important}
       body.unit-tests-night-theme .badge,body.unit-tests-night-theme .badge-soft{background:#6b7280!important;color:#f9fafb!important;border-color:#9ca3af!important}
       body.unit-tests-night-theme h5,body.unit-tests-night-theme .h5{color:#f9fafb!important}
@@ -1882,20 +1895,12 @@
       <div class="row">
         <!-- AI Assistant - at top for easy access -->
         <div class="col-12 mb-4" id="aiAssistantCard" style="display: none;">
-          <div class="card">
-            <div class="card-header p-0">
-              <div class="accordion" id="aiAccordion">
-                <div class="card">
-                  <div class="card-header" id="headingAIAssistant">
-                    <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseAIAssistant" aria-expanded="false" aria-controls="collapseAIAssistant">
-                        <i class="bi-robot"></i> Encompass Unit Testing AI Assistant
-                        <i class="bi-chevron-down float-right"></i>
-                      </button>
-                    </h5>
-                  </div>
-                  <div id="collapseAIAssistant" class="collapse" aria-labelledby="headingAIAssistant">
-                    <div class="card-body">
+          <div class="section-card">
+            <div class="section-card-header collapsed" id="headingAIAssistant" role="button" data-toggle="collapse" data-target="#collapseAIAssistant" aria-expanded="false" aria-controls="collapseAIAssistant">
+              <span class="section-title"><i class="bi-robot"></i> Encompass Unit Testing AI Assistant</span>
+              <i class="bi-chevron-down"></i>
+            </div>
+            <div id="collapseAIAssistant" class="collapse section-card-body" aria-labelledby="headingAIAssistant">
                       <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                           <p class="text-muted mb-0"><small>Ask questions about unit testing, test scenarios, Encompass APIs, and test automation.</small></p>
@@ -1922,32 +1927,21 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
         
-        <!-- Accordion Container -->
+        <!-- Section Cards Container - multiple can stay open -->
         <div class="col-12 mb-4" id="accordionContainer">
-          <div class="card">
-            <div class="card-header p-0">
-              <div class="accordion" id="testAccordion">
-                <!-- Test Library -->
-                <div class="card">
-                  <div class="card-header" id="headingTestLibrary">
-                    <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTestLibrary" aria-expanded="false" aria-controls="collapseTestLibrary">
-                        <i class="bi-folder2-open"></i> Test Library
-                        <i class="bi-chevron-down float-right"></i>
-                      </button>
-                    </h5>
-                  </div>
-                  <div id="collapseTestLibrary" class="collapse" aria-labelledby="headingTestLibrary">
-                    <div class="card-body">
+          <div class="section-cards" id="testAccordion">
+            <!-- Test Library -->
+            <div class="section-card">
+              <div class="section-card-header collapsed" id="headingTestLibrary" role="button" data-toggle="collapse" data-target="#collapseTestLibrary" aria-expanded="false" aria-controls="collapseTestLibrary">
+                <span class="section-title"><i class="bi-folder2-open"></i> Test Library</span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseTestLibrary" class="collapse section-card-body" aria-labelledby="headingTestLibrary">
                       <p class="text-muted mb-3"><small>Load saved Excel tests from the library. Search by Encompass field ID (e.g. CX.TYPE, 353) to find which tests use a field.</small></p>
                       <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
                         <input type="text" class="form-control form-control-sm" id="fieldIdSearchInput" placeholder="Search by field ID (e.g. CX.TYPE, 353)" style="max-width: 220px;" />
@@ -1963,57 +1957,37 @@
                         <strong>Search results for field:</strong> <span id="fieldSearchTerm" class="text-primary"></span>
                         <div id="fieldSearchResultsList" class="mt-2"></div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Overall Test Sign-off -->
-                <div class="card">
-                  <div class="card-header" id="headingOverallSignOff">
-                    <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
-                        <i class="bi-check2-all"></i> Test Sign-off
-                        <span class="badge badge-success ml-2" id="signOffCompleteBadge" style="display: none;">3/3</span>
-                        <i class="bi-chevron-down float-right"></i>
-                      </button>
-                    </h5>
-                  </div>
-                  <div id="collapseOverallSignOff" class="collapse" aria-labelledby="headingOverallSignOff">
-                    <div class="card-body">
+              </div>
+            </div>
+            <!-- Overall Test Sign-off -->
+            <div class="section-card">
+              <div class="section-card-header collapsed" id="headingOverallSignOff" role="button" data-toggle="collapse" data-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
+                <span class="section-title"><i class="bi-check2-all"></i> Test Sign-off <span class="badge badge-success ml-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseOverallSignOff" class="collapse section-card-body" aria-labelledby="headingOverallSignOff">
                       <p class="text-muted mb-3"><small>Each tester confirms the overall test passed. Timestamps are recorded when you confirm.</small></p>
                       <div id="overallSignOffContainer" class="overall-signoff-grid"></div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Test Scenarios Accordion -->
-                <div class="card">
-                  <div class="card-header" id="headingTestScenarios">
-                    <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
-                        <i class="bi-list-check"></i> Test Scenarios
-                        <span class="badge badge-primary ml-2" id="testScenariosCount"></span>
-                        <i class="bi-chevron-down float-right"></i>
-                      </button>
-                    </h5>
-                  </div>
-                  <div id="collapseTestScenarios" class="collapse" aria-labelledby="headingTestScenarios">
-                    <div class="card-body">
+              </div>
+            </div>
+            <!-- Test Scenarios -->
+            <div class="section-card">
+              <div class="section-card-header collapsed" id="headingTestScenarios" role="button" data-toggle="collapse" data-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
+                <span class="section-title"><i class="bi-list-check"></i> Test Scenarios <span class="badge badge-primary ml-2" id="testScenariosCount"></span></span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
                       <p class="text-muted mb-3"><small>Click a scenario to highlight its column. Use <strong>Run</strong> to execute it. Click the <strong>Edit</strong> button on a scenario card to edit its description.</small></p>
                       <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Selected Field (when generated from custom field) -->
-                <div class="card" id="selectedFieldAccordionCard" style="display: none;">
-                  <div class="card-header" id="headingSelectedField">
-                    <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
-                        <i class="bi-field"></i> Selected Field
-                        <i class="bi-chevron-down float-right"></i>
-                      </button>
-                    </h5>
-                  </div>
-                  <div id="collapseSelectedField" class="collapse" aria-labelledby="headingSelectedField">
-                    <div class="card-body">
+              </div>
+            </div>
+            <!-- Selected Field (when generated from custom field) -->
+            <div class="section-card" id="selectedFieldAccordionCard" style="display: none;">
+              <div class="section-card-header collapsed" id="headingSelectedField" role="button" data-toggle="collapse" data-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
+                <span class="section-title"><i class="bi-field"></i> Selected Field</span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseSelectedField" class="collapse section-card-body" aria-labelledby="headingSelectedField">
                       <div id="selectedFieldContent" class="selected-field-details">
                         <!-- Populated by loadGeneratedTestData when source is custom field -->
                       </div>
@@ -2039,22 +2013,15 @@
                           <div id="scenarioBuilderResult" class="form-control-plaintext scenario-builder-result-display" readonly>—</div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Test Grid Accordion -->
-                <div class="card">
-                  <div class="card-header" id="headingTestGrid">
-                    <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
-                        <i class="bi-table"></i> Test Grid
-                        <span class="badge badge-info ml-2" id="testGridCount"></span>
-                        <i class="bi-chevron-down float-right"></i>
-                      </button>
-                    </h5>
-                  </div>
-                  <div id="collapseTestGrid" class="collapse" aria-labelledby="headingTestGrid">
-                    <div class="card-body">
+              </div>
+            </div>
+            <!-- Test Grid -->
+            <div class="section-card">
+              <div class="section-card-header collapsed" id="headingTestGrid" role="button" data-toggle="collapse" data-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
+                <span class="section-title"><i class="bi-table"></i> Test Grid <span class="badge badge-info ml-2" id="testGridCount"></span></span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseTestGrid" class="collapse section-card-body" aria-labelledby="headingTestGrid">
                       <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                           <span class="badge-soft" id="resultsMeta">0 rows</span>
@@ -2063,21 +2030,15 @@
                       <div class="table-responsive">
                         <div id="unitTestsGrid" class="ag-theme-alpine unit-tests-grid"></div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Unit Test Data (bottom) -->
-                <div class="card">
-                  <div class="card-header" id="headingUnitTestData">
-                    <h5 class="mb-0">
-                      <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseUnitTestData" aria-expanded="true" aria-controls="collapseUnitTestData">
-                        <i class="bi-database"></i> Unit Test Data
-                        <i class="bi-chevron-down float-right"></i>
-                      </button>
-                    </h5>
-                  </div>
-                  <div id="collapseUnitTestData" class="collapse show" aria-labelledby="headingUnitTestData">
-                    <div class="card-body">
+              </div>
+            </div>
+            <!-- Unit Test Data (bottom) - default open -->
+            <div class="section-card">
+              <div class="section-card-header" id="headingUnitTestData" role="button" data-toggle="collapse" data-target="#collapseUnitTestData" aria-expanded="true" aria-controls="collapseUnitTestData">
+                <span class="section-title"><i class="bi-database"></i> Unit Test Data</span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseUnitTestData" class="collapse show section-card-body" aria-labelledby="headingUnitTestData">
                       <!-- Wrapper keeps file info + action bar together so they are not overwritten by test results below -->
                       <div class="unit-test-data-header" id="unitTestDataHeader">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -2161,9 +2122,6 @@
                           </button>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -2181,15 +2139,15 @@
       <ul class="voice-command-list">
         <li>
           <span>"Show grid"</span>
-          Opens the Test Grid accordion.
+          Opens the Test Grid section.
         </li>
         <li>
           <span>"Show scenarios"</span>
-          Opens the Test Scenarios accordion.
+          Opens the Test Scenarios section.
         </li>
         <li>
           <span>"Show library"</span>
-          Opens the Test Library accordion.
+          Opens the Test Library section.
         </li>
         <li>
           <span>"Run tests"</span>

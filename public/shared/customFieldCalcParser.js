@@ -460,13 +460,14 @@
   }
 
   /**
-   * Compute suggested test value from a numeric comparison (for condition=true branch).
-   * @param {{ fieldId: string, op: string, value: number }} comp
+   * Compute suggested test value for a comparison operator and target value (condition=true branch).
+   * @param {string} op - comparison operator
+   * @param {number} value - target value from condition
    * @returns {number}
    */
-  function suggestedValueForComparison(comp) {
-    const v = comp.value;
-    switch (comp.op) {
+  function suggestedValueForOp(op, value) {
+    const v = value;
+    switch (op) {
       case '<=':
         return v > 100 ? Math.max(0, v - 100) : Math.floor(v / 2);
       case '>=':
@@ -482,6 +483,15 @@
       default:
         return v;
     }
+  }
+
+  /**
+   * Compute suggested test value from a numeric comparison (for condition=true branch).
+   * @param {{ fieldId: string, op: string, value: number }} comp
+   * @returns {number}
+   */
+  function suggestedValueForComparison(comp) {
+    return suggestedValueForOp(comp.op, comp.value);
   }
 
   /**
@@ -557,19 +567,19 @@
         const elseCycle = ['N', 'Y', ''];
         const val = elseCycle[scenarioIndex % 3];
         for (const norm of yFields) {
-          if (inputFields.some((f) => normalizeFieldIdForLookup(f) === norm)) {
+          if (isInInputFields(norm, inputFields)) {
             suggested[norm] = val;
           }
         }
         const nElseCycle = ['', 'N', 'Y'];
         const nVal = nElseCycle[scenarioIndex % 3];
         for (const norm of nFields) {
-          if (inputFields.some((f) => normalizeFieldIdForLookup(f) === norm)) {
+          if (isInInputFields(norm, inputFields)) {
             suggested[norm] = nVal;
           }
         }
         for (const norm of notNothingFields) {
-          if (inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+          if (isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
             suggested[norm] = '';
           }
         }
@@ -581,7 +591,7 @@
     for (let i = 0; i < comps.length; i++) {
       const c = comps[i];
       const norm = normalizeFieldIdForLookup(c.fieldId);
-      if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm)) {
+      if (norm && isInInputFields(norm, inputFields)) {
         const val = suggestedValueForComparison(c);
         suggested[norm] = Number.isFinite(val) ? val : '';
       }
@@ -592,7 +602,7 @@
       for (let j = 0; j < ac.fieldIds.length; j++) {
         const fid = ac.fieldIds[j];
         const norm = normalizeFieldIdForLookup(fid);
-        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+        if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
           suggested[norm] = (ac.op === '>=' || ac.op === '>') && j === 0 ? ac.value : 0;
         }
       }
@@ -601,7 +611,7 @@
     for (let i = 0; i < strComps.length; i++) {
       const sc = strComps[i];
       const norm = normalizeFieldIdForLookup(sc.fieldId);
-      if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm)) {
+      if (norm && isInInputFields(norm, inputFields)) {
         const val = (sc.value || '').toUpperCase();
         if (val === 'Y') {
           const yNEmpty = ['Y', 'N', ''];
@@ -621,12 +631,12 @@
       const cv = condValues[i];
       if (cv.type === 'isDate') {
         const norm = normalizeFieldIdForLookup(cv.fieldId);
-        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+        if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
           suggested[norm] = cv.negated ? '' : '01/15/2025';
         }
       } else if (cv.type === 'contains') {
         const norm = normalizeFieldIdForLookup(cv.fieldId);
-        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+        if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
           const meta = fieldMetadata[norm] || fieldMetadata[cv.fieldId];
           const options = meta && Array.isArray(meta.options) ? meta.options : [];
           const substr = (cv.substring || '').toLowerCase();
@@ -639,7 +649,7 @@
         }
       } else if (cv.type === 'startsWith') {
         const norm = normalizeFieldIdForLookup(cv.fieldId);
-        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+        if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
           const meta = fieldMetadata[norm] || fieldMetadata[cv.fieldId];
           const options = meta && Array.isArray(meta.options) ? meta.options : [];
           const prefix = (cv.prefix || '').toLowerCase();
@@ -654,15 +664,15 @@
         const sv = suggestedValuesForDateDiff(cv);
         const norm1 = normalizeFieldIdForLookup(sv.field1);
         const norm2 = normalizeFieldIdForLookup(sv.field2);
-        if (norm1 && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm1) && suggested[norm1] === undefined) {
+        if (norm1 && isInInputFields(norm1, inputFields) && suggested[norm1] === undefined) {
           suggested[norm1] = sv.val1;
         }
-        if (norm2 && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm2) && suggested[norm2] === undefined) {
+        if (norm2 && isInInputFields(norm2, inputFields) && suggested[norm2] === undefined) {
           suggested[norm2] = sv.val2;
         }
       } else if (cv.type === 'nothing') {
         const norm = normalizeFieldIdForLookup(cv.fieldId);
-        if (norm && inputFields.some((f) => normalizeFieldIdForLookup(f) === norm) && suggested[norm] === undefined) {
+        if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
           suggested[norm] = cv.negated ? 'Y' : '';
         }
       }
@@ -707,6 +717,17 @@
       s = s.replace(/#[1-6]$/, '');
     }
     return s;
+  }
+
+  /**
+   * True if normalized field ID is in the input fields list.
+   * @param {string} norm - normalized field ID
+   * @param {string[]} inputFields - field IDs referenced in formula
+   * @returns {boolean}
+   */
+  function isInInputFields(norm, inputFields) {
+    if (!norm || !inputFields || !Array.isArray(inputFields)) return false;
+    return inputFields.some((f) => normalizeFieldIdForLookup(f) === norm);
   }
 
   /**
@@ -993,7 +1014,7 @@
       if (s && s.result) {
         const resultField = extractSingleResultField(s.result);
         const literalResult = extractLiteralResult(s.result);
-        if (resultField && inputFields.some((f) => normalizeFieldIdForLookup(f) === resultField)) {
+        if (resultField && isInInputFields(resultField, inputFields)) {
           const suggestedMap = getSuggestedValuesForScenario(s, inputFields, { fieldMetadata, scenarioIndex: idx });
           const val = suggestedMap[resultField];
           suggested = val !== undefined && val !== '' ? String(val) : '';
@@ -1094,6 +1115,25 @@
   }
 
   /**
+   * Apply numeric comparison operator (<=, >=, <, >, =, <>).
+   * @param {string} op - comparison operator
+   * @param {number} lhs - left-hand side value
+   * @param {number} rhs - right-hand side value
+   * @returns {boolean}
+   */
+  function applyNumericComparison(op, lhs, rhs) {
+    switch (op) {
+      case '<=': return lhs <= rhs;
+      case '>=': return lhs >= rhs;
+      case '<': return lhs < rhs;
+      case '>': return lhs > rhs;
+      case '=': return lhs === rhs;
+      case '<>': return lhs !== rhs;
+      default: return false;
+    }
+  }
+
+  /**
    * Evaluate a single atomic condition (no AndAlso/OrElse).
    * @param {string} cond - e.g. "[353] <= 200", "([#FR0112#2] + ([#FR0124#2]/12)) >= 2"
    * @param {Record<string, string|number>} values
@@ -1112,15 +1152,7 @@
       if (num === null) return false;
       const target = parseFloat(arithMatchParen[3]);
       if (!Number.isFinite(target)) return false;
-      switch (arithMatchParen[2]) {
-        case '<=': return num <= target;
-        case '>=': return num >= target;
-        case '<': return num < target;
-        case '>': return num > target;
-        case '=': return num === target;
-        case '<>': return num !== target;
-        default: return false;
-      }
+      return applyNumericComparison(arithMatchParen[2], num, target);
     }
     const arithMatchNoParen = c.match(/^([\s\S]+)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/);
     if (arithMatchNoParen && /[+\-*\/]/.test(arithMatchNoParen[1]) && /\[[^\]]+\]/.test(arithMatchNoParen[1])) {
@@ -1128,15 +1160,7 @@
       if (num === null) return false;
       const target = parseFloat(arithMatchNoParen[3]);
       if (!Number.isFinite(target)) return false;
-      switch (arithMatchNoParen[2]) {
-        case '<=': return num <= target;
-        case '>=': return num >= target;
-        case '<': return num < target;
-        case '>': return num > target;
-        case '=': return num === target;
-        case '<>': return num !== target;
-        default: return false;
-      }
+      return applyNumericComparison(arithMatchNoParen[2], num, target);
     }
 
     const comps = extractComparisonValues(c);
@@ -1146,17 +1170,7 @@
         const val = getFieldValue(comp.fieldId, values);
         const num = (val === '' || val === null || val === undefined) ? 0 : (typeof val === 'number' ? val : parseFloat(val));
         const target = comp.value;
-        let result = false;
-        switch (comp.op) {
-          case '<=': result = num <= target; break;
-          case '>=': result = num >= target; break;
-          case '<': result = num < target; break;
-          case '>': result = num > target; break;
-          case '=': result = num === target; break;
-          case '<>': result = num !== target; break;
-          default: result = false;
-        }
-        if (!result) return false;
+        if (!applyNumericComparison(comp.op, num, target)) return false;
       }
       return true;
     }
@@ -1199,17 +1213,7 @@
         const d2 = new Date(v2);
         if (Number.isNaN(d1.getTime()) || Number.isNaN(d2.getTime())) return false;
         const diff = Math.floor((d2 - d1) / (24 * 60 * 60 * 1000));
-        let result = false;
-        switch (cv.op) {
-          case '<=': result = diff <= cv.value; break;
-          case '>=': result = diff >= cv.value; break;
-          case '<': result = diff < cv.value; break;
-          case '>': result = diff > cv.value; break;
-          case '=': result = diff === cv.value; break;
-          case '<>': result = diff !== cv.value; break;
-          default: result = false;
-        }
-        if (!result) return false;
+        if (!applyNumericComparison(cv.op, diff, cv.value)) return false;
       }
     }
     return condVals.length > 0 || (c === 'true' || c === 'True');

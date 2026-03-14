@@ -501,12 +501,12 @@ main.container {
 }
 .domain-tile:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
-  border-color: rgba(102, 126, 234, 0.5);
+  box-shadow: 0 8px 24px rgba(52, 152, 219, 0.2);
+  border-color: rgba(52, 152, 219, 0.5);
 }
 .domain-tile i {
   font-size: 2rem;
-  color: #667eea;
+  color: #3498db;
   margin-bottom: 0.4rem;
 }
 .domain-tile span {
@@ -519,4 +519,4 @@ main.container {
 .domain-grid.domain-grid-sm .domain-tile { min-height: 95px; padding: 1rem 0.5rem; }
 .domain-grid.domain-grid-sm .domain-tile i { font-size: 1.6rem; }
 .domain-grid.domain-grid-sm .domain-tile span { font-size: 0.78rem; }
-.domain-tile.active { border-color: rgba(102, 126, 234, 0.6); background: rgba(102, 126, 234, 0.08); }
+.domain-tile.active { border-color: rgba(52, 152, 219, 0.6); background: rgba(52, 152, 219, 0.08); }
