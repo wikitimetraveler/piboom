@@ -162,21 +162,77 @@
     return DOMAIN_TILES;
   }
 
+  function makeToolId(item, href) {
+    if (item && item.id) return String(item.id);
+    const source = String(href || item?.href || item?.label || 'home');
+    return source
+      .toLowerCase()
+      .replace(/[?#].*$/, '')
+      .replace(/^\/+|\/+$/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'home';
+  }
+
+  function normalizeToolItem(item, options) {
+    const basePath = (options && options.basePath) || '';
+    const href = item.href.startsWith('/') ? item.href : basePath + item.href;
+    return {
+      id: makeToolId(item, href),
+      href: href,
+      icon: item.icon || 'bi-grid',
+      label: item.label || 'Tool',
+      title: item.title || item.label || 'Tool',
+      category: item.category || (options && options.category) || 'General',
+      domain: item.domain || ''
+    };
+  }
+
+  function getAllTools(demoMode) {
+    const groups = [
+      { items: getDomainTiles(demoMode), category: 'Domain' },
+      { items: FINANCE_TOOLS, category: 'Finance' },
+      { items: ENCOMPASS_TOOLS, category: 'Encompass' },
+      { items: NATURE_TOOLS, category: 'Nature' },
+      { items: BIKE_TOOLS, category: 'Bike' },
+      { items: MUSIC_TOOLS, category: 'Music' }
+    ];
+    const tools = [];
+    groups.forEach((group) => {
+      (group.items || []).forEach((item) => {
+        if (item && !item.divider && item.href) {
+          tools.push(normalizeToolItem(item, { category: group.category }));
+        }
+      });
+    });
+    return tools;
+  }
+
   /** Render domain grid HTML from items array */
   function renderDomainGridItems(items, options) {
-    const basePath = (options && options.basePath) || '';
     return items.map(function (item) {
-      const href = item.href.startsWith('/') ? item.href : basePath + item.href;
-      const domain = item.domain ? ' data-domain="' + item.domain + '"' : '';
-      const title = (item.title || item.label).replace(/"/g, '&quot;');
-      return '<a href="' + href + '" class="domain-tile"' + domain + ' title="' + title + '">' +
-        '<i class="bi ' + item.icon + '"></i><span>' + item.label + '</span></a>';
+      const normalized = normalizeToolItem(item, options);
+      const domain = normalized.domain ? ' data-domain="' + normalized.domain + '"' : '';
+      const title = normalized.title.replace(/"/g, '&quot;');
+      const label = normalized.label.replace(/"/g, '&quot;');
+      const category = normalized.category.replace(/"/g, '&quot;');
+      return '<a href="' + normalized.href + '" class="domain-tile"' + domain +
+        ' title="' + title + '"' +
+        ' data-tool-id="' + normalized.id + '"' +
+        ' data-tool-url="' + normalized.href + '"' +
+        ' data-tool-label="' + label + '"' +
+        ' data-tool-category="' + category + '"' +
+        ' data-tool-icon="' + normalized.icon + '">' +
+        '<i class="bi ' + normalized.icon + '"></i><span>' + normalized.label + '</span>' +
+        '</a>';
     }).join('');
   }
 
   const MENU_CONFIG = {
     DOMAIN_TILES,
     getDomainTiles,
+    getAllTools,
+    makeToolId,
+    normalizeToolItem,
     renderDomainGridItems,
     NAV_FINANCE,
     NAV_ENCOMPASS,

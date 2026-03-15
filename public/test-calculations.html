@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculations Test Page</title>
+    <link rel="stylesheet" href="/shared/collection-styles.css"/>
+    <script src="/shared/toast.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -433,7 +435,7 @@
 
         function speakResponse() {
             if (!lastChatResponse) {
-                alert('No ChatGPT response to speak');
+                if (typeof showToast === 'function') showToast('No ChatGPT response to speak', { type: 'warning' });
                 return;
             }
             
@@ -459,7 +461,7 @@
             const voice = document.getElementById('voiceSelect').value;
 
             if (!text) {
-                alert('Please enter text to speak');
+                if (typeof showToast === 'function') showToast('Please enter text to speak', { type: 'warning' });
                 return;
             }
 
@@ -515,7 +517,7 @@
             const text = document.getElementById('ttsInput').value.trim();
             
             if (!text) {
-                alert('Please enter text to speak');
+                if (typeof showToast === 'function') showToast('Please enter text to speak', { type: 'warning' });
                 return;
             }
 
@@ -535,14 +537,14 @@
 
                 if (data.success) {
                     console.log('✅ Backend TTS successful');
-                    alert('Backend TTS successful!');
+                    if (typeof showToast === 'function') showToast('Backend TTS successful!', { type: 'success' });
                 } else {
                     throw new Error(data.message || 'Backend TTS failed');
                 }
 
             } catch (error) {
                 console.error('❌ Backend TTS Error:', error);
-                alert(`Backend TTS Error: ${error.message}`);
+                if (typeof showToast === 'function') showToast(`Backend TTS Error: ${error.message}`, { type: 'error' });
             }
         }
 

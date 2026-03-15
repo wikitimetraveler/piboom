@@ -92,9 +92,11 @@ class ModernNavbar extends HTMLElement {
     if (!items || !items.length) return '';
     const cfg = window.MENU_CONFIG;
     if (!cfg) return '';
+    const currentPath = location.pathname;
     return items.map(function (it) {
       if (it.divider) return '<div class="dropdown-divider"></div>';
-      return '<a class="dropdown-item" href="' + it.href + '"><i class="bi ' + it.icon + '"></i> ' + it.label + '</a>';
+      const isActive = it.href && (currentPath === it.href || (it.href !== '/' && currentPath.endsWith(it.href)));
+      return '<a class="dropdown-item' + (isActive ? ' active' : '') + '" href="' + it.href + '"><i class="bi ' + it.icon + '"></i> ' + it.label + '</a>';
     }).join('\n                  ');
   }
 
@@ -123,7 +125,13 @@ class ModernNavbar extends HTMLElement {
         }
         
         .modern-navbar.scrolled {
-          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+          background: linear-gradient(135deg, rgba(255,255,255,0.97) 0%, rgba(232,241,255,0.97) 100%);
+          box-shadow: 0 4px 30px rgba(52, 152, 219, 0.12);
+          border-bottom-color: rgba(52, 152, 219, 0.25);
+        }
+
+        .modern-navbar.scrolled .navbar-brand-modern {
+          filter: drop-shadow(0 0 8px rgba(52, 152, 219, 0.35));
         }
         
         .navbar-brand-modern {
@@ -160,6 +168,11 @@ class ModernNavbar extends HTMLElement {
         }
         
         /* Modern Dropdown Menus */
+        @keyframes dropIn {
+          from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
         .dropdown-menu {
           display: none;
           position: absolute;
@@ -178,6 +191,7 @@ class ModernNavbar extends HTMLElement {
         
         .dropdown-menu.show {
           display: block;
+          animation: dropIn 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .dropdown-item {
@@ -197,6 +211,12 @@ class ModernNavbar extends HTMLElement {
           background: linear-gradient(135deg, rgba(52,152,219,0.1), rgba(41,128,185,0.1));
           color: #3498db;
           transform: translateX(5px);
+        }
+
+        .dropdown-item.active {
+          background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(41,128,185,0.15));
+          color: #3498db;
+          font-weight: 600;
         }
         
         .dropdown-divider {
@@ -243,10 +263,30 @@ class ModernNavbar extends HTMLElement {
           align-items: center;
           gap: 0.4rem;
           transition: all 0.3s ease;
+          border-radius: 8px;
+          position: relative;
         }
         
         .nav-link:hover {
           color: #3498db;
+          background: rgba(52, 152, 219, 0.06);
+        }
+
+        .nav-link.active-page {
+          color: #3498db;
+          font-weight: 600;
+        }
+
+        .nav-link.active-page::after {
+          content: '';
+          position: absolute;
+          bottom: -2px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 60%;
+          height: 2px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #3498db, #2980b9);
         }
         
         .nav-item.dropdown.open .nav-link {
@@ -517,8 +557,30 @@ class ModernNavbar extends HTMLElement {
       }
     });
 
+    // Mark active nav items
+    this.markActiveNavItems();
+
     // Initialize user display
     this.updateUserDisplay();
+  }
+
+  markActiveNavItems() {
+    const currentPath = location.pathname;
+    // Highlight plain nav-link (Home, etc.)
+    this.shadowRoot.querySelectorAll('.nav-link:not(.dropdown-toggle):not(.nav-user-btn)').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && href !== '#' && (currentPath === href || currentPath.endsWith(href))) {
+        link.classList.add('active-page');
+      }
+    });
+    // Highlight dropdown parent if any child matches
+    this.shadowRoot.querySelectorAll('.nav-item.dropdown').forEach(dropdown => {
+      const hasActive = dropdown.querySelector('.dropdown-item.active');
+      if (hasActive) {
+        const toggle = dropdown.querySelector('.dropdown-toggle');
+        if (toggle) toggle.classList.add('active-page');
+      }
+    });
   }
 
   updateUserDisplay() {

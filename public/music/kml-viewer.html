@@ -412,9 +412,10 @@
       to { opacity: 0; }
     }
   </style>
+  <link rel="stylesheet" href="/shared/collection-styles.css">
+  <script src="/shared/toast.js"></script>
 </head>
 <body>
-  <div class="toast-container" id="toastContainer"></div>
   <div class="nav-home">
     <a href="/index.html">
       <i class="bi-house-fill"></i> Home
@@ -639,22 +640,6 @@
     let youtubeAPIReady = false;
     let youtubeApiScriptLoading = false;
     let youtubeInitInProgress = false;
-    let toastCounter = 0;
-
-    function showToast(message, type = 'info') {
-      const container = document.getElementById('toastContainer');
-      const id = `toast-${++toastCounter}`;
-      const div = document.createElement('div');
-      div.id = id;
-      div.className = `toast-notice ${type}`;
-      div.innerHTML = `<i class="bi-info-circle"></i><span>${message}</span>`;
-      container.appendChild(div);
-      setTimeout(() => {
-        div.style.opacity = '0';
-        setTimeout(() => div.remove(), 250);
-      }, 4500);
-    }
-
     // Load Google Maps API with key from server
     async function loadGoogleMapsAPI() {
       try {

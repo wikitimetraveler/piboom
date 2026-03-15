@@ -7,9 +7,6 @@ const ratioMeta = document.getElementById('ratioMeta');
 const ratioPlaceholder = document.getElementById('ratioChartPlaceholder');
 const mapMeta = document.getElementById('mapMeta');
 const cubeMeta = document.getElementById('cubeMeta');
-const statusToast = document.getElementById('statusToast');
-const statusToastMessage = document.getElementById('statusToastMessage');
-
 let mapInstance;
 let currentDeckLayer;
 let cubeScene;
@@ -348,16 +345,6 @@ function resizeCubeRenderer() {
   cubeCamera.aspect = width / height;
   cubeCamera.updateProjectionMatrix();
   cubeRenderer.setSize(width, height, false);
-}
-
-function showToast(message) {
-  if (!statusToast || !statusToastMessage) return;
-  statusToastMessage.textContent = message;
-  statusToast.classList.add('show');
-}
-
-function hideToast() {
-  statusToast?.classList.remove('show');
 }
 
 function formatCurrency(value) {

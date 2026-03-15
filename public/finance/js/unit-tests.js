@@ -131,17 +131,6 @@ function setStatus(text, status = 'info', icon = 'bi-info-circle') {
   statusChip.innerHTML = `<i class="bi ${icon}"></i> ${text}`;
 }
 
-function showToast(message, type = 'info', duration = 2500) {
-  const el = document.getElementById('unitTestsToast');
-  if (!el) return;
-  el.textContent = message;
-  el.className = `unit-tests-toast ${type} show`;
-  clearTimeout(el._toastTimer);
-  el._toastTimer = setTimeout(() => {
-    el.classList.remove('show');
-  }, duration);
-}
-
 function detectColumnType(columnData) {
   if (!columnData || columnData.length === 0) return 'text';
   

@@ -584,35 +584,6 @@ function removeEmptyValues() {
     }
 }
 
-// Show toast notification
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('actionToast');
-    const toastBody = toast.querySelector('.toast-body');
-    
-    toastBody.textContent = message;
-    toast.classList.add('show');
-    
-    toast.classList.remove('bg-success', 'bg-warning', 'bg-danger', 'bg-info');
-    
-    switch(type) {
-        case 'success':
-            toast.classList.add('bg-success');
-            break;
-        case 'warning':
-            toast.classList.add('bg-warning');
-            break;
-        case 'error':
-            toast.classList.add('bg-danger');
-            break;
-        default:
-            toast.classList.add('bg-info');
-    }
-    
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 3000);
-}
-
 // Function to convert Encompass VB condition to JavaScript
 function convertEncompassConditionToJS(conditionValue) {
     return conditionValue

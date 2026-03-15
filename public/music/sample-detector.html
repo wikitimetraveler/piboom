@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <script src="/shared/toast.js"></script>
   <script src="/shared/modern-navbar.js"></script>
   <style>
     .search-container {
@@ -303,12 +305,12 @@ async function searchNetwork(event) {
     if (data.success) {
       displayResults(data);
     } else {
-      alert('Error: ' + (data.message || 'Failed to search network'));
+      if (typeof showToast === 'function') showToast('Error: ' + (data.message || 'Failed to search network'), { type: 'error' });
     }
   } catch (error) {
     console.error('Search error:', error);
     document.getElementById('loadingState').style.display = 'none';
-    alert('Error searching network. Please try again.');
+    if (typeof showToast === 'function') showToast('Error searching network. Please try again.', { type: 'error' });
   }
 }
 

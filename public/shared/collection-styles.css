@@ -161,6 +161,7 @@
 .collection-toast.error { border-left-color: #dc3545; }
 .collection-toast.success { border-left-color: #28a745; }
 .collection-toast.info { border-left-color: #17a2b8; }
+.collection-toast.warning { border-left-color: #ffc107; }
 
 @keyframes collection-slideIn {
   from { transform: translateX(400px); opacity: 0; }

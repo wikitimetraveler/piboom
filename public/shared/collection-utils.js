@@ -9,13 +9,17 @@
 
   const COLLECTION_UTILS = {
     /**
-     * Show a toast notification. Creates container if needed.
+     * Show a toast notification. Delegates to shared toast.js when available.
      * @param {string} title - Toast title
      * @param {string} message - Toast message
      * @param {string} type - 'success' | 'error' | 'info'
      * @param {number} durationMs - Auto-remove after ms (default 4000)
      */
     showToast(title, message, type = 'info', durationMs = 4000) {
+      if (typeof window.showToast === 'function') {
+        window.showToast(title, message, type, durationMs);
+        return;
+      }
       let container = document.getElementById('toastContainer');
       if (!container) {
         container = document.createElement('div');

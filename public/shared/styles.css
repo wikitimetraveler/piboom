@@ -520,3 +520,181 @@ main.container {
 .domain-grid.domain-grid-sm .domain-tile i { font-size: 1.6rem; }
 .domain-grid.domain-grid-sm .domain-tile span { font-size: 0.78rem; }
 .domain-tile.active { border-color: rgba(52, 152, 219, 0.6); background: rgba(52, 152, 219, 0.08); }
+
+/* Command Center dashboard */
+.command-center {
+  margin: 0 auto;
+}
+
+.command-center-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.command-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: 14px;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+
+.command-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1rem;
+  background: rgba(52, 152, 219, 0.08);
+  border-bottom: 1px solid rgba(52, 152, 219, 0.15);
+}
+
+.command-card-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.command-card-body {
+  padding: 0.8rem;
+  display: grid;
+  gap: 0.5rem;
+  min-height: 82px;
+}
+
+.action-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.25rem;
+}
+
+.action-chip-link {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  text-decoration: none;
+  color: #1f2937;
+  border-radius: 8px;
+  padding: 0.4rem 0.45rem;
+}
+
+.action-chip-link:hover {
+  text-decoration: none;
+  background: rgba(52, 152, 219, 0.08);
+  color: #0f172a;
+}
+
+.action-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.favorite-toggle {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(52, 152, 219, 0.25);
+  border-radius: 999px;
+  background: #fff;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.favorite-toggle:hover {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+.favorite-toggle.active {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.favorite-toggle:focus-visible,
+.action-chip-link:focus-visible,
+.resume-card:focus-visible,
+.domain-tile:focus-visible {
+  outline: 2px solid rgba(52, 152, 219, 0.7);
+  outline-offset: 2px;
+}
+
+.action-item {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 10px;
+  padding: 0.5rem 0.65rem;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.action-item-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.action-item-label {
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.action-item-meta {
+  font-size: 0.72rem;
+  color: #475569;
+  text-transform: uppercase;
+}
+
+.action-item-time {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.resume-card {
+  display: block;
+  text-decoration: none;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+}
+
+.resume-card:hover {
+  text-decoration: none;
+  background: rgba(52, 152, 219, 0.08);
+}
+
+.resume-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.resume-card-meta {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.empty-state {
+  border: 1px dashed rgba(148, 163, 184, 0.5);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  color: #64748b;
+  font-size: 0.8rem;
+  background: rgba(255, 255, 255, 0.7);
+}

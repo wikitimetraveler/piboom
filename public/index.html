@@ -7,7 +7,10 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/shared/styles.css"/>
+<link rel="stylesheet" href="/shared/collection-styles.css"/>
+<script src="/shared/toast.js"></script>
 <script src="/shared/menu-config.js"></script>
+<script src="/shared/dashboard-state.js"></script>
 <script src="/shared/modern-navbar.js"></script>
 <style>
   /* Floating Musical Notes */
@@ -277,11 +280,67 @@
     text-align: center;
     line-height: 1.2;
   }
+
+  .command-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+  }
+  .command-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .command-toast.pinned { background: rgba(52, 152, 219, 0.95); color: #fff; }
+  .command-toast.unpinned { background: rgba(100, 116, 139, 0.95); color: #fff; }
 </style>
 
 <main class="container">
-  
+  <section class="command-center" id="commandCenter" aria-label="Command Center">
+    <div class="command-center-grid">
+      <article class="command-card" aria-labelledby="recentToolsHeading">
+        <div class="command-card-header">
+          <h3 id="recentToolsHeading"><i class="bi-clock-history mr-1"></i>Recent Tools</h3>
+        </div>
+        <div class="command-card-body" id="recentToolsList"></div>
+      </article>
+
+      <article class="command-card" aria-labelledby="favoritesHeading">
+        <div class="command-card-header">
+          <h3 id="favoritesHeading"><i class="bi-star-fill mr-1"></i>Pinned Favorites</h3>
+        </div>
+        <div class="command-card-body" id="favoritesList"></div>
+      </article>
+
+      <article class="command-card" aria-labelledby="actionsHeading">
+        <div class="command-card-header">
+          <h3 id="actionsHeading"><i class="bi-lightning mr-1"></i>Last 5 Actions</h3>
+        </div>
+        <div class="command-card-body" id="lastActionsList"></div>
+      </article>
+
+      <article class="command-card" aria-labelledby="resumeHeading">
+        <div class="command-card-header">
+          <h3 id="resumeHeading"><i class="bi-play-circle mr-1"></i>Quick Resume</h3>
+        </div>
+        <div class="command-card-body" id="quickResumeList"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="mt-4" aria-label="All Domains">
+    <h5 class="text-center text-muted mb-3"><i class="bi-grid-3x3-gap mr-1"></i>All Domains</h5>
   <div class="domain-grid" id="domainGrid"><!-- populated by menu-config --></div>
+  </section>
   <p class="text-center text-muted mt-3 mb-4 small" id="domainHint">Click a domain to explore. Press <kbd>Ctrl+K</kbd> to search all tools.</p>
   <p class="text-center mt-2" id="showAllWrap" style="display:none;">
     <a href="/?demo=0" class="small text-muted">Show all domains</a>
@@ -351,10 +410,156 @@ window.addEventListener('DOMContentLoaded', () => {
   const hint = document.getElementById('domainHint');
   const showAll = document.getElementById('showAllWrap');
   const demoLink = document.getElementById('demoModeWrap');
+  const state = window.DashboardState;
+  const params = new URLSearchParams(window.location.search);
+  const resumeToolId = params.get('resume') === '1' ? params.get('tool') : null;
+
+  function getCatalogMap() {
+    const fallback = [];
+    const tools = window.MENU_CONFIG?.getAllTools?.(demoMode) || fallback;
+    const byId = new Map();
+    const byUrl = new Map();
+    tools.forEach((tool) => {
+      if (tool?.id) byId.set(tool.id, tool);
+      if (tool?.href) byUrl.set(tool.href, tool);
+    });
+    return { tools, byId, byUrl };
+  }
+
+  function getToolMetaFromElement(el) {
+    if (!el) return null;
+    return {
+      id: el.getAttribute('data-tool-id') || state?.slugFromUrl?.(el.getAttribute('href')),
+      label: el.getAttribute('data-tool-label') || el.textContent?.trim() || 'Tool',
+      url: el.getAttribute('data-tool-url') || el.getAttribute('href') || '/',
+      category: el.getAttribute('data-tool-category') || 'General',
+      icon: el.getAttribute('data-tool-icon') || 'bi-grid'
+    };
+  }
+
+  function renderEmptyState(container, text) {
+    if (!container) return;
+    container.innerHTML = `<div class="empty-state">${text}</div>`;
+  }
+
+  function favoriteButton(tool) {
+    const active = state?.isFavorite?.(tool.id);
+    const title = active ? 'Unpin favorite' : 'Pin favorite';
+    return `<button type="button" class="favorite-toggle ${active ? 'active' : ''}" aria-label="${title}" title="${title}" data-tool-id="${tool.id}">
+      <i class="bi ${active ? 'bi-star-fill' : 'bi-star'}"></i>
+    </button>`;
+  }
+
+  function toolChip(tool, withFavorite) {
+    return `<div class="action-chip">
+      <a class="action-chip-link" href="${tool.url}" data-tool-id="${tool.id}" data-tool-url="${tool.url}" data-tool-label="${tool.label}" data-tool-category="${tool.category}" data-tool-icon="${tool.icon}">
+      <i class="bi ${tool.icon || 'bi-grid'}"></i>
+      <span class="action-chip-label">${tool.label}</span>
+      </a>
+      ${withFavorite ? favoriteButton(tool) : ''}
+    </div>`;
+  }
+
+  function renderRecentAndFavorites() {
+    const recentContainer = document.getElementById('recentToolsList');
+    const favoritesContainer = document.getElementById('favoritesList');
+    const { byId, byUrl } = getCatalogMap();
+    const recent = state?.getRecentTools?.(5) || [];
+    const favorites = state?.getFavorites?.() || [];
+
+    if (!recent.length) {
+      renderEmptyState(recentContainer, 'No recent tools yet. Open a tool to populate this section.');
+    } else {
+      recentContainer.innerHTML = recent.map((item) => {
+        const fallback = byId.get(item.id) || byUrl.get(item.url) || {};
+        return toolChip({
+          id: item.id,
+          label: item.label || fallback.label || 'Tool',
+          url: item.url || fallback.href || '/',
+          category: item.category || fallback.category || 'General',
+          icon: item.icon || fallback.icon || 'bi-grid'
+        }, true);
+      }).join('');
+    }
+
+    const favoriteTools = favorites
+      .map((id) => byId.get(id))
+      .filter(Boolean)
+      .slice(0, 8)
+      .map((tool) => ({
+        id: tool.id,
+        label: tool.label,
+        url: tool.href,
+        category: tool.category || 'General',
+        icon: tool.icon || 'bi-grid'
+      }));
+
+    if (!favoriteTools.length) {
+      renderEmptyState(favoritesContainer, 'Pin favorites from Recent Tools to keep them here.');
+    } else {
+      favoritesContainer.innerHTML = favoriteTools.map((tool) => toolChip(tool, true)).join('');
+    }
+  }
+
+  function renderActions() {
+    const container = document.getElementById('lastActionsList');
+    const actions = state?.getLastActions?.(5) || [];
+    if (!actions.length) {
+      renderEmptyState(container, 'No actions recorded yet.');
+      return;
+    }
+    container.innerHTML = actions.map((action) => {
+      const when = new Date(action.timestamp || Date.now()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      return `<div class="action-item">
+        <div class="action-item-main">
+          <span class="action-item-label">${action.label}</span>
+          <span class="action-item-meta">${action.type}</span>
+        </div>
+        <div class="action-item-time">${when}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function withResumeUrl(toolId, url) {
+    try {
+      const u = new URL(url, window.location.origin);
+      u.searchParams.set('resume', '1');
+      u.searchParams.set('tool', toolId);
+      return u.pathname + u.search + u.hash;
+    } catch (_) {
+      return url;
+    }
+  }
+
+  function renderQuickResume() {
+    const container = document.getElementById('quickResumeList');
+    const { byId } = getCatalogMap();
+    const resumeCandidates = (state?.getRecentTools?.(5) || []).filter((item) => state?.getResumeState?.(item.id));
+    if (!resumeCandidates.length) {
+      renderEmptyState(container, 'Open a tool and return to see quick resume cards.');
+      return;
+    }
+    container.innerHTML = resumeCandidates.map((item) => {
+      const fallback = byId.get(item.id) || {};
+      const resume = state?.getResumeState?.(item.id);
+      const ts = resume?.timestamp ? new Date(resume.timestamp).toLocaleString() : 'recent';
+      const url = withResumeUrl(item.id, item.url || fallback.href || '/');
+      return `<a class="resume-card" href="${url}" data-tool-id="${item.id}" data-tool-url="${item.url || fallback.href || '/'}" data-tool-label="${item.label || fallback.label || 'Tool'}" data-tool-category="${item.category || fallback.category || 'General'}" data-tool-icon="${item.icon || fallback.icon || 'bi-grid'}">
+        <div class="resume-card-title"><i class="bi ${item.icon || fallback.icon || 'bi-grid'}"></i>${item.label || fallback.label || 'Tool'}</div>
+        <div class="resume-card-meta">Resume saved ${ts}</div>
+      </a>`;
+    }).join('');
+  }
+
+  function renderCommandCenter() {
+    renderRecentAndFavorites();
+    renderActions();
+    renderQuickResume();
+  }
 
   if (grid && window.MENU_CONFIG) {
     const tiles = window.MENU_CONFIG.getDomainTiles(demoMode);
-    grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(tiles);
+    grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(tiles, { category: 'Domain' });
   }
 
   if (demoMode) {
@@ -365,6 +570,52 @@ window.addEventListener('DOMContentLoaded', () => {
     if (showAll) showAll.style.display = 'none';
     if (demoLink) demoLink.style.display = 'block';
   }
+
+  if (resumeToolId) {
+    state?.recordAction?.({
+      type: 'resume-open',
+      label: `Opened quick resume for ${resumeToolId}`,
+      toolId: resumeToolId,
+      url: window.location.pathname + window.location.search,
+      category: 'Resume'
+    });
+    if (hint) hint.textContent = `Quick resume loaded (${resumeToolId}). Press Ctrl+K to search all tools.`;
+  }
+
+  renderCommandCenter();
+
+  document.addEventListener('click', (e) => {
+    const favoriteBtn = e.target.closest('.favorite-toggle');
+    if (favoriteBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      const toolId = favoriteBtn.getAttribute('data-tool-id');
+      const nowPinned = state?.toggleFavorite?.(toolId);
+      renderCommandCenter();
+      if (typeof showToast === 'function') showToast(nowPinned ? 'Pinned to favorites' : 'Unpinned', { type: nowPinned ? 'success' : 'info', duration: 2000 });
+      return;
+    }
+    const tile = e.target.closest('.domain-tile, .action-chip-link, .resume-card');
+    if (!tile) return;
+    const tool = getToolMetaFromElement(tile);
+    if (!tool?.id) return;
+    state?.recordVisit?.(tool);
+    state?.saveResumeState?.(tool.id, {
+      source: 'home',
+      demoMode: demoMode,
+      lastVisitedAt: Date.now()
+    });
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const target = e.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (e.key !== 'Enter' || !target.classList.contains('favorite-toggle')) return;
+    e.preventDefault();
+    const toolId = target.getAttribute('data-tool-id');
+    state?.toggleFavorite?.(toolId);
+    renderCommandCenter();
+  });
 });
 </script>
 <script>

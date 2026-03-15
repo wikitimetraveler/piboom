@@ -42,8 +42,9 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 
 | Path | Purpose |
 |------|---------|
+| `public/shared/toast.js` | Shared toast notifications (showToast) — use instead of alert() |
 | `public/shared/collection-styles.css` | Shared collection page styles (stats, cards, map, empty/loading, toast) |
-| `public/shared/collection-utils.js` | Shared collection utilities (showToast, resolvePosterImageUrl, waitForPosterImages, requestDeviceLocation) |
+| `public/shared/collection-utils.js` | Shared collection utilities (showToast delegates to toast.js, resolvePosterImageUrl, waitForPosterImages, requestDeviceLocation) |
 | `public/shared/modern-navbar.js` | Web component navbar |
 | `public/shared/styles.css` | Shared styles |
 | `public/shared/user-login.js` | User login |
@@ -136,6 +137,25 @@ Use `value ? 'Yes' : 'No'` or equivalent. AG Grid/DataTables cell renderers and 
 - Bootstrap Icons
 - Custom CSS variables in pages (e.g. `--primary-color`, `--danger-color`)
 - Inter or similar fonts via Google Fonts
+
+## Toast Notifications
+
+Use the shared toast instead of `alert()` for user feedback. Include `toast.js` and `collection-styles.css` on pages that need feedback.
+
+**API:**
+```javascript
+// Simple message
+showToast('Copied to clipboard', { type: 'success' });
+
+// With title
+showToast('Save Failed', { title: 'Error', type: 'error' });
+
+// Backward compat (collection-utils style)
+showToast('Success', 'Tree saved', 'success');
+showToast('Error', 'Failed to load', 'error', 5000);
+```
+
+**Types:** `success`, `error`, `warning`, `info` (aliases: `ok` → success, `err`/`danger` → error)
 
 ## Voice Commands
 

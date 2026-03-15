@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.css" />
     <link rel="stylesheet" href="/shared/styles.css" />
+    <link rel="stylesheet" href="/shared/collection-styles.css" />
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <script src="/shared/toast.js"></script>
     <script src="/shared/modern-navbar.js" defer></script>
     <style>
       :root {
@@ -195,10 +197,6 @@
         <canvas id="cubeCanvas"></canvas>
       </div>
     </main>
-
-    <div id="statusToast" class="status-toast alert alert-danger mb-0" role="alert">
-      <strong>Warning:</strong> <span id="statusToastMessage">Unable to load data.</span>
-    </div>
 
     <script src="https://unpkg.com/maplibre-gl@3.6.1/dist/maplibre-gl.js"></script>
     <script src="https://unpkg.com/deck.gl@8.9.27/dist.min.js"></script>

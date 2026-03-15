@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Nunito:wght@600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <script src="/shared/toast.js"></script>
   <script src="/shared/modern-navbar.js"></script>
   <script src="/shared/collection-utils.js"></script>
   <script src="/shared/user-selector.js"></script>
@@ -687,7 +688,6 @@
   </button>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
 
 <script>
 let currentCollection = [];
@@ -1339,20 +1339,6 @@ function viewOnMap(lat, lng) {
   if (!map) initMap();
   map.setCenter({ lat: parseFloat(lat), lng: parseFloat(lng) });
   map.setZoom(14);
-}
-
-function showToast(title, message, type) {
-  if (window.collectionUtils && window.collectionUtils.showToast) {
-    window.collectionUtils.showToast(title, message, type || 'info');
-    return;
-  }
-  const container = document.getElementById('toastContainer');
-  if (!container) return;
-  const toast = document.createElement('div');
-  toast.className = `toast ${type || 'info'}`;
-  toast.innerHTML = `<strong>${title}</strong><br>${message}`;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
 }
 
 function toggleDarkMode() {

@@ -8,6 +8,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="https://www.gstatic.com/knowledge/kgsearch/widget/1.0/widget.min.css"/>
 <link rel="stylesheet" href="/shared/styles.css"/>
+<link rel="stylesheet" href="/shared/collection-styles.css"/>
+<script src="/shared/toast.js"></script>
 <script src="/shared/modern-navbar.js"></script>
 <script src="/shared/music-mini-nav.js"></script>
 <!-- Google API for YouTube (client-side search) -->
@@ -510,9 +512,6 @@
   <div class="musical-note">♫</div>
   <div class="musical-note">♪</div>
 </div>
-
-<!-- Toast Container -->
-<div class="toast-container" id="toastContainer"></div>
 
 <!-- Modern Navbar Web Component -->
 <modern-navbar></modern-navbar>
@@ -1356,7 +1355,7 @@ function initializeKGWidget() {
                     const name = e.row.name.toLowerCase();
                     if (nonMusicianBlocklist.some(blocked => name.includes(blocked))) {
                       console.log('🚫 Blocked non-musician:', e.row.name);
-                      alert(`"${e.row.name}" is not a musician. Please search for music artists or bands.`);
+                      if (typeof showToast === 'function') showToast(`"${e.row.name}" is not a musician. Please search for music artists or bands.`, { type: 'warning' });
                       return;
                     }
                     
@@ -1449,25 +1448,9 @@ function renderCard(row) {
 
 
 function showVoiceNotification(message) {
-  // Create a temporary notification
-  const notification = document.createElement('div');
-  notification.className = 'alert alert-info alert-dismissible fade show position-fixed';
-  notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
-  notification.innerHTML = `
-    <i class="bi-mic"></i> ${message}
-    <button type="button" class="close" data-dismiss="alert">
-      <span>&times;</span>
-    </button>
-  `;
-  
-  document.body.appendChild(notification);
-  
-  // Auto-remove after 5 seconds
-  setTimeout(() => {
-    if (notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
-  }, 5000);
+  if (typeof window.showToast === 'function') {
+    window.showToast(message, { type: 'info', duration: 5000 });
+  }
 }
 
 function checkMode() {
@@ -1604,7 +1587,7 @@ function handleSearchKeypress(event) {
 function askChatGPT() {
   const question = document.getElementById('kgBand').value.trim();
   if (!question) {
-    alert('Please enter a question for ChatGPT');
+    if (typeof showToast === 'function') showToast('Please enter a question for ChatGPT', { type: 'warning' });
     return;
   }
   
@@ -1683,7 +1666,7 @@ function testVoiceCommand(command) {
 function testCustomVoiceCommand() {
   const command = document.getElementById('testVoiceInput').value.trim();
   if (!command) {
-    alert('Please enter a command to test');
+    if (typeof showToast === 'function') showToast('Please enter a command to test', { type: 'warning' });
     return;
   }
   
@@ -2206,7 +2189,7 @@ async function stopVoiceSystem() {
 function searchArtist() {
   const searchTerm = document.getElementById('kgBand').value.trim();
   if (!searchTerm) {
-    alert('Please enter an artist name to search');
+    if (typeof showToast === 'function') showToast('Please enter an artist name to search', { type: 'warning' });
     return;
   }
   
@@ -3248,63 +3231,6 @@ function initializeFallbackMap(artistName) {
       </div>
     </div>
   `;
-}
-
-// Toast notification system
-function showToast(type, title, message, duration = 5000) {
-  const toastContainer = document.getElementById('toastContainer');
-  if (!toastContainer) return;
-  
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  
-  const icons = {
-    success: 'bi-check-circle-fill',
-    info: 'bi-info-circle-fill',
-    warning: 'bi-exclamation-triangle-fill',
-    error: 'bi-x-circle-fill'
-  };
-  
-  const colors = {
-    success: '#28a745',
-    info: '#17a2b8',
-    warning: '#ffc107',
-    error: '#dc3545'
-  };
-  
-  toast.innerHTML = `
-    <div class="toast-header">
-      <i class="toast-icon ${icons[type]}" style="color: ${colors[type]}"></i>
-      <h6 class="toast-title">${title}</h6>
-      <button class="toast-close" onclick="closeToast(this)">&times;</button>
-    </div>
-    <div class="toast-body">${message}</div>
-  `;
-  
-  toastContainer.appendChild(toast);
-  
-  // Trigger animation
-  setTimeout(() => {
-    toast.classList.add('show');
-  }, 100);
-  
-  // Auto-remove
-  setTimeout(() => {
-    closeToast(toast.querySelector('.toast-close'));
-  }, duration);
-}
-
-// Close toast function
-function closeToast(closeBtn) {
-  const toast = closeBtn.closest('.toast');
-  if (toast) {
-    toast.classList.remove('show');
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.parentNode.removeChild(toast);
-      }
-    }, 300);
-  }
 }
 
 // Global function for Google Maps callback

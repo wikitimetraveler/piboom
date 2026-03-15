@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <script src="/shared/toast.js"></script>
   <script src="/shared/modern-navbar.js"></script>
   <script src="/shared/user-selector.js"></script>
   <style>
@@ -807,7 +809,7 @@ async function openCollectionPicker() {
     }
   } catch (error) {
     console.error('Error loading collection:', error);
-    alert('Error loading collection');
+    if (typeof showToast === 'function') showToast('Error loading collection', { type: 'error' });
   }
 }
 
@@ -875,7 +877,7 @@ function selectStyle(style) {
 // Generate poster
 async function generatePoster() {
   if (!selectedAlbum) {
-    alert('Please select an album first');
+    if (typeof showToast === 'function') showToast('Please select an album first', { type: 'warning' });
     return;
   }
 
@@ -926,7 +928,7 @@ async function generatePoster() {
       // Scroll to result
       document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
     } else {
-      alert('Error generating poster: ' + (data.error || 'Unknown error'));
+      if (typeof showToast === 'function') showToast('Error generating poster: ' + (data.error || 'Unknown error'), { type: 'error' });
     }
     
   } catch (error) {
@@ -957,7 +959,7 @@ function generateQrDataUrl(url) {
 async function generateTemplatePoster() {
   let imageUrl = uploadedImage;
   if (!imageUrl) {
-    alert('Template mode requires an album cover image. Please upload or select from collection.');
+    if (typeof showToast === 'function') showToast('Template mode requires an album cover image. Please upload or select from collection.', { type: 'warning' });
     return;
   }
   if (imageUrl.startsWith('data:')) {
@@ -1004,7 +1006,7 @@ async function generateTemplatePoster() {
   } catch (err) {
     console.error('Template poster error:', err);
     document.getElementById('loadingState').style.display = 'none';
-    alert('Error creating poster: ' + (err.message || 'Please try again.'));
+    if (typeof showToast === 'function') showToast('Error creating poster: ' + (err.message || 'Please try again.'), { type: 'error' });
   }
 }
 

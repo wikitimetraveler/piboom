@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap4.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/shared/collection-styles.css">
 
     <style>
         :root {
@@ -633,12 +634,7 @@
         </div>
     </nav>
 
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-        <div id="actionToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-body"></div>
-        </div>
-    </div>
-
+    <script src="/shared/toast.js"></script>
     <div class="main-content">
         <div class="container">
             <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
@@ -1072,34 +1068,6 @@
                 showToast('Error removing empty values: ' + error.message, 'error');
                 voiceController.speak('Error removing empty values');
             }
-        }
-
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('actionToast');
-            const toastBody = toast.querySelector('.toast-body');
-            
-            toastBody.textContent = message;
-            toast.classList.add('show');
-            
-            toast.classList.remove('bg-success', 'bg-warning', 'bg-danger', 'bg-info');
-            
-            switch(type) {
-                case 'success':
-                    toast.classList.add('bg-success');
-                    break;
-                case 'warning':
-                    toast.classList.add('bg-warning');
-                    break;
-                case 'error':
-                    toast.classList.add('bg-danger');
-                    break;
-                default:
-                    toast.classList.add('bg-info');
-            }
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
         }
 
         // Make voice controller globally accessible for debugging

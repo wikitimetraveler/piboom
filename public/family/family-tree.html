@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <script src="/shared/toast.js"></script>
   <script src="/shared/modern-navbar.js"></script>
   <style>
     body {
@@ -460,7 +462,7 @@
         })
         .catch(error => {
           console.error('Error loading family data:', error);
-          alert('Error loading family tree data. Please check your server connection.');
+          if (typeof showToast === 'function') showToast('Error loading family tree data', 'Please check your server connection.', 'error');
         });
     }
 
@@ -506,7 +508,7 @@
 
     function initVoiceControl() {
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert('Voice recognition not supported in this browser');
+        if (typeof showToast === 'function') showToast('Voice recognition not supported in this browser', { type: 'warning' });
         return;
       }
 

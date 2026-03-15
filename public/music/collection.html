@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <script src="/shared/toast.js"></script>
   <script src="/shared/modern-navbar.js"></script>
 <script src="/shared/collection-utils.js"></script>
 <script src="/shared/music-mini-nav.js"></script>
@@ -1238,7 +1239,7 @@ async function loadCollection() {
   } catch (error) {
     console.error('Error loading collection:', error);
     document.getElementById('loadingState').style.display = 'none';
-    alert('Failed to load collection. Please check your database connection.');
+    if (typeof showToast === 'function') showToast('Failed to load collection', 'Please check your database connection.', 'error');
   }
 }
 
@@ -1719,12 +1720,12 @@ async function editAlbum(id) {
   const albumUserId = album.user_id;
   
   if (!loggedInUserId) {
-    alert('Please login from the home page to edit albums!');
+    if (typeof showToast === 'function') showToast('Please login from the home page to edit albums!', { type: 'warning' });
     return;
   }
   
   if (loggedInUserId !== albumUserId) {
-    alert('You can only edit your own albums! This belongs to another user.');
+    if (typeof showToast === 'function') showToast('You can only edit your own albums! This belongs to another user.', { type: 'warning' });
     return;
   }
   
@@ -1861,12 +1862,12 @@ async function deleteAlbum(id, albumName, artistName) {
   const albumUserId = album.user_id;
   
   if (!loggedInUserId) {
-    alert('Please login from the home page to delete albums!');
+    if (typeof showToast === 'function') showToast('Please login from the home page to delete albums!', { type: 'warning' });
     return;
   }
   
   if (loggedInUserId !== albumUserId) {
-    alert('You can only delete your own albums! This belongs to another user.');
+    if (typeof showToast === 'function') showToast('You can only delete your own albums! This belongs to another user.', { type: 'warning' });
     return;
   }
   
@@ -1934,74 +1935,6 @@ async function confirmDelete() {
     deleteAlbumId = null;
     deleteAlbumInfo = null;
   }
-}
-
-// Toast notification system
-function showToast(title, message, type = 'info') {
-  if (window.collectionUtils && window.collectionUtils.showToast) {
-    window.collectionUtils.showToast(title, message, type, 5000);
-    return;
-  }
-  // Create toast container if it doesn't exist
-  let container = document.getElementById('toastContainer');
-  if (!container) {
-    container = document.createElement('div');
-    container.id = 'toastContainer';
-    container.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
-    document.body.appendChild(container);
-  }
-  
-  const toast = document.createElement('div');
-  toast.style.cssText = `
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    margin-bottom: 10px;
-    padding: 16px 20px;
-    transform: translateX(100%);
-    transition: all 0.3s ease;
-    opacity: 0;
-    border-left: 4px solid ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
-  `;
-  
-  const icons = {
-    success: 'bi-check-circle-fill',
-    error: 'bi-x-circle-fill',
-    info: 'bi-info-circle-fill'
-  };
-  
-  const colors = {
-    success: '#28a745',
-    error: '#dc3545',
-    info: '#17a2b8'
-  };
-  
-  toast.innerHTML = `
-    <div style="display: flex; align-items: flex-start; gap: 10px;">
-      <i class="bi ${icons[type]}" style="color: ${colors[type]}; font-size: 1.2rem;"></i>
-      <div style="flex: 1;">
-        <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
-        <div style="font-size: 0.9rem; color: #6c757d;">${message}</div>
-      </div>
-      <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #6c757d; cursor: pointer; font-size: 1.2rem; padding: 0;">&times;</button>
-    </div>
-  `;
-  
-  container.appendChild(toast);
-  
-  // Trigger animation
-  setTimeout(() => {
-    toast.style.transform = 'translateX(0)';
-    toast.style.opacity = '1';
-  }, 100);
-  
-  // Auto-remove after 5 seconds
-  setTimeout(() => {
-    toast.style.transform = 'translateX(100%)';
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 300);
-  }, 5000);
 }
 
 // Go to discovery page
@@ -2218,7 +2151,7 @@ window.addEventListener('DOMContentLoaded', () => {
       const lowerCommand = command.toLowerCase();
       if (lowerCommand.includes('show') || lowerCommand.includes('find') || lowerCommand.includes('search')) {
         // Extract artist/album name and trigger search
-        alert(`Voice command: "${command}"\n\nRedirecting to voice search...`);
+        if (typeof showToast === 'function') showToast(`Voice command: "${command}" - Redirecting to voice search...`, { type: 'info' });
         sessionStorage.setItem('voiceCommand', command);
         window.location.href = '/voice-dj.html';
       }
