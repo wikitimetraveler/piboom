@@ -2804,18 +2804,70 @@ function handleVoiceCommand(rawCommand = '') {
   speak('Command not recognized for Unit Tests');
 }
 
+function getSectionCardForCollapse(sectionId) {
+  const el = document.getElementById(sectionId);
+  if (!el) return null;
+  if (sectionId === 'collapseAIAssistant') return document.getElementById('aiAssistantCard');
+  return el.closest('.section-card');
+}
+
 function showAccordionSection(sectionId) {
   const section = document.getElementById(sectionId);
   if (!section) return;
-  const trigger = document.querySelector(`[data-target="#${sectionId}"]`);
-  if (trigger) {
-    trigger.setAttribute('aria-expanded', 'true');
-    trigger.classList.remove('collapsed');
-  }
+  if (section.classList.contains('show')) return; // already open
+  const card = getSectionCardForCollapse(sectionId);
+  if (card) card.classList.remove('section-card-hidden');
+  updateSectionHeaderState(sectionId, true);
   if (window.$ && typeof window.$.fn?.collapse === 'function') {
     window.$(section).collapse('show');
   } else {
     section.classList.add('show');
+  }
+}
+
+function toggleAccordionSection(sectionId) {
+  const section = document.getElementById(sectionId);
+  if (!section) return;
+  const card = getSectionCardForCollapse(sectionId);
+  const isExpanded = section.classList.contains('show');
+  if (isExpanded) {
+    updateSectionHeaderState(sectionId, false);
+    if (window.$ && typeof window.$.fn?.collapse === 'function') {
+      window.$(section).collapse('hide');
+      if (card) {
+        window.$(section).one('hidden.bs.collapse', function () {
+          card.classList.add('section-card-hidden');
+        });
+      }
+    } else {
+      section.classList.remove('show');
+      if (card) card.classList.add('section-card-hidden');
+    }
+  } else {
+    if (card) card.classList.remove('section-card-hidden');
+    updateSectionHeaderState(sectionId, true);
+    if (window.$ && typeof window.$.fn?.collapse === 'function') {
+      window.$(section).collapse('show');
+    } else {
+      section.classList.add('show');
+    }
+  }
+}
+
+function updateSectionHeaderState(sectionId, expanded) {
+  const trigger = document.querySelector(`[data-target="#${sectionId}"]`);
+  if (trigger) {
+    trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    trigger.classList.toggle('collapsed', !expanded);
+  }
+}
+
+function updateSectionSidebarActiveState(sectionId, isExpanded) {
+  const nav = document.getElementById('sectionSidebarNav');
+  if (!nav) return;
+  const link = nav.querySelector('a[data-target="' + sectionId + '"]');
+  if (link) {
+    link.classList.toggle('active-section', isExpanded);
   }
 }
 
@@ -3163,7 +3215,10 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
       html += `<div><strong>Color:</strong> ${swatch}<code>${escapeHtml(colorStr)}</code></div>`;
     }
     selectedFieldContent.innerHTML = html || '<span class="text-muted">No details</span>';
+    selectedFieldCard.classList.remove('section-card-hidden');
     selectedFieldCard.style.display = 'block';
+    const sidebarSelectedField = document.getElementById('sidebarSelectedField');
+    if (sidebarSelectedField) sidebarSelectedField.style.display = '';
     currentScenarioBuilderField = field;
     renderScenarioBuilder(field);
     if (collapseSelectedField && typeof window.$ !== 'undefined' && window.$.fn?.collapse) {
@@ -3173,6 +3228,8 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
     }
   } else if (selectedFieldCard) {
     selectedFieldCard.style.display = 'none';
+    const sidebarSelectedField = document.getElementById('sidebarSelectedField');
+    if (sidebarSelectedField) sidebarSelectedField.style.display = 'none';
     currentScenarioBuilderField = null;
     const builderContainer = document.getElementById('liveScenarioBuilderContainer');
     if (builderContainer) builderContainer.style.display = 'none';
@@ -3742,6 +3799,76 @@ function initializeGenerateFromBRRule() {
   });
 }
 
+function initializeSectionSidebar() {
+  const nav = document.getElementById('sectionSidebarNav');
+  if (!nav) return;
+
+  // On load: hide all section cards and collapse all sections (nothing visible until sidebar is used)
+  var sectionIds = ['collapseAIAssistant', 'collapseTestLibrary', 'collapseOverallSignOff', 'collapseTestScenarios', 'collapseSelectedField', 'collapseTestGrid', 'collapseUnitTestData'];
+  sectionIds.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.classList.remove('show');
+      if (window.$ && typeof window.$.fn?.collapse === 'function') {
+        try { window.$(el).collapse('hide'); } catch (_) {}
+      }
+    }
+    var card = getSectionCardForCollapse(id);
+    if (card) card.classList.add('section-card-hidden');
+  });
+  var sidebarNav = document.getElementById('sectionSidebarNav');
+  if (sidebarNav) {
+    sidebarNav.querySelectorAll('.active-section').forEach(function (a) { a.classList.remove('active-section'); });
+  }
+  if (typeof history !== 'undefined' && history.replaceState && location.hash) {
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
+  // Sidebar click: toggle section visibility (multiple sections can stay open)
+  nav.addEventListener('click', function (e) {
+    const link = e.target.closest('a[data-target], a[data-action]');
+    if (!link) return;
+    e.preventDefault();
+    const action = link.getAttribute('data-action');
+    if (action === 'voice-help') {
+      if (typeof toggleVoiceHelp === 'function') toggleVoiceHelp(true);
+      return;
+    }
+    const target = link.getAttribute('data-target');
+    if (target && typeof toggleAccordionSection === 'function') {
+      toggleAccordionSection(target);
+      const heading = document.getElementById(link.getAttribute('data-heading'));
+      if (heading) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            heading.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          });
+        });
+      }
+    }
+  });
+
+  // Sync sidebar active state when sections expand/collapse (from header clicks, voice, or sidebar)
+  var sectionIds = ['collapseAIAssistant', 'collapseTestLibrary', 'collapseOverallSignOff', 'collapseTestScenarios', 'collapseSelectedField', 'collapseTestGrid', 'collapseUnitTestData'];
+  sectionIds.forEach(function (id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    if (window.$ && typeof window.$.fn?.on === 'function') {
+      window.$(el).on('shown.bs.collapse', function () {
+        updateSectionSidebarActiveState(id, true);
+      }).on('hidden.bs.collapse', function () {
+        updateSectionSidebarActiveState(id, false);
+      });
+    } else {
+      // Fallback: use MutationObserver or check on next tick after manual class toggle
+      var observer = new MutationObserver(function () {
+        updateSectionSidebarActiveState(id, el.classList.contains('show'));
+      });
+      observer.observe(el, { attributes: true, attributeFilter: ['class'] });
+    }
+  });
+}
+
 // Initialize grid on load
 document.addEventListener('DOMContentLoaded', () => {
   initializeGrid();
@@ -3749,6 +3876,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeScanSetFields();
   initializeGenerateFromCustomField();
   initializeGenerateFromBRRule();
+  initializeSectionSidebar();
   updateLoanGuidChipDisplay(currentLoanGuid);
   renderRecentRunsSelect();
   loadTestLibrary();

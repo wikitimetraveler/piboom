@@ -76,6 +76,10 @@ const quickActionsHTML = `
     transform: rotate(45deg);
   }
   
+  .fab-main.active:hover {
+    transform: rotate(45deg) scale(1.1);
+  }
+  
   .fab-actions {
     position: absolute;
     bottom: 70px;
@@ -85,13 +89,14 @@ const quickActionsHTML = `
     gap: 12px;
     opacity: 0;
     pointer-events: none;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateZ(0);
+    will-change: opacity;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .fab-actions.show {
     opacity: 1;
     pointer-events: all;
-    bottom: 75px;
   }
   
   .fab-action {
@@ -103,18 +108,43 @@ const quickActionsHTML = `
     color: #667eea;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.2rem;
     position: relative;
+    opacity: 0;
+    transform: translateY(10px) scale(0.94);
+    transform-origin: center center;
+    backface-visibility: hidden;
+    transition: opacity 0.38s cubic-bezier(0.34, 1.15, 0.64, 1),
+                transform 0.42s cubic-bezier(0.34, 1.15, 0.64, 1),
+                background 0.22s ease,
+                color 0.22s ease,
+                box-shadow 0.22s ease;
   }
+  
+  .fab-actions.show .fab-action {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  
+  .fab-actions.show .fab-action:nth-child(1) { transition-delay: 0ms; }
+  .fab-actions.show .fab-action:nth-child(2) { transition-delay: 45ms; }
+  .fab-actions.show .fab-action:nth-child(3) { transition-delay: 90ms; }
+  .fab-actions.show .fab-action:nth-child(4) { transition-delay: 135ms; }
+  .fab-actions.show .fab-action:nth-child(5) { transition-delay: 180ms; }
+  
+  .fab-action:nth-child(1) { transition-delay: 0ms; }
+  .fab-action:nth-child(2) { transition-delay: 30ms; }
+  .fab-action:nth-child(3) { transition-delay: 60ms; }
+  .fab-action:nth-child(4) { transition-delay: 90ms; }
+  .fab-action:nth-child(5) { transition-delay: 120ms; }
   
   .fab-action:hover {
     background: linear-gradient(135deg, #667eea, #764ba2);
     color: white;
-    transform: scale(1.1);
+    transform: translateY(0) scale(1.1);
   }
   
   .fab-action-label {

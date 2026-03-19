@@ -59,6 +59,10 @@
     let expr = expression.trim();
     if (!expr) return null;
 
+    // Pre-pass: resolve VB date functions (Month, Day, Year, Now, Today) while
+    // field values are still date strings — must happen before numeric substitution.
+    expr = evaluateDatePrePass(expr, values);
+
     // Replace each [fieldId] with the value (use getFieldValue for consistent lookup)
     const fieldRefs = [...expr.matchAll(/\[([^\]]+)\]/g)];
     for (let i = 0; i < fieldRefs.length; i++) {
@@ -74,8 +78,12 @@
       expr = expr.replace(m[0], replacement);
     }
 
-    // Sanitize: only allow digits, decimals, + - * / ( ) and spaces
-    if (!/^[\d\s+\-*/().]+$/.test(expr)) {
+    // Preprocess Encompass built-in functions (Diff, Sum, Avg, Round, Abs, Max, Min)
+    expr = preprocessEncompassFunctions(expr);
+
+    // Sanitize: allow digits, arithmetic ops (including % from Mod), parens, and Math.* calls
+    const sanitizeExpr = expr.replace(/\bMath\.(abs|max|min|round|pow|floor|ceil|sqrt|trunc)\b/g, '');
+    if (!/^[\d\s+\-*/().%]+$/.test(sanitizeExpr)) {
       return null;
     }
 
@@ -398,6 +406,12 @@
       });
     }
 
+    // IsEmpty([field]) / Not IsEmpty([field]) — VB empty/null check
+    const isEmptyRe = /(Not\s+)?IsEmpty\s*\(\s*\[([^\]]+)\]\s*\)/gi;
+    while ((m = isEmptyRe.exec(conditionString)) !== null) {
+      results.push({ type: 'isEmpty', fieldId: m[2].trim(), negated: !!m[1] });
+    }
+
     return results;
   }
 
@@ -416,6 +430,23 @@
       if (Number.isFinite(value)) {
         results.push({ fieldId: m[1].trim(), op: m[2], value });
       }
+    }
+    return results;
+  }
+
+  /**
+   * Extract field-to-field comparisons: [field1] op [field2].
+   * Supports numeric, date, and string values — comparison type is inferred at runtime.
+   * @param {string} conditionString - e.g. "[@L244] <> [@L245]"
+   * @returns {Array<{ field1: string, op: string, field2: string }>}
+   */
+  function extractFieldToFieldComparisons(conditionString) {
+    if (!conditionString || typeof conditionString !== 'string') return [];
+    const results = [];
+    const re = /\[([^\]]+)\]\s*(<=|>=|<>|<|>|=)\s*\[([^\]]+)\]/g;
+    let m;
+    while ((m = re.exec(conditionString)) !== null) {
+      results.push({ field1: m[1].trim(), op: m[2], field2: m[3].trim() });
     }
     return results;
   }
@@ -675,6 +706,12 @@
         if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
           suggested[norm] = cv.negated ? 'Y' : '';
         }
+      } else if (cv.type === 'isEmpty') {
+        const norm = normalizeFieldIdForLookup(cv.fieldId);
+        if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
+          // IsEmpty condition true: suggest empty; Not IsEmpty: suggest a value
+          suggested[norm] = cv.negated ? 'Y' : '';
+        }
       }
     }
     return suggested;
@@ -779,6 +816,96 @@
   }
 
   /**
+   * Extract positive numeric literals (not inside [...]) from an expression.
+   * Used to seed suggested values for pure-calc (non-IIf) formulas.
+   * @param {string} expression - e.g. "Diff([CX.BASELINELOCKEDAMT], 50000)"
+   * @returns {number[]}
+   */
+  function extractNumericLiterals(expression) {
+    if (!expression || typeof expression !== 'string') return [];
+    const cleaned = expression.replace(/\[[^\]]+\]/g, '');
+    const matches = cleaned.match(/\b\d+(?:\.\d+)?\b/g) || [];
+    return matches.map(Number).filter((n) => Number.isFinite(n) && n > 0);
+  }
+
+  /**
+   * Pre-pass: resolve VB date-extraction functions BEFORE [field] refs are cast to numbers.
+   * Must run while field values are still date strings.
+   * Handles: Month(), Day(), Year(), Now(), Today() — including nested Month(Now()).
+   * @param {string} expr - raw expression
+   * @param {Record<string, string|number>} values - fieldId -> value
+   * @returns {string} - expression with date functions replaced by their numeric results
+   */
+  function evaluateDatePrePass(expr, values) {
+    if (!expr || typeof expr !== 'string') return expr;
+    let e = expr;
+
+    // Replace Now() and Today() with today's date string so Month(Now()) etc. resolve
+    const todayStr = formatDateWithOffset(0);
+    e = e.replace(/\bNow\s*\(\s*\)/gi, '"' + todayStr + '"');
+    e = e.replace(/\bToday\s*\(\s*\)/gi, '"' + todayStr + '"');
+
+    const resolveArg = (fieldId, literal) =>
+      fieldId !== undefined ? String(getFieldValue(fieldId.trim(), values)) : (literal !== undefined ? literal : '');
+
+    for (let pass = 0; pass < 3; pass++) {
+      const prev = e;
+      e = e.replace(/\bMonth\s*\(\s*(?:\[([^\]]+)\]|"([^"]*)")\s*\)/gi, (_, fid, lit) => {
+        const d = new Date(resolveArg(fid, lit));
+        return Number.isNaN(d.getTime()) ? '0' : String(d.getMonth() + 1);
+      });
+      e = e.replace(/\bDay\s*\(\s*(?:\[([^\]]+)\]|"([^"]*)")\s*\)/gi, (_, fid, lit) => {
+        const d = new Date(resolveArg(fid, lit));
+        return Number.isNaN(d.getTime()) ? '0' : String(d.getDate());
+      });
+      e = e.replace(/\bYear\s*\(\s*(?:\[([^\]]+)\]|"([^"]*)")\s*\)/gi, (_, fid, lit) => {
+        const d = new Date(resolveArg(fid, lit));
+        return Number.isNaN(d.getTime()) ? '0' : String(d.getFullYear());
+      });
+      if (e === prev) break;
+    }
+    return e;
+  }
+
+  /**
+   * Preprocess Encompass/VB built-in function calls into JS equivalents.
+   * Runs multiple passes to handle lightly-nested calls.
+   * Numeric:  Diff, Abs, Max, Min, Round, Sum, Avg, Int, Fix, Sqr
+   * Operator: VB Mod → JS %
+   * @param {string} expr - expression (after [field] refs substituted with numbers)
+   * @returns {string}
+   */
+  function preprocessEncompassFunctions(expr) {
+    if (!expr || typeof expr !== 'string') return expr;
+    let e = expr;
+    for (let pass = 0; pass < 4; pass++) {
+      const prev = e;
+      // Numeric / math
+      e = e.replace(/\bAbs\s*\(([^()]+)\)/gi, 'Math.abs($1)');
+      e = e.replace(/\bMax\s*\(([^()]+)\)/gi, 'Math.max($1)');
+      e = e.replace(/\bMin\s*\(([^()]+)\)/gi, 'Math.min($1)');
+      e = e.replace(/\bSqr\s*\(([^()]+)\)/gi, 'Math.sqrt($1)');
+      // VB Int(n) rounds toward -Infinity (same as Math.floor for positive numbers)
+      e = e.replace(/\bInt\s*\(([^()]+)\)/gi, 'Math.floor($1)');
+      // VB Fix(n) truncates toward zero
+      e = e.replace(/\bFix\s*\(([^()]+)\)/gi, 'Math.trunc($1)');
+      e = e.replace(/\bDiff\s*\(([^(),]+),\s*([^()]+)\)/gi, 'Math.abs(($1)-($2))');
+      e = e.replace(/\bRound\s*\(([^(),]+),\s*([^()]+)\)/gi, '(Math.round(($1)*Math.pow(10,($2)))/Math.pow(10,($2)))');
+      e = e.replace(/\bSum\s*\(([^()]+)\)/gi, (_, args) =>
+        '(' + args.split(',').map((a) => '(' + a.trim() + ')').join('+') + ')'
+      );
+      e = e.replace(/\bAvg\s*\(([^()]+)\)/gi, (_, args) => {
+        const parts = args.split(',');
+        return '((' + parts.map((a) => '(' + a.trim() + ')').join('+') + ')/' + parts.length + ')';
+      });
+      // VB Mod operator → JS %
+      e = e.replace(/\bMod\b/gi, '%');
+      if (e === prev) break;
+    }
+    return e;
+  }
+
+  /**
    * Format date as MM/DD/YYYY with optional day offset from today.
    * @param {number} daysOffset - e.g. -2, 0, 2
    * @returns {string}
@@ -856,6 +983,68 @@
   }
 
   /**
+   * Extract the number of decimal places from an Encompass format string.
+   * e.g. "#,##0.00" → 2, "#,##0.000%" → 3, "Percent" → 3, "#,##0" → 0, "" → null
+   * @param {string} format
+   * @returns {number|null} - decimal places, or null if format is unknown/not applicable
+   */
+  function getDecimalPlacesFromFormat(format) {
+    if (!format || typeof format !== 'string') return null;
+    const f = format.trim();
+    if (/^percent$/i.test(f)) return 3;
+    if (/^currency$/i.test(f)) return 2;
+    const m = f.match(/0\.(\d+)%?$/);
+    if (m) return m[1].length;
+    if (/^#[,#0]+$/.test(f)) return 0;
+    return null;
+  }
+
+  /**
+   * True if a fieldMetadata dataType string represents a non-numeric type
+   * (date, string, Y/N, boolean) that should not receive numeric pure-calc suggestions.
+   * @param {string} dataType
+   * @returns {boolean}
+   */
+  function isNonNumericDataType(dataType) {
+    if (!dataType || typeof dataType !== 'string') return false;
+    const t = dataType.toLowerCase().trim();
+    return t === 'string' || t === 'date' || t === 'datetime' || t === 'yn' ||
+           t === 'boolean' || t === 'yesno' || t === 'y/n';
+  }
+
+  /**
+   * Build suggested input-value maps for a pure-calc (non-IIf) formula.
+   * Uses numeric literals found in the expression as a base, then varies across scenarios.
+   * Skips fields whose metadata declares a non-numeric type (Date, String, Y/N).
+   * @param {string} expression - e.g. "Diff([CX.BASELINELOCKEDAMT], 50000)"
+   * @param {string[]} inputFields - field IDs referenced in expression
+   * @param {number} scenarioCount - number of test columns to generate
+   * @param {Record<string, { dataType: string, format: string }>} [fieldMetadata]
+   * @returns {Array<Record<string, number>>} - one value-map per scenario
+   */
+  function buildPureCalcSuggestions(expression, inputFields, scenarioCount, fieldMetadata) {
+    const literals = extractNumericLiterals(expression);
+    const multipliers = [1, 1.5, 0.5, 2, 0];
+    const result = [];
+    for (let idx = 0; idx < scenarioCount; idx++) {
+      const m = multipliers[idx % multipliers.length];
+      const vals = {};
+      for (let k = 0; k < inputFields.length; k++) {
+        const displayId = normalizeFieldIdForLookup(inputFields[k]);
+        // Skip fields declared as non-numeric (date, string, Y/N, etc.)
+        const meta = fieldMetadata && (fieldMetadata[displayId] || fieldMetadata[inputFields[k]]);
+        if (meta && isNonNumericDataType(meta.dataType)) continue;
+        // Also skip by notation — @ prefix means date field
+        if (isDateFieldByNotation(inputFields[k])) continue;
+        const base = literals.length > k ? literals[k] : (literals[0] || 100);
+        vals[displayId] = Math.round(base * m * 100) / 100;
+      }
+      result.push(vals);
+    }
+    return result;
+  }
+
+  /**
    * Generate unit test rows from a custom field with a calculation.
    * @param {object} customField - { id, fieldId, calculation, calculationExpression, ... }
    * @param {object} [options] - optional { fieldMetadata: Record<fieldId, {dataType, format, description}> }
@@ -916,6 +1105,13 @@
     if (scenarios) scenarios = expandOrElseScenarios(scenarios);
     const maxScenarios = 20;
     const scenarioCount = Math.min(Math.max(5, (scenarios && scenarios.length) || 0), maxScenarios);
+
+    // For pure-calc formulas (no IIf) that contain numeric literals (e.g. Diff([CX.X], 50000)),
+    // seed suggested input values and auto-evaluate the COMPARE row.
+    // Skip when no literals are found so date-field heuristics (CX.SUNRISE.*) still apply.
+    const pureCalcSuggested = (!scenarios && inputFields.length > 0 && extractNumericLiterals(expression).length > 0)
+      ? buildPureCalcSuggestions(expression, inputFields, scenarioCount, fieldMetadata)
+      : null;
     const headers = ['Step', 'Action', 'Target', 'Description', 'Test 1'];
     for (let i = 2; i <= scenarioCount; i++) {
       headers.push('Test ' + i);
@@ -943,6 +1139,9 @@
 
     const scenarioList = scenarios ? scenarios.slice(0, scenarioCount) : [];
 
+    // Track SET values per scenario so COMPARE can auto-evaluate for pure-calc formulas
+    const scenarioInputValues = Array.from({ length: scenarioCount }, () => ({}));
+
     // SET rows: all input fields first
     for (let k = 0; k < inputFields.length; k++) {
       const inputField = inputFields[k];
@@ -960,11 +1159,23 @@
         const s = scenarioList[idx];
         const suggested = s ? getSuggestedValuesForScenario(s, inputFields, { fieldMetadata, scenarioIndex: idx, allScenarios: scenarioList }) : {};
         let val = suggested[displayId];
-        if ((val === undefined || val === '') && isSunriseField(displayId)) {
-          const daysOffset = idx - Math.floor((scenarioCount - 1) / 2);
-          val = formatDateWithOffset(daysOffset);
+        // Pure-calc numeric suggestions (e.g. Diff([CX.X], 50000))
+        if ((val === undefined || val === '') && pureCalcSuggested && pureCalcSuggested[idx]) {
+          const pcVal = pureCalcSuggested[idx][displayId];
+          if (pcVal !== undefined) val = pcVal;
         }
-        setRow['Test ' + (idx + 1)] = val !== undefined && val !== '' ? String(val) : '';
+        // Date suggestions: CX.SUNRISE.* fields
+        if ((val === undefined || val === '') && isSunriseField(displayId)) {
+          val = formatDateWithOffset(idx - Math.floor((scenarioCount - 1) / 2));
+        }
+        // Date suggestions: any @ date-notation field (e.g. @3570) used in Month/Day/Year calcs
+        if ((val === undefined || val === '') && isDateFieldByNotation(inputField)) {
+          val = formatDateWithOffset(idx - Math.floor((scenarioCount - 1) / 2));
+        }
+        const strVal = val !== undefined && val !== '' ? String(val) : '';
+        setRow['Test ' + (idx + 1)] = strVal;
+        // Track for COMPARE auto-evaluation
+        if (strVal !== '') scenarioInputValues[idx][displayId] = strVal;
       }
       rows.push(setRow);
       step++;
@@ -1012,6 +1223,7 @@
       const s = scenarioList[idx];
       let suggested = '';
       if (s && s.result) {
+        // IIf scenario: use result field or literal
         const resultField = extractSingleResultField(s.result);
         const literalResult = extractLiteralResult(s.result);
         if (resultField && isInInputFields(resultField, inputFields)) {
@@ -1019,8 +1231,21 @@
           const val = suggestedMap[resultField];
           suggested = val !== undefined && val !== '' ? String(val) : '';
         } else if (literalResult !== null) {
-          // String/Date/Y-N literal result (e.g. "AltPropTax(F)" or "") — use as-is per output field dataType
           suggested = literalResult;
+        }
+      } else if (!s && Object.keys(scenarioInputValues[idx]).length > 0) {
+        // Pure-calc (no IIf): evaluate expression with tracked SET values.
+        // Covers numeric calcs (Diff, Round, …) AND date-extraction calcs (Month, Day, Year).
+        const evalResult = evaluateExpression(expression, scenarioInputValues[idx]);
+        if (evalResult !== null && evalResult !== undefined) {
+          const fmt = (outMeta && outMeta.format) || outMetaFromField.format || '';
+          const dp = getDecimalPlacesFromFormat(fmt);
+          const num = typeof evalResult === 'number' ? evalResult : parseFloat(String(evalResult));
+          if (Number.isFinite(num) && dp !== null) {
+            suggested = num.toFixed(dp);
+          } else {
+            suggested = String(evalResult);
+          }
         }
       }
       compareRow['Test ' + (idx + 1)] = suggested;
@@ -1175,6 +1400,39 @@
       return true;
     }
 
+    // Field-to-field comparisons: [field1] op [field2]
+    // (must come before string comparisons so date fields are handled correctly)
+    const fieldComps = extractFieldToFieldComparisons(c);
+    if (fieldComps.length > 0) {
+      for (let i = 0; i < fieldComps.length; i++) {
+        const fc = fieldComps[i];
+        const raw1 = String(getFieldValue(fc.field1, values) ?? '').trim();
+        const raw2 = String(getFieldValue(fc.field2, values) ?? '').trim();
+        const n1 = parseFloat(raw1);
+        const n2 = parseFloat(raw2);
+        if (Number.isFinite(n1) && Number.isFinite(n2)) {
+          if (!applyNumericComparison(fc.op, n1, n2)) return false;
+        } else {
+          // Try date comparison
+          const d1 = new Date(raw1);
+          const d2 = new Date(raw2);
+          if (!Number.isNaN(d1.getTime()) && !Number.isNaN(d2.getTime())) {
+            if (!applyNumericComparison(fc.op, d1.getTime(), d2.getTime())) return false;
+          } else {
+            // String comparison
+            const cmp = raw1 < raw2 ? -1 : raw1 > raw2 ? 1 : 0;
+            if (fc.op === '=' && cmp !== 0) return false;
+            if (fc.op === '<>' && cmp === 0) return false;
+            if (fc.op === '<' && cmp >= 0) return false;
+            if (fc.op === '>' && cmp <= 0) return false;
+            if (fc.op === '<=' && cmp > 0) return false;
+            if (fc.op === '>=' && cmp < 0) return false;
+          }
+        }
+      }
+      return true;
+    }
+
     const strComps = extractStringComparisons(c);
     if (strComps.length > 0) {
       for (let i = 0; i < strComps.length; i++) {
@@ -1206,6 +1464,11 @@
         const val = String(getFieldValue(cv.fieldId, values) ?? '').trim();
         const isEmpty = val === '';
         if (cv.negated ? isEmpty : !isEmpty) return false;
+      } else if (cv.type === 'isEmpty') {
+        const val = String(getFieldValue(cv.fieldId, values) ?? '').trim();
+        const empty = val === '';
+        // IsEmpty → true when field is empty; Not IsEmpty → true when field has a value
+        if (cv.negated ? empty : !empty) return false;
       } else if (cv.type === 'dateDiff') {
         const v1 = String(getFieldValue(cv.field1, values) ?? '');
         const v2 = String(getFieldValue(cv.field2, values) ?? '');
@@ -1220,7 +1483,117 @@
   }
 
   /**
-   * Evaluate a full condition (supports AndAlso, OrElse).
+   * Split a condition by top-level OrElse/Or (no AndAlso suffix redistribution).
+   * Respects paren depth and quotes. Used for correct VB precedence in evaluation.
+   * OrElse/Or has lower precedence than AndAlso/And.
+   * @param {string} condition
+   * @returns {string[]}
+   */
+  function splitTopLevelOrElse(condition) {
+    if (!condition || typeof condition !== 'string') return [condition || ''];
+    const str = condition.trim();
+    if (!str) return [str];
+    const orElseRe = /^\s+OrElse\s+/i;
+    const orOnlyRe = /^\s+Or\b\s*/i;
+    let minDepth = -1;
+    let depth = 0;
+    let inQuote = false;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      if (ch === '"' && (i === 0 || str[i - 1] !== '\\')) inQuote = !inQuote;
+      if (!inQuote) {
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        else {
+          const chunk = str.substring(i);
+          const mo = orElseRe.test(chunk);
+          const mo2 = !mo && orOnlyRe.test(chunk);
+          if ((mo || mo2) && (minDepth < 0 || depth < minDepth)) minDepth = depth;
+        }
+      }
+    }
+    if (minDepth < 0) return [str];
+    const parts = [];
+    depth = 0; inQuote = false;
+    let current = '';
+    let i = 0;
+    while (i < str.length) {
+      const ch = str[i];
+      if (ch === '"' && (i === 0 || str[i - 1] !== '\\')) { inQuote = !inQuote; current += ch; i++; continue; }
+      if (!inQuote) {
+        if (ch === '(') { depth++; current += ch; i++; continue; }
+        if (ch === ')') { depth--; current += ch; i++; continue; }
+        if (depth === minDepth) {
+          const chunk = str.substring(i);
+          const moe = chunk.match(/^(\s+OrElse\s+)/i);
+          const mo = !moe && chunk.match(/^(\s+Or\b\s*)/i);
+          const match = moe || mo;
+          if (match) { parts.push(current.trim()); current = ''; i += match[1].length; continue; }
+        }
+      }
+      current += ch; i++;
+    }
+    if (current.trim()) parts.push(current.trim());
+    return parts.length > 1 ? parts : [str];
+  }
+
+  /**
+   * Split a condition by top-level AndAlso/And.
+   * Respects paren depth and quotes. AndAlso has higher precedence than OrElse.
+   * @param {string} condition
+   * @returns {string[]}
+   */
+  function splitTopLevelAndAlso(condition) {
+    if (!condition || typeof condition !== 'string') return [condition || ''];
+    const str = condition.trim();
+    if (!str) return [str];
+    const andAlsoRe = /^\s+AndAlso\s+/i;
+    const andOnlyRe = /^\s+And\b\s*/i;
+    let minDepth = -1;
+    let depth = 0;
+    let inQuote = false;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      if (ch === '"' && (i === 0 || str[i - 1] !== '\\')) inQuote = !inQuote;
+      if (!inQuote) {
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        else {
+          const chunk = str.substring(i);
+          const ma = andAlsoRe.test(chunk);
+          const ma2 = !ma && andOnlyRe.test(chunk);
+          if ((ma || ma2) && (minDepth < 0 || depth < minDepth)) minDepth = depth;
+        }
+      }
+    }
+    if (minDepth < 0) return [str];
+    const parts = [];
+    depth = 0; inQuote = false;
+    let current = '';
+    let i = 0;
+    while (i < str.length) {
+      const ch = str[i];
+      if (ch === '"' && (i === 0 || str[i - 1] !== '\\')) { inQuote = !inQuote; current += ch; i++; continue; }
+      if (!inQuote) {
+        if (ch === '(') { depth++; current += ch; i++; continue; }
+        if (ch === ')') { depth--; current += ch; i++; continue; }
+        if (depth === minDepth) {
+          const chunk = str.substring(i);
+          const mae = chunk.match(/^(\s+AndAlso\s+)/i);
+          const ma = !mae && chunk.match(/^(\s+And\b\s*)/i);
+          const match = mae || ma;
+          if (match) { parts.push(current.trim()); current = ''; i += match[1].length; continue; }
+        }
+      }
+      current += ch; i++;
+    }
+    if (current.trim()) parts.push(current.trim());
+    return parts.length > 1 ? parts : [str];
+  }
+
+  /**
+   * Evaluate a full condition (supports AndAlso, OrElse) with correct VB precedence.
+   * AndAlso/And binds tighter than OrElse/Or.
    * @param {string} condition - e.g. "[353] <= 200 AndAlso [19] = \"Y\""
    * @param {Record<string, string|number>} values
    * @returns {boolean}
@@ -1230,14 +1603,16 @@
     const c = condition.trim();
     if (!c) return false;
 
-    const orParts = splitOrElseBranches(c);
+    // OrElse/Or — lowest precedence, split first
+    const orParts = splitTopLevelOrElse(c);
     if (orParts.length > 1) {
       return orParts.some((p) => evaluateCondition(p, values));
     }
 
-    const andMatch = c.match(/^(.+?)\s+(?:AndAlso|And)\s+(.+)$/i);
-    if (andMatch) {
-      return evaluateCondition(andMatch[1].trim(), values) && evaluateCondition(andMatch[2].trim(), values);
+    // AndAlso/And — higher precedence
+    const andParts = splitTopLevelAndAlso(c);
+    if (andParts.length > 1) {
+      return andParts.every((p) => evaluateCondition(p, values));
     }
 
     return evaluateAtomicCondition(c, values);
@@ -1342,6 +1717,14 @@
 
   global.customFieldCalcParser = {
     parseCalculationFormula: parseCalculationFormula,
+    preprocessEncompassFunctions: preprocessEncompassFunctions,
+    extractNumericLiterals: extractNumericLiterals,
+    evaluateDatePrePass: evaluateDatePrePass,
+    extractFieldToFieldComparisons: extractFieldToFieldComparisons,
+    splitTopLevelOrElse: splitTopLevelOrElse,
+    splitTopLevelAndAlso: splitTopLevelAndAlso,
+    getDecimalPlacesFromFormat: getDecimalPlacesFromFormat,
+    isNonNumericDataType: isNonNumericDataType,
     splitByTopLevelAmpersand: splitByTopLevelAmpersand,
     parseIIfScenarios: parseIIfScenarios,
     parseAllIIfScenarios: parseAllIIfScenarios,

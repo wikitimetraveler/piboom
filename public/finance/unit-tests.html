@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
     <link rel="stylesheet" href="/shared/collection-styles.css" />
+    <script src="/shared/menu-config.js"></script>
     <style>
       :root {
         --zen-primary: #4a90a4;
@@ -801,43 +802,32 @@
         border: 1px solid rgba(255, 193, 7, 0.3);
       }
 
-      /* Tool switcher pills - exact copy from tool4 */
+      /* Switch tools - always visible pills */
       .tool-pills {
         background: var(--white);
         border: 1px solid var(--border-light);
         border-radius: 12px;
-        padding: 0.85rem 1rem;
-        margin-bottom: 1.5rem;
+        padding: 0.75rem 1rem;
         box-shadow: var(--shadow-sm);
       }
       .tool-pills .nav {
-        flex-wrap: nowrap;
-        margin-left: auto;
+        flex-wrap: wrap;
+        gap: 0.25rem;
       }
       .tool-pills .nav-link {
-        border: 1px solid var(--border-light);
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: var(--text-dark);
-        background: var(--background-light);
-        padding: 0.3rem 0.65rem;
-        margin: 0.15rem 0.2rem 0.15rem 0;
+        color: var(--text-muted);
+        font-weight: 500;
+        padding: 0.4rem 0.75rem;
+        border-radius: 8px;
         transition: all 0.2s ease;
-        white-space: nowrap;
       }
       .tool-pills .nav-link:hover {
-        background: var(--ice-light);
-        border-color: var(--primary-blue);
         color: var(--primary-blue);
-        box-shadow: var(--shadow-sm);
-        transform: translateY(-1px);
+        background: var(--ice-light);
       }
       .tool-pills .nav-link.active {
         background: var(--primary-blue);
-        border-color: var(--primary-blue);
-        color: #fff;
-        box-shadow: var(--shadow-md);
+        color: var(--white);
       }
 
       .overall-signoff-grid {
@@ -1104,13 +1094,50 @@
         gap: 1rem;
       }
 
+      /* Section cards hidden until opened via sidebar menu - smooth transitions */
+      .section-card-hidden {
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+        border-width: 0 !important;
+        pointer-events: none;
+        visibility: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    margin 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .section-cards .section-card-hidden {
+        margin-top: -1rem !important;
+        margin-bottom: -1rem !important;
+      }
+
+      .section-card,
+      #aiAssistantCard {
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                    margin 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                    box-shadow 0.25s ease,
+                    border-color 0.25s ease;
+      }
+
+      .section-card:not(.section-card-hidden),
+      #aiAssistantCard:not(.section-card-hidden) {
+        max-height: 1200px;
+        opacity: 1;
+        visibility: visible;
+      }
+
       .section-card {
         background: var(--zen-card-bg);
         border: 1px solid var(--zen-border);
         border-radius: 14px;
         box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
         overflow: hidden;
-        transition: box-shadow 0.2s ease, border-color 0.2s ease;
       }
 
       .section-card:hover {
@@ -1126,7 +1153,8 @@
         background: rgba(74, 144, 164, 0.06);
         border-bottom: 1px solid transparent;
         cursor: pointer;
-        transition: background 0.2s ease;
+        transition: background 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+                    border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         user-select: none;
       }
 
@@ -1543,6 +1571,91 @@
         word-break: break-all;
       }
 
+      /* Section sidebar nav - compact vertical nav for sections */
+      .unit-tests-layout {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+      }
+      .section-sidebar {
+        flex: 0 0 200px;
+        position: sticky;
+        top: 90px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        background: var(--zen-card-bg);
+        border: 1px solid var(--zen-border);
+        border-radius: 12px;
+        padding: 0.75rem;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+      }
+      .section-sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      .section-sidebar-nav li {
+        margin-bottom: 0.25rem;
+      }
+      .section-sidebar-nav a {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.65rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                    color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .section-sidebar-nav a:hover {
+        background: rgba(74, 144, 164, 0.1);
+        color: var(--zen-primary);
+      }
+      .section-sidebar-nav a.active-section {
+        background: rgba(74, 144, 164, 0.12);
+        color: var(--zen-primary);
+        font-weight: 600;
+      }
+      .section-sidebar-nav a i {
+        font-size: 1rem;
+        opacity: 0.85;
+      }
+      .section-sidebar-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        color: var(--zen-muted);
+        text-transform: uppercase;
+        padding: 0.5rem 0.65rem 0.25rem;
+        margin-bottom: 0.25rem;
+      }
+      .section-content-area {
+        flex: 1;
+        min-width: 0;
+      }
+      @media (max-width: 991px) {
+        .unit-tests-layout {
+          flex-direction: column;
+        }
+        .section-sidebar {
+          flex: none;
+          width: 100%;
+          max-height: none;
+          position: static;
+        }
+        .section-sidebar-nav {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+        .section-sidebar-nav li {
+          margin-bottom: 0;
+        }
+      }
+
       /* Live Scenario Builder */
       .scenario-builder-grid-wrapper {
         max-height: 280px;
@@ -1694,6 +1807,13 @@
       body.unit-tests-night-theme .badge-light{background:#6b7280!important;color:#f9fafb!important;border-color:#9ca3af!important}
       body.unit-tests-night-theme .scenario-builder-grid th{background:#6b7280!important;color:#f9fafb!important}
       body.unit-tests-night-theme .scenario-builder-result-display{background:rgba(255,255,255,0.08)!important;color:#f3f4f6!important}
+      body.unit-tests-night-theme .section-sidebar{background:#4b5563!important;border-color:#6b7280!important}
+      body.unit-tests-night-theme .section-sidebar-nav a{color:#9ca3af!important}
+      body.unit-tests-night-theme .section-sidebar-nav a:hover{background:#6b7280!important;color:#38bdf8!important}
+      body.unit-tests-night-theme .section-sidebar-nav a.active-section{background:rgba(56,189,248,0.2)!important;color:#38bdf8!important}
+      body.unit-tests-night-theme .tools-dropdown .dropdown-menu,body.unit-tests-night-theme .action-dropdown .dropdown-menu{background:#4b5563!important;border:1px solid #6b7280!important}
+      body.unit-tests-night-theme .tools-dropdown .dropdown-item,body.unit-tests-night-theme .action-dropdown .dropdown-item{color:#f9fafb!important}
+      body.unit-tests-night-theme .tools-dropdown .dropdown-item:hover,body.unit-tests-night-theme .action-dropdown .dropdown-item:hover{background:#6b7280!important;color:#38bdf8!important}
     </style>
   </head>
   <body data-page="unit-tests">
@@ -1715,7 +1835,8 @@
 
     <div class="main-content">
       <div class="container">
-        <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
+        <!-- Switch tools - always visible pills -->
+        <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between mb-3">
           <div class="d-flex align-items-center mb-2 mb-lg-0 text-muted">
             <i class="bi-grid-3x3-gap-fill text-primary mr-2"></i>
             <span class="font-weight-bold">Switch tools</span>
@@ -1732,7 +1853,7 @@
           </ul>
         </div>
 
-        <!-- Compact title + actions bar (matches tool4 density) -->
+        <!-- Excel Unit Tests - always visible title + action buttons -->
         <div class="d-flex justify-content-between align-items-center py-2 flex-wrap">
           <h5 class="mb-0 font-weight-600"><i class="bi-file-earmark-spreadsheet mr-2"></i>Excel Unit Tests</h5>
           <div class="d-flex flex-wrap" style="gap: 0.5rem;">
@@ -1894,8 +2015,25 @@
 
     <main class="container-fluid pb-3 px-4">
       <div class="row">
+        <div class="col-12">
+          <div class="unit-tests-layout">
+            <!-- Section sidebar nav -->
+            <nav class="section-sidebar" aria-label="Section navigation">
+              <div class="section-sidebar-title">Sections</div>
+              <ul class="section-sidebar-nav" id="sectionSidebarNav">
+                <li><a href="#collapseAIAssistant" data-target="collapseAIAssistant" data-heading="headingAIAssistant"><i class="bi-robot"></i> AI Assistant</a></li>
+                <li><a href="#collapseTestLibrary" data-target="collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
+                <li><a href="#collapseOverallSignOff" data-target="collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-check2-all"></i> Test Sign-off</a></li>
+                <li><a href="#collapseTestScenarios" data-target="collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-list-check"></i> Test Scenarios</a></li>
+                <li><a href="#collapseSelectedField" data-target="collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-field"></i> Selected Field</a></li>
+                <li><a href="#collapseTestGrid" data-target="collapseTestGrid" data-heading="headingTestGrid"><i class="bi-table"></i> Test Grid</a></li>
+                <li><a href="#collapseUnitTestData" data-target="collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-database"></i> Unit Test Data</a></li>
+                <li><a href="#" id="sidebarVoiceShortcuts" data-action="voice-help"><i class="bi-mic"></i> Voice Shortcuts</a></li>
+              </ul>
+            </nav>
+            <div class="section-content-area">
         <!-- AI Assistant - at top for easy access -->
-        <div class="col-12 mb-4" id="aiAssistantCard" style="display: none;">
+        <div class="col-12 mb-4 section-card-hidden" id="aiAssistantCard">
           <div class="section-card">
             <div class="section-card-header collapsed" id="headingAIAssistant" role="button" data-toggle="collapse" data-target="#collapseAIAssistant" aria-expanded="false" aria-controls="collapseAIAssistant">
               <span class="section-title"><i class="bi-robot"></i> Encompass Unit Testing AI Assistant</span>
@@ -1937,7 +2075,7 @@
         <div class="col-12 mb-4" id="accordionContainer">
           <div class="section-cards" id="testAccordion">
             <!-- Test Library -->
-            <div class="section-card">
+            <div class="section-card section-card-hidden" data-collapse-target="collapseTestLibrary">
               <div class="section-card-header collapsed" id="headingTestLibrary" role="button" data-toggle="collapse" data-target="#collapseTestLibrary" aria-expanded="false" aria-controls="collapseTestLibrary">
                 <span class="section-title"><i class="bi-folder2-open"></i> Test Library</span>
                 <i class="bi-chevron-down"></i>
@@ -1961,7 +2099,7 @@
               </div>
             </div>
             <!-- Overall Test Sign-off -->
-            <div class="section-card">
+            <div class="section-card section-card-hidden" data-collapse-target="collapseOverallSignOff">
               <div class="section-card-header collapsed" id="headingOverallSignOff" role="button" data-toggle="collapse" data-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
                 <span class="section-title"><i class="bi-check2-all"></i> Test Sign-off <span class="badge badge-success ml-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
                 <i class="bi-chevron-down"></i>
@@ -1972,7 +2110,7 @@
               </div>
             </div>
             <!-- Test Scenarios -->
-            <div class="section-card">
+            <div class="section-card section-card-hidden" data-collapse-target="collapseTestScenarios">
               <div class="section-card-header collapsed" id="headingTestScenarios" role="button" data-toggle="collapse" data-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
                 <span class="section-title"><i class="bi-list-check"></i> Test Scenarios <span class="badge badge-primary ml-2" id="testScenariosCount"></span></span>
                 <i class="bi-chevron-down"></i>
@@ -1983,7 +2121,7 @@
               </div>
             </div>
             <!-- Selected Field (when generated from custom field) -->
-            <div class="section-card" id="selectedFieldAccordionCard" style="display: none;">
+            <div class="section-card section-card-hidden" id="selectedFieldAccordionCard" data-collapse-target="collapseSelectedField" style="display: none;">
               <div class="section-card-header collapsed" id="headingSelectedField" role="button" data-toggle="collapse" data-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
                 <span class="section-title"><i class="bi-field"></i> Selected Field</span>
                 <i class="bi-chevron-down"></i>
@@ -2017,7 +2155,7 @@
               </div>
             </div>
             <!-- Test Grid -->
-            <div class="section-card">
+            <div class="section-card section-card-hidden" data-collapse-target="collapseTestGrid">
               <div class="section-card-header collapsed" id="headingTestGrid" role="button" data-toggle="collapse" data-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
                 <span class="section-title"><i class="bi-table"></i> Test Grid <span class="badge badge-info ml-2" id="testGridCount"></span></span>
                 <i class="bi-chevron-down"></i>
@@ -2033,13 +2171,13 @@
                       </div>
               </div>
             </div>
-            <!-- Unit Test Data (bottom) - default open -->
-            <div class="section-card">
-              <div class="section-card-header" id="headingUnitTestData" role="button" data-toggle="collapse" data-target="#collapseUnitTestData" aria-expanded="true" aria-controls="collapseUnitTestData">
+            <!-- Unit Test Data (bottom) - collapsed by default -->
+            <div class="section-card section-card-hidden" data-collapse-target="collapseUnitTestData">
+              <div class="section-card-header collapsed" id="headingUnitTestData" role="button" data-toggle="collapse" data-target="#collapseUnitTestData" aria-expanded="false" aria-controls="collapseUnitTestData">
                 <span class="section-title"><i class="bi-database"></i> Unit Test Data</span>
                 <i class="bi-chevron-down"></i>
               </div>
-              <div id="collapseUnitTestData" class="collapse show section-card-body" aria-labelledby="headingUnitTestData">
+              <div id="collapseUnitTestData" class="collapse section-card-body" aria-labelledby="headingUnitTestData">
                       <!-- Wrapper keeps file info + action bar together so they are not overwritten by test results below -->
                       <div class="unit-test-data-header" id="unitTestDataHeader">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -2127,6 +2265,9 @@
             </div>
           </div>
         </div>
+            </div><!-- /section-content-area -->
+          </div><!-- /unit-tests-layout -->
+        </div>
       </div>
     </main>
 
@@ -2210,9 +2351,12 @@
     <script>
       (function() {
         var current = window.location.pathname.split('/').pop();
-        document.querySelectorAll('#toolPillNav .nav-link').forEach(function(link) {
-          var target = (link.getAttribute('href') || '').split('/').pop();
-          if (target === current) { link.classList.add('active'); link.setAttribute('aria-current', 'page'); }
+        document.querySelectorAll('#toolsDropdownMenu .dropdown-item').forEach(function(link) {
+          var href = link.getAttribute('href');
+          if (!href || href === '#') return;
+          var target = href.split('/').pop();
+          link.classList.toggle('active', target === current);
+          link.setAttribute('aria-current', target === current ? 'page' : null);
         });
       })();
     </script>
