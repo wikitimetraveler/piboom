@@ -2,7 +2,7 @@
 
 All API routes are mounted under `/api`. Base URL examples assume `http://localhost:3000` or your `RENDER_EXTERNAL_URL`.
 
-## Finance & Encompass
+## Worksheets & Encompass
 
 | Method | Path | Description |
 |--------|------|-------------|

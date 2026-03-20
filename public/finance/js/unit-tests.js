@@ -581,11 +581,12 @@ function generateColumnDefs(headers, rows) {
               : { dataType: 'Date', format: '', description: 'Date (from @)' };
           }
         }
-        // Fallback: parse Description for (DateTime) or (Date) or datetime/date keywords
+        // Fallback: only explicit (Date) / (DateTime) tags in Description — avoid matching the word "date"
+        // elsewhere (misleading) which forced DatePicker and cleared non-date text input.
         if (!meta && params.data && params.data.Description) {
           const desc = String(params.data.Description || '').toLowerCase();
-          if (desc.includes('(datetime)') || /\bdatetime\b/.test(desc)) meta = { dataType: 'DateTime', format: '', description: 'DateTime (from Description)' };
-          else if (desc.includes('(date)') || /\bdate\b/.test(desc)) meta = { dataType: 'Date', format: '', description: 'Date (from Description)' };
+          if (desc.includes('(datetime)')) meta = { dataType: 'DateTime', format: '', description: 'DateTime (from Description)' };
+          else if (desc.includes('(date)')) meta = { dataType: 'Date', format: '', description: 'Date (from Description)' };
         }
         const dt = (meta && meta.dataType) ? String(meta.dataType).toLowerCase() : '';
         if (meta && Array.isArray(meta.options) && meta.options.length > 0) {
@@ -594,10 +595,12 @@ function generateColumnDefs(headers, rows) {
         if (/integer/i.test(dt)) {
           return { component: 'agNumberCellEditor', params: { precision: 0, step: 1 } };
         }
-        if (/decimal|number/i.test(dt) || (meta?.format && String(meta.format).toLowerCase().includes('decimal'))) {
+        // Number editor only when dataType says numeric — not from format strings (too many false positives).
+        if (/decimal|number/i.test(dt)) {
           return { component: 'agNumberCellEditor', params: { precision: 2 } };
         }
-        if (/date|datetime/i.test(dt) || (meta?.format && String(meta.format).toLowerCase().includes('date'))) {
+        // Date editor only from explicit dataType or @ / field-id inference above — not from loose format match.
+        if (/date|datetime/i.test(dt)) {
           const isDateTime = /datetime/i.test(dt);
           return {
             component: 'DatePickerCellEditor',
@@ -623,30 +626,29 @@ function generateColumnDefs(headers, rows) {
         return cls;
       };
       
-      // Detect value types and style accordingly
+      // Show values plainly — no green/red Y/N badges (misleading vs pass/fail cell shading).
       colDef.cellRenderer = (params) => {
         if (!params.value || params.value === '' || params.value === null || params.value === undefined) {
           return '<span class="text-muted">—</span>';
         }
         
         const value = String(params.value).trim();
-        const valueLower = value.toLowerCase();
+        const esc = escapeHtml(value);
         
-        // Boolean/Yes-No values (Y/N, Yes/No, True/False)
-        if (valueLower === 'y' || valueLower === 'yes' || valueLower === 'true' || value === '1') {
-          return '<span class="test-value-badge test-value-yes">Y</span>';
-        }
-        if (valueLower === 'n' || valueLower === 'no' || valueLower === 'false' || value === '0') {
-          return '<span class="test-value-badge test-value-no">N</span>';
-        }
-        
-        // Numeric values (like IDs: 2518608430, 1765780087)
+        // Numeric values (like IDs) — subtle monospace; Y/N use same neutral text as other strings
         if (/^\d+$/.test(value)) {
-          return `<span class="test-value-numeric" title="Numeric ID: ${value}">${value}</span>`;
+          return `<span class="test-value-numeric" title="Numeric: ${esc}">${esc}</span>`;
         }
         
-        // Text values (like "FHLMC Conf Fixed 30 Buydown")
-        return `<span class="test-value-text" title="Test value for Set operation">${value}</span>`;
+        return `<span class="test-value-text" title="Test value">${esc}</span>`;
+      };
+
+      // If the editor returns undefined (cancel / invalid), keep prior value; null clears to empty string.
+      colDef.valueSetter = (params) => {
+        const field = params.colDef.field;
+        if (params.newValue === undefined) return false;
+        params.data[field] = params.newValue === null ? '' : params.newValue;
+        return true;
       };
       
       // Tooltip to indicate these are test values (all editable; Target column is overwritten by API)
@@ -2911,9 +2913,10 @@ let currentScenarioBuilderField = null;
 /**
  * Get metadata for a field (from currentFieldMetadata or infer from ID).
  * @param {string} fieldId - e.g. "353", "@353", "CX.TEST"
+ * @param {{ expression?: string }|null} [opts] - when expression contains DateDiff([a],[b]), those fields use Date inputs
  * @returns {{ dataType?: string, options?: string[] }|null}
  */
-function getScenarioBuilderFieldMeta(fieldId) {
+function getScenarioBuilderFieldMeta(fieldId, opts) {
   const norm = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(fieldId) || String(fieldId || '').replace(/^[@#]+/, '');
   let meta = (currentFieldMetadata && currentFieldMetadata[norm]) || (currentFieldMetadata && currentFieldMetadata[fieldId]);
   if (!meta && fieldId && window.customFieldCalcParser?.inferDateTypeFromFieldId) {
@@ -2925,6 +2928,18 @@ function getScenarioBuilderFieldMeta(fieldId) {
   if (!meta && fieldId && window.customFieldCalcParser?.isNumberFieldByNotation?.(fieldId)) {
     meta = { dataType: 'Decimal', format: '', description: 'Number (from #)' };
   }
+  const expr = opts && opts.expression ? String(opts.expression) : '';
+  if (expr && window.customFieldCalcParser?.collectDateDiffFieldIdsFromExpression) {
+    const dateIds = window.customFieldCalcParser.collectDateDiffFieldIdsFromExpression(expr);
+    if (dateIds.includes(norm) || dateIds.includes(String(fieldId || '').trim())) {
+      meta = {
+        ...(meta || {}),
+        dataType: 'Date',
+        format: meta && meta.format != null ? meta.format : '',
+        description: (meta && meta.description) ? meta.description : 'Date (DateDiff operand)',
+      };
+    }
+  }
   return meta || null;
 }
 
@@ -2933,10 +2948,11 @@ function getScenarioBuilderFieldMeta(fieldId) {
  * @param {string} fieldId
  * @param {string} initialValue
  * @param {string} dataAttr - data attribute for lookup
+ * @param {{ expression?: string }|null} [opts] - passed to metadata (DateDiff operands → date picker)
  * @returns {HTMLInputElement|HTMLSelectElement}
  */
-function createScenarioBuilderInput(fieldId, initialValue, dataAttr) {
-  const meta = getScenarioBuilderFieldMeta(fieldId);
+function createScenarioBuilderInput(fieldId, initialValue, dataAttr, opts) {
+  const meta = getScenarioBuilderFieldMeta(fieldId, opts);
   const dt = (meta && meta.dataType) ? String(meta.dataType).toLowerCase() : '';
   const val = initialValue !== undefined && initialValue !== null ? String(initialValue) : '';
 
@@ -3018,7 +3034,15 @@ function getScenarioBuilderValues() {
     const norm = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(fid) || fid.replace(/^[@#]+/, '');
     const raw = el.getAttribute('data-field-id-raw');
     let v = el.value;
-    if (el.type === 'number') v = el.value === '' ? '' : parseFloat(el.value);
+    if (el.type === 'number') {
+      if (el.value === '') v = '';
+      // Mis-typed metadata can mark dates as number; parseFloat("09/19/2020") === 9 and breaks DateDiff
+      else if (/\d{1,2}\/\d{1,2}\/\d{4}/.test(el.value) || /^\d{4}-\d{2}-\d{2}/.test(el.value)) v = el.value;
+      else {
+        const n = parseFloat(el.value);
+        v = Number.isFinite(n) ? n : el.value;
+      }
+    }
     values[norm] = v;
     values[fid] = v;
     if (raw && raw !== fid) values[raw] = v;
@@ -3115,7 +3139,7 @@ function renderScenarioBuilder(field) {
     tr.appendChild(tdId);
     const tdVal = document.createElement('td');
     tdVal.className = 'value-cell';
-    const input = createScenarioBuilderInput(fid, initialVal, displayId);
+    const input = createScenarioBuilderInput(fid, initialVal, displayId, { expression: calc });
     input.setAttribute('data-field-id-raw', fid);
     const onChange = () => runScenarioCalculation();
     input.addEventListener('input', onChange);

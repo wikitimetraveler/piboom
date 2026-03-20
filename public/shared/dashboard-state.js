@@ -1,6 +1,8 @@
 /**
  * Command Center dashboard state manager.
  * Stores recent tools, last actions, favorites, and resume state in localStorage.
+ * All data is scoped per signed-in user (loggedInUserId). When not logged in,
+ * falls back to currentUserId (e.g. from user-selector) or 'anon'.
  */
 (function (global) {
   'use strict';
@@ -18,11 +20,17 @@
     favorites: 50
   };
 
+  /**
+   * Returns the user scope for dashboard persistence.
+   * Prefers loggedInUserId (authenticated user) so dashboard items persist per signed-in user.
+   * Never uses currentUserId when logged in (that may be "viewing as" from user-selector).
+   */
   function getUserScope() {
     try {
       const loggedIn = localStorage.getItem('loggedInUserId');
+      if (loggedIn && String(loggedIn).trim()) return String(loggedIn).trim();
       const current = localStorage.getItem('currentUserId');
-      const userId = String(loggedIn || current || 'anon').trim();
+      const userId = String(current || 'anon').trim();
       return userId || 'anon';
     } catch (_) {
       return 'anon';

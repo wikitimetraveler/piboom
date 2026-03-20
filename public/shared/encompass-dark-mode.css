@@ -408,14 +408,6 @@
 .encompass-dark-mode .ag-theme-alpine .test-value-text {
   color: #e6edf3 !important;
 }
-.encompass-dark-mode .ag-theme-alpine .test-value-badge.test-value-yes {
-  background: rgba(46, 204, 113, 0.2);
-  color: #3fb950;
-}
-.encompass-dark-mode .ag-theme-alpine .test-value-badge.test-value-no {
-  background: rgba(248, 81, 73, 0.2);
-  color: #f85149;
-}
 .encompass-dark-mode .ag-theme-alpine .ag-pinned-left-header,
 .encompass-dark-mode .ag-theme-alpine .ag-pinned-right-header,
 .encompass-dark-mode .ag-theme-alpine .ag-center-cols-viewport,

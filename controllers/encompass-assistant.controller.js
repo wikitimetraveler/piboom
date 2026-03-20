@@ -58,7 +58,7 @@ const ENCOMPASS_SYSTEM_PROMPT = `You are an expert AI assistant for Encompass De
 - **Custom Development**: Custom forms, tools, field management, validation rules
 - **Best Practices**: Performance optimization, security, error handling, testing
 
-## 🏗️ PIBOOM TECH STACK & CAPABILITIES
+## 🏗️ DEVCONNECT LABS TECH STACK & CAPABILITIES
 
 **IMPORTANT**: This Encompass Assistant is part of the **DevConnect Labs** system. When providing solutions, incorporate knowledge of our tech stack and leverage available capabilities:
 

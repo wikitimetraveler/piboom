@@ -429,10 +429,12 @@ export async function ingestFirmsNrt() {
   const feats = (geo && geo.features) ? geo.features : [];
   
   // Filter configuration for significant fires
-  const MIN_BRIGHTNESS = 300; // Kelvin - lowered to capture more fires (VIIRS typical range ~300-500K)
-  const MIN_CONFIDENCE = 'nominal'; // 'low', 'nominal', 'high' - only nominal or high
-  const CLUSTER_RADIUS_KM = 5; // km - fires within this radius are considered a cluster
-  const MIN_CLUSTER_SIZE = 1; // Allow single fires (was 2 - too strict when no major fires)
+  const MIN_BRIGHTNESS = parseInt(process.env.FIRMS_MIN_BRIGHTNESS || '330', 10) || 330;
+  const MIN_CONFIDENCE = String(process.env.FIRMS_MIN_CONFIDENCE || 'nominal').toLowerCase().trim(); // nominal|high
+  const CLUSTER_RADIUS_KM = parseFloat(process.env.FIRMS_CLUSTER_RADIUS_KM || '5') || 5; // km - fires within this radius are considered a cluster
+  const MIN_CLUSTER_SIZE = parseInt(process.env.FIRMS_MIN_CLUSTER_SIZE || '2', 10) || 2;
+  const confidenceRank = { low: 0, nominal: 1, high: 2 };
+  const minConfidenceRank = confidenceRank[MIN_CONFIDENCE] ?? confidenceRank.nominal;
   
   // First pass: filter by confidence and brightness
   const significantFires = [];
@@ -451,8 +453,9 @@ export async function ingestFirmsNrt() {
     const brightness = props.brightness ? parseFloat(props.brightness) : null;
     const confidence = (props.confidence || '').toLowerCase().trim();
     
-    // Filter by confidence (skip 'low' confidence fires)
-    if (confidence === 'low') {
+    // Filter by confidence (explicit threshold: nominal+ or high-only)
+    const confRank = confidenceRank[confidence] ?? -1;
+    if (confRank < minConfidenceRank) {
       filteredByConfidence++;
       continue;
     }
@@ -489,7 +492,7 @@ export async function ingestFirmsNrt() {
   }
   
   console.log(`🔥 FIRMS: Filtered ${feats.length} detections:`);
-  console.log(`   - ${filteredByConfidence} filtered by low confidence`);
+  console.log(`   - ${filteredByConfidence} filtered by confidence < ${MIN_CONFIDENCE}`);
   console.log(`   - ${filteredByBrightness} filtered by brightness < ${MIN_BRIGHTNESS}K`);
   console.log(`   - ${significantFires.length} significant fires remaining`);
   

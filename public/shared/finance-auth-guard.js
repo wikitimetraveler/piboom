@@ -51,7 +51,7 @@
       <div style="max-width: 520px; width: 100%; background: #ffffff; border-radius: 20px; padding: 28px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;">
         <div style="font-size: 2rem; margin-bottom: 12px;">🔒</div>
         <h2 style="margin: 0 0 8px; color: #1f2a44; font-size: 1.4rem;">Login Required</h2>
-        <p style="margin: 0 0 20px; color: #556070;">Finance and Encompass tools are locked until you log in.</p>
+        <p style="margin: 0 0 20px; color: #556070;">Worksheets and Encompass tools are locked until you log in.</p>
         <button id="financeAuthLoginBtn" style="background: #4a90a4; color: #fff; border: none; border-radius: 12px; padding: 12px 18px; font-weight: 600; cursor: pointer; width: 100%;">
           Log In to Continue
         </button>

@@ -194,7 +194,10 @@ function submitLogin() {
     // Close modal
     closeLoginPopup();
     
-    // Reload page to show logged-in state
+    // Notify listeners (navbar, dashboard) before reload
+    window.dispatchEvent(new CustomEvent('user-logged-in', { detail: { userId: selectedLoginUserId } }));
+    
+    // Reload page to show logged-in state and refresh dashboard per user
     window.location.reload();
   } else {
     // Wrong password

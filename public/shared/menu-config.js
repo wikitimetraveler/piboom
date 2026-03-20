@@ -9,7 +9,7 @@
   /** Home page domain tiles. demoOnly: true = shown only in demo mode (?demo=1) */
   const DOMAIN_TILES = [
     { href: '/music/music-research.html', icon: 'bi-music-note-beamed', label: 'Music', domain: 'music', title: 'Music research, albums, Spotify, song ID', demoOnly: false },
-    { href: '/finance/index.html', icon: 'bi-bank', label: 'Finance', domain: 'finance', title: 'Encompass, calculators, unit tests', demoOnly: true },
+    { href: '/finance/index.html', icon: 'bi-bank', label: 'Worksheets', domain: 'finance', title: 'Worksheets — Encompass, calculators, unit tests', demoOnly: true },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', domain: 'encompass', title: 'Encompass Hub, pipeline, loan APIs', demoOnly: true },
     { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, field guide', demoOnly: false },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike', domain: 'bike', title: 'Bike shop, peloton, discover', demoOnly: false },
@@ -19,19 +19,19 @@
     { href: '/family/genealogy.html', icon: 'bi-people-fill', label: 'Family', domain: 'family', title: 'Family tree', demoOnly: false },
   ];
 
-  /** Navbar Finance dropdown items */
+  /** Navbar Worksheets dropdown items (URLs under /finance/) */
   const NAV_FINANCE = [
-    { href: '/finance/index.html', icon: 'bi-calculator', label: 'Finance Hub' },
+    { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
     { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests' },
     { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test' },
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk' },
     { divider: true },
-    { href: '/finance/index.html', icon: 'bi-grid-3x3-gap', label: 'All Finance Tools' },
+    { href: '/finance/index.html', icon: 'bi-grid-3x3-gap', label: 'All Worksheets Tools' },
   ];
 
-  /** Navbar Encompass dropdown items (under Finance or standalone) */
+  /** Navbar Encompass dropdown items (under Worksheets or standalone) */
   const NAV_ENCOMPASS = [
     { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
@@ -57,6 +57,10 @@
     { href: '/music/song-identifier.html', icon: 'bi-soundwave', label: 'Song Identifier' },
     { href: '/music/spotify-dashboard.html', icon: 'bi-spotify', label: 'Spotify' },
     { href: '/music/music-time-machine.html', icon: 'bi-clock-history', label: 'Time Machine' },
+    { href: '/music/kml-viewer.html', icon: 'bi-globe2', label: 'KML Timeline' },
+    { href: '/music/musical-google-earth-files.html', icon: 'bi-cloud-arrow-down', label: 'Google Earth KML' },
+    { href: '/music/my-grateful-dead-shows.html', icon: 'bi-calendar-event', label: 'Grateful Dead Shows' },
+    { href: '/music/sample-detector.html', icon: 'bi-magnet', label: 'Sample Detector' },
     { divider: true },
     { href: '/#headingMusic', icon: 'bi-grid-3x3-gap', label: 'All Music Tools' },
   ];
@@ -89,7 +93,7 @@
     { href: '/', icon: 'bi-house', label: 'Hub (All Tools)' },
   ];
 
-  /** Finance hub tool grid (calculators + disasters only) */
+  /** Worksheets hub tool grid (calculators + disasters only) */
   const FINANCE_TOOLS = [
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', title: 'Encompass Hub, pipeline, loan APIs' },
     { href: '/finance/fha-streamline-calculator.html', icon: 'bi-calculator', label: 'FHA Streamline', title: 'FHA Streamline refinance calculator' },
@@ -107,7 +111,7 @@
 
   /** Encompass hub tool grid (Encompass Assistant, pipeline, fields, tools) */
   const ENCOMPASS_TOOLS = [
-    { href: '/finance/index.html', icon: 'bi-calculator', label: 'Finance Hub', title: 'Finance Hub, calculators, disasters' },
+    { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub', title: 'Worksheets Hub, calculators, disasters' },
     { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub', title: 'Encompass Hub' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant' },
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk', title: 'Pipeline Risk Dashboard' },
@@ -152,6 +156,10 @@
     { href: '/music/song-identifier.html', icon: 'bi-music-note-beamed', label: 'Song ID', title: 'Identify songs' },
     { href: '/music/spotify-dashboard.html', icon: 'bi-spotify', label: 'Spotify', title: 'Spotify dashboard' },
     { href: '/music/music-time-machine.html', icon: 'bi-clock-history', label: 'Time Machine', title: 'Music time machine' },
+    { href: '/music/kml-viewer.html', icon: 'bi-globe2', label: 'KML Timeline', title: 'Upload or load KML, map timeline, YouTube' },
+    { href: '/music/musical-google-earth-files.html', icon: 'bi-cloud-arrow-down', label: 'Google Earth KML', title: 'Network links and downloads for Google Earth Pro' },
+    { href: '/music/my-grateful-dead-shows.html', icon: 'bi-calendar-event', label: 'Grateful Dead Shows', title: 'Grateful Dead show archive' },
+    { href: '/music/sample-detector.html', icon: 'bi-magnet', label: 'Sample Detector', title: 'Detect samples and covers' },
   ];
 
   /** Get home domain tiles, optionally filtered for demo mode */
@@ -190,7 +198,7 @@
   function getAllTools(demoMode) {
     const groups = [
       { items: getDomainTiles(demoMode), category: 'Domain' },
-      { items: FINANCE_TOOLS, category: 'Finance' },
+      { items: FINANCE_TOOLS, category: 'Worksheets' },
       { items: ENCOMPASS_TOOLS, category: 'Encompass' },
       { items: NATURE_TOOLS, category: 'Nature' },
       { items: BIKE_TOOLS, category: 'Bike' },

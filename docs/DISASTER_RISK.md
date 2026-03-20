@@ -92,7 +92,7 @@ npm run refresh-disasters
 Cron example (6 AM daily):
 
 ```
-0 6 * * * cd /path/to/piBoom && npm run refresh-disasters
+0 6 * * * cd /path/to/your-project && npm run refresh-disasters
 ```
 
 ## Related

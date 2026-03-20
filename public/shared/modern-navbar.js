@@ -426,10 +426,10 @@ class ModernNavbar extends HTMLElement {
                 </a>
               </li>
 
-              <!-- Finance Dropdown (Hub + Essentials) -->
+              <!-- Worksheets dropdown (Hub + essentials; /finance/ URLs) -->
               <li class="nav-item dropdown" id="navFinanceDropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Finance menu">
-                  <i class="bi-bank"></i> Finance
+                <a class="nav-link dropdown-toggle" href="#" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Worksheets menu">
+                  <i class="bi-bank"></i> Worksheets
                 </a>
                 <div class="dropdown-menu">
                   ${this.renderDropdownItems(navFinance)}

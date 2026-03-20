@@ -69,3 +69,116 @@ describe('Full IIf formula evaluation', () => {
     expect(result).toBe('Yes');
   });
 });
+
+/**
+ * NQM eligibility formula: TPO.X88 <> Y AndAlso (AUS Jumbo | NQM Expanded | NQM DSCR | Jumbo | Express)
+ * with Not [CX.SUB.NQM.*].contains("ND") checks.
+ */
+const NQM_IIF = `IIf(
+  [TPO.X88] <> "Y"  
+  AndAlso
+  (
+    (
+      (
+        [1401].contains ( "AUS Jumbo" )
+        OrElse [2866].contains ( "AUS Jumbo" )
+      )
+      AndAlso Not [CX.SUB.NQM.EXPRESS].contains ( "ND" )
+    )
+    OrElse
+    (
+      (
+        [1401].contains ( "NQM Expanded" )
+        OrElse [2866].contains ( "NQM Expanded" )
+      )
+      AndAlso Not [CX.SUB.NQM.EXPANDED].contains ( "ND" )
+    )
+    OrElse
+    (
+      (
+        [1401].contains ( "NQM DSCR" )
+        OrElse [2866].contains ( "NQM DSCR" )
+      )
+      AndAlso Not [CX.SUB.NQM.DSCR].contains ( "ND" )
+    )
+    OrElse
+    (
+      (
+        [1401].contains ( "Jumbo" ) AndAlso Not( [1401].contains ( "AUS" ))
+        OrElse ([2866].contains ( "Jumbo" ) AndAlso Not([2866].contains("AUS" )))
+      )
+      AndAlso Not [CX.SUB.NQM.JUMBO].contains ( "ND" )
+    )
+    OrElse
+    (
+      (
+        [1401].contains ( "Express" ) AndAlso Not( [1401].contains ( "AUS" ))
+        OrElse ([2866].contains ( "Express" ) AndAlso Not([2866].contains("AUS" )))
+      )
+      AndAlso Not [CX.SUB.NQM.EXPRESS].contains ( "ND" )
+    )
+  )
+  ,
+  "Y",
+  "N"
+)`;
+
+describe('NQM IIf formula (Not contains, corrected Express block)', () => {
+  test('returns N when TPO.X88 is Y', () => {
+    const values = {
+      'TPO.X88': 'Y',
+      '1401': 'AUS Jumbo',
+      '2866': '',
+      'CX.SUB.NQM.EXPRESS': '',
+    };
+    expect(evaluateExpression(NQM_IIF, values)).toBe('N');
+  });
+
+  test('returns Y when 1401 has AUS Jumbo and CX.SUB.NQM.EXPRESS does not contain ND', () => {
+    const values = {
+      'TPO.X88': 'N',
+      '1401': 'AUS Jumbo',
+      '2866': '',
+      'CX.SUB.NQM.EXPRESS': 'Approved',
+    };
+    expect(evaluateExpression(NQM_IIF, values)).toBe('Y');
+  });
+
+  test('returns N when 1401 has AUS Jumbo but CX.SUB.NQM.EXPRESS contains ND', () => {
+    const values = {
+      'TPO.X88': 'N',
+      '1401': 'AUS Jumbo',
+      '2866': '',
+      'CX.SUB.NQM.EXPRESS': 'ND',
+    };
+    expect(evaluateExpression(NQM_IIF, values)).toBe('N');
+  });
+
+  test('returns Y when 2866 has Express (not AUS) and CX.SUB.NQM.EXPRESS does not contain ND', () => {
+    const values = {
+      'TPO.X88': 'N',
+      '1401': '',
+      '2866': 'Express',
+      'CX.SUB.NQM.EXPRESS': 'Approved',
+      'CX.SUB.NQM.EXPANDED': '',
+      'CX.SUB.NQM.DSCR': '',
+      'CX.SUB.NQM.JUMBO': '',
+    };
+    const block5IIf = `IIf([TPO.X88] <> "Y" AndAlso ((([1401].contains("Express") AndAlso Not([1401].contains("AUS"))) OrElse ([2866].contains("Express") AndAlso Not([2866].contains("AUS")))) AndAlso Not [CX.SUB.NQM.EXPRESS].contains("ND")),"Y","N")`;
+    expect(evaluateExpression(block5IIf, values)).toBe('Y');
+  });
+
+  test('Not contains("ND") evaluates correctly', () => {
+    const cond = 'Not [CX.SUB.NQM.EXPRESS].contains ( "ND" )';
+    expect(evaluateCondition(cond, { 'CX.SUB.NQM.EXPRESS': 'Approved' })).toBe(true);
+    expect(evaluateCondition(cond, { 'CX.SUB.NQM.EXPRESS': 'ND' })).toBe(false);
+    expect(evaluateCondition(cond, { 'CX.SUB.NQM.EXPRESS': 'Pending ND review' })).toBe(false);
+  });
+
+  test('smart quotes in literals still evaluate (Excel/Word paste)', () => {
+    const iif =
+      'IIf([TPO.X88] <> \u201CY\u201D AndAlso [1401].contains ( \u201CAUS Jumbo\u201D ), \u201CY\u201D, \u201CN\u201D)';
+    expect(evaluateExpression(iif, { 'TPO.X88': 'N', '1401': 'AUS Jumbo' })).toBe('Y');
+  });
+
+});

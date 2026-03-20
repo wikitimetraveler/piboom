@@ -4,7 +4,7 @@ import 'dotenv/config';
 
 /**
  * Standalone script to refresh disaster data from all sources.
- * Run once per day via cron: 0 6 * * * cd /path/to/piBoom && node scripts/refresh-disasters.js
+ * Run once per day via cron: 0 6 * * * cd /path/to/your-project && node scripts/refresh-disasters.js
  *
  * Data sources: FEMA, NASA FIRMS, USGS, NWS, NHC (no wildfire cameras)
  *

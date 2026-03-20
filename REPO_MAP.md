@@ -32,8 +32,8 @@
 - Memory: `services/langchain-memory.service.js`, `docs/LANGCHAIN_MEMORY.md`
 - Assistants: `controllers/*-ai.controller.js` (encompass-assistant, unit-tests-ai, loan-pipeline-ai, reviewer-ai)
 
-### Finance tools
-- UI: `public/finance/`
+### Worksheets tools (paths `public/finance/`)
+- UI: `public/finance/` — calculators, Encompass tools, unit tests (branding: Worksheets)
 - Unit Tests: `public/finance/unit-tests.html`, `public/finance/js/unit-tests.js`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js`, `services/unit-tests-file.service.js`
 - Screen Test: `public/finance/tool9.html`, `controllers/reviewer-ai.controller.js`
 - Encompass field browsers: `encompass-custom-fields.html`, `encompass-native-fields.html`

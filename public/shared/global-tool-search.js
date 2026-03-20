@@ -10,7 +10,8 @@
   const MAX_RESULTS = 14;
 
   const CATEGORY_ICONS = {
-    Finance: 'bi-bank',
+    Worksheets: 'bi-bank',
+    Finance: 'bi-bank', // legacy: recent tools / bookmarks
     Encompass: 'bi-columns-gap',
     Music: 'bi-music-note-beamed',
     Entertainment: 'bi-stars',
@@ -23,7 +24,8 @@
   };
 
   const CATEGORY_COLORS = {
-    Finance: '#3498db',
+    Worksheets: '#3498db',
+    Finance: '#3498db', // legacy
     Encompass: '#2980b9',
     Music: '#9b59b6',
     Entertainment: '#e74c3c',

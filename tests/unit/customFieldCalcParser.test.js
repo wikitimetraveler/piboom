@@ -311,6 +311,91 @@ describe('customFieldCalcParser', () => {
     });
   });
 
+  describe('evaluateExpression (DateAdd)', () => {
+    test('DateAdd("m", 4, [@2336]) adds 4 months', () => {
+      const result = evaluateExpression('DateAdd("m",4,[@2336])', { '2336': '11/01/2025', '@2336': '11/01/2025' });
+      expect(result).toBe('3/1/2026');
+    });
+    test('DateAdd with field ID 2336 (no @) works', () => {
+      const result = evaluateExpression('DateAdd("m",4,[2336])', { '2336': '11/01/2025' });
+      expect(result).toBe('3/1/2026');
+    });
+    test('DateAdd with datetime preserves time', () => {
+      const result = evaluateExpression('DateAdd("m",4,[@2336])', { '2336': '11/01/2200 01:01 AM' });
+      expect(result).toMatch(/3\/1\/2201/);
+      expect(result).toMatch(/1:01/);
+    });
+    test('DateAdd returns null for empty date', () => {
+      expect(evaluateExpression('DateAdd("m",4,[@2336])', {})).toBeNull();
+    });
+  });
+
+  describe('evaluateExpression (DateDiff)', () => {
+    test('DateDiff("m", [682], [ULDD.X58]) returns month difference', () => {
+      const result = evaluateExpression('DateDiff("m",[682],[ULDD.X58])', {
+        '682': '01/01/2022',
+        'ULDD.X58': '01/12/2022',
+      });
+      expect(result).toBe(0);
+    });
+
+    test('DateDiff("d", [@A], [@B]) returns whole day difference', () => {
+      const result = evaluateExpression('DateDiff("d",[@A],[@B])', {
+        '@A': '01/01/2022',
+        '@B': '01/12/2022',
+      });
+      expect(result).toBe(11);
+    });
+
+    test('DateDiff("yyyy", [@A], [@B]) returns year boundary difference', () => {
+      const result = evaluateExpression('DateDiff("yyyy",[@A],[@B])', {
+        '@A': '12/31/2021',
+        '@B': '01/01/2022',
+      });
+      expect(result).toBe(1);
+    });
+
+    test('DateDiff handles Scenario Builder placeholder datetime text', () => {
+      const result = evaluateExpression('DateDiff("d",[682],[ULDD.X58])', {
+        '682': '01/01/2022 --:-- --',
+        'ULDD.X58': '01/12/2022 --:-- --',
+      });
+      expect(result).toBe(11);
+    });
+
+    test('DateDiff tolerates en/em dash in placeholder (Word/Excel paste)', () => {
+      const pl = '09/19/2020 \u2013\u2013:\u2013\u2013 \u2013\u2013';
+      const result = evaluateExpression('DateDiff("M", [682], [ULDD.X58])', {
+        '682': pl,
+        'ULDD.X58': '01/01/2020 --:-- --',
+      });
+      expect(result).toBe(-8);
+    });
+
+    test('DateDiff accepts single-quoted interval (VB-style)', () => {
+      const result = evaluateExpression("DateDiff('m', [682], [ULDD.X58])", {
+        '682': '01/01/2022',
+        'ULDD.X58': '01/12/2022',
+      });
+      expect(result).toBe(0);
+    });
+  });
+
+  describe('evaluateExpression (IIf with DateDiff condition)', () => {
+    test('IIF(DateDiff("d", [3925], [682])>0, "Y", "N") is Y when end date is later', () => {
+      const f = 'IIF(DateDiff("d", [3925], [682])>0, "Y", "N")';
+      expect(evaluateExpression(f, { '3925': '01/01/2025', '682': '01/15/2025' })).toBe('Y');
+    });
+    test('IIf: N when day difference is not > 0', () => {
+      const f = 'IIf(DateDiff("d", [3925], [682])>0, "Y", "N")';
+      expect(evaluateExpression(f, { '3925': '01/15/2025', '682': '01/15/2025' })).toBe('N');
+    });
+    test('IIf: no space before > and single-quoted d', () => {
+      const f = 'IIf(DateDiff(\'d\',[3925],[682])>0,"Y","N")';
+      expect(evaluateExpression(f, { '3925': '1/1/2025', '682': '1/2/2025' })).toBe('Y');
+    });
+  });
+
   describe('getSuggestedValuesForScenario', () => {
     test('returns suggested values for <= condition', () => {
       const scenario = { condition: '[#60#1] <= 200 And [#1452#1] <= 200', result: '[#1415#1]', isElse: false };
@@ -451,20 +536,27 @@ describe('customFieldCalcParser', () => {
     test('extracts DateDiff("d", [field1], [field2]) > N', () => {
       const result = extractConditionValues('DateDiff("d", [@CX.DISASTER.DATE], [@3142]) > 90');
       expect(result).toEqual([
-        { type: 'dateDiff', field1: '@CX.DISASTER.DATE', field2: '@3142', op: '>', value: 90 },
+        { type: 'dateDiff', interval: 'd', field1: '@CX.DISASTER.DATE', field2: '@3142', op: '>', value: 90 },
       ]);
     });
 
     test('extracts DateDiff with <= operator', () => {
       const result = extractConditionValues('DateDiff("d", [@field1], [@field2]) <= 90');
       expect(result).toEqual([
-        { type: 'dateDiff', field1: '@field1', field2: '@field2', op: '<=', value: 90 },
+        { type: 'dateDiff', interval: 'd', field1: '@field1', field2: '@field2', op: '<=', value: 90 },
+      ]);
+    });
+
+    test('extracts DateDiff with single-quoted interval and no spaces before >', () => {
+      const result = extractConditionValues("DateDiff('d', [3925], [682])>0");
+      expect(result).toEqual([
+        { type: 'dateDiff', interval: 'd', field1: '3925', field2: '682', op: '>', value: 0 },
       ]);
     });
 
     test('extracts [field].Contains("literal")', () => {
       const result = extractConditionValues('[19].Contains("Refi")');
-      expect(result).toEqual([{ type: 'contains', fieldId: '19', substring: 'Refi' }]);
+      expect(result).toEqual([{ type: 'contains', fieldId: '19', substring: 'Refi', negated: false }]);
     });
 
     test('extracts multiple condition types', () => {
@@ -472,8 +564,8 @@ describe('customFieldCalcParser', () => {
       const result = extractConditionValues(cond);
       expect(result).toHaveLength(3);
       expect(result).toContainEqual({ type: 'isDate', fieldId: 'CX.DATE', negated: false });
-      expect(result).toContainEqual({ type: 'contains', fieldId: '19', substring: 'Refi' });
-      expect(result).toContainEqual({ type: 'dateDiff', field1: '@A', field2: '@B', op: '>', value: 30 });
+      expect(result).toContainEqual({ type: 'contains', fieldId: '19', substring: 'Refi', negated: false });
+      expect(result).toContainEqual({ type: 'dateDiff', interval: 'd', field1: '@A', field2: '@B', op: '>', value: 30 });
     });
 
     test('extracts [field].StartsWith("literal")', () => {

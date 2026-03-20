@@ -60,19 +60,19 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 
 ## Navigation (modern-navbar)
 
-The shared navbar (`public/shared/modern-navbar.js`) uses a hub-first structure with 5 top-level items: Home, Finance, Music, Entertainment, More.
+The shared navbar (`public/shared/modern-navbar.js`) uses a hub-first structure with 5 top-level items: Home, Worksheets, Music, Entertainment, More.
 
 ### Nav structure
 
 | Nav item | Contents |
 |----------|----------|
 | **Home** | Link to `/` |
-| **Finance** | Finance Hub, Encompass Assistant, Encompass Hub, Pipeline Risk, Unit Tests, The Screen Test |
+| **Worksheets** | Worksheets Hub, Encompass Assistant, Encompass Hub, Pipeline Risk, Unit Tests, The Screen Test |
 | **Music** | Music Research, Album Discovery, My Collection, Song Identifier, Spotify, Time Machine, All Music Tools |
 | **Entertainment** | Boombox, Visualizer, Black Light, Poster Generator, Art Gallery, Ouija Board, All Entertainment |
 | **More** | Bike Store, Wolfman Dave, Levi Assistant, Voice Guide, Family, Nature, Hub (All Tools) |
 
-Additional tools (Parser, Mashup, Automator, Ruler, Transformer, Alchemist, Encompass Users, Risk Analysis, Grateful Dead Timeline, etc.) are reachable via **Finance Hub** (`/finance/index.html`) or **Hub** (`/`).
+Additional tools (Parser, Mashup, Automator, Ruler, Transformer, Alchemist, Encompass Users, Risk Analysis, Grateful Dead Timeline, etc.) are reachable via **Worksheets Hub** (`/finance/index.html`) or **Hub** (`/`).
 
 ### Global Tool Search
 
@@ -86,7 +86,7 @@ Additional tools (Parser, Mashup, Automator, Ruler, Transformer, Alchemist, Enco
 | Attribute | Purpose |
 |-----------|---------|
 | `brand="Custom Name"` | Override brand text (default: `DevConnect Labs`) |
-| `compact` | Hide Entertainment as top-level; show only Home, Finance, Music, More |
+| `compact` | Hide Entertainment as top-level; show only Home, Worksheets, Music, More |
 
 Example: `<modern-navbar brand="My App" compact></modern-navbar>`
 

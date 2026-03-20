@@ -6,8 +6,8 @@
   'use strict';
 
   const TOOL_INDEX = [
-    // Finance
-    { name: 'Finance Hub', url: '/finance/index.html', category: 'Finance', keywords: 'calculator hub' },
+    // Worksheets (calculators & disasters; paths remain /finance/)
+    { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets' },
     { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API' },
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API' },
     { name: 'Test Endpoints', url: '/finance/encompass-hub-test.html', category: 'Encompass', keywords: 'API test' },
@@ -17,12 +17,12 @@
     { name: 'Encompass Users', url: '/finance/encompass-users.html', category: 'Encompass', keywords: 'users directory' },
     { name: 'Native Loan Fields', url: '/finance/encompass-native-fields.html', category: 'Encompass', keywords: 'field definitions' },
     { name: 'Custom Loan Fields', url: '/finance/encompass-custom-fields.html', category: 'Encompass', keywords: 'custom fields' },
-    { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Finance', keywords: 'FHA refinance' },
-    { name: 'Asset Qualifier', url: '/finance/asset-qualifier-calculator.html', category: 'Finance', keywords: 'asset retirement' },
-    { name: 'DTI Calculator', url: '/finance/dti-calculator.html', category: 'Finance', keywords: 'debt income ratio' },
-    { name: 'Closing Cost Calculator', url: '/finance/closing-cost-calculator.html', category: 'Finance', keywords: 'closing fees' },
-    { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Finance', keywords: 'VA refinance' },
-    { name: 'Disasters Unified', url: '/finance/disasters-unified.html', category: 'Finance', keywords: 'FEMA disaster' },
+    { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Worksheets', keywords: 'FHA refinance' },
+    { name: 'Asset Qualifier', url: '/finance/asset-qualifier-calculator.html', category: 'Worksheets', keywords: 'asset retirement' },
+    { name: 'DTI Calculator', url: '/finance/dti-calculator.html', category: 'Worksheets', keywords: 'debt income ratio' },
+    { name: 'Closing Cost Calculator', url: '/finance/closing-cost-calculator.html', category: 'Worksheets', keywords: 'closing fees' },
+    { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Worksheets', keywords: 'VA refinance' },
+    { name: 'Disasters Unified', url: '/finance/disasters-unified.html', category: 'Worksheets', keywords: 'FEMA disaster' },
     { name: 'The Parser', url: '/finance/tool2.html', category: 'Encompass', keywords: 'JSON parser' },
     { name: 'The Mashup', url: '/finance/tool3.html', category: 'Encompass', keywords: 'FEMA disaster data' },
     { name: 'The Automator', url: '/finance/tool4.html', category: 'Encompass', keywords: 'automation workflow' },
@@ -38,7 +38,8 @@
     { name: 'Time Machine', url: '/music/music-time-machine.html', category: 'Music', keywords: 'history date' },
     { name: 'Grateful Dead Shows', url: '/music/my-grateful-dead-shows.html', category: 'Music', keywords: 'dead shows' },
     { name: 'Sample Detector', url: '/music/sample-detector.html', category: 'Music', keywords: 'sample cover' },
-    { name: 'Music KML', url: '/music/kml-viewer.html', category: 'Music', keywords: 'map timeline' },
+    { name: 'Music KML', url: '/music/kml-viewer.html', category: 'Music', keywords: 'map timeline geographic upload' },
+    { name: 'Google Earth KML Files', url: '/music/musical-google-earth-files.html', category: 'Music', keywords: 'kml google earth network link download beatles dylan dead venues' },
     // Entertainment
     { name: 'The Boombox', url: '/entertainment/player.html', category: 'Entertainment', keywords: 'player audio' },
     { name: 'Psychedelic Visualizer', url: '/entertainment/visualizer.html', category: 'Entertainment', keywords: 'visualizer trippy' },

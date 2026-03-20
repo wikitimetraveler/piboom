@@ -222,17 +222,18 @@
   }
 
   /**
-   * Extract string comparisons [field] = "value" from a condition for suggested test values.
-   * @param {string} conditionString - e.g. '[19] = "NoCash-Out Refinance"'
+   * Extract string comparisons [field] = "value" or [field] <> "value" from a condition.
+   * @param {string} conditionString - e.g. '[19] = "NoCash-Out Refinance"' or '[TPO.X88] <> "Y"'
    * @returns {Array<{ fieldId: string, op: string, value: string }>}
    */
   function extractStringComparisons(conditionString) {
     if (!conditionString || typeof conditionString !== 'string') return [];
+    conditionString = normalizeConditionQuotes(conditionString);
     const results = [];
-    const re = /\[([^\]]+)\]\s*=\s*"([^"]*)"/g;
+    const re = /\[([^\]]+)\]\s*(=|<>)\s*"([^"]*)"/g;
     let m;
     while ((m = re.exec(conditionString)) !== null) {
-      results.push({ fieldId: m[1].trim(), op: '=', value: m[2] });
+      results.push({ fieldId: m[1].trim(), op: m[2].trim(), value: m[3] });
     }
     return results;
   }
@@ -359,6 +360,7 @@
    */
   function extractConditionValues(conditionString) {
     if (!conditionString || typeof conditionString !== 'string') return [];
+    conditionString = normalizeConditionQuotes(conditionString);
     const results = [];
 
     // IsDate([field]) or Not IsDate([field]) — (Not\s+)? captures optional "Not "
@@ -368,25 +370,27 @@
       results.push({ type: 'isDate', fieldId: m[2].trim(), negated: !!m[1] });
     }
 
-    // DateDiff("d", [field1], [field2]) op N
-    const dateDiffRe = /DateDiff\s*\(\s*"d"\s*,\s*\[([^\]]+)\]\s*,\s*\[([^\]]+)\]\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+)/gi;
+    // DateDiff("d"|'d', [field1], [field2]) op N — any interval letter(s); case-insensitive DateDiff
+    const dateDiffRe = /DateDiff\s*\(\s*["']([^"']+)["']\s*,\s*\[([^\]]+)\]\s*,\s*\[([^\]]+)\]\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)/gi;
     while ((m = dateDiffRe.exec(conditionString)) !== null) {
-      const value = parseInt(m[4], 10);
+      const value = parseFloat(m[5]);
       if (Number.isFinite(value)) {
         results.push({
           type: 'dateDiff',
-          field1: m[1].trim(),
-          field2: m[2].trim(),
-          op: m[3],
+          interval: String(m[1] || 'd').toLowerCase().trim(),
+          field1: m[2].trim(),
+          field2: m[3].trim(),
+          op: m[4],
           value,
         });
       }
     }
 
-    // [field].Contains("literal")
-    const containsRe = /\[([^\]]+)\]\.Contains\s*\(\s*"([^"]*)"\s*\)/gi;
+    // [field].Contains("literal") or Not [field].Contains("literal") or Not([field].Contains("literal"))
+    const containsRe = /(Not\s*\(?\s*)?\[([^\]]+)\]\.Contains\s*\(\s*"([^"]*)"\s*\)/gi;
     while ((m = containsRe.exec(conditionString)) !== null) {
-      results.push({ type: 'contains', fieldId: m[1].trim(), substring: m[2] });
+      const hasNot = !!(m[1] && m[1].replace(/\s/g, '').toLowerCase().startsWith('not'));
+      results.push({ type: 'contains', fieldId: m[2].trim(), substring: m[3], negated: hasNot });
     }
 
     // [field].StartsWith("literal")
@@ -1309,6 +1313,71 @@
   }
 
   /**
+   * Normalize curly/smart quotes to ASCII so regex extraction matches Excel/Word pastes.
+   * @param {string} str
+   * @returns {string}
+   */
+  function normalizeConditionQuotes(str) {
+    if (!str || typeof str !== 'string') return str;
+    return str
+      .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036\u00AB\u00BB]/g, '"')
+      .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'");
+  }
+
+  /**
+   * Parse flexible loan date values used by Scenario Builder and Encompass formulas.
+   * Supports:
+   * - MM/DD/YYYY
+   * - MM/DD/YYYY HH:mm[:ss] [AM|PM]
+   * - YYYY-MM-DD / YYYY-MM-DDTHH:mm[:ss]
+   * - UI placeholders like "MM/DD/YYYY --:-- --" (treated as date-only)
+   * @param {string|number|null|undefined} rawValue
+   * @returns {Date|null}
+   */
+  function parseLoanDateValue(rawValue) {
+    if (rawValue === null || rawValue === undefined) return null;
+    let s = String(rawValue).trim();
+    if (!s) return null;
+
+    // Word/Excel often paste en/em dashes (– —) instead of hyphen-minus; breaks placeholder strip & ISO dates
+    s = s.replace(/[\u2013\u2014]/g, '-');
+
+    // Scenario Builder datetime placeholder (e.g. "01/01/2022 --:-- --")
+    s = s.replace(/\s+--:--\s+--\s*$/i, '').trim();
+    if (!s) return null;
+
+    // ISO date-only from <input type="date"> should be local-midnight stable
+    const isoDateOnly = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (isoDateOnly) {
+      const y = parseInt(isoDateOnly[1], 10);
+      const m = parseInt(isoDateOnly[2], 10) - 1;
+      const d = parseInt(isoDateOnly[3], 10);
+      const out = new Date(y, m, d, 0, 0, 0, 0);
+      return Number.isNaN(out.getTime()) ? null : out;
+    }
+
+    // US format: MM/DD/YYYY with optional time
+    const us = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?$/i);
+    if (us) {
+      const month = parseInt(us[1], 10) - 1;
+      const day = parseInt(us[2], 10);
+      const year = parseInt(us[3], 10);
+      let hour = us[4] ? parseInt(us[4], 10) : 0;
+      const minute = us[5] ? parseInt(us[5], 10) : 0;
+      const second = us[6] ? parseInt(us[6], 10) : 0;
+      const ampm = (us[7] || '').toUpperCase();
+      if (ampm === 'PM' && hour < 12) hour += 12;
+      if (ampm === 'AM' && hour === 12) hour = 0;
+      const out = new Date(year, month, day, hour, minute, second, 0);
+      return Number.isNaN(out.getTime()) ? null : out;
+    }
+
+    // Fallback to JS parser for ISO datetime and other valid formats
+    const out = new Date(s);
+    return Number.isNaN(out.getTime()) ? null : out;
+  }
+
+  /**
    * Evaluate an arithmetic expression with [field] refs, substituting values.
    * Used for conditions like ([#FR0112#2] + ([#FR0124#2] / 12)) >= 2.
    * @param {string} expr - e.g. "[#FR0112#2] + ([#FR0124#2] / 12)"
@@ -1368,6 +1437,24 @@
     if (!cond || typeof cond !== 'string') return false;
     const c = cond.trim();
     if (!c) return false;
+
+    // DateDiff("d", [a], [b]) op N — whole condition (IIf); must run before generic numeric compares
+    const soloDiff = c.match(
+      /^\s*DateDiff\s*\(\s*["']([^"']+)["']\s*,\s*\[([^\]]+)\]\s*,\s*\[([^\]]+)\]\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/i
+    );
+    if (soloDiff) {
+      const interval = String(soloDiff[1] || 'd').toLowerCase().trim();
+      const v1 = String(getFieldValue(soloDiff[2].trim(), values) ?? '');
+      const v2 = String(getFieldValue(soloDiff[3].trim(), values) ?? '');
+      const d1 = parseLoanDateValue(v1);
+      const d2 = parseLoanDateValue(v2);
+      if (!d1 || !d2) return false;
+      const diff = computeDateDiffNumeric(interval, d1, d2);
+      if (diff === null) return false;
+      const target = parseFloat(soloDiff[5]);
+      if (!Number.isFinite(target)) return false;
+      return applyNumericComparison(soloDiff[4], diff, target);
+    }
 
     // Arithmetic expression comparison: (expr) op number  OR  expr op number (e.g. (A) + (B) >= 2)
     // Use [\s\S] instead of . so newlines (Encompass paste) are matched
@@ -1439,7 +1526,9 @@
         const sc = strComps[i];
         const val = String(getFieldValue(sc.fieldId, values) ?? '').trim();
         const target = (sc.value ?? '').trim();
-        if (val !== target) return false;
+        const match = val === target;
+        if (sc.op === '=' && !match) return false;
+        if (sc.op === '<>' && match) return false;
       }
       return true;
     }
@@ -1453,9 +1542,11 @@
         const valid = !Number.isNaN(d.getTime()) && val.trim() !== '';
         if (valid !== !cv.negated) return false;
       } else if (cv.type === 'contains') {
-        const val = String(getFieldValue(cv.fieldId, values) ?? '').toLowerCase();
-        const sub = (cv.substring ?? '').toLowerCase();
-        if (!val.includes(sub)) return false;
+        const raw = getFieldValue(cv.fieldId, values);
+        const hay = String(raw ?? '').toLowerCase();
+        const needle = String(cv.substring ?? '').toLowerCase();
+        const hasSubstring = needle !== '' && hay.includes(needle);
+        if (cv.negated ? hasSubstring : !hasSubstring) return false;
       } else if (cv.type === 'startsWith') {
         const val = String(getFieldValue(cv.fieldId, values) ?? '').toLowerCase();
         const prefix = (cv.prefix ?? '').toLowerCase();
@@ -1472,10 +1563,12 @@
       } else if (cv.type === 'dateDiff') {
         const v1 = String(getFieldValue(cv.field1, values) ?? '');
         const v2 = String(getFieldValue(cv.field2, values) ?? '');
-        const d1 = new Date(v1);
-        const d2 = new Date(v2);
-        if (Number.isNaN(d1.getTime()) || Number.isNaN(d2.getTime())) return false;
-        const diff = Math.floor((d2 - d1) / (24 * 60 * 60 * 1000));
+        const d1 = parseLoanDateValue(v1);
+        const d2 = parseLoanDateValue(v2);
+        if (!d1 || !d2) return false;
+        const interval = (cv.interval || 'd').toLowerCase().trim();
+        const diff = computeDateDiffNumeric(interval, d1, d2);
+        if (diff === null) return false;
         if (!applyNumericComparison(cv.op, diff, cv.value)) return false;
       }
     }
@@ -1592,27 +1685,84 @@
   }
 
   /**
+   * Find minimum depth at which OrElse/Or appears.
+   * @param {string} str
+   * @returns {number} -1 if not found
+   */
+  function minDepthOrElse(str) {
+    let minDepth = -1;
+    let depth = 0;
+    let inQuote = false;
+    const orElseRe = /^\s+OrElse\s+/i;
+    const orOnlyRe = /^\s+Or\b\s*/i;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      if (ch === '"' && (i === 0 || str[i - 1] !== '\\')) inQuote = !inQuote;
+      if (!inQuote) {
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        else {
+          const chunk = str.substring(i);
+          if ((orElseRe.test(chunk) || orOnlyRe.test(chunk)) && (minDepth < 0 || depth < minDepth)) minDepth = depth;
+        }
+      }
+    }
+    return minDepth;
+  }
+
+  /**
+   * Find minimum depth at which AndAlso/And appears.
+   * @param {string} str
+   * @returns {number} -1 if not found
+   */
+  function minDepthAndAlso(str) {
+    let minDepth = -1;
+    let depth = 0;
+    let inQuote = false;
+    const andAlsoRe = /^\s+AndAlso\s+/i;
+    const andOnlyRe = /^\s+And\b\s*/i;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str[i];
+      if (ch === '"' && (i === 0 || str[i - 1] !== '\\')) inQuote = !inQuote;
+      if (!inQuote) {
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        else {
+          const chunk = str.substring(i);
+          if ((andAlsoRe.test(chunk) || andOnlyRe.test(chunk)) && (minDepth < 0 || depth < minDepth)) minDepth = depth;
+        }
+      }
+    }
+    return minDepth;
+  }
+
+  /**
    * Evaluate a full condition (supports AndAlso, OrElse) with correct VB precedence.
-   * AndAlso/And binds tighter than OrElse/Or.
+   * AndAlso/And binds tighter than OrElse/Or. Split by the operator at shallowest depth.
    * @param {string} condition - e.g. "[353] <= 200 AndAlso [19] = \"Y\""
    * @param {Record<string, string|number>} values
    * @returns {boolean}
    */
   function evaluateCondition(condition, values) {
     if (!condition || typeof condition !== 'string') return false;
-    const c = condition.trim();
+    const c = normalizeConditionQuotes(condition).trim();
     if (!c) return false;
 
-    // OrElse/Or — lowest precedence, split first
-    const orParts = splitTopLevelOrElse(c);
-    if (orParts.length > 1) {
-      return orParts.some((p) => evaluateCondition(p, values));
-    }
+    const dOr = minDepthOrElse(c);
+    const dAnd = minDepthAndAlso(c);
 
-    // AndAlso/And — higher precedence
-    const andParts = splitTopLevelAndAlso(c);
-    if (andParts.length > 1) {
-      return andParts.every((p) => evaluateCondition(p, values));
+    // Split by the operator at shallowest depth (AndAlso has higher precedence)
+    if (dAnd >= 0 && (dOr < 0 || dAnd <= dOr)) {
+      const andParts = splitTopLevelAndAlso(c);
+      if (andParts.length > 1) {
+        return andParts.every((p) => evaluateCondition(p, values));
+      }
+    }
+    if (dOr >= 0) {
+      const orParts = splitTopLevelOrElse(c);
+      if (orParts.length > 1) {
+        return orParts.some((p) => evaluateCondition(p, values));
+      }
     }
 
     return evaluateAtomicCondition(c, values);
@@ -1691,6 +1841,151 @@
   }
 
   /**
+   * Evaluate VB DateAdd(interval, number, date) — adds interval to date.
+   * Supports: "d" day, "m" month, "y"/"yyyy" year, "h" hour, "n" minute, "s" second, "w" weekday, "ww" week.
+   * @param {string} expr - e.g. 'DateAdd("m", 4, [@2336])'
+   * @param {Record<string, string|number>} values
+   * @returns {string|null} - formatted date string or null
+   */
+  function evaluateDateAdd(expr, values) {
+    if (!expr || typeof expr !== 'string') return null;
+    const trimmed = expr.trim();
+    if (!/^DateAdd\s*\(/i.test(trimmed)) return null;
+    const match = trimmed.match(
+      /^DateAdd\s*\(\s*["']([^"']+)["']\s*,\s*(-?\d+)\s*,\s*(?:\[([^\]]+)\]|["']([^"']*)["'])\s*\)\s*$/i
+    );
+    if (!match) return null;
+    const interval = (match[1] || '').toLowerCase();
+    const number = parseInt(match[2], 10);
+    const fieldId = match[3];
+    const literal = match[4];
+    const dateStr = fieldId !== undefined && fieldId !== ''
+      ? String(getFieldValue(fieldId.trim(), values) ?? '')
+      : (literal !== undefined ? literal : '');
+    if (!dateStr.trim()) return null;
+    const d = parseLoanDateValue(dateStr);
+    if (!d) return null;
+    switch (interval) {
+      case 'yyyy':
+      case 'y':
+        d.setFullYear(d.getFullYear() + number);
+        break;
+      case 'm':
+        d.setMonth(d.getMonth() + number);
+        break;
+      case 'd':
+        d.setDate(d.getDate() + number);
+        break;
+      case 'ww':
+        d.setDate(d.getDate() + (number * 7));
+        break;
+      case 'w':
+        d.setDate(d.getDate() + number);
+        break;
+      case 'h':
+        d.setHours(d.getHours() + number);
+        break;
+      case 'n':
+        d.setMinutes(d.getMinutes() + number);
+        break;
+      case 's':
+        d.setSeconds(d.getSeconds() + number);
+        break;
+      default:
+        return null;
+    }
+    const hasTime = /:\d{2}\s*(?:AM|PM)?$/i.test(dateStr) || dateStr.includes(':');
+    if (hasTime) {
+      const h = d.getHours();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = h % 12 || 12;
+      const m = String(d.getMinutes()).padStart(2, '0');
+      const s = String(d.getSeconds()).padStart(2, '0');
+      return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear() + ' ' + h12 + ':' + m + ' ' + ampm;
+    }
+    return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+  }
+
+  /**
+   * VB DateDiff interval count between two parsed dates (shared by evaluateDateDiff and IIf conditions).
+   * @param {string} intervalRaw - e.g. "d", "m", "yyyy"
+   * @param {Date} d1
+   * @param {Date} d2
+   * @returns {number|null}
+   */
+  function computeDateDiffNumeric(intervalRaw, d1, d2) {
+    const interval = String(intervalRaw || 'd').toLowerCase().trim();
+    if (!d1 || !d2 || Number.isNaN(d1.getTime()) || Number.isNaN(d2.getTime())) return null;
+    switch (interval) {
+      case 'd':
+        return Math.floor((d2 - d1) / (24 * 60 * 60 * 1000));
+      case 'ww':
+        return Math.floor((d2 - d1) / (7 * 24 * 60 * 60 * 1000));
+      case 'm':
+        return ((d2.getFullYear() - d1.getFullYear()) * 12) + (d2.getMonth() - d1.getMonth());
+      case 'yyyy':
+      case 'y':
+        return d2.getFullYear() - d1.getFullYear();
+      case 'h':
+        return Math.floor((d2 - d1) / (60 * 60 * 1000));
+      case 'n':
+        return Math.floor((d2 - d1) / (60 * 1000));
+      case 's':
+        return Math.floor((d2 - d1) / 1000);
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Evaluate VB DateDiff(interval, date1, date2) for direct expressions.
+   * Returns the number of interval boundaries between two dates.
+   * @param {string} expr - e.g. 'DateDiff("m", [682], [ULDD.X58])'
+   * @param {Record<string, string|number>} values
+   * @returns {number|null}
+   */
+  function evaluateDateDiff(expr, values) {
+    if (!expr || typeof expr !== 'string') return null;
+    const trimmed = expr.trim();
+    if (!/^DateDiff\s*\(/i.test(trimmed)) return null;
+    const match = trimmed.match(
+      /^DateDiff\s*\(\s*["']([^"']+)["']\s*,\s*(?:\[([^\]]+)\]|["']([^"']*)["'])\s*,\s*(?:\[([^\]]+)\]|["']([^"']*)["'])\s*\)\s*$/i
+    );
+    if (!match) return null;
+
+    const interval = (match[1] || '').toLowerCase().trim();
+    const date1Raw = match[2] !== undefined && match[2] !== ''
+      ? getFieldValue(match[2].trim(), values)
+      : (match[3] !== undefined ? match[3] : '');
+    const date2Raw = match[4] !== undefined && match[4] !== ''
+      ? getFieldValue(match[4].trim(), values)
+      : (match[5] !== undefined ? match[5] : '');
+
+    const d1 = parseLoanDateValue(date1Raw);
+    const d2 = parseLoanDateValue(date2Raw);
+    if (!d1 || !d2) return null;
+    return computeDateDiffNumeric(interval, d1, d2);
+  }
+
+  /**
+   * Field IDs that appear as DateDiff date1/date2 in an expression (for Scenario Builder date inputs).
+   * @param {string} expression
+   * @returns {string[]} - normalized field IDs
+   */
+  function collectDateDiffFieldIdsFromExpression(expression) {
+    if (!expression || typeof expression !== 'string') return [];
+    const s = normalizeConditionQuotes(expression);
+    const ids = new Set();
+    const re = /DateDiff\s*\(\s*["'][^"']+["']\s*,\s*\[([^\]]+)\]\s*,\s*\[([^\]]+)\]\s*\)/gi;
+    let m;
+    while ((m = re.exec(s)) !== null) {
+      ids.add(normalizeFieldIdForLookup(m[1].trim()));
+      ids.add(normalizeFieldIdForLookup(m[2].trim()));
+    }
+    return [...ids];
+  }
+
+  /**
    * Evaluate an Encompass calculation expression (IIf or simple arithmetic).
    * @param {string} expression - e.g. "[4002] + [4003]" or "IIf([19] = \"Refi\", \"Y\", \"N\")"
    * @param {Record<string, string|number>} values - fieldId (normalized) -> value
@@ -1699,8 +1994,15 @@
   function evaluateExpression(expression, values) {
     values = values || {};
     if (!expression || typeof expression !== 'string') return null;
-    const expr = expression.trim();
+    // Whole-formula normalize so IIf comma scanning, quoted literals, and & splits see ASCII ".
+    const expr = normalizeConditionQuotes(expression).trim();
     if (!expr) return null;
+
+    const dateAddResult = evaluateDateAdd(expr, values);
+    if (dateAddResult !== null) return dateAddResult;
+
+    const dateDiffResult = evaluateDateDiff(expr, values);
+    if (dateDiffResult !== null) return dateDiffResult;
 
     if (/IIf\s*\(/i.test(expr)) {
       const segments = splitByTopLevelAmpersand(expr);
@@ -1750,5 +2052,7 @@
     formatDateWithOffset: formatDateWithOffset,
     extractSingleResultField: extractSingleResultField,
     extractLiteralResult: extractLiteralResult,
+    computeDateDiffNumeric: computeDateDiffNumeric,
+    collectDateDiffFieldIdsFromExpression: collectDateDiffFieldIdsFromExpression,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

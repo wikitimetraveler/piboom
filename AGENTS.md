@@ -60,7 +60,7 @@ routes/encompass-*.routes.js
 | AI Chat / Memory         | `controllers/unit-tests-ai.controller.js`, `controllers/loan-pipeline-ai.controller.js`                          |
 | Screen Test tool         | `controllers/reviewer-ai.controller.js`, `routes/reviewer.routes.js`, `public/finance/tool9.html`                |
 | Unit Tests               | `public/finance/unit-tests.html`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js`   |
-| Finance UI               | `public/finance/`                                                                                                |
+| Worksheets UI            | `public/finance/` (URLs unchanged; product name Worksheets)                                                      |
 | Financial calculations   | `public/shared/calculationEngine.js`                                                                             |
 | AG Grid pages            | `unit-tests.html`, `encompass-custom-fields.html`, `encompass-native-fields.html`                                |
 
