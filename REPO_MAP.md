@@ -39,9 +39,9 @@
 - Encompass field browsers: `encompass-custom-fields.html`, `encompass-native-fields.html`
 
 ### Nature
-- UI: `public/nature/` (nature-hub.html, tree-discovery.html, critter-discovery.html, fish-identification.html, tree/critter/fish-collection.html, share-collection.html)
-- Lat/long auto-fill from device GPS on mobile for tree, critter, fish discovery pages
-- Routes: `routes/nature-collection.routes.js`, `routes/critter-collection.routes.js`, `routes/critter-discovery.routes.js`
+- UI: `public/nature/` (nature-hub.html, tree-discovery.html, critter-discovery.html, fish-identification.html, rock-discovery.html, rock-collection.html, tree/critter/fish-collection.html, share-collection.html)
+- Lat/long auto-fill from device GPS on mobile for tree, critter, fish, rock discovery pages
+- Routes: `routes/nature-collection.routes.js`, `routes/critter-collection.routes.js`, `routes/critter-discovery.routes.js`, `routes/rock-discovery.routes.js`, `routes/rock-collection.routes.js` (API: `/api/rock-discovery`, `/api/rock-specimens`)
 
 ### Local Spots
 - UI: `public/local/local-spots.html` (thrift, taco trucks, gardens, bike trails; lat/lng auto-fill when adding spot on mobile)

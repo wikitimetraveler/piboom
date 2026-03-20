@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rocky The Rock Star — Gems & Meteorites</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    :root {
+      --rock-deep: #4527a0;
+      --rock-mid: #5e35b1;
+      --rock-accent: #3949ab;
+      --rock-surface: #faf8ff;
+      --rock-border: #e1d5f0;
+      --rock-text: #1a1a2e;
+    }
+    body {
+      background: linear-gradient(135deg, #f5f0ff 0%, #ede7f6 50%, #e8eaf6 100%);
+      color: var(--rock-text);
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    }
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0.5rem;
+      z-index: 100000;
+      padding: 0.5rem 1rem;
+      background: #fff;
+      color: var(--rock-deep);
+      border-radius: 8px;
+      box-shadow: var(--shadow-elevated, 0 4px 12px rgba(0,0,0,0.15));
+    }
+    .skip-link:focus {
+      left: 0.5rem;
+      outline: 3px solid rgba(94, 53, 177, 0.5);
+    }
+    .container { max-width: 1100px; }
+    .hero {
+      background: linear-gradient(135deg, var(--rock-mid), var(--rock-accent));
+      color: #fff;
+      padding: 28px 24px;
+      border-radius: 20px;
+      box-shadow: 0 12px 30px rgba(94, 53, 177, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero:after {
+      content: "";
+      position: absolute;
+      right: -50px;
+      top: -50px;
+      width: 180px;
+      height: 180px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+    }
+    .card-pane {
+      border: 1px solid var(--rock-border);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+      background: #fff;
+    }
+    .rock-disclosure {
+      border: 1px solid var(--rock-border);
+      border-radius: 14px;
+      background: #fff;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+    .rock-disclosure > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 16px;
+      font-weight: 600;
+      color: var(--rock-deep);
+      background: var(--rock-surface);
+      border-bottom: 1px solid var(--rock-border);
+    }
+    .rock-disclosure > summary::-webkit-details-marker { display: none; }
+    .rock-disclosure > summary::after {
+      content: " ▼";
+      font-size: 0.75em;
+      opacity: 0.7;
+    }
+    .rock-disclosure[open] > summary::after { content: " ▲"; }
+    .rock-disclosure .disclosure-body { padding: 16px; }
+    .chat-area {
+      height: 320px;
+      overflow-y: auto;
+      background: var(--rock-surface);
+      border: 1px solid var(--rock-border);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .chat-bubble {
+      max-width: 92%;
+      padding: 10px 14px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+    }
+    .chat-bubble.user-msg {
+      background: #7e57c2;
+      color: #fff;
+      margin-left: auto;
+    }
+    .chat-bubble.ai-msg {
+      background: #fff;
+      border: 1px solid #d1c4e9;
+    }
+    #rockMap {
+      width: 100%;
+      height: 420px;
+      min-height: 240px;
+      border-radius: 12px;
+      border: 1px solid var(--rock-border);
+    }
+    @media (min-width: 992px) {
+      .rock-photo-split > .rock-photo-tools {
+        border-right: 1px solid var(--rock-border);
+      }
+    }
+    .pac-container { z-index: 20000; }
+    #cameraPreview {
+      max-width: 100%;
+      border-radius: 12px;
+      border: 1px solid #e1d5f0;
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main-rock-discovery">Skip to main content</a>
+  <modern-navbar></modern-navbar>
+  <div id="main-rock-discovery" class="container mt-4 mb-5" tabindex="-1">
+    <div class="hero mb-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center">
+        <div>
+          <h1 class="mb-2"><i class="bi-gem"></i> Rocky The Rock Star</h1>
+          <p class="mb-1">Gem expert (especially rubies & corundum), minerals & meteorites — voice, camera, and map.</p>
+          <span class="badge badge-light text-primary">Educational ID only — verify important finds with a lab or curator</span>
+        </div>
+        <div class="mt-2 mt-md-0">
+          <a href="/nature/rock-collection.html" class="btn btn-light btn-sm mr-2"><i class="bi-collection"></i> My collection</a>
+          <a href="/nature/nature-hub.html" class="btn btn-outline-light btn-sm"><i class="bi-globe2"></i> Nature Hub</a>
+        </div>
+      </div>
+    </div>
+
+    <div id="userSelectorContainer" class="mb-3"></div>
+
+    <div class="row">
+      <div class="col-lg-8 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-geo-alt"></i> Find spot & collection map</h5>
+            <div id="rockMap" role="region" aria-label="Map: click to set where you found the specimen"></div>
+            <small class="text-muted d-block mt-2">Click the map to set where you found the specimen. Purple markers = saved finds.</small>
+            <div id="mapStatus" class="text-muted mt-2" role="status" aria-live="polite" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-list-ul"></i> Your specimens</h5>
+            <div id="specList" style="max-height: 420px; overflow-y: auto;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-8 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-plus-circle"></i> Save a specimen</h5>
+            <div class="form-group">
+              <label for="specimenName">Name / label</label>
+              <input id="specimenName" class="form-control" placeholder="e.g., Desert find #3, suspected chondrite">
+            </div>
+            <div class="form-group">
+              <label for="likelyType">Likely type (optional)</label>
+              <input id="likelyType" class="form-control" placeholder="e.g., stony meteorite candidate, quartz vein, slag">
+            </div>
+            <div class="form-group">
+              <label for="rockNotes">Notes</label>
+              <textarea id="rockNotes" class="form-control" rows="2" placeholder="Weight feel, magnet sticks?, crust, where found…"></textarea>
+            </div>
+            <details class="rock-disclosure">
+              <summary><i class="bi-signpost-2"></i> Address lookup (optional)</summary>
+              <div class="disclosure-body">
+                <p class="small text-muted mb-3">Use this if you want a street address on the label. Map click or GPS still sets the pin; choosing an address can sync coordinates to that place.</p>
+                <div class="form-group mb-0">
+                  <label for="rockStreet"><i class="bi-geo-alt"></i> Street or search</label>
+                  <input type="text" id="rockStreet" class="form-control mb-2" placeholder="Start typing an address" autocomplete="street-address">
+                  <div class="form-row">
+                    <div class="col"><label class="sr-only" for="rockCity">City</label><input id="rockCity" class="form-control" placeholder="City" autocomplete="address-level2"></div>
+                    <div class="col-3"><label class="sr-only" for="rockState">State</label><input id="rockState" class="form-control" placeholder="CA" maxlength="2" autocomplete="address-level1"></div>
+                    <div class="col-3"><label class="sr-only" for="rockZip">ZIP</label><input id="rockZip" class="form-control" placeholder="Zip" autocomplete="postal-code"></div>
+                  </div>
+                  <label class="sr-only" for="rockCounty">County</label>
+                  <input id="rockCounty" class="form-control mt-2" placeholder="County">
+                </div>
+              </div>
+            </details>
+            <p class="small text-muted mt-2 mb-1">Coordinates (from map, GPS, or address)</p>
+            <div class="form-row">
+              <div class="col"><label class="sr-only" for="rockLat">Latitude</label><input id="rockLat" class="form-control" placeholder="Latitude" readonly aria-readonly="true"></div>
+              <div class="col"><label class="sr-only" for="rockLng">Longitude</label><input id="rockLng" class="form-control" placeholder="Longitude" readonly aria-readonly="true"></div>
+            </div>
+            <div class="form-row mt-2">
+              <div class="col"><label class="sr-only" for="rockAddressLat">Geocoded latitude</label><input id="rockAddressLat" class="form-control" placeholder="Address lat" readonly aria-readonly="true"></div>
+              <div class="col"><label class="sr-only" for="rockAddressLng">Geocoded longitude</label><input id="rockAddressLng" class="form-control" placeholder="Address lng" readonly aria-readonly="true"></div>
+            </div>
+            <div class="form-group mt-2">
+              <label for="rockLabel">Location label</label>
+              <input id="rockLabel" class="form-control" placeholder="e.g., Mojave dry lake">
+            </div>
+            <div class="d-flex flex-wrap mt-3">
+              <button type="button" class="btn btn-outline-primary mr-2 mb-2" onclick="useMyLocation()"><i class="bi-geo-alt"></i> Use my location</button>
+              <button type="button" class="btn btn-success mb-2" onclick="saveSpecimen()"><i class="bi-check-circle"></i> Save specimen</button>
+            </div>
+            <div id="saveStatus" class="text-muted mt-2" role="status" aria-live="polite" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-7 mb-4">
+        <div class="card card-pane">
+          <div class="card-body">
+            <h5 class="card-title mb-3"><i class="bi-search"></i> Ask Rocky The Rock Star</h5>
+            <div class="form-group">
+              <label for="rockQuery">Ask about rubies vs spinel, treatments, rough ID, meteorites vs slag, or describe texture and magnet tests</label>
+              <textarea id="rockQuery" class="form-control" rows="4" placeholder="Example: Pigeon-blood ruby vs red spinel — how to tell? Or: dark gray, heavy, weakly magnetic — meteorite?"></textarea>
+            </div>
+            <div class="d-flex flex-wrap mb-3">
+              <button type="button" class="btn btn-primary mr-2 mb-2" id="askRockyBtn" onclick="askRocky()"><i class="bi-robot"></i> Ask Rocky The Rock Star</button>
+              <button type="button" class="btn btn-outline-secondary mr-2 mb-2" onclick="clearChat()"><i class="bi-x-circle"></i> Clear</button>
+              <button type="button" class="btn btn-success mr-2 mb-2" id="startVoiceBtn" onclick="startVoice()"><i class="bi-mic-fill"></i> Voice</button>
+              <button type="button" class="btn btn-warning mr-2 mb-2" id="stopVoiceBtn" onclick="stopVoice()" disabled><i class="bi-mic-mute"></i> Stop</button>
+              <button type="button" class="btn btn-info mb-2" onclick="speakLast()"><i class="bi-volume-up"></i> Speak last reply</button>
+            </div>
+            <div id="voiceStatus" class="small text-muted mb-2" role="status" aria-live="polite" style="display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 mb-4">
+        <div class="card card-pane h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title mb-3"><i class="bi-chat-dots"></i> Chat</h5>
+            <div id="chatArea" class="chat-area flex-grow-1" role="log" aria-live="polite" aria-relevant="additions" aria-label="Rocky chat messages"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 mb-2">
+        <details class="rock-disclosure">
+          <summary><i class="bi-camera"></i> Photo ID (upload, camera, vision)</summary>
+          <div class="disclosure-body p-0">
+            <div class="row m-0 rock-photo-split">
+              <div class="col-lg-7 rock-photo-tools py-3 px-3">
+                <div class="d-flex flex-wrap mb-3">
+                  <label class="btn btn-outline-primary mr-2 mb-2">
+                    <i class="bi-upload"></i> Upload
+                    <input type="file" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)" aria-label="Upload image for identification">
+                  </label>
+                  <button type="button" class="btn btn-success mr-2 mb-2" onclick="startCamera()"><i class="bi-camera-video"></i> Camera</button>
+                  <button type="button" class="btn btn-info mr-2 mb-2" onclick="capturePhoto()"><i class="bi-camera-fill"></i> Capture</button>
+                  <button type="button" class="btn btn-secondary mr-2 mb-2" onclick="stopCamera()"><i class="bi-stop-circle"></i> Stop</button>
+                  <button type="button" class="btn btn-primary mb-2" id="identifyPhotoBtn" onclick="identifyRockPhoto()"><i class="bi-magic"></i> Identify from photo</button>
+                </div>
+                <video id="cameraPreview" autoplay playsinline muted style="display:none;"></video>
+                <canvas id="cameraCanvas" style="display:none;" aria-hidden="true"></canvas>
+                <div id="photoStatus" class="text-muted mt-2" role="status" aria-live="polite"></div>
+              </div>
+              <div class="col-lg-5 py-3 px-3">
+                <h6 class="text-muted mb-2"><i class="bi-card-image"></i> Preview</h6>
+                <img id="photoPreview" class="img-fluid rounded" alt="Selected specimen photo preview" style="display:none; border:1px solid var(--rock-border);">
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+  <script src="/shared/tts.js"></script>
+  <script>
+    let map;
+    let specimens = [];
+    let markers = [];
+    let markerInfos = [];
+    let newPinMarker = null;
+    let rockAddressAutocomplete = null;
+    let uploadedImageData = null;
+    let cameraStream = null;
+    let mapStatusTimer = null;
+    let selectedSpecimenId = null;
+    let lastAIResponse = '';
+    let lastVisionAnalysis = '';
+    let recognition = null;
+    let listening = false;
+
+    function appendMessage(text, type = 'ai') {
+      const chat = document.getElementById('chatArea');
+      const bubble = document.createElement('div');
+      bubble.className = 'chat-bubble ' + (type === 'user' ? 'user-msg' : 'ai-msg');
+      bubble.innerHTML = text.replace(/\n/g, '<br>');
+      chat.appendChild(bubble);
+      chat.scrollTop = chat.scrollHeight;
+      if (type === 'ai') lastAIResponse = text;
+    }
+
+    function setSaveStatus(msg, type = 'info') {
+      const el = document.getElementById('saveStatus');
+      el.style.display = 'block';
+      el.className = type === 'error' ? 'text-danger mt-2' : 'text-success mt-2';
+      el.textContent = msg;
+      setTimeout(function () { el.style.display = 'none'; }, 4000);
+    }
+
+    function setMapStatus(msg, type, persist) {
+      const el = document.getElementById('mapStatus');
+      if (!el) return;
+      el.style.display = msg ? 'block' : 'none';
+      el.className = type === 'error' ? 'text-danger mt-2' : 'text-muted mt-2';
+      el.textContent = msg || '';
+      if (!persist && msg) {
+        clearTimeout(mapStatusTimer);
+        mapStatusTimer = setTimeout(function () { el.style.display = 'none'; }, 3000);
+      }
+    }
+
+    async function loadGoogleMaps() {
+      try {
+        const res = await fetch('/api/rock-specimens/google-api-key');
+        const data = await res.json();
+        if (!data.apiKey) {
+          console.warn('No Google Maps API key.');
+          fetchSpecimens();
+          return;
+        }
+        return new Promise(function (resolve) {
+          window.initRockMapCb = function () { initMap(); resolve(); };
+          const script = document.createElement('script');
+          script.src = 'https://maps.googleapis.com/maps/api/js?key=' + encodeURIComponent(data.apiKey) + '&libraries=places&callback=initRockMapCb';
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        });
+      } catch (e) {
+        console.error(e);
+        fetchSpecimens();
+      }
+    }
+
+    function initMap() {
+      const center = { lat: 39.5, lng: -98.35 };
+      const rockIcon = {
+        url: 'https://maps.google.com/mapfiles/ms/icons/purple-dot.png',
+        scaledSize: new google.maps.Size(32, 32),
+        anchor: new google.maps.Point(16, 32)
+      };
+      map = new google.maps.Map(document.getElementById('rockMap'), {
+        center: center,
+        zoom: 4
+      });
+      map.addListener('click', function (e) {
+        setNewPinLocation(e.latLng);
+      });
+      map.__rockIcon = rockIcon;
+      initRockAddressAutocomplete();
+      fetchSpecimens();
+    }
+
+    function buildRockAddressLabel() {
+      const street = (document.getElementById('rockStreet') && document.getElementById('rockStreet').value.trim()) || '';
+      const city = (document.getElementById('rockCity') && document.getElementById('rockCity').value.trim()) || '';
+      const state = (document.getElementById('rockState') && document.getElementById('rockState').value.trim()) || '';
+      const zip = (document.getElementById('rockZip') && document.getElementById('rockZip').value.trim()) || '';
+      return [street, city, state, zip].filter(Boolean).join(', ');
+    }
+
+    function fillRockAddressFromPlace(place) {
+      let city = '';
+      let state = '';
+      let county = '';
+      let zip = '';
+      if (Array.isArray(place.address_components)) {
+        place.address_components.forEach(function (component) {
+          const types = component.types || [];
+          if (types.indexOf('locality') >= 0) city = component.long_name;
+          else if (types.indexOf('administrative_area_level_1') >= 0) state = component.short_name;
+          else if (types.indexOf('administrative_area_level_2') >= 0) {
+            county = component.long_name.replace(/ County$/, '');
+          } else if (types.indexOf('postal_code') >= 0) zip = component.long_name;
+        });
+      }
+      const streetInput = document.getElementById('rockStreet');
+      const label = place.formatted_address || place.name || (streetInput && streetInput.value) || '';
+      if (streetInput) streetInput.value = label;
+      const cityInput = document.getElementById('rockCity');
+      if (cityInput) cityInput.value = city;
+      const stateInput = document.getElementById('rockState');
+      if (stateInput) stateInput.value = state;
+      const countyInput = document.getElementById('rockCounty');
+      if (countyInput) countyInput.value = county;
+      const zipInput = document.getElementById('rockZip');
+      if (zipInput) zipInput.value = zip;
+      if (place.geometry && place.geometry.location) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        document.getElementById('rockAddressLat').value = lat;
+        document.getElementById('rockAddressLng').value = lng;
+        document.getElementById('rockLat').value = lat.toFixed(6);
+        document.getElementById('rockLng').value = lng.toFixed(6);
+      }
+      const labelEl = document.getElementById('rockLabel');
+      if (labelEl && label) labelEl.value = label;
+    }
+
+    function initRockAddressAutocomplete() {
+      const input = document.getElementById('rockStreet');
+      if (!input || rockAddressAutocomplete || !window.google || !google.maps || !google.maps.places) return;
+      try {
+        rockAddressAutocomplete = new google.maps.places.Autocomplete(input, {
+          types: ['address'],
+          componentRestrictions: { country: 'us' }
+        });
+        rockAddressAutocomplete.addListener('place_changed', function () {
+          fillRockAddressFromPlace(rockAddressAutocomplete.getPlace());
+        });
+        input.addEventListener('input', function () {
+          document.getElementById('rockAddressLat').value = '';
+          document.getElementById('rockAddressLng').value = '';
+          document.getElementById('rockLat').value = '';
+          document.getElementById('rockLng').value = '';
+        });
+      } catch (err) {
+        console.warn(err);
+      }
+    }
+
+    function setNewPinLocation(latLng) {
+      if (!map) return;
+      if (!newPinMarker) {
+        newPinMarker = new google.maps.Marker({
+          position: latLng,
+          map: map,
+          icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png',
+          title: 'New find'
+        });
+      } else {
+        newPinMarker.setPosition(latLng);
+      }
+      map.panTo(latLng);
+      document.getElementById('rockLat').value = latLng.lat().toFixed(6);
+      document.getElementById('rockLng').value = latLng.lng().toFixed(6);
+      document.getElementById('rockAddressLat').value = latLng.lat();
+      document.getElementById('rockAddressLng').value = latLng.lng();
+      const labelInput = document.getElementById('rockLabel');
+      if (labelInput && !labelInput.value) {
+        labelInput.value = latLng.lat().toFixed(5) + ', ' + latLng.lng().toFixed(5);
+      }
+    }
+
+    function requestDeviceLocationNow() {
+      return new Promise(function (resolve) {
+        if (!navigator.geolocation) {
+          resolve(null);
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            resolve({ lat: position.coords.latitude, lng: position.coords.longitude });
+          },
+          function () { resolve(null); },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+        );
+      });
+    }
+
+    function requestDeviceLocationOnLoad() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          document.getElementById('rockLat').value = lat.toFixed(6);
+          document.getElementById('rockLng').value = lng.toFixed(6);
+          document.getElementById('rockAddressLat').value = lat;
+          document.getElementById('rockAddressLng').value = lng;
+          const labelEl = document.getElementById('rockLabel');
+          if (labelEl && !labelEl.value) labelEl.value = lat.toFixed(5) + ', ' + lng.toFixed(5);
+          if (map && window.google && google.maps) {
+            setNewPinLocation(new google.maps.LatLng(lat, lng));
+          }
+        },
+        function () {},
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+      );
+    }
+
+    async function useMyLocation() {
+      const coords = await requestDeviceLocationNow();
+      if (!coords) {
+        setSaveStatus('Could not read GPS. Check permissions.', 'error');
+        return;
+      }
+      if (map && window.google && google.maps) {
+        setNewPinLocation(new google.maps.LatLng(coords.lat, coords.lng));
+      } else {
+        document.getElementById('rockLat').value = coords.lat.toFixed(6);
+        document.getElementById('rockLng').value = coords.lng.toFixed(6);
+      }
+    }
+
+    async function fetchSpecimens() {
+      const u = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+      if (!u || !u.id) {
+        setMapStatus('Select a user to load your specimens.', 'error', true);
+        specimens = [];
+        renderSpecList();
+        return;
+      }
+      setMapStatus('');
+      try {
+        const res = await fetch('/api/rock-specimens?userId=' + encodeURIComponent(u.id));
+        const data = await res.json();
+        if (!data.success) return;
+        specimens = data.specimens || [];
+        renderMarkers();
+        renderSpecList();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderMarkers() {
+      if (!map || !window.google) return;
+      markers.forEach(function (m) { m.setMap(null); });
+      markers = [];
+      markerInfos = [];
+      const bounds = new google.maps.LatLngBounds();
+      specimens.forEach(function (s, idx) {
+        if (s.latitude == null || s.longitude == null) return;
+        const pos = { lat: parseFloat(s.latitude), lng: parseFloat(s.longitude) };
+        const marker = new google.maps.Marker({
+          position: pos,
+          map: map,
+          title: s.specimen_name || 'Specimen',
+          icon: map.__rockIcon
+        });
+        const info = new google.maps.InfoWindow({
+          content: '<div style="max-width:220px;"><strong>' + (s.specimen_name || '') + '</strong><br>' +
+            (s.likely_type || '') + '<br><small>' + (s.location_label || '') + '</small></div>'
+        });
+        marker.addListener('click', function () { info.open(map, marker); });
+        markers.push(marker);
+        markerInfos.push({ marker: marker, info: info, specimen: s, index: idx });
+        bounds.extend(pos);
+      });
+      if (markers.length) map.fitBounds(bounds);
+    }
+
+    function renderSpecList() {
+      const list = document.getElementById('specList');
+      if (!list) return;
+      if (!specimens.length) {
+        list.innerHTML = '<div class="text-muted small">No saved specimens yet.</div>';
+        return;
+      }
+      list.innerHTML = specimens.map(function (s, idx) {
+        const sel = selectedSpecimenId === s.id ? 'border-primary' : 'border-light';
+        return (
+          '<div class="card mb-2 ' + sel + '" style="border-width:2px;cursor:pointer;" onclick="locateSpecimen(' + idx + ')">' +
+          '<div class="card-body p-2"><strong class="d-block">' + escapeHtml(s.specimen_name || '') + '</strong>' +
+          '<small class="text-muted">' + escapeHtml(s.likely_type || '') + '</small></div></div>'
+        );
+      }).join('');
+    }
+
+    function escapeHtml(t) {
+      if (!t) return '';
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    window.locateSpecimen = function (idx) {
+      const item = markerInfos[idx];
+      if (!item || !map) return;
+      map.panTo(item.marker.getPosition());
+      map.setZoom(Math.max(map.getZoom(), 10));
+      item.info.open(map, item.marker);
+      selectedSpecimenId = item.specimen.id;
+      renderSpecList();
+    };
+
+    async function saveSpecimen() {
+      const u = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+      if (!u || !u.id) {
+        setSaveStatus('Select a user (top) before saving.', 'error');
+        return;
+      }
+      const specimenName = document.getElementById('specimenName').value.trim();
+      const likelyType = document.getElementById('likelyType').value.trim();
+      const notes = document.getElementById('rockNotes').value.trim();
+      let lat = parseFloat(document.getElementById('rockLat').value);
+      let lng = parseFloat(document.getElementById('rockLng').value);
+      let locationLabel = document.getElementById('rockLabel').value.trim();
+      const addressLabel = buildRockAddressLabel();
+      const addressLatRaw = document.getElementById('rockAddressLat').value;
+      const addressLngRaw = document.getElementById('rockAddressLng').value;
+      const addressLat = addressLatRaw ? parseFloat(addressLatRaw) : null;
+      const addressLng = addressLngRaw ? parseFloat(addressLngRaw) : null;
+
+      if (addressLabel) {
+        locationLabel = addressLabel;
+        document.getElementById('rockLabel').value = addressLabel;
+      }
+      if (Number.isFinite(addressLat) && Number.isFinite(addressLng)) {
+        lat = addressLat;
+        lng = addressLng;
+        document.getElementById('rockLat').value = addressLat.toFixed(6);
+        document.getElementById('rockLng').value = addressLng.toFixed(6);
+      }
+
+      if (!specimenName) {
+        setSaveStatus('Add a name / label for the specimen.', 'error');
+        return;
+      }
+
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        const coords = await requestDeviceLocationNow();
+        if (coords) {
+          lat = coords.lat;
+          lng = coords.lng;
+          document.getElementById('rockLat').value = lat.toFixed(6);
+          document.getElementById('rockLng').value = lng.toFixed(6);
+          if (!locationLabel) {
+            locationLabel = lat.toFixed(5) + ', ' + lng.toFixed(5);
+            document.getElementById('rockLabel').value = locationLabel;
+          }
+        }
+      }
+
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        setSaveStatus('Set location: click the map or use GPS.', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/rock-specimens?userId=' + encodeURIComponent(u.id), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            specimenName: specimenName,
+            likelyType: likelyType || null,
+            notes: notes || null,
+            latitude: lat,
+            longitude: lng,
+            locationLabel: locationLabel || null,
+            aiAnalysis: lastVisionAnalysis || null
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setSaveStatus('Saved.');
+          document.getElementById('specimenName').value = '';
+          document.getElementById('likelyType').value = '';
+          document.getElementById('rockNotes').value = '';
+          fetchSpecimens();
+        } else {
+          setSaveStatus(data.error || 'Save failed.', 'error');
+        }
+      } catch (e) {
+        console.error(e);
+        setSaveStatus('Save error.', 'error');
+      }
+    }
+
+    async function askRocky() {
+      const prompt = document.getElementById('rockQuery').value.trim();
+      const askBtn = document.getElementById('askRockyBtn');
+      if (!prompt) {
+        appendMessage('Type a question first.', 'ai');
+        return;
+      }
+      appendMessage('<strong>You:</strong> ' + prompt, 'user');
+      if (askBtn) {
+        askBtn.disabled = true;
+        askBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-1" role="status" aria-hidden="true"></span> Thinking…';
+      }
+      try {
+        const res = await fetch('/api/rock-discovery/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: prompt })
+        });
+        const data = await res.json();
+        if (data.success && data.response) {
+          appendMessage(data.response, 'ai');
+        } else {
+          appendMessage(data.error || 'No response.', 'ai');
+        }
+      } catch (e) {
+        console.error(e);
+        appendMessage('Request failed.', 'ai');
+      } finally {
+        if (askBtn) {
+          askBtn.disabled = false;
+          askBtn.innerHTML = '<i class="bi-robot"></i> Ask Rocky The Rock Star';
+        }
+      }
+    }
+
+    function clearChat() {
+      const chat = document.getElementById('chatArea');
+      if (chat) chat.innerHTML = '';
+      lastAIResponse = '';
+    }
+
+    async function speak(text) {
+      if (!text) return;
+      if (typeof window.stopSpeech === 'function') window.stopSpeech();
+      if (typeof window.speakWithGoogle === 'function') {
+        const ok = await window.speakWithGoogle(text);
+        if (ok) return;
+      }
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'en-US';
+      window.speechSynthesis.speak(u);
+    }
+
+    function speakLast() {
+      speak(lastAIResponse.replace(/<[^>]+>/g, ''));
+    }
+
+    function startVoice() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        appendMessage('Voice not supported in this browser.', 'ai');
+        return;
+      }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      recognition.onstart = function () {
+        listening = true;
+        document.getElementById('startVoiceBtn').disabled = true;
+        document.getElementById('stopVoiceBtn').disabled = false;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) { vs.style.display = 'block'; vs.textContent = 'Listening…'; }
+      };
+      recognition.onresult = function (event) {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('rockQuery').value = transcript;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) vs.textContent = 'Heard: "' + transcript + '"';
+        askRocky();
+      };
+      recognition.onerror = function (event) {
+        const vs = document.getElementById('voiceStatus');
+        if (vs) vs.textContent = 'Voice error: ' + event.error;
+      };
+      recognition.onend = function () {
+        listening = false;
+        document.getElementById('startVoiceBtn').disabled = false;
+        document.getElementById('stopVoiceBtn').disabled = true;
+        const vs = document.getElementById('voiceStatus');
+        if (vs) setTimeout(function () { vs.style.display = 'none'; }, 1500);
+      };
+      recognition.start();
+    }
+
+    function stopVoice() {
+      if (recognition && listening) recognition.stop();
+    }
+
+    function setPhotoStatus(msg, type) {
+      const el = document.getElementById('photoStatus');
+      el.className = type === 'error' ? 'text-danger mt-2' : 'text-muted mt-2';
+      el.textContent = msg || '';
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        setPhotoStatus('Choose an image file.', 'error');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        uploadedImageData = e.target.result;
+        const img = document.getElementById('photoPreview');
+        img.src = uploadedImageData;
+        img.style.display = 'block';
+        setPhotoStatus('Loaded. Tap Identify from photo.', 'info');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function startCamera() {
+      try {
+        stopCamera();
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+        });
+        cameraStream = stream;
+        const video = document.getElementById('cameraPreview');
+        video.srcObject = stream;
+        video.style.display = 'block';
+        setPhotoStatus('Camera on. Capture when ready.', 'info');
+      } catch (err) {
+        console.error(err);
+        setPhotoStatus('Camera blocked or unavailable.', 'error');
+      }
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById('cameraPreview');
+      if (!video || !cameraStream) {
+        setPhotoStatus('Start the camera first.', 'error');
+        return;
+      }
+      const canvas = document.getElementById('cameraCanvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      uploadedImageData = canvas.toDataURL('image/jpeg', 0.9);
+      const img = document.getElementById('photoPreview');
+      img.src = uploadedImageData;
+      img.style.display = 'block';
+      setPhotoStatus('Captured.', 'info');
+    }
+
+    function stopCamera() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(function (t) { t.stop(); });
+        cameraStream = null;
+      }
+      const video = document.getElementById('cameraPreview');
+      if (video) {
+        video.srcObject = null;
+        video.style.display = 'none';
+      }
+    }
+
+    async function identifyRockPhoto() {
+      if (!uploadedImageData) {
+        setPhotoStatus('Upload or capture a photo first.', 'error');
+        return;
+      }
+      const idBtn = document.getElementById('identifyPhotoBtn');
+      const prompt = document.getElementById('rockQuery').value.trim();
+      appendMessage('<strong>You:</strong> [Photo for ID]', 'user');
+      setPhotoStatus('Analyzing…', 'info');
+      if (idBtn) idBtn.disabled = true;
+      try {
+        const res = await fetch('/api/rock-discovery/vision-id', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageData: uploadedImageData,
+            prompt: prompt || 'Meteorite vs Earth rock vs slag — what do you see?'
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          lastVisionAnalysis = data.result;
+          appendMessage(data.result, 'ai');
+          setPhotoStatus('Done.', 'info');
+        } else {
+          appendMessage('Vision error: ' + (data.error || 'unknown'), 'ai');
+          setPhotoStatus('Error.', 'error');
+        }
+      } catch (e) {
+        console.error(e);
+        appendMessage('Vision request failed.', 'ai');
+        setPhotoStatus('Failed.', 'error');
+      } finally {
+        if (idBtn) idBtn.disabled = false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      createUserSelector('userSelectorContainer', { title: 'Collector:', showAllOption: false });
+      loadGoogleMaps().then(function () {
+        requestDeviceLocationOnLoad();
+      });
+      window.addEventListener('userChanged', fetchSpecimens);
+      const stateInput = document.getElementById('rockState');
+      if (stateInput) {
+        stateInput.addEventListener('input', function (ev) {
+          ev.target.value = ev.target.value.toUpperCase();
+        });
+      }
+    });
+  </script>
+</body>
+</html>

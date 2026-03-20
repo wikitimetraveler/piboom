@@ -233,6 +233,31 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_catches_caught_at ON catches(caught_at DESC)
     `);
 
+    // Rock / meteorite specimens (Nature — Rocky The Rock Star)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS rock_specimens (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100),
+        specimen_name VARCHAR(255) NOT NULL,
+        likely_type VARCHAR(255),
+        notes TEXT,
+        image_url TEXT,
+        latitude DOUBLE PRECISION,
+        longitude DOUBLE PRECISION,
+        location_label TEXT,
+        ai_analysis TEXT,
+        found_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_rock_specimens_user ON rock_specimens(user_id)
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_rock_specimens_found_at ON rock_specimens(found_at DESC)
+    `);
+
     // Bikes inventory
     await pool.query(`
       CREATE TABLE IF NOT EXISTS bikes (

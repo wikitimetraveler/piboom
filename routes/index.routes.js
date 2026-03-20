@@ -29,6 +29,8 @@ import disastersRoutes from './disasters.routes.js';
 import encompassHubRoutes from './encompass-hub.routes.js';
 import encompassWebhookRoutes from './encompass-webhook.routes.js';
 import fishCatchesRoutes from './fish-catches.routes.js';
+import rockDiscoveryRoutes from './rock-discovery.routes.js';
+import rockCollectionRoutes from './rock-collection.routes.js';
 import bikesRoutes from './bikes.routes.js';
 import customersRoutes from './customers.routes.js';
 import unitTestsRoutes from './unit-tests.routes.js';
@@ -66,6 +68,8 @@ export default function buildRoutes(io) {
   api.use('/disasters', disastersRoutes);
   api.use('/webhooks', encompassWebhookRoutes);
   api.use('/fish-catches', fishCatchesRoutes);
+  api.use('/rock-discovery', rockDiscoveryRoutes);
+  api.use('/rock-specimens', rockCollectionRoutes);
   api.use('/bikes', bikesRoutes);
   api.use('/customers', customersRoutes);
   api.use('/unit-tests', unitTestsRoutes);
