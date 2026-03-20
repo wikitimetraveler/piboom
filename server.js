@@ -83,6 +83,38 @@ app.use(
 ); // Support base64 image uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+const FINANCE_SESSION_COOKIE = 'dc_finance_session';
+const FINANCE_SESSION_VALUE = '1';
+/** Paths that are allowed without finance session cookie (scripts, styles, images for /finance/ pages). */
+const FINANCE_PUBLIC_FILE = /\.(js|mjs|css|png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|eot|map|json|txt|xml|kml|wasm)$/i;
+
+function readCookieHeader(req, name) {
+  const raw = req.headers.cookie;
+  if (!raw) return null;
+  for (const part of raw.split(';')) {
+    const i = part.indexOf('=');
+    if (i === -1) continue;
+    const k = part.slice(0, i).trim();
+    if (k !== name) continue;
+    return decodeURIComponent(part.slice(i + 1).trim());
+  }
+  return null;
+}
+
+function financePathNeedsSession(urlPath) {
+  if (urlPath === '/finance' || urlPath === '/finance/') return true;
+  if (!urlPath.startsWith('/finance/')) return false;
+  return !FINANCE_PUBLIC_FILE.test(urlPath);
+}
+
+function requireFinanceSession(req, res, next) {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+  if (!financePathNeedsSession(req.path)) return next();
+  if (readCookieHeader(req, FINANCE_SESSION_COOKIE) === FINANCE_SESSION_VALUE) return next();
+  const returnTo = encodeURIComponent(req.originalUrl);
+  return res.redirect(302, `/?returnTo=${returnTo}&financeLogin=1`);
+}
+
 // Allow iframe embedding for Encompass Assistant
 app.use('/finance/encompass-assistant.html', (req, res, next) => {
   res.removeHeader('X-Frame-Options');
@@ -93,6 +125,7 @@ app.use('/finance/encompass-assistant.html', (req, res, next) => {
 // Make io available to routes
 app.locals.io = io;
 
+app.use(requireFinanceSession);
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/data', express.static(path.join(__dirname, 'data'))); // Serve KML files
 app.get('/vendor/exceljs.min.js', (req, res) => {

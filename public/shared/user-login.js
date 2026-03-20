@@ -50,6 +50,31 @@ const USER_PASSWORDS = {
   'fuzz-maestro': 'Fly Dog'
 };
 
+/** HttpOnly cannot be set from JS; this pairs with server middleware so /finance/*.html is not served without login. */
+const FINANCE_SESSION_COOKIE_NAME = 'dc_finance_session';
+const FINANCE_SESSION_COOKIE_VALUE = '1';
+const FINANCE_SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 30;
+
+function setFinanceSessionCookie() {
+  try {
+    document.cookie = `${FINANCE_SESSION_COOKIE_NAME}=${FINANCE_SESSION_COOKIE_VALUE}; Path=/; Max-Age=${FINANCE_SESSION_MAX_AGE_SEC}; SameSite=Lax`;
+  } catch (_) {}
+}
+
+function clearFinanceSessionCookie() {
+  try {
+    document.cookie = `${FINANCE_SESSION_COOKIE_NAME}=; Path=/; Max-Age=0`;
+  } catch (_) {}
+}
+
+(function syncFinanceSessionCookieFromStorage() {
+  try {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('loggedInUserId')) {
+      setFinanceSessionCookie();
+    }
+  } catch (_) {}
+})();
+
 // Use USERS from user-selector.js if already loaded, otherwise define it here
 window.USERS = window.USERS || [
   { id: 'cosmic-turtle', name: 'The Cosmic Turtle', avatar: '/images/cosmic turtle.png', color: '#00CED1' },
@@ -190,7 +215,8 @@ function submitLogin() {
     // Correct password - login user
     localStorage.setItem('loggedInUserId', selectedLoginUserId);
     localStorage.setItem('currentUserId', selectedLoginUserId);
-    
+    setFinanceSessionCookie();
+
     // Close modal
     closeLoginPopup();
     
@@ -225,6 +251,7 @@ function logout() {
     localStorage.removeItem('loggedInUserId');
     localStorage.removeItem('currentUserId');
     sessionStorage.clear();
+    clearFinanceSessionCookie();
     window.location.reload();
   }
 }
@@ -244,8 +271,33 @@ function updateNavbarUserDisplay() {
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const returnToRaw = params.get('returnTo');
+  const financeLogin = params.get('financeLogin') === '1';
+
+  if (returnToRaw && isLoggedIn()) {
+    try {
+      const dest = new URL(returnToRaw, window.location.origin);
+      if (dest.origin === window.location.origin && dest.pathname.startsWith('/finance')) {
+        window.location.replace(dest.pathname + dest.search + dest.hash);
+        return;
+      }
+    } catch (_) {
+      /* ignore malformed returnTo */
+    }
+  }
+
+  if (financeLogin && returnToRaw && !isLoggedIn()) {
+    try {
+      const dest = new URL(returnToRaw, window.location.origin);
+      if (dest.origin === window.location.origin && dest.pathname.startsWith('/finance')) {
+        showLoginPopup();
+      }
+    } catch (_) {}
+  }
+
   updateNavbarUserDisplay();
-  
+
   // Listen for Enter key in password field
   document.addEventListener('keypress', (e) => {
     if (e.target.id === 'loginPasswordInput' && e.key === 'Enter') {

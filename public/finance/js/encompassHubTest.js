@@ -36,7 +36,7 @@ const endpoints = [
   { label: 'Timeline Dataset', value: '/api/encompass-hub/visualizations/timeline', method: 'GET', needsFilters: true },
   { label: 'Native Fields', value: '/api/encompass-hub/native-fields', method: 'GET' },
   { label: 'Custom Fields', value: '/api/encompass-hub/custom-fields', method: 'GET' },
-  { label: 'Users Directory', value: '/api/encompass-hub/users', method: 'GET' },
+  { label: 'Users Directory', value: '/api/encompass-hub/users', method: 'GET', hideInDropdown: true },
 ];
 
 const payloadPresets = [
@@ -62,7 +62,8 @@ const payloadPresets = [
 ];
 
 function populateEndpoints() {
-  endpoints.forEach((endpoint, index) => {
+  const shown = endpoints.filter((e) => !e.hideInDropdown);
+  shown.forEach((endpoint, index) => {
     const option = document.createElement('option');
     option.value = endpoint.value;
     option.textContent = `${endpoint.label} (${endpoint.method})`;
