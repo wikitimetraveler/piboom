@@ -82,6 +82,12 @@
         opacity: 0;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .floating-cash * {
+        animation: none !important;
+      }
+    }
     
     .finance-grid { max-width: 900px; margin: 0 auto; }
   </style>
@@ -104,7 +110,11 @@
 <modern-navbar></modern-navbar>
 
 <main class="container">
-  
+  <header class="page-hero" aria-labelledby="worksheetsHeroTitle">
+    <h1 id="worksheetsHeroTitle" class="page-hero__title">Worksheets</h1>
+    <p class="page-hero__lead">Calculators, Encompass tools, disaster maps, and developer utilities—pick a tool below.</p>
+  </header>
+
   <div class="domain-grid domain-grid-sm finance-grid" id="financeToolGrid"><!-- populated by menu-config --></div>
   
 </main>
