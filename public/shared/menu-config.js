@@ -16,6 +16,7 @@
     { href: '/ai/voice-dj.html', icon: 'bi-robot', label: 'AI & Voice', domain: 'ai', title: 'Wolfman Dave, Levi, voice guide', demoOnly: false },
     { href: '/entertainment/player.html', icon: 'bi-stars', label: 'Entertainment', domain: 'entertainment', title: 'Boombox, visualizer, posters', demoOnly: false },
     { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local', domain: 'local', title: 'Local spots map', demoOnly: false },
+    { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds', domain: 'finds', title: 'Thrift & vintage discovery', demoOnly: false },
     { href: '/family/genealogy.html', icon: 'bi-people-fill', label: 'Family', domain: 'family', title: 'Family tree', demoOnly: false },
   ];
 
@@ -23,6 +24,7 @@
   const NAV_FINANCE = [
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
+    { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
     { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests' },
     { href: '/finance/tool9.html', icon: 'bi-camera-reels', label: 'Screen Test' },
@@ -34,6 +36,7 @@
   /** Navbar Encompass dropdown items (under Worksheets or standalone) */
   const NAV_ENCOMPASS = [
     { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub' },
+    { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk' },
     { href: '/finance/unit-tests.html', icon: 'bi-clipboard-check', label: 'Unit Tests' },
@@ -89,6 +92,7 @@
     { href: '/nature/critter-discovery.html', icon: 'bi-bug-fill', label: 'Critter Discovery' },
     { href: '/nature/critter-collection.html', icon: 'bi-bug', label: 'Critter Collection' },
     { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local Spots' },
+    { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds' },
     { divider: true },
     { href: '/', icon: 'bi-house', label: 'Hub (All Tools)' },
   ];
@@ -113,6 +117,7 @@
   const ENCOMPASS_TOOLS = [
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub', title: 'Worksheets Hub, calculators, disasters' },
     { href: '/finance/encompass-hub.html', icon: 'bi-cloud-arrow-down', label: 'Encompass Hub', title: 'Encompass Hub' },
+    { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update', title: 'Encompass loanBatch/updateRequests' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant', title: 'Encompass AI Assistant' },
     { href: '/finance/pipeline-risk-dashboard.html', icon: 'bi-shield-check', label: 'Pipeline Risk', title: 'Pipeline Risk Dashboard' },
     { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests', title: 'Unit Test Runner' },

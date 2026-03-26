@@ -1099,6 +1099,41 @@ export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavi
   }
 }
 
+/**
+ * POST /encompass/v1/loanBatch/updateRequests — batch update loans (by loanIds or filter + loanData).
+ * @param {object} body - ICE request body
+ * @returns {Promise<{ status: number, data: unknown }>}
+ */
+export async function postLoanBatchUpdateRequests(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    throw new Error('Request body must be a JSON object');
+  }
+
+  try {
+    const response = await requestWithAuth({
+      method: 'post',
+      url: `${API_V1_BASE}/loanBatch/updateRequests`,
+      data: body,
+    });
+    return { status: response.status, data: response.data };
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass loanBatch updateRequests failed', {
+      status,
+      summary: data?.summary,
+      details: data?.details,
+      errors: data?.errors,
+      message: error.message,
+    });
+    const detail = data?.details || data?.message || data?.error || error.message;
+    const err = new Error(`Encompass loanBatch ${status || 'error'}: ${detail}`);
+    err.statusCode = status || 500;
+    err.upstream = data;
+    throw err;
+  }
+}
+
 export {
   normalizePipelineItems,
   parseNumber,

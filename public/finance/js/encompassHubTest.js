@@ -36,6 +36,12 @@ const endpoints = [
   { label: 'Timeline Dataset', value: '/api/encompass-hub/visualizations/timeline', method: 'GET', needsFilters: true },
   { label: 'Native Fields', value: '/api/encompass-hub/native-fields', method: 'GET' },
   { label: 'Custom Fields', value: '/api/encompass-hub/custom-fields', method: 'GET' },
+  {
+    label: 'Loan batch update',
+    value: '/api/encompass-hub/loan-batch/update-requests',
+    method: 'POST',
+    needsBody: true,
+  },
   { label: 'Users Directory', value: '/api/encompass-hub/users', method: 'GET', hideInDropdown: true },
 ];
 

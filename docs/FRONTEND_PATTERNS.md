@@ -58,6 +58,29 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 | `public/shared/calculationEngine.js` | Calculation engine |
 | `public/shared/calcEngineLibrary.js` | calcMath library |
 
+## Finance / Worksheets shell (Bootstrap 5)
+
+Worksheets and Encompass pages under `public/finance/` use **Bootstrap 5.3.3** from jsDelivr (not Bootstrap 4).
+
+**CSS (head):**
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+```
+
+**JS (before `</body>`, after jQuery when the page needs jQuery):**
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+```
+
+`bootstrap.bundle.min.js` includes Popper — do **not** add a separate Popper script for Bootstrap-only usage.
+
+**jQuery:** Keep only where required (DataTables, legacy `$()` helpers, some calculators). Bootstrap 5 components use `data-bs-*` attributes (e.g. `data-bs-toggle="collapse"`, `data-bs-target="#id"`, `data-bs-dismiss="modal"`).
+
+**Utilities (v4 → v5):** `ml-*` → `ms-*`, `mr-*` → `me-*`, `pl-*` → `ps-*`, `pr-*` → `pe-*`, `font-weight-bold` → `fw-bold`, modal close → `button.btn-close` with `data-bs-dismiss="modal"`.
+
 ## Navigation (modern-navbar)
 
 The shared navbar (`public/shared/modern-navbar.js`) uses a hub-first structure with 5 top-level items: Home, Worksheets, Music, Entertainment, More.

@@ -89,6 +89,8 @@ Key files:
 * `docs/DEVELOPMENT_WORKFLOW.md`
 * `docs/IIF_PARSER_PHASE2.md`
 * `docs/UNIT_TEST_LIBRARY.md`
+* `docs/UNIT_TEST_VIDEO_SCRIPT.md` (video shot list: unit tests)
+* `docs/SVEN_UX_VIDEO_SCRIPT.md` (video shot list: Sven UI/UX series)
 
 ---
 

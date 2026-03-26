@@ -37,6 +37,7 @@
 - Unit Tests: `public/finance/unit-tests.html`, `public/finance/js/unit-tests.js`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js`, `services/unit-tests-file.service.js`
 - Screen Test: `public/finance/tool9.html`, `controllers/reviewer-ai.controller.js`
 - Encompass field browsers: `encompass-custom-fields.html`, `encompass-native-fields.html`
+- Loan batch update: `public/finance/loan-batch-update.html` (AG Grid + env-scoped native/custom catalogs via hub APIs; SheetJS import; `loanFields` + `loanData.customFields`) → `POST /api/encompass-hub/loan-batch/update-requests` → Encompass `loanBatch/updateRequests`
 
 ### Nature
 - UI: `public/nature/` (nature-hub.html, tree-discovery.html, critter-discovery.html, fish-identification.html, rock-discovery.html, rock-collection.html, tree/critter/fish-collection.html, share-collection.html)
@@ -46,6 +47,11 @@
 ### Local Spots
 - UI: `public/local/local-spots.html` (thrift, taco trucks, gardens, bike trails; lat/lng auto-fill when adding spot on mobile)
 - Routes: `routes/local-spots.routes.js`
+
+### Finds (thrift / flea / vintage)
+- UI: `public/finds/` — `index.html`, `discovery.html`, `detail.html`; JS `public/finds/js/`
+- API: `routes/finds.routes.js` → `/api/finds` (Postgres `finds` table); services: `finds.service.js`, `finds-ai.service.js`, `finds-voice.service.js`
+- Vision: OpenAI `gpt-4o-mini`; TTS: existing `POST /api/voice/synthesize`
 
 ## Commands (source of truth)
 - Dev: `npm run dev`

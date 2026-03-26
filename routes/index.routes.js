@@ -36,6 +36,8 @@ import customersRoutes from './customers.routes.js';
 import unitTestsRoutes from './unit-tests.routes.js';
 import reviewerRoutes from './reviewer.routes.js';
 import localSpotsRoutes from './local-spots.routes.js';
+import findsRoutes from './finds.routes.js';
+import appUserAuthRoutes from './app-user-auth.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -75,6 +77,8 @@ export default function buildRoutes(io) {
   api.use('/unit-tests', unitTestsRoutes);
   api.use('/reviewer', reviewerRoutes);
   api.use('/local-spots', localSpotsRoutes);
+  api.use('/finds', findsRoutes);
+  api.use('/auth', appUserAuthRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }

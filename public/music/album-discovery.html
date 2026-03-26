@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/shared/styles.css"/>
 <script src="/shared/modern-navbar.js"></script>
 <script src="/shared/music-mini-nav.js"></script>
+<script src="/shared/discovery-camera.js"></script>
 <!-- EXIF.js for reading photo GPS metadata -->
 <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script src="https://apis.google.com/js/api.js"></script>
@@ -1961,14 +1962,15 @@ async function startCamera() {
   try {
     setCameraLoading(true);
     updateCameraStatus('Requesting camera access…', 'info');
-    const constraints = {
-      video: {
-        facingMode: 'environment',
-        width: { ideal: 2560 },
-        height: { ideal: 1440 }
-      }
-    };
-    cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+    cameraStream = typeof getDiscoveryCameraVideoStream === 'function'
+      ? await getDiscoveryCameraVideoStream()
+      : await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+          },
+        });
     cameraVideo = document.getElementById('cameraVideo');
     cameraVideo.srcObject = cameraStream;
     document.getElementById('cameraPreview').style.display = 'block';

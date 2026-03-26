@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find detail — DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f8f4ff 0%, #e8f4fc 100%); }
+  </style>
+</head>
+<body>
+  <modern-navbar></modern-navbar>
+  <div class="container py-4">
+    <p><a href="/finds/index.html">&larr; Finds</a></p>
+    <div id="userSelectorContainer" class="mb-3"></div>
+    <div id="detailRoot">
+      <h1 class="h4 mb-3">Find detail</h1>
+      <p class="text-muted" id="scoreDisplay"></p>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Voice</h5>
+          <button type="button" id="btnReadSummary" class="btn btn-outline-primary"><i class="bi-volume-up"></i> Read summary (TTS)</button>
+          <button type="button" id="btnVoiceNote" class="btn btn-outline-secondary ml-2"><i class="bi-mic"></i> Voice note</button>
+          <span id="ttsStatus" class="ml-2 small text-muted"></span>
+          <span id="voiceStatus" class="ml-2 small text-info"></span>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Photos</h5>
+          <div id="imageGallery"></div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Edit</h5>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="findTitle" class="form-control">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-4">
+              <label>Category</label>
+              <select id="findCategory" class="form-control">
+                <option value="unknown">unknown</option>
+                <option value="art">art</option>
+                <option value="bags">bags</option>
+                <option value="clothing">clothing</option>
+                <option value="vintage_electronics">vintage_electronics</option>
+                <option value="audio">audio</option>
+                <option value="books">books</option>
+                <option value="decor">decor</option>
+                <option value="ceramics_glass">ceramics_glass</option>
+                <option value="sporting">sporting</option>
+              </select>
+            </div>
+            <div class="form-group col-md-4">
+              <label>Status</label>
+              <select id="findStatus" class="form-control">
+                <option value="researching">researching</option>
+                <option value="spotted">spotted</option>
+                <option value="acquired">acquired</option>
+                <option value="keeper">keeper</option>
+                <option value="resale">resale</option>
+                <option value="sold">sold</option>
+              </select>
+            </div>
+            <div class="form-group col-md-4">
+              <label>Subcategory</label>
+              <input type="text" id="subcategory" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Acquisition</h5>
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label>Source</label>
+              <input type="text" id="acqSource" class="form-control">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Location</label>
+              <input type="text" id="acqLocation" class="form-control">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Price paid</label>
+              <input type="number" id="pricePaid" class="form-control" step="0.01">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Date</label>
+              <input type="text" id="acqDate" class="form-control">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Identification</h5>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label>Maker</label>
+              <input type="text" id="idMaker" class="form-control">
+            </div>
+            <div class="form-group col-md-6">
+              <label>Probable maker</label>
+              <input type="text" id="idProbable" class="form-control">
+            </div>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" id="idSigned" class="form-check-input">
+            <label class="form-check-label" for="idSigned">Signed</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input type="checkbox" id="idNumbered" class="form-check-input">
+            <label class="form-check-label" for="idNumbered">Numbered</label>
+          </div>
+          <div class="form-row mt-2">
+            <div class="form-group col-md-4">
+              <label>Edition</label>
+              <input type="text" id="idEdition" class="form-control">
+            </div>
+            <div class="form-group col-md-4">
+              <label>Medium</label>
+              <input type="text" id="idMedium" class="form-control">
+            </div>
+            <div class="form-group col-md-4">
+              <label>Confidence</label>
+              <input type="number" id="idConfidence" class="form-control" step="0.05" min="0" max="1">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Visible text</label>
+            <textarea id="idVisibleText" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Condition</h5>
+          <div class="form-group">
+            <label>Overall</label>
+            <select id="condOverall" class="form-control">
+              <option value="">—</option>
+              <option value="good">good</option>
+              <option value="fair">fair</option>
+              <option value="poor">poor</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="condFramed" class="form-check-input">
+            <label class="form-check-label" for="condFramed">Framed</label>
+          </div>
+          <textarea id="condNotes" class="form-control mt-2" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Valuation</h5>
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label>Listing low</label>
+              <input type="number" id="valListLow" class="form-control" step="0.01">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Listing high</label>
+              <input type="number" id="valListHigh" class="form-control" step="0.01">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Realistic low</label>
+              <input type="number" id="valRealLow" class="form-control" step="0.01">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Realistic high</label>
+              <input type="number" id="valRealHigh" class="form-control" step="0.01">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Valuation confidence</label>
+            <select id="valConf" class="form-control">
+              <option value="">—</option>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
+            </select>
+          </div>
+          <textarea id="valNotes" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Notes & tags</h5>
+          <textarea id="findNotes" class="form-control mb-2" rows="3"></textarea>
+          <input type="text" id="findTags" class="form-control" placeholder="tags">
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Voice notes</h5>
+          <div id="voiceNotesList"></div>
+        </div>
+      </div>
+
+      <button type="button" id="btnSave" class="btn btn-primary"><i class="bi-save"></i> Save</button>
+      <span id="saveStatus" class="ml-2 text-success small"></span>
+      <button type="button" id="btnDelete" class="btn btn-outline-danger float-right">Delete</button>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof createUserSelector === 'function') {
+        createUserSelector('userSelectorContainer', { title: 'Finds — user' });
+      }
+    });
+  </script>
+  <script src="/finds/js/finds-api.js"></script>
+  <script src="/finds/js/finds-detail.js"></script>
+</body>
+</html>

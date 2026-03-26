@@ -20,6 +20,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/encompass-hub/native-fields` | Native fields |
 | GET | `/api/encompass-hub/custom-fields` | Custom fields |
 | POST | `/api/encompass-hub/create-fields` | Create custom fields (tool4 JSON payload) |
+| POST | `/api/encompass-hub/loan-batch/update-requests` | Proxy to Encompass `POST …/loanBatch/updateRequests` (body: loanIds + loanData or filter + loanData) |
 | * | `/api/encompass/*` | Encompass Assistant (search, chat, summary) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |
 | POST | `/api/reviewer/ai/chat` | The Screen Test AI |
@@ -114,6 +115,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | * | `/api/bikes/*` | Bikes CRUD |
 | * | `/api/customers/*` | Customers CRUD |
 | * | `/api/fish-catches/*` | Fish catches |
+| * | `/api/finds/*` | Finds (thrift/flea/vintage): CRUD, `GET /google-api-key` (browser Maps key), `POST /analyze`, `POST /score-preview`, voice note, summary text |
 
 ## Route Files
 
@@ -127,5 +129,6 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | `routes/nature-collection.routes.js` | `/api/nature-collection` |
 | `routes/loan-pipeline.routes.js` | `/api/loan-pipeline` |
 | `routes/disasters.routes.js` | `/api/disasters` |
+| `routes/finds.routes.js` | `/api/finds` |
 | `routes/chat.routes.js` | `/api/chat` |
 | (others) | See `routes/index.routes.js` |

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Find — DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f8f4ff 0%, #e8f4fc 100%); }
+    .pac-container { z-index: 20000; }
+    #findCameraPreview {
+      max-width: 100%;
+      max-height: 240px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <modern-navbar></modern-navbar>
+  <div class="container py-4">
+    <h1 class="h4 mb-3"><i class="bi-camera"></i> New find</h1>
+    <div id="userSelectorContainer" class="mb-3"></div>
+    <p><a href="/finds/index.html">&larr; Back to Finds</a></p>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Photos</h5>
+        <p class="small text-muted mb-2">Gallery, one-tap camera on phones, or live camera on supported browsers.</p>
+        <div class="d-flex flex-wrap align-items-center mb-2">
+          <label class="btn btn-outline-secondary btn-sm mr-2 mb-2 mb-md-0">
+            <i class="bi-images"></i> From gallery
+            <input type="file" id="imageInput" class="d-none" accept="image/*" multiple>
+          </label>
+          <label class="btn btn-outline-secondary btn-sm mr-2 mb-2 mb-md-0">
+            <i class="bi-camera-fill"></i> Camera / take photo
+            <input type="file" id="imageInputCamera" class="d-none" accept="image/*" capture="environment">
+          </label>
+          <button type="button" id="btnCameraStart" class="btn btn-outline-info btn-sm mr-2 mb-2 mb-md-0"><i class="bi-webcam"></i> Live camera</button>
+          <button type="button" id="btnCameraCapture" class="btn btn-outline-primary btn-sm mr-2 mb-2 mb-md-0" disabled>Capture frame</button>
+          <button type="button" id="btnCameraStop" class="btn btn-outline-secondary btn-sm mb-2 mb-md-0" disabled>Stop</button>
+        </div>
+        <video id="findCameraPreview" playsinline muted autoplay style="display:none;"></video>
+        <canvas id="findCameraCanvas" class="d-none" aria-hidden="true"></canvas>
+        <p id="cameraStatus" class="small text-muted mb-2"></p>
+        <div id="imageThumbs" class="mt-2"></div>
+        <button type="button" id="btnAnalyze" class="btn btn-outline-primary mt-2"><i class="bi-stars"></i> Analyze with AI</button>
+        <span id="analyzeStatus" class="ml-2 text-muted small"></span>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Basics</h5>
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" id="findTitle" class="form-control score-refresh" placeholder="e.g. Lee White serigraph">
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-4">
+            <label>Category</label>
+            <select id="findCategory" class="form-control score-refresh">
+              <option value="unknown">unknown</option>
+              <option value="art">art</option>
+              <option value="bags">bags</option>
+              <option value="clothing">clothing</option>
+              <option value="vintage_electronics">vintage_electronics</option>
+              <option value="audio">audio</option>
+              <option value="books">books</option>
+              <option value="decor">decor</option>
+              <option value="ceramics_glass">ceramics_glass</option>
+              <option value="sporting">sporting</option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Status</label>
+            <select id="findStatus" class="form-control">
+              <option value="researching">researching</option>
+              <option value="spotted">spotted</option>
+              <option value="acquired">acquired</option>
+              <option value="keeper">keeper</option>
+              <option value="resale">resale</option>
+              <option value="sold">sold</option>
+            </select>
+          </div>
+          <div class="form-group col-md-4">
+            <label>Subcategory</label>
+            <input type="text" id="subcategory" class="form-control" placeholder="optional">
+          </div>
+        </div>
+        <p id="scorePreview" class="font-weight-bold text-info mb-0">Score: —</p>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Acquisition</h5>
+        <div class="form-group">
+          <label for="findAddress">Address or area</label>
+          <input type="text" id="findAddress" class="form-control" placeholder="Type freely or pick a suggestion — incomplete is fine" autocomplete="street-address">
+          <small class="form-text text-muted">Optional: Google suggestions when a Maps key is configured. You can leave partial text or skip entirely.</small>
+          <input type="hidden" id="findLat" value="">
+          <input type="hidden" id="findLng" value="">
+          <input type="hidden" id="findPlaceId" value="">
+          <button type="button" id="btnUseMyLocation" class="btn btn-outline-primary btn-sm mt-2"><i class="bi-geo-alt"></i> Use my location</button>
+          <span id="geoStatus" class="ml-2 small text-muted"></span>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label>Source</label>
+            <input type="text" id="acqSource" class="form-control" placeholder="thrift, flea…">
+          </div>
+          <div class="form-group col-md-3">
+            <label>Store / venue</label>
+            <input type="text" id="acqLocation" class="form-control score-refresh" placeholder="shop name, aisle…">
+          </div>
+          <div class="form-group col-md-3">
+            <label>Price paid ($)</label>
+            <input type="number" id="pricePaid" class="form-control score-refresh" step="0.01" min="0">
+          </div>
+          <div class="form-group col-md-3">
+            <label>Date</label>
+            <input type="text" id="acqDate" class="form-control" placeholder="YYYY-MM-DD">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Identification</h5>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label>Maker / artist</label>
+            <input type="text" id="idMaker" class="form-control score-refresh">
+          </div>
+          <div class="form-group col-md-6">
+            <label>Probable maker</label>
+            <input type="text" id="idProbable" class="form-control score-refresh">
+          </div>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="checkbox" id="idSigned" class="form-check-input score-refresh">
+          <label class="form-check-label" for="idSigned">Signed</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input type="checkbox" id="idNumbered" class="form-check-input score-refresh">
+          <label class="form-check-label" for="idNumbered">Numbered edition</label>
+        </div>
+        <div class="form-row mt-2">
+          <div class="form-group col-md-4">
+            <label>Edition</label>
+            <input type="text" id="idEdition" class="form-control" placeholder="254/350">
+          </div>
+          <div class="form-group col-md-4">
+            <label>Medium</label>
+            <input type="text" id="idMedium" class="form-control" placeholder="serigraph">
+          </div>
+          <div class="form-group col-md-4">
+            <label>ID confidence (0–1)</label>
+            <input type="number" id="idConfidence" class="form-control score-refresh" step="0.05" min="0" max="1" value="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Visible text (from object)</label>
+          <textarea id="idVisibleText" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Condition</h5>
+        <div class="form-group">
+          <label>Overall</label>
+          <select id="condOverall" class="form-control score-refresh">
+            <option value="">—</option>
+            <option value="good">good</option>
+            <option value="fair">fair</option>
+            <option value="poor">poor</option>
+            <option value="unknown">unknown</option>
+          </select>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="condFramed" class="form-check-input score-refresh">
+          <label class="form-check-label" for="condFramed">Matted / framed</label>
+        </div>
+        <div class="form-group mt-2">
+          <label>Condition notes</label>
+          <textarea id="condNotes" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Valuation</h5>
+        <div class="form-row">
+          <div class="form-group col-md-3">
+            <label>Listing low</label>
+            <input type="number" id="valListLow" class="form-control" step="0.01">
+          </div>
+          <div class="form-group col-md-3">
+            <label>Listing high</label>
+            <input type="number" id="valListHigh" class="form-control" step="0.01">
+          </div>
+          <div class="form-group col-md-3">
+            <label>Realistic low</label>
+            <input type="number" id="valRealLow" class="form-control score-refresh" step="0.01">
+          </div>
+          <div class="form-group col-md-3">
+            <label>Realistic high</label>
+            <input type="number" id="valRealHigh" class="form-control score-refresh" step="0.01">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Valuation confidence</label>
+          <select id="valConf" class="form-control">
+            <option value="">—</option>
+            <option value="low">low</option>
+            <option value="medium">medium</option>
+            <option value="high">high</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Valuation notes</label>
+          <textarea id="valNotes" class="form-control" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Notes & tags</h5>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea id="findNotes" class="form-control score-refresh" rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Tags (comma-separated)</label>
+          <input type="text" id="findTags" class="form-control" placeholder="thrift, signed, framed">
+        </div>
+      </div>
+    </div>
+
+    <button type="button" id="btnSave" class="btn btn-success btn-lg"><i class="bi-check2"></i> Save find</button>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof createUserSelector === 'function') {
+        createUserSelector('userSelectorContainer', { title: 'Finds — user' });
+      }
+    });
+  </script>
+  <script src="/finds/js/finds-api.js"></script>
+  <script src="/finds/js/finds-discovery.js"></script>
+</body>
+</html>

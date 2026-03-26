@@ -27,7 +27,7 @@
     Technologies: HTML, CSS, JavaScript, Bootstrap
     -->
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
     <style>
@@ -590,11 +590,11 @@
             <a class="navbar-brand" href="#">
                 <i class="bi-rulers me-2"></i>The Ruler
             </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
+                <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="../../index.html">
                             <i class="bi-house"></i> Back to Menu
@@ -609,18 +609,18 @@
         <div class="container">
             <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
                 <div class="d-flex align-items-center mb-2 mb-lg-0 text-muted">
-                    <i class="bi-grid-3x3-gap-fill text-primary mr-2"></i>
-                    <span class="font-weight-bold">Switch tools</span>
+                    <i class="bi-grid-3x3-gap-fill text-primary me-2"></i>
+                    <span class="fw-bold">Switch tools</span>
                 </div>
                 <ul class="nav nav-pills" id="toolPillNav">
-                    <li class="nav-item"><a class="nav-link" href="unit-tests.html"><i class="bi-check2-circle mr-1"></i>Unit Test</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tool2.html"><i class="bi-code-slash mr-1"></i>Parser</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tool3.html"><i class="bi-globe mr-1"></i>Mashup</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tool4.html"><i class="bi-gear mr-1"></i>Automator</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tool5.html"><i class="bi-rulers mr-1"></i>Ruler</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tool6.html"><i class="bi-arrow-repeat mr-1"></i>Transformer</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tool8.html"><i class="bi-magic mr-1"></i>Alchemist</a></li>
-                    <li class="nav-item"><a class="nav-link" href="tool9.html"><i class="bi-camera-reels mr-1"></i>Screen Test</a></li>
+                    <li class="nav-item"><a class="nav-link" href="unit-tests.html"><i class="bi-check2-circle me-1"></i>Unit Test</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool2.html"><i class="bi-code-slash me-1"></i>Parser</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool3.html"><i class="bi-globe me-1"></i>Mashup</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool4.html"><i class="bi-gear me-1"></i>Automator</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool5.html"><i class="bi-rulers me-1"></i>Ruler</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool6.html"><i class="bi-arrow-repeat me-1"></i>Transformer</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool8.html"><i class="bi-magic me-1"></i>Alchemist</a></li>
+                    <li class="nav-item"><a class="nav-link" href="tool9.html"><i class="bi-camera-reels me-1"></i>Screen Test</a></li>
                 </ul>
             </div>
 
@@ -630,7 +630,7 @@
                     <span><i class="bi-search me-2"></i>JSON FieldID-Label Analyzer</span>
                 </h3>
                 
-                <div class="form-group">
+                <div class="mb-3">
                     <label for="jsonInput" class="form-label">Paste JSON or Rules Sheet Here:</label>
                     <textarea id="jsonInput" class="form-control" rows="10" placeholder="Paste your JSON data here..."></textarea>
                 </div>
@@ -659,7 +659,7 @@
                         <button class="btn btn-primary" onclick="analyzeJSON()">
                             <i class="bi-search me-2"></i>Analyze
                         </button>
-                        <button class="btn btn-primary ml-2" onclick="copyToClipboard()">
+                        <button class="btn btn-primary ms-2" onclick="copyToClipboard()">
                             <i class="bi-clipboard me-2"></i>Copy Result
                         </button>
                     </div>
@@ -685,8 +685,8 @@
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         // Voice Control System

@@ -8,7 +8,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>The Screen Test - Encompass Form Code Expert</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="/shared/encompass-dark-mode.css">
   <style>
@@ -197,9 +197,9 @@
         <i class="bi-camera-reels me-2"></i>The Screen Test
       </a>
       <div class="navbar-collapse">
-        <ul class="navbar-nav ml-auto">
+        <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/index.html"><i class="bi-house mr-1"></i>Back to Menu</a>
+            <a class="nav-link" href="/index.html"><i class="bi-house me-1"></i>Back to Menu</a>
           </li>
         </ul>
       </div>
@@ -210,24 +210,24 @@
     <div class="container">
       <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
         <div class="d-flex align-items-center mb-2 mb-lg-0 text-muted">
-          <i class="bi-grid-3x3-gap-fill text-primary mr-2"></i>
-          <span class="font-weight-bold">Switch tools</span>
+          <i class="bi-grid-3x3-gap-fill text-primary me-2"></i>
+          <span class="fw-bold">Switch tools</span>
         </div>
         <ul class="nav nav-pills" id="toolPillNav">
-          <li class="nav-item"><a class="nav-link" href="unit-tests.html"><i class="bi-check2-circle mr-1"></i>Unit Test</a></li>
-          <li class="nav-item"><a class="nav-link" href="tool2.html"><i class="bi-code-slash mr-1"></i>Parser</a></li>
-          <li class="nav-item"><a class="nav-link" href="tool3.html"><i class="bi-globe mr-1"></i>Mashup</a></li>
-          <li class="nav-item"><a class="nav-link" href="tool4.html"><i class="bi-gear mr-1"></i>Automator</a></li>
-          <li class="nav-item"><a class="nav-link" href="tool5.html"><i class="bi-rulers mr-1"></i>Ruler</a></li>
-          <li class="nav-item"><a class="nav-link" href="tool6.html"><i class="bi-arrow-repeat mr-1"></i>Transformer</a></li>
-          <li class="nav-item"><a class="nav-link" href="tool8.html"><i class="bi-magic mr-1"></i>Alchemist</a></li>
-          <li class="nav-item"><a class="nav-link active" href="tool9.html"><i class="bi-camera-reels mr-1"></i>Screen Test</a></li>
+          <li class="nav-item"><a class="nav-link" href="unit-tests.html"><i class="bi-check2-circle me-1"></i>Unit Test</a></li>
+          <li class="nav-item"><a class="nav-link" href="tool2.html"><i class="bi-code-slash me-1"></i>Parser</a></li>
+          <li class="nav-item"><a class="nav-link" href="tool3.html"><i class="bi-globe me-1"></i>Mashup</a></li>
+          <li class="nav-item"><a class="nav-link" href="tool4.html"><i class="bi-gear me-1"></i>Automator</a></li>
+          <li class="nav-item"><a class="nav-link" href="tool5.html"><i class="bi-rulers me-1"></i>Ruler</a></li>
+          <li class="nav-item"><a class="nav-link" href="tool6.html"><i class="bi-arrow-repeat me-1"></i>Transformer</a></li>
+          <li class="nav-item"><a class="nav-link" href="tool8.html"><i class="bi-magic me-1"></i>Alchemist</a></li>
+          <li class="nav-item"><a class="nav-link active" href="tool9.html"><i class="bi-camera-reels me-1"></i>Screen Test</a></li>
         </ul>
       </div>
 
       <!-- Compact title + actions bar (matches tool4 density) -->
       <div class="d-flex justify-content-between align-items-center py-2 flex-wrap">
-        <h5 class="mb-0 font-weight-600"><i class="bi-file-earmark-code mr-2"></i>The Screen Test</h5>
+        <h5 class="mb-0 font-weight-600"><i class="bi-file-earmark-code me-2"></i>The Screen Test</h5>
         <button class="btn btn-outline-primary btn-sm" id="toggleVoiceHelp"><i class="bi-mic"></i> Voice Guide</button>
       </div>
     </div>
@@ -239,15 +239,15 @@
       <h5><i class="bi-file-earmark-code me-2"></i>Manifest XML</h5>
       <p class="text-muted small mb-3">Form-code-specific. Paste or upload manifest XML to extract field IDs, parse form logic, and check for issues. Form objects only — not business rules.</p>
       <ul class="nav nav-tabs mb-3" role="tablist">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" href="#pasteTab">Paste</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#uploadTab">Upload File</a></li>
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#pasteTab">Paste</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#uploadTab">Upload File</a></li>
       </ul>
       <div class="tab-content">
         <div id="pasteTab" class="tab-pane fade show active">
           <textarea id="formCodeInput" class="form-control font-monospace" rows="12" placeholder="Paste your Encompass form code, XML, scripts, or HTML here..."></textarea>
         </div>
         <div id="uploadTab" class="tab-pane fade">
-          <input type="file" id="formCodeFile" class="form-control-file" accept=".xml" />
+          <input type="file" id="formCodeFile" class="form-control" accept=".xml" />
           <small class="text-muted">Manifest XML only (.xml)</small>
         </div>
       </div>
@@ -328,15 +328,13 @@
         <div class="p-3 border-top">
           <div class="input-group">
             <input type="text" class="form-control" id="aiChatInput" placeholder="Ask about form code, field bindings, migration..." />
-            <div class="input-group-append">
-              <button class="btn btn-primary" id="aiChatSendBtn"><i class="bi-send"></i> Send</button>
-            </div>
+            <button class="btn btn-primary" id="aiChatSendBtn"><i class="bi-send"></i> Send</button>
           </div>
           <div class="mt-2 d-flex flex-wrap">
-            <button class="btn btn-sm btn-outline-primary mr-2 mb-2" id="extractFieldsBtn"><i class="bi-list-ul me-1"></i>Extract &amp; Overview</button>
-            <button class="btn btn-sm btn-outline-primary mr-2 mb-2" id="askReviewBtn"><i class="bi-search me-1"></i>Ask Screen Test</button>
-            <button class="btn btn-sm btn-outline-info mr-2 mb-2" id="summarizeFuncBtn"><i class="bi-lightning me-1"></i>Summarize Functionality</button>
-            <button class="btn btn-sm btn-outline-warning mr-2 mb-2" id="checkIssuesBtn"><i class="bi-exclamation-triangle me-1"></i>Check for Issues</button>
+            <button class="btn btn-sm btn-outline-primary me-2 mb-2" id="extractFieldsBtn"><i class="bi-list-ul me-1"></i>Extract &amp; Overview</button>
+            <button class="btn btn-sm btn-outline-primary me-2 mb-2" id="askReviewBtn"><i class="bi-search me-1"></i>Ask Screen Test</button>
+            <button class="btn btn-sm btn-outline-info me-2 mb-2" id="summarizeFuncBtn"><i class="bi-lightning me-1"></i>Summarize Functionality</button>
+            <button class="btn btn-sm btn-outline-warning me-2 mb-2" id="checkIssuesBtn"><i class="bi-exclamation-triangle me-1"></i>Check for Issues</button>
           </div>
         </div>
       </div>
@@ -365,7 +363,7 @@
     })();
   </script>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/shared/voice-widget.js"></script>
   <script src="/finance/js/tool9.js"></script>
   <script src="/shared/finance-auth-guard.js"></script>

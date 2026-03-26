@@ -9,7 +9,28 @@ const __dirname = path.dirname(__filename);
 
 const DATA_FILE = path.join(__dirname, '..', 'data', 'local-spots.json');
 
-const VALID_CATEGORIES = ['thrift', 'taco_truck', 'garden', 'bike_trail', 'fishing', 'kayak', 'concert'];
+const VALID_CATEGORIES = ['thrift', 'taco_truck', 'garden', 'bike_trail', 'fishing', 'kayak', 'concert', 'misc'];
+
+function firstImageUrlFromGallery(arr) {
+  if (!Array.isArray(arr) || !arr.length) return null;
+  const firstImg = arr.find(
+    (m) => m && m.url && m.type !== 'video' && !/^data:video\//i.test(String(m.url))
+  );
+  if (firstImg) return String(firstImg.url).trim();
+  const firstNonVideo = arr.find((m) => m && m.url && !/^data:video\//i.test(String(m.url)));
+  return firstNonVideo ? String(firstNonVideo.url).trim() : null;
+}
+
+function normalizeMediaGalleryInput(raw) {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((m) => m && typeof m.url === 'string' && m.url.trim())
+    .map((m) => ({
+      type: m.type === 'video' || /^data:video\//i.test(String(m.url)) ? 'video' : 'image',
+      url: String(m.url).trim(),
+      caption: m.caption ? String(m.caption).trim() : undefined,
+    }));
+}
 
 async function readData() {
   try {
@@ -51,7 +72,7 @@ export async function listSpots(req, res) {
 
 export async function addSpot(req, res) {
   try {
-    const { name, category, lat, lng, address, notes, tags, imageUrl } = req.body;
+    const { name, category, lat, lng, address, notes, tags, imageUrl, mediaGallery } = req.body;
 
     if (!name || !category) {
       return res.status(400).json({ success: false, error: 'Name and category are required' });
@@ -68,6 +89,14 @@ export async function addSpot(req, res) {
     const data = await readData();
     const spots = data.spots || [];
 
+    const gallery = normalizeMediaGalleryInput(mediaGallery);
+    let resolvedImage = imageUrl ? String(imageUrl).trim() : null;
+    if (gallery.length) {
+      resolvedImage = firstImageUrlFromGallery(gallery) || resolvedImage;
+    } else if (resolvedImage) {
+      gallery.push({ type: 'image', url: resolvedImage });
+    }
+
     const spot = {
       id: randomUUID(),
       name: String(name).trim(),
@@ -77,7 +106,8 @@ export async function addSpot(req, res) {
       address: address ? String(address).trim() : null,
       notes: notes ? String(notes).trim() : null,
       tags: Array.isArray(tags) ? tags : tags ? [String(tags).trim()] : [],
-      imageUrl: imageUrl ? String(imageUrl).trim() : null,
+      imageUrl: resolvedImage,
+      mediaGallery: gallery,
       favorite: Boolean(req.body.favorite),
       createdAt: new Date().toISOString()
     };
@@ -95,7 +125,7 @@ export async function addSpot(req, res) {
 export async function updateSpot(req, res) {
   try {
     const { id } = req.params;
-    const { name, category, lat, lng, address, notes, tags, imageUrl, favorite } = req.body;
+    const { name, category, lat, lng, address, notes, tags, imageUrl, mediaGallery, favorite } = req.body;
 
     if (!id) {
       return res.status(400).json({ success: false, error: 'Spot id is required' });
@@ -123,7 +153,16 @@ export async function updateSpot(req, res) {
     if (address !== undefined) existing.address = address ? String(address).trim() : null;
     if (notes !== undefined) existing.notes = notes ? String(notes).trim() : null;
     if (tags !== undefined) existing.tags = Array.isArray(tags) ? tags : tags ? [String(tags).trim()] : [];
-    if (imageUrl !== undefined) existing.imageUrl = imageUrl ? String(imageUrl).trim() : null;
+    if (mediaGallery !== undefined) {
+      const gallery = normalizeMediaGalleryInput(mediaGallery);
+      existing.mediaGallery = gallery;
+      existing.imageUrl = firstImageUrlFromGallery(gallery);
+    } else if (imageUrl !== undefined) {
+      existing.imageUrl = imageUrl ? String(imageUrl).trim() : null;
+      if (!existing.mediaGallery || !Array.isArray(existing.mediaGallery)) {
+        existing.mediaGallery = existing.imageUrl ? [{ type: 'image', url: existing.imageUrl }] : [];
+      }
+    }
     if (favorite !== undefined) existing.favorite = Boolean(favorite);
 
     await writeData({ spots });
@@ -173,11 +212,20 @@ export async function importSpots(req, res) {
 
     for (const s of incomingSpots) {
       const name = s.name || s.title || '';
-      const category = s.category || 'thrift';
+      const rawCat = s.category || 'thrift';
+      const category = rawCat === 'miscellaneous' ? 'misc' : rawCat;
       const lat = s.lat ?? s.latitude;
       const lng = s.lng ?? s.longitude;
 
       if (!name || lat == null || lng == null || !VALID_CATEGORIES.includes(category)) continue;
+
+      const impGallery = normalizeMediaGalleryInput(s.mediaGallery);
+      let impImage = s.imageUrl ? String(s.imageUrl).trim() : null;
+      if (impGallery.length) {
+        impImage = firstImageUrlFromGallery(impGallery) || impImage;
+      } else if (impImage) {
+        impGallery.push({ type: 'image', url: impImage });
+      }
 
       spots.push({
         id: randomUUID(),
@@ -188,7 +236,8 @@ export async function importSpots(req, res) {
         address: s.address ? String(s.address).trim() : null,
         notes: s.notes ? String(s.notes).trim() : null,
         tags: Array.isArray(s.tags) ? s.tags : s.tags ? [String(s.tags).trim()] : [],
-        imageUrl: s.imageUrl ? String(s.imageUrl).trim() : null,
+        imageUrl: impImage,
+        mediaGallery: impGallery,
         favorite: Boolean(s.favorite),
         createdAt: new Date().toISOString()
       });

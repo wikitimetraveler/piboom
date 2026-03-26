@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Encompass Hub – Pipeline & Loan APIs</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="/shared/styles.css" />
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
@@ -331,7 +331,7 @@
 
     <section class="hero">
       <div class="container">
-        <span class="badge badge-pill mb-2"><i class="bi-cloud"></i> Developer Connect</span>
+        <span class="badge rounded-pill mb-2"><i class="bi-cloud"></i> Developer Connect</span>
         <h1>Encompass Hub</h1>
         <p>
           Monitor live pipeline data, drill into loans, and validate field values from Encompass APIs. All calls stay server-side.
@@ -346,6 +346,9 @@
           </button>
           <a class="btn btn-light" href="encompass-analytics.html">
             <i class="bi-graph-up"></i> Analytics
+          </a>
+          <a class="btn btn-light" href="loan-batch-update.html">
+            <i class="bi-layers-half"></i> Loan batch update
           </a>
         </div>
         <div class="domain-grid domain-grid-sm mt-3 encompass-tool-grid" id="encompassToolGrid" style="max-width: 900px; margin-left: auto; margin-right: auto;"><!-- populated by menu-config --></div>
@@ -372,7 +375,7 @@
                 Checking...
               </span>
             </div>
-            <div class="form-group mb-3">
+            <div class="mb-3 mb-3">
               <label for="encompassEnvSelect">Environment</label>
               <select id="encompassEnvSelect" class="form-control form-control-sm">
                 <option value="correspondent">Correspondent Dev</option>
@@ -384,17 +387,17 @@
             </button>
 
             <form id="pipelineForm">
-              <div class="form-group">
+              <div class="mb-3">
                 <label for="stateFilter">Property State</label>
                 <input type="text" id="stateFilter" name="state" class="form-control" placeholder="e.g. CA" />
               </div>
-              <div class="form-group">
+              <div class="mb-3">
                 <label for="countyFilter">Counties</label>
                 <input type="text" id="countyFilter" name="counties" class="form-control" placeholder="Los Angeles, Orange" />
                 <small class="form-text text-muted">Comma separated</small>
               </div>
               <div class="form-row">
-                <div class="form-group col-6">
+                <div class="mb-3 col-6">
                   <label for="loanFolderFilter">Folder</label>
                   <select id="loanFolderFilter" name="loanFolder" class="form-control">
                     <option value="My Pipeline" selected>My Pipeline</option>
@@ -404,7 +407,7 @@
                     <option value="Funding">Funding</option>
                   </select>
                 </div>
-                <div class="form-group col-6">
+                <div class="mb-3 col-6">
                   <label for="loanTypeFilter">Doc Type</label>
                   <select id="loanTypeFilter" name="loanType" class="form-control">
                     <option value="" selected>Any</option>
@@ -414,7 +417,7 @@
                   </select>
                 </div>
               </div>
-              <div class="form-group">
+              <div class="mb-3">
                 <label for="limitFilter">Record Limit</label>
                 <input type="number" min="1" max="100" id="limitFilter" name="limit" class="form-control" value="25" />
               </div>
@@ -435,6 +438,7 @@
               <li class="mb-1"><a href="/api/encompass-hub/visualizations/map3d" target="_blank" rel="noreferrer"><i class="bi-geo"></i> 3D Map</a></li>
               <li class="mb-1"><a href="/api/encompass-hub/visualizations/stacked-cubes" target="_blank" rel="noreferrer"><i class="bi-layers"></i> Stacked Cubes</a></li>
               <li><a href="/api/encompass-hub/visualizations/timeline" target="_blank" rel="noreferrer"><i class="bi-calendar3"></i> Timeline</a></li>
+              <li class="mt-2"><a href="loan-batch-update.html"><i class="bi-layers-half"></i> Loan batch update (UI)</a></li>
             </ul>
           </div>
         </div>
@@ -446,7 +450,7 @@
                 <h5 class="mb-1">Pipeline Results</h5>
                 <small class="text-muted">Click or say “Select first loan” to drill in</small>
               </div>
-              <div class="text-right">
+              <div class="text-end">
                 <div class="filter-chips mb-2" id="activeFilters"></div>
                 <small id="resultMeta" class="text-muted">No data loaded yet</small>
               </div>
@@ -480,7 +484,7 @@
                 <h5 class="mb-1">Loan Details</h5>
                 <small class="text-muted">Live data direct from Developer Connect</small>
               </div>
-              <span class="badge badge-pill badge-light" id="loanGuidDisplay">Select a loan</span>
+              <span class="badge rounded-pill badge-light" id="loanGuidDisplay">Select a loan</span>
             </div>
             <div id="loanDetailsBody" class="empty-state">
               Select a loan from the table to load borrower, property, and milestone data.

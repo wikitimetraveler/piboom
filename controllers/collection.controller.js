@@ -1,5 +1,15 @@
 import { getPool } from '../services/database.service.js';
 
+function firstCoverUrlFromMediaGallery(arr) {
+  if (!Array.isArray(arr) || !arr.length) return null;
+  const firstImg = arr.find(
+    (m) => m && m.url && m.type !== 'video' && !/^data:video\//i.test(String(m.url))
+  );
+  if (firstImg) return firstImg.url;
+  const firstNonVideo = arr.find((m) => m && m.url && !/^data:video\//i.test(String(m.url)));
+  return firstNonVideo ? firstNonVideo.url : null;
+}
+
 // Add album to collection
 export async function addToCollection(req, res) {
   try {
@@ -222,6 +232,17 @@ export async function updateAlbum(req, res) {
     if (locationLabel !== undefined) {
       updates.push(`location_label = $${paramCount++}`);
       params.push(locationLabel);
+    }
+    if (req.body.mediaGallery !== undefined) {
+      const arr = Array.isArray(req.body.mediaGallery) ? req.body.mediaGallery : [];
+      updates.push(`media_gallery = $${paramCount++}::jsonb`);
+      params.push(JSON.stringify(arr));
+      updates.push(`cover_url = $${paramCount++}`);
+      params.push(firstCoverUrlFromMediaGallery(arr));
+    }
+    if (req.body.coverUrl !== undefined && req.body.mediaGallery === undefined) {
+      updates.push(`cover_url = $${paramCount++}`);
+      params.push(req.body.coverUrl);
     }
 
     if (updates.length === 0) {

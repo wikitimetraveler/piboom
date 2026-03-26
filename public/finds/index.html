@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finds — DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/user-selector.js"></script>
+  <style>
+    body { background: linear-gradient(135deg, #f8f4ff 0%, #e8f4fc 100%); min-height: 100vh; }
+    .finds-hero { background: linear-gradient(135deg, #6f42c1, #0077b6); color: #fff; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; }
+    .finds-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important; transition: 0.2s ease; }
+  </style>
+</head>
+<body>
+  <modern-navbar></modern-navbar>
+  <div class="container py-4">
+    <div class="finds-hero">
+      <h1 class="h3 mb-1"><i class="bi-search-heart"></i> Finds</h1>
+      <p class="mb-0 small opacity-90">Thrift, flea, vintage — discovery and collection (AI + voice).</p>
+    </div>
+    <div id="userSelectorContainer"></div>
+    <div class="d-flex flex-wrap gap-2 mb-3">
+      <a class="btn btn-primary" href="/finds/discovery.html"><i class="bi-plus-lg"></i> New find</a>
+      <a class="btn btn-outline-secondary" href="/"><i class="bi-house"></i> Hub</a>
+    </div>
+    <div id="findsDashboardError" class="alert alert-danger" style="display:none;"></div>
+    <div id="findsDashboardRoot"></div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof createUserSelector === 'function') {
+        createUserSelector('userSelectorContainer', { title: 'Finds — user' });
+      }
+    });
+  </script>
+  <script src="/finds/js/finds-api.js"></script>
+  <script src="/finds/js/finds-dashboard.js"></script>
+</body>
+</html>

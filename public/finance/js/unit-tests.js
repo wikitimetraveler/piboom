@@ -69,6 +69,62 @@ const getRawFieldIdFromTarget = window.unitTestsUtils?.getRawFieldIdFromTarget |
   return match ? match[1].trim() : null;
 };
 
+/** Bootstrap 5 modals (jQuery .modal() is not available with BS5+jQuery slim). */
+function showBsModal(modalEl) {
+  if (!modalEl) return;
+  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  } else if (typeof window.$ !== 'undefined' && window.$.fn && window.$.fn.modal) {
+    window.$(modalEl).modal('show');
+  } else {
+    modalEl.classList.add('show');
+    modalEl.style.display = 'block';
+  }
+}
+
+function hideBsModal(modalEl) {
+  if (!modalEl) return;
+  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+  } else if (typeof window.$ !== 'undefined' && window.$.fn && window.$.fn.modal) {
+    window.$(modalEl).modal('hide');
+  } else {
+    modalEl.classList.remove('show');
+    modalEl.style.display = 'none';
+  }
+}
+
+function bsCollapseShow(el) {
+  if (!el) return;
+  if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+    bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
+  } else if (window.$ && window.$.fn && window.$.fn.collapse) {
+    window.$(el).collapse('show');
+  } else {
+    el.classList.add('show');
+  }
+}
+
+function bsCollapseHide(el, onHidden) {
+  if (!el) return;
+  if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+    if (typeof onHidden === 'function') {
+      const handler = function () {
+        el.removeEventListener('hidden.bs.collapse', handler);
+        onHidden();
+      };
+      el.addEventListener('hidden.bs.collapse', handler);
+    }
+    bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).hide();
+  } else if (window.$ && window.$.fn && window.$.fn.collapse) {
+    if (onHidden) window.$(el).one('hidden.bs.collapse', onHidden);
+    window.$(el).collapse('hide');
+  } else {
+    el.classList.remove('show');
+    if (onHidden) onHidden();
+  }
+}
+
 /**
  * Custom date picker cell editor - uses HTML5 date/time inputs for reliable date picker.
  * AG Grid's agDateStringCellEditor can be unreliable; this ensures date picker always works.
@@ -2820,11 +2876,7 @@ function showAccordionSection(sectionId) {
   const card = getSectionCardForCollapse(sectionId);
   if (card) card.classList.remove('section-card-hidden');
   updateSectionHeaderState(sectionId, true);
-  if (window.$ && typeof window.$.fn?.collapse === 'function') {
-    window.$(section).collapse('show');
-  } else {
-    section.classList.add('show');
-  }
+  bsCollapseShow(section);
 }
 
 function toggleAccordionSection(sectionId) {
@@ -2834,30 +2886,16 @@ function toggleAccordionSection(sectionId) {
   const isExpanded = section.classList.contains('show');
   if (isExpanded) {
     updateSectionHeaderState(sectionId, false);
-    if (window.$ && typeof window.$.fn?.collapse === 'function') {
-      window.$(section).collapse('hide');
-      if (card) {
-        window.$(section).one('hidden.bs.collapse', function () {
-          card.classList.add('section-card-hidden');
-        });
-      }
-    } else {
-      section.classList.remove('show');
-      if (card) card.classList.add('section-card-hidden');
-    }
+    bsCollapseHide(section, card ? function () { card.classList.add('section-card-hidden'); } : undefined);
   } else {
     if (card) card.classList.remove('section-card-hidden');
     updateSectionHeaderState(sectionId, true);
-    if (window.$ && typeof window.$.fn?.collapse === 'function') {
-      window.$(section).collapse('show');
-    } else {
-      section.classList.add('show');
-    }
+    bsCollapseShow(section);
   }
 }
 
 function updateSectionHeaderState(sectionId, expanded) {
-  const trigger = document.querySelector(`[data-target="#${sectionId}"]`);
+  const trigger = document.querySelector(`[data-bs-target="#${sectionId}"], [data-target="#${sectionId}"]`);
   if (trigger) {
     trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     trigger.classList.toggle('collapsed', !expanded);
@@ -2867,7 +2905,9 @@ function updateSectionHeaderState(sectionId, expanded) {
 function updateSectionSidebarActiveState(sectionId, isExpanded) {
   const nav = document.getElementById('sectionSidebarNav');
   if (!nav) return;
-  const link = nav.querySelector('a[data-target="' + sectionId + '"]');
+  const link = nav.querySelector(
+    'a[data-bs-target="' + sectionId + '"], a[data-bs-target="#' + sectionId + '"], a[data-target="' + sectionId + '"], a[data-target="#' + sectionId + '"]'
+  );
   if (link) {
     link.classList.toggle('active-section', isExpanded);
   }
@@ -3245,10 +3285,8 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
     if (sidebarSelectedField) sidebarSelectedField.style.display = '';
     currentScenarioBuilderField = field;
     renderScenarioBuilder(field);
-    if (collapseSelectedField && typeof window.$ !== 'undefined' && window.$.fn?.collapse) {
-      window.$(collapseSelectedField).collapse('show');
-    } else if (collapseSelectedField?.classList) {
-      collapseSelectedField.classList.add('show');
+    if (collapseSelectedField) {
+      bsCollapseShow(collapseSelectedField);
     }
   } else if (selectedFieldCard) {
     selectedFieldCard.style.display = 'none';
@@ -3380,12 +3418,7 @@ function initializeScanSetFields() {
       return action === 'SET';
     });
     if (setRows.length === 0) {
-      if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
-        window.$(modal).modal('show');
-      } else {
-        modal.classList.add('show');
-        modal.style.display = 'block';
-      }
+      showBsModal(modal);
       statusEl.textContent = 'No SET rows found in this test.';
       resultsEl.innerHTML = '<p class="text-muted small mb-0">No action needed.</p>';
       return;
@@ -3393,12 +3426,7 @@ function initializeScanSetFields() {
 
     statusEl.textContent = 'Loading field metadata from Encompass...';
     resultsEl.innerHTML = '';
-    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
-      window.$(modal).modal('show');
-    } else {
-      modal.classList.add('show');
-      modal.style.display = 'block';
-    }
+    showBsModal(modal);
 
     try {
       const { fieldMeta } = await loadMetadataForSetRowsFromEncompass();
@@ -3609,12 +3637,7 @@ function initializeGenerateFromCustomField() {
     confirmBtn.disabled = true;
     preview.style.display = 'none';
 
-    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
-      window.$(modal).modal('show');
-    } else {
-      modal.classList.add('show');
-      modal.style.display = 'block';
-    }
+    showBsModal(modal);
 
     try {
       const [customRes, nativeRes] = await Promise.all([
@@ -3673,12 +3696,7 @@ function initializeGenerateFromCustomField() {
     }
 
     loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, `Generated: [${field.fieldId || field.id || field.Id}]`, result.fieldMetadata, field);
-    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
-      window.$(modal).modal('hide');
-    } else {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-    }
+    hideBsModal(modal);
     showToast('Unit test generated and loaded', 'success');
   });
 }
@@ -3759,12 +3777,7 @@ function initializeGenerateFromBRRule() {
     brExtractStatus.textContent = '';
     brExtractResults.style.display = 'none';
     brCreateTestBtn.disabled = true;
-    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
-      window.$(modal).modal('show');
-    } else {
-      modal.classList.add('show');
-      modal.style.display = 'block';
-    }
+    showBsModal(modal);
   });
 
   brXmlFile.addEventListener('change', (e) => {
@@ -3813,12 +3826,7 @@ function initializeGenerateFromBRRule() {
       calculation: lastParsed.mainCondition ? lastParsed.mainCondition.expression : '',
       description: 'BR Rule: ' + (lastParsed.rule ? lastParsed.rule.name : ''),
     });
-    if (typeof window.$ !== 'undefined' && window.$.fn?.modal) {
-      window.$(modal).modal('hide');
-    } else {
-      modal.classList.remove('show');
-      modal.style.display = 'none';
-    }
+    hideBsModal(modal);
     showToast('Unit test generated from BR rule', 'success');
   });
 }
@@ -3833,9 +3841,14 @@ function initializeSectionSidebar() {
     var el = document.getElementById(id);
     if (el) {
       el.classList.remove('show');
-      if (window.$ && typeof window.$.fn?.collapse === 'function') {
-        try { window.$(el).collapse('hide'); } catch (_) {}
-      }
+      try {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+          const inst = bootstrap.Collapse.getInstance(el);
+          if (inst) inst.hide();
+        } else if (window.$ && window.$.fn && window.$.fn.collapse) {
+          window.$(el).collapse('hide');
+        }
+      } catch (_) {}
     }
     var card = getSectionCardForCollapse(id);
     if (card) card.classList.add('section-card-hidden');
@@ -3850,7 +3863,7 @@ function initializeSectionSidebar() {
 
   // Sidebar click: toggle section visibility (multiple sections can stay open)
   nav.addEventListener('click', function (e) {
-    const link = e.target.closest('a[data-target], a[data-action]');
+    const link = e.target.closest('a[data-bs-target], a[data-target], a[data-action]');
     if (!link) return;
     e.preventDefault();
     const action = link.getAttribute('data-action');
@@ -3858,7 +3871,7 @@ function initializeSectionSidebar() {
       if (typeof toggleVoiceHelp === 'function') toggleVoiceHelp(true);
       return;
     }
-    const target = link.getAttribute('data-target');
+    const target = link.getAttribute('data-bs-target') || link.getAttribute('data-target');
     if (target && typeof toggleAccordionSection === 'function') {
       toggleAccordionSection(target);
       const heading = document.getElementById(link.getAttribute('data-heading'));
@@ -3877,19 +3890,12 @@ function initializeSectionSidebar() {
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
-    if (window.$ && typeof window.$.fn?.on === 'function') {
-      window.$(el).on('shown.bs.collapse', function () {
-        updateSectionSidebarActiveState(id, true);
-      }).on('hidden.bs.collapse', function () {
-        updateSectionSidebarActiveState(id, false);
-      });
-    } else {
-      // Fallback: use MutationObserver or check on next tick after manual class toggle
-      var observer = new MutationObserver(function () {
-        updateSectionSidebarActiveState(id, el.classList.contains('show'));
-      });
-      observer.observe(el, { attributes: true, attributeFilter: ['class'] });
-    }
+    el.addEventListener('shown.bs.collapse', function () {
+      updateSectionSidebarActiveState(id, true);
+    });
+    el.addEventListener('hidden.bs.collapse', function () {
+      updateSectionSidebarActiveState(id, false);
+    });
   });
 }
 

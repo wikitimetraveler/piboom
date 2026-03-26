@@ -20,35 +20,21 @@
  * - Logout functionality
  * - Login modal popup system
  * 
- * User Accounts:
- * - cosmic-turtle: Dufus
- * - wizened-wizard: Giraffe Pizza
- * - jerry-garcia: Fooze
- * - easy-levi: Zip Knot
- * - fuzz-maestro: Fly Dog
- * 
  * Technical Implementation:
- * - Password validation against predefined user database
+ * - Password validation via POST /api/auth/verify-user-password (PostgreSQL)
  * - SessionStorage for login state persistence
  * - Modal popup UI with animated transitions
  * - User avatar and name rendering
  * - Event-driven authentication flow
  * 
  * Security Notes:
- * - Passwords stored in client-side code (for demo purposes)
- * - Session-based authentication (cleared on browser close)
- * - No server-side validation in current implementation
+ * - Passwords verified server-side (see /api/auth/verify-user-password)
+ * - Login persistence uses localStorage + finance session cookie
  * 
  * ==============================================================================
  */
 
-const USER_PASSWORDS = {
-  'cosmic-turtle': 'Dufus',
-  'wizened-wizard': 'Giraffe Pizza',
-  'jerry-garcia': 'Fooze',
-  'easy-levi': 'Zip Knot',
-  'fuzz-maestro': 'Fly Dog'
-};
+const LOGIN_MODAL_Z = 12000;
 
 /** HttpOnly cannot be set from JS; this pairs with server middleware so /finance/*.html is not served without login. */
 const FINANCE_SESSION_COOKIE_NAME = 'dc_finance_session';
@@ -95,153 +81,306 @@ function getLoggedInUser() {
   return window.USERS.find(u => u.id === userId) || null;
 }
 
+function setupLoginModalAccessibility(modal) {
+  const panel = modal.querySelector('#loginDialogPanel');
+  if (!panel) return;
+  const previousActive = document.activeElement;
+  const focusable = [
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'a[href]',
+    '[tabindex]:not([tabindex="-1"])',
+  ].join(', ');
+
+  function getList() {
+    return Array.from(panel.querySelectorAll(focusable)).filter(
+      (el) => el.offsetParent !== null && !el.disabled
+    );
+  }
+
+  function onKeydown(e) {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      closeLoginPopup();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const list = getList();
+    if (!list.length) return;
+    const first = list[0];
+    const last = list[list.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first || !panel.contains(document.activeElement)) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else if (document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+
+  function onFocusIn(e) {
+    if (!modal.parentNode || !panel.contains(e.target)) {
+      const list = getList();
+      if (list.length) list[0].focus();
+    }
+  }
+
+  document.addEventListener('keydown', onKeydown, true);
+  document.addEventListener('focusin', onFocusIn, true);
+  modal.dataset._loginA11y = '1';
+  modal._loginTeardown = () => {
+    document.removeEventListener('keydown', onKeydown, true);
+    document.removeEventListener('focusin', onFocusIn, true);
+    if (previousActive && typeof previousActive.focus === 'function') {
+      try {
+        previousActive.focus();
+      } catch (_) {}
+    }
+  };
+
+  requestAnimationFrame(() => {
+    const closeBtn = modal.querySelector('#loginModalCloseBtn');
+    if (closeBtn) closeBtn.focus();
+  });
+}
+
 // Show login popup
 function showLoginPopup() {
   const modal = document.createElement('div');
   modal.id = 'loginModal';
+  modal.setAttribute('role', 'presentation');
   modal.style.cssText = `
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: ${LOGIN_MODAL_Z};
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(8px);
+    box-sizing: border-box;
   `;
-  
+
   modal.innerHTML = `
-    <div style="background: white; padding: 30px 20px; border-radius: 24px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); position: relative;">
-      <button onclick="closeLoginPopup()" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2.5rem; color: #999; cursor: pointer; line-height: 1; padding: 5px; z-index: 1;">×</button>
-      
-      <h2 style="text-align: center; color: #2c3e50; margin-bottom: 10px; font-size: 1.5rem;">
-        <i class="bi-person-circle"></i> Select Your User
+    <div id="loginDialogPanel" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle"
+         style="background: var(--bs-body-bg, #fff); color: var(--bs-body-color, #212529); padding: 30px 20px; border-radius: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.5); position: relative;">
+      <button type="button" id="loginModalCloseBtn"
+              aria-label="Close"
+              style="position: absolute; top: 10px; right: 12px; min-width:44px;min-height:44px;background: none; border: none; font-size: 1.75rem; color: #999; cursor: pointer; line-height: 1; padding: 0; z-index: 1;">×</button>
+
+      <h2 id="loginModalTitle" tabindex="-1" style="text-align: center; margin-bottom: 10px; font-size: 1.5rem;">
+        <i class="bi bi-person-circle" aria-hidden="true"></i> Select your user
       </h2>
-      <p style="text-align: center; color: #666; margin-bottom: 25px; font-size: 0.95rem;">Click your icon to login</p>
-      
+      <p style="text-align: center; color: var(--bs-secondary-color, #6c757d); margin-bottom: 25px; font-size: 0.95rem;">Click your icon to log in</p>
+
       <div id="userIconGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; margin-bottom: 20px;">
         ${window.USERS.map(user => `
-          <div class="login-user-card" data-user="${user.id}" onclick="selectUserForLogin('${user.id}', '${user.name}', '${user.color}')">
-            <img src="${user.avatar}" alt="${user.name}" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto; display: block; border: 4px solid ${user.color}; cursor: pointer; transition: all 0.3s ease; touch-action: manipulation;">
-            <div style="text-align: center; font-size: 0.85rem; margin-top: 8px; font-weight: 600; color: #2c3e50; line-height: 1.2;">${user.name.split(' ').slice(-1)}</div>
+          <div class="login-user-card" data-user="${user.id}" role="button" tabindex="0"
+               aria-label="Log in as ${user.name.replace(/"/g, '&quot;')}" style="cursor:pointer;">
+            <img src="${user.avatar}" alt="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto; display: block; border: 4px solid ${user.color}; transition: transform 0.2s ease; touch-action: manipulation;">
+            <div style="text-align: center; font-size: 0.85rem; margin-top: 8px; font-weight: 600; line-height: 1.2;">${user.name.split(' ').slice(-1)}</div>
           </div>
         `).join('')}
       </div>
-      
-      <div id="passwordSection" style="display: none; margin-top: 25px; padding-top: 25px; border-top: 2px solid #eee;">
-        <h4 style="text-align: center; color: #2c3e50; margin-bottom: 15px;">
-          Enter Password for <span id="selectedUserName" style="color: #3498db;"></span>
+
+      <div id="passwordSection" style="display: none; margin-top: 25px; padding-top: 25px; border-top: 2px solid #eee;" aria-live="polite">
+        <h4 style="text-align: center; margin-bottom: 15px; font-size: 1.1rem;">
+          Password for <span id="selectedUserName" style="color: #0d6efd;"></span>
         </h4>
         <div style="position: relative; margin-bottom: 15px;">
-          <input type="text" id="loginPasswordInput" 
-                 placeholder="Enter password..." 
+          <input type="password" id="loginPasswordInput"
+                 placeholder="Password"
                  inputmode="text"
-                 autocomplete="off" 
-                 autocorrect="off" 
-                 autocapitalize="off" 
+                 autocomplete="off"
+                 autocorrect="off"
+                 autocapitalize="off"
                  spellcheck="false"
-                 style="width: 100%; padding: 14px 50px 14px 14px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.1rem; box-sizing: border-box; -webkit-appearance: none;">
-          <button id="toggleLoginPasswordBtn" type="button"
-                  style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 8px; color: #666; font-size: 1.3rem;">
-            🙈
+                 aria-invalid="false"
+                 style="width: 100%; padding: 14px 52px 14px 14px; border: 2px solid #dee2e6; border-radius: 10px; font-size: 1.1rem; box-sizing: border-box; min-height: 48px;">
+          <button type="button" id="toggleLoginPasswordBtn"
+                  aria-label="Show password" aria-pressed="false" title="Show password"
+                  style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; background: none; border: none; cursor: pointer; border-radius: 8px; color: #6c757d; display: inline-flex; align-items: center; justify-content: center;">
+            <i class="bi bi-eye" aria-hidden="true"></i>
           </button>
         </div>
-        <div id="loginPasswordError" style="color: #e74c3c; font-size: 0.9rem; margin-bottom: 15px; text-align: center; display: none;">
-          ❌ Incorrect password
-        </div>
+        <div id="loginPasswordError" role="alert" style="color: #dc3545; font-size: 0.9rem; margin-bottom: 15px; text-align: center; display: none;"></div>
         <div style="display: flex; gap: 10px;">
-          <button onclick="closeLoginPopup()" 
-                  style="flex: 1; padding: 14px; border: 2px solid #ddd; background: white; color: #666; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;">
+          <button type="button" id="loginCancelBtn"
+                  style="flex: 1; min-height: 44px; padding: 14px; border: 2px solid #dee2e6; background: #fff; color: #6c757d; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;">
             Cancel
           </button>
-          <button id="loginSubmitBtn" onclick="submitLogin()" 
-                  style="flex: 1; padding: 14px; border: none; background: #3498db; color: white; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;">
-            Login
+          <button type="button" id="loginSubmitBtn"
+                  style="flex: 1; min-height: 44px; padding: 14px; border: 2px solid #0d6efd; background: #0d6efd; color: #fff; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;">
+            Log in
           </button>
         </div>
       </div>
-      
-      <button onclick="closeLoginPopup()" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 2rem; color: #999; cursor: pointer; line-height: 1;">×</button>
     </div>
   `;
-  
+
   document.body.appendChild(modal);
-  
-  // Add hover effects
-  const style = document.createElement('style');
-  style.textContent = `
-    .login-user-card:hover img {
-      transform: scale(1.1);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+
+  document.getElementById('loginModalCloseBtn').addEventListener('click', closeLoginPopup);
+  document.getElementById('loginCancelBtn').addEventListener('click', closeLoginPopup);
+  document.getElementById('loginSubmitBtn').addEventListener('click', () => {
+    submitLogin();
+  });
+
+  document.querySelectorAll('.login-user-card').forEach((card) => {
+    const uid = card.dataset.user;
+    const go = () => selectUserForLogin(uid);
+    card.addEventListener('click', go);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        go();
+      }
+    });
+  });
+
+  const pwdInput = document.getElementById('loginPasswordInput');
+  const togglePwd = document.getElementById('toggleLoginPasswordBtn');
+  togglePwd.addEventListener('click', () => {
+    const visible = pwdInput.type === 'password';
+    pwdInput.type = visible ? 'text' : 'password';
+    togglePwd.setAttribute('aria-pressed', visible ? 'true' : 'false');
+    togglePwd.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+    togglePwd.title = visible ? 'Hide password' : 'Show password';
+    const icon = togglePwd.querySelector('i');
+    if (icon) icon.className = visible ? 'bi bi-eye-slash' : 'bi bi-eye';
+  });
+
+  pwdInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitLogin();
     }
-  `;
-  document.head.appendChild(style);
+  });
+
+  if (!document.getElementById('login-modal-hover-style')) {
+    const style = document.createElement('style');
+    style.id = 'login-modal-hover-style';
+    style.textContent = `
+      @media (prefers-reduced-motion: no-preference) {
+        .login-user-card:hover img { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.25); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  setupLoginModalAccessibility(modal);
 }
 
 // Select user for login
 let selectedLoginUserId = null;
-let selectedUserColor = null;
 
-function selectUserForLogin(userId, userName, userColor) {
+function selectUserForLogin(userId) {
+  const u = window.USERS.find((x) => x.id === userId);
+  if (!u) return;
   selectedLoginUserId = userId;
-  selectedUserColor = userColor;
-  
-  // Show password section
+
   document.getElementById('passwordSection').style.display = 'block';
-  document.getElementById('selectedUserName').textContent = userName;
-  document.getElementById('selectedUserName').style.color = userColor;
-  document.getElementById('loginSubmitBtn').style.background = userColor;
-  
-  // Focus password input
+  const nameEl = document.getElementById('selectedUserName');
+  nameEl.textContent = u.name;
+  nameEl.style.color = u.color;
+
+  const submitBtn = document.getElementById('loginSubmitBtn');
+  submitBtn.style.background = '#0d6efd';
+  submitBtn.style.borderColor = '#0d6efd';
+  submitBtn.style.color = '#fff';
+
+  const pwd = document.getElementById('loginPasswordInput');
+  pwd.value = '';
+  pwd.setAttribute('aria-invalid', 'false');
+
   setTimeout(() => {
-    document.getElementById('loginPasswordInput').focus();
+    pwd.focus();
   }, 100);
-  
-  // Add highlight to selected user
-  document.querySelectorAll('.login-user-card').forEach(card => {
+
+  document.querySelectorAll('.login-user-card').forEach((card) => {
     card.style.opacity = card.dataset.user === userId ? '1' : '0.5';
   });
 }
 
 // Submit login
-function submitLogin() {
-  const password = document.getElementById('loginPasswordInput').value.trim();
+async function submitLogin() {
+  if (!selectedLoginUserId) return;
+  const pwdInput = document.getElementById('loginPasswordInput');
+  const password = pwdInput.value.trim();
   const errorDiv = document.getElementById('loginPasswordError');
-  
-  if (password === USER_PASSWORDS[selectedLoginUserId]) {
-    // Correct password - login user
+  const submitBtn = document.getElementById('loginSubmitBtn');
+  const verify =
+    typeof window.verifyPasswordWithServer === 'function'
+      ? window.verifyPasswordWithServer
+      : async (userId, pwd) => {
+          const res = await fetch('/api/auth/verify-user-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ userId, password: pwd }),
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) return { ok: false, serverError: res.status === 503 };
+          return { ok: data.valid === true, serverError: false };
+        };
+
+  const panel = document.getElementById('loginDialogPanel');
+  errorDiv.style.display = 'none';
+  errorDiv.textContent = '';
+  pwdInput.setAttribute('aria-invalid', 'false');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.setAttribute('aria-busy', 'true');
+    submitBtn.dataset._loginLabel = submitBtn.textContent;
+    submitBtn.textContent = 'Signing in…';
+  }
+  if (panel) panel.setAttribute('aria-busy', 'true');
+
+  const { ok, serverError } = await verify(selectedLoginUserId, password);
+
+  if (submitBtn) {
+    submitBtn.disabled = false;
+    submitBtn.removeAttribute('aria-busy');
+    if (submitBtn.dataset._loginLabel) submitBtn.textContent = submitBtn.dataset._loginLabel;
+  }
+  if (panel) panel.removeAttribute('aria-busy');
+
+  if (ok) {
     localStorage.setItem('loggedInUserId', selectedLoginUserId);
     localStorage.setItem('currentUserId', selectedLoginUserId);
     setFinanceSessionCookie();
-
-    // Close modal
     closeLoginPopup();
-    
-    // Notify listeners (navbar, dashboard) before reload
     window.dispatchEvent(new CustomEvent('user-logged-in', { detail: { userId: selectedLoginUserId } }));
-    
-    // Reload page to show logged-in state and refresh dashboard per user
     window.location.reload();
-  } else {
-    // Wrong password
-    errorDiv.style.display = 'block';
-    document.getElementById('loginPasswordInput').value = '';
-    document.getElementById('loginPasswordInput').style.borderColor = '#e74c3c';
-    
-    setTimeout(() => {
-      document.getElementById('loginPasswordInput').style.borderColor = '#ddd';
-    }, 1000);
+    return;
   }
+
+  if (serverError) {
+    errorDiv.textContent = 'Could not reach server. Check connection and try again.';
+  } else {
+    errorDiv.textContent = 'Incorrect password. Try again.';
+  }
+  pwdInput.setAttribute('aria-invalid', 'true');
+  errorDiv.style.display = 'block';
+  pwdInput.value = '';
+  pwdInput.style.borderColor = '#e74c3c';
+  setTimeout(() => {
+    pwdInput.style.borderColor = '#dee2e6';
+  }, 1000);
+  pwdInput.focus();
 }
 
 // Close login popup
 function closeLoginPopup() {
   const modal = document.getElementById('loginModal');
-  if (modal) {
-    document.body.removeChild(modal);
+  if (modal && typeof modal._loginTeardown === 'function') {
+    modal._loginTeardown();
+    modal._loginTeardown = null;
+  }
+  if (modal && modal.parentNode) {
+    modal.parentNode.removeChild(modal);
   }
 }
 
@@ -297,31 +436,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   updateNavbarUserDisplay();
-
-  // Listen for Enter key in password field
-  document.addEventListener('keypress', (e) => {
-    if (e.target.id === 'loginPasswordInput' && e.key === 'Enter') {
-      submitLogin();
-    }
-  });
-  
-  // Toggle password visibility in login popup
-  document.addEventListener('click', (e) => {
-    if (e.target.id === 'toggleLoginPasswordBtn') {
-      const input = document.getElementById('loginPasswordInput');
-      const btn = e.target;
-      
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.textContent = '🙈';
-        btn.title = 'Hide Password';
-      } else {
-        input.type = 'password';
-        btn.textContent = '👁️';
-        btn.title = 'Show Password';
-      }
-    }
-  });
 });
 
 // Export functions

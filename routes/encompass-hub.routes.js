@@ -15,6 +15,7 @@ import {
   getStackedVisualization,
   getTimelineVisualization,
   postCreateFields,
+  postLoanBatchUpdateRequestsHandler,
 } from '../controllers/encompass-hub.controller.js';
 
 const router = Router();
@@ -40,6 +41,7 @@ router.get('/visualizations/timeline', getTimelineVisualization);
 router.get('/native-fields', getNativeFields);
 router.get('/custom-fields', getCustomFields);
 router.post('/create-fields', postCreateFields);
+router.post('/loan-batch/update-requests', postLoanBatchUpdateRequestsHandler);
 
 export default router;
 

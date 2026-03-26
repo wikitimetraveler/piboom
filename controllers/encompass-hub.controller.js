@@ -7,6 +7,7 @@ import {
   fetchNativeFields,
   fetchCustomFields,
   createCustomFields,
+  postLoanBatchUpdateRequests,
 } from '../services/encompass-hub.service.js';
 import {
   ensureEncompassToken,
@@ -206,6 +207,43 @@ export async function postCreateFields(req, res) {
     return res.status(500).json({
       error: 'Failed to create Encompass custom fields',
       details: error.message,
+    });
+  }
+}
+
+export async function postLoanBatchUpdateRequestsHandler(req, res) {
+  try {
+    const body = req.body;
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Request body must be a JSON object' });
+    }
+    const { status, data } = await postLoanBatchUpdateRequests(body);
+    if (data === undefined || data === null || data === '') {
+      return res.status(status).json({});
+    }
+    if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
+      return res.status(status).json(data);
+    }
+    if (Array.isArray(data)) {
+      return res.status(status).json(data);
+    }
+    return res.status(status).json({ result: data });
+  } catch (error) {
+    const status = error.statusCode || error.response?.status || 500;
+    const upstream = error.upstream || error.response?.data;
+    const safeStatus = status >= 400 && status < 600 ? status : 500;
+    console.error('Error posting Encompass loan batch update:', error.message, upstream ? { upstream } : '');
+    return res.status(safeStatus).json({
+      error: 'Failed to post Encompass loan batch update',
+      details: error.message,
+      upstream: upstream
+        ? {
+            summary: upstream.summary,
+            details: upstream.details,
+            errors: upstream.errors,
+            message: upstream.message,
+          }
+        : null,
     });
   }
 }

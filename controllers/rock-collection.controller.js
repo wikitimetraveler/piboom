@@ -86,6 +86,16 @@ export async function listSpecimens(req, res) {
   }
 }
 
+function firstImageUrlFromGallery(arr) {
+  if (!Array.isArray(arr) || !arr.length) return null;
+  const firstImg = arr.find(
+    (m) => m && m.url && m.type !== 'video' && !/^data:video\//i.test(String(m.url))
+  );
+  if (firstImg) return firstImg.url;
+  const first = arr.find((m) => m && m.url && !/^data:video\//i.test(String(m.url)));
+  return first ? first.url : null;
+}
+
 export async function updateSpecimen(req, res) {
   try {
     const { id } = req.params;
@@ -97,6 +107,8 @@ export async function updateSpecimen(req, res) {
       latitude,
       longitude,
       locationLabel,
+      imageUrl,
+      mediaGallery,
     } = req.body;
 
     if (!userId) {
@@ -138,6 +150,17 @@ export async function updateSpecimen(req, res) {
     if (locationLabel !== undefined) {
       updates.push(`location_label = $${idx++}`);
       params.push(locationLabel);
+    }
+    if (mediaGallery !== undefined) {
+      const arr = Array.isArray(mediaGallery) ? mediaGallery : [];
+      updates.push(`media_gallery = $${idx++}::jsonb`);
+      params.push(JSON.stringify(arr));
+      updates.push(`image_url = $${idx++}`);
+      params.push(firstImageUrlFromGallery(arr));
+    }
+    if (imageUrl !== undefined && mediaGallery === undefined) {
+      updates.push(`image_url = $${idx++}`);
+      params.push(imageUrl);
     }
 
     if (!updates.length) {

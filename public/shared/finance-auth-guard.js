@@ -27,7 +27,7 @@
     if (!window.isLoggedIn || !window.showLoginPopup) {
       await loadScript('/shared/user-login.js');
     }
-    if (!window.USER_PASSWORDS && !window.verifyUserPassword) {
+    if (!window.verifyUserPassword) {
       await loadScript('/shared/user-passwords.js');
     }
   };

@@ -123,7 +123,7 @@ function initializeComponents() {
 async function loadReferenceFiles() {
     try {
         // Load dropdown fields
-        const dropdownResponse = await fetch('../data/dropdownFields.txt');
+        const dropdownResponse = await fetch('data/dropdownFields.txt');
         const dropdownText = await dropdownResponse.text();
         dropdownFields = new Set(
             dropdownText.split('\n')
@@ -134,7 +134,7 @@ async function loadReferenceFiles() {
         console.log(`Loaded ${dropdownFields.size} dropdown fields`);
 
         // Load borrower specific fields
-        const borrResponse = await fetch('../data/borrSpecificFields.txt');
+        const borrResponse = await fetch('data/borrSpecificFields.txt');
         const borrText = await borrResponse.text();
         borrSpecificFields = new Set(
             borrText.split('\n')
@@ -649,6 +649,15 @@ function getTestValueForField(fieldId) {
     return encompassFieldTestValues["DEFAULT_STRING"];
 }
 
+function escapeHtmlTool8(str) {
+    if (str == null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
 // Function to test the condition evaluator
 function testConditionEvaluator() {
     const xmlInput = document.getElementById('xmlInput').value;
@@ -734,35 +743,42 @@ function testConditionEvaluator() {
         // Evaluate the condition
         const result = evaluateEncompassCondition(condition, loanData);
         
-        // Display the results
+        // Display the results (use .evaluator-pre + light theme so text is never dark-on-dark)
+        const stepsText = vbParts.map((vbPart, index) => {
+            let stepResult;
+            try {
+                stepResult = eval(jsParts[index]);
+            } catch (e) {
+                stepResult = '(error: ' + (e && e.message ? e.message : e) + ')';
+            }
+            return `${index + 1}. VB Part: ${vbPart}\n   JS Part: ${jsParts[index]}\n   → ${stepResult}`;
+        }).join('\n\n');
+
         const resultDiv = document.getElementById('result');
         resultDiv.innerHTML = `
-            <div class="card mb-3">
-                <div class="card-header">
+            <div class="card mb-3 border">
+                <div class="card-header bg-light border-bottom">
                     <h5 class="mb-0">Condition Evaluator Test Results</h5>
                 </div>
                 <div class="card-body">
-                    <h6>Original VB Condition:</h6>
-                    <pre class="bg-dark p-3 rounded">${condition}</pre>
-                    
-                    <h6>Converted JavaScript:</h6>
-                    <pre class="bg-dark p-3 rounded">${jsExpr}</pre>
-                    
-                    <h6>Test Data (Original):</h6>
-                    <pre class="bg-dark p-3 rounded">${JSON.stringify(loanData, null, 2)}</pre>
+                    <h6>Original VB Condition</h6>
+                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(condition)}</pre>
 
-                    <h6>Test Data (Processed):</h6>
-                    <pre class="bg-dark p-3 rounded">${JSON.stringify(fields, null, 2)}</pre>
-                    
-                    <h6>Evaluation Steps:</h6>
-                    <pre class="bg-dark p-3 rounded">${vbParts.map((vbPart, index) => `
-${index + 1}. VB Part: ${vbPart}
-   JS Part: ${jsParts[index]}
-   → ${eval(jsParts[index])}`).join('\n\n')}</pre>
-                    
-                    <h6>Final Result:</h6>
-                    <div class="alert ${result ? 'alert-success' : 'alert-danger'}">
-                        Condition evaluated to: ${result}
+                    <h6>Converted JavaScript</h6>
+                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(jsExpr)}</pre>
+
+                    <h6>Test Data (Original)</h6>
+                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(JSON.stringify(loanData, null, 2))}</pre>
+
+                    <h6>Test Data (Processed)</h6>
+                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(JSON.stringify(fields, null, 2))}</pre>
+
+                    <h6>Evaluation Steps</h6>
+                    <pre class="evaluator-pre p-3 rounded">${escapeHtmlTool8(stepsText)}</pre>
+
+                    <h6>Final Result</h6>
+                    <div class="alert mb-0 ${result ? 'alert-success' : 'alert-danger'}">
+                        Condition evaluated to: <strong>${escapeHtmlTool8(String(result))}</strong>
                     </div>
                 </div>
             </div>

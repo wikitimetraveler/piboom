@@ -52,7 +52,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FHA Streamline Loan Amount Calculator</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="../shared/calcEngineLibrary.js"></script>
     <script src="../shared/calculationEngine.js"></script>
@@ -89,8 +89,8 @@
 
       <!-- Section: Borrower Information -->
       <div class="calculator-card">
-        <h3 data-toggle="collapse" data-target="#collapseBorrower" aria-expanded="true" aria-controls="collapseBorrower">
-          <span><i class="bi-person-badge mr-2"></i>Borrower Information</span>
+        <h3 data-bs-toggle="collapse" data-bs-target="#collapseBorrower" aria-expanded="true" aria-controls="collapseBorrower">
+          <span><i class="bi-person-badge me-2"></i>Borrower Information</span>
           <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
         </h3>
         <div class="collapse show card-content" id="collapseBorrower">
@@ -105,8 +105,8 @@
 
       <!-- Section: Base Amounts -->
       <div class="calculator-card">
-        <h3 data-toggle="collapse" data-target="#collapseBase" aria-expanded="true" aria-controls="collapseBase">
-          <span><i class="bi-cash-stack mr-2"></i>Base Amounts</span>
+        <h3 data-bs-toggle="collapse" data-bs-target="#collapseBase" aria-expanded="true" aria-controls="collapseBase">
+          <span><i class="bi-cash-stack me-2"></i>Base Amounts</span>
           <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
         </h3>
         <div class="collapse show card-content" id="collapseBase">
@@ -114,7 +114,7 @@
             <div class="col-md-8"><label for="fs_g7" class="form-label">Base Amount (G7)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control" id="fs_g7" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
@@ -123,7 +123,7 @@
             <div class="col-md-8"><label for="fs_g8" class="form-label">Maximum Loan Amount (G8)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control" id="fs_g8" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
@@ -132,7 +132,7 @@
             <div class="col-md-8"><label for="fs_g9" class="form-label">Current Mortgage Balance (G9)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control" id="fs_g9" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
@@ -142,8 +142,8 @@
 
       <!-- Section: Additional Amounts -->
       <div class="calculator-card">
-        <h3 data-toggle="collapse" data-target="#collapseAdditional" aria-expanded="true" aria-controls="collapseAdditional">
-          <span><i class="bi-plus-circle mr-2"></i>Additional Amounts</span>
+        <h3 data-bs-toggle="collapse" data-bs-target="#collapseAdditional" aria-expanded="true" aria-controls="collapseAdditional">
+          <span><i class="bi-plus-circle me-2"></i>Additional Amounts</span>
           <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
         </h3>
         <div class="collapse show card-content" id="collapseAdditional">
@@ -151,7 +151,7 @@
             <div class="col-md-8"><label for="fs_g12" class="form-label">Additional Amount 1 (G12)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control" id="fs_g12" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
@@ -160,7 +160,7 @@
             <div class="col-md-8"><label for="fs_g13" class="form-label">Additional Amount 2 (G13)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control" id="fs_g13" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
@@ -169,7 +169,7 @@
             <div class="col-md-8"><label for="fs_g14" class="form-label">Additional Amount 3 (G14)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control" id="fs_g14" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
@@ -178,7 +178,7 @@
             <div class="col-md-8"><label for="fs_g15" class="form-label">Total Additional Amounts (G15 = SUM(G12:G14))</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g15" readonly>
               </div>
             </div>
@@ -188,8 +188,8 @@
 
       <!-- Section: Calculations -->
       <div class="calculator-card">
-        <h3 data-toggle="collapse" data-target="#collapseCalculations" aria-expanded="true" aria-controls="collapseCalculations">
-          <span><i class="bi-calculator mr-2"></i>Loan Amount Calculations</span>
+        <h3 data-bs-toggle="collapse" data-bs-target="#collapseCalculations" aria-expanded="true" aria-controls="collapseCalculations">
+          <span><i class="bi-calculator me-2"></i>Loan Amount Calculations</span>
           <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
         </h3>
         <div class="collapse show card-content" id="collapseCalculations">
@@ -197,7 +197,7 @@
             <div class="col-md-8"><label for="fs_g18" class="form-label">Total Base + Additional (G18 = G15)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g18" readonly>
               </div>
             </div>
@@ -206,7 +206,7 @@
             <div class="col-md-8"><label for="fs_g19" class="form-label">Current Mortgage Balance (G19 = G9)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g19" readonly>
               </div>
             </div>
@@ -215,7 +215,7 @@
             <div class="col-md-8"><label for="fs_g20" class="form-label">Difference (G20 = G18 - G19)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g20" readonly>
               </div>
             </div>
@@ -224,7 +224,7 @@
             <div class="col-md-8"><label for="fs_g22" class="form-label">Maximum Loan Amount (G22 = G8)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g22" readonly>
               </div>
             </div>
@@ -233,7 +233,7 @@
             <div class="col-md-8"><label for="fs_g24" class="form-label">Maximum Loan Amount (G24 = ROUNDDOWN(MIN(G20,G22),0))</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g24" readonly style="font-size: 1.2rem; color: var(--primary);">
               </div>
             </div>
@@ -243,8 +243,8 @@
 
       <!-- Section: Final Calculations -->
       <div class="calculator-card">
-        <h3 data-toggle="collapse" data-target="#collapseFinal" aria-expanded="true" aria-controls="collapseFinal">
-          <span><i class="bi-check-circle mr-2"></i>Final Loan Amount</span>
+        <h3 data-bs-toggle="collapse" data-bs-target="#collapseFinal" aria-expanded="true" aria-controls="collapseFinal">
+          <span><i class="bi-check-circle me-2"></i>Final Loan Amount</span>
           <button class="card-toggle" type="button"><i class="bi-chevron-down"></i></button>
         </h3>
         <div class="collapse show card-content" id="collapseFinal">
@@ -252,7 +252,7 @@
             <div class="col-md-8"><label for="fs_g28" class="form-label">Base Loan Amount (G28 = G24)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g28" readonly>
               </div>
             </div>
@@ -261,7 +261,7 @@
             <div class="col-md-8"><label for="fs_d29" class="form-label">Factor/Percentage (D29)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">%</span></div>
+                <span class="input-group-text">%</span>
                 <input type="number" class="form-control" id="fs_d29" placeholder="0.00" min="0" max="100" step="0.01">
               </div>
             </div>
@@ -270,7 +270,7 @@
             <div class="col-md-8"><label for="fs_e29" class="form-label">Calculated Amount (E29 = G24 * D29)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_e29" readonly>
               </div>
             </div>
@@ -279,7 +279,7 @@
             <div class="col-md-8"><label for="fs_g29" class="form-label">Rounded Amount (G29 = ROUNDDOWN(E29,0))</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g29" readonly>
               </div>
             </div>
@@ -288,7 +288,7 @@
             <div class="col-md-8"><label for="fs_g30" class="form-label">Total Loan Amount (G30 = SUM(G28:G29))</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <div class="input-group-prepend"><span class="input-group-text">$</span></div>
+                <span class="input-group-text">$</span>
                 <input type="number" class="form-control result" id="fs_g30" readonly style="font-size: 1.3rem; font-weight: 700; color: var(--primary);">
               </div>
             </div>
@@ -298,7 +298,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <input type="number" class="form-control result" id="fs_g33" readonly>
-                <div class="input-group-append"><span class="input-group-text">x</span></div>
+                <span class="input-group-text">x</span>
               </div>
             </div>
           </div>
@@ -307,8 +307,8 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/calculator-pills.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {

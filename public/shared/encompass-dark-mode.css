@@ -475,7 +475,9 @@
 
 /* Form labels, code, main content */
 .encompass-dark-mode label,
-.encompass-dark-mode .form-group label {
+.encompass-dark-mode .form-group label,
+.encompass-dark-mode .form-label,
+.encompass-dark-mode .mb-3 > label {
   color: #f9fafb !important;
 }
 .encompass-dark-mode code {
@@ -548,6 +550,7 @@
   color: #e6edf3;
 }
 .encompass-dark-mode .badge-pill,
+.encompass-dark-mode .badge.rounded-pill,
 .encompass-dark-mode .badge {
   background: #6b7280 !important;
   color: #f9fafb !important;

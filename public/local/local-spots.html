@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="/shared/styles.css">
+  <link rel="stylesheet" href="/shared/collection-media-gallery.css">
   <script src="/shared/modern-navbar.js"></script>
   <style>
     body { background: linear-gradient(135deg, #f3fbff 0%, #e3f2fd 100%); color: #1c2833; font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
@@ -82,7 +83,7 @@
   <div class="container-fluid">
     <div class="hero">
       <h1><i class="bi-map"></i> My Local Spots</h1>
-      <p>Thrift shops, taco trucks, gardens, bike trails, fishing, kayak, and concert venues.</p>
+      <p>Thrift shops, taco trucks, gardens, bike trails, fishing, kayak, concert venues—and anything else you want to remember.</p>
     </div>
 
     <!-- Local Expert AI (accordion) -->
@@ -96,7 +97,7 @@
         </div>
         <div id="collapseLocalExpert" class="collapse" aria-labelledby="headingLocalExpert" data-parent="#localExpertAccordion">
           <div class="card-body">
-            <p class="text-muted small mb-3">Ask about thrift shops, taco trucks, gardens, bike trails, fishing, kayak, concerts. Use the mic to speak!</p>
+            <p class="text-muted small mb-3">Ask about thrift shops, taco trucks, gardens, bike trails, fishing, kayak, concerts, or miscellaneous spots. Use the mic to speak!</p>
             <div class="d-flex flex-wrap gap-2 mb-2">
               <button class="btn btn-sm btn-outline-secondary" id="localExpertTtsBtn" title="Speak AI responses"><i class="bi-volume-up"></i> Speak</button>
               <button class="btn btn-sm btn-outline-secondary" id="localExpertClearBtn"><i class="bi-trash"></i> Clear</button>
@@ -140,6 +141,7 @@
               <span class="badge badge-light category-pill" data-category="fishing"><i class="bi-geo-alt"></i> Fishing</span>
               <span class="badge badge-light category-pill" data-category="kayak"><i class="bi-water"></i> Kayak</span>
               <span class="badge badge-light category-pill" data-category="concert"><i class="bi-music-note-beamed"></i> Concert</span>
+              <span class="badge badge-light category-pill" data-category="misc" title="Parks, cafés, landmarks, anything else"><i class="bi-stars"></i> Misc</span>
             </div>
             <div class="d-flex flex-wrap gap-2 mb-2">
               <button class="btn btn-sm btn-outline-secondary" onclick="sortByNearby()" title="Sort by distance from you"><i class="bi-geo-alt"></i> Near me</button>
@@ -197,7 +199,9 @@
               <option value="fishing">Fishing Spot</option>
               <option value="kayak">Kayak Spot</option>
               <option value="concert">Concert Venue</option>
+              <option value="misc">Miscellaneous</option>
             </select>
+            <p id="spotCategoryHelp" class="form-text text-muted small mb-0 mt-1" aria-live="polite"></p>
           </div>
           <div class="form-group">
             <label>Address * (search for place)</label>
@@ -223,13 +227,11 @@
             </div>
           </div>
           <div class="form-group">
-            <label><i class="bi-camera"></i> Photo</label>
-            <input type="file" id="spotPhotoInput" class="form-control-file" accept="image/*" onchange="previewSpotPhoto(this)">
-            <div id="spotPhotoPreview" class="mt-2" style="display:none;">
-              <img id="spotPhotoImg" class="spot-photo-preview" alt="Preview">
-              <button type="button" class="btn btn-sm btn-outline-danger ml-2" onclick="clearSpotPhoto()">Remove</button>
-            </div>
-            <small class="form-text text-muted">Add a photo of the spot</small>
+            <label><i class="bi-images"></i> Photos &amp; videos</label>
+            <input type="file" id="spotMediaInput" class="form-control-file" accept="image/*,video/*" multiple onchange="onSpotMediaFiles(this)">
+            <div id="spotModalMediaMount" class="mt-2"></div>
+            <button type="button" class="btn btn-sm btn-outline-danger mt-2" onclick="clearSpotMedia()"><i class="bi-x-lg"></i> Clear all media</button>
+            <small class="form-text text-muted d-block">Multiple images or short videos (up to 10). Stored in your local JSON export.</small>
           </div>
         </div>
         <div class="modal-footer">
@@ -324,6 +326,7 @@
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   <script src="/shared/poster-utils.js"></script>
   <script src="/shared/poster-templates.js"></script>
+  <script src="/shared/collection-media-gallery.js"></script>
   <script>
     let map;
     let markers = [];
@@ -339,7 +342,8 @@
     let placeAutocomplete;
     let localExpertChatContext = [];
     let localExpertSpeakResponses = false;
-    let spotPhotoDataUrl = null;
+    /** @type {{ type: string, url: string, caption?: string }[]} */
+    let spotMediaItems = [];
 
     const CATEGORY_LABELS = {
       thrift: 'Thrift',
@@ -348,7 +352,19 @@
       bike_trail: 'Bike Trail',
       fishing: 'Fishing',
       kayak: 'Kayak',
-      concert: 'Concert'
+      concert: 'Concert',
+      misc: 'Miscellaneous'
+    };
+
+    const CATEGORY_DESCRIPTIONS = {
+      thrift: 'Secondhand and vintage shopping—best days, what to look for.',
+      taco_truck: 'Food trucks and quick eats—hours, favorites, parking.',
+      garden: 'Community or botanical gardens—seasons, plants, events.',
+      bike_trail: 'Trails and paths—difficulty, distance, parking.',
+      fishing: 'Bank, pier, or shore fishing—species, tides, access.',
+      kayak: 'Paddling launches—conditions, parking, safety.',
+      concert: 'Live music and shows—venues, genres, tips.',
+      misc: 'Anything that doesn’t fit above—parks, cafés, viewpoints, random gems. Use Notes below to describe what it is and why you like it.'
     };
 
     const CATEGORY_COLORS = {
@@ -358,8 +374,61 @@
       bike_trail: '#3498db',
       fishing: '#0984e3',
       kayak: '#00b894',
-      concert: '#9b59b6'
+      concert: '#9b59b6',
+      misc: '#7f8c8d'
     };
+
+    function updateSpotCategoryHelp() {
+      const sel = document.getElementById('spotCategory');
+      const el = document.getElementById('spotCategoryHelp');
+      const notes = document.getElementById('spotNotes');
+      if (!sel || !el) return;
+      el.textContent = CATEGORY_DESCRIPTIONS[sel.value] || '';
+      if (notes) {
+        notes.placeholder = sel.value === 'misc'
+          ? 'Describe this place: what it is, why you saved it, tips…'
+          : 'Best time to go, tips…';
+      }
+    }
+
+    function normalizeSpotMedia(spot) {
+      if (!window.CollectionMediaGallery) return [];
+      return CollectionMediaGallery.normalizeCollectionMedia(spot, 'imageUrl');
+    }
+
+    function spotListThumbParts(spot) {
+      const items = normalizeSpotMedia(spot);
+      const firstStill = items.find((m) => m.type === 'image');
+      const thumbUrl = firstStill ? firstStill.url : (items[0] && items[0].type === 'video' ? null : items[0]?.url) || spot.imageUrl || '';
+      const extra = items.length > 1 ? items.length - 1 : 0;
+      return { thumbUrl, extra };
+    }
+
+    function spotPosterStillUrl(spot) {
+      const items = normalizeSpotMedia(spot);
+      const still = items.find((m) => m.type === 'image');
+      if (still) return still.url;
+      const nonVid = items.find((m) => !CollectionMediaGallery.inferVideo(m.url));
+      return nonVid ? nonVid.url : (spot.imageUrl || '');
+    }
+
+    function infoWindowPhotoBlock(spot) {
+      const { thumbUrl, extra } = spotListThumbParts(spot);
+      if (!thumbUrl) return '';
+      const safe = thumbUrl.replace(/"/g, '&quot;');
+      const more = extra ? `<div style="margin-top:4px;font-size:0.8rem;color:#666;">+${extra} more in edit</div>` : '';
+      return `<div style="margin-top:6px;"><img src="${safe}" style="max-width:200px;max-height:120px;border-radius:8px;object-fit:cover;"></div>${more}`;
+    }
+
+    function renderSpotModalMediaPreview() {
+      const mount = document.getElementById('spotModalMediaMount');
+      if (!mount || !window.CollectionMediaGallery) return;
+      const copy = spotMediaItems.map((m) => ({ type: m.type, url: m.url, caption: m.caption || '' }));
+      CollectionMediaGallery.mountCollectionSlideshow(mount, copy, {
+        compact: true,
+        emptyText: 'No photos yet — choose files above.',
+      });
+    }
 
     function setMapStatus(msg, persist) {
       const el = document.getElementById('mapStatus');
@@ -522,7 +591,7 @@
           }
         });
         const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${spot.lat},${spot.lng}`;
-        const photoHtml = spot.imageUrl ? `<div style="margin-top:6px;"><img src="${spot.imageUrl.replace(/"/g, '&quot;')}" style="max-width:200px;max-height:120px;border-radius:8px;object-fit:cover;"></div>` : '';
+        const photoHtml = infoWindowPhotoBlock(spot);
         const favStar = spot.favorite ? '★' : '☆';
         const info = new google.maps.InfoWindow({
           content: `
@@ -571,7 +640,10 @@
         const starClass = spot.favorite ? 'star-fav active' : 'star-fav';
         const item = document.createElement('div');
         item.className = 'spot-list-item d-flex align-items-center';
-        const thumb = spot.imageUrl ? `<img src="${(spot.imageUrl || '').replace(/"/g, '&quot;')}" class="spot-photo-preview mr-2" alt="">` : '';
+        const { thumbUrl, extra } = spotListThumbParts(spot);
+        const thumb = thumbUrl
+          ? `<img src="${thumbUrl.replace(/"/g, '&quot;')}" class="spot-photo-preview mr-2" alt="">${extra ? `<span class="badge badge-secondary align-self-center mr-1" title="More media">+${extra}</span>` : ''}`
+          : '';
         item.innerHTML = `
           <span class="${starClass} mr-1" onclick="event.stopPropagation();toggleFavoriteById('${spot.id}')" title="Toggle favorite"><i class="bi-star-fill"></i></span>
           <span class="category-icon mr-2" style="color:${color};">${icon}</span>
@@ -595,7 +667,7 @@
     }
 
     function getCategoryIcon(cat) {
-      const icons = { thrift: '<i class="bi-shop"></i>', taco_truck: '<i class="bi-truck"></i>', garden: '<i class="bi-flower2"></i>', bike_trail: '<i class="bi-bicycle"></i>', fishing: '<i class="bi-geo-alt"></i>', kayak: '<i class="bi-water"></i>', concert: '<i class="bi-music-note-beamed"></i>' };
+      const icons = { thrift: '<i class="bi-shop"></i>', taco_truck: '<i class="bi-truck"></i>', garden: '<i class="bi-flower2"></i>', bike_trail: '<i class="bi-bicycle"></i>', fishing: '<i class="bi-geo-alt"></i>', kayak: '<i class="bi-water"></i>', concert: '<i class="bi-music-note-beamed"></i>', misc: '<i class="bi-stars"></i>' };
       return icons[cat] || '<i class="bi-geo-alt"></i>';
     }
 
@@ -615,6 +687,8 @@
       fetchSpots();
     });
 
+    document.getElementById('spotCategory')?.addEventListener('change', () => updateSpotCategoryHelp());
+
     function openAddModal() {
       document.getElementById('spotModalTitle').innerHTML = '<i class="bi-plus-circle"></i> Add Spot';
       document.getElementById('spotId').value = '';
@@ -626,8 +700,9 @@
       document.getElementById('spotNotes').value = '';
       document.getElementById('spotTags').value = '';
       document.getElementById('spotFavorite').checked = true;
-      clearSpotPhoto();
+      clearSpotMedia();
       syncDeviceLocationToSpotInputs();
+      updateSpotCategoryHelp();
       $('#spotModal').modal('show');
     }
 
@@ -652,32 +727,40 @@
       });
     }
 
-    function previewSpotPhoto(input) {
-      const file = input?.files?.[0];
-      if (!file || !file.type.startsWith('image/')) return;
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        let dataUrl = e.target.result;
-        if (file.size > 500 * 1024) {
-          dataUrl = await compressImage(dataUrl, 1200, 0.8);
+    async function onSpotMediaFiles(input) {
+      const files = input?.files;
+      if (!files?.length || !window.CollectionMediaGallery) return;
+      const max = CollectionMediaGallery.MAX_FILES;
+      const remaining = max - spotMediaItems.length;
+      if (remaining <= 0) {
+        alert(`Maximum ${max} files.`);
+        input.value = '';
+        return;
+      }
+      const slice = Array.prototype.slice.call(files, 0, remaining);
+      for (let i = 0; i < slice.length; i++) {
+        const file = slice[i];
+        if (file.type.startsWith('video/')) {
+          const batch = await CollectionMediaGallery.filesToMediaItems([file], 1);
+          if (batch[0]) spotMediaItems.push(batch[0]);
+        } else if (file.type.startsWith('image/')) {
+          const batch = await CollectionMediaGallery.filesToMediaItems([file], 1);
+          let dataUrl = batch[0]?.url;
+          if (dataUrl && file.size > 500 * 1024) {
+            dataUrl = await compressImage(dataUrl, 1200, 0.8);
+          }
+          if (dataUrl) spotMediaItems.push({ type: 'image', url: dataUrl });
         }
-        spotPhotoDataUrl = dataUrl;
-        const preview = document.getElementById('spotPhotoPreview');
-        const img = document.getElementById('spotPhotoImg');
-        if (preview && img) {
-          img.src = spotPhotoDataUrl;
-          preview.style.display = 'block';
-        }
-      };
-      reader.readAsDataURL(file);
+      }
+      input.value = '';
+      renderSpotModalMediaPreview();
     }
 
-    function clearSpotPhoto() {
-      spotPhotoDataUrl = null;
-      const input = document.getElementById('spotPhotoInput');
-      const preview = document.getElementById('spotPhotoPreview');
+    function clearSpotMedia() {
+      spotMediaItems = [];
+      const input = document.getElementById('spotMediaInput');
       if (input) input.value = '';
-      if (preview) preview.style.display = 'none';
+      renderSpotModalMediaPreview();
     }
 
     function editSpotById(id) {
@@ -693,15 +776,13 @@
       document.getElementById('spotNotes').value = spot.notes || '';
       document.getElementById('spotTags').value = Array.isArray(spot.tags) ? spot.tags.join(', ') : (spot.tags || '');
       document.getElementById('spotFavorite').checked = spot.favorite === true;
-      spotPhotoDataUrl = spot.imageUrl || null;
-      const preview = document.getElementById('spotPhotoPreview');
-      const img = document.getElementById('spotPhotoImg');
-      if (spot.imageUrl && preview && img) {
-        img.src = spot.imageUrl;
-        preview.style.display = 'block';
-      } else {
-        clearSpotPhoto();
-      }
+      spotMediaItems = normalizeSpotMedia(spot).map((m) => ({
+        type: m.type,
+        url: m.url,
+        caption: m.caption || undefined,
+      }));
+      renderSpotModalMediaPreview();
+      updateSpotCategoryHelp();
       $('#spotModal').modal('show');
     }
 
@@ -730,9 +811,23 @@
 
       const url = id ? `/api/local-spots/${id}` : '/api/local-spots';
       const method = id ? 'PUT' : 'POST';
-      const imageUrl = spotPhotoDataUrl || (id ? (spots.find(s => s.id === id)?.imageUrl || null) : null);
       const favorite = document.getElementById('spotFavorite').checked;
-      const body = JSON.stringify({ name, category, lat: parseFloat(lat), lng: parseFloat(lng), address: address || null, notes: notes || null, tags, imageUrl, favorite });
+      const mediaGallery = spotMediaItems.map((m) => ({
+        type: m.type,
+        url: m.url,
+        ...(m.caption ? { caption: m.caption } : {}),
+      }));
+      const body = JSON.stringify({
+        name,
+        category,
+        lat: parseFloat(lat),
+        lng: parseFloat(lng),
+        address: address || null,
+        notes: notes || null,
+        tags,
+        mediaGallery,
+        favorite,
+      });
 
       fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body })
         .then(r => r.json())
@@ -828,8 +923,14 @@
       URL.revokeObjectURL(a.href);
     }
 
+    function csvJsonCell(val) {
+      if (val == null) return '""';
+      const s = typeof val === 'string' ? val : JSON.stringify(val);
+      return `"${String(s).replace(/"/g, '""')}"`;
+    }
+
     function exportSpotsCsv() {
-      const headers = ['name', 'category', 'lat', 'lng', 'address', 'notes', 'tags', 'favorite'];
+      const headers = ['name', 'category', 'lat', 'lng', 'address', 'notes', 'tags', 'favorite', 'imageUrl', 'mediaGallery'];
       const rows = spots.map(s => [
         `"${(s.name || '').replace(/"/g, '""')}"`,
         s.category || '',
@@ -838,7 +939,9 @@
         `"${(s.address || '').replace(/"/g, '""')}"`,
         `"${(s.notes || '').replace(/"/g, '""')}"`,
         `"${(Array.isArray(s.tags) ? s.tags.join(', ') : '').replace(/"/g, '""')}"`,
-        s.favorite ? '1' : '0'
+        s.favorite ? '1' : '0',
+        `"${String(s.imageUrl || '').replace(/"/g, '""')}"`,
+        csvJsonCell(Array.isArray(s.mediaGallery) ? s.mediaGallery : []),
       ].join(','));
       const csv = [headers.join(','), ...rows].join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -879,7 +982,8 @@
     }
 
     function buildSpotPosterHtml(spot) {
-      const photoUrl = resolvePosterImageUrl(spot.imageUrl || 'https://via.placeholder.com/320x240/4a90a4/FFFFFF?text=' + encodeURIComponent(spot.name || 'Spot'));
+      const still = spotPosterStillUrl(spot);
+      const photoUrl = resolvePosterImageUrl(still || 'https://via.placeholder.com/320x240/4a90a4/FFFFFF?text=' + encodeURIComponent(spot.name || 'Spot'));
       const meta = [
         spot.address ? `Address: ${spot.address}` : null,
         spot.notes ? `Notes: ${spot.notes}` : null,
@@ -934,7 +1038,7 @@
       if (!currentPosterSpot) return;
       spotPosterCanvas = null;
       if (spotPosterMode === 'template' && window.posterTemplates) {
-        const imageUrl = resolvePosterImageUrl(currentPosterSpot.imageUrl || '');
+        const imageUrl = resolvePosterImageUrl(spotPosterStillUrl(currentPosterSpot) || '');
         const qrUrl = currentPosterSpot.address
           ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(currentPosterSpot.address)
           : 'https://www.google.com/search?q=' + encodeURIComponent(currentPosterSpot.name || '');
@@ -1134,10 +1238,10 @@
     document.getElementById('localExpertClearBtn')?.addEventListener('click', () => {
       localExpertChatContext = [];
       document.getElementById('localExpertMessages').innerHTML = '';
-      addLocalExpertMessage('assistant', 'Hi! I\'m your Local Expert. Ask me about thrift shops, taco trucks, gardens, bike trails, fishing, kayak spots, or concert venues!');
+      addLocalExpertMessage('assistant', 'Hi! I\'m your Local Expert. Ask me about thrift shops, taco trucks, gardens, bike trails, fishing, kayak spots, concert venues—or miscellaneous favorites!');
     });
 
-    addLocalExpertMessage('assistant', 'Hi! I\'m your Local Expert. Ask me about thrift shops, taco trucks, gardens, bike trails, fishing, kayak spots, or concert venues!');
+    addLocalExpertMessage('assistant', 'Hi! I\'m your Local Expert. Ask me about thrift shops, taco trucks, gardens, bike trails, fishing, kayak spots, concert venues—or miscellaneous favorites!');
 
     // Voice Control (tool8 standard) - sends commands to Local Expert AI
     (function initVoiceControl() {

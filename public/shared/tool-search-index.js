@@ -10,6 +10,7 @@
     { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets' },
     { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API' },
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API' },
+    { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter' },
     { name: 'Test Endpoints', url: '/finance/encompass-hub-test.html', category: 'Encompass', keywords: 'API test' },
     { name: 'Pipeline Risk Dashboard', url: '/finance/pipeline-risk-dashboard.html', category: 'Encompass', keywords: 'disaster FEMA risk' },
     { name: 'Unit Tests', url: '/finance/unit-tests.html', category: 'Encompass', keywords: 'excel test runner' },
@@ -61,6 +62,7 @@
     { name: 'Critter Discovery', url: '/nature/critter-discovery.html', category: 'Nature', keywords: 'animal wildlife identify photo' },
     { name: 'Critter Collection', url: '/nature/critter-collection.html', category: 'Nature', keywords: 'critters wildlife collection' },
     { name: 'Local Spots', url: '/local/local-spots.html', category: 'Local', keywords: 'thrift spots map' },
+    { name: 'Finds', url: '/finds/index.html', category: 'Local', keywords: 'thrift flea vintage collection AI' },
     { name: 'Home', url: '/', category: 'Hub', keywords: 'hub index' },
   ];
 

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loan batch update – Encompass</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
+    <script src="/shared/menu-config.js"></script>
+    <script src="/shared/modern-navbar.js" defer></script>
+    <style>
+      :root {
+        --batch-deep: #1e3a5f;
+        --batch-accent: #0d9488;
+        --batch-glow: rgba(13, 148, 136, 0.25);
+      }
+      body {
+        min-height: 100vh;
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 35%, #f5f3ff 100%);
+      }
+      .batch-hero {
+        background: linear-gradient(135deg, var(--batch-deep) 0%, #0f766e 55%, #134e4a 100%);
+        color: #fff;
+        border-radius: 20px;
+        padding: 1.75rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 20px 50px var(--batch-glow);
+        position: relative;
+        overflow: hidden;
+      }
+      .batch-hero::after {
+        content: '';
+        position: absolute;
+        right: -40px;
+        top: -40px;
+        width: 160px;
+        height: 160px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 50%;
+      }
+      .batch-hero h1 {
+        font-size: clamp(1.35rem, 3vw, 1.75rem);
+        font-weight: 700;
+        margin-bottom: 0.35rem;
+      }
+      .batch-hero .lead {
+        opacity: 0.92;
+        font-size: 0.95rem;
+        max-width: 52rem;
+        margin-bottom: 0;
+      }
+      .batch-card {
+        border-radius: 16px;
+        border: 1px solid rgba(30, 58, 95, 0.12);
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+      }
+      .batch-card .card-header {
+        background: linear-gradient(90deg, rgba(13, 148, 136, 0.08), rgba(30, 58, 95, 0.06));
+        border-bottom: 1px solid rgba(30, 58, 95, 0.1);
+        font-weight: 600;
+        border-radius: 16px 16px 0 0 !important;
+      }
+      .ag-theme-alpine {
+        --ag-font-size: 13px;
+        --ag-border-radius: 8px;
+      }
+      #loansGridWrap,
+      #fieldsGridWrap {
+        height: 280px;
+        width: 100%;
+      }
+      .format-callout {
+        font-size: 0.8rem;
+        border-left: 4px solid var(--batch-accent);
+        padding: 0.5rem 0.75rem;
+        background: rgba(13, 148, 136, 0.07);
+        border-radius: 0 8px 8px 0;
+      }
+      main.batch-shell {
+        max-width: 1280px;
+      }
+    </style>
+  </head>
+  <body>
+    <modern-navbar></modern-navbar>
+    <main class="container py-4 batch-shell">
+      <p class="mb-3"><a href="encompass-hub.html" class="text-decoration-none font-weight-500"><i class="bi-arrow-left"></i> Encompass Hub</a></p>
+
+      <div class="batch-hero">
+        <h1><i class="bi-layers-half"></i> Loan batch update</h1>
+        <p class="lead mb-0">
+          Build <code class="text-white-50" style="background: rgba(0,0,0,0.2); padding: 0.1rem 0.35rem; border-radius: 4px">loanBatch/updateRequests</code> payloads with AG Grid — paste from Excel or import
+          <strong>.xlsx</strong> / <strong>.csv</strong>.           Native + custom field IDs are loaded from the hub for <strong>Correspondent</strong> or <strong>Retail</strong>. Custom rows become <code class="text-white-50" style="background: rgba(0,0,0,0.2); padding: 0.1rem 0.35rem; border-radius: 4px">loanData.customFields</code>; native rows become <code class="text-white-50" style="background: rgba(0,0,0,0.2); padding: 0.1rem 0.35rem; border-radius: 4px">loanFields</code> (same shape as field writer). Same patch applies to every loan ID.
+        </p>
+      </div>
+
+      <p id="batchFieldCatalogMeta" class="small text-muted mb-2">Loading field catalogs…</p>
+
+      <div class="form-row mb-3">
+        <div class="mb-3 col-md-4 mb-2">
+          <label for="batchEnvSelect" class="fw-bold small text-uppercase text-muted">Encompass environment</label>
+          <select id="batchEnvSelect" class="form-control form-control-sm">
+            <option value="correspondent">Correspondent</option>
+            <option value="retail">Retail</option>
+          </select>
+        </div>
+        <div class="mb-3 col-md-8 mb-2 d-flex flex-wrap align-items-end">
+          <div class="btn-toolbar flex-wrap" role="toolbar">
+            <div class="btn-group btn-group-sm me-2 mb-2">
+              <button type="button" class="btn btn-sm btn-outline-info" id="batchRefreshCatalogs" title="Reload native + custom fields for selected env">
+                <i class="bi-arrow-clockwise"></i> Refresh fields
+              </button>
+            </div>
+            <div class="btn-group btn-group-sm me-2 mb-2">
+              <button type="button" class="btn btn-sm border" id="batchDownloadTemplate" style="background: linear-gradient(135deg, #ccfbf1, #99f6e4); border-color: #5eead4 !important">
+                <i class="bi-download"></i> Excel template
+              </button>
+              <label class="btn btn-sm btn-outline-primary mb-0" style="cursor: pointer">
+                <i class="bi-file-earmark-spreadsheet"></i> Import file
+                <input type="file" id="batchFileImport" class="d-none" accept=".xlsx,.xls,.csv" />
+              </label>
+            </div>
+            <div class="btn-group btn-group-sm mb-2">
+              <button type="button" class="btn btn-outline-secondary" id="batchAddLoanRow" title="Add loan row"><i class="bi-plus-lg"></i> Loan</button>
+              <button type="button" class="btn btn-outline-secondary" id="batchAddFieldRow" title="Add field row"><i class="bi-plus-lg"></i> Field</button>
+              <button type="button" class="btn btn-primary" id="batchGridsToJson"><i class="bi-arrow-down-circle"></i> Grids → JSON</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="format-callout mb-3">
+        <strong>Fields sheet columns:</strong> <code>fieldSource</code> (<code>native</code> or <code>custom</code>), <code>fieldId</code>, <code>stringValue</code> / <code>decimalValue</code> / <code>dateValue</code>.
+        <strong>Loans sheet:</strong> <code>loanId</code>. <strong>Single-sheet long format:</strong> same columns plus <code>loanId</code> per row; all loans must receive the same combined native+custom patch.
+      </div>
+
+      <div class="row">
+        <div class="col-lg-6 mb-3">
+          <div class="card batch-card h-100">
+            <div class="card-header py-2"><i class="bi-list-ul"></i> Loan IDs <small class="text-muted font-weight-normal">(paste from Excel)</small></div>
+            <div class="card-body p-2">
+              <div id="loansGridWrap" class="ag-theme-alpine"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 mb-3">
+          <div class="card batch-card h-100">
+            <div class="card-header py-2"><i class="bi-sliders"></i> Field updates <small class="text-muted font-weight-normal">(native → loanFields, custom → loanData)</small></div>
+            <div class="card-body p-2">
+              <div id="fieldsGridWrap" class="ag-theme-alpine"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card batch-card mb-3">
+        <div class="card-header py-2 d-flex flex-wrap align-items-center justify-content-between">
+          <span><i class="bi-code-slash"></i> Request JSON</span>
+          <div class="form-check form-check-inline mb-0">
+            <input class="form-check-input" type="radio" name="batchMode" id="modeLoanIds" value="loanIds" checked />
+            <label class="form-check-label small" for="modeLoanIds">Loan IDs body</label>
+          </div>
+          <div class="form-check form-check-inline mb-0">
+            <input class="form-check-input" type="radio" name="batchMode" id="modeFilter" value="filter" />
+            <label class="form-check-label small" for="modeFilter">Filter body</label>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="paneLoanIds">
+            <label for="batchBodyLoanIds" class="small fw-bold text-muted">POST body (loanIds + loanData)</label>
+            <textarea id="batchBodyLoanIds" class="form-control font-monospace small" rows="12" spellcheck="false"></textarea>
+          </div>
+          <div id="paneFilter" style="display: none">
+            <label for="batchBodyFilter" class="small fw-bold text-muted">POST body (filter + loanData)</label>
+            <textarea id="batchBodyFilter" class="form-control font-monospace small" rows="12" spellcheck="false"></textarea>
+          </div>
+          <button type="button" id="batchSubmitBtn" class="btn btn-success mt-3 px-4">
+            <i class="bi-send-fill"></i> Submit batch update
+          </button>
+        </div>
+      </div>
+
+      <div class="card batch-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <small id="batchResponseMeta" class="text-muted">Response will appear here.</small>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="batchCopyBtn"><i class="bi-clipboard"></i> Copy</button>
+          </div>
+          <pre id="batchResponseBody" class="mb-0 small p-3 bg-dark text-light rounded" style="max-height: 380px; overflow: auto; white-space: pre-wrap"></pre>
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <script src="/shared/encompass-api.js"></script>
+    <script src="/shared/encompass-dark-mode.js"></script>
+    <script>
+      document.querySelectorAll('input[name="batchMode"]').forEach(function (r) {
+        r.addEventListener('change', function () {
+          var filter = document.getElementById('modeFilter').checked;
+          document.getElementById('paneLoanIds').style.display = filter ? 'none' : 'block';
+          document.getElementById('paneFilter').style.display = filter ? 'block' : 'none';
+        });
+      });
+    </script>
+    <script src="js/loan-batch-update.js"></script>
+    <script src="/shared/finance-auth-guard.js"></script>
+  </body>
+</html>

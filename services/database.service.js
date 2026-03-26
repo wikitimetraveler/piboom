@@ -47,6 +47,7 @@
  * ==============================================================================
  */
 
+import bcrypt from 'bcryptjs';
 import pg from 'pg';
 const { Pool } = pg;
 
@@ -134,6 +135,23 @@ export async function createTables() {
       ON CONFLICT (id) DO NOTHING
     `);
 
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)
+    `);
+    const { rows: usersNeedingHash } = await pool.query(`
+      SELECT id, password FROM users
+      WHERE (password_hash IS NULL OR password_hash = '')
+        AND password IS NOT NULL
+        AND TRIM(password) <> ''
+    `);
+    for (const row of usersNeedingHash) {
+      const passwordHash = await bcrypt.hash(row.password, 10);
+      await pool.query(
+        `UPDATE users SET password_hash = $1, password = $2 WHERE id = $3`,
+        [passwordHash, '', row.id]
+      );
+    }
+
     // Create records table for vinyl/album collection
     await pool.query(`
       CREATE TABLE IF NOT EXISTS records (
@@ -207,6 +225,12 @@ export async function createTables() {
       ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION,
       ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION,
       ADD COLUMN IF NOT EXISTS location_label TEXT
+    `);
+
+    // Album / vinyl: multiple photos & videos (JSON array of { type, url, caption? })
+    await pool.query(`
+      ALTER TABLE records
+      ADD COLUMN IF NOT EXISTS media_gallery JSONB DEFAULT '[]'::jsonb
     `);
 
     // Create catches table for fish logging
@@ -399,6 +423,43 @@ export async function createTables() {
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_critters_user ON critters(user_id)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_critters_location ON critters(latitude, longitude)`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_critters_added_date ON critters(added_date DESC)`);
+
+    // Multi-photo / video galleries on nature collection rows (JSON array of { type, url, caption? })
+    await pool.query(`
+      ALTER TABLE rock_specimens
+      ADD COLUMN IF NOT EXISTS media_gallery JSONB DEFAULT '[]'::jsonb
+    `);
+    await pool.query(`
+      ALTER TABLE catches
+      ADD COLUMN IF NOT EXISTS media_gallery JSONB DEFAULT '[]'::jsonb
+    `);
+    await pool.query(`
+      ALTER TABLE trees
+      ADD COLUMN IF NOT EXISTS media_gallery JSONB DEFAULT '[]'::jsonb
+    `);
+    await pool.query(`
+      ALTER TABLE critters
+      ADD COLUMN IF NOT EXISTS media_gallery JSONB DEFAULT '[]'::jsonb
+    `);
+
+    // Thrift / flea / vintage finds (Finds domain)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS finds (
+        id SERIAL PRIMARY KEY,
+        user_id VARCHAR(100) NOT NULL,
+        title VARCHAR(500) NOT NULL DEFAULT '',
+        category VARCHAR(100) NOT NULL DEFAULT 'unknown',
+        status VARCHAR(50) NOT NULL DEFAULT 'researching',
+        score INTEGER NOT NULL DEFAULT 0,
+        score_label VARCHAR(20) NOT NULL DEFAULT 'low',
+        payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_finds_user ON finds(user_id)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_finds_status ON finds(status)`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_finds_created ON finds(created_at DESC)`);
 
     // Create conversations table for LangChain memory
     await pool.query(`

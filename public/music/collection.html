@@ -8,7 +8,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <link rel="stylesheet" href="/shared/collection-media-gallery.css"/>
   <script src="/shared/toast.js"></script>
+  <script src="/shared/collection-media-gallery.js"></script>
   <script src="/shared/modern-navbar.js"></script>
 <script src="/shared/collection-utils.js"></script>
 <script src="/shared/music-mini-nav.js"></script>
@@ -291,6 +293,24 @@
       border-radius: var(--zen-radius);
       margin-bottom: 12px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .album-cover-wrap {
+      width: 100%;
+      height: 220px;
+      margin-bottom: 12px;
+      border-radius: var(--zen-radius);
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    .album-cover-wrap .collection-media-root--compact {
+      max-height: 220px;
+    }
+
+    .album-cover-wrap .collection-media-viewport {
+      min-height: 200px;
+      max-height: 220px;
     }
     
     .album-info h5 {
@@ -734,6 +754,14 @@
       <div class="modal-body">
         <input type="hidden" id="editAlbumId">
         <div class="form-group">
+          <label><i class="bi-images"></i> Photos &amp; videos</label>
+          <p class="small text-muted mb-2">Multiple sleeve shots, vinyl, inserts, or short clips. The first still image is used as the main cover.</p>
+          <div id="editAlbumMediaPreview" class="mb-2"></div>
+          <input type="file" id="editAlbumMediaFiles" class="d-none" multiple accept="image/*,video/*">
+          <button type="button" class="btn btn-sm btn-outline-primary" id="editAlbumMediaPickBtn"><i class="bi-plus-lg"></i> Add media</button>
+          <button type="button" class="btn btn-sm btn-outline-secondary ml-2" id="editAlbumMediaClearBtn" type="button">Clear all</button>
+        </div>
+        <div class="form-group">
           <label>Rating</label>
           <div class="rating-input">
             <button type="button" class="btn btn-outline-warning" onclick="setRating(1)">★</button>
@@ -927,6 +955,30 @@
 
 <script>
 let currentCollection = [];
+let editAlbumMediaItems = [];
+
+function renderEditAlbumMediaPreview() {
+  const el = document.getElementById('editAlbumMediaPreview');
+  if (!el || !window.CollectionMediaGallery) return;
+  CollectionMediaGallery.mountCollectionSlideshow(el, editAlbumMediaItems, {
+    compact: true,
+    emptyText: 'No gallery yet — add photos or videos.'
+  });
+}
+
+async function handleEditAlbumMediaFiles(ev) {
+  const files = ev.target.files;
+  if (!files || !files.length || !window.CollectionMediaGallery) return;
+  const added = await CollectionMediaGallery.filesToMediaItems(files);
+  editAlbumMediaItems = editAlbumMediaItems.concat(added);
+  ev.target.value = '';
+  renderEditAlbumMediaPreview();
+}
+
+function clearEditAlbumMedia() {
+  editAlbumMediaItems = [];
+  renderEditAlbumMediaPreview();
+}
 let GOOGLE_API_KEY = null;
 let youtubeAPIReady = false;
 let youtubeInitInProgress = false;
@@ -1159,6 +1211,17 @@ document.addEventListener('DOMContentLoaded', async function() {
       event.target.value = event.target.value.toUpperCase();
     });
   }
+
+  const editAlbumMediaPickBtn = document.getElementById('editAlbumMediaPickBtn');
+  const editAlbumMediaFiles = document.getElementById('editAlbumMediaFiles');
+  const editAlbumMediaClearBtn = document.getElementById('editAlbumMediaClearBtn');
+  if (editAlbumMediaPickBtn && editAlbumMediaFiles) {
+    editAlbumMediaPickBtn.addEventListener('click', () => editAlbumMediaFiles.click());
+    editAlbumMediaFiles.addEventListener('change', handleEditAlbumMediaFiles);
+  }
+  if (editAlbumMediaClearBtn) {
+    editAlbumMediaClearBtn.addEventListener('click', clearEditAlbumMedia);
+  }
   
   // Update header based on view mode
   updateCollectionHeader();
@@ -1345,13 +1408,10 @@ function displayAlbums(albums) {
     const albumCard = document.createElement('div');
     albumCard.className = 'album-card';
     albumCard.onclick = (e) => {
-      // Don't flip if clicking on buttons
-      if (!e.target.closest('button')) {
-        albumCard.classList.toggle('flipped');
-      }
+      if (e.target.closest('button') || e.target.closest('.collection-media-nav') || e.target.closest('.collection-media-dot') || e.target.closest('video')) return;
+      albumCard.classList.toggle('flipped');
     };
-    
-    const coverUrl = album.cover_url || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><rect width="100%" height="100%" fill="%2387CEEB"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="20" font-family="Arial">No Cover</text></svg>';
+
     const rating = album.rating ? '★'.repeat(album.rating) + '☆'.repeat(5 - album.rating) : '☆☆☆☆☆';
     const addedDate = new Date(album.added_date).toLocaleDateString();
     const locationLabel = album.location_label || '';
@@ -1375,8 +1435,7 @@ function displayAlbums(albums) {
               ${albumUser.name.split(' ').slice(-2).join(' ')}
             </div>
           ` : ''}
-          <img src="${coverUrl}" alt="${album.album}" class="album-cover" 
-               onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;220&quot; height=&quot;220&quot;><rect width=&quot;100%&quot; height=&quot;100%&quot; fill=&quot;%2387CEEB&quot;/><text x=&quot;50%&quot; y=&quot;50%&quot; dominant-baseline=&quot;middle&quot; text-anchor=&quot;middle&quot; fill=&quot;white&quot; font-size=&quot;20&quot; font-family=&quot;Arial&quot;>No Cover</text></svg>'">
+          <div id="album-cover-wrap-${album.id}" class="album-cover-wrap" onclick="event.stopPropagation();" role="region" aria-label="Album media"></div>
           <div class="album-info">
             <h5>${album.album}</h5>
             <p><strong>${album.artist}</strong></p>
@@ -1482,6 +1541,18 @@ function displayAlbums(albums) {
     `;
     
     albumGrid.appendChild(albumCard);
+
+    const coverWrap = document.getElementById('album-cover-wrap-' + album.id);
+    if (coverWrap && window.CollectionMediaGallery) {
+      let mediaItems = CollectionMediaGallery.normalizeCollectionMedia(album, 'cover_url');
+      if (!mediaItems.length) {
+        mediaItems = [{
+          type: 'image',
+          url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><rect width="100%" height="100%" fill="%2387CEEB"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="20" font-family="Arial">No Cover</text></svg>'
+        }];
+      }
+      CollectionMediaGallery.mountCollectionSlideshow(coverWrap, mediaItems, { compact: true });
+    }
   });
 
 }
@@ -1750,6 +1821,13 @@ async function editAlbum(id) {
   
   // Highlight rating buttons
   updateRatingButtons(album.rating || 0);
+
+  editAlbumMediaItems = window.CollectionMediaGallery
+    ? CollectionMediaGallery.normalizeCollectionMedia(album, 'cover_url').map(function (m) {
+      return { type: m.type, url: m.url, caption: m.caption || '' };
+    })
+    : [];
+  renderEditAlbumMediaPreview();
   
   loadGooglePlacesApi();
   initEditLocationAutocomplete();
@@ -1824,11 +1902,19 @@ async function saveAlbumEdit() {
     const year = document.getElementById('editYear').value;
     const rating = parseInt(document.getElementById('editRating').value) || null;
     const valuation = document.getElementById('editValuation').value ? parseFloat(document.getElementById('editValuation').value) : null;
-    
-    const response = await fetch(`/api/collection/${id}`, {
+
+    const loggedInUserId = localStorage.getItem('loggedInUserId');
+    const userQ = loggedInUserId ? `?userId=${encodeURIComponent(loggedInUserId)}` : '';
+
+    const payload = { notes, story, genre, label, year, rating, valuation, locationLabel: locationLabel || null, locationLat, locationLng };
+    if (window.CollectionMediaGallery && Array.isArray(editAlbumMediaItems)) {
+      payload.mediaGallery = editAlbumMediaItems;
+    }
+
+    const response = await fetch(`/api/collection/${id}${userQ}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ notes, story, genre, label, year, rating, valuation, locationLabel: locationLabel || null, locationLat, locationLng })
+      body: JSON.stringify(payload)
     });
     
     const data = await response.json();
