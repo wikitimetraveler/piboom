@@ -91,6 +91,9 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | * | `/api/album-discovery/*` | Album AI analysis, search |
 | * | `/api/spotify/*` | Spotify auth, profile, playlists |
 | * | `/api/collection/*` | Collection CRUD |
+| POST | `/api/collection/add` | Add album (body: artist, album, … optional `storageZone` + `storageSlot`, or `storageCode` e.g. `C4`) |
+| GET | `/api/collection/storage/next-slot` | Next shelf index: query `userId`, `zone` (A–G) → `{ nextSlot }` |
+| PATCH | `/api/collection/:id` | Update album (optional `storageZone` + `storageSlot` or `storageCode`; send empty/null both to clear) |
 | * | `/api/audio-fingerprint/*` | Song identification |
 | * | `/api/sample-detection/*` | Covers, samples |
 | * | `/api/tree-discovery/*` | Tree identification |

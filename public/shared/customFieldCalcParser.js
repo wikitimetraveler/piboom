@@ -1141,6 +1141,18 @@
       return meta;
     };
 
+    /** Grid Description column: match unit-tests maybeUpdateDescriptionFromApi (description + optional type). */
+    const descriptionCellFromMeta = (meta, displayId) => {
+      const fallback = 'Field ' + displayId;
+      if (!meta) return fallback;
+      const desc = String(meta.description || '').trim();
+      const typeStr = String(meta.dataType || meta.type || '').trim();
+      if (!desc) return fallback;
+      const parts = [desc];
+      if (typeStr) parts.push('(' + typeStr + ')');
+      return parts.join(' ');
+    };
+
     const scenarioList = scenarios ? scenarios.slice(0, scenarioCount) : [];
 
     // Track SET values per scenario so COMPARE can auto-evaluate for pure-calc formulas
@@ -1151,7 +1163,7 @@
       const inputField = inputFields[k];
       const displayId = normalizeFieldIdForLookup(inputField);
       const meta = getMetaForField(inputField);
-      const desc = 'Field ' + displayId;
+      const desc = descriptionCellFromMeta(meta, displayId);
       const setRow = {
         Step: step,
         Action: 'SET',
@@ -1190,7 +1202,7 @@
       const inputField = inputFields[k];
       const displayId = normalizeFieldIdForLookup(inputField);
       const meta = getMetaForField(inputField);
-      const desc = 'Field ' + displayId;
+      const desc = descriptionCellFromMeta(meta, displayId);
       const getRow = {
         Step: step,
         Action: 'GET',
@@ -1215,7 +1227,7 @@
     // COMPARE row — pre-fill when result is single field ref (pass-through)
     const outDisplayId = normalizeFieldIdForLookup(outField);
     const outMeta = getMetaForField(outField);
-    const compareDesc = 'Field ' + outDisplayId;
+    const compareDesc = descriptionCellFromMeta(outMeta, outDisplayId);
     const compareRow = {
       Step: step,
       Action: 'COMPARE',

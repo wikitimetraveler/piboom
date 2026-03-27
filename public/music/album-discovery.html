@@ -786,6 +786,7 @@
 <!-- User Selector and Login Scripts -->
 <script src="/shared/user-selector.js"></script>
 <script src="/shared/user-login.js"></script>
+<script src="/shared/vinyl-storage-locations.js"></script>
 
 <div class="container">
   <div class="album-container">
@@ -831,6 +832,25 @@
           <i class="bi-geo-alt-fill"></i> Use my phone's location
         </button>
         <small class="form-text text-muted d-block mt-2">Used as the default location when adding albums to your collection. Location is requested when you open the page.</small>
+      </div>
+    </div>
+
+    <div class="card mt-3 mb-4" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
+      <div class="card-body">
+        <h5 class="card-title mb-3"><i class="bi-box-seam"></i> Physical shelf (vinyl)</h5>
+        <p class="small text-muted mb-3">Optional. Choose a zone (A–G); the slot defaults to the next free number for that zone. You can change the number before adding.</p>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="addStorageZone">Zone</label>
+            <select id="addStorageZone" class="form-control">
+              <option value="">— Not set —</option>
+            </select>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="addStorageSlot">Slot #</label>
+            <input type="number" id="addStorageSlot" class="form-control" min="1" step="1" placeholder="Pick zone first" disabled>
+          </div>
+        </div>
       </div>
     </div>
     
@@ -2816,24 +2836,34 @@ async function showAddModal(artist, album, year, genre, coverUrl, musicbrainzId,
       locationLabel = `${Number(locationLat).toFixed(5)}, ${Number(locationLng).toFixed(5)}`;
     }
 
+    const addPayload = {
+      artist: artist,
+      album: album,
+      year: year,
+      genre: genre,
+      coverUrl: coverUrl,
+      musicbrainzId: musicbrainzId || null,
+      locationLat: locationLat ?? null,
+      locationLng: locationLng ?? null,
+      locationLabel: locationLabel ?? null,
+      valuation: estimatedValue && estimatedValue !== 'null' ? parseFloat(estimatedValue) / 2 : null,
+      aiAnalysis: aiAnalysis,
+    };
+    const zs = document.getElementById('addStorageZone');
+    const sl = document.getElementById('addStorageSlot');
+    if (zs && zs.value && sl && sl.value !== '' && !sl.disabled) {
+      const sn = parseInt(sl.value, 10);
+      if (Number.isFinite(sn) && sn >= 1) {
+        addPayload.storageZone = zs.value;
+        addPayload.storageSlot = sn;
+      }
+    }
+
     // Add album directly
     const response = await fetch(`/api/collection/add?userId=${currentUser.id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        artist: artist,
-        album: album,
-        year: year,
-        genre: genre,
-        coverUrl: coverUrl,
-        musicbrainzId: musicbrainzId || null,
-        locationLat: locationLat ?? null,
-        locationLng: locationLng ?? null,
-        locationLabel: locationLabel ?? null,
-        // Automatically cut AI valuations in half (AI tends to overestimate)
-        valuation: estimatedValue && estimatedValue !== 'null' ? parseFloat(estimatedValue) / 2 : null,
-        aiAnalysis: aiAnalysis
-      })
+      body: JSON.stringify(addPayload)
     });
     
     const data = await response.json();
@@ -3232,11 +3262,58 @@ function closeToast(closeBtn) {
   }
 }
 
+// Physical shelf: populate zone dropdown and default next slot per zone
+function initAddStorageShelfUI() {
+  const sel = document.getElementById('addStorageZone');
+  const slot = document.getElementById('addStorageSlot');
+  if (!sel || !slot || !window.VinylStorageLocations) return;
+  const { STORAGE_ZONES } = window.VinylStorageLocations;
+  STORAGE_ZONES.forEach((z) => {
+    const opt = document.createElement('option');
+    opt.value = z.code;
+    opt.textContent = z.code + ' — ' + z.label;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', async () => {
+    const zone = sel.value;
+    if (!zone) {
+      slot.value = '';
+      slot.disabled = true;
+      return;
+    }
+    slot.disabled = false;
+    const uid = localStorage.getItem('loggedInUserId');
+    if (!uid) {
+      slot.value = '1';
+      return;
+    }
+    try {
+      const r = await fetch(
+        '/api/collection/storage/next-slot?userId=' +
+          encodeURIComponent(uid) +
+          '&zone=' +
+          encodeURIComponent(zone)
+      );
+      const data = await r.json();
+      if (data.success && data.nextSlot != null) {
+        slot.value = String(data.nextSlot);
+      } else {
+        slot.value = '1';
+      }
+    } catch (e) {
+      console.warn('next-slot fetch failed', e);
+      slot.value = '1';
+    }
+  });
+}
+
 // Basic page initialization
 
 // Initialize page (copied from working research page)
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🚀 DOM Content Loaded - Starting initialization...');
+
+  initAddStorageShelfUI();
   
   // Initialize user selector
   createUserSelector('userSelectorContainer', { 

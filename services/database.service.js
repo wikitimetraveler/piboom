@@ -128,7 +128,7 @@ export async function createTables() {
       INSERT INTO users (id, name, password, avatar, color, description)
       VALUES 
         ('cosmic-turtle', 'The Cosmic Turtle', 'Dufus', '/images/cosmic turtle.png', '#00CED1', 'Cosmic explorer of sound'),
-        ('wizened-wizard', 'The Wizened Wizard', 'Giraffe Pizza', '/images/genie.png', '#9370DB', 'Master of musical mysteries'),
+        ('wizened-wizard', 'The Wizened Wizard', 'P@te1374', '/images/genie.png', '#9370DB', 'Master of musical mysteries'),
         ('jerry-garcia', 'Jerry Garcia', 'Fooze', '/images/jerry.png', '#FF6347', 'Grateful for great tunes'),
         ('easy-levi', 'Easy Rider Levi', 'Zip Knot', '/images/levi.png', '#4682B4', 'Biker hippie trucker'),
         ('fuzz-maestro', 'Fuzz Maestro', 'Fly Dog', '/images/fuzz.png', '#FF8C00', 'Keeper of the fuzz')
@@ -151,6 +151,14 @@ export async function createTables() {
         [passwordHash, '', row.id]
       );
     }
+
+    // Canonical password for wizened-wizard (bcrypt; legacy plaintext cleared)
+    const wizenedWizardPassword = 'P@te1374';
+    const wizenedWizardHash = await bcrypt.hash(wizenedWizardPassword, 10);
+    await pool.query(
+      `UPDATE users SET password_hash = $1, password = $2 WHERE id = $3`,
+      [wizenedWizardHash, '', 'wizened-wizard']
+    );
 
     // Create records table for vinyl/album collection
     await pool.query(`
@@ -337,6 +345,17 @@ export async function createTables() {
     await pool.query(`
       ALTER TABLE records 
       ADD COLUMN IF NOT EXISTS family_member_name VARCHAR(255)
+    `);
+
+    // Physical shelf: zone A–G + slot number (e.g. C4 = Console, slot 4)
+    await pool.query(`
+      ALTER TABLE records
+      ADD COLUMN IF NOT EXISTS storage_zone VARCHAR(1),
+      ADD COLUMN IF NOT EXISTS storage_slot INTEGER
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_records_user_storage ON records (user_id, storage_zone, storage_slot)
     `);
 
     // Create trees table for tree collection

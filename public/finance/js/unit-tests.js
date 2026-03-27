@@ -1199,6 +1199,27 @@ function buildExportRowsInFormat() {
     compareRows.forEach((r) => aoa.push(rowFromObj(r)));
   }
 
+  // 8b. Export-only: GET [364] loan number audit (so the file shows which loan was tested) — skip if already present
+  const allPartitioned = [...setRows, ...getRows, ...compareRows, ...otherRows];
+  const alreadyHas364Get = allPartitioned.some((r) => {
+    const id = extractFieldId(r.Target || r.target || '');
+    return id === '364';
+  });
+  if (!alreadyHas364Get && headers.length > 0) {
+    const loanAudit = {};
+    headers.forEach((h) => {
+      loanAudit[h] = '';
+    });
+    const setByHeader = (name, val) => {
+      const h = headers.find((x) => x && String(x).toLowerCase() === String(name).toLowerCase());
+      if (h) loanAudit[h] = val;
+    };
+    setByHeader('Action', 'GET');
+    setByHeader('Target', '[364]');
+    setByHeader('Description', 'Loan number (which loan was tested)');
+    aoa.push(rowFromObj(loanAudit));
+  }
+
   // 9. Buffer + "Overall Test Results" section
   aoa.push(emptyRow());
   aoa.push(emptyRow());

@@ -16,6 +16,7 @@
 <script src="/shared/music-mini-nav.js"></script>
   <script src="/shared/user-selector.js"></script>
   <script src="/shared/user-login.js"></script>
+  <script src="/shared/vinyl-storage-locations.js"></script>
   <script src="https://apis.google.com/js/api.js"></script>
   <style>
     /* Floating Musical Notes */
@@ -821,6 +822,22 @@
           <input type="hidden" id="editLocationLng">
         </div>
         <div class="form-group">
+          <label><i class="bi-box-seam"></i> Physical shelf (vinyl)</label>
+          <div class="form-row">
+            <div class="col-md-6">
+              <label class="small text-muted" for="editStorageZone">Zone</label>
+              <select id="editStorageZone" class="form-control">
+                <option value="">— Not set —</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="small text-muted" for="editStorageSlot">Slot #</label>
+              <input type="number" id="editStorageSlot" class="form-control" min="1" step="1" placeholder="Pick zone first" disabled>
+            </div>
+          </div>
+          <small class="form-text text-muted">Changing zone suggests the next free slot; you can override the number.</small>
+        </div>
+        <div class="form-group">
           <label>Genre</label>
           <input type="text" id="editGenre" class="form-control" placeholder="Rock, Jazz, Hip Hop, etc.">
         </div>
@@ -1195,6 +1212,47 @@ function fillEditAddressFieldsFromPlace(place) {
   }
 }
 
+function initEditStorageShelfUI() {
+  const sel = document.getElementById('editStorageZone');
+  const slot = document.getElementById('editStorageSlot');
+  if (!sel || !window.VinylStorageLocations) return;
+  if (sel.querySelectorAll('option').length > 1) return;
+  const { STORAGE_ZONES } = window.VinylStorageLocations;
+  STORAGE_ZONES.forEach((z) => {
+    const opt = document.createElement('option');
+    opt.value = z.code;
+    opt.textContent = z.code + ' — ' + z.label;
+    sel.appendChild(opt);
+  });
+  sel.addEventListener('change', async () => {
+    if (!slot) return;
+    const zone = sel.value;
+    if (!zone) {
+      slot.value = '';
+      slot.disabled = true;
+      return;
+    }
+    slot.disabled = false;
+    const uid = localStorage.getItem('loggedInUserId');
+    if (!uid) {
+      slot.value = '1';
+      return;
+    }
+    try {
+      const r = await fetch(
+        '/api/collection/storage/next-slot?userId=' +
+          encodeURIComponent(uid) +
+          '&zone=' +
+          encodeURIComponent(zone)
+      );
+      const data = await r.json();
+      slot.value = data.success && data.nextSlot != null ? String(data.nextSlot) : '1';
+    } catch (e) {
+      slot.value = '1';
+    }
+  });
+}
+
 // Load collection on page load
 document.addEventListener('DOMContentLoaded', async function() {
   // Initialize user selector
@@ -1211,6 +1269,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       event.target.value = event.target.value.toUpperCase();
     });
   }
+
+  initEditStorageShelfUI();
 
   const editAlbumMediaPickBtn = document.getElementById('editAlbumMediaPickBtn');
   const editAlbumMediaFiles = document.getElementById('editAlbumMediaFiles');
@@ -1419,7 +1479,13 @@ function displayAlbums(albums) {
       ? `${parseFloat(album.latitude).toFixed(4)}, ${parseFloat(album.longitude).toFixed(4)}`
       : '';
     const locationDisplay = locationLabel || locationCoords;
-    
+    const storageLine =
+      window.VinylStorageLocations &&
+      album.storage_zone &&
+      album.storage_slot != null
+        ? window.VinylStorageLocations.formatStorageLine(album.storage_zone, album.storage_slot)
+        : '';
+
     // Get user info for this album
     const albumUser = album.user_id ? getUserById(album.user_id) : USERS[0];
     const viewMode = localStorage.getItem('viewMode') || 'single';
@@ -1441,6 +1507,7 @@ function displayAlbums(albums) {
             <p><strong>${album.artist}</strong></p>
             <p>${album.year || 'Year Unknown'} · ${album.genre || 'Genre Unknown'}</p>
             ${locationDisplay ? `<p style="margin: 4px 0 8px 0; font-size: 0.9rem; color: #2c3e50;"><i class="bi-geo-alt"></i> ${locationDisplay}</p>` : ''}
+            ${storageLine ? `<p style="margin: 4px 0 8px 0; font-size: 0.9rem; color: #34495e;"><i class="bi-box-seam"></i> ${storageLine}</p>` : ''}
             ${album.valuation ? `<p style="color: #28a745; font-weight: 600; margin-top: 8px;"><i class="bi-cash-coin"></i> $${parseFloat(album.valuation).toFixed(2)}</p>` : ''}
             ${rating ? `<div class="rating-stars">${rating}</div>` : ''}
           </div>
@@ -1818,7 +1885,20 @@ async function editAlbum(id) {
   document.getElementById('editYear').value = album.year || '';
   document.getElementById('editRating').value = album.rating || '';
   document.getElementById('editValuation').value = album.valuation || '';
-  
+
+  const editSz = document.getElementById('editStorageZone');
+  const editSl = document.getElementById('editStorageSlot');
+  if (editSz && editSl) {
+    editSz.value = album.storage_zone || '';
+    if (album.storage_zone && album.storage_slot != null) {
+      editSl.value = String(album.storage_slot);
+      editSl.disabled = false;
+    } else {
+      editSl.value = '';
+      editSl.disabled = !editSz.value;
+    }
+  }
+
   // Highlight rating buttons
   updateRatingButtons(album.rating || 0);
 
@@ -1909,6 +1989,25 @@ async function saveAlbumEdit() {
     const payload = { notes, story, genre, label, year, rating, valuation, locationLabel: locationLabel || null, locationLat, locationLng };
     if (window.CollectionMediaGallery && Array.isArray(editAlbumMediaItems)) {
       payload.mediaGallery = editAlbumMediaItems;
+    }
+
+    const ez = document.getElementById('editStorageZone');
+    const es = document.getElementById('editStorageSlot');
+    if (ez && es) {
+      if (!ez.value) {
+        payload.storageZone = null;
+        payload.storageSlot = null;
+      } else {
+        const sn = parseInt(es.value, 10);
+        if (!Number.isFinite(sn) || sn < 1) {
+          if (typeof showToast === 'function') {
+            showToast('Invalid shelf slot', 'Enter a slot number of 1 or more when a zone is selected.', 'warning');
+          }
+          return;
+        }
+        payload.storageZone = ez.value;
+        payload.storageSlot = sn;
+      }
     }
 
     const response = await fetch(`/api/collection/${id}${userQ}`, {

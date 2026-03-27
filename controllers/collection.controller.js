@@ -1,5 +1,47 @@
 import { getPool } from '../services/database.service.js';
 
+const STORAGE_ZONE_CODES = new Set(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
+
+/** Returns { storage_zone, storage_slot } or null if unset; throws message string if invalid */
+export function normalizeStorageInput(body) {
+  const rawCode = body.storageCode != null && String(body.storageCode).trim() !== ''
+    ? String(body.storageCode).trim()
+    : null;
+  let zone = body.storageZone != null ? String(body.storageZone).trim().toUpperCase() : null;
+  let slot = body.storageSlot;
+
+  if (rawCode) {
+    const m = rawCode.match(/^([A-Ga-g])(\d+)$/);
+    if (!m) {
+      throw new Error('storageCode must look like C4 (letter A–G + number)');
+    }
+    zone = m[1].toUpperCase();
+    slot = parseInt(m[2], 10);
+  }
+
+  if (zone === '' || zone === 'NULL') zone = null;
+  if (slot === '' || slot === null || slot === undefined) {
+    slot = null;
+  } else {
+    slot = parseInt(slot, 10);
+    if (Number.isNaN(slot)) throw new Error('storageSlot must be a number');
+  }
+
+  if (!zone && !slot) {
+    return { storage_zone: null, storage_slot: null };
+  }
+  if (!zone || slot === null) {
+    throw new Error('Set both storage zone (A–G) and slot, or omit both');
+  }
+  if (!STORAGE_ZONE_CODES.has(zone)) {
+    throw new Error('storage zone must be A through G');
+  }
+  if (slot < 1) {
+    throw new Error('storage slot must be at least 1');
+  }
+  return { storage_zone: zone, storage_slot: slot };
+}
+
 function firstCoverUrlFromMediaGallery(arr) {
   if (!Array.isArray(arr) || !arr.length) return null;
   const firstImg = arr.find(
@@ -10,11 +52,46 @@ function firstCoverUrlFromMediaGallery(arr) {
   return firstNonVideo ? firstNonVideo.url : null;
 }
 
+// Next physical shelf slot for a zone (per user)
+export async function getNextStorageSlot(req, res) {
+  try {
+    const userId = req.query.userId || null;
+    const zone = (req.query.zone || '').toString().trim().toUpperCase();
+    if (!userId) {
+      return res.status(400).json({ success: false, error: 'userId is required' });
+    }
+    if (!STORAGE_ZONE_CODES.has(zone)) {
+      return res.status(400).json({ success: false, error: 'zone must be A through G' });
+    }
+    const pool = getPool();
+    if (!pool) {
+      return res.status(503).json({ success: false, error: 'Database not available' });
+    }
+    const r = await pool.query(
+      `SELECT COALESCE(MAX(storage_slot), 0) AS max_slot FROM records WHERE user_id = $1 AND storage_zone = $2`,
+      [userId, zone]
+    );
+    const maxSlot = parseInt(r.rows[0].max_slot, 10) || 0;
+    const nextSlot = maxSlot + 1;
+    res.json({ success: true, nextSlot, zone });
+  } catch (error) {
+    console.error('❌ getNextStorageSlot:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+}
+
 // Add album to collection
 export async function addToCollection(req, res) {
   try {
     const { artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation, aiAnalysis, locationLat, locationLng, locationLabel } = req.body;
     const userId = req.query.userId || null; // Multi-user support
+
+    let storage;
+    try {
+      storage = normalizeStorageInput(req.body);
+    } catch (e) {
+      return res.status(400).json({ success: false, error: e.message });
+    }
     
     if (!artist || !album) {
       return res.status(400).json({ 
@@ -47,10 +124,29 @@ export async function addToCollection(req, res) {
 
     // Insert the album
     const result = await pool.query(
-      `INSERT INTO records (user_id, artist, album, year, genre, label, notes, cover_url, spotify_id, musicbrainz_id, rating, valuation, ai_analysis, latitude, longitude, location_label)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+      `INSERT INTO records (user_id, artist, album, year, genre, label, notes, cover_url, spotify_id, musicbrainz_id, rating, valuation, ai_analysis, latitude, longitude, location_label, storage_zone, storage_slot)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
        RETURNING *`,
-      [userId, artist, album, year, genre, label, notes, coverUrl, spotifyId, musicbrainzId, rating, valuation, aiAnalysis, locationLat ?? null, locationLng ?? null, locationLabel ?? null]
+      [
+        userId,
+        artist,
+        album,
+        year,
+        genre,
+        label,
+        notes,
+        coverUrl,
+        spotifyId,
+        musicbrainzId,
+        rating,
+        valuation,
+        aiAnalysis,
+        locationLat ?? null,
+        locationLng ?? null,
+        locationLabel ?? null,
+        storage.storage_zone,
+        storage.storage_slot,
+      ]
     );
 
     console.log('✅ Album added to collection:', album, 'by', artist);
@@ -109,7 +205,7 @@ export async function getCollection(req, res) {
     }
 
     // Add sorting
-    const validSortColumns = ['artist', 'album', 'year', 'added_date', 'rating', 'valuation'];
+    const validSortColumns = ['artist', 'album', 'year', 'added_date', 'rating', 'valuation', 'storage_zone', 'storage_slot'];
     const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'added_date';
     const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
     query += ` ORDER BY ${sortColumn} ${sortOrder} NULLS LAST`;
@@ -243,6 +339,12 @@ export async function updateAlbum(req, res) {
     if (req.body.coverUrl !== undefined && req.body.mediaGallery === undefined) {
       updates.push(`cover_url = $${paramCount++}`);
       params.push(req.body.coverUrl);
+    }
+    if (storagePatch) {
+      updates.push(`storage_zone = $${paramCount++}`);
+      params.push(storagePatch.storage_zone);
+      updates.push(`storage_slot = $${paramCount++}`);
+      params.push(storagePatch.storage_slot);
     }
 
     if (updates.length === 0) {

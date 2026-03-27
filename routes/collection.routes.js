@@ -5,7 +5,8 @@ import {
   getAlbumById,
   updateAlbum,
   deleteAlbum,
-  getCollectionStats
+  getCollectionStats,
+  getNextStorageSlot
 } from '../controllers/collection.controller.js';
 
 const router = express.Router();
@@ -18,6 +19,9 @@ router.get('/', getCollection);
 
 // Get collection statistics
 router.get('/stats', getCollectionStats);
+
+// Next physical shelf slot for zone A–G (before /:id)
+router.get('/storage/next-slot', getNextStorageSlot);
 
 // Get single album by ID
 router.get('/:id', getAlbumById);

@@ -229,7 +229,7 @@
 
 **Default Users:**
 - cosmic-turtle / Dufus
-- wizened-wizard / Giraffe Pizza
+- wizened-wizard — password set on server (`database.service.js` user seed / bcrypt)
 - jerry-garcia / Fooze
 - easy-levi / Zip Knot
 - fuzz-maestro / Fly Dog
@@ -258,11 +258,15 @@
 - `ai_analysis` (TEXT) - AI analysis
 - `family_member_id` (INTEGER) - Genealogy link
 - `family_member_name` (VARCHAR 255)
+- `storage_zone` (VARCHAR 1) - Physical shelf zone: `A`–`G` (Workbench, Bookshelf, Console, Cooler, GarageBox1, GarageBox2, GarageBox3), or NULL
+- `storage_slot` (INTEGER) - Slot index within zone (1..N); NULL if `storage_zone` is NULL
 - `added_date` (TIMESTAMP)
 - `updated_date` (TIMESTAMP)
 
 **Unique Constraint:**
 - `(artist, album, user_id)`
+
+**Physical storage:** Display as concatenated code, e.g. `C4` = zone C + slot 4. Both columns NULL means not assigned.
 
 ---
 
