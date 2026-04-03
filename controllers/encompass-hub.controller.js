@@ -8,12 +8,21 @@ import {
   fetchCustomFields,
   createCustomFields,
   postLoanBatchUpdateRequests,
+  fetchLoanAssociates,
+  assignLoanAssociate,
+  unassignLoanAssociate,
 } from '../services/encompass-hub.service.js';
+import { runProcessorAssignment } from '../services/processor-assignment.service.js';
 import {
   ensureEncompassToken,
   getEncompassEnvStatus,
   getEncompassTokenStatus,
+  encompassEnvStorage,
 } from '../services/encompass-auth.service.js';
+import {
+  getProcessorAssignmentToolConfig,
+  saveProcessorAssignmentToolConfig,
+} from '../services/processor-assignment-config.service.js';
 import {
   buildCalculatorSummary,
   buildRatioSeries,
@@ -116,6 +125,7 @@ function parseUserFilters(query = {}) {
   return {
     search: query.search?.trim() || undefined,
     personaId: query.personaId || query.personaIds,
+    personaName: query.personaName?.trim() || undefined,
     groupId: query.groupId,
     roleId: query.roleId,
     featureId: query.featureId,
@@ -410,6 +420,139 @@ export async function getTimelineVisualization(req, res) {
     console.error('Error building timeline visualization dataset:', error.message);
     return res.status(500).json({
       error: 'Failed to build timeline visualization dataset',
+      details: error.message,
+    });
+  }
+}
+
+export async function getLoanAssociatesHandler(req, res) {
+  try {
+    const { loanGuid } = req.params;
+    const { userId, roleId, fixedRoleId } = req.query;
+    if (!loanGuid) {
+      return res.status(400).json({ error: 'Loan GUID is required' });
+    }
+    const data = await fetchLoanAssociates(loanGuid, { userId, roleId, fixedRoleId });
+    return res.json(Array.isArray(data) ? data : data ?? []);
+  } catch (error) {
+    console.error('Error fetching loan associates:', error.message);
+    const status = error.response?.status || 500;
+    return res.status(status).json({
+      error: 'Failed to fetch loan associates',
+      details: error.message,
+    });
+  }
+}
+
+export async function putLoanAssociateHandler(req, res) {
+  try {
+    const { loanGuid, logId } = req.params;
+    const body = req.body;
+    if (!loanGuid || !logId) {
+      return res.status(400).json({ error: 'loanGuid and logId are required' });
+    }
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Request body must be a JSON object (e.g. { id: userEntityId })' });
+    }
+    const result = await assignLoanAssociate(loanGuid, logId, body);
+    return res.json(result ?? { success: true });
+  } catch (error) {
+    const status = error.response?.status || 500;
+    const upstream = error.response?.data;
+    console.error('Error assigning loan associate:', error.message, upstream ? { upstream } : '');
+    return res.status(status).json({
+      error: 'Failed to assign loan associate',
+      details: error.message,
+      upstream: upstream ? { summary: upstream.summary, details: upstream.details, errors: upstream.errors } : null,
+    });
+  }
+}
+
+export async function deleteLoanAssociateHandler(req, res) {
+  try {
+    const { loanGuid, logId } = req.params;
+    if (!loanGuid || !logId) {
+      return res.status(400).json({ error: 'loanGuid and logId are required' });
+    }
+    const result = await unassignLoanAssociate(loanGuid, logId);
+    return res.json(result ?? { success: true });
+  } catch (error) {
+    const status = error.response?.status || 500;
+    const upstream = error.response?.data;
+    console.error('Error unassigning loan associate:', error.message, upstream ? { upstream } : '');
+    return res.status(status).json({
+      error: 'Failed to unassign loan associate',
+      details: error.message,
+      upstream: upstream ? { summary: upstream.summary, details: upstream.details, errors: upstream.errors } : null,
+    });
+  }
+}
+
+function requestEncompassEnv() {
+  return encompassEnvStorage.getStore()?.env ?? 'correspondent';
+}
+
+export async function getProcessorAssignmentConfig(req, res) {
+  try {
+    const env = requestEncompassEnv();
+    const { config, updatedAt } = await getProcessorAssignmentToolConfig(env);
+    return res.json({
+      encompassEnv: env,
+      config: config ?? {},
+      updatedAt,
+    });
+  } catch (error) {
+    console.error('Error loading processor assignment config:', error.message);
+    const sc = error.statusCode;
+    const status =
+      typeof sc === 'number' && sc >= 400 && sc < 600 ? sc : 500;
+    return res.status(status).json({
+      error: 'Failed to load processor assignment config',
+      details: error.message,
+    });
+  }
+}
+
+export async function putProcessorAssignmentConfig(req, res) {
+  try {
+    const body = req.body;
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Request body must be a JSON object' });
+    }
+    const env = requestEncompassEnv();
+    const { config, updatedAt } = await saveProcessorAssignmentToolConfig(env, body);
+    return res.json({
+      encompassEnv: env,
+      config,
+      updatedAt,
+    });
+  } catch (error) {
+    console.error('Error saving processor assignment config:', error.message);
+    const sc = error.statusCode;
+    const status =
+      typeof sc === 'number' && sc >= 400 && sc < 600 ? sc : 500;
+    return res.status(status).json({
+      error: 'Failed to save processor assignment config',
+      details: error.message,
+    });
+  }
+}
+
+export async function postProcessorAssignmentRun(req, res) {
+  try {
+    const body = req.body;
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return res.status(400).json({ error: 'Request body must be a JSON object' });
+    }
+    const result = await runProcessorAssignment(body);
+    return res.json(result);
+  } catch (error) {
+    console.error('Error running processor assignment:', error.message);
+    const sc = error.statusCode;
+    const status =
+      typeof sc === 'number' && sc >= 400 && sc < 600 ? sc : 500;
+    return res.status(status).json({
+      error: 'Processor assignment failed',
       details: error.message,
     });
   }

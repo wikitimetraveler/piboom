@@ -1,5 +1,6 @@
 const filtersForm = document.getElementById('userFilters');
 const searchInput = document.getElementById('userSearch');
+const personaNameInput = document.getElementById('personaName');
 const personaInput = document.getElementById('personaId');
 const limitInput = document.getElementById('userLimit');
 const statusRadios = document.querySelectorAll('input[name="statusFilter"]');
@@ -47,11 +48,13 @@ async function loadUsers() {
 function buildQuery() {
   const params = new URLSearchParams();
   const search = searchInput?.value?.trim();
+  const personaName = personaNameInput?.value?.trim();
   const personaId = personaInput?.value?.trim();
   const limit = limitInput?.value;
   const status = getStatusFilter();
 
   if (search) params.append('search', search);
+  if (personaName) params.append('personaName', personaName);
   if (personaId) params.append('personaId', personaId);
   if (limit) params.append('limit', limit);
   if (status === 'active') params.append('enabled', 'true');

@@ -11,6 +11,7 @@
     { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API' },
     { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API' },
     { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter' },
+    { name: 'Processor assignment', url: '/finance/processor-assignment.html', category: 'Encompass', keywords: 'processor assign complexity capacity associates' },
     { name: 'Test Endpoints', url: '/finance/encompass-hub-test.html', category: 'Encompass', keywords: 'API test' },
     { name: 'Pipeline Risk Dashboard', url: '/finance/pipeline-risk-dashboard.html', category: 'Encompass', keywords: 'disaster FEMA risk' },
     { name: 'Unit Tests', url: '/finance/unit-tests.html', category: 'Encompass', keywords: 'excel test runner' },

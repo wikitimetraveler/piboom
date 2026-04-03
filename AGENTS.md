@@ -55,6 +55,7 @@ routes/encompass-*.routes.js
 | Area                     | Paths                                                                                                            |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------- |
 | Encompass Hub/API        | `services/encompass-hub.service.js`, `controllers/encompass-hub.controller.js`, `routes/encompass-hub.routes.js` |
+| Processor assignment     | `services/processor-assignment.service.js`, `services/processor-assignment-config.service.js`, `public/finance/processor-assignment.html`, `public/finance/js/processor-assignment.js` |
 | Encompass Assistant (AI) | `controllers/encompass-assistant.controller.js`, `services/encompass-docs.service.js`                            |
 | ICE Knowledge            | `lib/knowledge/ice-knowledge.service.js`, `knowledge-sources/ice/`, `data/knowledge/ice-sources.json`            |
 | AI Chat / Memory         | `controllers/unit-tests-ai.controller.js`, `controllers/loan-pipeline-ai.controller.js`                          |
@@ -74,6 +75,7 @@ Key files:
 
 * `README.md`
 * `docs/ENCOMPASS.md`
+* `docs/PROCESSOR_ASSIGNMENT.md`
 * `docs/ICE_KNOWLEDGE_SOURCES.md`
 * `docs/AI_SYSTEM.md`
 * `docs/LANGCHAIN_MEMORY.md`

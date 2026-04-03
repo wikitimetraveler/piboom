@@ -3,7 +3,7 @@
 
 ---
 
-## 📊 **TOTAL TABLES: 13**
+## 📊 **TOTAL TABLES: 14+** (header count tracks major documented tables; see `services/database.service.js` for the full `createTables()` list)
 
 ### 🗺️ **GEOCODED TABLES** (Tables with latitude/longitude coordinates)
 
@@ -390,6 +390,21 @@
 
 **Geocoding:**
 - Coordinates accessed via `concert_id` → `concerts` → `venues` (geocoded)
+
+---
+
+## 14. **`processor_assignment_tool_config`** - Processor assignment tool state
+
+**Purpose:** Persists Worksheets **Processor assignment** page settings per Encompass API environment (correspondent vs retail).
+
+**Columns:**
+- `encompass_env` (VARCHAR 32) PRIMARY KEY – `correspondent` or `retail` (matches `X-Encompass-Env` on hub routes)
+- `payload` (JSONB) NOT NULL DEFAULT `{}` – string fields such as `processorsJson`, `rulesJson`, `roleConfigJson`, plus `pipelineLimit`, `delayMs`, `complexityMode`, `complexityAiModel`, `complexityMaxPoints`
+- `updated_at` (TIMESTAMP)
+
+**API:** `GET` / `PUT /api/encompass-hub/processor-assignment/config` (see `docs/API_ROUTES.md`). **Service:** `services/processor-assignment-config.service.js`. Created in `database.service.js` → `createTables()`.
+
+**Geocoding:** None (configuration only).
 
 ---
 

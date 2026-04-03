@@ -7,6 +7,7 @@ Short definitions for AI agents and developers working with Encompass and mortga
 | Loan Pipeline | Encompass queue of loans in progress; queryable via Loan Pipeline API |
 | ScreenBindings | In-app binding of web forms to Encompass loan fields when running inside Encompass (browser context) |
 | Encompass Hub | Server-side REST APIs (Pipeline, Loans, Users, etc.) used by DevConnect Labs |
+| Processor assignment tool | Finance page `processor-assignment.html`: scores loans (rules and optional OpenAI), assigns Processor associate slots via hub associates API; processors JSON + rules persisted in browser and optionally Postgres (`processor_assignment_tool_config` per env) |
 | Developer Connect | ICE Mortgage Technology developer portal and API docs |
 | LO Connect | Loan Officer Connect – Encompass web app for LOs; supports custom tools and Web-IFB forms |
 | Web-IFB / IFB | Web Input Form Builder – WYSIWYG form builder for Encompass; scripts run in form context |

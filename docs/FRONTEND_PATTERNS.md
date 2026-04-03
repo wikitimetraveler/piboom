@@ -128,6 +128,7 @@ public/finance/
 ├── unit-tests.html
 ├── encompass-custom-fields.html
 ├── encompass-native-fields.html
+├── processor-assignment.html   # Complexity + processor capacity; Encompass users picker; encompassFetch + hub config API
 ├── asset-qualifier-calculator.html
 ├── closing-cost-calculator.html
 ├── cashout-refinance-calculator.html
@@ -140,6 +141,7 @@ public/finance/
     ├── unit-tests-ai.js
     ├── encompassHub.js
     ├── encompassAnalytics.js
+    ├── processor-assignment.js
     └── ...
 ```
 

@@ -8,7 +8,7 @@ Central reference for environment variables used by DevConnect Labs. **Never com
 |----------|---------|
 | `PORT` | Server port (default 3000) |
 | `NODE_ENV` | `development` or `production` |
-| `DATABASE_URL` | PostgreSQL connection string (LangChain memory, disasters, loan pipeline) |
+| `DATABASE_URL` | PostgreSQL connection string (LangChain memory, disasters, loan pipeline, processor assignment tool config, unit test file library, etc.) |
 | `OPENAI_API_KEY` | OpenAI API key (Encompass Assistant, Screen Test, Loan Pipeline AI, etc.) |
 
 ## Encompass / ICE

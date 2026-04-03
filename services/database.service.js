@@ -830,7 +830,15 @@ export async function createTables() {
       END $$
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, and unit test files)');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS processor_assignment_tool_config (
+        encompass_env VARCHAR(32) PRIMARY KEY,
+        payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, and processor assignment tool config)');
     
     // Migrate existing Grateful Dead data to new structure (run in background)
     migrateGratefulDeadData().catch(error => {

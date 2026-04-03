@@ -10,6 +10,12 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/encompass-hub/users` | Company users |
 | GET | `/api/encompass-hub/pipeline` | Loan pipeline |
 | GET | `/api/encompass-hub/loans/:loanGuid` | Loan details |
+| GET | `/api/encompass-hub/loans/:loanGuid/associates` | Loan associates (v1); optional query `userId`, `roleId`, `fixedRoleId` |
+| PUT | `/api/encompass-hub/loans/:loanGuid/associates/:logId` | Assign associate slot (body e.g. `{ "id": "userEntityId" }`) |
+| DELETE | `/api/encompass-hub/loans/:loanGuid/associates/:logId` | Unassign associate slot |
+| GET | `/api/encompass-hub/processor-assignment/config` | Load saved tool config from Postgres for `X-Encompass-Env` (`correspondent` \| `retail`); returns `{ encompassEnv, config, updatedAt }` |
+| PUT | `/api/encompass-hub/processor-assignment/config` | Save tool config (JSON keys: `processorsJson`, `rulesJson`, `roleConfigJson`, `pipelineLimit`, `delayMs`, `complexityMode`, `complexityAiModel`, `complexityMaxPoints`); merges with existing row per env |
+| POST | `/api/encompass-hub/processor-assignment/run` | Run complexity scoring + processor assignment (`dryRun`, `processors`, `complexityRules`, `pipelineFilters`, …) |
 | POST | `/api/encompass-hub/loans/:loanId/field-writer` | Write fields |
 | POST | `/api/encompass-hub/loans/:loanGuid/field-reader` | Read fields |
 | GET | `/api/encompass-hub/analytics/calc-summary` | Calculator summary |

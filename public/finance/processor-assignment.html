@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Processor assignment – Encompass</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="/shared/styles.css" />
+    <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <script src="/shared/menu-config.js"></script>
+    <script src="/shared/modern-navbar.js" defer></script>
+    <script src="/shared/encompass-api.js"></script>
+    <style>
+      body {
+        min-height: 100vh;
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+        background: linear-gradient(160deg, #f0f9ff 0%, #e0f2fe 35%, #f5f3ff 100%);
+      }
+      .pa-hero {
+        background: linear-gradient(135deg, #1e3a5f 0%, #0f766e 55%, #134e4a 100%);
+        color: #fff;
+        border-radius: 20px;
+        padding: 1.75rem 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 20px 50px rgba(13, 148, 136, 0.2);
+      }
+      .pa-card {
+        border-radius: 16px;
+        border: 1px solid rgba(30, 58, 95, 0.12);
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        background: rgba(255, 255, 255, 0.95);
+      }
+      .pa-card .card-header {
+        font-weight: 600;
+        border-radius: 16px 16px 0 0 !important;
+      }
+      textarea.code-json {
+        font-family: ui-monospace, monospace;
+        font-size: 0.8rem;
+        min-height: 140px;
+      }
+      main.pa-shell {
+        max-width: 1280px;
+      }
+    </style>
+  </head>
+  <body>
+    <modern-navbar></modern-navbar>
+    <main class="container py-4 pa-shell">
+      <p class="mb-3">
+        <a href="encompass-hub.html" class="text-decoration-none fw-medium"><i class="bi-arrow-left"></i> Encompass Hub</a>
+      </p>
+
+      <div class="pa-hero">
+        <h1 class="h3 mb-2"><i class="bi-people-fill me-2"></i>Processor assignment</h1>
+        <p class="mb-0 small opacity-90">
+          Score loans with <strong>configurable complexity rules</strong> (pipeline field paths), then assign <strong>Processor</strong> slots via
+          <code class="text-white-50" style="background: rgba(0, 0, 0, 0.2); padding: 0.1rem 0.35rem; border-radius: 4px">GET/PUT …/loans/{id}/associates</code>.
+          Capacity is in abstract <strong>points</strong> per processor. Always run <strong>Dry run</strong> first. Replace placeholder user entity IDs before apply.
+        </p>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <label class="form-label small text-uppercase text-muted" for="paEnvSelect">Encompass environment</label>
+          <select id="paEnvSelect" class="form-select form-select-sm">
+            <option value="correspondent">Correspondent</option>
+            <option value="retail">Retail</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small text-uppercase text-muted" for="pipelineLimit">Pipeline limit</label>
+          <input type="number" id="pipelineLimit" class="form-control form-control-sm" min="1" max="100" value="50" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label small text-uppercase text-muted" for="delayMs">Delay ms between assigns</label>
+          <input type="number" id="delayMs" class="form-control form-control-sm" min="0" value="0" />
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-12 col-lg-6">
+          <div class="card pa-card">
+            <div class="card-header bg-light">Processors (JSON)</div>
+            <div class="card-body">
+              <textarea id="processorsJson" class="form-control code-json" rows="8" spellcheck="false"></textarea>
+              <p class="small text-muted mt-2 mb-0">Array of <code>{ "userId", "displayName"?, "maxPoints" }</code> — <code>userId</code> is the Encompass user entity id (see <strong>User ID</strong> below each name on the Users page).</p>
+              <div class="border-top pt-3 mt-3">
+                <h6 class="small text-uppercase text-muted mb-2">Add from Encompass users</h6>
+                <div class="row g-2 align-items-end mb-2">
+                  <div class="col-md-4">
+                    <label class="form-label small mb-0" for="paUserSearch">Search</label>
+                    <input type="text" id="paUserSearch" class="form-control form-control-sm" placeholder="Name, email, login" />
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label small mb-0" for="paUserLimit">Limit</label>
+                    <input type="number" id="paUserLimit" class="form-control form-control-sm" min="1" max="200" value="40" />
+                  </div>
+                  <div class="col-md-2">
+                    <label class="form-label small mb-0" for="paAddMaxPoints">Max points</label>
+                    <input type="number" id="paAddMaxPoints" class="form-control form-control-sm" min="0" value="40" />
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label small mb-0" for="paAddMode">When adding</label>
+                    <select id="paAddMode" class="form-select form-select-sm">
+                      <option value="append">Append (update if same userId)</option>
+                      <option value="replace_placeholder">Replace first template row (YOUR_ENCOMPASS…)</option>
+                      <option value="replace_userid">Replace existing userId</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row g-2 mb-2 d-none" id="paReplaceUserIdRow">
+                  <div class="col-md-6">
+                    <label class="form-label small mb-0" for="paReplaceUserId">Replace this userId (e.g. test.processor)</label>
+                    <input type="text" id="paReplaceUserId" class="form-control form-control-sm" placeholder="test.processor" spellcheck="false" autocomplete="off" />
+                  </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary mb-2" id="btnPaLoadUsers">
+                  <i class="bi-search"></i> Search users
+                </button>
+                <div class="table-responsive small border rounded" style="max-height: 220px; overflow-y: auto">
+                  <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light sticky-top">
+                      <tr>
+                        <th>Name</th>
+                        <th>User ID</th>
+                        <th class="text-end">Add</th>
+                      </tr>
+                    </thead>
+                    <tbody id="paUserPickBody"></tbody>
+                  </table>
+                </div>
+                <p class="small text-muted mb-0 mt-2" id="paConfigDbStatus"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="card pa-card">
+            <div class="card-header bg-light">Role slot finder (JSON)</div>
+            <div class="card-body">
+              <textarea id="roleConfigJson" class="form-control code-json" rows="8" spellcheck="false"></textarea>
+              <p class="small text-muted mt-2 mb-0">Default <code>{ "roleNameIncludes": "processor" }</code>. Optional <code>fixedRoleId</code> / <code>roleId</code> for your tenant.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card pa-card mb-3">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <span>Complexity rules (JSON)</span>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="btnLoadDefaults">Load example defaults</button>
+        </div>
+        <div class="card-body">
+          <textarea id="rulesJson" class="form-control code-json mb-3" rows="10" spellcheck="false"></textarea>
+
+          <h6 class="small text-uppercase text-muted">Add simple rule</h6>
+          <div class="row g-2 align-items-end">
+            <div class="col-md-2">
+              <label class="form-label small mb-0" for="simpleRuleId">Rule id</label>
+              <input type="text" id="simpleRuleId" class="form-control form-control-sm" placeholder="optional" />
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small mb-0" for="simpleField">Field</label>
+              <input type="text" id="simpleField" class="form-control form-control-sm" placeholder="Loan.LoanAmount" />
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small mb-0" for="simpleOp">Op</label>
+              <select id="simpleOp" class="form-select form-select-sm">
+                <option value="eq">eq</option>
+                <option value="neq">neq</option>
+                <option value="gte">gte</option>
+                <option value="gt">gt</option>
+                <option value="lte">lte</option>
+                <option value="lt">lt</option>
+                <option value="between">between</option>
+                <option value="in">in</option>
+                <option value="contains">contains</option>
+                <option value="isempty">isempty</option>
+                <option value="isnotempty">isnotempty</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label small mb-0" for="simpleValue">Value</label>
+              <input type="text" id="simpleValue" class="form-control form-control-sm" placeholder="or min,max" />
+            </div>
+            <div class="col-md-1">
+              <label class="form-label small mb-0" for="simplePoints">Pts</label>
+              <input type="number" id="simplePoints" class="form-control form-control-sm" value="5" />
+            </div>
+            <div class="col-md-2">
+              <button type="button" class="btn btn-sm btn-primary w-100" id="btnAddRule"><i class="bi-plus-lg"></i> Append</button>
+            </div>
+          </div>
+          <p class="small text-muted mt-2 mb-0">
+            Advanced: use <code>when.all</code> / <code>when.any</code> in JSON. Operators match <code>loan-complexity.service.js</code>.
+          </p>
+        </div>
+      </div>
+
+      <div class="card pa-card mb-3">
+        <div class="card-header bg-light">Run options</div>
+        <div class="card-body">
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="assignOnlyUnassigned" checked />
+            <label class="form-check-label" for="assignOnlyUnassigned">Only loans with no processor (<code>Loan.LoanProcessorID</code> empty)</label>
+          </div>
+          <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" id="sortDesc" checked />
+            <label class="form-check-label" for="sortDesc">Sort by complexity descending (hardest first)</label>
+          </div>
+          <div class="row g-2 align-items-center mb-2">
+            <div class="col-md-3">
+              <label class="col-form-label small" for="complexityMode">Complexity mode</label>
+              <select id="complexityMode" class="form-select form-select-sm">
+                <option value="rules" selected>Rule-based only</option>
+                <option value="ai">AI score only (needs OPENAI_API_KEY)</option>
+                <option value="both">Rules + AI (sum, capped)</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="col-form-label small" for="complexityAiModel">AI model (optional)</label>
+              <input type="text" id="complexityAiModel" class="form-control form-control-sm" placeholder="gpt-4o-mini" spellcheck="false" />
+            </div>
+            <div class="col-md-3">
+              <label class="col-form-label small" for="complexityMaxPoints">Max points per loan (cap)</label>
+              <input type="number" id="complexityMaxPoints" class="form-control form-control-sm" placeholder="no cap" min="0" />
+            </div>
+          </div>
+          <p class="small text-muted mb-3">
+            AI mode returns 0–50 “difficulty” points from a field summary (loan type, amounts, DTI/LTV, FICO, program, investor, etc.). Map your tenant
+            <strong>income type / self-employed / condition count / investor program</strong> fields into rules, or add those ids to pipeline + rules. Example placeholders in default rules:
+            <code>Fields.CX.BORROWER.INCOME.TYPE</code>, <code>Fields.CX.BORROWER.SELF.EMPLOYED</code>,
+            <code>Fields.CX.UW.CONDITION.COUNT</code>, <code>Fields.CX.INVESTOR.PROGRAM</code> (rename to match your site).
+          </p>
+          <div class="btn-toolbar flex-wrap gap-2" role="toolbar">
+            <button type="button" class="btn btn-outline-info btn-sm" id="btnPreviewPipeline"><i class="bi-cloud-download"></i> Preview pipeline</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnSaveConfig"><i class="bi-save"></i> Save config (browser + database)</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnReloadDbConfig"><i class="bi-database-down"></i> Reload from database</button>
+            <button type="button" class="btn btn-primary btn-sm" id="btnDryRun"><i class="bi-eye"></i> Dry run</button>
+            <button type="button" class="btn btn-danger btn-sm" id="btnApply"><i class="bi-check2-circle"></i> Apply assignments</button>
+          </div>
+          <p id="pipelinePreviewStatus" class="small text-muted mt-2 mb-0"></p>
+          <p id="runStatus" class="small fw-medium mt-2 mb-0"></p>
+        </div>
+      </div>
+
+      <div class="card pa-card mb-4">
+        <div class="card-header bg-light">Results</div>
+        <div class="card-body p-0">
+          <p id="resultsMeta" class="small text-muted px-3 pt-3 mb-0"></p>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Loan #</th>
+                  <th>Borrower</th>
+                  <th>GUID</th>
+                  <th class="text-end">Score</th>
+                  <th class="text-end">Rules</th>
+                  <th class="text-end">AI</th>
+                  <th class="small">AI note</th>
+                  <th>Rule hits</th>
+                  <th>Processor</th>
+                  <th>Status</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="modal fade" id="applyConfirmModal" tabindex="-1" aria-labelledby="applyConfirmLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="applyConfirmLabel">Apply processor assignments?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            This will call Encompass <strong>PUT …/associates/{logId}</strong> for each matched loan. Run a <strong>dry run</strong> first and confirm user IDs and capacity.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="btnConfirmApply">Confirm apply</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/processor-assignment.js"></script>
+  </body>
+</html>

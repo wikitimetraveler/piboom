@@ -66,6 +66,7 @@ const PIPELINE_FIELDS = [
   'Loan.UnderwriterName',
   'Loan.CloserID',
   'Loan.CloserName',
+  'Loan.InvestorName',
   'Fields.1172', // Loan program (legacy)
   'Fields.4000', // Doc / channel specific type
   'Fields.11', // Property Street
@@ -227,7 +228,7 @@ function normalizeUserProfile(user = {}) {
 }
 
 function filterUsersList(users, filters = {}) {
-  const { search, enabled, personaId } = filters;
+  const { search, enabled, personaId, personaName } = filters;
   let filtered = [...users];
 
   if (enabled === true || enabled === false) {
@@ -237,6 +238,15 @@ function filterUsersList(users, filters = {}) {
   if (personaId !== undefined && personaId !== null && personaId !== '') {
     const personaKey = `${personaId}`.trim();
     filtered = filtered.filter((user) => user.personaIds.some((id) => `${id}` === personaKey));
+  }
+
+  if (personaName !== undefined && personaName !== null && `${personaName}`.trim() !== '') {
+    const needle = `${personaName}`.trim().toLowerCase();
+    filtered = filtered.filter(
+      (user) =>
+        Array.isArray(user.personaNames) &&
+        user.personaNames.some((n) => `${n}`.toLowerCase().includes(needle)),
+    );
   }
 
   if (search) {
@@ -612,6 +622,7 @@ export async function fetchCompanyUsers(options = {}) {
     groupId,
     roleId,
     personaId,
+    personaName,
     featureId,
     organizationId,
     includeEmailSignature = false,
@@ -623,6 +634,14 @@ export async function fetchCompanyUsers(options = {}) {
   const safeStart = coercePositiveInteger(start, 1) ?? 1;
   const safeLimit = Math.min(coercePositiveInteger(limit, 200) ?? 200, 1000);
 
+  const hasPersonaName =
+    personaName !== undefined && personaName !== null && `${personaName}`.trim() !== '';
+  const hasPersonaId =
+    personaId !== undefined && personaId !== null && `${personaId}`.trim() !== '';
+  // Name-based filter is applied client-side on normalized personas; omit API personaId when only
+  // personaName is used so the returned page is not over-restricted by an unrelated id.
+  const apiPersonaId = hasPersonaId ? personaId : undefined;
+
   let response;
   try {
     response = await requestWithAuth({
@@ -632,7 +651,7 @@ export async function fetchCompanyUsers(options = {}) {
         viewEmailSignature: includeEmailSignature ? 'true' : undefined,
         groupId,
         roleId,
-        personaId,
+        personaId: apiPersonaId,
         featureId,
         organizationId,
         userName: search || undefined,
@@ -654,7 +673,12 @@ export async function fetchCompanyUsers(options = {}) {
 
   const rawUsers = Array.isArray(response.data) ? response.data : response.data?.items || [];
   const normalized = rawUsers.map(normalizeUserProfile);
-  return filterUsersList(normalized, { search, enabled, personaId });
+  return filterUsersList(normalized, {
+    search,
+    enabled,
+    personaId: hasPersonaId ? personaId : undefined,
+    personaName: hasPersonaName ? personaName : undefined,
+  });
 }
 
 function normalizeFieldsPayload(data) {
@@ -862,14 +886,27 @@ export async function fetchPipelineLoans(options = {}) {
     const folderValue = (loanFolder === 'My Pipeline' ? 'Pipeline' : loanFolder) || 'Pipeline';
     requestData = {
       fields: [
-        'Loan.LoanGuid',
-        'Loan.LoanFolder',
-        'Fields.4000',
-        'Loan.LoanNumber',
-        'Loan.LoanRate',
-        'Loan.LoanAmount',
-        'Loan.LastModified',
-        'Loan.BorrowerName',
+        ...new Set([
+          'Loan.LoanGuid',
+          'Loan.LoanFolder',
+          'Fields.4000',
+          'Loan.LoanNumber',
+          'Loan.LoanRate',
+          'Loan.LoanAmount',
+          'Loan.LastModified',
+          'Loan.BorrowerName',
+          'Loan.LoanType',
+          'Loan.LoanProgram',
+          'Loan.PropertyType',
+          'Loan.TotalDTI',
+          'Loan.LTV',
+          'Loan.BorrowerScore',
+          'Loan.CoBorrowerScore',
+          'Loan.LoanProcessorID',
+          'Fields.1172',
+          'Loan.InvestorName',
+          ...PIPELINE_FIELDS,
+        ]),
       ],
       sortOrder: [
         {
@@ -1096,6 +1133,94 @@ export async function readLoanFields(loanGuid, fieldIds = [], invalidFieldBehavi
     });
     const detail = data?.message || data?.error || error.message;
     throw new Error(`Encompass fieldReader ${status || 'error'}: ${detail}`);
+  }
+}
+
+/**
+ * GET /encompass/v1/loans/{loanGuid}/associates — loan team / milestone associate slots.
+ * @param {string} loanGuid
+ * @param {{ userId?: string, roleId?: string, fixedRoleId?: string }} [query]
+ * @returns {Promise<unknown>} Raw Encompass JSON (usually an array of associate objects).
+ */
+export async function fetchLoanAssociates(loanGuid, query = {}) {
+  if (!loanGuid) {
+    throw new Error('loanGuid is required');
+  }
+  const params = {};
+  if (query.userId != null && query.userId !== '') params.userId = query.userId;
+  if (query.roleId != null && query.roleId !== '') params.roleId = query.roleId;
+  if (query.fixedRoleId != null && query.fixedRoleId !== '') params.fixedRoleId = query.fixedRoleId;
+
+  try {
+    const response = await requestWithAuth({
+      method: 'get',
+      url: `${API_V1_BASE}/loans/${encodeURIComponent(loanGuid)}/associates`,
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass fetchLoanAssociates failed', { status, data, message: error.message });
+    const detail = data?.details || data?.message || data?.error || error.message;
+    throw new Error(`Encompass loan associates GET ${status || 'error'}: ${detail}`);
+  }
+}
+
+/**
+ * PUT /encompass/v1/loans/{loanGuid}/associates/{logId} — assign user/group to a slot.
+ * @param {string} loanGuid
+ * @param {string} logId - Milestone / milestone-free role log id (from GET associates).
+ * @param {object} body - e.g. { id: userEntityId } (camelCase; Id also sent for compatibility).
+ */
+export async function assignLoanAssociate(loanGuid, logId, body = {}) {
+  if (!loanGuid) throw new Error('loanGuid is required');
+  if (!logId) throw new Error('logId is required');
+
+  const payload =
+    body && typeof body === 'object'
+      ? {
+          ...body,
+          Id: body.Id ?? body.id,
+          id: body.id ?? body.Id,
+        }
+      : {};
+
+  try {
+    const response = await requestWithAuth({
+      method: 'put',
+      url: `${API_V1_BASE}/loans/${encodeURIComponent(loanGuid)}/associates/${encodeURIComponent(logId)}`,
+      data: payload,
+    });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass assignLoanAssociate failed', { status, data, message: error.message });
+    const detail = data?.details || data?.message || data?.error || error.message;
+    throw new Error(`Encompass loan associate PUT ${status || 'error'}: ${detail}`);
+  }
+}
+
+/**
+ * DELETE /encompass/v1/loans/{loanGuid}/associates/{logId} — unassign slot.
+ */
+export async function unassignLoanAssociate(loanGuid, logId) {
+  if (!loanGuid) throw new Error('loanGuid is required');
+  if (!logId) throw new Error('logId is required');
+
+  try {
+    const response = await requestWithAuth({
+      method: 'delete',
+      url: `${API_V1_BASE}/loans/${encodeURIComponent(loanGuid)}/associates/${encodeURIComponent(logId)}`,
+    });
+    return response.data;
+  } catch (error) {
+    const status = error.response?.status;
+    const data = error.response?.data;
+    console.error('Encompass unassignLoanAssociate failed', { status, data, message: error.message });
+    const detail = data?.details || data?.message || data?.error || error.message;
+    throw new Error(`Encompass loan associate DELETE ${status || 'error'}: ${detail}`);
   }
 }
 

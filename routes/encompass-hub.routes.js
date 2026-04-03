@@ -9,6 +9,12 @@ import {
   getLoan,
   setLoanFields,
   getLoanFields,
+  getLoanAssociatesHandler,
+  putLoanAssociateHandler,
+  deleteLoanAssociateHandler,
+  postProcessorAssignmentRun,
+  getProcessorAssignmentConfig,
+  putProcessorAssignmentConfig,
   getCalculatorSummary,
   getRatioAnalytics,
   getMapVisualization,
@@ -31,6 +37,12 @@ router.get('/status', getHubStatus);
 router.get('/users', getCompanyUsers);
 router.get('/pipeline', getPipeline);
 router.get('/loans/:loanGuid', getLoan);
+router.get('/loans/:loanGuid/associates', getLoanAssociatesHandler);
+router.put('/loans/:loanGuid/associates/:logId', putLoanAssociateHandler);
+router.delete('/loans/:loanGuid/associates/:logId', deleteLoanAssociateHandler);
+router.get('/processor-assignment/config', getProcessorAssignmentConfig);
+router.put('/processor-assignment/config', putProcessorAssignmentConfig);
+router.post('/processor-assignment/run', postProcessorAssignmentRun);
 router.post('/loans/:loanId/field-writer', setLoanFields);
 router.post('/loans/:loanGuid/field-reader', getLoanFields);
 router.get('/analytics/calc-summary', getCalculatorSummary);

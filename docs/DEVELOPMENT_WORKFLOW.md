@@ -37,5 +37,5 @@ No automated hooks are configured by default.
 ## Reference
 
 - Setup: [docs/SETUP.md](SETUP.md), [docs/DATABASE_SETUP.md](DATABASE_SETUP.md)
-- Encompass: [docs/ENCOMPASS.md](ENCOMPASS.md)
+- Encompass: [docs/ENCOMPASS.md](ENCOMPASS.md), [docs/PROCESSOR_ASSIGNMENT.md](PROCESSOR_ASSIGNMENT.md)
 - Glossary: [docs/GLOSSARY.md](GLOSSARY.md)

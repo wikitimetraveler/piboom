@@ -136,7 +136,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
               <div>
                 <h5 class="mb-1">Filters</h5>
-                <small class="text-muted">Search by name, login, or persona</small>
+                <small class="text-muted">Search users; optional persona name or ID filters</small>
               </div>
               <span class="badge-soft" id="usersMeta">Loading…</span>
             </div>
@@ -152,6 +152,19 @@
                 />
               </div>
               <div class="mb-3">
+                <label for="personaName">Persona name contains</label>
+                <input
+                  id="personaName"
+                  type="text"
+                  class="form-control"
+                  placeholder="e.g. Processor"
+                  autocomplete="off"
+                />
+                <small class="form-text text-muted">
+                  Case-insensitive match on any persona name (works across companies where persona IDs differ)
+                </small>
+              </div>
+              <div class="mb-3">
                 <label for="personaId">Persona ID (optional)</label>
                 <input
                   id="personaId"
@@ -160,7 +173,7 @@
                   placeholder="e.g. 15"
                   autocomplete="off"
                 />
-                <small class="form-text text-muted">Matches any personaId on a user</small>
+                <small class="form-text text-muted">Exact persona id; sent to Encompass when set</small>
               </div>
               <div class="mb-3">
                 <label for="userLimit">Record limit</label>

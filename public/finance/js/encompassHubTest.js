@@ -8,6 +8,7 @@ const stateInput = document.getElementById('stateInput');
 const countyInput = document.getElementById('countyInput');
 const limitInput = document.getElementById('limitInput');
 const loanGuidInput = document.getElementById('loanGuidInput');
+const logIdInput = document.getElementById('logIdInput');
 const requestBodyInput = document.getElementById('requestBodyInput');
 const payloadPresetSelect = document.getElementById('payloadPresetSelect');
 
@@ -28,6 +29,21 @@ const endpoints = [
     method: 'POST',
     needsLoanGuid: true,
     needsBody: true
+  },
+  { label: 'Loan associates (GET)', value: '/api/encompass-hub/loans/{loanGuid}/associates', method: 'GET', needsLoanGuid: true },
+  {
+    label: 'Loan associate assign (PUT)',
+    value: '/api/encompass-hub/loans/{loanGuid}/associates/{logId}',
+    method: 'PUT',
+    needsLoanGuid: true,
+    needsLogId: true,
+    needsBody: true,
+  },
+  {
+    label: 'Processor assignment run',
+    value: '/api/encompass-hub/processor-assignment/run',
+    method: 'POST',
+    needsBody: true,
   },
   { label: 'Calculator Summary', value: '/api/encompass-hub/analytics/calc-summary', method: 'GET', needsFilters: true },
   { label: 'Ratio Analytics', value: '/api/encompass-hub/analytics/ratios', method: 'GET', needsFilters: true },
@@ -61,6 +77,32 @@ const payloadPresets = [
         { id: '4002', value: 'Doe' },
         { id: '4000#2', value: 'John' },
       ],
+      null,
+      2
+    ),
+  },
+  {
+    label: 'Associate assign – user id body',
+    value: JSON.stringify({ id: 'USER_ENTITY_ID' }, null, 2),
+  },
+  {
+    label: 'Processor assignment – dry run (edit user IDs)',
+    value: JSON.stringify(
+      {
+        dryRun: true,
+        pipelineFilters: { limit: 20 },
+        assignOnlyUnassigned: true,
+        sortOrder: 'desc',
+        processors: [
+          { userId: 'USER_ENTITY_ID_1', displayName: 'Processor A', maxPoints: 40 },
+          { userId: 'USER_ENTITY_ID_2', displayName: 'Processor B', maxPoints: 40 },
+        ],
+        complexityMode: 'rules',
+        complexityRules: [
+          { id: 'high_balance', points: 10, when: { field: 'Loan.LoanAmount', op: 'gte', value: 500000 } },
+        ],
+        roleConfig: { roleNameIncludes: 'processor' },
+      },
       null,
       2
     ),
@@ -111,14 +153,22 @@ function buildQueryParams() {
 }
 
 function resolveEndpointPath(endpoint) {
+  let path = endpoint.value;
   if (endpoint.needsLoanGuid) {
     const loanGuid = loanGuidInput.value.trim();
     if (!loanGuid) {
       throw new Error('Loan GUID is required for this endpoint.');
     }
-    return endpoint.value.replace('{loanGuid}', encodeURIComponent(loanGuid));
+    path = path.replace('{loanGuid}', encodeURIComponent(loanGuid));
   }
-  return endpoint.value;
+  if (endpoint.needsLogId) {
+    const logId = logIdInput?.value?.trim();
+    if (!logId) {
+      throw new Error('Associate log ID is required for this endpoint.');
+    }
+    path = path.replace('{logId}', encodeURIComponent(logId));
+  }
+  return path;
 }
 
 async function runTest(event) {

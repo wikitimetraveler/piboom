@@ -24,6 +24,7 @@ A comprehensive multi-domain platform featuring **music research**, **mortgage l
 - **🤖 AI Mortgage Assistant**: LangChain-powered AI assistant for mortgage operations and risk analysis
 - **📈 Pipeline Efficiency Analysis**: Cycle time tracking, milestone optimization, bottleneck identification
 - **🏢 Channel Management**: Correspondent and Retail lending channel support
+- **👥 Processor assignment**: Complexity-based pipeline scoring (rules and optional AI), Encompass user picker, capacity-aware `Loan` associate assignment; config stored per Encompass environment in PostgreSQL
 
 ### 🌪️ Disaster Monitoring Domain
 - **📡 Real-Time Disaster Tracking**: 90-day rolling window of FEMA disaster declarations

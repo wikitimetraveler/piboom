@@ -22,6 +22,7 @@ Overview of DevConnect Labs's AI integration for assistants, memory, and retriev
 - **Model**: GPT-4
 - **Context**: DevConnect Labs tech stack, calculation engine, Encompass Hub/ScreenBindings
 - **Endpoints**: `/api/encompass-assistant/search`, `/chat`, `/summary`
+- **Related (optional AI scoring)**: Processor assignment can use OpenAI for loan difficulty points (`services/loan-complexity-ai.service.js`); see `docs/PROCESSOR_ASSIGNMENT.md`.
 
 ### 2. Loan Pipeline AI
 

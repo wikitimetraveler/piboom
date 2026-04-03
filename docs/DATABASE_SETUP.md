@@ -125,7 +125,7 @@ Render will automatically deploy and connect to the database!
 - One source of truth for your vinyl collection
 
 ### Automatic Table Creation
-- First time the app starts (local or cloud), it creates the `records` table
+- First time the app starts (local or cloud), `createTables()` in `services/database.service.js` creates application tables (e.g. `records`, `processor_assignment_tool_config`, conversations, loans, and others as configured)
 - Safe to run multiple times - uses `CREATE TABLE IF NOT EXISTS`
 
 ### Secure Connection

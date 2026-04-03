@@ -58,15 +58,33 @@ describe('encompass-hub service helpers', () => {
     });
   });
 
-  test('filterUsersList filters by enabled, persona, and search', () => {
+  test('filterUsersList filters by enabled, persona id, persona name, and search', () => {
     const users = [
-      { name: 'Alex Smith', loginName: 'asmith', email: 'a@ex.com', title: 'LO', enabled: true, personaIds: ['1'] },
-      { name: 'Jamie Doe', loginName: 'jdoe', email: 'j@ex.com', title: 'UW', enabled: false, personaIds: ['2'] },
+      {
+        name: 'Alex Smith',
+        loginName: 'asmith',
+        email: 'a@ex.com',
+        title: 'LO',
+        enabled: true,
+        personaIds: ['1'],
+        personaNames: ['Loan Officer'],
+      },
+      {
+        name: 'Jamie Doe',
+        loginName: 'jdoe',
+        email: 'j@ex.com',
+        title: 'UW',
+        enabled: false,
+        personaIds: ['2'],
+        personaNames: ['Processor'],
+      },
     ];
 
     expect(filterUsersList(users, { enabled: true })).toHaveLength(1);
     expect(filterUsersList(users, { personaId: '2' })[0].name).toBe('Jamie Doe');
     expect(filterUsersList(users, { search: 'alex' })[0].name).toBe('Alex Smith');
+    expect(filterUsersList(users, { personaName: 'process' })[0].name).toBe('Jamie Doe');
+    expect(filterUsersList(users, { personaName: 'officer' })[0].name).toBe('Alex Smith');
   });
 
   test('normalizeListParam and normalizeCounties normalize values', () => {
