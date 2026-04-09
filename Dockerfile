@@ -27,11 +27,12 @@ RUN apt-get update && apt-get install -y \
 # Create audio configuration for container
 RUN echo 'pcm.!default {\n    type hw\n    card 0\n    device 0\n}\nctl.!default {\n    type hw\n    card 0\n}' > /etc/asound.conf
 
-# Copy package files
+# Copy package files (legacy-peer-deps: see .npmrc — zod peer conflict LangChain vs MCP)
 COPY package*.json ./
+COPY .npmrc ./
 
 # Install Node.js dependencies
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Copy application code
 COPY . .

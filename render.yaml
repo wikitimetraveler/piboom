@@ -1,14 +1,13 @@
 services:
   - type: web
     name: devconnect-labs
-    env: docker
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    runtime: node
     plan: starter
     region: oregon
     branch: main
-    buildCommand: ""
-    startCommand: ""
+    # Match previous Docker image: production deps only (no devDependencies). No Docker required.
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
