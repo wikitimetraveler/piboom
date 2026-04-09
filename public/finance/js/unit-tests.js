@@ -2341,7 +2341,8 @@ function clearData() {
   lastRunResults = [];
   lastRunSummary = null;
   lastRunCellResults = {};
-  
+  resetCurrentFieldMetadataToFallback();
+
   if (gridApi) {
     setGridRows([]);
   }
@@ -2435,8 +2436,8 @@ async function handleFileUpload(file) {
     }
     showAllColumns();
 
-    // Load Encompass metadata for SET rows (dropdowns, date pickers) - same as custom field generation
-    loadMetadataForSetRowsFromEncompass().then(({ dropdownCount }) => {
+    resetCurrentFieldMetadataToFallback();
+    scheduleUnitTestGridMetadataRefresh().then(({ dropdownCount }) => {
       if (dropdownCount > 0) {
         showToast(`Loaded metadata: ${dropdownCount} field(s) with dropdowns`, 'info');
       }
@@ -3227,6 +3228,39 @@ function speakWithBrowser(text) {
 /** Field metadata from Encompass (dataType, format, description) keyed by field ID. Used for scenario builder. */
 let currentFieldMetadata = {};
 
+function resetCurrentFieldMetadataToFallback() {
+  const fb = window.customFieldCalcParser?.getFallbackFieldMetadata?.() || {};
+  currentFieldMetadata = { ...fb };
+}
+
+/**
+ * Merge buildFieldMetadataLookup() result without wiping existing non-empty description/type (FALLBACK rows often have empty strings).
+ */
+function mergeParserFieldMetadataLookup(parserLookup) {
+  if (!parserLookup || typeof parserLookup !== 'object') return;
+  Object.keys(parserLookup).forEach((k) => {
+    if (!k) return;
+    if (!currentFieldMetadata[k]) currentFieldMetadata[k] = {};
+    const inc = parserLookup[k];
+    if (!inc || typeof inc !== 'object') return;
+    const patch = { ...inc };
+    ['description', 'dataType', 'format'].forEach((f) => {
+      const v = patch[f];
+      if (v === '' || v === null || v === undefined) delete patch[f];
+    });
+    const prevDesc = String(currentFieldMetadata[k].description || '').trim();
+    Object.assign(currentFieldMetadata[k], patch);
+    const nextDesc = String(currentFieldMetadata[k].description || '').trim();
+    if (!nextDesc && prevDesc) currentFieldMetadata[k].description = prevDesc;
+  });
+}
+
+/** After any grid is loaded: enrich row descriptions + _fieldMetadata, then refresh from Hub (cached). */
+function scheduleUnitTestGridMetadataRefresh() {
+  enrichSetRowsWithEncompassMetadata();
+  return loadMetadataForSetRowsFromEncompass();
+}
+
 /** Current custom field for Live Scenario Builder (when generated from custom field). */
 let currentScenarioBuilderField = null;
 
@@ -3669,7 +3703,6 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
 
   initializeGrid();
   setGridRows(allData);
-  enrichSetRowsWithEncompassMetadata();
   showAllColumns();
 
   const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
@@ -3773,7 +3806,7 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
   updateResultsMeta();
   setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
 
-  loadMetadataForSetRowsFromEncompass()
+  scheduleUnitTestGridMetadataRefresh()
     .then(({ dropdownCount }) => {
       if (dropdownCount > 0) {
         showToast(`Encompass: ${dropdownCount} SET field(s) with dropdown metadata`, 'info');
@@ -3817,6 +3850,16 @@ function resolveFieldMetadataForTarget(target) {
       if (norm(keys[k]) === n) return { ...currentFieldMetadata[keys[k]] };
     }
   }
+  const seedStr = extracted || raw;
+  if (seedStr) {
+    const nl = norm(String(seedStr)).toLowerCase();
+    if (nl) {
+      const keys = Object.keys(currentFieldMetadata);
+      for (let k = 0; k < keys.length; k++) {
+        if (norm(String(keys[k])).toLowerCase() === nl) return { ...currentFieldMetadata[keys[k]] };
+      }
+    }
+  }
   return null;
 }
 
@@ -3825,14 +3868,15 @@ function resolveFieldMetadataForTarget(target) {
  */
 function enrichSetRowsWithEncompassMetadata() {
   if (!allData || !Array.isArray(allData)) return;
+  const enrichActions = { SET: 1, COMPARE: 1, GET: 1 };
   allData.forEach((row) => {
     const action = String(row.Action || row.action || '').trim().toUpperCase();
-    if (action !== 'SET') {
+    const target = row.Target || row.target || '';
+    if (!target || !hasFieldId(target)) {
       delete row._fieldMetadata;
       return;
     }
-    const target = row.Target || row.target || '';
-    if (!target) {
+    if (!enrichActions[action]) {
       delete row._fieldMetadata;
       return;
     }
@@ -3889,11 +3933,15 @@ function enrichSetRowsWithEncompassMetadata() {
  */
 async function loadMetadataForSetRowsFromEncompass() {
   if (!allData || allData.length === 0) return { fieldMeta: {}, dropdownCount: 0 };
-  const setRows = allData.filter((r) => {
+  const metadataRelevantRows = allData.filter((r) => {
     const action = String(r.Action || r.action || '').trim().toUpperCase();
-    return action === 'SET';
+    const target = r.Target || r.target || '';
+    return ['SET', 'COMPARE', 'GET'].includes(action) && target && extractFieldId(target);
   });
-  if (setRows.length === 0) return { fieldMeta: {}, dropdownCount: 0 };
+  if (metadataRelevantRows.length === 0) {
+    enrichSetRowsWithEncompassMetadata();
+    return { fieldMeta: {}, dropdownCount: 0 };
+  }
 
   const { customList, nativeList } = await fetchHubFieldListsCached();
 
@@ -3911,7 +3959,12 @@ async function loadMetadataForSetRowsFromEncompass() {
     const options = Array.isArray(rawOpts) && rawOpts.length > 0
       ? rawOpts.map((o) => (o && typeof o === 'object' ? (o.Value ?? o.value ?? o.Key ?? o.key ?? o.Label ?? o.label ?? o.Text ?? o.text ?? String(o)) : String(o)))
       : null;
-    for (const key of [baseId, id]) {
+    const aliasKeys = new Set([baseId, id].filter(Boolean));
+    [item.fieldName, item.name, item.Name, item.title].forEach((nm) => {
+      const s = String(nm || '').trim();
+      if (s) aliasKeys.add(s);
+    });
+    for (const key of aliasKeys) {
       if (!key) continue;
       if (!fieldMeta[key]) fieldMeta[key] = { id: baseId, readOnly: false, isCalculated: false, source: '' };
       fieldMeta[key].readOnly = fieldMeta[key].readOnly || readOnly;
@@ -3941,15 +3994,7 @@ async function loadMetadataForSetRowsFromEncompass() {
   Object.assign(currentFieldMetadata, fallback);
 
   const parserLookup = window.customFieldCalcParser?.buildFieldMetadataLookup?.(customList, nativeList);
-  if (parserLookup && typeof parserLookup === 'object') {
-    Object.keys(parserLookup).forEach((k) => {
-      if (!currentFieldMetadata[k]) currentFieldMetadata[k] = {};
-      const inc = parserLookup[k];
-      if (inc && typeof inc === 'object') {
-        Object.assign(currentFieldMetadata[k], inc);
-      }
-    });
-  }
+  mergeParserFieldMetadataLookup(parserLookup);
 
   const uniqueDropdownIds = new Set();
   Object.keys(fieldMeta).forEach((k) => {
