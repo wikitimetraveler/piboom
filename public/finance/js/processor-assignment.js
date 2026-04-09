@@ -331,6 +331,9 @@
       const hits = (row.ruleHits || [])
         .map((h) => (h.ruleId ? `${h.ruleId}(+${h.points})` : `+${h.points}`))
         .join(', ');
+      const curId = row.currentProcessorId != null && `${row.currentProcessorId}`.trim() !== '' ? row.currentProcessorId : '';
+      const curName = row.currentProcessorName != null && `${row.currentProcessorName}`.trim() !== '' ? row.currentProcessorName : '';
+      const curCell = curId || curName ? `${curId}${curId && curName ? ' · ' : ''}${curName}` : '—';
       tr.innerHTML = `
         <td>${escapeHtml(row.loanNumber ?? '')}</td>
         <td>${escapeHtml(row.borrowerName ?? '')}</td>
@@ -340,7 +343,8 @@
         <td class="text-end text-muted">${row.aiPoints != null ? row.aiPoints : '—'}</td>
         <td class="small text-muted">${escapeHtml(row.aiRationale ?? '')}</td>
         <td class="small" title="${escapeAttr(hits)}">${escapeHtml(hits || '—')}</td>
-        <td>${escapeHtml(row.processorUserId ?? '')}</td>
+        <td class="small text-muted">${escapeHtml(curCell)}</td>
+        <td><code class="small">${escapeHtml(row.processorUserId ?? '')}</code></td>
         <td><span class="badge bg-${statusClass(row.status)}">${escapeHtml(row.status)}</span></td>
         <td class="small text-muted">${escapeHtml(row.reason ?? '')}</td>
       `;
@@ -534,6 +538,8 @@
     });
     $('btnPreviewPipeline').addEventListener('click', async () => {
       const st = $('pipelinePreviewStatus');
+      const card = $('pipelinePreviewCard');
+      const tbody = $('pipelinePreviewBody');
       st.textContent = 'Loading pipeline…';
       saveStorage();
       try {
@@ -541,10 +547,33 @@
         const res = await getFetch()(`/api/encompass-hub/pipeline?limit=${lim}`);
         const json = await res.json();
         if (!res.ok) throw new Error(json.details || json.error);
-        st.textContent = `Pipeline: ${json.count ?? 0} loan(s) in snapshot (used as input for dry run / apply).`;
+        const items = json.items || [];
+        st.textContent = `Pipeline: ${json.count ?? items.length} loan(s). Table below — run Dry run for complexity scores and rule hits.`;
+        tbody.innerHTML = '';
+        items.forEach((item) => {
+          const fields = item.fields || {};
+          const guid = item.loanGuid || item.loanId || fields['Loan.LoanGuid'] || '';
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${escapeHtml(fields['Loan.LoanNumber'] ?? '')}</td>
+            <td>${escapeHtml(fields['Loan.BorrowerName'] ?? '')}</td>
+            <td><code class="small">${escapeHtml(guid)}</code></td>
+            <td><code class="small">${escapeHtml(fields['Loan.LoanProcessorID'] ?? fields['Loan.LoanProcessorId'] ?? '')}</code></td>
+            <td class="small">${escapeHtml(fields['Loan.LoanProcessorName'] ?? '')}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        if (card) {
+          card.style.display = '';
+        }
       } catch (e) {
         st.textContent = 'Error: ' + e.message;
       }
+    });
+
+    $('btnHidePipelinePreview')?.addEventListener('click', () => {
+      const card = $('pipelinePreviewCard');
+      if (card) card.style.display = 'none';
     });
   }
 

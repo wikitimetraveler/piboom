@@ -34,7 +34,7 @@
 
 ### Worksheets tools (paths `public/finance/`)
 - UI: `public/finance/` — calculators, Encompass tools, unit tests (branding: Worksheets)
-- Unit Tests: `public/finance/unit-tests.html`, `public/finance/js/unit-tests.js`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js`, `services/unit-tests-file.service.js`
+- Unit Tests: `public/finance/unit-tests.html`, `public/finance/js/unit-tests.js`, `public/shared/customFieldCalcParser.js`, `public/shared/brRuleParser.js`, `public/shared/tool8FieldMatrix.js` (Tool 8 / Alchemist field-matrix JSON), `public/shared/unit-tests-utils.js`, `services/unit-tests-file.service.js`, `services/business-rule-files.service.js` — library APIs under `/api/unit-tests/files` (Excel) and `/api/unit-tests/br-rules` (BR XML, VB snippet, Tool 8 JSON; Postgres `br_rule_files`)
 - Screen Test: `public/finance/tool9.html`, `controllers/reviewer-ai.controller.js`
 - Encompass field browsers: `encompass-custom-fields.html`, `encompass-native-fields.html`
 - Loan batch update: `public/finance/loan-batch-update.html` (AG Grid + env-scoped native/custom catalogs via hub APIs; SheetJS import; `loanFields` + `loanData.customFields`) → `POST /api/encompass-hub/loan-batch/update-requests` → Encompass `loanBatch/updateRequests`

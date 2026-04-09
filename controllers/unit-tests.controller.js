@@ -6,6 +6,13 @@ import {
   searchByFieldId,
   deleteUnitTestFile,
 } from '../services/unit-tests-file.service.js';
+import {
+  saveBrRuleFile,
+  listBrRuleFiles,
+  getBrRuleFile,
+  searchBrRulesByFieldId,
+  deleteBrRuleFile,
+} from '../services/business-rule-files.service.js';
 
 /**
  * Upload unit test Excel file to library
@@ -115,6 +122,154 @@ export async function deleteUnitTestFileHandler(req, res) {
     console.error('Error deleting unit test file:', error);
     return res.status(500).json({
       error: 'Failed to delete unit test file',
+      message: error.message,
+    });
+  }
+}
+
+const BR_JSON_FORMATS = new Set([
+  'encompass_br_xml',
+  'tool8_field_matrix_json',
+  'encompass_br_vb_snippet',
+]);
+
+/**
+ * POST /api/unit-tests/br-rules/file — multipart field "file" (.xml, .json)
+ */
+export async function uploadBrRuleFileHandler(req, res) {
+  try {
+    if (!req.file || !req.file.buffer) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const record = await saveBrRuleFile(req.file.buffer, req.file.originalname || 'rule.xml');
+    return res.status(201).json({
+      success: true,
+      file: {
+        id: record.id,
+        file_name: record.file_name,
+        original_name: record.original_name,
+        source_format: record.source_format,
+        display_name: record.display_name,
+        field_ids: record.field_ids,
+        uploaded_at: record.uploaded_at,
+      },
+    });
+  } catch (error) {
+    console.error('Error uploading BR rule file:', error);
+    return res.status(500).json({
+      error: 'Failed to upload business rule',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * POST /api/unit-tests/br-rules — JSON { sourceFormat, body, originalName? }
+ */
+export async function saveBrRuleJsonHandler(req, res) {
+  try {
+    const { sourceFormat, body, originalName } = req.body || {};
+    if (!sourceFormat || !BR_JSON_FORMATS.has(String(sourceFormat))) {
+      return res.status(400).json({
+        error: 'Invalid or missing sourceFormat',
+        allowed: [...BR_JSON_FORMATS],
+      });
+    }
+    if (body == null || String(body).trim() === '') {
+      return res.status(400).json({ error: 'body is required' });
+    }
+    const record = await saveBrRuleFile(
+      Buffer.from(String(body), 'utf8'),
+      originalName || 'pasted.txt',
+      sourceFormat,
+    );
+    return res.status(201).json({
+      success: true,
+      file: {
+        id: record.id,
+        file_name: record.file_name,
+        original_name: record.original_name,
+        source_format: record.source_format,
+        display_name: record.display_name,
+        field_ids: record.field_ids,
+        uploaded_at: record.uploaded_at,
+      },
+    });
+  } catch (error) {
+    console.error('Error saving BR rule (JSON):', error);
+    return res.status(500).json({
+      error: 'Failed to save business rule',
+      message: error.message,
+    });
+  }
+}
+
+export async function listBrRuleFilesHandler(req, res) {
+  try {
+    const files = await listBrRuleFiles();
+    return res.json({ success: true, files });
+  } catch (error) {
+    console.error('Error listing BR rule files:', error);
+    return res.status(500).json({
+      error: 'Failed to list business rules',
+      message: error.message,
+    });
+  }
+}
+
+export async function getBrRuleFileHandler(req, res) {
+  try {
+    const { id } = req.params;
+    const row = await getBrRuleFile(parseInt(id, 10));
+    if (!row) {
+      return res.status(404).json({ error: 'Business rule not found' });
+    }
+    const { body_text, ...meta } = row;
+    return res.json({
+      success: true,
+      file: {
+        ...meta,
+        body_text,
+      },
+    });
+  } catch (error) {
+    console.error('Error getting BR rule file:', error);
+    return res.status(500).json({
+      error: 'Failed to get business rule',
+      message: error.message,
+    });
+  }
+}
+
+export async function searchBrRulesByFieldIdHandler(req, res) {
+  try {
+    const { fieldId } = req.query;
+    if (!fieldId || !String(fieldId).trim()) {
+      return res.status(400).json({ error: 'fieldId query parameter is required' });
+    }
+    const files = await searchBrRulesByFieldId(String(fieldId).trim());
+    return res.json({ success: true, files });
+  } catch (error) {
+    console.error('Error searching BR rules:', error);
+    return res.status(500).json({
+      error: 'Failed to search business rules',
+      message: error.message,
+    });
+  }
+}
+
+export async function deleteBrRuleFileHandler(req, res) {
+  try {
+    const { id } = req.params;
+    const deleted = await deleteBrRuleFile(parseInt(id, 10));
+    if (!deleted) {
+      return res.status(404).json({ error: 'Business rule not found' });
+    }
+    return res.json({ success: true, message: 'Business rule deleted' });
+  } catch (error) {
+    console.error('Error deleting BR rule file:', error);
+    return res.status(500).json({
+      error: 'Failed to delete business rule',
       message: error.message,
     });
   }

@@ -39,6 +39,22 @@ const fieldIdSearchBtn = document.getElementById('fieldIdSearchBtn');
 const fieldSearchResults = document.getElementById('fieldSearchResults');
 const fieldSearchTerm = document.getElementById('fieldSearchTerm');
 const fieldSearchResultsList = document.getElementById('fieldSearchResultsList');
+const uploadBrRuleLibraryBtn = document.getElementById('uploadBrRuleLibraryBtn');
+const brRuleLibraryFileInput = document.getElementById('brRuleLibraryFileInput');
+const brRuleLibraryList = document.getElementById('brRuleLibraryList');
+
+/** Hero toolbar: export / clear / scan live under Load / Tools dropdowns */
+function setHeroPostLoadActionsVisible(visible) {
+  ['heroExportCsvLi', 'heroExportExcelLi', 'heroClearReloadLi', 'heroScanSetLi'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('d-none', !visible);
+  });
+}
+
+function setUnitTestsWelcomeVisible(visible) {
+  const el = document.getElementById('unitTestsWelcomeCard');
+  if (el) el.classList.toggle('d-none', !visible);
+}
 
 let gridApi;
 let allData = [];
@@ -52,6 +68,42 @@ let lastRunSummary = null;
 let lastRunCellResults = {}; // { 'rowIndex-field': 'pass'|'fail' } for cell shading
 
 const RECENT_RUNS_KEY = 'unitTestsRecentRuns';
+
+/** Short-lived cache so BR generate + grid metadata share one hub fetch */
+let _hubFieldListsCache = null;
+let _hubFieldListsCacheAt = 0;
+const HUB_FIELD_LISTS_TTL_MS = 30000;
+
+/**
+ * @returns {Promise<{ customList: object[], nativeList: object[] }>}
+ */
+async function fetchHubFieldListsCached() {
+  const now = Date.now();
+  if (_hubFieldListsCache && now - _hubFieldListsCacheAt < HUB_FIELD_LISTS_TTL_MS) {
+    return _hubFieldListsCache;
+  }
+  const [customRes, nativeRes] = await Promise.all([
+    (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/custom-fields'),
+    (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/native-fields'),
+  ]);
+  const customItems = customRes.ok ? (await customRes.json()) : [];
+  const customList = Array.isArray(customItems) ? customItems : customItems.items || customItems.fields || [];
+  const nativeItems = nativeRes.ok ? (await nativeRes.json()) : [];
+  const nativeList = Array.isArray(nativeItems) ? nativeItems : nativeItems.items || nativeItems.fields || nativeItems.standardFields || [];
+  _hubFieldListsCache = { customList, nativeList };
+  _hubFieldListsCacheAt = now;
+  return _hubFieldListsCache;
+}
+
+/**
+ * Full metadata lookup for descriptions + grid editors (same shape as custom-field generator).
+ * @returns {Promise<Record<string, object>>}
+ */
+async function buildEncompassFieldMetadataLookupForUnitTests() {
+  const { customList, nativeList } = await fetchHubFieldListsCached();
+  if (!window.customFieldCalcParser?.buildFieldMetadataLookup) return {};
+  return window.customFieldCalcParser.buildFieldMetadataLookup(customList, nativeList);
+}
 
 const extractFieldId = window.unitTestsUtils?.extractFieldId || function(value) {
   if (!value) return null;
@@ -2255,11 +2307,12 @@ function displayTestResults(results, scenarioSummary, scenarioPassed, scenarioFa
   html += '<details class="scenario-debug-details mt-3"><summary class="scenario-debug-summary">Debug: all SET/GET steps</summary><div class="test-results-grid mt-2">';
   results.forEach((result) => {
     const statusClass = result.status === 'info' ? 'success' : result.status === 'skipped' ? 'warning' : 'danger';
-    const scenarioLabel = result.testNumber ? ` <span class="badge badge-light mr-1">Test ${result.testNumber}</span>` : '';
+    const scenarioLabel = result.testNumber ? ` <span class="badge text-bg-secondary me-1">Test ${result.testNumber}</span>` : '';
+    const actionBadgeClass = statusClass === 'success' ? 'text-bg-success' : statusClass === 'warning' ? 'text-bg-warning' : 'text-bg-danger';
     html += `
       <div class="test-result-card test-result-${result.status} small">
         <div class="d-flex align-items-start">
-          <span class="badge badge-${statusClass} mr-2">${result.action}</span>
+          <span class="badge ${actionBadgeClass} me-2">${result.action}</span>
           <div class="flex-grow-1">
             <div><strong>Step ${result.step}</strong>${scenarioLabel}</div>
             <div class="text-muted small">${escapeHtml(result.description || result.target)}</div>
@@ -2296,10 +2349,8 @@ function clearData() {
   fileInput.value = '';
   searchInput.value = '';
   uploadArea.style.display = 'block';
-  if (exportCsvBtn) exportCsvBtn.style.display = 'none';
-  if (exportExcelBtn) exportExcelBtn.style.display = 'none';
-  if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'none';
-  if (scanSetFieldsBtn) scanSetFieldsBtn.style.display = 'none';
+  setHeroPostLoadActionsVisible(false);
+  setUnitTestsWelcomeVisible(true);
   runTestsBtn.style.display = 'none';
   clearBtn.style.display = 'none';
   testResultsContainer.style.display = 'none';
@@ -2440,10 +2491,8 @@ async function handleFileUpload(file) {
     
     // Update UI
     uploadArea.style.display = 'none';
-    if (exportCsvBtn) exportCsvBtn.style.display = 'inline-block';
-    if (exportExcelBtn) exportExcelBtn.style.display = 'inline-block';
-    if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'inline-block';
-    if (scanSetFieldsBtn) scanSetFieldsBtn.style.display = 'inline-block';
+    setHeroPostLoadActionsVisible(true);
+    setUnitTestsWelcomeVisible(false);
     runTestsBtn.style.display = 'inline-block';
     clearBtn.style.display = 'inline-block';
     if (stickyActionBar) {
@@ -2465,7 +2514,7 @@ async function handleFileUpload(file) {
     if (testDescriptionsData.length > 0) {
       fileInfoHTML += `<div class="mt-2"><small class="text-muted">Test Scenarios:</small> `;
       const testList = testDescriptionsData.map(test =>
-        `<span class="badge badge-light mr-1" title="${test.description}">Test ${test.testNumber}</span>`
+        `<span class="badge text-bg-secondary me-1" title="${test.description}">Test ${test.testNumber}</span>`
       ).join('');
       fileInfoHTML += testList + `</div>`;
     } else if (scenarioColumns.length > 0) {
@@ -2584,35 +2633,219 @@ async function deleteFileFromLibrary(id) {
   }
 }
 
+/**
+ * Apply saved BR / Tool 8 payload from server into the unit test grid.
+ * Fetches Encompass custom/native catalogs (cached) to enrich descriptions and grid editors.
+ */
+async function applyBrRulePayloadToGrid(sourceName, bodyText, sourceFormat) {
+  if (!window.brRuleParser) {
+    showToast('BR parser not loaded', 'err');
+    return;
+  }
+  let metaLookup = {};
+  try {
+    metaLookup = await buildEncompassFieldMetadataLookupForUnitTests();
+  } catch (_) {
+    /* Hub offline — still load grid */
+  }
+  if (sourceFormat === 'tool8_field_matrix_json') {
+    if (!window.tool8FieldMatrix) {
+      showToast('Tool 8 parser not loaded', 'err');
+      return;
+    }
+    const p = window.tool8FieldMatrix.parseTool8FieldMatrixJson(bodyText);
+    if (p.error) {
+      showToast(p.error, 'err');
+      return;
+    }
+    const result = window.tool8FieldMatrix.generateUnitTestFromTool8FieldMatrix(p, { fieldMetadataLookup: metaLookup });
+    if (!result || !result.rows || result.rows.length === 0) {
+      showToast('No rows from Tool 8 JSON', 'warn');
+      return;
+    }
+    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, sourceName, metaLookup, {
+      fieldId: '',
+      calculation: '',
+      description: 'Tool 8 (Alchemist) field matrix',
+    });
+    return;
+  }
+  if (sourceFormat === 'encompass_br_vb_snippet') {
+    const parsed = window.brRuleParser.parseBRConditionSnippet(bodyText);
+    if (parsed.error) {
+      showToast(parsed.error, 'err');
+      return;
+    }
+    const result = window.brRuleParser.generateUnitTestFromBRRule(parsed, { fieldMetadataLookup: metaLookup });
+    if (!result || !result.rows || result.rows.length === 0) {
+      showToast('No rows generated from VB snippet', 'warn');
+      return;
+    }
+    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, sourceName, metaLookup, {
+      fieldId: '',
+      calculation: String(bodyText).slice(0, 400),
+      description: 'BR VB snippet',
+    });
+    return;
+  }
+  const parsed = window.brRuleParser.parseBRXml(bodyText);
+  if (parsed.error) {
+    showToast(parsed.error, 'err');
+    return;
+  }
+  const result = window.brRuleParser.generateUnitTestFromBRRule(parsed, { fieldMetadataLookup: metaLookup });
+  if (!result || !result.rows || result.rows.length === 0) {
+    showToast('No rows from BR XML (needs advanced conditions)', 'warn');
+    return;
+  }
+  loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, sourceName, metaLookup, {
+    fieldId: '',
+    calculation: parsed.mainCondition ? parsed.mainCondition.expression : '',
+    description: 'BR Rule: ' + (parsed.rule ? parsed.rule.name : ''),
+  });
+}
+
+async function loadBrRuleLibrary() {
+  if (!brRuleLibraryList) return;
+  try {
+    const res = await fetch('/api/unit-tests/br-rules');
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data?.message || data?.error || `Server error (${res.status})`);
+    }
+    if (!data.success || !Array.isArray(data.files)) {
+      brRuleLibraryList.innerHTML = '<p class="text-muted mb-0">No saved rules.</p>';
+      return;
+    }
+    if (data.files.length === 0) {
+      brRuleLibraryList.innerHTML =
+        '<p class="text-muted mb-0">No BR / Tool 8 files yet. Use <strong>Save to BR library</strong> in Generate from BR Rule, or upload here.</p>';
+      return;
+    }
+    const fmtLabel = (f) => {
+      const s = f.source_format || '';
+      if (s === 'tool8_field_matrix_json') return 'Tool 8';
+      if (s === 'encompass_br_vb_snippet') return 'VB';
+      return 'XML';
+    };
+    brRuleLibraryList.innerHTML = data.files
+      .map((f) => {
+        const title = (f.display_name || f.original_name || f.file_name || 'Untitled').replace(/"/g, '&quot;');
+        const safeTitle = (f.display_name || f.original_name || f.file_name || 'Untitled').replace(/</g, '&lt;');
+        const nf = Array.isArray(f.field_ids) ? f.field_ids.length : 0;
+        return `<div class="d-flex justify-content-between align-items-center py-1 border-bottom border-light">
+            <span class="text-truncate" style="max-width: 160px;" title="${title}">${safeTitle}</span>
+            <span class="badge bg-secondary ms-1">${fmtLabel(f)}</span>
+            <span class="text-muted small ms-1">${nf} fields</span>
+            <span class="ms-2">
+              <button type="button" class="btn btn-sm btn-outline-primary load-br-rule-library" data-id="${f.id}" data-title="${title}" title="Load into grid"><i class="bi-folder2"></i> Load</button>
+              <button type="button" class="btn btn-sm btn-outline-danger delete-br-rule-library ms-1" data-id="${f.id}" title="Delete"><i class="bi-trash"></i></button>
+            </span>
+          </div>`;
+      })
+      .join('');
+    brRuleLibraryList.querySelectorAll('.load-br-rule-library').forEach((btn) => {
+      btn.addEventListener('click', () => loadBrRuleFromLibrary(btn.dataset.id, btn.dataset.title));
+    });
+    brRuleLibraryList.querySelectorAll('.delete-br-rule-library').forEach((btn) => {
+      btn.addEventListener('click', () => deleteBrRuleFromLibrary(btn.dataset.id));
+    });
+  } catch (err) {
+    const msg = err?.message || 'Failed to load BR library.';
+    brRuleLibraryList.innerHTML = `<p class="text-danger mb-0">${String(msg).replace(/</g, '&lt;')}</p>`;
+  }
+}
+
+async function loadBrRuleFromLibrary(id, displayTitle) {
+  const btn = document.querySelector(`.load-br-rule-library[data-id="${id}"]`);
+  if (btn) btn.disabled = true;
+  try {
+    const res = await fetch(`/api/unit-tests/br-rules/${id}`);
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data?.error || `Failed (${res.status})`);
+    }
+    const f = data.file;
+    if (!f || !f.body_text) throw new Error('Invalid response');
+    const sourceName = 'Library: ' + (f.display_name || displayTitle || f.original_name || 'BR');
+    await applyBrRulePayloadToGrid(sourceName, f.body_text, f.source_format);
+    showToast('Loaded from BR library', 'ok');
+  } catch (err) {
+    showToast(err?.message || 'Failed to load rule', 'err');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function deleteBrRuleFromLibrary(id) {
+  if (!confirm('Remove this business rule from the server library?')) return;
+  try {
+    const res = await fetch(`/api/unit-tests/br-rules/${id}`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('Failed to delete');
+    await loadBrRuleLibrary();
+    if (fieldSearchResults && fieldSearchResults.style.display !== 'none') {
+      const term = fieldIdSearchInput?.value?.trim();
+      if (term) searchByFieldId(term);
+    }
+    showToast('Removed BR rule', 'ok');
+  } catch (err) {
+    showToast('Failed to remove', 'err');
+  }
+}
+
 async function searchByFieldId(fieldId) {
   if (!fieldId || !fieldSearchResults || !fieldSearchTerm || !fieldSearchResultsList) return;
   try {
-    const res = await fetch(`/api/unit-tests/search?fieldId=${encodeURIComponent(fieldId)}`);
-    const data = await res.json();
-    if (!data.success || !Array.isArray(data.files)) {
-      fieldSearchResults.style.display = 'block';
-      fieldSearchTerm.textContent = fieldId;
-      fieldSearchResultsList.innerHTML = '<p class="text-muted mb-0">No tests found.</p>';
-      return;
-    }
+    const [resExcel, resBr] = await Promise.all([
+      fetch(`/api/unit-tests/search?fieldId=${encodeURIComponent(fieldId)}`),
+      fetch(`/api/unit-tests/br-rules/search?fieldId=${encodeURIComponent(fieldId)}`),
+    ]);
+    const dataExcel = await resExcel.json();
+    const dataBr = await resBr.json();
+
     fieldSearchResults.style.display = 'block';
     fieldSearchTerm.textContent = fieldId;
-    if (data.files.length === 0) {
-      fieldSearchResultsList.innerHTML = '<p class="text-muted mb-0">No tests contain this field.</p>';
-    } else {
-      fieldSearchResultsList.innerHTML = data.files
+
+    const excelFiles = resExcel.ok && dataExcel.success && Array.isArray(dataExcel.files) ? dataExcel.files : [];
+    const brFiles = resBr.ok && dataBr.success && Array.isArray(dataBr.files) ? dataBr.files : [];
+
+    if (excelFiles.length === 0 && brFiles.length === 0) {
+      fieldSearchResultsList.innerHTML = '<p class="text-muted mb-0">No Excel tests or BR / Tool 8 rules reference this field.</p>';
+      return;
+    }
+
+    let html = '';
+    if (excelFiles.length > 0) {
+      html += '<div class="small fw-bold mb-1">Excel unit tests</div>';
+      html += excelFiles
         .map(
           (f) =>
             `<div class="d-flex justify-content-between align-items-center py-1">
               <span class="text-truncate" style="max-width: 180px;">${(f.original_name || f.file_name || 'Untitled').replace(/</g, '&lt;')}</span>
-              <button class="btn btn-sm btn-outline-primary load-from-library" data-id="${f.id}" data-name="${(f.original_name || f.file_name || '').replace(/"/g, '&quot;')}"><i class="bi-folder2"></i> Load</button>
-            </div>`
+              <button type="button" class="btn btn-sm btn-outline-primary load-from-library" data-id="${f.id}" data-name="${(f.original_name || f.file_name || '').replace(/"/g, '&quot;')}"><i class="bi-folder2"></i> Load</button>
+            </div>`,
         )
         .join('');
-      fieldSearchResultsList.querySelectorAll('.load-from-library').forEach((btn) => {
-        btn.addEventListener('click', () => loadFileFromLibrary(btn.dataset.id, btn.dataset.name));
-      });
     }
+    if (brFiles.length > 0) {
+      html += '<div class="small fw-bold mt-2 mb-1">BR / Tool 8</div>';
+      html += brFiles
+        .map(
+          (f) =>
+            `<div class="d-flex justify-content-between align-items-center py-1">
+              <span class="text-truncate" style="max-width: 160px;">${(f.display_name || f.original_name || f.file_name || 'Untitled').replace(/</g, '&lt;')}</span>
+              <button type="button" class="btn btn-sm btn-outline-primary load-br-rule-search" data-id="${f.id}" data-title="${(f.display_name || f.original_name || '').replace(/"/g, '&quot;')}"><i class="bi-folder2"></i> Load</button>
+            </div>`,
+        )
+        .join('');
+    }
+    fieldSearchResultsList.innerHTML = html;
+    fieldSearchResultsList.querySelectorAll('.load-from-library').forEach((btn) => {
+      btn.addEventListener('click', () => loadFileFromLibrary(btn.dataset.id, btn.dataset.name));
+    });
+    fieldSearchResultsList.querySelectorAll('.load-br-rule-search').forEach((btn) => {
+      btn.addEventListener('click', () => loadBrRuleFromLibrary(btn.dataset.id, btn.dataset.title));
+    });
   } catch (err) {
     fieldSearchResults.style.display = 'block';
     fieldSearchTerm.textContent = fieldId;
@@ -2643,6 +2876,27 @@ libraryFileInput?.addEventListener('change', async (e) => {
     showToast('Saved to library', 'ok');
   } catch (err) {
     showToast(err.message || 'Failed to save to library', 'err');
+  }
+});
+
+uploadBrRuleLibraryBtn?.addEventListener('click', () => {
+  brRuleLibraryFileInput?.click();
+});
+
+brRuleLibraryFileInput?.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/unit-tests/br-rules/file', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || data.message || 'Upload failed');
+    await loadBrRuleLibrary();
+    showToast('Saved BR / Tool 8 to library', 'ok');
+  } catch (err) {
+    showToast(err.message || 'Failed to upload rule', 'err');
   }
 });
 
@@ -2891,32 +3145,37 @@ function getSectionCardForCollapse(sectionId) {
 }
 
 function showAccordionSection(sectionId) {
-  const section = document.getElementById(sectionId);
+  const id = String(sectionId || '').replace(/^#/, '').trim();
+  const section = document.getElementById(id);
   if (!section) return;
   if (section.classList.contains('show')) return; // already open
-  const card = getSectionCardForCollapse(sectionId);
+  const card = getSectionCardForCollapse(id);
   if (card) card.classList.remove('section-card-hidden');
-  updateSectionHeaderState(sectionId, true);
+  updateSectionHeaderState(id, true);
   bsCollapseShow(section);
 }
 
 function toggleAccordionSection(sectionId) {
-  const section = document.getElementById(sectionId);
+  const id = String(sectionId || '').replace(/^#/, '').trim();
+  const section = document.getElementById(id);
   if (!section) return;
-  const card = getSectionCardForCollapse(sectionId);
+  const card = getSectionCardForCollapse(id);
   const isExpanded = section.classList.contains('show');
   if (isExpanded) {
-    updateSectionHeaderState(sectionId, false);
+    updateSectionHeaderState(id, false);
     bsCollapseHide(section, card ? function () { card.classList.add('section-card-hidden'); } : undefined);
   } else {
     if (card) card.classList.remove('section-card-hidden');
-    updateSectionHeaderState(sectionId, true);
+    updateSectionHeaderState(id, true);
     bsCollapseShow(section);
   }
 }
 
 function updateSectionHeaderState(sectionId, expanded) {
-  const trigger = document.querySelector(`[data-bs-target="#${sectionId}"], [data-target="#${sectionId}"]`);
+  const id = String(sectionId || '').replace(/^#/, '').trim();
+  const trigger = document.querySelector(
+    `[data-bs-target="#${id}"], [data-bs-target="${id}"], [data-target="#${id}"], [data-target="${id}"]`
+  );
   if (trigger) {
     trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     trigger.classList.toggle('collapsed', !expanded);
@@ -2970,6 +3229,180 @@ let currentFieldMetadata = {};
 
 /** Current custom field for Live Scenario Builder (when generated from custom field). */
 let currentScenarioBuilderField = null;
+
+/** How many grid scenario columns to fill from Live Scenario Builder: one | five | all */
+let scenarioApplyMode = 'one';
+
+/**
+ * Resolve which ag-Grid column fields receive builder values.
+ * @param {'one'|'five'|'all'} mode
+ * @param {string} startField - column `field` from dropdown (Test 1, etc.)
+ * @returns {string[]}
+ */
+function getTargetColumnFieldsForApply(mode, startField) {
+  const ordered = getOrderedTestColumns().filter((c) => c.testNumber && c.testNumber !== 'RESET');
+  if (!ordered.length) return [];
+  let idx = ordered.findIndex((c) => c.field === startField);
+  if (idx < 0) idx = 0;
+  if (mode === 'one') return [ordered[idx].field].filter(Boolean);
+  if (mode === 'five') return ordered.slice(idx, idx + 5).map((c) => c.field).filter(Boolean);
+  if (mode === 'all') return ordered.map((c) => c.field).filter(Boolean);
+  return [ordered[idx].field].filter(Boolean);
+}
+
+/**
+ * Match a SET row Target to a key in scenario builder values.
+ * @param {string} target - e.g. "[CX.TYPE]" or "[@Log.MS.Date.Underwriting]"
+ * @param {Record<string, unknown>} builderValues - from getScenarioBuilderValues()
+ * @returns {string|number|undefined}
+ */
+function valueForTargetFromScenarioBuilder(target, builderValues) {
+  if (!builderValues || typeof builderValues !== 'object') return undefined;
+  const raw = getRawFieldIdFromTarget(target);
+  if (raw == null || raw === '') return undefined;
+  const norm = window.customFieldCalcParser?.normalizeFieldIdForLookup?.(raw) || String(raw).replace(/^[@#]+/, '');
+  const stripped = String(raw).replace(/^[@#]+/, '');
+  const candidates = [raw, norm, stripped, '[' + raw + ']', '[' + norm + ']', '[' + stripped + ']'];
+  const m = String(target || '').trim().match(/^\[([^\]]+)\]$/);
+  if (m) candidates.push(m[1]);
+  for (let i = 0; i < candidates.length; i++) {
+    const k = candidates[i];
+    if (!k) continue;
+    const v = builderValues[k];
+    if (v !== undefined && v !== null && String(v).trim() !== '') return v;
+  }
+  return undefined;
+}
+
+/**
+ * Populate scenario-column dropdown; call after grid or builder updates.
+ */
+function refreshScenarioApplyToolbar() {
+  const sel = document.getElementById('scenarioApplyColumnSelect');
+  if (!sel) return;
+  const ordered = getOrderedTestColumns().filter((c) => c.testNumber && c.testNumber !== 'RESET');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  if (ordered.length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'No Test columns — load a test first';
+    sel.appendChild(opt);
+    sel.disabled = true;
+    return;
+  }
+  sel.disabled = false;
+  ordered.forEach((c) => {
+    const opt = document.createElement('option');
+    opt.value = c.field;
+    opt.textContent = c.field || ('Test ' + c.testNumber);
+    sel.appendChild(opt);
+  });
+  if (prev && ordered.some((c) => c.field === prev)) sel.value = prev;
+}
+
+/**
+ * Copy Live Scenario Builder values into SET rows for selected scenario column(s).
+ */
+function applyScenarioBuilderValuesToGrid() {
+  const sel = document.getElementById('scenarioApplyColumnSelect');
+  const startField = sel && !sel.disabled ? sel.value : '';
+  const colFields = getTargetColumnFieldsForApply(scenarioApplyMode, startField);
+  if (!colFields.length) {
+    showToast('No test scenario columns in the grid (or none selected).', 'warning');
+    return;
+  }
+  if (!gridApi || !allData || allData.length === 0) {
+    showToast('Load a unit test grid first.', 'warning');
+    return;
+  }
+  const builderValues = getScenarioBuilderValues();
+  let cells = 0;
+  let rowsTouched = 0;
+  gridApi.forEachNode((node) => {
+    const row = node.data;
+    if (!row) return;
+    const action = String(row.Action || row.action || '').trim().toUpperCase();
+    if (action !== 'SET') return;
+    const val = valueForTargetFromScenarioBuilder(row.Target, builderValues);
+    if (val === undefined) return;
+    const strVal = typeof val === 'number' && Number.isFinite(val) ? String(val) : String(val);
+    rowsTouched += 1;
+    colFields.forEach((field) => {
+      if (!field) return;
+      row[field] = strVal;
+      cells += 1;
+    });
+  });
+  gridApi.refreshCells({ force: true });
+  if (cells === 0) {
+    showToast('No matching SET rows (check Target field IDs vs builder).', 'warning');
+    return;
+  }
+  showToast(`Applied to ${colFields.length} column(s), ${rowsTouched} SET row(s), ${cells} cell(s).`, 'ok');
+}
+
+/**
+ * Fill empty scenario builder inputs from Tool 8 / Alchemist sample map.
+ */
+function fillScenarioBuilderInputsFromTool8Samples() {
+  const map = (typeof window !== 'undefined' && window.encompassFieldTestValuesMap) || {};
+  const container = document.getElementById('liveScenarioBuilderContainer');
+  if (!container || container.style.display === 'none') {
+    showToast('Open the Live Scenario Builder first (generate from a custom field).', 'warning');
+    return;
+  }
+  const inputs = container.querySelectorAll('[data-field-id]');
+  let n = 0;
+  inputs.forEach((el) => {
+    if (String(el.value || '').trim() !== '') return;
+    const fid = el.getAttribute('data-field-id');
+    const rawAttr = el.getAttribute('data-field-id-raw') || fid;
+    const strip = (s) => String(s || '').replace(/^\[|\]$/g, '').replace(/^[@#]+/, '');
+    const keys = [strip(fid), strip(rawAttr), String(rawAttr || '').trim(), String(fid || '').trim()];
+    let sample = null;
+    for (let i = 0; i < keys.length; i++) {
+      const k = keys[i];
+      if (k && map[k] != null && map[k] !== '') {
+        sample = map[k];
+        break;
+      }
+    }
+    if (sample == null) {
+      const dt = (getScenarioBuilderFieldMeta(fid) || {}).dataType;
+      if (/date/i.test(String(dt || ''))) sample = map.DEFAULT_DATE;
+      else if (/int|decimal|number/i.test(String(dt || ''))) sample = map.DEFAULT_NUMBER;
+      else sample = map.DEFAULT_STRING;
+    }
+    if (sample == null) return;
+    if (el.tagName === 'SELECT') {
+      const opt = Array.from(el.options).find((o) => String(o.value) === String(sample));
+      if (opt) {
+        el.value = sample;
+        n += 1;
+      }
+    } else {
+      el.value = String(sample);
+      n += 1;
+    }
+  });
+  runScenarioCalculation();
+  showToast(n ? `Filled ${n} empty field(s) from Tool 8 samples` : 'No empty fields to fill (or no matching samples)', n ? 'ok' : 'info');
+}
+
+function initializeScenarioBuilderApplyControls() {
+  const toolbar = document.getElementById('scenarioBuilderApplyToolbar');
+  if (!toolbar) return;
+  toolbar.querySelectorAll('.scenario-apply-mode').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      toolbar.querySelectorAll('.scenario-apply-mode').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      scenarioApplyMode = btn.getAttribute('data-mode') || 'one';
+    });
+  });
+  document.getElementById('scenarioApplyToGridBtn')?.addEventListener('click', () => applyScenarioBuilderValuesToGrid());
+  document.getElementById('scenarioFillTool8Btn')?.addEventListener('click', () => fillScenarioBuilderInputsFromTool8Samples());
+}
 
 /**
  * Get metadata for a field (from currentFieldMetadata or infer from ID).
@@ -3212,6 +3645,7 @@ function renderScenarioBuilder(field) {
 
   container.style.display = 'block';
   runScenarioCalculation();
+  refreshScenarioApplyToolbar();
 }
 
 /**
@@ -3235,6 +3669,7 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
 
   initializeGrid();
   setGridRows(allData);
+  enrichSetRowsWithEncompassMetadata();
   showAllColumns();
 
   const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
@@ -3270,10 +3705,8 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
   }
 
   uploadArea.style.display = 'none';
-  if (exportCsvBtn) exportCsvBtn.style.display = 'inline-block';
-  if (exportExcelBtn) exportExcelBtn.style.display = 'inline-block';
-  if (clearAndReloadBtn) clearAndReloadBtn.style.display = 'inline-block';
-  if (scanSetFieldsBtn) scanSetFieldsBtn.style.display = 'inline-block';
+  setHeroPostLoadActionsVisible(true);
+  setUnitTestsWelcomeVisible(false);
   runTestsBtn.style.display = 'inline-block';
   if (clearBtn) clearBtn.style.display = 'inline-block';
   if (stickyActionBar) stickyActionBar.style.display = 'flex';
@@ -3330,7 +3763,7 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
   fileInfoHTML += ` <span class="text-muted">(${rows.length} test step${rows.length !== 1 ? 's' : ''}, ${headers.length} columns)</span>`;
   if (testDescriptions && testDescriptions.length > 0) {
     fileInfoHTML += `<div class="mt-2"><small class="text-muted">Test Scenarios:</small> `;
-    fileInfoHTML += testDescriptions.map((t) => `<span class="badge badge-light mr-1" title="${t.description}">Test ${t.testNumber}</span>`).join('');
+    fileInfoHTML += testDescriptions.map((t) => `<span class="badge text-bg-secondary me-1" title="${t.description}">Test ${t.testNumber}</span>`).join('');
     fileInfoHTML += `</div>`;
   } else if (scenarioColumns.length > 0) {
     fileInfoHTML += ` <span class="text-muted">• ${scenarioColumns.length} test scenario${scenarioColumns.length !== 1 ? 's' : ''}</span>`;
@@ -3339,6 +3772,114 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
 
   updateResultsMeta();
   setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
+
+  loadMetadataForSetRowsFromEncompass()
+    .then(({ dropdownCount }) => {
+      if (dropdownCount > 0) {
+        showToast(`Encompass: ${dropdownCount} SET field(s) with dropdown metadata`, 'info');
+      }
+    })
+    .catch(() => {
+      /* Hub unavailable — text editors still work */
+    });
+}
+
+/**
+ * Resolve merged field metadata for a SET row Target using currentFieldMetadata (Hub + parser).
+ * @param {string} target - e.g. "[CX.FOO]", "[@Log.MS.Date.Underwriting]"
+ * @returns {object|null}
+ */
+function resolveFieldMetadataForTarget(target) {
+  if (!target || typeof currentFieldMetadata !== 'object') return null;
+  const normFn = window.customFieldCalcParser?.normalizeFieldIdForLookup;
+  const norm = normFn || function (id) { return String(id || '').replace(/^[@#]+/, ''); };
+  const raw = getRawFieldIdFromTarget(target);
+  const extracted = extractFieldId(target);
+  const candidates = [];
+  if (raw) {
+    candidates.push(raw, norm(raw));
+    const noAt = raw.replace(/^@/, '');
+    if (noAt !== raw) candidates.push(noAt, '@' + noAt);
+  }
+  if (extracted) {
+    candidates.push(extracted, norm(extracted));
+  }
+  for (let i = 0; i < candidates.length; i++) {
+    const c = candidates[i];
+    if (c && currentFieldMetadata[c]) return { ...currentFieldMetadata[c] };
+  }
+  const seeds = [extracted, raw].filter(Boolean);
+  for (let s = 0; s < seeds.length; s++) {
+    const n = norm(String(seeds[s]));
+    if (!n) continue;
+    const keys = Object.keys(currentFieldMetadata);
+    for (let k = 0; k < keys.length; k++) {
+      if (norm(keys[k]) === n) return { ...currentFieldMetadata[keys[k]] };
+    }
+  }
+  return null;
+}
+
+/**
+ * Attach _fieldMetadata to SET rows and refresh Description from Encompass metadata (same idea as custom-field load).
+ */
+function enrichSetRowsWithEncompassMetadata() {
+  if (!allData || !Array.isArray(allData)) return;
+  allData.forEach((row) => {
+    const action = String(row.Action || row.action || '').trim().toUpperCase();
+    if (action !== 'SET') {
+      delete row._fieldMetadata;
+      return;
+    }
+    const target = row.Target || row.target || '';
+    if (!target) {
+      delete row._fieldMetadata;
+      return;
+    }
+    let meta = resolveFieldMetadataForTarget(target);
+    const rawId = getRawFieldIdFromTarget(target);
+    if (!meta && rawId && window.customFieldCalcParser?.isDateFieldByNotation?.(rawId)) {
+      const descLow = String(row.Description || '').toLowerCase();
+      meta = {
+        dataType: descLow.includes('datetime') ? 'DateTime' : 'Date',
+        format: '',
+        description: 'Date field (@ milestone)',
+      };
+    }
+    if (!meta) {
+      const eid = extractFieldId(target);
+      if (eid && window.customFieldCalcParser?.inferDateTypeFromFieldId) {
+        const inferred = window.customFieldCalcParser.inferDateTypeFromFieldId(eid);
+        if (inferred) meta = { ...inferred };
+      }
+    }
+    if (meta) {
+      row._fieldMetadata = {
+        dataType: meta.dataType,
+        format: meta.format || '',
+        description: meta.description || '',
+        ...(Array.isArray(meta.options) && meta.options.length > 0 ? { options: [...meta.options] } : {}),
+      };
+    } else {
+      delete row._fieldMetadata;
+    }
+    const apiDesc = meta && String(meta.description || '').trim();
+    const extracted = extractFieldId(target);
+    const bracket = String(target).trim().startsWith('[') ? String(target).trim() : extracted ? `[${extracted}]` : String(target).trim();
+    const dt = meta && meta.dataType ? String(meta.dataType).trim() : '';
+    if (apiDesc) {
+      const typeSuffix = dt && !/^string$/i.test(dt) ? ` — ${dt}` : '';
+      row.Description = `${apiDesc} ${bracket}${typeSuffix}`.trim();
+    } else if (meta && dt && !/^string$/i.test(dt)) {
+      const base = String(row.Description || '').trim();
+      if (base && !base.includes(`(${dt})`) && !base.includes(` — ${dt}`)) {
+        row.Description = `${base} (${dt})`.trim();
+      }
+    }
+  });
+  if (gridApi && typeof gridApi.refreshCells === 'function') {
+    gridApi.refreshCells({ force: true });
+  }
 }
 
 /**
@@ -3354,14 +3895,7 @@ async function loadMetadataForSetRowsFromEncompass() {
   });
   if (setRows.length === 0) return { fieldMeta: {}, dropdownCount: 0 };
 
-  const [customRes, nativeRes] = await Promise.all([
-    (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/custom-fields'),
-    (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/native-fields'),
-  ]);
-  const customItems = customRes.ok ? (await customRes.json()) : [];
-  const customList = Array.isArray(customItems) ? customItems : customItems.items || customItems.fields || [];
-  const nativeItems = nativeRes.ok ? (await nativeRes.json()) : [];
-  const nativeList = Array.isArray(nativeItems) ? nativeItems : nativeItems.items || nativeItems.fields || nativeItems.standardFields || [];
+  const { customList, nativeList } = await fetchHubFieldListsCached();
 
   const fieldMeta = {};
   const addMeta = (item, source) => {
@@ -3372,6 +3906,7 @@ async function loadMetadataForSetRowsFromEncompass() {
     const isCalc = !!(item.isCalculatedField ?? item.isCalculated ?? item.calculated ?? item.isCalculation ?? false);
     const fmt = String(item.format || item.formatType || item.Format || '').toUpperCase();
     const dt = String(item.dataType || item.DataType || item.type || '').toUpperCase();
+    const desc = String(item.description || item.longDescription || item.shortDescription || item.label || item.Name || '').trim();
     const rawOpts = item.options ?? item.Options ?? item.values ?? item.Values ?? item.enum ?? item.Enum;
     const options = Array.isArray(rawOpts) && rawOpts.length > 0
       ? rawOpts.map((o) => (o && typeof o === 'object' ? (o.Value ?? o.value ?? o.Key ?? o.key ?? o.Label ?? o.label ?? o.Text ?? o.text ?? String(o)) : String(o)))
@@ -3382,10 +3917,16 @@ async function loadMetadataForSetRowsFromEncompass() {
       fieldMeta[key].readOnly = fieldMeta[key].readOnly || readOnly;
       fieldMeta[key].isCalculated = fieldMeta[key].isCalculated || isCalc;
       if (!fieldMeta[key].source) fieldMeta[key].source = source;
-      const isDropdownFormat = /^(DROPDOWN|DROPDOWNLIST|SELECT|LIST|COMBO)$/i.test(fmt);
-      if (options && isDropdownFormat) {
+      if (desc) fieldMeta[key].description = fieldMeta[key].description || desc;
+      const isDropdownFormat = /^(DROPDOWN|DROPDOWNLIST|SELECT|LIST|COMBO|AUDIT|PICKLIST)$/i.test(fmt);
+      const allowOptsByFormat = isDropdownFormat || /^(AUDIT|PICKLIST|ENUMERATED)/i.test(fmt);
+      if (options && options.length > 0 && allowOptsByFormat) {
         fieldMeta[key].options = options;
         fieldMeta[key].dataType = fieldMeta[key].dataType || 'String';
+      }
+      if (/^(YN|YESNO|Y\/N)$/i.test(fmt) || /^YN$/i.test(dt)) {
+        fieldMeta[key].dataType = fieldMeta[key].dataType || 'YesNo';
+        if (!fieldMeta[key].options) fieldMeta[key].options = ['Y', 'N'];
       }
       if (/^(DATE|DATETIME|DATETIMEOFFSET)$/i.test(fmt) || /^(DATE|DATETIME)$/i.test(dt)) {
         fieldMeta[key].dataType = fieldMeta[key].dataType || (/DATETIME/i.test(fmt) || /DATETIME/i.test(dt) ? 'DateTime' : 'Date');
@@ -3398,21 +3939,36 @@ async function loadMetadataForSetRowsFromEncompass() {
   if (typeof currentFieldMetadata !== 'object') currentFieldMetadata = {};
   const fallback = window.customFieldCalcParser?.getFallbackFieldMetadata?.() || {};
   Object.assign(currentFieldMetadata, fallback);
+
+  const parserLookup = window.customFieldCalcParser?.buildFieldMetadataLookup?.(customList, nativeList);
+  if (parserLookup && typeof parserLookup === 'object') {
+    Object.keys(parserLookup).forEach((k) => {
+      if (!currentFieldMetadata[k]) currentFieldMetadata[k] = {};
+      const inc = parserLookup[k];
+      if (inc && typeof inc === 'object') {
+        Object.assign(currentFieldMetadata[k], inc);
+      }
+    });
+  }
+
   const uniqueDropdownIds = new Set();
   Object.keys(fieldMeta).forEach((k) => {
     const m = fieldMeta[k];
     if (!currentFieldMetadata[k]) currentFieldMetadata[k] = {};
+    if (m.description) {
+      currentFieldMetadata[k].description = m.description || currentFieldMetadata[k].description;
+    }
     if (m.options && m.options.length > 0) {
       currentFieldMetadata[k].options = m.options;
-      currentFieldMetadata[k].dataType = currentFieldMetadata[k].dataType || 'String';
+      currentFieldMetadata[k].dataType = m.dataType || currentFieldMetadata[k].dataType || 'String';
       uniqueDropdownIds.add(m.id || k);
     }
-    if (m.dataType) currentFieldMetadata[k].dataType = currentFieldMetadata[k].dataType || m.dataType;
+    if (m.dataType) {
+      currentFieldMetadata[k].dataType = m.dataType || currentFieldMetadata[k].dataType;
+    }
   });
   const dropdownCount = uniqueDropdownIds.size;
-  if (gridApi && typeof gridApi.refreshCells === 'function') {
-    gridApi.refreshCells({ force: true });
-  }
+  enrichSetRowsWithEncompassMetadata();
   return { fieldMeta, dropdownCount };
 }
 
@@ -3488,8 +4044,8 @@ function initializeScanSetFields() {
       html += '<ul class="list-group">';
       problems.forEach((p) => {
         html += '<li class="list-group-item d-flex flex-column align-items-start">';
-        html += '<span class="font-weight-bold text-danger">Step ' + (p.step || '?') + ': ' + (p.target || p.fieldId) + '</span>';
-        html += '<span class="badge badge-warning mt-1">' + (p.reason || '') + '</span>';
+        html += '<span class="fw-bold text-danger">Step ' + (p.step || '?') + ': ' + (p.target || p.fieldId) + '</span>';
+        html += '<span class="badge text-bg-warning mt-1">' + (p.reason || '') + '</span>';
         if (p.description) html += '<small class="text-muted mt-1">' + (p.description || '').replace(/</g, '&lt;') + '</small>';
         html += '</li>';
       });
@@ -3723,6 +4279,65 @@ function initializeGenerateFromCustomField() {
 }
 
 /**
+ * Keyboard + aria-selected sync for BR modal tabs (Bootstrap 5 button tabs).
+ */
+function initializeBrRuleModalTabsA11y(modalEl) {
+  const tablist = modalEl.querySelector('#brRuleModalTabs');
+  if (!tablist) return;
+  const getTabs = () => Array.from(tablist.querySelectorAll('[role="tab"]'));
+
+  function syncTabAttributes() {
+    const list = getTabs();
+    const active = list.find((t) => t.classList.contains('active'));
+    list.forEach((t) => {
+      const isSel = t === active;
+      t.setAttribute('aria-selected', isSel ? 'true' : 'false');
+      t.setAttribute('tabindex', isSel ? '0' : '-1');
+    });
+  }
+
+  tablist.addEventListener('shown.bs.tab', () => {
+    syncTabAttributes();
+  });
+  tablist.addEventListener('click', (e) => {
+    if (e.target.closest('[role="tab"]')) {
+      requestAnimationFrame(() => syncTabAttributes());
+    }
+  });
+
+  tablist.addEventListener('keydown', (e) => {
+    const list = getTabs();
+    const cur = list.indexOf(document.activeElement);
+    if (cur < 0) return;
+    let next = cur;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      next = (cur + 1) % list.length;
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      next = (cur - 1 + list.length) % list.length;
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      next = 0;
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      next = list.length - 1;
+    } else {
+      return;
+    }
+    const nextTab = list[next];
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+      bootstrap.Tab.getOrCreateInstance(nextTab).show();
+    } else {
+      nextTab.click();
+    }
+    nextTab.focus();
+  });
+
+  syncTabAttributes();
+}
+
+/**
  * Initialize Generate from BR Rule modal and handlers.
  */
 function initializeGenerateFromBRRule() {
@@ -3730,18 +4345,44 @@ function initializeGenerateFromBRRule() {
   const modal = document.getElementById('generateFromBRRuleModal');
   const brXmlInput = document.getElementById('brXmlInput');
   const brXmlFile = document.getElementById('brXmlFile');
+  const brConditionSnippetInput = document.getElementById('brConditionSnippetInput');
+  const brTool8JsonInput = document.getElementById('brTool8JsonInput');
   const brExtractBtn = document.getElementById('brExtractBtn');
   const brCreateTestBtn = document.getElementById('brCreateTestBtn');
+  const brSaveToServerBtn = document.getElementById('brSaveToServerBtn');
   const brExtractStatus = document.getElementById('brExtractStatus');
   const brExtractResults = document.getElementById('brExtractResults');
   const brExtractContent = document.getElementById('brExtractContent');
 
   if (!btn || !modal || !brXmlInput) return;
 
+  initializeBrRuleModalTabsA11y(modal);
+
   let lastParsed = null;
 
   function getXmlText() {
     return (brXmlInput && brXmlInput.value ? String(brXmlInput.value).trim() : '') || '';
+  }
+
+  /**
+   * Which BR modal tab is active (Bootstrap 5). Prefer visible tab-pane — nav-link.active
+   * is sometimes missing or wrong inside modals / after programmatic opens.
+   */
+  function getActiveBrTabHref() {
+    const pane =
+      modal.querySelector('.tab-content .tab-pane.active') ||
+      modal.querySelector('.tab-content .tab-pane.show');
+    if (pane && pane.id) {
+      return '#' + pane.id;
+    }
+    const link = modal.querySelector('#brRuleModalTabs .nav-link.active');
+    if (link) {
+      const h = link.getAttribute('href');
+      if (h && h !== '#') return h;
+      const t = link.getAttribute('data-bs-target');
+      if (t) return t;
+    }
+    return '';
   }
 
   function renderExtract(parsed) {
@@ -3758,7 +4399,7 @@ function initializeGenerateFromBRRule() {
       html += '<div class="condition-block mb-2 p-2 rounded" style="background: rgba(74,144,164,0.08); border-left: 4px solid #4a90a4;">';
       html += '<strong>Rule condition</strong><pre class="mb-0 mt-1 small" style="white-space: pre-wrap;">' + escapeHtml(mainCondition.expression) + '</pre>';
       if (mainCondition.fields && mainCondition.fields.length) {
-        html += '<div class="mt-1"><span class="badge badge-secondary mr-1">Fields</span> ';
+        html += '<div class="mt-1"><span class="badge text-bg-secondary me-1">Fields</span> ';
         mainCondition.fields.forEach((f) => { html += '<span class="field-chip">[' + escapeHtml(f.entityId) + ']</span> '; });
         html += '</div></div>';
       } else html += '</div>';
@@ -3772,7 +4413,7 @@ function initializeGenerateFromBRRule() {
         html += '<span class="milestone-badge">' + escapeHtml(ms || 'Milestone') + '</span>';
         html += '<pre class="mb-1 mt-1 small" style="white-space: pre-wrap;">' + escapeHtml(ac.value) + '</pre>';
         if (ac.fields && ac.fields.length) {
-          html += '<div><span class="badge badge-secondary mr-1">Fields</span> ';
+          html += '<div><span class="badge text-bg-secondary me-1">Fields</span> ';
           ac.fields.forEach((f) => { html += '<span class="field-chip">[' + escapeHtml(f.entityId) + ']</span> '; });
           html += '</div>';
         }
@@ -3794,6 +4435,8 @@ function initializeGenerateFromBRRule() {
   btn.addEventListener('click', () => {
     brXmlInput.value = '';
     if (brXmlFile) brXmlFile.value = '';
+    if (brConditionSnippetInput) brConditionSnippetInput.value = '';
+    if (brTool8JsonInput) brTool8JsonInput.value = '';
     lastParsed = null;
     brExtractStatus.textContent = '';
     brExtractResults.style.display = 'none';
@@ -3801,7 +4444,7 @@ function initializeGenerateFromBRRule() {
     showBsModal(modal);
   });
 
-  brXmlFile.addEventListener('change', (e) => {
+  if (brXmlFile) brXmlFile.addEventListener('change', (e) => {
     const f = e.target && e.target.files[0];
     if (!f) return;
     const r = new FileReader();
@@ -3812,51 +4455,215 @@ function initializeGenerateFromBRRule() {
   });
 
   brExtractBtn.addEventListener('click', () => {
-    const xml = getXmlText();
-    if (!xml) {
-      brExtractStatus.textContent = 'Paste or upload BR XML first.';
-      brExtractResults.style.display = 'none';
-      brCreateTestBtn.disabled = true;
-      return;
-    }
     if (!window.brRuleParser) {
       brExtractStatus.textContent = 'BR parser not loaded.';
       return;
     }
-    lastParsed = window.brRuleParser.parseBRXml(xml);
+
+    let tabHref = getActiveBrTabHref();
+    const xmlText = getXmlText();
+    const snippetText = brConditionSnippetInput ? String(brConditionSnippetInput.value).trim() : '';
+    const tool8Text = brTool8JsonInput ? String(brTool8JsonInput.value).trim() : '';
+    const xmlTab = tabHref === '#brPasteTab' || tabHref === '#brUploadTab' || tabHref === '';
+    if (xmlTab && !xmlText && snippetText) {
+      tabHref = '#brConditionTab';
+    } else if (xmlTab && !xmlText && !snippetText && tool8Text) {
+      tabHref = '#brTool8Tab';
+    }
+
+    if (tabHref === '#brConditionTab') {
+      const snippet = snippetText;
+      if (!snippet) {
+        brExtractStatus.textContent = 'Paste the VB condition (If … Then Fail …) first.';
+        brExtractResults.style.display = 'none';
+        brCreateTestBtn.disabled = true;
+        return;
+      }
+      if (!window.brRuleParser.parseBRConditionSnippet) {
+        brExtractStatus.textContent = 'BR parser missing parseBRConditionSnippet; refresh the page.';
+        brCreateTestBtn.disabled = true;
+        return;
+      }
+      lastParsed = window.brRuleParser.parseBRConditionSnippet(snippet);
+    } else if (tabHref === '#brTool8Tab') {
+      const jsonText = tool8Text;
+      if (!jsonText) {
+        brExtractStatus.textContent = 'Paste Tool 8 JSON or VB field logic here, then Extract.';
+        brExtractResults.style.display = 'none';
+        brCreateTestBtn.disabled = true;
+        return;
+      }
+      if (!window.tool8FieldMatrix || !window.tool8FieldMatrix.parseTool8FieldMatrixJson) {
+        brExtractStatus.textContent = 'Tool 8 helper not loaded; refresh the page.';
+        brExtractResults.style.display = 'none';
+        brCreateTestBtn.disabled = true;
+        return;
+      }
+      const trimmedT8 = jsonText.trim();
+      const looksLikeTool8JsonArray =
+        trimmedT8.startsWith('[') && (/^\[\s*\{/.test(trimmedT8) || /^\[\s*"/.test(trimmedT8));
+      const t8 = window.tool8FieldMatrix.parseTool8FieldMatrixJson(jsonText);
+      if (!t8.error) {
+        lastParsed = {
+          rule: { name: 'Tool 8 (Alchemist) field matrix', ruleType: 'Tool8FieldMatrix', status: '' },
+          mainCondition: null,
+          advancedConditions: [
+            {
+              value: 'JSON matrix — ' + t8.items.length + ' field row(s) (see Tool 8 → Transform XML)',
+              milestone: null,
+              fields: t8.items.map((it) => ({
+                entityId: window.tool8FieldMatrix.stripBrackets(it.FieldID),
+                entityUid: it.Label || '',
+              })),
+            },
+          ],
+          requiredFields: [],
+          _tool8Matrix: t8,
+        };
+      } else {
+        const vbIds = window.brRuleParser.extractFieldIdsFromConditionText
+          ? window.brRuleParser.extractFieldIdsFromConditionText(jsonText)
+          : [];
+        if (!looksLikeTool8JsonArray && vbIds.length > 0 && window.brRuleParser.parseBRConditionSnippet) {
+          lastParsed = window.brRuleParser.parseBRConditionSnippet(jsonText);
+          if (lastParsed.error) {
+            lastParsed = { error: lastParsed.error + ' (input is not Tool 8 JSON: ' + t8.error + ')' };
+          }
+        } else {
+          lastParsed = {
+            error:
+              t8.error +
+              (looksLikeTool8JsonArray
+                ? ''
+                : ' Tip: paste VB with [FieldID] references in this tab or use **VB condition only**.'),
+          };
+        }
+      }
+    } else {
+      const xml = xmlText;
+      if (!xml) {
+        brExtractStatus.textContent = 'Paste or upload BR XML first (or switch to VB / Tool 8 tab).';
+        brExtractResults.style.display = 'none';
+        brCreateTestBtn.disabled = true;
+        return;
+      }
+      lastParsed = window.brRuleParser.parseBRXml(xml);
+    }
+
     brExtractResults.style.display = 'block';
     renderExtract(lastParsed);
-    const hasAdvanced = lastParsed && !lastParsed.error && lastParsed.advancedConditions && lastParsed.advancedConditions.length > 0;
+    const hasAdvanced =
+      lastParsed &&
+      !lastParsed.error &&
+      lastParsed.advancedConditions &&
+      lastParsed.advancedConditions.length > 0;
     brCreateTestBtn.disabled = !hasAdvanced;
-    brExtractStatus.textContent = lastParsed.error
-      ? lastParsed.error
-      : (lastParsed.advancedConditions ? lastParsed.advancedConditions.length : 0) + ' advanced condition(s), ' +
-        (lastParsed.requiredFields ? lastParsed.requiredFields.length : 0) + ' required field(s)';
+    if (lastParsed && lastParsed._tool8Matrix) {
+      brExtractStatus.textContent =
+        lastParsed._tool8Matrix.items.length + ' Tool 8 field row(s), ' +
+        (lastParsed._tool8Matrix.fieldIds ? lastParsed._tool8Matrix.fieldIds.length : 0) +
+        ' unique field id(s)';
+    } else {
+      brExtractStatus.textContent = lastParsed.error
+        ? lastParsed.error
+        : (lastParsed.advancedConditions ? lastParsed.advancedConditions.length : 0) + ' advanced condition(s), ' +
+          (lastParsed.requiredFields ? lastParsed.requiredFields.length : 0) + ' required field(s)';
+    }
   });
 
-  brCreateTestBtn.addEventListener('click', () => {
-    if (!lastParsed || lastParsed.error || !window.brRuleParser) return;
-    const result = window.brRuleParser.generateUnitTestFromBRRule(lastParsed);
+  brCreateTestBtn.addEventListener('click', async () => {
+    if (!lastParsed || lastParsed.error) return;
+
+    let metaLookup = {};
+    try {
+      metaLookup = await buildEncompassFieldMetadataLookupForUnitTests();
+    } catch (_) {
+      /* continue without API labels */
+    }
+
+    let result;
+    let sourceName;
+    let calcExpr;
+    let desc;
+
+    if (lastParsed._tool8Matrix && window.tool8FieldMatrix) {
+      result = window.tool8FieldMatrix.generateUnitTestFromTool8FieldMatrix(lastParsed._tool8Matrix, {
+        fieldMetadataLookup: metaLookup,
+      });
+      sourceName = 'Generated: Tool 8 (Alchemist) matrix';
+      calcExpr = '';
+      desc = 'Tool 8 (Alchemist) field matrix';
+    } else {
+      if (!window.brRuleParser) return;
+      result = window.brRuleParser.generateUnitTestFromBRRule(lastParsed, { fieldMetadataLookup: metaLookup });
+      sourceName = 'Generated: BR ' + (lastParsed.rule ? lastParsed.rule.name || lastParsed.rule.ruleType : 'Rule');
+      const firstAdv = lastParsed.advancedConditions && lastParsed.advancedConditions[0];
+      calcExpr = lastParsed.mainCondition
+        ? lastParsed.mainCondition.expression
+        : firstAdv && firstAdv.value
+          ? firstAdv.value
+          : '';
+      desc = 'BR Rule: ' + (lastParsed.rule ? lastParsed.rule.name : '');
+    }
+
     if (!result || !result.rows || result.rows.length === 0) {
-      showToast('No test rows generated (need advanced conditions)', 'warning');
+      showToast('No test rows generated', 'warning');
       return;
     }
-    const sourceName = 'Generated: BR ' + (lastParsed.rule ? lastParsed.rule.name || lastParsed.rule.ruleType : 'Rule');
-    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, sourceName, null, {
+    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, sourceName, metaLookup, {
       fieldId: '',
-      calculation: lastParsed.mainCondition ? lastParsed.mainCondition.expression : '',
-      description: 'BR Rule: ' + (lastParsed.rule ? lastParsed.rule.name : ''),
+      calculation: calcExpr,
+      description: desc,
     });
     hideBsModal(modal);
-    showToast('Unit test generated from BR rule', 'success');
+    showToast('Unit test generated', 'success');
   });
+
+  if (brSaveToServerBtn) {
+    brSaveToServerBtn.addEventListener('click', async () => {
+      const tabHref = getActiveBrTabHref();
+      let sourceFormat;
+      let body;
+      let originalName;
+      if (tabHref === '#brConditionTab') {
+        body = brConditionSnippetInput ? String(brConditionSnippetInput.value).trim() : '';
+        sourceFormat = 'encompass_br_vb_snippet';
+        originalName = 'vb-condition.txt';
+      } else if (tabHref === '#brTool8Tab') {
+        body = brTool8JsonInput ? String(brTool8JsonInput.value).trim() : '';
+        sourceFormat = 'tool8_field_matrix_json';
+        originalName = 'tool8-field-matrix.json';
+      } else {
+        body = getXmlText();
+        sourceFormat = 'encompass_br_xml';
+        originalName = 'business-rule.xml';
+      }
+      if (!body) {
+        showToast('Nothing to save on this tab', 'warning');
+        return;
+      }
+      try {
+        const res = await fetch('/api/unit-tests/br-rules', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sourceFormat, body, originalName }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || data.message || 'Save failed');
+        await loadBrRuleLibrary();
+        showToast('Saved to BR library', 'success');
+      } catch (err) {
+        showToast(err.message || 'Save failed', 'err');
+      }
+    });
+  }
 }
 
 function initializeSectionSidebar() {
   const nav = document.getElementById('sectionSidebarNav');
   if (!nav) return;
 
-  // On load: hide all section cards and collapse all sections (nothing visible until sidebar is used)
+  // On load: hide section cards and collapse; then open Unit Test Data so status, welcome, and upload are visible
   var sectionIds = ['collapseAIAssistant', 'collapseTestLibrary', 'collapseOverallSignOff', 'collapseTestScenarios', 'collapseSelectedField', 'collapseTestGrid', 'collapseUnitTestData'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
@@ -3918,6 +4725,25 @@ function initializeSectionSidebar() {
       updateSectionSidebarActiveState(id, false);
     });
   });
+
+  var utdId = 'collapseUnitTestData';
+  var utdEl = document.getElementById(utdId);
+  var utdCard = getSectionCardForCollapse(utdId);
+  if (utdCard) utdCard.classList.remove('section-card-hidden');
+  if (utdEl) {
+    updateSectionHeaderState(utdId, true);
+    bsCollapseShow(utdEl);
+  }
+  updateSectionSidebarActiveState(utdId, true);
+
+  document.querySelectorAll('.section-card-header[role="button"]').forEach((h) => {
+    h.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        h.click();
+      }
+    });
+  });
 }
 
 // Initialize grid on load
@@ -3927,10 +4753,19 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeScanSetFields();
   initializeGenerateFromCustomField();
   initializeGenerateFromBRRule();
+  initializeScenarioBuilderApplyControls();
   initializeSectionSidebar();
+  const welcomeUploadBtn = document.getElementById('welcomeUploadBtn');
+  welcomeUploadBtn?.addEventListener('click', () => fileInput?.click());
   updateLoanGuidChipDisplay(currentLoanGuid);
   renderRecentRunsSelect();
   loadTestLibrary();
+  loadBrRuleLibrary();
+  if (typeof window !== 'undefined') {
+    window.addEventListener('encompassEnvChanged', () => {
+      _hubFieldListsCache = null;
+    });
+  }
   if (failFirstBtn) {
     failFirstBtn.disabled = true;
   }

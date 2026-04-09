@@ -35,6 +35,12 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/unit-tests/files/:id` | Download unit test file |
 | DELETE | `/api/unit-tests/files/:id` | Delete unit test file from library |
 | GET | `/api/unit-tests/search` | Search tests by field ID (query: fieldId) |
+| GET | `/api/unit-tests/br-rules/search` | Search saved BR / Tool 8 payloads by field ID |
+| GET | `/api/unit-tests/br-rules` | List saved business rules (XML, VB snippet, Tool 8 JSON) |
+| POST | `/api/unit-tests/br-rules/file` | Upload `.xml` / `.json` / `.txt` (multipart field `file`) |
+| POST | `/api/unit-tests/br-rules` | Save pasted body JSON: `{ sourceFormat, body, originalName? }` — formats: `encompass_br_xml`, `tool8_field_matrix_json`, `encompass_br_vb_snippet` |
+| GET | `/api/unit-tests/br-rules/:id` | Get one rule (JSON including `body_text`) |
+| DELETE | `/api/unit-tests/br-rules/:id` | Delete saved rule |
 | POST | `/api/unit-tests/executions` | Save test execution |
 | GET | `/api/unit-tests/executions` | Get executions (by fileName) |
 | GET | `/api/unit-tests/executions/all` | All executions |

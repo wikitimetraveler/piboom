@@ -830,6 +830,23 @@ export async function createTables() {
       END $$
     `);
 
+    // Encompass BR XML, Tool 8 (Alchemist) field-matrix JSON, or VB snippets — shared library for unit tests page
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS br_rule_files (
+        id SERIAL PRIMARY KEY,
+        file_name VARCHAR(255) NOT NULL UNIQUE,
+        original_name VARCHAR(512),
+        source_format VARCHAR(64) NOT NULL,
+        display_name VARCHAR(512),
+        field_ids JSONB DEFAULT '[]',
+        body_text TEXT NOT NULL,
+        uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_br_rule_files_field_ids ON br_rule_files USING GIN (field_ids)
+    `);
+
     await pool.query(`
       CREATE TABLE IF NOT EXISTS processor_assignment_tool_config (
         encompass_env VARCHAR(32) PRIMARY KEY,
@@ -838,7 +855,7 @@ export async function createTables() {
       )
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, and processor assignment tool config)');
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, br_rule_files, and processor assignment tool config)');
     
     // Migrate existing Grateful Dead data to new structure (run in background)
     migrateGratefulDeadData().catch(error => {

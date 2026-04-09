@@ -21,53 +21,13 @@ let fieldCTypes = {};
 let fieldCalendars = {};
 let lastMethod = null;
 
-// Dictionary of test values for Encompass fields
-const encompassFieldTestValues = {
-    // Loan Type Fields
-    "1172": "FHA", // Trans Details Loan Type
-    "CX.TYPE": "Purchase", // Loan Category
-    "MORNET.X67": "FHA Full Doc", // Fannie Mae Loan Doc Type Code
-    
-    // Property Type Fields
-    "CX.PROPERTY.TYPE": "Condo", // Property Type Master
-    "CX.PROPERTY.STATUS": "Existing", // Property Status
-    
-    // Appraisal Fields
-    "CX.IS.APPRAISALWAIVERUSED": "N", // Appraisal Waiver Used
-    "CX.APPRAISAL.TYPE": "Full", // Appraisal Type
-    
-    // Milestone Date Fields
-    "Log.MS.Date.Underwriting": "2020-01-15",
-    "@Log.MS.Date.Underwriting": "2020-01-15",
-    "Log.MS.Date.Processing": "2019-12-15",
-    "@Log.MS.Date.Processing": "2019-12-15",
-    "Log.MS.Date.Closing": "2020-02-15",
-    "@Log.MS.Date.Closing": "2020-02-15",
-    
-    // Borrower Fields
-    "CX.BORROWER.COUNT": "1",
-    "CX.BORROWER.1.CREDIT.SCORE": "720",
-    "CX.BORROWER.1.OCCUPANCY": "Primary",
-    
-    // Loan Amount Fields
-    "CX.LOAN.AMOUNT": "250000",
-    "CX.MAX.LOAN.AMOUNT": "300000",
-    
-    // Rate Fields
-    "CX.INTEREST.RATE": "3.5",
-    "CX.MIP.RATE": "0.85",
-    
-    // Channel Fields
-    "CX.CHANNEL": "Brokered",
-    
-    // Program Fields
-    "CX.PROGRAM": "Standard",
-    
-    // Default values for unknown fields
-    "DEFAULT_STRING": "N",
-    "DEFAULT_DATE": "2020-01-15",
-    "DEFAULT_NUMBER": "0"
-};
+// Dictionary of test values (shared: /shared/encompassFieldTestValues.js → window.encompassFieldTestValuesMap)
+const encompassFieldTestValues =
+    (typeof window !== 'undefined' && window.encompassFieldTestValuesMap) ? window.encompassFieldTestValuesMap : {
+        DEFAULT_STRING: 'N',
+        DEFAULT_DATE: '2020-01-15',
+        DEFAULT_NUMBER: '0',
+    };
 
 // Initialize when document is ready
 document.addEventListener('DOMContentLoaded', function() {

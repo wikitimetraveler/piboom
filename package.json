@@ -19,7 +19,8 @@
     "install-pi-deps": "sudo apt update && sudo apt install -y sox alsa-utils espeak-ng mpg123",
     "generate-gd-kml": "node scripts/generate-grateful-dead-kml.js",
     "refresh-disasters": "node scripts/refresh-disasters.js",
-    "extract:asset-qualifier": "node scripts/extract-asset-qualifier.js \"data/30 Retail Lending - Asset Qualifier Calculator, August 10, 2022.xlsx\" > data/asset-qualifier.json"
+    "extract:asset-qualifier": "node scripts/extract-asset-qualifier.js \"data/30 Retail Lending - Asset Qualifier Calculator, August 10, 2022.xlsx\" > data/asset-qualifier.json",
+    "mcp:encompass": "node mcp/devconnect-encompass/server.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",
@@ -27,6 +28,7 @@
     "@langchain/community": "^1.1.22",
     "@langchain/core": "^1.1.30",
     "@langchain/openai": "^1.2.12",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@xmldom/xmldom": "^0.8.11",
     "axios": "^1.6.0",
     "bcryptjs": "^3.0.3",
@@ -42,7 +44,8 @@
     "pg": "^8.16.3",
     "play-sound": "^1.1.6",
     "socket.io": "^4.7.5",
-    "spotify-web-api-node": "^5.0.2"
+    "spotify-web-api-node": "^5.0.2",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

@@ -141,16 +141,64 @@ export function composeComplexityScores({ mode, rulesScore, aiPoints, maxPoints 
   return score;
 }
 
+export function currentProcessorFromFields(fields) {
+  const id = processorIdFromFields(fields);
+  const name = fields['Loan.LoanProcessorName'] ?? fields['Loan.LoanProcessorname'] ?? null;
+  return {
+    currentProcessorId: id != null && `${id}`.trim() !== '' ? `${id}`.trim() : null,
+    currentProcessorName: name != null && `${name}`.trim() !== '' ? `${name}`.trim() : null,
+  };
+}
+
 function resultRowBase(row) {
+  const cur = currentProcessorFromFields(row.fields || {});
   return {
     loanNumber: row.number,
     borrowerName: row.borrowerName,
+    currentProcessorId: cur.currentProcessorId,
+    currentProcessorName: cur.currentProcessorName,
     score: row.score,
     rulesScore: row.rulesScore,
     aiPoints: row.aiPoints,
     aiRationale: row.aiRationale,
     ruleHits: row.ruleHits,
   };
+}
+
+/**
+ * Single loan complexity (rules / AI / both) — shared by capacity accounting and candidate scoring.
+ */
+async function computeComplexityForFields(fields, {
+  complexityMode,
+  complexityRules,
+  complexityMaxPoints,
+  complexityAiModel,
+}) {
+  const ruleCap = complexityMode === 'both' ? null : complexityMaxPoints;
+  let rulesScore = 0;
+  let ruleHits = [];
+  if (complexityMode !== 'ai') {
+    const r = scoreLoanWithRules(fields, complexityRules, { maxPoints: ruleCap });
+    rulesScore = r.score;
+    ruleHits = r.ruleHits;
+  }
+
+  let aiPoints = null;
+  let aiRationale = null;
+  if (complexityMode === 'ai' || complexityMode === 'both') {
+    const ai = await scoreLoanComplexityWithAi(fields, { model: complexityAiModel });
+    aiPoints = ai.points;
+    aiRationale = ai.rationale;
+  }
+
+  const score = composeComplexityScores({
+    mode: complexityMode,
+    rulesScore,
+    aiPoints: aiPoints ?? 0,
+    maxPoints: complexityMaxPoints,
+  });
+
+  return { score, rulesScore, ruleHits, aiPoints, aiRationale };
 }
 
 /**
@@ -236,15 +284,35 @@ export async function runProcessorAssignment(body) {
     usedPoints[`${p.userId}`] = 0;
   });
 
+  const scoringCtx = {
+    complexityMode,
+    complexityRules,
+    complexityMaxPoints,
+    complexityAiModel,
+  };
+
+  const scoreCache = new Map();
+  async function scoreLoanOnce(loan) {
+    const guid = loanGuidFromItem(loan);
+    const key = guid && `${guid}`.trim() !== '' ? `${guid}`.trim() : null;
+    const fields = loanFieldsFromItem(loan);
+    const cacheKey = key || `noguid:${fields['Loan.LoanNumber'] ?? ''}:${fields['Loan.BorrowerName'] ?? ''}`;
+    if (scoreCache.has(cacheKey)) {
+      return scoreCache.get(cacheKey);
+    }
+    const computed = await computeComplexityForFields(fields, scoringCtx);
+    const packed = { ...computed, fields };
+    scoreCache.set(cacheKey, packed);
+    return packed;
+  }
+
   for (const loan of loans) {
     const fields = loanFieldsFromItem(loan);
     const procId = processorIdFromFields(fields);
     const match = processors.find((x) => `${x.userId}` === `${procId}`);
     if (match) {
-      const { score: rulePts } = scoreLoanWithRules(fields, complexityRules, {
-        maxPoints: complexityMaxPoints,
-      });
-      usedPoints[`${match.userId}`] += rulePts;
+      const { score: pts } = await scoreLoanOnce(loan);
+      usedPoints[`${match.userId}`] += pts;
     }
   }
 
@@ -264,30 +332,13 @@ export async function runProcessorAssignment(body) {
     const number = fields['Loan.LoanNumber'] ?? null;
     const borrowerName = fields['Loan.BorrowerName'] ?? null;
 
-    const ruleCap =
-      complexityMode === 'both' ? null : complexityMaxPoints;
-    let rulesScore = 0;
-    let ruleHits = [];
-    if (complexityMode !== 'ai') {
-      const r = scoreLoanWithRules(fields, complexityRules, { maxPoints: ruleCap });
-      rulesScore = r.score;
-      ruleHits = r.ruleHits;
-    }
-
-    let aiPoints = null;
-    let aiRationale = null;
-    if (complexityMode === 'ai' || complexityMode === 'both') {
-      const ai = await scoreLoanComplexityWithAi(fields, { model: complexityAiModel });
-      aiPoints = ai.points;
-      aiRationale = ai.rationale;
-    }
-
-    const score = composeComplexityScores({
-      mode: complexityMode,
+    const {
+      score,
       rulesScore,
-      aiPoints: aiPoints ?? 0,
-      maxPoints: complexityMaxPoints,
-    });
+      ruleHits,
+      aiPoints,
+      aiRationale,
+    } = await scoreLoanOnce(loan);
 
     scored.push({
       loan,
@@ -408,7 +459,10 @@ export async function runProcessorAssignment(body) {
   return {
     dryRun: Boolean(dryRun),
     complexityMode,
-    usedPointsBasis: 'rules',
+    usedPointsBasis:
+      complexityMode === 'rules'
+        ? 'rules'
+        : 'rules_plus_ai_cached_per_loan',
     usedPoints,
     processorRemaining,
     summary,

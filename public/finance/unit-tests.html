@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Unit Tests - Excel Viewer</title>
+    <title>Excel Unit Tests — Worksheets</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
@@ -242,7 +242,7 @@
         line-height: 1.6;
       }
 
-      .file-info-display .badge {
+      .file-info-display .badge:not([class*='text-bg-']) {
         font-size: 0.75rem;
         padding: 0.25rem 0.5rem;
         font-weight: 600;
@@ -252,7 +252,7 @@
         cursor: help;
       }
 
-      .file-info-display .badge:hover {
+      .file-info-display .badge:not([class*='text-bg-']):hover {
         background-color: rgba(74, 144, 164, 0.15);
         border-color: var(--zen-primary);
       }
@@ -702,46 +702,11 @@
         border: 1px solid rgba(46, 204, 113, 0.3);
       }
 
-      /* Brief disappearing toast */
-      .unit-tests-toast {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        padding: 0.6rem 1rem;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        font-weight: 500;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        z-index: 9999;
-        opacity: 0;
-        transform: translateY(10px);
-        transition: opacity 0.25s ease, transform 0.25s ease;
-        pointer-events: none;
-      }
+      /* Toasts: use /shared/toast.js (sharedToastContainer) */
 
-      .unit-tests-toast.show {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .unit-tests-toast.success {
-        background: rgba(46, 204, 113, 0.95);
-        color: #fff;
-      }
-
-      .unit-tests-toast.warning {
-        background: rgba(255, 193, 7, 0.95);
-        color: #1a2856;
-      }
-
-      .unit-tests-toast.error {
-        background: rgba(231, 76, 60, 0.95);
-        color: #fff;
-      }
-
-      .unit-tests-toast.info {
-        background: rgba(74, 144, 164, 0.95);
-        color: #fff;
+      .unit-tests-welcome {
+        border-color: var(--zen-border) !important;
+        background: var(--zen-card-bg) !important;
       }
 
       /* Context menu for scenario cards */
@@ -1778,7 +1743,7 @@
       body.unit-tests-night-theme .file-upload-area h5{color:#f9fafb!important}
       body.unit-tests-night-theme .run-summary-card{background:#4b5563!important;border-color:rgba(255,255,255,0.15)!important}
       body.unit-tests-night-theme .unit-test-data-header{background:#4b5563!important;border-color:rgba(255,255,255,0.1)!important}
-      body.unit-tests-night-theme .badge-light{background:#6b7280!important;color:#f9fafb!important;border-color:#9ca3af!important}
+      body.unit-tests-night-theme .text-bg-secondary{background:#6b7280!important;color:#f9fafb!important;border:1px solid #9ca3af!important}
       body.unit-tests-night-theme .scenario-builder-grid th{background:#6b7280!important;color:#f9fafb!important}
       body.unit-tests-night-theme .scenario-builder-result-display{background:rgba(255,255,255,0.08)!important;color:#f3f4f6!important}
       body.unit-tests-night-theme .section-sidebar{background:#4b5563!important;border-color:#6b7280!important}
@@ -1827,41 +1792,67 @@
           </ul>
         </div>
 
-        <!-- Excel Unit Tests - always visible title + action buttons -->
-        <div class="d-flex justify-content-between align-items-center py-2 flex-wrap">
-          <h5 class="mb-0 font-weight-600"><i class="bi-file-earmark-spreadsheet me-2"></i>Excel Unit Tests</h5>
-          <div class="d-flex flex-wrap" style="gap: 0.5rem;">
+        <!-- Excel Unit Tests - title + grouped actions (Load / Generate / Tools) -->
+        <div class="d-flex justify-content-between align-items-center py-2 flex-wrap gap-2">
+          <h5 class="mb-0 fw-semibold"><i class="bi-file-earmark-spreadsheet me-2"></i>Excel Unit Tests</h5>
+          <div class="d-flex flex-wrap align-items-center gap-2">
             <div class="file-input-wrapper">
-              <button class="btn btn-primary btn-sm" id="uploadBtn">
-                <i class="bi-upload"></i> Upload Excel File
+              <button type="button" class="btn btn-primary btn-sm" id="uploadBtn">
+                <i class="bi-upload me-1"></i>Upload Excel
               </button>
               <input type="file" id="fileInput" accept=".xlsx" style="display: none;" />
             </div>
-            <button class="btn btn-outline-secondary btn-sm" id="uploadToLibraryBtn" title="Save Excel file to Test Library for later use">
-              <i class="bi-folder-plus"></i> Save to Library
-            </button>
             <input type="file" id="libraryFileInput" accept=".xlsx" style="display: none;" />
-            <button class="btn btn-outline-primary btn-sm" id="exportCsvBtn" style="display: none;">
-              <i class="bi-download"></i> Export CSV
-            </button>
-            <button class="btn btn-outline-primary btn-sm" id="exportExcelBtn" style="display: none;">
-              <i class="bi-file-earmark-excel"></i> Export Excel
-            </button>
-            <button class="btn btn-outline-secondary btn-sm" id="clearAndReloadBtn" style="display: none;" title="Clear current data and reload a new spreadsheet">
-              <i class="bi-x-circle"></i> Clear & Reload
-            </button>
-            <button class="btn btn-outline-secondary btn-sm voice-help-toggle" id="toggleVoiceHelp">
-              <i class="bi-mic"></i> Voice Guide
-            </button>
-            <button class="btn btn-outline-primary btn-sm" id="generateFromCustomFieldBtn" title="Generate unit test from an Encompass custom field with a calculation">
-              <i class="bi-magic"></i> Generate from Custom Field
-            </button>
-            <button class="btn btn-outline-primary btn-sm" id="generateFromBRRuleBtn" title="Generate unit test from Encompass BR XML (advanced conditions, milestones)">
-              <i class="bi-diagram-3"></i> Generate from BR Rule
-            </button>
-            <button class="btn btn-warning btn-sm scan-set-fields-btn" id="scanSetFieldsBtn" style="display: none;" title="Scan SET rows for read-only or calculated fields that will fail if not addressed">
-              <i class="bi-exclamation-triangle"></i> Scan SET Fields
-            </button>
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="heroLoadDropdownBtn">Load</button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="heroLoadDropdownBtn">
+                <li>
+                  <button type="button" class="dropdown-item" id="uploadToLibraryBtn" title="Save Excel file to Test Library for later use">
+                    <i class="bi-folder-plus me-2"></i>Save to Library
+                  </button>
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li id="heroExportCsvLi" class="d-none">
+                  <button type="button" class="dropdown-item" id="exportCsvBtn"><i class="bi-download me-2"></i>Export CSV</button>
+                </li>
+                <li id="heroExportExcelLi" class="d-none">
+                  <button type="button" class="dropdown-item" id="exportExcelBtn"><i class="bi-file-earmark-excel me-2"></i>Export Excel</button>
+                </li>
+                <li id="heroClearReloadLi" class="d-none">
+                  <button type="button" class="dropdown-item" id="clearAndReloadBtn" title="Clear current data and reload a new spreadsheet">
+                    <i class="bi-x-circle me-2"></i>Clear &amp; Reload
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div class="btn-group">
+              <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="heroGenerateDropdownBtn">Generate</button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="heroGenerateDropdownBtn">
+                <li>
+                  <button type="button" class="dropdown-item" id="generateFromCustomFieldBtn" title="Generate unit test from an Encompass custom field with a calculation">
+                    <i class="bi-magic me-2"></i>From custom field
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="dropdown-item" id="generateFromBRRuleBtn" title="Generate unit test from Encompass BR XML (advanced conditions, milestones)">
+                    <i class="bi-diagram-3 me-2"></i>From BR rule
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div class="btn-group tools-dropdown">
+              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="heroToolsDropdownBtn">Tools</button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="heroToolsDropdownBtn">
+                <li>
+                  <button type="button" class="dropdown-item voice-help-toggle" id="toggleVoiceHelp"><i class="bi-mic me-2"></i>Voice guide</button>
+                </li>
+                <li id="heroScanSetLi" class="d-none">
+                  <button type="button" class="dropdown-item text-warning scan-set-fields-btn" id="scanSetFieldsBtn" title="Scan SET rows for read-only or calculated fields that will fail if not addressed">
+                    <i class="bi-exclamation-triangle me-2"></i>Scan SET fields
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -1869,7 +1860,7 @@
 
     <!-- Scan SET Fields Modal -->
     <div class="modal fade" id="scanSetFieldsModal" tabindex="-1" role="dialog" aria-labelledby="scanSetFieldsModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="scanSetFieldsModalLabel">
@@ -1891,7 +1882,7 @@
 
     <!-- Generate from Custom Field Modal -->
     <div class="modal fade" id="generateFromCustomFieldModal" tabindex="-1" role="dialog" aria-labelledby="generateFromCustomFieldModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="generateFromCustomFieldModalLabel">
@@ -1936,7 +1927,7 @@
 
     <!-- Generate from BR Rule Modal -->
     <div class="modal fade" id="generateFromBRRuleModal" tabindex="-1" role="dialog" aria-labelledby="generateFromBRRuleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="generateFromBRRuleModalLabel">
@@ -1945,19 +1936,40 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p class="text-muted mb-3">
-              Paste or upload Encompass BR XML (MilestoneRules, LoanAccess, etc.). Extracts advanced conditions, associated milestones, and affected fields. Creates test scenarios from conditions.
+            <p class="text-muted mb-3" id="brRuleModalIntro">
+              Paste or upload Encompass BR XML (MilestoneRules, LoanAccess, etc.), or paste only the VB advanced condition (If … Then Fail …). Extracts fields from <code>[…]</code> references and builds the same style of test rows as full XML.
             </p>
-            <ul class="nav nav-tabs mb-3">
-              <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#brPasteTab">Paste</a></li>
-              <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#brUploadTab">Upload</a></li>
+            <ul class="nav nav-tabs mb-3" id="brRuleModalTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link active" id="brTab-paste" data-bs-toggle="tab" data-bs-target="#brPasteTab" role="tab" aria-controls="brPasteTab" aria-selected="true" tabindex="0">Paste XML</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link" id="brTab-upload" data-bs-toggle="tab" data-bs-target="#brUploadTab" role="tab" aria-controls="brUploadTab" aria-selected="false" tabindex="-1">Upload</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link" id="brTab-condition" data-bs-toggle="tab" data-bs-target="#brConditionTab" role="tab" aria-controls="brConditionTab" aria-selected="false" tabindex="-1">VB condition only</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button type="button" class="nav-link" id="brTab-tool8" data-bs-toggle="tab" data-bs-target="#brTool8Tab" role="tab" aria-controls="brTool8Tab" aria-selected="false" tabindex="-1">Tool 8 JSON</button>
+              </li>
             </ul>
             <div class="tab-content">
-              <div id="brPasteTab" class="tab-pane fade show active">
-                <textarea id="brXmlInput" class="form-control font-monospace" rows="8" placeholder="Paste BR XML here..."></textarea>
+              <div id="brPasteTab" class="tab-pane fade show active" role="tabpanel" aria-labelledby="brTab-paste">
+                <textarea id="brXmlInput" class="form-control font-monospace" rows="8" placeholder="Paste BR XML here..." aria-describedby="brRuleModalIntro"></textarea>
               </div>
-              <div id="brUploadTab" class="tab-pane fade">
-                <input type="file" id="brXmlFile" class="form-control" accept=".xml,.Xml" />
+              <div id="brUploadTab" class="tab-pane fade" role="tabpanel" aria-labelledby="brTab-upload">
+                <input type="file" id="brXmlFile" class="form-control" accept=".xml,.Xml" aria-describedby="brRuleModalIntro" />
+              </div>
+              <div id="brConditionTab" class="tab-pane fade" role="tabpanel" aria-labelledby="brTab-condition">
+                <label for="brConditionSnippetInput" class="form-label">Advanced condition (VB)</label>
+                <textarea id="brConditionSnippetInput" class="form-control font-monospace" rows="10" placeholder="If ([16] >= 2 And ([-ULDD.X160] = &quot;&quot; Or ...)) Or _&#10;    ... Then&#10;    Fail(&quot;…&quot;)&#10;End If" aria-describedby="brRuleModalIntro brConditionTabHelp"></textarea>
+                <p id="brConditionTabHelp" class="form-text small text-muted mb-0">Field columns are inferred from every <code>[FieldId]</code> in the text. Use <strong>Extract</strong> then <strong>Create Test &amp; Load</strong>.</p>
+              </div>
+              <div id="brTool8Tab" class="tab-pane fade" role="tabpanel" aria-labelledby="brTab-tool8">
+                <label for="brTool8JsonInput" class="form-label">Tool 8 JSON <span class="text-muted">or VB with <code>[FieldID]</code></span></label>
+                <p id="brTool8TabHelp" class="small text-muted">Paste the <strong>JSON array</strong> from Alchemist after <strong>Transform XML</strong>, <em>or</em> paste <strong>.NET / VB rule text</strong> here (e.g. <code>[CX.TYPE].Contains(&quot;Condo&quot;) AndAlso …</code>) — Extract will treat it like the <strong>VB condition only</strong> tab when it is not JSON.</p>
+                <textarea id="brTool8JsonInput" class="form-control font-monospace" rows="10" placeholder='JSON: [ { "FieldID": "[353]", "Label": "…" } ]  —  or VB: [CX.PROPERTY.TYPE].Contains("Condo") AndAlso …' aria-describedby="brRuleModalIntro brTool8TabHelp"></textarea>
+                <p class="form-text small text-muted mb-0">Click <strong>Extract</strong> then <strong>Create Test &amp; Load</strong>. (Dedicated VB tab is still available if you prefer.)</p>
               </div>
             </div>
             <div id="brExtractStatus" class="mt-2 small text-muted"></div>
@@ -1966,10 +1978,13 @@
               <div id="brExtractContent"></div>
             </div>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer flex-wrap gap-2">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
             <button type="button" class="btn btn-outline-primary" id="brExtractBtn">
               <i class="bi-search me-1"></i>Extract
+            </button>
+            <button type="button" class="btn btn-outline-success" id="brSaveToServerBtn" title="Save current tab content to server library (Postgres)">
+              <i class="bi-cloud-upload me-1"></i>Save to BR library
             </button>
             <button type="button" class="btn btn-primary" id="brCreateTestBtn" disabled>
               <i class="bi-plus-circle me-1"></i>Create Test & Load
@@ -1987,13 +2002,13 @@
             <nav class="section-sidebar" aria-label="Section navigation">
               <div class="section-sidebar-title">Sections</div>
               <ul class="section-sidebar-nav" id="sectionSidebarNav">
-                <li><a href="#collapseAIAssistant" data-bs-target="collapseAIAssistant" data-heading="headingAIAssistant"><i class="bi-robot"></i> AI Assistant</a></li>
-                <li><a href="#collapseTestLibrary" data-bs-target="collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
-                <li><a href="#collapseOverallSignOff" data-bs-target="collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-check2-all"></i> Test Sign-off</a></li>
-                <li><a href="#collapseTestScenarios" data-bs-target="collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-list-check"></i> Test Scenarios</a></li>
-                <li><a href="#collapseSelectedField" data-bs-target="collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-field"></i> Selected Field</a></li>
-                <li><a href="#collapseTestGrid" data-bs-target="collapseTestGrid" data-heading="headingTestGrid"><i class="bi-table"></i> Test Grid</a></li>
-                <li><a href="#collapseUnitTestData" data-bs-target="collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-database"></i> Unit Test Data</a></li>
+                <li><a href="#collapseAIAssistant" data-bs-target="#collapseAIAssistant" data-heading="headingAIAssistant"><i class="bi-robot"></i> AI Assistant</a></li>
+                <li><a href="#collapseTestLibrary" data-bs-target="#collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
+                <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-check2-all"></i> Test Sign-off</a></li>
+                <li><a href="#collapseTestScenarios" data-bs-target="#collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-list-check"></i> Test Scenarios</a></li>
+                <li><a href="#collapseSelectedField" data-bs-target="#collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-input-cursor-text"></i> Selected Field</a></li>
+                <li><a href="#collapseTestGrid" data-bs-target="#collapseTestGrid" data-heading="headingTestGrid"><i class="bi-table"></i> Test Grid</a></li>
+                <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-database"></i> Unit Test Data</a></li>
                 <li><a href="#" id="sidebarVoiceShortcuts" data-action="voice-help"><i class="bi-mic"></i> Voice Shortcuts</a></li>
               </ul>
             </nav>
@@ -2001,7 +2016,7 @@
         <!-- AI Assistant - at top for easy access -->
         <div class="col-12 mb-4 section-card-hidden" id="aiAssistantCard">
           <div class="section-card">
-            <div class="section-card-header collapsed" id="headingAIAssistant" role="button" data-bs-toggle="collapse" data-bs-target="#collapseAIAssistant" aria-expanded="false" aria-controls="collapseAIAssistant">
+            <div class="section-card-header collapsed" tabindex="0" id="headingAIAssistant" role="button" data-bs-toggle="collapse" data-bs-target="#collapseAIAssistant" aria-expanded="false" aria-controls="collapseAIAssistant">
               <span class="section-title"><i class="bi-robot"></i> Encompass Unit Testing AI Assistant</span>
               <i class="bi-chevron-down"></i>
             </div>
@@ -2040,7 +2055,7 @@
           <div class="section-cards" id="testAccordion">
             <!-- Test Library -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseTestLibrary">
-              <div class="section-card-header collapsed" id="headingTestLibrary" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestLibrary" aria-expanded="false" aria-controls="collapseTestLibrary">
+              <div class="section-card-header collapsed" tabindex="0" id="headingTestLibrary" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestLibrary" aria-expanded="false" aria-controls="collapseTestLibrary">
                 <span class="section-title"><i class="bi-folder2-open"></i> Test Library</span>
                 <i class="bi-chevron-down"></i>
               </div>
@@ -2051,9 +2066,18 @@
                         <button class="btn btn-outline-primary btn-sm" id="fieldIdSearchBtn">
                           <i class="bi-search"></i> Search
                         </button>
+                        <button class="btn btn-outline-secondary btn-sm" id="uploadBrRuleLibraryBtn" title="Upload Encompass BR XML or Tool 8 JSON from Alchemist">
+                          <i class="bi-file-earmark-code"></i> Upload BR / Tool 8
+                        </button>
+                        <input type="file" id="brRuleLibraryFileInput" accept=".xml,.json,.txt,application/xml,application/json,text/plain" style="display: none;" />
                       </div>
                       <div id="testLibraryList" class="small">
                         <p class="text-muted mb-0">Loading library...</p>
+                      </div>
+                      <h6 class="mt-3 mb-2 small text-uppercase text-muted">BR / Tool 8 library</h6>
+                      <p class="text-muted mb-2"><small>Server-stored rules (XML, VB snippet, or Tool 8 field matrix). <a href="/finance/tool8.html" target="_blank" rel="noopener">Open Alchemist (Tool 8)</a> to produce JSON.</small></p>
+                      <div id="brRuleLibraryList" class="small">
+                        <p class="text-muted mb-0">Loading…</p>
                       </div>
                       <div id="fieldSearchResults" class="mt-2" style="display: none;">
                         <hr class="my-2" />
@@ -2064,8 +2088,8 @@
             </div>
             <!-- Overall Test Sign-off -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseOverallSignOff">
-              <div class="section-card-header collapsed" id="headingOverallSignOff" role="button" data-bs-toggle="collapse" data-bs-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
-                <span class="section-title"><i class="bi-check2-all"></i> Test Sign-off <span class="badge badge-success ms-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
+              <div class="section-card-header collapsed" tabindex="0" id="headingOverallSignOff" role="button" data-bs-toggle="collapse" data-bs-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
+                <span class="section-title"><i class="bi-check2-all"></i> Test Sign-off <span class="badge text-bg-success ms-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseOverallSignOff" class="collapse section-card-body" aria-labelledby="headingOverallSignOff">
@@ -2075,8 +2099,8 @@
             </div>
             <!-- Test Scenarios -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseTestScenarios">
-              <div class="section-card-header collapsed" id="headingTestScenarios" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
-                <span class="section-title"><i class="bi-list-check"></i> Test Scenarios <span class="badge badge-primary ms-2" id="testScenariosCount"></span></span>
+              <div class="section-card-header collapsed" tabindex="0" id="headingTestScenarios" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
+                <span class="section-title"><i class="bi-list-check"></i> Test Scenarios <span class="badge text-bg-primary ms-2" id="testScenariosCount"></span></span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
@@ -2086,8 +2110,8 @@
             </div>
             <!-- Selected Field (when generated from custom field) -->
             <div class="section-card section-card-hidden" id="selectedFieldAccordionCard" data-collapse-target="collapseSelectedField" style="display: none;">
-              <div class="section-card-header collapsed" id="headingSelectedField" role="button" data-bs-toggle="collapse" data-bs-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
-                <span class="section-title"><i class="bi-field"></i> Selected Field</span>
+              <div class="section-card-header collapsed" tabindex="0" id="headingSelectedField" role="button" data-bs-toggle="collapse" data-bs-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
+                <span class="section-title"><i class="bi-input-cursor-text"></i> Selected Field</span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseSelectedField" class="collapse section-card-body" aria-labelledby="headingSelectedField">
@@ -2111,8 +2135,25 @@
                             </tbody>
                           </table>
                         </div>
+                        <div id="scenarioBuilderApplyToolbar" class="border rounded p-3 mb-3 bg-light">
+                          <h6 class="small text-uppercase text-muted mb-2"><i class="bi-arrow-down-circle me-1"></i>Push values to unit test grid</h6>
+                          <p class="small text-muted mb-2 mb-md-3">Copies each builder value into <strong>SET</strong> rows that match the field ID in <strong>Target</strong>. Pick a starting scenario column, then how many columns to fill.</p>
+                          <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                            <label for="scenarioApplyColumnSelect" class="small mb-0 text-nowrap">Start at</label>
+                            <select id="scenarioApplyColumnSelect" class="form-select form-select-sm" style="max-width: 220px" aria-label="Starting test scenario column"></select>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="How many columns to fill">
+                              <button type="button" class="btn btn-outline-primary scenario-apply-mode active" data-mode="one" title="Only the selected column">This column</button>
+                              <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="five" title="Selected column plus the next four">5 columns</button>
+                              <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="all" title="Every Test column">All</button>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-primary" id="scenarioApplyToGridBtn"><i class="bi-check2-circle me-1"></i>Apply</button>
+                          </div>
+                          <button type="button" class="btn btn-sm btn-outline-secondary" id="scenarioFillTool8Btn" title="Fill empty builder inputs using the same sample map as Alchemist (Tool 8)">
+                            <i class="bi-magic me-1"></i>Fill empty from Tool 8 samples
+                          </button>
+                        </div>
                         <div class="scenario-builder-result-wrapper">
-                          <label class="mb-1 font-weight-600"><small>Result</small></label>
+                          <label class="mb-1 fw-semibold"><small>Result</small></label>
                           <div id="scenarioBuilderResult" class="form-control-plaintext scenario-builder-result-display" readonly>—</div>
                         </div>
                       </div>
@@ -2120,8 +2161,8 @@
             </div>
             <!-- Test Grid -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseTestGrid">
-              <div class="section-card-header collapsed" id="headingTestGrid" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
-                <span class="section-title"><i class="bi-table"></i> Test Grid <span class="badge badge-info ms-2" id="testGridCount"></span></span>
+              <div class="section-card-header collapsed" tabindex="0" id="headingTestGrid" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
+                <span class="section-title"><i class="bi-table"></i> Test Grid <span class="badge text-bg-info ms-2" id="testGridCount"></span></span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseTestGrid" class="collapse section-card-body" aria-labelledby="headingTestGrid">
@@ -2137,18 +2178,29 @@
             </div>
             <!-- Unit Test Data (bottom) - collapsed by default -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseUnitTestData">
-              <div class="section-card-header collapsed" id="headingUnitTestData" role="button" data-bs-toggle="collapse" data-bs-target="#collapseUnitTestData" aria-expanded="false" aria-controls="collapseUnitTestData">
+              <div class="section-card-header collapsed" tabindex="0" id="headingUnitTestData" role="button" data-bs-toggle="collapse" data-bs-target="#collapseUnitTestData" aria-expanded="false" aria-controls="collapseUnitTestData">
                 <span class="section-title"><i class="bi-database"></i> Unit Test Data</span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseUnitTestData" class="collapse section-card-body" aria-labelledby="headingUnitTestData">
+                      <div id="unitTestsWelcomeCard" class="alert alert-light border mb-3 unit-tests-welcome" role="region" aria-label="Getting started">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                          <div>
+                            <strong class="d-block text-dark mb-1">Get started</strong>
+                            <p class="mb-0 small text-muted">Upload an Excel test, use <strong>Generate</strong> for a custom field or BR rule, or open <strong>Test Library</strong> in Sections.</p>
+                          </div>
+                          <button type="button" class="btn btn-primary btn-sm flex-shrink-0" id="welcomeUploadBtn">
+                            <i class="bi-upload me-1"></i>Upload Excel
+                          </button>
+                        </div>
+                      </div>
                       <!-- Wrapper keeps file info + action bar together so they are not overwritten by test results below -->
                       <div class="unit-test-data-header" id="unitTestDataHeader">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                           <div>
                             <div class="d-flex flex-wrap align-items-center gap-2">
                               <div id="fileInfo" class="file-info-display">No file loaded</div>
-                              <span class="badge rounded-pill badge-light" id="testGuidDisplay">No GUID</span>
+                              <span class="badge rounded-pill text-bg-secondary" id="testGuidDisplay">No GUID</span>
                             </div>
                           </div>
                           <span class="status-chip info" id="statusChip" role="status" aria-live="polite"><i class="bi-info-circle"></i> Ready</span>
@@ -2197,7 +2249,7 @@
                             <h6 class="mb-1">Last Run Summary</h6>
                             <small class="text-muted" id="runSummaryTime">Not run yet</small>
                           </div>
-                          <span class="badge badge-light" id="runSummaryCounts">0 total</span>
+                          <span class="badge text-bg-secondary" id="runSummaryCounts">0 total</span>
                         </div>
                         <div class="progress" style="height: 10px;">
                           <div class="progress-bar bg-success" id="runSummaryPassBar" role="progressbar" style="width: 0%"></div>
@@ -2285,6 +2337,8 @@
     <script src="/shared/calcEngineLibrary.js"></script>
     <script src="/shared/customFieldCalcParser.js"></script>
     <script src="/shared/brRuleParser.js"></script>
+    <script src="/shared/tool8FieldMatrix.js"></script>
+    <script src="/shared/encompassFieldTestValues.js"></script>
     <script type="module">
       import * as u from '/shared/unit-tests-utils.js';
       window.unitTestsUtils = u;

@@ -4,6 +4,7 @@ import {
   normalizeAssociatesList,
   normalizeComplexityMode,
   composeComplexityScores,
+  currentProcessorFromFields,
 } from '../../services/processor-assignment.service.js';
 
 describe('processor-assignment.service helpers', () => {
@@ -46,5 +47,20 @@ describe('processor-assignment.service helpers', () => {
     ).toBe(50);
     expect(composeComplexityScores({ mode: 'ai', rulesScore: 99, aiPoints: 12, maxPoints: null })).toBe(12);
     expect(composeComplexityScores({ mode: 'rules', rulesScore: 12, aiPoints: 99, maxPoints: null })).toBe(12);
+  });
+
+  test('currentProcessorFromFields reads Loan.LoanProcessorID and name', () => {
+    const f = currentProcessorFromFields({
+      'Loan.LoanProcessorID': 'u-1',
+      'Loan.LoanProcessorName': 'Jane P',
+    });
+    expect(f.currentProcessorId).toBe('u-1');
+    expect(f.currentProcessorName).toBe('Jane P');
+  });
+
+  test('currentProcessorFromFields returns nulls when empty', () => {
+    const f = currentProcessorFromFields({});
+    expect(f.currentProcessorId).toBeNull();
+    expect(f.currentProcessorName).toBeNull();
   });
 });
