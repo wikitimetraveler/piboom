@@ -6,7 +6,8 @@
   ==============================================================================
   
   @file       tool4.html
-  @author     David Lane
+  @author     David Lane (Developer)
+  @product    Tez Patel (Product owner)
   @version    1.0.0
   @since      2024
   
@@ -425,7 +426,6 @@
         .footer-content {
             color: var(--text-muted);
             font-size: 0.875rem;
-            animation: footerFloat 4s ease-in-out infinite;
         }
 
         @keyframes footerFloat {
@@ -435,6 +435,48 @@
 
         .footer-content strong {
             color: var(--text-dark);
+        }
+
+        .tool-product-credits-footer {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .tool-product-credits-footer .credits-block {
+            text-align: center;
+        }
+        .tool-product-credits-footer .credits-label {
+            display: block;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 0.2rem;
+        }
+        .tool-product-credits-footer .credits-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            letter-spacing: 0.02em;
+        }
+        .tool-product-credits-footer .credits-sep {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--ice-primary);
+            opacity: 0.45;
+            flex-shrink: 0;
+        }
+        .footer-meta-line {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            animation: footerFloat 4s ease-in-out infinite;
         }
 
         /* Responsive Design */
@@ -601,6 +643,9 @@
             <textarea class="form-control" id="ADOoutput" rows="8"></textarea>
         </div>
         <div class="btn-group w-100 flex-wrap">
+            <button class="btn btn-outline-primary" id="parsePastedBtn" title="Parse pasted field definition rows into JSON">
+                <i class="bi-clipboard-data"></i> Parse Pasted Content
+            </button>
             <button class="btn btn-primary" id="copyJsonBtn">Copy JSON</button>
             <button class="btn btn-success" id="copyRulesBtn">Copy Field Definitions</button>
             <button class="btn btn-outline-success" id="createFieldsBtn" title="Create fields in Encompass via API">
@@ -615,7 +660,22 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <strong>Design by David Lane</strong> - <span id="currentDate"></span> | Professional Automation Tools
+                <div class="tool-product-credits-footer" role="contentinfo" aria-label="Product credits">
+                    <div class="credits-block">
+                        <span class="credits-label">Product owner</span>
+                        <span class="credits-name">Tez Patel</span>
+                    </div>
+                    <span class="credits-sep" aria-hidden="true"></span>
+                    <div class="credits-block">
+                        <span class="credits-label">Developer</span>
+                        <span class="credits-name">David Lane</span>
+                    </div>
+                </div>
+                <div class="footer-meta-line">
+                    <span id="currentDate"></span>
+                    <span class="mx-1">·</span>
+                    <span>The Automator · DevConnect Labs Worksheets</span>
+                </div>
             </div>
         </div>
     </footer>
@@ -687,27 +747,114 @@
         };
 
         // Core functions
+        function setParserStatus(messages = [], level = 'warning') {
+            const statusEl = document.getElementById('createFieldsStatus');
+            if (!statusEl) return;
+            if (!messages.length) {
+                statusEl.style.display = 'none';
+                return;
+            }
+            statusEl.style.display = 'block';
+            statusEl.className = `mt-2 small text-${level}`;
+            statusEl.textContent = messages.join(' | ');
+        }
+
+        function parseFieldLine(line) {
+            if (!line || !line.trim()) return null;
+            const trimmed = line.trim();
+            const parts = trimmed.includes('\t')
+                ? trimmed.split('\t').map((p) => p.trim())
+                : trimmed.split(/\s{2,}/).map((p) => p.trim());
+            if (parts.length < 4) {
+                return { error: `Skipping malformed row: "${trimmed}"` };
+            }
+            return {
+                idRaw: parts[0] || '',
+                typeRaw: parts[2] || '',
+                descriptionRaw: parts[3] || '',
+            };
+        }
+
+        function normalizeType(typeRaw) {
+            const token = (typeRaw || '').trim();
+            const t = token.toLowerCase();
+
+            const stringMatch = t.match(/^string\s*\(\s*(\d+)\s*\)$/i);
+            if (stringMatch) {
+                return { format: 'string', maxLength: Number(stringMatch[1]) };
+            }
+
+            if (/^(string|text|char|varchar)$/i.test(t)) {
+                return { format: 'string' };
+            }
+
+            if (/^(integer|int|long|short)$/i.test(t)) {
+                return { format: 'integer' };
+            }
+
+            const decimalMatch = t.match(/^(decimal|number|numeric|double|float|currency|percent)\s*\(\s*(\d+)\s*(?:,\s*\d+\s*)?\)$/i);
+            if (decimalMatch) {
+                const precision = Number(decimalMatch[2]);
+                if (precision === 2) return { format: 'decimal2' };
+                if (precision === 3) return { format: 'decimal3' };
+                if (precision === 4) return { format: 'decimal4' };
+                return { format: 'decimal', warning: `Decimal precision "${precision}" mapped to decimal` };
+            }
+
+            if (/^(decimal|number|numeric|double|float|currency|percent)$/i.test(t)) {
+                return { format: 'decimal' };
+            }
+
+            if (/^(date|datetime|date\/time|time)$/i.test(t)) {
+                return { format: 'date' };
+            }
+
+            if (/^(boolean|bool|yes\/no|checkbox)$/i.test(t)) {
+                return { format: 'boolean' };
+            }
+
+            if (/^(dropdown|enum|picklist|list|phone|ssn)$/i.test(t)) {
+                return { format: 'string', warning: `Mapped "${token}" to string` };
+            }
+
+            return { format: 'string', warning: `Unknown type "${token}" mapped to string` };
+        }
+
         function generateJSON() {
             const ruleOutput = document.getElementById('ruleOutput').value;
-            if (!ruleOutput.trim()) return;
+            if (!ruleOutput.trim()) {
+                document.getElementById('ADOoutput').value = '';
+                setParserStatus([]);
+                return;
+            }
 
-            const rules = ruleOutput.trim().split('\n').map(rule => rule.split('\t'));
-            let jsonOutput = [];
+            const rows = ruleOutput.split('\n');
+            const jsonOutput = [];
+            const warnings = [];
+            const errors = [];
 
-            rules.forEach(rule => {
-                const fieldId = rule[0].replace(/[\[\]]/g, '');
-                const format = rule[2].includes('String') ? 'string' : 
-                              rule[2].includes('Integer') ? 'integer' : 
-                              rule[2].includes('Decimal') ? 'decimal' : 'string';
-                
-                const ruleCode = document.getElementById('ruleInput').value
-                    .replace(/[^a-zA-Z0-9]/g, '');
-                
+            rows.forEach((line) => {
+                const parsed = parseFieldLine(line);
+                if (!parsed) return;
+                if (parsed.error) {
+                    errors.push(parsed.error);
+                    return;
+                }
+
+                const fieldId = parsed.idRaw.replace(/[\[\]]/g, '').trim().toUpperCase();
+                if (!fieldId) {
+                    errors.push(`Skipping row with missing field id: "${line.trim()}"`);
+                    return;
+                }
+
+                const typeInfo = normalizeType(parsed.typeRaw);
+                if (typeInfo.warning) warnings.push(`${fieldId}: ${typeInfo.warning}`);
+
                 const jsonObj = {
                     id: fieldId,
-                    description: rule[3],
-                    format: format.toLowerCase(),
-                    maxLength: format === 'string' ? rule[2].match(/\d+/)?.[0] : undefined,
+                    description: parsed.descriptionRaw || '',
+                    format: typeInfo.format,
+                    maxLength: typeInfo.format === 'string' ? typeInfo.maxLength : undefined,
                     calculation: fieldId.startsWith('CX.R.') ? `IIf(false = true, "(F)","")` : ''
                 };
 
@@ -719,6 +866,11 @@
             });
 
             document.getElementById('ADOoutput').value = JSON.stringify(jsonOutput, null, 4);
+
+            const statusMessages = [];
+            if (errors.length) statusMessages.push(`${errors.length} malformed row(s) skipped`);
+            if (warnings.length) statusMessages.push(`${warnings.length} type warning(s)`);
+            setParserStatus(statusMessages, errors.length ? 'danger' : (warnings.length ? 'warning' : 'success'));
         }
 
         function generateRules() {
@@ -754,10 +906,15 @@
             const ruleInput = document.getElementById('ruleInput');
             const appendInput = document.getElementById('appendInput');
             const ineligibleAudit = document.getElementById('ineligibleAudit');
+            const ruleOutput = document.getElementById('ruleOutput');
             
             ruleInput.addEventListener('input', generateRules);
             appendInput.addEventListener('input', generateRules);
             ineligibleAudit.addEventListener('change', generateRules);
+            // Support direct paste/edit flow: regenerate JSON whenever field definitions change.
+            ruleOutput.addEventListener('input', generateJSON);
+            ruleOutput.addEventListener('paste', () => setTimeout(generateJSON, 0));
+            document.getElementById('parsePastedBtn').addEventListener('click', generateJSON);
 
             document.getElementById('copyJsonBtn').addEventListener('click', async () => {
                 await copyToClipboard(document.getElementById('ADOoutput').value);

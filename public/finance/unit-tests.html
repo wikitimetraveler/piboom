@@ -1753,6 +1753,55 @@
       body.unit-tests-night-theme .tools-dropdown .dropdown-menu,body.unit-tests-night-theme .action-dropdown .dropdown-menu{background:#4b5563!important;border:1px solid #6b7280!important}
       body.unit-tests-night-theme .tools-dropdown .dropdown-item,body.unit-tests-night-theme .action-dropdown .dropdown-item{color:#f9fafb!important}
       body.unit-tests-night-theme .tools-dropdown .dropdown-item:hover,body.unit-tests-night-theme .action-dropdown .dropdown-item:hover{background:#6b7280!important;color:#38bdf8!important}
+
+      /* Product credits — Unit Test tool */
+      .tool-product-credits {
+        font-size: 0.8125rem;
+        letter-spacing: 0.02em;
+        border-top: 1px solid var(--zen-border);
+        margin-top: 0.25rem;
+      }
+      .tool-product-credits-inner {
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.35rem 0.75rem;
+        max-width: 100%;
+      }
+      .tool-product-credits .credits-pair {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.45rem;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tool-product-credits .credits-label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+      .tool-product-credits .credits-name {
+        font-weight: 600;
+        color: var(--text-dark);
+      }
+      .tool-product-credits .credits-divider {
+        color: var(--zen-primary);
+        opacity: 0.35;
+        font-weight: 300;
+        user-select: none;
+      }
+      body.unit-tests-night-theme .tool-product-credits {
+        border-top-color: rgba(255, 255, 255, 0.12);
+      }
+      body.unit-tests-night-theme .tool-product-credits .credits-name {
+        color: #f3f4f6;
+      }
+      body.unit-tests-night-theme .tool-product-credits .credits-label {
+        color: #9ca3af;
+      }
     </style>
   </head>
   <body data-page="unit-tests">
@@ -1852,6 +1901,19 @@
                   </button>
                 </li>
               </ul>
+            </div>
+          </div>
+        </div>
+        <div class="tool-product-credits text-center py-3 px-2" role="contentinfo" aria-label="Product credits">
+          <div class="tool-product-credits-inner">
+            <div class="credits-pair">
+              <span class="credits-label">Product owner</span>
+              <span class="credits-name">Tez Patel</span>
+            </div>
+            <span class="credits-divider" aria-hidden="true">|</span>
+            <div class="credits-pair">
+              <span class="credits-label">Developer</span>
+              <span class="credits-name">David Lane</span>
             </div>
           </div>
         </div>
