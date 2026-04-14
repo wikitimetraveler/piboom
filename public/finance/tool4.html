@@ -264,75 +264,41 @@
         }
 
         .main-content {
-            padding: 2rem 0;
+            padding: 1rem 0 2rem;
         }
 
-        /* Professional Tool Cards */
-        .tool-card {
+        .main-content .container {
+            max-width: 1200px;
+        }
+
+        /* Flat panels (unit-test style: stable, no floating accordion) */
+        .automator-panel {
             background: var(--white);
             border: 1px solid var(--border-light);
             border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.25rem;
             box-shadow: var(--shadow-sm);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
             overflow: hidden;
-            animation: cardFloat 6s ease-in-out infinite;
         }
 
-        .tool-card:nth-child(odd) {
-            animation-delay: 0s;
-        }
-
-        .tool-card:nth-child(even) {
-            animation-delay: 3s;
-        }
-
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-5px) rotate(0.5deg); }
-            50% { transform: translateY(-2px) rotate(-0.5deg); }
-            75% { transform: translateY(-8px) rotate(0.3deg); }
-        }
-
-        .tool-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: var(--shadow-lg), 0 0 30px var(--ice-glow);
-            border-color: var(--ice-primary);
-            animation-play-state: paused;
-        }
-
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--ice-primary), var(--ice-secondary), var(--ice-glow));
-            transform: scaleX(0);
-            transition: transform 0.4s ease;
-        }
-
-        .tool-card:hover::before {
-            transform: scaleX(1);
-        }
-
-        .tool-card h3 {
-            color: var(--text-dark);
-            font-size: 1.5rem;
+        .automator-panel-header {
+            padding: 0.85rem 1.25rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid var(--primary-blue);
-            padding-bottom: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            background: var(--background-light);
+            border-bottom: 1px solid var(--border-light);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 0.5rem;
         }
 
-        .tool-card h3:hover {
-            color: var(--primary-blue);
+        .automator-panel-body {
+            padding: 1.25rem 1.5rem;
+        }
+
+        .automator-page-title {
+            margin-bottom: 1rem;
         }
 
         /* Professional Form Styling */
@@ -481,12 +447,8 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .tool-card {
-                padding: 1.5rem;
-            }
-            
-            .tool-card h3 {
-                font-size: 1.25rem;
+            .automator-panel-body {
+                padding: 1rem;
             }
             
             .form-label {
@@ -559,7 +521,7 @@
         }
     </style>
 </head>
-<body>
+<body data-page="automator">
     <!-- Particle effects container -->
     <div class="particles" id="particles"></div>
 
@@ -574,7 +536,7 @@
     <!-- Professional Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="tool4.html">
                 <i class="bi-lightning me-2"></i>The Automator
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -583,8 +545,8 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="../../index.html">
-                            <i class="bi-house"></i> Back to Menu
+                        <a class="nav-link" href="/index.html">
+                            <i class="bi-house me-1"></i>Back to Menu
                         </a>
                     </li>
                 </ul>
@@ -594,7 +556,7 @@
 
     <div class="main-content">
         <div class="container">
-            <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
+            <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between mb-3">
                 <div class="d-flex align-items-center mb-2 mb-lg-0 text-muted">
                     <i class="bi-grid-3x3-gap-fill text-primary me-2"></i>
                     <span class="fw-bold">Switch tools</span>
@@ -611,49 +573,99 @@
                 </ul>
             </div>
 
-            <!-- Automation Tool Card -->
-            <div class="tool-card fade-in">
-                <h3>
-                    <span><i class="bi-lightning me-2"></i>Professional Automation Tool</span>
-                </h3>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="ruleInput">Rule Name</label>
-                    <input type="text" class="form-control" id="ruleInput" maxlength="20" placeholder="Enter rule name">
+            <div class="automator-page-title">
+                <h5 class="mb-1 fw-semibold"><i class="bi-lightning-charge me-2 text-primary"></i>Tool 4 — The Automator</h5>
+                <p class="mb-0 small text-muted">Generate R/O field rows and JSON for Encompass custom fields; parse pasted definitions and push to the API when ready.</p>
+            </div>
+
+            <section class="automator-panel fade-in" aria-labelledby="automator-setup-heading">
+                <div class="automator-panel-header" id="automator-setup-heading">
+                    <i class="bi-sliders text-primary" aria-hidden="true"></i> Rule setup
                 </div>
-            </div>
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="appendInput">Description Override</label>
-                    <input type="text" class="form-control" id="appendInput" placeholder="Optional description override">
+                <div class="automator-panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="ruleInput">Rule Name</label>
+                                <input type="text" class="form-control" id="ruleInput" maxlength="20" placeholder="Enter rule name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="appendInput">Description Override</label>
+                                <input type="text" class="form-control" id="appendInput" placeholder="Optional description override">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="ineligibleAudit">
+                        <label class="form-check-label" for="ineligibleAudit">Auto Ineligible</label>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="custom-control custom-checkbox mt-2">
-            <input type="checkbox" class="custom-control-input" id="ineligibleAudit">
-            <label class="custom-control-label" for="ineligibleAudit">Auto Ineligible</label>
-        </div>
-        <div class="mb-3 mt-3">
-            <label for="ruleOutput">Field Definitions</label>
-            <textarea class="form-control" id="ruleOutput" rows="8"></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="ADOoutput">Generated JSON</label>
-            <textarea class="form-control" id="ADOoutput" rows="8"></textarea>
-        </div>
-        <div class="btn-group w-100 flex-wrap">
-            <button class="btn btn-outline-primary" id="parsePastedBtn" title="Parse pasted field definition rows into JSON">
-                <i class="bi-clipboard-data"></i> Parse Pasted Content
-            </button>
-            <button class="btn btn-primary" id="copyJsonBtn">Copy JSON</button>
-            <button class="btn btn-success" id="copyRulesBtn">Copy Field Definitions</button>
-            <button class="btn btn-outline-success" id="createFieldsBtn" title="Create fields in Encompass via API">
-                <i class="bi-cloud-upload"></i> Create Fields in Encompass
-            </button>
-        </div>
-        <div id="createFieldsStatus" class="mt-2 small" style="display: none;"></div>
-            </div>
+            </section>
+
+            <section class="automator-panel fade-in" aria-labelledby="automator-io-heading">
+                <div class="automator-panel-header" id="automator-io-heading">
+                    <i class="bi-braces text-primary" aria-hidden="true"></i> Field definitions &amp; output
+                </div>
+                <div class="automator-panel-body">
+                    <div class="p-3 border rounded bg-light mb-3">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                            <div>
+                                <div class="fw-semibold">Image Import (Vision)</div>
+                                <div class="small text-muted">Paste, upload, or capture an image to extract Encompass field rows.</div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="pasteImageBtn"><i class="bi-clipboard-image me-1"></i>Paste Image</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="uploadImageBtn"><i class="bi-upload me-1"></i>Upload</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="startCameraBtn"><i class="bi-camera-video me-1"></i>Start Camera</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="captureCameraBtn" disabled><i class="bi-camera-fill me-1"></i>Capture</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="stopCameraBtn" disabled><i class="bi-camera-video-off me-1"></i>Stop</button>
+                                <button type="button" class="btn btn-primary btn-sm" id="extractFieldsBtn" disabled><i class="bi-stars me-1"></i>Extract Fields</button>
+                            </div>
+                        </div>
+                        <input type="file" id="imageFileInput" accept="image/*" style="display:none;">
+                        <div id="imageDropZone" class="mt-2 p-2 border rounded text-center small text-muted">Drop image here or press Ctrl+V to paste.</div>
+                        <div class="row g-2 mt-2">
+                            <div class="col-md-6">
+                                <video id="cameraVideo" class="w-100 border rounded" style="display:none;max-height:240px;" autoplay playsinline></video>
+                                <canvas id="cameraCanvas" style="display:none;"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <img id="imagePreview" class="w-100 border rounded" style="display:none;max-height:240px;object-fit:contain;" alt="Imported field screenshot preview">
+                            </div>
+                        </div>
+                        <div id="imageStatus" class="small text-muted mt-2">No image loaded.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="ruleOutput">Field Definitions</label>
+                        <textarea class="form-control" id="ruleOutput" rows="8" placeholder="Tab-separated field rows appear here as you type the rule name…"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="ADOoutput">Generated JSON (New)</label>
+                        <textarea class="form-control" id="ADOoutput" rows="8" placeholder="Generated JSON appears here…"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="ADOupdateOutput">Generated JSON (Modify)</label>
+                        <textarea class="form-control" id="ADOupdateOutput" rows="6" placeholder="Modify rows JSON appears here…"></textarea>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-outline-primary" id="parsePastedBtn" title="Parse pasted field definition rows into JSON">
+                            <i class="bi-clipboard-data me-1"></i>Parse Pasted Content
+                        </button>
+                        <button type="button" class="btn btn-primary" id="copyJsonBtn">Copy JSON</button>
+                        <button type="button" class="btn btn-outline-primary" id="copyUpdateJsonBtn">Copy Update JSON</button>
+                        <button type="button" class="btn btn-success" id="copyRulesBtn">Copy Field Definitions</button>
+                        <button type="button" class="btn btn-outline-success" id="createFieldsBtn" title="Create fields in Encompass via API">
+                            <i class="bi-cloud-upload me-1"></i>Create Fields in Encompass
+                        </button>
+                        <button type="button" class="btn btn-outline-warning" id="updateFieldsBtn" title="Update existing fields in Encompass via API">
+                            <i class="bi-arrow-repeat me-1"></i>Update Fields in Encompass
+                        </button>
+                    </div>
+                    <div id="createFieldsStatus" class="mt-2 small" style="display: none;" role="status"></div>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -683,6 +695,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/shared/discovery-camera.js"></script>
 
     <!-- ICE Library -->
     <script src="https://cdn.elliemae.io/elliemae/core/ssf/1.0/elli.ssf.guest-with-polyfill.js"></script>
@@ -701,7 +714,7 @@
         // Create floating particles
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
-            const particleCount = 15;
+            const particleCount = 6;
 
             for (let i = 0; i < particleCount; i++) {
                 const particle = document.createElement('div');
@@ -768,8 +781,11 @@
             if (parts.length < 4) {
                 return { error: `Skipping malformed row: "${trimmed}"` };
             }
+            const actionRaw = (parts[1] || 'New').trim();
+            const normalizedAction = /^mod/i.test(actionRaw) ? 'modify' : 'new';
             return {
                 idRaw: parts[0] || '',
+                actionRaw: normalizedAction,
                 typeRaw: parts[2] || '',
                 descriptionRaw: parts[3] || '',
             };
@@ -777,7 +793,7 @@
 
         function normalizeType(typeRaw) {
             const token = (typeRaw || '').trim();
-            const t = token.toLowerCase();
+            const t = token.toLowerCase().replace(/_/g, '');
 
             const stringMatch = t.match(/^string\s*\(\s*(\d+)\s*\)$/i);
             if (stringMatch) {
@@ -790,6 +806,10 @@
 
             if (/^(integer|int|long|short)$/i.test(t)) {
                 return { format: 'integer' };
+            }
+
+            if (/^decimal[234]$/i.test(t)) {
+                return { format: `decimal${t.slice(-1)}` };
             }
 
             const decimalMatch = t.match(/^(decimal|number|numeric|double|float|currency|percent)\s*\(\s*(\d+)\s*(?:,\s*\d+\s*)?\)$/i);
@@ -824,12 +844,15 @@
             const ruleOutput = document.getElementById('ruleOutput').value;
             if (!ruleOutput.trim()) {
                 document.getElementById('ADOoutput').value = '';
+                document.getElementById('ADOupdateOutput').value = '';
+                document.getElementById('updateFieldsBtn').disabled = true;
                 setParserStatus([]);
                 return;
             }
 
             const rows = ruleOutput.split('\n');
             const jsonOutput = [];
+            const updateOutput = [];
             const warnings = [];
             const errors = [];
 
@@ -862,14 +885,22 @@
                     delete jsonObj.maxLength;
                 }
 
-                jsonOutput.push(jsonObj);
+                if (parsed.actionRaw === 'modify') {
+                    updateOutput.push(jsonObj);
+                } else {
+                    jsonOutput.push(jsonObj);
+                }
             });
 
             document.getElementById('ADOoutput').value = JSON.stringify(jsonOutput, null, 4);
+            document.getElementById('ADOupdateOutput').value = JSON.stringify(updateOutput, null, 4);
+            document.getElementById('updateFieldsBtn').disabled = updateOutput.length === 0;
 
             const statusMessages = [];
             if (errors.length) statusMessages.push(`${errors.length} malformed row(s) skipped`);
             if (warnings.length) statusMessages.push(`${warnings.length} type warning(s)`);
+            statusMessages.push(`${jsonOutput.length} new row(s)`);
+            statusMessages.push(`${updateOutput.length} modify row(s)`);
             setParserStatus(statusMessages, errors.length ? 'danger' : (warnings.length ? 'warning' : 'success'));
         }
 
@@ -901,12 +932,103 @@
             generateJSON();
         }
 
+        let automatorImageData = null;
+        let automatorCameraStream = null;
+
+        function setImageStatus(message, level = 'muted') {
+            const el = document.getElementById('imageStatus');
+            el.className = `small mt-2 text-${level}`;
+            el.textContent = message;
+        }
+
+        function setAutomatorImage(dataUrl) {
+            automatorImageData = dataUrl;
+            const preview = document.getElementById('imagePreview');
+            preview.src = dataUrl || '';
+            preview.style.display = dataUrl ? 'block' : 'none';
+            document.getElementById('extractFieldsBtn').disabled = !dataUrl;
+        }
+
+        async function startAutomatorCamera() {
+            if (automatorCameraStream) return;
+            try {
+                automatorCameraStream = typeof getDiscoveryCameraVideoStream === 'function'
+                    ? await getDiscoveryCameraVideoStream()
+                    : await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = automatorCameraStream;
+                video.style.display = 'block';
+                document.getElementById('captureCameraBtn').disabled = false;
+                document.getElementById('stopCameraBtn').disabled = false;
+                setImageStatus('Camera ready. Capture to use image for extraction.', 'info');
+            } catch (error) {
+                setImageStatus(`Camera error: ${error.message}`, 'danger');
+            }
+        }
+
+        function stopAutomatorCamera() {
+            if (automatorCameraStream) {
+                automatorCameraStream.getTracks().forEach((t) => t.stop());
+                automatorCameraStream = null;
+            }
+            const video = document.getElementById('cameraVideo');
+            video.srcObject = null;
+            video.style.display = 'none';
+            document.getElementById('captureCameraBtn').disabled = true;
+            document.getElementById('stopCameraBtn').disabled = true;
+        }
+
+        function captureAutomatorCamera() {
+            const video = document.getElementById('cameraVideo');
+            if (!automatorCameraStream || !video.videoWidth || !video.videoHeight) return;
+            const canvas = document.getElementById('cameraCanvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            setAutomatorImage(canvas.toDataURL('image/jpeg', 0.9));
+            setImageStatus('Camera image captured. Click Extract Fields.', 'success');
+        }
+
+        async function extractFieldsFromImage() {
+            if (!automatorImageData) {
+                setImageStatus('Load an image before extracting.', 'warning');
+                return;
+            }
+            const btn = document.getElementById('extractFieldsBtn');
+            btn.disabled = true;
+            setImageStatus('Extracting fields from image...', 'info');
+            try {
+                const res = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/automator/parse-field-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageData: automatorImageData }),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error((data.error || 'Vision request failed') + (data.details ? `: ${data.details}` : ''));
+                }
+                if (!Array.isArray(data.lines) || data.lines.length === 0) {
+                    throw new Error('No rows extracted from image');
+                }
+                document.getElementById('ruleOutput').value = data.lines.join('\n');
+                generateJSON();
+                setImageStatus(`Extracted ${data.lines.length} row(s) from image.`, 'success');
+            } catch (error) {
+                setImageStatus(`Extraction failed: ${error.message}`, 'danger');
+            } finally {
+                btn.disabled = !automatorImageData;
+            }
+        }
+
         // Event handlers
         document.addEventListener('DOMContentLoaded', function() {
             const ruleInput = document.getElementById('ruleInput');
             const appendInput = document.getElementById('appendInput');
             const ineligibleAudit = document.getElementById('ineligibleAudit');
             const ruleOutput = document.getElementById('ruleOutput');
+            const imageFileInput = document.getElementById('imageFileInput');
+            const imageDropZone = document.getElementById('imageDropZone');
             
             ruleInput.addEventListener('input', generateRules);
             appendInput.addEventListener('input', generateRules);
@@ -918,6 +1040,9 @@
 
             document.getElementById('copyJsonBtn').addEventListener('click', async () => {
                 await copyToClipboard(document.getElementById('ADOoutput').value);
+            });
+            document.getElementById('copyUpdateJsonBtn').addEventListener('click', async () => {
+                await copyToClipboard(document.getElementById('ADOupdateOutput').value);
             });
 
             document.getElementById('copyRulesBtn').addEventListener('click', async () => {
@@ -981,6 +1106,108 @@
                 }
             });
 
+            document.getElementById('updateFieldsBtn').addEventListener('click', async () => {
+                const btn = document.getElementById('updateFieldsBtn');
+                const statusEl = document.getElementById('createFieldsStatus');
+                const jsonStr = document.getElementById('ADOupdateOutput').value.trim();
+                if (!jsonStr) {
+                    statusEl.textContent = 'No modify rows detected. Set row action to Modify.';
+                    statusEl.className = 'mt-2 small text-warning';
+                    statusEl.style.display = 'block';
+                    return;
+                }
+                let fields;
+                try {
+                    fields = JSON.parse(jsonStr);
+                } catch (e) {
+                    statusEl.textContent = 'Invalid update JSON: ' + e.message;
+                    statusEl.className = 'mt-2 small text-danger';
+                    statusEl.style.display = 'block';
+                    return;
+                }
+                if (!Array.isArray(fields) || fields.length === 0) {
+                    statusEl.textContent = 'Update JSON must be a non-empty array.';
+                    statusEl.className = 'mt-2 small text-warning';
+                    statusEl.style.display = 'block';
+                    return;
+                }
+                btn.disabled = true;
+                statusEl.textContent = 'Updating fields in Encompass...';
+                statusEl.className = 'mt-2 small text-info';
+                statusEl.style.display = 'block';
+                try {
+                    const res = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/update-fields', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(fields),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        statusEl.textContent = (data.error || 'Request failed') + ': ' + (data.details || res.status);
+                        statusEl.className = 'mt-2 small text-danger';
+                        return;
+                    }
+                    const { updated, failed } = data;
+                    if (failed && failed.length > 0) {
+                        statusEl.innerHTML = `Updated ${updated} field(s). Failed: ${failed.map(f => f.id + ': ' + f.error).join('; ')}`;
+                        statusEl.className = 'mt-2 small text-warning';
+                    } else {
+                        statusEl.textContent = `Successfully updated ${updated} field(s) in Encompass.`;
+                        statusEl.className = 'mt-2 small text-success';
+                    }
+                } catch (err) {
+                    statusEl.textContent = 'Error: ' + err.message;
+                    statusEl.className = 'mt-2 small text-danger';
+                } finally {
+                    btn.disabled = false;
+                }
+            });
+
+            document.getElementById('uploadImageBtn').addEventListener('click', () => imageFileInput.click());
+            document.getElementById('pasteImageBtn').addEventListener('click', () => {
+                setImageStatus('Press Ctrl+V now to paste an image.', 'info');
+            });
+            imageFileInput.addEventListener('change', (event) => {
+                const file = event.target.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    setAutomatorImage(reader.result);
+                    setImageStatus('Image loaded from file. Click Extract Fields.', 'success');
+                };
+                reader.readAsDataURL(file);
+            });
+            imageDropZone.addEventListener('dragover', (e) => { e.preventDefault(); });
+            imageDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const file = e.dataTransfer?.files?.[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    setAutomatorImage(reader.result);
+                    setImageStatus('Image dropped. Click Extract Fields.', 'success');
+                };
+                reader.readAsDataURL(file);
+            });
+            document.addEventListener('paste', (e) => {
+                const items = Array.from(e.clipboardData?.items || []);
+                const imageItem = items.find((item) => item.type.startsWith('image/'));
+                if (!imageItem) return;
+                const file = imageItem.getAsFile();
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    setAutomatorImage(reader.result);
+                    setImageStatus('Image pasted. Click Extract Fields.', 'success');
+                };
+                reader.readAsDataURL(file);
+            });
+            document.getElementById('startCameraBtn').addEventListener('click', startAutomatorCamera);
+            document.getElementById('captureCameraBtn').addEventListener('click', captureAutomatorCamera);
+            document.getElementById('stopCameraBtn').addEventListener('click', stopAutomatorCamera);
+            document.getElementById('extractFieldsBtn').addEventListener('click', extractFieldsFromImage);
+            document.getElementById('updateFieldsBtn').disabled = true;
+
             // Add voice commands for automator
             if (typeof voiceController !== 'undefined') {
                 // Override the processCommand method to add automator-specific commands
@@ -1014,6 +1241,10 @@
                         document.getElementById('ineligibleAudit').checked = false;
                         document.getElementById('ruleOutput').value = '';
                         document.getElementById('ADOoutput').value = '';
+                        document.getElementById('ADOupdateOutput').value = '';
+                        setAutomatorImage(null);
+                        stopAutomatorCamera();
+                        setImageStatus('No image loaded.', 'muted');
                         return;
                     }
                     

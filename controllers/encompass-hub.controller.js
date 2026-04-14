@@ -7,6 +7,7 @@ import {
   fetchNativeFields,
   fetchCustomFields,
   createCustomFields,
+  updateCustomFields,
   postLoanBatchUpdateRequests,
   fetchLoanAssociates,
   assignLoanAssociate,
@@ -216,6 +217,25 @@ export async function postCreateFields(req, res) {
     console.error('Error creating Encompass custom fields:', error.message);
     return res.status(500).json({
       error: 'Failed to create Encompass custom fields',
+      details: error.message,
+    });
+  }
+}
+
+export async function postUpdateFields(req, res) {
+  try {
+    const fields = req.body;
+    if (!Array.isArray(fields) || fields.length === 0) {
+      return res.status(400).json({
+        error: 'Request body must be a non-empty array of field definitions',
+      });
+    }
+    const result = await updateCustomFields(fields);
+    return res.json(result);
+  } catch (error) {
+    console.error('Error updating Encompass custom fields:', error.message);
+    return res.status(500).json({
+      error: 'Failed to update Encompass custom fields',
       details: error.message,
     });
   }

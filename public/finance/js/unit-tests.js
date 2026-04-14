@@ -9,6 +9,7 @@ const scanSetFieldsBtn = document.getElementById('scanSetFieldsBtn');
 const clearAndReloadBtn = document.getElementById('clearAndReloadBtn');
 const runTestsBtn = document.getElementById('runTestsBtn');
 const clearBtn = document.getElementById('clearBtn');
+const fillEmptyTestNullBtn = document.getElementById('fillEmptyTestNullBtn');
 const searchInput = document.getElementById('searchInput');
 const resultsMeta = document.getElementById('resultsMeta');
 const fileInfo = document.getElementById('fileInfo');
@@ -1041,6 +1042,39 @@ function copyColumnToNext(testNumber) {
   });
   setGridRows(allData);
   return true;
+}
+
+function isCellEmptyForNullFill(val) {
+  return val === null || val === undefined || String(val).trim() === '';
+}
+
+/**
+ * Inserts the literal text "null" in empty scenario cells (Test # / Reset after Description).
+ * SET then clears the loan field; COMPARE treats it as an expected blank (see isBlankForTest).
+ */
+function fillEmptyScenarioCellsWithNull() {
+  const ordered = getOrderedTestColumns();
+  if (!ordered.length) {
+    showToast('No scenario columns found. Use a layout with Description and Test # columns.', 'warning');
+    return;
+  }
+  if (!allData || !allData.length) {
+    showToast('No rows to update', 'warning');
+    return;
+  }
+  const token = 'null';
+  let n = 0;
+  allData.forEach((row) => {
+    ordered.forEach(({ field }) => {
+      if (!field || !isCellEmptyForNullFill(row[field])) return;
+      row[field] = token;
+      n += 1;
+    });
+  });
+  if (n && gridApi) {
+    setGridRows(allData);
+  }
+  showToast(n ? `Filled ${n} empty cell(s) with null` : 'No empty scenario cells to fill', n ? 'ok' : 'info');
 }
 
 function pickTestValue(testValues) {
@@ -2354,6 +2388,7 @@ function clearData() {
   setUnitTestsWelcomeVisible(true);
   runTestsBtn.style.display = 'none';
   clearBtn.style.display = 'none';
+  if (fillEmptyTestNullBtn) fillEmptyTestNullBtn.style.display = 'none';
   testResultsContainer.style.display = 'none';
   fileInfo.textContent = 'No file loaded';
   fileInfo.innerHTML = 'No file loaded';
@@ -2496,6 +2531,7 @@ async function handleFileUpload(file) {
     setUnitTestsWelcomeVisible(false);
     runTestsBtn.style.display = 'inline-block';
     clearBtn.style.display = 'inline-block';
+    if (fillEmptyTestNullBtn) fillEmptyTestNullBtn.style.display = 'inline-block';
     if (stickyActionBar) {
       stickyActionBar.style.display = 'flex';
     }
@@ -2963,6 +2999,11 @@ clearAndReloadBtn?.addEventListener('click', (e) => {
 clearBtn.addEventListener('click', (e) => {
   e.preventDefault();
   clearData();
+});
+
+fillEmptyTestNullBtn?.addEventListener('click', (e) => {
+  e.preventDefault();
+  fillEmptyScenarioCellsWithNull();
 });
 
 loanGuidInput?.addEventListener('input', (e) => {
@@ -3742,6 +3783,7 @@ function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fiel
   setUnitTestsWelcomeVisible(false);
   runTestsBtn.style.display = 'inline-block';
   if (clearBtn) clearBtn.style.display = 'inline-block';
+  if (fillEmptyTestNullBtn) fillEmptyTestNullBtn.style.display = 'inline-block';
   if (stickyActionBar) stickyActionBar.style.display = 'flex';
 
   const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');

@@ -762,22 +762,26 @@ export async function fetchCustomFields() {
 }
 
 /**
- * Create or update custom fields in Encompass via the settings API.
+ * Patch loan custom field definitions (add or update) via Encompass settings API.
  * Passes payload exactly as received - no transformation.
- * Uses: PATCH /encompass/v3/settings/loan/customFields?action=add&view=entity
  * @param {Array<object>} fields - Array of field definitions (tool4 JSON format)
- * @returns {Promise<{ created: number, failed: Array<{id: string, error: string}> }>}
+ * @param {'add'|'update'} action - Encompass action query value.
+ * @returns {Promise<{ succeeded: number, failed: Array<{id: string, error: string}> }>}
  */
-export async function createCustomFields(fields) {
+async function patchLoanCustomFields(fields, action) {
   if (!Array.isArray(fields) || fields.length === 0) {
     throw new Error('fields must be a non-empty array');
   }
+  if (action !== 'add' && action !== 'update') {
+    throw new Error('action must be add or update');
+  }
   const payloads = fields.filter((f) => f && (f.id || f.Id || f.fieldId));
   if (payloads.length === 0) {
-    return { created: 0, failed: fields.map((f) => ({ id: f?.id || f?.Id || 'unknown', error: 'Missing field id' })) };
+    return { succeeded: 0, failed: fields.map((f) => ({ id: f?.id || f?.Id || 'unknown', error: 'Missing field id' })) };
   }
 
-  const baseUrl = `${API_V3_BASE}/settings/loan/customFields?action=add&view=entity`;
+  const baseUrl = `${API_V3_BASE}/settings/loan/customFields?action=${encodeURIComponent(action)}&view=entity`;
+  const logLabel = action === 'update' ? '[Encompass update-fields]' : '[Encompass create-fields]';
 
   // Helper to extract readable error message from Encompass response
   function extractErrorMessage(err) {
@@ -797,27 +801,27 @@ export async function createCustomFields(fields) {
     const status = err.response?.status;
     const data = err.response?.data;
     const msg = extractErrorMessage(err);
-    console.error('[Encompass create-fields]', { fieldId, status, encompassResponse: data });
+    console.error(logLabel, { fieldId, status, encompassResponse: data });
     return `${status || 'error'}: ${msg}`;
   }
 
-  // Try batch: PATCH all fields in one request (matches Postman)
+  // Try batch first.
   try {
     await requestWithAuth({
       method: 'patch',
       url: baseUrl,
       data: payloads,
     });
-    return { created: payloads.length, failed: [] };
+    return { succeeded: payloads.length, failed: [] };
   } catch (batchError) {
     const msg = captureError(batchError, 'batch');
     if (batchError.response?.status !== 405 && batchError.response?.status !== 404) {
-      return { created: 0, failed: payloads.map((p) => ({ id: p.id, error: msg })) };
+      return { succeeded: 0, failed: payloads.map((p) => ({ id: p.id, error: msg })) };
     }
   }
 
-  // Fallback: one field per request
-  const results = { created: 0, failed: [] };
+  // Fallback: one field per request.
+  const results = { succeeded: 0, failed: [] };
   for (const payload of payloads) {
     try {
       await requestWithAuth({
@@ -825,12 +829,34 @@ export async function createCustomFields(fields) {
         url: baseUrl,
         data: payload,
       });
-      results.created += 1;
+      results.succeeded += 1;
     } catch (error) {
       results.failed.push({ id: payload.id, error: captureError(error, payload.id) });
     }
   }
   return results;
+}
+
+/**
+ * Create custom fields in Encompass via the settings API.
+ * Uses: PATCH /encompass/v3/settings/loan/customFields?action=add&view=entity
+ * @param {Array<object>} fields - Array of field definitions (tool4 JSON format)
+ * @returns {Promise<{ created: number, failed: Array<{id: string, error: string}> }>}
+ */
+export async function createCustomFields(fields) {
+  const { succeeded, failed } = await patchLoanCustomFields(fields, 'add');
+  return { created: succeeded, failed };
+}
+
+/**
+ * Update existing custom fields in Encompass via the settings API.
+ * Uses: PATCH /encompass/v3/settings/loan/customFields?action=update&view=entity
+ * @param {Array<object>} fields - Array of field definitions (tool4 JSON format)
+ * @returns {Promise<{ updated: number, failed: Array<{id: string, error: string}> }>}
+ */
+export async function updateCustomFields(fields) {
+  const { succeeded, failed } = await patchLoanCustomFields(fields, 'update');
+  return { updated: succeeded, failed };
 }
 
 function coerceNumber(value) {

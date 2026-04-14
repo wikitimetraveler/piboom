@@ -26,6 +26,8 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/encompass-hub/native-fields` | Native fields |
 | GET | `/api/encompass-hub/custom-fields` | Custom fields |
 | POST | `/api/encompass-hub/create-fields` | Create custom fields (tool4 JSON payload) |
+| POST | `/api/encompass-hub/update-fields` | Update custom fields (tool4 JSON payload for Modify rows) |
+| POST | `/api/encompass-hub/automator/parse-field-image` | Parse field-definition rows from image via vision API (`{ imageData }`) |
 | POST | `/api/encompass-hub/loan-batch/update-requests` | Proxy to Encompass `POST …/loanBatch/updateRequests` (body: loanIds + loanData or filter + loanData) |
 | * | `/api/encompass/*` | Encompass Assistant (search, chat, summary) |
 | POST | `/api/webhooks/encompass` | Encompass webhook receiver |

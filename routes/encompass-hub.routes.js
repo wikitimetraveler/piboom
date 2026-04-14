@@ -21,8 +21,10 @@ import {
   getStackedVisualization,
   getTimelineVisualization,
   postCreateFields,
+  postUpdateFields,
   postLoanBatchUpdateRequestsHandler,
 } from '../controllers/encompass-hub.controller.js';
+import { postParseAutomatorFieldImage } from '../controllers/automator-vision.controller.js';
 
 const router = Router();
 
@@ -53,6 +55,8 @@ router.get('/visualizations/timeline', getTimelineVisualization);
 router.get('/native-fields', getNativeFields);
 router.get('/custom-fields', getCustomFields);
 router.post('/create-fields', postCreateFields);
+router.post('/update-fields', postUpdateFields);
+router.post('/automator/parse-field-image', postParseAutomatorFieldImage);
 router.post('/loan-batch/update-requests', postLoanBatchUpdateRequestsHandler);
 
 export default router;
