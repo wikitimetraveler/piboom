@@ -13,6 +13,20 @@ import {
   getPeopleByGeneration,
   getFamilyStats
 } from '../services/genealogy.service.js';
+import multer from 'multer';
+import fs from 'fs/promises';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { summarizeGenealogyImageImport, writeImportArtifact } from '../services/genealogy-import.service.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const uploadStorage = multer.memoryStorage();
+export const genealogyImageUpload = multer({
+  storage: uploadStorage,
+  limits: { fileSize: 15 * 1024 * 1024, files: 40 }
+});
 
 /**
  * Get complete family data (nodes + links) for D3 visualization
@@ -275,6 +289,73 @@ export async function getMusicalTimeline(req, res) {
   }
 }
 
+/**
+ * Accept genealogy source page images for OCR/import pipeline.
+ */
+export async function importImages(req, res) {
+  try {
+    const files = req.files || [];
+    if (!files.length) {
+      return res.status(400).json({
+        success: false,
+        error: 'No images uploaded'
+      });
+    }
+
+    let providedOcrPages = [];
+    if (req.body?.ocrPages) {
+      try {
+        providedOcrPages = JSON.parse(req.body.ocrPages);
+      } catch {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid ocrPages JSON payload'
+        });
+      }
+    }
+
+    const summary = summarizeGenealogyImageImport(files, providedOcrPages);
+    const artifactPath = await writeImportArtifact(summary.laneData, Date.now());
+
+    const qualityReport = {
+      totalDetectedPeople: summary.parsed.people.length,
+      totalRelationshipCandidates: summary.parsed.relationshipCandidates.length,
+      totalAcceptedLinks: summary.strictLinks.accepted.length,
+      totalRejectedLinks: summary.strictLinks.rejected.length,
+      totalReviewItems: summary.parsed.reviewQueue.length + summary.strictLinks.rejected.length
+    };
+
+    const reviewQueue = {
+      generatedAt: new Date().toISOString(),
+      pageReviewItems: summary.parsed.reviewQueue,
+      rejectedRelationshipCandidates: summary.strictLinks.rejected
+    };
+    const reviewQueuePath = path.join(__dirname, '..', 'data', `genealogy-import-review-${Date.now()}.json`);
+    await fs.writeFile(reviewQueuePath, JSON.stringify(reviewQueue, null, 2), 'utf-8');
+
+    return res.json({
+      success: true,
+      message: 'Images received for genealogy import pipeline',
+      summary: {
+        acceptedCount: summary.acceptedCount,
+        rejectedCount: summary.rejectedCount,
+        rejectedFiles: summary.rejectedFiles,
+        validation: summary.validation
+      },
+      qualityReport,
+      artifactPath,
+      reviewQueuePath,
+      laneData: summary.laneData
+    });
+  } catch (error) {
+    console.error('Error importing genealogy images:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
 export default {
   getFamilyData,
   getPeople,
@@ -284,6 +365,8 @@ export default {
   getPeopleAliveInYear,
   getMusicalEraInfo,
   getStats,
-  getMusicalTimeline
+  getMusicalTimeline,
+  importImages,
+  genealogyImageUpload
 };
 

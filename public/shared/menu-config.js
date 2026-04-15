@@ -17,7 +17,7 @@
     { href: '/entertainment/player.html', icon: 'bi-stars', label: 'Entertainment', domain: 'entertainment', title: 'Boombox, visualizer, posters', demoOnly: false },
     { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local', domain: 'local', title: 'Local spots map', demoOnly: false },
     { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds', domain: 'finds', title: 'Thrift & vintage discovery', demoOnly: false },
-    { href: '/family/genealogy.html', icon: 'bi-people-fill', label: 'Family', domain: 'family', title: 'Family tree', demoOnly: false },
+    { href: '/family/genealogy.html', icon: 'bi-people-fill', label: 'D3 Family Tree', domain: 'family', title: 'D3.js Family Tree Visualization', demoOnly: false },
   ];
 
   /** Navbar Worksheets dropdown items (URLs under /finance/) */
@@ -86,7 +86,7 @@
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },
     { href: '/ai/assistant.html', icon: 'bi-chat-dots', label: 'Levi Assistant' },
     { href: '/ai/voice-guide.html', icon: 'bi-book', label: 'Voice Guide' },
-    { href: '/family/genealogy.html', icon: 'bi-diagram-3', label: 'Family' },
+    { href: '/family/genealogy.html', icon: 'bi-diagram-3', label: 'D3 Family Tree' },
     { href: '/nature/tree-discovery.html', icon: 'bi-tree-fill', label: 'Tree Discovery' },
     { href: '/nature/tree-collection.html', icon: 'bi-trees', label: 'Tree Collection' },
     { href: '/nature/critter-discovery.html', icon: 'bi-bug-fill', label: 'Critter Discovery' },

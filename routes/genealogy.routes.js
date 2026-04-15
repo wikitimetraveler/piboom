@@ -8,7 +8,9 @@ import {
   getPeopleAliveInYear,
   getMusicalEraInfo,
   getStats,
-  getMusicalTimeline
+  getMusicalTimeline,
+  importImages,
+  genealogyImageUpload
 } from '../controllers/genealogy.controller.js';
 
 const router = express.Router();
@@ -27,6 +29,9 @@ router.get('/stats', getStats);
 
 // Get musical timeline
 router.get('/musical-timeline', getMusicalTimeline);
+
+// Upload genealogy page photos (camera/import)
+router.post('/import-images', genealogyImageUpload.array('photos', 40), importImages);
 
 // Get people by generation
 router.get('/generation/:generation', getGeneration);
