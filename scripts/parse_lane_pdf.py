@@ -1,6 +1,7 @@
 import json
 import re
 import argparse
+from collections import Counter
 from pathlib import Path
 from datetime import datetime, UTC
 from pypdf import PdfReader
@@ -188,12 +189,23 @@ def parse_child_line(line: str):
     line_clean = clean_text(line)
     if not re.match(r"^\(?\d+\)?\s*[IVXLCDM]+[\.\-]|^[IVXLCDM]+[\.\-]", line_clean):
         return None
+    marker_level = 1
+    if re.match(r"^\(\d+\)\s*[IVXLCDM]+[\.\-]", line_clean):
+        # Numbered descendant marker plus Roman numeral generally indicates
+        # a deeper descendant tier under the active parent context.
+        marker_level = 2
     name = first_name_from_segment(line_clean)
     if not name:
         return None
     birth_year = parse_year(line_clean)
     locations = extract_locations(line_clean)
-    return {"name": name, "birthYear": birth_year, "rawText": line_clean, "locations": locations}
+    return {
+        "name": name,
+        "birthYear": birth_year,
+        "rawText": line_clean,
+        "locations": locations,
+        "markerLevel": marker_level,
+    }
 
 
 def looks_like_prose_or_header(line: str) -> bool:
@@ -229,17 +241,22 @@ def parse_pages_to_people(pages, page_offset):
     current_father = None
     current_mother = None
 
-    def ensure_person(name, birth_year=None, meta=None, locations=None):
+    current_family_generation = 0
+
+    def ensure_person(name, birth_year=None, meta=None, locations=None, generation=None):
         key = f"{normalize_name(name)}|{birth_year if birth_year else 'unknown'}"
         if key not in people:
             people[key] = {
                 "key": key,
                 "name": name,
                 "birthYear": birth_year,
+                "generation": generation if generation is not None else None,
                 "sources": [],
                 "notes": [],
                 "locations": []
             }
+        elif generation is not None and people[key].get("generation") is None:
+            people[key]["generation"] = generation
         if meta:
             people[key]["sources"].append(meta)
             raw = meta.get("rawText")
@@ -268,6 +285,7 @@ def parse_pages_to_people(pages, page_offset):
             if re.search(r"^No\.\s*\d+", line, flags=re.IGNORECASE):
                 current_father = None
                 current_mother = None
+                current_family_generation = 0
 
             header = parse_parent_header(line)
             if not header:
@@ -281,13 +299,13 @@ def parse_pages_to_people(pages, page_offset):
                     "pdfPageNumber": absolute_page,
                     "lineNumber": line_number,
                     "rawText": line
-                }, extract_locations(line))
+                }, extract_locations(line), generation=current_family_generation)
                 if mother_name:
                     current_mother = ensure_person(mother_name, None, {
                         "pdfPageNumber": absolute_page,
                         "lineNumber": line_number,
                         "rawText": line
-                    }, extract_locations(line))
+                    }, extract_locations(line), generation=current_family_generation)
                     relation_candidates.append({
                         "relation": "spouse",
                         "sourceKey": current_father,
@@ -313,7 +331,10 @@ def parse_pages_to_people(pages, page_offset):
                     "pdfPageNumber": absolute_page,
                     "lineNumber": line_number,
                     "rawText": line
-                }, child.get("locations"))
+                }, child.get("locations"), generation=(
+                    current_family_generation + max(child.get("markerLevel", 1), 1)
+                    if current_father else None
+                ))
                 if current_father:
                     relation_candidates.append({
                         "relation": "father",
@@ -390,8 +411,37 @@ def infer_gender(name: str):
     return "U"
 
 
+def ensure_unique_node_ids(lane_data):
+    nodes = lane_data.get("nodes", [])
+    ids = [node.get("id") for node in nodes if node.get("id") is not None]
+    dup_ids = {nid for nid, count in Counter(ids).items() if count > 1}
+    if not dup_ids:
+        return 0
+
+    next_id = max(ids, default=-1) + 1
+    first_seen = set()
+    reassigned = 0
+    for node in nodes:
+        nid = node.get("id")
+        if nid is None:
+            node["id"] = next_id
+            next_id += 1
+            reassigned += 1
+            continue
+        if nid not in dup_ids:
+            continue
+        if nid not in first_seen:
+            first_seen.add(nid)
+            continue
+        node["id"] = next_id
+        next_id += 1
+        reassigned += 1
+    return reassigned
+
+
 def append_to_lane_data(parsed_people, accepted_relations):
     lane_data = json.loads(LANE_DATA_PATH.read_text(encoding="utf-8"))
+    ensure_unique_node_ids(lane_data)
     existing_nodes = lane_data.get("nodes", [])
     existing_links = lane_data.get("links", [])
 
@@ -400,12 +450,20 @@ def append_to_lane_data(parsed_people, accepted_relations):
     for node in existing_nodes:
         key = f"{normalize_name(node.get('name', ''))}|{node.get('birthYear') if node.get('birthYear') else 'unknown'}"
         existing_lookup[key] = node["id"]
+    existing_by_id = {node.get("id"): node for node in existing_nodes}
 
     new_count = 0
     key_to_id = {}
     for key, person in parsed_people.items():
         if key in existing_lookup:
-            key_to_id[key] = existing_lookup[key]
+            existing_id = existing_lookup[key]
+            key_to_id[key] = existing_id
+            existing_node = existing_by_id.get(existing_id)
+            if existing_node is not None:
+                incoming_gen = person.get("generation")
+                existing_gen = existing_node.get("generation")
+                if incoming_gen is not None and existing_gen in ("", None):
+                    existing_node["generation"] = incoming_gen
             continue
         inferred_last_name = ""
         if person["name"]:
@@ -416,7 +474,7 @@ def append_to_lane_data(parsed_people, accepted_relations):
             "name": person["name"],
             "id": next_id,
             "text": " | ".join(person.get("notes", [])[:8]),
-            "generation": 0,
+            "generation": person["generation"] if person.get("generation") is not None else 0,
             "gender": infer_gender(person["name"]),
             "lastName": inferred_last_name or ("Lane" if " lane" in person["name"].lower() else ""),
             "birthYear": person["birthYear"] if person["birthYear"] else "",

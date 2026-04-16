@@ -173,6 +173,80 @@ def fails_person_pattern(node):
     return False
 
 
+def parse_generation(value):
+    if value in ("", None):
+        return None
+    try:
+        num = int(value)
+        return num if num >= 0 else None
+    except (TypeError, ValueError):
+        return None
+
+
+def reconcile_generations(nodes, links):
+    nodes_by_id = {n.get("id"): n for n in nodes if n.get("id") is not None}
+    generations = {nid: parse_generation(node.get("generation")) for nid, node in nodes_by_id.items()}
+
+    parent_edges = []
+    spouse_edges = []
+    for link in links:
+        rel = link.get("relation")
+        source = link.get("source")
+        target = link.get("target")
+        if source not in nodes_by_id or target not in nodes_by_id:
+            continue
+        if rel in {"father", "mother"}:
+            # Model is child(source) -> parent(target).
+            parent_edges.append((source, target))
+        elif rel == "spouse":
+            spouse_edges.append((source, target))
+
+    changed = True
+    # Small fixed-point iteration to propagate lineage constraints.
+    for _ in range(12):
+        if not changed:
+            break
+        changed = False
+        for child_id, parent_id in parent_edges:
+            child_gen = generations.get(child_id)
+            parent_gen = generations.get(parent_id)
+            if parent_gen is not None:
+                expected_child = parent_gen + 1
+                if child_gen is None or child_gen <= parent_gen:
+                    generations[child_id] = expected_child
+                    changed = True
+            if child_gen is not None:
+                inferred_parent = max(child_gen - 1, 0)
+                if parent_gen is None:
+                    generations[parent_id] = inferred_parent
+                    changed = True
+                elif parent_gen >= child_gen:
+                    generations[parent_id] = inferred_parent
+                    changed = True
+
+        # Keep spouse generations aligned where only one side is known.
+        for a_id, b_id in spouse_edges:
+            a_gen = generations.get(a_id)
+            b_gen = generations.get(b_id)
+            if a_gen is not None and b_gen is None:
+                generations[b_id] = a_gen
+                changed = True
+            elif b_gen is not None and a_gen is None:
+                generations[a_id] = b_gen
+                changed = True
+
+    updated = 0
+    for nid, node in nodes_by_id.items():
+        new_gen = generations.get(nid)
+        cur_gen = parse_generation(node.get("generation"))
+        if new_gen is None:
+            continue
+        if cur_gen != new_gen:
+            node["generation"] = new_gen
+            updated += 1
+    return updated
+
+
 def main():
     data = json.loads(LANE_DATA_PATH.read_text(encoding="utf-8"))
     nodes = data.get("nodes", [])
@@ -270,6 +344,8 @@ def main():
             if l.get("source") not in pruned_ids and l.get("target") not in pruned_ids
         ]
 
+    generation_updates = reconcile_generations(nodes, deduped_links)
+
     data["nodes"] = nodes
     data["links"] = deduped_links
     LANE_DATA_PATH.write_text(json.dumps(data, indent=2), encoding="utf-8")
@@ -283,6 +359,7 @@ def main():
         "normalizedNodes": normalized_count,
         "mergedNodes": len(merged_ids),
         "prunedIsolatedBadNodes": len(pruned_ids),
+        "updatedGenerations": generation_updates,
         "remainingNodes": len(nodes),
         "remainingLinks": len(deduped_links),
         "missingRefs": missing_refs,
