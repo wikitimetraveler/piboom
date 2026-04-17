@@ -2428,6 +2428,116 @@ function clearData() {
   setStatus('Ready', 'info', 'bi-info-circle');
 }
 
+function getScenarioColumnsFromHeaders(headers) {
+  const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
+  const targetIdx = headers.findIndex((h) => /^target$/i.test(String(h || '').trim()));
+  const scenarioStart = descIdx >= 0 ? descIdx + 1 : (targetIdx >= 0 ? targetIdx + 1 : 0);
+  const scenarioColumns = [];
+  for (let i = scenarioStart; i < headers.length; i++) {
+    if (!isScenarioColumnHeader(headers[i])) break;
+    scenarioColumns.push(headers[i]);
+  }
+  return scenarioColumns;
+}
+
+function mergeScenarioDescriptions(scenarioColumns, testDescriptions) {
+  const testCols = scenarioColumns.filter((h) => String(h || '').toLowerCase().trim() !== 'reset');
+  const byNum = new Map((testDescriptions || []).map((t) => [String(t.testNumber), t.description]));
+  return testCols.map((h) => {
+    const testNum = extractTestNumberFromKey(h) || '';
+    const desc = byNum.get(testNum) || (h || `Test ${testNum}`).trim();
+    return { testNumber: testNum, description: desc };
+  }).filter((t) => t.testNumber);
+}
+
+function buildFileInfoHtml(name, rowsCount, headersCount, scenarioDescriptions, scenarioColumns) {
+  let fileInfoHTML = `<strong>${name}</strong>`;
+  fileInfoHTML += ` <span class="text-muted">(${rowsCount} test step${rowsCount !== 1 ? 's' : ''}, ${headersCount} columns)</span>`;
+  if (scenarioDescriptions.length > 0) {
+    fileInfoHTML += `<div class="mt-2"><small class="text-muted">Test Scenarios:</small> `;
+    fileInfoHTML += scenarioDescriptions.map((test) =>
+      `<span class="badge text-bg-secondary me-1" title="${escapeHtml(test.description || '')}">Test ${escapeHtml(test.testNumber || '')}</span>`
+    ).join('');
+    fileInfoHTML += `</div>`;
+  } else if (scenarioColumns.length > 0) {
+    fileInfoHTML += ` <span class="text-muted">• ${scenarioColumns.length} test scenario${scenarioColumns.length !== 1 ? 's' : ''}</span>`;
+  }
+  return fileInfoHTML;
+}
+
+async function hydrateLoadedUnitTestData(options) {
+  const {
+    headers,
+    rows,
+    sourceName,
+    testDescriptions,
+    fieldMetadata,
+    refreshFieldMetadataFromHub = false,
+  } = options;
+
+  if (!rows || rows.length === 0) return null;
+
+  if (refreshFieldMetadataFromHub) {
+    resetCurrentFieldMetadataToFallback();
+  } else {
+    const fallback = window.customFieldCalcParser?.getFallbackFieldMetadata?.() || {};
+    currentFieldMetadata = { ...fallback, ...(fieldMetadata || {}) };
+  }
+
+  columnDefs = generateColumnDefs(headers, rows);
+  allData = rows.map((r, i) => ({ ...r, __rowIndex: i }));
+  lastRunCellResults = {};
+
+  initializeGrid();
+  setGridRows(allData);
+  if (gridApi && typeof gridApi.refreshCells === 'function') {
+    gridApi.refreshCells({ force: true });
+  }
+  showAllColumns();
+
+  if (refreshFieldMetadataFromHub) {
+    scheduleUnitTestGridMetadataRefresh().then(({ dropdownCount }) => {
+      if (dropdownCount > 0) {
+        showToast(`Loaded metadata: ${dropdownCount} field(s) with dropdowns`, 'info');
+      }
+    }).catch(() => { /* API may be unavailable; grid still works with text editors */ });
+  }
+
+  const scenarioColumns = getScenarioColumnsFromHeaders(headers);
+  testDescriptionsData = mergeScenarioDescriptions(scenarioColumns, testDescriptions);
+  currentFileName = sourceName;
+
+  const execResult = await loadTestExecutionsFromDatabase(currentFileName);
+  displayOverallSignOff(execResult.executions, execResult.dbUnavailable);
+
+  if (testDescriptionsData.length > 0) {
+    displayTestDescriptions(testDescriptionsData);
+  } else {
+    hideTestDescriptions();
+  }
+
+  uploadArea.style.display = 'none';
+  setHeroPostLoadActionsVisible(true);
+  setUnitTestsWelcomeVisible(false);
+  runTestsBtn.style.display = 'inline-block';
+  clearBtn.style.display = 'inline-block';
+  if (fillEmptyTestNullBtn) fillEmptyTestNullBtn.style.display = 'inline-block';
+  if (stickyActionBar) stickyActionBar.style.display = 'flex';
+
+  updateLoanGuidChipDisplay(currentLoanGuid);
+  renderRecentRunsSelect();
+  updateScenarioBadges([]);
+
+  if (window.unitTestsAI && window.unitTestsAI.show) {
+    window.unitTestsAI.show();
+  }
+
+  fileInfo.innerHTML = buildFileInfoHtml(currentFileName, rows.length, headers.length, testDescriptionsData, scenarioColumns);
+  updateResultsMeta();
+
+  return { scenarioColumns, execResult };
+}
+
 async function handleFileUpload(file) {
   if (!file) return;
   
@@ -2456,55 +2566,14 @@ async function handleFileUpload(file) {
       return;
     }
     
-    // Generate column definitions
-    columnDefs = generateColumnDefs(headers, rows);
-    allData = rows.map((r, i) => ({ ...r, __rowIndex: i }));
-    lastRunCellResults = {};
-
-    // Initialize grid if not already done
-    initializeGrid();
-    
-    // Populate grid
-    setGridRows(allData);
-    if (gridApi && typeof gridApi.refreshCells === 'function') {
-      gridApi.refreshCells({ force: true });
-    }
-    showAllColumns();
-
-    resetCurrentFieldMetadataToFallback();
-    scheduleUnitTestGridMetadataRefresh().then(({ dropdownCount }) => {
-      if (dropdownCount > 0) {
-        showToast(`Loaded metadata: ${dropdownCount} field(s) with dropdowns`, 'info');
-      }
-    }).catch(() => { /* API may be unavailable; grid still works with text editors */ });
-
-    // Count scenario columns: Reset, Test 1..N; start after Description or Target
-    const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
-    const targetIdx = headers.findIndex((h) => /^target$/i.test(String(h || '').trim()));
-    const scenarioStart = descIdx >= 0 ? descIdx + 1 : (targetIdx >= 0 ? targetIdx + 1 : 0);
-    const scenarioColumns = [];
-    for (let i = scenarioStart; i < headers.length; i++) {
-      if (!isScenarioColumnHeader(headers[i])) break;
-      scenarioColumns.push(headers[i]);
-    }
-    
-    // Use Excel Test #/Test Plan if found; fill missing from actual column headers so we have one card per scenario
-    const testCols = scenarioColumns.filter((h) => String(h || '').toLowerCase().trim() !== 'reset');
-    const byNum = new Map((testDescriptions || []).map((t) => [String(t.testNumber), t.description]));
-    const finalDescriptions = testCols.map((h) => {
-      const testNum = extractTestNumberFromKey(h) || '';
-      const desc = byNum.get(testNum) || (h || `Test ${testNum}`).trim();
-      return { testNumber: testNum, description: desc };
-    }).filter((t) => t.testNumber);
-    
-    // Store test descriptions globally for persistence
-    testDescriptionsData = finalDescriptions;
-    
-    // Store current file name
-    currentFileName = parsedFileName;
-    
-    // Load test executions from database
-    const execResult = await loadTestExecutionsFromDatabase(parsedFileName);
+    const hydration = await hydrateLoadedUnitTestData({
+      headers,
+      rows,
+      sourceName: parsedFileName,
+      testDescriptions,
+      refreshFieldMetadataFromHub: true,
+    });
+    const scenarioColumns = hydration?.scenarioColumns || [];
 
     // Ensure accordion container is visible for grid/scenarios
     const accordionContainer = document.getElementById('accordionContainer');
@@ -2515,52 +2584,6 @@ async function handleFileUpload(file) {
     const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
     if (selectedFieldCard) selectedFieldCard.style.display = 'none';
 
-    // Display Overall Test Sign-off (file-level; always show when file is loaded)
-    displayOverallSignOff(execResult.executions, execResult.dbUnavailable);
-
-    // Display test descriptions (scenarios) if available
-    if (testDescriptionsData.length > 0) {
-      displayTestDescriptions(testDescriptionsData);
-    } else {
-      hideTestDescriptions();
-    }
-    
-    // Update UI
-    uploadArea.style.display = 'none';
-    setHeroPostLoadActionsVisible(true);
-    setUnitTestsWelcomeVisible(false);
-    runTestsBtn.style.display = 'inline-block';
-    clearBtn.style.display = 'inline-block';
-    if (fillEmptyTestNullBtn) fillEmptyTestNullBtn.style.display = 'inline-block';
-    if (stickyActionBar) {
-      stickyActionBar.style.display = 'flex';
-    }
-    updateLoanGuidChipDisplay(currentLoanGuid);
-    renderRecentRunsSelect();
-    updateScenarioBadges([]);
-    
-    // Show AI Assistant
-    if (window.unitTestsAI && window.unitTestsAI.show) {
-      window.unitTestsAI.show();
-    }
-    
-    // Build enhanced file info with test descriptions
-    let fileInfoHTML = `<strong>${parsedFileName}</strong>`;
-    fileInfoHTML += ` <span class="text-muted">(${rows.length} test step${rows.length !== 1 ? 's' : ''}, ${headers.length} columns)</span>`;
-    
-    if (testDescriptionsData.length > 0) {
-      fileInfoHTML += `<div class="mt-2"><small class="text-muted">Test Scenarios:</small> `;
-      const testList = testDescriptionsData.map(test =>
-        `<span class="badge text-bg-secondary me-1" title="${test.description}">Test ${test.testNumber}</span>`
-      ).join('');
-      fileInfoHTML += testList + `</div>`;
-    } else if (scenarioColumns.length > 0) {
-      fileInfoHTML += ` <span class="text-muted">• ${scenarioColumns.length} test scenario${scenarioColumns.length !== 1 ? 's' : ''}</span>`;
-    }
-    
-    fileInfo.innerHTML = fileInfoHTML;
-    
-    updateResultsMeta();
     setStatus('File loaded successfully', 'ok', 'bi-check-circle');
     
   } catch (error) {
@@ -2952,6 +2975,7 @@ fieldIdSearchInput?.addEventListener('keydown', (e) => {
 
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
+  e.target.value = '';
   if (file) {
     handleFileUpload(file);
   }
@@ -3733,130 +3757,76 @@ function renderScenarioBuilder(field) {
  * @param {Record<string,{dataType,format,description}>} [fieldMetadata] - optional Encompass field metadata
  * @param {object} [field] - optional custom field object (fieldId, calculation, description, color) for Selected Field accordion
  */
-function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fieldMetadata, field) {
+async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fieldMetadata, field) {
   if (!rows || rows.length === 0) return;
+  try {
+    const accordionContainer = document.getElementById('accordionContainer');
+    if (accordionContainer) accordionContainer.style.display = 'block';
 
-  const fallback = window.customFieldCalcParser?.getFallbackFieldMetadata?.() || {};
-  currentFieldMetadata = { ...fallback, ...(fieldMetadata || {}) };
-  columnDefs = generateColumnDefs(headers, rows);
-  allData = rows.map((r, i) => ({ ...r, __rowIndex: i }));
-  lastRunCellResults = {};
-
-  initializeGrid();
-  setGridRows(allData);
-  showAllColumns();
-
-  const descIdx = headers.findIndex((h) => String(h || '').toLowerCase().trim() === 'description');
-  const targetIdx = headers.findIndex((h) => /^target$/i.test(String(h || '').trim()));
-  const scenarioStart = descIdx >= 0 ? descIdx + 1 : (targetIdx >= 0 ? targetIdx + 1 : 0);
-  const scenarioColumns = [];
-  for (let i = scenarioStart; i < headers.length; i++) {
-    if (!isScenarioColumnHeader(headers[i])) break;
-    scenarioColumns.push(headers[i]);
-  }
-
-  // Merge Excel descriptions with actual column headers so we have one card per scenario
-  const testCols = scenarioColumns.filter((h) => String(h || '').toLowerCase().trim() !== 'reset');
-  const byNum = new Map((testDescriptions || []).map((t) => [String(t.testNumber), t.description]));
-  testDescriptionsData = testCols.map((h) => {
-    const testNum = extractTestNumberFromKey(h) || '';
-    const desc = byNum.get(testNum) || (h || `Test ${testNum}`).trim();
-    return { testNumber: testNum, description: desc };
-  }).filter((t) => t.testNumber);
-  currentFileName = sourceName || 'Generated from Custom Field';
-
-  const accordionContainer = document.getElementById('accordionContainer');
-  if (accordionContainer) accordionContainer.style.display = 'block';
-
-  loadTestExecutionsFromDatabase(currentFileName).then((result) => {
-    displayOverallSignOff(result.executions, result.dbUnavailable);
-  });
-
-  if (testDescriptionsData.length > 0) {
-    displayTestDescriptions(testDescriptionsData);
-  } else {
-    hideTestDescriptions();
-  }
-
-  uploadArea.style.display = 'none';
-  setHeroPostLoadActionsVisible(true);
-  setUnitTestsWelcomeVisible(false);
-  runTestsBtn.style.display = 'inline-block';
-  if (clearBtn) clearBtn.style.display = 'inline-block';
-  if (fillEmptyTestNullBtn) fillEmptyTestNullBtn.style.display = 'inline-block';
-  if (stickyActionBar) stickyActionBar.style.display = 'flex';
-
-  const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
-  const selectedFieldContent = document.getElementById('selectedFieldContent');
-  const collapseSelectedField = document.getElementById('collapseSelectedField');
-  if (field && selectedFieldCard && selectedFieldContent) {
-    const fieldId = field.fieldId || field.id || field.Id || field.fieldName || '';
-    const calc = field.calculation || field.calculationExpression || field.calculatedExpression || field.expression || field.formula || '';
-    const desc = field.description || field.longDescription || field.shortDescription || field.comments || '';
-    const color = field.color || field.backgroundColor || field.foregroundColor || '';
-    let html = `<div class="mb-2"><strong>Field:</strong> <code>[${fieldId}]</code></div>`;
-    if (calc) {
-      html += `<div class="mb-2"><strong>Calculation:</strong><pre class="mb-0 mt-1 p-2 bg-light rounded" style="max-height: 200px; overflow: auto; font-size: 1rem;">${escapeHtml(calc)}</pre></div>`;
-    }
-    if (desc) {
-      html += `<div class="mb-2"><strong>Comments:</strong> <span class="text-muted">${escapeHtml(desc)}</span></div>`;
-    }
-    if (color) {
-      const colorStr = String(color).trim();
-      const isHex = /^#([0-9a-fA-F]{3}){1,2}$/.test(colorStr) || /^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(colorStr);
-      const swatch = isHex ? `<span class="d-inline-block rounded border" style="width: 1.2em; height: 1.2em; background: ${colorStr.startsWith('#') ? colorStr : '#' + colorStr}; vertical-align: middle;"></span> ` : '';
-      html += `<div><strong>Color:</strong> ${swatch}<code>${escapeHtml(colorStr)}</code></div>`;
-    }
-    selectedFieldContent.innerHTML = html || '<span class="text-muted">No details</span>';
-    selectedFieldCard.classList.remove('section-card-hidden');
-    selectedFieldCard.style.display = 'block';
-    const sidebarSelectedField = document.getElementById('sidebarSelectedField');
-    if (sidebarSelectedField) sidebarSelectedField.style.display = '';
-    currentScenarioBuilderField = field;
-    renderScenarioBuilder(field);
-    if (collapseSelectedField) {
-      bsCollapseShow(collapseSelectedField);
-    }
-  } else if (selectedFieldCard) {
-    selectedFieldCard.style.display = 'none';
-    const sidebarSelectedField = document.getElementById('sidebarSelectedField');
-    if (sidebarSelectedField) sidebarSelectedField.style.display = 'none';
-    currentScenarioBuilderField = null;
-    const builderContainer = document.getElementById('liveScenarioBuilderContainer');
-    if (builderContainer) builderContainer.style.display = 'none';
-  }
-
-  updateLoanGuidChipDisplay(currentLoanGuid);
-  renderRecentRunsSelect();
-  updateScenarioBadges([]);
-
-  if (window.unitTestsAI && window.unitTestsAI.show) {
-    window.unitTestsAI.show();
-  }
-
-  let fileInfoHTML = `<strong>${currentFileName}</strong>`;
-  fileInfoHTML += ` <span class="text-muted">(${rows.length} test step${rows.length !== 1 ? 's' : ''}, ${headers.length} columns)</span>`;
-  if (testDescriptions && testDescriptions.length > 0) {
-    fileInfoHTML += `<div class="mt-2"><small class="text-muted">Test Scenarios:</small> `;
-    fileInfoHTML += testDescriptions.map((t) => `<span class="badge text-bg-secondary me-1" title="${t.description}">Test ${t.testNumber}</span>`).join('');
-    fileInfoHTML += `</div>`;
-  } else if (scenarioColumns.length > 0) {
-    fileInfoHTML += ` <span class="text-muted">• ${scenarioColumns.length} test scenario${scenarioColumns.length !== 1 ? 's' : ''}</span>`;
-  }
-  fileInfo.innerHTML = fileInfoHTML;
-
-  updateResultsMeta();
-  setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
-
-  scheduleUnitTestGridMetadataRefresh()
-    .then(({ dropdownCount }) => {
-      if (dropdownCount > 0) {
-        showToast(`Encompass: ${dropdownCount} SET field(s) with dropdown metadata`, 'info');
-      }
-    })
-    .catch(() => {
-      /* Hub unavailable — text editors still work */
+    await hydrateLoadedUnitTestData({
+      headers,
+      rows,
+      sourceName: sourceName || 'Generated from Custom Field',
+      testDescriptions,
+      fieldMetadata,
+      refreshFieldMetadataFromHub: false,
     });
+
+    const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
+    const selectedFieldContent = document.getElementById('selectedFieldContent');
+    const collapseSelectedField = document.getElementById('collapseSelectedField');
+    if (field && selectedFieldCard && selectedFieldContent) {
+      const fieldId = field.fieldId || field.id || field.Id || field.fieldName || '';
+      const calc = field.calculation || field.calculationExpression || field.calculatedExpression || field.expression || field.formula || '';
+      const desc = field.description || field.longDescription || field.shortDescription || field.comments || '';
+      const color = field.color || field.backgroundColor || field.foregroundColor || '';
+      let html = `<div class="mb-2"><strong>Field:</strong> <code>[${fieldId}]</code></div>`;
+      if (calc) {
+        html += `<div class="mb-2"><strong>Calculation:</strong><pre class="mb-0 mt-1 p-2 bg-light rounded" style="max-height: 200px; overflow: auto; font-size: 1rem;">${escapeHtml(calc)}</pre></div>`;
+      }
+      if (desc) {
+        html += `<div class="mb-2"><strong>Comments:</strong> <span class="text-muted">${escapeHtml(desc)}</span></div>`;
+      }
+      if (color) {
+        const colorStr = String(color).trim();
+        const isHex = /^#([0-9a-fA-F]{3}){1,2}$/.test(colorStr) || /^[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(colorStr);
+        const swatch = isHex ? `<span class="d-inline-block rounded border" style="width: 1.2em; height: 1.2em; background: ${colorStr.startsWith('#') ? colorStr : '#' + colorStr}; vertical-align: middle;"></span> ` : '';
+        html += `<div><strong>Color:</strong> ${swatch}<code>${escapeHtml(colorStr)}</code></div>`;
+      }
+      selectedFieldContent.innerHTML = html || '<span class="text-muted">No details</span>';
+      selectedFieldCard.classList.remove('section-card-hidden');
+      selectedFieldCard.style.display = 'block';
+      const sidebarSelectedField = document.getElementById('sidebarSelectedField');
+      if (sidebarSelectedField) sidebarSelectedField.style.display = '';
+      currentScenarioBuilderField = field;
+      renderScenarioBuilder(field);
+      if (collapseSelectedField) {
+        bsCollapseShow(collapseSelectedField);
+      }
+    } else if (selectedFieldCard) {
+      selectedFieldCard.style.display = 'none';
+      const sidebarSelectedField = document.getElementById('sidebarSelectedField');
+      if (sidebarSelectedField) sidebarSelectedField.style.display = 'none';
+      currentScenarioBuilderField = null;
+      const builderContainer = document.getElementById('liveScenarioBuilderContainer');
+      if (builderContainer) builderContainer.style.display = 'none';
+    }
+
+    setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
+
+    scheduleUnitTestGridMetadataRefresh()
+      .then(({ dropdownCount }) => {
+        if (dropdownCount > 0) {
+          showToast(`Encompass: ${dropdownCount} SET field(s) with dropdown metadata`, 'info');
+        }
+      })
+      .catch(() => {
+        /* Hub unavailable — text editors still work */
+      });
+  } catch (error) {
+    console.error('Error loading generated test data:', error);
+    setStatus(`Error: ${error.message}`, 'err', 'bi-exclamation-octagon');
+  }
 }
 
 /**

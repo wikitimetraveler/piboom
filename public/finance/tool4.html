@@ -430,14 +430,25 @@
             font-weight: 600;
             color: var(--text-dark);
             letter-spacing: 0.02em;
+            opacity: 1 !important;
+            visibility: visible !important;
+            text-shadow: 0 0 0 transparent;
         }
         .tool-product-credits-footer .credits-sep {
             width: 5px;
             height: 5px;
             border-radius: 50%;
             background: var(--ice-primary);
-            opacity: 0.45;
+            opacity: 0.7;
             flex-shrink: 0;
+        }
+        #imageDropZone {
+            transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+        }
+        #imageDropZone.image-dropzone-active {
+            border-color: var(--primary-blue) !important;
+            background: var(--ice-light);
+            color: var(--primary-blue);
         }
         .footer-meta-line {
             font-size: 0.8rem;
@@ -625,7 +636,7 @@
                             </div>
                         </div>
                         <input type="file" id="imageFileInput" accept="image/*" style="display:none;">
-                        <div id="imageDropZone" class="mt-2 p-2 border rounded text-center small text-muted">Drop image here or press Ctrl+V to paste.</div>
+                        <div id="imageDropZone" class="mt-2 p-2 border rounded text-center small text-muted" tabindex="0" role="button" aria-label="Image drop and paste zone">Drop image here or click and press Ctrl+V to paste.</div>
                         <div class="row g-2 mt-2">
                             <div class="col-md-6">
                                 <video id="cameraVideo" class="w-100 border rounded" style="display:none;max-height:240px;" autoplay playsinline></video>
@@ -949,6 +960,133 @@
             document.getElementById('extractFieldsBtn').disabled = !dataUrl;
         }
 
+        function loadImageFile(file, successMessage) {
+            if (!file) return false;
+            if (!file.type || !file.type.startsWith('image/')) {
+                setImageStatus('Only image files are supported.', 'warning');
+                return false;
+            }
+            const reader = new FileReader();
+            reader.onload = () => {
+                setAutomatorImage(reader.result);
+                setImageStatus(successMessage, 'success');
+            };
+            reader.readAsDataURL(file);
+            return true;
+        }
+
+        function tryLoadClipboardImageFromEvent(e, noImageMessage) {
+            const items = Array.from(e?.clipboardData?.items || []);
+            const imageItem = items.find((item) => item.type.startsWith('image/'));
+            if (!imageItem) {
+                if (noImageMessage) setImageStatus(noImageMessage, 'warning');
+                return false;
+            }
+            const file = imageItem.getAsFile();
+            if (!file) {
+                if (noImageMessage) setImageStatus(noImageMessage, 'warning');
+                return false;
+            }
+            return loadImageFile(file, 'Image pasted. Click Extract Fields.');
+        }
+
+        function setCreateUpdateStatus(statusEl, message, level) {
+            if (!statusEl) return;
+            statusEl.textContent = message;
+            statusEl.className = `mt-2 small text-${level}`;
+            statusEl.style.display = 'block';
+        }
+
+        function parseFieldPayload(jsonStr, emptyMessage, invalidPrefix) {
+            const value = (jsonStr || '').trim();
+            if (!value) return { error: emptyMessage };
+            try {
+                const parsed = JSON.parse(value);
+                if (!Array.isArray(parsed) || parsed.length === 0) {
+                    return { error: emptyMessage };
+                }
+                return { data: parsed };
+            } catch (error) {
+                return { error: `${invalidPrefix}: ${error.message}` };
+            }
+        }
+
+        function buildFailureSummary(prefix, processedCount, failed) {
+            if (!Array.isArray(failed) || failed.length === 0) return '';
+            const failures = failed.map((item) => `${item.id}: ${item.error}`).join('; ');
+            return `${prefix} ${processedCount} field(s). Failed: ${failures}`;
+        }
+
+        async function submitAutomatorFieldChanges(options) {
+            const {
+                mode,
+                jsonStr,
+                buttonEl,
+                statusEl,
+            } = options;
+            const config = mode === 'update'
+                ? {
+                    endpoint: '/api/encompass-hub/update-fields',
+                    emptyMessage: 'Update JSON must be a non-empty array.',
+                    invalidPrefix: 'Invalid update JSON',
+                    progressMessage: 'Updating fields in Encompass...',
+                    successPrefix: 'Successfully updated',
+                    partialPrefix: 'Updated',
+                    countKey: 'updated',
+                }
+                : {
+                    endpoint: '/api/encompass-hub/create-fields',
+                    emptyMessage: 'JSON must be a non-empty array of field definitions.',
+                    invalidPrefix: 'Invalid JSON',
+                    progressMessage: 'Creating fields in Encompass...',
+                    successPrefix: 'Successfully created',
+                    partialPrefix: 'Created',
+                    countKey: 'created',
+                };
+
+            const parsed = parseFieldPayload(jsonStr, config.emptyMessage, config.invalidPrefix);
+            if (parsed.error) {
+                setCreateUpdateStatus(statusEl, parsed.error, 'warning');
+                return;
+            }
+
+            buttonEl.disabled = true;
+            setCreateUpdateStatus(statusEl, config.progressMessage, 'info');
+
+            try {
+                const res = await (window.encompassApi?.encompassFetch || fetch)(config.endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(parsed.data),
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    setCreateUpdateStatus(
+                        statusEl,
+                        `${data.error || 'Request failed'}: ${data.details || res.status}`,
+                        'danger'
+                    );
+                    return;
+                }
+
+                const processedCount = Number(data[config.countKey] || 0);
+                const partialSummary = buildFailureSummary(config.partialPrefix, processedCount, data.failed);
+                if (partialSummary) {
+                    setCreateUpdateStatus(statusEl, partialSummary, 'warning');
+                } else {
+                    setCreateUpdateStatus(
+                        statusEl,
+                        `${config.successPrefix} ${processedCount} field(s) in Encompass.`,
+                        'success'
+                    );
+                }
+            } catch (error) {
+                setCreateUpdateStatus(statusEl, `Error: ${error.message}`, 'danger');
+            } finally {
+                buttonEl.disabled = false;
+            }
+        }
+
         async function startAutomatorCamera() {
             if (automatorCameraStream) return;
             try {
@@ -1023,190 +1161,127 @@
 
         // Event handlers
         document.addEventListener('DOMContentLoaded', function() {
-            const ruleInput = document.getElementById('ruleInput');
-            const appendInput = document.getElementById('appendInput');
-            const ineligibleAudit = document.getElementById('ineligibleAudit');
-            const ruleOutput = document.getElementById('ruleOutput');
-            const imageFileInput = document.getElementById('imageFileInput');
-            const imageDropZone = document.getElementById('imageDropZone');
+            const els = {
+                ruleInput: document.getElementById('ruleInput'),
+                appendInput: document.getElementById('appendInput'),
+                ineligibleAudit: document.getElementById('ineligibleAudit'),
+                ruleOutput: document.getElementById('ruleOutput'),
+                imageFileInput: document.getElementById('imageFileInput'),
+                imageDropZone: document.getElementById('imageDropZone'),
+                parsePastedBtn: document.getElementById('parsePastedBtn'),
+                copyJsonBtn: document.getElementById('copyJsonBtn'),
+                copyUpdateJsonBtn: document.getElementById('copyUpdateJsonBtn'),
+                copyRulesBtn: document.getElementById('copyRulesBtn'),
+                createFieldsBtn: document.getElementById('createFieldsBtn'),
+                updateFieldsBtn: document.getElementById('updateFieldsBtn'),
+                createFieldsStatus: document.getElementById('createFieldsStatus'),
+                uploadImageBtn: document.getElementById('uploadImageBtn'),
+                pasteImageBtn: document.getElementById('pasteImageBtn'),
+                startCameraBtn: document.getElementById('startCameraBtn'),
+                captureCameraBtn: document.getElementById('captureCameraBtn'),
+                stopCameraBtn: document.getElementById('stopCameraBtn'),
+                extractFieldsBtn: document.getElementById('extractFieldsBtn'),
+            };
             
-            ruleInput.addEventListener('input', generateRules);
-            appendInput.addEventListener('input', generateRules);
-            ineligibleAudit.addEventListener('change', generateRules);
+            els.ruleInput.addEventListener('input', generateRules);
+            els.appendInput.addEventListener('input', generateRules);
+            els.ineligibleAudit.addEventListener('change', generateRules);
             // Support direct paste/edit flow: regenerate JSON whenever field definitions change.
-            ruleOutput.addEventListener('input', generateJSON);
-            ruleOutput.addEventListener('paste', () => setTimeout(generateJSON, 0));
-            document.getElementById('parsePastedBtn').addEventListener('click', generateJSON);
+            els.ruleOutput.addEventListener('input', generateJSON);
+            els.ruleOutput.addEventListener('paste', () => setTimeout(generateJSON, 0));
+            els.parsePastedBtn.addEventListener('click', generateJSON);
 
-            document.getElementById('copyJsonBtn').addEventListener('click', async () => {
+            els.copyJsonBtn.addEventListener('click', async () => {
                 await copyToClipboard(document.getElementById('ADOoutput').value);
             });
-            document.getElementById('copyUpdateJsonBtn').addEventListener('click', async () => {
+            els.copyUpdateJsonBtn.addEventListener('click', async () => {
                 await copyToClipboard(document.getElementById('ADOupdateOutput').value);
             });
 
-            document.getElementById('copyRulesBtn').addEventListener('click', async () => {
+            els.copyRulesBtn.addEventListener('click', async () => {
                 await copyToClipboard(document.getElementById('ruleOutput').value);
             });
 
-            document.getElementById('createFieldsBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('createFieldsBtn');
-                const statusEl = document.getElementById('createFieldsStatus');
-                const jsonStr = document.getElementById('ADOoutput').value.trim();
-                if (!jsonStr) {
-                    statusEl.textContent = 'Generate JSON first (enter a rule name).';
-                    statusEl.className = 'mt-2 small text-warning';
-                    statusEl.style.display = 'block';
-                    return;
-                }
-                let fields;
-                try {
-                    fields = JSON.parse(jsonStr);
-                } catch (e) {
-                    statusEl.textContent = 'Invalid JSON: ' + e.message;
-                    statusEl.className = 'mt-2 small text-danger';
-                    statusEl.style.display = 'block';
-                    return;
-                }
-                if (!Array.isArray(fields) || fields.length === 0) {
-                    statusEl.textContent = 'JSON must be a non-empty array of field definitions.';
-                    statusEl.className = 'mt-2 small text-warning';
-                    statusEl.style.display = 'block';
-                    return;
-                }
-                btn.disabled = true;
-                statusEl.textContent = 'Creating fields in Encompass...';
-                statusEl.className = 'mt-2 small text-info';
-                statusEl.style.display = 'block';
-                try {
-                    const res = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/create-fields', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(fields),
-                    });
-                    const data = await res.json();
-                    if (!res.ok) {
-                        statusEl.textContent = (data.error || 'Request failed') + ': ' + (data.details || res.status);
-                        statusEl.className = 'mt-2 small text-danger';
-                        return;
-                    }
-                    const { created, failed } = data;
-                    if (failed && failed.length > 0) {
-                        statusEl.innerHTML = `Created ${created} field(s). Failed: ${failed.map(f => f.id + ': ' + f.error).join('; ')}`;
-                        statusEl.className = 'mt-2 small text-warning';
-                    } else {
-                        statusEl.textContent = `Successfully created ${created} field(s) in Encompass.`;
-                        statusEl.className = 'mt-2 small text-success';
-                    }
-                } catch (err) {
-                    statusEl.textContent = 'Error: ' + err.message;
-                    statusEl.className = 'mt-2 small text-danger';
-                } finally {
-                    btn.disabled = false;
-                }
+            els.createFieldsBtn.addEventListener('click', async () => {
+                const jsonStr = document.getElementById('ADOoutput').value;
+                await submitAutomatorFieldChanges({
+                    mode: 'create',
+                    jsonStr,
+                    buttonEl: els.createFieldsBtn,
+                    statusEl: els.createFieldsStatus,
+                });
             });
 
-            document.getElementById('updateFieldsBtn').addEventListener('click', async () => {
-                const btn = document.getElementById('updateFieldsBtn');
-                const statusEl = document.getElementById('createFieldsStatus');
-                const jsonStr = document.getElementById('ADOupdateOutput').value.trim();
-                if (!jsonStr) {
-                    statusEl.textContent = 'No modify rows detected. Set row action to Modify.';
-                    statusEl.className = 'mt-2 small text-warning';
-                    statusEl.style.display = 'block';
-                    return;
-                }
-                let fields;
-                try {
-                    fields = JSON.parse(jsonStr);
-                } catch (e) {
-                    statusEl.textContent = 'Invalid update JSON: ' + e.message;
-                    statusEl.className = 'mt-2 small text-danger';
-                    statusEl.style.display = 'block';
-                    return;
-                }
-                if (!Array.isArray(fields) || fields.length === 0) {
-                    statusEl.textContent = 'Update JSON must be a non-empty array.';
-                    statusEl.className = 'mt-2 small text-warning';
-                    statusEl.style.display = 'block';
-                    return;
-                }
-                btn.disabled = true;
-                statusEl.textContent = 'Updating fields in Encompass...';
-                statusEl.className = 'mt-2 small text-info';
-                statusEl.style.display = 'block';
-                try {
-                    const res = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/update-fields', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(fields),
-                    });
-                    const data = await res.json();
-                    if (!res.ok) {
-                        statusEl.textContent = (data.error || 'Request failed') + ': ' + (data.details || res.status);
-                        statusEl.className = 'mt-2 small text-danger';
-                        return;
-                    }
-                    const { updated, failed } = data;
-                    if (failed && failed.length > 0) {
-                        statusEl.innerHTML = `Updated ${updated} field(s). Failed: ${failed.map(f => f.id + ': ' + f.error).join('; ')}`;
-                        statusEl.className = 'mt-2 small text-warning';
-                    } else {
-                        statusEl.textContent = `Successfully updated ${updated} field(s) in Encompass.`;
-                        statusEl.className = 'mt-2 small text-success';
-                    }
-                } catch (err) {
-                    statusEl.textContent = 'Error: ' + err.message;
-                    statusEl.className = 'mt-2 small text-danger';
-                } finally {
-                    btn.disabled = false;
-                }
+            els.updateFieldsBtn.addEventListener('click', async () => {
+                const jsonStr = document.getElementById('ADOupdateOutput').value;
+                await submitAutomatorFieldChanges({
+                    mode: 'update',
+                    jsonStr,
+                    buttonEl: els.updateFieldsBtn,
+                    statusEl: els.createFieldsStatus,
+                });
             });
 
-            document.getElementById('uploadImageBtn').addEventListener('click', () => imageFileInput.click());
-            document.getElementById('pasteImageBtn').addEventListener('click', () => {
+            els.uploadImageBtn.addEventListener('click', () => els.imageFileInput.click());
+            els.pasteImageBtn.addEventListener('click', () => {
                 setImageStatus('Press Ctrl+V now to paste an image.', 'info');
+                els.imageDropZone.focus();
             });
-            imageFileInput.addEventListener('change', (event) => {
+            els.imageFileInput.addEventListener('change', (event) => {
                 const file = event.target.files?.[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    setAutomatorImage(reader.result);
-                    setImageStatus('Image loaded from file. Click Extract Fields.', 'success');
-                };
-                reader.readAsDataURL(file);
+                loadImageFile(file, 'Image loaded from file. Click Extract Fields.');
             });
-            imageDropZone.addEventListener('dragover', (e) => { e.preventDefault(); });
-            imageDropZone.addEventListener('drop', (e) => {
+            els.imageDropZone.addEventListener('click', () => {
+                els.imageDropZone.focus();
+                setImageStatus('Drop an image or press Ctrl+V while this box is focused.', 'info');
+            });
+            els.imageDropZone.addEventListener('dragenter', (e) => {
                 e.preventDefault();
+                els.imageDropZone.classList.add('image-dropzone-active');
+            });
+            els.imageDropZone.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V')) {
+                    setImageStatus('Paste detected. If your clipboard contains an image, it will load.', 'info');
+                }
+            });
+            els.imageDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                els.imageDropZone.classList.add('image-dropzone-active');
+            });
+            els.imageDropZone.addEventListener('dragleave', () => {
+                els.imageDropZone.classList.remove('image-dropzone-active');
+            });
+            els.imageDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                els.imageDropZone.classList.remove('image-dropzone-active');
                 const file = e.dataTransfer?.files?.[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    setAutomatorImage(reader.result);
-                    setImageStatus('Image dropped. Click Extract Fields.', 'success');
-                };
-                reader.readAsDataURL(file);
+                loadImageFile(file, 'Image dropped. Click Extract Fields.');
+            });
+            els.imageDropZone.addEventListener('paste', (e) => {
+                e.preventDefault();
+                tryLoadClipboardImageFromEvent(
+                    e,
+                    'No image detected in clipboard. Copy an image first, then press Ctrl+V.'
+                );
             });
             document.addEventListener('paste', (e) => {
-                const items = Array.from(e.clipboardData?.items || []);
-                const imageItem = items.find((item) => item.type.startsWith('image/'));
-                if (!imageItem) return;
-                const file = imageItem.getAsFile();
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = () => {
-                    setAutomatorImage(reader.result);
-                    setImageStatus('Image pasted. Click Extract Fields.', 'success');
-                };
-                reader.readAsDataURL(file);
+                const activeEl = document.activeElement;
+                const isTypingField = activeEl && (
+                    activeEl.tagName === 'INPUT' ||
+                    activeEl.tagName === 'TEXTAREA' ||
+                    activeEl.isContentEditable
+                );
+                const shouldShowNoImageStatus = activeEl === els.imageDropZone || !isTypingField;
+                tryLoadClipboardImageFromEvent(
+                    e,
+                    shouldShowNoImageStatus ? 'Clipboard paste did not contain an image.' : ''
+                );
             });
-            document.getElementById('startCameraBtn').addEventListener('click', startAutomatorCamera);
-            document.getElementById('captureCameraBtn').addEventListener('click', captureAutomatorCamera);
-            document.getElementById('stopCameraBtn').addEventListener('click', stopAutomatorCamera);
-            document.getElementById('extractFieldsBtn').addEventListener('click', extractFieldsFromImage);
-            document.getElementById('updateFieldsBtn').disabled = true;
+            els.startCameraBtn.addEventListener('click', startAutomatorCamera);
+            els.captureCameraBtn.addEventListener('click', captureAutomatorCamera);
+            els.stopCameraBtn.addEventListener('click', stopAutomatorCamera);
+            els.extractFieldsBtn.addEventListener('click', extractFieldsFromImage);
+            els.updateFieldsBtn.disabled = true;
 
             // Add voice commands for automator
             if (typeof voiceController !== 'undefined') {

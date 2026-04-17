@@ -25,6 +25,9 @@ OCCUPATION_TERMS = (
     "merchant", "physician", "lawyer", "cooper", "carpenter", "mason",
     "wheelwright", "saddler", "minister", "deacon", "selectman", "clerk",
     "schoolmaster", "teacher", "surveyor", "gentleman", "esquire",
+    "joiner", "weaver", "constable", "tax collector", "innkeeper", "miller",
+    "husbandman", "yeoman", "sexton", "shipwright", "magistrate", "barber",
+    "silversmith", "gunsmith",
 )
 
 MILITARY_HINTS = (
@@ -32,11 +35,15 @@ MILITARY_HINTS = (
     "maj.", "major", "sergeant", "militia", "regiment", "company",
     "king philip", "philip's war", "indian war", "french and indian",
     "revolutionary", "revolution", "continental", "civil war",
+    "ensign", "corporal", "private", "artillery", "infantry", "navy", "naval",
+    "bunker hill", "lexington", "concord", "drummer", "fifer",
 )
 
 EDUCATION_HINTS = (
     "harvard", "yale", "dartmouth", "brown", "college", "academy",
     "graduated", "a.b.", "a. m.", "ll.b.", "degree", "tutor",
+    "grammar school", "read law", "harvard college", "philips academy",
+    "williams college", "princeton", "columbian", "latin school",
 )
 
 
@@ -162,23 +169,84 @@ def is_plausible_name(name: str) -> bool:
     return True
 
 
-def extract_locations(text: str):
+def _trim_place_tail(candidate: str) -> str:
+    candidate = clean_text(candidate)
+    candidate = re.sub(r"\b(?:and|who|had|their|ch\.|children)\b.*$", "", candidate, flags=re.IGNORECASE)
+    candidate = re.sub(r"\b(?:m\.|d\.|b\.)\s*$", "", candidate, flags=re.IGNORECASE)
+    candidate = candidate.strip(" ,;:.—-")
+    return candidate
+
+
+def extract_locations_and_hints(text: str):
+    """Return (location_strings, place_hints) for map-ready provenance. Roles: birth, residence, death, burial, other."""
     text = clean_text(text)
     locations = []
-    patterns = [
-        r"\bb\.\s*in\s+([A-Z][A-Za-z\s.'-]{2,60})",
-        r"\bborn\s+in\s+([A-Z][A-Za-z\s.'-]{2,60})",
-        r"\bof\s+([A-Z][A-Za-z\s.'-]{2,60})",
-        r"\bin\s+([A-Z][A-Za-z\s.'-]{2,60})"
+    hints = []
+    seen_loc = set()
+
+    def add_loc(cand: str):
+        cand = _trim_place_tail(cand)
+        if len(cand) < 3:
+            return
+        key = cand.lower()[:120]
+        if key not in seen_loc:
+            seen_loc.add(key)
+            locations.append(cand)
+
+    def add_hint(cand: str, role: str):
+        cand = _trim_place_tail(cand)
+        if len(cand) < 3:
+            return
+        add_loc(cand)
+        entry = {"text": cand, "role": role}
+        if entry not in hints:
+            hints.append(entry)
+
+    # Typed patterns (conservative; capitalized place start).
+    typed = [
+        (r"\bb\.\s*in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "birth"),
+        (r"\bborn\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "birth"),
+        (r"\bres\.?\s*,?\s*in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
+        (r"\bresided\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
+        (r"\bsettled\s+(?:at|in)\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
+        (r"\bremoved\s+to\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
+        (r"\bliving\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
+        (r"\blived\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
+        (r"\bdied\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|and\b)|$)", "death"),
+        (r"\bd\.\s*,?\s*in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|and\b)|$)", "death"),
+        (r"\bbur\.\s*,?\s*in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "burial"),
+        (r"\bburied\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "burial"),
     ]
-    for pat in patterns:
+    for pat, role in typed:
         for m in re.finditer(pat, text, flags=re.IGNORECASE):
-            candidate = clean_text(m.group(1))
-            candidate = re.sub(r"\b(?:and|who|had|m\.|d\.)\b.*$", "", candidate, flags=re.IGNORECASE)
-            candidate = candidate.strip(" ,;:.")
-            if len(candidate) >= 3 and candidate not in locations:
-                locations.append(candidate)
-    return locations[:5]
+            add_hint(m.group(1), role)
+
+    # Generic fallbacks (other): "of Town" when Town looks place-like (not "his wife").
+    for m in re.finditer(
+        r"\bof\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}(?:,\s*)?(?:Massachusetts|Connecticut|Maine|New Hampshire|Vermont|Rhode Island|N\.?\s*H\.?|Mass\.?|Conn\.?|Ct\.?|Me\.?|Vt\.?|R\.?\s*I\.?))",
+        text,
+    ):
+        add_hint(m.group(1), "other")
+
+    legacy = [
+        r"\bof\s+([A-Z][A-Za-z\s.'-]{2,50})",
+        r"\bin\s+([A-Z][A-Za-z\s.'-]{2,50})",
+    ]
+    for pat in legacy:
+        for m in re.finditer(pat, text, flags=re.IGNORECASE):
+            raw = m.group(1)
+            low = raw.lower()
+            if any(bad in low for bad in ("his wife", "their ch", "children", "had by")):
+                continue
+            add_loc(raw)
+
+    return locations[:8], hints[:12]
+
+
+def extract_locations(text: str):
+    """Backward-compatible: location strings only."""
+    locs, _ = extract_locations_and_hints(text)
+    return locs
 
 
 def strip_name_qualifiers(name: str) -> str:
@@ -189,8 +257,75 @@ def strip_name_qualifiers(name: str) -> str:
     return n
 
 
+MILITARY_SNIPPET_RE = (
+    r"([^.]{8,140}(?:soldier|militia|capt\.|captain|lieutenant|lt\.|sergeant|ensign|corporal|"
+    r"private|regiment|company|artillery|infantry|king philip|war|revolutionary|continental|"
+    r"bunker|lexington)[^.]{0,120})"
+)
+
+
+def extract_vital_facts(line: str) -> dict:
+    """Conservative death / burial / marriage fragments; death year only when tied to d./died."""
+    line = clean_text(line)
+    low = line.lower()
+    out = {
+        "deathYear": None,
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+    }
+
+    death_years = []
+    for m in re.finditer(
+        r"(?:\bd\.|\bdied)\s*[,:]?\s*[^0-9]{0,40}?\b(1[5-9]\d{2}|20\d{2})\b",
+        line,
+        flags=re.IGNORECASE,
+    ):
+        death_years.append(int(m.group(1)))
+    if death_years:
+        out["deathYear"] = death_years[-1]
+
+    dm = re.search(
+        r"(?:\bdied\s+in\s+|\bd\.\s*(?:1[5-9]\d{2}\s*,?\s*)?in\s+)(.+?)(?=,\s*(?:m\.|bur\.)|\s+m\.|$)",
+        line,
+        flags=re.IGNORECASE,
+    )
+    if dm:
+        sn = _trim_place_tail(dm.group(1))
+        if len(sn) >= 3 and sn not in out["deathPlaceHints"]:
+            out["deathPlaceHints"].append(sn[:120])
+
+    for m in re.finditer(
+        r"(?:\bbur\.|\bburied)\s*,?\s*(?:in\s+)?([A-Z][A-Za-z\s,.'-]{2,55}?)(?=\s*(?:,|\.|;|and\b|had\b|$))",
+        line,
+        flags=re.IGNORECASE,
+    ):
+        sn = _trim_place_tail(m.group(1))
+        if len(sn) >= 3 and sn not in out["burialHints"]:
+            out["burialHints"].append(sn[:120])
+
+    for m in re.finditer(
+        r"\bm\.\s*([^.;]{4,120}?)(?=\s*[.;]|\s+had\b|\s*$)",
+        line,
+        flags=re.IGNORECASE,
+    ):
+        sn = clean_text(m.group(1).strip())
+        if len(sn) > 3 and sn.lower() not in ("unm", "unmarried"):
+            out["marriageSnippets"].append(sn[:200])
+    for m in re.finditer(
+        r"\bmarried\s+([A-Z][A-Za-z\s.'-]{2,80}?)(?=\s*(?:,|\.|;|had\b|m\.|d\.|\s+in\s+\d{4})|\s*$)",
+        line,
+        flags=re.IGNORECASE,
+    ):
+        sn = clean_text("married " + m.group(1).strip())
+        if len(sn) > 10 and sn not in out["marriageSnippets"]:
+            out["marriageSnippets"].append(sn[:200])
+
+    return out
+
+
 def extract_bio_facts(line: str) -> dict:
-    """Pull occupation, military, education, and children notes from a raw line."""
+    """Pull occupation, military, education, children notes, vitals, and place hints from a raw line."""
     low = line.lower()
     jobs = []
     for term in OCCUPATION_TERMS:
@@ -199,12 +334,7 @@ def extract_bio_facts(line: str) -> dict:
 
     military = []
     if any(h in low for h in MILITARY_HINTS):
-        # Keep a short evidence phrase for UI / text merge.
-        for m in re.finditer(
-            r"([^.]{10,120}(?:soldier|militia|capt\.|captain|king philip|war|company|regiment)[^.]{0,120})",
-            line,
-            flags=re.IGNORECASE,
-        ):
+        for m in re.finditer(MILITARY_SNIPPET_RE, line, flags=re.IGNORECASE):
             snippet = clean_text(m.group(1))
             if len(snippet) > 12 and snippet not in military:
                 military.append(snippet[:240])
@@ -234,11 +364,20 @@ def extract_bio_facts(line: str) -> dict:
     if re.search(r"\bs\.\s*p\.|sine\s+prole|without\s+issue", low):
         children_note = (children_note + "; " if children_note else "") + "sine prole (from text)"
 
+    locs, place_hints = extract_locations_and_hints(line)
+    vitals = extract_vital_facts(line)
+
     return {
         "occupation": list(dict.fromkeys(jobs)),
         "military": military[:3],
         "education": education[:3],
         "childrenNote": children_note,
+        "placeHints": place_hints,
+        "locationsExtra": locs,
+        "deathYear": vitals["deathYear"],
+        "deathPlaceHints": vitals["deathPlaceHints"],
+        "burialHints": vitals["burialHints"],
+        "marriageSnippets": vitals["marriageSnippets"],
     }
 
 
@@ -310,15 +449,33 @@ def extract_spouse_names(line: str) -> list:
 def merge_bio_dict(target: dict, incoming: dict) -> None:
     if not incoming:
         return
-    for k in ("occupation", "military", "education"):
+    for k in (
+        "occupation",
+        "military",
+        "education",
+        "deathPlaceHints",
+        "burialHints",
+        "marriageSnippets",
+        "locationsExtra",
+    ):
         cur = target.setdefault(k, [])
         for item in incoming.get(k, []) or []:
             if item and item not in cur:
                 cur.append(item)
+    for hint in incoming.get("placeHints") or []:
+        if not hint or not isinstance(hint, dict):
+            continue
+        cur = target.setdefault("placeHints", [])
+        key = (hint.get("text"), hint.get("role"))
+        if not any((h.get("text"), h.get("role")) == key for h in cur):
+            cur.append(hint)
     cn = incoming.get("childrenNote")
     if cn:
         prev = target.get("childrenNote")
         target["childrenNote"] = f"{prev}; {cn}" if prev else cn
+    inc_dy = incoming.get("deathYear")
+    if inc_dy is not None and target.get("deathYear") is None:
+        target["deathYear"] = inc_dy
 
 
 def parse_parent_header(line: str):
@@ -421,6 +578,9 @@ def parse_pages_to_people(pages, page_offset):
             bio = meta.get("bio")
             if bio:
                 merge_bio_dict(people[key].setdefault("bio", {}), bio)
+                for loc in bio.get("locationsExtra") or []:
+                    if loc and loc not in people[key]["locations"]:
+                        people[key]["locations"].append(loc)
             people[key]["sources"].append(meta)
             raw = meta.get("rawText")
             if raw and raw not in people[key]["notes"]:
@@ -620,12 +780,41 @@ def infer_gender(name: str):
     return "U"
 
 
+def _looks_like_place_fragment(s: str) -> bool:
+    s = (s or "").strip()
+    if len(s) < 4:
+        return False
+    if re.search(
+        r"\b(Massachusetts|Connecticut|Hampshire|Maine|Vermont|Rhode|England|County|York|Boston)\b",
+        s,
+        re.IGNORECASE,
+    ):
+        return True
+    if "," in s and re.search(r"[A-Za-z]{3,}", s):
+        return True
+    return len(s.split()) <= 8 and not re.search(r"^(had|who|and|the|wife)\b", s, re.IGNORECASE)
+
+
 def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
-    """Merge OCR-derived occupation/military/education/children hints into a laneData node."""
+    """Merge OCR-derived occupation/military/education/vitals/place hints into a laneData node."""
     bio = person.get("bio") or {}
     if not bio:
         return
-    if not any([bio.get("occupation"), bio.get("military"), bio.get("education"), bio.get("childrenNote")]):
+    has_any = any(
+        [
+            bio.get("occupation"),
+            bio.get("military"),
+            bio.get("education"),
+            bio.get("childrenNote"),
+            bio.get("deathYear") is not None,
+            bio.get("deathPlaceHints"),
+            bio.get("burialHints"),
+            bio.get("marriageSnippets"),
+            bio.get("placeHints"),
+            bio.get("locationsExtra"),
+        ]
+    )
+    if not has_any:
         return
 
     imp = node.setdefault("importMeta", {})
@@ -644,6 +833,42 @@ def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
     if bio.get("childrenNote"):
         prev = facts.get("childrenNote")
         facts["childrenNote"] = f"{prev}; {bio['childrenNote']}" if prev else bio["childrenNote"]
+
+    for hint in bio.get("placeHints") or []:
+        if not isinstance(hint, dict):
+            continue
+        cur = facts.setdefault("placeHints", [])
+        key = (hint.get("text"), hint.get("role"))
+        if not any((h.get("text"), h.get("role")) == key for h in cur):
+            cur.append(hint)
+
+    for k_src, k_dst in (
+        ("deathPlaceHints", "deathPlaceSnippets"),
+        ("burialHints", "burialSnippets"),
+        ("marriageSnippets", "marriageSnippets"),
+    ):
+        for item in bio.get(k_src) or []:
+            if not item:
+                continue
+            cur = facts.setdefault(k_dst, [])
+            if item not in cur:
+                cur.append(item)
+
+    loc_ex = bio.get("locationsExtra") or []
+    for loc in loc_ex:
+        if loc and loc not in (node.get("locations") or []):
+            node.setdefault("locations", []).append(loc)
+
+    dy = bio.get("deathYear")
+    if dy is not None and node.get("deathYear") in ("", None):
+        node["deathYear"] = dy if isinstance(dy, int) else dy
+
+    dph = bio.get("deathPlaceHints") or []
+    if not node.get("deathPlace") and len(dph) == 1 and _looks_like_place_fragment(dph[0]):
+        node["deathPlace"] = dph[0]
+    bh = bio.get("burialHints") or []
+    if not node.get("burial") and len(bh) == 1 and _looks_like_place_fragment(bh[0]):
+        node["burial"] = bh[0]
 
     existing_occ = node.get("occupation")
     if not isinstance(existing_occ, list):
@@ -677,6 +902,14 @@ def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
         extra_text.append("Education (OCR): " + "; ".join(bio["education"][:2]))
     if bio.get("childrenNote"):
         extra_text.append("Children (OCR): " + bio["childrenNote"])
+    if bio.get("marriageSnippets"):
+        extra_text.append("Marriage (OCR): " + "; ".join(bio["marriageSnippets"][:2]))
+    if dy is not None:
+        extra_text.append(f"Death year (OCR): {dy}")
+    if dph and not (len(dph) == 1 and node.get("deathPlace")):
+        extra_text.append("Death place (OCR): " + "; ".join(dph[:2]))
+    if bh and not (len(bh) == 1 and node.get("burial")):
+        extra_text.append("Burial (OCR): " + "; ".join(bh[:2]))
     if extra_text:
         prev = (node.get("text") or "").strip()
         add = " | ".join(extra_text)
@@ -743,6 +976,10 @@ def append_to_lane_data(parsed_people, accepted_relations):
             parts = person["name"].split()
             if parts:
                 inferred_last_name = parts[-1] if parts[-1].lower() not in {"jr", "sr"} else (parts[-2] if len(parts) > 1 else "")
+        pbio = person.get("bio") or {}
+        death_from_bio = pbio.get("deathYear")
+        dph_new = pbio.get("deathPlaceHints") or []
+        bh_new = pbio.get("burialHints") or []
         node = {
             "name": person["name"],
             "id": next_id,
@@ -751,12 +988,12 @@ def append_to_lane_data(parsed_people, accepted_relations):
             "gender": infer_gender(person["name"]),
             "lastName": inferred_last_name or ("Lane" if " lane" in person["name"].lower() else ""),
             "birthYear": person["birthYear"] if person["birthYear"] else "",
-            "deathYear": "",
+            "deathYear": death_from_bio if death_from_bio is not None else "",
             "birthDate": "",
             "deathDate": "",
             "born": (person.get("locations") or [""])[0] if person.get("locations") else "",
-            "deathPlace": "",
-            "burial": "",
+            "deathPlace": dph_new[0] if len(dph_new) == 1 and _looks_like_place_fragment(dph_new[0]) else "",
+            "burial": bh_new[0] if len(bh_new) == 1 and _looks_like_place_fragment(bh_new[0]) else "",
             "locations": person.get("locations", []),
             "sourceRefs": person.get("sources", []),
             "importMeta": {
@@ -770,6 +1007,9 @@ def append_to_lane_data(parsed_people, accepted_relations):
         next_id += 1
         new_count += 1
 
+    # laneData link convention (must match public UI / existing JSON): only father|mother|spouse;
+    # colors #39F / #F39 / #CC0. Parent edges point child -> parent (source=child id, target=parent id).
+    # Spouse edges use the sourceKey/targetKey from the parser (e.g. header: father->mother; child line: child->spouse).
     link_seen = {(l.get("relation"), l.get("source"), l.get("target")) for l in existing_links}
     new_links = 0
     for rel in accepted_relations:
@@ -810,6 +1050,49 @@ def validate_lane_data(lane_data):
         if link.get("relation") not in ("father", "mother", "spouse"):
             issues.append({"severity": "error", "reason": "Unsupported relation", "relation": link.get("relation")})
     return {"valid": len([i for i in issues if i["severity"] == "error"]) == 0, "issues": issues}
+
+
+def compute_extraction_stats(people_dict):
+    """Aggregate counts from parsed person blobs (before laneData append)."""
+    stats = {
+        "peopleWithOccupation": 0,
+        "peopleWithMilitary": 0,
+        "peopleWithEducation": 0,
+        "peopleWithChildrenNote": 0,
+        "peopleWithDeathYear": 0,
+        "peopleWithDeathPlaceHints": 0,
+        "peopleWithBurialHints": 0,
+        "peopleWithMarriageSnippets": 0,
+        "peopleWithPlaceHints": 0,
+        "peopleWithAnyLocation": 0,
+        "peopleWithMultipleLocations": 0,
+    }
+    for p in people_dict.values():
+        bio = p.get("bio") or {}
+        locs = p.get("locations") or []
+        if bio.get("occupation"):
+            stats["peopleWithOccupation"] += 1
+        if bio.get("military"):
+            stats["peopleWithMilitary"] += 1
+        if bio.get("education"):
+            stats["peopleWithEducation"] += 1
+        if bio.get("childrenNote"):
+            stats["peopleWithChildrenNote"] += 1
+        if bio.get("deathYear") is not None:
+            stats["peopleWithDeathYear"] += 1
+        if bio.get("deathPlaceHints"):
+            stats["peopleWithDeathPlaceHints"] += 1
+        if bio.get("burialHints"):
+            stats["peopleWithBurialHints"] += 1
+        if bio.get("marriageSnippets"):
+            stats["peopleWithMarriageSnippets"] += 1
+        if bio.get("placeHints"):
+            stats["peopleWithPlaceHints"] += 1
+        if locs:
+            stats["peopleWithAnyLocation"] += 1
+        if len(locs) > 1:
+            stats["peopleWithMultipleLocations"] += 1
+    return stats
 
 
 def build_output_paths(content_offset, content_count):
@@ -856,6 +1139,7 @@ def main():
 
     lane_data, appended_nodes, appended_links = append_to_lane_data(parsed["people"], accepted)
     validation = validate_lane_data(lane_data)
+    extraction_stats = compute_extraction_stats(parsed["people"])
     structured_out_path, review_out_path, quality_out_path = build_output_paths(args.content_offset, args.content_count)
 
     structured_out = {
@@ -886,7 +1170,8 @@ def main():
         "reviewItems": len(parsed["reviewQueue"]) + len(rejected),
         "appendedNodes": appended_nodes,
         "appendedLinks": appended_links,
-        "validation": validation
+        "validation": validation,
+        "extractionStats": extraction_stats,
     }
 
     structured_out_path.write_text(json.dumps(structured_out, indent=2), encoding="utf-8")
@@ -903,6 +1188,7 @@ def main():
         "appendedNodes": appended_nodes,
         "appendedLinks": appended_links,
         "valid": validation["valid"],
+        "extractionStats": extraction_stats,
         "structuredOut": str(structured_out_path),
         "reviewOut": str(review_out_path),
         "qualityOut": str(quality_out_path)
