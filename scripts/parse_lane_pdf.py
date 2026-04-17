@@ -19,6 +19,26 @@ PROSE_HINTS = {
     "committee", "published", "volume", "chapter", "pages", "church"
 }
 
+# Occupation / role keywords common in Lane genealogy (OCR-tolerant).
+OCCUPATION_TERMS = (
+    "cordwainer", "tailor", "shoemaker", "tanner", "blacksmith", "farmer",
+    "merchant", "physician", "lawyer", "cooper", "carpenter", "mason",
+    "wheelwright", "saddler", "minister", "deacon", "selectman", "clerk",
+    "schoolmaster", "teacher", "surveyor", "gentleman", "esquire",
+)
+
+MILITARY_HINTS = (
+    "soldier", "capt.", "captain", "lt.", "lieutenant", "col.", "colonel",
+    "maj.", "major", "sergeant", "militia", "regiment", "company",
+    "king philip", "philip's war", "indian war", "french and indian",
+    "revolutionary", "revolution", "continental", "civil war",
+)
+
+EDUCATION_HINTS = (
+    "harvard", "yale", "dartmouth", "brown", "college", "academy",
+    "graduated", "a.b.", "a. m.", "ll.b.", "degree", "tutor",
+)
+
 
 def normalize_name(value: str) -> str:
     value = value.lower()
@@ -161,10 +181,150 @@ def extract_locations(text: str):
     return locations[:5]
 
 
+def strip_name_qualifiers(name: str) -> str:
+    """Remove parenthetical surnames from extracted spouse tokens."""
+    n = clean_text(name)
+    n = re.sub(r"\([^)]*\)", " ", n)
+    n = re.sub(r"\s+", " ", n).strip(" ,.;:")
+    return n
+
+
+def extract_bio_facts(line: str) -> dict:
+    """Pull occupation, military, education, and children notes from a raw line."""
+    low = line.lower()
+    jobs = []
+    for term in OCCUPATION_TERMS:
+        if term in low:
+            jobs.append(title_case(term))
+
+    military = []
+    if any(h in low for h in MILITARY_HINTS):
+        # Keep a short evidence phrase for UI / text merge.
+        for m in re.finditer(
+            r"([^.]{10,120}(?:soldier|militia|capt\.|captain|king philip|war|company|regiment)[^.]{0,120})",
+            line,
+            flags=re.IGNORECASE,
+        ):
+            snippet = clean_text(m.group(1))
+            if len(snippet) > 12 and snippet not in military:
+                military.append(snippet[:240])
+        if not military:
+            military.append(clean_text(line)[:240])
+
+    education = []
+    for hint in EDUCATION_HINTS:
+        if hint not in low:
+            continue
+        idx = low.find(hint)
+        if idx == -1:
+            continue
+        start = max(0, idx - 40)
+        end = min(len(line), idx + len(hint) + 60)
+        snippet = clean_text(line[start:end])
+        if snippet and snippet not in education:
+            education.append(snippet[:200])
+
+    children_note = None
+    m = re.search(r"\bhad\s+(\d+)\s+ch", low)
+    if m:
+        children_note = f"{m.group(1)} children (from text)"
+    m = re.search(r"\b(\d+)\s+ch\b", low)
+    if m and not children_note:
+        children_note = f"{m.group(1)} ch. (from text)"
+    if re.search(r"\bs\.\s*p\.|sine\s+prole|without\s+issue", low):
+        children_note = (children_note + "; " if children_note else "") + "sine prole (from text)"
+
+    return {
+        "occupation": list(dict.fromkeys(jobs)),
+        "military": military[:3],
+        "education": education[:3],
+        "childrenNote": children_note,
+    }
+
+
+def extract_spouse_names(line: str) -> list:
+    """Find spouse given names from marriage / wife phrases (conservative)."""
+    s = clean_text(line)
+    low = s.lower()
+    if re.search(r"\bunm\.|unmarried|single\b", low):
+        return []
+
+    names = []
+
+    def add_name(raw: str):
+        raw = strip_name_qualifiers(raw)
+        if not raw or len(raw) < 2:
+            return
+        parts = [p for p in raw.split() if re.match(r"^[A-Za-z][A-Za-z'.-]*$", p)]
+        parts = [p for p in parts if p.lower() not in BAD_NAME_TOKENS and len(p) > 1]
+        if not parts:
+            return
+        # Drop obvious place words trailing "of Connecticut"
+        if len(parts) > 2 and parts[-2].lower() == "of":
+            parts = parts[:-2]
+        cand = " ".join(parts[:3])
+        if is_plausible_name(cand):
+            names.append(title_case(cand))
+
+    for m in re.finditer(
+        r"(?:his\s+)?wife\s+was\s+([A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+){0,3})",
+        s,
+        flags=re.IGNORECASE,
+    ):
+        add_name(m.group(1))
+
+    for m in re.finditer(
+        r"\bmarried\s+([A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+){0,3})\b",
+        s,
+        flags=re.IGNORECASE,
+    ):
+        add_name(m.group(1))
+
+    # m. <date stuff>, NAME — capture capitalized name after first comma following m.
+    for m in re.finditer(
+        r"\bm\.\s*[^,]{0,48},\s*([A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+){0,3})",
+        s,
+        flags=re.IGNORECASE,
+    ):
+        add_name(m.group(1))
+
+    # "and his w. ELIZABETH ..." (handled in header; repeat for inline)
+    for m in re.finditer(
+        r"\b(?:his\s+)?w\.\s+([A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+){0,2})\s*(?:,|had|\.|$)",
+        s,
+        flags=re.IGNORECASE,
+    ):
+        add_name(m.group(1))
+
+    # Dedupe preserving order
+    out = []
+    seen = set()
+    for n in names:
+        k = normalize_name(n)
+        if k not in seen:
+            seen.add(k)
+            out.append(n)
+    return out[:4]
+
+
+def merge_bio_dict(target: dict, incoming: dict) -> None:
+    if not incoming:
+        return
+    for k in ("occupation", "military", "education"):
+        cur = target.setdefault(k, [])
+        for item in incoming.get(k, []) or []:
+            if item and item not in cur:
+                cur.append(item)
+    cn = incoming.get("childrenNote")
+    if cn:
+        prev = target.get("childrenNote")
+        target["childrenNote"] = f"{prev}; {cn}" if prev else cn
+
+
 def parse_parent_header(line: str):
     line_clean = clean_text(line)
     squashed = re.sub(r"[^a-z]", "", line_clean.lower())
-    if "had" not in squashed:
+    if "had" not in squashed and "wifewas" not in squashed and "theirchildren" not in squashed:
         return None
     # Common forms:
     # "SAMUEL LANE ... and his w. ELIZABETH ... had"
@@ -258,6 +418,9 @@ def parse_pages_to_people(pages, page_offset):
         elif generation is not None and people[key].get("generation") is None:
             people[key]["generation"] = generation
         if meta:
+            bio = meta.get("bio")
+            if bio:
+                merge_bio_dict(people[key].setdefault("bio", {}), bio)
             people[key]["sources"].append(meta)
             raw = meta.get("rawText")
             if raw and raw not in people[key]["notes"]:
@@ -295,16 +458,19 @@ def parse_pages_to_people(pages, page_offset):
             if header:
                 father_name, mother_name = header
                 father_birth = parse_year(line)
+                line_bio = extract_bio_facts(line)
                 current_father = ensure_person(father_name, father_birth, {
                     "pdfPageNumber": absolute_page,
                     "lineNumber": line_number,
-                    "rawText": line
+                    "rawText": line,
+                    "bio": line_bio,
                 }, extract_locations(line), generation=current_family_generation)
                 if mother_name:
                     current_mother = ensure_person(mother_name, None, {
                         "pdfPageNumber": absolute_page,
                         "lineNumber": line_number,
-                        "rawText": line
+                        "rawText": line,
+                        "bio": {},
                     }, extract_locations(line), generation=current_family_generation)
                     relation_candidates.append({
                         "relation": "spouse",
@@ -314,6 +480,25 @@ def parse_pages_to_people(pages, page_offset):
                         "pdfPageNumber": absolute_page,
                         "lineNumber": line_number,
                         "rawText": line
+                    })
+                # Extra spouses named on the same line (e.g. second marriages are rare in one line; still link if clear).
+                for extra_spouse in extract_spouse_names(line):
+                    if mother_name and normalize_name(extra_spouse) == normalize_name(mother_name):
+                        continue
+                    sp_key = ensure_person(extra_spouse, None, {
+                        "pdfPageNumber": absolute_page,
+                        "lineNumber": line_number,
+                        "rawText": line,
+                        "bio": {},
+                    }, [], generation=current_family_generation)
+                    relation_candidates.append({
+                        "relation": "spouse",
+                        "sourceKey": current_father,
+                        "targetKey": sp_key,
+                        "confidence": 0.75,
+                        "pdfPageNumber": absolute_page,
+                        "lineNumber": line_number,
+                        "rawText": line,
                     })
 
             child = parse_child_line(line)
@@ -327,10 +512,12 @@ def parse_pages_to_people(pages, page_offset):
                         "rawText": line
                     })
                     continue
+                line_bio = extract_bio_facts(line)
                 child_key = ensure_person(child["name"], child["birthYear"], {
                     "pdfPageNumber": absolute_page,
                     "lineNumber": line_number,
-                    "rawText": line
+                    "rawText": line,
+                    "bio": line_bio,
                 }, child.get("locations"), generation=(
                     current_family_generation + max(child.get("markerLevel", 1), 1)
                     if current_father else None
@@ -363,6 +550,28 @@ def parse_pages_to_people(pages, page_offset):
                         "pdfPageNumber": absolute_page,
                         "lineNumber": line_number,
                         "rawText": line
+                    })
+
+                child_gen = people[child_key].get("generation")
+                for sp_name in extract_spouse_names(line):
+                    if current_mother:
+                        mom_nm = (people.get(current_mother) or {}).get("name", "")
+                        if mom_nm and normalize_name(sp_name) == normalize_name(mom_nm):
+                            continue
+                    sp_key = ensure_person(sp_name, None, {
+                        "pdfPageNumber": absolute_page,
+                        "lineNumber": line_number,
+                        "rawText": line,
+                        "bio": {},
+                    }, [], generation=child_gen)
+                    relation_candidates.append({
+                        "relation": "spouse",
+                        "sourceKey": child_key,
+                        "targetKey": sp_key,
+                        "confidence": 0.78,
+                        "pdfPageNumber": absolute_page,
+                        "lineNumber": line_number,
+                        "rawText": line,
                     })
 
     return {"people": people, "relationCandidates": relation_candidates, "reviewQueue": review_queue}
@@ -409,6 +618,69 @@ def infer_gender(name: str):
     if first in male_tokens:
         return "M"
     return "U"
+
+
+def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
+    """Merge OCR-derived occupation/military/education/children hints into a laneData node."""
+    bio = person.get("bio") or {}
+    if not bio:
+        return
+    if not any([bio.get("occupation"), bio.get("military"), bio.get("education"), bio.get("childrenNote")]):
+        return
+
+    imp = node.setdefault("importMeta", {})
+    if not isinstance(imp, dict):
+        imp = {}
+        node["importMeta"] = imp
+    facts = imp.setdefault("ocrFacts", {})
+    for key in ("occupation", "military", "education"):
+        items = bio.get(key) or []
+        if not items:
+            continue
+        cur = facts.setdefault(key, [])
+        for it in items:
+            if it and it not in cur:
+                cur.append(it)
+    if bio.get("childrenNote"):
+        prev = facts.get("childrenNote")
+        facts["childrenNote"] = f"{prev}; {bio['childrenNote']}" if prev else bio["childrenNote"]
+
+    existing_occ = node.get("occupation")
+    if not isinstance(existing_occ, list):
+        existing_occ = []
+    new_occ = list(existing_occ)
+
+    for job in bio.get("occupation", []):
+        if not job:
+            continue
+        low = job.lower()
+        if not any(isinstance(o, dict) and (o.get("job") or "").lower() == low for o in new_occ):
+            new_occ.append({"job": low})
+
+    for mil in bio.get("military", []):
+        def _svc_match(o):
+            if not isinstance(o, dict) or not o.get("service"):
+                return False
+            try:
+                return o["service"][0].get("text") == mil
+            except (IndexError, TypeError, KeyError):
+                return False
+
+        if mil and not any(_svc_match(o) for o in new_occ):
+            new_occ.append({"service": [{"text": mil}]})
+
+    if new_occ != existing_occ:
+        node["occupation"] = new_occ
+
+    extra_text = []
+    if bio.get("education"):
+        extra_text.append("Education (OCR): " + "; ".join(bio["education"][:2]))
+    if bio.get("childrenNote"):
+        extra_text.append("Children (OCR): " + bio["childrenNote"])
+    if extra_text:
+        prev = (node.get("text") or "").strip()
+        add = " | ".join(extra_text)
+        node["text"] = f"{prev} | {add}" if prev else add
 
 
 def ensure_unique_node_ids(lane_data):
@@ -464,6 +736,7 @@ def append_to_lane_data(parsed_people, accepted_relations):
                 existing_gen = existing_node.get("generation")
                 if incoming_gen is not None and existing_gen in ("", None):
                     existing_node["generation"] = incoming_gen
+                merge_parsed_bio_into_node(existing_node, person)
             continue
         inferred_last_name = ""
         if person["name"]:
@@ -491,6 +764,7 @@ def append_to_lane_data(parsed_people, accepted_relations):
                 "parser": "parse_lane_pdf.py"
             }
         }
+        merge_parsed_bio_into_node(node, person)
         existing_nodes.append(node)
         key_to_id[key] = next_id
         next_id += 1
