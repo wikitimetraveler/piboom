@@ -11,8 +11,15 @@ import {
   getMusicalEra,
   getPeopleAliveDuring,
   getPeopleByGeneration,
-  getFamilyStats
+  getFamilyStats,
+  getMuseumContent,
+  getFeaturedStory,
+  getProminentLanes,
+  getWarParticipants,
+  getWarCampaignsSummary,
+  getOccupationSummary
 } from '../services/genealogy.service.js';
+import { config } from '../config/index.js';
 import multer from 'multer';
 import fs from 'fs/promises';
 import path from 'path';
@@ -253,6 +260,149 @@ export async function getStats(req, res) {
 }
 
 /**
+ * Get curated museum content metadata (themes, media, timeline, docent config).
+ */
+export async function getMuseumContentData(req, res) {
+  try {
+    const content = getMuseumContent();
+    res.json({
+      success: true,
+      content
+    });
+  } catch (error) {
+    console.error('Error getting museum content:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Get opening featured chronological story (William E Lane of Boston).
+ */
+export async function getFeaturedStoryData(req, res) {
+  try {
+    const featuredStory = getFeaturedStory();
+    res.json({
+      success: true,
+      featuredStory
+    });
+  } catch (error) {
+    console.error('Error getting featured story:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Get curated prominent Lane profiles for the museum gallery.
+ */
+export async function getProminentLanesData(req, res) {
+  try {
+    const prominentLanes = getProminentLanes();
+    res.json({
+      success: true,
+      count: prominentLanes.length,
+      prominentLanes
+    });
+  } catch (error) {
+    console.error('Error getting prominent lanes:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Get available war campaigns and participant counts.
+ */
+export async function getWarCampaignsData(req, res) {
+  try {
+    const summary = getWarCampaignsSummary();
+    res.json({
+      success: true,
+      ...summary
+    });
+  } catch (error) {
+    console.error('Error getting war campaigns:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Get participants for a specific war slug.
+ */
+export async function getWarParticipantsData(req, res) {
+  try {
+    const { warSlug } = req.params;
+    const participants = getWarParticipants(warSlug);
+    res.json({
+      success: true,
+      warSlug,
+      count: participants.length,
+      participants
+    });
+  } catch (error) {
+    console.error('Error getting war participants:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Occupation labels aggregated from laneData occupation.job fields.
+ */
+export async function getOccupationsData(req, res) {
+  try {
+    const summary = getOccupationSummary();
+    res.json({
+      success: true,
+      ...summary
+    });
+  } catch (error) {
+    console.error('Error getting occupation summary:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Expose browser-safe Google Maps key used by war history map page.
+ */
+export async function getGenealogyGoogleApiKey(req, res) {
+  try {
+    const key = config.googleBrowserApiKey || config.googleApiKey || '';
+    if (!key) {
+      return res.status(404).json({
+        success: false,
+        error: 'Google Maps API key not configured'
+      });
+    }
+    res.json({
+      success: true,
+      apiKey: key
+    });
+  } catch (error) {
+    console.error('Error getting genealogy map API key:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
  * Get musical timeline (combines family + music history)
  */
 export async function getMusicalTimeline(req, res) {
@@ -365,6 +515,13 @@ export default {
   getPeopleAliveInYear,
   getMusicalEraInfo,
   getStats,
+  getMuseumContentData,
+  getFeaturedStoryData,
+  getProminentLanesData,
+  getWarCampaignsData,
+  getWarParticipantsData,
+  getOccupationsData,
+  getGenealogyGoogleApiKey,
   getMusicalTimeline,
   importImages,
   genealogyImageUpload

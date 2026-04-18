@@ -13,10 +13,8 @@ yarn-error.log*
 
 # Google Cloud credentials - NEVER commit these!
 google-credentials.json
-*.json
-!package.json
-!package-lock.json
-!data/local-spots.json
+# Keep secrets blocked, but allow normal project JSON files.
+*.credentials.json
 
 # Logs
 logs
@@ -69,6 +67,17 @@ Thumbs.db
 
 # Unit test library (uploaded Excel files)
 data/unit-tests/
+
+# OCR-generated genealogy batch artifacts (regenerable)
+data/lanegenealogies01chap-content*-quality-report.json
+data/lanegenealogies01chap-content*-review-queue.json
+data/lanegenealogies01chap-content*-structured.json
+
+# Python cache
+scripts/__pycache__/
+
+# Cursor local machine state
+.cursor/worktrees.json
 
 # Audio files (optional - remove if you want to track them)
 # music/*.mp3

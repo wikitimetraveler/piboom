@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lane Occupations — Historical Context - DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-occupations.css" />
+  <script src="/shared/modern-navbar.js"></script>
+</head>
+<body class="lane-occ-page">
+  <modern-navbar></modern-navbar>
+  <main class="occ-wrap">
+    <section class="occ-card occ-header">
+      <div class="occ-kicker">Lane family economy</div>
+      <h1 class="h3 mb-2">Occupations in the Lane dataset</h1>
+      <p class="text-muted mb-0">
+        Roles recorded on imported genealogy pages—grouped by job, with short historical notes and the individuals tagged with each occupation.
+      </p>
+      <div id="occMeta" class="small text-muted mt-2"></div>
+      <div id="occError" class="occ-error small mt-2"></div>
+    </section>
+
+    <section class="occ-grid">
+      <aside class="occ-card occ-panel">
+        <h2 class="h6 mb-2">Occupations</h2>
+        <p class="small text-muted mb-2">Select a role to read context and see participants.</p>
+        <div id="occJobList" class="occ-job-list"></div>
+      </aside>
+      <article class="occ-card occ-panel">
+        <div class="d-flex justify-content-between align-items-baseline flex-wrap gap-2 mb-2">
+          <h2 id="occDetailTitle" class="h5 mb-0">Loading…</h2>
+          <span id="occDetailCount" class="small text-muted"></span>
+        </div>
+        <p id="occDetailContext" class="occ-context"></p>
+        <h3 class="h6 text-muted">Individuals recorded with this occupation</h3>
+        <div id="occPeople" class="occ-people-wrap"></div>
+      </article>
+    </section>
+
+    <section class="occ-card occ-panel mt-3">
+      <a href="/family/genealogy.html" class="small mr-3"><i class="bi-arrow-left"></i> Back to Family Genealogy</a>
+      <a href="/family/lane-war-history.html" class="small">Lane War History</a>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/family/js/lane-occupations.js"></script>
+</body>
+</html>

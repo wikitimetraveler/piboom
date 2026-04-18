@@ -1,0 +1,122 @@
+body.lane-war-page {
+  background: #0f141b;
+  color: #f2ebdf;
+}
+
+.war-wrap {
+  max-width: 1320px;
+  margin: 2rem auto 4rem;
+  padding: 0 1rem;
+}
+
+.war-card {
+  background: #1a2230;
+  border: 1px solid #2b3647;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.war-header {
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.war-kicker {
+  color: #caa56c;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.war-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+}
+
+#warMap {
+  height: 520px;
+  border-radius: 12px;
+  border: 1px solid #2b3647;
+  overflow: hidden;
+  background: #111826;
+}
+
+.war-panel {
+  padding: 1rem;
+}
+
+.war-tabs .btn {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.participant-list {
+  max-height: 520px;
+  overflow: auto;
+}
+
+.participant-item {
+  background: #212c3c;
+  border: 1px solid #33455d;
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.65rem;
+  cursor: pointer;
+}
+
+.participant-item:hover {
+  border-color: #6da3d1;
+}
+
+.confidence-badge {
+  border-radius: 999px;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.confidence-high {
+  background: #1f6d3b;
+  color: #e9f8ef;
+}
+
+.confidence-medium {
+  background: #7a6330;
+  color: #fff7e8;
+}
+
+.confidence-low {
+  background: #5c5050;
+  color: #f3ebeb;
+}
+
+.timeline-item {
+  border-left: 3px solid #caa56c;
+  padding: 0.45rem 0.75rem;
+  margin-bottom: 0.55rem;
+  background: #212c3c;
+  border-radius: 0 8px 8px 0;
+}
+
+.timeline-year {
+  color: #caa56c;
+  font-weight: 700;
+}
+
+.evidence-box {
+  background: #212c3c;
+  border: 1px solid #33455d;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+@media (max-width: 992px) {
+  .war-grid {
+    grid-template-columns: 1fr;
+  }
+  #warMap {
+    height: 380px;
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "featuredStory": {
+    "slug": "william-e-lane-boston",
+    "title": "Exhibit 1: William E Lane of Boston",
+    "subtitle": "Opening the Lane story in chronological order",
+    "personQuery": {
+      "preferredNames": [
+        "William E Lane",
+        "William Lane"
+      ],
+      "fallbackKeywords": [
+        "William",
+        "Boston"
+      ]
+    },
+    "summary": "This opening exhibit introduces William E Lane of Boston as the first anchor in the museum experience. The storyline then advances chronologically through later Lane generations.",
+    "historianNotes": [
+      "Start with verified book citations and sourceRefs tied to this figure.",
+      "Use this exhibit as the chronology baseline for future stories, including Lane Crater."
+    ],
+    "citations": [
+      {
+        "label": "Lane genealogy source book",
+        "kind": "book"
+      }
+    ]
+  },
+  "prominentLanes": [
+    {
+      "order": 1,
+      "personQuery": "William E Lane",
+      "caption": "Opening exhibit figure",
+      "eraLabel": "Colonial Boston"
+    },
+    {
+      "order": 2,
+      "personQuery": "William Lane",
+      "caption": "Chronology continuation",
+      "eraLabel": "Early New England"
+    }
+  ],
+  "media": [
+    {
+      "id": "exhibit1-hero",
+      "storySlug": "william-e-lane-boston",
+      "type": "image",
+      "url": "/family/assets/william-e-lane-placeholder.jpg",
+      "caption": "Portrait placeholder for William E Lane of Boston",
+      "credit": "Pending source image"
+    },
+    {
+      "id": "exhibit1-map",
+      "storySlug": "william-e-lane-boston",
+      "type": "image",
+      "url": "/family/assets/boston-map-placeholder.jpg",
+      "caption": "Map context for Boston-era Lane history",
+      "credit": "Pending map source"
+    }
+  ],
+  "timelineEvents": [
+    {
+      "year": 1625,
+      "title": "Chronology Start",
+      "description": "William E Lane of Boston is used as the opening narrative anchor.",
+      "kind": "family"
+    },
+    {
+      "year": 1770,
+      "title": "American History Context",
+      "description": "Colonial tensions shape New England family life and migration patterns.",
+      "kind": "history"
+    }
+  ],
+  "themes": {
+    "defaultTheme": "museumDark",
+    "available": [
+      {
+        "id": "museumDark",
+        "label": "Museum Dark"
+      },
+      {
+        "id": "archiveLight",
+        "label": "Archival Light"
+      }
+    ]
+  },
+  "aiDocent": {
+    "personaName": "American History + Lane Expert",
+    "intro": "I focus on Lane lineage chronology and historical context, starting with William E Lane of Boston.",
+    "promptChips": [
+      "Who was William E Lane of Boston, and why is he the opening figure?",
+      "Show the next major Lane events in chronological order.",
+      "Connect this exhibit to wider American history."
+    ]
+  }
+}

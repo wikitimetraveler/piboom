@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lane Legacy Museum - DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-museum.css" />
+  <script src="/shared/modern-navbar.js"></script>
+</head>
+<body class="lane-museum-page">
+  <modern-navbar></modern-navbar>
+
+  <main class="museum-wrap">
+    <section class="museum-hero">
+      <div class="museum-kicker">Lane Museum MVP</div>
+      <h1 class="museum-title">Lane Legacy Museum</h1>
+      <p class="museum-subtitle">
+        A chronological gallery beginning with William E Lane of Boston, then moving through later Lane history.
+      </p>
+      <div id="themeButtons" class="theme-row" aria-label="Theme switcher"></div>
+      <div id="museumError" class="text-warning small mt-2"></div>
+    </section>
+
+    <section class="museum-grid">
+      <article class="museum-panel">
+        <div class="featured-badge">Opening Exhibit</div>
+        <h2 id="featuredTitle">Exhibit 1</h2>
+        <p id="featuredSubtitle" class="text-muted mb-2">Loading...</p>
+        <p id="featuredSummary"></p>
+
+        <div class="museum-media mt-3">
+          <div id="mainMedia" class="museum-main-media">
+            <div class="museum-placeholder">Loading media...</div>
+          </div>
+          <div id="secondaryMedia"></div>
+        </div>
+
+        <ul class="nav nav-tabs museum-tabs mt-4" id="museumTabs" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active" id="narrative-tab" data-toggle="tab" href="#narrative" role="tab">Exhibit Narrative</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="connections-tab" data-toggle="tab" href="#connections" role="tab">Family Connections</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="archive-tab" data-toggle="tab" href="#archive" role="tab">Media Archive</a>
+          </li>
+        </ul>
+        <div class="tab-content pt-3">
+          <div class="tab-pane fade show active" id="narrative" role="tabpanel">
+            <div id="timelineRows"></div>
+          </div>
+          <div class="tab-pane fade" id="connections" role="tabpanel">
+            <p class="text-muted">
+              Relationship rendering can reuse existing `/api/genealogy/:id` data once Exhibit 1 person identity is fully confirmed.
+            </p>
+          </div>
+          <div class="tab-pane fade" id="archive" role="tabpanel">
+            <p class="text-muted">
+              Multimedia placeholders are wired. Add final curated photos/doc scans under museum content metadata.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <aside class="museum-panel">
+        <h2 class="h5 mb-3">Featured Profile Snapshot</h2>
+        <div id="featuredMeta" class="museum-meta"></div>
+
+        <hr />
+
+        <h2 class="h5">Ask The Historian</h2>
+        <div id="docentName" class="font-weight-bold mb-1">American History + Lane Expert</div>
+        <p id="docentIntro" class="docent-intro"></p>
+        <div id="promptChips" class="mb-2"></div>
+        <div id="docentAnswer" class="docent-answer">
+          Select a prompt to preview guided answers grounded in the exhibit and chronology.
+        </div>
+      </aside>
+    </section>
+
+    <section class="museum-panel mt-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h5 mb-0">Prominent Lanes (Chronological)</h2>
+        <a href="/family/genealogy.html" class="small">Open classic genealogy view</a>
+      </div>
+      <div id="prominentGrid" class="prominent-grid"></div>
+    </section>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/family/js/lane-museum.js"></script>
+</body>
+</html>

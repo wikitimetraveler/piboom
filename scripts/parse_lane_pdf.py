@@ -1105,43 +1105,66 @@ def build_output_paths(content_offset, content_count):
     return structured, review, quality
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Parse genealogy PDF content pages and append to laneData.json")
-    parser.add_argument("--content-offset", type=int, default=0, help="Offset into content pages after detected start")
-    parser.add_argument("--content-count", type=int, default=100, help="Number of content pages to parse")
-    parser.add_argument("--reset-added-from-id", type=int, default=None, help="Before append, remove nodes with id >= value and links referencing them")
-    parser.add_argument("--use-ocr", action="store_true", help="Use true OCR page extraction instead of embedded PDF text")
-    args = parser.parse_args()
+def build_chunk_output_paths(chunk_one_based: int, num_chunks: int, content_offset: int, content_count: int):
+    """Paths for a chunk run; content_offset/count are relative to content start (same as single-batch naming)."""
+    start_num = content_offset + 1
+    end_num = content_offset + content_count
+    base = f"lanegenealogies01chap-chunk{chunk_one_based:02d}of{num_chunks:02d}-content{start_num}-{end_num}"
+    structured = ROOT / "data" / f"{base}-structured.json"
+    review = ROOT / "data" / f"{base}-review-queue.json"
+    quality = ROOT / "data" / f"{base}-quality-report.json"
+    return structured, review, quality
 
-    if args.use_ocr:
-        start_index, selected_pages = extract_ocr_content_pages(PDF_PATH, args.content_offset, args.content_count)
-        batch_start = start_index + args.content_offset
-    else:
-        reader = PdfReader(str(PDF_PATH))
-        pages = [page.extract_text() or "" for page in reader.pages]
-        start_index = detect_content_start(pages)
-        batch_start = start_index + args.content_offset
-        batch_end = batch_start + args.content_count
-        selected_pages = pages[batch_start:batch_end]
 
-    parsed = parse_pages_to_people(selected_pages, batch_start)
-    accepted, rejected = strict_gate(parsed["people"], parsed["relationCandidates"])
+def split_content_into_n_chunks(total_content_pages: int, n: int):
+    """
+    Split `total_content_pages` into n contiguous segments as (offset, page_count) pairs
+    relative to the content start. Remainder pages go to the first chunks (larger windows).
+    """
+    if n < 1:
+        raise ValueError("n must be >= 1")
+    if total_content_pages < 1:
+        return []
+    base = total_content_pages // n
+    rem = total_content_pages % n
+    out = []
+    pos = 0
+    for i in range(n):
+        c = base + (1 if i < rem else 0)
+        out.append((pos, c))
+        pos += c
+    return out
 
-    if args.reset_added_from_id is not None:
-        lane_data_reset = json.loads(LANE_DATA_PATH.read_text(encoding="utf-8"))
-        lane_data_reset["nodes"] = [n for n in lane_data_reset.get("nodes", []) if n.get("id", -1) < args.reset_added_from_id]
-        valid_ids = {n.get("id") for n in lane_data_reset["nodes"]}
-        lane_data_reset["links"] = [
-            l for l in lane_data_reset.get("links", [])
-            if l.get("source") in valid_ids and l.get("target") in valid_ids
-        ]
-        LANE_DATA_PATH.write_text(json.dumps(lane_data_reset, indent=2), encoding="utf-8")
 
-    lane_data, appended_nodes, appended_links = append_to_lane_data(parsed["people"], accepted)
-    validation = validate_lane_data(lane_data)
-    extraction_stats = compute_extraction_stats(parsed["people"])
-    structured_out_path, review_out_path, quality_out_path = build_output_paths(args.content_offset, args.content_count)
+def maybe_reset_lane_data(reset_added_from_id):
+    if reset_added_from_id is None:
+        return
+    lane_data_reset = json.loads(LANE_DATA_PATH.read_text(encoding="utf-8"))
+    lane_data_reset["nodes"] = [n for n in lane_data_reset.get("nodes", []) if n.get("id", -1) < reset_added_from_id]
+    valid_ids = {n.get("id") for n in lane_data_reset["nodes"]}
+    lane_data_reset["links"] = [
+        l for l in lane_data_reset.get("links", [])
+        if l.get("source") in valid_ids and l.get("target") in valid_ids
+    ]
+    LANE_DATA_PATH.write_text(json.dumps(lane_data_reset, indent=2), encoding="utf-8")
 
+
+def emit_batch_json_files(
+    structured_out_path,
+    review_out_path,
+    quality_out_path,
+    *,
+    start_index,
+    batch_start,
+    selected_pages,
+    parsed,
+    accepted,
+    rejected,
+    validation,
+    extraction_stats,
+    appended_nodes,
+    appended_links,
+):
     structured_out = {
         "generatedAt": datetime.now(UTC).isoformat(),
         "sourcePdf": str(PDF_PATH),
@@ -1149,14 +1172,14 @@ def main():
         "batchStartPdfPage": batch_start + 1,
         "parsedPageCount": len(selected_pages),
         "people": list(parsed["people"].values()),
-        "acceptedRelationships": accepted
+        "acceptedRelationships": accepted,
     }
     review_out = {
         "generatedAt": datetime.now(UTC).isoformat(),
         "detectedStartPdfPage": start_index + 1,
         "batchStartPdfPage": batch_start + 1,
         "rejectedRelationships": rejected,
-        "reviewQueue": parsed["reviewQueue"]
+        "reviewQueue": parsed["reviewQueue"],
     }
     quality_out = {
         "generatedAt": datetime.now(UTC).isoformat(),
@@ -1173,10 +1196,166 @@ def main():
         "validation": validation,
         "extractionStats": extraction_stats,
     }
-
     structured_out_path.write_text(json.dumps(structured_out, indent=2), encoding="utf-8")
     review_out_path.write_text(json.dumps(review_out, indent=2), encoding="utf-8")
     quality_out_path.write_text(json.dumps(quality_out, indent=2), encoding="utf-8")
+
+
+def run_embedded_chunks(num_chunks: int, reset_added_from_id):
+    """Parse the full embedded-text content range in `num_chunks` batches; append to laneData each time."""
+    reader = PdfReader(str(PDF_PATH))
+    pages = [page.extract_text() or "" for page in reader.pages]
+    start_index = detect_content_start(pages)
+    content_total = len(pages) - start_index
+    segments = split_content_into_n_chunks(content_total, num_chunks)
+
+    maybe_reset_lane_data(reset_added_from_id)
+
+    chunk_results = []
+    total_appended_nodes = 0
+    total_appended_links = 0
+    last_validation = {"valid": True, "issues": []}
+
+    for chunk_i, (content_offset, content_count) in enumerate(segments):
+        batch_start = start_index + content_offset
+        selected_pages = pages[batch_start : batch_start + content_count]
+        parsed = parse_pages_to_people(selected_pages, batch_start)
+        accepted, rejected = strict_gate(parsed["people"], parsed["relationCandidates"])
+        lane_data, appended_nodes, appended_links = append_to_lane_data(parsed["people"], accepted)
+        validation = validate_lane_data(lane_data)
+        last_validation = validation
+        extraction_stats = compute_extraction_stats(parsed["people"])
+        structured_out_path, review_out_path, quality_out_path = build_chunk_output_paths(
+            chunk_i + 1, num_chunks, content_offset, content_count
+        )
+        emit_batch_json_files(
+            structured_out_path,
+            review_out_path,
+            quality_out_path,
+            start_index=start_index,
+            batch_start=batch_start,
+            selected_pages=selected_pages,
+            parsed=parsed,
+            accepted=accepted,
+            rejected=rejected,
+            validation=validation,
+            extraction_stats=extraction_stats,
+            appended_nodes=appended_nodes,
+            appended_links=appended_links,
+        )
+        total_appended_nodes += appended_nodes
+        total_appended_links += appended_links
+        chunk_results.append(
+            {
+                "chunk": chunk_i + 1,
+                "of": num_chunks,
+                "contentOffset": content_offset,
+                "contentCount": content_count,
+                "batchStartPdfPage": batch_start + 1,
+                "parsedPages": len(selected_pages),
+                "detectedPeople": len(parsed["people"]),
+                "acceptedRelationships": len(accepted),
+                "rejectedRelationships": len(rejected),
+                "appendedNodes": appended_nodes,
+                "appendedLinks": appended_links,
+                "valid": validation["valid"],
+                "structuredOut": str(structured_out_path),
+                "reviewOut": str(review_out_path),
+                "qualityOut": str(quality_out_path),
+            }
+        )
+
+    summary_path = ROOT / "data" / f"lanegenealogies01chap-chunks{num_chunks:02d}-summary.json"
+    summary_out = {
+        "generatedAt": datetime.now(UTC).isoformat(),
+        "sourcePdf": str(PDF_PATH),
+        "detectedStartPdfPage": start_index + 1,
+        "contentPageTotal": content_total,
+        "chunks": num_chunks,
+        "totalAppendedNodes": total_appended_nodes,
+        "totalAppendedLinks": total_appended_links,
+        "lastValidationValid": last_validation.get("valid"),
+        "chunkResults": chunk_results,
+    }
+    summary_path.write_text(json.dumps(summary_out, indent=2), encoding="utf-8")
+
+    print(
+        json.dumps(
+            {
+                "mode": "chunks",
+                "chunks": num_chunks,
+                "detectedStartPdfPage": start_index + 1,
+                "contentPageTotal": content_total,
+                "totalAppendedNodes": total_appended_nodes,
+                "totalAppendedLinks": total_appended_links,
+                "valid": last_validation.get("valid"),
+                "summaryOut": str(summary_path),
+                "chunkResults": chunk_results,
+            },
+            indent=2,
+        )
+    )
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Parse genealogy PDF content pages and append to laneData.json")
+    parser.add_argument("--content-offset", type=int, default=0, help="Offset into content pages after detected start")
+    parser.add_argument("--content-count", type=int, default=100, help="Number of content pages to parse")
+    parser.add_argument(
+        "--chunks",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Split all embedded-text content pages into N contiguous batches (ignores --content-offset/--content-count). Not supported with --use-ocr.",
+    )
+    parser.add_argument("--reset-added-from-id", type=int, default=None, help="Before append, remove nodes with id >= value and links referencing them")
+    parser.add_argument("--use-ocr", action="store_true", help="Use true OCR page extraction instead of embedded PDF text")
+    args = parser.parse_args()
+
+    if args.chunks is not None:
+        if args.chunks < 1:
+            parser.error("--chunks must be >= 1")
+        if args.use_ocr:
+            parser.error("--chunks cannot be used with --use-ocr; use --content-offset/--content-count per batch instead")
+        run_embedded_chunks(args.chunks, args.reset_added_from_id)
+        return
+
+    if args.use_ocr:
+        start_index, selected_pages = extract_ocr_content_pages(PDF_PATH, args.content_offset, args.content_count)
+        batch_start = start_index + args.content_offset
+    else:
+        reader = PdfReader(str(PDF_PATH))
+        pages = [page.extract_text() or "" for page in reader.pages]
+        start_index = detect_content_start(pages)
+        batch_start = start_index + args.content_offset
+        batch_end = batch_start + args.content_count
+        selected_pages = pages[batch_start:batch_end]
+
+    parsed = parse_pages_to_people(selected_pages, batch_start)
+    accepted, rejected = strict_gate(parsed["people"], parsed["relationCandidates"])
+
+    maybe_reset_lane_data(args.reset_added_from_id)
+
+    lane_data, appended_nodes, appended_links = append_to_lane_data(parsed["people"], accepted)
+    validation = validate_lane_data(lane_data)
+    extraction_stats = compute_extraction_stats(parsed["people"])
+    structured_out_path, review_out_path, quality_out_path = build_output_paths(args.content_offset, args.content_count)
+
+    emit_batch_json_files(
+        structured_out_path,
+        review_out_path,
+        quality_out_path,
+        start_index=start_index,
+        batch_start=batch_start,
+        selected_pages=selected_pages,
+        parsed=parsed,
+        accepted=accepted,
+        rejected=rejected,
+        validation=validation,
+        extraction_stats=extraction_stats,
+        appended_nodes=appended_nodes,
+        appended_links=appended_links,
+    )
 
     print(json.dumps({
         "startPage": start_index + 1,

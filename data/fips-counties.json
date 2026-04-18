@@ -1,0 +1,9 @@
+[
+  { "county_fips": "06037", "county_name": "Los Angeles", "state_abbr": "CA", "state_fips": "06" },
+  { "county_fips": "48201", "county_name": "Harris", "state_abbr": "TX", "state_fips": "48" },
+  { "county_fips": "12086", "county_name": "Miami-Dade", "state_abbr": "FL", "state_fips": "12" },
+  { "county_fips": "36061", "county_name": "New York", "state_abbr": "NY", "state_fips": "36" },
+  { "county_fips": "17031", "county_name": "Cook", "state_abbr": "IL", "state_fips": "17" }
+]
+
+

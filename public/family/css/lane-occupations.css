@@ -1,0 +1,127 @@
+body.lane-occ-page {
+  background: #0f141b;
+  color: #f2ebdf;
+}
+
+.occ-wrap {
+  max-width: 1320px;
+  margin: 2rem auto 4rem;
+  padding: 0 1rem;
+}
+
+.occ-card {
+  background: #1a2230;
+  border: 1px solid #2b3647;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.occ-header {
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.occ-kicker {
+  color: #caa56c;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.occ-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 320px) 1fr;
+  gap: 1rem;
+}
+
+.occ-panel {
+  padding: 1rem;
+}
+
+.occ-job-list {
+  max-height: min(70vh, 640px);
+  overflow: auto;
+  padding-right: 0.25rem;
+}
+
+.occ-job-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  background: #212c3c;
+  border: 1px solid #33455d;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.5rem;
+  color: #f2ebdf;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.occ-job-btn:hover {
+  border-color: #6da3d1;
+}
+
+.occ-job-btn.active {
+  border-color: #caa56c;
+  background: #263347;
+}
+
+.occ-job-btn .occ-count {
+  font-size: 0.8rem;
+  color: #9aa6b5;
+}
+
+.occ-context {
+  color: #cfd6e0;
+  line-height: 1.55;
+  margin-bottom: 1rem;
+}
+
+.occ-people-wrap {
+  max-height: 420px;
+  overflow: auto;
+  border: 1px solid #33455d;
+  border-radius: 10px;
+  background: #212c3c;
+}
+
+.occ-person-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid #2b3647;
+  font-size: 0.92rem;
+}
+
+.occ-person-row:last-child {
+  border-bottom: none;
+}
+
+.occ-person-name {
+  font-weight: 600;
+  color: #e8e4dc;
+}
+
+.occ-person-years {
+  color: #9aa6b5;
+  white-space: nowrap;
+  font-size: 0.85rem;
+}
+
+.occ-error {
+  color: #f0ad4e;
+}
+
+@media (max-width: 992px) {
+  .occ-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .occ-job-list {
+    max-height: 280px;
+  }
+}

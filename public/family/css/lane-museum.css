@@ -1,0 +1,230 @@
+:root {
+  --museum-bg: #111418;
+  --museum-surface: #1b2129;
+  --museum-surface-soft: #252f3a;
+  --museum-text: #e7e1d2;
+  --museum-muted: #9ea5ae;
+  --museum-accent: #bf9b5f;
+  --museum-link: #c8ab75;
+  --museum-border: #3a4653;
+  --museum-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+}
+
+body.archiveLight {
+  --museum-bg: #f1ecdf;
+  --museum-surface: #fffaf0;
+  --museum-surface-soft: #efe8d9;
+  --museum-text: #22262b;
+  --museum-muted: #5e646d;
+  --museum-accent: #7d5d2f;
+  --museum-link: #66461f;
+  --museum-border: #d7ccb6;
+  --museum-shadow: 0 8px 24px rgba(65, 45, 15, 0.12);
+}
+
+body.lane-museum-page {
+  background: var(--museum-bg);
+  color: var(--museum-text);
+}
+
+.museum-wrap {
+  max-width: 1240px;
+  margin: 2rem auto 4rem;
+  padding: 0 1rem;
+}
+
+.museum-hero,
+.museum-panel {
+  background: var(--museum-surface);
+  border: 1px solid var(--museum-border);
+  border-radius: 14px;
+  box-shadow: var(--museum-shadow);
+}
+
+.museum-hero {
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.museum-kicker {
+  color: var(--museum-accent);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+.museum-title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2.7vw, 2.4rem);
+}
+
+.museum-subtitle {
+  margin-top: 0.5rem;
+  color: var(--museum-muted);
+}
+
+.theme-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.museum-theme-btn {
+  border: 1px solid var(--museum-border);
+  background: transparent;
+  color: var(--museum-text);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.9rem;
+}
+
+.museum-theme-btn.active {
+  border-color: var(--museum-accent);
+  color: var(--museum-accent);
+}
+
+.museum-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.museum-panel {
+  padding: 1rem;
+}
+
+.museum-panel h2 {
+  font-size: 1.2rem;
+}
+
+.featured-badge {
+  font-size: 0.85rem;
+  color: var(--museum-accent);
+}
+
+.museum-media {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.8rem;
+}
+
+.museum-main-media,
+.museum-media-item {
+  background: var(--museum-surface-soft);
+  border: 1px solid var(--museum-border);
+  border-radius: 10px;
+  min-height: 180px;
+  overflow: hidden;
+}
+
+.museum-main-media img,
+.museum-media-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.museum-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--museum-muted);
+  min-height: 180px;
+  padding: 1rem;
+}
+
+.museum-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  gap: 0.8rem;
+}
+
+.museum-meta-item {
+  background: var(--museum-surface-soft);
+  border: 1px solid var(--museum-border);
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+}
+
+.museum-meta-label {
+  color: var(--museum-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.museum-meta-value {
+  font-weight: 600;
+}
+
+.museum-tabs .nav-link {
+  color: var(--museum-text);
+  border-color: transparent;
+}
+
+.museum-tabs .nav-link.active {
+  background: var(--museum-surface-soft);
+  color: var(--museum-accent);
+  border-color: var(--museum-border);
+}
+
+.timeline-row {
+  padding: 0.7rem 0.2rem;
+  border-bottom: 1px solid var(--museum-border);
+}
+
+.timeline-year {
+  color: var(--museum-accent);
+  font-weight: 700;
+}
+
+.prominent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.8rem;
+}
+
+.prominent-card {
+  background: var(--museum-surface-soft);
+  border: 1px solid var(--museum-border);
+  border-radius: 12px;
+  padding: 0.8rem;
+}
+
+.docent-intro {
+  color: var(--museum-muted);
+}
+
+.prompt-chip {
+  border: 1px solid var(--museum-border);
+  color: var(--museum-text);
+  background: transparent;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  margin: 0 0.4rem 0.4rem 0;
+}
+
+.docent-answer {
+  background: var(--museum-surface-soft);
+  border: 1px solid var(--museum-border);
+  border-radius: 10px;
+  padding: 0.8rem;
+  margin-top: 0.7rem;
+}
+
+a {
+  color: var(--museum-link);
+}
+
+@media (max-width: 992px) {
+  .museum-grid,
+  .museum-media {
+    grid-template-columns: 1fr;
+  }
+}

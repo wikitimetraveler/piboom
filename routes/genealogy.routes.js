@@ -8,6 +8,13 @@ import {
   getPeopleAliveInYear,
   getMusicalEraInfo,
   getStats,
+  getMuseumContentData,
+  getFeaturedStoryData,
+  getProminentLanesData,
+  getWarCampaignsData,
+  getWarParticipantsData,
+  getOccupationsData,
+  getGenealogyGoogleApiKey,
   getMusicalTimeline,
   importImages,
   genealogyImageUpload
@@ -29,6 +36,15 @@ router.get('/stats', getStats);
 
 // Get musical timeline
 router.get('/musical-timeline', getMusicalTimeline);
+
+// Museum storytelling content endpoints
+router.get('/museum-content', getMuseumContentData);
+router.get('/featured-story', getFeaturedStoryData);
+router.get('/prominent-lanes', getProminentLanesData);
+router.get('/wars', getWarCampaignsData);
+router.get('/wars/:warSlug/participants', getWarParticipantsData);
+router.get('/occupations', getOccupationsData);
+router.get('/google-api-key', getGenealogyGoogleApiKey);
 
 // Upload genealogy page photos (camera/import)
 router.post('/import-images', genealogyImageUpload.array('photos', 40), importImages);

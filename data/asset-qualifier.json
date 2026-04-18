@@ -1,0 +1,105 @@
+{
+  "file": "30 Retail Lending - Asset Qualifier Calculator, August 10, 2022.xlsx",
+  "sheets": [
+    {
+      "name": "AQ Calculation Tool",
+      "size": {
+        "rows": 34,
+        "cols": 16
+      },
+      "headerRowIdx": 0,
+      "headers": [
+        "",
+        "Asset Qualifier Calculator",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      "formulaCount": 14,
+      "formulas": [
+        {
+          "a1": "J2",
+          "f": "IF(AND(C31=\"\",C32=\"\"),\"Yes\",\"No\")",
+          "v": "No"
+        },
+        {
+          "a1": "J3",
+          "f": "TODAY()",
+          "v": 44783
+        },
+        {
+          "a1": "P6",
+          "f": "IF(H8=\"\",\"\",(J3-H8)/365)",
+          "v": ""
+        },
+        {
+          "a1": "P8",
+          "f": "(P7-H8)/365",
+          "v": 122.0027397260274
+        },
+        {
+          "a1": "H15",
+          "f": "G15*F15",
+          "v": 0
+        },
+        {
+          "a1": "H16",
+          "f": "G16*F16",
+          "v": 0
+        },
+        {
+          "a1": "G17",
+          "f": "IF(J3=\"\",\"\",IF(H8=\"\",\"\",IF(P6>56.9,100%,70%)))",
+          "v": ""
+        },
+        {
+          "a1": "H17",
+          "f": "IF(G17=\"\",\"\",F17*G17)",
+          "v": ""
+        },
+        {
+          "a1": "H19",
+          "f": "SUM(H15:H17)",
+          "v": 0
+        },
+        {
+          "a1": "H22",
+          "f": "IF(SUM(F15:F17)-F21 < 500000,\"FAIL\",\"PASS\")",
+          "v": "FAIL"
+        },
+        {
+          "a1": "H24",
+          "f": "H19-F21",
+          "v": 0
+        },
+        {
+          "a1": "H28",
+          "f": "H24*((0.0025*1.233354)/(1.233354-1))",
+          "v": 0
+        },
+        {
+          "a1": "C31",
+          "f": "IF(H9=\"\",\"Confirmation Required\",IF(H9=\"Yes\",\"Guidelines Do Not Accept Assets From Borrowers Not Listed On The Loan\",IF(SUM(F15:F17)<500000,\"A Minimum of $500,000 Is Required\",\"\")))",
+          "v": "Confirmation Required"
+        },
+        {
+          "a1": "C32",
+          "f": "IF(H10=\"\",\"Missing Data Entry is Required\",IF(H10=\"No\", \"Most Recent 12 Month Account History is Required\",\"\"))",
+          "v": "Missing Data Entry is Required"
+        }
+      ]
+    }
+  ],
+  "extractedAt": "2025-10-30T04:36:21.136Z"
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lane Memorial Wall - DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-memorial-wall.css" />
+  <script src="/shared/modern-navbar.js"></script>
+</head>
+<body class="lane-memorial-page">
+  <modern-navbar></modern-navbar>
+  <main class="memorial-wrap">
+    <header class="memorial-hero">
+      <p class="memorial-kicker">Chronological remembrance</p>
+      <h1 class="memorial-title">Lane family — names &amp; birth years</h1>
+      <p class="memorial-sub">
+        Names and dates in small inscription. Click a line for details. Order follows birth year when known.
+      </p>
+      <div class="memorial-controls">
+        <label class="mb-0 d-flex align-items-center">
+          <input type="checkbox" id="bookOnly" class="mr-2" />
+          Book / OCR–sourced entries only
+        </label>
+        <span id="memorialStat" class="memorial-stat"></span>
+      </div>
+    </header>
+
+    <div id="memorialError" class="memorial-error d-none"></div>
+    <div id="memorialWall" class="memorial-wall" aria-live="polite"></div>
+
+    <p class="text-center mt-4 mb-0">
+      <a href="/family/genealogy.html" class="text-muted small">Back to Family Genealogy</a>
+    </p>
+  </main>
+
+  <div class="modal fade" id="memorialModal" tabindex="-1" role="dialog" aria-labelledby="memorialModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content bg-dark text-light border-secondary">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="memorialModalTitle">Profile</h5>
+          <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body memorial-modal-body" id="memorialModalBody"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/family/js/lane-memorial-wall.js"></script>
+</body>
+</html>

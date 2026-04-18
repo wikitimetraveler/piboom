@@ -1,0 +1,14 @@
+[
+  { "type": "tree", "name": "Coast Live Oak", "scientific": "Quercus agrifolia", "habitat": "Coastal California, chaparral" },
+  { "type": "tree", "name": "California Sycamore", "scientific": "Platanus racemosa", "habitat": "Streams, canyons, riparian" },
+  { "type": "tree", "name": "California Black Walnut", "scientific": "Juglans californica", "habitat": "Southern California foothills" },
+  { "type": "tree", "name": "Toyon", "scientific": "Heteromeles arbutifolia", "habitat": "Chaparral, coastal sage" },
+  { "type": "tree", "name": "Coastal Redwood", "scientific": "Sequoia sempervirens", "habitat": "Fog belt, northern California" },
+  { "type": "tree", "name": "Joshua Tree", "scientific": "Yucca brevifolia", "habitat": "Mojave Desert" },
+  { "type": "critter", "name": "Western Fence Lizard", "scientific": "Sceloporus occidentalis", "habitat": "Rocks, woodpiles, sunny spots" },
+  { "type": "critter", "name": "Anna's Hummingbird", "scientific": "Calypte anna", "habitat": "Gardens, coastal scrub" },
+  { "type": "critter", "name": "California Kingsnake", "scientific": "Lampropeltis californiae", "habitat": "Desert to coast" },
+  { "type": "critter", "name": "Desert Cottontail", "scientific": "Sylvilagus audubonii", "habitat": "Desert, brush" },
+  { "type": "critter", "name": "Monarch Butterfly", "scientific": "Danaus plexippus", "habitat": "Milkweed, migration routes" },
+  { "type": "critter", "name": "Western Toad", "scientific": "Anaxyrus boreas", "habitat": "Ponds, streams" }
+]
