@@ -17,7 +17,8 @@ import {
   getProminentLanes,
   getWarParticipants,
   getWarCampaignsSummary,
-  getOccupationSummary
+  getOccupationSummary,
+  getDirectAncestorStory
 } from '../services/genealogy.service.js';
 import { config } from '../config/index.js';
 import multer from 'multer';
@@ -378,6 +379,40 @@ export async function getOccupationsData(req, res) {
 }
 
 /**
+ * Get direct-ancestor-only storyline for a starting person.
+ */
+export async function getDirectAncestorStoryData(req, res) {
+  try {
+    const rawStartId = req.query.startId;
+    const startId = rawStartId ? parseInt(rawStartId, 10) : 112;
+    const order = String(req.query.order || 'oldest-first').toLowerCase();
+    if (!Number.isFinite(startId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid startId'
+      });
+    }
+    const story = getDirectAncestorStory(startId, order);
+    if (!story) {
+      return res.status(404).json({
+        success: false,
+        error: 'Start person not found'
+      });
+    }
+    res.json({
+      success: true,
+      ...story
+    });
+  } catch (error) {
+    console.error('Error getting direct ancestor story:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
  * Expose browser-safe Google Maps key used by war history map page.
  */
 export async function getGenealogyGoogleApiKey(req, res) {
@@ -521,6 +556,7 @@ export default {
   getWarCampaignsData,
   getWarParticipantsData,
   getOccupationsData,
+  getDirectAncestorStoryData,
   getGenealogyGoogleApiKey,
   getMusicalTimeline,
   importImages,

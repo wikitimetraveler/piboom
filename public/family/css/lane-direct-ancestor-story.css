@@ -1,0 +1,94 @@
+body.lane-direct-page {
+  background: #0f141b;
+  color: #f2ebdf;
+}
+
+.direct-wrap {
+  max-width: 1080px;
+  margin: 2rem auto 4rem;
+  padding: 0 1rem;
+}
+
+.direct-card {
+  background: #1a2230;
+  border: 1px solid #2b3647;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.direct-header,
+.direct-footer {
+  padding: 1.2rem;
+}
+
+.direct-kicker {
+  color: #caa56c;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.direct-timeline {
+  margin-top: 1rem;
+}
+
+.ancestor-entry {
+  margin-bottom: 0.85rem;
+  padding: 1rem;
+}
+
+.ancestor-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ancestor-years {
+  color: #9fb2c9;
+  font-size: 0.9rem;
+}
+
+.ancestor-tags {
+  margin-top: 0.45rem;
+}
+
+.ancestor-tags .badge {
+  margin-right: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.ancestor-line {
+  border-left: 3px solid #caa56c;
+  padding-left: 0.75rem;
+  margin-top: 0.65rem;
+  color: #d6dde8;
+}
+
+.family-context {
+  margin-top: 0.75rem;
+  color: #b8c3d3;
+  font-size: 0.9rem;
+}
+
+.desc-draft-list {
+  margin-top: 0.75rem;
+}
+
+.desc-item {
+  border: 1px solid #33455d;
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  margin-bottom: 0.45rem;
+  background: #212c3c;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.desc-item-meta {
+  color: #9fb2c9;
+  font-size: 0.84rem;
+}

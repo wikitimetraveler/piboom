@@ -14,6 +14,7 @@ import {
   getWarCampaignsData,
   getWarParticipantsData,
   getOccupationsData,
+  getDirectAncestorStoryData,
   getGenealogyGoogleApiKey,
   getMusicalTimeline,
   importImages,
@@ -44,6 +45,7 @@ router.get('/prominent-lanes', getProminentLanesData);
 router.get('/wars', getWarCampaignsData);
 router.get('/wars/:warSlug/participants', getWarParticipantsData);
 router.get('/occupations', getOccupationsData);
+router.get('/direct-line-story', getDirectAncestorStoryData);
 router.get('/google-api-key', getGenealogyGoogleApiKey);
 
 // Upload genealogy page photos (camera/import)

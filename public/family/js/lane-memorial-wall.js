@@ -17,6 +17,11 @@
     return Number.isFinite(y) ? y : null;
   }
 
+  function parseDeathYear(person) {
+    const y = parseInt(person.deathYear, 10);
+    return Number.isFinite(y) ? y : null;
+  }
+
   function isBookOrOcrSource(person) {
     const im = person.importMeta;
     if (im && (im.source || im.parser)) return true;
@@ -78,12 +83,14 @@
   }
 
   function lineHtml(person) {
-    const y = parseBirthYear(person);
-    const birth = y === null ? 'b. ?' : `b. ${y}`;
+    const birthYear = parseBirthYear(person);
+    const deathYear = parseDeathYear(person);
+    const birth = birthYear === null ? 'b. ?' : `b. ${birthYear}`;
+    const death = deathYear === null ? '' : ` · d. ${deathYear}`;
     return `
       <div class="memorial-line" role="button" tabindex="0" data-person-id="${esc(person.id)}">
         <span class="memorial-name">${esc(person.name || 'Unknown')}</span>
-        <span class="memorial-birth"> — ${esc(birth)}</span>
+        <span class="memorial-birth"> — ${esc(birth + death)}</span>
       </div>`;
   }
 

@@ -476,6 +476,109 @@ export function getOccupationSummary() {
   };
 }
 
+function extractOccupationLabels(person = {}) {
+  const occ = Array.isArray(person.occupation) ? person.occupation : [];
+  const labels = [];
+  for (const entry of occ) {
+    if (!entry || typeof entry !== 'object') continue;
+    if (typeof entry.job === 'string' && entry.job.trim()) {
+      labels.push(titleCaseWords(entry.job.trim()));
+    }
+  }
+  return compactUnique(labels);
+}
+
+function extractWarLinks(person = {}) {
+  const links = [];
+  for (const war of Object.values(WAR_DEFINITIONS)) {
+    const scored = scoreWarMatch(person, war);
+    if (!scored) continue;
+    links.push({
+      warSlug: war.slug,
+      warLabel: war.label,
+      confidence: scored.confidence,
+      evidence: scored.evidence.slice(0, 3)
+    });
+  }
+  return links;
+}
+
+function summarizeDirectLinePerson(person = {}) {
+  const spouses = getSpouses(person.id).filter(Boolean);
+  const children = getChildren(person.id).filter(Boolean);
+  const parents = getParents(person.id).filter((p) => p?.person);
+  const occupations = extractOccupationLabels(person);
+  const warLinks = extractWarLinks(person);
+
+  const birthYear = person.birthYear || '?';
+  const deathYear = person.deathYear || '?';
+  const place = person.born || person.deathPlace || 'Location not recorded';
+  const parentNames = parents.map((p) => p.person?.name).filter(Boolean);
+  const narrativeParts = [
+    `${person.name || 'Unknown'} (${birthYear} - ${deathYear}) is part of the direct ancestor line.`,
+    `Place context: ${place}.`
+  ];
+  if (occupations.length) {
+    narrativeParts.push(`Recorded occupations include ${occupations.slice(0, 3).join(', ')}.`);
+  }
+  if (warLinks.length) {
+    narrativeParts.push(`War-linked evidence appears for ${warLinks.map((w) => w.warLabel).join(', ')}.`);
+  }
+  if (parentNames.length) {
+    narrativeParts.push(`Parent record links: ${parentNames.join(' and ')}.`);
+  }
+
+  return {
+    id: person.id,
+    name: person.name,
+    generation: person.generation,
+    birthYear: person.birthYear,
+    deathYear: person.deathYear,
+    born: person.born || '',
+    deathPlace: person.deathPlace || '',
+    burial: person.burial || '',
+    occupations,
+    warLinks,
+    spouses: spouses.map((s) => ({ id: s.id, name: s.name, birthYear: s.birthYear, deathYear: s.deathYear })),
+    children: children.map((c) => ({ id: c.id, name: c.name, birthYear: c.birthYear, deathYear: c.deathYear })),
+    parents: parents.map((p) => ({
+      relation: p.relation,
+      person: p.person
+        ? { id: p.person.id, name: p.person.name, birthYear: p.person.birthYear, deathYear: p.person.deathYear }
+        : null
+    })),
+    narrative: narrativeParts.join(' ')
+  };
+}
+
+export function getDirectAncestorStory(startId = 112, order = 'oldest-first') {
+  const anchor = getPersonById(startId);
+  if (!anchor) return null;
+
+  const visited = new Set();
+  const chain = [];
+  let current = anchor;
+  while (current && !visited.has(current.id)) {
+    visited.add(current.id);
+    chain.push(summarizeDirectLinePerson(current));
+
+    const parentLinks = getParents(current.id).filter((p) => p?.person);
+    const father = parentLinks.find((p) => p.relation === 'father')?.person || null;
+    const mother = parentLinks.find((p) => p.relation === 'mother')?.person || null;
+    current = father || mother || null;
+  }
+
+  const orderedLine = order === 'newest-first' ? chain : chain.slice().reverse();
+  return {
+    startId: anchor.id,
+    startPerson: { id: anchor.id, name: anchor.name, birthYear: anchor.birthYear, deathYear: anchor.deathYear },
+    order: order === 'newest-first' ? 'newest-first' : 'oldest-first',
+    directOnly: true,
+    generations: orderedLine.length,
+    line: orderedLine
+  };
+}
+
 /**
  * Get all family data (nodes + links)
  */
@@ -704,6 +807,7 @@ export default {
   getProminentLanes,
   getWarParticipants,
   getWarCampaignsSummary,
-  getOccupationSummary
+  getOccupationSummary,
+  getDirectAncestorStory
 };
 
