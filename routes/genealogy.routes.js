@@ -16,6 +16,8 @@ import {
   getOccupationsData,
   getDirectAncestorStoryData,
   getGenealogyGoogleApiKey,
+  getGenealogyMapboxAccessToken,
+  getGenealogyGeocodeAddress,
   getMusicalTimeline,
   importImages,
   genealogyImageUpload
@@ -47,6 +49,8 @@ router.get('/wars/:warSlug/participants', getWarParticipantsData);
 router.get('/occupations', getOccupationsData);
 router.get('/direct-line-story', getDirectAncestorStoryData);
 router.get('/google-api-key', getGenealogyGoogleApiKey);
+router.get('/mapbox-access-token', getGenealogyMapboxAccessToken);
+router.get('/geocode-address', getGenealogyGeocodeAddress);
 
 // Upload genealogy page photos (camera/import)
 router.post('/import-images', genealogyImageUpload.array('photos', 40), importImages);

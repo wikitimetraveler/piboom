@@ -26,6 +26,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { summarizeGenealogyImageImport, writeImportArtifact } from '../services/genealogy-import.service.js';
+import { geocodeAddressFree } from '../services/free-geocoding.service.js';
+import { resolveGenealogyGeocodeQuery } from '../services/genealogy-geocode.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -438,6 +440,73 @@ export async function getGenealogyGoogleApiKey(req, res) {
 }
 
 /**
+ * Mapbox public token for family pages (Mapbox GL + same stack as free-geocoding.service.js).
+ */
+export async function getGenealogyMapboxAccessToken(req, res) {
+  try {
+    const token = config.mapboxAccessToken || '';
+    if (!token) {
+      return res.status(404).json({
+        success: false,
+        error: 'MAPBOX_ACCESS_TOKEN (or MAPBOX_API_KEY) not configured'
+      });
+    }
+    res.json({
+      success: true,
+      accessToken: token
+    });
+  } catch (error) {
+    console.error('Error getting Mapbox token for genealogy:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Forward geocode via geocodeAddressFree + Lane-specific query aliases.
+ */
+export async function getGenealogyGeocodeAddress(req, res) {
+  try {
+    const q = String(req.query.q || '').trim();
+    if (!q) {
+      return res.status(400).json({
+        success: false,
+        error: 'Query parameter q is required'
+      });
+    }
+    const resolvedQuery = resolveGenealogyGeocodeQuery(q);
+    const result = await geocodeAddressFree(resolvedQuery);
+    const lat = result?.latitude;
+    const lng = result?.longitude;
+    if (lat == null || lng == null || Number.isNaN(+lat) || Number.isNaN(+lng)) {
+      return res.json({
+        success: false,
+        query: q,
+        resolvedQuery,
+        error: 'No coordinates found'
+      });
+    }
+    res.json({
+      success: true,
+      query: q,
+      resolvedQuery,
+      latitude: +lat,
+      longitude: +lng,
+      label: result.display_name || resolvedQuery,
+      source: result.source || 'geocode'
+    });
+  } catch (error) {
+    console.error('Error geocoding genealogy address:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
  * Get musical timeline (combines family + music history)
  */
 export async function getMusicalTimeline(req, res) {
@@ -558,6 +627,8 @@ export default {
   getOccupationsData,
   getDirectAncestorStoryData,
   getGenealogyGoogleApiKey,
+  getGenealogyMapboxAccessToken,
+  getGenealogyGeocodeAddress,
   getMusicalTimeline,
   importImages,
   genealogyImageUpload

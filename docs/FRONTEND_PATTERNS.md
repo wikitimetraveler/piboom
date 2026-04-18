@@ -38,6 +38,14 @@ Discovery and collection pages auto-fill latitude/longitude from the device when
 
 Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` and `maximumAge: 60000`. Sync device location to inputs via a `syncDeviceLocationTo*Inputs()` helper called after position is obtained.
 
+
+
+## Lane / family maps (`public/family/`)
+
+Interactive maps on the Lane genealogy pages use **Mapbox GL JS** for the map canvas and **server-side** geocoding via [`services/free-geocoding.service.js`](./../services/free-geocoding.service.js) (Mapbox Geocoding API when `MAPBOX_ACCESS_TOKEN` is set, then Nominatim, etc.). Endpoints: `GET /api/genealogy/mapbox-access-token`, `GET /api/genealogy/geocode-address?q=`. Historical place aliases live in [`services/genealogy-geocode.service.js`](./../services/genealogy-geocode.service.js). Family map UIs use the **`satellite-streets-v12`** style (satellite imagery plus labels/roads) for readability.
+
+**Do not** add the Google Maps JavaScript API or `google.maps.Geocoder` to these family pages. Other areas of the repo may still use Google Maps keys for legacy UIs; do not copy that pattern into new `public/family/` work.
+
 ## Shared Resources
 
 | Path | Purpose |

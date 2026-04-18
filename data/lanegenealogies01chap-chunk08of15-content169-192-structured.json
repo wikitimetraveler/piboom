@@ -1,0 +1,1609 @@
+{
+  "generatedAt": "2026-04-18T22:45:43.731408+00:00",
+  "sourcePdf": "C:\\projects\\piBoom\\data\\lanegenealogies01chap.pdf",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 190,
+  "parsedPageCount": 24,
+  "people": [
+    {
+      "key": "joseph lane|1779",
+      "name": "Joseph Lane",
+      "birthYear": 1779,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 191,
+          "lineNumber": 3,
+          "rawText": "No.105.JOSEPHLANE 6(Jn.5,Josh.^,Josh.3,Wm.2),1779-1842,car-penter,&c.andhis(i)w.GRATA(MELVIN)hadb.in Dan-ville,Vt. :",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [
+              "Dan-ville"
+            ],
+            "birthDateText": null,
+            "deathYear": 1842,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": []
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.105.JOSEPHLANE 6(Jn.5,Josh.^,Josh.3,Wm.2),1779-1842,car-penter,&c.andhis(i)w.GRATA(MELVIN)hadb.in Dan-ville,Vt. :"
+      ],
+      "locations": [
+        "Dan-ville"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+        "locationsExtra": [
+          "Dan-ville"
+        ],
+        "deathYear": 1842
+      }
+    },
+    {
+      "key": "grata|unknown",
+      "name": "Grata",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 191,
+          "lineNumber": 3,
+          "rawText": "No.105.JOSEPHLANE 6(Jn.5,Josh.^,Josh.3,Wm.2),1779-1842,car-penter,&c.andhis(i)w.GRATA(MELVIN)hadb.in Dan-ville,Vt. :",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.105.JOSEPHLANE 6(Jn.5,Josh.^,Josh.3,Wm.2),1779-1842,car-penter,&c.andhis(i)w.GRATA(MELVIN)hadb.in Dan-ville,Vt. :"
+      ],
+      "locations": [
+        "Dan-ville"
+      ]
+    },
+    {
+      "key": "william lane|1804",
+      "name": "William Lane",
+      "birthYear": 1804,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 192,
+          "lineNumber": 1,
+          "rawText": "168 WILLIAMLANEANDFAMILY.I.Columbus^,b.20 Nov.,1804,d.in Wheelock,Vt.,29 Jan.,1805.II.John Godfrey^,b.27 Apr.,1806,in Portland,Me.,acar-penter,d.unm.,12 July,1829.III.Luther Melvin^,b.26 Mar.,1808,m.(i)26 June,1839,Mary Annie Lowell,b.15 Sept.,1815,m.(2)i Dec,1853,Jane Psalmond,b.17 June,1817,whod.1883.Mr.Lanewasacontractor,livedandd.in Midwayvillagenear Milledgeville,Ga.,15 June,1856.Ch. : 1.John Godfrey^,b.31 May,1840,teacherandstudentof Oglethorp Univer-sity,Ga.,havingtheministryinview.On 21 Aug.,1864,hewaskilledinthe Confederatearmy,near Charlestown,Va.2.William Henry^,b.2 May,d.10 Oct.,1841.3.IValter Larrie^,b.29 Aug.,1 S 54.IV.Amos Clement^,b.24 May,1810,d.15 July,1815.V.Joseph^,b.16 May,1812,d.6 Aug.,1813.VI.Joseph^,b.19 Oct.,1814,m.(i)Lydia Chamberlain,b.3 May,1817,in Buxton,Me.(dau.of Johnand Mary L.Goodsoe Chamberlain),acarpenterandcontractor,res.at Milledgeville,Ga.Ch.:1.Eckoard Pavson^,b.9 June,1839,book-keeper,m.4 Mar.,1885,Miss W.Ganse(?)Ch. : I.)Marie Roberta^,b.17 Jan.,1886,d.20 Apr.,1887.2.)Edward J?,b.17 Nov.,1887.2.William H?,b.19 Dec,1841,acarpenter,m.15 May,1 S 67,Emma Moore,andd.13 Dec,1874.Shed.8 July,1888.Ch. : I.)John H?,b.26 July,1871,m.1889,Miss Frankandhadch.3.Charles Samuel^,b.19 Apr.,1843,unm.4.Mary Lydia^,b.20 Jan.,1845.5.Sarah Louisa^,b.10 Aug.,1850,d.13 July,1857.6.Helen Martha^,b.7 Oct.,1852,afterashortanduseful Christianlife,shed.10 Oct.,1885.7.Alice Gordon^,b.26 July,1855,abeautiful Christiandisciple,d.20 June,1884.VII.Harriet Grata''',b.at Portland,28 May,1821,bapt.by Dr.E.Payson,m.9 June,1840,James(s.of Ebenand Mary)Delanoof Cape Elizabeth,Me.,amechanicandlighthousekeeper,joined,in 1842,the M.E.church,andd.17 Sept.,1886.Ch. : I.Mary Philbrook'^{Delano),b.17 Jan.,1843,m.4 July,1865,Moses M.(s.of Wm.and Mehitable)Hatch.Bothjoinedthe Methodist Episcopalchurchin 1862,res.in Lowell,Mass.Ch. ;",
+          "bio": {
+            "occupation": [
+              "Carpenter",
+              "Teacher"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Lowell",
+                "role": "residence",
+                "scope": "primary"
+              },
+              {
+                "text": "Wheelock",
+                "role": "death",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Lowell",
+              "Wheelock",
+              "Johnand Mary L.Goodsoe Chamberlain",
+              "Ebenand Mary",
+              "Portland",
+              "Midwayvillagenear Milledgeville",
+              "Buxton"
+            ],
+            "birthDateText": "20 Nov.,1804",
+            "deathYear": 1884,
+            "deathDateText": "10 Oct.,1841",
+            "deathPlaceHints": [
+              "Wheelock,Vt.,29 Jan.,1805.II.John Godfrey^,b.27 Apr.,1806,in Portland,Me.,acar-penter,d.unm.,12 July,1829.III.Luther Mel"
+            ],
+            "burialHints": [],
+            "marriageSnippets": [
+              "(i)26 June,1839,Mary Annie Lowell,b",
+              "(2)i Dec,1853,Jane Psalmond,b",
+              "(i)Lydia Chamberlain,b",
+              "4 Mar",
+              "15 May,1 S 67,Emma Moore,andd",
+              "1889,Miss Frankandhadch",
+              "9 June,1840,James(s",
+              "4 July,1865,Moses M"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "168 WILLIAMLANEANDFAMILY.I.Columbus^,b.20 Nov.,1804,d.in Wheelock,Vt.,29 Jan.,1805.II.John Godfrey^,b.27 Apr.,1806,in Portland,Me.,acar-penter,d.unm.,12 July,1829.III.Luther Melvin^,b.26 Mar.,1808,m.(i)26 June,1839,Mary Annie Lowell,b.15 Sept.,1815,m.(2)i Dec,1853,Jane Psalmond,b.17 June,1817,whod.1883.Mr.Lanewasacontractor,livedandd.in Midwayvillagenear Milledgeville,Ga.,15 June,1856.Ch. : 1.John Godfrey^,b.31 May,1840,teacherandstudentof Oglethorp Univer-sity,Ga.,havingtheministryinview.On 21 Aug.,1864,hewaskilledinthe Confederatearmy,near Charlestown,Va.2.William Henry^,b.2 May,d.10 Oct.,1841.3.IValter Larrie^,b.29 Aug.,1 S 54.IV.Amos Clement^,b.24 May,1810,d.15 July,1815.V.Joseph^,b.16 May,1812,d.6 Aug.,1813.VI.Joseph^,b.19 Oct.,1814,m.(i)Lydia Chamberlain,b.3 May,1817,in Buxton,Me.(dau.of Johnand Mary L.Goodsoe Chamberlain),acarpenterandcontractor,res.at Milledgeville,Ga.Ch.:1.Eckoard Pavson^,b.9 June,1839,book-keeper,m.4 Mar.,1885,Miss W.Ganse(?)Ch. : I.)Marie Roberta^,b.17 Jan.,1886,d.20 Apr.,1887.2.)Edward J?,b.17 Nov.,1887.2.William H?,b.19 Dec,1841,acarpenter,m.15 May,1 S 67,Emma Moore,andd.13 Dec,1874.Shed.8 July,1888.Ch. : I.)John H?,b.26 July,1871,m.1889,Miss Frankandhadch.3.Charles Samuel^,b.19 Apr.,1843,unm.4.Mary Lydia^,b.20 Jan.,1845.5.Sarah Louisa^,b.10 Aug.,1850,d.13 July,1857.6.Helen Martha^,b.7 Oct.,1852,afterashortanduseful Christianlife,shed.10 Oct.,1885.7.Alice Gordon^,b.26 July,1855,abeautiful Christiandisciple,d.20 June,1884.VII.Harriet Grata''',b.at Portland,28 May,1821,bapt.by Dr.E.Payson,m.9 June,1840,James(s.of Ebenand Mary)Delanoof Cape Elizabeth,Me.,amechanicandlighthousekeeper,joined,in 1842,the M.E.church,andd.17 Sept.,1886.Ch. : I.Mary Philbrook'^{Delano),b.17 Jan.,1843,m.4 July,1865,Moses M.(s.of Wm.and Mehitable)Hatch.Bothjoinedthe Methodist Episcopalchurchin 1862,res.in Lowell,Mass.Ch. ;"
+      ],
+      "locations": [
+        "Lowell",
+        "Wheelock",
+        "Johnand Mary L.Goodsoe Chamberlain",
+        "Ebenand Mary",
+        "Portland",
+        "Midwayvillagenear Milledgeville",
+        "Buxton"
+      ],
+      "bio": {
+        "occupation": [
+          "Carpenter",
+          "Teacher"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [
+          "Wheelock,Vt.,29 Jan.,1805.II.John Godfrey^,b.27 Apr.,1806,in Portland,Me.,acar-penter,d.unm.,12 July,1829.III.Luther Mel"
+        ],
+        "burialHints": [],
+        "marriageSnippets": [
+          "(i)26 June,1839,Mary Annie Lowell,b",
+          "(2)i Dec,1853,Jane Psalmond,b",
+          "(i)Lydia Chamberlain,b",
+          "4 Mar",
+          "15 May,1 S 67,Emma Moore,andd",
+          "1889,Miss Frankandhadch",
+          "9 June,1840,James(s",
+          "4 July,1865,Moses M"
+        ],
+        "locationsExtra": [
+          "Lowell",
+          "Wheelock",
+          "Johnand Mary L.Goodsoe Chamberlain",
+          "Ebenand Mary",
+          "Portland",
+          "Midwayvillagenear Milledgeville",
+          "Buxton"
+        ],
+        "placeHints": [
+          {
+            "text": "Lowell",
+            "role": "residence",
+            "scope": "primary"
+          },
+          {
+            "text": "Wheelock",
+            "role": "death",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1884,
+        "deathDateText": "10 Oct.,1841",
+        "birthDateText": "20 Nov.,1804"
+      }
+    },
+    {
+      "key": "ganse|unknown",
+      "name": "Ganse",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 192,
+          "lineNumber": 1,
+          "rawText": "168 WILLIAMLANEANDFAMILY.I.Columbus^,b.20 Nov.,1804,d.in Wheelock,Vt.,29 Jan.,1805.II.John Godfrey^,b.27 Apr.,1806,in Portland,Me.,acar-penter,d.unm.,12 July,1829.III.Luther Melvin^,b.26 Mar.,1808,m.(i)26 June,1839,Mary Annie Lowell,b.15 Sept.,1815,m.(2)i Dec,1853,Jane Psalmond,b.17 June,1817,whod.1883.Mr.Lanewasacontractor,livedandd.in Midwayvillagenear Milledgeville,Ga.,15 June,1856.Ch. : 1.John Godfrey^,b.31 May,1840,teacherandstudentof Oglethorp Univer-sity,Ga.,havingtheministryinview.On 21 Aug.,1864,hewaskilledinthe Confederatearmy,near Charlestown,Va.2.William Henry^,b.2 May,d.10 Oct.,1841.3.IValter Larrie^,b.29 Aug.,1 S 54.IV.Amos Clement^,b.24 May,1810,d.15 July,1815.V.Joseph^,b.16 May,1812,d.6 Aug.,1813.VI.Joseph^,b.19 Oct.,1814,m.(i)Lydia Chamberlain,b.3 May,1817,in Buxton,Me.(dau.of Johnand Mary L.Goodsoe Chamberlain),acarpenterandcontractor,res.at Milledgeville,Ga.Ch.:1.Eckoard Pavson^,b.9 June,1839,book-keeper,m.4 Mar.,1885,Miss W.Ganse(?)Ch. : I.)Marie Roberta^,b.17 Jan.,1886,d.20 Apr.,1887.2.)Edward J?,b.17 Nov.,1887.2.William H?,b.19 Dec,1841,acarpenter,m.15 May,1 S 67,Emma Moore,andd.13 Dec,1874.Shed.8 July,1888.Ch. : I.)John H?,b.26 July,1871,m.1889,Miss Frankandhadch.3.Charles Samuel^,b.19 Apr.,1843,unm.4.Mary Lydia^,b.20 Jan.,1845.5.Sarah Louisa^,b.10 Aug.,1850,d.13 July,1857.6.Helen Martha^,b.7 Oct.,1852,afterashortanduseful Christianlife,shed.10 Oct.,1885.7.Alice Gordon^,b.26 July,1855,abeautiful Christiandisciple,d.20 June,1884.VII.Harriet Grata''',b.at Portland,28 May,1821,bapt.by Dr.E.Payson,m.9 June,1840,James(s.of Ebenand Mary)Delanoof Cape Elizabeth,Me.,amechanicandlighthousekeeper,joined,in 1842,the M.E.church,andd.17 Sept.,1886.Ch. : I.Mary Philbrook'^{Delano),b.17 Jan.,1843,m.4 July,1865,Moses M.(s.of Wm.and Mehitable)Hatch.Bothjoinedthe Methodist Episcopalchurchin 1862,res.in Lowell,Mass.Ch. ;",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "168 WILLIAMLANEANDFAMILY.I.Columbus^,b.20 Nov.,1804,d.in Wheelock,Vt.,29 Jan.,1805.II.John Godfrey^,b.27 Apr.,1806,in Portland,Me.,acar-penter,d.unm.,12 July,1829.III.Luther Melvin^,b.26 Mar.,1808,m.(i)26 June,1839,Mary Annie Lowell,b.15 Sept.,1815,m.(2)i Dec,1853,Jane Psalmond,b.17 June,1817,whod.1883.Mr.Lanewasacontractor,livedandd.in Midwayvillagenear Milledgeville,Ga.,15 June,1856.Ch. : 1.John Godfrey^,b.31 May,1840,teacherandstudentof Oglethorp Univer-sity,Ga.,havingtheministryinview.On 21 Aug.,1864,hewaskilledinthe Confederatearmy,near Charlestown,Va.2.William Henry^,b.2 May,d.10 Oct.,1841.3.IValter Larrie^,b.29 Aug.,1 S 54.IV.Amos Clement^,b.24 May,1810,d.15 July,1815.V.Joseph^,b.16 May,1812,d.6 Aug.,1813.VI.Joseph^,b.19 Oct.,1814,m.(i)Lydia Chamberlain,b.3 May,1817,in Buxton,Me.(dau.of Johnand Mary L.Goodsoe Chamberlain),acarpenterandcontractor,res.at Milledgeville,Ga.Ch.:1.Eckoard Pavson^,b.9 June,1839,book-keeper,m.4 Mar.,1885,Miss W.Ganse(?)Ch. : I.)Marie Roberta^,b.17 Jan.,1886,d.20 Apr.,1887.2.)Edward J?,b.17 Nov.,1887.2.William H?,b.19 Dec,1841,acarpenter,m.15 May,1 S 67,Emma Moore,andd.13 Dec,1874.Shed.8 July,1888.Ch. : I.)John H?,b.26 July,1871,m.1889,Miss Frankandhadch.3.Charles Samuel^,b.19 Apr.,1843,unm.4.Mary Lydia^,b.20 Jan.,1845.5.Sarah Louisa^,b.10 Aug.,1850,d.13 July,1857.6.Helen Martha^,b.7 Oct.,1852,afterashortanduseful Christianlife,shed.10 Oct.,1885.7.Alice Gordon^,b.26 July,1855,abeautiful Christiandisciple,d.20 June,1884.VII.Harriet Grata''',b.at Portland,28 May,1821,bapt.by Dr.E.Payson,m.9 June,1840,James(s.of Ebenand Mary)Delanoof Cape Elizabeth,Me.,amechanicandlighthousekeeper,joined,in 1842,the M.E.church,andd.17 Sept.,1886.Ch. : I.Mary Philbrook'^{Delano),b.17 Jan.,1843,m.4 July,1865,Moses M.(s.of Wm.and Mehitable)Hatch.Bothjoinedthe Methodist Episcopalchurchin 1862,res.in Lowell,Mass.Ch. ;"
+      ],
+      "locations": [
+        "Lowell",
+        "Wheelock",
+        "Johnand Mary L.Goodsoe Chamberlain",
+        "Ebenand Mary",
+        "Portland",
+        "Midwayvillagenear Milledgeville",
+        "Buxton"
+      ]
+    },
+    {
+      "key": "owilliam lane|1827",
+      "name": "Owilliam Lane",
+      "birthYear": 1827,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 194,
+          "lineNumber": 1,
+          "rawText": "I/OWILLIAMLANEANDFAMILY.XLMary Elizabeth\"^,b.19 Sept.,1827,m.in Midway,Ga.,i July,1856,Rev.Thomas Jefferson(s.of Reubenand Phebe James Mc Gossland)Daivdson,b.Green Co.,Ala.,26 June,1826.Hejoinedthe Presbyterianchurch,1850,graduatedat Oglethorpe Universityand Columbia Theological Seminary,licensedby Pres-byteryof Tuscaloosa,Ala.,Oct.,1856,ordained Evangelistin 1857;originatedchurchesat Elytonand Cedar Grove,chaplainofan Alabamaregiment,'d.at Elyton,25 Oct.,1861,anableandsuc-cessfulminister.Hiswidowremovedfrom Elytonandmadeherhomewithhersister,Mrs.Milner,andd.June,1872.Xn.Sarah^,b.7 Sept.,1829,m.in Midway,Ga.,24 Dec,1850,Rev.Robert William(s.of Benjaminand Charity Ely)Milner,graduatedat Oglethorpe University,1849,licensedin 1850,ordainedat Athensin 1852,preachedat Stanfordville,Law-renceville,Danielsonvilleand New Hope;rem.in Dec,1866,to Acworth,Cobb Co.,Ga.Ch. : 1.William Oszvald^{Milner),b.l 6 Nov.,1 S 51,d.22 June,1852.2.Mary Elizabeth^,b.13 Apr.,1853.3.Sarah Ellen^,b.13 Feb.,1855.4.Louie Davidson^,b.15 Nov.,1856,d.23 July,1 S 57.5.George Case^,b.2 June,18^9.6.Robert IVells^,b.20 July,r S 6 i.7.Charles Talmage^,b.30 Dec,1862.8.William Thompson^,b.29 Dec,1864.9.John Edwin^,b.25 May,1866.Xni.Albion\"^,b.5,d.19 Oct.,1832.XIV.Ellen Louisa\",b.8 Nov.,1836,m.29 Sept.,1868,Wil-ll^m Jefferson(s.of Seabornand Mary Blake)Palmer,b.1830,whohad,byaformermarriage,4 daus.andres.at Acworth,Cobb Co.,Ga.,wherehehadaplantation,largelyrented.Afterthedeathofherhusband,Mrs.Palmerlivedwithhersister,Mrs.Cart-ledge,at Bold Spring,Ga.",
+          "bio": {
+            "occupation": [
+              "Minister"
+            ],
+            "military": [
+              ",1856,ordained Evangelistin 1857;originatedchurchesat Elytonand Cedar Grove,chaplainofan Alabamaregiment,'d"
+            ],
+            "education": [
+              "826.Hejoinedthe Presbyterianchurch,1850,graduatedat Oglethorpe Universityand Columbia Theological Seminary,li"
+            ],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [
+              "Reubenand Phebe James Mc Gossland",
+              "Benjaminand Charity Ely",
+              "Seabornand Mary Blake",
+              "Midway",
+              "Dec"
+            ],
+            "birthDateText": "19 Sept.,1827",
+            "deathYear": 1832,
+            "deathDateText": "22 June,1852",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "in Midway,Ga",
+              "in Midway,Ga",
+              "29 Sept"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "I/OWILLIAMLANEANDFAMILY.XLMary Elizabeth\"^,b.19 Sept.,1827,m.in Midway,Ga.,i July,1856,Rev.Thomas Jefferson(s.of Reubenand Phebe James Mc Gossland)Daivdson,b.Green Co.,Ala.,26 June,1826.Hejoinedthe Presbyterianchurch,1850,graduatedat Oglethorpe Universityand Columbia Theological Seminary,licensedby Pres-byteryof Tuscaloosa,Ala.,Oct.,1856,ordained Evangelistin 1857;originatedchurchesat Elytonand Cedar Grove,chaplainofan Alabamaregiment,'d.at Elyton,25 Oct.,1861,anableandsuc-cessfulminister.Hiswidowremovedfrom Elytonandmadeherhomewithhersister,Mrs.Milner,andd.June,1872.Xn.Sarah^,b.7 Sept.,1829,m.in Midway,Ga.,24 Dec,1850,Rev.Robert William(s.of Benjaminand Charity Ely)Milner,graduatedat Oglethorpe University,1849,licensedin 1850,ordainedat Athensin 1852,preachedat Stanfordville,Law-renceville,Danielsonvilleand New Hope;rem.in Dec,1866,to Acworth,Cobb Co.,Ga.Ch. : 1.William Oszvald^{Milner),b.l 6 Nov.,1 S 51,d.22 June,1852.2.Mary Elizabeth^,b.13 Apr.,1853.3.Sarah Ellen^,b.13 Feb.,1855.4.Louie Davidson^,b.15 Nov.,1856,d.23 July,1 S 57.5.George Case^,b.2 June,18^9.6.Robert IVells^,b.20 July,r S 6 i.7.Charles Talmage^,b.30 Dec,1862.8.William Thompson^,b.29 Dec,1864.9.John Edwin^,b.25 May,1866.Xni.Albion\"^,b.5,d.19 Oct.,1832.XIV.Ellen Louisa\",b.8 Nov.,1836,m.29 Sept.,1868,Wil-ll^m Jefferson(s.of Seabornand Mary Blake)Palmer,b.1830,whohad,byaformermarriage,4 daus.andres.at Acworth,Cobb Co.,Ga.,wherehehadaplantation,largelyrented.Afterthedeathofherhusband,Mrs.Palmerlivedwithhersister,Mrs.Cart-ledge,at Bold Spring,Ga."
+      ],
+      "locations": [
+        "Reubenand Phebe James Mc Gossland",
+        "Benjaminand Charity Ely",
+        "Seabornand Mary Blake",
+        "Midway",
+        "Dec"
+      ],
+      "bio": {
+        "occupation": [
+          "Minister"
+        ],
+        "military": [
+          ",1856,ordained Evangelistin 1857;originatedchurchesat Elytonand Cedar Grove,chaplainofan Alabamaregiment,'d"
+        ],
+        "education": [
+          "826.Hejoinedthe Presbyterianchurch,1850,graduatedat Oglethorpe Universityand Columbia Theological Seminary,li"
+        ],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "in Midway,Ga",
+          "29 Sept"
+        ],
+        "locationsExtra": [
+          "Reubenand Phebe James Mc Gossland",
+          "Benjaminand Charity Ely",
+          "Seabornand Mary Blake",
+          "Midway",
+          "Dec"
+        ],
+        "deathYear": 1832,
+        "deathDateText": "22 June,1852",
+        "birthDateText": "19 Sept.,1827"
+      }
+    },
+    {
+      "key": "idowremovedfrom elytonandmadeherhomewithhersister|unknown",
+      "name": "Idowremovedfrom Elytonandmadeherhomewithhersister",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 194,
+          "lineNumber": 1,
+          "rawText": "I/OWILLIAMLANEANDFAMILY.XLMary Elizabeth\"^,b.19 Sept.,1827,m.in Midway,Ga.,i July,1856,Rev.Thomas Jefferson(s.of Reubenand Phebe James Mc Gossland)Daivdson,b.Green Co.,Ala.,26 June,1826.Hejoinedthe Presbyterianchurch,1850,graduatedat Oglethorpe Universityand Columbia Theological Seminary,licensedby Pres-byteryof Tuscaloosa,Ala.,Oct.,1856,ordained Evangelistin 1857;originatedchurchesat Elytonand Cedar Grove,chaplainofan Alabamaregiment,'d.at Elyton,25 Oct.,1861,anableandsuc-cessfulminister.Hiswidowremovedfrom Elytonandmadeherhomewithhersister,Mrs.Milner,andd.June,1872.Xn.Sarah^,b.7 Sept.,1829,m.in Midway,Ga.,24 Dec,1850,Rev.Robert William(s.of Benjaminand Charity Ely)Milner,graduatedat Oglethorpe University,1849,licensedin 1850,ordainedat Athensin 1852,preachedat Stanfordville,Law-renceville,Danielsonvilleand New Hope;rem.in Dec,1866,to Acworth,Cobb Co.,Ga.Ch. : 1.William Oszvald^{Milner),b.l 6 Nov.,1 S 51,d.22 June,1852.2.Mary Elizabeth^,b.13 Apr.,1853.3.Sarah Ellen^,b.13 Feb.,1855.4.Louie Davidson^,b.15 Nov.,1856,d.23 July,1 S 57.5.George Case^,b.2 June,18^9.6.Robert IVells^,b.20 July,r S 6 i.7.Charles Talmage^,b.30 Dec,1862.8.William Thompson^,b.29 Dec,1864.9.John Edwin^,b.25 May,1866.Xni.Albion\"^,b.5,d.19 Oct.,1832.XIV.Ellen Louisa\",b.8 Nov.,1836,m.29 Sept.,1868,Wil-ll^m Jefferson(s.of Seabornand Mary Blake)Palmer,b.1830,whohad,byaformermarriage,4 daus.andres.at Acworth,Cobb Co.,Ga.,wherehehadaplantation,largelyrented.Afterthedeathofherhusband,Mrs.Palmerlivedwithhersister,Mrs.Cart-ledge,at Bold Spring,Ga.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "I/OWILLIAMLANEANDFAMILY.XLMary Elizabeth\"^,b.19 Sept.,1827,m.in Midway,Ga.,i July,1856,Rev.Thomas Jefferson(s.of Reubenand Phebe James Mc Gossland)Daivdson,b.Green Co.,Ala.,26 June,1826.Hejoinedthe Presbyterianchurch,1850,graduatedat Oglethorpe Universityand Columbia Theological Seminary,licensedby Pres-byteryof Tuscaloosa,Ala.,Oct.,1856,ordained Evangelistin 1857;originatedchurchesat Elytonand Cedar Grove,chaplainofan Alabamaregiment,'d.at Elyton,25 Oct.,1861,anableandsuc-cessfulminister.Hiswidowremovedfrom Elytonandmadeherhomewithhersister,Mrs.Milner,andd.June,1872.Xn.Sarah^,b.7 Sept.,1829,m.in Midway,Ga.,24 Dec,1850,Rev.Robert William(s.of Benjaminand Charity Ely)Milner,graduatedat Oglethorpe University,1849,licensedin 1850,ordainedat Athensin 1852,preachedat Stanfordville,Law-renceville,Danielsonvilleand New Hope;rem.in Dec,1866,to Acworth,Cobb Co.,Ga.Ch. : 1.William Oszvald^{Milner),b.l 6 Nov.,1 S 51,d.22 June,1852.2.Mary Elizabeth^,b.13 Apr.,1853.3.Sarah Ellen^,b.13 Feb.,1855.4.Louie Davidson^,b.15 Nov.,1856,d.23 July,1 S 57.5.George Case^,b.2 June,18^9.6.Robert IVells^,b.20 July,r S 6 i.7.Charles Talmage^,b.30 Dec,1862.8.William Thompson^,b.29 Dec,1864.9.John Edwin^,b.25 May,1866.Xni.Albion\"^,b.5,d.19 Oct.,1832.XIV.Ellen Louisa\",b.8 Nov.,1836,m.29 Sept.,1868,Wil-ll^m Jefferson(s.of Seabornand Mary Blake)Palmer,b.1830,whohad,byaformermarriage,4 daus.andres.at Acworth,Cobb Co.,Ga.,wherehehadaplantation,largelyrented.Afterthedeathofherhusband,Mrs.Palmerlivedwithhersister,Mrs.Cart-ledge,at Bold Spring,Ga."
+      ],
+      "locations": [
+        "Reubenand Phebe James Mc Gossland",
+        "Benjaminand Charity Ely",
+        "Seabornand Mary Blake",
+        "Midway",
+        "Dec"
+      ]
+    },
+    {
+      "key": "deaconjoslah lane|1781",
+      "name": "Deaconjoslah Lane",
+      "birthYear": 1781,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 194,
+          "lineNumber": 2,
+          "rawText": "No.106.DEACONJOSLAHLANE\u00ab(Jn.^,Josh.\",Josh.3,Wm.^),1781-1866,carpenter,farmer,&c.,andhisw.PHEBE(MORRILL),hadb.in Wheelock,Vt. :",
+          "bio": {
+            "occupation": [
+              "Farmer",
+              "Carpenter",
+              "Deacon"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [
+              "Wheelock"
+            ],
+            "birthDateText": null,
+            "deathYear": 1866,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": []
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.106.DEACONJOSLAHLANE\u00ab(Jn.^,Josh.\",Josh.3,Wm.^),1781-1866,carpenter,farmer,&c.,andhisw.PHEBE(MORRILL),hadb.in Wheelock,Vt. :"
+      ],
+      "locations": [
+        "Wheelock"
+      ],
+      "bio": {
+        "occupation": [
+          "Farmer",
+          "Carpenter",
+          "Deacon"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+        "locationsExtra": [
+          "Wheelock"
+        ],
+        "deathYear": 1866
+      }
+    },
+    {
+      "key": "phebe|unknown",
+      "name": "Phebe",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 194,
+          "lineNumber": 2,
+          "rawText": "No.106.DEACONJOSLAHLANE\u00ab(Jn.^,Josh.\",Josh.3,Wm.^),1781-1866,carpenter,farmer,&c.,andhisw.PHEBE(MORRILL),hadb.in Wheelock,Vt. :",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.106.DEACONJOSLAHLANE\u00ab(Jn.^,Josh.\",Josh.3,Wm.^),1781-1866,carpenter,farmer,&c.,andhisw.PHEBE(MORRILL),hadb.in Wheelock,Vt. :"
+      ],
+      "locations": [
+        "Wheelock"
+      ]
+    },
+    {
+      "key": "esq john lane|1813",
+      "name": "Esq.john Lane",
+      "birthYear": 1813,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 196,
+          "lineNumber": 2,
+          "rawText": "No.107.ESQ.JOHNLANE 6(Jn.-^Josh.^,Josh.^,Wm.^),1783-1851,of Candia,andhisw.NABBY(EMERSON),hadb.in Candia: I.Richard Emerson\",b.2 June,1813,possessedtalentofrarepromise,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y.,wherehed.suddenly,27 May,1842,bytheruptureofabloodvessel.\"Hewashighlyesteemedandexertedahappy Christianinfluenceupontheyouthin Lewiston.Hewasinstru-mentalintheconversionofseveralcollegeclassmateswhobecameeminentintheministry.Hisshortlifewasnotinvain,butischerishedinremembranceasapreciousgifttohumanity.\"II.Sarah Tilton''',b.10 June,1815,m.Nov.,1839,Warren Story(s.of Solomonand Mary Long)Childs,b.in Henniker,12 Oct.,1811,bothjoinedthe Congregationalchurchin 1832,res.in Henniker,farmerandbridgebuilder,activeinchurchandintown,wherehed.10 Apr.,1888.Shed.8 June,1890.Mrs.Childs,\"Isrememberedasthedevotedwife,thefaithfullovingmother,thegentle,quiet,saintedfriend,whosepure,blameless Christianlifewasfullofgoodwordsandworks,andwhoseverypresencewasasweetbenedictiontoall.\" - From Her Obituary Notice.Ch.: I.Richard Lane^,\\>.2 Aug.,1843,farmerathome,m.19 Mar.,i Zqi,Kate M.Gtitterson,b.4 Dec,1855.^h.:I.)Anna Lois^,b.25 Oct.,1878.2.)Emily Erances^,b.10 May,1 S 80,d.ofdiphtheria,25 June,1890.3.)Erancis Lane^,b.18 Dec,1884.",
+          "bio": {
+            "occupation": [
+              "Farmer",
+              "Teacher"
+            ],
+            "military": [],
+            "education": [
+              "e,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y",
+              "t Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y.,whereh",
+              "edtalentofrarepromise,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherin"
+            ],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Henniker",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Henniker",
+                "role": "residence",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Henniker",
+              "Candia",
+              "Solomonand Mary Long"
+            ],
+            "birthDateText": "2 June,1813",
+            "deathYear": 1890,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "19 Mar",
+              "Gtitterson,b"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.107.ESQ.JOHNLANE 6(Jn.-^Josh.^,Josh.^,Wm.^),1783-1851,of Candia,andhisw.NABBY(EMERSON),hadb.in Candia: I.Richard Emerson\",b.2 June,1813,possessedtalentofrarepromise,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y.,wherehed.suddenly,27 May,1842,bytheruptureofabloodvessel.\"Hewashighlyesteemedandexertedahappy Christianinfluenceupontheyouthin Lewiston.Hewasinstru-mentalintheconversionofseveralcollegeclassmateswhobecameeminentintheministry.Hisshortlifewasnotinvain,butischerishedinremembranceasapreciousgifttohumanity.\"II.Sarah Tilton''',b.10 June,1815,m.Nov.,1839,Warren Story(s.of Solomonand Mary Long)Childs,b.in Henniker,12 Oct.,1811,bothjoinedthe Congregationalchurchin 1832,res.in Henniker,farmerandbridgebuilder,activeinchurchandintown,wherehed.10 Apr.,1888.Shed.8 June,1890.Mrs.Childs,\"Isrememberedasthedevotedwife,thefaithfullovingmother,thegentle,quiet,saintedfriend,whosepure,blameless Christianlifewasfullofgoodwordsandworks,andwhoseverypresencewasasweetbenedictiontoall.\" - From Her Obituary Notice.Ch.: I.Richard Lane^,\\>.2 Aug.,1843,farmerathome,m.19 Mar.,i Zqi,Kate M.Gtitterson,b.4 Dec,1855.^h.:I.)Anna Lois^,b.25 Oct.,1878.2.)Emily Erances^,b.10 May,1 S 80,d.ofdiphtheria,25 June,1890.3.)Erancis Lane^,b.18 Dec,1884."
+      ],
+      "locations": [
+        "Henniker",
+        "Candia",
+        "Solomonand Mary Long"
+      ],
+      "bio": {
+        "occupation": [
+          "Farmer",
+          "Teacher"
+        ],
+        "military": [],
+        "education": [
+          "e,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y",
+          "t Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y.,whereh",
+          "edtalentofrarepromise,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherin"
+        ],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "19 Mar",
+          "Gtitterson,b"
+        ],
+        "locationsExtra": [
+          "Henniker",
+          "Candia",
+          "Solomonand Mary Long"
+        ],
+        "placeHints": [
+          {
+            "text": "Henniker",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Henniker",
+            "role": "residence",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1890,
+        "birthDateText": "2 June,1813"
+      }
+    },
+    {
+      "key": "nabby|unknown",
+      "name": "Nabby",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 196,
+          "lineNumber": 2,
+          "rawText": "No.107.ESQ.JOHNLANE 6(Jn.-^Josh.^,Josh.^,Wm.^),1783-1851,of Candia,andhisw.NABBY(EMERSON),hadb.in Candia: I.Richard Emerson\",b.2 June,1813,possessedtalentofrarepromise,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y.,wherehed.suddenly,27 May,1842,bytheruptureofabloodvessel.\"Hewashighlyesteemedandexertedahappy Christianinfluenceupontheyouthin Lewiston.Hewasinstru-mentalintheconversionofseveralcollegeclassmateswhobecameeminentintheministry.Hisshortlifewasnotinvain,butischerishedinremembranceasapreciousgifttohumanity.\"II.Sarah Tilton''',b.10 June,1815,m.Nov.,1839,Warren Story(s.of Solomonand Mary Long)Childs,b.in Henniker,12 Oct.,1811,bothjoinedthe Congregationalchurchin 1832,res.in Henniker,farmerandbridgebuilder,activeinchurchandintown,wherehed.10 Apr.,1888.Shed.8 June,1890.Mrs.Childs,\"Isrememberedasthedevotedwife,thefaithfullovingmother,thegentle,quiet,saintedfriend,whosepure,blameless Christianlifewasfullofgoodwordsandworks,andwhoseverypresencewasasweetbenedictiontoall.\" - From Her Obituary Notice.Ch.: I.Richard Lane^,\\>.2 Aug.,1843,farmerathome,m.19 Mar.,i Zqi,Kate M.Gtitterson,b.4 Dec,1855.^h.:I.)Anna Lois^,b.25 Oct.,1878.2.)Emily Erances^,b.10 May,1 S 80,d.ofdiphtheria,25 June,1890.3.)Erancis Lane^,b.18 Dec,1884.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.107.ESQ.JOHNLANE 6(Jn.-^Josh.^,Josh.^,Wm.^),1783-1851,of Candia,andhisw.NABBY(EMERSON),hadb.in Candia: I.Richard Emerson\",b.2 June,1813,possessedtalentofrarepromise,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y.,wherehed.suddenly,27 May,1842,bytheruptureofabloodvessel.\"Hewashighlyesteemedandexertedahappy Christianinfluenceupontheyouthin Lewiston.Hewasinstru-mentalintheconversionofseveralcollegeclassmateswhobecameeminentintheministry.Hisshortlifewasnotinvain,butischerishedinremembranceasapreciousgifttohumanity.\"II.Sarah Tilton''',b.10 June,1815,m.Nov.,1839,Warren Story(s.of Solomonand Mary Long)Childs,b.in Henniker,12 Oct.,1811,bothjoinedthe Congregationalchurchin 1832,res.in Henniker,farmerandbridgebuilder,activeinchurchandintown,wherehed.10 Apr.,1888.Shed.8 June,1890.Mrs.Childs,\"Isrememberedasthedevotedwife,thefaithfullovingmother,thegentle,quiet,saintedfriend,whosepure,blameless Christianlifewasfullofgoodwordsandworks,andwhoseverypresencewasasweetbenedictiontoall.\" - From Her Obituary Notice.Ch.: I.Richard Lane^,\\>.2 Aug.,1843,farmerathome,m.19 Mar.,i Zqi,Kate M.Gtitterson,b.4 Dec,1855.^h.:I.)Anna Lois^,b.25 Oct.,1878.2.)Emily Erances^,b.10 May,1 S 80,d.ofdiphtheria,25 June,1890.3.)Erancis Lane^,b.18 Dec,1884."
+      ],
+      "locations": [
+        "Henniker",
+        "Candia",
+        "Solomonand Mary Long"
+      ]
+    },
+    {
+      "key": "dr isaiah lane|1830",
+      "name": "Dr.isaiah Lane",
+      "birthYear": 1830,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 200,
+          "lineNumber": 2,
+          "rawText": "No.108.DR.ISAIAHLANE 6(Jn.\\Josh.^,Josh.^Wm.^),1797-1854,andhisw.FRANCES(BATCHELDER),hadb.in Candia:I.John Godfrey''',b.10 Sept.,1830,m.10 Oct.,1854,Ann Caroline Anderson^,b.in Candia,i Nov.,1832,(dau.of Thos.\"*and Lavinia)Eaton(Thos.^,Sam.^,Thos.').Bothunitedwiththe Congregationalchurchin Candiain 1849,''^s.in Manchester.Heisgeneralinsuranceagent,dealerinwesternfarmmortgages,andagentforthe Western Farm Mortgageand Trust Co.of Law-rence,Ka.Hehasbeenactivein Sundayschoolmeetings,Chatau-quacirclesofthestateandcounty,Ch. : 1.Charles Anderson^,b.23 July,1857,d.28 July,1873.2.Francis Randsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m.23 June,1891,Miss Ella Louise Macartney.(144:)II-^EVJames Pillsbury''',b.8 Sept.,1832,d.6 Jan.,1889,m.IJan.,1861,inthe Congregationalchurchin Hamp-stead,N.H.,Emma Louisa Pillsbur V(Benj.L.-*^,Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,Mass.,10 Jan.,1861.Hespentmuchtimeandmoneyuponthis Lane Familyhistory,butsicknessanddeathpreventedhiscompletingit.[See No.144 and Notes.]HI.Charles Russell\"^,b.31 Aug.,1836,d.12 May,1839.IV.Martha Batchelder''',b.12 July,1838,joinedthe Congre-gationalchurchin 1853,m.William H.Blodgettof Newton,Mass.,andd.21 July,1863.V.Charles'^,b.30 Jan.,1841,joinedthe Congregationalchurchin 1856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I.Eddie Wilson\"^,b.13 May,1868,d.10 Dec,1877.Mrs,Susan J.Lane,m.(2)David Clay.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [
+              "andsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m",
+              "856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I",
+              ",Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,"
+            ],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Candia",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Stoneham",
+                "role": "residence",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Candia",
+              "Stoneham",
+              "Thos",
+              "Law-rence",
+              "Manchester.Heisgeneralinsuranceagent"
+            ],
+            "birthDateText": "10 Sept.,1830",
+            "deathYear": 1877,
+            "deathDateText": "28 July,1873",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "10 Oct",
+              "23 June,1891,Miss Ella Louise Macartney",
+              "IJan",
+              "William H",
+              "Susan Jennie(dau",
+              "(2)David Clay"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.108.DR.ISAIAHLANE 6(Jn.\\Josh.^,Josh.^Wm.^),1797-1854,andhisw.FRANCES(BATCHELDER),hadb.in Candia:I.John Godfrey''',b.10 Sept.,1830,m.10 Oct.,1854,Ann Caroline Anderson^,b.in Candia,i Nov.,1832,(dau.of Thos.\"*and Lavinia)Eaton(Thos.^,Sam.^,Thos.').Bothunitedwiththe Congregationalchurchin Candiain 1849,''^s.in Manchester.Heisgeneralinsuranceagent,dealerinwesternfarmmortgages,andagentforthe Western Farm Mortgageand Trust Co.of Law-rence,Ka.Hehasbeenactivein Sundayschoolmeetings,Chatau-quacirclesofthestateandcounty,Ch. : 1.Charles Anderson^,b.23 July,1857,d.28 July,1873.2.Francis Randsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m.23 June,1891,Miss Ella Louise Macartney.(144:)II-^EVJames Pillsbury''',b.8 Sept.,1832,d.6 Jan.,1889,m.IJan.,1861,inthe Congregationalchurchin Hamp-stead,N.H.,Emma Louisa Pillsbur V(Benj.L.-*^,Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,Mass.,10 Jan.,1861.Hespentmuchtimeandmoneyuponthis Lane Familyhistory,butsicknessanddeathpreventedhiscompletingit.[See No.144 and Notes.]HI.Charles Russell\"^,b.31 Aug.,1836,d.12 May,1839.IV.Martha Batchelder''',b.12 July,1838,joinedthe Congre-gationalchurchin 1853,m.William H.Blodgettof Newton,Mass.,andd.21 July,1863.V.Charles'^,b.30 Jan.,1841,joinedthe Congregationalchurchin 1856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I.Eddie Wilson\"^,b.13 May,1868,d.10 Dec,1877.Mrs,Susan J.Lane,m.(2)David Clay."
+      ],
+      "locations": [
+        "Candia",
+        "Stoneham",
+        "Thos",
+        "Law-rence",
+        "Manchester.Heisgeneralinsuranceagent"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [
+          "andsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m",
+          "856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I",
+          ",Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,"
+        ],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "10 Oct",
+          "23 June,1891,Miss Ella Louise Macartney",
+          "IJan",
+          "William H",
+          "Susan Jennie(dau",
+          "(2)David Clay"
+        ],
+        "locationsExtra": [
+          "Candia",
+          "Stoneham",
+          "Thos",
+          "Law-rence",
+          "Manchester.Heisgeneralinsuranceagent"
+        ],
+        "placeHints": [
+          {
+            "text": "Candia",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Stoneham",
+            "role": "residence",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1877,
+        "deathDateText": "28 July,1873",
+        "birthDateText": "10 Sept.,1830"
+      }
+    },
+    {
+      "key": "frances|unknown",
+      "name": "Frances",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 200,
+          "lineNumber": 2,
+          "rawText": "No.108.DR.ISAIAHLANE 6(Jn.\\Josh.^,Josh.^Wm.^),1797-1854,andhisw.FRANCES(BATCHELDER),hadb.in Candia:I.John Godfrey''',b.10 Sept.,1830,m.10 Oct.,1854,Ann Caroline Anderson^,b.in Candia,i Nov.,1832,(dau.of Thos.\"*and Lavinia)Eaton(Thos.^,Sam.^,Thos.').Bothunitedwiththe Congregationalchurchin Candiain 1849,''^s.in Manchester.Heisgeneralinsuranceagent,dealerinwesternfarmmortgages,andagentforthe Western Farm Mortgageand Trust Co.of Law-rence,Ka.Hehasbeenactivein Sundayschoolmeetings,Chatau-quacirclesofthestateandcounty,Ch. : 1.Charles Anderson^,b.23 July,1857,d.28 July,1873.2.Francis Randsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m.23 June,1891,Miss Ella Louise Macartney.(144:)II-^EVJames Pillsbury''',b.8 Sept.,1832,d.6 Jan.,1889,m.IJan.,1861,inthe Congregationalchurchin Hamp-stead,N.H.,Emma Louisa Pillsbur V(Benj.L.-*^,Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,Mass.,10 Jan.,1861.Hespentmuchtimeandmoneyuponthis Lane Familyhistory,butsicknessanddeathpreventedhiscompletingit.[See No.144 and Notes.]HI.Charles Russell\"^,b.31 Aug.,1836,d.12 May,1839.IV.Martha Batchelder''',b.12 July,1838,joinedthe Congre-gationalchurchin 1853,m.William H.Blodgettof Newton,Mass.,andd.21 July,1863.V.Charles'^,b.30 Jan.,1841,joinedthe Congregationalchurchin 1856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I.Eddie Wilson\"^,b.13 May,1868,d.10 Dec,1877.Mrs,Susan J.Lane,m.(2)David Clay.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.108.DR.ISAIAHLANE 6(Jn.\\Josh.^,Josh.^Wm.^),1797-1854,andhisw.FRANCES(BATCHELDER),hadb.in Candia:I.John Godfrey''',b.10 Sept.,1830,m.10 Oct.,1854,Ann Caroline Anderson^,b.in Candia,i Nov.,1832,(dau.of Thos.\"*and Lavinia)Eaton(Thos.^,Sam.^,Thos.').Bothunitedwiththe Congregationalchurchin Candiain 1849,''^s.in Manchester.Heisgeneralinsuranceagent,dealerinwesternfarmmortgages,andagentforthe Western Farm Mortgageand Trust Co.of Law-rence,Ka.Hehasbeenactivein Sundayschoolmeetings,Chatau-quacirclesofthestateandcounty,Ch. : 1.Charles Anderson^,b.23 July,1857,d.28 July,1873.2.Francis Randsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m.23 June,1891,Miss Ella Louise Macartney.(144:)II-^EVJames Pillsbury''',b.8 Sept.,1832,d.6 Jan.,1889,m.IJan.,1861,inthe Congregationalchurchin Hamp-stead,N.H.,Emma Louisa Pillsbur V(Benj.L.-*^,Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,Mass.,10 Jan.,1861.Hespentmuchtimeandmoneyuponthis Lane Familyhistory,butsicknessanddeathpreventedhiscompletingit.[See No.144 and Notes.]HI.Charles Russell\"^,b.31 Aug.,1836,d.12 May,1839.IV.Martha Batchelder''',b.12 July,1838,joinedthe Congre-gationalchurchin 1853,m.William H.Blodgettof Newton,Mass.,andd.21 July,1863.V.Charles'^,b.30 Jan.,1841,joinedthe Congregationalchurchin 1856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I.Eddie Wilson\"^,b.13 May,1868,d.10 Dec,1877.Mrs,Susan J.Lane,m.(2)David Clay."
+      ],
+      "locations": [
+        "Candia",
+        "Stoneham",
+        "Thos",
+        "Law-rence",
+        "Manchester.Heisgeneralinsuranceagent"
+      ]
+    },
+    {
+      "key": "mass|unknown",
+      "name": "Mass",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 200,
+          "lineNumber": 2,
+          "rawText": "No.108.DR.ISAIAHLANE 6(Jn.\\Josh.^,Josh.^Wm.^),1797-1854,andhisw.FRANCES(BATCHELDER),hadb.in Candia:I.John Godfrey''',b.10 Sept.,1830,m.10 Oct.,1854,Ann Caroline Anderson^,b.in Candia,i Nov.,1832,(dau.of Thos.\"*and Lavinia)Eaton(Thos.^,Sam.^,Thos.').Bothunitedwiththe Congregationalchurchin Candiain 1849,''^s.in Manchester.Heisgeneralinsuranceagent,dealerinwesternfarmmortgages,andagentforthe Western Farm Mortgageand Trust Co.of Law-rence,Ka.Hehasbeenactivein Sundayschoolmeetings,Chatau-quacirclesofthestateandcounty,Ch. : 1.Charles Anderson^,b.23 July,1857,d.28 July,1873.2.Francis Randsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m.23 June,1891,Miss Ella Louise Macartney.(144:)II-^EVJames Pillsbury''',b.8 Sept.,1832,d.6 Jan.,1889,m.IJan.,1861,inthe Congregationalchurchin Hamp-stead,N.H.,Emma Louisa Pillsbur V(Benj.L.-*^,Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,Mass.,10 Jan.,1861.Hespentmuchtimeandmoneyuponthis Lane Familyhistory,butsicknessanddeathpreventedhiscompletingit.[See No.144 and Notes.]HI.Charles Russell\"^,b.31 Aug.,1836,d.12 May,1839.IV.Martha Batchelder''',b.12 July,1838,joinedthe Congre-gationalchurchin 1853,m.William H.Blodgettof Newton,Mass.,andd.21 July,1863.V.Charles'^,b.30 Jan.,1841,joinedthe Congregationalchurchin 1856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I.Eddie Wilson\"^,b.13 May,1868,d.10 Dec,1877.Mrs,Susan J.Lane,m.(2)David Clay.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.108.DR.ISAIAHLANE 6(Jn.\\Josh.^,Josh.^Wm.^),1797-1854,andhisw.FRANCES(BATCHELDER),hadb.in Candia:I.John Godfrey''',b.10 Sept.,1830,m.10 Oct.,1854,Ann Caroline Anderson^,b.in Candia,i Nov.,1832,(dau.of Thos.\"*and Lavinia)Eaton(Thos.^,Sam.^,Thos.').Bothunitedwiththe Congregationalchurchin Candiain 1849,''^s.in Manchester.Heisgeneralinsuranceagent,dealerinwesternfarmmortgages,andagentforthe Western Farm Mortgageand Trust Co.of Law-rence,Ka.Hehasbeenactivein Sundayschoolmeetings,Chatau-quacirclesofthestateandcounty,Ch. : 1.Charles Anderson^,b.23 July,1857,d.28 July,1873.2.Francis Randsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m.23 June,1891,Miss Ella Louise Macartney.(144:)II-^EVJames Pillsbury''',b.8 Sept.,1832,d.6 Jan.,1889,m.IJan.,1861,inthe Congregationalchurchin Hamp-stead,N.H.,Emma Louisa Pillsbur V(Benj.L.-*^,Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,Mass.,10 Jan.,1861.Hespentmuchtimeandmoneyuponthis Lane Familyhistory,butsicknessanddeathpreventedhiscompletingit.[See No.144 and Notes.]HI.Charles Russell\"^,b.31 Aug.,1836,d.12 May,1839.IV.Martha Batchelder''',b.12 July,1838,joinedthe Congre-gationalchurchin 1853,m.William H.Blodgettof Newton,Mass.,andd.21 July,1863.V.Charles'^,b.30 Jan.,1841,joinedthe Congregationalchurchin 1856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I.Eddie Wilson\"^,b.13 May,1868,d.10 Dec,1877.Mrs,Susan J.Lane,m.(2)David Clay."
+      ],
+      "locations": []
+    },
+    {
+      "key": "josiah lane|1801",
+      "name": "Josiah Lane",
+      "birthYear": 1801,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 206,
+          "lineNumber": 2,
+          "rawText": "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Searsport,Me",
+                "role": "other",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Searsport,Me",
+              "Searsport"
+            ],
+            "birthDateText": "13 Jan.,1801",
+            "deathYear": 1862,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "Asa Matthews,andres",
+              "(2)Mary Webb",
+              "Winslozu Hall",
+              "Mary Hardy,andd"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862."
+      ],
+      "locations": [
+        "Searsport,Me",
+        "Searsport"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "Asa Matthews,andres",
+          "(2)Mary Webb",
+          "Winslozu Hall",
+          "Mary Hardy,andd"
+        ],
+        "locationsExtra": [
+          "Searsport,Me",
+          "Searsport"
+        ],
+        "placeHints": [
+          {
+            "text": "Searsport,Me",
+            "role": "other",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1862,
+        "birthDateText": "13 Jan.,1801"
+      }
+    },
+    {
+      "key": "sallie|unknown",
+      "name": "Sallie",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 206,
+          "lineNumber": 2,
+          "rawText": "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862."
+      ],
+      "locations": [
+        "Searsport,Me",
+        "Searsport"
+      ]
+    },
+    {
+      "key": "andres at hampden|unknown",
+      "name": "Andres.at Hampden",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 206,
+          "lineNumber": 2,
+          "rawText": "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862."
+      ],
+      "locations": []
+    },
+    {
+      "key": "andd in|unknown",
+      "name": "Andd.in",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 206,
+          "lineNumber": 2,
+          "rawText": "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862."
+      ],
+      "locations": []
+    },
+    {
+      "key": "joshua lane|1813",
+      "name": "Joshua Lane",
+      "birthYear": 1813,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 208,
+          "lineNumber": 2,
+          "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": "sine prole (from text)",
+            "placeHints": [
+              {
+                "text": "Bangor",
+                "role": "residence",
+                "scope": "primary"
+              },
+              {
+                "text": "Bucksport,Me",
+                "role": "other",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Bangor",
+              "Bucksport,Me",
+              "Bucksport"
+            ],
+            "birthDateText": "11 Mar.,1813",
+            "deathYear": 1875,
+            "deathDateText": "14 Nov.,1839",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "Eliza A",
+              "David Mosman,andd",
+              "anactress,andd"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+      ],
+      "locations": [
+        "Bangor",
+        "Bucksport,Me",
+        "Bucksport"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "Eliza A",
+          "David Mosman,andd",
+          "anactress,andd"
+        ],
+        "locationsExtra": [
+          "Bangor",
+          "Bucksport,Me",
+          "Bucksport"
+        ],
+        "placeHints": [
+          {
+            "text": "Bangor",
+            "role": "residence",
+            "scope": "primary"
+          },
+          {
+            "text": "Bucksport,Me",
+            "role": "other",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "sine prole (from text)",
+        "deathYear": 1875,
+        "deathDateText": "14 Nov.,1839",
+        "birthDateText": "11 Mar.,1813"
+      }
+    },
+    {
+      "key": "abigaila|unknown",
+      "name": "Abigaila.",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 208,
+          "lineNumber": 2,
+          "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+      ],
+      "locations": [
+        "Bangor",
+        "Bucksport,Me",
+        "Bucksport"
+      ]
+    },
+    {
+      "key": "of bucksport|unknown",
+      "name": "Of Bucksport",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 208,
+          "lineNumber": 2,
+          "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+      ],
+      "locations": []
+    },
+    {
+      "key": "andd|unknown",
+      "name": "Andd",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 208,
+          "lineNumber": 2,
+          "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+      ],
+      "locations": []
+    },
+    {
+      "key": "andd at st louis|unknown",
+      "name": "Andd.at St.louis",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 208,
+          "lineNumber": 2,
+          "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+      ],
+      "locations": []
+    },
+    {
+      "key": "ii-josi ahclark|1818",
+      "name": "Ii-josi Ahclark",
+      "birthYear": 1818,
+      "generation": 2,
+      "sources": [
+        {
+          "pdfPageNumber": 209,
+          "lineNumber": 2,
+          "rawText": "(145)II-Josi AHClark^,b.21 June,18-15,m.Catharine Clark Ball.III.Joshua Oilman''',b.15 Feb.,1818,d.31 Dec,1844.IV.Hannah^,b.12 Mar.,1820,m.(i)28 Sept.,1845,Nathan-iel Morrill,Jr.,whod.20 July,1848.Shem,(2)William E.Frenchof Sandown.Ch. : 1.Maiy Frances^{French),b.15 Aug.,1852,m.30 June,1881,Pev.IVillis P\".Odellof Lake Village,ofthe Methodistchurch,res.at Buffalo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,Oct.,1884.Hem.24 Nov.,1881,Anna M.Emeryof Suncook,N.H.Ch. : I.)George Finery^,b.20 Mar.,1884,d.28 July,18 S 6.2.)Mary Harriet^,b.13 July,1888.Buriedinfiveyears,threetineboys.V.John Jay''',b.23 Nov.,1825,carpenterandfarmeronthehomesteadin Epping;m.8 Nov.,1854,Ellen Smith Carterof Leominster,Mass.,b.10 July,1828.Ch. : 1.Clara Augusta^,b.16 Oct.,1859,teacherin Watson Academy,Epping.2.Fred Cartet^,b.15 June,1865,m.27 Apr.,1889,Minnie F.(dau.of Ira)Dearborn,b.in Candia,7 Dec,1870.VI.George Franklin^,b.5 Dec,1827,m.i Nov.,1854,Lucy Ann Rundlett,b.in Gilmanton,N.H.,i July,1829;wasinthebonebric-a-bracbusinessin Leominster,Mass.,in 1858 afarmerin Janesville,Wis.,in 1880 in Dakota.Ch. : I.Eugene P?,b.in Leominster,7 Sept.,1855,m.24 Mar.,1880,Maiy A.Czit-ting,b.in Westminster,Mass.,26 Oct.,1855,res.at Cavour,Dakota.Ch. : I.)Clara^,b.23 Aug.,1881.",
+          "bio": {
+            "occupation": [
+              "Farmer",
+              "Carpenter",
+              "Teacher"
+            ],
+            "military": [],
+            "education": [
+              "n Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,O",
+              "rill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1",
+              "lo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medi"
+            ],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Candia",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Gilmanton",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Leominster",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Westminster",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Candia",
+              "Gilmanton",
+              "Leominster",
+              "Westminster",
+              "Ira",
+              "Dakota.Ch"
+            ],
+            "birthDateText": "15 Feb.,1818",
+            "deathYear": 1888,
+            "deathDateText": "31 Dec,1844",
+            "deathPlaceHints": [],
+            "burialHints": [
+              "infiveyears"
+            ],
+            "marriageSnippets": [
+              "Catharine Clark Ball",
+              "(i)28 Sept",
+              "30 June,1881,Pev",
+              "Emeryof Suncook,N",
+              "8 Nov",
+              "27 Apr",
+              "i Nov",
+              "24 Mar"
+            ]
+          }
+        }
+      ],
+      "notes": [
+        "(145)II-Josi AHClark^,b.21 June,18-15,m.Catharine Clark Ball.III.Joshua Oilman''',b.15 Feb.,1818,d.31 Dec,1844.IV.Hannah^,b.12 Mar.,1820,m.(i)28 Sept.,1845,Nathan-iel Morrill,Jr.,whod.20 July,1848.Shem,(2)William E.Frenchof Sandown.Ch. : 1.Maiy Frances^{French),b.15 Aug.,1852,m.30 June,1881,Pev.IVillis P\".Odellof Lake Village,ofthe Methodistchurch,res.at Buffalo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,Oct.,1884.Hem.24 Nov.,1881,Anna M.Emeryof Suncook,N.H.Ch. : I.)George Finery^,b.20 Mar.,1884,d.28 July,18 S 6.2.)Mary Harriet^,b.13 July,1888.Buriedinfiveyears,threetineboys.V.John Jay''',b.23 Nov.,1825,carpenterandfarmeronthehomesteadin Epping;m.8 Nov.,1854,Ellen Smith Carterof Leominster,Mass.,b.10 July,1828.Ch. : 1.Clara Augusta^,b.16 Oct.,1859,teacherin Watson Academy,Epping.2.Fred Cartet^,b.15 June,1865,m.27 Apr.,1889,Minnie F.(dau.of Ira)Dearborn,b.in Candia,7 Dec,1870.VI.George Franklin^,b.5 Dec,1827,m.i Nov.,1854,Lucy Ann Rundlett,b.in Gilmanton,N.H.,i July,1829;wasinthebonebric-a-bracbusinessin Leominster,Mass.,in 1858 afarmerin Janesville,Wis.,in 1880 in Dakota.Ch. : I.Eugene P?,b.in Leominster,7 Sept.,1855,m.24 Mar.,1880,Maiy A.Czit-ting,b.in Westminster,Mass.,26 Oct.,1855,res.at Cavour,Dakota.Ch. : I.)Clara^,b.23 Aug.,1881."
+      ],
+      "locations": [
+        "Candia",
+        "Gilmanton",
+        "Leominster",
+        "Westminster",
+        "Ira",
+        "Dakota.Ch"
+      ],
+      "bio": {
+        "occupation": [
+          "Farmer",
+          "Carpenter",
+          "Teacher"
+        ],
+        "military": [],
+        "education": [
+          "n Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,O",
+          "rill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1",
+          "lo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medi"
+        ],
+        "deathPlaceHints": [],
+        "burialHints": [
+          "infiveyears"
+        ],
+        "marriageSnippets": [
+          "Catharine Clark Ball",
+          "(i)28 Sept",
+          "30 June,1881,Pev",
+          "Emeryof Suncook,N",
+          "8 Nov",
+          "27 Apr",
+          "i Nov",
+          "24 Mar"
+        ],
+        "locationsExtra": [
+          "Candia",
+          "Gilmanton",
+          "Leominster",
+          "Westminster",
+          "Ira",
+          "Dakota.Ch"
+        ],
+        "placeHints": [
+          {
+            "text": "Candia",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Gilmanton",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Leominster",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Westminster",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1888,
+        "deathDateText": "31 Dec,1844",
+        "birthDateText": "15 Feb.,1818"
+      }
+    },
+    {
+      "key": "n h ch|unknown",
+      "name": "N.h.ch",
+      "birthYear": null,
+      "generation": 2,
+      "sources": [
+        {
+          "pdfPageNumber": 209,
+          "lineNumber": 2,
+          "rawText": "(145)II-Josi AHClark^,b.21 June,18-15,m.Catharine Clark Ball.III.Joshua Oilman''',b.15 Feb.,1818,d.31 Dec,1844.IV.Hannah^,b.12 Mar.,1820,m.(i)28 Sept.,1845,Nathan-iel Morrill,Jr.,whod.20 July,1848.Shem,(2)William E.Frenchof Sandown.Ch. : 1.Maiy Frances^{French),b.15 Aug.,1852,m.30 June,1881,Pev.IVillis P\".Odellof Lake Village,ofthe Methodistchurch,res.at Buffalo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,Oct.,1884.Hem.24 Nov.,1881,Anna M.Emeryof Suncook,N.H.Ch. : I.)George Finery^,b.20 Mar.,1884,d.28 July,18 S 6.2.)Mary Harriet^,b.13 July,1888.Buriedinfiveyears,threetineboys.V.John Jay''',b.23 Nov.,1825,carpenterandfarmeronthehomesteadin Epping;m.8 Nov.,1854,Ellen Smith Carterof Leominster,Mass.,b.10 July,1828.Ch. : 1.Clara Augusta^,b.16 Oct.,1859,teacherin Watson Academy,Epping.2.Fred Cartet^,b.15 June,1865,m.27 Apr.,1889,Minnie F.(dau.of Ira)Dearborn,b.in Candia,7 Dec,1870.VI.George Franklin^,b.5 Dec,1827,m.i Nov.,1854,Lucy Ann Rundlett,b.in Gilmanton,N.H.,i July,1829;wasinthebonebric-a-bracbusinessin Leominster,Mass.,in 1858 afarmerin Janesville,Wis.,in 1880 in Dakota.Ch. : I.Eugene P?,b.in Leominster,7 Sept.,1855,m.24 Mar.,1880,Maiy A.Czit-ting,b.in Westminster,Mass.,26 Oct.,1855,res.at Cavour,Dakota.Ch. : I.)Clara^,b.23 Aug.,1881.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "(145)II-Josi AHClark^,b.21 June,18-15,m.Catharine Clark Ball.III.Joshua Oilman''',b.15 Feb.,1818,d.31 Dec,1844.IV.Hannah^,b.12 Mar.,1820,m.(i)28 Sept.,1845,Nathan-iel Morrill,Jr.,whod.20 July,1848.Shem,(2)William E.Frenchof Sandown.Ch. : 1.Maiy Frances^{French),b.15 Aug.,1852,m.30 June,1881,Pev.IVillis P\".Odellof Lake Village,ofthe Methodistchurch,res.at Buffalo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,Oct.,1884.Hem.24 Nov.,1881,Anna M.Emeryof Suncook,N.H.Ch. : I.)George Finery^,b.20 Mar.,1884,d.28 July,18 S 6.2.)Mary Harriet^,b.13 July,1888.Buriedinfiveyears,threetineboys.V.John Jay''',b.23 Nov.,1825,carpenterandfarmeronthehomesteadin Epping;m.8 Nov.,1854,Ellen Smith Carterof Leominster,Mass.,b.10 July,1828.Ch. : 1.Clara Augusta^,b.16 Oct.,1859,teacherin Watson Academy,Epping.2.Fred Cartet^,b.15 June,1865,m.27 Apr.,1889,Minnie F.(dau.of Ira)Dearborn,b.in Candia,7 Dec,1870.VI.George Franklin^,b.5 Dec,1827,m.i Nov.,1854,Lucy Ann Rundlett,b.in Gilmanton,N.H.,i July,1829;wasinthebonebric-a-bracbusinessin Leominster,Mass.,in 1858 afarmerin Janesville,Wis.,in 1880 in Dakota.Ch. : I.Eugene P?,b.in Leominster,7 Sept.,1855,m.24 Mar.,1880,Maiy A.Czit-ting,b.in Westminster,Mass.,26 Oct.,1855,res.at Cavour,Dakota.Ch. : I.)Clara^,b.23 Aug.,1881."
+      ],
+      "locations": []
+    },
+    {
+      "key": "william lane|1857",
+      "name": "William Lane",
+      "birthYear": 1857,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 210,
+          "lineNumber": 1,
+          "rawText": "182 WILLIAMLANEAND\"FAMILY.2.George Fran P,b.13 Nov.,1857,d.22 Aug.,1859.3.Fred T?,b.6 Apr.,i 860,d.21 Oct.,1862.4.Charles F?,b.26 Jan.,1862,d.9 Apr.,1863.(J_4 g)VII.Samuel Gordon''',b.in Epping,23 Jan.,1831,m.19 June,1856,Mary Spencer(dau.of Rev.Amosand Caroline Wilder)Binney.Hewasasalesmanofmachinery,andres.in Boston,Melrose,Wakefield,Cambridgeand Roxbury,Mass.Had 3 ch.VIII.Howard Malcom''',b.12 Dec,1833,res.in Leominster,Mass.,from 1851,twentyyearsinthebusinessofpianofortecasemanufacturing;treasurerandmanagerofthe Leominster Gas Light Co.Hem.21 Jan.,1863,Sarah Brooks(dau.of Jamesand Caroline)Carterof Leominster,Mass.Ch. : I.Carrie Carter^,b.31 Dec,1864.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": "3 children (from text)",
+            "placeHints": [
+              {
+                "text": "Epping",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Leominster",
+                "role": "residence",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Epping",
+              "Leominster",
+              "Rev.Amosand Caroline Wilder",
+              "Jamesand Caroline",
+              "Boston"
+            ],
+            "birthDateText": "13 Nov.,1857",
+            "deathYear": 1863,
+            "deathDateText": "22 Aug.,1859",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "19 June,1856,Mary Spencer(dau"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "182 WILLIAMLANEAND\"FAMILY.2.George Fran P,b.13 Nov.,1857,d.22 Aug.,1859.3.Fred T?,b.6 Apr.,i 860,d.21 Oct.,1862.4.Charles F?,b.26 Jan.,1862,d.9 Apr.,1863.(J_4 g)VII.Samuel Gordon''',b.in Epping,23 Jan.,1831,m.19 June,1856,Mary Spencer(dau.of Rev.Amosand Caroline Wilder)Binney.Hewasasalesmanofmachinery,andres.in Boston,Melrose,Wakefield,Cambridgeand Roxbury,Mass.Had 3 ch.VIII.Howard Malcom''',b.12 Dec,1833,res.in Leominster,Mass.,from 1851,twentyyearsinthebusinessofpianofortecasemanufacturing;treasurerandmanagerofthe Leominster Gas Light Co.Hem.21 Jan.,1863,Sarah Brooks(dau.of Jamesand Caroline)Carterof Leominster,Mass.Ch. : I.Carrie Carter^,b.31 Dec,1864."
+      ],
+      "locations": [
+        "Epping",
+        "Leominster",
+        "Rev.Amosand Caroline Wilder",
+        "Jamesand Caroline",
+        "Boston"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "19 June,1856,Mary Spencer(dau"
+        ],
+        "locationsExtra": [
+          "Epping",
+          "Leominster",
+          "Rev.Amosand Caroline Wilder",
+          "Jamesand Caroline",
+          "Boston"
+        ],
+        "placeHints": [
+          {
+            "text": "Epping",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Leominster",
+            "role": "residence",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "3 children (from text)",
+        "deathYear": 1863,
+        "deathDateText": "22 Aug.,1859",
+        "birthDateText": "13 Nov.,1857"
+      }
+    },
+    {
+      "key": "charlesjoshua lane|1843",
+      "name": "Charlesjoshua Lane",
+      "birthYear": 1843,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 210,
+          "lineNumber": 2,
+          "rawText": "No.115.CHARLESJOSHUALANE^(Jn.^,Josh.^,Jn.^,Josh.^),1818-1869,farmerandshoemaker,andhisw.SARAH(SANBORN),hadb.in Sanborntononthehomestead: I.Spencer^,b.7 Apr.,1843,i\"the Eighth New Hampshire Regimentofthe Union Army 3 yrs.,wasateacherandcomposerofmusic.Thirty-sevenofhispieceshavebeenpublished.Hem.30 June,1878,Isabella Frances Harrisof Woonsocket,R.I.,whereheres.in 1880,thenat 139 Courtstreet,Brockton,Mass.Ch.:1.Florence R?,b.19 July,1882.2.Ralph Mason^,b.19 Apr.,1885.3.Arthur Jackson^,b.24 June,1888,d.9 Dec,1890.II.Arabella^,b.21 May,1844,m.12 May,1872,Herman(s.of Moses)Clarkof Sanbornton,whowasin 1880,arailroadengi-neerin Lowell,Mass.Shed.at Tilton,25 Apr.,1879,\"anemi-nent Christian.\"III.William^b.5 July,1845,\u2122-^Sept,1868,Mary A.(dau.of Jn.S.)Sanborn,b.25 Jan.,1851,d.15 July,1886.Heisanindustriousfarmeronthehomestead.Ch, :",
+          "bio": {
+            "occupation": [
+              "Shoemaker",
+              "Farmer",
+              "Mason",
+              "Teacher"
+            ],
+            "military": [
+              ",1843,i\"the Eighth New Hampshire Regimentofthe Union Army 3 yrs"
+            ],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [
+              "Moses",
+              "Jn.S",
+              "Sanborntononthehomestead"
+            ],
+            "birthDateText": "7 Apr.,1843",
+            "deathYear": 1886,
+            "deathDateText": "9 Dec,1890",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "12 May,1872,Herman(s"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.115.CHARLESJOSHUALANE^(Jn.^,Josh.^,Jn.^,Josh.^),1818-1869,farmerandshoemaker,andhisw.SARAH(SANBORN),hadb.in Sanborntononthehomestead: I.Spencer^,b.7 Apr.,1843,i\"the Eighth New Hampshire Regimentofthe Union Army 3 yrs.,wasateacherandcomposerofmusic.Thirty-sevenofhispieceshavebeenpublished.Hem.30 June,1878,Isabella Frances Harrisof Woonsocket,R.I.,whereheres.in 1880,thenat 139 Courtstreet,Brockton,Mass.Ch.:1.Florence R?,b.19 July,1882.2.Ralph Mason^,b.19 Apr.,1885.3.Arthur Jackson^,b.24 June,1888,d.9 Dec,1890.II.Arabella^,b.21 May,1844,m.12 May,1872,Herman(s.of Moses)Clarkof Sanbornton,whowasin 1880,arailroadengi-neerin Lowell,Mass.Shed.at Tilton,25 Apr.,1879,\"anemi-nent Christian.\"III.William^b.5 July,1845,\u2122-^Sept,1868,Mary A.(dau.of Jn.S.)Sanborn,b.25 Jan.,1851,d.15 July,1886.Heisanindustriousfarmeronthehomestead.Ch, :"
+      ],
+      "locations": [
+        "Moses",
+        "Jn.S",
+        "Sanborntononthehomestead"
+      ],
+      "bio": {
+        "occupation": [
+          "Shoemaker",
+          "Farmer",
+          "Mason",
+          "Teacher"
+        ],
+        "military": [
+          ",1843,i\"the Eighth New Hampshire Regimentofthe Union Army 3 yrs"
+        ],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "12 May,1872,Herman(s"
+        ],
+        "locationsExtra": [
+          "Moses",
+          "Jn.S",
+          "Sanborntononthehomestead"
+        ],
+        "deathYear": 1886,
+        "deathDateText": "9 Dec,1890",
+        "birthDateText": "7 Apr.,1843"
+      }
+    },
+    {
+      "key": "sarah|unknown",
+      "name": "Sarah",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 210,
+          "lineNumber": 2,
+          "rawText": "No.115.CHARLESJOSHUALANE^(Jn.^,Josh.^,Jn.^,Josh.^),1818-1869,farmerandshoemaker,andhisw.SARAH(SANBORN),hadb.in Sanborntononthehomestead: I.Spencer^,b.7 Apr.,1843,i\"the Eighth New Hampshire Regimentofthe Union Army 3 yrs.,wasateacherandcomposerofmusic.Thirty-sevenofhispieceshavebeenpublished.Hem.30 June,1878,Isabella Frances Harrisof Woonsocket,R.I.,whereheres.in 1880,thenat 139 Courtstreet,Brockton,Mass.Ch.:1.Florence R?,b.19 July,1882.2.Ralph Mason^,b.19 Apr.,1885.3.Arthur Jackson^,b.24 June,1888,d.9 Dec,1890.II.Arabella^,b.21 May,1844,m.12 May,1872,Herman(s.of Moses)Clarkof Sanbornton,whowasin 1880,arailroadengi-neerin Lowell,Mass.Shed.at Tilton,25 Apr.,1879,\"anemi-nent Christian.\"III.William^b.5 July,1845,\u2122-^Sept,1868,Mary A.(dau.of Jn.S.)Sanborn,b.25 Jan.,1851,d.15 July,1886.Heisanindustriousfarmeronthehomestead.Ch, :",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.115.CHARLESJOSHUALANE^(Jn.^,Josh.^,Jn.^,Josh.^),1818-1869,farmerandshoemaker,andhisw.SARAH(SANBORN),hadb.in Sanborntononthehomestead: I.Spencer^,b.7 Apr.,1843,i\"the Eighth New Hampshire Regimentofthe Union Army 3 yrs.,wasateacherandcomposerofmusic.Thirty-sevenofhispieceshavebeenpublished.Hem.30 June,1878,Isabella Frances Harrisof Woonsocket,R.I.,whereheres.in 1880,thenat 139 Courtstreet,Brockton,Mass.Ch.:1.Florence R?,b.19 July,1882.2.Ralph Mason^,b.19 Apr.,1885.3.Arthur Jackson^,b.24 June,1888,d.9 Dec,1890.II.Arabella^,b.21 May,1844,m.12 May,1872,Herman(s.of Moses)Clarkof Sanbornton,whowasin 1880,arailroadengi-neerin Lowell,Mass.Shed.at Tilton,25 Apr.,1879,\"anemi-nent Christian.\"III.William^b.5 July,1845,\u2122-^Sept,1868,Mary A.(dau.of Jn.S.)Sanborn,b.25 Jan.,1851,d.15 July,1886.Heisanindustriousfarmeronthehomestead.Ch, :"
+      ],
+      "locations": [
+        "Moses",
+        "Jn.S",
+        "Sanborntononthehomestead"
+      ]
+    },
+    {
+      "key": "josephh lane|1815",
+      "name": "Josephh. Lane",
+      "birthYear": 1815,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 213,
+          "lineNumber": 2,
+          "rawText": "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear.Ch. : 1.William Henry^{Dame),d.ae.18 mos.2.Mary Ella^,b.5 Dec,1843,m.1862,Daniel Webber,of West Concord.Ch.:I.)Stella May^(Webber),b.12 May,1874.2.)Irving Eiiiery'^,b.Apr.,1877.II.Judith A.''',b.17 Nov.,1817,m.25 May,1843,Joseph(s.of Michael)Emery,b.1807,farmeronthehomesteadin Tilton,anddeaconofthe Congregationalchurchin Sanbornton.Ch. : I.Lydia Louise^{Emery),b.30 Apr.,1844,whom.4 June,1873,Horatio N.(s.of Joshua)March,b.12 May,1831.",
+          "bio": {
+            "occupation": [
+              "Farmer",
+              "Deacon"
+            ],
+            "military": [
+              "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear"
+            ],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [
+              "Laconia",
+              "West Concord.Ch",
+              "Michael",
+              "Joshua",
+              "Sanbornton"
+            ],
+            "birthDateText": "11 Nov.,1815",
+            "deathYear": 1843,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "1862,Daniel Webber,of West Concord",
+              "25 May,1843,Joseph(s"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear.Ch. : 1.William Henry^{Dame),d.ae.18 mos.2.Mary Ella^,b.5 Dec,1843,m.1862,Daniel Webber,of West Concord.Ch.:I.)Stella May^(Webber),b.12 May,1874.2.)Irving Eiiiery'^,b.Apr.,1877.II.Judith A.''',b.17 Nov.,1817,m.25 May,1843,Joseph(s.of Michael)Emery,b.1807,farmeronthehomesteadin Tilton,anddeaconofthe Congregationalchurchin Sanbornton.Ch. : I.Lydia Louise^{Emery),b.30 Apr.,1844,whom.4 June,1873,Horatio N.(s.of Joshua)March,b.12 May,1831."
+      ],
+      "locations": [
+        "Laconia",
+        "West Concord.Ch",
+        "Michael",
+        "Joshua",
+        "Sanbornton"
+      ],
+      "bio": {
+        "occupation": [
+          "Farmer",
+          "Deacon"
+        ],
+        "military": [
+          "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear"
+        ],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "1862,Daniel Webber,of West Concord",
+          "25 May,1843,Joseph(s"
+        ],
+        "locationsExtra": [
+          "Laconia",
+          "West Concord.Ch",
+          "Michael",
+          "Joshua",
+          "Sanbornton"
+        ],
+        "deathYear": 1843,
+        "birthDateText": "11 Nov.,1815"
+      }
+    },
+    {
+      "key": "pollymary|unknown",
+      "name": "Pollymary",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 213,
+          "lineNumber": 2,
+          "rawText": "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear.Ch. : 1.William Henry^{Dame),d.ae.18 mos.2.Mary Ella^,b.5 Dec,1843,m.1862,Daniel Webber,of West Concord.Ch.:I.)Stella May^(Webber),b.12 May,1874.2.)Irving Eiiiery'^,b.Apr.,1877.II.Judith A.''',b.17 Nov.,1817,m.25 May,1843,Joseph(s.of Michael)Emery,b.1807,farmeronthehomesteadin Tilton,anddeaconofthe Congregationalchurchin Sanbornton.Ch. : I.Lydia Louise^{Emery),b.30 Apr.,1844,whom.4 June,1873,Horatio N.(s.of Joshua)March,b.12 May,1831.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear.Ch. : 1.William Henry^{Dame),d.ae.18 mos.2.Mary Ella^,b.5 Dec,1843,m.1862,Daniel Webber,of West Concord.Ch.:I.)Stella May^(Webber),b.12 May,1874.2.)Irving Eiiiery'^,b.Apr.,1877.II.Judith A.''',b.17 Nov.,1817,m.25 May,1843,Joseph(s.of Michael)Emery,b.1807,farmeronthehomesteadin Tilton,anddeaconofthe Congregationalchurchin Sanbornton.Ch. : I.Lydia Louise^{Emery),b.30 Apr.,1844,whom.4 June,1873,Horatio N.(s.of Joshua)March,b.12 May,1831."
+      ],
+      "locations": [
+        "Laconia",
+        "West Concord.Ch",
+        "Michael",
+        "Joshua",
+        "Sanbornton"
+      ]
+    },
+    {
+      "key": "daniel webber|unknown",
+      "name": "Daniel Webber",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 213,
+          "lineNumber": 2,
+          "rawText": "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear.Ch. : 1.William Henry^{Dame),d.ae.18 mos.2.Mary Ella^,b.5 Dec,1843,m.1862,Daniel Webber,of West Concord.Ch.:I.)Stella May^(Webber),b.12 May,1874.2.)Irving Eiiiery'^,b.Apr.,1877.II.Judith A.''',b.17 Nov.,1817,m.25 May,1843,Joseph(s.of Michael)Emery,b.1807,farmeronthehomesteadin Tilton,anddeaconofthe Congregationalchurchin Sanbornton.Ch. : I.Lydia Louise^{Emery),b.30 Apr.,1844,whom.4 June,1873,Horatio N.(s.of Joshua)March,b.12 May,1831.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear.Ch. : 1.William Henry^{Dame),d.ae.18 mos.2.Mary Ella^,b.5 Dec,1843,m.1862,Daniel Webber,of West Concord.Ch.:I.)Stella May^(Webber),b.12 May,1874.2.)Irving Eiiiery'^,b.Apr.,1877.II.Judith A.''',b.17 Nov.,1817,m.25 May,1843,Joseph(s.of Michael)Emery,b.1807,farmeronthehomesteadin Tilton,anddeaconofthe Congregationalchurchin Sanbornton.Ch. : I.Lydia Louise^{Emery),b.30 Apr.,1844,whom.4 June,1873,Horatio N.(s.of Joshua)March,b.12 May,1831."
+      ],
+      "locations": []
+    }
+  ],
+  "acceptedRelationships": [
+    {
+      "relation": "spouse",
+      "sourceKey": "joseph lane|1779",
+      "targetKey": "grata|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 191,
+      "lineNumber": 3,
+      "rawText": "No.105.JOSEPHLANE 6(Jn.5,Josh.^,Josh.3,Wm.2),1779-1842,car-penter,&c.andhis(i)w.GRATA(MELVIN)hadb.in Dan-ville,Vt. :"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1804",
+      "targetKey": "ganse|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 192,
+      "lineNumber": 1,
+      "rawText": "168 WILLIAMLANEANDFAMILY.I.Columbus^,b.20 Nov.,1804,d.in Wheelock,Vt.,29 Jan.,1805.II.John Godfrey^,b.27 Apr.,1806,in Portland,Me.,acar-penter,d.unm.,12 July,1829.III.Luther Melvin^,b.26 Mar.,1808,m.(i)26 June,1839,Mary Annie Lowell,b.15 Sept.,1815,m.(2)i Dec,1853,Jane Psalmond,b.17 June,1817,whod.1883.Mr.Lanewasacontractor,livedandd.in Midwayvillagenear Milledgeville,Ga.,15 June,1856.Ch. : 1.John Godfrey^,b.31 May,1840,teacherandstudentof Oglethorp Univer-sity,Ga.,havingtheministryinview.On 21 Aug.,1864,hewaskilledinthe Confederatearmy,near Charlestown,Va.2.William Henry^,b.2 May,d.10 Oct.,1841.3.IValter Larrie^,b.29 Aug.,1 S 54.IV.Amos Clement^,b.24 May,1810,d.15 July,1815.V.Joseph^,b.16 May,1812,d.6 Aug.,1813.VI.Joseph^,b.19 Oct.,1814,m.(i)Lydia Chamberlain,b.3 May,1817,in Buxton,Me.(dau.of Johnand Mary L.Goodsoe Chamberlain),acarpenterandcontractor,res.at Milledgeville,Ga.Ch.:1.Eckoard Pavson^,b.9 June,1839,book-keeper,m.4 Mar.,1885,Miss W.Ganse(?)Ch. : I.)Marie Roberta^,b.17 Jan.,1886,d.20 Apr.,1887.2.)Edward J?,b.17 Nov.,1887.2.William H?,b.19 Dec,1841,acarpenter,m.15 May,1 S 67,Emma Moore,andd.13 Dec,1874.Shed.8 July,1888.Ch. : I.)John H?,b.26 July,1871,m.1889,Miss Frankandhadch.3.Charles Samuel^,b.19 Apr.,1843,unm.4.Mary Lydia^,b.20 Jan.,1845.5.Sarah Louisa^,b.10 Aug.,1850,d.13 July,1857.6.Helen Martha^,b.7 Oct.,1852,afterashortanduseful Christianlife,shed.10 Oct.,1885.7.Alice Gordon^,b.26 July,1855,abeautiful Christiandisciple,d.20 June,1884.VII.Harriet Grata''',b.at Portland,28 May,1821,bapt.by Dr.E.Payson,m.9 June,1840,James(s.of Ebenand Mary)Delanoof Cape Elizabeth,Me.,amechanicandlighthousekeeper,joined,in 1842,the M.E.church,andd.17 Sept.,1886.Ch. : I.Mary Philbrook'^{Delano),b.17 Jan.,1843,m.4 July,1865,Moses M.(s.of Wm.and Mehitable)Hatch.Bothjoinedthe Methodist Episcopalchurchin 1862,res.in Lowell,Mass.Ch. ;"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "owilliam lane|1827",
+      "targetKey": "idowremovedfrom elytonandmadeherhomewithhersister|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 194,
+      "lineNumber": 1,
+      "rawText": "I/OWILLIAMLANEANDFAMILY.XLMary Elizabeth\"^,b.19 Sept.,1827,m.in Midway,Ga.,i July,1856,Rev.Thomas Jefferson(s.of Reubenand Phebe James Mc Gossland)Daivdson,b.Green Co.,Ala.,26 June,1826.Hejoinedthe Presbyterianchurch,1850,graduatedat Oglethorpe Universityand Columbia Theological Seminary,licensedby Pres-byteryof Tuscaloosa,Ala.,Oct.,1856,ordained Evangelistin 1857;originatedchurchesat Elytonand Cedar Grove,chaplainofan Alabamaregiment,'d.at Elyton,25 Oct.,1861,anableandsuc-cessfulminister.Hiswidowremovedfrom Elytonandmadeherhomewithhersister,Mrs.Milner,andd.June,1872.Xn.Sarah^,b.7 Sept.,1829,m.in Midway,Ga.,24 Dec,1850,Rev.Robert William(s.of Benjaminand Charity Ely)Milner,graduatedat Oglethorpe University,1849,licensedin 1850,ordainedat Athensin 1852,preachedat Stanfordville,Law-renceville,Danielsonvilleand New Hope;rem.in Dec,1866,to Acworth,Cobb Co.,Ga.Ch. : 1.William Oszvald^{Milner),b.l 6 Nov.,1 S 51,d.22 June,1852.2.Mary Elizabeth^,b.13 Apr.,1853.3.Sarah Ellen^,b.13 Feb.,1855.4.Louie Davidson^,b.15 Nov.,1856,d.23 July,1 S 57.5.George Case^,b.2 June,18^9.6.Robert IVells^,b.20 July,r S 6 i.7.Charles Talmage^,b.30 Dec,1862.8.William Thompson^,b.29 Dec,1864.9.John Edwin^,b.25 May,1866.Xni.Albion\"^,b.5,d.19 Oct.,1832.XIV.Ellen Louisa\",b.8 Nov.,1836,m.29 Sept.,1868,Wil-ll^m Jefferson(s.of Seabornand Mary Blake)Palmer,b.1830,whohad,byaformermarriage,4 daus.andres.at Acworth,Cobb Co.,Ga.,wherehehadaplantation,largelyrented.Afterthedeathofherhusband,Mrs.Palmerlivedwithhersister,Mrs.Cart-ledge,at Bold Spring,Ga."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "deaconjoslah lane|1781",
+      "targetKey": "phebe|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 194,
+      "lineNumber": 2,
+      "rawText": "No.106.DEACONJOSLAHLANE\u00ab(Jn.^,Josh.\",Josh.3,Wm.^),1781-1866,carpenter,farmer,&c.,andhisw.PHEBE(MORRILL),hadb.in Wheelock,Vt. :"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "esq john lane|1813",
+      "targetKey": "nabby|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 196,
+      "lineNumber": 2,
+      "rawText": "No.107.ESQ.JOHNLANE 6(Jn.-^Josh.^,Josh.^,Wm.^),1783-1851,of Candia,andhisw.NABBY(EMERSON),hadb.in Candia: I.Richard Emerson\",b.2 June,1813,possessedtalentofrarepromise,studiedat Meriden Academy,graduatedat Dartmouth College,1841,studentoflawandteacherinacademyin Lewiston,N.Y.,wherehed.suddenly,27 May,1842,bytheruptureofabloodvessel.\"Hewashighlyesteemedandexertedahappy Christianinfluenceupontheyouthin Lewiston.Hewasinstru-mentalintheconversionofseveralcollegeclassmateswhobecameeminentintheministry.Hisshortlifewasnotinvain,butischerishedinremembranceasapreciousgifttohumanity.\"II.Sarah Tilton''',b.10 June,1815,m.Nov.,1839,Warren Story(s.of Solomonand Mary Long)Childs,b.in Henniker,12 Oct.,1811,bothjoinedthe Congregationalchurchin 1832,res.in Henniker,farmerandbridgebuilder,activeinchurchandintown,wherehed.10 Apr.,1888.Shed.8 June,1890.Mrs.Childs,\"Isrememberedasthedevotedwife,thefaithfullovingmother,thegentle,quiet,saintedfriend,whosepure,blameless Christianlifewasfullofgoodwordsandworks,andwhoseverypresencewasasweetbenedictiontoall.\" - From Her Obituary Notice.Ch.: I.Richard Lane^,\\>.2 Aug.,1843,farmerathome,m.19 Mar.,i Zqi,Kate M.Gtitterson,b.4 Dec,1855.^h.:I.)Anna Lois^,b.25 Oct.,1878.2.)Emily Erances^,b.10 May,1 S 80,d.ofdiphtheria,25 June,1890.3.)Erancis Lane^,b.18 Dec,1884."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "dr isaiah lane|1830",
+      "targetKey": "frances|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 200,
+      "lineNumber": 2,
+      "rawText": "No.108.DR.ISAIAHLANE 6(Jn.\\Josh.^,Josh.^Wm.^),1797-1854,andhisw.FRANCES(BATCHELDER),hadb.in Candia:I.John Godfrey''',b.10 Sept.,1830,m.10 Oct.,1854,Ann Caroline Anderson^,b.in Candia,i Nov.,1832,(dau.of Thos.\"*and Lavinia)Eaton(Thos.^,Sam.^,Thos.').Bothunitedwiththe Congregationalchurchin Candiain 1849,''^s.in Manchester.Heisgeneralinsuranceagent,dealerinwesternfarmmortgages,andagentforthe Western Farm Mortgageand Trust Co.of Law-rence,Ka.Hehasbeenactivein Sundayschoolmeetings,Chatau-quacirclesofthestateandcounty,Ch. : 1.Charles Anderson^,b.23 July,1857,d.28 July,1873.2.Francis Randsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m.23 June,1891,Miss Ella Louise Macartney.(144:)II-^EVJames Pillsbury''',b.8 Sept.,1832,d.6 Jan.,1889,m.IJan.,1861,inthe Congregationalchurchin Hamp-stead,N.H.,Emma Louisa Pillsbur V(Benj.L.-*^,Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,Mass.,10 Jan.,1861.Hespentmuchtimeandmoneyuponthis Lane Familyhistory,butsicknessanddeathpreventedhiscompletingit.[See No.144 and Notes.]HI.Charles Russell\"^,b.31 Aug.,1836,d.12 May,1839.IV.Martha Batchelder''',b.12 July,1838,joinedthe Congre-gationalchurchin 1853,m.William H.Blodgettof Newton,Mass.,andd.21 July,1863.V.Charles'^,b.30 Jan.,1841,joinedthe Congregationalchurchin 1856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I.Eddie Wilson\"^,b.13 May,1868,d.10 Dec,1877.Mrs,Susan J.Lane,m.(2)David Clay."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "dr isaiah lane|1830",
+      "targetKey": "mass|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 200,
+      "lineNumber": 2,
+      "rawText": "No.108.DR.ISAIAHLANE 6(Jn.\\Josh.^,Josh.^Wm.^),1797-1854,andhisw.FRANCES(BATCHELDER),hadb.in Candia:I.John Godfrey''',b.10 Sept.,1830,m.10 Oct.,1854,Ann Caroline Anderson^,b.in Candia,i Nov.,1832,(dau.of Thos.\"*and Lavinia)Eaton(Thos.^,Sam.^,Thos.').Bothunitedwiththe Congregationalchurchin Candiain 1849,''^s.in Manchester.Heisgeneralinsuranceagent,dealerinwesternfarmmortgages,andagentforthe Western Farm Mortgageand Trust Co.of Law-rence,Ka.Hehasbeenactivein Sundayschoolmeetings,Chatau-quacirclesofthestateandcounty,Ch. : 1.Charles Anderson^,b.23 July,1857,d.28 July,1873.2.Francis Randsom^,M.D.,\\i.23 Dec,1858,graduatedat Dartmouth Col-legein 1882;principalofthehighschoolin Washington,D.C,m.23 June,1891,Miss Ella Louise Macartney.(144:)II-^EVJames Pillsbury''',b.8 Sept.,1832,d.6 Jan.,1889,m.IJan.,1861,inthe Congregationalchurchin Hamp-stead,N.H.,Emma Louisa Pillsbur V(Benj.L.-*^,Sam.-,Benj.i).Hefittedat Kimball Union Academy,graduatedat Amherst Col-lege,1857,ordainedat East Weymouth,Mass.,10 Jan.,1861.Hespentmuchtimeandmoneyuponthis Lane Familyhistory,butsicknessanddeathpreventedhiscompletingit.[See No.144 and Notes.]HI.Charles Russell\"^,b.31 Aug.,1836,d.12 May,1839.IV.Martha Batchelder''',b.12 July,1838,joinedthe Congre-gationalchurchin 1853,m.William H.Blodgettof Newton,Mass.,andd.21 July,1863.V.Charles'^,b.30 Jan.,1841,joinedthe Congregationalchurchin 1856,m.Susan Jennie(dau.of Jn.and Relief Brown)Langof Candia,res.in Stoneham,Mass.,andd.7 Dec,1878.Ch, : I.Eddie Wilson\"^,b.13 May,1868,d.10 Dec,1877.Mrs,Susan J.Lane,m.(2)David Clay."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "josiah lane|1801",
+      "targetKey": "sallie|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 206,
+      "lineNumber": 2,
+      "rawText": "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "josiah lane|1801",
+      "targetKey": "andres at hampden|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 206,
+      "lineNumber": 2,
+      "rawText": "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "josiah lane|1801",
+      "targetKey": "andd in|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 206,
+      "lineNumber": 2,
+      "rawText": "No.112.JOSIAHLANE 6(Josh.^,Josh.^,Josh.3,Wm.^),1780-1843,of Searsport,Me.,andhisw.SALLIE(SHAW),had: I.Maru Shaw''',b.13 Jan.,1801,m.Asa Matthews,andres.at Hampden,Me.Ch. : 1.Samuel Worcester^{Mattheivs),whom.(l)Augusta Amy,whohadadau.andd.;m.(2)Mary Webb.Ch. : I.)Mae Carrie^,m.Winslozu Hall.2.)Hattie Holmes^.3.)Edith Maria^,d.aninfant.2.Howard^,m.Mary Hardy,andd.in 1862."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "joshua lane|1813",
+      "targetKey": "abigaila|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 208,
+      "lineNumber": 2,
+      "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "joshua lane|1813",
+      "targetKey": "of bucksport|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 208,
+      "lineNumber": 2,
+      "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "joshua lane|1813",
+      "targetKey": "andd|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 208,
+      "lineNumber": 2,
+      "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "joshua lane|1813",
+      "targetKey": "andd at st louis|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 208,
+      "lineNumber": 2,
+      "rawText": "No.113.JOSHUALANE 6(Josh.s,Josh.^,Josh.^Wm.^),1786 andhisw.ABIGAILA.(HASKINS)had: I.JOHN^,b 22 Apr.,1811,m.Eliza A.Lufkin,of Bucksport,Me.,res.in Bangor,andd.July,1881,s.p.II.Melinda Haskins^,b.11 Mar.,1813,d.14 Nov.,1839.HI.Mary Ann^,b.9 June,1819,m.David Mosman,andd.27 Apr.,1841;res.at Bangor.Ch, : I.Mary Ann^{Mosmait),b.19 Sept.,1840,d.25 Feb.,1875.Shem.24 Dec,i 860,Wallace S.Chase,cashierof Bankof Commonwealth,Bos-ton,whod.28 May,1883.Ch. : I.)Robert L?{Chase),d.8 Dec,1875.2.)Mary Harris^,b.17 Mar.,1872.IV.Henry'^,b.19 July,1 S 20,m.anactress,andd.at St.Louis,Mo.,abt.1880,s.p."
+    },
+    {
+      "relation": "mother",
+      "sourceKey": "ii-josi ahclark|1818",
+      "targetKey": "abigaila|unknown",
+      "confidence": 0.82,
+      "pdfPageNumber": 209,
+      "lineNumber": 2,
+      "rawText": "(145)II-Josi AHClark^,b.21 June,18-15,m.Catharine Clark Ball.III.Joshua Oilman''',b.15 Feb.,1818,d.31 Dec,1844.IV.Hannah^,b.12 Mar.,1820,m.(i)28 Sept.,1845,Nathan-iel Morrill,Jr.,whod.20 July,1848.Shem,(2)William E.Frenchof Sandown.Ch. : 1.Maiy Frances^{French),b.15 Aug.,1852,m.30 June,1881,Pev.IVillis P\".Odellof Lake Village,ofthe Methodistchurch,res.at Buffalo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,Oct.,1884.Hem.24 Nov.,1881,Anna M.Emeryof Suncook,N.H.Ch. : I.)George Finery^,b.20 Mar.,1884,d.28 July,18 S 6.2.)Mary Harriet^,b.13 July,1888.Buriedinfiveyears,threetineboys.V.John Jay''',b.23 Nov.,1825,carpenterandfarmeronthehomesteadin Epping;m.8 Nov.,1854,Ellen Smith Carterof Leominster,Mass.,b.10 July,1828.Ch. : 1.Clara Augusta^,b.16 Oct.,1859,teacherin Watson Academy,Epping.2.Fred Cartet^,b.15 June,1865,m.27 Apr.,1889,Minnie F.(dau.of Ira)Dearborn,b.in Candia,7 Dec,1870.VI.George Franklin^,b.5 Dec,1827,m.i Nov.,1854,Lucy Ann Rundlett,b.in Gilmanton,N.H.,i July,1829;wasinthebonebric-a-bracbusinessin Leominster,Mass.,in 1858 afarmerin Janesville,Wis.,in 1880 in Dakota.Ch. : I.Eugene P?,b.in Leominster,7 Sept.,1855,m.24 Mar.,1880,Maiy A.Czit-ting,b.in Westminster,Mass.,26 Oct.,1855,res.at Cavour,Dakota.Ch. : I.)Clara^,b.23 Aug.,1881."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "ii-josi ahclark|1818",
+      "targetKey": "n h ch|unknown",
+      "confidence": 0.78,
+      "pdfPageNumber": 209,
+      "lineNumber": 2,
+      "rawText": "(145)II-Josi AHClark^,b.21 June,18-15,m.Catharine Clark Ball.III.Joshua Oilman''',b.15 Feb.,1818,d.31 Dec,1844.IV.Hannah^,b.12 Mar.,1820,m.(i)28 Sept.,1845,Nathan-iel Morrill,Jr.,whod.20 July,1848.Shem,(2)William E.Frenchof Sandown.Ch. : 1.Maiy Frances^{French),b.15 Aug.,1852,m.30 June,1881,Pev.IVillis P\".Odellof Lake Village,ofthe Methodistchurch,res.at Buffalo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,Oct.,1884.Hem.24 Nov.,1881,Anna M.Emeryof Suncook,N.H.Ch. : I.)George Finery^,b.20 Mar.,1884,d.28 July,18 S 6.2.)Mary Harriet^,b.13 July,1888.Buriedinfiveyears,threetineboys.V.John Jay''',b.23 Nov.,1825,carpenterandfarmeronthehomesteadin Epping;m.8 Nov.,1854,Ellen Smith Carterof Leominster,Mass.,b.10 July,1828.Ch. : 1.Clara Augusta^,b.16 Oct.,1859,teacherin Watson Academy,Epping.2.Fred Cartet^,b.15 June,1865,m.27 Apr.,1889,Minnie F.(dau.of Ira)Dearborn,b.in Candia,7 Dec,1870.VI.George Franklin^,b.5 Dec,1827,m.i Nov.,1854,Lucy Ann Rundlett,b.in Gilmanton,N.H.,i July,1829;wasinthebonebric-a-bracbusinessin Leominster,Mass.,in 1858 afarmerin Janesville,Wis.,in 1880 in Dakota.Ch. : I.Eugene P?,b.in Leominster,7 Sept.,1855,m.24 Mar.,1880,Maiy A.Czit-ting,b.in Westminster,Mass.,26 Oct.,1855,res.at Cavour,Dakota.Ch. : I.)Clara^,b.23 Aug.,1881."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "charlesjoshua lane|1843",
+      "targetKey": "sarah|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 210,
+      "lineNumber": 2,
+      "rawText": "No.115.CHARLESJOSHUALANE^(Jn.^,Josh.^,Jn.^,Josh.^),1818-1869,farmerandshoemaker,andhisw.SARAH(SANBORN),hadb.in Sanborntononthehomestead: I.Spencer^,b.7 Apr.,1843,i\"the Eighth New Hampshire Regimentofthe Union Army 3 yrs.,wasateacherandcomposerofmusic.Thirty-sevenofhispieceshavebeenpublished.Hem.30 June,1878,Isabella Frances Harrisof Woonsocket,R.I.,whereheres.in 1880,thenat 139 Courtstreet,Brockton,Mass.Ch.:1.Florence R?,b.19 July,1882.2.Ralph Mason^,b.19 Apr.,1885.3.Arthur Jackson^,b.24 June,1888,d.9 Dec,1890.II.Arabella^,b.21 May,1844,m.12 May,1872,Herman(s.of Moses)Clarkof Sanbornton,whowasin 1880,arailroadengi-neerin Lowell,Mass.Shed.at Tilton,25 Apr.,1879,\"anemi-nent Christian.\"III.William^b.5 July,1845,\u2122-^Sept,1868,Mary A.(dau.of Jn.S.)Sanborn,b.25 Jan.,1851,d.15 July,1886.Heisanindustriousfarmeronthehomestead.Ch, :"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "josephh lane|1815",
+      "targetKey": "pollymary|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 213,
+      "lineNumber": 2,
+      "rawText": "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear.Ch. : 1.William Henry^{Dame),d.ae.18 mos.2.Mary Ella^,b.5 Dec,1843,m.1862,Daniel Webber,of West Concord.Ch.:I.)Stella May^(Webber),b.12 May,1874.2.)Irving Eiiiery'^,b.Apr.,1877.II.Judith A.''',b.17 Nov.,1817,m.25 May,1843,Joseph(s.of Michael)Emery,b.1807,farmeronthehomesteadin Tilton,anddeaconofthe Congregationalchurchin Sanbornton.Ch. : I.Lydia Louise^{Emery),b.30 Apr.,1844,whom.4 June,1873,Horatio N.(s.of Joshua)March,b.12 May,1831."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "josephh lane|1815",
+      "targetKey": "daniel webber|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 213,
+      "lineNumber": 2,
+      "rawText": "No.116.JOSEPHH.LANE 6(Josh.^,Jn.4,Josh.3,Wm.%),1793-1843,farmer,&c.,andhis(i)w.POLLYMARY(LANE),hadb.in Sanbornton: I.Catharine^,b.11 Nov.,1815,m.abt.,1837,William Dame,butcher,of Laconia,rem.to Concord,whereshed.June,1845,inherthirtiethyear.Ch. : 1.William Henry^{Dame),d.ae.18 mos.2.Mary Ella^,b.5 Dec,1843,m.1862,Daniel Webber,of West Concord.Ch.:I.)Stella May^(Webber),b.12 May,1874.2.)Irving Eiiiery'^,b.Apr.,1877.II.Judith A.''',b.17 Nov.,1817,m.25 May,1843,Joseph(s.of Michael)Emery,b.1807,farmeronthehomesteadin Tilton,anddeaconofthe Congregationalchurchin Sanbornton.Ch. : I.Lydia Louise^{Emery),b.30 Apr.,1844,whom.4 June,1873,Horatio N.(s.of Joshua)March,b.12 May,1831."
+    }
+  ]
+}

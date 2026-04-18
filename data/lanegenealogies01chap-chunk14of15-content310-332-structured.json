@@ -1,0 +1,542 @@
+{
+  "generatedAt": "2026-04-18T22:45:44.612433+00:00",
+  "sourcePdf": "C:\\projects\\piBoom\\data\\lanegenealogies01chap.pdf",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 331,
+  "parsedPageCount": 23,
+  "people": [
+    {
+      "key": "i-henry'''|1791",
+      "name": "I-henry'''",
+      "birthYear": 1791,
+      "generation": null,
+      "sources": [
+        {
+          "pdfPageNumber": 339,
+          "lineNumber": 2,
+          "rawText": "(2)I-Henry''',b.in Bennington,Vt.,1791,d.in Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,in Chester,hisnativeplace;and Henry'''inheriteda Yankeetalentformakinginventions.Hewasofarestless,rovingdisposition,andleftotherstoprofitbyhisinventions.In 1819 hem.at Phil-adelphia,Pa.,Joanna Riordan,b.in Ireland,near Lake Killarney,in 1793,whod.in Washington,D.C,1856.Herfamilywereem-inentscholars;andherbrother.Prof.James Riordan,whoaccom-paniedherto America,wasformanyyearsemployedatthe De-partmentof State,Washington,D.C,astranslatoroflanguages.Henry'''livedinvariousplaces,andonlytwoofhissevenchildrenwereborninthesameplace.II,Polly''',m.in Danville,Vt,,Rev.Asahel[or Asher]Fish,andhad 9 ch.,2 sonsand 7 daus.,widelyscattered;rem.to Canadathenceto Erie,Penn.,andthento Wisconsin,near Por-tagecity,wheretheydied.III,Cyrus'',b.about 1812,boughtafarmin Canada West,near Toronto;m.twiceandhad 12 ch.,andd.there,ae.87,IV,Ru Fus''',settledin Lowell,Mass.,whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works.Hem,Abi,Langton,from York,Me,Ch, : I.Anna Marie?,m.S.M.Alexander,of York,Me.,whowentto Cal-ifornia.Hadason.V,Parker''',settledin Lowell,Mass.,overseerinamill.Hem,Abi,Hodgdon,of Hudson,N,H,Ch,: 1.Alary Jane^,whod.ae.18.2.Adelin^.3.Parker^,d.ae.about 20.VI,Betsey''',b.in Danville,Vt.,6 May,1804,d.9 August,1883,ae.79;m.in Newport,N,H,,Stephen Metcalf,farmer,res.andd,in Haverhill,N.H.Ch. : I.Parker^{Meicalf),b.in Croydon,N.H.,6 May,1831;m.in Great",
+          "bio": {
+            "occupation": [
+              "Farmer"
+            ],
+            "military": [
+              ",whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works"
+            ],
+            "education": [],
+            "childrenNote": "9 ch. (from text)",
+            "placeHints": [
+              {
+                "text": "Bennington",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Irel",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Danville",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Croydon",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "York",
+                "role": "other",
+                "scope": "primary"
+              },
+              {
+                "text": "Baltimore",
+                "role": "death",
+                "scope": "primary"
+              },
+              {
+                "text": "York,Me",
+                "role": "other",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Bennington",
+              "Irel",
+              "Danville",
+              "Croydon",
+              "York",
+              "Baltimore",
+              "York,Me",
+              "Hudson",
+              "Chester",
+              "Ireland",
+              "Washington",
+              "Newport",
+              "Haverhill",
+              "Great"
+            ],
+            "birthDateText": null,
+            "deathYear": 1883,
+            "deathDateText": "9 August,1883",
+            "deathPlaceHints": [
+              "Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,"
+            ],
+            "burialHints": [],
+            "marriageSnippets": [
+              "in Danville,Vt,,Rev",
+              "twiceandhad 12 ch",
+              "Alexander,of York,Me",
+              "in Newport,N,H,,Stephen Metcalf,farmer,res",
+              "in Great"
+            ]
+          }
+        }
+      ],
+      "notes": [
+        "(2)I-Henry''',b.in Bennington,Vt.,1791,d.in Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,in Chester,hisnativeplace;and Henry'''inheriteda Yankeetalentformakinginventions.Hewasofarestless,rovingdisposition,andleftotherstoprofitbyhisinventions.In 1819 hem.at Phil-adelphia,Pa.,Joanna Riordan,b.in Ireland,near Lake Killarney,in 1793,whod.in Washington,D.C,1856.Herfamilywereem-inentscholars;andherbrother.Prof.James Riordan,whoaccom-paniedherto America,wasformanyyearsemployedatthe De-partmentof State,Washington,D.C,astranslatoroflanguages.Henry'''livedinvariousplaces,andonlytwoofhissevenchildrenwereborninthesameplace.II,Polly''',m.in Danville,Vt,,Rev.Asahel[or Asher]Fish,andhad 9 ch.,2 sonsand 7 daus.,widelyscattered;rem.to Canadathenceto Erie,Penn.,andthento Wisconsin,near Por-tagecity,wheretheydied.III,Cyrus'',b.about 1812,boughtafarmin Canada West,near Toronto;m.twiceandhad 12 ch.,andd.there,ae.87,IV,Ru Fus''',settledin Lowell,Mass.,whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works.Hem,Abi,Langton,from York,Me,Ch, : I.Anna Marie?,m.S.M.Alexander,of York,Me.,whowentto Cal-ifornia.Hadason.V,Parker''',settledin Lowell,Mass.,overseerinamill.Hem,Abi,Hodgdon,of Hudson,N,H,Ch,: 1.Alary Jane^,whod.ae.18.2.Adelin^.3.Parker^,d.ae.about 20.VI,Betsey''',b.in Danville,Vt.,6 May,1804,d.9 August,1883,ae.79;m.in Newport,N,H,,Stephen Metcalf,farmer,res.andd,in Haverhill,N.H.Ch. : I.Parker^{Meicalf),b.in Croydon,N.H.,6 May,1831;m.in Great"
+      ],
+      "locations": [
+        "Bennington",
+        "Irel",
+        "Danville",
+        "Croydon",
+        "York",
+        "Baltimore",
+        "York,Me",
+        "Hudson",
+        "Chester",
+        "Ireland",
+        "Washington",
+        "Newport",
+        "Haverhill",
+        "Great"
+      ],
+      "bio": {
+        "occupation": [
+          "Farmer"
+        ],
+        "military": [
+          ",whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works"
+        ],
+        "education": [],
+        "deathPlaceHints": [
+          "Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,"
+        ],
+        "burialHints": [],
+        "marriageSnippets": [
+          "in Danville,Vt,,Rev",
+          "twiceandhad 12 ch",
+          "Alexander,of York,Me",
+          "in Newport,N,H,,Stephen Metcalf,farmer,res",
+          "in Great"
+        ],
+        "locationsExtra": [
+          "Bennington",
+          "Irel",
+          "Danville",
+          "Croydon",
+          "York",
+          "Baltimore",
+          "York,Me",
+          "Hudson",
+          "Chester",
+          "Ireland",
+          "Washington",
+          "Newport",
+          "Haverhill",
+          "Great"
+        ],
+        "placeHints": [
+          {
+            "text": "Bennington",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Irel",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Danville",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Croydon",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "York",
+            "role": "other",
+            "scope": "primary"
+          },
+          {
+            "text": "Baltimore",
+            "role": "death",
+            "scope": "primary"
+          },
+          {
+            "text": "York,Me",
+            "role": "other",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "9 ch. (from text)",
+        "deathYear": 1883,
+        "deathDateText": "9 August,1883"
+      }
+    },
+    {
+      "key": "andd there|unknown",
+      "name": "Andd.there",
+      "birthYear": null,
+      "generation": null,
+      "sources": [
+        {
+          "pdfPageNumber": 339,
+          "lineNumber": 2,
+          "rawText": "(2)I-Henry''',b.in Bennington,Vt.,1791,d.in Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,in Chester,hisnativeplace;and Henry'''inheriteda Yankeetalentformakinginventions.Hewasofarestless,rovingdisposition,andleftotherstoprofitbyhisinventions.In 1819 hem.at Phil-adelphia,Pa.,Joanna Riordan,b.in Ireland,near Lake Killarney,in 1793,whod.in Washington,D.C,1856.Herfamilywereem-inentscholars;andherbrother.Prof.James Riordan,whoaccom-paniedherto America,wasformanyyearsemployedatthe De-partmentof State,Washington,D.C,astranslatoroflanguages.Henry'''livedinvariousplaces,andonlytwoofhissevenchildrenwereborninthesameplace.II,Polly''',m.in Danville,Vt,,Rev.Asahel[or Asher]Fish,andhad 9 ch.,2 sonsand 7 daus.,widelyscattered;rem.to Canadathenceto Erie,Penn.,andthento Wisconsin,near Por-tagecity,wheretheydied.III,Cyrus'',b.about 1812,boughtafarmin Canada West,near Toronto;m.twiceandhad 12 ch.,andd.there,ae.87,IV,Ru Fus''',settledin Lowell,Mass.,whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works.Hem,Abi,Langton,from York,Me,Ch, : I.Anna Marie?,m.S.M.Alexander,of York,Me.,whowentto Cal-ifornia.Hadason.V,Parker''',settledin Lowell,Mass.,overseerinamill.Hem,Abi,Hodgdon,of Hudson,N,H,Ch,: 1.Alary Jane^,whod.ae.18.2.Adelin^.3.Parker^,d.ae.about 20.VI,Betsey''',b.in Danville,Vt.,6 May,1804,d.9 August,1883,ae.79;m.in Newport,N,H,,Stephen Metcalf,farmer,res.andd,in Haverhill,N.H.Ch. : I.Parker^{Meicalf),b.in Croydon,N.H.,6 May,1831;m.in Great",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "(2)I-Henry''',b.in Bennington,Vt.,1791,d.in Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,in Chester,hisnativeplace;and Henry'''inheriteda Yankeetalentformakinginventions.Hewasofarestless,rovingdisposition,andleftotherstoprofitbyhisinventions.In 1819 hem.at Phil-adelphia,Pa.,Joanna Riordan,b.in Ireland,near Lake Killarney,in 1793,whod.in Washington,D.C,1856.Herfamilywereem-inentscholars;andherbrother.Prof.James Riordan,whoaccom-paniedherto America,wasformanyyearsemployedatthe De-partmentof State,Washington,D.C,astranslatoroflanguages.Henry'''livedinvariousplaces,andonlytwoofhissevenchildrenwereborninthesameplace.II,Polly''',m.in Danville,Vt,,Rev.Asahel[or Asher]Fish,andhad 9 ch.,2 sonsand 7 daus.,widelyscattered;rem.to Canadathenceto Erie,Penn.,andthento Wisconsin,near Por-tagecity,wheretheydied.III,Cyrus'',b.about 1812,boughtafarmin Canada West,near Toronto;m.twiceandhad 12 ch.,andd.there,ae.87,IV,Ru Fus''',settledin Lowell,Mass.,whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works.Hem,Abi,Langton,from York,Me,Ch, : I.Anna Marie?,m.S.M.Alexander,of York,Me.,whowentto Cal-ifornia.Hadason.V,Parker''',settledin Lowell,Mass.,overseerinamill.Hem,Abi,Hodgdon,of Hudson,N,H,Ch,: 1.Alary Jane^,whod.ae.18.2.Adelin^.3.Parker^,d.ae.about 20.VI,Betsey''',b.in Danville,Vt.,6 May,1804,d.9 August,1883,ae.79;m.in Newport,N,H,,Stephen Metcalf,farmer,res.andd,in Haverhill,N.H.Ch. : I.Parker^{Meicalf),b.in Croydon,N.H.,6 May,1831;m.in Great"
+      ],
+      "locations": []
+    },
+    {
+      "key": "of york|unknown",
+      "name": "Of York",
+      "birthYear": null,
+      "generation": null,
+      "sources": [
+        {
+          "pdfPageNumber": 339,
+          "lineNumber": 2,
+          "rawText": "(2)I-Henry''',b.in Bennington,Vt.,1791,d.in Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,in Chester,hisnativeplace;and Henry'''inheriteda Yankeetalentformakinginventions.Hewasofarestless,rovingdisposition,andleftotherstoprofitbyhisinventions.In 1819 hem.at Phil-adelphia,Pa.,Joanna Riordan,b.in Ireland,near Lake Killarney,in 1793,whod.in Washington,D.C,1856.Herfamilywereem-inentscholars;andherbrother.Prof.James Riordan,whoaccom-paniedherto America,wasformanyyearsemployedatthe De-partmentof State,Washington,D.C,astranslatoroflanguages.Henry'''livedinvariousplaces,andonlytwoofhissevenchildrenwereborninthesameplace.II,Polly''',m.in Danville,Vt,,Rev.Asahel[or Asher]Fish,andhad 9 ch.,2 sonsand 7 daus.,widelyscattered;rem.to Canadathenceto Erie,Penn.,andthento Wisconsin,near Por-tagecity,wheretheydied.III,Cyrus'',b.about 1812,boughtafarmin Canada West,near Toronto;m.twiceandhad 12 ch.,andd.there,ae.87,IV,Ru Fus''',settledin Lowell,Mass.,whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works.Hem,Abi,Langton,from York,Me,Ch, : I.Anna Marie?,m.S.M.Alexander,of York,Me.,whowentto Cal-ifornia.Hadason.V,Parker''',settledin Lowell,Mass.,overseerinamill.Hem,Abi,Hodgdon,of Hudson,N,H,Ch,: 1.Alary Jane^,whod.ae.18.2.Adelin^.3.Parker^,d.ae.about 20.VI,Betsey''',b.in Danville,Vt.,6 May,1804,d.9 August,1883,ae.79;m.in Newport,N,H,,Stephen Metcalf,farmer,res.andd,in Haverhill,N.H.Ch. : I.Parker^{Meicalf),b.in Croydon,N.H.,6 May,1831;m.in Great",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "(2)I-Henry''',b.in Bennington,Vt.,1791,d.in Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,in Chester,hisnativeplace;and Henry'''inheriteda Yankeetalentformakinginventions.Hewasofarestless,rovingdisposition,andleftotherstoprofitbyhisinventions.In 1819 hem.at Phil-adelphia,Pa.,Joanna Riordan,b.in Ireland,near Lake Killarney,in 1793,whod.in Washington,D.C,1856.Herfamilywereem-inentscholars;andherbrother.Prof.James Riordan,whoaccom-paniedherto America,wasformanyyearsemployedatthe De-partmentof State,Washington,D.C,astranslatoroflanguages.Henry'''livedinvariousplaces,andonlytwoofhissevenchildrenwereborninthesameplace.II,Polly''',m.in Danville,Vt,,Rev.Asahel[or Asher]Fish,andhad 9 ch.,2 sonsand 7 daus.,widelyscattered;rem.to Canadathenceto Erie,Penn.,andthento Wisconsin,near Por-tagecity,wheretheydied.III,Cyrus'',b.about 1812,boughtafarmin Canada West,near Toronto;m.twiceandhad 12 ch.,andd.there,ae.87,IV,Ru Fus''',settledin Lowell,Mass.,whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works.Hem,Abi,Langton,from York,Me,Ch, : I.Anna Marie?,m.S.M.Alexander,of York,Me.,whowentto Cal-ifornia.Hadason.V,Parker''',settledin Lowell,Mass.,overseerinamill.Hem,Abi,Hodgdon,of Hudson,N,H,Ch,: 1.Alary Jane^,whod.ae.18.2.Adelin^.3.Parker^,d.ae.about 20.VI,Betsey''',b.in Danville,Vt.,6 May,1804,d.9 August,1883,ae.79;m.in Newport,N,H,,Stephen Metcalf,farmer,res.andd,in Haverhill,N.H.Ch. : I.Parker^{Meicalf),b.in Croydon,N.H.,6 May,1831;m.in Great"
+      ],
+      "locations": []
+    },
+    {
+      "key": "henry lane|1820",
+      "name": "Henry Lane",
+      "birthYear": 1820,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 340,
+          "lineNumber": 2,
+          "rawText": "No.2.HENRYLANE^(Dan.e,Dan.^,Jn.^,Jn.3,Wm.^),1791-1849,andhisvv.JOANNA(RIORDAN)had: I.Anne^,b.in Jonesboro,Tenn.,1820;m.about 1841,Heze-Ki AHWo LLARDof Washington,D.C,manyyearsaninvalid,whod.thereabout 1853.Ch.b.in Georgetown,D.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Jonesboro",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Georgetown",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Jonesboro",
+              "Georgetown"
+            ],
+            "birthDateText": null,
+            "deathYear": 1853,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "about 1841,Heze-Ki AHWo LLARDof Washington,D"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.2.HENRYLANE^(Dan.e,Dan.^,Jn.^,Jn.3,Wm.^),1791-1849,andhisvv.JOANNA(RIORDAN)had: I.Anne^,b.in Jonesboro,Tenn.,1820;m.about 1841,Heze-Ki AHWo LLARDof Washington,D.C,manyyearsaninvalid,whod.thereabout 1853.Ch.b.in Georgetown,D."
+      ],
+      "locations": [
+        "Jonesboro",
+        "Georgetown"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "about 1841,Heze-Ki AHWo LLARDof Washington,D"
+        ],
+        "locationsExtra": [
+          "Jonesboro",
+          "Georgetown"
+        ],
+        "placeHints": [
+          {
+            "text": "Jonesboro",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Georgetown",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1853
+      }
+    },
+    {
+      "key": "heze-ki ahwo llardof|unknown",
+      "name": "Heze-ki Ahwo Llardof",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 340,
+          "lineNumber": 2,
+          "rawText": "No.2.HENRYLANE^(Dan.e,Dan.^,Jn.^,Jn.3,Wm.^),1791-1849,andhisvv.JOANNA(RIORDAN)had: I.Anne^,b.in Jonesboro,Tenn.,1820;m.about 1841,Heze-Ki AHWo LLARDof Washington,D.C,manyyearsaninvalid,whod.thereabout 1853.Ch.b.in Georgetown,D.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.2.HENRYLANE^(Dan.e,Dan.^,Jn.^,Jn.3,Wm.^),1791-1849,andhisvv.JOANNA(RIORDAN)had: I.Anne^,b.in Jonesboro,Tenn.,1820;m.about 1841,Heze-Ki AHWo LLARDof Washington,D.C,manyyearsaninvalid,whod.thereabout 1853.Ch.b.in Georgetown,D."
+      ],
+      "locations": []
+    },
+    {
+      "key": "iii-jo hn|1824",
+      "name": "Iii-jo Hn",
+      "birthYear": 1824,
+      "generation": 2,
+      "sources": [
+        {
+          "pdfPageNumber": 340,
+          "lineNumber": 4,
+          "rawText": "(3)III-Jo HN^,b.in Richmond,Va.,1824;m.in Frederickcounty,Md.,in 1851,Elizabeth Ellen(dau.Geo.)Titlo.Herfatherwasacivilengineer,widelyknownasagenialgentlemanandnotedforhishospitality.Forthirtyyears John Lane^of Washingtondealtinwholesaleproduce,butin 1872 hefailed.Theyhadtench.",
+          "bio": {
+            "occupation": [
+              "Gentleman"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Richmond",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Richmond",
+              "Washingtondealtinwholesaleproduce",
+              "Frederickcounty"
+            ],
+            "birthDateText": null,
+            "deathYear": null,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "in Frederickcounty,Md"
+            ]
+          }
+        }
+      ],
+      "notes": [
+        "(3)III-Jo HN^,b.in Richmond,Va.,1824;m.in Frederickcounty,Md.,in 1851,Elizabeth Ellen(dau.Geo.)Titlo.Herfatherwasacivilengineer,widelyknownasagenialgentlemanandnotedforhishospitality.Forthirtyyears John Lane^of Washingtondealtinwholesaleproduce,butin 1872 hefailed.Theyhadtench."
+      ],
+      "locations": [
+        "Richmond",
+        "Washingtondealtinwholesaleproduce",
+        "Frederickcounty"
+      ],
+      "bio": {
+        "occupation": [
+          "Gentleman"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "in Frederickcounty,Md"
+        ],
+        "locationsExtra": [
+          "Richmond",
+          "Washingtondealtinwholesaleproduce",
+          "Frederickcounty"
+        ],
+        "placeHints": [
+          {
+            "text": "Richmond",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ]
+      }
+    },
+    {
+      "key": "john lane|1878",
+      "name": "John Lane",
+      "birthYear": 1878,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 341,
+          "lineNumber": 2,
+          "rawText": "No.3.JOHNLANE 8(Henry^,Peter^,Peter^,Jn.^,Jn.^,Wm.^),1824-,merchant,andhisw.ELIZ.E.(TITLO)hadb.in Wash-ington,D.C.: I.George^,d.aninfant.II.Mary Elizabeth^,unm.III.Josephine^,m.in Washington,D.C,1876,Hon.Eugene Durnin,\"anableandesteemedlawyerof New York City.\"Ch. : I.Josephine Margarita\"\"^,b.in New York,1878.IV.John Ellsworth^,unm.V.Charles Hollingsworth^,dealerincoalandwood,m.in San Francisco,Cal.,in 1882,Rosalie O'Donnelof Baltimore,Md.,whosemotherbelongedtothehistoric Carrollfamilyof Carrollton.Hediedin April,1890,leavingthreech.b.in San Francisco : I.Chas.O.Donnel^'^{Lane).2.Gertrude Stevens^\".3.Josephine Elizabeth^^.VI.Emily Riley^,d.aninfant.VII.Emily Titlo^,unm.VIII.Effie Magdalene^.IX.Helen Virginia^.X.Elliot Middleton^,onthestaffof Public Opinionin Washington.",
+          "bio": {
+            "occupation": [
+              "Merchant",
+              "Lawyer"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "New York",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "New York",
+              "Wash-ington",
+              "Washington",
+              "San Francisco"
+            ],
+            "birthDateText": null,
+            "deathYear": 1876,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "in Washington,D",
+              "in San Francisco,Cal"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.3.JOHNLANE 8(Henry^,Peter^,Peter^,Jn.^,Jn.^,Wm.^),1824-,merchant,andhisw.ELIZ.E.(TITLO)hadb.in Wash-ington,D.C.: I.George^,d.aninfant.II.Mary Elizabeth^,unm.III.Josephine^,m.in Washington,D.C,1876,Hon.Eugene Durnin,\"anableandesteemedlawyerof New York City.\"Ch. : I.Josephine Margarita\"\"^,b.in New York,1878.IV.John Ellsworth^,unm.V.Charles Hollingsworth^,dealerincoalandwood,m.in San Francisco,Cal.,in 1882,Rosalie O'Donnelof Baltimore,Md.,whosemotherbelongedtothehistoric Carrollfamilyof Carrollton.Hediedin April,1890,leavingthreech.b.in San Francisco : I.Chas.O.Donnel^'^{Lane).2.Gertrude Stevens^\".3.Josephine Elizabeth^^.VI.Emily Riley^,d.aninfant.VII.Emily Titlo^,unm.VIII.Effie Magdalene^.IX.Helen Virginia^.X.Elliot Middleton^,onthestaffof Public Opinionin Washington."
+      ],
+      "locations": [
+        "New York",
+        "Wash-ington",
+        "Washington",
+        "San Francisco"
+      ],
+      "bio": {
+        "occupation": [
+          "Merchant",
+          "Lawyer"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "in Washington,D",
+          "in San Francisco,Cal"
+        ],
+        "locationsExtra": [
+          "New York",
+          "Wash-ington",
+          "Washington",
+          "San Francisco"
+        ],
+        "placeHints": [
+          {
+            "text": "New York",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1876
+      }
+    },
+    {
+      "key": "eliz e|unknown",
+      "name": "Eliz.e.",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 341,
+          "lineNumber": 2,
+          "rawText": "No.3.JOHNLANE 8(Henry^,Peter^,Peter^,Jn.^,Jn.^,Wm.^),1824-,merchant,andhisw.ELIZ.E.(TITLO)hadb.in Wash-ington,D.C.: I.George^,d.aninfant.II.Mary Elizabeth^,unm.III.Josephine^,m.in Washington,D.C,1876,Hon.Eugene Durnin,\"anableandesteemedlawyerof New York City.\"Ch. : I.Josephine Margarita\"\"^,b.in New York,1878.IV.John Ellsworth^,unm.V.Charles Hollingsworth^,dealerincoalandwood,m.in San Francisco,Cal.,in 1882,Rosalie O'Donnelof Baltimore,Md.,whosemotherbelongedtothehistoric Carrollfamilyof Carrollton.Hediedin April,1890,leavingthreech.b.in San Francisco : I.Chas.O.Donnel^'^{Lane).2.Gertrude Stevens^\".3.Josephine Elizabeth^^.VI.Emily Riley^,d.aninfant.VII.Emily Titlo^,unm.VIII.Effie Magdalene^.IX.Helen Virginia^.X.Elliot Middleton^,onthestaffof Public Opinionin Washington.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.3.JOHNLANE 8(Henry^,Peter^,Peter^,Jn.^,Jn.^,Wm.^),1824-,merchant,andhisw.ELIZ.E.(TITLO)hadb.in Wash-ington,D.C.: I.George^,d.aninfant.II.Mary Elizabeth^,unm.III.Josephine^,m.in Washington,D.C,1876,Hon.Eugene Durnin,\"anableandesteemedlawyerof New York City.\"Ch. : I.Josephine Margarita\"\"^,b.in New York,1878.IV.John Ellsworth^,unm.V.Charles Hollingsworth^,dealerincoalandwood,m.in San Francisco,Cal.,in 1882,Rosalie O'Donnelof Baltimore,Md.,whosemotherbelongedtothehistoric Carrollfamilyof Carrollton.Hediedin April,1890,leavingthreech.b.in San Francisco : I.Chas.O.Donnel^'^{Lane).2.Gertrude Stevens^\".3.Josephine Elizabeth^^.VI.Emily Riley^,d.aninfant.VII.Emily Titlo^,unm.VIII.Effie Magdalene^.IX.Helen Virginia^.X.Elliot Middleton^,onthestaffof Public Opinionin Washington."
+      ],
+      "locations": [
+        "New York",
+        "Wash-ington",
+        "Washington",
+        "San Francisco"
+      ]
+    }
+  ],
+  "acceptedRelationships": [
+    {
+      "relation": "spouse",
+      "sourceKey": "i-henry'''|1791",
+      "targetKey": "andd there|unknown",
+      "confidence": 0.78,
+      "pdfPageNumber": 339,
+      "lineNumber": 2,
+      "rawText": "(2)I-Henry''',b.in Bennington,Vt.,1791,d.in Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,in Chester,hisnativeplace;and Henry'''inheriteda Yankeetalentformakinginventions.Hewasofarestless,rovingdisposition,andleftotherstoprofitbyhisinventions.In 1819 hem.at Phil-adelphia,Pa.,Joanna Riordan,b.in Ireland,near Lake Killarney,in 1793,whod.in Washington,D.C,1856.Herfamilywereem-inentscholars;andherbrother.Prof.James Riordan,whoaccom-paniedherto America,wasformanyyearsemployedatthe De-partmentof State,Washington,D.C,astranslatoroflanguages.Henry'''livedinvariousplaces,andonlytwoofhissevenchildrenwereborninthesameplace.II,Polly''',m.in Danville,Vt,,Rev.Asahel[or Asher]Fish,andhad 9 ch.,2 sonsand 7 daus.,widelyscattered;rem.to Canadathenceto Erie,Penn.,andthento Wisconsin,near Por-tagecity,wheretheydied.III,Cyrus'',b.about 1812,boughtafarmin Canada West,near Toronto;m.twiceandhad 12 ch.,andd.there,ae.87,IV,Ru Fus''',settledin Lowell,Mass.,whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works.Hem,Abi,Langton,from York,Me,Ch, : I.Anna Marie?,m.S.M.Alexander,of York,Me.,whowentto Cal-ifornia.Hadason.V,Parker''',settledin Lowell,Mass.,overseerinamill.Hem,Abi,Hodgdon,of Hudson,N,H,Ch,: 1.Alary Jane^,whod.ae.18.2.Adelin^.3.Parker^,d.ae.about 20.VI,Betsey''',b.in Danville,Vt.,6 May,1804,d.9 August,1883,ae.79;m.in Newport,N,H,,Stephen Metcalf,farmer,res.andd,in Haverhill,N.H.Ch. : I.Parker^{Meicalf),b.in Croydon,N.H.,6 May,1831;m.in Great"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "i-henry'''|1791",
+      "targetKey": "of york|unknown",
+      "confidence": 0.78,
+      "pdfPageNumber": 339,
+      "lineNumber": 2,
+      "rawText": "(2)I-Henry''',b.in Bennington,Vt.,1791,d.in Baltimore,Md.,1849.Hisfatherissaidtohavebeeninterestedwith David Folsom'ssonsintheinventionformakingcutnailsbymachinery,in Chester,hisnativeplace;and Henry'''inheriteda Yankeetalentformakinginventions.Hewasofarestless,rovingdisposition,andleftotherstoprofitbyhisinventions.In 1819 hem.at Phil-adelphia,Pa.,Joanna Riordan,b.in Ireland,near Lake Killarney,in 1793,whod.in Washington,D.C,1856.Herfamilywereem-inentscholars;andherbrother.Prof.James Riordan,whoaccom-paniedherto America,wasformanyyearsemployedatthe De-partmentof State,Washington,D.C,astranslatoroflanguages.Henry'''livedinvariousplaces,andonlytwoofhissevenchildrenwereborninthesameplace.II,Polly''',m.in Danville,Vt,,Rev.Asahel[or Asher]Fish,andhad 9 ch.,2 sonsand 7 daus.,widelyscattered;rem.to Canadathenceto Erie,Penn.,andthento Wisconsin,near Por-tagecity,wheretheydied.III,Cyrus'',b.about 1812,boughtafarmin Canada West,near Toronto;m.twiceandhad 12 ch.,andd.there,ae.87,IV,Ru Fus''',settledin Lowell,Mass.,whenthemillswerefirstbuilt.Hewasoverseerinamill,andsuperintendentof Print Works.Hem,Abi,Langton,from York,Me,Ch, : I.Anna Marie?,m.S.M.Alexander,of York,Me.,whowentto Cal-ifornia.Hadason.V,Parker''',settledin Lowell,Mass.,overseerinamill.Hem,Abi,Hodgdon,of Hudson,N,H,Ch,: 1.Alary Jane^,whod.ae.18.2.Adelin^.3.Parker^,d.ae.about 20.VI,Betsey''',b.in Danville,Vt.,6 May,1804,d.9 August,1883,ae.79;m.in Newport,N,H,,Stephen Metcalf,farmer,res.andd,in Haverhill,N.H.Ch. : I.Parker^{Meicalf),b.in Croydon,N.H.,6 May,1831;m.in Great"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "henry lane|1820",
+      "targetKey": "heze-ki ahwo llardof|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 340,
+      "lineNumber": 2,
+      "rawText": "No.2.HENRYLANE^(Dan.e,Dan.^,Jn.^,Jn.3,Wm.^),1791-1849,andhisvv.JOANNA(RIORDAN)had: I.Anne^,b.in Jonesboro,Tenn.,1820;m.about 1841,Heze-Ki AHWo LLARDof Washington,D.C,manyyearsaninvalid,whod.thereabout 1853.Ch.b.in Georgetown,D."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "john lane|1878",
+      "targetKey": "eliz e|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 341,
+      "lineNumber": 2,
+      "rawText": "No.3.JOHNLANE 8(Henry^,Peter^,Peter^,Jn.^,Jn.^,Wm.^),1824-,merchant,andhisw.ELIZ.E.(TITLO)hadb.in Wash-ington,D.C.: I.George^,d.aninfant.II.Mary Elizabeth^,unm.III.Josephine^,m.in Washington,D.C,1876,Hon.Eugene Durnin,\"anableandesteemedlawyerof New York City.\"Ch. : I.Josephine Margarita\"\"^,b.in New York,1878.IV.John Ellsworth^,unm.V.Charles Hollingsworth^,dealerincoalandwood,m.in San Francisco,Cal.,in 1882,Rosalie O'Donnelof Baltimore,Md.,whosemotherbelongedtothehistoric Carrollfamilyof Carrollton.Hediedin April,1890,leavingthreech.b.in San Francisco : I.Chas.O.Donnel^'^{Lane).2.Gertrude Stevens^\".3.Josephine Elizabeth^^.VI.Emily Riley^,d.aninfant.VII.Emily Titlo^,unm.VIII.Effie Magdalene^.IX.Helen Virginia^.X.Elliot Middleton^,onthestaffof Public Opinionin Washington."
+    }
+  ]
+}

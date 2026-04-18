@@ -19,6 +19,58 @@ PROSE_HINTS = {
     "committee", "published", "volume", "chapter", "pages", "church"
 }
 
+# Whole-word OCR fixes for given names (case-insensitive). Extend from review-queue patterns after each run.
+OCR_NAME_FIXES = (
+    ("yohns", "John"),
+    ("yohn", "John"),
+    ("simot", "Simon"),
+    ("facob", "Jacob"),
+    ("hannahe", "Hannah"),
+    ("willaim", "William"),
+    ("johne", "John"),
+    ("samwele", "Samuel"),
+    ("samuel e", "Samuel E"),
+)
+
+def apply_ocr_name_fixes(text: str) -> str:
+    if not text:
+        return text
+    t = text
+    for wrong, right in OCR_NAME_FIXES:
+        t = re.sub(rf"\b{re.escape(wrong)}\b", right, t, flags=re.IGNORECASE)
+    return t
+
+
+def split_honorifics_from_name(name: str) -> tuple[str, list]:
+    """Strip leading military/civic titles from display name; return (clean_name, ['Col.', ...])."""
+    s = clean_text(apply_ocr_name_fixes(name)).strip()
+    titles = []
+    while True:
+        m = re.match(
+            r"^(Col|Capt|Gen|Maj|Lt|Dr|Rev|Hon|Deacon|Esq|Sir)\.?\s+",
+            s,
+            re.IGNORECASE,
+        )
+        if not m:
+            break
+        raw = m.group(1)
+        lab = raw[0].upper() + raw[1:].lower() + "."
+        titles.append(lab)
+        s = s[m.end() :].strip()
+    s = re.sub(r"\s+", " ", s).strip()
+    return (s if s else clean_text(name).strip(), titles)
+
+
+def _lifespan_years_in_text(text: str):
+    """Book-style '1765-1833' or '1765–1833' after OCR repair. Returns (birth_year, death_year) or (None, None)."""
+    if not text:
+        return None, None
+    t = normalize_for_genealogy_vitals(text)
+    m = re.search(r"\b(1[5-9]\d{2}|20\d{2})\s*[-–]\s*(1[5-9]\d{2}|20\d{2})\b", t)
+    if m:
+        return int(m.group(1)), int(m.group(2))
+    return None, None
+
 # Occupation / role keywords common in Lane genealogy (OCR-tolerant).
 OCCUPATION_TERMS = (
     "cordwainer", "tailor", "shoemaker", "tanner", "blacksmith", "farmer",
@@ -73,6 +125,83 @@ def clean_text(value: str) -> str:
 def parse_year(text: str):
     match = re.search(r"\b(1[5-9]\d{2}|20\d{2})\b", text)
     return int(match.group(1)) if match else None
+
+
+# Genealogy OCR: Roman "I" or lowercase "l" misread as digit 1 before a 3-digit year fragment (e.g. "I 778" -> 1778).
+MAX_LOCATION_STRINGS = 48
+MAX_PLACE_HINTS = 64
+
+_MARRIAGE_CUT = re.compile(
+    r"(?i)\b(?:she|he)\s+married\b|\bwas\s+wife\s+of\b|\bwas\s+husband\s+of\b"
+)
+
+
+def repair_ocr_roman_one_years(text: str) -> str:
+    def repl(match):
+        triple = match.group(1)
+        try:
+            n = int(triple)
+        except ValueError:
+            return match.group(0)
+        year = 1000 + n
+        if 1500 <= year <= 1999:
+            return str(year)
+        return match.group(0)
+
+    return re.sub(r"\b[Il]\s+(\d{3})\b", repl, text)
+
+
+def normalize_for_genealogy_vitals(text: str) -> str:
+    return repair_ocr_roman_one_years(clean_text(text))
+
+
+def split_primary_spouse_segments(line: str) -> tuple[str, str]:
+    s = clean_text(line)
+    low = s.lower()
+    m = _MARRIAGE_CUT.search(low)
+    if m:
+        return s[: m.start()].strip(), s[m.end() :].strip()
+    return s, ""
+
+
+def primary_vitals_segment(line: str) -> str:
+    primary, _ = split_primary_spouse_segments(line)
+    return primary
+
+
+def _death_years_in_segment(segment: str) -> list:
+    seg = normalize_for_genealogy_vitals(segment)
+    years = []
+    for m in re.finditer(
+        r"(?:\bd\.|\bdied)\s*[,:;]?\s*.*?\b(1[5-9]\d{2}|20\d{2})\b",
+        seg,
+        flags=re.IGNORECASE,
+    ):
+        years.append(int(m.group(1)))
+    return years
+
+
+def parse_birth_year_from_line(line: str):
+    primary = primary_vitals_segment(line)
+    seg = normalize_for_genealogy_vitals(primary)
+    for pat in (
+        r"\bb\.\s*.*?\b(1[5-9]\d{2}|20\d{2})\b",
+        r"\bborn\s*.*?\b(1[5-9]\d{2}|20\d{2})\b",
+    ):
+        m = re.search(pat, seg, flags=re.IGNORECASE)
+        if m:
+            return int(m.group(1))
+    dyears = _death_years_in_segment(primary)
+    vdeath = dyears[-1] if dyears else None
+    for m in re.finditer(r"\b(1[5-9]\d{2}|20\d{2})\b", seg):
+        yi = int(m.group(1))
+        if vdeath is None or yi != vdeath:
+            return yi
+    if not _line_leads_with_child_roman_marker(line):
+        lb, _ld = _lifespan_years_in_text(seg)
+        if lb is not None:
+            return lb
+    return None
 
 
 def detect_content_start(pages):
@@ -134,6 +263,7 @@ def first_name_from_segment(segment: str):
     segment = re.sub(r"^\(?\d+\)?\s*", "", segment)
     segment = re.sub(r"^[IVXLCDM]+\.\s*", "", segment)
     segment = clean_text(segment)
+    segment = apply_ocr_name_fixes(segment)
     if "," in segment:
         segment = segment.split(",", 1)[0]
     segment = re.sub(r"\b(b|m|d)\.\s*$", "", segment, flags=re.IGNORECASE)
@@ -177,9 +307,19 @@ def _trim_place_tail(candidate: str) -> str:
     return candidate
 
 
-def extract_locations_and_hints(text: str):
-    """Return (location_strings, place_hints) for map-ready provenance. Roles: birth, residence, death, burial, other."""
-    text = clean_text(text)
+def extract_locations_and_hints(text: str, include_spouse_places: bool = True):
+    """Return (location_strings, place_hints) for map-ready provenance. Roles: birth, residence, death, burial, other.
+
+    When include_spouse_places is False, only the segment before \"She married\" / \"He married\" (etc.) is scanned
+    for locations, so a spouse's \"b. in Candia\" does not attach to the subject's location list.
+    Hints include optional \"scope\": \"primary\" | \"spouse\" for downstream filtering.
+    """
+    text_raw = clean_text(text)
+    primary, spouse = split_primary_spouse_segments(text_raw)
+    fragments = [(normalize_for_genealogy_vitals(primary), "primary")]
+    if include_spouse_places and spouse.strip():
+        fragments.append((normalize_for_genealogy_vitals(spouse), "spouse"))
+
     locations = []
     hints = []
     seen_loc = set()
@@ -193,19 +333,26 @@ def extract_locations_and_hints(text: str):
             seen_loc.add(key)
             locations.append(cand)
 
-    def add_hint(cand: str, role: str):
+    def add_hint(cand: str, role: str, scope: str):
         cand = _trim_place_tail(cand)
         if len(cand) < 3:
             return
         add_loc(cand)
-        entry = {"text": cand, "role": role}
-        if entry not in hints:
+        entry = {"text": cand, "role": role, "scope": scope}
+        key_h = (cand.lower()[:120], role, scope)
+        if not any(
+            (h.get("text", "").lower()[:120], h.get("role"), h.get("scope", "primary")) == key_h for h in hints
+        ):
             hints.append(entry)
 
-    # Typed patterns (conservative; capitalized place start).
     typed = [
         (r"\bb\.\s*in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "birth"),
         (r"\bborn\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "birth"),
+        (r"\bnative\s+of\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "birth"),
+        (
+            r"\bfrom\s+([A-Z][A-Za-z\s,.'-]{2,50}?)(?=\s*,\s*(?:Massachusetts|Connecticut|Maine|New Hampshire|Vermont|Rhode Island|N\.?\s*H\.?|Mass\.?|Conn\.?|Ct\.?|Me\.?|Vt\.?|R\.?\s*I\.?|N\.Y\.?|N\.J\.?))",
+            "other",
+        ),
         (r"\bres\.?\s*,?\s*in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
         (r"\bresided\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
         (r"\bsettled\s+(?:at|in)\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "residence"),
@@ -217,30 +364,33 @@ def extract_locations_and_hints(text: str):
         (r"\bbur\.\s*,?\s*in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "burial"),
         (r"\bburied\s+in\s+([A-Z][A-Za-z\s,.'-]{2,60}?)(?=\s*(?:,|\.|;|had|m\.|d\.|and\b)|$)", "burial"),
     ]
-    for pat, role in typed:
-        for m in re.finditer(pat, text, flags=re.IGNORECASE):
-            add_hint(m.group(1), role)
 
-    # Generic fallbacks (other): "of Town" when Town looks place-like (not "his wife").
-    for m in re.finditer(
-        r"\bof\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}(?:,\s*)?(?:Massachusetts|Connecticut|Maine|New Hampshire|Vermont|Rhode Island|N\.?\s*H\.?|Mass\.?|Conn\.?|Ct\.?|Me\.?|Vt\.?|R\.?\s*I\.?))",
-        text,
-    ):
-        add_hint(m.group(1), "other")
+    for frag, scope in fragments:
+        if not frag.strip():
+            continue
+        for pat, role in typed:
+            for m in re.finditer(pat, frag, flags=re.IGNORECASE):
+                add_hint(m.group(1), role, scope)
 
-    legacy = [
-        r"\bof\s+([A-Z][A-Za-z\s.'-]{2,50})",
-        r"\bin\s+([A-Z][A-Za-z\s.'-]{2,50})",
-    ]
-    for pat in legacy:
-        for m in re.finditer(pat, text, flags=re.IGNORECASE):
-            raw = m.group(1)
-            low = raw.lower()
-            if any(bad in low for bad in ("his wife", "their ch", "children", "had by")):
-                continue
-            add_loc(raw)
+        for m in re.finditer(
+            r"\bof\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,3}(?:,\s*)?(?:Massachusetts|Connecticut|Maine|New Hampshire|Vermont|Rhode Island|N\.?\s*H\.?|Mass\.?|Conn\.?|Ct\.?|Me\.?|Vt\.?|R\.?\s*I\.?))",
+            frag,
+        ):
+            add_hint(m.group(1), "other", scope)
 
-    return locations[:8], hints[:12]
+        legacy = [
+            r"\bof\s+([A-Z][A-Za-z\s.'-]{2,50})",
+            r"\bin\s+([A-Z][A-Za-z\s.'-]{2,50})",
+        ]
+        for pat in legacy:
+            for m in re.finditer(pat, frag, flags=re.IGNORECASE):
+                raw = m.group(1)
+                low = raw.lower()
+                if any(bad in low for bad in ("his wife", "their ch", "children", "had by")):
+                    continue
+                add_loc(raw)
+
+    return locations[:MAX_LOCATION_STRINGS], hints[:MAX_PLACE_HINTS]
 
 
 def extract_locations(text: str):
@@ -265,29 +415,52 @@ MILITARY_SNIPPET_RE = (
 
 
 def extract_vital_facts(line: str) -> dict:
-    """Conservative death / burial / marriage fragments; death year only when tied to d./died."""
-    line = clean_text(line)
-    low = line.lower()
+    """Conservative death / burial / marriage fragments; death year only when tied to d./died.
+
+    Death and burial for the *subject* are taken from the segment before \"She/He married\" so a spouse's
+    vitals on the same OCR line do not overwrite the subject's death year.
+    """
+    primary, _sp = split_primary_spouse_segments(line)
+    line_pri = normalize_for_genealogy_vitals(primary)
+    line_full = normalize_for_genealogy_vitals(line)
     out = {
+        "birthDateText": None,
         "deathYear": None,
+        "deathDateText": None,
         "deathPlaceHints": [],
         "burialHints": [],
         "marriageSnippets": [],
     }
 
+    birth_m = re.search(
+        r"\bb\.\s*(\d{1,2}\s+[A-Za-z.]+\s*,\s*\d{4})\b",
+        line_pri,
+        flags=re.IGNORECASE,
+    )
+    if birth_m:
+        out["birthDateText"] = clean_text(birth_m.group(1))
+
     death_years = []
     for m in re.finditer(
-        r"(?:\bd\.|\bdied)\s*[,:]?\s*[^0-9]{0,40}?\b(1[5-9]\d{2}|20\d{2})\b",
-        line,
+        r"(?:\bd\.|\bdied)\s*[,:;]?\s*.*?\b(1[5-9]\d{2}|20\d{2})\b",
+        line_pri,
         flags=re.IGNORECASE,
     ):
         death_years.append(int(m.group(1)))
     if death_years:
         out["deathYear"] = death_years[-1]
 
+    dm_date = re.search(
+        r"(?:\bd\.|\bdied)\s*[,:;]?\s*(\d{1,2}\s+[A-Za-z.]+\s*,\s*\d{4})\b",
+        line_pri,
+        flags=re.IGNORECASE,
+    )
+    if dm_date:
+        out["deathDateText"] = clean_text(dm_date.group(1))
+
     dm = re.search(
         r"(?:\bdied\s+in\s+|\bd\.\s*(?:1[5-9]\d{2}\s*,?\s*)?in\s+)(.+?)(?=,\s*(?:m\.|bur\.)|\s+m\.|$)",
-        line,
+        line_pri,
         flags=re.IGNORECASE,
     )
     if dm:
@@ -297,7 +470,7 @@ def extract_vital_facts(line: str) -> dict:
 
     for m in re.finditer(
         r"(?:\bbur\.|\bburied)\s*,?\s*(?:in\s+)?([A-Z][A-Za-z\s,.'-]{2,55}?)(?=\s*(?:,|\.|;|and\b|had\b|$))",
-        line,
+        line_pri,
         flags=re.IGNORECASE,
     ):
         sn = _trim_place_tail(m.group(1))
@@ -306,7 +479,7 @@ def extract_vital_facts(line: str) -> dict:
 
     for m in re.finditer(
         r"\bm\.\s*([^.;]{4,120}?)(?=\s*[.;]|\s+had\b|\s*$)",
-        line,
+        line_full,
         flags=re.IGNORECASE,
     ):
         sn = clean_text(m.group(1).strip())
@@ -314,12 +487,17 @@ def extract_vital_facts(line: str) -> dict:
             out["marriageSnippets"].append(sn[:200])
     for m in re.finditer(
         r"\bmarried\s+([A-Z][A-Za-z\s.'-]{2,80}?)(?=\s*(?:,|\.|;|had\b|m\.|d\.|\s+in\s+\d{4})|\s*$)",
-        line,
+        line_full,
         flags=re.IGNORECASE,
     ):
         sn = clean_text("married " + m.group(1).strip())
         if len(sn) > 10 and sn not in out["marriageSnippets"]:
             out["marriageSnippets"].append(sn[:200])
+
+    if out["deathYear"] is None and not _line_leads_with_child_roman_marker(line):
+        _lb, ld_span = _lifespan_years_in_text(line_pri)
+        if ld_span is not None:
+            out["deathYear"] = ld_span
 
     return out
 
@@ -334,12 +512,20 @@ def extract_bio_facts(line: str) -> dict:
 
     military = []
     if any(h in low for h in MILITARY_HINTS):
-        for m in re.finditer(MILITARY_SNIPPET_RE, line, flags=re.IGNORECASE):
-            snippet = clean_text(m.group(1))
-            if len(snippet) > 12 and snippet not in military:
-                military.append(snippet[:240])
-        if not military:
-            military.append(clean_text(line)[:240])
+        # Do not treat "Col. Isaac Lane" style rank+name on a child line as a military service block.
+        if _line_leads_with_child_roman_marker(line) and not re.search(
+            r"\b(?:soldier|militia|regiment|enlisted|revolution|continental|battle|king philip|bunker|lexington|company|artillery|infantry|captain|lieutenant|sergeant|private|corporal|ensign)\b",
+            low,
+        ):
+            military = []
+        else:
+            for m in re.finditer(MILITARY_SNIPPET_RE, line, flags=re.IGNORECASE):
+                snippet = clean_text(m.group(1))
+                if len(snippet) > 12 and snippet not in military:
+                    military.append(snippet[:240])
+            if not military:
+                if not _line_leads_with_child_roman_marker(line):
+                    military.append(clean_text(line)[:240])
 
     education = []
     for hint in EDUCATION_HINTS:
@@ -363,6 +549,8 @@ def extract_bio_facts(line: str) -> dict:
         children_note = f"{m.group(1)} ch. (from text)"
     if re.search(r"\bs\.\s*p\.|sine\s+prole|without\s+issue", low):
         children_note = (children_note + "; " if children_note else "") + "sine prole (from text)"
+    if re.search(r"\band\s+had\s*:", low):
+        children_note = (children_note + "; " if children_note else "") + "had children (from text)"
 
     locs, place_hints = extract_locations_and_hints(line)
     vitals = extract_vital_facts(line)
@@ -374,7 +562,9 @@ def extract_bio_facts(line: str) -> dict:
         "childrenNote": children_note,
         "placeHints": place_hints,
         "locationsExtra": locs,
+        "birthDateText": vitals.get("birthDateText"),
         "deathYear": vitals["deathYear"],
+        "deathDateText": vitals.get("deathDateText"),
         "deathPlaceHints": vitals["deathPlaceHints"],
         "burialHints": vitals["burialHints"],
         "marriageSnippets": vitals["marriageSnippets"],
@@ -466,8 +656,8 @@ def merge_bio_dict(target: dict, incoming: dict) -> None:
         if not hint or not isinstance(hint, dict):
             continue
         cur = target.setdefault("placeHints", [])
-        key = (hint.get("text"), hint.get("role"))
-        if not any((h.get("text"), h.get("role")) == key for h in cur):
+        key = (hint.get("text"), hint.get("role"), hint.get("scope", "primary"))
+        if not any((h.get("text"), h.get("role"), h.get("scope", "primary")) == key for h in cur):
             cur.append(hint)
     cn = incoming.get("childrenNote")
     if cn:
@@ -476,10 +666,27 @@ def merge_bio_dict(target: dict, incoming: dict) -> None:
     inc_dy = incoming.get("deathYear")
     if inc_dy is not None and target.get("deathYear") is None:
         target["deathYear"] = inc_dy
+    inc_dd = incoming.get("deathDateText")
+    if inc_dd and not target.get("deathDateText"):
+        target["deathDateText"] = inc_dd
+    inc_bd = incoming.get("birthDateText")
+    if inc_bd and not target.get("birthDateText"):
+        target["birthDateText"] = inc_bd
+
+
+def _line_leads_with_child_roman_marker(line: str) -> bool:
+    """True when the line begins a child enumeration (I., II., (12) III., etc.), not a family header."""
+    s = clean_text(line).strip()
+    return bool(
+        re.match(r"^\(?\d+\)?\s*[IVXLCDM]{1,5}\.\s", s, re.IGNORECASE)
+        or re.match(r"^[IVXLCDM]{1,5}\.\s+", s, re.IGNORECASE)
+    )
 
 
 def parse_parent_header(line: str):
-    line_clean = clean_text(line)
+    line_clean = apply_ocr_name_fixes(clean_text(line))
+    if _line_leads_with_child_roman_marker(line_clean):
+        return None
     squashed = re.sub(r"[^a-z]", "", line_clean.lower())
     if "had" not in squashed and "wifewas" not in squashed and "theirchildren" not in squashed:
         return None
@@ -490,6 +697,7 @@ def parse_parent_header(line: str):
     if not lane_match:
         return None
     father_name = title_case(lane_match.group(1) + " Lane")
+    father_name, father_titles = split_honorifics_from_name(father_name)
     if not is_plausible_name(father_name):
         return None
 
@@ -497,9 +705,10 @@ def parse_parent_header(line: str):
     spouse_match = re.search(r"(?:wife|his\s*w\.?|w\.)\s*([A-Z][A-Za-z.'-]+(?:\s+[A-Z][A-Za-z.'-]+){0,2})\s*(?:\(|,|had|$)", line_clean, flags=re.IGNORECASE)
     if spouse_match:
         spouse_name = title_case(spouse_match.group(1))
+        spouse_name, _sp_titles = split_honorifics_from_name(spouse_name)
         if not is_plausible_name(spouse_name):
             spouse_name = None
-    return father_name, spouse_name
+    return father_name, spouse_name, father_titles
 
 
 def parse_child_line(line: str):
@@ -514,8 +723,9 @@ def parse_child_line(line: str):
     name = first_name_from_segment(line_clean)
     if not name:
         return None
-    birth_year = parse_year(line_clean)
-    locations = extract_locations(line_clean)
+    name, _child_titles = split_honorifics_from_name(name)
+    birth_year = parse_birth_year_from_line(line_clean)
+    locations = extract_locations_and_hints(line_clean, include_spouse_places=False)[0]
     return {
         "name": name,
         "birthYear": birth_year,
@@ -544,8 +754,11 @@ def split_segments(page_text: str):
     text = re.sub(r"\s+", " ", text)
     text = re.sub(r"(--\s*\d+\s*of\s*\d+\s*--)", r"\n\1\n", text, flags=re.IGNORECASE)
     text = re.sub(r"(\bNo\.\s*\d+\.)", r"\n\1", text)
+    # Glued OCR: "No.12" or "No. 12 COL" without space before name
+    text = re.sub(r"(\bNo\.\s*\d+)\s+(?=[A-Z])", r"\n\1 ", text, flags=re.IGNORECASE)
     text = re.sub(r"(\(\d+\)\s*[IVXLCDM]+[\.\-])", r"\n\1", text)
     text = re.sub(r"((?<![A-Za-z])[IVXLCDM]{1,5}[\.\-]\s)", r"\n\1", text)
+    text = re.sub(r"([;.])\s*(?=(?:COL|CAPT|GEN|MAJ|REV|HON)\.\s*[A-Z])", r"\1\n", text, flags=re.IGNORECASE)
     text = re.sub(r"(and\s+his\s+w\.\s*)", r"\n\1", text, flags=re.IGNORECASE)
     return [clean_text(seg) for seg in text.split("\n") if clean_text(seg)]
 
@@ -585,6 +798,11 @@ def parse_pages_to_people(pages, page_offset):
             raw = meta.get("rawText")
             if raw and raw not in people[key]["notes"]:
                 people[key]["notes"].append(raw)
+            if meta.get("titles"):
+                cur_t = people[key].setdefault("titles", [])
+                for t in meta["titles"]:
+                    if t and t not in cur_t:
+                        cur_t.append(t)
         if locations:
             for loc in locations:
                 if loc not in people[key]["locations"]:
@@ -616,14 +834,15 @@ def parse_pages_to_people(pages, page_offset):
                 if header_match:
                     header = parse_parent_header(header_match.group(1))
             if header:
-                father_name, mother_name = header
-                father_birth = parse_year(line)
+                father_name, mother_name, father_titles = header
+                father_birth = parse_birth_year_from_line(line)
                 line_bio = extract_bio_facts(line)
                 current_father = ensure_person(father_name, father_birth, {
                     "pdfPageNumber": absolute_page,
                     "lineNumber": line_number,
                     "rawText": line,
                     "bio": line_bio,
+                    "titles": father_titles,
                 }, extract_locations(line), generation=current_family_generation)
                 if mother_name:
                     current_mother = ensure_person(mother_name, None, {
@@ -797,6 +1016,10 @@ def _looks_like_place_fragment(s: str) -> bool:
 
 def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
     """Merge OCR-derived occupation/military/education/vitals/place hints into a laneData node."""
+    ptitles = person.get("titles") or []
+    if ptitles and not node.get("title"):
+        node["title"] = " ".join(ptitles)
+
     bio = person.get("bio") or {}
     if not bio:
         return
@@ -807,6 +1030,8 @@ def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
             bio.get("education"),
             bio.get("childrenNote"),
             bio.get("deathYear") is not None,
+            bio.get("birthDateText"),
+            bio.get("deathDateText"),
             bio.get("deathPlaceHints"),
             bio.get("burialHints"),
             bio.get("marriageSnippets"),
@@ -838,8 +1063,8 @@ def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
         if not isinstance(hint, dict):
             continue
         cur = facts.setdefault("placeHints", [])
-        key = (hint.get("text"), hint.get("role"))
-        if not any((h.get("text"), h.get("role")) == key for h in cur):
+        key = (hint.get("text"), hint.get("role"), hint.get("scope", "primary"))
+        if not any((h.get("text"), h.get("role"), h.get("scope", "primary")) == key for h in cur):
             cur.append(hint)
 
     for k_src, k_dst in (
@@ -862,6 +1087,14 @@ def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
     dy = bio.get("deathYear")
     if dy is not None and node.get("deathYear") in ("", None):
         node["deathYear"] = dy if isinstance(dy, int) else dy
+
+    bd_txt = bio.get("birthDateText")
+    if bd_txt and not (node.get("birthDate") or "").strip():
+        node["birthDate"] = bd_txt
+
+    dd_txt = bio.get("deathDateText")
+    if dd_txt and not (node.get("deathDate") or "").strip():
+        node["deathDate"] = dd_txt
 
     dph = bio.get("deathPlaceHints") or []
     if not node.get("deathPlace") and len(dph) == 1 and _looks_like_place_fragment(dph[0]):
@@ -897,23 +1130,36 @@ def merge_parsed_bio_into_node(node: dict, person: dict) -> None:
     if new_occ != existing_occ:
         node["occupation"] = new_occ
 
-    extra_text = []
+    prev_notes = (node.get("text") or "").strip()
+
+    def _append_ocr_note(label: str, body: str) -> None:
+        nonlocal prev_notes
+        if not body:
+            return
+        block = f"{label}: {body}"
+        if block in prev_notes:
+            return
+        prev_notes = f"{prev_notes} | {block}" if prev_notes else block
+
     if bio.get("education"):
-        extra_text.append("Education (OCR): " + "; ".join(bio["education"][:2]))
+        _append_ocr_note("Education (OCR)", "; ".join(bio["education"][:2]))
+    if bio.get("birthDateText") and not (node.get("birthDate") or "").strip():
+        _append_ocr_note("Birth date (OCR)", bio["birthDateText"])
     if bio.get("childrenNote"):
-        extra_text.append("Children (OCR): " + bio["childrenNote"])
+        _append_ocr_note("Children (OCR)", bio["childrenNote"])
     if bio.get("marriageSnippets"):
-        extra_text.append("Marriage (OCR): " + "; ".join(bio["marriageSnippets"][:2]))
+        uniq_ms = list(dict.fromkeys([m for m in bio["marriageSnippets"] if m]))
+        _append_ocr_note("Marriage (OCR)", "; ".join(uniq_ms[:8]))
     if dy is not None:
-        extra_text.append(f"Death year (OCR): {dy}")
+        _append_ocr_note("Death year (OCR)", str(dy))
+    if bio.get("deathDateText") and not (node.get("deathDate") or "").strip():
+        _append_ocr_note("Death date (OCR)", bio["deathDateText"])
     if dph and not (len(dph) == 1 and node.get("deathPlace")):
-        extra_text.append("Death place (OCR): " + "; ".join(dph[:2]))
+        _append_ocr_note("Death place (OCR)", "; ".join(dph[:2]))
     if bh and not (len(bh) == 1 and node.get("burial")):
-        extra_text.append("Burial (OCR): " + "; ".join(bh[:2]))
-    if extra_text:
-        prev = (node.get("text") or "").strip()
-        add = " | ".join(extra_text)
-        node["text"] = f"{prev} | {add}" if prev else add
+        _append_ocr_note("Burial (OCR)", "; ".join(bh[:2]))
+    if prev_notes != (node.get("text") or "").strip():
+        node["text"] = prev_notes
 
 
 def ensure_unique_node_ids(lane_data):
@@ -978,8 +1224,11 @@ def append_to_lane_data(parsed_people, accepted_relations):
                 inferred_last_name = parts[-1] if parts[-1].lower() not in {"jr", "sr"} else (parts[-2] if len(parts) > 1 else "")
         pbio = person.get("bio") or {}
         death_from_bio = pbio.get("deathYear")
+        birth_date_from_bio = pbio.get("birthDateText")
+        death_date_from_bio = pbio.get("deathDateText")
         dph_new = pbio.get("deathPlaceHints") or []
         bh_new = pbio.get("burialHints") or []
+        titles = person.get("titles") or []
         node = {
             "name": person["name"],
             "id": next_id,
@@ -989,8 +1238,8 @@ def append_to_lane_data(parsed_people, accepted_relations):
             "lastName": inferred_last_name or ("Lane" if " lane" in person["name"].lower() else ""),
             "birthYear": person["birthYear"] if person["birthYear"] else "",
             "deathYear": death_from_bio if death_from_bio is not None else "",
-            "birthDate": "",
-            "deathDate": "",
+            "birthDate": birth_date_from_bio if birth_date_from_bio else "",
+            "deathDate": death_date_from_bio if death_date_from_bio else "",
             "born": (person.get("locations") or [""])[0] if person.get("locations") else "",
             "deathPlace": dph_new[0] if len(dph_new) == 1 and _looks_like_place_fragment(dph_new[0]) else "",
             "burial": bh_new[0] if len(bh_new) == 1 and _looks_like_place_fragment(bh_new[0]) else "",
@@ -1200,6 +1449,34 @@ def emit_batch_json_files(
     review_out_path.write_text(json.dumps(review_out, indent=2), encoding="utf-8")
     quality_out_path.write_text(json.dumps(quality_out, indent=2), encoding="utf-8")
 
+    report_path = ROOT / "data" / "genealogy-parse-report.json"
+    report_payload = {
+        "generatedAt": datetime.now(UTC).isoformat(),
+        "sourcePdf": str(PDF_PATH),
+        "readmeMergeWorkflow": (
+            "Staged merge: inspect this file and sibling batch outputs under data/. "
+            "Review reviewQueue and rejectedRelationships before relying on new nodes. "
+            "laneData.json is updated only when append_to_lane_data runs (CLI default). "
+            "Use --reset-added-from-id to roll back appended high ids if needed."
+        ),
+        "batchStartPdfPage": batch_start + 1,
+        "parsedPageCount": len(selected_pages),
+        "detectedPeople": len(parsed["people"]),
+        "acceptedRelationships": len(accepted),
+        "rejectedRelationships": len(rejected),
+        "reviewQueueItems": len(parsed["reviewQueue"]),
+        "appendedNodes": appended_nodes,
+        "appendedLinks": appended_links,
+        "validation": validation,
+        "extractionStats": extraction_stats,
+        "structuredOut": str(structured_out_path),
+        "reviewOut": str(review_out_path),
+        "qualityOut": str(quality_out_path),
+        "reviewQueue": parsed["reviewQueue"],
+        "rejectedRelationshipsDetail": rejected,
+    }
+    report_path.write_text(json.dumps(report_payload, indent=2), encoding="utf-8")
+
 
 def run_embedded_chunks(num_chunks: int, reset_added_from_id):
     """Parse the full embedded-text content range in `num_chunks` batches; append to laneData each time."""
@@ -1276,6 +1553,7 @@ def run_embedded_chunks(num_chunks: int, reset_added_from_id):
         "totalAppendedLinks": total_appended_links,
         "lastValidationValid": last_validation.get("valid"),
         "chunkResults": chunk_results,
+        "genealogyParseReport": str(ROOT / "data" / "genealogy-parse-report.json"),
     }
     summary_path.write_text(json.dumps(summary_out, indent=2), encoding="utf-8")
 
@@ -1370,7 +1648,8 @@ def main():
         "extractionStats": extraction_stats,
         "structuredOut": str(structured_out_path),
         "reviewOut": str(review_out_path),
-        "qualityOut": str(quality_out_path)
+        "qualityOut": str(quality_out_path),
+        "genealogyParseReport": str(ROOT / "data" / "genealogy-parse-report.json"),
     }, indent=2))
 
 

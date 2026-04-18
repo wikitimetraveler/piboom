@@ -1,0 +1,44 @@
+{
+  "generatedAt": "2026-04-18T22:45:42.505893+00:00",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 22,
+  "rejectedRelationships": [
+    {
+      "relation": "father",
+      "sourceKey": "sarah|1727",
+      "targetKey": "william lane|1720",
+      "confidence": 0.85,
+      "pdfPageNumber": 33,
+      "lineNumber": 2,
+      "rawText": "(23)VIII.Sarah 4,b.3 Dec,1727,d.8 June,1784 or'86.Sheunitedwiththechurchin 1742,m.i Jan.,1747,Deacon Jona-than Weareof Seabrook,b.29 June,1724,whod.6 Nov.,1790,andhad 5 ch.IX.Bathsheda'^,b.6 June,1729,unitedwiththechurchin 1744,andd.,unm.,offever,5 Sept.,1757,ae.28.\"Adevotedanduseful Christian.\"X.Isaiah^,b.21 Dec,1730,m.24 July,1755,Sarah Perkins,b.15 Feb.,1735,andd,16 Mar.,1823,s.p.Theylivedat Hampton Falls.Hewasafarmerandshoemaker,andd.23 Oct.,1815,ae.85.On 26 Mar.,1770,hepetitioned Gov.Wcntworthandthe General Assemblyforacommitteetosettleparishdiffi-culties.(24)^I-F)eacon Jereahah'^,b.10 March,1732,d.21 June,1806,m.18 Jan.,1759,Mary(dau.of Lieutenant Joseph)San-born,b.24 May,1736,d.17 Aug.,1818,ae.82.Theyhad 7 childrenb.in Hampton Falls,nearwherehisson Leviafterwardlived.Hedeliveredtheaddressatthefuneralofhisfatherwhichwasprintedunderthetitle\"AMemorialanda Tearof Lamenta-tion.\"Wefijidhisnameonpetitionsto Gov.Wentworthrelativetodelinquenttaxpayers,in May,1772.In Mar.,1773,hemadestatementto Gov.Wentworthandthe General Assemblyrespect-ingadisputeinaparishof Hampton Falls.On Oct.i,1762,hewasonacommitteetoadjusttheboundariesbetween Salisburyand Andover,thencalled Stevenstownand New Britain.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "iii-si mon|1733",
+      "targetKey": "thomas lane|1731",
+      "confidence": 0.85,
+      "pdfPageNumber": 35,
+      "lineNumber": 3,
+      "rawText": "(33)III-Si MON^,b.3 July,1733,d.30 Nov.,1813.In Capt.H.Elkins'Co.,Col.E.Poor's Regiment,in May,1775.Marched Aug.I,1775,from Hamptontojointhearmyin Medford,Mass.Hem.17 Nov.,1757,Sarah Robieof North Hampton,b.2 Mar.,1736,d.25 Dec,1816,8 ch.Oni June,1796,withhisson,Simon,Jr.,and James Lane,petitionedthe Senateandthe House No TK.-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice.On May 10,1777,Oliver Wellington Laneof Hamptonwasonacommitteetopetitionthe New Hampshire Committeeof Safetyforthedefenceofthecoast.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "v-david|1746",
+      "targetKey": "enos lane|1737",
+      "confidence": 0.85,
+      "pdfPageNumber": 38,
+      "lineNumber": 2,
+      "rawText": "(36)V-David\\b.22 May,1746,m.Suffield,Ct.,1794,Betsey(Elizabeth)Ballard,b.1776.Hed.1 S 15,shed.1 S 30,ae.54.No.II.SAMUELLANE 6(Jn.-\\Jn.^Jn.^Wi Uiam^),1760-1 S 25,of Chesterandhis(1)w.HANNAH(LANE)hadb.in Chester.I.John\"^,ni.Betsey(dau.of Benjamin)Currier.II.Stephen^.III.Mary'',b.22 Nov.,178 S,m.Peter Sanborn Folsom,Jr.,b.14 Oct.,17 S 7,of Mt.Vernon,Me.,andd.2 Apr.,1 S 5 S,ae.71.Ch.: 1.yohn L?{Folsom),b.30 Oct.,i So S,d.5 Apr.,1852.2.Peier^,b.2 Dec,i Sio,m.2 Jan.,1838(i)Eunice Doniianandhadb.in Mt.Vernon:I.)Sarah O?,b.22 Feb.,1839.2.)/%z 7;<r\u00ab^b.July,1841.3.)Mary M?,b.Mar.,1843,d.Aug.,1858.4.)Eerdinam P,b.July,1845.5.)Myra M?,b.5 Mar.,1 S 48.Peter S.Folsomm.(2)Sept.,1 S 67,Jull\\A.P.Brownandhad:3.Saiiiuel/J,h.Feb.,1813,d.July,1 S 51.4.Henry H?,b.10 Sept.,1815,d.Aug.,1854.5.Mary L?,b.8 May,1819,m.N./.ei,i;hlo)t,farmerin Mt.Vernon.6.S^Pelcr^,m.Shaftuck,andres.Burlington,Vt.]?7.Julia^,b.16 July,1825.By(2)w.ANNA(CURRIER)SAMUELLANE\"'had: IV.Samuel\",b.1796,m.Fanny Tufts,andd.1840,^-./.In Sept.,1814,wascorporalin Captain S.Aiken's Co.V.Betsey'',b.1798,m.Josiah Forsaithandd.1821.Ch. : 1.Mattheii F'.2.Sarah^.",
+      "rejectReason": "Temporal sanity failed"
+    }
+  ],
+  "reviewQueue": [
+    {
+      "type": "page",
+      "pdfPageNumber": 30,
+      "reason": "Empty extracted page"
+    }
+  ]
+}

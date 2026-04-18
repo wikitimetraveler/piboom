@@ -1,0 +1,665 @@
+{
+  "generatedAt": "2026-04-18T22:45:44.066704+00:00",
+  "sourcePdf": "C:\\projects\\piBoom\\data\\lanegenealogies01chap.pdf",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 238,
+  "parsedPageCount": 24,
+  "people": [
+    {
+      "key": "samuelgardner lane|1877",
+      "name": "Samuelgardner Lane",
+      "birthYear": 1877,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 239,
+          "lineNumber": 2,
+          "rawText": "No.146.SAMUELGARDNERLANE^(Jn.6,Josh.^,Josh.^,Josh.3,Wm.2),1831,andhisw.MARYS.(BINNEY),hadb.in Melrose,Mass. : I.Dr.Edward Binney*^,b.13 July,i 860,studiedat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunaticasylumsat Somerville,Boston,Northamptonand Dorchester,Mass.Hem.28 May,1888,Esther(dau.of Wm.and Martha)Bridgman,b.in Law-rence,Mass.,18 Oct.,1859.Ch. : I.Spencer Bridgman^,b.in Boston,28 Sept.,1889.II.Harriet Steele^,b.in Charlestown,Mass.,22 Jan.,1864.III.A.Lincoln^,b.in Wakefield,Mass.,17 Feb.,1867.Heisasalesmanin New York City.",
+          "bio": {
+            "occupation": [
+              "Physician"
+            ],
+            "military": [],
+            "education": [
+              "edat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunatic",
+              "ton University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunaticasylumsa",
+              ",i 860,studiedat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicia"
+            ],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Law-rence",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Boston",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Charlestown",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Wakefield",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Law-rence",
+              "Boston",
+              "Charlestown",
+              "Wakefield",
+              "Melrose"
+            ],
+            "birthDateText": null,
+            "deathYear": null,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": []
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.146.SAMUELGARDNERLANE^(Jn.6,Josh.^,Josh.^,Josh.3,Wm.2),1831,andhisw.MARYS.(BINNEY),hadb.in Melrose,Mass. : I.Dr.Edward Binney*^,b.13 July,i 860,studiedat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunaticasylumsat Somerville,Boston,Northamptonand Dorchester,Mass.Hem.28 May,1888,Esther(dau.of Wm.and Martha)Bridgman,b.in Law-rence,Mass.,18 Oct.,1859.Ch. : I.Spencer Bridgman^,b.in Boston,28 Sept.,1889.II.Harriet Steele^,b.in Charlestown,Mass.,22 Jan.,1864.III.A.Lincoln^,b.in Wakefield,Mass.,17 Feb.,1867.Heisasalesmanin New York City."
+      ],
+      "locations": [
+        "Law-rence",
+        "Boston",
+        "Charlestown",
+        "Wakefield",
+        "Melrose"
+      ],
+      "bio": {
+        "occupation": [
+          "Physician"
+        ],
+        "military": [],
+        "education": [
+          "edat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunatic",
+          "ton University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunaticasylumsa",
+          ",i 860,studiedat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicia"
+        ],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+        "locationsExtra": [
+          "Law-rence",
+          "Boston",
+          "Charlestown",
+          "Wakefield",
+          "Melrose"
+        ],
+        "placeHints": [
+          {
+            "text": "Law-rence",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Boston",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Charlestown",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Wakefield",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ]
+      }
+    },
+    {
+      "key": "marys|unknown",
+      "name": "Marys.",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 239,
+          "lineNumber": 2,
+          "rawText": "No.146.SAMUELGARDNERLANE^(Jn.6,Josh.^,Josh.^,Josh.3,Wm.2),1831,andhisw.MARYS.(BINNEY),hadb.in Melrose,Mass. : I.Dr.Edward Binney*^,b.13 July,i 860,studiedat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunaticasylumsat Somerville,Boston,Northamptonand Dorchester,Mass.Hem.28 May,1888,Esther(dau.of Wm.and Martha)Bridgman,b.in Law-rence,Mass.,18 Oct.,1859.Ch. : I.Spencer Bridgman^,b.in Boston,28 Sept.,1889.II.Harriet Steele^,b.in Charlestown,Mass.,22 Jan.,1864.III.A.Lincoln^,b.in Wakefield,Mass.,17 Feb.,1867.Heisasalesmanin New York City.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.146.SAMUELGARDNERLANE^(Jn.6,Josh.^,Josh.^,Josh.3,Wm.2),1831,andhisw.MARYS.(BINNEY),hadb.in Melrose,Mass. : I.Dr.Edward Binney*^,b.13 July,i 860,studiedat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunaticasylumsat Somerville,Boston,Northamptonand Dorchester,Mass.Hem.28 May,1888,Esther(dau.of Wm.and Martha)Bridgman,b.in Law-rence,Mass.,18 Oct.,1859.Ch. : I.Spencer Bridgman^,b.in Boston,28 Sept.,1889.II.Harriet Steele^,b.in Charlestown,Mass.,22 Jan.,1864.III.A.Lincoln^,b.in Wakefield,Mass.,17 Feb.,1867.Heisasalesmanin New York City."
+      ],
+      "locations": [
+        "Law-rence",
+        "Boston",
+        "Charlestown",
+        "Wakefield",
+        "Melrose"
+      ]
+    },
+    {
+      "key": "edwins lane|1869",
+      "name": "Edwins. Lane",
+      "birthYear": 1869,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 240,
+          "lineNumber": 2,
+          "rawText": "No.148.EDWINS.LANE 8(Thos.^,Dan'ie,Ward^Wm.4,Josh.^),1845,andhisw.ANNAG.(TUCKER),hadb.in Ames-bury,Mass. : I.Cora Bell^,b.9 Aug.,1869,d.20 Mar.,1875.II.George Oscar^,b.12 Sept.,1872.III.Harvey Scott^,b.ii Sept.,1877,d.9 Aug.,1878.IV.Harlan Stacy^,b.13 Sept.,1879,d.12 Oct.,1882.V.Gertie May 9,b.13 Oct.,1882.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [
+              "Ames-bury"
+            ],
+            "birthDateText": "9 Aug.,1869",
+            "deathYear": 1882,
+            "deathDateText": "20 Mar.,1875",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": []
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.148.EDWINS.LANE 8(Thos.^,Dan'ie,Ward^Wm.4,Josh.^),1845,andhisw.ANNAG.(TUCKER),hadb.in Ames-bury,Mass. : I.Cora Bell^,b.9 Aug.,1869,d.20 Mar.,1875.II.George Oscar^,b.12 Sept.,1872.III.Harvey Scott^,b.ii Sept.,1877,d.9 Aug.,1878.IV.Harlan Stacy^,b.13 Sept.,1879,d.12 Oct.,1882.V.Gertie May 9,b.13 Oct.,1882."
+      ],
+      "locations": [
+        "Ames-bury"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+        "locationsExtra": [
+          "Ames-bury"
+        ],
+        "deathYear": 1882,
+        "deathDateText": "20 Mar.,1875",
+        "birthDateText": "9 Aug.,1869"
+      }
+    },
+    {
+      "key": "annag|unknown",
+      "name": "Annag.",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 240,
+          "lineNumber": 2,
+          "rawText": "No.148.EDWINS.LANE 8(Thos.^,Dan'ie,Ward^Wm.4,Josh.^),1845,andhisw.ANNAG.(TUCKER),hadb.in Ames-bury,Mass. : I.Cora Bell^,b.9 Aug.,1869,d.20 Mar.,1875.II.George Oscar^,b.12 Sept.,1872.III.Harvey Scott^,b.ii Sept.,1877,d.9 Aug.,1878.IV.Harlan Stacy^,b.13 Sept.,1879,d.12 Oct.,1882.V.Gertie May 9,b.13 Oct.,1882.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.148.EDWINS.LANE 8(Thos.^,Dan'ie,Ward^Wm.4,Josh.^),1845,andhisw.ANNAG.(TUCKER),hadb.in Ames-bury,Mass. : I.Cora Bell^,b.9 Aug.,1869,d.20 Mar.,1875.II.George Oscar^,b.12 Sept.,1872.III.Harvey Scott^,b.ii Sept.,1877,d.9 Aug.,1878.IV.Harlan Stacy^,b.13 Sept.,1879,d.12 Oct.,1882.V.Gertie May 9,b.13 Oct.,1882."
+      ],
+      "locations": [
+        "Ames-bury"
+      ]
+    },
+    {
+      "key": "johna lane|1872",
+      "name": "Johna. Lane",
+      "birthYear": 1872,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 240,
+          "lineNumber": 3,
+          "rawText": "No.149.JOHNA.LANE 8,(Thos.^,Dan'l W.e,Ward^,Wm.^,Josh.3),1848,of Amesbury,Mass.,carriagemakerandhisw.ISETTEA.(TRUE),hadb.in Amesbury : I.Ella B.^,b.26 Sept.,1872.II.Clarence E.^,b.25 May,1874,d.15 July,1877.III.John Raymond^,b.12 June.,1878.IV.Blanche E.^,b.30 Nov.,1883.V.Ralph H.9,b.25 Aug.,1888.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Amesbury,Mass",
+                "role": "other",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Amesbury,Mass",
+              "Amesbury"
+            ],
+            "birthDateText": "26 Sept.,1872",
+            "deathYear": 1877,
+            "deathDateText": "15 July,1877",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": []
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.149.JOHNA.LANE 8,(Thos.^,Dan'l W.e,Ward^,Wm.^,Josh.3),1848,of Amesbury,Mass.,carriagemakerandhisw.ISETTEA.(TRUE),hadb.in Amesbury : I.Ella B.^,b.26 Sept.,1872.II.Clarence E.^,b.25 May,1874,d.15 July,1877.III.John Raymond^,b.12 June.,1878.IV.Blanche E.^,b.30 Nov.,1883.V.Ralph H.9,b.25 Aug.,1888."
+      ],
+      "locations": [
+        "Amesbury,Mass",
+        "Amesbury"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+        "locationsExtra": [
+          "Amesbury,Mass",
+          "Amesbury"
+        ],
+        "placeHints": [
+          {
+            "text": "Amesbury,Mass",
+            "role": "other",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1877,
+        "deathDateText": "15 July,1877",
+        "birthDateText": "26 Sept.,1872"
+      }
+    },
+    {
+      "key": "isettea|unknown",
+      "name": "Isettea.",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 240,
+          "lineNumber": 3,
+          "rawText": "No.149.JOHNA.LANE 8,(Thos.^,Dan'l W.e,Ward^,Wm.^,Josh.3),1848,of Amesbury,Mass.,carriagemakerandhisw.ISETTEA.(TRUE),hadb.in Amesbury : I.Ella B.^,b.26 Sept.,1872.II.Clarence E.^,b.25 May,1874,d.15 July,1877.III.John Raymond^,b.12 June.,1878.IV.Blanche E.^,b.30 Nov.,1883.V.Ralph H.9,b.25 Aug.,1888.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.149.JOHNA.LANE 8,(Thos.^,Dan'l W.e,Ward^,Wm.^,Josh.3),1848,of Amesbury,Mass.,carriagemakerandhisw.ISETTEA.(TRUE),hadb.in Amesbury : I.Ella B.^,b.26 Sept.,1872.II.Clarence E.^,b.25 May,1874,d.15 July,1877.III.John Raymond^,b.12 June.,1878.IV.Blanche E.^,b.30 Nov.,1883.V.Ralph H.9,b.25 Aug.,1888."
+      ],
+      "locations": [
+        "Amesbury,Mass",
+        "Amesbury"
+      ]
+    },
+    {
+      "key": "william lane|1750",
+      "name": "William Lane",
+      "birthYear": 1750,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 248,
+          "lineNumber": 1,
+          "rawText": "2 l 6 WILLIAMLANEANDFAMILY.haveexperiencedhisseasonableandbountifulrelief.Hewastoohonestandtoowisetocourtpopularitybyflatteringthevicesofmen,anddidnotthroughambitionaspiretoofficesofdistinction,butwhencalledupontoperformanyofficialduty,hefailednottodischargeitwithabilityandfidelity.\"Ashehadlivedinthehabitualexerciseof Christiangraces,andinthediligentcultivationofthe Christiantemper,andhavingwhileinhealth,sethishouseinorder,whenhewasvisitedwithhislastsickness,hehadlittlemoretodothantotrimhislampandpatientlywaitforthemomentofhisdeparture.***Fromthefirstapproachofhisillnessheexpressedanentireresignationtothedivinewill.Heborehismaladies,whichweresometimesdis-tressing,withpatience.Ashisbodilyweaknessincreasedandhevieweddeathapproaching,hisfaithandhopewereinlivelyexer-ciseandaffordedhimconsolationandsupportinthemomentofdissolution.Inthemostpeacefulmanner,intheenjoymentofhisreasontothelast,hefellasleep,andwehaveabundantreasontobelievethatherestsfromhislaborsandhisworkswillfollowhim.Ifweconsiderthecharacterofthedeceased,initsvariousrelations,fromhisyouthtohisgrave,weshallseldomfindoneintheprivatewalksoflifemoredeservingofouresteemandimitation.\" Note VIIon No.21,II.[By J.H.Fi TTS.]John Lane^(Josh.'^,Josh.^,Wm.~),1750-1823,b.at Poplin,24 Oct.,1750,[O.S.]m.30 Nov.,1775,Hannah Godfrey,b.in Pop-lin,19 Nov.,1755,dau.of Josephand Susanna Morrill Godfrey.Thefarmof Hon.Ezekiel Godfreyandhisson,Esq.Josephwasthebestoneintheneighborhood.Esq.Josephdidthemosttownbusinessandwastherichestmanintown.The Eanesandthe Godfreyslivedonadjoiningfarms,and Johnand Hannahwereintimatelyassociatedfrom,childhood.Theysettledin Candiain 1775,onafarmaboutonemilefromthevillageonthe North Road.Healsocarriedonthebusinessofacabinetmakerandlandsurveyor,andusedacompassboxandtripodofhisownman-ufacture.Heregularlymaintainedfamilydevotions,andwasa",
+          "bio": {
+            "occupation": [
+              "Surveyor"
+            ],
+            "military": [
+              "Ifweconsiderthecharacterofthedeceased,initsvariousrelations,fromhisyouthtohisgrave,weshallseldomfindoneintheprivatewalksoflifemoredeservingofouresteemandimitation"
+            ],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Pop-lin",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Pop-lin",
+              "Josephand Susanna Morrill Godfrey.Thefarmof Hon.Eze"
+            ],
+            "birthDateText": null,
+            "deathYear": 1823,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "30 Nov"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "2 l 6 WILLIAMLANEANDFAMILY.haveexperiencedhisseasonableandbountifulrelief.Hewastoohonestandtoowisetocourtpopularitybyflatteringthevicesofmen,anddidnotthroughambitionaspiretoofficesofdistinction,butwhencalledupontoperformanyofficialduty,hefailednottodischargeitwithabilityandfidelity.\"Ashehadlivedinthehabitualexerciseof Christiangraces,andinthediligentcultivationofthe Christiantemper,andhavingwhileinhealth,sethishouseinorder,whenhewasvisitedwithhislastsickness,hehadlittlemoretodothantotrimhislampandpatientlywaitforthemomentofhisdeparture.***Fromthefirstapproachofhisillnessheexpressedanentireresignationtothedivinewill.Heborehismaladies,whichweresometimesdis-tressing,withpatience.Ashisbodilyweaknessincreasedandhevieweddeathapproaching,hisfaithandhopewereinlivelyexer-ciseandaffordedhimconsolationandsupportinthemomentofdissolution.Inthemostpeacefulmanner,intheenjoymentofhisreasontothelast,hefellasleep,andwehaveabundantreasontobelievethatherestsfromhislaborsandhisworkswillfollowhim.Ifweconsiderthecharacterofthedeceased,initsvariousrelations,fromhisyouthtohisgrave,weshallseldomfindoneintheprivatewalksoflifemoredeservingofouresteemandimitation.\" Note VIIon No.21,II.[By J.H.Fi TTS.]John Lane^(Josh.'^,Josh.^,Wm.~),1750-1823,b.at Poplin,24 Oct.,1750,[O.S.]m.30 Nov.,1775,Hannah Godfrey,b.in Pop-lin,19 Nov.,1755,dau.of Josephand Susanna Morrill Godfrey.Thefarmof Hon.Ezekiel Godfreyandhisson,Esq.Josephwasthebestoneintheneighborhood.Esq.Josephdidthemosttownbusinessandwastherichestmanintown.The Eanesandthe Godfreyslivedonadjoiningfarms,and Johnand Hannahwereintimatelyassociatedfrom,childhood.Theysettledin Candiain 1775,onafarmaboutonemilefromthevillageonthe North Road.Healsocarriedonthebusinessofacabinetmakerandlandsurveyor,andusedacompassboxandtripodofhisownman-ufacture.Heregularlymaintainedfamilydevotions,andwasa"
+      ],
+      "locations": [
+        "Pop-lin",
+        "Josephand Susanna Morrill Godfrey.Thefarmof Hon.Eze"
+      ],
+      "bio": {
+        "occupation": [
+          "Surveyor"
+        ],
+        "military": [
+          "Ifweconsiderthecharacterofthedeceased,initsvariousrelations,fromhisyouthtohisgrave,weshallseldomfindoneintheprivatewalksoflifemoredeservingofouresteemandimitation"
+        ],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "30 Nov"
+        ],
+        "locationsExtra": [
+          "Pop-lin",
+          "Josephand Susanna Morrill Godfrey.Thefarmof Hon.Eze"
+        ],
+        "placeHints": [
+          {
+            "text": "Pop-lin",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1823
+      }
+    },
+    {
+      "key": "orkswillfollowhim ifweconsiderthecharacterofthedeceased|unknown",
+      "name": "Orkswillfollowhim.ifweconsiderthecharacterofthedeceased",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 248,
+          "lineNumber": 1,
+          "rawText": "2 l 6 WILLIAMLANEANDFAMILY.haveexperiencedhisseasonableandbountifulrelief.Hewastoohonestandtoowisetocourtpopularitybyflatteringthevicesofmen,anddidnotthroughambitionaspiretoofficesofdistinction,butwhencalledupontoperformanyofficialduty,hefailednottodischargeitwithabilityandfidelity.\"Ashehadlivedinthehabitualexerciseof Christiangraces,andinthediligentcultivationofthe Christiantemper,andhavingwhileinhealth,sethishouseinorder,whenhewasvisitedwithhislastsickness,hehadlittlemoretodothantotrimhislampandpatientlywaitforthemomentofhisdeparture.***Fromthefirstapproachofhisillnessheexpressedanentireresignationtothedivinewill.Heborehismaladies,whichweresometimesdis-tressing,withpatience.Ashisbodilyweaknessincreasedandhevieweddeathapproaching,hisfaithandhopewereinlivelyexer-ciseandaffordedhimconsolationandsupportinthemomentofdissolution.Inthemostpeacefulmanner,intheenjoymentofhisreasontothelast,hefellasleep,andwehaveabundantreasontobelievethatherestsfromhislaborsandhisworkswillfollowhim.Ifweconsiderthecharacterofthedeceased,initsvariousrelations,fromhisyouthtohisgrave,weshallseldomfindoneintheprivatewalksoflifemoredeservingofouresteemandimitation.\" Note VIIon No.21,II.[By J.H.Fi TTS.]John Lane^(Josh.'^,Josh.^,Wm.~),1750-1823,b.at Poplin,24 Oct.,1750,[O.S.]m.30 Nov.,1775,Hannah Godfrey,b.in Pop-lin,19 Nov.,1755,dau.of Josephand Susanna Morrill Godfrey.Thefarmof Hon.Ezekiel Godfreyandhisson,Esq.Josephwasthebestoneintheneighborhood.Esq.Josephdidthemosttownbusinessandwastherichestmanintown.The Eanesandthe Godfreyslivedonadjoiningfarms,and Johnand Hannahwereintimatelyassociatedfrom,childhood.Theysettledin Candiain 1775,onafarmaboutonemilefromthevillageonthe North Road.Healsocarriedonthebusinessofacabinetmakerandlandsurveyor,andusedacompassboxandtripodofhisownman-ufacture.Heregularlymaintainedfamilydevotions,andwasa",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "2 l 6 WILLIAMLANEANDFAMILY.haveexperiencedhisseasonableandbountifulrelief.Hewastoohonestandtoowisetocourtpopularitybyflatteringthevicesofmen,anddidnotthroughambitionaspiretoofficesofdistinction,butwhencalledupontoperformanyofficialduty,hefailednottodischargeitwithabilityandfidelity.\"Ashehadlivedinthehabitualexerciseof Christiangraces,andinthediligentcultivationofthe Christiantemper,andhavingwhileinhealth,sethishouseinorder,whenhewasvisitedwithhislastsickness,hehadlittlemoretodothantotrimhislampandpatientlywaitforthemomentofhisdeparture.***Fromthefirstapproachofhisillnessheexpressedanentireresignationtothedivinewill.Heborehismaladies,whichweresometimesdis-tressing,withpatience.Ashisbodilyweaknessincreasedandhevieweddeathapproaching,hisfaithandhopewereinlivelyexer-ciseandaffordedhimconsolationandsupportinthemomentofdissolution.Inthemostpeacefulmanner,intheenjoymentofhisreasontothelast,hefellasleep,andwehaveabundantreasontobelievethatherestsfromhislaborsandhisworkswillfollowhim.Ifweconsiderthecharacterofthedeceased,initsvariousrelations,fromhisyouthtohisgrave,weshallseldomfindoneintheprivatewalksoflifemoredeservingofouresteemandimitation.\" Note VIIon No.21,II.[By J.H.Fi TTS.]John Lane^(Josh.'^,Josh.^,Wm.~),1750-1823,b.at Poplin,24 Oct.,1750,[O.S.]m.30 Nov.,1775,Hannah Godfrey,b.in Pop-lin,19 Nov.,1755,dau.of Josephand Susanna Morrill Godfrey.Thefarmof Hon.Ezekiel Godfreyandhisson,Esq.Josephwasthebestoneintheneighborhood.Esq.Josephdidthemosttownbusinessandwastherichestmanintown.The Eanesandthe Godfreyslivedonadjoiningfarms,and Johnand Hannahwereintimatelyassociatedfrom,childhood.Theysettledin Candiain 1775,onafarmaboutonemilefromthevillageonthe North Road.Healsocarriedonthebusinessofacabinetmakerandlandsurveyor,andusedacompassboxandtripodofhisownman-ufacture.Heregularlymaintainedfamilydevotions,andwasa"
+      ],
+      "locations": [
+        "Pop-lin",
+        "Josephand Susanna Morrill Godfrey.Thefarmof Hon.Eze"
+      ]
+    },
+    {
+      "key": "william lane|1789",
+      "name": "William Lane",
+      "birthYear": 1789,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 250,
+          "lineNumber": 1,
+          "rawText": "2 l 8 WILLIAMLANEANDFAMILY.eighteen.Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringalltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;cominghomefromcampandpitchinghistentsoearlyinthewildernessof New Hampshire;movingfrom Pittsfieldto Deerfieldwhenhewasthirty-nineandhisbravewifelessthanthirty-six,withnineyoungchildrenfromsixteenyearsdowntothreemonths,withtherapidadditionofthreemoretoberearedinthepathsofvirtue,religionandusefulness;livingtogethertoseeseventy-eightchildrenofthenextgenerationandmanyofthefourth;goingwiththeirhouseholdformilestomeetingevery Sab-bathdayaspunctuallyasthe Sabbathcame,andalwaysingoodseason;becomingateacheroftheoldest Bibleclassinthe Sab-bathschoollongafter'thegrindershadceasedbecausetheywerefew,andtheythatlookoutofthewindows'hadbecomedim.Surelythatnoblepairdidnoteatthebreadofidleness,norsailtotheskies'onflowerybedsofease.'\" Note IXon No.40,H,[d YJAMESP.LANE.]Hon.George W.Crocket(s.of John,gr.s.of Mary Lane),b.in Sanbornton,1789.Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccountofillhealth;commencedmercantilebusinessin Durham,subsequentlyremovedto Portsmouth,andafter 1820 residedin Bostontillhisdeathin 1859.In 1843 hewasacommoncouncilman,in 1847 representativetothe Legislature,in 1849 senatorfrom Suffolk County,Mass.In 1853 hewasamemberoftheconventionforrevisingthe Constitu-tionofthestate.In 1850 hewasthefirstpresidentofthe Bankof North America;wasoneofthefoundersofthe Boston Academyof Music,whichwasorganizedathishouse.Inanoticeofhis",
+          "bio": {
+            "occupation": [
+              "Minister",
+              "Teacher"
+            ],
+            "military": [
+              "Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringal",
+              "ltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;comingh",
+              "Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M"
+            ],
+            "education": [
+              "Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccounto"
+            ],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Sanbornton",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Sanbornton",
+              "John",
+              "Mary Lane"
+            ],
+            "birthDateText": null,
+            "deathYear": null,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "C,preceptor,butleftonaccountofillhealth"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "2 l 8 WILLIAMLANEANDFAMILY.eighteen.Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringalltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;cominghomefromcampandpitchinghistentsoearlyinthewildernessof New Hampshire;movingfrom Pittsfieldto Deerfieldwhenhewasthirty-nineandhisbravewifelessthanthirty-six,withnineyoungchildrenfromsixteenyearsdowntothreemonths,withtherapidadditionofthreemoretoberearedinthepathsofvirtue,religionandusefulness;livingtogethertoseeseventy-eightchildrenofthenextgenerationandmanyofthefourth;goingwiththeirhouseholdformilestomeetingevery Sab-bathdayaspunctuallyasthe Sabbathcame,andalwaysingoodseason;becomingateacheroftheoldest Bibleclassinthe Sab-bathschoollongafter'thegrindershadceasedbecausetheywerefew,andtheythatlookoutofthewindows'hadbecomedim.Surelythatnoblepairdidnoteatthebreadofidleness,norsailtotheskies'onflowerybedsofease.'\" Note IXon No.40,H,[d YJAMESP.LANE.]Hon.George W.Crocket(s.of John,gr.s.of Mary Lane),b.in Sanbornton,1789.Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccountofillhealth;commencedmercantilebusinessin Durham,subsequentlyremovedto Portsmouth,andafter 1820 residedin Bostontillhisdeathin 1859.In 1843 hewasacommoncouncilman,in 1847 representativetothe Legislature,in 1849 senatorfrom Suffolk County,Mass.In 1853 hewasamemberoftheconventionforrevisingthe Constitu-tionofthestate.In 1850 hewasthefirstpresidentofthe Bankof North America;wasoneofthefoundersofthe Boston Academyof Music,whichwasorganizedathishouse.Inanoticeofhis"
+      ],
+      "locations": [
+        "Sanbornton",
+        "John",
+        "Mary Lane"
+      ],
+      "bio": {
+        "occupation": [
+          "Minister",
+          "Teacher"
+        ],
+        "military": [
+          "Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringal",
+          "ltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;comingh",
+          "Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M"
+        ],
+        "education": [
+          "Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccounto"
+        ],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "C,preceptor,butleftonaccountofillhealth"
+        ],
+        "locationsExtra": [
+          "Sanbornton",
+          "John",
+          "Mary Lane"
+        ],
+        "placeHints": [
+          {
+            "text": "Sanbornton",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ]
+      }
+    },
+    {
+      "key": "lessthanthirty-six|unknown",
+      "name": "Lessthanthirty-six",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 250,
+          "lineNumber": 1,
+          "rawText": "2 l 8 WILLIAMLANEANDFAMILY.eighteen.Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringalltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;cominghomefromcampandpitchinghistentsoearlyinthewildernessof New Hampshire;movingfrom Pittsfieldto Deerfieldwhenhewasthirty-nineandhisbravewifelessthanthirty-six,withnineyoungchildrenfromsixteenyearsdowntothreemonths,withtherapidadditionofthreemoretoberearedinthepathsofvirtue,religionandusefulness;livingtogethertoseeseventy-eightchildrenofthenextgenerationandmanyofthefourth;goingwiththeirhouseholdformilestomeetingevery Sab-bathdayaspunctuallyasthe Sabbathcame,andalwaysingoodseason;becomingateacheroftheoldest Bibleclassinthe Sab-bathschoollongafter'thegrindershadceasedbecausetheywerefew,andtheythatlookoutofthewindows'hadbecomedim.Surelythatnoblepairdidnoteatthebreadofidleness,norsailtotheskies'onflowerybedsofease.'\" Note IXon No.40,H,[d YJAMESP.LANE.]Hon.George W.Crocket(s.of John,gr.s.of Mary Lane),b.in Sanbornton,1789.Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccountofillhealth;commencedmercantilebusinessin Durham,subsequentlyremovedto Portsmouth,andafter 1820 residedin Bostontillhisdeathin 1859.In 1843 hewasacommoncouncilman,in 1847 representativetothe Legislature,in 1849 senatorfrom Suffolk County,Mass.In 1853 hewasamemberoftheconventionforrevisingthe Constitu-tionofthestate.In 1850 hewasthefirstpresidentofthe Bankof North America;wasoneofthefoundersofthe Boston Academyof Music,whichwasorganizedathishouse.Inanoticeofhis",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "2 l 8 WILLIAMLANEANDFAMILY.eighteen.Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringalltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;cominghomefromcampandpitchinghistentsoearlyinthewildernessof New Hampshire;movingfrom Pittsfieldto Deerfieldwhenhewasthirty-nineandhisbravewifelessthanthirty-six,withnineyoungchildrenfromsixteenyearsdowntothreemonths,withtherapidadditionofthreemoretoberearedinthepathsofvirtue,religionandusefulness;livingtogethertoseeseventy-eightchildrenofthenextgenerationandmanyofthefourth;goingwiththeirhouseholdformilestomeetingevery Sab-bathdayaspunctuallyasthe Sabbathcame,andalwaysingoodseason;becomingateacheroftheoldest Bibleclassinthe Sab-bathschoollongafter'thegrindershadceasedbecausetheywerefew,andtheythatlookoutofthewindows'hadbecomedim.Surelythatnoblepairdidnoteatthebreadofidleness,norsailtotheskies'onflowerybedsofease.'\" Note IXon No.40,H,[d YJAMESP.LANE.]Hon.George W.Crocket(s.of John,gr.s.of Mary Lane),b.in Sanbornton,1789.Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccountofillhealth;commencedmercantilebusinessin Durham,subsequentlyremovedto Portsmouth,andafter 1820 residedin Bostontillhisdeathin 1859.In 1843 hewasacommoncouncilman,in 1847 representativetothe Legislature,in 1849 senatorfrom Suffolk County,Mass.In 1853 hewasamemberoftheconventionforrevisingthe Constitu-tionofthestate.In 1850 hewasthefirstpresidentofthe Bankof North America;wasoneofthefoundersofthe Boston Academyof Music,whichwasorganizedathishouse.Inanoticeofhis"
+      ],
+      "locations": [
+        "Sanbornton",
+        "John",
+        "Mary Lane"
+      ]
+    },
+    {
+      "key": "preceptor|unknown",
+      "name": "Preceptor",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 250,
+          "lineNumber": 1,
+          "rawText": "2 l 8 WILLIAMLANEANDFAMILY.eighteen.Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringalltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;cominghomefromcampandpitchinghistentsoearlyinthewildernessof New Hampshire;movingfrom Pittsfieldto Deerfieldwhenhewasthirty-nineandhisbravewifelessthanthirty-six,withnineyoungchildrenfromsixteenyearsdowntothreemonths,withtherapidadditionofthreemoretoberearedinthepathsofvirtue,religionandusefulness;livingtogethertoseeseventy-eightchildrenofthenextgenerationandmanyofthefourth;goingwiththeirhouseholdformilestomeetingevery Sab-bathdayaspunctuallyasthe Sabbathcame,andalwaysingoodseason;becomingateacheroftheoldest Bibleclassinthe Sab-bathschoollongafter'thegrindershadceasedbecausetheywerefew,andtheythatlookoutofthewindows'hadbecomedim.Surelythatnoblepairdidnoteatthebreadofidleness,norsailtotheskies'onflowerybedsofease.'\" Note IXon No.40,H,[d YJAMESP.LANE.]Hon.George W.Crocket(s.of John,gr.s.of Mary Lane),b.in Sanbornton,1789.Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccountofillhealth;commencedmercantilebusinessin Durham,subsequentlyremovedto Portsmouth,andafter 1820 residedin Bostontillhisdeathin 1859.In 1843 hewasacommoncouncilman,in 1847 representativetothe Legislature,in 1849 senatorfrom Suffolk County,Mass.In 1853 hewasamemberoftheconventionforrevisingthe Constitu-tionofthestate.In 1850 hewasthefirstpresidentofthe Bankof North America;wasoneofthefoundersofthe Boston Academyof Music,whichwasorganizedathishouse.Inanoticeofhis",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "2 l 8 WILLIAMLANEANDFAMILY.eighteen.Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringalltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;cominghomefromcampandpitchinghistentsoearlyinthewildernessof New Hampshire;movingfrom Pittsfieldto Deerfieldwhenhewasthirty-nineandhisbravewifelessthanthirty-six,withnineyoungchildrenfromsixteenyearsdowntothreemonths,withtherapidadditionofthreemoretoberearedinthepathsofvirtue,religionandusefulness;livingtogethertoseeseventy-eightchildrenofthenextgenerationandmanyofthefourth;goingwiththeirhouseholdformilestomeetingevery Sab-bathdayaspunctuallyasthe Sabbathcame,andalwaysingoodseason;becomingateacheroftheoldest Bibleclassinthe Sab-bathschoollongafter'thegrindershadceasedbecausetheywerefew,andtheythatlookoutofthewindows'hadbecomedim.Surelythatnoblepairdidnoteatthebreadofidleness,norsailtotheskies'onflowerybedsofease.'\" Note IXon No.40,H,[d YJAMESP.LANE.]Hon.George W.Crocket(s.of John,gr.s.of Mary Lane),b.in Sanbornton,1789.Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccountofillhealth;commencedmercantilebusinessin Durham,subsequentlyremovedto Portsmouth,andafter 1820 residedin Bostontillhisdeathin 1859.In 1843 hewasacommoncouncilman,in 1847 representativetothe Legislature,in 1849 senatorfrom Suffolk County,Mass.In 1853 hewasamemberoftheconventionforrevisingthe Constitu-tionofthestate.In 1850 hewasthefirstpresidentofthe Bankof North America;wasoneofthefoundersofthe Boston Academyof Music,whichwasorganizedathishouse.Inanoticeofhis"
+      ],
+      "locations": []
+    },
+    {
+      "key": "william lane|1802",
+      "name": "William Lane",
+      "birthYear": 1802,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 254,
+          "lineNumber": 1,
+          "rawText": "220 WILLIAMLANEANDFAMILY.waschosen.Beingfirmanddecidedinhisconvictionsofduty,andfaithfulinitsperformance,hehadtherespectandesteemoftheentirecommunity.Hewas,beforeheunitedwithitin 1849,oneofthechiefsup-portersofthe Congregationalchurch,andhislifewasconsistentwithhisprofession.Hischaritybeganathome,butwentoutinaidofmissionsbothhomeandforeign.Whenhisyoungestson,whohaddevotedhimselftotheworkoftheministry,diedjustashehadcompletedhiscourseofstudyat Andover Theological Semi-nary,Mr.Lanegavetothatinstitutionfivehundreddollarstofoundamemorialscholarship.In November,1867,whenpastseventyyearsofage,heclosedhisbusinessat South Newmarketandreturnedtotheancestralhomein Stratham,wherehepassedthelastyearsofhislifeinquietretirement,butalwaysactiveandusefulinsomeoccupationtillhishealthandstrengthfailed,andhewascompelledtorelinquishthecaresofthislifeandpatientlywaitforthesummonstoentertheworldbeyondthegrave.Hisdeathwason 27 Oct.,1884,ae.87 yrs.,IImos.Note XIon No.47,VIII.[byrev.J.PLANE.]Deacon Edmund J.Lane,b.in Stratham,1802,wasfrom 1825.to 1831 ateacherin Durham,andunitedwiththe Congregationalchurchtherein 1827.Hethentookchargeofaschoolin Dover,buton IFeb.,1832,heboughtthebookstoreof Eli French,in Dover,andformanyyearscontinuedthebookbindingbusinesswiththebooktrade.In July,1832,heunitedwiththe Firstchurch,andin December,1838,waschosendeacon,whichofficeheheld 46 years,tillhisdeathin 1884.From Mar.,1853,hewas 14 yearsclerkoftheparish,andfrom Mar.,1840,hewasfor 16 yearsoneofthewar-densoftheparish.Theyraisedbysubscriptionandpaid,quar-terly,theministerandparishexpenses.Hewasconnectedwiththe Sabbathschool,andfor 14 yearssuperintendentortreasurer.In 1854,withhisassociateddeacon,hevisitedandheldreligious",
+          "bio": {
+            "occupation": [
+              "Minister",
+              "Deacon",
+              "Clerk",
+              "Teacher"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Stratham",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Stratham",
+              "November",
+              "Dover",
+              "July"
+            ],
+            "birthDateText": null,
+            "deathYear": 1867,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": []
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "220 WILLIAMLANEANDFAMILY.waschosen.Beingfirmanddecidedinhisconvictionsofduty,andfaithfulinitsperformance,hehadtherespectandesteemoftheentirecommunity.Hewas,beforeheunitedwithitin 1849,oneofthechiefsup-portersofthe Congregationalchurch,andhislifewasconsistentwithhisprofession.Hischaritybeganathome,butwentoutinaidofmissionsbothhomeandforeign.Whenhisyoungestson,whohaddevotedhimselftotheworkoftheministry,diedjustashehadcompletedhiscourseofstudyat Andover Theological Semi-nary,Mr.Lanegavetothatinstitutionfivehundreddollarstofoundamemorialscholarship.In November,1867,whenpastseventyyearsofage,heclosedhisbusinessat South Newmarketandreturnedtotheancestralhomein Stratham,wherehepassedthelastyearsofhislifeinquietretirement,butalwaysactiveandusefulinsomeoccupationtillhishealthandstrengthfailed,andhewascompelledtorelinquishthecaresofthislifeandpatientlywaitforthesummonstoentertheworldbeyondthegrave.Hisdeathwason 27 Oct.,1884,ae.87 yrs.,IImos.Note XIon No.47,VIII.[byrev.J.PLANE.]Deacon Edmund J.Lane,b.in Stratham,1802,wasfrom 1825.to 1831 ateacherin Durham,andunitedwiththe Congregationalchurchtherein 1827.Hethentookchargeofaschoolin Dover,buton IFeb.,1832,heboughtthebookstoreof Eli French,in Dover,andformanyyearscontinuedthebookbindingbusinesswiththebooktrade.In July,1832,heunitedwiththe Firstchurch,andin December,1838,waschosendeacon,whichofficeheheld 46 years,tillhisdeathin 1884.From Mar.,1853,hewas 14 yearsclerkoftheparish,andfrom Mar.,1840,hewasfor 16 yearsoneofthewar-densoftheparish.Theyraisedbysubscriptionandpaid,quar-terly,theministerandparishexpenses.Hewasconnectedwiththe Sabbathschool,andfor 14 yearssuperintendentortreasurer.In 1854,withhisassociateddeacon,hevisitedandheldreligious"
+      ],
+      "locations": [
+        "Stratham",
+        "November",
+        "Dover",
+        "July"
+      ],
+      "bio": {
+        "occupation": [
+          "Minister",
+          "Deacon",
+          "Clerk",
+          "Teacher"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+        "locationsExtra": [
+          "Stratham",
+          "November",
+          "Dover",
+          "July"
+        ],
+        "placeHints": [
+          {
+            "text": "Stratham",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1867
+      }
+    }
+  ],
+  "acceptedRelationships": [
+    {
+      "relation": "spouse",
+      "sourceKey": "samuelgardner lane|1877",
+      "targetKey": "marys|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 239,
+      "lineNumber": 2,
+      "rawText": "No.146.SAMUELGARDNERLANE^(Jn.6,Josh.^,Josh.^,Josh.3,Wm.2),1831,andhisw.MARYS.(BINNEY),hadb.in Melrose,Mass. : I.Dr.Edward Binney*^,b.13 July,i 860,studiedat Boston University,1877;graduatedat Harvard College,1881;Harvard Medical School,1884;physicianinlunaticasylumsat Somerville,Boston,Northamptonand Dorchester,Mass.Hem.28 May,1888,Esther(dau.of Wm.and Martha)Bridgman,b.in Law-rence,Mass.,18 Oct.,1859.Ch. : I.Spencer Bridgman^,b.in Boston,28 Sept.,1889.II.Harriet Steele^,b.in Charlestown,Mass.,22 Jan.,1864.III.A.Lincoln^,b.in Wakefield,Mass.,17 Feb.,1867.Heisasalesmanin New York City."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "edwins lane|1869",
+      "targetKey": "annag|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 240,
+      "lineNumber": 2,
+      "rawText": "No.148.EDWINS.LANE 8(Thos.^,Dan'ie,Ward^Wm.4,Josh.^),1845,andhisw.ANNAG.(TUCKER),hadb.in Ames-bury,Mass. : I.Cora Bell^,b.9 Aug.,1869,d.20 Mar.,1875.II.George Oscar^,b.12 Sept.,1872.III.Harvey Scott^,b.ii Sept.,1877,d.9 Aug.,1878.IV.Harlan Stacy^,b.13 Sept.,1879,d.12 Oct.,1882.V.Gertie May 9,b.13 Oct.,1882."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "johna lane|1872",
+      "targetKey": "isettea|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 240,
+      "lineNumber": 3,
+      "rawText": "No.149.JOHNA.LANE 8,(Thos.^,Dan'l W.e,Ward^,Wm.^,Josh.3),1848,of Amesbury,Mass.,carriagemakerandhisw.ISETTEA.(TRUE),hadb.in Amesbury : I.Ella B.^,b.26 Sept.,1872.II.Clarence E.^,b.25 May,1874,d.15 July,1877.III.John Raymond^,b.12 June.,1878.IV.Blanche E.^,b.30 Nov.,1883.V.Ralph H.9,b.25 Aug.,1888."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1750",
+      "targetKey": "orkswillfollowhim ifweconsiderthecharacterofthedeceased|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 248,
+      "lineNumber": 1,
+      "rawText": "2 l 6 WILLIAMLANEANDFAMILY.haveexperiencedhisseasonableandbountifulrelief.Hewastoohonestandtoowisetocourtpopularitybyflatteringthevicesofmen,anddidnotthroughambitionaspiretoofficesofdistinction,butwhencalledupontoperformanyofficialduty,hefailednottodischargeitwithabilityandfidelity.\"Ashehadlivedinthehabitualexerciseof Christiangraces,andinthediligentcultivationofthe Christiantemper,andhavingwhileinhealth,sethishouseinorder,whenhewasvisitedwithhislastsickness,hehadlittlemoretodothantotrimhislampandpatientlywaitforthemomentofhisdeparture.***Fromthefirstapproachofhisillnessheexpressedanentireresignationtothedivinewill.Heborehismaladies,whichweresometimesdis-tressing,withpatience.Ashisbodilyweaknessincreasedandhevieweddeathapproaching,hisfaithandhopewereinlivelyexer-ciseandaffordedhimconsolationandsupportinthemomentofdissolution.Inthemostpeacefulmanner,intheenjoymentofhisreasontothelast,hefellasleep,andwehaveabundantreasontobelievethatherestsfromhislaborsandhisworkswillfollowhim.Ifweconsiderthecharacterofthedeceased,initsvariousrelations,fromhisyouthtohisgrave,weshallseldomfindoneintheprivatewalksoflifemoredeservingofouresteemandimitation.\" Note VIIon No.21,II.[By J.H.Fi TTS.]John Lane^(Josh.'^,Josh.^,Wm.~),1750-1823,b.at Poplin,24 Oct.,1750,[O.S.]m.30 Nov.,1775,Hannah Godfrey,b.in Pop-lin,19 Nov.,1755,dau.of Josephand Susanna Morrill Godfrey.Thefarmof Hon.Ezekiel Godfreyandhisson,Esq.Josephwasthebestoneintheneighborhood.Esq.Josephdidthemosttownbusinessandwastherichestmanintown.The Eanesandthe Godfreyslivedonadjoiningfarms,and Johnand Hannahwereintimatelyassociatedfrom,childhood.Theysettledin Candiain 1775,onafarmaboutonemilefromthevillageonthe North Road.Healsocarriedonthebusinessofacabinetmakerandlandsurveyor,andusedacompassboxandtripodofhisownman-ufacture.Heregularlymaintainedfamilydevotions,andwasa"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1789",
+      "targetKey": "lessthanthirty-six|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 250,
+      "lineNumber": 1,
+      "rawText": "2 l 8 WILLIAMLANEANDFAMILY.eighteen.Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringalltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;cominghomefromcampandpitchinghistentsoearlyinthewildernessof New Hampshire;movingfrom Pittsfieldto Deerfieldwhenhewasthirty-nineandhisbravewifelessthanthirty-six,withnineyoungchildrenfromsixteenyearsdowntothreemonths,withtherapidadditionofthreemoretoberearedinthepathsofvirtue,religionandusefulness;livingtogethertoseeseventy-eightchildrenofthenextgenerationandmanyofthefourth;goingwiththeirhouseholdformilestomeetingevery Sab-bathdayaspunctuallyasthe Sabbathcame,andalwaysingoodseason;becomingateacheroftheoldest Bibleclassinthe Sab-bathschoollongafter'thegrindershadceasedbecausetheywerefew,andtheythatlookoutofthewindows'hadbecomedim.Surelythatnoblepairdidnoteatthebreadofidleness,norsailtotheskies'onflowerybedsofease.'\" Note IXon No.40,H,[d YJAMESP.LANE.]Hon.George W.Crocket(s.of John,gr.s.of Mary Lane),b.in Sanbornton,1789.Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccountofillhealth;commencedmercantilebusinessin Durham,subsequentlyremovedto Portsmouth,andafter 1820 residedin Bostontillhisdeathin 1859.In 1843 hewasacommoncouncilman,in 1847 representativetothe Legislature,in 1849 senatorfrom Suffolk County,Mass.In 1853 hewasamemberoftheconventionforrevisingthe Constitu-tionofthestate.In 1850 hewasthefirstpresidentofthe Bankof North America;wasoneofthefoundersofthe Boston Academyof Music,whichwasorganizedathishouse.Inanoticeofhis"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1789",
+      "targetKey": "preceptor|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 250,
+      "lineNumber": 1,
+      "rawText": "2 l 8 WILLIAMLANEANDFAMILY.eighteen.Losinghisownmotherwhenhewasfourandahalfyearsold;enteringthe Revolutionaryarmywhenhewassixteen,aboyofmoderatesize,marchingwith New Hampshireveterans,fromnearthe Piscataquatothe Hudson,enduringalltheperilsandhardshipsofafrontiercampaigninthedarkestperiodofthewar;aminister'stendersonevincingthepatriotismthatburnedinthebosomofaministerandchild,inthosedaysthattriedmen'ssouls;cominghomefromcampandpitchinghistentsoearlyinthewildernessof New Hampshire;movingfrom Pittsfieldto Deerfieldwhenhewasthirty-nineandhisbravewifelessthanthirty-six,withnineyoungchildrenfromsixteenyearsdowntothreemonths,withtherapidadditionofthreemoretoberearedinthepathsofvirtue,religionandusefulness;livingtogethertoseeseventy-eightchildrenofthenextgenerationandmanyofthefourth;goingwiththeirhouseholdformilestomeetingevery Sab-bathdayaspunctuallyasthe Sabbathcame,andalwaysingoodseason;becomingateacheroftheoldest Bibleclassinthe Sab-bathschoollongafter'thegrindershadceasedbecausetheywerefew,andtheythatlookoutofthewindows'hadbecomedim.Surelythatnoblepairdidnoteatthebreadofidleness,norsailtotheskies'onflowerybedsofease.'\" Note IXon No.40,H,[d YJAMESP.LANE.]Hon.George W.Crocket(s.of John,gr.s.of Mary Lane),b.in Sanbornton,1789.Whenfifteenyearsoldheentered Salis-bury Academy,Ichabod Bartlett,afterwards M.C,preceptor,butleftonaccountofillhealth;commencedmercantilebusinessin Durham,subsequentlyremovedto Portsmouth,andafter 1820 residedin Bostontillhisdeathin 1859.In 1843 hewasacommoncouncilman,in 1847 representativetothe Legislature,in 1849 senatorfrom Suffolk County,Mass.In 1853 hewasamemberoftheconventionforrevisingthe Constitu-tionofthestate.In 1850 hewasthefirstpresidentofthe Bankof North America;wasoneofthefoundersofthe Boston Academyof Music,whichwasorganizedathishouse.Inanoticeofhis"
+    }
+  ]
+}

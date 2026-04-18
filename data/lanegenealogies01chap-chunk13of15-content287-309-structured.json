@@ -1,0 +1,260 @@
+{
+  "generatedAt": "2026-04-18T22:45:44.491006+00:00",
+  "sourcePdf": "C:\\projects\\piBoom\\data\\lanegenealogies01chap.pdf",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 308,
+  "parsedPageCount": 23,
+  "people": [
+    {
+      "key": "edwin lane|1863",
+      "name": "Edwin Lane",
+      "birthYear": 1863,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 308,
+          "lineNumber": 2,
+          "rawText": "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Saginaw",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Barre,Vt",
+                "role": "other",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Saginaw",
+              "Barre,Vt",
+              "Barre",
+              "West Danville"
+            ],
+            "birthDateText": "18 Dec,1863",
+            "deathYear": null,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "(2)andhad:II",
+              "(3)EFFIEP"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888."
+      ],
+      "locations": [
+        "Saginaw",
+        "Barre,Vt",
+        "Barre",
+        "West Danville"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "(2)andhad:II",
+          "(3)EFFIEP"
+        ],
+        "locationsExtra": [
+          "Saginaw",
+          "Barre,Vt",
+          "Barre",
+          "West Danville"
+        ],
+        "placeHints": [
+          {
+            "text": "Saginaw",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Barre,Vt",
+            "role": "other",
+            "scope": "primary"
+          }
+        ],
+        "birthDateText": "18 Dec,1863"
+      }
+    },
+    {
+      "key": "ann|unknown",
+      "name": "Ann",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 308,
+          "lineNumber": 2,
+          "rawText": "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888."
+      ],
+      "locations": [
+        "Saginaw",
+        "Barre,Vt",
+        "Barre",
+        "West Danville"
+      ]
+    },
+    {
+      "key": "b in saginaw|unknown",
+      "name": "B.in Saginaw",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 308,
+          "lineNumber": 2,
+          "rawText": "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888."
+      ],
+      "locations": []
+    },
+    {
+      "key": "montpelierandm|unknown",
+      "name": "Montpelierandm",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 308,
+          "lineNumber": 2,
+          "rawText": "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888."
+      ],
+      "locations": []
+    },
+    {
+      "key": "arthurn lane|1871",
+      "name": "Arthurn. Lane",
+      "birthYear": 1871,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 312,
+          "lineNumber": 2,
+          "rawText": "No.10.ARTHURN.LANE-i(Willis^,Joseph^,Jn.'),1849,lum-berman,andhisw.ROSA(BATCHELDER),hadb.in Plainfield,Vt.: I.Bertha Rosette^,b.12 Jan.,1871.II.Blanche Linwood^,b.30 July,1875.III.Bernice Laura^b.20 Nov.,1879.IV.Bertille Loris-^b.16 Nov.,1888.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [
+              "Plainfield"
+            ],
+            "birthDateText": "12 Jan.,1871",
+            "deathYear": null,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": []
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.10.ARTHURN.LANE-i(Willis^,Joseph^,Jn.'),1849,lum-berman,andhisw.ROSA(BATCHELDER),hadb.in Plainfield,Vt.: I.Bertha Rosette^,b.12 Jan.,1871.II.Blanche Linwood^,b.30 July,1875.III.Bernice Laura^b.20 Nov.,1879.IV.Bertille Loris-^b.16 Nov.,1888."
+      ],
+      "locations": [
+        "Plainfield"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+        "locationsExtra": [
+          "Plainfield"
+        ],
+        "birthDateText": "12 Jan.,1871"
+      }
+    },
+    {
+      "key": "rosa|unknown",
+      "name": "Rosa",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 312,
+          "lineNumber": 2,
+          "rawText": "No.10.ARTHURN.LANE-i(Willis^,Joseph^,Jn.'),1849,lum-berman,andhisw.ROSA(BATCHELDER),hadb.in Plainfield,Vt.: I.Bertha Rosette^,b.12 Jan.,1871.II.Blanche Linwood^,b.30 July,1875.III.Bernice Laura^b.20 Nov.,1879.IV.Bertille Loris-^b.16 Nov.,1888.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.10.ARTHURN.LANE-i(Willis^,Joseph^,Jn.'),1849,lum-berman,andhisw.ROSA(BATCHELDER),hadb.in Plainfield,Vt.: I.Bertha Rosette^,b.12 Jan.,1871.II.Blanche Linwood^,b.30 July,1875.III.Bernice Laura^b.20 Nov.,1879.IV.Bertille Loris-^b.16 Nov.,1888."
+      ],
+      "locations": [
+        "Plainfield"
+      ]
+    }
+  ],
+  "acceptedRelationships": [
+    {
+      "relation": "spouse",
+      "sourceKey": "edwin lane|1863",
+      "targetKey": "ann|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 308,
+      "lineNumber": 2,
+      "rawText": "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "edwin lane|1863",
+      "targetKey": "b in saginaw|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 308,
+      "lineNumber": 2,
+      "rawText": "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "edwin lane|1863",
+      "targetKey": "montpelierandm|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 308,
+      "lineNumber": 2,
+      "rawText": "No.7.EDWINLANE 4(Wi Uis S.Jo.^,Jn.i),1835;of Barre,Vt.,andhisw.ANN(PERRIN)had: I.Lillian A.^,b.18 Dec,1863,res.withhergrandfather,Wil-lis^(Lane)tillshem.,22 July,1884,Herbert Slaytonof Plain-field.Shehasadau.b.8 Mar.1891.EDWINLANE 4 m.(2)andhad:II.Arthur E.^,b.in Saginaw,Mich.,24 June,1868.Hegrad.at Vt.M.E.C.Sem.,Montpelierandm.16 Sept.,1890,Lucy Moulton,of West Danville,andres.at Peacham,Vt.,mana-gerofhisfather'slumberbusiness.III.Glen-'',adau.b.at Marshfield,Vt.,7 May,1870.IV.Fred^,b.9 May,1872.EDWINLANE 4 m.(3)EFFIEP.(SKINNER)andhad : V.Edwina Hallie S,b,at Berlin,Vt.,5 May,1888."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "arthurn lane|1871",
+      "targetKey": "rosa|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 312,
+      "lineNumber": 2,
+      "rawText": "No.10.ARTHURN.LANE-i(Willis^,Joseph^,Jn.'),1849,lum-berman,andhisw.ROSA(BATCHELDER),hadb.in Plainfield,Vt.: I.Bertha Rosette^,b.12 Jan.,1871.II.Blanche Linwood^,b.30 July,1875.III.Bernice Laura^b.20 Nov.,1879.IV.Bertille Loris-^b.16 Nov.,1888."
+    }
+  ]
+}

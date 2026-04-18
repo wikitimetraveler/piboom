@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-04-18T22:45:42.683160+00:00",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 46,
+  "rejectedRelationships": [
+    {
+      "relation": "father",
+      "sourceKey": "i-hoii james|1782",
+      "targetKey": "william lane|1655",
+      "confidence": 0.85,
+      "pdfPageNumber": 46,
+      "lineNumber": 2,
+      "rawText": "(46)I-Hoii.James{Clarke'),b.IFeb.,17 S 4,d.15 June,1 S 61,ae.77.Hem.2 Oct.,i So S,Polly{Jillonof Aiidover,b.5 Apr.,1782,wliod.8 Nov.,1857,ae.75.[See Note V,Appendix.](4*7)VIII.Jabez^,b.16 May,1760,d.3 April,1810,res.onthehomesteadandcontinuedthebusinessofhisfather.Beingofaweaklyconstitution,andfromchildhoodlame,hecommencedpre-paringforcollege,butthe Revolutionarywarledhimtogiveuphisstudiesandlearnthetradeofhisfather.On 2 Oct.,1783,hem.hisstep-sister,Eunice(dau.of Gideonand Rachel Parsons)Colcord,b.25 Mar.,1763,d.6 Apr.,1836,ae.73.In Aug.,1801,heunitedwiththe Congregational Churchin Stratham,andwashighlyesteemedasausefulmember.Afewdaysbeforehisdeathhecalledtohisbedsideasoneightyearsoldtoreceivehisdyingcounsel,\"tobekindtohismother,brothersandsisters,tobeagoodchild,toprayto Godandtoteachhisyoungersistertopray.\"\"Thecalmnessandcomposurewithwhichhespake,madeadeepandlastingimpressionuponthechild.\"Evenatthatearlyage,hefeltthattodieashisfatherdiedwasverydifferentfromwhatitwastodiewithouthope;andhefelteventhenthathewasnotpreparedtodie.Hiswidow,whohadlivedwithhim 27 years,survivedhim 26 years,faithfullycaringforthelargefamily,theyoungestonly 5 yrs.old.[See Note VI,Appendix.]*Joseph Clark-(John').John Clark'camefrom Haverhill,Mass.andset-tledin Stratham,onthefarmoccupiedin 1826 byhisgrandson,Benjamin Clarke,whohadtwosons,Danieland David J.,graduatesof Dartmouthcollegeandlawyerswellknownin New Hampshire.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "sarahsb|1762",
+      "targetKey": "william lane|1760",
+      "confidence": 0.85,
+      "pdfPageNumber": 50,
+      "lineNumber": 2,
+      "rawText": "(56)VIII.Sarahsb.in Poplin,16 May,bapt.19 May,1765,d.25 Apr.,1845,ae.80;m.John(s.of Rev.Josiah)Stearns,b.in Epping,16 Jan.,1762,d.at Deerfield,23 Jan.,1843,ae.81.Hesettledin Pittsfield,butrem.in March,1801,to Deerfield.Esq.Stearnsandwifeunitedwiththe Congregational Churchin Deerfield,2 Nov.,1834.Theyhad 13 ch.,ofwhomallthatgrewupweremembersofchurches.[See Note VIII,Appendix.]IX.Elizabeth^b.25,bapt.26 Nov.,1769,d.26 Oct.,1770.(57)^-Isaiah Lane^,*b.in Poplin,11 Dec,1770,m.(1)27 Nov.,1792,Elizabeth Wheelerof Epping,whod.10 Dec,1807.Hem.(2),Dec,1808,Mrs.Deborah Parsons Doe,b.at Epping,30 June,1775,whom.(i)21 Feb.,1796,Nicholas Doe''(Nich.'*,Nich,^,Sampson^,Nich.i)of Newmarket.Afterthedeathof Mr.Lane,29 May,1827,ae.56 yrs,shereturnedtothe Doehomesteadin Newmarketandd.there,21 Sept.,1865,ae.90 yrs.Hewasanattendantatthe Congregational Churchat Eppingandinterestedinreligiousmattersin Poplin.(58)-^I-Obadiah Lane.Perhapsconnected.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "i-james|1836",
+      "targetKey": "simon lane|1733",
+      "confidence": 0.85,
+      "pdfPageNumber": 63,
+      "lineNumber": 3,
+      "rawText": "(80)I-James^,b.29 Sept.,175 S,m.abt.17 S 0,Sarah Godfreyof Hampton,andd.4 Mar.,1836.Ch. : I.Daniel'^,res.in Hamptonin 1840,had 3 ch.II.Sarah^,b.5 Jan.,1761.HI.Mary-^,b.21 Feb.,1763.(gj_)IV.Si MON^,b.IISept.,1765,m.Meribah Taylorof Hampton,b.Nov.,1769,whod.11 Jan.,1 S 27.Hed.2 Dec,1847,^6-S 2;afarmerin Hampton,had 3 s.andidau.,whod.ininfancy.",
+      "rejectReason": "Temporal sanity failed"
+    }
+  ],
+  "reviewQueue": []
+}

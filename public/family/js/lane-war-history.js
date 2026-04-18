@@ -1,11 +1,12 @@
 let map = null;
-let geocoder = null;
-let infoWindow = null;
+let mapReady = false;
 const markerById = new Map();
 const geocodeCache = new Map();
 let activeWarSlug = 'king-philips-war';
 let allCampaigns = [];
 let activeParticipants = [];
+
+const API_BASE = '/api/genealogy';
 
 const CAMPAIGN_CONTEXT = {
   'king-philips-war': [
@@ -35,6 +36,51 @@ async function getJson(url) {
   return res.json();
 }
 
+function loadMapboxCssOnce() {
+  if (document.getElementById('mapbox-gl-css')) return;
+  const l = document.createElement('link');
+  l.id = 'mapbox-gl-css';
+  l.rel = 'stylesheet';
+  l.href = 'https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css';
+  document.head.appendChild(l);
+}
+
+let mapboxScriptPromise = null;
+
+async function ensureMapboxGl() {
+  if (window.mapboxgl) return;
+  loadMapboxCssOnce();
+  if (!mapboxScriptPromise) {
+    mapboxScriptPromise = fetch(`${API_BASE}/mapbox-access-token`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`Mapbox token (${res.status})`);
+        return res.json();
+      })
+      .then((data) => {
+        if (!data || !data.success || !data.accessToken) throw new Error('Mapbox token unavailable');
+        const token = data.accessToken;
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js';
+          script.async = true;
+          script.onload = () => {
+            window.mapboxgl.accessToken = token;
+            resolve();
+          };
+          script.onerror = () => reject(new Error('Mapbox GL failed to load'));
+          document.head.appendChild(script);
+        });
+      });
+  }
+  await mapboxScriptPromise;
+}
+
+function confidenceColor(conf) {
+  if (conf === 'high') return '#2db56b';
+  if (conf === 'medium') return '#d4a856';
+  return '#9aa6b5';
+}
+
 function confidenceClass(conf) {
   if (conf === 'high') return 'confidence-high';
   if (conf === 'medium') return 'confidence-medium';
@@ -46,7 +92,7 @@ function renderCampaignButtons() {
   host.innerHTML = allCampaigns
     .map(
       (c) =>
-        `<button class="btn btn-outline-light btn-sm campaign-btn ${c.slug === activeWarSlug ? 'active' : ''}" data-war="${esc(c.slug)}">${esc(c.label)} <span class="badge badge-secondary ml-1">${c.participantCount}</span></button>`
+        `<button class="btn btn-outline-light btn-sm campaign-btn ${c.slug === activeWarSlug ? 'active' : ''}" data-war="${esc(c.slug)}">${esc(c.label)} <span class="badge badge-secondary ml-1">${esc(c.participantCount)}</span></button>`
     )
     .join('');
   host.querySelectorAll('.campaign-btn').forEach((btn) => {
@@ -132,30 +178,18 @@ function openSoldierModal(personId) {
 }
 
 function initMap() {
-  map = new google.maps.Map(document.getElementById('warMap'), {
-    center: { lat: 42.4, lng: -71.1 },
-    zoom: 6,
-    mapTypeControl: false,
-    streetViewControl: false
+  map = new mapboxgl.Map({
+    container: 'warMap',
+    style: 'mapbox://styles/mapbox/satellite-streets-v12',
+    center: [-71.1, 42.4],
+    zoom: 7
   });
-  geocoder = new google.maps.Geocoder();
-  infoWindow = new google.maps.InfoWindow();
-}
-
-function markerIcon(confidence) {
-  const color = confidence === 'high' ? '#2db56b' : confidence === 'medium' ? '#d4a856' : '#9aa6b5';
-  return {
-    path: google.maps.SymbolPath.CIRCLE,
-    scale: 7,
-    fillColor: color,
-    fillOpacity: 0.95,
-    strokeColor: '#0d1016',
-    strokeWeight: 1
-  };
+  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
+  mapReady = true;
 }
 
 function clearMarkers() {
-  markerById.forEach((marker) => marker.setMap(null));
+  markerById.forEach((marker) => marker.remove());
   markerById.clear();
 }
 
@@ -163,60 +197,73 @@ async function geocodePlace(place) {
   if (!place) return null;
   const key = place.toLowerCase();
   if (geocodeCache.has(key)) return geocodeCache.get(key);
-  const result = await new Promise((resolve) => {
-    geocoder.geocode({ address: place }, (results, status) => {
-      if (status === 'OK' && results && results.length) {
-        resolve(results[0].geometry.location);
-      } else {
-        resolve(null);
-      }
-    });
-  });
-  geocodeCache.set(key, result);
-  return result;
+  try {
+    const res = await fetch(`${API_BASE}/geocode-address?q=${encodeURIComponent(place)}`);
+    const data = await res.json();
+    if (data.success && data.longitude != null && data.latitude != null) {
+      const lngLat = [data.longitude, data.latitude];
+      geocodeCache.set(key, lngLat);
+      return lngLat;
+    }
+  } catch (e) {
+    /* ignore */
+  }
+  geocodeCache.set(key, null);
+  return null;
 }
 
 async function renderMarkers() {
   clearMarkers();
-  const bounds = new google.maps.LatLngBounds();
-  let placed = 0;
-  for (const entry of activeParticipants.slice(0, 45)) {
+  if (!map || !mapReady) return;
+
+  const coords = [];
+  const slice = activeParticipants.slice(0, 45);
+  for (const entry of slice) {
     const p = entry.person || {};
     const place = (entry.places && entry.places[0]) || p.born || '';
-    const location = await geocodePlace(place);
-    if (!location) continue;
-    const marker = new google.maps.Marker({
-      map,
-      position: location,
-      title: p.name || 'Soldier',
-      icon: markerIcon(entry.confidence)
-    });
-    marker.addListener('click', () => {
-      infoWindow.setContent(`
-        <div style="min-width:220px">
+    const lngLat = await geocodePlace(place);
+    if (!lngLat) continue;
+
+    const el = document.createElement('div');
+    el.style.width = '14px';
+    el.style.height = '14px';
+    el.style.borderRadius = '50%';
+    el.style.background = confidenceColor(entry.confidence);
+    el.style.border = '1px solid #0d1016';
+    el.style.cursor = 'pointer';
+
+    const marker = new mapboxgl.Marker({ element: el })
+      .setLngLat(lngLat)
+      .setPopup(
+        new mapboxgl.Popup({ offset: 12 }).setHTML(`
+        <div style="min-width:220px;color:#111">
           <strong>${esc(p.name || 'Unknown')}</strong><br/>
           <small>${esc(entry.warLabel || '')} • ${esc(entry.confidence)} confidence</small><br/>
           <small>${esc(place)}</small><br/>
-          <button style="margin-top:6px" class="btn btn-sm btn-outline-secondary" onclick="window.__laneWarOpen('${esc(String(p.id))}')">Open profile</button>
-        </div>
-      `);
-      infoWindow.open(map, marker);
-    });
+          <button type="button" style="margin-top:6px" class="btn btn-sm btn-outline-secondary" onclick="window.__laneWarOpen('${String(p.id)}')">Open profile</button>
+        </div>`)
+      )
+      .addTo(map);
+
     markerById.set(String(p.id), marker);
-    bounds.extend(location);
-    placed += 1;
+    coords.push(lngLat);
   }
-  if (placed > 1) {
-    map.fitBounds(bounds);
+
+  if (coords.length > 1) {
+    const bounds = new mapboxgl.LngLatBounds(coords[0], coords[0]);
+    for (let i = 1; i < coords.length; i++) bounds.extend(coords[i]);
+    map.fitBounds(bounds, { padding: 48, maxZoom: 12 });
+  } else if (coords.length === 1) {
+    map.flyTo({ center: coords[0], zoom: 10 });
   }
 }
 
 function focusParticipant(personId) {
   const marker = markerById.get(String(personId));
-  if (!marker) return;
-  map.panTo(marker.getPosition());
-  map.setZoom(Math.max(map.getZoom(), 8));
-  google.maps.event.trigger(marker, 'click');
+  if (!marker || !map) return;
+  const lngLat = marker.getLngLat();
+  map.flyTo({ center: lngLat, zoom: Math.max(map.getZoom(), 10) });
+  marker.togglePopup();
 }
 
 async function loadParticipants() {
@@ -231,7 +278,6 @@ async function loadParticipants() {
 }
 
 async function boot() {
-  const keyRes = await getJson('/api/genealogy/google-api-key');
   const campaignsRes = await getJson('/api/genealogy/wars');
   allCampaigns = campaignsRes.campaigns || [];
   if (!allCampaigns.length) throw new Error('No campaigns available');
@@ -239,15 +285,7 @@ async function boot() {
     activeWarSlug = allCampaigns[0].slug;
   }
 
-  await new Promise((resolve, reject) => {
-    const s = document.createElement('script');
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(keyRes.apiKey)}`;
-    s.async = true;
-    s.onload = resolve;
-    s.onerror = () => reject(new Error('Google Maps failed to load'));
-    document.head.appendChild(s);
-  });
-
+  await ensureMapboxGl();
   initMap();
   renderCampaignButtons();
   await loadParticipants();

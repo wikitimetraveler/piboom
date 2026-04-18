@@ -1,0 +1,151 @@
+{
+  "generatedAt": "2026-04-18T22:45:44.704264+00:00",
+  "sourcePdf": "C:\\projects\\piBoom\\data\\lanegenealogies01chap.pdf",
+  "readmeMergeWorkflow": "Staged merge: inspect this file and sibling batch outputs under data/. Review reviewQueue and rejectedRelationships before relying on new nodes. laneData.json is updated only when append_to_lane_data runs (CLI default). Use --reset-added-from-id to roll back appended high ids if needed.",
+  "batchStartPdfPage": 354,
+  "parsedPageCount": 23,
+  "detectedPeople": 0,
+  "acceptedRelationships": 0,
+  "rejectedRelationships": 0,
+  "reviewQueueItems": 23,
+  "appendedNodes": 0,
+  "appendedLinks": 0,
+  "validation": {
+    "valid": true,
+    "issues": []
+  },
+  "extractionStats": {
+    "peopleWithOccupation": 0,
+    "peopleWithMilitary": 0,
+    "peopleWithEducation": 0,
+    "peopleWithChildrenNote": 0,
+    "peopleWithDeathYear": 0,
+    "peopleWithDeathPlaceHints": 0,
+    "peopleWithBurialHints": 0,
+    "peopleWithMarriageSnippets": 0,
+    "peopleWithPlaceHints": 0,
+    "peopleWithAnyLocation": 0,
+    "peopleWithMultipleLocations": 0
+  },
+  "structuredOut": "C:\\projects\\piBoom\\data\\lanegenealogies01chap-chunk15of15-content333-355-structured.json",
+  "reviewOut": "C:\\projects\\piBoom\\data\\lanegenealogies01chap-chunk15of15-content333-355-review-queue.json",
+  "qualityOut": "C:\\projects\\piBoom\\data\\lanegenealogies01chap-chunk15of15-content333-355-quality-report.json",
+  "reviewQueue": [
+    {
+      "type": "page",
+      "pdfPageNumber": 354,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 355,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 356,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 357,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 358,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 359,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 360,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 361,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 362,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 363,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 364,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 365,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 366,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 367,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 368,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 369,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 370,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 371,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 372,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 373,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 374,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 375,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 376,
+      "reason": "Empty extracted page"
+    }
+  ],
+  "rejectedRelationshipsDetail": []
+}

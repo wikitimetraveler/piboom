@@ -307,6 +307,23 @@
   </div>
 </div>
 
+<!-- Person Details Modal -->
+<div class="modal fade" id="personDetailModal" tabindex="-1" role="dialog" aria-labelledby="personDetailModalTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="personDetailModalTitle">Person Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="personDetailModalBody">
+        <p class="text-muted mb-0">Select a person to view details.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer class="footer">
   <div class="container text-center">
     <div class="footer-content">
@@ -316,6 +333,162 @@
 </footer>
 
 <script>
+function esc(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function formatLifeDate(person, yearKey, dateKey) {
+  const year = person?.[yearKey];
+  const date = person?.[dateKey];
+  const values = [year, date]
+    .filter(v => v !== undefined && v !== null && String(v).trim() !== '')
+    .map(v => String(v).trim());
+  return values.length ? values.join(' · ') : '—';
+}
+
+function formatParentNamesGenealogy(rows) {
+  if (!rows || !rows.length) return '—';
+  const parts = rows
+    .map((row) => {
+      const n = row && row.person && row.person.name;
+      if (!n) return null;
+      const rel = row.relation ? row.relation + ': ' : '';
+      return rel + n;
+    })
+    .filter(Boolean);
+  return parts.length ? parts.join(', ') : '—';
+}
+
+function formatPersonNamesGenealogy(rows) {
+  if (!rows || !rows.length) return '—';
+  const parts = rows.map((row) => (row && row.name ? String(row.name) : null)).filter(Boolean);
+  return parts.length ? parts.join(', ') : '—';
+}
+
+function occupationLabelsGenealogy(person) {
+  const occ = Array.isArray(person.occupation) ? person.occupation : [];
+  const labels = [];
+  for (const o of occ) {
+    if (o && typeof o === 'object' && typeof o.job === 'string' && o.job.trim()) labels.push(o.job.trim());
+  }
+  return [...new Set(labels)];
+}
+
+function militaryBriefGenealogy(person) {
+  const parts = [];
+  const ocr = person.importMeta && person.importMeta.ocrFacts;
+  if (ocr && Array.isArray(ocr.military)) {
+    for (const m of ocr.military) {
+      const s = String(m || '').trim();
+      if (s) parts.push(s);
+    }
+  }
+  const occ = Array.isArray(person.occupation) ? person.occupation : [];
+  for (const o of occ) {
+    if (!o || typeof o !== 'object') continue;
+    const svc = Array.isArray(o.service) ? o.service : [];
+    for (const s of svc) {
+      if (s && typeof s.text === 'string' && s.text.trim()) parts.push(s.text.trim());
+    }
+  }
+  const joined = parts.join(' · ');
+  return joined.length > 450 ? joined.slice(0, 447) + '…' : joined;
+}
+
+function extractLineageHintsFromTextGenealogy(raw) {
+  const t = String(raw || '');
+  const parents = [];
+  const seen = new Set();
+  function add(s) {
+    const v = String(s || '').replace(/\s+/g, ' ').trim();
+    if (v.length < 2) return;
+    const k = v.toLowerCase();
+    if (seen.has(k)) return;
+    seen.add(k);
+    parents.push(v);
+  }
+  let m;
+  const reDau = /\(\s*dau\.?\s+of\s+([^)]+)\)/gi;
+  const reSon = /\(\s*s\.?\s+of\s+([^)]+)\)/gi;
+  while ((m = reDau.exec(t))) add(m[1]);
+  while ((m = reSon.exec(t))) add(m[1]);
+  return { parentHints: parents };
+}
+
+function spouseHintsFromOcrGenealogy(ocrFacts) {
+  if (!ocrFacts || !Array.isArray(ocrFacts.marriageSnippets)) return [];
+  return [...new Set(ocrFacts.marriageSnippets.map((s) => String(s || '').trim()).filter((s) => s.length >= 2))];
+}
+
+function renderPersonDetail(person, family, musicalEra) {
+  const fam = family || {};
+  const ocrFacts = person?.importMeta?.ocrFacts && typeof person.importMeta.ocrFacts === 'object'
+    ? person.importMeta.ocrFacts
+    : null;
+  const marriedList = Array.isArray(ocrFacts?.marriageSnippets)
+    ? [...new Set(ocrFacts.marriageSnippets.map(s => String(s || '').trim()).filter(Boolean))]
+    : [];
+  const childrenNote = ocrFacts?.childrenNote ? String(ocrFacts.childrenNote).trim() : '';
+  const places = [person.birthPlace, person.deathPlace, person.born, person.died]
+    .filter(Boolean)
+    .map(p => String(p).trim())
+    .filter(Boolean);
+  const placeLine = places.length
+    ? `<p><strong>Places:</strong> ${esc(places.join(' · '))}</p>`
+    : '';
+  const occList = occupationLabelsGenealogy(person);
+  const occRow = occList.length
+    ? `<dt class="col-sm-3">Occupation</dt><dd class="col-sm-9">${esc(occList.join(' · '))}</dd>`
+    : '';
+  const milText = militaryBriefGenealogy(person);
+  const milRow = milText
+    ? `<dt class="col-sm-3">Military</dt><dd class="col-sm-9">${esc(milText)}</dd>`
+    : '';
+  const lineageG = extractLineageHintsFromTextGenealogy(person.text || '');
+  const parentHintsG = lineageG.parentHints || [];
+  const spouseTextHintsG = spouseHintsFromOcrGenealogy(ocrFacts);
+  const hasNarrativeG =
+    (parentHintsG && parentHintsG.length > 0) || (spouseTextHintsG && spouseTextHintsG.length > 0);
+  const narrativeFamilyBlockG = hasNarrativeG
+    ? `
+    <div class="border-top pt-2 mt-2">
+      <div class="small text-muted text-uppercase mb-2">From book text (not linked in tree)</div>
+      <p class="mb-1 small"><strong>Parents (text):</strong> ${esc(parentHintsG.length ? parentHintsG.join(', ') : '—')}</p>
+      <p class="mb-0 small"><strong>Partners / spouse (text):</strong> ${esc(spouseTextHintsG.length ? spouseTextHintsG.join(' · ') : '—')}</p>
+    </div>
+  `
+    : '';
+  const familyBlock = `
+    <p class="mb-2"><strong>Family</strong></p>
+    <p class="mb-1 small text-muted">Linked in family tree</p>
+    <p class="mb-1 small"><strong>Parents:</strong> ${esc(formatParentNamesGenealogy(fam.parents))}</p>
+    <p class="mb-1 small"><strong>Spouses:</strong> ${esc(formatPersonNamesGenealogy(fam.spouses))}</p>
+    <p class="mb-1 small"><strong>Children:</strong> ${esc(formatPersonNamesGenealogy(fam.children))}</p>
+    <p class="mb-2 small"><strong>Siblings:</strong> ${esc(formatPersonNamesGenealogy(fam.siblings))}</p>
+    ${narrativeFamilyBlockG}
+  `;
+
+  return `
+    <dl class="row mb-2">
+      <dt class="col-sm-3">Birth</dt><dd class="col-sm-9">${esc(formatLifeDate(person, 'birthYear', 'birthDate'))}</dd>
+      <dt class="col-sm-3">Death</dt><dd class="col-sm-9">${esc(formatLifeDate(person, 'deathYear', 'deathDate'))}</dd>
+      ${marriedList.length ? `<dt class="col-sm-3">Married</dt><dd class="col-sm-9">${esc(marriedList.join(' · '))}</dd>` : ''}
+      ${childrenNote ? `<dt class="col-sm-3">Children (text)</dt><dd class="col-sm-9">${esc(childrenNote)}</dd>` : ''}
+      ${occRow}
+      ${milRow}
+    </dl>
+    ${placeLine}
+    <p class="mb-1"><strong>Musical Era:</strong> ${esc(musicalEra?.period || 'Unknown')}</p>
+    <p class="mb-2"><strong>Music:</strong> ${esc(musicalEra?.music || 'Unknown')}</p>
+    ${familyBlock}
+  `;
+}
+
 // Load statistics on page load
 document.addEventListener('DOMContentLoaded', function() {
   loadStats();
@@ -455,17 +628,29 @@ async function searchFamily() {
 // View person details
 async function viewPerson(id) {
   try {
+    const titleEl = document.getElementById('personDetailModalTitle');
+    const bodyEl = document.getElementById('personDetailModalBody');
+    titleEl.textContent = 'Loading...';
+    bodyEl.innerHTML = '<p class="text-muted mb-0">Fetching profile...</p>';
+    $('#personDetailModal').modal('show');
+
     const response = await fetch(`/api/genealogy/${id}`);
     const data = await response.json();
     
     if (data.success) {
       const person = data.person;
-      const era = data.musicalEra;
-      
-      alert(`${person.name}\n\nBorn: ${person.birthYear} in ${person.born}\nDied: ${person.deathYear}\n\nMusical Era: ${era.period}\nMusic: ${era.music}\n\nParents: ${data.family.parents.length}\nChildren: ${data.family.children.length}\nSiblings: ${data.family.siblings.length}`);
+      titleEl.textContent = person?.name || 'Profile';
+      bodyEl.innerHTML = renderPersonDetail(person, data.family, data.musicalEra);
+    } else {
+      titleEl.textContent = 'Not found';
+      bodyEl.innerHTML = `<p class="text-warning mb-0">${esc(data.error || 'Person not found.')}</p>`;
     }
   } catch (error) {
     console.error('Error viewing person:', error);
+    const titleEl = document.getElementById('personDetailModalTitle');
+    const bodyEl = document.getElementById('personDetailModalBody');
+    titleEl.textContent = 'Error';
+    bodyEl.innerHTML = `<p class="text-danger mb-0">${esc(error.message || String(error))}</p>`;
   }
 }
 

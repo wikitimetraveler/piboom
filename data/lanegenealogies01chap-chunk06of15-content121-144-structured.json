@@ -1,0 +1,1834 @@
+{
+  "generatedAt": "2026-04-18T22:45:43.414255+00:00",
+  "sourcePdf": "C:\\projects\\piBoom\\data\\lanegenealogies01chap.pdf",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 142,
+  "parsedPageCount": 24,
+  "people": [
+    {
+      "key": "william lane|1797",
+      "name": "William Lane",
+      "birthYear": 1797,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 142,
+          "lineNumber": 1,
+          "rawText": "126 WILLIAMLANEANDFAMILY.I.Amasa K.6(Seavey),b.13 June,1797,m.2 June,1825,Maria Libbey,andhad 2 ch.: Philena'and Ruth L?,d.i July,1829.II.Ruth M.^,b.8 Mar.,1799,m.13 Mar.,1823,J.N.C.Leaviit,of Chichester.Shed.2 Apr.,1872.Ch.: I.George C?{^Leavitt^.2.Augustus'.3.Elvira'.4.Nathanie P . 5.yacintha' . III.Reuben L.\u00ab,b.27 Aug.,1801,d.26 Oct.,1888;m.13 Nov.,1828,Dorothy(dau.of Jamesand Anna)Towle,b.ii Aug.,1803,d.12 June,1867;res.at Hampton.Ch. : 1.Elizabeth P?,b.29 Aug.,1829,m.(i)David M.Dearborn,whod.9 Nov.,1865,muchlamented.Theyres.in Concordandhad; I.)George Merrili P,{Dearbor 7 t),b.17 May,1864.Elizabeth P?,m.(2)Jn.H.Johnson.2.George James'',b.31 Mar.,1832,d.at Dayton O.,18 May,1859.3.Isabella'',b.22 Dec,1835.4.Edward Payson'',b.2 Sept.,1843,d.at Hampton,5 Jan.,1851.5.Henry Lle'wellyn'',b.IIOct.,1847,d.at Hampton,il Jan.,1851.IV.Nathaniel^,b.6 Aug.,1803,ofthe Congregationalchurch;m.13 Aug.,1834,Mary Ann Hinds,ofthe Methodistchurch,res.in Chichester.Ch. : 1.Ann M?,b.2 June,1835.2.Mary Jane'',b.29 Apr.,1837.3.Betsey Drake'',b.23 July,1840.V.Sally L.^,b.16 Jan.,1806,m.16 Nov.,1828,Jn.Eaton,Jr.,res.in Grantham;both Methodists.Ch. : 1.Benjamin F'rank''{Eaton).2.Augusta''.VI.Shadrach*\"',b.23 Feb.,t 8 o 8,m.22 Jan.,1834,Belinda Herbert,bothofthe Congregationalchurch,res.in Concord.Ch. : I.Herberf.2.Ellen Augusta''.VII.Betsey^,b.14 Oct.,1811,ofthe Baptistchurch;m.13 Aug.[Oct.?],1834,James Drake,b.at Pittsfield,29 June,1805,d.7 Apr.,1870;Betseyd.28 Sept.,1865.Res.in Pittsfield.Ch. : 1.Georgiana Butters''{Drake),b.15 Jan.,1836,m.ISept.,l?>$%,Josiah Car-penter,b.31 May,1829,andhad: 1.)Georgia Ella^,b.Oct.,1859,d.Aug.,1889.2.Franklin James'',b.3 Nov.,1842,m.7 June,1869,Harriet C.E,Barkerb.29 Dec,1848.Ch. :",
+          "bio": {
+            "occupation": [],
+            "military": [
+              "126 WILLIAMLANEANDFAMILY.I.Amasa K.6(Seavey),b.13 June,1797,m.2 June,1825,Maria Libbey,andhad 2 ch.: Philena'and Ruth L?,d.i July,1829.II.Ruth M.^,b.8 Mar.,1799,m.13 Mar.,1823,J.N.C.Leaviit,of Chichester.Shed.2 Apr.,1872.Ch.: I.George C?{^L"
+            ],
+            "education": [],
+            "childrenNote": "2 ch. (from text)",
+            "placeHints": [
+              {
+                "text": "Chichester",
+                "role": "residence",
+                "scope": "primary"
+              },
+              {
+                "text": "Grantham",
+                "role": "residence",
+                "scope": "primary"
+              },
+              {
+                "text": "Concor",
+                "role": "residence",
+                "scope": "primary"
+              },
+              {
+                "text": "Pittsfiel",
+                "role": "residence",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Chichester",
+              "Grantham",
+              "Concor",
+              "Pittsfiel",
+              "Chichester.Shed",
+              "Jamesand Anna",
+              "Concordandhad",
+              "Chichester.Ch",
+              "Concord.Ch",
+              "Pittsfield.Ch"
+            ],
+            "birthDateText": "13 June,1797",
+            "deathYear": 1889,
+            "deathDateText": "26 Oct.,1888",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "2 June,1825,Maria Libbey,andhad 2 ch",
+              "13 Mar",
+              "13 Nov",
+              "(i)David M",
+              "(2)Jn",
+              "13 Aug",
+              "16 Nov",
+              "22 Jan",
+              "13 Aug",
+              "ISept",
+              "7 June,1869,Harriet C"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "126 WILLIAMLANEANDFAMILY.I.Amasa K.6(Seavey),b.13 June,1797,m.2 June,1825,Maria Libbey,andhad 2 ch.: Philena'and Ruth L?,d.i July,1829.II.Ruth M.^,b.8 Mar.,1799,m.13 Mar.,1823,J.N.C.Leaviit,of Chichester.Shed.2 Apr.,1872.Ch.: I.George C?{^Leavitt^.2.Augustus'.3.Elvira'.4.Nathanie P . 5.yacintha' . III.Reuben L.\u00ab,b.27 Aug.,1801,d.26 Oct.,1888;m.13 Nov.,1828,Dorothy(dau.of Jamesand Anna)Towle,b.ii Aug.,1803,d.12 June,1867;res.at Hampton.Ch. : 1.Elizabeth P?,b.29 Aug.,1829,m.(i)David M.Dearborn,whod.9 Nov.,1865,muchlamented.Theyres.in Concordandhad; I.)George Merrili P,{Dearbor 7 t),b.17 May,1864.Elizabeth P?,m.(2)Jn.H.Johnson.2.George James'',b.31 Mar.,1832,d.at Dayton O.,18 May,1859.3.Isabella'',b.22 Dec,1835.4.Edward Payson'',b.2 Sept.,1843,d.at Hampton,5 Jan.,1851.5.Henry Lle'wellyn'',b.IIOct.,1847,d.at Hampton,il Jan.,1851.IV.Nathaniel^,b.6 Aug.,1803,ofthe Congregationalchurch;m.13 Aug.,1834,Mary Ann Hinds,ofthe Methodistchurch,res.in Chichester.Ch. : 1.Ann M?,b.2 June,1835.2.Mary Jane'',b.29 Apr.,1837.3.Betsey Drake'',b.23 July,1840.V.Sally L.^,b.16 Jan.,1806,m.16 Nov.,1828,Jn.Eaton,Jr.,res.in Grantham;both Methodists.Ch. : 1.Benjamin F'rank''{Eaton).2.Augusta''.VI.Shadrach*\"',b.23 Feb.,t 8 o 8,m.22 Jan.,1834,Belinda Herbert,bothofthe Congregationalchurch,res.in Concord.Ch. : I.Herberf.2.Ellen Augusta''.VII.Betsey^,b.14 Oct.,1811,ofthe Baptistchurch;m.13 Aug.[Oct.?],1834,James Drake,b.at Pittsfield,29 June,1805,d.7 Apr.,1870;Betseyd.28 Sept.,1865.Res.in Pittsfield.Ch. : 1.Georgiana Butters''{Drake),b.15 Jan.,1836,m.ISept.,l?>$%,Josiah Car-penter,b.31 May,1829,andhad: 1.)Georgia Ella^,b.Oct.,1859,d.Aug.,1889.2.Franklin James'',b.3 Nov.,1842,m.7 June,1869,Harriet C.E,Barkerb.29 Dec,1848.Ch. :"
+      ],
+      "locations": [
+        "Chichester",
+        "Grantham",
+        "Concor",
+        "Pittsfiel",
+        "Chichester.Shed",
+        "Jamesand Anna",
+        "Concordandhad",
+        "Chichester.Ch",
+        "Concord.Ch",
+        "Pittsfield.Ch"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [
+          "126 WILLIAMLANEANDFAMILY.I.Amasa K.6(Seavey),b.13 June,1797,m.2 June,1825,Maria Libbey,andhad 2 ch.: Philena'and Ruth L?,d.i July,1829.II.Ruth M.^,b.8 Mar.,1799,m.13 Mar.,1823,J.N.C.Leaviit,of Chichester.Shed.2 Apr.,1872.Ch.: I.George C?{^L"
+        ],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "2 June,1825,Maria Libbey,andhad 2 ch",
+          "13 Mar",
+          "13 Nov",
+          "(i)David M",
+          "(2)Jn",
+          "13 Aug",
+          "16 Nov",
+          "22 Jan",
+          "ISept",
+          "7 June,1869,Harriet C"
+        ],
+        "locationsExtra": [
+          "Chichester",
+          "Grantham",
+          "Concor",
+          "Pittsfiel",
+          "Chichester.Shed",
+          "Jamesand Anna",
+          "Concordandhad",
+          "Chichester.Ch",
+          "Concord.Ch",
+          "Pittsfield.Ch"
+        ],
+        "placeHints": [
+          {
+            "text": "Chichester",
+            "role": "residence",
+            "scope": "primary"
+          },
+          {
+            "text": "Grantham",
+            "role": "residence",
+            "scope": "primary"
+          },
+          {
+            "text": "Concor",
+            "role": "residence",
+            "scope": "primary"
+          },
+          {
+            "text": "Pittsfiel",
+            "role": "residence",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "2 ch. (from text)",
+        "deathYear": 1889,
+        "deathDateText": "26 Oct.,1888",
+        "birthDateText": "13 June,1797"
+      }
+    },
+    {
+      "key": "whod|unknown",
+      "name": "Whod",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 142,
+          "lineNumber": 1,
+          "rawText": "126 WILLIAMLANEANDFAMILY.I.Amasa K.6(Seavey),b.13 June,1797,m.2 June,1825,Maria Libbey,andhad 2 ch.: Philena'and Ruth L?,d.i July,1829.II.Ruth M.^,b.8 Mar.,1799,m.13 Mar.,1823,J.N.C.Leaviit,of Chichester.Shed.2 Apr.,1872.Ch.: I.George C?{^Leavitt^.2.Augustus'.3.Elvira'.4.Nathanie P . 5.yacintha' . III.Reuben L.\u00ab,b.27 Aug.,1801,d.26 Oct.,1888;m.13 Nov.,1828,Dorothy(dau.of Jamesand Anna)Towle,b.ii Aug.,1803,d.12 June,1867;res.at Hampton.Ch. : 1.Elizabeth P?,b.29 Aug.,1829,m.(i)David M.Dearborn,whod.9 Nov.,1865,muchlamented.Theyres.in Concordandhad; I.)George Merrili P,{Dearbor 7 t),b.17 May,1864.Elizabeth P?,m.(2)Jn.H.Johnson.2.George James'',b.31 Mar.,1832,d.at Dayton O.,18 May,1859.3.Isabella'',b.22 Dec,1835.4.Edward Payson'',b.2 Sept.,1843,d.at Hampton,5 Jan.,1851.5.Henry Lle'wellyn'',b.IIOct.,1847,d.at Hampton,il Jan.,1851.IV.Nathaniel^,b.6 Aug.,1803,ofthe Congregationalchurch;m.13 Aug.,1834,Mary Ann Hinds,ofthe Methodistchurch,res.in Chichester.Ch. : 1.Ann M?,b.2 June,1835.2.Mary Jane'',b.29 Apr.,1837.3.Betsey Drake'',b.23 July,1840.V.Sally L.^,b.16 Jan.,1806,m.16 Nov.,1828,Jn.Eaton,Jr.,res.in Grantham;both Methodists.Ch. : 1.Benjamin F'rank''{Eaton).2.Augusta''.VI.Shadrach*\"',b.23 Feb.,t 8 o 8,m.22 Jan.,1834,Belinda Herbert,bothofthe Congregationalchurch,res.in Concord.Ch. : I.Herberf.2.Ellen Augusta''.VII.Betsey^,b.14 Oct.,1811,ofthe Baptistchurch;m.13 Aug.[Oct.?],1834,James Drake,b.at Pittsfield,29 June,1805,d.7 Apr.,1870;Betseyd.28 Sept.,1865.Res.in Pittsfield.Ch. : 1.Georgiana Butters''{Drake),b.15 Jan.,1836,m.ISept.,l?>$%,Josiah Car-penter,b.31 May,1829,andhad: 1.)Georgia Ella^,b.Oct.,1859,d.Aug.,1889.2.Franklin James'',b.3 Nov.,1842,m.7 June,1869,Harriet C.E,Barkerb.29 Dec,1848.Ch. :",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "126 WILLIAMLANEANDFAMILY.I.Amasa K.6(Seavey),b.13 June,1797,m.2 June,1825,Maria Libbey,andhad 2 ch.: Philena'and Ruth L?,d.i July,1829.II.Ruth M.^,b.8 Mar.,1799,m.13 Mar.,1823,J.N.C.Leaviit,of Chichester.Shed.2 Apr.,1872.Ch.: I.George C?{^Leavitt^.2.Augustus'.3.Elvira'.4.Nathanie P . 5.yacintha' . III.Reuben L.\u00ab,b.27 Aug.,1801,d.26 Oct.,1888;m.13 Nov.,1828,Dorothy(dau.of Jamesand Anna)Towle,b.ii Aug.,1803,d.12 June,1867;res.at Hampton.Ch. : 1.Elizabeth P?,b.29 Aug.,1829,m.(i)David M.Dearborn,whod.9 Nov.,1865,muchlamented.Theyres.in Concordandhad; I.)George Merrili P,{Dearbor 7 t),b.17 May,1864.Elizabeth P?,m.(2)Jn.H.Johnson.2.George James'',b.31 Mar.,1832,d.at Dayton O.,18 May,1859.3.Isabella'',b.22 Dec,1835.4.Edward Payson'',b.2 Sept.,1843,d.at Hampton,5 Jan.,1851.5.Henry Lle'wellyn'',b.IIOct.,1847,d.at Hampton,il Jan.,1851.IV.Nathaniel^,b.6 Aug.,1803,ofthe Congregationalchurch;m.13 Aug.,1834,Mary Ann Hinds,ofthe Methodistchurch,res.in Chichester.Ch. : 1.Ann M?,b.2 June,1835.2.Mary Jane'',b.29 Apr.,1837.3.Betsey Drake'',b.23 July,1840.V.Sally L.^,b.16 Jan.,1806,m.16 Nov.,1828,Jn.Eaton,Jr.,res.in Grantham;both Methodists.Ch. : 1.Benjamin F'rank''{Eaton).2.Augusta''.VI.Shadrach*\"',b.23 Feb.,t 8 o 8,m.22 Jan.,1834,Belinda Herbert,bothofthe Congregationalchurch,res.in Concord.Ch. : I.Herberf.2.Ellen Augusta''.VII.Betsey^,b.14 Oct.,1811,ofthe Baptistchurch;m.13 Aug.[Oct.?],1834,James Drake,b.at Pittsfield,29 June,1805,d.7 Apr.,1870;Betseyd.28 Sept.,1865.Res.in Pittsfield.Ch. : 1.Georgiana Butters''{Drake),b.15 Jan.,1836,m.ISept.,l?>$%,Josiah Car-penter,b.31 May,1829,andhad: 1.)Georgia Ella^,b.Oct.,1859,d.Aug.,1889.2.Franklin James'',b.3 Nov.,1842,m.7 June,1869,Harriet C.E,Barkerb.29 Dec,1848.Ch. :"
+      ],
+      "locations": []
+    },
+    {
+      "key": "william lane|1791",
+      "name": "William Lane",
+      "birthYear": 1791,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 144,
+          "lineNumber": 1,
+          "rawText": "128 WILLIAMLANEANDFAMILY.III.Lydia^,b.9 Aug.,1791,d.unm.in West Newfield,Me.,24 Apr.,1869.(132)I^-BENj AMi Np,b.24 Apr.,1794,m.8 May,1825,Irene(dau.of Johnand Rebecca)Tuckerof Bath,Me.,andd.at Pier-mont,28 May,1868.Shed.in Sandwich,17 Nov.,1887,ae.82.Theyres.at Lake Village,N.H.,andhad 11 ch.V.Sarahc,b.28 Sept.,1796,m.Isaac Marstonof North Hampton.Attheageof 91,havingoutlivedherchildren,shewasatthereunionin Hampton.In 1890 shewaslivingin West New-field,Me.,ae.94.Ch.: 1.Daniel Simon''(^Marston'),d.ae.20.2.JMa)y Esther'',m.John Garland,andd.1 S 7 S.By(2)w.MARY(Mollie)TOWLE,JONATHANLANE^had:VI.Ann\",b.in Hampton Falls,28 Sept.,1799,d.at Epsom,May,1 S 62,whom.25 Dec,1823,Benvolio Sanbornof Epsomandhad: 1.Samuel''{Sanborn),b.28 Jan.,1 S 26,whom.Elizabeth Stoddardoi Tol-land,Conn.,andhad:I.)Isette D?2.)Wallace?2.Charlotte MP,b.20 Jan.,1828,m.Jn.A.Gardnerof Groton,Mass.,andd.IIJan.,1857.Ch.:I.)Ida F.Killihur^,of Louisville,Ky.2.)Stella M.Garretson^,of Rochester,N.Y.3.Susan P?,twinto Charlotte M.,d.24 Feb.,1834.4.Elizabeth M?,b.15 Apr.,1830,111.(i)William W.Virginof Concordandhad:I.)Netties.Walker\"^,oi Qoncor A.Elizabeth M?,m.(2)Walter Gageof Concord,andd.28 Sept.,|i 888.5.Joel L?,\\i.13 Oct.,1832.Hewasaboardthe Kearsargeinthewar,andgivesaninterestingaccountofthesinkingofthe Sumter.6.Edwi)i',b.14 Apr.,1835,i^-/i'\"''/^^/Z^'''''of Belgrade,Me.Ch. : I.)Dane A?,of Lynn,Mass.7.Ostinellfjh.T,P'eb.,1837,servedduringthe Rebellioninthe 17 th Maineregiment,regular Army,wasseverelywoundedinthebattleof Gettys-burg,andreceivedapensiontillhisdeath,11 Jan.,1 S 72.8.Mary'',b.31 Jan.,1839.9.Clara MP,b.27 July,1840,m.JValter Gageof Concord.ID.Moses'',b.12 Apr.,1842,m.Lilian Ordwayof Chichester,andd.2 June,1870.Ch.:I.)Annie^.2.)Lilian^.3.)Clara^.4.)Austin^.",
+          "bio": {
+            "occupation": [],
+            "military": [
+              "Hewasaboardthe Kearsargeinthewar,andgivesaninterestingaccountofthesinkingofthe Sumter",
+              ",1837,servedduringthe Rebellioninthe 17 th Maineregiment,regular Army,wasseverelywoundedinthebattleof Gettys-burg,andreceivedapensiontillhisdeath,11 Jan"
+            ],
+            "education": [],
+            "childrenNote": "11 ch. (from text)",
+            "placeHints": [
+              {
+                "text": "Hampton Falls",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Belgrade,Me",
+                "role": "other",
+                "scope": "primary"
+              },
+              {
+                "text": "Lynn,Mass",
+                "role": "other",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Hampton Falls",
+              "Belgrade,Me",
+              "Lynn,Mass",
+              "Johnand Rebecca",
+              "Louisville",
+              "Rochester",
+              "Belgrade",
+              "Lynn",
+              "West Newfield",
+              "Sandwich"
+            ],
+            "birthDateText": "9 Aug.,1791",
+            "deathYear": 1834,
+            "deathDateText": "24 Feb.,1834",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "8 May,1825,Irene(dau",
+              "Isaac Marstonof North Hampton",
+              "John Garland,andd",
+              "Garretson^,of Rochester,N",
+              "(2)Walter Gageof Concord,andd",
+              "JValter Gageof Concord",
+              "Lilian Ordwayof Chichester,andd"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "128 WILLIAMLANEANDFAMILY.III.Lydia^,b.9 Aug.,1791,d.unm.in West Newfield,Me.,24 Apr.,1869.(132)I^-BENj AMi Np,b.24 Apr.,1794,m.8 May,1825,Irene(dau.of Johnand Rebecca)Tuckerof Bath,Me.,andd.at Pier-mont,28 May,1868.Shed.in Sandwich,17 Nov.,1887,ae.82.Theyres.at Lake Village,N.H.,andhad 11 ch.V.Sarahc,b.28 Sept.,1796,m.Isaac Marstonof North Hampton.Attheageof 91,havingoutlivedherchildren,shewasatthereunionin Hampton.In 1890 shewaslivingin West New-field,Me.,ae.94.Ch.: 1.Daniel Simon''(^Marston'),d.ae.20.2.JMa)y Esther'',m.John Garland,andd.1 S 7 S.By(2)w.MARY(Mollie)TOWLE,JONATHANLANE^had:VI.Ann\",b.in Hampton Falls,28 Sept.,1799,d.at Epsom,May,1 S 62,whom.25 Dec,1823,Benvolio Sanbornof Epsomandhad: 1.Samuel''{Sanborn),b.28 Jan.,1 S 26,whom.Elizabeth Stoddardoi Tol-land,Conn.,andhad:I.)Isette D?2.)Wallace?2.Charlotte MP,b.20 Jan.,1828,m.Jn.A.Gardnerof Groton,Mass.,andd.IIJan.,1857.Ch.:I.)Ida F.Killihur^,of Louisville,Ky.2.)Stella M.Garretson^,of Rochester,N.Y.3.Susan P?,twinto Charlotte M.,d.24 Feb.,1834.4.Elizabeth M?,b.15 Apr.,1830,111.(i)William W.Virginof Concordandhad:I.)Netties.Walker\"^,oi Qoncor A.Elizabeth M?,m.(2)Walter Gageof Concord,andd.28 Sept.,|i 888.5.Joel L?,\\i.13 Oct.,1832.Hewasaboardthe Kearsargeinthewar,andgivesaninterestingaccountofthesinkingofthe Sumter.6.Edwi)i',b.14 Apr.,1835,i^-/i'\"''/^^/Z^'''''of Belgrade,Me.Ch. : I.)Dane A?,of Lynn,Mass.7.Ostinellfjh.T,P'eb.,1837,servedduringthe Rebellioninthe 17 th Maineregiment,regular Army,wasseverelywoundedinthebattleof Gettys-burg,andreceivedapensiontillhisdeath,11 Jan.,1 S 72.8.Mary'',b.31 Jan.,1839.9.Clara MP,b.27 July,1840,m.JValter Gageof Concord.ID.Moses'',b.12 Apr.,1842,m.Lilian Ordwayof Chichester,andd.2 June,1870.Ch.:I.)Annie^.2.)Lilian^.3.)Clara^.4.)Austin^."
+      ],
+      "locations": [
+        "Hampton Falls",
+        "Belgrade,Me",
+        "Lynn,Mass",
+        "Johnand Rebecca",
+        "Louisville",
+        "Rochester",
+        "Belgrade",
+        "Lynn",
+        "West Newfield",
+        "Sandwich"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [
+          "Hewasaboardthe Kearsargeinthewar,andgivesaninterestingaccountofthesinkingofthe Sumter",
+          ",1837,servedduringthe Rebellioninthe 17 th Maineregiment,regular Army,wasseverelywoundedinthebattleof Gettys-burg,andreceivedapensiontillhisdeath,11 Jan"
+        ],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "8 May,1825,Irene(dau",
+          "Isaac Marstonof North Hampton",
+          "John Garland,andd",
+          "Garretson^,of Rochester,N",
+          "(2)Walter Gageof Concord,andd",
+          "JValter Gageof Concord",
+          "Lilian Ordwayof Chichester,andd"
+        ],
+        "locationsExtra": [
+          "Hampton Falls",
+          "Belgrade,Me",
+          "Lynn,Mass",
+          "Johnand Rebecca",
+          "Louisville",
+          "Rochester",
+          "Belgrade",
+          "Lynn",
+          "West Newfield",
+          "Sandwich"
+        ],
+        "placeHints": [
+          {
+            "text": "Hampton Falls",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Belgrade,Me",
+            "role": "other",
+            "scope": "primary"
+          },
+          {
+            "text": "Lynn,Mass",
+            "role": "other",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "11 ch. (from text)",
+        "deathYear": 1834,
+        "deathDateText": "24 Feb.,1834",
+        "birthDateText": "9 Aug.,1791"
+      }
+    },
+    {
+      "key": "mary|unknown",
+      "name": "Mary",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 144,
+          "lineNumber": 1,
+          "rawText": "128 WILLIAMLANEANDFAMILY.III.Lydia^,b.9 Aug.,1791,d.unm.in West Newfield,Me.,24 Apr.,1869.(132)I^-BENj AMi Np,b.24 Apr.,1794,m.8 May,1825,Irene(dau.of Johnand Rebecca)Tuckerof Bath,Me.,andd.at Pier-mont,28 May,1868.Shed.in Sandwich,17 Nov.,1887,ae.82.Theyres.at Lake Village,N.H.,andhad 11 ch.V.Sarahc,b.28 Sept.,1796,m.Isaac Marstonof North Hampton.Attheageof 91,havingoutlivedherchildren,shewasatthereunionin Hampton.In 1890 shewaslivingin West New-field,Me.,ae.94.Ch.: 1.Daniel Simon''(^Marston'),d.ae.20.2.JMa)y Esther'',m.John Garland,andd.1 S 7 S.By(2)w.MARY(Mollie)TOWLE,JONATHANLANE^had:VI.Ann\",b.in Hampton Falls,28 Sept.,1799,d.at Epsom,May,1 S 62,whom.25 Dec,1823,Benvolio Sanbornof Epsomandhad: 1.Samuel''{Sanborn),b.28 Jan.,1 S 26,whom.Elizabeth Stoddardoi Tol-land,Conn.,andhad:I.)Isette D?2.)Wallace?2.Charlotte MP,b.20 Jan.,1828,m.Jn.A.Gardnerof Groton,Mass.,andd.IIJan.,1857.Ch.:I.)Ida F.Killihur^,of Louisville,Ky.2.)Stella M.Garretson^,of Rochester,N.Y.3.Susan P?,twinto Charlotte M.,d.24 Feb.,1834.4.Elizabeth M?,b.15 Apr.,1830,111.(i)William W.Virginof Concordandhad:I.)Netties.Walker\"^,oi Qoncor A.Elizabeth M?,m.(2)Walter Gageof Concord,andd.28 Sept.,|i 888.5.Joel L?,\\i.13 Oct.,1832.Hewasaboardthe Kearsargeinthewar,andgivesaninterestingaccountofthesinkingofthe Sumter.6.Edwi)i',b.14 Apr.,1835,i^-/i'\"''/^^/Z^'''''of Belgrade,Me.Ch. : I.)Dane A?,of Lynn,Mass.7.Ostinellfjh.T,P'eb.,1837,servedduringthe Rebellioninthe 17 th Maineregiment,regular Army,wasseverelywoundedinthebattleof Gettys-burg,andreceivedapensiontillhisdeath,11 Jan.,1 S 72.8.Mary'',b.31 Jan.,1839.9.Clara MP,b.27 July,1840,m.JValter Gageof Concord.ID.Moses'',b.12 Apr.,1842,m.Lilian Ordwayof Chichester,andd.2 June,1870.Ch.:I.)Annie^.2.)Lilian^.3.)Clara^.4.)Austin^.",
+          "bio": {}
+        },
+        {
+          "pdfPageNumber": 162,
+          "lineNumber": 2,
+          "rawText": "No.86.WILLIAMF.LANE^(Wm.^,Sam.s,Sam.^Josh.3),1802-andhisw.MARY(BAILEY),hadb.in Wentworth: I.Eunice^,b.27 Feb.,1825.II.Hazen S,b.13 Oct.,1826.III.Mary*^,b.ir July,1828.IV.William^,b.8 Mar.,1830.V.Harriet^,b.4 Mar.,1832.VI.Luc Y^,b.5 May,1834.VII.George^,b.6 Mar.,1838.VIII.Charles^,b.23 Aug.,1839.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "128 WILLIAMLANEANDFAMILY.III.Lydia^,b.9 Aug.,1791,d.unm.in West Newfield,Me.,24 Apr.,1869.(132)I^-BENj AMi Np,b.24 Apr.,1794,m.8 May,1825,Irene(dau.of Johnand Rebecca)Tuckerof Bath,Me.,andd.at Pier-mont,28 May,1868.Shed.in Sandwich,17 Nov.,1887,ae.82.Theyres.at Lake Village,N.H.,andhad 11 ch.V.Sarahc,b.28 Sept.,1796,m.Isaac Marstonof North Hampton.Attheageof 91,havingoutlivedherchildren,shewasatthereunionin Hampton.In 1890 shewaslivingin West New-field,Me.,ae.94.Ch.: 1.Daniel Simon''(^Marston'),d.ae.20.2.JMa)y Esther'',m.John Garland,andd.1 S 7 S.By(2)w.MARY(Mollie)TOWLE,JONATHANLANE^had:VI.Ann\",b.in Hampton Falls,28 Sept.,1799,d.at Epsom,May,1 S 62,whom.25 Dec,1823,Benvolio Sanbornof Epsomandhad: 1.Samuel''{Sanborn),b.28 Jan.,1 S 26,whom.Elizabeth Stoddardoi Tol-land,Conn.,andhad:I.)Isette D?2.)Wallace?2.Charlotte MP,b.20 Jan.,1828,m.Jn.A.Gardnerof Groton,Mass.,andd.IIJan.,1857.Ch.:I.)Ida F.Killihur^,of Louisville,Ky.2.)Stella M.Garretson^,of Rochester,N.Y.3.Susan P?,twinto Charlotte M.,d.24 Feb.,1834.4.Elizabeth M?,b.15 Apr.,1830,111.(i)William W.Virginof Concordandhad:I.)Netties.Walker\"^,oi Qoncor A.Elizabeth M?,m.(2)Walter Gageof Concord,andd.28 Sept.,|i 888.5.Joel L?,\\i.13 Oct.,1832.Hewasaboardthe Kearsargeinthewar,andgivesaninterestingaccountofthesinkingofthe Sumter.6.Edwi)i',b.14 Apr.,1835,i^-/i'\"''/^^/Z^'''''of Belgrade,Me.Ch. : I.)Dane A?,of Lynn,Mass.7.Ostinellfjh.T,P'eb.,1837,servedduringthe Rebellioninthe 17 th Maineregiment,regular Army,wasseverelywoundedinthebattleof Gettys-burg,andreceivedapensiontillhisdeath,11 Jan.,1 S 72.8.Mary'',b.31 Jan.,1839.9.Clara MP,b.27 July,1840,m.JValter Gageof Concord.ID.Moses'',b.12 Apr.,1842,m.Lilian Ordwayof Chichester,andd.2 June,1870.Ch.:I.)Annie^.2.)Lilian^.3.)Clara^.4.)Austin^.",
+        "No.86.WILLIAMF.LANE^(Wm.^,Sam.s,Sam.^Josh.3),1802-andhisw.MARY(BAILEY),hadb.in Wentworth: I.Eunice^,b.27 Feb.,1825.II.Hazen S,b.13 Oct.,1826.III.Mary*^,b.ir July,1828.IV.William^,b.8 Mar.,1830.V.Harriet^,b.4 Mar.,1832.VI.Luc Y^,b.5 May,1834.VII.George^,b.6 Mar.,1838.VIII.Charles^,b.23 Aug.,1839."
+      ],
+      "locations": [
+        "Hampton Falls",
+        "Belgrade,Me",
+        "Lynn,Mass",
+        "Johnand Rebecca",
+        "Louisville",
+        "Rochester",
+        "Belgrade",
+        "Lynn",
+        "West Newfield",
+        "Sandwich",
+        "Wentworth"
+      ]
+    },
+    {
+      "key": "jonathan lane|1844",
+      "name": "Jonathan Lane",
+      "birthYear": 1844,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 145,
+          "lineNumber": 1,
+          "rawText": "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:",
+          "bio": {
+            "occupation": [
+              "Lawyer",
+              "Teacher"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Lowell",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Gilsum",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Sullivan",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Bangor",
+                "role": "residence",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Lowell",
+              "Gilsum",
+              "Sullivan",
+              "Bangor",
+              "Jas",
+              "Brad-buryand Abi.N",
+              "Piermont",
+              "Nashua"
+            ],
+            "birthDateText": "24 June,1824",
+            "deathYear": 1848,
+            "deathDateText": "4 Dec,1874",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "James(s",
+              "12 Aug",
+              "11 Apr",
+              "Sophia(dau",
+              "Charles Hartof Manchesterandhad:I",
+              "in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N",
+              "in Nashua,16 Feb"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:"
+      ],
+      "locations": [
+        "Lowell",
+        "Gilsum",
+        "Sullivan",
+        "Bangor",
+        "Jas",
+        "Brad-buryand Abi.N",
+        "Piermont",
+        "Nashua"
+      ],
+      "bio": {
+        "occupation": [
+          "Lawyer",
+          "Teacher"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "James(s",
+          "12 Aug",
+          "11 Apr",
+          "Sophia(dau",
+          "Charles Hartof Manchesterandhad:I",
+          "in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N",
+          "in Nashua,16 Feb"
+        ],
+        "locationsExtra": [
+          "Lowell",
+          "Gilsum",
+          "Sullivan",
+          "Bangor",
+          "Jas",
+          "Brad-buryand Abi.N",
+          "Piermont",
+          "Nashua"
+        ],
+        "placeHints": [
+          {
+            "text": "Lowell",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Gilsum",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Sullivan",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Bangor",
+            "role": "residence",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1848,
+        "deathDateText": "4 Dec,1874",
+        "birthDateText": "24 June,1824"
+      }
+    },
+    {
+      "key": "idowd in lowell|unknown",
+      "name": "Idowd.in Lowell",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 145,
+          "lineNumber": 1,
+          "rawText": "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:"
+      ],
+      "locations": [
+        "Lowell",
+        "Gilsum",
+        "Sullivan",
+        "Bangor",
+        "Jas",
+        "Brad-buryand Abi.N",
+        "Piermont",
+        "Nashua"
+      ]
+    },
+    {
+      "key": "b at piermontor orford|unknown",
+      "name": "B.at Piermontor Orford",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 145,
+          "lineNumber": 1,
+          "rawText": "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:"
+      ],
+      "locations": []
+    },
+    {
+      "key": "b at augusta|unknown",
+      "name": "B.at Augusta",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 145,
+          "lineNumber": 1,
+          "rawText": "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:"
+      ],
+      "locations": []
+    },
+    {
+      "key": "asa lane|1789",
+      "name": "Asa Lane",
+      "birthYear": 1789,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 148,
+          "lineNumber": 3,
+          "rawText": "No.78.ASALANE 5(Sam.4,Sam.3,Wm.^),1763-1847,andhisw.SARAH(JAMES)hadb.in Chichester: I,Betsey'',b.12 June,1789,m.June,1827,Bracket L.Nor-Ris,andd.s.p.in Pittsfield,amemberofthe Congregationalchurch.n.Samuel^,b.Nov.,1790,d.Dec,1791,ae.iyr.HI.Sally^,b.29 Feb.,1792,m.i May,1816,Joseph Pervier,res.at Wilmot,membersofthe Baptistchurch;had 7 ch.IV.Polly'5,b.22 April,1794,m.Oct.,1812,David Bakerof Goshen;membersofthe Baptistchurch,Had 2 s.and 3 daus.V.Lydia'',b.22 Nov.,1796,m.16 June,1823,John Carpen-ter,of Chichester,bothofthe Congregationalchurch;had 4 ch.VI.Nancy^,twinsisterto Lydia,m.i Oct.,1812,Lovewell Bakerof Croydonboth Baptists.Theyhad 5 ch.VII.As A^,d.20 Sept.,1802,ae.2 yrs.VIII.Sophia^,andatwin,b.12 July,1803.IX.Asa\",b.July,1803,d.Aug.,1803.X.Joshua J.,b.19 Apr.,1805,d.May,1806.XLHu LDAHJ.\"^,b.9 Jan.,1809,m.18 Nov.,1831,George S.Masonof Chichester,ofthe M.E.church;had 3 ch.",
+          "bio": {
+            "occupation": [
+              "Mason"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": "7 children (from text); sine prole (from text)",
+            "placeHints": [],
+            "locationsExtra": [
+              "Chichester",
+              "Pittsfield"
+            ],
+            "birthDateText": "12 June,1789",
+            "deathYear": 1806,
+            "deathDateText": "20 Sept.,1802",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "June,1827,Bracket L",
+              "i May,1816,Joseph Pervier,res",
+              "16 June,1823,John Carpen-ter,of Chichester,bothofthe Congregationalchurch",
+              "i Oct",
+              "18 Nov"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.78.ASALANE 5(Sam.4,Sam.3,Wm.^),1763-1847,andhisw.SARAH(JAMES)hadb.in Chichester: I,Betsey'',b.12 June,1789,m.June,1827,Bracket L.Nor-Ris,andd.s.p.in Pittsfield,amemberofthe Congregationalchurch.n.Samuel^,b.Nov.,1790,d.Dec,1791,ae.iyr.HI.Sally^,b.29 Feb.,1792,m.i May,1816,Joseph Pervier,res.at Wilmot,membersofthe Baptistchurch;had 7 ch.IV.Polly'5,b.22 April,1794,m.Oct.,1812,David Bakerof Goshen;membersofthe Baptistchurch,Had 2 s.and 3 daus.V.Lydia'',b.22 Nov.,1796,m.16 June,1823,John Carpen-ter,of Chichester,bothofthe Congregationalchurch;had 4 ch.VI.Nancy^,twinsisterto Lydia,m.i Oct.,1812,Lovewell Bakerof Croydonboth Baptists.Theyhad 5 ch.VII.As A^,d.20 Sept.,1802,ae.2 yrs.VIII.Sophia^,andatwin,b.12 July,1803.IX.Asa\",b.July,1803,d.Aug.,1803.X.Joshua J.,b.19 Apr.,1805,d.May,1806.XLHu LDAHJ.\"^,b.9 Jan.,1809,m.18 Nov.,1831,George S.Masonof Chichester,ofthe M.E.church;had 3 ch."
+      ],
+      "locations": [
+        "Chichester",
+        "Pittsfield"
+      ],
+      "bio": {
+        "occupation": [
+          "Mason"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "June,1827,Bracket L",
+          "i May,1816,Joseph Pervier,res",
+          "16 June,1823,John Carpen-ter,of Chichester,bothofthe Congregationalchurch",
+          "i Oct",
+          "18 Nov"
+        ],
+        "locationsExtra": [
+          "Chichester",
+          "Pittsfield"
+        ],
+        "childrenNote": "7 children (from text); sine prole (from text)",
+        "deathYear": 1806,
+        "deathDateText": "20 Sept.,1802",
+        "birthDateText": "12 June,1789"
+      }
+    },
+    {
+      "key": "sarah|unknown",
+      "name": "Sarah",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 148,
+          "lineNumber": 3,
+          "rawText": "No.78.ASALANE 5(Sam.4,Sam.3,Wm.^),1763-1847,andhisw.SARAH(JAMES)hadb.in Chichester: I,Betsey'',b.12 June,1789,m.June,1827,Bracket L.Nor-Ris,andd.s.p.in Pittsfield,amemberofthe Congregationalchurch.n.Samuel^,b.Nov.,1790,d.Dec,1791,ae.iyr.HI.Sally^,b.29 Feb.,1792,m.i May,1816,Joseph Pervier,res.at Wilmot,membersofthe Baptistchurch;had 7 ch.IV.Polly'5,b.22 April,1794,m.Oct.,1812,David Bakerof Goshen;membersofthe Baptistchurch,Had 2 s.and 3 daus.V.Lydia'',b.22 Nov.,1796,m.16 June,1823,John Carpen-ter,of Chichester,bothofthe Congregationalchurch;had 4 ch.VI.Nancy^,twinsisterto Lydia,m.i Oct.,1812,Lovewell Bakerof Croydonboth Baptists.Theyhad 5 ch.VII.As A^,d.20 Sept.,1802,ae.2 yrs.VIII.Sophia^,andatwin,b.12 July,1803.IX.Asa\",b.July,1803,d.Aug.,1803.X.Joshua J.,b.19 Apr.,1805,d.May,1806.XLHu LDAHJ.\"^,b.9 Jan.,1809,m.18 Nov.,1831,George S.Masonof Chichester,ofthe M.E.church;had 3 ch.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.78.ASALANE 5(Sam.4,Sam.3,Wm.^),1763-1847,andhisw.SARAH(JAMES)hadb.in Chichester: I,Betsey'',b.12 June,1789,m.June,1827,Bracket L.Nor-Ris,andd.s.p.in Pittsfield,amemberofthe Congregationalchurch.n.Samuel^,b.Nov.,1790,d.Dec,1791,ae.iyr.HI.Sally^,b.29 Feb.,1792,m.i May,1816,Joseph Pervier,res.at Wilmot,membersofthe Baptistchurch;had 7 ch.IV.Polly'5,b.22 April,1794,m.Oct.,1812,David Bakerof Goshen;membersofthe Baptistchurch,Had 2 s.and 3 daus.V.Lydia'',b.22 Nov.,1796,m.16 June,1823,John Carpen-ter,of Chichester,bothofthe Congregationalchurch;had 4 ch.VI.Nancy^,twinsisterto Lydia,m.i Oct.,1812,Lovewell Bakerof Croydonboth Baptists.Theyhad 5 ch.VII.As A^,d.20 Sept.,1802,ae.2 yrs.VIII.Sophia^,andatwin,b.12 July,1803.IX.Asa\",b.July,1803,d.Aug.,1803.X.Joshua J.,b.19 Apr.,1805,d.May,1806.XLHu LDAHJ.\"^,b.9 Jan.,1809,m.18 Nov.,1831,George S.Masonof Chichester,ofthe M.E.church;had 3 ch."
+      ],
+      "locations": [
+        "Chichester",
+        "Pittsfield"
+      ]
+    },
+    {
+      "key": "william lane|1782",
+      "name": "William Lane",
+      "birthYear": 1782,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 150,
+          "lineNumber": 1,
+          "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [
+              "el\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Ha"
+            ],
+            "childrenNote": "sine prole (from text)",
+            "placeHints": [
+              {
+                "text": "Hampton",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Hampton",
+              "Zacheus",
+              "Moses Leavitt",
+              "Si-mon",
+              "James"
+            ],
+            "birthDateText": "31 Dec,1808",
+            "deathYear": 1864,
+            "deathDateText": "30 Mar.,1850",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "1804,Martha(dau",
+              "8 Dec,1836,Lticretia Prescott,whod",
+              "(i)1831,Ilamjah Olive Marvinof Newcastle,b",
+              "1849,Abby(dau",
+              "19 Oct",
+              "22 Oct",
+              ")Lamprey,of Hampton,andhad:a",
+              "Simon Cottonof Gilford,andd"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+      ],
+      "locations": [
+        "Hampton",
+        "Zacheus",
+        "Moses Leavitt",
+        "Si-mon",
+        "James"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [
+          "el\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Ha"
+        ],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "1804,Martha(dau",
+          "8 Dec,1836,Lticretia Prescott,whod",
+          "(i)1831,Ilamjah Olive Marvinof Newcastle,b",
+          "1849,Abby(dau",
+          "19 Oct",
+          "22 Oct",
+          ")Lamprey,of Hampton,andhad:a",
+          "Simon Cottonof Gilford,andd"
+        ],
+        "locationsExtra": [
+          "Hampton",
+          "Zacheus",
+          "Moses Leavitt",
+          "Si-mon",
+          "James"
+        ],
+        "placeHints": [
+          {
+            "text": "Hampton",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "sine prole (from text)",
+        "deathYear": 1864,
+        "deathDateText": "30 Mar.,1850",
+        "birthDateText": "31 Dec,1808"
+      }
+    },
+    {
+      "key": "whiteof andover|unknown",
+      "name": "Whiteof Andover",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 150,
+          "lineNumber": 1,
+          "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+      ],
+      "locations": [
+        "Hampton",
+        "Zacheus",
+        "Moses Leavitt",
+        "Si-mon",
+        "James"
+      ]
+    },
+    {
+      "key": "martha|unknown",
+      "name": "Martha",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 150,
+          "lineNumber": 1,
+          "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+      ],
+      "locations": []
+    },
+    {
+      "key": "ilamjah olive marvinof|unknown",
+      "name": "Ilamjah Olive Marvinof",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 150,
+          "lineNumber": 1,
+          "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+      ],
+      "locations": []
+    },
+    {
+      "key": "abby|unknown",
+      "name": "Abby",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 150,
+          "lineNumber": 1,
+          "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+      ],
+      "locations": []
+    },
+    {
+      "key": "of hampton|unknown",
+      "name": "Of Hampton",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 150,
+          "lineNumber": 1,
+          "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+      ],
+      "locations": []
+    },
+    {
+      "key": "william lane|1815",
+      "name": "William Lane",
+      "birthYear": 1815,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 154,
+          "lineNumber": 1,
+          "rawText": "138 WILLIAMLANEANDFAMILY.VIII.Hannah''',b.16 Jan.,1815,m.29 Dec,1837,John M.Wells,b.in Loudon,19 Mar.,1815,afarmerin Campton.Ch. : 1.Lydia J?{Wells),b.ii Oct.,1 S 3 S,m.10 Mar.,1854,Hiram Buzzdl,andhad:I.)Sarah{Buzzeliy,d.10 Oct.,1863.2.)Hannah F?,d.18 Oct.,1863.3.)Frederick^,b.6 Nov.,i 860.4.)Martha^,b.14 May,1862.5.)Ida^,b.27 Jan.,1864.2.John A?,b.22 Sept.,1840,d.27 Sept.,1862.3.Benjamin A?,b.16 Aug.,1842,d.27 Nov.,1862.4.Eben H?,b.20 Apr.,1845,m.6 Aug.,1865,Sarah A.Morrill,b.26 May,1848.Ch. : I.)George A?,b.6 Oct.,1866.2.)^27/?>i\u00a5.9,b.3 Aug.,1869.3.)Allie H?,b.16 Apr.,1871.5.Horace F?,b.30 Mar.,1847.6.Syrcne A.^,b.13 July,d.20 Dec,1849.7.Cjfrt;-Z.8,b.13 Feb.,1851,d.16 Oct.,1863.8.Hannah F.^,h.27 Sept.,18^3,m.William Buzzell,adivorcedman.9.Julia Ann^,b.15 Feb.,1856,d.17 Oct.,1 S 63.",
+          "bio": {
+            "occupation": [
+              "Farmer"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [
+              {
+                "text": "Loudon",
+                "role": "birth",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Loudon"
+            ],
+            "birthDateText": "16 Jan.,1815",
+            "deathYear": 1863,
+            "deathDateText": "10 Oct.,1863",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "29 Dec,1837,John M",
+              "10 Mar",
+              "6 Aug",
+              "William Buzzell,adivorcedman"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "138 WILLIAMLANEANDFAMILY.VIII.Hannah''',b.16 Jan.,1815,m.29 Dec,1837,John M.Wells,b.in Loudon,19 Mar.,1815,afarmerin Campton.Ch. : 1.Lydia J?{Wells),b.ii Oct.,1 S 3 S,m.10 Mar.,1854,Hiram Buzzdl,andhad:I.)Sarah{Buzzeliy,d.10 Oct.,1863.2.)Hannah F?,d.18 Oct.,1863.3.)Frederick^,b.6 Nov.,i 860.4.)Martha^,b.14 May,1862.5.)Ida^,b.27 Jan.,1864.2.John A?,b.22 Sept.,1840,d.27 Sept.,1862.3.Benjamin A?,b.16 Aug.,1842,d.27 Nov.,1862.4.Eben H?,b.20 Apr.,1845,m.6 Aug.,1865,Sarah A.Morrill,b.26 May,1848.Ch. : I.)George A?,b.6 Oct.,1866.2.)^27/?>i\u00a5.9,b.3 Aug.,1869.3.)Allie H?,b.16 Apr.,1871.5.Horace F?,b.30 Mar.,1847.6.Syrcne A.^,b.13 July,d.20 Dec,1849.7.Cjfrt;-Z.8,b.13 Feb.,1851,d.16 Oct.,1863.8.Hannah F.^,h.27 Sept.,18^3,m.William Buzzell,adivorcedman.9.Julia Ann^,b.15 Feb.,1856,d.17 Oct.,1 S 63."
+      ],
+      "locations": [
+        "Loudon"
+      ],
+      "bio": {
+        "occupation": [
+          "Farmer"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "29 Dec,1837,John M",
+          "10 Mar",
+          "6 Aug",
+          "William Buzzell,adivorcedman"
+        ],
+        "locationsExtra": [
+          "Loudon"
+        ],
+        "placeHints": [
+          {
+            "text": "Loudon",
+            "role": "birth",
+            "scope": "primary"
+          }
+        ],
+        "deathYear": 1863,
+        "deathDateText": "10 Oct.,1863",
+        "birthDateText": "16 Jan.,1815"
+      }
+    },
+    {
+      "key": "b in loudon|unknown",
+      "name": "B.in Loudon",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 154,
+          "lineNumber": 1,
+          "rawText": "138 WILLIAMLANEANDFAMILY.VIII.Hannah''',b.16 Jan.,1815,m.29 Dec,1837,John M.Wells,b.in Loudon,19 Mar.,1815,afarmerin Campton.Ch. : 1.Lydia J?{Wells),b.ii Oct.,1 S 3 S,m.10 Mar.,1854,Hiram Buzzdl,andhad:I.)Sarah{Buzzeliy,d.10 Oct.,1863.2.)Hannah F?,d.18 Oct.,1863.3.)Frederick^,b.6 Nov.,i 860.4.)Martha^,b.14 May,1862.5.)Ida^,b.27 Jan.,1864.2.John A?,b.22 Sept.,1840,d.27 Sept.,1862.3.Benjamin A?,b.16 Aug.,1842,d.27 Nov.,1862.4.Eben H?,b.20 Apr.,1845,m.6 Aug.,1865,Sarah A.Morrill,b.26 May,1848.Ch. : I.)George A?,b.6 Oct.,1866.2.)^27/?>i\u00a5.9,b.3 Aug.,1869.3.)Allie H?,b.16 Apr.,1871.5.Horace F?,b.30 Mar.,1847.6.Syrcne A.^,b.13 July,d.20 Dec,1849.7.Cjfrt;-Z.8,b.13 Feb.,1851,d.16 Oct.,1863.8.Hannah F.^,h.27 Sept.,18^3,m.William Buzzell,adivorcedman.9.Julia Ann^,b.15 Feb.,1856,d.17 Oct.,1 S 63.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "138 WILLIAMLANEANDFAMILY.VIII.Hannah''',b.16 Jan.,1815,m.29 Dec,1837,John M.Wells,b.in Loudon,19 Mar.,1815,afarmerin Campton.Ch. : 1.Lydia J?{Wells),b.ii Oct.,1 S 3 S,m.10 Mar.,1854,Hiram Buzzdl,andhad:I.)Sarah{Buzzeliy,d.10 Oct.,1863.2.)Hannah F?,d.18 Oct.,1863.3.)Frederick^,b.6 Nov.,i 860.4.)Martha^,b.14 May,1862.5.)Ida^,b.27 Jan.,1864.2.John A?,b.22 Sept.,1840,d.27 Sept.,1862.3.Benjamin A?,b.16 Aug.,1842,d.27 Nov.,1862.4.Eben H?,b.20 Apr.,1845,m.6 Aug.,1865,Sarah A.Morrill,b.26 May,1848.Ch. : I.)George A?,b.6 Oct.,1866.2.)^27/?>i\u00a5.9,b.3 Aug.,1869.3.)Allie H?,b.16 Apr.,1871.5.Horace F?,b.30 Mar.,1847.6.Syrcne A.^,b.13 July,d.20 Dec,1849.7.Cjfrt;-Z.8,b.13 Feb.,1851,d.16 Oct.,1863.8.Hannah F.^,h.27 Sept.,18^3,m.William Buzzell,adivorcedman.9.Julia Ann^,b.15 Feb.,1856,d.17 Oct.,1 S 63."
+      ],
+      "locations": []
+    },
+    {
+      "key": "adivorcedman|unknown",
+      "name": "Adivorcedman",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 154,
+          "lineNumber": 1,
+          "rawText": "138 WILLIAMLANEANDFAMILY.VIII.Hannah''',b.16 Jan.,1815,m.29 Dec,1837,John M.Wells,b.in Loudon,19 Mar.,1815,afarmerin Campton.Ch. : 1.Lydia J?{Wells),b.ii Oct.,1 S 3 S,m.10 Mar.,1854,Hiram Buzzdl,andhad:I.)Sarah{Buzzeliy,d.10 Oct.,1863.2.)Hannah F?,d.18 Oct.,1863.3.)Frederick^,b.6 Nov.,i 860.4.)Martha^,b.14 May,1862.5.)Ida^,b.27 Jan.,1864.2.John A?,b.22 Sept.,1840,d.27 Sept.,1862.3.Benjamin A?,b.16 Aug.,1842,d.27 Nov.,1862.4.Eben H?,b.20 Apr.,1845,m.6 Aug.,1865,Sarah A.Morrill,b.26 May,1848.Ch. : I.)George A?,b.6 Oct.,1866.2.)^27/?>i\u00a5.9,b.3 Aug.,1869.3.)Allie H?,b.16 Apr.,1871.5.Horace F?,b.30 Mar.,1847.6.Syrcne A.^,b.13 July,d.20 Dec,1849.7.Cjfrt;-Z.8,b.13 Feb.,1851,d.16 Oct.,1863.8.Hannah F.^,h.27 Sept.,18^3,m.William Buzzell,adivorcedman.9.Julia Ann^,b.15 Feb.,1856,d.17 Oct.,1 S 63.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "138 WILLIAMLANEANDFAMILY.VIII.Hannah''',b.16 Jan.,1815,m.29 Dec,1837,John M.Wells,b.in Loudon,19 Mar.,1815,afarmerin Campton.Ch. : 1.Lydia J?{Wells),b.ii Oct.,1 S 3 S,m.10 Mar.,1854,Hiram Buzzdl,andhad:I.)Sarah{Buzzeliy,d.10 Oct.,1863.2.)Hannah F?,d.18 Oct.,1863.3.)Frederick^,b.6 Nov.,i 860.4.)Martha^,b.14 May,1862.5.)Ida^,b.27 Jan.,1864.2.John A?,b.22 Sept.,1840,d.27 Sept.,1862.3.Benjamin A?,b.16 Aug.,1842,d.27 Nov.,1862.4.Eben H?,b.20 Apr.,1845,m.6 Aug.,1865,Sarah A.Morrill,b.26 May,1848.Ch. : I.)George A?,b.6 Oct.,1866.2.)^27/?>i\u00a5.9,b.3 Aug.,1869.3.)Allie H?,b.16 Apr.,1871.5.Horace F?,b.30 Mar.,1847.6.Syrcne A.^,b.13 July,d.20 Dec,1849.7.Cjfrt;-Z.8,b.13 Feb.,1851,d.16 Oct.,1863.8.Hannah F.^,h.27 Sept.,18^3,m.William Buzzell,adivorcedman.9.Julia Ann^,b.15 Feb.,1856,d.17 Oct.,1 S 63."
+      ],
+      "locations": []
+    },
+    {
+      "key": "william lane|1863",
+      "name": "William Lane",
+      "birthYear": 1863,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 158,
+          "lineNumber": 1,
+          "rawText": "I 40 WILLIAMLANEANDFAMILY.published,andattainedawidecirculation,viz.,\"Methodsof Teaching,\"\"School Elocution,\"and\"Normal Word Book.\"Ch.:I.)E 7 neline T.Y?,b.9 Mar,1863,m.J.VV.Parkhurst.2.)Frmik T?,b.22 Nov.,1869.3.)Nellie^,b.7 Apr.,1875.4.)Jn.French^,b.i Aug.,1879.Mrs.Lucretia Swettm.2 d 7 Feb.,1844,William Berryof Pittsfield(2)w.Hed.in 1870.In 1891 shewasawidowin San Francisco,Cal.,andhadlosthersight.VI.Harriet^,b.18 July,1806,amemberofthe Baptistchurch,m.18 Nov.,1829,William Lane''',s.of Eben Lane,Esq.,of Pitts-field,whod.15 Jan.,1848.Theyhad 6 ch.Allbutoned.early,unm.[See No.2>2\u201eIV.]In 1891 shewas Hvingin Stratham.VII.Samuel^,b.23 Oct.,1808,acarpenter,d.in Pittsfield,9 Dec,1841,unm.VIII.Nancy^,b.12 Jan.,i Sii,m.4 Jan.,1838,Nathaniel Wi GGi N,b.18 Oct.,1806,afarmerin Canterbury,thenin Stratham,wherehed.5 May,1891,ae.84 yrs.,7 mos.Ch. : 1.Eliza Ann''{Wiggin),b.14 Apr.,1839,m.30 Dec,i 860,Charles O.Brownof Northwood.Shed.16 Aug.,1 S 61,s.p.2.Ellen Sweti\\b.18 Nov.,1840,d.27 Aug.,1843.3.Mary Ellen'',b.16 May,1843,m.16 May,1 S 70,Charles Haleyof E.xeter.andd.30 Oct.,1877,leaving:I.)Charles EP,b.July,1873.2.)Emma D?,b.July,1875.4.E??ima Louise'',b.25 Dec,1849,m.3 Dec,1881,Herbert Wii^ginandhad:I.)Howardm:\",b.14 Sept.,1882.IX.Eliza^,twinsisterto Nancy,b.12 Jan.,1811,d.ae.26.X.Charles^,b.lo July,1813,m.21 May,1839,Sarah Burley,b.1815.Hed.3 Aug.,1883.Ch. : 1.Charles F?,b.12 July,1840,unm.2.John HP,b.3 Nov.,1844,m.Ahi.Maxfield.Ch. : I.)AIi 7 ia IV?2.)Mary F?3.)Clara S?4.)Bessie O?5.)Scott\"^.6.)Fannie F?XI.John Flavel^,b.27 Feb.,1816,m.14 Nov.,1839,Ruth L.'^NGLEY,b.1815.Hed.10 Mar.,1854.Ch. : 1.Fannie M?,b.i May,1 S 47,'^'^^-um\"-.in Amherst.2.Le Roy Johif,m.Drake,res.in Hyde Park,Mass.,s.p.",
+          "bio": {
+            "occupation": [
+              "Farmer",
+              "Carpenter"
+            ],
+            "military": [],
+            "education": [
+              "b.14 Apr.,1839,m.30 Dec,i 860,Charles O.Brownof Northwood.Shed.16 Aug.,1 S 61,s.p.2.Ellen Sweti\\b.18 Nov."
+            ],
+            "childrenNote": "6 ch. (from text); sine prole (from text)",
+            "placeHints": [
+              {
+                "text": "Hyde Park",
+                "role": "residence",
+                "scope": "primary"
+              },
+              {
+                "text": "Pittsfield",
+                "role": "death",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Hyde Park",
+              "Pittsfield",
+              "Eben Lane",
+              "Pitts-field",
+              "Amherst"
+            ],
+            "birthDateText": "9 Mar,1863",
+            "deathYear": 1813,
+            "deathDateText": "27 Aug.,1843",
+            "deathPlaceHints": [
+              "Pittsfield,9 Dec,1841,unm.VIII.Nancy^,b.12 Jan.,i Sii"
+            ],
+            "burialHints": [],
+            "marriageSnippets": [
+              "18 Nov",
+              "4 Jan",
+              "30 Dec,i 860,Charles O",
+              "16 May,1 S 70,Charles Haleyof E",
+              "3 Dec,1881,Herbert Wii^ginandhad:I",
+              "21 May,1839,Sarah Burley,b",
+              "14 Nov",
+              "Drake,res"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "I 40 WILLIAMLANEANDFAMILY.published,andattainedawidecirculation,viz.,\"Methodsof Teaching,\"\"School Elocution,\"and\"Normal Word Book.\"Ch.:I.)E 7 neline T.Y?,b.9 Mar,1863,m.J.VV.Parkhurst.2.)Frmik T?,b.22 Nov.,1869.3.)Nellie^,b.7 Apr.,1875.4.)Jn.French^,b.i Aug.,1879.Mrs.Lucretia Swettm.2 d 7 Feb.,1844,William Berryof Pittsfield(2)w.Hed.in 1870.In 1891 shewasawidowin San Francisco,Cal.,andhadlosthersight.VI.Harriet^,b.18 July,1806,amemberofthe Baptistchurch,m.18 Nov.,1829,William Lane''',s.of Eben Lane,Esq.,of Pitts-field,whod.15 Jan.,1848.Theyhad 6 ch.Allbutoned.early,unm.[See No.2>2\u201eIV.]In 1891 shewas Hvingin Stratham.VII.Samuel^,b.23 Oct.,1808,acarpenter,d.in Pittsfield,9 Dec,1841,unm.VIII.Nancy^,b.12 Jan.,i Sii,m.4 Jan.,1838,Nathaniel Wi GGi N,b.18 Oct.,1806,afarmerin Canterbury,thenin Stratham,wherehed.5 May,1891,ae.84 yrs.,7 mos.Ch. : 1.Eliza Ann''{Wiggin),b.14 Apr.,1839,m.30 Dec,i 860,Charles O.Brownof Northwood.Shed.16 Aug.,1 S 61,s.p.2.Ellen Sweti\\b.18 Nov.,1840,d.27 Aug.,1843.3.Mary Ellen'',b.16 May,1843,m.16 May,1 S 70,Charles Haleyof E.xeter.andd.30 Oct.,1877,leaving:I.)Charles EP,b.July,1873.2.)Emma D?,b.July,1875.4.E??ima Louise'',b.25 Dec,1849,m.3 Dec,1881,Herbert Wii^ginandhad:I.)Howardm:\",b.14 Sept.,1882.IX.Eliza^,twinsisterto Nancy,b.12 Jan.,1811,d.ae.26.X.Charles^,b.lo July,1813,m.21 May,1839,Sarah Burley,b.1815.Hed.3 Aug.,1883.Ch. : 1.Charles F?,b.12 July,1840,unm.2.John HP,b.3 Nov.,1844,m.Ahi.Maxfield.Ch. : I.)AIi 7 ia IV?2.)Mary F?3.)Clara S?4.)Bessie O?5.)Scott\"^.6.)Fannie F?XI.John Flavel^,b.27 Feb.,1816,m.14 Nov.,1839,Ruth L.'^NGLEY,b.1815.Hed.10 Mar.,1854.Ch. : 1.Fannie M?,b.i May,1 S 47,'^'^^-um\"-.in Amherst.2.Le Roy Johif,m.Drake,res.in Hyde Park,Mass.,s.p."
+      ],
+      "locations": [
+        "Hyde Park",
+        "Pittsfield",
+        "Eben Lane",
+        "Pitts-field",
+        "Amherst"
+      ],
+      "bio": {
+        "occupation": [
+          "Farmer",
+          "Carpenter"
+        ],
+        "military": [],
+        "education": [
+          "b.14 Apr.,1839,m.30 Dec,i 860,Charles O.Brownof Northwood.Shed.16 Aug.,1 S 61,s.p.2.Ellen Sweti\\b.18 Nov."
+        ],
+        "deathPlaceHints": [
+          "Pittsfield,9 Dec,1841,unm.VIII.Nancy^,b.12 Jan.,i Sii"
+        ],
+        "burialHints": [],
+        "marriageSnippets": [
+          "18 Nov",
+          "4 Jan",
+          "30 Dec,i 860,Charles O",
+          "16 May,1 S 70,Charles Haleyof E",
+          "3 Dec,1881,Herbert Wii^ginandhad:I",
+          "21 May,1839,Sarah Burley,b",
+          "14 Nov",
+          "Drake,res"
+        ],
+        "locationsExtra": [
+          "Hyde Park",
+          "Pittsfield",
+          "Eben Lane",
+          "Pitts-field",
+          "Amherst"
+        ],
+        "placeHints": [
+          {
+            "text": "Hyde Park",
+            "role": "residence",
+            "scope": "primary"
+          },
+          {
+            "text": "Pittsfield",
+            "role": "death",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "6 ch. (from text); sine prole (from text)",
+        "deathYear": 1813,
+        "deathDateText": "27 Aug.,1843",
+        "birthDateText": "9 Mar,1863"
+      }
+    },
+    {
+      "key": "i-mary moody|1802",
+      "name": "I-mary Moody",
+      "birthYear": 1802,
+      "generation": 2,
+      "sources": [
+        {
+          "pdfPageNumber": 161,
+          "lineNumber": 2,
+          "rawText": "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :",
+          "bio": {
+            "occupation": [
+              "Farmer",
+              "Deacon",
+              "Teacher"
+            ],
+            "military": [],
+            "education": [
+              "amuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,a"
+            ],
+            "childrenNote": "9 ch. (from text)",
+            "placeHints": [
+              {
+                "text": "Stratham",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Maumee City",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Portsmouth",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Shrewsbury",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Newmarket",
+                "role": "residence",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Stratham",
+              "Maumee City",
+              "Portsmouth",
+              "Shrewsbury",
+              "Newmarket",
+              "Theodore",
+              "Dea",
+              "William",
+              "Rye",
+              "Shrewsbury.Heisintheshoebusinessatthe West"
+            ],
+            "birthDateText": "21 Nov.,1802",
+            "deathYear": 1879,
+            "deathDateText": "16 Nov.,1879",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "1825,Nathan Gate,b",
+              "1837,John Thompsonof Stratham,2 dw",
+              "''',b",
+              "17 Jan",
+              "8 July,1844,Rev",
+              "andhadch"
+            ]
+          }
+        }
+      ],
+      "notes": [
+        "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :"
+      ],
+      "locations": [
+        "Stratham",
+        "Maumee City",
+        "Portsmouth",
+        "Shrewsbury",
+        "Newmarket",
+        "Theodore",
+        "Dea",
+        "William",
+        "Rye",
+        "Shrewsbury.Heisintheshoebusinessatthe West"
+      ],
+      "bio": {
+        "occupation": [
+          "Farmer",
+          "Deacon",
+          "Teacher"
+        ],
+        "military": [],
+        "education": [
+          "amuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,a"
+        ],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "1825,Nathan Gate,b",
+          "1837,John Thompsonof Stratham,2 dw",
+          "''',b",
+          "17 Jan",
+          "8 July,1844,Rev",
+          "andhadch"
+        ],
+        "locationsExtra": [
+          "Stratham",
+          "Maumee City",
+          "Portsmouth",
+          "Shrewsbury",
+          "Newmarket",
+          "Theodore",
+          "Dea",
+          "William",
+          "Rye",
+          "Shrewsbury.Heisintheshoebusinessatthe West"
+        ],
+        "placeHints": [
+          {
+            "text": "Stratham",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Maumee City",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Portsmouth",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Shrewsbury",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Newmarket",
+            "role": "residence",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "9 ch. (from text)",
+        "deathYear": 1879,
+        "deathDateText": "16 Nov.,1879",
+        "birthDateText": "21 Nov.,1802"
+      }
+    },
+    {
+      "key": "nathan gate|unknown",
+      "name": "Nathan Gate",
+      "birthYear": null,
+      "generation": 2,
+      "sources": [
+        {
+          "pdfPageNumber": 161,
+          "lineNumber": 2,
+          "rawText": "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :"
+      ],
+      "locations": []
+    },
+    {
+      "key": "john thompsonof stratham|unknown",
+      "name": "John Thompsonof Stratham",
+      "birthYear": null,
+      "generation": 2,
+      "sources": [
+        {
+          "pdfPageNumber": 161,
+          "lineNumber": 2,
+          "rawText": "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :"
+      ],
+      "locations": []
+    },
+    {
+      "key": "b in stratham|unknown",
+      "name": "B.in Stratham",
+      "birthYear": null,
+      "generation": 2,
+      "sources": [
+        {
+          "pdfPageNumber": 161,
+          "lineNumber": 2,
+          "rawText": "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :"
+      ],
+      "locations": []
+    },
+    {
+      "key": "williamf lane|1825",
+      "name": "Williamf. Lane",
+      "birthYear": 1825,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 162,
+          "lineNumber": 2,
+          "rawText": "No.86.WILLIAMF.LANE^(Wm.^,Sam.s,Sam.^Josh.3),1802-andhisw.MARY(BAILEY),hadb.in Wentworth: I.Eunice^,b.27 Feb.,1825.II.Hazen S,b.13 Oct.,1826.III.Mary*^,b.ir July,1828.IV.William^,b.8 Mar.,1830.V.Harriet^,b.4 Mar.,1832.VI.Luc Y^,b.5 May,1834.VII.George^,b.6 Mar.,1838.VIII.Charles^,b.23 Aug.,1839.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [
+              "Wentworth"
+            ],
+            "birthDateText": "27 Feb.,1825",
+            "deathYear": null,
+            "deathDateText": null,
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": []
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.86.WILLIAMF.LANE^(Wm.^,Sam.s,Sam.^Josh.3),1802-andhisw.MARY(BAILEY),hadb.in Wentworth: I.Eunice^,b.27 Feb.,1825.II.Hazen S,b.13 Oct.,1826.III.Mary*^,b.ir July,1828.IV.William^,b.8 Mar.,1830.V.Harriet^,b.4 Mar.,1832.VI.Luc Y^,b.5 May,1834.VII.George^,b.6 Mar.,1838.VIII.Charles^,b.23 Aug.,1839."
+      ],
+      "locations": [
+        "Wentworth"
+      ],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [],
+        "locationsExtra": [
+          "Wentworth"
+        ],
+        "birthDateText": "27 Feb.,1825"
+      }
+    },
+    {
+      "key": "james lane|1795",
+      "name": "James Lane",
+      "birthYear": 1795,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 162,
+          "lineNumber": 3,
+          "rawText": "No.87.JAMESLANE 6(Josh.^,Sam.^,Josh.^,Wm.^),1770-1833,of Pittsfieldand Stratham,teacher,tannerandfarmer,andhisw.DEBORAH(FOLSOM)had:I.William Frederick\",b.in Pittsfield,i Oct.,1795,wentto Hallowell,Me.,in 1816,wasabookseller,m.there 21 Dec,1820,Mary D.(dau.of Hon.Nath'land*Maria Dummer)Perley,b.2 Sept.,1799,whod.there 28 Mar.,1843,ae.43 yrs.,6 mos.Hewenttoseaandwaslost,\"supposedtohaved.ofcholerain New York.\"Heintroducedaniintotheword Lane,whenhewrotehisname,butthechangedoesnotpromisetobepermanent.Ch. : 1.Henry Perley^,b.23 Oct.,1821,d.ofconsumptionat Augusta,Ga.,24 Mar.,1844.2.Mary Louise^,b.IJan.,1824,m.1 S 44 Dr.C.H.Bonneyof Wayne,Me.[or Manchester,N.H.]andd.1851,leaving 2 ch : Clarw'and Fred^{Bonney').3.George Frederick^,b.21 Feb.,1826,d.in Boston,ae.20;aclerk.4.Richard William*,b.10 Sept.,1 S 2 S,wholedavariedlifewhichmightbestudiedwithinterestandprofit.Hewasinthe Royal.School,with Luna-lilo,Kingofthe Sandwich Islands.Hebecameapublicspirited Ha-waiian,butstillremainedapatriotic Americanofthekeen New Englandtype.Asamanhischaracterwasabovereproach.Hewaswith Scottinthe Mexicanwar,wherehewonamedal.Hewasanearlysettlerin*Mariawasdau.of Richard,abrotherof Lt.-Gov.William Dummer,founderofthe Academyin Byfield,Mass.Theirgrandfatherwasfrom Bishopstoke,England.In 1632 hereceivedagrantoflandin Newbury-Byfield.",
+          "bio": {
+            "occupation": [
+              "Tanner",
+              "Farmer",
+              "Clerk",
+              "Teacher"
+            ],
+            "military": [
+              "Hewaswith Scottinthe Mexicanwar,wherehewonamedal",
+              "of Richard,abrotherof Lt.-Gov"
+            ],
+            "education": [
+              "rof Lt.-Gov.William Dummer,founderofthe Academyin Byfield,Mass.Theirgrandfatherwasfrom Bishopstoke,England."
+            ],
+            "childrenNote": "2 ch. (from text)",
+            "placeHints": [
+              {
+                "text": "Pittsfield",
+                "role": "birth",
+                "scope": "primary"
+              },
+              {
+                "text": "Boston",
+                "role": "death",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Pittsfield",
+              "Boston",
+              "Pittsfieldand Stratham",
+              "Hon.Nath'land",
+              "Richard"
+            ],
+            "birthDateText": "2 Sept.,1799",
+            "deathYear": 1632,
+            "deathDateText": null,
+            "deathPlaceHints": [
+              "Boston,ae.20;aclerk.4.Richard William*,b.10 Sept.,1 S 2 S,wholedavariedlifewhichmightbestudiedwithinterestandprofit.Hewa"
+            ],
+            "burialHints": [],
+            "marriageSnippets": [
+              "there 21 Dec,1820,Mary D",
+              "1 S 44 Dr"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.87.JAMESLANE 6(Josh.^,Sam.^,Josh.^,Wm.^),1770-1833,of Pittsfieldand Stratham,teacher,tannerandfarmer,andhisw.DEBORAH(FOLSOM)had:I.William Frederick\",b.in Pittsfield,i Oct.,1795,wentto Hallowell,Me.,in 1816,wasabookseller,m.there 21 Dec,1820,Mary D.(dau.of Hon.Nath'land*Maria Dummer)Perley,b.2 Sept.,1799,whod.there 28 Mar.,1843,ae.43 yrs.,6 mos.Hewenttoseaandwaslost,\"supposedtohaved.ofcholerain New York.\"Heintroducedaniintotheword Lane,whenhewrotehisname,butthechangedoesnotpromisetobepermanent.Ch. : 1.Henry Perley^,b.23 Oct.,1821,d.ofconsumptionat Augusta,Ga.,24 Mar.,1844.2.Mary Louise^,b.IJan.,1824,m.1 S 44 Dr.C.H.Bonneyof Wayne,Me.[or Manchester,N.H.]andd.1851,leaving 2 ch : Clarw'and Fred^{Bonney').3.George Frederick^,b.21 Feb.,1826,d.in Boston,ae.20;aclerk.4.Richard William*,b.10 Sept.,1 S 2 S,wholedavariedlifewhichmightbestudiedwithinterestandprofit.Hewasinthe Royal.School,with Luna-lilo,Kingofthe Sandwich Islands.Hebecameapublicspirited Ha-waiian,butstillremainedapatriotic Americanofthekeen New Englandtype.Asamanhischaracterwasabovereproach.Hewaswith Scottinthe Mexicanwar,wherehewonamedal.Hewasanearlysettlerin*Mariawasdau.of Richard,abrotherof Lt.-Gov.William Dummer,founderofthe Academyin Byfield,Mass.Theirgrandfatherwasfrom Bishopstoke,England.In 1632 hereceivedagrantoflandin Newbury-Byfield."
+      ],
+      "locations": [
+        "Pittsfield",
+        "Boston",
+        "Pittsfieldand Stratham",
+        "Hon.Nath'land",
+        "Richard"
+      ],
+      "bio": {
+        "occupation": [
+          "Tanner",
+          "Farmer",
+          "Clerk",
+          "Teacher"
+        ],
+        "military": [
+          "Hewaswith Scottinthe Mexicanwar,wherehewonamedal",
+          "of Richard,abrotherof Lt.-Gov"
+        ],
+        "education": [
+          "rof Lt.-Gov.William Dummer,founderofthe Academyin Byfield,Mass.Theirgrandfatherwasfrom Bishopstoke,England."
+        ],
+        "deathPlaceHints": [
+          "Boston,ae.20;aclerk.4.Richard William*,b.10 Sept.,1 S 2 S,wholedavariedlifewhichmightbestudiedwithinterestandprofit.Hewa"
+        ],
+        "burialHints": [],
+        "marriageSnippets": [
+          "there 21 Dec,1820,Mary D",
+          "1 S 44 Dr"
+        ],
+        "locationsExtra": [
+          "Pittsfield",
+          "Boston",
+          "Pittsfieldand Stratham",
+          "Hon.Nath'land",
+          "Richard"
+        ],
+        "placeHints": [
+          {
+            "text": "Pittsfield",
+            "role": "birth",
+            "scope": "primary"
+          },
+          {
+            "text": "Boston",
+            "role": "death",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "2 ch. (from text)",
+        "deathYear": 1632,
+        "birthDateText": "2 Sept.,1799"
+      }
+    },
+    {
+      "key": "deborah|unknown",
+      "name": "Deborah",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 162,
+          "lineNumber": 3,
+          "rawText": "No.87.JAMESLANE 6(Josh.^,Sam.^,Josh.^,Wm.^),1770-1833,of Pittsfieldand Stratham,teacher,tannerandfarmer,andhisw.DEBORAH(FOLSOM)had:I.William Frederick\",b.in Pittsfield,i Oct.,1795,wentto Hallowell,Me.,in 1816,wasabookseller,m.there 21 Dec,1820,Mary D.(dau.of Hon.Nath'land*Maria Dummer)Perley,b.2 Sept.,1799,whod.there 28 Mar.,1843,ae.43 yrs.,6 mos.Hewenttoseaandwaslost,\"supposedtohaved.ofcholerain New York.\"Heintroducedaniintotheword Lane,whenhewrotehisname,butthechangedoesnotpromisetobepermanent.Ch. : 1.Henry Perley^,b.23 Oct.,1821,d.ofconsumptionat Augusta,Ga.,24 Mar.,1844.2.Mary Louise^,b.IJan.,1824,m.1 S 44 Dr.C.H.Bonneyof Wayne,Me.[or Manchester,N.H.]andd.1851,leaving 2 ch : Clarw'and Fred^{Bonney').3.George Frederick^,b.21 Feb.,1826,d.in Boston,ae.20;aclerk.4.Richard William*,b.10 Sept.,1 S 2 S,wholedavariedlifewhichmightbestudiedwithinterestandprofit.Hewasinthe Royal.School,with Luna-lilo,Kingofthe Sandwich Islands.Hebecameapublicspirited Ha-waiian,butstillremainedapatriotic Americanofthekeen New Englandtype.Asamanhischaracterwasabovereproach.Hewaswith Scottinthe Mexicanwar,wherehewonamedal.Hewasanearlysettlerin*Mariawasdau.of Richard,abrotherof Lt.-Gov.William Dummer,founderofthe Academyin Byfield,Mass.Theirgrandfatherwasfrom Bishopstoke,England.In 1632 hereceivedagrantoflandin Newbury-Byfield.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.87.JAMESLANE 6(Josh.^,Sam.^,Josh.^,Wm.^),1770-1833,of Pittsfieldand Stratham,teacher,tannerandfarmer,andhisw.DEBORAH(FOLSOM)had:I.William Frederick\",b.in Pittsfield,i Oct.,1795,wentto Hallowell,Me.,in 1816,wasabookseller,m.there 21 Dec,1820,Mary D.(dau.of Hon.Nath'land*Maria Dummer)Perley,b.2 Sept.,1799,whod.there 28 Mar.,1843,ae.43 yrs.,6 mos.Hewenttoseaandwaslost,\"supposedtohaved.ofcholerain New York.\"Heintroducedaniintotheword Lane,whenhewrotehisname,butthechangedoesnotpromisetobepermanent.Ch. : 1.Henry Perley^,b.23 Oct.,1821,d.ofconsumptionat Augusta,Ga.,24 Mar.,1844.2.Mary Louise^,b.IJan.,1824,m.1 S 44 Dr.C.H.Bonneyof Wayne,Me.[or Manchester,N.H.]andd.1851,leaving 2 ch : Clarw'and Fred^{Bonney').3.George Frederick^,b.21 Feb.,1826,d.in Boston,ae.20;aclerk.4.Richard William*,b.10 Sept.,1 S 2 S,wholedavariedlifewhichmightbestudiedwithinterestandprofit.Hewasinthe Royal.School,with Luna-lilo,Kingofthe Sandwich Islands.Hebecameapublicspirited Ha-waiian,butstillremainedapatriotic Americanofthekeen New Englandtype.Asamanhischaracterwasabovereproach.Hewaswith Scottinthe Mexicanwar,wherehewonamedal.Hewasanearlysettlerin*Mariawasdau.of Richard,abrotherof Lt.-Gov.William Dummer,founderofthe Academyin Byfield,Mass.Theirgrandfatherwasfrom Bishopstoke,England.In 1632 hereceivedagrantoflandin Newbury-Byfield."
+      ],
+      "locations": [
+        "Pittsfield",
+        "Boston",
+        "Pittsfieldand Stratham",
+        "Hon.Nath'land",
+        "Richard"
+      ]
+    },
+    {
+      "key": "stephen lane|1799",
+      "name": "Stephen Lane",
+      "birthYear": 1799,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 164,
+          "lineNumber": 2,
+          "rawText": "No.88.STEPHENLANE 6(Josh.^Sam.^,Josh.^,VVm.'^),1771-1840,joiner,andhisw.LOIS(CURRIER),res.in Stewartstovvn,Coos Co.,N.H.,andin Moscow,N.Y.,had: I.Sarah^,b.22 June,1799,d.1843,m.1822,Isaac Beers,whod.1843.Theyhad 5 ch. : I.Stephen^{Beers).2.Anna\"^.3.Jane^.4.Ruhama^.5.Uriah''.Alldeadin 1886.II.Charles^,b.20 Jan.,1801,d.21 July,1830.Hem.in 1823,A.Wardwell.Ch. : 1.Hannah^,b.1823.2.Eliza^,b.1825.3.Laura^,b.1827.4.Charles^,b.1829.*Jere L.(s.of Abner)Aferrill,wasb.in Newbury,Mass.,21 Apr.,1791.In 1816 hecommencedthemanufactureofhatsin Exeter,andcontinuedit 62 years.Tothisheaddedthetradeinwoolwhichheandhissonscontinuedmanyyearswithremarkablesuccess.",
+          "bio": {
+            "occupation": [
+              "Joiner"
+            ],
+            "military": [],
+            "education": [],
+            "childrenNote": "5 ch. (from text)",
+            "placeHints": [
+              {
+                "text": "Stewartstovvn",
+                "role": "residence",
+                "scope": "primary"
+              }
+            ],
+            "locationsExtra": [
+              "Stewartstovvn",
+              "Abner",
+              "Newbury"
+            ],
+            "birthDateText": "22 June,1799",
+            "deathYear": 1830,
+            "deathDateText": "21 July,1830",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "1822,Isaac Beers,whod"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "No.88.STEPHENLANE 6(Josh.^Sam.^,Josh.^,VVm.'^),1771-1840,joiner,andhisw.LOIS(CURRIER),res.in Stewartstovvn,Coos Co.,N.H.,andin Moscow,N.Y.,had: I.Sarah^,b.22 June,1799,d.1843,m.1822,Isaac Beers,whod.1843.Theyhad 5 ch. : I.Stephen^{Beers).2.Anna\"^.3.Jane^.4.Ruhama^.5.Uriah''.Alldeadin 1886.II.Charles^,b.20 Jan.,1801,d.21 July,1830.Hem.in 1823,A.Wardwell.Ch. : 1.Hannah^,b.1823.2.Eliza^,b.1825.3.Laura^,b.1827.4.Charles^,b.1829.*Jere L.(s.of Abner)Aferrill,wasb.in Newbury,Mass.,21 Apr.,1791.In 1816 hecommencedthemanufactureofhatsin Exeter,andcontinuedit 62 years.Tothisheaddedthetradeinwoolwhichheandhissonscontinuedmanyyearswithremarkablesuccess."
+      ],
+      "locations": [
+        "Stewartstovvn",
+        "Abner",
+        "Newbury"
+      ],
+      "bio": {
+        "occupation": [
+          "Joiner"
+        ],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "1822,Isaac Beers,whod"
+        ],
+        "locationsExtra": [
+          "Stewartstovvn",
+          "Abner",
+          "Newbury"
+        ],
+        "placeHints": [
+          {
+            "text": "Stewartstovvn",
+            "role": "residence",
+            "scope": "primary"
+          }
+        ],
+        "childrenNote": "5 ch. (from text)",
+        "deathYear": 1830,
+        "deathDateText": "21 July,1830",
+        "birthDateText": "22 June,1799"
+      }
+    },
+    {
+      "key": "lois|unknown",
+      "name": "Lois",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 164,
+          "lineNumber": 2,
+          "rawText": "No.88.STEPHENLANE 6(Josh.^Sam.^,Josh.^,VVm.'^),1771-1840,joiner,andhisw.LOIS(CURRIER),res.in Stewartstovvn,Coos Co.,N.H.,andin Moscow,N.Y.,had: I.Sarah^,b.22 June,1799,d.1843,m.1822,Isaac Beers,whod.1843.Theyhad 5 ch. : I.Stephen^{Beers).2.Anna\"^.3.Jane^.4.Ruhama^.5.Uriah''.Alldeadin 1886.II.Charles^,b.20 Jan.,1801,d.21 July,1830.Hem.in 1823,A.Wardwell.Ch. : 1.Hannah^,b.1823.2.Eliza^,b.1825.3.Laura^,b.1827.4.Charles^,b.1829.*Jere L.(s.of Abner)Aferrill,wasb.in Newbury,Mass.,21 Apr.,1791.In 1816 hecommencedthemanufactureofhatsin Exeter,andcontinuedit 62 years.Tothisheaddedthetradeinwoolwhichheandhissonscontinuedmanyyearswithremarkablesuccess.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.88.STEPHENLANE 6(Josh.^Sam.^,Josh.^,VVm.'^),1771-1840,joiner,andhisw.LOIS(CURRIER),res.in Stewartstovvn,Coos Co.,N.H.,andin Moscow,N.Y.,had: I.Sarah^,b.22 June,1799,d.1843,m.1822,Isaac Beers,whod.1843.Theyhad 5 ch. : I.Stephen^{Beers).2.Anna\"^.3.Jane^.4.Ruhama^.5.Uriah''.Alldeadin 1886.II.Charles^,b.20 Jan.,1801,d.21 July,1830.Hem.in 1823,A.Wardwell.Ch. : 1.Hannah^,b.1823.2.Eliza^,b.1825.3.Laura^,b.1827.4.Charles^,b.1829.*Jere L.(s.of Abner)Aferrill,wasb.in Newbury,Mass.,21 Apr.,1791.In 1816 hecommencedthemanufactureofhatsin Exeter,andcontinuedit 62 years.Tothisheaddedthetradeinwoolwhichheandhissonscontinuedmanyyearswithremarkablesuccess."
+      ],
+      "locations": [
+        "Stewartstovvn",
+        "Abner",
+        "Newbury"
+      ]
+    },
+    {
+      "key": "isaac beers|unknown",
+      "name": "Isaac Beers",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 164,
+          "lineNumber": 2,
+          "rawText": "No.88.STEPHENLANE 6(Josh.^Sam.^,Josh.^,VVm.'^),1771-1840,joiner,andhisw.LOIS(CURRIER),res.in Stewartstovvn,Coos Co.,N.H.,andin Moscow,N.Y.,had: I.Sarah^,b.22 June,1799,d.1843,m.1822,Isaac Beers,whod.1843.Theyhad 5 ch. : I.Stephen^{Beers).2.Anna\"^.3.Jane^.4.Ruhama^.5.Uriah''.Alldeadin 1886.II.Charles^,b.20 Jan.,1801,d.21 July,1830.Hem.in 1823,A.Wardwell.Ch. : 1.Hannah^,b.1823.2.Eliza^,b.1825.3.Laura^,b.1827.4.Charles^,b.1829.*Jere L.(s.of Abner)Aferrill,wasb.in Newbury,Mass.,21 Apr.,1791.In 1816 hecommencedthemanufactureofhatsin Exeter,andcontinuedit 62 years.Tothisheaddedthetradeinwoolwhichheandhissonscontinuedmanyyearswithremarkablesuccess.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "No.88.STEPHENLANE 6(Josh.^Sam.^,Josh.^,VVm.'^),1771-1840,joiner,andhisw.LOIS(CURRIER),res.in Stewartstovvn,Coos Co.,N.H.,andin Moscow,N.Y.,had: I.Sarah^,b.22 June,1799,d.1843,m.1822,Isaac Beers,whod.1843.Theyhad 5 ch. : I.Stephen^{Beers).2.Anna\"^.3.Jane^.4.Ruhama^.5.Uriah''.Alldeadin 1886.II.Charles^,b.20 Jan.,1801,d.21 July,1830.Hem.in 1823,A.Wardwell.Ch. : 1.Hannah^,b.1823.2.Eliza^,b.1825.3.Laura^,b.1827.4.Charles^,b.1829.*Jere L.(s.of Abner)Aferrill,wasb.in Newbury,Mass.,21 Apr.,1791.In 1816 hecommencedthemanufactureofhatsin Exeter,andcontinuedit 62 years.Tothisheaddedthetradeinwoolwhichheandhissonscontinuedmanyyearswithremarkablesuccess."
+      ],
+      "locations": []
+    },
+    {
+      "key": "rev joshua lane|1808",
+      "name": "Rev.joshua Lane",
+      "birthYear": 1808,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 165,
+          "lineNumber": 4,
+          "rawText": "REV.JOSHUALANE 6(Josh.-\\Sam.4,Josh.3,Wm.2),1773-1846,andhis(i)w.ELIZABETH(EATON)had:I.and II.Namesunknown.Byhis(2)w.CHARITY(DICKINSON),REV.JOSHUALANE 6 had: III.Mary''',b.25 Aug.,1808,m.19 Apr.,1829,James Edgar Hopkins,b.at Hartford,Conn.,Dec,1804,d.at Cleveland,O.,1868.Ch. : 1.Edgar Augustus^{Hopkins),b.19 Jan.,1830,d.3 July,1877.Hem.Oct.,l 86\u00ab,Emma Almira Patchen,andhadnoch.2.Mary Sophia^,b.19 Oct.,1832,m.19 Sept.,1861,Jerome L.Hopkins(norelation),d.17 June,1882.Ch. : I.)Florence Jerome^,b.16 Sept.,1862,whom.16 Oct.,1883,Francis H.Dnncanandhad : a.Bruce^\u00b0,b.1884.2.)Frederick Louis^,b.8 Aug.,1868.",
+          "bio": {
+            "occupation": [],
+            "military": [],
+            "education": [],
+            "childrenNote": null,
+            "placeHints": [],
+            "locationsExtra": [],
+            "birthDateText": "25 Aug.,1808",
+            "deathYear": 1882,
+            "deathDateText": "3 July,1877",
+            "deathPlaceHints": [],
+            "burialHints": [],
+            "marriageSnippets": [
+              "19 Apr",
+              "19 Sept"
+            ]
+          },
+          "titles": []
+        }
+      ],
+      "notes": [
+        "REV.JOSHUALANE 6(Josh.-\\Sam.4,Josh.3,Wm.2),1773-1846,andhis(i)w.ELIZABETH(EATON)had:I.and II.Namesunknown.Byhis(2)w.CHARITY(DICKINSON),REV.JOSHUALANE 6 had: III.Mary''',b.25 Aug.,1808,m.19 Apr.,1829,James Edgar Hopkins,b.at Hartford,Conn.,Dec,1804,d.at Cleveland,O.,1868.Ch. : 1.Edgar Augustus^{Hopkins),b.19 Jan.,1830,d.3 July,1877.Hem.Oct.,l 86\u00ab,Emma Almira Patchen,andhadnoch.2.Mary Sophia^,b.19 Oct.,1832,m.19 Sept.,1861,Jerome L.Hopkins(norelation),d.17 June,1882.Ch. : I.)Florence Jerome^,b.16 Sept.,1862,whom.16 Oct.,1883,Francis H.Dnncanandhad : a.Bruce^\u00b0,b.1884.2.)Frederick Louis^,b.8 Aug.,1868."
+      ],
+      "locations": [],
+      "bio": {
+        "occupation": [],
+        "military": [],
+        "education": [],
+        "deathPlaceHints": [],
+        "burialHints": [],
+        "marriageSnippets": [
+          "19 Apr",
+          "19 Sept"
+        ],
+        "locationsExtra": [],
+        "deathYear": 1882,
+        "deathDateText": "3 July,1877",
+        "birthDateText": "25 Aug.,1808"
+      }
+    },
+    {
+      "key": "elizabeth|unknown",
+      "name": "Elizabeth",
+      "birthYear": null,
+      "generation": 0,
+      "sources": [
+        {
+          "pdfPageNumber": 165,
+          "lineNumber": 4,
+          "rawText": "REV.JOSHUALANE 6(Josh.-\\Sam.4,Josh.3,Wm.2),1773-1846,andhis(i)w.ELIZABETH(EATON)had:I.and II.Namesunknown.Byhis(2)w.CHARITY(DICKINSON),REV.JOSHUALANE 6 had: III.Mary''',b.25 Aug.,1808,m.19 Apr.,1829,James Edgar Hopkins,b.at Hartford,Conn.,Dec,1804,d.at Cleveland,O.,1868.Ch. : 1.Edgar Augustus^{Hopkins),b.19 Jan.,1830,d.3 July,1877.Hem.Oct.,l 86\u00ab,Emma Almira Patchen,andhadnoch.2.Mary Sophia^,b.19 Oct.,1832,m.19 Sept.,1861,Jerome L.Hopkins(norelation),d.17 June,1882.Ch. : I.)Florence Jerome^,b.16 Sept.,1862,whom.16 Oct.,1883,Francis H.Dnncanandhad : a.Bruce^\u00b0,b.1884.2.)Frederick Louis^,b.8 Aug.,1868.",
+          "bio": {}
+        }
+      ],
+      "notes": [
+        "REV.JOSHUALANE 6(Josh.-\\Sam.4,Josh.3,Wm.2),1773-1846,andhis(i)w.ELIZABETH(EATON)had:I.and II.Namesunknown.Byhis(2)w.CHARITY(DICKINSON),REV.JOSHUALANE 6 had: III.Mary''',b.25 Aug.,1808,m.19 Apr.,1829,James Edgar Hopkins,b.at Hartford,Conn.,Dec,1804,d.at Cleveland,O.,1868.Ch. : 1.Edgar Augustus^{Hopkins),b.19 Jan.,1830,d.3 July,1877.Hem.Oct.,l 86\u00ab,Emma Almira Patchen,andhadnoch.2.Mary Sophia^,b.19 Oct.,1832,m.19 Sept.,1861,Jerome L.Hopkins(norelation),d.17 June,1882.Ch. : I.)Florence Jerome^,b.16 Sept.,1862,whom.16 Oct.,1883,Francis H.Dnncanandhad : a.Bruce^\u00b0,b.1884.2.)Frederick Louis^,b.8 Aug.,1868."
+      ],
+      "locations": []
+    }
+  ],
+  "acceptedRelationships": [
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1797",
+      "targetKey": "whod|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 142,
+      "lineNumber": 1,
+      "rawText": "126 WILLIAMLANEANDFAMILY.I.Amasa K.6(Seavey),b.13 June,1797,m.2 June,1825,Maria Libbey,andhad 2 ch.: Philena'and Ruth L?,d.i July,1829.II.Ruth M.^,b.8 Mar.,1799,m.13 Mar.,1823,J.N.C.Leaviit,of Chichester.Shed.2 Apr.,1872.Ch.: I.George C?{^Leavitt^.2.Augustus'.3.Elvira'.4.Nathanie P . 5.yacintha' . III.Reuben L.\u00ab,b.27 Aug.,1801,d.26 Oct.,1888;m.13 Nov.,1828,Dorothy(dau.of Jamesand Anna)Towle,b.ii Aug.,1803,d.12 June,1867;res.at Hampton.Ch. : 1.Elizabeth P?,b.29 Aug.,1829,m.(i)David M.Dearborn,whod.9 Nov.,1865,muchlamented.Theyres.in Concordandhad; I.)George Merrili P,{Dearbor 7 t),b.17 May,1864.Elizabeth P?,m.(2)Jn.H.Johnson.2.George James'',b.31 Mar.,1832,d.at Dayton O.,18 May,1859.3.Isabella'',b.22 Dec,1835.4.Edward Payson'',b.2 Sept.,1843,d.at Hampton,5 Jan.,1851.5.Henry Lle'wellyn'',b.IIOct.,1847,d.at Hampton,il Jan.,1851.IV.Nathaniel^,b.6 Aug.,1803,ofthe Congregationalchurch;m.13 Aug.,1834,Mary Ann Hinds,ofthe Methodistchurch,res.in Chichester.Ch. : 1.Ann M?,b.2 June,1835.2.Mary Jane'',b.29 Apr.,1837.3.Betsey Drake'',b.23 July,1840.V.Sally L.^,b.16 Jan.,1806,m.16 Nov.,1828,Jn.Eaton,Jr.,res.in Grantham;both Methodists.Ch. : 1.Benjamin F'rank''{Eaton).2.Augusta''.VI.Shadrach*\"',b.23 Feb.,t 8 o 8,m.22 Jan.,1834,Belinda Herbert,bothofthe Congregationalchurch,res.in Concord.Ch. : I.Herberf.2.Ellen Augusta''.VII.Betsey^,b.14 Oct.,1811,ofthe Baptistchurch;m.13 Aug.[Oct.?],1834,James Drake,b.at Pittsfield,29 June,1805,d.7 Apr.,1870;Betseyd.28 Sept.,1865.Res.in Pittsfield.Ch. : 1.Georgiana Butters''{Drake),b.15 Jan.,1836,m.ISept.,l?>$%,Josiah Car-penter,b.31 May,1829,andhad: 1.)Georgia Ella^,b.Oct.,1859,d.Aug.,1889.2.Franklin James'',b.3 Nov.,1842,m.7 June,1869,Harriet C.E,Barkerb.29 Dec,1848.Ch. :"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1791",
+      "targetKey": "mary|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 144,
+      "lineNumber": 1,
+      "rawText": "128 WILLIAMLANEANDFAMILY.III.Lydia^,b.9 Aug.,1791,d.unm.in West Newfield,Me.,24 Apr.,1869.(132)I^-BENj AMi Np,b.24 Apr.,1794,m.8 May,1825,Irene(dau.of Johnand Rebecca)Tuckerof Bath,Me.,andd.at Pier-mont,28 May,1868.Shed.in Sandwich,17 Nov.,1887,ae.82.Theyres.at Lake Village,N.H.,andhad 11 ch.V.Sarahc,b.28 Sept.,1796,m.Isaac Marstonof North Hampton.Attheageof 91,havingoutlivedherchildren,shewasatthereunionin Hampton.In 1890 shewaslivingin West New-field,Me.,ae.94.Ch.: 1.Daniel Simon''(^Marston'),d.ae.20.2.JMa)y Esther'',m.John Garland,andd.1 S 7 S.By(2)w.MARY(Mollie)TOWLE,JONATHANLANE^had:VI.Ann\",b.in Hampton Falls,28 Sept.,1799,d.at Epsom,May,1 S 62,whom.25 Dec,1823,Benvolio Sanbornof Epsomandhad: 1.Samuel''{Sanborn),b.28 Jan.,1 S 26,whom.Elizabeth Stoddardoi Tol-land,Conn.,andhad:I.)Isette D?2.)Wallace?2.Charlotte MP,b.20 Jan.,1828,m.Jn.A.Gardnerof Groton,Mass.,andd.IIJan.,1857.Ch.:I.)Ida F.Killihur^,of Louisville,Ky.2.)Stella M.Garretson^,of Rochester,N.Y.3.Susan P?,twinto Charlotte M.,d.24 Feb.,1834.4.Elizabeth M?,b.15 Apr.,1830,111.(i)William W.Virginof Concordandhad:I.)Netties.Walker\"^,oi Qoncor A.Elizabeth M?,m.(2)Walter Gageof Concord,andd.28 Sept.,|i 888.5.Joel L?,\\i.13 Oct.,1832.Hewasaboardthe Kearsargeinthewar,andgivesaninterestingaccountofthesinkingofthe Sumter.6.Edwi)i',b.14 Apr.,1835,i^-/i'\"''/^^/Z^'''''of Belgrade,Me.Ch. : I.)Dane A?,of Lynn,Mass.7.Ostinellfjh.T,P'eb.,1837,servedduringthe Rebellioninthe 17 th Maineregiment,regular Army,wasseverelywoundedinthebattleof Gettys-burg,andreceivedapensiontillhisdeath,11 Jan.,1 S 72.8.Mary'',b.31 Jan.,1839.9.Clara MP,b.27 July,1840,m.JValter Gageof Concord.ID.Moses'',b.12 Apr.,1842,m.Lilian Ordwayof Chichester,andd.2 June,1870.Ch.:I.)Annie^.2.)Lilian^.3.)Clara^.4.)Austin^."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "jonathan lane|1844",
+      "targetKey": "idowd in lowell|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 145,
+      "lineNumber": 1,
+      "rawText": "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "jonathan lane|1844",
+      "targetKey": "b at piermontor orford|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 145,
+      "lineNumber": 1,
+      "rawText": "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "jonathan lane|1844",
+      "targetKey": "b at augusta|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 145,
+      "lineNumber": 1,
+      "rawText": "NUMBERSEVENTY-SEVEN.129 II.Drusilla E?,b.IJune,1844,111.24 Aug.,1866,Charles H.Whittieroi Raymond.VII.Rachel^,b.19 Apr,,1801,m.James(s.of Jas.and Tamar)Kent,b.at Piermontor Orford,21 Oct.,1800,andd.in Lowell,Mass.,26 Apr.,1876.Racheld.at Lowell,Mass.,22 Dec,1880.Thefather,James Kent,wasashoemanufacturer,areligiousman,anardent Abolitionist,andrespectedbyhisfellowcitizens.Hediedattheageof 70 fromasuddenshockofapo-plexy.Ch.b.in Piermont : 1.Miriam H?{A'e 7 it),b.24 June,1824,asuccessfulteacherin Lowellmorethan 30 years.2.Sarah E.'',b.IIAug.,1826,m.12 Aug.,1846,Samuel Bement,princi-palofthe Bartlettschool,Lowell 40 yrs.Ch. : I.)Charles J?{Bejjient),b.25 Aug.,1 S 51,d.ISept.,1 S 65.2.)Gerard^,b.17 July,1855,alawyerin Boston.3.)Mary M?,b.27 Oct.,1859.3.Tamar M?,b.4 Feb.,1828,m.11 Apr.,1854,Aaron Hale.Ch. : I.)George H?{Hale),b.1855,d.4 Dec,1874.3.)Dora F?.4.Eliza A.\\b.28 July,1830,d.13 May,1832.5.Mary AJ,h.2 Jan.,1833.6.jfane A?,b.5 Dec,1835,'\"\u20224 Dec,1862,Joseph Chamberlain,res.in Bangor,Me.Ch. : I.)Hawthorne^{Chamberlaiit),b.31 July,1863,d.22 Feb.,1870.2.)James Kent^,b.8 Jan.,1867.3.)Grace\"\",b.28 Aug.,1868.4.)Joseph F,?,b.3 June,1870.5.)Marion/.?,b.16 June,1872.6.)Kate^,h.11 Mar.,1874.7.Henrf,b.in Lowell,29 Nov.,1839,d.23 Oct.,1840.8.Henrietta'',b.29 Nov.,1839,d.26 Sept.,1840.9.El Dora FP,b.27 Sept.,1844,d.31 Oct.,1849.10.Oriole,b.27 Oct.,1846,d.13 Aug.,1848.JONATHANLANE-',by(2 wife),MATTIE(TOWLE),had:VIII.Jonathan^,b.19 Jan.,1803,m.Sophia(dau.of Brad-buryand Abi.N.)Blake,b.at Augusta,Me.Hewasanexpress-manin Lincoln,Me.,wherehed.19 Nov.,1845,ae.near 42.Hiswidowd.in Lowell,Mass.,12 Dec,1879.Ch. : 1.Almira'',b.14 July,1833,m.Charles Hartof Manchesterandhad:I.)Ella Vernette^{Hart).2.)Addie Louisa^.2.I\\fary Abbie\"^,b.12 Feb.,1835,m.in Nashua,1 July,1858,Hezro William Hubbardoi Sullivan,N.H.,b.in Gilsum,12 Oct.,1833,machinemakerin Keene.Ch. : I.)William Lane^{Hubbard),b.in Sullivan,N.H.,23 July,1859,m.in Nashua,16 Feb.,1887,Grace Geneva Gage,andhad:"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "asa lane|1789",
+      "targetKey": "sarah|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 148,
+      "lineNumber": 3,
+      "rawText": "No.78.ASALANE 5(Sam.4,Sam.3,Wm.^),1763-1847,andhisw.SARAH(JAMES)hadb.in Chichester: I,Betsey'',b.12 June,1789,m.June,1827,Bracket L.Nor-Ris,andd.s.p.in Pittsfield,amemberofthe Congregationalchurch.n.Samuel^,b.Nov.,1790,d.Dec,1791,ae.iyr.HI.Sally^,b.29 Feb.,1792,m.i May,1816,Joseph Pervier,res.at Wilmot,membersofthe Baptistchurch;had 7 ch.IV.Polly'5,b.22 April,1794,m.Oct.,1812,David Bakerof Goshen;membersofthe Baptistchurch,Had 2 s.and 3 daus.V.Lydia'',b.22 Nov.,1796,m.16 June,1823,John Carpen-ter,of Chichester,bothofthe Congregationalchurch;had 4 ch.VI.Nancy^,twinsisterto Lydia,m.i Oct.,1812,Lovewell Bakerof Croydonboth Baptists.Theyhad 5 ch.VII.As A^,d.20 Sept.,1802,ae.2 yrs.VIII.Sophia^,andatwin,b.12 July,1803.IX.Asa\",b.July,1803,d.Aug.,1803.X.Joshua J.,b.19 Apr.,1805,d.May,1806.XLHu LDAHJ.\"^,b.9 Jan.,1809,m.18 Nov.,1831,George S.Masonof Chichester,ofthe M.E.church;had 3 ch."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1782",
+      "targetKey": "whiteof andover|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 150,
+      "lineNumber": 1,
+      "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1782",
+      "targetKey": "martha|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 150,
+      "lineNumber": 1,
+      "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1782",
+      "targetKey": "ilamjah olive marvinof|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 150,
+      "lineNumber": 1,
+      "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1782",
+      "targetKey": "abby|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 150,
+      "lineNumber": 1,
+      "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1782",
+      "targetKey": "of hampton|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 150,
+      "lineNumber": 1,
+      "rawText": "134 WILLIAMLANEANDFAMILY.I.Daniel\",b.1782,m.1804,Martha(dau.of Zacheus)Brownof Hampton,b.1783.Hed.6 Mar.,1847.Shed.i May,1864.Ch.b.in Hampton: I.William'',h.IMay,1805,m.8 Dec,1836,Lticretia Prescott,whod.1837.Ch.:I.)Williani^,d.30 Mar.,1850,ae.18 yrs.(133)2.Jesse Appleton\\b.31 Dec,1808,m.(i)1831,Ilamjah Olive Marvinof Newcastle,b.1807,whod.21 Nov.,1853.Hem.(2)li Dec,1856,Mrs.Elizabeth Hobbs(dau.of Moses Leavitt)of Hampton.3.Adna Brown',b.in Hampton,25 Jan.,1821,m.1849,Abby(dau.of Si-mon)Dearbornof Hampton,b.27 Mar.,1823.Ch.b.in Hampton:I.)Simon Dearborn^,b.23 Dec,1853.2.)Mary Hannah'^,b.27 Mar.,1858,m.19 Oct.,1 S 85,Arthur W.Whiteof Andover,Mass.3.)George William^,b.7 Sept.,1863,d.17 Feb.,1864.4.)Isabella Shirley^,b.2 Oct.,1865,m.22 Oct.,1882,Josiah Irvine(s.of James M.)Lamprey,of Hampton,andhad:a.Chester Shirley^{Lamprey),b.11 Mar.,1883.b.Arthiir Bein,b.12 Apr.,1885.4.Mary Brown'',b.30 Mar.,1829,m.Simon Cottonof Gilford,andd.s.p.30 Aug.,1854."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1815",
+      "targetKey": "b in loudon|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 154,
+      "lineNumber": 1,
+      "rawText": "138 WILLIAMLANEANDFAMILY.VIII.Hannah''',b.16 Jan.,1815,m.29 Dec,1837,John M.Wells,b.in Loudon,19 Mar.,1815,afarmerin Campton.Ch. : 1.Lydia J?{Wells),b.ii Oct.,1 S 3 S,m.10 Mar.,1854,Hiram Buzzdl,andhad:I.)Sarah{Buzzeliy,d.10 Oct.,1863.2.)Hannah F?,d.18 Oct.,1863.3.)Frederick^,b.6 Nov.,i 860.4.)Martha^,b.14 May,1862.5.)Ida^,b.27 Jan.,1864.2.John A?,b.22 Sept.,1840,d.27 Sept.,1862.3.Benjamin A?,b.16 Aug.,1842,d.27 Nov.,1862.4.Eben H?,b.20 Apr.,1845,m.6 Aug.,1865,Sarah A.Morrill,b.26 May,1848.Ch. : I.)George A?,b.6 Oct.,1866.2.)^27/?>i\u00a5.9,b.3 Aug.,1869.3.)Allie H?,b.16 Apr.,1871.5.Horace F?,b.30 Mar.,1847.6.Syrcne A.^,b.13 July,d.20 Dec,1849.7.Cjfrt;-Z.8,b.13 Feb.,1851,d.16 Oct.,1863.8.Hannah F.^,h.27 Sept.,18^3,m.William Buzzell,adivorcedman.9.Julia Ann^,b.15 Feb.,1856,d.17 Oct.,1 S 63."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "william lane|1815",
+      "targetKey": "adivorcedman|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 154,
+      "lineNumber": 1,
+      "rawText": "138 WILLIAMLANEANDFAMILY.VIII.Hannah''',b.16 Jan.,1815,m.29 Dec,1837,John M.Wells,b.in Loudon,19 Mar.,1815,afarmerin Campton.Ch. : 1.Lydia J?{Wells),b.ii Oct.,1 S 3 S,m.10 Mar.,1854,Hiram Buzzdl,andhad:I.)Sarah{Buzzeliy,d.10 Oct.,1863.2.)Hannah F?,d.18 Oct.,1863.3.)Frederick^,b.6 Nov.,i 860.4.)Martha^,b.14 May,1862.5.)Ida^,b.27 Jan.,1864.2.John A?,b.22 Sept.,1840,d.27 Sept.,1862.3.Benjamin A?,b.16 Aug.,1842,d.27 Nov.,1862.4.Eben H?,b.20 Apr.,1845,m.6 Aug.,1865,Sarah A.Morrill,b.26 May,1848.Ch. : I.)George A?,b.6 Oct.,1866.2.)^27/?>i\u00a5.9,b.3 Aug.,1869.3.)Allie H?,b.16 Apr.,1871.5.Horace F?,b.30 Mar.,1847.6.Syrcne A.^,b.13 July,d.20 Dec,1849.7.Cjfrt;-Z.8,b.13 Feb.,1851,d.16 Oct.,1863.8.Hannah F.^,h.27 Sept.,18^3,m.William Buzzell,adivorcedman.9.Julia Ann^,b.15 Feb.,1856,d.17 Oct.,1 S 63."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "i-mary moody|1802",
+      "targetKey": "nathan gate|unknown",
+      "confidence": 0.78,
+      "pdfPageNumber": 161,
+      "lineNumber": 2,
+      "rawText": "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "i-mary moody|1802",
+      "targetKey": "john thompsonof stratham|unknown",
+      "confidence": 0.78,
+      "pdfPageNumber": 161,
+      "lineNumber": 2,
+      "rawText": "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "i-mary moody|1802",
+      "targetKey": "b in stratham|unknown",
+      "confidence": 0.78,
+      "pdfPageNumber": 161,
+      "lineNumber": 2,
+      "rawText": "(134)I-Mary Moody^,b.21 Nov.,1802,m.1825,Nathan Gate,b.15 June,1783;hadch.b.in Stratham,whereshed.11 May,1887.n.Hannah CJ,b.15 Sept.,1804,m.1837,John Thompsonof Stratham,2 dw.,andd.s./.,Mar.,1839>^niemberofthe Con-gregationalchurch.HI,Thomas M.''',b.in Stratham,12 June,1806,ateacherin Portsmouth,Doverand Maumee,O.Hem.26 Dec,1840,Amel-ia Van Tassel,b.18 Mar.,1819.Hed.there 7 Feb.,1847,leaving : I.Frank Tho 7 nas^,b.10 Apr.,1842,ofthe\"Toledo Blade,\"whom.24 Aug.,1870,Ahnira Post(dau.ofjn.A.and Almira P.)Moore,b.in Maumee City,6 Feb.,1844.Herparentswerefrom VVestbrook,Conn.Ch. : I.)Frank Alexander^,b.19 May,1 S 71,d.16 Nov.,1879,ae.8 yrs.IV.John Jay''',b.6 June,1808,m.Oct.,1834,Louisa(dau.of Theodore)Wiggin,whod.9 Apr.,1840.Hed.26 Aug.,1840,ae.32;amemberofthe Gongregationalchurch,ateacherin Portsmouth,andhad: I.Milton Samuel^,b.in Portsmouth,14 Mar.,1838,m.17 Jan.,1864,Abi.(dau.of Dea.)Mathes,b.15 Jan.,1837,res.in Newmarket,hasison:I.)George Milton^,b.22 Nov.,1865.V.Samuel G.^,b.8 Nov.,1811,entered Bowdoin Collegetopreparefortheministryinthe Methodistchurch,butd.Dec,1837,ae.26.(135)^I-Deacon Enoch Moody Clark\",ofthe Congrega-tionalchurch,b.27 Aug.,1815,afarmeronthehomesteadin Stratham.Hem.13 Jan.,1842,Mary A.(dau.of William)Sea-vey,of Rye,b.13 May,1819,andhad 9 ch.VII.Caroline E.'^,b.23 Aug.,1817,m.8 July,1844,Rev.Samuel Gushing,a Methodist,andd.at Shrewsbury,Mass.,June,1854,ae.37.Ch. : I.Samuel G?,b.in Shrewsbury.Heisintheshoebusinessatthe West;m.andhadch. :"
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "williamf lane|1825",
+      "targetKey": "mary|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 162,
+      "lineNumber": 2,
+      "rawText": "No.86.WILLIAMF.LANE^(Wm.^,Sam.s,Sam.^Josh.3),1802-andhisw.MARY(BAILEY),hadb.in Wentworth: I.Eunice^,b.27 Feb.,1825.II.Hazen S,b.13 Oct.,1826.III.Mary*^,b.ir July,1828.IV.William^,b.8 Mar.,1830.V.Harriet^,b.4 Mar.,1832.VI.Luc Y^,b.5 May,1834.VII.George^,b.6 Mar.,1838.VIII.Charles^,b.23 Aug.,1839."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "james lane|1795",
+      "targetKey": "deborah|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 162,
+      "lineNumber": 3,
+      "rawText": "No.87.JAMESLANE 6(Josh.^,Sam.^,Josh.^,Wm.^),1770-1833,of Pittsfieldand Stratham,teacher,tannerandfarmer,andhisw.DEBORAH(FOLSOM)had:I.William Frederick\",b.in Pittsfield,i Oct.,1795,wentto Hallowell,Me.,in 1816,wasabookseller,m.there 21 Dec,1820,Mary D.(dau.of Hon.Nath'land*Maria Dummer)Perley,b.2 Sept.,1799,whod.there 28 Mar.,1843,ae.43 yrs.,6 mos.Hewenttoseaandwaslost,\"supposedtohaved.ofcholerain New York.\"Heintroducedaniintotheword Lane,whenhewrotehisname,butthechangedoesnotpromisetobepermanent.Ch. : 1.Henry Perley^,b.23 Oct.,1821,d.ofconsumptionat Augusta,Ga.,24 Mar.,1844.2.Mary Louise^,b.IJan.,1824,m.1 S 44 Dr.C.H.Bonneyof Wayne,Me.[or Manchester,N.H.]andd.1851,leaving 2 ch : Clarw'and Fred^{Bonney').3.George Frederick^,b.21 Feb.,1826,d.in Boston,ae.20;aclerk.4.Richard William*,b.10 Sept.,1 S 2 S,wholedavariedlifewhichmightbestudiedwithinterestandprofit.Hewasinthe Royal.School,with Luna-lilo,Kingofthe Sandwich Islands.Hebecameapublicspirited Ha-waiian,butstillremainedapatriotic Americanofthekeen New Englandtype.Asamanhischaracterwasabovereproach.Hewaswith Scottinthe Mexicanwar,wherehewonamedal.Hewasanearlysettlerin*Mariawasdau.of Richard,abrotherof Lt.-Gov.William Dummer,founderofthe Academyin Byfield,Mass.Theirgrandfatherwasfrom Bishopstoke,England.In 1632 hereceivedagrantoflandin Newbury-Byfield."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "stephen lane|1799",
+      "targetKey": "lois|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 164,
+      "lineNumber": 2,
+      "rawText": "No.88.STEPHENLANE 6(Josh.^Sam.^,Josh.^,VVm.'^),1771-1840,joiner,andhisw.LOIS(CURRIER),res.in Stewartstovvn,Coos Co.,N.H.,andin Moscow,N.Y.,had: I.Sarah^,b.22 June,1799,d.1843,m.1822,Isaac Beers,whod.1843.Theyhad 5 ch. : I.Stephen^{Beers).2.Anna\"^.3.Jane^.4.Ruhama^.5.Uriah''.Alldeadin 1886.II.Charles^,b.20 Jan.,1801,d.21 July,1830.Hem.in 1823,A.Wardwell.Ch. : 1.Hannah^,b.1823.2.Eliza^,b.1825.3.Laura^,b.1827.4.Charles^,b.1829.*Jere L.(s.of Abner)Aferrill,wasb.in Newbury,Mass.,21 Apr.,1791.In 1816 hecommencedthemanufactureofhatsin Exeter,andcontinuedit 62 years.Tothisheaddedthetradeinwoolwhichheandhissonscontinuedmanyyearswithremarkablesuccess."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "stephen lane|1799",
+      "targetKey": "isaac beers|unknown",
+      "confidence": 0.75,
+      "pdfPageNumber": 164,
+      "lineNumber": 2,
+      "rawText": "No.88.STEPHENLANE 6(Josh.^Sam.^,Josh.^,VVm.'^),1771-1840,joiner,andhisw.LOIS(CURRIER),res.in Stewartstovvn,Coos Co.,N.H.,andin Moscow,N.Y.,had: I.Sarah^,b.22 June,1799,d.1843,m.1822,Isaac Beers,whod.1843.Theyhad 5 ch. : I.Stephen^{Beers).2.Anna\"^.3.Jane^.4.Ruhama^.5.Uriah''.Alldeadin 1886.II.Charles^,b.20 Jan.,1801,d.21 July,1830.Hem.in 1823,A.Wardwell.Ch. : 1.Hannah^,b.1823.2.Eliza^,b.1825.3.Laura^,b.1827.4.Charles^,b.1829.*Jere L.(s.of Abner)Aferrill,wasb.in Newbury,Mass.,21 Apr.,1791.In 1816 hecommencedthemanufactureofhatsin Exeter,andcontinuedit 62 years.Tothisheaddedthetradeinwoolwhichheandhissonscontinuedmanyyearswithremarkablesuccess."
+    },
+    {
+      "relation": "spouse",
+      "sourceKey": "rev joshua lane|1808",
+      "targetKey": "elizabeth|unknown",
+      "confidence": 0.9,
+      "pdfPageNumber": 165,
+      "lineNumber": 4,
+      "rawText": "REV.JOSHUALANE 6(Josh.-\\Sam.4,Josh.3,Wm.2),1773-1846,andhis(i)w.ELIZABETH(EATON)had:I.and II.Namesunknown.Byhis(2)w.CHARITY(DICKINSON),REV.JOSHUALANE 6 had: III.Mary''',b.25 Aug.,1808,m.19 Apr.,1829,James Edgar Hopkins,b.at Hartford,Conn.,Dec,1804,d.at Cleveland,O.,1868.Ch. : 1.Edgar Augustus^{Hopkins),b.19 Jan.,1830,d.3 July,1877.Hem.Oct.,l 86\u00ab,Emma Almira Patchen,andhadnoch.2.Mary Sophia^,b.19 Oct.,1832,m.19 Sept.,1861,Jerome L.Hopkins(norelation),d.17 June,1882.Ch. : I.)Florence Jerome^,b.16 Sept.,1862,whom.16 Oct.,1883,Francis H.Dnncanandhad : a.Bruce^\u00b0,b.1884.2.)Frederick Louis^,b.8 Aug.,1868."
+    }
+  ]
+}

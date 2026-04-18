@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-04-18T22:45:42.854978+00:00",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 70,
+  "rejectedRelationships": [
+    {
+      "relation": "father",
+      "sourceKey": "ii-stephen|1771",
+      "targetKey": "joshua lane|1770",
+      "confidence": 0.85,
+      "pdfPageNumber": 75,
+      "lineNumber": 2,
+      "rawText": "(88)II-Stephen^,b.8 Dec,1771,d.6 Dec,1840,m.Lois Currierof Gilmanton,whod.21 Aug.,1859.Hewasajoiner,livedin Stewartstownand Sanbornton,N.H.,thenin Moscow,N.Y.,wherehed,ofdropsy,6 Dec,1840,ae.69.Had 7 ch.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "iii-rev joshua|1773",
+      "targetKey": "joshua lane|1770",
+      "confidence": 0.85,
+      "pdfPageNumber": 75,
+      "lineNumber": 3,
+      "rawText": "(89)III-Rev.Joshua^,b.13 Jan.,1773,m.(i)9 Sept.,1801,Elizabeth Eaton,m.(2)22 Nov.,1807,.Charity Dickinson,b.31 Oct.,1788,d.28 Mar.,1873.Hisfirstmarriagewasunhappy,andafterhavingtwochildrenhewasdivorced.Hegraduatedat Harvard College,1799,wasordaineda Congregationalminister,butneversettledoveraparish;livedinseveralplacesin New York,thenhadchargeofthelighthouseat Portland Harboron Lake Erie.Hed.at Barcelona,townof VVestfield,N.Y.,21 Mar.,1846,ae.73.IV.Sarah^,b,6 Sept.,1774,d.Aug.,1862,m.29 Oct.,1795,Josi AHFolsom^(Josiah^,Jn.^,Pet.~,Jn.^),1765-1846,farmerin Exeter.Theyhadb.in Exeteron Hamptonroad: 1.Charles Lane'{Folsom),b.5 June,1799,graduatedat Dartmouth College,1820,teacherin Exeter Academy,d.8 Nov.,1829,unm.Hewasanexcellentscholarandausefulman.2.Mary Clark'',b.9 Nov.,1800,andd.2 Nov.,1864.Shewasateacher,andni.29 Mar.,1836,Deacon Willard Keyesof Quincy,Ills.,widelyknownasageneroussupporterofthechurchandher Christianinstitutions.Hewasb.in Newfane,Vt.,28 Oct.,1792,andd.at Quincy,111.,7 Feb.,1872.In 1823 hebuiltthefirsthousein Quincy,andafterwardsl)uilt Keyes Hallforthe Theological Seminaryin Chicago,111.Theirch.were:I.)Martha^{Keyes),b.3 Mar.,1837,d.5 Oct.,183 S.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "viii-mary''|1782",
+      "targetKey": "william lane|1870",
+      "confidence": 0.85,
+      "pdfPageNumber": 77,
+      "lineNumber": 2,
+      "rawText": "(91)VIII-Mary'',b.17 June,1782,m.John Gari^nd,cabinetmaker,res.at Pittsfield.Shewasamemberofthe Congregationalchurch.Sheleftherhusbandonaccountofhisintemperance.Hed.in Apr.,1824.Sherem.to Newmarket,thento Ryeandd.there,8 Apr.,i 860.IX.Ason,b.4 andd.7 July,1784.X.Mark^b.18 Aug.,178 S,m.Henrieita Tenneyof North-wood.Hewasateacherin Strathamandvicinity,waslameforyearsinonearm,settledin Geneseo,Livingston Co.,N.Y.,theninornear Franklin,Venango Co.,Penn.,d.16 Jan.,1844,ae.56 yrs.Heandhiswifeweremembersofthe Congregationalchurch.Theirch. : 1.Jonathan Homer',b.Aug.,1819,entered Exeter Academy,1839,graduated Yale College,1846,wascoastsurveyofficial,Washington,D.C,d.1880.2.Elizabeth Swain'',b.June,1 S 21.3.John Mark'',b.Oct.,1823.4.David Tenney^,b.Apr.,1826.5.James',b.Apr.,182 S.6.Maria'',b.1830.7.Edward E?,b.1832.8.Hannah Lonise'',b.18359.Samuel Siuain'',b.1 S 38.10.Sarah Folsom'' . XI.Hannah'5,b.3 June,1790.XII.Abigail\",b.12 June,1793,m.(i)Thomas(s.of Ensign David)Wigginof Stratham,settledin Northwood,atannerandshoemaker,d.1837 or'2 i^s.p.Bothweremembersofthe Con-gregationalchurch.Shem.(2)Deacon Gateof Epsom,whorem.to Northwood.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "ii-samuel|1779",
+      "targetKey": "deaconwilliam lane|1777",
+      "confidence": 0.85,
+      "pdfPageNumber": 87,
+      "lineNumber": 4,
+      "rawText": "(95)II-Samuel^,b.9 Oct.,1779,m.Susan Jamesof Hampton,wasacooperandfarmerin Exeter,wherehis 5 ch.wereb.Hed.in Stratham,18 Aug.,1825,ae.45 yrs.,10 mos.Shed.at Exeter,27 Aug.,1871,ae.91.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "jo hn|1784",
+      "targetKey": "deaconwilliam lane|1777",
+      "confidence": 0.85,
+      "pdfPageNumber": 88,
+      "lineNumber": 2,
+      "rawText": "(96)IV.Jo HN^,b.18 May,1784,atailorm Pittsfield,m.Abi.Cram,b.6 Oct.,1784,had 9 ch.,andd.26 Oct.,1861,ae.77.Shed.14 Oct.,1 S 60,ae.78'.V.Mary C,b.24 Oct.,1786,d.16 Apr.,1788,fromfallingintoatubofley.VI.Meshech'5,b.15 Apr.,1789,d.in Hampton,onthehome-stead,unm.,15 June,1862,ae.73.(9*7)VII-Joel\"^?b-25 Aug.,1791,m.IJan.,1814,Mahala Brownof Hopkinton,b.at Hampton,7 Sept.,1791,wasablack-smithin Exeter,d.20 June,1861,ae.69 yrs.,10 mos.Shed.11 Dec,1868,ae.77.",
+      "rejectReason": "Temporal sanity failed"
+    },
+    {
+      "relation": "father",
+      "sourceKey": "brown|1805",
+      "targetKey": "william lane|1807",
+      "confidence": 0.85,
+      "pdfPageNumber": 93,
+      "lineNumber": 2,
+      "rawText": "(2)L.Brown,(3)Gardner Tilton.4.Daniel L?,b.7 Aug.,1805,d.3 June,1873,ae.66;m.Sophia Ann(dau.of Stephen{Osgood),res.at Dover.Ch. : I.)Albert C?,b.Dec,1831,d.at Dover,2 Mar.,1844.2.)Sophia A?,b.8 May,1835,m.Davidluine^fjonth.^David\",David*,W,W).3.)Charles H?,b.17 Mar.,1839.4.)Sally A.G^,b.17 Nov.,1841.5.Timothy OP,b.14 Aug.,1812,Dartmouth College,1840,taughtat Hamp-ton Academyandin Troy,Iowa.IV.Jo HN^,b.18 July,1773,d.at Dover,10 Nov.,1833,s.p.Hem.(i)Mary Moulton,(2)Martha Giles,res.at Raymond.V.Stephen\"^,b.6 Feb.,1775,d.8 Apr.,1777.VI.Mo LLY<5,b.2 Mar.,1776,m.David Lane*^,(David^^Jn.'*,Jn.3,Wm.2).VII.Ru TH^b.22 Nov.,1778,d.4 Dec,1806,ra.Henry San-bornof Eppingandhad: 1.Hen>-y''{Sanborn),b.2 May,179';,m.(i)i Vaney Shepardandhad:I.)/iuth Jane^,b.Apr.,1824,d.Oct.,1831.By(2)wife,Nancy Stevens,Henry Sanbornhad : 2.)Ruth Ann^,b.9 May,18353.)George O?,b.31 Oct.,1836.2.Mary'',b.26 Oct.,1802,m.Caleb French,res.at Epping.Ch. : I.)Kuth G?{French),b.11 June,1826.2.)Susan A.O?,b.28 Mar.,1828.3.)Marf,b.IIAug.,1829.4.)Clarissa M?,b.23 Nov.,1830.5.)Hannah^,b.Mar.,1832.6.)Sarah E?,b.9 July,1833.7.)Charlotte 6'.^b.Jan.,1835.8.)Emetine^,b.3 July,1836.9.)Elizabeth A.^,b.3 Apr.,1838.10.)George E?,b.12 Jan.,1840.VIII.Stephen'5,b.20 Feb.,1781,afarmer,d.15 Mar.,1815,m.8 Apr.,1804,Sarah Libbey,b.20 June,1779,bothchurchmembersin Meredith,wherehewassuperintendentofthefirst Sundayschoolintown.Ch. :",
+      "rejectReason": "Temporal sanity failed"
+    }
+  ],
+  "reviewQueue": []
+}

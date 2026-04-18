@@ -647,12 +647,18 @@ export function getRelationships(personId) {
 
 /**
  * Get children of a person
+ * Links are stored child -> parent (source = child, target = parent) for father/mother.
  */
 export function getChildren(personId) {
-  const relationships = getRelationships(personId);
-  return relationships.filter(rel => 
-    rel.relation === 'father' || rel.relation === 'mother'
-  ).map(rel => rel.person);
+  if (!genealogyData) {
+    loadGenealogyData();
+  }
+  const id = parseInt(personId, 10);
+  const childLinks = genealogyData.links.filter(
+    (link) =>
+      link.target === id && (link.relation === 'father' || link.relation === 'mother')
+  );
+  return childLinks.map((link) => getPersonById(link.source)).filter(Boolean);
 }
 
 /**

@@ -1,0 +1,23 @@
+{
+  "generatedAt": "2026-04-18T22:45:44.066720+00:00",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 238,
+  "rejectedRelationships": [],
+  "reviewQueue": [
+    {
+      "type": "page",
+      "pdfPageNumber": 238,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 251,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 256,
+      "reason": "Empty extracted page"
+    }
+  ]
+}

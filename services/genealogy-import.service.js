@@ -25,12 +25,44 @@ function titleCaseName(value = '') {
     .join(' ');
 }
 
-function parseBirthYear(text = '') {
-  const yearMatch = text.match(/\b(1[5-9]\d{2}|20\d{2})\b/);
-  return yearMatch ? parseInt(yearMatch[1], 10) : null;
+/** OCR often reads a leading 1 in years as Roman I or lowercase l (e.g. "I 778" -> 1778). */
+export function repairOcrRomanYears(text = '') {
+  return String(text).replace(/\b[Il]\s+(\d{3})\b/g, (_, triple) => {
+    const y = 1000 + parseInt(triple, 10);
+    if (y >= 1500 && y <= 1999) return String(y);
+    return `I ${triple}`;
+  });
 }
 
-function parseChildLine(text = '') {
+export function splitPrimarySpouseSegments(text = '') {
+  const s = String(text);
+  const lower = s.toLowerCase();
+  const re = /\b(?:she|he)\s+married\b|\bwas\s+wife\s+of\b|\bwas\s+husband\s+of\b/;
+  const m = re.exec(lower);
+  if (!m) return { primary: s.trim(), spouse: '' };
+  const idx = m.index;
+  return { primary: s.slice(0, idx).trim(), spouse: s.slice(idx + m[0].length).trim() };
+}
+
+export function parseBirthYear(text = '') {
+  const repaired = repairOcrRomanYears(text);
+  const { primary } = splitPrimarySpouseSegments(repaired);
+  const b = primary.match(/\bb\.\s*.*?\b(1[5-9]\d{2}|20\d{2})\b/i);
+  if (b) return parseInt(b[1], 10);
+  const born = primary.match(/\bborn\s*.*?\b(1[5-9]\d{2}|20\d{2})\b/i);
+  if (born) return parseInt(born[1], 10);
+  const deathMatch = primary.match(/(?:\bd\.|\bdied)\s*[:,;]?\s*.*?\b(1[5-9]\d{2}|20\d{2})\b/i);
+  const deathY = deathMatch ? parseInt(deathMatch[1], 10) : null;
+  const yearRe = /\b(1[5-9]\d{2}|20\d{2})\b/g;
+  let m;
+  while ((m = yearRe.exec(primary)) !== null) {
+    const y = parseInt(m[1], 10);
+    if (deathY === null || y !== deathY) return y;
+  }
+  return null;
+}
+
+export function parseChildLine(text = '') {
   const candidate = text
     .replace(/^\s*(?:\(?\d+\)?|[IVXLCDM]+)\.\s*/i, '')
     .trim();
@@ -400,5 +432,9 @@ export default {
   emitLaneDataJson,
   validateLaneData,
   summarizeGenealogyImageImport,
-  writeImportArtifact
+  writeImportArtifact,
+  repairOcrRomanYears,
+  splitPrimarySpouseSegments,
+  parseBirthYear,
+  parseChildLine
 };

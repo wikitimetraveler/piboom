@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-04-18T22:45:43.731437+00:00",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 190,
+  "rejectedRelationships": [
+    {
+      "relation": "father",
+      "sourceKey": "ii-josi ahclark|1818",
+      "targetKey": "joshua lane|1813",
+      "confidence": 0.85,
+      "pdfPageNumber": 209,
+      "lineNumber": 2,
+      "rawText": "(145)II-Josi AHClark^,b.21 June,18-15,m.Catharine Clark Ball.III.Joshua Oilman''',b.15 Feb.,1818,d.31 Dec,1844.IV.Hannah^,b.12 Mar.,1820,m.(i)28 Sept.,1845,Nathan-iel Morrill,Jr.,whod.20 July,1848.Shem,(2)William E.Frenchof Sandown.Ch. : 1.Maiy Frances^{French),b.15 Aug.,1852,m.30 June,1881,Pev.IVillis P\".Odellof Lake Village,ofthe Methodistchurch,res.at Buffalo,N.Y.2.George Morrill^,b.30 Apr.,1854,graduatedat Tilton Academy,1876,Boston Universityin 1880,Harvard Medical School M.D.,1884,settledinpracticeat Maiden,Mass.,Oct.,1884.Hem.24 Nov.,1881,Anna M.Emeryof Suncook,N.H.Ch. : I.)George Finery^,b.20 Mar.,1884,d.28 July,18 S 6.2.)Mary Harriet^,b.13 July,1888.Buriedinfiveyears,threetineboys.V.John Jay''',b.23 Nov.,1825,carpenterandfarmeronthehomesteadin Epping;m.8 Nov.,1854,Ellen Smith Carterof Leominster,Mass.,b.10 July,1828.Ch. : 1.Clara Augusta^,b.16 Oct.,1859,teacherin Watson Academy,Epping.2.Fred Cartet^,b.15 June,1865,m.27 Apr.,1889,Minnie F.(dau.of Ira)Dearborn,b.in Candia,7 Dec,1870.VI.George Franklin^,b.5 Dec,1827,m.i Nov.,1854,Lucy Ann Rundlett,b.in Gilmanton,N.H.,i July,1829;wasinthebonebric-a-bracbusinessin Leominster,Mass.,in 1858 afarmerin Janesville,Wis.,in 1880 in Dakota.Ch. : I.Eugene P?,b.in Leominster,7 Sept.,1855,m.24 Mar.,1880,Maiy A.Czit-ting,b.in Westminster,Mass.,26 Oct.,1855,res.at Cavour,Dakota.Ch. : I.)Clara^,b.23 Aug.,1881.",
+      "rejectReason": "Temporal sanity failed"
+    }
+  ],
+  "reviewQueue": [
+    {
+      "type": "page",
+      "pdfPageNumber": 197,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 203,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 211,
+      "reason": "Empty extracted page"
+    },
+    {
+      "type": "page",
+      "pdfPageNumber": 212,
+      "reason": "Empty extracted page"
+    }
+  ]
+}

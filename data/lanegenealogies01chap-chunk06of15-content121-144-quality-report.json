@@ -1,0 +1,30 @@
+{
+  "generatedAt": "2026-04-18T22:45:43.414276+00:00",
+  "detectedStartPdfPage": 22,
+  "batchStartPdfPage": 142,
+  "parsedPageCount": 24,
+  "detectedPeople": 32,
+  "relationshipCandidates": 22,
+  "acceptedRelationships": 21,
+  "rejectedRelationships": 1,
+  "reviewItems": 4,
+  "appendedNodes": 19,
+  "appendedLinks": 21,
+  "validation": {
+    "valid": true,
+    "issues": []
+  },
+  "extractionStats": {
+    "peopleWithOccupation": 7,
+    "peopleWithMilitary": 3,
+    "peopleWithEducation": 4,
+    "peopleWithChildrenNote": 8,
+    "peopleWithDeathYear": 11,
+    "peopleWithDeathPlaceHints": 2,
+    "peopleWithBurialHints": 0,
+    "peopleWithMarriageSnippets": 11,
+    "peopleWithPlaceHints": 9,
+    "peopleWithAnyLocation": 17,
+    "peopleWithMultipleLocations": 15
+  }
+}
