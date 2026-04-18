@@ -72,6 +72,8 @@ data/unit-tests/
 data/lanegenealogies01chap-content*-quality-report.json
 data/lanegenealogies01chap-content*-review-queue.json
 data/lanegenealogies01chap-content*-structured.json
+# Chunked batch outputs (quality / review / structured / chunk summary JSON)
+data/lanegenealogies01chap-chunk*.json
 
 # Python cache
 scripts/__pycache__/
