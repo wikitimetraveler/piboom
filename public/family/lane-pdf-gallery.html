@@ -42,6 +42,9 @@
   <p class="small text-muted">
     Streams that fail to decode (for example JBIG2 without <code>jbig2dec</code>) are omitted from this grid; counts in the bar above include how many were skipped.
   </p>
+  <p class="small border-left pl-3" style="border-color: rgba(0,0,0,0.15);">
+    <strong>About these plates.</strong> Most portraits and scenes here are <strong>late-19th- and early-20th-century photographs</strong> (and related book illustrations) reproduced in a printed genealogy. Expect uneven contrast, silvering or fading in the originals, yellowed paper, halftone screening, and occasional blank or nearly blank pages from tissue inserts or lightly exposed images. What you see is typical of period books and digitization, not a defect in this viewer.
+  </p>
 
   <div id="lanePdfStats" class="mb-3"></div>
   <div id="lanePdfError" class="alert alert-danger d-none" role="alert"></div>
@@ -57,7 +60,16 @@
     </div>
   </div>
 
-  <div class="row" id="lanePdfGrid"></div>
+  <div class="row" id="lanePdfGrid" data-lane-tts-ignore></div>
+</div>
+
+<div id="lanePdfLightbox" class="lane-pdf-lightbox" hidden>
+  <div class="lane-pdf-lightbox-backdrop" tabindex="-1"></div>
+  <div class="lane-pdf-lightbox-panel" role="dialog" aria-modal="true" aria-labelledby="lanePdfLightboxCaption">
+    <button type="button" class="lane-pdf-lightbox-close" aria-label="Close">&times;</button>
+    <img id="lanePdfLightboxImg" src="" alt="" />
+    <div id="lanePdfLightboxCaption" class="lane-pdf-lightbox-caption text-light small mt-2"></div>
+  </div>
 </div>
 
 <script src="/shared/tts.js"></script>

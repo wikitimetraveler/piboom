@@ -2,6 +2,17 @@
   font-size: 0.9rem;
 }
 
+/* Stats bar one-liner (historical context); keep styling here, not inline */
+.lane-pdf-stats-hint {
+  max-width: 52rem;
+  margin: 0.5rem 0 0;
+  padding-left: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #6c757d;
+  border-left: 3px solid rgba(0, 0, 0, 0.12);
+}
+
 .lane-pdf-card {
   background: rgba(255, 255, 255, 0.96);
   border-radius: 10px;
@@ -10,11 +21,17 @@
   height: 100%;
 }
 
-.lane-pdf-card img {
+.lane-pdf-card img.lane-pdf-thumb {
   width: 100%;
   height: 180px;
   object-fit: contain;
   background: #f4f4f4;
+  cursor: zoom-in;
+}
+
+.lane-pdf-card img.lane-pdf-thumb:focus {
+  outline: 2px solid #0d6efd;
+  outline-offset: 2px;
 }
 
 .lane-pdf-card--skipped img {
@@ -43,4 +60,71 @@
 .lane-pdf-filters .form-control,
 .lane-pdf-filters .form-select {
   font-size: 0.9rem;
+}
+
+/* Full-size plate view (click thumbnail) */
+.lane-pdf-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.lane-pdf-lightbox[hidden] {
+  display: none !important;
+}
+
+.lane-pdf-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  cursor: zoom-out;
+}
+
+.lane-pdf-lightbox-panel {
+  position: relative;
+  z-index: 1;
+  max-width: min(96vw, 1400px);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lane-pdf-lightbox-panel img {
+  max-width: 100%;
+  max-height: calc(92vh - 3rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lane-pdf-lightbox-caption {
+  text-align: center;
+  max-width: 100%;
+}
+
+.lane-pdf-lightbox-close {
+  position: absolute;
+  top: -2.5rem;
+  right: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.lane-pdf-lightbox-close:hover,
+.lane-pdf-lightbox-close:focus {
+  opacity: 1;
+  outline: none;
 }

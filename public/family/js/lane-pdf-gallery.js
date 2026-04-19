@@ -33,9 +33,16 @@ function renderGallery(images, portraits, container) {
       const confirmed = img.imageId && portraitByImageId.has(img.imageId);
       const url = img.publicUrl || '#';
       const cardClass = isSkipped ? 'lane-pdf-card lane-pdf-card--skipped' : 'lane-pdf-card';
+      const plateMeta =
+        !isSkipped &&
+        `Page ${img.pdfPage} · ${img.imageId}${
+          img.width && img.height ? ` · ${img.width}×${img.height}` : ''
+        }`;
       const imgTag = isSkipped
         ? `<div class="d-flex align-items-center justify-content-center bg-secondary text-white" style="height:120px">Not extracted</div>`
-        : `<img src="${esc(url)}" alt="" loading="lazy" onerror="this.style.opacity=0.35" />`;
+        : `<img src="${esc(url)}" alt="" loading="lazy" class="lane-pdf-thumb" tabindex="0" role="button" data-plate-meta="${esc(
+            plateMeta
+          )}" aria-label="${esc(`Expand plate, page ${img.pdfPage}`)}" onerror="this.style.opacity=0.35" />`;
 
       let badge = '';
       if (isSkipped) {
@@ -82,6 +89,62 @@ function renderGallery(images, portraits, container) {
     .join('');
 }
 
+function bindPlateLightbox(grid) {
+  if (!grid) return;
+  const root = document.getElementById('lanePdfLightbox');
+  const imgEl = document.getElementById('lanePdfLightboxImg');
+  const capEl = document.getElementById('lanePdfLightboxCaption');
+  const backdrop = root && root.querySelector('.lane-pdf-lightbox-backdrop');
+  const closeBtn = root && root.querySelector('.lane-pdf-lightbox-close');
+  let lastFocus = null;
+
+  if (!root || !imgEl || !capEl || !backdrop || !closeBtn) return;
+
+  function openFromThumb(thumb) {
+    const src = thumb.getAttribute('src');
+    if (!src || src === '#') return;
+    lastFocus = thumb;
+    imgEl.src = src;
+    imgEl.alt = thumb.getAttribute('aria-label') || 'Plate';
+    capEl.textContent = thumb.getAttribute('data-plate-meta') || '';
+    capEl.id = 'lanePdfLightboxCaption';
+    root.hidden = false;
+    document.body.style.overflow = 'hidden';
+    closeBtn.focus();
+  }
+
+  function close() {
+    root.hidden = true;
+    imgEl.src = '';
+    document.body.style.overflow = '';
+    if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+    lastFocus = null;
+  }
+
+  grid.addEventListener('click', (e) => {
+    const t = e.target;
+    if (t.tagName !== 'IMG' || !t.classList.contains('lane-pdf-thumb')) return;
+    e.preventDefault();
+    openFromThumb(t);
+  });
+
+  grid.addEventListener('keydown', (e) => {
+    const t = e.target;
+    if (t.tagName !== 'IMG' || !t.classList.contains('lane-pdf-thumb')) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openFromThumb(t);
+    }
+  });
+
+  backdrop.addEventListener('click', close);
+  closeBtn.addEventListener('click', close);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !root.hidden) close();
+  });
+}
+
 function filterImages(images, pageFilter, idFilter) {
   let list = images.slice();
   if (pageFilter != null && pageFilter !== '') {
@@ -101,8 +164,10 @@ async function initLanePdfGallery() {
   const grid = document.getElementById('lanePdfGrid');
   const errEl = document.getElementById('lanePdfError');
   const statsEl = document.getElementById('lanePdfStats');
-  const pageInput = document.getElementById('lanePdfFilterPage');
-  const idInput = document.getElementById('lanePdfFilterIds');
+    const pageInput = document.getElementById('lanePdfFilterPage');
+    const idInput = document.getElementById('lanePdfFilterIds');
+
+  bindPlateLightbox(grid);
 
   try {
     const res = await fetch('/api/genealogy/lane-pdf/gallery');
@@ -125,7 +190,10 @@ async function initLanePdfGallery() {
           images.filter((i) => (i.candidatePersonIds || []).length > 0).length
         )}</strong> ·
         Curated portraits: <strong>${portraits.length}</strong>
-      </div>`;
+      </div>
+      <p class="lane-pdf-stats-hint" role="note">
+        These plates are late-19th- and early-20th-century book reproductions; faded paper, halftones, and uneven contrast are normal for the period.
+      </p>`;
 
     function applyFilters() {
       const pageVal = pageInput.value.trim();
