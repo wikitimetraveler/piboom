@@ -42,6 +42,15 @@ body.lane-war-page {
   background: #111826;
 }
 
+#warMap .war-map-fallback {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-align: center;
+}
+
 .war-panel {
   padding: 1rem;
 }

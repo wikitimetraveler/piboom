@@ -2,7 +2,6 @@
   'use strict';
 
   const API_BASE = '/api/genealogy';
-  let mapboxScriptPromise = null;
   let memorialMap = null;
   let memorialMarker = null;
   let modalRenderToken = 0;
@@ -295,41 +294,14 @@
     caption.textContent = copy;
   }
 
-  function loadMapboxCssOnce() {
-    if (document.getElementById('mapbox-gl-css')) return;
-    const l = document.createElement('link');
-    l.id = 'mapbox-gl-css';
-    l.rel = 'stylesheet';
-    l.href = 'https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css';
-    document.head.appendChild(l);
-  }
-
-  async function ensureMapboxGl() {
-    if (window.mapboxgl) return;
-    loadMapboxCssOnce();
-    if (!mapboxScriptPromise) {
-      mapboxScriptPromise = fetch(`${API_BASE}/mapbox-access-token`)
-        .then((res) => {
-          if (!res.ok) throw new Error(`Mapbox token (${res.status})`);
-          return res.json();
-        })
-        .then((data) => {
-          if (!data || !data.success || !data.accessToken) throw new Error('Mapbox token unavailable');
-          const token = data.accessToken;
-          return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js';
-            script.async = true;
-            script.onload = () => {
-              window.mapboxgl.accessToken = token;
-              resolve();
-            };
-            script.onerror = () => reject(new Error('Mapbox GL failed to load'));
-            document.head.appendChild(script);
-          });
-        });
+  async function ensureGoogleMaps() {
+    if (window.google && window.google.maps) return true;
+    if (typeof window.laneFamilyLoadGoogleMaps !== 'function') {
+      window.__laneGoogleMapsUnavailableReason =
+        'Google Maps loader missing. Include /family/js/lane-family-google-maps.js before this script.';
+      return false;
     }
-    await mapboxScriptPromise;
+    return window.laneFamilyLoadGoogleMaps();
   }
 
   async function geocodePlace(entry) {
@@ -375,13 +347,17 @@
 
   function disposeMemorialMap() {
     if (memorialMarker) {
-      memorialMarker.remove();
+      memorialMarker.setMap(null);
       memorialMarker = null;
     }
     if (memorialMap) {
-      memorialMap.remove();
+      if (window.google && google.maps && google.maps.event) {
+        google.maps.event.clearInstanceListeners(memorialMap);
+      }
       memorialMap = null;
     }
+    const mapEl = document.getElementById('memorialMapCanvas');
+    if (mapEl) mapEl.innerHTML = '';
   }
 
   async function focusPlaceOnMap(placeEntries, index, renderToken) {
@@ -394,13 +370,15 @@
     if (renderToken !== modalRenderToken) return;
 
     if (result && result.ok && result.lngLat) {
-      try {
-        await ensureMapboxGl();
-      } catch (e) {
+      if (!(await ensureGoogleMaps())) {
         if (renderToken !== modalRenderToken) return;
         entry.status = 'unresolved';
         updatePlaceList(placeEntries, index);
-        renderMapEmptyState('Map unavailable', 'Place details are shown below even though the map could not load.');
+        renderMapEmptyState(
+          'Map unavailable',
+          window.__laneGoogleMapsUnavailableReason ||
+            'Place details are shown below even though the map could not load.'
+        );
         return;
       }
       if (renderToken !== modalRenderToken) return;
@@ -414,15 +392,24 @@
       if (loading) loading.classList.add('d-none');
       canvas.classList.remove('d-none');
       disposeMemorialMap();
-      memorialMap = new mapboxgl.Map({
-        container: 'memorialMapCanvas',
-        style: 'mapbox://styles/mapbox/satellite-streets-v12',
-        center: result.lngLat,
-        zoom: 10
+      const center = { lat: result.lngLat[1], lng: result.lngLat[0] };
+      memorialMap = new google.maps.Map(canvas, {
+        center,
+        zoom: 10,
+        mapTypeId: google.maps.MapTypeId.HYBRID,
+        streetViewControl: false,
+        fullscreenControl: true
       });
-      memorialMap.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
-      memorialMarker = new mapboxgl.Marker({ color: '#3b82f6' }).setLngLat(result.lngLat).addTo(memorialMap);
+      memorialMarker = new google.maps.Marker({
+        position: center,
+        map: memorialMap
+      });
       caption.textContent = `Approximate location based on recorded place name: ${result.place}`;
+      setTimeout(() => {
+        if (memorialMap && window.google && google.maps.event) {
+          google.maps.event.trigger(memorialMap, 'resize');
+        }
+      }, 250);
       updatePlaceList(placeEntries, index);
       return;
     }
@@ -440,11 +427,13 @@
   async function renderPlaceContext(placeEntries, renderToken) {
     if (!placeEntries.length) return;
 
-    try {
-      await ensureMapboxGl();
-    } catch (error) {
+    if (!(await ensureGoogleMaps())) {
       if (renderToken !== modalRenderToken) return;
-      renderMapEmptyState('Map unavailable', 'Place details are shown below even though the map could not load.');
+      renderMapEmptyState(
+        'Map unavailable',
+        window.__laneGoogleMapsUnavailableReason ||
+          'Place details are shown below even though the map could not load.'
+      );
       return;
     }
 

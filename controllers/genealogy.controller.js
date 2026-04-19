@@ -421,9 +421,10 @@ export async function getGenealogyGoogleApiKey(req, res) {
   try {
     const key = config.googleBrowserApiKey || config.googleApiKey || '';
     if (!key) {
-      return res.status(404).json({
+      return res.json({
         success: false,
-        error: 'Google Maps API key not configured'
+        error:
+          'Google Maps API key not configured. Set GOOGLE_BROWSER_API_KEY (referrer-restricted) or GOOGLE_API_KEY on the server.'
       });
     }
     res.json({
@@ -446,9 +447,11 @@ export async function getGenealogyMapboxAccessToken(req, res) {
   try {
     const token = config.mapboxAccessToken || '';
     if (!token) {
-      return res.status(404).json({
+      // 200 + JSON so production proxies/CDNs never substitute HTML error pages for fetch().json()
+      return res.json({
         success: false,
-        error: 'MAPBOX_ACCESS_TOKEN (or MAPBOX_API_KEY) not configured'
+        error:
+          'Mapbox token not configured. Set MAPBOX_ACCESS_TOKEN (or MAPBOX_API_KEY / MAP_KEY) in the server environment.'
       });
     }
     res.json({

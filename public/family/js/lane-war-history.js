@@ -36,45 +36,6 @@ async function getJson(url) {
   return res.json();
 }
 
-function loadMapboxCssOnce() {
-  if (document.getElementById('mapbox-gl-css')) return;
-  const l = document.createElement('link');
-  l.id = 'mapbox-gl-css';
-  l.rel = 'stylesheet';
-  l.href = 'https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css';
-  document.head.appendChild(l);
-}
-
-let mapboxScriptPromise = null;
-
-async function ensureMapboxGl() {
-  if (window.mapboxgl) return;
-  loadMapboxCssOnce();
-  if (!mapboxScriptPromise) {
-    mapboxScriptPromise = fetch(`${API_BASE}/mapbox-access-token`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Mapbox token (${res.status})`);
-        return res.json();
-      })
-      .then((data) => {
-        if (!data || !data.success || !data.accessToken) throw new Error('Mapbox token unavailable');
-        const token = data.accessToken;
-        return new Promise((resolve, reject) => {
-          const script = document.createElement('script');
-          script.src = 'https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js';
-          script.async = true;
-          script.onload = () => {
-            window.mapboxgl.accessToken = token;
-            resolve();
-          };
-          script.onerror = () => reject(new Error('Mapbox GL failed to load'));
-          document.head.appendChild(script);
-        });
-      });
-  }
-  await mapboxScriptPromise;
-}
-
 function confidenceColor(conf) {
   if (conf === 'high') return '#2db56b';
   if (conf === 'medium') return '#d4a856';
@@ -178,18 +139,24 @@ function openSoldierModal(personId) {
 }
 
 function initMap() {
-  map = new mapboxgl.Map({
-    container: 'warMap',
-    style: 'mapbox://styles/mapbox/satellite-streets-v12',
-    center: [-71.1, 42.4],
-    zoom: 7
+  const el = document.getElementById('warMap');
+  if (!el || !window.google || !google.maps) return;
+  map = new google.maps.Map(el, {
+    center: { lat: 42.4, lng: -71.1 },
+    zoom: 7,
+    mapTypeId: google.maps.MapTypeId.HYBRID,
+    mapTypeControl: true,
+    streetViewControl: false,
+    fullscreenControl: true
   });
-  map.addControl(new mapboxgl.NavigationControl({ showCompass: false }));
   mapReady = true;
 }
 
 function clearMarkers() {
-  markerById.forEach((marker) => marker.remove());
+  markerById.forEach(({ marker, infoWindow }) => {
+    marker.setMap(null);
+    if (infoWindow) infoWindow.close();
+  });
   markerById.clear();
 }
 
@@ -224,46 +191,60 @@ async function renderMarkers() {
     const lngLat = await geocodePlace(place);
     if (!lngLat) continue;
 
-    const el = document.createElement('div');
-    el.style.width = '14px';
-    el.style.height = '14px';
-    el.style.borderRadius = '50%';
-    el.style.background = confidenceColor(entry.confidence);
-    el.style.border = '1px solid #0d1016';
-    el.style.cursor = 'pointer';
+    const position = { lat: lngLat[1], lng: lngLat[0] };
+    const marker = new google.maps.Marker({
+      position,
+      map,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 7,
+        fillColor: confidenceColor(entry.confidence),
+        fillOpacity: 1,
+        strokeColor: '#0d1016',
+        strokeWeight: 1
+      }
+    });
 
-    const marker = new mapboxgl.Marker({ element: el })
-      .setLngLat(lngLat)
-      .setPopup(
-        new mapboxgl.Popup({ offset: 12 }).setHTML(`
+    const infoWindow = new google.maps.InfoWindow({
+      content: `
         <div style="min-width:220px;color:#111">
           <strong>${esc(p.name || 'Unknown')}</strong><br/>
           <small>${esc(entry.warLabel || '')} • ${esc(entry.confidence)} confidence</small><br/>
           <small>${esc(place)}</small><br/>
           <button type="button" style="margin-top:6px" class="btn btn-sm btn-outline-secondary" onclick="window.__laneWarOpen('${String(p.id)}')">Open profile</button>
-        </div>`)
-      )
-      .addTo(map);
+        </div>`
+    });
 
-    markerById.set(String(p.id), marker);
+    marker.addListener('click', () => {
+      infoWindow.open(map, marker);
+    });
+
+    markerById.set(String(p.id), { marker, infoWindow });
     coords.push(lngLat);
   }
 
   if (coords.length > 1) {
-    const bounds = new mapboxgl.LngLatBounds(coords[0], coords[0]);
-    for (let i = 1; i < coords.length; i++) bounds.extend(coords[i]);
-    map.fitBounds(bounds, { padding: 48, maxZoom: 12 });
+    const bounds = new google.maps.LatLngBounds();
+    for (const c of coords) {
+      bounds.extend({ lat: c[1], lng: c[0] });
+    }
+    map.fitBounds(bounds, { top: 48, right: 48, bottom: 48, left: 48 });
+    google.maps.event.addListenerOnce(map, 'idle', () => {
+      if (map.getZoom() > 12) map.setZoom(12);
+    });
   } else if (coords.length === 1) {
-    map.flyTo({ center: coords[0], zoom: 10 });
+    map.panTo({ lat: coords[0][1], lng: coords[0][0] });
+    map.setZoom(10);
   }
 }
 
 function focusParticipant(personId) {
-  const marker = markerById.get(String(personId));
-  if (!marker || !map) return;
-  const lngLat = marker.getLngLat();
-  map.flyTo({ center: lngLat, zoom: Math.max(map.getZoom(), 10) });
-  marker.togglePopup();
+  const entry = markerById.get(String(personId));
+  if (!entry || !map) return;
+  const { marker, infoWindow } = entry;
+  map.panTo(marker.getPosition());
+  map.setZoom(Math.max(map.getZoom(), 10));
+  if (infoWindow) infoWindow.open(map, marker);
 }
 
 async function loadParticipants() {
@@ -277,6 +258,15 @@ async function loadParticipants() {
   await renderMarkers();
 }
 
+function showWarMapFallback(message) {
+  const el = document.getElementById('warMap');
+  if (el) {
+    el.innerHTML = `<div class="war-map-fallback p-3 small text-muted">${esc(message)}</div>`;
+  }
+  const warn = document.getElementById('warError');
+  if (warn) warn.textContent = message;
+}
+
 async function boot() {
   const campaignsRes = await getJson('/api/genealogy/wars');
   allCampaigns = campaignsRes.campaigns || [];
@@ -285,7 +275,27 @@ async function boot() {
     activeWarSlug = allCampaigns[0].slug;
   }
 
-  await ensureMapboxGl();
+  const loadFn = typeof window.laneFamilyLoadGoogleMaps === 'function' ? window.laneFamilyLoadGoogleMaps : null;
+  if (!loadFn) {
+    showWarMapFallback('Google Maps loader missing. Include /family/js/lane-family-google-maps.js before this script.');
+    renderCampaignButtons();
+    await loadParticipants();
+    window.__laneWarOpen = (personId) => openSoldierModal(personId);
+    return;
+  }
+
+  const mapOk = await loadFn();
+  if (!mapOk) {
+    showWarMapFallback(
+      window.__laneGoogleMapsUnavailableReason ||
+        'Google Maps could not load. Campaign list and profiles still work below.'
+    );
+    renderCampaignButtons();
+    await loadParticipants();
+    window.__laneWarOpen = (personId) => openSoldierModal(personId);
+    return;
+  }
+
   initMap();
   renderCampaignButtons();
   await loadParticipants();

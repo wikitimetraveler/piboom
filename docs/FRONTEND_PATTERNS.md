@@ -42,9 +42,9 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 
 ## Lane / family maps (`public/family/`)
 
-Interactive maps on the Lane genealogy pages use **Mapbox GL JS** for the map canvas and **server-side** geocoding via [`services/free-geocoding.service.js`](./../services/free-geocoding.service.js) (Mapbox Geocoding API when `MAPBOX_ACCESS_TOKEN` is set, then Nominatim, etc.). Endpoints: `GET /api/genealogy/mapbox-access-token`, `GET /api/genealogy/geocode-address?q=`. Historical place aliases live in [`services/genealogy-geocode.service.js`](./../services/genealogy-geocode.service.js). Family map UIs use the **`satellite-streets-v12`** style (satellite imagery plus labels/roads) for readability.
+**Map display** uses the **Google Maps JavaScript API** (hybrid / satellite+labels via `mapTypeId: HYBRID`). The browser loads Maps with `GET /api/genealogy/google-api-key` (`GOOGLE_BROWSER_API_KEY` or `GOOGLE_API_KEY` on the server). Shared loader: [`public/family/js/lane-family-google-maps.js`](./../public/family/js/lane-family-google-maps.js).
 
-**Do not** add the Google Maps JavaScript API or `google.maps.Geocoder` to these family pages. Other areas of the repo may still use Google Maps keys for legacy UIs; do not copy that pattern into new `public/family/` work.
+**Geocoding stays server-side** via [`services/free-geocoding.service.js`](./../services/free-geocoding.service.js) (Mapbox Geocoding API when `MAPBOX_ACCESS_TOKEN` is set, then Nominatim, etc.): `GET /api/genealogy/geocode-address?q=`. Do **not** use `google.maps.Geocoder` on family pages for place resolution; keep using that endpoint. Historical place aliases live in [`services/genealogy-geocode.service.js`](./../services/genealogy-geocode.service.js).
 
 ## Shared Resources
 

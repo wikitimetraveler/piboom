@@ -64,7 +64,7 @@ routes/encompass-*.routes.js
 | Worksheets UI            | `public/finance/` (URLs unchanged; product name Worksheets)                                                      |
 | Financial calculations   | `public/shared/calculationEngine.js`                                                                             |
 | AG Grid pages            | `unit-tests.html`, `encompass-custom-fields.html`, `encompass-native-fields.html`                                |
-| Lane family / genealogy | `public/family/`, `services/genealogy.service.js`, `routes/genealogy.routes.js` — maps: Mapbox GL + `geocodeAddressFree` via `/api/genealogy/*`; see `docs/FRONTEND_PATTERNS.md` (Lane / family maps) |
+| Lane family / genealogy | `public/family/`, `services/genealogy.service.js`, `routes/genealogy.routes.js` — maps: Google Maps JS (loader `lane-family-google-maps.js`) + server geocode `geocodeAddressFree` via `/api/genealogy/*`; see `docs/FRONTEND_PATTERNS.md` (Lane / family maps) |
 
 ---
 

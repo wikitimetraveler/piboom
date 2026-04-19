@@ -27,8 +27,9 @@ Central reference for environment variables used by DevConnect Labs. **Never com
 
 | Variable | Purpose |
 |----------|---------|
-| `GOOGLE_API_KEY` | Google Maps API (geocoding, places, maps) |
-| `MAP_KEY` | Alternative map/geocoding key (e.g. Mapbox) |
+| `GOOGLE_API_KEY` | General Google APIs; also fallback for browser Maps if `GOOGLE_BROWSER_API_KEY` is unset |
+| `GOOGLE_BROWSER_API_KEY` | Referrer-restricted key for **Google Maps JavaScript API** on public pages (recommended for `/family/` Lane maps) |
+| `MAPBOX_ACCESS_TOKEN` / `MAPBOX_API_KEY` / `MAP_KEY` | **Server-side** geocoding in `free-geocoding.service.js` (not required for drawing Google Maps if you only need the map canvas) |
 
 ## Disaster & Risk
 
