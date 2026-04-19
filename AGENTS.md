@@ -66,6 +66,13 @@ routes/encompass-*.routes.js
 | AG Grid pages            | `unit-tests.html`, `encompass-custom-fields.html`, `encompass-native-fields.html`                                |
 | Lane family / genealogy | `public/family/`, `services/genealogy.service.js`, `routes/genealogy.routes.js` — maps: Google Maps JS (loader `lane-family-google-maps.js`) + server geocode `geocodeAddressFree` via `/api/genealogy/*`; see `docs/FRONTEND_PATTERNS.md` (Lane / family maps) |
 
+### Lane PDF plate gallery (tracked assets)
+
+- **UI:** `public/family/lane-pdf-gallery.html` — data from `GET /api/genealogy/lane-pdf/gallery` (`services/genealogy.service.js`).
+- **Plate JPEGs:** `public/family/assets/lane-pdf/*.jpg` are **committed** (plain git, not LFS) so clones show thumbnails without a local extract.
+- **Regenerate plates + manifest:** `npm run extract:lane-pdf-images` (requires `data/lanegenealogies01chap.pdf`). **Refresh candidate join:** `npm run build:lane-pdf-candidates` after manifest changes.
+- **Data:** `data/lane-pdf-image-manifest.json`, `data/lane-pdf-photo-candidates.json`, `data/lane-pdf-person-portraits.json`.
+
 ---
 
 # Documentation Index

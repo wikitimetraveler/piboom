@@ -76,8 +76,10 @@ data/lanegenealogies01chap-content*-structured.json
 data/lanegenealogies01chap-chunk*.json
 
 # Lane PDF extracted plate JPEGs (regenerate via scripts/extract_lane_pdf_images.py)
+# Tracked in git (plain; ~5MB / 376 plates). Ignore other scratch files in this folder.
 public/family/assets/lane-pdf/*
 !public/family/assets/lane-pdf/.gitkeep
+!public/family/assets/lane-pdf/*.jpg
 
 # Generated Lane sayings review outputs (regenerate with npm run extract:lane-sayings-candidates)
 data/lane-book-sayings-extracted.json

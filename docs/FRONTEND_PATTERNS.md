@@ -46,6 +46,11 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 
 **Geocoding stays server-side** via [`services/free-geocoding.service.js`](./../services/free-geocoding.service.js) (Mapbox Geocoding API when `MAPBOX_ACCESS_TOKEN` is set, then Nominatim, etc.): `GET /api/genealogy/geocode-address?q=`. Do **not** use `google.maps.Geocoder` on family pages for place resolution; keep using that endpoint. Historical place aliases live in [`services/genealogy-geocode.service.js`](./../services/genealogy-geocode.service.js).
 
+### Lane PDF plate gallery
+
+- **Page:** [`public/family/lane-pdf-gallery.html`](../public/family/lane-pdf-gallery.html) — fetches `GET /api/genealogy/lane-pdf/gallery`.
+- **Static plates:** `public/family/assets/lane-pdf/*.jpg` are version-controlled (see `AGENTS.md`); regenerate with `npm run extract:lane-pdf-images` and refresh joins with `npm run build:lane-pdf-candidates`.
+
 ## Shared Resources
 
 | Path | Purpose |
