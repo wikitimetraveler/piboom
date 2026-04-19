@@ -768,9 +768,11 @@ export function getPersonById(id) {
 export function searchPeople(query) {
   const people = getAllPeople();
   const lowerQuery = query.toLowerCase();
-  return people.filter(person => 
-    person.name.toLowerCase().includes(lowerQuery)
-  );
+  return people.filter((person) => {
+    const nm = (person.name || '').toLowerCase();
+    const tt = (person.title || '').toLowerCase();
+    return nm.includes(lowerQuery) || tt.includes(lowerQuery);
+  });
 }
 
 /**

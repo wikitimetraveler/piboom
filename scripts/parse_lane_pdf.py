@@ -41,16 +41,61 @@ def apply_ocr_name_fixes(text: str) -> str:
     return t
 
 
+# Spelled-out ranks first (longest match via separate passes). Lieut. before short Lt.
+_HON_FULL = re.compile(
+    r"^(Lieutenant|Captain|Colonel|General|Commodore|Admiral|Ensign|Sergeant|Major)\.?\s+",
+    re.IGNORECASE,
+)
+# Require a period so we do not strip the "Lieut" prefix of "Lieutenant".
+_HON_LIEUT = re.compile(r"^Lieut\.\s+", re.IGNORECASE)
+_HON_SHORT = re.compile(
+    r"^(Col|Capt|Gen|Maj|Lt|Dr|Rev|Hon|Deacon|Esq|Sir)\.?\s+",
+    re.IGNORECASE,
+)
+
+
+def unfuse_rank_prefix_ocr(text: str) -> str:
+    """Insert a space when OCR jammed a rank against the following name (e.g. LIEUTENANTEDMUND)."""
+    if not text or len(text) < 6:
+        return text
+    t = text
+    rank_words = (
+        "Lieutenant",
+        "Commodore",
+        "Captain",
+        "Colonel",
+        "General",
+        "Admiral",
+        "Sergeant",
+        "Ensign",
+        "Major",
+    )
+    # Lookahead must not use IGNORECASE, or "Lieut" matches inside "Lieutenant" (e is "A-Z" with re.I).
+    for w in rank_words:
+        t = re.sub(rf"(?i)({re.escape(w)})(?=(?-i:[A-Z]))", r"\1 ", t)
+    # Require "Lieut." so we do not match the "Lieut" prefix of "Lieutenant".
+    t = re.sub(r"(?i)(Lieut\.)(?=(?-i:[A-Z]))", r"\1 ", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
 def split_honorifics_from_name(name: str) -> tuple[str, list]:
     """Strip leading military/civic titles from display name; return (clean_name, ['Col.', ...])."""
     s = clean_text(apply_ocr_name_fixes(name)).strip()
     titles = []
     while True:
-        m = re.match(
-            r"^(Col|Capt|Gen|Maj|Lt|Dr|Rev|Hon|Deacon|Esq|Sir)\.?\s+",
-            s,
-            re.IGNORECASE,
-        )
+        m = _HON_FULL.match(s)
+        if m:
+            raw = m.group(1)
+            lab = raw[0].upper() + raw[1:].lower() + "."
+            titles.append(lab)
+            s = s[m.end() :].strip()
+            continue
+        m = _HON_LIEUT.match(s)
+        if m:
+            titles.append("Lieut.")
+            s = s[m.end() :].strip()
+            continue
+        m = _HON_SHORT.match(s)
         if not m:
             break
         raw = m.group(1)
@@ -684,7 +729,7 @@ def _line_leads_with_child_roman_marker(line: str) -> bool:
 
 
 def parse_parent_header(line: str):
-    line_clean = apply_ocr_name_fixes(clean_text(line))
+    line_clean = apply_ocr_name_fixes(unfuse_rank_prefix_ocr(clean_text(line)))
     if _line_leads_with_child_roman_marker(line_clean):
         return None
     squashed = re.sub(r"[^a-z]", "", line_clean.lower())
@@ -712,7 +757,7 @@ def parse_parent_header(line: str):
 
 
 def parse_child_line(line: str):
-    line_clean = clean_text(line)
+    line_clean = unfuse_rank_prefix_ocr(clean_text(line))
     if not re.match(r"^\(?\d+\)?\s*[IVXLCDM]+[\.\-]|^[IVXLCDM]+[\.\-]", line_clean):
         return None
     marker_level = 1
@@ -752,13 +797,19 @@ def looks_like_prose_or_header(line: str) -> bool:
 def split_segments(page_text: str):
     text = (page_text or "").replace("\n", " ")
     text = re.sub(r"\s+", " ", text)
+    text = unfuse_rank_prefix_ocr(text)
     text = re.sub(r"(--\s*\d+\s*of\s*\d+\s*--)", r"\n\1\n", text, flags=re.IGNORECASE)
     text = re.sub(r"(\bNo\.\s*\d+\.)", r"\n\1", text)
     # Glued OCR: "No.12" or "No. 12 COL" without space before name
     text = re.sub(r"(\bNo\.\s*\d+)\s+(?=[A-Z])", r"\n\1 ", text, flags=re.IGNORECASE)
     text = re.sub(r"(\(\d+\)\s*[IVXLCDM]+[\.\-])", r"\n\1", text)
     text = re.sub(r"((?<![A-Za-z])[IVXLCDM]{1,5}[\.\-]\s)", r"\n\1", text)
-    text = re.sub(r"([;.])\s*(?=(?:COL|CAPT|GEN|MAJ|REV|HON)\.\s*[A-Z])", r"\1\n", text, flags=re.IGNORECASE)
+    text = re.sub(
+        r"([;.])\s*(?=(?:LIEUTENANT|LIEUT|CAPTAIN|COL|CAPT|GEN|MAJ|REV|HON)\.?\s*[A-Z])",
+        r"\1\n",
+        text,
+        flags=re.IGNORECASE,
+    )
     text = re.sub(r"(and\s+his\s+w\.\s*)", r"\n\1", text, flags=re.IGNORECASE)
     return [clean_text(seg) for seg in text.split("\n") if clean_text(seg)]
 

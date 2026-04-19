@@ -355,6 +355,14 @@ function esc(value) {
     .replace(/'/g, '&#39;');
 }
 
+function formatPersonDisplayName(person) {
+  if (!person) return '';
+  const t = person.title != null && String(person.title).trim() ? String(person.title).trim() : '';
+  const n = person.name != null ? String(person.name).trim() : '';
+  if (t && n) return t + ' ' + n;
+  return n || '';
+}
+
 function formatLifeDate(person, yearKey, dateKey) {
   const year = person?.[yearKey];
   const date = person?.[dateKey];
@@ -368,10 +376,10 @@ function formatParentNamesGenealogy(rows) {
   if (!rows || !rows.length) return '—';
   const parts = rows
     .map((row) => {
-      const n = row && row.person && row.person.name;
-      if (!n) return null;
+      const p = row && row.person;
+      if (!p || (!p.name && !p.title)) return null;
       const rel = row.relation ? row.relation + ': ' : '';
-      return rel + n;
+      return rel + formatPersonDisplayName(p);
     })
     .filter(Boolean);
   return parts.length ? parts.join(', ') : '—';
@@ -379,7 +387,9 @@ function formatParentNamesGenealogy(rows) {
 
 function formatPersonNamesGenealogy(rows) {
   if (!rows || !rows.length) return '—';
-  const parts = rows.map((row) => (row && row.name ? String(row.name) : null)).filter(Boolean);
+  const parts = rows
+    .map((row) => (row && (row.name || row.title) ? formatPersonDisplayName(row) : null))
+    .filter(Boolean);
   return parts.length ? parts.join(', ') : '—';
 }
 
@@ -502,9 +512,13 @@ function renderPersonDetail(person, family, musicalEra, lanePdfPortraits) {
     ${narrativeFamilyBlockG}
   `;
 
+  const titleRow = person.title
+    ? `<dt class="col-sm-3">Title</dt><dd class="col-sm-9">${esc(String(person.title))}</dd>`
+    : '';
   return `
     ${portraitBlock}
     <dl class="row mb-2">
+      ${titleRow}
       <dt class="col-sm-3">Birth</dt><dd class="col-sm-9">${esc(formatLifeDate(person, 'birthYear', 'birthDate'))}</dd>
       <dt class="col-sm-3">Death</dt><dd class="col-sm-9">${esc(formatLifeDate(person, 'deathYear', 'deathDate'))}</dd>
       ${marriedList.length ? `<dt class="col-sm-3">Married</dt><dd class="col-sm-9">${esc(marriedList.join(' · '))}</dd>` : ''}
@@ -638,7 +652,7 @@ async function searchFamily() {
         card.className = 'person-card';
         card.onclick = () => viewPerson(person.id);
         card.innerHTML = `
-          <div class="person-name">${person.name}</div>
+          <div class="person-name">${esc(formatPersonDisplayName(person))}</div>
           <div class="person-details">
             ${person.birthYear} - ${person.deathYear || 'Present'}<br>
             ${person.born || 'Unknown location'}<br>
@@ -669,7 +683,7 @@ async function viewPerson(id) {
     
     if (data.success) {
       const person = data.person;
-      titleEl.textContent = person?.name || 'Profile';
+      titleEl.textContent = formatPersonDisplayName(person) || 'Profile';
       bodyEl.innerHTML = renderPersonDetail(person, data.family, data.musicalEra, data.lanePdfPortraits || []);
     } else {
       titleEl.textContent = 'Not found';

@@ -23,6 +23,7 @@
     "mcp:encompass": "node mcp/devconnect-encompass/server.mjs",
     "extract:lane-pdf-images": "python scripts/extract_lane_pdf_images.py",
     "build:lane-pdf-candidates": "node scripts/build-lane-pdf-photo-candidates.mjs",
+    "migrate:lane-ranks": "python scripts/migrate_lane_military_ranks.py",
     "extract:lane-sayings-candidates": "python scripts/extract_lane_sayings_candidates.py",
     "extract:lane-sayings-llm": "node scripts/extract_lane_sayings_llm.mjs"
   },

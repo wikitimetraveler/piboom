@@ -68,9 +68,26 @@ def test_ocr_name_fix():
     assert "Jacob" in p.apply_ocr_name_fixes("Facob Lane")
 
 
+def test_split_honorifics_lieutenant_and_captain():
+    n, titles = p.split_honorifics_from_name("Lieutenant Edmund Chadwick Lane")
+    assert n == "Edmund Chadwick Lane"
+    assert any("Lieutenant" in x for x in titles)
+    n2, t2 = p.split_honorifics_from_name("Capt. Samuel Lane")
+    assert n2 == "Samuel Lane"
+    assert any("Capt" in x for x in t2)
+
+
+def test_unfuse_jammed_lieutenant_ocr():
+    out = p.unfuse_rank_prefix_ocr("LIEUTENANTEDMUND CHADWICK LANE")
+    assert "LIEUTENANT EDMUND" in out.upper()
+    assert p.unfuse_rank_prefix_ocr("Lieutenant Edmund Chadwick Lane") == "Lieutenant Edmund Chadwick Lane"
+
+
 if __name__ == "__main__":
     main()
     test_eu_dox_glued_header_line()
     test_header_lifespan_and_honorific()
     test_split_segments_glued_no()
     test_ocr_name_fix()
+    test_split_honorifics_lieutenant_and_captain()
+    test_unfuse_jammed_lieutenant_ocr()

@@ -73,9 +73,8 @@ jspm_packages/
 .nuxt
 dist
 
-# Gatsby files
+# Gatsby / Next-style build caches (do NOT ignore repo `public/` — Express serves static assets from it)
 .cache/
-public
 
 # Storybook build outputs
 .out
