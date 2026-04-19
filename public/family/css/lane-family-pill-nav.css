@@ -1,0 +1,85 @@
+/**
+ * Sticky pill strip — switch between Lane family tools (all /family/* pages).
+ */
+.lane-pill-nav {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  background: rgba(18, 20, 24, 0.88);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+.lane-pill-nav__inner {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  align-items: center;
+  max-width: 1280px;
+  margin: 0 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  padding-bottom: 1px;
+}
+
+.lane-pill-nav__inner::-webkit-scrollbar {
+  height: 4px;
+}
+
+.lane-pill-nav__inner::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.lane-pill-nav__label {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-right: 0.35rem;
+  padding-right: 0.25rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.lane-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.72);
+  text-decoration: none;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.lane-pill:hover {
+  color: #fff;
+  border-color: rgba(196, 184, 150, 0.45);
+  background: rgba(174, 154, 120, 0.15);
+}
+
+.lane-pill.is-active {
+  color: #f4f0e8;
+  border-color: rgba(196, 184, 150, 0.55);
+  background: rgba(174, 154, 120, 0.22);
+  box-shadow: 0 0 0 1px rgba(196, 184, 150, 0.12);
+}
+
+@media (max-width: 400px) {
+  .lane-pill-nav__label {
+    display: none;
+  }
+}

@@ -11,6 +11,8 @@ import {
   getMuseumContentData,
   getFeaturedStoryData,
   getProminentLanesData,
+  getLanePdfGallery,
+  getLaneBookSayingsData,
   getWarCampaignsData,
   getWarParticipantsData,
   getOccupationsData,
@@ -44,6 +46,8 @@ router.get('/musical-timeline', getMusicalTimeline);
 router.get('/museum-content', getMuseumContentData);
 router.get('/featured-story', getFeaturedStoryData);
 router.get('/prominent-lanes', getProminentLanesData);
+router.get('/lane-pdf/gallery', getLanePdfGallery);
+router.get('/lane-book-sayings', getLaneBookSayingsData);
 router.get('/wars', getWarCampaignsData);
 router.get('/wars/:warSlug/participants', getWarParticipantsData);
 router.get('/occupations', getOccupationsData);

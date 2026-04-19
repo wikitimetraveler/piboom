@@ -18,7 +18,10 @@ import {
   getWarParticipants,
   getWarCampaignsSummary,
   getOccupationSummary,
-  getDirectAncestorStory
+  getDirectAncestorStory,
+  getLanePdfGalleryData,
+  getLanePdfPortraitsForPerson,
+  getLaneBookSayings
 } from '../services/genealogy.service.js';
 import { config } from '../config/index.js';
 import multer from 'multer';
@@ -117,6 +120,7 @@ export async function getPerson(req, res) {
       success: true,
       person: person,
       musicalEra: musicalEra,
+      lanePdfPortraits: getLanePdfPortraitsForPerson(id),
       family: {
         parents: parents,
         children: children,
@@ -282,6 +286,28 @@ export async function getMuseumContentData(req, res) {
 }
 
 /**
+ * Lane genealogy book sayings / excerpts for AI docent grounding.
+ */
+export async function getLaneBookSayingsData(req, res) {
+  try {
+    const doc = getLaneBookSayings();
+    res.json({
+      success: true,
+      version: doc.version,
+      source: doc.source,
+      sourceLabel: doc.sourceLabel,
+      entries: doc.entries || []
+    });
+  } catch (error) {
+    console.error('Error getting Lane book sayings:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
  * Get opening featured chronological story (William E Lane of Boston).
  */
 export async function getFeaturedStoryData(req, res) {
@@ -313,6 +339,25 @@ export async function getProminentLanesData(req, res) {
     });
   } catch (error) {
     console.error('Error getting prominent lanes:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Lane PDF extracted plates + page-based person candidates + curated portraits.
+ */
+export async function getLanePdfGallery(req, res) {
+  try {
+    const data = getLanePdfGalleryData();
+    res.json({
+      success: true,
+      ...data
+    });
+  } catch (error) {
+    console.error('Error getting Lane PDF gallery:', error);
     res.status(500).json({
       success: false,
       error: error.message
@@ -625,6 +670,8 @@ export default {
   getMuseumContentData,
   getFeaturedStoryData,
   getProminentLanesData,
+  getLanePdfGallery,
+  getLaneBookSayingsData,
   getWarCampaignsData,
   getWarParticipantsData,
   getOccupationsData,

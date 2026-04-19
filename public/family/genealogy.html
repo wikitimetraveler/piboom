@@ -7,7 +7,10 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/family/css/lane-tts.css"/>
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css"/>
   <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     .family-tree-container {
@@ -131,11 +134,18 @@
   </div>
 </div>
 
-<div class="container mt-4">
+<div class="container mt-4" data-lane-tts-main>
   <!-- Header -->
   <div class="family-tree-container">
+    <p class="mb-2" style="font-size:0.9rem;">
+      <a href="/family/lane-family.html" class="text-secondary" style="text-decoration:none;border-bottom:1px solid rgba(0,0,0,0.15);">Lane Family home</a>
+      <span class="text-muted"> — all tools &amp; exhibits</span>
+    </p>
     <h1><i class="bi-diagram-3"></i> Lane Family Tree & Musical Timeline</h1>
     <p class="text-muted">400+ years of family history mapped to musical eras</p>
+    <a class="btn btn-outline-secondary btn-sm mr-2" href="/family/lane-family.html">
+      <i class="bi-house-heart"></i> Lane Family home
+    </a>
     <a class="btn btn-outline-warning btn-sm mr-2" href="/family/lane-museum.html">
       <i class="bi-building"></i> Open Lane Museum MVP
     </a>
@@ -147,6 +157,9 @@
     </a>
     <a class="btn btn-outline-secondary btn-sm mr-2" href="/family/lane-occupations.html">
       <i class="bi-briefcase"></i> Lane Occupations
+    </a>
+    <a class="btn btn-outline-info btn-sm mr-2" href="/family/lane-pdf-gallery.html">
+      <i class="bi-images"></i> Book plates (PDF)
     </a>
     <a class="btn btn-outline-info btn-sm mr-2" href="/family/lane-direct-ancestor-story.html">
       <i class="bi-signpost-2"></i> Direct Ancestor Story
@@ -425,8 +438,24 @@ function spouseHintsFromOcrGenealogy(ocrFacts) {
   return [...new Set(ocrFacts.marriageSnippets.map((s) => String(s || '').trim()).filter((s) => s.length >= 2))];
 }
 
-function renderPersonDetail(person, family, musicalEra) {
+function renderPersonDetail(person, family, musicalEra, lanePdfPortraits) {
   const fam = family || {};
+  const lp = Array.isArray(lanePdfPortraits) ? lanePdfPortraits : [];
+  const portraitBlock = lp.length
+    ? `<div class="mb-3 text-center border-bottom pb-3">
+        <div class="small text-muted text-uppercase mb-2">Book plates (curated)</div>
+        ${lp
+          .map(
+            (p) => `
+        <figure class="figure d-inline-block mr-2 mb-2" style="max-width: 220px; vertical-align: top">
+          <img src="${esc(p.publicUrl)}" class="figure-img img-fluid rounded border" alt="" loading="lazy"
+            onerror="this.style.display='none'" />
+          <figcaption class="figure-caption small">${esc(p.credit || '')}</figcaption>
+        </figure>`
+          )
+          .join('')}
+      </div>`
+    : '';
   const ocrFacts = person?.importMeta?.ocrFacts && typeof person.importMeta.ocrFacts === 'object'
     ? person.importMeta.ocrFacts
     : null;
@@ -474,6 +503,7 @@ function renderPersonDetail(person, family, musicalEra) {
   `;
 
   return `
+    ${portraitBlock}
     <dl class="row mb-2">
       <dt class="col-sm-3">Birth</dt><dd class="col-sm-9">${esc(formatLifeDate(person, 'birthYear', 'birthDate'))}</dd>
       <dt class="col-sm-3">Death</dt><dd class="col-sm-9">${esc(formatLifeDate(person, 'deathYear', 'deathDate'))}</dd>
@@ -640,7 +670,7 @@ async function viewPerson(id) {
     if (data.success) {
       const person = data.person;
       titleEl.textContent = person?.name || 'Profile';
-      bodyEl.innerHTML = renderPersonDetail(person, data.family, data.musicalEra);
+      bodyEl.innerHTML = renderPersonDetail(person, data.family, data.musicalEra, data.lanePdfPortraits || []);
     } else {
       titleEl.textContent = 'Not found';
       bodyEl.innerHTML = `<p class="text-warning mb-0">${esc(data.error || 'Person not found.')}</p>`;
@@ -668,9 +698,33 @@ async function testAPI() {
 }
 </script>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="/shared/tts.js"></script>
+  <script src="/family/js/lane-tts.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+  (function applySearchQueryFromUrl() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var idParam = params.get('id');
+      if (idParam && typeof viewPerson === 'function') {
+        var pid = parseInt(idParam, 10);
+        if (!isNaN(pid)) {
+          viewPerson(pid);
+          return;
+        }
+      }
+      var q = params.get('q');
+      if (!q || typeof searchFamily !== 'function') return;
+      var input = document.getElementById('searchInput');
+      if (input) input.value = q;
+      var tab = document.getElementById('search-tab');
+      if (tab && window.jQuery && window.jQuery.fn.tab) window.jQuery(tab).tab('show');
+      searchFamily();
+    } catch (e) { /* ignore */ }
+  })();
+</script>
 </body>
 </html>
 

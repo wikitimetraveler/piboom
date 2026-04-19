@@ -43,6 +43,28 @@ SAFETY:
 `;
   }
 
+  if (context?.laneMuseumDocent === true) {
+    const persona = context.personaName || 'Lane Legacy Museum docent';
+    const intro = context.docentIntro || '';
+    const featured = context.featuredTitle || '';
+    const sayingsBlock = context.sayingsContextBlock || '(No excerpt list supplied.)';
+    return `You are "${persona}", the museum docent for the Lane Legacy Museum (DevConnect Labs family history site).
+
+ROLE:
+${intro}
+
+FEATURED EXHIBIT: ${featured}
+
+SOURCE BOOK EXCERPTS (Lane genealogy PDF — cite pdfPage when you quote or closely paraphrase):
+${sayingsBlock}
+
+RULES:
+- Warm, concise, scholarly tone. Ground answers in the excerpts when they apply; mention the PDF page number.
+- If the question is not covered by these excerpts, say so and give careful general American history or genealogy context without inventing book quotations.
+- Do not fabricate quotations or page numbers. Keep excerpts short; this is a family history context.
+- Avoid emoji unless the visitor uses a playful tone; prefer plain text.`;
+  }
+
   const assistants = {
     robert: {
       name: "Robert",
@@ -293,7 +315,8 @@ Remember: You're not just answering questions - you're having a conversation wit
 const chatWithGPT = async (req, res) => {
   try {
     const { message, context = {} } = req.body;
-    
+    const isLaneMuseumDocent = Boolean(context?.laneMuseumDocent);
+
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
@@ -302,48 +325,54 @@ const chatWithGPT = async (req, res) => {
       return res.status(500).json({ error: 'OpenAI API key not configured' });
     }
 
-    // Add user message to conversation history
-    conversationHistory.push({
-      role: "user",
-      content: message,
-      timestamp: new Date().toISOString()
-    });
+    if (!isLaneMuseumDocent) {
+      conversationHistory.push({
+        role: "user",
+        content: message,
+        timestamp: new Date().toISOString()
+      });
+    }
 
     // Get system prompt based on current assistant
     const systemPrompt = getAssistantSystemPrompt(currentAssistant, context, userPreferences);
 
-    // Prepare messages with conversation history (keep last 8 exchanges for context)
-    const messages = [
-      { role: "system", content: systemPrompt },
-      ...conversationHistory.slice(-8)
-    ];
+    const messages = isLaneMuseumDocent
+      ? [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: message }
+        ]
+      : [
+          { role: "system", content: systemPrompt },
+          ...conversationHistory.slice(-8)
+        ];
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: messages,
-      max_tokens: 600,
-      temperature: 0.8, // Higher temperature for more personality
+      max_tokens: isLaneMuseumDocent ? 900 : 600,
+      temperature: isLaneMuseumDocent ? 0.45 : 0.8, // Higher temperature for more personality
     });
 
     const response = completion.choices[0].message.content;
 
-    // Add assistant response to conversation history
-    conversationHistory.push({
-      role: "assistant",
-      content: response,
-      timestamp: new Date().toISOString()
-    });
+    if (!isLaneMuseumDocent) {
+      conversationHistory.push({
+        role: "assistant",
+        content: response,
+        timestamp: new Date().toISOString()
+      });
 
-    // Keep conversation history manageable (last 20 exchanges)
-    if (conversationHistory.length > 20) {
-      conversationHistory = conversationHistory.slice(-20);
+      // Keep conversation history manageable (last 20 exchanges)
+      if (conversationHistory.length > 20) {
+        conversationHistory = conversationHistory.slice(-20);
+      }
     }
 
-    res.json({ 
+    res.json({
       response,
       timestamp: new Date().toISOString(),
       model: "gpt-4o-mini",
-      personality: "engaging",
+      personality: isLaneMuseumDocent ? "lane-museum-docent" : "engaging",
       conversationLength: conversationHistory.length
     });
     

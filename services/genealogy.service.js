@@ -8,6 +8,128 @@ const __dirname = path.dirname(__filename);
 let genealogyData = null;
 let museumContent = null;
 
+let lanePdfManifestCache = null;
+let lanePdfCandidatesCache = null;
+let lanePdfPortraitsCache = null;
+let laneBookSayingsCache = null;
+
+function loadLaneBookSayings() {
+  if (laneBookSayingsCache !== null) return laneBookSayingsCache;
+  try {
+    const p = path.join(__dirname, '..', 'data', 'lane-book-sayings.json');
+    laneBookSayingsCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
+  } catch {
+    laneBookSayingsCache = { version: 0, source: '', entries: [] };
+  }
+  return laneBookSayingsCache;
+}
+
+function loadLanePdfManifest() {
+  if (lanePdfManifestCache !== null) return lanePdfManifestCache;
+  try {
+    const manifestPath = path.join(__dirname, '..', 'data', 'lane-pdf-image-manifest.json');
+    lanePdfManifestCache = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
+  } catch {
+    lanePdfManifestCache = null;
+  }
+  return lanePdfManifestCache;
+}
+
+function loadLanePdfPhotoCandidates() {
+  if (lanePdfCandidatesCache !== null) return lanePdfCandidatesCache;
+  try {
+    const p = path.join(__dirname, '..', 'data', 'lane-pdf-photo-candidates.json');
+    lanePdfCandidatesCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
+  } catch {
+    lanePdfCandidatesCache = null;
+  }
+  return lanePdfCandidatesCache;
+}
+
+function loadLanePdfPersonPortraits() {
+  if (lanePdfPortraitsCache !== null) return lanePdfPortraitsCache;
+  try {
+    const p = path.join(__dirname, '..', 'data', 'lane-pdf-person-portraits.json');
+    lanePdfPortraitsCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
+  } catch {
+    lanePdfPortraitsCache = null;
+  }
+  return lanePdfPortraitsCache;
+}
+
+/**
+ * Bundle manifest, page-candidate join, and curated portraits for the Lane PDF gallery UI.
+ */
+export function getLanePdfGalleryData() {
+  const manifest = loadLanePdfManifest();
+  const candidates = loadLanePdfPhotoCandidates();
+  const portraitsDoc = loadLanePdfPersonPortraits();
+
+  const summary = manifest
+    ? {
+        generatedAt: manifest.generatedAt,
+        sourcePdf: manifest.sourcePdf,
+        pdfPageCount: manifest.pdfPageCount,
+        extractedOkCount: manifest.extractedOkCount,
+        skippedCount: manifest.skippedCount,
+        listedImageSlots: manifest.listedImageSlots
+      }
+    : null;
+
+  const creditDefault =
+    (portraitsDoc && portraitsDoc.creditDefault) || 'Lane genealogy source book (digitized plates).';
+  const rawPortraits = Array.isArray(portraitsDoc?.portraits) ? portraitsDoc.portraits : [];
+  const portraits = rawPortraits
+    .filter((p) => p && p.personId != null && (p.confirmed === undefined || p.confirmed === true))
+    .map((p) => {
+      const person = getPersonById(p.personId);
+      const publicUrl =
+        p.publicUrl ||
+        (p.imageId ? `/family/assets/lane-pdf/${String(p.imageId)}.jpg` : '');
+      return {
+        personId: Number(p.personId),
+        imageId: p.imageId || null,
+        publicUrl,
+        credit: p.credit || creditDefault,
+        notes: p.notes || '',
+        personName: person?.name || null
+      };
+    });
+
+  return {
+    summary,
+    creditDefault,
+    candidatesStats: candidates?.stats || null,
+    images: candidates?.images || [],
+    portraits
+  };
+}
+
+/**
+ * Curated book portraits for a single person (confirmed entries only).
+ */
+export function getLanePdfPortraitsForPerson(personId) {
+  const doc = loadLanePdfPersonPortraits();
+  if (!doc || !Array.isArray(doc.portraits)) return [];
+  const pid = parseInt(personId, 10);
+  if (Number.isNaN(pid)) return [];
+  const creditDefault = doc.creditDefault || '';
+  return doc.portraits
+    .filter(
+      (p) =>
+        p &&
+        Number(p.personId) === pid &&
+        (p.confirmed === undefined || p.confirmed === true)
+    )
+    .map((p) => ({
+      personId: pid,
+      imageId: p.imageId || null,
+      publicUrl: p.publicUrl || (p.imageId ? `/family/assets/lane-pdf/${String(p.imageId)}.jpg` : ''),
+      credit: p.credit || creditDefault,
+      notes: p.notes || ''
+    }));
+}
+
 const WAR_DEFINITIONS = {
   'king-philips-war': {
     slug: 'king-philips-war',
@@ -42,32 +164,49 @@ const WAR_DEFINITIONS = {
 const DEFAULT_MUSEUM_CONTENT = {
   featuredStory: {
     slug: 'william-e-lane-boston',
-    title: 'Exhibit 1: William E Lane of Boston',
+    title: 'Exhibit 1: William Lane of Boston',
     subtitle: 'Opening the Lane story in chronological order',
     personQuery: {
       preferredNames: ['William E Lane', 'William Lane'],
       fallbackKeywords: ['William', 'Boston']
     },
     summary:
-      'This opening exhibit introduces William E Lane of Boston as the first anchor in the museum experience. The storyline then advances chronologically through later Lane generations.',
+      'William Lane of Boston (cordwainer) anchors the opening exhibit; the museum narrative continues through later Lane generations.',
     historianNotes: [
-      'Start with verified book citations and sourceRefs tied to this figure.',
+      'Verify Hartford / Lynn harmonization and NEHGR XII:196 against original register and town records.',
       'Use this exhibit as the chronology baseline for future stories, including Lane Crater.'
     ],
     citations: [{ label: 'Lane genealogy source book', kind: 'book' }]
   },
   prominentLanes: [
-    { order: 1, personQuery: 'William E Lane', caption: 'Opening exhibit figure', eraLabel: 'Colonial Boston' },
-    { order: 2, personQuery: 'William Lane', caption: 'Chronology continuation', eraLabel: 'Early New England' }
+    {
+      order: 1,
+      personId: 4,
+      displayName: 'William Lane of Boston',
+      personQuery: 'William Lane',
+      caption: 'Opening exhibit · colonial chronology anchor',
+      eraLabel: 'Colonial Boston · 17th century',
+      blurb:
+        'Book narrative: Hartford (Samuel b. 8 Aug. 1648), Lynn (1651), freeman 1657; Mary d. 1656; marriage to Mary Brewer — see Hist. Gen. Reg. XII, 196.',
+      imageUrl: '/family/assets/william-e-lane-boston-hero.png',
+      imageCaption: 'Portrait plate (book materials).',
+      imageCredit: 'Lane family / genealogy compilation',
+      links: [
+        {
+          label: 'NEHGR XII:196 — citation in Lane genealogy narrative',
+          kind: 'book'
+        }
+      ]
+    }
   ],
   media: [
     {
       id: 'exhibit1-hero',
       storySlug: 'william-e-lane-boston',
       type: 'image',
-      url: '/family/assets/william-e-lane-placeholder.jpg',
-      caption: 'Portrait placeholder for William E Lane of Boston',
-      credit: 'Pending source image'
+      url: '/family/assets/william-e-lane-boston-hero.png',
+      caption: 'William Lane of Boston — portrait from book materials',
+      credit: 'Lane family / genealogy compilation'
     },
     {
       id: 'exhibit1-map',
@@ -108,7 +247,9 @@ const DEFAULT_MUSEUM_CONTENT = {
       'Show the next major Lane events in chronological order.',
       'Connect this exhibit to wider American history.'
     ]
-  }
+  },
+  /** Optional: Lane lunar crater “observatory” panel (see lane-museum-content.json). */
+  lunarExhibit: null
 };
 
 /**
@@ -300,6 +441,13 @@ export function getMuseumContent() {
   return museumContent;
 }
 
+/**
+ * Curated / merged Lane book sayings for museum docent context (see data/lane-book-sayings.json).
+ */
+export function getLaneBookSayings() {
+  return loadLaneBookSayings();
+}
+
 export function getFeaturedStory() {
   const content = getMuseumContent() || {};
   const story = content.featuredStory || {};
@@ -317,10 +465,17 @@ export function getProminentLanes() {
   const entries = content.prominentLanes || [];
   const resolved = entries
     .map((entry) => {
-      const pq = String(entry.personQuery || '').toLowerCase().trim();
       let person = null;
-      if (pq) {
-        person = people.find((p) => String(p.name || '').toLowerCase().includes(pq)) || null;
+      const pid = entry.personId;
+      if (pid != null && pid !== '' && Number.isFinite(Number(pid))) {
+        const idNum = Number(pid);
+        person = people.find((p) => Number(p.id) === idNum) || null;
+      }
+      if (!person) {
+        const pq = String(entry.personQuery || '').toLowerCase().trim();
+        if (pq) {
+          person = people.find((p) => String(p.name || '').toLowerCase().includes(pq)) || null;
+        }
       }
       return { ...entry, person };
     })
@@ -814,6 +969,8 @@ export default {
   getWarParticipants,
   getWarCampaignsSummary,
   getOccupationSummary,
-  getDirectAncestorStory
+  getDirectAncestorStory,
+  getLanePdfGalleryData,
+  getLanePdfPortraitsForPerson
 };
 

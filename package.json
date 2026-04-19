@@ -20,7 +20,11 @@
     "generate-gd-kml": "node scripts/generate-grateful-dead-kml.js",
     "refresh-disasters": "node scripts/refresh-disasters.js",
     "extract:asset-qualifier": "node scripts/extract-asset-qualifier.js \"data/30 Retail Lending - Asset Qualifier Calculator, August 10, 2022.xlsx\" > data/asset-qualifier.json",
-    "mcp:encompass": "node mcp/devconnect-encompass/server.mjs"
+    "mcp:encompass": "node mcp/devconnect-encompass/server.mjs",
+    "extract:lane-pdf-images": "python scripts/extract_lane_pdf_images.py",
+    "build:lane-pdf-candidates": "node scripts/build-lane-pdf-photo-candidates.mjs",
+    "extract:lane-sayings-candidates": "python scripts/extract_lane_sayings_candidates.py",
+    "extract:lane-sayings-llm": "node scripts/extract_lane_sayings_llm.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",

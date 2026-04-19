@@ -75,6 +75,14 @@ data/lanegenealogies01chap-content*-structured.json
 # Chunked batch outputs (quality / review / structured / chunk summary JSON)
 data/lanegenealogies01chap-chunk*.json
 
+# Lane PDF extracted plate JPEGs (regenerate via scripts/extract_lane_pdf_images.py)
+public/family/assets/lane-pdf/*
+!public/family/assets/lane-pdf/.gitkeep
+
+# Generated Lane sayings review outputs (regenerate with npm run extract:lane-sayings-candidates)
+data/lane-book-sayings-extracted.json
+data/lane-book-sayings-llm-staging.json
+
 # Python cache
 scripts/__pycache__/
 

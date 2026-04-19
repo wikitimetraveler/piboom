@@ -8,11 +8,14 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
   <link rel="stylesheet" href="/shared/styles.css" />
   <link rel="stylesheet" href="/family/css/lane-occupations.css" />
+  <link rel="stylesheet" href="/family/css/lane-tts.css" />
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
   <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
 </head>
 <body class="lane-occ-page">
   <modern-navbar></modern-navbar>
-  <main class="occ-wrap">
+  <main class="occ-wrap" data-lane-tts-main>
     <section class="occ-card occ-header">
       <div class="occ-kicker">Lane family economy</div>
       <h1 class="h3 mb-2">Occupations in the Lane dataset</h1>
@@ -46,6 +49,8 @@
     </section>
   </main>
 
+  <script src="/shared/tts.js"></script>
+  <script src="/family/js/lane-tts.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

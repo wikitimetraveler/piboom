@@ -1,99 +1,172 @@
 :root {
-  --museum-bg: #111418;
-  --museum-surface: #1b2129;
-  --museum-surface-soft: #252f3a;
-  --museum-text: #e7e1d2;
-  --museum-muted: #9ea5ae;
-  --museum-accent: #bf9b5f;
-  --museum-link: #c8ab75;
-  --museum-border: #3a4653;
-  --museum-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  --museum-bg: #13151a;
+  --museum-surface: #1b1e26;
+  --museum-surface-soft: #232830;
+  --museum-text: #ece8df;
+  --museum-muted: #9a958a;
+  --museum-accent: #ae9a78;
+  --museum-link: #c4b896;
+  --museum-border: rgba(236, 232, 223, 0.1);
+  --museum-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 48px rgba(0, 0, 0, 0.35);
+  --museum-serif: Georgia, 'Times New Roman', serif;
+  --museum-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 body.archiveLight {
-  --museum-bg: #f1ecdf;
-  --museum-surface: #fffaf0;
-  --museum-surface-soft: #efe8d9;
-  --museum-text: #22262b;
-  --museum-muted: #5e646d;
-  --museum-accent: #7d5d2f;
-  --museum-link: #66461f;
-  --museum-border: #d7ccb6;
-  --museum-shadow: 0 8px 24px rgba(65, 45, 15, 0.12);
+  --museum-bg: #f4f1eb;
+  --museum-surface: #fffcf7;
+  --museum-surface-soft: #f0ebe3;
+  --museum-text: #252320;
+  --museum-muted: #6e6a62;
+  --museum-accent: #6b5344;
+  --museum-link: #5a4839;
+  --museum-border: rgba(37, 35, 32, 0.12);
+  --museum-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset, 0 12px 32px rgba(45, 38, 28, 0.08);
 }
 
 body.lane-museum-page {
   background: var(--museum-bg);
   color: var(--museum-text);
+  font-family: var(--museum-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
 .museum-wrap {
-  max-width: 1240px;
-  margin: 2rem auto 4rem;
-  padding: 0 1rem;
+  max-width: 1120px;
+  margin: 0 auto 4.5rem;
+  padding: 2.5rem 1.25rem 0;
 }
 
 .museum-hero,
 .museum-panel {
   background: var(--museum-surface);
   border: 1px solid var(--museum-border);
-  border-radius: 14px;
+  border-radius: 2px;
   box-shadow: var(--museum-shadow);
 }
 
 .museum-hero {
-  padding: 1.5rem;
-  margin-bottom: 1rem;
+  padding: 2.25rem 2rem 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.museum-crumb {
+  margin: 0 0 1.25rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.04em;
+}
+
+.museum-crumb a {
+  color: var(--museum-muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.museum-crumb a:hover {
+  color: var(--museum-link);
+  border-bottom-color: rgba(196, 184, 150, 0.45);
 }
 
 .museum-kicker {
   color: var(--museum-accent);
-  font-size: 0.82rem;
-  letter-spacing: 0.06em;
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  margin-bottom: 0.6rem;
+  margin: 0 0 0.75rem;
+  font-weight: 500;
+}
+
+.museum-title-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.museum-wordmark {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  opacity: 0.92;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+body.archiveLight .museum-wordmark {
+  filter: none;
+  opacity: 1;
 }
 
 .museum-title {
   margin: 0;
-  font-size: clamp(1.5rem, 2.7vw, 2.4rem);
+  font-family: var(--museum-serif);
+  font-weight: 400;
+  font-size: clamp(1.85rem, 4vw, 2.65rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
 }
 
 .museum-subtitle {
-  margin-top: 0.5rem;
+  margin: 1rem 0 0;
+  max-width: 38em;
+  font-size: 1.0625rem;
+  line-height: 1.55;
   color: var(--museum-muted);
+  font-weight: 400;
+}
+
+.museum-error {
+  color: #c9a227;
 }
 
 .theme-row {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
 }
 
 .museum-theme-btn {
   border: 1px solid var(--museum-border);
   background: transparent;
+  color: var(--museum-muted);
+  border-radius: 2px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 500;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.museum-theme-btn:hover {
   color: var(--museum-text);
-  border-radius: 999px;
-  padding: 0.45rem 0.9rem;
-  font-size: 0.9rem;
+  border-color: rgba(174, 154, 120, 0.45);
 }
 
 .museum-theme-btn.active {
   border-color: var(--museum-accent);
-  color: var(--museum-accent);
+  color: var(--museum-text);
+  background: rgba(174, 154, 120, 0.08);
 }
 
 .museum-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 1.25rem;
+  margin-top: 0;
 }
 
 .museum-panel {
-  padding: 1rem;
+  padding: 1.5rem 1.5rem 1.75rem;
+}
+
+.museum-panel--primary {
+  padding-top: 1.75rem;
+}
+
+.museum-panel--aside {
+  padding-bottom: 1.5rem;
 }
 
 .museum-panel h2 {
@@ -101,8 +174,126 @@ body.lane-museum-page {
 }
 
 .featured-badge {
-  font-size: 0.85rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--museum-accent);
+  margin-bottom: 0.65rem;
+}
+
+.museum-featured-title {
+  font-family: var(--museum-serif);
+  font-size: 1.35rem;
+  font-weight: 400;
+  margin: 0 0 0.25rem;
+  letter-spacing: -0.01em;
+}
+
+.museum-lede {
+  color: var(--museum-muted);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.museum-prose {
+  margin: 0;
+  line-height: 1.65;
+  font-size: 0.9375rem;
+}
+
+.museum-prose--muted {
+  color: var(--museum-muted);
+}
+
+.museum-code {
+  font-size: 0.85em;
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+  background: var(--museum-surface-soft);
+  border: 1px solid var(--museum-border);
+}
+
+.museum-text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--museum-link);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(196, 184, 150, 0.35);
+  padding-bottom: 0.15rem;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.museum-text-btn:hover {
+  color: var(--museum-accent);
+  border-bottom-color: var(--museum-accent);
+}
+
+.museum-aside-title {
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--museum-muted);
+  font-weight: 600;
+  margin: 0 0 1rem;
+}
+
+.museum-rule {
+  height: 1px;
+  background: var(--museum-border);
+  margin: 1.35rem 0 1.35rem;
+  border: 0;
+}
+
+.museum-docent-name {
+  font-family: var(--museum-serif);
+  font-size: 1.05rem;
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+  color: var(--museum-text);
+}
+
+.museum-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.museum-section-title {
+  font-family: var(--museum-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.museum-section-sub {
+  margin: 0.2rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--museum-muted);
+  letter-spacing: 0.02em;
+}
+
+.museum-quiet-link {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--museum-muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.museum-quiet-link:hover {
+  color: var(--museum-link);
+  border-bottom-color: rgba(196, 184, 150, 0.4);
 }
 
 .museum-media {
@@ -111,11 +302,17 @@ body.lane-museum-page {
   gap: 0.8rem;
 }
 
+#secondaryMedia {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
 .museum-main-media,
 .museum-media-item {
   background: var(--museum-surface-soft);
   border: 1px solid var(--museum-border);
-  border-radius: 10px;
+  border-radius: 2px;
   min-height: 180px;
   overflow: hidden;
 }
@@ -147,53 +344,292 @@ body.lane-museum-page {
 .museum-meta-item {
   background: var(--museum-surface-soft);
   border: 1px solid var(--museum-border);
-  border-radius: 10px;
-  padding: 0.7rem 0.8rem;
+  border-radius: 2px;
+  padding: 0.75rem 0.85rem;
 }
 
 .museum-meta-label {
   color: var(--museum-muted);
-  font-size: 0.78rem;
+  font-size: 0.6875rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
 }
 
 .museum-meta-value {
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.museum-tabs {
+  border-bottom: 1px solid var(--museum-border);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.museum-tabs .nav-item {
+  margin-bottom: -1px;
 }
 
 .museum-tabs .nav-link {
+  color: var(--museum-muted);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent !important;
+  padding: 0.65rem 0;
+  margin-right: 1.5rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.museum-tabs .nav-link:hover {
   color: var(--museum-text);
-  border-color: transparent;
 }
 
 .museum-tabs .nav-link.active {
-  background: var(--museum-surface-soft);
   color: var(--museum-accent);
-  border-color: var(--museum-border);
+  border-bottom-color: var(--museum-accent);
 }
 
 .timeline-row {
-  padding: 0.7rem 0.2rem;
+  padding: 0.85rem 0.15rem;
   border-bottom: 1px solid var(--museum-border);
+}
+
+.timeline-row:last-child {
+  border-bottom: none;
 }
 
 .timeline-year {
   color: var(--museum-accent);
-  font-weight: 700;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
 }
 
 .prominent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.8rem;
+  gap: 1rem;
 }
 
 .prominent-card {
   background: var(--museum-surface-soft);
   border: 1px solid var(--museum-border);
+  border-radius: 2px;
+  padding: 0;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.25s ease;
+}
+
+.prominent-card-body {
+  padding: 1rem 1.1rem;
+}
+
+.prominent-card--hero {
+  grid-column: 1 / -1;
+}
+
+.prominent-card-media {
+  margin: 0;
+  border-bottom: 1px solid var(--museum-border);
+  background: var(--museum-surface);
+}
+
+.prominent-card-media img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  object-position: top center;
+}
+
+.prominent-card-media--missing img {
+  display: none;
+}
+
+.prominent-card-media figcaption {
+  padding: 0.5rem 1.1rem 0.75rem;
+  line-height: 1.35;
+}
+
+.prominent-link-cite {
+  display: inline-block;
+}
+
+.prominent-card:hover {
+  border-color: rgba(174, 154, 120, 0.35);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+body.archiveLight .prominent-card:hover {
+  box-shadow: 0 8px 24px rgba(45, 38, 28, 0.06);
+}
+
+.prominent-card h3 {
+  font-family: var(--museum-serif);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.prominent-blurb {
+  color: var(--museum-muted);
+  margin-top: 0.35rem;
+}
+
+.prominent-links {
+  margin-top: 0.5rem;
+}
+
+.prominent-links li + li {
+  margin-top: 0.35rem;
+}
+
+.prominent-external-link {
+  color: var(--museum-link);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(191, 155, 95, 0.45);
+}
+
+.prominent-external-link:hover {
+  color: var(--museum-accent);
+  border-bottom-color: var(--museum-accent);
+}
+
+.prominent-internal-link {
+  color: var(--museum-link);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(191, 155, 95, 0.35);
+}
+
+.prominent-internal-link:hover {
+  color: var(--museum-accent);
+  border-bottom-color: var(--museum-accent);
+}
+
+.prominent-tree-link {
+  font-size: 0.85rem;
+}
+
+/* Lane lunar observatory (“Lunar-5”) */
+.lunar-observatory {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse 120% 80% at 70% 20%, rgba(80, 60, 120, 0.35), transparent 55%),
+    radial-gradient(ellipse 90% 60% at 20% 90%, rgba(191, 155, 95, 0.12), transparent 50%),
+    linear-gradient(165deg, #0c0e14 0%, #151b26 45%, #0a0c10 100%);
+  border: 1px solid var(--museum-border);
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.45);
+}
+
+.lunar-observatory::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.35), transparent),
+    radial-gradient(1px 1px at 80% 40%, rgba(255, 255, 255, 0.25), transparent),
+    radial-gradient(1px 1px at 35% 70%, rgba(255, 255, 255, 0.2), transparent);
+  background-size: 100% 100%;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.lunar-observatory-inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(200px, 0.9fr);
+  gap: 1.25rem;
+  padding: 1.25rem;
+  align-items: start;
+}
+
+.lunar-observatory-kicker {
+  margin-bottom: 0.35rem;
+}
+
+.lunar-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #1a1520;
+  background: linear-gradient(90deg, #e8c87a, #f0dfa8);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.lunar-observatory-body {
+  color: var(--museum-muted);
+  line-height: 1.5;
+}
+
+.lunar-coords dt {
+  color: var(--museum-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lunar-coords dd {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.lunar-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.lunar-btn {
+  border-radius: 999px !important;
+}
+
+.lunar-observatory-visual {
+  position: relative;
   border-radius: 12px;
-  padding: 0.8rem;
+  overflow: hidden;
+  border: 1px solid rgba(191, 155, 95, 0.25);
+  min-height: 200px;
+  background: var(--museum-surface-soft);
+}
+
+.lunar-observatory-img {
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  object-fit: cover;
+  display: block;
+  filter: saturate(1.05) contrast(1.05);
+}
+
+.lunar-observatory-visual--fallback {
+  min-height: 220px;
+  background: radial-gradient(circle at 55% 45%, #3a3d4a 0%, #1a1c22 62%, #0e0f12 100%);
+  box-shadow: inset 0 -20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lunar-observatory-visual--fallback::after {
+  content: '☾';
+  position: absolute;
+  right: 12%;
+  top: 18%;
+  font-size: 4.5rem;
+  opacity: 0.12;
+  color: #fff;
+  pointer-events: none;
+}
+
+@media (max-width: 992px) {
+  .lunar-observatory-inner {
+    grid-template-columns: 1fr;
+  }
 }
 
 .docent-intro {
@@ -202,20 +638,30 @@ body.lane-museum-page {
 
 .prompt-chip {
   border: 1px solid var(--museum-border);
-  color: var(--museum-text);
+  color: var(--museum-muted);
   background: transparent;
-  padding: 0.45rem 0.7rem;
-  border-radius: 999px;
-  font-size: 0.82rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
   margin: 0 0.4rem 0.4rem 0;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.prompt-chip:hover {
+  color: var(--museum-text);
+  border-color: rgba(174, 154, 120, 0.45);
 }
 
 .docent-answer {
   background: var(--museum-surface-soft);
   border: 1px solid var(--museum-border);
-  border-radius: 10px;
-  padding: 0.8rem;
-  margin-top: 0.7rem;
+  border-radius: 2px;
+  padding: 1rem;
+  margin-top: 0.85rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--museum-muted);
 }
 
 a {
@@ -226,5 +672,10 @@ a {
   .museum-grid,
   .museum-media {
     grid-template-columns: 1fr;
+  }
+
+  .museum-section-head {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

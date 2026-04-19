@@ -1,0 +1,138 @@
+:root {
+  --whai-bg: #13151a;
+  --whai-surface: #1b1e26;
+  --whai-text: #ece8df;
+  --whai-muted: #9a958a;
+  --whai-accent: #ae9a78;
+  --whai-border: rgba(236, 232, 223, 0.1);
+  --whai-serif: Georgia, 'Times New Roman', serif;
+  --whai-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+body.whai-page {
+  background: var(--whai-bg);
+  color: var(--whai-text);
+  font-family: var(--whai-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+.whai-wrap {
+  max-width: 42rem;
+  margin: 0 auto 4rem;
+  padding: 2.25rem 1.25rem 0;
+}
+
+.whai-hero {
+  margin-bottom: 2rem;
+}
+
+.whai-crumb {
+  font-size: 0.8125rem;
+  margin: 0 0 1rem;
+}
+
+.whai-crumb a {
+  color: var(--whai-muted);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.whai-crumb a:hover {
+  color: var(--whai-accent);
+  border-bottom-color: rgba(174, 154, 120, 0.45);
+}
+
+.whai-crumb-sep {
+  margin: 0 0.35rem;
+  color: var(--whai-muted);
+}
+
+.whai-kicker {
+  color: var(--whai-accent);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin: 0 0 0.75rem;
+}
+
+.whai-title {
+  font-family: var(--whai-serif);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 4vw, 2.35rem);
+  line-height: 1.15;
+  margin: 0 0 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.whai-byline {
+  font-family: var(--whai-serif);
+  font-size: 1.05rem;
+  margin: 0 0 0.5rem;
+  color: var(--whai-muted);
+}
+
+.whai-article {
+  background: var(--whai-surface);
+  border: 1px solid var(--whai-border);
+  border-radius: 2px;
+  padding: 1.75rem 1.5rem 2rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 48px rgba(0, 0, 0, 0.35);
+}
+
+.whai-article p {
+  font-family: var(--whai-serif);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  margin: 0 0 1.15rem;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.whai-article p:last-child {
+  margin-bottom: 0;
+}
+
+.whai-figure {
+  margin: 1.5rem 0;
+  padding: 0;
+  border: 1px solid var(--whai-border);
+  border-radius: 2px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.whai-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  vertical-align: middle;
+}
+
+.whai-figure figcaption {
+  padding: 0.65rem 0.85rem;
+  font-size: 0.8125rem;
+  color: var(--whai-muted);
+  line-height: 1.45;
+  border-top: 1px solid var(--whai-border);
+}
+
+.whai-figure-placeholder {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--whai-muted);
+  font-size: 0.875rem;
+}
+
+.whai-error {
+  color: #c9a227;
+}
+
+.whai-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--whai-border);
+}
+
+.whai-footer a {
+  color: var(--whai-accent);
+}

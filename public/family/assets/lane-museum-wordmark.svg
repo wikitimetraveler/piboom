@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title">
+  <title id="title">Lane Legacy Museum</title>
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d4c4a8"/>
+      <stop offset="100%" stop-color="#8a7a5e"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="10" fill="#1b1e26" stroke="url(#g)" stroke-width="1.5"/>
+  <!-- Open book -->
+  <path fill="none" stroke="url(#g)" stroke-width="2" stroke-linejoin="round"
+    d="M60 28v64M32 40c0-8 12-8 28-4v56c-16-4-28-4-28 4V40zm56 0c0-8-12-8-28-4v56c16-4 28-4 28 4V40z"/>
+  <!-- L initial -->
+  <path fill="url(#g)" d="M48 34h8v40h20v8H48V34z"/>
+</svg>

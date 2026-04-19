@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lane book plates — PDF gallery</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+  <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/family/css/lane-pdf-gallery.css"/>
+  <link rel="stylesheet" href="/family/css/lane-tts.css"/>
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css"/>
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+<modern-navbar></modern-navbar>
+
+<div class="simple-header">
+  <div class="container">
+    <div class="header-content">
+      <a href="/" class="brand">DevConnect Labs</a>
+      <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/family/lane-family.html">Lane Family</a>
+        <a href="/family/genealogy.html">Family Tree</a>
+        <a href="/family/lane-museum.html">Lane Museum</a>
+        <a href="/family/lane-pdf-gallery.html" class="active">Book plates</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4 mb-5" data-lane-tts-main>
+  <h1 class="h3"><i class="bi bi-images" aria-hidden="true"></i> Lane genealogy book plates</h1>
+  <p class="text-muted">
+    Embedded images from <code>lanegenealogies01chap.pdf</code>, joined to tree people by matching
+    <code>sourceRefs.pdfPageNumber</code>. Multiple names on the same page are flagged as ambiguous; confirm links in
+    <code>data/lane-pdf-person-portraits.json</code>.
+  </p>
+  <p class="small text-muted">
+    Streams that fail to decode (for example JBIG2 without <code>jbig2dec</code>) are omitted from this grid; counts in the bar above include how many were skipped.
+  </p>
+
+  <div id="lanePdfStats" class="mb-3"></div>
+  <div id="lanePdfError" class="alert alert-danger d-none" role="alert"></div>
+
+  <div class="lane-pdf-filters row mb-3">
+    <div class="col-md-3 mb-2">
+      <label class="small text-muted mb-0" for="lanePdfFilterPage">Filter by PDF page (1-based)</label>
+      <input type="number" min="1" class="form-control" id="lanePdfFilterPage" placeholder="e.g. 191"/>
+    </div>
+    <div class="col-md-5 mb-2">
+      <label class="small text-muted mb-0" for="lanePdfFilterIds">Filter by candidate person id(s)</label>
+      <input type="text" class="form-control" id="lanePdfFilterIds" placeholder="e.g. 133 134 or 2898"/>
+    </div>
+  </div>
+
+  <div class="row" id="lanePdfGrid"></div>
+</div>
+
+<script src="/shared/tts.js"></script>
+<script src="/family/js/lane-tts.js"></script>
+<script src="/family/js/lane-pdf-gallery.js"></script>
+</body>
+</html>

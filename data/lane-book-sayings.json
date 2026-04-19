@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": "lanegenealogies01chap.pdf",
+  "sourceLabel": "Lane genealogy source book (digitized)",
+  "entries": [
+    {
+      "id": "curated-william-lane-section-head",
+      "quote": "WILLIAM LANE AND FAMILY. 32 of giant frame and great strength. They had b. in Sanbornton 8 ch.",
+      "description": "Section header and physical description from the compiled Lane genealogy (William Lane cluster).",
+      "pdfPage": 46,
+      "tags": ["chapter", "William Lane", "Sanbornton"]
+    },
+    {
+      "id": "curated-deacon-joshua-conversion",
+      "quote": "His conversion was instantaneous, but be- came permanent. He read his Bible and prayed habitually in his family and frequently visited the sick.",
+      "description": "Religious character sketch embedded in the Sarah Lane / Deacon Joshua Lane narrative.",
+      "pdfPage": 45,
+      "tags": ["faith", "narrative"]
+    },
+    {
+      "id": "curated-school-publications",
+      "quote": "\"Methods of Teaching,\" \"School Elocution,\" and \"Normal Word Book.\"",
+      "description": "Titles of works noted as having attained wide circulation in a Lane family education context.",
+      "pdfPage": 158,
+      "tags": ["education", "publication"]
+    }
+  ]
+}
