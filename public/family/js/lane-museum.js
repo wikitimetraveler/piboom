@@ -1,4 +1,9 @@
 const MUSEUM_THEME_KEY = 'laneMuseumTheme';
+const HISTORY_STATE_COPY = {
+  loading: 'Loading history records...',
+  empty: 'No Lane records available for this view.',
+  unavailable: 'History records are unavailable right now.'
+};
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -50,7 +55,7 @@ function renderFeatured(featuredStory = {}, museum = {}) {
   document.getElementById('featuredSubtitle').textContent =
     featuredStory.subtitle || 'William E Lane of Boston as chronology anchor';
   document.getElementById('featuredSummary').textContent =
-    featuredStory.summary || 'No featured summary available yet.';
+    featuredStory.summary || HISTORY_STATE_COPY.empty;
 
   const meta = document.getElementById('featuredMeta');
   const rows = [
@@ -100,7 +105,7 @@ function renderTimeline(events = []) {
   const host = document.getElementById('timelineRows');
   const ordered = events.slice().sort((a, b) => (a.year || 0) - (b.year || 0));
   if (!ordered.length) {
-    host.innerHTML = '<div class="text-muted">Timeline data pending.</div>';
+    host.innerHTML = `<div class="text-muted">${HISTORY_STATE_COPY.empty}</div>`;
     return;
   }
   host.innerHTML = ordered
@@ -125,6 +130,14 @@ function linkKindIcon(kind) {
   return '<i class="bi bi-link-45deg" aria-hidden="true"></i> ';
 }
 
+function getMuseumAccentIndex(entry = {}, fallbackIndex = 0) {
+  const rawOrder = Number(entry.order);
+  if (Number.isFinite(rawOrder)) return Math.abs(rawOrder) % 8;
+  const rawPid = Number(entry.personId ?? entry.person?.id);
+  if (Number.isFinite(rawPid)) return Math.abs(rawPid) % 8;
+  return Math.abs(fallbackIndex) % 8;
+}
+
 function isProminentInternalLink(lnk) {
   if (!lnk || !lnk.url) return false;
   if (lnk.kind === 'article' || lnk.kind === 'internal') return true;
@@ -135,13 +148,14 @@ function isProminentInternalLink(lnk) {
 function renderProminent(prominent = []) {
   const host = document.getElementById('prominentGrid');
   if (!prominent.length) {
-    host.innerHTML = '<div class="text-muted">Prominent lanes list pending.</div>';
+    host.innerHTML = `<div class="text-muted">${HISTORY_STATE_COPY.empty}</div>`;
     return;
   }
   host.innerHTML = prominent
-    .map((entry) => {
+    .map((entry, index) => {
       const person = entry.person || {};
       const title = entry.displayName || person.name || entry.personQuery || 'Pending profile';
+      const accentIndex = getMuseumAccentIndex(entry, index);
       const links = Array.isArray(entry.links) ? entry.links : [];
       const linksHtml = links.length
         ? `<ul class="prominent-links list-unstyled small mb-2">
@@ -167,6 +181,8 @@ function renderProminent(prominent = []) {
         pid != null
           ? `/family/genealogy.html?q=${encodeURIComponent(String(title).replace(/\s+/g, ' ').trim())}`
           : '/family/genealogy.html';
+      const memorialUrl =
+        pid != null ? `/family/lane-memorial-wall.html?personId=${encodeURIComponent(String(pid))}` : '/family/lane-memorial-wall.html';
       const imgUrl = entry.imageUrl != null ? String(entry.imageUrl).trim() : '';
       const mediaBlock =
         imgUrl !== ''
@@ -186,7 +202,7 @@ function renderProminent(prominent = []) {
           : '';
       const cardMods = [imgUrl ? 'prominent-card--hero' : ''].filter(Boolean).join(' ');
       return `
-        <article class="prominent-card ${cardMods}">
+        <article class="prominent-card ${cardMods}" data-person-id="${escapeHtml(String(pid ?? ''))}" data-museum-accent="${accentIndex}">
           ${mediaBlock}
           <div class="prominent-card-body">
           <div class="small text-muted">Exhibit order ${escapeHtml(entry.order || '?')}</div>
@@ -203,11 +219,51 @@ function renderProminent(prominent = []) {
           <div class="mt-2">
             <a class="small prominent-tree-link" href="${escapeHtml(geneUrl)}">Search in family tree</a>
           </div>
+          <div class="mt-1">
+            <a class="small prominent-wall-link" href="${escapeHtml(memorialUrl)}">View on memorial wall</a>
+          </div>
           </div>
         </article>
       `;
     })
     .join('');
+}
+
+/** LROC QuickMap expects extent=minLon,minLat,maxLon,maxLat (degrees). */
+function buildLrocQuickMapUrl(lat, lon, padDeg = 1.5) {
+  const minLon = lon - padDeg;
+  const minLat = lat - padDeg;
+  const maxLon = lon + padDeg;
+  const maxLat = lat + padDeg;
+  const extent = [minLon, minLat, maxLon, maxLat].join(',');
+  return `https://quickmap.lroc.im-ldi.com/?extent=${encodeURIComponent(extent)}`;
+}
+
+/**
+ * Prefer quickMapPermalink when curated; else center on latitude/longitude when valid;
+ * else fall back to quickMapUrl (generic QuickMap home).
+ */
+function resolveQuickMapHref(lunar) {
+  const permalink = lunar.quickMapPermalink != null ? String(lunar.quickMapPermalink).trim() : '';
+  if (permalink) return permalink;
+  const lat = lunar.latitude != null ? Number(lunar.latitude) : null;
+  const lon = lunar.longitude != null ? Number(lunar.longitude) : null;
+  if (lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon)) {
+    return buildLrocQuickMapUrl(lat, lon);
+  }
+  const fallback = lunar.quickMapUrl != null ? String(lunar.quickMapUrl).trim() : '';
+  return fallback || 'https://quickmap.lroc.im-ldi.com/';
+}
+
+/**
+ * Moon Trek has no stable public lat/lon URL scheme; optional moonTrekPermalink overrides.
+ * Otherwise use moonTrekUrl (generic portal).
+ */
+function resolveMoonTrekHref(lunar) {
+  const permalink = lunar.moonTrekPermalink != null ? String(lunar.moonTrekPermalink).trim() : '';
+  if (permalink) return permalink;
+  const fallback = lunar.moonTrekUrl != null ? String(lunar.moonTrekUrl).trim() : '';
+  return fallback || 'https://moontrek.jpl.nasa.gov/';
 }
 
 function renderLunarObservatory(lunar) {
@@ -218,6 +274,8 @@ function renderLunarObservatory(lunar) {
     return;
   }
   mount.classList.remove('d-none');
+  const quickMapHref = resolveQuickMapHref(lunar);
+  const moonTrekHref = resolveMoonTrekHref(lunar);
   const lat = lunar.latitude != null ? Number(lunar.latitude) : null;
   const lon = lunar.longitude != null ? Number(lunar.longitude) : null;
   const coordLine =
@@ -225,12 +283,70 @@ function renderLunarObservatory(lunar) {
       ? `${lat.toFixed(2)}°, ${lon.toFixed(2)}° (lunar)`
       : 'Coordinates on USGS sheet';
   const diam = lunar.diameterKm != null ? `~${escapeHtml(String(lunar.diameterKm))} km` : '—';
-  const img = lunar.imageUrl
-    ? `<div class="lunar-observatory-visual">
-         <img src="${escapeHtml(lunar.imageUrl)}" alt="" class="lunar-observatory-img" loading="lazy"
-           onerror="this.style.display='none';this.parentElement.classList.add('lunar-observatory-visual--fallback');" />
+  const nomenclatureOrigin = lunar.nomenclatureOrigin != null ? String(lunar.nomenclatureOrigin).trim() : '';
+  const usgsFeatures = Array.isArray(lunar.usgsFeatures) ? lunar.usgsFeatures : [];
+  const usgsRows = usgsFeatures
+    .map((feature) => {
+      const fName = feature?.name != null ? String(feature.name) : '';
+      if (!fName) return '';
+      const fType = feature?.featureType != null ? String(feature.featureType) : 'Feature';
+      const fLat = Number(feature?.latitude);
+      const fLon = Number(feature?.longitude);
+      const fDiam = feature?.diameterKm != null ? String(feature.diameterKm) : '—';
+      const coord =
+        Number.isFinite(fLat) && Number.isFinite(fLon) ? `${fLat.toFixed(2)}°, ${fLon.toFixed(2)}°` : '—';
+      return `<tr>
+        <td>${escapeHtml(fName)}</td>
+        <td>${escapeHtml(fType)}</td>
+        <td>${escapeHtml(coord)}</td>
+        <td>${escapeHtml(fDiam)}</td>
+      </tr>`;
+    })
+    .filter(Boolean)
+    .join('');
+  const galleryItems = Array.isArray(lunar.gallery)
+    ? lunar.gallery
+        .map((item) => ({
+          url: item?.url != null ? String(item.url).trim() : '',
+          caption: item?.caption != null ? String(item.caption).trim() : '',
+          credit: item?.credit != null ? String(item.credit).trim() : ''
+        }))
+        .filter((item) => item.url)
+    : [];
+  const hasGallery = galleryItems.length > 0;
+  const initialImage = hasGallery ? galleryItems[0] : null;
+  const imageCaption = initialImage?.caption || '';
+  const imageCredit = initialImage?.credit || lunar.imageCredit || '';
+  const img = hasGallery
+    ? `<div class="lunar-observatory-visual lunar-observatory-gallery">
+         <img src="${escapeHtml(initialImage.url)}" alt="${escapeHtml(imageCaption || 'Lane crater lunar image')}" class="lunar-observatory-img" loading="lazy" data-lunar-main-image />
+         <div class="lunar-gallery-thumbs" role="tablist" aria-label="Lane crater image gallery">
+           ${galleryItems
+             .map(
+               (item, index) => `
+                 <button
+                   type="button"
+                   class="lunar-gallery-thumb${index === 0 ? ' is-active' : ''}"
+                   data-lunar-thumb-index="${index}"
+                   aria-label="View image ${index + 1}"
+                   aria-selected="${index === 0 ? 'true' : 'false'}"
+                 >
+                   <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.caption || `Lunar image ${index + 1}`)}" loading="lazy" />
+                 </button>
+               `
+             )
+             .join('')}
+         </div>
+         <p class="small text-muted lunar-gallery-caption mb-0" data-lunar-gallery-caption>
+           ${escapeHtml(imageCaption)}${imageCaption && imageCredit ? ' · ' : ''}${escapeHtml(imageCredit)}
+         </p>
        </div>`
-    : '<div class="lunar-observatory-visual lunar-observatory-visual--fallback" aria-hidden="true"></div>';
+    : lunar.imageUrl
+      ? `<div class="lunar-observatory-visual">
+           <img src="${escapeHtml(lunar.imageUrl)}" alt="" class="lunar-observatory-img" loading="lazy"
+             onerror="this.style.display='none';this.parentElement.classList.add('lunar-observatory-visual--fallback');" />
+         </div>`
+      : '<div class="lunar-observatory-visual lunar-observatory-visual--fallback" aria-hidden="true"></div>';
 
   mount.innerHTML = `
     <div class="lunar-observatory-inner">
@@ -239,21 +355,70 @@ function renderLunarObservatory(lunar) {
         <h2 class="h4 mb-1">${escapeHtml(lunar.title || 'Lane crater')}</h2>
         <p class="text-muted small mb-2">${escapeHtml(lunar.subtitle || '')}</p>
         <p class="small lunar-observatory-body">${escapeHtml(lunar.body || '')}</p>
+        ${nomenclatureOrigin ? `<p class="lunar-nomenclature-epitaph mb-2">${escapeHtml(nomenclatureOrigin)}</p>` : ''}
         <dl class="lunar-coords row small mb-3">
           <div class="col-sm-4"><dt>Feature</dt><dd>${escapeHtml(lunar.featureName || 'Lane')}</dd></div>
           <div class="col-sm-4"><dt>Approx. coords</dt><dd>${escapeHtml(coordLine)}</dd></div>
           <div class="col-sm-4"><dt>Diameter</dt><dd>${diam}</dd></div>
         </dl>
         <div class="lunar-action-row">
-          ${lunar.quickMapUrl ? `<a class="btn btn-sm btn-outline-light lunar-btn" href="${escapeHtml(lunar.quickMapUrl)}" target="_blank" rel="noopener noreferrer">Open LROC QuickMap</a>` : ''}
-          ${lunar.moonTrekUrl ? `<a class="btn btn-sm btn-outline-light lunar-btn" href="${escapeHtml(lunar.moonTrekUrl)}" target="_blank" rel="noopener noreferrer">NASA Moon Trek</a>` : ''}
+          <a class="btn btn-sm btn-outline-light lunar-btn" href="${escapeHtml(quickMapHref)}" target="_blank" rel="noopener noreferrer">Open LROC QuickMap</a>
+          <a class="btn btn-sm btn-outline-light lunar-btn" href="${escapeHtml(moonTrekHref)}" target="_blank" rel="noopener noreferrer">NASA Moon Trek</a>
           ${lunar.usgsUrl ? `<a class="btn btn-sm btn-outline-warning lunar-btn" href="${escapeHtml(lunar.usgsUrl)}" target="_blank" rel="noopener noreferrer">USGS nomenclature</a>` : ''}
         </div>
-        ${lunar.imageCredit ? `<p class="small text-muted mt-2 mb-0">${escapeHtml(lunar.imageCredit)}</p>` : ''}
+        ${
+          usgsRows
+            ? `<div class="lunar-usgs-table-wrap mt-3">
+                 <table class="table table-sm lunar-usgs-table mb-0">
+                   <thead>
+                     <tr><th>Name</th><th>Type</th><th>Coords</th><th>Diameter (km)</th></tr>
+                   </thead>
+                   <tbody>${usgsRows}</tbody>
+                 </table>
+               </div>`
+            : ''
+        }
+        ${!hasGallery && lunar.imageCredit ? `<p class="small text-muted mt-2 mb-0">${escapeHtml(lunar.imageCredit)}</p>` : ''}
       </div>
       ${img}
     </div>
   `;
+
+  if (hasGallery) {
+    const mainImage = mount.querySelector('[data-lunar-main-image]');
+    const captionEl = mount.querySelector('[data-lunar-gallery-caption]');
+    const thumbButtons = Array.from(mount.querySelectorAll('[data-lunar-thumb-index]'));
+    const setActive = (index) => {
+      const item = galleryItems[index];
+      if (!item || !mainImage) return;
+      mainImage.style.display = '';
+      mainImage.closest('.lunar-observatory-visual')?.classList.remove('lunar-observatory-visual--fallback');
+      mainImage.src = item.url;
+      mainImage.alt = item.caption || `Lunar image ${index + 1}`;
+      if (captionEl) {
+        const cap = item.caption || '';
+        const credit = item.credit || lunar.imageCredit || '';
+        captionEl.textContent = cap && credit ? `${cap} · ${credit}` : cap || credit;
+      }
+      thumbButtons.forEach((btn, btnIndex) => {
+        const active = btnIndex === index;
+        btn.classList.toggle('is-active', active);
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+      });
+    };
+    thumbButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const index = Number(button.dataset.lunarThumbIndex);
+        if (Number.isFinite(index)) setActive(index);
+      });
+    });
+    if (mainImage) {
+      mainImage.addEventListener('error', () => {
+        mainImage.style.display = 'none';
+        mainImage.closest('.lunar-observatory-visual')?.classList.add('lunar-observatory-visual--fallback');
+      });
+    }
+  }
 }
 
 function formatSayingsContextBlock(entries = []) {
@@ -336,16 +501,30 @@ async function initLaneMuseum() {
   renderFeatured(featuredStory, content);
   renderTimeline(content.timelineEvents || []);
   renderLunarObservatory(content.lunarExhibit);
+  if (new URLSearchParams(window.location.search).get('lunar') === '1') {
+    const lunarEl = document.getElementById('lunarObservatoryMount');
+    if (lunarEl && !lunarEl.classList.contains('d-none')) {
+      requestAnimationFrame(() => {
+        lunarEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }
   renderProminent(prominentLanes);
   renderDocent(content.aiDocent || {}, featuredStory, sayingsEntries);
+  if (typeof window.initHistoryQuickNav === 'function') {
+    window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    const errEl = document.getElementById('museumError');
+    if (errEl) errEl.textContent = HISTORY_STATE_COPY.loading;
     await initLaneMuseum();
+    if (errEl) errEl.textContent = '';
   } catch (error) {
     console.error('Failed to initialize Lane museum page:', error);
     document.getElementById('museumError').textContent =
-      'Could not load museum data right now. Check /api/genealogy/museum-content.';
+      `${HISTORY_STATE_COPY.unavailable} Check /api/genealogy/museum-content.`;
   }
 });

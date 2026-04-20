@@ -37,16 +37,26 @@
       <p class="museum-subtitle">
         A quiet chronological gallery—opening in Boston, then onward through later Lane generations.
       </p>
+      <nav class="museum-quick-nav history-quick-nav" aria-label="Museum quick links">
+        <a href="#museumFeaturedPanel" class="museum-quick-link history-quick-link">Featured exhibit</a>
+        <a href="#lunarObservatoryMount" class="museum-quick-link history-quick-link">Lunar observatory</a>
+        <a href="#museumProminentPanel" class="museum-quick-link history-quick-link">Prominent Lanes</a>
+      </nav>
       <div id="themeButtons" class="theme-row" aria-label="Theme switcher"></div>
       <div id="museumError" class="museum-error small mt-2"></div>
     </section>
 
     <section class="museum-grid">
-      <article class="museum-panel museum-panel--primary">
+      <article class="museum-panel museum-panel--primary" id="museumFeaturedPanel">
         <div class="featured-badge">Opening exhibit</div>
         <h2 id="featuredTitle" class="museum-featured-title">Exhibit 1</h2>
         <p id="featuredSubtitle" class="museum-lede mb-3">Loading...</p>
         <p id="featuredSummary" class="museum-prose"></p>
+        <aside class="museum-context-callout mt-3" aria-label="American history context">
+          <h3 class="museum-context-title">Why this matters in American history</h3>
+          <p class="mb-0">This line links household-level records to larger colonial migration, religious institutions, and wartime civic change in New England.</p>
+        </aside>
+        <p class="history-context-evidence-note mt-2 mb-0"><strong>Context:</strong> general history background. <strong>Evidence:</strong> Lane-specific records/snippets.</p>
 
         <div class="museum-media mt-3">
           <div id="mainMedia" class="museum-main-media">
@@ -106,7 +116,7 @@
 
     <section id="lunarObservatoryMount" class="museum-panel mt-3 lunar-observatory" aria-label="Lane lunar crater observatory"></section>
 
-    <section class="museum-panel mt-3 museum-panel--prominent">
+    <section class="museum-panel mt-3 museum-panel--prominent" id="museumProminentPanel">
       <div class="museum-section-head">
         <div>
           <h2 class="museum-section-title">Prominent Lanes</h2>
@@ -123,6 +133,7 @@
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="/family/js/history-mode.js"></script>
   <script src="/family/js/lane-museum.js"></script>
 </body>
 </html>

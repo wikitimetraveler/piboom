@@ -1,4 +1,20 @@
 {
   "creditDefault": "Lane genealogy source book (digitized plates). Personal research use; verify rights before wider publication.",
-  "portraits": []
+  "portraits": [
+    {
+      "personId": 2888,
+      "imageId": "p244-i0",
+      "notes": "Confirmed from candidate set [2888, 2889]. Selected Deacon Samuel Lane record; alternate candidate is spouse-only OCR fragment."
+    },
+    {
+      "personId": 3645,
+      "imageId": "p248-i0",
+      "notes": "Confirmed from candidate set [2892, 3645, 3646]. Selected clean William Lane profile with 1750-1823 years; alternates are byline/noise fragments."
+    },
+    {
+      "personId": 2896,
+      "imageId": "p253-i0",
+      "notes": "Confirmed single-candidate match for Charles Lane."
+    }
+  ]
 }

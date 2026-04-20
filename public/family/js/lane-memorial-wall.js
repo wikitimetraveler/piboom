@@ -2,10 +2,16 @@
   'use strict';
 
   const API_BASE = '/api/genealogy';
+  const HISTORY_STATE_COPY = {
+    loading: 'Loading history records...',
+    empty: 'No Lane records available for this view.',
+    unavailable: 'History records are unavailable right now.'
+  };
   let memorialMap = null;
   let memorialMarker = null;
   let modalRenderToken = 0;
   const geocodeCache = new Map();
+  const museumAccentByPersonId = new Map();
 
   function esc(value) {
     return String(value ?? '')
@@ -18,6 +24,14 @@
 
   function normalizePlaceKey(value) {
     return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  function escapeSelectorValue(value) {
+    const text = String(value || '');
+    if (window.CSS && typeof window.CSS.escape === 'function') {
+      return window.CSS.escape(text);
+    }
+    return text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   }
 
   function parseBirthYear(person) {
@@ -90,13 +104,23 @@
     return { centuries, byCentury, undated };
   }
 
+  function getMuseumAccentForPerson(person) {
+    const personId = String(person?.id ?? '').trim();
+    if (!personId) return null;
+    const accent = museumAccentByPersonId.get(personId);
+    return Number.isFinite(accent) ? accent : null;
+  }
+
   function lineHtml(person) {
     const birthYear = parseBirthYear(person);
     const deathYear = parseDeathYear(person);
     const birth = birthYear === null ? 'b. ?' : `b. ${birthYear}`;
     const death = deathYear === null ? '' : ` · d. ${deathYear}`;
+    const accent = getMuseumAccentForPerson(person);
+    const accentClass = accent == null ? '' : ` memorial-line--museum-${accent}`;
+    const accentAttr = accent == null ? '' : ` data-museum-accent="${accent}"`;
     return `
-      <div class="memorial-line" role="button" tabindex="0" data-person-id="${esc(person.id)}">
+      <div class="memorial-line${accentClass}" role="button" tabindex="0" data-person-id="${esc(person.id)}"${accentAttr}>
         <span class="memorial-name">${esc(person.name || 'Unknown')}</span>
         <span class="memorial-birth"> — ${esc(birth + death)}</span>
       </div>`;
@@ -104,6 +128,21 @@
 
   function centuryId(cLabel) {
     return `century-${String(cLabel).replace(/[^a-zA-Z0-9]+/g, '-')}`;
+  }
+
+  function renderCenturyJump(centuries) {
+    const host = document.getElementById('memorialCenturyJump');
+    if (!host) return;
+    if (!Array.isArray(centuries) || !centuries.length) {
+      host.innerHTML = '';
+      return;
+    }
+    host.innerHTML = centuries
+      .map((cLabel) => {
+        const cid = centuryId(cLabel);
+        return `<a class="memorial-century-jump-link" href="#${esc(cid)}">${esc(cLabel)}</a>`;
+      })
+      .join('');
   }
 
   function shouldSkipFalseLocation(place) {
@@ -254,7 +293,7 @@
                 <div class="memorial-map-loading" id="memorialMapStatus">
                   <div>
                     <i class="bi bi-geo-alt"></i>
-                    <div>Preparing map context...</div>
+                    <div>${HISTORY_STATE_COPY.loading}</div>
                   </div>
                 </div>
                 <div id="memorialMapCanvas" class="memorial-map-canvas d-none" aria-label="Person place map"></div>
@@ -263,7 +302,7 @@
                 <div class="memorial-map-empty">
                   <div class="memorial-map-empty-inner">
                     <i class="bi bi-pin-map"></i>
-                    <h6 class="mb-2">No place recorded</h6>
+                    <h6 class="mb-2">${HISTORY_STATE_COPY.empty}</h6>
                     <p class="mb-0 small text-muted">This profile has no mappable location in the current record.</p>
                   </div>
                 </div>
@@ -471,6 +510,7 @@
   function renderWall(people) {
     const host = document.getElementById('memorialWall');
     const { centuries, byCentury, undated } = groupByCenturyAndDecade(people);
+    renderCenturyJump(centuries);
 
     const parts = [];
     for (const cLabel of centuries) {
@@ -519,6 +559,24 @@
     }
 
     host.innerHTML = parts.join('');
+  }
+
+  function applyPersonHighlightFromQuery() {
+    const search = new URLSearchParams(window.location.search);
+    const personId = String(search.get('personId') || '').trim();
+    if (!personId) return;
+
+    document.querySelectorAll('.memorial-line--highlight').forEach((el) => {
+      el.classList.remove('memorial-line--highlight');
+    });
+    const target = document.querySelector(`.memorial-line[data-person-id="${escapeSelectorValue(personId)}"]`);
+    if (!target) return;
+    target.classList.add('memorial-line--highlight');
+    target.setAttribute('aria-current', 'true');
+
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' });
+    target.focus({ preventScroll: true });
   }
 
   async function openModal(personId) {
@@ -665,16 +723,46 @@
     });
   }
 
+  function initQuickFilters() {
+    const bookOnly = document.getElementById('bookOnly');
+    const actionButtons = Array.from(document.querySelectorAll('[data-memorial-filter]'));
+    if (!bookOnly || !actionButtons.length) return;
+    actionButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const mode = button.getAttribute('data-memorial-filter');
+        bookOnly.checked = mode === 'book';
+        load();
+      });
+    });
+  }
+
   async function load() {
     const errBox = document.getElementById('memorialError');
     const stat = document.getElementById('memorialStat');
     errBox.classList.add('d-none');
+    errBox.textContent = '';
+    stat.textContent = HISTORY_STATE_COPY.loading;
 
     try {
-      const res = await fetch(`${API_BASE}/people`);
-      const data = await res.json();
-      if (!res.ok || !data.success || !Array.isArray(data.people)) {
+      const [peopleRes, prominentRes] = await Promise.all([
+        fetch(`${API_BASE}/people`),
+        fetch(`${API_BASE}/prominent-lanes`).catch(() => null)
+      ]);
+      const data = await peopleRes.json();
+      if (!peopleRes.ok || !data.success || !Array.isArray(data.people)) {
         throw new Error(data.error || 'Failed to load people');
+      }
+      museumAccentByPersonId.clear();
+      if (prominentRes && prominentRes.ok) {
+        const prominentData = await prominentRes.json().catch(() => ({}));
+        const entries = Array.isArray(prominentData.prominentLanes) ? prominentData.prominentLanes : [];
+        entries.forEach((entry, idx) => {
+          const pid = entry?.person?.id ?? entry?.personId;
+          if (pid == null) return;
+          const rawOrder = Number(entry.order);
+          const accent = Number.isFinite(rawOrder) ? Math.abs(rawOrder) % 8 : idx % 8;
+          museumAccentByPersonId.set(String(pid), accent);
+        });
       }
 
       let people = data.people;
@@ -686,8 +774,12 @@
       stat.textContent = `${people.length} shown${bookOnly ? ' (filtered)' : ''} · ${data.count} total in tree`;
 
       renderWall(people);
+      applyPersonHighlightFromQuery();
+      if (!people.length) {
+        document.getElementById('memorialWall').innerHTML = `<div class="small text-muted">${HISTORY_STATE_COPY.empty}</div>`;
+      }
     } catch (e) {
-      errBox.textContent = e.message || String(e);
+      errBox.textContent = `${HISTORY_STATE_COPY.unavailable} ${e.message || String(e)}`;
       errBox.classList.remove('d-none');
       document.getElementById('memorialWall').innerHTML = '';
       stat.textContent = '';
@@ -696,5 +788,9 @@
 
   document.getElementById('bookOnly').addEventListener('change', load);
   wireClicks();
+  initQuickFilters();
+  if (typeof window.initHistoryQuickNav === 'function') {
+    window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });
+  }
   load();
 })();

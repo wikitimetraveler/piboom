@@ -83,6 +83,11 @@ export function getLanePdfGalleryData() {
     .filter((p) => p && p.personId != null && (p.confirmed === undefined || p.confirmed === true))
     .map((p) => {
       const person = getPersonById(p.personId);
+      const occupations = Array.isArray(person?.occupation)
+        ? person.occupation
+            .map((entry) => (entry && typeof entry.job === 'string' ? entry.job.trim() : ''))
+            .filter(Boolean)
+        : [];
       const publicUrl =
         p.publicUrl ||
         (p.imageId ? `/family/assets/lane-pdf/${String(p.imageId)}.jpg` : '');
@@ -92,7 +97,14 @@ export function getLanePdfGalleryData() {
         publicUrl,
         credit: p.credit || creditDefault,
         notes: p.notes || '',
-        personName: person?.name || null
+        personName: person?.name || null,
+        personBirthYear: person?.birthYear || null,
+        personDeathYear: person?.deathYear || null,
+        personBorn: person?.born || person?.birthPlace || null,
+        personDeathPlace: person?.deathPlace || null,
+        personGeneration: person?.generation ?? null,
+        personTitle: person?.title || null,
+        personOccupations: compactUnique(occupations).slice(0, 4)
       };
     });
 
@@ -141,7 +153,13 @@ const WAR_DEFINITIONS = {
       'king philips war',
       'metacom',
       'capt. turner',
-      'capt. poole'
+      'capt. poole',
+      'wampanoag',
+      'narragansett',
+      'nipmuc',
+      'great swamp',
+      'bloody brook',
+      'peskeompskut'
     ]
   },
   'revolutionary-war': {
@@ -156,7 +174,12 @@ const WAR_DEFINITIONS = {
       'bunker hill',
       'lexington',
       'concord',
-      'west point'
+      'west point',
+      'saratoga',
+      'yorktown',
+      'trenton',
+      'hessian',
+      'burgoyne'
     ]
   }
 };
@@ -311,6 +334,65 @@ function hasKeyword(haystack, keywords = []) {
   return keywords.some((kw) => h.includes(normalizeLoose(kw)));
 }
 
+function normalizeSpaces(value = '') {
+  return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function extractWarAssociationText(node = {}) {
+  const text = [];
+  if (node.text) text.push(String(node.text));
+  const ocrFacts = node.importMeta?.ocrFacts;
+  if (ocrFacts?.rawText) text.push(String(ocrFacts.rawText));
+  if (Array.isArray(ocrFacts?.military)) {
+    for (const line of ocrFacts.military) text.push(String(line));
+  }
+  if (Array.isArray(ocrFacts?.marriageSnippets)) {
+    for (const line of ocrFacts.marriageSnippets) text.push(String(line));
+  }
+  return compactUnique(text);
+}
+
+function detectFamilyWarAssociation(node = {}, warDef = {}) {
+  const relationshipPattern = /\b(m\.|married|husband|wife|widow|widower|spouse|her cousin|his cousin)\b/i;
+  const servicePattern = /\b(soldier|served|service|capt\.?|captain|militia|private|sergeant|lieutenant|colonel)\b/i;
+  const snippets = [];
+  const lines = extractWarAssociationText(node);
+  for (const line of lines) {
+    if (!hasKeyword(line, warDef.keywords)) continue;
+    if (!relationshipPattern.test(line)) continue;
+    if (!servicePattern.test(line)) continue;
+    snippets.push(normalizeSpaces(line));
+  }
+  return {
+    isFamilyAssociated: snippets.length > 0,
+    snippets: snippets.slice(0, 3)
+  };
+}
+
+function extractAssociatedServicePeople(node = {}) {
+  const names = [];
+  const seen = new Set();
+  const lines = extractWarAssociationText(node);
+  const patterns = [
+    /\bm\.\s*(?:her|his)?\s*cousin,\s*([^,;]+),/i,
+    /\bmarried\s+(?:her|his)?\s*cousin,\s*([^,;]+),/i,
+    /\bmarried\s+([^,;]+),/i
+  ];
+  for (const line of lines) {
+    for (const pattern of patterns) {
+      const m = line.match(pattern);
+      if (!m) continue;
+      const candidate = normalizeSpaces(m[1]).replace(/\s*\.+$/, '');
+      if (!candidate) continue;
+      const key = normalizeLoose(candidate);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      names.push(candidate);
+    }
+  }
+  return names.slice(0, 3);
+}
+
 function extractMilitaryEvidence(node = {}) {
   const evidence = [];
   const occupation = Array.isArray(node.occupation) ? node.occupation : [];
@@ -333,6 +415,13 @@ function extractMilitaryEvidence(node = {}) {
   const facts = node.importMeta?.ocrFacts;
   if (facts && Array.isArray(facts.military)) {
     for (const item of facts.military) evidence.push(String(item));
+  }
+  /** Optional pilot: curated engagement lines (same review rules as other military text). */
+  if (Array.isArray(node.militaryEngagements)) {
+    for (const m of node.militaryEngagements) {
+      if (typeof m === 'string') evidence.push(m);
+      else if (m && typeof m === 'object' && m.text) evidence.push(String(m.text));
+    }
   }
   if (node.text) evidence.push(String(node.text));
   return compactUnique(evidence);
@@ -386,15 +475,29 @@ function scoreWarMatch(node, warDef) {
     return null;
   }
 
+  const familyAssociation = detectFamilyWarAssociation(node, warDef);
   let confidence = 'low';
   if (structured) confidence = 'high';
-  else if (semiStructured) confidence = 'medium';
+  else if (semiStructured || familyAssociation.isFamilyAssociated) confidence = 'medium';
 
   const matchedEvidence = evidence.filter((line) => hasKeyword(line, warDef.keywords)).slice(0, 8);
+  const associationType =
+    !structured && familyAssociation.isFamilyAssociated ? 'family-associated' : 'service-member';
+  const associatedPeople = associationType === 'family-associated' ? extractAssociatedServicePeople(node) : [];
+  const associationNotes =
+    associationType === 'family-associated'
+      ? [
+          'War reference appears in spouse/cousin relationship text; included as family-associated record.',
+          ...familyAssociation.snippets
+        ].slice(0, 3)
+      : [];
 
   return {
     confidence,
-    evidence: matchedEvidence.length ? matchedEvidence : evidence.slice(0, 4)
+    evidence: matchedEvidence.length ? matchedEvidence : evidence.slice(0, 4),
+    associationType,
+    associatedPeople,
+    associationNotes
   };
 }
 
@@ -519,6 +622,9 @@ export function getWarParticipants(warSlug) {
         warLabel: war.label,
         warYears: war.years,
         confidence: scored.confidence,
+        associationType: scored.associationType || 'service-member',
+        associatedPeople: scored.associatedPeople || [],
+        associationNotes: scored.associationNotes || [],
         person,
         evidence: scored.evidence,
         places: extractParticipantPlaces(person)

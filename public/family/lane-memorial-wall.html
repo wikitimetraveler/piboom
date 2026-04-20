@@ -31,10 +31,24 @@
       </div>
     </header>
 
+    <section class="memorial-onboarding" aria-label="How to use memorial wall">
+      <p class="mb-2"><strong>How to read this wall:</strong> entries are grouped by birth-era chronology, with optional source filtering and clickable lines for full profile context.</p>
+      <p class="history-context-evidence-note mb-2"><strong>Context:</strong> general history background. <strong>Evidence:</strong> Lane-specific records/snippets.</p>
+      <div class="memorial-quick-actions">
+        <button type="button" class="btn btn-sm btn-outline-light" data-memorial-filter="all">Show all entries</button>
+        <button type="button" class="btn btn-sm btn-outline-light" data-memorial-filter="book">Book/OCR only</button>
+      </div>
+      <nav class="memorial-quick-nav history-quick-nav mt-2" aria-label="Memorial quick links">
+        <a href="#memorialWall" class="history-quick-link memorial-quick-link">Wall</a>
+        <a href="#memorialBackLink" class="history-quick-link memorial-quick-link">Back link</a>
+      </nav>
+    </section>
+
     <div id="memorialError" class="memorial-error d-none"></div>
+    <nav id="memorialCenturyJump" class="memorial-century-jump" aria-label="Jump to century"></nav>
     <div id="memorialWall" class="memorial-wall" aria-live="polite"></div>
 
-    <p class="text-center mt-4 mb-0">
+    <p class="text-center mt-4 mb-0" id="memorialBackLink">
       <a href="/family/genealogy.html" class="text-muted small">Back to Family Genealogy</a>
     </p>
   </main>
@@ -59,6 +73,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/family/js/history-mode.js"></script>
   <script src="/family/js/lane-memorial-wall.js"></script>
 </body>
 </html>

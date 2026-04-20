@@ -31,6 +31,7 @@ function renderGallery(images, portraits, container) {
       const ids = img.candidatePersonIds || [];
       const ambiguous = img.ambiguous;
       const confirmed = img.imageId && portraitByImageId.has(img.imageId);
+      const portrait = confirmed ? portraitByImageId.get(img.imageId) : null;
       const url = img.publicUrl || '#';
       const cardClass = isSkipped ? 'lane-pdf-card lane-pdf-card--skipped' : 'lane-pdf-card';
       const plateMeta =
@@ -67,6 +68,30 @@ function renderGallery(images, portraits, container) {
         )
         .join(' ');
       const more = ids.length > 12 ? ` <span class="text-muted">+${ids.length - 12}</span>` : '';
+      const yearRange = portrait
+        ? `${portrait.personBirthYear || '?'} - ${portrait.personDeathYear || '?'}`
+        : '';
+      const occupationText =
+        portrait && Array.isArray(portrait.personOccupations) && portrait.personOccupations.length
+          ? portrait.personOccupations.join(' | ')
+          : '';
+      const portraitMeta = portrait
+        ? `
+          <div class="lane-pdf-meta mt-1 small">
+            <div><strong>Years:</strong> ${esc(yearRange)}</div>
+            ${portrait.personBorn ? `<div><strong>Born:</strong> ${esc(portrait.personBorn)}</div>` : ''}
+            ${portrait.personDeathPlace ? `<div><strong>Died:</strong> ${esc(portrait.personDeathPlace)}</div>` : ''}
+            ${portrait.personTitle ? `<div><strong>Title:</strong> ${esc(portrait.personTitle)}</div>` : ''}
+            ${occupationText ? `<div><strong>Occupation:</strong> ${esc(occupationText)}</div>` : ''}
+            ${
+              portrait.personGeneration != null && portrait.personGeneration !== ''
+                ? `<div><strong>Generation:</strong> ${esc(portrait.personGeneration)}</div>`
+                : ''
+            }
+            ${portrait.notes ? `<div><strong>Match note:</strong> ${esc(portrait.notes)}</div>` : ''}
+            ${portrait.credit ? `<div class="text-muted"><strong>Credit:</strong> ${esc(portrait.credit)}</div>` : ''}
+          </div>`
+        : '';
 
       return `
         <div class="col-md-4 col-sm-6 mb-4">
@@ -75,6 +100,12 @@ function renderGallery(images, portraits, container) {
             <div class="lane-pdf-card-body">
               ${badge}
               <div><strong>Page</strong> ${esc(img.pdfPage)} · <code>${esc(img.imageId)}</code></div>
+              ${
+                portrait && portrait.personName
+                  ? `<div class="mt-1"><strong>Display name:</strong> ${esc(portrait.personName)}</div>`
+                  : ''
+              }
+              ${portraitMeta}
               ${!isSkipped && img.width ? `<div class="text-muted">${esc(img.width)}×${esc(img.height)}</div>` : ''}
               ${
                 isSkipped && img.reason

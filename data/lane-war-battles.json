@@ -1,0 +1,163 @@
+{
+  "version": 1,
+  "generatedNote": "Approximate map pins for general historical context. Not evidence that any Lane ancestor was present unless stated in that person’s record.",
+  "battles": [
+    {
+      "id": "kp-great-swamp-1675",
+      "warSlug": "king-philips-war",
+      "title": "Great Swamp Fight",
+      "approxWhen": "December 1675",
+      "lat": 41.455,
+      "lng": -71.678,
+      "summary": "Major assault on a Narragansett stronghold in the Great Swamp (modern Rhode Island). Colonial forces attacked a winter encampment; casualties and long-term diplomatic fallout were severe.",
+      "belligerents": [
+        "United Colonies militias",
+        "Narragansett and allied Native forces"
+      ],
+      "keywords": ["great swamp", "south kingstown", "narragansett fort"]
+    },
+    {
+      "id": "kp-bloody-brook-1675",
+      "warSlug": "king-philips-war",
+      "title": "Bloody Brook",
+      "approxWhen": "September 1675",
+      "lat": 42.475,
+      "lng": -72.955,
+      "summary": "Ambush near a cart path in the Connecticut River valley as colonial troops escorted grain; emblematic of frontier raids and counter-raids.",
+      "belligerents": ["Massachusetts militia and teamsters", "Native raiding party"],
+      "keywords": ["bloody brook", "south deerfield"]
+    },
+    {
+      "id": "kp-brookfield-1675",
+      "warSlug": "king-philips-war",
+      "title": "Brookfield siege",
+      "approxWhen": "August 1675",
+      "lat": 42.213,
+      "lng": -72.102,
+      "summary": "Settlement under attack and relief column actions in central Massachusetts during the opening phase of the war.",
+      "belligerents": ["Massachusetts Bay militia", "Wampanoag-led forces"],
+      "keywords": ["brookfield", "wheeler's surprise"]
+    },
+    {
+      "id": "kp-turners-falls-1676",
+      "warSlug": "king-philips-war",
+      "title": "Turner's Falls / Peskeompskut",
+      "approxWhen": "May 1676",
+      "lat": 42.733,
+      "lng": -72.555,
+      "summary": "Raid on an Indigenous fishing encampment on the Connecticut River; often paired with Metacom’s War narratives about retaliation cycles.",
+      "belligerents": ["Massachusetts militia", "Non-combatants and defenders at camp"],
+      "keywords": ["turner", "peskeompskut", "falls fight"]
+    },
+    {
+      "id": "kp-lancaster-raid-1676",
+      "warSlug": "king-philips-war",
+      "title": "Lancaster raid",
+      "approxWhen": "February 1676",
+      "lat": 42.456,
+      "lng": -71.673,
+      "summary": "Attack on the Lancaster settlement during the winter campaign period; often cited in captivity and frontier defense narratives.",
+      "belligerents": ["Lancaster settlers and local militia", "Native war parties aligned against English expansion"],
+      "keywords": ["lancaster", "captivity", "mary rowlandson"]
+    },
+    {
+      "id": "kp-sudbury-fight-1676",
+      "warSlug": "king-philips-war",
+      "title": "Sudbury Fight",
+      "approxWhen": "April 1676",
+      "lat": 42.383,
+      "lng": -71.416,
+      "summary": "Major engagement near Sudbury where relief columns and local forces were heavily hit in a broad ambush and running fight.",
+      "belligerents": ["Massachusetts and allied colonial companies", "Native coalition forces"],
+      "keywords": ["sudbury", "noyes", "wadsworth"]
+    },
+    {
+      "id": "kp-mount-hope-1676",
+      "warSlug": "king-philips-war",
+      "title": "Mount Hope campaign",
+      "approxWhen": "August 1676",
+      "lat": 41.716,
+      "lng": -71.291,
+      "summary": "Operations around Mount Hope and nearby swamps culminating in Metacom’s death; used as a symbolic endpoint in many narratives.",
+      "belligerents": ["Plymouth-aligned colonial forces", "Wampanoag leadership and supporters"],
+      "keywords": ["mount hope", "metacom", "bristol"]
+    },
+    {
+      "id": "rw-lexington-concord-1775",
+      "warSlug": "revolutionary-war",
+      "title": "Lexington and Concord",
+      "approxWhen": "April 1775",
+      "lat": 42.449,
+      "lng": -71.226,
+      "summary": "Opening armed engagements of the war in Massachusetts; militia and British regulars clashed on the road network west of Boston.",
+      "belligerents": ["Massachusetts militia and minutemen", "British Army expedition"],
+      "keywords": ["lexington", "concord", "north bridge"]
+    },
+    {
+      "id": "rw-bunker-hill-1775",
+      "warSlug": "revolutionary-war",
+      "title": "Bunker Hill",
+      "approxWhen": "June 1775",
+      "lat": 42.376,
+      "lng": -71.056,
+      "summary": "Early pitched battle for heights overlooking Boston; showed colonial forces could stand against regulars despite British tactical success.",
+      "belligerents": ["New England provincial troops", "British Army"],
+      "keywords": ["bunker hill", "breeds hill"]
+    },
+    {
+      "id": "rw-saratoga-1777",
+      "warSlug": "revolutionary-war",
+      "title": "Saratoga campaign",
+      "approxWhen": "1777",
+      "lat": 43.01,
+      "lng": -73.644,
+      "summary": "Northern campaign often treated as a turning point encouraging French alliance; involved Continental and state troops against a British northern army.",
+      "belligerents": ["Continental Army and militia", "British northern army"],
+      "keywords": ["saratoga", "gates", "burgoyne"]
+    },
+    {
+      "id": "rw-yorktown-1781",
+      "warSlug": "revolutionary-war",
+      "title": "Siege of Yorktown",
+      "approxWhen": "1781",
+      "lat": 37.239,
+      "lng": -76.509,
+      "summary": "Franco-American siege that trapped a British field army; French fleet and ground forces were decisive alongside Continentals.",
+      "belligerents": ["Continental and French forces", "British Army (Cornwallis)"],
+      "keywords": ["yorktown", "cornwallis", "rochambeau"]
+    },
+    {
+      "id": "rw-trenton-1776",
+      "warSlug": "revolutionary-war",
+      "title": "Trenton",
+      "approxWhen": "December 1776",
+      "lat": 40.2206,
+      "lng": -74.7597,
+      "summary": "Continental crossing and surprise attack at Trenton during the New Jersey campaign, often paired with Princeton in winter operations.",
+      "belligerents": ["Continental Army", "Hessian garrison under British command"],
+      "keywords": ["trenton", "delaware crossing", "new jersey campaign"]
+    },
+    {
+      "id": "rw-princeton-1777",
+      "warSlug": "revolutionary-war",
+      "title": "Princeton",
+      "approxWhen": "January 1777",
+      "lat": 40.3573,
+      "lng": -74.6672,
+      "summary": "Follow-on engagement after Trenton that helped recover Continental momentum and shifted pressure in New Jersey.",
+      "belligerents": ["Continental Army", "British regular forces"],
+      "keywords": ["princeton", "new jersey", "washington"]
+    },
+    {
+      "id": "rw-monmouth-1778",
+      "warSlug": "revolutionary-war",
+      "title": "Monmouth",
+      "approxWhen": "June 1778",
+      "lat": 40.3148,
+      "lng": -74.336,
+      "summary": "Large late-June battle in extreme heat during the British withdrawal from Philadelphia to New York.",
+      "belligerents": ["Continental Army", "British Army"],
+      "keywords": ["monmouth", "new jersey", "philadelphia withdrawal"]
+    }
+  ]
+}

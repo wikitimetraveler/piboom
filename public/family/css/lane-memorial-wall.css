@@ -1,9 +1,19 @@
 /* Lane memorial wall — Vietnam Wall–inspired density; not official memorial branding */
 
 body.lane-memorial-page {
+  --history-bg: #1a1c1f;
+  --history-text: #d4cfc4;
+  --history-surface: rgba(255, 255, 255, 0.03);
+  --history-border: rgba(196, 181, 153, 0.24);
+  --history-accent: #c4b599;
+  --history-link: #8cc7ff;
   background: linear-gradient(180deg, #1a1c1f 0%, #23262b 40%, #1a1c1f 100%);
   color: #d4cfc4;
   min-height: 100vh;
+}
+
+body.lane-memorial-page .text-muted {
+  color: #b5aea0 !important;
 }
 
 .memorial-wrap {
@@ -54,12 +64,95 @@ body.lane-memorial-page {
   font-size: 0.85rem;
 }
 
+.memorial-onboarding {
+  border: 1px solid rgba(196, 181, 153, 0.24);
+  border-left: 4px solid rgba(196, 181, 153, 0.52);
+  border-radius: 0.6rem;
+  padding: 0.75rem 0.85rem;
+  margin: 0.8rem 0 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  color: #c9c2b4;
+}
+
+.history-context-evidence-note {
+  color: #cec6b7;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+}
+
+.memorial-quick-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.memorial-quick-nav {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.history-quick-nav .history-quick-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.26rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--history-border);
+  color: var(--history-text);
+  text-decoration: none;
+  font-size: 0.74rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.history-quick-nav .history-quick-link:hover,
+.history-quick-nav .history-quick-link.is-active {
+  border-color: var(--history-accent);
+  color: #fff6e2;
+  background: rgba(196, 181, 153, 0.12);
+}
+
+.memorial-quick-actions .btn {
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .memorial-stat {
   color: #a89b82;
 }
 
 .memorial-wall {
   margin-top: 1.25rem;
+}
+
+.memorial-century-jump {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+
+.memorial-century-jump-link {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(196, 181, 153, 0.32);
+  color: #d8d1c3;
+  text-decoration: none;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.22rem 0.58rem;
+}
+
+.memorial-century-jump-link:hover,
+.memorial-century-jump-link:focus-visible {
+  border-color: rgba(196, 181, 153, 0.72);
+  color: #fff6e2;
+  background: rgba(196, 181, 153, 0.12);
+  outline: none;
 }
 
 .memorial-century {
@@ -131,6 +224,16 @@ body.lane-memorial-page {
   .memorial-columns {
     column-count: 1;
   }
+
+  .memorial-decade-header {
+    position: sticky;
+    top: 0.35rem;
+    z-index: 2;
+    background: rgba(26, 28, 31, 0.92);
+    padding: 0.25rem 0.45rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgba(196, 181, 153, 0.16);
+  }
 }
 
 .memorial-line {
@@ -143,6 +246,21 @@ body.lane-memorial-page {
   cursor: pointer;
   border-radius: 2px;
   transition: background 0.15s ease, color 0.15s ease;
+}
+
+.memorial-line--museum-0 { border-left: 3px solid #c5ab6b; padding-left: 0.42rem; }
+.memorial-line--museum-1 { border-left: 3px solid #8bb0d6; padding-left: 0.42rem; }
+.memorial-line--museum-2 { border-left: 3px solid #9dbd93; padding-left: 0.42rem; }
+.memorial-line--museum-3 { border-left: 3px solid #c49a8d; padding-left: 0.42rem; }
+.memorial-line--museum-4 { border-left: 3px solid #b7a1cf; padding-left: 0.42rem; }
+.memorial-line--museum-5 { border-left: 3px solid #cfb784; padding-left: 0.42rem; }
+.memorial-line--museum-6 { border-left: 3px solid #84c1bd; padding-left: 0.42rem; }
+.memorial-line--museum-7 { border-left: 3px solid #d0a06f; padding-left: 0.42rem; }
+
+.memorial-line--highlight {
+  background: rgba(196, 181, 153, 0.25);
+  color: #fff6e2;
+  box-shadow: 0 0 0 1px rgba(242, 221, 164, 0.45);
 }
 
 .memorial-line:hover,
@@ -353,5 +471,11 @@ body.lane-memorial-page {
   .memorial-map-loading {
     min-height: 280px;
     height: 280px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memorial-line {
+    transition: none;
   }
 }

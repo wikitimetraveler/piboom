@@ -146,14 +146,56 @@
     "title": "Lane crater observatory",
     "subtitle": "LROC QuickMap · USGS planetary names · “Lunar-5” spotlight",
     "featureName": "Lane",
-    "body": "Jonathan Homer Lane’s solar models helped launch stellar structure theory. The Moon’s Lane crater (~55 km) sits in Mare Cognitum — explore it in NASA’s LROC QuickMap or read the official USGS feature sheet.",
-    "latitude": -9.51,
-    "longitude": 132.21,
-    "diameterKm": 55.1,
+    "body": "Jonathan Homer Lane’s solar models helped launch stellar structure theory. The Moon’s Lane crater (~54 km) sits in Mare Cognitum — explore it in NASA’s LROC QuickMap or read the official USGS feature sheet.",
+    "nomenclatureOrigin": "Jonathan Homer; American physicist, astrophysicist (1819-1880).",
+    "latitude": -9.5,
+    "longitude": 132.36,
+    "diameterKm": 53.76,
+    "usgsFeatures": [
+      {
+        "name": "Lane",
+        "featureType": "Crater",
+        "latitude": -9.5,
+        "longitude": 132.36,
+        "diameterKm": 53.76,
+        "primary": true
+      },
+      {
+        "name": "Lane B",
+        "featureType": "Satellite Feature",
+        "latitude": -7.7,
+        "longitude": 133.15,
+        "diameterKm": 11.95
+      },
+      {
+        "name": "Lane S",
+        "featureType": "Satellite Feature",
+        "latitude": -9.84,
+        "longitude": 131.06,
+        "diameterKm": 34.41
+      }
+    ],
     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/960px-FullMoon2010.jpg",
+    "gallery": [
+      {
+        "url": "/family/assets/Lane.png",
+        "caption": "USGS feature context — Lane crater",
+        "credit": "USGS Gazetteer of Planetary Nomenclature"
+      },
+      {
+        "url": "/family/assets/Lane B.png",
+        "caption": "USGS feature context — Lane B",
+        "credit": "USGS Gazetteer of Planetary Nomenclature"
+      },
+      {
+        "url": "/family/assets/Lane S.png",
+        "caption": "USGS feature context — Lane S",
+        "credit": "USGS Gazetteer of Planetary Nomenclature"
+      }
+    ],
     "imageCredit": "Full Moon (Clementine data) — Wikimedia / NASA",
     "quickMapUrl": "https://quickmap.lroc.im-ldi.com/",
-    "moonTrekUrl": "https://moontrek.jpl.nasa.gov/",
+    "moonTrekUrl": "https://trek.nasa.gov/moon/",
     "usgsUrl": "https://planetarynames.wr.usgs.gov/Feature/3315"
   },
   "media": [

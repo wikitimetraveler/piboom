@@ -1,6 +1,11 @@
 let directStory = null;
 let descendantDraft = [];
 const DESC_STORAGE_KEY = 'lane.direct.descendants.draft.v1';
+const HISTORY_STATE_COPY = {
+  loading: 'Loading history records...',
+  empty: 'No Lane records available for this view.',
+  unavailable: 'History records are unavailable right now.'
+};
 
 function esc(value) {
   return String(value ?? '')
@@ -39,7 +44,7 @@ function renderDescendantDraft() {
   const host = document.getElementById('descendantDraftList');
   if (!host) return;
   if (!descendantDraft.length) {
-    host.innerHTML = '<div class="small text-muted">No draft descendants added yet.</div>';
+    host.innerHTML = `<div class="small text-muted">${HISTORY_STATE_COPY.empty}</div>`;
     return;
   }
   host.innerHTML = descendantDraft
@@ -68,7 +73,6 @@ function renderDescendantDraft() {
 function renderStory() {
   const host = document.getElementById('directTimeline');
   if (!host || !directStory) return;
-  const lineOnly = document.getElementById('lineOnlyToggle')?.checked !== false;
   const entries = Array.isArray(directStory.line) ? directStory.line : [];
   host.innerHTML = entries
     .map((entry, idx) => {
@@ -76,8 +80,10 @@ function renderStory() {
       const wars = (entry.warLinks || []).slice(0, 3);
       const spouseNames = (entry.spouses || []).map((s) => s.name).filter(Boolean);
       const childNames = (entry.children || []).map((c) => c.name).filter(Boolean);
+      const anchorId = `ancestor-step-${idx + 1}`;
+      const quote = String(entry.narrative || '').split(/[.!?]/)[0].trim();
       return `
-      <article class="direct-card ancestor-entry">
+      <article class="direct-card ancestor-entry" id="${anchorId}">
         <div class="ancestor-head">
           <h2 class="h5 mb-0">${esc(entry.name || 'Unknown')}</h2>
           <span class="ancestor-years">${esc(entry.birthYear || '?')} - ${esc(entry.deathYear || '?')} • Step ${idx + 1}</span>
@@ -88,16 +94,40 @@ function renderStory() {
           ${wars.map((w) => `<span class="badge badge-warning">${esc(w.warLabel)} (${esc(w.confidence)})</span>`).join('')}
         </div>
         <div class="ancestor-line">${esc(entry.narrative || '')}</div>
-        ${
-          lineOnly
-            ? ''
-            : `<div class="family-context">
-                <div><strong>Spouses:</strong> ${esc(spouseNames.join(', ') || 'None listed')}</div>
-                <div><strong>Children:</strong> ${esc(childNames.join(', ') || 'None listed')}</div>
-              </div>`
-        }
+        ${quote ? `<blockquote class="ancestor-quote mb-0">"${esc(quote)}."</blockquote>` : ''}
+        <div class="family-context">
+          <div><strong>Spouses:</strong> ${esc(spouseNames.join(', ') || 'None listed')}</div>
+          <div><strong>Children:</strong> ${esc(childNames.join(', ') || 'None listed')}</div>
+        </div>
       </article>`;
     })
+    .join('');
+}
+
+function renderQuickNav() {
+  const host = document.getElementById('directQuickNav');
+  if (!host || !directStory) return;
+  const entries = Array.isArray(directStory.line) ? directStory.line : [];
+  if (!entries.length) {
+    host.innerHTML = `<span class="small text-muted">${HISTORY_STATE_COPY.empty}</span>`;
+    return;
+  }
+  const checkpoints = [];
+  const first = entries[0];
+  const middle = entries[Math.floor(entries.length / 2)];
+  const latest = entries[entries.length - 1];
+  checkpoints.push({ label: 'Origin', id: 'ancestor-step-1', name: first?.name || 'Origin' });
+  if (middle && middle !== first && middle !== latest) {
+    checkpoints.push({
+      label: 'Middle era',
+      id: `ancestor-step-${Math.floor(entries.length / 2) + 1}`,
+      name: middle.name || 'Middle era'
+    });
+  }
+  checkpoints.push({ label: 'Recent anchor', id: `ancestor-step-${entries.length}`, name: latest?.name || 'Recent anchor' });
+
+  host.innerHTML = checkpoints
+    .map((point) => `<a href="#${esc(point.id)}" class="direct-quick-link history-quick-link" title="${esc(point.name)}">${esc(point.label)}</a>`)
     .join('');
 }
 
@@ -113,17 +143,20 @@ async function boot() {
   directStory = await getJson('/api/genealogy/direct-line-story?startId=112&order=oldest-first');
   renderMeta();
   renderStory();
+  renderQuickNav();
+  if (typeof window.initHistoryQuickNav === 'function') {
+    window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });
+  }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    const err = document.getElementById('directError');
+    if (err) err.textContent = HISTORY_STATE_COPY.loading;
     loadDescendantDraft();
     await boot();
+    if (err) err.textContent = '';
     renderDescendantDraft();
-    const toggle = document.getElementById('lineOnlyToggle');
-    if (toggle) {
-      toggle.addEventListener('change', () => renderStory());
-    }
     const form = document.getElementById('descendantForm');
     if (form) {
       form.addEventListener('submit', (event) => {
@@ -152,6 +185,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (error) {
     console.error(error);
     const err = document.getElementById('directError');
-    if (err) err.textContent = `Direct ancestor story failed to load: ${error.message}`;
+    if (err) err.textContent = `${HISTORY_STATE_COPY.unavailable} ${error.message}`;
   }
 });

@@ -19,29 +19,122 @@
     <section class="war-card war-header">
       <div class="war-kicker">Lane Historical Campaigns</div>
       <h1 class="h3 mb-2">King Philip’s War + Revolutionary War</h1>
-      <p class="text-muted mb-2">Hybrid evidence scoring (structured records + military text) with map context and soldier evidence popups.</p>
+      <p class="text-muted mb-2">Hybrid evidence scoring (structured records + military text) with map context, curated battle pins (general history), and soldier evidence popups.</p>
+      <p class="history-context-evidence-note mb-2"><strong>Context:</strong> general history background. <strong>Evidence:</strong> Lane-specific records/snippets.</p>
       <div id="campaignButtons" class="war-tabs"></div>
+      <nav class="war-quick-nav history-quick-nav" aria-label="War page quick links">
+        <a href="#warMapPanel" class="war-quick-link history-quick-link">Map</a>
+        <a href="#warTimelinePanel" class="war-quick-link history-quick-link">Timeline</a>
+        <a href="#warContextPanel" class="war-quick-link history-quick-link">Context</a>
+        <a href="#warNotesPanel" class="war-quick-link history-quick-link">Interpretive notes</a>
+      </nav>
       <div id="warError" class="text-warning small mt-2"></div>
     </section>
 
+    <section class="war-highlights" id="warHighlightsPanel" aria-label="Historical highlights">
+      <article class="war-highlight-card">
+        <h2 class="war-highlight-title">Women’s wartime labor</h2>
+        <p class="mb-0 small text-muted">Household logistics, nursing, intelligence circulation, and record-keeping were critical across both wars.</p>
+      </article>
+      <article class="war-highlight-card">
+        <h2 class="war-highlight-title">Context vs evidence</h2>
+        <p class="mb-0 small text-muted">Battle pins provide campaign geography; person cards document Lane-specific evidence confidence.</p>
+      </article>
+      <article class="war-highlight-card">
+        <h2 class="war-highlight-title">Geography matters</h2>
+        <p class="mb-0 small text-muted">River valleys, roads, and coastal corridors shaped militia mobilization and conflict outcomes.</p>
+      </article>
+    </section>
+
     <section class="war-grid">
-      <article class="war-card war-panel">
+      <article class="war-card war-panel" id="warMapPanel">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <h2 id="campaignTitle" class="h5 mb-0">War Campaign</h2>
           <span id="campaignCount" class="small text-muted"></span>
         </div>
         <div id="warMap"></div>
+        <p class="small text-muted mt-2 mb-0 war-map-legend">
+          <span class="war-legend-star">★</span> Battle/theater pin (general history) ·
+          <span class="war-legend-dot">●</span> Lane participant (evidence-based)
+        </p>
       </article>
 
-      <aside class="war-card war-panel">
+      <aside class="war-card war-panel" id="warTimelinePanel">
         <h3 class="h6 mb-2">Campaign Timeline</h3>
         <div id="timelineBox" class="mb-3"></div>
-        <h3 class="h6 mb-2">Lane Soldiers</h3>
-        <div id="participantList" class="participant-list"></div>
+
+        <h3 class="h6 mb-2">Notable engagements (context)</h3>
+        <div id="battleListHost" class="battle-list-host" data-lane-tts-ignore></div>
+
+        <h3 class="h6 mb-2 mt-3">Lane Participants</h3>
+        <div id="participantList" class="participant-list" data-lane-tts-ignore></div>
       </aside>
     </section>
 
-    <section class="war-card war-panel mt-3">
+    <section class="war-card war-panel mt-3 war-video-section">
+      <h3 class="h6 mb-2"><i class="bi bi-play-btn" aria-hidden="true"></i> Overview video (general U.S. history)</h3>
+      <p class="small text-muted mb-2">External overview for classroom-style context—not Lane-specific. Replace the embed source in <code class="text-muted">lane-war-history.js</code> (<code>WAR_OVERVIEW_VIDEO_EMBED</code>) if you prefer another clip.</p>
+      <div class="embed-responsive embed-responsive-16by9 war-video-embed">
+        <iframe
+          id="warOverviewVideo"
+          class="embed-responsive-item"
+          title="American history overview (YouTube)"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+      </div>
+      <p class="small mt-2 mb-0">
+        <a href="/family/lane-museum.html" class="text-info">Lane Museum</a>
+        <span class="text-muted"> — related exhibits and media</span>
+      </p>
+    </section>
+
+    <section class="war-card war-panel mt-3 war-interpretive" id="warContextPanel">
+      <h3 class="h6 mb-3">Historical context (general)</h3>
+      <p class="small text-muted mb-3">Summaries below are for orientation only. They do not assert that any named Lane ancestor served in a particular unit or battle unless your genealogy notes say so.</p>
+      <p class="small text-muted mb-3">
+        <strong>Women’s roles:</strong> Women were central to wartime survival and communication: maintaining households and food networks, protecting children during frontier displacement, carrying intelligence and warnings, nursing wounded people, managing property in the absence of enlisted men, and preserving diaries or testimony that now anchors local history research.
+      </p>
+
+      <div class="accordion war-context-accordion" id="warContextAccordion">
+        <div class="card bg-dark border-secondary">
+          <div class="card-header p-0 border-secondary" id="headingKp">
+            <h4 class="mb-0">
+              <button class="btn btn-link btn-block text-left text-light collapsed py-3" type="button" data-toggle="collapse" data-target="#collapseKp" aria-expanded="false" aria-controls="collapseKp">
+                King Philip’s War — Native polities, militias, and geography
+              </button>
+            </h4>
+          </div>
+          <div id="collapseKp" class="collapse" aria-labelledby="headingKp" data-parent="#warContextAccordion">
+            <div class="card-body small text-muted">
+              <p class="mb-2">Wampanoag, Narragansett, Nipmuc, and other communities navigated alliances and pressures differently across southern New England. Colonial towns raised militia and volunteer companies; Massachusetts Bay, Plymouth, Connecticut, and Rhode Island did not always coordinate.</p>
+              <p class="mb-2">Raids, sieges, and counter-attacks moved along rivers and frontier towns (Connecticut River valley, Plymouth colony edges, Rhode Island’s Narragansett country). Language in older sources often reflects period bias; modern tribal histories should be consulted for nation-specific perspectives.</p>
+              <p class="mb-0"><strong>Foreign involvement:</strong> limited direct European troop presence compared with later wars; the conflict was primarily regional. See standard secondary works (e.g. Lepore, Drake, regional tribal histories) for depth, and review <a href="https://en.wikipedia.org/wiki/King_Philip%27s_War" target="_blank" rel="noopener noreferrer">King Philip’s War overview</a> for quick orientation.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card bg-dark border-secondary">
+          <div class="card-header p-0 border-secondary" id="headingRev">
+            <h4 class="mb-0">
+              <button class="btn btn-link btn-block text-left text-light collapsed py-3" type="button" data-toggle="collapse" data-target="#collapseRev" aria-expanded="false" aria-controls="collapseRev">
+                Revolutionary War — Continentals, militia, allies, and opponents
+              </button>
+            </h4>
+          </div>
+          <div id="collapseRev" class="collapse" aria-labelledby="headingRev" data-parent="#warContextAccordion">
+            <div class="card-body small text-muted">
+              <p class="mb-2"><strong>Continental Army</strong> units drew from multiple states; <strong>militia</strong> served shorter turns closer to home. Naval and coastal defense mattered in Massachusetts ports.</p>
+              <p class="mb-2"><strong>French alliance</strong> (after 1778): fleet, advisors, and materiel were decisive at Yorktown and elsewhere—French forces appear as allies of the United States, not “foreign invaders” in that role.</p>
+              <p class="mb-2"><strong>British forces</strong> included German auxiliaries (often labeled “Hessians” in American rhetoric) under British pay; <strong>Loyalist</strong> provincial units also served. Some Haudenosaunee (Iroquois) nations split between alliances.</p>
+              <p class="mb-0">Use the evidence panel on each person for what the Lane book or records actually claim; treat this section as textbook-style background.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="war-card war-panel mt-3" id="warNotesPanel">
       <h3 class="h6">Interpretive Notes</h3>
       <p class="text-muted mb-1">High confidence = structured war fields. Medium = military service text or OCR military facts. Low = broader text inference only.</p>
       <a href="/family/genealogy.html" class="small">Back to Family Genealogy</a>
@@ -52,7 +145,7 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content bg-dark text-light">
         <div class="modal-header border-secondary">
-          <h5 class="modal-title" id="soldierModalTitle">Soldier Profile</h5>
+          <h5 class="modal-title" id="soldierModalTitle">Participant Profile</h5>
           <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -68,6 +161,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/family/js/history-mode.js"></script>
   <script src="/family/js/lane-war-history.js"></script>
 </body>
 </html>

@@ -25,10 +25,20 @@ body.archiveLight {
 }
 
 body.lane-museum-page {
+  --history-bg: var(--museum-bg);
+  --history-text: var(--museum-text);
+  --history-surface: var(--museum-surface);
+  --history-border: var(--museum-border);
+  --history-accent: var(--museum-accent);
+  --history-link: var(--museum-link);
   background: var(--museum-bg);
   color: var(--museum-text);
   font-family: var(--museum-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+body.lane-museum-page .text-muted {
+  color: #b6b0a5 !important;
 }
 
 .museum-wrap {
@@ -113,6 +123,53 @@ body.archiveLight .museum-wordmark {
   line-height: 1.55;
   color: var(--museum-muted);
   font-weight: 400;
+}
+
+.museum-quick-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.history-quick-nav .history-quick-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.68rem;
+  border-radius: 999px;
+  border: 1px solid var(--history-border);
+  color: var(--history-link);
+  text-decoration: none;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.history-quick-nav .history-quick-link:hover,
+.history-quick-nav .history-quick-link.is-active {
+  border-color: var(--history-accent);
+  color: var(--history-text);
+  background: rgba(174, 154, 120, 0.1);
+}
+
+.museum-quick-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.68rem;
+  border-radius: 999px;
+  border: 1px solid var(--museum-border);
+  color: var(--museum-link);
+  text-decoration: none;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.museum-quick-link:hover,
+.museum-quick-link.is-active {
+  border-color: var(--museum-accent);
+  color: var(--museum-text);
+  background: rgba(174, 154, 120, 0.1);
 }
 
 .museum-error {
@@ -203,6 +260,29 @@ body.archiveLight .museum-wordmark {
 
 .museum-prose--muted {
   color: var(--museum-muted);
+}
+
+.museum-context-callout {
+  border: 1px solid rgba(174, 154, 120, 0.38);
+  border-left-width: 4px;
+  background: rgba(174, 154, 120, 0.08);
+  border-radius: 2px;
+  padding: 0.8rem 0.9rem;
+  color: var(--museum-muted);
+}
+
+.museum-context-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--museum-accent);
+}
+
+.history-context-evidence-note {
+  color: #c4bcb0;
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
 }
 
 .museum-code {
@@ -516,6 +596,27 @@ body.archiveLight .prominent-card:hover {
   font-size: 0.85rem;
 }
 
+.prominent-wall-link {
+  font-size: 0.8rem;
+  color: var(--museum-link);
+  text-decoration: none;
+  border-bottom: 1px dotted rgba(196, 184, 150, 0.45);
+}
+
+.prominent-wall-link:hover {
+  color: var(--museum-accent);
+  border-bottom-color: var(--museum-accent);
+}
+
+.prominent-card[data-museum-accent='0'] { border-left: 4px solid #c5ab6b; }
+.prominent-card[data-museum-accent='1'] { border-left: 4px solid #8bb0d6; }
+.prominent-card[data-museum-accent='2'] { border-left: 4px solid #9dbd93; }
+.prominent-card[data-museum-accent='3'] { border-left: 4px solid #c49a8d; }
+.prominent-card[data-museum-accent='4'] { border-left: 4px solid #b7a1cf; }
+.prominent-card[data-museum-accent='5'] { border-left: 4px solid #cfb784; }
+.prominent-card[data-museum-accent='6'] { border-left: 4px solid #84c1bd; }
+.prominent-card[data-museum-accent='7'] { border-left: 4px solid #d0a06f; }
+
 /* Lane lunar observatory (“Lunar-5”) */
 .lunar-observatory {
   position: relative;
@@ -569,6 +670,42 @@ body.archiveLight .prominent-card:hover {
   line-height: 1.5;
 }
 
+.lunar-nomenclature-epitaph {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #e8dcb8;
+  border-left: 3px solid rgba(240, 223, 168, 0.55);
+  padding: 0.35rem 0 0.35rem 0.7rem;
+  background: rgba(10, 12, 18, 0.28);
+  border-radius: 2px;
+}
+
+.lunar-usgs-table-wrap {
+  border: 1px solid rgba(196, 184, 150, 0.25);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.lunar-usgs-table {
+  color: var(--museum-text);
+  margin: 0;
+}
+
+.lunar-usgs-table thead th {
+  border-top: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--museum-muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.lunar-usgs-table td {
+  font-size: 0.82rem;
+  border-top: 1px solid rgba(236, 232, 223, 0.08);
+}
+
 .lunar-coords dt {
   color: var(--museum-muted);
   font-size: 0.72rem;
@@ -609,6 +746,61 @@ body.archiveLight .prominent-card:hover {
   filter: saturate(1.05) contrast(1.05);
 }
 
+.lunar-observatory-gallery .lunar-observatory-img {
+  min-height: 260px;
+  max-height: 360px;
+  object-fit: contain;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.lunar-gallery-thumbs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+  padding: 0.55rem;
+  background: rgba(12, 14, 20, 0.56);
+  border-top: 1px solid rgba(191, 155, 95, 0.25);
+}
+
+.lunar-gallery-thumb {
+  border: 1px solid rgba(236, 232, 223, 0.22);
+  background: transparent;
+  border-radius: 4px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  min-height: 56px;
+}
+
+.lunar-gallery-thumb img {
+  width: 100%;
+  height: 56px;
+  object-fit: cover;
+  display: block;
+  opacity: 0.85;
+}
+
+.lunar-gallery-thumb.is-active {
+  border-color: rgba(240, 223, 168, 0.85);
+  box-shadow: 0 0 0 1px rgba(240, 223, 168, 0.25);
+}
+
+.lunar-gallery-thumb.is-active img {
+  opacity: 1;
+}
+
+.lunar-gallery-thumb:focus-visible {
+  outline: 2px solid rgba(240, 223, 168, 0.95);
+  outline-offset: 1px;
+}
+
+.lunar-gallery-caption {
+  margin: 0;
+  padding: 0.55rem 0.7rem 0.7rem;
+  border-top: 1px solid rgba(236, 232, 223, 0.08);
+  background: rgba(12, 14, 20, 0.4);
+}
+
 .lunar-observatory-visual--fallback {
   min-height: 220px;
   background: radial-gradient(circle at 55% 45%, #3a3d4a 0%, #1a1c22 62%, #0e0f12 100%);
@@ -629,6 +821,16 @@ body.archiveLight .prominent-card:hover {
 @media (max-width: 992px) {
   .lunar-observatory-inner {
     grid-template-columns: 1fr;
+  }
+
+  .lunar-gallery-thumbs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  .lunar-gallery-thumbs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
