@@ -777,7 +777,7 @@ body.archiveLight .prominent-card:hover {
   height: 56px;
   object-fit: cover;
   display: block;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .lunar-gallery-thumb.is-active {
@@ -799,6 +799,58 @@ body.archiveLight .prominent-card:hover {
   padding: 0.55rem 0.7rem 0.7rem;
   border-top: 1px solid rgba(236, 232, 223, 0.08);
   background: rgba(12, 14, 20, 0.4);
+}
+
+.lunar-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: none;
+}
+
+.lunar-lightbox.is-open {
+  display: block;
+}
+
+.lunar-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.lunar-lightbox-panel {
+  position: relative;
+  z-index: 1;
+  width: min(94vw, 1050px);
+  margin: 4vh auto;
+  padding: 0.75rem 0.75rem 0.5rem;
+  background: rgba(15, 16, 20, 0.96);
+  border: 1px solid rgba(191, 155, 95, 0.35);
+  border-radius: 10px;
+}
+
+.lunar-lightbox-image {
+  display: block;
+  width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lunar-lightbox-close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.35rem;
+  border: 0;
+  background: transparent;
+  color: #f4f4f4;
+  font-size: 1.85rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lunar-lightbox-caption {
+  margin: 0.45rem 0.2rem 0.15rem;
 }
 
 .lunar-observatory-visual--fallback {

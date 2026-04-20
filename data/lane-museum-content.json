@@ -176,6 +176,9 @@
       }
     ],
     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/960px-FullMoon2010.jpg",
+    "mainImageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/FullMoon2010.jpg/960px-FullMoon2010.jpg",
+    "mainImageCaption": "Full Moon (Clementine data)",
+    "mainImageCredit": "Wikimedia / NASA",
     "gallery": [
       {
         "url": "/family/assets/Lane.png",

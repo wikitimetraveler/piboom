@@ -266,6 +266,50 @@ function resolveMoonTrekHref(lunar) {
   return fallback || 'https://moontrek.jpl.nasa.gov/';
 }
 
+function openLunarImageLightbox(image) {
+  if (!image || !image.url) return;
+  let root = document.getElementById('lunarImageLightbox');
+  if (!root) {
+    root = document.createElement('div');
+    root.id = 'lunarImageLightbox';
+    root.className = 'lunar-lightbox';
+    root.innerHTML = `
+      <div class="lunar-lightbox-backdrop" data-lunar-close="1"></div>
+      <div class="lunar-lightbox-panel" role="dialog" aria-modal="true" aria-label="Lunar image">
+        <button type="button" class="lunar-lightbox-close" data-lunar-close="1" aria-label="Close">&times;</button>
+        <img class="lunar-lightbox-image" alt="" />
+        <div class="lunar-lightbox-caption small text-light"></div>
+      </div>
+    `;
+    document.body.appendChild(root);
+    root.addEventListener('click', (event) => {
+      const closeTarget = event.target?.getAttribute?.('data-lunar-close');
+      if (closeTarget === '1') {
+        root.classList.remove('is-open');
+        document.body.style.overflow = '';
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && root.classList.contains('is-open')) {
+        root.classList.remove('is-open');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+  const img = root.querySelector('.lunar-lightbox-image');
+  const cap = root.querySelector('.lunar-lightbox-caption');
+  if (img) {
+    img.src = image.url;
+    img.alt = image.caption || 'Lunar image';
+  }
+  if (cap) {
+    const credit = image.credit || '';
+    cap.textContent = image.caption && credit ? `${image.caption} · ${credit}` : image.caption || credit;
+  }
+  root.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+}
+
 function renderLunarObservatory(lunar) {
   const mount = document.getElementById('lunarObservatoryMount');
   if (!mount) return;
@@ -314,39 +358,44 @@ function renderLunarObservatory(lunar) {
         .filter((item) => item.url)
     : [];
   const hasGallery = galleryItems.length > 0;
-  const initialImage = hasGallery ? galleryItems[0] : null;
-  const imageCaption = initialImage?.caption || '';
-  const imageCredit = initialImage?.credit || lunar.imageCredit || '';
-  const img = hasGallery
+  const mainImageUrl =
+    (lunar.mainImageUrl != null ? String(lunar.mainImageUrl).trim() : '') ||
+    (lunar.imageUrl != null ? String(lunar.imageUrl).trim() : '') ||
+    (hasGallery ? galleryItems[0].url : '');
+  const mainImageCaption = lunar.mainImageCaption || '';
+  const mainImageCredit = lunar.mainImageCredit || lunar.imageCredit || '';
+  const thumbItems = hasGallery
+    ? galleryItems.filter((item) => item.url && item.url !== mainImageUrl)
+    : [];
+  const img = mainImageUrl
     ? `<div class="lunar-observatory-visual lunar-observatory-gallery">
-         <img src="${escapeHtml(initialImage.url)}" alt="${escapeHtml(imageCaption || 'Lane crater lunar image')}" class="lunar-observatory-img" loading="lazy" data-lunar-main-image />
-         <div class="lunar-gallery-thumbs" role="tablist" aria-label="Lane crater image gallery">
-           ${galleryItems
-             .map(
-               (item, index) => `
-                 <button
-                   type="button"
-                   class="lunar-gallery-thumb${index === 0 ? ' is-active' : ''}"
-                   data-lunar-thumb-index="${index}"
-                   aria-label="View image ${index + 1}"
-                   aria-selected="${index === 0 ? 'true' : 'false'}"
-                 >
-                   <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.caption || `Lunar image ${index + 1}`)}" loading="lazy" />
-                 </button>
-               `
-             )
-             .join('')}
-         </div>
-         <p class="small text-muted lunar-gallery-caption mb-0" data-lunar-gallery-caption>
-           ${escapeHtml(imageCaption)}${imageCaption && imageCredit ? ' · ' : ''}${escapeHtml(imageCredit)}
+         <img src="${escapeHtml(mainImageUrl)}" alt="${escapeHtml(mainImageCaption || 'Lane crater lunar image')}" class="lunar-observatory-img" loading="lazy"
+           onerror="this.style.display='none';this.parentElement.classList.add('lunar-observatory-visual--fallback');" />
+         ${
+           thumbItems.length
+             ? `<div class="lunar-gallery-thumbs" role="list" aria-label="Expandable lunar thumbnails">
+                  ${thumbItems
+                    .map(
+                      (item, index) => `
+                        <button
+                          type="button"
+                          class="lunar-gallery-thumb"
+                          data-lunar-expand-index="${index}"
+                          aria-label="Expand thumbnail ${index + 1}"
+                        >
+                          <img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.caption || `Lunar image ${index + 1}`)}" loading="lazy" />
+                        </button>
+                      `
+                    )
+                    .join('')}
+                </div>`
+             : ''
+         }
+         <p class="small text-muted lunar-gallery-caption mb-0">
+           ${escapeHtml(mainImageCaption)}${mainImageCaption && mainImageCredit ? ' · ' : ''}${escapeHtml(mainImageCredit)}
          </p>
        </div>`
-    : lunar.imageUrl
-      ? `<div class="lunar-observatory-visual">
-           <img src="${escapeHtml(lunar.imageUrl)}" alt="" class="lunar-observatory-img" loading="lazy"
-             onerror="this.style.display='none';this.parentElement.classList.add('lunar-observatory-visual--fallback');" />
-         </div>`
-      : '<div class="lunar-observatory-visual lunar-observatory-visual--fallback" aria-hidden="true"></div>';
+    : '<div class="lunar-observatory-visual lunar-observatory-visual--fallback" aria-hidden="true"></div>';
 
   mount.innerHTML = `
     <div class="lunar-observatory-inner">
@@ -384,41 +433,16 @@ function renderLunarObservatory(lunar) {
     </div>
   `;
 
-  if (hasGallery) {
-    const mainImage = mount.querySelector('[data-lunar-main-image]');
-    const captionEl = mount.querySelector('[data-lunar-gallery-caption]');
-    const thumbButtons = Array.from(mount.querySelectorAll('[data-lunar-thumb-index]'));
-    const setActive = (index) => {
-      const item = galleryItems[index];
-      if (!item || !mainImage) return;
-      mainImage.style.display = '';
-      mainImage.closest('.lunar-observatory-visual')?.classList.remove('lunar-observatory-visual--fallback');
-      mainImage.src = item.url;
-      mainImage.alt = item.caption || `Lunar image ${index + 1}`;
-      if (captionEl) {
-        const cap = item.caption || '';
-        const credit = item.credit || lunar.imageCredit || '';
-        captionEl.textContent = cap && credit ? `${cap} · ${credit}` : cap || credit;
-      }
-      thumbButtons.forEach((btn, btnIndex) => {
-        const active = btnIndex === index;
-        btn.classList.toggle('is-active', active);
-        btn.setAttribute('aria-selected', active ? 'true' : 'false');
-      });
-    };
-    thumbButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const index = Number(button.dataset.lunarThumbIndex);
-        if (Number.isFinite(index)) setActive(index);
-      });
+  const thumbButtons = Array.from(mount.querySelectorAll('[data-lunar-expand-index]'));
+  thumbButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      const index = Number(button.dataset.lunarExpandIndex);
+      if (!Number.isFinite(index)) return;
+      const image = thumbItems[index];
+      if (!image) return;
+      openLunarImageLightbox(image);
     });
-    if (mainImage) {
-      mainImage.addEventListener('error', () => {
-        mainImage.style.display = 'none';
-        mainImage.closest('.lunar-observatory-visual')?.classList.add('lunar-observatory-visual--fallback');
-      });
-    }
-  }
+  });
 }
 
 function formatSayingsContextBlock(entries = []) {
