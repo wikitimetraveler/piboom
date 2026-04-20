@@ -31,9 +31,9 @@
       "burial": "Hampton, Rockingham, New Hampshire"
     },
     {
-      "name": "Mary Lane",
+      "name": "Mary (Kelway) Lane",
       "id": 2,
-      "text": "",
+      "text": "Profile evidence indicates she is the Mary (Kelway) Lane spouse of William Lane, with marriage about 1650 (location uncertain).",
       "generation": 0,
       "gender": "F",
       "lastName": "First Wife of William ",
@@ -46,9 +46,9 @@
       "burial": "Hampton, Rockingham, New Hampshire"
     },
     {
-      "name": "Mary Brewer",
+      "name": "Mary (Brewer) Lane",
       "id": 3,
-      "text": "",
+      "text": "Profile evidence indicates marriage to William Lane on 21 Aug 1656 in Boston, Suffolk, Massachusetts Bay Colony.",
       "generation": 0,
       "gender": "F",
       "lastName": "Second Wife of William Lane  ",
@@ -62,14 +62,14 @@
     {
       "name": "William Lane",
       "id": 4,
-      "text": "",
+      "text": "Profile evidence: born about 1625 (uncertain), in England (uncertain). Died after 20 May 1676 (about age 51) in Massachusetts Bay Colony (uncertain). Husband of Mary (Kelway) Lane and Mary (Brewer) Lane.",
       "generation": 0,
       "gender": "M",
       "lastName": "cordwainer",
       "birthYear": 1625,
-      "deathYear": "1690",
+      "deathYear": "aft 1676",
       "birthDate": "1625-01-01T00:00:00.000Z",
-      "deathDate": "1690-01-01T00:00:00.000Z",
+      "deathDate": "1676-05-20T00:00:00.000Z",
       "born": "Boston, Massachusetts., USA",
       "burial": "Hampton, Rockingham, New Hampshire"
     },
@@ -894,13 +894,13 @@
     {
       "name": "Samuel Lane",
       "id": 56,
-      "text": "Deacon Samuel Lane removed in June,1741,from Hampton to Stratham,where he continued the business of a tanner and shoe - maker,and purchased first a piece of wet land,on the east of the streamthen three acres of dry land,on the opposite side,where he built a house.He afterward bought eighty acres and added the business of farming to that of a mechanic.He was often called away from home to survey lands.The township of Bow and several others were surveyed by him.He was elected selectman in 1751",
+      "text": "Deacon Samuel Lane moved in 1741 from Hampton to Stratham, New Hampshire, where he worked as a shoemaker, tanner, and surveyor and later farmed. He served in civic offices including town clerk and selectman, and DAR records identify him as a Revolutionary-era patriotic service ancestor in New Hampshire.",
       "generation": 4,
       "gender": "M",
       "lastName": "moved in June, 1741, from Hampton to Stratham, where he continued the business of a tanner and shoe- maker, and purchased first a piece of wet land, on the east of the stream,then three acres of dry land,on the opposite side, where he built a house.He afterward bought eighty acres and added the business of farming to that of a mechanic.He was often called awayfromhometosurveylands.ThetownshipofBowandseveral others were surveyed by him.He was elected selectman in 1751,and for several years afterward was justice of the peace.He was a member of the Provincial Assembly in 1766,and from 1774 on - ward,was town clerk.When seventeen years of age he united with the Congregational church and drew up certain rules to govern his conduct as a Christian,to which he firmly adhered through life.On 4 July,1765,he was elected deacon,and held the office till 28 May,1800",
       "birthYear": 1718,
       "deathYear": "1806",
-      "birthDate": "1718-01-01T00:00:00.000Z",
+      "birthDate": "1718-10-06T00:00:00.000Z",
       "deathDate": "1806-01-01T00:00:00.000Z",
       "born": "Hampton, New Hampshire",
       "burial": " ",
@@ -917,6 +917,21 @@
       "occupation": [
         {
           "job": "deacon"
+        },
+        {
+          "job": "tanner"
+        },
+        {
+          "job": "shoemaker"
+        },
+        {
+          "job": "surveyor"
+        },
+        {
+          "government": "selectman"
+        },
+        {
+          "government": "town clerk"
         }
       ],
       "title": "Deacon"
@@ -1083,7 +1098,7 @@
       "burial": " "
     },
     {
-      "name": "Mary James",
+      "name": "Mary (James) Lane",
       "id": 66,
       "text": "",
       "generation": 4,
@@ -1132,9 +1147,9 @@
       "gender": "M",
       "lastName": "Settled in Stratham, I 1-2 miles from his father's on the road to Portsmouth, a farmer, and carried on the trades of tanner and shoemaker. He joined the Gongregational church, 13 June, 1804, and was beloved and respected by all who knew him. He had 9 ch. and d. 24 Nov., 1820, in the 75th year of his age.",
       "birthYear": 1746,
-      "deathYear": "1792",
+      "deathYear": "1820",
       "birthDate": "1746-01-01T00:00:00.000Z",
-      "deathDate": "1792-01-01T00:00:00.000Z",
+      "deathDate": "1820-01-01T00:00:00.000Z",
       "born": "Stratham, New Hampshire",
       "burial": " ",
       "importMeta": {
@@ -1212,7 +1227,7 @@
       "burial": " "
     },
     {
-      "name": "Bathsheua Lane",
+      "name": "Bathsheba Lane",
       "id": 74,
       "text": "",
       "generation": 5,
