@@ -3207,6 +3207,7 @@ function getSectionCardForCollapse(sectionId) {
   const el = document.getElementById(sectionId);
   if (!el) return null;
   if (sectionId === 'collapseAIAssistant') return document.getElementById('aiAssistantCard');
+  if (sectionId === 'collapseLearnMode') return document.getElementById('learnModeCard');
   return el.closest('.section-card');
 }
 
@@ -4721,7 +4722,7 @@ function initializeSectionSidebar() {
   if (!nav) return;
 
   // On load: hide section cards and collapse; then open Unit Test Data so status, welcome, and upload are visible
-  var sectionIds = ['collapseAIAssistant', 'collapseTestLibrary', 'collapseOverallSignOff', 'collapseTestScenarios', 'collapseSelectedField', 'collapseTestGrid', 'collapseUnitTestData'];
+  var sectionIds = ['collapseUnitTestData', 'collapseTestGrid', 'collapseTestScenarios', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (el) {
@@ -4771,7 +4772,7 @@ function initializeSectionSidebar() {
   });
 
   // Sync sidebar active state when sections expand/collapse (from header clicks, voice, or sidebar)
-  var sectionIds = ['collapseAIAssistant', 'collapseTestLibrary', 'collapseOverallSignOff', 'collapseTestScenarios', 'collapseSelectedField', 'collapseTestGrid', 'collapseUnitTestData'];
+  var sectionIds = ['collapseUnitTestData', 'collapseTestGrid', 'collapseTestScenarios', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;

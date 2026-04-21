@@ -23,9 +23,10 @@ describe('processor-assignment-config.service', () => {
       pickAllowedConfigPayload({
         processorsJson: '[]',
         rulesJson: '{}',
+        allowIneligibleOverride: 'true',
         evil: 'x',
       }),
-    ).toEqual({ processorsJson: '[]', rulesJson: '{}' });
+    ).toEqual({ processorsJson: '[]', rulesJson: '{}', allowIneligibleOverride: 'true' });
   });
 
   it('getProcessorAssignmentToolConfig returns null when no row', async () => {

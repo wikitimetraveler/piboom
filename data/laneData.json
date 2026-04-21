@@ -162737,6 +162737,209 @@
           "job": "lawyer"
         }
       ]
+    },
+    {
+      "name": "Charles Lane",
+      "id": 3981,
+      "text": "",
+      "generation": 0,
+      "gender": "U",
+      "lastName": "Lane",
+      "birthYear": 1797,
+      "deathYear": "1833",
+      "birthDate": "1797-02-15T00:00:00.000Z",
+      "deathDate": "1833-11-01T00:00:00.000Z",
+      "born": "Boston, Suffolk, Massachusetts, United States",
+      "deathPlace": "Roxbury, Norfolk, Massachusetts, United States",
+      "burial": "",
+      "sourceRefs": [
+        {
+          "rawText": "Screenshot profile import (Lane/Spouse intake): name/date/place summary.",
+          "lineNumber": null,
+          "pdfPageNumber": null
+        }
+      ],
+      "importMeta": {
+        "source": "manual-screenshot-intake",
+        "parser": "cursor-agent-intake",
+        "ocrFacts": {
+          "rawText": "Imported from user-provided screenshot list (managed by Nathan Bell, last edited 19 Apr 2026)."
+        }
+      }
+    },
+    {
+      "name": "Frederick Lane",
+      "id": 3982,
+      "text": "",
+      "generation": 0,
+      "gender": "U",
+      "lastName": "Lane",
+      "birthYear": 1791,
+      "deathYear": "1865",
+      "birthDate": "1791-05-16T00:00:00.000Z",
+      "deathDate": "1865-12-06T00:00:00.000Z",
+      "born": "Boston, Suffolk, Massachusetts, United States",
+      "deathPlace": "Boston, Suffolk, Massachusetts, United States",
+      "burial": "",
+      "sourceRefs": [
+        {
+          "rawText": "Screenshot profile import (Lane/Spouse intake): name/date/place summary.",
+          "lineNumber": null,
+          "pdfPageNumber": null
+        }
+      ],
+      "importMeta": {
+        "source": "manual-screenshot-intake",
+        "parser": "cursor-agent-intake",
+        "ocrFacts": {
+          "rawText": "Imported from user-provided screenshot list (managed by Nathan Bell, last edited 19 Apr 2026)."
+        }
+      }
+    },
+    {
+      "name": "James Lane",
+      "id": 3983,
+      "text": "",
+      "generation": 0,
+      "gender": "U",
+      "lastName": "Lane",
+      "birthYear": 1790,
+      "deathYear": "1811",
+      "birthDate": "1790-03-14T00:00:00.000Z",
+      "deathDate": "1811-01-26T00:00:00.000Z",
+      "born": "Boston, Suffolk, Massachusetts, United States",
+      "deathPlace": "",
+      "burial": "",
+      "sourceRefs": [
+        {
+          "rawText": "Screenshot profile import (Lane/Spouse intake): name/date/place summary.",
+          "lineNumber": null,
+          "pdfPageNumber": null
+        }
+      ],
+      "importMeta": {
+        "source": "manual-screenshot-intake",
+        "parser": "cursor-agent-intake",
+        "ocrFacts": {
+          "rawText": "Imported from user-provided screenshot list (managed by Nathan Bell, last edited 19 Apr 2026)."
+        }
+      }
+    },
+    {
+      "name": "George Lane",
+      "id": 3984,
+      "text": "",
+      "generation": 0,
+      "gender": "U",
+      "lastName": "Lane",
+      "birthYear": 1788,
+      "deathYear": "1849",
+      "birthDate": "1788-09-07T00:00:00.000Z",
+      "deathDate": "1849-05-04T00:00:00.000Z",
+      "born": "Boston, Suffolk, Massachusetts, United States",
+      "deathPlace": "Boston, Suffolk, Massachusetts, United States",
+      "burial": "",
+      "sourceRefs": [
+        {
+          "rawText": "Screenshot profile import (Lane/Spouse intake): name/date/place summary.",
+          "lineNumber": null,
+          "pdfPageNumber": null
+        }
+      ],
+      "importMeta": {
+        "source": "manual-screenshot-intake",
+        "parser": "cursor-agent-intake",
+        "ocrFacts": {
+          "rawText": "Imported from user-provided screenshot list (managed by Nathan Bell, last edited 19 Apr 2026)."
+        }
+      }
+    },
+    {
+      "name": "Charlotte (Lane) Plaisted",
+      "id": 3985,
+      "text": "",
+      "generation": 0,
+      "gender": "U",
+      "lastName": "Plaisted",
+      "birthYear": 1787,
+      "deathYear": "1881",
+      "birthDate": "1787-01-06T00:00:00.000Z",
+      "deathDate": "1881-01-12T00:00:00.000Z",
+      "born": "Boston, Suffolk, Massachusetts, United States",
+      "deathPlace": "Braintree, Norfolk, Massachusetts, United States",
+      "burial": "",
+      "sourceRefs": [
+        {
+          "rawText": "Screenshot profile import (Lane/Spouse intake): name/date/place summary.",
+          "lineNumber": null,
+          "pdfPageNumber": null
+        }
+      ],
+      "importMeta": {
+        "source": "manual-screenshot-intake",
+        "parser": "cursor-agent-intake",
+        "ocrFacts": {
+          "rawText": "Imported from user-provided screenshot list (managed by Nathan Bell, last edited 19 Apr 2026)."
+        }
+      }
+    },
+    {
+      "name": "Laura (Lane) Skeels",
+      "id": 3986,
+      "text": "Birth year shown as approximate (abt 1822) in screenshot source.",
+      "generation": 0,
+      "gender": "U",
+      "lastName": "Skeels",
+      "birthYear": 1822,
+      "deathYear": "1899",
+      "birthDate": "1822-01-01T00:00:00.000Z",
+      "deathDate": "1899-11-05T00:00:00.000Z",
+      "born": "Potsdam, St. Lawrence, New York, United States",
+      "deathPlace": "San Francisco, California, United States",
+      "burial": "",
+      "sourceRefs": [
+        {
+          "rawText": "Screenshot profile import (Lane/Spouse intake): name/date/place summary.",
+          "lineNumber": null,
+          "pdfPageNumber": null
+        }
+      ],
+      "importMeta": {
+        "source": "manual-screenshot-intake",
+        "parser": "cursor-agent-intake",
+        "ocrFacts": {
+          "rawText": "Imported from user-provided screenshot list (managed by Nathan Bell, last edited 19 Apr 2026)."
+        }
+      }
+    },
+    {
+      "name": "Thelma Maude (Lane) Lawson",
+      "id": 3987,
+      "text": "",
+      "generation": 0,
+      "gender": "U",
+      "lastName": "Lawson",
+      "birthYear": 1907,
+      "deathYear": "1966",
+      "birthDate": "1907-01-01T00:00:00.000Z",
+      "deathDate": "1966-02-11T00:00:00.000Z",
+      "born": "Canterbury, New Zealand",
+      "deathPlace": "Canterbury, New Zealand",
+      "burial": "",
+      "sourceRefs": [
+        {
+          "rawText": "Screenshot profile import (Lane/Spouse intake): name/date/place summary.",
+          "lineNumber": null,
+          "pdfPageNumber": null
+        }
+      ],
+      "importMeta": {
+        "source": "manual-screenshot-intake",
+        "parser": "cursor-agent-intake",
+        "ocrFacts": {
+          "rawText": "Imported from user-provided screenshot list (managed by Nathan Bell, last edited 19 Apr 2026)."
+        }
+      }
     }
   ],
   "links": [

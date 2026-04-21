@@ -5,6 +5,8 @@ import {
   normalizeComplexityMode,
   composeComplexityScores,
   currentProcessorFromFields,
+  deriveLoanProductTags,
+  evaluateProcessorEligibility,
 } from '../../services/processor-assignment.service.js';
 
 describe('processor-assignment.service helpers', () => {
@@ -62,5 +64,24 @@ describe('processor-assignment.service helpers', () => {
     const f = currentProcessorFromFields({});
     expect(f.currentProcessorId).toBeNull();
     expect(f.currentProcessorName).toBeNull();
+  });
+
+  test('deriveLoanProductTags infers common product labels', () => {
+    const tags = deriveLoanProductTags({
+      'Loan.MortgageType': 'FHA',
+      'Loan.LoanProgramName': 'VA Full Doc Jumbo',
+      'Loan.PropertyType': 'Condominium',
+    });
+    expect(tags).toEqual(expect.arrayContaining(['fha', 'va', 'va full doc', 'jumbo', 'condo']));
+  });
+
+  test('evaluateProcessorEligibility supports unrestricted and matched products', () => {
+    expect(evaluateProcessorEligibility(['fha'], { userId: 'p1' }).eligible).toBe(true);
+    const matched = evaluateProcessorEligibility(['fha', 'va'], { userId: 'p2', products: ['VA', 'Jumbo'] });
+    expect(matched.eligible).toBe(true);
+    expect(matched.matchedTags).toEqual(['va']);
+    expect(
+      evaluateProcessorEligibility(['fha'], { userId: 'p3', products: ['Jumbo'] }).eligible,
+    ).toBe(false);
   });
 });

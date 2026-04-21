@@ -11,6 +11,7 @@ const ALLOWED_KEYS = new Set([
   'complexityMode',
   'complexityAiModel',
   'complexityMaxPoints',
+  'allowIneligibleOverride',
 ]);
 
 /**

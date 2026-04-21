@@ -15,6 +15,30 @@
       "personId": 2896,
       "imageId": "p253-i0",
       "notes": "Confirmed single-candidate match for Charles Lane."
+    },
+    {
+      "personId": 621,
+      "publicUrl": "https://www.nhhistory.org/object/271516/carte-de-visite-of-edmund-james-lane-approximately-1874",
+      "credit": "New Hampshire Historical Society, object 2014.107.001",
+      "notes": "Deacon Edmund James Lane (father). Catalog image record paired in wall popup with son portrait for storefront continuity."
+    },
+    {
+      "personId": 621,
+      "publicUrl": "https://www.nhhistory.org/object/271517/edmund-b-lane-undated",
+      "credit": "New Hampshire Historical Society, object 2014.107.002",
+      "notes": "Edmund B. Lane (son). Verso inscription notes he worked with father and continued Lane's Bookstore after father's death."
+    },
+    {
+      "personId": 1983,
+      "publicUrl": "https://www.nhhistory.org/object/271516/carte-de-visite-of-edmund-james-lane-approximately-1874",
+      "credit": "New Hampshire Historical Society, object 2014.107.001",
+      "notes": "Duplicate Edmund James profile receives same father portrait for memorial-wall consistency."
+    },
+    {
+      "personId": 1983,
+      "publicUrl": "https://www.nhhistory.org/object/271517/edmund-b-lane-undated",
+      "credit": "New Hampshire Historical Society, object 2014.107.002",
+      "notes": "Duplicate Edmund James profile receives paired son record image per curation request."
     }
   ]
 }

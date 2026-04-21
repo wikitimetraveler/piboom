@@ -109,6 +109,58 @@ function processorIdFromFields(fields) {
   return fields['Loan.LoanProcessorID'] ?? fields['Loan.LoanProcessorId'] ?? fields['Loan.LoanProcessorid'] ?? null;
 }
 
+function normalizeTag(value) {
+  return `${value ?? ''}`.trim().toLowerCase();
+}
+
+function stringifyField(fields, key) {
+  return `${fields?.[key] ?? ''}`.trim();
+}
+
+function hasToken(text, token) {
+  return `${text ?? ''}`.toLowerCase().includes(`${token}`.toLowerCase());
+}
+
+export function deriveLoanProductTags(fields) {
+  const tags = new Set();
+  const mt = stringifyField(fields, 'Loan.MortgageType');
+  const program = stringifyField(fields, 'Loan.LoanProgramName');
+  const productDesc = stringifyField(fields, 'Loan.ProductName');
+  const investorProgram = stringifyField(fields, 'Fields.CX.INVESTOR.PROGRAM');
+  const propertyType = stringifyField(fields, 'Loan.PropertyType');
+
+  const composite = `${mt} ${program} ${productDesc} ${investorProgram}`.toLowerCase();
+  if (hasToken(composite, 'fha')) tags.add('fha');
+  if (hasToken(composite, 'va')) tags.add('va');
+  if (hasToken(composite, 'va full doc') || hasToken(composite, 'full doc')) tags.add('va full doc');
+  if (hasToken(composite, 'jumbo') || hasToken(composite, 'non agency')) tags.add('jumbo');
+  if (hasToken(composite, 'cema')) tags.add('cema');
+  if (hasToken(propertyType, 'condo') || hasToken(propertyType, 'condominium')) tags.add('condo');
+
+  return Array.from(tags);
+}
+
+function processorProductTags(processor) {
+  if (!processor || !Array.isArray(processor.products)) return [];
+  return processor.products
+    .map((t) => normalizeTag(t))
+    .filter(Boolean);
+}
+
+export function evaluateProcessorEligibility(loanTags, processor) {
+  const pTags = processorProductTags(processor);
+  if (!pTags.length) {
+    return { eligible: true, matchedTags: [], processorTags: [] };
+  }
+  const loanSet = new Set((loanTags || []).map((t) => normalizeTag(t)).filter(Boolean));
+  const matchedTags = pTags.filter((t) => loanSet.has(t));
+  return {
+    eligible: matchedTags.length > 0,
+    matchedTags,
+    processorTags: pTags,
+  };
+}
+
 /**
  * @param {unknown} raw
  * @returns {'rules'|'ai'|'both'}
@@ -162,6 +214,7 @@ function resultRowBase(row) {
     aiPoints: row.aiPoints,
     aiRationale: row.aiRationale,
     ruleHits: row.ruleHits,
+    loanProductTags: row.loanProductTags,
   };
 }
 
@@ -211,6 +264,7 @@ async function computeComplexityForFields(fields, {
  * @param {number} [body.complexityMaxPoints]
  * @param {object} [body.roleConfig]
  * @param {boolean} [body.assignOnlyUnassigned] - default true
+ * @param {boolean} [body.allowIneligibleOverride] - allow fallback assignment to non-matching processor product tags
  * @param {string} [body.sortOrder] - 'desc' | 'asc' for complexity (default desc)
  * @param {number} [body.delayMsBetweenAssign] - throttle PUTs (default 0)
  * @param {string} [body.complexityMode] - 'rules' | 'ai' | 'both'
@@ -226,6 +280,7 @@ export async function runProcessorAssignment(body) {
     complexityMaxPoints,
     roleConfig = {},
     assignOnlyUnassigned = true,
+    allowIneligibleOverride = false,
     sortOrder = 'desc',
     delayMsBetweenAssign = 0,
     complexityMode: complexityModeRaw,
@@ -249,6 +304,11 @@ export async function runProcessorAssignment(body) {
     const mp = Number(p.maxPoints);
     if (!Number.isFinite(mp) || mp < 0) {
       const err = new Error('Each processor must have numeric maxPoints >= 0');
+      err.statusCode = 400;
+      throw err;
+    }
+    if (p.products !== undefined && !Array.isArray(p.products)) {
+      const err = new Error('Each processor.products must be an array of strings when provided');
       err.statusCode = 400;
       throw err;
     }
@@ -351,6 +411,7 @@ export async function runProcessorAssignment(body) {
       guid,
       number,
       borrowerName,
+      loanProductTags: deriveLoanProductTags(fields),
     });
   }
 
@@ -379,34 +440,68 @@ export async function runProcessorAssignment(body) {
 
     const pts = row.score;
 
-    let best = null;
-    let bestRemaining = -Infinity;
+    let bestEligible = null;
+    let bestEligibleRemaining = -Infinity;
+    let bestAny = null;
+    let bestAnyRemaining = -Infinity;
+    const loanTags = row.loanProductTags || [];
+    const eligibilityByProcessorId = {};
+
     for (const p of processors) {
       const key = `${p.userId}`;
       const rem = processorRemaining[key];
-      if (rem >= pts && rem > bestRemaining) {
-        best = p;
-        bestRemaining = rem;
+      const elig = evaluateProcessorEligibility(loanTags, p);
+      eligibilityByProcessorId[key] = elig;
+      if (rem >= pts && rem > bestAnyRemaining) {
+        bestAny = p;
+        bestAnyRemaining = rem;
+      }
+      if (elig.eligible && rem >= pts && rem > bestEligibleRemaining) {
+        bestEligible = p;
+        bestEligibleRemaining = rem;
       }
     }
 
-    if (!best) {
+    const chosen = bestEligible || (allowIneligibleOverride ? bestAny : null);
+    if (!chosen) {
+      const hasEligibleProcessor = processors.some((p) => {
+        const elig = eligibilityByProcessorId[`${p.userId}`];
+        return Boolean(elig?.eligible);
+      });
+      const hasEligibleCapacity = processors.some((p) => {
+        const key = `${p.userId}`;
+        const elig = eligibilityByProcessorId[key];
+        return Boolean(elig?.eligible) && processorRemaining[key] >= pts;
+      });
+      let reason = 'no_eligible_processor';
+      if (hasEligibleProcessor && !hasEligibleCapacity) reason = 'no_capacity_eligible';
+      else if (!hasEligibleProcessor && allowIneligibleOverride && !bestAny) reason = 'no_capacity_any_processor';
       results.push({
         loanGuid: row.guid,
         status: 'skipped',
-        reason: 'no_capacity',
+        reason,
+        eligibilityNote: `loanTags=${loanTags.join(',') || 'none'}`,
         ...resultRowBase(row),
       });
       continue;
     }
 
-    const proposedUserId = `${best.userId}`;
+    const proposedUserId = `${chosen.userId}`;
+    const proposedEligibility = eligibilityByProcessorId[proposedUserId] || {
+      eligible: true,
+      matchedTags: [],
+      processorTags: [],
+    };
+    const eligibilityNote = proposedEligibility.eligible
+      ? `matched:${proposedEligibility.matchedTags.join(',') || 'none'} loanTags:${loanTags.join(',') || 'none'}`
+      : `override processorTags:${proposedEligibility.processorTags.join(',') || 'none'} loanTags:${loanTags.join(',') || 'none'}`;
 
     if (dryRun) {
       results.push({
         loanGuid: row.guid,
         status: 'proposed',
         processorUserId: proposedUserId,
+        eligibilityNote,
         ...resultRowBase(row),
       });
       processorRemaining[proposedUserId] -= pts;
@@ -431,6 +526,7 @@ export async function runProcessorAssignment(body) {
         loanGuid: row.guid,
         status: 'assigned',
         processorUserId: proposedUserId,
+        eligibilityNote,
         ...resultRowBase(row),
       });
       processorRemaining[proposedUserId] -= pts;

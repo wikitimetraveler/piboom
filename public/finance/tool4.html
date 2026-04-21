@@ -62,7 +62,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated background particles */
         body::before {
             content: '';
             position: fixed;
@@ -70,7 +69,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
@@ -173,87 +172,13 @@
             box-shadow: var(--shadow-md);
         }
 
-        /* Voice Control Button */
-        .voice-control {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
+        .voice-btn-inline {
+            min-width: 44px;
         }
-
-        .voice-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--ice-primary);
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-
-        .voice-btn:hover {
-            background: var(--primary-blue-hover);
-            transform: scale(1.1);
-        }
-
-        .voice-btn.listening {
-            background: #e74c3c;
-            animation: pulse 1.5s infinite;
-        }
-
-        .voice-btn.listening::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 3px solid #e74c3c;
-            animation: ripple 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes ripple {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-
-        .voice-status {
-            background: var(--white);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.875rem;
-            color: var(--text-dark);
-            box-shadow: var(--shadow-md);
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .voice-status.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .voice-status.listening {
-            background: #e74c3c;
-            color: white;
+        .voice-btn-inline.listening {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #fff;
         }
 
         /* Professional Container */
@@ -299,6 +224,46 @@
 
         .automator-page-title {
             margin-bottom: 1rem;
+        }
+        .automator-page-title .helper-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .helper-note {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.32rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            border: 1px solid transparent;
+        }
+        .status-chip.info {
+            background: rgba(37, 99, 235, 0.12);
+            color: #1d4ed8;
+            border-color: rgba(37, 99, 235, 0.22);
+        }
+        .status-chip.ok {
+            background: rgba(46, 204, 113, 0.14);
+            color: #166534;
+            border-color: rgba(46, 204, 113, 0.3);
+        }
+        .status-chip.warn {
+            background: rgba(245, 158, 11, 0.15);
+            color: #92400e;
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+        .status-chip.err {
+            background: rgba(239, 68, 68, 0.14);
+            color: #b91c1c;
+            border-color: rgba(239, 68, 68, 0.32);
         }
 
         /* Professional Form Styling */
@@ -444,11 +409,16 @@
         }
         #imageDropZone {
             transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+            border-style: dashed !important;
         }
         #imageDropZone.image-dropzone-active {
             border-color: var(--primary-blue) !important;
             background: var(--ice-light);
             color: var(--primary-blue);
+        }
+        #imageDropZone:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.28);
+            outline-offset: 2px;
         }
         .footer-meta-line {
             font-size: 0.8rem;
@@ -466,15 +436,8 @@
                 font-size: 0.9rem;
             }
 
-            .voice-control {
-                bottom: 1rem;
-                right: 1rem;
-            }
-
-            .voice-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 1.25rem;
+            .voice-btn-inline {
+                width: 100%;
             }
         }
 
@@ -494,56 +457,9 @@
             }
         }
 
-        /* Particle effects */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--ice-glow);
-            border-radius: 50%;
-            animation: particleFloat 15s linear infinite;
-        }
-
-        @keyframes particleFloat {
-            0% {
-                transform: translateY(100vh) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) translateX(100px);
-                opacity: 0;
-            }
-        }
     </style>
 </head>
 <body data-page="automator">
-    <!-- Particle effects container -->
-    <div class="particles" id="particles"></div>
-
-    <!-- Voice Control Button -->
-    <div class="voice-control">
-        <div class="voice-status" id="voiceStatus">Click to start voice control</div>
-        <button class="voice-btn" id="voiceBtn" title="Voice Control">
-            <i class="bi-mic"></i>
-        </button>
-    </div>
-
     <!-- Professional Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
@@ -585,8 +501,20 @@
             </div>
 
             <div class="automator-page-title">
-                <h5 class="mb-1 fw-semibold"><i class="bi-lightning-charge me-2 text-primary"></i>Tool 4 — The Automator</h5>
-                <p class="mb-0 small text-muted">Generate R/O field rows and JSON for Encompass custom fields; parse pasted definitions and push to the API when ready.</p>
+                <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-2">
+                    <div>
+                        <h5 class="mb-1 fw-semibold"><i class="bi-lightning-charge me-2 text-primary"></i>Tool 4 — The Automator</h5>
+                        <p class="mb-0 helper-text">Generate field definitions, parse or extract rows, then create/update Encompass fields from validated JSON.</p>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm voice-help-toggle voice-btn-inline" id="voiceBtn" title="Voice control">
+                            <i class="bi-mic" aria-hidden="true"></i>
+                        </button>
+                        <span id="voiceStatus" class="status-chip info" role="status" aria-live="polite">
+                            <i class="bi bi-info-circle" aria-hidden="true"></i>Voice ready
+                        </span>
+                    </div>
+                </div>
             </div>
 
             <section class="automator-panel fade-in" aria-labelledby="automator-setup-heading">
@@ -599,12 +527,14 @@
                             <div class="mb-3">
                                 <label class="form-label" for="ruleInput">Rule Name</label>
                                 <input type="text" class="form-control" id="ruleInput" maxlength="20" placeholder="Enter rule name">
+                                <div class="helper-note mt-1">Example: <code>CX.R.MYRULE</code> or <code>MYRULE</code> (auto-prefixed).</div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label" for="appendInput">Description Override</label>
                                 <input type="text" class="form-control" id="appendInput" placeholder="Optional description override">
+                                <div class="helper-note mt-1">Optional text used in generated descriptions instead of the rule name.</div>
                             </div>
                         </div>
                     </div>
@@ -636,7 +566,7 @@
                             </div>
                         </div>
                         <input type="file" id="imageFileInput" accept="image/*" style="display:none;">
-                        <div id="imageDropZone" class="mt-2 p-2 border rounded text-center small text-muted" tabindex="0" role="button" aria-label="Image drop and paste zone">Drop image here or click and press Ctrl+V to paste.</div>
+                        <div id="imageDropZone" class="mt-2 p-2 border rounded text-center small text-muted" tabindex="0" role="button" aria-label="Image drop and paste zone">Drop image here, click to focus, then press Ctrl+V to paste.</div>
                         <div class="row g-2 mt-2">
                             <div class="col-md-6">
                                 <video id="cameraVideo" class="w-100 border rounded" style="display:none;max-height:240px;" autoplay playsinline></video>
@@ -646,7 +576,7 @@
                                 <img id="imagePreview" class="w-100 border rounded" style="display:none;max-height:240px;object-fit:contain;" alt="Imported field screenshot preview">
                             </div>
                         </div>
-                        <div id="imageStatus" class="small text-muted mt-2">No image loaded.</div>
+                        <div id="imageStatus" class="small text-muted mt-2" role="status" aria-live="polite">No image loaded.</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="ruleOutput">Field Definitions</label>
@@ -674,7 +604,7 @@
                             <i class="bi-arrow-repeat me-1"></i>Update Fields in Encompass
                         </button>
                     </div>
-                    <div id="createFieldsStatus" class="mt-2 small" style="display: none;" role="status"></div>
+                    <div id="createFieldsStatus" class="mt-2 small" style="display: none;" role="status" aria-live="polite"></div>
                 </div>
             </section>
         </div>
@@ -722,27 +652,7 @@
         // Initialize voice controller
         const voiceController = new VoiceController();
 
-        // Create floating particles
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            const particleCount = 6;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                particle.style.opacity = Math.random() * 0.5 + 0.1;
-                particle.style.width = particle.style.height = (Math.random() * 6 + 2) + 'px';
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        // Initialize particles on page load
         document.addEventListener('DOMContentLoaded', function() {
-            createParticles();
             setActiveToolPill();
         });
 
@@ -771,6 +681,24 @@
         };
 
         // Core functions
+        function createStatusChip(level, message) {
+            const iconByLevel = {
+                info: 'bi-info-circle',
+                success: 'bi-check-circle',
+                warning: 'bi-exclamation-triangle',
+                danger: 'bi-exclamation-octagon'
+            };
+            const classByLevel = {
+                info: 'info',
+                success: 'ok',
+                warning: 'warn',
+                danger: 'err'
+            };
+            const icon = iconByLevel[level] || iconByLevel.info;
+            const cls = classByLevel[level] || classByLevel.info;
+            return `<span class="status-chip ${cls}"><i class="bi ${icon}" aria-hidden="true"></i>${message}</span>`;
+        }
+
         function setParserStatus(messages = [], level = 'warning') {
             const statusEl = document.getElementById('createFieldsStatus');
             if (!statusEl) return;
@@ -779,8 +707,8 @@
                 return;
             }
             statusEl.style.display = 'block';
-            statusEl.className = `mt-2 small text-${level}`;
-            statusEl.textContent = messages.join(' | ');
+            statusEl.className = 'mt-2 small';
+            statusEl.innerHTML = createStatusChip(level, messages.join(' | '));
         }
 
         function parseFieldLine(line) {
@@ -948,8 +876,9 @@
 
         function setImageStatus(message, level = 'muted') {
             const el = document.getElementById('imageStatus');
-            el.className = `small mt-2 text-${level}`;
-            el.textContent = message;
+            const safeLevel = level === 'muted' ? 'info' : level;
+            el.className = 'small mt-2';
+            el.innerHTML = createStatusChip(safeLevel, message);
         }
 
         function setAutomatorImage(dataUrl) {
@@ -992,8 +921,9 @@
 
         function setCreateUpdateStatus(statusEl, message, level) {
             if (!statusEl) return;
-            statusEl.textContent = message;
-            statusEl.className = `mt-2 small text-${level}`;
+            statusEl.innerHTML = createStatusChip(level, message);
+            statusEl.className = 'mt-2 small';
+            statusEl.setAttribute('aria-live', level === 'danger' ? 'assertive' : 'polite');
             statusEl.style.display = 'block';
         }
 
@@ -1192,14 +1122,29 @@
             els.parsePastedBtn.addEventListener('click', generateJSON);
 
             els.copyJsonBtn.addEventListener('click', async () => {
-                await copyToClipboard(document.getElementById('ADOoutput').value);
+                const ok = await copyToClipboard(document.getElementById('ADOoutput').value);
+                setCreateUpdateStatus(
+                    els.createFieldsStatus,
+                    ok ? 'Generated JSON copied to clipboard.' : 'Copy failed. Check clipboard permission.',
+                    ok ? 'success' : 'danger'
+                );
             });
             els.copyUpdateJsonBtn.addEventListener('click', async () => {
-                await copyToClipboard(document.getElementById('ADOupdateOutput').value);
+                const ok = await copyToClipboard(document.getElementById('ADOupdateOutput').value);
+                setCreateUpdateStatus(
+                    els.createFieldsStatus,
+                    ok ? 'Update JSON copied to clipboard.' : 'Copy failed. Check clipboard permission.',
+                    ok ? 'success' : 'danger'
+                );
             });
 
             els.copyRulesBtn.addEventListener('click', async () => {
-                await copyToClipboard(document.getElementById('ruleOutput').value);
+                const ok = await copyToClipboard(document.getElementById('ruleOutput').value);
+                setCreateUpdateStatus(
+                    els.createFieldsStatus,
+                    ok ? 'Field definitions copied to clipboard.' : 'Copy failed. Check clipboard permission.',
+                    ok ? 'success' : 'danger'
+                );
             });
 
             els.createFieldsBtn.addEventListener('click', async () => {

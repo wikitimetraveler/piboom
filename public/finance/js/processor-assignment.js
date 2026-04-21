@@ -12,23 +12,41 @@
   const LS_COMPLEXITY_MODE = 'processorAssignment_complexityMode';
   const LS_AI_MODEL = 'processorAssignment_complexityAiModel';
   const LS_COMPLEXITY_MAX = 'processorAssignment_complexityMaxPoints';
+  const LS_ALLOW_INELIGIBLE_OVERRIDE = 'processorAssignment_allowIneligibleOverride';
 
   const DEFAULT_PROCESSORS = `[
-  { "userId": "YOUR_ENCOMPASS_USER_ENTITY_ID", "displayName": "Processor A", "maxPoints": 40 },
-  { "userId": "YOUR_ENCOMPASS_USER_ENTITY_ID_2", "displayName": "Processor B", "maxPoints": 40 }
+  { "userId": "YOUR_ENCOMPASS_USER_ENTITY_ID", "displayName": "Processor A", "maxPoints": 40, "products": ["Conventional", "FHA", "VA"] },
+  { "userId": "YOUR_ENCOMPASS_USER_ENTITY_ID_2", "displayName": "Processor B", "maxPoints": 40, "products": ["Jumbo", "Condo", "CEMA"] }
 ]`;
 
   const DEFAULT_RULES = `[
-  { "id": "high_balance", "points": 10, "when": { "field": "Loan.LoanAmount", "op": "gte", "value": 500000 } },
-  { "id": "high_dti", "points": 8, "when": { "field": "Loan.TotalDTI", "op": "gte", "value": 45 } },
-  { "id": "fha_va", "points": 5, "when": { "field": "Fields.4000", "op": "in", "values": ["FHA", "VA"] } },
-  { "id": "low_fico", "points": 7, "when": { "field": "Loan.BorrowerScore", "op": "lt", "value": 640 } },
-  { "id": "nonstandard_property", "points": 4, "when": { "field": "Loan.PropertyType", "op": "in", "values": ["Condominium", "Co-Operative", "Manufactured Housing", "Mixed Use Residential"] } },
-  { "id": "investor_assigned", "points": 3, "when": { "field": "Loan.InvestorName", "op": "isnotempty" } },
-  { "id": "self_employed_cx_placeholder", "points": 6, "when": { "field": "Fields.CX.BORROWER.SELF.EMPLOYED", "op": "in", "values": ["Y", "Yes", "true", "TRUE"] } },
-  { "id": "uw_condition_count_cx_placeholder", "points": 1, "when": { "field": "Fields.CX.UW.CONDITION.COUNT", "op": "gte", "value": 5 } },
-  { "id": "income_type_bankstmt_cx_placeholder", "points": 5, "when": { "field": "Fields.CX.BORROWER.INCOME.TYPE", "op": "contains", "value": "Bank" } },
-  { "id": "investor_program_cx_placeholder", "points": 3, "when": { "field": "Fields.CX.INVESTOR.PROGRAM", "op": "isnotempty" } }
+  { "id": "progression_multiple_processors", "points": 0.5, "when": { "field": "Fields.CX.PROGRESSION.MULTIPLE_PROCESSORS", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "progression_non_cooper_title", "points": 0.25, "when": { "field": "Fields.CX.PROGRESSION.NON_COOPER_TITLE", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "progression_product_change", "points": 1, "when": { "field": "Fields.CX.PROGRESSION.PRODUCT_CHANGE", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "progression_rejected_from_setup", "points": 0.25, "when": { "field": "Fields.CX.PROGRESSION.REJECTED_FROM_SETUP", "op": "isnotempty" } },
+  { "id": "progression_restructure_condition", "points": 0.5, "when": { "field": "Fields.CX.PROGRESSION.RESTRUCTURE_CONDITION", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "progression_sales_hold", "points": 0.5, "when": { "field": "Fields.CX.PROGRESSION.SALES_HOLD", "op": "in", "values": ["2K", "Y", "Yes", "true", "TRUE"] } },
+  { "id": "progression_subject_to_appraisal", "points": 0.5, "when": { "field": "Fields.CX.PROGRESSION.SUBJECT_TO_APPRAISAL", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "progression_suspended", "points": 0.5, "when": { "field": "Fields.CX.PROGRESSION.SUSPENDED", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "progression_title_hold", "points": 0.5, "when": { "field": "Fields.CX.PROGRESSION.TITLE_HOLD", "op": "in", "values": ["2H", "Y", "Yes", "true", "TRUE"] } },
+  { "id": "initial_borrower_count", "points": 0.25, "when": { "field": "Fields.CX.INITIAL.BORROWER_PAIR_COUNT", "op": "gt", "value": 1 } },
+  { "id": "initial_cema", "points": 0.5, "when": { "field": "Loan.MortgageType", "op": "contains", "value": "CEMA" } },
+  { "id": "initial_condo", "points": 0.5, "when": { "field": "Loan.PropertyType", "op": "contains", "value": "Condo" } },
+  { "id": "initial_dti_gt_45", "points": 0.5, "when": { "field": "Loan.TotalDTI", "op": "gt", "value": 45 } },
+  { "id": "initial_fico_lt_680", "points": 0.25, "when": { "field": "Loan.BorrowerScore", "op": "lt", "value": 680 } },
+  { "id": "initial_job_tenure_lt_12m", "points": 0.5, "when": { "field": "Fields.CX.INITIAL.JOB_TENURE_MONTHS", "op": "lt", "value": 12 } },
+  { "id": "initial_job_tenure2_lt_24m", "points": 0.5, "when": { "field": "Fields.CX.INITIAL.JOB_TENURE_2_MONTHS", "op": "lt", "value": 24 } },
+  { "id": "initial_jumbo_non_agency", "points": 0.5, "when": { "field": "Loan.LoanProgramName", "op": "contains", "value": "Jumbo" } },
+  { "id": "initial_occupancy_investor", "points": 1, "when": { "field": "Loan.PropertyOccupancyType", "op": "contains", "value": "Investment" } },
+  { "id": "initial_occupancy_second_home", "points": 0.5, "when": { "field": "Loan.PropertyOccupancyType", "op": "contains", "value": "Second" } },
+  { "id": "initial_other_income_used", "points": 0.5, "when": { "field": "Fields.CX.INITIAL.OTHER_INCOME_USED", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "initial_re_liabilities_gt_2", "points": 0.5, "when": { "field": "Fields.CX.INITIAL.RE_LIABILITIES_COUNT", "op": "gt", "value": 2 } },
+  { "id": "initial_self_employed", "points": 0.5, "when": { "field": "Fields.CX.BORROWER.SELF.EMPLOYED", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "initial_subordination", "points": 1, "when": { "field": "Fields.CX.INITIAL.SUBORDINATION", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } },
+  { "id": "initial_trust", "points": 0.5, "when": { "field": "Loan.BorrowerType", "op": "contains", "value": "Trust" } },
+  { "id": "initial_tx50a6", "points": 0.25, "when": { "field": "Loan.State", "op": "eq", "value": "TX" } },
+  { "id": "initial_va_full_doc", "points": 0.5, "when": { "field": "Loan.LoanProgramName", "op": "contains", "value": "VA" } },
+  { "id": "initial_variable_income", "points": 0.25, "when": { "field": "Fields.CX.INITIAL.VARIABLE_INCOME_USED", "op": "in", "values": ["Y", "Yes", "true", "TRUE", "1"] } }
 ]`;
 
   const DEFAULT_ROLE = `{
@@ -53,6 +71,7 @@
       complexityMode: $('complexityMode').value,
       complexityAiModel: $('complexityAiModel').value.trim(),
       complexityMaxPoints: $('complexityMaxPoints').value.trim(),
+      allowIneligibleOverride: $('allowIneligibleOverride').checked ? 'true' : 'false',
     };
   }
 
@@ -69,6 +88,10 @@
     if (typeof c.complexityAiModel === 'string') $('complexityAiModel').value = c.complexityAiModel;
     if (c.complexityMaxPoints != null && `${c.complexityMaxPoints}`.trim() !== '') {
       $('complexityMaxPoints').value = `${c.complexityMaxPoints}`;
+    }
+    if (c.allowIneligibleOverride != null) {
+      const val = `${c.allowIneligibleOverride}`.trim().toLowerCase();
+      $('allowIneligibleOverride').checked = ['true', '1', 'yes', 'y'].includes(val);
     }
   }
 
@@ -140,6 +163,12 @@
       if (am) $('complexityAiModel').value = am;
       const cmax = localStorage.getItem(LS_COMPLEXITY_MAX);
       if (cmax != null) $('complexityMaxPoints').value = cmax;
+      const allowOverride = localStorage.getItem(LS_ALLOW_INELIGIBLE_OVERRIDE);
+      if (allowOverride != null) {
+        $('allowIneligibleOverride').checked = ['true', '1', 'yes', 'y'].includes(
+          `${allowOverride}`.trim().toLowerCase(),
+        );
+      }
     } catch (e) {
       console.warn(e);
     }
@@ -155,6 +184,10 @@
       localStorage.setItem(LS_COMPLEXITY_MODE, $('complexityMode').value);
       localStorage.setItem(LS_AI_MODEL, $('complexityAiModel').value.trim());
       localStorage.setItem(LS_COMPLEXITY_MAX, $('complexityMaxPoints').value.trim());
+      localStorage.setItem(
+        LS_ALLOW_INELIGIBLE_OVERRIDE,
+        $('allowIneligibleOverride').checked ? 'true' : 'false',
+      );
     } catch (e) {
       console.warn(e);
     }
@@ -345,6 +378,7 @@
         <td class="small" title="${escapeAttr(hits)}">${escapeHtml(hits || '—')}</td>
         <td class="small text-muted">${escapeHtml(curCell)}</td>
         <td><code class="small">${escapeHtml(row.processorUserId ?? '')}</code></td>
+        <td class="small">${escapeHtml(row.eligibilityNote ?? '—')}</td>
         <td><span class="badge bg-${statusClass(row.status)}">${escapeHtml(row.status)}</span></td>
         <td class="small text-muted">${escapeHtml(row.reason ?? '')}</td>
       `;
@@ -394,6 +428,7 @@
       complexityRules,
       roleConfig,
       assignOnlyUnassigned: $('assignOnlyUnassigned').checked,
+      allowIneligibleOverride: $('allowIneligibleOverride').checked,
       sortOrder: $('sortDesc').checked ? 'desc' : 'asc',
       delayMsBetweenAssign: Math.max(0, parseInt($('delayMs').value, 10) || 0),
     };
@@ -521,6 +556,7 @@
       $('complexityMode').value = 'rules';
       $('complexityAiModel').value = '';
       $('complexityMaxPoints').value = '';
+      $('allowIneligibleOverride').checked = false;
       saveStorage();
       $('runStatus').textContent = 'Defaults loaded (replace user IDs and CX.* field ids before apply).';
     });

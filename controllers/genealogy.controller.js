@@ -116,11 +116,12 @@ export async function getPerson(req, res) {
     const siblings = getSiblings(id);
     const musicalEra = getMusicalEra(person.birthYear);
     
+    const lanePdfPortraits = getLanePdfPortraitsForPerson(id);
     res.json({
       success: true,
       person: person,
       musicalEra: musicalEra,
-      lanePdfPortraits: getLanePdfPortraitsForPerson(id),
+      lanePdfPortraits: Array.isArray(lanePdfPortraits) ? lanePdfPortraits : [],
       family: {
         parents: parents,
         children: children,

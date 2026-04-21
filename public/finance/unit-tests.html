@@ -1851,7 +1851,7 @@
           </ul>
         </div>
 
-        <!-- Excel Unit Tests - title + grouped actions (Load / Generate / Tools) -->
+        <!-- Excel Unit Tests - title + grouped actions (Upload / Generate / More) -->
         <div class="d-flex justify-content-between align-items-center py-2 flex-wrap gap-2">
           <h5 class="mb-0 fw-semibold"><i class="bi-file-earmark-spreadsheet me-2"></i>Excel Unit Tests</h5>
           <div class="d-flex flex-wrap align-items-center gap-2">
@@ -1863,8 +1863,23 @@
             </div>
             <input type="file" id="libraryFileInput" accept=".xlsx" style="display: none;" />
             <div class="btn-group">
-              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="heroLoadDropdownBtn">Load</button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="heroLoadDropdownBtn">
+              <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="heroGenerateDropdownBtn">Generate</button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="heroGenerateDropdownBtn">
+                <li>
+                  <button type="button" class="dropdown-item" id="generateFromCustomFieldBtn" title="Generate unit test from an Encompass custom field with a calculation">
+                    <i class="bi-magic me-2"></i>From custom field
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="dropdown-item" id="generateFromBRRuleBtn" title="Generate unit test from Encompass BR XML (advanced conditions, milestones)">
+                    <i class="bi-diagram-3 me-2"></i>From BR rule
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div class="btn-group tools-dropdown">
+              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="heroToolsDropdownBtn">More</button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="heroToolsDropdownBtn">
                 <li>
                   <button type="button" class="dropdown-item" id="uploadToLibraryBtn" title="Save Excel file to Test Library for later use">
                     <i class="bi-folder-plus me-2"></i>Save to Library
@@ -1882,26 +1897,7 @@
                     <i class="bi-x-circle me-2"></i>Clear &amp; Reload
                   </button>
                 </li>
-              </ul>
-            </div>
-            <div class="btn-group">
-              <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="heroGenerateDropdownBtn">Generate</button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="heroGenerateDropdownBtn">
-                <li>
-                  <button type="button" class="dropdown-item" id="generateFromCustomFieldBtn" title="Generate unit test from an Encompass custom field with a calculation">
-                    <i class="bi-magic me-2"></i>From custom field
-                  </button>
-                </li>
-                <li>
-                  <button type="button" class="dropdown-item" id="generateFromBRRuleBtn" title="Generate unit test from Encompass BR XML (advanced conditions, milestones)">
-                    <i class="bi-diagram-3 me-2"></i>From BR rule
-                  </button>
-                </li>
-              </ul>
-            </div>
-            <div class="btn-group tools-dropdown">
-              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" id="heroToolsDropdownBtn">Tools</button>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="heroToolsDropdownBtn">
+                <li><hr class="dropdown-divider" /></li>
                 <li>
                   <button type="button" class="dropdown-item voice-help-toggle" id="toggleVoiceHelp"><i class="bi-mic me-2"></i>Voice guide</button>
                 </li>
@@ -2072,15 +2068,17 @@
           <div class="unit-tests-layout">
             <!-- Section sidebar nav -->
             <nav class="section-sidebar" aria-label="Section navigation">
-              <div class="section-sidebar-title">Sections</div>
+              <div class="section-sidebar-title">Workflow</div>
               <ul class="section-sidebar-nav" id="sectionSidebarNav">
-                <li><a href="#collapseAIAssistant" data-bs-target="#collapseAIAssistant" data-heading="headingAIAssistant"><i class="bi-robot"></i> AI Assistant</a></li>
+                <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-1-circle"></i> Step 1: Start</a></li>
+                <li><a href="#collapseTestGrid" data-bs-target="#collapseTestGrid" data-heading="headingTestGrid"><i class="bi-2-circle"></i> Step 2: Test Grid</a></li>
+                <li><a href="#collapseTestScenarios" data-bs-target="#collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-3-circle"></i> Step 3: Scenarios</a></li>
+                <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-4-circle"></i> Step 4: Sign-off</a></li>
                 <li><a href="#collapseTestLibrary" data-bs-target="#collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
-                <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-check2-all"></i> Test Sign-off</a></li>
-                <li><a href="#collapseTestScenarios" data-bs-target="#collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-list-check"></i> Test Scenarios</a></li>
                 <li><a href="#collapseSelectedField" data-bs-target="#collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-input-cursor-text"></i> Selected Field</a></li>
-                <li><a href="#collapseTestGrid" data-bs-target="#collapseTestGrid" data-heading="headingTestGrid"><i class="bi-table"></i> Test Grid</a></li>
-                <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-database"></i> Unit Test Data</a></li>
+                <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Advanced</span></li>
+                <li><a href="#collapseLearnMode" data-bs-target="#collapseLearnMode" data-heading="headingLearnMode"><i class="bi-mortarboard"></i> Learn Mode</a></li>
+                <li><a href="#collapseAIAssistant" data-bs-target="#collapseAIAssistant" data-heading="headingAIAssistant"><i class="bi-robot"></i> AI Assistant</a></li>
                 <li><a href="#" id="sidebarVoiceShortcuts" data-action="voice-help"><i class="bi-mic"></i> Voice Shortcuts</a></li>
               </ul>
             </nav>
@@ -2089,7 +2087,7 @@
         <div class="col-12 mb-4 section-card-hidden" id="aiAssistantCard">
           <div class="section-card">
             <div class="section-card-header collapsed" tabindex="0" id="headingAIAssistant" role="button" data-bs-toggle="collapse" data-bs-target="#collapseAIAssistant" aria-expanded="false" aria-controls="collapseAIAssistant">
-              <span class="section-title"><i class="bi-robot"></i> Encompass Unit Testing AI Assistant</span>
+              <span class="section-title"><i class="bi-robot"></i> Advanced: Encompass Unit Testing AI Assistant</span>
               <i class="bi-chevron-down"></i>
             </div>
             <div id="collapseAIAssistant" class="collapse section-card-body" aria-labelledby="headingAIAssistant">
@@ -2117,6 +2115,93 @@
                           </div>
                         </div>
                       </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mb-4 section-card-hidden" id="learnModeCard">
+          <div class="section-card">
+            <div class="section-card-header collapsed" tabindex="0" id="headingLearnMode" role="button" data-bs-toggle="collapse" data-bs-target="#collapseLearnMode" aria-expanded="false" aria-controls="collapseLearnMode">
+              <span class="section-title"><i class="bi-mortarboard"></i> Advanced: Learn Mode (Node Parser Training)</span>
+              <i class="bi-chevron-down"></i>
+            </div>
+            <div id="collapseLearnMode" class="collapse section-card-body" aria-labelledby="headingLearnMode">
+              <p class="text-muted mb-3">
+                <small>Provide parser logic and a worked test case to build reusable examples. Learn Mode generates unit-test templates and Node parser suggestions, with optional VB evaluation notes.</small>
+              </p>
+              <div class="row g-3">
+                <div class="col-12 col-lg-6">
+                  <label for="learnModeParserLogicInput" class="form-label">VB logic (left panel)</label>
+                  <textarea id="learnModeParserLogicInput" class="form-control font-monospace" rows="8" placeholder='Paste VB / .NET condition text (example: If [CX.TAXES] &gt; 0 AndAlso [364] = "" Then Fail "...")'></textarea>
+                  <div class="form-text">This input is treated as VB rule logic and used to learn field/rule intent.</div>
+                </div>
+                <div class="col-12 col-lg-6">
+                  <label for="learnModeCaseTextInput" class="form-label">Unit-test grid rows (right panel)</label>
+                  <textarea id="learnModeCaseTextInput" class="form-control font-monospace" rows="8" placeholder="Paste Excel test grid rows including Step, Action, Target, Description, Test 1..N"></textarea>
+                  <div class="form-text">Expected format: Step / Action / Target / Description / Test N columns from your sheet.</div>
+                </div>
+                <div class="col-12">
+                  <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <input type="file" id="learnModeExcelInput" accept=".xlsx,.xls,.csv,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" class="form-control form-control-sm" style="max-width: 320px;">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="learnModeSaveToLibrary">
+                      <label class="form-check-label" for="learnModeSaveToLibrary">Save approved example to local library</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="learnModeEnableVBEval">
+                      <label class="form-check-label" for="learnModeEnableVBEval">Include optional VB evaluation notes</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-primary" id="learnModeRunBtn" disabled>
+                      <i class="bi-lightning-charge me-1"></i>Learn from Example
+                    </button>
+                    <button type="button" class="btn btn-outline-success" id="learnModePromoteBtn">
+                      <i class="bi-shield-check me-1"></i>Promote to Approved
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="learnModeClearBtn">
+                      <i class="bi-x-circle me-1"></i>Clear
+                    </button>
+                  </div>
+                  <label for="learnModeApprovalNoteInput" class="form-label mt-2 mb-1"><small>Approval note (required for manual promote)</small></label>
+                  <textarea id="learnModeApprovalNoteInput" class="form-control form-control-sm" rows="2" placeholder="Why this candidate is safe to approve despite guardrails or low confidence."></textarea>
+                  <div id="learnModeStatus" class="small text-muted mt-2" role="status" aria-live="polite">Add parser logic and a worked case to enable Learn Mode.</div>
+                </div>
+                <div class="col-12">
+                  <div class="row g-2">
+                    <div class="col-12 col-md-4">
+                      <label for="learnModeQualityThresholdInput" class="form-label mb-1"><small>Quality threshold</small></label>
+                      <input type="number" min="0" max="100" step="1" id="learnModeQualityThresholdInput" class="form-control form-control-sm" value="60">
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <label for="learnModeMinImprovementInput" class="form-label mb-1"><small>Min improvement (%)</small></label>
+                      <input type="number" min="0" max="100" step="1" id="learnModeMinImprovementInput" class="form-control form-control-sm" value="0">
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <label class="form-label mb-1"><small>Guardrail mode</small></label>
+                      <div class="form-control form-control-sm bg-light d-flex align-items-center">Block on any regression</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-xl-4">
+                  <h6 class="mb-2">Saved Example Library</h6>
+                  <div id="learnModeLibraryList" class="small text-muted border rounded p-2 bg-light">No saved examples yet.</div>
+                </div>
+                <div class="col-12 col-xl-8">
+                  <h6 class="mb-2">Lifecycle State</h6>
+                  <pre id="learnModeStateOutput" class="form-control" style="min-height: 72px; white-space: pre-wrap;">No evaluation yet.</pre>
+                  <h6 class="mb-2 mt-3">Benchmark + Regression Gate</h6>
+                  <pre id="learnModeBenchmarkOutput" class="form-control" style="min-height: 120px; white-space: pre-wrap;">No benchmark run yet.</pre>
+                  <h6 class="mb-2">Auto-generated / Corrected Unit-Test Rows</h6>
+                  <pre id="learnModeTemplateOutput" class="form-control" style="min-height: 130px; white-space: pre-wrap;">No output yet.</pre>
+                  <h6 class="mb-2 mt-3">Node Parser Suggestions</h6>
+                  <pre id="learnModeParserOutput" class="form-control" style="min-height: 130px; white-space: pre-wrap;">No output yet.</pre>
+                  <h6 class="mb-2 mt-3">Optional VB Evaluation</h6>
+                  <pre id="learnModeVBOutput" class="form-control" style="min-height: 90px; white-space: pre-wrap;">Disabled.</pre>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2161,7 +2246,7 @@
             <!-- Overall Test Sign-off -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseOverallSignOff">
               <div class="section-card-header collapsed" tabindex="0" id="headingOverallSignOff" role="button" data-bs-toggle="collapse" data-bs-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
-                <span class="section-title"><i class="bi-check2-all"></i> Test Sign-off <span class="badge text-bg-success ms-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
+                <span class="section-title"><i class="bi-4-circle"></i> Step 4: Test Sign-off <span class="badge text-bg-success ms-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseOverallSignOff" class="collapse section-card-body" aria-labelledby="headingOverallSignOff">
@@ -2172,7 +2257,7 @@
             <!-- Test Scenarios -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseTestScenarios">
               <div class="section-card-header collapsed" tabindex="0" id="headingTestScenarios" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
-                <span class="section-title"><i class="bi-list-check"></i> Test Scenarios <span class="badge text-bg-primary ms-2" id="testScenariosCount"></span></span>
+                <span class="section-title"><i class="bi-3-circle"></i> Step 3: Test Scenarios <span class="badge text-bg-primary ms-2" id="testScenariosCount"></span></span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
@@ -2234,7 +2319,7 @@
             <!-- Test Grid -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseTestGrid">
               <div class="section-card-header collapsed" tabindex="0" id="headingTestGrid" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
-                <span class="section-title"><i class="bi-table"></i> Test Grid <span class="badge text-bg-info ms-2" id="testGridCount"></span></span>
+                <span class="section-title"><i class="bi-2-circle"></i> Step 2: Test Grid <span class="badge text-bg-info ms-2" id="testGridCount"></span></span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseTestGrid" class="collapse section-card-body" aria-labelledby="headingTestGrid">
@@ -2251,7 +2336,7 @@
             <!-- Unit Test Data (bottom) - collapsed by default -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseUnitTestData">
               <div class="section-card-header collapsed" tabindex="0" id="headingUnitTestData" role="button" data-bs-toggle="collapse" data-bs-target="#collapseUnitTestData" aria-expanded="false" aria-controls="collapseUnitTestData">
-                <span class="section-title"><i class="bi-database"></i> Unit Test Data</span>
+                <span class="section-title"><i class="bi-1-circle"></i> Step 1: Start / Unit Test Data</span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseUnitTestData" class="collapse section-card-body" aria-labelledby="headingUnitTestData">
@@ -2294,22 +2379,29 @@
                           <span class="loan-guid-chip" id="loanGuidChip">No Loan GUID</span>
                         </div>
                         <div class="sticky-action-right">
-                          <button class="btn btn-outline-secondary btn-sm" id="showAllColumnsBtn" title="Show Step, Action, Description, Target columns">
-                            <i class="bi-layout-three-columns"></i> All Columns
-                          </button>
                           <select class="form-control form-control-sm" id="recentRunsSelect">
                             <option value="">Recent runs…</option>
                           </select>
-                          <button class="btn btn-outline-danger btn-sm" id="failFirstBtn">
-                            <i class="bi-exclamation-triangle"></i> Fail First
-                          </button>
                           <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." />
-                          <button type="button" class="btn btn-outline-secondary btn-sm" id="fillEmptyTestNullBtn" style="display: none;" title="Inserts the text null in empty Test / Reset cells. SET clears the loan field; COMPARE expects a blank value.">
-                            <i class="bi-braces me-1"></i>Null empty cells
+                          <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#runAdvancedOptions" aria-expanded="false" aria-controls="runAdvancedOptions">
+                            <i class="bi-sliders me-1"></i>Advanced
                           </button>
-                          <button class="btn btn-outline-secondary btn-sm" id="clearBtn" style="display: none;">
-                            <i class="bi-x-circle"></i> Clear Data
-                          </button>
+                        </div>
+                        <div class="collapse mt-2" id="runAdvancedOptions">
+                          <div class="d-flex flex-wrap align-items-center gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" id="showAllColumnsBtn" title="Show Step, Action, Description, Target columns">
+                              <i class="bi-layout-three-columns"></i> All Columns
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" id="failFirstBtn">
+                              <i class="bi-exclamation-triangle"></i> Fail First
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="fillEmptyTestNullBtn" style="display: none;" title="Inserts the text null in empty Test / Reset cells. SET clears the loan field; COMPARE expects a blank value.">
+                              <i class="bi-braces me-1"></i>Null empty cells
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" id="clearBtn" style="display: none;">
+                              <i class="bi-x-circle"></i> Clear Data
+                            </button>
+                          </div>
                         </div>
                       </div>
                       </div><!-- /unit-test-data-header -->
@@ -2453,6 +2545,7 @@
     </script>
     <script defer src="/finance/js/unit-tests.js"></script>
     <script defer src="/finance/js/unit-tests-ai.js"></script>
+    <script defer src="/finance/js/unit-tests-learn-mode.js"></script>
     <script src="/shared/finance-auth-guard.js"></script>
   </body>
 </html>

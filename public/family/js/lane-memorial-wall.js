@@ -12,6 +12,11 @@
   let modalRenderToken = 0;
   const geocodeCache = new Map();
   const museumAccentByPersonId = new Map();
+  const MEMORIAL_FLASH_KEY = 'laneMemorialFlashSeen';
+  const MEMORIAL_FLASH_IMAGE =
+    '/family/assets/lane-genealogies-title-spread.png';
+  const PRIMARY_SOURCE_URL = 'https://archive.org/details/lanegenealogies01chap/page/n7/mode/2up';
+  const NHHS_SOURCE_URL = 'https://www.nhhistory.org/object/272904/lane-family-papers-1727-1924';
 
   function esc(value) {
     return String(value ?? '')
@@ -258,6 +263,77 @@
     }
     const joined = parts.join(' · ');
     return joined.length > 450 ? `${joined.slice(0, 447)}…` : joined;
+  }
+
+  function normalizePortraits(rawPortraits) {
+    if (!Array.isArray(rawPortraits)) return [];
+    return rawPortraits
+      .map((item) => ({
+        publicUrl: String(item?.publicUrl || '').trim(),
+        credit: String(item?.credit || '').trim(),
+        notes: String(item?.notes || '').trim()
+      }))
+      .filter((item) => item.publicUrl);
+  }
+
+  function createPortraitsCardMarkup(portraits) {
+    if (!portraits.length) {
+      return `
+        <section class="memorial-profile-card mb-3">
+          <h6 class="mb-3">Portraits</h6>
+          <p class="small text-muted mb-0">No curated portraits for this profile yet.</p>
+        </section>
+      `;
+    }
+    const items = portraits
+      .map(
+        (item, index) => `
+          <figure class="memorial-portrait-item">
+            <div class="memorial-portrait-media">
+              <img
+                src="${esc(item.publicUrl)}"
+                alt="Portrait ${index + 1}"
+                loading="lazy"
+                onerror="this.parentElement.classList.add('is-unavailable');"
+              />
+              <a class="memorial-portrait-link" href="${esc(item.publicUrl)}" target="_blank" rel="noopener noreferrer">Open source</a>
+            </div>
+            ${
+              item.credit || item.notes
+                ? `<figcaption class="memorial-portrait-caption">
+                    ${item.credit ? `<div class="memorial-portrait-credit">${esc(item.credit)}</div>` : ''}
+                    ${item.notes ? `<div class="memorial-portrait-notes">${esc(item.notes)}</div>` : ''}
+                  </figcaption>`
+                : ''
+            }
+          </figure>
+        `
+      )
+      .join('');
+    return `
+      <section class="memorial-profile-card mb-3">
+        <h6 class="mb-3">Portraits</h6>
+        <div class="memorial-portrait-grid">${items}</div>
+      </section>
+    `;
+  }
+
+  function createSourceProvenanceMarkup() {
+    return `
+      <section class="memorial-profile-card mb-3 memorial-source-provenance">
+        <h6 class="mb-2">Source provenance</h6>
+        <p class="small mb-2">
+          Primary source:
+          <a href="${esc(PRIMARY_SOURCE_URL)}" target="_blank" rel="noopener noreferrer">Lane Genealogies, Vol. 1 (1891)</a>
+        </p>
+        <p class="small mb-0">
+          Supporting references:
+          <a href="/family/lane-pdf-gallery.html">local plate extract set</a>
+          ·
+          <a href="${esc(NHHS_SOURCE_URL)}" target="_blank" rel="noopener noreferrer">NH Historical Society holdings</a>
+        </p>
+      </section>
+    `;
   }
 
   function createMapCardMarkup(placeEntries) {
@@ -561,6 +637,43 @@
     host.innerHTML = parts.join('');
   }
 
+  function initMemorialFlash() {
+    const flash = document.getElementById('memorialFlash');
+    const skip = document.getElementById('memorialFlashSkip');
+    const bg = document.getElementById('memorialFlashBg');
+    if (!flash || !skip || !bg) return;
+
+    const hasSeen = localStorage.getItem(MEMORIAL_FLASH_KEY) === '1';
+    if (hasSeen) {
+      flash.classList.add('memorial-flash--hidden');
+      return;
+    }
+
+    bg.style.backgroundImage = `url("${MEMORIAL_FLASH_IMAGE}")`;
+    const probe = new Image();
+    probe.onerror = () => {
+      flash.classList.add('memorial-flash--fallback');
+    };
+    probe.src = MEMORIAL_FLASH_IMAGE;
+
+    const close = () => {
+      if (flash.classList.contains('memorial-flash--closing')) return;
+      flash.classList.add('memorial-flash--closing');
+      localStorage.setItem(MEMORIAL_FLASH_KEY, '1');
+      window.setTimeout(() => {
+        flash.classList.add('memorial-flash--hidden');
+      }, 900);
+    };
+
+    skip.addEventListener('click', close);
+    flash.addEventListener('click', (event) => {
+      if (event.target === flash || event.target.classList.contains('memorial-flash-vignette')) {
+        close();
+      }
+    });
+    window.setTimeout(close, 3200);
+  }
+
   function applyPersonHighlightFromQuery() {
     const search = new URLSearchParams(window.location.search);
     const personId = String(search.get('personId') || '').trim();
@@ -599,6 +712,7 @@
       disposeMemorialMap();
       const p = data.person;
       const fam = data.family || {};
+      const portraits = normalizePortraits(data.lanePdfPortraits);
       titleEl.textContent = p.name || 'Profile';
       const placeEntries = buildPlaceEntries(p);
       const text = p.text ? `<p class="small text-light" style="white-space: pre-wrap;">${esc(p.text)}</p>` : '';
@@ -664,6 +778,8 @@
       bodyEl.innerHTML = `
         <div class="memorial-profile-grid">
           <div>
+            ${createPortraitsCardMarkup(portraits)}
+            ${createSourceProvenanceMarkup()}
             <section class="memorial-profile-card mb-3">
               <h6 class="mb-3">Record Summary</h6>
               <dl class="row mb-0">
@@ -789,6 +905,7 @@
   document.getElementById('bookOnly').addEventListener('change', load);
   wireClicks();
   initQuickFilters();
+  initMemorialFlash();
   if (typeof window.initHistoryQuickNav === 'function') {
     window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });
   }

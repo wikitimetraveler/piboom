@@ -72,6 +72,38 @@ body.lane-family-hub {
   font-weight: 400;
 }
 
+.lf-source-note {
+  margin: 1rem 0 0;
+  color: var(--lf-muted);
+  font-size: 0.82rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.lf-source-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lf-accent);
+}
+
+.lf-source-note a {
+  color: var(--lf-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s var(--lf-ease);
+}
+
+.lf-source-note a:hover {
+  border-bottom-color: var(--lf-accent);
+}
+
+.lf-source-sep {
+  color: var(--lf-line-strong);
+}
+
 /* Sticky dock */
 .lf-dock-wrap {
   position: sticky;
