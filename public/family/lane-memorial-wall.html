@@ -58,8 +58,77 @@
     </section>
 
     <div id="memorialError" class="memorial-error d-none"></div>
-    <nav id="memorialCenturyJump" class="memorial-century-jump" aria-label="Jump to century"></nav>
-    <div id="memorialWall" class="memorial-wall" aria-live="polite"></div>
+    <div class="memorial-wall-layout" id="memorialWallLayout">
+      <div class="memorial-wall-primary">
+        <div class="memorial-wall-toolbar d-flex flex-wrap align-items-center gap-2">
+          <nav id="memorialCenturyJump" class="memorial-century-jump flex-grow-1" aria-label="Jump to century"></nav>
+          <div class="memorial-wall-era-toolbar">
+            <button
+              type="button"
+              class="btn btn-sm btn-outline-light memorial-wall-era-cta"
+              id="memorialWallEraToggle"
+              aria-expanded="false"
+              aria-controls="memorialWallEraSplit"
+            >
+              Era context
+            </button>
+          </div>
+        </div>
+        <div id="memorialWall" class="memorial-wall" aria-live="polite"></div>
+      </div>
+      <div
+        class="memorial-wall-era-backdrop"
+        id="memorialWallEraBackdrop"
+        hidden
+        aria-hidden="true"
+      ></div>
+      <div
+        id="memorialWallEraSplit"
+        class="memorial-wall-era-dock memorial-profile-card memorial-era-context mb-0"
+        role="region"
+        aria-labelledby="memorialWallEraHeading"
+        aria-hidden="true"
+      >
+        <div class="memorial-wall-era-sheet-top d-flex justify-content-between align-items-start gap-2 mb-2">
+          <h6 class="mb-0" id="memorialWallEraHeading">Era context (general U.S. history)</h6>
+          <button
+            type="button"
+            class="btn btn-sm btn-link text-light p-0 memorial-wall-era-close d-lg-none"
+            id="memorialWallEraClose"
+            aria-label="Close era context"
+            hidden
+          >
+            <span aria-hidden="true" style="font-size: 1.5rem; line-height: 1">×</span>
+          </button>
+        </div>
+        <p class="small text-muted mb-2 history-context-evidence-note">
+          <strong>Context:</strong> general U.S. history (not a Lane family record). <strong>Evidence:</strong> birth, death, and places in the profile modal.
+        </p>
+        <div class="row memorial-era-split" id="memorialWallEraRow">
+          <div class="col-lg-4 mb-3 mb-lg-0 memorial-era-col">
+            <h6 class="memorial-era-subhead small text-uppercase text-muted mb-2">Life coordinate</h6>
+            <div id="memorialWallEraLife">
+              <p class="small text-muted mb-0">
+                Hover a name (or move keyboard focus to a line) to load era here. Open <strong>Era context</strong> to expand this panel; click a line for the full profile.
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="row">
+              <div class="col-md-6 mb-3 mb-md-0 memorial-era-col">
+                <h6 class="memorial-era-subhead small text-uppercase text-muted mb-2">U.S. president (term)</h6>
+                <div id="memorialWallEraPresident"><p class="small text-muted mb-0">—</p></div>
+              </div>
+              <div class="col-md-6 memorial-era-col">
+                <h6 class="memorial-era-subhead small text-uppercase text-muted mb-2">Historical figure (curated band)</h6>
+                <div id="memorialWallEraFigure"><p class="small text-muted mb-0">—</p></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="memorialWallEraAnnounce" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+      </div>
+    </div>
 
     <p class="text-center mt-4 mb-0" id="memorialBackLink">
       <a href="/family/genealogy.html" class="text-muted small">Back to Family Genealogy</a>

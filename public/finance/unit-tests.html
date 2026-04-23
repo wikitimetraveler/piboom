@@ -1754,63 +1754,112 @@
       body.unit-tests-night-theme .tools-dropdown .dropdown-item,body.unit-tests-night-theme .action-dropdown .dropdown-item{color:#f9fafb!important}
       body.unit-tests-night-theme .tools-dropdown .dropdown-item:hover,body.unit-tests-night-theme .action-dropdown .dropdown-item:hover{background:#6b7280!important;color:#38bdf8!important}
 
-      /* Product credits — Unit Test tool */
-      .tool-product-credits {
-        font-size: 0.8125rem;
-        letter-spacing: 0.02em;
-        border-top: 1px solid var(--zen-border);
-        margin-top: 0.25rem;
+      /* Page footer + product credits (matches tool4 Automator) */
+      .footer {
+        background: var(--white);
+        border-top: 1px solid var(--border-light);
+        padding: 2rem 0;
+        margin-top: 4rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
       }
-      .tool-product-credits-inner {
-        display: inline-flex;
+      .footer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--ice-primary), transparent);
+        animation: footerGlow 2s ease-in-out infinite;
+      }
+      @keyframes footerGlow {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+      .footer-content {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+      }
+      @keyframes footerFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-2px);
+        }
+      }
+      .footer-content strong {
+        color: var(--text-dark);
+      }
+      .tool-product-credits-footer {
+        display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: center;
-        gap: 0.35rem 0.75rem;
-        max-width: 100%;
+        gap: 0.75rem 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--border-light);
       }
-      .tool-product-credits .credits-pair {
-        display: inline-flex;
-        align-items: baseline;
-        gap: 0.45rem;
-        flex-wrap: wrap;
-        justify-content: center;
+      .tool-product-credits-footer .credits-block {
+        text-align: center;
       }
-      .tool-product-credits .credits-label {
+      .tool-product-credits-footer .credits-label {
+        display: block;
         font-size: 0.65rem;
         text-transform: uppercase;
         letter-spacing: 0.14em;
         font-weight: 600;
         color: var(--text-muted);
+        margin-bottom: 0.2rem;
       }
-      .tool-product-credits .credits-name {
+      .tool-product-credits-footer .credits-name {
+        font-size: 0.95rem;
         font-weight: 600;
         color: var(--text-dark);
+        letter-spacing: 0.02em;
         opacity: 1 !important;
         visibility: visible !important;
         text-shadow: 0 0 0 transparent;
       }
-      .tool-product-credits .credits-divider {
-        color: var(--zen-primary);
-        opacity: 0.35;
-        font-weight: 300;
-        user-select: none;
+      .tool-product-credits-footer .credits-sep {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--ice-primary);
+        opacity: 0.7;
+        flex-shrink: 0;
       }
-      body.unit-tests-night-theme .tool-product-credits {
-        border-top-color: rgba(255, 255, 255, 0.12);
+      .footer-meta-line {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        animation: footerFloat 4s ease-in-out infinite;
       }
-      body.unit-tests-night-theme .tool-product-credits .credits-name {
+      body.unit-tests-night-theme .footer {
+        background: #1e293b;
+        border-top-color: rgba(255, 255, 255, 0.1);
+      }
+      body.unit-tests-night-theme .footer-content,
+      body.unit-tests-night-theme .footer-meta-line {
+        color: #94a3b8 !important;
+      }
+      body.unit-tests-night-theme .footer-content strong,
+      body.unit-tests-night-theme .tool-product-credits-footer .credits-name {
         color: #f9fafb !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
       }
-      body.unit-tests-night-theme .tool-product-credits .credits-label {
+      body.unit-tests-night-theme .tool-product-credits-footer {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+      }
+      body.unit-tests-night-theme .tool-product-credits-footer .credits-label {
         color: #d1d5db !important;
-      }
-      body.unit-tests-night-theme .tool-product-credits .credits-divider {
-        color: #93c5fd !important;
-        opacity: 0.85;
       }
     </style>
   </head>
@@ -1907,19 +1956,6 @@
                   </button>
                 </li>
               </ul>
-            </div>
-          </div>
-        </div>
-        <div class="tool-product-credits text-center py-3 px-2" role="contentinfo" aria-label="Product credits">
-          <div class="tool-product-credits-inner">
-            <div class="credits-pair">
-              <span class="credits-label">Product director</span>
-              <span class="credits-name">Tez Patel</span>
-            </div>
-            <span class="credits-divider" aria-hidden="true">|</span>
-            <div class="credits-pair">
-              <span class="credits-label">Developer</span>
-              <span class="credits-name">David Lane</span>
             </div>
           </div>
         </div>
@@ -2076,6 +2112,7 @@
                 <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-4-circle"></i> Step 4: Sign-off</a></li>
                 <li><a href="#collapseTestLibrary" data-bs-target="#collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
                 <li><a href="#collapseSelectedField" data-bs-target="#collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-input-cursor-text"></i> Selected Field</a></li>
+                <li><a href="#collapseLiveScenarioBuilder" data-bs-target="#collapseLiveScenarioBuilder" data-heading="headingLiveScenarioBuilder" id="sidebarLiveScenarioBuilder" style="display: none;"><i class="bi-calculator"></i> Live Scenario Builder</a></li>
                 <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Advanced</span></li>
                 <li><a href="#collapseLearnMode" data-bs-target="#collapseLearnMode" data-heading="headingLearnMode"><i class="bi-mortarboard"></i> Learn Mode</a></li>
                 <li><a href="#collapseAIAssistant" data-bs-target="#collapseAIAssistant" data-heading="headingAIAssistant"><i class="bi-robot"></i> AI Assistant</a></li>
@@ -2275,45 +2312,57 @@
                       <div id="selectedFieldContent" class="selected-field-details">
                         <!-- Populated by loadGeneratedTestData when source is custom field -->
                       </div>
-                      <!-- Live Scenario Builder (open when custom field selected) -->
-                      <div id="liveScenarioBuilderContainer" class="mt-4 pt-4 border-top" style="display: none;">
-                        <h6 class="mb-2"><i class="bi-calculator me-1"></i>Live Scenario Builder</h6>
-                        <p class="text-muted small mb-3">Edit mock values and see the calculation result. No Set/Get—single calc only.</p>
-                        <div class="scenario-builder-grid-wrapper mb-3">
-                          <table class="table table-sm table-bordered scenario-builder-grid" id="scenarioBuilderGrid">
-                            <thead>
-                              <tr>
-                                <th>Field ID</th>
-                                <th>Value</th>
-                              </tr>
-                            </thead>
-                            <tbody id="scenarioBuilderGridBody">
-                              <!-- Rows populated by JS -->
-                            </tbody>
-                          </table>
-                        </div>
-                        <div id="scenarioBuilderApplyToolbar" class="border rounded p-3 mb-3 bg-light">
-                          <h6 class="small text-uppercase text-muted mb-2"><i class="bi-arrow-down-circle me-1"></i>Push values to unit test grid</h6>
-                          <p class="small text-muted mb-2 mb-md-3">Copies each builder value into <strong>SET</strong> rows that match the field ID in <strong>Target</strong>. Pick a starting scenario column, then how many columns to fill.</p>
-                          <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                            <label for="scenarioApplyColumnSelect" class="small mb-0 text-nowrap">Start at</label>
-                            <select id="scenarioApplyColumnSelect" class="form-select form-select-sm" style="max-width: 220px" aria-label="Starting test scenario column"></select>
-                            <div class="btn-group btn-group-sm" role="group" aria-label="How many columns to fill">
-                              <button type="button" class="btn btn-outline-primary scenario-apply-mode active" data-mode="one" title="Only the selected column">This column</button>
-                              <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="five" title="Selected column plus the next four">5 columns</button>
-                              <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="all" title="Every Test column">All</button>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-primary" id="scenarioApplyToGridBtn"><i class="bi-check2-circle me-1"></i>Apply</button>
-                          </div>
-                          <button type="button" class="btn btn-sm btn-outline-secondary" id="scenarioFillTool8Btn" title="Fill empty builder inputs using the same sample map as Alchemist (Tool 8)">
-                            <i class="bi-magic me-1"></i>Fill empty from Tool 8 samples
-                          </button>
-                        </div>
-                        <div class="scenario-builder-result-wrapper">
-                          <label class="mb-1 fw-semibold"><small>Result</small></label>
-                          <div id="scenarioBuilderResult" class="form-control-plaintext scenario-builder-result-display" readonly>—</div>
-                        </div>
+              </div>
+            </div>
+            <!-- Live Scenario Builder (own section; shown when generated from custom field with inputs) -->
+            <div class="section-card section-card-hidden" id="liveScenarioBuilderSectionCard" data-collapse-target="collapseLiveScenarioBuilder" style="display: none;">
+              <div class="section-card-header collapsed" tabindex="0" id="headingLiveScenarioBuilder" role="button" data-bs-toggle="collapse" data-bs-target="#collapseLiveScenarioBuilder" aria-expanded="false" aria-controls="collapseLiveScenarioBuilder">
+                <span class="section-title"><i class="bi-calculator me-1"></i> Live Scenario Builder</span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseLiveScenarioBuilder" class="collapse section-card-body" aria-labelledby="headingLiveScenarioBuilder">
+                <p class="text-muted small mb-3">Edit mock values and see the calculation result. No Set/Get—single calc only. <strong>Null all</strong> sets every value to the literal <code>null</code> (same convention as the unit test grid).</p>
+                <div id="liveScenarioBuilderContainer" style="display: none;">
+                  <div class="scenario-builder-grid-wrapper mb-3">
+                    <table class="table table-sm table-bordered scenario-builder-grid" id="scenarioBuilderGrid">
+                      <thead>
+                        <tr>
+                          <th>Field ID</th>
+                          <th>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody id="scenarioBuilderGridBody">
+                        <!-- Rows populated by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                  <div id="scenarioBuilderApplyToolbar" class="border rounded p-3 mb-3 bg-light">
+                    <h6 class="small text-uppercase text-muted mb-2"><i class="bi-arrow-down-circle me-1"></i>Push values to unit test grid</h6>
+                    <p class="small text-muted mb-2 mb-md-3">Copies each builder value into <strong>SET</strong> rows that match the field ID in <strong>Target</strong>. Pick a starting scenario column, then how many columns to fill.</p>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                      <label for="scenarioApplyColumnSelect" class="small mb-0 text-nowrap">Start at</label>
+                      <select id="scenarioApplyColumnSelect" class="form-select form-select-sm" style="max-width: 220px" aria-label="Starting test scenario column"></select>
+                      <div class="btn-group btn-group-sm" role="group" aria-label="How many columns to fill">
+                        <button type="button" class="btn btn-outline-primary scenario-apply-mode active" data-mode="one" title="Only the selected column">This column</button>
+                        <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="five" title="Selected column plus the next four">5 columns</button>
+                        <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="all" title="Every Test column">All</button>
                       </div>
+                      <button type="button" class="btn btn-sm btn-primary" id="scenarioApplyToGridBtn"><i class="bi-check2-circle me-1"></i>Apply</button>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" id="scenarioFillTool8Btn" title="Fill empty builder inputs using the same sample map as Alchemist (Tool 8)">
+                        <i class="bi-magic me-1"></i>Fill empty from Tool 8 samples
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-warning" id="scenarioBuilderNullAllBtn" title="Set every builder value to the literal null text">
+                        <i class="bi-braces me-1"></i>Null all
+                      </button>
+                    </div>
+                  </div>
+                  <div class="scenario-builder-result-wrapper">
+                    <label class="mb-1 fw-semibold"><small>Result</small></label>
+                    <div id="scenarioBuilderResult" class="form-control-plaintext scenario-builder-result-display" readonly>—</div>
+                  </div>
+                </div>
               </div>
             </div>
             <!-- Test Grid -->
@@ -2452,6 +2501,29 @@
       </div>
     </main>
 
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="tool-product-credits-footer" role="contentinfo" aria-label="Product credits">
+            <div class="credits-block">
+              <span class="credits-label">Product director</span>
+              <span class="credits-name">Tez Patel</span>
+            </div>
+            <span class="credits-sep" aria-hidden="true"></span>
+            <div class="credits-block">
+              <span class="credits-label">Developer</span>
+              <span class="credits-name">David Lane</span>
+            </div>
+          </div>
+          <div class="footer-meta-line">
+            <span id="unitTestsFooterDate"></span>
+            <span class="mx-1">·</span>
+            <span>Unit Test · DevConnect Labs</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
     <div class="voice-help-drawer" id="voiceHelp">
       <div class="voice-help-header">
         <h4 class="mb-0"><i class="bi-mic"></i> Voice Shortcuts</h4>
@@ -2496,6 +2568,12 @@
     </div>
 
     <script src="/shared/toast.js"></script>
+    <script>
+      (function () {
+        var el = document.getElementById('unitTestsFooterDate');
+        if (el) el.textContent = new Date().toLocaleDateString();
+      })();
+    </script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>

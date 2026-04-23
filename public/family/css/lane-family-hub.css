@@ -72,6 +72,214 @@ body.lane-family-hub {
   font-weight: 400;
 }
 
+.lf-hero-chrono {
+  font-size: 0.9375rem;
+  color: var(--lf-ink-soft);
+  max-width: 36em;
+  margin: 1rem 0 0;
+  line-height: 1.5;
+}
+
+.lf-hero-chrono em {
+  font-style: italic;
+  color: var(--lf-ink-soft);
+}
+
+.lf-era-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin: 1.25rem 0 0;
+  padding: 0.65rem 0 0;
+  border-top: 1px solid var(--lf-line);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lf-muted);
+}
+
+.lf-era-strip__item {
+  color: var(--lf-accent);
+}
+
+.lf-era-strip__dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--lf-line-strong);
+  display: inline-block;
+}
+
+.lf-reading-order {
+  margin: 1rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--lf-muted);
+  max-width: 40em;
+  line-height: 1.55;
+}
+
+.lf-reading-order__label {
+  display: block;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--lf-accent);
+  margin-bottom: 0.35rem;
+}
+
+.lf-reading-order a {
+  color: var(--lf-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s var(--lf-ease);
+}
+
+.lf-reading-order a:hover {
+  border-bottom-color: var(--lf-accent);
+}
+
+.lf-also-line {
+  margin: 2rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--lf-line);
+  font-size: 0.8125rem;
+  color: var(--lf-muted);
+  max-width: 40em;
+}
+
+.lf-also-line a {
+  color: var(--lf-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.lf-also-line a:hover {
+  border-bottom-color: var(--lf-accent);
+}
+
+/* Lane guide (AI) — same editorial tone as the hub */
+.lf-ai-panel {
+  margin-top: 1.75rem;
+  padding: 1.25rem 1.35rem;
+  background: var(--lf-bg-elevated);
+  border: 1px solid var(--lf-line);
+  border-radius: var(--lf-radius);
+  box-shadow: var(--lf-shadow);
+}
+
+.lf-ai-panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.lf-ai-panel__title {
+  font-family: var(--lf-serif);
+  font-size: 1.15rem;
+  font-weight: 400;
+  margin: 0;
+  color: var(--lf-ink-soft);
+}
+
+.lf-ai-panel__badges {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lf-muted);
+}
+
+.lf-ai-panel__lede {
+  font-size: 0.875rem;
+  color: var(--lf-muted);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  max-width: 40em;
+}
+
+.lf-ai-panel__disclaimer {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.8rem;
+  color: #8a8478;
+}
+
+.lf-ai-input {
+  font-size: 0.9rem;
+  border-radius: var(--lf-radius) !important;
+  border: 1px solid var(--lf-line-strong) !important;
+  resize: vertical;
+  min-height: 2.75rem;
+}
+
+.lf-ai-input:focus {
+  border-color: var(--lf-accent) !important;
+  box-shadow: 0 0 0 0.15rem rgba(107, 83, 68, 0.12);
+}
+
+.lf-ai-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 0.65rem;
+}
+
+.lf-ai-send {
+  background: var(--lf-accent) !important;
+  border: none !important;
+  color: #fff !important;
+  padding: 0.4rem 1rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lf-ai-send:hover:not(:disabled) {
+  background: var(--lf-accent-hover) !important;
+  color: #fff !important;
+}
+
+.lf-ai-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.lf-ai-status {
+  font-size: 0.8rem;
+  color: var(--lf-muted);
+}
+
+.lf-ai-reply {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--lf-line);
+  font-size: 0.9rem;
+  color: var(--lf-ink-soft);
+  line-height: 1.55;
+  max-width: 40em;
+}
+
+.lf-ai-reply--visible:not([hidden]) {
+  display: block;
+}
+
+.lf-ai-answer .lf-ai-para {
+  margin: 0 0 0.75rem;
+}
+
+.lf-ai-answer .lf-ai-para:last-child {
+  margin-bottom: 0;
+}
+
+.lf-ai-error {
+  color: #8b4513;
+  font-size: 0.9rem;
+}
+
 .lf-source-note {
   margin: 1rem 0 0;
   color: var(--lf-muted);
@@ -268,4 +476,31 @@ body.lane-family-hub {
 
 .lf-footer-note a:hover {
   border-bottom-color: var(--lf-accent);
+}
+
+@media print {
+  body.lane-family-hub {
+    background: #fff;
+    color: #000;
+  }
+
+  .lf-dock-wrap,
+  .lf-footer-note {
+    display: none;
+  }
+
+  .lf-hero {
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 1rem;
+  }
+
+  .lf-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+
+  .lf-section {
+    break-inside: avoid;
+  }
 }

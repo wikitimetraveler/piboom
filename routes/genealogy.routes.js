@@ -24,8 +24,11 @@ import {
   importImages,
   genealogyImageUpload
 } from '../controllers/genealogy.controller.js';
+import laneFamilyAIRouter from '../controllers/lane-family-ai.controller.js';
 
 const router = express.Router();
+
+router.use('/ai', laneFamilyAIRouter);
 
 // Get complete family data for D3 visualization
 router.get('/data', getFamilyData);

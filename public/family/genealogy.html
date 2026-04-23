@@ -512,6 +512,34 @@ function renderPersonDetail(person, family, musicalEra, lanePdfPortraits) {
     ${narrativeFamilyBlockG}
   `;
 
+  const seeAlsoParts = [];
+  if (lp.length) {
+    seeAlsoParts.push(
+      '<a href="/family/lane-pdf-gallery.html">Book plates (provenance &amp; gallery)</a>'
+    );
+  }
+  if (occList.length) {
+    seeAlsoParts.push(
+      '<a href="/family/lane-occupations.html">Occupations (aggregated tree)</a>'
+    );
+  }
+  if (milText && String(milText).trim() !== '') {
+    seeAlsoParts.push(
+      '<a href="/family/lane-war-history.html">War history (themed views)</a>'
+    );
+  }
+  const seeAlsoBlock =
+    seeAlsoParts.length > 0
+      ? `
+    <div class="border-top pt-2 mt-3 small">
+      <p class="text-muted text-uppercase mb-1" style="font-size:0.65rem;letter-spacing:0.08em">See also</p>
+      <p class="text-muted small mb-1">Themed site indexes from this profile’s fields. Other people may appear in the same views.</p>
+      <p class="history-context-evidence-note small mb-0"><strong>Context:</strong> site navigation. <strong>Evidence:</strong> the record fields above.</p>
+      <p class="mb-0 mt-1">${seeAlsoParts.join(' · ')}</p>
+    </div>
+  `
+      : '';
+
   const titleRow = person.title
     ? `<dt class="col-sm-3">Title</dt><dd class="col-sm-9">${esc(String(person.title))}</dd>`
     : '';
@@ -530,6 +558,7 @@ function renderPersonDetail(person, family, musicalEra, lanePdfPortraits) {
     <p class="mb-1"><strong>Musical Era:</strong> ${esc(musicalEra?.period || 'Unknown')}</p>
     <p class="mb-2"><strong>Music:</strong> ${esc(musicalEra?.music || 'Unknown')}</p>
     ${familyBlock}
+    ${seeAlsoBlock}
   `;
 }
 

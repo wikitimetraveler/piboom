@@ -2419,6 +2419,7 @@ function clearData() {
   currentScenarioBuilderField = null;
   const builderContainer = document.getElementById('liveScenarioBuilderContainer');
   if (builderContainer) builderContainer.style.display = 'none';
+  setLiveScenarioBuilderSectionVisible(false);
   
   // Hide AI Assistant
   if (window.unitTestsAI && window.unitTestsAI.hide) {
@@ -3208,6 +3209,7 @@ function getSectionCardForCollapse(sectionId) {
   if (!el) return null;
   if (sectionId === 'collapseAIAssistant') return document.getElementById('aiAssistantCard');
   if (sectionId === 'collapseLearnMode') return document.getElementById('learnModeCard');
+  if (sectionId === 'collapseLiveScenarioBuilder') return document.getElementById('liveScenarioBuilderSectionCard');
   return el.closest('.section-card');
 }
 
@@ -3375,6 +3377,25 @@ function valueForTargetFromScenarioBuilder(target, builderValues) {
 }
 
 /**
+ * Show or hide the Live Scenario Builder section card and sidebar link.
+ * @param {boolean} visible
+ */
+function setLiveScenarioBuilderSectionVisible(visible) {
+  const sectionCard = document.getElementById('liveScenarioBuilderSectionCard');
+  const side = document.getElementById('sidebarLiveScenarioBuilder');
+  if (sectionCard) {
+    if (visible) {
+      sectionCard.classList.remove('section-card-hidden');
+      sectionCard.style.display = 'block';
+    } else {
+      sectionCard.classList.add('section-card-hidden');
+      sectionCard.style.display = 'none';
+    }
+  }
+  if (side) side.style.display = visible ? '' : 'none';
+}
+
+/**
  * Populate scenario-column dropdown; call after grid or builder updates.
  */
 function refreshScenarioApplyToolbar() {
@@ -3445,6 +3466,37 @@ function applyScenarioBuilderValuesToGrid() {
 /**
  * Fill empty scenario builder inputs from Tool 8 / Alchemist sample map.
  */
+/**
+ * Set every Live Scenario Builder input to the literal null text (grid convention).
+ */
+function nullAllScenarioBuilderInputs() {
+  const container = document.getElementById('liveScenarioBuilderContainer');
+  if (!container || container.style.display === 'none') {
+    showToast('Open the Live Scenario Builder first (generate from a custom field).', 'warning');
+    return;
+  }
+  const inputs = container.querySelectorAll('[data-field-id]');
+  const NULL_STR = 'null';
+  let n = 0;
+  inputs.forEach((el) => {
+    if (el.tagName === 'SELECT') {
+      const byVal = Array.from(el.options).find((o) => String(o.value).toLowerCase() === 'null');
+      if (byVal) {
+        el.value = byVal.value;
+        n += 1;
+      } else {
+        el.value = '';
+        n += 1;
+      }
+    } else {
+      el.value = NULL_STR;
+      n += 1;
+    }
+  });
+  runScenarioCalculation();
+  showToast(n ? `Set ${n} field(s) to null` : 'No fields to update', n ? 'ok' : 'info');
+}
+
 function fillScenarioBuilderInputsFromTool8Samples() {
   const map = (typeof window !== 'undefined' && window.encompassFieldTestValuesMap) || {};
   const container = document.getElementById('liveScenarioBuilderContainer');
@@ -3502,6 +3554,7 @@ function initializeScenarioBuilderApplyControls() {
   });
   document.getElementById('scenarioApplyToGridBtn')?.addEventListener('click', () => applyScenarioBuilderValuesToGrid());
   document.getElementById('scenarioFillTool8Btn')?.addEventListener('click', () => fillScenarioBuilderInputsFromTool8Samples());
+  document.getElementById('scenarioBuilderNullAllBtn')?.addEventListener('click', () => nullAllScenarioBuilderInputs());
 }
 
 /**
@@ -3688,6 +3741,7 @@ function renderScenarioBuilder(field) {
   const container = document.getElementById('liveScenarioBuilderContainer');
   const tbody = document.getElementById('scenarioBuilderGridBody');
   const resultEl = document.getElementById('scenarioBuilderResult');
+  setLiveScenarioBuilderSectionVisible(false);
   if (!container || !tbody || !field) return;
 
   const calc = field.calculation || field.calculationExpression || field.calculatedExpression || field.expression || field.formula || '';
@@ -3744,6 +3798,7 @@ function renderScenarioBuilder(field) {
   });
 
   container.style.display = 'block';
+  setLiveScenarioBuilderSectionVisible(true);
   runScenarioCalculation();
   refreshScenarioApplyToolbar();
 }
@@ -3801,6 +3856,10 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
       if (sidebarSelectedField) sidebarSelectedField.style.display = '';
       currentScenarioBuilderField = field;
       renderScenarioBuilder(field);
+      const lsbAfter = document.getElementById('liveScenarioBuilderContainer');
+      if (lsbAfter && lsbAfter.style.display === 'block') {
+        showAccordionSection('collapseLiveScenarioBuilder');
+      }
       if (collapseSelectedField) {
         bsCollapseShow(collapseSelectedField);
       }
@@ -3811,6 +3870,7 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
       currentScenarioBuilderField = null;
       const builderContainer = document.getElementById('liveScenarioBuilderContainer');
       if (builderContainer) builderContainer.style.display = 'none';
+      setLiveScenarioBuilderSectionVisible(false);
     }
 
     setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
@@ -4722,7 +4782,7 @@ function initializeSectionSidebar() {
   if (!nav) return;
 
   // On load: hide section cards and collapse; then open Unit Test Data so status, welcome, and upload are visible
-  var sectionIds = ['collapseUnitTestData', 'collapseTestGrid', 'collapseTestScenarios', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLearnMode', 'collapseAIAssistant'];
+  var sectionIds = ['collapseUnitTestData', 'collapseTestGrid', 'collapseTestScenarios', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (el) {
@@ -4772,7 +4832,7 @@ function initializeSectionSidebar() {
   });
 
   // Sync sidebar active state when sections expand/collapse (from header clicks, voice, or sidebar)
-  var sectionIds = ['collapseUnitTestData', 'collapseTestGrid', 'collapseTestScenarios', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLearnMode', 'collapseAIAssistant'];
+  var sectionIds = ['collapseUnitTestData', 'collapseTestGrid', 'collapseTestScenarios', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;

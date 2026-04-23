@@ -23,6 +23,24 @@
       <p class="lf-hero-lede">
         A single place to open the tree, exhibits, and reference tools—spaced for reading, not scrolling through noise.
       </p>
+      <p class="lf-hero-chrono">
+        Roughly <strong>1600s–1900s</strong> New England lives, grounded in the <em>Lane Genealogies</em> (1891) and later archives—not a general U.S. history site, but a lane through the record.
+      </p>
+      <div class="lf-era-strip" aria-hidden="true">
+        <span class="lf-era-strip__item">Colonial</span>
+        <span class="lf-era-strip__dot" aria-hidden="true"></span>
+        <span class="lf-era-strip__item">Revolution</span>
+        <span class="lf-era-strip__dot" aria-hidden="true"></span>
+        <span class="lf-era-strip__item">Early republic</span>
+        <span class="lf-era-strip__dot" aria-hidden="true"></span>
+        <span class="lf-era-strip__item">Civil era</span>
+        <span class="lf-era-strip__dot" aria-hidden="true"></span>
+        <span class="lf-era-strip__item">Gilded &amp; later</span>
+      </div>
+      <p class="lf-reading-order">
+        <span class="lf-reading-order__label">Suggested path</span>
+        Tree or <a href="/family/lane-memorial-wall.html">Memorial</a> for names and dates, then <a href="/family/lane-museum.html">Museum</a> for narrative, <a href="/family/lane-war-history.html">War</a> or <a href="/family/lane-occupations.html">Occupations</a> for themed views, <a href="/family/lane-pdf-gallery.html">Plates</a> for provenance.
+      </p>
       <p class="lf-source-note">
         <span class="lf-source-label">Primary data source</span>
         <a href="https://archive.org/details/lanegenealogies01chap/page/n7/mode/2up" target="_blank" rel="noopener noreferrer">Lane Genealogies, Vol. 1 (1891) — Internet Archive</a>
@@ -31,6 +49,33 @@
         <span class="lf-source-sep">·</span>
         <a href="https://www.nhhistory.org/object/272904/lane-family-papers-1727-1924" target="_blank" rel="noopener noreferrer">NH Historical Society holdings</a>
       </p>
+
+      <section class="lf-ai-panel" id="lfAiPanel" aria-labelledby="lfAiHeading">
+        <div class="lf-ai-panel__head">
+          <h2 class="lf-ai-panel__title" id="lfAiHeading">Lane guide</h2>
+          <span class="lf-ai-panel__badges" aria-label="Technologies">LangChain · OpenAI</span>
+        </div>
+        <p class="lf-ai-panel__lede">
+          Ask about the 1891 book, New England context, and where to look on this site.
+          <span class="lf-ai-panel__disclaimer">AI gives context, not proof—verify people and dates in the tree and primary sources.</span>
+        </p>
+        <div class="lf-ai-form">
+          <label class="sr-only" for="lfAiInput">Message to Lane guide</label>
+          <textarea
+            id="lfAiInput"
+            class="form-control lf-ai-input"
+            rows="2"
+            placeholder="e.g. How do the Memorial wall and the book plates relate?"
+            maxlength="2000"
+            autocomplete="off"
+          ></textarea>
+          <div class="lf-ai-actions">
+            <button type="button" class="btn btn-sm lf-ai-send" id="lfAiSend" disabled>Send</button>
+            <span class="lf-ai-status" id="lfAiStatus" role="status" aria-live="polite"></span>
+          </div>
+        </div>
+        <div class="lf-ai-reply" id="lfAiReply" tabindex="-1" hidden></div>
+      </section>
     </header>
 
     <nav class="lf-dock-wrap" aria-label="Lane sections">
@@ -51,25 +96,25 @@
         <a class="lf-card" href="/family/genealogy.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-diagram-3"></i></span>
           <h3 class="lf-card-title">Family tree</h3>
-          <p class="lf-card-desc">Search names, open profiles, and browse the Lane dataset with musical-era context.</p>
+          <p class="lf-card-desc">Who’s in the dataset? Search, open profiles, follow links—17th–20th c. with musical-era tags.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
         <a class="lf-card" href="/family/lane-museum.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-building"></i></span>
           <h3 class="lf-card-title">Lane Museum</h3>
-          <p class="lf-card-desc">Chronological exhibits, featured figures, and docent-style narrative framing.</p>
+          <p class="lf-card-desc">How do we tell the story? Chronological exhibits and docent-style framing—18th–19th c. lean.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
         <a class="lf-card" href="/family/lane-direct-ancestor-story.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-signpost-2"></i></span>
           <h3 class="lf-card-title">Direct line</h3>
-          <p class="lf-card-desc">Follow parent links from a chosen ancestor—your line only, without lateral clutter.</p>
+          <p class="lf-card-desc">What’s my straight line? One ancestor chain via parent links—no lateral branches.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
         <a class="lf-card" href="/family/lane-was-he-an-idiot.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-newspaper"></i></span>
           <h3 class="lf-card-title">Was He an Idiot?</h3>
-          <p class="lf-card-desc">Popular Science (1884) feature on a Hampton Falls Lane—full text with period illustrations.</p>
+          <p class="lf-card-desc">How did the press see a Lane? <em>Popular Science</em> (1884), Hampton Falls—full text, 19th c.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
       </div>
@@ -84,13 +129,13 @@
         <a class="lf-card" href="/family/lane-war-history.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-shield"></i></span>
           <h3 class="lf-card-title">War history</h3>
-          <p class="lf-card-desc">King Philip’s War and the Revolution—evidence-graded participants with map context.</p>
+          <p class="lf-card-desc">Who served or was named in war context? King Philip’s &amp; Revolution—graded evidence, maps—17th–18th c.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
         <a class="lf-card" href="/family/lane-memorial-wall.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-columns-gap"></i></span>
           <h3 class="lf-card-title">Memorial wall</h3>
-          <p class="lf-card-desc">A quiet grid for names and eras worth pausing on.</p>
+          <p class="lf-card-desc">Who to remember by year? Chronological wall of names; optional era context—not a claim of kinship.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
       </div>
@@ -105,13 +150,13 @@
         <a class="lf-card" href="/family/lane-pdf-gallery.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-images"></i></span>
           <h3 class="lf-card-title">Book plates</h3>
-          <p class="lf-card-desc">Plates from the Lane genealogy PDF, with page-to-tree candidates for review.</p>
+          <p class="lf-card-desc">What did the book look like? PDF plate extracts and tree join candidates—provenance first.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
         <a class="lf-card" href="/family/lane-occupations.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-briefcase"></i></span>
           <h3 class="lf-card-title">Occupations</h3>
-          <p class="lf-card-desc">How work appears across the tree—aggregated roles and people.</p>
+          <p class="lf-card-desc">What work recurs? Aggregated roles across the tree—18th–19th c. common.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
       </div>
@@ -126,11 +171,15 @@
         <a class="lf-card" href="/family/genealogy-import.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-camera"></i></span>
           <h3 class="lf-card-title">Photo import</h3>
-          <p class="lf-card-desc">Upload page photos for the genealogy import pipeline (camera or files).</p>
+          <p class="lf-card-desc">Add new pages to the pipeline? Camera or file upload for OCR and review.</p>
           <span class="lf-card-arrow">Open</span>
         </a>
       </div>
     </section>
+
+    <p class="lf-also-line">
+      Also in the Lane bar: <a href="/family/family-tree.html">Canvas tree</a> (large layout view, same data as the interactive tree).
+    </p>
 
     <p class="lf-footer-note">
       <a href="/">DevConnect Labs home</a>
@@ -141,6 +190,7 @@
 
   <script src="/shared/tts.js"></script>
   <script src="/family/js/lane-tts.js"></script>
+  <script src="/family/js/lane-family-ai.js" defer></script>
   <script>
     (function () {
       var dock = document.getElementById('lfDock');

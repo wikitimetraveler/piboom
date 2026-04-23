@@ -1,0 +1,117 @@
+{
+  "sourceNote": "Curated, non-overlapping year bands (inclusive) for rough coeval context only — not relationships to any Lane person.",
+  "figures": [
+    {
+      "id": "winthrop",
+      "label": "John Winthrop",
+      "blurb": "Bay Colony leader and early Massachusetts governorship, emblematic of Puritan New England in the 17th century.",
+      "startYear": 1600,
+      "endYear": 1699,
+      "sourceUrl": "https://en.wikipedia.org/wiki/John_Winthrop"
+    },
+    {
+      "id": "mather",
+      "label": "Cotton Mather",
+      "blurb": "Minister and writer associated with late colonial Boston intellectual and religious life.",
+      "startYear": 1700,
+      "endYear": 1727,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Cotton_Mather"
+    },
+    {
+      "id": "edwards",
+      "label": "Jonathan Edwards",
+      "blurb": "Theologian and revival figure of the First Great Awakening in colonial America.",
+      "startYear": 1728,
+      "endYear": 1758,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Jonathan_Edwards_(theologian)"
+    },
+    {
+      "id": "franklin",
+      "label": "Benjamin Franklin",
+      "blurb": "Printer, scientist, and statesman from Philadelphia bridging colonial politics and the Revolutionary era.",
+      "startYear": 1759,
+      "endYear": 1769,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Benjamin_Franklin"
+    },
+    {
+      "id": "revere",
+      "label": "Paul Revere",
+      "blurb": "Artisan and patriot whose midnight ride in 1775 is a familiar Revolutionary War touchstone in Massachusetts.",
+      "startYear": 1770,
+      "endYear": 1780,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Paul_Revere"
+    },
+    {
+      "id": "hamilton",
+      "label": "Alexander Hamilton",
+      "blurb": "First Secretary of the Treasury; deeply involved in the Federalist shaping of the early U.S. government.",
+      "startYear": 1781,
+      "endYear": 1791,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Alexander_Hamilton"
+    },
+    {
+      "id": "sacagawea",
+      "label": "Sacagawea",
+      "blurb": "Lemhi Shoshone guide on the 1804–06 Lewis and Clark expedition across the Louisiana Purchase west.",
+      "startYear": 1792,
+      "endYear": 1807,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Sacagawea"
+    },
+    {
+      "id": "truth",
+      "label": "Sojourner Truth",
+      "blurb": "Abolitionist and women’s rights speaker whose public ministry began after escaping enslavement in New York State.",
+      "startYear": 1808,
+      "endYear": 1862,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Sojourner_Truth"
+    },
+    {
+      "id": "stanton",
+      "label": "Elizabeth Cady Stanton",
+      "blurb": "Suffrage advocate and drafter of the 1848 Seneca Falls Declaration of Sentiments in New York.",
+      "startYear": 1863,
+      "endYear": 1885,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Elizabeth_Cady_Stanton"
+    },
+    {
+      "id": "dubois",
+      "label": "W. E. B. Du Bois",
+      "blurb": "Sociologist and civil rights leader; co-founder of the NAACP and a voice of the post-Reconstruction and Progressive eras.",
+      "startYear": 1886,
+      "endYear": 1910,
+      "sourceUrl": "https://en.wikipedia.org/wiki/W._E._B._Du_Bois"
+    },
+    {
+      "id": "eleanor",
+      "label": "Eleanor Roosevelt",
+      "blurb": "First Lady, diplomat, and UN human-rights work tied to the mid-20th century United States.",
+      "startYear": 1911,
+      "endYear": 1940,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Eleanor_Roosevelt"
+    },
+    {
+      "id": "marshall",
+      "label": "Thurgood Marshall",
+      "blurb": "Civil rights attorney and later the first Black justice on the U.S. Supreme Court (Brown v. Board era to late century).",
+      "startYear": 1941,
+      "endYear": 1974,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Thurgood_Marshall"
+    },
+    {
+      "id": "jordan",
+      "label": "Barbara Jordan",
+      "blurb": "Civil rights–era U.S. representative from Texas; noted for 1974 remarks on the Constitution and impeachment.",
+      "startYear": 1975,
+      "endYear": 1999,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Barbara_Jordan"
+    },
+    {
+      "id": "sotomayor",
+      "label": "Sonia Sotomayor",
+      "blurb": "U.S. Supreme Court justice whose appointment in 2009 continued trends toward a more demographically open federal bench.",
+      "startYear": 2000,
+      "endYear": 2100,
+      "sourceUrl": "https://en.wikipedia.org/wiki/Sonia_Sotomayor"
+    }
+  ]
+}

@@ -10,9 +10,14 @@
   let memorialMap = null;
   let memorialMarker = null;
   let modalRenderToken = 0;
+  let wallEraRenderToken = 0;
+  let eraDatasetsPromise = null;
+  let wallEraDebounceTimer = null;
+  let lastWallHoverLineId = null;
   const geocodeCache = new Map();
   const museumAccentByPersonId = new Map();
   const MEMORIAL_FLASH_KEY = 'laneMemorialFlashSeen';
+  const WALL_ERA_OPEN_KEY = 'laneMemorialWallEraOpen';
   const MEMORIAL_FLASH_IMAGE =
     '/family/assets/lane-genealogies-title-spread.png';
   const PRIMARY_SOURCE_URL = 'https://archive.org/details/lanegenealogies01chap/page/n7/mode/2up';
@@ -336,6 +341,40 @@
     `;
   }
 
+  /**
+   * Themed “See also” links when this profile’s fields support them (not claims of new relationships).
+   * @param {{ occList: string[], milText: string, portraitCount: number }} opts
+   */
+  function createSeeAlsoLaneToolsMarkup(opts) {
+    const occList = Array.isArray(opts.occList) ? opts.occList : [];
+    const mil = opts.milText != null && String(opts.milText).trim() !== '';
+    const hasPortraits = Number(opts.portraitCount) > 0;
+    const parts = [];
+    if (hasPortraits) {
+      parts.push(
+        '<a href="/family/lane-pdf-gallery.html" class="text-info">Book plates (curated portraits in this view)</a>'
+      );
+    }
+    if (occList.length) {
+      parts.push(
+        '<a href="/family/lane-occupations.html" class="text-info">Occupations (aggregated—other people may appear)</a>'
+      );
+    }
+    if (mil) {
+      parts.push(
+        '<a href="/family/lane-war-history.html" class="text-info">War history (themed site view)</a>'
+      );
+    }
+    if (!parts.length) return '';
+    return `
+    <div class="memorial-see-also small border-top border-secondary pt-3 mt-3">
+      <p class="text-muted text-uppercase mb-1 memorial-see-also-kicker">See also (same site)</p>
+      <p class="history-context-evidence-note small mb-2"><strong>Context:</strong> themed index pages. <strong>Evidence:</strong> the fields in this record summary.</p>
+      <p class="mb-0">${parts.join(' <span class="text-muted" aria-hidden="true">·</span> ')}</p>
+    </div>
+    `;
+  }
+
   function createMapCardMarkup(placeEntries) {
     const hasPlaces = placeEntries.length > 0;
     const placeList = hasPlaces
@@ -391,6 +430,259 @@
         ${placeList}
       </section>
     `;
+  }
+
+  function ensureEraDatasets() {
+    if (!eraDatasetsPromise) {
+      eraDatasetsPromise = import('/family/js/lane-memorial-era-api.mjs').then((m) => m.loadEraDatasets());
+    }
+    return eraDatasetsPromise;
+  }
+
+  function createEraContextMarkup() {
+    return `
+      <section class="memorial-profile-card mb-3 memorial-era-context" aria-label="Era context">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+          <h6 class="mb-0" id="memorialEraHeading">Era context (general U.S. history)</h6>
+          <button type="button" class="btn btn-sm btn-outline-light memorial-era-toggle" id="memorialEraToggle" aria-expanded="false" aria-controls="memorialEraPanel">Show era context</button>
+        </div>
+        <p class="small text-muted mb-0 history-context-evidence-note">
+          <strong>Context:</strong> general U.S. history (not a Lane family record). <strong>Evidence:</strong> birth, death, and places in Record Summary.
+        </p>
+        <div id="memorialEraPanel" class="memorial-era-panel-body d-none mt-3" role="region" aria-labelledby="memorialEraHeading" hidden>
+          <div class="row memorial-era-split">
+            <div class="col-lg-4 mb-3 mb-lg-0 memorial-era-col">
+              <h6 class="memorial-era-subhead small text-uppercase text-muted mb-2">Life coordinate</h6>
+              <div id="memorialEraLife"></div>
+            </div>
+            <div class="col-lg-8">
+              <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0 memorial-era-col">
+                  <h6 class="memorial-era-subhead small text-uppercase text-muted mb-2">U.S. president (term)</h6>
+                  <div id="memorialEraPresident"></div>
+                </div>
+                <div class="col-md-6 memorial-era-col">
+                  <h6 class="memorial-era-subhead small text-uppercase text-muted mb-2">Historical figure (curated band)</h6>
+                  <div id="memorialEraFigure"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p id="memorialEraAnnounce" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+      </section>
+    `;
+  }
+
+  function eraContextStale(tokenKind, renderToken) {
+    if (tokenKind === 'wall') return renderToken !== wallEraRenderToken;
+    return renderToken !== modalRenderToken;
+  }
+
+  /**
+   * @param {object} person
+   * @param {{ lifeEl: Element, presEl: Element, figEl: Element, announce: Element | null }} els
+   * @param {number} renderToken
+   * @param {string} announceName - e.g. "this profile" or a person's name
+   * @param {'modal' | 'wall'} [tokenKind]
+   */
+  async function fillEraContextForPerson(person, els, renderToken, announceName, tokenKind) {
+    const kind = tokenKind || 'modal';
+    const { lifeEl, presEl, figEl, announce } = els;
+    if (!lifeEl || !presEl || !figEl) return;
+    if (eraContextStale(kind, renderToken)) return;
+    lifeEl.innerHTML = '<p class="small text-muted mb-0">Loading…</p>';
+    presEl.innerHTML = '';
+    figEl.innerHTML = '';
+    try {
+      const mod = await import('/family/js/lane-memorial-era-api.mjs');
+      const { terms, figures } = await ensureEraDatasets();
+      if (eraContextStale(kind, renderToken)) return;
+      const mid = mod.getLifeMidDate(person.birthYear, person.deathYear);
+      const fmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
+      if (!mid) {
+        lifeEl.innerHTML =
+          '<p class="small text-muted mb-0">Add a parseable birth or death year to see an approximate life midpoint and era matches.</p>';
+        presEl.innerHTML = '<p class="small text-muted mb-0">—</p>';
+        figEl.innerHTML = '<p class="small text-muted mb-0">—</p>';
+        if (announce) announce.textContent = `Era context updated for ${announceName}.`;
+        return;
+      }
+      if (eraContextStale(kind, renderToken)) return;
+      const by = parseInt(person.birthYear, 10);
+      const dy = parseInt(person.deathYear, 10);
+      const lifeLines = [];
+      lifeLines.push(
+        `<p class="small mb-1"><strong>Approx. life midpoint</strong> (for matching): <time datetime="${esc(mid.toISOString())}">${esc(fmt.format(mid))}</time> (UTC)</p>`
+      );
+      if (Number.isFinite(by) && Number.isFinite(dy)) {
+        lifeLines.push(
+          `<p class="small text-muted mb-0">Based on birth year ${by} and death year ${dy}. This is a rough coordinate, not a biographical claim.</p>`
+        );
+      } else if (Number.isFinite(by)) {
+        lifeLines.push(
+          `<p class="small text-muted mb-0">Based on birth year ${by} only (death year missing).</p>`
+        );
+      } else {
+        lifeLines.push(
+          `<p class="small text-muted mb-0">Based on death year ${dy} only (birth year missing).</p>`
+        );
+      }
+      lifeEl.innerHTML = lifeLines.join('');
+
+      const pres = mod.pickPresidentForMidDate(terms, mid);
+      if (pres.mode === 'before') {
+        presEl.innerHTML = `<p class="small mb-1">The U.S. presidency began in 1789. This notional midpoint is <strong>before</strong> any president’s term.</p><p class="small text-muted mb-0">Colonial and Revolutionary-era context still applies to many New England lives in this period.</p>`;
+      } else if (pres.term && (pres.mode === 'overlap' || pres.mode === 'closest')) {
+        const range = mod.formatTermRange(pres.term.start, pres.term.end);
+        const note =
+          pres.mode === 'closest'
+            ? '<p class="small text-muted mb-0 mt-1">Nearest administration to the mid-life point (no term contained that exact date).</p>'
+            : '';
+        presEl.innerHTML = `<p class="small mb-1"><strong>${esc(pres.term.name)}</strong></p><p class="small mb-0">Term: ${esc(range)}</p>${note}`;
+      } else {
+        presEl.innerHTML = '<p class="small text-muted mb-0">Could not match this date to a president’s term.</p>';
+      }
+
+      const fig = mod.pickEraFigureForMidDate(figures, mid);
+      if (fig) {
+        const link = fig.sourceUrl
+          ? `<p class="small mb-0"><a href="${esc(fig.sourceUrl)}" target="_blank" rel="noopener noreferrer">Read more — external article (new tab)</a></p>`
+          : '';
+        figEl.innerHTML = `<p class="small mb-1"><strong>${esc(fig.label)}</strong> — roughly coeval (not a relationship to this person)</p><p class="small mb-2">${esc(fig.blurb)}</p>${link}`;
+      } else {
+        figEl.innerHTML = '<p class="small text-muted mb-0">No curated figure for this year band.</p>';
+      }
+      if (announce) announce.textContent = `Era context updated for ${announceName}.`;
+    } catch (e) {
+      if (eraContextStale(kind, renderToken)) return;
+      lifeEl.innerHTML = `<p class="small text-warning mb-0">Could not load era data. ${esc(e.message || 'Network error')}</p>`;
+      presEl.innerHTML = '';
+      figEl.innerHTML = '';
+    }
+  }
+
+  async function setupEraContextPanel(person, renderToken) {
+    const toggle = document.getElementById('memorialEraToggle');
+    const panel = document.getElementById('memorialEraPanel');
+    const lifeEl = document.getElementById('memorialEraLife');
+    const presEl = document.getElementById('memorialEraPresident');
+    const figEl = document.getElementById('memorialEraFigure');
+    const announce = document.getElementById('memorialEraAnnounce');
+    if (!toggle || !panel || !lifeEl || !presEl || !figEl) return;
+
+    const els = { lifeEl, presEl, figEl, announce };
+    const fill = function () {
+      return fillEraContextForPerson(person, els, renderToken, 'this profile', 'modal');
+    };
+
+    await fill();
+
+    toggle.onclick = function () {
+      const hidden = panel.classList.contains('d-none');
+      if (hidden) {
+        panel.classList.remove('d-none');
+        panel.removeAttribute('hidden');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.textContent = 'Hide era context';
+        void fill();
+      } else {
+        panel.classList.add('d-none');
+        panel.setAttribute('hidden', 'hidden');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.textContent = 'Show era context';
+      }
+    };
+  }
+
+  function isMemorialWallWide() {
+    return window.matchMedia && window.matchMedia('(min-width: 992px)').matches;
+  }
+
+  function setupMemorialWallEraUI() {
+    const layout = document.getElementById('memorialWallLayout');
+    const split = document.getElementById('memorialWallEraSplit');
+    const toggle = document.getElementById('memorialWallEraToggle');
+    const backdrop = document.getElementById('memorialWallEraBackdrop');
+    const closeBtn = document.getElementById('memorialWallEraClose');
+    if (!layout || !split || !toggle) return;
+
+    const modalIsOpen = () =>
+      typeof window.jQuery === 'function' && window.jQuery('#memorialModal').hasClass('show');
+
+    function setOpen(open) {
+      if (open) {
+        layout.classList.add('memorial-wall-layout--era-open');
+        split.setAttribute('aria-hidden', 'false');
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.textContent = 'Close era context';
+        if (closeBtn) closeBtn.removeAttribute('hidden');
+        if (backdrop) {
+          if (isMemorialWallWide()) {
+            backdrop.setAttribute('hidden', 'hidden');
+            backdrop.setAttribute('aria-hidden', 'true');
+          } else {
+            backdrop.removeAttribute('hidden');
+            backdrop.setAttribute('aria-hidden', 'false');
+          }
+        }
+        if (!isMemorialWallWide()) {
+          try {
+            split.setAttribute('tabindex', '-1');
+            split.focus({ preventScroll: true });
+          } catch (e) {
+            /* pass */
+          }
+        }
+      } else {
+        layout.classList.remove('memorial-wall-layout--era-open');
+        split.setAttribute('aria-hidden', 'true');
+        split.removeAttribute('tabindex');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.textContent = 'Era context';
+        if (closeBtn) closeBtn.setAttribute('hidden', 'hidden');
+        if (backdrop) {
+          backdrop.setAttribute('hidden', 'hidden');
+          backdrop.setAttribute('aria-hidden', 'true');
+        }
+      }
+      try {
+        if (isMemorialWallWide()) {
+          localStorage.setItem(WALL_ERA_OPEN_KEY, open ? '1' : '0');
+        } else if (!open) {
+          localStorage.setItem(WALL_ERA_OPEN_KEY, '0');
+        }
+      } catch (e) {
+        /* pass */
+      }
+    }
+
+    function onToggle() {
+      const isOpen = layout.classList.contains('memorial-wall-layout--era-open');
+      setOpen(!isOpen);
+    }
+
+    toggle.addEventListener('click', onToggle);
+    if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
+    if (backdrop) {
+      backdrop.addEventListener('click', () => setOpen(false));
+    }
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Escape' || !layout.classList.contains('memorial-wall-layout--era-open')) return;
+      if (modalIsOpen()) return;
+      setOpen(false);
+    });
+
+    window.addEventListener('resize', () => {
+      if (isMemorialWallWide() && layout.classList.contains('memorial-wall-layout--era-open') && backdrop) {
+        backdrop.setAttribute('hidden', 'hidden');
+        backdrop.setAttribute('aria-hidden', 'true');
+      }
+    });
+
+    if (localStorage.getItem(WALL_ERA_OPEN_KEY) === '1' && isMemorialWallWide()) {
+      setOpen(true);
+    }
   }
 
   function renderMapEmptyState(title, copy) {
@@ -583,7 +875,97 @@
     });
   }
 
+  function canMemorialPrimaryHover() {
+    return window.matchMedia && window.matchMedia('(hover: hover)').matches;
+  }
+
+  async function loadWallEraByPersonId(personId) {
+    if (!personId) return;
+    const wLife = document.getElementById('memorialWallEraLife');
+    const wPres = document.getElementById('memorialWallEraPresident');
+    const wFig = document.getElementById('memorialWallEraFigure');
+    const wAnn = document.getElementById('memorialWallEraAnnounce');
+    if (!wLife || !wPres || !wFig) return;
+
+    const t = ++wallEraRenderToken;
+    wLife.innerHTML = '<p class="small text-muted mb-0">Loading…</p>';
+    wPres.innerHTML = '';
+    wFig.innerHTML = '';
+
+    try {
+      const res = await fetch(`${API_BASE}/${encodeURIComponent(personId)}`);
+      const data = await res.json().catch(() => ({}));
+      if (t !== wallEraRenderToken) return;
+      if (!res.ok || !data.success || !data.person) {
+        wLife.innerHTML = `<p class="small text-warning mb-0">${esc(data.error || 'Profile not found.')}</p>`;
+        wPres.innerHTML = '<p class="small text-muted mb-0">—</p>';
+        wFig.innerHTML = '<p class="small text-muted mb-0">—</p>';
+        return;
+      }
+      const p = data.person;
+      await fillEraContextForPerson(
+        p,
+        { lifeEl: wLife, presEl: wPres, figEl: wFig, announce: wAnn },
+        t,
+        p.name || 'this person',
+        'wall'
+      );
+    } catch (e) {
+      if (t !== wallEraRenderToken) return;
+      wLife.innerHTML = `<p class="small text-warning mb-0">Could not load profile. ${esc(e.message || 'Network error')}</p>`;
+      wPres.innerHTML = '';
+      wFig.innerHTML = '';
+    }
+  }
+
+  function scheduleWallEraFromHover(personId) {
+    clearTimeout(wallEraDebounceTimer);
+    wallEraDebounceTimer = setTimeout(() => {
+      void loadWallEraByPersonId(personId);
+    }, 160);
+  }
+
+  function wireWallEraHover() {
+    const wall = document.getElementById('memorialWall');
+    if (!wall) return;
+
+    wall.addEventListener(
+      'mouseover',
+      (e) => {
+        if (!canMemorialPrimaryHover()) return;
+        const line = e.target.closest('.memorial-line[data-person-id]');
+        if (!line || !wall.contains(line)) return;
+        const id = String(line.dataset.personId || '');
+        if (!id) return;
+        if (id === lastWallHoverLineId) return;
+        lastWallHoverLineId = id;
+        scheduleWallEraFromHover(id);
+      },
+      true
+    );
+
+    wall.addEventListener(
+      'mouseout',
+      (e) => {
+        if (!canMemorialPrimaryHover()) return;
+        const rel = e.relatedTarget;
+        if (rel && wall.contains(rel)) return;
+        lastWallHoverLineId = null;
+      },
+      true
+    );
+
+    wall.addEventListener('focusin', (e) => {
+      const line = e.target && e.target.closest && e.target.closest('.memorial-line[data-person-id]');
+      if (!line || !wall.contains(line) || e.target !== line) return;
+      const id = String(line.dataset.personId || '');
+      if (!id) return;
+      void loadWallEraByPersonId(id);
+    });
+  }
+
   function renderWall(people) {
+    lastWallHoverLineId = null;
     const host = document.getElementById('memorialWall');
     const { centuries, byCentury, undated } = groupByCenturyAndDecade(people);
     renderCenturyJump(centuries);
@@ -796,6 +1178,7 @@
               ${infoLine('Recorded died', p.died)}
               ${infoLine('Burial', p.burial)}
             </section>
+            ${createEraContextMarkup()}
             ${familySummary}
             ${
               text || metaDetails
@@ -808,6 +1191,11 @@
                 `
                 : ''
             }
+            ${createSeeAlsoLaneToolsMarkup({
+              occList,
+              milText,
+              portraitCount: portraits.length
+            })}
             <p class="mb-0 mt-3 memorial-profile-links"><a href="/family/genealogy.html" class="text-info">Open family tree</a></p>
           </div>
           <div>
@@ -816,6 +1204,7 @@
         </div>
       `;
 
+      await setupEraContextPanel(p, renderToken);
       renderPlaceContext(placeEntries, renderToken);
     } catch (e) {
       titleEl.textContent = 'Error';
@@ -904,10 +1293,13 @@
 
   document.getElementById('bookOnly').addEventListener('change', load);
   wireClicks();
+  wireWallEraHover();
   initQuickFilters();
+  setupMemorialWallEraUI();
   initMemorialFlash();
   if (typeof window.initHistoryQuickNav === 'function') {
     window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });
   }
   load();
+  ensureEraDatasets().catch(() => {});
 })();
