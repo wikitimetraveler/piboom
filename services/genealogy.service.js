@@ -142,8 +142,58 @@ export function getLanePdfPortraitsForPerson(personId) {
     }));
 }
 
-const WAR_DEFINITIONS = {
-  'king-philips-war': {
+const SERVICE_SIGNAL_TERMS = [
+  'soldier',
+  'troop',
+  'trooper',
+  'troops',
+  'service',
+  'served',
+  'serving',
+  'enlist',
+  'enlisted',
+  'enlistment',
+  'discharge',
+  'veteran',
+  'militia',
+  'regiment',
+  'company',
+  'infantry',
+  'artillery',
+  'cavalry',
+  'dragoons',
+  'army',
+  'navy',
+  'marine',
+  'officer',
+  'capt',
+  'captain',
+  'lt',
+  'lieutenant',
+  'ensign',
+  'sergeant',
+  'corporal',
+  'major',
+  'colonel',
+  'general',
+  'surgeon',
+  'pension'
+];
+
+const RELATIONSHIP_SIGNAL_TERMS = [
+  'm.',
+  'married',
+  'husband',
+  'wife',
+  'widow',
+  'widower',
+  'spouse',
+  'her cousin',
+  'his cousin'
+];
+
+const CONFLICT_DEFINITIONS = [
+  {
     slug: 'king-philips-war',
     label: "King Philip's War",
     years: [1675, 1678],
@@ -162,7 +212,13 @@ const WAR_DEFINITIONS = {
       'peskeompskut'
     ]
   },
-  'revolutionary-war': {
+  {
+    slug: 'french-and-indian-war',
+    label: 'French and Indian War',
+    years: [1754, 1763],
+    keywords: ['french and indian war', 'seven years war', 'braddock']
+  },
+  {
     slug: 'revolutionary-war',
     label: 'Revolutionary War',
     years: [1775, 1783],
@@ -181,8 +237,49 @@ const WAR_DEFINITIONS = {
       'hessian',
       'burgoyne'
     ]
+  },
+  {
+    slug: 'war-of-1812',
+    label: 'War of 1812',
+    years: [1812, 1815],
+    keywords: ['war of 1812', '1812']
+  },
+  {
+    slug: 'mexican-american-war',
+    label: 'Mexican-American War',
+    years: [1846, 1848],
+    keywords: ['mexican war', 'mexican american war', 'with scott']
+  },
+  {
+    slug: 'civil-war',
+    label: 'Civil War',
+    years: [1861, 1865],
+    keywords: ['civil war', 'war of the rebellion', 'union soldier', 'confederate', 'union army']
+  },
+  {
+    slug: 'spanish-american-war',
+    label: 'Spanish-American War',
+    years: [1898, 1898],
+    keywords: ['spanish american war']
+  },
+  {
+    slug: 'world-war-i',
+    label: 'World War I',
+    years: [1914, 1918],
+    keywords: ['world war i', 'world war 1', 'wwi', 'great war']
+  },
+  {
+    slug: 'world-war-ii',
+    label: 'World War II',
+    years: [1939, 1945],
+    keywords: ['world war ii', 'world war 2', 'wwii']
   }
-};
+];
+
+const WAR_DEFINITIONS = CONFLICT_DEFINITIONS.reduce((acc, war) => {
+  acc[war.slug] = war;
+  return acc;
+}, {});
 
 const DEFAULT_MUSEUM_CONTENT = {
   featuredStory: {
@@ -338,6 +435,22 @@ function normalizeSpaces(value = '') {
   return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
+function termPattern(terms = []) {
+  const escaped = terms
+    .map((t) => String(t || '').trim())
+    .filter(Boolean)
+    .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .map((t) => t.replace(/\\\./g, '[.]?'));
+  return escaped.length ? new RegExp(`\\b(?:${escaped.join('|')})\\b`, 'i') : null;
+}
+
+const RELATIONSHIP_PATTERN = termPattern(RELATIONSHIP_SIGNAL_TERMS);
+const SERVICE_PATTERN = termPattern(SERVICE_SIGNAL_TERMS);
+
+function hasServiceSignal(text = '') {
+  return SERVICE_PATTERN ? SERVICE_PATTERN.test(String(text || '')) : false;
+}
+
 function extractWarAssociationText(node = {}) {
   const text = [];
   if (node.text) text.push(String(node.text));
@@ -353,14 +466,12 @@ function extractWarAssociationText(node = {}) {
 }
 
 function detectFamilyWarAssociation(node = {}, warDef = {}) {
-  const relationshipPattern = /\b(m\.|married|husband|wife|widow|widower|spouse|her cousin|his cousin)\b/i;
-  const servicePattern = /\b(soldier|served|service|capt\.?|captain|militia|private|sergeant|lieutenant|colonel)\b/i;
   const snippets = [];
   const lines = extractWarAssociationText(node);
   for (const line of lines) {
     if (!hasKeyword(line, warDef.keywords)) continue;
-    if (!relationshipPattern.test(line)) continue;
-    if (!servicePattern.test(line)) continue;
+    if (!RELATIONSHIP_PATTERN || !RELATIONSHIP_PATTERN.test(line)) continue;
+    if (!hasServiceSignal(line)) continue;
     snippets.push(normalizeSpaces(line));
   }
   return {
@@ -438,11 +549,40 @@ function extractParticipantPlaces(node = {}) {
   return compactUnique(places);
 }
 
-function scoreWarMatch(node, warDef) {
+function summarizeMilitarySignal(node = {}) {
   const evidence = extractMilitaryEvidence(node);
+  const serviceSignalEvidence = evidence.filter((line) => hasServiceSignal(line));
+  return {
+    evidence,
+    hasMilitarySignal: serviceSignalEvidence.length > 0,
+    serviceSignalEvidence
+  };
+}
+
+function parseYearNumber(value) {
+  const y = parseInt(value, 10);
+  return Number.isFinite(y) ? y : null;
+}
+
+function yearsOverlapRange(birthYear, deathYear, range = []) {
+  if (!Array.isArray(range) || range.length !== 2) return false;
+  const start = Number(range[0]);
+  const end = Number(range[1]);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+  const by = Number.isFinite(birthYear) ? birthYear : null;
+  const dy = Number.isFinite(deathYear) ? deathYear : null;
+  if (by === null && dy === null) return false;
+  if (by !== null && dy !== null) return !(dy < start || by > end);
+  if (by !== null) return by <= end + 65;
+  return dy >= start - 65;
+}
+
+function analyzeConflictMatch(node, warDef, militarySignal) {
+  const evidence = militarySignal.evidence;
   let structured = false;
   let semiStructured = false;
   let textOnly = false;
+  const hasKeywordMatch = evidence.some((line) => hasKeyword(line, warDef.keywords));
 
   const occupation = Array.isArray(node.occupation) ? node.occupation : [];
   for (const occ of occupation) {
@@ -471,18 +611,45 @@ function scoreWarMatch(node, warDef) {
     textOnly = true;
   }
 
-  if (!structured && !semiStructured && !textOnly) {
+  const birthYear = parseYearNumber(node.birthYear);
+  const deathYear = parseYearNumber(node.deathYear);
+  const yearSignal = yearsOverlapRange(birthYear, deathYear, warDef.years);
+  const inferredBySignalAndYears = !hasKeywordMatch && militarySignal.hasMilitarySignal && yearSignal;
+
+  return {
+    structured,
+    semiStructured,
+    textOnly,
+    hasKeywordMatch,
+    yearSignal,
+    inferredBySignalAndYears,
+    matched: structured || semiStructured || textOnly || inferredBySignalAndYears
+  };
+}
+
+function scoreWarMatch(node, warDef) {
+  const militarySignal = summarizeMilitarySignal(node);
+  const conflict = analyzeConflictMatch(node, warDef, militarySignal);
+  if (!conflict.matched) {
     return null;
   }
 
   const familyAssociation = detectFamilyWarAssociation(node, warDef);
   let confidence = 'low';
-  if (structured) confidence = 'high';
-  else if (semiStructured || familyAssociation.isFamilyAssociated) confidence = 'medium';
+  if (conflict.structured) confidence = 'high';
+  else if (
+    conflict.semiStructured ||
+    familyAssociation.isFamilyAssociated ||
+    conflict.inferredBySignalAndYears
+  ) {
+    confidence = 'medium';
+  }
 
-  const matchedEvidence = evidence.filter((line) => hasKeyword(line, warDef.keywords)).slice(0, 8);
+  const matchedEvidence = militarySignal.evidence
+    .filter((line) => hasKeyword(line, warDef.keywords) || (conflict.inferredBySignalAndYears && hasServiceSignal(line)))
+    .slice(0, 8);
   const associationType =
-    !structured && familyAssociation.isFamilyAssociated ? 'family-associated' : 'service-member';
+    !conflict.structured && familyAssociation.isFamilyAssociated ? 'family-associated' : 'service-member';
   const associatedPeople = associationType === 'family-associated' ? extractAssociatedServicePeople(node) : [];
   const associationNotes =
     associationType === 'family-associated'
@@ -494,10 +661,11 @@ function scoreWarMatch(node, warDef) {
 
   return {
     confidence,
-    evidence: matchedEvidence.length ? matchedEvidence : evidence.slice(0, 4),
+    evidence: matchedEvidence.length ? matchedEvidence : militarySignal.evidence.slice(0, 4),
     associationType,
     associatedPeople,
-    associationNotes
+    associationNotes,
+    hasMilitarySignal: militarySignal.hasMilitarySignal
   };
 }
 
@@ -656,9 +824,77 @@ export function getWarCampaignsSummary() {
       participantCount: participants.length,
       confidenceCounts: counts
     };
-  });
+  }).filter((c) => c.participantCount > 0);
   return { campaigns };
 }
+
+export function getMilitaryDeepScanReport() {
+  const people = getAllPeople();
+  const byConflict = Object.fromEntries(
+    Object.values(WAR_DEFINITIONS).map((w) => [w.slug, { war: w, participants: [] }])
+  );
+  const suspicious = [];
+  let serviceSignalHits = 0;
+
+  for (const person of people) {
+    const militarySignal = summarizeMilitarySignal(person);
+    if (!militarySignal.hasMilitarySignal) continue;
+    serviceSignalHits += 1;
+
+    let matchedAny = false;
+    for (const war of Object.values(WAR_DEFINITIONS)) {
+      const scored = scoreWarMatch(person, war);
+      if (!scored) continue;
+      matchedAny = true;
+      byConflict[war.slug].participants.push({
+        id: person.id,
+        name: person.name,
+        birthYear: person.birthYear,
+        deathYear: person.deathYear,
+        confidence: scored.confidence,
+        associationType: scored.associationType,
+        evidence: scored.evidence.slice(0, 3)
+      });
+    }
+
+    if (!matchedAny) {
+      suspicious.push({
+        id: person.id,
+        name: person.name,
+        birthYear: person.birthYear,
+        deathYear: person.deathYear,
+        evidence: militarySignal.serviceSignalEvidence.slice(0, 3)
+      });
+    }
+  }
+
+  const conflicts = Object.values(byConflict)
+    .filter((entry) => entry.participants.length > 0)
+    .map((entry) => ({
+      slug: entry.war.slug,
+      label: entry.war.label,
+      years: entry.war.years,
+      participantCount: entry.participants.length,
+      participants: entry.participants
+    }));
+
+  return {
+    scannedPeople: people.length,
+    serviceSignalHits,
+    conflictCount: conflicts.length,
+    conflicts,
+    suspiciousUnmatched: suspicious
+  };
+}
+
+export const __test__ = {
+  SERVICE_SIGNAL_TERMS,
+  hasServiceSignal,
+  summarizeMilitarySignal,
+  analyzeConflictMatch,
+  scoreWarMatch,
+  WAR_DEFINITIONS
+};
 
 function titleCaseWords(value = '') {
   return String(value)
@@ -1076,6 +1312,7 @@ export default {
   getProminentLanes,
   getWarParticipants,
   getWarCampaignsSummary,
+  getMilitaryDeepScanReport,
   getOccupationSummary,
   getDirectAncestorStory,
   getLanePdfGalleryData,
