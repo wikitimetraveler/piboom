@@ -140,6 +140,22 @@
           "kind": "other"
         }
       ]
+    },
+    {
+      "order": 5,
+      "personId": 1024,
+      "displayName": "Captain Aaron G. Lane",
+      "personQuery": "Aaron G. Lane",
+      "caption": "Mojave pioneer; established Lane's Crossing ranch and traveler store (1859)",
+      "eraLabel": "1817–1883 · Mojave River / San Bernardino County",
+      "blurb": "Veteran of the Mexican-American War and a Forty-niner. In 1859 he established the ranch and traveler store at Lane's Crossing on the Mormon Road, recognized as the first settlement on the Mojave River.",
+      "links": [
+        {
+          "label": "Wikipedia — Lane's Crossing",
+          "url": "https://en.wikipedia.org/wiki/Lane%27s_Crossing",
+          "kind": "other"
+        }
+      ]
     }
   ],
   "lunarExhibit": {
