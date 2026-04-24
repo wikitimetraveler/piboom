@@ -29,6 +29,44 @@ const CAMPAIGN_CONTEXT = {
     { year: 1776, event: 'Independence declared; militia and continental forces expand.' },
     { year: 1778, event: 'Women sustain wartime economies, travel with camps in support roles, and preserve community records.' },
     { year: 1783, event: 'Treaty of Paris formally ends the war.' }
+  ],
+  'french-and-indian-war': [
+    { year: 1754, event: 'Imperial rivalry expands into North American frontier campaigns.' },
+    { year: 1755, event: 'Fort and supply routes shape local militia service and risks.' },
+    { year: 1758, event: 'Families absorb labor and provisioning burdens during long mobilizations.' },
+    { year: 1763, event: 'Treaty settlements reshape control and migration pressures.' }
+  ],
+  'war-of-1812': [
+    { year: 1812, event: 'War declared between the United States and Britain.' },
+    { year: 1813, event: 'Regional militia and regular units guard coasts and frontiers.' },
+    { year: 1814, event: 'Supply, transport, and communication networks become decisive.' },
+    { year: 1815, event: 'Treaty of Ghent ends formal hostilities.' }
+  ],
+  'mexican-american-war': [
+    { year: 1846, event: 'War opens across Texas, northern Mexico, and Pacific routes.' },
+    { year: 1847, event: 'Campaigns toward Mexico City draw volunteers and regular forces.' },
+    { year: 1848, event: 'Treaty of Guadalupe Hidalgo redraws U.S. territorial boundaries.' }
+  ],
+  'civil-war': [
+    { year: 1861, event: 'Secession crisis escalates to national civil war.' },
+    { year: 1862, event: 'Large volunteer formations and rail logistics intensify campaigns.' },
+    { year: 1863, event: 'Gettysburg and Vicksburg mark turning points in strategy.' },
+    { year: 1865, event: 'Confederate collapse ends major combat operations.' }
+  ],
+  'spanish-american-war': [
+    { year: 1898, event: 'Short conflict expands U.S. military operations overseas.' },
+    { year: 1898, event: 'Naval and expeditionary campaigns dominate outcomes.' }
+  ],
+  'world-war-i': [
+    { year: 1914, event: 'European war begins before later U.S. entry.' },
+    { year: 1917, event: 'U.S. mobilization accelerates recruitment and logistics.' },
+    { year: 1918, event: 'Armistice ends major fighting on the Western Front.' }
+  ],
+  'world-war-ii': [
+    { year: 1939, event: 'Global war begins in Europe and expands worldwide.' },
+    { year: 1941, event: 'U.S. entry creates full-scale mobilization across services.' },
+    { year: 1944, event: 'Multi-theater offensives accelerate allied advances.' },
+    { year: 1945, event: 'Axis surrender ends the war in Europe and the Pacific.' }
   ]
 };
 
@@ -83,10 +121,12 @@ function associationLabel(entry) {
 
 function renderCampaignButtons() {
   const host = document.getElementById('campaignButtons');
+  host.setAttribute('role', 'tablist');
+  host.setAttribute('aria-label', 'War campaign tabs');
   host.innerHTML = allCampaigns
     .map(
       (c) =>
-        `<button class="btn btn-outline-light btn-sm campaign-btn ${c.slug === activeWarSlug ? 'active' : ''}" data-war="${esc(c.slug)}">${esc(c.label)} <span class="badge badge-secondary ml-1">${esc(c.participantCount)}</span></button>`
+        `<button class="btn btn-outline-light btn-sm campaign-btn ${c.slug === activeWarSlug ? 'active' : ''}" role="tab" aria-selected="${c.slug === activeWarSlug ? 'true' : 'false'}" data-war="${esc(c.slug)}">${esc(c.label)} <span class="badge badge-secondary ml-1">${esc(c.participantCount)}</span></button>`
     )
     .join('');
   host.querySelectorAll('.campaign-btn').forEach((btn) => {
@@ -100,7 +140,7 @@ function renderCampaignButtons() {
 
 function renderTimeline() {
   const box = document.getElementById('timelineBox');
-  const context = CAMPAIGN_CONTEXT[activeWarSlug] || [];
+  const context = campaignContextFor(activeWarSlug);
   box.innerHTML = context
     .map(
       (item) => `
@@ -111,6 +151,49 @@ function renderTimeline() {
     `
     )
     .join('');
+}
+
+function campaignContextFor(warSlug) {
+  const listed = CAMPAIGN_CONTEXT[warSlug];
+  if (Array.isArray(listed) && listed.length) return listed;
+  const campaign = allCampaigns.find((c) => c.slug === warSlug);
+  const years = Array.isArray(campaign?.years) ? campaign.years : [];
+  const start = Number(years[0]);
+  const end = Number(years[1]);
+  if (Number.isFinite(start) && Number.isFinite(end)) {
+    return [
+      { year: start, event: `${campaign?.label || 'Campaign'} begins in this record window.` },
+      { year: Math.floor((start + end) / 2), event: 'Military movement, logistics, and local civilian support shape outcomes.' },
+      { year: end, event: 'Campaign window closes; evidence confidence remains person-specific.' }
+    ];
+  }
+  return [{ year: '—', event: 'Context timeline not yet curated for this campaign.' }];
+}
+
+function renderCampaignContextPanel() {
+  const host = document.getElementById('warContextHost');
+  if (!host) return;
+  const campaign = allCampaigns.find((c) => c.slug === activeWarSlug);
+  const contextItems = campaignContextFor(activeWarSlug);
+  const itemsHtml = contextItems
+    .map(
+      (item) => `
+      <li class="war-context-item mb-2">
+        <span class="war-context-year">${esc(item.year)}</span>
+        <span class="war-context-event">${esc(item.event)}</span>
+      </li>
+    `
+    )
+    .join('');
+
+  host.innerHTML = `
+    <div class="war-context-card">
+      <h4 class="h6 mb-2">${esc(campaign?.label || 'Campaign context')}</h4>
+      <p class="small text-muted mb-2">Campaign range: ${esc((campaign?.years || []).join(' - ') || 'Unknown')}</p>
+      <ul class="list-unstyled mb-0">${itemsHtml}</ul>
+      <p class="small text-muted mt-2 mb-0">Use each participant evidence panel for Lane-specific proof and confidence.</p>
+    </div>
+  `;
 }
 
 function renderParticipantsList() {
@@ -415,6 +498,7 @@ async function loadParticipants() {
   document.getElementById('campaignTitle').textContent = campaign ? campaign.label : 'War Campaign';
   document.getElementById('campaignCount').textContent = `${activeParticipants.length} participants`;
   renderTimeline();
+  renderCampaignContextPanel();
   renderParticipantsList();
   await renderAllMapLayers();
 }

@@ -142,6 +142,60 @@ body.lane-war-page .text-muted {
 .war-tabs .btn {
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
+  border-radius: 999px;
+}
+
+.war-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.war-tabs .campaign-btn {
+  border-color: #3a4a5f;
+  color: #cfd9e7;
+  background: transparent;
+}
+
+.war-tabs .campaign-btn.active,
+.war-tabs .campaign-btn[aria-selected="true"] {
+  border-color: #caa56c;
+  color: #f6e8cc;
+  background: rgba(202, 165, 108, 0.18);
+}
+
+.war-tabs .campaign-btn:focus-visible {
+  outline: 2px solid rgba(202, 165, 108, 0.8);
+  outline-offset: 1px;
+}
+
+.war-context-host {
+  margin-top: 0.4rem;
+}
+
+.war-context-card {
+  background: #182131;
+  border: 1px solid #314159;
+  border-radius: 10px;
+  padding: 0.8rem 0.9rem;
+}
+
+.war-context-item {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: 0.55rem;
+}
+
+.war-context-year {
+  color: #d4b27a;
+  font-weight: 700;
+  font-size: 0.83rem;
+}
+
+.war-context-event {
+  color: #cfd9e7;
+  font-size: 0.85rem;
+  line-height: 1.35;
 }
 
 .participant-list {
@@ -286,5 +340,21 @@ body.lane-war-page .text-muted {
   }
   #warMap {
     height: 380px;
+  }
+
+  .war-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.2rem;
+  }
+
+  .war-tabs .campaign-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .war-context-item {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
   }
 }

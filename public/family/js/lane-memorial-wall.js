@@ -10,14 +10,10 @@
   let memorialMap = null;
   let memorialMarker = null;
   let modalRenderToken = 0;
-  let wallEraRenderToken = 0;
   let eraDatasetsPromise = null;
-  let wallEraDebounceTimer = null;
-  let lastWallHoverLineId = null;
   const geocodeCache = new Map();
   const museumAccentByPersonId = new Map();
   const MEMORIAL_FLASH_KEY = 'laneMemorialFlashSeen';
-  const WALL_ERA_OPEN_KEY = 'laneMemorialWallEraOpen';
   const MEMORIAL_FLASH_IMAGE =
     '/family/assets/lane-genealogies-title-spread.png';
   const PRIMARY_SOURCE_URL = 'https://archive.org/details/lanegenealogies01chap/page/n7/mode/2up';
@@ -474,8 +470,7 @@
     `;
   }
 
-  function eraContextStale(tokenKind, renderToken) {
-    if (tokenKind === 'wall') return renderToken !== wallEraRenderToken;
+  function eraContextStaleForModal(renderToken) {
     return renderToken !== modalRenderToken;
   }
 
@@ -484,20 +479,18 @@
    * @param {{ lifeEl: Element, presEl: Element, figEl: Element, announce: Element | null }} els
    * @param {number} renderToken
    * @param {string} announceName - e.g. "this profile" or a person's name
-   * @param {'modal' | 'wall'} [tokenKind]
    */
-  async function fillEraContextForPerson(person, els, renderToken, announceName, tokenKind) {
-    const kind = tokenKind || 'modal';
+  async function fillEraContextForPerson(person, els, renderToken, announceName) {
     const { lifeEl, presEl, figEl, announce } = els;
     if (!lifeEl || !presEl || !figEl) return;
-    if (eraContextStale(kind, renderToken)) return;
+    if (eraContextStaleForModal(renderToken)) return;
     lifeEl.innerHTML = '<p class="small text-muted mb-0">Loading…</p>';
     presEl.innerHTML = '';
     figEl.innerHTML = '';
     try {
       const mod = await import('/family/js/lane-memorial-era-api.mjs');
       const { terms, figures } = await ensureEraDatasets();
-      if (eraContextStale(kind, renderToken)) return;
+      if (eraContextStaleForModal(renderToken)) return;
       const mid = mod.getLifeMidDate(person.birthYear, person.deathYear);
       const fmt = new Intl.DateTimeFormat('en-US', { dateStyle: 'long', timeZone: 'UTC' });
       if (!mid) {
@@ -508,7 +501,7 @@
         if (announce) announce.textContent = `Era context updated for ${announceName}.`;
         return;
       }
-      if (eraContextStale(kind, renderToken)) return;
+      if (eraContextStaleForModal(renderToken)) return;
       const by = parseInt(person.birthYear, 10);
       const dy = parseInt(person.deathYear, 10);
       const lifeLines = [];
@@ -555,7 +548,7 @@
       }
       if (announce) announce.textContent = `Era context updated for ${announceName}.`;
     } catch (e) {
-      if (eraContextStale(kind, renderToken)) return;
+      if (eraContextStaleForModal(renderToken)) return;
       lifeEl.innerHTML = `<p class="small text-warning mb-0">Could not load era data. ${esc(e.message || 'Network error')}</p>`;
       presEl.innerHTML = '';
       figEl.innerHTML = '';
@@ -573,7 +566,7 @@
 
     const els = { lifeEl, presEl, figEl, announce };
     const fill = function () {
-      return fillEraContextForPerson(person, els, renderToken, 'this profile', 'modal');
+      return fillEraContextForPerson(person, els, renderToken, 'this profile');
     };
 
     await fill();
@@ -593,96 +586,6 @@
         toggle.textContent = 'Show era context';
       }
     };
-  }
-
-  function isMemorialWallWide() {
-    return window.matchMedia && window.matchMedia('(min-width: 992px)').matches;
-  }
-
-  function setupMemorialWallEraUI() {
-    const layout = document.getElementById('memorialWallLayout');
-    const split = document.getElementById('memorialWallEraSplit');
-    const toggle = document.getElementById('memorialWallEraToggle');
-    const backdrop = document.getElementById('memorialWallEraBackdrop');
-    const closeBtn = document.getElementById('memorialWallEraClose');
-    if (!layout || !split || !toggle) return;
-
-    const modalIsOpen = () =>
-      typeof window.jQuery === 'function' && window.jQuery('#memorialModal').hasClass('show');
-
-    function setOpen(open) {
-      if (open) {
-        layout.classList.add('memorial-wall-layout--era-open');
-        split.setAttribute('aria-hidden', 'false');
-        toggle.setAttribute('aria-expanded', 'true');
-        toggle.textContent = 'Close era context';
-        if (closeBtn) closeBtn.removeAttribute('hidden');
-        if (backdrop) {
-          if (isMemorialWallWide()) {
-            backdrop.setAttribute('hidden', 'hidden');
-            backdrop.setAttribute('aria-hidden', 'true');
-          } else {
-            backdrop.removeAttribute('hidden');
-            backdrop.setAttribute('aria-hidden', 'false');
-          }
-        }
-        if (!isMemorialWallWide()) {
-          try {
-            split.setAttribute('tabindex', '-1');
-            split.focus({ preventScroll: true });
-          } catch (e) {
-            /* pass */
-          }
-        }
-      } else {
-        layout.classList.remove('memorial-wall-layout--era-open');
-        split.setAttribute('aria-hidden', 'true');
-        split.removeAttribute('tabindex');
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.textContent = 'Era context';
-        if (closeBtn) closeBtn.setAttribute('hidden', 'hidden');
-        if (backdrop) {
-          backdrop.setAttribute('hidden', 'hidden');
-          backdrop.setAttribute('aria-hidden', 'true');
-        }
-      }
-      try {
-        if (isMemorialWallWide()) {
-          localStorage.setItem(WALL_ERA_OPEN_KEY, open ? '1' : '0');
-        } else if (!open) {
-          localStorage.setItem(WALL_ERA_OPEN_KEY, '0');
-        }
-      } catch (e) {
-        /* pass */
-      }
-    }
-
-    function onToggle() {
-      const isOpen = layout.classList.contains('memorial-wall-layout--era-open');
-      setOpen(!isOpen);
-    }
-
-    toggle.addEventListener('click', onToggle);
-    if (closeBtn) closeBtn.addEventListener('click', () => setOpen(false));
-    if (backdrop) {
-      backdrop.addEventListener('click', () => setOpen(false));
-    }
-    document.addEventListener('keydown', (ev) => {
-      if (ev.key !== 'Escape' || !layout.classList.contains('memorial-wall-layout--era-open')) return;
-      if (modalIsOpen()) return;
-      setOpen(false);
-    });
-
-    window.addEventListener('resize', () => {
-      if (isMemorialWallWide() && layout.classList.contains('memorial-wall-layout--era-open') && backdrop) {
-        backdrop.setAttribute('hidden', 'hidden');
-        backdrop.setAttribute('aria-hidden', 'true');
-      }
-    });
-
-    if (localStorage.getItem(WALL_ERA_OPEN_KEY) === '1' && isMemorialWallWide()) {
-      setOpen(true);
-    }
   }
 
   function renderMapEmptyState(title, copy) {
@@ -875,97 +778,7 @@
     });
   }
 
-  function canMemorialPrimaryHover() {
-    return window.matchMedia && window.matchMedia('(hover: hover)').matches;
-  }
-
-  async function loadWallEraByPersonId(personId) {
-    if (!personId) return;
-    const wLife = document.getElementById('memorialWallEraLife');
-    const wPres = document.getElementById('memorialWallEraPresident');
-    const wFig = document.getElementById('memorialWallEraFigure');
-    const wAnn = document.getElementById('memorialWallEraAnnounce');
-    if (!wLife || !wPres || !wFig) return;
-
-    const t = ++wallEraRenderToken;
-    wLife.innerHTML = '<p class="small text-muted mb-0">Loading…</p>';
-    wPres.innerHTML = '';
-    wFig.innerHTML = '';
-
-    try {
-      const res = await fetch(`${API_BASE}/${encodeURIComponent(personId)}`);
-      const data = await res.json().catch(() => ({}));
-      if (t !== wallEraRenderToken) return;
-      if (!res.ok || !data.success || !data.person) {
-        wLife.innerHTML = `<p class="small text-warning mb-0">${esc(data.error || 'Profile not found.')}</p>`;
-        wPres.innerHTML = '<p class="small text-muted mb-0">—</p>';
-        wFig.innerHTML = '<p class="small text-muted mb-0">—</p>';
-        return;
-      }
-      const p = data.person;
-      await fillEraContextForPerson(
-        p,
-        { lifeEl: wLife, presEl: wPres, figEl: wFig, announce: wAnn },
-        t,
-        p.name || 'this person',
-        'wall'
-      );
-    } catch (e) {
-      if (t !== wallEraRenderToken) return;
-      wLife.innerHTML = `<p class="small text-warning mb-0">Could not load profile. ${esc(e.message || 'Network error')}</p>`;
-      wPres.innerHTML = '';
-      wFig.innerHTML = '';
-    }
-  }
-
-  function scheduleWallEraFromHover(personId) {
-    clearTimeout(wallEraDebounceTimer);
-    wallEraDebounceTimer = setTimeout(() => {
-      void loadWallEraByPersonId(personId);
-    }, 160);
-  }
-
-  function wireWallEraHover() {
-    const wall = document.getElementById('memorialWall');
-    if (!wall) return;
-
-    wall.addEventListener(
-      'mouseover',
-      (e) => {
-        if (!canMemorialPrimaryHover()) return;
-        const line = e.target.closest('.memorial-line[data-person-id]');
-        if (!line || !wall.contains(line)) return;
-        const id = String(line.dataset.personId || '');
-        if (!id) return;
-        if (id === lastWallHoverLineId) return;
-        lastWallHoverLineId = id;
-        scheduleWallEraFromHover(id);
-      },
-      true
-    );
-
-    wall.addEventListener(
-      'mouseout',
-      (e) => {
-        if (!canMemorialPrimaryHover()) return;
-        const rel = e.relatedTarget;
-        if (rel && wall.contains(rel)) return;
-        lastWallHoverLineId = null;
-      },
-      true
-    );
-
-    wall.addEventListener('focusin', (e) => {
-      const line = e.target && e.target.closest && e.target.closest('.memorial-line[data-person-id]');
-      if (!line || !wall.contains(line) || e.target !== line) return;
-      const id = String(line.dataset.personId || '');
-      if (!id) return;
-      void loadWallEraByPersonId(id);
-    });
-  }
-
   function renderWall(people) {
-    lastWallHoverLineId = null;
     const host = document.getElementById('memorialWall');
     const { centuries, byCentury, undated } = groupByCenturyAndDecade(people);
     renderCenturyJump(centuries);
@@ -1293,9 +1106,7 @@
 
   document.getElementById('bookOnly').addEventListener('change', load);
   wireClicks();
-  wireWallEraHover();
   initQuickFilters();
-  setupMemorialWallEraUI();
   initMemorialFlash();
   if (typeof window.initHistoryQuickNav === 'function') {
     window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });

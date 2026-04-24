@@ -231,7 +231,7 @@ body.lane-memorial-page .text-muted {
   color: #a89b82;
 }
 
-/* Wall + era: fixed dock does not narrow the name column (no reflow) */
+/* Wall list container + toolbar (century jump) */
 .memorial-wall-layout {
   position: relative;
 }
@@ -243,98 +243,6 @@ body.lane-memorial-page .text-muted {
 .memorial-wall-toolbar {
   margin-top: 0.8rem;
   gap: 0.5rem 0.75rem;
-}
-
-.memorial-wall-era-toolbar {
-  flex-shrink: 0;
-}
-
-.memorial-wall-era-cta {
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.memorial-wall-era-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1030;
-  background: rgba(8, 9, 12, 0.62);
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-
-.memorial-wall-era-dock {
-  position: fixed;
-  z-index: 1040;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: auto;
-  max-height: 70vh;
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  border-radius: 0.6rem 0.6rem 0 0;
-  background: linear-gradient(180deg, rgba(36, 39, 44, 0.98) 0%, #1f2227 100%);
-  border: 1px solid rgba(196, 181, 153, 0.28);
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.45);
-  padding: 0.9rem 1.05rem 1.15rem;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  visibility: hidden;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(100%);
-  transition:
-    transform 0.3s ease,
-    opacity 0.22s ease,
-    visibility 0.3s;
-}
-
-.memorial-wall-layout--era-open .memorial-wall-era-dock {
-  visibility: visible;
-  pointer-events: auto;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-@media (min-width: 992px) {
-  .memorial-wall-era-backdrop {
-    display: none !important;
-  }
-
-  .memorial-wall-era-dock {
-    left: auto;
-    right: 1rem;
-    bottom: 1.25rem;
-    top: 5.5rem;
-    width: min(100% - 2rem, 22rem);
-    max-width: 22rem;
-    max-height: calc(100vh - 6.75rem);
-    border-radius: 0.5rem;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
-    transform: translateX(calc(100% + 2rem));
-    visibility: hidden;
-    pointer-events: none;
-    opacity: 0;
-  }
-
-  .memorial-wall-layout--era-open .memorial-wall-era-dock {
-    transform: translateX(0);
-  }
-}
-
-.memorial-wrap .memorial-wall-era-dock a {
-  color: #8cc7ff;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(140, 199, 255, 0.32);
-}
-
-.memorial-wrap .memorial-wall-era-dock a:hover {
-  border-bottom-color: rgba(140, 199, 255, 0.7);
 }
 
 .memorial-wall {
@@ -830,14 +738,6 @@ body.lane-memorial-page .text-muted {
 @media (prefers-reduced-motion: reduce) {
   .memorial-line {
     transition: none;
-  }
-
-  .memorial-wall-era-dock {
-    transition: none;
-  }
-
-  .memorial-wall-layout--era-open .memorial-wall-era-dock {
-    transform: none;
   }
 }
 
