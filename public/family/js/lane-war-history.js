@@ -394,6 +394,28 @@ function renderBattleMapMarkers() {
   }
 }
 
+function hasAnyMappableParticipants() {
+  return activeParticipants.some((entry) => {
+    const p = entry.person || {};
+    const place = (entry.places && entry.places[0]) || p.born || '';
+    return Boolean(place && String(place).trim());
+  });
+}
+
+function isWithinUsBounds(lngLat) {
+  if (!Array.isArray(lngLat) || lngLat.length < 2) return false;
+  const lng = Number(lngLat[0]);
+  const lat = Number(lngLat[1]);
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return false;
+
+  // Rough bounding boxes for U.S. plotting (contiguous + Alaska + Hawaii).
+  const contiguousUs = lat >= 24 && lat <= 50 && lng >= -125 && lng <= -66;
+  const alaska = lat >= 51 && lat <= 72 && lng >= -170 && lng <= -129;
+  const hawaii = lat >= 18 && lat <= 23 && lng >= -161 && lng <= -154;
+
+  return contiguousUs || alaska || hawaii;
+}
+
 async function renderPersonMarkers() {
   const coords = [];
   const slice = activeParticipants.slice(0, 45);
@@ -402,6 +424,7 @@ async function renderPersonMarkers() {
     const place = (entry.places && entry.places[0]) || p.born || '';
     const lngLat = await geocodePlace(place);
     if (!lngLat) continue;
+    if (!isWithinUsBounds(lngLat)) continue;
 
     const position = { lat: lngLat[1], lng: lngLat[0] };
     const marker = new google.maps.Marker({
@@ -471,12 +494,19 @@ async function renderAllMapLayers() {
   renderBattleSidebarList();
   if (!map || !mapReady) return;
 
-  renderBattleMapMarkers();
+  // Avoid visual implication that Lane evidence ties directly to context battles.
+  // Show battle/theater pins only when we do not have participant locations to map.
+  const showContextBattlePins = !hasAnyMappableParticipants();
+  if (showContextBattlePins) {
+    renderBattleMapMarkers();
+  }
 
   const personCoords = await renderPersonMarkers();
-  const battleCoords = battlesForActiveWar()
-    .filter((b) => b.lat != null && b.lng != null)
-    .map((b) => [Number(b.lng), Number(b.lat)]);
+  const battleCoords = showContextBattlePins
+    ? battlesForActiveWar()
+        .filter((b) => b.lat != null && b.lng != null)
+        .map((b) => [Number(b.lng), Number(b.lat)])
+    : [];
 
   const merged = [...battleCoords, ...personCoords];
   fitMapBoundsFromCoords(merged);
