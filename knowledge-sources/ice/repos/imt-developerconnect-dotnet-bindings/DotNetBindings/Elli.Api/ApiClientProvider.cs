@@ -16,7 +16,7 @@ namespace Elli.Api.Base
         {
             if (Config != null)
             {
-                var apiBasePath = Config != null && string.IsNullOrEmpty(Config.ApiHost) ? "https://api.elliemae.com" : Config.ApiHost;
+                var apiBasePath = Config != null && string.IsNullOrEmpty(Config.ApiHost) ? "https://concept.api.elliemae.com" : Config.ApiHost;
                 object[] parameters = { apiBasePath };
                 var retVal = (T)Activator.CreateInstance(typeof(T), parameters);
                 return retVal;

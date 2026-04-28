@@ -590,12 +590,12 @@
                         <div class="mb-3">
                             <label for="state" class="form-label">State</label>
                             <input type="text" id="state" emid="14" class="form-control" placeholder="Enter state code (e.g., TX)" maxlength="2">
-                            <small class="text-danger" id="stateError">Invalid state code.</small>
+                            <small class="text-danger d-none" id="stateError" role="alert">Invalid state code.</small>
                         </div>
                         <div class="mb-3">
                             <label for="county" class="form-label">County</label>
                             <input type="text" id="county" emid="13" class="form-control" placeholder="Enter county name (for FEMA search)">
-                            <small class="text-danger" id="countyError">County name must start with a capital letter followed by lowercase letters.</small>
+                            <small class="text-danger d-none" id="countyError" role="alert">Enter a plausible U.S. county name (letters, spaces, periods, apostrophes, hyphens).</small>
                         </div>
                         <div class="mb-3">
                             <label for="zip" class="form-label">ZIP Code</label>
@@ -916,6 +916,31 @@
             }
         }
 
+        function updateTool3AddressValidation() {
+            const stateEl = document.getElementById('state');
+            const countyEl = document.getElementById('county');
+            const stateErr = document.getElementById('stateError');
+            const countyErr = document.getElementById('countyError');
+            if (!stateEl || !countyEl || !stateErr || !countyErr) return;
+
+            const state = (stateEl.value || '').trim().toUpperCase();
+            const county = (countyEl.value || '').trim();
+
+            let stateBad = false;
+            if (state.length > 0) {
+                if (!/^[A-Z]{2}$/.test(state)) stateBad = true;
+                else if (Object.keys(usStates).length > 0 && !Object.prototype.hasOwnProperty.call(usStates, state)) stateBad = true;
+            }
+
+            let countyBad = false;
+            if (county.length > 0) {
+                countyBad = !/^[A-Za-z][A-Za-z\s.'-]{1,126}$/.test(county);
+            }
+
+            stateErr.classList.toggle('d-none', !stateBad);
+            countyErr.classList.toggle('d-none', !countyBad);
+        }
+
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), { 
                 center: { lat: 37.0902, lng: -95.7129 }, 
@@ -974,6 +999,7 @@
             document.getElementById('zip').value = zip;
             document.getElementById('latitude').value = lat;
             document.getElementById('longitude').value = lng;
+            updateTool3AddressValidation();
         }
 
         function handleZipInput() {
@@ -1000,7 +1026,9 @@
 
         document.getElementById('state').addEventListener('input', (event) => {
             event.target.value = event.target.value.toUpperCase();
+            updateTool3AddressValidation();
         });
+        document.getElementById('county').addEventListener('input', updateTool3AddressValidation);
 
         function searchByAddress() {
             const state = document.getElementById('state').value;
@@ -1031,7 +1059,9 @@
             }
         }, 10000);
 
-        fetchStates();
+        fetchStates()
+            .then(() => updateTool3AddressValidation())
+            .catch(() => updateTool3AddressValidation());
 
         // Make voice controller globally accessible for debugging
         window.voiceController = voiceController;

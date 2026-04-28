@@ -95,7 +95,7 @@ namespace Example
 <a name="documentation-for-api-endpoints"></a>
 ## Documentation for API Endpoints
 
-All URIs are relative to *https://api.elliemae.com*
+All URIs are relative to *https://concept.api.elliemae.com*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------

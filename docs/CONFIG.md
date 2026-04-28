@@ -19,8 +19,8 @@ Central reference for environment variables used by DevConnect Labs. **Never com
 | `ENCOMPASS_CLIENT_SECRET` | Encompass API client secret |
 | `ENCOMPASS_USERNAME` | `user.id@encompass:tebexxxxxxx` |
 | `ENCOMPASS_PASSWORD` | Encompass password |
-| `ENCOMPASS_AUTH_URL` | OAuth token URL (default: `https://api.elliemae.com/oauth2/v1/token`) |
-| `ENCOMPASS_API_BASE` | API base URL (default: `https://api.elliemae.com/encompass/v1`) |
+| `ENCOMPASS_AUTH_URL` | OAuth token URL (default: `https://concept.api.elliemae.com/oauth2/v1/token`) |
+| `ENCOMPASS_API_BASE` | API base URL (default: `https://concept.api.elliemae.com/encompass/v1`) |
 | `ENCOMPASS_WEBHOOK_SIGNING_KEY` | Webhook signature verification |
 
 ## Geocoding & Maps

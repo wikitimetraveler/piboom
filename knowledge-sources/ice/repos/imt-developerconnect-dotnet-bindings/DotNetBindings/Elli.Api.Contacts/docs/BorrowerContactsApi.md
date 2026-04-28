@@ -1,6 +1,6 @@
 # Elli.Api.Contacts.Api.BorrowerContactsApi
 
-All URIs are relative to *https://api.elliemae.com/encompass*
+All URIs are relative to *https://concept.api.elliemae.com/encompass*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

@@ -1,8 +1,35 @@
 import { AsyncLocalStorage } from 'async_hooks';
 import axios from 'axios';
 
-const DEFAULT_OAUTH_URL = 'https://api.elliemae.com/oauth2/v1/token';
+const DEFAULT_OAUTH_URL = 'https://concept.api.elliemae.com/oauth2/v1/token';
 const TOKEN_SKEW_MS = 60 * 1000; // refresh 1 min before actual expiry
+
+/**
+ * ICE OAuth token URL is always `{host}/oauth2/v1/token`.
+ * Common .env mistakes append REST path segments, e.g.
+ * `.../encompass/v1/oauth2/v1/token` or `.../v1/oauth2/v1/token`.
+ */
+export function normalizeEncompassOAuthUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  const trimmed = url.trim();
+  try {
+    const u = new URL(trimmed);
+    const p = u.pathname.replace(/\/+$/, '') || '';
+    let fixed = trimmed;
+    // Wrong: .../v1/oauth2/v1/token
+    if (p === '/v1/oauth2/v1/token' || /\/v1\/oauth2\/v1\/token$/i.test(p)) {
+      u.pathname = '/oauth2/v1/token';
+      fixed = u.toString();
+    } else if (/^\/encompass\/v\d+/i.test(p) && /oauth2/i.test(p)) {
+      // Wrong: .../encompass/v1/.../oauth2/...
+      u.pathname = '/oauth2/v1/token';
+      fixed = u.toString();
+    }
+    return fixed;
+  } catch {
+    return trimmed;
+  }
+}
 
 /** Request-scoped Encompass env (correspondent | retail). Set by routes middleware. */
 export const encompassEnvStorage = new AsyncLocalStorage();
@@ -45,7 +72,11 @@ function collectEnvConfig(env = 'correspondent') {
     password: readEnv(keys.password),
     clientId: readEnv(keys.clientId),
     clientSecret: readEnv(keys.clientSecret),
-    oauthUrl: process.env.ENCOMPASS_AUTH_URL || process.env.ENCOMPASS_OAUTH_URL || DEFAULT_OAUTH_URL,
+    oauthUrl: normalizeEncompassOAuthUrl(
+      process.env.ENCOMPASS_AUTH_URL ||
+        process.env.ENCOMPASS_OAUTH_URL ||
+        DEFAULT_OAUTH_URL,
+    ),
   };
 }
 
@@ -77,11 +108,36 @@ async function requestToken(env) {
     client_secret: config.clientSecret,
   });
 
-  const response = await axios.post(config.oauthUrl, params.toString(), {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
+  let response;
+  try {
+    response = await axios.post(config.oauthUrl, params.toString(), {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+  } catch (err) {
+    if (axios.isAxiosError(err) && err.response) {
+      const status = err.response.status;
+      const data = err.response.data;
+      let detail = '';
+      if (typeof data === 'string' && data.trim()) {
+        detail = ` — ${data.trim().slice(0, 300)}`;
+      } else if (data && typeof data === 'object') {
+        const line =
+          data.error_description ||
+          data.error ||
+          data.message ||
+          (Object.keys(data).length ? JSON.stringify(data) : '');
+        if (line) detail = ` — ${String(line).slice(0, 300)}`;
+      }
+      const msg = `OAuth token request failed (HTTP ${status})${detail}`;
+      /** @type {Error & { upstreamStatus?: number }} */
+      const error = new Error(msg);
+      error.upstreamStatus = status;
+      throw error;
+    }
+    throw err;
+  }
 
   const token = response.data?.access_token || null;
   const expiresInSeconds = Number(response.data?.expires_in ?? 3600);

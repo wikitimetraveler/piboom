@@ -89,17 +89,17 @@ namespace Elli.Api.Contacts.Client
 		
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiClient" /> class
-        /// with default configuration and base path (https://api.elliemae.com/encompass).
+        /// with default configuration and base path (https://concept.api.elliemae.com/encompass).
         /// </summary>
         public ApiClient()
         {
             Configuration = Configuration.Default;
-            RestClient = new RestClient("https://api.elliemae.com/encompass");
+            RestClient = new RestClient("https://concept.api.elliemae.com/encompass");
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiClient" /> class
-        /// with default base path (https://api.elliemae.com/encompass).
+        /// with default base path (https://concept.api.elliemae.com/encompass).
         /// </summary>
         /// <param name="config">An instance of Configuration.</param>
         public ApiClient(Configuration config = null)
@@ -109,7 +109,7 @@ namespace Elli.Api.Contacts.Client
             else
                 Configuration = config;
 
-            RestClient = new RestClient("https://api.elliemae.com/encompass");
+            RestClient = new RestClient("https://concept.api.elliemae.com/encompass");
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Elli.Api.Contacts.Client
         /// with default configuration.
         /// </summary>
         /// <param name="basePath">The base path.</param>
-        public ApiClient(String basePath = "https://api.elliemae.com/encompass")
+        public ApiClient(String basePath = "https://concept.api.elliemae.com/encompass")
         {
            if (String.IsNullOrEmpty(basePath))
                 throw new ArgumentException("basePath cannot be empty");

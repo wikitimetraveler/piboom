@@ -89,17 +89,17 @@ namespace Elli.Api.CustomDataObjects.Client
 		
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiClient" /> class
-        /// with default configuration and base path (https://api.elliemae.com).
+        /// with default configuration and base path (https://concept.api.elliemae.com).
         /// </summary>
         public ApiClient()
         {
             Configuration = Configuration.Default;
-            RestClient = new RestClient("https://api.elliemae.com");
+            RestClient = new RestClient("https://concept.api.elliemae.com");
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApiClient" /> class
-        /// with default base path (https://api.elliemae.com).
+        /// with default base path (https://concept.api.elliemae.com).
         /// </summary>
         /// <param name="config">An instance of Configuration.</param>
         public ApiClient(Configuration config = null)
@@ -109,7 +109,7 @@ namespace Elli.Api.CustomDataObjects.Client
             else
                 Configuration = config;
 
-            RestClient = new RestClient("https://api.elliemae.com");
+            RestClient = new RestClient("https://concept.api.elliemae.com");
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Elli.Api.CustomDataObjects.Client
         /// with default configuration.
         /// </summary>
         /// <param name="basePath">The base path.</param>
-        public ApiClient(String basePath = "https://api.elliemae.com")
+        public ApiClient(String basePath = "https://concept.api.elliemae.com")
         {
            if (String.IsNullOrEmpty(basePath))
                 throw new ArgumentException("basePath cannot be empty");

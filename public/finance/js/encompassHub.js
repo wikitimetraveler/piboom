@@ -81,6 +81,9 @@ async function refreshStatus() {
       setStatusChip(`Connected · ${remaining}`, 'ok', 'bi-check-circle');
     } else if (data.reason === 'missing-env') {
       setStatusChip('Missing credentials', 'err', 'bi-exclamation-octagon');
+    } else if (data.reason === 'token-error' && data.message) {
+      const short = String(data.message).replace(/\s+/g, ' ').trim().slice(0, 120);
+      setStatusChip(short || 'Auth error', 'err', 'bi-shield-exclamation');
     } else {
       setStatusChip('Auth error', 'err', 'bi-shield-exclamation');
     }

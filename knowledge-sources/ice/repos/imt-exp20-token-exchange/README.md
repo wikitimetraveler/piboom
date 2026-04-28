@@ -23,7 +23,7 @@ following contents:
 
 ```javascript
 module.exports = {
-   host: "<api_hostname>",   // e.g. api.elliemae.com
+   host: "<api_hostname>",   // e.g. concept.api.elliemae.com
    clientId: "<oauth_cid>",
    secret: "<oauth_secret>"
 }

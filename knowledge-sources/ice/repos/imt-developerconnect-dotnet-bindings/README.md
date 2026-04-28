@@ -65,11 +65,11 @@ Elli.Api.Base enables easy configuration for project. Depending on the type of t
         <section name="ElliApiConfig" type="Elli.Api.Base.ApiConfiguration, Elli.Api.Base"/>
         ...
     </configSections>
-    <ElliApiConfig apiHost="https://api.elliemae.com.com" apiClientId="" clientSecret="" idpHost="idp.elliemae.com" redirectUrl=""/>
+    <ElliApiConfig apiHost="https://concept.api.elliemae.com" apiClientId="" clientSecret="" idpHost="idp.elliemae.com" redirectUrl=""/>
 
 Where
 
-    apiHost: this is the end point where APIs are located. In most of the cases this value is https://api.elliemae.com and should not require any changes
+    apiHost: this is the end point where APIs are located. In most of the cases this value is https://concept.api.elliemae.com and should not require any changes
     apiClientID and clientSecret: This value can be obtained from Encompass Developer Connect portal. If you do not have access to developer portal, please contact your account representative to obtain access.
     idpHost: This is the host name where user can authenticate for auth code flow. In most of the cases this value is idp.elliemae.com and should not require any changes	
      redirectUrl: This is the url where user will be redirected in case of authcode flow. For security reasons, this must be an https end point, else the redirect will not work.

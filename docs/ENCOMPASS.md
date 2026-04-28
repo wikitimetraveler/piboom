@@ -17,7 +17,7 @@ REST API integration with Encompass:
 - **Pipeline** – Loan pipeline queries, filters, status
 - **Loans** – Loan read/update via API
 - **OAuth** – Token management via `encompass-auth.service.js`
-- **Base URL** – `ENCOMPASS_API_BASE` or default `https://api.elliemae.com/encompass/v1`
+- **Base URL** – `ENCOMPASS_API_BASE` or default `https://concept.api.elliemae.com/encompass/v1`
 - **V3** – Uses `/encompass/v3` where applicable
 
 Key fields: `Loan.LoanGuid`, `Loan.LoanNumber`, `Loan.LoanStatus`, `Loan.CurrentMilestoneName`, `Fields.11`–`Fields.15` (address), etc.
@@ -68,7 +68,7 @@ In-browser binding to Encompass forms via Encompass Hub. The assistant knows bot
 ## Environment Variables
 
 ```bash
-ENCOMPASS_API_BASE=https://api.elliemae.com/encompass/v1
+ENCOMPASS_API_BASE=https://concept.api.elliemae.com/encompass/v1
 ENCOMPASS_CLIENT_ID=...
 ENCOMPASS_CLIENT_SECRET=...
 ENCOMPASS_INSTANCE_ID=...

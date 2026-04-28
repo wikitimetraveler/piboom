@@ -1,6 +1,6 @@
 # Elli.Api.OAuth.Api.TokenApi
 
-All URIs are relative to *https://api.elliemae.com*
+All URIs are relative to *https://concept.api.elliemae.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

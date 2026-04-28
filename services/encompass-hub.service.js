@@ -4,7 +4,7 @@ import {
   buildLoanAnalytics,
 } from './loan-analytics.service.js';
 
-const API_BASE_URL = process.env.ENCOMPASS_API_BASE || 'https://api.elliemae.com/encompass/v1';
+const API_BASE_URL = process.env.ENCOMPASS_API_BASE || 'https://concept.api.elliemae.com/encompass/v1';
 const API_SERVER = API_BASE_URL.replace(/\/encompass\/v\d+\/?$/i, '');
 const API_V3_BASE = `${API_SERVER}/encompass/v3`;
 const API_V1_BASE = `${API_SERVER}/encompass/v1`;

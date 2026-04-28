@@ -132,7 +132,7 @@ Class | Method | HTTP request | Description
 
 - **Type**: OAuth
 - **Flow**: accessCode
-- **Authorization URL**: https://api.elliemae.com/oauth2/v1/token
+- **Authorization URL**: https://concept.api.elliemae.com/oauth2/v1/token
 - **Scopes**: 
   - lp: Lending platform
 

@@ -10,7 +10,7 @@ namespace Elli.Api.Base
     //TODO:Correct Client, and make it to OAPI Client ID, Remove Elli From Class Name
     public class ApiConfiguration : ConfigurationSection
     {
-        [ConfigurationProperty("apiHost", DefaultValue = "http://api.elliemae.com", IsRequired = false)]
+        [ConfigurationProperty("apiHost", DefaultValue = "https://concept.api.elliemae.com", IsRequired = false)]
         public string ApiHost
         {
             get

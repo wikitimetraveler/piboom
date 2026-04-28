@@ -54,10 +54,18 @@ export async function getHubStatus(req, res) {
       secondsRemaining: tokenStatus.secondsRemaining,
     });
   } catch (error) {
-    return res.status(500).json({
+    const upstreamStatus =
+      error && typeof error === 'object' && 'upstreamStatus' in error
+        ? error.upstreamStatus
+        : undefined;
+    /** Status check: report upstream OAuth failure without treating it as server fault. */
+    return res.json({
       connected: false,
       reason: 'token-error',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
+      ...(typeof upstreamStatus === 'number'
+        ? { upstreamStatus }
+        : {}),
     });
   }
 }
