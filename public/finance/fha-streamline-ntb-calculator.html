@@ -57,8 +57,7 @@
     <title>FHA Streamline Net Tangible Benefit Calculator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="../shared/calcEngineLibrary.js"></script>
-    <script src="../shared/calculationEngine.js"></script>
+    <link rel="stylesheet" href="/finance/css/worksheets-shell.css" />
     <style>
       :root {
         --primary: #4A90A4;
@@ -67,12 +66,15 @@
         --border: #E8EDF2;
         --shadow: rgba(74, 144, 164, 0.1);
       }
-      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
-      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
-      .nav-home { right: 20px; }
-      .nav-finance { right: 170px; }
-      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
-      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 900px; }
+      body.worksheets-shell { color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .worksheets-calculator-stack.container {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px var(--shadow);
+        padding: 24px;
+        max-width: 900px;
+      }
       .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
       .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
       .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
@@ -103,7 +105,7 @@
           <div class="row">
             <div class="col-md-8"><label for="ntb_borrower" class="form-label">Borrower Name</label></div>
             <div class="col-md-4">
-              <input type="text" class="form-control" id="ntb_borrower" placeholder="Enter borrower name">
+              <input type="text" class="form-control" id="ntb_borrower" data-encompass-field="CUSTOM.CX.NTB.BORROWER" placeholder="Enter borrower name">
             </div>
           </div>
         </div>
@@ -121,7 +123,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="ntb_b25" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="ntb_b25" data-encompass-field="CUSTOM.CX.NTB.B25" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -130,7 +132,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="ntb_b26" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="ntb_b26" data-encompass-field="CUSTOM.CX.NTB.B26" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -139,7 +141,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="ntb_b27" readonly>
+                <input type="number" class="form-control result" id="ntb_b27" data-encompass-field="CUSTOM.CX.NTB.B27" readonly>
               </div>
             </div>
           </div>
@@ -158,7 +160,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="ntb_e25" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="ntb_e25" data-encompass-field="CUSTOM.CX.NTB.E25" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -167,7 +169,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="ntb_e26" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="ntb_e26" data-encompass-field="CUSTOM.CX.NTB.E26" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -176,7 +178,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="ntb_e27" readonly>
+                <input type="number" class="form-control result" id="ntb_e27" data-encompass-field="CUSTOM.CX.NTB.E27" readonly>
               </div>
             </div>
           </div>
@@ -195,7 +197,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="ntb_i25" readonly>
+                <input type="number" class="form-control result" id="ntb_i25" data-encompass-field="CUSTOM.CX.NTB.I25" readonly>
               </div>
             </div>
           </div>
@@ -204,7 +206,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="ntb_i26" readonly>
+                <input type="number" class="form-control result" id="ntb_i26" data-encompass-field="CUSTOM.CX.NTB.I26" readonly>
               </div>
             </div>
           </div>
@@ -213,7 +215,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result ntb-result" id="ntb_i27" readonly>
+                <input type="number" class="form-control result ntb-result" id="ntb_i27" data-encompass-field="CUSTOM.CX.NTB.I27" readonly>
               </div>
               <small class="text-muted" id="ntb_i27_status"></small>
             </div>
@@ -242,7 +244,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="ntb_d43" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="ntb_d43" data-encompass-field="CUSTOM.CX.NTB.D43" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -251,7 +253,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="ntb_d44" readonly>
+                <input type="number" class="form-control result" id="ntb_d44" data-encompass-field="CUSTOM.CX.NTB.D44" readonly>
               </div>
             </div>
           </div>
@@ -260,7 +262,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="ntb_i42" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="ntb_i42" data-encompass-field="CUSTOM.CX.NTB.I42" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -269,7 +271,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="ntb_i43" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="ntb_i43" data-encompass-field="CUSTOM.CX.NTB.I43" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -278,18 +280,20 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result ntb-result" id="ntb_i44" readonly>
+                <input type="number" class="form-control result ntb-result" id="ntb_i44" data-encompass-field="CUSTOM.CX.NTB.I44" readonly>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/calculator-pills.js"></script>
+    <script src="/shared/calcEngineLibrary.js"></script>
+    <script src="/shared/calculationEngine.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const calc = new CalculationsEngine({

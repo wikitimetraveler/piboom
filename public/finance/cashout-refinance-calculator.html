@@ -20,9 +20,7 @@
     <title>Cash-Out Refinance Calculator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <script src="../shared/calcEngineLibrary.js"></script>
-    <script src="../shared/calculationEngine.js"></script>
-    <script src="js/calculator-pills.js"></script>
+    <link rel="stylesheet" href="/finance/css/worksheets-shell.css" />
     <style>
       :root {
         --primary: #4A90A4;
@@ -33,12 +31,15 @@
         --success: #28a745;
         --warning: #ffc107;
       }
-      body { background: linear-gradient(135deg, #FEFEFE 0%, #F8FAFC 100%); color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
-      .nav-home, .nav-finance { position: absolute; top: 20px; z-index: 1000; }
-      .nav-home { right: 20px; }
-      .nav-finance { right: 170px; }
-      .nav-home a, .nav-finance a { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; background: rgba(255,255,255,.9); color: var(--dark); text-decoration: none; border-radius: 20px; box-shadow: 0 4px 12px var(--shadow); }
-      .container { background: #fff; border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 20px 60px var(--shadow); margin-top: 80px; padding: 24px; max-width: 1000px; }
+      body.worksheets-shell { color: var(--dark); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; }
+      .worksheets-calculator-stack.container {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px var(--shadow);
+        padding: 24px;
+        max-width: 1000px;
+      }
       .calculator-card { border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; background: #fff; box-shadow: 0 8px 25px var(--shadow); }
       .calculator-card h3 { display: flex; justify-content: space-between; align-items: center; font-size: 1.25rem; border-bottom: 2px solid var(--primary); padding-bottom: 8px; margin-bottom: 16px; cursor: pointer; }
       .calculator-card h3 .card-toggle { background: none; border: none; color: var(--primary); font-size: 1.2rem; }
@@ -49,11 +50,39 @@
       .info-box { background: #E8F4F8; border-left: 4px solid var(--primary); padding: 12px; margin-top: 12px; border-radius: 4px; }
     </style>
   </head>
-  <body data-calculator="cashout-refinance">
-    <div class="nav-finance"><a href="index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a></div>
-    <div class="nav-home"><a href="/index.html"><i class="bi-house-fill"></i> Home</a></div>
-
-    <div class="container">
+  <body class="worksheets-shell" data-calculator="cashout-refinance">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container">
+        <span class="navbar-brand mb-0 fs-5">Cash-Out Refinance</span>
+        <div class="navbar-collapse">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="/finance/index.html"><i class="bi bi-grid-3x3-gap-fill me-1"></i>Worksheets Hub</a></li>
+            <li class="nav-item"><a class="nav-link" href="/finance/unit-tests.html"><i class="bi bi-check2-circle me-1"></i>Unit Tests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/index.html"><i class="bi bi-house me-1"></i>Home</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="main-content">
+    <div class="container worksheets-calculator-stack">
+      <div class="tool-pills d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between mb-3">
+        <div class="d-flex align-items-center mb-2 mb-lg-0 text-muted">
+          <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
+          <span class="fw-bold">Switch calculators</span>
+        </div>
+        <ul class="nav nav-pills flex-wrap" role="list">
+          <li class="nav-item"><a class="nav-link" href="fha-streamline-calculator.html"><i class="bi bi-house-heart me-1"></i>FHA Streamline</a></li>
+          <li class="nav-item"><a class="nav-link" href="fha-streamline-loan-amount-calculator.html"><i class="bi bi-cash-coin me-1"></i>FHA Loan Amount</a></li>
+          <li class="nav-item"><a class="nav-link" href="fha-streamline-ntb-calculator.html"><i class="bi bi-graph-up me-1"></i>FHA NTB</a></li>
+          <li class="nav-item"><a class="nav-link" href="asset-qualifier-calculator.html"><i class="bi bi-wallet2 me-1"></i>Asset Qualifier</a></li>
+          <li class="nav-item"><a class="nav-link active" href="cashout-refinance-calculator.html" aria-current="page"><i class="bi bi-currency-dollar me-1"></i>Cash-Out</a></li>
+          <li class="nav-item"><a class="nav-link" href="dti-calculator.html"><i class="bi bi-percent me-1"></i>DTI</a></li>
+          <li class="nav-item"><a class="nav-link" href="ltv-calculator.html"><i class="bi bi-house-door me-1"></i>LTV</a></li>
+          <li class="nav-item"><a class="nav-link" href="closing-cost-calculator.html"><i class="bi bi-receipt me-1"></i>Closing Costs</a></li>
+          <li class="nav-item"><a class="nav-link" href="amortization-schedule-calculator.html"><i class="bi bi-calendar me-1"></i>Amortization</a></li>
+          <li class="nav-item"><a class="nav-link" href="va-irrrl-calculator.html"><i class="bi bi-flag me-1"></i>VA IRRRL</a></li>
+        </ul>
+      </div>
       <h1 class="mb-2">Cash-Out Refinance Calculator</h1>
       <p class="text-muted mb-4">Calculate maximum cash-out amount, new payment, and compare savings. Includes tax implications analysis.</p>
 
@@ -69,7 +98,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="cashout_current_balance" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="cashout_current_balance" data-encompass-field="1172" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -78,7 +107,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="cashout_current_payment" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="cashout_current_payment" data-encompass-field="VASUMM.X23" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -86,7 +115,7 @@
             <div class="col-md-8"><label for="cashout_current_rate" class="form-label">Current Interest Rate (%)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <input type="number" class="form-control" id="cashout_current_rate" placeholder="0.00" min="0" max="100" step="0.01">
+                <input type="number" class="form-control" id="cashout_current_rate" data-encompass-field="352" placeholder="0.00" min="0" max="100" step="0.01">
                 <span class="input-group-text">%</span>
               </div>
             </div>
@@ -106,7 +135,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="cashout_property_value" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="cashout_property_value" data-encompass-field="356" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -114,7 +143,7 @@
             <div class="col-md-8"><label for="cashout_new_rate" class="form-label">New Interest Rate (%)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <input type="number" class="form-control" id="cashout_new_rate" placeholder="0.00" min="0" max="100" step="0.01">
+                <input type="number" class="form-control" id="cashout_new_rate" data-encompass-field="CUSTOM.CX.CO.NEW_RATE" placeholder="0.00" min="0" max="100" step="0.01">
                 <span class="input-group-text">%</span>
               </div>
             </div>
@@ -123,7 +152,7 @@
             <div class="col-md-8"><label for="cashout_new_term" class="form-label">New Loan Term (Years)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <input type="number" class="form-control" id="cashout_new_term" placeholder="30" min="1" max="50" step="1">
+                <input type="number" class="form-control" id="cashout_new_term" data-encompass-field="4" placeholder="30" min="1" max="50" step="1">
                 <span class="input-group-text">years</span>
               </div>
             </div>
@@ -132,7 +161,7 @@
             <div class="col-md-8"><label for="cashout_max_ltv" class="form-label">Maximum LTV Allowed (%)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <input type="number" class="form-control" id="cashout_max_ltv" placeholder="80" min="0" max="100" step="0.01" value="80">
+                <input type="number" class="form-control" id="cashout_max_ltv" data-encompass-field="CUSTOM.CX.CO.MAX_LTV" placeholder="80" min="0" max="100" step="0.01" value="80">
                 <span class="input-group-text">%</span>
               </div>
               <small class="text-muted">Typically 80% for conventional, 85% for FHA</small>
@@ -153,7 +182,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="cashout_closing_costs" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="cashout_closing_costs" data-encompass-field="CUSTOM.CX.CO.CLOSING_COSTS" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -162,7 +191,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control" id="cashout_prepaid_items" placeholder="0.00" min="0" step="0.01">
+                <input type="number" class="form-control" id="cashout_prepaid_items" data-encompass-field="CUSTOM.CX.CO.PREPAIDS" placeholder="0.00" min="0" step="0.01">
               </div>
             </div>
           </div>
@@ -171,7 +200,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="cashout_total_costs" readonly>
+                <input type="number" class="form-control result" id="cashout_total_costs" data-encompass-field="CUSTOM.CX.CO.TOTAL_COSTS" readonly>
               </div>
             </div>
           </div>
@@ -190,7 +219,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="cashout_max_loan_amount" readonly>
+                <input type="number" class="form-control result" id="cashout_max_loan_amount" data-encompass-field="CUSTOM.CX.CO.MAX_LOAN" readonly>
               </div>
             </div>
           </div>
@@ -209,7 +238,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result highlight-result" id="cashout_cash_out_amount" readonly>
+                <input type="number" class="form-control result highlight-result" id="cashout_cash_out_amount" data-encompass-field="CUSTOM.CX.CO.CASH_OUT" readonly>
               </div>
             </div>
           </div>
@@ -218,7 +247,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="cashout_new_monthly_payment" readonly>
+                <input type="number" class="form-control result" id="cashout_new_monthly_payment" data-encompass-field="CUSTOM.CX.CO.NEW_PMT" readonly>
               </div>
             </div>
           </div>
@@ -227,7 +256,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="cashout_payment_change" readonly>
+                <input type="number" class="form-control result" id="cashout_payment_change" data-encompass-field="CUSTOM.CX.CO.PMT_CHANGE" readonly>
               </div>
             </div>
           </div>
@@ -254,7 +283,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="cashout_annual_interest" readonly>
+                <input type="number" class="form-control result" id="cashout_annual_interest" data-encompass-field="CUSTOM.CX.CO.ANN_INTEREST" readonly>
               </div>
             </div>
           </div>
@@ -262,7 +291,7 @@
             <div class="col-md-8"><label for="cashout_marginal_tax_rate" class="form-label">Marginal Tax Rate (%)</label></div>
             <div class="col-md-4">
               <div class="input-group">
-                <input type="number" class="form-control" id="cashout_marginal_tax_rate" placeholder="22" min="0" max="50" step="0.1" value="22">
+                <input type="number" class="form-control" id="cashout_marginal_tax_rate" data-encompass-field="CUSTOM.CX.CO.TAX_RATE" placeholder="22" min="0" max="50" step="0.1" value="22">
                 <span class="input-group-text">%</span>
               </div>
             </div>
@@ -272,7 +301,7 @@
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input type="number" class="form-control result" id="cashout_tax_savings" readonly>
+                <input type="number" class="form-control result" id="cashout_tax_savings" data-encompass-field="CUSTOM.CX.CO.TAX_SAVINGS" readonly>
               </div>
               <small class="text-muted">If interest is deductible</small>
             </div>
@@ -280,10 +309,13 @@
         </div>
       </div>
     </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/shared/calcEngineLibrary.js"></script>
+    <script src="/shared/calculationEngine.js"></script>
     <script src="js/encompass-test-loans.js"></script>
     <script src="js/calculator-scenario-runner.js"></script>
     <script>
@@ -314,8 +346,7 @@
         math.cashOutAmount = function(values) {
           const newLoan = Number(values?.[0]) || 0;
           const currentBalance = Number(values?.[1]) || 0;
-          const totalCosts = Number(values?.[2]) || 0;sdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdxsdx+0-*-c-.
-          3
+          const totalCosts = Number(values?.[2]) || 0;
           if (newLoan <= 0) return 0;
           return round2(newLoan - currentBalance - totalCosts);
         };

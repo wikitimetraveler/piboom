@@ -1,3 +1,7 @@
+/**
+ * @deprecated Kept for backward compatibility only. New calculator HTML should use
+ * static `.tool-pills` + `worksheets-shell.css` (same pattern as `unit-tests.html` / rollout calculators).
+ */
 (() => {
   const calculators = [
     { id: 'fha-streamline', label: 'FHA Streamline', href: 'fha-streamline-calculator.html', icon: 'bi-house-heart' },

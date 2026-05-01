@@ -31,6 +31,14 @@ import { fileURLToPath } from 'url';
 import { summarizeGenealogyImageImport, writeImportArtifact } from '../services/genealogy-import.service.js';
 import { geocodeAddressFree } from '../services/free-geocoding.service.js';
 import { resolveGenealogyGeocodeQuery } from '../services/genealogy-geocode.service.js';
+import {
+  getHiddenPlateState,
+  hidePlate,
+  undoLastHide,
+  clearClientHides,
+  bulkImportHiddenPlates,
+  isValidClientId
+} from '../services/lane-pdf-gallery-hides.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -366,6 +374,74 @@ export async function getLanePdfGallery(req, res) {
   }
 }
 
+export async function getLanePdfGalleryHides(req, res) {
+  try {
+    const clientId = String(req.query.clientId ?? '').trim();
+    if (!isValidClientId(clientId)) {
+      return res.status(400).json({ success: false, error: 'clientId query (UUID) is required' });
+    }
+    const state = await getHiddenPlateState(clientId);
+    return res.json({ success: true, ...state });
+  } catch (error) {
+    console.error('Error getting Lane PDF gallery hides:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+export async function postLanePdfGalleryHidePlate(req, res) {
+  try {
+    const { clientId, imageId } = req.body ?? {};
+    const state = await hidePlate(clientId, imageId);
+    return res.json({ success: true, ...state });
+  } catch (error) {
+    console.error('Error hiding Lane PDF plate:', error);
+    return res.status(400).json({ success: false, error: error.message });
+  }
+}
+
+export async function postLanePdfGalleryUndoHide(req, res) {
+  try {
+    const { clientId } = req.body ?? {};
+    if (!isValidClientId(clientId)) {
+      return res.status(400).json({ success: false, error: 'clientId (UUID) is required' });
+    }
+    const result = await undoLastHide(clientId);
+    return res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('Error undo Lane PDF hide:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+export async function deleteLanePdfGalleryClientHides(req, res) {
+  try {
+    const clientId = String(req.query.clientId ?? req.body?.clientId ?? '').trim();
+    if (!isValidClientId(clientId)) {
+      return res.status(400).json({ success: false, error: 'clientId (UUID) is required in query or body' });
+    }
+    const state = await clearClientHides(clientId);
+    return res.json({ success: true, ...state });
+  } catch (error) {
+    console.error('Error clearing Lane PDF gallery hides:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+/** One-shot: merge browser local hides into Postgres for this client id */
+export async function postLanePdfGalleryBulkImport(req, res) {
+  try {
+    const { clientId, imageIds } = req.body ?? {};
+    if (!isValidClientId(clientId)) {
+      return res.status(400).json({ success: false, error: 'clientId (UUID) is required' });
+    }
+    const state = await bulkImportHiddenPlates(clientId, imageIds || []);
+    return res.json({ success: true, ...state });
+  } catch (error) {
+    console.error('Error bulk-import Lane PDF gallery hides:', error);
+    return res.status(400).json({ success: false, error: error.message });
+  }
+}
+
 /**
  * Get available war campaigns and participant counts.
  */
@@ -672,6 +748,11 @@ export default {
   getFeaturedStoryData,
   getProminentLanesData,
   getLanePdfGallery,
+  getLanePdfGalleryHides,
+  postLanePdfGalleryHidePlate,
+  postLanePdfGalleryUndoHide,
+  deleteLanePdfGalleryClientHides,
+  postLanePdfGalleryBulkImport,
   getLaneBookSayingsData,
   getWarCampaignsData,
   getWarParticipantsData,

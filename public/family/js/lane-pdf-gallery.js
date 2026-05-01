@@ -1,3 +1,34 @@
+/** Browser id for Postgres-backed hide list (not secret; bucket for this device) */
+const LS_CLIENT_ID = 'lanePdfGallery.clientId';
+/** One-shot migrate old localStorage hides to API */
+const LS_DB_MIGRATED = 'lanePdfGallery.dbHidesMigrated20260428';
+const LEGACY_PLATE_HIDE = 'lanePdfGallery.userHiddenIds';
+const LS_PLATE_HIDE_LEGACY = 'lanePdfGallery.plateHideIds';
+const LS_SHOW_HIDDEN = 'lanePdfGallery.showHidden';
+/** Runs once ever per browser if the full grid suppressed every plate with no filters (broken state) */
+const LS_AUTO_GRID_FIX_ONCE = 'lanePdfGallery.blankGridRecoverOnce.v1';
+/** One-shot: older builds defaulted checkbox off → empty grid after denylist+hides */
+const SHOW_HIDDEN_LEGACY_ONCE = 'lanePdfGallery.defaultShowLegacy20260428';
+
+/** Lane PDF extractor plate keys, e.g. p12-i0 (ignore junk from bad imports) */
+const PLATE_IMAGE_ID_RE = /^p\d+-i\d+$/;
+
+function isLikelyPlateImageId(raw) {
+  return typeof raw === 'string' && PLATE_IMAGE_ID_RE.test(raw.trim());
+}
+
+function sanitizePlateIdList(ids) {
+  const seen = new Set();
+  const out = [];
+  for (const x of ids || []) {
+    const s = String(x ?? '').trim();
+    if (!isLikelyPlateImageId(s) || seen.has(s)) continue;
+    seen.add(s);
+    out.push(s);
+  }
+  return out;
+}
+
 function esc(s) {
   return String(s ?? '')
     .replace(/&/g, '&amp;')
@@ -17,6 +48,92 @@ function isExtractedPlate(img) {
   if (!img || img.status === 'skipped') return false;
   if (img.status === 'ok') return true;
   return Boolean(img.publicUrl && (img.fileName || /\.jpg$/i.test(String(img.publicUrl))));
+}
+
+/**
+ * Migrate from legacy lanePdfGallery.userHiddenIds once:
+ * oversized lists (>200 valid ids after sanitize) were almost always accidental imports → drop them.
+ */
+function migratePlateHideFromLegacyOnce() {
+  try {
+    const legacy = localStorage.getItem(LEGACY_PLATE_HIDE);
+    const current = localStorage.getItem(LS_PLATE_HIDE_LEGACY);
+    if (!legacy) return;
+    if (!current) {
+      const parsed = JSON.parse(legacy);
+      if (!Array.isArray(parsed)) {
+        localStorage.removeItem(LEGACY_PLATE_HIDE);
+        return;
+      }
+      const cleaned = sanitizePlateIdList(parsed.map((x) => String(x ?? '')));
+      /** Keep deliberate small queues; purge obvious bulk-hide accidents */
+      if (cleaned.length > 200) {
+        localStorage.removeItem(LEGACY_PLATE_HIDE);
+        return;
+      }
+      localStorage.setItem(LS_PLATE_HIDE_LEGACY, JSON.stringify(cleaned));
+    }
+    localStorage.removeItem(LEGACY_PLATE_HIDE);
+  } catch (_) {
+    try {
+      localStorage.removeItem(LEGACY_PLATE_HIDE);
+    } catch (_) {
+      /* ignore */
+    }
+  }
+}
+
+function getOrCreateClientId() {
+  try {
+    let id = localStorage.getItem(LS_CLIENT_ID);
+    if (id && typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      /** basic UUID shape */
+      const u = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (u.test(id.trim())) return id.trim();
+    }
+    const nu = crypto.randomUUID();
+    localStorage.setItem(LS_CLIENT_ID, nu);
+    return nu;
+  } catch (e) {
+    console.warn('lane-pdf-gallery: client id', e);
+    return '';
+  }
+}
+
+/** Read legacy local hides once for Postgres import only */
+function peekLegacyPlateHideIds() {
+  try {
+    const raw = localStorage.getItem(LS_PLATE_HIDE_LEGACY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? sanitizePlateIdList(parsed.map((x) => String(x ?? ''))) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Page + candidate id filters only */
+function filterByPageAndIds(images, pageFilter, idFilter) {
+  let list = images.slice();
+  if (pageFilter != null && pageFilter !== '') {
+    const p = parseInt(pageFilter, 10);
+    /* PDF pages are 1-based; p=0 or negative matches nothing → empty grid confusion */
+    if (!Number.isNaN(p) && p >= 1) list = list.filter((img) => img.pdfPage === p);
+  }
+  if (idFilter && idFilter.length) {
+    list = list.filter((img) => {
+      const ids = img.candidatePersonIds || [];
+      return idFilter.some((fid) => ids.includes(fid));
+    });
+  }
+  return list;
+}
+
+function combinedHiddenSet(galleryHiddenIds, userHiddenIds) {
+  return new Set([
+    ...sanitizePlateIdList(galleryHiddenIds || []),
+    ...sanitizePlateIdList(userHiddenIds || [])
+  ]);
 }
 
 function renderGallery(images, portraits, container) {
@@ -43,7 +160,7 @@ function renderGallery(images, portraits, container) {
         ? `<div class="d-flex align-items-center justify-content-center bg-secondary text-white" style="height:120px">Not extracted</div>`
         : `<img src="${esc(url)}" alt="" loading="lazy" class="lane-pdf-thumb" tabindex="0" role="button" data-plate-meta="${esc(
             plateMeta
-          )}" aria-label="${esc(`Expand plate, page ${img.pdfPage}`)}" onerror="this.style.opacity=0.35" />`;
+          )}" aria-label="${esc(`Expand plate, page ${img.pdfPage}`)}" title="Decoded JPEG from the PDF scan; pale boxes often match blank or low-detail pages in the book, not a missing file." onerror="this.style.opacity=0.35" />`;
 
       let badge = '';
       if (isSkipped) {
@@ -59,6 +176,11 @@ function renderGallery(images, portraits, container) {
       } else {
         badge = '<span class="badge bg-secondary mb-1">No tree match</span>';
       }
+
+      const hideBtn =
+        !isSkipped && img.imageId
+          ? `<button type="button" class="btn btn-sm btn-outline-secondary lane-pdf-hide-btn mt-2" data-hide-plate-id="${esc(img.imageId)}">Hide from gallery</button>`
+          : '';
 
       const idLinks = ids
         .slice(0, 12)
@@ -113,6 +235,7 @@ function renderGallery(images, portraits, container) {
                   : ''
               }
               <div class="mt-1 small"><strong>Candidates:</strong> ${idLinks || '—'}${more}</div>
+              ${hideBtn}
             </div>
           </div>
         </div>`;
@@ -154,6 +277,7 @@ function bindPlateLightbox(grid) {
 
   grid.addEventListener('click', (e) => {
     const t = e.target;
+    if (t.closest('[data-hide-plate-id]')) return;
     if (t.tagName !== 'IMG' || !t.classList.contains('lane-pdf-thumb')) return;
     e.preventDefault();
     openFromThumb(t);
@@ -176,27 +300,37 @@ function bindPlateLightbox(grid) {
   });
 }
 
-function filterImages(images, pageFilter, idFilter) {
-  let list = images.slice();
-  if (pageFilter != null && pageFilter !== '') {
-    const p = parseInt(pageFilter, 10);
-    if (!Number.isNaN(p)) list = list.filter((img) => img.pdfPage === p);
-  }
-  if (idFilter && idFilter.length) {
-    list = list.filter((img) => {
-      const ids = img.candidatePersonIds || [];
-      return idFilter.some((fid) => ids.includes(fid));
-    });
-  }
-  return list;
+function bindHideDelegation(grid, onHidePlate) {
+  if (!grid || typeof onHidePlate !== 'function') return;
+  grid.addEventListener('click', (e) => {
+    const hideBtn = e.target.closest('[data-hide-plate-id]');
+    if (!hideBtn) return;
+    e.preventDefault();
+    const id = hideBtn.getAttribute('data-hide-plate-id');
+    if (!id) return;
+    onHidePlate(id);
+  });
 }
 
 async function initLanePdfGallery() {
   const grid = document.getElementById('lanePdfGrid');
   const errEl = document.getElementById('lanePdfError');
-  const statsEl = document.getElementById('lanePdfStats');
-    const pageInput = document.getElementById('lanePdfFilterPage');
-    const idInput = document.getElementById('lanePdfFilterIds');
+  const statsLine = document.getElementById('lanePdfStatsLine');
+  const pageInput = document.getElementById('lanePdfFilterPage');
+  const idInput = document.getElementById('lanePdfFilterIds');
+  const showHiddenInput = document.getElementById('lanePdfShowHidden');
+  const clearUserBtn = document.getElementById('lanePdfClearUserHidden');
+  const exportBtn = document.getElementById('lanePdfExportUserHidden');
+  const importTrigger = document.getElementById('lanePdfTriggerImportHides');
+  const importInput = document.getElementById('lanePdfImportHidesInput');
+  const emptyHint = document.getElementById('lanePdfEmptyHint');
+  const emptyTitle = document.getElementById('lanePdfEmptyHintTitle');
+  const emptyDetail = document.getElementById('lanePdfEmptyHintDetail');
+  const recoverShowHiddenBtn = document.getElementById('lanePdfRecoverShowHidden');
+  const recoverClearHidesBtn = document.getElementById('lanePdfRecoverClearHides');
+  const recoverClearFiltersBtn = document.getElementById('lanePdfRecoverClearFilters');
+  const emergencyRestoreBtn = document.getElementById('lanePdfEmergencyRestore');
+  const undoBtn = document.getElementById('lanePdfUndoHide');
 
   bindPlateLightbox(grid);
 
@@ -205,32 +339,413 @@ async function initLanePdfGallery() {
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Request failed');
 
+    const galleryHiddenIds = sanitizePlateIdList(
+      Array.isArray(data.galleryHiddenIds) ? data.galleryHiddenIds.map(String) : []
+    );
     const images = (data.images || []).filter(isExtractedPlate);
     const portraits = data.portraits || [];
     const summary = data.summary || {};
-    const skippedHidden =
-      typeof summary.skippedCount === 'number' && summary.skippedCount > 0
-        ? ` · <span class="text-muted">Skipped decode entries hidden (${esc(summary.skippedCount)})</span>`
-        : '';
+    const extractedIdSet = new Set(images.map((i) => (i.imageId ? String(i.imageId) : '')));
 
-    statsEl.innerHTML = `
-      <div class="lane-pdf-gallery-stats text-muted">
-        PDF pages: <strong>${esc(summary.pdfPageCount)}</strong> ·
-        Plates in grid: <strong>${esc(images.length)}</strong> (extracted JPEGs only)${skippedHidden} ·
-        With ≥1 tree candidate (in grid): <strong>${esc(
-          images.filter((i) => (i.candidatePersonIds || []).length > 0).length
-        )}</strong> ·
-        Curated portraits: <strong>${portraits.length}</strong>
-      </div>
-      <p class="lane-pdf-stats-hint" role="note">
-        These plates are late-19th- and early-20th-century book reproductions; faded paper, halftones, and uneven contrast are normal for the period.
-      </p>`;
+    /** Postgres-backed hides for this browser (merged with repo denylist in combinedHiddenSet) */
+    let dbUserHiddenIds = [];
+    let dbCanUndo = false;
+    const clientId = getOrCreateClientId();
 
+    async function refreshHidesFromServer() {
+      if (!clientId) return;
+      const r = await fetch(`/api/genealogy/lane-pdf/hides?clientId=${encodeURIComponent(clientId)}`);
+      const j = await r.json();
+      if (!j.success) throw new Error(j.error || 'Could not load your hide preferences');
+      dbUserHiddenIds = sanitizePlateIdList(Array.isArray(j.hiddenImageIds) ? j.hiddenImageIds : []);
+      dbCanUndo = Boolean(j.canUndo);
+      if (undoBtn) undoBtn.disabled = !dbCanUndo;
+    }
+
+    async function migrateLegacyHidesToDb() {
+      if (!clientId || localStorage.getItem(LS_DB_MIGRATED) === '1') return;
+      migratePlateHideFromLegacyOnce();
+      const merged = sanitizePlateIdList(peekLegacyPlateHideIds());
+      const capped = merged.length > 250 ? merged.slice(0, 250) : merged;
+      try {
+        const r = await fetch('/api/genealogy/lane-pdf/hides/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, imageIds: capped })
+        });
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error(j.error || 'Import failed');
+        localStorage.setItem(LS_DB_MIGRATED, '1');
+        try {
+          localStorage.removeItem(LS_PLATE_HIDE_LEGACY);
+          localStorage.removeItem(LEGACY_PLATE_HIDE);
+        } catch (_) {
+          /* ignore */
+        }
+      } catch (e) {
+        console.warn('lane-pdf-gallery: DB migrate deferred', e);
+      }
+    }
+
+    try {
+      await migrateLegacyHidesToDb();
+      await refreshHidesFromServer();
+    } catch (hidesErr) {
+      console.warn('lane-pdf-gallery hides API', hidesErr);
+      errEl.textContent =
+        hidesErr.message ||
+        String(hidesErr || 'Gallery data loaded but hide preferences unavailable (check DATABASE_URL server-side).');
+      errEl.classList.remove('d-none');
+    }
+
+    try {
+      if (!localStorage.getItem(SHOW_HIDDEN_LEGACY_ONCE)) {
+        localStorage.setItem(SHOW_HIDDEN_LEGACY_ONCE, '1');
+        if (localStorage.getItem(LS_SHOW_HIDDEN) === '0') {
+          localStorage.removeItem(LS_SHOW_HIDDEN);
+        }
+      }
+    } catch (_) {
+      /* ignore */
+    }
+
+    if (showHiddenInput) {
+      const sv = localStorage.getItem(LS_SHOW_HIDDEN);
+      if (sv === '0') {
+        showHiddenInput.checked = false;
+      } else {
+        /** Default checked: show full grid (omit denylist hides only when unchecked) */
+        showHiddenInput.checked = true;
+      }
+    }
+
+    bindHideDelegation(grid, async (plateId) => {
+      if (!clientId) return;
+      try {
+        errEl.textContent = '';
+        errEl.classList.add('d-none');
+        const r = await fetch('/api/genealogy/lane-pdf/hides', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, imageId: plateId })
+        });
+        const j = await r.json();
+        if (!r.ok || !j.success) {
+          errEl.textContent = j.error || 'Could not save hide';
+          errEl.classList.remove('d-none');
+          return;
+        }
+        dbUserHiddenIds = sanitizePlateIdList(j.hiddenImageIds || []);
+        dbCanUndo = Boolean(j.canUndo);
+        if (undoBtn) undoBtn.disabled = !dbCanUndo;
+        /** Filtered view so this plate disappears immediately */
+        if (showHiddenInput) {
+          showHiddenInput.checked = false;
+          persistShowHiddenCheckbox();
+        }
+        applyFilters();
+      } catch (he) {
+        console.warn('lane-pdf-gallery: hide POST', he);
+        errEl.textContent = he.message || String(he);
+        errEl.classList.remove('d-none');
+      }
+    });
+
+    function persistShowHiddenCheckbox() {
+      if (!showHiddenInput) return;
+      try {
+        localStorage.setItem(LS_SHOW_HIDDEN, showHiddenInput.checked ? '1' : '0');
+      } catch (e) {
+        console.warn('lane-pdf-gallery: could not persist show-hidden toggle', e);
+      }
+    }
+
+    if (showHiddenInput && localStorage.getItem(LS_SHOW_HIDDEN) === null) {
+      persistShowHiddenCheckbox();
+    }
+
+    /** User hides come from Postgres (refreshHidesFromServer); repo denylist from gallery payload. */
     function applyFilters() {
+      const userHiddenIdsLive = dbUserHiddenIds;
+      const hidden = combinedHiddenSet(galleryHiddenIds, userHiddenIdsLive);
       const pageVal = pageInput.value.trim();
       const idFilter = parseIdList(idInput.value.trim());
-      const filtered = filterImages(images, pageVal, idFilter);
-      renderGallery(filtered, portraits, grid);
+      const narrowed = filterByPageAndIds(images, pageVal, idFilter);
+
+      let showHidden = Boolean(showHiddenInput && showHiddenInput.checked);
+      const noTextFilters =
+        pageInput.value.trim().length === 0 && idInput.value.trim().length === 0;
+      const wouldHideAll =
+        narrowed.length >= 40 &&
+        images.length >= 40 &&
+        noTextFilters &&
+        narrowed.length === images.length &&
+        !showHidden &&
+        narrowed.every((img) => img.imageId && hidden.has(String(img.imageId)));
+
+      if (
+        wouldHideAll &&
+        !localStorage.getItem(LS_AUTO_GRID_FIX_ONCE)
+      ) {
+        try {
+          localStorage.setItem(LS_AUTO_GRID_FIX_ONCE, '1');
+        } catch (_) {
+          /* ignore */
+        }
+        if (showHiddenInput) showHiddenInput.checked = true;
+        persistShowHiddenCheckbox();
+        showHidden = true;
+      }
+
+      let displayed;
+      let suppressedHere;
+      if (showHidden) {
+        displayed = narrowed;
+        suppressedHere = narrowed.filter((img) => img.imageId && hidden.has(String(img.imageId))).length;
+      } else {
+        suppressedHere = narrowed.filter((img) => img.imageId && hidden.has(String(img.imageId))).length;
+        displayed = narrowed.filter((img) => !(img.imageId && hidden.has(String(img.imageId))));
+      }
+
+      renderGallery(displayed, portraits, grid);
+
+      const skippedHidden =
+        typeof summary.skippedCount === 'number' && summary.skippedCount > 0
+          ? ` · <span class="text-muted">Skipped decode entries omitted (${esc(summary.skippedCount)})</span>`
+          : '';
+
+      const totalHiddenListed = galleryHiddenIds.reduce(
+        (acc, id) => acc + (extractedIdSet.has(String(id)) ? 1 : 0),
+        0
+      );
+      const uhCount = (userHiddenIdsLive || []).filter((id) => extractedIdSet.has(String(id))).length;
+
+      const serverDeniedInNarrowed = narrowed.filter(
+        (img) => img.imageId && galleryHiddenIds.includes(String(img.imageId))
+      ).length;
+      const serverDenyMin = Math.min(totalHiddenListed, serverDeniedInNarrowed);
+
+      let viewingNote = '';
+      if (showHidden && suppressedHere > 0) {
+        viewingNote = ` <span class="text-info">Including ${esc(suppressedHere)} plate(s) on denylist/hidden-by-you for this filtered set.</span>`;
+      } else if (!showHidden && suppressedHere > 0) {
+        viewingNote = ` <span class="text-muted">${esc(suppressedHere)} plate(s) hidden for this filtered set (${esc(serverDenyMin)} via server denylist).</span>`;
+      }
+
+      if (statsLine) {
+        statsLine.innerHTML = `
+        PDF pages: <strong>${esc(summary.pdfPageCount)}</strong> ·
+        Extracted JPEGs: <strong>${esc(images.length)}</strong>${skippedHidden} ·
+        Plates shown: <strong>${esc(displayed.length)}</strong>${viewingNote} ·
+        Server-hidden (in corpus): <strong>${esc(totalHiddenListed)}</strong> ·
+        Your hides (DB): <strong>${esc(uhCount)}</strong> ·
+        With ≥1 tree candidate (all extracted): <strong>${esc(images.filter((i) => (i.candidatePersonIds || []).length > 0).length)}</strong> ·
+        Curated portraits: <strong>${portraits.length}</strong>`;
+      }
+
+      /* Empty-grid recovery hints (wrong import, stray filters, or show-hidden off while everything suppressed) */
+      if (emptyHint && emptyTitle && emptyDetail && images.length > 0) {
+        recoverShowHiddenBtn && recoverShowHiddenBtn.classList.add('d-none');
+        recoverClearHidesBtn && recoverClearHidesBtn.classList.add('d-none');
+        recoverClearFiltersBtn && recoverClearFiltersBtn.classList.add('d-none');
+
+        const hasPageOrIdFilter =
+          pageInput.value.trim().length > 0 || idInput.value.trim().length > 0;
+
+        if (displayed.length === 0) {
+          emptyHint.classList.remove('d-none');
+          if (narrowed.length === 0 && hasPageOrIdFilter) {
+            emptyTitle.textContent = 'No plates match your filters.';
+            emptyDetail.textContent =
+              'Adjust or clear the PDF page number and candidate id filters.';
+            recoverClearFiltersBtn && recoverClearFiltersBtn.classList.remove('d-none');
+          } else if (narrowed.length > 0 && !showHidden) {
+            emptyTitle.textContent =
+              'No plates visible — everything in this filtered set is on your hidden list.';
+            emptyDetail.textContent =
+              'Turn on “Show hidden plates” to preview them anyway, or use Clear my hides if a large import suppressed the whole gallery by mistake.';
+            recoverShowHiddenBtn && recoverShowHiddenBtn.classList.remove('d-none');
+            recoverClearHidesBtn && recoverClearHidesBtn.classList.remove('d-none');
+          } else {
+            emptyHint.classList.add('d-none');
+          }
+        } else {
+          emptyHint.classList.add('d-none');
+        }
+      }
+    }
+
+    function onStorageAcrossTabs(ev) {
+      if (ev.key === LS_SHOW_HIDDEN || ev.key === LS_CLIENT_ID) {
+        refreshHidesFromServer()
+          .then(() => applyFilters())
+          .catch(() => {});
+      }
+    }
+    window.addEventListener('storage', onStorageAcrossTabs);
+
+    async function clearHidesViaApiOnly() {
+      if (!clientId) return;
+      const r = await fetch(`/api/genealogy/lane-pdf/hides?clientId=${encodeURIComponent(clientId)}`, {
+        method: 'DELETE'
+      });
+      const j = await r.json();
+      if (!r.ok || !j.success) throw new Error(j.error || 'Clear hides failed');
+      dbUserHiddenIds = sanitizePlateIdList(j.hiddenImageIds || []);
+      dbCanUndo = Boolean(j.canUndo);
+      if (undoBtn) undoBtn.disabled = !dbCanUndo;
+    }
+
+    async function restoreFullGalleryView() {
+      try {
+        await clearHidesViaApiOnly();
+      } catch (e) {
+        console.warn('lane-pdf-gallery: restore', e);
+      }
+      pageInput.value = '';
+      idInput.value = '';
+      if (showHiddenInput) {
+        showHiddenInput.checked = true;
+        persistShowHiddenCheckbox();
+      }
+      try {
+        localStorage.removeItem(LS_AUTO_GRID_FIX_ONCE);
+      } catch (_) {
+        /* ignore */
+      }
+      applyFilters();
+    }
+
+    if (clearUserBtn) {
+      clearUserBtn.addEventListener('click', async () => {
+        try {
+          await clearHidesViaApiOnly();
+          errEl.classList.add('d-none');
+        } catch (e) {
+          errEl.textContent = e.message || String(e);
+          errEl.classList.remove('d-none');
+          return;
+        }
+        applyFilters();
+      });
+    }
+
+    if (undoBtn) {
+      undoBtn.addEventListener('click', async () => {
+        if (!clientId || undoBtn.disabled) return;
+        try {
+          errEl.classList.add('d-none');
+          const r = await fetch('/api/genealogy/lane-pdf/hides/undo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId })
+          });
+          const j = await r.json();
+          if (!r.ok || !j.success) throw new Error(j.error || 'Undo failed');
+          dbUserHiddenIds = sanitizePlateIdList(j.hiddenImageIds || []);
+          dbCanUndo = Boolean(j.canUndo);
+          undoBtn.disabled = !dbCanUndo;
+          applyFilters();
+        } catch (ue) {
+          errEl.textContent = ue.message || String(ue);
+          errEl.classList.remove('d-none');
+        }
+      });
+    }
+
+    if (emergencyRestoreBtn) {
+      emergencyRestoreBtn.addEventListener('click', () => restoreFullGalleryView());
+    }
+
+    if (recoverShowHiddenBtn) {
+      recoverShowHiddenBtn.addEventListener('click', () => {
+        if (!showHiddenInput) return;
+        showHiddenInput.checked = true;
+        persistShowHiddenCheckbox();
+        applyFilters();
+      });
+    }
+
+    if (recoverClearHidesBtn) {
+      recoverClearHidesBtn.addEventListener('click', async () => {
+        try {
+          await clearHidesViaApiOnly();
+          errEl.classList.add('d-none');
+        } catch (_) {
+          /* ignore */
+        }
+        applyFilters();
+      });
+    }
+
+    if (recoverClearFiltersBtn) {
+      recoverClearFiltersBtn.addEventListener('click', () => {
+        pageInput.value = '';
+        idInput.value = '';
+        applyFilters();
+      });
+    }
+
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        const ids = dbUserHiddenIds.slice();
+        const doc = {
+          version: 1,
+          exportedAt: new Date().toISOString(),
+          notes: 'Merge via Import hides on Lane book plates gallery; merges with existing browser hides.',
+          hiddenImageIds: ids
+        };
+        const blob = new Blob([JSON.stringify(doc, null, 2)], { type: 'application/json;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'lane-pdf-gallery-user-hides.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    if (importTrigger && importInput) {
+      importTrigger.addEventListener('click', () => importInput.click());
+      importInput.addEventListener('change', async () => {
+        const file = importInput.files && importInput.files[0];
+        importInput.value = '';
+        if (!file || !clientId) return;
+        try {
+          const text = await file.text();
+          const doc = JSON.parse(text);
+          const incoming = Array.isArray(doc.hiddenImageIds) ? doc.hiddenImageIds : [];
+          const merged = sanitizePlateIdList(
+            [...new Set([...dbUserHiddenIds, ...incoming.map((id) => String(id))])]
+          ).slice(0, 250);
+          const r = await fetch('/api/genealogy/lane-pdf/hides/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId, imageIds: merged })
+          });
+          const j = await r.json();
+          if (!r.ok || !j.success) throw new Error(j.error || 'Import failed');
+          dbUserHiddenIds = sanitizePlateIdList(j.hiddenImageIds || []);
+          dbCanUndo = Boolean(j.canUndo);
+          if (undoBtn) undoBtn.disabled = !dbCanUndo;
+          errEl.textContent = '';
+          errEl.classList.add('d-none');
+          applyFilters();
+        } catch (e) {
+          console.warn('lane-pdf-gallery: import failed', e);
+          errEl.textContent = 'Could not merge import (invalid JSON?).';
+          errEl.classList.remove('d-none');
+        }
+      });
+    }
+
+    if (showHiddenInput) {
+      showHiddenInput.addEventListener('change', () => {
+        persistShowHiddenCheckbox();
+        applyFilters();
+      });
     }
 
     pageInput.addEventListener('input', applyFilters);

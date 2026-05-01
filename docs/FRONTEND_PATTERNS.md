@@ -90,6 +90,10 @@ Worksheets and Encompass pages under `public/finance/` use **Bootstrap 5.3.3** f
 
 `bootstrap.bundle.min.js` includes Popper — do **not** add a separate Popper script for Bootstrap-only usage.
 
+**Calculator / Worksheets chrome:** Standalone calculators under `public/finance/*-calculator.html` share **`/finance/css/worksheets-shell.css`**, `body.worksheets-shell`, a top **`navbar`** (light bar for Hub / Unit Tests / Home), **`main-content`**, and static HTML **tool-pills** (`nav.nav-pills`) linking to sibling calculators—the same vocabulary as **`unit-tests.html`**. Prefer this markup instead of injecting duplicate strips via **`public/finance/js/calculator-pills.js`** (deprecated no-op if pills already exist). **Dark primary navbars** (e.g. FHA Streamline worksheet) remain `navbar-dark`; shell styles target light navbars only (`:not(.navbar-dark)`).
+
+**Encompass field hints:** Add **`data-encompass-field="<id>"`** on worksheet inputs/results where a native ID or `CUSTOM.*` placeholder is known. Authoritative suggestion map: **`public/shared/encompass-calculator-field-suggestions.json`** (aligned with `calculationEngine.js` factories). Tools that read bindings can surface the attribute next to **`emid`** where both exist.
+
 **jQuery:** Keep only where required (DataTables, legacy `$()` helpers, some calculators). Bootstrap 5 components use `data-bs-*` attributes (e.g. `data-bs-toggle="collapse"`, `data-bs-target="#id"`, `data-bs-dismiss="modal"`).
 
 **Utilities (v4 → v5):** `ml-*` → `ms-*`, `mr-*` → `me-*`, `pl-*` → `ps-*`, `pr-*` → `pe-*`, `font-weight-bold` → `fw-bold`, modal close → `button.btn-close` with `data-bs-dismiss="modal"`.

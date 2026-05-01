@@ -855,7 +855,31 @@ export async function createTables() {
       )
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, br_rule_files, and processor assignment tool config)');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS lane_pdf_gallery_hidden_plate (
+        client_id UUID NOT NULL,
+        image_id TEXT NOT NULL,
+        hidden_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (client_id, image_id)
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_lane_pdf_hidden_client ON lane_pdf_gallery_hidden_plate (client_id)
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS lane_pdf_gallery_hide_stack (
+        id SERIAL PRIMARY KEY,
+        client_id UUID NOT NULL,
+        image_id TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_lane_pdf_stack_client_created ON lane_pdf_gallery_hide_stack (client_id, created_at DESC)
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, br_rule_files, processor assignment tool config, and lane PDF gallery hides)');
     
     // Migrate existing Grateful Dead data to new structure (run in background)
     migrateGratefulDeadData().catch(error => {

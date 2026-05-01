@@ -11,6 +11,7 @@ let museumContent = null;
 let lanePdfManifestCache = null;
 let lanePdfCandidatesCache = null;
 let lanePdfPortraitsCache = null;
+let lanePdfGalleryHiddenCache = null;
 let laneBookSayingsCache = null;
 
 function loadLaneBookSayings() {
@@ -57,6 +58,20 @@ function loadLanePdfPersonPortraits() {
   return lanePdfPortraitsCache;
 }
 
+function loadLanePdfGalleryHidden() {
+  if (lanePdfGalleryHiddenCache !== null) return lanePdfGalleryHiddenCache;
+  try {
+    const p = path.join(__dirname, '..', 'data', 'lane-pdf-gallery-hidden.json');
+    lanePdfGalleryHiddenCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
+  } catch {
+    lanePdfGalleryHiddenCache = { version: 0, hiddenImageIds: [] };
+  }
+  if (!lanePdfGalleryHiddenCache || !Array.isArray(lanePdfGalleryHiddenCache.hiddenImageIds)) {
+    lanePdfGalleryHiddenCache = { version: 0, hiddenImageIds: [] };
+  }
+  return lanePdfGalleryHiddenCache;
+}
+
 /**
  * Bundle manifest, page-candidate join, and curated portraits for the Lane PDF gallery UI.
  */
@@ -64,6 +79,17 @@ export function getLanePdfGalleryData() {
   const manifest = loadLanePdfManifest();
   const candidates = loadLanePdfPhotoCandidates();
   const portraitsDoc = loadLanePdfPersonPortraits();
+  const hiddenDoc = loadLanePdfGalleryHidden();
+  const candidateImages = Array.isArray(candidates?.images) ? candidates.images : [];
+  const knownPlateImageIds = new Set(
+    candidateImages
+      .map((img) => (img && img.imageId != null ? String(img.imageId).trim() : ''))
+      .filter((id) => id.length > 0)
+  );
+  /** Only denylist ids that exist in the corpus (typos / stale entries dropped). */
+  const galleryHiddenIds = [...new Set((hiddenDoc.hiddenImageIds || []).map((id) => String(id)))]
+    .filter((id) => knownPlateImageIds.has(id))
+    .sort();
 
   const summary = manifest
     ? {
@@ -113,7 +139,8 @@ export function getLanePdfGalleryData() {
     creditDefault,
     candidatesStats: candidates?.stats || null,
     images: candidates?.images || [],
-    portraits
+    portraits,
+    galleryHiddenIds
   };
 }
 

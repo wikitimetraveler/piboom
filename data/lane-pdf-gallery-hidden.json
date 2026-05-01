@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "notes": "imageIds omitted from default gallery grid when blank-looking extracts should not appear. Editors: add/remove entries here; see also lane-pdf-photo-candidates.json ids.",
+  "hiddenImageIds": []
+}

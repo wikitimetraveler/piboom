@@ -34,6 +34,12 @@
 
 <div class="container mt-4 mb-5" data-lane-tts-main>
   <h1 class="h3"><i class="bi bi-images" aria-hidden="true"></i> Lane genealogy book plates</h1>
+  <div class="alert alert-info border-info mb-3" role="status">
+    <strong>Large tan “empty” boxes are usually not a deployment bug.</strong>
+    Each card loads a real JPEG under <code>/family/assets/lane-pdf/</code>.
+    Early pages often decode as plain paper or very faint prints in the scanned book (example: page&nbsp;4 next to portrait plates on other pages).
+    That looks the same in local dev and in production if the same assets are deployed.
+  </div>
   <p class="text-muted">
     Embedded images from <code>lanegenealogies01chap.pdf</code>, joined to tree people by matching
     <code>sourceRefs.pdfPageNumber</code>. Multiple names on the same page are flagged as ambiguous; confirm links in
@@ -46,17 +52,57 @@
     <strong>About these plates.</strong> Most portraits and scenes here are <strong>late-19th- and early-20th-century photographs</strong> (and related book illustrations) reproduced in a printed genealogy. Expect uneven contrast, silvering or fading in the originals, yellowed paper, halftone screening, and occasional blank or nearly blank pages from tissue inserts or lightly exposed images. What you see is typical of period books and digitization, not a defect in this viewer.
   </p>
 
-  <div id="lanePdfStats" class="mb-3"></div>
+  <div id="lanePdfStats" class="mb-3">
+    <div id="lanePdfStatsLine" class="lane-pdf-gallery-stats text-muted"></div>
+    <p class="lane-pdf-stats-hint" role="note">
+      These plates are late-19th- and early-20th-century book reproductions; faded paper, halftones, and uneven contrast are normal for the period.
+    </p>
+  </div>
   <div id="lanePdfError" class="alert alert-danger d-none" role="alert"></div>
 
-  <div class="lane-pdf-filters row mb-3">
+  <div class="alert alert-secondary border mb-3 lane-pdf-restore-banner" role="region" aria-label="Gallery recovery">
+    <button type="button" class="btn btn-primary btn-sm mr-3 mb-1" id="lanePdfEmergencyRestore">Show all plates again</button>
+    <span class="small text-muted mb-1 d-inline-block" style="max-width:42rem;">
+      Clears PDF page/id filters, removes your personally hidden plate IDs from this browser, and turns on the checkbox so every thumbnail is shown again.
+      Also use this when the page filter was set to <strong>0</strong> by mistake (that matches no PDF page).
+    </span>
+  </div>
+
+  <div id="lanePdfEmptyHint" class="alert alert-warning d-none" role="status">
+    <strong id="lanePdfEmptyHintTitle"></strong>
+    <span id="lanePdfEmptyHintDetail" class="d-block mt-1 small"></span>
+    <div class="btn-group mt-2" role="group" aria-label="Recover gallery view">
+      <button type="button" class="btn btn-outline-dark btn-sm d-none" id="lanePdfRecoverShowHidden">Turn on Show hidden plates</button>
+      <button type="button" class="btn btn-outline-dark btn-sm d-none" id="lanePdfRecoverClearHides">Clear my hides</button>
+      <button type="button" class="btn btn-outline-dark btn-sm d-none" id="lanePdfRecoverClearFilters">Clear page &amp; id filters</button>
+    </div>
+  </div>
+
+  <div class="lane-pdf-filters lane-pdf-filters--hide row mb-3 align-items-end">
     <div class="col-md-3 mb-2">
       <label class="small text-muted mb-0" for="lanePdfFilterPage">Filter by PDF page (1-based)</label>
-      <input type="number" min="1" class="form-control" id="lanePdfFilterPage" placeholder="e.g. 191"/>
+      <input type="number" min="1" class="form-control" id="lanePdfFilterPage" placeholder="e.g. 191" autocomplete="off"/>
     </div>
-    <div class="col-md-5 mb-2">
+    <div class="col-md-4 mb-2">
       <label class="small text-muted mb-0" for="lanePdfFilterIds">Filter by candidate person id(s)</label>
-      <input type="text" class="form-control" id="lanePdfFilterIds" placeholder="e.g. 133 134 or 2898"/>
+      <input type="text" class="form-control" id="lanePdfFilterIds" placeholder="e.g. 133 134 or 2898" autocomplete="off"/>
+    </div>
+    <div class="col-md-5 mb-2 lane-pdf-hide-controls">
+      <div class="custom-control custom-checkbox mb-2">
+        <input type="checkbox" class="custom-control-input" id="lanePdfShowHidden" checked />
+        <label class="custom-control-label small" for="lanePdfShowHidden">Show all plate thumbnails incl. denylist / your hides (<strong>off</strong> = hide those entries)</label>
+      </div>
+      <div class="btn-group lane-pdf-hide-buttons" role="group" aria-label="Your hidden plates">
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfUndoHide" disabled>Undo last hide</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfClearUserHidden">Clear my hides</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfExportUserHidden" title="Download JSON backup">Export hides</button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfTriggerImportHides">Import hides</button>
+      </div>
+      <label class="sr-only" for="lanePdfImportHidesInput">Merge plate IDs from exported JSON backup</label>
+      <input type="file" class="lane-pdf-sr-hidden" id="lanePdfImportHidesInput" accept=".json,application/json" tabindex="-1" />
+      <p class="small text-muted mb-0 lane-pdf-hide-hint mt-2">
+        <strong>Your hides</strong> are tied to this browser and stored in Postgres (server API). Client id in <code class="lane-pdf-k">localStorage</code>. Export/import JSON merges into the same hide list. Shared repo denylist: <code>data/lane-pdf-gallery-hidden.json</code>.
+      </p>
     </div>
   </div>
 

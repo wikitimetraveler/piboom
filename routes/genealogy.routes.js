@@ -12,6 +12,11 @@ import {
   getFeaturedStoryData,
   getProminentLanesData,
   getLanePdfGallery,
+  getLanePdfGalleryHides,
+  postLanePdfGalleryHidePlate,
+  postLanePdfGalleryUndoHide,
+  deleteLanePdfGalleryClientHides,
+  postLanePdfGalleryBulkImport,
   getLaneBookSayingsData,
   getWarCampaignsData,
   getWarParticipantsData,
@@ -50,6 +55,11 @@ router.get('/museum-content', getMuseumContentData);
 router.get('/featured-story', getFeaturedStoryData);
 router.get('/prominent-lanes', getProminentLanesData);
 router.get('/lane-pdf/gallery', getLanePdfGallery);
+router.get('/lane-pdf/hides', getLanePdfGalleryHides);
+router.post('/lane-pdf/hides', postLanePdfGalleryHidePlate);
+router.post('/lane-pdf/hides/undo', postLanePdfGalleryUndoHide);
+router.post('/lane-pdf/hides/import', postLanePdfGalleryBulkImport);
+router.delete('/lane-pdf/hides', deleteLanePdfGalleryClientHides);
 router.get('/lane-book-sayings', getLaneBookSayingsData);
 router.get('/wars', getWarCampaignsData);
 router.get('/wars/:warSlug/participants', getWarParticipantsData);
