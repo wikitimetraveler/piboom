@@ -1,0 +1,40 @@
+/* Genealogy image import (/family/genealogy-import.html) — BS5-compatible */
+
+body.genealogy-import-page {
+  background: #f6f8fc;
+}
+
+.camera-frame {
+  width: 100%;
+  min-height: 280px;
+  background: #111;
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.camera-frame video,
+.camera-frame img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.thumb {
+  width: 110px;
+  height: 145px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid rgba(44, 62, 80, 0.12);
+}
+
+.genealogy-import-page .card {
+  border-radius: 12px;
+  border-color: rgba(44, 62, 80, 0.08);
+}
+
+.genealogy-import-page .btn:focus-visible {
+  outline: 2px solid rgba(52, 152, 219, 0.85);
+  outline-offset: 2px;
+}

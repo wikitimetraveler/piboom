@@ -1,6 +1,112 @@
 import axios from 'axios';
 import { geocodeAddressFree } from '../services/free-geocoding.service.js';
 import { getGoogleBrowserApiKey, getGoogleServerApiKey } from '../lib/google-api-key.js';
+import { mbGet } from '../services/musicbrainz.service.js';
+
+/** Wikimedia Wikidata rate limits: space requests and honor Retry-After on 429 */
+const WIKIDATA_USER_AGENT =
+  'DevConnectLabsMusicResearch/1.0 (https://github.com/wikitimetraveler/devconnect-labs; piBoom music-research)';
+const WIKIDATA_MIN_INTERVAL_MS = 600;
+let wikidataNextSlot = 0;
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function wikidataThrottle() {
+  const now = Date.now();
+  const wait = Math.max(0, wikidataNextSlot - now);
+  if (wait > 0) await sleep(wait);
+}
+
+function wikidataBumpSchedule() {
+  wikidataNextSlot = Math.max(Date.now(), wikidataNextSlot) + WIKIDATA_MIN_INTERVAL_MS;
+}
+
+function parseRetryAfterMs(response) {
+  const ra = response?.headers?.['retry-after'];
+  if (ra == null || ra === '') return null;
+  const n = Number(String(ra).trim());
+  return Number.isFinite(n) ? Math.min(Math.max(n * 1000, 500), 120_000) : null;
+}
+
+/**
+ * GET a Wikidata / w/api.php URL with throttling + 429 retries (Retry-After).
+ */
+async function wikidataApiGet(url, options = {}) {
+  const maxAttempts = options.maxAttempts ?? 5;
+  let attempt = 0;
+  let lastErr;
+
+  while (attempt < maxAttempts) {
+    attempt += 1;
+    await wikidataThrottle();
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': WIKIDATA_USER_AGENT,
+          ...options.headers
+        },
+        validateStatus: () => true
+      });
+
+      if (response.status === 429) {
+        const backoff = parseRetryAfterMs(response) ?? Math.min(2000 * attempt, 30_000);
+        console.warn(`Wikidata rate limit (429); waiting ${backoff}ms before retry ${attempt}/${maxAttempts}`);
+        await sleep(backoff);
+        wikidataNextSlot = Date.now() + WIKIDATA_MIN_INTERVAL_MS;
+        lastErr = new Error('Wikidata 429');
+        lastErr.response = response;
+        continue;
+      }
+
+      if (response.status >= 400) {
+        const err = new Error(`Wikidata HTTP ${response.status}`);
+        err.response = response;
+        wikidataBumpSchedule();
+        throw err;
+      }
+
+      wikidataBumpSchedule();
+      return response;
+    } catch (e) {
+      lastErr = e;
+      const st = e.response?.status;
+      if (st === 429 && attempt < maxAttempts) {
+        const backoff =
+          parseRetryAfterMs(e.response) ?? Math.min(2000 * attempt, 30_000);
+        await sleep(backoff);
+        wikidataNextSlot = Date.now() + WIKIDATA_MIN_INTERVAL_MS;
+        continue;
+      }
+      wikidataBumpSchedule();
+      throw e;
+    }
+  }
+  if (lastErr) throw lastErr;
+  throw new Error('Wikidata: exceeded retries');
+}
+
+/** Batch english labels for Q-ids (up to 50 per request — API limit). */
+async function wikidataLabelsEnForIds(rawIds) {
+  const uniq = [...new Set((rawIds || []).filter(Boolean).map(String))];
+  const map = new Map();
+  if (!uniq.length) return map;
+
+  for (let i = 0; i < uniq.length; i += 50) {
+    const chunk = uniq.slice(i, i + 50);
+    const idsParam = chunk.map((id) => encodeURIComponent(String(id))).join('|');
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${idsParam}&format=json&props=labels&languages=en`;
+    const res = await wikidataApiGet(url);
+    const entities = res.data?.entities || {};
+    for (const id of Object.keys(entities)) {
+      const v = entities[id]?.labels?.en?.value;
+      if (v) map.set(id, v);
+    }
+  }
+  return map;
+}
 
 // Google Knowledge Graph search - now uses MusicBrainz for better data
 export async function searchKnowledgeGraph(req, res) {
@@ -12,14 +118,7 @@ export async function searchKnowledgeGraph(req, res) {
     }
 
     // Use MusicBrainz API for detailed artist information
-    const searchQuery = encodeURIComponent(artist);
-    const musicBrainzUrl = `https://musicbrainz.org/ws/2/artist?query=${searchQuery}&fmt=json&limit=1`;
-
-    const response = await axios.get(musicBrainzUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
-    });
+    const response = await mbGet('/artist', { query: artist, limit: 1 });
 
     const data = response.data;
 
@@ -184,12 +283,8 @@ async function getWikidataInfo(pageTitle) {
 
     // Get structured data from Wikidata
     const dataUrl = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${wikidataId}&format=json&props=claims`;
-    
-    const dataResponse = await axios.get(dataUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
-      }
-    });
+
+    const dataResponse = await wikidataApiGet(dataUrl);
     const entity = dataResponse.data.entities[wikidataId];
     
     if (!entity) {
@@ -239,28 +334,30 @@ async function getWikidataInfo(pageTitle) {
     // Extract band members (P527 for "has part") with enhanced data
     let bandMembers = [];
     if (claims.P527) {
+      const memberIds = [];
       for (const member of claims.P527) {
-        const memberId = member.mainsnak?.datavalue?.value?.id;
-        if (memberId) {
-          const memberName = await getEntityLabel(memberId);
-          if (memberName) {
-            // Try to get member's birth date and place directly from their Wikidata
-            const memberInfo = await getMemberInfoFromWikidata(memberId);
-            bandMembers.push({ 
-              name: memberName, 
-              instrument: memberInfo.instruments && memberInfo.instruments.length > 0 
-                ? memberInfo.instruments.join(', ') 
-                : 'Unknown', 
-              birthPlace: memberInfo.birthPlace || 'Unknown',
-              birthDate: memberInfo.birthDate || 'Unknown',
-              deathDate: memberInfo.deathDate || null,
-              deathPlace: memberInfo.deathPlace || null,
-              associatedActs: memberInfo.associatedActs || [],
-              imageUrl: memberInfo.imageUrl || null,
-              equipment: []
-            });
-          }
-        }
+        const mid = member.mainsnak?.datavalue?.value?.id;
+        if (mid) memberIds.push(mid);
+      }
+      const memberLabelMap = await wikidataLabelsEnForIds(memberIds);
+      for (const memberId of memberIds) {
+        const memberName = memberLabelMap.get(memberId);
+        if (!memberName) continue;
+        const memberInfo = await getMemberInfoFromWikidata(memberId);
+        bandMembers.push({
+          name: memberName,
+          instrument:
+            memberInfo.instruments && memberInfo.instruments.length > 0
+              ? memberInfo.instruments.join(', ')
+              : 'Unknown',
+          birthPlace: memberInfo.birthPlace || 'Unknown',
+          birthDate: memberInfo.birthDate || 'Unknown',
+          deathDate: memberInfo.deathDate || null,
+          deathPlace: memberInfo.deathPlace || null,
+          associatedActs: memberInfo.associatedActs || [],
+          imageUrl: memberInfo.imageUrl || null,
+          equipment: []
+        });
       }
     }
 
@@ -280,12 +377,10 @@ async function getWikidataInfo(pageTitle) {
 // Get place name from Wikidata ID
 async function getPlaceName(placeId) {
   try {
-    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${placeId}&format=json&props=labels&languages=en`;
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
-      }
-    });
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${encodeURIComponent(
+      placeId
+    )}&format=json&props=labels&languages=en`;
+    const response = await wikidataApiGet(url);
     const entity = response.data.entities[placeId];
     return entity?.labels?.en?.value || 'Unknown';
   } catch (error) {
@@ -297,12 +392,10 @@ async function getPlaceName(placeId) {
 // Get entity label from Wikidata ID
 async function getEntityLabel(entityId) {
   try {
-    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${entityId}&format=json&props=labels&languages=en`;
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
-      }
-    });
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${encodeURIComponent(
+      entityId
+    )}&format=json&props=labels&languages=en`;
+    const response = await wikidataApiGet(url);
     const entity = response.data.entities[entityId];
     return entity?.labels?.en?.value || null;
   } catch (error) {
@@ -311,103 +404,100 @@ async function getEntityLabel(entityId) {
   }
 }
 
-// Get member info directly from Wikidata
+// Get member info directly from Wikidata (1 claims request + batched label requests)
 async function getMemberInfoFromWikidata(memberId) {
   try {
-    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${memberId}&format=json&props=claims`;
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs; contact@example.com)'
-      }
-    });
+    const url = `https://www.wikidata.org/w/api.php?action=wbgetentities&ids=${encodeURIComponent(
+      memberId
+    )}&format=json&props=claims`;
+    const response = await wikidataApiGet(url);
     const entity = response.data.entities[memberId];
-    
+
     if (!entity) {
-      return { 
-        birthDate: 'Unknown', 
-        birthPlace: 'Unknown', 
-        deathDate: null, 
+      return {
+        birthDate: 'Unknown',
+        birthPlace: 'Unknown',
+        deathDate: null,
         deathPlace: null,
         instruments: [],
         associatedActs: [],
         imageUrl: null
       };
     }
-    
+
     const claims = entity.claims || {};
     let birthDate = 'Unknown';
-    let birthPlace = 'Unknown';
     let deathDate = null;
-    let deathPlace = null;
     let instruments = [];
     let associatedActs = [];
     let imageUrl = null;
-    
+
+    const idsForLabels = [];
+
+    let birthPlaceId = null;
+    let deathPlaceId = null;
+
     // Extract birth date (P569)
     if (claims.P569 && claims.P569[0]) {
       const dateValue = claims.P569[0].mainsnak?.datavalue?.value?.time;
-      if (dateValue) {
-        birthDate = formatWikidataDate(dateValue);
-      }
+      if (dateValue) birthDate = formatWikidataDate(dateValue);
     }
-    
+
     // Extract birth place (P19)
     if (claims.P19 && claims.P19[0]) {
-      const placeId = claims.P19[0].mainsnak?.datavalue?.value?.id;
-      if (placeId) {
-        birthPlace = await getPlaceName(placeId);
-      }
+      birthPlaceId = claims.P19[0].mainsnak?.datavalue?.value?.id;
+      if (birthPlaceId) idsForLabels.push(birthPlaceId);
     }
-    
+
     // Extract death date (P570)
     if (claims.P570 && claims.P570[0]) {
       const dateValue = claims.P570[0].mainsnak?.datavalue?.value?.time;
-      if (dateValue) {
-        deathDate = formatWikidataDate(dateValue);
-      }
+      if (dateValue) deathDate = formatWikidataDate(dateValue);
     }
-    
+
     // Extract death place (P20)
     if (claims.P20 && claims.P20[0]) {
-      const placeId = claims.P20[0].mainsnak?.datavalue?.value?.id;
-      if (placeId) {
-        deathPlace = await getPlaceName(placeId);
-      }
+      deathPlaceId = claims.P20[0].mainsnak?.datavalue?.value?.id;
+      if (deathPlaceId) idsForLabels.push(deathPlaceId);
     }
-    
-    // Extract instruments (P1303 - instrument played)
+
+    const instrumentIds = [];
     if (claims.P1303) {
       for (const instrumentClaim of claims.P1303) {
-        const instrumentId = instrumentClaim.mainsnak?.datavalue?.value?.id;
-        if (instrumentId) {
-          const instrumentName = await getEntityLabel(instrumentId);
-          if (instrumentName) {
-            instruments.push(instrumentName);
-          }
-        }
+        const iid = instrumentClaim.mainsnak?.datavalue?.value?.id;
+        if (iid) instrumentIds.push(iid);
       }
     }
-    
-    // Extract associated acts/bands (P463 - member of)
-    if (claims.P463) {
-      const limitedActs = claims.P463.slice(0, 5); // Limit to 5 to avoid too many requests
-      for (const actClaim of limitedActs) {
-        const actId = actClaim.mainsnak?.datavalue?.value?.id;
-        if (actId) {
-          const actName = await getEntityLabel(actId);
-          if (actName) {
-            // Try to get years active from qualifiers
-            const startTime = actClaim.qualifiers?.P580?.[0]?.datavalue?.value?.time;
-            const endTime = actClaim.qualifiers?.P582?.[0]?.datavalue?.value?.time;
-            
-            const yearsActive = formatYearsActive(startTime, endTime);
-            associatedActs.push({
-              name: actName,
-              years: yearsActive
-            });
-          }
-        }
-      }
+    idsForLabels.push(...instrumentIds);
+
+    const limitedActs = claims.P463 ? claims.P463.slice(0, 5) : [];
+    for (const actClaim of limitedActs) {
+      const actId = actClaim.mainsnak?.datavalue?.value?.id;
+      if (actId) idsForLabels.push(actId);
+    }
+
+    const labelMap = await wikidataLabelsEnForIds(idsForLabels);
+
+    let birthPlace = birthPlaceId ? labelMap.get(birthPlaceId) || 'Unknown' : 'Unknown';
+    let deathPlace = deathPlaceId ? labelMap.get(deathPlaceId) || null : null;
+
+    for (const iid of instrumentIds) {
+      const nm = labelMap.get(iid);
+      if (nm) instruments.push(nm);
+    }
+
+    for (let i = 0; i < limitedActs.length; i++) {
+      const actClaim = limitedActs[i];
+      const actId = actClaim.mainsnak?.datavalue?.value?.id;
+      if (!actId) continue;
+      const actName = labelMap.get(actId);
+      if (!actName) continue;
+      const startTime = actClaim.qualifiers?.P580?.[0]?.datavalue?.value?.time;
+      const endTime = actClaim.qualifiers?.P582?.[0]?.datavalue?.value?.time;
+      associatedActs.push({
+        name: actName,
+        years: formatYearsActive(startTime, endTime)
+      });
     }
     
     // Extract image (P18)
@@ -729,7 +819,7 @@ async function enrichBandMembersWithLocations(members) {
       }
       
       // Add a small delay to be respectful to APIs
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise((resolve) => setTimeout(resolve, 700));
       
     } catch (error) {
       console.error(`❌ Error enriching ${member.name}:`, error.message);
@@ -813,17 +903,7 @@ function extractSignatureEquipment(text, memberName) {
 // Get band members from MusicBrainz
 async function getMusicBrainzMembers(artistName) {
   try {
-    // Search for artist
-    const searchResponse = await axios.get('https://musicbrainz.org/ws/2/artist', {
-      params: {
-        query: artistName,
-        fmt: 'json',
-        limit: 1
-      },
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
-    });
+    const searchResponse = await mbGet('/artist', { query: artistName, limit: 1 });
 
     if (!searchResponse.data.artists || searchResponse.data.artists.length === 0) {
       return [];
@@ -831,16 +911,7 @@ async function getMusicBrainzMembers(artistName) {
 
     const artistData = searchResponse.data.artists[0];
 
-    // Get detailed artist info with relationships
-    const detailResponse = await axios.get(`https://musicbrainz.org/ws/2/artist/${artistData.id}`, {
-      params: {
-        inc: 'artist-rels',
-        fmt: 'json'
-      },
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
-    });
+    const detailResponse = await mbGet(`/artist/${artistData.id}`, { inc: 'artist-rels' });
 
     const detailedArtist = detailResponse.data;
     const bandMembers = [];
@@ -889,17 +960,7 @@ export async function searchMusicBrainz(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    // Search for artist
-    const searchResponse = await axios.get('https://musicbrainz.org/ws/2/artist', {
-      params: {
-        query: artist,
-        fmt: 'json',
-        limit: 1
-      },
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
-    });
+    const searchResponse = await mbGet('/artist', { query: artist, limit: 1 });
 
     if (!searchResponse.data.artists || searchResponse.data.artists.length === 0) {
       return res.json({ error: 'Artist not found in MusicBrainz' });
@@ -907,16 +968,7 @@ export async function searchMusicBrainz(req, res) {
 
     const artistData = searchResponse.data.artists[0];
 
-    // Get detailed artist info with relationships
-    const detailResponse = await axios.get(`https://musicbrainz.org/ws/2/artist/${artistData.id}`, {
-      params: {
-        inc: 'artist-rels',
-        fmt: 'json'
-      },
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
-    });
+    const detailResponse = await mbGet(`/artist/${artistData.id}`, { inc: 'artist-rels' });
 
     const detailedArtist = detailResponse.data;
     let bandMembers = [];
@@ -1011,17 +1063,7 @@ export async function searchAlbums(req, res) {
       return res.status(400).json({ error: 'Artist name is required' });
     }
 
-    // First, find the artist
-    const searchResponse = await axios.get('https://musicbrainz.org/ws/2/artist', {
-      params: {
-        query: artist,
-        fmt: 'json',
-        limit: 1
-      },
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/your-repo)'
-      }
-    });
+    const searchResponse = await mbGet('/artist', { query: artist, limit: 1 });
 
     if (!searchResponse.data.artists || searchResponse.data.artists.length === 0) {
       return res.json({ error: 'Artist not found in MusicBrainz' });
@@ -1029,20 +1071,14 @@ export async function searchAlbums(req, res) {
 
     const artistData = searchResponse.data.artists[0];
 
-    // Get albums for this artist
-    const albumsResponse = await axios.get(`https://musicbrainz.org/ws/2/release-group`, {
-      params: {
-        artist: artistData.id,
-        type: 'album',
-        fmt: 'json',
-        limit: 20
-      },
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/your-repo)'
-      }
+    const albumsResponse = await mbGet('/release-group', {
+      artist: artistData.id,
+      type: 'album',
+      limit: 20
     });
 
-    const albums = albumsResponse.data['release-groups'].map(album => ({
+    const releaseGroups = albumsResponse.data['release-groups'] || [];
+    const albums = releaseGroups.map(album => ({
       id: album.id,
       title: album.title,
       year: album['first-release-date'] ? album['first-release-date'].substring(0, 4) : 'Unknown',

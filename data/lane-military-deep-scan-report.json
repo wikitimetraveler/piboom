@@ -1,6 +1,6 @@
 {
-  "scannedPeople": 3618,
-  "serviceSignalHits": 260,
+  "scannedPeople": 3612,
+  "serviceSignalHits": 251,
   "conflictCount": 9,
   "conflicts": [
     {
@@ -10,7 +10,7 @@
         1675,
         1678
       ],
-      "participantCount": 23,
+      "participantCount": 22,
       "participants": [
         {
           "id": 6,
@@ -34,17 +34,6 @@
           "associationType": "service-member",
           "evidence": [
             "In Mar., 1675, when 22 years of age, he was a soldier in King Philip's war, in the same company where his brother Samuel served under Capt. Poole."
-          ]
-        },
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "low",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
           ]
         },
         {
@@ -293,7 +282,7 @@
         1754,
         1763
       ],
-      "participantCount": 116,
+      "participantCount": 115,
       "participants": [
         {
           "id": 44,
@@ -370,17 +359,6 @@
           "associationType": "service-member",
           "evidence": [
             "He was a farmer and shoemaker, and d. 23 Oct., 1815, ae. 85. On 26 Mar., 1770, he petitioned Gov. Wcntworth and the General Assembly for a committee to settle parish diffi- culties."
-          ]
-        },
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "low",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
           ]
         },
         {
@@ -1659,7 +1637,7 @@
         1775,
         1783
       ],
-      "participantCount": 168,
+      "participantCount": 167,
       "participants": [
         {
           "id": 44,
@@ -1737,17 +1715,6 @@
           "associationType": "service-member",
           "evidence": [
             "He was a farmer and shoemaker, and d. 23 Oct., 1815, ae. 85. On 26 Mar., 1770, he petitioned Gov. Wcntworth and the General Assembly for a committee to settle parish diffi- culties."
-          ]
-        },
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
           ]
         },
         {
@@ -3611,7 +3578,7 @@
         1812,
         1815
       ],
-      "participantCount": 162,
+      "participantCount": 161,
       "participants": [
         {
           "id": 44,
@@ -3633,17 +3600,6 @@
           "associationType": "service-member",
           "evidence": [
             "He was a farmer and shoemaker, and d. 23 Oct., 1815, ae. 85. On 26 Mar., 1770, he petitioned Gov. Wcntworth and the General Assembly for a committee to settle parish diffi- culties."
-          ]
-        },
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
           ]
         },
         {
@@ -5503,19 +5459,8 @@
         1846,
         1848
       ],
-      "participantCount": 156,
+      "participantCount": 155,
       "participants": [
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
-          ]
-        },
         {
           "id": 138,
           "name": "Hgen Willaim Lane - Tailor",
@@ -7338,19 +7283,8 @@
         1861,
         1865
       ],
-      "participantCount": 153,
+      "participantCount": 152,
       "participants": [
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
-          ]
-        },
         {
           "id": 138,
           "name": "Hgen Willaim Lane - Tailor",
@@ -9133,19 +9067,8 @@
         1898,
         1898
       ],
-      "participantCount": 138,
+      "participantCount": 137,
       "participants": [
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
-          ]
-        },
         {
           "id": 138,
           "name": "Hgen Willaim Lane - Tailor",
@@ -10754,19 +10677,8 @@
         1914,
         1918
       ],
-      "participantCount": 138,
+      "participantCount": 137,
       "participants": [
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
-          ]
-        },
         {
           "id": 138,
           "name": "Hgen Willaim Lane - Tailor",
@@ -12375,19 +12287,8 @@
         1939,
         1945
       ],
-      "participantCount": 138,
+      "participantCount": 137,
       "participants": [
-        {
-          "id": 87,
-          "name": "Abenaki People",
-          "birthYear": 1580,
-          "deathYear": "9999",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "wikipedia - When the Wampanoag people under King Philip (Metacomet) fought the English colonists in New England in 1675 in King Philip's War, the Abenaki joined the Wampanoag. For three years there was fighting along the Maine frontier in the First Abenaki War. The Abenaki pushed back the line of white settlement by devastating raids on scattered farmhouses and small villages. The war was settled by a peace treaty in 1678, with the Wampanoag more than decimated and many Native survivors having been sold into slavery in Bermuda.[9]During Queen Anne's War in 1702, the Abenaki were allied with the French; they raided numerous small villages in Maine, Wells to Casco, killing about 300 settlers over ten years. The raids stopped when the war ended. Some captives were adopted into the Mohawk and Abenaki tribes; older captives were generally ransomed, and the colonies carried on a brisk trade.[10]The Third Abenaki War (1722–25), called Father Rale's War, erupted when the French Jesuit missionary Sébastien Rale (or Rasles, 1657?-1724) encouraged the Abenaki to halt the spread of Yankee settlements. When the Massachusetts militia tried to seize Rasles, the Abenaki raided the settlements at Brunswick, Arrowsick, and Merry-Meeting Bay. The Massachusetts government then declared war and bloody battles were fought at Norridgewock (1724), where Rasles was killed, and at a daylong battle at the Indian village near present-day Fryeburg, Maine, on the upper Saco River (1725). Peace conferences at Boston and Casco Bay brought an end to the war. After Rale died the Abenaki moved to a settlement on the St. Francis River.[11]The Abenaki from St. Francois continued to raid British settlements in their former homelands along the New England frontier during Father Le Loutre's War (see Northeast Coast Campaign (1750)) and the French and Indian War."
-          ]
-        },
         {
           "id": 138,
           "name": "Hgen Willaim Lane - Tailor",

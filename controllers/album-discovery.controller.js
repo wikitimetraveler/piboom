@@ -1,6 +1,7 @@
 import axios from 'axios';
 import OpenAI from 'openai';
 import { config } from '../config/index.js';
+import { mbGet } from '../services/musicbrainz.service.js';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -200,13 +201,10 @@ export async function getAlbums(req, res) {
 
 
     // Use MusicBrainz API for album information
-    const searchQuery = encodeURIComponent(artist);
-    const musicBrainzUrl = `https://musicbrainz.org/ws/2/release-group?query=artist:${searchQuery}&type=album&fmt=json&limit=20`;
-
-    const response = await axios.get(musicBrainzUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
+    const response = await mbGet('/release-group', {
+      query: `artist:${artist}`,
+      type: 'album',
+      limit: 20
     });
 
     const data = response.data;
@@ -257,13 +255,10 @@ export async function searchAlbum(req, res) {
     console.log('🔍 Searching for album:', albumName);
 
     // Use MusicBrainz API to search for specific album
-    const searchQuery = encodeURIComponent(albumName);
-    const musicBrainzUrl = `https://musicbrainz.org/ws/2/release-group?query=releasegroup:${searchQuery}&type=album&fmt=json&limit=5`;
-
-    const response = await axios.get(musicBrainzUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
+    const response = await mbGet('/release-group', {
+      query: `releasegroup:${albumName}`,
+      type: 'album',
+      limit: 5
     });
 
     const data = response.data;

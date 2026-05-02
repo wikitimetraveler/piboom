@@ -69,6 +69,11 @@ body.lane-occ-page {
   background: #263347;
 }
 
+.occ-job-btn:focus-visible {
+  outline: 2px solid rgba(109, 163, 209, 0.95);
+  outline-offset: 2px;
+}
+
 .occ-job-btn .occ-count {
   font-size: 0.8rem;
   color: #9aa6b5;

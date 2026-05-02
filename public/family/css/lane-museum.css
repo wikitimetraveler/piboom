@@ -31,6 +31,20 @@ body.lane-museum-page {
   --history-border: var(--museum-border);
   --history-accent: var(--museum-accent);
   --history-link: var(--museum-link);
+  /* lane-shell themed hooks */
+  --lane-qnav-link-bd: var(--museum-border);
+  --lane-qnav-link-fg: var(--museum-link);
+  --lane-qnav-link-fs: 0.76rem;
+  --lane-qnav-link-tracking: 0.08em;
+  --lane-qnav-link-case: uppercase;
+  --lane-qnav-link-pad-v: 0.3rem;
+  --lane-qnav-link-pad-h: 0.68rem;
+  --lane-qnav-link-hover-bd: var(--museum-accent);
+  --lane-qnav-link-hover-fg: var(--museum-text);
+  --lane-qnav-link-hover-bg: rgba(174, 154, 120, 0.1);
+  --lane-qnav-focus-color: rgba(196, 184, 150, 0.92);
+  --lane-context-note-fg: var(--museum-muted);
+  --lane-context-note-size: 0.82rem;
   background: var(--museum-bg);
   color: var(--museum-text);
   font-family: var(--museum-sans);
@@ -126,50 +140,8 @@ body.archiveLight .museum-wordmark {
 }
 
 .museum-quick-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
   margin-top: 1rem;
-}
-
-.history-quick-nav .history-quick-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.68rem;
-  border-radius: 999px;
-  border: 1px solid var(--history-border);
-  color: var(--history-link);
-  text-decoration: none;
-  font-size: 0.76rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.history-quick-nav .history-quick-link:hover,
-.history-quick-nav .history-quick-link.is-active {
-  border-color: var(--history-accent);
-  color: var(--history-text);
-  background: rgba(174, 154, 120, 0.1);
-}
-
-.museum-quick-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.68rem;
-  border-radius: 999px;
-  border: 1px solid var(--museum-border);
-  color: var(--museum-link);
-  text-decoration: none;
-  font-size: 0.76rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.museum-quick-link:hover,
-.museum-quick-link.is-active {
-  border-color: var(--museum-accent);
-  color: var(--museum-text);
-  background: rgba(174, 154, 120, 0.1);
+  gap: 0.5rem;
 }
 
 .museum-error {
@@ -277,12 +249,6 @@ body.archiveLight .museum-wordmark {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--museum-accent);
-}
-
-.history-context-evidence-note {
-  color: #c4bcb0;
-  font-size: 0.82rem;
-  letter-spacing: 0.01em;
 }
 
 .museum-code {
@@ -932,4 +898,148 @@ a {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* Exhibit card modal (shared pattern with music collection poster) */
+.museum-poster-modal-content {
+  background: var(--museum-surface);
+  color: var(--museum-text);
+  border: 1px solid var(--museum-border);
+}
+
+.museum-poster-modal-content .modal-header {
+  background: var(--museum-surface-soft);
+  border-bottom: 1px solid var(--museum-border);
+}
+
+.museum-poster-modal-content .close {
+  color: var(--museum-text);
+  text-shadow: none;
+  opacity: 0.85;
+}
+
+.museum-poster-layout.poster-layout {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.museum-poster-preview.poster-preview {
+  flex: 0 0 320px;
+  max-width: 100%;
+  overflow: auto;
+  max-height: 420px;
+}
+
+.museum-poster-frame.poster-frame,
+#museumPosterContent.museum-poster-frame {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 2px solid rgba(174, 154, 120, 0.35);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.museum-poster-frame .poster-cover,
+#museumPosterContent .poster-cover {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  background: #f0f0f0;
+  display: block;
+}
+
+.museum-poster-frame .poster-body,
+#museumPosterContent .poster-body {
+  padding: 16px;
+  text-align: left;
+  color: #1a1a1a;
+}
+
+#museumPosterContent .poster-kicker {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #6b5344;
+  margin-bottom: 6px;
+}
+
+#museumPosterContent .poster-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #1a1a1a;
+}
+
+#museumPosterContent .poster-subtitle {
+  font-size: 0.95rem;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+#museumPosterContent .poster-meta {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+#museumPosterContent .poster-section {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(174, 154, 120, 0.12);
+  border-left: 3px solid #ae9a78;
+  font-size: 0.82rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+#museumPosterContent .poster-section h6 {
+  margin: 0 0 6px 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6b5344;
+}
+
+.museum-poster-sidebar .poster-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.museum-poster-sidebar .poster-actions button {
+  flex: 1 1 auto;
+  min-width: 140px;
+}
+
+.museum-poster-sidebar .poster-share-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.museum-poster-sidebar .poster-share-row input {
+  flex: 1 1 auto;
+  background: var(--museum-surface-soft);
+  color: var(--museum-text);
+  border: 1px solid var(--museum-border);
+}
+
+.prominent-card-poster-btn {
+  font-size: 0.75rem;
+}
+
+#museumPosterModeSimple.active,
+#museumPosterModeTemplate.active {
+  box-shadow: inset 0 0 0 2px rgba(174, 154, 120, 0.5);
+}
+
+.museum-template-btn.active {
+  background-color: rgba(174, 154, 120, 0.25);
+  border-color: var(--museum-accent);
 }

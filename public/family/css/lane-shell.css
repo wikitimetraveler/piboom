@@ -1,0 +1,144 @@
+/**
+ * Lane family tools — shared structure + themed hooks (--lane-qnav-*, --lane-context-*).
+ * Theme pages assign hook variables on body; do not impose light palette globally.
+ */
+
+.lane-tools-page {
+  --lane-focus-ring: 0 0 0 3px rgba(52, 152, 219, 0.45);
+  --lane-qnav-gap: 0.45rem;
+  --lane-qnav-margin-top: 0;
+  --lane-qnav-link-pad-v: 0.28rem;
+  --lane-qnav-link-pad-h: 0.62rem;
+  --lane-qnav-link-bd: rgba(44, 62, 80, 0.22);
+  --lane-qnav-link-fg: var(--ice-dark, #2c3e50);
+  --lane-qnav-link-fs: 0.78rem;
+  --lane-qnav-link-tracking: 0.04em;
+  --lane-qnav-link-case: none;
+  --lane-qnav-link-radius: 999px;
+  --lane-qnav-link-hover-bd: rgba(52, 152, 219, 0.35);
+  --lane-qnav-link-hover-fg: var(--ice-dark, #2c3e50);
+  --lane-qnav-link-hover-bg: rgba(52, 152, 219, 0.08);
+  --lane-qnav-focus-color: rgba(52, 152, 219, 0.9);
+  --lane-context-note-fg: #6c757d;
+  --lane-context-note-size: 0.82rem;
+}
+
+/* Canonical page titles (plus PDF gallery aliases) */
+.lane-tools-page .lane-page-head,
+.lane-pdf-gallery-page .lane-pdf-page-head {
+  border-bottom: 1px solid var(--border, rgba(189, 195, 199, 0.35));
+  padding-bottom: 1rem;
+}
+
+.lane-tools-page .lane-page-title,
+.lane-pdf-gallery-page .lane-pdf-page-title {
+  font-size: clamp(1.45rem, 3.8vw, 1.95rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ice-dark, #2c3e50);
+  margin: 0 0 0.5rem;
+  line-height: 1.25;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.65rem;
+}
+
+.lane-tools-page .lane-page-title .bi,
+.lane-pdf-gallery-page .lane-pdf-page-title .bi {
+  font-size: 1.05em;
+  color: rgba(52, 152, 219, 0.85);
+  flex-shrink: 0;
+}
+
+.lane-tools-page .lane-page-title__text,
+.lane-pdf-gallery-page .lane-pdf-page-title__text {
+  min-width: 0;
+}
+
+.lane-tools-page .lane-page-lead,
+.lane-pdf-gallery-page .lane-pdf-page-lead {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  max-width: 48rem;
+}
+
+.history-quick-nav,
+.museum-quick-nav,
+.war-quick-nav,
+.direct-quick-nav,
+.memorial-quick-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lane-qnav-gap, 0.45rem);
+  margin-top: var(--lane-qnav-margin-top, 0);
+}
+
+.history-quick-nav .history-quick-link,
+.museum-quick-nav .museum-quick-link,
+.war-quick-nav .war-quick-link,
+.direct-quick-nav .direct-quick-link,
+.memorial-quick-nav .history-quick-link,
+.memorial-quick-nav .memorial-quick-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--lane-qnav-link-pad-v) var(--lane-qnav-link-pad-h);
+  border-radius: var(--lane-qnav-link-radius);
+  border: 1px solid var(--lane-qnav-link-bd);
+  color: var(--lane-qnav-link-fg);
+  text-decoration: none;
+  font-size: var(--lane-qnav-link-fs);
+  letter-spacing: var(--lane-qnav-link-tracking);
+  text-transform: var(--lane-qnav-link-case, none);
+  min-height: 2.05rem;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease,
+    background 0.2s ease;
+}
+
+.history-quick-nav .history-quick-link:hover,
+.history-quick-nav .history-quick-link.is-active,
+.museum-quick-nav .museum-quick-link:hover,
+.museum-quick-nav .museum-quick-link.is-active,
+.war-quick-nav .war-quick-link:hover,
+.war-quick-nav .war-quick-link.is-active,
+.direct-quick-nav .direct-quick-link:hover,
+.direct-quick-nav .direct-quick-link.is-active,
+.memorial-quick-nav .history-quick-link:hover,
+.memorial-quick-nav .history-quick-link.is-active,
+.memorial-quick-nav .memorial-quick-link:hover,
+.memorial-quick-nav .memorial-quick-link.is-active {
+  border-color: var(--lane-qnav-link-hover-bd);
+  color: var(--lane-qnav-link-hover-fg);
+  background: var(--lane-qnav-link-hover-bg);
+}
+
+.history-quick-nav .history-quick-link:focus-visible,
+.museum-quick-nav .museum-quick-link:focus-visible,
+.war-quick-nav .war-quick-link:focus-visible,
+.direct-quick-nav .direct-quick-link:focus-visible,
+.memorial-quick-nav .history-quick-link:focus-visible,
+.memorial-quick-nav .memorial-quick-link:focus-visible {
+  outline: 2px solid var(--lane-qnav-focus-color);
+  outline-offset: 2px;
+}
+
+@media (pointer: coarse) {
+  .history-quick-nav .history-quick-link,
+  .museum-quick-nav .museum-quick-link,
+  .war-quick-nav .war-quick-link,
+  .direct-quick-nav .direct-quick-link,
+  .memorial-quick-nav .history-quick-link,
+  .memorial-quick-nav .memorial-quick-link {
+    min-height: 2.45rem;
+  }
+}
+
+.history-context-evidence-note {
+  color: var(--lane-context-note-fg, #6c757d);
+  font-size: var(--lane-context-note-size, 0.82rem);
+  letter-spacing: 0.01em;
+}

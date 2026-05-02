@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/shared/collection-styles.css"/>
+  <link rel="stylesheet" href="/family/css/lane-shell.css"/>
   <link rel="stylesheet" href="/family/css/lane-tts.css"/>
   <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css"/>
   <script src="/shared/toast.js"></script>
@@ -242,6 +243,27 @@
       background: #2980b9;
       color: white;
       text-decoration: none;
+    }
+
+    #menu a:focus-visible {
+      outline: 2px solid rgba(52, 152, 219, 0.9);
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
+
+    .toggle__button:focus-visible {
+      outline: 2px solid rgba(52, 152, 219, 0.9);
+      outline-offset: 2px;
+    }
+
+    .back-button:focus-visible {
+      outline: 3px solid #fff;
+      outline-offset: 3px;
+    }
+
+    #search:focus-visible {
+      border-color: rgba(52, 152, 219, 0.55);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.35);
     }
   </style>
 </head>

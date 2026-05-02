@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
   <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-shell.css" />
   <link rel="stylesheet" href="/family/css/lane-museum.css" />
   <link rel="stylesheet" href="/family/css/lane-tts.css" />
   <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
@@ -51,7 +52,12 @@
 
     <section class="museum-grid">
       <article class="museum-panel museum-panel--primary" id="museumFeaturedPanel">
-        <div class="featured-badge">Opening exhibit</div>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2 featured-exhibit-actions">
+          <div class="featured-badge mb-0">Opening exhibit</div>
+          <button type="button" id="featuredExhibitCardBtn" class="btn btn-sm btn-outline-secondary museum-exhibit-card-btn d-none" aria-label="Generate exhibit card for featured exhibit">
+            <i class="bi bi-image" aria-hidden="true"></i> Exhibit card
+          </button>
+        </div>
         <h2 id="featuredTitle" class="museum-featured-title">Exhibit 1</h2>
         <p id="featuredSubtitle" class="museum-lede mb-3">Loading...</p>
         <p id="featuredSummary" class="museum-prose"></p>
@@ -131,12 +137,103 @@
     </section>
   </main>
 
+  <!-- Exhibit card modal (same pipeline as record collection posters) -->
+  <div class="modal fade" id="museumPosterModal" tabindex="-1" role="dialog" aria-labelledby="museumPosterModalTitle">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content museum-poster-modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="museumPosterModalTitle"><i class="bi bi-image" aria-hidden="true"></i> Exhibit card</h5>
+          <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="small font-weight-bold">Mode</label>
+            <div class="d-flex flex-wrap gap-2 mt-1">
+              <button type="button" class="btn btn-sm btn-outline-primary" id="museumPosterModeSimple">Simple</button>
+              <button type="button" class="btn btn-sm btn-outline-primary" id="museumPosterModeTemplate">Template</button>
+            </div>
+          </div>
+          <div id="museumPosterTemplateOpts" class="mb-3" style="display: none;">
+            <label class="small font-weight-bold">Template</label>
+            <div class="d-flex flex-wrap gap-2 mt-1 mb-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary museum-template-btn" data-id="single">Single</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary museum-template-btn" data-id="vintage">Vintage</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary museum-template-btn" data-id="split">Split</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary museum-template-btn" data-id="grid">Grid</button>
+            </div>
+            <div class="d-flex flex-wrap gap-3 align-items-center">
+              <div>
+                <label class="small">Font</label>
+                <select id="museumPosterFont" class="form-control form-control-sm" style="max-width: 160px;">
+                  <option value="Georgia, serif">Serif</option>
+                  <option value="'Helvetica Neue', Arial, sans-serif">Sans</option>
+                  <option value="'Impact', 'Arial Black', sans-serif">Display</option>
+                  <option value="'Brush Script MT', cursive">Script</option>
+                  <option value="'Courier New', monospace">Mono</option>
+                </select>
+              </div>
+              <div>
+                <label class="small">Frame</label>
+                <select id="museumPosterFrame" class="form-control form-control-sm" style="max-width: 140px;">
+                  <option value="none">None</option>
+                  <option value="thin_gold">Thin Gold</option>
+                  <option value="thick_vintage">Thick Vintage</option>
+                  <option value="neon_glow">Neon Glow</option>
+                </select>
+              </div>
+              <div class="form-check align-self-end">
+                <input type="checkbox" class="form-check-input" id="museumPosterQr" />
+                <label class="form-check-label small" for="museumPosterQr">QR code</label>
+              </div>
+            </div>
+          </div>
+          <div class="poster-layout mt-3 museum-poster-layout">
+            <div class="poster-preview museum-poster-preview">
+              <div id="museumPosterContent" class="poster-frame museum-poster-frame"></div>
+            </div>
+            <div class="museum-poster-sidebar">
+              <p class="mb-2">Create a shareable card for this exhibit.</p>
+              <div class="poster-actions">
+                <button type="button" class="btn btn-primary" id="museumPosterDownloadPng">
+                  <i class="bi bi-download" aria-hidden="true"></i> Download PNG
+                </button>
+                <button type="button" class="btn btn-secondary" id="museumPosterDownloadPdf">
+                  <i class="bi bi-filetype-pdf" aria-hidden="true"></i> Download PDF
+                </button>
+                <button type="button" class="btn btn-success" id="museumPosterShare">
+                  <i class="bi bi-share" aria-hidden="true"></i> Share
+                </button>
+              </div>
+              <div class="poster-share-row">
+                <input id="museumPosterShareLink" class="form-control" placeholder="Share link will appear here" readonly />
+                <button type="button" class="btn btn-outline-primary" id="museumPosterCopyLink" aria-label="Copy share link">
+                  <i class="bi bi-clipboard" aria-hidden="true"></i>
+                </button>
+              </div>
+              <small class="text-muted">QR points at memorial wall, featured page URL, or lunar QuickMap when enabled.</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="/shared/tts.js"></script>
   <script src="/family/js/lane-tts.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="/family/js/history-mode.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
+  <script src="/shared/poster-utils.js"></script>
+  <script src="/shared/poster-templates.js"></script>
   <script src="/family/js/lane-museum.js"></script>
 </body>
 </html>

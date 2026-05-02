@@ -889,34 +889,106 @@
             document.getElementById('extractFieldsBtn').disabled = !dataUrl;
         }
 
-        function loadImageFile(file, successMessage) {
+        function loadImageFile(file, successMessage, options = {}) {
             if (!file) return false;
-            if (!file.type || !file.type.startsWith('image/')) {
+            const mimeOk = file.type && file.type.startsWith('image/');
+            const acceptUntyped = options.allowUntypedClipboard && file.size > 0;
+            if (!mimeOk && !acceptUntyped) {
                 setImageStatus('Only image files are supported.', 'warning');
                 return false;
             }
             const reader = new FileReader();
             reader.onload = () => {
-                setAutomatorImage(reader.result);
+                const result = reader.result;
+                if (typeof result !== 'string' || !result.startsWith('data:image')) {
+                    setImageStatus('Could not decode image data from paste.', 'warning');
+                    return;
+                }
+                setAutomatorImage(result);
                 setImageStatus(successMessage, 'success');
+            };
+            reader.onerror = () => {
+                setImageStatus(`Could not read image file: ${reader.error?.message || 'unknown error'}.`, 'danger');
             };
             reader.readAsDataURL(file);
             return true;
         }
 
-        function tryLoadClipboardImageFromEvent(e, noImageMessage) {
-            const items = Array.from(e?.clipboardData?.items || []);
-            const imageItem = items.find((item) => item.type.startsWith('image/'));
-            if (!imageItem) {
+        function firstImageFileFromPasteEvent(e) {
+            const cd = e?.clipboardData;
+            if (!cd) return null;
+            const fromFileList = (list) => {
+                if (!list?.length) return null;
+                const arr = Array.from(list);
+                return (
+                    arr.find((f) => f.type && f.type.startsWith('image/'))
+                    ?? arr.find(
+                        (f) => f.size > 16 && (!f.type || f.type === 'application/octet-stream'),
+                    )
+                    ?? null
+                );
+            };
+            // Windows / Chrome often put pasted screenshots under files[], not items[].
+            const direct = fromFileList(cd.files);
+            if (direct) return direct;
+            const items = Array.from(cd.items || []);
+            let untypedGuess = null;
+            for (const item of items) {
+                if (item.kind !== 'file') continue;
+                const file = item.getAsFile();
+                if (!file || !file.size) continue;
+                if (file.type && file.type.startsWith('image/')) return file;
+                const maybeRaw = !file.type || file.type === 'application/octet-stream';
+                if (maybeRaw && file.size > 128) {
+                    untypedGuess ||= file;
+                }
+            }
+            if (untypedGuess) return untypedGuess;
+            const byMime = items.find((item) => item.type && item.type.startsWith('image/'));
+            if (byMime) {
+                const file = byMime.getAsFile();
+                if (file && file.size > 0) return file;
+            }
+            return null;
+        }
+
+        async function loadImageFromAsyncClipboardPaste(noImageMessage) {
+            if (!navigator.clipboard?.read || !window.isSecureContext) {
                 if (noImageMessage) setImageStatus(noImageMessage, 'warning');
                 return false;
             }
-            const file = imageItem.getAsFile();
-            if (!file) {
-                if (noImageMessage) setImageStatus(noImageMessage, 'warning');
-                return false;
+            try {
+                const items = await navigator.clipboard.read();
+                for (const clipItem of items) {
+                    for (const mime of clipItem.types || []) {
+                        if (!mime.startsWith('image/')) continue;
+                        const blob = await clipItem.getType(mime);
+                        const reader = new FileReader();
+                        const result = await new Promise((resolve, reject) => {
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = () => reject(reader.error);
+                            reader.readAsDataURL(blob);
+                        });
+                        if (typeof result === 'string' && result.startsWith('data:image')) {
+                            setAutomatorImage(result);
+                            setImageStatus('Image pasted. Click Extract Fields.', 'success');
+                            return true;
+                        }
+                    }
+                }
+            } catch (_) {
+                // Permission denied or unsupported — fall through.
             }
-            return loadImageFile(file, 'Image pasted. Click Extract Fields.');
+            if (noImageMessage) setImageStatus(noImageMessage, 'warning');
+            return false;
+        }
+
+        function tryLoadClipboardImageFromEvent(e) {
+            const file = firstImageFileFromPasteEvent(e);
+            if (!file) return false;
+            return loadImageFile(file, 'Image pasted. Click Extract Fields.', {
+                allowUntypedClipboard: !file.type || file.type === 'application/octet-stream',
+            });
         }
 
         function setCreateUpdateStatus(statusEl, message, level) {
@@ -1186,7 +1258,8 @@
             });
             els.imageDropZone.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V')) {
-                    setImageStatus('Paste detected. If your clipboard contains an image, it will load.', 'info');
+                    // Do not imply success yet — Ctrl+V fires before paste.
+                    setImageStatus('Reading clipboard…', 'info');
                 }
             });
             els.imageDropZone.addEventListener('dragover', (e) => {
@@ -1202,13 +1275,26 @@
                 const file = e.dataTransfer?.files?.[0];
                 loadImageFile(file, 'Image dropped. Click Extract Fields.');
             });
-            els.imageDropZone.addEventListener('paste', (e) => {
-                e.preventDefault();
-                tryLoadClipboardImageFromEvent(
-                    e,
-                    'No image detected in clipboard. Copy an image first, then press Ctrl+V.'
-                );
-            });
+            const noPasteImageMsg =
+                'No image in clipboard. Copy a screenshot (e.g. Win+Shift+S) or image, click this dashed drop zone once so it shows a focus outline, then Ctrl+V.';
+
+            function clipboardHasLikelyImage(e) {
+                const types = Array.from(e.clipboardData?.types || []);
+                return types.some((t) => t.startsWith('image/'));
+            }
+
+            async function interceptAutomatorPaste(e) {
+                if (typeof e.preventDefault === 'function') {
+                    e.preventDefault();
+                }
+                if (tryLoadClipboardImageFromEvent(e)) {
+                    return;
+                }
+                // Some browsers/OS builds hide image bytes from sync clipboardData unless read via Async Clipboard API.
+                await loadImageFromAsyncClipboardPaste(noPasteImageMsg);
+            }
+
+            // Single document-level handler avoids double-firing when the drop zone is focused
             document.addEventListener('paste', (e) => {
                 const activeEl = document.activeElement;
                 const isTypingField = activeEl && (
@@ -1216,11 +1302,17 @@
                     activeEl.tagName === 'TEXTAREA' ||
                     activeEl.isContentEditable
                 );
-                const shouldShowNoImageStatus = activeEl === els.imageDropZone || !isTypingField;
-                tryLoadClipboardImageFromEvent(
-                    e,
-                    shouldShowNoImageStatus ? 'Clipboard paste did not contain an image.' : ''
-                );
+                if (isTypingField) return;
+
+                const focusOnDrop =
+                    activeEl === els.imageDropZone || els.imageDropZone.contains(activeEl);
+
+                const shouldTryImage =
+                    focusOnDrop || clipboardHasLikelyImage(e);
+
+                if (!shouldTryImage) return;
+
+                void interceptAutomatorPaste(e);
             });
             els.startCameraBtn.addEventListener('click', startAutomatorCamera);
             els.captureCameraBtn.addEventListener('click', captureAutomatorCamera);

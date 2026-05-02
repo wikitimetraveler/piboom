@@ -22,6 +22,493 @@ async function getJson(url) {
   return response.json();
 }
 
+/** Cached API payloads for exhibit cards (set in initLaneMuseum). */
+let cachedMuseumContent = null;
+let cachedFeaturedStory = null;
+let cachedProminentLanes = [];
+let cachedLunarExhibit = null;
+
+let currentMuseumPoster = null;
+let museumPosterCanvas = null;
+let museumPosterMode = 'simple';
+let museumPosterTemplateId = 'single';
+let museumPosterUiBound = false;
+
+/** Same-origin raster when no exhibit portrait / proxy fails — never use raw svg+xml in src without encoding (breaks HTML). */
+const MUSEUM_EXHIBIT_DEFAULT_IMAGE = '/family/assets/lane-genealogies-title-spread.png';
+
+function svgMarkupToDataUrl(markup) {
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(markup.trim())}`;
+}
+
+function museumLunarDefaultCoverDataUrl() {
+  return svgMarkupToDataUrl(`<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640"><rect width="640" height="640" fill="#1a1a2e"/><circle cx="320" cy="320" r="210" fill="#d4dce8" opacity="0.28"/><circle cx="320" cy="320" r="180" fill="#b8bcc8" opacity="0.15"/><ellipse cx="250" cy="260" rx="36" ry="28" fill="#8a8793" opacity="0.35"/><ellipse cx="380" cy="360" rx="22" ry="18" fill="#8a8793" opacity="0.3"/><text x="320" y="520" fill="#ece8df" font-size="20" font-family="Georgia,serif" text-anchor="middle">Lane lunar feature</text></svg>`);
+}
+
+/** Safe src for HTML attributes (do not escape & in query strings). */
+function escapeAttrSrc(src) {
+  return String(src || '').replace(/"/g, '%22').replace(/\n/g, '').trim();
+}
+
+function exhibitPosterCoverUrl(primaryUrl) {
+  const u = String(primaryUrl || '').trim();
+  if (!u) return MUSEUM_EXHIBIT_DEFAULT_IMAGE;
+  const resolved = resolvePosterImageUrl(u);
+  return resolved && String(resolved).trim() ? resolved : MUSEUM_EXHIBIT_DEFAULT_IMAGE;
+}
+
+function lunarPosterCoverUrl(primaryUrl) {
+  const u = String(primaryUrl || '').trim();
+  if (!u) return museumLunarDefaultCoverDataUrl();
+  const resolved = resolvePosterImageUrl(u);
+  return resolved && String(resolved).trim() ? resolved : museumLunarDefaultCoverDataUrl();
+}
+
+function resolvePosterImageUrl(url) {
+  if (!url) return url;
+  if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+  if (url.startsWith('/') || url.startsWith(window.location.origin)) return url;
+  return `/api/poster-generator/proxy-image?url=${encodeURIComponent(url)}`;
+}
+
+function generateMuseumPosterQr(url) {
+  if (!window.QRCode || !url) return null;
+  const div = document.createElement('div');
+  div.style.cssText = 'position:absolute;left:-9999px;width:128px;height:128px;';
+  document.body.appendChild(div);
+  try {
+    new window.QRCode(div, { text: url, width: 128, height: 128 });
+    const canvas = div.querySelector('canvas');
+    const img = div.querySelector('img');
+    const dataUrl = canvas ? canvas.toDataURL('image/png') : img ? img.src : null;
+    document.body.removeChild(div);
+    return dataUrl;
+  } catch (e) {
+    if (div.parentNode) document.body.removeChild(div);
+    return null;
+  }
+}
+
+function truncateMuseumText(raw, maxLen) {
+  const s = String(raw || '').replace(/\s+/g, ' ').trim();
+  if (s.length <= maxLen) return s;
+  return `${s.slice(0, maxLen - 1)}…`;
+}
+
+function normalizeMuseumPosterPayload(raw) {
+  if (raw.kind === 'prominent' && raw.prominentEntry) {
+    const entry = raw.prominentEntry;
+    const person = entry.person || {};
+    const title = entry.displayName || person.name || entry.personQuery || 'Exhibit';
+    const idPart = person.id != null ? person.id : entry.personId != null ? entry.personId : 'x';
+    const fileSlug = `prominent-${idPart}-${String(title)
+      .replace(/[^a-z0-9]+/gi, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 48)}`;
+    return {
+      kind: 'prominent',
+      prominentEntry: entry,
+      shareTitle: `${title} — Lane Legacy Museum`,
+      fileSlug: fileSlug || 'prominent-exhibit'
+    };
+  }
+  if (raw.kind === 'featured') {
+    const fs = cachedFeaturedStory || {};
+    const t = fs.title || 'Featured exhibit';
+    return {
+      kind: 'featured',
+      shareTitle: `${t} — Lane Legacy Museum`,
+      fileSlug: `featured-${String(t)
+        .replace(/[^a-z0-9]+/gi, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 60)}` || 'featured-exhibit'
+    };
+  }
+  if (raw.kind === 'lunar') {
+    const lunar = cachedLunarExhibit || {};
+    const t = lunar.title || 'Lunar observatory';
+    return {
+      kind: 'lunar',
+      shareTitle: `${t} — Lane Legacy Museum`,
+      fileSlug: `lunar-${String(t)
+        .replace(/[^a-z0-9]+/gi, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 60)}` || 'lunar-exhibit'
+    };
+  }
+  return null;
+}
+
+function getFeaturedMainMedia(cms, featuredStory) {
+  const media = (cms?.media || []).filter((item) => item.storySlug === featuredStory?.slug);
+  return media[0] || null;
+}
+
+function getMuseumQrTargetUrl(poster) {
+  if (!poster) return window.location.href;
+  if (poster.kind === 'prominent') {
+    const entry = poster.prominentEntry || {};
+    const person = entry.person || {};
+    const pid = person.id != null ? person.id : entry.personId;
+    if (pid != null) {
+      return new URL(`/family/lane-memorial-wall.html?personId=${encodeURIComponent(String(pid))}`, window.location.origin).href;
+    }
+  }
+  if (poster.kind === 'lunar') {
+    const lunar = cachedLunarExhibit || {};
+    return resolveQuickMapHref(lunar) || window.location.href;
+  }
+  return `${window.location.origin}/family/lane-museum.html#museumFeaturedPanel`;
+}
+
+function buildMuseumTemplateData(poster) {
+  if (poster.kind === 'prominent') {
+    const entry = poster.prominentEntry || {};
+    const person = entry.person || {};
+    const title = entry.displayName || person.name || entry.personQuery || 'Exhibit';
+    const subtitle = entry.eraLabel || '';
+    const img = exhibitPosterCoverUrl(entry.imageUrl);
+    const venue = person.born || '';
+    const date = `${person.birthYear || '?'} – ${person.deathYear || '?'}`;
+    return { imageUrl: img, title, subtitle, album: title, artist: subtitle || 'Lane Legacy Museum', venue, date };
+  }
+  if (poster.kind === 'featured') {
+    const fs = cachedFeaturedStory || {};
+    const person = fs.featuredPerson || {};
+    const main = getFeaturedMainMedia(cachedMuseumContent, fs);
+    const img = exhibitPosterCoverUrl(main?.url || '');
+    const title = fs.title || 'Featured exhibit';
+    const subtitle = fs.subtitle || '';
+    const venue = person.born || '';
+    const date = `${person.birthYear || '?'} – ${person.deathYear || '?'}`;
+    return { imageUrl: img, title, subtitle, album: title, artist: subtitle || 'Lane Legacy Museum', venue, date };
+  }
+  const lunar = cachedLunarExhibit || {};
+  const galleryItems = Array.isArray(lunar.gallery)
+    ? lunar.gallery.map((item) => ({ url: item?.url != null ? String(item.url).trim() : '' })).filter((item) => item.url)
+    : [];
+  const mainImageUrl =
+    (lunar.mainImageUrl != null ? String(lunar.mainImageUrl).trim() : '') ||
+    (lunar.imageUrl != null ? String(lunar.imageUrl).trim() : '') ||
+    (galleryItems[0] ? galleryItems[0].url : '');
+  const img = lunarPosterCoverUrl(mainImageUrl);
+  const lat = lunar.latitude != null ? Number(lunar.latitude) : null;
+  const lon = lunar.longitude != null ? Number(lunar.longitude) : null;
+  const coordLine =
+    lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon)
+      ? `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`
+      : '';
+  const diam = lunar.diameterKm != null ? `~${lunar.diameterKm} km` : '';
+  const title = lunar.title || 'Lane crater';
+  const subtitle = lunar.subtitle || '';
+  return {
+    imageUrl: img,
+    title,
+    subtitle,
+    album: title,
+    artist: subtitle || 'Lunar observatory',
+    venue: coordLine || lunar.featureName || '',
+    date: diam
+  };
+}
+
+function buildMuseumPosterHtmlSimple(poster) {
+  const imgFallbackQuoted = escapeAttrSrc(MUSEUM_EXHIBIT_DEFAULT_IMAGE);
+  const kicker = '<div class="poster-kicker">Lane Legacy Museum</div>';
+  const coverOnError = ` onerror="this.onerror=null;this.src='${imgFallbackQuoted}'"`;
+
+  if (poster.kind === 'prominent') {
+    const entry = poster.prominentEntry || {};
+    const person = entry.person || {};
+    const title = entry.displayName || person.name || entry.personQuery || 'Exhibit';
+    const coverSrc = escapeAttrSrc(exhibitPosterCoverUrl(entry.imageUrl));
+    const metaRows = [
+      entry.eraLabel ? `Era: ${entry.eraLabel}` : null,
+      `${person.birthYear || '?'} – ${person.deathYear || '?'}`,
+      person.born ? `Born / context: ${person.born}` : null
+    ].filter(Boolean);
+    const caption = entry.caption ? truncateMuseumText(entry.caption, 360) : '';
+    const blurb = entry.blurb ? truncateMuseumText(entry.blurb, 280) : '';
+    const metaHtml = metaRows.map((row) => `<div>${escapeHtml(row)}</div>`).join('');
+    const captionHtml = caption
+      ? `<div class="poster-section"><h6>Caption</h6><div>${escapeHtml(caption)}</div></div>`
+      : '';
+    const blurbHtml = blurb
+      ? `<div class="poster-section"><h6>Curator note</h6><div>${escapeHtml(blurb)}</div></div>`
+      : '';
+    return `
+    ${kicker}
+    <img class="poster-cover" src="${coverSrc}" alt="" crossorigin="anonymous"${coverOnError} />
+    <div class="poster-body">
+      <div class="poster-title">${escapeHtml(title)}</div>
+      <div class="poster-subtitle">${escapeHtml(entry.eraLabel || '')}</div>
+      <div class="poster-meta">${metaHtml}</div>
+      ${captionHtml}
+      ${blurbHtml}
+    </div>`;
+  }
+  if (poster.kind === 'featured') {
+    const fs = cachedFeaturedStory || {};
+    const person = fs.featuredPerson || {};
+    const main = getFeaturedMainMedia(cachedMuseumContent, fs);
+    const coverSrc = escapeAttrSrc(exhibitPosterCoverUrl(main?.url || ''));
+    const metaRows = [
+      person.name ? `Name: ${person.name}` : null,
+      person.birthYear ? `Born: ${person.birthYear}` : null,
+      person.born ? `Place: ${person.born}` : null
+    ].filter(Boolean);
+    const summary = fs.summary ? truncateMuseumText(fs.summary, 420) : '';
+    const metaHtml = metaRows.map((row) => `<div>${escapeHtml(row)}</div>`).join('');
+    const sumHtml = summary
+      ? `<div class="poster-section"><h6>Summary</h6><div>${escapeHtml(summary)}</div></div>`
+      : '';
+    return `
+    ${kicker}
+    <img class="poster-cover" src="${coverSrc}" alt="" crossorigin="anonymous"${coverOnError} />
+    <div class="poster-body">
+      <div class="poster-title">${escapeHtml(fs.title || 'Featured exhibit')}</div>
+      <div class="poster-subtitle">${escapeHtml(fs.subtitle || '')}</div>
+      <div class="poster-meta">${metaHtml || '<div>Exhibit details</div>'}</div>
+      ${sumHtml}
+    </div>`;
+  }
+  const lunar = cachedLunarExhibit || {};
+  const galleryItems = Array.isArray(lunar.gallery)
+    ? lunar.gallery
+        .map((item) => ({
+          url: item?.url != null ? String(item.url).trim() : ''
+        }))
+        .filter((item) => item.url)
+    : [];
+  const mainImageUrl =
+    (lunar.mainImageUrl != null ? String(lunar.mainImageUrl).trim() : '') ||
+    (lunar.imageUrl != null ? String(lunar.imageUrl).trim() : '') ||
+    (galleryItems[0] ? galleryItems[0].url : '');
+  const coverSrc = escapeAttrSrc(lunarPosterCoverUrl(mainImageUrl));
+  const lunarCoverOnError = ` onerror="this.onerror=null;this.src='${imgFallbackQuoted}'"`;
+  const lat = lunar.latitude != null ? Number(lunar.latitude) : null;
+  const lon = lunar.longitude != null ? Number(lunar.longitude) : null;
+  const coordLine =
+    lat != null && lon != null && Number.isFinite(lat) && Number.isFinite(lon)
+      ? `${lat.toFixed(2)}°, ${lon.toFixed(2)}° (lunar)`
+      : 'Coordinates on chart';
+  const diam = lunar.diameterKm != null ? `Diameter ~${lunar.diameterKm} km` : '';
+  const body = lunar.body ? truncateMuseumText(lunar.body, 320) : '';
+  const nom = lunar.nomenclatureOrigin ? truncateMuseumText(lunar.nomenclatureOrigin, 200) : '';
+  const metaHtml = [`Feature: ${lunar.featureName || 'Lane'}`, coordLine, diam]
+    .filter(Boolean)
+    .map((row) => `<div>${escapeHtml(row)}</div>`)
+    .join('');
+  const bodyHtml = body
+    ? `<div class="poster-section"><h6>About</h6><div>${escapeHtml(body)}</div></div>`
+    : '';
+  const nomHtml = nom
+    ? `<div class="poster-section"><h6>Nomenclature</h6><div>${escapeHtml(nom)}</div></div>`
+    : '';
+  return `
+  ${kicker}
+  <img class="poster-cover" src="${coverSrc}" alt="" crossorigin="anonymous"${lunarCoverOnError} />
+  <div class="poster-body">
+    <div class="poster-title">${escapeHtml(lunar.title || 'Lane crater')}</div>
+    <div class="poster-subtitle">${escapeHtml(lunar.subtitle || '')}</div>
+    <div class="poster-meta">${metaHtml}</div>
+    ${bodyHtml}
+    ${nomHtml}
+  </div>`;
+}
+
+function rebuildMuseumPoster() {
+  if (!currentMuseumPoster) return;
+  museumPosterCanvas = null;
+  const host = document.getElementById('museumPosterContent');
+  if (!host) return;
+
+  if (museumPosterMode === 'template' && window.posterTemplates) {
+    const data = buildMuseumTemplateData(currentMuseumPoster);
+    const fontFamily = document.getElementById('museumPosterFont')?.value || 'Georgia, serif';
+    const frame = document.getElementById('museumPosterFrame')?.value || 'none';
+    const addQr = Boolean(document.getElementById('museumPosterQr')?.checked);
+    const qrUrl = getMuseumQrTargetUrl(currentMuseumPoster);
+    const qrDataUrl = addQr ? generateMuseumPosterQr(qrUrl) : undefined;
+    host.innerHTML = window.posterTemplates.render(museumPosterTemplateId, {
+      ...data,
+      fontFamily,
+      frame,
+      qrDataUrl
+    });
+  } else {
+    host.innerHTML = buildMuseumPosterHtmlSimple(currentMuseumPoster);
+  }
+}
+
+function setMuseumPosterMode(mode) {
+  museumPosterMode = mode;
+  const simpleBtn = document.getElementById('museumPosterModeSimple');
+  const tplBtn = document.getElementById('museumPosterModeTemplate');
+  const opts = document.getElementById('museumPosterTemplateOpts');
+  if (simpleBtn) simpleBtn.classList.toggle('active', mode === 'simple');
+  if (tplBtn) tplBtn.classList.toggle('active', mode === 'template');
+  if (opts) opts.style.display = mode === 'template' ? 'block' : 'none';
+  rebuildMuseumPoster();
+}
+
+function selectMuseumPosterTemplate(id) {
+  museumPosterTemplateId = id;
+  document.querySelectorAll('.museum-template-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-id') === id);
+  });
+  rebuildMuseumPoster();
+}
+
+function openMuseumExhibitPoster(rawPayload) {
+  const normalized = normalizeMuseumPosterPayload(rawPayload);
+  if (!normalized) return;
+  currentMuseumPoster = normalized;
+  museumPosterCanvas = null;
+  museumPosterMode = 'simple';
+  museumPosterTemplateId = 'single';
+
+  const simpleBtn = document.getElementById('museumPosterModeSimple');
+  const tplBtn = document.getElementById('museumPosterModeTemplate');
+  const opts = document.getElementById('museumPosterTemplateOpts');
+  const qr = document.getElementById('museumPosterQr');
+  if (simpleBtn) simpleBtn.classList.add('active');
+  if (tplBtn) tplBtn.classList.remove('active');
+  if (opts) opts.style.display = 'none';
+  if (qr) qr.checked = false;
+  document.querySelectorAll('.museum-template-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.getAttribute('data-id') === 'single');
+  });
+  const shareInput = document.getElementById('museumPosterShareLink');
+  if (shareInput) shareInput.value = '';
+
+  rebuildMuseumPoster();
+  if (typeof $ !== 'undefined' && $('#museumPosterModal').modal) {
+    $('#museumPosterModal').modal('show');
+  }
+}
+
+function waitForPosterImages(container) {
+  const images = Array.from(container.querySelectorAll('img'));
+  return Promise.all(
+    images.map((img) =>
+      img.complete ? Promise.resolve() : new Promise((resolve) => {
+        img.onload = () => resolve();
+        img.onerror = () => resolve();
+      })
+    )
+  );
+}
+
+async function getMuseumPosterCanvas() {
+  if (museumPosterCanvas) return museumPosterCanvas;
+  const el = document.getElementById('museumPosterContent');
+  await waitForPosterImages(el);
+  if (!window.posterUtils) throw new Error('posterUtils unavailable');
+  museumPosterCanvas = await window.posterUtils.renderPosterCanvas(el);
+  return museumPosterCanvas;
+}
+
+async function downloadMuseumPosterPng() {
+  if (!currentMuseumPoster || !window.posterUtils || !window.html2canvas) return;
+  try {
+    const canvas = await getMuseumPosterCanvas();
+    const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+    const slug = currentMuseumPoster.fileSlug || 'lane-museum-exhibit';
+    window.posterUtils.downloadDataUrl(dataUrl, `lane-museum-${slug}.png`);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function downloadMuseumPosterPdf() {
+  if (!currentMuseumPoster || !window.posterUtils || !window.jspdf) return;
+  try {
+    const canvas = await getMuseumPosterCanvas();
+    const slug = currentMuseumPoster.fileSlug || 'lane-museum-exhibit';
+    await window.posterUtils.downloadPdfFromCanvas(canvas, `lane-museum-${slug}.pdf`);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function shareMuseumPoster() {
+  if (!currentMuseumPoster || !window.posterUtils || !window.html2canvas) return;
+  try {
+    const canvas = await getMuseumPosterCanvas();
+    const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
+    const title = currentMuseumPoster.shareTitle || 'Lane Legacy Museum';
+    const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'museum');
+    const shareUrl = new URL(shareData.shareUrl, window.location.origin).toString();
+    const linkEl = document.getElementById('museumPosterShareLink');
+    if (linkEl) linkEl.value = shareUrl;
+    const slug = (currentMuseumPoster.fileSlug || 'exhibit').replace(/[^a-z0-9-]+/gi, '-');
+    const shared = await window.posterUtils.sharePoster({
+      canvas,
+      title,
+      text: 'Lane Legacy Museum exhibit card',
+      fileName: `lane-museum-${slug}.png`,
+      shareUrl
+    });
+    if (!shared && typeof window !== 'undefined') {
+      window.alert?.('Share link ready — copy from the field if native share is unavailable.');
+    }
+  } catch (e) {
+    console.error(e);
+    window.alert?.(`Share failed: ${e.message || e}`);
+  }
+}
+
+function copyMuseumPosterShareLink() {
+  const input = document.getElementById('museumPosterShareLink');
+  if (!input || !input.value) return;
+  input.select();
+  input.setSelectionRange(0, input.value.length);
+  try {
+    document.execCommand('copy');
+  } catch (_) {
+    navigator.clipboard?.writeText(input.value);
+  }
+}
+
+function bindProminentPosterButtons() {
+  const grid = document.getElementById('prominentGrid');
+  if (!grid) return;
+  grid.querySelectorAll('.prominent-card-poster-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const idx = Number(btn.dataset.exhibitIndex);
+      if (!Number.isFinite(idx) || !cachedProminentLanes[idx]) return;
+      openMuseumExhibitPoster({ kind: 'prominent', prominentEntry: cachedProminentLanes[idx] });
+    });
+  });
+}
+
+function initMuseumPosterUi() {
+  if (museumPosterUiBound) return;
+  museumPosterUiBound = true;
+
+  document.getElementById('museumPosterModeSimple')?.addEventListener('click', () => setMuseumPosterMode('simple'));
+  document.getElementById('museumPosterModeTemplate')?.addEventListener('click', () => setMuseumPosterMode('template'));
+  document.querySelectorAll('.museum-template-btn').forEach((btn) => {
+    btn.addEventListener('click', () => selectMuseumPosterTemplate(btn.getAttribute('data-id') || 'single'));
+  });
+  ['museumPosterFont', 'museumPosterFrame'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('change', () => rebuildMuseumPoster());
+  });
+  document.getElementById('museumPosterQr')?.addEventListener('change', () => rebuildMuseumPoster());
+
+  document.getElementById('museumPosterDownloadPng')?.addEventListener('click', () => downloadMuseumPosterPng());
+  document.getElementById('museumPosterDownloadPdf')?.addEventListener('click', () => downloadMuseumPosterPdf());
+  document.getElementById('museumPosterShare')?.addEventListener('click', () => shareMuseumPoster());
+  document.getElementById('museumPosterCopyLink')?.addEventListener('click', () => copyMuseumPosterShareLink());
+
+  document.getElementById('featuredExhibitCardBtn')?.addEventListener('click', () => {
+    openMuseumExhibitPoster({ kind: 'featured' });
+  });
+}
+
 function applyTheme(themeId) {
   document.body.classList.remove('archiveLight');
   if (themeId === 'archiveLight') {
@@ -89,16 +576,21 @@ function renderFeatured(featuredStory = {}, museum = {}) {
   const secondaryHost = document.getElementById('secondaryMedia');
   if (!secondary.length) {
     secondaryHost.innerHTML = '<div class="museum-placeholder">Additional media placeholders</div>';
-    return;
+  } else {
+    secondaryHost.innerHTML = secondary
+      .map((item) => {
+        if (item.type === 'image') {
+          return `<div class="museum-media-item"><img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.caption || 'Media item')}" onerror="this.parentElement.innerHTML='<div class=&quot;museum-placeholder&quot;>Media unavailable</div>'" /></div>`;
+        }
+        return `<div class="museum-media-item"><div class="museum-placeholder">${escapeHtml(item.type || 'media')}<br>${escapeHtml(item.caption || '')}</div></div>`;
+      })
+      .join('');
   }
-  secondaryHost.innerHTML = secondary
-    .map((item) => {
-      if (item.type === 'image') {
-        return `<div class="museum-media-item"><img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.caption || 'Media item')}" onerror="this.parentElement.innerHTML='<div class=&quot;museum-placeholder&quot;>Media unavailable</div>'" /></div>`;
-      }
-      return `<div class="museum-media-item"><div class="museum-placeholder">${escapeHtml(item.type || 'media')}<br>${escapeHtml(item.caption || '')}</div></div>`;
-    })
-    .join('');
+
+  const featuredCardBtn = document.getElementById('featuredExhibitCardBtn');
+  if (featuredCardBtn) {
+    featuredCardBtn.classList.remove('d-none');
+  }
 }
 
 function renderTimeline(events = []) {
@@ -222,6 +714,9 @@ function renderProminent(prominent = []) {
           <div class="mt-1">
             <a class="small prominent-wall-link" href="${escapeHtml(memorialUrl)}">View on memorial wall</a>
           </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary prominent-card-poster-btn mt-2" data-exhibit-index="${index}">
+            <i class="bi bi-image" aria-hidden="true"></i> Exhibit card
+          </button>
           </div>
         </article>
       `;
@@ -314,9 +809,11 @@ function renderLunarObservatory(lunar) {
   const mount = document.getElementById('lunarObservatoryMount');
   if (!mount) return;
   if (!lunar || typeof lunar !== 'object') {
+    cachedLunarExhibit = null;
     mount.classList.add('d-none');
     return;
   }
+  cachedLunarExhibit = lunar;
   mount.classList.remove('d-none');
   const quickMapHref = resolveQuickMapHref(lunar);
   const moonTrekHref = resolveMoonTrekHref(lunar);
@@ -443,6 +940,20 @@ function renderLunarObservatory(lunar) {
       openLunarImageLightbox(image);
     });
   });
+
+  const actionRow = mount.querySelector('.lunar-action-row');
+  if (actionRow && !actionRow.querySelector('.lunar-exhibit-card-btn')) {
+    const lunarCardBtn = document.createElement('button');
+    lunarCardBtn.type = 'button';
+    lunarCardBtn.className = 'btn btn-sm btn-outline-info lunar-exhibit-card-btn';
+    lunarCardBtn.setAttribute('aria-label', 'Generate exhibit card for lunar observatory');
+    lunarCardBtn.innerHTML = '<i class="bi bi-image" aria-hidden="true"></i> Exhibit card';
+    lunarCardBtn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      openMuseumExhibitPoster({ kind: 'lunar' });
+    });
+    actionRow.appendChild(lunarCardBtn);
+  }
 }
 
 function formatSayingsContextBlock(entries = []) {
@@ -521,6 +1032,11 @@ async function initLaneMuseum() {
   const prominentLanes = prominentRes.prominentLanes || [];
   const sayingsEntries = Array.isArray(sayingsRes.entries) ? sayingsRes.entries : [];
 
+  cachedMuseumContent = content;
+  cachedFeaturedStory = featuredStory;
+  cachedProminentLanes = prominentLanes;
+  initMuseumPosterUi();
+
   renderThemeButtons(content.themes || {});
   renderFeatured(featuredStory, content);
   renderTimeline(content.timelineEvents || []);
@@ -534,6 +1050,7 @@ async function initLaneMuseum() {
     }
   }
   renderProminent(prominentLanes);
+  bindProminentPosterButtons();
   renderDocent(content.aiDocent || {}, featuredStory, sayingsEntries);
   if (typeof window.initHistoryQuickNav === 'function') {
     window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });

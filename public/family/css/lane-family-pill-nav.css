@@ -71,11 +71,28 @@
   background: rgba(174, 154, 120, 0.15);
 }
 
+.lane-pill:focus {
+  outline: none;
+}
+
+.lane-pill:focus-visible {
+  outline: 2px solid rgba(224, 210, 180, 0.95);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
 .lane-pill.is-active {
   color: #f4f0e8;
   border-color: rgba(196, 184, 150, 0.55);
   background: rgba(174, 154, 120, 0.22);
   box-shadow: 0 0 0 1px rgba(196, 184, 150, 0.12);
+}
+
+@media (pointer: coarse) {
+  .lane-pill {
+    padding: 0.4rem 0.72rem;
+    min-height: 2.65rem;
+  }
 }
 
 @media (max-width: 400px) {

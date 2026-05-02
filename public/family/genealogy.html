@@ -7,108 +7,13 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/family/css/lane-shell.css"/>
+  <link rel="stylesheet" href="/family/css/genealogy-tree-page.css"/>
   <link rel="stylesheet" href="/family/css/lane-tts.css"/>
   <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css"/>
   <script src="/shared/modern-navbar.js"></script>
   <script src="/family/js/lane-family-pill-nav.js" defer></script>
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <style>
-    .family-tree-container {
-      background: rgba(255,255,255,0.95);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 30px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      min-height: 600px;
-    }
-    
-    #d3-visualization {
-      width: 100%;
-      height: 600px;
-      border: 2px dashed #ccc;
-      border-radius: 10px;
-      background: linear-gradient(135deg, rgba(135,206,250,0.05), rgba(144,238,144,0.05));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    
-    .stat-card {
-      background: linear-gradient(135deg, rgba(135,206,250,0.15), rgba(144,238,144,0.15));
-      border-radius: 15px;
-      padding: 20px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-    
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #3498db;
-    }
-    
-    .stat-label {
-      color: #666;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    .timeline-item {
-      background: rgba(255,255,255,0.95);
-      border-left: 4px solid #3498db;
-      padding: 15px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    
-    .timeline-year {
-      font-weight: bold;
-      color: #3498db;
-      font-size: 1.2rem;
-    }
-    
-    .timeline-era {
-      color: #666;
-      font-style: italic;
-      margin-top: 5px;
-    }
-    
-    .person-card {
-      background: rgba(255,255,255,0.95);
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .person-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
-    
-    .person-name {
-      font-weight: bold;
-      color: #2c3e50;
-      font-size: 1.1rem;
-    }
-    
-    .person-details {
-      color: #666;
-      font-size: 0.9rem;
-    }
-  </style>
 </head>
 <body>
 <div class="particles" id="particles"></div>
@@ -134,15 +39,17 @@
   </div>
 </div>
 
-<div class="container mt-4" data-lane-tts-main>
+<div class="container mt-4 lane-tools-page" data-lane-tts-main>
   <!-- Header -->
   <div class="family-tree-container">
-    <p class="mb-2" style="font-size:0.9rem;">
+    <p class="mb-2 small">
       <a href="/family/lane-family.html" class="text-secondary" style="text-decoration:none;border-bottom:1px solid rgba(0,0,0,0.15);">Lane Family home</a>
       <span class="text-muted"> — all tools &amp; exhibits</span>
     </p>
-    <h1><i class="bi-diagram-3"></i> Lane Family Tree & Musical Timeline</h1>
-    <p class="text-muted">400+ years of family history mapped to musical eras</p>
+    <header class="lane-page-head mb-3">
+      <h1 class="lane-page-title"><i class="bi bi-diagram-3" aria-hidden="true"></i><span class="lane-page-title__text">Lane Family Tree &amp; Musical Timeline</span></h1>
+      <p class="lane-page-lead text-muted mb-0">400+ years of family history mapped to musical eras</p>
+    </header>
     <a class="btn btn-outline-secondary btn-sm mr-2" href="/family/lane-family.html">
       <i class="bi-house-heart"></i> Lane Family home
     </a>

@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
+  <link rel="stylesheet" href="/family/css/lane-shell.css"/>
   <link rel="stylesheet" href="/family/css/lane-pdf-gallery.css"/>
   <link rel="stylesheet" href="/family/css/lane-tts.css"/>
   <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css"/>
@@ -32,8 +33,11 @@
   </div>
 </div>
 
-<div class="container mt-4 mb-5" data-lane-tts-main>
-  <h1 class="h3"><i class="bi bi-images" aria-hidden="true"></i> Lane genealogy book plates</h1>
+<div class="container mt-4 mb-5 lane-pdf-gallery-page" data-lane-tts-main>
+  <header class="lane-pdf-page-head mb-3">
+    <h1 class="lane-pdf-page-title"><i class="bi bi-images" aria-hidden="true"></i><span class="lane-pdf-page-title__text">Lane genealogy book plates</span></h1>
+    <p class="lane-pdf-page-lead text-muted mb-0">Thumbnails keyed to PDF pages and tree IDs; counts update when you filter or change show-hidden.</p>
+  </header>
   <div class="alert alert-info border-info mb-3" role="status">
     <strong>Large tan “empty” boxes are usually not a deployment bug.</strong>
     Each card loads a real JPEG under <code>/family/assets/lane-pdf/</code>.
@@ -52,8 +56,8 @@
     <strong>About these plates.</strong> Most portraits and scenes here are <strong>late-19th- and early-20th-century photographs</strong> (and related book illustrations) reproduced in a printed genealogy. Expect uneven contrast, silvering or fading in the originals, yellowed paper, halftone screening, and occasional blank or nearly blank pages from tissue inserts or lightly exposed images. What you see is typical of period books and digitization, not a defect in this viewer.
   </p>
 
-  <div id="lanePdfStats" class="mb-3">
-    <div id="lanePdfStatsLine" class="lane-pdf-gallery-stats text-muted"></div>
+  <div id="lanePdfStats" class="mb-3 lane-pdf-stats-region" aria-label="Gallery counts">
+    <div id="lanePdfStatsLine" class="lane-pdf-gallery-stats"></div>
     <p class="lane-pdf-stats-hint" role="note">
       These plates are late-19th- and early-20th-century book reproductions; faded paper, halftones, and uneven contrast are normal for the period.
     </p>
@@ -90,9 +94,9 @@
     <div class="col-md-5 mb-2 lane-pdf-hide-controls">
       <div class="custom-control custom-checkbox mb-2">
         <input type="checkbox" class="custom-control-input" id="lanePdfShowHidden" checked />
-        <label class="custom-control-label small" for="lanePdfShowHidden">Show all plate thumbnails incl. denylist / your hides (<strong>off</strong> = hide those entries)</label>
+        <label class="custom-control-label small" for="lanePdfShowHidden"><strong>On</strong> = page/id filters plus <strong>server denylist</strong> plates visible. <strong>Off</strong> = hide denylisted plates too. Your personal hides (Hide from gallery) always stay off the grid until Undo / Clear.</label>
       </div>
-      <div class="btn-group lane-pdf-hide-buttons" role="group" aria-label="Your hidden plates">
+      <div class="lane-pdf-btn-cluster lane-pdf-hide-buttons" role="group" aria-label="Your hidden plates">
         <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfUndoHide" disabled>Undo last hide</button>
         <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfClearUserHidden">Clear my hides</button>
         <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfExportUserHidden" title="Download JSON backup">Export hides</button>
@@ -100,6 +104,9 @@
       </div>
       <label class="sr-only" for="lanePdfImportHidesInput">Merge plate IDs from exported JSON backup</label>
       <input type="file" class="lane-pdf-sr-hidden" id="lanePdfImportHidesInput" accept=".json,application/json" tabindex="-1" />
+      <p class="small text-muted mb-0 lane-pdf-hide-hint mt-2">
+        Personal <strong>Hide from gallery</strong> removes thumbnails immediately (saved in Postgres). The checkbox below only reveals or hides plates on the shared <strong>server denylist</strong>.
+      </p>
       <p class="small text-muted mb-0 lane-pdf-hide-hint mt-2">
         <strong>Your hides</strong> are tied to this browser and stored in Postgres (server API). Client id in <code class="lane-pdf-k">localStorage</code>. Export/import JSON merges into the same hide list. Shared repo denylist: <code>data/lane-pdf-gallery-hidden.json</code>.
       </p>

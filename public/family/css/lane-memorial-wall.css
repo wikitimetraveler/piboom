@@ -7,6 +7,19 @@ body.lane-memorial-page {
   --history-border: rgba(196, 181, 153, 0.24);
   --history-accent: #c4b599;
   --history-link: #8cc7ff;
+  /* lane-shell themed hooks */
+  --lane-qnav-link-bd: var(--history-border);
+  --lane-qnav-link-fg: var(--history-text);
+  --lane-qnav-link-fs: 0.74rem;
+  --lane-qnav-link-tracking: 0.05em;
+  --lane-qnav-link-case: uppercase;
+  --lane-qnav-link-pad-v: 0.26rem;
+  --lane-qnav-link-pad-h: 0.6rem;
+  --lane-qnav-link-hover-bd: var(--history-accent);
+  --lane-qnav-link-hover-fg: #fff6e2;
+  --lane-qnav-link-hover-bg: rgba(196, 181, 153, 0.12);
+  --lane-qnav-focus-color: rgba(232, 220, 195, 0.95);
+  --lane-context-note-fg: #cec6b7;
   background: linear-gradient(180deg, #1a1c1f 0%, #23262b 40%, #1a1c1f 100%);
   color: #d4cfc4;
   min-height: 100vh;
@@ -182,12 +195,6 @@ body.lane-memorial-page .text-muted {
   color: #c9c2b4;
 }
 
-.history-context-evidence-note {
-  color: #cec6b7;
-  font-size: 0.8rem;
-  letter-spacing: 0.01em;
-}
-
 .memorial-quick-actions {
   display: flex;
   gap: 0.5rem;
@@ -195,29 +202,7 @@ body.lane-memorial-page .text-muted {
 }
 
 .memorial-quick-nav {
-  display: flex;
   gap: 0.45rem;
-  flex-wrap: wrap;
-}
-
-.history-quick-nav .history-quick-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.26rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid var(--history-border);
-  color: var(--history-text);
-  text-decoration: none;
-  font-size: 0.74rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.history-quick-nav .history-quick-link:hover,
-.history-quick-nav .history-quick-link.is-active {
-  border-color: var(--history-accent);
-  color: #fff6e2;
-  background: rgba(196, 181, 153, 0.12);
 }
 
 .memorial-quick-actions .btn {

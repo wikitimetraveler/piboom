@@ -1,39 +1,205 @@
+/* Lane PDF plate gallery — aligns with DevConnect Labs shared tokens (see /shared/styles.css :root) */
+.lane-pdf-gallery-page {
+  --lane-pdf-bar-bg: rgba(255, 255, 255, 0.9);
+  --lane-pdf-chip-bg: rgba(248, 250, 252, 0.95);
+  --lane-pdf-chip-border: rgba(44, 62, 80, 0.1);
+  --lane-pdf-chip-em: rgba(52, 152, 219, 0.08);
+}
+
+/* Page title / lead: see lane-shell.css grouped with .lane-pdf-gallery-page */
+
 .lane-pdf-gallery-stats {
-  font-size: 0.9rem;
+  font-size: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: var(--lane-pdf-bar-bg);
+  border: 1px solid var(--lane-pdf-chip-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-elevated, 0 4px 18px rgba(15, 23, 42, 0.07));
+}
+
+.lane-pdf-stats-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.45rem;
+}
+
+.lane-pdf-stat-chip {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.35rem;
+  padding: 0.4rem 0.65rem;
+  background: var(--lane-pdf-chip-bg);
+  border: 1px solid var(--lane-pdf-chip-border);
+  border-radius: 8px;
+  line-height: 1.35;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.lane-pdf-stat-chip--emphasis {
+  border-color: rgba(52, 152, 219, 0.28);
+  background: linear-gradient(135deg, var(--lane-pdf-chip-em) 0%, var(--lane-pdf-chip-bg) 100%);
+  flex: 1 1 12rem;
+  min-width: min(100%, 10rem);
+}
+
+.lane-pdf-stat-chip--note {
+  border-style: dashed;
+  opacity: 0.95;
+}
+
+.lane-pdf-stat-k {
+  font-weight: 500;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted, #7f8c8d);
+}
+
+.lane-pdf-stat-v {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--ice-dark, #2c3e50);
+  font-variant-numeric: tabular-nums;
+}
+
+.lane-pdf-stat-chip strong:not(.lane-pdf-stat-v) {
+  color: var(--ice-dark, #2c3e50);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Stats bar one-liner (historical context); keep styling here, not inline */
 .lane-pdf-stats-hint {
   max-width: 52rem;
-  margin: 0.5rem 0 0;
+  margin: 0.65rem 0 0;
   padding-left: 0.75rem;
   font-size: 0.875rem;
   line-height: 1.45;
   color: #6c757d;
-  border-left: 3px solid rgba(0, 0, 0, 0.12);
+  border-left: 3px solid rgba(52, 152, 219, 0.35);
+}
+
+.lane-pdf-restore-banner {
+  border-radius: 10px;
+  border-color: rgba(44, 62, 80, 0.12) !important;
+  background: rgba(248, 250, 252, 0.95) !important;
+  padding: 0.85rem 1rem !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.lane-pdf-filters .form-control,
+.lane-pdf-filters .form-select {
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border-color: rgba(44, 62, 80, 0.14);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.lane-pdf-filters .form-control:focus {
+  border-color: rgba(52, 152, 219, 0.55);
+  box-shadow: var(--focus-ring, 0 0 0 3px rgba(52, 152, 219, 0.45));
+}
+
+.lane-pdf-filters.row {
+  margin-top: 0.35rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--lane-pdf-chip-border);
+}
+
+.lane-pdf-filters label.small {
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted, #7f8c8d);
+}
+
+.lane-pdf-hide-controls .custom-control-label {
+  line-height: 1.45;
+}
+
+/* Wrapped action cluster — better tap targets than a single horizontal btn-group on narrow viewports */
+.lane-pdf-btn-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.lane-pdf-btn-cluster .btn {
+  margin-bottom: 0;
+}
+
+.lane-pdf-hide-buttons .btn {
+  border-radius: 8px;
+  border-color: rgba(44, 62, 80, 0.18);
+  font-weight: 500;
+}
+
+.lane-pdf-hide-buttons .btn:hover {
+  border-color: rgba(52, 152, 219, 0.35);
+  background: rgba(52, 152, 219, 0.06);
+}
+
+.lane-pdf-hide-buttons .btn:focus {
+  box-shadow: var(--focus-ring, 0 0 0 3px rgba(52, 152, 219, 0.45));
+}
+
+@media (max-width: 767.98px) {
+  .lane-pdf-btn-cluster .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-height: 2.65rem;
+    font-size: 0.8125rem;
+  }
 }
 
 .lane-pdf-card {
-  background: rgba(255, 255, 255, 0.96);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(44, 62, 80, 0.08);
+  box-shadow:
+    0 2px 8px rgba(15, 23, 42, 0.06),
+    0 1px 2px rgba(15, 23, 42, 0.04);
   height: 100%;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.lane-pdf-card:hover {
+  box-shadow:
+    0 10px 28px rgba(15, 23, 42, 0.1),
+    0 2px 6px rgba(52, 152, 219, 0.08);
+  transform: translateY(-2px);
 }
 
 .lane-pdf-card img.lane-pdf-thumb {
   width: 100%;
   height: 180px;
   object-fit: contain;
-  background: #f4f4f4;
+  background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
   box-sizing: border-box;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(44, 62, 80, 0.08);
   cursor: zoom-in;
 }
 
 .lane-pdf-card img.lane-pdf-thumb:focus {
-  outline: 2px solid #0d6efd;
+  outline: 2px solid rgba(52, 152, 219, 0.85);
   outline-offset: 2px;
+}
+
+.lane-pdf-card-body .lane-pdf-hide-btn {
+  min-height: 2.375rem;
+  border-radius: 8px;
+  font-weight: 500;
 }
 
 .lane-pdf-card--skipped img {
@@ -42,7 +208,7 @@
 }
 
 .lane-pdf-card-body {
-  padding: 0.75rem 1rem 1rem;
+  padding: 0.85rem 1rem 1.05rem;
   font-size: 0.85rem;
 }
 
@@ -59,11 +225,6 @@
   background: #6c757d;
 }
 
-.lane-pdf-filters .form-control,
-.lane-pdf-filters .form-select {
-  font-size: 0.9rem;
-}
-
 /* Hide/import file input visually; keep programmatic access */
 .lane-pdf-sr-hidden {
   position: absolute;
@@ -77,12 +238,17 @@
   border: 0;
 }
 
-.lane-pdf-hide-buttons .btn {
-  margin-bottom: 0.125rem;
-}
-
 .lane-pdf-hide-controls code.lane-pdf-k {
   font-size: 0.78em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lane-pdf-card {
+    transition: none;
+  }
+  .lane-pdf-card:hover {
+    transform: none;
+  }
 }
 
 /* Full-size plate view (click thumbnail) */
@@ -141,13 +307,24 @@
   color: #fff;
   font-size: 2rem;
   line-height: 1;
-  padding: 0.25rem 0.5rem;
+  padding: 0.35rem 0.6rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   cursor: pointer;
-  opacity: 0.9;
+  opacity: 0.92;
+  border-radius: 8px;
 }
 
 .lane-pdf-lightbox-close:hover,
 .lane-pdf-lightbox-close:focus {
   opacity: 1;
+}
+
+.lane-pdf-lightbox-close:focus {
   outline: none;
+}
+
+.lane-pdf-lightbox-close:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.95);
+  outline-offset: 2px;
 }

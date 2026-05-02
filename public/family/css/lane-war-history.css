@@ -5,6 +5,19 @@ body.lane-war-page {
   --history-border: #2b3647;
   --history-accent: #caa56c;
   --history-link: #6da3d1;
+  /* lane-shell themed hooks */
+  --lane-qnav-link-bd: #3a4a5f;
+  --lane-qnav-link-fg: #cfd9e7;
+  --lane-qnav-link-fs: 0.78rem;
+  --lane-qnav-link-tracking: 0.04em;
+  --lane-qnav-link-case: none;
+  --lane-qnav-margin-top: 0.75rem;
+  --lane-qnav-link-hover-bd: var(--history-accent);
+  --lane-qnav-link-hover-fg: #f6e8cc;
+  --lane-qnav-link-hover-bg: rgba(202, 165, 108, 0.12);
+  --lane-qnav-focus-color: rgba(240, 228, 200, 0.95);
+  --lane-context-note-fg: #c8d3e2;
+  --lane-context-note-size: 0.82rem;
   background: var(--history-bg);
   color: var(--history-text);
 }
@@ -31,63 +44,11 @@ body.lane-war-page .text-muted {
   margin-bottom: 1rem;
 }
 
-.war-quick-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 0.75rem;
-}
-
-.history-quick-nav .history-quick-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.28rem 0.62rem;
-  border-radius: 999px;
-  border: 1px solid #3a4a5f;
-  color: #cfd9e7;
-  text-decoration: none;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
-}
-
-.history-quick-nav .history-quick-link:hover,
-.history-quick-nav .history-quick-link.is-active {
-  border-color: var(--history-accent);
-  color: #f6e8cc;
-  background: rgba(202, 165, 108, 0.12);
-}
-
-.war-quick-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.28rem 0.62rem;
-  border-radius: 999px;
-  border: 1px solid #3a4a5f;
-  color: #cfd9e7;
-  text-decoration: none;
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
-}
-
-.war-quick-link:hover,
-.war-quick-link.is-active {
-  border-color: #caa56c;
-  color: #f6e8cc;
-  background: rgba(202, 165, 108, 0.12);
-}
-
 .war-kicker {
   color: var(--history-accent);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   font-size: 0.8rem;
-}
-
-.history-context-evidence-note {
-  color: #c8d3e2;
-  font-size: 0.82rem;
-  letter-spacing: 0.01em;
 }
 
 .war-highlights {

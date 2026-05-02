@@ -1,14 +1,6 @@
-import axios from 'axios';
+import { mbGet } from './musicbrainz.service.js';
 
 class SampleDetectionService {
-  constructor() {
-    this.musicBrainzBaseUrl = 'https://musicbrainz.org/ws/2';
-    this.headers = {
-      'User-Agent': 'DevConnectLabs/1.0.0 (https://github.com/wikitimetraveler/devconnect-labs)',
-      'Accept': 'application/json'
-    };
-  }
-
   /**
    * Search for a recording by name and artist
    * @param {string} songName - Song/track name
@@ -18,15 +10,10 @@ class SampleDetectionService {
   async searchRecording(songName, artistName) {
     try {
       const query = `recording:"${songName}" AND artist:"${artistName}"`;
-      const url = `${this.musicBrainzBaseUrl}/recording`;
-      
-      const response = await axios.get(url, {
-        params: {
-          query: query,
-          limit: 5,
-          fmt: 'json'
-        },
-        headers: this.headers
+
+      const response = await mbGet('/recording', {
+        query,
+        limit: 5
       });
 
       if (response.data.recordings && response.data.recordings.length > 0) {
@@ -54,17 +41,8 @@ class SampleDetectionService {
    */
   async getRecordingRelationships(recordingId) {
     try {
-      const url = `${this.musicBrainzBaseUrl}/recording/${recordingId}`;
-      
-      // Add delay to respect rate limits (1 request per second)
-      await this.delay(1000);
-      
-      const response = await axios.get(url, {
-        params: {
-          inc: 'artist-credits+releases+recording-rels+work-rels',
-          fmt: 'json'
-        },
-        headers: this.headers
+      const response = await mbGet(`/recording/${recordingId}`, {
+        inc: 'artist-credits+releases+recording-rels+work-rels'
       });
 
       return response.data;
@@ -97,17 +75,10 @@ class SampleDetectionService {
 
       // Search for cover versions
       const query = `recording:"${songName}" NOT artist:"${artistName}"`;
-      const url = `${this.musicBrainzBaseUrl}/recording`;
-      
-      await this.delay(1000);
-      
-      const response = await axios.get(url, {
-        params: {
-          query: query,
-          limit: 50,
-          fmt: 'json'
-        },
-        headers: this.headers
+
+      const response = await mbGet('/recording', {
+        query,
+        limit: 50
       });
 
       const covers = response.data.recordings?.map(rec => ({
@@ -266,12 +237,6 @@ class SampleDetectionService {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
-  /**
-   * Delay helper for rate limiting
-   */
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
 }
 
 export default SampleDetectionService;

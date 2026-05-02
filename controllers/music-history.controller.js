@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getGoogleServerApiKey } from '../lib/google-api-key.js';
+import { mbGet } from '../services/musicbrainz.service.js';
 
 // Get music history for a specific date
 export async function getMusicHistory(req, res) {
@@ -73,12 +74,9 @@ async function getAlbumsReleasedOnDate(month, day, year) {
     const dateStr = year ? `${year}-${monthStr}-${dayStr}` : `${monthStr}-${dayStr}`;
     
     // Search MusicBrainz for releases on this date
-    const searchUrl = `https://musicbrainz.org/ws/2/release?query=date:${dateStr}*&fmt=json&limit=20`;
-    
-    const response = await axios.get(searchUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
+    const response = await mbGet('/release', {
+      query: `date:${dateStr}*`,
+      limit: 20
     });
 
     if (response.data.releases && response.data.releases.length > 0) {

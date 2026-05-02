@@ -2,6 +2,7 @@ import axios from 'axios';
 import OpenAI from 'openai';
 import { getUserConversationHistory } from '../services/langchain-memory.service.js';
 import { getPool } from '../services/database.service.js';
+import { mbGet } from '../services/musicbrainz.service.js';
 
 const openai = new OpenAI({
   apiKey: (process.env.OPENAI_API_KEY || '').trim(),
@@ -200,12 +201,9 @@ async function searchArtistAlbums(artist) {
   const albums = [];
   
   try {
-    const searchUrl = `https://musicbrainz.org/ws/2/release-group?query=artist:${encodeURIComponent(artist)}&fmt=json&limit=12`;
-    
-    const response = await axios.get(searchUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
+    const response = await mbGet('/release-group', {
+      query: `artist:${artist}`,
+      limit: 12
     });
 
     if (response.data['release-groups']) {
@@ -241,12 +239,9 @@ async function searchByYear(year, genre, userId) {
   try {
     // Try a simpler query format that should work
     const query = `date:${year}`;
-    const searchUrl = `https://musicbrainz.org/ws/2/release-group?query=${encodeURIComponent(query)}&fmt=json&limit=12`;
-    
-    const response = await axios.get(searchUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
+    const response = await mbGet('/release-group', {
+      query,
+      limit: 12
     });
 
     if (response.data['release-groups']) {
@@ -318,12 +313,9 @@ async function searchByGenre(genre, userId) {
   const albums = [];
   
   try {
-    const searchUrl = `https://musicbrainz.org/ws/2/release-group?query=tag:${encodeURIComponent(genre)}&fmt=json&limit=12`;
-    
-    const response = await axios.get(searchUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
+    const response = await mbGet('/release-group', {
+      query: `tag:${genre}`,
+      limit: 12
     });
 
     if (response.data['release-groups']) {
@@ -358,12 +350,9 @@ async function searchAlbums(query) {
   const albums = [];
   
   try {
-    const searchUrl = `https://musicbrainz.org/ws/2/release-group?query=${encodeURIComponent(query)}&fmt=json&limit=12`;
-    
-    const response = await axios.get(searchUrl, {
-      headers: {
-        'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-      }
+    const response = await mbGet('/release-group', {
+      query,
+      limit: 12
     });
 
     if (response.data['release-groups']) {

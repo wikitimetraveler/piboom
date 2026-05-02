@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getGoogleServerApiKey } from '../lib/google-api-key.js';
+import { mbGet } from '../services/musicbrainz.service.js';
 
 // Search for posters/album covers from multiple data sources
 export async function searchPosters(req, res) {
@@ -104,13 +105,9 @@ async function searchMusicBrainzPosters(query, filter = 'all') {
 
   for (const searchTerm of searchTerms.slice(0, 3)) { // Limit to 3 searches
     try {
-      const searchQuery = encodeURIComponent(searchTerm);
-      const musicBrainzUrl = `https://musicbrainz.org/ws/2/release-group?query=${searchQuery}&fmt=json&limit=5`;
-
-      const response = await axios.get(musicBrainzUrl, {
-        headers: {
-          'User-Agent': 'DevConnectLabs/1.0 (https://github.com/wikitimetraveler/devconnect-labs)'
-        }
+      const response = await mbGet('/release-group', {
+        query: searchTerm,
+        limit: 5
       });
 
       const data = response.data;

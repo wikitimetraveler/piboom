@@ -42,6 +42,12 @@ body.whai-page {
   border-bottom-color: rgba(174, 154, 120, 0.45);
 }
 
+.whai-crumb a:focus-visible {
+  outline: 2px solid rgba(196, 184, 150, 0.65);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
 .whai-crumb-sep {
   margin: 0 0.35rem;
   color: var(--whai-muted);

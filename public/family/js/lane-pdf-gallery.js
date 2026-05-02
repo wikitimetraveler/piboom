@@ -129,11 +129,53 @@ function filterByPageAndIds(images, pageFilter, idFilter) {
   return list;
 }
 
-function combinedHiddenSet(galleryHiddenIds, userHiddenIds) {
-  return new Set([
-    ...sanitizePlateIdList(galleryHiddenIds || []),
-    ...sanitizePlateIdList(userHiddenIds || [])
-  ]);
+/** Plates suppressed by repo denylist (checkbox controls whether those still show). */
+function serverHiddenSet(ids) {
+  return new Set(sanitizePlateIdList(ids || []));
+}
+
+/** Always removed from grid when hidden — personal list in Postgres */
+function userHiddenSet(ids) {
+  return new Set(sanitizePlateIdList(ids || []));
+}
+
+/**
+ * Decide which thumbnails to render.
+ * Personal hides never appear; "Show hidden plates" reveals only denylist-flagged IDs.
+ */
+function computeGalleryVisible(narrowed, galleryHiddenIds, userHiddenIds, showServerDenied) {
+  const serverH = serverHiddenSet(galleryHiddenIds);
+  const userH = userHiddenSet(userHiddenIds);
+  const displayed = narrowed.filter((img) => {
+    const id = img.imageId ? String(img.imageId) : '';
+    if (!id) return true;
+    if (userH.has(id)) return false;
+    if (serverH.has(id)) return showServerDenied;
+    return true;
+  });
+
+  /** In current filtered slice: suppressed by denylist toggle or by your hide list */
+  const suppressedHere = narrowed.reduce((acc, img) => {
+    const id = img.imageId ? String(img.imageId) : '';
+    if (!id) return acc;
+    if (userH.has(id)) return acc + 1;
+    if (serverH.has(id) && !showServerDenied) return acc + 1;
+    return acc;
+  }, 0);
+
+  const serverSuppressedFiltered = narrowed.filter(
+    (img) => img.imageId && serverH.has(String(img.imageId))
+  ).length;
+  const uhCount = narrowed.filter(
+    (img) => img.imageId && userH.has(String(img.imageId))
+  ).length;
+
+  return {
+    displayed,
+    suppressedHere,
+    serverSuppressedFiltered,
+    uhCount
+  };
 }
 
 function renderGallery(images, portraits, container) {
@@ -303,7 +345,9 @@ function bindPlateLightbox(grid) {
 function bindHideDelegation(grid, onHidePlate) {
   if (!grid || typeof onHidePlate !== 'function') return;
   grid.addEventListener('click', (e) => {
-    const hideBtn = e.target.closest('[data-hide-plate-id]');
+    let n = /** @type {Node | null} */ (e.target);
+    while (n && n.nodeType !== Node.ELEMENT_NODE) n = n.parentNode;
+    const hideBtn = n instanceof Element ? n.closest('[data-hide-plate-id]') : null;
     if (!hideBtn) return;
     e.preventDefault();
     const id = hideBtn.getAttribute('data-hide-plate-id');
@@ -347,7 +391,7 @@ async function initLanePdfGallery() {
     const summary = data.summary || {};
     const extractedIdSet = new Set(images.map((i) => (i.imageId ? String(i.imageId) : '')));
 
-    /** Postgres-backed hides for this browser (merged with repo denylist in combinedHiddenSet) */
+    /** Postgres-backed personal hides — always omitted from grid; denylist separately toggled below */
     let dbUserHiddenIds = [];
     let dbCanUndo = false;
     const clientId = getOrCreateClientId();
@@ -420,7 +464,12 @@ async function initLanePdfGallery() {
     }
 
     bindHideDelegation(grid, async (plateId) => {
-      if (!clientId) return;
+      if (!clientId) {
+        errEl.textContent =
+          'Cannot save hides — no browser client id (check local storage / private window).';
+        errEl.classList.remove('d-none');
+        return;
+      }
       try {
         errEl.textContent = '';
         errEl.classList.add('d-none');
@@ -438,11 +487,7 @@ async function initLanePdfGallery() {
         dbUserHiddenIds = sanitizePlateIdList(j.hiddenImageIds || []);
         dbCanUndo = Boolean(j.canUndo);
         if (undoBtn) undoBtn.disabled = !dbCanUndo;
-        /** Filtered view so this plate disappears immediately */
-        if (showHiddenInput) {
-          showHiddenInput.checked = false;
-          persistShowHiddenCheckbox();
-        }
+        /** Do not uncheck "show denylist" — that was hiding hundreds of plates; user hides are filtered in applyFilters() */
         applyFilters();
       } catch (he) {
         console.warn('lane-pdf-gallery: hide POST', he);
@@ -464,10 +509,90 @@ async function initLanePdfGallery() {
       persistShowHiddenCheckbox();
     }
 
-    /** User hides come from Postgres (refreshHidesFromServer); repo denylist from gallery payload. */
+    let lastFilterSerialized = '';
+    let galleryDisplayedFull = [];
+    /** Snapshot for stats line + empty-state hints (matches latest applyFilters pass). */
+    let lastGalleryStatsCtx = null;
+
+    function filterSnapshot() {
+      const pageVal = pageInput.value.trim();
+      const idVal = idInput.value.trim();
+      const sh = showHiddenInput ? (showHiddenInput.checked ? '1' : '0') : '1';
+      return `${pageVal}|${idVal}|${sh}`;
+    }
+
+    function plateVisibilityLabelHtml(N) {
+      return `Plates shown: <strong>${esc(N)}</strong>`;
+    }
+
+    function refreshGalleryVisuals(ctx) {
+      const {
+        displayedFull,
+        narrowed,
+        showHidden,
+        suppressedHere,
+        serverSuppressedInFilter,
+        userHidesInFilter,
+        summary: sum,
+        galleryHiddenIds: gHid,
+        extractedIdSet: exSet,
+        userHiddenIdsLive: uHid,
+        portraits: portraitsArg
+      } = ctx;
+      renderGallery(displayedFull, portraitsArg, grid);
+
+      const N = displayedFull.length;
+
+      const skippedChip =
+        typeof sum.skippedCount === 'number' && sum.skippedCount > 0
+          ? `<span class="lane-pdf-stat-chip lane-pdf-stat-chip--note"><span class="lane-pdf-stat-k">Skipped decode</span> <span class="text-muted">${esc(sum.skippedCount)} omitted</span></span>`
+          : '';
+
+      const totalHiddenListed = gHid.reduce(
+        (acc, id) => acc + (exSet.has(String(id)) ? 1 : 0),
+        0
+      );
+      const uhCount = (uHid || []).filter((id) => exSet.has(String(id))).length;
+
+      let viewingNote = '';
+      if (showHidden && serverSuppressedInFilter > 0) {
+        const uh = typeof userHidesInFilter === 'number' ? userHidesInFilter : 0;
+        viewingNote = ` <span class="text-info">Showing ${esc(
+          serverSuppressedInFilter
+        )} server-denylisted plate(s) in this filtered set.${uh > 0 ? ` Omitting ${esc(uh)} you hid.` : ''}</span>`;
+      } else if (!showHidden && suppressedHere > 0) {
+        viewingNote = ` <span class="text-muted">${esc(
+          suppressedHere
+        )} plate(s) not shown (${esc(serverSuppressedInFilter)} denylist toggle; personal hides always off grid).</span>`;
+      }
+
+      const platesFrag = plateVisibilityLabelHtml(N);
+
+      const withCandidates = images.filter((i) => (i.candidatePersonIds || []).length > 0).length;
+
+      if (statsLine) {
+        statsLine.innerHTML = `
+        <div class="lane-pdf-stats-chips">
+          <span class="lane-pdf-stat-chip"><span class="lane-pdf-stat-k">PDF pages</span> <strong class="lane-pdf-stat-v">${esc(sum.pdfPageCount)}</strong></span>
+          <span class="lane-pdf-stat-chip"><span class="lane-pdf-stat-k">Extracted JPEGs</span> <strong class="lane-pdf-stat-v">${esc(images.length)}</strong></span>
+          ${skippedChip}
+          <span class="lane-pdf-stat-chip lane-pdf-stat-chip--emphasis">${platesFrag}${viewingNote}</span>
+          <span class="lane-pdf-stat-chip"><span class="lane-pdf-stat-k">Server-hidden</span> <strong class="lane-pdf-stat-v">${esc(totalHiddenListed)}</strong></span>
+          <span class="lane-pdf-stat-chip"><span class="lane-pdf-stat-k">Your hides</span> <strong class="lane-pdf-stat-v">${esc(uhCount)}</strong></span>
+          <span class="lane-pdf-stat-chip"><span class="lane-pdf-stat-k">With ≥1 candidate</span> <strong class="lane-pdf-stat-v">${esc(withCandidates)}</strong></span>
+          <span class="lane-pdf-stat-chip"><span class="lane-pdf-stat-k">Curated portraits</span> <strong class="lane-pdf-stat-v">${esc(portraitsArg.length)}</strong></span>
+        </div>`;
+      }
+    }
+
+    /** User hides from Postgres; checkbox only reveals repo denylist (your hides stay off-grid). */
     function applyFilters() {
+      const snap = filterSnapshot();
+      if (snap !== lastFilterSerialized) {
+        lastFilterSerialized = snap;
+      }
+
       const userHiddenIdsLive = dbUserHiddenIds;
-      const hidden = combinedHiddenSet(galleryHiddenIds, userHiddenIdsLive);
       const pageVal = pageInput.value.trim();
       const idFilter = parseIdList(idInput.value.trim());
       const narrowed = filterByPageAndIds(images, pageVal, idFilter);
@@ -475,18 +600,25 @@ async function initLanePdfGallery() {
       let showHidden = Boolean(showHiddenInput && showHiddenInput.checked);
       const noTextFilters =
         pageInput.value.trim().length === 0 && idInput.value.trim().length === 0;
+
+      const visibilityIfOff = computeGalleryVisible(
+        narrowed,
+        galleryHiddenIds,
+        userHiddenIdsLive,
+        false
+      );
+      const visibilityIfOn = computeGalleryVisible(narrowed, galleryHiddenIds, userHiddenIdsLive, true);
+
       const wouldHideAll =
         narrowed.length >= 40 &&
         images.length >= 40 &&
         noTextFilters &&
         narrowed.length === images.length &&
         !showHidden &&
-        narrowed.every((img) => img.imageId && hidden.has(String(img.imageId)));
+        visibilityIfOff.displayed.length === 0 &&
+        visibilityIfOn.displayed.length > 0;
 
-      if (
-        wouldHideAll &&
-        !localStorage.getItem(LS_AUTO_GRID_FIX_ONCE)
-      ) {
+      if (wouldHideAll && !localStorage.getItem(LS_AUTO_GRID_FIX_ONCE)) {
         try {
           localStorage.setItem(LS_AUTO_GRID_FIX_ONCE, '1');
         } catch (_) {
@@ -497,51 +629,26 @@ async function initLanePdfGallery() {
         showHidden = true;
       }
 
-      let displayed;
-      let suppressedHere;
-      if (showHidden) {
-        displayed = narrowed;
-        suppressedHere = narrowed.filter((img) => img.imageId && hidden.has(String(img.imageId))).length;
-      } else {
-        suppressedHere = narrowed.filter((img) => img.imageId && hidden.has(String(img.imageId))).length;
-        displayed = narrowed.filter((img) => !(img.imageId && hidden.has(String(img.imageId))));
-      }
+      const vis = computeGalleryVisible(narrowed, galleryHiddenIds, userHiddenIdsLive, showHidden);
+      const { displayed, suppressedHere, uhCount: userHidesInFilter, serverSuppressedFiltered } = vis;
 
-      renderGallery(displayed, portraits, grid);
+      galleryDisplayedFull = displayed;
 
-      const skippedHidden =
-        typeof summary.skippedCount === 'number' && summary.skippedCount > 0
-          ? ` · <span class="text-muted">Skipped decode entries omitted (${esc(summary.skippedCount)})</span>`
-          : '';
+      lastGalleryStatsCtx = {
+        displayedFull: galleryDisplayedFull,
+        narrowed,
+        showHidden,
+        suppressedHere,
+        serverSuppressedInFilter: serverSuppressedFiltered,
+        userHidesInFilter,
+        summary,
+        galleryHiddenIds,
+        extractedIdSet,
+        userHiddenIdsLive,
+        portraits
+      };
 
-      const totalHiddenListed = galleryHiddenIds.reduce(
-        (acc, id) => acc + (extractedIdSet.has(String(id)) ? 1 : 0),
-        0
-      );
-      const uhCount = (userHiddenIdsLive || []).filter((id) => extractedIdSet.has(String(id))).length;
-
-      const serverDeniedInNarrowed = narrowed.filter(
-        (img) => img.imageId && galleryHiddenIds.includes(String(img.imageId))
-      ).length;
-      const serverDenyMin = Math.min(totalHiddenListed, serverDeniedInNarrowed);
-
-      let viewingNote = '';
-      if (showHidden && suppressedHere > 0) {
-        viewingNote = ` <span class="text-info">Including ${esc(suppressedHere)} plate(s) on denylist/hidden-by-you for this filtered set.</span>`;
-      } else if (!showHidden && suppressedHere > 0) {
-        viewingNote = ` <span class="text-muted">${esc(suppressedHere)} plate(s) hidden for this filtered set (${esc(serverDenyMin)} via server denylist).</span>`;
-      }
-
-      if (statsLine) {
-        statsLine.innerHTML = `
-        PDF pages: <strong>${esc(summary.pdfPageCount)}</strong> ·
-        Extracted JPEGs: <strong>${esc(images.length)}</strong>${skippedHidden} ·
-        Plates shown: <strong>${esc(displayed.length)}</strong>${viewingNote} ·
-        Server-hidden (in corpus): <strong>${esc(totalHiddenListed)}</strong> ·
-        Your hides (DB): <strong>${esc(uhCount)}</strong> ·
-        With ≥1 tree candidate (all extracted): <strong>${esc(images.filter((i) => (i.candidatePersonIds || []).length > 0).length)}</strong> ·
-        Curated portraits: <strong>${portraits.length}</strong>`;
-      }
+      refreshGalleryVisuals(lastGalleryStatsCtx);
 
       /* Empty-grid recovery hints (wrong import, stray filters, or show-hidden off while everything suppressed) */
       if (emptyHint && emptyTitle && emptyDetail && images.length > 0) {
@@ -559,13 +666,23 @@ async function initLanePdfGallery() {
             emptyDetail.textContent =
               'Adjust or clear the PDF page number and candidate id filters.';
             recoverClearFiltersBtn && recoverClearFiltersBtn.classList.remove('d-none');
-          } else if (narrowed.length > 0 && !showHidden) {
-            emptyTitle.textContent =
-              'No plates visible — everything in this filtered set is on your hidden list.';
-            emptyDetail.textContent =
-              'Turn on “Show hidden plates” to preview them anyway, or use Clear my hides if a large import suppressed the whole gallery by mistake.';
-            recoverShowHiddenBtn && recoverShowHiddenBtn.classList.remove('d-none');
-            recoverClearHidesBtn && recoverClearHidesBtn.classList.remove('d-none');
+          } else if (narrowed.length > 0) {
+            if (visibilityIfOn.displayed.length === 0) {
+              emptyTitle.textContent =
+                'No plates visible — you hid every plate in this filtered view.';
+              emptyDetail.textContent =
+                'Use Undo last hide or Clear my hides to restore them. Turning on Show hidden plates only affects server denylist items, not your personal hides.';
+              recoverClearHidesBtn && recoverClearHidesBtn.classList.remove('d-none');
+            } else if (!showHidden) {
+              emptyTitle.textContent =
+                'No plates visible — matched plates are hidden by the server denylist.';
+              emptyDetail.textContent =
+                'Turn on Show hidden plates to show those flagged plates again (your personally hidden plates stay off the grid until you clear them).';
+              recoverShowHiddenBtn && recoverShowHiddenBtn.classList.remove('d-none');
+              recoverClearHidesBtn && recoverClearHidesBtn.classList.remove('d-none');
+            } else {
+              emptyHint.classList.add('d-none');
+            }
           } else {
             emptyHint.classList.add('d-none');
           }
