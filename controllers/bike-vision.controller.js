@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
 
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
 const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
@@ -18,7 +19,7 @@ export async function visionIdentifyBike(req, res) {
       'You are a professional e-bike and bicycle product specialist. Identify bikes from photos and summarize key specs. Provide concise results.';
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiVisionModel('BIKE_VISION_MODEL'),
       messages: [
         { role: 'system', content: systemPrompt },
         {

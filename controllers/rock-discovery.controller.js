@@ -1,4 +1,6 @@
 import OpenAI from 'openai';
+import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
+import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
 const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
@@ -37,7 +39,7 @@ export async function chatWithRocky(req, res) {
     }
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiAgentModel('ROCK_CHAT_MODEL'),
       messages: [
         { role: 'system', content: ROCKY_SYSTEM_PROMPT },
         { role: 'user', content: message.trim() },
@@ -78,7 +80,7 @@ export async function visionIdentifyRock(req, res) {
       'You are Rocky The Rock Star, a gem and meteorite expert (especially strong on rubies and corundum). From the photo, assess whether this looks like rough rock, a cut/faceted gemstone, jewelry, or a meteorite candidate. For red or pink stones: discuss ruby (corundum) vs red spinel, garnet, tourmaline, or glass/synthetic — mention what you can and cannot see (facets, luster, obvious inclusions). For rough or meteoritic: note texture, color, metallic flashes, vesicles, fusion crust hints, weathering, slag. Give confidence low/medium/high with caveats. Stress that photo ID is not a gem lab or meteorite lab result. Be concise.';
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiVisionModel('ROCK_VISION_MODEL'),
       messages: [
         { role: 'system', content: visionSystem },
         {

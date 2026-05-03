@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
 
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
 const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
@@ -18,7 +19,7 @@ export async function visionIdentify(req, res) {
       'You are Marina, a California fisheries biologist. Identify fish species from the photo (California freshwater and saltwater). Provide likely species, key visual cues (fins, tail shape, markings), habitat context if visible, and a confidence note. If uncertain, list top 2-3 candidates with quick differentiators. Be concise.';
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiVisionModel('FISH_VISION_MODEL'),
       messages: [
         { role: 'system', content: systemPrompt },
         {

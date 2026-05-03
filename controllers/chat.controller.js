@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
 import axios from 'axios';
 import { getConversationChain, getUserConversationHistory, clearUserConversationHistory, getUserConversationStats } from '../services/langchain-memory.service.js';
+import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 import { getGoogleServerApiKey } from '../lib/google-api-key.js';
 
 // OpenAI configuration
@@ -347,7 +348,7 @@ const chatWithGPT = async (req, res) => {
         ];
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: resolveOpenAiAgentModel('CHAT_MODEL'),
       messages: messages,
       max_tokens: isLaneMuseumDocent ? 900 : 600,
       temperature: isLaneMuseumDocent ? 0.45 : 0.8, // Higher temperature for more personality
@@ -371,7 +372,7 @@ const chatWithGPT = async (req, res) => {
     res.json({
       response,
       timestamp: new Date().toISOString(),
-      model: "gpt-4o-mini",
+      model: resolveOpenAiAgentModel('CHAT_MODEL'),
       personality: isLaneMuseumDocent ? "lane-museum-docent" : "engaging",
       conversationLength: conversationHistory.length
     });
@@ -411,7 +412,7 @@ const getMusicRecommendations = async (req, res) => {
     prompt += ` Here's what I'm thinking - give me 5 fantastic music recommendations that'll rock your world! Include the artist name, song title, and tell me why it's going to be killer! Make it personal and exciting - I want you to feel the passion I have for these classic tracks! Peace and love, you know! 🏍️🎸🎵`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: resolveOpenAiAgentModel('CHAT_MODEL'),
       messages: [
         { 
           role: "system", 
@@ -465,7 +466,7 @@ Tell me all the soulful, interesting, and heartfelt facts about ${artist}. I wan
 Make it exciting and personal - I want to feel your passion for this artist! Use emojis and be enthusiastic with a blues vibe! Tell me why you think they're mighty fine! The blues got soul, you know! 🎵🎸`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: resolveOpenAiAgentModel('CHAT_MODEL'),
       messages: [
         { 
           role: "system", 
@@ -751,7 +752,7 @@ const chatWithLangChain = async (req, res) => {
     res.json({ 
       response,
       timestamp: new Date().toISOString(),
-      model: "gpt-4o-mini",
+      model: resolveOpenAiAgentModel('CHAT_MODEL'),
       personality: assistant,
       userId: userId,
       sessionId: sessionId,

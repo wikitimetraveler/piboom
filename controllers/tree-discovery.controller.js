@@ -1,4 +1,6 @@
 import OpenAI from 'openai';
+import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
+import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 
 // OpenAI configuration
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
@@ -31,7 +33,7 @@ export async function identifyTreeFromImage(req, res) {
 
     // Use OpenAI Vision to identify the tree
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: resolveOpenAiVisionModel('TREE_VISION_MODEL'),
       messages: [
         {
           role: "user",
@@ -149,7 +151,7 @@ export async function getTreeInfo(req, res) {
     console.log('🌲 Getting tree info from Smokey for:', treeName);
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: resolveOpenAiAgentModel('TREE_CHAT_MODEL'),
       messages: [
         {
           role: "system",

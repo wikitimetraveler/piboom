@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { FIND_CATEGORIES } from './finds.service.js';
+import { resolveOpenAiVisionModel } from './openai-vision-model.js';
 
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
 const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
@@ -73,7 +74,7 @@ export async function analyzeFindImages({ images, notes }) {
   ];
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
+    model: resolveOpenAiVisionModel('FINDS_VISION_MODEL'),
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: userContent },

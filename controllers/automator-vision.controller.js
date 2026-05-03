@@ -1,7 +1,15 @@
 import OpenAI from 'openai';
 import { config } from '../config/index.js';
+import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
 
 const openai = config.openaiApiKey ? new OpenAI({ apiKey: config.openaiApiKey }) : null;
+
+/** Vision extraction can stall if OpenAI is slow; prevents open-ended hangs (override AUTOMATOR_VISION_OPENAI_TIMEOUT_MS). */
+const AUTOMATOR_VISION_OPENAI_TIMEOUT_MS = Number(process.env.AUTOMATOR_VISION_OPENAI_TIMEOUT_MS || 120000);
+const AUTOMATOR_VISION_MAX_TOKENS = Math.min(
+  16384,
+  Math.max(700, Number(process.env.AUTOMATOR_VISION_MAX_TOKENS || 4096) || 4096),
+);
 
 function extractJsonObject(raw) {
   if (!raw || typeof raw !== 'string') return null;
@@ -37,29 +45,32 @@ export async function postParseAutomatorFieldImage(req, res) {
       return res.status(400).json({ error: 'imageData data URL is required' });
     }
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      temperature: 0.1,
-      max_tokens: 700,
-      messages: [
-        {
-          role: 'system',
-          content: [
-            'You extract Encompass custom field definition rows from screenshots.',
-            'Return only JSON with this exact shape: {"lines":["[CX.ID]\\tNew\\tString(3)\\tDescription\\tN"]}.',
-            'Each line should be tab-separated and contain: [FieldId], Action(New or Modify), Type token, Description, optional N.',
-            'Do not add commentary, markdown, or extra keys.',
-          ].join(' '),
-        },
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: 'Extract all visible field rows from this image.' },
-            { type: 'image_url', image_url: { url: imageData } },
-          ],
-        },
-      ],
-    });
+    const completion = await openai.chat.completions.create(
+      {
+        model: resolveOpenAiVisionModel('AUTOMATOR_VISION_MODEL'),
+        temperature: 0.1,
+        max_tokens: AUTOMATOR_VISION_MAX_TOKENS,
+        messages: [
+          {
+            role: 'system',
+            content: [
+              'You extract Encompass custom field definition rows from screenshots.',
+              'Return only JSON with this exact shape: {"lines":["[CX.ID]\\tNew\\tString(3)\\tDescription\\tN"]}.',
+              'Each line should be tab-separated and contain: [FieldId], Action(New or Modify), Type token, Description, optional N.',
+              'Do not add commentary, markdown, or extra keys.',
+            ].join(' '),
+          },
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: 'Extract all visible field rows from this image.' },
+              { type: 'image_url', image_url: { url: imageData } },
+            ],
+          },
+        ],
+      },
+      { timeout: AUTOMATOR_VISION_OPENAI_TIMEOUT_MS },
+    );
 
     const raw = completion.choices?.[0]?.message?.content || '';
     const parsed = extractJsonObject(raw);
@@ -77,6 +88,16 @@ export async function postParseAutomatorFieldImage(req, res) {
     return res.json({ success: true, lines });
   } catch (error) {
     console.error('Automator vision parse failed:', error.message);
+    const timedOut =
+      error.code === 'ETIMEDOUT' ||
+      error.message?.includes?.('timeout') ||
+      error.message?.includes?.('timed out');
+    if (timedOut) {
+      return res.status(504).json({
+        error: 'Vision request timed out',
+        details: `OpenAI did not respond within ${AUTOMATOR_VISION_OPENAI_TIMEOUT_MS}ms. Retry with a smaller image or raise AUTOMATOR_VISION_OPENAI_TIMEOUT_MS.`,
+      });
+    }
     return res.status(500).json({
       error: 'Failed to parse field definitions from image',
       details: error.message,

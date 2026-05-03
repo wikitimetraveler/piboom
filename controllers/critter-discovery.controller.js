@@ -1,4 +1,6 @@
 import OpenAI from 'openai';
+import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
+import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
@@ -21,7 +23,7 @@ export async function identifyCritterFromImage(req, res) {
     console.log('🦎 Analyzing critter image with AI Vision...');
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiVisionModel('CRITTER_VISION_MODEL'),
       messages: [
         {
           role: 'user',
@@ -124,7 +126,7 @@ export async function getCritterInfo(req, res) {
     console.log('🦎 Getting critter info for:', animalName, expert ? `(expert: ${expert})` : '');
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiAgentModel('CRITTER_CHAT_MODEL'),
       messages: [
         { role: 'system', content: systemPrompt },
         {
@@ -214,7 +216,7 @@ export async function chatWithCritterExpert(req, res) {
     console.log(`🦎 Asking ${assistantNames[expert]}:`, message.substring(0, 50) + '...');
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiAgentModel('CRITTER_CHAT_MODEL'),
       messages: [
         { role: 'system', content: EXPERT_PROMPTS[expert] },
         { role: 'user', content: message }

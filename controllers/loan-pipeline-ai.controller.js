@@ -11,6 +11,7 @@
  */
 
 import { getConversationChain } from '../services/langchain-memory.service.js';
+import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 import { getAllLoans, getPipelineStats } from '../services/loan-pipeline.service.js';
 import { getPool } from '../services/database.service.js';
 
@@ -206,7 +207,7 @@ export async function chatWithAI(req, res) {
             success: true,
             response,
             timestamp: new Date().toISOString(),
-            model: "gpt-4o-mini",
+            model: resolveOpenAiAgentModel('LOAN_PIPELINE_AI_MODEL'),
             context: {
                 filters: context.filters || null,
                 selectedDisaster: context.selectedDisaster || null
@@ -278,7 +279,7 @@ export async function chatWithDisasterExpert(req, res) {
             success: true,
             response,
             timestamp: new Date().toISOString(),
-            model: "gpt-4o-mini",
+            model: resolveOpenAiAgentModel('LOAN_PIPELINE_AI_MODEL'),
             context: {
                 filters: context.filters || null,
                 selectedDisaster: context.selectedDisaster || null,

@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import OpenAI from 'openai';
+import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -72,7 +73,7 @@ Rules:
       .join('\n\n')}`;
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiAgentModel('LANE_SAYINGS_LLM_MODEL'),
       messages: [
         { role: 'system', content: system },
         { role: 'user', content: user }

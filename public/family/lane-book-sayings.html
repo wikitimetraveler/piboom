@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lane book sayings &amp; attributions — DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-shell.css" />
+  <link rel="stylesheet" href="/family/css/lane-family-hub.css" />
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
+  <style>
+    .lbs-meta { color: #64748b; font-size: 0.95rem; margin-bottom: 1.25rem; }
+    .lbs-quote { white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
+    .lbs-table-wrap { overflow-x: auto; }
+    .lbs-tags .badge { margin-right: 0.25rem; margin-bottom: 0.25rem; font-weight: 500; }
+  </style>
+</head>
+<body class="lane-family-hub">
+  <modern-navbar></modern-navbar>
+
+  <main class="lf-main">
+    <p class="mb-2">
+      <a href="/family/lane-family.html"><i class="bi bi-arrow-left" aria-hidden="true"></i> Lane Family</a>
+    </p>
+    <header class="mb-4">
+      <h1 class="h3 font-weight-bold">Lane book sayings &amp; attributions</h1>
+      <p class="lbs-meta mb-1">
+        Curated excerpts from the digitized genealogy PDF, with short descriptions (attribution / context) and PDF page numbers.
+        Same dataset the <a href="/family/lane-museum.html">Lane Museum</a> docent uses for grounding.
+      </p>
+      <p id="lbsSourceLine" class="lbs-meta mb-0" hidden></p>
+    </header>
+
+    <div id="lbsStatus" class="alert alert-light border" role="status">Loading…</div>
+
+    <div id="lbsTableHost" class="lbs-table-wrap d-none">
+      <table class="table table-sm table-bordered bg-white">
+        <thead class="thead-light">
+          <tr>
+            <th scope="col" style="min-width: 28%;">Quote</th>
+            <th scope="col" style="min-width: 24%;">Description / attribution</th>
+            <th scope="col">PDF page</th>
+            <th scope="col">Tags</th>
+          </tr>
+        </thead>
+        <tbody id="lbsTbody"></tbody>
+      </table>
+      <p class="small text-muted mb-0">
+        Raw JSON: <a href="/api/genealogy/lane-book-sayings" id="lbsJsonLink"><code>/api/genealogy/lane-book-sayings</code></a>
+      </p>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      function esc(s) {
+        if (s == null) return '';
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      async function load() {
+        var status = document.getElementById('lbsStatus');
+        var tbody = document.getElementById('lbsTbody');
+        var host = document.getElementById('lbsTableHost');
+        var sourceLine = document.getElementById('lbsSourceLine');
+        try {
+          var res = await fetch('/api/genealogy/lane-book-sayings');
+          var data = await res.json();
+          if (!res.ok || !data.success) {
+            throw new Error((data && data.error) || 'Request failed');
+          }
+          var entries = Array.isArray(data.entries) ? data.entries : [];
+          if (data.sourceLabel || data.source) {
+            sourceLine.textContent =
+              'Source: ' + (data.sourceLabel || data.source || '') + (data.version != null ? ' · dataset v' + data.version : '');
+            sourceLine.hidden = false;
+          }
+          if (entries.length === 0) {
+            status.className = 'alert alert-warning';
+            status.textContent = 'No entries in data/lane-book-sayings.json yet.';
+            return;
+          }
+          status.className = 'd-none';
+          host.classList.remove('d-none');
+          tbody.innerHTML = entries
+            .map(function (e) {
+              var page = e.pdfPage != null ? e.pdfPage : '—';
+              var tags = Array.isArray(e.tags) ? e.tags : [];
+              var tagHtml = tags.length
+                ? '<span class="lbs-tags">' +
+                  tags.map(function (t) {
+                    return '<span class="badge badge-secondary">' + esc(t) + '</span>';
+                  }).join(' ') +
+                  '</span>'
+                : '—';
+              return (
+                '<tr><td class="lbs-quote">' +
+                esc(e.quote || '') +
+                '</td><td>' +
+                esc(e.description || '') +
+                '</td><td>' +
+                esc(page) +
+                '</td><td>' +
+                tagHtml +
+                '</td></tr>'
+              );
+            })
+            .join('');
+        } catch (err) {
+          status.className = 'alert alert-danger';
+          status.textContent = 'Could not load sayings: ' + (err && err.message ? err.message : err);
+        }
+      }
+      load();
+    })();
+  </script>
+</body>
+</html>

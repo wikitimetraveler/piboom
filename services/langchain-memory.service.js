@@ -4,6 +4,7 @@ import { ConversationChain } from "@langchain/classic/chains";
 import { ChatMessageHistory } from "@langchain/classic/stores/message/in_memory";
 import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { getPool } from './database.service.js';
+import { resolveOpenAiAgentModel } from './openai-agent-model.js';
 
 /**
  * PostgreSQL-backed conversation memory for LangChain
@@ -154,7 +155,7 @@ export async function getConversationChain(userId, systemPrompt, sessionId = 'de
 
   // Create OpenAI chat model
   const model = new ChatOpenAI({
-    modelName: "gpt-4o-mini",
+    modelName: resolveOpenAiAgentModel('LANGCHAIN_CHAT_MODEL'),
     temperature: 0.8,
     maxTokens: 600,
     openAIApiKey: (process.env.OPENAI_API_KEY || '').trim(),

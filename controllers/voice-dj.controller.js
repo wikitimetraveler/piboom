@@ -1,6 +1,7 @@
 import axios from 'axios';
 import OpenAI from 'openai';
 import { getUserConversationHistory } from '../services/langchain-memory.service.js';
+import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 import { getPool } from '../services/database.service.js';
 import { mbGet } from '../services/musicbrainz.service.js';
 
@@ -85,7 +86,7 @@ RESPOND WITH ONLY VALID JSON!`
 
     // Call OpenAI with JSON mode
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: resolveOpenAiAgentModel('VOICE_DJ_MODEL'),
       messages: messages,
       temperature: 0.7,
       max_tokens: 300,

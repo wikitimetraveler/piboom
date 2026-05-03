@@ -1,6 +1,7 @@
 import axios from 'axios';
 import OpenAI from 'openai';
 import { config } from '../config/index.js';
+import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
 import { mbGet } from '../services/musicbrainz.service.js';
 
 // Initialize OpenAI client
@@ -313,7 +314,7 @@ export async function identifyAlbumFromImage(req, res) {
 
     // Use OpenAI Vision API to identify the album
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Vision-capable model
+      model: resolveOpenAiVisionModel('ALBUM_VISION_MODEL'),
       messages: [
         {
           role: "system",

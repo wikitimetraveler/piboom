@@ -504,7 +504,7 @@
                 <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between gap-2">
                     <div>
                         <h5 class="mb-1 fw-semibold"><i class="bi-lightning-charge me-2 text-primary"></i>Tool 4 — The Automator</h5>
-                        <p class="mb-0 helper-text">Generate field definitions, parse or extract rows, then create/update Encompass fields from validated JSON.</p>
+                        <p class="mb-0 helper-text">Generate field definitions, parse or extract rows, then create/update Encompass fields from validated JSON. The default rule-indicator placeholder formula is added in JSON only when rows are produced from the Rule name box above — not for pasted, vision-extracted, or hand-edited field rows.</p>
                     </div>
                     <div class="d-flex flex-wrap align-items-center gap-2">
                         <button type="button" class="btn btn-outline-secondary btn-sm voice-help-toggle voice-btn-inline" id="voiceBtn" title="Voice control">
@@ -522,6 +522,7 @@
                     <i class="bi-sliders text-primary" aria-hidden="true"></i> Rule setup
                 </div>
                 <div class="automator-panel-body">
+                    <p class="small text-muted mb-3 mb-md-2">Use this block to auto-build the standard custom-field row set (indicator <code>CX.R.*</code>, overrides <code>CX.O.*</code>, etc.). JSON built from these inputs may include the rule-indicator placeholder formula on <code>CX.R.*</code> only—rows from vision, paste, or hand-editing the Field Definitions box do not.</p>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -554,7 +555,7 @@
                         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                             <div>
                                 <div class="fw-semibold">Image Import (Vision)</div>
-                                <div class="small text-muted">Paste, upload, or capture an image to extract Encompass field rows.</div>
+                                <div class="small text-muted">Paste, upload, or capture an image to extract Encompass field rows. Slow paste usually means the async clipboard API or a permission prompt — watch the status line below for a spinner (times out after ~12s).</div>
                             </div>
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="pasteImageBtn"><i class="bi-clipboard-image me-1"></i>Paste Image</button>
@@ -580,6 +581,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="ruleOutput">Field Definitions</label>
+                        <div class="helper-note mb-1">JSON from vision, paste, or manual edits does not get the rule-box placeholder formula. Use the Rule name / description fields above when you want that placeholder on <code>CX.R.*</code> fields, or paste Unit Test output for real logic.</div>
                         <textarea class="form-control" id="ruleOutput" rows="8" placeholder="Tab-separated field rows appear here as you type the rule name…"></textarea>
                     </div>
                     <div class="mb-3">
@@ -694,6 +696,11 @@
                 warning: 'warn',
                 danger: 'err'
             };
+            if (level === 'loading') {
+                const cls = classByLevel.info;
+                const esc = String(message).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+                return `<span class="status-chip ${cls} d-inline-flex align-items-center gap-2" role="status"><span class="spinner-border spinner-border-sm" aria-hidden="true"></span><span>${esc}</span></span>`;
+            }
             const icon = iconByLevel[level] || iconByLevel.info;
             const cls = classByLevel[level] || classByLevel.info;
             return `<span class="status-chip ${cls}"><i class="bi ${icon}" aria-hidden="true"></i>${message}</span>`;
@@ -729,6 +736,9 @@
                 descriptionRaw: parts[3] || '',
             };
         }
+
+        /** True only for the generateJSON() pass triggered by Rule name box (generateRules). Vision/paste/manual defs omit placeholder calculation. */
+        let automatorJsonIncludeRuleBoxCalc = false;
 
         function normalizeType(typeRaw) {
             const token = (typeRaw || '').trim();
@@ -780,6 +790,9 @@
         }
 
         function generateJSON() {
+            const applyRuleBoxPlaceholderCalc = automatorJsonIncludeRuleBoxCalc;
+            automatorJsonIncludeRuleBoxCalc = false;
+
             const ruleOutput = document.getElementById('ruleOutput').value;
             if (!ruleOutput.trim()) {
                 document.getElementById('ADOoutput').value = '';
@@ -817,8 +830,10 @@
                     description: parsed.descriptionRaw || '',
                     format: typeInfo.format,
                     maxLength: typeInfo.format === 'string' ? typeInfo.maxLength : undefined,
-                    calculation: fieldId.startsWith('CX.R.') ? `IIf(false = true, "(F)","")` : ''
                 };
+                if (applyRuleBoxPlaceholderCalc && fieldId.startsWith('CX.R.')) {
+                    jsonObj.calculation = 'IIf(false = true, "(F)","")';
+                }
 
                 if (jsonObj.maxLength === undefined) {
                     delete jsonObj.maxLength;
@@ -857,16 +872,17 @@
             }
 
             processedInput = processedInput.replace(/[\[\]\s]/g, '');
-            const ruleLogicLength = 'String(3)';  // R field length 3 as (F)
+            const ruleIndicatorFieldType = 'String(3)';
 
             const rules = [
-                [`[${processedInput.toUpperCase()}]`, "New", ruleLogicLength, `${appendParam || inputParam} Logic${isIneligibleAudit ? ' - Auto Decline' : ''}`, "N"],
+                [`[${processedInput.toUpperCase()}]`, "New", ruleIndicatorFieldType, `${appendParam || inputParam} Rule${isIneligibleAudit ? ' - Auto Decline' : ''}`, "N"],
                 [`[${processedInput.replace(".R.", ".O.").toUpperCase()}]`, "New", "String(16)", `${appendParam || inputParam} Override`, "N"],
                 [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.BY]`, "New", "String(128)", `${appendParam || inputParam} Override By`, "N"],
                 [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.DT]`, "New", "String(40)", `${appendParam || inputParam} Override Date`, "N"],
                 [`[${processedInput.replace(".R.", ".O.").toUpperCase()}.RN]`, "New", "String(256)", `${appendParam || inputParam} Override Reason`, "N"]
             ];
 
+            automatorJsonIncludeRuleBoxCalc = true;
             document.getElementById('ruleOutput').value = rules.map(rule => rule.join('\t')).join('\n');
             generateJSON();
         }
@@ -878,7 +894,32 @@
             const el = document.getElementById('imageStatus');
             const safeLevel = level === 'muted' ? 'info' : level;
             el.className = 'small mt-2';
+            el.setAttribute('aria-live', safeLevel === 'danger' ? 'assertive' : 'polite');
             el.innerHTML = createStatusChip(safeLevel, message);
+        }
+
+        const CLIPBOARD_READ_TIMEOUT_MS = 12000;
+        /** Browser fetch has no default timeout — Encompass/OpenAI can stall forever without this. */
+        const AUTOMATOR_API_FETCH_TIMEOUT_MS = 120000;
+
+        function promiseWithTimeout(promise, ms, timeoutMessage = 'timeout') {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error(timeoutMessage)), ms);
+                }),
+            ]);
+        }
+
+        async function automatorFetchWithTimeout(url, options = {}, timeoutMs = AUTOMATOR_API_FETCH_TIMEOUT_MS) {
+            const ctrl = new AbortController();
+            const id = setTimeout(() => ctrl.abort(), timeoutMs);
+            try {
+                const fetchFn = window.encompassApi?.encompassFetch || fetch;
+                return await fetchFn(url, { ...options, signal: ctrl.signal });
+            } finally {
+                clearTimeout(id);
+            }
         }
 
         function setAutomatorImage(dataUrl) {
@@ -957,11 +998,23 @@
                 if (noImageMessage) setImageStatus(noImageMessage, 'warning');
                 return false;
             }
+            const t0 = typeof performance !== 'undefined' ? performance.now() : 0;
             try {
-                const items = await navigator.clipboard.read();
+                setImageStatus('Reading clipboard (browser API)…', 'loading');
+                await Promise.resolve();
+                const items = await promiseWithTimeout(
+                    navigator.clipboard.read(),
+                    CLIPBOARD_READ_TIMEOUT_MS,
+                    'CLIPBOARD_READ_TIMEOUT',
+                );
+                if (typeof performance !== 'undefined') {
+                    const dt = performance.now() - t0;
+                    if (dt > 2500) console.warn('[Automator] clipboard.read() took', Math.round(dt), 'ms');
+                }
                 for (const clipItem of items) {
                     for (const mime of clipItem.types || []) {
                         if (!mime.startsWith('image/')) continue;
+                        setImageStatus('Decoding image…', 'loading');
                         const blob = await clipItem.getType(mime);
                         const reader = new FileReader();
                         const result = await new Promise((resolve, reject) => {
@@ -976,8 +1029,23 @@
                         }
                     }
                 }
-            } catch (_) {
-                // Permission denied or unsupported — fall through.
+            } catch (err) {
+                const msg = err && err.message;
+                if (msg === 'CLIPBOARD_READ_TIMEOUT') {
+                    setImageStatus(
+                        'Clipboard read timed out (often a browser dialog or a large clipboard). Try Upload, or click the dashed box once then paste again.',
+                        'warning',
+                    );
+                    return false;
+                }
+                if (err && err.name === 'NotAllowedError') {
+                    setImageStatus(
+                        'Clipboard blocked — click the dashed drop zone so this page has focus, then paste again (or allow clipboard when the browser asks).',
+                        'warning',
+                    );
+                    return false;
+                }
+                console.warn('[Automator] clipboard.read failed:', err);
             }
             if (noImageMessage) setImageStatus(noImageMessage, 'warning');
             return false;
@@ -1056,7 +1124,7 @@
             setCreateUpdateStatus(statusEl, config.progressMessage, 'info');
 
             try {
-                const res = await (window.encompassApi?.encompassFetch || fetch)(config.endpoint, {
+                const res = await automatorFetchWithTimeout(config.endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(parsed.data),
@@ -1083,7 +1151,10 @@
                     );
                 }
             } catch (error) {
-                setCreateUpdateStatus(statusEl, `Error: ${error.message}`, 'danger');
+                const msg = error.name === 'AbortError'
+                    ? `Request timed out after ${AUTOMATOR_API_FETCH_TIMEOUT_MS / 1000}s — Encompass may be slow or down. You can raise the wait in code or try again.`
+                    : error.message;
+                setCreateUpdateStatus(statusEl, `Error: ${msg}`, 'danger');
             } finally {
                 buttonEl.disabled = false;
             }
@@ -1137,9 +1208,9 @@
             }
             const btn = document.getElementById('extractFieldsBtn');
             btn.disabled = true;
-            setImageStatus('Extracting fields from image...', 'info');
+            setImageStatus('Extracting fields from image…', 'loading');
             try {
-                const res = await (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/automator/parse-field-image', {
+                const res = await automatorFetchWithTimeout('/api/encompass-hub/automator/parse-field-image', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ imageData: automatorImageData }),
@@ -1155,7 +1226,10 @@
                 generateJSON();
                 setImageStatus(`Extracted ${data.lines.length} row(s) from image.`, 'success');
             } catch (error) {
-                setImageStatus(`Extraction failed: ${error.message}`, 'danger');
+                const msg = error.name === 'AbortError'
+                    ? `Timed out after ${AUTOMATOR_API_FETCH_TIMEOUT_MS / 1000}s — server or OpenAI may be slow. Retry or try a smaller screenshot.`
+                    : error.message;
+                setImageStatus(`Extraction failed: ${msg}`, 'danger');
             } finally {
                 btn.disabled = !automatorImageData;
             }
@@ -1258,8 +1332,8 @@
             });
             els.imageDropZone.addEventListener('keydown', (e) => {
                 if ((e.ctrlKey || e.metaKey) && (e.key === 'v' || e.key === 'V')) {
-                    // Do not imply success yet — Ctrl+V fires before paste.
-                    setImageStatus('Reading clipboard…', 'info');
+                    // Ctrl+V fires before paste; async path may follow.
+                    setImageStatus('Reading clipboard…', 'loading');
                 }
             });
             els.imageDropZone.addEventListener('dragover', (e) => {
@@ -1291,7 +1365,14 @@
                     return;
                 }
                 // Some browsers/OS builds hide image bytes from sync clipboardData unless read via Async Clipboard API.
-                await loadImageFromAsyncClipboardPaste(noPasteImageMsg);
+                els.imageDropZone.setAttribute('aria-busy', 'true');
+                if (els.pasteImageBtn) els.pasteImageBtn.disabled = true;
+                try {
+                    await loadImageFromAsyncClipboardPaste(noPasteImageMsg);
+                } finally {
+                    els.imageDropZone.removeAttribute('aria-busy');
+                    if (els.pasteImageBtn) els.pasteImageBtn.disabled = false;
+                }
             }
 
             // Single document-level handler avoids double-firing when the drop zone is focused

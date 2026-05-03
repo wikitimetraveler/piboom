@@ -4,6 +4,7 @@ import { ConversationChain } from "langchain/chains";
 import { ChatMessageHistory } from "langchain/stores/message/in_memory";
 import { HumanMessage, AIMessage, SystemMessage, BaseMessage } from "@langchain/core/messages";
 import { getPool } from './database.service.js';
+import { resolveOpenAiAgentModel } from './openai-agent-model.js';
 import type { UserId, ConversationMessage, ConversationStats } from '../types/langchain.d.js';
 import type { DatabasePool } from '../types/database.d.js';
 
@@ -175,7 +176,7 @@ export async function getConversationChain(
 
   // Create OpenAI chat model
   const model = new ChatOpenAI({
-    modelName: "gpt-4o-mini",
+    modelName: resolveOpenAiAgentModel('LANGCHAIN_CHAT_MODEL'),
     temperature: 0.8,
     maxTokens: 600,
     openAIApiKey: (process.env.OPENAI_API_KEY || '').trim(),

@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { resolveOpenAiAgentModel } from './openai-agent-model.js';
 
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
 const openaiClient = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
@@ -10,7 +11,7 @@ Return ONLY valid JSON with this exact shape:
 
 Calibration: 0-10 straightforward, 11-25 typical, 26-40 elevated, 41-50 unusually heavy. If data is very sparse, stay in the low-mid range and explain uncertainty in rationale.`;
 
-/** Keys most relevant for processor complexity (kept small for latency/cost). */
+/** Keys most relevant for processor complexity (kept small for latency). */
 export const AI_COMPLEXITY_FIELD_KEYS = [
   'Loan.LoanNumber',
   'Loan.BorrowerName',
@@ -95,7 +96,10 @@ export async function scoreLoanComplexityWithAi(fields, options = {}) {
   }
 
   const summary = buildAiFieldSummary(fields);
-  const model = options.model && `${options.model}`.trim() ? options.model.trim() : 'gpt-4o-mini';
+  const model =
+    options.model && `${options.model}`.trim()
+      ? options.model.trim()
+      : resolveOpenAiAgentModel('LOAN_COMPLEXITY_AI_MODEL');
   const payload = JSON.stringify(summary);
   const clipped = payload.length > 14000 ? `${payload.slice(0, 14000)}…` : payload;
 

@@ -268,7 +268,7 @@ async function computeComplexityForFields(fields, {
  * @param {string} [body.sortOrder] - 'desc' | 'asc' for complexity (default desc)
  * @param {number} [body.delayMsBetweenAssign] - throttle PUTs (default 0)
  * @param {string} [body.complexityMode] - 'rules' | 'ai' | 'both'
- * @param {string} [body.complexityAiModel] - OpenAI model id (default gpt-4o-mini)
+ * @param {string} [body.complexityAiModel] - OpenAI model id (default from LOAN_COMPLEXITY_AI_MODEL / OPENAI_AGENT_MODEL, usually gpt-4o)
  */
 export async function runProcessorAssignment(body) {
   const {

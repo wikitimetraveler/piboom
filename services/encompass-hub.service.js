@@ -9,6 +9,8 @@ const API_SERVER = API_BASE_URL.replace(/\/encompass\/v\d+\/?$/i, '');
 const API_V3_BASE = `${API_SERVER}/encompass/v3`;
 const API_V1_BASE = `${API_SERVER}/encompass/v1`;
 const DEFAULT_LIMIT = Number(process.env.ENCOMPASS_PIPELINE_LIMIT || 50);
+/** Prevent indefinite hangs when Encompass or the network stalls (ms). Override with ENCOMPASS_AXIOS_TIMEOUT_MS. */
+const ENCOMPASS_AXIOS_TIMEOUT_MS = Number(process.env.ENCOMPASS_AXIOS_TIMEOUT_MS || 120000);
 
 const PIPELINE_FIELDS = [
   'Loan.LoanGuid',
@@ -107,11 +109,16 @@ async function requestWithAuth(config, { retryOn401 = true } = {}) {
   const requestConfig = {
     ...config,
     headers,
+    timeout: config.timeout != null ? config.timeout : ENCOMPASS_AXIOS_TIMEOUT_MS,
   };
 
   try {
     return await axios(requestConfig);
   } catch (error) {
+    if (error.code === 'ECONNABORTED' || error.message?.includes?.('timeout')) {
+      const ms = requestConfig.timeout;
+      throw new Error(`Encompass request timed out after ${ms}ms — API may be slow or unreachable. Retry or raise ENCOMPASS_AXIOS_TIMEOUT_MS if operations need longer.`);
+    }
     if (retryOn401 && error.response?.status === 401) {
       clearEncompassTokenCache();
       const refreshedToken = await ensureEncompassToken();
