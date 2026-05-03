@@ -9,6 +9,9 @@ const LS_SHOW_HIDDEN = 'lanePdfGallery.showHidden';
 const LS_AUTO_GRID_FIX_ONCE = 'lanePdfGallery.blankGridRecoverOnce.v1';
 /** One-shot: older builds defaulted checkbox off → empty grid after denylist+hides */
 const SHOW_HIDDEN_LEGACY_ONCE = 'lanePdfGallery.defaultShowLegacy20260428';
+/** Legacy localStorage presets — migrated once to Postgres via /lane-pdf/presets/import */
+const LS_FILTER_PRESETS = 'lanePdfGallery.filterPresets.v1';
+const LS_PRESETS_MIGRATED = 'lanePdfGallery.presetsMigratedToDb.v1';
 
 /** Lane PDF extractor plate keys, e.g. p12-i0 (ignore junk from bad imports) */
 const PLATE_IMAGE_ID_RE = /^p\d+-i\d+$/;
@@ -41,6 +44,16 @@ function parseIdList(raw) {
   if (!raw || typeof raw !== 'string') return null;
   const parts = raw.split(/[\s,]+/).map((x) => parseInt(x.trim(), 10)).filter((n) => !Number.isNaN(n));
   return parts.length ? parts : null;
+}
+
+/** PDF page filter: empty or integer ≥ 1 */
+function sanitizeFilterPage(raw) {
+  if (raw == null || raw === '') return '';
+  const s = String(raw).trim();
+  if (!s) return '';
+  const p = parseInt(s, 10);
+  if (Number.isNaN(p) || p < 1) return '';
+  return String(p);
 }
 
 /** JPEG exists (pypdf decoded); skip JBIG2 / other failed streams */
@@ -375,6 +388,13 @@ async function initLanePdfGallery() {
   const recoverClearFiltersBtn = document.getElementById('lanePdfRecoverClearFilters');
   const emergencyRestoreBtn = document.getElementById('lanePdfEmergencyRestore');
   const undoBtn = document.getElementById('lanePdfUndoHide');
+  const presetSelect = document.getElementById('lanePdfPresetSelect');
+  const presetLoadBtn = document.getElementById('lanePdfPresetLoad');
+  const presetSaveBtn = document.getElementById('lanePdfPresetSave');
+  const presetDeleteBtn = document.getElementById('lanePdfPresetDelete');
+  const presetExportBtn = document.getElementById('lanePdfPresetExport');
+  const presetImportTrigger = document.getElementById('lanePdfPresetImportTrigger');
+  const presetImportInput = document.getElementById('lanePdfPresetImportInput');
 
   bindPlateLightbox(grid);
 
@@ -513,6 +533,8 @@ async function initLanePdfGallery() {
     let galleryDisplayedFull = [];
     /** Snapshot for stats line + empty-state hints (matches latest applyFilters pass). */
     let lastGalleryStatsCtx = null;
+    /** Last fetch from GET /lane-pdf/presets (server-backed saved views). */
+    let presetsCache = [];
 
     function filterSnapshot() {
       const pageVal = pageInput.value.trim();
@@ -692,6 +714,223 @@ async function initLanePdfGallery() {
       }
     }
 
+    async function migrateLocalPresetsOnce() {
+      if (!clientId || localStorage.getItem(LS_PRESETS_MIGRATED) === '1') return;
+      try {
+        const raw = localStorage.getItem(LS_FILTER_PRESETS);
+        if (!raw) {
+          localStorage.setItem(LS_PRESETS_MIGRATED, '1');
+          return;
+        }
+        const doc = JSON.parse(raw);
+        const arr = doc && Array.isArray(doc.presets) ? doc.presets : [];
+        if (arr.length === 0) {
+          localStorage.setItem(LS_PRESETS_MIGRATED, '1');
+          localStorage.removeItem(LS_FILTER_PRESETS);
+          return;
+        }
+        const r = await fetch('/api/genealogy/lane-pdf/presets/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, presets: arr })
+        });
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error(j.error || 'Preset migration failed');
+        localStorage.setItem(LS_PRESETS_MIGRATED, '1');
+        localStorage.removeItem(LS_FILTER_PRESETS);
+      } catch (e) {
+        console.warn('lane-pdf-gallery: preset migration deferred', e);
+      }
+    }
+
+    async function refreshPresetDropdown(selectIdAfter) {
+      if (!presetSelect) return;
+      if (!clientId) {
+        presetSelect.innerHTML = '';
+        const opt0 = document.createElement('option');
+        opt0.value = '';
+        opt0.textContent = '— Client id unavailable —';
+        presetSelect.appendChild(opt0);
+        if (presetDeleteBtn) presetDeleteBtn.disabled = true;
+        if (presetLoadBtn) presetLoadBtn.disabled = true;
+        return;
+      }
+      try {
+        const r = await fetch(`/api/genealogy/lane-pdf/presets?clientId=${encodeURIComponent(clientId)}`);
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error(j.error || 'Could not load presets');
+        presetsCache = Array.isArray(j.presets) ? j.presets : [];
+      } catch (e) {
+        console.warn('lane-pdf-gallery: presets GET', e);
+        presetsCache = [];
+      }
+      const sorted = presetsCache
+        .slice()
+        .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }));
+      presetSelect.innerHTML = '';
+      const opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = '— Choose a saved view —';
+      presetSelect.appendChild(opt0);
+      for (const pr of sorted) {
+        const op = document.createElement('option');
+        op.value = pr.id;
+        op.textContent = pr.label;
+        presetSelect.appendChild(op);
+      }
+      if (selectIdAfter && sorted.some((p) => p.id === selectIdAfter)) {
+        presetSelect.value = selectIdAfter;
+      }
+      if (presetDeleteBtn) presetDeleteBtn.disabled = !presetSelect.value;
+      if (presetLoadBtn) presetLoadBtn.disabled = !presetSelect.value;
+    }
+
+    function loadSelectedPreset() {
+      if (!presetSelect) return;
+      const sel = presetSelect.value;
+      if (!sel) return;
+      const pr = presetsCache.find((p) => p.id === sel);
+      if (!pr || !pr.config) return;
+      pageInput.value = pr.config.filterPage != null ? String(pr.config.filterPage) : '';
+      idInput.value =
+        pr.config.filterCandidateIds != null ? String(pr.config.filterCandidateIds) : '';
+      if (showHiddenInput && typeof pr.config.showServerDenied === 'boolean') {
+        showHiddenInput.checked = pr.config.showServerDenied;
+        persistShowHiddenCheckbox();
+      }
+      applyFilters();
+    }
+
+    async function saveCurrentPreset() {
+      if (!clientId) {
+        window.alert('Cannot save — no browser client id.');
+        return;
+      }
+      const label = window.prompt(
+        'Name this saved view (stores PDF page, candidate id filter, and Show denylist checkbox):',
+        ''
+      );
+      if (label == null) return;
+      const trimmed = label.trim().slice(0, 80);
+      if (!trimmed) {
+        window.alert('Please enter a name.');
+        return;
+      }
+      const cfg = {
+        filterPage: sanitizeFilterPage(pageInput.value),
+        filterCandidateIds: idInput.value.trim().slice(0, 500),
+        showServerDenied: showHiddenInput ? showHiddenInput.checked : true
+      };
+      try {
+        const r = await fetch('/api/genealogy/lane-pdf/presets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId, label: trimmed, config: cfg })
+        });
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error(j.error || 'Could not save preset');
+        presetsCache = Array.isArray(j.presets) ? j.presets : presetsCache;
+        const sid = j.saved && j.saved.id ? String(j.saved.id) : '';
+        await refreshPresetDropdown(sid);
+      } catch (e) {
+        window.alert(e.message || String(e) || 'Could not save presets.');
+      }
+    }
+
+    async function deleteSelectedPreset() {
+      if (!presetSelect || !presetSelect.value || !clientId) return;
+      const sel = presetSelect.value;
+      try {
+        const r = await fetch(
+          `/api/genealogy/lane-pdf/presets?clientId=${encodeURIComponent(clientId)}&presetId=${encodeURIComponent(sel)}`,
+          { method: 'DELETE' }
+        );
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error(j.error || 'Delete failed');
+        presetsCache = Array.isArray(j.presets) ? j.presets : [];
+        await refreshPresetDropdown('');
+      } catch (e) {
+        window.alert(e.message || String(e) || 'Could not delete preset.');
+      }
+    }
+
+    function exportPresetsToFile() {
+      const out = {
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        notes:
+          'Lane book plates gallery — filter presets. Import merges by label into Postgres for this browser client id.',
+        presets: presetsCache.slice()
+      };
+      const blob = new Blob([JSON.stringify(out, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lane-pdf-gallery-filter-presets.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    if (presetLoadBtn) {
+      presetLoadBtn.addEventListener('click', () => loadSelectedPreset());
+    }
+    if (presetSelect) {
+      presetSelect.addEventListener('change', () => {
+        if (presetDeleteBtn) presetDeleteBtn.disabled = !presetSelect.value;
+        if (presetLoadBtn) presetLoadBtn.disabled = !presetSelect.value;
+      });
+      presetSelect.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          loadSelectedPreset();
+        }
+      });
+    }
+    if (presetSaveBtn) presetSaveBtn.addEventListener('click', () => saveCurrentPreset());
+    if (presetDeleteBtn) presetDeleteBtn.addEventListener('click', () => deleteSelectedPreset());
+    if (presetExportBtn) presetExportBtn.addEventListener('click', () => exportPresetsToFile());
+    if (presetImportTrigger && presetImportInput) {
+      presetImportTrigger.addEventListener('click', () => presetImportInput.click());
+      presetImportInput.addEventListener('change', () => {
+        const file = presetImportInput.files && presetImportInput.files[0];
+        presetImportInput.value = '';
+        if (!file || !clientId) return;
+        file
+          .text()
+          .then(async (text) => {
+            const parsed = JSON.parse(text);
+            const arr = Array.isArray(parsed.presets)
+              ? parsed.presets
+              : Array.isArray(parsed)
+                ? parsed
+                : null;
+            if (!arr || !arr.length) throw new Error('No presets array found in JSON.');
+            const r = await fetch('/api/genealogy/lane-pdf/presets/import', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ clientId, presets: arr })
+            });
+            const j = await r.json();
+            if (!r.ok || !j.success) throw new Error(j.error || 'Import failed');
+            presetsCache = Array.isArray(j.presets) ? j.presets : [];
+            await refreshPresetDropdown('');
+            errEl.textContent = '';
+            errEl.classList.add('d-none');
+          })
+          .catch((e) => {
+            console.warn('lane-pdf-gallery: preset import', e);
+            errEl.textContent = e.message || 'Could not import presets (invalid JSON?).';
+            errEl.classList.remove('d-none');
+          });
+      });
+    }
+
+    migrateLocalPresetsOnce()
+      .then(() => refreshPresetDropdown(''))
+      .catch(() => refreshPresetDropdown(''));
+
     function onStorageAcrossTabs(ev) {
       if (ev.key === LS_SHOW_HIDDEN || ev.key === LS_CLIENT_ID) {
         refreshHidesFromServer()
@@ -700,6 +939,10 @@ async function initLanePdfGallery() {
       }
     }
     window.addEventListener('storage', onStorageAcrossTabs);
+    window.addEventListener('focus', () => {
+      if (!clientId || !presetSelect) return;
+      refreshPresetDropdown(presetSelect.value || '').catch(() => {});
+    });
 
     async function clearHidesViaApiOnly() {
       if (!clientId) return;

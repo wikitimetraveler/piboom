@@ -90,6 +90,253 @@
       ]
     },
     {
+      "order": 2.25,
+      "personId": 7,
+      "displayName": "John Lane (William¹)",
+      "personQuery": "John Lane Boston 1653",
+      "caption": "Second generation · colonial Boston cordwainer; King Philip's War narrative (1675)",
+      "eraLabel": "b. Boston 1653–54 · colonial military record (Vol. 1)",
+      "blurb": "Lane Genealogies (Vol. 1, 1891) states that in March 1675, age 22, he was a soldier in King Philip's War under Capt. Poole — not claiming muster-roll verification beyond the genealogy text.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 — Internet Archive (context)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "War history · King Philip participants (site)",
+          "url": "/family/lane-war-history.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.5,
+      "personId": 6,
+      "displayName": "Samuel Lane (William¹)",
+      "personQuery": "Samuel Lane Boston 1651",
+      "caption": "Second generation · Boston; Turner company in same war (1676 narrative)",
+      "eraLabel": "1651–1690 · King Philip's War (Vol. 1)",
+      "blurb": "Same compilation puts him under Capt. Turner in 1676 and explicitly ties him to the same company lineage where brother John Lane served under Capt. Poole in March 1675 — separate captain and year from John; not collapsed into \"both under Poole.\"",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 — Internet Archive (context)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "War history · King Philip participants (site)",
+          "url": "/family/lane-war-history.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.35,
+      "personId": 10,
+      "displayName": "William² Lane — tailor, Hampton (Vol. 1)",
+      "personQuery": "William Lane tailor Hampton 1659",
+      "caption": "Second-generation tailor; Boston · removal to Hampton 1686; Sarah Webster marriage",
+      "eraLabel": "1659–1749 · colonial Massachusetts / NH coast",
+      "blurb": "Lane Genealogies (Vol. 1, 1891) summarizes Boston tailoring, joining North Church 1681, grant and removal to Hampton 1686, and wife Sarah (Thomas Webster line). The compilation also cites Tythinge Man Boston (May 5, 1686, spelling as printed) and Hampton parish assessment extracts via NEHGR IX:159; those are bookkeeping and civic context—not military proof. Daniel Webster ties in the book are treated here as compilation claims unless separately verified.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891) — Internet Archive",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "NEHGR — vol. 9 register context (book cites IX:159)",
+          "url": "https://en.wikipedia.org/wiki/New_England_Historical_and_Genealogical_Register",
+          "kind": "book"
+        },
+        {
+          "label": "War history (related era)",
+          "url": "/family/lane-war-history.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.38,
+      "personId": 13,
+      "displayName": "Sarah Dickinson — Hadley; wife of Samuel² (Vol. 1)",
+      "personQuery": "Sarah Dickinson Hadley Lane",
+      "caption": "Samuel² (Hadley) household; later captivity narrative in compilation",
+      "eraLabel": "Late 17th century · Hadley / frontier record",
+      "blurb": "Vol. 1 places Samuel² in Hadley with Sarah (Dickinson) and names their children’s births and marriages there or nearby (e.g. Suffield). The same tradition line includes her later hardship: widowhood, remarriage to Martin Kellogg, and the 1704 French and Indian raid taking her and children captive—reported in the compilation as family narrative, not as muster or court file.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891) — Internet Archive",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "Memorial wall (find by name)",
+          "url": "/family/lane-memorial-wall.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.42,
+      "personId": 35,
+      "displayName": "Mary (Libbey) Lane — Webster footnote knot (Vol. 1)",
+      "personQuery": "Mary Libbey Rye",
+      "caption": "m. John³ son of William²; Anthony Libbey / Black Point prose in book",
+      "eraLabel": "c. 1685 · Rye area (book)",
+      "blurb": "Vol. 1 (NEHGR IX:159 bundle): daughter of Anthony and Sarah Drake Libbey of Rye; married John Lane³ b. Boston 17 Feb. 1685. The same footnote block threads Libbey origins, 1690 Black Point incident, Portsmouth, Hampton church 1717, and Mary’s will legacy—genealogy-compilation tier only; not a substitute for town or court records.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891) — Internet Archive",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "Memorial wall (find by name)",
+          "url": "/family/lane-memorial-wall.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.417,
+      "personId": 36,
+      "displayName": "Cornet John Lane⁴ — Rye/Chester (Vol. 1)",
+      "personQuery": "John Lane Hampton 1709 Cornet Chester Hannah Lamprey",
+      "caption": "Father-generation anchor for Lt. Bennington line · mounted militia 1754",
+      "eraLabel": "1709–1784 · French and Indian frontier context",
+      "blurb": "Vol. 1 traces Hampton-born John⁴ to Chester with Hannah Lamprey and later Mary Knowles, farming and tavern-keeping—the compilation’s officer note for Sept. 1754 Cornet in a troop of horse is genealogy tier (check provincial rolls separately). Revolutionary officer sons Ezekiel and John Lt. descend from this cluster.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "War history timeline",
+          "url": "/family/lane-war-history.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.43,
+      "personId": 46,
+      "displayName": "Lt. Ezekiel Lane — Bennington casualty (Chester)",
+      "personQuery": "Ezekiel Lane Bennington Dearborn",
+      "caption": "Stickney regiment / Dearborn company (Vol. 1 compilation)",
+      "eraLabel": "1739–1777 · NH Revolutionary War",
+      "blurb": "Lane Genealogies (Vol. 1) assigns him lieutenant commission in Dearborn company, Stickney regiment, battlefield death Battle of Bennington Aug. 16, 1777—genealogy abstraction; corroborate with pension files and Compiled Military Service Records.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "War history timeline",
+          "url": "/family/lane-war-history.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.44,
+      "personId": 44,
+      "displayName": "Lt. John Lane — Bennington survivor, promoted",
+      "personQuery": "John Lane Chester Dearborn Stickney Bennington",
+      "caption": "Brother-branch officer line in same regiment cluster (Vol. 1)",
+      "eraLabel": "1733–1813 · Revolutionary War",
+      "blurb": "Vol. 1: second lieutenant July 1777 in Dearborn’s company, marched from Chester, present at Bennington Aug. 16, 1777; promoted after Ezekiel Lane fell—the book pairs the brothers deliberately; treat enlistment dates as pedigree until NH rolls confirm. Wife in the compilation is Mary (dau. of Benaiah and Mary Webster) of Chester (OCR “Coley“ garbage removed on the tree). A later descendant in the same Chester column bears the given name Webster Lane—a Vol. 1 naming echo of the Webster line only, not independent proof.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "War history timeline",
+          "url": "/family/lane-war-history.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.45,
+      "personId": 119,
+      "displayName": "John Lane — Bunker Hill to West Point (Chester enlistments)",
+      "personQuery": "John Lane Chester Hutchins Bunker Hill Poor regiment",
+      "caption": "Youth enlistment continuum in Vol. 1 Chester column",
+      "eraLabel": "1758–1828?",
+      "blurb": "Genealogy book strings Hutchins company / Bunker-or-Breed’s Hill involvement, Poor’s regiment enlistment March 1777, and Bartlett regiment duty at West Point in 1780—OCR quirks cleaned on the tree node but evidence tier remains familial abstraction.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "War history timeline",
+          "url": "/family/lane-war-history.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.46,
+      "personId": 45,
+      "displayName": "Daniel Lane — burying-ground donor; Gale regiment detail",
+      "personQuery": "Daniel Lane Gale regiment Chester burying ground",
+      "caption": "26-day NJ deployment line (Aug. 1778) + civic contribution",
+      "eraLabel": "1735–1825 · Chester periphery",
+      "blurb": "Vol. 1 combines benevolent-town fabric (family burying lot with cousin fencing circle) with a Revolutionary note: enlistment Aug. 5, 1778 in Col. Gale’s regiment destined for New Jersey for twenty-six days—confirm against pay lists before asserting campaign presence.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "War history timeline",
+          "url": "/family/lane-war-history.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
+      "order": 2.47,
+      "personId": 26,
+      "displayName": "Thomas³ Lane — Hampton church sexton",
+      "personQuery": "Thomas Lane Hampton sexton",
+      "caption": "Parish and civic duty (William² branch, Vol. 1)",
+      "eraLabel": "1701–1775 · Hampton",
+      "blurb": "Lane Genealogies Vol. 1 carries Thomas³ as a Hampton resident and sexton of the church who died 30 Aug. 1775, ae. 74—local church-care context only; no battlefield claim.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        }
+      ]
+    },
+    {
+      "order": 2.48,
+      "personId": 124,
+      "displayName": "Matthias Lane — War of 1812 anecdote (Chester)",
+      "personQuery": "Matthias Lane Chester War of 1812",
+      "caption": "Compiled family anecdote only (Vol. 1)",
+      "eraLabel": "1770 · Chester compilation",
+      "blurb": "Vol. 1 states that Captain Matthias Lane in the War of 1812 declined the office of colonel—compilation anecdote until pay rolls or state papers corroborate; not a statement that he fought at a named action.",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        }
+      ]
+    },
+    {
       "order": 3,
       "personId": 2898,
       "displayName": "George G. Lane",
@@ -243,6 +490,91 @@
       "kind": "family"
     },
     {
+      "year": 1675,
+      "title": "John Lane — Capt. Poole (Vol. 1 narrative)",
+      "description": "Lane Genealogies (Vol. 1): Mar. 1675, age 22, soldier under Capt. Poole in Philip’s/King Philip’s War—compilation wording; verify with muster sources separately.",
+      "kind": "family"
+    },
+    {
+      "year": 1676,
+      "title": "Samuel Lane — Turner; footnote Joshua — Wadsworth (Vol. 1)",
+      "description": "Vol. 1: Samuel² under Capt. Turner in the same-war company lineage tied to John’s 1675 Poole roll. Separate footnote (NEHGR IX:159 cluster) mentions a Joshua Lane in July 1676 under Capt. Wadsworth—do not collapse into Samuel or John without proof.",
+      "kind": "family"
+    },
+    {
+      "year": 1680,
+      "title": "William² & Sarah Webster (Vol. 1)",
+      "description": "Book: marriage 21 June 1680—Sarah (dau. of Thomas Webster) per Vol. 1; Daniel Webster pedigree claims flagged as compilation-only on-site.",
+      "kind": "family"
+    },
+    {
+      "year": 1686,
+      "title": "Hampton grant & Boston Tythinge Man (Vol. 1)",
+      "description": "Vol. 1: William² to Hampton on a grant of ten acres; Boston town meeting 5 May 1686—chosen Tythinge Man (printed spelling Tythinge).",
+      "kind": "family"
+    },
+    {
+      "year": 1709,
+      "title": "John³ (William²) & Mary Libbey — Rye marriage (Vol. 1)",
+      "description": "Book line: Boston-born John³ m. 7 Mar. 1709 Mary (Libbey) of Rye; Libbey-Black Point-Hampton prose sits in same reference cluster—compilation narrative tier.",
+      "kind": "family"
+    },
+    {
+      "year": 1704,
+      "title": "Captivity narrative — Sarah widow of Samuel (book text)",
+      "description": "OCR/book block: Kellogg marriage, Deerfield-era captivity strand—use as genealogical narrative only until matched to primary lists.",
+      "kind": "family"
+    },
+    {
+      "year": 1732,
+      "title": "Hampton assessments cited — NEHGR IX:159 (Vol. 1)",
+      "description": "Book excerpts Old Parish Hampton Dec. 1731 / Jan. 1732 lists (William, Joshua, Thomas holdings)—tax context, not service records.",
+      "kind": "family"
+    },
+    {
+      "year": 1775,
+      "title": "Chester Lane roster — Breed's/Bunker Hill youth enlistment strand (Vol. 1)",
+      "description": "John Lane (later Poor/Bartlett service in book lines) cites Capt. Hutchins company at seventeen during the June 1775 Charlestown fight—compilation pedigree; reconcile with Compiled Military Service Records.",
+      "kind": "family"
+    },
+    {
+      "year": 1775,
+      "title": "Thomas³ Lane — Hampton church sexton (Vol. 1)",
+      "description": "Vol. 1: William²’s son Thomas resided in Hampton as sexton of the parish church and died 30 Aug. 1775, ae. 74—parish civic life only; not a military-roll claim.",
+      "kind": "family"
+    },
+    {
+      "year": 1775,
+      "title": "Simon Lane — Elkins / Poor company; march Hampton → Medford (Vol. 1 p. 21)",
+      "description": "Genealogical abstraction only: III. Simon Lane (Thomas², William¹)—Capt. H. Elkins’s company, Col. E. Poor’s regiment in May 1775; the compilation states he marched 1 Aug. 1775 from Hampton to join the army at Medford, Mass. Not a roll-confirmed battle claim beyond Lane Genealogies Vol. 1 (1891), p. 21.",
+      "kind": "family",
+      "personId": 3740
+    },
+    {
+      "year": 1777,
+      "title": "16 Aug. 1777 — Battle of Bennington (Lt. Ezekiel KIA; Lt. John promoted; Vol. 1)",
+      "description": "Book cluster: Lt. John Lane commissioned July 1777 Dearborn company, Stickney regiment, march from Chester, present at Bennington Aug. 16; Lt. Ezekiel Lane (same regiment context) killed that day—compilation pairing only until NH muster/service files confirm.",
+      "kind": "family"
+    },
+    {
+      "year": 1778,
+      "title": "Daniel Lane — Gale regiment NJ stint (Vol. 1)",
+      "description": "Aug. 5, 1778 enlistment narrative in Col. Gale’s regiment headed to New Jersey for twenty-six recorded days—civilian civic notes (burying-ground gift) anchored in same family cluster.",
+      "kind": "family"
+    },
+    {
+      "year": 1812,
+      "title": "Matthias Lane — War of 1812 anecdote (compilation only)",
+      "description": "Vol. 1: Captain Matthias Lane is said (in compilation) to have declined the office of colonel during the War of 1812—family anecdote until service records corroborate; does not assign him to any named battlefield.",
+      "kind": "family"
+    },
+    {
+      "year": 1780,
+      "title": "John Lane — Bartlett regiment at West Point (Vol. 1 Chester column)",
+      "description": "Book lists July-Oct. 1780 service with Col. T. Bartlett’s regiment guarding West Point after earlier Continental enlistments—treat chronology text as pedigree until corroborated.",
+      "kind": "family"
+    },
+    {
       "year": 1770,
       "title": "American History Context",
       "description": "Colonial tensions shape New England family life and migration patterns.",
@@ -275,7 +607,8 @@
       "Who was William Lane of Boston, and why is he the opening figure?",
       "Show the next major Lane events in chronological order.",
       "Connect this exhibit to wider American history.",
-      "Tell me about Lane crater on the Moon and Jonathan Homer Lane."
+      "Tell me about Lane crater on the Moon and Jonathan Homer Lane.",
+      "Explain the Chester Lanes at Bennington and Bunker Hill (book vs rolls)."
     ]
   }
 }

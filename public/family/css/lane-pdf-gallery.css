@@ -107,6 +107,21 @@
   box-shadow: var(--focus-ring, 0 0 0 3px rgba(52, 152, 219, 0.45));
 }
 
+/* Saved filter presets (localStorage) — sits above main filters */
+.lane-pdf-presets-bar {
+  border-color: rgba(44, 62, 80, 0.1) !important;
+  background: rgba(248, 250, 252, 0.98) !important;
+}
+
+.lane-pdf-presets-controls .form-control {
+  font-size: 0.9rem;
+  border-radius: 8px;
+}
+
+.lane-pdf-presets-buttons .btn {
+  border-radius: 8px;
+}
+
 .lane-pdf-filters.row {
   margin-top: 0.35rem;
   padding-top: 1.15rem;

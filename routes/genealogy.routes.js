@@ -17,6 +17,10 @@ import {
   postLanePdfGalleryUndoHide,
   deleteLanePdfGalleryClientHides,
   postLanePdfGalleryBulkImport,
+  getLanePdfGalleryPresets,
+  postLanePdfGalleryPreset,
+  deleteLanePdfGalleryPreset,
+  postLanePdfGalleryPresetsImport,
   getLaneBookSayingsData,
   getWarCampaignsData,
   getWarParticipantsData,
@@ -60,6 +64,10 @@ router.post('/lane-pdf/hides', postLanePdfGalleryHidePlate);
 router.post('/lane-pdf/hides/undo', postLanePdfGalleryUndoHide);
 router.post('/lane-pdf/hides/import', postLanePdfGalleryBulkImport);
 router.delete('/lane-pdf/hides', deleteLanePdfGalleryClientHides);
+router.get('/lane-pdf/presets', getLanePdfGalleryPresets);
+router.post('/lane-pdf/presets', postLanePdfGalleryPreset);
+router.delete('/lane-pdf/presets', deleteLanePdfGalleryPreset);
+router.post('/lane-pdf/presets/import', postLanePdfGalleryPresetsImport);
 router.get('/lane-book-sayings', getLaneBookSayingsData);
 router.get('/wars', getWarCampaignsData);
 router.get('/wars/:warSlug/participants', getWarParticipantsData);

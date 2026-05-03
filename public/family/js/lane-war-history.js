@@ -18,6 +18,23 @@ const HISTORY_STATE_COPY = {
 };
 
 const CAMPAIGN_CONTEXT = {
+  'colonial-frontier-militia': [
+    {
+      year: 1689,
+      event:
+        'Colonial northern frontier cycles include Indigenous diplomacy, provincial militia mobilizations, and county administration.'
+    },
+    {
+      year: 1724,
+      event:
+        'Local correspondence shows frontier officers and inhabitants navigating livestock damage claims and militia conduct.'
+    },
+    {
+      year: 1763,
+      event:
+        'Earlier provincial frontier militia service overlaps this broad administrative window; interpret dates carefully.'
+    }
+  ],
   'king-philips-war': [
     { year: 1675, event: "War begins after escalating conflict in New England." },
     { year: 1676, event: 'Colonial militias and Native forces clash across frontier towns.' },

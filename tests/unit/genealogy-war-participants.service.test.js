@@ -29,6 +29,41 @@ describe('genealogy war participant matching', () => {
     expect(Array.isArray(scored.evidence)).toBe(true);
   });
 
+  test('plausibleAgeForWarInference rejects Mexican War for early 18th-century birth', () => {
+    const mex = __test__.WAR_DEFINITIONS['mexican-american-war'];
+    expect(__test__.plausibleAgeForWarInference(1701, null, mex.years)).toBe(false);
+    expect(__test__.plausibleAgeForWarInference(1820, null, mex.years)).toBe(true);
+  });
+
+  test('colonial frontier militia matches Dummer/Westbrook Maine narrative (John Lane id 2903)', () => {
+    const colonial = __test__.WAR_DEFINITIONS['colonial-frontier-militia'];
+    const person = {
+      id: 2903,
+      name: 'John Lane',
+      birthYear: 1701,
+      text:
+        'Lieutenant Governor Dummer and Col. Thomas Westbrook at York 1724 regarding Lieutenant John Lane and York County.',
+      occupation: [],
+      importMeta: {}
+    };
+    const scored = __test__.scoreWarMatch(person, colonial);
+    expect(scored).toBeTruthy();
+    expect(scored.confidence).toBe('medium');
+  });
+
+  test('early colonial birth does not infer-match Mexican-American War on generic military text', () => {
+    const mex = __test__.WAR_DEFINITIONS['mexican-american-war'];
+    const person = {
+      id: 999002,
+      name: 'OCR Colonial',
+      birthYear: 1701,
+      text: 'He entered military service early and became captain.',
+      occupation: [],
+      importMeta: {}
+    };
+    expect(__test__.scoreWarMatch(person, mex)).toBeNull();
+  });
+
   test('war campaigns summary includes participant counts', () => {
     const summary = getWarCampaignsSummary();
     expect(summary).toBeTruthy();

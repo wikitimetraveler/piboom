@@ -39,6 +39,12 @@ import {
   bulkImportHiddenPlates,
   isValidClientId
 } from '../services/lane-pdf-gallery-hides.service.js';
+import {
+  listFilterPresets,
+  upsertFilterPreset,
+  deleteFilterPreset,
+  mergeImportFilterPresets
+} from '../services/lane-pdf-gallery-presets.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -442,6 +448,67 @@ export async function postLanePdfGalleryBulkImport(req, res) {
   }
 }
 
+export async function getLanePdfGalleryPresets(req, res) {
+  try {
+    const clientId = String(req.query.clientId ?? '').trim();
+    if (!isValidClientId(clientId)) {
+      return res.status(400).json({ success: false, error: 'clientId query (UUID) is required' });
+    }
+    const presets = await listFilterPresets(clientId);
+    return res.json({ success: true, presets });
+  } catch (error) {
+    console.error('Error getting Lane PDF gallery presets:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+export async function postLanePdfGalleryPreset(req, res) {
+  try {
+    const { clientId, label, config } = req.body ?? {};
+    if (!isValidClientId(clientId)) {
+      return res.status(400).json({ success: false, error: 'clientId (UUID) is required' });
+    }
+    const result = await upsertFilterPreset(clientId, label, config);
+    return res.json({ success: true, presets: result.presets, saved: result.saved });
+  } catch (error) {
+    console.error('Error saving Lane PDF gallery preset:', error);
+    const code = /required|Invalid|at most/i.test(error.message) ? 400 : 500;
+    return res.status(code).json({ success: false, error: error.message });
+  }
+}
+
+export async function deleteLanePdfGalleryPreset(req, res) {
+  try {
+    const clientId = String(req.query.clientId ?? req.body?.clientId ?? '').trim();
+    const presetId = String(req.query.presetId ?? req.body?.presetId ?? '').trim();
+    if (!isValidClientId(clientId)) {
+      return res.status(400).json({ success: false, error: 'clientId (UUID) is required' });
+    }
+    if (!presetId) {
+      return res.status(400).json({ success: false, error: 'presetId is required' });
+    }
+    const presets = await deleteFilterPreset(clientId, presetId);
+    return res.json({ success: true, presets });
+  } catch (error) {
+    console.error('Error deleting Lane PDF gallery preset:', error);
+    return res.status(400).json({ success: false, error: error.message });
+  }
+}
+
+export async function postLanePdfGalleryPresetsImport(req, res) {
+  try {
+    const { clientId, presets } = req.body ?? {};
+    if (!isValidClientId(clientId)) {
+      return res.status(400).json({ success: false, error: 'clientId (UUID) is required' });
+    }
+    const list = await mergeImportFilterPresets(clientId, Array.isArray(presets) ? presets : []);
+    return res.json({ success: true, presets: list });
+  } catch (error) {
+    console.error('Error importing Lane PDF gallery presets:', error);
+    return res.status(400).json({ success: false, error: error.message });
+  }
+}
+
 /**
  * Get available war campaigns and participant counts.
  */
@@ -753,6 +820,10 @@ export default {
   postLanePdfGalleryUndoHide,
   deleteLanePdfGalleryClientHides,
   postLanePdfGalleryBulkImport,
+  getLanePdfGalleryPresets,
+  postLanePdfGalleryPreset,
+  deleteLanePdfGalleryPreset,
+  postLanePdfGalleryPresetsImport,
   getLaneBookSayingsData,
   getWarCampaignsData,
   getWarParticipantsData,

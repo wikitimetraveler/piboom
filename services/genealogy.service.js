@@ -221,6 +221,19 @@ const RELATIONSHIP_SIGNAL_TERMS = [
 
 const CONFLICT_DEFINITIONS = [
   {
+    slug: 'colonial-frontier-militia',
+    label: 'Colonial frontier militia (New England / Maine)',
+    years: [1689, 1763],
+    keywords: [
+      'lieutenant governor dummer',
+      'thomas westbrook',
+      'fighting the indians',
+      'county of york',
+      'dummer',
+      'westbrook'
+    ]
+  },
+  {
     slug: 'king-philips-war',
     label: "King Philip's War",
     years: [1675, 1678],
@@ -231,6 +244,8 @@ const CONFLICT_DEFINITIONS = [
       'metacom',
       'capt. turner',
       'capt. poole',
+      'capt. wadsworth',
+      'wadsworth',
       'wampanoag',
       'narragansett',
       'nipmuc',
@@ -262,7 +277,11 @@ const CONFLICT_DEFINITIONS = [
       'yorktown',
       'trenton',
       'hessian',
-      'burgoyne'
+      'burgoyne',
+      'bennington',
+      'dearborn',
+      'stickney',
+      'gale'
     ]
   },
   {
@@ -604,6 +623,37 @@ function yearsOverlapRange(birthYear, deathYear, range = []) {
   return dy >= start - 65;
 }
 
+/**
+ * Gates inferred keyword-only matches: someone born ~1701 must not "match" the Mexican War
+ * via generic military vocabulary plus the old loose year heuristic.
+ * Uses a typical enlisted-age window at campaign start (≤45) and youth ceiling at campaign end.
+ */
+function plausibleAgeForWarInference(birthYear, deathYear, range = []) {
+  if (!Array.isArray(range) || range.length !== 2) return false;
+  const start = Number(range[0]);
+  const end = Number(range[1]);
+  if (!Number.isFinite(start) || !Number.isFinite(end)) return false;
+
+  const minBirth = start - 45;
+  const maxBirth = end - 14;
+
+  const by = Number.isFinite(birthYear) ? birthYear : null;
+  const dy = Number.isFinite(deathYear) ? deathYear : null;
+
+  if (by !== null) {
+    if (by > maxBirth) return false;
+    if (by < minBirth) return false;
+    if (dy !== null && dy < start) return false;
+    return true;
+  }
+
+  if (dy !== null) {
+    return dy >= start + 14;
+  }
+
+  return false;
+}
+
 function analyzeConflictMatch(node, warDef, militarySignal) {
   const evidence = militarySignal.evidence;
   let structured = false;
@@ -641,7 +691,13 @@ function analyzeConflictMatch(node, warDef, militarySignal) {
   const birthYear = parseYearNumber(node.birthYear);
   const deathYear = parseYearNumber(node.deathYear);
   const yearSignal = yearsOverlapRange(birthYear, deathYear, warDef.years);
-  const inferredBySignalAndYears = !hasKeywordMatch && militarySignal.hasMilitarySignal && yearSignal;
+  const inferredBySignalAndYears =
+    !hasKeywordMatch &&
+    militarySignal.hasMilitarySignal &&
+    yearSignal &&
+    plausibleAgeForWarInference(birthYear, deathYear, warDef.years);
+  const textOnlyPlausible =
+    !textOnly || plausibleAgeForWarInference(birthYear, deathYear, warDef.years);
 
   return {
     structured,
@@ -650,7 +706,8 @@ function analyzeConflictMatch(node, warDef, militarySignal) {
     hasKeywordMatch,
     yearSignal,
     inferredBySignalAndYears,
-    matched: structured || semiStructured || textOnly || inferredBySignalAndYears
+    matched:
+      structured || semiStructured || (textOnly && textOnlyPlausible) || inferredBySignalAndYears
   };
 }
 
@@ -666,6 +723,7 @@ function scoreWarMatch(node, warDef) {
   if (conflict.structured) confidence = 'high';
   else if (
     conflict.semiStructured ||
+    conflict.textOnly ||
     familyAssociation.isFamilyAssociated ||
     conflict.inferredBySignalAndYears
   ) {
@@ -920,6 +978,7 @@ export const __test__ = {
   summarizeMilitarySignal,
   analyzeConflictMatch,
   scoreWarMatch,
+  plausibleAgeForWarInference,
   WAR_DEFINITIONS
 };
 

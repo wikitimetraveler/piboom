@@ -91,7 +91,7 @@
     {
       "name": "Samuel Lane",
       "id": 6,
-      "text": "In 1676 he was a soldier, under Captain Turner of the same company in which John Lane, in 1675, served under Capt. Poole in King Philip's War.",
+      "text": "Samuel² (son of William¹): Vol. 1 places him in Hadley, Mass., with wife Sarah (Dickinson); soldier under Capt. Turner in Philip's Indian War (see structured service). In 1676 he was a soldier under Capt. Turner in the same company in which John Lane, in Mar. 1675, served under Capt. Poole in King Philip's War.",
       "occupation": [
         {
           "job": "tanner"
@@ -103,43 +103,11 @@
           "government": "selectman"
         },
         {
+          "text": "In 1676 he was a soldier under Capt. Turner in the same company in which John Lane, in Mar. 1675, served under Capt. Poole in King Philip's War (Lane genealogies, Vol. 1, 1891).",
           "service": [
             {
-              "wars": [
-                {
-                  "war": "King Philip's War",
-                  "text": "King Philip's War, sometimes called the First Indian War, Metacom's War, Metacomet's War, or Metacom's Rebellion, was an armed conflict between Native American inhabitants of present-day New England and English colonists and their Native American allies in 1675–78. The war is named for the main leader of the Native American side, Metacomet, who had adopted the English name King Philip in honor of the previously-friendly relations between his father and the original Mayflower Pilgrims. The war continued in the most northern reaches of New England until the signing of the Treaty of Casco Bay in April 1678"
-                }
-              ]
-            },
-            {
-              "armyName": "Colonial Army"
-            },
-            {
-              "branch": "Colonial Army"
-            },
-            {
-              "battles": [
-                {
-                  "name": "n/a",
-                  "place": "n/a",
-                  "start": "n/a",
-                  "end": "n/a"
-                }
-              ]
-            }
-          ],
-          "commanding officers": [
-            {
-              "officer": "Capt. Poole"
-            }
-          ],
-          "text": "In 1676 he was a soldier, under Captain Turner of the same company in which John Lane, in 1675, served under Capt. Poole in King Philip's War."
-        },
-        {
-          "service": [
-            {
-              "text": "SAMUEL LANE? (William') 1651-1690, a (soldiert under Capt. Turner in Philip's Indian war"
+              "war": "King Philip's War",
+              "text": "1676, soldier under Capt. Turner; same company lineage noted for brother John Lane's Mar. 1675 service under Capt. Poole (Lane genealogies, Vol. 1)."
             }
           ]
         }
@@ -164,11 +132,13 @@
               "role": "residence"
             }
           ]
+        },
+        "laneGenealogiesVol1": {
+          "footnoteJoshuaJuly1676": "Same Vol. 1 footnote bundle (NEHGR IX:159) names a Joshua Lane under Capt. Wadsworth July 1676—distinct from Samuel² and John²; full structured note on William² (person id 10)."
         }
       },
       "locations": [
-        "Hadley",
-        "Philip's Indian war"
+        "Hadley"
       ],
       "militaryEngagements": [
         {
@@ -177,18 +147,16 @@
           "confidence": "high",
           "associationType": "service-member",
           "evidence": [
-            "In 1676 he was a soldier, under Captain Turner of the same company in which John Lane, in 1675, served under Capt. Poole in King Philip's War.",
-            "King Philip's War",
-            "King Philip's War, sometimes called the First Indian War, Metacom's War, Metacomet's War, or Metacom's Rebellion, was an armed conflict between Native American inhabitants of present-day New England and English colonists and their Native American allies in 1675–78. The war is named for the main leader of the Native American side, Metacomet, who had adopted the English name King Philip in honor of the previously-friendly relations between his father and the original Mayflower Pilgrims. The war continued in the most northern reaches of New England until the signing of the Treaty of Casco Bay in April 1678"
+            "In 1676 he was a soldier under Capt. Turner in the same company in which John Lane, in Mar. 1675, served under Capt. Poole in King Philip's War (Lane genealogies, Vol. 1)."
           ],
-          "source": "lane-military-deep-scan-report"
+          "source": "lane-genealogies-vol1-1891"
         }
       ]
     },
     {
       "name": "John Lane",
       "id": 7,
-      "text": "In Mar., 1675, when 22 years of age, he was a soldier in King Philip's war, in the same company where his brother Samuel served under Capt. Poole.",
+      "text": "In Mar., 1675, at age 22, he was a soldier in King Philip's War under Capt. Poole. The same compilation records his brother Samuel (b. Boston, 1651–52) serving in 1676 under Capt. Turner, described as the same company in which John had served under Capt. Poole in 1675 (Lane genealogies, Vol. 1).",
       "generation": 2,
       "gender": "M",
       "lastName": "Cordwainer and Soldier in King Phillips War",
@@ -198,16 +166,31 @@
       "deathDate": "1725-01-01T00:00:00.000Z",
       "born": "Boston, Mass, USA",
       "burial": "Pine Grove Cemetary, Hampton, New Hampshire",
+      "occupation": [
+        {
+          "job": "cordwainer"
+        },
+        {
+          "text": "Mar., 1675, soldier in King Philip's War under Capt. Poole, age 22; brother Samuel named for 1676 under Capt. Turner in the same company lineage (Lane genealogies, Vol. 1).",
+          "service": [
+            {
+              "war": "King Philip's War",
+              "text": "Mar. 1675, soldier under Capt. Poole (Lane genealogies, Vol. 1)."
+            }
+          ]
+        }
+      ],
       "militaryEngagements": [
         {
           "warSlug": "king-philips-war",
           "warLabel": "King Philip's War",
-          "confidence": "low",
+          "confidence": "high",
           "associationType": "service-member",
           "evidence": [
-            "In Mar., 1675, when 22 years of age, he was a soldier in King Philip's war, in the same company where his brother Samuel served under Capt. Poole."
+            "Mar., 1675, age 22: soldier in King Philip's War under Capt. Poole (Lane genealogies, Vol. 1).",
+            "Brother Samuel: 1676 under Capt. Turner, same company lineage as John's 1675 service (Vol. 1)."
           ],
-          "source": "lane-military-deep-scan-report"
+          "source": "lane-genealogies-vol1-1891"
         }
       ]
     },
@@ -242,7 +225,7 @@
     {
       "name": "William Lane",
       "id": 10,
-      "text": "William-, b. i Oct., 1659, a tailor, m. 21 June, 1680, Sarah (dau. of Thomas) Webster, b. 22 Jan., 1660-1 ; joined the North ch., Boston in 1681 ; removed in 1686 to Hampton, settled on a grant of ten acres. ",
+      "text": "William² (William¹): tailor; m. 21 June 1680 Sarah Webster (Lane Genealogies, Vol. 1, 1891). Sarah (dau. of Thomas Webster) per book b. 22 Jan. 1660–61; compilation ties her line to Hon. Daniel Webster as a pedigree claim—not independently verified here. Joined North Church, Boston 1681; removed to Hampton 1686 on a grant of ten acres. Town meeting Boston, 5 May 1686: William Lane chosen Tythinge Man for the year ensuing (spelling as printed in Vol. 1). Hampton (Old Parish) Dec. 1731 / Jan. 1732 assessments cite William Lane (one head, one one-story house); Joshua Lane (livestock/tillage/pasture list); Thomas Lane (one head, one cow)—book cites NEHGR IX:159.",
       "generation": 0,
       "gender": "M",
       "lastName": "Willaim Lane - Tailor",
@@ -257,10 +240,29 @@
           "occupation": [
             "Tailor"
           ]
+        },
+        "laneGenealogiesVol1": {
+          "footnoteJoshuaJuly1676": "Vol. 1 footnote in NEHGR IX:159 cluster—In July 1676 a Joshua Lane was in Philip's Indian War under Capt. Wadsworth. Do not merge with Deacon Joshua Lane in this dataset (e.g. b. 1696) without stronger proof.",
+          "hamptonAssessments1731Note": "Assessments transcribed under Vol. 1 / NEHGR IX:159; names correspond to Hampton household heads—not proof of military service.",
+          "tythingeMan1686": "Boston town meeting 5 May 1686—William Lane chosen Tythinge Man (Vol. 1 spelling).",
+          "personIdMapVol1Page10": {
+            "samuel2William1CaptainTurner1676": 6,
+            "john2William1CaptainPoole1675": 7,
+            "william2TailorBostonHampton1686": 10,
+            "sarahDickinsonWifeSamuel2Hadley": 13,
+            "samuelThirdGenSamuel2Line": 14,
+            "sarahThirdGenSamuel2Line": 15,
+            "maryThirdGenSamuel2LineSuffield": 16,
+            "johnThirdGenSamuel2LineCtDrift1686HadleyBirth": 17,
+            "elizabethThirdGenSamuel2Line": 18,
+            "johnThirdGenWilliam2LineBoston1685LibbeyFootnote": 20,
+            "crossWireWarning": "Vol. 1 page-10 distinguishes two Johns: Samuel² line id 17 (Hadley birth 1686, Connecticut)—no King Philip engagements on this node; William² Sarah Webster line id 20 (Boston 1685, Mary Libbey §)—not the Turner/Poole KP roster attributed to John's 1675 line. Joshua under Capt. Wadsworth July 1676 is footnote ‡ on ix:159 bundle only (see footnoteJoshuaJuly1676), not Samuel² or John²."
+          }
         }
       },
       "locations": [
-        "Boston"
+        "Boston",
+        "Hampton, New Hampshire"
       ],
       "occupation": [
         {
@@ -299,10 +301,10 @@
     {
       "name": "Sarah Dickinson",
       "id": 13,
-      "text": "0n 27 Feb., 1691, Sarah, widow of Samuel Lane, re-married to Martin  Kellogg,  with four children they were taken, 10 Feb., 1704, bytheFrenchandIndians,andcarriedcaptivetoCanada. Aftersomemonths all were released and returned, except one daughter who had married an Indian chief.",
+      "text": "Lane Genealogies (Vol. 1) places her with Samuel² in Hadley, Mass.—third-generation roster carries through their children elsewhere in the book lines. On 27 Feb., 1691, Sarah, widow of Samuel Lane, re-married to Martin  Kellogg,  with four children they were taken, 10 Feb., 1704, bytheFrenchandIndians,andcarriedcaptivetoCanada. Aftersomemonths all were released and returned, except one daughter who had married an Indian chief.",
       "generation": 2,
       "gender": "F",
-      "lastName": "0n 27 Feb., 1691, Sarah, widow of Samuel Lane, re-married to Martin  Kellogg",
+      "lastName": "On 27 Feb., 1691, Sarah, widow of Samuel Lane, re-married to Martin  Kellogg",
       "birthYear": 1672,
       "deathYear": "1731",
       "birthDate": "1672-01-01T00:00:00.000Z",
@@ -313,7 +315,7 @@
     {
       "name": "Samuel Lane",
       "id": 14,
-      "text": "",
+      "text": "Samuel³ (Samuel² of Hadley × Sarah Dickinson), per Lane Genealogies (Vol. 1): m. 6 Oct. 1709 Abigail Hovey of Suffield—genealogy-compilation tier for dates.",
       "generation": 3,
       "gender": "M",
       "lastName": "Samuel Lane -  m. 6 Oct., 1709, Abigail Hovey of Suffield County",
@@ -321,13 +323,13 @@
       "deathYear": "1738",
       "birthDate": "1680-01-01T00:00:00.000Z",
       "deathDate": "1738-01-01T00:00:00.000Z",
-      "born": "Suffield County, New Hampshire",
+      "born": "Hadley, Mass.",
       "burial": "Pine Grove Cemetary, Hampton, New Hampshire"
     },
     {
       "name": "Sarah Lane",
       "id": 15,
-      "text": "",
+      "text": "Sarah³ (Samuel² × Sarah Dickinson), Vol. 1 Hadley strand—generation-3 sibling in same household cluster as siblings id 14–18.",
       "generation": 3,
       "gender": "F",
       "lastName": "Sarah Lane",
@@ -341,7 +343,7 @@
     {
       "name": "Mary Lane",
       "id": 16,
-      "text": "",
+      "text": "Mary³ (Samuel² line): Vol. 1 cites birth Suffield, Conn., 7 May 1684; marriage 11 Dec. 1707 Jonathan Sykes—compilation pedigree.",
       "generation": 3,
       "gender": "F",
       "lastName": "Mary b. Suffield, Ct., 7 May, 1684, m. 11 Dec, 1707, Jonathan Sykes.",
@@ -355,7 +357,7 @@
     {
       "name": "John Lane",
       "id": 17,
-      "text": "",
+      "text": "John³ son of Samuel² (William¹ lineage, Vol. 1): Hadley-born 1686; compilation mentions Connecticut drift. Not William²'s Libbey-line John³ b. Boston 17 Feb. 1685 (person id 20).",
       "generation": 3,
       "gender": "M",
       "lastName": "Settled in Connecticut.",
@@ -369,7 +371,7 @@
     {
       "name": "Elizabeth Lane",
       "id": 18,
-      "text": "",
+      "text": "Elizabeth³ (Samuel² × Sarah Dickinson roster, Vol. 1): Hadley birth 1688; m. 11 Nov. 1711 John Smith—compilation wording.",
       "generation": 3,
       "gender": "F",
       "lastName": " m. 11 Nov., 1711, John Smith",
@@ -397,16 +399,21 @@
     {
       "name": "John Lane",
       "id": 20,
-      "text": "After some years at home he went to sea again, and died at sea, leaving a widow and an only son :",
+      "text": "John³ (William² / Sarah Webster), Lane Genealogies (Vol. 1, 1891): b. Boston 17 Feb. 1685; m. 7 Mar. 1709 Mary (dau. of Anthony and Sarah Drake) Libbey of Rye. The compilation then records a maritime life—taken captive by pirates and held seven years; after time at home sailed again and died at sea, leaving widow and only son—the book continues that line under John⁴ (b. Hampton 12 Oct. 1709, Cornet). Maritime episodes are folklore-style narrative in the genealogical compilation only—confirm with independent shipping or court references if asserting as fact.",
       "generation": 3,
-      "gender": "F",
-      "lastName": "John Lane followed the sea, and was taken captive by pirates and held seven years.",
+      "gender": "M",
+      "lastName": "",
       "birthYear": 1685,
-      "deathYear": "1738?",
-      "birthDate": "1688-01-01T00:00:00.000Z",
-      "deathDate": "1738-01-01T00:00:00.000Z",
+      "deathYear": "?",
+      "birthDate": "1685-02-17T00:00:00.000Z",
+      "deathDate": "",
       "born": "Boston, Mass",
-      "burial": "Sea"
+      "burial": "at sea (per Vol. 1 narrative)",
+      "importMeta": {
+        "laneGenealogiesVol1": {
+          "footnoteSection": "Book § after Libbey marriage line—see Cornet John (descendant continuation, Hampton births)."
+        }
+      }
     },
     {
       "name": "Sarah Lane",
@@ -458,9 +465,9 @@
       "gender": " M",
       "lastName": "Deacon Joshua Lane While standing on his door-step after a shower, he was killed by lightning,",
       "birthYear": 1696,
-      "deathYear": "1765",
+      "deathYear": "1766",
       "birthDate": "1696-01-01T00:00:00.000Z",
-      "deathDate": "1765-01-01T00:00:00.000Z",
+      "deathDate": "1766-06-14T00:00:00.000Z",
       "born": "Boston, Mass",
       "burial": "Pine Grove Cemetary, Hampton, New Hampshie",
       "importMeta": {
@@ -468,6 +475,9 @@
           "occupation": [
             "Deacon"
           ]
+        },
+        "laneGenealogiesVol1": {
+          "lightningDeath": "Vol. 1 (Number Three continuation): struck by lightning while on doorstep after shower, June 1766—not the same Joshua as footnote ‡ King Philip roster (different century)."
         }
       },
       "locations": [
@@ -637,16 +647,46 @@
     {
       "name": "Coronet John Lane",
       "id": 36,
-      "text": "",
+      "text": "John⁴ continuation in Lane Genealogies Vol. 1: b. Hampton 12 Oct. 1709; d. 13 Feb. 1784. Narrative cites land dealings (e.g. 1743 Chestnut Country lots), removing Rye to Chester 1749—the Lane Elm—house-building, longtime farmer and tavern keeper; marriages Hannah Lamprey (before 1733) and Mary Knowles (before 1739) per compilation. Leaves six sons with land gifts as stated in book. French and Indian era militia framing: appointed Cornet Sept. 1754, in a troop of horse—that is mounted militia (the period wording for horse troops; essentially cavalry in role). Vol. 1 describes Cornet roughly as third officer / color bearer. Selectman in 1768 per same source. Compilation tier only for military/civic detail until muster warrants or town minutes are cited.",
       "generation": 4,
       "gender": "M",
       "lastName": "",
       "birthYear": 1709,
       "deathYear": "1784",
-      "birthDate": "1709-01-01T00:00:00.000Z",
-      "deathDate": "1784-01-01T00:00:00.000Z",
-      "born": "Rye, New Hampshire",
-      "burial": ""
+      "birthDate": "1709-10-12T00:00:00.000Z",
+      "deathDate": "1784-02-13T00:00:00.000Z",
+      "born": "Hampton, New Hampshire",
+      "burial": "",
+      "locations": [
+        "Chester, New Hampshire",
+        "Rye, New Hampshire"
+      ],
+      "occupation": [
+        {
+          "job": "farmer"
+        },
+        {
+          "job": "tavern keeper"
+        },
+        {
+          "government": "selectman",
+          "text": "Vol. 1: served as town selectman in 1768 (genealogy citation)."
+        },
+        {
+          "text": "Militia: Cornet in a troop of horse (mounted / cavalry-type unit—Vol. 1 wording)",
+          "service": [
+            {
+              "war": "French and Indian War",
+              "text": "Sept. 1754 appointed Cornet, in a troop of horse (mounted militia—the book phrase is the period equivalent of cavalry; Vol. 1 officer note)—verify against provincial rolls elsewhere."
+            }
+          ]
+        }
+      ],
+      "importMeta": {
+        "laneGenealogiesVol1": {
+          "marriagesNoted": "Hannah Lamprey (bef. 1733); Mary Knowles (bef. 1739)—dates from book synopsis only."
+        }
+      }
     },
     {
       "name": "John Libbey",
@@ -749,7 +789,7 @@
     {
       "name": "John Lane",
       "id": 44,
-      "text": "July 21, 1777, as second lieutenant in S. Dearborn's Company, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777.Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant.",
+      "text": "I. Lt. John⁵ (Cornet John Lane's son in Vol. 1): b. 17 Oct. 1733; d. 11 Mar. 1813; m. Mary (dau. of Benaiah and Mary Webster) of Chester—Vol. 1 line (prior OCR wrongly split “of Chester”). Chester Revolutionary summary (compilation): commissioned second lieutenant 21 July 1777 in S. Dearborn's company, T. Stickney's regiment (march from Chester); at Battle of Bennington, 16 Aug. 1777. After Lieutenant Ezekiel Lane (brother branch) fell at Bennington he was promoted to first lieutenant. Vol. 1 also notes settlement as farmer and shoemaker—Lot 130 Old Hundreds.",
       "generation": 5,
       "gender": "M",
       "lastName": "He settled, a farmer and shoemaker, on lot 130 Old Hundreds.",
@@ -760,43 +800,40 @@
       "born": "Rye, New Hampshire",
       "burial": " ",
       "title": "Lieutenant",
-      "militaryEngagements": [
+      "occupation": [
         {
-          "warSlug": "french-and-indian-war",
-          "warLabel": "French and Indian War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "July 21, 1777, as second lieutenant in S. Dearborn's Company, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777.Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant."
-          ],
-          "source": "lane-military-deep-scan-report"
+          "job": "farmer"
         },
+        {
+          "job": "shoemaker"
+        },
+        {
+          "text": "NH Revolutionary War commissions per Vol. 1: Dearborn company, Stickney regiment; Bennington Aug. 16, 1777.",
+          "service": [
+            {
+              "war": "Revolutionary War",
+              "text": "2nd Lt. S. Dearborn's Co., T. Stickney's Regt., Chester to Bennington; promoted 1st Lt after Lt. Ezekiel Lane killed at Bennington."
+            }
+          ]
+        }
+      ],
+      "militaryEngagements": [
         {
           "warSlug": "revolutionary-war",
           "warLabel": "Revolutionary War",
-          "confidence": "medium",
+          "confidence": "high",
           "associationType": "service-member",
           "evidence": [
-            "July 21, 1777, as second lieutenant in S. Dearborn's Company, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777.Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant."
+            "Lane Genealogies Vol. 1: Dearborn company, Stickney regiment line; Battle of Bennington 16 Aug. 1777; promotion after Ezekiel Lane KIA."
           ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "war-of-1812",
-          "warLabel": "War of 1812",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "July 21, 1777, as second lieutenant in S. Dearborn's Company, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777.Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant."
-          ],
-          "source": "lane-military-deep-scan-report"
+          "source": "lane-genealogies-vol1-1891"
         }
       ]
     },
     {
       "name": "Daniel Lane",
       "id": 45,
-      "text": "He gave for a burying ground one-fourth of an acre of land, and David Lane, David Lane, Jr., Isaac Lane, Jonathan Lane, Josiah Lane, &c., agreed to keep it fenced.",
+      "text": "Chester-era Lane Genealogies (Vol. 1, compilation): donated one-fourth acre for burying-ground; David Lane (senior), David Lane Jr., Isaac Lane, Jonathan Lane, Josiah Lane, etc., undertook fencing. Revolutionary War enlistment per same book column: 5 Aug. 1778 in Col. J. Gale's regiment ordered to New Jersey, twenty-six days' service—not a substitute for Compiled Military Service Records.",
       "generation": 5,
       "gender": "M",
       "lastName": "He enlisted, 5 Aug., 1778, in Col. J. Gale's Regiment for New Jersey, and served 26 days.",
@@ -805,12 +842,38 @@
       "birthDate": "1735-01-01T00:00:00.000Z",
       "deathDate": "1825-01-01T00:00:00.000Z",
       "born": "Rye, New Hampshire",
-      "burial": " "
+      "burial": " ",
+      "occupation": [
+        {
+          "job": "farmer"
+        },
+        {
+          "text": "Revolutionary War—short NJ detail per Vol. 1.",
+          "service": [
+            {
+              "war": "Revolutionary War",
+              "text": "5 Aug. 1778 enlistment Col. Gale's regiment (New Jersey)—26 days in compilation."
+            }
+          ]
+        }
+      ],
+      "militaryEngagements": [
+        {
+          "warSlug": "revolutionary-war",
+          "warLabel": "Revolutionary War",
+          "confidence": "medium",
+          "associationType": "service-member",
+          "evidence": [
+            "Vol. 1: Gale regiment NJ enlistment Aug. 5, 1778—26-day compilation note."
+          ],
+          "source": "lane-genealogies-vol1-1891"
+        }
+      ]
     },
     {
       "name": "Ezekiel",
       "id": 46,
-      "text": "He was Lieutenant in S. Dearborn's Company, T. Stickney's Regiment, and was killed in the battle of Bennington, 16 Aug., 1777.",
+      "text": "Lane Genealogies (Vol. 1): Lieutenant in S. Dearborn's Company, Thomas Stickney's Regiment; killed at Battle of Bennington, 16 Aug. 1777. Household note in book: farmer and carpenter Lot 128 Old Hundreds—select-man 1765–1773, built school-house (compilation pedigree).",
       "generation": 5,
       "gender": "M",
       "lastName": "Res. on Lot 128, Old Hundreds, farmer and carpenter, was select-man from 1765 to 1773,built a school house",
@@ -821,26 +884,36 @@
       "born": "Rye, New Hampshire",
       "burial": " ",
       "title": "Lieutenant",
-      "militaryEngagements": [
+      "occupation": [
         {
-          "warSlug": "french-and-indian-war",
-          "warLabel": "French and Indian War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He was Lieutenant in S. Dearborn's Company, T. Stickney's Regiment, and was killed in the battle of Bennington, 16 Aug., 1777."
-          ],
-          "source": "lane-military-deep-scan-report"
+          "job": "farmer"
         },
+        {
+          "job": "carpenter"
+        },
+        {
+          "government": "selectman"
+        },
+        {
+          "text": "Revolutionary War—Bennington casualty per Vol. 1 Dearborn/Stickney line.",
+          "service": [
+            {
+              "war": "Revolutionary War",
+              "text": "Lt. Dearborn Co., Stickney Regt.—KIA Bennington Aug. 16, 1777."
+            }
+          ]
+        }
+      ],
+      "militaryEngagements": [
         {
           "warSlug": "revolutionary-war",
           "warLabel": "Revolutionary War",
-          "confidence": "medium",
+          "confidence": "high",
           "associationType": "service-member",
           "evidence": [
-            "He was Lieutenant in S. Dearborn's Company, T. Stickney's Regiment, and was killed in the battle of Bennington, 16 Aug., 1777."
+            "Vol. 1: Dearborn company, Stickney regiment; battlefield death Bennington Aug. 16, 1777."
           ],
-          "source": "lane-military-deep-scan-report"
+          "source": "lane-genealogies-vol1-1891"
         }
       ]
     },
@@ -1932,12 +2005,12 @@
       "burial": " "
     },
     {
-      "name": "Mary Colby",
+      "name": "Mary (Webster) Lane",
       "id": 117,
       "text": "",
       "generation": 5,
       "gender": "F",
-      "lastName": "dau. of Benaiah and Mary Websterof Chester",
+      "lastName": "dau. of Benaiah and Mary Webster of Chester",
       "birthYear": 1734,
       "deathYear": "1815?",
       "birthDate": "1734-01-01T00:00:00.000Z",
@@ -1967,47 +2040,24 @@
     {
       "name": "John Lane",
       "id": 119,
-      "text": "b. 30 Jan., 175S. At 17 years of age he enlisted in Captain H. Hutchins' Company; was in the Battle of Bunker Mill; and March, 1777, in S. Blodgett's Company, Enoch Poor's Regiment, f(or three years. From July to Oct., 1 7S0, in Col. T. Bartlett's Regiment at West Boint, &c.",
+      "text": "Born 30 Jan. 1758 (OCR “175S” corrected). Chester branch in Lane Genealogies (Vol. 1): enlisted at seventeen in Capt. H. Hutchins's company—book places him at Breed's/Bunker Hill fighting; March 1777 enlisted in S. Blodgett's company, Enoch Poor's regiment, term three years; July-Oct. 1780 duty with Col. T. Bartlett's regiment at West Point. Bunker Mill in OCR corrected to Bunker Hill; genealogical abstraction only—confirm with Compiled Military Service Records.",
       "occupation": [
         {
           "job": "professional soldier"
         },
         {
+          "text": "Compilation-only Continental enlistments per Vol. 1 Chester column.",
           "service": [
             {
-              "war": "Revolutionary"
-            },
-            {
-              "armyName": "Continental"
-            },
-            {
-              "branch": [
-                {
-                  "name": "Army",
-                  "company": "S. Blodgett's Company",
-                  "regiment": "Enoch Poor's Regiment - Col. T. Bartlett's Regiment at West Point",
-                  "description": "At 17 years of age he enlisted in Captain H. Hutchins Company; was in the Battle of Bunker Mill; and March, 1777, in S. Blodgett's Company, Enoch Poor's Regiment, f(or three years. From July to Oct., 1 7S0, in Col. T. Bartlett's Regiment at West Boint"
-                }
-              ]
-            },
-            {
-              "battles": [
-                {
-                  "company": "Captain H. Hutchins Company",
-                  "name": "Battle of Bunker Hill",
-                  "place": "Charlestown, Massachusetts",
-                  "start": "June 17, 1775, 3:00PM",
-                  "end": "June 17, 1775, 5:00PM",
-                  "description": "The Battle of Bunker Hill was a battle fought on June 17, 1775, during the Siege of Boston in the early stages of the American Revolutionary War. The battle is named after Bunker Hill in Charlestown, Boston, which was peripherally involved in the battle, and was the original objective of both the colonial and British troops, though the vast majority of combat took place on the adjacent Breed's Hill.On June 13, 1775, the leaders of the colonial forces besieging Boston learned that the British were planning to send troops out from the city to fortify the unoccupied hills surrounding the city, giving them control of Boston Harbor. In response, 1,200 colonial troops under the command of William Prescott stealthily occupied Bunker Hill and Breed's Hill. The colonists constructed a strong redoubt on Breed's Hill, as well as smaller fortified lines across the Charlestown Peninsula. When the British were alerted to the presence of colonial forces on the Peninsula, they mounted an attack against them. After two assaults on the colonial positions were repulsed with significant British casualties, the third and final attack carried the redoubt after the defenders ran out of ammunition. The colonists retreated to Cambridge over Bunker Hill, leaving the British in control of the Peninsula.While the result was a victory for the British, the massive losses they encountered discouraged them from any further sorties against the siege lines; 226 men were killed with over 800 wounded, including a large number of officers. The battle at the time was considered to be a colonial defeat; however, the losses suffered by the British troops gave encouragement to the colonies, demonstrating that inexperienced militiamen were able to stand up to regular army troops in a pitched battle."
-                }
-              ]
+              "war": "Revolutionary War",
+              "text": "Hutchins company; Breed's/Bunker Hill Jun. 17, 1775 (book wording); Poor's regiment, Blodgett March 1777; Bartlett regt. West Point 1780 stint."
             }
           ]
         }
       ],
       "generation": 6,
       "gender": "M",
-      "lastName": "At 17 years of age he enlisted in Captain H. Hutchins' Company; was in the Battle of Bunker Mill; and March, 1777, in S. Blodgett's Company, Enoch Poor's Regiment, f(or three years. From July to Oct., 1 7S0, in Col. T. Bartlett's Regiment at West Boint, &c.",
+      "lastName": "Born Chester; Bunker Hill, Poor regiment, Bartlett West Point enlistments per Lane Genealogies Vol. 1.",
       "birthYear": 1758,
       "deathYear": "1828?",
       "birthDate": "1758-01-01T00:00:00.000Z",
@@ -2016,34 +2066,14 @@
       "burial": " ",
       "militaryEngagements": [
         {
-          "warSlug": "french-and-indian-war",
-          "warLabel": "French and Indian War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "b. 30 Jan., 175S. At 17 years of age he enlisted in Captain H. Hutchins' Company; was in the Battle of Bunker Mill; and March, 1777, in S. Blodgett's Company, Enoch Poor's Regiment, f(or three years. From July to Oct., 1 7S0, in Col. T. Bartlett's Regiment at West Boint, &c."
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
           "warSlug": "revolutionary-war",
           "warLabel": "Revolutionary War",
           "confidence": "high",
           "associationType": "service-member",
           "evidence": [
-            "Revolutionary"
+            "Vol. 1: Revolutionary enlistments—Hutchins/Bunker Hill line; Poor regiment 1777; Bartlett-West Point spell 1780."
           ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "war-of-1812",
-          "warLabel": "War of 1812",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "b. 30 Jan., 175S. At 17 years of age he enlisted in Captain H. Hutchins' Company; was in the Battle of Bunker Mill; and March, 1777, in S. Blodgett's Company, Enoch Poor's Regiment, f(or three years. From July to Oct., 1 7S0, in Col. T. Bartlett's Regiment at West Boint, &c."
-          ],
-          "source": "lane-military-deep-scan-report"
+          "source": "lane-genealogies-vol1-1891"
         }
       ]
     },
@@ -2115,7 +2145,7 @@
         {
           "service": [
             {
-              "war": "War if 1812"
+              "war": "War of 1812"
             },
             {
               "armyName": "Regular"
@@ -2180,31 +2210,34 @@
           "job": "soldier"
         },
         {
+          "text": "Revolutionary War—Vol. 1 phrase (Daniel Lane line, child Jacob⁶).",
           "service": [
             {
-              "war": "The Revolution"
-            },
-            {
-              "armyName": "Regular"
-            },
-            {
-              "branch": [
-                {
-                  "name": "Army",
-                  "commanding officer": "Col. L. Baldwin"
-                }
-              ]
+              "war": "Revolutionary War",
+              "text": "a soldier in the Revolution under Col. L. Baldwin (Vol. 1 wording as printed in Lane Genealogies, 1891)."
             }
           ]
         }
       ],
       "lastName": " b 15 Jan., 1757, d. 6 May, 1797, a soldier in the Revolution under Col. L. Baldwin.",
       "birthYear": 1757,
-      "deathYear": "1897?",
+      "deathYear": "1797",
       "birthDate": "1757-01-01T00:00:00.000Z",
-      "deathDate": "1897-01-01T00:00:00.000Z",
+      "deathDate": "1797-05-06T00:00:00.000Z",
       "born": "Chester, New Hampshire",
-      "burial": " "
+      "burial": " ",
+      "militaryEngagements": [
+        {
+          "warSlug": "revolutionary-war",
+          "warLabel": "Revolutionary War",
+          "confidence": "medium",
+          "associationType": "service-member",
+          "evidence": [
+            "Vol. 1: a soldier in the Revolution under Col. L. Baldwin."
+          ],
+          "source": "lane-genealogies-vol1-1891"
+        }
+      ]
     },
     {
       "name": "Hannah Lane",
@@ -2505,26 +2538,20 @@
       }
     },
     {
-      "name": "Hgen Willaim Lane - Tailor",
+      "name": "Vol. 1 footnote block (PDF artifact)",
       "id": 138,
-      "text": "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds",
+      "text": "PDF-ingest artifact: Holds the verbatim Lane Genealogies footnote referencing NEHGR IX:159 (Hampton assessments 1731/32, civic note 1686, additional kinship notes). Canonical wording and Phillipian-war footnote nuances are summarized on William² person id 10 importMeta—not on this stub. Do not treat this row as an individual soldier.",
       "generation": 3,
       "gender": "U",
-      "lastName": "Willaim Lane - Tailor",
+      "lastName": "",
       "birthYear": 1731,
       "deathYear": "",
       "birthDate": "",
       "deathDate": "",
-      "born": "Hampton",
+      "born": "",
       "deathPlace": "",
       "burial": "",
-      "locations": [
-        "Hampton",
-        "pasturing. Thomas Lane",
-        "John Libbey",
-        "July",
-        "Hamp- ton"
-      ],
+      "locations": [],
       "sourceRefs": [
         {
           "pdfPageNumber": 22,
@@ -2534,100 +2561,9 @@
       ],
       "importMeta": {
         "source": "lanegenealogies01chap.pdf",
-        "parser": "parse_lane_pdf.py"
-      },
-      "militaryEngagements": [
-        {
-          "warSlug": "king-philips-war",
-          "warLabel": "King Philip's War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "french-and-indian-war",
-          "warLabel": "French and Indian War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "revolutionary-war",
-          "warLabel": "Revolutionary War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "war-of-1812",
-          "warLabel": "War of 1812",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "mexican-american-war",
-          "warLabel": "Mexican-American War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "civil-war",
-          "warLabel": "Civil War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "spanish-american-war",
-          "warLabel": "Spanish-American War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "world-war-i",
-          "warLabel": "World War I",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "world-war-ii",
-          "warLabel": "World War II",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "L. [See H. Gen. Reg. IX, 159]. In the Records of Hampton (Old Parish) December, 1731, and January 1732, are found the following assessments : \"William Lane, One head, one one-story house. One head, one one-story house, Joshua Lane, 3 cows, one 3 year old, I horse, one I year old, one swine, 3 acres Tillage and Mowing, and ten acres of pasturing. Thomas Lane, one head, one cow.* + “\" At Towni Meeting, Boston, May 5, 1686, William Lane was chosen Tyth- inge Man for the yere ensueinge.\" + In July, 1676, a Joshua Lane was in the same war under Capt. Wadsworth. S Anthony wasa son of John Libbey,from Kent County, England, who in 1663 was at Scarboro', Me., but when in May, 1690, the Indians attacked Black Point he fled to Portsmouth, N. H., where his sons Anthony and James settled, or in Rye.Anthony had sons, Abraham, Isaac, and Jacob. On the I 4 th of July, 1717, Mary Lane was admitted to the church in Hampton.In 1718 Jacob Lybie, husbandman in Rye, sold land to his sister, Mary Lane of Hamp- ton. 20 Feb., 1717-18, Mary Lane rceived by her father's will “six pounds"
-          ],
-          "source": "lane-military-deep-scan-report"
-        }
-      ]
+        "parser": "parse_lane_pdf.py",
+        "bookExcerptRaw": "Verbatim OCR footnote (see sourceRefs.rawText)—retained offline from military matchers; API consumers should prefer person id 10 importMeta.laneGenealogiesVol1."
+      }
     },
     {
       "name": "Sarah Willaim Lane - Tailor",
@@ -3056,7 +2992,7 @@
     {
       "name": "Ltjo Hn",
       "id": 154,
-      "text": "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :",
+      "text": "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :",
       "generation": 0,
       "gender": "U",
       "lastName": "Hn",
@@ -3078,7 +3014,7 @@
         {
           "pdfPageNumber": 25,
           "lineNumber": 2,
-          "rawText": "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+          "rawText": "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
         }
       ],
       "importMeta": {
@@ -3092,7 +3028,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         },
@@ -3102,7 +3038,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         },
@@ -3112,7 +3048,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         },
@@ -3122,7 +3058,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         },
@@ -3132,7 +3068,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         },
@@ -3142,7 +3078,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         },
@@ -3152,7 +3088,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         },
@@ -3162,7 +3098,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         },
@@ -3172,7 +3108,7 @@
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
+            "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :"
           ],
           "source": "lane-military-deep-scan-report"
         }
@@ -45270,7 +45206,7 @@
     {
       "name": "Jo Hn",
       "id": 1563,
-      "text": "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children : | Marriage (OCR): 9 Dec",
+      "text": "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children : | Marriage (OCR): 9 Dec",
       "generation": 0,
       "gender": "U",
       "lastName": "Hn",
@@ -45293,7 +45229,7 @@
         {
           "pdfPageNumber": 25,
           "lineNumber": 2,
-          "rawText": "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) Co LEYy of Ches- ter. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :",
+          "rawText": "I. LT. Jo Hn 5, b. 17 Oct., 1733, d. 1 I Mar., 1813, m. 9 Dec., I 755, MARY (dau. of Benaiah and Mary Webster) of Chester. He settled, a farmer and shoemaker, on lot I 3 o Old Hun- dreds. July 21, 1777, as second lieutenant in S. Dearborn's Com- pany, Thomas Stickney's Regiment, he marched from Chester, and was in the battle of Bennington, 16 Aug., 1777. Upon the death of Lieutenant Ezekiel Lane, he was promoted to first lieutenant. Children :",
           "bio": {
             "occupation": [
               "Shoemaker",
@@ -116537,28 +116473,23 @@
       "title": "Captain"
     },
     {
-      "name": "Jo Hn",
+      "name": "John Lane",
       "id": 2903,
-      "text": "II. Jo HN², b. in Hampton, I Mar., I 701-2. He entered military service early, under his father, was a lieutenant and at the death of his father became captain.He served in various places in Maine, and became famous in fighting the Indians.In a report to Lieutenant Governor Dummer, dated York, 21 Apr., 1724, Col. Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of York. He did not deny the fact, and made satisfaction to the people. He m., about I 733, MARY (dau. of Peter) Now ELL of York, Me., and had 5 ch. [N. E. Hist. Gen. Reg. XLV, P. I 3 o.] [See Note B.] | Children (OCR): 5 children (from text) | Marriage (OCR): , about I 733, MARY (dau | Children (OCR): 5 children (from text) | Marriage (OCR): , about I 733, MARY (dau",
+      "text": "II. John Lane — Born Hampton, N.H., March 1701/02 (Lane Genealogies Vol. I). Son of Captain John Lane of York County, Maine. Entered military service under his father; lieutenant, then captain after his father's death. Served on the Maine frontier; cited when Col. Thomas Westbrook reported from York (21 Apr. 1724) to Lieutenant Governor Dummer concerning Lieutenant John Lane and militia conduct toward inhabitants of York County. Married about 1733 Mary Nowell (daughter of Peter) of York, Maine; five children (N.E.H.G.R. XLV:130).",
       "generation": 1,
-      "gender": "U",
-      "lastName": "Hn",
-      "birthYear": 1724,
+      "gender": "M",
+      "lastName": "Lane",
+      "birthYear": 1701,
       "deathYear": "",
       "birthDate": "",
       "deathDate": "",
-      "born": "Hampton",
+      "born": "Hampton, N.H.",
       "deathPlace": "",
       "burial": "",
       "locations": [
-        "Hampton",
-        "York, Me",
-        "his father became captain.He served in various plac",
-        "the County of York. He did not deny the fact",
-        "Peter",
-        "York",
-        "various places in Maine",
-        "fighting the Indians.In a report to Lieutenant Gove"
+        "Hampton, N.H.",
+        "York, Maine",
+        "York County, Maine"
       ],
       "sourceRefs": [
         {
@@ -116586,13 +116517,7 @@
             ],
             "locationsExtra": [
               "Hampton",
-              "York, Me",
-              "his father became captain.He served in various plac",
-              "the County of York. He did not deny the fact",
-              "Peter",
-              "York",
-              "various places in Maine",
-              "fighting the Indians.In a report to Lieutenant Gove"
+              "York, Me"
             ],
             "deathYear": null,
             "deathPlaceHints": [],
@@ -116612,7 +116537,7 @@
             "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
             "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
           ],
-          "childrenNote": "5 children (from text); 5 children (from text)",
+          "childrenNote": "5 children (from text)",
           "placeHints": [
             {
               "text": "Hampton",
@@ -116632,135 +116557,13 @@
         {
           "service": [
             {
-              "text": "He entered military service early, under his father, was a lieutenant and at the death of his father became captain"
-            }
-          ]
-        },
-        {
-          "service": [
-            {
-              "text": "In a report to Lieutenant Governor Dummer, dated York, 21 Apr"
-            }
-          ]
-        },
-        {
-          "service": [
-            {
-              "text": "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
+              "text": "Lieutenant, then captain (Maine frontier militia under father Captain John Lane); cited Apr. 1724 York report (Westbrook to Lt. Gov. Dummer)."
             }
           ]
         }
       ],
-      "militaryEngagements": [
-        {
-          "warSlug": "king-philips-war",
-          "warLabel": "King Philip's War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "french-and-indian-war",
-          "warLabel": "French and Indian War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "revolutionary-war",
-          "warLabel": "Revolutionary War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "war-of-1812",
-          "warLabel": "War of 1812",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "mexican-american-war",
-          "warLabel": "Mexican-American War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "civil-war",
-          "warLabel": "Civil War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "spanish-american-war",
-          "warLabel": "Spanish-American War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "world-war-i",
-          "warLabel": "World War I",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "world-war-ii",
-          "warLabel": "World War II",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "He entered military service early, under his father, was a lieutenant and at the death of his father became captain",
-            "In a report to Lieutenant Governor Dummer, dated York, 21 Apr",
-            "Thomas Westbrook says, with regret, that \"Lieutenant John Lane has been so imprudent as to suffer his men to kill sundry creatures belonging to the people of the County of"
-          ],
-          "source": "lane-military-deep-scan-report"
-        }
-      ]
+      "title": "Captain",
+      "militaryEngagements": []
     },
     {
       "name": "About",
@@ -158455,24 +158258,23 @@
       }
     },
     {
-      "name": "Iii-si Mon",
+      "name": "Simon Lane",
       "id": 3740,
-      "text": "(33)III-Si MON^,b.3 July,1733,d.30 Nov.,1813.In Capt.H.Elkins'Co.,Col.E.Poor's Regiment,in May,1775.Marched Aug.I,1775,from Hamptontojointhearmyin Medford,Mass.Hem.17 Nov.,1757,Sarah Robieof North Hampton,b.2 Mar.,1736,d.25 Dec,1816,8 ch.Oni June,1796,withhisson,Simon,Jr.,and James Lane,petitionedthe Senateandthe House No TK.-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice.On May 10,1777,Oliver Wellington Laneof Hamptonwasonacommitteetopetitionthe New Hampshire Committeeof Safetyforthedefenceofthecoast. | Children (OCR): 8 ch. (from text) | Death year (OCR): 1816",
+      "text": "III. Simon Lane (No. 33, Thomas², William¹ in Lane Genealogies): b. 3 July 1733; d. 30 Nov. 1813. Revolutionary summary (compilation): in Capt. H. Elkins's company, Col. E. Poor's regiment, May 1775; marched 1 Aug. 1775 from Hampton to join the army in Medford, Mass. He m. 17 Nov. 1757 Sarah Robie of North Hampton (b. 2 Mar. 1736, d. 25 Dec. 1816), eight children. On 1 June 1796, with his son Simon Jr. and James Lane, he petitioned the New Hampshire Senate and House. Lane Genealogies Vol. 1 (1891), p. 21 — compilation tier; confirm with Compiled Military Service Records separately.",
       "generation": 2,
-      "gender": "U",
-      "lastName": "Mon",
+      "gender": "M",
+      "lastName": "Lane",
       "birthYear": 1733,
-      "deathYear": 1816,
+      "deathYear": "1813",
       "birthDate": "3 July,1733",
       "deathDate": "30 Nov.,1813",
-      "born": "Hamptontojointhearmyin Medford",
+      "born": "Hampton, New Hampshire",
       "deathPlace": "",
       "burial": "",
       "locations": [
-        "Hamptontojointhearmyin Medford",
-        "Capt.H.Elkins'Co",
-        "May",
-        "April"
+        "Hampton",
+        "Medford, Mass.",
+        "North Hampton"
       ],
       "sourceRefs": [
         {
@@ -158482,25 +158284,24 @@
           "bio": {
             "occupation": [],
             "military": [
-              "-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice"
+              "In Capt. H. Elkins' Co., Col. E. Poor's Regiment, May 1775; marched Aug. 1, 1775 from Hampton to Medford, Mass. (Simon Lane — OCR tail after petition describes other men)."
             ],
             "education": [],
             "childrenNote": "8 ch. (from text)",
             "placeHints": [
               {
-                "text": "Hamptontojointhearmyin Medford",
+                "text": "Medford, Mass.",
                 "role": "other",
                 "scope": "primary"
               }
             ],
             "locationsExtra": [
-              "Hamptontojointhearmyin Medford",
-              "Capt.H.Elkins'Co",
-              "May",
-              "April"
+              "Hampton",
+              "Medford, Mass.",
+              "Capt. H. Elkins' Co."
             ],
             "birthDateText": "3 July,1733",
-            "deathYear": 1816,
+            "deathYear": 1813,
             "deathDateText": "30 Nov.,1813",
             "deathPlaceHints": [],
             "burialHints": [],
@@ -158513,12 +158314,12 @@
         "parser": "parse_lane_pdf.py",
         "ocrFacts": {
           "military": [
-            "-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice"
+            "In Capt. H. Elkins' Co., Col. E. Poor's Regiment, May 1775; marched Aug. 1, 1775 Hampton to Medford (Simon Lane); OCR column merged unrelated April 1777 lines."
           ],
-          "childrenNote": "8 ch. (from text); 8 ch. (from text)",
+          "childrenNote": "8 ch. (from text)",
           "placeHints": [
             {
-              "text": "Hamptontojointhearmyin Medford",
+              "text": "Medford, Mass.",
               "role": "other",
               "scope": "primary"
             }
@@ -158527,46 +158328,25 @@
       },
       "occupation": [
         {
+          "text": "Revolutionary War—Elkins / Poor; Hampton to Medford (Vol. 1, p. 21).",
           "service": [
             {
-              "text": "-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice"
+              "war": "Revolutionary War",
+              "text": "Capt. H. Elkins's Co., Col. E. Poor's Regt., May 1775; marched 1 Aug. 1775 from Hampton to Medford, Mass. (Lane Genealogies Vol. 1 compilation)."
             }
           ]
         }
       ],
       "militaryEngagements": [
         {
-          "warSlug": "french-and-indian-war",
-          "warLabel": "French and Indian War",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice",
-            "(33)III-Si MON^,b.3 July,1733,d.30 Nov.,1813.In Capt.H.Elkins'Co.,Col.E.Poor's Regiment,in May,1775.Marched Aug.I,1775,from Hamptontojointhearmyin Medford,Mass.Hem.17 Nov.,1757,Sarah Robieof North Hampton,b.2 Mar.,1736,d.25 Dec,1816,8 ch.Oni June,1796,withhisson,Simon,Jr.,and James Lane,petitionedthe Senateandthe House No TK.-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice.On May 10,1777,Oliver Wellington Laneof Hamptonwasonacommitteetopetitionthe New Hampshire Committeeof Safetyforthedefenceofthecoast. | Children (OCR): 8 ch. (from text) | Death year (OCR): 1816"
-          ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
           "warSlug": "revolutionary-war",
           "warLabel": "Revolutionary War",
           "confidence": "medium",
           "associationType": "service-member",
           "evidence": [
-            "-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice",
-            "(33)III-Si MON^,b.3 July,1733,d.30 Nov.,1813.In Capt.H.Elkins'Co.,Col.E.Poor's Regiment,in May,1775.Marched Aug.I,1775,from Hamptontojointhearmyin Medford,Mass.Hem.17 Nov.,1757,Sarah Robieof North Hampton,b.2 Mar.,1736,d.25 Dec,1816,8 ch.Oni June,1796,withhisson,Simon,Jr.,and James Lane,petitionedthe Senateandthe House No TK.-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice.On May 10,1777,Oliver Wellington Laneof Hamptonwasonacommitteetopetitionthe New Hampshire Committeeof Safetyforthedefenceofthecoast. | Children (OCR): 8 ch. (from text) | Death year (OCR): 1816"
+            "Vol. 1, p. 21: Capt. H. Elkins's company, Col. E. Poor's regiment, May 1775; marched 1 Aug. 1775 from Hampton to join the army in Medford, Mass."
           ],
-          "source": "lane-military-deep-scan-report"
-        },
-        {
-          "warSlug": "war-of-1812",
-          "warLabel": "War of 1812",
-          "confidence": "medium",
-          "associationType": "service-member",
-          "evidence": [
-            "-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice",
-            "(33)III-Si MON^,b.3 July,1733,d.30 Nov.,1813.In Capt.H.Elkins'Co.,Col.E.Poor's Regiment,in May,1775.Marched Aug.I,1775,from Hamptontojointhearmyin Medford,Mass.Hem.17 Nov.,1757,Sarah Robieof North Hampton,b.2 Mar.,1736,d.25 Dec,1816,8 ch.Oni June,1796,withhisson,Simon,Jr.,and James Lane,petitionedthe Senateandthe House No TK.-In April,1777,Thomas Lain,from First Batallionof Militia,enlistedforthreeyearsorduringthewarin Captain Blodget's Company,for Ports-mouth,ofthe Continentalservice.On May 10,1777,Oliver Wellington Laneof Hamptonwasonacommitteetopetitionthe New Hampshire Committeeof Safetyforthedefenceofthecoast. | Children (OCR): 8 ch. (from text) | Death year (OCR): 1816"
-          ],
-          "source": "lane-military-deep-scan-report"
+          "source": "lane-genealogies-vol1-1891"
         }
       ]
     },
@@ -161630,25 +161410,24 @@
       }
     },
     {
-      "name": "Samuela. Lane",
+      "name": "Samuel A. Lane",
       "id": 3787,
-      "text": "No.34.SAMUELA.LANE^(Comfort^,Gad^,Sam.»,Sam.^,Sam.2),181 5 ,andhisw.PAULINAPOTTER,hadb.in Akron,O. : I.Sarah Maria^,b.12 Dec,1839,d.2 July,1841.II.Julius Sherman^,b.19 Nov.,1841,mechanicalengineerandsuperintendentofamanufacturingcompanyof Chicago,111.Hem.21 Aug.,1867,Julia Eliz.(dau.of Rev.C.J.and Eliz.Bancroft)Pitkin,*b.at North Bloomfield,Trumbul Co.,O.,8 Sept.,1845.Res.at Oak Park,III,1890.Ch. : 1.Henry Mat-(]uette>,h.at Ishpeming,Marque Ue Co.,Mich.,14 May,1 S 68,isof Perdue University,Lafayette,Ind.2.Pauline Elizabeth^,b.at Akron,O.,20 Nov.,1869,of Oberlin College,O.3.Frank Pitkin^,b.19 Aug.,1871.4.Albert Alanson^,b.22 Sept.,1873.5.Florence Maria^,b.3 Dec,1876.6.George Comfort'^,b.28 Oct.,18 S 4.III.Henry Lorenzo*^,b.25 Aug.,1843,d.5 Jan.,1849.IV.William Alanson\"^,b.14 Dec,1845,d-5 J^i^-?1849-\"Rev.C.J.Pitkin(s.of Caleband Anna Pitkin),b.at Milford,Ct.,4 Dec,1812,andd.in Vandalia,III,19 May,18 S 7.Hem.Elizabeth Bancroftof Granville,O.Hegraduatedat Western Res.Collegein 1836,Theological Seminaryin 1839.Hewassettledpastorofthe Presbyterian Churchat North Bloomtield,O.,fourteenyears.In 1856 heremovedto Winchester,111.;hepreachedat Troy,Vandaliaand Cerro Gordo,111.Theyhadtenchildrenofwhomfivehvedtomarry.1.Julia E.,b.8 Sept.,1845,m.Julius S.Lane.2.Thomasi V.,b.10 x\\pr.,1852,m.Anna L.Mc Cord.3.Albert,J.,b.22 Mar.,1854,m.Carrie M?(sisterof Julius S.)Lane.4.Willie G.,b.26 May,1856,m.Myi-a D.Seward.5.Stephen II.,b.26 Oct.,1864,m.Ada M.Maltby.By(2)w.Flavia B.Clark,b.23 Dec,1836,d.5 Dec,18 S 2,hehad:6.Grace C,b.14 Mar.,1869. | Education (OCR): ^,b.at Akron,O.,20 Nov.,1869,of Oberlin College,O.3.Frank Pitkin^,b.19 Aug.,1871.4.Albert Alanson^,b.22 Sep; .Hem.Elizabeth Bancroftof Granville,O.Hegraduatedat Western Res.Collegein 1836,Theological Seminaryin 1839.He | Marriage (OCR): Julius S; Anna L; Carrie M?(sisterof Julius S; Myi-a D; Ada M | Death year (OCR): 1869",
+      "text": "No. 34 — Samuel A. Lane (Comfort⁶, Gad⁵, Sam.⁴, Sam.³, Sam.² in Vol. 1 line): b. 1815; m. Paulina Potter; children b. in Akron, Ohio. I. Sarah Maria, b. 12 Dec. 1839, d. 2 July 1841. II. Julius Sherman, b. 19 Nov. 1841; mechanical engineer and superintendent of a manufacturing company in Chicago, Ill.; m. 21 Aug. 1867 Julia Elizabeth Pitkin (dau. of Rev. C. J. and Elizabeth Bancroft), b. North Bloomfield, Trumbull Co., Ohio, 8 Sept. 1845; res. Oak Park, Ill., 1890. Their children: Henry (b. Ishpeming, Marquette Co., Mich., 14 May 1868; book prints “Perdue University,” Lafayette, Ind.—commonly read as Purdue); Pauline Elizabeth (b. Akron, 20 Nov. 1869, Oberlin College); Frank Pitkin; Albert Alanson; Florence Maria; George Comfort. III. Henry Lorenzo, b. 25 Aug. 1843, d. 5 Jan. 1849. IV. William Alanson, b. 14 Dec. 1845, d. 5 Jan. 1849. Footnote (same page): Rev. C. J. Pitkin (s. of Caleb and Anna), b. Milford, Conn., 4 Dec. 1812, d. Vandalia, Ill., 19 May 1887; m. Elizabeth Bancroft of Granville, Ohio; Western Reserve College 1836, Theological Seminary 1839; Presbyterian pastor at North Bloomfield, Ohio, fourteen years; later Winchester, Troy, Vandalia, and Cerro Gordo, Ill.; ten children, five lived to marry (including Julia E. to Julius S. Lane); by second wife Flavia B. Clark (b. 23 Dec. 1836, d. 5 Dec. 1882), daughter Grace C., b. 14 Mar. 1869. Lane Genealogies Vol. 1 (1891), p. 48 (compilation tier; PDF page index in sourceRefs may differ from printed page).",
       "generation": 0,
-      "gender": "U",
+      "gender": "M",
       "lastName": "Lane",
-      "birthYear": 1839,
-      "deathYear": 1869,
-      "birthDate": "12 Dec,1839",
-      "deathDate": "2 July,1841",
-      "born": "Rev.C.J",
+      "birthYear": 1815,
+      "deathYear": "",
+      "birthDate": "",
+      "deathDate": "",
+      "born": "Akron, Ohio",
       "deathPlace": "",
       "burial": "",
       "locations": [
-        "Rev.C.J",
-        "Oberlin College",
-        "Caleband Anna Pitkin",
-        "Akron",
-        "Vandalia"
+        "Akron, Ohio",
+        "Chicago, Illinois",
+        "Oak Park, Illinois",
+        "North Bloomfield, Ohio"
       ],
       "sourceRefs": [
         {
@@ -161657,33 +161436,33 @@
           "rawText": "No.34.SAMUELA.LANE^(Comfort^,Gad^,Sam.»,Sam.^,Sam.2),181 5 ,andhisw.PAULINAPOTTER,hadb.in Akron,O. : I.Sarah Maria^,b.12 Dec,1839,d.2 July,1841.II.Julius Sherman^,b.19 Nov.,1841,mechanicalengineerandsuperintendentofamanufacturingcompanyof Chicago,111.Hem.21 Aug.,1867,Julia Eliz.(dau.of Rev.C.J.and Eliz.Bancroft)Pitkin,*b.at North Bloomfield,Trumbul Co.,O.,8 Sept.,1845.Res.at Oak Park,III,1890.Ch. : 1.Henry Mat-(]uette>,h.at Ishpeming,Marque Ue Co.,Mich.,14 May,1 S 68,isof Perdue University,Lafayette,Ind.2.Pauline Elizabeth^,b.at Akron,O.,20 Nov.,1869,of Oberlin College,O.3.Frank Pitkin^,b.19 Aug.,1871.4.Albert Alanson^,b.22 Sept.,1873.5.Florence Maria^,b.3 Dec,1876.6.George Comfort'^,b.28 Oct.,18 S 4.III.Henry Lorenzo*^,b.25 Aug.,1843,d.5 Jan.,1849.IV.William Alanson\"^,b.14 Dec,1845,d-5 J^i^-?1849-\"Rev.C.J.Pitkin(s.of Caleband Anna Pitkin),b.at Milford,Ct.,4 Dec,1812,andd.in Vandalia,III,19 May,18 S 7.Hem.Elizabeth Bancroftof Granville,O.Hegraduatedat Western Res.Collegein 1836,Theological Seminaryin 1839.Hewassettledpastorofthe Presbyterian Churchat North Bloomtield,O.,fourteenyears.In 1856 heremovedto Winchester,111.;hepreachedat Troy,Vandaliaand Cerro Gordo,111.Theyhadtenchildrenofwhomfivehvedtomarry.1.Julia E.,b.8 Sept.,1845,m.Julius S.Lane.2.Thomasi V.,b.10 x\\pr.,1852,m.Anna L.Mc Cord.3.Albert,J.,b.22 Mar.,1854,m.Carrie M?(sisterof Julius S.)Lane.4.Willie G.,b.26 May,1856,m.Myi-a D.Seward.5.Stephen II.,b.26 Oct.,1864,m.Ada M.Maltby.By(2)w.Flavia B.Clark,b.23 Dec,1836,d.5 Dec,18 S 2,hehad:6.Grace C,b.14 Mar.,1869.",
           "bio": {
             "occupation": [],
-            "military": [
-              ",1841,mechanicalengineerandsuperintendentofamanufacturingcompanyof Chicago,111"
-            ],
+            "military": [],
             "education": [
-              "^,b.at Akron,O.,20 Nov.,1869,of Oberlin College,O.3.Frank Pitkin^,b.19 Aug.,1871.4.Albert Alanson^,b.22 Sep",
-              ".Hem.Elizabeth Bancroftof Granville,O.Hegraduatedat Western Res.Collegein 1836,Theological Seminaryin 1839.He"
+              "Western Reserve College 1836; Theological Seminary 1839 (Rev. C. J. Pitkin footnote in OCR column)."
             ],
-            "childrenNote": null,
-            "placeHints": [],
+            "childrenNote": "Four named children of Samuel A. and Paulina; Pitkin footnote lists Rev. C. J. Pitkin’s additional children (separate family).",
+            "placeHints": [
+              {
+                "text": "Akron, Ohio",
+                "role": "other",
+                "scope": "primary"
+              }
+            ],
             "locationsExtra": [
-              "Rev.C.J",
-              "Oberlin College",
-              "Caleband Anna Pitkin",
-              "Akron",
-              "Vandalia"
+              "Akron, Ohio",
+              "Chicago, Illinois",
+              "Granville, Ohio",
+              "North Bloomfield, Ohio"
             ],
-            "birthDateText": "12 Dec,1839",
-            "deathYear": 1869,
-            "deathDateText": "2 July,1841",
+            "birthDateText": "1815 (header; OCR merged first child dates into KPI)",
+            "deathYear": null,
+            "deathDateText": null,
             "deathPlaceHints": [],
             "burialHints": [],
             "marriageSnippets": [
-              "Julius S",
-              "Anna L",
-              "Carrie M?(sisterof Julius S",
-              "Myi-a D",
-              "Ada M"
+              "Paulina Potter",
+              "Julia Eliz. Pitkin",
+              "Julius S. Lane"
             ]
           },
           "titles": []
@@ -161693,31 +161472,13 @@
         "source": "lanegenealogies01chap.pdf",
         "parser": "parse_lane_pdf.py",
         "ocrFacts": {
-          "military": [
-            ",1841,mechanicalengineerandsuperintendentofamanufacturingcompanyof Chicago,111"
-          ],
-          "education": [
-            "^,b.at Akron,O.,20 Nov.,1869,of Oberlin College,O.3.Frank Pitkin^,b.19 Aug.,1871.4.Albert Alanson^,b.22 Sep",
-            ".Hem.Elizabeth Bancroftof Granville,O.Hegraduatedat Western Res.Collegein 1836,Theological Seminaryin 1839.He"
-          ],
+          "note": "OCR merged Sarah Maria vital dates onto Samuel row; mechanical engineer line applies to son Julius Sherman, not military service.",
           "marriageSnippets": [
-            "Julius S",
-            "Anna L",
-            "Carrie M?(sisterof Julius S",
-            "Myi-a D",
-            "Ada M"
+            "Paulina Potter",
+            "Julia Eliz. Pitkin"
           ]
         }
-      },
-      "occupation": [
-        {
-          "service": [
-            {
-              "text": ",1841,mechanicalengineerandsuperintendentofamanufacturingcompanyof Chicago,111"
-            }
-          ]
-        }
-      ]
+      }
     },
     {
       "name": "Paulinapotter",
