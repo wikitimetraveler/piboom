@@ -12,8 +12,7 @@
     { href: '/family/lane-pdf-gallery.html', label: 'Plates' },
     { href: '/family/genealogy.html', label: 'Tree' },
     { href: '/family/lane-direct-ancestor-story.html', label: 'Line' },
-    { href: '/family/genealogy-import.html', label: 'Import' },
-    { href: '/family/family-tree.html', label: 'Canvas' }
+    { href: '/family/genealogy-import.html', label: 'Import' }
   ];
 
   function normalizePath(p) {
