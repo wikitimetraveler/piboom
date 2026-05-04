@@ -22,7 +22,7 @@
       <p class="lf-hero-kicker">DevConnect Labs</p>
       <h1 class="lf-hero-title">Lane Family</h1>
       <p class="lf-hero-lede">
-        A single place to open the tree, exhibits, and reference tools—spaced for reading, not scrolling through noise.
+        A single place for Lane exhibits and book-backed tools—spaced for reading, not scrolling through noise.
       </p>
       <p class="lf-hero-chrono">
         Roughly <strong>1600s–1900s</strong> New England lives, grounded in the <em>Lane Genealogies</em> (1891) and later archives—not a general U.S. history site, but a lane through the record.
@@ -40,7 +40,7 @@
       </div>
       <p class="lf-reading-order">
         <span class="lf-reading-order__label">Suggested path</span>
-        Tree or <a href="/family/lane-memorial-wall.html">Memorial</a> for names and dates, then <a href="/family/lane-museum.html">Museum</a> for narrative, <a href="/family/lane-war-history.html">War</a> or <a href="/family/lane-occupations.html">Occupations</a> for themed views, <a href="/family/lane-pdf-gallery.html">Plates</a> for provenance.
+        <a href="/family/lane-memorial-wall.html">Memorial</a> for names and dates, then <a href="/family/lane-museum.html">Museum</a> (teaser) or <a href="/family/lane-historians.html">Historians</a> for compilers, <a href="/family/lane-war-history.html">War</a> or <a href="/family/lane-occupations.html">Occupations</a> for themed views, <a href="/family/lane-pdf-gallery.html">Plates</a> for provenance.
       </p>
       <p class="lf-source-note">
         <span class="lf-source-label">Primary data source</span>
@@ -59,8 +59,23 @@
         <p class="lf-ai-panel__lede">
           Ask about the 1891 book, New England context, and where to look on this site.
           <a href="/family/lane-book-sayings.html" class="d-inline-block mt-1">All curated book sayings &amp; attributions</a> (full list with PDF page refs).
-          <span class="lf-ai-panel__disclaimer">AI gives context, not proof—verify people and dates in the tree and primary sources.</span>
+          <span class="lf-ai-panel__disclaimer">AI gives context, not proof—verify people and dates on the memorial wall, in the book plates, and against primary sources.</span>
         </p>
+        <p class="lf-ai-suggestions-label small text-muted mb-1">Suggested prompts</p>
+        <div id="lfAiSuggestedPrompts" class="lf-ai-suggestions mb-3" role="group" aria-label="Suggested prompts for Lane guide">
+          <button type="button" class="lf-ai-prompt-chip" data-lf-ai-prompt="Who compiled Lane Genealogies, Volume I (1891), and how did the work pass from early Hampton-area deacons (Jeremiah Lane, Samuel Lane) through Deacon E. J. Lane and Rev. James P. Lane to the Hampton monument publishing committee—George W. Lane, Rev. John W. Lane, Dr. Edward B. Lane, Rev. James H. Fitts, Rev. Jacob Chapman—and on to Chapman and Fitts finishing the printed volume with John Templeton in Exeter (1891)? Where on this site should I open next for historians and compilers?">
+            Compilers &amp; 1891 book lineage
+          </button>
+          <button type="button" class="lf-ai-prompt-chip" data-lf-ai-prompt="How do the Memorial wall, Lane Museum, and book plates gallery relate for researching one person?">
+            Wall, museum, and plates
+          </button>
+          <button type="button" class="lf-ai-prompt-chip" data-lf-ai-prompt="Where do I open the scanned opening plate with the committee portraits (Rev. John Wm. Lane, Fitts, Geo. W. Lane, Dr. Edward B. Lane)—and how does that relate to Lane Historians and plate id p4-i0?">
+            Frontispiece plate (p4-i0)
+          </button>
+          <button type="button" class="lf-ai-prompt-chip" data-lf-ai-prompt="What are the four per-face JPEG crops from plate p4-i0, how do gallery URLs use ?portrait= (john-wm-lane, jas-h-fitts, geo-w-lane, dr-edwd-b-lane), and how do Lane Historians anchors (#lh-portrait-…) line up with those links?">
+            Historians portrait crops &amp; deep links
+          </button>
+        </div>
         <div class="lf-ai-form">
           <label class="sr-only" for="lfAiInput">Message to Lane guide</label>
           <textarea
@@ -84,7 +99,7 @@
       <div class="lf-dock" id="lfDock">
         <a href="#explore">Explore</a>
         <a href="#history">History</a>
-        <a href="#reference">Reference</a>
+        <a href="#sources">Sources</a>
         <a href="#tools">Tools</a>
       </div>
     </nav>
@@ -92,7 +107,7 @@
     <section id="explore" class="lf-section">
       <header class="lf-section-head">
         <p class="lf-section-label">Explore</p>
-        <h2 class="lf-section-title">Tree &amp; stories</h2>
+        <h2 class="lf-section-title">Stories &amp; exhibits</h2>
       </header>
       <div class="lf-grid lf-grid--triple">
         <a class="lf-card" href="/family/lane-museum.html">
@@ -137,12 +152,18 @@
       </div>
     </section>
 
-    <section id="reference" class="lf-section">
+    <section id="sources" class="lf-section">
       <header class="lf-section-head">
-        <p class="lf-section-label">Reference</p>
-        <h2 class="lf-section-title">Sources &amp; work</h2>
+        <p class="lf-section-label">Sources</p>
+        <h2 class="lf-section-title">Book &amp; plates</h2>
       </header>
       <div class="lf-grid lf-grid--triple">
+        <a class="lf-card" href="/family/lane-historians.html">
+          <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-journal-richtext"></i></span>
+          <h3 class="lf-card-title">Historians</h3>
+          <p class="lf-card-desc">Who carried Volume I (1891) into print? Committee portraits, title page, timeline, and Chapman’s preface—plus room for modern record-keepers.</p>
+          <span class="lf-card-arrow">Open</span>
+        </a>
         <a class="lf-card" href="/family/lane-book-sayings.html">
           <span class="lf-card-icon" aria-hidden="true"><i class="bi bi-quote"></i></span>
           <h3 class="lf-card-title">Book sayings</h3>
@@ -179,14 +200,8 @@
       </div>
     </section>
 
-    <p class="lf-also-line">
-      <a href="/family/genealogy.html">Interactive tree &amp; musical timeline</a> — search, open profiles, D3 graph, 17th–20th c. tags.
-    </p>
-
     <p class="lf-footer-note">
       <a href="/">DevConnect Labs home</a>
-      ·
-      <a href="/family/genealogy.html">Interactive tree</a>
     </p>
   </main>
 

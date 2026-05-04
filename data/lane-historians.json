@@ -1,0 +1,122 @@
+{
+  "version": 2,
+  "title": "Lane historians & compilers",
+  "subtitle": "Honoring those who carried Lane Genealogies, Volume I (1891) into print—and the longer line of record-keeping before them.",
+  "heroImageUrl": "/family/assets/lane-historians/frontispiece-title-1891.png",
+  "heroImageAlt": "Lane Genealogies title spread and reference imagery (thumbnail context beside the scanned book).",
+  "heroCaption": "Hero: Greenshot-style title reference. The four committee portraits below are cropped from scanned plate p4-i0 (same opening as PDF page 4). Full plate opens in the book gallery via deep link (?plate=p4-i0).",
+  "galleryFullPlateHref": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4",
+  "publication": {
+    "volumeTitle": "Lane Genealogies. Volume I.",
+    "subjectLines": [
+      "William Lane of Boston, Mass., 1648",
+      "Including records of Edmund J. Lane and James P. Lane",
+      "Capt. John Lane of York County, Maine, 1693; Capt. John Lane of Fishersfield, N.H., 1737"
+    ],
+    "authors": "By Rev. Jacob Chapman, and Rev. James H. Fitts.",
+    "imprint": "Exeter, N.H.: Printed by John Templeton, The News-Letter Press. 1891."
+  },
+  "figures": [
+    {
+      "slug": "john-wm-lane",
+      "displayName": "Rev. John Wm. Lane",
+      "role": "Frontispiece portrait; Hampton monument publishing committee (per preface).",
+      "bookNote": "North Hadley, Mass., in committee roster as given in the dedication narrative.",
+      "portraitUrl": "/family/assets/lane-historians/portrait-john-wm-lane.jpg",
+      "galleryHref": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4&portrait=john-wm-lane"
+    },
+    {
+      "slug": "jas-h-fitts",
+      "displayName": "Rev. James H. Fitts",
+      "role": "Frontispiece portrait; named co-author on title page; antiquarian research for Candia and Chester Lane lines.",
+      "bookNote": "South Newmarket, N.H., in committee roster; Chapman credits his accurate writing.",
+      "portraitUrl": "/family/assets/lane-historians/portrait-jas-h-fitts.jpg",
+      "galleryHref": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4&portrait=jas-h-fitts"
+    },
+    {
+      "slug": "geo-w-lane",
+      "displayName": "Geo. W. Lane, Esq.",
+      "role": "Frontispiece portrait; committee member for resuming the compiled work.",
+      "bookNote": "Salem, Mass., in preface roster at the Hampton monument meeting.",
+      "portraitUrl": "/family/assets/lane-historians/portrait-geo-w-lane.jpg",
+      "galleryHref": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4&portrait=geo-w-lane"
+    },
+    {
+      "slug": "dr-edwd-b-lane",
+      "displayName": "Dr. Edward B. Lane",
+      "role": "Frontispiece portrait; committee member.",
+      "bookNote": "Roxbury, Mass., in preface roster.",
+      "portraitUrl": "/family/assets/lane-historians/portrait-dr-edwd-b-lane.jpg",
+      "galleryHref": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4&portrait=dr-edwd-b-lane"
+    },
+    {
+      "slug": "jacob-chapman",
+      "displayName": "Rev. Jacob Chapman",
+      "role": "Named author; completed the volume from prior manuscripts; signed the preface.",
+      "bookNote": "Exeter, N.H.; acknowledges manuscripts of Deacon E. J. Lane and Rev. James P. Lane placed in his hands.",
+      "galleryHref": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4"
+    },
+    {
+      "slug": "james-p-lane",
+      "displayName": "Rev. James P. Lane",
+      "role": "Prior compiler (d. Jan. 1889); NEHGR and pamphlet publications; manuscripts passed to Chapman.",
+      "bookNote": "Twenty years of gathering; pulpit duties and health ended his editorship before completion.",
+      "galleryHref": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4"
+    }
+  ],
+  "timeline": [
+    {
+      "yearLabel": "c. 1765",
+      "summary": "Deacon Jeremiah Lane of Hampton Falls prepared a genealogical chart for his branch; brother Deacon Samuel Lane of Stratham left a diary with valuable family notes."
+    },
+    {
+      "yearLabel": "1839 onward",
+      "summary": "Deacon E. J. Lane of Dover resumed earlier work, collecting for more than thirty years until age and health forced him to stop short of a finished volume."
+    },
+    {
+      "yearLabel": "1869–1889",
+      "summary": "Rev. James P. Lane took up the task, publishing some results in the New England Historic Genealogical Register (e.g. 1873 abstract) and pamphlets; he died January 1889 with the work unfinished."
+    },
+    {
+      "yearLabel": "Hampton monument meeting",
+      "summary": "At dedication of the granite monument to William Lane in Hampton, a committee was chosen to gather fragments and complete a portable monument—the printed genealogy—including George W. Lane, Rev. John W. Lane, Dr. Edward B. Lane, Rev. James H. Fitts, and Rev. Jacob Chapman."
+    },
+    {
+      "yearLabel": "1891",
+      "summary": "Volume I printed at Exeter by John Templeton; Chapman and Fitts credited as authors; manuscript of Deacon E. J. Lane and Rev. James P. Lane incorporated and enlarged."
+    }
+  ],
+  "prefaceLeadParagraphs": [
+    "Few persons can have any adequate idea of the amount of labor which, during the last one hundred and twenty-five years, has been expended upon this Family History.",
+    "About 1765, Deacon Jeremiah Lane of Hampton Falls carefully prepared a genealogical chart, containing extensive records of that branch of the family with which he was connected. The diary of his brother, Deacon Samuel Lane of Stratham, contains much valuable information upon the family history.",
+    "In 1839 Deacon E. J. Lane of Dover, N. H., took up the work left by his grandfather and his great uncle. He visited many places, and with untiring perseverance continued, as he had opportunities, to collect records, for more than thirty years. At length his advanced age, and impaired health compelled him, with deep regret, to relinquish the idea of completing the volume as he had designed.",
+    "It was then placed in the hands of Rev. James P. Lane, who in 1869 entered upon it with great interest, and for more than twenty years continued, at much expense, collecting records of different Lane families in New England. Some of the valuable results of his labors were published in the New England Historic Genealogical Register for 1888, and in pamphlets published at different times. But his professional duties in his pulpit and in his parish, and his failing health, compelled him to leave the work unfinished at his death, in January, 1889."
+  ],
+  "prefaceMoreParagraphs": [
+    "In April, 1873, Deacon Lane furnished for the N. E. Historical Genealogical Register an abstract of the descendants of William Lane, his ancestor, for four generations, covering five pages.",
+    "At the family meeting for the dedication of the granite monument in Hampton, the home of their ancestor, William Lane, and the birthplace of many of his descendants, George W. Lane of Salem, Mass., Rev. John W. Lane of North Hadley, Mass., Dr. Edward B. Lane of Roxbury, Mass., Rev. James H. Fitts of South Newmarket, N. H., and Rev. Jacob Chapman of Exeter, N. H., were chosen a committee to resume the work commenced so long ago, to gather up the fragments of our family history, that nothing be lost, to complete another monument of different material, a portable and a permanent monument, that every one who values the Lane blood in his veins may know whence it came, and be able to derive some moral and spiritual help from the examples of good men who being dead yet speak to all who value the lessons of the past, and are able to profit by the experience of those who have gone before us.",
+    "We wish to preserve in our homes the records of our ancestors, not that we may worship their manes, but that we may cherish in our hearts any valuable traits we have inherited from them, and avoid, if possible, any of the faults and follies into which they may have fallen.",
+    "Nearly two years ago, the manuscript of Deacon E. J. Lane and Rev. James P. Lane were placed in my hands; and the best part of my time since, has been spent in correcting and confirming these, and in enlarging the work by adding many families unknown to these writers. In this important and somewhat perplexing work I have had the valuable assistance of Rev. James H. Fitts, by his antiquarian researches well known as a careful student and an accurate writer, to whom we are indebted for the records of the Candia family with which he is connected, and the Chester family, descended from John Lane, who removed from Rye and settled in that place.",
+    "It was our intention to include in this volume the descendants of William Lane of Dorchester, Mass., of Job and James Lane of Malden and others of the name; but the manuscript grew to such a size that it was decided to make two volumes. This first to include the family of William of Boston, John of York and John of Fishersfield, N. H., leaving the records of the other families in the hands of Mr. Fitts to be completed at some future period.",
+    "We are indebted to many for aid in preparing this volume: Rev. M. T. Runnels, in the History of Sanbornton; B. Chase in the History of Chester; Levi E. Lane of Hampton Falls, who inherits some of the talents of his ancestor, Deacon Jeremiah Lane; the late Joseph Cram of Deerfield; J. J. Lane of West Epping and others whose names and assistance are mentioned in the following pages.",
+    "Since many have so long anxiously waited for this volume, three members of the committee, (the first two and last) have assumed the pecuniary responsibility of publishing it. They believe many more of the family will order copies of it, when it is ready for delivery and will recommend it to others, who ought to know whence they came as well as whither they are going. They ask no donations; but that persons connected with the family, will aid in circulating a volume, the sales of which will never return one half of the cost of preparing and publishing it. The number of copies is limited, and there will be no second edition. When those who may have ordered the volume are supplied, it is expected that the price will be higher.",
+    "Like my departed friends who commenced and continued this work so long, I have given my labor without expecting any compensation but the satisfaction of perpetuating the memory of good men, most of whom have gone to their reward, and the hope that the examples here exhibited may aid many in future generations to prove themselves worthy descendants of an honored ancestry. It has seemed, however, necessary to give a few specimens of Lane character, in the sketches of Dea. E. J. Lane, his father, Jabez, and several others, that the readers may be aided in obtaining a correct view of some family characteristics, that have descended from early generations, that perhaps have induced so many churches and societies to elect their deacons and treasurers from the Lane family. One of them who was very tall, is said to have spoken of himself as \"The long Lane that has no turning.\" But usually they have been slow to speak of themselves, and have left their works to praise them.",
+    "— Jacob Chapman (preface; book page context as in Vol. I)."
+  ],
+  "externalLinks": [
+    {
+      "label": "Lane Genealogies, Vol. I (1891) — Internet Archive",
+      "url": "https://archive.org/details/lanegenealogies01chap",
+      "kind": "book"
+    },
+    {
+      "label": "NH Historical Society — Lane family papers, 1727–1924",
+      "url": "https://www.nhhistory.org/object/272904/lane-family-papers-1727-1924",
+      "kind": "archive"
+    }
+  ],
+  "illustrationsIndexNote": "The book's \"Illustrations in Lane Genealogy\" index maps display names to book page numbers in data/lane-illustrations-index.json (e.g. Rev. Jn. W. Lane, Rev. Jas. H. Fitts, Geo. W. Lane, Dr. Edw. B. Lane, Rev. Jas. P. Lane, Jacob Chapman).",
+  "modernHistorians": [],
+  "modernHistoriansPlaceholder": "Later: add family members and researchers who carry the record forward on this site—imports, OCR review, exhibits, and curation—using the modernHistorians array in this JSON file (same shape as figures: displayName, role, bio, optional image, links).",
+  "notes": "OCR-style slips in older scans (e.g. hiin/him) were normalized in this excerpt where obvious; verify wording against the Internet Archive facsimile. Per-face JPEGs are regenerated with npm run extract:lane-frontispiece-portraits (edit CROPS in scripts/tools/extract-lane-frontispiece-portraits.mjs if the PDF extract changes)."
+}

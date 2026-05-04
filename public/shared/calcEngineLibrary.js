@@ -161,6 +161,49 @@
       else if (hist12mo === 'No') msgs.push('Most recent 12-month account history is required');
 
       return msgs.join(' | ') || '';
+    },
+
+    /**
+     * GSE scenario support (Fannie/Freddie research tool): LTV% from loan amount and purchase price.
+     * @param {number[]} values [loanAmount, purchasePrice]
+     */
+    gseLtvPercent(values = []) {
+      const loan = toNumber(values[0]);
+      const price = toNumber(values[1]);
+      if (price <= 0) return 0;
+      return round2((loan / price) * 100);
+    },
+
+    /**
+     * Compare loan amount to one conforming limit for the subject unit count (FHFA / county).
+     * @param {number[]} values [loanAmount, conformingLimit]
+     * @returns {'within-limit'|'above-limit'|'unknown'}
+     */
+    gseConformingBand(values = []) {
+      const loan = toNumber(values[0]);
+      const limit = toNumber(values[1]);
+      if (!(limit > 0)) return 'unknown';
+      return loan <= limit ? 'within-limit' : 'above-limit';
+    },
+
+    /**
+     * Coarse risk tier for UI coloring only (not underwriting).
+     * @param {number[]} values [dti, reservesMonths, ltv]
+     */
+    gseScenarioRiskLevel(values = []) {
+      const dti = toNumber(values[0]);
+      const reserves = toNumber(values[1]);
+      const ltv = toNumber(values[2]);
+      let pts = 0;
+      if (dti >= 45) pts += 2;
+      else if (dti >= 40) pts += 1;
+      if (reserves < 2) pts += 2;
+      else if (reserves < 4) pts += 1;
+      if (ltv > 95) pts += 2;
+      else if (ltv > 90) pts += 1;
+      if (pts >= 4) return 'high';
+      if (pts >= 2) return 'medium';
+      return 'low';
     }
   };
 

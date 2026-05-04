@@ -30,6 +30,11 @@ const CAMPAIGN_CONTEXT = {
         'Local correspondence shows frontier officers and inhabitants navigating livestock damage claims and militia conduct.'
     },
     {
+      year: 1724,
+      event:
+        'Father Rale’s War / Dummer’s War era: Norridgewock and upper Kennebec operations appear in standard Maine–New Hampshire frontier histories (context only).'
+    },
+    {
       year: 1763,
       event:
         'Earlier provincial frontier militia service overlaps this broad administrative window; interpret dates carefully.'
@@ -37,6 +42,11 @@ const CAMPAIGN_CONTEXT = {
   ],
   'king-philips-war': [
     { year: 1675, event: "War begins after escalating conflict in New England." },
+    {
+      year: 1675,
+      event:
+        'Late 1675: Great Swamp Fight and Connecticut Valley raids typify escalation in many general histories (geography on map pins is context only).'
+    },
     { year: 1676, event: 'Colonial militias and Native forces clash across frontier towns.' },
     { year: 1676, event: 'Women and families face displacement, supply burdens, captivity, and emergency care roles in frontier settlements.' },
     { year: 1678, event: 'Regional fighting declines; long-term demographic impacts remain.' }
@@ -44,20 +54,45 @@ const CAMPAIGN_CONTEXT = {
   'revolutionary-war': [
     { year: 1775, event: 'Lexington and Concord open the war in Massachusetts.' },
     { year: 1776, event: 'Independence declared; militia and continental forces expand.' },
+    {
+      year: 1777,
+      event:
+        'Northern theater: Bennington (August) and the Saratoga campaign strain British northern supply in standard U.S. histories; French alliance follows Saratoga in textbook chronology.'
+    },
     { year: 1778, event: 'Women sustain wartime economies, travel with camps in support roles, and preserve community records.' },
     { year: 1783, event: 'Treaty of Paris formally ends the war.' }
   ],
   'french-and-indian-war': [
     { year: 1754, event: 'Imperial rivalry expands into North American frontier campaigns.' },
+    {
+      year: 1755,
+      event:
+        'Lake George and Monongahela fighting illustrate British regulars and provincials learning frontier warfare at high cost (general histories).'
+    },
     { year: 1755, event: 'Fort and supply routes shape local militia service and risks.' },
     { year: 1758, event: 'Families absorb labor and provisioning burdens during long mobilizations.' },
+    {
+      year: 1759,
+      event:
+        'Quebec campaign: Wolfe–Montcalm climax on the St. Lawrence often marks the strategic hinge year in Seven Years’ War North American narratives.'
+    },
     { year: 1763, event: 'Treaty settlements reshape control and migration pressures.' }
   ],
   'war-of-1812': [
     { year: 1812, event: 'War declared between the United States and Britain.' },
     { year: 1813, event: 'Regional militia and regular units guard coasts and frontiers.' },
+    {
+      year: 1814,
+      event:
+        'Chesapeake campaigns (e.g. defense narratives around Baltimore) and Great Lakes fighting dominate many commemorative accounts.'
+    },
     { year: 1814, event: 'Supply, transport, and communication networks become decisive.' },
-    { year: 1815, event: 'Treaty of Ghent ends formal hostilities.' }
+    { year: 1815, event: 'Treaty of Ghent ends formal hostilities.' },
+    {
+      year: 1815,
+      event:
+        'New Orleans battle (January) occurs after the treaty in transatlantic mail time—common chronology teaching point in general U.S. histories.'
+    }
   ],
   'mexican-american-war': [
     { year: 1846, event: 'War opens across Texas, northern Mexico, and Pacific routes.' },
@@ -98,6 +133,50 @@ function esc(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+/** Strip simple **bold** from catalog strings so we never inject HTML. */
+function stripInlineMdBold(value) {
+  return String(value ?? '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*\*/g, '');
+}
+
+/**
+ * @param {object} b battle row
+ * @param {{ mapPopup?: boolean }} [opts]
+ */
+function battleLaneBookNoteHtml(b, opts = {}) {
+  if (!b || !b.laneBookNote) return '';
+  const text = stripInlineMdBold(b.laneBookNote).trim();
+  if (!text) return '';
+  const mod = opts.mapPopup ? ' battle-lane-book-note--mapPopup' : '';
+  return `<div class="battle-lane-book-note small mt-1 mb-1${mod}"><strong>Lane book (verify separately):</strong> ${esc(text)}</div>`;
+}
+
+/**
+ * @param {object} b battle row
+ * @param {{ mapPopup?: boolean }} [opts]
+ */
+function battleExternalLinksHtml(b, opts = {}) {
+  const raw = Array.isArray(b?.externalLinks) ? b.externalLinks : [];
+  const safe = raw.filter(
+    (x) =>
+      x &&
+      typeof x.label === 'string' &&
+      typeof x.url === 'string' &&
+      /^https:\/\//i.test(String(x.url).trim())
+  );
+  if (!safe.length) return '';
+  const items = safe
+    .map((l) => {
+      const href = String(l.url).trim();
+      const label = String(l.label).trim();
+      return `<li><a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a></li>`;
+    })
+    .join('');
+  const mod = opts.mapPopup ? ' battle-external-links--mapPopup' : '';
+  return `<div class="battle-external-links small mt-1${mod}"><span class="battle-external-links__label text-muted">Further reading (general history):</span><ul class="battle-external-links__list mb-0 pl-3">${items}</ul></div>`;
 }
 
 async function getJson(url) {
@@ -268,6 +347,8 @@ function renderBattleSidebarList() {
           <strong class="battle-pin-title">${esc(b.title)}</strong>
           <span class="text-muted small d-block">${esc(b.approxWhen || '')}</span>
           <span class="small d-block">${esc(b.summary || '')}</span>
+          ${battleLaneBookNoteHtml(b)}
+          ${battleExternalLinksHtml(b)}
         </li>`
         )
         .join('')}
@@ -401,6 +482,8 @@ function renderBattleMapMarkers() {
           <small class="text-muted">${esc(b.approxWhen || '')}</small>
           <p class="small mt-1 mb-1">${esc(b.summary || '')}</p>
           ${bell}
+          ${battleLaneBookNoteHtml(b, { mapPopup: true })}
+          ${battleExternalLinksHtml(b, { mapPopup: true })}
           <p class="small text-muted mb-0 mt-1"><em>Context only — not proof any Lane ancestor fought here.</em></p>
         </div>`
     });

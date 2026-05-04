@@ -88,4 +88,47 @@ describe('genealogy war participant matching', () => {
     expect(Array.isArray(report.conflicts)).toBe(true);
     expect(Array.isArray(report.suspiciousUnmatched)).toBe(true);
   });
+
+  test('OCR fold thc→the before revolution anchor detection', () => {
+    expect(__test__.ocrFoldMilitaryHaystack('army of thc Revolution')).toContain('the Revolution');
+    const sig = __test__.summarizeMilitarySignal({
+      id: 1,
+      name: 'X',
+      birthYear: 1734,
+      text: 'lieutenant in the army of thc Revolution',
+      occupation: [],
+      importMeta: {}
+    });
+    expect(__test__.hasRevolutionaryEraAnchorInEvidence(sig)).toBe(true);
+  });
+
+  test('War of 1812 digit keyword requires word boundary (1813 is not 1812)', () => {
+    const w1812 = __test__.WAR_DEFINITIONS['war-of-1812'];
+    expect(__test__.hasKeyword('d. 27 Feb., 1813, ae. 79', w1812.keywords)).toBe(false);
+    expect(__test__.hasKeyword('enlisted in 1812 under Hull', w1812.keywords)).toBe(true);
+  });
+
+  test('Prescott spouse paragraph: Revolutionary family-associated; no French and Indian inference', () => {
+    const fiw = __test__.WAR_DEFINITIONS['french-and-indian-war'];
+    const rev = __test__.WAR_DEFINITIONS['revolutionary-war'];
+    const kp = __test__.WAR_DEFINITIONS['king-philips-war'];
+    const w1812 = __test__.WAR_DEFINITIONS['war-of-1812'];
+    const person = {
+      id: 201001,
+      name: 'Mary Lane',
+      birthYear: 1734,
+      deathYear: '',
+      text:
+        "V. MARy 4, b. 6 Dec., 1734, m. 1 Jan., I 756, CAPTAIN JAMEs (s. of Eben and Abi.) PREsco TT of Hampton Falls, b. 5 Dec. 1733. He was selectman for years, a lieutenant in the army of thc Revolution; resided on the homc place, and d. 27 Feb., 1813, ae. 79.",
+      occupation: [],
+      importMeta: {}
+    };
+    expect(__test__.scoreWarMatch(person, fiw)).toBeNull();
+    expect(__test__.scoreWarMatch(person, kp)).toBeNull();
+    expect(__test__.scoreWarMatch(person, w1812)).toBeNull();
+    const scoredRev = __test__.scoreWarMatch(person, rev);
+    expect(scoredRev).toBeTruthy();
+    expect(scoredRev.associationType).toBe('family-associated');
+    expect(scoredRev.associationNotes.join(' ')).toMatch(/spouse or in-law/i);
+  });
 });

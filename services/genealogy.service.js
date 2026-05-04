@@ -266,6 +266,7 @@ const CONFLICT_DEFINITIONS = [
     years: [1775, 1783],
     keywords: [
       'revolutionary',
+      'revolution',
       'revolutionary war',
       'the revolution',
       'continental',
@@ -411,8 +412,18 @@ const DEFAULT_MUSEUM_CONTENT = {
     promptChips: [
       'Who was William E Lane of Boston, and why is he the opening figure?',
       'Show the next major Lane events in chronological order.',
-      'Connect this exhibit to wider American history.'
+      'Connect this exhibit to wider American history.',
+      'Who compiled Lane Genealogies Vol. I (1891)—Chapman and Fitts, the Hampton monument committee, and manuscripts left by Rev. James P. Lane—and where does this site summarize that lineage?',
+      'Where is plate p4-i0 in the book plates gallery, and what are the historian portrait deep links?'
     ]
+  },
+  historiansTeaser: {
+    title: 'Honoring the compilers',
+    lede:
+      'Volume I (1891) was generations in the making—from Hampton-area deacon charts through Dover collectors, Rev. James P. Lanes manuscripts, and the Hampton monument publishing committee. Read the frontispiece, title page, timeline, and Chapmans preface on a dedicated page.',
+    href: '/family/lane-historians.html',
+    ctaLabel: 'Open Lane Historians',
+    imageUrl: '/family/assets/lane-historians/frontispiece-title-1891.png'
   },
   /** Optional: Lane lunar crater “observatory” panel (see lane-museum-content.json). */
   lunarExhibit: null
@@ -457,6 +468,18 @@ function normalizeLoose(value = '') {
   return String(value).toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
+/** Common OCR fold for military snippets before keyword tests. */
+function ocrFoldMilitaryHaystack(value = '') {
+  return String(value ?? '').replace(/\bthc\b/gi, 'the');
+}
+
+function hasRevolutionaryEraAnchorInEvidence(militarySignal) {
+  const lines = militarySignal?.evidence;
+  if (!Array.isArray(lines) || !lines.length) return false;
+  const j = lines.map((line) => ocrFoldMilitaryHaystack(line)).join(' ');
+  return /\b(revolution|revolutionary|continental)\b/i.test(j);
+}
+
 function compactUnique(values = []) {
   const out = [];
   const seen = new Set();
@@ -472,9 +495,21 @@ function compactUnique(values = []) {
 }
 
 function hasKeyword(haystack, keywords = []) {
-  const h = normalizeLoose(haystack);
+  const raw = ocrFoldMilitaryHaystack(haystack);
+  const h = normalizeLoose(raw);
   if (!h) return false;
-  return keywords.some((kw) => h.includes(normalizeLoose(kw)));
+  return keywords.some((kw) => {
+    const k = String(kw || '').trim();
+    if (!k) return false;
+    if (/^\d{3,4}$/.test(k)) {
+      try {
+        return new RegExp(`\\b${k}\\b`).test(raw);
+      } catch {
+        return false;
+      }
+    }
+    return h.includes(normalizeLoose(k));
+  });
 }
 
 function normalizeSpaces(value = '') {
@@ -691,11 +726,14 @@ function analyzeConflictMatch(node, warDef, militarySignal) {
   const birthYear = parseYearNumber(node.birthYear);
   const deathYear = parseYearNumber(node.deathYear);
   const yearSignal = yearsOverlapRange(birthYear, deathYear, warDef.years);
-  const inferredBySignalAndYears =
+  const inferredBySignalAndYearsRaw =
     !hasKeywordMatch &&
     militarySignal.hasMilitarySignal &&
     yearSignal &&
     plausibleAgeForWarInference(birthYear, deathYear, warDef.years);
+  const revAnchor = hasRevolutionaryEraAnchorInEvidence(militarySignal);
+  const inferredBySignalAndYears =
+    inferredBySignalAndYearsRaw && !(revAnchor && warDef.slug !== 'revolutionary-war');
   const textOnlyPlausible =
     !textOnly || plausibleAgeForWarInference(birthYear, deathYear, warDef.years);
 
@@ -736,13 +774,19 @@ function scoreWarMatch(node, warDef) {
   const associationType =
     !conflict.structured && familyAssociation.isFamilyAssociated ? 'family-associated' : 'service-member';
   const associatedPeople = associationType === 'family-associated' ? extractAssociatedServicePeople(node) : [];
-  const associationNotes =
+  let associationNotes =
     associationType === 'family-associated'
       ? [
           'War reference appears in spouse/cousin relationship text; included as family-associated record.',
           ...familyAssociation.snippets
         ].slice(0, 3)
       : [];
+  if (warDef.slug === 'revolutionary-war' && familyAssociation.isFamilyAssociated) {
+    associationNotes = [
+      'Service language may describe a spouse or in-law (by marriage); confirm which person held the commission.',
+      ...associationNotes
+    ].slice(0, 4);
+  }
 
   return {
     confidence,
@@ -979,7 +1023,10 @@ export const __test__ = {
   analyzeConflictMatch,
   scoreWarMatch,
   plausibleAgeForWarInference,
-  WAR_DEFINITIONS
+  WAR_DEFINITIONS,
+  ocrFoldMilitaryHaystack,
+  hasRevolutionaryEraAnchorInEvidence,
+  hasKeyword
 };
 
 function titleCaseWords(value = '') {

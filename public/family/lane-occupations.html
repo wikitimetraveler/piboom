@@ -23,6 +23,17 @@
       <p class="text-muted mb-0">
         Roles recorded on imported genealogy pages—grouped by job, with short historical notes and the individuals tagged with each occupation.
       </p>
+      <figure class="occ-jobs-figure mt-3 mb-0">
+        <img
+          src="/family/assets/was-he-an-idiot/OCCUPATION.png"
+          alt="Illustration of jobs and roles in the family"
+          loading="lazy"
+          decoding="async"
+        />
+        <figcaption class="small text-muted mt-2 mb-0">
+          A snapshot of our jobs—same spirit as the trades and callings listed below.
+        </figcaption>
+      </figure>
       <div id="occMeta" class="small text-muted mt-2"></div>
       <div id="occError" class="occ-error small mt-2"></div>
     </section>
@@ -45,11 +56,33 @@
     </section>
 
     <section class="occ-card occ-panel mt-3">
-      <a href="/family/genealogy.html" class="small mr-3"><i class="bi-arrow-left"></i> Back to Family Genealogy</a>
+      <a href="/family/lane-family.html" class="small mr-3"><i class="bi-arrow-left"></i> Back to Lane Family</a>
       <a href="/family/lane-war-history.html" class="small mr-3">Lane War History</a>
       <a href="/family/lane-memorial-wall.html" class="small">Lane Memorial Wall</a>
     </section>
   </main>
+
+  <div class="modal fade occ-person-modal" id="occPersonModal" tabindex="-1" role="dialog" aria-labelledby="occPersonModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-secondary bg-dark text-light">
+        <div class="modal-header border-secondary">
+          <h5 class="modal-title" id="occPersonModalTitle">Person</h5>
+          <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p id="occPersonModalYears" class="text-muted mb-2"></p>
+          <p class="small mb-3">
+            Open the memorial wall for photos, narratives, military notes, and linked plates when available.
+          </p>
+          <a id="occPersonModalWallBtn" class="btn btn-primary btn-sm" href="#">
+            <i class="bi bi-heart-fill" aria-hidden="true"></i> Open memorial wall
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="/shared/tts.js"></script>
   <script src="/family/js/lane-tts.js"></script>

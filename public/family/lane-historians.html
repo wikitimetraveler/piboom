@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lane Historians — DevConnect Labs</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-shell.css" />
+  <link rel="stylesheet" href="/family/css/lane-historians.css" />
+  <link rel="stylesheet" href="/family/css/lane-tts.css" />
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
+</head>
+<body class="lane-historians-page">
+  <modern-navbar></modern-navbar>
+  <main class="lane-historians-wrap" data-lane-tts-main>
+    <nav class="lane-historians-crumb" aria-label="Breadcrumb">
+      <a href="/family/lane-family.html">Lane Family hub</a>
+      <span aria-hidden="true"> · </span>
+      <a href="/family/lane-museum.html">Lane Museum</a>
+      <span aria-hidden="true"> · </span>
+      <span>Historians</span>
+    </nav>
+    <p class="small text-muted mb-2">
+      Continue in the <a href="/family/lane-museum.html">Museum</a> for exhibits, or ask the <a href="/family/lane-family.html#lfAiPanel">Lane guide</a> (suggested prompts include compilers).
+    </p>
+    <div id="historiansRoot" aria-live="polite">
+      <p class="text-muted small mb-0">Loading historians…</p>
+    </div>
+  </main>
+  <script src="/shared/tts.js"></script>
+  <script src="/family/js/lane-tts.js"></script>
+  <script src="/family/js/lane-historians.js" defer></script>
+</body>
+</html>

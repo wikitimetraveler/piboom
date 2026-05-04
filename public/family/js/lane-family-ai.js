@@ -45,15 +45,22 @@
     return p.map((chunk) => `<p class="lf-ai-para">${chunk.replace(/\n/g, '<br>')}</p>`).join('');
   }
 
-  async function send() {
+  function setSendingUi(disabled, btn) {
+    if (btn) btn.disabled = disabled;
+  }
+
+  /**
+   * @param {string} message
+   * @param {{ fromChip?: boolean }} [opts]
+   */
+  async function sendLaneGuide(message, opts) {
     const input = getEl('lfAiInput');
     const btn = getEl('lfAiSend');
-    if (!input || !btn) return;
-    const message = String(input.value || '').trim();
-    if (!message) return;
+    const trimmed = String(message || '').trim();
+    if (!trimmed) return;
 
-    btn.disabled = true;
-    setStatus('Asking the guide…');
+    setSendingUi(true, btn);
+    setStatus(opts?.fromChip ? 'Asking about compilers…' : 'Asking the guide…');
     setReply('', false);
 
     try {
@@ -61,9 +68,9 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message,
+          message: trimmed,
           history: history,
-          pageContext: 'Lane Family hub (lane-family.html)'
+          pageContext: 'Lane Family hub (lane-family.html) — Lane guide; suggested prompts may relate to compilers and site navigation.'
         })
       });
       const data = await res.json().catch(() => ({}));
@@ -71,12 +78,13 @@
         throw new Error(data.error || res.statusText || 'Request failed');
       }
       const answer = data.message != null ? String(data.message) : '';
-      history.push({ user: message, assistant: answer });
+      history.push({ user: trimmed, assistant: answer });
       if (history.length > MAX_TURNS) {
         history = history.slice(-MAX_TURNS);
       }
-      input.value = '';
-      input.dispatchEvent(new Event('input', { bubbles: true }));
+      if (input && !opts?.fromChip) input.value = '';
+      if (input) input.dispatchEvent(new Event('input', { bubbles: true }));
+      syncSendButtonState();
       setStatus('');
       setReply(
         `<div class="lf-ai-answer">${formatReplyAsHtml(answer)}<p class="lf-ai-para lf-ai-timestamp text-muted small mb-0">${escapeHtml(
@@ -92,8 +100,34 @@
         true
       );
     } finally {
-      btn.disabled = false;
+      setSendingUi(false, btn);
     }
+  }
+
+  async function sendFromInput() {
+    const input = getEl('lfAiInput');
+    if (!input) return;
+    await sendLaneGuide(input.value, {});
+  }
+
+  function syncSendButtonState() {
+    const input = getEl('lfAiInput');
+    const btn = getEl('lfAiSend');
+    if (!input || !btn) return;
+    btn.disabled = String(input.value || '').trim().length === 0;
+  }
+
+  function bindSuggestedPromptButtons() {
+    const host = getEl('lfAiSuggestedPrompts');
+    if (!host) return;
+    host.querySelectorAll('[data-lf-ai-prompt]').forEach((el) => {
+      el.addEventListener('click', () => {
+        const prompt = el.getAttribute('data-lf-ai-prompt');
+        if (prompt != null && String(prompt).trim()) {
+          void sendLaneGuide(String(prompt).trim(), { fromChip: true });
+        }
+      });
+    });
   }
 
   function init() {
@@ -101,20 +135,16 @@
     const btn = getEl('lfAiSend');
     if (!input || !btn) return;
 
-    function sync() {
-      const has = String(input.value || '').trim().length > 0;
-      btn.disabled = !has;
-    }
-
-    input.addEventListener('input', sync);
+    input.addEventListener('input', syncSendButtonState);
     input.addEventListener('keydown', (ev) => {
       if (ev.key === 'Enter' && !ev.shiftKey) {
         ev.preventDefault();
-        if (!btn.disabled) send();
+        if (!btn.disabled) void sendFromInput();
       }
     });
-    btn.addEventListener('click', send);
-    sync();
+    btn.addEventListener('click', () => void sendFromInput());
+    bindSuggestedPromptButtons();
+    syncSendButtonState();
   }
 
   if (document.readyState === 'loading') {

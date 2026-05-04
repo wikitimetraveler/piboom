@@ -30,6 +30,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { summarizeGenealogyImageImport, writeImportArtifact } from '../services/genealogy-import.service.js';
 import { geocodeAddressFree } from '../services/free-geocoding.service.js';
+import {
+  getGenealogyForwardGeocodeFromCache,
+  normalizeGenealogyGeocodeCacheKey,
+  upsertGenealogyForwardGeocodeHit,
+  upsertGenealogyForwardGeocodeMiss
+} from '../services/genealogy-geocode-cache.service.js';
 import { resolveGenealogyGeocodeQuery } from '../services/genealogy-geocode.service.js';
 import {
   getHiddenPlateState,
@@ -669,10 +675,45 @@ export async function getGenealogyGeocodeAddress(req, res) {
       });
     }
     const resolvedQuery = resolveGenealogyGeocodeQuery(q);
+    const cacheKey = normalizeGenealogyGeocodeCacheKey(resolvedQuery);
+
+    if (cacheKey) {
+      const cached = await getGenealogyForwardGeocodeFromCache(cacheKey);
+      if (cached?.is_miss) {
+        return res.json({
+          success: false,
+          query: q,
+          resolvedQuery,
+          error: 'No coordinates found',
+          source: 'postgres-cache'
+        });
+      }
+      if (
+        cached &&
+        cached.latitude != null &&
+        cached.longitude != null &&
+        !Number.isNaN(+cached.latitude) &&
+        !Number.isNaN(+cached.longitude)
+      ) {
+        const preview = cacheKey.length > 80 ? `${cacheKey.slice(0, 80)}…` : cacheKey;
+        console.log(`💾 Geocode cache hit: ${preview}`);
+        return res.json({
+          success: true,
+          query: q,
+          resolvedQuery,
+          latitude: +cached.latitude,
+          longitude: +cached.longitude,
+          label: cached.display_name || resolvedQuery,
+          source: cached.source || 'postgres-cache'
+        });
+      }
+    }
+
     const result = await geocodeAddressFree(resolvedQuery);
     const lat = result?.latitude;
     const lng = result?.longitude;
     if (lat == null || lng == null || Number.isNaN(+lat) || Number.isNaN(+lng)) {
+      if (cacheKey) await upsertGenealogyForwardGeocodeMiss(cacheKey);
       return res.json({
         success: false,
         query: q,
@@ -680,6 +721,17 @@ export async function getGenealogyGeocodeAddress(req, res) {
         error: 'No coordinates found'
       });
     }
+
+    const src = result.source || 'geocode';
+    if (cacheKey) {
+      await upsertGenealogyForwardGeocodeHit(cacheKey, {
+        latitude: lat,
+        longitude: lng,
+        display_name: result.display_name || null,
+        source: src
+      });
+    }
+
     res.json({
       success: true,
       query: q,
@@ -687,7 +739,7 @@ export async function getGenealogyGeocodeAddress(req, res) {
       latitude: +lat,
       longitude: +lng,
       label: result.display_name || resolvedQuery,
-      source: result.source || 'geocode'
+      source: src
     });
   } catch (error) {
     console.error('Error geocoding genealogy address:', error);

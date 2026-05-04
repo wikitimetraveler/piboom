@@ -20,6 +20,41 @@ function isLikelyPlateImageId(raw) {
   return typeof raw === 'string' && PLATE_IMAGE_ID_RE.test(raw.trim());
 }
 
+/** Allowlisted slugs for committee portrait crops on plate p4-i0 (see data/lane-historians.json). */
+const LANE_HISTORIANS_PORTRAIT_DEEPLINK = Object.freeze({
+  'john-wm-lane': 'Rev. John Wm. Lane',
+  'jas-h-fitts': 'Rev. James H. Fitts',
+  'geo-w-lane': 'Geo. W. Lane, Esq.',
+  'dr-edwd-b-lane': 'Dr. Edward B. Lane'
+});
+
+/**
+ * @param {string} raw query value
+ * @returns {{ slug: string, label: string } | null}
+ */
+function parsePortraitDeepLinkParam(raw) {
+  const k = String(raw || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, '');
+  if (!k || !Object.prototype.hasOwnProperty.call(LANE_HISTORIANS_PORTRAIT_DEEPLINK, k)) return null;
+  return { slug: k, label: LANE_HISTORIANS_PORTRAIT_DEEPLINK[k] };
+}
+
+function renderPortraitDeeplinkBanner(portraitInfo) {
+  const banner = document.getElementById('lanePdfPortraitDeeplinkBanner');
+  if (!banner) return;
+  if (!portraitInfo) {
+    banner.classList.add('d-none');
+    banner.innerHTML = '';
+    return;
+  }
+  const { slug, label } = portraitInfo;
+  const histUrl = `/family/lane-historians.html#lh-portrait-${encodeURIComponent(slug)}`;
+  banner.classList.remove('d-none');
+  banner.innerHTML = `<p class="mb-1"><strong>Historians portrait</strong> — this opening plate includes a dedicated crop for <strong>${esc(label)}</strong> on the Lane Historians page.</p><p class="mb-0 small"><a href="${esc(histUrl)}">Open Lane Historians · ${esc(label)}</a> · <code>p4-i0</code></p>`;
+}
+
 function sanitizePlateIdList(ids) {
   const seen = new Set();
   const out = [];
@@ -272,7 +307,7 @@ function renderGallery(images, portraits, container) {
 
       return `
         <div class="col-md-4 col-sm-6 mb-4">
-          <div class="${cardClass}">
+          <div class="${cardClass}"${img.imageId ? ` data-lane-pdf-plate-id="${esc(img.imageId)}"` : ''}>
             ${imgTag}
             <div class="lane-pdf-card-body">
               ${badge}
@@ -1110,7 +1145,40 @@ async function initLanePdfGallery() {
 
     pageInput.addEventListener('input', applyFilters);
     idInput.addEventListener('input', applyFilters);
-    applyFilters();
+
+    /** Deep link: ?pdfPage=4 and/or ?plate=p4-i0 (alias ?imageId=p4-i0); optional ?portrait=<slug> for Lane Historians committee crops */
+    (function applyUrlDeepLinkParams() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const plate = (params.get('plate') || params.get('imageId') || '').trim();
+        const pageFromQuery = sanitizeFilterPage(params.get('pdfPage') || '');
+        const portraitInfo = parsePortraitDeepLinkParam(params.get('portrait') || params.get('historian') || '');
+        if (plate && isLikelyPlateImageId(plate)) {
+          const hit = images.find((img) => String(img.imageId || '') === plate);
+          if (hit && hit.pdfPage) {
+            pageInput.value = String(hit.pdfPage);
+          }
+          idInput.value = '';
+        } else if (pageFromQuery) {
+          pageInput.value = pageFromQuery;
+        }
+        applyFilters();
+        renderPortraitDeeplinkBanner(portraitInfo);
+        if (plate && isLikelyPlateImageId(plate)) {
+          requestAnimationFrame(() => {
+            const cel = grid.querySelector(`[data-lane-pdf-plate-id="${CSS.escape(plate)}"]`);
+            if (cel && typeof cel.scrollIntoView === 'function') {
+              cel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              cel.classList.add('lane-pdf-card--deeplink');
+              window.setTimeout(() => cel.classList.remove('lane-pdf-card--deeplink'), 2600);
+            }
+          });
+        }
+      } catch (_) {
+        renderPortraitDeeplinkBanner(null);
+        applyFilters();
+      }
+    })();
   } catch (e) {
     errEl.textContent = e.message || String(e);
     errEl.classList.remove('d-none');

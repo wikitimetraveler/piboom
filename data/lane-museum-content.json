@@ -607,8 +607,17 @@
       "Who was William Lane of Boston, and why is he the opening figure?",
       "Show the next major Lane events in chronological order.",
       "Connect this exhibit to wider American history.",
+      "Who compiled Lane Genealogies Vol. I (1891)—Chapman and Fitts, the Hampton monument committee, and Rev. James P. Lanes manuscripts—and where does this site summarize that lineage?",
+      "Where is the scanned committee frontispiece plate (p4-i0) in the book gallery, and how do per-face crops on Lane Historians relate to it?",
       "Tell me about Lane crater on the Moon and Jonathan Homer Lane.",
       "Explain the Chester Lanes at Bennington and Bunker Hill (book vs rolls)."
     ]
+  },
+  "historiansTeaser": {
+    "title": "Honoring the compilers",
+    "lede": "Volume I (1891) was generations in the making—from Hampton-area deacon charts through Dover collectors, Rev. James P. Lane’s manuscripts, and the Hampton monument publishing committee. Read the frontispiece, title page, timeline, and Chapman’s preface on a dedicated page.",
+    "href": "/family/lane-historians.html",
+    "ctaLabel": "Open Lane Historians",
+    "imageUrl": "/family/assets/lane-historians/frontispiece-title-1891.png"
   }
 }

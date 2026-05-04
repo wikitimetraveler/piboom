@@ -96,7 +96,8 @@ body.lane-occ-page {
 .occ-person-row {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.75rem;
   padding: 0.55rem 0.85rem;
   border-bottom: 1px solid #2b3647;
   font-size: 0.92rem;
@@ -106,9 +107,35 @@ body.lane-occ-page {
   border-bottom: none;
 }
 
-.occ-person-name {
+.occ-person-name-cell {
+  flex: 1;
+  min-width: 0;
+}
+
+.occ-person-name-btn {
   font-weight: 600;
-  color: #e8e4dc;
+  color: #e8d9b8 !important;
+  text-decoration: none !important;
+}
+
+.occ-person-name-btn:hover,
+.occ-person-name-btn:focus {
+  color: #f5ecd4 !important;
+  text-decoration: underline !important;
+}
+
+.occ-person-actions {
+  flex-shrink: 0;
+}
+
+.occ-wall-link {
+  border-color: rgba(109, 163, 209, 0.55) !important;
+  color: #8ec5f2 !important;
+}
+
+.occ-wall-link:hover {
+  background: rgba(109, 163, 209, 0.15) !important;
+  color: #cfe8ff !important;
 }
 
 .occ-person-years {
@@ -119,6 +146,33 @@ body.lane-occ-page {
 
 .occ-error {
   color: #f0ad4e;
+}
+
+.occ-person-modal .modal-content {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.occ-person-modal .close:focus {
+  outline: 2px solid rgba(109, 163, 209, 0.8);
+  outline-offset: 2px;
+}
+
+.occ-jobs-figure {
+  margin: 0;
+  max-width: min(100%, 520px);
+}
+
+.occ-jobs-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid #33455d;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.occ-jobs-figure figcaption {
+  line-height: 1.4;
 }
 
 @media (max-width: 992px) {

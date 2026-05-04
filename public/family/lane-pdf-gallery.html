@@ -25,7 +25,6 @@
       <div class="nav-links">
         <a href="/">Home</a>
         <a href="/family/lane-family.html">Lane Family</a>
-        <a href="/family/genealogy.html">Family Tree</a>
         <a href="/family/lane-museum.html">Lane Museum</a>
         <a href="/family/lane-pdf-gallery.html" class="active">Book plates</a>
       </div>
@@ -38,6 +37,12 @@
     <h1 class="lane-pdf-page-title"><i class="bi bi-images" aria-hidden="true"></i><span class="lane-pdf-page-title__text">Lane genealogy book plates</span></h1>
     <p class="lane-pdf-page-lead text-muted mb-0">Thumbnails keyed to PDF pages and tree IDs; counts update when you filter or change show-hidden.</p>
   </header>
+  <div
+    id="lanePdfPortraitDeeplinkBanner"
+    class="alert alert-primary border-primary d-none mb-3 lane-pdf-portrait-deeplink"
+    role="region"
+    aria-label="Historians portrait deep link"
+  ></div>
   <div class="alert alert-info border-info mb-3" role="status">
     <strong>Large tan “empty” boxes are usually not a deployment bug.</strong>
     Each card loads a real JPEG under <code>/family/assets/lane-pdf/</code>.
@@ -86,7 +91,7 @@
   <div class="lane-pdf-presets-bar mb-3 p-3 border rounded bg-light" role="region" aria-label="Saved filter views">
     <div class="d-flex flex-wrap align-items-center mb-2">
       <strong class="mr-2 mb-1"><i class="bi bi-bookmarks" aria-hidden="true"></i> Saved views</strong>
-      <span class="small text-muted mb-1">Saved views are stored <strong>server-side</strong> (Postgres) with the same browser <code class="lane-pdf-k">clientId</code> as your hide list—filters + denylist checkbox only; personal hides stay on the hides API.</span>
+      <span class="small text-muted mb-1">Saved views are stored <strong>server-side</strong> (Postgres) with the same browser <code class="lane-pdf-k">clientId</code> as your hide list—filters + denylist checkbox only; personal hides stay on the hides API. <strong>Export presets</strong> downloads <code>lane-pdf-gallery-filter-presets.json</code> (backup you can re-import elsewhere).</span>
     </div>
     <div class="form-row align-items-end lane-pdf-presets-controls">
       <div class="col-md-4 mb-2 mb-md-0">

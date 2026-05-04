@@ -63,6 +63,38 @@ const FALLBACK_CONTEXT =
 let occupations = [];
 let activeJobKey = '';
 
+function memorialWallUrl(personId) {
+  const id = personId != null ? String(personId).trim() : '';
+  if (!id) return '/family/lane-memorial-wall.html';
+  return `/family/lane-memorial-wall.html?personId=${encodeURIComponent(id)}`;
+}
+
+function findPersonInActiveOccupation(personId) {
+  const occ = occupations.find((o) => o.jobKey === activeJobKey);
+  if (!occ || !Array.isArray(occ.people)) return null;
+  return occ.people.find((p) => String(p.id) === String(personId)) || null;
+}
+
+function openOccPersonModal(personId) {
+  const p = findPersonInActiveOccupation(personId);
+  if (!p) return;
+  const titleEl = document.getElementById('occPersonModalTitle');
+  const yearsEl = document.getElementById('occPersonModalYears');
+  const wallBtn = document.getElementById('occPersonModalWallBtn');
+  if (titleEl) titleEl.textContent = p.name || 'Person';
+  if (yearsEl) {
+    yearsEl.textContent = `${p.birthYear != null && p.birthYear !== '' ? p.birthYear : '?'} – ${
+      p.deathYear != null && p.deathYear !== '' ? p.deathYear : '?'
+    }`;
+  }
+  if (wallBtn) {
+    wallBtn.href = memorialWallUrl(p.id);
+  }
+  if (typeof window.jQuery !== 'undefined' && window.jQuery.fn.modal) {
+    window.jQuery('#occPersonModal').modal('show');
+  }
+}
+
 function esc(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -134,14 +166,33 @@ function renderDetail() {
 
   if (peopleEl) {
     peopleEl.innerHTML = (occ.people || [])
-      .map(
-        (p) => `
+      .map((p) => {
+        const pid = p.id != null ? String(p.id) : '';
+        const wallHref = memorialWallUrl(pid);
+        const safeIdAttr = esc(pid);
+        return `
       <div class="occ-person-row">
-        <span class="occ-person-name">${esc(p.name || 'Unknown')}</span>
+        <div class="occ-person-name-cell">
+          <button type="button" class="occ-person-name-btn btn btn-link p-0 text-left" data-person-id="${safeIdAttr}">
+            ${esc(p.name || 'Unknown')}
+          </button>
+        </div>
         <span class="occ-person-years">${esc(p.birthYear || '?')} – ${esc(p.deathYear || '?')}</span>
-      </div>`
-      )
+        <div class="occ-person-actions">
+          <a class="btn btn-sm btn-outline-info occ-wall-link" href="${esc(wallHref)}" title="Memorial wall profile">
+            <i class="bi bi-heart" aria-hidden="true"></i> Wall
+          </a>
+        </div>
+      </div>`;
+      })
       .join('');
+
+    peopleEl.querySelectorAll('.occ-person-name-btn[data-person-id]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-person-id');
+        if (id) openOccPersonModal(id);
+      });
+    });
   }
 }
 

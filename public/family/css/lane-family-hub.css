@@ -209,6 +209,44 @@ body.lane-family-hub {
   color: #8a8478;
 }
 
+.lf-ai-suggestions-label {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.65rem !important;
+}
+
+.lf-ai-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.55rem;
+  align-items: flex-start;
+}
+
+.lf-ai-prompt-chip {
+  border: 1px solid var(--lf-line-strong);
+  color: var(--lf-muted);
+  background: var(--lf-bg);
+  padding: 0.4rem 0.72rem;
+  border-radius: var(--lf-radius);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.lf-ai-prompt-chip:hover {
+  color: var(--lf-ink);
+  border-color: var(--lf-accent);
+  background: rgba(107, 83, 68, 0.06);
+}
+
+.lf-ai-prompt-chip:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(107, 83, 68, 0.25);
+}
+
 .lf-ai-input {
   font-size: 0.9rem;
   border-radius: var(--lf-radius) !important;

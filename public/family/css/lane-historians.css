@@ -1,0 +1,273 @@
+/**
+ * Lane Historians tribute — archival reading column
+ */
+body.lane-historians-page {
+  background: #f4f0e8;
+  color: #2c2824;
+}
+
+.lane-historians-wrap {
+  max-width: 44rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+
+.lane-historians-crumb {
+  font-size: 0.8125rem;
+  color: #6b645c;
+  margin-bottom: 1rem;
+}
+
+.lane-historians-crumb a {
+  color: #5a5348;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lane-historians-crumb a:hover {
+  color: #3d3832;
+}
+
+.lane-historians-hero {
+  margin-bottom: 2rem;
+}
+
+.lane-historians-hero__frame {
+  border: 1px solid rgba(44, 40, 36, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #faf7f1;
+  box-shadow: 0 2px 12px rgba(28, 24, 20, 0.06);
+}
+
+.lane-historians-hero__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: min(52vh, 420px);
+  object-fit: cover;
+  object-position: left center;
+}
+
+.lane-historians-hero__caption {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #5a5348;
+  padding: 0.65rem 0.85rem 0.75rem;
+  border-top: 1px solid rgba(44, 40, 36, 0.1);
+}
+
+.lane-historians-title {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: 400;
+  font-size: 1.65rem;
+  letter-spacing: 0.02em;
+  color: #252220;
+  margin: 0 0 0.35rem;
+}
+
+.lane-historians-subtitle {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #5a5348;
+  margin: 0 0 1.5rem;
+}
+
+.lane-historians-section {
+  margin-bottom: 2rem;
+}
+
+.lane-historians-section h2 {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: #38342f;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(44, 40, 36, 0.12);
+}
+
+.lane-historians-publication {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  padding: 1rem 1.1rem;
+  background: #faf7f1;
+  border: 1px solid rgba(44, 40, 36, 0.12);
+  border-radius: 4px;
+}
+
+.lane-historians-publication .lh-vol {
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.lane-historians-figure-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 560px) {
+  .lane-historians-figure-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.lane-historians-figure-card {
+  padding: 0.85rem 1rem;
+  background: #faf7f1;
+  border: 1px solid rgba(44, 40, 36, 0.1);
+  border-radius: 4px;
+  scroll-margin-top: 6rem;
+}
+
+.lane-historians-figure-card::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.lane-historians-figure-portrait-wrap {
+  float: none;
+  margin: 0 auto 0.85rem;
+  max-width: 220px;
+  text-align: center;
+}
+
+@media (min-width: 560px) {
+  .lane-historians-figure-portrait-wrap {
+    float: right;
+    margin: 0 0 0.5rem 0.85rem;
+    max-width: 168px;
+  }
+}
+
+.lane-historians-figure-portrait {
+  width: 100%;
+  height: auto;
+  border-radius: 50%;
+  border: 3px solid rgba(44, 40, 36, 0.12);
+  box-shadow: 0 4px 14px rgba(28, 24, 20, 0.08);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.lh-figure-gallery {
+  margin-top: 0.5rem;
+}
+
+.lh-figure-gallery .lh-plate-tag {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+}
+
+.lane-historians-figure-card h3 {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+  color: #2c2824;
+}
+
+.lane-historians-figure-card .role {
+  font-size: 0.8125rem;
+  color: #4a443d;
+  margin: 0 0 0.35rem;
+}
+
+.lane-historians-figure-card .note {
+  font-size: 0.78rem;
+  color: #6b645c;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.lane-historians-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-left: 2px solid rgba(107, 83, 68, 0.35);
+  padding-left: 1rem;
+}
+
+.lane-historians-timeline li {
+  margin-bottom: 1rem;
+}
+
+.lane-historians-timeline .year {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #4a3828;
+}
+
+.lane-historians-timeline .summary {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #3d3832;
+  margin: 0.15rem 0 0;
+}
+
+.lane-historians-prose p {
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  margin: 0 0 0.85rem;
+  color: #2c2824;
+}
+
+.lane-historians-prose details {
+  margin-top: 0.5rem;
+}
+
+.lane-historians-prose summary {
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #5a4535;
+  font-weight: 500;
+}
+
+.lane-historians-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.lane-historians-links li {
+  margin-bottom: 0.5rem;
+}
+
+.lane-historians-links a {
+  font-size: 0.9rem;
+}
+
+.lane-historians-error {
+  padding: 1rem;
+  background: #fdecea;
+  border: 1px solid #e8c4c0;
+  border-radius: 4px;
+  color: #5c2a26;
+}
+
+.lane-historians-modern {
+  padding: 1rem 1.1rem;
+  background: #ede8df;
+  border: 1px dashed rgba(44, 40, 36, 0.2);
+  border-radius: 4px;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #4a443d;
+}
+
+.lane-historians-modern ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.lane-historians-meta {
+  font-size: 0.78rem;
+  color: #6b645c;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(44, 40, 36, 0.1);
+}

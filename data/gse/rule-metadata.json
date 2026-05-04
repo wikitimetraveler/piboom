@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, and FHFA materials. It is not underwriting, not DU/LPA, and not a commitment to lend. Always confirm eligibility in the current official guides and through your AUS / compliance process.",
+  "sources": [
+    {
+      "id": "FANNIE_SELLING_GUIDE",
+      "title": "Fannie Mae Selling Guide",
+      "url": "https://selling-guide.fanniemae.com/"
+    },
+    {
+      "id": "FANNIE_SPC",
+      "title": "Fannie Mae Selling Policy Communications",
+      "url": "https://singlefamily.fanniemae.com/selling-guide/selling-policy-communications"
+    },
+    {
+      "id": "FANNIE_HOMEREADY",
+      "title": "Fannie Mae HomeReady (public product information)",
+      "url": "https://singlefamily.fanniemae.com/our-lending-solutions/single-family-home-ready"
+    },
+    {
+      "id": "FREDDIE_SELLER_GUIDE",
+      "title": "Freddie Mac Seller/Servicer Guide",
+      "url": "https://guide.freddiemac.com/app/guide/"
+    },
+    {
+      "id": "FREDDIE_BULLETINS",
+      "title": "Freddie Mac Guide Bulletins & Industry Letters",
+      "url": "https://guide.freddiemac.com/app/guide/bulletin"
+    },
+    {
+      "id": "FREDDIE_HOME_POSSIBLE",
+      "title": "Freddie Mac Home Possible (public product information)",
+      "url": "https://sf.freddiemac.com/working-with-us/origination-underwriting/mortgage-products/home-possible"
+    },
+    {
+      "id": "FHFA_LIMITS",
+      "title": "FHFA Conforming Loan Limits",
+      "url": "https://www.fhfa.gov/data/conforming-loan-limits"
+    }
+  ],
+  "sourceRefs": {
+    "FANNIE_HOMEREADY_GUIDE": {
+      "title": "HomeReady — refer to current Selling Guide & SPCs",
+      "url": "https://selling-guide.fanniemae.com/"
+    },
+    "FANNIE_CONFORMING": {
+      "title": "Standard conventional conforming — Selling Guide",
+      "url": "https://selling-guide.fanniemae.com/"
+    },
+    "FREDDIE_HOME_POSSIBLE_GUIDE": {
+      "title": "Home Possible — refer to current Seller/Servicer Guide & bulletins",
+      "url": "https://guide.freddiemac.com/app/guide/"
+    },
+    "FREDDIE_CONFORMING": {
+      "title": "Standard conventional conforming — Seller/Servicer Guide",
+      "url": "https://guide.freddiemac.com/app/guide/"
+    }
+  }
+}

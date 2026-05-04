@@ -36,4 +36,21 @@ describe('calcEngineLibrary helpers', () => {
     expect(message).toContain('Confirmation Required');
     expect(message).toContain('Missing data entry: 12-month account history required');
   });
+
+  test('gseLtvPercent', () => {
+    expect(calcMath.gseLtvPercent([380000, 400000])).toBe(95);
+    expect(calcMath.gseLtvPercent([100, 0])).toBe(0);
+  });
+
+  test('gseConformingBand', () => {
+    expect(calcMath.gseConformingBand([500000, 806500])).toBe('within-limit');
+    expect(calcMath.gseConformingBand([900000, 806500])).toBe('above-limit');
+    expect(calcMath.gseConformingBand([500000, 0])).toBe('unknown');
+  });
+
+  test('gseScenarioRiskLevel', () => {
+    expect(calcMath.gseScenarioRiskLevel([38, 6, 80])).toBe('low');
+    expect(calcMath.gseScenarioRiskLevel([43, 2, 91])).toBe('medium');
+    expect(calcMath.gseScenarioRiskLevel([46, 1, 96])).toBe('high');
+  });
 });

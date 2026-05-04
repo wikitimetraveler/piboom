@@ -26,7 +26,11 @@
     "migrate:lane-ranks": "python scripts/migrate_lane_military_ranks.py",
     "extract:lane-sayings-candidates": "python scripts/extract_lane_sayings_candidates.py",
     "extract:lane-sayings-llm": "node scripts/extract_lane_sayings_llm.mjs",
-    "scan:lane-military-gaps": "node scripts/scan-lane-military-gaps.js"
+    "scan:lane-military-gaps": "node scripts/scan-lane-military-gaps.js",
+    "extract:lane-frontispiece-portraits": "node scripts/tools/extract-lane-frontispiece-portraits.mjs",
+    "scan:lane-pdf-blanks": "node scripts/tools/scan-lane-pdf-blank-plates.mjs",
+    "strip:lane-military-engagements": "node scripts/tools/strip-lane-military-engagements.mjs",
+    "strip:lane-military-engagements:write": "node scripts/tools/strip-lane-military-engagements.mjs --write"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",
@@ -60,6 +64,7 @@
     "@types/socket.io": "^3.0.2",
     "cross-env": "^10.1.0",
     "jest": "^30.2.0",
+    "sharp": "^0.34.5",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   },

@@ -892,7 +892,22 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_lane_pdf_filter_preset_client ON lane_pdf_gallery_filter_preset (client_id)
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, br_rule_files, processor assignment tool config, lane PDF gallery hides, and lane PDF gallery filter presets)');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS genealogy_forward_geocode_cache (
+        query_key VARCHAR(2048) PRIMARY KEY,
+        latitude DOUBLE PRECISION,
+        longitude DOUBLE PRECISION,
+        display_name TEXT,
+        source VARCHAR(64),
+        is_miss BOOLEAN NOT NULL DEFAULT FALSE,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_genealogy_geocode_updated ON genealogy_forward_geocode_cache (updated_at DESC)
+    `);
+
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, br_rule_files, processor assignment tool config, lane PDF gallery hides, lane PDF gallery filter presets, and genealogy forward geocode cache)');
     
     // Migrate existing Grateful Dead data to new structure (run in background)
     migrateGratefulDeadData().catch(error => {

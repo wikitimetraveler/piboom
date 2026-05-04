@@ -1009,7 +1009,7 @@
               milText,
               portraitCount: portraits.length
             })}
-            <p class="mb-0 mt-3 memorial-profile-links"><a href="/family/genealogy.html" class="text-info">Open family tree</a></p>
+            <p class="mb-0 mt-3 memorial-profile-links"><a href="/family/lane-family.html" class="text-info">Lane Family hub</a></p>
           </div>
           <div>
             ${createMapCardMarkup(placeEntries)}

@@ -1,0 +1,38 @@
+{
+  "agency": "Fannie Mae",
+  "products": [
+    {
+      "id": "standard-conforming",
+      "name": "Conventional Conforming (standard)",
+      "tag": "standard",
+      "sourceRefs": ["FANNIE_CONFORMING"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 97,
+        "maxCltv": 97,
+        "minFico": 620,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary", "secondHome", "investment"],
+        "allowedPurpose": ["purchase", "rateTermRefi", "cashOutRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    },
+    {
+      "id": "homeready",
+      "name": "HomeReady",
+      "tag": "affordable",
+      "sourceRefs": ["FANNIE_HOMEREADY_GUIDE"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 97,
+        "maxCltv": 105,
+        "minFico": 620,
+        "maxDti": 50,
+        "maxAmiPercent": 100,
+        "amiNote": "HomeReady has income limits based on AMI; confirm current chart for the subject property address.",
+        "firstTimeHomebuyerRequired": false,
+        "allowedOccupancy": ["primary"],
+        "allowedPurpose": ["purchase", "rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    }
+  ]
+}

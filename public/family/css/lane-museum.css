@@ -457,6 +457,11 @@ body.archiveLight .museum-wordmark {
   letter-spacing: 0.04em;
 }
 
+.museum-prominent-timeline-title {
+  color: var(--museum-text);
+  font-weight: 600;
+}
+
 .prominent-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -1042,4 +1047,53 @@ a {
 .museum-template-btn.active {
   background-color: rgba(174, 154, 120, 0.25);
   border-color: var(--museum-accent);
+}
+
+/* Lane Historians teaser (hybrid link to /family/lane-historians.html) */
+.museum-historians-teaser {
+  margin-top: 0.75rem;
+  padding: 1rem 1.15rem;
+  background: var(--museum-surface-soft);
+  border: 1px solid var(--museum-border);
+  border-radius: 4px;
+}
+
+.museum-historians-teaser__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem 1.25rem;
+}
+
+.museum-historians-teaser__media {
+  flex: 0 0 auto;
+}
+
+.museum-historians-teaser__thumb {
+  display: block;
+  width: min(200px, 38vw);
+  height: auto;
+  border-radius: 4px;
+  border: 1px solid var(--museum-border);
+  object-fit: cover;
+}
+
+.museum-historians-teaser__body {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.museum-historians-teaser__title {
+  font-family: var(--museum-serif);
+  font-size: 1.05rem;
+  font-weight: 400;
+  margin: 0 0 0.35rem;
+  color: var(--museum-text);
+}
+
+.museum-historians-teaser__lede {
+  font-size: 0.88rem;
+  color: var(--museum-muted);
+  margin: 0;
+  line-height: 1.55;
 }

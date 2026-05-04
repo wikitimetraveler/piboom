@@ -1,0 +1,28 @@
+{
+  "year": 2026,
+  "note": "Sample rows for development. Replace with values transcribed from the official FHFA conforming loan limits publication for the active year. https://www.fhfa.gov/data/conforming-loan-limits",
+  "counties": [
+    {
+      "state": "CA",
+      "county": "Orange",
+      "limitsByUnit": {
+        "1": 1149825,
+        "2": 1472550,
+        "3": 1780050,
+        "4": 2211150
+      },
+      "highCost": true
+    },
+    {
+      "state": "TX",
+      "county": "Dallas",
+      "limitsByUnit": {
+        "1": 806500,
+        "2": 1032650,
+        "3": 1248150,
+        "4": 1551250
+      },
+      "highCost": false
+    }
+  ]
+}

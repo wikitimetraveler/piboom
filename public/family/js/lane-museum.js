@@ -22,6 +22,41 @@ async function getJson(url) {
   return response.json();
 }
 
+/**
+ * Hybrid Lane Historians discovery — content from museum JSON (historiansTeaser).
+ * @param {Record<string, unknown>} content
+ */
+function renderHistoriansTeaser(content) {
+  const el = document.getElementById('museumHistoriansTeaser');
+  if (!el) return;
+  const t = content && content.historiansTeaser;
+  if (!t || t.enabled === false || !String(t.href || '').trim()) {
+    el.innerHTML = '';
+    el.setAttribute('hidden', 'hidden');
+    return;
+  }
+  const title = escapeHtml(t.title || 'Honoring the compilers');
+  const lede = escapeHtml(t.lede || '');
+  const cta = escapeHtml(t.ctaLabel || 'Open Lane Historians');
+  const href = String(t.href || '').trim();
+  const safeHref = escapeHtml(href);
+  const imgUrl = String(t.imageUrl || '').trim();
+  const imgBlock = imgUrl
+    ? `<div class="museum-historians-teaser__media"><img src="${escapeHtml(
+        imgUrl
+      )}" alt="" width="240" height="140" loading="lazy" decoding="async" class="museum-historians-teaser__thumb" /></div>`
+    : '';
+  el.innerHTML = `<div class="museum-historians-teaser__inner">
+      ${imgBlock}
+      <div class="museum-historians-teaser__body">
+        <h2 class="museum-historians-teaser__title">${title}</h2>
+        <p class="museum-historians-teaser__lede museum-prose mb-2">${lede}</p>
+        <a class="btn btn-sm museum-text-btn" href="${safeHref}"><i class="bi bi-journal-text" aria-hidden="true"></i> ${cta}</a>
+      </div>
+    </div>`;
+  el.removeAttribute('hidden');
+}
+
 /** Cached API payloads for exhibit cards (set in initLaneMuseum). */
 let cachedMuseumContent = null;
 let cachedFeaturedStory = null;
@@ -669,10 +704,6 @@ function renderProminent(prominent = []) {
         : '';
       const blurb = entry.blurb ? `<p class="small prominent-blurb">${escapeHtml(entry.blurb)}</p>` : '';
       const pid = person.id != null ? person.id : entry.personId;
-      const geneUrl =
-        pid != null
-          ? `/family/genealogy.html?q=${encodeURIComponent(String(title).replace(/\s+/g, ' ').trim())}`
-          : '/family/genealogy.html';
       const memorialUrl =
         pid != null ? `/family/lane-memorial-wall.html?personId=${encodeURIComponent(String(pid))}` : '/family/lane-memorial-wall.html';
       const imgUrl = entry.imageUrl != null ? String(entry.imageUrl).trim() : '';
@@ -709,9 +740,6 @@ function renderProminent(prominent = []) {
             ${escapeHtml(person.born || 'Location pending')}
           </div>
           <div class="mt-2">
-            <a class="small prominent-tree-link" href="${escapeHtml(geneUrl)}">Search in family tree</a>
-          </div>
-          <div class="mt-1">
             <a class="small prominent-wall-link" href="${escapeHtml(memorialUrl)}">View on memorial wall</a>
           </div>
           <button type="button" class="btn btn-sm btn-outline-secondary prominent-card-poster-btn mt-2" data-exhibit-index="${index}">
@@ -1037,6 +1065,7 @@ async function initLaneMuseum() {
   cachedProminentLanes = prominentLanes;
   initMuseumPosterUi();
 
+  renderHistoriansTeaser(content);
   renderThemeButtons(content.themes || {});
   renderFeatured(featuredStory, content);
   renderTimeline(content.timelineEvents || []);

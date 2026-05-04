@@ -245,9 +245,45 @@ body.lane-war-page .text-muted {
 }
 
 .battle-list-host {
-  max-height: 220px;
+  max-height: 280px;
   overflow: auto;
   font-size: 0.85rem;
+}
+
+.battle-lane-book-note {
+  border-left: 2px solid #6da3d1;
+  padding-left: 0.5rem;
+  margin-top: 0.35rem;
+  color: #c8d3e2;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.battle-lane-book-note--mapPopup {
+  color: #222;
+  border-left-color: #4a7cab;
+}
+
+.battle-external-links__label {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.78rem;
+}
+
+.battle-external-links__list li {
+  margin-bottom: 0.15rem;
+}
+
+.battle-external-links a {
+  color: #6da3d1;
+}
+
+.battle-external-links--mapPopup .battle-external-links__label {
+  color: #555;
+}
+
+.battle-external-links--mapPopup a {
+  color: #1a5276;
 }
 
 .battle-pin-item {

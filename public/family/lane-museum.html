@@ -43,12 +43,20 @@
       </p>
       <nav class="museum-quick-nav history-quick-nav" aria-label="Museum quick links">
         <a href="#museumFeaturedPanel" class="museum-quick-link history-quick-link">Featured exhibit</a>
+        <a href="#museumHistoriansTeaser" class="museum-quick-link history-quick-link">Historians</a>
         <a href="#lunarObservatoryMount" class="museum-quick-link history-quick-link">Lunar observatory</a>
         <a href="#museumProminentPanel" class="museum-quick-link history-quick-link">Prominent Lanes</a>
       </nav>
       <div id="themeButtons" class="theme-row" aria-label="Theme switcher"></div>
       <div id="museumError" class="museum-error small mt-2"></div>
     </section>
+
+    <section
+      id="museumHistoriansTeaser"
+      class="museum-historians-teaser museum-panel"
+      aria-label="Honoring the compilers"
+      hidden
+    ></section>
 
     <section class="museum-grid">
       <article class="museum-panel museum-panel--primary" id="museumFeaturedPanel">
@@ -87,7 +95,9 @@
         </ul>
         <div class="tab-content pt-3">
           <div class="tab-pane fade show active" id="narrative" role="tabpanel">
-            <div id="timelineRows"></div>
+            <p class="museum-prose small text-muted mb-0">
+              Chronological milestones for this opening strand are listed below under <strong>Prominent Lanes</strong>.
+            </p>
           </div>
           <div class="tab-pane fade" id="connections" role="tabpanel">
             <p class="museum-prose museum-prose--muted">
@@ -131,9 +141,22 @@
           <h2 class="museum-section-title">Prominent Lanes</h2>
           <p class="museum-section-sub">Chronological highlights</p>
         </div>
-        <a href="/family/genealogy.html" class="museum-quiet-link">Genealogy view</a>
+        <a href="/family/lane-family.html" class="museum-quiet-link">Lane Family hub</a>
       </div>
       <div id="prominentGrid" class="prominent-grid"></div>
+
+      <div
+        class="museum-prominent-timeline mt-4 pt-4 border-top"
+        aria-labelledby="prominentTimelineHeading"
+      >
+        <h3 id="prominentTimelineHeading" class="h5 museum-prominent-timeline-title mb-2">
+          Opening exhibit chronology
+        </h3>
+        <p class="small text-muted mb-3">
+          Curated milestones from <code class="museum-code">timelineEvents</code> in museum content—same list as before, placed here under Prominent Lanes.
+        </p>
+        <div id="timelineRows" class="museum-timeline-rows"></div>
+      </div>
     </section>
   </main>
 

@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "generatedNote": "Approximate map pins for general historical context. Not evidence that any Lane ancestor was present unless stated in that person’s record.",
+  "version": 4,
+  "generatedNote": "Summaries follow general historiography. “Further reading” favors Library of Congress guides, National Archives topic pages, NPS parks and portals, and similar institutional sources—not scraped Wikipedia. Optional Lane-book notes flag compilation wording only; verify with primary records before asserting presence at an engagement. This catalog does not alter laneData.json or server war-matching rules.",
   "battles": [
     {
       "id": "kp-great-swamp-1675",
@@ -10,11 +10,18 @@
       "lat": 41.455,
       "lng": -71.678,
       "summary": "Major assault on a Narragansett stronghold in the Great Swamp (modern Rhode Island). Colonial forces attacked a winter encampment; casualties and long-term diplomatic fallout were severe.",
-      "belligerents": [
-        "United Colonies militias",
-        "Narragansett and allied Native forces"
-      ],
-      "keywords": ["great swamp", "south kingstown", "narragansett fort"]
+      "belligerents": ["United Colonies militias", "Narragansett and allied Native forces"],
+      "keywords": ["great swamp", "south kingstown", "narragansett fort"],
+      "externalLinks": [
+        {
+          "label": "Mass.gov — King Philip’s War / Metacom’s Rebellion",
+          "url": "https://www.mass.gov/info-details/king-philips-war-metacoms-rebellion"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
     },
     {
       "id": "kp-bloody-brook-1675",
@@ -25,7 +32,17 @@
       "lng": -72.955,
       "summary": "Ambush near a cart path in the Connecticut River valley as colonial troops escorted grain; emblematic of frontier raids and counter-raids.",
       "belligerents": ["Massachusetts militia and teamsters", "Native raiding party"],
-      "keywords": ["bloody brook", "south deerfield"]
+      "keywords": ["bloody brook", "south deerfield"],
+      "externalLinks": [
+        {
+          "label": "Mass.gov — King Philip’s War / Metacom’s Rebellion",
+          "url": "https://www.mass.gov/info-details/king-philips-war-metacoms-rebellion"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
     },
     {
       "id": "kp-brookfield-1675",
@@ -36,7 +53,17 @@
       "lng": -72.102,
       "summary": "Settlement under attack and relief column actions in central Massachusetts during the opening phase of the war.",
       "belligerents": ["Massachusetts Bay militia", "Wampanoag-led forces"],
-      "keywords": ["brookfield", "wheeler's surprise"]
+      "keywords": ["brookfield", "wheeler's surprise"],
+      "externalLinks": [
+        {
+          "label": "Mass.gov — King Philip’s War / Metacom’s Rebellion",
+          "url": "https://www.mass.gov/info-details/king-philips-war-metacoms-rebellion"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
     },
     {
       "id": "kp-turners-falls-1676",
@@ -47,7 +74,17 @@
       "lng": -72.555,
       "summary": "Raid on an Indigenous fishing encampment on the Connecticut River; often paired with Metacom’s War narratives about retaliation cycles.",
       "belligerents": ["Massachusetts militia", "Non-combatants and defenders at camp"],
-      "keywords": ["turner", "peskeompskut", "falls fight"]
+      "keywords": ["turner", "peskeompskut", "falls fight"],
+      "externalLinks": [
+        {
+          "label": "Mass.gov — King Philip’s War / Metacom’s Rebellion",
+          "url": "https://www.mass.gov/info-details/king-philips-war-metacoms-rebellion"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
     },
     {
       "id": "kp-lancaster-raid-1676",
@@ -58,7 +95,17 @@
       "lng": -71.673,
       "summary": "Attack on the Lancaster settlement during the winter campaign period; often cited in captivity and frontier defense narratives.",
       "belligerents": ["Lancaster settlers and local militia", "Native war parties aligned against English expansion"],
-      "keywords": ["lancaster", "captivity", "mary rowlandson"]
+      "keywords": ["lancaster", "captivity", "mary rowlandson"],
+      "externalLinks": [
+        {
+          "label": "Mass.gov — King Philip’s War / Metacom’s Rebellion",
+          "url": "https://www.mass.gov/info-details/king-philips-war-metacoms-rebellion"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
     },
     {
       "id": "kp-sudbury-fight-1676",
@@ -69,7 +116,17 @@
       "lng": -71.416,
       "summary": "Major engagement near Sudbury where relief columns and local forces were heavily hit in a broad ambush and running fight.",
       "belligerents": ["Massachusetts and allied colonial companies", "Native coalition forces"],
-      "keywords": ["sudbury", "noyes", "wadsworth"]
+      "keywords": ["sudbury", "noyes", "wadsworth"],
+      "externalLinks": [
+        {
+          "label": "Mass.gov — King Philip’s War / Metacom’s Rebellion",
+          "url": "https://www.mass.gov/info-details/king-philips-war-metacoms-rebellion"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
     },
     {
       "id": "kp-mount-hope-1676",
@@ -80,7 +137,17 @@
       "lng": -71.291,
       "summary": "Operations around Mount Hope and nearby swamps culminating in Metacom’s death; used as a symbolic endpoint in many narratives.",
       "belligerents": ["Plymouth-aligned colonial forces", "Wampanoag leadership and supporters"],
-      "keywords": ["mount hope", "metacom", "bristol"]
+      "keywords": ["mount hope", "metacom", "bristol"],
+      "externalLinks": [
+        {
+          "label": "Mass.gov — King Philip’s War / Metacom’s Rebellion",
+          "url": "https://www.mass.gov/info-details/king-philips-war-metacoms-rebellion"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
     },
     {
       "id": "rw-lexington-concord-1775",
@@ -91,7 +158,21 @@
       "lng": -71.226,
       "summary": "Opening armed engagements of the war in Massachusetts; militia and British regulars clashed on the road network west of Boston.",
       "belligerents": ["Massachusetts militia and minutemen", "British Army expedition"],
-      "keywords": ["lexington", "concord", "north bridge"]
+      "keywords": ["lexington", "concord", "north bridge"],
+      "externalLinks": [
+        {
+          "label": "Library of Congress — American Revolution guide",
+          "url": "https://guides.loc.gov/american-revolution-war-for-independence"
+        },
+        {
+          "label": "NPS — Minute Man National Historical Park",
+          "url": "https://www.nps.gov/mima/index.htm"
+        },
+        {
+          "label": "National Archives — Revolutionary War",
+          "url": "https://www.archives.gov/research/military/revolutionary-war"
+        }
+      ]
     },
     {
       "id": "rw-bunker-hill-1775",
@@ -102,7 +183,21 @@
       "lng": -71.056,
       "summary": "Early pitched battle for heights overlooking Boston; showed colonial forces could stand against regulars despite British tactical success.",
       "belligerents": ["New England provincial troops", "British Army"],
-      "keywords": ["bunker hill", "breeds hill"]
+      "keywords": ["bunker hill", "breeds hill"],
+      "externalLinks": [
+        {
+          "label": "Library of Congress — American Revolution guide",
+          "url": "https://guides.loc.gov/american-revolution-war-for-independence"
+        },
+        {
+          "label": "NPS — Boston National Historical Park",
+          "url": "https://www.nps.gov/bost/index.htm"
+        },
+        {
+          "label": "National Archives — Revolutionary War",
+          "url": "https://www.archives.gov/research/military/revolutionary-war"
+        }
+      ]
     },
     {
       "id": "rw-saratoga-1777",
@@ -113,7 +208,47 @@
       "lng": -73.644,
       "summary": "Northern campaign often treated as a turning point encouraging French alliance; involved Continental and state troops against a British northern army.",
       "belligerents": ["Continental Army and militia", "British northern army"],
-      "keywords": ["saratoga", "gates", "burgoyne"]
+      "keywords": ["saratoga", "gates", "burgoyne"],
+      "externalLinks": [
+        {
+          "label": "NPS — Saratoga National Historical Park",
+          "url": "https://www.nps.gov/sara/index.htm"
+        },
+        {
+          "label": "Library of Congress — American Revolution guide",
+          "url": "https://guides.loc.gov/american-revolution-war-for-independence"
+        },
+        {
+          "label": "National Archives — Revolutionary War",
+          "url": "https://www.archives.gov/research/military/revolutionary-war"
+        }
+      ]
+    },
+    {
+      "id": "rw-bennington-1777",
+      "warSlug": "revolutionary-war",
+      "title": "Battle of Bennington",
+      "approxWhen": "August 16, 1777",
+      "lat": 42.939,
+      "lng": -73.303,
+      "summary": "Northern theater clash near Walloomsac Heights (often grouped with the Saratoga campaign). NH and Berkshire militia elements reinforced Stark’s attackers against Hessian/British detachments seeking supplies.",
+      "belligerents": ["New Hampshire, Massachusetts, and Vermont-associated militia forces", "German auxiliary troops under Baum/Breymann (British expedition)"],
+      "keywords": ["bennington", "walloomsac", "stark", "dearborn", "stickney"],
+      "laneBookNote": "Lane Genealogies Vol. 1 (compilation wording) places Chester officer-line figures with Dearborn/Stickney lineage language mentioning battle of Bennington, Aug. 16, 1777—treat as genealogy abstraction until pension/CMSR corroboration.",
+      "externalLinks": [
+        {
+          "label": "NYS Parks — Bennington Battlefield State Historic Site",
+          "url": "https://parks.ny.gov/historic-sites/benningtonbattlefield/details.aspx"
+        },
+        {
+          "label": "NPS — Saratoga National Historical Park (related northern campaign)",
+          "url": "https://www.nps.gov/sara/index.htm"
+        },
+        {
+          "label": "National Archives — Revolutionary War",
+          "url": "https://www.archives.gov/research/military/revolutionary-war"
+        }
+      ]
     },
     {
       "id": "rw-yorktown-1781",
@@ -124,7 +259,21 @@
       "lng": -76.509,
       "summary": "Franco-American siege that trapped a British field army; French fleet and ground forces were decisive alongside Continentals.",
       "belligerents": ["Continental and French forces", "British Army (Cornwallis)"],
-      "keywords": ["yorktown", "cornwallis", "rochambeau"]
+      "keywords": ["yorktown", "cornwallis", "rochambeau"],
+      "externalLinks": [
+        {
+          "label": "NPS — Yorktown Battlefield (Colonial National Historical Park)",
+          "url": "https://www.nps.gov/york/index.htm"
+        },
+        {
+          "label": "Library of Congress — American Revolution guide",
+          "url": "https://guides.loc.gov/american-revolution-war-for-independence"
+        },
+        {
+          "label": "National Archives — Revolutionary War",
+          "url": "https://www.archives.gov/research/military/revolutionary-war"
+        }
+      ]
     },
     {
       "id": "rw-trenton-1776",
@@ -135,7 +284,21 @@
       "lng": -74.7597,
       "summary": "Continental crossing and surprise attack at Trenton during the New Jersey campaign, often paired with Princeton in winter operations.",
       "belligerents": ["Continental Army", "Hessian garrison under British command"],
-      "keywords": ["trenton", "delaware crossing", "new jersey campaign"]
+      "keywords": ["trenton", "delaware crossing", "new jersey campaign"],
+      "externalLinks": [
+        {
+          "label": "NPS — Washington Crossing State Park (NJ)",
+          "url": "https://www.nps.gov/wacc/index.htm"
+        },
+        {
+          "label": "Library of Congress — American Revolution guide",
+          "url": "https://guides.loc.gov/american-revolution-war-for-independence"
+        },
+        {
+          "label": "National Archives — Revolutionary War",
+          "url": "https://www.archives.gov/research/military/revolutionary-war"
+        }
+      ]
     },
     {
       "id": "rw-princeton-1777",
@@ -146,7 +309,21 @@
       "lng": -74.6672,
       "summary": "Follow-on engagement after Trenton that helped recover Continental momentum and shifted pressure in New Jersey.",
       "belligerents": ["Continental Army", "British regular forces"],
-      "keywords": ["princeton", "new jersey", "washington"]
+      "keywords": ["princeton", "new jersey", "washington"],
+      "externalLinks": [
+        {
+          "label": "Library of Congress — American Revolution guide",
+          "url": "https://guides.loc.gov/american-revolution-war-for-independence"
+        },
+        {
+          "label": "NPS — Revolutionary War subject portal",
+          "url": "https://www.nps.gov/subjects/revolutionarywar/index.htm"
+        },
+        {
+          "label": "National Archives — Revolutionary War",
+          "url": "https://www.archives.gov/research/military/revolutionary-war"
+        }
+      ]
     },
     {
       "id": "rw-monmouth-1778",
@@ -157,7 +334,295 @@
       "lng": -74.336,
       "summary": "Large late-June battle in extreme heat during the British withdrawal from Philadelphia to New York.",
       "belligerents": ["Continental Army", "British Army"],
-      "keywords": ["monmouth", "new jersey", "philadelphia withdrawal"]
+      "keywords": ["monmouth", "new jersey", "philadelphia withdrawal"],
+      "externalLinks": [
+        {
+          "label": "NPS — Monmouth Battlefield State Park",
+          "url": "https://www.nps.gov/mono/index.htm"
+        },
+        {
+          "label": "Library of Congress — American Revolution guide",
+          "url": "https://guides.loc.gov/american-revolution-war-for-independence"
+        }
+      ]
+    },
+    {
+      "id": "rw-hampton-falls-prescott-lane",
+      "warSlug": "revolutionary-war",
+      "title": "Hampton Falls — Prescott–Lane household (book context)",
+      "approxWhen": "c. 1756–1783",
+      "lat": 42.914,
+      "lng": -70.963,
+      "summary": "Rockingham County, New Hampshire map anchor for a Lane compilation household; not a battlefield pin—general geography for Revolutionary-era family context.",
+      "belligerents": ["New Hampshire provincial / militia society (general)", "British forces elsewhere (general war context)"],
+      "keywords": ["hampton falls", "prescott", "rockingham", "nh revolution"],
+      "laneBookNote": "Lane Genealogies (Vol. 1): Mary Lane (b. 6 Dec. 1734) m. 1 Jan. 1756 Capt. James Prescott of Hampton Falls (b. 5 Dec. 1733); compilation calls him a lieutenant in the army of the Revolution and notes long selectman service. Son Ebenezer Prescott (b. 6 June 1756) is described as a soldier in the Revolution, then a farmer in Pittsfield (d. 26 June 1834, ae. 78). These are Prescott-surname and in-law lines—verify service with Compiled Military Service Records and pensions; do not treat compilation phrasing as muster-roll proof for Mary Lane herself.",
+      "externalLinks": [
+        {
+          "label": "NPS — New Hampshire listings (Revolutionary-era sites)",
+          "url": "https://www.nps.gov/state/nh/list.htm"
+        },
+        {
+          "label": "Library of Congress — American Revolution guide",
+          "url": "https://guides.loc.gov/american-revolution-war-for-independence"
+        },
+        {
+          "label": "National Archives — Revolutionary War",
+          "url": "https://www.archives.gov/research/military/revolutionary-war"
+        }
+      ]
+    },
+    {
+      "id": "fiw-monongahela-1755",
+      "warSlug": "french-and-indian-war",
+      "title": "Battle of the Monongahela (Braddock’s defeat)",
+      "approxWhen": "July 1755",
+      "lat": 40.356,
+      "lng": -79.901,
+      "summary": "British regulars and provincials marching on Fort Duquesne were ambushed; high casualties among officers including Braddock—often cited as a shock to imperial assumptions about frontier warfare.",
+      "belligerents": ["British Army and Virginia provincials", "French and Indigenous forces"],
+      "keywords": ["braddock", "monongahela", "fort duquesne"],
+      "externalLinks": [
+        {
+          "label": "Library of Congress — French and Indian War guide",
+          "url": "https://guides.loc.gov/french-indian-war"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
+    },
+    {
+      "id": "fiw-lake-george-1755",
+      "warSlug": "french-and-indian-war",
+      "title": "Lake George / Fort William Henry theater",
+      "approxWhen": "1755–1757",
+      "lat": 43.415,
+      "lng": -73.71,
+      "summary": "Strategic corridor between Albany and Lake Champlain; provincial campaigns and fort-system logistics shaped New England and New York frontier experience.",
+      "belligerents": ["British provincials and regulars", "French and Indigenous forces"],
+      "keywords": ["lake george", "fort william henry", "champlain"],
+      "externalLinks": [
+        {
+          "label": "NPS — Fort Stanwix National Monument (related theater hub)",
+          "url": "https://www.nps.gov/fost/index.htm"
+        },
+        {
+          "label": "Library of Congress — French and Indian War guide",
+          "url": "https://guides.loc.gov/french-indian-war"
+        }
+      ]
+    },
+    {
+      "id": "fiw-quebec-1759",
+      "warSlug": "french-and-indian-war",
+      "title": "Siege and battle of Quebec",
+      "approxWhen": "1759",
+      "lat": 46.813,
+      "lng": -71.208,
+      "summary": "Amphibious campaign culminating in the Plains of Abraham; France’s position in Canada unraveled in standard Seven Years’ War narratives.",
+      "belligerents": ["British Army and Royal Navy", "French Army and militia"],
+      "keywords": ["quebec", "wolfe", "montcalm", "plains of abraham"],
+      "externalLinks": [
+        {
+          "label": "Library of Congress — French and Indian War guide",
+          "url": "https://guides.loc.gov/french-indian-war"
+        },
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        }
+      ]
+    },
+    {
+      "id": "cf-norridgewock-1724",
+      "warSlug": "colonial-frontier-militia",
+      "title": "Norridgewock raid (Father Rale’s War context)",
+      "approxWhen": "August 1724",
+      "lat": 44.769,
+      "lng": -69.893,
+      "summary": "Massachusetts expedition against Norridgewock on the Kennebec—often discussed in Maine frontier histories tied to Dummer’s War / Father Rale’s War period.",
+      "belligerents": ["Massachusetts provincial forces", "Abenaki and French-allied communities"],
+      "keywords": ["norridgewock", "father rale", "kennebec", "dummer"],
+      "externalLinks": [
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        },
+        {
+          "label": "Library of Congress — U.S. local history & genealogy portal",
+          "url": "https://guides.loc.gov/us-history-local-history-genealogy"
+        }
+      ]
+    },
+    {
+      "id": "cf-lovewells-1725",
+      "warSlug": "colonial-frontier-militia",
+      "title": "Lovewell’s Fight",
+      "approxWhen": "May 1725",
+      "lat": 44.85,
+      "lng": -70.67,
+      "summary": "Borderland engagement in the upper Saco–White Mountains corridor during Dummer’s War; commemorated in New England frontier literature.",
+      "belligerents": ["Massachusetts volunteers (Lovewell’s company)", "Abenaki warriors"],
+      "keywords": ["lovewell", "fryeburg", "dummer's war"],
+      "externalLinks": [
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        },
+        {
+          "label": "Library of Congress — U.S. local history & genealogy portal",
+          "url": "https://guides.loc.gov/us-history-local-history-genealogy"
+        }
+      ]
+    },
+    {
+      "id": "cf-casco-bay-1717",
+      "warSlug": "colonial-frontier-militia",
+      "title": "Treaty of Casco Bay (post–King Philip’s era diplomacy)",
+      "approxWhen": "April 1678",
+      "lat": 43.66,
+      "lng": -70.25,
+      "summary": "Diplomatic milestone often used to bracket fighting in the eastern Wabanaki sphere; pin approximates Casco Bay / Portland area for map orientation.",
+      "belligerents": ["Massachusetts and allied colonial authorities", "Wabanaki leadership"],
+      "keywords": ["casco bay", "treaty", "wabanaki"],
+      "externalLinks": [
+        {
+          "label": "National Archives — colonial wars research",
+          "url": "https://www.archives.gov/research/military/colonial-wars"
+        },
+        {
+          "label": "Library of Congress — U.S. local history & genealogy portal",
+          "url": "https://guides.loc.gov/us-history-local-history-genealogy"
+        }
+      ]
+    },
+    {
+      "id": "w1812-baltimore-1814",
+      "warSlug": "war-of-1812",
+      "title": "Defense of Baltimore / Fort McHenry",
+      "approxWhen": "September 1814",
+      "lat": 39.2647,
+      "lng": -76.5797,
+      "summary": "British naval bombardment and land operations near Baltimore; Francis Scott Key’s witness account later framed national memory of the flag.",
+      "belligerents": ["U.S. forces and militia", "British Navy and expeditionary troops"],
+      "keywords": ["baltimore", "fort mchenry", "star spangled"],
+      "externalLinks": [
+        {
+          "label": "NPS — Fort McHenry National Monument and Historic Shrine",
+          "url": "https://www.nps.gov/fomc/index.htm"
+        },
+        {
+          "label": "National Archives — War of 1812",
+          "url": "https://www.archives.gov/research/military/war-of-1812"
+        }
+      ]
+    },
+    {
+      "id": "w1812-plattsburgh-1814",
+      "warSlug": "war-of-1812",
+      "title": "Plattsburgh / Lake Champlain",
+      "approxWhen": "September 1814",
+      "lat": 44.6989,
+      "lng": -73.4537,
+      "summary": "Naval battle on Lake Champlain and linked land operations helped end the British northern advance in many standard accounts.",
+      "belligerents": ["U.S. Navy and Army", "British Navy and Army"],
+      "keywords": ["plattsburgh", "lake champlain", "macdonough"],
+      "externalLinks": [
+        {
+          "label": "National Archives — War of 1812",
+          "url": "https://www.archives.gov/research/military/war-of-1812"
+        },
+        {
+          "label": "NPS — War of 1812 subject portal",
+          "url": "https://www.nps.gov/subjects/warof1812/index.htm"
+        }
+      ]
+    },
+    {
+      "id": "w1812-new-orleans-1815",
+      "warSlug": "war-of-1812",
+      "title": "Battle of New Orleans",
+      "approxWhen": "January 1815",
+      "lat": 29.9414,
+      "lng": -90.0715,
+      "summary": "Major land engagement after the Treaty of Ghent was signed but before news crossed the Atlantic—a staple chronology lesson in U.S. survey courses.",
+      "belligerents": ["U.S. Army, militia, and naval artillery", "British Army"],
+      "keywords": ["new orleans", "jackson", "ghent"],
+      "externalLinks": [
+        {
+          "label": "National Archives — War of 1812",
+          "url": "https://www.archives.gov/research/military/war-of-1812"
+        },
+        {
+          "label": "NPS — Jean Lafitte National Historical Park and Preserve",
+          "url": "https://www.nps.gov/jela/index.htm"
+        }
+      ]
+    },
+    {
+      "id": "cw-first-bull-run-1861",
+      "warSlug": "civil-war",
+      "title": "First Bull Run (First Manassas)",
+      "approxWhen": "July 1861",
+      "lat": 38.8129,
+      "lng": -77.5211,
+      "summary": "Early large engagement near Washington that sobered expectations of a short war in many Northern and Southern public narratives.",
+      "belligerents": ["Union Army", "Confederate Army"],
+      "keywords": ["bull run", "manassas", "1861"],
+      "externalLinks": [
+        {
+          "label": "NPS — Manassas National Battlefield Park",
+          "url": "https://www.nps.gov/mana/index.htm"
+        },
+        {
+          "label": "National Archives — Civil War records",
+          "url": "https://www.archives.gov/research/military/civil-war"
+        }
+      ]
+    },
+    {
+      "id": "cw-antietam-1862",
+      "warSlug": "civil-war",
+      "title": "Antietam (Sharpsburg)",
+      "approxWhen": "September 1862",
+      "lat": 39.4747,
+      "lng": -77.7389,
+      "summary": "Bloodiest single day in U.S. military history to that point; often linked to preliminary emancipation timing in general histories.",
+      "belligerents": ["Union Army of the Potomac", "Confederate Army of Northern Virginia"],
+      "keywords": ["antietam", "sharpsburg", "maryland"],
+      "externalLinks": [
+        {
+          "label": "NPS — Antietam National Battlefield",
+          "url": "https://www.nps.gov/anti/index.htm"
+        },
+        {
+          "label": "National Archives — Civil War records",
+          "url": "https://www.archives.gov/research/military/civil-war"
+        }
+      ]
+    },
+    {
+      "id": "cw-gettysburg-1863",
+      "warSlug": "civil-war",
+      "title": "Gettysburg",
+      "approxWhen": "July 1863",
+      "lat": 39.8309,
+      "lng": -77.2311,
+      "summary": "Three-day eastern-theater battle frequently treated as a commemorative hinge for Union war aims and national memory.",
+      "belligerents": ["Union Army of the Potomac", "Confederate Army of Northern Virginia"],
+      "keywords": ["gettysburg", "pennsylvania", "pickett"],
+      "externalLinks": [
+        {
+          "label": "NPS — Gettysburg National Military Park",
+          "url": "https://www.nps.gov/gett/index.htm"
+        },
+        {
+          "label": "National Archives — Civil War records",
+          "url": "https://www.archives.gov/research/military/civil-war"
+        }
+      ]
     }
   ]
 }

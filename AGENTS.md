@@ -38,6 +38,8 @@ The system runs on:
 
 `public/shared/calculationEngine.js`
 
+* Shared **pure math** (`calcMath`) lives in `public/shared/calcEngineLibrary.js`. Extend `calcMath` there—do **not** introduce parallel math libraries or duplicate calculator modules for new features (e.g. GSE scenario ratios belong as named helpers on `calcMath`, not a new `public/shared/*-math.js` file).
+
 * Encompass integrations follow patterns in:
 
 ```
@@ -62,7 +64,8 @@ routes/encompass-*.routes.js
 | Screen Test tool         | `controllers/reviewer-ai.controller.js`, `routes/reviewer.routes.js`, `public/finance/tool9.html`                |
 | Unit Tests               | `public/finance/unit-tests.html`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js`   |
 | Worksheets UI            | `public/finance/` (URLs unchanged; product name Worksheets)                                                      |
-| Financial calculations   | `public/shared/calculationEngine.js`                                                                             |
+| Financial calculations   | `public/shared/calculationEngine.js` (UI engine); pure helpers: `public/shared/calcEngineLibrary.js` (`calcMath`)  |
+| GSE scenario analyzer      | `public/gse-analyzer.html`, `routes/gse.routes.js`, `controllers/gse.controller.js`, `services/gse-scenario.service.js`, `data/gse/` |
 | AG Grid pages            | `unit-tests.html`, `encompass-custom-fields.html`, `encompass-native-fields.html`                                |
 | Lane family / genealogy | `public/family/`, `services/genealogy.service.js`, `routes/genealogy.routes.js` — maps: Google Maps JS (loader `lane-family-google-maps.js`) + server geocode `geocodeAddressFree` via `/api/genealogy/*`; see `docs/FRONTEND_PATTERNS.md` (Lane / family maps) |
 
@@ -71,7 +74,10 @@ routes/encompass-*.routes.js
 - **UI:** `public/family/lane-pdf-gallery.html` — data from `GET /api/genealogy/lane-pdf/gallery` (`services/genealogy.service.js`).
 - **Plate JPEGs:** `public/family/assets/lane-pdf/*.jpg` are **committed** (plain git, not LFS) so clones show thumbnails without a local extract.
 - **Regenerate plates + manifest:** `npm run extract:lane-pdf-images` (requires `data/lanegenealogies01chap.pdf`). **Refresh candidate join:** `npm run build:lane-pdf-candidates` after manifest changes.
+- **Lane Historians frontispiece crops (p4-i0):** `npm run extract:lane-frontispiece-portraits` — writes `public/family/assets/lane-historians/portrait-*.jpg` (edit `scripts/tools/extract-lane-frontispiece-portraits.mjs` bounds if needed).
+- **Gallery deep link:** `/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4` filters to the plate and scroll/highlights the card. Optional committee portrait context: `&portrait=john-wm-lane` (or `jas-h-fitts`, `geo-w-lane`, `dr-edwd-b-lane`) shows a banner linking to `/family/lane-historians.html#lh-portrait-<slug>`.
 - **Data:** `data/lane-pdf-image-manifest.json`, `data/lane-pdf-photo-candidates.json`, `data/lane-pdf-person-portraits.json`.
+- **Saved filter views (presets):** stored **server-side** in Postgres per browser `clientId` (`/api/genealogy/lane-pdf/presets*`). The gallery **Export presets** button downloads a JSON backup named **`lane-pdf-gallery-filter-presets.json`** (that filename is the browser download only—not a file committed under `data/`).
 
 ---
 

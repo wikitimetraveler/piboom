@@ -341,12 +341,13 @@
 <script src="/shared/quick-actions.js"></script>
 <script src="/shared/scripts.js"></script>
 <script>
-// Auto-redirect root to demo mode when no ?demo param
-(function() {
+// Bare home URL: no auto demo redirect; clear stale demoMode so launch shows full catalog + navbar.
+(function () {
   const path = location.pathname.replace(/\/$/, '') || '/';
-  if ((path === '/' || path === '/index.html') && !location.search) {
-    location.replace('/?demo=1');
-    return;
+  if ((path === '/' || path === '/index.html') && location.search === '') {
+    try {
+      localStorage.removeItem('demoMode');
+    } catch (_) {}
   }
 })();
 

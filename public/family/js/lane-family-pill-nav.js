@@ -4,13 +4,13 @@
 (function () {
   const LINKS = [
     { href: '/family/lane-family.html', label: 'Hub' },
+    { href: '/family/lane-historians.html', label: 'Historians' },
     { href: '/family/lane-museum.html', label: 'Museum' },
     { href: '/family/lane-was-he-an-idiot.html', label: 'PS 1884' },
     { href: '/family/lane-war-history.html', label: 'War' },
     { href: '/family/lane-memorial-wall.html', label: 'Memorial' },
     { href: '/family/lane-occupations.html', label: 'Work' },
     { href: '/family/lane-pdf-gallery.html', label: 'Plates' },
-    { href: '/family/genealogy.html', label: 'Tree' },
     { href: '/family/lane-direct-ancestor-story.html', label: 'Line' },
     { href: '/family/genealogy-import.html', label: 'Import' }
   ];

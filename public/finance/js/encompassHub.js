@@ -13,6 +13,11 @@ const loanTypeSelect = document.getElementById('loanTypeFilter');
 const limitInput = document.getElementById('limitFilter');
 const clearFiltersBtn = document.getElementById('clearFiltersBtn');
 const loadPipelineCta = document.getElementById('loadPipelineCta');
+const pipelineViewSelect = document.getElementById('pipelineViewSelect');
+const pipelinePushAll = document.getElementById('pipelinePushAll');
+const pipelineResultsHead = document.getElementById('pipelineResultsHead');
+const LS_PIPELINE_VIEW = 'encompassHub.pipelineView';
+
 const voiceHelpPanel = document.getElementById('voiceHelp');
 const voiceHelpToggle = document.getElementById('toggleVoiceHelp');
 const voiceHelpClose = document.getElementById('closeVoiceHelp');
@@ -109,6 +114,63 @@ function buildQueryParams(formData) {
   return params;
 }
 
+function getPipelineView() {
+  try {
+    const v = localStorage.getItem(LS_PIPELINE_VIEW);
+    if (v === 'overview' || v === 'lanePeoples') return v;
+  } catch (_) {
+    /* ignore */
+  }
+  return 'lanePeoples';
+}
+
+function setPipelineView(v) {
+  try {
+    localStorage.setItem(LS_PIPELINE_VIEW, v);
+  } catch (_) {
+    /* ignore */
+  }
+}
+
+function pipelineColCount(view = getPipelineView()) {
+  return view === 'overview' ? 6 : 10;
+}
+
+function loanField(loan, key) {
+  const v = loan?.fields?.[key];
+  if (v == null || v === '') return '—';
+  return String(v);
+}
+
+function renderPipelineHeader(view) {
+  if (!pipelineResultsHead) return;
+  if (view === 'overview') {
+    pipelineResultsHead.innerHTML = `
+      <tr>
+        <th>Loan #</th>
+        <th>Borrower</th>
+        <th>County</th>
+        <th>State</th>
+        <th>Amount</th>
+        <th>Doc Type</th>
+      </tr>`;
+  } else {
+    pipelineResultsHead.innerHTML = `
+      <tr>
+        <th>Loan #</th>
+        <th>Borrower</th>
+        <th>County</th>
+        <th>State</th>
+        <th>Amount</th>
+        <th>Doc Type</th>
+        <th>Loan Officer</th>
+        <th>Processor</th>
+        <th>Underwriter</th>
+        <th>Closer</th>
+      </tr>`;
+  }
+}
+
 function updateFilterBadges(filters) {
   const chips = [];
   if (filters.get('state')) {
@@ -127,10 +189,12 @@ function updateFilterBadges(filters) {
 }
 
 function renderPipelineRows(loans) {
+  const view = getPipelineView();
+  const cols = pipelineColCount(view);
   if (!loans.length) {
     pipelineTableBody.innerHTML = `
       <tr>
-        <td colspan="6" class="text-center text-muted py-4">
+        <td colspan="${cols}" class="text-center text-muted py-4">
           No loans returned for the current filter set.
         </td>
       </tr>
@@ -141,25 +205,46 @@ function renderPipelineRows(loans) {
 
   const rows = loans
     .map((loan) => {
-      const loanNumber = loan?.fields?.['Loan.LoanNumber'] || '—';
-      const borrower = loan?.fields?.['Loan.BorrowerName'] || '—';
-      const county = loan?.fields?.['Fields.15'] || '—';
-      const state = loan?.fields?.['Fields.14'] || '—';
+      const loanNumber = loanField(loan, 'Loan.LoanNumber');
+      const borrower = loanField(loan, 'Loan.BorrowerName');
+      const county = loanField(loan, 'Fields.15');
+      const state = loanField(loan, 'Fields.14');
       const amount = loan?.fields?.['Loan.LoanAmount']
         ? currencyFormatter.format(loan.fields['Loan.LoanAmount'])
         : '—';
-      const docType = loan?.fields?.['Fields.4000'] || '—';
+      const docType = loanField(loan, 'Fields.4000');
+      const guid = loan.loanGuid || '';
 
-      return `
-        <tr data-guid="${loan.loanGuid || ''}">
+      if (view === 'overview') {
+        return `
+        <tr data-guid="${guid}">
           <td>${loanNumber}</td>
           <td>${borrower}</td>
           <td>${county}</td>
           <td>${state}</td>
           <td>${amount}</td>
           <td>${docType}</td>
-        </tr>
-      `;
+        </tr>`;
+      }
+
+      const loName = loanField(loan, 'Loan.LoanOfficerName');
+      const procName = loanField(loan, 'Loan.LoanProcessorName');
+      const uwName = loanField(loan, 'Loan.UnderwriterName');
+      const closerName = loanField(loan, 'Loan.CloserName');
+
+      return `
+        <tr data-guid="${guid}">
+          <td>${loanNumber}</td>
+          <td>${borrower}</td>
+          <td>${county}</td>
+          <td>${state}</td>
+          <td>${amount}</td>
+          <td>${docType}</td>
+          <td>${loName}</td>
+          <td>${procName}</td>
+          <td>${uwName}</td>
+          <td>${closerName}</td>
+        </tr>`;
     })
     .join('');
 

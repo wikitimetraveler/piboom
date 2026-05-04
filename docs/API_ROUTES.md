@@ -71,6 +71,16 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/loan-pipeline/ai/analyze` | Analyze dashboard |
 | GET | `/api/loan-pipeline/ai/history` | Conversation history |
 
+## GSE scenario analyzer (public rules / FHFA sample data)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/gse/products` | Merged Fannie/Freddie product catalog from `data/gse/*.json` |
+| GET | `/api/gse/sources` | `rule-metadata.json`: disclaimers and official doc URLs |
+| POST | `/api/gse/analyze-scenario` | Body: non-PII scenario JSON → summary, product fit rows, suggestions |
+| POST | `/api/gse/import-loan-json` | Validate + normalize scenario JSON (same shape as analyze); no persistence |
+| GET | `/api/gse/loan-limits` | Query `state`, `county`, `units` → bundled FHFA sample limit row |
+
 ## Disasters
 
 | Method | Path | Description |
@@ -147,5 +157,6 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | `routes/loan-pipeline.routes.js` | `/api/loan-pipeline` |
 | `routes/disasters.routes.js` | `/api/disasters` |
 | `routes/finds.routes.js` | `/api/finds` |
+| `routes/gse.routes.js` | `/api/gse` |
 | `routes/chat.routes.js` | `/api/chat` |
 | (others) | See `routes/index.routes.js` |

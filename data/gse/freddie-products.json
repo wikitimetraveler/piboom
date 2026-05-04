@@ -1,0 +1,37 @@
+{
+  "agency": "Freddie Mac",
+  "products": [
+    {
+      "id": "standard-conforming",
+      "name": "Conventional Conforming (standard)",
+      "tag": "standard",
+      "sourceRefs": ["FREDDIE_CONFORMING"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 97,
+        "maxCltv": 97,
+        "minFico": 620,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary", "secondHome", "investment"],
+        "allowedPurpose": ["purchase", "rateTermRefi", "cashOutRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    },
+    {
+      "id": "home-possible",
+      "name": "Home Possible",
+      "tag": "affordable",
+      "sourceRefs": ["FREDDIE_HOME_POSSIBLE_GUIDE"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 97,
+        "maxCltv": 105,
+        "minFico": 660,
+        "maxDti": 50,
+        "maxAmiPercent": 100,
+        "amiNote": "Home Possible has income limits; confirm current requirements for the subject property.",
+        "allowedOccupancy": ["primary"],
+        "allowedPurpose": ["purchase", "rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    }
+  ]
+}

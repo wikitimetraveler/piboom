@@ -1,4 +1,8 @@
 /* Lane PDF plate gallery — aligns with DevConnect Labs shared tokens (see /shared/styles.css :root) */
+.lane-pdf-portrait-deeplink {
+  border-radius: 10px;
+}
+
 .lane-pdf-gallery-page {
   --lane-pdf-bar-bg: rgba(255, 255, 255, 0.9);
   --lane-pdf-chip-bg: rgba(248, 250, 252, 0.95);
@@ -187,6 +191,11 @@
   transition:
     box-shadow 0.2s ease,
     transform 0.2s ease;
+}
+
+.lane-pdf-card--deeplink {
+  outline: 3px solid rgba(52, 152, 219, 0.9);
+  outline-offset: 3px;
 }
 
 .lane-pdf-card:hover {

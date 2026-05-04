@@ -445,19 +445,31 @@
 
         <div class="col-lg-8 mb-4">
           <div class="hub-card p-3 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
               <div>
                 <h5 class="mb-1">Pipeline Results</h5>
                 <small class="text-muted">Click or say “Select first loan” to drill in</small>
               </div>
-              <div class="text-end">
-                <div class="filter-chips mb-2" id="activeFilters"></div>
-                <small id="resultMeta" class="text-muted">No data loaded yet</small>
+              <div class="d-flex flex-wrap align-items-end gap-2">
+                <div>
+                  <label for="pipelineViewSelect" class="small text-muted d-block mb-0">View</label>
+                  <select id="pipelineViewSelect" class="form-select form-select-sm" style="min-width: 11rem" aria-label="Pipeline table view">
+                    <option value="lanePeoples">Lane Peoples</option>
+                    <option value="overview">Overview</option>
+                  </select>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="pipelinePushAll" title="Set record limit to 100 (API max) and reload pipeline">
+                  <i class="bi bi-cloud-arrow-up"></i> Push all
+                </button>
+                <div class="text-end">
+                  <div class="filter-chips mb-2" id="activeFilters"></div>
+                  <small id="resultMeta" class="text-muted">No data loaded yet</small>
+                </div>
               </div>
             </div>
             <div class="table-responsive">
               <table class="table table-hover mb-0" id="pipelineResults">
-                <thead>
+                <thead id="pipelineResultsHead">
                   <tr>
                     <th>Loan #</th>
                     <th>Borrower</th>
@@ -465,11 +477,15 @@
                     <th>State</th>
                     <th>Amount</th>
                     <th>Doc Type</th>
+                    <th>Loan Officer</th>
+                    <th>Processor</th>
+                    <th>Underwriter</th>
+                    <th>Closer</th>
                   </tr>
                 </thead>
                 <tbody id="pipelineResultsBody">
                   <tr>
-                    <td colspan="6" class="text-center text-muted py-4">
+                    <td colspan="10" class="text-center text-muted py-4">
                       Use the filters to load pipeline data from Encompass.
                     </td>
                   </tr>
