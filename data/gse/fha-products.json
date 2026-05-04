@@ -1,0 +1,50 @@
+{
+  "agency": "FHA",
+  "products": [
+    {
+      "id": "forward-203b",
+      "name": "FHA forward (203(b))",
+      "tag": "fha",
+      "sourceRefs": ["FHA_HANDBOOK"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 96.5,
+        "maxCltv": 96.5,
+        "minFico": 580,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary", "secondHome", "investment"],
+        "allowedPurpose": ["purchase", "rateTermRefi", "cashOutRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    },
+    {
+      "id": "streamline",
+      "name": "FHA streamline refinance",
+      "tag": "fha",
+      "sourceRefs": ["FHA_HANDBOOK"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 97.75,
+        "maxCltv": 97.75,
+        "minFico": 580,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary", "secondHome", "investment"],
+        "allowedPurpose": ["rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    },
+    {
+      "id": "limited-203k",
+      "name": "FHA Limited 203(k)",
+      "tag": "fha",
+      "sourceRefs": ["FHA_HANDBOOK"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 96.5,
+        "maxCltv": 110,
+        "minFico": 620,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary"],
+        "allowedPurpose": ["purchase", "rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    }
+  ]
+}

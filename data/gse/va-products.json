@@ -1,0 +1,50 @@
+{
+  "agency": "VA",
+  "products": [
+    {
+      "id": "purchase",
+      "name": "VA-guaranteed purchase",
+      "tag": "va",
+      "sourceRefs": ["VA_HANDBOOK"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 100,
+        "maxCltv": 100,
+        "minFico": 620,
+        "maxDti": 60,
+        "allowedOccupancy": ["primary", "secondHome"],
+        "allowedPurpose": ["purchase"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    },
+    {
+      "id": "irrrl",
+      "name": "VA IRRRL",
+      "tag": "va",
+      "sourceRefs": ["VA_HANDBOOK"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 100,
+        "maxCltv": 100,
+        "minFico": 620,
+        "maxDti": 60,
+        "allowedOccupancy": ["primary", "secondHome"],
+        "allowedPurpose": ["rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    },
+    {
+      "id": "cash-out",
+      "name": "VA cash-out refinance",
+      "tag": "va",
+      "sourceRefs": ["VA_HANDBOOK"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 90,
+        "maxCltv": 90,
+        "minFico": 620,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary", "secondHome"],
+        "allowedPurpose": ["cashOutRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    }
+  ]
+}

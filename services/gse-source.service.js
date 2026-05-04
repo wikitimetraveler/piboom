@@ -15,29 +15,27 @@ function readJsonFile(name) {
 /**
  * Merged product catalog for UI (stable productId per agency).
  */
+const PRODUCT_FILES = [
+  ['fannie-products.json', 'fannie'],
+  ['freddie-products.json', 'freddie'],
+  ['va-products.json', 'va'],
+  ['fha-products.json', 'fha']
+];
+
 export function readProducts() {
-  const fannie = readJsonFile('fannie-products.json');
-  const freddie = readJsonFile('freddie-products.json');
   const list = [];
-  for (const p of fannie.products || []) {
-    list.push({
-      agency: fannie.agency,
-      productId: `fannie:${p.id}`,
-      id: p.id,
-      name: p.name,
-      tag: p.tag,
-      sourceRefs: p.sourceRefs || []
-    });
-  }
-  for (const p of freddie.products || []) {
-    list.push({
-      agency: freddie.agency,
-      productId: `freddie:${p.id}`,
-      id: p.id,
-      name: p.name,
-      tag: p.tag,
-      sourceRefs: p.sourceRefs || []
-    });
+  for (const [fileName, prefix] of PRODUCT_FILES) {
+    const data = readJsonFile(fileName);
+    for (const p of data.products || []) {
+      list.push({
+        agency: data.agency,
+        productId: `${prefix}:${p.id}`,
+        id: p.id,
+        name: p.name,
+        tag: p.tag,
+        sourceRefs: p.sourceRefs || []
+      });
+    }
   }
   return list;
 }

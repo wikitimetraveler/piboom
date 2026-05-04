@@ -436,6 +436,12 @@ class ModernNavbar extends HTMLElement {
                 </div>
               </li>
 
+              <li class="nav-item">
+                <a class="nav-link" href="/gse-analyzer.html" title="Fannie / Freddie / FHFA scenario research (not pricing or approval)">
+                  <i class="bi-graph-up-arrow"></i> GSE analyzer
+                </a>
+              </li>
+
               ${demoMode ? `
               <li class="nav-item">
                 <a class="nav-link" href="/?demo=0" style="font-size:0.8rem;color:var(--muted,#888);" title="Show all domains">

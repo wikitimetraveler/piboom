@@ -41,9 +41,17 @@ describe('gse-scenario.service', () => {
     expect(out.summary.conformingStatus).toBe('within-limit');
     expect(out.summary.bestFit).not.toBe('none');
     expect(Array.isArray(out.products)).toBe(true);
-    expect(out.products.length).toBeGreaterThanOrEqual(4);
+    expect(out.products.length).toBeGreaterThanOrEqual(12);
     for (const p of out.products) {
-      expect(p.warnings.some((w) => w.includes('Selling Guide') || w.includes('Seller/Servicer'))).toBe(true);
+      expect(
+        p.warnings.some(
+          (w) =>
+            w.includes('Selling Guide') ||
+            w.includes('Seller/Servicer') ||
+            w.includes('VA Lenders') ||
+            w.includes('HUD FHA')
+        )
+      ).toBe(true);
     }
     expect(Array.isArray(out.suggestions)).toBe(true);
     expect(out.suggestions.some((s) => String(s).toLowerCase().includes('aus'))).toBe(true);

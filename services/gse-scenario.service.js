@@ -32,12 +32,16 @@ const FORBIDDEN_BORROWER_KEYS = new Set([
 
 const FORBIDDEN_ROOT = new Set(['ssn', 'taxId', 'email', 'phone', 'fullName']);
 
+const PRODUCT_FILES = [
+  ['fannie-products.json', 'fannie'],
+  ['freddie-products.json', 'freddie'],
+  ['va-products.json', 'va'],
+  ['fha-products.json', 'fha']
+];
+
 function loadFullProductRows() {
   const rows = [];
-  for (const [file, prefix] of [
-    ['fannie-products.json', 'fannie'],
-    ['freddie-products.json', 'freddie']
-  ]) {
+  for (const [file, prefix] of PRODUCT_FILES) {
     const p = path.join(GSE_DIR, file);
     const data = JSON.parse(fs.readFileSync(p, 'utf8'));
     for (const prod of data.products || []) {

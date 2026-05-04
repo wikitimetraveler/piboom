@@ -33,6 +33,36 @@
         "allowedPurpose": ["purchase", "rateTermRefi"],
         "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
       }
+    },
+    {
+      "id": "homestyle",
+      "name": "HomeStyle Renovation",
+      "tag": "renovation",
+      "sourceRefs": ["FANNIE_CONFORMING"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 95,
+        "maxCltv": 95,
+        "minFico": 620,
+        "maxDti": 45,
+        "allowedOccupancy": ["primary", "secondHome", "investment"],
+        "allowedPurpose": ["purchase", "rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
+    },
+    {
+      "id": "high-ltv-refi",
+      "name": "High-LTV refinance option (guide-based)",
+      "tag": "refinance",
+      "sourceRefs": ["FANNIE_CONFORMING"],
+      "rules": {
+        "maxLtvPrimaryPurchase": 97,
+        "maxCltv": 97,
+        "minFico": 620,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary", "secondHome"],
+        "allowedPurpose": ["rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
+      }
     }
   ]
 }

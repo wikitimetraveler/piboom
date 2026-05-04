@@ -159,7 +159,7 @@ body.lane-occ-page {
 
 .occ-jobs-figure {
   margin: 0;
-  max-width: min(100%, 520px);
+  max-width: min(100%, 960px);
 }
 
 .occ-jobs-figure img {

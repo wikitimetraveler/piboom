@@ -12,11 +12,24 @@ const GUIDE_WARNINGS = {
   freddie: [
     'Confirm current Freddie Mac Seller/Servicer Guide and bulletin eligibility for this scenario.',
     'Do not rely on this tool for LPA findings or approval.'
+  ],
+  va: [
+    'Confirm current VA Lenders Handbook (VA Pamphlet 26-7) and VA circulars for this scenario.',
+    'VA residual income, COE, and funding fee rules are not modeled in this prototype.'
+  ],
+  fha: [
+    'Confirm current HUD FHA Handbook 4000.1 and applicable Mortgagee Letters.',
+    'Do not rely on this tool for FHA TOTAL Scorecard or approval.'
   ]
 };
 
 function agencyKind(agency) {
-  return String(agency || '').toLowerCase().includes('freddie') ? 'freddie' : 'fannie';
+  const a = String(agency || '').toLowerCase();
+  if (a.includes('freddie')) return 'freddie';
+  if (a.includes('fannie')) return 'fannie';
+  if (a === 'va' || a.includes('veterans')) return 'va';
+  if (a === 'fha' || a.includes('federal housing')) return 'fha';
+  return 'fannie';
 }
 
 export function evaluateProduct(scenario, productRow) {

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, and FHFA materials. It is not underwriting, not DU/LPA, and not a commitment to lend. Always confirm eligibility in the current official guides and through your AUS / compliance process.",
+  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, and FHA materials. It is not underwriting, not DU/LPA/TOTAL, and not a commitment to lend. Always confirm eligibility in the current official guides and through your AUS / compliance process.",
   "sources": [
     {
       "id": "FANNIE_SELLING_GUIDE",
@@ -36,6 +36,16 @@
       "id": "FHFA_LIMITS",
       "title": "FHFA Conforming Loan Limits",
       "url": "https://www.fhfa.gov/data/conforming-loan-limits"
+    },
+    {
+      "id": "VA_LENDERS_HANDBOOK",
+      "title": "VA Lenders Handbook (VA Pamphlet 26-7)",
+      "url": "https://www.benefits.va.gov/WARMS/docs/admin26/m26-7/ah_26-7.pdf"
+    },
+    {
+      "id": "FHA_4000_1",
+      "title": "HUD FHA Single Family Housing Policy Handbook 4000.1",
+      "url": "https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1"
     }
   ],
   "sourceRefs": {
@@ -54,6 +64,14 @@
     "FREDDIE_CONFORMING": {
       "title": "Standard conventional conforming — Seller/Servicer Guide",
       "url": "https://guide.freddiemac.com/app/guide/"
+    },
+    "VA_HANDBOOK": {
+      "title": "VA Lenders Handbook (26-7)",
+      "url": "https://www.benefits.va.gov/WARMS/docs/admin26/m26-7/ah_26-7.pdf"
+    },
+    "FHA_HANDBOOK": {
+      "title": "HUD FHA Handbook 4000.1",
+      "url": "https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1"
     }
   }
 }
