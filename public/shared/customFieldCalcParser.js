@@ -17,12 +17,19 @@
   /**
    * Parse a calculation formula to extract output field, input fields, and expression.
    * @param {string} formula - e.g. "[CX.TEST] = 1 + [353]" or "1 + [353]"
+   *   (optional leading "=" when the assignment starts with "[" — Excel paste)
    * @returns {{ outputField: string|null, inputFields: string[], expression: string }|null}
    */
   function parseCalculationFormula(formula) {
     if (!formula || typeof formula !== 'string') return null;
-    const trimmed = formula.trim();
+    let trimmed = formula.trim();
     if (!trimmed) return null;
+
+    // Excel copy/paste often prefixes the whole calc with '='; Encompass text starts at '['
+    if (trimmed.charCodeAt(0) === 61 /* '=' */) {
+      const afterEq = trimmed.slice(1).trimStart();
+      if (afterEq.startsWith('[')) trimmed = afterEq;
+    }
 
     // Pattern: [outputField] = expression  OR  just expression (output inferred from context)
     const assignMatch = trimmed.match(/^\s*\[([^\]]+)\]\s*=\s*(.+)$/);

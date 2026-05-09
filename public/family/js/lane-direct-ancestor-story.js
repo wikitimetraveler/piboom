@@ -185,6 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (error) {
     console.error(error);
     const err = document.getElementById('directError');
-    if (err) err.textContent = `${HISTORY_STATE_COPY.unavailable} ${error.message}`;
+    if (err)
+      err.textContent = `${HISTORY_STATE_COPY.unavailable} ${error.message}. Verify GET /api/genealogy/direct-line-story parameters.`;
   }
 });

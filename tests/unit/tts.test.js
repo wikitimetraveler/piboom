@@ -5,10 +5,15 @@ const setupBrowserGlobals = () => {
   delete global.__ttsHelperInitialized;
   delete global.speakWithGoogle;
   delete global.stopSpeech;
+  delete global.speakNarrationAwaitEnd;
   global.document = {
     readyState: 'complete',
     addEventListener: jest.fn(),
     removeEventListener: jest.fn()
+  };
+  global.localStorage = {
+    getItem: jest.fn(() => null),
+    setItem: jest.fn()
   };
   global.atob = (value) => Buffer.from(value, 'base64').toString('binary');
   global.Blob = class {
@@ -76,5 +81,36 @@ describe('shared tts helper', () => {
 
     expect(result).toBe(true);
     expect(global.speechSynthesis.speak).toHaveBeenCalled();
+  });
+
+  test('speakNarrationAwaitEnd awaits synthesized audio completion', async () => {
+    global.navigator = { userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120', maxTouchPoints: 0 };
+
+    global.Audio = class {
+      constructor() {
+        this.volume = 1;
+        this.onended = null;
+      }
+
+      async play() {
+        const cb = this.onended;
+        queueMicrotask(() => {
+          if (cb) cb();
+        });
+        return Promise.resolve();
+      }
+
+      pause() {}
+    };
+
+    global.fetch = jest.fn().mockResolvedValue({
+      json: async () => ({ success: true, audio: Buffer.from('z').toString('base64') })
+    });
+
+    await import('../../public/shared/tts.js');
+
+    await window.speakNarrationAwaitEnd('Scene narration line.');
+
+    expect(global.fetch).toHaveBeenCalled();
   });
 });

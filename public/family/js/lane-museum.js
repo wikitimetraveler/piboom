@@ -418,8 +418,9 @@ function openMuseumExhibitPoster(rawPayload) {
   if (shareInput) shareInput.value = '';
 
   rebuildMuseumPoster();
-  if (typeof $ !== 'undefined' && $('#museumPosterModal').modal) {
-    $('#museumPosterModal').modal('show');
+  const posterModal = document.getElementById('museumPosterModal');
+  if (posterModal && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    bootstrap.Modal.getOrCreateInstance(posterModal).show();
   }
 }
 
@@ -573,9 +574,10 @@ function renderThemeButtons(themes = {}) {
 
 function renderFeatured(featuredStory = {}, museum = {}) {
   const person = featuredStory.featuredPerson || {};
-  document.getElementById('featuredTitle').textContent = featuredStory.title || 'Exhibit 1';
+  document.getElementById('featuredTitle').textContent =
+    featuredStory.title || 'William E Lane of Boston';
   document.getElementById('featuredSubtitle').textContent =
-    featuredStory.subtitle || 'William E Lane of Boston as chronology anchor';
+    featuredStory.subtitle || 'Exhibit 1 · Opening exhibit';
   document.getElementById('featuredSummary').textContent =
     featuredStory.summary || HISTORY_STATE_COPY.empty;
 
@@ -724,11 +726,15 @@ function renderProminent(prominent = []) {
              </figure>`
           : '';
       const cardMods = [imgUrl ? 'prominent-card--hero' : ''].filter(Boolean).join(' ');
+      const orderLine =
+        entry.order === 1
+          ? 'Exhibit 1'
+          : `Exhibit order ${escapeHtml(entry.order != null ? String(entry.order) : '?')}`;
       return `
         <article class="prominent-card ${cardMods}" data-person-id="${escapeHtml(String(pid ?? ''))}" data-museum-accent="${accentIndex}">
           ${mediaBlock}
           <div class="prominent-card-body">
-          <div class="small text-muted">Exhibit order ${escapeHtml(entry.order || '?')}</div>
+          <div class="small text-muted">${orderLine}</div>
           <h3 class="h6 mb-1">${escapeHtml(title)}</h3>
           <div class="small mb-2">${escapeHtml(entry.eraLabel || '')}</div>
           <div class="small">${escapeHtml(entry.caption || '')}</div>
@@ -1019,7 +1025,7 @@ async function askLaneMuseumDocent(question, ctx) {
     }
     out.textContent = data.response || '(Empty response.)';
   } catch (err) {
-    out.textContent = `The docent could not answer right now (${err.message}). You can still browse exhibits and timelines offline.`;
+    out.textContent = `The docent could not answer right now (${err.message}). Check POST /api/chat/chat and OpenAI on the server. You can still browse exhibits and timelines offline.`;
   }
 }
 
@@ -1086,15 +1092,592 @@ async function initLaneMuseum() {
   }
 }
 
+/* --- Museum HyperFrames story mode --- */
+const GEORGE_LANE_PROMINENT_PERSON_ID = 2898;
+const STORAGE_MUSEUM_STORY_CHAPTERS = 'laneMuseumStoryChapters';
+const STORAGE_MUSEUM_STORY_NARRATE = 'laneMuseumStoryNarrate';
+const MUSEUM_STORY_SCENE_MS = 4600;
+const MUSEUM_STORY_CHAPTER_MS = 3400;
+const MUSEUM_STORY_GAP_MS = 200;
+
+let museumSpeakToken = 0;
+const museumStoryState = {
+  running: false,
+  playbackToken: 0,
+  scenes: []
+};
+let museumStoryFloatResolveAnchor = null;
+let museumStoryFloatScrollBound = false;
+let museumStoryFloatReflowScheduled = false;
+let museumStoryListenersBound = false;
+
+function normalizeMuseumNarrationSpace(s) {
+  return String(s || '')
+    .replace(/\s+/g, ' ')
+    .replace(/\u00a0/g, ' ')
+    .trim();
+}
+
+function truncateMuseumNarration(raw, max) {
+  const t = normalizeMuseumNarrationSpace(raw);
+  if (t.length <= max) return t;
+  return `${t.slice(0, Math.max(0, max - 1))}\u2026`;
+}
+
+function escapeMuseumCssAttr(val) {
+  const text = String(val ?? '');
+  if (typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function') {
+    return window.CSS.escape(text);
+  }
+  return text.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+}
+
+function museumStoryChaptersEnabled() {
+  const el = document.getElementById('museumStoryChapters');
+  return !el || el.checked;
+}
+
+function museumStoryNarrationEnabled() {
+  const el = document.getElementById('museumStoryNarrate');
+  return !!(el && el.checked);
+}
+
+function persistMuseumStoryOptions() {
+  const ch = document.getElementById('museumStoryChapters');
+  const na = document.getElementById('museumStoryNarrate');
+  try {
+    if (ch) localStorage.setItem(STORAGE_MUSEUM_STORY_CHAPTERS, ch.checked ? '1' : '0');
+    if (na) localStorage.setItem(STORAGE_MUSEUM_STORY_NARRATE, na.checked ? '1' : '0');
+  } catch (_) {}
+}
+
+function loadMuseumStoryOptions() {
+  const ch = document.getElementById('museumStoryChapters');
+  const na = document.getElementById('museumStoryNarrate');
+  try {
+    if (ch) {
+      const v = localStorage.getItem(STORAGE_MUSEUM_STORY_CHAPTERS);
+      if (v === '0') ch.checked = false;
+      else if (v === '1') ch.checked = true;
+      else ch.checked = true;
+    }
+    if (na) {
+      const v = localStorage.getItem(STORAGE_MUSEUM_STORY_NARRATE);
+      if (v === '1') na.checked = true;
+      else if (v === '0') na.checked = false;
+      else na.checked = true; /* default: narrate on for Story Mode / HyperFrames */
+    }
+  } catch (_) {}
+}
+
+function findGeorgeLaneProminentEntry(entries) {
+  const id = GEORGE_LANE_PROMINENT_PERSON_ID;
+  const list = Array.isArray(entries) ? entries : [];
+  return (
+    list.find((e) => {
+      const a = e?.personId != null ? Number(e.personId) : NaN;
+      const b = e?.person?.id != null ? Number(e.person.id) : NaN;
+      return a === id || b === id;
+    }) || null
+  );
+}
+
+function historiansTeaserVisible() {
+  const el = document.getElementById('museumHistoriansTeaser');
+  if (!el || el.hasAttribute('hidden')) return false;
+  return !!normalizeMuseumNarrationSpace(el.innerText || el.textContent);
+}
+
+function lunarObservatoryVisible() {
+  const mount = document.getElementById('lunarObservatoryMount');
+  return !!(mount && !mount.classList.contains('d-none') && normalizeMuseumNarrationSpace(mount.innerText || ''));
+}
+
+function rebuildMuseumStoryScenesAfterContent() {
+  museumStoryState.scenes = buildMuseumStoryScenes();
+  updateMuseumStoryToggleButton();
+}
+
+function buildMuseumStoryScenes() {
+  const chapters = museumStoryChaptersEnabled();
+  const scenes = [];
+  const fs = cachedFeaturedStory || {};
+  const cms = cachedMuseumContent || {};
+  const teaser = cms.historiansTeaser || {};
+  const lunar = cachedLunarExhibit || {};
+
+  /** @typedef {{ scrollEl?: () => Element | null, floatEl?: () => Element | null, kicker: string, title: string, copy: string, narration: string, durationMs: number }} MuseumScene */
+
+  /** @type {Array<MuseumScene & { scrollEl?: () => Element | null, floatEl?: () => Element | null }>} */
+  const add = (s) => scenes.push(s);
+
+  if (chapters) {
+    add({
+      scrollEl: () => document.getElementById('museumHero'),
+      floatEl: () => document.getElementById('museumHero'),
+      kicker: 'Welcome',
+      title: 'Lane Legacy Museum · guided reel',
+      copy: 'Quiet chronological gallery—from Boston onward through later Lane generations.',
+      narration: normalizeMuseumNarrationSpace(
+        'Welcome to the Lane Legacy Museum. This guided reel highlights curated exhibits across the gallery: Boston origins, compilers and sources, nineteenth-century Popular Science-era coverage of a Hampton Falls figure, astronomy naming honors, then a chronological sampler of prominent Lanes.'
+      ),
+      durationMs: MUSEUM_STORY_CHAPTER_MS
+    });
+  }
+
+  const ft = document.getElementById('featuredTitle')?.textContent || '';
+  const fsub = document.getElementById('featuredSubtitle')?.textContent || '';
+  const fsumEl = document.getElementById('featuredSummary');
+  const fsumRaw = normalizeMuseumNarrationSpace((fsumEl?.textContent || fsumEl?.innerText || '').trim());
+
+  add({
+    scrollEl: () => document.getElementById('museumFeaturedPanel'),
+    floatEl: () => document.getElementById('museumFeaturedPanel'),
+    kicker: 'Opening exhibit',
+    title: truncateMuseumText(ft || fs.title || 'Featured exhibit', 120),
+    copy: truncateMuseumText(fsub || fs.subtitle || '', 160),
+    narration: truncateMuseumNarration(
+      normalizeMuseumNarrationSpace(
+        `${ft || fs.title || 'The opening exhibit'}, ${normalizeMuseumNarrationSpace(fsub || fs.subtitle || '')}. ` +
+          (fsumRaw ||
+            normalizeMuseumNarrationSpace(fs.summary || '') ||
+            'This panel anchors colonial New England chronology for Lane lines preserved in cited records.')
+      ),
+      780
+    ),
+    durationMs: MUSEUM_STORY_SCENE_MS
+  });
+
+  if (historiansTeaserVisible()) {
+    const hTitleEl = document.querySelector('.museum-historians-teaser__title');
+    const ledeEl = document.querySelector('.museum-historians-teaser__lede');
+    const ht = truncateMuseumText(
+      normalizeMuseumNarrationSpace(hTitleEl?.textContent || teaser.title || 'Honoring the compilers'),
+      100
+    );
+    const hledeRaw = normalizeMuseumNarrationSpace(ledeEl?.textContent || teaser.lede || '');
+    add({
+      scrollEl: () => document.getElementById('museumHistoriansTeaser'),
+      floatEl: () => document.getElementById('museumHistoriansTeaser'),
+      kicker: 'Historians · compilers',
+      title: ht,
+      copy: truncateMuseumText(hledeRaw, 240),
+      narration: truncateMuseumNarration(
+        normalizeMuseumNarrationSpace(
+          `Behind the plaques and printed volumes stand compilers and trustees. ${hledeRaw || 'Lane Historians links frontispieces, timelines, and the editorial labor that condensed centuries into book form.'}`
+        ),
+        620
+      ),
+      durationMs: MUSEUM_STORY_SCENE_MS
+    });
+  }
+
+  const geoEntry = findGeorgeLaneProminentEntry(cachedProminentLanes);
+  const geoPid = geoEntry?.personId != null ? String(geoEntry.personId) : String(GEORGE_LANE_PROMINENT_PERSON_ID);
+  const geoSel = `.prominent-grid .prominent-card[data-person-id="${escapeMuseumCssAttr(geoPid)}"]`;
+  if (geoEntry) {
+    const display = geoEntry.displayName || 'George G. Lane';
+    const cap = normalizeMuseumNarrationSpace(geoEntry.caption || '');
+    const blurb = normalizeMuseumNarrationSpace(geoEntry.blurb || '');
+    add({
+      scrollEl: () =>
+        document.querySelector(geoSel) || document.getElementById('museumProminentPanel'),
+      floatEl: () =>
+        document.querySelector(geoSel) || document.getElementById('museumProminentPanel'),
+      kicker: 'Popular Science Monthly · May 1884',
+      title: truncateMuseumText(`${display}`, 80),
+      copy: truncateMuseumText(`${cap}`, 260),
+      narration: truncateMuseumNarration(
+        normalizeMuseumNarrationSpace(
+          `${display}, in Popular Science Monthly, May eighteen eighty-four. ${cap}${blurb ? ` ${blurb}` : ''} ` +
+            `The companion read-along Was He an Idiot is on this Lane family site, with figures and fuller context. Period language overlaps today's idea of idiot savant, used here strictly as historical wording.`
+        ),
+        960
+      ),
+      durationMs: MUSEUM_STORY_SCENE_MS
+    });
+  }
+
+  if (lunarObservatoryVisible()) {
+    const lt = normalizeMuseumNarrationSpace(lunar.title || '');
+    const lst = normalizeMuseumNarrationSpace(lunar.subtitle || '');
+    const lb = normalizeMuseumNarrationSpace(lunar.body || '');
+    const nomen = normalizeMuseumNarrationSpace(lunar.nomenclatureOrigin || '');
+    const lunarNarrPieces = [];
+    if (lt) lunarNarrPieces.push(`${lt}.`);
+    if (lst) lunarNarrPieces.push(lst);
+    if (nomen) lunarNarrPieces.push(nomen);
+    else
+      lunarNarrPieces.push(
+        'Jonathan Homer Lane helped model gaseous stars; Mare Cognitum holds Lane crater honoring that astronomical work.'
+      );
+    if (lb) lunarNarrPieces.push(truncateMuseumNarration(lb, 420));
+    add({
+      scrollEl: () => document.getElementById('lunarObservatoryMount'),
+      floatEl: () => document.getElementById('lunarObservatoryMount'),
+      kicker: 'Lunar nomenclature',
+      title: lt || 'Lane crater observatory',
+      copy: truncateMuseumText(`${lst}`, 200),
+      narration: truncateMuseumNarration(normalizeMuseumNarrationSpace(lunarNarrPieces.join(' ')), 980),
+      durationMs: MUSEUM_STORY_SCENE_MS
+    });
+  }
+
+  const timelineHeading = document.getElementById('prominentTimelineHeading');
+  add({
+    scrollEl: () => timelineHeading || document.getElementById('museumProminentPanel'),
+    floatEl: () => timelineHeading || document.getElementById('museumProminentPanel'),
+    kicker: 'Prominent Lanes · chronology',
+    title: 'Chronological highlights',
+    copy: 'Milestones from museum content—inscription lines on the memorial wall expand many of these vignettes.',
+    narration: truncateMuseumNarration(
+      `Here concludes the highlighted circle: chronological milestones under Prominent Lanes. Continue to the memorial wall entry lines for births, deaths, places, and book-sourced excerpts when you want deeper evidence.`,
+      720
+    ),
+    durationMs: MUSEUM_STORY_CHAPTER_MS
+  });
+
+  return scenes;
+}
+
+function updateMuseumStoryToggleButton() {
+  const toggle = document.getElementById('museumStoryToggle');
+  if (!toggle) return;
+  const hasPlaylist = museumStoryState.scenes.length > 0;
+  toggle.disabled = !hasPlaylist && !museumStoryState.running;
+  toggle.setAttribute('aria-pressed', museumStoryState.running ? 'true' : 'false');
+  toggle.textContent = museumStoryState.running ? 'Pause highlight reel' : 'Play highlight reel';
+}
+
+function unbindMuseumStoryFloatListeners() {
+  if (!museumStoryFloatScrollBound) return;
+  window.removeEventListener('scroll', onMuseumStoryFloatingReflow, true);
+  window.removeEventListener('resize', onMuseumStoryFloatingReflow);
+  museumStoryFloatScrollBound = false;
+}
+
+function onMuseumStoryFloatingReflow() {
+  if (!museumStoryState.running) return;
+  const overlay = document.getElementById('museumStoryOverlay');
+  if (!overlay || overlay.classList.contains('d-none')) return;
+  if (museumStoryFloatReflowScheduled) return;
+  museumStoryFloatReflowScheduled = true;
+  window.requestAnimationFrame(() => {
+    museumStoryFloatReflowScheduled = false;
+    repositionMuseumFloatingNugget();
+  });
+}
+
+function bindMuseumStoryFloatListeners() {
+  if (museumStoryFloatScrollBound) return;
+  window.addEventListener('scroll', onMuseumStoryFloatingReflow, true);
+  window.addEventListener('resize', onMuseumStoryFloatingReflow);
+  museumStoryFloatScrollBound = true;
+}
+
+function clearMuseumFloatingOverlayStyles() {
+  const overlay = document.getElementById('museumStoryOverlay');
+  if (!overlay) return;
+  overlay.classList.remove('museum-story-overlay--floating');
+  overlay.style.left = '';
+  overlay.style.right = '';
+  overlay.style.top = '';
+  overlay.style.bottom = '';
+  overlay.style.transform = '';
+  overlay.style.width = '';
+  overlay.style.maxWidth = '';
+}
+
+function museumStoryClamp(n, lo, hi) {
+  return Math.min(hi, Math.max(lo, n));
+}
+
+function positionMuseumStoryFloatingNear(anchorEl) {
+  const overlay = document.getElementById('museumStoryOverlay');
+  if (!overlay || overlay.classList.contains('d-none')) return;
+
+  const pad = 10;
+  const gap = 12;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  overlay.classList.add('museum-story-overlay--floating');
+
+  const anchor = anchorEl instanceof Element ? anchorEl : null;
+
+  function placeFallbackCenter() {
+    overlay.style.transform = 'translateX(-50%)';
+    overlay.style.left = '50%';
+    overlay.style.right = 'auto';
+    overlay.style.bottom = 'auto';
+    overlay.style.top = `${Math.round(museumStoryClamp(Math.min(vh * 0.2, Math.max(vh * 0.12, pad + 76)), pad, vh * 0.35))}px`;
+    overlay.style.width = `${Math.round(Math.min(340, vw - 2 * pad))}px`;
+  }
+
+  if (!anchor || typeof anchor.getBoundingClientRect !== 'function') {
+    placeFallbackCenter();
+    return;
+  }
+
+  const r = anchor.getBoundingClientRect();
+  const narrow = vw <= 576;
+
+  if (narrow) {
+    overlay.style.transform = '';
+    const w = Math.round(Math.min(340, vw - 18));
+    let left = r.left + r.width / 2 - w / 2;
+    left = museumStoryClamp(left, pad, vw - w - pad);
+    let top = r.bottom + gap;
+    overlay.style.left = `${Math.round(left)}px`;
+    overlay.style.right = 'auto';
+    overlay.style.width = `${w}px`;
+    overlay.style.bottom = 'auto';
+    overlay.style.top = `${Math.round(top)}px`;
+
+    window.requestAnimationFrame(() => {
+      const ob = overlay.getBoundingClientRect();
+      if (ob.bottom > vh - pad) {
+        const aboveTop = museumStoryClamp(Math.round(r.top - gap - ob.height), pad, vh - ob.height - pad);
+        overlay.style.top = `${aboveTop}px`;
+      }
+    });
+    return;
+  }
+
+  overlay.style.transform = 'translateY(-50%)';
+  overlay.style.bottom = 'auto';
+  overlay.style.right = 'auto';
+  overlay.style.width = '';
+
+  let leftGuess = Math.round(r.right + gap);
+  const midY = r.top + r.height / 2;
+  overlay.style.top = `${Math.round(midY)}px`;
+  overlay.style.left = `${leftGuess}px`;
+
+  window.requestAnimationFrame(() => {
+    const ob = overlay.getBoundingClientRect();
+    if (leftGuess + ob.width > vw - pad) {
+      leftGuess = Math.round(r.left - gap - ob.width);
+    }
+    leftGuess = museumStoryClamp(leftGuess, pad, vw - ob.width - pad);
+    overlay.style.left = `${leftGuess}px`;
+
+    const ob2 = overlay.getBoundingClientRect();
+    const half = ob2.height / 2;
+    const centerY = museumStoryClamp(r.top + r.height / 2, pad + half, vh - half - pad);
+    overlay.style.top = `${Math.round(centerY)}px`;
+  });
+}
+
+function repositionMuseumFloatingNugget() {
+  let anchor = typeof museumStoryFloatResolveAnchor === 'function' ? museumStoryFloatResolveAnchor() : null;
+  if (!anchor || !(anchor instanceof Element))
+    anchor = document.querySelector('.museum-story-spotlight');
+  positionMuseumStoryFloatingNear(anchor || null);
+}
+
+function scheduleMuseumRepositionNugget() {
+  const slots = [0, 48, 200, 450];
+  for (let i = 0; i < slots.length; i++) {
+    window.setTimeout(() => repositionMuseumFloatingNugget(), slots[i]);
+  }
+  window.requestAnimationFrame(() =>
+    window.requestAnimationFrame(() => repositionMuseumFloatingNugget())
+  );
+}
+
+function setMuseumStoryOverlay(scene) {
+  const overlay = document.getElementById('museumStoryOverlay');
+  const kickerEl = document.getElementById('museumStorySceneKicker');
+  const titleEl = document.getElementById('museumStorySceneTitle');
+  const copyEl = document.getElementById('museumStorySceneCopy');
+  if (!overlay || !kickerEl || !titleEl || !copyEl) return;
+  if (!scene) {
+    unbindMuseumStoryFloatListeners();
+    museumStoryFloatResolveAnchor = null;
+    clearMuseumFloatingOverlayStyles();
+    overlay.classList.add('d-none');
+    kickerEl.textContent = '';
+    titleEl.textContent = '';
+    copyEl.textContent = '';
+    return;
+  }
+  bindMuseumStoryFloatListeners();
+  overlay.classList.remove('d-none');
+  kickerEl.textContent = scene.kicker || '';
+  titleEl.textContent = scene.title || '';
+  copyEl.textContent = scene.copy || '';
+  scheduleMuseumRepositionNugget();
+}
+
+function clearMuseumStorySpotlights() {
+  document.querySelectorAll('.museum-story-spotlight').forEach((el) => {
+    el.classList.remove('museum-story-spotlight');
+  });
+}
+
+function stopMuseumStoryNarration() {
+  museumSpeakToken += 1;
+  if (typeof window.stopSpeech === 'function') window.stopSpeech();
+  else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+function sleepMuseumStory(ms) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+function applyMuseumStoryScene(scene) {
+  clearMuseumStorySpotlights();
+  const reducedMotion =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const behavior = reducedMotion ? 'auto' : 'smooth';
+
+  const scrollTarget = typeof scene.scrollEl === 'function' ? scene.scrollEl() : null;
+  const floatTarget =
+    typeof scene.floatEl === 'function' ? scene.floatEl() || scrollTarget : scrollTarget;
+
+  museumStoryFloatResolveAnchor = function museumStoryFloatAnchorResolver() {
+    return floatTarget instanceof Element ? floatTarget : null;
+  };
+
+  setMuseumStoryOverlay(scene);
+
+  if (floatTarget instanceof Element) floatTarget.classList.add('museum-story-spotlight');
+  const elScroll = scrollTarget instanceof Element ? scrollTarget : floatTarget;
+  if (elScroll && typeof elScroll.scrollIntoView === 'function')
+    elScroll.scrollIntoView({ behavior, block: 'center' });
+}
+
+function stopMuseumStoryMode(preserveOverlay) {
+  const keep = !!preserveOverlay;
+  stopMuseumStoryNarration();
+  museumStoryState.running = false;
+  museumStoryState.playbackToken += 1;
+  clearMuseumStorySpotlights();
+  if (!keep) setMuseumStoryOverlay(null);
+  updateMuseumStoryToggleButton();
+}
+
+async function museumStoryPlaybackLoop(playbackToken) {
+  if (!museumStoryState.scenes.length) {
+    stopMuseumStoryNarration();
+    museumStoryState.running = false;
+    updateMuseumStoryToggleButton();
+    return;
+  }
+  let idx = 0;
+  while (
+    museumStoryState.running &&
+    playbackToken === museumStoryState.playbackToken &&
+    museumStoryState.scenes.length
+  ) {
+    stopMuseumStoryNarration();
+    const scene = museumStoryState.scenes[idx];
+    if (!scene) break;
+    applyMuseumStoryScene(scene);
+    const narrToken = museumSpeakToken;
+    const narrationText = normalizeMuseumNarrationSpace(scene.narration || '');
+    const narrPromise =
+      museumStoryNarrationEnabled() && narrationText && typeof window.speakNarrationAwaitEnd === 'function'
+        ? window.speakNarrationAwaitEnd(narrationText, {
+            volume: 0.85,
+            isCancelled: () => narrToken !== museumSpeakToken
+          })
+        : Promise.resolve();
+    const minMs = Number(scene.durationMs) || MUSEUM_STORY_SCENE_MS;
+    await Promise.all([narrPromise, sleepMuseumStory(minMs)]);
+    if (!museumStoryState.running || playbackToken !== museumStoryState.playbackToken) break;
+    if (idx + 1 >= museumStoryState.scenes.length) {
+      stopMuseumStoryMode(true);
+      break;
+    }
+    await sleepMuseumStory(MUSEUM_STORY_GAP_MS);
+    idx += 1;
+  }
+  if (!museumStoryState.running) {
+    updateMuseumStoryToggleButton();
+  }
+}
+
+function museumStoryRestartKeepPlaying() {
+  stopMuseumStoryNarration();
+  museumStoryState.playbackToken += 1;
+  museumStoryState.running = true;
+  const token = museumStoryState.playbackToken;
+  if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+  if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+  updateMuseumStoryToggleButton();
+  void museumStoryPlaybackLoop(token);
+}
+
+function startMuseumStoryMode() {
+  if (!museumStoryState.scenes.length) return;
+  if (typeof window.laneTtsStopPlayback === 'function') window.laneTtsStopPlayback();
+  stopMuseumStoryNarration();
+  museumStoryState.playbackToken += 1;
+  museumStoryState.running = true;
+  const token = museumStoryState.playbackToken;
+  if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+  if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+  updateMuseumStoryToggleButton();
+  void museumStoryPlaybackLoop(token);
+}
+
+function initMuseumStoryMode() {
+  if (museumStoryListenersBound) return;
+  museumStoryListenersBound = true;
+  loadMuseumStoryOptions();
+
+  document.getElementById('museumStoryToggle')?.addEventListener('click', () => {
+    if (museumStoryState.running) {
+      stopMuseumStoryMode();
+    } else {
+      museumStoryState.scenes = buildMuseumStoryScenes();
+      if (!museumStoryState.scenes.length) {
+        updateMuseumStoryToggleButton();
+        return;
+      }
+      startMuseumStoryMode();
+    }
+  });
+
+  ['museumStoryChapters', 'museumStoryNarrate'].forEach((id) => {
+    document.getElementById(id)?.addEventListener('change', () => {
+      persistMuseumStoryOptions();
+      museumStoryState.scenes = buildMuseumStoryScenes();
+      if (!museumStoryState.scenes.length) stopMuseumStoryMode();
+      else if (museumStoryState.running) museumStoryRestartKeepPlaying();
+      updateMuseumStoryToggleButton();
+    });
+  });
+
+  document.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.key !== 'Escape' || !museumStoryState.running) return;
+      stopMuseumStoryMode();
+    },
+    true
+  );
+
+  updateMuseumStoryToggleButton();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  initMuseumStoryMode();
   try {
     const errEl = document.getElementById('museumError');
     if (errEl) errEl.textContent = HISTORY_STATE_COPY.loading;
     await initLaneMuseum();
+    rebuildMuseumStoryScenesAfterContent();
     if (errEl) errEl.textContent = '';
   } catch (error) {
     console.error('Failed to initialize Lane museum page:', error);
     document.getElementById('museumError').textContent =
-      `${HISTORY_STATE_COPY.unavailable} Check /api/genealogy/museum-content.`;
+      `${HISTORY_STATE_COPY.unavailable} Check GET /api/genealogy/museum-content, featured-story, and prominent-lanes.`;
+    rebuildMuseumStoryScenesAfterContent();
   }
 });

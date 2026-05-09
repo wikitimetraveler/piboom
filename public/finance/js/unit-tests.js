@@ -2392,6 +2392,7 @@ function clearData() {
   testResultsContainer.style.display = 'none';
   fileInfo.textContent = 'No file loaded';
   fileInfo.innerHTML = 'No file loaded';
+  renderUnitTestsScenarioPills([], []);
   resultsMeta.textContent = '0 rows';
   hideTestDescriptions();
   removeColumnHighlight();
@@ -2454,16 +2455,28 @@ function mergeScenarioDescriptions(scenarioColumns, testDescriptions) {
 function buildFileInfoHtml(name, rowsCount, headersCount, scenarioDescriptions, scenarioColumns) {
   let fileInfoHTML = `<strong>${name}</strong>`;
   fileInfoHTML += ` <span class="text-muted">(${rowsCount} test step${rowsCount !== 1 ? 's' : ''}, ${headersCount} columns)</span>`;
-  if (scenarioDescriptions.length > 0) {
-    fileInfoHTML += `<div class="mt-2"><small class="text-muted">Test Scenarios:</small> `;
-    fileInfoHTML += scenarioDescriptions.map((test) =>
-      `<span class="badge text-bg-secondary me-1" title="${escapeHtml(test.description || '')}">Test ${escapeHtml(test.testNumber || '')}</span>`
-    ).join('');
-    fileInfoHTML += `</div>`;
-  } else if (scenarioColumns.length > 0) {
+  if (scenarioDescriptions.length === 0 && scenarioColumns.length > 0) {
     fileInfoHTML += ` <span class="text-muted">• ${scenarioColumns.length} test scenario${scenarioColumns.length !== 1 ? 's' : ''}</span>`;
   }
   return fileInfoHTML;
+}
+
+function renderUnitTestsScenarioPills(scenarioDescriptions, scenarioColumns) {
+  const wrap = typeof document !== 'undefined' ? document.getElementById('unitTestsScenarioPills') : null;
+  if (!wrap) return;
+  if (scenarioDescriptions.length > 0) {
+    const badges = scenarioDescriptions
+      .map(
+        (test) =>
+          `<span class="badge rounded-pill text-bg-secondary" title="${escapeHtml(test.description || '')}">Test ${escapeHtml(test.testNumber || '')}</span>`
+      )
+      .join('');
+    wrap.innerHTML = `<span class="small text-muted me-2">Scenarios:</span>${badges}`;
+  } else if (scenarioColumns.length > 0) {
+    wrap.innerHTML = `<span class="small text-muted">${scenarioColumns.length} scenario column${scenarioColumns.length !== 1 ? 's' : ''}</span>`;
+  } else {
+    wrap.innerHTML = '';
+  }
 }
 
 async function hydrateLoadedUnitTestData(options) {
@@ -2534,6 +2547,7 @@ async function hydrateLoadedUnitTestData(options) {
   }
 
   fileInfo.innerHTML = buildFileInfoHtml(currentFileName, rows.length, headers.length, testDescriptionsData, scenarioColumns);
+  renderUnitTestsScenarioPills(testDescriptionsData, scenarioColumns);
   updateResultsMeta();
 
   return { scenarioColumns, execResult };
@@ -3111,9 +3125,30 @@ function initializeVoiceWidget() {
   });
 }
 
+/** Spoken QA script (shared by voice command and Listen button). Keep in sync with Step 3 Run tests QA highlights. */
+function getUnitTestsQaTipsSpeakScript() {
+  return (
+    'QA tips for Unit Tests. ' +
+    'Your grid uses SET and COMPARE rows against a loan GUID. Upload Excel, adjust scenarios, run from the sticky bar when ready, then use sign-off once testers agree it passed. ' +
+    'For custom field math, the assignment equals inside the calculation matters: bracketed field, equals, then the expression. ' +
+    'If you pasted from Excel, remove the extra equals at the very start. Use Generate from custom field and Live Scenario Builder to sanity check.'
+  );
+}
+
 function handleVoiceCommand(rawCommand = '') {
   const command = rawCommand.toLowerCase().trim();
   if (!command) return;
+
+  if (
+    command.includes('show run tests') ||
+    command.includes('open run tests') ||
+    command.includes('show upload section') ||
+    command.includes('show unit test data')
+  ) {
+    showAccordionSection('collapseUnitTestData');
+    speak('Showing run tests');
+    return;
+  }
 
   if (command.includes('show grid') || command.includes('open grid') || command.includes('show test grid')) {
     showAccordionSection('collapseTestGrid');
@@ -3124,6 +3159,17 @@ function handleVoiceCommand(rawCommand = '') {
   if (command.includes('show scenarios') || command.includes('show test scenarios') || command.includes('show tests')) {
     showAccordionSection('collapseTestScenarios');
     speak('Showing test scenarios');
+    return;
+  }
+
+  if (
+    command.includes('show sign-off') ||
+    command.includes('show signoff') ||
+    command.includes('open sign-off') ||
+    command.includes('open signoff')
+  ) {
+    showAccordionSection('collapseOverallSignOff');
+    speak('Showing sign-off');
     return;
   }
 
@@ -3193,6 +3239,13 @@ function handleVoiceCommand(rawCommand = '') {
     return;
   }
 
+  if (command.includes('qa tips') || command.includes('formula help') || command.includes('explain formulas')) {
+    showAccordionSection('collapseUnitTestData');
+    toggleVoiceHelp(true);
+    speak(getUnitTestsQaTipsSpeakScript());
+    return;
+  }
+
   // Fallback: route to AI assistant
   if (window.unitTestsAI && typeof window.unitTestsAI.sendMessage === 'function') {
     showAccordionSection('collapseAIAssistant');
@@ -3222,6 +3275,23 @@ function showAccordionSection(sectionId) {
   if (card) card.classList.remove('section-card-hidden');
   updateSectionHeaderState(id, true);
   bsCollapseShow(section);
+}
+
+/** After generated tests load (custom field, BR, Tool 8, library BR), bring Step 2 Test Grid into view. */
+function revealUnitTestGridSection() {
+  const section = document.getElementById('collapseTestGrid');
+  if (!section) return;
+  if (!section.classList.contains('show')) {
+    showAccordionSection('collapseTestGrid');
+  }
+  const heading = document.getElementById('headingTestGrid');
+  if (heading) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        heading.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
+  }
 }
 
 function toggleAccordionSection(sectionId) {
@@ -3874,6 +3944,7 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
     }
 
     setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
+    revealUnitTestGridSection();
 
     scheduleUnitTestGridMetadataRefresh()
       .then(({ dropdownCount }) => {
@@ -3888,6 +3959,61 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
     console.error('Error loading generated test data:', error);
     setStatus(`Error: ${error.message}`, 'err', 'bi-exclamation-octagon');
   }
+}
+
+/** Embedded fallback if `/finance/fixtures/unit-tests-offline-demo.json` is missing. */
+const UNIT_TESTS_OFFLINE_DEMO_FIELD_EMBEDDED = {
+  fieldId: 'CX.UT.DEMO',
+  calculation: '[CX.UT.DEMO] = [353] + 50000',
+  description:
+    'Offline demo only: representative calculated custom field for Unit Test grid / Story Mode. Values are synthesized; not connected to Encompass.',
+  dataType: 'Decimal',
+  format: 'DECIMAL_2',
+};
+
+/**
+ * Load a synthetic custom-field-shaped workbook (same pipeline as “Generate from custom field”) without Encompass.
+ * @returns {Promise<void>}
+ */
+async function loadOfflineDemoUnitTest() {
+  if (!window.customFieldCalcParser?.generateUnitTestFromCustomField) {
+    setStatus('Offline demo unavailable: calculation parser not loaded', 'err', 'bi-exclamation-octagon');
+    return;
+  }
+  let field = { ...UNIT_TESTS_OFFLINE_DEMO_FIELD_EMBEDDED };
+  try {
+    const fixtureUrl = new URL('fixtures/unit-tests-offline-demo.json', window.location.href);
+    const res = await fetch(fixtureUrl.toString(), { cache: 'no-store' });
+    if (res.ok) {
+      const j = await res.json();
+      if (j && j.field && typeof j.field === 'object') {
+        field = { ...field, ...j.field };
+      }
+    }
+  } catch (_) {
+    /* use embedded field */
+  }
+
+  const fallbackMeta = window.customFieldCalcParser.getFallbackFieldMetadata
+    ? window.customFieldCalcParser.getFallbackFieldMetadata()
+    : {};
+  const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field, { fieldMetadata: fallbackMeta });
+  if (!result || !result.rows || result.rows.length === 0) {
+    setStatus('Offline demo could not generate rows from the sample field', 'err', 'bi-exclamation-octagon');
+    return;
+  }
+  await loadGeneratedTestData(
+    result.headers,
+    result.rows,
+    result.testDescriptions,
+    'Demo: custom field (offline)',
+    result.fieldMetadata,
+    field
+  );
+}
+
+function unitTestsHasLoadedData() {
+  return Array.isArray(allData) && allData.length > 0;
 }
 
 /**
@@ -4781,8 +4907,8 @@ function initializeSectionSidebar() {
   const nav = document.getElementById('sectionSidebarNav');
   if (!nav) return;
 
-  // On load: hide section cards and collapse; then open Unit Test Data so status, welcome, and upload are visible
-  var sectionIds = ['collapseUnitTestData', 'collapseTestGrid', 'collapseTestScenarios', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseLearnMode', 'collapseAIAssistant'];
+  // On load: hide section cards and collapse; then open Test Scenarios (Step 1) — upload/generate stays in the Excel Unit Tests hero band above
+  var sectionIds = ['collapseTestScenarios', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (el) {
@@ -4832,7 +4958,7 @@ function initializeSectionSidebar() {
   });
 
   // Sync sidebar active state when sections expand/collapse (from header clicks, voice, or sidebar)
-  var sectionIds = ['collapseUnitTestData', 'collapseTestGrid', 'collapseTestScenarios', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseLearnMode', 'collapseAIAssistant'];
+  var sectionIds = ['collapseTestScenarios', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -4844,15 +4970,15 @@ function initializeSectionSidebar() {
     });
   });
 
-  var utdId = 'collapseUnitTestData';
-  var utdEl = document.getElementById(utdId);
-  var utdCard = getSectionCardForCollapse(utdId);
-  if (utdCard) utdCard.classList.remove('section-card-hidden');
-  if (utdEl) {
-    updateSectionHeaderState(utdId, true);
-    bsCollapseShow(utdEl);
+  var defaultOpenId = 'collapseTestScenarios';
+  var defaultOpenEl = document.getElementById(defaultOpenId);
+  var defaultOpenCard = getSectionCardForCollapse(defaultOpenId);
+  if (defaultOpenCard) defaultOpenCard.classList.remove('section-card-hidden');
+  if (defaultOpenEl) {
+    updateSectionHeaderState(defaultOpenId, true);
+    bsCollapseShow(defaultOpenEl);
   }
-  updateSectionSidebarActiveState(utdId, true);
+  updateSectionSidebarActiveState(defaultOpenId, true);
 
   document.querySelectorAll('.section-card-header[role="button"]').forEach((h) => {
     h.addEventListener('keydown', (e) => {
@@ -4875,10 +5001,21 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeSectionSidebar();
   const welcomeUploadBtn = document.getElementById('welcomeUploadBtn');
   welcomeUploadBtn?.addEventListener('click', () => fileInput?.click());
+  const qaTipsListenBtn = document.getElementById('qaTipsListenBtn');
+  qaTipsListenBtn?.addEventListener('click', () => speak(getUnitTestsQaTipsSpeakScript()));
   updateLoanGuidChipDisplay(currentLoanGuid);
   renderRecentRunsSelect();
   loadTestLibrary();
   loadBrRuleLibrary();
+  document.getElementById('unitTestsOfflineDemoBtn')?.addEventListener('click', () => {
+    void loadOfflineDemoUnitTest();
+  });
+  try {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('demo') === '1' || p.get('storybook') === '1') {
+      setTimeout(() => void loadOfflineDemoUnitTest(), 0);
+    }
+  } catch (_) {}
   if (typeof window !== 'undefined') {
     window.addEventListener('encompassEnvChanged', () => {
       _hubFieldListsCache = null;
@@ -4888,3 +5025,9 @@ document.addEventListener('DOMContentLoaded', () => {
     failFirstBtn.disabled = true;
   }
 });
+
+if (typeof window !== 'undefined') {
+  window.showAccordionSection = showAccordionSection;
+  window.loadOfflineDemoUnitTest = loadOfflineDemoUnitTest;
+  window.unitTestsHasLoadedData = unitTestsHasLoadedData;
+}

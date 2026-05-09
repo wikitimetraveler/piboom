@@ -1,0 +1,238 @@
+{
+  "version": 1,
+  "sourceTitle": "Illustrations in Lane Genealogy",
+  "sourceBookHint": "Chapman–Fitts Lane genealogies (digitized PDF; illustration index page)",
+  "conventions": [
+    "plateImageIds use the extractor scheme p{pdfPage}-{imageIndex}; pdfPage aligns with printed book citations + laneData sourceRefs.pdfPageNumber for this scan.",
+    "Rows 6–7 both cite printed page 58 but only p58-i0 is decoded in the manifest; p58-i1 is skipped (JBIG2) — treat as partial until extraction is rerun with jbig2 support.",
+    "Rows 1–4 have no arabic printed page on the plate list; curated as one historians frontispiece (p4-i0) aligned with Lane Historians committee portrait crops.",
+    "Visual QA: low-contrast or blank-looking JPEGs can still correspond to faint halftone plates — verify in source PDF where uncertain."
+  ],
+  "illustrations": [
+    {
+      "illustrationNo": 1,
+      "caption": "Rev. Jn. W. Lane.",
+      "section": null,
+      "printedPage": null,
+      "plateImageIds": ["p4-i0"],
+      "matchStatus": "composite",
+      "notes": "Frontispiece committee plate p4-i0 (shared with illustrations 2–4); historians deep links in lane-historians / gallery banner."
+    },
+    {
+      "illustrationNo": 2,
+      "caption": "Rev. Jas. H. Fitts.",
+      "section": null,
+      "printedPage": null,
+      "plateImageIds": ["p4-i0"],
+      "matchStatus": "composite",
+      "notes": "Same composite as illustration 1 (p4-i0)."
+    },
+    {
+      "illustrationNo": 3,
+      "caption": "Geo. W. Lane.",
+      "section": null,
+      "printedPage": null,
+      "plateImageIds": ["p4-i0"],
+      "matchStatus": "composite",
+      "notes": "Same composite as illustration 1 (p4-i0)."
+    },
+    {
+      "illustrationNo": 4,
+      "caption": "Dr. Edw. B. Lane.",
+      "section": null,
+      "printedPage": null,
+      "plateImageIds": ["p4-i0"],
+      "matchStatus": "composite",
+      "notes": "Same composite as illustration 1 (p4-i0)."
+    },
+    {
+      "illustrationNo": 5,
+      "caption": "Isaac Lane.",
+      "section": null,
+      "printedPage": 16,
+      "plateImageIds": ["p16-i0"],
+      "matchStatus": "verified",
+      "notes": "Manifest lists p16-i0 ok; p16-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 6,
+      "caption": "H. L. French.",
+      "section": null,
+      "printedPage": 58,
+      "plateImageIds": ["p58-i0"],
+      "matchStatus": "partial",
+      "notes": "Share printed page 58 with Abraham French (#7); only p58-i0 extracted — second embedded image skipped unless both sitters appear in one raster."
+    },
+    {
+      "illustrationNo": 7,
+      "caption": "Abraham French.",
+      "section": null,
+      "printedPage": 58,
+      "plateImageIds": ["p58-i0"],
+      "matchStatus": "partial",
+      "notes": "Same plate as illustration 6; p58-i1 missing decode in current manifest."
+    },
+    {
+      "illustrationNo": 8,
+      "caption": "Levi E. Lane.",
+      "section": null,
+      "printedPage": 116,
+      "plateImageIds": ["p116-i0"],
+      "matchStatus": "verified",
+      "notes": "p116-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 9,
+      "caption": "Jn. Cate French.",
+      "section": null,
+      "printedPage": 138,
+      "plateImageIds": ["p138-i0"],
+      "matchStatus": "verified",
+      "notes": "p138-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 10,
+      "caption": "John Swett.",
+      "section": null,
+      "printedPage": 140,
+      "plateImageIds": ["p140-i0"],
+      "matchStatus": "verified",
+      "notes": "p140-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 11,
+      "caption": "Jacob Chapman.",
+      "section": null,
+      "printedPage": 158,
+      "plateImageIds": ["p158-i0"],
+      "matchStatus": "verified",
+      "notes": "p158-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 12,
+      "caption": "Benaiah Fitts.",
+      "section": null,
+      "printedPage": 167,
+      "plateImageIds": ["p167-i0"],
+      "matchStatus": "verified",
+      "notes": "p167-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 13,
+      "caption": "Mrs. E. Lane Smith.",
+      "section": null,
+      "printedPage": 173,
+      "plateImageIds": ["p173-i0"],
+      "matchStatus": "verified",
+      "notes": "p173-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 14,
+      "caption": "Geo. B. Lane.",
+      "section": null,
+      "printedPage": 177,
+      "plateImageIds": ["p177-i0"],
+      "matchStatus": "verified",
+      "notes": "p177-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 15,
+      "caption": "H. M. Lane.",
+      "section": null,
+      "printedPage": 182,
+      "plateImageIds": ["p182-i0"],
+      "matchStatus": "verified",
+      "notes": "p182-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 16,
+      "caption": "Rev. Jas. P. Lane.",
+      "section": null,
+      "printedPage": 206,
+      "plateImageIds": ["p206-i0"],
+      "matchStatus": "verified",
+      "notes": "p206-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 17,
+      "caption": "Charles Lane.",
+      "section": null,
+      "printedPage": 219,
+      "plateImageIds": ["p219-i0"],
+      "matchStatus": "verified",
+      "notes": "p219-i1 skipped (JBIG2); overlaps lane-pdf-person-portraits curated pick p219-i0 for personId 2896."
+    },
+    {
+      "illustrationNo": 18,
+      "caption": "Edward J. Lane.",
+      "section": null,
+      "printedPage": 220,
+      "plateImageIds": ["p220-i0"],
+      "matchStatus": "verified",
+      "notes": "p220-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 19,
+      "caption": "Geo. Fred Smith.",
+      "section": null,
+      "printedPage": 224,
+      "plateImageIds": ["p224-i0"],
+      "matchStatus": "verified",
+      "notes": "p224-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 20,
+      "caption": "The Willows.",
+      "section": null,
+      "printedPage": 225,
+      "plateImageIds": ["p225-i0"],
+      "matchStatus": "verified",
+      "notes": "Scene / residence plate; p225-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 21,
+      "caption": "Joseph Lane.",
+      "section": "Family of Capt. John Lane of Fishersfield.",
+      "printedPage": 254,
+      "plateImageIds": ["p254-i0"],
+      "matchStatus": "verified",
+      "notes": "p254-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 22,
+      "caption": "Dennis Lane.",
+      "section": "Family of Capt. John Lane of Fishersfield.",
+      "printedPage": 255,
+      "plateImageIds": ["p255-i0"],
+      "matchStatus": "verified",
+      "notes": "p255-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 23,
+      "caption": "Willis Lane.",
+      "section": "Family of Capt. John Lane of Fishersfield.",
+      "printedPage": 256,
+      "plateImageIds": ["p256-i0"],
+      "matchStatus": "verified",
+      "notes": "p256-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 24,
+      "caption": "Alfred W. Lane.",
+      "section": "Family of Capt. John Lane of Fishersfield.",
+      "printedPage": 259,
+      "plateImageIds": ["p259-i0"],
+      "matchStatus": "verified",
+      "notes": "p259-i1 skipped (JBIG2)."
+    },
+    {
+      "illustrationNo": 25,
+      "caption": "Edwin Lane.",
+      "section": "Family of Capt. John Lane of Fishersfield.",
+      "printedPage": 260,
+      "plateImageIds": ["p260-i0"],
+      "matchStatus": "verified",
+      "notes": "p260-i1 skipped (JBIG2)."
+    }
+  ]
+}

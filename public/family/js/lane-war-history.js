@@ -222,7 +222,7 @@ function renderCampaignButtons() {
   host.innerHTML = allCampaigns
     .map(
       (c) =>
-        `<button class="btn btn-outline-light btn-sm campaign-btn ${c.slug === activeWarSlug ? 'active' : ''}" role="tab" aria-selected="${c.slug === activeWarSlug ? 'true' : 'false'}" data-war="${esc(c.slug)}">${esc(c.label)} <span class="badge badge-secondary ml-1">${esc(c.participantCount)}</span></button>`
+        `<button class="btn btn-outline-light btn-sm campaign-btn ${c.slug === activeWarSlug ? 'active' : ''}" role="tab" aria-selected="${c.slug === activeWarSlug ? 'true' : 'false'}" data-war="${esc(c.slug)}">${esc(c.label)} <span class="badge bg-secondary ms-1">${esc(c.participantCount)}</span></button>`
     )
     .join('');
   host.querySelectorAll('.campaign-btn').forEach((btn) => {
@@ -370,7 +370,7 @@ function openSoldierModal(personId) {
   body.innerHTML = `
     <div class="mb-2">
       <span class="confidence-badge ${confidenceClass(entry.confidence)}">${esc(entry.confidence)} confidence</span>
-      <span class="ml-2 text-muted">${esc(entry.warLabel || '')}</span>
+      <span class="ms-2 text-muted">${esc(entry.warLabel || '')}</span>
     </div>
     <p><strong>Classification:</strong> ${esc(associationLabel(entry))}</p>
     ${
@@ -392,8 +392,9 @@ function openSoldierModal(personId) {
         : ''
     }
   `;
-  if (window.jQuery && window.jQuery.fn.modal) {
-    window.jQuery('#soldierModal').modal('show');
+  const soldierModal = document.getElementById('soldierModal');
+  if (soldierModal && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    bootstrap.Modal.getOrCreateInstance(soldierModal).show();
   }
 }
 
@@ -697,6 +698,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (warn && warn.textContent === HISTORY_STATE_COPY.loading) warn.textContent = '';
   } catch (error) {
     console.error(error);
-    document.getElementById('warError').textContent = `${HISTORY_STATE_COPY.unavailable} ${error.message}`;
+    document.getElementById('warError').textContent = `${HISTORY_STATE_COPY.unavailable} ${error.message}. Verify GET /api/genealogy/wars and campaign endpoints.`;
   }
 });

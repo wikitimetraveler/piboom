@@ -709,6 +709,135 @@
         background: var(--zen-card-bg) !important;
       }
 
+      .unit-tests-qa-highlights {
+        border-left-color: var(--zen-primary, #4a90a4) !important;
+      }
+
+      .unit-tests-main {
+        padding-top: 1.25rem;
+      }
+      @media (min-width: 992px) {
+        .unit-tests-main {
+          padding-top: 1.5rem;
+        }
+      }
+      .unit-tests-workflow-hint {
+        margin-top: 1rem;
+        padding-top: 0.85rem;
+        margin-bottom: 0;
+        border-top: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+      }
+      .unit-tests-story-mode {
+        margin-bottom: 1.5rem;
+        scroll-margin-top: 5rem;
+      }
+      #collapseTestScenarios,
+      #collapseTestGrid,
+      #collapseOverallSignOff,
+      #collapseUnitTestData {
+        scroll-margin-top: 5rem;
+      }
+
+      .unit-tests-story-mode-inner {
+        border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+        border-radius: 18px;
+        padding: 0.75rem 1rem;
+        background: var(--zen-card-bg, rgba(255, 255, 255, 0.97));
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+      }
+
+      .unit-tests-story-header {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.55rem;
+      }
+
+      .unit-tests-story-kicker {
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--text-muted, #6b7280);
+        font-weight: 600;
+      }
+
+      .unit-tests-story-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.25rem;
+        margin-top: 0.5rem;
+        font-size: 0.82rem;
+      }
+
+      .unit-tests-story-option {
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .unit-tests-story-overlay {
+        margin-top: 0.65rem;
+        border: 1px solid var(--border-light, #e5e7eb);
+        border-left: 4px solid var(--zen-primary, #4a90a4);
+        border-radius: 0.55rem;
+        padding: 0.6rem 0.75rem;
+        background: rgba(255, 255, 255, 0.95);
+      }
+
+      .unit-tests-story-overlay.unit-tests-story-overlay--floating {
+        position: fixed;
+        margin-top: 0;
+        z-index: 1080;
+        left: 50%;
+        transform: translateX(-50%);
+        top: clamp(72px, 18vh, 160px);
+        max-width: min(22rem, calc(100vw - 24px));
+        width: min(22rem, calc(100vw - 24px));
+        box-shadow: 0 14px 40px rgba(15, 23, 42, 0.12);
+        pointer-events: none;
+        backdrop-filter: blur(4px);
+      }
+
+      .unit-tests-story-scene-title {
+        color: var(--text-dark, #1f2937);
+      }
+
+      .unit-tests-story-spotlight.section-card-header {
+        box-shadow: inset 0 0 0 2px var(--zen-primary, #4a90a4);
+        border-radius: 12px;
+      }
+
+      body.unit-tests-night-theme .unit-tests-story-mode-inner {
+        background: #4b5563 !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        color: #f3f4f6 !important;
+      }
+
+      body.unit-tests-night-theme .unit-tests-story-kicker,
+      body.unit-tests-night-theme .unit-tests-story-copy {
+        color: #9ca3af !important;
+      }
+
+      body.unit-tests-night-theme .unit-tests-story-overlay {
+        background: rgba(55, 65, 81, 0.96) !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        color: #f9fafb !important;
+      }
+
+      body.unit-tests-night-theme .unit-tests-story-scene-title {
+        color: #f9fafb !important;
+      }
+
+      body.unit-tests-night-theme .unit-tests-workflow-hint {
+        border-top-color: rgba(255, 255, 255, 0.12) !important;
+        color: #9ca3af !important;
+      }
+
       /* Context menu for scenario cards */
       .scenario-context-menu {
         position: fixed;
@@ -1959,6 +2088,7 @@
             </div>
           </div>
         </div>
+        <p class="unit-tests-workflow-hint small text-muted mb-0">Use the <strong>Excel Unit Tests</strong> bar above to upload, <strong>Generate</strong> from a custom field or BR rule, or pull from <strong>Test Library</strong>. Then follow the sidebar: <strong>Step 1</strong> test scenarios, <strong>Step 2</strong> test grid, <strong>Step 3</strong> run tests (QA, loan GUID, execute), <strong>Step 4</strong> sign-off.</p>
       </div>
     </div>
 
@@ -1995,9 +2125,12 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p class="text-muted mb-3">
+            <p class="text-muted mb-2">
               Select an Encompass custom field with a calculation (e.g. <code>[CX.TEST] = 1 + [353]</code>).
               We will generate SET and COMPARE steps to test it.
+            </p>
+            <p class="small text-muted mb-3 mb-0">
+              The meaningful equals is the <strong>assignment</strong> after the bracketed field (<code>[FIELD] = …</code>). If you pasted from Excel, drop the spreadsheet’s leading <code>=</code>—this tool parses Encompass calculation text, not an Excel formula cell.
             </p>
             <div id="generateCustomFieldStatus" class="mb-2 small text-muted"></div>
             <div class="mb-3">
@@ -2098,7 +2231,7 @@
       </div>
     </div>
 
-    <main class="container-fluid pb-3 px-4">
+    <main class="container-fluid unit-tests-main pb-3 px-4">
       <div class="row">
         <div class="col-12">
           <div class="unit-tests-layout">
@@ -2106,9 +2239,9 @@
             <nav class="section-sidebar" aria-label="Section navigation">
               <div class="section-sidebar-title">Workflow</div>
               <ul class="section-sidebar-nav" id="sectionSidebarNav">
-                <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-1-circle"></i> Step 1: Start</a></li>
+                <li><a href="#collapseTestScenarios" data-bs-target="#collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-1-circle"></i> Step 1: Test Scenarios</a></li>
                 <li><a href="#collapseTestGrid" data-bs-target="#collapseTestGrid" data-heading="headingTestGrid"><i class="bi-2-circle"></i> Step 2: Test Grid</a></li>
-                <li><a href="#collapseTestScenarios" data-bs-target="#collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-3-circle"></i> Step 3: Scenarios</a></li>
+                <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-3-circle"></i> Step 3: Run tests</a></li>
                 <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-4-circle"></i> Step 4: Sign-off</a></li>
                 <li><a href="#collapseTestLibrary" data-bs-target="#collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
                 <li><a href="#collapseSelectedField" data-bs-target="#collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-input-cursor-text"></i> Selected Field</a></li>
@@ -2120,6 +2253,45 @@
               </ul>
             </nav>
             <div class="section-content-area">
+        <div class="col-12">
+          <section class="unit-tests-story-mode" id="unitTestsStoryMode" aria-label="Workflow story mode">
+            <div class="unit-tests-story-mode-inner">
+              <div class="unit-tests-story-header">
+                <p class="unit-tests-story-kicker mb-0">Story Mode</p>
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-1">
+                  <button type="button" class="btn btn-sm btn-outline-primary" id="unitTestsStoryToggle" aria-pressed="false">
+                    Play highlight reel
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-secondary" id="unitTestsOfflineDemoBtn">
+                    Load offline demo (sample custom field)
+                  </button>
+                </div>
+              </div>
+              <p class="small text-muted mb-2 mb-sm-1" id="unitTestsOfflineDemoDisclaimer">
+                If the grid has no data yet, <strong>Play highlight reel</strong> loads the offline sample workbook first (SET / COMPARE rows and scenarios). It does not call Encompass or run live field calculations.
+              </p>
+              <p class="unit-tests-story-copy small text-muted mb-2">
+                HyperFrames-style reel: scenarios → grid → run tests (QA, GUID, execute) → sign-off &amp; library (when step intros are on).
+                <strong>Narrate scenes</strong> is on by default; uncheck for a silent reel. Same audio stack as Lane tools (<code>/shared/tts.js</code>). Runs once, no loop. <kbd>Escape</kbd> stops playback.
+              </p>
+              <div class="unit-tests-story-options" role="group" aria-label="Story mode options">
+                <label class="unit-tests-story-option">
+                  <input type="checkbox" id="unitTestsStoryChapters" checked />
+                  <span>Workflow step intros</span>
+                </label>
+                <label class="unit-tests-story-option">
+                  <input type="checkbox" id="unitTestsStoryNarrate" checked />
+                  <span>Narrate scenes</span>
+                </label>
+              </div>
+              <div class="unit-tests-story-overlay d-none" id="unitTestsStoryOverlay" aria-live="polite">
+                <p class="unit-tests-story-scene-kicker mb-1 small text-uppercase text-muted" id="unitTestsStorySceneKicker"></p>
+                <h2 class="unit-tests-story-scene-title h6 mb-1" id="unitTestsStorySceneTitle"></h2>
+                <p class="unit-tests-story-scene-copy mb-0 small" id="unitTestsStorySceneCopy"></p>
+              </div>
+            </div>
+          </section>
+        </div>
         <!-- AI Assistant - at top for easy access -->
         <div class="col-12 mb-4 section-card-hidden" id="aiAssistantCard">
           <div class="section-card">
@@ -2247,6 +2419,169 @@
         <!-- Section Cards Container - multiple can stay open -->
         <div class="col-12 mb-4" id="accordionContainer">
           <div class="section-cards" id="testAccordion">
+            <!-- Test Scenarios -->
+            <div class="section-card section-card-hidden" data-collapse-target="collapseTestScenarios">
+              <div class="section-card-header collapsed" tabindex="0" id="headingTestScenarios" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
+                <span class="section-title"><i class="bi-1-circle"></i> Step 1: Test Scenarios <span class="badge text-bg-primary ms-2" id="testScenariosCount"></span></span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
+                      <p class="text-muted mb-3"><small>Click a scenario to highlight its column. Use <strong>Run</strong> to execute it. Click the <strong>Edit</strong> button on a scenario card to edit its description.</small></p>
+                      <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
+              </div>
+            </div>
+            <!-- Test Grid -->
+            <div class="section-card section-card-hidden" data-collapse-target="collapseTestGrid">
+              <div class="section-card-header collapsed" tabindex="0" id="headingTestGrid" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
+                <span class="section-title"><i class="bi-2-circle"></i> Step 2: Test Grid <span class="badge text-bg-info ms-2" id="testGridCount"></span></span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseTestGrid" class="collapse section-card-body" aria-labelledby="headingTestGrid">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                          <span class="badge-soft" id="resultsMeta">0 rows</span>
+                        </div>
+                      </div>
+                      <div class="table-responsive">
+                        <div id="unitTestsGrid" class="ag-theme-alpine unit-tests-grid"></div>
+                      </div>
+              </div>
+            </div>
+            <!-- Unit Test Data: Run tests - Step 3 (QA, GUID, execute; upload also in hero band above) -->
+            <div class="section-card section-card-hidden" data-collapse-target="collapseUnitTestData">
+              <div class="section-card-header collapsed" tabindex="0" id="headingUnitTestData" role="button" data-bs-toggle="collapse" data-bs-target="#collapseUnitTestData" aria-expanded="false" aria-controls="collapseUnitTestData">
+                <span class="section-title"><i class="bi-3-circle"></i> Step 3: Run tests / Unit Test Data</span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseUnitTestData" class="collapse section-card-body" aria-labelledby="headingUnitTestData">
+                      <div id="unitTestsWelcomeCard" class="alert alert-light border mb-3 unit-tests-welcome" role="region" aria-label="Getting started">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                          <div>
+                            <strong class="d-block text-dark mb-1">Get started</strong>
+                            <p class="mb-0 small text-muted">Upload an Excel test, use <strong>Generate</strong> for a custom field or BR rule, or open <strong>Test Library</strong> in Sections.</p>
+                          </div>
+                          <button type="button" class="btn btn-primary btn-sm flex-shrink-0" id="welcomeUploadBtn">
+                            <i class="bi-upload me-1"></i>Upload Excel
+                          </button>
+                        </div>
+                      </div>
+                      <div id="unitTestsQaHighlightsCard" class="alert alert-light border-start border-4 rounded mb-3 unit-tests-qa-highlights" role="region" aria-label="QA highlights">
+                        <p class="fw-semibold text-dark mb-2"><i class="bi-patch-check-fill me-1 text-primary"></i>QA highlights</p>
+                        <ul class="small text-muted mb-2 ps-3">
+                          <li class="mb-1">Runs are <strong>SET</strong> / <strong>COMPARE</strong> rows from your Excel-style grid against a loan GUID—upload, tune scenarios, run, sign off.</li>
+                          <li class="mb-1">Custom-field calcs use assignment form <code>[CX.FIELD] = expression</code>. The spreadsheet <code>=</code> at the very start is not part of Encompass—strip it when pasting.</li>
+                          <li class="mb-0">Sanity-check with <strong>Generate → From custom field</strong> and <strong>Live Scenario Builder</strong> when inputs are editable.</li>
+                        </ul>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="qaTipsListenBtn" aria-label="Listen to QA tips aloud">
+                          <i class="bi-volume-up me-1"></i>Listen to QA tips
+                        </button>
+                      </div>
+                      <!-- Wrapper keeps file info + action bar together so they are not overwritten by test results below -->
+                      <div class="unit-test-data-header" id="unitTestDataHeader">
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3 unit-test-data-topline">
+                          <div class="flex-grow-1 min-w-0">
+                            <div id="fileInfo" class="file-info-display">No file loaded</div>
+                            <div id="unitTestsScenarioPills" class="d-flex flex-wrap align-items-center gap-1 mt-2" aria-label="Loaded test scenarios"></div>
+                          </div>
+                          <div class="d-flex flex-wrap align-items-center gap-2 flex-shrink-0">
+                            <span class="badge rounded-pill text-bg-secondary" id="testGuidDisplay">No GUID</span>
+                            <span class="status-chip info" id="statusChip" role="status" aria-live="polite"><i class="bi-info-circle"></i> Ready</span>
+                          </div>
+                        </div>
+                        <div class="sticky-action-bar" id="stickyActionBar" style="display: none;">
+                        <div class="sticky-action-left">
+                          <div class="loan-guid-group">
+                            <label for="loanGuidInput" class="mb-1 text-muted"><small>Loan GUID</small></label>
+                            <div class="input-group input-group-sm">
+                              <input type="text" class="form-control" id="loanGuidInput" placeholder="Enter Loan GUID for API calls" />
+                              <button class="btn btn-success" id="runTestsBtn" style="display: none;">
+                                  <i class="bi-play-circle"></i> Run
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" id="clearLoanGuidBtn">
+                                  <i class="bi-x-circle"></i> Clear
+                                </button>
+                            </div>
+                          </div>
+                          <span class="loan-guid-chip" id="loanGuidChip">No Loan GUID</span>
+                        </div>
+                        <div class="sticky-action-right">
+                          <select class="form-control form-control-sm" id="recentRunsSelect">
+                            <option value="">Recent runs…</option>
+                          </select>
+                          <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." />
+                          <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#runAdvancedOptions" aria-expanded="false" aria-controls="runAdvancedOptions">
+                            <i class="bi-sliders me-1"></i>Advanced
+                          </button>
+                        </div>
+                        <div class="collapse mt-2" id="runAdvancedOptions">
+                          <div class="d-flex flex-wrap align-items-center gap-2">
+                            <button class="btn btn-outline-secondary btn-sm" id="showAllColumnsBtn" title="Show Step, Action, Description, Target columns">
+                              <i class="bi-layout-three-columns"></i> All Columns
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" id="failFirstBtn">
+                              <i class="bi-exclamation-triangle"></i> Fail First
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="fillEmptyTestNullBtn" style="display: none;" title="Inserts the text null in empty Test / Reset cells. SET clears the loan field; COMPARE expects a blank value.">
+                              <i class="bi-braces me-1"></i>Null empty cells
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" id="clearBtn" style="display: none;">
+                              <i class="bi-x-circle"></i> Clear Data
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      </div><!-- /unit-test-data-header -->
+                      <div id="uploadArea" class="file-upload-area">
+                        <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
+                        <h5>Drop Excel file here or click to browse</h5>
+                        <p class="text-muted mb-1">Supports .xlsx format</p>
+                        <p class="small text-muted mb-0">You can also copy a <code>.xlsx</code> in File Explorer, click this page outside any text field, and press <kbd>Ctrl</kbd>+<kbd>V</kbd> to load it.</p>
+                      </div>
+                      <div class="run-summary-card mt-4" id="runSummaryCard" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                          <div>
+                            <h6 class="mb-1">Last Run Summary</h6>
+                            <small class="text-muted" id="runSummaryTime">Not run yet</small>
+                          </div>
+                          <span class="badge text-bg-secondary" id="runSummaryCounts">0 total</span>
+                        </div>
+                        <div class="progress" style="height: 10px;">
+                          <div class="progress-bar bg-success" id="runSummaryPassBar" role="progressbar" style="width: 0%"></div>
+                          <div class="progress-bar bg-warning" id="runSummarySkipBar" role="progressbar" style="width: 0%"></div>
+                          <div class="progress-bar bg-danger" id="runSummaryFailBar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                      </div>
+                      <!-- Test Results Panel -->
+                      <div id="testResultsContainer" style="display: none;" class="mt-4">
+                        <div class="card p-4 test-results-dark-card">
+                          <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                              <h5 class="mb-1"><i class="bi-clipboard-check"></i> Test Results</h5>
+                              <small class="text-muted" id="testResultsSummary">Running tests...</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary" id="closeResultsBtn">
+                              <i class="bi-x"></i> Close
+                            </button>
+                          </div>
+                          <div id="testResultsList" class="test-results-list"></div>
+                          <button class="btn btn-sm btn-outline-secondary mt-3 d-inline-flex align-items-center" id="scrollToTopBtn" style="display: none;">
+                            <i class="bi-arrow-up me-1"></i> Scroll to top
+                          </button>
+                        </div>
+                      </div>
+              </div>
+            </div>
+            <!-- Overall Test Sign-off -->
+            <div class="section-card section-card-hidden" data-collapse-target="collapseOverallSignOff">
+              <div class="section-card-header collapsed" tabindex="0" id="headingOverallSignOff" role="button" data-bs-toggle="collapse" data-bs-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
+                <span class="section-title"><i class="bi-4-circle"></i> Step 4: Test Sign-off <span class="badge text-bg-success ms-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseOverallSignOff" class="collapse section-card-body" aria-labelledby="headingOverallSignOff">
+                      <p class="text-muted mb-3"><small>Each tester confirms the overall test passed. Timestamps are recorded when you confirm.</small></p>
+                      <div id="overallSignOffContainer" class="overall-signoff-grid"></div>
+              </div>
+            </div>
             <!-- Test Library -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseTestLibrary">
               <div class="section-card-header collapsed" tabindex="0" id="headingTestLibrary" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestLibrary" aria-expanded="false" aria-controls="collapseTestLibrary">
@@ -2278,28 +2613,6 @@
                         <strong>Search results for field:</strong> <span id="fieldSearchTerm" class="text-primary"></span>
                         <div id="fieldSearchResultsList" class="mt-2"></div>
                       </div>
-              </div>
-            </div>
-            <!-- Overall Test Sign-off -->
-            <div class="section-card section-card-hidden" data-collapse-target="collapseOverallSignOff">
-              <div class="section-card-header collapsed" tabindex="0" id="headingOverallSignOff" role="button" data-bs-toggle="collapse" data-bs-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
-                <span class="section-title"><i class="bi-4-circle"></i> Step 4: Test Sign-off <span class="badge text-bg-success ms-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
-                <i class="bi-chevron-down"></i>
-              </div>
-              <div id="collapseOverallSignOff" class="collapse section-card-body" aria-labelledby="headingOverallSignOff">
-                      <p class="text-muted mb-3"><small>Each tester confirms the overall test passed. Timestamps are recorded when you confirm.</small></p>
-                      <div id="overallSignOffContainer" class="overall-signoff-grid"></div>
-              </div>
-            </div>
-            <!-- Test Scenarios -->
-            <div class="section-card section-card-hidden" data-collapse-target="collapseTestScenarios">
-              <div class="section-card-header collapsed" tabindex="0" id="headingTestScenarios" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
-                <span class="section-title"><i class="bi-3-circle"></i> Step 3: Test Scenarios <span class="badge text-bg-primary ms-2" id="testScenariosCount"></span></span>
-                <i class="bi-chevron-down"></i>
-              </div>
-              <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
-                      <p class="text-muted mb-3"><small>Click a scenario to highlight its column. Use <strong>Run</strong> to execute it. Click the <strong>Edit</strong> button on a scenario card to edit its description.</small></p>
-                      <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
               </div>
             </div>
             <!-- Selected Field (when generated from custom field) -->
@@ -2365,134 +2678,6 @@
                 </div>
               </div>
             </div>
-            <!-- Test Grid -->
-            <div class="section-card section-card-hidden" data-collapse-target="collapseTestGrid">
-              <div class="section-card-header collapsed" tabindex="0" id="headingTestGrid" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
-                <span class="section-title"><i class="bi-2-circle"></i> Step 2: Test Grid <span class="badge text-bg-info ms-2" id="testGridCount"></span></span>
-                <i class="bi-chevron-down"></i>
-              </div>
-              <div id="collapseTestGrid" class="collapse section-card-body" aria-labelledby="headingTestGrid">
-                      <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                          <span class="badge-soft" id="resultsMeta">0 rows</span>
-                        </div>
-                      </div>
-                      <div class="table-responsive">
-                        <div id="unitTestsGrid" class="ag-theme-alpine unit-tests-grid"></div>
-                      </div>
-              </div>
-            </div>
-            <!-- Unit Test Data (bottom) - collapsed by default -->
-            <div class="section-card section-card-hidden" data-collapse-target="collapseUnitTestData">
-              <div class="section-card-header collapsed" tabindex="0" id="headingUnitTestData" role="button" data-bs-toggle="collapse" data-bs-target="#collapseUnitTestData" aria-expanded="false" aria-controls="collapseUnitTestData">
-                <span class="section-title"><i class="bi-1-circle"></i> Step 1: Start / Unit Test Data</span>
-                <i class="bi-chevron-down"></i>
-              </div>
-              <div id="collapseUnitTestData" class="collapse section-card-body" aria-labelledby="headingUnitTestData">
-                      <div id="unitTestsWelcomeCard" class="alert alert-light border mb-3 unit-tests-welcome" role="region" aria-label="Getting started">
-                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                          <div>
-                            <strong class="d-block text-dark mb-1">Get started</strong>
-                            <p class="mb-0 small text-muted">Upload an Excel test, use <strong>Generate</strong> for a custom field or BR rule, or open <strong>Test Library</strong> in Sections.</p>
-                          </div>
-                          <button type="button" class="btn btn-primary btn-sm flex-shrink-0" id="welcomeUploadBtn">
-                            <i class="bi-upload me-1"></i>Upload Excel
-                          </button>
-                        </div>
-                      </div>
-                      <!-- Wrapper keeps file info + action bar together so they are not overwritten by test results below -->
-                      <div class="unit-test-data-header" id="unitTestDataHeader">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                          <div>
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                              <div id="fileInfo" class="file-info-display">No file loaded</div>
-                              <span class="badge rounded-pill text-bg-secondary" id="testGuidDisplay">No GUID</span>
-                            </div>
-                          </div>
-                          <span class="status-chip info" id="statusChip" role="status" aria-live="polite"><i class="bi-info-circle"></i> Ready</span>
-                        </div>
-                        <div class="sticky-action-bar" id="stickyActionBar" style="display: none;">
-                        <div class="sticky-action-left">
-                          <div class="loan-guid-group">
-                            <label for="loanGuidInput" class="mb-1 text-muted"><small>Loan GUID</small></label>
-                            <div class="input-group input-group-sm">
-                              <input type="text" class="form-control" id="loanGuidInput" placeholder="Enter Loan GUID for API calls" />
-                              <button class="btn btn-success" id="runTestsBtn" style="display: none;">
-                                  <i class="bi-play-circle"></i> Run
-                                </button>
-                                <button class="btn btn-outline-secondary" type="button" id="clearLoanGuidBtn">
-                                  <i class="bi-x-circle"></i> Clear
-                                </button>
-                            </div>
-                          </div>
-                          <span class="loan-guid-chip" id="loanGuidChip">No Loan GUID</span>
-                        </div>
-                        <div class="sticky-action-right">
-                          <select class="form-control form-control-sm" id="recentRunsSelect">
-                            <option value="">Recent runs…</option>
-                          </select>
-                          <input type="text" class="form-control form-control-sm" id="searchInput" placeholder="Search all columns..." />
-                          <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#runAdvancedOptions" aria-expanded="false" aria-controls="runAdvancedOptions">
-                            <i class="bi-sliders me-1"></i>Advanced
-                          </button>
-                        </div>
-                        <div class="collapse mt-2" id="runAdvancedOptions">
-                          <div class="d-flex flex-wrap align-items-center gap-2">
-                            <button class="btn btn-outline-secondary btn-sm" id="showAllColumnsBtn" title="Show Step, Action, Description, Target columns">
-                              <i class="bi-layout-three-columns"></i> All Columns
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm" id="failFirstBtn">
-                              <i class="bi-exclamation-triangle"></i> Fail First
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" id="fillEmptyTestNullBtn" style="display: none;" title="Inserts the text null in empty Test / Reset cells. SET clears the loan field; COMPARE expects a blank value.">
-                              <i class="bi-braces me-1"></i>Null empty cells
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm" id="clearBtn" style="display: none;">
-                              <i class="bi-x-circle"></i> Clear Data
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                      </div><!-- /unit-test-data-header -->
-                      <div id="uploadArea" class="file-upload-area">
-                        <i class="bi-cloud-upload" style="font-size: 3rem; color: var(--zen-primary); margin-bottom: 1rem;"></i>
-                        <h5>Drop Excel file here or click to browse</h5>
-                        <p class="text-muted mb-0">Supports .xlsx format</p>
-                      </div>
-                      <div class="run-summary-card mt-4" id="runSummaryCard" style="display: none;">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                          <div>
-                            <h6 class="mb-1">Last Run Summary</h6>
-                            <small class="text-muted" id="runSummaryTime">Not run yet</small>
-                          </div>
-                          <span class="badge text-bg-secondary" id="runSummaryCounts">0 total</span>
-                        </div>
-                        <div class="progress" style="height: 10px;">
-                          <div class="progress-bar bg-success" id="runSummaryPassBar" role="progressbar" style="width: 0%"></div>
-                          <div class="progress-bar bg-warning" id="runSummarySkipBar" role="progressbar" style="width: 0%"></div>
-                          <div class="progress-bar bg-danger" id="runSummaryFailBar" role="progressbar" style="width: 0%"></div>
-                        </div>
-                      </div>
-                      <!-- Test Results Panel -->
-                      <div id="testResultsContainer" style="display: none;" class="mt-4">
-                        <div class="card p-4 test-results-dark-card">
-                          <div class="d-flex justify-content-between align-items-center mb-3">
-                            <div>
-                              <h5 class="mb-1"><i class="bi-clipboard-check"></i> Test Results</h5>
-                              <small class="text-muted" id="testResultsSummary">Running tests...</small>
-                            </div>
-                            <button class="btn btn-sm btn-outline-secondary" id="closeResultsBtn">
-                              <i class="bi-x"></i> Close
-                            </button>
-                          </div>
-                          <div id="testResultsList" class="test-results-list"></div>
-                          <button class="btn btn-sm btn-outline-secondary mt-3 d-inline-flex align-items-center" id="scrollToTopBtn" style="display: none;">
-                            <i class="bi-arrow-up me-1"></i> Scroll to top
-                          </button>
-                        </div>
-                      </div>
-              </div>
-            </div>
           </div>
         </div>
             </div><!-- /section-content-area -->
@@ -2533,12 +2718,20 @@
       </div>
       <ul class="voice-command-list">
         <li>
-          <span>"Show grid"</span>
-          Opens the Test Grid section.
+          <span>"Show scenarios"</span>
+          Opens Step 1 Test Scenarios.
         </li>
         <li>
-          <span>"Show scenarios"</span>
-          Opens the Test Scenarios section.
+          <span>"Show grid"</span>
+          Opens Step 2 Test Grid (after you load a sheet from the Excel Unit Tests bar above).
+        </li>
+        <li>
+          <span>"Show run tests"</span> / <span>"Open run tests"</span>
+          Opens Step 3 Run tests (QA highlights, loan GUID, execute).
+        </li>
+        <li>
+          <span>"Show sign-off"</span> / <span>"Open sign-off"</span>
+          Opens Step 4 Test Sign-off.
         </li>
         <li>
           <span>"Show library"</span>
@@ -2559,6 +2752,14 @@
         <li>
           <span>"Analyze failures"</span>
           Sends current test failures to the AI assistant for analysis (after a test run).
+        </li>
+        <li>
+          <span>"QA tips" / "Formula help"</span>
+          Opens Step 3 Run tests, expands QA highlights, reads calculation and workflow tips aloud.
+        </li>
+        <li>
+          <span>AI Speak button</span>
+          In Advanced: AI Assistant, use <strong>Speak</strong> to hear assistant replies when you want voice instead of reading the chat.
         </li>
         <li>
           <span>"Show commands" / "Hide commands"</span>
@@ -2599,7 +2800,7 @@
           set(isOn());
           if(!document.getElementById('unitTestsNightToggle')){
             var b=document.createElement('button');b.id='unitTestsNightToggle';b.type='button';b.className='dark-mode-toggle';
-            b.style.cssText='position:fixed;top:70px;right:16px;z-index:999;width:40px;height:40px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#1e293b;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
+            b.style.cssText='position:fixed;top:80px;right:16px;z-index:999;width:40px;height:40px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#1e293b;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
             function updateBtn(){var on=document.body.classList.contains('unit-tests-night-theme');b.innerHTML=on?'<i class="bi bi-sun-fill"></i>':'<i class="bi bi-moon-stars-fill"></i>';b.title=on?'Switch to light mode':'Switch to dark mode';b.setAttribute('aria-label',on?'Switch to light mode':'Switch to dark mode');b.style.background=on?'#4b5563':'#fff';b.style.color=on?'#f9fafb':'#374151';b.style.borderColor=on?'#6b7280':'#e2e8f0';}
             updateBtn();
             b.onclick=function(){set(!document.body.classList.contains('unit-tests-night-theme'));updateBtn();};
@@ -2622,6 +2823,7 @@
       })();
     </script>
     <script defer src="/finance/js/unit-tests.js"></script>
+    <script defer src="/finance/js/unit-tests-story-mode.js"></script>
     <script defer src="/finance/js/unit-tests-ai.js"></script>
     <script defer src="/finance/js/unit-tests-learn-mode.js"></script>
     <script src="/shared/finance-auth-guard.js"></script>

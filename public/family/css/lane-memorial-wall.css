@@ -216,6 +216,110 @@ body.lane-memorial-page .text-muted {
   color: #a89b82;
 }
 
+.memorial-story-mode {
+  margin: 1rem auto 0;
+  max-width: 52rem;
+  text-align: left;
+  border: 1px solid rgba(196, 181, 153, 0.22);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.memorial-story-header {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.memorial-story-kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #b6aa92;
+}
+
+.memorial-story-copy {
+  margin-top: 0.5rem;
+  color: #bfb6a6;
+  font-size: 0.84rem;
+}
+
+.memorial-story-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  color: #c9c0b2;
+}
+
+.memorial-story-option {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.memorial-story-option input {
+  margin: 0;
+  accent-color: rgba(205, 191, 159, 0.85);
+}
+
+.memorial-story-overlay {
+  margin-top: 0.65rem;
+  border: 1px solid rgba(205, 191, 159, 0.32);
+  border-left: 4px solid rgba(205, 191, 159, 0.64);
+  border-radius: 0.55rem;
+  padding: 0.6rem 0.7rem;
+  background: rgba(9, 12, 16, 0.52);
+}
+
+/* Story Mode: floats beside the spotlight line so copy stays visible after scroll */
+.memorial-story-overlay.memorial-story-overlay--floating {
+  position: fixed;
+  margin-top: 0;
+  left: auto;
+  right: auto;
+  top: auto;
+  z-index: 1150;
+  max-width: min(20rem, calc(100vw - 24px));
+  pointer-events: none;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
+  background: rgba(12, 14, 18, 0.94);
+  border-left-width: 4px;
+  backdrop-filter: blur(6px);
+}
+
+@media (max-width: 576px) {
+  .memorial-story-overlay.memorial-story-overlay--floating {
+    max-width: calc(100vw - 18px);
+  }
+}
+
+.memorial-story-scene-kicker {
+  font-size: 0.67rem;
+  color: #b9ad96;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.memorial-story-scene-title {
+  font-family: Georgia, "Palatino Linotype", Palatino, serif;
+  color: #ece3d1;
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  font-weight: 500;
+}
+
+.memorial-story-scene-copy {
+  color: #cec4b3;
+  font-size: 0.86rem;
+}
+
 /* Wall list container + toolbar (century jump) */
 .memorial-wall-layout {
   position: relative;
@@ -368,6 +472,18 @@ body.lane-memorial-page .text-muted {
   background: rgba(196, 181, 153, 0.25);
   color: #fff6e2;
   box-shadow: 0 0 0 1px rgba(242, 221, 164, 0.45);
+}
+
+.memorial-line--story-active {
+  background: rgba(140, 199, 255, 0.18);
+  color: #f5fbff;
+  box-shadow: 0 0 0 1px rgba(140, 199, 255, 0.45);
+  animation: memorialStoryPulse 1800ms ease-in-out infinite;
+}
+
+@keyframes memorialStoryPulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(140, 199, 255, 0.45); }
+  50% { box-shadow: 0 0 0 1px rgba(140, 199, 255, 0.6), 0 0 18px rgba(140, 199, 255, 0.18); }
 }
 
 .memorial-line:hover,
@@ -723,6 +839,10 @@ body.lane-memorial-page .text-muted {
 @media (prefers-reduced-motion: reduce) {
   .memorial-line {
     transition: none;
+  }
+
+  .memorial-line--story-active {
+    animation: none;
   }
 }
 

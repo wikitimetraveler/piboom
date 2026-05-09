@@ -1,24 +1,42 @@
 /**
  * Lane family tools — shared structure + themed hooks (--lane-qnav-*, --lane-context-*).
  * Theme pages assign hook variables on body; do not impose light palette globally.
+ * Heritage tokens (--lane-heritage-*) align tool pages with the hub warm palette.
  */
 
+body.lane-historians-page,
+body.lane-museum-page,
+body.lane-war-page,
+body.lane-memorial-page,
+body.lane-occ-page,
+body.lane-direct-page,
+body.lane-pdf-gallery-root,
+body.whai-page,
+body.genealogy-import-page,
+body.genealogy-tree-page {
+  --lane-heritage-ink: #2a2824;
+  --lane-heritage-ink-soft: #3d3a36;
+  --lane-heritage-accent: #6b5344;
+  --lane-heritage-muted: #7a756c;
+  --ice-dark: var(--lane-heritage-ink);
+}
+
 .lane-tools-page {
-  --lane-focus-ring: 0 0 0 3px rgba(52, 152, 219, 0.45);
+  --lane-focus-ring: 0 0 0 3px rgba(107, 83, 68, 0.35);
   --lane-qnav-gap: 0.45rem;
   --lane-qnav-margin-top: 0;
   --lane-qnav-link-pad-v: 0.28rem;
   --lane-qnav-link-pad-h: 0.62rem;
-  --lane-qnav-link-bd: rgba(44, 62, 80, 0.22);
-  --lane-qnav-link-fg: var(--ice-dark, #2c3e50);
+  --lane-qnav-link-bd: rgba(44, 40, 36, 0.2);
+  --lane-qnav-link-fg: var(--lane-heritage-ink, var(--ice-dark, #2c3e50));
   --lane-qnav-link-fs: 0.78rem;
   --lane-qnav-link-tracking: 0.04em;
   --lane-qnav-link-case: none;
   --lane-qnav-link-radius: 999px;
-  --lane-qnav-link-hover-bd: rgba(52, 152, 219, 0.35);
-  --lane-qnav-link-hover-fg: var(--ice-dark, #2c3e50);
-  --lane-qnav-link-hover-bg: rgba(52, 152, 219, 0.08);
-  --lane-qnav-focus-color: rgba(52, 152, 219, 0.9);
+  --lane-qnav-link-hover-bd: rgba(107, 83, 68, 0.38);
+  --lane-qnav-link-hover-fg: var(--lane-heritage-ink, #2a2824);
+  --lane-qnav-link-hover-bg: rgba(107, 83, 68, 0.09);
+  --lane-qnav-focus-color: rgba(107, 83, 68, 0.9);
   --lane-context-note-fg: #6c757d;
   --lane-context-note-size: 0.82rem;
 }
@@ -35,7 +53,7 @@
   font-size: clamp(1.45rem, 3.8vw, 1.95rem);
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: var(--ice-dark, #2c3e50);
+  color: var(--lane-heritage-ink-soft, var(--ice-dark, #2c3e50));
   margin: 0 0 0.5rem;
   line-height: 1.25;
   display: flex;
@@ -47,7 +65,7 @@
 .lane-tools-page .lane-page-title .bi,
 .lane-pdf-gallery-page .lane-pdf-page-title .bi {
   font-size: 1.05em;
-  color: rgba(52, 152, 219, 0.85);
+  color: rgba(107, 83, 68, 0.88);
   flex-shrink: 0;
 }
 
@@ -141,4 +159,21 @@
   color: var(--lane-context-note-fg, #6c757d);
   font-size: var(--lane-context-note-size, 0.82rem);
   letter-spacing: 0.01em;
+}
+
+/* Breadcrumb — reuse on gallery, historians, and other Lane tools */
+.lane-family-crumb {
+  font-size: 0.8125rem;
+  color: var(--lane-heritage-muted, #6b645c);
+  margin-bottom: 0.75rem;
+}
+
+.lane-family-crumb a {
+  color: var(--lane-heritage-accent, #5a5348);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lane-family-crumb a:hover {
+  color: var(--lane-heritage-ink, #3d3832);
 }

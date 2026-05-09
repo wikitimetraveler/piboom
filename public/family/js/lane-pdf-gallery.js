@@ -245,7 +245,7 @@ function renderGallery(images, portraits, container) {
         !isSkipped &&
         `Page ${img.pdfPage} · ${img.imageId}${
           img.width && img.height ? ` · ${img.width}×${img.height}` : ''
-        }`;
+        }${img.bookIllustrationLabel ? ` · ${img.bookIllustrationLabel}` : ''}`;
       const imgTag = isSkipped
         ? `<div class="d-flex align-items-center justify-content-center bg-secondary text-white" style="height:120px">Not extracted</div>`
         : `<img src="${esc(url)}" alt="" loading="lazy" class="lane-pdf-thumb" tabindex="0" role="button" data-plate-meta="${esc(
@@ -276,7 +276,7 @@ function renderGallery(images, portraits, container) {
         .slice(0, 12)
         .map(
           (pid) =>
-            `<a href="/family/genealogy.html?id=${encodeURIComponent(pid)}" class="mr-2">#${esc(pid)}</a>`
+            `<a href="/family/genealogy.html?id=${encodeURIComponent(pid)}" class="me-2">#${esc(pid)}</a>`
         )
         .join(' ');
       const more = ids.length > 12 ? ` <span class="text-muted">+${ids.length - 12}</span>` : '';
@@ -312,6 +312,13 @@ function renderGallery(images, portraits, container) {
             <div class="lane-pdf-card-body">
               ${badge}
               <div><strong>Page</strong> ${esc(img.pdfPage)} · <code>${esc(img.imageId)}</code></div>
+              ${
+                img.bookIllustrationLabel
+                  ? `<div class="mt-1 small text-muted lane-pdf-book-illus"><strong>Book illustration:</strong> ${esc(
+                      img.bookIllustrationLabel
+                    )}</div>`
+                  : ''
+              }
               ${
                 portrait && portrait.personName
                   ? `<div class="mt-1"><strong>Display name:</strong> ${esc(portrait.personName)}</div>`
@@ -1180,7 +1187,8 @@ async function initLanePdfGallery() {
       }
     })();
   } catch (e) {
-    errEl.textContent = e.message || String(e);
+    const msg = e.message || String(e);
+    errEl.textContent = `${msg} Verify GET /api/genealogy/lane-pdf/gallery and plate manifest data.`;
     errEl.classList.remove('d-none');
   }
 }

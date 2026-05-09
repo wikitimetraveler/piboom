@@ -18,6 +18,48 @@
     '/family/assets/lane-genealogies-title-spread.png';
   const PRIMARY_SOURCE_URL = 'https://archive.org/details/lanegenealogies01chap/page/n7/mode/2up';
   const NHHS_SOURCE_URL = 'https://www.nhhistory.org/object/272904/lane-family-papers-1727-1924';
+  const STORAGE_STORY_CHAPTERS = 'laneMemorialStoryChapters';
+  const STORAGE_STORY_NARRATE = 'laneMemorialStoryNarrate';
+  const STORY_SCENE_DURATION_MS = 4600;
+  const STORY_CHAPTER_DURATION_MS = 3400;
+  const STORY_SCENE_GAP_MS = 200;
+  const STORY_ERAS_ORDER = [1600, 1700, 1800, 1900];
+  /** @type {Record<number, { title: string, chapterCopy: string }>} */
+  const STORY_ERA_COPY = {
+    1600: {
+      title: 'Seventeenth century',
+      chapterCopy:
+        'Colonial footing in New England: earliest named generations preserved in condensed inscription before the Revolutionary era reshapes civic life.'
+    },
+    1700: {
+      title: 'Eighteenth century',
+      chapterCopy:
+        'Republic and homestead rhythm: Revolutionary aftermath, town centers, and the thickening braid of ancestor lines documented in nineteenth-century compilations.'
+    },
+    1800: {
+      title: 'Nineteenth century',
+      chapterCopy:
+        'Steam, print, migration, and sharper vital detail: occupations, wartime echoes, and the volume that organizes so many memorial lines.'
+    },
+    1900: {
+      title: 'Twentieth century',
+      chapterCopy:
+        'Registers and descendants carry the wall toward living memory—the same chronology ladder, nearer the horizon of direct recollection.'
+    }
+  };
+
+  let storySpeakToken = 0;
+  /** Returns the element beside which the floating scene card should sit */
+  let storyFloatResolveAnchor = null;
+  let storyFloatScrollBound = false;
+  let storyFloatReflowScheduled = false;
+
+  const storyState = {
+    running: false,
+    playbackToken: 0,
+    scenes: []
+  };
+  let lastRenderedPeople = [];
 
   function esc(value) {
     return String(value ?? '')
@@ -887,12 +929,545 @@
     target.focus({ preventScroll: true });
   }
 
+  function updateStoryToggleButton() {
+    const toggle = document.getElementById('memorialStoryToggle');
+    if (!toggle) return;
+    const hasPlaylist = Boolean(storyState.scenes.length);
+    toggle.disabled = !hasPlaylist && !storyState.running;
+    toggle.setAttribute('aria-pressed', storyState.running ? 'true' : 'false');
+    toggle.textContent = storyState.running ? 'Pause highlight reel' : 'Play highlight reel';
+  }
+
+  function unbindStoryFloatListeners() {
+    if (!storyFloatScrollBound) return;
+    window.removeEventListener('scroll', onStoryFloatingReflow, true);
+    window.removeEventListener('resize', onStoryFloatingReflow);
+    storyFloatScrollBound = false;
+  }
+
+  function onStoryFloatingReflow() {
+    if (!storyState.running) return;
+    const overlay = document.getElementById('memorialStoryOverlay');
+    if (!overlay || overlay.classList.contains('d-none')) return;
+    if (storyFloatReflowScheduled) return;
+    storyFloatReflowScheduled = true;
+    window.requestAnimationFrame(() => {
+      storyFloatReflowScheduled = false;
+      repositionStoryFloatingNugget();
+    });
+  }
+
+  function bindStoryFloatListeners() {
+    if (storyFloatScrollBound) return;
+    window.addEventListener('scroll', onStoryFloatingReflow, true);
+    window.addEventListener('resize', onStoryFloatingReflow);
+    storyFloatScrollBound = true;
+  }
+
+  function clearFloatingOverlayStyles() {
+    const overlay = document.getElementById('memorialStoryOverlay');
+    if (!overlay) return;
+    overlay.classList.remove('memorial-story-overlay--floating');
+    overlay.style.left = '';
+    overlay.style.right = '';
+    overlay.style.top = '';
+    overlay.style.bottom = '';
+    overlay.style.transform = '';
+    overlay.style.width = '';
+    overlay.style.maxWidth = '';
+  }
+
+  function memorialStoryClamp(n, lo, hi) {
+    return Math.min(hi, Math.max(lo, n));
+  }
+
+  /** Place the overlay near `anchor`; falls back to upper viewport if missing */
+  function positionStoryFloatingNear(anchorEl) {
+    const overlay = document.getElementById('memorialStoryOverlay');
+    if (!overlay || overlay.classList.contains('d-none')) return;
+
+    const pad = 10;
+    const gap = 12;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    overlay.classList.add('memorial-story-overlay--floating');
+
+    const anchor = anchorEl instanceof Element ? anchorEl : null;
+
+    function placeFallbackCenter() {
+      overlay.style.transform = 'translateX(-50%)';
+      overlay.style.left = '50%';
+      overlay.style.right = 'auto';
+      overlay.style.bottom = 'auto';
+      overlay.style.top = `${Math.round(memorialStoryClamp(Math.min(vh * 0.2, Math.max(vh * 0.12, pad + 76)), pad, vh * 0.35))}px`;
+      overlay.style.width = `${Math.round(Math.min(340, vw - 2 * pad))}px`;
+    }
+
+    if (!anchor || typeof anchor.getBoundingClientRect !== 'function') {
+      placeFallbackCenter();
+      return;
+    }
+
+    const r = anchor.getBoundingClientRect();
+    const narrow = vw <= 576;
+
+    if (narrow) {
+      overlay.style.transform = '';
+      const w = Math.round(Math.min(340, vw - 18));
+      let left = r.left + r.width / 2 - w / 2;
+      left = memorialStoryClamp(left, pad, vw - w - pad);
+      let top = r.bottom + gap;
+      overlay.style.left = `${Math.round(left)}px`;
+      overlay.style.right = 'auto';
+      overlay.style.width = `${w}px`;
+      overlay.style.bottom = 'auto';
+      overlay.style.top = `${Math.round(top)}px`;
+
+      window.requestAnimationFrame(() => {
+        const ob = overlay.getBoundingClientRect();
+        if (ob.bottom > vh - pad) {
+          const aboveTop = memorialStoryClamp(Math.round(r.top - gap - ob.height), pad, vh - ob.height - pad);
+          overlay.style.top = `${aboveTop}px`;
+        }
+      });
+      return;
+    }
+
+    overlay.style.transform = 'translateY(-50%)';
+    overlay.style.bottom = 'auto';
+    overlay.style.right = 'auto';
+    overlay.style.width = '';
+
+    let leftGuess = Math.round(r.right + gap);
+    const midY = r.top + r.height / 2;
+    overlay.style.top = `${Math.round(midY)}px`;
+    overlay.style.left = `${leftGuess}px`;
+
+    window.requestAnimationFrame(() => {
+      const ob = overlay.getBoundingClientRect();
+      if (leftGuess + ob.width > vw - pad) {
+        leftGuess = Math.round(r.left - gap - ob.width);
+      }
+      leftGuess = memorialStoryClamp(leftGuess, pad, vw - ob.width - pad);
+      overlay.style.left = `${leftGuess}px`;
+
+      const ob2 = overlay.getBoundingClientRect();
+      const half = ob2.height / 2;
+      let centerY = memorialStoryClamp(r.top + r.height / 2, pad + half, vh - half - pad);
+      overlay.style.top = `${Math.round(centerY)}px`;
+    });
+  }
+
+  function repositionStoryFloatingNugget() {
+    let anchor =
+      typeof storyFloatResolveAnchor === 'function' ? storyFloatResolveAnchor() : null;
+    if (!anchor || !(anchor instanceof Element)) anchor = document.querySelector('.memorial-line--story-active');
+    positionStoryFloatingNear(anchor || null);
+  }
+
+  /** After scroll/layout, run a couple of ticks so smooth scroll settles */
+  function scheduleRepositionStoryNugget() {
+    const slots = [0, 48, 200, 450];
+    for (let i = 0; i < slots.length; i++) {
+      window.setTimeout(() => repositionStoryFloatingNugget(), slots[i]);
+    }
+    window.requestAnimationFrame(() =>
+      window.requestAnimationFrame(() => repositionStoryFloatingNugget())
+    );
+  }
+
+  function setStoryOverlay(scene) {
+    const overlay = document.getElementById('memorialStoryOverlay');
+    const kickerEl = document.getElementById('memorialStorySceneKicker');
+    const titleEl = document.getElementById('memorialStorySceneTitle');
+    const copyEl = document.getElementById('memorialStorySceneCopy');
+    if (!overlay || !kickerEl || !titleEl || !copyEl) return;
+    if (!scene) {
+      unbindStoryFloatListeners();
+      storyFloatResolveAnchor = null;
+      clearFloatingOverlayStyles();
+      overlay.classList.add('d-none');
+      kickerEl.textContent = '';
+      titleEl.textContent = '';
+      copyEl.textContent = '';
+      return;
+    }
+    bindStoryFloatListeners();
+    overlay.classList.remove('d-none');
+    kickerEl.textContent = scene.kicker;
+    titleEl.textContent = scene.title;
+    copyEl.textContent = scene.copy;
+    scheduleRepositionStoryNugget();
+  }
+
+  function clearStoryHighlights() {
+    document.querySelectorAll('.memorial-line--story-active').forEach((el) => {
+      el.classList.remove('memorial-line--story-active');
+    });
+  }
+
+  function storyChaptersEnabled() {
+    const el = document.getElementById('memorialStoryChapters');
+    if (!el) return true;
+    return el.checked;
+  }
+
+  function storyNarrationEnabled() {
+    const el = document.getElementById('memorialStoryNarrate');
+    if (!el) return false;
+    return el.checked;
+  }
+
+  function persistStoryModeOptions() {
+    const ch = document.getElementById('memorialStoryChapters');
+    const na = document.getElementById('memorialStoryNarrate');
+    try {
+      if (ch) localStorage.setItem(STORAGE_STORY_CHAPTERS, ch.checked ? '1' : '0');
+      if (na) localStorage.setItem(STORAGE_STORY_NARRATE, na.checked ? '1' : '0');
+    } catch (_) {}
+  }
+
+  function loadStoryModeOptions() {
+    const ch = document.getElementById('memorialStoryChapters');
+    const na = document.getElementById('memorialStoryNarrate');
+    try {
+      if (ch) {
+        const v = localStorage.getItem(STORAGE_STORY_CHAPTERS);
+        if (v === '0') ch.checked = false;
+        else if (v === '1') ch.checked = true;
+        else ch.checked = true;
+      }
+      if (na) {
+        const v = localStorage.getItem(STORAGE_STORY_NARRATE);
+        if (v === '1') na.checked = true;
+        else if (v === '0') na.checked = false;
+        else na.checked = true;
+      }
+    } catch (_) {}
+  }
+
+  function sleepStory(ms) {
+    return new Promise((resolve) => {
+      window.setTimeout(resolve, ms);
+    });
+  }
+
+  function stopStoryNarration() {
+    storySpeakToken += 1;
+    if (typeof window.stopSpeech === 'function') window.stopSpeech();
+    else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  }
+
+  function storyNarrationText(scene) {
+    if (!scene) return '';
+    return String(scene.narration || '').trim();
+  }
+
+  /** @param {string} text @param {number} token - invalid when storySpeakToken changes */
+  function narrateMemorialStoryAsync(text, token) {
+    const t = String(text || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!t) return Promise.resolve();
+    if (typeof window.speakNarrationAwaitEnd !== 'function') return Promise.resolve();
+    return window.speakNarrationAwaitEnd(t, {
+      volume: 0.85,
+      isCancelled: () => token !== storySpeakToken
+    });
+  }
+
+  function buildMemorialStoryScenes(people) {
+    const rows = Array.isArray(people) ? people.slice().sort(sortByBirthYear) : [];
+    const dated = rows.filter((person) => parseBirthYear(person) !== null);
+    const undated = rows.filter((person) => parseBirthYear(person) === null);
+    const scenes = [];
+    const used = new Set();
+    const chapterIntros = storyChaptersEnabled();
+
+    const pushProfileScene = (person, kicker, copy, eraLabel) => {
+      if (!person || !person.id) return;
+      const personId = String(person.id);
+      if (used.has(personId)) return;
+      used.add(personId);
+      const birthYear = parseBirthYear(person);
+      const deathYear = parseDeathYear(person);
+      const years = birthYear == null ? 'Birth year not recorded' : `${birthYear}${deathYear == null ? '' : ` to ${deathYear}`}`;
+      const title = `${person.name || 'Unknown'} (${years})`;
+      const narration = `${kicker}. ${title}. ${copy}`;
+      scenes.push({
+        kind: 'profile',
+        personId,
+        eraLabel: eraLabel || '',
+        kicker,
+        title,
+        copy,
+        narration,
+        durationMs: STORY_SCENE_DURATION_MS
+      });
+    };
+
+    const pushChapterScene = (centuryDisplayLabel, title, copy, anchorId) => {
+      const kicker = `Chapter · ${centuryDisplayLabel}`;
+      const narration = `${kicker} ${title}. ${copy}`;
+      scenes.push({
+        kind: 'chapter',
+        anchorId: anchorId || '',
+        kicker,
+        title,
+        copy,
+        narration,
+        durationMs: STORY_CHAPTER_DURATION_MS
+      });
+    };
+
+    const peopleInCenturyRange = (start, end) =>
+      dated.filter((p) => {
+        const y = parseBirthYear(p);
+        return y != null && y >= start && y <= end;
+      });
+
+    const pickProfilesForBucket = (bucket) => {
+      const start = bucket;
+      const end = bucket + 99;
+      const list = peopleInCenturyRange(start, end).sort(sortByBirthYear);
+      if (!list.length) return [];
+      if (list.length === 1) return [list[0]];
+      const out = [list[0]];
+      if (list.length >= 4) {
+        const mid = list[Math.floor(list.length / 2)];
+        if (mid && String(mid.id) !== String(list[0].id)) out.push(mid);
+      } else if (list.length >= 2) {
+        const last = list[list.length - 1];
+        if (last && String(last.id) !== String(list[0].id)) out.push(last);
+      }
+      return out;
+    };
+
+    for (const bucket of STORY_ERAS_ORDER) {
+      const meta = STORY_ERA_COPY[bucket];
+      const centuryDisplay = `${bucket}s`;
+      const anchorId = centuryId(centuryDisplay);
+      const profiles = pickProfilesForBucket(bucket);
+      if (!profiles.length) continue;
+      if (chapterIntros && meta) {
+        pushChapterScene(centuryDisplay, meta.title, meta.chapterCopy, anchorId);
+      }
+      const first = profiles[0];
+      pushProfileScene(first, `${centuryDisplay} · Earliest birth in view`, 'Earliest dated line in this century for the current wall filter.', centuryDisplay);
+      if (profiles[1]) {
+        pushProfileScene(
+          profiles[1],
+          `${centuryDisplay} · Another voice in the wall`,
+          profiles.length > 2 ? 'A second anchor in the same century band.' : 'Another dated line in the same century band.',
+          centuryDisplay
+        );
+      }
+    }
+
+    const outliers = dated.filter((p) => {
+      const y = parseBirthYear(p);
+      return y != null && (y < 1600 || y > 1999);
+    });
+    outliers.sort(sortByBirthYear);
+    if (outliers.length && chapterIntros) {
+      const lowY = parseBirthYear(outliers[0]);
+      const hiY = parseBirthYear(outliers[outliers.length - 1]);
+      const span =
+        Number.isFinite(lowY) && Number.isFinite(hiY) ? `Birth years roughly ${lowY}–${hiY}` : 'Rare birth-year span';
+      pushChapterScene(
+        'Outside 1600s–1900s band',
+        'Earlier or later inscriptions',
+        `${span} on this wall—still inscribed in chronological order.`,
+        outliers.length ? centuryId(centuryLabel(parseBirthYear(outliers[0]))) : ''
+      );
+    }
+    for (let i = 0; i < Math.min(outliers.length, 2); i++) {
+      const person = outliers[i];
+      pushProfileScene(
+        person,
+        'Extended chronology · Wall line',
+        'Profile outside the Four-century highlight band but shown on the memorial wall.',
+        'other'
+      );
+    }
+
+    if (undated.length) {
+      if (chapterIntros) {
+        pushChapterScene(
+          'Undated',
+          'Names awaiting birth year anchor',
+          'Lines preserved without a resolved birth year in this compilation—research continues.',
+          ''
+        );
+      }
+      pushProfileScene(
+        undated[0],
+        'Undated · Wall line',
+        'Some memorial lines stay open until parish, census, or book evidence pins a birth year.',
+        'undated'
+      );
+    }
+
+    return scenes;
+  }
+
+  function applyMemorialStoryScene(scene) {
+    clearStoryHighlights();
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const behavior = reducedMotion ? 'auto' : 'smooth';
+
+    if (!scene || scene.kind === 'chapter') {
+      const rawId = scene && scene.anchorId ? String(scene.anchorId).trim() : '';
+      const anchorSection = rawId ? document.getElementById(rawId) : null;
+      storyFloatResolveAnchor = function memorialStoryChapterAnchorResolver() {
+        if (anchorSection) return anchorSection;
+        const wall = document.getElementById('memorialWall');
+        const firstHeading = wall && wall.querySelector('.memorial-century-label');
+        return firstHeading || wall || null;
+      };
+      setStoryOverlay(scene);
+      const firstEl = anchorSection || storyFloatResolveAnchor();
+      if (firstEl && typeof firstEl.scrollIntoView === 'function') firstEl.scrollIntoView({ behavior, block: 'start' });
+      return;
+    }
+
+    const selector = `.memorial-line[data-person-id="${escapeSelectorValue(scene.personId)}"]`;
+    storyFloatResolveAnchor = function memorialStoryProfileAnchorResolver() {
+      return document.querySelector(selector);
+    };
+
+    const target = document.querySelector(selector);
+    setStoryOverlay(scene);
+    if (!target) return;
+    target.classList.add('memorial-line--story-active');
+    target.scrollIntoView({ behavior, block: 'center' });
+  }
+
+  function stopMemorialStoryMode(options = {}) {
+    const preserveOverlay = Boolean(options.preserveOverlay);
+    stopStoryNarration();
+    storyState.running = false;
+    storyState.playbackToken += 1;
+    clearStoryHighlights();
+    if (!preserveOverlay) {
+      setStoryOverlay(null);
+    }
+    updateStoryToggleButton();
+  }
+
+  async function memorialStoryPlaybackLoop(playbackToken) {
+    if (!storyState.scenes.length) {
+      stopStoryNarration();
+      storyState.running = false;
+      updateStoryToggleButton();
+      return;
+    }
+    let idx = 0;
+    while (storyState.running && playbackToken === storyState.playbackToken && storyState.scenes.length) {
+      stopStoryNarration();
+      const scene = storyState.scenes[idx];
+      if (!scene) break;
+      applyMemorialStoryScene(scene);
+      const narrToken = storySpeakToken;
+      const narrPromise =
+        storyNarrationEnabled() && storyNarrationText(scene)
+          ? narrateMemorialStoryAsync(storyNarrationText(scene), narrToken)
+          : Promise.resolve();
+      const minMs = Number(scene.durationMs) || STORY_SCENE_DURATION_MS;
+      await Promise.all([narrPromise, sleepStory(minMs)]);
+      if (!storyState.running || playbackToken !== storyState.playbackToken) break;
+      if (idx + 1 >= storyState.scenes.length) {
+        stopMemorialStoryMode({ preserveOverlay: true });
+        break;
+      }
+      await sleepStory(STORY_SCENE_GAP_MS);
+      idx += 1;
+    }
+    if (!storyState.running) {
+      updateStoryToggleButton();
+    }
+  }
+
+  function memorialStoryRestartKeepPlaying() {
+    stopStoryNarration();
+    storyState.playbackToken += 1;
+    storyState.running = true;
+    const token = storyState.playbackToken;
+    if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+    if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+    updateStoryToggleButton();
+    void memorialStoryPlaybackLoop(token);
+  }
+
+  function startMemorialStoryMode() {
+    if (!storyState.scenes.length) return;
+    if (typeof window.laneTtsStopPlayback === 'function') window.laneTtsStopPlayback();
+    stopStoryNarration();
+    storyState.playbackToken += 1;
+    storyState.running = true;
+    const token = storyState.playbackToken;
+    if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+    if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+    updateStoryToggleButton();
+    void memorialStoryPlaybackLoop(token);
+  }
+
+  function initMemorialStoryMode() {
+    const toggle = document.getElementById('memorialStoryToggle');
+    if (!toggle) return;
+    loadStoryModeOptions();
+
+    toggle.addEventListener('click', () => {
+      if (storyState.running) {
+        stopMemorialStoryMode();
+      } else {
+        storyState.scenes = buildMemorialStoryScenes(lastRenderedPeople);
+        if (!storyState.scenes.length) {
+          updateStoryToggleButton();
+          return;
+        }
+        startMemorialStoryMode();
+      }
+    });
+
+    const optIds = ['memorialStoryChapters', 'memorialStoryNarrate'];
+    optIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('change', () => {
+        persistStoryModeOptions();
+        storyState.scenes = buildMemorialStoryScenes(lastRenderedPeople);
+        if (!storyState.scenes.length) {
+          stopMemorialStoryMode();
+        } else if (storyState.running) {
+          memorialStoryRestartKeepPlaying();
+        }
+        updateStoryToggleButton();
+      });
+    });
+
+    updateStoryToggleButton();
+  }
+
+  document.addEventListener(
+    'keydown',
+    (e) => {
+      if (e.key !== 'Escape' || !storyState.running) return;
+      stopMemorialStoryMode();
+    },
+    true
+  );
+
   async function openModal(personId) {
     const titleEl = document.getElementById('memorialModalTitle');
     const bodyEl = document.getElementById('memorialModalBody');
     titleEl.textContent = 'Loading…';
     bodyEl.innerHTML = '<p class="text-muted mb-0">Fetching profile…</p>';
-    $('#memorialModal').modal('show');
+    const memorialModal = document.getElementById('memorialModal');
+    if (memorialModal && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+      bootstrap.Modal.getOrCreateInstance(memorialModal).show();
+    }
     const renderToken = ++modalRenderToken;
 
     try {
@@ -1088,25 +1663,39 @@
       if (bookOnly) {
         people = people.filter(isBookOrOcrSource);
       }
+      lastRenderedPeople = people.slice();
 
       stat.textContent = `${people.length} shown${bookOnly ? ' (filtered)' : ''} · ${data.count} total in tree`;
 
       renderWall(people);
+      storyState.scenes = buildMemorialStoryScenes(lastRenderedPeople);
+      if (storyState.running) {
+        if (!storyState.scenes.length) {
+          stopMemorialStoryMode();
+        } else {
+          memorialStoryRestartKeepPlaying();
+        }
+      } else {
+        updateStoryToggleButton();
+      }
       applyPersonHighlightFromQuery();
       if (!people.length) {
         document.getElementById('memorialWall').innerHTML = `<div class="small text-muted">${HISTORY_STATE_COPY.empty}</div>`;
+        stopMemorialStoryMode();
       }
     } catch (e) {
-      errBox.textContent = `${HISTORY_STATE_COPY.unavailable} ${e.message || String(e)}`;
+      errBox.textContent = `${HISTORY_STATE_COPY.unavailable} ${e.message || String(e)} Verify GET ${API_BASE}/people (and optionally ${API_BASE}/prominent-lanes).`;
       errBox.classList.remove('d-none');
       document.getElementById('memorialWall').innerHTML = '';
       stat.textContent = '';
+      stopMemorialStoryMode();
     }
   }
 
   document.getElementById('bookOnly').addEventListener('change', load);
   wireClicks();
   initQuickFilters();
+  initMemorialStoryMode();
   initMemorialFlash();
   if (typeof window.initHistoryQuickNav === 'function') {
     window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });

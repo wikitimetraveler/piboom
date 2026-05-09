@@ -152,7 +152,7 @@ body.lane-occ-page {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 
-.occ-person-modal .close:focus {
+.occ-person-modal .btn-close:focus {
   outline: 2px solid rgba(109, 163, 209, 0.8);
   outline-offset: 2px;
 }

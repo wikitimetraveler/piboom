@@ -12,22 +12,6 @@ body.lane-historians-page {
   padding: 1.5rem 1.25rem 3rem;
 }
 
-.lane-historians-crumb {
-  font-size: 0.8125rem;
-  color: #6b645c;
-  margin-bottom: 1rem;
-}
-
-.lane-historians-crumb a {
-  color: #5a5348;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.lane-historians-crumb a:hover {
-  color: #3d3832;
-}
-
 .lane-historians-hero {
   margin-bottom: 2rem;
 }
@@ -58,7 +42,7 @@ body.lane-historians-page {
 }
 
 .lane-historians-title {
-  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-family: 'Source Serif 4', Georgia, 'Times New Roman', Times, serif;
   font-weight: 400;
   font-size: 1.65rem;
   letter-spacing: 0.02em;

@@ -204,7 +204,7 @@
         const result = await response.json();
         apiResponse.textContent = JSON.stringify(result, null, 2);
       } catch (error) {
-        apiResponse.textContent = `Upload failed: ${error.message}`;
+        apiResponse.textContent = `Upload failed: ${error.message}\nVerify POST /api/genealogy/import-images (multipart) and genealogy service on the server.`;
       } finally {
         uploadBtn.disabled = false;
       }

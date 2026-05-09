@@ -1,8 +1,8 @@
 {
   "featuredStory": {
     "slug": "william-e-lane-boston",
-    "title": "Exhibit 1: William Lane of Boston",
-    "subtitle": "Opening the Lane story in chronological order",
+    "title": "William E Lane of Boston",
+    "subtitle": "Exhibit 1 · Opening exhibit",
     "personQuery": {
       "preferredNames": [
         "William E Lane",
@@ -13,7 +13,7 @@
         "Boston"
       ]
     },
-    "summary": "William Lane of Boston (cordwainer) anchors the opening exhibit: Hartford and Lynn appearances, freeman 1657, and the Mary Brewer marriage — chronology that later Lanes extend from.",
+    "summary": "William E Lane of Boston (cordwainer) anchors the opening exhibit: Hartford and Lynn appearances, freeman 1657, and the Mary Brewer marriage — chronology that later Lanes extend from.",
     "historianNotes": [
       "Book narrative cites Hist. Gen. Reg. XII, 196 for harmonizing Hartford (Samuel b. 8 Aug. 1648) and Lynn (1651); verify against NEHGR and town records.",
       "First church Boston, Mary’s death 1656, second marriage to Mary Brewer (Roxbury) — use as baseline before Stratham and later migrations."
@@ -33,13 +33,13 @@
     {
       "order": 1,
       "personId": 4,
-      "displayName": "William Lane of Boston",
+      "displayName": "William E Lane of Boston",
       "personQuery": "William Lane",
-      "caption": "Opening exhibit · colonial New England chronology anchor (William E. / William Lane merged)",
+      "caption": "Opening exhibit · colonial New England chronology anchor (same as featured panel)",
       "eraLabel": "Colonial Boston · 17th century",
-      "blurb": "Some records may be harmonized if William Lane were residing in Hartford, Connecticut, where he had a son, Samuel, born 8 August 1648, and visiting in Lynn in 1651 [see Hist. Gen. Reg. XII, 196]. He was made freeman 6 May 1657. His wife Mary, a member of the first church in Boston (probably from England), died 22 May 1656; and he married (2) 21 August 1656, by Richard Bellingham, Deputy Governor, to Mary (daughter of Thomas) Brewer of Roxbury, Massachusetts. Her father, Goodman Brewer, in 1642 resided in Ipswich, removed afterward to Roxbury, and died at the home of his son-in-law, Thomas Webster, in Hampton, 3 March 1689–90.",
+      "blurb": "Some records may be harmonized if William E Lane were residing in Hartford, Connecticut, where he had a son, Samuel, born 8 August 1648, and visiting in Lynn in 1651 [see Hist. Gen. Reg. XII, 196]. He was made freeman 6 May 1657. His wife Mary, a member of the first church in Boston (probably from England), died 22 May 1656; and he married (2) 21 August 1656, by Richard Bellingham, Deputy Governor, to Mary (daughter of Thomas) Brewer of Roxbury, Massachusetts. Her father, Goodman Brewer, in 1642 resided in Ipswich, removed afterward to Roxbury, and died at the home of his son-in-law, Thomas Webster, in Hampton, 3 March 1689–90.",
       "imageUrl": "/family/assets/william-e-lane-boston-hero.png",
-      "imageCaption": "Portrait plate associated with William Lane of Boston (book materials).",
+      "imageCaption": "Portrait plate associated with William E Lane of Boston (book materials).",
       "imageCredit": "Lane family / genealogy compilation",
       "links": [
         {
@@ -470,7 +470,7 @@
       "storySlug": "william-e-lane-boston",
       "type": "image",
       "url": "/family/assets/william-e-lane-boston-hero.png",
-      "caption": "William Lane of Boston — portrait from book materials",
+      "caption": "William E Lane of Boston — portrait from book materials",
       "credit": "Lane family / genealogy compilation"
     },
     {
@@ -486,7 +486,7 @@
     {
       "year": 1625,
       "title": "Chronology Start",
-      "description": "William Lane of Boston (cordwainer) is used as the opening narrative anchor.",
+      "description": "William E Lane of Boston (cordwainer) is used as the opening narrative anchor.",
       "kind": "family"
     },
     {
@@ -602,9 +602,9 @@
   },
   "aiDocent": {
     "personaName": "American History + Lane Expert",
-    "intro": "I focus on Lane lineage chronology and historical context, starting with William Lane of Boston.",
+    "intro": "I focus on Lane lineage chronology and historical context, starting with William E Lane of Boston.",
     "promptChips": [
-      "Who was William Lane of Boston, and why is he the opening figure?",
+      "Who was William E Lane of Boston, and why is he the opening figure?",
       "Show the next major Lane events in chronological order.",
       "Connect this exhibit to wider American history.",
       "Who compiled Lane Genealogies Vol. I (1891)—Chapman and Fitts, the Hampton monument committee, and Rev. James P. Lanes manuscripts—and where does this site summarize that lineage?",

@@ -825,4 +825,33 @@ describe('customFieldCalcParser', () => {
       expect(compareRow['Test 2']).toBe('');
     });
   });
+
+  describe('parseCalculationFormula', () => {
+    test('parses bracket assignment', () => {
+      const r = parseCalculationFormula('[CX.TEST] = 1 + [353]');
+      expect(r).toEqual({
+        outputField: 'CX.TEST',
+        inputFields: ['353'],
+        expression: '1 + [353]',
+      });
+    });
+
+    test('strips one leading spreadsheet equals before bracket assignment', () => {
+      const withPrefix = parseCalculationFormula('=[CX.TEST] = 1 + [353]');
+      const plain = parseCalculationFormula('[CX.TEST] = 1 + [353]');
+      expect(withPrefix).toEqual(plain);
+    });
+
+    test('strips leading equals with spaces before bracket', () => {
+      const r = parseCalculationFormula('=  [CX.TEST] = 2');
+      expect(r.outputField).toBe('CX.TEST');
+      expect(r.expression).toBe('2');
+    });
+
+    test('does not strip leading equals when RHS does not start with bracket', () => {
+      const r = parseCalculationFormula('=1+2');
+      expect(r.outputField).toBeNull();
+      expect(r.expression).toBe('=1+2');
+    });
+  });
 });

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lane book plates — PDF gallery</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/family/css/lane-shell.css"/>
@@ -14,25 +14,21 @@
   <script src="/shared/modern-navbar.js"></script>
   <script src="/family/js/lane-family-pill-nav.js" defer></script>
 </head>
-<body>
+<body class="lane-pdf-gallery-root">
 <div class="particles" id="particles"></div>
 <modern-navbar></modern-navbar>
 
-<div class="simple-header">
-  <div class="container">
-    <div class="header-content">
-      <a href="/" class="brand">DevConnect Labs</a>
-      <div class="nav-links">
-        <a href="/">Home</a>
-        <a href="/family/lane-family.html">Lane Family</a>
-        <a href="/family/lane-museum.html">Lane Museum</a>
-        <a href="/family/lane-pdf-gallery.html" class="active">Book plates</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="container mt-4 mb-5 lane-pdf-gallery-page" data-lane-tts-main>
+<div class="container mt-4 mb-5 lane-tools-page lane-pdf-gallery-page" data-lane-tts-main>
+  <nav class="lane-family-crumb" aria-label="Breadcrumb">
+    <a href="/family/lane-family.html">Lane Family hub</a>
+    <span aria-hidden="true"> · </span>
+    <a href="/family/lane-museum.html">Lane Museum</a>
+    <span aria-hidden="true"> · </span>
+    <span>Book plates</span>
+  </nav>
+  <p class="small text-muted mb-3 lane-pdf-gallery-context">
+    Continue in <a href="/family/lane-historians.html">Historians</a> for compilers, or ask the <a href="/family/lane-family.html#lfAiPanel">Lane guide</a> about the 1891 book.
+  </p>
   <header class="lane-pdf-page-head mb-3">
     <h1 class="lane-pdf-page-title"><i class="bi bi-images" aria-hidden="true"></i><span class="lane-pdf-page-title__text">Lane genealogy book plates</span></h1>
     <p class="lane-pdf-page-lead text-muted mb-0">Thumbnails keyed to PDF pages and tree IDs; counts update when you filter or change show-hidden.</p>
@@ -43,23 +39,33 @@
     role="region"
     aria-label="Historians portrait deep link"
   ></div>
-  <div class="alert alert-info border-info mb-3" role="status">
-    <strong>Large tan “empty” boxes are usually not a deployment bug.</strong>
-    Each card loads a real JPEG under <code>/family/assets/lane-pdf/</code>.
-    Early pages often decode as plain paper or very faint prints in the scanned book (example: page&nbsp;4 next to portrait plates on other pages).
-    That looks the same in local dev and in production if the same assets are deployed.
-  </div>
-  <p class="text-muted">
-    Embedded images from <code>lanegenealogies01chap.pdf</code>, joined to tree people by matching
-    <code>sourceRefs.pdfPageNumber</code>. Multiple names on the same page are flagged as ambiguous; confirm links in
-    <code>data/lane-pdf-person-portraits.json</code>.
+
+  <p class="lane-pdf-provenance mb-3">
+    A digital index of plates from <em>Lane Genealogies</em> (1891)—reproductions from a printed book, not modern scans. Faded paper and halftones are typical of the period.
   </p>
-  <p class="small text-muted">
-    Streams that fail to decode (for example JBIG2 without <code>jbig2dec</code>) are omitted from this grid; counts in the bar above include how many were skipped.
-  </p>
-  <p class="small border-left pl-3" style="border-color: rgba(0,0,0,0.15);">
-    <strong>About these plates.</strong> Most portraits and scenes here are <strong>late-19th- and early-20th-century photographs</strong> (and related book illustrations) reproduced in a printed genealogy. Expect uneven contrast, silvering or fading in the originals, yellowed paper, halftone screening, and occasional blank or nearly blank pages from tissue inserts or lightly exposed images. What you see is typical of period books and digitization, not a defect in this viewer.
-  </p>
+
+  <details class="lane-pdf-archive-about mb-3">
+    <summary class="lane-pdf-archive-about__summary">About this digital archive (technical notes)</summary>
+    <div class="lane-pdf-archive-about__body">
+      <div class="alert alert-info border-info mb-3 mt-2" role="status">
+        <strong>Large tan “empty” boxes are usually not a deployment bug.</strong>
+        Each card loads a real JPEG under <code>/family/assets/lane-pdf/</code>.
+        Early pages often decode as plain paper or very faint prints in the scanned book (example: page&nbsp;4 next to portrait plates on other pages).
+        That looks the same in local dev and in production if the same assets are deployed.
+      </div>
+      <p class="text-muted mb-2">
+        Embedded images from <code>lanegenealogies01chap.pdf</code>, joined to tree people by matching
+        <code>sourceRefs.pdfPageNumber</code>. Multiple names on the same page are flagged as ambiguous; confirm links in
+        <code>data/lane-pdf-person-portraits.json</code>.
+      </p>
+      <p class="small text-muted mb-2">
+        Streams that fail to decode (for example JBIG2 without <code>jbig2dec</code>) are omitted from this grid; counts in the bar above include how many were skipped.
+      </p>
+      <p class="small border-start border-2 ps-3 mb-0" style="border-color: rgba(0,0,0,0.15) !important;">
+        <strong>About these plates.</strong> Most portraits and scenes here are <strong>late-19th- and early-20th-century photographs</strong> (and related book illustrations) reproduced in a printed genealogy. Expect uneven contrast, silvering or fading in the originals, yellowed paper, halftone screening, and occasional blank or nearly blank pages from tissue inserts or lightly exposed images. What you see is typical of period books and digitization, not a defect in this viewer.
+      </p>
+    </div>
+  </details>
 
   <div id="lanePdfStats" class="mb-3 lane-pdf-stats-region" aria-label="Gallery counts">
     <div id="lanePdfStatsLine" class="lane-pdf-gallery-stats"></div>
@@ -70,7 +76,7 @@
   <div id="lanePdfError" class="alert alert-danger d-none" role="alert"></div>
 
   <div class="alert alert-secondary border mb-3 lane-pdf-restore-banner" role="region" aria-label="Gallery recovery">
-    <button type="button" class="btn btn-primary btn-sm mr-3 mb-1" id="lanePdfEmergencyRestore">Show all plates again</button>
+    <button type="button" class="btn btn-primary btn-sm me-3 mb-1" id="lanePdfEmergencyRestore">Show all plates again</button>
     <span class="small text-muted mb-1 d-inline-block" style="max-width:42rem;">
       Clears PDF page/id filters, removes your personally hidden plate IDs from this browser, and turns on the checkbox so every thumbnail is shown again.
       Also use this when the page filter was set to <strong>0</strong> by mistake (that matches no PDF page).
@@ -90,25 +96,25 @@
 
   <div class="lane-pdf-presets-bar mb-3 p-3 border rounded bg-light" role="region" aria-label="Saved filter views">
     <div class="d-flex flex-wrap align-items-center mb-2">
-      <strong class="mr-2 mb-1"><i class="bi bi-bookmarks" aria-hidden="true"></i> Saved views</strong>
+      <strong class="me-2 mb-1"><i class="bi bi-bookmarks" aria-hidden="true"></i> Saved views</strong>
       <span class="small text-muted mb-1">Saved views are stored <strong>server-side</strong> (Postgres) with the same browser <code class="lane-pdf-k">clientId</code> as your hide list—filters + denylist checkbox only; personal hides stay on the hides API. <strong>Export presets</strong> downloads <code>lane-pdf-gallery-filter-presets.json</code> (backup you can re-import elsewhere).</span>
     </div>
-    <div class="form-row align-items-end lane-pdf-presets-controls">
+    <div class="row align-items-end g-2 lane-pdf-presets-controls">
       <div class="col-md-4 mb-2 mb-md-0">
         <label class="small text-muted mb-0" for="lanePdfPresetSelect">Preset</label>
-        <select class="form-control" id="lanePdfPresetSelect" autocomplete="off">
+        <select class="form-select" id="lanePdfPresetSelect" autocomplete="off">
           <option value="">— Choose a saved view —</option>
         </select>
       </div>
       <div class="col-md-8 mb-2 mb-md-0">
         <div class="btn-toolbar flex-wrap lane-pdf-presets-buttons" role="toolbar" aria-label="Preset actions">
-          <button type="button" class="btn btn-outline-primary btn-sm mr-1 mb-1" id="lanePdfPresetLoad">Load</button>
-          <button type="button" class="btn btn-outline-success btn-sm mr-1 mb-1" id="lanePdfPresetSave" title="Save current filters + checkbox">Save current…</button>
-          <button type="button" class="btn btn-outline-danger btn-sm mr-1 mb-1" id="lanePdfPresetDelete">Delete selected</button>
-          <button type="button" class="btn btn-outline-secondary btn-sm mr-1 mb-1" id="lanePdfPresetExport" title="Download JSON backup">Export presets</button>
+          <button type="button" class="btn btn-outline-primary btn-sm me-1 mb-1" id="lanePdfPresetLoad">Load</button>
+          <button type="button" class="btn btn-outline-success btn-sm me-1 mb-1" id="lanePdfPresetSave" title="Save current filters + checkbox">Save current…</button>
+          <button type="button" class="btn btn-outline-danger btn-sm me-1 mb-1" id="lanePdfPresetDelete">Delete selected</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm me-1 mb-1" id="lanePdfPresetExport" title="Download JSON backup">Export presets</button>
           <button type="button" class="btn btn-outline-secondary btn-sm mb-1" id="lanePdfPresetImportTrigger">Import presets</button>
         </div>
-        <label class="sr-only" for="lanePdfPresetImportInput">Import presets JSON</label>
+        <label class="visually-hidden" for="lanePdfPresetImportInput">Import presets JSON</label>
         <input type="file" class="lane-pdf-sr-hidden" id="lanePdfPresetImportInput" accept=".json,application/json" tabindex="-1" />
       </div>
     </div>
@@ -124,9 +130,9 @@
       <input type="text" class="form-control" id="lanePdfFilterIds" placeholder="e.g. 133 134 or 2898" autocomplete="off"/>
     </div>
     <div class="col-md-5 mb-2 lane-pdf-hide-controls">
-      <div class="custom-control custom-checkbox mb-2">
-        <input type="checkbox" class="custom-control-input" id="lanePdfShowHidden" checked />
-        <label class="custom-control-label small" for="lanePdfShowHidden"><strong>On</strong> = page/id filters plus <strong>server denylist</strong> plates visible. <strong>Off</strong> = hide denylisted plates too. Your personal hides (Hide from gallery) always stay off the grid until Undo / Clear.</label>
+      <div class="form-check mb-2">
+        <input type="checkbox" class="form-check-input" id="lanePdfShowHidden" checked />
+        <label class="form-check-label small" for="lanePdfShowHidden"><strong>On</strong> = page/id filters plus <strong>server denylist</strong> plates visible. <strong>Off</strong> = hide denylisted plates too. Your personal hides (Hide from gallery) always stay off the grid until Undo / Clear.</label>
       </div>
       <div class="lane-pdf-btn-cluster lane-pdf-hide-buttons" role="group" aria-label="Your hidden plates">
         <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfUndoHide" disabled>Undo last hide</button>
@@ -134,7 +140,7 @@
         <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfExportUserHidden" title="Download JSON backup">Export hides</button>
         <button type="button" class="btn btn-outline-secondary btn-sm" id="lanePdfTriggerImportHides">Import hides</button>
       </div>
-      <label class="sr-only" for="lanePdfImportHidesInput">Merge plate IDs from exported JSON backup</label>
+      <label class="visually-hidden" for="lanePdfImportHidesInput">Merge plate IDs from exported JSON backup</label>
       <input type="file" class="lane-pdf-sr-hidden" id="lanePdfImportHidesInput" accept=".json,application/json" tabindex="-1" />
       <p class="small text-muted mb-0 lane-pdf-hide-hint mt-2">
         Personal <strong>Hide from gallery</strong> removes thumbnails immediately (saved in Postgres). The checkbox below only reveals or hides plates on the shared <strong>server denylist</strong>.

@@ -1,0 +1,9 @@
+{
+  "field": {
+    "fieldId": "CX.UT.DEMO",
+    "calculation": "[CX.UT.DEMO] = [353] + 50000",
+    "description": "Offline demo only: representative calculated custom field for Unit Test grid / Story Mode. Values are synthesized; not connected to Encompass.",
+    "dataType": "Decimal",
+    "format": "DECIMAL_2"
+  }
+}

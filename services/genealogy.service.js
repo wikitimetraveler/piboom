@@ -12,6 +12,7 @@ let lanePdfManifestCache = null;
 let lanePdfCandidatesCache = null;
 let lanePdfPortraitsCache = null;
 let lanePdfGalleryHiddenCache = null;
+let lanePdfBookIllustrationsCache = null;
 let laneBookSayingsCache = null;
 
 function loadLaneBookSayings() {
@@ -70,6 +71,20 @@ function loadLanePdfGalleryHidden() {
     lanePdfGalleryHiddenCache = { version: 0, hiddenImageIds: [] };
   }
   return lanePdfGalleryHiddenCache;
+}
+
+function loadLanePdfBookIllustrations() {
+  if (lanePdfBookIllustrationsCache !== null) return lanePdfBookIllustrationsCache;
+  try {
+    const p = path.join(__dirname, '..', 'data', 'lane-pdf-book-illustrations.json');
+    lanePdfBookIllustrationsCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
+  } catch {
+    lanePdfBookIllustrationsCache = { version: 0, illustrations: [] };
+  }
+  if (!lanePdfBookIllustrationsCache || !Array.isArray(lanePdfBookIllustrationsCache.illustrations)) {
+    lanePdfBookIllustrationsCache = { version: 0, illustrations: [] };
+  }
+  return lanePdfBookIllustrationsCache;
 }
 
 /**
@@ -134,11 +149,57 @@ export function getLanePdfGalleryData() {
       };
     });
 
+  const bookDoc = loadLanePdfBookIllustrations();
+  const illRows = Array.isArray(bookDoc.illustrations) ? bookDoc.illustrations : [];
+  const illustrationRefsByPlate = new Map();
+  for (const ill of illRows) {
+    if (!ill || ill.illustrationNo == null) continue;
+    const plateIds = Array.isArray(ill.plateImageIds) ? ill.plateImageIds : [];
+    for (const rawId of plateIds) {
+      const plateId = String(rawId ?? '').trim();
+      if (!plateId) continue;
+      if (!illustrationRefsByPlate.has(plateId)) illustrationRefsByPlate.set(plateId, []);
+      illustrationRefsByPlate.get(plateId).push({
+        illustrationNo: Number(ill.illustrationNo),
+        caption: typeof ill.caption === 'string' ? ill.caption : '',
+        printedPage:
+          ill.printedPage != null && Number.isFinite(Number(ill.printedPage))
+            ? Number(ill.printedPage)
+            : null,
+        section: typeof ill.section === 'string' && ill.section.trim() ? ill.section.trim() : null,
+        matchStatus: typeof ill.matchStatus === 'string' ? ill.matchStatus : null
+      });
+    }
+  }
+  for (const refList of illustrationRefsByPlate.values()) {
+    refList.sort((a, b) => a.illustrationNo - b.illustrationNo);
+  }
+  function summarizeBookIllustrations(refs) {
+    if (!refs || !refs.length) return '';
+    return refs
+      .map((r) => {
+        const cap = String(r.caption || '').trim();
+        const tail = cap.endsWith('.') ? cap.slice(0, -1) : cap;
+        return `#${r.illustrationNo} ${tail}`;
+      })
+      .join(' · ');
+  }
+  const galleryImages = candidateImages.map((img) => {
+    const id = img && img.imageId != null ? String(img.imageId).trim() : '';
+    const refs = id && illustrationRefsByPlate.has(id) ? illustrationRefsByPlate.get(id) : [];
+    if (!refs.length) return img;
+    return {
+      ...img,
+      bookIllustrations: refs,
+      bookIllustrationLabel: summarizeBookIllustrations(refs)
+    };
+  });
+
   return {
     summary,
     creditDefault,
     candidatesStats: candidates?.stats || null,
-    images: candidates?.images || [],
+    images: galleryImages,
     portraits,
     galleryHiddenIds
   };
@@ -331,14 +392,14 @@ const WAR_DEFINITIONS = CONFLICT_DEFINITIONS.reduce((acc, war) => {
 const DEFAULT_MUSEUM_CONTENT = {
   featuredStory: {
     slug: 'william-e-lane-boston',
-    title: 'Exhibit 1: William Lane of Boston',
-    subtitle: 'Opening the Lane story in chronological order',
+    title: 'William E Lane of Boston',
+    subtitle: 'Exhibit 1 · Opening exhibit',
     personQuery: {
       preferredNames: ['William E Lane', 'William Lane'],
       fallbackKeywords: ['William', 'Boston']
     },
     summary:
-      'William Lane of Boston (cordwainer) anchors the opening exhibit; the museum narrative continues through later Lane generations.',
+      'William E Lane of Boston (cordwainer) anchors the opening exhibit; the museum narrative continues through later Lane generations.',
     historianNotes: [
       'Verify Hartford / Lynn harmonization and NEHGR XII:196 against original register and town records.',
       'Use this exhibit as the chronology baseline for future stories, including Lane Crater.'
@@ -349,14 +410,14 @@ const DEFAULT_MUSEUM_CONTENT = {
     {
       order: 1,
       personId: 4,
-      displayName: 'William Lane of Boston',
+      displayName: 'William E Lane of Boston',
       personQuery: 'William Lane',
-      caption: 'Opening exhibit · colonial chronology anchor',
+      caption: 'Opening exhibit · colonial chronology anchor (same as featured panel)',
       eraLabel: 'Colonial Boston · 17th century',
       blurb:
         'Book narrative: Hartford (Samuel b. 8 Aug. 1648), Lynn (1651), freeman 1657; Mary d. 1656; marriage to Mary Brewer — see Hist. Gen. Reg. XII, 196.',
       imageUrl: '/family/assets/william-e-lane-boston-hero.png',
-      imageCaption: 'Portrait plate (book materials).',
+      imageCaption: 'Portrait plate associated with William E Lane of Boston (book materials).',
       imageCredit: 'Lane family / genealogy compilation',
       links: [
         {
@@ -372,7 +433,7 @@ const DEFAULT_MUSEUM_CONTENT = {
       storySlug: 'william-e-lane-boston',
       type: 'image',
       url: '/family/assets/william-e-lane-boston-hero.png',
-      caption: 'William Lane of Boston — portrait from book materials',
+      caption: 'William E Lane of Boston — portrait from book materials',
       credit: 'Lane family / genealogy compilation'
     },
     {

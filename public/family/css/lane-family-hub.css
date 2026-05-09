@@ -11,7 +11,7 @@
   --lf-line-strong: rgba(28, 27, 25, 0.14);
   --lf-accent: #6b5344;
   --lf-accent-hover: #554233;
-  --lf-serif: Georgia, 'Times New Roman', serif;
+  --lf-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
   --lf-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --lf-radius: 2px;
   --lf-shadow:
@@ -85,6 +85,22 @@ body.lane-family-hub {
 .lf-hero-chrono em {
   font-style: italic;
   color: var(--lf-ink-soft);
+}
+
+.lf-hero-roots {
+  font-size: 0.9375rem;
+  color: var(--lf-ink-soft);
+  max-width: 38em;
+  margin: 1rem 0 0;
+  line-height: 1.55;
+}
+
+.lf-hero-host {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--lf-muted);
+  margin: 0.85rem 0 0;
 }
 
 .lf-era-strip {
@@ -518,10 +534,173 @@ body.lane-family-hub {
   border-bottom-color: var(--lf-accent);
 }
 
+/* First-visit splash (Lane Historians–style plate; see lane-family-splash.js) */
+
+.lf-hub-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  background: #2c2824;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 900ms ease, visibility 900ms ease;
+}
+
+.lf-hub-splash-bg {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  filter: grayscale(0.06) contrast(1.04) saturate(0.92);
+  transform: scale(1.05);
+  animation: lfHubSplashDrift 3200ms ease forwards;
+}
+
+.lf-hub-splash--reduced-motion .lf-hub-splash-bg {
+  animation: none;
+  transform: scale(1);
+}
+
+.lf-hub-splash-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at center, rgba(244, 240, 232, 0.12) 0%, rgba(44, 40, 36, 0.45) 55%, rgba(30, 26, 22, 0.82) 100%),
+    linear-gradient(180deg, rgba(20, 18, 16, 0.35), rgba(20, 18, 16, 0.65));
+}
+
+.lf-hub-splash-inner {
+  position: relative;
+  z-index: 2;
+  max-width: min(92vw, 42rem);
+  padding: 1rem 1.1rem 1.5rem;
+  text-align: center;
+  color: #f4f0e8;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+}
+
+.lf-hub-splash-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #e8dfd0;
+}
+
+.lf-hub-splash-title {
+  margin: 0;
+  font-family: var(--lf-serif);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.lf-hub-splash-sub {
+  margin: 0.6rem auto 0;
+  max-width: 36rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #e0d8ca;
+}
+
+.lf-hub-splash-sub a {
+  color: #fff4e4;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lf-hub-splash-sub a:hover {
+  color: #fff;
+}
+
+.lf-hub-splash-embed-wrap {
+  margin-top: 1rem;
+  width: 100%;
+  max-width: min(92vw, 720px);
+  margin-left: auto;
+  margin-right: auto;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(244, 240, 232, 0.22);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  background: #1a1816;
+}
+
+.lf-hub-splash-iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.lf-hub-splash-placeholder {
+  margin: 1rem auto 0;
+  max-width: 34rem;
+  color: #d4cfc4 !important;
+  line-height: 1.5;
+}
+
+.lf-hub-splash-placeholder code {
+  font-size: 0.85em;
+  color: #f0ebe3;
+}
+
+.lf-hub-splash-skip {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 3;
+  border: 1px solid rgba(244, 240, 232, 0.35);
+  background: rgba(30, 26, 22, 0.55);
+  color: #f4f0e8;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+}
+
+.lf-hub-splash-skip:hover {
+  background: rgba(44, 40, 36, 0.75);
+  color: #fff;
+}
+
+.lf-hub-splash--closing {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.lf-hub-splash--hidden {
+  display: none;
+}
+
+.lf-hub-splash--fallback .lf-hub-splash-bg {
+  background-image: none !important;
+  background: linear-gradient(145deg, #3d3832 0%, #252220 55%, #1a1816 100%);
+}
+
+@keyframes lfHubSplashDrift {
+  from {
+    transform: scale(1.06);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 @media print {
   body.lane-family-hub {
     background: #fff;
     color: #000;
+  }
+
+  .lf-hub-splash {
+    display: none !important;
   }
 
   .lf-dock-wrap,

@@ -95,8 +95,11 @@
       getEl('lfAiReply')?.focus({ preventScroll: true });
     } catch (e) {
       setStatus('');
+      const detail = escapeHtml(String(e.message || 'Request failed.'));
+      const hint =
+        'Check POST <span class="text-muted">/api/genealogy/ai/chat</span> and server genealogy AI/OpenAI setup. Navigation and other hub links still work.';
       setReply(
-        `<p class="lf-ai-error mb-0">${escapeHtml(e.message || 'Something went wrong.')}</p>`,
+        `<p class="lf-ai-error mb-0">${detail}</p><p class="small text-muted mb-0">${hint}</p>`,
         true
       );
     } finally {

@@ -290,4 +290,7 @@
   } else {
     mountBar();
   }
+
+  /** Stop Listen bar playback — use when HyperFrames narration starts */
+  window.laneTtsStopPlayback = stopLanePlayback;
 })();

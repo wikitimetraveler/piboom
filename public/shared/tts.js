@@ -188,8 +188,156 @@
     }
   }
 
+  const NARRATION_CHUNK_MAX = 3200;
+
+  function splitNarrationChunks(text, maxLen) {
+    const t = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!t) return [];
+    if (t.length <= maxLen) return [t];
+    const parts = [];
+    let rest = t;
+    while (rest.length) {
+      if (rest.length <= maxLen) {
+        parts.push(rest.trim());
+        break;
+      }
+      let cut = rest.lastIndexOf('. ', maxLen);
+      if (cut < maxLen * 0.45) cut = rest.lastIndexOf('\n', maxLen);
+      if (cut < maxLen * 0.45) cut = rest.lastIndexOf(' ', maxLen);
+      if (cut <= 0) cut = maxLen;
+      const piece = rest.slice(0, cut).trim();
+      if (piece) parts.push(piece);
+      rest = rest.slice(cut).trim();
+    }
+    return parts.filter(Boolean);
+  }
+
+  function getNarrationSpeakingRate(options) {
+    if (options && options.speakingRate != null) return options.speakingRate;
+    try {
+      const raw = parseFloat(localStorage.getItem('laneTtsSpeakingRate') || '0.92', 10);
+      return Number.isFinite(raw) ? raw : 0.92;
+    } catch (_) {
+      return 0.92;
+    }
+  }
+
+  function speakBrowserChunkAwaitEnd(text, options) {
+    return new Promise((resolve) => {
+      if (!('speechSynthesis' in window)) {
+        resolve();
+        return;
+      }
+      try {
+        window.speechSynthesis.cancel();
+        try { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); } catch (_) {}
+        const utterance = new SpeechSynthesisUtterance(text);
+        const mobile = isMobile();
+        utterance.rate = mobile ? 1.0 : (options.speakingRate || 1.0);
+        utterance.pitch = mobile ? 1.0 : (typeof options.pitch === 'number' ? options.pitch : 1.0);
+        utterance.volume = typeof options.volume === 'number' ? options.volume : 0.85;
+        const voices = window.speechSynthesis.getVoices();
+        const deep = voices.find(v => /male|daniel|david|alex/i.test(v.name));
+        if (deep) utterance.voice = deep;
+        utterance.onend = () => resolve();
+        utterance.onerror = () => resolve();
+        window.speechSynthesis.speak(utterance);
+      } catch (_) {
+        resolve();
+      }
+    });
+  }
+
+  async function synthChunkAwaitEnd(text, voice, options) {
+    try {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+      const response = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          voice,
+          pitch: options.pitch || 0,
+          speakingRate: options.speakingRate != null ? options.speakingRate : 1.0
+        })
+      });
+      const data = await response.json();
+      if (!data.success || !data.audio) {
+        await speakBrowserChunkAwaitEnd(text, options);
+        return;
+      }
+      const audioBlob = base64ToBlob(data.audio, 'audio/mp3');
+      const audioUrl = URL.createObjectURL(audioBlob);
+      await new Promise((resolve) => {
+        if (typeof options.isCancelled === 'function' && options.isCancelled()) {
+          URL.revokeObjectURL(audioUrl);
+          resolve();
+          return;
+        }
+        const audio = new Audio(audioUrl);
+        currentAudio = audio;
+        audio.volume = typeof options.volume === 'number' ? options.volume : 0.85;
+        const done = () => {
+          URL.revokeObjectURL(audioUrl);
+          if (currentAudio === audio) currentAudio = null;
+          resolve();
+        };
+        audio.onended = done;
+        audio.onerror = done;
+        audio.play().catch(() => {
+          if (currentAudio === audio) currentAudio = null;
+          URL.revokeObjectURL(audioUrl);
+          speakBrowserChunkAwaitEnd(text, options).then(resolve);
+        });
+      });
+      audioUnlocked = true;
+    } catch (_) {
+      await speakBrowserChunkAwaitEnd(text, options);
+    }
+  }
+
+  /**
+   * Speak text to completion for HyperFrames / guided narration.
+   * Uses same stack as Listen: desktop Google synth + fallback; mobile browser utterance.
+   * @param {string} text
+   * @param {object} [options]
+   * @param {() => boolean} [options.isCancelled] - abort between chunks / before play
+   * @param {string} [options.voice]
+   * @param {number} [options.speakingRate] - overrides localStorage laneTtsSpeakingRate
+   */
+  async function speakNarrationAwaitEnd(text, options = {}) {
+    const isCancelled = typeof options.isCancelled === 'function' ? options.isCancelled : () => false;
+    const voice = options.voice || 'en-US-Standard-D';
+    const vol = typeof options.volume === 'number' ? options.volume : 0.85;
+    const rate = getNarrationSpeakingRate(options);
+    const baseOpts = {
+      speakingRate: rate,
+      volume: vol,
+      pitch: options.pitch,
+      voice,
+      isCancelled
+    };
+
+    const t = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!t) return;
+    const chunks = splitNarrationChunks(t, NARRATION_CHUNK_MAX);
+    for (let i = 0; i < chunks.length; i++) {
+      if (isCancelled()) return;
+      const piece = chunks[i];
+      if (isMobile()) {
+        await speakBrowserChunkAwaitEnd(piece, baseOpts);
+      } else {
+        await synthChunkAwaitEnd(piece, voice, baseOpts);
+      }
+    }
+  }
+
   if (!window.speakWithGoogle) window.speakWithGoogle = speakWithGoogle;
   if (!window.stopSpeech) window.stopSpeech = stopSpeech;
   if (!window.ensureAudioUnlock) window.ensureAudioUnlock = ensureAudioUnlock;
   if (!window.primeSpeechSynthesis) window.primeSpeechSynthesis = primeSpeechSynthesis;
+  if (!window.speakNarrationAwaitEnd) window.speakNarrationAwaitEnd = speakNarrationAwaitEnd;
 })();

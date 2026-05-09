@@ -90,8 +90,9 @@ function openOccPersonModal(personId) {
   if (wallBtn) {
     wallBtn.href = memorialWallUrl(p.id);
   }
-  if (typeof window.jQuery !== 'undefined' && window.jQuery.fn.modal) {
-    window.jQuery('#occPersonModal').modal('show');
+  const occModal = document.getElementById('occPersonModal');
+  if (occModal && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    bootstrap.Modal.getOrCreateInstance(occModal).show();
   }
 }
 
@@ -212,6 +213,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch (error) {
     console.error(error);
     const err = document.getElementById('occError');
-    if (err) err.textContent = `Occupations page failed to load: ${error.message}`;
+    if (err)
+      err.textContent = `Occupations page failed to load: ${error.message}. Verify GET /api/genealogy/occupations.`;
   }
 });

@@ -62,7 +62,7 @@ routes/encompass-*.routes.js
 | ICE Knowledge            | `lib/knowledge/ice-knowledge.service.js`, `knowledge-sources/ice/`, `data/knowledge/ice-sources.json`            |
 | AI Chat / Memory         | `controllers/unit-tests-ai.controller.js`, `controllers/loan-pipeline-ai.controller.js`                          |
 | Screen Test tool         | `controllers/reviewer-ai.controller.js`, `routes/reviewer.routes.js`, `public/finance/tool9.html`                |
-| Unit Tests               | `public/finance/unit-tests.html`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js`   |
+| Unit Tests               | `public/finance/unit-tests.html`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js` — Story Mode offline demo (`?demo=1`, **Load offline demo**, or **Play highlight reel** with no grid rows yet) uses synthetic workbook data, not live Encompass.   |
 | Worksheets UI            | `public/finance/` (URLs unchanged; product name Worksheets)                                                      |
 | Financial calculations   | `public/shared/calculationEngine.js` (UI engine); pure helpers: `public/shared/calcEngineLibrary.js` (`calcMath`)  |
 | GSE scenario analyzer      | `public/gse-analyzer.html`, `routes/gse.routes.js`, `controllers/gse.controller.js`, `services/gse-scenario.service.js`, `data/gse/` |
@@ -76,7 +76,7 @@ routes/encompass-*.routes.js
 - **Regenerate plates + manifest:** `npm run extract:lane-pdf-images` (requires `data/lanegenealogies01chap.pdf`). **Refresh candidate join:** `npm run build:lane-pdf-candidates` after manifest changes.
 - **Lane Historians frontispiece crops (p4-i0):** `npm run extract:lane-frontispiece-portraits` — writes `public/family/assets/lane-historians/portrait-*.jpg` (edit `scripts/tools/extract-lane-frontispiece-portraits.mjs` bounds if needed).
 - **Gallery deep link:** `/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4` filters to the plate and scroll/highlights the card. Optional committee portrait context: `&portrait=john-wm-lane` (or `jas-h-fitts`, `geo-w-lane`, `dr-edwd-b-lane`) shows a banner linking to `/family/lane-historians.html#lh-portrait-<slug>`.
-- **Data:** `data/lane-pdf-image-manifest.json`, `data/lane-pdf-photo-candidates.json`, `data/lane-pdf-person-portraits.json`.
+- **Data:** `data/lane-pdf-image-manifest.json`, `data/lane-pdf-photo-candidates.json`, `data/lane-pdf-person-portraits.json`, `data/lane-pdf-book-illustrations.json` (printed-book illustration index → plate `imageId`s; merged into gallery API).
 - **Saved filter views (presets):** stored **server-side** in Postgres per browser `clientId` (`/api/genealogy/lane-pdf/presets*`). The gallery **Export presets** button downloads a JSON backup named **`lane-pdf-gallery-filter-presets.json`** (that filename is the browser download only—not a file committed under `data/`).
 
 ---
