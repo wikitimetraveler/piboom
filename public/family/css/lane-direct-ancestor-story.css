@@ -64,13 +64,152 @@ body.lane-direct-page .text-muted {
   margin-bottom: 0.55rem;
 }
 
+.direct-story-mode {
+  margin-top: 0.95rem;
+  border: 1px solid rgba(43, 54, 71, 0.95);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  background: rgba(15, 20, 27, 0.45);
+}
+
+.direct-story-header {
+  display: flex;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.direct-story-kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--history-accent);
+}
+
+.direct-story-copy {
+  margin-top: 0.5rem;
+  color: var(--lane-context-note-fg);
+  font-size: 0.84rem;
+}
+
+.direct-story-voice-hint {
+  padding-left: 0.65rem;
+  border-left: 3px solid rgba(202, 165, 108, 0.45);
+  color: #d5dde8;
+}
+
+.direct-story-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  color: #b9c7da;
+}
+
+.direct-story-option {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.direct-story-option input {
+  margin: 0;
+  accent-color: rgba(202, 165, 108, 0.85);
+}
+
+.direct-story-overlay {
+  margin-top: 0.65rem;
+  border: 1px solid rgba(202, 165, 108, 0.32);
+  border-left: 4px solid rgba(202, 165, 108, 0.64);
+  border-radius: 0.55rem;
+  padding: 0.6rem 0.7rem;
+  background: rgba(9, 12, 18, 0.55);
+}
+
+.direct-story-overlay.direct-story-overlay--floating {
+  position: fixed;
+  margin-top: 0;
+  left: auto;
+  right: auto;
+  top: auto;
+  z-index: 1150;
+  max-width: min(20rem, calc(100vw - 24px));
+  pointer-events: none;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
+  background: rgba(12, 17, 24, 0.94);
+  border-left-width: 4px;
+  backdrop-filter: blur(6px);
+}
+
+.direct-story-scene-kicker {
+  font-size: 0.67rem;
+  color: #b9aa8e;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.direct-story-scene-title {
+  font-family: Georgia, 'Palatino Linotype', Palatino, serif;
+  color: #f6efe3;
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.direct-story-scene-copy {
+  color: #c9d2df;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 576px) {
+  .direct-story-overlay.direct-story-overlay--floating {
+    max-width: calc(100vw - 18px);
+  }
+}
+
 .direct-timeline {
   margin-top: 1rem;
 }
 
 .ancestor-entry {
+  scroll-margin-top: 5rem;
   margin-bottom: 0.85rem;
   padding: 1.1rem 1.15rem;
+}
+
+.ancestor-entry--story-active {
+  box-shadow:
+    0 0 0 1px rgba(140, 199, 255, 0.45),
+    0 12px 32px rgba(0, 0, 0, 0.45);
+  background: rgba(60, 90, 120, 0.22);
+  animation: directStoryPulse 1800ms ease-in-out infinite;
+}
+
+@keyframes directStoryPulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(140, 199, 255, 0.45),
+      0 12px 32px rgba(0, 0, 0, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(140, 199, 255, 0.62),
+      0 0 18px rgba(140, 199, 255, 0.16),
+      0 12px 32px rgba(0, 0, 0, 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ancestor-entry--story-active {
+    animation: none;
+  }
 }
 
 .ancestor-head {
@@ -163,4 +302,17 @@ body.lane-direct-page .text-muted {
 
 .direct-descendant-details[open] summary::before {
   content: 'Hide draft tools';
+}
+
+/* Direct descendant storybook wall: responsive grid + cards use .ddw-* in lane-direct-descendant-wall.css */
+#directDescendantWall {
+  scroll-margin-top: 5rem;
+}
+
+#directDescendantWall .ddw-grid {
+  margin-top: 0.25rem;
+}
+
+#directDescendantWall .ddw-card-title {
+  letter-spacing: 0.02em;
 }

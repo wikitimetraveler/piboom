@@ -14,6 +14,98 @@
 (function (global) {
   'use strict';
 
+  /** Learn Mode (Unit Tests) persists SET-row values here; merged into getSuggestedValuesForScenario. */
+  var LEARNED_SET_HINTS_STORAGE_KEY = 'customFieldCalcParserLearnedSetHintsV1';
+  /** @type {{ version: number, hints: Record<string, { source?: string, valuesByScenarioIndex: Record<string, string|number> }>, updatedAt?: string|null }|undefined} */
+  var learnedSetHintsDocCache;
+
+  function getLocalStorageSafe() {
+    try {
+      if (global.localStorage && typeof global.localStorage.getItem === 'function') {
+        return global.localStorage;
+      }
+    } catch (_e) {
+      /* private mode or non-browser */
+    }
+    return null;
+  }
+
+  /**
+   * @returns {{ version: number, hints: Record<string, { source?: string, valuesByScenarioIndex: Record<string, string|number> }>, updatedAt?: string|null }}
+   */
+  function loadLearnedSetHintsFromStorage() {
+    if (learnedSetHintsDocCache !== undefined) {
+      return learnedSetHintsDocCache;
+    }
+    var empty = { version: 1, hints: {}, updatedAt: null };
+    var ls = getLocalStorageSafe();
+    if (!ls) {
+      learnedSetHintsDocCache = empty;
+      return learnedSetHintsDocCache;
+    }
+    try {
+      var raw = ls.getItem(LEARNED_SET_HINTS_STORAGE_KEY);
+      if (!raw) {
+        learnedSetHintsDocCache = empty;
+        return learnedSetHintsDocCache;
+      }
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object' || !parsed.hints || typeof parsed.hints !== 'object') {
+        learnedSetHintsDocCache = empty;
+        return learnedSetHintsDocCache;
+      }
+      learnedSetHintsDocCache = parsed;
+      return learnedSetHintsDocCache;
+    } catch (_e2) {
+      learnedSetHintsDocCache = empty;
+      return learnedSetHintsDocCache;
+    }
+  }
+
+  /** Clear cached hints so the next read re-parses localStorage (after Learn Mode persist). */
+  function reloadLearnedSetHintsCache() {
+    learnedSetHintsDocCache = undefined;
+  }
+
+  /**
+   * Override suggested[norm] when Learn Mode stored SET values for that field (same normalized id as parser).
+   * @param {Record<string, string|number>} suggested
+   * @param {string[]} inputFields
+   * @param {{ scenarioIndex?: number }} [opts]
+   */
+  function applyLearnedSetHintsToSuggested(suggested, inputFields, opts) {
+    if (!suggested || typeof suggested !== 'object' || !inputFields || !Array.isArray(inputFields)) {
+      return;
+    }
+    var doc = loadLearnedSetHintsFromStorage();
+    var hints = doc && doc.hints;
+    if (!hints || typeof hints !== 'object') {
+      return;
+    }
+    var scenarioIndex = typeof (opts && opts.scenarioIndex) === 'number' ? opts.scenarioIndex : 0;
+    for (var i = 0; i < inputFields.length; i += 1) {
+      var norm = normalizeFieldIdForLookup(inputFields[i]);
+      if (!norm) {
+        continue;
+      }
+      var entry = hints[norm];
+      if (!entry || !entry.valuesByScenarioIndex || typeof entry.valuesByScenarioIndex !== 'object') {
+        continue;
+      }
+      var vmap = entry.valuesByScenarioIndex;
+      var val = vmap[String(scenarioIndex)];
+      if (val === undefined) {
+        val = vmap[scenarioIndex];
+      }
+      if (val === undefined) {
+        val = vmap['0'];
+      }
+      if (val !== undefined && val !== null && val !== '') {
+        suggested[norm] = val;
+      }
+    }
+  }
+
   /**
    * Parse a calculation formula to extract output field, input fields, and expression.
    * @param {string} formula - e.g. "[CX.TEST] = 1 + [353]" or "1 + [353]"
@@ -626,6 +718,7 @@
           }
         }
       }
+      applyLearnedSetHintsToSuggested(suggested, inputFields, opts);
       return suggested;
     }
 
@@ -725,6 +818,7 @@
         }
       }
     }
+    applyLearnedSetHintsToSuggested(suggested, inputFields, opts);
     return suggested;
   }
 
@@ -2037,6 +2131,8 @@
   }
 
   global.customFieldCalcParser = {
+    LEARNED_SET_HINTS_STORAGE_KEY: LEARNED_SET_HINTS_STORAGE_KEY,
+    reloadLearnedSetHintsCache: reloadLearnedSetHintsCache,
     parseCalculationFormula: parseCalculationFormula,
     preprocessEncompassFunctions: preprocessEncompassFunctions,
     extractNumericLiterals: extractNumericLiterals,

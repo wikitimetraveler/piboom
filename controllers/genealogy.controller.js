@@ -19,6 +19,7 @@ import {
   getWarCampaignsSummary,
   getOccupationSummary,
   getDirectAncestorStory,
+  getDirectDescendantStory,
   getLanePdfGalleryData,
   getLanePdfPortraitsForPerson,
   getLaneBookSayings
@@ -610,6 +611,39 @@ export async function getDirectAncestorStoryData(req, res) {
 }
 
 /**
+ * Get direct-descendant-only storyline from a starting person (earliest documented child each generation).
+ */
+export async function getDirectDescendantStoryData(req, res) {
+  try {
+    const rawStartId = req.query.startId;
+    const startId = rawStartId ? parseInt(rawStartId, 10) : 112;
+    if (!Number.isFinite(startId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid startId'
+      });
+    }
+    const story = getDirectDescendantStory(startId);
+    if (!story) {
+      return res.status(404).json({
+        success: false,
+        error: 'Start person not found'
+      });
+    }
+    res.json({
+      success: true,
+      ...story
+    });
+  } catch (error) {
+    console.error('Error getting direct descendant story:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
  * Expose browser-safe Google Maps key used by war history map page.
  */
 export async function getGenealogyGoogleApiKey(req, res) {
@@ -881,6 +915,7 @@ export default {
   getWarParticipantsData,
   getOccupationsData,
   getDirectAncestorStoryData,
+  getDirectDescendantStoryData,
   getGenealogyGoogleApiKey,
   getGenealogyMapboxAccessToken,
   getGenealogyGeocodeAddress,

@@ -1270,6 +1270,53 @@ export function getDirectAncestorStory(startId = 112, order = 'oldest-first') {
   };
 }
 
+/** Deterministic single-child step for direct descendant line: earliest documented birth year (missing years sort last). */
+function sortChildrenForDirectDescendantLine(children) {
+  const list = (children || []).filter(Boolean);
+  return list.sort((a, b) => {
+    const ay = Number.isFinite(Number(a?.birthYear)) ? Number(a.birthYear) : 99999;
+    const by = Number.isFinite(Number(b?.birthYear)) ? Number(b.birthYear) : 99999;
+    if (ay !== by) return ay - by;
+    return String(a.name || '').localeCompare(String(b.name || ''));
+  });
+}
+
+/**
+ * Direct descendant chain from start person: one child per generation (earliest documented child).
+ */
+export function getDirectDescendantStory(startId = 112) {
+  const anchor = getPersonById(startId);
+  if (!anchor) return null;
+
+  const visited = new Set();
+  const chain = [];
+  let current = anchor;
+
+  while (current && !visited.has(current.id)) {
+    visited.add(current.id);
+    chain.push(summarizeDirectLinePerson(current));
+
+    const kids = getChildren(current.id).filter(Boolean);
+    if (!kids.length) break;
+
+    const sorted = sortChildrenForDirectDescendantLine(kids);
+    const next = sorted[0];
+    if (!next || visited.has(next.id)) break;
+
+    current = next;
+  }
+
+  return {
+    startId: anchor.id,
+    startPerson: { id: anchor.id, name: anchor.name, birthYear: anchor.birthYear, deathYear: anchor.deathYear },
+    order: 'forward',
+    directOnly: true,
+    generations: chain.length,
+    line: chain,
+    childPickRule: 'earliest-documented-birth-year'
+  };
+}
+
 /**
  * Get all family data (nodes + links)
  */
@@ -1379,6 +1426,16 @@ export function getParents(personId) {
 export function getSpouses(personId) {
   const relationships = getRelationships(personId);
   return relationships.filter(rel => rel.relation === 'spouse')
+    .map(rel => rel.person);
+}
+
+/**
+ * Named associations (non-parent/spouse ties), e.g. book cross-references without implying biology.
+ * Uses links with relation "associated"; does not affect getParents/getChildren.
+ */
+export function getAssociatedPeople(personId) {
+  const relationships = getRelationships(personId);
+  return relationships.filter(rel => rel.relation === 'associated')
     .map(rel => rel.person);
 }
 
@@ -1496,6 +1553,7 @@ export default {
   getChildren,
   getParents,
   getSpouses,
+  getAssociatedPeople,
   getSiblings,
   getMusicalEra,
   getPeopleAliveDuring,
@@ -1509,6 +1567,7 @@ export default {
   getMilitaryDeepScanReport,
   getOccupationSummary,
   getDirectAncestorStory,
+  getDirectDescendantStory,
   getLanePdfGalleryData,
   getLanePdfPortraitsForPerson
 };

@@ -26,6 +26,7 @@ import {
   getWarParticipantsData,
   getOccupationsData,
   getDirectAncestorStoryData,
+  getDirectDescendantStoryData,
   getGenealogyGoogleApiKey,
   getGenealogyMapboxAccessToken,
   getGenealogyGeocodeAddress,
@@ -73,6 +74,7 @@ router.get('/wars', getWarCampaignsData);
 router.get('/wars/:warSlug/participants', getWarParticipantsData);
 router.get('/occupations', getOccupationsData);
 router.get('/direct-line-story', getDirectAncestorStoryData);
+router.get('/direct-descendant-story', getDirectDescendantStoryData);
 router.get('/google-api-key', getGenealogyGoogleApiKey);
 router.get('/mapbox-access-token', getGenealogyMapboxAccessToken);
 router.get('/geocode-address', getGenealogyGeocodeAddress);

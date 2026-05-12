@@ -342,7 +342,11 @@ export function emitLaneDataJson(people = [], acceptedLinks = []) {
     links.push({
       source,
       target,
-      color: rel.relation === 'father' ? '#39F' : rel.relation === 'mother' ? '#F39' : '#CC0',
+      color:
+        rel.relation === 'father' ? '#39F'
+        : rel.relation === 'mother' ? '#F39'
+        : rel.relation === 'associated' ? '#999'
+        : '#CC0',
       relation: rel.relation
     });
   }
@@ -369,7 +373,7 @@ export function validateLaneData(laneData) {
         link
       });
     }
-    if (!['father', 'mother', 'spouse'].includes(link.relation)) {
+    if (!['father', 'mother', 'spouse', 'associated'].includes(link.relation)) {
       issues.push({
         severity: 'error',
         reason: 'Unsupported relation',

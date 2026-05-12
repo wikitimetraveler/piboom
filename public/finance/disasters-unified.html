@@ -21,9 +21,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
+        --primary-color: #2563eb;
         --wildfire: linear-gradient(135deg, #ff6b35, #f7931e);
         --earthquake: linear-gradient(135deg, #8b4513, #a0522d);
         --hurricane: linear-gradient(135deg, #1e88e5, #1565c0);
@@ -532,6 +533,49 @@
         50% { transform: scale(1.2); opacity: 0.7; }
         100% { transform: scale(1); opacity: 1; }
       }
+
+      /* Disaster source chips — quick toggle (aligned with Risk Analysis dashboard) */
+      .disaster-source-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+      }
+      .source-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 25px;
+        background: white;
+        color: #6b7280;
+        font-weight: 500;
+        font-size: 0.8125rem;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      .source-chip:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        border-color: #d1d5db;
+      }
+      .source-chip i { font-size: 0.95rem; }
+      .source-chip-active {
+        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        color: white;
+        border-color: var(--primary-color);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+      }
+      .source-chip[data-source="fema"].source-chip-active { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+      .source-chip[data-source="firms"].source-chip-active { background: linear-gradient(135deg, #ef4444, #f87171); }
+      .source-chip[data-source="usgs"].source-chip-active { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #1f2937; }
+      .source-chip[data-source="nws"].source-chip-active { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
+      .source-chip[data-source="nhc"].source-chip-active { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+      .source-chip[data-source="gdacs"].source-chip-active { background: linear-gradient(135deg, #6b7280, #9ca3af); }
+      .source-chip[data-source="floodzones"].source-chip-active { background: linear-gradient(135deg, #06b6d4, #67e8f9); }
+      .source-chip[data-source="alertcalifornia"].source-chip-active { background: linear-gradient(135deg, #ea580c, #fb923c); }
     </style>
   </head>
   <body>
@@ -603,6 +647,38 @@
         </div>
       </div>
 
+      <div class="card mb-4">
+        <div class="card-body py-3">
+          <label class="form-label mb-2"><strong>Disaster sources</strong> <small class="text-muted">(click to toggle; loads immediately)</small></label>
+          <div class="disaster-source-selector" id="unifiedSourceChips">
+            <button type="button" class="source-chip source-chip-active" data-source="fema" onclick="toggleUnifiedSourceChip(this, 'fema')">
+              <i class="bi bi-shield-check"></i> FEMA
+            </button>
+            <button type="button" class="source-chip" data-source="firms" onclick="toggleUnifiedSourceChip(this, 'firms')">
+              <i class="bi bi-fire"></i> NASA FIRMS
+            </button>
+            <button type="button" class="source-chip source-chip-active" data-source="usgs" onclick="toggleUnifiedSourceChip(this, 'usgs')">
+              <i class="bi bi-geo-alt"></i> USGS
+            </button>
+            <button type="button" class="source-chip source-chip-active" data-source="nws" onclick="toggleUnifiedSourceChip(this, 'nws')">
+              <i class="bi bi-cloud-lightning"></i> NOAA/NWS
+            </button>
+            <button type="button" class="source-chip source-chip-active" data-source="nhc" onclick="toggleUnifiedSourceChip(this, 'nhc')">
+              <i class="bi bi-tornado"></i> NHC
+            </button>
+            <button type="button" class="source-chip" data-source="gdacs" onclick="toggleUnifiedSourceChip(this, 'gdacs')">
+              <i class="bi bi-globe"></i> GDACS
+            </button>
+            <button type="button" class="source-chip" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
+              <i class="bi bi-droplet"></i> Flood zones
+            </button>
+            <button type="button" class="source-chip" data-source="alertcalifornia" onclick="toggleUnifiedSourceChip(this, 'alertcalifornia')">
+              <i class="bi bi-camera-video"></i> CA fire cameras
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Bootstrap Accordion -->
       <div class="accordion mb-4" id="disastersAccordion">
         <!-- Accordion Item 1: Filters -->
@@ -629,7 +705,7 @@
                       <label class="form-label">Source</label>
                       <select id="sourceInput" class="form-select" multiple>
                         <option value="fema" selected>FEMA</option>
-                        <option value="firms" selected>NASA FIRMS</option>
+                        <option value="firms">NASA FIRMS</option>
                         <option value="usgs" selected>USGS</option>
                         <option value="nws" selected>NOAA/NWS</option>
                         <option value="nhc" selected>NHC</option>
@@ -680,6 +756,10 @@
               <div class="card">
                 <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos and loans)</small></div>
                 <div class="card-body">
+                  <div id="firmsDeferredAlert" class="alert alert-info py-2 small d-flex align-items-center gap-2 mb-3" role="status">
+                    <i class="bi bi-info-circle flex-shrink-0"></i>
+                    <span><strong>NASA FIRMS</strong> (active fire hotspots) is not loaded. Turn on the <strong>NASA FIRMS</strong> source above or in Filters, then use <strong>Apply</strong> if you changed the multiselect only.</span>
+                  </div>
                   <div class="table-responsive">
                     <table class="table table-hover" id="disastersTable">
                       <thead>
@@ -1001,7 +1081,12 @@
         }, 50);
         encompassLoansTable = $('#encompassLoansTable').DataTable({ pageLength: 10, order: [[0, 'asc']] });
         map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6}, mapTypeId: 'satellite' });
-        $('#applyBtn').on('click', loadDisasters);
+        syncSourceChipsFromSelect();
+        $('#sourceInput').on('change', syncSourceChipsFromSelect);
+        $('#applyBtn').on('click', function() {
+          syncSourceChipsFromSelect();
+          loadDisasters();
+        });
         $('#refreshBtn').on('click', refreshDisasters);
         
         // Make table rows clickable (but ignore clicks on buttons)
@@ -1031,6 +1116,27 @@
         loadAllLoansOnMap();
       });
 
+      function syncSourceChipsFromSelect() {
+        const selected = new Set($('#sourceInput').val() || []);
+        document.querySelectorAll('#unifiedSourceChips .source-chip').forEach((chip) => {
+          chip.classList.toggle('source-chip-active', selected.has(chip.getAttribute('data-source')));
+        });
+        updateFirmsDeferredAlert();
+      }
+
+      function updateFirmsDeferredAlert() {
+        const sources = $('#sourceInput').val() || [];
+        $('#firmsDeferredAlert').toggleClass('d-none', sources.includes('firms'));
+      }
+
+      function toggleUnifiedSourceChip(btn, sourceKey) {
+        btn.classList.toggle('source-chip-active');
+        const on = btn.classList.contains('source-chip-active');
+        $(`#sourceInput option[value="${sourceKey}"]`).prop('selected', on);
+        updateFirmsDeferredAlert();
+        loadDisasters();
+      }
+
       async function loadDisasters() {
         showLoading();
         updateLoadingStatusDisaster('Loading disaster data...', 10);
@@ -1042,27 +1148,35 @@
         
         let allRows = [];
         
-        // Build database query params - use /api/disasters for ALL sources (fast DB query, no external API)
         const dbSources = sources.filter(s => s !== 'floodzones' && s !== 'alertcalifornia');
-        const needsDb = dbSources.length > 0 || sources.length === 0;
+        const needsDb = dbSources.length > 0;
         
         if (needsDb) {
           try {
-            updateLoadingStatusDisaster('Loading disasters (geocoding for map)...', 30);
-            const qp = new URLSearchParams();
-            if (state) qp.set('state', state);
-            if (county) qp.set('county', county);
-            if (dbSources.length === 1) qp.set('source', dbSources[0]);
-            if (events.length === 1) qp.set('event', events[0]);
-            qp.set('since', new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString());
-            qp.set('geocode', 'true');
-            const url = `/api/disasters?${qp.toString()}`;
-            const resp = await fetch(url);
-            const json = await resp.json();
-            if (json.success && json.data?.disasters) {
-              allRows = allRows.concat(json.data.disasters);
-              console.log('📊 Loaded', json.data.disasters.length, 'disasters from database');
+            updateLoadingStatusDisaster(
+              'Loading disasters (parallel sources; geocoding up to ~40 lookups per source request)...',
+              28
+            );
+            const sinceIso = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString();
+            const fetchDbSource = async (src) => {
+              const qp = new URLSearchParams();
+              if (state) qp.set('state', state);
+              if (county) qp.set('county', county);
+              qp.set('source', src);
+              if (events.length === 1) qp.set('event', events[0]);
+              qp.set('since', sinceIso);
+              qp.set('geocode', 'true');
+              const resp = await fetch(`/api/disasters?${qp.toString()}`);
+              const json = await resp.json();
+              return json.success && json.data?.disasters ? json.data.disasters : [];
+            };
+            const chunks = await Promise.all(dbSources.map(fetchDbSource));
+            allRows = allRows.concat(chunks.flat());
+            if (events.length > 1) {
+              const evSet = new Set(events.map((e) => String(e).toLowerCase()));
+              allRows = allRows.filter((d) => evSet.has(String(d.event_type || '').toLowerCase()));
             }
+            console.log('📊 Loaded', allRows.length, 'disasters from database (selected sources)');
           } catch (e) {
             console.error('❌ Error loading disasters:', e);
           }
@@ -1080,6 +1194,7 @@
                 renderTable(floodZoneRows);
                 renderMap(floodZoneRows);
                 updateLoadingStatusDisaster('Complete!', 100);
+                updateFirmsDeferredAlert();
                 hideLoading();
                 return;
               }
@@ -1127,7 +1242,8 @@
           renderMap(allRows);
           updateLoadingStatusDisaster('Complete!', 100);
         }
-        
+
+        updateFirmsDeferredAlert();
         hideLoading();
       }
       

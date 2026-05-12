@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/shared/styles.css" />
   <link rel="stylesheet" href="/family/css/lane-shell.css" />
   <link rel="stylesheet" href="/family/css/lane-memorial-wall.css" />
+  <link rel="stylesheet" href="/family/css/lane-direct-descendant-wall.css" />
   <link rel="stylesheet" href="/family/css/lane-tts.css" />
   <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
   <script src="/shared/modern-navbar.js"></script>
@@ -29,19 +30,21 @@
       </p>
     </div>
   </div>
-  <main class="memorial-wrap" data-lane-tts-main>
+  <main class="memorial-wrap memorial-main-view--wall" data-lane-tts-main>
     <header class="memorial-hero">
       <p class="memorial-kicker">Chronological remembrance</p>
       <h1 class="memorial-title">Lane family — names, birth years, death years</h1>
       <p class="memorial-sub">
         Names and dates in small inscription. Death year appears when available. Click a line for details. Order follows birth year when known.
       </p>
-      <div class="memorial-controls">
-        <label class="mb-0 d-flex align-items-center">
-          <input type="checkbox" id="bookOnly" class="me-2" />
-          Book / OCR–sourced entries only
-        </label>
-        <span id="memorialStat" class="memorial-stat"></span>
+      <div class="memorial-toolbar">
+        <div class="memorial-controls">
+          <label class="mb-0 d-flex align-items-center memorial-book-only-label" for="bookOnly">
+            <input type="checkbox" id="bookOnly" class="me-2" />
+            Book / OCR–sourced entries only
+          </label>
+          <span id="memorialStat" class="memorial-stat"></span>
+        </div>
       </div>
       <section class="memorial-story-mode" aria-label="Memorial story mode">
         <div class="memorial-story-header">
@@ -79,14 +82,29 @@
         <button type="button" class="btn btn-sm btn-outline-light" data-memorial-filter="all">Show all entries</button>
         <button type="button" class="btn btn-sm btn-outline-light" data-memorial-filter="book">Book/OCR only</button>
       </div>
-      <nav class="memorial-quick-nav history-quick-nav mt-2" aria-label="Memorial quick links">
-        <a href="#memorialWall" class="history-quick-link memorial-quick-link">Wall</a>
-        <a href="#memorialBackLink" class="history-quick-link memorial-quick-link">Back link</a>
+      <nav class="memorial-quick-nav memorial-view-tabs history-quick-nav mt-2" role="tablist" aria-label="Memorial content view">
+        <button type="button" class="history-quick-link memorial-quick-link memorial-view-tab is-active" role="tab" id="memorialTabWall" data-memorial-view="wall" aria-selected="true" tabindex="0" aria-controls="memorialWallLayout">Wall</button>
+        <button type="button" class="history-quick-link memorial-quick-link memorial-view-tab" role="tab" id="memorialTabAncestor" data-memorial-view="ancestor-line" aria-selected="false" tabindex="-1" aria-controls="memorialDescendantWall">Ancestor line</button>
+        <a href="#memorialBackLink" class="history-quick-link memorial-quick-link" role="link">Back link</a>
       </nav>
+      <p class="small text-muted mb-0 mt-2">Wall and Ancestor line tabs switch the main pane—only one is visible at a time.</p>
+    </section>
+
+    <section id="memorialDescendantWall" class="memorial-descendant-storybook memorial-main-pane ddw-section" aria-label="Ancestor line storybook" role="tabpanel" aria-labelledby="memorialTabAncestor">
+      <p class="ddw-kicker mb-1">Storybook · Same direct line as Line page</p>
+      <h2 class="h5 mb-2">Ancestor line to Homer R Lane</h2>
+      <p class="small text-muted mb-2">
+        Same data as <a href="/family/lane-direct-ancestor-story.html">Line</a>: parent links upward from Alderman Homer R Lane (anchor), ordered <strong>oldest generation first</strong>. The sequence <strong>ends at Homer R Lane</strong> (recent anchor)—not forward through children.
+      </p>
+      <p class="history-context-evidence-note mb-2"><strong>Context:</strong> general history background. <strong>Evidence:</strong> Lane-specific records/snippets.</p>
+      <nav id="memorialDescendantQuickNav" class="history-quick-nav memorial-quick-nav mb-2" aria-label="Ancestor line quick jumps"></nav>
+      <div id="memorialDescendantMeta" class="small text-muted mb-1"></div>
+      <div id="memorialDescendantError" class="small text-warning mb-2 d-none"></div>
+      <div id="memorialDescendantGrid" class="ddw-grid"></div>
     </section>
 
     <div id="memorialError" class="memorial-error d-none"></div>
-    <div class="memorial-wall-layout" id="memorialWallLayout">
+    <div class="memorial-wall-layout memorial-main-pane" id="memorialWallLayout" role="tabpanel" aria-labelledby="memorialTabWall">
       <div class="memorial-wall-primary">
         <div class="memorial-wall-toolbar d-flex flex-wrap align-items-center gap-2">
           <nav id="memorialCenturyJump" class="memorial-century-jump flex-grow-1" aria-label="Jump to century"></nav>
@@ -98,6 +116,7 @@
     <p class="text-center mt-4 mb-0" id="memorialBackLink">
       <a href="/family/lane-family.html" class="text-muted small">Back to Lane Family</a>
     </p>
+    <div class="text-center px-2" data-lane-site-credit></div>
   </main>
 
   <div class="modal fade" id="memorialModal" tabindex="-1" role="dialog" aria-labelledby="memorialModalTitle" aria-hidden="true">
@@ -112,11 +131,13 @@
     </div>
   </div>
 
+  <script src="/family/js/lane-site-credit.js"></script>
   <script src="/shared/tts.js"></script>
   <script src="/family/js/lane-tts.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
   <script src="/family/js/history-mode.js"></script>
+  <script src="/family/js/lane-direct-descendant-wall.js"></script>
   <script src="/family/js/lane-memorial-wall.js"></script>
 </body>
 </html>

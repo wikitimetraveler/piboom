@@ -572,6 +572,28 @@ function renderThemeButtons(themes = {}) {
   applyTheme(preferred);
 }
 
+/** Caption/credit under featured secondary tiles (historic maps, period flags, etc.). */
+function buildFeaturedSecondaryCaptionHtml(item) {
+  const cap = String(item?.caption || '').trim();
+  const cred = String(item?.credit || '').trim();
+  if (!cap && !cred) return '';
+  const line = cap && cred ? `${cap} · ${cred}` : cap || cred;
+  return `<div class="museum-media-caption">${escapeHtml(line)}</div>`;
+}
+
+/** Wrap secondary tile image in a new-tab link when media JSON includes openUrl (e.g. Wikimedia Commons). */
+function wrapFeaturedSecondaryImageHtml(imgHtml, item) {
+  const raw = String(item?.openUrl || '').trim();
+  if (!raw) return imgHtml;
+  const id = String(item?.id || '');
+  const capLower = String(item?.caption || '').toLowerCase();
+  const ariaLabel =
+    id.includes('map') || capLower.includes('map') || capLower.includes('peninsula')
+      ? 'Open map source on Wikimedia Commons (new tab)'
+      : 'Open image source on Wikimedia Commons (new tab)';
+  return `<a class="museum-media-open-source" href="${escapeHtml(raw)}" target="_blank" rel="noopener noreferrer" aria-label="${escapeHtml(ariaLabel)}">${imgHtml}</a>`;
+}
+
 function renderFeatured(featuredStory = {}, museum = {}) {
   const person = featuredStory.featuredPerson || {};
   document.getElementById('featuredTitle').textContent =
@@ -617,9 +639,16 @@ function renderFeatured(featuredStory = {}, museum = {}) {
     secondaryHost.innerHTML = secondary
       .map((item) => {
         if (item.type === 'image') {
-          return `<div class="museum-media-item"><img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.caption || 'Media item')}" onerror="this.parentElement.innerHTML='<div class=&quot;museum-placeholder&quot;>Media unavailable</div>'" /></div>`;
+          const capHtml = buildFeaturedSecondaryCaptionHtml(item);
+          const altRaw = String(item.caption || item.credit || 'Media item').trim() || 'Media item';
+          const alt = escapeHtml(altRaw);
+          const imgHtml = `<img src="${escapeHtml(item.url)}" alt="${alt}" onerror="var n=this.closest('.museum-media-item');if(n)n.innerHTML='<div class=&quot;museum-placeholder&quot;>Media unavailable</div>';" />`;
+          const inner = wrapFeaturedSecondaryImageHtml(imgHtml, item);
+          return `<div class="museum-media-item"><div class="museum-media-item__visual">${inner}</div>${capHtml}</div>`;
         }
-        return `<div class="museum-media-item"><div class="museum-placeholder">${escapeHtml(item.type || 'media')}<br>${escapeHtml(item.caption || '')}</div></div>`;
+        return `<div class="museum-media-item"><div class="museum-placeholder">${escapeHtml(item.type || 'media')}<br>${escapeHtml(
+          item.caption || ''
+        )}</div>${buildFeaturedSecondaryCaptionHtml(item)}</div>`;
       })
       .join('');
   }

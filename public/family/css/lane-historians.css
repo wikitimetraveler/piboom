@@ -255,3 +255,137 @@ body.lane-historians-page {
   padding-top: 1rem;
   border-top: 1px solid rgba(44, 40, 36, 0.1);
 }
+
+/* --- HyperFrames story mode (parchment-aligned) --- */
+.lh-story-mode {
+  position: relative;
+  padding: 0.85rem 1rem 1rem;
+  background: #faf7f1;
+  border: 1px solid rgba(44, 40, 36, 0.14);
+  border-radius: 4px;
+  box-shadow: 0 1px 10px rgba(28, 24, 20, 0.04);
+}
+
+.lh-story-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.55rem;
+}
+
+.lh-story-kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b6358;
+}
+
+.lh-story-copy {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #3d3832;
+}
+
+.lh-story-voice-hint {
+  color: #5a5348;
+  line-height: 1.5;
+}
+
+.lh-story-option {
+  margin-top: 0.65rem;
+  font-size: 0.875rem;
+  color: #3d3832;
+  user-select: none;
+}
+
+.lh-story-overlay {
+  margin-top: 0.6rem;
+  border: 1px solid rgba(44, 40, 36, 0.18);
+  border-left: 4px solid rgba(107, 83, 68, 0.55);
+  border-radius: 4px;
+  padding: 0.55rem 0.65rem;
+  background: rgba(252, 250, 244, 0.98);
+}
+
+.lh-story-overlay.lh-story-overlay--floating {
+  position: fixed;
+  margin-top: 0;
+  left: auto;
+  right: auto;
+  top: auto;
+  z-index: 1150;
+  max-width: min(21rem, calc(100vw - 24px));
+  pointer-events: none;
+  box-shadow: 0 12px 34px rgba(28, 24, 20, 0.18);
+  background: rgba(252, 250, 244, 0.97);
+  border-left-width: 4px;
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 576px) {
+  .lh-story-overlay.lh-story-overlay--floating {
+    max-width: calc(100vw - 18px);
+  }
+}
+
+.lh-story-scene-kicker {
+  font-size: 0.65rem;
+  color: #6b645c;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.lh-story-scene-title {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  color: #252220;
+  font-size: clamp(0.95rem, 2.1vw, 1.2rem);
+  font-weight: 500;
+}
+
+.lh-story-scene-copy {
+  color: #3d3832;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+#lh-story-intro.lh-story-anchor {
+  scroll-margin-top: 6rem;
+  min-height: 1px;
+}
+
+.lane-historians-timeline li.lh-story-highlight-target {
+  scroll-margin-top: 5.5rem;
+}
+
+.lane-historians-story-active {
+  outline: 2px solid rgba(107, 83, 68, 0.45);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lane-historians-story-active {
+    transition: outline-color 0.22s ease;
+  }
+}
+
+/* NHHS archive evidence callout */
+.lh-archive-evidence-callout {
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+  background: #f2ede4;
+  border: 1px dashed rgba(44, 40, 36, 0.22);
+  border-radius: 4px;
+  color: #2c2824;
+}
+
+.lh-archive-evidence-title {
+  color: #38342f;
+}
+
+.lh-archive-citation cite {
+  font-style: normal;
+  color: #5a5348;
+}

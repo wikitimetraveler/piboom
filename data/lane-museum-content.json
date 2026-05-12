@@ -367,10 +367,15 @@
       "personId": 94,
       "displayName": "Jonathan Homer Lane",
       "personQuery": "Jonathan Homer Lane",
-      "caption": "Astrophysicist; lunar crater Lane honors his work (Lane–Emden equation foundation)",
-      "eraLabel": "1819–1880 · Washington / standards bureau",
-      "blurb": "First mathematical modeling of the Sun as a gaseous body; namesake of Mare Cognitum’s Lane crater.",
+      "caption": "Astrophysicist · Lane–Emden equation; lunar crater Lane; uncle of William Homer Lane in this tree",
+      "eraLabel": "1819 Geneseo, N.Y. – 1880 Washington, D.C.",
+      "blurb": "Vol. I lists him under Mark Lane as first child: Exeter Academy, Yale 1846, coast survey in Washington. Standard biography adds Patent Office and Weights and Measures work and the gaseous-sun analysis behind stellar-structure theory. In this graph he is paternal uncle of William Homer Lane (id 108) and grand-uncle of Alderman Homer R Lane (id 112).",
       "links": [
+        {
+          "label": "Lane Genealogies Vol. I — Internet Archive (context)",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
         {
           "label": "USGS — Lane (lunar crater) nomenclature",
           "url": "https://planetarynames.wr.usgs.gov/Feature/3315",
@@ -477,9 +482,19 @@
       "id": "exhibit1-map",
       "storySlug": "william-e-lane-boston",
       "type": "image",
-      "url": "/family/assets/boston-map-placeholder.jpg",
-      "caption": "Map context for Boston-era Lane history",
-      "credit": "Pending map source"
+      "url": "/family/assets/historic-boston-town-map-1723-leventhal.jpg",
+      "openUrl": "https://commons.wikimedia.org/wiki/File:The_town_of_Boston_in_New_England_(2674664191).jpg",
+      "caption": "Boston peninsula — Bonner town plot (published impression ca. 1723–1733). Approximate geography for colonial-era narrative; not a precise life-events map.",
+      "credit": "Norman B. Leventhal Map Center at Boston Public Library · Wikimedia Commons · CC BY 2.0 · File: The town of Boston in New England (2674664191).jpg"
+    },
+    {
+      "id": "exhibit1-colonial-ensign",
+      "storySlug": "william-e-lane-boston",
+      "type": "image",
+      "url": "/family/assets/colonial-red-ensign-great-britain-1707-1800.svg",
+      "openUrl": "https://commons.wikimedia.org/wiki/File:Red_ensign_of_Great_Britain_(1707%E2%80%931800).svg",
+      "caption": "British Red Ensign (Kingdom of Great Britain, 1707–1800)—period maritime / colonial merchant naval context; not a Lane family emblem.",
+      "credit": "Wikimedia Commons · public domain · File: Red ensign of Great Britain (1707–1800).svg"
     }
   ],
   "timelineEvents": [

@@ -177,3 +177,19 @@ body.genealogy-tree-page {
 .lane-family-crumb a:hover {
   color: var(--lane-heritage-ink, #3d3832);
 }
+
+/* Shared site credit — copy lives in public/family/js/lane-site-credit.js */
+.lane-site-credit-mount {
+  margin-top: 1rem;
+}
+
+p.lane-site-credit {
+  font-size: 0.8125rem;
+  color: var(--lane-heritage-muted, #6c757d);
+  text-align: center;
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}

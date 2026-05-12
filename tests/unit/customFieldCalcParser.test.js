@@ -17,6 +17,8 @@ const {
   evaluateCondition,
   isSunriseField,
   formatDateWithOffset,
+  reloadLearnedSetHintsCache,
+  LEARNED_SET_HINTS_STORAGE_KEY,
 } = globalThis.customFieldCalcParser;
 
 describe('customFieldCalcParser', () => {
@@ -688,6 +690,70 @@ describe('customFieldCalcParser', () => {
       const scenario = { condition: '[CX.DATE] <> Nothing', result: '"Y"', isElse: false };
       const result = getSuggestedValuesForScenario(scenario, ['CX.DATE']);
       expect(result['CX.DATE']).toBe('Y');
+    });
+  });
+
+  describe('getSuggestedValuesForScenario learned SET hints', () => {
+    beforeEach(() => {
+      const mem = Object.create(null);
+      const ls = {
+        getItem: (k) => (Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null),
+        setItem: (k, v) => {
+          mem[k] = String(v);
+        },
+        removeItem: (k) => {
+          delete mem[k];
+        },
+      };
+      globalThis.localStorage = ls;
+      reloadLearnedSetHintsCache();
+    });
+
+    afterEach(() => {
+      try {
+        globalThis.localStorage.removeItem(LEARNED_SET_HINTS_STORAGE_KEY);
+      } catch (_) {
+        /* ignore */
+      }
+      reloadLearnedSetHintsCache();
+    });
+
+    test('learned SET hint overrides parser default for same field and scenario', () => {
+      const doc = {
+        version: 1,
+        hints: {
+          FLAG: { source: 'test', valuesByScenarioIndex: { '0': 'N' } },
+        },
+        updatedAt: new Date().toISOString(),
+      };
+      globalThis.localStorage.setItem(LEARNED_SET_HINTS_STORAGE_KEY, JSON.stringify(doc));
+      reloadLearnedSetHintsCache();
+
+      const scenario = { condition: '[FLAG] = "Y"', result: '"ok"', isElse: false };
+      const r0 = getSuggestedValuesForScenario(scenario, ['FLAG'], { scenarioIndex: 0 });
+      expect(r0.FLAG).toBe('N');
+    });
+
+    test('learned SET hint overrides numeric suggestion from comparison', () => {
+      const doc = {
+        version: 1,
+        hints: {
+          '60#1': { source: 'test', valuesByScenarioIndex: { '0': 50 } },
+        },
+        updatedAt: new Date().toISOString(),
+      };
+      globalThis.localStorage.setItem(LEARNED_SET_HINTS_STORAGE_KEY, JSON.stringify(doc));
+      reloadLearnedSetHintsCache();
+
+      const scenario = {
+        condition: '[#60#1] <= 200 And [#1452#1] <= 200',
+        result: '[#1415#1]',
+        isElse: false,
+      };
+      const inputFields = ['#60#1', '#1452#1', '#1415#1'];
+      const result = getSuggestedValuesForScenario(scenario, inputFields);
+      expect(result['60#1']).toBe(50);
+      expect(result['1452#1']).toBe(100);
     });
   });
 

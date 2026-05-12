@@ -33,7 +33,7 @@
     {
       "name": "Mary (Kelway) Lane",
       "id": 2,
-      "text": "Profile evidence indicates she is the Mary (Kelway) Lane spouse of William Lane, with marriage about 1650 (location uncertain).",
+      "text": "Profile evidence indicates she is the Mary (Kelway) Lane spouse of William Lane, with marriage about 1650 (location uncertain). Died Boston 2 May 1656 vs daughter Mary rec. 15 May 1656 — treat as Savage’s probable single-event mis-split unless primary proof separates them.",
       "generation": 0,
       "gender": "F",
       "lastName": "First Wife of William ",
@@ -41,9 +41,9 @@
       "deathYear": "May 2, 1656",
       "birthDate": "1625-01-01T00:00:00.000Z",
       "deathDate": "1656-01-01T00:00:00.000Z",
-      "deathPlace": "Hampton, Rockingham, New Hampshire",
-      "born": "Hampton, Rockingham, New Hampshire",
-      "burial": "Hampton, Rockingham, New Hampshire"
+      "deathPlace": "Boston, Suffolk, Massachusetts Bay Colony",
+      "born": "England (Kelway linkage — interpret cautiously); Boston-area by 1650s",
+      "burial": ""
     },
     {
       "name": "Mary (Brewer) Lane",
@@ -60,38 +60,46 @@
       "burial": "Hampton, Rockingham, New Hampshire"
     },
     {
-      "name": "William Lane",
+      "name": "William Lane (I)",
       "id": 4,
-      "text": "Profile evidence: born about 1625 (uncertain), in England (uncertain). Died after 20 May 1676 (about age 51) in Massachusetts Bay Colony (uncertain). Husband of Mary (Kelway) Lane and Mary (Brewer) Lane.",
+      "text": "William¹ (Boston line): birth ~1620–1630 England (parentage unknown; ~1625 midpoint reasonable). Immigration often bracketed ~1650–1651 (e.g. Walter Kelway will Oct 1650 Chelmsford naming Mary Lane in Boston — use cautiously). First child on Boston vital register: Samuel Jan 1651/2 (Samuel² — id 6), not the speculative Hartford Aug 1648 “Samiwell Lanes” tie (NEHGR XII:196; “Lanes” may be Lines). Freeman Mass. Bay 6 May 1657 (Shurtleff Colony Records IV p.461). Suffolk deeds 1674–1676 call him labourer; Vol. I “cordwainer” lacks matching deed support here. Last record: deed 20 May 1676; died after that date — not Mount Auburn (opened 1831). Husbands of Mary (Kelway) Lane (d. 2 May 1656 Boston — reconcile vs daughter Mary b. 15 May 1656 per Savage as one misrecord) and Mary (Brewer) Lane (m. 21 Aug 1656).",
       "generation": 0,
       "gender": "M",
-      "lastName": "cordwainer",
+      "lastName": "",
+      "occupation": [
+        {
+          "job": "labourer"
+        },
+        {
+          "text": "Chapman–Fitts Lane Genealogies (1891) calls him cordwainer; Boston-area deeds 1674–1676 transcribed in research notes use “labourer” — treat cordwainer as unverified for William¹ until a primary shoemaker record is tied to him."
+        }
+      ],
       "birthYear": 1625,
-      "deathYear": "aft 1676",
+      "deathYear": "aft. May 1676",
       "birthDate": "1625-01-01T00:00:00.000Z",
-      "deathDate": "1676-05-20T00:00:00.000Z",
-      "born": "Boston, Massachusetts., USA",
-      "burial": "Hampton, Rockingham, New Hampshire"
+      "deathDate": "",
+      "born": "England (birth uncertain); Boston, Mass. from 1650s",
+      "burial": ""
     },
     {
-      "name": "Samuel Lane",
+      "name": "Samuel Lane (deprecated node — use id 6)",
       "id": 5,
-      "text": "died as an infant",
-      "generation": 2,
+      "text": "Deprecated placeholder: Chapman–Fitts sometimes harmonize Hartford VR “Samiwell Lanes … borne August 8, 1648” (NEHGR XII:196) with Samuel; treating that infant as William¹’s Samuel² is speculative. “Lanes” may be scribal for Lines (other CT families). Canonical Samuel² is id 6 — Boston births Jan 1651/2 (report 1883 p.33), King Philip roster line toward Hadley/Sarah Dickinson. No graph edges — do not merge with id 6.",
+      "generation": 1,
       "gender": "M",
       "lastName": "",
-      "birthYear": 1648,
-      "deathYear": "1650?",
-      "birthDate": "1648-01-01T00:00:00.000Z",
-      "deathDate": "1650-01-01T00:00:00.000Z",
-      "born": "Boston, Massachusetts., USA",
-      "died": "Sufifield, Conn",
+      "birthYear": "",
+      "deathYear": "",
+      "birthDate": "",
+      "deathDate": "",
+      "born": "",
+      "died": "",
       "burial": ""
     },
     {
       "name": "Samuel Lane",
       "id": 6,
-      "text": "Samuel² (son of William¹): Vol. 1 places him in Hadley, Mass., with wife Sarah (Dickinson); soldier under Capt. Turner in Philip's Indian War (see structured service). In 1676 he was a soldier under Capt. Turner in the same company in which John Lane, in Mar. 1675, served under Capt. Poole in King Philip's War.",
+      "text": "Samuel² (son of William¹): anchored to Boston vital register birth Jan 1651/2 (Boston births report 1883 p.33) — not the Hartford Aug 1648 infant sometimes speculatively harmonized with this line. Lane Genealogies Vol. 1 puts him in Hadley with wife Sarah (Dickinson); 1676 soldier under Capt. Turner in Philip's Indian War (see structured service), in the company lineage Chapman ties to brother John Lane’s Mar. 1675 service under Capt. Poole.",
       "occupation": [
         {
           "job": "tanner"
@@ -119,12 +127,12 @@
       "deathYear": "1690",
       "birthDate": "1651-01-01T00:00:00.000Z",
       "deathDate": "1690-01-01T00:00:00.000Z",
-      "born": "Boston, Mass, USA",
+      "born": "Boston, Mass — Jan 1651/2 per Boston vital register (report 1883 p.33); later Hadley, Mass.",
       "burial": "Pine Grove Cemetary, Hampton, New Hampshire",
       "importMeta": {
         "ocrFacts": {
           "military": [
-            "SAMUEL LANE? (William') 1651-1690, a (soldiert under Capt. Turner in Philip's Indian war"
+            "SAMUEL LANE (William¹ line) Boston Jan 1651/2–1690; soldier under Capt. Turner Philip's Indian war"
           ],
           "placeHints": [
             {
@@ -198,10 +206,10 @@
       "burial": ""
     },
     {
-      "name": "William Lane",
+      "name": "William Lane (II)",
       "id": 10,
-      "text": "William² (William¹): tailor; m. 21 June 1680 Sarah Webster (Lane Genealogies, Vol. 1, 1891). Sarah (dau. of Thomas Webster) per book b. 22 Jan. 1660–61; compilation ties her line to Hon. Daniel Webster as a pedigree claim—not independently verified here. Joined North Church, Boston 1681; removed to Hampton 1686 on a grant of ten acres. Town meeting Boston, 5 May 1686: William Lane chosen Tythinge Man for the year ensuing (spelling as printed in Vol. 1). Hampton (Old Parish) Dec. 1731 / Jan. 1732 assessments cite William Lane (one head, one one-story house); Joshua Lane (livestock/tillage/pasture list); Thomas Lane (one head, one cow)—book cites NEHGR IX:159.",
-      "generation": 0,
+      "text": "William² (William¹): tailor; m. 21 June 1680 Sarah Webster (Lane Genealogies, Vol. 1, 1891). Sarah (dau. of Thomas Webster) per book b. 22 Jan. 1660–61; compilation ties her line to Hon. Daniel Webster as a pedigree claim—not independently verified here. Joined North Church, Boston 1681; removed to Hampton 1686 on a grant of ten acres. Town meeting Boston, 5 May 1686: William Lane chosen Tythinge Man for the year ensuing (spelling as printed in Vol. 1). Hampton (Old Parish) Dec. 1731 / Jan. 1732 assessments cite William Lane (one head, one one-story house); Joshua Lane (livestock/tillage/pasture list); Thomas Lane (one head, one cow)—book cites NEHGR IX:159. Prominent-figure documentation for Hon. Daniel Webster as named by the book (compilation tier only; no graph edge): person id 3988.",
+      "generation": 2,
       "gender": "M",
       "lastName": "Willaim Lane - Tailor",
       "birthYear": 1659,
@@ -232,7 +240,9 @@
             "elizabethThirdGenSamuel2Line": 18,
             "johnThirdGenWilliam2LineBoston1685LibbeyFootnote": 20,
             "crossWireWarning": "Vol. 1 page-10 distinguishes two Johns: Samuel² line id 17 (Hadley birth 1686, Connecticut)—no King Philip engagements on this node; William² Sarah Webster line id 20 (Boston 1685, Mary Libbey §)—not the Turner/Poole KP roster attributed to John's 1675 line. Joshua under Capt. Wadsworth July 1676 is footnote ‡ on ix:159 bundle only (see footnoteJoshuaJuly1676), not Samuel² or John²."
-          }
+          },
+          "danielWebsterOratorStub": 3988,
+          "thomasWebsterVol1FatherId": 3989
         }
       },
       "locations": [
@@ -360,7 +370,7 @@
     {
       "name": "Sarah Webster",
       "id": 19,
-      "text": "",
+      "text": "Wife of William² Lane (id 10). Lane Genealogies Vol. I gives her as daughter of Thomas Webster; b. 22 Jan. 1660–61 per book. Graph: father is Thomas Webster (id 3989). The compilation ties this Webster line to Hon. Daniel Webster as a pedigree claim—see compilation-tier person id 3988 (no Lane→Daniel kinship edges; Daniel’s parent Ebenezer is id 3990).",
       "generation": 0,
       "gender": "F",
       "lastName": "",
@@ -374,7 +384,7 @@
     {
       "name": "John Lane",
       "id": 20,
-      "text": "John³ (William² / Sarah Webster), Lane Genealogies (Vol. 1, 1891): b. Boston 17 Feb. 1685; m. 7 Mar. 1709 Mary (dau. of Anthony and Sarah Drake) Libbey of Rye. The compilation then records a maritime life—taken captive by pirates and held seven years; after time at home sailed again and died at sea, leaving widow and only son—the book continues that line under John⁴ (b. Hampton 12 Oct. 1709, Cornet). Maritime episodes are folklore-style narrative in the genealogical compilation only—confirm with independent shipping or court references if asserting as fact.",
+      "text": "John³ (William² / Sarah Webster), Lane Genealogies (Vol. 1, 1891): b. Boston 17 Feb. 1685; m. 7 Mar. 1709 Mary (dau. of Anthony and Sarah Drake) Libbey of Rye. The compilation then records a maritime life—taken captive by pirates and held seven years; after time at home sailed again and died at sea, leaving widow and only son—the book continues that line under John⁴ (b. Hampton 12 Oct. 1709, Cornet). Maritime episodes are folklore-style narrative in the genealogical compilation only—confirm with independent shipping or court references if asserting as fact. Vol. I also uses statesman language about Hon. Daniel Webster (OCR echo on stub id 137); cross-reference compilation record id 3988—no kinship edge implied.",
       "generation": 3,
       "gender": "M",
       "lastName": "",
@@ -386,7 +396,10 @@
       "burial": "at sea (per Vol. 1 narrative)",
       "importMeta": {
         "laneGenealogiesVol1": {
-          "footnoteSection": "Book § after Libbey marriage line—see Cornet John (descendant continuation, Hampton births)."
+          "footnoteSection": "Book § after Libbey marriage line—see Cornet John (descendant continuation, Hampton births).",
+          "danielWebsterOcrEchoId": 137,
+          "danielWebsterOratorStub": 3988,
+          "thomasWebsterVol1FatherId": 3989
         }
       }
     },
@@ -692,18 +705,18 @@
       "burial": " "
     },
     {
-      "name": "Nathanian Dickinson",
+      "name": "Nathaniel Dickinson",
       "id": 39,
-      "text": "Three of Nathaniel's sons, John, Joseph, and Azariah, were killed in King Philip's War in 1675 and 1676",
+      "text": "Hadley-area Dickinson patriarch (Wethersfield / Connecticut River tradition). Three of Nathaniel's sons, John, Joseph, and Azariah, were killed in King Philip's War in 1675 and 1676 (as often retold—verify in period records). In this graph: Nathaniel (id 39) is father of John Dickinson (id 41); Sarah Dickinson (id 13) lists John as father (links 13→41, 13→42). So Nathaniel is Sarah's paternal grandfather. Samuel² Lane (id 6) is spouse of Sarah (6→13). Therefore Nathaniel is grandfather of Samuel²'s spouse, not father-in-law—John Dickinson (id 41) is Samuel²'s father-in-law. Parent links: 41→39 (father), 41→40 (mother Anna Gull).",
       "generation": 0,
       "gender": "M",
-      "lastName": " ",
+      "lastName": "Dickinson",
       "birthYear": 1600,
       "deathYear": "1676",
       "birthDate": "1600-01-01T00:00:00.000Z",
       "deathDate": "1676-01-01T00:00:00.000Z",
       "born": "Wethersfield, Connecticut",
-      "burial": "Nathanian Dickinson"
+      "burial": ""
     },
     {
       "name": "Anna Gull",
@@ -1518,16 +1531,31 @@
     {
       "name": "Jonathan Homer Lane",
       "id": 94,
-      "text": "The crater Lane on the Moon is named after him.",
+      "text": "Lane Genealogies Vol. I (Mark Lane × Henrietta Tenney roster): b. Aug. 1819; Phillips Exeter Academy 1839; Yale 1846; coast survey work in Washington; d. 1880 per book line (Washington, D.C.). Parents in this graph: Mark Lane (id 86), Henrieita Tenney (id 93). Kinship in this file: paternal uncle of William Homer Lane (id 108); grand-uncle (great-uncle) of Alderman Homer R Lane (id 112) via David Tenney Lane (id 97). Standard biography adds Geneseo, N.Y., birth (9 Aug. 1819), U.S. Patent Office principal examiner to 1857, Office of Weights and Measures from 1869, and the Lane–Emden work on gaseous stellar structure; the Moon’s Lane crater is named for him. Wikipedia and USGS links are modern reference tier, not Vol. I text.",
       "generation": 7,
       "gender": "M",
-      "lastName": "his education was at the Phillips Academy in Exeter, New Hampshire. He graduated from Yale University in 1846. He worked for the U.S. Patent Office, and became a principal examiner in 1851. In 1869 he joined the Office of Weights and Measures, a part of the Department of the Treasury that later became the National Bureau of Standards. Lane was particularly interested in astronomy, and was the first to perform a mathematical analysis of the Sun as a gaseous body. His investigations demonstrated the thermodynamic relations between pressure, temperature, and density of the gas within the Sun, and formed the foundation of what would in the future become the theory of stellar evolution (see Lane-Emden equation).",
+      "lastName": "",
       "birthYear": 1819,
       "deathYear": "1880",
-      "birthDate": "1819-01-01T00:00:00.000Z",
-      "deathDate": "1880-01T00:00:00.000Z",
-      "born": "Washington, DC",
-      "burial": " "
+      "birthDate": "1819-08-09T00:00:00.000Z",
+      "deathDate": "1880-05-03T00:00:00.000Z",
+      "born": "Geneseo, Livingston County, New York",
+      "deathPlace": "Washington, D.C.",
+      "burial": "",
+      "sourceRefs": [
+        {
+          "pdfPageNumber": 77,
+          "lineNumber": 10,
+          "rawText": "I. Jonathan Homer, b. Aug., 1819, entered Exeter Academy, 1839, graduated Yale College, 1846, was coast survey official, Washington,"
+        }
+      ],
+      "importMeta": {
+        "source": "lanegenealogies01chap.pdf",
+        "parser": "manual-book-verify",
+        "bookVerified": true,
+        "verificationNote": "Vol. I Mark Lane child roster; same PDF excerpt as OCR node id 560 in this dataset.",
+        "relatedOcrPersonId": 560
+      }
     },
     {
       "name": "Elizabeth Swain Lane",
@@ -1713,7 +1741,7 @@
     {
       "name": "William Homer Lane",
       "id": 108,
-      "text": "",
+      "text": "Paternal uncle: Jonathan Homer Lane (id 94) — astrophysicist; lunar crater Lane namesake (Lane–Emden equation).",
       "generation": 8,
       "gender": "M",
       "lastName": "",
@@ -1769,7 +1797,7 @@
     {
       "name": "Alderman Homer R Lane",
       "id": 112,
-      "text": "",
+      "text": "Grand-uncle (great-uncle): Jonathan Homer Lane (id 94), brother of paternal grandfather David Tenney Lane (id 97).",
       "generation": 9,
       "gender": "M",
       "lastName": "",
@@ -162873,6 +162901,68 @@
           "rawText": "Imported from user-provided screenshot list (managed by Nathan Bell, last edited 19 Apr 2026)."
         }
       }
+    },
+    {
+      "name": "Daniel Webster (Hon., statesman — compilation record)",
+      "id": 3988,
+      "text": "Historical statesman and orator (1782–1852); died Marshfield, Mass. This row documents Lane Genealogies Vol. I name-dropping and anchors accepted reference parentage. Vol. I Lane–Webster traditions: (1) Sarah Webster (id 19) and William² Lane (id 10)—Thomas Webster (id 3989) is Sarah’s father in the graph per Vol. I; pedigree claims toward this statesman are compilation-tier. (2) Vol. I OCR echo on id 137 / canonical John³ id 20 statesman wording—still narrative cross-reference, not an edge to Lane. One father edge in this file follows standard biography: Ebenezer Webster (id 3990). No Lane person has a father/mother/spouse edge to this node—Lane descent to Daniel is not asserted as proven here.",
+      "generation": 0,
+      "gender": "M",
+      "lastName": "Webster",
+      "birthYear": 1782,
+      "deathYear": "1852",
+      "birthDate": "1782-01-18T00:00:00.000Z",
+      "deathDate": "1852-10-24T00:00:00.000Z",
+      "born": "Salisbury, New Hampshire (general chronology; not sourced from this Lane file)",
+      "deathPlace": "Marshfield, Massachusetts",
+      "burial": "",
+      "importMeta": {
+        "laneGenealogiesProminentFigure": true,
+        "claimNarrative": "Family compilation tier: Vol. I associates Lane and Webster lines with Hon. Daniel Webster; not peer-verified in this dataset.",
+        "relatedLanePersonIds": [10, 19, 20, 137],
+        "ebenezerWebsterParentId": 3990,
+        "thomasWebsterVol1FatherId": 3989
+      }
+    },
+    {
+      "name": "Thomas Webster",
+      "id": 3989,
+      "text": "Named in Lane Genealogies Vol. I as father of Sarah Webster (id 19). Dates in this row are left sparse—compilation tier. Graph edge: Sarah (19) → father (this id). Vol. I’s broader Hon. Daniel Webster pedigree language remains documented on id 3988 as family-book narrative, not an extra biological edge from Lane ids to Daniel.",
+      "generation": 0,
+      "gender": "M",
+      "lastName": "Webster",
+      "birthYear": "",
+      "deathYear": "",
+      "birthDate": "",
+      "deathDate": "",
+      "born": "Massachusetts or vicinity (Vol. I context only)",
+      "burial": "",
+      "importMeta": {
+        "laneGenealogiesVol1": {
+          "role": "fatherOfSarahWebster",
+          "childPersonId": 19
+        }
+      }
+    },
+    {
+      "name": "Ebenezer Webster",
+      "id": 3990,
+      "text": "Standard biographical genealogy: father of Daniel Webster (person id 3988 in this file). Farmer/innkeeper Salisbury, New Hampshire area. Chronology from common reference sources, not from Lane Genealogies. This node is not a Lane ancestor; it only anchors accepted parentage for the Daniel Webster stub row (3988).",
+      "generation": 0,
+      "gender": "M",
+      "lastName": "Webster",
+      "birthYear": 1739,
+      "deathYear": "1806",
+      "birthDate": "1739-01-01T00:00:00.000Z",
+      "deathDate": "1806-01-01T00:00:00.000Z",
+      "born": "New Hampshire area (reference tier)",
+      "deathPlace": "Salisbury, New Hampshire",
+      "burial": "",
+      "importMeta": {
+        "externalReferenceFigure": true,
+        "referenceNote": "Widely published dates for Ebenezer Webster; refine with primary sources if needed.",
+        "childPersonId": 3988
+      }
     }
   ],
   "links": [
@@ -162901,18 +162991,6 @@
       "relation": "spouse"
     },
     {
-      "source": 5,
-      "target": 4,
-      "color": "#39F",
-      "relation": "father"
-    },
-    {
-      "source": 5,
-      "target": 2,
-      "color": "#F39",
-      "relation": "mother"
-    },
-    {
       "source": 6,
       "target": 4,
       "color": "#39F",
@@ -162964,13 +163042,13 @@
       "source": 10,
       "target": 3,
       "color": "#F39",
-      "relation": "father"
+      "relation": "mother"
     },
     {
       "source": 10,
       "target": 4,
       "color": "#F39F",
-      "relation": "mother"
+      "relation": "father"
     },
     {
       "source": 11,
@@ -162987,14 +163065,14 @@
     {
       "source": 12,
       "target": 4,
-      "color": "#F39",
-      "relation": "mother"
+      "color": "#F39F",
+      "relation": "father"
     },
     {
       "source": 12,
       "target": 3,
-      "color": "#F39F",
-      "relation": "father"
+      "color": "#F39",
+      "relation": "mother"
     },
     {
       "source": 2,
@@ -175679,6 +175757,18 @@
       "target": 3722,
       "color": "#CC0",
       "relation": "spouse"
+    },
+    {
+      "source": 19,
+      "target": 3989,
+      "color": "#39F",
+      "relation": "father"
+    },
+    {
+      "source": 3988,
+      "target": 3990,
+      "color": "#39F",
+      "relation": "father"
     }
   ]
 }

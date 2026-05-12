@@ -1,0 +1,76 @@
+/* Shared: direct-descendant storybook wall (Line page + Memorial wall) */
+
+.ddw-section {
+  margin-top: 0;
+}
+
+.ddw-kicker {
+  color: var(--history-accent, #caa56c);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  margin-bottom: 0.35rem;
+}
+
+.ddw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.ddw-card {
+  background: var(--history-surface, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--history-border, rgba(196, 181, 153, 0.28));
+  border-radius: 12px;
+  padding: 1rem 1.05rem;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+}
+
+.ddw-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.ddw-card-title {
+  color: var(--history-text, #f2ebdf);
+  font-family: 'Source Serif 4', Georgia, serif;
+}
+
+.ddw-card-years {
+  font-size: 0.82rem;
+  color: #9fb2c9;
+  white-space: nowrap;
+}
+
+.ddw-card-snippet {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #d6dde8;
+  margin-bottom: 0;
+}
+
+/* Memorial: subtle variant strip inside main flow */
+.memorial-descendant-storybook {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem 1.5rem;
+}
+
+.memorial-descendant-storybook .ddw-card {
+  border-color: rgba(196, 181, 153, 0.32);
+}
+
+/* Line page: nest inside direct-card */
+.direct-descendant-wall-block {
+  padding: 1.15rem 1.2rem;
+}
+
+.direct-descendant-wall-block .ddw-card {
+  border-left: 3px solid rgba(110, 168, 210, 0.55);
+}

@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "title": "Lane historians & compilers",
   "subtitle": "Honoring those who carried Lane Genealogies, Volume I (1891) into print—and the longer line of record-keeping before them.",
   "heroImageUrl": "/family/assets/lane-historians/frontispiece-title-1891.png",
@@ -9,7 +9,7 @@
   "publication": {
     "volumeTitle": "Lane Genealogies. Volume I.",
     "subjectLines": [
-      "William Lane of Boston, Mass., 1648",
+      "William Lane of Boston — Vol. I subject tag; “1648” is Chapman–Fitts Hartford (NEHGR XII:196 “Samiwell Lanes” Aug 1648) harmonizing speculation—not William¹’s birth/death, and not Samuel² (first child on Boston register: Jan 1651/2).",
       "Including records of Edmund J. Lane and James P. Lane",
       "Capt. John Lane of York County, Maine, 1693; Capt. John Lane of Fishersfield, N.H., 1737"
     ],
@@ -115,6 +115,8 @@
       "kind": "archive"
     }
   ],
+  "archiveHighlight": "New Hampshire Historical Society (Concord) holds the Lane Family Papers, 1727–1924 — collection M 1991.095 (12 boxes; two series span diaries, ledgers, correspondence, and legal material). Accessions include Abby Lane of Stratham (~1914); Priscilla Lane Moore Tapley genealogy gifts (1988, 1991); and Henry C. Hines’s Deacon Joshua Lane journal (M 1939.001). Samuel Lane’s diaries underpin the printed NHHS edition A Journal for the Years 1739–1803 (1937). See the collection record for repository contact and permissions.",
+  "preferredCitationExample": "Item title, Lane Family Papers, 1727–1924, M 1991.095. New Hampshire Historical Society, Concord, NH. Date accessed.",
   "illustrationsIndexNote": "The book's \"Illustrations in Lane Genealogy\" index maps display names to book page numbers in data/lane-illustrations-index.json (e.g. Rev. Jn. W. Lane, Rev. Jas. H. Fitts, Geo. W. Lane, Dr. Edw. B. Lane, Rev. Jas. P. Lane, Jacob Chapman).",
   "modernHistorians": [],
   "modernHistoriansPlaceholder": "Later: add family members and researchers who carry the record forward on this site—imports, OCR review, exhibits, and curation—using the modernHistorians array in this JSON file (same shape as figures: displayName, role, bio, optional image, links).",

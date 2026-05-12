@@ -8,7 +8,103 @@
 (function () {
   const STORAGE_KEY = 'unitTestsLearnModeExamplesV1';
   const STATE_STORAGE_KEY = 'unitTestsLearnModePatternStateV1';
+  const PARSER_HINTS_KEY = 'customFieldCalcParserLearnedSetHintsV1';
   const MAX_LIBRARY_ITEMS = 25;
+
+  let lastLearnExample = null;
+
+  function coerceCellValue(raw) {
+    const t = String(raw == null ? '' : raw).trim();
+    if (!t) return undefined;
+    if (/^-?\d+(\.\d+)?$/.test(t)) {
+      const n = Number(t);
+      if (Number.isFinite(n)) return n;
+    }
+    return t;
+  }
+
+  function scenarioKeysFromRow(row) {
+    if (!row || typeof row !== 'object') return [];
+    const keys = Object.keys(row);
+    const pairs = [];
+    for (let k = 0; k < keys.length; k += 1) {
+      const key = keys[k];
+      const m1 = key.match(/^Test\s*(\d+)$/i);
+      const m2 = key.match(/^Scenario\s*(\d+)$/i);
+      const mi = m1 || m2;
+      if (mi) {
+        pairs.push({ key: key, index: Math.max(0, parseInt(mi[1], 10) - 1) });
+      }
+    }
+    pairs.sort(function (a, b) {
+      return a.index - b.index;
+    });
+    return pairs;
+  }
+
+  /**
+   * Build normalized fieldId -> SET values from unit-test grid rows (Learn Mode right panel).
+   * @returns {Record<string, { source: string, valuesByScenarioIndex: Record<string, string|number> }>}
+   */
+  function distillSetHintsFromCaseRows(caseRows, sourceNote) {
+    const hints = {};
+    if (!Array.isArray(caseRows) || !window.customFieldCalcParser || typeof window.customFieldCalcParser.normalizeFieldIdForLookup !== 'function') {
+      return hints;
+    }
+    const normFn = window.customFieldCalcParser.normalizeFieldIdForLookup;
+    for (let r = 0; r < caseRows.length; r += 1) {
+      const row = caseRows[r];
+      if (!row) continue;
+      const action = String(row.Action || '').trim().toUpperCase();
+      if (action !== 'SET') continue;
+      const target = String(row.Target || '').trim();
+      const bm = target.match(/^\[([^\]]+)\]$/);
+      if (!bm) continue;
+      const norm = normFn(bm[1]);
+      if (!norm) continue;
+      const scenPairs = scenarioKeysFromRow(row);
+      if (!scenPairs.length) continue;
+      if (!hints[norm]) {
+        hints[norm] = { source: sourceNote || 'learn-mode', valuesByScenarioIndex: {} };
+      }
+      for (let s = 0; s < scenPairs.length; s += 1) {
+        const co = coerceCellValue(row[scenPairs[s].key]);
+        if (co !== undefined) {
+          hints[norm].valuesByScenarioIndex[String(scenPairs[s].index)] = co;
+        }
+      }
+      hints[norm].source = sourceNote || hints[norm].source;
+    }
+    return hints;
+  }
+
+  function persistParserSetHintsFromExample(example) {
+    try {
+      if (!example || !Array.isArray(example.caseRows)) return;
+      const distilled = distillSetHintsFromCaseRows(example.caseRows, example.createdAt || 'learn-mode');
+      const ids = Object.keys(distilled);
+      if (!ids.length) return;
+      if (typeof localStorage === 'undefined') return;
+      const doc = { version: 1, hints: {}, updatedAt: null };
+      try {
+        const raw = localStorage.getItem(PARSER_HINTS_KEY);
+        if (raw) {
+          const p = JSON.parse(raw);
+          if (p && p.hints && typeof p.hints === 'object') {
+            doc.hints = Object.assign({}, p.hints);
+          }
+        }
+      } catch (_parse) {}
+      for (let i = 0; i < ids.length; i += 1) {
+        doc.hints[ids[i]] = distilled[ids[i]];
+      }
+      doc.updatedAt = new Date().toISOString();
+      localStorage.setItem(PARSER_HINTS_KEY, JSON.stringify(doc));
+      if (window.customFieldCalcParser && typeof window.customFieldCalcParser.reloadLearnedSetHintsCache === 'function') {
+        window.customFieldCalcParser.reloadLearnedSetHintsCache();
+      }
+    } catch (_e) {}
+  }
 
   const parserLogicInput = document.getElementById('learnModeParserLogicInput');
   const caseTextInput = document.getElementById('learnModeCaseTextInput');
@@ -643,6 +739,10 @@
     lastLifecycle = promoted;
     lastConfidence = confidence;
     setStatus('Candidate manually promoted to APPROVED with audit note saved.', 'ok');
+    const ex = lastLearnExample || (sessionExamples.length ? sessionExamples[sessionExamples.length - 1] : null);
+    if (ex) {
+      persistParserSetHintsFromExample(ex);
+    }
   }
 
   function buildVBEvaluation(parserLogic, enabled) {
@@ -736,6 +836,10 @@
     saveLifecycleState(priorState, lifecycle, 'auto-evaluate', 'system');
     lastLifecycle = lifecycle;
     lastConfidence = confidence;
+    lastLearnExample = example;
+    if (lifecycle.phase === 'approved') {
+      persistParserSetHintsFromExample(example);
+    }
 
     templateOutputEl.textContent = buildTemplateOutput(allExamples);
     parserOutputEl.textContent = buildParserSuggestions(allExamples, lifecycle, confidence);
@@ -752,6 +856,7 @@
   function onClear() {
     parserLogicInput.value = '';
     caseTextInput.value = '';
+    lastLearnExample = null;
     if (excelInput) excelInput.value = '';
     if (saveToLibraryInput) saveToLibraryInput.checked = false;
     if (enableVBEvalInput) enableVBEvalInput.checked = false;

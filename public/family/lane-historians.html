@@ -30,10 +30,35 @@
     <p class="small text-muted mb-2">
       Continue in the <a href="/family/lane-museum.html">Museum</a> for exhibits, or ask the <a href="/family/lane-family.html#lfAiPanel">Lane guide</a> (suggested prompts include compilers).
     </p>
+    <section class="lh-story-mode mb-3" aria-label="Historians HyperFrames story mode">
+      <div class="lh-story-header">
+        <p class="lh-story-kicker mb-0">Story mode</p>
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="historiansStoryToggle" aria-pressed="false" disabled>
+          Play highlight reel
+        </button>
+      </div>
+      <p class="lh-story-copy mb-0">
+        Guided reel through this page: title page → portraits → timeline → Chapman’s preface → sources (including manuscripts). Runs once per play; Escape pauses (also stops Listen if speaking).
+      </p>
+      <p class="lh-story-voice-hint small mb-0 mt-2">
+        <strong>Voice:</strong> leave <strong>Narrate scenes</strong> checked, then click <strong>Play highlight reel</strong> (needed for autoplay policies). Narration matches the Listen bar stack; unmute the tab if you hear nothing.
+      </p>
+      <label class="lh-story-option mb-2 d-flex align-items-center gap-2">
+        <input type="checkbox" id="historiansStoryNarrate" checked />
+        <span>Narrate scenes</span>
+      </label>
+      <div class="lh-story-overlay d-none" id="historiansStoryOverlay" aria-live="polite">
+        <p class="lh-story-scene-kicker mb-1" id="historiansStorySceneKicker"></p>
+        <p class="lh-story-scene-title mb-1" id="historiansStorySceneTitle"></p>
+        <p class="lh-story-scene-copy mb-0" id="historiansStorySceneCopy"></p>
+      </div>
+    </section>
     <div id="historiansRoot" aria-live="polite">
       <p class="text-muted small mb-0">Loading historians…</p>
     </div>
+    <div class="text-center px-2 mt-3" data-lane-site-credit></div>
   </main>
+  <script src="/family/js/lane-site-credit.js"></script>
   <script src="/shared/tts.js"></script>
   <script src="/family/js/lane-tts.js"></script>
   <script src="/family/js/lane-historians.js" defer></script>

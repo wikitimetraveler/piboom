@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/shared/styles.css" />
   <link rel="stylesheet" href="/family/css/lane-shell.css" />
   <link rel="stylesheet" href="/family/css/lane-direct-ancestor-story.css" />
+  <link rel="stylesheet" href="/family/css/lane-direct-descendant-wall.css" />
   <link rel="stylesheet" href="/family/css/lane-tts.css" />
   <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
   <script src="/shared/modern-navbar.js"></script>
@@ -27,6 +28,37 @@
         <strong>American history framing:</strong> This timeline follows one direct line to connect household records with colonial settlement patterns, civic offices, and wartime transitions over generations.
       </aside>
       <p class="history-context-evidence-note mb-2"><strong>Context:</strong> general history background. <strong>Evidence:</strong> Lane-specific records/snippets.</p>
+
+      <section class="direct-story-mode" aria-label="Direct line HyperFrames story mode">
+        <div class="direct-story-header">
+          <p class="direct-story-kicker mb-0">Story mode</p>
+          <button type="button" class="btn btn-sm btn-outline-light" id="directAncestorStoryToggle" aria-pressed="false" disabled>
+            Play highlight reel
+          </button>
+        </div>
+        <p class="direct-story-copy mb-0">
+          Guided HyperFrames-style reel along <strong>this direct line</strong> from <strong>beginning to end</strong>: one beat per generation in order (oldest first → recent anchor). With <strong>Era chapter intros</strong> on, short chapter cards appear when birth centuries change. The reel runs once and stops at the last step. Press Escape while playing to pause.
+        </p>
+        <p class="direct-story-copy direct-story-voice-hint mb-0 mt-1">
+          <strong>Voice:</strong> leave <strong>Narrate scenes</strong> checked, then tap or click <strong>Play highlight reel</strong> (that counts as a user gesture—needed on phones and locked-down desktops). Narration uses the same stack as <strong>Listen</strong>: server voice when available, otherwise the browser—unmute the tab/system if you hear nothing.
+        </p>
+        <div class="direct-story-options" role="group" aria-label="Story mode options">
+          <label class="direct-story-option">
+            <input type="checkbox" id="directAncestorStoryChapters" checked />
+            <span>Era chapter intros</span>
+          </label>
+          <label class="direct-story-option">
+            <input type="checkbox" id="directAncestorStoryNarrate" checked />
+            <span>Narrate scenes</span>
+          </label>
+        </div>
+        <div class="direct-story-overlay d-none" id="directAncestorStoryOverlay" aria-live="polite">
+          <p class="direct-story-scene-kicker mb-1" id="directAncestorStorySceneKicker"></p>
+          <h2 class="direct-story-scene-title mb-1" id="directAncestorStorySceneTitle"></h2>
+          <p class="direct-story-scene-copy mb-0" id="directAncestorStorySceneCopy"></p>
+        </div>
+      </section>
+
       <nav id="directQuickNav" class="direct-quick-nav history-quick-nav" aria-label="Direct line quick jumps"></nav>
       <div id="directMeta" class="small text-muted"></div>
       <div id="directError" class="small text-warning mt-2"></div>
@@ -34,13 +66,26 @@
 
     <section id="directTimeline" class="direct-timeline"></section>
 
+    <section id="directDescendantWall" class="direct-card direct-footer mt-3 direct-descendant-wall-block ddw-section" aria-label="Direct descendant storybook wall">
+      <p class="ddw-kicker mb-1">Storybook · Direct line (forward)</p>
+      <h2 class="h5 mb-2">Direct descendant wall</h2>
+      <p class="text-muted small mb-2">
+        Same anchor as the ancestor timeline above: at each generation the chain continues through the <strong>earliest documented child</strong> (by birth year). One deterministic path through <code>laneData.json</code> links—not every descendant branch.
+      </p>
+      <p class="history-context-evidence-note mb-2"><strong>Context:</strong> general history background. <strong>Evidence:</strong> Lane-specific records/snippets.</p>
+      <nav id="descendantWallQuickNav" class="direct-quick-nav history-quick-nav mb-2" aria-label="Descendant line quick jumps"></nav>
+      <div id="descendantWallMeta" class="small text-muted mb-1"></div>
+      <div id="descendantWallError" class="small text-warning mb-2 d-none"></div>
+      <div id="descendantWallGrid" class="ddw-grid"></div>
+    </section>
+
     <section class="direct-card direct-footer mt-3">
       <details class="direct-descendant-details">
         <summary>
           <span class="h6 mb-0"><i class="bi-person-plus"></i> Add Later-Generation Descendants (Draft)</span>
         </summary>
         <p class="small text-muted mb-2 mt-2">
-          This is a local draft list for direct-line notes. It does not change `laneData.json`.
+          This is a local draft list for personal notes only; it does not change <code>laneData.json</code>. The <strong>Direct descendant wall</strong> above is graph-backed from the genealogy data.
         </p>
         <form id="descendantForm" class="row g-2 align-items-end">
           <div class="col-md-4">
@@ -67,11 +112,14 @@
     <section class="direct-card direct-footer mt-3">
       <a href="/family/lane-family.html" class="small"><i class="bi-arrow-left"></i> Back to Lane Family</a>
     </section>
+    <div class="text-center px-2 mt-2" data-lane-site-credit></div>
   </main>
 
+  <script src="/family/js/lane-site-credit.js"></script>
   <script src="/shared/tts.js"></script>
   <script src="/family/js/lane-tts.js"></script>
   <script src="/family/js/history-mode.js"></script>
+  <script src="/family/js/lane-direct-descendant-wall.js"></script>
   <script src="/family/js/lane-direct-ancestor-story.js"></script>
 </body>
 </html>

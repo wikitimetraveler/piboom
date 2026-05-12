@@ -18,6 +18,8 @@
     '/family/assets/lane-genealogies-title-spread.png';
   const PRIMARY_SOURCE_URL = 'https://archive.org/details/lanegenealogies01chap/page/n7/mode/2up';
   const NHHS_SOURCE_URL = 'https://www.nhhistory.org/object/272904/lane-family-papers-1727-1924';
+  /** Google Maps zoom for person modal Place Context (neighborhood / large parcel; was 10 = regional). */
+  const PLACE_CONTEXT_MAP_ZOOM = 17;
   const STORAGE_STORY_CHAPTERS = 'laneMemorialStoryChapters';
   const STORAGE_STORY_NARRATE = 'laneMemorialStoryNarrate';
   const STORY_SCENE_DURATION_MS = 4600;
@@ -49,6 +51,9 @@
   };
 
   let storySpeakToken = 0;
+  /** Full people array from last successful GET /people (before client filters). */
+  let cachedPeopleFull = [];
+  let lastApiTotalCount = 0;
   /** Returns the element beside which the floating scene card should sit */
   let storyFloatResolveAnchor = null;
   let storyFloatScrollBound = false;
@@ -167,10 +172,17 @@
     const accent = getMuseumAccentForPerson(person);
     const accentClass = accent == null ? '' : ` memorial-line--museum-${accent}`;
     const accentAttr = accent == null ? '' : ` data-museum-accent="${accent}"`;
+    const bookHtml = isBookOrOcrSource(person)
+      ? `<span class="memorial-source-badge" title="Entry tied to book/OCR pipeline or source refs in genealogy data">Book</span>`
+      : '';
+    const metaHtml = bookHtml ? `<span class="memorial-line-meta">${bookHtml}</span>` : '';
     return `
       <div class="memorial-line${accentClass}" role="button" tabindex="0" data-person-id="${esc(person.id)}"${accentAttr}>
-        <span class="memorial-name">${esc(person.name || 'Unknown')}</span>
-        <span class="memorial-birth"> — ${esc(birth + death)}</span>
+        <span class="memorial-line-text">
+          <span class="memorial-name">${esc(person.name || 'Unknown')}</span>
+          <span class="memorial-birth"> — ${esc(birth + death)}</span>
+        </span>
+        ${metaHtml}
       </div>`;
   }
 
@@ -747,7 +759,7 @@
       const center = { lat: result.lngLat[1], lng: result.lngLat[0] };
       memorialMap = new google.maps.Map(canvas, {
         center,
-        zoom: 10,
+        zoom: PLACE_CONTEXT_MAP_ZOOM,
         mapTypeId: google.maps.MapTypeId.HYBRID,
         streetViewControl: false,
         fullscreenControl: true
@@ -1624,9 +1636,42 @@
       button.addEventListener('click', () => {
         const mode = button.getAttribute('data-memorial-filter');
         bookOnly.checked = mode === 'book';
-        load();
+        if (cachedPeopleFull.length) applyWallFilters();
+        else load();
       });
     });
+  }
+
+  function applyWallFilters() {
+    const stat = document.getElementById('memorialStat');
+    const wallEl = document.getElementById('memorialWall');
+    const bookOnly = document.getElementById('bookOnly').checked;
+
+    let people = cachedPeopleFull.slice();
+    if (bookOnly) people = people.filter(isBookOrOcrSource);
+
+    lastRenderedPeople = people.slice();
+
+    const shownParts = [`${people.length} shown`];
+    if (bookOnly) shownParts.push('book/OCR only');
+    stat.textContent = `${shownParts.join(' · ')} · ${cachedPeopleFull.length} loaded · ${lastApiTotalCount} total in tree`;
+
+    renderWall(people);
+    storyState.scenes = buildMemorialStoryScenes(lastRenderedPeople);
+    if (storyState.running) {
+      if (!storyState.scenes.length) {
+        stopMemorialStoryMode();
+      } else {
+        memorialStoryRestartKeepPlaying();
+      }
+    } else {
+      updateStoryToggleButton();
+    }
+    applyPersonHighlightFromQuery();
+    if (!people.length) {
+      wallEl.innerHTML = `<div class="small text-muted">${HISTORY_STATE_COPY.empty}</div>`;
+      stopMemorialStoryMode();
+    }
   }
 
   async function load() {
@@ -1658,32 +1703,13 @@
         });
       }
 
-      let people = data.people;
-      const bookOnly = document.getElementById('bookOnly').checked;
-      if (bookOnly) {
-        people = people.filter(isBookOrOcrSource);
-      }
-      lastRenderedPeople = people.slice();
+      cachedPeopleFull = Array.isArray(data.people) ? data.people.slice() : [];
+      lastApiTotalCount = Number.isFinite(Number(data.count)) ? Number(data.count) : cachedPeopleFull.length;
 
-      stat.textContent = `${people.length} shown${bookOnly ? ' (filtered)' : ''} · ${data.count} total in tree`;
-
-      renderWall(people);
-      storyState.scenes = buildMemorialStoryScenes(lastRenderedPeople);
-      if (storyState.running) {
-        if (!storyState.scenes.length) {
-          stopMemorialStoryMode();
-        } else {
-          memorialStoryRestartKeepPlaying();
-        }
-      } else {
-        updateStoryToggleButton();
-      }
-      applyPersonHighlightFromQuery();
-      if (!people.length) {
-        document.getElementById('memorialWall').innerHTML = `<div class="small text-muted">${HISTORY_STATE_COPY.empty}</div>`;
-        stopMemorialStoryMode();
-      }
+      applyWallFilters();
     } catch (e) {
+      cachedPeopleFull = [];
+      lastApiTotalCount = 0;
       errBox.textContent = `${HISTORY_STATE_COPY.unavailable} ${e.message || String(e)} Verify GET ${API_BASE}/people (and optionally ${API_BASE}/prominent-lanes).`;
       errBox.classList.remove('d-none');
       document.getElementById('memorialWall').innerHTML = '';
@@ -1692,14 +1718,122 @@
     }
   }
 
-  document.getElementById('bookOnly').addEventListener('change', load);
+  function readMemorialViewFromHash() {
+    const h = String(window.location.hash || '').toLowerCase().replace(/^#/, '');
+    if (
+      h === 'memorialdescendantwall' ||
+      h.includes('descendantwall') ||
+      h === 'ancestor' ||
+      h === 'ancestorline'
+    ) {
+      return 'ancestor-line';
+    }
+    return 'wall';
+  }
+
+  function syncMemorialUrlHash(view) {
+    try {
+      const target = view === 'ancestor-line' ? '#memorialDescendantWall' : '#memorialWall';
+      if (window.location.hash !== target) window.history.replaceState(null, '', target);
+    } catch (_) {}
+  }
+
+  function setMemorialMainView(view) {
+    const main = document.querySelector('main.memorial-wrap');
+    const wallBtn = document.getElementById('memorialTabWall');
+    const ancBtn = document.getElementById('memorialTabAncestor');
+    if (!main) return;
+
+    const isAncestor = view === 'ancestor-line';
+    main.classList.toggle('memorial-main-view--wall', !isAncestor);
+    main.classList.toggle('memorial-main-view--ancestor-line', isAncestor);
+
+    if (wallBtn) {
+      const on = !isAncestor;
+      wallBtn.setAttribute('aria-selected', on ? 'true' : 'false');
+      wallBtn.classList.toggle('is-active', on);
+      wallBtn.tabIndex = on ? 0 : -1;
+    }
+    if (ancBtn) {
+      const on = isAncestor;
+      ancBtn.setAttribute('aria-selected', on ? 'true' : 'false');
+      ancBtn.classList.toggle('is-active', on);
+      ancBtn.tabIndex = on ? 0 : -1;
+    }
+
+    syncMemorialUrlHash(isAncestor ? 'ancestor-line' : 'wall');
+  }
+
+  function initMemorialMainViewTabs() {
+    const tabs = Array.from(document.querySelectorAll('.memorial-view-tab[data-memorial-view]'));
+    if (!tabs.length) return;
+
+    setMemorialMainView(readMemorialViewFromHash());
+
+    const prefersReducedMotion =
+      window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    tabs.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const mode = btn.getAttribute('data-memorial-view') === 'ancestor-line' ? 'ancestor-line' : 'wall';
+        setMemorialMainView(mode);
+        const panel =
+          mode === 'ancestor-line'
+            ? document.getElementById('memorialDescendantWall')
+            : document.getElementById('memorialWallLayout');
+        if (panel && typeof panel.scrollIntoView === 'function') {
+          panel.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+        }
+        btn.focus({ preventScroll: true });
+      });
+      btn.addEventListener('keydown', (e) => {
+        const idx = tabs.indexOf(btn);
+        if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || idx < 0) return;
+        e.preventDefault();
+        const dir = e.key === 'ArrowLeft' ? -1 : 1;
+        const ni = idx + dir;
+        if (ni >= 0 && ni < tabs.length) tabs[ni].click();
+      });
+    });
+
+    window.addEventListener('hashchange', () => setMemorialMainView(readMemorialViewFromHash()));
+  }
+
+  async function initMemorialDescendantWall() {
+    if (!window.LaneDirectDescendantWall || typeof window.LaneDirectDescendantWall.mount !== 'function') {
+      return;
+    }
+    try {
+      await window.LaneDirectDescendantWall.mount({
+        mode: 'ancestors',
+        startId: 112,
+        gridId: 'memorialDescendantGrid',
+        metaId: 'memorialDescendantMeta',
+        errorId: 'memorialDescendantError',
+        quickNavId: 'memorialDescendantQuickNav',
+        idPrefix: 'memorial-descendant-step'
+      });
+      if (typeof window.initHistoryQuickNav === 'function') {
+        window.initHistoryQuickNav({ selector: '#memorialDescendantQuickNav a[href^="#"]' });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  document.getElementById('bookOnly').addEventListener('change', () => {
+    if (cachedPeopleFull.length) applyWallFilters();
+    else load();
+  });
   wireClicks();
   initQuickFilters();
   initMemorialStoryMode();
   initMemorialFlash();
+  initMemorialMainViewTabs();
   if (typeof window.initHistoryQuickNav === 'function') {
-    window.initHistoryQuickNav({ selector: '.history-quick-link[href^="#"]' });
+    window.initHistoryQuickNav({ selector: '.memorial-onboarding a.history-quick-link[href^="#"]' });
   }
   load();
+  initMemorialDescendantWall();
   ensureEraDatasets().catch(() => {});
 })();
