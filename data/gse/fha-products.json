@@ -6,12 +6,47 @@
       "name": "FHA forward (203(b))",
       "tag": "fha",
       "sourceRefs": ["FHA_HANDBOOK"],
+      "guidance": {
+        "eligibilityNarrative": "FHA-insured forward mortgage path for owner-occupant scenarios with policy-driven credit, collateral, and mortgage-insurance execution controls.",
+        "keyRequirements": [
+          "Primary occupancy and FHA case assignment compliance.",
+          "Minimum investment and MI premium treatment.",
+          "TOTAL/manual underwriting requirements where applicable."
+        ],
+        "documentationExpectations": [
+          "Income and asset verification with FHA treatment rules.",
+          "Gift/dpa source and transfer documentation.",
+          "Property appraisal and MPR/MPS compliance evidence."
+        ],
+        "edgeCases": [
+          "Manual-underwrite with high DTI and limited reserves.",
+          "Non-traditional credit profile documentation.",
+          "Property condition repairs delaying close."
+        ],
+        "commonDenialReasons": [
+          "DTI/residual capacity outside lender overlay tolerance.",
+          "Ineligible occupancy/purpose path.",
+          "Collateral or condition issues unresolved."
+        ],
+        "overlayCaveats": [
+          "Lenders often apply stricter DTI/credit overlays than FHA baseline.",
+          "Manual underwrite may trigger reserve overlays."
+        ],
+        "compensatingFactors": [
+          "Strong residual cash flow and payment history.",
+          "Lower payment shock and stable income trend."
+        ],
+        "workflowNotes": [
+          "Confirm MIP structure and disclosures early.",
+          "Track FHA-specific underwriting conditions distinctly."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 96.5,
         "maxCltv": 96.5,
         "minFico": 580,
         "maxDti": 50,
-        "allowedOccupancy": ["primary", "secondHome", "investment"],
+        "allowedOccupancy": ["primary"],
         "allowedPurpose": ["purchase", "rateTermRefi", "cashOutRefi"],
         "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
       }
@@ -21,12 +56,47 @@
       "name": "FHA streamline refinance",
       "tag": "fha",
       "sourceRefs": ["FHA_HANDBOOK"],
+      "guidance": {
+        "eligibilityNarrative": "FHA streamline refinance path emphasizing net tangible benefit, seasoning/payment-history standards, and limited documentation execution per current FHA policy and investor overlays.",
+        "keyRequirements": [
+          "Existing FHA-insured loan with required payment history/seasoning.",
+          "Net tangible benefit and recoupment criteria satisfied.",
+          "Occupancy and case-number assignment compliance."
+        ],
+        "documentationExpectations": [
+          "Payment history support and current loan details.",
+          "NTB worksheet and rate/term comparison evidence.",
+          "MIP and fee disclosure package."
+        ],
+        "edgeCases": [
+          "Recent delinquency history and timing concerns.",
+          "Escrow/impound changes affecting payment calculation.",
+          "Overlay seasoning requirements beyond FHA baseline."
+        ],
+        "commonDenialReasons": [
+          "NTB threshold not satisfied.",
+          "Seasoning/payment history misses investor standards.",
+          "Overlay credit floor not met."
+        ],
+        "overlayCaveats": [
+          "Investors may apply stricter credit overlays to streamline loans.",
+          "Manual downgrade or reduced-doc restrictions can differ by investor."
+        ],
+        "compensatingFactors": [
+          "Strong payment history with measurable monthly benefit.",
+          "Stable occupancy/payment profile."
+        ],
+        "workflowNotes": [
+          "Validate NTB and recoupment before lock.",
+          "Track investor-specific streamline overlays at intake."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 97.75,
         "maxCltv": 97.75,
         "minFico": 580,
         "maxDti": 50,
-        "allowedOccupancy": ["primary", "secondHome", "investment"],
+        "allowedOccupancy": ["primary"],
         "allowedPurpose": ["rateTermRefi"],
         "allowedPropertyTypes": ["singleFamily", "condo", "pud", "2unit", "3unit", "4unit"]
       }
@@ -36,6 +106,41 @@
       "name": "FHA Limited 203(k)",
       "tag": "fha",
       "sourceRefs": ["FHA_HANDBOOK"],
+      "guidance": {
+        "eligibilityNarrative": "FHA 203(k) limited renovation path for owner-occupied properties with capped rehab scope and project controls.",
+        "keyRequirements": [
+          "Primary occupancy and eligible limited-rehab scope.",
+          "Contractor package and repair plan support.",
+          "As-completed value and draw controls per policy."
+        ],
+        "documentationExpectations": [
+          "Contractor bids and feasibility documentation.",
+          "As-improved appraisal references.",
+          "Escrow and draw administration package."
+        ],
+        "edgeCases": [
+          "Ineligible repair scope for limited program variant.",
+          "Contractor credential/doc gaps.",
+          "Budget overruns impacting CLTV/DTI."
+        ],
+        "commonDenialReasons": [
+          "Repair scope exceeds limited 203(k) allowances.",
+          "Collateral/condition profile not acceptable.",
+          "Overlay reserve or credit standards not met."
+        ],
+        "overlayCaveats": [
+          "Investors may tighten documentation and reserve standards for renovation files.",
+          "Some overlays limit contractor/project concentration."
+        ],
+        "compensatingFactors": [
+          "Strong reserves and conservative leverage profile.",
+          "Complete contractor package with clear timeline."
+        ],
+        "workflowNotes": [
+          "Validate rehab scope and contractor docs before underwriting.",
+          "Coordinate draw tracking with closing and post-close."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 96.5,
         "maxCltv": 110,

@@ -23,6 +23,28 @@
         </p>
       </div>
 
+      <div class="card shadow-sm mb-3 gse-pipeline-card">
+        <div class="card-body py-3">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+              <label class="form-label small text-muted mb-0" for="gsePipelineLoanId">Pipeline loan id</label>
+              <input type="number" class="form-control form-control-sm" id="gsePipelineLoanId" min="1" placeholder="e.g. 42" />
+            </div>
+            <div class="col-md-auto">
+              <button type="button" class="btn btn-sm btn-outline-primary" id="btnLoadPipeline">
+                <i class="bi bi-cloud-download me-1" aria-hidden="true"></i>Load from Encompass (pipeline)
+              </button>
+            </div>
+            <div class="col-md">
+              <p class="small text-muted mb-0" id="gsePipelineStatus" role="status" aria-live="polite" aria-atomic="true">
+                Requires a pipeline row with <code>encompass_loan_guid</code>. Calls <code>GET /api/loan-pipeline/loans/:id</code> then
+                <code>POST /api/encompass-hub/loans/…/field-reader</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="row g-3 mb-3">
         <div class="col-md-4">
           <div class="card gse-summary-card shadow-sm h-100">
@@ -39,14 +61,16 @@
                 <dd class="col-7" id="gseLimit">—</dd>
                 <dt class="col-5">Products loaded</dt>
                 <dd class="col-7" id="gseProductCount">—</dd>
+                <dt class="col-5">Overlay issues</dt>
+                <dd class="col-7" id="gseOverlayIssues">—</dd>
               </dl>
               <p class="small text-warning mt-2 mb-0 d-none" id="gseInputWarnings"></p>
             </div>
           </div>
         </div>
         <div class="col-md-8">
-          <div class="card shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="card shadow-sm gse-scenario-card">
+            <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
               <span>Scenario (no PII)</span>
               <div class="btn-group btn-group-sm">
                 <button type="button" class="btn btn-primary" id="btnAnalyze">Analyze</button>
@@ -54,7 +78,13 @@
               </div>
             </div>
             <div class="card-body">
-              <div class="row g-2 small">
+              <p class="small text-muted gse-section-subtitle mb-3">
+                Enter a clean, non-PII scenario. The analyzer compares agency and overlay-aware fit using guide-grounded rules.
+              </p>
+
+              <fieldset class="gse-form-group mb-3">
+                <legend class="gse-form-group__legend">Borrower profile</legend>
+                <div class="row g-2 small">
                 <div class="col-md-3">
                   <label class="form-label">Credit score</label>
                   <input type="number" class="form-control" id="creditScore" value="720" />
@@ -74,6 +104,12 @@
                   <label class="form-label">AMI % (optional)</label>
                   <input type="number" class="form-control" id="amiPercent" value="78" />
                 </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="gse-form-group mb-3">
+                <legend class="gse-form-group__legend">Property and loan structure</legend>
+                <div class="row g-2 small">
                 <div class="col-md-3">
                   <label class="form-label">Loan amount</label>
                   <input type="number" class="form-control" id="loanAmount" value="725000" />
@@ -129,6 +165,12 @@
                     <option value="4unit">4 units</option>
                   </select>
                 </div>
+                </div>
+              </fieldset>
+
+              <fieldset class="gse-form-group">
+                <legend class="gse-form-group__legend">Risk and underwriting signals</legend>
+                <div class="row g-2 small">
                 <div class="col-md-3">
                   <label class="form-label">DTI %</label>
                   <input type="number" class="form-control" id="dti" value="43" />
@@ -137,22 +179,190 @@
                   <label class="form-label">Reserves (months)</label>
                   <input type="number" class="form-control" id="reservesMonths" value="2" />
                 </div>
-              </div>
-              <label class="form-label mt-3">Or paste full scenario JSON (overrides form)</label>
-              <textarea class="form-control font-monospace small" id="jsonPaste" rows="5" placeholder='{"borrower":{...},"loan":{...},"risk":{...}}'></textarea>
+                <div class="col-md-3">
+                  <label class="form-label">Manual underwrite</label>
+                  <select class="form-select" id="manualUnderwrite">
+                    <option value="false" selected>No</option>
+                    <option value="true">Yes</option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">USDA eligible area</label>
+                  <select class="form-select" id="usdaEligibleArea">
+                    <option value="">Unknown</option>
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                  </select>
+                </div>
+                </div>
+              </fieldset>
+
+              <label class="form-label mt-3" for="jsonPaste">Or paste full scenario JSON (overrides form)</label>
+              <textarea class="form-control font-monospace small" id="jsonPaste" rows="5" aria-describedby="gseJsonHelp" placeholder='{"borrower":{...},"loan":{...},"risk":{...}}'></textarea>
+              <p class="small text-muted mt-2 mb-0" id="gseJsonHelp">
+                Use this for exact scenario replay from other systems. Form values are ignored when JSON is present.
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      <h2 class="h5 mb-2">Product fit</h2>
-      <div id="gseProductsGrid" class="ag-theme-alpine" style="height: 320px; width: 100%"></div>
+      <section class="gse-exhibit-section mb-4 d-none" id="gseExhibitSection" aria-label="Program fit by agency">
+        <h2 class="h5 mb-3">Program intelligence (by agency)</h2>
+        <p class="small text-muted mb-3">
+          <strong>Context:</strong> what each investor or government program generally covers.
+          <strong>Evidence:</strong> counts from this page’s last analysis run only—not DU/LPA/TOTAL.
+        </p>
+        <div class="row g-3" id="gseExhibitRow">
+          <div class="col-lg-3 col-md-6">
+            <article class="gse-exhibit-card" data-agency="fannie">
+              <div class="gse-exhibit-kicker">GSE</div>
+              <h3 class="h6 mb-1">Fannie Mae</h3>
+              <p class="small gse-exhibit-context mb-2">Conforming conventional and specialty products (e.g. HomeReady).</p>
+              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitFannieEvidence">
+                Confirm current Fannie Mae Selling Guide and SPC eligibility for this scenario. Do not rely on this tool for DU findings or approval.
+              </p>
+              <p class="small text-muted mb-2" id="gseExhibitFannieRun">Run Analyze to populate counts.</p>
+              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFannieCounts"></dl>
+            </article>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <article class="gse-exhibit-card" data-agency="freddie">
+              <div class="gse-exhibit-kicker">GSE</div>
+              <h3 class="h6 mb-1">Freddie Mac</h3>
+              <p class="small gse-exhibit-context mb-2">Conforming conventional paths (e.g. Home Possible).</p>
+              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitFreddieEvidence">
+                Confirm current Freddie Mac Seller/Servicer Guide and bulletin eligibility for this scenario. Do not rely on this tool for LPA findings or approval.
+              </p>
+              <p class="small text-muted mb-2" id="gseExhibitFreddieRun">Run Analyze to populate counts.</p>
+              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFreddieCounts"></dl>
+            </article>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <article class="gse-exhibit-card gse-exhibit-card--gov" data-agency="fha">
+              <div class="gse-exhibit-kicker">Government</div>
+              <h3 class="h6 mb-1">FHA (HUD)</h3>
+              <p class="small gse-exhibit-context mb-2">Government-insured forward and streamline paths (Handbook 4000.1).</p>
+              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitFhaEvidence">
+                Confirm current HUD FHA Handbook 4000.1 and applicable Mortgagee Letters. Do not rely on this tool for FHA TOTAL Scorecard or approval.
+              </p>
+              <p class="small text-muted mb-2" id="gseExhibitFhaRun">Run Analyze to populate counts.</p>
+              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFhaCounts"></dl>
+            </article>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <article class="gse-exhibit-card gse-exhibit-card--gov" data-agency="va">
+              <div class="gse-exhibit-kicker">Government</div>
+              <h3 class="h6 mb-1">VA</h3>
+              <p class="small gse-exhibit-context mb-2">VA-guaranteed programs (Pamphlet 26-7).</p>
+              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitVaEvidence">
+                Confirm current VA Lenders Handbook (VA Pamphlet 26-7) and VA circulars for this scenario. VA residual income, COE, and funding fee rules are not modeled in this prototype.
+              </p>
+              <p class="small text-muted mb-2" id="gseExhibitVaRun">Run Analyze to populate counts.</p>
+              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitVaCounts"></dl>
+            </article>
+          </div>
+          <div class="col-lg-3 col-md-6">
+            <article class="gse-exhibit-card gse-exhibit-card--gov" data-agency="usda">
+              <div class="gse-exhibit-kicker">Government</div>
+              <h3 class="h6 mb-1">USDA</h3>
+              <p class="small gse-exhibit-context mb-2">USDA rural housing guaranteed programs (HB-1-3555).</p>
+              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitUsdaEvidence">
+                Confirm current USDA handbook (HB-1-3555), eligible-area map, and household income limits before recommendation.
+              </p>
+              <p class="small text-muted mb-2" id="gseExhibitUsdaRun">Run Analyze to populate counts.</p>
+              <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitUsdaCounts"></dl>
+            </article>
+          </div>
+        </div>
+      </section>
 
-      <h2 class="h5 mt-4 mb-2">Suggestions</h2>
-      <div id="gseSuggestionsGrid" class="ag-theme-alpine" style="height: 180px; width: 100%"></div>
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+        <h2 class="h5 mb-0">Product fit <span class="gse-inline-count" id="gseProductRowCount">0 rows</span></h2>
+        <div class="btn-group btn-group-sm" role="group" aria-label="Filter products by agency">
+          <button type="button" class="btn btn-outline-secondary active" id="gseFilterAll">All</button>
+          <button type="button" class="btn btn-outline-secondary" id="gseFilterGse">GSE only</button>
+          <button type="button" class="btn btn-outline-secondary" id="gseFilterFha">FHA</button>
+          <button type="button" class="btn btn-outline-secondary" id="gseFilterVa">VA</button>
+          <button type="button" class="btn btn-outline-secondary" id="gseFilterUsda">USDA</button>
+        </div>
+      </div>
+      <p class="small text-muted gse-section-subtitle mb-2">Status and score are directional. Review reasons/warnings and overlay findings before lock.</p>
+      <div class="card shadow-sm gse-grid-card mb-3">
+        <div class="card-body p-2 p-md-3">
+          <div id="gseProductsGrid" class="ag-theme-alpine" style="height: 320px; width: 100%"></div>
+        </div>
+      </div>
+
+      <h2 class="h5 mt-4 mb-2">Suggestions <span class="gse-inline-count" id="gseSuggestionCount">0 items</span></h2>
+      <div class="card shadow-sm gse-grid-card">
+        <div class="card-body p-2 p-md-3">
+          <div id="gseSuggestionsGrid" class="ag-theme-alpine" style="height: 180px; width: 100%"></div>
+        </div>
+      </div>
+
+      <section class="card shadow-sm mt-4 gse-ai-card">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+          <span><i class="bi bi-stars me-1"></i>AI Loan Program Expert</span>
+          <small class="text-muted">Rule-grounded guidance with citations and overlay operations</small>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap gap-2 mb-2">
+            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="Compare Fannie HomeReady vs Freddie Home Possible for this scenario.">Compare affordable options</button>
+            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="What investor overlay issues are most likely to stop this file?">Check overlay blockers</button>
+            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="If this loan is denied by overlays, what should operations do next?">Ops next steps</button>
+            <button type="button" class="btn btn-sm btn-outline-primary gse-ai-chip" data-prompt="What documents do we need upfront for the best-fit programs?">Required docs upfront</button>
+          </div>
+          <div class="row g-2">
+            <div class="col-md-9">
+              <label class="form-label">Ask the expert</label>
+              <textarea class="form-control" id="gseAiQuestion" rows="3" aria-describedby="gseAiHelp" placeholder="Ask about product fit, overlays, denials, docs, investor strategy, or USDA/FHA/VA/GSE differences."></textarea>
+              <p class="small text-muted mt-2 mb-0" id="gseAiHelp">
+                Best results: ask one scenario-specific question at a time (program compare, overlay blockers, docs, or next-step ops).
+              </p>
+            </div>
+            <div class="col-md-3 d-flex flex-column justify-content-end gap-2">
+              <button type="button" class="btn btn-primary" id="btnAskLoanExpert">Ask AI Expert</button>
+              <small class="text-muted" id="gseAiStatus" role="status" aria-live="polite" aria-atomic="true">Uses /api/gse/loan-program-expert and /api/finance/loan-program-expert.</small>
+            </div>
+          </div>
+          <div class="mt-3 gse-ai-result d-none" id="gseAiResult" tabindex="-1" aria-label="AI recommendation results">
+            <h3 class="h6 mb-1" id="gseAiRecommendationTitle">Recommendation</h3>
+            <p class="mb-2" id="gseAiRecommendationText"></p>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <article class="gse-ai-subcard">
+                  <h4 class="h6">Rationale</h4>
+                  <ul class="small" id="gseAiRationale"></ul>
+                </article>
+              </div>
+              <div class="col-md-6">
+                <article class="gse-ai-subcard">
+                  <h4 class="h6">Required verifications</h4>
+                  <ul class="small" id="gseAiVerifications"></ul>
+                </article>
+              </div>
+              <div class="col-md-6">
+                <article class="gse-ai-subcard">
+                  <h4 class="h6">Overlay risks</h4>
+                  <ul class="small" id="gseAiOverlayRisks"></ul>
+                </article>
+              </div>
+              <div class="col-md-6">
+                <article class="gse-ai-subcard">
+                  <h4 class="h6">Citations</h4>
+                  <ul class="small" id="gseAiCitations"></ul>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
-    <script src="/js/gse-analyzer.js"></script>
+    <script src="/shared/encompass-api.js" defer></script>
+    <script src="/shared/gse-encompass-field-map.js" defer></script>
+    <script src="/js/gse-analyzer.js" defer></script>
   </body>
 </html>

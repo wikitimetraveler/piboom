@@ -71,15 +71,29 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/loan-pipeline/ai/analyze` | Analyze dashboard |
 | GET | `/api/loan-pipeline/ai/history` | Conversation history |
 
-## GSE scenario analyzer (public rules / FHFA sample data)
+## GSE scenario analyzer (public rules, investor overlays, FHFA sample data)
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/gse/products` | Merged Fannie/Freddie product catalog from `data/gse/*.json` |
-| GET | `/api/gse/sources` | `rule-metadata.json`: disclaimers and official doc URLs |
-| POST | `/api/gse/analyze-scenario` | Body: non-PII scenario JSON → summary, product fit rows, suggestions |
+| GET | `/api/gse/products` | Merged Fannie/Freddie/FHA/VA/USDA product catalog from `data/gse/*.json` |
+| GET | `/api/gse/sources` | `rule-metadata.json` + overlay catalog metadata (count/version) |
+| POST | `/api/gse/analyze-scenario` | Body: non-PII scenario JSON → summary, product fit rows, explanation fields, overlay findings, suggestions |
 | POST | `/api/gse/import-loan-json` | Validate + normalize scenario JSON (same shape as analyze); no persistence |
 | GET | `/api/gse/loan-limits` | Query `state`, `county`, `units` → bundled FHFA sample limit row |
+| POST | `/api/gse/loan-program-expert` | Dedicated GSE AI advisor response (recommendation, verifications, overlay risks, citations) |
+| POST | `/api/finance/loan-program-expert` | Shared finance AI advisor endpoint (same contract as `/api/gse/loan-program-expert`) |
+
+### GSE AI endpoint response shape
+
+`POST /api/gse/loan-program-expert` and `/api/finance/loan-program-expert` return:
+
+- `recommendation`: top product recommendation text
+- `rationale[]`: explanation bullets
+- `requiredVerifications[]`: checklist before lock/final recommendation
+- `overlayRisks[]`: investor overlay operations items (investor/title/severity/status/reasons)
+- `productsConsidered[]`: top product summaries with next steps
+- `citations[]`: source references from `data/gse/rule-metadata.json`
+- `sourceDisclaimer`: guide-disclaimer string for compliance context
 
 ## Disasters
 

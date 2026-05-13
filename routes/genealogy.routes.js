@@ -11,6 +11,8 @@ import {
   getMuseumContentData,
   getFeaturedStoryData,
   getProminentLanesData,
+  getLaneTradingCardsData,
+  getLaneTradingCardData,
   getLanePdfGallery,
   getLanePdfGalleryHides,
   postLanePdfGalleryHidePlate,
@@ -59,6 +61,8 @@ router.get('/musical-timeline', getMusicalTimeline);
 router.get('/museum-content', getMuseumContentData);
 router.get('/featured-story', getFeaturedStoryData);
 router.get('/prominent-lanes', getProminentLanesData);
+router.get('/lane-cards', getLaneTradingCardsData);
+router.get('/lane-cards/:cardId', getLaneTradingCardData);
 router.get('/lane-pdf/gallery', getLanePdfGallery);
 router.get('/lane-pdf/hides', getLanePdfGalleryHides);
 router.post('/lane-pdf/hides', postLanePdfGalleryHidePlate);

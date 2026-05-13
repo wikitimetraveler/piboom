@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, and FHA materials. It is not underwriting, not DU/LPA/TOTAL, and not a commitment to lend. Always confirm eligibility in the current official guides and through your AUS / compliance process.",
+  "version": "1.1.0",
+  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, FHA, and USDA materials, plus lender/investor overlay examples. It is informational decision support only, not underwriting, not DU/LPA/TOTAL/GUS, and not a commitment to lend. Always confirm eligibility in current agency guides, AUS findings, investor overlays, and compliance policy.",
   "sources": [
     {
       "id": "FANNIE_SELLING_GUIDE",
@@ -46,6 +46,21 @@
       "id": "FHA_4000_1",
       "title": "HUD FHA Single Family Housing Policy Handbook 4000.1",
       "url": "https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1"
+    },
+    {
+      "id": "USDA_HB_3555",
+      "title": "USDA Single Family Housing Guaranteed Loan Program Handbook (HB-1-3555)",
+      "url": "https://www.rd.usda.gov/resources/regulations/handbooks"
+    },
+    {
+      "id": "USDA_ELIGIBILITY",
+      "title": "USDA Income and Property Eligibility",
+      "url": "https://eligibility.sc.egov.usda.gov/eligibility/welcomeAction.do"
+    },
+    {
+      "id": "INVESTOR_OVERLAYS",
+      "title": "Investor Overlay Operations Reference (internal modeling profile)",
+      "url": "https://singlefamily.fanniemae.com/originating-underwriting"
     }
   ],
   "sourceRefs": {
@@ -72,6 +87,18 @@
     "FHA_HANDBOOK": {
       "title": "HUD FHA Handbook 4000.1",
       "url": "https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1"
+    },
+    "USDA_GUIDE": {
+      "title": "USDA Guaranteed Loan Program Handbook (HB-1-3555)",
+      "url": "https://www.rd.usda.gov/resources/regulations/handbooks"
+    },
+    "USDA_ELIGIBILITY_TOOL": {
+      "title": "USDA household income and eligible-area checks",
+      "url": "https://eligibility.sc.egov.usda.gov/eligibility/welcomeAction.do"
+    },
+    "INVESTOR_OVERLAY_REF": {
+      "title": "Lender/investor overlay operations reference",
+      "url": "https://singlefamily.fanniemae.com/originating-underwriting"
     }
   }
 }

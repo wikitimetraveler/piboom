@@ -30,7 +30,9 @@
     "extract:lane-frontispiece-portraits": "node scripts/tools/extract-lane-frontispiece-portraits.mjs",
     "scan:lane-pdf-blanks": "node scripts/tools/scan-lane-pdf-blank-plates.mjs",
     "strip:lane-military-engagements": "node scripts/tools/strip-lane-military-engagements.mjs",
-    "strip:lane-military-engagements:write": "node scripts/tools/strip-lane-military-engagements.mjs --write"
+    "strip:lane-military-engagements:write": "node scripts/tools/strip-lane-military-engagements.mjs --write",
+    "export:lane-trading-cards-snapshot": "node scripts/tools/export-lane-trading-cards-snapshot.mjs",
+    "migrate:lane-json-postgres": "node scripts/migrate-lane-json-to-postgres.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",

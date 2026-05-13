@@ -41,7 +41,7 @@ describe('gse-scenario.service', () => {
     expect(out.summary.conformingStatus).toBe('within-limit');
     expect(out.summary.bestFit).not.toBe('none');
     expect(Array.isArray(out.products)).toBe(true);
-    expect(out.products.length).toBeGreaterThanOrEqual(12);
+    expect(out.products.length).toBeGreaterThanOrEqual(15);
     for (const p of out.products) {
       expect(
         p.warnings.some(
@@ -49,7 +49,8 @@ describe('gse-scenario.service', () => {
             w.includes('Selling Guide') ||
             w.includes('Seller/Servicer') ||
             w.includes('VA Lenders') ||
-            w.includes('HUD FHA')
+            w.includes('HUD FHA') ||
+            w.includes('USDA')
         )
       ).toBe(true);
     }

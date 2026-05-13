@@ -1,0 +1,155 @@
+{
+  "agency": "USDA",
+  "products": [
+    {
+      "id": "guaranteed-purchase",
+      "name": "USDA guaranteed purchase",
+      "tag": "usda",
+      "sourceRefs": ["USDA_GUIDE", "USDA_ELIGIBILITY_TOOL"],
+      "guidance": {
+        "eligibilityNarrative": "USDA single-family guaranteed purchase path for eligible rural/suburban areas with household-income limits and primary-occupancy requirements.",
+        "keyRequirements": [
+          "Property must be in USDA-eligible geography at time of decision.",
+          "Household income must meet applicable USDA limits for area/household size.",
+          "Primary occupancy and agency underwriting requirements apply."
+        ],
+        "documentationExpectations": [
+          "USDA eligibility report (address + household income check).",
+          "Income package including household member income considerations.",
+          "Guarantee fee and annual fee disclosure calculations."
+        ],
+        "edgeCases": [
+          "Boundary properties where eligibility map updates change status.",
+          "Household-income treatment for non-borrowing adults.",
+          "Manual underwrite/reserve overlays by investor."
+        ],
+        "commonDenialReasons": [
+          "Property in ineligible area at time of underwriting.",
+          "Household income exceeds USDA threshold.",
+          "Overlay credit/DTI restrictions exceed baseline USDA tolerance."
+        ],
+        "overlayCaveats": [
+          "Many investors require minimum credit overlays above agency minimum assumptions.",
+          "Manual underwrite and reserve overlays are common."
+        ],
+        "compensatingFactors": [
+          "Verified reserves and stable repayment profile.",
+          "Lower DTI after accurate household-income treatment."
+        ],
+        "workflowNotes": [
+          "Run USDA area/income eligibility at intake and before final approval.",
+          "Document household-income logic for QC clarity."
+        ]
+      },
+      "rules": {
+        "maxLtvPrimaryPurchase": 100,
+        "maxCltv": 100,
+        "minFico": 640,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary"],
+        "allowedPurpose": ["purchase"],
+        "allowedPropertyTypes": ["singleFamily", "pud", "condo"]
+      }
+    },
+    {
+      "id": "streamlined-assist-refi",
+      "name": "USDA streamlined assist refinance",
+      "tag": "usda",
+      "sourceRefs": ["USDA_GUIDE", "USDA_ELIGIBILITY_TOOL"],
+      "guidance": {
+        "eligibilityNarrative": "USDA streamlined assist refinance for existing USDA borrowers, emphasizing payment benefit and seasoning/payment-history requirements.",
+        "keyRequirements": [
+          "Existing USDA guaranteed/qualified loan history.",
+          "Required payment reduction/benefit tests must be met.",
+          "Program seasoning and payment-history thresholds apply."
+        ],
+        "documentationExpectations": [
+          "Current USDA loan profile and payment history.",
+          "Benefit/payment-reduction worksheet.",
+          "Fee and guarantee-treatment disclosures."
+        ],
+        "edgeCases": [
+          "Short seasoning windows near eligibility threshold.",
+          "Escrow changes affecting payment-benefit calculation.",
+          "Investor overlays on credit history."
+        ],
+        "commonDenialReasons": [
+          "Payment benefit threshold not achieved.",
+          "Insufficient seasoning/payment history.",
+          "Overlay minimums not met."
+        ],
+        "overlayCaveats": [
+          "Some investors apply stricter payment-history overlays than agency minimums.",
+          "Credit overlays may still apply on streamline executions."
+        ],
+        "compensatingFactors": [
+          "Strong payment history and clear monthly savings.",
+          "Stable occupancy and reduced risk profile."
+        ],
+        "workflowNotes": [
+          "Confirm streamline-assist eligibility before lock.",
+          "Retain clear benefit-test documentation in file."
+        ]
+      },
+      "rules": {
+        "maxLtvPrimaryPurchase": 100,
+        "maxCltv": 100,
+        "minFico": 640,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary"],
+        "allowedPurpose": ["rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "pud", "condo"]
+      }
+    },
+    {
+      "id": "streamlined-standard-refi",
+      "name": "USDA streamlined standard refinance",
+      "tag": "usda",
+      "sourceRefs": ["USDA_GUIDE", "USDA_ELIGIBILITY_TOOL"],
+      "guidance": {
+        "eligibilityNarrative": "USDA streamlined standard refinance for eligible existing USDA borrowers requiring broader qualification support than assist paths.",
+        "keyRequirements": [
+          "Existing USDA path eligibility and acceptable payment history.",
+          "Income/asset/credit documentation per current policy and lender execution path.",
+          "Primary occupancy and property eligibility checks remain required."
+        ],
+        "documentationExpectations": [
+          "Income and credit verification package.",
+          "Payment history and payoff profile support.",
+          "Benefit and fee treatment documentation."
+        ],
+        "edgeCases": [
+          "Borderline DTI with manual-underwrite considerations.",
+          "Income variability complicating qualification.",
+          "Eligibility-map updates impacting property status."
+        ],
+        "commonDenialReasons": [
+          "Qualification profile outside policy or investor overlay tolerance.",
+          "Insufficient refinance benefit documentation.",
+          "Property/occupancy eligibility mismatch."
+        ],
+        "overlayCaveats": [
+          "Investors commonly add reserves/DTI overlays to standard streamlined paths.",
+          "Credit overlays may be tighter than agency baseline assumptions."
+        ],
+        "compensatingFactors": [
+          "Strong reserves and low payment shock.",
+          "Improved monthly obligation and stable income trend."
+        ],
+        "workflowNotes": [
+          "Validate eligibility map and occupancy near final approval.",
+          "Capture full qualification audit trail for overlays."
+        ]
+      },
+      "rules": {
+        "maxLtvPrimaryPurchase": 100,
+        "maxCltv": 100,
+        "minFico": 640,
+        "maxDti": 50,
+        "allowedOccupancy": ["primary"],
+        "allowedPurpose": ["rateTermRefi"],
+        "allowedPropertyTypes": ["singleFamily", "pud", "condo"]
+      }
+    }
+  ]
+}

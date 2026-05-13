@@ -1,0 +1,123 @@
+{
+  "version": "2026.1",
+  "note": "Illustrative investor overlay matrix for workflow guidance only. Do not treat as pricing or commitment policy.",
+  "overlays": [
+    {
+      "id": "ovl-gse-investor-a-fico-primary",
+      "investor": "Investor A",
+      "title": "Conventional primary occupancy credit floor",
+      "agencyScope": ["Fannie Mae", "Freddie Mac"],
+      "overlayType": "credit",
+      "severity": "hard-stop",
+      "effectiveDate": "2026-01-01",
+      "sourceRefs": ["INVESTOR_OVERLAY_REF"],
+      "conditions": {
+        "occupancy": ["primary"],
+        "minFico": 660
+      },
+      "operationsNote": "If credit score is below 660, move to alternate investor or improve credit profile before lock."
+    },
+    {
+      "id": "ovl-gse-investor-a-investment-dti",
+      "investor": "Investor A",
+      "title": "Investment DTI cap",
+      "agencyScope": ["Fannie Mae", "Freddie Mac"],
+      "overlayType": "dti",
+      "severity": "hard-stop",
+      "effectiveDate": "2026-01-01",
+      "sourceRefs": ["INVESTOR_OVERLAY_REF"],
+      "conditions": {
+        "occupancy": ["investment"],
+        "maxDti": 45
+      },
+      "operationsNote": "Investment occupancy above 45 DTI requires investor exception or program change."
+    },
+    {
+      "id": "ovl-fha-investor-b-manual",
+      "investor": "Investor B",
+      "title": "FHA manual underwrite reserves",
+      "agencyScope": ["FHA"],
+      "overlayType": "manual-underwrite",
+      "severity": "requires-exception",
+      "effectiveDate": "2026-01-01",
+      "sourceRefs": ["FHA_HANDBOOK", "INVESTOR_OVERLAY_REF"],
+      "conditions": {
+        "manualUnderwriteOnly": true,
+        "minReservesMonths": 3
+      },
+      "operationsNote": "Manual underwrite FHA files require at least 3 months reserves at this investor."
+    },
+    {
+      "id": "ovl-va-investor-c-fico",
+      "investor": "Investor C",
+      "title": "VA minimum FICO",
+      "agencyScope": ["VA"],
+      "overlayType": "credit",
+      "severity": "hard-stop",
+      "effectiveDate": "2026-01-01",
+      "sourceRefs": ["VA_HANDBOOK", "INVESTOR_OVERLAY_REF"],
+      "conditions": {
+        "minFico": 620
+      },
+      "operationsNote": "VA files below 620 are ineligible at this investor regardless of residual-income strength."
+    },
+    {
+      "id": "ovl-va-investor-c-cashout-ltv",
+      "investor": "Investor C",
+      "title": "VA cash-out LTV cap",
+      "agencyScope": ["VA"],
+      "overlayType": "ltv",
+      "severity": "hard-stop",
+      "effectiveDate": "2026-01-01",
+      "sourceRefs": ["VA_HANDBOOK", "INVESTOR_OVERLAY_REF"],
+      "conditions": {
+        "purpose": ["cashOutRefi"],
+        "maxLtv": 90
+      },
+      "operationsNote": "Cash-out transactions above 90 LTV require different investor strategy."
+    },
+    {
+      "id": "ovl-usda-investor-d-fico",
+      "investor": "Investor D",
+      "title": "USDA credit overlay",
+      "agencyScope": ["USDA"],
+      "overlayType": "credit",
+      "severity": "hard-stop",
+      "effectiveDate": "2026-01-01",
+      "sourceRefs": ["USDA_GUIDE", "INVESTOR_OVERLAY_REF"],
+      "conditions": {
+        "minFico": 640
+      },
+      "operationsNote": "USDA submissions below 640 require alternate investor or exception path."
+    },
+    {
+      "id": "ovl-usda-investor-d-dti",
+      "investor": "Investor D",
+      "title": "USDA DTI overlay",
+      "agencyScope": ["USDA"],
+      "overlayType": "dti",
+      "severity": "requires-exception",
+      "effectiveDate": "2026-01-01",
+      "sourceRefs": ["USDA_GUIDE", "INVESTOR_OVERLAY_REF"],
+      "conditions": {
+        "maxDti": 46
+      },
+      "operationsNote": "DTI above 46 may require documented compensating factors and investor approval."
+    },
+    {
+      "id": "ovl-crossinvestor-reserves-high-ltv",
+      "investor": "Cross-Investor Common",
+      "title": "High-LTV reserve floor",
+      "agencyScope": ["Fannie Mae", "Freddie Mac", "FHA", "VA", "USDA"],
+      "overlayType": "reserves",
+      "severity": "advisory",
+      "effectiveDate": "2026-01-01",
+      "sourceRefs": ["INVESTOR_OVERLAY_REF"],
+      "conditions": {
+        "ltvAtLeast": 95,
+        "minReservesMonths": 2
+      },
+      "operationsNote": "High-LTV files are materially more executable with at least 2 months reserves."
+    }
+  ]
+}

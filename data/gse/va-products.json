@@ -6,6 +6,41 @@
       "name": "VA-guaranteed purchase",
       "tag": "va",
       "sourceRefs": ["VA_HANDBOOK"],
+      "guidance": {
+        "eligibilityNarrative": "VA-guaranteed purchase path for eligible veterans/service members where entitlement, occupancy, residual-income, and property conditions satisfy current VA policy and lender overlays.",
+        "keyRequirements": [
+          "Certificate of Eligibility (COE) and entitlement verification.",
+          "Primary occupancy intent and property eligibility.",
+          "Residual income and DTI review under VA standards and investor overlays."
+        ],
+        "documentationExpectations": [
+          "COE and service documentation as required.",
+          "Residual income worksheet with regional family-size factors.",
+          "Funding-fee category and exemption support."
+        ],
+        "edgeCases": [
+          "Tier-two entitlement and county guaranty interactions.",
+          "Residual-income shortfall in high-cost markets.",
+          "Condo project approval and property-condition repairs."
+        ],
+        "commonDenialReasons": [
+          "Residual income insufficient under policy.",
+          "Ineligible occupancy or property condition issues.",
+          "Overlay credit/DTI restrictions exceed baseline VA tolerance."
+        ],
+        "overlayCaveats": [
+          "Many investors impose minimum FICO overlays for VA loans.",
+          "Manual-underwrite paths often face tighter DTI and reserve overlays."
+        ],
+        "compensatingFactors": [
+          "Strong residual-income buffer.",
+          "Verified reserves and stable housing payment profile."
+        ],
+        "workflowNotes": [
+          "Order COE and confirm entitlement early in intake.",
+          "Track funding fee/exemption evidence before closing docs."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 100,
         "maxCltv": 100,
@@ -21,6 +56,41 @@
       "name": "VA IRRRL",
       "tag": "va",
       "sourceRefs": ["VA_HANDBOOK"],
+      "guidance": {
+        "eligibilityNarrative": "VA IRRRL streamline path for existing VA borrowers with required net tangible benefit and seasoning/payment-history controls.",
+        "keyRequirements": [
+          "Existing VA loan and eligible seasoning/payment history.",
+          "Net tangible benefit documentation and recoupment limits.",
+          "Occupancy certification and fee policy compliance."
+        ],
+        "documentationExpectations": [
+          "Current mortgage payment history evidence.",
+          "VA IRRRL NTB and recoupment worksheet.",
+          "Funding fee treatment and exemption confirmation."
+        ],
+        "edgeCases": [
+          "Payment-history exceptions or recent delinquencies.",
+          "Loan payoff timing issues affecting recoupment.",
+          "Investor seasoning overlays."
+        ],
+        "commonDenialReasons": [
+          "NTB/recoupment requirement not met.",
+          "Insufficient seasoning/payment history.",
+          "Overlay-specific DTI or credit minimum shortfall."
+        ],
+        "overlayCaveats": [
+          "Some investors layer stricter payment-history windows.",
+          "Credit overlays may apply despite streamline concept."
+        ],
+        "compensatingFactors": [
+          "Strong current payment history with clear savings.",
+          "Low risk-profile changes and stable occupancy."
+        ],
+        "workflowNotes": [
+          "Validate NTB early before locking terms.",
+          "Confirm payoff timing and escrows for recoupment test."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 100,
         "maxCltv": 100,
@@ -36,6 +106,41 @@
       "name": "VA cash-out refinance",
       "tag": "va",
       "sourceRefs": ["VA_HANDBOOK"],
+      "guidance": {
+        "eligibilityNarrative": "VA cash-out path requiring full income/asset/credit qualification, occupancy compliance, and lender overlay review.",
+        "keyRequirements": [
+          "Cash-out purpose must be policy compliant with documented proceeds use.",
+          "Full underwrite including income, assets, and liabilities.",
+          "Residual-income and DTI must satisfy policy/overlay thresholds."
+        ],
+        "documentationExpectations": [
+          "Cash-out purpose and payoff documentation.",
+          "Full income and asset verification package.",
+          "Residual-income worksheet and VA fee category support."
+        ],
+        "edgeCases": [
+          "High LTV with thin residual-income margin.",
+          "Large subordinate payoff complexity.",
+          "Overlay cash-out LTV caps by investor."
+        ],
+        "commonDenialReasons": [
+          "Residual income or DTI outside investor tolerance.",
+          "Cash-out purpose documentation insufficient.",
+          "Overlay credit/LTV limits exceeded."
+        ],
+        "overlayCaveats": [
+          "Cash-out programs frequently have tighter investor overlays than purchase/IRRRL.",
+          "Manual underwrite often triggers stricter reserve expectations."
+        ],
+        "compensatingFactors": [
+          "Strong residual-income surplus and reserves.",
+          "Conservative use-of-proceeds with low layered risk."
+        ],
+        "workflowNotes": [
+          "Document payoff and cash disbursement trail clearly.",
+          "Escalate overlay exceptions before final underwriting."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 90,
         "maxCltv": 90,

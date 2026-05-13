@@ -1,6 +1,7 @@
-import { readProducts, readSources } from '../services/gse-source.service.js';
+import { readProducts, readSources, readInvestorOverlays } from '../services/gse-source.service.js';
 import { lookupLoanLimit } from '../services/fhfa-loan-limit.service.js';
 import { analyzeScenario, normalizeScenario } from '../services/gse-scenario.service.js';
+import { askLoanProgramExpert } from '../services/finance-loan-expert.service.js';
 
 export function getGseProducts(req, res) {
   try {
@@ -12,7 +13,18 @@ export function getGseProducts(req, res) {
 
 export function getGseSources(req, res) {
   try {
-    res.json({ success: true, data: readSources() });
+    const sources = readSources();
+    const overlays = readInvestorOverlays();
+    res.json({
+      success: true,
+      data: {
+        ...sources,
+        overlayCatalog: {
+          version: overlays?.version || '',
+          count: Array.isArray(overlays?.overlays) ? overlays.overlays.length : 0
+        }
+      }
+    });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message || 'Failed to load sources' });
   }
@@ -78,5 +90,20 @@ export function getGseLoanLimits(req, res) {
     });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message || 'Lookup failed' });
+  }
+}
+
+export function postLoanProgramExpert(req, res) {
+  try {
+    const out = askLoanProgramExpert(req.body || {});
+    if (!out.success) {
+      return res.status(400).json({
+        success: false,
+        errors: out.errors || ['Expert request failed.']
+      });
+    }
+    return res.json(out);
+  } catch (e) {
+    return res.status(500).json({ success: false, error: e.message || 'Loan expert failed' });
   }
 }

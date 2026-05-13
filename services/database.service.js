@@ -856,6 +856,58 @@ export async function createTables() {
     `);
 
     await pool.query(`
+      CREATE TABLE IF NOT EXISTS lane_person (
+        person_id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        generation INTEGER,
+        gender VARCHAR(16),
+        birth_year INTEGER,
+        death_year_text TEXT,
+        born TEXT,
+        death_place TEXT,
+        payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_lane_person_name ON lane_person (lower(name))
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_lane_person_generation ON lane_person (generation)
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS lane_relationship (
+        relationship_id BIGSERIAL PRIMARY KEY,
+        source_person_id INTEGER NOT NULL REFERENCES lane_person(person_id) ON DELETE CASCADE,
+        target_person_id INTEGER NOT NULL REFERENCES lane_person(person_id) ON DELETE CASCADE,
+        relation VARCHAR(64) NOT NULL,
+        payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT uq_lane_relationship UNIQUE (source_person_id, target_person_id, relation)
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_lane_relationship_source ON lane_relationship (source_person_id, relation)
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_lane_relationship_target ON lane_relationship (target_person_id, relation)
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS lane_dataset (
+        dataset_key VARCHAR(128) PRIMARY KEY,
+        source_file TEXT NOT NULL,
+        payload JSONB NOT NULL,
+        checksum_sha256 CHAR(64) NOT NULL,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_lane_dataset_updated ON lane_dataset (updated_at DESC)
+    `);
+
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS lane_pdf_gallery_hidden_plate (
         client_id UUID NOT NULL,
         image_id TEXT NOT NULL,
@@ -907,7 +959,7 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_genealogy_geocode_updated ON genealogy_forward_geocode_cache (updated_at DESC)
     `);
 
-    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, br_rule_files, processor assignment tool config, lane PDF gallery hides, lane PDF gallery filter presets, and genealogy forward geocode cache)');
+    console.log('✅ Database tables created successfully (including conversation memory, Grateful Dead shows, expandable concert collections, loan pipeline, test executions, unit test files, br_rule_files, processor assignment tool config, Lane graph datasets, lane PDF gallery hides, lane PDF gallery filter presets, and genealogy forward geocode cache)');
     
     // Migrate existing Grateful Dead data to new structure (run in background)
     migrateGratefulDeadData().catch(error => {

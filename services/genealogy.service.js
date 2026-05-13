@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  backfillLaneDataFromFilesystem,
+  getAllLaneDatasetsFromPostgres,
+  getLaneGraphDataFromPostgres
+} from './lane-postgres.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -14,9 +19,83 @@ let lanePdfPortraitsCache = null;
 let lanePdfGalleryHiddenCache = null;
 let lanePdfBookIllustrationsCache = null;
 let laneBookSayingsCache = null;
+let laneDatasetsCache = {};
+let lanePostgresHydratedAt = null;
+
+function isObject(value) {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function cloneJson(value) {
+  if (value == null) return value;
+  return JSON.parse(JSON.stringify(value));
+}
+
+function getLaneDatasetDoc(datasetKey) {
+  const key = String(datasetKey || '').trim();
+  if (!key) return null;
+  const value = laneDatasetsCache[key];
+  return isObject(value) ? cloneJson(value) : null;
+}
+
+/**
+ * Hydrate in-memory genealogy/Lane caches from Postgres.
+ * This keeps sync getter APIs intact while switching storage backend.
+ */
+export async function refreshGenealogyCachesFromPostgres(options = {}) {
+  const { bootstrapFromFilesystem = true } = options || {};
+  try {
+    if (bootstrapFromFilesystem) {
+      await backfillLaneDataFromFilesystem();
+    }
+    const [graph, datasets] = await Promise.all([
+      getLaneGraphDataFromPostgres(),
+      getAllLaneDatasetsFromPostgres()
+    ]);
+
+    if (graph && Array.isArray(graph.nodes) && Array.isArray(graph.links) && graph.nodes.length > 0) {
+      genealogyData = graph;
+    }
+    laneDatasetsCache = isObject(datasets) ? datasets : {};
+
+    const museumDoc = getLaneDatasetDoc('lane-museum-content');
+    if (museumDoc) museumContent = { ...DEFAULT_MUSEUM_CONTENT, ...museumDoc };
+    const sayingsDoc = getLaneDatasetDoc('lane-book-sayings');
+    if (sayingsDoc) laneBookSayingsCache = sayingsDoc;
+    const manifestDoc = getLaneDatasetDoc('lane-pdf-image-manifest');
+    if (manifestDoc) lanePdfManifestCache = manifestDoc;
+    const candidatesDoc = getLaneDatasetDoc('lane-pdf-photo-candidates');
+    if (candidatesDoc) lanePdfCandidatesCache = candidatesDoc;
+    const portraitsDoc = getLaneDatasetDoc('lane-pdf-person-portraits');
+    if (portraitsDoc) lanePdfPortraitsCache = portraitsDoc;
+    const hiddenDoc = getLaneDatasetDoc('lane-pdf-gallery-hidden');
+    if (hiddenDoc) lanePdfGalleryHiddenCache = hiddenDoc;
+    const illustrationsDoc = getLaneDatasetDoc('lane-pdf-book-illustrations');
+    if (illustrationsDoc) lanePdfBookIllustrationsCache = illustrationsDoc;
+
+    lanePostgresHydratedAt = new Date().toISOString();
+    return {
+      success: true,
+      hydratedAt: lanePostgresHydratedAt,
+      graphNodes: Array.isArray(genealogyData?.nodes) ? genealogyData.nodes.length : 0,
+      datasetCount: Object.keys(laneDatasetsCache).length
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+let laneTradingCardsCache = null;
 
 function loadLaneBookSayings() {
   if (laneBookSayingsCache !== null) return laneBookSayingsCache;
+  const pgDoc = getLaneDatasetDoc('lane-book-sayings');
+  if (pgDoc) {
+    laneBookSayingsCache = pgDoc;
+    return laneBookSayingsCache;
+  }
   try {
     const p = path.join(__dirname, '..', 'data', 'lane-book-sayings.json');
     laneBookSayingsCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
@@ -28,6 +107,11 @@ function loadLaneBookSayings() {
 
 function loadLanePdfManifest() {
   if (lanePdfManifestCache !== null) return lanePdfManifestCache;
+  const pgDoc = getLaneDatasetDoc('lane-pdf-image-manifest');
+  if (pgDoc) {
+    lanePdfManifestCache = pgDoc;
+    return lanePdfManifestCache;
+  }
   try {
     const manifestPath = path.join(__dirname, '..', 'data', 'lane-pdf-image-manifest.json');
     lanePdfManifestCache = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'));
@@ -39,6 +123,11 @@ function loadLanePdfManifest() {
 
 function loadLanePdfPhotoCandidates() {
   if (lanePdfCandidatesCache !== null) return lanePdfCandidatesCache;
+  const pgDoc = getLaneDatasetDoc('lane-pdf-photo-candidates');
+  if (pgDoc) {
+    lanePdfCandidatesCache = pgDoc;
+    return lanePdfCandidatesCache;
+  }
   try {
     const p = path.join(__dirname, '..', 'data', 'lane-pdf-photo-candidates.json');
     lanePdfCandidatesCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
@@ -50,6 +139,11 @@ function loadLanePdfPhotoCandidates() {
 
 function loadLanePdfPersonPortraits() {
   if (lanePdfPortraitsCache !== null) return lanePdfPortraitsCache;
+  const pgDoc = getLaneDatasetDoc('lane-pdf-person-portraits');
+  if (pgDoc) {
+    lanePdfPortraitsCache = pgDoc;
+    return lanePdfPortraitsCache;
+  }
   try {
     const p = path.join(__dirname, '..', 'data', 'lane-pdf-person-portraits.json');
     lanePdfPortraitsCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
@@ -61,6 +155,16 @@ function loadLanePdfPersonPortraits() {
 
 function loadLanePdfGalleryHidden() {
   if (lanePdfGalleryHiddenCache !== null) return lanePdfGalleryHiddenCache;
+  const pgDoc = getLaneDatasetDoc('lane-pdf-gallery-hidden');
+  if (pgDoc) {
+    lanePdfGalleryHiddenCache = pgDoc;
+  }
+  if (lanePdfGalleryHiddenCache !== null) {
+    if (!lanePdfGalleryHiddenCache || !Array.isArray(lanePdfGalleryHiddenCache.hiddenImageIds)) {
+      lanePdfGalleryHiddenCache = { version: 0, hiddenImageIds: [] };
+    }
+    return lanePdfGalleryHiddenCache;
+  }
   try {
     const p = path.join(__dirname, '..', 'data', 'lane-pdf-gallery-hidden.json');
     lanePdfGalleryHiddenCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
@@ -75,6 +179,16 @@ function loadLanePdfGalleryHidden() {
 
 function loadLanePdfBookIllustrations() {
   if (lanePdfBookIllustrationsCache !== null) return lanePdfBookIllustrationsCache;
+  const pgDoc = getLaneDatasetDoc('lane-pdf-book-illustrations');
+  if (pgDoc) {
+    lanePdfBookIllustrationsCache = pgDoc;
+  }
+  if (lanePdfBookIllustrationsCache !== null) {
+    if (!lanePdfBookIllustrationsCache || !Array.isArray(lanePdfBookIllustrationsCache.illustrations)) {
+      lanePdfBookIllustrationsCache = { version: 0, illustrations: [] };
+    }
+    return lanePdfBookIllustrationsCache;
+  }
   try {
     const p = path.join(__dirname, '..', 'data', 'lane-pdf-book-illustrations.json');
     lanePdfBookIllustrationsCache = JSON.parse(fs.readFileSync(p, 'utf-8'));
@@ -495,6 +609,11 @@ const DEFAULT_MUSEUM_CONTENT = {
  */
 export function loadGenealogyData() {
   try {
+    const pgDoc = getLaneDatasetDoc('laneData');
+    if (pgDoc && Array.isArray(pgDoc.nodes) && Array.isArray(pgDoc.links)) {
+      genealogyData = pgDoc;
+      return genealogyData;
+    }
     const dataPath = path.join(__dirname, '..', 'data', 'laneData.json');
     const rawData = fs.readFileSync(dataPath, 'utf-8');
     genealogyData = JSON.parse(rawData);
@@ -511,6 +630,14 @@ export function loadGenealogyData() {
  */
 export function loadMuseumContent() {
   try {
+    const pgDoc = getLaneDatasetDoc('lane-museum-content');
+    if (pgDoc) {
+      museumContent = {
+        ...DEFAULT_MUSEUM_CONTENT,
+        ...pgDoc
+      };
+      return museumContent;
+    }
     const dataPath = path.join(__dirname, '..', 'data', 'lane-museum-content.json');
     const rawData = fs.readFileSync(dataPath, 'utf-8');
     museumContent = {
@@ -902,6 +1029,14 @@ export function getMuseumContent() {
   return museumContent;
 }
 
+export function getLaneStorageStatus() {
+  return {
+    lanePostgresHydratedAt,
+    laneDatasetCount: Object.keys(laneDatasetsCache).length,
+    loadedPeople: Array.isArray(genealogyData?.nodes) ? genealogyData.nodes.length : 0
+  };
+}
+
 /**
  * Curated / merged Lane book sayings for museum docent context (see data/lane-book-sayings.json).
  */
@@ -963,6 +1098,175 @@ export function getProminentLanes() {
   }
 
   return resolved;
+}
+
+function normalizeStringArray(values) {
+  if (!Array.isArray(values)) return [];
+  return values
+    .map((value) => String(value || '').trim())
+    .filter(Boolean);
+}
+
+function normalizeCardCitations(citations) {
+  if (!Array.isArray(citations)) return [];
+  return citations
+    .map((citation) => {
+      if (!citation || typeof citation !== 'object') return null;
+      const label = String(citation.label || '').trim();
+      const kind = String(citation.kind || '').trim();
+      if (!label || !kind) return null;
+      const url = String(citation.url || '').trim();
+      const pageRef = String(citation.pageRef || '').trim();
+      return {
+        label,
+        kind,
+        ...(url ? { url } : {}),
+        ...(pageRef ? { pageRef } : {})
+      };
+    })
+    .filter(Boolean);
+}
+
+function normalizeTradingCard(card) {
+  if (!card || typeof card !== 'object') return null;
+  const cardId = String(card.cardId || '').trim().toLowerCase();
+  if (!cardId) return null;
+  const personId = Number(card.personId);
+  const title = String(card.title || '').trim();
+  const era = String(card.era || '').trim();
+  const branch = String(card.branch || '').trim();
+  const summary = String(card.summary || '').trim();
+  if (!Number.isFinite(personId) || !title || !era || !branch || !summary) return null;
+
+  const facts = normalizeStringArray(card.facts);
+  const citations = normalizeCardCitations(card.citations);
+  const tags = normalizeStringArray(card.tags).map((tag) => tag.toLowerCase());
+  if (!facts.length || !citations.length || !tags.length) return null;
+
+  const relatedCardIds = normalizeStringArray(card.relatedCardIds).map((id) => id.toLowerCase());
+  const frontImage = String(card.frontImage || '').trim();
+  const rarity = String(card.rarity || '').trim().toLowerCase();
+  const timelineYear = Number(card.timelineYear);
+
+  return {
+    cardId,
+    personId,
+    title,
+    era,
+    branch,
+    summary,
+    facts,
+    citations,
+    tags,
+    relatedCardIds,
+    ...(frontImage ? { frontImage } : {}),
+    ...(rarity ? { rarity } : {}),
+    ...(Number.isFinite(timelineYear) ? { timelineYear } : {})
+  };
+}
+
+function loadLaneTradingCards() {
+  if (laneTradingCardsCache !== null) return laneTradingCardsCache;
+  try {
+    const pgDoc = getLaneDatasetDoc('lane-trading-cards-first-edition');
+    const parsed = pgDoc || (() => {
+      const p = path.join(__dirname, '..', 'data', 'lane-trading-cards-first-edition.json');
+      return JSON.parse(fs.readFileSync(p, 'utf-8'));
+    })();
+    laneTradingCardsCache = {
+      version: Number(parsed?.version) || 1,
+      edition: String(parsed?.edition || 'First Edition'),
+      generatedAt: String(parsed?.generatedAt || ''),
+      sourceLabel: String(parsed?.sourceLabel || 'Lane Genealogies Vol. I (1891)'),
+      cards: Array.isArray(parsed?.cards) ? parsed.cards.map((card) => normalizeTradingCard(card)).filter(Boolean) : []
+    };
+  } catch {
+    laneTradingCardsCache = {
+      version: 1,
+      edition: 'First Edition',
+      generatedAt: '',
+      sourceLabel: 'Lane Genealogies Vol. I (1891)',
+      cards: []
+    };
+  }
+  return laneTradingCardsCache;
+}
+
+function enrichLaneTradingCard(card, personById) {
+  const person = personById.get(card.personId) || null;
+  const born = person?.born || person?.birthPlace || '';
+  const dates = `${person?.birthYear || '?'} - ${person?.deathYear || '?'}`;
+  return {
+    ...card,
+    person,
+    personDisplay: {
+      name: person?.name || card.title,
+      dates,
+      born
+    }
+  };
+}
+
+export function getLaneTradingCards(filters = {}) {
+  const doc = loadLaneTradingCards();
+  const people = getAllPeople();
+  const personById = new Map(people.map((person) => [Number(person.id), person]));
+  const eraFilter = String(filters.era || '').trim().toLowerCase();
+  const tagFilter = String(filters.tag || '').trim().toLowerCase();
+  const branchFilter = String(filters.branch || '').trim().toLowerCase();
+  const qFilter = String(filters.q || '').trim().toLowerCase();
+  const personIdFilter = Number(filters.personId);
+
+  const cards = doc.cards
+    .filter((card) => (eraFilter ? card.era.toLowerCase() === eraFilter : true))
+    .filter((card) => (tagFilter ? card.tags.includes(tagFilter) : true))
+    .filter((card) => (branchFilter ? card.branch.toLowerCase() === branchFilter : true))
+    .filter((card) => (Number.isFinite(personIdFilter) ? card.personId === personIdFilter : true))
+    .filter((card) => {
+      if (!qFilter) return true;
+      const haystack = [card.cardId, card.title, card.summary, card.era, card.branch, card.tags.join(' ')].join(' ').toLowerCase();
+      return haystack.includes(qFilter);
+    })
+    .map((card) => enrichLaneTradingCard(card, personById))
+    .sort((a, b) => {
+      const ay = Number.isFinite(a.timelineYear) ? a.timelineYear : 99999;
+      const by = Number.isFinite(b.timelineYear) ? b.timelineYear : 99999;
+      if (ay !== by) return ay - by;
+      return a.title.localeCompare(b.title);
+    });
+
+  const eras = compactUnique(doc.cards.map((card) => card.era));
+  const branches = compactUnique(doc.cards.map((card) => card.branch));
+  const tags = compactUnique(doc.cards.flatMap((card) => card.tags)).sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: 'base' })
+  );
+
+  return {
+    version: doc.version,
+    edition: doc.edition,
+    generatedAt: doc.generatedAt,
+    sourceLabel: doc.sourceLabel,
+    count: cards.length,
+    eras,
+    branches,
+    tags,
+    cards
+  };
+}
+
+export function getLaneTradingCardById(cardId) {
+  const requested = String(cardId || '').trim().toLowerCase();
+  if (!requested) return null;
+  const listing = getLaneTradingCards();
+  const card = listing.cards.find((entry) => entry.cardId === requested);
+  if (!card) return null;
+  const relatedCards = card.relatedCardIds
+    .map((id) => listing.cards.find((entry) => entry.cardId === id))
+    .filter(Boolean);
+  return {
+    ...card,
+    relatedCards
+  };
 }
 
 export function getWarParticipants(warSlug) {
@@ -1545,6 +1849,7 @@ loadGenealogyData();
 export default {
   loadGenealogyData,
   loadMuseumContent,
+  refreshGenealogyCachesFromPostgres,
   getAllFamilyData,
   getAllPeople,
   getPersonById,
@@ -1569,6 +1874,9 @@ export default {
   getDirectAncestorStory,
   getDirectDescendantStory,
   getLanePdfGalleryData,
-  getLanePdfPortraitsForPerson
+  getLanePdfPortraitsForPerson,
+  getLaneTradingCards,
+  getLaneTradingCardById,
+  getLaneStorageStatus
 };
 

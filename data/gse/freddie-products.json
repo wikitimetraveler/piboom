@@ -6,6 +6,41 @@
       "name": "Conventional Conforming (standard)",
       "tag": "standard",
       "sourceRefs": ["FREDDIE_CONFORMING"],
+      "guidance": {
+        "eligibilityNarrative": "Standard Freddie Mac conforming delivery path where AUS, collateral, and documentation meet current Seller/Servicer Guide requirements.",
+        "keyRequirements": [
+          "LPA/AUS findings and documentation level must be eligible.",
+          "Occupancy and purpose limits must satisfy current guide.",
+          "Income, assets, and liabilities must be fully reconciled."
+        ],
+        "documentationExpectations": [
+          "Income validation package tied to underwriting method.",
+          "Asset and reserve verification with sourcing support.",
+          "Collateral and project eligibility package as required."
+        ],
+        "edgeCases": [
+          "High-risk layering with thin reserves.",
+          "Investment-property reserve stacking.",
+          "Project or insurance exceptions impacting condo delivery."
+        ],
+        "commonDenialReasons": [
+          "Ineligible AUS risk class or findings mismatch.",
+          "LTV/CLTV/DTI exceeds investor guardrails.",
+          "Documentation quality gaps in variable income."
+        ],
+        "overlayCaveats": [
+          "Investors often tighten DTI and reserve minimums above guide baseline.",
+          "Credit overlays frequently step up for non-primary occupancy."
+        ],
+        "compensatingFactors": [
+          "Strong reserve profile and low payment shock.",
+          "Stable verified employment/income continuity."
+        ],
+        "workflowNotes": [
+          "Capture overlay matrix at lock to avoid rework.",
+          "Re-validate AUS after any borrower liability changes."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 97,
         "maxCltv": 97,
@@ -21,6 +56,41 @@
       "name": "Home Possible",
       "tag": "affordable",
       "sourceRefs": ["FREDDIE_HOME_POSSIBLE_GUIDE"],
+      "guidance": {
+        "eligibilityNarrative": "Affordable conventional option for income-limited households, requiring AMI validation and program-specific execution controls.",
+        "keyRequirements": [
+          "Borrower AMI must be within current Home Possible thresholds.",
+          "Primary residence occupancy is required in most cases.",
+          "AUS findings and MI structure must remain eligible."
+        ],
+        "documentationExpectations": [
+          "AMI and income worksheet support.",
+          "Program-required borrower education evidence where applicable.",
+          "Source-of-funds documentation for grants/gifts."
+        ],
+        "edgeCases": [
+          "AMI threshold edge cases with variable/bonus income.",
+          "Non-occupant or co-borrower structure complexity.",
+          "Overlay reserve adjustments with higher DTI."
+        ],
+        "commonDenialReasons": [
+          "AMI exceeds allowable ratio for census tract.",
+          "Occupancy/purpose mismatch with product constraints.",
+          "Overlay minimums exceed agency baseline."
+        ],
+        "overlayCaveats": [
+          "Investors may require stronger credit for higher-LTV affordable loans.",
+          "Overlay reserve floors can override baseline AUS tolerance."
+        ],
+        "compensatingFactors": [
+          "Strong residual reserves and stable payment history.",
+          "Conservative DTI after verified income treatment."
+        ],
+        "workflowNotes": [
+          "Run AMI eligibility before final product recommendation.",
+          "Document overlay deltas in underwriting submission."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 97,
         "maxCltv": 105,
@@ -38,6 +108,41 @@
       "name": "CHOICEHome (renovation)",
       "tag": "renovation",
       "sourceRefs": ["FREDDIE_CONFORMING"],
+      "guidance": {
+        "eligibilityNarrative": "Freddie renovation execution requiring documented scope, compliant contractor package, and as-completed collateral approach.",
+        "keyRequirements": [
+          "Renovation scope and bids must meet program standards.",
+          "As-completed valuation and contingency controls are mandatory.",
+          "Loan file must support draw and completion monitoring."
+        ],
+        "documentationExpectations": [
+          "Contractor documentation and bid package.",
+          "Appraisal support for after-improved value.",
+          "Draw/escrow management setup."
+        ],
+        "edgeCases": [
+          "Property condition delays for appraisal completion.",
+          "Contractor capacity or insurance concerns.",
+          "Scope creep increasing CLTV/DTI risk."
+        ],
+        "commonDenialReasons": [
+          "Incomplete renovation package or ineligible scope.",
+          "Overlay credit/DTI/reserve limits exceeded.",
+          "Timeline mismatch for lock and closing."
+        ],
+        "overlayCaveats": [
+          "Investor overlays commonly add reserve and contractor requirements.",
+          "Renovation concentration controls may apply by seller."
+        ],
+        "compensatingFactors": [
+          "Low leverage profile with verified reserves.",
+          "Experienced contractor and complete project controls."
+        ],
+        "workflowNotes": [
+          "Validate contractor packet before lock.",
+          "Coordinate renovation administration with operations."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 95,
         "maxCltv": 95,
@@ -53,6 +158,41 @@
       "name": "Relief refinance / refinance option (guide-based)",
       "tag": "refinance",
       "sourceRefs": ["FREDDIE_CONFORMING"],
+      "guidance": {
+        "eligibilityNarrative": "Refinance-relief style execution for eligible borrowers where benefit, history, and current guide constraints are met.",
+        "keyRequirements": [
+          "Performance history and eligibility path must match current guide.",
+          "Refinance benefit tests and cost controls must be documented.",
+          "Subordinate lien treatment must align with execution path."
+        ],
+        "documentationExpectations": [
+          "Payment history support and mortgage profile evidence.",
+          "Benefit/NTB worksheet evidence.",
+          "Lien and payoff documentation."
+        ],
+        "edgeCases": [
+          "Subordinate financing affecting final CLTV.",
+          "Investor payment-shock overlays.",
+          "Inconsistent servicing history records."
+        ],
+        "commonDenialReasons": [
+          "Insufficient documented refinance benefit.",
+          "Ineligible occupancy/history profile.",
+          "Overlay limits tighter than baseline rules."
+        ],
+        "overlayCaveats": [
+          "Investors may apply stricter DTI/reserve constraints for relief refi.",
+          "Additional payment-history seasoning overlays are common."
+        ],
+        "compensatingFactors": [
+          "Strong current mortgage history.",
+          "Clear borrower savings and improved risk profile."
+        ],
+        "workflowNotes": [
+          "Validate payoff and subordinate data at intake.",
+          "Preserve complete NTB evidence for post-close review."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 97,
         "maxCltv": 97,

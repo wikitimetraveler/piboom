@@ -19,7 +19,8 @@ const PRODUCT_FILES = [
   ['fannie-products.json', 'fannie'],
   ['freddie-products.json', 'freddie'],
   ['va-products.json', 'va'],
-  ['fha-products.json', 'fha']
+  ['fha-products.json', 'fha'],
+  ['usda-products.json', 'usda']
 ];
 
 export function readProducts() {
@@ -33,7 +34,26 @@ export function readProducts() {
         id: p.id,
         name: p.name,
         tag: p.tag,
+        guidance: p.guidance || {},
         sourceRefs: p.sourceRefs || []
+      });
+    }
+  }
+  return list;
+}
+
+/**
+ * Full product rows including rules/guidance for analysis/AI services.
+ */
+export function readFullProducts() {
+  const list = [];
+  for (const [fileName, prefix] of PRODUCT_FILES) {
+    const data = readJsonFile(fileName);
+    for (const p of data.products || []) {
+      list.push({
+        ...p,
+        agency: data.agency,
+        productId: `${prefix}:${p.id}`
       });
     }
   }
@@ -45,6 +65,10 @@ export function readProducts() {
  */
 export function readSources() {
   return readJsonFile('rule-metadata.json');
+}
+
+export function readInvestorOverlays() {
+  return readJsonFile('investor-overlays.json');
 }
 
 export function getGseDataDir() {

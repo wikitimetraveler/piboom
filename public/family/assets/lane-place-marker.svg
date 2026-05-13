@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="58" viewBox="0 0 48 58" role="img" aria-label="Lane place">
+  <defs>
+    <filter id="lanePinShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#1a1510" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="lanePinFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3d3832"/>
+      <stop offset="100%" stop-color="#2a2824"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded pin body -->
+  <path
+    filter="url(#lanePinShadow)"
+    fill="url(#lanePinFill)"
+    stroke="#8c7358"
+    stroke-width="1.25"
+    d="M24 3.5C14.8 3.5 7.5 10.9 7.5 20.1c0 7.8 5.6 14.4 10.8 20.8L24 54.5l5.7-13.6c5.2-6.4 10.8-13 10.8-20.8C40.5 10.9 33.2 3.5 24 3.5z"
+  />
+  <!-- Inner ring (modern accent) -->
+  <circle cx="24" cy="20" r="11" fill="none" stroke="#caa56c" stroke-width="1.35" opacity="0.9"/>
+  <!-- L monogram -->
+  <path
+    fill="#e8e0d4"
+    d="M17.2 13.2h3.1v11.4h5.8v2.6H17.2z"
+  />
+</svg>

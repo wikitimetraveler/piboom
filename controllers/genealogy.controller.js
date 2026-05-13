@@ -22,7 +22,9 @@ import {
   getDirectDescendantStory,
   getLanePdfGalleryData,
   getLanePdfPortraitsForPerson,
-  getLaneBookSayings
+  getLaneBookSayings,
+  getLaneTradingCards,
+  getLaneTradingCardById
 } from '../services/genealogy.service.js';
 import { config } from '../config/index.js';
 import multer from 'multer';
@@ -361,6 +363,58 @@ export async function getProminentLanesData(req, res) {
     });
   } catch (error) {
     console.error('Error getting prominent lanes:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Lane Trading Cards list endpoint with optional filters.
+ */
+export async function getLaneTradingCardsData(req, res) {
+  try {
+    const { era, tag, branch, personId, q } = req.query;
+    const data = getLaneTradingCards({
+      era,
+      tag,
+      branch,
+      q,
+      ...(personId !== undefined ? { personId } : {})
+    });
+    res.json({
+      success: true,
+      ...data
+    });
+  } catch (error) {
+    console.error('Error getting lane trading cards:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
+ * Single Lane Trading Card detail endpoint.
+ */
+export async function getLaneTradingCardData(req, res) {
+  try {
+    const { cardId } = req.params;
+    const card = getLaneTradingCardById(cardId);
+    if (!card) {
+      return res.status(404).json({
+        success: false,
+        error: 'Card not found'
+      });
+    }
+    res.json({
+      success: true,
+      card
+    });
+  } catch (error) {
+    console.error('Error getting lane trading card:', error);
     res.status(500).json({
       success: false,
       error: error.message
@@ -900,6 +954,8 @@ export default {
   getMuseumContentData,
   getFeaturedStoryData,
   getProminentLanesData,
+  getLaneTradingCardsData,
+  getLaneTradingCardData,
   getLanePdfGallery,
   getLanePdfGalleryHides,
   postLanePdfGalleryHidePlate,

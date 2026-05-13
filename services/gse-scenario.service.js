@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import '../public/shared/calcEngineLibrary.js';
 import { lookupLoanLimit } from './fhfa-loan-limit.service.js';
 import { evaluateProduct } from './gse-rules.service.js';
+import { readInvestorOverlays } from './gse-source.service.js';
 
 const { calcMath } = globalThis;
 
@@ -36,7 +37,8 @@ const PRODUCT_FILES = [
   ['fannie-products.json', 'fannie'],
   ['freddie-products.json', 'freddie'],
   ['va-products.json', 'va'],
-  ['fha-products.json', 'fha']
+  ['fha-products.json', 'fha'],
+  ['usda-products.json', 'usda']
 ];
 
 function loadFullProductRows() {
@@ -56,10 +58,19 @@ function loadFullProductRows() {
 }
 
 let productRowsCache;
+let investorOverlaysCache;
 
 function getProductRows() {
   if (!productRowsCache) productRowsCache = loadFullProductRows();
   return productRowsCache;
+}
+
+function getInvestorOverlays() {
+  if (!investorOverlaysCache) {
+    const doc = readInvestorOverlays();
+    investorOverlaysCache = Array.isArray(doc?.overlays) ? doc.overlays : [];
+  }
+  return investorOverlaysCache;
 }
 
 /**
@@ -139,11 +150,15 @@ export function normalizeScenario(body) {
       propertyType: loan.propertyType,
       units,
       state: String(loan.state).trim().toUpperCase(),
-      county: String(loan.county).trim()
+      county: String(loan.county).trim(),
+      ...(loan.investorName != null ? { investorName: String(loan.investorName).trim() } : {}),
+      ...(loan.channel != null ? { channel: String(loan.channel).trim() } : {}),
+      ...(typeof loan.usdaEligibleArea === 'boolean' ? { usdaEligibleArea: loan.usdaEligibleArea } : {})
     },
     risk: {
       dti: Number(risk.dti),
-      reservesMonths: Number(risk.reservesMonths)
+      reservesMonths: Number(risk.reservesMonths),
+      ...(typeof risk.manualUnderwrite === 'boolean' ? { manualUnderwrite: risk.manualUnderwrite } : {})
     }
   };
 
@@ -182,8 +197,9 @@ export function analyzeScenario(body) {
   ]);
 
   const products = [];
+  const overlayRows = getInvestorOverlays();
   for (const row of getProductRows()) {
-    products.push(evaluateProduct(scenario, row));
+    products.push(evaluateProduct(scenario, row, { overlayRows }));
   }
 
   const ranked = products.filter((p) => p.status === 'fit' || p.status === 'possible-fit');
@@ -193,11 +209,17 @@ export function analyzeScenario(body) {
   const suggestions = [
     'Check whether borrower qualifies for HomeReady or Home Possible income limits using official AMI / census tools.',
     'Confirm county conforming loan limit for the subject year at fhfa.gov before product selection.',
-    'Run AUS (DU / LPA) and comply with investor overlays before final decision.'
+    'Run AUS (DU / LPA / TOTAL / GUS as applicable) and comply with investor overlays before final decision.',
+    'Document overlay impacts with clear next steps: re-structure, exception path, or alternate investor.'
   ];
   if (conformingStatus === 'unknown') {
     suggestions.push('Load accurate FHFA limit data for the subject county and unit count.');
   }
+
+  const failedOverlayCount = products.reduce(
+    (sum, row) => sum + (Array.isArray(row.overlayFindings) ? row.overlayFindings.filter((f) => f.status !== 'pass').length : 0),
+    0
+  );
 
   return {
     success: true,
@@ -206,6 +228,7 @@ export function analyzeScenario(body) {
       bestFit,
       riskLevel,
       conformingStatus,
+      failedOverlayCount,
       loanLimit: limitHit
         ? { amount: limitHit.limit, year: limitHit.year, highCostArea: limitHit.highCost }
         : null

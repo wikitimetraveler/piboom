@@ -18,8 +18,13 @@
     '/family/assets/lane-genealogies-title-spread.png';
   const PRIMARY_SOURCE_URL = 'https://archive.org/details/lanegenealogies01chap/page/n7/mode/2up';
   const NHHS_SOURCE_URL = 'https://www.nhhistory.org/object/272904/lane-family-papers-1727-1924';
-  /** Google Maps zoom for person modal Place Context (neighborhood / large parcel; was 10 = regional). */
-  const PLACE_CONTEXT_MAP_ZOOM = 17;
+  /** Google Maps zoom for person modal Place Context (neighborhood; slightly pulled back for context). */
+  const PLACE_CONTEXT_MAP_ZOOM = 16;
+  /** Hide Google POI / transit pins so only the Lane place marker reads clearly on hybrid. */
+  const PLACE_CONTEXT_MAP_STYLES = [
+    { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+    { featureType: 'transit', stylers: [{ visibility: 'off' }] }
+  ];
   const STORAGE_STORY_CHAPTERS = 'laneMemorialStoryChapters';
   const STORAGE_STORY_NARRATE = 'laneMemorialStoryNarrate';
   const STORY_SCENE_DURATION_MS = 4600;
@@ -762,11 +767,18 @@
         zoom: PLACE_CONTEXT_MAP_ZOOM,
         mapTypeId: google.maps.MapTypeId.HYBRID,
         streetViewControl: false,
-        fullscreenControl: true
+        fullscreenControl: true,
+        styles: PLACE_CONTEXT_MAP_STYLES
       });
       memorialMarker = new google.maps.Marker({
         position: center,
-        map: memorialMap
+        map: memorialMap,
+        title: result.place || 'Recorded place',
+        icon: {
+          url: '/family/assets/lane-place-marker.svg',
+          scaledSize: new google.maps.Size(48, 58),
+          anchor: new google.maps.Point(24, 55)
+        }
       });
       caption.textContent = `Approximate location based on recorded place name: ${result.place}`;
       setTimeout(() => {

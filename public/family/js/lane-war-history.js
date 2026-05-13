@@ -401,13 +401,18 @@ function openSoldierModal(personId) {
 function initMap() {
   const el = document.getElementById('warMap');
   if (!el || !window.google || !google.maps) return;
+  const hybridNoPoiStyles = [
+    { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+    { featureType: 'transit', stylers: [{ visibility: 'off' }] }
+  ];
   map = new google.maps.Map(el, {
     center: { lat: 42.4, lng: -71.1 },
     zoom: 7,
     mapTypeId: google.maps.MapTypeId.HYBRID,
     mapTypeControl: true,
     streetViewControl: false,
-    fullscreenControl: true
+    fullscreenControl: true,
+    styles: hybridNoPoiStyles
   });
   mapReady = true;
 }

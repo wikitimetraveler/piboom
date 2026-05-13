@@ -4,7 +4,8 @@ import {
   getGseSources,
   postGseAnalyzeScenario,
   postGseImportLoanJson,
-  getGseLoanLimits
+  getGseLoanLimits,
+  postLoanProgramExpert
 } from '../controllers/gse.controller.js';
 
 const router = Router();
@@ -14,5 +15,6 @@ router.get('/sources', getGseSources);
 router.post('/analyze-scenario', postGseAnalyzeScenario);
 router.post('/import-loan-json', postGseImportLoanJson);
 router.get('/loan-limits', getGseLoanLimits);
+router.post('/loan-program-expert', postLoanProgramExpert);
 
 export default router;

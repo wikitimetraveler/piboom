@@ -6,6 +6,41 @@
       "name": "Conventional Conforming (standard)",
       "tag": "standard",
       "sourceRefs": ["FANNIE_CONFORMING"],
+      "guidance": {
+        "eligibilityNarrative": "Standard conforming path for primary, second-home, and investment transactions where AUS and collateral findings align with current guide policy.",
+        "keyRequirements": [
+          "AUS findings must support risk classification and documentation level.",
+          "Confirm occupancy, purpose, and property-type specific LTV/CLTV caps in current guide.",
+          "Validate income and assets to guide-specific documentation standards."
+        ],
+        "documentationExpectations": [
+          "Income calculation worksheets aligned to underwriting method.",
+          "Asset sourcing and large-deposit support per guide policy.",
+          "Collateral review conditions from appraisal/CDA as applicable."
+        ],
+        "edgeCases": [
+          "Layered risk with high DTI and minimal reserves.",
+          "Multiple financed properties for investment scenarios.",
+          "Condo/project eligibility constraints."
+        ],
+        "commonDenialReasons": [
+          "AUS findings not eligible for delivery path.",
+          "Ineligible occupancy/purpose combinations.",
+          "Overlay-driven credit or reserve shortfall."
+        ],
+        "overlayCaveats": [
+          "Many investors require tighter minimum FICO than baseline agency guide.",
+          "DTI and reserve overlays often tighten for investment properties."
+        ],
+        "compensatingFactors": [
+          "Strong reserve position beyond minimums.",
+          "Stable housing payment history and low payment shock."
+        ],
+        "workflowNotes": [
+          "Lock investor overlays early to avoid late-condition surprises.",
+          "Re-run AUS after material changes (credit/liability/income)."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 97,
         "maxCltv": 97,
@@ -21,6 +56,41 @@
       "name": "HomeReady",
       "tag": "affordable",
       "sourceRefs": ["FANNIE_HOMEREADY_GUIDE"],
+      "guidance": {
+        "eligibilityNarrative": "Affordable conventional option for low-to-moderate income borrowers, emphasizing AMI limits and homeownership education/occupancy requirements where applicable.",
+        "keyRequirements": [
+          "AMI eligibility must be validated using current eligibility tools.",
+          "Primary-residence occupancy required for most transactions.",
+          "AUS findings and MI coverage must align with current policy."
+        ],
+        "documentationExpectations": [
+          "Income documentation with AMI worksheet support.",
+          "Education completion documentation when required.",
+          "Gift/grant source documentation where used."
+        ],
+        "edgeCases": [
+          "Borderline AMI calculations with variable income.",
+          "Boarder income treatment and documentation quality.",
+          "Manufactured or specialty collateral requiring extra guide review."
+        ],
+        "commonDenialReasons": [
+          "AMI exceeds allowable threshold for subject location.",
+          "Ineligible occupancy or purpose selection.",
+          "Insufficient reserves under investor overlay."
+        ],
+        "overlayCaveats": [
+          "Investors may cap DTI tighter than guide max when credit is marginal.",
+          "Reserve overlays can apply even when agency baseline is permissive."
+        ],
+        "compensatingFactors": [
+          "Strong post-close reserves.",
+          "Lower payment shock and stable employment profile."
+        ],
+        "workflowNotes": [
+          "Validate AMI early before issuing commitment terms.",
+          "Track overlay exceptions in underwriting narrative."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 97,
         "maxCltv": 105,
@@ -39,6 +109,41 @@
       "name": "HomeStyle Renovation",
       "tag": "renovation",
       "sourceRefs": ["FANNIE_CONFORMING"],
+      "guidance": {
+        "eligibilityNarrative": "Renovation delivery path combining acquisition/refinance with approved improvement scope under HomeStyle policy.",
+        "keyRequirements": [
+          "Scope-of-work and contractor documentation must meet renovation guide requirements.",
+          "As-completed valuation and contingency controls are required.",
+          "Project management timelines must fit lock and closing requirements."
+        ],
+        "documentationExpectations": [
+          "Executed contractor bids and renovation agreements.",
+          "As-completed appraisal support.",
+          "Draw administration setup and escrow controls."
+        ],
+        "edgeCases": [
+          "Property condition issues delaying appraisal completion.",
+          "Contractor licensing/insurance inconsistencies.",
+          "Large rehab scope with contingency overruns."
+        ],
+        "commonDenialReasons": [
+          "Unacceptable project scope or incomplete contractor package.",
+          "LTV/CLTV and DTI profile outside investor tolerance.",
+          "Timeline risk exceeding lock/closing constraints."
+        ],
+        "overlayCaveats": [
+          "Investors may restrict renovation volume or contractor concentration.",
+          "Additional reserve overlays are common for renovation paths."
+        ],
+        "compensatingFactors": [
+          "Strong reserves and low leverage profile.",
+          "Experienced contractor with complete package."
+        ],
+        "workflowNotes": [
+          "Front-load contractor validation and appraisal sequencing.",
+          "Coordinate draw controls with closing operations."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 95,
         "maxCltv": 95,
@@ -54,6 +159,41 @@
       "name": "High-LTV refinance option (guide-based)",
       "tag": "refinance",
       "sourceRefs": ["FANNIE_CONFORMING"],
+      "guidance": {
+        "eligibilityNarrative": "Refinance option for higher-LTV legacy borrowers where current policy allows relief-style treatment and required benefit tests are met.",
+        "keyRequirements": [
+          "Loan must meet current eligibility history/performance criteria.",
+          "Refinance benefit tests and payment standards must be documented.",
+          "AUS and investor requirements must support final execution."
+        ],
+        "documentationExpectations": [
+          "Current mortgage payment history evidence.",
+          "Refinance net-benefit worksheet.",
+          "Title/liens validation supporting final CLTV."
+        ],
+        "edgeCases": [
+          "Subordinate financing changes final CLTV.",
+          "Payment shock concerns under investor overlays.",
+          "Servicing transfer data gaps."
+        ],
+        "commonDenialReasons": [
+          "Benefit test fails or is insufficiently documented.",
+          "Ineligible occupancy/loan history profile.",
+          "Overlay limits exceeded on credit or DTI."
+        ],
+        "overlayCaveats": [
+          "Some investors apply tighter DTI caps for high-LTV refi execution.",
+          "Reserve or payment-history overlays can supersede baseline guide."
+        ],
+        "compensatingFactors": [
+          "Strong mortgage payment history.",
+          "Material monthly savings and reduced risk profile."
+        ],
+        "workflowNotes": [
+          "Validate payoff/subordinate lien details early.",
+          "Document refinance benefit clearly for QC."
+        ]
+      },
       "rules": {
         "maxLtvPrimaryPurchase": 97,
         "maxCltv": 97,

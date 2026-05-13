@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lane Trading Cards - DevConnect Labs</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/shared/styles.css" />
+  <link rel="stylesheet" href="/family/css/lane-shell.css" />
+  <link rel="stylesheet" href="/family/css/lane-family-pill-nav.css" />
+  <link rel="stylesheet" href="/family/css/lane-trading-cards.css" />
+  <script src="/shared/modern-navbar.js"></script>
+  <script src="/family/js/lane-family-pill-nav.js" defer></script>
+</head>
+<body class="lane-trading-cards-page">
+  <modern-navbar></modern-navbar>
+  <main class="ltc-wrap">
+    <section class="ltc-hero">
+      <p class="ltc-kicker">Lane Legacy Museum</p>
+      <h1 class="ltc-title">Lane Trading Cards</h1>
+      <p class="ltc-lede">A permanent, evidence-first gallery of 25 First Edition cards for people, eras, and records.</p>
+      <p class="history-context-evidence-note mb-0">
+        <strong>Context:</strong> broad era and migration framing. <strong>Evidence:</strong> person facts and citations on each card.
+      </p>
+    </section>
+
+    <section class="ltc-toolbar card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="row g-2 align-items-end">
+          <div class="col-12 col-lg-4">
+            <label for="ltcSearch" class="form-label mb-1">Search</label>
+            <input id="ltcSearch" class="form-control" type="search" placeholder="Name, era, branch, tag..." />
+          </div>
+          <div class="col-6 col-lg-2">
+            <label for="ltcEra" class="form-label mb-1">Era</label>
+            <select id="ltcEra" class="form-select">
+              <option value="">All eras</option>
+            </select>
+          </div>
+          <div class="col-6 col-lg-2">
+            <label for="ltcBranch" class="form-label mb-1">Branch</label>
+            <select id="ltcBranch" class="form-select">
+              <option value="">All branches</option>
+            </select>
+          </div>
+          <div class="col-6 col-lg-2">
+            <label for="ltcTag" class="form-label mb-1">Tag</label>
+            <select id="ltcTag" class="form-select">
+              <option value="">All tags</option>
+            </select>
+          </div>
+          <div class="col-6 col-lg-2 d-grid">
+            <button type="button" id="ltcReset" class="btn btn-outline-secondary">Reset filters</button>
+          </div>
+        </div>
+        <div class="ltc-actions mt-3">
+          <button type="button" id="ltcSheetPng" class="btn btn-sm btn-primary">
+            <i class="bi bi-grid-3x3-gap"></i> Download 9-card sheet PNG
+          </button>
+          <button type="button" id="ltcSheetPdf" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-filetype-pdf"></i> Download 9-card sheet PDF
+          </button>
+          <button type="button" id="ltcCatalogPdf" class="btn btn-sm btn-outline-dark">
+            <i class="bi bi-book"></i> Download catalog PDF
+          </button>
+          <label class="form-check form-check-inline ms-lg-2 mb-0 align-self-center">
+            <input class="form-check-input" type="checkbox" id="ltcIncludeQr" checked />
+            <span class="form-check-label small">Include QR</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="mt-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="h5 mb-0">First Edition Gallery</h2>
+        <div id="ltcCount" class="small text-muted"></div>
+      </div>
+      <div id="ltcError" class="text-danger small mb-2"></div>
+      <div id="ltcGrid" class="ltc-grid"></div>
+    </section>
+
+    <div class="text-center mt-4" data-lane-site-credit></div>
+  </main>
+
+  <div class="modal fade" id="ltcDetailModal" tabindex="-1" aria-labelledby="ltcDetailModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="ltcDetailModalTitle" class="h5 mb-0">Card detail</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="ltcDetailBody"></div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <div class="d-flex gap-2">
+            <button type="button" id="ltcSinglePng" class="btn btn-sm btn-primary">Single PNG</button>
+            <button type="button" id="ltcSinglePdf" class="btn btn-sm btn-outline-primary">Single PDF</button>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ltcExportMount" class="ltc-export-mount" aria-hidden="true"></div>
+
+  <script src="/family/js/lane-site-credit.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
+  <script src="/shared/poster-utils.js"></script>
+  <script src="/family/js/lane-trading-cards.js"></script>
+</body>
+</html>

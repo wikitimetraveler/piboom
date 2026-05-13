@@ -11,14 +11,15 @@
   'use strict';
 
   var DISPLAY_NAME = 'David E Lane';
-  /** Single-line public byline (muted footer). */
+  /** Public byline (muted footer); date appended like public/index.html footer. */
   var LINE =
     'Presentation, visualization, and software by ' +
     DISPLAY_NAME +
-    ' · AI-assisted development.';
+    ' · AI-assisted development';
 
   function mount() {
     var roots = document.querySelectorAll('[data-lane-site-credit]');
+    var dateStr = new Date().toLocaleDateString();
     for (var i = 0; i < roots.length; i++) {
       var root = roots[i];
       if (root.getAttribute('data-lane-site-credit-mounted')) continue;
@@ -27,7 +28,7 @@
       var p = document.createElement('p');
       p.className = 'lane-site-credit mb-0';
       p.setAttribute('role', 'note');
-      p.textContent = LINE;
+      p.textContent = LINE + ' — ' + dateStr;
       root.appendChild(p);
     }
   }

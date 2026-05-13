@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import { config } from './config/index.js';
 import buildRoutes from './routes/index.routes.js';
 import { initializeDatabase, createTables } from './services/database.service.js';
+import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -39,6 +40,19 @@ try {
   console.error('❌ Failed to create database tables:', err.message);
   console.error('   Application cannot start without database');
   process.exit(1);
+}
+
+try {
+  const hydrated = await refreshGenealogyCachesFromPostgres({ bootstrapFromFilesystem: false });
+  if (hydrated?.success) {
+    console.log(
+      `✅ Lane Postgres cache hydrated: ${hydrated.graphNodes} people, ${hydrated.datasetCount} dataset(s)`
+    );
+  } else {
+    console.warn(`⚠️ Lane Postgres cache hydration skipped: ${hydrated?.error || 'unknown error'}`);
+  }
+} catch (err) {
+  console.warn(`⚠️ Lane Postgres cache hydration failed: ${err.message}`);
 }
 
 // Initialize disasters schema - REQUIRED
