@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Impact Graph (Prototype)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <style>
+      body {
+        background: #f7f9fc;
+      }
+      .card {
+        border: 1px solid #e8ecf3;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+      }
+      .table-wrap {
+        max-height: 320px;
+        overflow: auto;
+      }
+      .mono {
+        font-family: Consolas, Menlo, Monaco, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-xxl py-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+        <h1 class="h3 mb-0">Disaster Impact Graph</h1>
+        <span class="badge bg-secondary">Prototype: county -> disaster -> zip -> loan -> milestone -> processor</span>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+              <label for="nodeIdInput" class="form-label">Search Node ID</label>
+              <input id="nodeIdInput" class="form-control" placeholder="e.g. 101">
+            </div>
+            <div class="col-md-2">
+              <label for="depthInput" class="form-label">Depth</label>
+              <input id="depthInput" type="number" class="form-control" value="3" min="1" max="6">
+            </div>
+            <div class="col-md-2">
+              <button id="loadGraphBtn" class="btn btn-primary w-100">Load Graph</button>
+            </div>
+            <div class="col-md-2">
+              <label for="countyInput" class="form-label">County FIPS</label>
+              <input id="countyInput" class="form-control" placeholder="e.g. 06037">
+            </div>
+            <div class="col-md-2">
+              <button id="loadCountyLoansBtn" class="btn btn-outline-primary w-100">County Loans</button>
+            </div>
+          </div>
+          <div class="row g-2 mt-1 align-items-end">
+            <div class="col-md-4">
+              <label for="disasterInput" class="form-label">Disaster External ID</label>
+              <input id="disasterInput" class="form-control" placeholder="e.g. 4850">
+            </div>
+            <div class="col-md-2">
+              <button id="loadDisasterLoansBtn" class="btn btn-outline-primary w-100">Disaster Loans</button>
+            </div>
+            <div class="col">
+              <div id="statusMessage" class="alert alert-light border mb-0 py-2">Ready.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-lg-5">
+          <div class="card h-100">
+            <div class="card-header">Node Details</div>
+            <div class="card-body">
+              <div id="nodeDetails" class="small text-muted">Load a node to view details.</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-7">
+          <div class="card h-100">
+            <div class="card-header">Risk Summary</div>
+            <div class="card-body" id="riskSummary">
+              <div class="text-muted small">Summary appears after loading a node.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header">Connected Nodes</div>
+        <div class="card-body table-wrap p-0">
+          <table class="table table-sm table-striped mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Label</th>
+                <th>Source</th>
+                <th>External ID</th>
+              </tr>
+            </thead>
+            <tbody id="connectedNodesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header">Edge Paths</div>
+        <div class="card-body table-wrap p-0">
+          <table class="table table-sm table-striped mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Depth</th>
+                <th>Node Path</th>
+                <th>Edge Path</th>
+              </tr>
+            </thead>
+            <tbody id="edgePathsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card mb-3">
+        <div class="card-header">Impacted Loans</div>
+        <div class="card-body table-wrap p-0">
+          <table class="table table-sm table-striped mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Loan External ID</th>
+                <th>Depth</th>
+                <th>Borrower</th>
+                <th>State</th>
+                <th>County</th>
+                <th>Milestone</th>
+                <th>Risk Score</th>
+              </tr>
+            </thead>
+            <tbody id="impactedLoansBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const nodeIdInput = document.getElementById('nodeIdInput');
+      const depthInput = document.getElementById('depthInput');
+      const countyInput = document.getElementById('countyInput');
+      const disasterInput = document.getElementById('disasterInput');
+      const statusMessage = document.getElementById('statusMessage');
+      const nodeDetails = document.getElementById('nodeDetails');
+      const riskSummary = document.getElementById('riskSummary');
+      const connectedNodesBody = document.getElementById('connectedNodesBody');
+      const edgePathsBody = document.getElementById('edgePathsBody');
+      const impactedLoansBody = document.getElementById('impactedLoansBody');
+
+      function setStatus(message, isError = false) {
+        statusMessage.className = `alert mb-0 py-2 ${isError ? 'alert-danger' : 'alert-light border'}`;
+        statusMessage.textContent = message;
+      }
+
+      function formatJson(obj) {
+        return `<pre class="small mb-0 mono">${JSON.stringify(obj, null, 2)}</pre>`;
+      }
+
+      function renderConnectedNodes(nodes, startNodeId) {
+        const rows = (nodes || []).filter(node => Number(node.id) !== Number(startNodeId));
+        if (!rows.length) {
+          connectedNodesBody.innerHTML = '<tr><td colspan="5" class="text-muted text-center py-3">No connected nodes found.</td></tr>';
+          return;
+        }
+        connectedNodesBody.innerHTML = rows.map(node => `
+          <tr>
+            <td>${node.id}</td>
+            <td>${node.node_type}</td>
+            <td>${node.label || ''}</td>
+            <td>${node.source || ''}</td>
+            <td>${node.external_id || ''}</td>
+          </tr>
+        `).join('');
+      }
+
+      function renderEdgePaths(paths) {
+        if (!paths || !paths.length) {
+          edgePathsBody.innerHTML = '<tr><td colspan="3" class="text-muted text-center py-3">No paths found.</td></tr>';
+          return;
+        }
+        edgePathsBody.innerHTML = paths.map(path => `
+          <tr>
+            <td>${path.depth}</td>
+            <td class="mono">${(path.nodePath || []).join(' -> ')}</td>
+            <td class="mono">${(path.edgePath || []).join(' -> ')}</td>
+          </tr>
+        `).join('');
+      }
+
+      function renderImpactedLoans(loans) {
+        if (!loans || !loans.length) {
+          impactedLoansBody.innerHTML = '<tr><td colspan="7" class="text-muted text-center py-3">No impacted loans found.</td></tr>';
+          return;
+        }
+        impactedLoansBody.innerHTML = loans.map(row => {
+          const details = row.loanDetails || {};
+          return `
+            <tr>
+              <td class="mono">${row.loan_external_id || ''}</td>
+              <td>${row.depth ?? ''}</td>
+              <td>${details.borrower_name || ''}</td>
+              <td>${details.state || ''}</td>
+              <td>${details.county || ''}</td>
+              <td>${details.milestone || ''}</td>
+              <td>${details.disaster_risk_score ?? ''}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      function renderSummary(summary) {
+        if (!summary) {
+          riskSummary.innerHTML = '<div class="text-muted small">Summary unavailable.</div>';
+          return;
+        }
+        riskSummary.innerHTML = `
+          <div class="row g-2 mb-2">
+            <div class="col-md-3"><div class="border rounded p-2"><strong>Nodes</strong><div>${summary.nodeCount ?? 0}</div></div></div>
+            <div class="col-md-3"><div class="border rounded p-2"><strong>Edges</strong><div>${summary.edgeCount ?? 0}</div></div></div>
+            <div class="col-md-3"><div class="border rounded p-2"><strong>Impacted Loans</strong><div>${summary.impactedLoanCount ?? 0}</div></div></div>
+            <div class="col-md-3"><div class="border rounded p-2"><strong>Start Node</strong><div>${summary.startNodeId ?? '-'}</div></div></div>
+          </div>
+          <div class="mb-2"><strong class="small">Node Type Counts</strong>${formatJson(summary.nodeTypeCounts || {})}</div>
+          <div class="mb-2"><strong class="small">Edge Type Counts</strong>${formatJson(summary.edgeTypeCounts || {})}</div>
+          <div><strong class="small">Highest Risk Path</strong>${formatJson(summary.highestRiskPath || {})}</div>
+        `;
+      }
+
+      async function fetchJson(url) {
+        const response = await fetch(url);
+        const payload = await response.json();
+        if (!response.ok || payload.success === false) {
+          throw new Error(payload.details || payload.error || `Request failed: ${response.status}`);
+        }
+        return payload.data;
+      }
+
+      async function loadGraph() {
+        const nodeId = nodeIdInput.value.trim();
+        const depth = depthInput.value.trim() || '3';
+        if (!nodeId) {
+          setStatus('Node ID is required.', true);
+          return;
+        }
+        try {
+          setStatus('Loading graph...');
+          const [graph, summary] = await Promise.all([
+            fetchJson(`/api/disaster-impact-graph/${encodeURIComponent(nodeId)}?depth=${encodeURIComponent(depth)}`),
+            fetchJson(`/api/disaster-impact-graph/${encodeURIComponent(nodeId)}/summary`)
+          ]);
+          const startNode = (graph.nodes || []).find(node => Number(node.id) === Number(nodeId));
+          nodeDetails.innerHTML = startNode ? formatJson(startNode) : '<span class="text-muted">Start node not found in response.</span>';
+          renderConnectedNodes(graph.nodes, nodeId);
+          renderEdgePaths(graph.paths);
+          renderSummary(summary);
+          setStatus(`Loaded graph for node ${nodeId} (depth ${graph.depth}).`);
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      }
+
+      async function loadCountyLoans() {
+        const countyFips = countyInput.value.trim();
+        if (!countyFips) {
+          setStatus('County FIPS is required.', true);
+          return;
+        }
+        try {
+          setStatus(`Loading impacted loans for county ${countyFips}...`);
+          const data = await fetchJson(`/api/disaster-impact-graph/county/${encodeURIComponent(countyFips)}/loans`);
+          renderImpactedLoans(data.loans || []);
+          setStatus(`Loaded ${data.loans?.length || 0} impacted loans for county ${countyFips}.`);
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      }
+
+      async function loadDisasterLoans() {
+        const disasterId = disasterInput.value.trim();
+        if (!disasterId) {
+          setStatus('Disaster external ID is required.', true);
+          return;
+        }
+        try {
+          setStatus(`Loading impacted loans for disaster ${disasterId}...`);
+          const data = await fetchJson(`/api/disaster-impact-graph/disaster/${encodeURIComponent(disasterId)}/loans`);
+          renderImpactedLoans(data.loans || []);
+          setStatus(`Loaded ${data.loans?.length || 0} impacted loans for disaster ${disasterId}.`);
+        } catch (error) {
+          setStatus(error.message, true);
+        }
+      }
+
+      document.getElementById('loadGraphBtn').addEventListener('click', loadGraph);
+      document.getElementById('loadCountyLoansBtn').addEventListener('click', loadCountyLoans);
+      document.getElementById('loadDisasterLoansBtn').addEventListener('click', loadDisasterLoans);
+    </script>
+  </body>
+</html>

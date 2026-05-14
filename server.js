@@ -9,6 +9,7 @@ import buildRoutes from './routes/index.routes.js';
 import { initializeDatabase, createTables } from './services/database.service.js';
 import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
+import { ensureDisasterImpactGraphReady } from './services/disaster-impact-graph.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,6 +64,13 @@ try {
   console.error('❌ Failed to initialize disasters schema:', err.message);
   console.error('   Application cannot start without database');
   process.exit(1);
+}
+
+try {
+  await ensureDisasterImpactGraphReady();
+  console.log('✅ Disaster impact graph schema ready');
+} catch (err) {
+  console.warn(`⚠️ Disaster impact graph initialization skipped: ${err.message}`);
 }
 
 if (config.autoIngestDisasters) {

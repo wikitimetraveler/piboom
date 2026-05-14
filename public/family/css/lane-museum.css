@@ -541,8 +541,54 @@ body.archiveLight .museum-wordmark {
   object-position: top center;
 }
 
+.prominent-card-cover {
+  display: none;
+  min-height: 220px;
+  padding: 1.2rem 1.15rem 1.35rem;
+  background:
+    linear-gradient(160deg, rgba(216, 190, 139, 0.12) 0%, rgba(37, 33, 26, 0.18) 100%),
+    var(--museum-surface);
+  border-bottom: 1px solid var(--museum-border);
+}
+
+.prominent-card-cover__kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--museum-muted);
+  margin-bottom: 0.65rem;
+}
+
+.prominent-card-cover__name {
+  font-family: var(--museum-serif);
+  font-size: 1.28rem;
+  line-height: 1.2;
+  margin-bottom: 0.55rem;
+  color: var(--museum-text);
+}
+
+.prominent-card-cover__dates {
+  font-size: 0.92rem;
+  color: var(--museum-text);
+}
+
+.prominent-card-cover__meta {
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  color: var(--museum-muted);
+}
+
 .prominent-card-media--missing img {
   display: none;
+}
+
+.prominent-card-media--missing figcaption {
+  display: none;
+}
+
+.prominent-card-media--missing .prominent-card-cover,
+.prominent-card-media--cover .prominent-card-cover {
+  display: block;
 }
 
 .prominent-card-media figcaption {

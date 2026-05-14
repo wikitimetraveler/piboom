@@ -552,10 +552,10 @@ body.lane-family-hub {
 .lf-hub-splash-bg {
   position: absolute;
   inset: 0;
-  background-position: center;
+  background-position: center top;
   background-size: cover;
   filter: grayscale(0.06) contrast(1.04) saturate(0.92);
-  transform: scale(1.05);
+  transform: scale(1.02);
   animation: lfHubSplashDrift 3200ms ease forwards;
 }
 
@@ -686,7 +686,7 @@ body.lane-family-hub {
 
 @keyframes lfHubSplashDrift {
   from {
-    transform: scale(1.06);
+    transform: scale(1.03);
   }
   to {
     transform: scale(1);

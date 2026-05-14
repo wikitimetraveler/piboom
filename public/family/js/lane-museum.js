@@ -738,11 +738,22 @@ function renderProminent(prominent = []) {
       const memorialUrl =
         pid != null ? `/family/lane-memorial-wall.html?personId=${encodeURIComponent(String(pid))}` : '/family/lane-memorial-wall.html';
       const imgUrl = entry.imageUrl != null ? String(entry.imageUrl).trim() : '';
+      const lifeSpanLine = `${person.birthYear || 'Unknown'} - ${person.deathYear || 'Unknown'}`;
+      const coverMetaLine = person.born || entry.eraLabel || 'Lane family records';
+      const coverMarkup = `
+        <div class="prominent-card-cover" aria-hidden="true">
+          <div class="prominent-card-cover__kicker">Lane Legacy Museum</div>
+          <div class="prominent-card-cover__name">${escapeHtml(title)}</div>
+          <div class="prominent-card-cover__dates">${escapeHtml(lifeSpanLine)}</div>
+          <div class="prominent-card-cover__meta">${escapeHtml(coverMetaLine)}</div>
+        </div>
+      `;
       const mediaBlock =
         imgUrl !== ''
           ? `<figure class="prominent-card-media">
                <img src="${escapeHtml(imgUrl)}" alt="" loading="lazy"
                  onerror="this.closest('figure')?.classList.add('prominent-card-media--missing');" />
+               ${coverMarkup}
                ${
                  entry.imageCaption || entry.imageCredit
                    ? `<figcaption class="small text-muted">
@@ -753,7 +764,9 @@ function renderProminent(prominent = []) {
                    : ''
                }
              </figure>`
-          : '';
+          : `<figure class="prominent-card-media prominent-card-media--cover">
+               ${coverMarkup}
+             </figure>`;
       const cardMods = [imgUrl ? 'prominent-card--hero' : ''].filter(Boolean).join(' ');
       const orderLine =
         entry.order === 1

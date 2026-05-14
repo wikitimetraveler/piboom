@@ -7,9 +7,9 @@
   /** Set to an 11-character YouTube video id when the “gem” clip is ready; leave empty to show placeholder copy only. */
   const LANE_FAMILY_SPLASH_VIDEO_ID = '';
 
-  const LANE_FAMILY_SPLASH_BG = '/family/assets/lane-historians/frontispiece-title-1891.png';
+  const LANE_FAMILY_SPLASH_BG = '/family/assets/DavidELane.png';
   /** Bump suffix when splash copy/behavior changes so testers see it again without clearing all site data. */
-  const LANE_FAMILY_SPLASH_LS_KEY = 'laneFamilyHubSplashSeen_v2';
+  const LANE_FAMILY_SPLASH_LS_KEY = 'laneFamilyHubSplashSeen_v3';
   const SPLASH_AUTO_MS = 5200;
 
   function init() {

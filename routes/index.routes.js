@@ -40,6 +40,7 @@ import findsRoutes from './finds.routes.js';
 import appUserAuthRoutes from './app-user-auth.routes.js';
 import gseRoutes from './gse.routes.js';
 import financeRoutes from './finance.routes.js';
+import disasterImpactGraphRoutes from './disaster-impact-graph.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -83,6 +84,7 @@ export default function buildRoutes(io) {
   api.use('/auth', appUserAuthRoutes);
   api.use('/gse', gseRoutes);
   api.use('/finance', financeRoutes);
+  api.use('/disaster-impact-graph', disasterImpactGraphRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }
