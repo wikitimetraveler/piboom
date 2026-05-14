@@ -67,6 +67,15 @@
       .trim();
   }
 
+  function liveScenarioBuilderSceneRelevant() {
+    const card = document.getElementById('liveScenarioBuilderSectionCard');
+    const container = document.getElementById('liveScenarioBuilderContainer');
+    if (!card || !container) return false;
+    if (card.classList.contains('section-card-hidden')) return false;
+    if (card.style && card.style.display === 'none') return false;
+    return container.style && container.style.display === 'block';
+  }
+
   function buildScenes() {
     const full = chaptersEnabled();
     const scenes = [];
@@ -81,6 +90,19 @@
       ),
       durationMs: SCENE_MS,
     });
+    if (liveScenarioBuilderSceneRelevant()) {
+      scenes.push({
+        collapseId: 'collapseLiveScenarioBuilder',
+        scrollEl: () => document.getElementById('headingLiveScenarioBuilder'),
+        kicker: 'Step 1b',
+        title: 'Live Scenario Builder',
+        copy: 'Edit mock values, preview the result instantly, then apply values into SET rows for one, five, or all test columns.',
+        narration: norm(
+          'Step one B, Live Scenario Builder. Edit mock values, inspect the live result, then apply those values to set rows across one, five, or all test columns.'
+        ),
+        durationMs: SCENE_MS,
+      });
+    }
     scenes.push({
       collapseId: 'collapseTestGrid',
       scrollEl: () => document.getElementById('headingTestGrid'),

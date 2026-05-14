@@ -3804,6 +3804,33 @@ function runScenarioCalculation() {
 }
 
 /**
+ * Hub / parser field metadata line for Live Scenario Builder (description + type).
+ * @param {string} displayId
+ * @param {Record<string, object>} metaBag
+ * @returns {string}
+ */
+function scenarioBuilderLabelFromMetadata(displayId, metaBag) {
+  if (!metaBag || typeof metaBag !== 'object' || !displayId) return '';
+  const bare = String(displayId).replace(/^\[|\]$/g, '').trim();
+  const keys = [displayId, bare, '[' + bare + ']'].filter(Boolean);
+  let meta = null;
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i];
+    if (metaBag[k]) {
+      meta = metaBag[k];
+      break;
+    }
+  }
+  if (!meta || typeof meta !== 'object') return '';
+  const desc = String(meta.description || '').trim();
+  const dt = String(meta.dataType || '').trim();
+  const parts = [];
+  if (desc) parts.push(desc);
+  if (dt && !/^string$/i.test(dt)) parts.push('Type: ' + dt);
+  return parts.join(' · ');
+}
+
+/**
  * Render the Live Scenario Builder grid for the given custom field.
  * @param {object} field - { fieldId, calculation, ... }
  */
@@ -3855,6 +3882,11 @@ function renderScenarioBuilder(field) {
     tdId.className = 'field-id-cell';
     tdId.textContent = '[' + displayId + ']';
     tr.appendChild(tdId);
+    const tdLabel = document.createElement('td');
+    tdLabel.className = 'scenario-builder-label-cell text-muted small';
+    const labelLine = scenarioBuilderLabelFromMetadata(displayId, fieldMetadata);
+    tdLabel.textContent = labelLine || '—';
+    tr.appendChild(tdLabel);
     const tdVal = document.createElement('td');
     tdVal.className = 'value-cell';
     const input = createScenarioBuilderInput(fid, initialVal, displayId, { expression: calc });
@@ -3950,6 +3982,9 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
       .then(({ dropdownCount }) => {
         if (dropdownCount > 0) {
           showToast(`Encompass: ${dropdownCount} SET field(s) with dropdown metadata`, 'info');
+        }
+        if (currentScenarioBuilderField) {
+          renderScenarioBuilder(currentScenarioBuilderField);
         }
       })
       .catch(() => {
@@ -4908,7 +4943,7 @@ function initializeSectionSidebar() {
   if (!nav) return;
 
   // On load: hide section cards and collapse; then open Test Scenarios (Step 1) — upload/generate stays in the Excel Unit Tests hero band above
-  var sectionIds = ['collapseTestScenarios', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseLearnMode', 'collapseAIAssistant'];
+  var sectionIds = ['collapseTestScenarios', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (el) {
@@ -4958,7 +4993,7 @@ function initializeSectionSidebar() {
   });
 
   // Sync sidebar active state when sections expand/collapse (from header clicks, voice, or sidebar)
-  var sectionIds = ['collapseTestScenarios', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseLearnMode', 'collapseAIAssistant'];
+  var sectionIds = ['collapseTestScenarios', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;

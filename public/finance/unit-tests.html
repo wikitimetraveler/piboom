@@ -1743,6 +1743,12 @@
         font-weight: 600;
         vertical-align: middle;
       }
+      .scenario-builder-grid .scenario-builder-label-cell {
+        max-width: 22rem;
+        vertical-align: middle;
+        word-break: break-word;
+        line-height: 1.35;
+      }
       .scenario-builder-grid .value-cell {
         min-width: 180px;
       }
@@ -2240,12 +2246,12 @@
               <div class="section-sidebar-title">Workflow</div>
               <ul class="section-sidebar-nav" id="sectionSidebarNav">
                 <li><a href="#collapseTestScenarios" data-bs-target="#collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-1-circle"></i> Step 1: Test Scenarios</a></li>
+                <li><a href="#collapseLiveScenarioBuilder" data-bs-target="#collapseLiveScenarioBuilder" data-heading="headingLiveScenarioBuilder" id="sidebarLiveScenarioBuilder" style="display: none;"><i class="bi-calculator"></i> Live Scenario Builder</a></li>
                 <li><a href="#collapseTestGrid" data-bs-target="#collapseTestGrid" data-heading="headingTestGrid"><i class="bi-2-circle"></i> Step 2: Test Grid</a></li>
                 <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-3-circle"></i> Step 3: Run tests</a></li>
                 <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-4-circle"></i> Step 4: Sign-off</a></li>
                 <li><a href="#collapseTestLibrary" data-bs-target="#collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
                 <li><a href="#collapseSelectedField" data-bs-target="#collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-input-cursor-text"></i> Selected Field</a></li>
-                <li><a href="#collapseLiveScenarioBuilder" data-bs-target="#collapseLiveScenarioBuilder" data-heading="headingLiveScenarioBuilder" id="sidebarLiveScenarioBuilder" style="display: none;"><i class="bi-calculator"></i> Live Scenario Builder</a></li>
                 <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Advanced</span></li>
                 <li><a href="#collapseLearnMode" data-bs-target="#collapseLearnMode" data-heading="headingLearnMode"><i class="bi-mortarboard"></i> Learn Mode</a></li>
                 <li><a href="#collapseAIAssistant" data-bs-target="#collapseAIAssistant" data-heading="headingAIAssistant"><i class="bi-robot"></i> AI Assistant</a></li>
@@ -2428,6 +2434,58 @@
               <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
                       <p class="text-muted mb-3"><small>Click a scenario to highlight its column. Use <strong>Run</strong> to execute it. Click the <strong>Edit</strong> button on a scenario card to edit its description.</small></p>
                       <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
+              </div>
+            </div>
+            <!-- Live Scenario Builder (directly above Step 2 Test Grid when shown) -->
+            <div class="section-card section-card-hidden" id="liveScenarioBuilderSectionCard" data-collapse-target="collapseLiveScenarioBuilder" style="display: none;">
+              <div class="section-card-header collapsed" tabindex="0" id="headingLiveScenarioBuilder" role="button" data-bs-toggle="collapse" data-bs-target="#collapseLiveScenarioBuilder" aria-expanded="false" aria-controls="collapseLiveScenarioBuilder">
+                <span class="section-title"><i class="bi-calculator me-1"></i> Live Scenario Builder</span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseLiveScenarioBuilder" class="collapse section-card-body" aria-labelledby="headingLiveScenarioBuilder">
+                <p class="text-muted small mb-3">Edit mock values and see the calculation result. No Set/Get—single calc only. <strong>Null all</strong> sets every value to the literal <code>null</code> (same convention as the unit test grid). <strong>Label / aliases</strong> pulls Encompass descriptions when the hub metadata is loaded.</p>
+                <div id="liveScenarioBuilderContainer" style="display: none;">
+                  <div class="scenario-builder-grid-wrapper mb-3">
+                    <table class="table table-sm table-bordered scenario-builder-grid" id="scenarioBuilderGrid">
+                      <thead>
+                        <tr>
+                          <th>Field ID</th>
+                          <th>Label / aliases</th>
+                          <th>Value</th>
+                        </tr>
+                      </thead>
+                      <tbody id="scenarioBuilderGridBody">
+                        <!-- Rows populated by JS -->
+                      </tbody>
+                    </table>
+                  </div>
+                  <div id="scenarioBuilderApplyToolbar" class="border rounded p-3 mb-3 bg-light">
+                    <h6 class="small text-uppercase text-muted mb-2"><i class="bi-arrow-down-circle me-1"></i>Push values to unit test grid</h6>
+                    <p class="small text-muted mb-2 mb-md-3">Copies each builder value into <strong>SET</strong> rows that match the field ID in <strong>Target</strong>. Pick a starting scenario column, then how many columns to fill.</p>
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                      <label for="scenarioApplyColumnSelect" class="small mb-0 text-nowrap">Start at</label>
+                      <select id="scenarioApplyColumnSelect" class="form-select form-select-sm" style="max-width: 220px" aria-label="Starting test scenario column"></select>
+                      <div class="btn-group btn-group-sm" role="group" aria-label="How many columns to fill">
+                        <button type="button" class="btn btn-outline-primary scenario-apply-mode active" data-mode="one" title="Only the selected column">This column</button>
+                        <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="five" title="Selected column plus the next four">5 columns</button>
+                        <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="all" title="Every Test column">All</button>
+                      </div>
+                      <button type="button" class="btn btn-sm btn-primary" id="scenarioApplyToGridBtn"><i class="bi-check2-circle me-1"></i>Apply</button>
+                    </div>
+                    <div class="d-flex flex-wrap align-items-center gap-2">
+                      <button type="button" class="btn btn-sm btn-outline-secondary" id="scenarioFillTool8Btn" title="Fill empty builder inputs using the same sample map as Alchemist (Tool 8)">
+                        <i class="bi-magic me-1"></i>Fill empty from Tool 8 samples
+                      </button>
+                      <button type="button" class="btn btn-sm btn-outline-warning" id="scenarioBuilderNullAllBtn" title="Set every builder value to the literal null text">
+                        <i class="bi-braces me-1"></i>Null all
+                      </button>
+                    </div>
+                  </div>
+                  <div class="scenario-builder-result-wrapper">
+                    <label class="mb-1 fw-semibold"><small>Result</small></label>
+                    <div id="scenarioBuilderResult" class="form-control-plaintext scenario-builder-result-display" readonly>—</div>
+                  </div>
+                </div>
               </div>
             </div>
             <!-- Test Grid -->
@@ -2627,56 +2685,6 @@
                       </div>
               </div>
             </div>
-            <!-- Live Scenario Builder (own section; shown when generated from custom field with inputs) -->
-            <div class="section-card section-card-hidden" id="liveScenarioBuilderSectionCard" data-collapse-target="collapseLiveScenarioBuilder" style="display: none;">
-              <div class="section-card-header collapsed" tabindex="0" id="headingLiveScenarioBuilder" role="button" data-bs-toggle="collapse" data-bs-target="#collapseLiveScenarioBuilder" aria-expanded="false" aria-controls="collapseLiveScenarioBuilder">
-                <span class="section-title"><i class="bi-calculator me-1"></i> Live Scenario Builder</span>
-                <i class="bi-chevron-down"></i>
-              </div>
-              <div id="collapseLiveScenarioBuilder" class="collapse section-card-body" aria-labelledby="headingLiveScenarioBuilder">
-                <p class="text-muted small mb-3">Edit mock values and see the calculation result. No Set/Get—single calc only. <strong>Null all</strong> sets every value to the literal <code>null</code> (same convention as the unit test grid).</p>
-                <div id="liveScenarioBuilderContainer" style="display: none;">
-                  <div class="scenario-builder-grid-wrapper mb-3">
-                    <table class="table table-sm table-bordered scenario-builder-grid" id="scenarioBuilderGrid">
-                      <thead>
-                        <tr>
-                          <th>Field ID</th>
-                          <th>Value</th>
-                        </tr>
-                      </thead>
-                      <tbody id="scenarioBuilderGridBody">
-                        <!-- Rows populated by JS -->
-                      </tbody>
-                    </table>
-                  </div>
-                  <div id="scenarioBuilderApplyToolbar" class="border rounded p-3 mb-3 bg-light">
-                    <h6 class="small text-uppercase text-muted mb-2"><i class="bi-arrow-down-circle me-1"></i>Push values to unit test grid</h6>
-                    <p class="small text-muted mb-2 mb-md-3">Copies each builder value into <strong>SET</strong> rows that match the field ID in <strong>Target</strong>. Pick a starting scenario column, then how many columns to fill.</p>
-                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                      <label for="scenarioApplyColumnSelect" class="small mb-0 text-nowrap">Start at</label>
-                      <select id="scenarioApplyColumnSelect" class="form-select form-select-sm" style="max-width: 220px" aria-label="Starting test scenario column"></select>
-                      <div class="btn-group btn-group-sm" role="group" aria-label="How many columns to fill">
-                        <button type="button" class="btn btn-outline-primary scenario-apply-mode active" data-mode="one" title="Only the selected column">This column</button>
-                        <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="five" title="Selected column plus the next four">5 columns</button>
-                        <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="all" title="Every Test column">All</button>
-                      </div>
-                      <button type="button" class="btn btn-sm btn-primary" id="scenarioApplyToGridBtn"><i class="bi-check2-circle me-1"></i>Apply</button>
-                    </div>
-                    <div class="d-flex flex-wrap align-items-center gap-2">
-                      <button type="button" class="btn btn-sm btn-outline-secondary" id="scenarioFillTool8Btn" title="Fill empty builder inputs using the same sample map as Alchemist (Tool 8)">
-                        <i class="bi-magic me-1"></i>Fill empty from Tool 8 samples
-                      </button>
-                      <button type="button" class="btn btn-sm btn-outline-warning" id="scenarioBuilderNullAllBtn" title="Set every builder value to the literal null text">
-                        <i class="bi-braces me-1"></i>Null all
-                      </button>
-                    </div>
-                  </div>
-                  <div class="scenario-builder-result-wrapper">
-                    <label class="mb-1 fw-semibold"><small>Result</small></label>
-                    <div id="scenarioBuilderResult" class="form-control-plaintext scenario-builder-result-display" readonly>—</div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
