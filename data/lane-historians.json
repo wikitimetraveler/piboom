@@ -118,7 +118,25 @@
   "archiveHighlight": "New Hampshire Historical Society (Concord) holds the Lane Family Papers, 1727–1924 — collection M 1991.095 (12 boxes; two series span diaries, ledgers, correspondence, and legal material). Accessions include Abby Lane of Stratham (~1914); Priscilla Lane Moore Tapley genealogy gifts (1988, 1991); and Henry C. Hines’s Deacon Joshua Lane journal (M 1939.001). Samuel Lane’s diaries underpin the printed NHHS edition A Journal for the Years 1739–1803 (1937). See the collection record for repository contact and permissions.",
   "preferredCitationExample": "Item title, Lane Family Papers, 1727–1924, M 1991.095. New Hampshire Historical Society, Concord, NH. Date accessed.",
   "illustrationsIndexNote": "The book's \"Illustrations in Lane Genealogy\" index maps display names to book page numbers in data/lane-illustrations-index.json (e.g. Rev. Jn. W. Lane, Rev. Jas. H. Fitts, Geo. W. Lane, Dr. Edw. B. Lane, Rev. Jas. P. Lane, Jacob Chapman).",
-  "modernHistorians": [],
+  "modernHistorians": [
+    {
+      "displayName": "David E. Lane",
+      "role": "Time Traveler interpreter of Lane family history",
+      "bio": "Turns Lane Genealogies Vol. I into visual, navigable exhibits by connecting scanned evidence, OCR cleanup, and curation into modern story flow. Builds evidence-first experiences with Cursor skills while keeping the original record in view.",
+      "tagline": "Math + CS (Youngstown State) · interpreting the record across eras.",
+      "imageUrl": "/family/assets/DavidELane.png",
+      "links": [
+        {
+          "label": "Lane Family hub",
+          "url": "/family/lane-family.html"
+        },
+        {
+          "label": "Book gallery opening plate",
+          "url": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4"
+        }
+      ]
+    }
+  ],
   "modernHistoriansPlaceholder": "Later: add family members and researchers who carry the record forward on this site—imports, OCR review, exhibits, and curation—using the modernHistorians array in this JSON file (same shape as figures: displayName, role, bio, optional image, links).",
   "notes": "OCR-style slips in older scans (e.g. hiin/him) were normalized in this excerpt where obvious; verify wording against the Internet Archive facsimile. Per-face JPEGs are regenerated with npm run extract:lane-frontispiece-portraits (edit CROPS in scripts/tools/extract-lane-frontispiece-portraits.mjs if the PDF extract changes)."
 }

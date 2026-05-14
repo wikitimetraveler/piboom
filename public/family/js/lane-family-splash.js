@@ -8,8 +8,8 @@
   const LANE_FAMILY_SPLASH_VIDEO_ID = '';
 
   const LANE_FAMILY_SPLASH_BG = '/family/assets/DavidELane.png';
-  /** Bump suffix when splash copy/behavior changes so testers see it again without clearing all site data. */
-  const LANE_FAMILY_SPLASH_LS_KEY = 'laneFamilyHubSplashSeen_v3';
+  const LANE_FAMILY_SPLASH_COUNT_KEY = 'laneFamilyHubSplashCount_v1';
+  const LANE_FAMILY_SPLASH_MAX_SHOWS = 2;
   const SPLASH_AUTO_MS = 5200;
 
   function init() {
@@ -24,9 +24,8 @@
 
     const params = new URLSearchParams(window.location.search);
     const forceSplash = params.get('splash') === '1';
-    const hasSeen = localStorage.getItem(LANE_FAMILY_SPLASH_LS_KEY) === '1';
-
-    if (hasSeen && !forceSplash) {
+    const shownCount = Number.parseInt(localStorage.getItem(LANE_FAMILY_SPLASH_COUNT_KEY) || '0', 10) || 0;
+    if (!forceSplash && shownCount >= LANE_FAMILY_SPLASH_MAX_SHOWS) {
       flash.classList.add('lf-hub-splash--hidden');
       flash.setAttribute('aria-hidden', 'true');
       return;
@@ -64,7 +63,10 @@
     function close() {
       if (flash.classList.contains('lf-hub-splash--closing')) return;
       flash.classList.add('lf-hub-splash--closing');
-      localStorage.setItem(LANE_FAMILY_SPLASH_LS_KEY, '1');
+      if (!forceSplash) {
+        const nextCount = Math.min(shownCount + 1, LANE_FAMILY_SPLASH_MAX_SHOWS);
+        localStorage.setItem(LANE_FAMILY_SPLASH_COUNT_KEY, String(nextCount));
+      }
       if (timerId != null) {
         clearTimeout(timerId);
         timerId = null;

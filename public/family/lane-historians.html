@@ -56,6 +56,15 @@
     <div id="historiansRoot" aria-live="polite">
       <p class="text-muted small mb-0">Loading historians…</p>
     </div>
+    <div id="lhImageModal" class="lh-image-modal d-none" aria-hidden="true" role="dialog" aria-label="Expanded historians image">
+      <div class="lh-image-modal__dialog">
+        <button type="button" id="lhImageModalClose" class="lh-image-modal__close" aria-label="Close image viewer">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+        <img id="lhImageModalImg" class="lh-image-modal__img" src="" alt="Expanded historians image" />
+        <p id="lhImageModalCaption" class="lh-image-modal__caption mb-0"></p>
+      </div>
+    </div>
     <div class="text-center px-2 mt-3" data-lane-site-credit></div>
   </main>
   <script src="/family/js/lane-site-credit.js"></script>

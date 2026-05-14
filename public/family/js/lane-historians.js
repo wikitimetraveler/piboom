@@ -90,7 +90,7 @@
         const idAttr = slug ? ` id="lh-portrait-${escapeHtml(slug)}"` : '';
         const pUrl = String(f.portraitUrl || '').trim();
         const portraitHtml = pUrl
-          ? `<div class="lane-historians-figure-portrait-wrap"><img src="${escapeHtml(pUrl)}" alt="${name}" class="lane-historians-figure-portrait" loading="lazy" decoding="async" /></div>`
+          ? `<div class="lane-historians-figure-portrait-wrap"><img src="${escapeHtml(pUrl)}" alt="${name}" class="lane-historians-figure-portrait lh-expandable-image" loading="lazy" decoding="async" tabindex="0" role="button" aria-label="Expand image for ${name}" /></div>`
           : '';
         const gh = String(f.galleryHref || '').trim();
         const gallHtml = gh
@@ -133,12 +133,31 @@
 
   function renderModern(modern, placeholder) {
     if (Array.isArray(modern) && modern.length) {
+      const linksHtml = (links) => {
+        if (!Array.isArray(links) || !links.length) return '';
+        const rows = links
+          .map((entry) => {
+            const url = String(entry?.url || '').trim();
+            const label = String(entry?.label || url).trim();
+            if (!url || !label) return '';
+            return `<li><a href="${escapeHtml(url)}" ${url.startsWith('/') ? '' : 'target="_blank" rel="noopener noreferrer"'}>${escapeHtml(label)}</a></li>`;
+          })
+          .filter(Boolean)
+          .join('');
+        if (!rows) return '';
+        return `<ul class="lh-modern-links mb-0 mt-2">${rows}</ul>`;
+      };
       const cards = modern
         .map((m) => {
           const name = escapeHtml(m.displayName || '');
           const role = escapeHtml(m.role || '');
           const bio = escapeHtml(m.bio || '');
-          return `<div class="lane-historians-figure-card mb-2 lh-story-highlight-target"><h3>${name}</h3><p class="role">${role}</p><p class="note">${bio}</p></div>`;
+          const tagline = escapeHtml(m.tagline || '');
+          const pUrl = String(m.imageUrl || m.image || '').trim();
+          const portraitHtml = pUrl
+            ? `<div class="lane-historians-figure-portrait-wrap"><img src="${escapeHtml(pUrl)}" alt="${name}" class="lane-historians-figure-portrait lh-expandable-image" loading="lazy" decoding="async" tabindex="0" role="button" aria-label="Expand image for ${name}" /></div>`
+            : '';
+          return `<div class="lane-historians-figure-card mb-2 lh-story-highlight-target">${portraitHtml}<h3>${name}</h3><p class="role">${role}</p><p class="note">${bio}</p>${tagline ? `<p class="lh-modern-tagline">${tagline}</p>` : ''}${linksHtml(m.links)}</div>`;
         })
         .join('');
       return `<div class="lane-historians-modern">${cards}</div>`;
@@ -181,7 +200,7 @@
 
     const heroBlock =
       heroUrl ?
-        `<div class="lane-historians-hero lh-story-highlight-target"><div class="lane-historians-hero__frame"><img class="lane-historians-hero__img" src="${heroUrl}" alt="${heroAlt}" width="880" height="520" decoding="async" loading="lazy" /></div><p class="lane-historians-hero__caption">${heroCap}</p>${heroGallery}</div>`
+        `<div class="lane-historians-hero lh-story-highlight-target"><div class="lane-historians-hero__frame"><img class="lane-historians-hero__img lh-expandable-image" src="${heroUrl}" alt="${heroAlt}" width="880" height="520" decoding="async" loading="lazy" tabindex="0" role="button" aria-label="Expand hero image" /></div><p class="lane-historians-hero__caption">${heroCap}</p>${heroGallery}</div>`
       : '';
 
     const prefaceMoreBlock =
@@ -730,6 +749,59 @@
     root.innerHTML = `<div class="lane-historians-error" role="alert">${escapeHtml(msg)}</div>`;
   }
 
+  function initHistoriansImageExpand() {
+    const root = document.getElementById('historiansRoot');
+    const modal = document.getElementById('lhImageModal');
+    const closeBtn = document.getElementById('lhImageModalClose');
+    const modalImg = document.getElementById('lhImageModalImg');
+    const modalCaption = document.getElementById('lhImageModalCaption');
+    if (!root || !modal || !closeBtn || !modalImg || !modalCaption) return;
+    if (modal.dataset.bound === '1') return;
+    modal.dataset.bound = '1';
+
+    function closeModal() {
+      modal.classList.add('d-none');
+      modal.setAttribute('aria-hidden', 'true');
+      modalImg.setAttribute('src', '');
+      modalCaption.textContent = '';
+      document.body.classList.remove('lh-image-modal-open');
+    }
+
+    function openFromImage(img) {
+      const src = String(img?.getAttribute('src') || '').trim();
+      if (!src) return;
+      const alt = String(img.getAttribute('alt') || 'Expanded image').trim();
+      modalImg.setAttribute('src', src);
+      modalImg.setAttribute('alt', alt);
+      modalCaption.textContent = alt;
+      modal.classList.remove('d-none');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lh-image-modal-open');
+    }
+
+    root.addEventListener('click', (event) => {
+      const img = event.target?.closest?.('img.lh-expandable-image');
+      if (!img) return;
+      openFromImage(img);
+    });
+
+    root.addEventListener('keydown', (event) => {
+      const img = event.target?.closest?.('img.lh-expandable-image');
+      if (!img) return;
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openFromImage(img);
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (event) => {
+      if (event.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !modal.classList.contains('d-none')) closeModal();
+    });
+  }
+
   async function init() {
     initHistoriansHyperFrameStoryBindings();
     try {
@@ -738,6 +810,7 @@
       const data = await res.json();
       historiansDataRef = data;
       render(data);
+      initHistoriansImageExpand();
       updateHistoriansStoryToggle();
       document.title = `${data.title || 'Lane historians'} — DevConnect Labs`;
       try {
