@@ -37,27 +37,27 @@
     }
   };
 
-  /** Disaster/loan event icons (24x24 to match loan dot size) */
-  const disasterSize = 24;
-  const disasterAnchor = 15;
+  /** Disaster event icons (compact, type-specific) */
+  const disasterSize = 18;
+  const disasterAnchor = 9;
   const disaster = {
     fire: {
-      url: 'https://maps.google.com/mapfiles/ms/icons/fire.png',
+      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#F97316" stroke="#C2410C" stroke-width="1.2" d="M12.7 2.4c.5 3.1-1 4.5-2.4 6.1-1 1.2-1.8 2.5-1.8 4.4 0 2.2 1.8 4 4 4s4-1.8 4-4c0-3.3-2-5.3-3.8-6.8.2 1.7-.5 2.5-1.5 3.4.2-2.3 0-4.4-1.5-7.1z"/></svg>'),
       scaledSize: { width: disasterSize, height: disasterSize },
       anchor: { x: disasterAnchor, y: disasterSize }
     },
     earthquake: {
-      url: 'https://maps.google.com/mapfiles/ms/icons/earthquake.png',
+      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#9A3412" stroke="#7C2D12" stroke-width="1.2" d="M5 4h14l-4.3 6H18l-4.8 10 .8-7H11l1.6-5H9.7z"/></svg>'),
       scaledSize: { width: disasterSize, height: disasterSize },
       anchor: { x: disasterAnchor, y: disasterSize }
     },
     storm: {
-      url: 'https://maps.google.com/mapfiles/ms/icons/storm.png',
+      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#0EA5E9" stroke="#0369A1" stroke-width="1.2" d="M7 17h9a4 4 0 0 0 .2-8 5.5 5.5 0 0 0-10.7 1A3.5 3.5 0 0 0 7 17z"/><path fill="#F59E0B" d="M12.3 12.2h2L13 15h1.8l-3.1 4 1-2.8h-1.6z"/></svg>'),
       scaledSize: { width: disasterSize, height: disasterSize },
       anchor: { x: disasterAnchor, y: disasterSize }
     },
     flood: {
-      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#2196F3" stroke="#1565C0" stroke-width="1" d="M12 2L4 10h3v4H4l8 8 8-8h-3v-4h3L12 2z"/></svg>'),
+      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#0284C7" d="M3 10.5c1.4 0 1.4 1 2.8 1s1.4-1 2.8-1 1.4 1 2.8 1 1.4-1 2.8-1 1.4 1 2.8 1 1.4-1 2.8-1v2.8c-1.4 0-1.4 1-2.8 1s-1.4-1-2.8-1-1.4 1-2.8 1-1.4-1-2.8-1-1.4 1-2.8 1-1.4-1-2.8-1z"/></svg>'),
       scaledSize: { width: disasterSize, height: disasterSize },
       anchor: { x: disasterAnchor, y: disasterSize }
     },
@@ -67,28 +67,30 @@
       anchor: { x: disasterAnchor, y: disasterSize }
     },
     default: {
-      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#E53935" stroke="#B71C1C" stroke-width="2"/></svg>'),
+      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#DC2626" stroke="#991B1B" stroke-width="1.2" d="M12 3 2.8 20h18.4z"/><rect x="11" y="8" width="2" height="6" fill="#fff"/><circle cx="12" cy="17" r="1" fill="#fff"/></svg>'),
       scaledSize: { width: disasterSize, height: disasterSize },
       anchor: { x: disasterAnchor, y: disasterSize }
     }
   };
 
-  /** Loan risk icons (30x30) */
+  /** Loan risk icons (small houses for Encompass loan points) */
+  const loanSize = 16;
+  const loanAnchor = 8;
   const loan = {
     high: {
-      url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-      scaledSize: { width: disasterSize, height: disasterSize },
-      anchor: { x: disasterAnchor, y: disasterSize }
+      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#DC2626" stroke="#991B1B" stroke-width="1.2" d="M4 11.5 12 5l8 6.5V20h-5v-5h-6v5H4z"/></svg>'),
+      scaledSize: { width: loanSize, height: loanSize },
+      anchor: { x: loanAnchor, y: loanSize }
     },
     medium: {
-      url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-      scaledSize: { width: disasterSize, height: disasterSize },
-      anchor: { x: disasterAnchor, y: disasterSize }
+      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#F59E0B" stroke="#B45309" stroke-width="1.2" d="M4 11.5 12 5l8 6.5V20h-5v-5h-6v5H4z"/></svg>'),
+      scaledSize: { width: loanSize, height: loanSize },
+      anchor: { x: loanAnchor, y: loanSize }
     },
     low: {
-      url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
-      scaledSize: { width: disasterSize, height: disasterSize },
-      anchor: { x: disasterAnchor, y: disasterSize }
+      url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#2563EB" stroke="#1E40AF" stroke-width="1.2" d="M4 11.5 12 5l8 6.5V20h-5v-5h-6v5H4z"/></svg>'),
+      scaledSize: { width: loanSize, height: loanSize },
+      anchor: { x: loanAnchor, y: loanSize }
     }
   };
 
@@ -129,7 +131,8 @@
     if (typeof google === 'undefined' || !google.maps) return { url: c.url };
     return {
       url: c.url,
-      scaledSize: new google.maps.Size(c.scaledSize.width, c.scaledSize.height)
+      scaledSize: new google.maps.Size(c.scaledSize.width, c.scaledSize.height),
+      anchor: c.anchor ? new google.maps.Point(c.anchor.x, c.anchor.y) : undefined
     };
   }
 
@@ -142,7 +145,8 @@
     if (typeof google === 'undefined' || !google.maps) return { url: c.url };
     return {
       url: c.url,
-      scaledSize: new google.maps.Size(c.scaledSize.width, c.scaledSize.height)
+      scaledSize: new google.maps.Size(c.scaledSize.width, c.scaledSize.height),
+      anchor: c.anchor ? new google.maps.Point(c.anchor.x, c.anchor.y) : undefined
     };
   }
 
@@ -161,7 +165,8 @@
     if (typeof google === 'undefined' || !google.maps) return { url: c.url };
     return {
       url: c.url,
-      scaledSize: new google.maps.Size(c.scaledSize.width, c.scaledSize.height)
+      scaledSize: new google.maps.Size(c.scaledSize.width, c.scaledSize.height),
+      anchor: c.anchor ? new google.maps.Point(c.anchor.x, c.anchor.y) : undefined
     };
   }
 

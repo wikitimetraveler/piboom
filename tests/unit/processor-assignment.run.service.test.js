@@ -88,4 +88,103 @@ describe('runProcessorAssignment product eligibility', () => {
     expect(out.results[0].status).toBe('skipped');
     expect(out.results[0].reason).toBe('no_capacity_eligible');
   });
+
+  test('assigns to processor closest to utilization target after impact', async () => {
+    const { runProcessorAssignment } = await loadServiceWithMocks();
+    const loan = {
+      loanGuid: 'g-4',
+      fields: {
+        'Loan.LoanNumber': '1004',
+        'Loan.BorrowerName': 'Borrower Four',
+        'Loan.MortgageType': 'FHA',
+      },
+    };
+    const out = await runProcessorAssignment({
+      dryRun: true,
+      loans: [loan],
+      processors: [
+        { userId: 'p-low-target', maxPoints: 10, products: ['FHA'], targetUtilization: 0.4 },
+        { userId: 'p-high-target', maxPoints: 6, products: ['FHA'], targetUtilization: 0.85 },
+      ],
+      complexityRules: [
+        {
+          id: 'score_five',
+          points: 5,
+          when: { field: 'Loan.MortgageType', op: 'isnotempty' },
+        },
+      ],
+      allowIneligibleOverride: false,
+    });
+    expect(out.results[0].status).toBe('proposed');
+    expect(out.results[0].processorUserId).toBe('p-high-target');
+  });
+
+  test('uses weighted capacity impact when deciding assignment', async () => {
+    const { runProcessorAssignment } = await loadServiceWithMocks();
+    const loan = {
+      loanGuid: 'g-5',
+      fields: {
+        'Loan.LoanNumber': '1005',
+        'Loan.BorrowerName': 'Borrower Five',
+        'Loan.MortgageType': 'FHA',
+      },
+    };
+    const out = await runProcessorAssignment({
+      dryRun: true,
+      loans: [loan],
+      processors: [
+        { userId: 'p-small', maxPoints: 6, products: ['FHA'] },
+        { userId: 'p-large', maxPoints: 10, products: ['FHA'] },
+      ],
+      complexityRules: [
+        {
+          id: 'score_five',
+          points: 5,
+          when: { field: 'Loan.MortgageType', op: 'isnotempty' },
+        },
+      ],
+      capacityWeightingMode: 'linear',
+      capacityWeightFactor: 1.2,
+      allowIneligibleOverride: false,
+    });
+    expect(out.results[0].status).toBe('proposed');
+    expect(out.results[0].capacityImpact).toBe(6);
+    expect(out.results[0].processorUserId).toBe('p-large');
+    expect(out.usedPointsBasis).toBe('weighted_capacity_impact');
+    expect(out.routingConfig.capacityWeightingMode).toBe('linear');
+    expect(out.routingConfig.capacityWeightFactor).toBe(1.2);
+  });
+
+  test('applies hard-loan multiplier above threshold', async () => {
+    const { runProcessorAssignment } = await loadServiceWithMocks();
+    const loan = {
+      loanGuid: 'g-6',
+      fields: {
+        'Loan.LoanNumber': '1006',
+        'Loan.BorrowerName': 'Borrower Six',
+        'Loan.MortgageType': 'FHA',
+      },
+    };
+    const out = await runProcessorAssignment({
+      dryRun: true,
+      loans: [loan],
+      processors: [
+        { userId: 'p-limited', maxPoints: 9, products: ['FHA'] },
+        { userId: 'p-room', maxPoints: 12, products: ['FHA'] },
+      ],
+      complexityRules: [
+        {
+          id: 'score_five',
+          points: 5,
+          when: { field: 'Loan.MortgageType', op: 'isnotempty' },
+        },
+      ],
+      hardLoanThreshold: 4,
+      hardLoanWeightMultiplier: 2,
+      allowIneligibleOverride: false,
+    });
+    expect(out.results[0].status).toBe('proposed');
+    expect(out.results[0].capacityImpact).toBe(10);
+    expect(out.results[0].processorUserId).toBe('p-room');
+  });
 });

@@ -334,6 +334,16 @@
             padding: 1.5rem;
         }
 
+        #map,
+        #youtubeResults {
+            height: clamp(320px, 56vh, 760px);
+        }
+
+        .dashboard-status-banner {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
         .loading-spinner {
             display: none;
         }
@@ -542,6 +552,13 @@
         .footer a:hover {
             color: white;
         }
+
+        @media (max-width: 992px) {
+            #map,
+            #youtubeResults {
+                height: clamp(280px, 48vh, 560px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -612,6 +629,7 @@
 
         <!-- Bootstrap Accordion -->
         <div class="accordion mb-4" id="dashboardAccordion">
+            <div id="dashboardStatusBanner" class="alert alert-warning dashboard-status-banner" role="alert"></div>
             <!-- Accordion Item 1: Statistics & Charts -->
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingStatsCharts">
@@ -763,7 +781,7 @@
                                     <select class="form-select" id="riskFilter">
                                         <option value="">All Risk Levels</option>
                                         <option value="low">Low Risk</option>
-                                        <option value="medium">Medium Risk</option>
+                                        <option value="medium">Moderate Risk</option>
                                         <option value="high">High Risk</option>
                                     </select>
                                 </div>
@@ -857,11 +875,11 @@
             <!-- Accordion Item 4: Map & YouTube -->
             <div class="accordion-item">
                 <h2 class="accordion-header" id="headingMapYouTube">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMapYouTube" aria-expanded="false" aria-controls="collapseMapYouTube">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMapYouTube" aria-expanded="true" aria-controls="collapseMapYouTube">
                         <i class="bi bi-geo-alt me-2"></i> Map & Disaster Videos
                     </button>
                 </h2>
-                <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube">
+                <div id="collapseMapYouTube" class="accordion-collapse collapse show" aria-labelledby="headingMapYouTube">
                     <div class="accordion-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -874,7 +892,7 @@
                                         <div class="mb-2 d-flex gap-2 flex-wrap">
                                             <!-- Flood zone info is now shown via loan markers (color-coded) -->
                                         </div>
-                                        <div id="map" style="height: 1000px; width: 100%;"></div>
+                                        <div id="map" style="width: 100%;"></div>
                                         <div class="mt-2">
                                             <small class="text-muted">
                                                 <span class="badge bg-danger me-1">●</span> Disaster Areas<br>
@@ -893,7 +911,7 @@
                                         <h5 class="mb-0"><i class="bi bi-youtube"></i> Disaster Videos</h5>
                                     </div>
                                     <div class="card-body" style="padding: 0;">
-                                        <div id="youtubeResults" style="height: 1000px; overflow-y: auto; padding: 1rem;">
+                                        <div id="youtubeResults" style="overflow-y: auto; padding: 1rem;">
                                             <div class="text-center text-muted">
                                                 <i class="bi bi-youtube"></i><br>
                                                 Click on a FEMA disaster to search for related videos
@@ -1088,6 +1106,9 @@
                 if (state) qp.set('state', state);
                 if (county) qp.set('county', county);
                 const resp = await fetch(`/api/loan-pipeline/query-fema?${qp.toString()}`);
+                if (!resp.ok) {
+                    throw new Error(`FEMA request failed: HTTP ${resp.status}`);
+                }
                 const json = await resp.json();
                 if (json.success) {
                     populateFEMATable(json.data.disasters);
@@ -1807,6 +1828,9 @@
                 
                 console.log('Loading all FEMA disasters on map...');
                 const resp = await fetch('/api/loan-pipeline/query-fema');
+                if (!resp.ok) {
+                    throw new Error(`FEMA map request failed: HTTP ${resp.status}`);
+                }
                 const json = await resp.json();
                 
                 if (json.success && json.data.disasters) {
@@ -1815,6 +1839,7 @@
                 }
             } catch (error) {
                 console.error('Error loading FEMA disasters on map:', error);
+                showAlert(`Unable to load FEMA map markers: ${error.message}`, 'warning');
             }
         }
 
@@ -1852,7 +1877,7 @@
         function getRiskLevel(score) {
             if (score === 0) return 'Not Analyzed';
             if (score <= 2) return 'Low Risk';
-            if (score <= 5) return 'Medium Risk';
+            if (score <= 5) return 'Moderate Risk';
             return 'High Risk';
         }
 
@@ -2027,24 +2052,14 @@
 
         // Show alert
         function showAlert(message, type) {
-            const alertHtml = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `;
-            
-            // Remove existing alerts
-            $('.alert').remove();
-            
-            // Add new alert
-            $('.container-fluid').prepend(alertHtml);
-            
-            // Auto-dismiss after 5 seconds (Bootstrap 5 Alert API)
+            const banner = document.getElementById('dashboardStatusBanner');
+            if (!banner) return;
+            const mapped = type === 'danger' ? 'danger' : (type === 'success' ? 'success' : (type === 'info' ? 'info' : 'warning'));
+            banner.className = `alert alert-${mapped} dashboard-status-banner`;
+            banner.textContent = message;
+            banner.style.display = 'block';
             setTimeout(() => {
-                document.querySelectorAll('.container-fluid .alert').forEach((el) => {
-                    bootstrap.Alert.getOrCreateInstance(el).close();
-                });
+                banner.style.display = 'none';
             }, 5000);
         }
 
@@ -2572,9 +2587,14 @@
             // Clear existing markers
             markers.forEach(marker => marker.setMap(null));
             markers = [];
-
-            disasters.forEach(disaster => {
-                if (disaster.latitude && disaster.longitude) {
+            const validDisasters = (Array.isArray(disasters) ? disasters : []).filter((disaster) =>
+                disaster && disaster.latitude && disaster.longitude
+            );
+            const chunkSize = 120;
+            function renderDisasterChunk(startIndex = 0) {
+                const endIndex = Math.min(startIndex + chunkSize, validDisasters.length);
+                for (let i = startIndex; i < endIndex; i += 1) {
+                    const disaster = validDisasters[i];
                     const disasterIcon = window.mapIcons && window.mapIcons.getDisasterIconForMarker
                         ? window.mapIcons.getDisasterIconForMarker(disaster.incidentType || disaster.event_type, disaster.source)
                         : { url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', scaledSize: new google.maps.Size(30, 30) };
@@ -2596,19 +2616,18 @@
                             </div>
                         `
                     });
-
-                    // Store infoWindow on marker for later use
                     marker.infoWindow = infoWindow;
-
                     marker.addListener('click', () => {
                         infoWindow.open(map, marker);
-                        // Also trigger YouTube search when marker is clicked
                         searchYouTubeForDisaster(disaster.declarationTitle, disaster.state, disaster.county);
                     });
-
                     markers.push(marker);
                 }
-            });
+                if (endIndex < validDisasters.length) {
+                    window.requestAnimationFrame(() => renderDisasterChunk(endIndex));
+                }
+            }
+            renderDisasterChunk(0);
         }
 
         // Plot loan markers on map
@@ -2616,8 +2635,12 @@
             // Clear existing loan markers
             loanMarkers.forEach(m => m.marker && m.marker.setMap(null));
             loanMarkers = [];
-            loans.forEach(loan => {
-                if (loan.latitude && loan.longitude) {
+            const validLoans = (Array.isArray(loans) ? loans : []).filter((loan) => loan && loan.latitude && loan.longitude);
+            const chunkSize = 150;
+            function renderLoanChunk(startIndex = 0) {
+                const endIndex = Math.min(startIndex + chunkSize, validLoans.length);
+                for (let i = startIndex; i < endIndex; i += 1) {
+                    const loan = validLoans[i];
                     const loanIcon = window.mapIcons && window.mapIcons.getLoanIconByFloodZoneForMarker
                         ? window.mapIcons.getLoanIconByFloodZoneForMarker(loan.flood_zone, loan.flood_zone_type)
                         : { url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png', scaledSize: new google.maps.Size(30, 30) };
@@ -2627,8 +2650,7 @@
                         title: `Loan ${loan.loan_number}${loan.flood_zone ? ` - Zone ${loan.flood_zone}` : ''}`,
                         icon: loanIcon
                     });
-                    
-                    // Build info window content with flood zone info
+
                     let infoContent = `<div style="min-width:250px; padding: 5px;">`;
                     infoContent += `<h6 style="margin: 0 0 10px 0; color: #2563eb;">Loan ${loan.loan_number}</h6>`;
                     infoContent += `<p style="margin: 5px 0;"><strong>Address:</strong> ${loan.property_address || 'N/A'}</p>`;
@@ -2637,46 +2659,39 @@
                         infoContent += `<p style="margin: 5px 0;"><strong>County:</strong> ${loan.county}</p>`;
                     }
                     infoContent += `<p style="margin: 5px 0;"><strong>Risk Level:</strong> ${getRiskLevel(loan.disaster_risk_score)}</p>`;
-                    
-                    // Add flood zone information
+
                     if (loan.flood_zone) {
                         const fz = loan.flood_zone.toUpperCase();
                         let floodRisk = 'Low';
-                        let floodColor = '#10b981'; // green
+                        let floodColor = '#10b981';
                         if (fz.startsWith('A') || fz.startsWith('V')) {
                             floodRisk = 'High';
-                            floodColor = '#ef4444'; // red
+                            floodColor = '#ef4444';
                         } else if (fz.includes('X')) {
                             floodRisk = loan.flood_zone_type && loan.flood_zone_type.includes('Shaded') ? 'Moderate' : 'Minimal';
                             floodColor = loan.flood_zone_type && loan.flood_zone_type.includes('Shaded') ? '#f59e0b' : '#10b981';
                         }
-                        
                         infoContent += `<hr style="margin: 10px 0; border-color: #ddd;">`;
                         infoContent += `<p style="margin: 5px 0;"><strong>Flood Zone:</strong> <span style="color: ${floodColor}; font-weight: bold;">${loan.flood_zone}</span></p>`;
                         infoContent += `<p style="margin: 5px 0;"><strong>Flood Risk:</strong> <span style="color: ${floodColor};">${floodRisk}</span></p>`;
-                        if (loan.flood_zone_type) {
-                            infoContent += `<p style="margin: 5px 0;"><strong>Zone Type:</strong> ${loan.flood_zone_type}</p>`;
-                        }
-                        if (loan.dfirm_id) {
-                            infoContent += `<p style="margin: 5px 0; font-size: 0.85em;"><strong>DFIRM ID:</strong> ${loan.dfirm_id}</p>`;
-                        }
-                        if (loan.base_flood_elevation) {
-                            infoContent += `<p style="margin: 5px 0; font-size: 0.85em;"><strong>Base Flood Elevation:</strong> ${loan.base_flood_elevation} ft</p>`;
-                        }
+                        if (loan.flood_zone_type) infoContent += `<p style="margin: 5px 0;"><strong>Zone Type:</strong> ${loan.flood_zone_type}</p>`;
+                        if (loan.dfirm_id) infoContent += `<p style="margin: 5px 0; font-size: 0.85em;"><strong>DFIRM ID:</strong> ${loan.dfirm_id}</p>`;
+                        if (loan.base_flood_elevation) infoContent += `<p style="margin: 5px 0; font-size: 0.85em;"><strong>Base Flood Elevation:</strong> ${loan.base_flood_elevation} ft</p>`;
                     } else {
                         infoContent += `<hr style="margin: 10px 0; border-color: #ddd;">`;
                         infoContent += `<p style="margin: 5px 0; color: #6b7280;"><strong>Flood Zone:</strong> Not analyzed</p>`;
                     }
-                    
-                    infoContent += `</div>`;
-                    
-                    const infoWindow = new google.maps.InfoWindow({
-                        content: infoContent
-                    });
+
+                    infoContent += '</div>';
+                    const infoWindow = new google.maps.InfoWindow({ content: infoContent });
                     marker.addListener('click', () => infoWindow.open(map, marker));
                     loanMarkers.push({ loanId: loan.id, marker });
                 }
-            });
+                if (endIndex < validLoans.length) {
+                    window.requestAnimationFrame(() => renderLoanChunk(endIndex));
+                }
+            }
+            renderLoanChunk(0);
         }
 
         // Update map to focus on selected disaster (like tool3)

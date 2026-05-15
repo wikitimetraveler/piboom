@@ -137,6 +137,68 @@ When a user asks about the ICE GitHub repositories or “what do the ICE repos h
 
 Be helpful, accurate, and always reference the official Encompass Developer Connect documentation and available collections when possible. When providing solutions, think about how they fit into the DevConnect Labs architecture and tech stack.`;
 
+function toSnippet(content, max = 700) {
+  const text = `${content ?? ''}`.replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+  if (text.length <= max) return text;
+  return `${text.slice(0, max)}...`;
+}
+
+function normalizedSourceKey(item) {
+  const parts = [
+    `${item?.repo || ''}`.toLowerCase(),
+    `${item?.url || ''}`.toLowerCase(),
+    `${item?.title || ''}`.toLowerCase(),
+    `${item?.category || ''}`.toLowerCase(),
+  ];
+  return parts.join('|');
+}
+
+function rankAndMergeResults(docResults = [], knowledgeResults = [], limit = 6) {
+  const merged = [];
+  const seen = new Set();
+  const ingest = (item, fallbackSourceType, sourceBoost) => {
+    const sourceType = item?.sourceType || fallbackSourceType;
+    const baseScore = Number(item?.score);
+    const score = (Number.isFinite(baseScore) ? baseScore : 0) + sourceBoost;
+    const key = normalizedSourceKey(item);
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    merged.push({
+      ...item,
+      sourceType,
+      score,
+    });
+  };
+
+  docResults.forEach((item) => ingest(item, 'official_doc', 20));
+  knowledgeResults.forEach((item) => ingest(item, item?.sourceType || 'knowledge', 0));
+
+  return merged
+    .sort((a, b) => {
+      if ((b.score || 0) !== (a.score || 0)) return (b.score || 0) - (a.score || 0);
+      return `${a.title || ''}`.localeCompare(`${b.title || ''}`);
+    })
+    .slice(0, Math.max(1, limit));
+}
+
+function buildDocsContext(results = []) {
+  if (!results.length) return '';
+  const lines = ['\n\nRelevant Documentation:'];
+  results.forEach((result, index) => {
+    const sourceId = `S${index + 1}`;
+    const title = result?.title || 'Untitled';
+    const repoOrCategory = result?.repo || result?.category || result?.sourceType || 'reference';
+    const urlPart = result?.url ? ` | ${result.url}` : '';
+    const snippet = toSnippet(result?.content || '', 850);
+    lines.push(`${sourceId}. ${title} (${repoOrCategory})${urlPart}`);
+    if (snippet) lines.push(`   ${snippet}`);
+    lines.push('');
+  });
+  lines.push('When possible, cite sources in your answer using [S#].');
+  return lines.join('\n');
+}
+
 // Search Encompass documentation
 router.get('/search', async (req, res) => {
   try {
@@ -179,37 +241,33 @@ router.post('/chat', async (req, res) => {
     console.log(`💬 Encompass AI Chat: "${message}"`);
     
     // Search for relevant documentation + knowledge base entries
-    const [docResultsRaw, knowledgeResults] = await Promise.all([
+    const [docResultsRaw, knowledgeResultsRaw] = await Promise.all([
       encompassDocsService.searchDocs(message, 3),
       iceKnowledgeService.search(message, 10)
     ]);
-
-    const docResults = docResultsRaw.map(result => ({
+    const docResults = (docResultsRaw || []).map(result => ({
       ...result,
       sourceType: 'official_doc',
-      repo: 'developer-connect'
+      repo: result.repo || 'developer-connect'
     }));
-
-    const combinedResults = [...docResults, ...knowledgeResults];
+    const knowledgeResults = (knowledgeResultsRaw || []).map(result => ({
+      ...result,
+      sourceType: result.sourceType || 'knowledge'
+    }));
+    const combinedResults = rankAndMergeResults(docResults, knowledgeResults, 6);
     
     // Build context from search results
-    let docsContext = '';
-    if (combinedResults.length > 0) {
-      docsContext = '\n\nRelevant Documentation:\n';
-      combinedResults.slice(0, 5).forEach((result, index) => {
-        const label = result.repo
-          ? `${result.title} (${result.repo})`
-          : `${result.title} (${result.category})`;
-        const snippet = (result.content || '').substring(0, 1000);
-        docsContext += `${index + 1}. ${label}\n`;
-        docsContext += `   ${snippet}...\n\n`;
-      });
-    }
+    const docsContext = buildDocsContext(combinedResults);
+    const contextMessages = Array.isArray(context)
+      ? context
+        .filter((msg) => typeof msg === 'string' && msg.trim() !== '')
+        .map((msg) => new HumanMessage(msg))
+      : [];
 
     // Prepare messages
     const messages = [
       new SystemMessage(ENCOMPASS_SYSTEM_PROMPT + docsContext),
-      ...context.map(msg => new HumanMessage(msg)),
+      ...contextMessages,
       new HumanMessage(message)
     ];
 
@@ -221,6 +279,14 @@ router.post('/chat', async (req, res) => {
     res.json({
       message: aiMessage,
       context: combinedResults,
+      sources: combinedResults.map((item, idx) => ({
+        id: `S${idx + 1}`,
+        title: item.title || null,
+        repo: item.repo || null,
+        category: item.category || null,
+        sourceType: item.sourceType || null,
+        url: item.url || null,
+      })),
       timestamp: new Date().toISOString()
     });
 

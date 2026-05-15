@@ -9,7 +9,7 @@ import buildRoutes from './routes/index.routes.js';
 import { initializeDatabase, createTables } from './services/database.service.js';
 import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
-import { ensureDisasterImpactGraphReady } from './services/disaster-impact-graph.service.js';
+import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -82,9 +82,10 @@ if (config.autoIngestDisasters) {
       await ingestNwsCap();
       await ingestNhc();
       await ingestFema();
+      const graphRes = await refreshDisasterImpactGraphFromCurrentData();
       // Camera feed disabled - too many records (198k+)
       // await ingestCaFireCameras();
-      console.log('✅ Initial data ingestion complete');
+      console.log('✅ Initial data ingestion complete', { graphRefreshed: graphRes?.refreshed === true });
     } catch (e) {
       console.warn('⚠️  Some data sources failed on initial ingestion (non-fatal):', e.message);
     }
@@ -207,16 +208,39 @@ app.get('/health', (req,res)=>res.json({ok:true, mode: config.mode, platform: pr
 if (config.autoIngestDisasters) {
   // Simple scheduler (once per day) for disaster data sources
   setInterval(async () => {
+    const startedAt = Date.now();
     try {
-      await ingestFirmsNrt();
-      await ingestUsgsQuakes();
-      await ingestNwsCap();
-      await ingestNhc();
-      await ingestFema();
+      const results = {};
+      const runSource = async (label, fn) => {
+        try {
+          results[label] = await fn();
+          console.log(`✅ Disaster scheduler source complete: ${label}`, results[label]);
+        } catch (err) {
+          results[label] = { error: err.message };
+          console.warn(`⚠️ Disaster scheduler source failed: ${label}`, { error: err.message });
+        }
+      };
+      await runSource('firms', ingestFirmsNrt);
+      await runSource('usgs', ingestUsgsQuakes);
+      await runSource('nws', ingestNwsCap);
+      await runSource('nhc', ingestNhc);
+      await runSource('fema', ingestFema);
       // Camera feed disabled - too many records (198k+)
       // await ingestCaFireCameras();
+      try {
+        const graphRes = await refreshDisasterImpactGraphFromCurrentData();
+        console.log('✅ Disaster scheduler graph refresh complete', graphRes);
+      } catch (graphErr) {
+        console.warn('⚠️ Disaster scheduler graph refresh failed', { error: graphErr.message });
+      }
+      console.log('✅ Disaster scheduler run complete', {
+        elapsedMs: Date.now() - startedAt
+      });
     } catch (e) {
-      // non-fatal
+      console.warn('⚠️ Disaster scheduler run failed (non-fatal)', {
+        error: e.message,
+        elapsedMs: Date.now() - startedAt
+      });
     }
   }, 24 * 60 * 60 * 1000); // Once per day (24 hours)
 } else {
@@ -228,7 +252,10 @@ if (config.autoIngestDisasters) {
   setInterval(async () => {
     try {
       await pruneOldDisasters();
-    } catch {}
+      console.log('✅ Disaster prune run complete');
+    } catch (err) {
+      console.warn('⚠️ Disaster prune run failed', { error: err.message });
+    }
   }, 24 * 60 * 60 * 1000);
 } else {
   console.log('⏸️ Skipping disaster pruning (auto ingestion disabled)');

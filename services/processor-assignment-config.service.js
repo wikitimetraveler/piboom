@@ -12,6 +12,11 @@ const ALLOWED_KEYS = new Set([
   'complexityAiModel',
   'complexityMaxPoints',
   'allowIneligibleOverride',
+  'globalTargetUtilization',
+  'capacityWeightingMode',
+  'capacityWeightFactor',
+  'hardLoanThreshold',
+  'hardLoanWeightMultiplier',
 ]);
 
 /**

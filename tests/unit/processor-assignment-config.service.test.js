@@ -24,9 +24,23 @@ describe('processor-assignment-config.service', () => {
         processorsJson: '[]',
         rulesJson: '{}',
         allowIneligibleOverride: 'true',
+        globalTargetUtilization: '0.8',
+        capacityWeightingMode: 'linear',
+        capacityWeightFactor: '1.25',
+        hardLoanThreshold: '8',
+        hardLoanWeightMultiplier: '1.4',
         evil: 'x',
       }),
-    ).toEqual({ processorsJson: '[]', rulesJson: '{}', allowIneligibleOverride: 'true' });
+    ).toEqual({
+      processorsJson: '[]',
+      rulesJson: '{}',
+      allowIneligibleOverride: 'true',
+      globalTargetUtilization: '0.8',
+      capacityWeightingMode: 'linear',
+      capacityWeightFactor: '1.25',
+      hardLoanThreshold: '8',
+      hardLoanWeightMultiplier: '1.4',
+    });
   });
 
   it('getProcessorAssignmentToolConfig returns null when no row', async () => {

@@ -23,6 +23,13 @@
   const fieldsTableBody = document.getElementById('fieldsTableBody');
   const fieldSearchInput = document.getElementById('fieldSearchInput');
   const calculationsList = document.getElementById('calculationsList');
+  const screenTestExportPanel = document.getElementById('screenTestExportPanel');
+  const screenTestExcelObject = document.getElementById('screenTestExcelObject');
+  const screenTestCreateFieldsObject = document.getElementById('screenTestCreateFieldsObject');
+  const screenTestCalculatedExcelObject = document.getElementById('screenTestCalculatedExcelObject');
+  const copyScreenTestExcelObjectBtn = document.getElementById('copyScreenTestExcelObjectBtn');
+  const copyScreenTestCreateObjectBtn = document.getElementById('copyScreenTestCreateObjectBtn');
+  const copyScreenTestCalculatedObjectBtn = document.getElementById('copyScreenTestCalculatedObjectBtn');
   const voiceHelp = document.getElementById('voiceHelp');
   const closeVoiceHelp = document.getElementById('closeVoiceHelp');
   const toggleVoiceHelp = document.getElementById('toggleVoiceHelp');
@@ -122,6 +129,106 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  function normalizeCreateFieldFormat(typeRaw) {
+    const token = String(typeRaw || '').trim();
+    const t = token.toLowerCase().replace(/_/g, '');
+    if (/^(string|text|char|varchar|dropdown|enum|picklist|list)$/i.test(t)) return 'string';
+    if (/^(integer|int|long|short)$/i.test(t)) return 'integer';
+    if (/^(decimal2|currency|percent)$/i.test(t)) return 'decimal2';
+    if (/^(decimal3)$/i.test(t)) return 'decimal3';
+    if (/^(decimal4)$/i.test(t)) return 'decimal4';
+    if (/^(decimal|number|numeric|double|float)$/i.test(t)) return 'decimal';
+    if (/^(date|datetime|time)$/i.test(t)) return 'date';
+    if (/^(boolean|bool|yes\/no|checkbox)$/i.test(t)) return 'boolean';
+    return 'string';
+  }
+
+  function toAutomatorTypeToken(field) {
+    const rawType = String(field?.type || 'STRING').trim().toUpperCase();
+    const maxLength = Number(field?.maxlength);
+    if (rawType === 'STRING' || rawType === 'DROPDOWN') {
+      if (Number.isFinite(maxLength) && maxLength > 0) {
+        return `String(${maxLength})`;
+      }
+      return 'String';
+    }
+    if (rawType === 'INTEGER' || rawType === 'INT') return 'Integer';
+    if (rawType === 'DECIMAL2') return 'Decimal2';
+    if (rawType === 'DECIMAL3') return 'Decimal3';
+    if (rawType === 'DECIMAL4') return 'Decimal4';
+    if (rawType === 'DECIMAL') return 'Decimal';
+    if (rawType === 'DATE' || rawType === 'DATETIME') return 'Date';
+    if (rawType === 'BOOLEAN') return 'Boolean';
+    return 'String';
+  }
+
+  function buildScreenTestExportObjects(parsed) {
+    const fields = Array.isArray(parsed?.customFields) ? parsed.customFields : [];
+    const excelReadyObject = [];
+    const createFieldObject = [];
+    const calculatedFieldsExcelObject = [];
+
+    fields.forEach((field) => {
+      const fieldId = String(field?.id || '').trim().toUpperCase();
+      if (!fieldId) return;
+      const bracketFieldId = `[${fieldId}]`;
+      const typeToken = toAutomatorTypeToken(field);
+
+      excelReadyObject.push({
+        'Field ID': bracketFieldId,
+        Action: 'New',
+        Type: typeToken,
+        Description: field?.desc || '',
+        Required: 'N',
+      });
+
+      const createObj = {
+        id: fieldId,
+        description: field?.desc || '',
+        format: normalizeCreateFieldFormat(field?.type || ''),
+      };
+      const maxLength = Number(field?.maxlength);
+      if (createObj.format === 'string' && Number.isFinite(maxLength) && maxLength > 0) {
+        createObj.maxLength = maxLength;
+      }
+      if (field?.calculation) {
+        createObj.calculation = field.calculation;
+        calculatedFieldsExcelObject.push({
+          'Field ID': bracketFieldId,
+          Calculation: field.calculation,
+        });
+      }
+      createFieldObject.push(createObj);
+    });
+
+    return { excelReadyObject, createFieldObject, calculatedFieldsExcelObject };
+  }
+
+  function renderScreenTestExportObjects(parsed) {
+    if (!screenTestExportPanel || !screenTestExcelObject || !screenTestCreateFieldsObject || !screenTestCalculatedExcelObject) {
+      return;
+    }
+    const exports = buildScreenTestExportObjects(parsed);
+    screenTestExcelObject.value = JSON.stringify(exports.excelReadyObject, null, 2);
+    screenTestCreateFieldsObject.value = JSON.stringify(exports.createFieldObject, null, 2);
+    screenTestCalculatedExcelObject.value = JSON.stringify(exports.calculatedFieldsExcelObject, null, 2);
+    screenTestExportPanel.style.display = 'block';
+  }
+
+  async function copyTextFromEl(textAreaEl, successMsg) {
+    const value = String(textAreaEl?.value || '').trim();
+    if (!value) {
+      addMessage('assistant', 'Nothing to copy yet. Extract first.');
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(value);
+      addMessage('assistant', successMsg);
+    } catch (err) {
+      addMessage('assistant', `Copy failed: ${err.message}`);
+    }
   }
 
   function addMessage(role, content, options = {}) {
@@ -283,6 +390,7 @@
     ];
     if (extractResultText) extractResultText.textContent = lines.filter(Boolean).join('\n');
     if (extractResult) extractResult.style.display = 'block';
+    renderScreenTestExportObjects(parsed);
     renderOverview(parsed);
     addMessage('assistant', `Extracted ${parsed.fieldIds.length} field IDs and ${parsed.calculations.length} calculations. Review the Form Overview above or ask me to analyze.`);
   }
@@ -378,6 +486,15 @@
   extractFieldsBtn?.addEventListener('click', handleExtract);
   summarizeFuncBtn?.addEventListener('click', handleSummarizeFunctionality);
   checkIssuesBtn?.addEventListener('click', handleCheckIssues);
+  copyScreenTestExcelObjectBtn?.addEventListener('click', () => {
+    copyTextFromEl(screenTestExcelObject, 'Copied Excel Ready Object.');
+  });
+  copyScreenTestCreateObjectBtn?.addEventListener('click', () => {
+    copyTextFromEl(screenTestCreateFieldsObject, 'Copied Create Field Object.');
+  });
+  copyScreenTestCalculatedObjectBtn?.addEventListener('click', () => {
+    copyTextFromEl(screenTestCalculatedExcelObject, 'Copied Calculated Fields Excel Object.');
+  });
 
   clearChatBtn?.addEventListener('click', () => {
     chatContext = [];

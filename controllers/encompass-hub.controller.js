@@ -160,9 +160,13 @@ export async function getPipeline(req, res) {
     });
   } catch (error) {
     console.error('Error fetching Encompass pipeline:', error.message);
-    return res.status(500).json({
+    const status = Number.isFinite(error?.statusCode) ? error.statusCode : 500;
+    return res.status(status).json({
       error: 'Failed to fetch Encompass pipeline data',
       details: error.message,
+      recoverable: Boolean(error?.isRecoverable),
+      retryAfterMs: Number.isFinite(error?.retryAfterMs) ? error.retryAfterMs : null,
+      upstreamStatus: Number.isFinite(error?.upstreamStatus) ? error.upstreamStatus : null,
     });
   }
 }

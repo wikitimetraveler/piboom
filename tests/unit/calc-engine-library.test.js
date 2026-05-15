@@ -53,4 +53,17 @@ describe('calcEngineLibrary helpers', () => {
     expect(calcMath.gseScenarioRiskLevel([43, 2, 91])).toBe('medium');
     expect(calcMath.gseScenarioRiskLevel([46, 1, 96])).toBe('high');
   });
+
+  test('calculateDTI uses ctx additional grossMonthly override when present', () => {
+    const value = calcMath.calculateDTI([3000, 5000], { additionalData: { grossMonthly: 10000 } });
+    expect(value).toBe(30);
+  });
+
+  test('calculateDTI returns empty string when income is zero', () => {
+    expect(calcMath.calculateDTI([1000, 0], {})).toBe('');
+  });
+
+  test('divideRounded returns empty string when dividing by zero', () => {
+    expect(calcMath.divideRounded([1000, 0])).toBe('');
+  });
 });

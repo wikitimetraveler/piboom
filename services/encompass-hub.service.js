@@ -11,6 +11,19 @@ const API_V1_BASE = `${API_SERVER}/encompass/v1`;
 const DEFAULT_LIMIT = Number(process.env.ENCOMPASS_PIPELINE_LIMIT || 50);
 /** Prevent indefinite hangs when Encompass or the network stalls (ms). Override with ENCOMPASS_AXIOS_TIMEOUT_MS. */
 const ENCOMPASS_AXIOS_TIMEOUT_MS = Number(process.env.ENCOMPASS_AXIOS_TIMEOUT_MS || 120000);
+/** Lightweight transient retry for flaky upstream/network paths. */
+const ENCOMPASS_TRANSIENT_RETRY_COUNT = Math.max(0, Number(process.env.ENCOMPASS_TRANSIENT_RETRY_COUNT || 1));
+const ENCOMPASS_TRANSIENT_RETRY_BASE_MS = Math.max(100, Number(process.env.ENCOMPASS_TRANSIENT_RETRY_BASE_MS || 400));
+const ENCOMPASS_TRANSIENT_STATUS = new Set([408, 425, 429, 500, 502, 503, 504]);
+const ENCOMPASS_TRANSIENT_CODES = new Set([
+  'ECONNABORTED',
+  'ETIMEDOUT',
+  'ECONNRESET',
+  'EAI_AGAIN',
+  'ENOTFOUND',
+  'EPIPE',
+  'ERR_NETWORK',
+]);
 
 const PIPELINE_FIELDS = [
   'Loan.LoanGuid',
@@ -98,7 +111,38 @@ const BASE_TERMS = [
   },
 ];
 
-async function requestWithAuth(config, { retryOn401 = true } = {}) {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function parseRetryAfterMs(headers = {}) {
+  const retryAfterRaw = headers['retry-after'] ?? headers['Retry-After'];
+  if (retryAfterRaw == null || `${retryAfterRaw}`.trim() === '') return null;
+  const num = Number(retryAfterRaw);
+  if (Number.isFinite(num) && num >= 0) return Math.round(num * 1000);
+  const dateMs = Date.parse(`${retryAfterRaw}`);
+  if (Number.isNaN(dateMs)) return null;
+  const delta = dateMs - Date.now();
+  return delta > 0 ? delta : null;
+}
+
+export function classifyEncompassError(error) {
+  const status = error?.response?.status;
+  const retryAfterMs = parseRetryAfterMs(error?.response?.headers || {});
+  const timeoutish = error?.code === 'ECONNABORTED' || error?.message?.includes?.('timeout');
+  const recoverable =
+    timeoutish ||
+    ENCOMPASS_TRANSIENT_STATUS.has(status) ||
+    ENCOMPASS_TRANSIENT_CODES.has(`${error?.code || ''}`.toUpperCase());
+  return {
+    status,
+    statusCode: Number.isFinite(status) ? status : null,
+    retryAfterMs,
+    recoverable,
+  };
+}
+
+async function requestWithAuth(config, { retryOn401 = true, retryOnTransient = true } = {}) {
   const token = await ensureEncompassToken();
   const headers = {
     'Content-Type': 'application/json',
@@ -112,25 +156,57 @@ async function requestWithAuth(config, { retryOn401 = true } = {}) {
     timeout: config.timeout != null ? config.timeout : ENCOMPASS_AXIOS_TIMEOUT_MS,
   };
 
-  try {
-    return await axios(requestConfig);
-  } catch (error) {
-    if (error.code === 'ECONNABORTED' || error.message?.includes?.('timeout')) {
-      const ms = requestConfig.timeout;
-      throw new Error(`Encompass request timed out after ${ms}ms — API may be slow or unreachable. Retry or raise ENCOMPASS_AXIOS_TIMEOUT_MS if operations need longer.`);
-    }
-    if (retryOn401 && error.response?.status === 401) {
-      clearEncompassTokenCache();
-      const refreshedToken = await ensureEncompassToken();
-      return axios({
-        ...requestConfig,
-        headers: {
+  let refreshed401 = false;
+  let transientAttempt = 0;
+  while (true) {
+    try {
+      return await axios(requestConfig);
+    } catch (error) {
+      if (retryOn401 && !refreshed401 && error.response?.status === 401) {
+        refreshed401 = true;
+        clearEncompassTokenCache();
+        const refreshedToken = await ensureEncompassToken();
+        requestConfig.headers = {
           ...headers,
           Authorization: `Bearer ${refreshedToken}`,
-        },
-      });
+        };
+        continue;
+      }
+
+      const classified = classifyEncompassError(error);
+      if (retryOnTransient && classified.recoverable && transientAttempt < ENCOMPASS_TRANSIENT_RETRY_COUNT) {
+        transientAttempt += 1;
+        const backoffMs = classified.retryAfterMs
+          ?? Math.min(2000, ENCOMPASS_TRANSIENT_RETRY_BASE_MS * transientAttempt);
+        console.warn('Encompass transient request failure, retrying', {
+          attempt: transientAttempt,
+          maxRetries: ENCOMPASS_TRANSIENT_RETRY_COUNT,
+          status: classified.status ?? null,
+          code: error?.code ?? null,
+          backoffMs,
+          method: requestConfig.method,
+          url: requestConfig.url,
+        });
+        await sleep(backoffMs);
+        continue;
+      }
+
+      if (error.code === 'ECONNABORTED' || error.message?.includes?.('timeout')) {
+        const ms = requestConfig.timeout;
+        const timeoutError = new Error(`Encompass request timed out after ${ms}ms — API may be slow or unreachable. Retry or raise ENCOMPASS_AXIOS_TIMEOUT_MS if operations need longer.`);
+        timeoutError.statusCode = 504;
+        timeoutError.isRecoverable = true;
+        timeoutError.retryAfterMs = ENCOMPASS_TRANSIENT_RETRY_BASE_MS;
+        timeoutError.upstreamStatus = classified.status ?? null;
+        throw timeoutError;
+      }
+
+      error.statusCode = classified.statusCode ?? error.statusCode;
+      error.isRecoverable = classified.recoverable;
+      if (classified.retryAfterMs != null) error.retryAfterMs = classified.retryAfterMs;
+      if (classified.status != null) error.upstreamStatus = classified.status;
+      throw error;
     }
-    throw error;
   }
 }
 
@@ -1003,15 +1079,23 @@ export async function fetchPipelineLoans(options = {}) {
       params: pipelineParams,
     });
   } catch (error) {
+    const classified = classifyEncompassError(error);
     const status = error.response?.status;
     const data = error.response?.data;
     console.error('Encompass loanPipeline request failed', {
       status,
       data,
       message: error.message,
+      recoverable: classified.recoverable,
+      retryAfterMs: classified.retryAfterMs,
     });
     const detail = data?.message || data?.error || error.message;
-    throw new Error(`Encompass loanPipeline ${status || 'error'}: ${detail}`);
+    const enriched = new Error(`Encompass loanPipeline ${status || 'error'}: ${detail}`);
+    enriched.statusCode = classified.statusCode ?? 502;
+    enriched.upstreamStatus = classified.status ?? null;
+    enriched.isRecoverable = classified.recoverable;
+    if (classified.retryAfterMs != null) enriched.retryAfterMs = classified.retryAfterMs;
+    throw enriched;
   }
 
   let rawItems = normalizePipelineItems(response.data);

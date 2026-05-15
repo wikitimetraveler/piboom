@@ -220,62 +220,60 @@ export async function upsertDisasters(batch) {
   const pool = getPool();
   if (!pool) throw new Error('Database not initialized');
 
-  const text = `
-    INSERT INTO disasters (
-      source, event_type, county_fips, county_name, state_abbr,
-      start_time, end_time, severity, title, lat, lng, source_id, raw
-    ) VALUES (
-      $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
-    ) ON CONFLICT (county_fips, source, source_id, start_time) DO NOTHING
-    RETURNING id
-  `;
+  const CHUNK_SIZE = 200;
+  let inserted = 0;
+  let skipped = 0;
 
-  let inserted = 0, skipped = 0;
-  const batchSize = batch.length;
-  
-  for (const d of batch) {
+  function normalizeStateAbbr(stateValue) {
+    if (!stateValue) return null;
+    const stateStr = String(stateValue).trim().toUpperCase();
+    if (!stateStr) return null;
+    return stateStr.length <= 3 ? stateStr : stateStr.substring(0, 3);
+  }
+
+  for (let i = 0; i < batch.length; i += CHUNK_SIZE) {
+    const chunk = batch.slice(i, i + CHUNK_SIZE);
+    if (!chunk.length) continue;
     try {
-      // Normalize state_abbr: allow up to 3 characters for Canadian provinces, otherwise 2
-      let stateAbbr = null;
-      if (d.state_abbr) {
-        const stateStr = String(d.state_abbr).trim().toUpperCase();
-        // Canadian provinces can be 3 chars (e.g., "ON", "BC", "QC", "MB", "SK", "AB", "NS", "NB", "PE", "NL", "YT", "NT", "NU")
-        // Check if it's likely Canadian (3 chars) or US (2 chars)
-        if (stateStr.length <= 3) {
-          stateAbbr = stateStr;
-        } else {
-          // If longer than 3, truncate to 3 (in case of longer codes)
-          stateAbbr = stateStr.substring(0, 3);
-        }
-      }
-      
-      const values = [
-        d.source,
-        d.event_type,
-        d.county_fips,
-        d.county_name || null,
-        stateAbbr,
-        d.start_time,
-        d.end_time || null,
-        d.severity || null,
-        d.title || null,
-        d.lat || null,
-        d.lng || null,
-        d.source_id || null,
-        d.raw || null,
-      ];
+      const values = [];
+      const tuples = chunk.map((d, idx) => {
+        const base = idx * 13;
+        values.push(
+          d.source,
+          d.event_type,
+          d.county_fips,
+          d.county_name || null,
+          normalizeStateAbbr(d.state_abbr),
+          d.start_time,
+          d.end_time || null,
+          d.severity || null,
+          d.title || null,
+          d.lat || null,
+          d.lng || null,
+          d.source_id || null,
+          d.raw || null
+        );
+        return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11},$${base + 12},$${base + 13})`;
+      });
+      const text = `
+        INSERT INTO disasters (
+          source, event_type, county_fips, county_name, state_abbr,
+          start_time, end_time, severity, title, lat, lng, source_id, raw
+        ) VALUES ${tuples.join(',')}
+        ON CONFLICT (county_fips, source, source_id, start_time) DO NOTHING
+        RETURNING id
+      `;
       const res = await pool.query(text, values);
-      if (res.rowCount > 0) inserted += res.rowCount; else skipped += 1;
+      const chunkInserted = res.rowCount || 0;
+      inserted += chunkInserted;
+      skipped += chunk.length - chunkInserted;
     } catch (e) {
-      console.warn('⚠️  Upsert disaster skipped:', e.message);
-      skipped += 1;
+      console.warn('⚠️  Upsert disaster chunk failed, marking as skipped:', e.message);
+      skipped += chunk.length;
     }
   }
-  
-  if (batchSize > 0) {
-    console.log(`📊 upsertDisasters: ${inserted} inserted, ${skipped} skipped from ${batchSize} records`);
-  }
-  
+
+  console.log(`📊 upsertDisasters: ${inserted} inserted, ${skipped} skipped from ${batch.length} records`);
   return { inserted, skipped };
 }
 
@@ -630,6 +628,9 @@ export async function ingestUsgsQuakes() {
   let geo;
   try {
     const resp = await fetch(url);
+    if (!resp.ok) {
+      throw new Error(`USGS API error: ${resp.status} ${resp.statusText}`);
+    }
     geo = await resp.json();
   } catch (e) {
     console.warn('USGS fetch failed:', e.message);
@@ -695,6 +696,9 @@ export async function ingestNwsCap() {
   let data;
   try {
     const resp = await fetch(url, { headers: { 'Accept': 'application/geo+json', 'User-Agent': 'DevConnectLabs/1.0' } });
+    if (!resp.ok) {
+      throw new Error(`NWS API error: ${resp.status} ${resp.statusText}`);
+    }
     data = await resp.json();
   } catch (e) {
     console.warn('NWS CAP fetch failed:', e.message);

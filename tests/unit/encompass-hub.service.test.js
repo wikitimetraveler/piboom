@@ -3,6 +3,7 @@ import {
   parseNumber,
   parseDate,
   coercePositiveInteger,
+  classifyEncompassError,
   normalizeUserProfile,
   filterUsersList,
   normalizeListParam,
@@ -91,5 +92,17 @@ describe('encompass-hub service helpers', () => {
     expect(normalizeListParam('a, b, c')).toEqual(['a', 'b', 'c']);
     expect(normalizeListParam(['x', 'y'])).toEqual(['x', 'y']);
     expect(normalizeCounties('King, Pierce')).toEqual(['king', 'pierce']);
+  });
+
+  test('classifyEncompassError marks known transient statuses as recoverable', () => {
+    const out = classifyEncompassError({ response: { status: 503 } });
+    expect(out.recoverable).toBe(true);
+    expect(out.statusCode).toBe(503);
+  });
+
+  test('classifyEncompassError parses retry-after seconds', () => {
+    const out = classifyEncompassError({ response: { status: 429, headers: { 'retry-after': '2' } } });
+    expect(out.recoverable).toBe(true);
+    expect(out.retryAfterMs).toBe(2000);
   });
 });

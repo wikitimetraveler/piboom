@@ -21,6 +21,7 @@ import {
   ingestNhc,
   pruneOldDisasters
 } from '../services/disasters.service.js';
+import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
 
 async function main() {
   console.log('📊 Disaster Data Refresh');
@@ -65,6 +66,10 @@ async function main() {
     console.log('🧹 Pruning disasters older than 90 days...');
     await pruneOldDisasters();
     console.log('   Prune complete');
+
+    console.log('🕸️ Refreshing disaster impact graph...');
+    const graphRes = await refreshDisasterImpactGraphFromCurrentData();
+    console.log('   Graph refresh complete', graphRes?.seeded || {});
 
     console.log('✅ Disaster refresh complete');
   } catch (error) {

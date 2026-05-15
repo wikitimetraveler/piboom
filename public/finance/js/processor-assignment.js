@@ -13,6 +13,11 @@
   const LS_AI_MODEL = 'processorAssignment_complexityAiModel';
   const LS_COMPLEXITY_MAX = 'processorAssignment_complexityMaxPoints';
   const LS_ALLOW_INELIGIBLE_OVERRIDE = 'processorAssignment_allowIneligibleOverride';
+  const LS_GLOBAL_TARGET_UTILIZATION = 'processorAssignment_globalTargetUtilization';
+  const LS_CAPACITY_WEIGHTING_MODE = 'processorAssignment_capacityWeightingMode';
+  const LS_CAPACITY_WEIGHT_FACTOR = 'processorAssignment_capacityWeightFactor';
+  const LS_HARD_LOAN_THRESHOLD = 'processorAssignment_hardLoanThreshold';
+  const LS_HARD_LOAN_MULTIPLIER = 'processorAssignment_hardLoanWeightMultiplier';
 
   const DEFAULT_PROCESSORS = `[
   { "userId": "YOUR_ENCOMPASS_USER_ENTITY_ID", "displayName": "Processor A", "maxPoints": 40, "products": ["Conventional", "FHA", "VA"] },
@@ -72,6 +77,11 @@
       complexityAiModel: $('complexityAiModel').value.trim(),
       complexityMaxPoints: $('complexityMaxPoints').value.trim(),
       allowIneligibleOverride: $('allowIneligibleOverride').checked ? 'true' : 'false',
+      globalTargetUtilization: $('globalTargetUtilization').value.trim(),
+      capacityWeightingMode: $('capacityWeightingMode').value,
+      capacityWeightFactor: $('capacityWeightFactor').value.trim(),
+      hardLoanThreshold: $('hardLoanThreshold').value.trim(),
+      hardLoanWeightMultiplier: $('hardLoanWeightMultiplier').value.trim(),
     };
   }
 
@@ -92,6 +102,21 @@
     if (c.allowIneligibleOverride != null) {
       const val = `${c.allowIneligibleOverride}`.trim().toLowerCase();
       $('allowIneligibleOverride').checked = ['true', '1', 'yes', 'y'].includes(val);
+    }
+    if (c.globalTargetUtilization != null && `${c.globalTargetUtilization}`.trim() !== '') {
+      $('globalTargetUtilization').value = `${c.globalTargetUtilization}`;
+    }
+    if (typeof c.capacityWeightingMode === 'string' && ['linear', 'none'].includes(c.capacityWeightingMode)) {
+      $('capacityWeightingMode').value = c.capacityWeightingMode;
+    }
+    if (c.capacityWeightFactor != null && `${c.capacityWeightFactor}`.trim() !== '') {
+      $('capacityWeightFactor').value = `${c.capacityWeightFactor}`;
+    }
+    if (c.hardLoanThreshold != null && `${c.hardLoanThreshold}`.trim() !== '') {
+      $('hardLoanThreshold').value = `${c.hardLoanThreshold}`;
+    }
+    if (c.hardLoanWeightMultiplier != null && `${c.hardLoanWeightMultiplier}`.trim() !== '') {
+      $('hardLoanWeightMultiplier').value = `${c.hardLoanWeightMultiplier}`;
     }
   }
 
@@ -169,6 +194,16 @@
           `${allowOverride}`.trim().toLowerCase(),
         );
       }
+      const gt = localStorage.getItem(LS_GLOBAL_TARGET_UTILIZATION);
+      if (gt != null) $('globalTargetUtilization').value = gt;
+      const cwm = localStorage.getItem(LS_CAPACITY_WEIGHTING_MODE);
+      if (cwm && ['linear', 'none'].includes(cwm)) $('capacityWeightingMode').value = cwm;
+      const cwf = localStorage.getItem(LS_CAPACITY_WEIGHT_FACTOR);
+      if (cwf != null && `${cwf}`.trim() !== '') $('capacityWeightFactor').value = cwf;
+      const hlt = localStorage.getItem(LS_HARD_LOAN_THRESHOLD);
+      if (hlt != null) $('hardLoanThreshold').value = hlt;
+      const hlm = localStorage.getItem(LS_HARD_LOAN_MULTIPLIER);
+      if (hlm != null && `${hlm}`.trim() !== '') $('hardLoanWeightMultiplier').value = hlm;
     } catch (e) {
       console.warn(e);
     }
@@ -188,6 +223,11 @@
         LS_ALLOW_INELIGIBLE_OVERRIDE,
         $('allowIneligibleOverride').checked ? 'true' : 'false',
       );
+      localStorage.setItem(LS_GLOBAL_TARGET_UTILIZATION, $('globalTargetUtilization').value.trim());
+      localStorage.setItem(LS_CAPACITY_WEIGHTING_MODE, $('capacityWeightingMode').value);
+      localStorage.setItem(LS_CAPACITY_WEIGHT_FACTOR, $('capacityWeightFactor').value.trim());
+      localStorage.setItem(LS_HARD_LOAN_THRESHOLD, $('hardLoanThreshold').value.trim());
+      localStorage.setItem(LS_HARD_LOAN_MULTIPLIER, $('hardLoanWeightMultiplier').value.trim());
     } catch (e) {
       console.warn(e);
     }
@@ -358,7 +398,9 @@
     }
     const mode = data.complexityMode ?? 'rules';
     const upBasis = data.usedPointsBasis ?? 'rules';
-    meta.textContent = `Mode: ${mode} | used-points basis: ${upBasis} | dry run: ${data.dryRun} | proposed: ${data.summary?.proposed ?? 0} assigned: ${data.summary?.assigned ?? 0} skipped: ${data.summary?.skipped ?? 0} errors: ${data.summary?.errors ?? 0}`;
+    const routing = data.routingConfig || {};
+    const targetTxt = routing.globalTargetUtilization != null ? routing.globalTargetUtilization : 'auto';
+    meta.textContent = `Mode: ${mode} | used-points basis: ${upBasis} | target utilization: ${targetTxt} | weighting: ${routing.capacityWeightingMode ?? 'linear'} x ${routing.capacityWeightFactor ?? 1} | dry run: ${data.dryRun} | proposed: ${data.summary?.proposed ?? 0} assigned: ${data.summary?.assigned ?? 0} skipped: ${data.summary?.skipped ?? 0} errors: ${data.summary?.errors ?? 0}`;
     data.results.forEach((row) => {
       const tr = document.createElement('tr');
       const hits = (row.ruleHits || [])
@@ -436,6 +478,27 @@
     if (maxPts !== '') {
       const n = Number(maxPts);
       if (Number.isFinite(n)) body.complexityMaxPoints = n;
+    }
+    const globalTargetUtilization = $('globalTargetUtilization').value.trim();
+    if (globalTargetUtilization !== '') {
+      const n = Number(globalTargetUtilization);
+      if (Number.isFinite(n)) body.globalTargetUtilization = n;
+    }
+    body.capacityWeightingMode = $('capacityWeightingMode').value || 'linear';
+    const capacityWeightFactor = $('capacityWeightFactor').value.trim();
+    if (capacityWeightFactor !== '') {
+      const n = Number(capacityWeightFactor);
+      if (Number.isFinite(n)) body.capacityWeightFactor = n;
+    }
+    const hardLoanThreshold = $('hardLoanThreshold').value.trim();
+    if (hardLoanThreshold !== '') {
+      const n = Number(hardLoanThreshold);
+      if (Number.isFinite(n)) body.hardLoanThreshold = n;
+    }
+    const hardLoanWeightMultiplier = $('hardLoanWeightMultiplier').value.trim();
+    if (hardLoanWeightMultiplier !== '') {
+      const n = Number(hardLoanWeightMultiplier);
+      if (Number.isFinite(n)) body.hardLoanWeightMultiplier = n;
     }
     body.complexityMode = $('complexityMode').value || 'rules';
     const aim = $('complexityAiModel').value.trim();
@@ -557,6 +620,11 @@
       $('complexityAiModel').value = '';
       $('complexityMaxPoints').value = '';
       $('allowIneligibleOverride').checked = false;
+      $('globalTargetUtilization').value = '';
+      $('capacityWeightingMode').value = 'linear';
+      $('capacityWeightFactor').value = '1';
+      $('hardLoanThreshold').value = '';
+      $('hardLoanWeightMultiplier').value = '1';
       saveStorage();
       $('runStatus').textContent = 'Defaults loaded (replace user IDs and CX.* field ids before apply).';
     });

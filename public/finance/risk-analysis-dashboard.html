@@ -117,7 +117,7 @@
         }
 
         .map-container {
-            height: 600px;
+            height: clamp(320px, 56vh, 760px);
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -126,6 +126,10 @@
         #map {
             width: 100%;
             height: 100%;
+        }
+
+        .dashboard-status-banner {
+            display: none;
         }
 
         .chart-container {
@@ -547,6 +551,12 @@
                 transform: rotate(270deg);
             }
         }
+
+        @media (max-width: 992px) {
+            .map-container {
+                height: clamp(280px, 48vh, 560px);
+            }
+        }
     </style>
 </head>
 <body>
@@ -591,12 +601,13 @@
                 <p class="text-muted">Comprehensive analysis of loan data and disaster risk through advanced visualization and AI-powered insights</p>
             </div>
         </div>
+        <div id="dashboardStatusBanner" class="alert alert-warning dashboard-status-banner mb-3" role="alert"></div>
 
         <!-- Statistics Cards - Starting at 0 -->
         <div class="row mb-4">
             <div class="col-md-2">
                 <div class="stat-card">
-                    <div class="stat-label">Total FEMA Disasters</div>
+                    <div class="stat-label">Total Disaster Events</div>
                     <div class="stat-number" id="totalFemaDisasters">0</div>
                     <div class="stat-change" id="femaChange"></div>
                 </div>
@@ -686,7 +697,7 @@
                     <select class="form-select form-select-sm" id="riskFilter">
                         <option value="">All Risk Levels</option>
                         <option value="low">Low (0-2)</option>
-                        <option value="medium">Medium (3-5)</option>
+                        <option value="medium">Moderate (3-5)</option>
                         <option value="high">High (6+)</option>
                     </select>
                 </div>
@@ -1059,7 +1070,7 @@
                 <!-- Recent Disasters Table -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <i class="bi bi-exclamation-triangle-fill"></i> Recent FEMA Disasters
+                        <i class="bi bi-exclamation-triangle-fill"></i> Recent Disaster Events
                         <small class="float-end text-white-50" id="disastersCount">0 disasters</small>
                     </div>
                     <div class="card-body">
@@ -1197,14 +1208,32 @@
             }
         }
 
+        function setDashboardStatus(message, type = 'warning') {
+            const banner = document.getElementById('dashboardStatusBanner');
+            if (!banner) return;
+            if (!message) {
+                banner.style.display = 'none';
+                banner.textContent = '';
+                banner.className = 'alert alert-warning dashboard-status-banner mb-3';
+                return;
+            }
+            banner.className = `alert alert-${type} dashboard-status-banner mb-3`;
+            banner.textContent = message;
+            banner.style.display = 'block';
+        }
+
         // Load dashboard data
         async function loadDashboardData() {
             try {
+                setDashboardStatus('');
                 updateLoadingStatus('Loading loan pipeline data...', 10);
                 
                 // Load loans
                 updateLoadingStatus('Fetching loans from database...', 30);
                 const loansResponse = await fetch('/api/loan-pipeline/loans');
+                if (!loansResponse.ok) {
+                    throw new Error(`Loan query failed: HTTP ${loansResponse.status}`);
+                }
                 const loansData = await loansResponse.json();
                 
                 if (loansData.success) {
@@ -1226,6 +1255,9 @@
                         if (stateFilter) qp.set('state', stateFilter);
                         if (countyFilter) qp.set('county', countyFilter);
                         const femaResponse = await fetch(`/api/loan-pipeline/query-fema?${qp.toString()}`);
+                        if (!femaResponse.ok) {
+                            throw new Error(`FEMA query failed: HTTP ${femaResponse.status}`);
+                        }
                         const femaData = await femaResponse.json();
                         if (femaData.success && femaData.data.disasters) {
                             const femaDisasters = femaData.data.disasters.map(d => ({
@@ -1281,7 +1313,11 @@
                             if (stateFilter) qp.set('state', stateFilter);
                             if (countyFilter) qp.set('county', countyFilter);
                             qp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
+                            qp.set('limit', '2000');
                             const dbResponse = await fetch(`/api/disasters?${qp.toString()}`);
+                            if (!dbResponse.ok) {
+                                throw new Error(`Source ${source} failed: HTTP ${dbResponse.status}`);
+                            }
                             const dbData = await dbResponse.json();
                             if (dbData.success && dbData.data.disasters) {
                                 // Normalize database disaster format to unified format
@@ -1335,6 +1371,7 @@
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
                 updateLoadingStatus('Error loading data. Please refresh.', 100);
+                setDashboardStatus(`Dashboard load failed: ${error.message}`, 'danger');
                 setTimeout(() => {
                     hideBankerLoading();
                 }, 2000);
@@ -1941,16 +1978,81 @@
             markers = [];
             loanMarkers = [];
             disasterMarkers = [];
+            const validLoans = (currentData.loans || []).filter((loan) => loan?.latitude && loan?.longitude);
+            const validDisasters = (currentData.disasters || []).filter((disaster) => {
+                const lat = disaster?.latitude || disaster?.lat;
+                const lng = disaster?.longitude || disaster?.lng;
+                return lat && lng && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng));
+            });
 
-            // Add loan markers
-            currentData.loans.forEach(loan => {
-                if (loan.latitude && loan.longitude) {
+            const loanChunkSize = 150;
+            const disasterChunkSize = 120;
+
+            function fitAllMarkers() {
+                if (!markers.length) return;
+                const bounds = new google.maps.LatLngBounds();
+                markers.forEach((m) => bounds.extend(m.getPosition()));
+                map.fitBounds(bounds);
+            }
+
+            function renderDisasterChunk(startIndex = 0) {
+                const endIndex = Math.min(startIndex + disasterChunkSize, validDisasters.length);
+                for (let i = startIndex; i < endIndex; i += 1) {
+                    const disaster = validDisasters[i];
+                    const lat = disaster.latitude || disaster.lat;
+                    const lng = disaster.longitude || disaster.lng;
+                    const incidentType = disaster.incidentType || disaster.event_type || 'Disaster';
+                    const county = disaster.county || disaster.county_name || '';
+                    const state = disaster.state || disaster.state_abbr || '';
+                    const date = disaster.incidentBeginDate || disaster.start_time;
+                    const title = disaster.title || disaster.declarationTitle || incidentType;
+                    const source = disaster.source || 'unknown';
+
+                    let iconUrl = 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
+                    if (source === 'firms') iconUrl = 'https://maps.google.com/mapfiles/ms/icons/fire.png';
+                    else if (source === 'usgs') iconUrl = 'https://maps.google.com/mapfiles/ms/icons/earthquake.png';
+                    else if (source === 'nws' || source === 'nhc') iconUrl = 'https://maps.google.com/mapfiles/ms/icons/storm.png';
+
+                    const marker = new google.maps.Marker({
+                        position: { lat: parseFloat(lat), lng: parseFloat(lng) },
+                        map: map,
+                        icon: { url: iconUrl },
+                        title: `${incidentType} - ${county}, ${state}`
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `
+                            <div style="padding: 10px;">
+                                <h6>${incidentType}</h6>
+                                <p><strong>Source:</strong> ${source.toUpperCase()}</p>
+                                <p><strong>Location:</strong> ${county}${county && state ? ', ' : ''}${state}</p>
+                                <p><strong>Date:</strong> ${date ? new Date(date).toLocaleDateString() : 'N/A'}</p>
+                                <p><strong>Title:</strong> ${title}</p>
+                                ${disaster.severity ? `<p><strong>Severity:</strong> ${disaster.severity}</p>` : ''}
+                            </div>
+                        `
+                    });
+
+                    marker.addListener('click', () => infoWindow.open(map, marker));
+                    disasterMarkers.push(marker);
+                    markers.push(marker);
+                }
+                if (endIndex < validDisasters.length) {
+                    window.requestAnimationFrame(() => renderDisasterChunk(endIndex));
+                    return;
+                }
+                fitAllMarkers();
+            }
+
+            function renderLoanChunk(startIndex = 0) {
+                const endIndex = Math.min(startIndex + loanChunkSize, validLoans.length);
+                for (let i = startIndex; i < endIndex; i += 1) {
+                    const loan = validLoans[i];
                     const riskScore = loan.disaster_risk_score || 0;
-                    let color = '#6b7280'; // Gray for no risk
-                    
-                    if (riskScore >= 6) color = '#ef4444'; // Red for high
-                    else if (riskScore >= 3) color = '#f59e0b'; // Yellow for medium
-                    else if (riskScore > 0) color = '#10b981'; // Green for low
+                    let color = '#6b7280';
+                    if (riskScore >= 6) color = '#ef4444';
+                    else if (riskScore >= 3) color = '#f59e0b';
+                    else if (riskScore > 0) color = '#10b981';
 
                     const marker = new google.maps.Marker({
                         position: { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) },
@@ -1982,121 +2084,41 @@
                             </div>
                         `
                     });
-                    
-                    marker.infoWindow = infoWindow;
 
+                    marker.infoWindow = infoWindow;
                     marker.addListener('click', () => {
-                        // Close other info windows
-                        markers.forEach(m => {
-                            if (m.infoWindow && m !== marker) {
-                                m.infoWindow.close();
-                            }
+                        markers.forEach((m) => {
+                            if (m.infoWindow && m !== marker) m.infoWindow.close();
                         });
-                        
                         infoWindow.open(map, marker);
-                        
-                        // Highlight row in grid
-                        $('#encompassLoansTable tbody tr').each(function() {
+                        $('#encompassLoansTable tbody tr').each(function () {
                             const loanObj = $(this).data('loanObj');
                             if (loanObj && loanObj.loan_number === loan.loan_number) {
                                 $('#encompassLoansTable tbody tr').removeClass('table-active');
                                 $(this).addClass('table-active');
-                                
-                                // Scroll to row
                                 const rowNode = encompassLoansTable.row(this).node();
                                 rowNode.scrollIntoView({ behavior: 'smooth', block: 'center' });
                             }
                         });
                     });
-
                     loanMarkers.push(marker);
                     markers.push(marker);
                 }
-            });
-
-            // Add disaster markers
-            let markersAdded = 0;
-            let markersSkipped = 0;
-            currentData.disasters.forEach(disaster => {
-                // Support both FEMA format (latitude/longitude) and unified format (lat/lng)
-                const lat = disaster.latitude || disaster.lat;
-                const lng = disaster.longitude || disaster.lng;
-                const incidentType = disaster.incidentType || disaster.event_type || 'Disaster';
-                const county = disaster.county || disaster.county_name || '';
-                const state = disaster.state || disaster.state_abbr || '';
-                const date = disaster.incidentBeginDate || disaster.start_time;
-                const title = disaster.title || disaster.declarationTitle || incidentType;
-                const source = disaster.source || 'unknown';
-                
-                if (lat && lng && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))) {
-                    markersAdded++;
-                    // Use different icons/colors based on source
-                    let iconUrl = 'https://maps.google.com/mapfiles/ms/icons/red-dot.png';
-                    if (source === 'firms') {
-                        iconUrl = 'https://maps.google.com/mapfiles/ms/icons/fire.png';
-                    } else if (source === 'usgs') {
-                        iconUrl = 'https://maps.google.com/mapfiles/ms/icons/earthquake.png';
-                    } else if (source === 'nws' || source === 'nhc') {
-                        iconUrl = 'https://maps.google.com/mapfiles/ms/icons/storm.png';
-                    }
-                    
-                    const marker = new google.maps.Marker({
-                        position: { lat: parseFloat(lat), lng: parseFloat(lng) },
-                        map: map,
-                        icon: {
-                            url: iconUrl
-                        },
-                        title: `${incidentType} - ${county}, ${state}`
-                    });
-
-                    const infoWindow = new google.maps.InfoWindow({
-                        content: `
-                            <div style="padding: 10px;">
-                                <h6>${incidentType}</h6>
-                                <p><strong>Source:</strong> ${source.toUpperCase()}</p>
-                                <p><strong>Location:</strong> ${county}${county && state ? ', ' : ''}${state}</p>
-                                <p><strong>Date:</strong> ${date ? new Date(date).toLocaleDateString() : 'N/A'}</p>
-                                <p><strong>Title:</strong> ${title}</p>
-                                ${disaster.severity ? `<p><strong>Severity:</strong> ${disaster.severity}</p>` : ''}
-                            </div>
-                        `
-                    });
-
-                    marker.addListener('click', () => {
-                        infoWindow.open(map, marker);
-                    });
-
-                    disasterMarkers.push(marker);
-                    markers.push(marker);
-                } else {
-                    markersSkipped++;
-                    if (markersSkipped <= 5) {
-                        console.warn(`⚠️ Skipped disaster marker (missing/invalid coordinates):`, {
-                            source,
-                            incidentType,
-                            lat,
-                            lng,
-                            disaster
-                        });
-                    }
+                if (endIndex < validLoans.length) {
+                    window.requestAnimationFrame(() => renderLoanChunk(endIndex));
+                    return;
                 }
-            });
-            
-            console.log(`✅ Added ${markersAdded} disaster markers to map (${markersSkipped} skipped due to missing coordinates)`);
-
-            // Fit bounds to show all markers
-            if (markers.length > 0) {
-                const bounds = new google.maps.LatLngBounds();
-                markers.forEach(m => bounds.extend(m.getPosition()));
-                map.fitBounds(bounds);
+                renderDisasterChunk(0);
             }
+
+            renderLoanChunk(0);
         }
 
         // Get risk level text
         function getRiskLevel(score) {
             if (!score && score !== 0) return 'Not Analyzed';
             if (score >= 6) return 'High';
-            if (score >= 3) return 'Medium';
+            if (score >= 3) return 'Moderate';
             return 'Low';
         }
 
@@ -2283,7 +2305,7 @@
                         </div>
                         <div class="insight-item">
                             <div class="insight-title">Disaster Activity</div>
-                            <div class="insight-text">${currentData.stats.totalFemaDisasters} FEMA disaster declarations detected in the analysis area.</div>
+                            <div class="insight-text">${currentData.stats.totalFemaDisasters} disaster events detected in the analysis area.</div>
                         </div>
                     `;
                 }
@@ -2299,7 +2321,7 @@
                         </div>
                         <div class="insight-item">
                             <div class="insight-title">Disaster Activity</div>
-                            <div class="insight-text">${currentData.stats.totalFemaDisasters} FEMA disaster declarations detected in the analysis area.</div>
+                            <div class="insight-text">${currentData.stats.totalFemaDisasters} disaster events detected in the analysis area.</div>
                         </div>
                         <div class="insight-item">
                             <div class="insight-title">Pipeline Health</div>
@@ -2931,7 +2953,7 @@ RISK METRICS
 ============
 High Risk Loans: ${stats.highRiskLoans}
 At-Risk Counties: ${stats.atRiskCounties}
-Active FEMA Disasters: ${stats.totalFemaDisasters}
+Active Disaster Events: ${stats.totalFemaDisasters}
 Analysis Coverage: ${stats.analysisCoverage}%
 Average Days Since Analysis: ${stats.avgDaysSinceAnalysis}
 
@@ -3030,7 +3052,11 @@ RECOMMENDATIONS
                         if (stateFilter) qp.set('state', stateFilter);
                         if (countyFilter) qp.set('county', countyFilter);
                         qp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
+                        qp.set('limit', '2000');
                         const dbResponse = await fetch(`/api/disasters?${qp.toString()}`);
+                        if (!dbResponse.ok) {
+                            throw new Error(`Source ${source} failed: HTTP ${dbResponse.status}`);
+                        }
                         const dbData = await dbResponse.json();
                         if (dbData.success && dbData.data.disasters) {
                             console.log(`✅ Loaded ${dbData.data.disasters.length} disasters from ${source}`);

@@ -743,6 +743,27 @@ export async function seedGraphFromExistingDisasterData(options = {}) {
   };
 }
 
+export async function refreshDisasterImpactGraphFromCurrentData() {
+  const pool = ensurePool();
+  await initDisasterImpactGraphSchema();
+  await pool.query('BEGIN');
+  try {
+    await pool.query('TRUNCATE TABLE graph_edges RESTART IDENTITY');
+    await pool.query('TRUNCATE TABLE graph_nodes RESTART IDENTITY CASCADE');
+    await pool.query('COMMIT');
+  } catch (err) {
+    await pool.query('ROLLBACK').catch(() => {});
+    throw err;
+  }
+
+  const seeded = await seedGraphFromExistingDisasterData({ force: true });
+  graphReadyPromise = Promise.resolve();
+  return {
+    refreshed: true,
+    seeded
+  };
+}
+
 export async function ensureDisasterImpactGraphReady() {
   if (!graphReadyPromise) {
     graphReadyPromise = (async () => {
@@ -761,6 +782,7 @@ export default {
   ensureDisasterImpactGraphReady,
   initDisasterImpactGraphSchema,
   seedGraphFromExistingDisasterData,
+  refreshDisasterImpactGraphFromCurrentData,
   upsertNode,
   upsertEdge,
   getImpactGraph,

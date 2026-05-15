@@ -14,6 +14,14 @@ class EncompassDocsService {
     this.docsPath = path.join(__dirname, '..', 'data', 'encompass-docs.json');
   }
 
+  tokenizeQuery(query) {
+    const text = `${query ?? ''}`.toLowerCase();
+    return text
+      .split(/[^a-z0-9]+/i)
+      .map((part) => part.trim())
+      .filter((part) => part.length >= 2);
+  }
+
   // Scrape and cache Encompass documentation
   async scrapeDocumentation() {
     try {
@@ -180,25 +188,47 @@ class EncompassDocsService {
       }
 
       const results = [];
-      const queryLower = query.toLowerCase();
+      const queryLower = `${query ?? ''}`.toLowerCase();
+      const tokens = this.tokenizeQuery(query);
 
       for (const section of docs.sections) {
         const content = section.content || '';
         const title = section.title || '';
+        const titleLower = title.toLowerCase();
+        const contentLower = content.toLowerCase();
         
-        // Simple text matching (can be enhanced with fuzzy search)
-        const titleMatch = title.toLowerCase().includes(queryLower);
-        const contentMatch = content.toLowerCase().includes(queryLower);
+        const titleMatch = queryLower && titleLower.includes(queryLower);
+        const contentMatch = queryLower && contentLower.includes(queryLower);
+
+        let tokenHits = 0;
+        let tokenScore = 0;
+        for (const token of tokens) {
+          const safeToken = this.escapeRegex(token);
+          const inTitle = titleLower.includes(token);
+          const contentOccurrences = safeToken
+            ? (contentLower.match(new RegExp(safeToken, 'g')) || []).length
+            : 0;
+          if (inTitle) {
+            tokenHits += 1;
+            tokenScore += 4;
+          }
+          if (contentOccurrences > 0) {
+            tokenHits += 1;
+            tokenScore += Math.min(8, contentOccurrences);
+          }
+        }
         
-        if (titleMatch || contentMatch) {
+        if (titleMatch || contentMatch || tokenHits > 0) {
           // Calculate relevance score
           let score = 0;
           if (titleMatch) score += 10;
           if (contentMatch) score += 5;
+          score += tokenScore;
           
           // Count occurrences
-          const titleOccurrences = (title.toLowerCase().match(new RegExp(queryLower, 'g')) || []).length;
-          const contentOccurrences = (content.toLowerCase().match(new RegExp(queryLower, 'g')) || []).length;
+          const safeQuery = this.escapeRegex(queryLower);
+          const titleOccurrences = safeQuery ? (titleLower.match(new RegExp(safeQuery, 'g')) || []).length : 0;
+          const contentOccurrences = safeQuery ? (contentLower.match(new RegExp(safeQuery, 'g')) || []).length : 0;
           
           score += titleOccurrences * 3;
           score += contentOccurrences;
@@ -206,6 +236,7 @@ class EncompassDocsService {
           results.push({
             ...section,
             score,
+            tokenHits,
             relevance: score > 15 ? 'high' : score > 5 ? 'medium' : 'low'
           });
         }

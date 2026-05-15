@@ -147,6 +147,59 @@ function processorProductTags(processor) {
     .filter(Boolean);
 }
 
+function normalizeUtilizationTarget(raw) {
+  if (raw === undefined || raw === null || `${raw}`.trim() === '') return null;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return null;
+  if (n >= 0 && n <= 1) return n;
+  if (n > 1 && n <= 100) return n / 100;
+  return null;
+}
+
+function resolveTargetUtilization({ processor, globalTargetUtilization, defaultTargetUtilization }) {
+  const perProcessor = normalizeUtilizationTarget(processor?.targetUtilization);
+  if (perProcessor !== null) return perProcessor;
+  if (globalTargetUtilization !== null && globalTargetUtilization !== undefined) {
+    return globalTargetUtilization;
+  }
+  return defaultTargetUtilization;
+}
+
+function normalizeCapacityWeightingMode(raw) {
+  const mode = `${raw ?? 'linear'}`.trim().toLowerCase();
+  if (mode === 'none') return 'none';
+  if (mode === 'linear') return 'linear';
+  return null;
+}
+
+function roundCapacity(value) {
+  return Math.round(value * 10000) / 10000;
+}
+
+function computeWeightedCapacityImpact(score, {
+  capacityWeightingMode,
+  capacityWeightFactor,
+  hardLoanThreshold,
+  hardLoanWeightMultiplier,
+}) {
+  const base = Number(score);
+  const rawScore = Number.isFinite(base) ? Math.max(0, base) : 0;
+  const factor = Number.isFinite(Number(capacityWeightFactor)) ? Number(capacityWeightFactor) : 1;
+  const threshold = Number(hardLoanThreshold);
+  const multiplier = Number.isFinite(Number(hardLoanWeightMultiplier))
+    ? Number(hardLoanWeightMultiplier)
+    : 1;
+
+  let weighted = rawScore;
+  if (capacityWeightingMode === 'linear') {
+    weighted = rawScore * factor;
+  }
+  if (Number.isFinite(threshold) && threshold >= 0 && rawScore >= threshold) {
+    weighted *= multiplier;
+  }
+  return roundCapacity(Math.max(0, weighted));
+}
+
 export function evaluateProcessorEligibility(loanTags, processor) {
   const pTags = processorProductTags(processor);
   if (!pTags.length) {
@@ -159,6 +212,97 @@ export function evaluateProcessorEligibility(loanTags, processor) {
     matchedTags,
     processorTags: pTags,
   };
+}
+
+function chooseBestFitProcessor({
+  processors,
+  processorRemaining,
+  pointsNeededWeighted,
+  eligibilityByProcessorId,
+  allowIneligibleOverride,
+  globalTargetUtilization,
+}) {
+  const totalCapacity = processors.reduce((sum, p) => {
+    const cap = Number(p?.maxPoints);
+    return sum + (Number.isFinite(cap) && cap > 0 ? cap : 0);
+  }, 0);
+  const totalUsed = processors.reduce((sum, p) => {
+    const cap = Number(p?.maxPoints);
+    const key = `${p?.userId ?? ''}`;
+    const remaining = Number(processorRemaining[key]);
+    if (!Number.isFinite(cap) || cap <= 0 || !Number.isFinite(remaining)) return sum;
+    return sum + Math.max(0, cap - remaining);
+  }, 0);
+  const defaultTargetUtilization = totalCapacity > 0
+    ? Math.min(1, Math.max(0, (totalUsed + pointsNeededWeighted) / totalCapacity))
+    : 1;
+
+  const candidates = processors
+    .map((processor) => {
+      const key = `${processor.userId}`;
+      const remaining = Number(processorRemaining[key]);
+      if (!Number.isFinite(remaining) || remaining < pointsNeededWeighted) {
+        return null;
+      }
+      const maxPoints = Number(processor.maxPoints);
+      if (!Number.isFinite(maxPoints) || maxPoints <= 0) {
+        return null;
+      }
+      const eligibility = eligibilityByProcessorId[key] || {
+        eligible: true,
+        matchedTags: [],
+      };
+      const usedBeforeAssign = maxPoints - remaining;
+      const postUsed = usedBeforeAssign + pointsNeededWeighted;
+      const postUtilization = postUsed / maxPoints;
+      const targetUtilization = resolveTargetUtilization({
+        processor,
+        globalTargetUtilization,
+        defaultTargetUtilization,
+      });
+      return {
+        processor,
+        key,
+        maxPoints,
+        remaining,
+        residualAfterAssign: remaining - pointsNeededWeighted,
+        postUtilization,
+        targetUtilization,
+        targetDelta: Math.abs(postUtilization - targetUtilization),
+        eligibility,
+      };
+    })
+    .filter(Boolean);
+
+  if (!candidates.length) return null;
+
+  const rank = (a, b) => {
+    if (a.targetDelta !== b.targetDelta) {
+      return a.targetDelta - b.targetDelta;
+    }
+    const aMatches = a.eligibility?.matchedTags?.length || 0;
+    const bMatches = b.eligibility?.matchedTags?.length || 0;
+    if (aMatches !== bMatches) {
+      return bMatches - aMatches;
+    }
+    if (a.postUtilization !== b.postUtilization) {
+      return b.postUtilization - a.postUtilization;
+    }
+    if (a.residualAfterAssign !== b.residualAfterAssign) {
+      return a.residualAfterAssign - b.residualAfterAssign;
+    }
+    if (a.remaining !== b.remaining) {
+      return b.remaining - a.remaining;
+    }
+    return `${a.key}`.localeCompare(`${b.key}`);
+  };
+
+  const eligible = candidates.filter((c) => Boolean(c.eligibility?.eligible)).sort(rank);
+  if (eligible.length) return eligible[0].processor;
+  if (allowIneligibleOverride) {
+    return candidates.sort(rank)[0].processor;
+  }
+  return null;
 }
 
 /**
@@ -215,6 +359,7 @@ function resultRowBase(row) {
     aiRationale: row.aiRationale,
     ruleHits: row.ruleHits,
     loanProductTags: row.loanProductTags,
+    capacityImpact: row.capacityImpact,
   };
 }
 
@@ -269,6 +414,11 @@ async function computeComplexityForFields(fields, {
  * @param {number} [body.delayMsBetweenAssign] - throttle PUTs (default 0)
  * @param {string} [body.complexityMode] - 'rules' | 'ai' | 'both'
  * @param {string} [body.complexityAiModel] - OpenAI model id (default from LOAN_COMPLEXITY_AI_MODEL / OPENAI_AGENT_MODEL, usually gpt-4o)
+ * @param {number} [body.globalTargetUtilization] - optional 0..1 or 0..100
+ * @param {string} [body.capacityWeightingMode] - 'linear' | 'none'
+ * @param {number} [body.capacityWeightFactor] - multiplier for weighted impact (default 1)
+ * @param {number} [body.hardLoanThreshold] - optional score threshold for hard-loan multiplier
+ * @param {number} [body.hardLoanWeightMultiplier] - multiplier applied at/above hardLoanThreshold (default 1)
  */
 export async function runProcessorAssignment(body) {
   const {
@@ -285,9 +435,53 @@ export async function runProcessorAssignment(body) {
     delayMsBetweenAssign = 0,
     complexityMode: complexityModeRaw,
     complexityAiModel,
+    globalTargetUtilization: globalTargetUtilizationRaw,
+    capacityWeightingMode: capacityWeightingModeRaw = 'linear',
+    capacityWeightFactor: capacityWeightFactorRaw = 1,
+    hardLoanThreshold: hardLoanThresholdRaw,
+    hardLoanWeightMultiplier: hardLoanWeightMultiplierRaw = 1,
   } = body || {};
 
   const complexityMode = normalizeComplexityMode(complexityModeRaw);
+  const capacityWeightingMode = normalizeCapacityWeightingMode(capacityWeightingModeRaw);
+  if (!capacityWeightingMode) {
+    const err = new Error('capacityWeightingMode must be one of: linear, none');
+    err.statusCode = 400;
+    throw err;
+  }
+  const capacityWeightFactor = Number(capacityWeightFactorRaw);
+  if (!Number.isFinite(capacityWeightFactor) || capacityWeightFactor <= 0) {
+    const err = new Error('capacityWeightFactor must be numeric > 0');
+    err.statusCode = 400;
+    throw err;
+  }
+  const hardLoanThreshold = (
+    hardLoanThresholdRaw === undefined || hardLoanThresholdRaw === null || `${hardLoanThresholdRaw}`.trim() === ''
+  )
+    ? null
+    : Number(hardLoanThresholdRaw);
+  if (hardLoanThreshold !== null && (!Number.isFinite(hardLoanThreshold) || hardLoanThreshold < 0)) {
+    const err = new Error('hardLoanThreshold must be numeric >= 0 when provided');
+    err.statusCode = 400;
+    throw err;
+  }
+  const hardLoanWeightMultiplier = Number(hardLoanWeightMultiplierRaw);
+  if (!Number.isFinite(hardLoanWeightMultiplier) || hardLoanWeightMultiplier <= 0) {
+    const err = new Error('hardLoanWeightMultiplier must be numeric > 0');
+    err.statusCode = 400;
+    throw err;
+  }
+  const hasGlobalTargetRaw = !(
+    globalTargetUtilizationRaw === undefined
+    || globalTargetUtilizationRaw === null
+    || `${globalTargetUtilizationRaw}`.trim() === ''
+  );
+  const globalTargetUtilization = normalizeUtilizationTarget(globalTargetUtilizationRaw);
+  if (hasGlobalTargetRaw && globalTargetUtilization === null) {
+    const err = new Error('globalTargetUtilization must be 0..1 or 0..100');
+    err.statusCode = 400;
+    throw err;
+  }
 
   if (!Array.isArray(processors) || processors.length === 0) {
     const err = new Error('processors must be a non-empty array of { userId, maxPoints }');
@@ -309,6 +503,16 @@ export async function runProcessorAssignment(body) {
     }
     if (p.products !== undefined && !Array.isArray(p.products)) {
       const err = new Error('Each processor.products must be an array of strings when provided');
+      err.statusCode = 400;
+      throw err;
+    }
+    const hasTargetRaw = !(
+      p.targetUtilization === undefined
+      || p.targetUtilization === null
+      || `${p.targetUtilization}`.trim() === ''
+    );
+    if (hasTargetRaw && normalizeUtilizationTarget(p.targetUtilization) === null) {
+      const err = new Error(`Processor ${p.userId} targetUtilization must be 0..1 or 0..100`);
       err.statusCode = 400;
       throw err;
     }
@@ -372,7 +576,13 @@ export async function runProcessorAssignment(body) {
     const match = processors.find((x) => `${x.userId}` === `${procId}`);
     if (match) {
       const { score: pts } = await scoreLoanOnce(loan);
-      usedPoints[`${match.userId}`] += pts;
+      const weightedPts = computeWeightedCapacityImpact(pts, {
+        capacityWeightingMode,
+        capacityWeightFactor,
+        hardLoanThreshold,
+        hardLoanWeightMultiplier,
+      });
+      usedPoints[`${match.userId}`] += weightedPts;
     }
   }
 
@@ -412,6 +622,12 @@ export async function runProcessorAssignment(body) {
       number,
       borrowerName,
       loanProductTags: deriveLoanProductTags(fields),
+      capacityImpact: computeWeightedCapacityImpact(score, {
+        capacityWeightingMode,
+        capacityWeightFactor,
+        hardLoanThreshold,
+        hardLoanWeightMultiplier,
+      }),
     });
   }
 
@@ -439,30 +655,25 @@ export async function runProcessorAssignment(body) {
     }
 
     const pts = row.score;
+    const weightedPointsNeeded = row.capacityImpact;
 
-    let bestEligible = null;
-    let bestEligibleRemaining = -Infinity;
-    let bestAny = null;
-    let bestAnyRemaining = -Infinity;
     const loanTags = row.loanProductTags || [];
     const eligibilityByProcessorId = {};
 
     for (const p of processors) {
       const key = `${p.userId}`;
-      const rem = processorRemaining[key];
       const elig = evaluateProcessorEligibility(loanTags, p);
       eligibilityByProcessorId[key] = elig;
-      if (rem >= pts && rem > bestAnyRemaining) {
-        bestAny = p;
-        bestAnyRemaining = rem;
-      }
-      if (elig.eligible && rem >= pts && rem > bestEligibleRemaining) {
-        bestEligible = p;
-        bestEligibleRemaining = rem;
-      }
     }
 
-    const chosen = bestEligible || (allowIneligibleOverride ? bestAny : null);
+    const chosen = chooseBestFitProcessor({
+      processors,
+      processorRemaining,
+      pointsNeededWeighted: weightedPointsNeeded,
+      eligibilityByProcessorId,
+      allowIneligibleOverride,
+      globalTargetUtilization,
+    });
     if (!chosen) {
       const hasEligibleProcessor = processors.some((p) => {
         const elig = eligibilityByProcessorId[`${p.userId}`];
@@ -471,16 +682,19 @@ export async function runProcessorAssignment(body) {
       const hasEligibleCapacity = processors.some((p) => {
         const key = `${p.userId}`;
         const elig = eligibilityByProcessorId[key];
-        return Boolean(elig?.eligible) && processorRemaining[key] >= pts;
+        return Boolean(elig?.eligible) && processorRemaining[key] >= weightedPointsNeeded;
       });
+      const hasAnyCapacity = processors.some(
+        (p) => processorRemaining[`${p.userId}`] >= weightedPointsNeeded,
+      );
       let reason = 'no_eligible_processor';
       if (hasEligibleProcessor && !hasEligibleCapacity) reason = 'no_capacity_eligible';
-      else if (!hasEligibleProcessor && allowIneligibleOverride && !bestAny) reason = 'no_capacity_any_processor';
+      else if (!hasAnyCapacity) reason = 'no_capacity_any_processor';
       results.push({
         loanGuid: row.guid,
         status: 'skipped',
         reason,
-        eligibilityNote: `loanTags=${loanTags.join(',') || 'none'}`,
+        eligibilityNote: `loanTags=${loanTags.join(',') || 'none'} impact=${weightedPointsNeeded}`,
         ...resultRowBase(row),
       });
       continue;
@@ -493,8 +707,8 @@ export async function runProcessorAssignment(body) {
       processorTags: [],
     };
     const eligibilityNote = proposedEligibility.eligible
-      ? `matched:${proposedEligibility.matchedTags.join(',') || 'none'} loanTags:${loanTags.join(',') || 'none'}`
-      : `override processorTags:${proposedEligibility.processorTags.join(',') || 'none'} loanTags:${loanTags.join(',') || 'none'}`;
+      ? `matched:${proposedEligibility.matchedTags.join(',') || 'none'} loanTags:${loanTags.join(',') || 'none'} impact:${weightedPointsNeeded}`
+      : `override processorTags:${proposedEligibility.processorTags.join(',') || 'none'} loanTags:${loanTags.join(',') || 'none'} impact:${weightedPointsNeeded}`;
 
     if (dryRun) {
       results.push({
@@ -504,7 +718,7 @@ export async function runProcessorAssignment(body) {
         eligibilityNote,
         ...resultRowBase(row),
       });
-      processorRemaining[proposedUserId] -= pts;
+      processorRemaining[proposedUserId] -= weightedPointsNeeded;
       continue;
     }
 
@@ -529,7 +743,7 @@ export async function runProcessorAssignment(body) {
         eligibilityNote,
         ...resultRowBase(row),
       });
-      processorRemaining[proposedUserId] -= pts;
+      processorRemaining[proposedUserId] -= weightedPointsNeeded;
 
       const delay = Number(delayMsBetweenAssign);
       if (Number.isFinite(delay) && delay > 0) {
@@ -555,10 +769,14 @@ export async function runProcessorAssignment(body) {
   return {
     dryRun: Boolean(dryRun),
     complexityMode,
-    usedPointsBasis:
-      complexityMode === 'rules'
-        ? 'rules'
-        : 'rules_plus_ai_cached_per_loan',
+    usedPointsBasis: 'weighted_capacity_impact',
+    routingConfig: {
+      globalTargetUtilization,
+      capacityWeightingMode,
+      capacityWeightFactor,
+      hardLoanThreshold,
+      hardLoanWeightMultiplier,
+    },
     usedPoints,
     processorRemaining,
     summary,

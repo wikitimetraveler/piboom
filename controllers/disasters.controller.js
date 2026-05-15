@@ -1,6 +1,7 @@
 import { getPool } from '../services/database.service.js';
 import { initDisastersSchema, upsertDisasters, normalizeFemaV2ToUnified, ingestFema, ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestCaFireCameras } from '../services/disasters.service.js';
 import { geocodeCountyStateWithCache } from '../services/geocoding-cache.service.js';
+import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
 
 // Ensure schema on startup (best-effort)
 initDisastersSchema().catch(() => {});
@@ -15,6 +16,14 @@ export async function listDisasters(req, res) {
     const { state, county, source, event, since, usOnly } = req.query;
     const pool = getPool();
     if (!pool) throw new Error('Database not initialized');
+    const DEFAULT_LIMIT = 1000;
+    const MAX_LIMIT = 5000;
+    const parsedLimit = parseInt(req.query.limit, 10);
+    const parsedOffset = parseInt(req.query.offset, 10);
+    const limit = Number.isFinite(parsedLimit) && parsedLimit > 0
+      ? Math.min(parsedLimit, MAX_LIMIT)
+      : DEFAULT_LIMIT;
+    const offset = Number.isFinite(parsedOffset) && parsedOffset >= 0 ? parsedOffset : 0;
 
     const clauses = [];
     const values = [];
@@ -39,10 +48,13 @@ export async function listDisasters(req, res) {
     if (since) { values.push(since); clauses.push(`start_time >= $${values.length}`); }
 
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
-    // Remove LIMIT to get all disasters - real-time data from database
-    const sql = `SELECT * FROM disasters ${where} ORDER BY start_time DESC`;
-    console.log('📊 Querying disasters:', sql, 'Values:', values);
-    let rows = (await pool.query(sql, values)).rows;
+    const countSql = `SELECT COUNT(*)::int AS total FROM disasters ${where}`;
+    const countRes = await pool.query(countSql, values);
+    const totalCount = countRes.rows[0]?.total || 0;
+    const sql = `SELECT * FROM disasters ${where} ORDER BY start_time DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
+    const queryValues = values.concat([limit, offset]);
+    console.log('📊 Querying disasters:', sql, 'Values:', queryValues);
+    let rows = (await pool.query(sql, queryValues)).rows;
 
     // Optional: geocode rows missing lat/lng but with county+state
     const doGeocode = req.query.geocode === 'true' || req.query.geocode === '1';
@@ -112,7 +124,21 @@ export async function listDisasters(req, res) {
     } else {
       console.log(`📊 Found ${rows.length} disasters in database`);
     }
-    res.json({ success: true, data: { disasters: rows, count: rows.length } });
+    res.json({
+      success: true,
+      data: {
+        disasters: rows,
+        count: rows.length,
+        total: totalCount,
+        pagination: {
+          limit,
+          offset,
+          returned: rows.length,
+          total: totalCount,
+          hasMore: offset + rows.length < totalCount
+        }
+      }
+    });
   } catch (e) {
     console.error('❌ Error listing disasters:', e);
     res.status(500).json({ success: false, error: 'Failed to list disasters', details: e.message });
@@ -139,7 +165,8 @@ export async function refreshDisasters(req, res) {
       results.cameras = await ingestCaFireCameras();
     }
     
-    res.json({ success: true, message: 'Refreshed disasters', data: results });
+    const graph = await refreshDisasterImpactGraphFromCurrentData();
+    res.json({ success: true, message: 'Refreshed disasters', data: { ...results, graph } });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Failed to refresh disasters', details: e.message });
   }
