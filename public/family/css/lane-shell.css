@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Lane family tools — shared structure + themed hooks (--lane-qnav-*, --lane-context-*).
  * Theme pages assign hook variables on body; do not impose light palette globally.
  * Heritage tokens (--lane-heritage-*) align tool pages with the hub warm palette.

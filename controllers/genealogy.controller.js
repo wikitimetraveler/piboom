@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import {
   getAllFamilyData,
   getAllPeople,

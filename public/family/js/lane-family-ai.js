@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Lane Family hub — Lane guide (POST /api/genealogy/ai/chat).
  * Client keeps short history for multi-turn; server is stateless.
  */

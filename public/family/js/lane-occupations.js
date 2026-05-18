@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Curated historical blurbs keyed by normalized occupation.job (lowercase).
  * New England / colonial–early republic framing where it fits the Lane record.
  */

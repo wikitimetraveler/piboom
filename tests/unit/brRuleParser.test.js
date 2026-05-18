@@ -41,6 +41,20 @@ End If`;
       expect(result.rows.some((r) => r.Action === 'SET' && r.Target === '[4002]')).toBe(true);
       expect(result.rows.some((r) => r.Action === 'COMPARE')).toBe(true);
     });
+
+    test('generated descriptions do not include bracketed field IDs', () => {
+      const parsed = parseBRConditionSnippet('If [4002] = "" Then Fail("bad") End If');
+      const result = generateUnitTestFromBRRule(parsed, {
+        fieldMetadataLookup: {
+          '4002': { description: 'Annual Income [4002]', dataType: 'Decimal' },
+        },
+      });
+      expect(result).not.toBeNull();
+      const setRow = result.rows.find((r) => r.Action === 'SET' && r.Target === '[4002]');
+      expect(setRow).toBeTruthy();
+      expect(setRow.Description).toContain('Annual Income');
+      expect(setRow.Description).not.toMatch(/\[[^\]]+\]/);
+    });
   });
 
 });

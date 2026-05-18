@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Optional second pass: send batched raw page text to OpenAI and write staging JSON for human merge.
  * Requires OPENAI_API_KEY. Does not modify lane-book-sayings.json.
  *

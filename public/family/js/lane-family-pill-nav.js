@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Injects a compact pill nav below the site navbar on Lane /family/* pages.
  */
 (function () {

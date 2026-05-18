@@ -1242,11 +1242,20 @@
       return meta;
     };
 
+    function sanitizeDescriptionText(raw) {
+      if (raw === null || raw === undefined) return '';
+      return String(raw)
+        .replace(/\[(?=[^\]\s]*[A-Za-z0-9])[^\]\s]+\]/g, ' ')
+        .replace(/\s{2,}/g, ' ')
+        .replace(/\s+([,;:.!?])/g, '$1')
+        .trim();
+    }
+
     /** Grid Description column: match unit-tests maybeUpdateDescriptionFromApi (description + optional type). */
-    const descriptionCellFromMeta = (meta, displayId) => {
-      const fallback = 'Field ' + displayId;
+    const descriptionCellFromMeta = (meta, _displayId) => {
+      const fallback = 'Field';
       if (!meta) return fallback;
-      const desc = String(meta.description || '').trim();
+      const desc = sanitizeDescriptionText(meta.description || '');
       const typeStr = String(meta.dataType || meta.type || '').trim();
       if (!desc) return fallback;
       const parts = [desc];

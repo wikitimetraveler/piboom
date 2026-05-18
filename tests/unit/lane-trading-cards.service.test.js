@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import { getLaneTradingCardById, getLaneTradingCards } from '../../services/genealogy.service.js';
 
 describe('lane trading cards service', () => {

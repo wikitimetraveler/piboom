@@ -15,6 +15,7 @@ class CalculationsEngine {
     {
       debounceMs = 50,
       math = __calcMath,
+      strictNumericParsing = false,
 
       // DAG-lite knobs
       enableDagLite = true,
@@ -29,6 +30,7 @@ class CalculationsEngine {
     this.inputElements = {}; // keyed by resultId
     this.debounceMs = debounceMs;
     this.math = math || (typeof window !== 'undefined' ? window.calcMath : {});
+    this.strictNumericParsing = strictNumericParsing;
 
     // DAG-lite state
     this.enableDagLite = enableDagLite;
@@ -122,7 +124,7 @@ class CalculationsEngine {
 
     const cascade = _cascade || {
       depth: 0,
-      visited: new Set()
+      path: new Set()
     };
 
     // loop guards
@@ -130,8 +132,11 @@ class CalculationsEngine {
       console.warn('DAG-lite: max cascade depth reached', { resultId, cascade });
       return;
     }
-    if (cascade.visited.has(resultId)) return;
-    cascade.visited.add(resultId);
+    // Detect cycles only within the current recursion path.
+    // A node may be legitimately revisited from a different sibling branch.
+    if (cascade.path.has(resultId)) return;
+    const currentPath = new Set(cascade.path);
+    currentPath.add(resultId);
 
     if (isRootCall) this._isComputing = true;
 
@@ -163,7 +168,10 @@ class CalculationsEngine {
 
       const ctx = {
         additionalData: Object.keys(additionalData).length ? additionalData : undefined,
-        meta: group.groupConfig?.meta
+        meta: {
+          ...(group.groupConfig?.meta || {}),
+          strictNumericParsing: this.strictNumericParsing
+        }
       };
 
       const computed = fn(values, ctx);
@@ -181,7 +189,10 @@ class CalculationsEngine {
 
         // DAG-lite propagation
         if (this.enableDagLite) {
-          this._propagateFromField(group.result, cascade);
+          this._propagateFromField(group.result, {
+            depth: cascade.depth,
+            path: currentPath
+          });
         }
       }
     } catch (error) {
@@ -199,7 +210,7 @@ class CalculationsEngine {
 
     const nextCascade = {
       depth: cascade.depth + 1,
-      visited: cascade.visited
+      path: cascade.path
     };
 
     dependents.forEach(depResultId => {

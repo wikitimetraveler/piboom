@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Genealogy source file.
+# Author: Levi Lane.
+
 """
 One-off: move leading military rank tokens from person name into title (laneData.json).
 

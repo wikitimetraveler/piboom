@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Lane Historians page — curated copy from GET /data/lane-historians.json + HyperFrames story mode
  */
 (function () {

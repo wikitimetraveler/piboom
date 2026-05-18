@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Lane Family hub — first-visit splash with historian plate background and optional YouTube embed.
  */
 (function () {

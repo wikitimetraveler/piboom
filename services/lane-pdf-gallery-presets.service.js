@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import { randomUUID } from 'crypto';
 import { getPool } from './database.service.js';
 import { isValidClientId } from './lane-pdf-gallery-hides.service.js';

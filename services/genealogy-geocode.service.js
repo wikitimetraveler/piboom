@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Normalize free-text place strings from Lane genealogy before server geocoding.
  * Avoids ambiguous overseas hits (e.g. Bennington UK, random "Philip" places).
  */

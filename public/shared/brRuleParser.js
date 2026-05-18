@@ -231,22 +231,32 @@
     return null;
   }
 
+  function sanitizeDescriptionText(raw) {
+    if (raw === null || raw === undefined) return '';
+    return String(raw)
+      .replace(/\[(?=[^\]\s]*[A-Za-z0-9])[^\]\s]+\]/g, ' ')
+      .replace(/\s{2,}/g, ' ')
+      .replace(/\s+([,;:.!?])/g, '$1')
+      .trim();
+  }
+
   /**
    * Human-readable field line for Description column (Encompass metadata optional).
    */
   function describeBrField(f, metaLookup) {
     const id = f.entityId;
     if (!id) return '';
-    const bracket = '[' + id + ']';
     const meta = lookupFieldMeta(metaLookup, id);
-    const apiDesc = meta && (meta.description || meta.longDescription || meta.shortDescription);
+    const apiDesc = sanitizeDescriptionText(
+      meta && (meta.description || meta.longDescription || meta.shortDescription),
+    );
     const fromXml = f.entityUid && String(f.entityUid).trim();
-    const title = (fromXml && fromXml !== id ? fromXml : null) || apiDesc || '';
+    const title = sanitizeDescriptionText((fromXml && fromXml !== id ? fromXml : null) || apiDesc || '');
     const typeHint = meta && meta.dataType ? String(meta.dataType).trim() : '';
-    if (title && typeHint) return title + ' ' + bracket + ' — ' + typeHint;
-    if (title) return title + ' ' + bracket;
-    if (typeHint) return bracket + ' — ' + typeHint;
-    return bracket;
+    if (title && typeHint) return title + ' — ' + typeHint;
+    if (title) return title;
+    if (typeHint) return 'Field — ' + typeHint;
+    return 'Field';
   }
 
   /**

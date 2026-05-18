@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import { describe, expect, it } from '@jest/globals';
 import { normalizeGenealogyGeocodeCacheKey } from '../../services/genealogy-geocode-cache.service.js';
 

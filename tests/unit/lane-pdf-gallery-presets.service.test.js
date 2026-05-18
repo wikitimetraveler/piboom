@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import { describe, test, expect } from '@jest/globals';
 import {
   sanitizeFilterPage,

@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Rank plate JPEGs by "blankness" using luminance variance (sharp).
  * Writes data/lane-pdf-blank-plate-candidates.json for human review.
  * Does NOT modify lane-pdf-gallery-hidden.json — editors merge IDs after review.

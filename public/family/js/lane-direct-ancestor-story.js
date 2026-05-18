@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 let directStory = null;
 let descendantDraft = [];
 /** Same anchor as server default for direct-line / direct-descendant APIs */

@@ -3,7 +3,6 @@
   "notes": "Blank plate suppressions: imageIds from npm run scan:lane-pdf-blanks (stdLuma<=2, meanLuma>=238) on 2026-05-03. Full ranked list: data/lane-pdf-blank-plate-candidates.json — tune thresholds and merge more IDs if needed.",
   "hiddenImageIds": [
     "p374-i0",
-    "p4-i0",
     "p30-i0",
     "p2-i0",
     "p212-i0",

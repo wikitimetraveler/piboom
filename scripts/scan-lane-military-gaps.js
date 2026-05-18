@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 const originalLog = console.log;
 console.log = () => {};
 const { getMilitaryDeepScanReport } = await import('../services/genealogy.service.js');

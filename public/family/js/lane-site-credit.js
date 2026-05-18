@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Lane family tools — shared footer credit.
  *
  * Scope: digital presentation, visualization, and software for book-derived

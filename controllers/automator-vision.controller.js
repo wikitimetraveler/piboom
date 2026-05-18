@@ -34,6 +34,25 @@ function extractJsonObject(raw) {
   return null;
 }
 
+function sanitizeDescriptionText(raw) {
+  if (raw === null || raw === undefined) return '';
+  return String(raw)
+    .replace(/\[(?=[^\]\s]*[A-Za-z0-9])[^\]\s]+\]/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([,;:.!?])/g, '$1')
+    .trim();
+}
+
+export function sanitizeAutomatorVisionLine(line) {
+  if (typeof line !== 'string') return '';
+  const trimmed = line.trim();
+  if (!trimmed) return '';
+  const parts = trimmed.split('\t').map((p) => p.trim());
+  if (parts.length < 4) return trimmed;
+  parts[3] = sanitizeDescriptionText(parts[3] || '');
+  return parts.join('\t');
+}
+
 export async function postParseAutomatorFieldImage(req, res) {
   try {
     if (!openai) {
@@ -57,6 +76,7 @@ export async function postParseAutomatorFieldImage(req, res) {
               'You extract Encompass custom field definition rows from screenshots.',
               'Return only JSON with this exact shape: {"lines":["[CX.ID]\\tNew\\tString(3)\\tDescription\\tN"]}.',
               'Each line should be tab-separated and contain: [FieldId], Action(New or Modify), Type token, Description, optional N.',
+              'Description must be human-readable only and must not repeat the FieldId or any bracketed id token.',
               'Do not add commentary, markdown, or extra keys.',
             ].join(' '),
           },
@@ -75,7 +95,9 @@ export async function postParseAutomatorFieldImage(req, res) {
     const raw = completion.choices?.[0]?.message?.content || '';
     const parsed = extractJsonObject(raw);
     const lines = Array.isArray(parsed?.lines)
-      ? parsed.lines.filter((line) => typeof line === 'string' && line.trim())
+      ? parsed.lines
+        .filter((line) => typeof line === 'string' && line.trim())
+        .map((line) => sanitizeAutomatorVisionLine(line))
       : [];
 
     if (lines.length === 0) {

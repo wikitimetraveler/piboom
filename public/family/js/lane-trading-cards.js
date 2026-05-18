@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 (function () {
   const LEGACY_PLACEHOLDER_FRONT_IMAGE = '/family/assets/lane-genealogies-title-spread.png';
   const DEFAULT_CARD_COVER_IMAGE = '/family/assets/DavidELane.png';

@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import fs from 'fs/promises';
 import path from 'path';
 import { createHash } from 'crypto';

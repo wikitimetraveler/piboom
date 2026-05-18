@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Genealogy source file.
+# Author: Levi Lane.
+
 """
 Heuristic extraction of candidate 'sayings' from the Lane genealogy PDF (parallel to parse_lane_pdf.py).
 Outputs a review file with status pending_review — merge approved rows into data/lane-book-sayings.json.

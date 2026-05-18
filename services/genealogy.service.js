@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -21,6 +25,7 @@ let lanePdfBookIllustrationsCache = null;
 let laneBookSayingsCache = null;
 let laneDatasetsCache = {};
 let lanePostgresHydratedAt = null;
+const LANE_PDF_ALWAYS_VISIBLE_IDS = new Set(['p4-i0']);
 
 function isObject(value) {
   return !!value && typeof value === 'object' && !Array.isArray(value);
@@ -217,7 +222,7 @@ export function getLanePdfGalleryData() {
   );
   /** Only denylist ids that exist in the corpus (typos / stale entries dropped). */
   const galleryHiddenIds = [...new Set((hiddenDoc.hiddenImageIds || []).map((id) => String(id)))]
-    .filter((id) => knownPlateImageIds.has(id))
+    .filter((id) => knownPlateImageIds.has(id) && !LANE_PDF_ALWAYS_VISIBLE_IDS.has(id))
     .sort();
 
   const summary = manifest

@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import {
   __test__,
   getMilitaryDeepScanReport,

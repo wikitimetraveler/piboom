@@ -1,3 +1,6 @@
+# Genealogy source file.
+# Author: Levi Lane.
+
 """Regression checks for scripts/parse_lane_pdf.py (invoked by Jest)."""
 import sys
 from pathlib import Path

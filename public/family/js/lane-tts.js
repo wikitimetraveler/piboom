@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Lane family pages — full read-aloud using /shared/tts.js (Google TTS + browser fallback).
  * Requires: <script src="/shared/tts.js"></script> before this file.
  */

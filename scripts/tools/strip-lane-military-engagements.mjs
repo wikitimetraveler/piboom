@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Maintainer one-off: remove `militaryEngagements` from every node in data/laneData.json.
  * Stale blobs can contradict genealogy.service scoring after war-matching fixes.
  *

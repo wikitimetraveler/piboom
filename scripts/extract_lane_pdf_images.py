@@ -1,3 +1,6 @@
+# Genealogy source file.
+# Author: Levi Lane.
+
 """
 Extract embedded raster images from data/lanegenealogies01chap.pdf and write a manifest.
 

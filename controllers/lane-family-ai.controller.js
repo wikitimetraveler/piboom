@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import express from 'express';
 import { invokeLaneExpertChat } from '../services/lane-family-ai.service.js';
 

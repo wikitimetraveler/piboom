@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 /** Browser id for Postgres-backed hide list (not secret; bucket for this device) */
 const LS_CLIENT_ID = 'lanePdfGallery.clientId';
 /** One-shot migrate old localStorage hides to API */

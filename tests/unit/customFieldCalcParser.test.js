@@ -890,6 +890,28 @@ describe('customFieldCalcParser', () => {
       // Scenario 2: else → ""
       expect(compareRow['Test 2']).toBe('');
     });
+
+    test('removes bracketed field IDs from generated Description text', () => {
+      const customField = {
+        fieldId: 'CX.OUT',
+        calculation: 'IIf([4002] > 0, "Y", "N")',
+      };
+      const result = generateUnitTestFromCustomField(customField, {
+        fieldMetadata: {
+          '4002': { description: 'Annual Income [4002]', dataType: 'Decimal' },
+          'CX.OUT': { description: 'Result [CX.OUT]', dataType: 'String' },
+        },
+      });
+      expect(result).not.toBeNull();
+      const setRow = result.rows.find((r) => r.Action === 'SET' && r.Target === '[4002]');
+      const compareRow = result.rows.find((r) => r.Action === 'COMPARE' && r.Target === '[CX.OUT]');
+      expect(setRow).toBeDefined();
+      expect(compareRow).toBeDefined();
+      expect(setRow.Description).toBe('Annual Income (Decimal)');
+      expect(compareRow.Description).toBe('Result (String)');
+      expect(setRow.Description).not.toMatch(/\[[^\]]+\]/);
+      expect(compareRow.Description).not.toMatch(/\[[^\]]+\]/);
+    });
   });
 
   describe('parseCalculationFormula', () => {

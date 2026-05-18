@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Extract four diamond-layout portrait crops from the Lane Genealogies PDF plate p4-i0.jpg
  * (high-res page scan). Regions are hand-tuned against 1747×2620 — edit CROPS if the source changes.
  *

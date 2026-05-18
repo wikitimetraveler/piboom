@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import { jest } from '@jest/globals';
 
 const queryMock = jest.fn();

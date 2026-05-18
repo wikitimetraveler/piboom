@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Shared storybook wall: forward descendants OR ancestor line toward anchor (Line page parity).
  * Data: GET /api/genealogy/direct-descendant-story | GET /api/genealogy/direct-line-story
  */

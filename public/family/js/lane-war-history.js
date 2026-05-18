@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 let map = null;
 let mapReady = false;
 const markerById = new Map();

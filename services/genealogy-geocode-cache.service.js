@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Persist forward-geocode results for Lane genealogy (/api/genealogy/geocode-address).
  * Keyed by normalized resolved query string — avoids repeating Mapbox/Nominatim on every site load.
  */

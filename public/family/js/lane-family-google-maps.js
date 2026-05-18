@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Loads Google Maps JavaScript API for Lane family pages (memorial wall, war history).
  * Geocoding stays on the server (/api/genealogy/geocode-address); this is display only.
  */

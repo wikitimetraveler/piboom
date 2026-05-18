@@ -4,10 +4,26 @@
 // Pure calculation helpers (no DOM). Attaches to global for browser use.
 // ============================================================================
 (function (global) {
-  const toNumber = (v) => {
-    if (typeof v === 'number') return Number.isFinite(v) ? v : 0;
-    const n = parseFloat(v);
-    return Number.isFinite(n) ? n : 0;
+  const STRICT_NUMBER_RE = /^[+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?$/;
+
+  const isStrictNumericParsing = (ctx) => Boolean(ctx?.meta?.strictNumericParsing);
+
+  const toNumber = (v, ctx, options = {}) => {
+    const { invalidValue = 0 } = options;
+    if (typeof v === 'number') return Number.isFinite(v) ? v : invalidValue;
+    if (v === null || v === undefined) return invalidValue;
+
+    const raw = String(v).trim();
+    if (!raw) return invalidValue;
+
+    if (isStrictNumericParsing(ctx)) {
+      if (!STRICT_NUMBER_RE.test(raw)) return invalidValue;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : invalidValue;
+    }
+
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : invalidValue;
   };
 
   const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -86,10 +102,13 @@
       return round2(base * (pct / 100));
     },
 
-    divideRounded(values = []) {
-      const a = toNumber(values[0]);
-      const b = toNumber(values[1]);
-      if (b === 0) return '';
+    divideRounded(values = [], ctx) {
+      const strict = isStrictNumericParsing(ctx);
+      const invalidValue = strict ? null : 0;
+      const a = toNumber(values[0], ctx, { invalidValue });
+      const b = toNumber(values[1], ctx, { invalidValue });
+      if (a === null || b === null) return null;
+      if (b === 0) return strict ? null : '';
       return round2(a / b);
     },
 
@@ -99,12 +118,15 @@
     },
 
     calculateDTI(values = [], ctx) {
-      const payment = toNumber(values[0]);
-      let income = toNumber(values[1]);
+      const strict = isStrictNumericParsing(ctx);
+      const invalidValue = strict ? null : 0;
+      const payment = toNumber(values[0], ctx, { invalidValue });
+      let income = toNumber(values[1], ctx, { invalidValue });
       const gm = ctx?.additionalData?.grossMonthly;
-      const grossMonthly = gm !== undefined ? toNumber(gm) : 0;
+      const grossMonthly = gm !== undefined ? toNumber(gm, ctx, { invalidValue }) : 0;
+      if (payment === null || income === null || grossMonthly === null) return null;
       if (grossMonthly > 0) income = grossMonthly;
-      if (income === 0) return '';
+      if (income === 0) return strict ? null : '';
       return round2((payment / income) * 100);
     },
 

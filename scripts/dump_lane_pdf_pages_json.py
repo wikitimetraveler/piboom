@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Genealogy source file.
+# Author: Levi Lane.
+
 """Emit JSON array of { pdfPage, text } for a page range (for LLM staging scripts)."""
 from __future__ import annotations
 

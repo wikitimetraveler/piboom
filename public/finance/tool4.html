@@ -737,6 +737,15 @@
             };
         }
 
+        function sanitizeDescriptionText(raw) {
+            if (raw === null || raw === undefined) return '';
+            return String(raw)
+                .replace(/\[(?=[^\]\s]*[A-Za-z0-9])[^\]\s]+\]/g, ' ')
+                .replace(/\s{2,}/g, ' ')
+                .replace(/\s+([,;:.!?])/g, '$1')
+                .trim();
+        }
+
         /** True only for the generateJSON() pass triggered by Rule name box (generateRules). Vision/paste/manual defs omit placeholder calculation. */
         let automatorJsonIncludeRuleBoxCalc = false;
 
@@ -827,7 +836,7 @@
 
                 const jsonObj = {
                     id: fieldId,
-                    description: parsed.descriptionRaw || '',
+                    description: sanitizeDescriptionText(parsed.descriptionRaw || ''),
                     format: typeInfo.format,
                     maxLength: typeInfo.format === 'string' ? typeInfo.maxLength : undefined,
                 };

@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * One-off generator for data/lane-was-he-an-idiot-article.json (source: Wikisource transcription).
  * Run: node scripts/build-lane-was-he-an-idiot-article.mjs
  */

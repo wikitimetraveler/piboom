@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Lane Family AI — LangChain entry point for the public Lane hub assistant.
  * Uses ChatOpenAI + message list today; can be swapped or wrapped with RunnableSequence,
  * tool-calling agents, or retrieval without changing the HTTP contract.

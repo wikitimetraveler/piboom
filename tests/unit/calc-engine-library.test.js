@@ -66,4 +66,23 @@ describe('calcEngineLibrary helpers', () => {
   test('divideRounded returns empty string when dividing by zero', () => {
     expect(calcMath.divideRounded([1000, 0])).toBe('');
   });
+
+  test('divideRounded keeps permissive parsing by default', () => {
+    expect(calcMath.divideRounded(['12abc', 3], {})).toBe(4);
+  });
+
+  test('divideRounded returns null in strict mode for mixed numeric strings', () => {
+    const value = calcMath.divideRounded(['12abc', 3], { meta: { strictNumericParsing: true } });
+    expect(value).toBeNull();
+  });
+
+  test('divideRounded returns null in strict mode for divide-by-zero', () => {
+    const value = calcMath.divideRounded([1000, 0], { meta: { strictNumericParsing: true } });
+    expect(value).toBeNull();
+  });
+
+  test('calculateDTI returns null in strict mode when income is zero', () => {
+    const value = calcMath.calculateDTI([1000, 0], { meta: { strictNumericParsing: true } });
+    expect(value).toBeNull();
+  });
 });

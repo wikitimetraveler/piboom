@@ -1,4 +1,8 @@
 /**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
+/**
  * Join data/lane-pdf-image-manifest.json with laneData.json sourceRefs (pdfPageNumber)
  * to produce data/lane-pdf-photo-candidates.json for review.
  *

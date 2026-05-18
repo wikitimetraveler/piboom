@@ -1,3 +1,6 @@
+# Genealogy source file.
+# Author: Levi Lane.
+
 import json
 import re
 import argparse

@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 function initHistoryQuickNav(options = {}) {
   const selector = options.selector || '.history-quick-link[href^="#"]';
   const links = Array.from(document.querySelectorAll(selector));

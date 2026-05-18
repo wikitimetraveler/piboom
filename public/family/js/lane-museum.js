@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 const MUSEUM_THEME_KEY = 'laneMuseumTheme';
 const HISTORY_STATE_COPY = {
   loading: 'Loading history records...',
@@ -71,6 +75,9 @@ let museumPosterUiBound = false;
 
 /** Same-origin raster when no exhibit portrait / proxy fails — never use raw svg+xml in src without encoding (breaks HTML). */
 const MUSEUM_EXHIBIT_DEFAULT_IMAGE = '/family/assets/lane-genealogies-title-spread.png';
+const MUSEUM_CURATED_PROMINENT_IMAGE_BY_PERSON_ID = Object.freeze({
+  1024: '/family/assets/aaron-g-lane.png'
+});
 
 function svgMarkupToDataUrl(markup) {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(markup.trim())}`;
@@ -90,6 +97,14 @@ function exhibitPosterCoverUrl(primaryUrl) {
   if (!u) return MUSEUM_EXHIBIT_DEFAULT_IMAGE;
   const resolved = resolvePosterImageUrl(u);
   return resolved && String(resolved).trim() ? resolved : MUSEUM_EXHIBIT_DEFAULT_IMAGE;
+}
+
+function resolveProminentImageUrl(entry = {}) {
+  const person = entry.person || {};
+  const personId = Number(person.id ?? entry.personId);
+  const curated = Number.isFinite(personId) ? MUSEUM_CURATED_PROMINENT_IMAGE_BY_PERSON_ID[personId] : '';
+  if (curated) return curated;
+  return entry.imageUrl != null ? String(entry.imageUrl).trim() : '';
 }
 
 function lunarPosterCoverUrl(primaryUrl) {
@@ -202,7 +217,7 @@ function buildMuseumTemplateData(poster) {
     const person = entry.person || {};
     const title = entry.displayName || person.name || entry.personQuery || 'Exhibit';
     const subtitle = entry.eraLabel || '';
-    const img = exhibitPosterCoverUrl(entry.imageUrl);
+    const img = exhibitPosterCoverUrl(resolveProminentImageUrl(entry));
     const venue = person.born || '';
     const date = `${person.birthYear || '?'} – ${person.deathYear || '?'}`;
     return { imageUrl: img, title, subtitle, album: title, artist: subtitle || 'Lane Legacy Museum', venue, date };
@@ -256,7 +271,7 @@ function buildMuseumPosterHtmlSimple(poster) {
     const entry = poster.prominentEntry || {};
     const person = entry.person || {};
     const title = entry.displayName || person.name || entry.personQuery || 'Exhibit';
-    const coverSrc = escapeAttrSrc(exhibitPosterCoverUrl(entry.imageUrl));
+    const coverSrc = escapeAttrSrc(exhibitPosterCoverUrl(resolveProminentImageUrl(entry)));
     const metaRows = [
       entry.eraLabel ? `Era: ${entry.eraLabel}` : null,
       `${person.birthYear || '?'} – ${person.deathYear || '?'}`,
@@ -737,7 +752,7 @@ function renderProminent(prominent = []) {
       const pid = person.id != null ? person.id : entry.personId;
       const memorialUrl =
         pid != null ? `/family/lane-memorial-wall.html?personId=${encodeURIComponent(String(pid))}` : '/family/lane-memorial-wall.html';
-      const imgUrl = entry.imageUrl != null ? String(entry.imageUrl).trim() : '';
+      const imgUrl = resolveProminentImageUrl(entry);
       const lifeSpanLine = `${person.birthYear || 'Unknown'} - ${person.deathYear || 'Unknown'}`;
       const coverMetaLine = person.born || entry.eraLabel || 'Lane family records';
       const coverMarkup = `

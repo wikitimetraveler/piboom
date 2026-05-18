@@ -1,3 +1,7 @@
+/**
+ * Genealogy source file.
+ * Author: Levi Lane.
+ */
 import 'dotenv/config';
 import { initializeDatabase, createTables } from '../services/database.service.js';
 import { backfillLaneDataFromFilesystem } from '../services/lane-postgres.service.js';
