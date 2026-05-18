@@ -188,6 +188,7 @@
 
     const title = escapeHtml(data.title || 'Lane historians');
     const subtitle = escapeHtml(data.subtitle || '');
+    const projectPurpose = escapeHtml(data.projectPurpose || '');
     const heroUrl = escapeHtml(data.heroImageUrl || '');
     const heroAlt = escapeHtml(data.heroImageAlt || '');
     const heroCap = escapeHtml(data.heroCaption || '');
@@ -217,6 +218,7 @@
       ${heroBlock}
       <h1 class="lane-historians-title">${title}</h1>
       ${subtitle ? `<p class="lane-historians-subtitle">${subtitle}</p>` : ''}
+      ${projectPurpose ? `<p class="lane-historians-subtitle">${projectPurpose}</p>` : ''}
       <p class="history-context-evidence-note small">Context: general publishing and family-committee history. Evidence: verify names, dates, and quotations in <a href="https://archive.org/details/lanegenealogies01chap" target="_blank" rel="noopener noreferrer">Lane Genealogies Vol. I (facsimile)</a>.</p>
       <section class="lane-historians-section lh-story-highlight-parent" aria-labelledby="lh-pub-heading"><h2 id="lh-pub-heading">Title page (1891)</h2>${renderPublication(data.publication)}</section>
       <section class="lane-historians-section lh-story-highlight-parent" aria-labelledby="lh-fig-heading"><h2 id="lh-fig-heading">Portraits & named compilers</h2>${renderFigures(data.figures)}</section>

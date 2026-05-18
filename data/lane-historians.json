@@ -2,6 +2,7 @@
   "version": 3,
   "title": "Lane historians & compilers",
   "subtitle": "Honoring those who carried Lane Genealogies, Volume I (1891) into print—and the longer line of record-keeping before them.",
+  "projectPurpose": "This project brings the original Lane genealogy book to life as an interactive family map. The book is the foundation; newer family branches are added from our own research so descendants can reconnect with people, places, stories, and long-lost family treasures that were hard to see on the printed page.",
   "heroImageUrl": "/family/assets/lane-historians/frontispiece-title-1891.png",
   "heroImageAlt": "Lane Genealogies title spread and reference imagery (thumbnail context beside the scanned book).",
   "heroCaption": "Hero: Greenshot-style title reference. The four committee portraits below are cropped from scanned plate p4-i0 (same opening as PDF page 4). Full plate opens in the book gallery via deep link (?plate=p4-i0).",
@@ -122,7 +123,7 @@
     {
       "displayName": "David E. Lane",
       "role": "Time Traveler interpreter of Lane family history",
-      "bio": "Turns Lane Genealogies Vol. I into visual, navigable exhibits by connecting scanned evidence, OCR cleanup, and curation into modern story flow. Builds evidence-first experiences with Cursor skills while keeping the original record in view.",
+      "bio": "Turns Lane Genealogies Vol. I into visual, navigable exhibits by connecting scanned evidence, OCR cleanup, and curation into modern story flow. The book is the foundation; newer family branches are added from family research so descendants can reconnect with long-lost people, places, stories, and treasures.",
       "tagline": "Math + CS (Youngstown State) · interpreting the record across eras.",
       "imageUrl": "/family/assets/DavidELane.png",
       "links": [

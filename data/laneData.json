@@ -24894,7 +24894,7 @@
     {
       "name": "Aaron G. Lane",
       "id": 1024,
-      "text": "XV. CAPT. AARo N G.6 (twin brother to Moses), b. 23 Dec., 1817,went to California in 1849,and was widelyknown in the early history of the state. He died unm. I 4 Sept., 1883, at Lane's Crossing of the Mojave river. His home was in the family of Mrs. Richmond, his neice, in Halleck, Cal. Lane's Crossing (San Bernardino County, California) was a ford and traveler stop on the Mormon Road at the Mojave River, established in 1859 by Captain Aaron G. Lane, a veteran of the Mexican-American War and Forty-niner.",
+      "text": "XV. CAPT. AARo N G.6 (twin brother to Moses), b. 23 Dec., 1817,went to California in 1849,and was widelyknown in the early history of the state. He died unm. I 4 Sept., 1883, at Lane's Crossing of the Mojave river. His home was in the family of Mrs. Richmond, his neice, in Halleck, Cal. Lane's Crossing (San Bernardino County, California) was a ford and traveler stop on the Mormon Road at the Mojave River, established in 1859 by Captain Aaron G. Lane, a veteran of the Mexican-American War and Forty-niner. Family note: Aaron G. Lane is Homer Lane's first cousin, three times removed.",
       "generation": 0,
       "gender": "M",
       "lastName": "Lane",
@@ -162963,6 +162963,81 @@
         "referenceNote": "Widely published dates for Ebenezer Webster; refine with primary sources if needed.",
         "childPersonId": 3988
       }
+    },
+    {
+      "name": "Peggy Lane",
+      "id": 3991,
+      "text": "Family-provided relationship: child of Alderman Homer R Lane (id 112); sibling of John Lane (id 3992) and William E Lane (id 3993).",
+      "generation": 10,
+      "gender": "F",
+      "lastName": "Lane",
+      "birthYear": "",
+      "deathYear": "",
+      "birthDate": "",
+      "deathDate": "",
+      "born": "Franklin, PA",
+      "deathPlace": "",
+      "burial": ""
+    },
+    {
+      "name": "John Lane",
+      "id": 3992,
+      "text": "Family-provided relationship: child of Alderman Homer R Lane (id 112); sibling of William E Lane (id 3993) and Peggy Lane (id 3991). Marriage note: additional spouse name to be supplied later.",
+      "generation": 10,
+      "gender": "M",
+      "lastName": "Lane",
+      "birthYear": "",
+      "deathYear": "",
+      "birthDate": "",
+      "deathDate": "",
+      "born": "Franklin, PA",
+      "deathPlace": "",
+      "burial": ""
+    },
+    {
+      "name": "William E Lane",
+      "id": 3993,
+      "text": "Family-provided relationship: child of Alderman Homer R Lane (id 112); sibling of John Lane (id 3992) and Peggy Lane (id 3991). Married Margaret Anne Lane (goes by Anne).",
+      "generation": 10,
+      "gender": "M",
+      "lastName": "Lane",
+      "birthYear": "",
+      "deathYear": "",
+      "birthDate": "",
+      "deathDate": "",
+      "born": "Franklin, PA",
+      "deathPlace": "",
+      "burial": ""
+    },
+    {
+      "name": "John McFate",
+      "id": 3994,
+      "text": "Family-provided relationship: spouse of Peggy Lane (id 3991).",
+      "generation": 10,
+      "gender": "M",
+      "lastName": "McFate",
+      "birthYear": "",
+      "deathYear": "",
+      "birthDate": "",
+      "deathDate": "",
+      "born": "Franklin, PA",
+      "deathPlace": "",
+      "burial": ""
+    },
+    {
+      "name": "Margaret Anne Lane",
+      "id": 3995,
+      "text": "Family-provided relationship: spouse of William E Lane (id 3993). Preferred name: Anne.",
+      "generation": 10,
+      "gender": "F",
+      "lastName": "Lane",
+      "birthYear": "",
+      "deathYear": "",
+      "birthDate": "",
+      "deathDate": "",
+      "born": "Franklin, PA",
+      "deathPlace": "",
+      "burial": ""
     }
   ],
   "links": [
@@ -175769,6 +175844,54 @@
       "target": 3990,
       "color": "#39F",
       "relation": "father"
+    },
+    {
+      "source": 3872,
+      "target": 56,
+      "color": "#39F",
+      "relation": "father"
+    },
+    {
+      "source": 1023,
+      "target": 3872,
+      "color": "#39F",
+      "relation": "father"
+    },
+    {
+      "source": 1024,
+      "target": 3872,
+      "color": "#39F",
+      "relation": "father"
+    },
+    {
+      "source": 3991,
+      "target": 112,
+      "color": "#39F",
+      "relation": "father"
+    },
+    {
+      "source": 3992,
+      "target": 112,
+      "color": "#39F",
+      "relation": "father"
+    },
+    {
+      "source": 3993,
+      "target": 112,
+      "color": "#39F",
+      "relation": "father"
+    },
+    {
+      "source": 3991,
+      "target": 3994,
+      "color": "#CC0",
+      "relation": "spouse"
+    },
+    {
+      "source": 3993,
+      "target": 3995,
+      "color": "#CC0",
+      "relation": "spouse"
     }
   ]
 }

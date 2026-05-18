@@ -14,6 +14,7 @@ const reportPath = path.join(dataDir, 'lane-military-deep-scan-report.json');
 
 const WIKI_NOTE =
   "Lane's Crossing (San Bernardino County, California) was a ford and traveler stop on the Mormon Road at the Mojave River, established in 1859 by Captain Aaron G. Lane, a veteran of the Mexican-American War and Forty-niner.";
+const FAMILY_NOTE = "Family note: Aaron G. Lane is Homer Lane's first cousin, three times removed.";
 
 function updateLaneData() {
   const doc = JSON.parse(fs.readFileSync(laneDataPath, 'utf8'));
@@ -31,7 +32,8 @@ function updateLaneData() {
 
   const textParts = [
     String(node.text || '').trim(),
-    WIKI_NOTE
+    WIKI_NOTE,
+    FAMILY_NOTE
   ].filter(Boolean);
   node.text = Array.from(new Set(textParts)).join(' ');
 
@@ -63,7 +65,7 @@ function updateReport() {
       if (Number(participant?.id) !== 1024) continue;
       participant.name = 'Aaron G. Lane';
       const evidence = Array.isArray(participant.evidence) ? participant.evidence : [];
-      const merged = Array.from(new Set([...evidence, WIKI_NOTE])).filter(Boolean);
+      const merged = Array.from(new Set([...evidence, WIKI_NOTE, FAMILY_NOTE])).filter(Boolean);
       participant.evidence = merged;
       touched += 1;
     }
