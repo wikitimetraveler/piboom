@@ -1,0 +1,231 @@
+{
+  "issueId": "lane-magazine-issue-01",
+  "title": "Lane Genealogies Lives Again",
+  "subtitle": "Issue 1",
+  "editionLabel": "Family zine pilot",
+  "status": "draft-ready",
+  "pageSize": "Letter",
+  "theme": "Compilers (1891) -> exhibits -> cards -> one verified war spotlight -> continuation lines.",
+  "editorNote": "This issue brings the 1891 Lane book and newer family research into one short shareable magazine for descendants.",
+  "downloadHint": "Use Print to PDF in your browser for a shareable issue file.",
+  "spreads": [
+    {
+      "id": "cover",
+      "kind": "cover",
+      "title": "Lane Genealogies Lives Again",
+      "kicker": "Issue 1",
+      "summary": "A small family magazine from the 1891 book and later family research.",
+      "imageUrl": "/family/assets/lane-genealogies-title-spread.png",
+      "caption": "Title spread context from Lane Genealogies, Volume I (1891)."
+    },
+    {
+      "id": "letter",
+      "kind": "editorial",
+      "title": "Letter from the family desk",
+      "summary": "The 1891 book is still the backbone. This issue keeps that foundation while adding branches gathered from newer family research so the line is easier to see and share.",
+      "quote": "The book is the foundation; newer branches are added so descendants can reconnect with people, places, and stories.",
+      "links": [
+        {
+          "label": "Lane family hub",
+          "url": "/family/lane-family.html"
+        }
+      ]
+    },
+    {
+      "id": "historians-open",
+      "kind": "feature",
+      "title": "Who carried the 1891 volume into print",
+      "summary": "The committee portraits and title-page details remain the handoff point between early record keepers and the printed book.",
+      "imageUrl": "/family/assets/lane-pdf/p4-i0.jpg",
+      "caption": "Frontispiece plate p4-i0 with committee portraits.",
+      "links": [
+        {
+          "label": "Historians page",
+          "url": "/family/lane-historians.html"
+        },
+        {
+          "label": "Plate deep link",
+          "url": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4"
+        }
+      ]
+    },
+    {
+      "id": "timeline",
+      "kind": "timeline",
+      "title": "Compiler timeline",
+      "summary": "A handoff from 18th- and 19th-century manuscript efforts to Chapman and Fitts finishing Volume I in 1891.",
+      "bullets": [
+        "c. 1765: Deacon Jeremiah Lane chart and Deacon Samuel Lane diary notes.",
+        "1839 onward: Deacon E. J. Lane gathers records for decades.",
+        "1869-1889: Rev. James P. Lane extends and publishes portions.",
+        "1891: Chapman and Fitts complete and print Volume I."
+      ],
+      "links": [
+        {
+          "label": "Timeline source",
+          "url": "/family/lane-historians.html"
+        }
+      ]
+    },
+    {
+      "id": "opening-exhibit",
+      "kind": "feature",
+      "title": "Opening exhibit: William E Lane of Boston",
+      "summary": "The opening museum exhibit anchors chronology and family context before branch expansion.",
+      "imageUrl": "/family/assets/william-e-lane-boston-hero.png",
+      "caption": "Opening exhibit portrait plate context.",
+      "links": [
+        {
+          "label": "Lane Museum",
+          "url": "/family/lane-museum.html"
+        }
+      ]
+    },
+    {
+      "id": "plate-spread-a",
+      "kind": "plates",
+      "title": "Book plate spread A",
+      "summary": "Representative plates from the extracted set. Keep period print texture visible in issue layout.",
+      "imageUrl": "/family/assets/lane-pdf/p1-i0.jpg",
+      "caption": "Plate p1-i0.",
+      "links": [
+        {
+          "label": "Book plates gallery",
+          "url": "/family/lane-pdf-gallery.html"
+        }
+      ]
+    },
+    {
+      "id": "plate-spread-b",
+      "kind": "plates",
+      "title": "Book plate spread B",
+      "summary": "A second visual spread for pacing and provenance.",
+      "imageUrl": "/family/assets/lane-pdf/p5-i0.jpg",
+      "caption": "Plate p5-i0."
+    },
+    {
+      "id": "cards-intro",
+      "kind": "cards",
+      "title": "Trading cards first edition",
+      "summary": "Use six cards in print for issue pacing, then link readers to the full 32-card catalog online—people, artifacts, and events.",
+      "bullets": [
+        "People, eras, artifacts, and events in one repeatable format.",
+        "Each card keeps context and evidence separate; catalog tiers from Common through Legendary.",
+        "Catalog PDF and 9-card sheets are already exportable."
+      ],
+      "links": [
+        {
+          "label": "Trading cards page",
+          "url": "/family/lane-trading-cards.html"
+        }
+      ]
+    },
+    {
+      "id": "cards-aaron",
+      "kind": "cards",
+      "title": "Card spotlight: Captain Aaron G. Lane",
+      "summary": "Issue 1 uses the dedicated portrait and keeps campaign attribution scoped to Mexican-American War context.",
+      "imageUrl": "/family/assets/aaron-g-lane.png",
+      "caption": "Captain Aaron G. Lane portrait.",
+      "links": [
+        {
+          "label": "War history",
+          "url": "/family/lane-war-history.html"
+        }
+      ]
+    },
+    {
+      "id": "war-spotlight",
+      "kind": "feature",
+      "title": "War spotlight (single campaign scope)",
+      "summary": "Captain Aaron G. Lane appears in this issue under Mexican-American War framing only. This preserves the evidence boundary and avoids multi-campaign overreach.",
+      "quote": "Context gives era framing; evidence stays attached to the documented campaign.",
+      "links": [
+        {
+          "label": "Mexican-American War tab",
+          "url": "/family/lane-war-history.html#laneWarTab-mexican-american-war"
+        }
+      ]
+    },
+    {
+      "id": "continuation",
+      "kind": "feature",
+      "title": "Continuation branches",
+      "summary": "Later branches like Homer and William continuations are included as family-led research extensions, not replacements for the 1891 book.",
+      "links": [
+        {
+          "label": "Direct ancestor story",
+          "url": "/family/lane-direct-ancestor-story.html"
+        }
+      ]
+    },
+    {
+      "id": "occupations",
+      "kind": "feature",
+      "title": "Work and daily life",
+      "summary": "Occupation patterns provide social context and help descendants orient records by place and period.",
+      "links": [
+        {
+          "label": "Occupations",
+          "url": "/family/lane-occupations.html"
+        }
+      ]
+    },
+    {
+      "id": "book-sayings",
+      "kind": "feature",
+      "title": "Book sayings and attribution",
+      "summary": "Curated excerpts stay traceable to page-level references for transparent reuse in issue notes.",
+      "links": [
+        {
+          "label": "Book sayings",
+          "url": "/family/lane-book-sayings.html"
+        }
+      ]
+    },
+    {
+      "id": "sources",
+      "kind": "sources",
+      "title": "Source bundle for Issue 1",
+      "summary": "Use this as the footer block in the final PDF and on social snippets.",
+      "bullets": [
+        "Lane Genealogies, Volume I (1891) plate extracts.",
+        "Lane Historians and Museum curated context.",
+        "Trading cards first edition structured set.",
+        "Family continuation notes from newer branch research."
+      ],
+      "links": [
+        {
+          "label": "Internet Archive source book",
+          "url": "https://archive.org/details/lanegenealogies01chap/page/n7/mode/2up"
+        }
+      ]
+    },
+    {
+      "id": "back-cover",
+      "kind": "back-cover",
+      "title": "Back cover",
+      "summary": "Open the Lane Family hub for full tools, stories, and source deep links.",
+      "imageUrl": "/family/assets/lane-family-qr-splash-colorized.png",
+      "caption": "Issue QR splash image.",
+      "links": [
+        {
+          "label": "Lane Family hub",
+          "url": "/family/lane-family.html"
+        }
+      ]
+    },
+    {
+      "id": "credits",
+      "kind": "credits",
+      "title": "Credits",
+      "summary": "Presentation and software byline appears in Lane hub/footer credit component.",
+      "links": [
+        {
+          "label": "Lane site credit script",
+          "url": "/family/js/lane-site-credit.js"
+        }
+      ]
+    }
+  ]
+}

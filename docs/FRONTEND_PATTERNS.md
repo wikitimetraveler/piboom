@@ -58,7 +58,9 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 | `public/shared/toast.js` | Shared toast notifications (showToast) — use instead of alert() |
 | `public/shared/collection-styles.css` | Shared collection page styles (stats, cards, map, empty/loading, toast) |
 | `public/shared/collection-utils.js` | Shared collection utilities (showToast delegates to toast.js, resolvePosterImageUrl, waitForPosterImages, requestDeviceLocation) |
-| `public/shared/modern-navbar.js` | Web component navbar |
+| `public/shared/modern-navbar.js` | Web component navbar (loads image lightbox sitewide) |
+| `public/shared/lane-image-lightbox.js` | Click-to-expand images in `main`; opt out with `data-lane-lightbox-ignore` or class `lane-lightbox-ignore` |
+| `public/shared/lane-image-lightbox.css` | Lightbox overlay styles (z-index above Bootstrap modals) |
 | `public/shared/styles.css` | Shared styles |
 | `public/shared/user-login.js` | User login |
 | `public/shared/user-selector.js` | User selector |

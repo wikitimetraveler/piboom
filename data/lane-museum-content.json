@@ -54,6 +54,30 @@
       ]
     },
     {
+      "order": 1.5,
+      "personId": 3,
+      "displayName": "Mary (Brewer) Lane",
+      "personQuery": "Mary Brewer Lane Roxbury",
+      "caption": "Second wife of William I · married 21 Aug. 1656 (Boston)",
+      "eraLabel": "c. 1635–1700 · Boston and Hampton links",
+      "blurb": "Vol. I: daughter of Thomas Brewer of Roxbury; married William Lane after the death of Mary (Kelway). Goodman Brewer later died at the home of his son-in-law Thomas Webster in Hampton (1689–90)—the Brewer and Webster lines thread through later Hampton and Chester narratives.",
+      "imageUrl": "/family/assets/mary-brewer-lane.png",
+      "imageCaption": "Mary (Brewer) Lane — second household of William I (compilation portrait).",
+      "imageCredit": "Lane family / genealogy compilation",
+      "links": [
+        {
+          "label": "Lane Genealogies Vol. 1 (1891) — Internet Archive",
+          "url": "https://archive.org/details/lanegenealogies01chap",
+          "kind": "book"
+        },
+        {
+          "label": "Memorial wall (find by name)",
+          "url": "/family/lane-memorial-wall.html",
+          "kind": "other"
+        }
+      ]
+    },
+    {
       "order": 2,
       "personId": 56,
       "displayName": "Deacon Samuel Lane",
@@ -118,6 +142,9 @@
       "caption": "Second generation · Boston; Turner company in same war (1676 narrative)",
       "eraLabel": "1651–1690 · King Philip's War (Vol. 1)",
       "blurb": "Same compilation puts him under Capt. Turner in 1676 and explicitly ties him to the same company lineage where brother John Lane served under Capt. Poole in March 1675 — separate captain and year from John; not collapsed into \"both under Poole.\"",
+      "imageUrl": "/family/assets/samuel-lane.png",
+      "imageCaption": "Samuel² Lane — Boston register line; Hadley and Turner company context in Vol. I.",
+      "imageCredit": "Lane family / genealogy compilation",
       "links": [
         {
           "label": "Lane Genealogies Vol. 1 — Internet Archive (context)",
@@ -165,6 +192,9 @@
       "caption": "Samuel² (Hadley) household; later captivity narrative in compilation",
       "eraLabel": "Late 17th century · Hadley / frontier record",
       "blurb": "Vol. 1 places Samuel² in Hadley with Sarah (Dickinson) and names their children’s births and marriages there or nearby (e.g. Suffield). The same tradition line includes her later hardship: widowhood, remarriage to Martin Kellogg, and the 1704 French and Indian raid taking her and children captive—reported in the compilation as family narrative, not as muster or court file.",
+      "imageUrl": "/family/assets/sarah-dickinson-lane.png",
+      "imageCaption": "Sarah Dickinson Lane — Hadley household line; remarriage and 1704 captivity narrative in Vol. I.",
+      "imageCredit": "Lane family / genealogy compilation",
       "links": [
         {
           "label": "Lane Genealogies Vol. 1 (1891) — Internet Archive",
@@ -207,6 +237,9 @@
       "caption": "Father-generation anchor for Lt. Bennington line · mounted militia 1754",
       "eraLabel": "1709–1784 · French and Indian frontier context",
       "blurb": "Vol. 1 traces Hampton-born John⁴ to Chester with Hannah Lamprey and later Mary Knowles, farming and tavern-keeping—the compilation’s officer note for Sept. 1754 Cornet in a troop of horse is genealogy tier (check provincial rolls separately). Revolutionary officer sons Ezekiel and John Lt. descend from this cluster.",
+      "imageUrl": "/family/assets/cornet-john-lane.png",
+      "imageCaption": "Cornet John Lane — Chester horse troop, French and Indian frontier context.",
+      "imageCredit": "Lane family / genealogy compilation",
       "links": [
         {
           "label": "Lane Genealogies Vol. 1 (1891)",
@@ -370,6 +403,9 @@
       "caption": "Astrophysicist · Lane–Emden equation; lunar crater Lane; uncle of William Homer Lane in this tree",
       "eraLabel": "1819 Geneseo, N.Y. – 1880 Washington, D.C.",
       "blurb": "Vol. I lists him under Mark Lane as first child: Exeter Academy, Yale 1846, coast survey in Washington. Standard biography adds Patent Office and Weights and Measures work and the gaseous-sun analysis behind stellar-structure theory. In this graph he is paternal uncle of William Homer Lane (id 108) and grand-uncle of Alderman Homer R Lane (id 112).",
+      "imageUrl": "/family/assets/jonathan-homer-lane.png",
+      "imageCaption": "Jonathan Homer Lane — astrophysicist; namesake of lunar crater Lane.",
+      "imageCredit": "Lane family / genealogy compilation",
       "links": [
         {
           "label": "Lane Genealogies Vol. I — Internet Archive (context)",

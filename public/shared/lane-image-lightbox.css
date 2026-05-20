@@ -1,0 +1,104 @@
+/* Sitewide image lightbox — z-index above Bootstrap modal (1055) */
+.lane-image-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: none;
+}
+
+.lane-image-lightbox.is-open {
+  display: block;
+}
+
+.lane-image-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.88);
+  cursor: zoom-out;
+}
+
+.lane-image-lightbox-panel {
+  position: relative;
+  z-index: 1;
+  width: min(94vw, 1100px);
+  max-height: 92vh;
+  margin: 4vh auto;
+  padding: 0.75rem 0.75rem 0.5rem;
+  background: rgba(18, 20, 26, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+  overflow: auto;
+}
+
+.lane-image-lightbox-panel--image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lane-image-lightbox-image {
+  display: block;
+  max-width: 100%;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.lane-image-lightbox-panel--element {
+  width: min(94vw, 720px);
+}
+
+.lane-image-lightbox-element-host {
+  min-width: min(680px, 88vw);
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.lane-image-lightbox-element-host .poster-cover,
+.lane-image-lightbox-element-host img {
+  max-width: 100%;
+  height: auto;
+}
+
+.lane-image-lightbox-close {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.5rem;
+  z-index: 2;
+  border: 0;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.lane-image-lightbox-close:hover,
+.lane-image-lightbox-close:focus {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.lane-image-lightbox-close:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.lane-image-lightbox-caption {
+  margin: 0.5rem 0.25rem 0.15rem;
+  color: #e8e8e8;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Expandable affordance in main content */
+main img:not([data-lane-lightbox-ignore]):not(.lane-lightbox-ignore):not(.lane-pdf-thumb) {
+  cursor: zoom-in;
+}

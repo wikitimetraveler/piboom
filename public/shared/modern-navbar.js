@@ -49,7 +49,30 @@ class ModernNavbar extends HTMLElement {
       this.render();
       this.attachEventListeners();
       this.injectToolSearchScripts();
+      this.injectImageLightbox();
     });
+  }
+
+  injectImageLightbox() {
+    if (window.LaneImageLightbox?.bound) return;
+    if (!document.querySelector('link[href="/shared/lane-image-lightbox.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/shared/lane-image-lightbox.css';
+      document.head.appendChild(link);
+    }
+    const runInit = () => {
+      if (window.LaneImageLightbox) window.LaneImageLightbox.init();
+    };
+    if (window.LaneImageLightbox) {
+      runInit();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = '/shared/lane-image-lightbox.js';
+    script.onload = runInit;
+    script.onerror = () => {};
+    document.head.appendChild(script);
   }
 
   ensureMenuConfig() {

@@ -86,3 +86,44 @@ export function getFieldPath(value) {
   const str = String(value).trim();
   return str || null;
 }
+
+/** Strip bracketed field ids from API/UI description text (Target column keeps [FIELD]). */
+export function sanitizeDescriptionText(raw) {
+  if (raw === null || raw === undefined) return '';
+  return String(raw)
+    .replace(/\[(?=[^\]\s]*[A-Za-z0-9])[^\]\s]+\]/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s+([,;:.!?])/g, '$1')
+    .trim();
+}
+
+/**
+ * Description column: human label + optional type — no [FIELD] (see Target column).
+ * @param {{ description?: string, dataType?: string, type?: string }} [meta]
+ * @param {string} [existingDesc]
+ */
+export function formatDescriptionFromMeta(meta, existingDesc = '') {
+  const apiDesc = sanitizeDescriptionText(meta?.description || '');
+  const dt = String(meta?.dataType || meta?.type || '').trim();
+  if (apiDesc) {
+    const typeSuffix = dt && !/^string$/i.test(dt) ? ` — ${dt}` : '';
+    return `${apiDesc}${typeSuffix}`.trim();
+  }
+  if (meta && dt && !/^string$/i.test(dt)) {
+    const base = sanitizeDescriptionText(existingDesc || '');
+    if (base && !base.includes(`(${dt})`) && !base.includes(` — ${dt}`)) {
+      return `${base} (${dt})`.trim();
+    }
+  }
+  return sanitizeDescriptionText(existingDesc || '');
+}
+
+/** True when Description should be refreshed from Encompass metadata. */
+export function descriptionNeedsMetadataRefresh(desc) {
+  const d = String(desc || '').trim();
+  if (!d) return true;
+  if (/^field$/i.test(d)) return true;
+  if (/^field\s+/i.test(d)) return true;
+  if (/\[[^\]]+\]/.test(d)) return true;
+  return false;
+}

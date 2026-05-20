@@ -44,12 +44,144 @@ const uploadBrRuleLibraryBtn = document.getElementById('uploadBrRuleLibraryBtn')
 const brRuleLibraryFileInput = document.getElementById('brRuleLibraryFileInput');
 const brRuleLibraryList = document.getElementById('brRuleLibraryList');
 
-/** Hero toolbar: export / clear / scan live under Load / Tools dropdowns */
+const FOCUS_MODE_KEY = 'unitTestsFocusMode';
+const TOOL_PILLS_EXPANDED_KEY = 'unitTestsToolPillsExpanded';
+const WORKFLOW_HINT_DISMISSED_KEY = 'unitTestsWorkflowHintDismissed';
+
+function updateUnitTestsFileNameChip() {
+  const chip = document.getElementById('unitTestsFileNameChip');
+  if (!chip) return;
+  if (currentFileName && allData && allData.length > 0) {
+    chip.textContent = currentFileName;
+    chip.classList.remove('d-none');
+  } else {
+    chip.classList.add('d-none');
+    chip.textContent = '';
+  }
+}
+
+/** Hero toolbar: export / clear / scan in More menu; Download Excel enabled when data loaded */
 function setHeroPostLoadActionsVisible(visible) {
-  ['heroExportCsvLi', 'heroExportExcelLi', 'heroClearReloadLi', 'heroScanSetLi'].forEach((id) => {
+  ['exportCsvBtn', 'clearAndReloadBtn', 'scanSetFieldsBtn'].forEach((id) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('d-none', !visible);
   });
+  if (exportExcelBtn) {
+    exportExcelBtn.disabled = !visible;
+  }
+  updateUnitTestsFileNameChip();
+}
+
+function isUnitTestsFocusMode() {
+  return document.body.classList.contains('unit-tests-focus-mode');
+}
+
+function syncGenerateModalPrimaryButtons() {
+  const loadBtn = document.getElementById('generateCustomFieldConfirmBtn');
+  const downloadBtn = document.getElementById('generateCustomFieldDownloadBtn');
+  if (!loadBtn || !downloadBtn) return;
+  const focus = isUnitTestsFocusMode();
+  loadBtn.classList.toggle('btn-primary', !focus);
+  loadBtn.classList.toggle('btn-outline-primary', focus);
+  downloadBtn.classList.toggle('btn-primary', focus);
+  downloadBtn.classList.toggle('btn-outline-primary', !focus);
+}
+
+function applyUnitTestsFocusMode(on) {
+  document.body.classList.toggle('unit-tests-focus-mode', !!on);
+  const btn = document.getElementById('unitTestsFocusModeBtn');
+  if (btn) btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  try {
+    localStorage.setItem(FOCUS_MODE_KEY, on ? '1' : '0');
+  } catch (_) {}
+  syncGenerateModalPrimaryButtons();
+}
+
+function initUnitTestsChromePrefs() {
+  const pillsRoot = document.getElementById('unitTestsToolPills');
+  const showAll = document.getElementById('unitTestsShowAllToolsBtn');
+  const hideAll = document.getElementById('unitTestsHideAllToolsBtn');
+  let expanded = false;
+  try {
+    expanded = localStorage.getItem(TOOL_PILLS_EXPANDED_KEY) === '1';
+  } catch (_) {}
+  if (pillsRoot) pillsRoot.classList.toggle('tool-pills-show-all', expanded);
+  if (showAll) showAll.setAttribute('aria-pressed', expanded ? 'true' : 'false');
+  showAll?.addEventListener('click', () => {
+    pillsRoot?.classList.add('tool-pills-show-all');
+    showAll.setAttribute('aria-pressed', 'true');
+    try {
+      localStorage.setItem(TOOL_PILLS_EXPANDED_KEY, '1');
+    } catch (_) {}
+  });
+  hideAll?.addEventListener('click', () => {
+    pillsRoot?.classList.remove('tool-pills-show-all');
+    showAll?.setAttribute('aria-pressed', 'false');
+    try {
+      localStorage.setItem(TOOL_PILLS_EXPANDED_KEY, '0');
+    } catch (_) {}
+  });
+
+  const tipsBlock = document.getElementById('unitTestsWorkflowTipsBlock');
+  const dismissBtn = document.getElementById('unitTestsWorkflowHintDismiss');
+  let dismissed = false;
+  try {
+    dismissed = localStorage.getItem(WORKFLOW_HINT_DISMISSED_KEY) === '1';
+  } catch (_) {}
+  if (dismissed && tipsBlock) tipsBlock.classList.add('is-dismissed');
+  dismissBtn?.addEventListener('click', () => {
+    tipsBlock?.classList.add('is-dismissed');
+    try {
+      localStorage.setItem(WORKFLOW_HINT_DISMISSED_KEY, '1');
+    } catch (_) {}
+  });
+
+  const tipsCollapse = document.getElementById('unitTestsWorkflowTipsCollapse');
+  const chevron = document.getElementById('unitTestsWorkflowTipsChevron');
+  tipsCollapse?.addEventListener('shown.bs.collapse', () => {
+    chevron?.classList.replace('bi-chevron-right', 'bi-chevron-down');
+  });
+  tipsCollapse?.addEventListener('hidden.bs.collapse', () => {
+    chevron?.classList.replace('bi-chevron-down', 'bi-chevron-right');
+  });
+
+  let focusOn = false;
+  try {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('focus') === '1') focusOn = true;
+    else focusOn = localStorage.getItem(FOCUS_MODE_KEY) === '1';
+  } catch (_) {}
+  applyUnitTestsFocusMode(focusOn);
+  document.getElementById('unitTestsFocusModeBtn')?.addEventListener('click', () => {
+    applyUnitTestsFocusMode(!isUnitTestsFocusMode());
+  });
+
+  document.getElementById('moreUploadExcelBtn')?.addEventListener('click', () => {
+    fileInput?.click();
+  });
+  document.getElementById('heroGenerateBRRuleBtn')?.addEventListener('click', () => {
+    document.getElementById('generateFromBRRuleBtn')?.click();
+  });
+  document.getElementById('moreOpenTestLibraryBtn')?.addEventListener('click', () => {
+    if (typeof toggleAccordionSection === 'function') toggleAccordionSection('collapseTestLibrary');
+  });
+  document.getElementById('moreShowWorkflowBtn')?.addEventListener('click', () => {
+    applyUnitTestsFocusMode(false);
+    tipsBlock?.classList.remove('is-dismissed');
+  });
+
+  syncGenerateModalPrimaryButtons();
+
+  try {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('generate') === '1') {
+      setTimeout(() => document.getElementById('generateFromCustomFieldBtn')?.click(), 0);
+    }
+  } catch (_) {}
+}
+
+function utDescUtils() {
+  return window.unitTestsUtils || {};
 }
 
 function setUnitTestsWelcomeVisible(visible) {
@@ -1169,13 +1301,20 @@ function extractFieldMetadataFromReaderResponse(data, fieldId) {
  */
 function maybeUpdateDescriptionFromApi(row, fieldId, apiData, gridApi, rowIndex) {
   const desc = String(row.Description || row.description || '').trim();
-  if (!/^Field\s+.+$/i.test(desc)) return;
+  const utils = utDescUtils();
+  const needsRefresh =
+    typeof utils.descriptionNeedsMetadataRefresh === 'function'
+      ? utils.descriptionNeedsMetadataRefresh(desc)
+      : /^Field\s+.+$/i.test(desc);
+  if (!needsRefresh) return;
+  const { formatDescriptionFromMeta } = utils;
   const meta = extractFieldMetadataFromReaderResponse(apiData, fieldId);
   if (!meta || (!meta.description && !meta.type)) return;
-  const parts = [];
-  if (meta.description) parts.push(meta.description);
-  if (meta.type) parts.push('(' + meta.type + ')');
-  const newDesc = parts.length ? parts.join(' ') : desc;
+  const newDesc =
+    typeof formatDescriptionFromMeta === 'function'
+      ? formatDescriptionFromMeta(meta, desc) || desc
+      : desc;
+  if (!newDesc || newDesc === desc) return;
   row.Description = newDesc;
   row.description = newDesc;
   const descCol = columnDefs.find((c) => (c.headerName || c.field || '').toLowerCase() === 'description');
@@ -1335,7 +1474,10 @@ function exportToCSV() {
   URL.revokeObjectURL(link.href);
 }
 
-async function exportToExcel() {
+/**
+ * @param {{ filename?: string }} [options] - optional exact download filename (e.g. unit-test-CX.FIELD.xlsx)
+ */
+async function exportToExcel(options = {}) {
   const ExcelJS = window.ExcelJS;
   if (!allData || allData.length === 0 || !ExcelJS) {
     console.warn('Excel export unavailable');
@@ -1352,7 +1494,8 @@ async function exportToExcel() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = ((currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '') + '-export.xlsx');
+    const base = (currentFileName || 'unit-tests').replace(/\.(xlsx|xls)$/i, '');
+    link.download = options.filename || `${base}-export.xlsx`;
     link.click();
     URL.revokeObjectURL(url);
     setStatus(`Exported to ${link.download}`, 'ok', 'bi-check-circle');
@@ -2487,6 +2630,7 @@ async function hydrateLoadedUnitTestData(options) {
     testDescriptions,
     fieldMetadata,
     refreshFieldMetadataFromHub = false,
+    showAiPanel = true,
   } = options;
 
   if (!rows || rows.length === 0) return null;
@@ -2542,11 +2686,12 @@ async function hydrateLoadedUnitTestData(options) {
   renderRecentRunsSelect();
   updateScenarioBadges([]);
 
-  if (window.unitTestsAI && window.unitTestsAI.show) {
+  if (showAiPanel && window.unitTestsAI && window.unitTestsAI.show) {
     window.unitTestsAI.show();
   }
 
   fileInfo.innerHTML = buildFileInfoHtml(currentFileName, rows.length, headers.length, testDescriptionsData, scenarioColumns);
+  updateUnitTestsFileNameChip();
   renderUnitTestsScenarioPills(testDescriptionsData, scenarioColumns);
   updateResultsMeta();
 
@@ -3914,12 +4059,14 @@ function renderScenarioBuilder(field) {
  * @param {string} sourceName
  * @param {Record<string,{dataType,format,description}>} [fieldMetadata] - optional Encompass field metadata
  * @param {object} [field] - optional custom field object (fieldId, calculation, description, color) for Selected Field accordion
+ * @param {{ silent?: boolean, autoDownload?: boolean }} [options]
  */
-async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fieldMetadata, field) {
+async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName, fieldMetadata, field, options = {}) {
   if (!rows || rows.length === 0) return;
+  const { silent = false, autoDownload = false } = options;
   try {
     const accordionContainer = document.getElementById('accordionContainer');
-    if (accordionContainer) accordionContainer.style.display = 'block';
+    if (accordionContainer && !silent) accordionContainer.style.display = 'block';
 
     await hydrateLoadedUnitTestData({
       headers,
@@ -3928,12 +4075,13 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
       testDescriptions,
       fieldMetadata,
       refreshFieldMetadataFromHub: false,
+      showAiPanel: !silent,
     });
 
     const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
     const selectedFieldContent = document.getElementById('selectedFieldContent');
     const collapseSelectedField = document.getElementById('collapseSelectedField');
-    if (field && selectedFieldCard && selectedFieldContent) {
+    if (!silent && field && selectedFieldCard && selectedFieldContent) {
       const fieldId = field.fieldId || field.id || field.Id || field.fieldName || '';
       const calc = field.calculation || field.calculationExpression || field.calculatedExpression || field.expression || field.formula || '';
       const desc = field.description || field.longDescription || field.shortDescription || field.comments || '';
@@ -3967,6 +4115,7 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
       }
     } else if (selectedFieldCard) {
       selectedFieldCard.style.display = 'none';
+      selectedFieldCard.classList.add('section-card-hidden');
       const sidebarSelectedField = document.getElementById('sidebarSelectedField');
       if (sidebarSelectedField) sidebarSelectedField.style.display = 'none';
       currentScenarioBuilderField = null;
@@ -3975,21 +4124,32 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
       setLiveScenarioBuilderSectionVisible(false);
     }
 
-    setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
-    revealUnitTestGridSection();
+    if (autoDownload) {
+      const downloadName = sourceName && /\.xlsx$/i.test(sourceName) ? sourceName : `${sourceName || 'unit-tests'}.xlsx`;
+      await exportToExcel({ filename: downloadName });
+      setStatus(`Downloaded ${downloadName}`, 'ok', 'bi-check-circle');
+    } else if (!silent) {
+      setStatus('Generated test loaded successfully', 'ok', 'bi-check-circle');
+      revealUnitTestGridSection();
+    } else {
+      setStatus('Generated test ready', 'ok', 'bi-check-circle');
+    }
 
-    scheduleUnitTestGridMetadataRefresh()
+    const metadataRefresh = scheduleUnitTestGridMetadataRefresh()
       .then(({ dropdownCount }) => {
-        if (dropdownCount > 0) {
+        if (!silent && dropdownCount > 0) {
           showToast(`Encompass: ${dropdownCount} SET field(s) with dropdown metadata`, 'info');
         }
-        if (currentScenarioBuilderField) {
+        if (!silent && currentScenarioBuilderField) {
           renderScenarioBuilder(currentScenarioBuilderField);
         }
       })
       .catch(() => {
         /* Hub unavailable — text editors still work */
       });
+    if (autoDownload) {
+      await metadataRefresh;
+    }
   } catch (error) {
     console.error('Error loading generated test data:', error);
     setStatus(`Error: ${error.message}`, 'err', 'bi-exclamation-octagon');
@@ -4141,18 +4301,12 @@ function enrichSetRowsWithEncompassMetadata() {
     } else {
       delete row._fieldMetadata;
     }
-    const apiDesc = meta && String(meta.description || '').trim();
-    const extracted = extractFieldId(target);
-    const bracket = String(target).trim().startsWith('[') ? String(target).trim() : extracted ? `[${extracted}]` : String(target).trim();
-    const dt = meta && meta.dataType ? String(meta.dataType).trim() : '';
-    if (apiDesc) {
-      const typeSuffix = dt && !/^string$/i.test(dt) ? ` — ${dt}` : '';
-      row.Description = `${apiDesc} ${bracket}${typeSuffix}`.trim();
-    } else if (meta && dt && !/^string$/i.test(dt)) {
-      const base = String(row.Description || '').trim();
-      if (base && !base.includes(`(${dt})`) && !base.includes(` — ${dt}`)) {
-        row.Description = `${base} (${dt})`.trim();
-      }
+    const { formatDescriptionFromMeta, sanitizeDescriptionText } = utDescUtils();
+    if (meta && typeof formatDescriptionFromMeta === 'function') {
+      const formatted = formatDescriptionFromMeta(meta, row.Description);
+      if (formatted) row.Description = formatted;
+    } else if (row.Description && typeof sanitizeDescriptionText === 'function' && /\[[^\]]+\]/.test(String(row.Description))) {
+      row.Description = sanitizeDescriptionText(row.Description);
     }
   });
   if (gridApi && typeof gridApi.refreshCells === 'function') {
@@ -4354,9 +4508,15 @@ function initializeGenerateFromCustomField() {
   const preview = document.getElementById('generateCustomFieldPreview');
   const previewContent = document.getElementById('generateCustomFieldPreviewContent');
   const confirmBtn = document.getElementById('generateCustomFieldConfirmBtn');
+  const downloadBtn = document.getElementById('generateCustomFieldDownloadBtn');
   const statusEl = document.getElementById('generateCustomFieldStatus');
 
   if (!btn || !modal || !searchInput || !hiddenSelect || !dropdown) return;
+
+  function setGenerateActionButtonsEnabled(enabled) {
+    if (confirmBtn) confirmBtn.disabled = !enabled;
+    if (downloadBtn) downloadBtn.disabled = !enabled;
+  }
 
   let calculatedFields = [];
   let cachedCustomFieldsForMetadata = [];
@@ -4414,13 +4574,13 @@ function initializeGenerateFromCustomField() {
     const val = hiddenSelect.value;
     if (!val) {
       preview.style.display = 'none';
-      confirmBtn.disabled = true;
+      setGenerateActionButtonsEnabled(false);
       return;
     }
     const field = calculatedFields.find((f) => (f.fieldId || f.id || f.Id) === val);
     if (!field || !window.customFieldCalcParser) {
       preview.style.display = 'none';
-      confirmBtn.disabled = true;
+      setGenerateActionButtonsEnabled(false);
       return;
     }
     const fieldMetadata = window.customFieldCalcParser.buildFieldMetadataLookup
@@ -4429,12 +4589,54 @@ function initializeGenerateFromCustomField() {
     const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field, { fieldMetadata });
     if (!result) {
       preview.style.display = 'none';
-      confirmBtn.disabled = true;
+      setGenerateActionButtonsEnabled(false);
       return;
     }
     previewContent.textContent = result.rows.map((r) => `${r.Step}. ${r.Action} [${(r.Target || '').replace(/[\[\]]/g, '')}] → ${r['Test 1'] ?? ''}`).join('\n');
     preview.style.display = 'block';
-    confirmBtn.disabled = false;
+    setGenerateActionButtonsEnabled(true);
+  }
+
+  let customFieldDeliverInFlight = false;
+
+  async function deliverFromSelectedCustomField(delivery) {
+    if (customFieldDeliverInFlight) return;
+    const val = hiddenSelect.value;
+    if (!val) return;
+    const field = calculatedFields.find((f) => (f.fieldId || f.id || f.Id) === val);
+    if (!field || !window.customFieldCalcParser) return;
+
+    customFieldDeliverInFlight = true;
+    try {
+      const fieldMetadata = window.customFieldCalcParser.buildFieldMetadataLookup
+        ? window.customFieldCalcParser.buildFieldMetadataLookup(cachedCustomFieldsForMetadata, cachedNativeFieldsForMetadata)
+        : {};
+      const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field, { fieldMetadata });
+      if (!result) {
+        showToast('Could not parse calculation formula', 'warning');
+        return;
+      }
+
+      const fieldId = field.fieldId || field.id || field.Id;
+      const sourceName = delivery.autoDownload ? `unit-test-${fieldId}.xlsx` : `Generated: [${fieldId}]`;
+      await loadGeneratedTestData(
+        result.headers,
+        result.rows,
+        result.testDescriptions,
+        sourceName,
+        result.fieldMetadata,
+        delivery.loadUi ? field : null,
+        { silent: delivery.autoDownload, autoDownload: delivery.autoDownload }
+      );
+      hideBsModal(modal);
+      if (delivery.autoDownload) {
+        showToast(`Downloaded ${sourceName}`, 'success');
+      } else {
+        showToast('Unit test generated and loaded', 'success');
+      }
+    } finally {
+      customFieldDeliverInFlight = false;
+    }
   }
 
   function showDropdown() {
@@ -4490,10 +4692,11 @@ function initializeGenerateFromCustomField() {
     hiddenSelect.value = '';
     searchInput.placeholder = 'Loading...';
     dropdown.style.display = 'none';
-    confirmBtn.disabled = true;
+    setGenerateActionButtonsEnabled(false);
     preview.style.display = 'none';
 
     showBsModal(modal);
+    setTimeout(() => searchInput.focus(), 150);
 
     try {
       const [customRes, nativeRes] = await Promise.all([
@@ -4537,23 +4740,22 @@ function initializeGenerateFromCustomField() {
   });
 
   confirmBtn.addEventListener('click', () => {
-    const val = hiddenSelect.value;
-    if (!val) return;
-    const field = calculatedFields.find((f) => (f.fieldId || f.id || f.Id) === val);
-    if (!field || !window.customFieldCalcParser) return;
+    void deliverFromSelectedCustomField({ loadUi: true, autoDownload: false });
+  });
 
-    const fieldMetadata = window.customFieldCalcParser.buildFieldMetadataLookup
-      ? window.customFieldCalcParser.buildFieldMetadataLookup(cachedCustomFieldsForMetadata, cachedNativeFieldsForMetadata)
-      : {};
-    const result = window.customFieldCalcParser.generateUnitTestFromCustomField(field, { fieldMetadata });
-    if (!result) {
-      showToast('Could not parse calculation formula', 'warning');
-      return;
+  downloadBtn?.addEventListener('click', () => {
+    void deliverFromSelectedCustomField({ loadUi: false, autoDownload: true });
+  });
+
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (isUnitTestsFocusMode() && downloadBtn && !downloadBtn.disabled) {
+      void deliverFromSelectedCustomField({ loadUi: false, autoDownload: true });
+    } else if (confirmBtn && !confirmBtn.disabled) {
+      void deliverFromSelectedCustomField({ loadUi: true, autoDownload: false });
     }
-
-    loadGeneratedTestData(result.headers, result.rows, result.testDescriptions, `Generated: [${field.fieldId || field.id || field.Id}]`, result.fieldMetadata, field);
-    hideBsModal(modal);
-    showToast('Unit test generated and loaded', 'success');
   });
 }
 
@@ -5034,6 +5236,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeGenerateFromBRRule();
   initializeScenarioBuilderApplyControls();
   initializeSectionSidebar();
+  initUnitTestsChromePrefs();
+  if (exportExcelBtn) exportExcelBtn.disabled = true;
   const welcomeUploadBtn = document.getElementById('welcomeUploadBtn');
   welcomeUploadBtn?.addEventListener('click', () => fileInput?.click());
   const qaTipsListenBtn = document.getElementById('qaTipsListenBtn');

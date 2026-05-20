@@ -61,7 +61,7 @@
             overflow-x: hidden;
         }
 
-        /* Animated background particles */
+        /* Static background gradient (no animation) */
         body::before {
             content: '';
             position: fixed;
@@ -69,20 +69,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background:
                 radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
                 radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
-            animation: backgroundFloat 20s ease-in-out infinite;
             pointer-events: none;
             z-index: -1;
-        }
-
-        @keyframes backgroundFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(-10px, -10px) scale(1.05); }
-            50% { transform: translate(10px, -5px) scale(0.95); }
-            75% { transform: translate(-5px, 10px) scale(1.02); }
         }
 
         /* Professional Navbar */
@@ -96,20 +88,7 @@
         }
 
         .navbar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, var(--ice-glow), transparent);
-            animation: headerShine 3s ease-in-out infinite;
-        }
-
-        @keyframes headerShine {
-            0% { left: -100%; }
-            50% { left: 100%; }
-            100% { left: 100%; }
+            display: none;
         }
 
         .navbar-brand {
@@ -338,32 +317,18 @@
             padding: 2rem;
             margin-bottom: 2rem;
             box-shadow: var(--shadow-sm);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
             position: relative;
             overflow: hidden;
-            animation: cardFloat 6s ease-in-out infinite;
         }
 
-        .tool-card:nth-child(odd) {
-            animation-delay: 0s;
-        }
-
-        .tool-card:nth-child(even) {
-            animation-delay: 3s;
-        }
-
-        @keyframes cardFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            25% { transform: translateY(-5px) rotate(0.5deg); }
-            50% { transform: translateY(-2px) rotate(-0.5deg); }
-            75% { transform: translateY(-8px) rotate(0.3deg); }
+        .tool-card--results {
+            padding: 1.25rem;
         }
 
         .tool-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: var(--shadow-lg), 0 0 30px var(--ice-glow);
+            box-shadow: var(--shadow-md);
             border-color: var(--ice-primary);
-            animation-play-state: paused;
         }
 
         .tool-card::before {
@@ -498,20 +463,93 @@
 
         .youtube-card:hover {
             box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
+        }
+
+        .youtube-card img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 0.5rem;
         }
 
         .youtube-card h5 {
             color: var(--text-dark);
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            margin-bottom: 0.35rem;
             font-weight: 600;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
         }
 
         .youtube-card p {
             color: var(--text-muted);
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+
+        .youtube-card .btn {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        #youtubeResults {
+            max-height: clamp(420px, 58vh, 720px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .youtube-results-placeholder {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            padding: 0.5rem 0;
+            min-height: 4rem;
+        }
+
+        #disasterTableWrap {
+            overflow-x: auto;
+            min-height: 280px;
+        }
+
+        .disaster-detail-strip {
+            background: var(--background-light);
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .disaster-detail-strip .form-label {
+            font-size: 0.7rem;
+            margin-bottom: 0.15rem;
+            color: var(--text-muted);
+        }
+
+        .disaster-detail-strip .form-control {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        #disasterTable tbody tr {
+            cursor: pointer;
+        }
+
+        #disasterTable tbody tr.disaster-row-selected {
+            background-color: var(--ice-light) !important;
+        }
+
+        .disaster-title-cell {
+            max-width: 14rem;
         }
 
         /* Professional Footer */
@@ -533,23 +571,12 @@
             right: 0;
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--ice-primary), transparent);
-            animation: footerGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes footerGlow {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
+            opacity: 0.6;
         }
 
         .footer-content {
             color: var(--text-muted);
             font-size: 0.875rem;
-            animation: footerFloat 4s ease-in-out infinite;
-        }
-
-        @keyframes footerFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
         }
 
         .footer-content strong {
@@ -636,6 +663,20 @@
             100% {
                 transform: translateY(-100px) translateX(100px);
                 opacity: 0;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .particle {
+                display: none;
             }
         }
     </style>
@@ -772,44 +813,76 @@
             <div class="row">
                 <!-- Sidebar for YouTube Results -->
                 <div class="col-md-3">
-                    <div class="tool-card">
+                    <div class="tool-card tool-card--results">
                         <h4><i class="bi-youtube me-2"></i>YouTube Results</h4>
                         <div id="youtubeResults">
-                            <!-- YouTube videos related to FEMA disaster declarations will be displayed here -->
+                            <p class="youtube-results-placeholder mb-0">Select a disaster row to load related videos.</p>
                         </div>
                     </div>
                 </div>
         
                 <!-- Main Content Area for FEMA Data -->
                 <div class="col-md-9">
-                    <div class="tool-card">
+                    <div class="tool-card tool-card--results">
                         <h4><i class="bi-table me-2"></i>Disaster Declarations Table</h4>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped" id="disasterTable">
+                        <div class="disaster-detail-strip" id="disasterDetailStrip">
+                            <div class="row g-2">
+                                <div class="col-md-4 col-6">
+                                    <label class="form-label" for="inputDeclarationTitle">Declaration Title</label>
+                                    <input type="text" id="inputDeclarationTitle" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <label class="form-label" for="inputDeclarationType">Type</label>
+                                    <input type="text" id="inputDeclarationType" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <label class="form-label" for="inputIncidentType">Incident</label>
+                                    <input type="text" id="inputIncidentType" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <label class="form-label" for="inputIncidentBeginDate">Begin</label>
+                                    <input type="text" id="inputIncidentBeginDate" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <label class="form-label" for="inputIncidentEndDate">End</label>
+                                    <input type="text" id="inputIncidentEndDate" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-1 col-3">
+                                    <label class="form-label" for="inputIHProgramDeclared" title="Individual &amp; Households">IH</label>
+                                    <input type="text" id="inputIHProgramDeclared" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-1 col-3">
+                                    <label class="form-label" for="inputIAProgramDeclared" title="Individual Assistance">IA</label>
+                                    <input type="text" id="inputIAProgramDeclared" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-1 col-3">
+                                    <label class="form-label" for="inputPAProgramDeclared" title="Public Assistance">PA</label>
+                                    <input type="text" id="inputPAProgramDeclared" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-1 col-3">
+                                    <label class="form-label" for="inputHMProgramDeclared" title="Hazard Mitigation">HM</label>
+                                    <input type="text" id="inputHMProgramDeclared" class="form-control form-control-sm" readonly>
+                                </div>
+                                <div class="col-md-2 col-6">
+                                    <label class="form-label" for="inputDisasterCloseoutDate">Closeout</label>
+                                    <input type="text" id="inputDisasterCloseoutDate" class="form-control form-control-sm" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="disasterTableWrap" class="table-responsive">
+                            <table class="table table-sm table-bordered table-striped" id="disasterTable">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th>Declaration Type</th>
-                                        <th>Incident Type</th>
-                                        <th>Declaration Title</th>
-                                        <th>IH Program Declared</th>
-                                        <th>IA Program Declared</th>
-                                        <th>PA Program Declared</th>
-                                        <th>HM Program Declared</th>
-                                        <th>Incident Begin Date</th>
-                                        <th>Incident End Date</th>
-                                        <th>Disaster Closeout Date</th>
-                                    </tr>
-                                    <tr>
-                                        <td><input type="text" id="inputDeclarationType" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputIncidentType" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputDeclarationTitle" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputIHProgramDeclared" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputIAProgramDeclared" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputPAProgramDeclared" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputHMProgramDeclared" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputIncidentBeginDate" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputIncidentEndDate" class="form-control" readonly></td>
-                                        <td><input type="text" id="inputDisasterCloseoutDate" class="form-control" readonly></td>
+                                        <th>Decl. Type</th>
+                                        <th>Incident</th>
+                                        <th>Title</th>
+                                        <th title="Individual &amp; Households">IH</th>
+                                        <th title="Individual Assistance">IA</th>
+                                        <th title="Public Assistance">PA</th>
+                                        <th title="Hazard Mitigation">HM</th>
+                                        <th class="text-nowrap">Begin</th>
+                                        <th class="text-nowrap">End</th>
+                                        <th class="text-nowrap">Closeout</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -1179,7 +1252,6 @@
 
         document.getElementById('searchButton').addEventListener('click', () => {
             searchByAddress();
-            updateTimestamp();
         });
 
         document.getElementById('state').addEventListener('input', (event) => {
@@ -1216,11 +1288,16 @@
         }
 
         function populateDisasterTable(disasters) {
+            if (typeof window.refreshDisasterTableUI === 'function') {
+                window.refreshDisasterTableUI(disasters);
+                return;
+            }
             const tbody = document.querySelector('#disasterTable tbody');
             if (!tbody) return;
             tbody.innerHTML = '';
             disasters.forEach(d => {
                 const tr = document.createElement('tr');
+                const fmt = window.formatDisasterDate || ((v) => (v ? new Date(v).toLocaleDateString() : ''));
                 tr.innerHTML = `
                     <td>${d.declarationType || ''}</td>
                     <td>${d.incidentType || ''}</td>
@@ -1229,9 +1306,9 @@
                     <td>${d.iaProgramDeclared ? 'Yes' : 'No'}</td>
                     <td>${d.paProgramDeclared ? 'Yes' : 'No'}</td>
                     <td>${d.hmProgramDeclared ? 'Yes' : 'No'}</td>
-                    <td>${d.incidentBeginDate ? new Date(d.incidentBeginDate).toLocaleDateString() : ''}</td>
-                    <td>${d.incidentEndDate ? new Date(d.incidentEndDate).toLocaleDateString() : ''}</td>
-                    <td>${d.disasterCloseoutDate ? new Date(d.disasterCloseoutDate).toLocaleDateString() : ''}</td>
+                    <td>${fmt(d.incidentBeginDate)}</td>
+                    <td>${d.incidentEndDate ? fmt(d.incidentEndDate) : ''}</td>
+                    <td>${d.disasterCloseoutDate ? fmt(d.disasterCloseoutDate) : ''}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -1255,8 +1332,8 @@
                             <strong>${d.declarationTitle || d.title || ''}</strong><br>
                             ${d.incidentType || ''}<br>
                             ${d.county || ''}, ${d.state || ''}<br>
-                            Begin: ${d.incidentBeginDate ? new Date(d.incidentBeginDate).toLocaleDateString() : ''}<br>
-                            End: ${d.incidentEndDate ? new Date(d.incidentEndDate).toLocaleDateString() : ''}
+                            Begin: ${d.incidentBeginDate ? (window.formatDisasterDate ? window.formatDisasterDate(d.incidentBeginDate) : new Date(d.incidentBeginDate).toLocaleDateString()) : ''}<br>
+                            End: ${d.incidentEndDate ? (window.formatDisasterDate ? window.formatDisasterDate(d.incidentEndDate) : new Date(d.incidentEndDate).toLocaleDateString()) : 'Ongoing'}
                         </div>`
                     });
                     marker.addListener('click', () => info.open(map, marker));
@@ -1271,8 +1348,7 @@
 
         function updateTimestamp() {
             const now = new Date();
-            const timeString = now.toLocaleTimeString();
-            document.getElementById('searchTimestamp').textContent = `Last Search Performed At: ${timeString}`;
+            document.getElementById('searchTimestamp').textContent = `Last Search Performed At: ${now.toLocaleString()}`;
         }
 
         // Fallback function if Google Maps fails to load

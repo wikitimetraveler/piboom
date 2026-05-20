@@ -324,29 +324,63 @@ export function getLanePdfGalleryData() {
   };
 }
 
+const TRADING_CARD_PLACEHOLDER_FRONT = '/family/assets/lane-genealogies-title-spread.png';
+
+function isTradingCardCuratedFrontImage(url) {
+  const raw = String(url || '').trim();
+  if (!raw) return false;
+  const lower = raw.toLowerCase();
+  const placeholder = TRADING_CARD_PLACEHOLDER_FRONT.toLowerCase();
+  return lower !== placeholder && !lower.endsWith(placeholder);
+}
+
+function getTradingCardPortraitForPerson(personId) {
+  const pid = Number(personId);
+  if (!Number.isFinite(pid)) return null;
+  const doc = loadLaneTradingCards();
+  const card = doc.cards.find((entry) => Number(entry.personId) === pid);
+  if (!card) return null;
+  const frontImage = String(card.frontImage || '').trim();
+  if (!isTradingCardCuratedFrontImage(frontImage)) return null;
+  return {
+    personId: pid,
+    imageId: null,
+    publicUrl: frontImage,
+    credit: 'Lane family / genealogy compilation',
+    notes: 'First Edition trading card portrait — shared with memorial wall profile.'
+  };
+}
+
 /**
- * Curated book portraits for a single person (confirmed entries only).
+ * Curated book portraits for a single person (confirmed entries only),
+ * plus non-placeholder First Edition trading card front art when present.
  */
 export function getLanePdfPortraitsForPerson(personId) {
   const doc = loadLanePdfPersonPortraits();
-  if (!doc || !Array.isArray(doc.portraits)) return [];
   const pid = parseInt(personId, 10);
   if (Number.isNaN(pid)) return [];
-  const creditDefault = doc.creditDefault || '';
-  return doc.portraits
-    .filter(
-      (p) =>
-        p &&
-        Number(p.personId) === pid &&
-        (p.confirmed === undefined || p.confirmed === true)
-    )
-    .map((p) => ({
-      personId: pid,
-      imageId: p.imageId || null,
-      publicUrl: p.publicUrl || (p.imageId ? `/family/assets/lane-pdf/${String(p.imageId)}.jpg` : ''),
-      credit: p.credit || creditDefault,
-      notes: p.notes || ''
-    }));
+  const creditDefault = doc?.creditDefault || '';
+  const portraits = Array.isArray(doc?.portraits)
+    ? doc.portraits
+        .filter(
+          (p) =>
+            p &&
+            Number(p.personId) === pid &&
+            (p.confirmed === undefined || p.confirmed === true)
+        )
+        .map((p) => ({
+          personId: pid,
+          imageId: p.imageId || null,
+          publicUrl: p.publicUrl || (p.imageId ? `/family/assets/lane-pdf/${String(p.imageId)}.jpg` : ''),
+          credit: p.credit || creditDefault,
+          notes: p.notes || ''
+        }))
+    : [];
+  const tradingPortrait = getTradingCardPortraitForPerson(pid);
+  if (!tradingPortrait) return portraits;
+  const seen = new Set(portraits.map((p) => String(p.publicUrl || '').trim().toLowerCase()).filter(Boolean));
+  if (seen.has(tradingPortrait.publicUrl.toLowerCase())) return portraits;
+  return [tradingPortrait, ...portraits];
 }
 
 const SERVICE_SIGNAL_TERMS = [
@@ -1132,6 +1166,53 @@ function normalizeCardCitations(citations) {
     .filter(Boolean);
 }
 
+const LANE_TRADING_CARD_TAXONOMY = Object.freeze({
+  tiers: {
+    common: {
+      label: 'Common',
+      definition: 'Regular family member with basic birth, death, and household facts.'
+    },
+    notable: {
+      label: 'Notable',
+      definition: 'Occupation, town office, migration, military context, or land grant in compilation records.'
+    },
+    rare: {
+      label: 'Rare',
+      definition: 'War service, captivity narrative, famous connection, or major historical event participation.'
+    },
+    legendary: {
+      label: 'Legendary',
+      definition: 'Founder line, major branch anchors, King Philip’s War figures, and iconic family names.'
+    }
+  },
+  kinds: {
+    person: {
+      label: 'Person',
+      definition: 'Named individual in the Lane genealogy with card facts and citations.'
+    },
+    artifact: {
+      label: 'Artifact',
+      definition: 'Source page, map, grave marker, handwritten record, or plate extract.'
+    },
+    event: {
+      label: 'Event',
+      definition: 'Historical moment spanning people—war, migration, settlement, or captivity.'
+    }
+  }
+});
+
+const LANE_TRADING_CARD_KINDS = ['person', 'artifact', 'event'];
+const LANE_TRADING_CARD_RARITIES = ['common', 'notable', 'rare', 'legendary'];
+
+function normalizeTradingCardRarity(rawRarity, cardKind = 'person') {
+  let rarity = String(rawRarity || '').trim().toLowerCase();
+  if (rarity === 'uncommon') rarity = 'notable';
+  if (!LANE_TRADING_CARD_RARITIES.includes(rarity)) {
+    rarity = cardKind === 'person' ? 'common' : 'notable';
+  }
+  return rarity;
+}
+
 function normalizeTradingCard(card) {
   if (!card || typeof card !== 'object') return null;
   const cardId = String(card.cardId || '').trim().toLowerCase();
@@ -1150,8 +1231,12 @@ function normalizeTradingCard(card) {
 
   const relatedCardIds = normalizeStringArray(card.relatedCardIds).map((id) => id.toLowerCase());
   const frontImage = String(card.frontImage || '').trim();
-  const rarity = String(card.rarity || '').trim().toLowerCase();
+  const cardKindRaw = String(card.cardKind || 'person').trim().toLowerCase();
+  const cardKind = LANE_TRADING_CARD_KINDS.includes(cardKindRaw) ? cardKindRaw : 'person';
+  const rarity = normalizeTradingCardRarity(card.rarity, cardKind);
   const timelineYear = Number(card.timelineYear);
+  const artifactType = String(card.artifactType || '').trim();
+  const eventSlug = String(card.eventSlug || '').trim();
 
   return {
     cardId,
@@ -1164,9 +1249,32 @@ function normalizeTradingCard(card) {
     citations,
     tags,
     relatedCardIds,
+    cardKind,
+    rarity,
     ...(frontImage ? { frontImage } : {}),
-    ...(rarity ? { rarity } : {}),
+    ...(artifactType ? { artifactType } : {}),
+    ...(eventSlug ? { eventSlug } : {}),
     ...(Number.isFinite(timelineYear) ? { timelineYear } : {})
+  };
+}
+
+function normalizeTimelineSpineEntry(entry, cardIds) {
+  if (!entry || typeof entry !== 'object') return null;
+  const year = Number(entry.year);
+  const label = String(entry.label || '').trim();
+  if (!Number.isFinite(year) || !label) return null;
+  const cardId = String(entry.cardId || '').trim().toLowerCase();
+  if (cardId && !cardIds.has(cardId)) return null;
+  const personId = Number(entry.personId);
+  const beatKind = String(entry.beatKind || '').trim().toLowerCase();
+  const notes = String(entry.notes || '').trim();
+  return {
+    year,
+    label,
+    ...(cardId ? { cardId } : {}),
+    ...(Number.isFinite(personId) ? { personId } : {}),
+    ...(beatKind ? { beatKind } : {}),
+    ...(notes ? { notes } : {})
   };
 }
 
@@ -1178,12 +1286,24 @@ function loadLaneTradingCards() {
       const p = path.join(__dirname, '..', 'data', 'lane-trading-cards-first-edition.json');
       return JSON.parse(fs.readFileSync(p, 'utf-8'));
     })();
+    const cards = Array.isArray(parsed?.cards)
+      ? parsed.cards.map((card) => normalizeTradingCard(card)).filter(Boolean)
+      : [];
+    const cardIds = new Set(cards.map((card) => card.cardId));
+    const timelineSpine = Array.isArray(parsed?.timelineSpine)
+      ? parsed.timelineSpine
+          .map((entry) => normalizeTimelineSpineEntry(entry, cardIds))
+          .filter(Boolean)
+          .sort((a, b) => a.year - b.year || a.label.localeCompare(b.label))
+      : [];
     laneTradingCardsCache = {
       version: Number(parsed?.version) || 1,
       edition: String(parsed?.edition || 'First Edition'),
       generatedAt: String(parsed?.generatedAt || ''),
       sourceLabel: String(parsed?.sourceLabel || 'Lane Genealogies Vol. I (1891)'),
-      cards: Array.isArray(parsed?.cards) ? parsed.cards.map((card) => normalizeTradingCard(card)).filter(Boolean) : []
+      taxonomyVersion: Number(parsed?.taxonomyVersion) || 1,
+      timelineSpine,
+      cards
     };
   } catch {
     laneTradingCardsCache = {
@@ -1191,6 +1311,8 @@ function loadLaneTradingCards() {
       edition: 'First Edition',
       generatedAt: '',
       sourceLabel: 'Lane Genealogies Vol. I (1891)',
+      taxonomyVersion: 1,
+      timelineSpine: [],
       cards: []
     };
   }
@@ -1212,13 +1334,30 @@ function enrichLaneTradingCard(card, personById) {
   };
 }
 
+function enrichTimelineSpineBeat(beat, cardById) {
+  const card = beat.cardId ? cardById.get(beat.cardId) || null : null;
+  return {
+    ...beat,
+    ...(card
+      ? {
+          cardRarity: card.rarity,
+          cardKind: card.cardKind,
+          cardTitle: card.title
+        }
+      : {})
+  };
+}
+
 export function getLaneTradingCards(filters = {}) {
   const doc = loadLaneTradingCards();
   const people = getAllPeople();
   const personById = new Map(people.map((person) => [Number(person.id), person]));
+  const cardById = new Map(doc.cards.map((card) => [card.cardId, card]));
   const eraFilter = String(filters.era || '').trim().toLowerCase();
   const tagFilter = String(filters.tag || '').trim().toLowerCase();
   const branchFilter = String(filters.branch || '').trim().toLowerCase();
+  const kindFilter = String(filters.cardKind || filters.kind || '').trim().toLowerCase();
+  const rarityFilter = String(filters.rarity || '').trim().toLowerCase();
   const qFilter = String(filters.q || '').trim().toLowerCase();
   const personIdFilter = Number(filters.personId);
 
@@ -1226,10 +1365,23 @@ export function getLaneTradingCards(filters = {}) {
     .filter((card) => (eraFilter ? card.era.toLowerCase() === eraFilter : true))
     .filter((card) => (tagFilter ? card.tags.includes(tagFilter) : true))
     .filter((card) => (branchFilter ? card.branch.toLowerCase() === branchFilter : true))
+    .filter((card) => (kindFilter ? card.cardKind === kindFilter : true))
+    .filter((card) => (rarityFilter ? card.rarity === rarityFilter : true))
     .filter((card) => (Number.isFinite(personIdFilter) ? card.personId === personIdFilter : true))
     .filter((card) => {
       if (!qFilter) return true;
-      const haystack = [card.cardId, card.title, card.summary, card.era, card.branch, card.tags.join(' ')].join(' ').toLowerCase();
+      const haystack = [
+        card.cardId,
+        card.title,
+        card.summary,
+        card.era,
+        card.branch,
+        card.rarity,
+        card.cardKind,
+        card.tags.join(' ')
+      ]
+        .join(' ')
+        .toLowerCase();
       return haystack.includes(qFilter);
     })
     .map((card) => enrichLaneTradingCard(card, personById))
@@ -1240,21 +1392,38 @@ export function getLaneTradingCards(filters = {}) {
       return a.title.localeCompare(b.title);
     });
 
+  const filteredCardIds = new Set(cards.map((card) => card.cardId));
   const eras = compactUnique(doc.cards.map((card) => card.era));
   const branches = compactUnique(doc.cards.map((card) => card.branch));
   const tags = compactUnique(doc.cards.flatMap((card) => card.tags)).sort((a, b) =>
     a.localeCompare(b, undefined, { sensitivity: 'base' })
   );
+  const kinds = LANE_TRADING_CARD_KINDS.slice();
+  const rarities = LANE_TRADING_CARD_RARITIES.slice();
+  const timelineSpine = (doc.timelineSpine || [])
+    .filter((beat) => {
+      if (!beat.cardId) {
+        if (!qFilter) return true;
+        return `${beat.year} ${beat.label}`.toLowerCase().includes(qFilter);
+      }
+      return filteredCardIds.has(beat.cardId);
+    })
+    .map((beat) => enrichTimelineSpineBeat(beat, cardById));
 
   return {
     version: doc.version,
     edition: doc.edition,
     generatedAt: doc.generatedAt,
     sourceLabel: doc.sourceLabel,
+    taxonomyVersion: doc.taxonomyVersion || 1,
+    taxonomy: LANE_TRADING_CARD_TAXONOMY,
     count: cards.length,
     eras,
     branches,
     tags,
+    kinds,
+    rarities,
+    timelineSpine,
     cards
   };
 }
@@ -1279,9 +1448,14 @@ export function getWarParticipants(warSlug) {
   const war = WAR_DEFINITIONS[key];
   if (!war) return [];
   const people = getAllPeople();
+  const CURATED_WAR_SLUG_BY_PERSON_ID = {
+    1024: 'mexican-american-war'
+  };
 
   return people
     .map((person) => {
+      const curatedWarSlug = CURATED_WAR_SLUG_BY_PERSON_ID[Number(person?.id)];
+      if (curatedWarSlug && curatedWarSlug !== key) return null;
       const scored = scoreWarMatch(person, war);
       if (!scored) return null;
       return {
@@ -1332,6 +1506,9 @@ export function getMilitaryDeepScanReport() {
   const byConflict = Object.fromEntries(
     Object.values(WAR_DEFINITIONS).map((w) => [w.slug, { war: w, participants: [] }])
   );
+  const CURATED_WAR_SLUG_BY_PERSON_ID = {
+    1024: 'mexican-american-war'
+  };
   const suspicious = [];
   let serviceSignalHits = 0;
 
@@ -1342,6 +1519,8 @@ export function getMilitaryDeepScanReport() {
 
     let matchedAny = false;
     for (const war of Object.values(WAR_DEFINITIONS)) {
+      const curatedWarSlug = CURATED_WAR_SLUG_BY_PERSON_ID[Number(person?.id)];
+      if (curatedWarSlug && war.slug !== curatedWarSlug) continue;
       const scored = scoreWarMatch(person, war);
       if (!scored) continue;
       matchedAny = true;

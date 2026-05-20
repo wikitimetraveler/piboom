@@ -100,8 +100,21 @@ const CAMPAIGN_CONTEXT = {
   ],
   'mexican-american-war': [
     { year: 1846, event: 'War opens across Texas, northern Mexico, and Pacific routes.' },
-    { year: 1847, event: 'Campaigns toward Mexico City draw volunteers and regular forces.' },
-    { year: 1848, event: 'Treaty of Guadalupe Hidalgo redraws U.S. territorial boundaries.' }
+    {
+      year: 1847,
+      event:
+        'Major campaigns include Veracruz and the march toward Mexico City; volunteer service and federal regulars overlap in records.'
+    },
+    {
+      year: 1848,
+      event:
+        'Treaty of Guadalupe Hidalgo closes formal hostilities and reshapes U.S. borders; many veterans then appear in western migration records.'
+    },
+    {
+      year: 1849,
+      event:
+        'Gold Rush migration follows for many veterans. In Lane records, Captain Aaron G. Lane is noted as a Mexican-American War veteran and Forty-niner.'
+    }
   ],
   'civil-war': [
     { year: 1861, event: 'Secession crisis escalates to national civil war.' },
@@ -219,6 +232,14 @@ function associationLabel(entry) {
   return entry?.associationType === 'family-associated' ? 'Family-associated' : 'Service member';
 }
 
+function participantCampaignNote(entry) {
+  const personId = Number(entry?.person?.id);
+  if (activeWarSlug === 'mexican-american-war' && personId === 1024) {
+    return 'Mexican-American War veteran; Forty-niner; later associated with Lane\'s Crossing on the Mojave River (1859).';
+  }
+  return '';
+}
+
 function renderCampaignButtons() {
   const host = document.getElementById('campaignButtons');
   host.setAttribute('role', 'tablist');
@@ -307,6 +328,7 @@ function renderParticipantsList() {
       const p = entry.person || {};
       const place = (entry.places && entry.places[0]) || p.born || 'Location unresolved';
       const association = associationLabel(entry);
+      const note = participantCampaignNote(entry);
       const metaId = `participantMeta-${esc(String(p.id || 'unknown'))}`;
       return `
         <button type="button" class="participant-item participant-item-btn" data-person-id="${esc(p.id)}" aria-describedby="${metaId}">
@@ -317,6 +339,7 @@ function renderParticipantsList() {
           <div id="${metaId}" class="small text-muted">${esc(p.birthYear || '?')} - ${esc(p.deathYear || '?')}</div>
           <div class="small ${entry.associationType === 'family-associated' ? 'text-warning' : 'text-muted'}">${esc(association)}</div>
           <div class="small">${esc(place)}</div>
+          ${note ? `<div class="small text-info">${esc(note)}</div>` : ''}
         </button>
       `;
     })
@@ -370,6 +393,7 @@ function openSoldierModal(personId) {
     .slice(0, 3)
     .map((n) => `<li>${esc(n)}</li>`)
     .join('');
+  const campaignNote = participantCampaignNote(entry);
   const associatedPeopleText = (entry.associatedPeople || []).join(' | ');
   body.innerHTML = `
     <div class="mb-2">
@@ -384,6 +408,7 @@ function openSoldierModal(personId) {
     }
     <p><strong>Years:</strong> ${esc(p.birthYear || '?')} - ${esc(p.deathYear || '?')}</p>
     <p><strong>Places:</strong> ${esc((entry.places || []).join(' | ') || 'Unresolved')}</p>
+    ${campaignNote ? `<p class="small text-info mb-2"><strong>Campaign note:</strong> ${esc(campaignNote)}</p>` : ''}
     <div class="evidence-box">
       <strong>Evidence snippets</strong>
       <ul class="mb-0 mt-2">

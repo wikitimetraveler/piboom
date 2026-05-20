@@ -5,11 +5,33 @@
 (function () {
   const LEGACY_PLACEHOLDER_FRONT_IMAGE = '/family/assets/lane-genealogies-title-spread.png';
   const DEFAULT_CARD_COVER_IMAGE = '/family/assets/DavidELane.png';
+  const CURATED_CARD_FRONT_IMAGE_BY_ID = Object.freeze({
+    'samuel-lane-ii': '/family/assets/samuel-lane.png',
+    'mary-brewer-lane': '/family/assets/mary-brewer-lane.png',
+    'sarah-dickinson-lane': '/family/assets/sarah-dickinson-lane.png',
+    'cornet-john-lane-iv': '/family/assets/cornet-john-lane.png',
+    'jonathan-homer-lane': '/family/assets/jonathan-homer-lane.png',
+    'captain-aaron-g-lane': '/family/assets/aaron-g-lane.png',
+    'event-king-philips-war': '/family/assets/lane-genealogies-title-spread.png',
+    'event-french-indian-frontier': '/family/assets/cornet-john-lane.png',
+    'event-hampton-settlement': '/family/assets/lane-genealogies-title-spread.png',
+    'event-boston-migration': '/family/assets/william-e-lane-boston-hero.png',
+    'event-captivity-canada-1704': '/family/assets/sarah-dickinson-lane.png',
+    'artifact-lane-genealogies-title-1891': '/family/assets/lane-genealogies-title-spread.png',
+    'artifact-plate-p4-i0': '/family/assets/lane-pdf/p4-i0.jpg',
+    'artifact-plate-opening-boston': '/family/assets/william-e-lane-boston-hero.png',
+    'museum-frontispiece-context': '/family/assets/lane-historians/frontispiece-title-1891.png'
+  });
+  const VIEW_STORAGE_KEY = 'laneTradingCardsView';
   const DEFAULT_CARD_DATES = 'Unknown - Unknown';
   const state = {
     cards: [],
     filteredCards: [],
-    selectedCard: null
+    filteredTimeline: [],
+    timelineSpine: [],
+    taxonomy: null,
+    selectedCard: null,
+    viewMode: 'cards'
   };
 
   function $(id) {
@@ -36,6 +58,61 @@
 
   function normalizeText(text) {
     return String(text || '').toLowerCase().trim();
+  }
+
+  function tierLabel(rarity) {
+    const key = normalizeText(rarity);
+    const fromTaxonomy = state.taxonomy?.tiers?.[key]?.label;
+    if (fromTaxonomy) return fromTaxonomy;
+    if (!key) return '';
+    return key.charAt(0).toUpperCase() + key.slice(1);
+  }
+
+  function kindLabel(cardKind) {
+    const key = normalizeText(cardKind || 'person');
+    const fromTaxonomy = state.taxonomy?.kinds?.[key]?.label;
+    if (fromTaxonomy) return fromTaxonomy;
+    if (key === 'artifact') return 'Artifact';
+    if (key === 'event') return 'Event';
+    return '';
+  }
+
+  function tierDefinition(rarity) {
+    const key = normalizeText(rarity);
+    return state.taxonomy?.tiers?.[key]?.definition || '';
+  }
+
+  function buildMetaPills() {
+    return '';
+  }
+
+  function cardArticleClass(card) {
+    const kind = normalizeText(card?.cardKind || 'person');
+    const rarity = normalizeText(card?.rarity || '');
+    return ['ltc-card', 'ltc-card--clickable', kind !== 'person' ? `ltc-card--${kind}` : '', rarity ? `ltc-card--${rarity}` : '']
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  function renderCatalogKey() {
+    const host = $('ltcCatalogKeyBody');
+    if (!host || !state.taxonomy) return;
+    const tiers = state.taxonomy.tiers || {};
+    const kinds = state.taxonomy.kinds || {};
+    const tierRows = Object.entries(tiers)
+      .map(
+        ([key, entry]) =>
+          `<dt class="ltc-catalog-key__term ltc-tier--${esc(key)}">${esc(entry.label || key)}</dt><dd class="ltc-catalog-key__def">${esc(entry.definition || '')}</dd>`
+      )
+      .join('');
+    const kindRows = Object.entries(kinds)
+      .filter(([key]) => key !== 'person')
+      .map(
+        ([key, entry]) =>
+          `<dt class="ltc-catalog-key__term ltc-kind--${esc(key)}">${esc(entry.label || key)}</dt><dd class="ltc-catalog-key__def">${esc(entry.definition || '')}</dd>`
+      )
+      .join('');
+    host.innerHTML = `<dl class="ltc-catalog-key__list">${tierRows}${kindRows}</dl>`;
   }
 
   function qrEnabled() {
@@ -91,11 +168,14 @@
   }
 
   function resolveCardFrontSrc(card) {
+    const curated = CURATED_CARD_FRONT_IMAGE_BY_ID[String(card?.cardId || '')];
+    if (curated) return curated;
     const raw = String(card?.frontImage || '').trim();
     return isMissingOrPlaceholderFront(raw) ? DEFAULT_CARD_COVER_IMAGE : raw;
   }
 
   function cardUsesDefaultCoverImage(card) {
+    if (CURATED_CARD_FRONT_IMAGE_BY_ID[String(card?.cardId || '')]) return false;
     return isMissingOrPlaceholderFront(card?.frontImage);
   }
 
@@ -191,11 +271,12 @@
       .map((card) => {
         const tags = (card.tags || []).slice(0, 3);
         return `
-          <article class="ltc-card ltc-card--clickable" data-card-id="${esc(card.cardId)}" role="button" tabindex="0" aria-label="Open card ${esc(
+          <article class="${cardArticleClass(card)}" data-card-id="${esc(card.cardId)}" role="button" tabindex="0" aria-label="Open card ${esc(
             card.title
           )}">
             ${buildCardFaceMarkup(card, { qrSlot: true, qrSize: 58 })}
             <div class="ltc-card-body">
+              ${buildMetaPills(card)}
               <div class="ltc-card-meta">${esc(card.era)} · ${esc(card.branch)}</div>
               <h3 class="h6 mb-1 mt-1">${esc(card.title)}</h3>
               <p class="ltc-card-summary">${esc(card.summary)}</p>
@@ -232,29 +313,150 @@
     renderGridQrs(cards);
   }
 
-  function applyFilters() {
-    const q = normalizeText($('ltcSearch').value);
-    const era = normalizeText($('ltcEra').value);
-    const branch = normalizeText($('ltcBranch').value);
-    const tag = normalizeText($('ltcTag').value);
-    state.filteredCards = state.cards.filter((card) => {
+  function filterCardsClient(cards) {
+    const q = normalizeText($('ltcSearch')?.value);
+    const era = normalizeText($('ltcEra')?.value);
+    const branch = normalizeText($('ltcBranch')?.value);
+    const tag = normalizeText($('ltcTag')?.value);
+    const kind = normalizeText($('ltcKind')?.value);
+    const rarity = normalizeText($('ltcRarity')?.value);
+    const filteredCardIds = new Set();
+
+    const filtered = (Array.isArray(cards) ? cards : []).filter((card) => {
       if (era && normalizeText(card.era) !== era) return false;
       if (branch && normalizeText(card.branch) !== branch) return false;
       if (tag && !(card.tags || []).map(normalizeText).includes(tag)) return false;
-      if (!q) return true;
+      if (kind && normalizeText(card.cardKind || 'person') !== kind) return false;
+      if (rarity && normalizeText(card.rarity) !== rarity) return false;
+      if (!q) {
+        filteredCardIds.add(card.cardId);
+        return true;
+      }
       const haystack = [
         card.title,
         card.summary,
         card.era,
         card.branch,
+        card.rarity,
+        card.cardKind,
         (card.tags || []).join(' '),
         card.personDisplay?.name || ''
       ]
         .join(' ')
         .toLowerCase();
-      return haystack.includes(q);
+      const match = haystack.includes(q);
+      if (match) filteredCardIds.add(card.cardId);
+      return match;
     });
-    renderGrid(state.filteredCards);
+
+    const spineBeats = (state.timelineSpine || []).filter((beat) => {
+      if (beat.cardId && !filteredCardIds.has(beat.cardId)) return false;
+      if (!q) return true;
+      return `${beat.year} ${beat.label} ${beat.notes || ''}`.toLowerCase().includes(q);
+    });
+    const filteredTimeline = buildMergedTimeline(spineBeats, filtered);
+
+    return { filtered, filteredTimeline };
+  }
+
+  /** Curated spine beats win copy; add filtered cards with timelineYear not already on spine. */
+  function buildMergedTimeline(spineBeats, filteredCards) {
+    const spineCardIds = new Set((spineBeats || []).map((beat) => beat.cardId).filter(Boolean));
+    const merged = (spineBeats || []).map((beat) => ({ ...beat }));
+    (filteredCards || []).forEach((card) => {
+      if (!Number.isFinite(card.timelineYear) || spineCardIds.has(card.cardId)) return;
+      merged.push({
+        year: card.timelineYear,
+        label: card.title,
+        cardId: card.cardId,
+        cardRarity: card.rarity,
+        cardKind: card.cardKind || 'person',
+        beatKind: 'catalog'
+      });
+    });
+    merged.sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return String(a.label).localeCompare(String(b.label));
+    });
+    return merged;
+  }
+
+  function applyFilters() {
+    const { filtered, filteredTimeline } = filterCardsClient(state.cards);
+    state.filteredCards = filtered;
+    state.filteredTimeline = filteredTimeline;
+    renderActiveView();
+  }
+
+  function renderTimeline(beats) {
+    const host = $('ltcTimeline');
+    if (!host) return;
+    const rows = Array.isArray(beats) ? beats : [];
+    $('ltcCount').textContent =
+      state.viewMode === 'timeline'
+        ? `${rows.length} timeline beat${rows.length === 1 ? '' : 's'}`
+        : `${state.filteredCards.length} card${state.filteredCards.length === 1 ? '' : 's'}`;
+    if (!rows.length) {
+      host.innerHTML = '<div class="text-muted">No timeline beats match these filters.</div>';
+      return;
+    }
+    host.innerHTML = rows
+      .map((beat) => {
+        const clickable = Boolean(beat.cardId);
+        const note = beat.notes ? `<div class="ltc-timeline-note">${esc(beat.notes)}</div>` : '';
+        return `
+          <article class="ltc-timeline-row${clickable ? ' ltc-timeline-row--clickable' : ''}"
+            ${clickable ? `data-card-id="${esc(beat.cardId)}" role="button" tabindex="0"` : ''}>
+            <div class="ltc-timeline-track" aria-hidden="true"><span class="ltc-timeline-dot"></span></div>
+            <div class="ltc-timeline-year">${esc(String(beat.year))}</div>
+            <div class="ltc-timeline-body">
+              <div class="ltc-timeline-label">${esc(beat.label)}</div>
+              ${note}
+            </div>
+          </article>
+        `;
+      })
+      .join('');
+
+    host.querySelectorAll('.ltc-timeline-row--clickable').forEach((row) => {
+      const open = () => openCard(row.getAttribute('data-card-id'), true);
+      row.addEventListener('click', open);
+      row.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        open();
+      });
+    });
+  }
+
+  function setViewMode(mode, updateUrl = true) {
+    const next = mode === 'timeline' ? 'timeline' : 'cards';
+    state.viewMode = next;
+    try {
+      sessionStorage.setItem(VIEW_STORAGE_KEY, next);
+    } catch (_) {
+      /* ignore */
+    }
+    $('ltcViewCards')?.classList.toggle('active', next === 'cards');
+    $('ltcViewTimeline')?.classList.toggle('active', next === 'timeline');
+    $('ltcViewCards')?.setAttribute('aria-pressed', next === 'cards' ? 'true' : 'false');
+    $('ltcViewTimeline')?.setAttribute('aria-pressed', next === 'timeline' ? 'true' : 'false');
+    if (updateUrl) {
+      const url = new URL(window.location.href);
+      if (next === 'timeline') url.searchParams.set('view', 'timeline');
+      else url.searchParams.delete('view');
+      window.history.replaceState({}, '', url.toString());
+    }
+    renderActiveView();
+  }
+
+  function renderActiveView() {
+    const isTimeline = state.viewMode === 'timeline';
+    $('ltcGrid')?.toggleAttribute('hidden', isTimeline);
+    $('ltcTimeline')?.toggleAttribute('hidden', !isTimeline);
+    $('ltcTimelineHint')?.toggleAttribute('hidden', !isTimeline);
+    if (isTimeline) renderTimeline(state.filteredTimeline);
+    else renderGrid(state.filteredCards);
   }
 
   function setCardParam(cardId) {
@@ -280,13 +482,23 @@
           .join('')}</div>`
       : '<p class="small text-muted mb-0">No related cards listed.</p>';
     $('ltcDetailModalTitle').textContent = `${card.title} · Card detail`;
+    const tierLine = card.rarity
+      ? `<p class="small mb-2"><strong>Catalog tier:</strong> ${esc(tierLabel(card.rarity))} — ${esc(tierDefinition(card.rarity))}</p>`
+      : '';
+    const kindLine =
+      card.cardKind && card.cardKind !== 'person'
+        ? `<p class="small mb-2"><strong>Card kind:</strong> ${esc(kindLabel(card.cardKind))}</p>`
+        : '';
     $('ltcDetailBody').innerHTML = `
       <div class="row g-3">
         <div class="col-md-4">
           ${buildCardFaceMarkup(card, { qrDataUrl, qrSlot: false, qrSize: 70 })}
           <p class="small text-muted mt-2 mb-0">${esc(card.era)} · ${esc(card.branch)}</p>
+          ${buildMetaPills(card)}
         </div>
         <div class="col-md-8">
+          ${tierLine}
+          ${kindLine}
           <p class="mb-2">${esc(card.summary)}</p>
           <p class="history-context-evidence-note small"><strong>Context:</strong> era/branch framing. <strong>Evidence:</strong> facts and citations below.</p>
           <h3 class="h6 mb-1">Evidence facts</h3>
@@ -498,7 +710,11 @@
         (card, index) => `
           <section style="page-break-inside: avoid; border:1px solid #bbb; padding:10px; margin-bottom:10px;">
             <h3 style="margin:0 0 4px;font-size:16px;">${index + 1}. ${esc(card.title)}</h3>
-            <div style="font-size:12px;color:#555;margin-bottom:6px;">${esc(card.era)} · ${esc(card.branch)}</div>
+            <div style="font-size:12px;color:#555;margin-bottom:6px;">${esc(card.era)} · ${esc(card.branch)}${
+              card.rarity ? ` · ${esc(tierLabel(card.rarity))}` : ''
+            }${
+              card.cardKind && card.cardKind !== 'person' ? ` · ${esc(kindLabel(card.cardKind))}` : ''
+            }</div>
             <p style="font-size:12px;margin:0 0 4px;">${esc(card.summary)}</p>
             <div style="font-size:11px;color:#222;"><strong>Key facts:</strong> ${(card.facts || []).slice(0, 2).map(esc).join(' · ')}</div>
           </section>
@@ -515,24 +731,43 @@
       $('ltcError').textContent = '';
       const data = await getJson('/api/genealogy/lane-cards');
       state.cards = Array.isArray(data.cards) ? data.cards : [];
-      state.filteredCards = state.cards.slice();
+      state.timelineSpine = Array.isArray(data.timelineSpine) ? data.timelineSpine : [];
+      state.taxonomy = data.taxonomy || null;
 
       setOptions($('ltcEra'), data.eras || [], 'All eras');
       setOptions($('ltcBranch'), data.branches || [], 'All branches');
       setOptions($('ltcTag'), data.tags || [], 'All tags');
-      renderGrid(state.cards);
+      renderCatalogKey();
 
-      ['ltcSearch', 'ltcEra', 'ltcBranch', 'ltcTag'].forEach((id) => {
-        $(id).addEventListener('input', applyFilters);
-        $(id).addEventListener('change', applyFilters);
+      const params = new URLSearchParams(window.location.search);
+      const viewParam = normalizeText(params.get('view'));
+      let initialView = 'cards';
+      try {
+        const stored = sessionStorage.getItem(VIEW_STORAGE_KEY);
+        if (viewParam === 'timeline') initialView = 'timeline';
+        else if (viewParam === 'cards') initialView = 'cards';
+        else if (stored === 'timeline' || stored === 'cards') initialView = stored;
+      } catch (_) {
+        if (viewParam === 'timeline') initialView = 'timeline';
+      }
+      setViewMode(initialView, false);
+      applyFilters();
+
+      ['ltcSearch', 'ltcEra', 'ltcBranch', 'ltcTag', 'ltcKind', 'ltcRarity'].forEach((id) => {
+        $(id)?.addEventListener('input', applyFilters);
+        $(id)?.addEventListener('change', applyFilters);
       });
-      $('ltcReset').addEventListener('click', () => {
+      $('ltcReset')?.addEventListener('click', () => {
         $('ltcSearch').value = '';
         $('ltcEra').value = '';
         $('ltcBranch').value = '';
         $('ltcTag').value = '';
+        $('ltcKind').value = '';
+        $('ltcRarity').value = '';
         applyFilters();
       });
+      $('ltcViewCards')?.addEventListener('click', () => setViewMode('cards'));
+      $('ltcViewTimeline')?.addEventListener('click', () => setViewMode('timeline'));
 
       $('ltcSinglePng').addEventListener('click', () => exportSingleCard(false));
       $('ltcSinglePdf').addEventListener('click', () => exportSingleCard(true));
@@ -542,7 +777,7 @@
       if ($('ltcSheetPng')) $('ltcSheetPng').textContent = 'Export Front + Back PNG';
       if ($('ltcSheetPdf')) $('ltcSheetPdf').textContent = 'Export Front + Back PDF';
       $('ltcIncludeQr')?.addEventListener('change', () => {
-        renderGrid(state.filteredCards);
+        renderActiveView();
         if (state.selectedCard) renderCardDetail(state.selectedCard);
       });
 

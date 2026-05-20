@@ -92,6 +92,34 @@ document.addEventListener('DOMContentLoaded', () => {
   `; document.head.appendChild(style);
 });
 
+/** Pages without modern-navbar still get click-to-expand images. */
+(function initLaneImageLightboxFallback() {
+  function tryInit() {
+    if (window.LaneImageLightbox?.bound) return;
+    if (document.querySelector('modern-navbar')) return;
+    if (!document.querySelector('link[href="/shared/lane-image-lightbox.css"]')) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '/shared/lane-image-lightbox.css';
+      document.head.appendChild(link);
+    }
+    const run = () => window.LaneImageLightbox?.init();
+    if (window.LaneImageLightbox) {
+      run();
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = '/shared/lane-image-lightbox.js';
+    script.onload = run;
+    document.head.appendChild(script);
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryInit);
+  } else {
+    tryInit();
+  }
+})();
+
 // ===== UNIVERSAL GOOGLE CLOUD TTS SPEECH FUNCTION =====
 // Available to ALL pages in the app!
 let currentAudio = null; // Track currently playing audio

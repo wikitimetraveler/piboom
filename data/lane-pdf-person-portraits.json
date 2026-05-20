@@ -45,6 +45,30 @@
       "publicUrl": "/family/assets/aaron-g-lane.png",
       "credit": "Lane family / genealogy compilation",
       "notes": "Captain Aaron G. Lane exhibit portrait for museum card, memorial wall profile, and plate/provenance continuity."
+    },
+    {
+      "personId": 3,
+      "publicUrl": "/family/assets/mary-brewer-lane.png",
+      "credit": "Lane family / genealogy compilation",
+      "notes": "Mary (Brewer) Lane — second wife of William I; trading card + museum exhibit."
+    },
+    {
+      "personId": 6,
+      "publicUrl": "/family/assets/samuel-lane.png",
+      "credit": "Lane family / genealogy compilation",
+      "notes": "Samuel² Lane — Boston/Hadley line; King Philip's War (Turner) context in Vol. I."
+    },
+    {
+      "personId": 13,
+      "publicUrl": "/family/assets/sarah-dickinson-lane.png",
+      "credit": "Lane family / genealogy compilation",
+      "notes": "Sarah Dickinson Lane — Hadley household; captivity narrative."
+    },
+    {
+      "personId": 94,
+      "publicUrl": "/family/assets/jonathan-homer-lane.png",
+      "credit": "Lane family / genealogy compilation",
+      "notes": "Jonathan Homer Lane — astrophysicist; trading card + museum exhibit; lunar crater namesake."
     }
   ]
 }

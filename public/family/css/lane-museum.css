@@ -1042,6 +1042,16 @@ body.archiveLight .museum-poster-modal-content .modal-header .btn-close.museum-p
   min-width: 0;
 }
 
+#museumPosterContent.lane-poster-expandable {
+  cursor: zoom-in;
+}
+
+#museumPosterContent.lane-poster-expandable:hover,
+#museumPosterContent.lane-poster-expandable:focus-visible {
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.45), 0 12px 30px rgba(0, 0, 0, 0.2);
+  outline: none;
+}
+
 .museum-poster-frame .poster-cover,
 #museumPosterContent .poster-cover {
   width: 100%;

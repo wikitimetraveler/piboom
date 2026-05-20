@@ -8,6 +8,7 @@
 (function () {
   const LINKS = [
     { href: '/family/lane-family.html', label: 'Hub' },
+    { href: '/family/lane-magazine.html', label: 'Issue 1' },
     { href: '/family/lane-historians.html', label: 'Historians' },
     { href: '/family/lane-museum.html', label: 'Museum' },
     { href: '/family/lane-trading-cards.html', label: 'Cards' },

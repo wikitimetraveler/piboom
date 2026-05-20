@@ -355,3 +355,236 @@
     width: 100%;
   }
 }
+
+/* Catalog key — archival tier definitions */
+.ltc-catalog-key {
+  margin-top: 0.75rem;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 10px;
+  background: rgba(12, 15, 22, 0.55);
+}
+
+.ltc-catalog-key__summary {
+  cursor: pointer;
+  padding: 0.55rem 0.75rem;
+  color: #d4c48a;
+  font-size: 0.88rem;
+}
+
+.ltc-catalog-key__body {
+  padding: 0 0.75rem 0.75rem;
+}
+
+.ltc-catalog-key__list {
+  display: grid;
+  grid-template-columns: minmax(88px, auto) 1fr;
+  gap: 0.35rem 0.75rem;
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.ltc-catalog-key__term {
+  margin: 0;
+  color: #e9d6a0;
+  font-weight: 600;
+}
+
+.ltc-catalog-key__def {
+  margin: 0;
+  color: #c5cad6;
+}
+
+/* Tier + kind pills */
+.ltc-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.35rem;
+}
+
+.ltc-pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.ltc-pill--tier {
+  background: rgba(28, 34, 48, 0.92);
+  color: #d8dce8;
+  border-color: rgba(180, 188, 205, 0.35);
+}
+
+.ltc-tier--notable {
+  border-color: rgba(168, 178, 198, 0.45);
+  color: #dbe2ef;
+}
+
+.ltc-tier--rare {
+  border-color: rgba(176, 152, 98, 0.55);
+  color: #e8d4a8;
+  background: rgba(42, 36, 22, 0.55);
+}
+
+.ltc-tier--legendary {
+  border-color: rgba(212, 175, 55, 0.65);
+  color: #f0dfaa;
+  background: rgba(48, 40, 18, 0.62);
+  box-shadow: inset 0 0 0 1px rgba(212, 175, 55, 0.18);
+}
+
+.ltc-pill--kind {
+  background: rgba(24, 30, 42, 0.88);
+  color: #c8d0df;
+  border-color: rgba(140, 152, 172, 0.4);
+}
+
+.ltc-kind--artifact {
+  border-color: rgba(148, 132, 98, 0.55);
+  color: #e6dcc4;
+}
+
+.ltc-kind--event {
+  border-color: rgba(118, 138, 168, 0.55);
+  color: #d4e0f0;
+}
+
+.ltc-kind--person {
+  border-color: rgba(160, 168, 188, 0.4);
+  color: #c8cedc;
+}
+
+.ltc-card-kind-ribbon {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.45rem;
+  z-index: 2;
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(12, 15, 22, 0.78);
+  border: 1px solid rgba(180, 188, 205, 0.35);
+  color: #e8ebf2;
+}
+
+.ltc-card-tier-badge {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.45rem;
+  z-index: 2;
+  border-radius: 999px;
+  padding: 0.14rem 0.42rem;
+  font-size: 0.56rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: rgba(12, 15, 22, 0.82);
+  border: 1px solid rgba(180, 188, 205, 0.35);
+  color: #d8dce8;
+}
+
+.ltc-card-tier-badge.ltc-tier--legendary {
+  border-color: rgba(212, 175, 55, 0.65);
+  color: #f0dfaa;
+}
+
+.ltc-card--artifact .ltc-card-face {
+  box-shadow: inset 0 0 0 2px rgba(168, 148, 102, 0.35);
+}
+
+.ltc-card--event .ltc-card-art::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  z-index: 2;
+  background: linear-gradient(90deg, rgba(118, 138, 168, 0.85), rgba(168, 178, 198, 0.45));
+}
+
+.ltc-card--legendary {
+  border-color: rgba(212, 175, 55, 0.48);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.26), inset 0 0 0 1px rgba(212, 175, 55, 0.12);
+}
+
+/* Timeline view */
+.ltc-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 12px;
+  background: rgba(17, 21, 30, 0.72);
+  padding: 0.75rem 0.85rem;
+}
+
+.ltc-timeline-row {
+  display: grid;
+  grid-template-columns: 18px 72px 1fr;
+  gap: 0.65rem 0.85rem;
+  align-items: start;
+  padding: 0.65rem 0.35rem;
+  border-bottom: 1px solid rgba(180, 188, 205, 0.12);
+}
+
+.ltc-timeline-row:last-child {
+  border-bottom: 0;
+}
+
+.ltc-timeline-track {
+  position: relative;
+  align-self: stretch;
+  border-left: 2px solid rgba(212, 175, 55, 0.35);
+  margin-left: 7px;
+}
+
+.ltc-timeline-dot {
+  position: absolute;
+  left: -5px;
+  top: 0.35rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d4af37;
+  box-shadow: 0 0 0 2px rgba(17, 21, 30, 0.95);
+}
+
+.ltc-timeline-year {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: #e9d6a0;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.ltc-timeline-label {
+  color: #e8e9ef;
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.ltc-timeline-note {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: #aab0bf;
+}
+
+.ltc-timeline-row--clickable {
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.ltc-timeline-row--clickable:hover,
+.ltc-timeline-row--clickable:focus-visible {
+  background: rgba(212, 175, 55, 0.08);
+  outline: none;
+}
+
+.ltc-timeline-row--clickable:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(233, 214, 160, 0.55);
+}

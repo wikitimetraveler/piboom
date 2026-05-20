@@ -379,12 +379,15 @@ export async function getProminentLanesData(req, res) {
  */
 export async function getLaneTradingCardsData(req, res) {
   try {
-    const { era, tag, branch, personId, q } = req.query;
+    const { era, tag, branch, personId, q, cardKind, kind, rarity } = req.query;
     const data = getLaneTradingCards({
       era,
       tag,
       branch,
       q,
+      cardKind,
+      kind,
+      rarity,
       ...(personId !== undefined ? { personId } : {})
     });
     res.json({

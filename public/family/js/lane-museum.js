@@ -76,6 +76,11 @@ let museumPosterUiBound = false;
 /** Same-origin raster when no exhibit portrait / proxy fails — never use raw svg+xml in src without encoding (breaks HTML). */
 const MUSEUM_EXHIBIT_DEFAULT_IMAGE = '/family/assets/lane-genealogies-title-spread.png';
 const MUSEUM_CURATED_PROMINENT_IMAGE_BY_PERSON_ID = Object.freeze({
+  3: '/family/assets/mary-brewer-lane.png',
+  6: '/family/assets/samuel-lane.png',
+  13: '/family/assets/sarah-dickinson-lane.png',
+  36: '/family/assets/cornet-john-lane.png',
+  94: '/family/assets/jonathan-homer-lane.png',
   1024: '/family/assets/aaron-g-lane.png'
 });
 
@@ -389,6 +394,33 @@ function rebuildMuseumPoster() {
   } else {
     host.innerHTML = buildMuseumPosterHtmlSimple(currentMuseumPoster);
   }
+  bindMuseumPosterExpand(host);
+}
+
+function bindMuseumPosterExpand(host) {
+  if (!host) return;
+  host.classList.add('lane-poster-expandable');
+  host.setAttribute('role', 'button');
+  host.setAttribute('tabindex', '0');
+  const title = currentMuseumPoster?.title || currentMuseumPoster?.shareTitle || 'Exhibit card';
+  host.setAttribute('aria-label', `Enlarge exhibit card: ${title}`);
+
+  const enlarge = () => {
+    if (!window.LaneImageLightbox?.openElement) return;
+    window.LaneImageLightbox.openElement(host, { caption: title });
+  };
+
+  host.onclick = (event) => {
+    if (event.target.closest('a, button, input, select, textarea')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    enlarge();
+  };
+  host.onkeydown = (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    enlarge();
+  };
 }
 
 function setMuseumPosterMode(mode) {

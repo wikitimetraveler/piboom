@@ -1,0 +1,107 @@
+.lane-magazine-page {
+  background: #f8fafc;
+}
+
+.lane-mag-header {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.lane-mag-intro {
+  border-radius: 0.75rem;
+}
+
+.lane-mag-spreads {
+  display: grid;
+  gap: 1rem;
+}
+
+.lane-mag-spread {
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 0.75rem;
+  padding: 1rem;
+}
+
+.lane-mag-spread__meta {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.lane-mag-spread__title {
+  font-size: 1.15rem;
+  margin: 0.25rem 0 0.4rem 0;
+}
+
+.lane-mag-spread__summary {
+  margin-bottom: 0.65rem;
+  line-height: 1.45;
+}
+
+.lane-mag-spread__image-wrap {
+  margin: 0.75rem 0;
+}
+
+.lane-mag-spread__image {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  max-height: 460px;
+  object-fit: contain;
+  background: #f8fafc;
+}
+
+.lane-mag-spread__caption {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.lane-mag-spread__quote {
+  border-left: 4px solid #6366f1;
+  margin: 0.75rem 0;
+  padding: 0.35rem 0.8rem;
+  color: #334155;
+}
+
+.lane-mag-spread__list {
+  margin-bottom: 0.65rem;
+}
+
+.lane-mag-spread__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media print {
+  body.lane-magazine-page {
+    background: #fff;
+  }
+
+  modern-navbar,
+  #lanePillNav,
+  .lane-mag-actions,
+  .lane-mag-intro,
+  [data-lane-site-credit] {
+    display: none !important;
+  }
+
+  .lane-mag-spread {
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    page-break-after: always;
+    break-after: page;
+    min-height: 10.2in;
+  }
+
+  .lane-mag-spread:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+}
