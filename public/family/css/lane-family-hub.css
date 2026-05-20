@@ -4,25 +4,8 @@
  */
 /**
  * Lane Family hub — quiet, editorial layout (warm neutral, one accent).
+ * Heritage tokens: /shared/design-tokens.css (--lf-*)
  */
-:root {
-  --lf-bg: #f7f5f1;
-  --lf-bg-elevated: #fffcf7;
-  --lf-ink: #1c1b19;
-  --lf-ink-soft: #3d3a36;
-  --lf-muted: #7a756c;
-  --lf-line: rgba(28, 27, 25, 0.08);
-  --lf-line-strong: rgba(28, 27, 25, 0.14);
-  --lf-accent: #6b5344;
-  --lf-accent-hover: #554233;
-  --lf-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-  --lf-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --lf-radius: 2px;
-  --lf-shadow:
-    0 1px 2px rgba(28, 27, 25, 0.05),
-    0 10px 28px rgba(28, 27, 25, 0.07);
-  --lf-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
-}
 
 html {
   scroll-behavior: smooth;

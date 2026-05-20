@@ -247,7 +247,7 @@ if (config.autoIngestDisasters) {
   console.log('⏸️ Skipping automatic disaster refresh scheduler');
 }
 
-// Nightly prune older than 90 days
+// Nightly prune — same 24h cadence as ingest (90-day rolling window in disasters.service)
 if (config.autoIngestDisasters) {
   setInterval(async () => {
     try {
@@ -256,7 +256,7 @@ if (config.autoIngestDisasters) {
     } catch (err) {
       console.warn('⚠️ Disaster prune run failed', { error: err.message });
     }
-  }, 24 * 60 * 60 * 1000);
+  }, 24 * 60 * 60 * 1000); // Once per day (24 hours)
 } else {
   console.log('⏸️ Skipping disaster pruning (auto ingestion disabled)');
 }

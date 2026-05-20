@@ -1691,7 +1691,7 @@
             const pos = { lat: item.lat, lng: item.lng };
             const disasterIcon = window.mapIcons && window.mapIcons.getDisasterIconForMarker
               ? window.mapIcons.getDisasterIconForMarker(r.event_type, r.source)
-              : { url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', scaledSize: new google.maps.Size(18, 18) };
+              : { url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', scaledSize: new google.maps.Size(24, 24) };
             const marker = new google.maps.Marker({
               position: pos,
               map,

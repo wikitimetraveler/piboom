@@ -30,29 +30,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="/shared/design-tokens.css">
 
     <style>
-        :root {
-            --ice-primary: #3498db;
-            --ice-secondary: #2ecc71;
-            --ice-dark: #1a1f35;
-            --ice-light: #e8f1ff;
-            --ice-glow: rgba(135, 206, 250, 0.3);
-            --ice-border: #3a4a6a;
-            --primary-blue: #2563eb;
-            --primary-blue-hover: #1d4ed8;
-            --text-dark: #1f2937;
-            --text-muted: #6b7280;
-            --border-light: #e5e7eb;
-            --background-light: #f9fafb;
-            --white: #ffffff;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
         body {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            background: linear-gradient(135deg, var(--zen-surface) 0%, var(--zen-surface-muted) 100%);
             color: var(--text-dark);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
@@ -1380,7 +1362,8 @@
     <!-- Google API for YouTube -->
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="script.js" defer></script>
-    
+    <script src="/shared/dark-mode.js"></script>
+
     <!-- Login Integration -->
     <script src="/shared/user-login.js"></script>
     <script src="/shared/user-passwords.js"></script>

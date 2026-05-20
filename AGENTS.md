@@ -64,6 +64,7 @@ routes/encompass-*.routes.js
 | Screen Test tool         | `controllers/reviewer-ai.controller.js`, `routes/reviewer.routes.js`, `public/finance/tool9.html`                |
 | Unit Tests               | `public/finance/unit-tests.html`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js` — Story Mode offline demo (`?demo=1`, **Load offline demo**, or **Play highlight reel** with no grid rows yet) uses synthetic workbook data, not live Encompass.   |
 | Worksheets UI            | `public/finance/` (URLs unchanged; product name Worksheets)                                                      |
+| Design tokens / dark mode | `public/shared/design-tokens.css` (`--zen-primary`, `--lf-*`, finance aliases); `public/shared/dark-mode.js` (sitewide zen); Encompass grids: `encompass-dark-mode.js` |
 | Financial calculations   | `public/shared/calculationEngine.js` (UI engine); pure helpers: `public/shared/calcEngineLibrary.js` (`calcMath`)  |
 | GSE scenario analyzer      | `public/gse-analyzer.html`, `routes/gse.routes.js`, `controllers/gse.controller.js`, `services/gse-scenario.service.js`, `data/gse/` |
 | AG Grid pages            | `unit-tests.html`, `encompass-custom-fields.html`, `encompass-native-fields.html`                                |

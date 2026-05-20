@@ -37,9 +37,9 @@
     }
   };
 
-  /** Disaster event icons (compact, type-specific) */
-  const disasterSize = 18;
-  const disasterAnchor = 9;
+  /** Disaster event icons — match Encompass loan marker footprint on unified disasters map */
+  const disasterSize = 24;
+  const disasterAnchor = 12;
   const disaster = {
     fire: {
       url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#F97316" stroke="#C2410C" stroke-width="1.2" d="M12.7 2.4c.5 3.1-1 4.5-2.4 6.1-1 1.2-1.8 2.5-1.8 4.4 0 2.2 1.8 4 4 4s4-1.8 4-4c0-3.3-2-5.3-3.8-6.8.2 1.7-.5 2.5-1.5 3.4.2-2.3 0-4.4-1.5-7.1z"/></svg>'),
@@ -73,9 +73,9 @@
     }
   };
 
-  /** Loan risk icons (small houses for Encompass loan points) */
-  const loanSize = 16;
-  const loanAnchor = 8;
+  /** Loan risk icons (Encompass loan points on disasters map) */
+  const loanSize = 24;
+  const loanAnchor = 12;
   const loan = {
     high: {
       url: svgToDataUri('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#DC2626" stroke="#991B1B" stroke-width="1.2" d="M4 11.5 12 5l8 6.5V20h-5v-5h-6v5H4z"/></svg>'),

@@ -1,0 +1,70 @@
+/**
+ * DevConnect Labs — shared design tokens
+ * Zen (#4a90a4), finance aliases, ICE, Lane heritage (--lf-*)
+ */
+:root {
+  /* Zen primary (finance + sitewide accent) */
+  --zen-primary: #4a90a4;
+  --zen-primary-hover: #3d7a8a;
+  --zen-primary-rgb: 74, 144, 164;
+  --zen-muted: #647196;
+  --zen-border: rgba(74, 144, 164, 0.18);
+  --zen-card-bg: rgba(255, 255, 255, 0.97);
+  --zen-dark: #1a2856;
+  --zen-surface: #f8fafc;
+  --zen-surface-muted: #e2e8f0;
+
+  /* Finance / worksheet layout aliases */
+  --primary-blue: var(--zen-primary);
+  --primary-blue-hover: var(--zen-primary-hover);
+  --text-dark: #1f2937;
+  --text-muted: #6b7280;
+  --border-light: #e5e7eb;
+  --background-light: #f9fafb;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* ICE — aligned to zen on finance pages; soft variants for marketing/home */
+  --ice-primary: var(--zen-primary);
+  --ice-secondary: #5ba88a;
+  --ice-dark: #2c3e50;
+  --ice-light: #e8f4f8;
+  --ice-glow: rgba(var(--zen-primary-rgb), 0.22);
+  --ice-border: rgba(var(--zen-primary-rgb), 0.2);
+
+  /* Semantic aliases (styles.css, components) */
+  --text: var(--text-dark);
+  --muted: var(--text-muted);
+  --border: var(--border-light);
+
+  /* Lane heritage */
+  --lf-bg: #f7f5f1;
+  --lf-bg-elevated: #fffcf7;
+  --lf-ink: #1c1b19;
+  --lf-ink-soft: #3d3a36;
+  --lf-muted: #7a756c;
+  --lf-line: rgba(28, 27, 25, 0.08);
+  --lf-line-strong: rgba(28, 27, 25, 0.14);
+  --lf-accent: #6b5344;
+  --lf-accent-hover: #554233;
+  --lf-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --lf-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --lf-radius: 2px;
+  --lf-shadow:
+    0 1px 2px rgba(28, 27, 25, 0.05),
+    0 10px 28px rgba(28, 27, 25, 0.07);
+  --lf-ease: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --lf-gold: #c8ab57;
+  --lf-gold-muted: rgba(200, 171, 87, 0.35);
+  --lf-surface-dark: #11141d;
+  --lf-ink-on-dark: #e8e9ef;
+  --lf-muted-on-dark: #cfd3df;
+
+  /* Lane shell aliases */
+  --lane-heritage-ink: var(--lf-ink);
+  --lane-heritage-ink-soft: var(--lf-ink-soft);
+  --lane-heritage-accent: var(--lf-accent);
+  --lane-heritage-muted: var(--lf-muted);
+}

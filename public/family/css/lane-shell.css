@@ -15,14 +15,12 @@ body.lane-memorial-page,
 body.lane-occ-page,
 body.lane-direct-page,
 body.lane-pdf-gallery-root,
+body.lane-magazine-page,
+body.lane-trading-cards-page,
 body.whai-page,
 body.genealogy-import-page,
 body.genealogy-tree-page {
-  --lane-heritage-ink: #2a2824;
-  --lane-heritage-ink-soft: #3d3a36;
-  --lane-heritage-accent: #6b5344;
-  --lane-heritage-muted: #7a756c;
-  --ice-dark: var(--lane-heritage-ink);
+  --ice-dark: var(--lane-heritage-ink, var(--lf-ink));
 }
 
 .lane-tools-page {

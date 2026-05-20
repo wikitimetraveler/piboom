@@ -58,6 +58,9 @@ import { geocodeCountyStateWithCache } from './geocoding-cache.service.js';
 import fs from 'fs';
 import path from 'path';
 
+/** Rolling window for ingest, UI, prune, and impact graph (keep in sync everywhere). */
+export const DISASTER_ROLLING_WINDOW_DAYS = 90;
+
 const CREATE_TABLE_SQL = `
 CREATE TABLE IF NOT EXISTS disasters (
   id SERIAL PRIMARY KEY,
@@ -133,7 +136,9 @@ export async function pruneOldDisasters() {
   const pool = getPool();
   if (!pool) return;
   try {
-    await pool.query(`DELETE FROM disasters WHERE start_time < NOW() - INTERVAL '90 days'`);
+    await pool.query(
+      `DELETE FROM disasters WHERE start_time < NOW() - INTERVAL '${DISASTER_ROLLING_WINDOW_DAYS} days'`
+    );
   } catch (e) {
     console.warn('⚠️  pruneOldDisasters failed:', e.message);
   }

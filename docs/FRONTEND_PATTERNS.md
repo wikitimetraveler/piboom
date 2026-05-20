@@ -179,8 +179,12 @@ Use `value ? 'Yes' : 'No'` or equivalent. AG Grid/DataTables cell renderers and 
 
 - Bootstrap 5 for layout and components
 - Bootstrap Icons
-- Custom CSS variables in pages (e.g. `--primary-color`, `--danger-color`)
-- Inter or similar fonts via Google Fonts
+- **Shared tokens:** [`public/shared/design-tokens.css`](../public/shared/design-tokens.css) — loaded via [`styles.css`](../public/shared/styles.css) (`@import`). Defines `--zen-primary` (#4a90a4), finance aliases (`--primary-blue` → zen), ICE, and Lane heritage (`--lf-*`, `--lane-heritage-*` aliases).
+- **Dark mode (sitewide zen):** [`public/shared/dark-mode.js`](../public/shared/dark-mode.js) — `body.dark-mode`, localStorage `devConnectLabs_darkMode`. Overrides zen + `--lf-*` on Lane magazine/hub pages. Encompass grid tools use separate `encompass-dark-mode.js`.
+- Finance worksheets: prefer tokens over inline `:root`; shell pages import tokens through `worksheets-shell.css` or `/shared/design-tokens.css`.
+- Lane magazine / trading cards: use `--lf-*` (see `lane-magazine.css`, `lane-trading-cards.css`); trading cards cinematic UI uses `--lf-gold`, `--lf-surface-dark`.
+- Dashboard-only variables still allowed (e.g. `--primary-color`, `--danger-color` on pipeline-risk pages).
+- Inter or similar fonts via Google Fonts; Lane heritage serif: `--lf-serif` (Source Serif 4 on hub)
 
 ## Toast Notifications
 

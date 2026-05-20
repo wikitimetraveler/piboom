@@ -1,11 +1,18 @@
 /**
  * Genealogy source file.
  * Author: Levi Lane.
+ * Heritage tokens: /shared/design-tokens.css (--lf-*, --lf-gold, --lf-surface-dark)
  */
 .lane-trading-cards-page {
-  background: linear-gradient(180deg, #11141d 0%, #0c0f16 45%, #121722 100%);
-  color: #e8e9ef;
+  background: linear-gradient(
+    180deg,
+    var(--lf-surface-dark) 0%,
+    color-mix(in srgb, var(--lf-ink) 92%, black) 45%,
+    color-mix(in srgb, var(--lf-surface-dark) 88%, var(--lf-accent)) 100%
+  );
+  color: var(--lf-ink-on-dark);
   min-height: 100vh;
+  font-family: var(--lf-sans);
 }
 
 .ltc-wrap {
@@ -15,16 +22,16 @@
 }
 
 .ltc-hero {
-  border: 1px solid rgba(212, 175, 55, 0.35);
+  border: 1px solid var(--lf-gold-muted);
   border-radius: 14px;
-  background: rgba(17, 21, 30, 0.88);
+  background: color-mix(in srgb, var(--lf-surface-dark) 88%, transparent);
   padding: 1rem;
 }
 
 .ltc-kicker {
   letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: #c8ab57;
+  color: var(--lf-gold);
   margin-bottom: 0.2rem;
   font-size: 0.78rem;
 }
@@ -34,14 +41,15 @@
 }
 
 .ltc-lede {
-  color: #cfd3df;
+  color: var(--lf-muted-on-dark);
   margin-bottom: 0.5rem;
 }
 
 .ltc-toolbar {
   margin-top: 1rem;
-  background: rgba(250, 250, 252, 0.97);
-  color: #1e2535;
+  background: var(--lf-bg-elevated);
+  color: var(--lf-ink);
+  border: 1px solid var(--lf-line);
 }
 
 .ltc-actions {
@@ -57,7 +65,7 @@
 }
 
 .ltc-card {
-  border: 1px solid rgba(223, 192, 118, 0.35);
+  border: 1px solid var(--lf-gold-muted);
   border-radius: 14px;
   background: linear-gradient(180deg, rgba(26, 31, 44, 0.98) 0%, rgba(18, 23, 34, 0.96) 100%);
   overflow: hidden;
@@ -79,7 +87,7 @@
   margin: 0.7rem 0.7rem 0;
   aspect-ratio: 2.5 / 3.5;
   border-radius: 11px;
-  border: 1px solid rgba(232, 203, 130, 0.45);
+  border: 1px solid color-mix(in srgb, var(--lf-gold) 45%, transparent);
   background: linear-gradient(145deg, #111722 0%, #1c2435 100%);
   padding: 0.45rem;
   display: flex;
@@ -119,7 +127,7 @@
   font-size: 0.55rem;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: #d9be73;
+  color: var(--lf-gold);
 }
 
 .ltc-card-cover-title {
@@ -241,7 +249,7 @@
 .ltc-tag {
   border: 1px solid rgba(200, 171, 87, 0.45);
   border-radius: 999px;
-  color: #d7be73;
+  color: var(--lf-gold);
   font-size: 0.72rem;
   padding: 0.08rem 0.45rem;
 }

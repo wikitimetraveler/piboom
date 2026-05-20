@@ -1,24 +1,8 @@
 /**
  * Worksheets calculator shell — shared with Unit Tests visual language
- * (@see public/finance/unit-tests.html patterns)
+ * Tokens: /shared/design-tokens.css (via /shared/styles.css or direct link)
  */
-:root {
-  --zen-primary: #4a90a4;
-  --zen-muted: #647196;
-  --zen-border: rgba(74, 144, 164, 0.18);
-  --zen-card-bg: rgba(255, 255, 255, 0.97);
-  --ice-primary: #3498db;
-  --ice-light: #e8f1ff;
-  --ice-glow: rgba(135, 206, 250, 0.3);
-  --primary-blue: #2563eb;
-  --text-dark: #1f2937;
-  --text-muted: #6b7280;
-  --border-light: #e5e7eb;
-  --background-light: #f9fafb;
-  --white: #ffffff;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
+@import url('/shared/design-tokens.css');
 
 body.worksheets-shell {
   min-height: 100vh;
@@ -26,7 +10,7 @@ body.worksheets-shell {
   line-height: 1.6;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--text-dark);
-  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  background: linear-gradient(135deg, var(--zen-surface) 0%, var(--zen-surface-muted) 100%);
   position: relative;
   overflow-x: hidden;
 }

@@ -1,4 +1,5 @@
 import { getPool } from './database.service.js';
+import { DISASTER_ROLLING_WINDOW_DAYS } from './disasters.service.js';
 
 const VALID_NODE_TYPES = new Set([
   'disaster_event',
@@ -494,7 +495,7 @@ export async function seedGraphFromExistingDisasterData(options = {}) {
       title,
       start_time
     FROM disasters
-    WHERE start_time >= NOW() - INTERVAL '120 days'
+    WHERE start_time >= NOW() - INTERVAL '${DISASTER_ROLLING_WINDOW_DAYS} days'
       AND event_type <> 'camera'
     ORDER BY start_time DESC
     LIMIT 400;
