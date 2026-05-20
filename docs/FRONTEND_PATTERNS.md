@@ -40,28 +40,6 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 
 
 
-## Sitewide zen palette (`public/shared/styles.css`)
-
-Motion and spacing tokens (`--zen-ease`, `--zen-radius`, `--zen-spacing`, `--zen-shadow`) apply globally. **Sitewide color surfaces** (page background, `.tool-card`, `.panel`, `.header`) use a restrained slate + blue accent and apply only when `body` is **not** a Lane family page.
-
-**Excluded body classes** (family keeps heritage / museum CSS; no ice-blue gradient bleed):
-
-`lane-family-hub`, `lane-magazine-page`, `lane-trading-cards-page`, `lane-tools-page`, `lane-museum-page`, `lane-war-page`, `lane-memorial-page`, `lane-historians-page`, `lane-occ-page`, `lane-direct-page`, `lane-pdf-gallery-root`, `whai-page`, `genealogy-import-page`, `genealogy-tree-page`
-
-[`lane-shell.css`](../public/family/css/lane-shell.css) sets `background: unset` on those bodies so family themes win.
-
-**Finance Worksheets** use a separate teal palette (`--zen-primary` in `public/finance/css/worksheets-shell.css`) — not the sitewide `:root` ice tokens.
-
-| Token | Sitewide value (approx.) |
-|-------|--------------------------|
-| `--ice-primary` | `#2563eb` |
-| `--ice-dark` / `--text` | `#0f172a` |
-| `--muted` | `#64748b` |
-| `--border` | `#e2e8f0` |
-| `--ice-light` | `#f8fafc` |
-
-Hub tool-card ripples: [`public/shared/scripts.js`](../public/shared/scripts.js) skips family pages and `prefers-reduced-motion: reduce`.
-
 ## Lane / family maps (`public/family/`)
 
 **Map display** uses the **Google Maps JavaScript API** (hybrid / satellite+labels via `mapTypeId: HYBRID`). The browser loads Maps with `GET /api/genealogy/google-api-key` (`GOOGLE_BROWSER_API_KEY` or `GOOGLE_API_KEY` on the server). Shared loader: [`public/family/js/lane-family-google-maps.js`](./../public/family/js/lane-family-google-maps.js).
@@ -83,7 +61,7 @@ Hub tool-card ripples: [`public/shared/scripts.js`](../public/shared/scripts.js)
 | `public/shared/modern-navbar.js` | Web component navbar (loads image lightbox sitewide) |
 | `public/shared/lane-image-lightbox.js` | Click-to-expand images in `main`; opt out with `data-lane-lightbox-ignore` or class `lane-lightbox-ignore` |
 | `public/shared/lane-image-lightbox.css` | Lightbox overlay styles (z-index above Bootstrap modals) |
-| `public/shared/styles.css` | Shared styles (sitewide zen tokens + motion; see below) |
+| `public/shared/styles.css` | Shared styles |
 | `public/shared/user-login.js` | User login |
 | `public/shared/user-selector.js` | User selector |
 | `public/shared/voice-widget.js` | Voice widget |
