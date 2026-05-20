@@ -8,6 +8,9 @@
  * Heritage tokens (--lane-heritage-*) align tool pages with the hub warm palette.
  */
 
+body.lane-family-hub,
+body.lane-magazine-page,
+body.lane-trading-cards-page,
 body.lane-historians-page,
 body.lane-museum-page,
 body.lane-war-page,
@@ -18,6 +21,7 @@ body.lane-pdf-gallery-root,
 body.whai-page,
 body.genealogy-import-page,
 body.genealogy-tree-page {
+  background: unset;
   --lane-heritage-ink: #2a2824;
   --lane-heritage-ink-soft: #3d3a36;
   --lane-heritage-accent: #6b5344;
