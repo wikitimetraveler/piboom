@@ -153,6 +153,9 @@ function parseNavigationCommand(command) {
     if (command.includes('map') || command.includes('youtube') || command.includes('video')) {
         return { type: 'navigate', action: 'expandAccordion', target: 'collapseMapYouTube' };
     }
+    if (command.includes('show loans') || command.includes('affected loans') || command.includes('encompass loans')) {
+        return { type: 'navigate', action: 'expandAccordion', target: 'collapseLoans' };
+    }
     if (command.includes('loan') || command.includes('encompass')) {
         return { type: 'navigate', action: 'expandAccordion', target: 'collapseLoans' };
     }

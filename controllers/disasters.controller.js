@@ -1,5 +1,17 @@
 import { getPool } from '../services/database.service.js';
-import { initDisastersSchema, upsertDisasters, normalizeFemaV2ToUnified, ingestFema, ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestCaFireCameras } from '../services/disasters.service.js';
+import {
+  initDisastersSchema,
+  upsertDisasters,
+  normalizeFemaV2ToUnified,
+  ingestFema,
+  ingestFirmsNrt,
+  ingestUsgsQuakes,
+  ingestNwsCap,
+  ingestNhc,
+  ingestCaFireCameras,
+  filterFireCamerasByDistance,
+  sortCamerasByDistance
+} from '../services/disasters.service.js';
 import { geocodeCountyStateWithCache } from '../services/geocoding-cache.service.js';
 import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
 
@@ -189,37 +201,102 @@ export async function refreshCameras(req, res) {
 
 export async function listCameras(req, res) {
   try {
-    const { limit = 100, offset = 0 } = req.query;
+    const { state, county, limit = 100, offset = 0, nearLat, nearLng, radiusMiles } = req.query;
     const pool = getPool();
     if (!pool) throw new Error('Database not initialized');
-    
-    // Get camera records
-    const camerasResult = await pool.query(`
-      SELECT 
-        id, source, event_type, county_name, state_abbr,
-        start_time, title, lat, lng, source_id, raw
-      FROM disasters
-      WHERE source = 'alertcalifornia' AND event_type = 'camera'
-      ORDER BY start_time DESC
-      LIMIT $1 OFFSET $2
-    `, [parseInt(limit), parseInt(offset)]);
-    
-    // Get total count
-    const countResult = await pool.query(`
-      SELECT COUNT(*) as total
-      FROM disasters
-      WHERE source = 'alertcalifornia' AND event_type = 'camera'
-    `);
-    
-    res.json({ 
-      success: true, 
-      data: { 
-        cameras: camerasResult.rows, 
-        count: camerasResult.rows.length,
-        total: parseInt(countResult.rows[0].total),
-        limit: parseInt(limit),
-        offset: parseInt(offset)
-      } 
+
+    const DEFAULT_LIMIT = 1000;
+    const MAX_LIMIT = 5000;
+    const GEO_DEFAULT_LIMIT = 20;
+    const parsedLimit = parseInt(limit, 10);
+    const parsedOffset = parseInt(offset, 10);
+    const parsedNearLat = parseFloat(nearLat);
+    const parsedNearLng = parseFloat(nearLng);
+    const hasGeo = Number.isFinite(parsedNearLat) && Number.isFinite(parsedNearLng);
+    let parsedRadius = parseFloat(radiusMiles);
+    if (!Number.isFinite(parsedRadius) || parsedRadius < 1) {
+      parsedRadius = 50;
+    } else if (parsedRadius > 500) {
+      parsedRadius = 500;
+    }
+
+    const rowLimit = Number.isFinite(parsedLimit) && parsedLimit > 0
+      ? Math.min(parsedLimit, MAX_LIMIT)
+      : (hasGeo ? GEO_DEFAULT_LIMIT : DEFAULT_LIMIT);
+    const rowOffset = Number.isFinite(parsedOffset) && parsedOffset >= 0 ? parsedOffset : 0;
+
+    const clauses = [];
+    const values = [];
+    if (state) {
+      values.push(String(state).trim().toUpperCase());
+      clauses.push(`UPPER(TRIM(COALESCE(state_abbr,''))) = $${values.length}`);
+    }
+    if (county) {
+      values.push(`%${String(county).trim()}%`);
+      clauses.push(`county_name ILIKE $${values.length}`);
+    }
+    if (hasGeo) {
+      clauses.push('lat IS NOT NULL AND lng IS NOT NULL');
+    }
+    const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+
+    const countResult = await pool.query(
+      `SELECT COUNT(*)::int AS total FROM fire_cameras ${where}`,
+      values
+    );
+
+    const fetchLimit = hasGeo ? MAX_LIMIT : rowLimit;
+    const fetchOffset = hasGeo ? 0 : rowOffset;
+
+    const camerasResult = await pool.query(
+      `SELECT
+        id, source_id, name, county_name, state_abbr, lat, lng,
+        camera_url, network_url, image_url, status, raw, updated_at
+      FROM fire_cameras
+      ${where}
+      ORDER BY name ASC NULLS LAST
+      LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
+      values.concat([fetchLimit, fetchOffset])
+    );
+
+    let cameras = camerasResult.rows.map((row) => ({
+      id: row.id,
+      source: 'alertcalifornia',
+      event_type: 'camera',
+      source_id: row.source_id,
+      title: row.name,
+      county_name: row.county_name,
+      state_abbr: row.state_abbr || 'CA',
+      lat: row.lat,
+      lng: row.lng,
+      severity: row.status,
+      raw: row.raw,
+      start_time: row.updated_at
+    }));
+
+    let total = countResult.rows[0]?.total || 0;
+
+    if (hasGeo) {
+      cameras = filterFireCamerasByDistance(cameras, parsedNearLat, parsedNearLng, parsedRadius);
+      total = cameras.length;
+      cameras = sortCamerasByDistance(cameras, parsedNearLat, parsedNearLng);
+      cameras = cameras.slice(rowOffset, rowOffset + rowLimit);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        cameras,
+        count: cameras.length,
+        total,
+        limit: rowLimit,
+        offset: rowOffset,
+        ...(hasGeo ? {
+          nearLat: parsedNearLat,
+          nearLng: parsedNearLng,
+          radiusMiles: parsedRadius
+        } : {})
+      }
     });
   } catch (e) {
     console.error('❌ Error listing cameras:', e);

@@ -52,12 +52,26 @@ export async function getAllLoans(req, res) {
     const filters = {
       milestone: req.query.milestone,
       state: req.query.state,
+      county: req.query.county,
       riskLevel: req.query.riskLevel
     };
-    
-    // Remove undefined filters
+
+    const nearLat = parseFloat(req.query.nearLat);
+    const nearLng = parseFloat(req.query.nearLng);
+    const radiusMiles = parseFloat(req.query.radiusMiles);
+    if (
+      Number.isFinite(nearLat) &&
+      Number.isFinite(nearLng) &&
+      Number.isFinite(radiusMiles)
+    ) {
+      filters.nearLat = nearLat;
+      filters.nearLng = nearLng;
+      filters.radiusMiles = Math.min(500, Math.max(1, radiusMiles));
+    }
+
+    // Remove undefined / empty filters
     Object.keys(filters).forEach(key => {
-      if (filters[key] === undefined) {
+      if (filters[key] === undefined || filters[key] === '') {
         delete filters[key];
       }
     });

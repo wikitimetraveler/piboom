@@ -18,6 +18,10 @@ class AIChatWidget {
         this.getContext = config.getContext || (() => this.context); // Function to get dynamic context
         this.onMessageSent = config.onMessageSent || null;
         this.onMessageReceived = config.onMessageReceived || null;
+        this.title = config.title || 'AI Assistant';
+        this.buttonTitle = config.buttonTitle || 'AI Assistant';
+        this.welcomeHtml = config.welcomeHtml || null;
+        this.inputPlaceholder = config.inputPlaceholder || 'Ask me anything about your loan pipeline...';
         
         this.isOpen = false;
         this.messages = [];
@@ -35,7 +39,7 @@ class AIChatWidget {
         chatButton.id = 'aiChatButton';
         chatButton.className = 'ai-chat-button';
         chatButton.innerHTML = '<i class="bi bi-chat-dots-fill"></i>';
-        chatButton.title = 'AI Assistant';
+        chatButton.title = this.buttonTitle;
         chatButton.onclick = () => this.toggle();
         document.body.appendChild(chatButton);
 
@@ -45,19 +49,19 @@ class AIChatWidget {
         chatPanel.className = 'ai-chat-panel';
         chatPanel.innerHTML = `
             <div class="ai-chat-header">
-                <h5 class="mb-0"><i class="bi bi-robot"></i> AI Assistant</h5>
+                <h5 class="mb-0"><i class="bi bi-robot"></i> ${this.title}</h5>
                 <button type="button" class="btn-close btn-close-white" onclick="window.aiChatWidget?.close()" aria-label="Close"></button>
             </div>
             <div class="ai-chat-messages" id="aiChatMessages">
                 <div class="ai-chat-welcome">
-                    <i class="bi bi-robot"></i>
+                    ${this.welcomeHtml || `<i class="bi bi-robot"></i>
                     <p>Hello! I'm your AI assistant for loan pipeline analysis. How can I help you today?</p>
-                    <small class="text-muted">Try asking: "What are the highest risk loans?" or "Show me insights about Texas loans"</small>
+                    <small class="text-muted">Try asking: "What are the highest risk loans?" or "Show me insights about Texas loans"</small>`}
                 </div>
             </div>
             <div class="ai-chat-input-container">
                 <div class="ai-chat-input-wrapper">
-                    <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="Ask me anything about your loan pipeline..." />
+                    <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="${this.inputPlaceholder}" />
                     <button id="aiChatSendBtn" class="ai-chat-send-btn" onclick="window.aiChatWidget?.sendMessage()">
                         <i class="bi bi-send"></i>
                     </button>

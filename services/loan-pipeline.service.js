@@ -1,3 +1,5 @@
+import { calculateDistance } from './disasters.service.js';
+
 /**
  * Loan Pipeline Service
  * 
@@ -964,8 +966,38 @@ export async function generateTestLoans(count = 100) {
 }
 
 /**
+ * Normalize county name for ILIKE matching (strip FEMA " (County)" suffix).
+ * @param {string} name
+ * @returns {string}
+ */
+export function normalizeCountyName(name) {
+  return String(name || '').replace(/\s*\(County\)$/i, '').trim();
+}
+
+/**
+ * Filter loans within radius (miles) of a point; excludes rows without coordinates.
+ * @param {Array} loans
+ * @param {number} nearLat
+ * @param {number} nearLng
+ * @param {number} radiusMiles
+ * @returns {Array}
+ */
+export function filterLoansByDistance(loans, nearLat, nearLng, radiusMiles) {
+  const radiusKm = radiusMiles * 1.60934;
+  return loans.filter((loan) => {
+    const lat = parseFloat(loan.latitude);
+    const lng = parseFloat(loan.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return false;
+    }
+    const km = calculateDistance(nearLat, nearLng, lat, lng);
+    return km !== null && km <= radiusKm;
+  });
+}
+
+/**
  * Get all loans with risk data
- * @param {Object} filters - Optional filters (milestone, state, riskLevel)
+ * @param {Object} filters - Optional filters (milestone, state, county, riskLevel, nearLat, nearLng, radiusMiles)
  * @returns {Promise<Array>} Array of loan objects
  */
 export async function getAllLoans(filters = {}) {
@@ -1001,6 +1033,15 @@ export async function getAllLoans(filters = {}) {
       params.push(filters.state);
     }
 
+    if (filters.county) {
+      const normalizedCounty = normalizeCountyName(filters.county);
+      if (normalizedCounty) {
+        paramCount++;
+        conditions.push(`county ILIKE $${paramCount}`);
+        params.push(`%${normalizedCounty}%`);
+      }
+    }
+
     if (filters.riskLevel) {
       paramCount++;
       switch (filters.riskLevel) {
@@ -1023,7 +1064,22 @@ export async function getAllLoans(filters = {}) {
     query += ` ORDER BY created_at DESC`;
 
     const result = await pool.query(query, params);
-    return result.rows;
+    let rows = result.rows;
+
+    if (
+      filters.nearLat != null &&
+      filters.nearLng != null &&
+      filters.radiusMiles != null
+    ) {
+      rows = filterLoansByDistance(
+        rows,
+        filters.nearLat,
+        filters.nearLng,
+        filters.radiusMiles
+      );
+    }
+
+    return rows;
   } catch (error) {
     console.error('❌ Error getting all loans:', error.message);
     throw error;

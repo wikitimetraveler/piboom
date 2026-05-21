@@ -20,11 +20,18 @@
     <title>Unified Disasters (90-day, Multi-Source)</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
-    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/shared/design-tokens.css" />
+    <link href="../shared/modern-navbar.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="module" src="../shared/voice-commands.js"></script>
+    <script type="module" src="../shared/ai-chat-widget.js"></script>
+    <script type="module" src="../shared/ai-insights-card.js"></script>
     <style>
       :root {
-        --primary-color: #2563eb;
+        --primary-color: var(--zen-primary, #4a90a4);
         --wildfire: linear-gradient(135deg, #ff6b35, #f7931e);
         --earthquake: linear-gradient(135deg, #8b4513, #a0522d);
         --hurricane: linear-gradient(135deg, #1e88e5, #1565c0);
@@ -40,11 +47,30 @@
         --acme-red: #e74c3c;
       }
 
-      body { 
-        background: #f5f7fa;
+      body {
+        background: var(--zen-surface, #f8fafc);
         min-height: 100vh;
         font-family: 'Inter', 'Segoe UI', sans-serif;
         position: relative;
+        color: var(--text-dark, #1f2937);
+      }
+
+      .card-header {
+        background: linear-gradient(135deg, var(--zen-primary, #4a90a4), var(--zen-primary-hover, #3d7a8a));
+        color: #fff;
+        border-radius: 12px 12px 0 0 !important;
+      }
+
+      .workflow-hint {
+        font-size: 0.875rem;
+        color: var(--text-muted, #6b7280);
+        margin-bottom: 0.75rem;
+        line-height: 1.5;
+      }
+
+      #encompassLoansGrid.ag-theme-alpine {
+        width: 100%;
+        height: 360px;
       }
 
       /* Disaster Loading Overlay - Modern & Cool */
@@ -334,72 +360,18 @@
       }
 
       /* Disaster type row colors - subtle background tints */
-      #disastersTable tbody tr.disaster-wildfire { background-color: #fff7ed; }
-      #disastersTable tbody tr.disaster-earthquake { background-color: #fef3f2; }
-      #disastersTable tbody tr.disaster-hurricane { background-color: #eff6ff; }
-      #disastersTable tbody tr.disaster-flood { background-color: #f0f9ff; }
-      #disastersTable tbody tr.disaster-severe { background-color: #fef2f2; }
-
-      /* Table styling */
-      #disastersTable {
-        width: 100% !important;
-        table-layout: auto;
+      #disastersGrid.ag-theme-alpine {
+        width: 100%;
+        height: 520px;
       }
+      #disastersGrid .ag-row.disaster-wildfire { background-color: #fff7ed; }
+      #disastersGrid .ag-row.disaster-earthquake { background-color: #fef3f2; }
+      #disastersGrid .ag-row.disaster-hurricane { background-color: #eff6ff; }
+      #disastersGrid .ag-row.disaster-flood { background-color: #f0f9ff; }
+      #disastersGrid .ag-row.disaster-severe { background-color: #fef2f2; }
+      #disastersGrid .ag-row.disaster-active { box-shadow: inset 3px 0 0 #2563eb; }
 
-      #disastersTable tbody tr {
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border-left: none;
-      }
-
-      #disastersTable tbody tr:hover {
-        background-color: #f3f4f6 !important;
-      }
-
-      #disastersTable thead th {
-        background: #f9fafb;
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.5px;
-        color: #6b7280;
-        border-bottom: 2px solid #e5e7eb;
-        padding: 0.75rem 1rem;
-        white-space: nowrap;
-        vertical-align: middle;
-      }
-
-      /* Ensure Source header matches Source column width - STRICT */
-      #disastersTable thead th:first-child {
-        width: 100px !important;
-        min-width: 100px !important;
-        max-width: 100px !important;
-        text-align: center !important;
-      }
-
-      #disastersTable tbody td {
-        vertical-align: middle;
-        padding: 0.75rem 1rem;
-        word-wrap: break-word;
-        overflow: visible;
-        position: relative;
-      }
-
-      
-      /* Ensure all source badges have consistent sizing - STRICT */
-      #disastersTable tbody td:first-child {
-        width: 100px !important;
-        min-width: 100px !important;
-        max-width: 100px !important;
-        text-align: center !important;
-        overflow: hidden !important;
-      }
-      
-      /* Force table layout to respect column widths */
-      #disastersTable {
-        table-layout: fixed;
-      }
-
+      #disastersGrid .ag-row { cursor: pointer; }
 
       /* Event type icons */
       .event-icon {
@@ -427,7 +399,7 @@
       #encompassLoansCard {
         animation: slideDown 0.5s ease;
       }
-      #encompassLoansTable tbody tr {
+      #encompassLoansGrid .ag-row {
         cursor: pointer;
       }
 
@@ -585,6 +557,50 @@
       .source-chip[data-source="floodzones"].source-chip-active { background: linear-gradient(135deg, #06b6d4, #67e8f9); }
       .source-chip[data-source="alertcalifornia"].source-chip-active { background: linear-gradient(135deg, #ea580c, #fb923c); }
 
+      /* Page footer — product credits (matches unit-tests / tool4) */
+      .footer {
+        margin-top: 2rem;
+        padding: 1.25rem 0 1.5rem;
+        background: #fff;
+        border-top: 1px solid #e5e7eb;
+        flex-shrink: 0;
+      }
+      .footer-content {
+        text-align: center;
+      }
+      .tool-product-credits-footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem 1.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      .tool-product-credits-footer .credits-block {
+        text-align: center;
+      }
+      .tool-product-credits-footer .credits-label {
+        display: block;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 0.2rem;
+      }
+      .tool-product-credits-footer .credits-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0f172a;
+        letter-spacing: 0.02em;
+      }
+      .footer-meta-line {
+        font-size: 0.8rem;
+        color: #64748b;
+      }
+
       @media (max-width: 768px) {
         #map, #youtubeResults {
           height: clamp(280px, 48vh, 520px);
@@ -632,12 +648,17 @@
       </div>
     </div>
 
+    <modern-navbar></modern-navbar>
+
     <div class="container-xxl py-4">
       <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
           <h1 class="mb-0"><i class="bi-fire"></i> Unified Disasters <small class="text-muted">(90-day, Multi-Source)</small></h1>
-          <a class="btn btn-outline-secondary" href="index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
+          <a class="btn btn-outline-secondary" href="/finance/index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
         </div>
+        <p class="workflow-hint mb-3" id="workflowHint">
+          <strong>Workflow:</strong> 1) Enable sources → 2) Filter grid → 3) Click a row → 4) Review loans &amp; cameras → 5) Ask the processor expert (chat button or selection banner).
+        </p>
         <div class="row g-3" id="statsRow">
           <div class="col-md-3">
             <div class="stat-card">
@@ -666,6 +687,14 @@
         </div>
       </div>
       <div id="dashboardStatusBanner" class="alert alert-warning dashboard-status-banner mt-3 mb-0" role="alert"></div>
+      <div id="aiInsightsContainer" class="mb-3">
+        <div id="aiInsightsIdle" class="card border bg-light shadow-sm mb-0">
+          <div class="card-body py-2 small text-muted mb-0">
+            <i class="bi bi-lightbulb"></i> Select a disaster in the grid for tailored AI insights.
+          </div>
+        </div>
+      </div>
+      <div id="selectionContextStrip" class="alert alert-primary py-2 small mb-3" style="display: none;" role="status"></div>
 
       <div class="card mb-4">
         <div class="card-body py-3">
@@ -692,8 +721,15 @@
             <button type="button" class="source-chip" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
               <i class="bi bi-droplet"></i> Flood zones
             </button>
-            <button type="button" class="source-chip" data-source="alertcalifornia" onclick="toggleUnifiedSourceChip(this, 'alertcalifornia')">
+            <a class="source-chip text-decoration-none" href="disasters-ca-cameras.html" title="Fixed ALERTCalifornia camera mounts (separate page)">
               <i class="bi bi-camera-video"></i> CA fire cameras
+            </a>
+          </div>
+          <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center mt-3 pt-2 border-top" id="unifiedToolbarActions">
+            <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn"><i class="bi-funnel"></i> Apply filters</button>
+            <button type="button" class="btn btn-primary btn-sm" id="refreshBtn"><i class="bi-arrow-repeat"></i> Refresh data</button>
+            <button type="button" class="btn btn-warning btn-sm" id="voiceControlBtn" onclick="toggleVoiceControl()" title="Voice: filter by state (e.g. show California), apply filters, show loans. Use the chat mic to talk to the processor expert.">
+              <i class="bi bi-mic"></i> <span id="voiceControlText">Voice</span>
             </button>
           </div>
         </div>
@@ -729,7 +765,6 @@
                         <option value="usgs" selected>USGS</option>
                         <option value="nws" selected>NOAA/NWS</option>
                         <option value="nhc" selected>NHC</option>
-                        <option value="alertcalifornia">CA Fire Cameras</option>
                         <option value="gdacs">GDACS</option>
                         <option value="floodzones">Flood Zones (NFHL)</option>
                       </select>
@@ -742,7 +777,6 @@
                         <option value="hurricane">Hurricane</option>
                         <option value="flood">Flood</option>
                         <option value="severe">Severe</option>
-                        <option value="camera">Fire Cameras</option>
                       </select>
                     </div>
                     <div class="col-12 d-flex gap-2 justify-content-end align-items-center flex-wrap">
@@ -750,12 +784,8 @@
                         <input type="checkbox" id="skipFemaCheck" class="form-check-input">
                         <label class="form-check-label small text-muted" for="skipFemaCheck">Skip FEMA</label>
                       </div>
-                      <button class="btn btn-outline-primary" id="applyBtn"><i class="bi-funnel"></i> Apply</button>
-                      <button class="btn btn-primary" id="refreshBtn"><i class="bi-arrow-repeat"></i> Refresh Now</button>
-                      <a class="btn btn-outline-secondary" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
-                      <button id="voiceControlBtn" class="btn btn-warning" onclick="toggleVoiceControl()" title="Voice Commands">
-                        <i class="bi bi-mic"></i> <span id="voiceControlText">Voice</span>
-                      </button>
+                      <a class="btn btn-outline-secondary btn-sm" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
+                      <span class="small text-muted">Apply, Refresh, and Voice are on the toolbar above source chips.</span>
                     </div>
                   </div>
                 </div>
@@ -780,24 +810,11 @@
                     <i class="bi bi-info-circle flex-shrink-0"></i>
                     <span><strong>NASA FIRMS</strong> (active fire hotspots) is not loaded. Turn on the <strong>NASA FIRMS</strong> source above or in Filters, then use <strong>Apply</strong> if you changed the multiselect only.</span>
                   </div>
-                  <div class="table-responsive">
-                    <table class="table table-hover" id="disastersTable">
-                      <thead>
-                        <tr>
-                          <th>Source</th>
-                          <th>Event</th>
-                          <th>County</th>
-                          <th>State</th>
-                          <th>Start</th>
-                          <th>End</th>
-                          <th>Title</th>
-                          <th>Risk Score</th>
-                          <th>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody></tbody>
-                    </table>
+                  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <small class="text-muted mb-0">Use column header filters to sort and filter. Quick filter searches all columns.</small>
+                    <input type="text" id="disastersQuickFilter" class="form-control form-control-sm" style="max-width: 280px;" placeholder="Quick filter (e.g. CA, wildfire, USGS)…" aria-label="Quick filter disasters grid">
                   </div>
+                  <div id="disastersGrid" class="ag-theme-alpine"></div>
                 </div>
               </div>
             </div>
@@ -851,28 +868,51 @@
             <div class="accordion-body">
               <div class="card" id="encompassLoansCard" style="display: none;">
                 <div class="card-header">
-                  <strong><i class="bi-bank"></i> Encompass Loans in Affected County</strong>
-                  <small class="text-muted d-block" id="encompassLoansSubtitle">Loans affected by selected disaster</small>
+                  <strong><i class="bi-bank"></i> Affected Encompass Loans</strong>
+                  <small class="text-muted d-block" id="encompassLoansSubtitle">Loans near selected disaster</small>
                 </div>
                 <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-hover" id="encompassLoansTable">
-                      <thead>
-                        <tr>
-                          <th>Loan Number</th>
-                          <th>Borrower</th>
-                          <th>Property Address</th>
-                          <th>City, State</th>
-                          <th>County</th>
-                          <th>Loan Amount</th>
-                          <th>Milestone</th>
-                          <th>Risk Level</th>
-                          <th>Encompass GUID</th>
-                          <th>Last Analysis</th>
-                        </tr>
-                      </thead>
-                      <tbody></tbody>
-                    </table>
+                  <div class="row g-2 align-items-end mb-3" id="duLoanFilterToolbar">
+                    <div class="col-md-3 col-6">
+                      <label class="form-label small mb-1" for="duLoanScopeMode">Scope</label>
+                      <select class="form-select form-select-sm" id="duLoanScopeMode">
+                        <option value="distance">Within distance</option>
+                        <option value="county">By county</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3 col-6">
+                      <label class="form-label small mb-1" for="duLoanRadiusMiles">Radius</label>
+                      <select class="form-select form-select-sm" id="duLoanRadiusMiles">
+                        <option value="10">10 mi</option>
+                        <option value="25">25 mi</option>
+                        <option value="50" selected>50 mi</option>
+                        <option value="100">100 mi</option>
+                        <option value="custom">Custom…</option>
+                      </select>
+                    </div>
+                    <div class="col-md-2 col-6" id="duLoanRadiusCustomWrap" style="display: none;">
+                      <label class="form-label small mb-1" for="duLoanRadiusCustom">Miles</label>
+                      <input type="number" class="form-control form-control-sm" id="duLoanRadiusCustom" min="1" max="500" value="50">
+                    </div>
+                    <div class="col-md-auto col-6">
+                      <button type="button" class="btn btn-sm btn-outline-primary" id="duLoanFilterApplyBtn">
+                        <i class="bi bi-funnel"></i> Apply
+                      </button>
+                    </div>
+                  </div>
+                  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                    <small class="text-muted mb-0">Sort and filter loans like the disasters grid. Click a row to focus the map.</small>
+                    <input type="text" id="loansQuickFilter" class="form-control form-control-sm" style="max-width: 240px;" placeholder="Quick filter loans…" aria-label="Quick filter loans">
+                  </div>
+                  <div id="encompassLoansGrid" class="ag-theme-alpine"></div>
+                  <div class="card mt-3" id="duNearbyCamerasCard" style="display: none;">
+                    <div class="card-header py-2">
+                      <strong class="small"><i class="bi bi-camera-video"></i> Nearby fire cameras</strong>
+                      <small class="text-muted d-block" id="duNearbyCamerasSubtitle">ALERTCalifornia cameras near selection</small>
+                    </div>
+                    <div class="card-body py-2" id="duNearbyCamerasList">
+                      <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -885,21 +925,389 @@
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <script src="../shared/modern-navbar.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI&libraries=places"></script>
     <script src="/shared/map-icons.js"></script>
     <!-- Google API for YouTube -->
     <script src="https://apis.google.com/js/api.js"></script>
+    <script src="/finance/js/disaster-loan-filters.js"></script>
+    <script src="/finance/js/disaster-camera-filters.js"></script>
+    <script src="/finance/js/ca-fire-camera-viewer.js"></script>
     <script>
-      let table, map, markers = [], loanMarkers = [];
-      let encompassLoansTable;
+      let disastersGridApi = null;
+      let map, markers = [], loanMarkers = [];
+      let encompassLoansGridApi = null;
       let youtubeAPIReady = false;
       let selectedDisaster = null;
-      let voiceRecognition = null;
-      let isVoiceListening = false;
+      let selectedDisasterObj = null;
+      let selectedDisasterRow = null;
+      let selectedLoan = null;
+      let cameraMarkers = [];
+      let cameraLoadContext = 'disaster';
+      let lastAffectedLoans = [];
+      let lastLoanFilterMeta = null;
+      let lastNearbyCameras = [];
       let aiChatWidget = null;
       let aiInsightsCard = null;
+      let voiceRecognition = null;
+      let isVoiceListening = false;
+
+      function clearCameraMarkers() {
+        cameraMarkers.forEach((entry) => entry.marker && entry.marker.setMap(null));
+        cameraMarkers = [];
+      }
+
+      function renderNearbyCamerasUI(cameras, meta) {
+        const subtitle = DisasterCameraFilters.formatCameraFilterSubtitle(meta, cameras.length);
+        $('#duNearbyCamerasSubtitle').text(subtitle);
+        const emptyMsg = meta.hasGeo === false
+          ? 'No coordinates for distance filter — showing county/state matches if available.'
+          : `No cameras within ${meta.radiusMiles || 50} mi of this location.`;
+        $('#duNearbyCamerasList').html(
+          DisasterCameraFilters.buildNearbyCamerasListHtml(cameras, emptyMsg)
+        );
+        $('#duNearbyCamerasCard').show();
+        clearCameraMarkers();
+        if (map) {
+          DisasterCameraFilters.addCameraMarkersToMap(map, cameras, cameraMarkers);
+        }
+        lastNearbyCameras = cameras;
+        updateSelectionContextStrip();
+        refreshAIContext();
+      }
+
+      async function loadNearbyCamerasForDisaster(disasterObj, disasterData) {
+        cameraLoadContext = 'disaster';
+        const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('duLoanRadiusMiles', 'duLoanRadiusCustom');
+        const req = DisasterCameraFilters.buildDisasterCameraRequest(disasterObj, disasterData, radiusMiles);
+        try {
+          const { cameras, meta } = await DisasterCameraFilters.fetchNearbyCameras(req.center, {
+            ...req.options,
+            radiusMiles
+          });
+          meta.hasGeo = !!req.center;
+          meta.radiusMiles = req.center ? radiusMiles : null;
+          renderNearbyCamerasUI(cameras, meta);
+        } catch (err) {
+          console.error('Error loading nearby cameras:', err);
+          $('#duNearbyCamerasSubtitle').text('Failed to load cameras');
+          $('#duNearbyCamerasList').html('<p class="text-danger small mb-0">Could not load fire cameras.</p>');
+        }
+      }
+
+      async function loadNearbyCamerasForLoan(loan) {
+        cameraLoadContext = 'loan';
+        const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('duLoanRadiusMiles', 'duLoanRadiusCustom');
+        const req = DisasterCameraFilters.buildLoanCameraRequest(loan, radiusMiles);
+        try {
+          const { cameras, meta } = await DisasterCameraFilters.fetchNearbyCameras(req.center, {
+            ...req.options,
+            radiusMiles
+          });
+          meta.hasGeo = !!req.center;
+          meta.radiusMiles = req.center ? radiusMiles : null;
+          renderNearbyCamerasUI(cameras, meta);
+        } catch (err) {
+          console.error('Error loading cameras for loan:', err);
+        }
+      }
+
+      function refreshNearbyCameras() {
+        if (cameraLoadContext === 'loan' && selectedLoan) {
+          loadNearbyCamerasForLoan(selectedLoan);
+        } else if (selectedDisasterObj || selectedDisasterRow) {
+          loadNearbyCamerasForDisaster(selectedDisasterObj, selectedDisasterRow);
+        }
+      }
+
+      function createSourceBadgeHtml(source) {
+        const src = String(source || '').trim().toLowerCase();
+        if (!src) return '';
+        return `<span class="source-badge source-${src}">${src.toUpperCase()}</span>`;
+      }
+
+      function htmlCellRenderer(html) {
+        const wrap = document.createElement('span');
+        wrap.innerHTML = html || '';
+        return wrap;
+      }
+
+      function buildDisasterGridRow(r, allRows, idx) {
+        const eventType = String(r.event_type || '').trim();
+        const source = String(r.source || '').trim().toLowerCase();
+        const county = String(r.county_name || '').trim();
+        const state = String(r.state_abbr || '').trim();
+        const startMs = r.start_time ? new Date(r.start_time).getTime() : null;
+        const endMs = r.end_time ? new Date(r.end_time).getTime() : null;
+        const title = String(r.title || '').trim().replace(/\s+/g, ' ');
+        const icon = getEventIcon(eventType);
+        const eventLabel = icon && eventType
+          ? `<span class="event-icon">${icon}</span>${eventType}`
+          : (eventType || '');
+        const riskScore = calculateDisasterRiskScore(r, allRows);
+        const isCamera = eventType === 'camera' || source === 'alertcalifornia'
+          || (title && title.toLowerCase().includes('camera'));
+        let cameraDataKey = '';
+        if (isCamera) {
+          cameraDataKey = `camera_grid_${idx}_${Date.now()}`;
+          window.cameraDataStore[cameraDataKey] = r;
+        }
+        let rowClasses = eventType ? [`disaster-${eventType}`] : [];
+        if (r.start_time) {
+          const hoursAgo = (Date.now() - new Date(r.start_time).getTime()) / (1000 * 60 * 60);
+          if (hoursAgo < 24) rowClasses.push('disaster-active');
+        }
+        return {
+          source,
+          sourceLabel: source.toUpperCase(),
+          eventType,
+          eventLabel,
+          county,
+          state,
+          startTime: startMs,
+          endTime: endMs,
+          title,
+          riskScore,
+          isCamera,
+          cameraDataKey,
+          rowClasses,
+          disasterObj: r
+        };
+      }
+
+      function initDisastersGrid() {
+        const gridEl = document.getElementById('disastersGrid');
+        if (!gridEl || disastersGridApi || typeof agGrid === 'undefined') return;
+
+        const columnDefs = [
+          {
+            field: 'sourceLabel',
+            headerName: 'Source',
+            width: 110,
+            filter: 'agTextColumnFilter',
+            cellRenderer: (params) => htmlCellRenderer(createSourceBadgeHtml(params.data?.source))
+          },
+          {
+            field: 'eventType',
+            headerName: 'Event',
+            width: 130,
+            filter: 'agTextColumnFilter',
+            cellRenderer: (params) => htmlCellRenderer(params.data?.eventLabel || '')
+          },
+          { field: 'county', headerName: 'County', minWidth: 120, flex: 1, filter: 'agTextColumnFilter' },
+          { field: 'state', headerName: 'State', width: 90, filter: 'agTextColumnFilter' },
+          {
+            field: 'startTime',
+            headerName: 'Start',
+            width: 175,
+            filter: 'agDateColumnFilter',
+            valueFormatter: (p) => (p.value ? new Date(p.value).toLocaleString() : '')
+          },
+          {
+            field: 'endTime',
+            headerName: 'End',
+            width: 175,
+            filter: 'agDateColumnFilter',
+            valueFormatter: (p) => (p.value ? new Date(p.value).toLocaleString() : '')
+          },
+          { field: 'title', headerName: 'Title', minWidth: 200, flex: 2, filter: 'agTextColumnFilter' },
+          {
+            field: 'riskScore',
+            headerName: 'Risk Score',
+            width: 140,
+            filter: 'agNumberColumnFilter',
+            cellRenderer: (params) => htmlCellRenderer(getRiskBadge(params.value ?? 0))
+          },
+          {
+            colId: 'actions',
+            headerName: 'Actions',
+            width: 120,
+            sortable: false,
+            filter: false,
+            floatingFilter: false,
+            cellRenderer: (params) => {
+              if (!params.data?.isCamera || !params.data.cameraDataKey) return '';
+              const key = params.data.cameraDataKey;
+              return `<button type="button" class="btn btn-sm btn-warning camera-view-btn" data-camera-key="${key}" title="View Camera Feed">
+                <i class="bi-camera-video"></i> View
+              </button>`;
+            }
+          }
+        ];
+
+        const gridOptions = {
+          columnDefs,
+          defaultColDef: {
+            sortable: true,
+            resizable: true,
+            floatingFilter: true
+          },
+          rowData: [],
+          pagination: true,
+          paginationPageSize: 25,
+          paginationPageSizeSelector: [10, 25, 50, 100],
+          animateRows: true,
+          getRowClass: (params) => (params.data?.rowClasses || []).join(' '),
+          onRowClicked: (event) => {
+            if (event.event?.target?.closest('button')) return;
+            const obj = event.data?.disasterObj;
+            if (obj) selectDisaster(null, obj);
+          },
+          onCellClicked: (event) => {
+            if (event.column?.getColId() !== 'actions') return;
+            const key = event.event?.target?.closest('[data-camera-key]')?.getAttribute('data-camera-key');
+            if (key && window.openCameraViewerFromTable) {
+              window.openCameraViewerFromTable(key);
+            }
+          }
+        };
+
+        if (typeof agGrid.createGrid === 'function') {
+          disastersGridApi = agGrid.createGrid(gridEl, gridOptions);
+        } else {
+          new agGrid.Grid(gridEl, gridOptions);
+          disastersGridApi = gridOptions.api;
+        }
+
+        $('#disastersQuickFilter').on('input', function () {
+          const text = $(this).val();
+          if (disastersGridApi?.setGridOption) {
+            disastersGridApi.setGridOption('quickFilterText', text);
+          } else if (disastersGridApi?.setQuickFilter) {
+            disastersGridApi.setQuickFilter(text);
+          }
+          maybeNudgeFirmsForQuickFilter(text);
+        });
+      }
+
+      function maybeNudgeFirmsForQuickFilter(text) {
+        const q = String(text || '').toLowerCase().trim();
+        if (!q) return;
+        if (!/\b(fire|wildfire|firms|hotspot)\b/.test(q)) return;
+        const sources = $('#sourceInput').val() || [];
+        if (sources.includes('firms')) return;
+        setDashboardStatus('Enable NASA FIRMS for active fire hotspots — use the NASA FIRMS source chip above.', 'info');
+      }
+
+      function buildEncompassLoanGridRow(loan) {
+        const riskLevel = getRiskLevel(loan.disaster_risk_score);
+        const riskClass = getRiskClass(loan.disaster_risk_score);
+        const distanceKm = DisasterLoanFilters.getDistanceValue(loan, selectedDisasterObj, selectedDisasterRow);
+        return {
+          loan_number: loan.loan_number,
+          borrower_name: loan.borrower_name,
+          property_address: loan.property_address,
+          cityState: `${loan.city || ''}, ${loan.state || ''}`,
+          county: loan.county || '',
+          loan_amountDisplay: `$${loan.loan_amount ? loan.loan_amount.toLocaleString() : '0'}`,
+          milestone: loan.milestone,
+          riskBadge: `<span class="badge ${riskClass}">${riskLevel}</span>`,
+          distanceKm: Number.isFinite(distanceKm) ? distanceKm : 999999,
+          distanceHtml: DisasterLoanFilters.formatDistance(loan, selectedDisasterObj, selectedDisasterRow),
+          encompass_loan_guid: loan.encompass_loan_guid || 'Not assigned',
+          lastAnalysis: loan.last_risk_analysis
+            ? new Date(loan.last_risk_analysis).toLocaleDateString()
+            : 'Not analyzed',
+          loanObj: loan
+        };
+      }
+
+      function initEncompassLoansGrid() {
+        const gridEl = document.getElementById('encompassLoansGrid');
+        if (!gridEl || encompassLoansGridApi || typeof agGrid === 'undefined') return;
+
+        const columnDefs = [
+          { field: 'loan_number', headerName: 'Loan #', width: 110, filter: 'agTextColumnFilter' },
+          { field: 'borrower_name', headerName: 'Borrower', minWidth: 140, flex: 1, filter: 'agTextColumnFilter' },
+          { field: 'property_address', headerName: 'Address', minWidth: 160, flex: 1, filter: 'agTextColumnFilter' },
+          { field: 'cityState', headerName: 'City, State', width: 130, filter: 'agTextColumnFilter' },
+          { field: 'county', headerName: 'County', width: 120, filter: 'agTextColumnFilter' },
+          { field: 'loan_amountDisplay', headerName: 'Amount', width: 110, filter: 'agTextColumnFilter' },
+          { field: 'milestone', headerName: 'Milestone', width: 120, filter: 'agTextColumnFilter' },
+          {
+            field: 'riskBadge',
+            headerName: 'Risk',
+            width: 110,
+            filter: 'agTextColumnFilter',
+            cellRenderer: (params) => htmlCellRenderer(params.value)
+          },
+          {
+            field: 'distanceKm',
+            headerName: 'Distance',
+            width: 120,
+            filter: 'agNumberColumnFilter',
+            cellRenderer: (params) => htmlCellRenderer(params.data?.distanceHtml || '')
+          },
+          { field: 'encompass_loan_guid', headerName: 'GUID', width: 120, filter: 'agTextColumnFilter' },
+          { field: 'lastAnalysis', headerName: 'Last analysis', width: 120, filter: 'agTextColumnFilter' }
+        ];
+
+        const gridOptions = {
+          columnDefs,
+          defaultColDef: {
+            sortable: true,
+            resizable: true,
+            floatingFilter: true
+          },
+          rowData: [],
+          pagination: true,
+          paginationPageSize: 10,
+          paginationPageSizeSelector: [10, 25, 50],
+          animateRows: true,
+          onRowClicked: (event) => {
+            const loan = event.data?.loanObj;
+            if (!loan) return;
+            selectedLoan = loan;
+            cameraLoadContext = 'loan';
+            if (encompassLoansGridApi?.deselectAll) encompassLoansGridApi.deselectAll();
+            if (event.node?.setSelected) event.node.setSelected(true);
+            loadNearbyCamerasForLoan(loan);
+            refreshAIOnSelection();
+            if (loan.latitude && loan.longitude && map) {
+              const pos = { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) };
+              map.setCenter(pos);
+              map.setZoom(10);
+            }
+          }
+        };
+
+        if (typeof agGrid.createGrid === 'function') {
+          encompassLoansGridApi = agGrid.createGrid(gridEl, gridOptions);
+        } else {
+          new agGrid.Grid(gridEl, gridOptions);
+          encompassLoansGridApi = gridOptions.api;
+        }
+
+        $('#loansQuickFilter').on('input', function () {
+          const text = $(this).val();
+          if (encompassLoansGridApi?.setGridOption) {
+            encompassLoansGridApi.setGridOption('quickFilterText', text);
+          } else if (encompassLoansGridApi?.setQuickFilter) {
+            encompassLoansGridApi.setQuickFilter(text);
+          }
+        });
+      }
+
+      function setEncompassLoansGridRows(rows) {
+        if (!encompassLoansGridApi) initEncompassLoansGrid();
+        if (!encompassLoansGridApi) return;
+        if (typeof encompassLoansGridApi.setGridOption === 'function') {
+          encompassLoansGridApi.setGridOption('rowData', rows);
+        } else if (typeof encompassLoansGridApi.setRowData === 'function') {
+          encompassLoansGridApi.setRowData(rows);
+        }
+      }
+
+      function setDisastersGridRows(rows) {
+        if (!disastersGridApi) initDisastersGrid();
+        if (!disastersGridApi) return;
+        if (typeof disastersGridApi.setGridOption === 'function') {
+          disastersGridApi.setGridOption('rowData', rows);
+        } else if (typeof disastersGridApi.setRowData === 'function') {
+          disastersGridApi.setRowData(rows);
+        }
+      }
 
       // Show/hide loading overlay
       function showLoading() {
@@ -945,10 +1353,8 @@
         // Show loading initially
         showLoading();
         
-        // Initialize AI components
-        initializeAIComponents();
-        // Initialize voice recognition
         initializeVoiceRecognition();
+        initializeAIComponents().catch((err) => console.error('AI init failed:', err));
         // Initialize camera data store and functions BEFORE table is created
         window.cameraDataStore = window.cameraDataStore || {};
         
@@ -996,124 +1402,9 @@
           }, 100);
         };
         
-        // Generate initial insights
-        generateInitialInsights();
-        // Ensure table exists and has exactly 9 headers (added Actions column)
-        const headerCount = $('#disastersTable thead th').length;
-        if (headerCount !== 9) {
-          console.error(`❌ Table has ${headerCount} headers, expected 9!`);
-        }
-        
-        table = $('#disastersTable').DataTable({ 
-          pageLength: 25, 
-          order: [[4, 'desc']],
-          autoWidth: false,
-          fixedColumns: false,
-          scrollX: false,
-          destroy: false,
-          retrieve: true,
-          drawCallback: function(settings) {
-            // Force column adjustment on every draw - this fixes alignment issues
-            const api = this.api();
-            
-            // Preserve data-order attributes and badges after redraw (table has 9 columns)
-            $('#disastersTable tbody tr').each(function() {
-              const $row = $(this);
-              const disasterObj = $row.data('disasterObj');
-              if (disasterObj) {
-                const cells = $row.find('td');
-                if (cells.length >= 6) {
-                  // Restore data-order attributes for proper date sorting (Start=4, End=5)
-                  const source = String(disasterObj.source || '').trim().toLowerCase();
-                  const rawStartTime = disasterObj.start_time ? new Date(disasterObj.start_time).getTime() : 0;
-                  const rawEndTime = disasterObj.end_time ? new Date(disasterObj.end_time).getTime() : 0;
-                  
-                  cells.eq(0).attr('data-order', source);
-                  cells.eq(4).attr('data-order', rawStartTime);
-                  cells.eq(5).attr('data-order', rawEndTime);
-                  
-                  // ALWAYS restore badge HTML with correct classes
-                  const $firstCell = cells.eq(0);
-                  const srcUpper = source.toUpperCase();
-                  $firstCell.html('<span class="source-badge source-' + source + '">' + srcUpper + '</span>');
-                }
-              }
-            });
-            
-            // Force Source column width immediately
-            $('#disastersTable thead th:first-child, #disastersTable tbody td:first-child').css({
-              'width': '100px',
-              'min-width': '100px',
-              'max-width': '100px'
-            });
-            
-            // Adjust columns - call multiple times to ensure it takes effect
-            api.columns.adjust();
-            
-            // Force another adjustment after a brief delay to catch any async rendering
-            setTimeout(() => {
-              api.columns.adjust();
-              $('#disastersTable thead th:first-child, #disastersTable tbody td:first-child').css({
-                'width': '100px',
-                'min-width': '100px',
-                'max-width': '100px'
-              });
-            }, 10);
-          },
-          columnDefs: [
-            { 
-              targets: 0, 
-              width: '100px', 
-              className: 'text-center', 
-              orderable: true,
-              type: 'string',
-              render: function(data, type, row, meta) {
-                // Always return HTML badge for display - badges are preserved
-                return data || '';
-              },
-              // Use data-order attribute on cell for sorting
-              orderDataType: 'dom-data'
-            }, // Source column fixed width
-            { 
-              targets: 4, // Start date column - orthogonal data for proper date sort
-              className: 'text-start', 
-              orderable: true,
-              type: 'num',
-              render: function(data, type, row, meta) {
-                if (type === 'sort' || type === 'filter') {
-                  return (data && typeof data === 'object' && typeof data.sort === 'number') ? data.sort : 0;
-                }
-                if (data && typeof data === 'object' && '_' in data) return String(data._ != null ? data._ : '');
-                return typeof data === 'string' ? data : '';
-              }
-            },
-            { 
-              targets: 5, // End date column - orthogonal data for proper date sort
-              className: 'text-start', 
-              orderable: true,
-              type: 'num',
-              render: function(data, type, row, meta) {
-                if (type === 'sort' || type === 'filter') {
-                  return (data && typeof data === 'object' && typeof data.sort === 'number') ? data.sort : 0;
-                }
-                if (data && typeof data === 'object' && '_' in data) return String(data._ != null ? data._ : '');
-                return typeof data === 'string' ? data : '';
-              }
-            },
-            { targets: [1,2,3,6], className: 'text-start', orderable: true } // Other columns
-          ]
-        });
-        
-        // Force Source column width after initialization
-        setTimeout(() => {
-          $('#disastersTable thead th:first-child, #disastersTable tbody td:first-child').css({
-            'width': '100px',
-            'min-width': '100px',
-            'max-width': '100px'
-          });
-          table.columns.adjust();
-        }, 50);
-        encompassLoansTable = $('#encompassLoansTable').DataTable({ pageLength: 10, order: [[0, 'asc']] });
+        initDisastersGrid();
+        initEncompassLoansGrid();
+        initializeDuLoanFilterControls();
         map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6}, mapTypeId: 'satellite' });
         syncSourceChipsFromSelect();
         $('#sourceInput').on('change', syncSourceChipsFromSelect);
@@ -1122,28 +1413,7 @@
           loadDisasters();
         });
         $('#refreshBtn').on('click', refreshDisasters);
-        
-        // Make table rows clickable (but ignore clicks on buttons)
-        $('#disastersTable tbody').on('click', 'tr', function(e) {
-          // Don't trigger if clicking on a button or its children
-          if ($(e.target).closest('button').length > 0) {
-            return;
-          }
-          const data = table.row(this).data();
-          const rowData = table.row(this).nodes().to$().data('disasterObj');
-          selectDisaster(data, rowData);
-        });
-        
-        // Encompass loans: click row to pan map to loan address (zoom 10)
-        $('#encompassLoansTable tbody').on('click', 'tr', function() {
-          const loan = $(this).data('loanObj');
-          if (loan && loan.latitude && loan.longitude && map) {
-            const pos = { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) };
-            map.setCenter(pos);
-            map.setZoom(10);
-          }
-        });
-        
+
         loadYouTubeAPI();
         loadDisasters();
         // Load all encompass loans on map on page load
@@ -1247,34 +1517,6 @@
         }
         
         // Load CA Fire Cameras if selected
-        if (sources.includes('alertcalifornia')) {
-          try {
-            updateLoadingStatusDisaster('Loading fire camera feeds...', 50);
-            const cameraQp = new URLSearchParams();
-            if (state) cameraQp.set('state', state);
-            if (county) cameraQp.set('county', county);
-            cameraQp.set('source', 'alertcalifornia');
-            cameraQp.set('event', 'camera');
-            cameraQp.set('since', new Date(Date.now() - 90*24*3600*1000).toISOString());
-            cameraQp.set('geocode', 'true');
-            cameraQp.set('limit', '2000');
-            const cameraUrl = `/api/disasters?${cameraQp.toString()}`;
-            console.log('📹 Loading CA Fire Cameras:', cameraUrl);
-            const cameraResp = await fetch(cameraUrl);
-            if (!cameraResp.ok) {
-              throw new Error(`Camera feed failed: HTTP ${cameraResp.status}`);
-            }
-            const cameraJson = await cameraResp.json();
-            if (cameraJson.success && cameraJson.data.disasters) {
-              console.log(`📹 Found ${cameraJson.data.disasters.length} cameras`);
-              allRows = allRows.concat(cameraJson.data.disasters);
-            }
-          } catch (e) {
-            console.error('❌ Error loading CA Fire Cameras:', e);
-            setDashboardStatus(`Camera feed load issue: ${e.message}`, 'warning');
-          }
-        }
-        
         if (allRows.length === 0) {
           console.warn('⚠️  No disasters found. Check:');
           console.warn('   - Database connection');
@@ -1420,247 +1662,24 @@
       }
 
       function renderTable(rows) {
-        console.log('🔄 renderTable called with', rows.length, 'rows');
-        
-        // Filter out duplicates based on unique key (source + source_id + start_time)
         const seen = new Set();
-        const uniqueRows = rows.filter(r => {
+        const uniqueRows = rows.filter((r) => {
           const key = `${r.source || ''}_${r.source_id || ''}_${r.start_time || ''}`;
-          if (seen.has(key)) {
-            console.warn(`⚠️  Duplicate row filtered: ${key}`);
-            return false;
-          }
+          if (seen.has(key)) return false;
           seen.add(key);
           return true;
         });
-        
-        console.log(`📊 Filtered ${rows.length} rows to ${uniqueRows.length} unique rows`);
-        
-        // Completely clear the table - destroy and recreate if needed
-        table.clear().draw(false);
-        
-        if (uniqueRows.length === 0) {
-          console.warn('⚠️  No rows to render - grid will be empty');
-          table.draw(); // Draw empty table
-          return; // Early return if no rows
-        }
-        
-        uniqueRows.forEach((r, idx) => {
-          try {
-            // Extract and sanitize all values first
-            const eventType = String(r.event_type || '').trim();
-            const source = String(r.source || '').trim().toLowerCase();
-            const county = String(r.county_name || '').trim();
-            const state = String(r.state_abbr || '').trim();
-            // Store raw date values for sorting
-            const rawStartTime = r.start_time ? new Date(r.start_time).getTime() : 0;
-            const rawEndTime = r.end_time ? new Date(r.end_time).getTime() : 0;
-            // Format dates for display
-            const startTime = r.start_time ? new Date(r.start_time).toLocaleString() : '';
-            const endTime = r.end_time ? new Date(r.end_time).toLocaleString() : '';
-            // Clean title - remove any characters that might cause issues
-            let title = String(r.title || '').trim();
-            title = title.replace(/\s+/g, ' '); // Normalize whitespace
-            
-            // Build source badge with proper styling
-            const icon = getEventIcon(eventType);
-            function createSourceBadge(src) {
-              if (!src) return '';
-              const srcUpper = String(src).toUpperCase();
-              return '<span class="source-badge source-' + src + '">' + srcUpper + '</span>';
-            }
-            const sourceBadge = createSourceBadge(source);
-            // Build event badge
-            let eventBadge = '';
-            if (icon && eventType) {
-              eventBadge = `<span class="event-icon">${icon}</span>${eventType}`;
-            } else {
-              eventBadge = eventType || '';
-            }
-            
-            // Calculate risk score for this disaster
-            const riskScore = calculateDisasterRiskScore(r, uniqueRows);
-            const riskBadge = getRiskBadge(riskScore);
-            
-            // Check if this is a camera row
-            const isCamera = eventType === 'camera' || source === 'alertcalifornia' || 
-                            (title && title.toLowerCase().includes('camera'));
-            
-            // Build action buttons
-            let actionButtons = '';
-            if (isCamera) {
-              // Use onclick directly since delegated handlers might not work with DataTables
-              const cameraDataKey = `camera_table_${idx}_${Date.now()}`;
-              window.cameraDataStore[cameraDataKey] = r;
-              actionButtons = `<button class="btn btn-sm btn-warning camera-view-btn" onclick="window.openCameraViewerFromTable('${cameraDataKey}'); return false;" title="View Camera Feed" style="cursor: pointer;">
-                <i class="bi-camera-video"></i> View Feed
-              </button>`;
-            }
-            
-            // Build rowData array - EXACTLY 9 elements (added Actions column)
-            // Use orthogonal data for date columns: { _: display, sort: timestamp } for correct date sorting
-            const rowData = [
-              sourceBadge || '',    // Source (0) - HTML badge
-              eventBadge || '',       // Event (1)
-              county || '',           // County (2)
-              state || '',            // State (3)
-              { _: startTime || '', sort: rawStartTime },  // Start (4) - display + numeric sort
-              { _: endTime || '', sort: rawEndTime },       // End (5) - display + numeric sort
-              title || '',            // Title (6)
-              riskBadge || '',        // Risk Score (7)
-              actionButtons || ''     // Actions (8)
-            ];
-            
-            // CRITICAL: Ensure exactly 9 elements - no more, no less
-            if (rowData.length !== 9) {
-              console.error(`❌ Row ${idx} (${source}) has ${rowData.length} columns, expected 9:`, rowData);
-              // Force to exactly 9
-              while (rowData.length < 9) rowData.push('');
-              rowData.splice(9); // Remove any extras
-            }
-            
-            // Verify all elements are strings (no undefined/null) - skip indices 4,5 (date objects)
-            for (let i = 0; i < 9; i++) {
-              if (i === 4 || i === 5) continue; // Keep orthogonal date objects for proper sort
-              if (rowData[i] === undefined || rowData[i] === null) {
-                rowData[i] = '';
-              }
-              rowData[i] = String(rowData[i]);
-            }
-            
-            // For FIRMS, log the exact data being added
-            if (source === 'firms') {
-              console.log(`🔥 FIRMS Row ${idx} - Columns:`, {
-                length: rowData.length,
-                columns: rowData.map((col, i) => `[${i}]: "${col}"`)
-              });
-            }
-            
-            // Use the array directly - no copy needed since we're being explicit
-            const rowDataCopy = rowData.slice(0, 9); // Ensure exactly 9
-            
-            // Add row to table with the copy - use apply to ensure clean array
-            const rowNode = table.row.add(rowDataCopy).node();
-            
-            // Store the full row data on the row node for camera viewer access (for all rows, not just cameras)
-            if (rowNode) {
-              $(rowNode).data('rowData', r);
-              $(rowNode).data('disasterObj', r); // Also store as disasterObj for row click handler
-            }
-            
-            // Store raw values for sorting on the cell elements using data-order attribute
-            if (rowNode) {
-              const cells = rowNode.getElementsByTagName('td');
-              if (cells.length === 9) {
-                // Store raw source in first cell (index 0) for sorting
-                const $firstCell = $(cells[0]);
-                $firstCell.attr('data-order', source);
-                
-                // Ensure badge is properly rendered with correct classes
-                const $badge = $firstCell.find('.source-badge');
-                const srcUpper = source.toUpperCase();
-                if ($badge.length === 0 || !$badge.hasClass('source-' + source)) {
-                  // Badge missing or incorrect - fix it immediately
-                  $firstCell.html('<span class="source-badge source-' + source + '">' + srcUpper + '</span>');
-                }
-                
-                // Store raw timestamps in date cells (indices 4 and 5) for numeric sorting
-                $(cells[4]).attr('data-order', rawStartTime);
-                $(cells[5]).attr('data-order', rawEndTime);
-              } else {
-                console.error(`❌ Row ${idx} (${source}) rendered with ${cells.length} cells, expected 9!`, {
-                  rowData: rowData,
-                  cells: Array.from(cells).map(c => c.innerHTML.substring(0, 30))
-                });
-              }
-              
-              if (source === 'firms') {
-                // Log FIRMS rows to verify they're correct
-                const cellCounts = Array.from(cells).map((c, i) => {
-                  const text = $(c).text().trim();
-                  return `[${i}]: "${text}"`;
-                });
-                console.log(`✅ FIRMS row ${idx} rendered with ${cells.length} cells:`, cellCounts.join(', '));
-                
-                // CRITICAL: Ensure no blank columns for FIRMS
-                if (cells.length !== 7) {
-                  console.error(`❌ FIRMS ERROR: Row has ${cells.length} cells instead of 7!`);
-                }
-              }
-            }
-            
-            // Add event type class for row styling
-            if (eventType) {
-              $(rowNode).addClass(`disaster-${eventType}`);
-            }
-            
-            // Add active class if recent (within 24 hours)
-            if (r.start_time) {
-              const startTimeObj = new Date(r.start_time);
-              const hoursAgo = (Date.now() - startTimeObj.getTime()) / (1000 * 60 * 60);
-              if (hoursAgo < 24) {
-                $(rowNode).addClass('disaster-active');
-              }
-            }
-            
-            // Store full disaster object on row for later access
-            $(rowNode).data('disasterObj', r);
-          } catch (e) {
-            console.error(`❌ Error adding row ${idx}:`, e, r);
-          }
-        });
-        
-        // Update stats with original rows count
+
+        const gridRows = uniqueRows.map((r, idx) => buildDisasterGridRow(r, uniqueRows, idx));
+        setDisastersGridRows(gridRows);
         updateStats(rows);
-        
-        // Draw table - ensure columns are properly adjusted
-        table.draw(false); // false = don't reset paging
-        
-        // Force badge fix after draw to ensure all badges are correct
-        setTimeout(() => {
-          $('#disastersTable tbody tr').each(function() {
-            const $row = $(this);
-            const disasterObj = $row.data('disasterObj');
-            if (disasterObj) {
-              const $firstCell = $row.find('td').eq(0);
-              const source = String(disasterObj.source || '').trim().toLowerCase();
-              const srcUpper = source.toUpperCase();
-              const $badge = $firstCell.find('.source-badge');
-              if ($badge.length === 0 || !$badge.hasClass('source-' + source)) {
-                $firstCell.html('<span class="source-badge source-' + source + '">' + srcUpper + '</span>');
-              } else {
-                $badge.removeClass().addClass('source-badge source-' + source).text(srcUpper);
-              }
-            }
+
+        if (disastersGridApi?.applyColumnState) {
+          disastersGridApi.applyColumnState({
+            state: [{ colId: 'startTime', sort: 'desc' }],
+            defaultState: { sort: null }
           });
-        }, 50);
-        
-        // Immediately force column adjustments after draw
-        setTimeout(() => {
-          // Force column adjustments - this is critical for proper rendering
-          table.columns.adjust();
-          
-          // Force Source column width
-          $('#disastersTable thead th:first-child, #disastersTable tbody td:first-child').css({
-            'width': '100px',
-            'min-width': '100px',
-            'max-width': '100px'
-          });
-          
-          // Trigger a redraw to ensure everything is aligned
-          table.columns.adjust();
-          table.draw(false);
-          
-          // Validate column count matches headers
-          const headerCount = $('#disastersTable thead th').length;
-          const firstRowCells = $('#disastersTable tbody tr:first td').length;
-          console.log(`✅ DataTable drawn with ${rows.length} rows`);
-          console.log(`📊 Column validation: ${headerCount} headers, first row has ${firstRowCells} cells`);
-          
-          if (headerCount !== firstRowCells && rows.length > 0) {
-            console.error(`❌ MISMATCH: Headers (${headerCount}) don't match cells (${firstRowCells})!`);
-          }
-        }, 100);
+        }
       }
 
       // Store camera data by index for marker info windows
@@ -1735,9 +1754,54 @@
         renderChunk(0);
       }
 
+      function syncDuLoanRadiusControls() {
+        const isDistance = $('#duLoanScopeMode').val() === 'distance';
+        $('#duLoanRadiusMiles').prop('disabled', !isDistance);
+        $('#duLoanRadiusCustom').prop('disabled', !isDistance);
+        DisasterLoanFilters.syncRadiusCustomVisibility('duLoanRadiusMiles', 'duLoanRadiusCustomWrap');
+      }
+
+      function applyDuLoanFilterIfReady() {
+        if (selectedDisasterObj || selectedDisasterRow) {
+          loadLoansForDisaster(selectedDisasterObj, selectedDisasterRow);
+        }
+      }
+
+      function initializeDuLoanFilterControls() {
+        const stored = DisasterLoanFilters.getStoredRadiusMiles();
+        const presetValues = ['10', '25', '50', '100'];
+        if (presetValues.includes(String(stored))) {
+          $('#duLoanRadiusMiles').val(String(stored));
+        } else {
+          $('#duLoanRadiusMiles').val('custom');
+          $('#duLoanRadiusCustom').val(stored);
+        }
+        syncDuLoanRadiusControls();
+
+        $('#duLoanRadiusMiles').on('change', function () {
+          syncDuLoanRadiusControls();
+          applyDuLoanFilterIfReady();
+          refreshNearbyCameras();
+        });
+        $('#duLoanRadiusCustom').on('change', function () {
+          applyDuLoanFilterIfReady();
+          refreshNearbyCameras();
+        });
+        $('#duLoanFilterApplyBtn').on('click', function () {
+          applyDuLoanFilterIfReady();
+          refreshNearbyCameras();
+        });
+        $('#duLoanScopeMode').on('change', function () {
+          syncDuLoanRadiusControls();
+          applyDuLoanFilterIfReady();
+        });
+      }
+
       // Select disaster and show YouTube/Encompass data
       function selectDisaster(disasterData, disasterObj) {
         selectedDisaster = disasterObj || disasterData;
+        selectedDisasterObj = disasterObj || null;
+        selectedDisasterRow = Array.isArray(disasterData) ? disasterData : null;
         const title = disasterObj?.title || disasterData[6] || '';
         const state = disasterObj?.state_abbr || disasterData[3] || '';
         const county = disasterObj?.county_name || disasterData[2] || '';
@@ -1745,24 +1809,22 @@
         
         console.log('Selecting disaster:', title, state, county, 'Risk:', riskScore);
         
-        // Update risk display if available
         if (riskScore > 0) {
           console.log(`⚠️  Risk Score: ${riskScore.toFixed(1)}`);
         }
         
-        // Show Encompass loans card
-        // Show Encompass loans card and expand accordion
         $('#encompassLoansCard').show();
-        // Expand the Encompass Loans accordion
-        const loansCollapse = new bootstrap.Collapse(document.getElementById('collapseLoans'), {
-          show: true
-        });
-        $('#encompassLoansSubtitle').text(`Loans in ${county}, ${state} affected by ${title}`);
-        
-        // Load Encompass loans
-        if (state && county) {
-          loadEncompassLoansForCounty(state, county);
-        }
+        new bootstrap.Collapse(document.getElementById('collapseLoans'), { show: true });
+
+        if (state) $('#stateInput').val(state);
+        if (county) $('#countyInput').val(county);
+
+        const defaultMode = DisasterLoanFilters.defaultScopeMode(disasterObj, selectedDisasterRow);
+        $('#duLoanScopeMode').val(defaultMode);
+        syncDuLoanRadiusControls();
+
+        loadLoansForDisaster(disasterObj, selectedDisasterRow);
+        loadNearbyCamerasForDisaster(disasterObj, selectedDisasterRow);
         
         // Search YouTube
         if (title) {
@@ -1778,6 +1840,7 @@
           map.setCenter({ lat: parseFloat(disasterObj.lat), lng: parseFloat(disasterObj.lng) });
           map.setZoom(10);
         }
+        refreshAIOnSelection();
       }
 
       // Load all encompass loans on map on page load
@@ -1802,57 +1865,75 @@
         }
       }
 
-      // Load Encompass loans for county
-      async function loadEncompassLoansForCounty(state, county) {
+      async function loadLoansForDisaster(disasterObj, disasterData) {
+        const normalizedDisaster = DisasterLoanFilters.normalizeDisasterForFilters(disasterObj, disasterData);
+        let mode = $('#duLoanScopeMode').val() || DisasterLoanFilters.defaultScopeMode(normalizedDisaster, disasterData);
+        const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('duLoanRadiusMiles', 'duLoanRadiusCustom');
+
+        if (mode === 'distance' && !DisasterLoanFilters.disasterHasCoords(normalizedDisaster, disasterData)) {
+          mode = 'county';
+          $('#duLoanScopeMode').val('county');
+          syncDuLoanRadiusControls();
+          setDashboardStatus('No disaster coordinates — showing county/state matches instead.', 'info');
+        }
+
+        const built = DisasterLoanFilters.buildLoanQueryParams(normalizedDisaster, disasterData, {
+          mode,
+          radiusMiles
+        });
+
+        if (!built.state) {
+          setDashboardStatus('Selected disaster has no state — cannot load loans.', 'warning');
+          return;
+        }
+
         try {
-          const response = await fetch(`/api/loan-pipeline/loans?state=${state}&county=${county}`);
+          const loanUrl = `/api/loan-pipeline/loans?${built.params.toString()}`;
+          console.log('📍 Loading loans:', loanUrl, { mode: built.mode, radiusMiles });
+          const response = await fetch(loanUrl);
           const data = await response.json();
-          
+
           if (data.success) {
-            populateEncompassLoansTable(data.data.loans);
-            updateMapWithLoans(data.data.loans);
+            const loans = data.data.loans || [];
+            populateEncompassLoansTable(loans);
+            updateMapWithLoans(loans);
+            const meta = {
+              mode: built.mode,
+              state: built.state,
+              county: built.county,
+              title: built.title,
+              radiusMiles: mode === 'distance' ? radiusMiles : null
+            };
+            let loanSub = DisasterLoanFilters.formatLoanFilterSubtitle(meta, loans.length);
+            if (!loans.length) {
+              loanSub += ' — No Encompass loans in this radius/county; widen radius or verify county.';
+            }
+            $('#encompassLoansSubtitle').text(loanSub);
+            lastAffectedLoans = loans;
+            lastLoanFilterMeta = meta;
           } else {
-            encompassLoansTable.clear().draw();
+            setEncompassLoansGridRows([]);
+            lastAffectedLoans = [];
+            lastLoanFilterMeta = null;
           }
+          updateSelectionContextStrip();
+          refreshAIContext();
         } catch (error) {
           console.error('Error loading Encompass loans:', error);
-          encompassLoansTable.clear().draw();
+          setEncompassLoansGridRows([]);
+          lastAffectedLoans = [];
+          lastLoanFilterMeta = null;
         }
       }
 
-      // Populate Encompass loans table
       function populateEncompassLoansTable(loans) {
-        encompassLoansTable.clear();
-        
         if (!loans || loans.length === 0) {
-          encompassLoansTable.draw();
+          setEncompassLoansGridRows([]);
           return;
         }
-        
-        loans.forEach(loan => {
-          const riskLevel = getRiskLevel(loan.disaster_risk_score);
-          const riskClass = getRiskClass(loan.disaster_risk_score);
-          const lastAnalysis = loan.last_risk_analysis ? 
-            new Date(loan.last_risk_analysis).toLocaleDateString() : 'Not analyzed';
-          
-          encompassLoansTable.row.add([
-            loan.loan_number,
-            loan.borrower_name,
-            loan.property_address,
-            `${loan.city}, ${loan.state}`,
-            loan.county || '',
-            `$${loan.loan_amount ? loan.loan_amount.toLocaleString() : '0'}`,
-            loan.milestone,
-            `<span class="badge ${riskClass}">${riskLevel}</span>`,
-            loan.encompass_loan_guid || 'Not assigned',
-            lastAnalysis
-          ]);
-          
-          const rowNode = encompassLoansTable.row(':last').node();
-          $(rowNode).data('loanObj', loan);
-        });
-        
-        encompassLoansTable.draw();
+        const rows = loans.map((loan) => buildEncompassLoanGridRow(loan));
+        rows.sort((a, b) => (a.distanceKm || 999999) - (b.distanceKm || 999999));
+        setEncompassLoansGridRows(rows);
       }
 
       // Get risk level text
@@ -2046,52 +2127,127 @@
         }, duration / steps);
       }
 
-      // Initialize AI Components
-      async function initializeAIComponents() {
-        // Import voice commands module
+      async function getDisasterStats() {
         try {
-          const voiceCommands = await import('../shared/voice-commands.js');
-          window.parseVoiceCommand = voiceCommands.parseVoiceCommand;
-          window.executeVoiceCommand = voiceCommands.executeVoiceCommand;
-        } catch (error) {
-          console.warn('Failed to load voice commands:', error);
+          const res = await fetch('/api/disasters/stats');
+          const json = await res.json();
+          if (json.success) return json.data;
+        } catch (e) {
+          console.warn('Could not load disaster stats:', e);
         }
-        
-        const userId = 'anonymous'; // Could use logged in user if available
-        
-        // Initialize AI Chat Widget (disaster-focused)
-        if (window.AIChatWidget) {
-          aiChatWidget = new window.AIChatWidget({
-            apiEndpoint: '/api/loan-pipeline/ai/chat', // Using same endpoint, context will differ
-            userId: userId,
-            sessionId: 'disasters-unified',
-            getContext: () => ({
-              selectedDisaster: selectedDisaster,
-              filters: getCurrentFilters()
-            }),
-            onMessageSent: (message) => console.log('AI Chat message sent:', message),
-            onMessageReceived: (response, data) => console.log('AI Chat response received:', response)
-          });
-          window.aiChatWidget = aiChatWidget;
-        }
-        
-        // Initialize AI Insights Card
-        if (window.AIInsightsCard) {
-          aiInsightsCard = new window.AIInsightsCard({
-            apiEndpoint: '/api/loan-pipeline/ai/insights',
-            userId: userId,
-            containerId: 'aiInsightsContainer',
-            autoGenerate: true,
-            onInsightsGenerated: (insights, data) => console.log('AI Insights generated:', insights)
-          });
-          window.aiInsightsCard = aiInsightsCard;
+        return { displayedRows: disastersGridApi?.getDisplayedRowCount?.() ?? 0 };
+      }
+
+      async function buildAIContext() {
+        return {
+          page: 'disasters-unified',
+          expertProfile: 'processor',
+          filters: getCurrentFilters(),
+          selectedDisaster: selectedDisasterObj,
+          selectedLoan: selectedLoan || null,
+          loanFilterMeta: lastLoanFilterMeta,
+          nearbyLoans: {
+            count: lastAffectedLoans.length,
+            sample: lastAffectedLoans.slice(0, 15)
+          },
+          nearbyCameras: {
+            count: lastNearbyCameras.length,
+            sample: lastNearbyCameras.slice(0, 5)
+          },
+          stats: await getDisasterStats()
+        };
+      }
+
+      async function refreshAIContext() {
+        if (!aiChatWidget) return;
+        const ctx = await buildAIContext();
+        aiChatWidget.updateContext(ctx);
+      }
+
+      function openProcessorExpert() {
+        if (window.aiChatWidget && typeof window.aiChatWidget.toggle === 'function') {
+          window.aiChatWidget.toggle();
         }
       }
 
-      // Generate initial insights
-      async function generateInitialInsights() {
-        if (aiInsightsCard) {
-          await aiInsightsCard.generateInsights(getCurrentFilters(), 'load', null);
+      function showInsightsIdlePlaceholder() {
+        const container = document.getElementById('aiInsightsContainer');
+        if (!container) return;
+        container.innerHTML = `
+          <div id="aiInsightsIdle" class="card border bg-light shadow-sm mb-0">
+            <div class="card-body py-2 small text-muted mb-0">
+              <i class="bi bi-lightbulb"></i> Select a disaster in the grid for tailored AI insights.
+            </div>
+          </div>`;
+      }
+
+      function updateSelectionContextStrip() {
+        const el = document.getElementById('selectionContextStrip');
+        if (!el || !selectedDisasterObj) {
+          if (el) el.style.display = 'none';
+          return;
+        }
+        const title = selectedDisasterObj.title || selectedDisasterObj.declarationTitle || 'Selected disaster';
+        const state = selectedDisasterObj.state_abbr || '';
+        const county = selectedDisasterObj.county_name || '';
+        const loanLine = lastLoanFilterMeta
+          ? DisasterLoanFilters.formatLoanFilterSubtitle(lastLoanFilterMeta, lastAffectedLoans.length)
+          : `${lastAffectedLoans.length} affected loan(s)`;
+        const camLine = lastNearbyCameras.length
+          ? `${lastNearbyCameras.length} fire camera(s) nearby`
+          : 'No nearby cameras in range';
+        el.innerHTML = `<strong>${title}</strong> · ${county}${county && state ? ', ' : ''}${state}
+          · ${loanLine} · ${camLine}
+          · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>
+          · <a href="disasters-ca-cameras.html" class="alert-link">CA cameras</a>
+          · <a href="pipeline-risk-dashboard.html" class="alert-link">FEMA pipeline risk</a>`;
+        el.style.display = 'block';
+      }
+
+      function refreshAIOnSelection() {
+        updateSelectionContextStrip();
+        refreshAIContext();
+        if (aiInsightsCard && selectedDisasterObj) {
+          aiInsightsCard.generateInsights(getCurrentFilters(), 'disaster', selectedDisasterObj);
+        } else {
+          showInsightsIdlePlaceholder();
+        }
+      }
+
+      async function initializeAIComponents() {
+        const userId = (typeof window.getLoggedInUser === 'function' && window.getLoggedInUser())
+          ? (window.getLoggedInUser().id || 'anonymous')
+          : 'anonymous';
+
+        const processorWelcome = `<i class="bi bi-robot"></i>
+          <p><strong>Disaster processor expert</strong> — ask about verification, insurance, milestones, and triage for the selected event.</p>
+          <small class="text-muted">Try: "What should I verify on loans within 25 miles?" · "Which milestones to hold until flood insurance is confirmed?" · "Summarize operational risk for this county."</small>`;
+
+        if (window.AIChatWidget) {
+          aiChatWidget = new window.AIChatWidget({
+            apiEndpoint: '/api/loan-pipeline/ai/chat-disaster-expert',
+            userId,
+            sessionId: 'unified-disaster-processor',
+            title: 'Disaster Processor Expert',
+            buttonTitle: 'Disaster processor expert (voice: use chat mic)',
+            welcomeHtml: processorWelcome,
+            inputPlaceholder: 'Ask about processor actions for this disaster…',
+            getContext: buildAIContext,
+            onMessageSent: (message) => console.log('Disaster expert message:', message),
+            onMessageReceived: (response) => console.log('Disaster expert response:', response)
+          });
+          window.aiChatWidget = aiChatWidget;
+        }
+
+        if (window.AIInsightsCard) {
+          aiInsightsCard = new window.AIInsightsCard({
+            apiEndpoint: '/api/loan-pipeline/ai/insights',
+            userId,
+            containerId: 'aiInsightsContainer',
+            autoGenerate: false,
+            onInsightsGenerated: (insights) => console.log('AI Insights:', insights)
+          });
+          window.aiInsightsCard = aiInsightsCard;
         }
       }
 
@@ -2119,37 +2275,49 @@
         voiceRecognition.interimResults = false;
         voiceRecognition.lang = 'en-US';
 
+        const runToolbarVoiceCommand = async function(event) {
+          const transcript = event.results[event.results.length - 1][0].transcript;
+          console.log('Voice command:', transcript);
+          setDashboardStatus(`Heard: "${transcript}"`, 'info');
+          if (!window.parseVoiceCommand || !window.executeVoiceCommand) {
+            setDashboardStatus('Voice commands not loaded yet.', 'warning');
+            return;
+          }
+          const action = window.parseVoiceCommand(transcript);
+          const context = {
+            applyFilters: loadDisasters,
+            setStateFilter: (state) => $('#stateInput').val(state),
+            setCountyFilter: (county) => $('#countyInput').val(county),
+            loadFEMADisastersDirect: () => $('#applyBtn').click(),
+            expandAccordion: (targetId) => {
+              const el = document.getElementById(targetId);
+              if (el) new bootstrap.Collapse(el, { show: true });
+            }
+          };
+          const result = await window.executeVoiceCommand(action, context);
+          if (result.success) {
+            setDashboardStatus(result.message || 'Done.', 'success');
+            if (action.type === 'filter' && aiInsightsCard) {
+              aiInsightsCard.generateInsights(getCurrentFilters(), 'filter', selectedDisasterObj);
+            }
+          } else {
+            setDashboardStatus(result.message || 'Command not recognized.', 'warning');
+          }
+        };
+
         voiceRecognition.onstart = function() {
           isVoiceListening = true;
           updateVoiceButton(true);
+          setDashboardStatus('Listening… speak a filter or navigation command.', 'info');
         };
 
-        voiceRecognition.onresult = async function(event) {
-          const transcript = event.results[event.results.length - 1][0].transcript;
-          console.log('Voice command:', transcript);
-          
-          if (window.parseVoiceCommand && window.executeVoiceCommand) {
-            const action = window.parseVoiceCommand(transcript);
-            const context = {
-              applyFilters: loadDisasters,
-              setStateFilter: (state) => $('#stateInput').val(state),
-              setCountyFilter: (county) => $('#countyInput').val(county),
-              expandAccordion: (targetId) => {
-                const collapse = new bootstrap.Collapse(document.getElementById(targetId), { show: true });
-              }
-            };
-            
-            const result = await window.executeVoiceCommand(action, context);
-            if (result.success && aiInsightsCard) {
-              aiInsightsCard.generateInsights(getCurrentFilters(), 'filter', null);
-            }
-          }
-        };
+        voiceRecognition.onresult = runToolbarVoiceCommand;
 
         voiceRecognition.onerror = function(event) {
           console.error('Voice recognition error:', event.error);
           isVoiceListening = false;
           updateVoiceButton(false);
+          setDashboardStatus('Voice recognition error. Try again.', 'danger');
         };
 
         voiceRecognition.onend = function() {
@@ -2159,15 +2327,17 @@
 
         window.voiceRecognition = {
           start: (callback) => {
-            if (callback) {
-              voiceRecognition.onresult = function(event) {
-                const transcript = event.results[event.results.length - 1][0].transcript;
-                callback(transcript);
-              };
-            }
+            voiceRecognition.onresult = callback
+              ? function(event) {
+                  callback(event.results[event.results.length - 1][0].transcript);
+                }
+              : runToolbarVoiceCommand;
             voiceRecognition.start();
           },
-          stop: () => voiceRecognition.stop(),
+          stop: () => {
+            voiceRecognition.onresult = runToolbarVoiceCommand;
+            voiceRecognition.stop();
+          },
           isListening: () => isVoiceListening
         };
       }
@@ -2202,144 +2372,15 @@
         }
       }
 
-      // Show camera viewer modal (make it globally accessible)
-      window.showCameraViewer = function showCameraViewer(cameraData) {
-        console.log('📹 showCameraViewer called with:', cameraData);
-        
-        if (!cameraData) {
-          console.error('❌ showCameraViewer called with no data');
-          alert('Error: No camera data available');
-          return;
-        }
-        
-        // Parse raw field if it's a JSON string
-        let raw = cameraData.raw || {};
-        if (typeof raw === 'string') {
-          try {
-            raw = JSON.parse(raw);
-          } catch (e) {
-            console.warn('⚠️  Could not parse raw field:', e);
-            raw = {};
-          }
-        }
-        
-        console.log('📹 Parsed raw data:', raw);
-        
-        // Extract camera URLs from raw metadata (check multiple possible field names)
-        const cameraUrl = raw.camera_url || raw.cameraURL || raw.CAMERA_URL || raw.cameraUrl || null;
-        const networkUrl = raw.network_url || raw.networkURL || raw.NETWORK_URL || raw.networkUrl || null;
-        const imageUrl = raw.image_url || raw.imageURL || raw.IMAGE_URL || raw.imageUrl || null;
-        const cameraName = cameraData.title || raw.name || raw.cameraName || raw.camera_name || 'Fire Camera';
-        const siteId = raw.site_id || raw.siteId || raw.SITE_ID || raw.siteId || null;
-        
-        // Determine which URL to use (prefer camera_url, then network_url, then image_url)
-        let feedUrl = cameraUrl || networkUrl || imageUrl;
-        
-        // If we have a siteId but no URL, construct ALERTCalifornia URL
-        if (!feedUrl && siteId) {
-          feedUrl = `https://cameras.alertcalifornia.org/?id=${siteId}`;
-        } else if (!feedUrl && networkUrl) {
-          feedUrl = networkUrl;
-        }
-        
-        // Update modal content
-        $('#cameraViewerTitle').text(cameraName);
-        $('#cameraViewerLocation').text(`${cameraData.county_name || ''}, ${cameraData.state_abbr || 'CA'}`);
-        $('#cameraViewerSiteId').text(siteId || 'N/A');
-        
-        // Update "Open in New Tab" link
-        const cameraViewerLink = document.getElementById('cameraViewerLink');
-        if (feedUrl) {
-          cameraViewerLink.href = feedUrl;
-          cameraViewerLink.style.display = 'inline-block';
-        } else {
-          cameraViewerLink.style.display = 'none';
-        }
-        
-        // Set up camera feed
-        const cameraFrame = document.getElementById('cameraFeedFrame');
-        const cameraImg = document.getElementById('cameraFeedImg');
-        const cameraError = document.getElementById('cameraFeedError');
-        
-        // Hide error initially
-        cameraError.style.display = 'none';
-        
-        if (feedUrl) {
-          // Try iframe first for interactive camera controls
-          if (cameraUrl || networkUrl) {
-            cameraFrame.src = feedUrl;
-            cameraFrame.style.display = 'block';
-            cameraImg.style.display = 'none';
-          } else if (imageUrl) {
-            // Use img tag for static images with auto-refresh
-            cameraFrame.style.display = 'none';
-            cameraImg.src = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-            cameraImg.style.display = 'block';
-            
-            // Auto-refresh image every 30 seconds
-            if (window.cameraRefreshInterval) {
-              clearInterval(window.cameraRefreshInterval);
-            }
-            window.cameraRefreshInterval = setInterval(() => {
-              cameraImg.src = imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-            }, 30000);
-          } else {
-            cameraError.textContent = 'Camera feed URL not available';
-            cameraError.style.display = 'block';
-            cameraFrame.style.display = 'none';
-            cameraImg.style.display = 'none';
-          }
-        } else {
-          cameraError.textContent = 'No camera feed URL found for this camera';
-          cameraError.style.display = 'block';
-          cameraFrame.style.display = 'none';
-          cameraImg.style.display = 'none';
-        }
-        
-        // Show modal
-        const cameraModal = new bootstrap.Modal(document.getElementById('cameraViewerModal'));
-        cameraModal.show();
-      }
-      
-      // Clean up refresh interval when modal is closed
-      document.getElementById('cameraViewerModal').addEventListener('hidden.bs.modal', function() {
-        if (window.cameraRefreshInterval) {
-          clearInterval(window.cameraRefreshInterval);
-          window.cameraRefreshInterval = null;
-        }
-        // Clear iframe src to stop loading
-        document.getElementById('cameraFeedFrame').src = '';
-      });
-      
-      // Handle camera viewer button clicks from table (use delegated event handler)
+      // Disaster table camera buttons (legacy rows with event_type camera)
       $(document).on('click', '.camera-view-btn', function(e) {
-        e.stopPropagation(); // Prevent row click event
-        e.preventDefault(); // Prevent any default behavior
-        
-        console.log('📹 Camera button clicked!');
-        
-        // Find the row node that contains this button
+        e.stopPropagation();
+        e.preventDefault();
         const rowNode = $(this).closest('tr')[0];
-        console.log('📹 Row node found:', rowNode);
-        
-        if (!rowNode) {
-          console.error('❌ Could not find row node');
-          return;
-        }
-        
+        if (!rowNode) return;
         const rowData = $(rowNode).data('rowData') || $(rowNode).data('disasterObj');
-        console.log('📹 Row data:', rowData);
-        
-        if (rowData) {
-          console.log('📹 Opening camera viewer from table button:', rowData);
-          showCameraViewer(rowData);
-        } else {
-          console.error('❌ Could not find row data for camera viewer');
-          console.log('📹 Available data on row:', {
-            rowData: $(rowNode).data('rowData'),
-            disasterObj: $(rowNode).data('disasterObj'),
-            allData: $(rowNode).data()
-          });
+        if (rowData && typeof window.showCameraViewer === 'function') {
+          window.showCameraViewer(rowData);
         }
       });
       
@@ -2378,7 +2419,7 @@
               </div>
             </div>
             <div class="mt-3 text-center">
-              <button class="btn btn-primary" onclick="document.getElementById('cameraFeedImg').src = document.getElementById('cameraFeedImg').src.split('&t=')[0] + '&t=' + Date.now();">
+              <button type="button" class="btn btn-primary" id="refreshFeedImgBtn">
                 <i class="bi-arrow-clockwise"></i> Refresh Image
               </button>
               <a id="cameraViewerLink" href="#" target="_blank" class="btn btn-outline-primary ms-2">
@@ -2392,7 +2433,33 @@
         </div>
       </div>
     </div>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="tool-product-credits-footer" role="contentinfo" aria-label="Product credits">
+            <div class="credits-block">
+              <span class="credits-label">Developed by</span>
+              <span class="credits-name">David E Lane</span>
+            </div>
+          </div>
+          <div class="footer-meta-line">
+            <span id="disastersFooterDate"></span>
+            <span class="mx-1">·</span>
+            <span>Unified Disasters · DevConnect Labs</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('disastersFooterDate');
+        if (el) el.textContent = new Date().toLocaleDateString();
+      });
+    </script>
   <script src="/shared/finance-auth-guard.js"></script>
+  <script src="/shared/encompass-dark-mode.js"></script>
   </body>
 </html>
 

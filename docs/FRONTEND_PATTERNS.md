@@ -42,6 +42,12 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 
 ## Lane / family maps (`public/family/`)
 
+**Footer credit:** Add `<div data-lane-site-credit></div>` and [`public/family/js/lane-site-credit.js`](../public/family/js/lane-site-credit.js) before closing `</main>` (styles in [`lane-shell.css`](../public/family/css/lane-shell.css)). Copy: “Developed by David E Lane · AI-assisted development” plus date.
+
+**Unified Disasters** ([`public/finance/disasters-unified.html`](../public/finance/disasters-unified.html)) uses the finance `tool-product-credits-footer` pattern inline (label **Developed by**, name **David E Lane**) — same labels as unit-tests/tool4, without the product-director block.
+
+**CA fire cameras** ([`public/finance/disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html)): fixed ALERTCalifornia mounts on a separate page; data from `GET /api/disasters/cameras` (`fire_cameras` table). Unified Disasters links here only (no camera layer on the disaster map). Ingest: `npm run refresh:fire-cameras` or `POST /api/disasters/refresh-cameras`.
+
 **Map display** uses the **Google Maps JavaScript API** (hybrid / satellite+labels via `mapTypeId: HYBRID`). The browser loads Maps with `GET /api/genealogy/google-api-key` (`GOOGLE_BROWSER_API_KEY` or `GOOGLE_API_KEY` on the server). Shared loader: [`public/family/js/lane-family-google-maps.js`](./../public/family/js/lane-family-google-maps.js).
 
 **Geocoding stays server-side** via [`services/free-geocoding.service.js`](./../services/free-geocoding.service.js) (Mapbox Geocoding API when `MAPBOX_ACCESS_TOKEN` is set, then Nominatim, etc.): `GET /api/genealogy/geocode-address?q=`. Do **not** use `google.maps.Geocoder` on family pages for place resolution; keep using that endpoint. Historical place aliases live in [`services/genealogy-geocode.service.js`](./../services/genealogy-geocode.service.js).

@@ -54,7 +54,7 @@
 
 import { getPool } from './database.service.js';
 import { reverseGeocodeCountyState } from './disaster-risk.service.js';
-import { geocodeCountyStateWithCache } from './geocoding-cache.service.js';
+import { geocodeCountyStateWithCache, reverseGeocodeWithCache } from './geocoding-cache.service.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -88,6 +88,48 @@ CREATE INDEX IF NOT EXISTS idx_disasters_state ON disasters (state_abbr);
 CREATE INDEX IF NOT EXISTS idx_disasters_fips ON disasters (county_fips);
 `;
 
+const CREATE_FIRE_CAMERAS_SQL = `
+CREATE TABLE IF NOT EXISTS fire_cameras (
+  id SERIAL PRIMARY KEY,
+  source_id TEXT NOT NULL UNIQUE,
+  name TEXT,
+  lat DOUBLE PRECISION NOT NULL,
+  lng DOUBLE PRECISION NOT NULL,
+  county_name TEXT,
+  county_fips CHAR(5),
+  state_abbr VARCHAR(3) DEFAULT 'CA',
+  camera_url TEXT,
+  network_url TEXT,
+  image_url TEXT,
+  status TEXT,
+  raw JSONB,
+  geocoded_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+`;
+
+const FIRE_CAMERAS_INDEXES_SQL = `
+CREATE INDEX IF NOT EXISTS idx_fire_cameras_state ON fire_cameras (state_abbr);
+CREATE INDEX IF NOT EXISTS idx_fire_cameras_county ON fire_cameras (county_name);
+`;
+
+/** Max reverse-geocode calls per camera ingest run (fixed mount locations, once only). */
+const MAX_CAMERA_GEOCODES_PER_RUN = 50;
+
+/**
+ * Initialize fire_cameras schema (idempotent).
+ */
+export async function initFireCamerasSchema() {
+  const pool = getPool();
+  if (!pool) {
+    console.warn('⚠️  Database pool not initialized; fire_cameras schema not created');
+    return;
+  }
+  await pool.query(CREATE_FIRE_CAMERAS_SQL);
+  await pool.query(FIRE_CAMERAS_INDEXES_SQL);
+}
+
 /**
  * Initialize disasters schema (idempotent).
  */
@@ -101,6 +143,7 @@ export async function initDisastersSchema() {
     await pool.query('BEGIN');
     await pool.query(CREATE_TABLE_SQL);
     await pool.query(INDEXES_SQL);
+    await initFireCamerasSchema();
     
     // Migrate existing state_abbr column from CHAR(2) to VARCHAR(3) for Canadian provinces
     try {
@@ -202,6 +245,72 @@ export function calculateDistance(lat1, lng1, lat2, lng2) {
   return R * c;
 }
 
+const KM_PER_MILE = 1.60934;
+const MI_PER_KM = 0.621371;
+
+/**
+ * Keep fire cameras within radius of a center point (Haversine).
+ * @param {Array} cameras
+ * @param {number} nearLat
+ * @param {number} nearLng
+ * @param {number} radiusMiles
+ * @returns {Array}
+ */
+export function filterFireCamerasByDistance(cameras, nearLat, nearLng, radiusMiles) {
+  const radiusKm = radiusMiles * KM_PER_MILE;
+  const centerLat = parseFloat(nearLat);
+  const centerLng = parseFloat(nearLng);
+  if (!Number.isFinite(centerLat) || !Number.isFinite(centerLng)) {
+    return [];
+  }
+  return cameras.filter((cam) => {
+    const lat = parseFloat(cam.lat);
+    const lng = parseFloat(cam.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return false;
+    }
+    const km = calculateDistance(centerLat, centerLng, lat, lng);
+    return km !== null && km <= radiusKm;
+  });
+}
+
+/**
+ * Attach distance_km / distance_miles and sort nearest-first.
+ * @param {Array} cameras
+ * @param {number} nearLat
+ * @param {number} nearLng
+ * @returns {Array}
+ */
+export function sortCamerasByDistance(cameras, nearLat, nearLng) {
+  const centerLat = parseFloat(nearLat);
+  const centerLng = parseFloat(nearLng);
+  if (!Number.isFinite(centerLat) || !Number.isFinite(centerLng)) {
+    return cameras;
+  }
+  return cameras
+    .map((cam) => {
+      const lat = parseFloat(cam.lat);
+      const lng = parseFloat(cam.lng);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        return { ...cam, distance_km: null, distance_miles: null };
+      }
+      const distance_km = calculateDistance(centerLat, centerLng, lat, lng);
+      const distance_miles = distance_km != null
+        ? Math.round(distance_km * MI_PER_KM * 10) / 10
+        : null;
+      return {
+        ...cam,
+        distance_km: distance_km != null ? Math.round(distance_km * 10) / 10 : null,
+        distance_miles
+      };
+    })
+    .sort((a, b) => {
+      if (a.distance_km == null) return 1;
+      if (b.distance_km == null) return -1;
+      return a.distance_km - b.distance_km;
+    });
+}
+
 export default {
   initDisastersSchema,
   loadFipsReference,
@@ -214,6 +323,9 @@ export default {
   ingestNwsCap,
   ingestNhc,
   ingestCaFireCameras,
+  initFireCamerasSchema,
+  upsertFireCameras,
+  cleanupLegacyCameraDisasters,
 };
 
 /**
@@ -280,6 +392,92 @@ export async function upsertDisasters(batch) {
 
   console.log(`📊 upsertDisasters: ${inserted} inserted, ${skipped} skipped from ${batch.length} records`);
   return { inserted, skipped };
+}
+
+/**
+ * Upsert fixed ALERTCalifornia camera mounts into fire_cameras (not disasters).
+ */
+export async function upsertFireCameras(batch) {
+  if (!Array.isArray(batch) || batch.length === 0) return { upserted: 0 };
+  const pool = getPool();
+  if (!pool) throw new Error('Database not initialized');
+
+  const CHUNK_SIZE = 100;
+  let upserted = 0;
+
+  for (let i = 0; i < batch.length; i += CHUNK_SIZE) {
+    const chunk = batch.slice(i, i + CHUNK_SIZE);
+    if (!chunk.length) continue;
+    try {
+      const values = [];
+      const tuples = chunk.map((c, idx) => {
+        const base = idx * 13;
+        values.push(
+          c.source_id,
+          c.name || null,
+          c.lat,
+          c.lng,
+          c.county_name || null,
+          c.county_fips || null,
+          c.state_abbr || 'CA',
+          c.camera_url || null,
+          c.network_url || null,
+          c.image_url || null,
+          c.status || null,
+          c.raw || null,
+          c.geocoded_at || null
+        );
+        return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11},$${base + 12},$${base + 13},NOW())`;
+      });
+      const text = `
+        INSERT INTO fire_cameras (
+          source_id, name, lat, lng, county_name, county_fips, state_abbr,
+          camera_url, network_url, image_url, status, raw, geocoded_at, updated_at
+        ) VALUES ${tuples.join(',')}
+        ON CONFLICT (source_id) DO UPDATE SET
+          name = EXCLUDED.name,
+          lat = COALESCE(fire_cameras.lat, EXCLUDED.lat),
+          lng = COALESCE(fire_cameras.lng, EXCLUDED.lng),
+          county_name = COALESCE(fire_cameras.county_name, EXCLUDED.county_name),
+          county_fips = COALESCE(fire_cameras.county_fips, EXCLUDED.county_fips),
+          state_abbr = COALESCE(fire_cameras.state_abbr, EXCLUDED.state_abbr),
+          camera_url = COALESCE(EXCLUDED.camera_url, fire_cameras.camera_url),
+          network_url = COALESCE(EXCLUDED.network_url, fire_cameras.network_url),
+          image_url = COALESCE(EXCLUDED.image_url, fire_cameras.image_url),
+          status = COALESCE(EXCLUDED.status, fire_cameras.status),
+          raw = COALESCE(EXCLUDED.raw, fire_cameras.raw),
+          geocoded_at = COALESCE(fire_cameras.geocoded_at, EXCLUDED.geocoded_at),
+          updated_at = NOW()
+      `;
+      const res = await pool.query(text, values);
+      upserted += res.rowCount || chunk.length;
+    } catch (e) {
+      console.warn('⚠️  Upsert fire_cameras chunk failed:', e.message);
+    }
+  }
+
+  console.log(`📹 upsertFireCameras: ${upserted} rows from ${batch.length} cameras`);
+  return { upserted };
+}
+
+/** Remove legacy camera rows mistakenly stored in disasters. */
+export async function cleanupLegacyCameraDisasters() {
+  const pool = getPool();
+  if (!pool) return 0;
+  try {
+    const res = await pool.query(`
+      DELETE FROM disasters
+      WHERE source = 'alertcalifornia' AND event_type = 'camera'
+    `);
+    const deleted = res.rowCount || 0;
+    if (deleted > 0) {
+      console.log(`📹 Removed ${deleted} legacy alertcalifornia camera rows from disasters`);
+    }
+    return deleted;
+  } catch (e) {
+    console.warn('⚠️  cleanupLegacyCameraDisasters failed:', e.message);
+    return 0;
+  }
 }
 
 /**
@@ -942,11 +1140,13 @@ export async function ingestCaFireCameras() {
   const pool = getPool();
   if (!pool) {
     console.warn('⚠️  Database pool not initialized; skipping CA fire cameras');
-    return { inserted: 0, skipped: 0 };
+    return { inserted: 0, upserted: 0, geocoded: 0 };
   }
 
   try {
     console.log('📹 Starting CA Fire Cameras ingestion...');
+    await loadFipsReference();
+    await initFireCamerasSchema();
     
     // ALERTCalifornia cameras are accessible via their API
     // Try multiple endpoints - ALERTCalifornia uses ArcGIS services
@@ -1205,7 +1405,7 @@ export async function ingestCaFireCameras() {
 
     if (cameras.length === 0) {
       console.log('📹 No CA fire cameras found (API may be unavailable or format changed)');
-      return { inserted: 0, skipped: 0 };
+      return { inserted: 0, upserted: 0, geocoded: 0 };
     }
 
     const beforeDedup = cameras.length;
@@ -1214,58 +1414,87 @@ export async function ingestCaFireCameras() {
       console.log(`📹 CA Fire Cameras: deduplicated ${beforeDedup} ➜ ${cameras.length} unique cameras`);
     }
 
-    // Convert cameras to disaster-like records for unified table
-    // We'll store cameras as "camera" event_type with source "alertcalifornia"
+    const existingBySourceId = new Map();
+    const existingRes = await pool.query(
+      'SELECT source_id, county_name, county_fips, geocoded_at FROM fire_cameras'
+    );
+    for (const row of existingRes.rows) {
+      existingBySourceId.set(String(row.source_id), row);
+    }
+
     const batch = [];
-    const now = new Date().toISOString();
+    let geocodeCount = 0;
+    const geocodeTimestamp = () => new Date().toISOString();
 
     for (const camera of cameras) {
       if (!camera.latitude || !camera.longitude) continue;
 
-      // Try to get county from camera data or reverse geocode
-      let countyFips = null;
-      let countyName = camera.county || null;
+      const lat = parseFloat(camera.latitude);
+      const lng = parseFloat(camera.longitude);
+      const sourceId = String(
+        camera.camera_id || camera.name || `camera_${lat}_${lng}`
+      );
+      const existing = existingBySourceId.get(sourceId);
       const stateAbbr = 'CA';
 
-      // Try to lookup county FIPS if we have county name
+      let countyName = (camera.county || '').replace(/\s*County$/i, '').trim() || null;
       if (countyName) {
-        const fipsLookup = await lookupCountyByFips(null, countyName, stateAbbr);
-        if (fipsLookup) {
-          countyFips = fipsLookup.fips;
+        countyName = countyName
+          .split(/\s+/)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+          .join(' ');
+      }
+      let countyFips = countyName ? mapCountyToFips(countyName, stateAbbr) : null;
+      let geocodedAt = null;
+
+      const hasCountyFromFeed = !!(countyName && countyFips);
+      const alreadyGeocoded = existing?.geocoded_at != null;
+      const hasStoredCounty = !!(
+        existing?.county_name &&
+        existing?.county_fips &&
+        existing.county_fips !== '06000'
+      );
+
+      if (hasCountyFromFeed) {
+        geocodedAt = geocodeTimestamp();
+      } else if (hasStoredCounty) {
+        countyName = existing.county_name;
+        countyFips = existing.county_fips;
+      } else if (!alreadyGeocoded && geocodeCount < MAX_CAMERA_GEOCODES_PER_RUN) {
+        try {
+          const geo = await reverseGeocodeWithCache(lat, lng);
+          if (geo.county) {
+            countyName = String(geo.county).replace(/\s*County$/i, '').trim();
+            countyFips = mapCountyToFips(countyName, geo.state || stateAbbr);
+          }
+          geocodedAt = geocodeTimestamp();
+          geocodeCount++;
+          if (!geo.cached) {
+            await new Promise((resolve) => setTimeout(resolve, 1100));
+          }
+        } catch (e) {
+          console.warn(`⚠️  Camera geocode failed for ${sourceId}:`, e.message);
+          geocodedAt = geocodeTimestamp();
+          geocodeCount++;
         }
+      } else if (existing) {
+        countyName = existing.county_name || countyName;
+        countyFips = existing.county_fips || countyFips;
       }
 
-      // 🚫 GEOCODING DISABLED FOR CAMERA FEEDS - No reverse geocoding
-      // if (!countyFips && camera.latitude && camera.longitude) {
-      //   try {
-      //     const geo = await reverseGeocodeCountyState(camera.latitude, camera.longitude);
-      //     if (geo.county) {
-      //       countyName = geo.county;
-      //       const fipsLookup = await lookupCountyByFips(null, geo.county, geo.state || 'CA');
-      //       if (fipsLookup) {
-      //         countyFips = fipsLookup.fips;
-      //       }
-      //     }
-      //   } catch (e) {
-      //     // Skip reverse geocoding errors
-      //   }
-      // }
-
-      const sourceId = camera.camera_id || camera.name || `camera_${camera.latitude}_${camera.longitude}`;
-      
       batch.push({
-        source: 'alertcalifornia',
-        event_type: 'camera',
-        county_fips: countyFips || '06000', // Default to CA state FIPS if county unknown
-        county_name: countyName || 'Unknown',
+        source_id: sourceId,
+        name: camera.name || 'Fire Camera',
+        lat,
+        lng,
+        county_name: countyName,
+        county_fips: countyFips,
         state_abbr: stateAbbr,
-        start_time: now, // Use current time as "active" timestamp
-        end_time: null, // Cameras are ongoing
-        severity: camera.status || 'active',
-        title: `${camera.name || 'Fire Camera'} - ${camera.location || 'California'}`,
-        lat: parseFloat(camera.latitude),
-        lng: parseFloat(camera.longitude),
-        source_id: String(sourceId),
+        camera_url: camera.camera_url || null,
+        network_url: camera.network_url || null,
+        image_url: camera.image_url || null,
+        status: camera.status || 'active',
+        geocoded_at: geocodedAt,
         raw: {
           ...camera,
           camera_type: 'fire_monitoring',
@@ -1274,14 +1503,15 @@ export async function ingestCaFireCameras() {
       });
     }
 
-    console.log(`📹 CA Fire Cameras: Prepared ${batch.length} camera records`);
-    const result = await upsertDisasters(batch);
-    console.log(`📹 CA Fire Cameras: Inserted ${result.inserted}, skipped ${result.skipped}`);
-    return result;
-
+    console.log(`📹 CA Fire Cameras: Prepared ${batch.length} camera records (${geocodeCount} geocoded this run)`);
+    const result = await upsertFireCameras(batch);
+    const legacyRemoved = await cleanupLegacyCameraDisasters();
+    const upserted = result.upserted || 0;
+    console.log(`📹 CA Fire Cameras: Upserted ${upserted}, geocoded ${geocodeCount}, legacy removed ${legacyRemoved}`);
+    return { inserted: upserted, upserted, geocoded: geocodeCount, legacyRemoved };
   } catch (error) {
     console.error('❌ Error ingesting CA fire cameras:', error.message);
-    return { inserted: 0, skipped: 0 };
+    return { inserted: 0, upserted: 0, geocoded: 0 };
   }
 }
 

@@ -156,6 +156,78 @@ When users ask questions, consider:
 
 Always provide context-aware responses that help users understand how disasters affect real estate values and mortgage portfolios. Focus on actionable insights for property value protection and mortgage risk management.`;
 
+const DISASTER_PROCESSOR_EXPERT_PROMPT = `You are an expert AI assistant for MORTGAGE PROCESSORS and pipeline operations during natural disasters. You help users triage loans, understand FEMA declarations, and take appropriate processing actions—not legal advice; use only data provided in context.
+
+## PROCESSOR OPERATIONS EXPERTISE
+
+### FEMA declarations (processing lens)
+- **Incident types** (fire, flood, hurricane, earthquake, etc.) and what they imply for property verification timelines
+- **Individual Assistance (IA) vs Public Assistance (PA)** — borrower-facing vs infrastructure; IA more directly affects borrower hardship workflows
+- **Declaration timing** — new vs ongoing; when to re-verify insurance, flood cert, or property condition
+
+### Loan-level actions processors should consider
+- Verify hazard and flood insurance coverage and deductibles; NFIP requirements in SFHA zones
+- Re-run or validate flood certification when disaster may change flood zone or property access
+- Property inspection delays, appraisal revisions, and milestone holds (funding, closing, post-closing)
+- Borrower outreach: hardship documentation, forbearance awareness (refer to policy), address occupancy
+- Concentration risk: many loans in one county or within radius of an event
+
+### Geographic triage
+- State/county filters, distance-to-disaster (miles), and affected loan counts from context
+- Compare portfolio exposure vs a selected disaster footprint
+
+### CA wildfire / situational awareness
+- Nearby ALERTCalifornia cameras support situational awareness only—they do not replace formal inspection or appraisal
+- Wildfire smoke and evacuation zones may delay verifications even without structure damage
+
+## RESPONSE GUIDELINES
+1. Be actionable for processors (checklists, hold/release considerations, what to verify next)
+2. Cite selected disaster, filters, loan samples, and camera counts from context when present
+3. Distinguish facts in context from general industry practice
+4. Do not invent loan numbers or declaration IDs not in context`;
+
+function resolveDisasterExpertPrompt(context = {}, sessionId = '') {
+    const profile = context.expertProfile || '';
+    const sid = String(sessionId || '');
+    if (profile === 'processor' || sid === 'unified-disaster-processor' || sid.startsWith('disasters-unified')) {
+        return DISASTER_PROCESSOR_EXPERT_PROMPT;
+    }
+    return DISASTER_REAL_ESTATE_EXPERT_PROMPT;
+}
+
+function appendDisasterExpertContext(enhancedPrompt, context = {}) {
+    if (context.page) {
+        enhancedPrompt += `\n\n## PAGE:\n${context.page}`;
+    }
+    if (context.filters) {
+        enhancedPrompt += `\n\n## CURRENT FILTERS:\n${JSON.stringify(context.filters, null, 2)}`;
+    }
+    if (context.selectedDisaster) {
+        enhancedPrompt += `\n\n## SELECTED DISASTER:\n${JSON.stringify(context.selectedDisaster, null, 2)}`;
+    }
+    if (context.selectedLoan) {
+        enhancedPrompt += `\n\n## SELECTED LOAN:\n${JSON.stringify(context.selectedLoan, null, 2)}`;
+    }
+    if (context.loanFilterMeta) {
+        enhancedPrompt += `\n\n## LOAN FILTER (near disaster):\n${JSON.stringify(context.loanFilterMeta, null, 2)}`;
+    }
+    if (context.stats) {
+        enhancedPrompt += `\n\n## CURRENT STATISTICS:\n${JSON.stringify(context.stats, null, 2)}`;
+    }
+    if (context.nearbyLoans) {
+        const sample = Array.isArray(context.nearbyLoans.sample) ? context.nearbyLoans.sample : [];
+        enhancedPrompt += `\n\n## NEARBY LOANS (${context.nearbyLoans.count ?? sample.length} total, sample):\n${JSON.stringify(sample.slice(0, 10), null, 2)}`;
+    }
+    if (context.nearbyCameras) {
+        const cams = Array.isArray(context.nearbyCameras.sample) ? context.nearbyCameras.sample : [];
+        enhancedPrompt += `\n\n## NEARBY FIRE CAMERAS (${context.nearbyCameras.count ?? cams.length} total, nearest sample):\n${JSON.stringify(cams.slice(0, 5), null, 2)}`;
+    }
+    if (context.loans && context.loans.length > 0) {
+        enhancedPrompt += `\n\n## LOAN DATA (Sample of ${context.loans.length} loans):\n${JSON.stringify(context.loans.slice(0, 10), null, 2)}`;
+    }
+    return enhancedPrompt;
+}
+
 /**
  * Chat with AI about loan pipeline
  * POST /api/loan-pipeline/ai/chat
@@ -246,24 +318,10 @@ export async function chatWithDisasterExpert(req, res) {
             });
         }
 
-        // Build enhanced system prompt with context
-        let enhancedPrompt = DISASTER_REAL_ESTATE_EXPERT_PROMPT;
-        
-        if (context.filters) {
-            enhancedPrompt += `\n\n## CURRENT FILTERS:\n${JSON.stringify(context.filters, null, 2)}`;
-        }
-        
-        if (context.selectedDisaster) {
-            enhancedPrompt += `\n\n## SELECTED DISASTER:\n${JSON.stringify(context.selectedDisaster, null, 2)}`;
-        }
-        
-        if (context.stats) {
-            enhancedPrompt += `\n\n## CURRENT STATISTICS:\n${JSON.stringify(context.stats, null, 2)}`;
-        }
-
-        if (context.loans && context.loans.length > 0) {
-            enhancedPrompt += `\n\n## LOAN DATA (Sample of ${context.loans.length} loans):\n${JSON.stringify(context.loans.slice(0, 10), null, 2)}`;
-        }
+        let enhancedPrompt = appendDisasterExpertContext(
+            resolveDisasterExpertPrompt(context, sessionId),
+            context
+        );
 
         // Get or create conversation chain
         const { chain } = await getConversationChain(userId, enhancedPrompt, sessionId);
@@ -283,7 +341,9 @@ export async function chatWithDisasterExpert(req, res) {
             context: {
                 filters: context.filters || null,
                 selectedDisaster: context.selectedDisaster || null,
-                expertType: "disaster-real-estate-expert"
+                expertType: resolveDisasterExpertPrompt(context, sessionId) === DISASTER_PROCESSOR_EXPERT_PROMPT
+                    ? "disaster-processor-expert"
+                    : "disaster-real-estate-expert"
             }
         });
 

@@ -5,7 +5,7 @@
 /**
  * Lane family tools — shared footer credit.
  *
- * Scope: digital presentation, visualization, and software for book-derived
+ * Scope: developed presentation, visualization, and software for book-derived
  * genealogy material (not a claim of original archival research; see primary
  * sources and citations on each experience).
  *
@@ -17,7 +17,7 @@
   var DISPLAY_NAME = 'David E Lane';
   /** Public byline (muted footer); date appended like public/index.html footer. */
   var LINE =
-    'Presentation, visualization, and software by ' +
+    'Developed by ' +
     DISPLAY_NAME +
     ' · AI-assisted development';
 

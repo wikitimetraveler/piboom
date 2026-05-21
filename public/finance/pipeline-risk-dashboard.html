@@ -936,10 +936,38 @@
                     <div class="accordion-body">
                         <div class="card" id="encompassLoansCard" style="display: none;">
                             <div class="card-header">
-                                <h5 class="mb-0"><i class="bi bi-bank"></i> Encompass Loans in Affected County</h5>
-                                <small class="text-muted" id="encompassLoansSubtitle">Loans affected by selected disaster (click loan to focus map)</small>
+                                <h5 class="mb-0"><i class="bi bi-bank"></i> Affected Encompass Loans</h5>
+                                <small class="text-muted" id="encompassLoansSubtitle">Loans near selected disaster (click loan to focus map)</small>
                             </div>
                             <div class="card-body">
+                                <div class="row g-2 align-items-end mb-3" id="loanFilterToolbar">
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label small mb-1" for="loanScopeMode">Scope</label>
+                                        <select class="form-select form-select-sm" id="loanScopeMode">
+                                            <option value="distance">Within distance</option>
+                                            <option value="county">By county</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <label class="form-label small mb-1" for="loanRadiusMiles">Radius</label>
+                                        <select class="form-select form-select-sm" id="loanRadiusMiles">
+                                            <option value="10">10 mi</option>
+                                            <option value="25">25 mi</option>
+                                            <option value="50" selected>50 mi</option>
+                                            <option value="100">100 mi</option>
+                                            <option value="custom">Custom…</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2 col-6" id="loanRadiusCustomWrap" style="display: none;">
+                                        <label class="form-label small mb-1" for="loanRadiusCustom">Miles</label>
+                                        <input type="number" class="form-control form-control-sm" id="loanRadiusCustom" min="1" max="500" value="50">
+                                    </div>
+                                    <div class="col-md-auto col-6">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="loanFilterApplyBtn">
+                                            <i class="bi bi-funnel"></i> Apply
+                                        </button>
+                                    </div>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover" id="encompassLoansTable">
                                         <thead>
@@ -963,6 +991,15 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <div class="card mt-3" id="nearbyCamerasCard" style="display: none;">
+                                    <div class="card-header py-2">
+                                        <h6 class="mb-0"><i class="bi bi-camera-video"></i> Nearby fire cameras</h6>
+                                        <small class="text-muted" id="nearbyCamerasSubtitle">ALERTCalifornia cameras near selection</small>
+                                    </div>
+                                    <div class="card-body py-2" id="nearbyCamerasList">
+                                        <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -982,6 +1019,40 @@
         </div>
     </div>
     <div id="loanInfoOverlay" class="loan-info-overlay" onclick="closeLoanInfoPanel()"></div>
+
+    <div class="modal fade" id="cameraViewerModal" tabindex="-1" aria-labelledby="cameraViewerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="cameraViewerModalLabel">
+                        <i class="bi-camera-video"></i> <span id="cameraViewerTitle">Fire Camera</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <p class="mb-1"><strong>Location:</strong> <span id="cameraViewerLocation"></span></p>
+                        <p class="mb-0"><strong>Site ID:</strong> <span id="cameraViewerSiteId"></span></p>
+                    </div>
+                    <div style="position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 8px; overflow: hidden;">
+                        <iframe id="cameraFeedFrame" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allowfullscreen loading="lazy"></iframe>
+                        <img id="cameraFeedImg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none;" alt="Camera Feed">
+                        <div id="cameraFeedError" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; text-align: center; display: none;">
+                            <i class="bi-exclamation-triangle" style="font-size: 2rem;"></i>
+                            <p class="mt-2">Unable to load camera feed</p>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                        <button type="button" class="btn btn-primary" id="refreshFeedImgBtn"><i class="bi-arrow-clockwise"></i> Refresh Image</button>
+                        <a id="cameraViewerLink" href="#" target="_blank" rel="noopener" class="btn btn-outline-primary ms-2"><i class="bi-box-arrow-up-right"></i> Open in New Tab</a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -1023,6 +1094,9 @@
     <script src="../shared/modern-navbar.js"></script>
     <script src="../shared/user-login.js"></script>
     <script src="../shared/user-passwords.js"></script>
+    <script src="/finance/js/disaster-loan-filters.js"></script>
+    <script src="/finance/js/disaster-camera-filters.js"></script>
+    <script src="/finance/js/ca-fire-camera-viewer.js"></script>
 
     <!-- Main Script -->
     <script>
@@ -1036,6 +1110,80 @@
         let selectedDisaster = null;
         let selectedDisasterObj = null; // Store full disaster object with coordinates
         let selectedLoan = null; // Store selected loan for info panel
+        let cameraMarkers = [];
+        let cameraLoadContext = 'disaster';
+
+        function clearCameraMarkers() {
+            cameraMarkers.forEach((entry) => entry.marker && entry.marker.setMap(null));
+            cameraMarkers = [];
+        }
+
+        function renderNearbyCamerasUI(cameras, meta) {
+            const subtitle = DisasterCameraFilters.formatCameraFilterSubtitle(meta, cameras.length);
+            $('#nearbyCamerasSubtitle').text(subtitle);
+            const emptyMsg = meta.hasGeo === false
+                ? 'No coordinates for distance filter — showing county/state matches if available.'
+                : `No cameras within ${meta.radiusMiles || 50} mi of this location.`;
+            $('#nearbyCamerasList').html(
+                DisasterCameraFilters.buildNearbyCamerasListHtml(cameras, emptyMsg)
+            );
+            $('#nearbyCamerasCard').show();
+            clearCameraMarkers();
+            if (map) {
+                DisasterCameraFilters.addCameraMarkersToMap(map, cameras, cameraMarkers);
+            }
+        }
+
+        async function loadNearbyCamerasForDisaster(disasterObj, disasterData) {
+            cameraLoadContext = 'disaster';
+            const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('loanRadiusMiles', 'loanRadiusCustom');
+            const req = DisasterCameraFilters.buildDisasterCameraRequest(disasterObj, disasterData, radiusMiles);
+            try {
+                const { cameras, meta } = await DisasterCameraFilters.fetchNearbyCameras(req.center, {
+                    ...req.options,
+                    radiusMiles
+                });
+                meta.hasGeo = !!req.center;
+                meta.radiusMiles = req.center ? radiusMiles : null;
+                renderNearbyCamerasUI(cameras, meta);
+            } catch (err) {
+                console.error('Error loading nearby cameras:', err);
+                $('#nearbyCamerasSubtitle').text('Failed to load cameras');
+                $('#nearbyCamerasList').html('<p class="text-danger small mb-0">Could not load fire cameras.</p>');
+            }
+        }
+
+        async function loadNearbyCamerasForLoan(loan) {
+            cameraLoadContext = 'loan';
+            const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('loanRadiusMiles', 'loanRadiusCustom');
+            const req = DisasterCameraFilters.buildLoanCameraRequest(loan, radiusMiles);
+            try {
+                const { cameras, meta } = await DisasterCameraFilters.fetchNearbyCameras(req.center, {
+                    ...req.options,
+                    radiusMiles
+                });
+                meta.hasGeo = !!req.center;
+                meta.radiusMiles = req.center ? radiusMiles : null;
+                renderNearbyCamerasUI(cameras, meta);
+                const snippetEl = document.getElementById('loanNearbyCamerasSnippet');
+                if (snippetEl) {
+                    const top3 = cameras.slice(0, 3);
+                    snippetEl.innerHTML = top3.length
+                        ? DisasterCameraFilters.buildNearbyCamerasListHtml(top3, 'No cameras in range')
+                        : '<p class="text-muted small mb-0">No cameras in range</p>';
+                }
+            } catch (err) {
+                console.error('Error loading cameras for loan:', err);
+            }
+        }
+
+        function refreshNearbyCameras() {
+            if (cameraLoadContext === 'loan' && selectedLoan) {
+                loadNearbyCamerasForLoan(selectedLoan);
+            } else if (selectedDisasterObj || selectedDisaster) {
+                loadNearbyCamerasForDisaster(selectedDisasterObj, selectedDisaster);
+            }
+        }
 
         // Initialize dashboard
         $(document).ready(function() {
@@ -1052,6 +1200,7 @@
             initializeEncompassDataTable();
             populateStateFilter();
             initializeGoogleMaps();
+            initializeLoanFilterControls();
             loadYouTubeAPI();
             // Load dashboard charts
             loadDashboardData();
@@ -2127,14 +2276,17 @@
             const loansCollapse = new bootstrap.Collapse(document.getElementById('collapseLoans'), {
                 show: true
             });
-            if (disasterData[3] && disasterData[4]) {
-                $('#encompassLoansSubtitle').text(`Loans in ${disasterData[4]}, ${disasterData[3]} affected by ${disasterData[2]}`);
-            }
-            
-            // Load Encompass loans for this county
-            if (disasterData[3] && disasterData[4]) {
-                loadEncompassLoansForCounty(disasterData[3], disasterData[4]);
-            }
+            const state = DisasterLoanFilters.getDisasterState(disasterObj, disasterData);
+            const county = DisasterLoanFilters.getDisasterCounty(disasterObj, disasterData);
+            if (state) $('#stateFilter').val(state);
+            if (county) $('#countyFilter').val(county);
+
+            const defaultMode = DisasterLoanFilters.defaultScopeMode(disasterObj);
+            $('#loanScopeMode').val(defaultMode);
+            DisasterLoanFilters.syncRadiusCustomVisibility('loanRadiusMiles', 'loanRadiusCustomWrap');
+
+            loadLoansForDisaster(disasterObj, disasterData);
+            loadNearbyCamerasForDisaster(disasterObj, disasterData);
             
             // Generate AI insights for selected disaster
             if (aiInsightsCard) {
@@ -2168,83 +2320,85 @@
             updateMapForDisaster(disasterData, disasterObj);
         }
 
-        // Load Encompass loans for specific county
-        async function loadEncompassLoansForCounty(state, county) {
+        function initializeLoanFilterControls() {
+            const stored = DisasterLoanFilters.getStoredRadiusMiles();
+            const presetValues = ['10', '25', '50', '100'];
+            if (presetValues.includes(String(stored))) {
+                $('#loanRadiusMiles').val(String(stored));
+            } else {
+                $('#loanRadiusMiles').val('custom');
+                $('#loanRadiusCustom').val(stored);
+            }
+            DisasterLoanFilters.syncRadiusCustomVisibility('loanRadiusMiles', 'loanRadiusCustomWrap');
+
+            $('#loanRadiusMiles').on('change', function () {
+                DisasterLoanFilters.syncRadiusCustomVisibility('loanRadiusMiles', 'loanRadiusCustomWrap');
+                refreshNearbyCameras();
+            });
+            $('#loanRadiusCustom').on('change', refreshNearbyCameras);
+            $('#loanFilterApplyBtn').on('click', function () {
+                if (selectedDisasterObj || selectedDisaster) {
+                    loadLoansForDisaster(selectedDisasterObj, selectedDisaster);
+                    refreshNearbyCameras();
+                }
+            });
+            $('#loanScopeMode').on('change', function () {
+                const isDistance = $(this).val() === 'distance';
+                $('#loanRadiusMiles').prop('disabled', !isDistance);
+                $('#loanRadiusCustom').prop('disabled', !isDistance);
+            });
+        }
+
+        async function loadLoansForDisaster(disasterObj, disasterData) {
+            let mode = $('#loanScopeMode').val() || DisasterLoanFilters.defaultScopeMode(disasterObj);
+            const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('loanRadiusMiles', 'loanRadiusCustom');
+
+            if (mode === 'distance' && !DisasterLoanFilters.disasterHasCoords(disasterObj)) {
+                mode = 'county';
+                $('#loanScopeMode').val('county');
+                showAlert('No disaster coordinates — showing county/state matches instead.', 'info');
+            }
+
+            const built = DisasterLoanFilters.buildLoanQueryParams(disasterObj, disasterData, {
+                mode,
+                radiusMiles
+            });
+
+            if (!built.state) {
+                showAlert('Selected disaster has no state — cannot load loans.', 'warning');
+                return;
+            }
+
             try {
-                const response = await fetch(`/api/loan-pipeline/loans?state=${state}&county=${county}`);
+                const response = await fetch(`/api/loan-pipeline/loans?${built.params.toString()}`);
                 const data = await response.json();
-                
+
                 if (data.success) {
-                    populateEncompassLoansTable(data.data.loans);
+                    const loans = data.data.loans || [];
+                    populateEncompassLoansTable(loans);
+                    const meta = {
+                        mode: built.mode,
+                        state: built.state,
+                        county: built.county,
+                        title: built.title,
+                        radiusMiles: mode === 'distance' ? radiusMiles : null
+                    };
+                    $('#encompassLoansSubtitle').text(DisasterLoanFilters.formatLoanFilterSubtitle(meta, loans.length));
+                } else {
+                    populateEncompassLoansTable([]);
                 }
             } catch (error) {
                 console.error('Error loading Encompass loans:', error);
+                showAlert('Error loading loans for disaster', 'danger');
             }
         }
 
-        // Calculate distance using Haversine formula
-        function calculateDistance(lat1, lng1, lat2, lng2) {
-            if (!lat1 || !lng1 || !lat2 || !lng2) return null;
-            const R = 6371; // Earth's radius in km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLng = (lng2 - lng1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLng / 2) * Math.sin(dLng / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
-        }
-
-        // Calculate distance value for sorting
         function getDistanceValue(loan, disasterObj) {
-            if (!disasterObj || !disasterObj.latitude || !disasterObj.longitude) {
-                return 999999; // Put N/A values at the end
-            }
-            if (!loan.latitude || !loan.longitude) {
-                return 999998; // Put missing coordinates second to last
-            }
-            
-            const distanceKm = calculateDistance(
-                parseFloat(loan.latitude),
-                parseFloat(loan.longitude),
-                parseFloat(disasterObj.latitude),
-                parseFloat(disasterObj.longitude)
-            );
-            
-            return distanceKm !== null ? distanceKm : 999999;
+            return DisasterLoanFilters.getDistanceValue(loan, disasterObj);
         }
 
-        // Format distance display
         function formatDistance(loan, disasterObj) {
-            if (!disasterObj || !disasterObj.latitude || !disasterObj.longitude) {
-                return '<span class="text-muted">N/A</span>';
-            }
-            if (!loan.latitude || !loan.longitude) {
-                return '<span class="text-muted">No coordinates</span>';
-            }
-            
-            const distanceKm = calculateDistance(
-                parseFloat(loan.latitude),
-                parseFloat(loan.longitude),
-                parseFloat(disasterObj.latitude),
-                parseFloat(disasterObj.longitude)
-            );
-            
-            if (distanceKm === null) return '<span class="text-muted">N/A</span>';
-            
-            const distanceMiles = distanceKm * 0.621371;
-            const kmRounded = Math.round(distanceKm * 10) / 10;
-            const milesRounded = Math.round(distanceMiles * 10) / 10;
-            
-            // Color code by distance: < 10km = red, < 25km = orange, < 50km = yellow, else green
-            let distanceClass = 'text-success';
-            if (distanceKm < 10) distanceClass = 'text-danger fw-bold';
-            else if (distanceKm < 25) distanceClass = 'text-warning fw-bold';
-            else if (distanceKm < 50) distanceClass = 'text-info';
-            
-            return `<span class="${distanceClass}" data-sort="${distanceKm}" title="${kmRounded} km / ${milesRounded} mi">
-                <i class="bi bi-geo-alt"></i> ${milesRounded} mi
-            </span>`;
+            return DisasterLoanFilters.formatDistance(loan, disasterObj);
         }
 
         // Populate Encompass loans table
@@ -2290,12 +2444,12 @@
         function showLoanInfoPanel(loan) {
             if (!loan) return;
             
-            const distanceKm = selectedDisasterObj && loan.latitude && loan.longitude && selectedDisasterObj.latitude && selectedDisasterObj.longitude
-                ? calculateDistance(
+            const distanceKm = selectedDisasterObj && loan.latitude && loan.longitude
+                ? DisasterLoanFilters.calculateDistance(
                     parseFloat(loan.latitude),
                     parseFloat(loan.longitude),
-                    parseFloat(selectedDisasterObj.latitude),
-                    parseFloat(selectedDisasterObj.longitude)
+                    parseFloat(selectedDisasterObj.latitude ?? selectedDisasterObj.lat),
+                    parseFloat(selectedDisasterObj.longitude ?? selectedDisasterObj.lng)
                   )
                 : null;
             
@@ -2507,6 +2661,13 @@
                     `}
                 </div>
 
+                <div class="loan-info-section">
+                    <h6><i class="bi bi-camera-video"></i> Nearest fire cameras</h6>
+                    <div id="loanNearbyCamerasSnippet">
+                        <p class="text-muted small mb-0">Loading cameras…</p>
+                    </div>
+                </div>
+
                 <div class="loan-info-section" style="text-align: center;">
                     <button class="btn btn-primary w-100 mb-2" onclick="analyzeLoan(${loan.id})">
                         <i class="bi bi-shield-check"></i> Re-analyze Risk
@@ -2520,6 +2681,7 @@
             `;
             
             document.getElementById('loanInfoContent').innerHTML = content;
+            loadNearbyCamerasForLoan(loan);
             document.getElementById('loanInfoPanel').classList.add('open');
             document.getElementById('loanInfoOverlay').classList.add('show');
         }

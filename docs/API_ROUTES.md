@@ -101,10 +101,12 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 |--------|------|-------------|
 | GET | `/api/disasters` | List disasters |
 | POST | `/api/disasters/refresh` | Refresh all sources |
-| POST | `/api/disasters/refresh-cameras` | Refresh cameras |
-| GET | `/api/disasters/cameras` | List cameras |
+| POST | `/api/disasters/refresh-cameras` | Ingest ALERTCalifornia into `fire_cameras` (manual / `npm run refresh:fire-cameras`; not daily disaster refresh) |
+| GET | `/api/disasters/cameras` | List fixed camera mounts from `fire_cameras` (not rolling disaster events) |
 | GET | `/api/disasters/stats` | Stats |
 | GET | `/api/disasters/export.csv` | CSV export |
+
+**CA fire cameras:** Stored in Postgres `fire_cameras` with stable `lat`/`lng`. County is reverse-geocoded **once** at ingest (max 50 new geocodes per run). UI: [`public/finance/disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html); linked from Unified Disasters.
 
 ## Chat & AI
 

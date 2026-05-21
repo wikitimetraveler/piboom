@@ -10,6 +10,7 @@ Disaster data feeds, loan pipeline risk analysis, and the Disaster Risk AI assis
 | **Loan Pipeline + Risk** | Pipeline loans, geocoding, FEMA overlap, flood zones, risk summaries |
 | **Disaster Risk AI** | AI assistant for disaster impact on real estate |
 | **Pipeline Risk Dashboard** | `public/finance/pipeline-risk-dashboard.html` – map, tables, AI widgets |
+| **Unified Disasters** | `public/finance/disasters-unified.html` – multi-source disasters AG Grid, voice commands, disaster **processor** expert AI (`sessionId: unified-disaster-processor`) |
 
 ## Data Sources (disasters.service.js)
 
@@ -44,12 +45,14 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 | POST | `/refresh` | Refresh from all sources (FEMA, FIRMS, USGS, NWS, NHC) |
 | GET | `/stats` | Stats |
 | GET | `/export.csv` | CSV export |
+| GET | `/cameras` | ALERTCalifornia fire cameras — query: `state`, `county` (ILIKE), `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — Haversine filter, nearest-first, each row includes `distance_miles` when geo is used |
+| POST | `/refresh-cameras` | Refresh camera feed (requires disaster refresh access) |
 
 ### Loan Pipeline (`/api/loan-pipeline`)
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/loans` | All loans (filters) |
+| GET | `/loans` | All loans — query: `milestone`, `state`, `county` (ILIKE), `riskLevel` (`low`/`medium`/`high`), `nearLat`, `nearLng`, `radiusMiles` (1–500; Haversine filter after SQL; requires loan coordinates) |
 | GET | `/loans/:id` | Single loan |
 | POST | `/generate` | Generate test loans |
 | POST | `/analyze` | Risk analysis for all loans |
@@ -70,7 +73,7 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/chat` | Chat with loan pipeline AI |
-| POST | `/chat-disaster-expert` | Chat with disaster expert AI |
+| POST | `/chat-disaster-expert` | Disaster expert AI — `expertProfile: processor` + `sessionId: unified-disaster-processor` use processor-operations prompt; context may include `selectedDisaster`, `selectedLoan`, `nearbyLoans`, `nearbyCameras`, `loanFilterMeta`, `page: disasters-unified` |
 | POST | `/insights` | Generate AI insights |
 | POST | `/analyze` | Analyze dashboard data |
 | GET | `/history` | Conversation history |

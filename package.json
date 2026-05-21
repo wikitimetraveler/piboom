@@ -19,6 +19,7 @@
     "install-pi-deps": "sudo apt update && sudo apt install -y sox alsa-utils espeak-ng mpg123",
     "generate-gd-kml": "node scripts/generate-grateful-dead-kml.js",
     "refresh-disasters": "node scripts/refresh-disasters.js",
+    "refresh:fire-cameras": "node scripts/refresh-fire-cameras.js",
     "extract:asset-qualifier": "node scripts/extract-asset-qualifier.js \"data/30 Retail Lending - Asset Qualifier Calculator, August 10, 2022.xlsx\" > data/asset-qualifier.json",
     "mcp:encompass": "node mcp/devconnect-encompass/server.mjs",
     "extract:lane-pdf-images": "python scripts/extract_lane_pdf_images.py",
