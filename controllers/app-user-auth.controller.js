@@ -1,4 +1,8 @@
 import { verifyAppUserPassword } from '../services/app-user-auth.service.js';
+import {
+  financeSessionClearCookieHeader,
+  financeSessionSetCookieHeader,
+} from '../lib/finance-session.js';
 
 export async function postVerifyUserPassword(req, res) {
   try {
@@ -13,9 +17,17 @@ export async function postVerifyUserPassword(req, res) {
     if (reason === 'unavailable') {
       return res.status(503).json({ valid: false, error: 'Database unavailable' });
     }
+    if (valid) {
+      res.setHeader('Set-Cookie', financeSessionSetCookieHeader());
+    }
     return res.json({ valid });
   } catch (e) {
     console.error('verify-user-password:', e.message);
     return res.status(500).json({ valid: false, error: 'Server error' });
   }
+}
+
+export function postLogout(req, res) {
+  res.setHeader('Set-Cookie', financeSessionClearCookieHeader());
+  return res.json({ ok: true });
 }

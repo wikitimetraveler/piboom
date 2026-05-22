@@ -226,6 +226,19 @@
       <section class="lane-historians-section lh-story-highlight-parent" aria-labelledby="lh-pref-heading"><h2 id="lh-pref-heading">From Chapman’s preface</h2><div class="lane-historians-prose lh-story-highlight-target">${lead}</div>${prefaceMoreBlock}</section>
       <section class="lane-historians-section lh-story-highlight-parent" aria-labelledby="lh-link-heading"><h2 id="lh-link-heading">External sources</h2>${renderLinks(data.externalLinks)}${renderArchiveCallout(data)}${illNote}</section>
       <section class="lane-historians-section lh-story-highlight-parent" aria-labelledby="lh-mod-heading"><h2 id="lh-mod-heading">Carrying the record forward</h2>${renderModern(data.modernHistorians, data.modernHistoriansPlaceholder)}</section>
+      <section class="lane-historians-section lh-story-highlight-parent" aria-labelledby="lh-achievers-heading" id="lh-achievers-section">
+        <h2 id="lh-achievers-heading">Major achievers (Vol. I)</h2>
+        <p class="mb-2">Twenty-two figures from the 1891 book and site curation—compilers, record-keepers, national footprint, and book-strong military/civic narratives—tiered for evidence strength.</p>
+        <p class="mb-2 small text-muted" id="lh-achievers-stats">Loading achiever counts…</p>
+        <p class="mb-0">
+          <a href="/family/lane-major-achievers.html">Browse all major achievers</a>
+          · <a href="/family/lane-major-achievers.html?tier=A">Tier A only</a>
+          · <a href="/family/lane-major-achievers.html?slug=jacob-chapman">Chapman</a>
+          · <a href="/family/lane-major-achievers.html?slug=james-h-fitts">Fitts</a>
+          · <a href="/family/lane-major-achievers.html?slug=hampton-monument-committee">1891 committee</a>
+          · <a href="/family/lane-magazine.html?issue=02">Issue 2 magazine</a>
+        </p>
+      </section>
       ${notes}
     `;
   }
@@ -808,6 +821,20 @@
     });
   }
 
+  async function loadAchieversStats() {
+    const el = document.getElementById('lh-achievers-stats');
+    if (!el) return;
+    try {
+      const res = await fetch('/data/lane-major-achievers.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error('unavailable');
+      const data = await res.json();
+      const stats = data.stats || {};
+      el.textContent = `${stats.totalAchievers || 0} documented · Tier A ${stats.tierA || 0} (book + external source) · Tier B ${stats.tierB || 0} (verify before national claims)`;
+    } catch {
+      el.textContent = 'See the achievers browse page for tier counts.';
+    }
+  }
+
   async function init() {
     initHistoriansHyperFrameStoryBindings();
     try {
@@ -816,6 +843,7 @@
       const data = await res.json();
       historiansDataRef = data;
       render(data);
+      loadAchieversStats();
       initHistoriansImageExpand();
       updateHistoriansStoryToggle();
       document.title = `${data.title || 'Lane historians'} — DevConnect Labs`;

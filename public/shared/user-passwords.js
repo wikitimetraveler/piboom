@@ -38,6 +38,7 @@ async function verifyPasswordWithServer(userId, password) {
   try {
     const res = await fetch(VERIFY_USER_PASSWORD_URL, {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ userId, password }),
     });

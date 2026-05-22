@@ -8,7 +8,9 @@
 (function () {
   const LINKS = [
     { href: '/family/lane-family.html', label: 'Hub' },
-    { href: '/family/lane-magazine.html', label: 'Issue 1' },
+    { href: '/family/lane-magazine.html', label: 'Issue 1', issue: '01' },
+    { href: '/family/lane-magazine.html?issue=02', label: 'Issue 2', issue: '02' },
+    { href: '/family/lane-major-achievers.html', label: 'Achievers' },
     { href: '/family/lane-historians.html', label: 'Historians' },
     { href: '/family/lane-museum.html', label: 'Museum' },
     { href: '/family/lane-trading-cards.html', label: 'Cards' },
@@ -32,6 +34,7 @@
     if (document.getElementById('lanePillNav')) return;
 
     const path = normalizePath(window.location.pathname);
+    const issueParam = new URLSearchParams(window.location.search).get('issue') || '01';
     const isFamily =
       path === '/family' || path.startsWith('/family/');
     if (!isFamily) return;
@@ -56,7 +59,13 @@
       a.href = item.href;
       a.textContent = item.label;
       const itemPath = normalizePath(item.href);
-      if (path === itemPath) {
+      const itemIssue = item.issue || null;
+      const isMagazine = path === '/family/lane-magazine.html';
+      const active =
+        itemIssue && isMagazine
+          ? itemIssue === issueParam || (itemIssue === '01' && issueParam === '1')
+          : path === itemPath;
+      if (active) {
         a.classList.add('is-active');
         a.setAttribute('aria-current', 'page');
       }

@@ -1,0 +1,169 @@
+{
+  "issueId": "lane-magazine-issue-02",
+  "title": "Major Achievers from Vol. I",
+  "subtitle": "Issue 2",
+  "editionLabel": "Achievers edition",
+  "status": "draft-ready",
+  "pageSize": "Letter",
+  "theme": "Tier A compilers and national footprint → Tier B military/civic → full browse index.",
+  "editorNote": "Issue 2 distills lane-major-achievers.json into a printable family zine. Context and evidence stay separated; Tier B military claims remain book-only until rolls confirm.",
+  "downloadHint": "Use Print to PDF in your browser for a shareable issue file.",
+  "spreads": [
+    {
+      "id": "cover",
+      "kind": "cover",
+      "title": "Major Achievers from Vol. I",
+      "kicker": "Issue 2",
+      "summary": "Twenty-two figures tiered from Lane Genealogies, Volume I (1891)—compilers, record-keepers, national footprint, and book-strong narratives.",
+      "imageUrl": "/family/assets/lane-genealogies-title-spread.png",
+      "caption": "The 1891 volume as portable monument—Chapman's preface frames achievement as record-keeping and moral example."
+    },
+    {
+      "id": "letter",
+      "kind": "editorial",
+      "title": "Letter from the family desk",
+      "summary": "This issue maps who the 1891 book and our site curation treat as major achievers. Tier A pairs book emphasis with stable external sources; Tier B stays book-strong until muster rolls or town records confirm.",
+      "quote": "Context: civic record-keeping as achievement. Evidence: Vol. I prose, illustrations, and external URLs where corroborated.",
+      "links": [
+        { "label": "Full achievers browse", "url": "/family/lane-major-achievers.html" },
+        { "label": "Issue 1 magazine", "url": "/family/lane-magazine.html" }
+      ]
+    },
+    {
+      "id": "compilers",
+      "kind": "feature",
+      "title": "Who carried the manuscript into print",
+      "summary": "The compiler chain from Deacon Jeremiah Lane's c. 1765 chart through Deacon E. J. Lane, Rev. James P. Lane, and the 1891 Hampton committee to Chapman and Fitts finishing Volume I.",
+      "bullets": [
+        "Rev. Jacob Chapman — completed Vol. I; signed preface (1810–1903).",
+        "Rev. James H. Fitts — co-author; Candia/Chester lines; NEHGR member.",
+        "Rev. James P. Lane — twenty years gathering; NEHGR pamphlets (d. 1889).",
+        "Deacon Edmund J. Lane — 30+ years collecting from 1839; Dover bookstore.",
+        "Deacon Jeremiah Lane — earliest named chart in preface chain (c. 1765).",
+        "Levi E. Lane — preface acknowledgment; George G. note author.",
+        "1891 committee — Geo. W., Rev. John Wm., Dr. Edw. B., Fitts, Chapman."
+      ],
+      "imageUrl": "/family/assets/lane-pdf/p4-i0.jpg",
+      "caption": "Frontispiece committee portraits (plate p4-i0).",
+      "links": [
+        { "label": "Lane Historians", "url": "/family/lane-historians.html" },
+        { "label": "Tier A compilers", "url": "/family/lane-major-achievers.html?tier=A" }
+      ]
+    },
+    {
+      "id": "record-keepers",
+      "kind": "feature",
+      "title": "Record-keepers: Deacon Samuel Lane",
+      "summary": "Stratham farmer, surveyor, and town clerk from 1774. His diaries and journals are classic New Hampshire Revolutionary-era primary sources—published by NHHS.",
+      "imageUrl": "/family/assets/samuel-lane.png",
+      "caption": "Deacon Samuel Lane (1718–1806) — Stratham civic roles.",
+      "links": [
+        { "label": "NHHS diary catalog", "url": "https://www.nhhistory.org/object/290310/samuel-lane-s-diary-1750-1799" },
+        { "label": "Achiever card", "url": "/family/lane-major-achievers.html?slug=deacon-samuel-lane-stratham" }
+      ]
+    },
+    {
+      "id": "national-footprint",
+      "kind": "feature",
+      "title": "National footprint",
+      "summary": "Three Lanes with reach beyond New England town records—each with external corroboration beyond the compiled pedigree alone.",
+      "bullets": [
+        "Jonathan Homer Lane (1819–1880) — gaseous-sun analysis; Lane–Emden equation; lunar crater namesake.",
+        "George G. Lane — Popular Science profile 'Was He an Idiot?' (May 1884) on calendrical gifts.",
+        "Captain Aaron G. Lane (1817–1883) — Mojave pioneer; Lane's Crossing (1859)."
+      ],
+      "links": [
+        { "label": "Jonathan Homer — Museum", "url": "/family/lane-museum.html" },
+        { "label": "George G. — read-along", "url": "/family/lane-was-he-an-idiot.html" },
+        { "label": "Aaron G. — War history", "url": "/family/lane-war-history.html#laneWarTab-mexican-american-war" }
+      ]
+    },
+    {
+      "id": "colonial-anchor",
+      "kind": "feature",
+      "title": "Colonial anchor: William Lane (I) of Boston",
+      "summary": "Vol. I subject line; cordwainer; freeman 1657. The pedigree anchor for Boston → Hampton → Hadley chronology in the compiled work.",
+      "imageUrl": "/family/assets/william-e-lane-boston-hero.png",
+      "caption": "Opening exhibit portrait context.",
+      "links": [
+        { "label": "Lane Museum", "url": "/family/lane-museum.html" },
+        { "label": "Achiever card", "url": "/family/lane-major-achievers.html?slug=william-lane-i-boston" }
+      ]
+    },
+    {
+      "id": "tier-b-military",
+      "kind": "timeline",
+      "title": "Tier B — military (book-strong)",
+      "summary": "Vol. I names these officers and soldiers; verification tier remains compilation until NH provincial rolls or Compiled Military Service Records are checked.",
+      "bullets": [
+        "John Lane (William¹) — King Philip's War, Capt. Poole, Mar. 1675.",
+        "Samuel Lane (William¹) — Capt. Turner, 1676 (Hadley).",
+        "Capt. John Lane — York/Hampton frontier captain; Dummer-era report.",
+        "Cornet John Lane⁴ — Chester horse troop cornet, 1754.",
+        "Lt. Ezekiel Lane — killed Bennington, 1777.",
+        "Lt. John Lane — Bennington; promoted after Ezekiel fell."
+      ],
+      "links": [
+        { "label": "War history", "url": "/family/lane-war-history.html" },
+        { "label": "Tier B achievers", "url": "/family/lane-major-achievers.html?tier=B" }
+      ]
+    },
+    {
+      "id": "tier-b-civic",
+      "kind": "feature",
+      "title": "Tier B — civic & frontier narrative",
+      "summary": "Local parish care, migration bookkeeping, and captivity tradition—historically significant even without national biographies.",
+      "bullets": [
+        "William Lane (II) — Tything Man Boston May 1686; removal to Hampton.",
+        "Thomas³ Lane — Hampton church sexton; d. 30 Aug. 1775, ae. 74.",
+        "Sarah (Dickinson) Lane — 1704 French and Indian raid captivity narrative (Hadley)."
+      ],
+      "links": [
+        { "label": "Memorial wall", "url": "/family/lane-memorial-wall.html" },
+        { "label": "Sarah — achiever card", "url": "/family/lane-major-achievers.html?slug=sarah-dickinson-captivity" }
+      ]
+    },
+    {
+      "id": "achievers-index",
+      "kind": "feature",
+      "title": "Full achievers index",
+      "summary": "All 22 entries live in structured JSON with book evidence, external links, and site cross-links. Filter by tier or category on the browse page; deep-link any slug for sharing.",
+      "quote": "Tier C meta: Lane Genealogies, Volume I (1891) itself—125+ years of manuscript labor in a limited Exeter print run.",
+      "links": [
+        { "label": "Browse all achievers", "url": "/family/lane-major-achievers.html" },
+        { "label": "Download issue JSON", "url": "/data/lane-magazine-issue-02.json" },
+        { "label": "Machine-readable source", "url": "/data/lane-major-achievers.json" }
+      ]
+    },
+    {
+      "id": "sources",
+      "kind": "sources",
+      "title": "Source bundle for Issue 2",
+      "summary": "Use this as the footer block in the final PDF.",
+      "bullets": [
+        "data/lane-major-achievers.json — tiered achiever research.",
+        "Lane Historians + Museum curated context.",
+        "NHHS, Internet Archive, Wikipedia/Wikisource/USGS external links where stable.",
+        "Tier B military entries remain book-only until rolls confirm."
+      ],
+      "links": [
+        {
+          "label": "Internet Archive — Lane Genealogies Vol. I",
+          "url": "https://archive.org/details/lanegenealogies01chap"
+        }
+      ]
+    },
+    {
+      "id": "back-cover",
+      "kind": "back-cover",
+      "title": "Back cover",
+      "summary": "Open the Lane Family hub for full tools, stories, and source deep links.",
+      "imageUrl": "/family/assets/lane-family-qr-splash-colorized.png",
+      "caption": "Issue QR splash image.",
+      "links": [
+        { "label": "Lane Family hub", "url": "/family/lane-family.html" },
+        { "label": "Major achievers", "url": "/family/lane-major-achievers.html" }
+      ]
+    }
+  ]
+}

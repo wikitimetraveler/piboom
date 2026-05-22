@@ -1,0 +1,435 @@
+{
+  "version": 1,
+  "generatedAt": "2026-05-20",
+  "sourceBook": "Lane Genealogies, Volume I (1891)",
+  "sourceBookUrl": "https://archive.org/details/lanegenealogies01chap",
+  "methodology": "Union of lane-historians.json, lane-illustrations-index.json, lane-museum-content.json prominentLanes, trading-card rarity, and lane-military-deep-scan-report.json; external links from NHHS, NEHGR context, Wikipedia/Wikisource/USGS where stable.",
+  "stats": {
+    "totalAchievers": 22,
+    "tierA": 12,
+    "tierB": 9,
+    "tierC": 1,
+    "missingPersonId": 7
+  },
+  "achievers": [
+    {
+      "slug": "jacob-chapman",
+      "displayName": "Rev. Jacob Chapman",
+      "tier": "A",
+      "categories": ["genealogy-compiler", "author"],
+      "personId": null,
+      "branch": "Compiler (not in family graph)",
+      "eraLabel": "1810–1903 · Exeter, N.H.",
+      "achievementSummary": "Named author of Lane Genealogies Vol. I (1891); prolific New Hampshire genealogist who completed the volume from manuscripts of Deacon E. J. Lane and Rev. James P. Lane. Also authored Leonard Weeks, Folsom, Philbrick, and Edward Chapman genealogies.",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "Signed preface; assumed pecuniary responsibility with committee; credited Fitts for Candia and Chester lines." },
+        { "kind": "illustration", "bookPage": 158, "source": "lane-illustrations-index.json" }
+      ],
+      "externalLinks": [
+        { "label": "Lane Genealogies Vol. I — Internet Archive", "url": "https://archive.org/details/lanegenealogies01chap", "kind": "book" },
+        { "label": "Leonard Weeks of Greenland (Chapman) — Internet Archive", "url": "https://archive.org/details/leonardweeksofgre00chap", "kind": "book" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [{ "label": "Lane Historians", "url": "/family/lane-historians.html" }]
+    },
+    {
+      "slug": "james-h-fitts",
+      "displayName": "Rev. James H. Fitts",
+      "tier": "A",
+      "categories": ["genealogy-compiler", "author", "local-historian"],
+      "personId": null,
+      "branch": "Compiler (Candia/Chester lines)",
+      "eraLabel": "1829–1900 · Candia / Newfields, N.H.",
+      "achievementSummary": "Co-author on title page; NEHGR member from 1867; antiquarian research for Candia and Chester Lane lines. Authored History of Newfields and Fitts family genealogy; posthumously completed Lane Genealogies Vol. III (1902).",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "Chapman credits his accurate writing and antiquarian researches." },
+        { "kind": "illustration", "bookPage": null, "source": "lane-illustrations-index.json", "note": "Frontispiece portrait Rev. Jas. H. Fitts" }
+      ],
+      "externalLinks": [
+        { "label": "History of Newfields — Internet Archive", "url": "https://archive.org/details/historyofnewfiel00fitt", "kind": "book" },
+        { "label": "UNH Fitts Collection guide", "url": "https://library.unh.edu/find/archives/collections/catalog-fitts-collection-1896", "kind": "archive" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [{ "label": "Lane Historians", "url": "/family/lane-historians.html" }]
+    },
+    {
+      "slug": "james-p-lane",
+      "displayName": "Rev. James P. Lane",
+      "tier": "A",
+      "categories": ["genealogy-compiler"],
+      "personId": null,
+      "branch": "Compiler",
+      "eraLabel": "d. Jan. 1889",
+      "achievementSummary": "Prior compiler; twenty years gathering Lane families; published in NEHGR (1873 abstract, 1888) and pamphlets including James Lane of North Yarmouth (1888). Manuscript passed to Chapman unfinished.",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "1869–1889 compiler timeline; professional duties ended editorship." },
+        { "kind": "illustration", "bookPage": 206, "source": "lane-illustrations-index.json" }
+      ],
+      "externalLinks": [
+        { "label": "James P. Lane — Open Library", "url": "https://openlibrary.org/authors/OL1278195A/James_P._Lane", "kind": "book" },
+        { "label": "Lane Genealogies — DPLA", "url": "https://dp.la/item/d92fcfc5c06dacdaf458ee4aeced1ccc", "kind": "book" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [{ "label": "Lane Historians", "url": "/family/lane-historians.html" }]
+    },
+    {
+      "slug": "edmund-j-lane",
+      "displayName": "Deacon Edmund J. Lane",
+      "tier": "A",
+      "categories": ["genealogy-compiler", "record-keeper", "business"],
+      "personId": null,
+      "branch": "Dover, N.H.",
+      "eraLabel": "1802–1884 · Dover",
+      "achievementSummary": "Resumed family genealogy in 1839; collected records for 30+ years; furnished NEHGR abstract April 1873 (four generations, five pages). Operated Lane's Bookstore in Dover (1832–1899 family business). Subject of extended preface sketch.",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "Chapman 'specimens of Lane character' sketch; manuscript placed in Chapman's hands." },
+        { "kind": "illustration", "bookPage": 220, "source": "lane-illustrations-index.json", "note": "Edward J. Lane portrait (son); Deacon E.J. subject of prose sketch" }
+      ],
+      "externalLinks": [
+        { "label": "NHHS — Lane's Bookstore newspaper excerpt (1899)", "url": "https://www.nhhistory.org/object/271520/newspaper-exceprt-on-lane-s-bookstore-1899-march-15", "kind": "archive" },
+        { "label": "NHHS — Lane Family Papers finding aid", "url": "https://www.nhhistory.org/finding_aids/finding_aids/M1991.095_Lane_Family%20Papers.pdf", "kind": "archive" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [{ "label": "Lane Historians", "url": "/family/lane-historians.html" }]
+    },
+    {
+      "slug": "deacon-samuel-lane-stratham",
+      "displayName": "Deacon Samuel Lane",
+      "tier": "A",
+      "categories": ["record-keeper", "civic"],
+      "personId": 56,
+      "branch": "Stratham, N.H.",
+      "eraLabel": "1718–1806 · Stratham",
+      "achievementSummary": "Farmer, surveyor, shoemaker, tanner, deacon; Stratham town clerk from 1774. His diaries and journals are classic New Hampshire Revolutionary-era primary sources, published by NHHS.",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "Brother of Deacon Jeremiah; diary contains valuable family information." },
+        { "kind": "node-text", "source": "laneData.json", "note": "Moved Hampton to Stratham 1741; civic and craft roles." }
+      ],
+      "externalLinks": [
+        { "label": "NHHS — Samuel Lane diary 1750–1799", "url": "https://www.nhhistory.org/object/290310/samuel-lane-s-diary-1750-1799", "kind": "archive" },
+        { "label": "NHHS — A Journal for the Years 1739–1803 (1937 ed.)", "url": "https://www.nhhistory.org/object/106099/a-journal-for-the-years-1739-1803---by-samuel-lane-of-strathem-new-hampshire-edited-by-charles-la", "kind": "book" },
+        { "label": "WorldCat — The Years of the Life of Samuel Lane (Brown, 2000)", "url": "https://search.worldcat.org/search?q=bn:9781584650515", "kind": "book" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [
+        { "label": "Lane Museum exhibit", "url": "/family/lane-museum.html" },
+        { "label": "Memorial wall", "url": "/family/lane-memorial-wall.html" }
+      ]
+    },
+    {
+      "slug": "deacon-jeremiah-lane",
+      "displayName": "Deacon Jeremiah Lane",
+      "tier": "A",
+      "categories": ["record-keeper", "genealogy-compiler"],
+      "personId": null,
+      "branch": "Hampton Falls",
+      "eraLabel": "c. 1765 chart",
+      "achievementSummary": "Prepared genealogical chart c. 1765 for his Hampton Falls branch — earliest named compiler in the 1891 preface chain.",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "1765 chart; Levi E. Lane inherits talents of this ancestor (preface acknowledgment)." }
+      ],
+      "externalLinks": [
+        { "label": "Lane Genealogies Vol. I — Internet Archive", "url": "https://archive.org/details/lanegenealogies01chap", "kind": "book" }
+      ],
+      "verificationStatus": "book-only",
+      "siteLinks": [{ "label": "Lane Historians timeline", "url": "/family/lane-historians.html" }]
+    },
+    {
+      "slug": "william-lane-i-boston",
+      "displayName": "William Lane (I) of Boston",
+      "tier": "A",
+      "categories": ["colonial-founder"],
+      "personId": 4,
+      "branch": "Boston anchor",
+      "eraLabel": "c. 1625–aft. 1676",
+      "achievementSummary": "Vol. I subject line; cordwainer; freeman 6 May 1657; anchors Boston–Hampton–Hadley chronology for the compiled pedigree.",
+      "bookEvidence": [
+        { "kind": "title-page", "source": "lane-historians.json", "note": "William Lane of Boston — Vol. I subject tag." },
+        { "kind": "node-text", "source": "laneData.json", "note": "Freeman, marriages, Hartford/Lynn harmonization per NEHGR XII:196." }
+      ],
+      "externalLinks": [
+        { "label": "NEHGR — register (vol. 12 context)", "url": "https://en.wikipedia.org/wiki/New_England_Historical_and_Genealogical_Register", "kind": "book" }
+      ],
+      "verificationStatus": "partial",
+      "siteLinks": [
+        { "label": "Lane Museum opening exhibit", "url": "/family/lane-museum.html" },
+        { "label": "Trading card — legendary", "url": "/family/lane-trading-cards.html" }
+      ]
+    },
+    {
+      "slug": "jonathan-homer-lane",
+      "displayName": "Jonathan Homer Lane",
+      "tier": "A",
+      "categories": ["science"],
+      "personId": 94,
+      "branch": "Mark Lane line",
+      "eraLabel": "1819–1880",
+      "achievementSummary": "Astrophysicist; first mathematical analysis of the Sun as a gaseous body (1870); namesake of Lane–Emden equation and lunar crater Lane.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Exeter Academy 1839; Yale 1846; coast survey Washington." }
+      ],
+      "externalLinks": [
+        { "label": "Wikipedia — Jonathan Homer Lane", "url": "https://en.wikipedia.org/wiki/Jonathan_Homer_Lane", "kind": "wikipedia" },
+        { "label": "USGS — Lane (lunar crater)", "url": "https://planetarynames.wr.usgs.gov/Feature/3315", "kind": "reference" },
+        { "label": "Wikipedia — Lane–Emden equation", "url": "https://en.wikipedia.org/wiki/Lane%E2%80%93Emden_equation", "kind": "wikipedia" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [{ "label": "Lane Museum + lunar exhibit", "url": "/family/lane-museum.html" }]
+    },
+    {
+      "slug": "george-g-lane",
+      "displayName": "George G. Lane",
+      "tier": "A",
+      "categories": ["press", "calendrical-prodigy"],
+      "personId": 2898,
+      "branch": "Hampton Falls (Levi E. Lane note)",
+      "eraLabel": "1880s press",
+      "achievementSummary": "Subject of Popular Science Monthly profile 'Was He an Idiot?' (May 1884) on calendrical and singular abilities; brother Levi E. Lane authored the Vol. I note.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Levi E. Lane note on brother's peculiar gifts; node id 2898 holds compiler prose." }
+      ],
+      "externalLinks": [
+        { "label": "Wikisource — Was He an Idiot? (May 1884)", "url": "https://en.wikisource.org/wiki/Popular_Science_Monthly/Volume_25/May_1884/Was_He_an_Idiot%3F", "kind": "magazine" },
+        { "label": "Internet Archive — Popular Science vol. 25", "url": "https://archive.org/details/popularsciencemo25newy", "kind": "magazine" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [{ "label": "Was He an Idiot? read-along", "url": "/family/lane-was-he-an-idiot.html" }]
+    },
+    {
+      "slug": "levi-e-lane",
+      "displayName": "Levi E. Lane",
+      "tier": "A",
+      "categories": ["record-keeper", "genealogy-contributor"],
+      "personId": null,
+      "branch": "Hampton Falls",
+      "eraLabel": "19th century",
+      "achievementSummary": "Acknowledged in Chapman preface for inheriting Deacon Jeremiah Lane's talents; illustrated in book (p. 116); authored George G. Lane note in Vol. I.",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "Named among helpers preparing the volume." },
+        { "kind": "illustration", "bookPage": 116, "source": "lane-illustrations-index.json" }
+      ],
+      "externalLinks": [
+        { "label": "Lane Genealogies Vol. I — Internet Archive", "url": "https://archive.org/details/lanegenealogies01chap", "kind": "book" }
+      ],
+      "verificationStatus": "partial",
+      "siteLinks": [{ "label": "Lane Museum (George G. context)", "url": "/family/lane-museum.html" }]
+    },
+    {
+      "slug": "aaron-g-lane",
+      "displayName": "Captain Aaron G. Lane",
+      "tier": "A",
+      "categories": ["frontier", "military"],
+      "personId": 1024,
+      "branch": "California / Mojave",
+      "eraLabel": "1817–1883",
+      "achievementSummary": "Mexican-American War veteran and Forty-niner; established Lane's Crossing ranch and traveler store on the Mojave River (1859), a Victor Valley pioneer site.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Went to California 1849; widely known in early Mojave corridor." }
+      ],
+      "externalLinks": [
+        { "label": "Wikipedia — Lane's Crossing", "url": "https://en.wikipedia.org/wiki/Lane%27s_Crossing", "kind": "wikipedia" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [{ "label": "Lane Museum exhibit", "url": "/family/lane-museum.html" }]
+    },
+    {
+      "slug": "hampton-monument-committee",
+      "displayName": "1891 publishing committee (portraits)",
+      "tier": "A",
+      "categories": ["genealogy-compiler"],
+      "personId": null,
+      "branch": "Multi-branch",
+      "eraLabel": "Hampton monument meeting → 1891 print",
+      "achievementSummary": "George W. Lane (Salem), Rev. John Wm. Lane (North Hadley), Dr. Edward B. Lane (Roxbury), Rev. James H. Fitts, Rev. Jacob Chapman — chosen to complete the printed genealogy as a 'portable monument.'",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "Hampton granite monument dedication meeting roster." },
+        { "kind": "illustration", "source": "lane-illustrations-index.json", "note": "Frontispiece portraits for John Wm., Fitts, Geo. W., Dr. Edw. B." }
+      ],
+      "externalLinks": [
+        { "label": "Lane Genealogies Vol. I — Internet Archive", "url": "https://archive.org/details/lanegenealogies01chap", "kind": "book" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [
+        { "label": "Lane Historians portraits", "url": "/family/lane-historians.html" },
+        { "label": "Plate p4-i0", "url": "/family/lane-pdf-gallery.html?plate=p4-i0&pdfPage=4" }
+      ]
+    },
+    {
+      "slug": "john-lane-king-philips-war",
+      "displayName": "John Lane (William¹)",
+      "tier": "B",
+      "categories": ["military"],
+      "personId": 7,
+      "branch": "Boston / colonial",
+      "eraLabel": "b. 1653 · d. 1725?",
+      "achievementSummary": "Vol. I: soldier in King Philip's War, March 1675, age 22, under Capt. Poole — book narrative only until muster rolls verified.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "March 1675 service under Capt. Poole." }
+      ],
+      "externalLinks": [
+        { "label": "Lane Genealogies Vol. I — Internet Archive", "url": "https://archive.org/details/lanegenealogies01chap", "kind": "book" }
+      ],
+      "verificationStatus": "book-only",
+      "siteLinks": [{ "label": "War history", "url": "/family/lane-war-history.html" }]
+    },
+    {
+      "slug": "samuel-lane-king-philips-war",
+      "displayName": "Samuel Lane (William¹)",
+      "tier": "B",
+      "categories": ["military"],
+      "personId": 6,
+      "branch": "Boston / Hadley",
+      "eraLabel": "1651–1690",
+      "achievementSummary": "Vol. I: under Capt. Turner in 1676; settled Hadley — separate captain/year from brother John under Poole.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Turner company 1676; Hadley settlement." }
+      ],
+      "externalLinks": [],
+      "verificationStatus": "book-only",
+      "siteLinks": [{ "label": "War history", "url": "/family/lane-war-history.html" }]
+    },
+    {
+      "slug": "capt-john-lane-york",
+      "displayName": "Capt. John Lane (York / Hampton)",
+      "tier": "B",
+      "categories": ["military"],
+      "personId": null,
+      "branch": "York County, Maine / Hampton",
+      "eraLabel": "b. Hampton 1702",
+      "achievementSummary": "Vol. I and NEHGR XLV:130: lieutenant then captain in Maine frontier service; Dummer-era report (York, 21 Apr. 1724) cited in book; 'famous in fighting the Indians' per compilation.",
+      "bookEvidence": [
+        { "kind": "title-page", "source": "lane-historians.json", "note": "Capt. John Lane of York County, Maine, 1693 subject line." },
+        { "kind": "military-scan", "source": "lane-military-deep-scan-report.json", "note": "Westbrook report quote; adventurous military career." }
+      ],
+      "externalLinks": [
+        { "label": "Wikipedia — Dummer's War (era context)", "url": "https://en.wikipedia.org/wiki/Dummer%27s_War", "kind": "reference" }
+      ],
+      "verificationStatus": "partial",
+      "siteLinks": [{ "label": "War history", "url": "/family/lane-war-history.html" }]
+    },
+    {
+      "slug": "cornet-john-lane-chester",
+      "displayName": "Cornet John Lane⁴",
+      "tier": "B",
+      "categories": ["military", "civic"],
+      "personId": 36,
+      "branch": "Chester / Rye",
+      "eraLabel": "1709–1784",
+      "achievementSummary": "Vol. I: Cornet in troop of horse, Sept. 1754; farmer and tavern-keeper at Chester; father of Revolutionary officers.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Hampton-born; Chester land and militia note." }
+      ],
+      "externalLinks": [],
+      "verificationStatus": "book-only",
+      "siteLinks": [{ "label": "Lane Museum", "url": "/family/lane-museum.html" }]
+    },
+    {
+      "slug": "ezekiel-lane-bennington",
+      "displayName": "Lt. Ezekiel Lane",
+      "tier": "B",
+      "categories": ["military"],
+      "personId": 46,
+      "branch": "Chester",
+      "eraLabel": "1739–1777",
+      "achievementSummary": "Vol. I: lieutenant in Dearborn company, Stickney regiment; killed Battle of Bennington, 16 Aug. 1777 — corroborate with NH rolls.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Bennington casualty." }
+      ],
+      "externalLinks": [],
+      "verificationStatus": "book-only",
+      "siteLinks": [{ "label": "War history", "url": "/family/lane-war-history.html" }]
+    },
+    {
+      "slug": "john-lane-bennington",
+      "displayName": "Lt. John Lane (Bennington)",
+      "tier": "B",
+      "categories": ["military"],
+      "personId": 44,
+      "branch": "Chester",
+      "eraLabel": "1733–1813",
+      "achievementSummary": "Vol. I: second lieutenant July 1777; present at Bennington; promoted after brother Ezekiel fell.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Dearborn company; Chester march." }
+      ],
+      "externalLinks": [],
+      "verificationStatus": "book-only",
+      "siteLinks": [{ "label": "War history", "url": "/family/lane-war-history.html" }]
+    },
+    {
+      "slug": "sarah-dickinson-captivity",
+      "displayName": "Sarah (Dickinson) Lane",
+      "tier": "B",
+      "categories": ["frontier", "family-narrative"],
+      "personId": 13,
+      "branch": "Hadley",
+      "eraLabel": "1672–1731",
+      "achievementSummary": "Vol. I frontier narrative: widow of Samuel²; remarried Martin Kellogg; taken captive with children in 10 Feb. 1704 French and Indian raid — compilation family record.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Hadley household; 1704 captivity tradition." }
+      ],
+      "externalLinks": [],
+      "verificationStatus": "book-only",
+      "siteLinks": [{ "label": "Lane Museum", "url": "/family/lane-museum.html" }]
+    },
+    {
+      "slug": "william-lane-ii-hampton",
+      "displayName": "William Lane (II)",
+      "tier": "B",
+      "categories": ["civic", "migration"],
+      "personId": 10,
+      "branch": "Boston → Hampton",
+      "eraLabel": "1659–1749",
+      "achievementSummary": "Tailor; Tything Man Boston May 1686; removal to Hampton 1686; Webster marriage line — civic bookkeeping in NEHGR IX:159 bundle.",
+      "bookEvidence": [
+        { "kind": "node-text", "source": "laneData.json", "note": "Tailor; North Church; Hampton grant." }
+      ],
+      "externalLinks": [],
+      "verificationStatus": "partial",
+      "siteLinks": [{ "label": "Lane Museum", "url": "/family/lane-museum.html" }]
+    },
+    {
+      "slug": "thomas-lane-sexton",
+      "displayName": "Thomas³ Lane",
+      "tier": "B",
+      "categories": ["civic", "church"],
+      "personId": 26,
+      "branch": "Hampton",
+      "eraLabel": "1701–1775",
+      "achievementSummary": "Vol. I: Hampton church sexton; died 30 Aug. 1775, ae. 74 — local parish care, not military.",
+      "bookEvidence": [
+        { "kind": "museum-blurb", "source": "lane-museum-content.json", "note": "Sexton role explicit." }
+      ],
+      "externalLinks": [],
+      "verificationStatus": "book-only",
+      "siteLinks": [{ "label": "Lane Museum", "url": "/family/lane-museum.html" }]
+    },
+    {
+      "slug": "lane-genealogies-volume-i",
+      "displayName": "Lane Genealogies, Volume I (1891)",
+      "tier": "C",
+      "categories": ["meta-achievement"],
+      "personId": null,
+      "branch": "Whole family",
+      "eraLabel": "1891 print · Exeter, N.H.",
+      "achievementSummary": "Culmination of 125+ years of manuscript work; limited edition; 'portable monument' to William Lane of Hampton/Boston lines; incorporates E.J. and James P. Lane manuscripts.",
+      "bookEvidence": [
+        { "kind": "preface", "source": "lane-historians.json", "note": "Full compiler chain and publication intent." }
+      ],
+      "externalLinks": [
+        { "label": "Internet Archive facsimile", "url": "https://archive.org/details/lanegenealogies01chap", "kind": "book" },
+        { "label": "NHHS Lane Family Papers 1727–1924", "url": "https://www.nhhistory.org/object/272904/lane-family-papers-1727-1924", "kind": "archive" }
+      ],
+      "verificationStatus": "corroborated",
+      "siteLinks": [
+        { "label": "Lane Historians", "url": "/family/lane-historians.html" },
+        { "label": "PDF gallery", "url": "/family/lane-pdf-gallery.html" }
+      ]
+    }
+  ],
+  "validationNotes": [
+    "Seven compiler/committee figures have no laneData.json personId — expected; they are authors or committee members, not tree nodes.",
+    "personId 2898 node name is 'By Levi E. Lane' but museum uses it for George G. Lane exhibit — prose is Levi's note about his brother; do not merge nodes.",
+    "Military Tier B entries remain book-only until NH provincial rolls or Compiled Military Service Records are checked.",
+    "Illustrated allied-family names (French, Swett) excluded from achiever count — not Lane surnames."
+  ]
+}

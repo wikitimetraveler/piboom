@@ -10,6 +10,7 @@ import { initializeDatabase, createTables } from './services/database.service.js
 import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
 import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
+import { hasFinanceSession } from './lib/finance-session.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -106,23 +107,8 @@ app.use(
 ); // Support base64 image uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-const FINANCE_SESSION_COOKIE = 'dc_finance_session';
-const FINANCE_SESSION_VALUE = '1';
 /** Paths that are allowed without finance session cookie (scripts, styles, images for /finance/ pages). */
 const FINANCE_PUBLIC_FILE = /\.(js|mjs|css|png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|eot|map|json|txt|xml|kml|wasm)$/i;
-
-function readCookieHeader(req, name) {
-  const raw = req.headers.cookie;
-  if (!raw) return null;
-  for (const part of raw.split(';')) {
-    const i = part.indexOf('=');
-    if (i === -1) continue;
-    const k = part.slice(0, i).trim();
-    if (k !== name) continue;
-    return decodeURIComponent(part.slice(i + 1).trim());
-  }
-  return null;
-}
 
 function financePathNeedsSession(urlPath) {
   if (urlPath === '/finance' || urlPath === '/finance/') return true;
@@ -133,7 +119,7 @@ function financePathNeedsSession(urlPath) {
 function requireFinanceSession(req, res, next) {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next();
   if (!financePathNeedsSession(req.path)) return next();
-  if (readCookieHeader(req, FINANCE_SESSION_COOKIE) === FINANCE_SESSION_VALUE) return next();
+  if (hasFinanceSession(req)) return next();
   const returnTo = encodeURIComponent(req.originalUrl);
   return res.redirect(302, `/?returnTo=${returnTo}&financeLogin=1`);
 }

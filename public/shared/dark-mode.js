@@ -54,6 +54,7 @@ const darkModeStyles = `
 
   /* Lane heritage (magazine, hub, shell tools) */
   body.dark-mode.lane-magazine-page,
+  body.dark-mode.lane-major-achievers-page,
   body.dark-mode.lane-family-hub,
   body.dark-mode.lane-historians-page,
   body.dark-mode.lane-museum-page,

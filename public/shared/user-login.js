@@ -53,6 +53,16 @@ function clearFinanceSessionCookie() {
   } catch (_) {}
 }
 
+function hasFinanceSessionCookie() {
+  try {
+    return document.cookie
+      .split(';')
+      .some((part) => part.trim().startsWith(`${FINANCE_SESSION_COOKIE_NAME}=${FINANCE_SESSION_COOKIE_VALUE}`));
+  } catch (_) {
+    return false;
+  }
+}
+
 (function syncFinanceSessionCookieFromStorage() {
   try {
     if (typeof localStorage !== 'undefined' && localStorage.getItem('loggedInUserId')) {
@@ -146,8 +156,25 @@ function setupLoginModalAccessibility(modal) {
   });
 }
 
+function redirectAfterLoginIfNeeded() {
+  const params = new URLSearchParams(window.location.search);
+  const returnToRaw = params.get('returnTo');
+  if (!returnToRaw) return false;
+  try {
+    const dest = new URL(returnToRaw, window.location.origin);
+    if (dest.origin === window.location.origin && dest.pathname.startsWith('/finance')) {
+      setFinanceSessionCookie();
+      window.location.replace(dest.pathname + dest.search + dest.hash);
+      return true;
+    }
+  } catch (_) {}
+  return false;
+}
+
 // Show login popup
 function showLoginPopup() {
+  const existing = document.getElementById('loginModal');
+  if (existing) closeLoginPopup();
   const modal = document.createElement('div');
   modal.id = 'loginModal';
   modal.setAttribute('role', 'presentation');
@@ -318,6 +345,7 @@ async function submitLogin() {
       : async (userId, pwd) => {
           const res = await fetch('/api/auth/verify-user-password', {
             method: 'POST',
+            credentials: 'same-origin',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
             body: JSON.stringify({ userId, password: pwd }),
           });
@@ -353,6 +381,7 @@ async function submitLogin() {
     setFinanceSessionCookie();
     closeLoginPopup();
     window.dispatchEvent(new CustomEvent('user-logged-in', { detail: { userId: selectedLoginUserId } }));
+    if (hasFinanceSessionCookie() && redirectAfterLoginIfNeeded()) return;
     window.location.reload();
     return;
   }
@@ -385,14 +414,16 @@ function closeLoginPopup() {
 }
 
 // Logout
-function logout() {
-  if (confirm('Logout? You will need to login again.')) {
-    localStorage.removeItem('loggedInUserId');
-    localStorage.removeItem('currentUserId');
-    sessionStorage.clear();
-    clearFinanceSessionCookie();
-    window.location.reload();
-  }
+async function logout() {
+  if (!confirm('Logout? You will need to login again.')) return;
+  try {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'same-origin' });
+  } catch (_) {}
+  localStorage.removeItem('loggedInUserId');
+  localStorage.removeItem('currentUserId');
+  sessionStorage.clear();
+  clearFinanceSessionCookie();
+  window.location.reload();
 }
 
 // Update navbar to show current user
@@ -415,14 +446,16 @@ window.addEventListener('DOMContentLoaded', () => {
   const financeLogin = params.get('financeLogin') === '1';
 
   if (returnToRaw && isLoggedIn()) {
-    try {
-      const dest = new URL(returnToRaw, window.location.origin);
-      if (dest.origin === window.location.origin && dest.pathname.startsWith('/finance')) {
-        window.location.replace(dest.pathname + dest.search + dest.hash);
-        return;
-      }
-    } catch (_) {
-      /* ignore malformed returnTo */
+    setFinanceSessionCookie();
+    if (hasFinanceSessionCookie() && redirectAfterLoginIfNeeded()) return;
+    if (!hasFinanceSessionCookie()) {
+      try {
+        const dest = new URL(returnToRaw, window.location.origin);
+        if (dest.origin === window.location.origin && dest.pathname.startsWith('/finance')) {
+          showLoginPopup();
+          return;
+        }
+      } catch (_) {}
     }
   }
 

@@ -75,3 +75,35 @@ Use the spread order in `data/lane-magazine-issue-01.json`.
 
 - Save final as `lane-magazine-issue-01.pdf`
 - Link from Lane hub or lane-magazine page for download
+
+---
+
+## Issue 2 — Major achievers edition
+
+Issue 2 is sourced from [`data/lane-major-achievers.json`](../data/lane-major-achievers.json) and rendered at `/family/lane-magazine.html?issue=02`.
+
+### Source files
+
+- Issue outline JSON: `data/lane-magazine-issue-02.json`
+- Achievers research: `data/lane-major-achievers.json`
+- Browse page: `/family/lane-major-achievers.html`
+
+### Spread order (Issue 2 JSON)
+
+- Cover
+- Editorial letter (Context vs Evidence)
+- Compilers (Tier A chain + p4-i0)
+- Record-keepers (Deacon Samuel Lane)
+- National footprint (Jonathan Homer, George G., Aaron G.)
+- Colonial anchor (William Lane I)
+- Tier B military timeline (verification caveat)
+- Tier B civic / captivity
+- Achievers index → full browse page
+- Sources
+- Back cover
+
+### Quality checks (Issue 2)
+
+- Tier B military bullets stay book-only framing
+- External links open NHHS / Archive / Wikipedia where cited
+- Full index links to `/family/lane-major-achievers.html`
