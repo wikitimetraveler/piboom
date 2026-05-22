@@ -131,10 +131,15 @@ function setupLoginModalAccessibility(modal) {
   }
 
   function onFocusIn(e) {
-    if (!modal.parentNode || !panel.contains(e.target)) {
-      const list = getList();
-      if (list.length) list[0].focus();
+    if (!modal.parentNode) return;
+    if (panel.contains(e.target)) return;
+    const list = getList();
+    const pwd = panel.querySelector('#loginPasswordInput');
+    if (pwd && panel.querySelector('#passwordSection')?.style.display !== 'none') {
+      pwd.focus({ preventScroll: true });
+      return;
     }
+    if (list.length) list[0].focus({ preventScroll: true });
   }
 
   document.addEventListener('keydown', onKeydown, true);
@@ -175,6 +180,7 @@ function redirectAfterLoginIfNeeded() {
 function showLoginPopup() {
   const existing = document.getElementById('loginModal');
   if (existing) closeLoginPopup();
+  selectedLoginUserId = null;
   const modal = document.createElement('div');
   modal.id = 'loginModal';
   modal.setAttribute('role', 'presentation');
@@ -207,92 +213,96 @@ function showLoginPopup() {
         ${window.USERS.map(user => `
           <div class="login-user-card" data-user="${user.id}" role="button" tabindex="0"
                aria-label="Log in as ${user.name.replace(/"/g, '&quot;')}" style="cursor:pointer;">
-            <img src="${user.avatar}" alt="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto; display: block; border: 4px solid ${user.color}; transition: transform 0.2s ease; touch-action: manipulation;">
+            <img src="${user.avatar}" alt="" class="lane-lightbox-ignore" data-lane-lightbox-ignore="1"
+                 style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto; display: block; border: 4px solid ${user.color}; touch-action: manipulation; pointer-events: none;">
             <div style="text-align: center; font-size: 0.85rem; margin-top: 8px; font-weight: 600; line-height: 1.2;">${user.name.split(' ').slice(-1)}</div>
           </div>
         `).join('')}
       </div>
 
       <div id="passwordSection" style="display: none; margin-top: 25px; padding-top: 25px; border-top: 2px solid #eee;" aria-live="polite">
-        <h4 style="text-align: center; margin-bottom: 15px; font-size: 1.1rem;">
-          Password for <span id="selectedUserName" style="color: #0d6efd;"></span>
-        </h4>
-        <div style="position: relative; margin-bottom: 15px;">
-          <input type="password" id="loginPasswordInput"
-                 placeholder="Password"
-                 inputmode="text"
-                 autocomplete="off"
-                 autocorrect="off"
-                 autocapitalize="off"
-                 spellcheck="false"
-                 aria-invalid="false"
-                 style="width: 100%; padding: 14px 52px 14px 14px; border: 2px solid #dee2e6; border-radius: 10px; font-size: 1.1rem; box-sizing: border-box; min-height: 48px;">
-          <button type="button" id="toggleLoginPasswordBtn"
-                  aria-label="Show password" aria-pressed="false" title="Show password"
-                  style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; background: none; border: none; cursor: pointer; border-radius: 8px; color: #6c757d; display: inline-flex; align-items: center; justify-content: center;">
-            <i class="bi bi-eye" aria-hidden="true"></i>
-          </button>
-        </div>
-        <div id="loginPasswordError" role="alert" style="color: #dc3545; font-size: 0.9rem; margin-bottom: 15px; text-align: center; display: none;"></div>
-        <div style="display: flex; gap: 10px;">
-          <button type="button" id="loginCancelBtn"
-                  style="flex: 1; min-height: 44px; padding: 14px; border: 2px solid #dee2e6; background: #fff; color: #6c757d; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;">
-            Cancel
-          </button>
-          <button type="button" id="loginSubmitBtn"
-                  style="flex: 1; min-height: 44px; padding: 14px; border: 2px solid #0d6efd; background: #0d6efd; color: #fff; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;">
-            Log in
-          </button>
-        </div>
+        <form id="loginPasswordForm" autocomplete="on" novalidate>
+          <h4 style="text-align: center; margin-bottom: 15px; font-size: 1.1rem;">
+            Password for <span id="selectedUserName" style="color: #0d6efd;"></span>
+          </h4>
+          <div style="position: relative; margin-bottom: 15px;">
+            <input type="password" id="loginPasswordInput" name="password"
+                   placeholder="Password"
+                   inputmode="text"
+                   autocomplete="current-password"
+                   autocorrect="off"
+                   autocapitalize="off"
+                   spellcheck="false"
+                   aria-invalid="false"
+                   required
+                   style="width: 100%; padding: 14px 52px 14px 14px; border: 2px solid #dee2e6; border-radius: 10px; font-size: 1.1rem; box-sizing: border-box; min-height: 48px;">
+            <button type="button" id="toggleLoginPasswordBtn"
+                    aria-label="Show password" aria-pressed="false" title="Show password"
+                    style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; background: none; border: none; cursor: pointer; border-radius: 8px; color: #6c757d; display: inline-flex; align-items: center; justify-content: center;">
+              <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div id="loginPasswordError" role="alert" style="color: #dc3545; font-size: 0.9rem; margin-bottom: 15px; text-align: center; display: none;"></div>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" id="loginCancelBtn"
+                    style="flex: 1; min-height: 44px; padding: 14px; border: 2px solid #dee2e6; background: #fff; color: #6c757d; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;">
+              Cancel
+            </button>
+            <button type="submit" id="loginSubmitBtn"
+                    style="flex: 1; min-height: 44px; padding: 14px; border: 2px solid #0d6efd; background: #0d6efd; color: #fff; border-radius: 12px; cursor: pointer; font-size: 1rem; font-weight: 600;">
+              Log in
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   `;
 
   document.body.appendChild(modal);
 
-  document.getElementById('loginModalCloseBtn').addEventListener('click', closeLoginPopup);
-  document.getElementById('loginCancelBtn').addEventListener('click', closeLoginPopup);
-  document.getElementById('loginSubmitBtn').addEventListener('click', () => {
+  modal.querySelector('#loginModalCloseBtn')?.addEventListener('click', closeLoginPopup);
+  modal.querySelector('#loginCancelBtn')?.addEventListener('click', closeLoginPopup);
+  modal.querySelector('#loginPasswordForm')?.addEventListener('submit', (e) => {
+    e.preventDefault();
     submitLogin();
   });
 
-  document.querySelectorAll('.login-user-card').forEach((card) => {
-    const uid = card.dataset.user;
-    const go = () => selectUserForLogin(uid);
-    card.addEventListener('click', go);
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        go();
-      }
-    });
+  modal.addEventListener('click', (e) => {
+    const card = e.target.closest('.login-user-card');
+    if (!card || !modal.contains(card)) return;
+    e.preventDefault();
+    selectUserForLogin(card.dataset.user, modal);
   });
 
-  const pwdInput = document.getElementById('loginPasswordInput');
-  const togglePwd = document.getElementById('toggleLoginPasswordBtn');
-  togglePwd.addEventListener('click', () => {
-    const visible = pwdInput.type === 'password';
-    pwdInput.type = visible ? 'text' : 'password';
-    togglePwd.setAttribute('aria-pressed', visible ? 'true' : 'false');
-    togglePwd.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
-    togglePwd.title = visible ? 'Hide password' : 'Show password';
-    const icon = togglePwd.querySelector('i');
-    if (icon) icon.className = visible ? 'bi bi-eye-slash' : 'bi bi-eye';
-  });
-
-  pwdInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
+  modal.addEventListener('keydown', (e) => {
+    const card = e.target.closest('.login-user-card');
+    if (!card || !modal.contains(card)) return;
+    if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      submitLogin();
+      selectUserForLogin(card.dataset.user, modal);
     }
   });
+
+  const pwdInput = modal.querySelector('#loginPasswordInput');
+  const togglePwd = modal.querySelector('#toggleLoginPasswordBtn');
+  if (togglePwd && pwdInput) {
+    togglePwd.addEventListener('click', () => {
+      const visible = pwdInput.type === 'password';
+      pwdInput.type = visible ? 'text' : 'password';
+      togglePwd.setAttribute('aria-pressed', visible ? 'true' : 'false');
+      togglePwd.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+      togglePwd.title = visible ? 'Hide password' : 'Show password';
+      const icon = togglePwd.querySelector('i');
+      if (icon) icon.className = visible ? 'bi bi-eye-slash' : 'bi bi-eye';
+    });
+  }
 
   if (!document.getElementById('login-modal-hover-style')) {
     const style = document.createElement('style');
     style.id = 'login-modal-hover-style';
     style.textContent = `
       @media (prefers-reduced-motion: no-preference) {
-        .login-user-card:hover img { transform: scale(1.05); box-shadow: 0 8px 25px rgba(0,0,0,0.25); }
+        .login-user-card:hover { box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.35); border-radius: 12px; }
       }
     `;
     document.head.appendChild(style);
@@ -304,30 +314,57 @@ function showLoginPopup() {
 // Select user for login
 let selectedLoginUserId = null;
 
-function selectUserForLogin(userId) {
+function getLoginModalRoot() {
+  return document.getElementById('loginModal');
+}
+
+function selectUserForLogin(userId, modalRoot) {
+  const modal = modalRoot || getLoginModalRoot();
+  if (!modal || !userId) return;
+
   const u = window.USERS.find((x) => x.id === userId);
   if (!u) return;
   selectedLoginUserId = userId;
 
-  document.getElementById('passwordSection').style.display = 'block';
-  const nameEl = document.getElementById('selectedUserName');
+  const panel = modal.querySelector('#loginDialogPanel');
+  const passwordSection = modal.querySelector('#passwordSection');
+  const userGrid = modal.querySelector('#userIconGrid');
+  const nameEl = modal.querySelector('#selectedUserName');
+  const submitBtn = modal.querySelector('#loginSubmitBtn');
+  const pwd = modal.querySelector('#loginPasswordInput');
+  const errorDiv = modal.querySelector('#loginPasswordError');
+
+  if (!passwordSection || !nameEl || !submitBtn || !pwd) return;
+
+  if (userGrid) {
+    userGrid.style.display = 'none';
+  }
+  passwordSection.style.display = 'block';
   nameEl.textContent = u.name;
   nameEl.style.color = u.color;
 
-  const submitBtn = document.getElementById('loginSubmitBtn');
   submitBtn.style.background = '#0d6efd';
   submitBtn.style.borderColor = '#0d6efd';
   submitBtn.style.color = '#fff';
 
-  const pwd = document.getElementById('loginPasswordInput');
   pwd.value = '';
   pwd.setAttribute('aria-invalid', 'false');
+  if (errorDiv) {
+    errorDiv.style.display = 'none';
+    errorDiv.textContent = '';
+  }
 
-  setTimeout(() => {
-    pwd.focus();
-  }, 100);
+  const titleEl = modal.querySelector('#loginModalTitle');
+  if (titleEl) {
+    titleEl.innerHTML = `<i class="bi bi-shield-lock" aria-hidden="true"></i> Enter password`;
+  }
 
-  document.querySelectorAll('.login-user-card').forEach((card) => {
+  requestAnimationFrame(() => {
+    passwordSection.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    pwd.focus({ preventScroll: true });
+  });
+
+  modal.querySelectorAll('.login-user-card').forEach((card) => {
     card.style.opacity = card.dataset.user === userId ? '1' : '0.5';
   });
 }
@@ -335,10 +372,11 @@ function selectUserForLogin(userId) {
 // Submit login
 async function submitLogin() {
   if (!selectedLoginUserId) return;
-  const pwdInput = document.getElementById('loginPasswordInput');
+  const modal = getLoginModalRoot();
+  const pwdInput = modal?.querySelector('#loginPasswordInput') || document.getElementById('loginPasswordInput');
   const password = pwdInput.value.trim();
-  const errorDiv = document.getElementById('loginPasswordError');
-  const submitBtn = document.getElementById('loginSubmitBtn');
+  const errorDiv = modal?.querySelector('#loginPasswordError') || document.getElementById('loginPasswordError');
+  const submitBtn = modal?.querySelector('#loginSubmitBtn') || document.getElementById('loginSubmitBtn');
   const verify =
     typeof window.verifyPasswordWithServer === 'function'
       ? window.verifyPasswordWithServer
@@ -354,7 +392,7 @@ async function submitLogin() {
           return { ok: data.valid === true, serverError: false };
         };
 
-  const panel = document.getElementById('loginDialogPanel');
+  const panel = modal?.querySelector('#loginDialogPanel') || document.getElementById('loginDialogPanel');
   errorDiv.style.display = 'none';
   errorDiv.textContent = '';
   pwdInput.setAttribute('aria-invalid', 'false');

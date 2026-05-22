@@ -8,9 +8,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <link rel="stylesheet" href="/shared/collection-styles.css"/>
-  <link rel="stylesheet" href="/shared/collection-media-gallery.css"/>
   <script src="/shared/toast.js"></script>
-  <script src="/shared/collection-media-gallery.js"></script>
   <script src="/shared/modern-navbar.js"></script>
 <script src="/shared/collection-utils.js"></script>
 <script src="/shared/music-mini-nav.js"></script>
@@ -296,23 +294,6 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
-    .album-cover-wrap {
-      width: 100%;
-      height: 220px;
-      margin-bottom: 12px;
-      border-radius: var(--zen-radius);
-      overflow: hidden;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    }
-
-    .album-cover-wrap .collection-media-root--compact {
-      max-height: 220px;
-    }
-
-    .album-cover-wrap .collection-media-viewport {
-      min-height: 200px;
-      max-height: 220px;
-    }
     
     .album-info h5 {
       color: var(--text);
@@ -669,6 +650,11 @@
 
   <!-- Album Grid -->
   <div id="albumGrid" class="album-grid"></div>
+  <div id="collectionLoadMoreWrap" class="text-center my-4" style="display: none;">
+    <button type="button" id="collectionLoadMoreBtn" class="btn btn-outline-primary">
+      <i class="bi-arrow-down-circle"></i> Load more albums
+    </button>
+  </div>
 
   <!-- Empty State -->
   <div id="emptyState" class="empty-state" style="display: none;">
@@ -754,14 +740,6 @@
       </div>
       <div class="modal-body">
         <input type="hidden" id="editAlbumId">
-        <div class="form-group">
-          <label><i class="bi-images"></i> Photos &amp; videos</label>
-          <p class="small text-muted mb-2">Multiple sleeve shots, vinyl, inserts, or short clips. The first still image is used as the main cover.</p>
-          <div id="editAlbumMediaPreview" class="mb-2"></div>
-          <input type="file" id="editAlbumMediaFiles" class="d-none" multiple accept="image/*,video/*">
-          <button type="button" class="btn btn-sm btn-outline-primary" id="editAlbumMediaPickBtn"><i class="bi-plus-lg"></i> Add media</button>
-          <button type="button" class="btn btn-sm btn-outline-secondary ml-2" id="editAlbumMediaClearBtn" type="button">Clear all</button>
-        </div>
         <div class="form-group">
           <label>Rating</label>
           <div class="rating-input">
@@ -972,30 +950,12 @@
 
 <script>
 let currentCollection = [];
-let editAlbumMediaItems = [];
+const COLLECTION_PAGE_SIZE = 48;
+let collectionListOffset = 0;
+let collectionHasMore = false;
+let collectionLoadingMore = false;
+const albumDetailCache = new Map();
 
-function renderEditAlbumMediaPreview() {
-  const el = document.getElementById('editAlbumMediaPreview');
-  if (!el || !window.CollectionMediaGallery) return;
-  CollectionMediaGallery.mountCollectionSlideshow(el, editAlbumMediaItems, {
-    compact: true,
-    emptyText: 'No gallery yet — add photos or videos.'
-  });
-}
-
-async function handleEditAlbumMediaFiles(ev) {
-  const files = ev.target.files;
-  if (!files || !files.length || !window.CollectionMediaGallery) return;
-  const added = await CollectionMediaGallery.filesToMediaItems(files);
-  editAlbumMediaItems = editAlbumMediaItems.concat(added);
-  ev.target.value = '';
-  renderEditAlbumMediaPreview();
-}
-
-function clearEditAlbumMedia() {
-  editAlbumMediaItems = [];
-  renderEditAlbumMediaPreview();
-}
 let GOOGLE_API_KEY = null;
 let youtubeAPIReady = false;
 let youtubeInitInProgress = false;
@@ -1272,17 +1232,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 
   initEditStorageShelfUI();
 
-  const editAlbumMediaPickBtn = document.getElementById('editAlbumMediaPickBtn');
-  const editAlbumMediaFiles = document.getElementById('editAlbumMediaFiles');
-  const editAlbumMediaClearBtn = document.getElementById('editAlbumMediaClearBtn');
-  if (editAlbumMediaPickBtn && editAlbumMediaFiles) {
-    editAlbumMediaPickBtn.addEventListener('click', () => editAlbumMediaFiles.click());
-    editAlbumMediaFiles.addEventListener('change', handleEditAlbumMediaFiles);
+  const loadMoreBtn = document.getElementById('collectionLoadMoreBtn');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', () => loadCollection({ append: true }));
   }
-  if (editAlbumMediaClearBtn) {
-    editAlbumMediaClearBtn.addEventListener('click', clearEditAlbumMedia);
-  }
-  
+
   // Update header based on view mode
   updateCollectionHeader();
   
@@ -1319,50 +1273,96 @@ function updateCollectionHeader() {
   }
 }
 
-// Load collection from API
-async function loadCollection() {
-  try {
-    document.getElementById('loadingState').style.display = 'block';
-    document.getElementById('albumGrid').innerHTML = '';
-    document.getElementById('emptyState').style.display = 'none';
-    
-    const sortSelect = document.getElementById('sortSelect').value.split(':');
-    const sortBy = sortSelect[0];
-    const order = sortSelect[1];
-    const search = document.getElementById('searchInput').value;
-    const viewMode = localStorage.getItem('viewMode') || 'single';
-    
-    const params = new URLSearchParams({ sortBy, order });
-    if (search) params.append('search', search);
-    
-    // Add userId parameter based on view mode
-    if (viewMode === 'all') {
-      params.append('userId', 'all');
-    } else {
-      const currentUser = getCurrentUser();
-      if (currentUser && currentUser.id) {
-        params.append('userId', currentUser.id);
-      }
+function buildCollectionQueryParams(offset) {
+  const sortSelect = document.getElementById('sortSelect').value.split(':');
+  const sortBy = sortSelect[0];
+  const order = sortSelect[1];
+  const search = document.getElementById('searchInput').value;
+  const viewMode = localStorage.getItem('viewMode') || 'single';
+  const params = new URLSearchParams({ sortBy, order, limit: String(COLLECTION_PAGE_SIZE), offset: String(offset) });
+  if (search) params.append('search', search);
+  if (viewMode === 'all') {
+    params.append('userId', 'all');
+  } else {
+    const currentUser = getCurrentUser();
+    if (currentUser && currentUser.id) {
+      params.append('userId', currentUser.id);
     }
-    
+  }
+  return params;
+}
+
+function updateCollectionLoadMoreUi() {
+  const wrap = document.getElementById('collectionLoadMoreWrap');
+  const btn = document.getElementById('collectionLoadMoreBtn');
+  if (!wrap || !btn) return;
+  if (collectionHasMore && currentCollection.length > 0) {
+    wrap.style.display = 'block';
+    btn.disabled = collectionLoadingMore;
+    btn.innerHTML = collectionLoadingMore
+      ? '<span class="spinner-border spinner-border-sm mr-2"></span> Loading…'
+      : '<i class="bi-arrow-down-circle"></i> Load more albums';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+// Load collection from API
+async function loadCollection(options = {}) {
+  const append = options.append === true;
+  if (collectionLoadingMore) return;
+  try {
+    collectionLoadingMore = append;
+    if (!append) {
+      document.getElementById('loadingState').style.display = 'block';
+      document.getElementById('albumGrid').innerHTML = '';
+      document.getElementById('emptyState').style.display = 'none';
+      collectionListOffset = 0;
+      albumDetailCache.clear();
+    } else {
+      updateCollectionLoadMoreUi();
+    }
+
+    const offset = append ? collectionListOffset : 0;
+    const params = buildCollectionQueryParams(offset);
     const response = await fetch(`/api/collection?${params}`);
     const data = await response.json();
-    
-    document.getElementById('loadingState').style.display = 'none';
-    
+
+    if (!append) {
+      document.getElementById('loadingState').style.display = 'none';
+    }
+
     if (data.success && data.albums && data.albums.length > 0) {
-      currentCollection = data.albums;
-      displayAlbums(data.albums);
-      document.getElementById('totalCount').textContent = data.count;
-    } else {
+      if (append) {
+        const existingIds = new Set(currentCollection.map((a) => a.id));
+        const newAlbums = data.albums.filter((a) => !existingIds.has(a.id));
+        currentCollection = currentCollection.concat(newAlbums);
+        appendAlbumCards(newAlbums);
+      } else {
+        currentCollection = data.albums;
+        displayAlbums(data.albums);
+      }
+      collectionListOffset = offset + data.albums.length;
+      collectionHasMore = data.hasMore === true;
+      document.getElementById('totalCount').textContent = data.count ?? currentCollection.length;
+    } else if (!append) {
+      currentCollection = [];
+      collectionHasMore = false;
       document.getElementById('emptyState').style.display = 'block';
       document.getElementById('totalCount').textContent = '0';
+    } else {
+      collectionHasMore = false;
     }
-    
+    updateCollectionLoadMoreUi();
   } catch (error) {
     console.error('Error loading collection:', error);
-    document.getElementById('loadingState').style.display = 'none';
+    if (!append) {
+      document.getElementById('loadingState').style.display = 'none';
+    }
     if (typeof showToast === 'function') showToast('Failed to load collection', 'Please check your database connection.', 'error');
+  } finally {
+    collectionLoadingMore = false;
+    updateCollectionLoadMoreUi();
   }
 }
 
@@ -1457,171 +1457,251 @@ function formatAIAnalysis(aiAnalysisJson) {
   }
 }
 
+const NO_COVER_PLACEHOLDER =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><rect width="100%" height="100%" fill="%2387CEEB"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="20" font-family="Arial">No Cover</text></svg>';
+
+function escapeHtml(text) {
+  if (text == null) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/** Grid covers: direct URL when safe; no proxy round-trips on load. */
+function resolveGridCoverUrl(url) {
+  if (!url) return NO_COVER_PLACEHOLDER;
+  if (url.startsWith('data:') || url.startsWith('blob:')) return url;
+  if (url.startsWith('/')) return url;
+  try {
+    const parsed = new URL(url, window.location.origin);
+    if (parsed.origin === window.location.origin) return url;
+  } catch (_) {}
+  if (/^https?:\/\//i.test(url)) return url;
+  return url;
+}
+
+function albumRatingStars(rating) {
+  return rating ? '★'.repeat(rating) + '☆'.repeat(5 - rating) : '☆☆☆☆☆';
+}
+
+function albumLocationDisplay(album) {
+  const locationLabel = album.location_label || '';
+  const locationCoords = album.latitude && album.longitude
+    ? `${parseFloat(album.latitude).toFixed(4)}, ${parseFloat(album.longitude).toFixed(4)}`
+    : '';
+  return locationLabel || locationCoords;
+}
+
+function collectionUserIdQuery() {
+  const viewMode = localStorage.getItem('viewMode') || 'single';
+  if (viewMode === 'all') return 'all';
+  const currentUser = getCurrentUser();
+  return currentUser?.id || '';
+}
+
+async function fetchAlbumDetail(albumId) {
+  if (albumDetailCache.has(albumId)) return albumDetailCache.get(albumId);
+  const userId = collectionUserIdQuery();
+  const q = userId ? `?userId=${encodeURIComponent(userId)}` : '';
+  const res = await fetch(`/api/collection/${albumId}${q}`);
+  const data = await res.json();
+  if (!data.success || !data.album) throw new Error(data.error || 'Album not found');
+  albumDetailCache.set(albumId, data.album);
+  return data.album;
+}
+
+function buildAlbumBackHtml(album, rating) {
+  const locationDisplay = albumLocationDisplay(album);
+  const addedDate = album.added_date ? new Date(album.added_date).toLocaleDateString() : '';
+  let html = '<h6><i class="bi-info-circle"></i> Album Details</h6>';
+
+  if (album.ai_analysis) {
+    html += `
+      <div class="metadata-item ai-analysis-section" onclick="event.stopPropagation(); toggleAIAnalysis(this)" style="background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(155,89,182,0.15)); border-left: 4px solid #3498db; padding: 12px; margin-bottom: 15px; max-height: 200px; overflow-y: auto;">
+        <span class="ai-expand-hint"><i class="bi-arrows-fullscreen"></i> Click to expand</span>
+        <strong style="color: #2980b9; font-size: 0.95rem;"><i class="bi-robot"></i> AI Analysis:</strong><br>
+        <div style="color: #34495e; margin-top: 8px; line-height: 1.5; font-size: 0.85rem;">
+          ${formatAIAnalysis(album.ai_analysis)}
+        </div>
+      </div>`;
+  }
+
+  if (album.story) {
+    html += `
+      <div class="metadata-item" style="background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2)); border-left: 4px solid #ffa500; padding: 12px; margin-bottom: 15px;">
+        <strong style="color: #ff8c00; font-size: 0.95rem;">📖 The Story Behind This Album:</strong><br>
+        <em style="font-size: 0.85rem; color: #333; line-height: 1.5; display: block; margin-top: 8px;">${escapeHtml(album.story)}</em>
+      </div>`;
+  }
+
+  html += `
+    <div class="metadata-item"><strong>🎵 Album:</strong> ${escapeHtml(album.album)}</div>
+    <div class="metadata-item"><strong>🎤 Artist:</strong> ${escapeHtml(album.artist)}</div>
+    ${album.year ? `<div class="metadata-item"><strong>📅 Year:</strong> ${escapeHtml(album.year)}</div>` : ''}
+    ${album.genre ? `<div class="metadata-item"><strong>🎸 Genre:</strong> ${escapeHtml(album.genre)}</div>` : ''}
+    ${album.label ? `<div class="metadata-item"><strong>🏷️ Label:</strong> ${escapeHtml(album.label)}</div>` : ''}
+    ${locationDisplay ? `<div class="metadata-item"><strong>📍 Location:</strong> ${escapeHtml(locationDisplay)}</div>` : ''}
+    <div class="metadata-item"><strong>⭐ Rating:</strong> ${rating}</div>
+    ${album.valuation ? `
+      <div class="metadata-item" style="background: linear-gradient(135deg, rgba(40,167,69,0.2), rgba(40,167,69,0.1)); border-left: 4px solid #28a745;">
+        <strong style="color: #28a745;"><i class="bi-cash-coin"></i> Valuation:</strong> $${parseFloat(album.valuation).toFixed(2)}
+      </div>` : ''}
+    ${album.notes ? `
+      <div class="metadata-item">
+        <strong>📝 Notes:</strong><br>
+        <em style="font-size: 0.8rem;">${escapeHtml(album.notes)}</em>
+      </div>` : '<div class="metadata-item"><em>No notes yet</em></div>'}
+    <div class="metadata-item"><strong>📆 Added:</strong> ${addedDate}</div>
+    ${album.spotify_id ? `<div class="metadata-item"><strong>🎧 Spotify ID:</strong> ${escapeHtml(album.spotify_id)}</div>` : ''}
+    ${album.musicbrainz_id ? `<div class="metadata-item"><strong>🎵 MusicBrainz ID:</strong> ${escapeHtml(String(album.musicbrainz_id).substring(0, 20))}...</div>` : ''}
+    <button type="button" class="btn btn-sm btn-secondary mt-3 w-100 album-back-close">
+      <i class="bi-arrow-left"></i> Back to Front
+    </button>`;
+  return html;
+}
+
+async function populateAlbumCardBack(albumCard, album) {
+  const back = albumCard.querySelector('.album-card-back');
+  if (!back || back.dataset.detailLoaded === '1') return;
+  const rating = albumRatingStars(album.rating);
+  back.innerHTML = '<p class="text-muted small mb-0"><span class="spinner-border spinner-border-sm"></span> Loading details…</p>';
+  try {
+    const detail = await fetchAlbumDetail(album.id);
+    const idx = currentCollection.findIndex((a) => a.id === album.id);
+    if (idx >= 0) currentCollection[idx] = { ...currentCollection[idx], ...detail };
+    back.innerHTML = buildAlbumBackHtml(detail, rating);
+    back.dataset.detailLoaded = '1';
+    back.querySelector('.album-back-close')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      albumCard.classList.remove('flipped');
+    });
+  } catch (err) {
+    console.error('Album detail load failed:', err);
+    back.innerHTML = `<p class="text-danger small">Could not load details.</p>
+      <button type="button" class="btn btn-sm btn-secondary album-back-close">Back to Front</button>`;
+    back.querySelector('.album-back-close')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      albumCard.classList.remove('flipped');
+    });
+  }
+}
+
+function buildAlbumCardElement(album) {
+  const loggedInUserId = localStorage.getItem('loggedInUserId');
+  const rating = albumRatingStars(album.rating);
+  const locationDisplay = albumLocationDisplay(album);
+  const storageLine =
+    window.VinylStorageLocations &&
+    album.storage_zone &&
+    album.storage_slot != null
+      ? window.VinylStorageLocations.formatStorageLine(album.storage_zone, album.storage_slot)
+      : '';
+  const coverSrc = resolveGridCoverUrl(album.cover_url || NO_COVER_PLACEHOLDER);
+  const albumUser = album.user_id ? getUserById(album.user_id) : USERS[0];
+  const viewMode = localStorage.getItem('viewMode') || 'single';
+  const showUserBadge = viewMode === 'all';
+  const hasAi = album.has_ai_analysis === true || album.has_ai_analysis === 't';
+  const artistEsc = escapeHtml(album.artist).replace(/'/g, '&#39;');
+  const albumEsc = escapeHtml(album.album).replace(/'/g, '&#39;');
+
+  const albumCard = document.createElement('div');
+  albumCard.className = 'album-card';
+  albumCard.dataset.albumId = String(album.id);
+
+  albumCard.addEventListener('click', async (e) => {
+    if (e.target.closest('button')) return;
+    const willFlip = !albumCard.classList.contains('flipped');
+    albumCard.classList.toggle('flipped');
+    if (willFlip) await populateAlbumCardBack(albumCard, album);
+  });
+
+  albumCard.innerHTML = `
+    <div class="album-card-inner">
+      <div class="album-card-front">
+        ${showUserBadge ? `
+          <div style="position: absolute; top: 10px; left: 10px; z-index: 10; background: ${albumUser.color}; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 5px;">
+            <img src="${albumUser.avatar}" alt="" class="lane-lightbox-ignore" data-lane-lightbox-ignore="1" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;">
+            ${escapeHtml(albumUser.name.split(' ').slice(-2).join(' '))}
+          </div>
+        ` : ''}
+        <img class="album-cover lane-lightbox-ignore" data-lane-lightbox-ignore="1" loading="lazy" decoding="async"
+             src="${coverSrc}" alt="${escapeHtml(album.album || 'Album')}">
+        <div class="album-info">
+          <h5>${escapeHtml(album.album)}</h5>
+          <p><strong>${escapeHtml(album.artist)}</strong></p>
+          <p>${escapeHtml(album.year || 'Year Unknown')} · ${escapeHtml(album.genre || 'Genre Unknown')}</p>
+          ${locationDisplay ? `<p style="margin: 4px 0 8px 0; font-size: 0.9rem; color: #2c3e50;"><i class="bi-geo-alt"></i> ${escapeHtml(locationDisplay)}</p>` : ''}
+          ${storageLine ? `<p style="margin: 4px 0 8px 0; font-size: 0.9rem; color: #34495e;"><i class="bi-box-seam"></i> ${escapeHtml(storageLine)}</p>` : ''}
+          ${album.valuation ? `<p style="color: #28a745; font-weight: 600; margin-top: 8px;"><i class="bi-cash-coin"></i> $${parseFloat(album.valuation).toFixed(2)}</p>` : ''}
+          ${rating ? `<div class="rating-stars">${rating}</div>` : ''}
+        </div>
+        <div class="album-actions">
+          ${loggedInUserId && loggedInUserId === album.user_id ? `
+            <button type="button" class="btn btn-sm btn-primary" data-action="edit" title="Edit Album">
+              <i class="bi-pencil"></i>
+            </button>
+          ` : ''}
+          <button type="button" class="btn btn-sm btn-secondary" data-action="poster" title="Create Poster">
+            <i class="bi-image"></i>
+          </button>
+          <button type="button" class="btn btn-sm btn-info" data-action="videos" title="Find videos">
+            <i class="bi-youtube"></i>
+          </button>
+          ${loggedInUserId && loggedInUserId === album.user_id ? `
+            <button type="button" class="btn btn-sm btn-danger" data-action="delete" title="Delete">
+              <i class="bi-trash"></i>
+            </button>
+          ` : ''}
+          ${!loggedInUserId || loggedInUserId !== album.user_id ? `
+            <div style="font-size: 0.75rem; color: #999; font-style: italic; margin-top: 5px;">👁️ Read-only</div>
+          ` : ''}
+        </div>
+        <div class="flip-hint" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+          <i class="bi-arrow-repeat"></i> Click to flip
+          ${hasAi ? '<span style="color: #3498db; font-weight: 600; font-size: 0.75rem;"><i class="bi-robot"></i> AI</span>' : ''}
+        </div>
+      </div>
+      <div class="album-card-back" data-detail-loaded="0">
+        <p class="text-muted small mb-0"><i class="bi-arrow-repeat"></i> Flip to load full details</p>
+      </div>
+    </div>
+  `;
+
+  albumCard.querySelector('[data-action="edit"]')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    editAlbum(album.id);
+  });
+  albumCard.querySelector('[data-action="poster"]')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openAlbumPoster(album.id);
+  });
+  albumCard.querySelector('[data-action="videos"]')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    findVideosForAlbum(artistEsc.replace(/&#39;/g, "'"), albumEsc.replace(/&#39;/g, "'"));
+  });
+  albumCard.querySelector('[data-action="delete"]')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    deleteAlbum(album.id, album.album, album.artist);
+  });
+
+  return albumCard;
+}
+
+function appendAlbumCards(albums) {
+  const albumGrid = document.getElementById('albumGrid');
+  const fragment = document.createDocumentFragment();
+  albums.forEach((album) => fragment.appendChild(buildAlbumCardElement(album)));
+  albumGrid.appendChild(fragment);
+}
+
 function displayAlbums(albums) {
   const albumGrid = document.getElementById('albumGrid');
   albumGrid.innerHTML = '';
-  
-  // Get logged-in user for read-only enforcement
-  const loggedInUserId = localStorage.getItem('loggedInUserId');
-  
-  albums.forEach(album => {
-    const albumCard = document.createElement('div');
-    albumCard.className = 'album-card';
-    albumCard.onclick = (e) => {
-      if (e.target.closest('button') || e.target.closest('.collection-media-nav') || e.target.closest('.collection-media-dot') || e.target.closest('video')) return;
-      albumCard.classList.toggle('flipped');
-    };
-
-    const rating = album.rating ? '★'.repeat(album.rating) + '☆'.repeat(5 - album.rating) : '☆☆☆☆☆';
-    const addedDate = new Date(album.added_date).toLocaleDateString();
-    const locationLabel = album.location_label || '';
-    const locationCoords = album.latitude && album.longitude
-      ? `${parseFloat(album.latitude).toFixed(4)}, ${parseFloat(album.longitude).toFixed(4)}`
-      : '';
-    const locationDisplay = locationLabel || locationCoords;
-    const storageLine =
-      window.VinylStorageLocations &&
-      album.storage_zone &&
-      album.storage_slot != null
-        ? window.VinylStorageLocations.formatStorageLine(album.storage_zone, album.storage_slot)
-        : '';
-
-    // Get user info for this album
-    const albumUser = album.user_id ? getUserById(album.user_id) : USERS[0];
-    const viewMode = localStorage.getItem('viewMode') || 'single';
-    const showUserBadge = viewMode === 'all'; // Show user badge when viewing all collections
-    
-    albumCard.innerHTML = `
-      <div class="album-card-inner">
-        <!-- FRONT OF CARD -->
-        <div class="album-card-front">
-          ${showUserBadge ? `
-            <div style="position: absolute; top: 10px; left: 10px; z-index: 10; background: ${albumUser.color}; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 5px;">
-              <img src="${albumUser.avatar}" style="width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;">
-              ${albumUser.name.split(' ').slice(-2).join(' ')}
-            </div>
-          ` : ''}
-          <div id="album-cover-wrap-${album.id}" class="album-cover-wrap" onclick="event.stopPropagation();" role="region" aria-label="Album media"></div>
-          <div class="album-info">
-            <h5>${album.album}</h5>
-            <p><strong>${album.artist}</strong></p>
-            <p>${album.year || 'Year Unknown'} · ${album.genre || 'Genre Unknown'}</p>
-            ${locationDisplay ? `<p style="margin: 4px 0 8px 0; font-size: 0.9rem; color: #2c3e50;"><i class="bi-geo-alt"></i> ${locationDisplay}</p>` : ''}
-            ${storageLine ? `<p style="margin: 4px 0 8px 0; font-size: 0.9rem; color: #34495e;"><i class="bi-box-seam"></i> ${storageLine}</p>` : ''}
-            ${album.valuation ? `<p style="color: #28a745; font-weight: 600; margin-top: 8px;"><i class="bi-cash-coin"></i> $${parseFloat(album.valuation).toFixed(2)}</p>` : ''}
-            ${rating ? `<div class="rating-stars">${rating}</div>` : ''}
-          </div>
-          <div class="album-actions">
-            ${loggedInUserId && loggedInUserId === album.user_id ? `
-              <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); editAlbum(${album.id})" title="Edit Album">
-                <i class="bi-pencil"></i>
-              </button>
-            ` : ''}
-            <button class="btn btn-sm btn-secondary" onclick="event.stopPropagation(); openAlbumPoster(${album.id})" title="Create Poster">
-              <i class="bi-image"></i>
-            </button>
-            <button class="btn btn-sm btn-info" onclick="event.stopPropagation(); findVideosForAlbum('${album.artist.replace(/'/g, "\\'")}', '${album.album.replace(/'/g, "\\'")}')">
-              <i class="bi-youtube"></i>
-            </button>
-            ${loggedInUserId && loggedInUserId === album.user_id ? `
-              <button class="btn btn-sm btn-danger" onclick="event.stopPropagation(); deleteAlbum(${album.id}, '${album.album.replace(/'/g, "\\'")}', '${album.artist.replace(/'/g, "\\'")}')">
-                <i class="bi-trash"></i>
-              </button>
-            ` : ''}
-            ${!loggedInUserId || loggedInUserId !== album.user_id ? `
-              <div style="font-size: 0.75rem; color: #999; font-style: italic; margin-top: 5px;">👁️ Read-only</div>
-            ` : ''}
-          </div>
-          <div class="flip-hint" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
-            <i class="bi-arrow-repeat"></i> Click to flip
-            ${album.ai_analysis ? '<span style="color: #3498db; font-weight: 600; font-size: 0.75rem;"><i class="bi-robot"></i> AI</span>' : ''}
-          </div>
-        </div>
-        
-        <!-- BACK OF CARD -->
-        <div class="album-card-back">
-          <h6><i class="bi-info-circle"></i> Album Details</h6>
-          
-          ${album.ai_analysis ? `
-            <div class="metadata-item ai-analysis-section" onclick="event.stopPropagation(); toggleAIAnalysis(this)" style="background: linear-gradient(135deg, rgba(52,152,219,0.15), rgba(155,89,182,0.15)); border-left: 4px solid #3498db; padding: 12px; margin-bottom: 15px; max-height: 200px; overflow-y: auto;">
-              <span class="ai-expand-hint"><i class="bi-arrows-fullscreen"></i> Click to expand</span>
-              <strong style="color: #2980b9; font-size: 0.95rem;"><i class="bi-robot"></i> AI Analysis:</strong><br>
-              <div style="color: #34495e; margin-top: 8px; line-height: 1.5; font-size: 0.85rem;">
-                ${formatAIAnalysis(album.ai_analysis)}
-              </div>
-            </div>
-          ` : ''}
-          
-          ${album.story ? `
-            <div class="metadata-item" style="background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2)); border-left: 4px solid #ffa500; padding: 12px; margin-bottom: 15px;">
-              <strong style="color: #ff8c00; font-size: 0.95rem;">📖 The Story Behind This Album:</strong><br>
-              <em style="font-size: 0.85rem; color: #333; line-height: 1.5; display: block; margin-top: 8px;">${album.story}</em>
-            </div>
-          ` : ''}
-          
-          <div class="metadata-item">
-            <strong>🎵 Album:</strong> ${album.album}
-          </div>
-          
-          <div class="metadata-item">
-            <strong>🎤 Artist:</strong> ${album.artist}
-          </div>
-          
-          ${album.year ? `<div class="metadata-item"><strong>📅 Year:</strong> ${album.year}</div>` : ''}
-          
-          ${album.genre ? `<div class="metadata-item"><strong>🎸 Genre:</strong> ${album.genre}</div>` : ''}
-          
-          ${album.label ? `<div class="metadata-item"><strong>🏷️ Label:</strong> ${album.label}</div>` : ''}
-          
-          ${locationDisplay ? `<div class="metadata-item"><strong>📍 Location:</strong> ${locationDisplay}</div>` : ''}
-          
-          <div class="metadata-item">
-            <strong>⭐ Rating:</strong> ${rating}
-          </div>
-          
-          ${album.valuation ? `
-            <div class="metadata-item" style="background: linear-gradient(135deg, rgba(40,167,69,0.2), rgba(40,167,69,0.1)); border-left: 4px solid #28a745;">
-              <strong style="color: #28a745;"><i class="bi-cash-coin"></i> Valuation:</strong> $${parseFloat(album.valuation).toFixed(2)}
-            </div>
-          ` : ''}
-          
-          ${album.notes ? `
-            <div class="metadata-item">
-              <strong>📝 Notes:</strong><br>
-              <em style="font-size: 0.8rem;">${album.notes}</em>
-            </div>
-          ` : '<div class="metadata-item"><em>No notes yet</em></div>'}
-          
-          <div class="metadata-item">
-            <strong>📆 Added:</strong> ${addedDate}
-          </div>
-          
-          ${album.spotify_id ? `<div class="metadata-item"><strong>🎧 Spotify ID:</strong> ${album.spotify_id}</div>` : ''}
-          
-          ${album.musicbrainz_id ? `<div class="metadata-item"><strong>🎵 MusicBrainz ID:</strong> ${album.musicbrainz_id.substring(0, 20)}...</div>` : ''}
-          
-          <button class="btn btn-sm btn-secondary mt-3 w-100" onclick="event.stopPropagation(); this.closest('.album-card').classList.remove('flipped')">
-            <i class="bi-arrow-left"></i> Back to Front
-          </button>
-        </div>
-      </div>
-    `;
-    
-    albumGrid.appendChild(albumCard);
-
-    const coverWrap = document.getElementById('album-cover-wrap-' + album.id);
-    if (coverWrap && window.CollectionMediaGallery) {
-      let mediaItems = CollectionMediaGallery.normalizeCollectionMedia(album, 'cover_url');
-      if (!mediaItems.length) {
-        mediaItems = [{
-          type: 'image',
-          url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="220"><rect width="100%" height="100%" fill="%2387CEEB"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-size="20" font-family="Arial">No Cover</text></svg>'
-        }];
-      }
-      CollectionMediaGallery.mountCollectionSlideshow(coverWrap, mediaItems, { compact: true });
-    }
-  });
-
+  const fragment = document.createDocumentFragment();
+  albums.forEach((album) => fragment.appendChild(buildAlbumCardElement(album)));
+  albumGrid.appendChild(fragment);
 }
 
 let currentPosterAlbum = null;
@@ -1731,9 +1811,14 @@ function buildAlbumPosterHtml(album) {
   `;
 }
 
-function openAlbumPoster(id) {
-  const album = currentCollection.find(item => item.id === id);
+async function openAlbumPoster(id) {
+  let album = currentCollection.find((item) => item.id === id);
   if (!album) return;
+  try {
+    album = await fetchAlbumDetail(id);
+  } catch (_) {
+    /* use slim row */
+  }
   currentPosterAlbum = album;
   albumPosterCanvas = null;
   collectionPosterMode = 'simple';
@@ -1848,12 +1933,19 @@ function searchCollection() {
   loadCollection();
 }
 
-// Edit album
+// Edit album (loads full record for notes/story)
 async function editAlbum(id) {
-  const album = currentCollection.find(a => a.id === id);
+  let album = currentCollection.find((a) => a.id === id);
   if (!album) return;
-  
-  // Check if user is logged in and owns this album
+
+  try {
+    album = await fetchAlbumDetail(id);
+  } catch (e) {
+    console.error('editAlbum fetch:', e);
+    if (typeof showToast === 'function') showToast('Could not load album for editing', '', 'error');
+    return;
+  }
+
   const loggedInUserId = localStorage.getItem('loggedInUserId');
   const albumUserId = album.user_id;
   
@@ -1902,13 +1994,6 @@ async function editAlbum(id) {
   // Highlight rating buttons
   updateRatingButtons(album.rating || 0);
 
-  editAlbumMediaItems = window.CollectionMediaGallery
-    ? CollectionMediaGallery.normalizeCollectionMedia(album, 'cover_url').map(function (m) {
-      return { type: m.type, url: m.url, caption: m.caption || '' };
-    })
-    : [];
-  renderEditAlbumMediaPreview();
-  
   loadGooglePlacesApi();
   initEditLocationAutocomplete();
 
@@ -1987,9 +2072,6 @@ async function saveAlbumEdit() {
     const userQ = loggedInUserId ? `?userId=${encodeURIComponent(loggedInUserId)}` : '';
 
     const payload = { notes, story, genre, label, year, rating, valuation, locationLabel: locationLabel || null, locationLat, locationLng };
-    if (window.CollectionMediaGallery && Array.isArray(editAlbumMediaItems)) {
-      payload.mediaGallery = editAlbumMediaItems;
-    }
 
     const ez = document.getElementById('editStorageZone');
     const es = document.getElementById('editStorageSlot');

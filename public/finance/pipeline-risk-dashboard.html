@@ -38,6 +38,7 @@
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
     <!-- Voice Commands & AI Components -->
     <script type="module" src="../shared/voice-commands.js"></script>
+    <script type="module" src="../shared/disaster-mood-music.js"></script>
     <script type="module" src="../shared/ai-chat-widget.js"></script>
     <script type="module" src="../shared/ai-insights-card.js"></script>
     <style>
@@ -3022,6 +3023,14 @@
                         apiEndpoint: '/api/loan-pipeline/ai/chat-disaster-expert',
                         userId: userId,
                         sessionId: 'pipeline-disaster-expert',
+                        showMusicMute: true,
+                        onOpen: async (ctx) => {
+                            if (window.DisasterMoodMusic?.isMuted?.()) return;
+                            await window.DisasterMoodMusic?.playForDisaster?.(
+                                ctx?.selectedDisaster || selectedDisasterObj
+                            );
+                        },
+                        onClose: () => window.DisasterMoodMusic?.stop?.(),
                         getContext: async () => {
                             // Get current loans for context
                             let loans = [];

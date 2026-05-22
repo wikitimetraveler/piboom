@@ -79,7 +79,7 @@
     if (!el || el.nodeType !== 1) return true;
     return Boolean(
       el.closest(
-        'button, a, [data-lane-lightbox-ignore], .lane-lightbox-ignore, modern-navbar, .lane-pdf-lightbox, .lunar-lightbox, .lane-image-lightbox, nav, .navbar'
+        'button, a, [data-lane-lightbox-ignore], .lane-lightbox-ignore, #loginModal, .login-user-card, .collection-media-root, modern-navbar, .lane-pdf-lightbox, .lunar-lightbox, .lane-image-lightbox, nav, .navbar'
       )
     );
   }
@@ -231,6 +231,7 @@
     if (!(target instanceof Element)) return;
 
     if (target.closest('#museumPosterContent.lane-poster-expandable')) return;
+    if (target.closest('#loginModal, .login-user-card, .collection-media-root')) return;
 
     const img = target.closest('img');
     if (!img || !isExpandableImage(img)) return;

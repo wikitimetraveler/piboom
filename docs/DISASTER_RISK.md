@@ -98,6 +98,28 @@ Cron example (6 AM daily):
 0 6 * * * cd /path/to/your-project && npm run refresh-disasters
 ```
 
+## Mood music (Disaster Processor Expert)
+
+When the floating **Disaster Processor Expert** AI chat opens on:
+
+- `public/finance/disasters-unified.html`
+- `public/finance/pipeline-risk-dashboard.html`
+
+…the app plays a local ambient MP3 from `music/disasters/` based on the selected disaster type/source. Music does **not** auto-play on grid/marker selection alone.
+
+| Mood | Typical signals | File |
+|------|-----------------|------|
+| fire | FIRMS, ALERTCalifornia, wildfire | `music/disasters/fire.mp3` |
+| flood | flood zones, flooding | `music/disasters/flood.mp3` |
+| hurricane | NHC, tropical storms | `music/disasters/hurricane.mp3` |
+| earthquake | USGS, quake | `music/disasters/earthquake.mp3` |
+| storm | NWS, severe weather | `music/disasters/storm.mp3` |
+| default | FEMA/other | `music/disasters/default.mp3` |
+
+Implementation: `public/shared/disaster-mood-music.js`, mapping in `lib/disaster-mood-music.js`, streamed via `/api/audio/stream/disasters%2F<file>.mp3`.
+
+Mute: music icon in the AI chat header, or `localStorage` key `dc_disaster_music_muted` = `1`. See `music/disasters/README.md`.
+
 ## Related
 
 - **docs/AI_SYSTEM.md** – Disaster Risk AI architecture

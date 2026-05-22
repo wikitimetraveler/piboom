@@ -135,6 +135,7 @@ app.use('/finance/encompass-assistant.html', (req, res, next) => {
 app.locals.io = io;
 
 app.use(requireFinanceSession);
+app.use('/lib', express.static(path.join(__dirname, 'lib')));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/data', express.static(path.join(__dirname, 'data'))); // Serve KML files
 app.get('/vendor/exceljs.min.js', (req, res) => {

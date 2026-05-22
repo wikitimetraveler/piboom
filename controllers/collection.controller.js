@@ -167,11 +167,26 @@ export async function addToCollection(req, res) {
   }
 }
 
-// Get all albums in collection
+const COLLECTION_LIST_SELECT = `
+  id, user_id, artist, album, year, genre, label, rating, valuation, cover_url,
+  added_date, storage_zone, storage_slot, latitude, longitude, location_label,
+  (ai_analysis IS NOT NULL AND TRIM(ai_analysis) <> '') AS has_ai_analysis
+`;
+
+const COLLECTION_PAGE_SIZE_DEFAULT = 48;
+const COLLECTION_PAGE_SIZE_MAX = 200;
+
+// Get all albums in collection (slim list rows; full detail via getAlbumById)
 export async function getCollection(req, res) {
   try {
     const userId = req.query.userId || null; // Multi-user support
     const { sortBy = 'added_date', order = 'DESC', search } = req.query;
+    const limitRaw = parseInt(req.query.limit, 10);
+    const offsetRaw = parseInt(req.query.offset, 10);
+    const limit = Number.isFinite(limitRaw)
+      ? Math.min(Math.max(limitRaw, 1), COLLECTION_PAGE_SIZE_MAX)
+      : COLLECTION_PAGE_SIZE_DEFAULT;
+    const offset = Number.isFinite(offsetRaw) && offsetRaw >= 0 ? offsetRaw : 0;
 
     const pool = getPool();
     if (!pool) {
@@ -182,40 +197,58 @@ export async function getCollection(req, res) {
     }
 
     // Build query based on userId
-    let query = '';
+    let whereClause = '';
     const params = [];
     
     if (userId === 'all') {
-      // Show all users' albums
-      query = 'SELECT * FROM records WHERE 1=1';
+      whereClause = 'WHERE 1=1';
     } else if (userId) {
-      // Show specific user's albums
-      query = 'SELECT * FROM records WHERE user_id = $1';
+      whereClause = 'WHERE user_id = $1';
       params.push(userId);
     } else {
-      // Legacy support: no userId specified
-      query = 'SELECT * FROM records WHERE user_id IS NULL';
+      whereClause = 'WHERE user_id IS NULL';
     }
 
     // Add search filter if provided
     if (search) {
       const paramNum = params.length + 1;
-      query += ` AND (LOWER(artist) LIKE $${paramNum} OR LOWER(album) LIKE $${paramNum} OR LOWER(genre) LIKE $${paramNum})`;
+      whereClause += ` AND (LOWER(artist) LIKE $${paramNum} OR LOWER(album) LIKE $${paramNum} OR LOWER(genre) LIKE $${paramNum})`;
       params.push(`%${search.toLowerCase()}%`);
     }
+
+    const countResult = await pool.query(
+      `SELECT COUNT(*)::int AS total FROM records ${whereClause}`,
+      params
+    );
+    const total = countResult.rows[0]?.total ?? 0;
 
     // Add sorting
     const validSortColumns = ['artist', 'album', 'year', 'added_date', 'rating', 'valuation', 'storage_zone', 'storage_slot'];
     const sortColumn = validSortColumns.includes(sortBy) ? sortBy : 'added_date';
     const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-    query += ` ORDER BY ${sortColumn} ${sortOrder} NULLS LAST`;
 
-    const result = await pool.query(query, params);
+    const limitParam = params.length + 1;
+    const offsetParam = params.length + 2;
+    const listParams = [...params, limit, offset];
+    const result = await pool.query(
+      `SELECT ${COLLECTION_LIST_SELECT} FROM records ${whereClause}
+       ORDER BY ${sortColumn} ${sortOrder} NULLS LAST
+       LIMIT $${limitParam} OFFSET $${offsetParam}`,
+      listParams
+    );
+
+    const albums = result.rows.map((row) => ({
+      ...row,
+      has_ai_analysis: row.has_ai_analysis === true || row.has_ai_analysis === 't',
+    }));
 
     res.json({
       success: true,
-      count: result.rows.length,
-      albums: result.rows
+      count: total,
+      albums,
+      limit,
+      offset,
+      hasMore: offset + albums.length < total,
     });
 
   } catch (error) {

@@ -1,7 +1,6 @@
 import fs from 'fs';
-import path from 'path';
-import { listFiles, playFile, stop, setVolume } from '../services/audio.service.js';
-import { config } from '../config/index.js';
+import { listFiles, playFile, stop, setVolume } from '../services/audio.service.js';import { config } from '../config/index.js';
+import { resolveSafeMusicPath } from '../lib/audio-path.js';
 
 export const AudioController = {
   list: (_req, res) => {
@@ -43,9 +42,8 @@ export const AudioController = {
   },
 
   stream: (req, res) => {
-    const safe = path.basename(req.params.file);
-    const full = path.join(config.musicDir, safe);
-    if (!fs.existsSync(full)) return res.sendStatus(404);
+    const full = resolveSafeMusicPath(config.musicDir, req.params.file);
+    if (!full || !fs.existsSync(full)) return res.sendStatus(404);
     res.setHeader('Content-Type', 'audio/mpeg');
     fs.createReadStream(full).pipe(res);
   }

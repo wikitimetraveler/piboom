@@ -89,7 +89,8 @@
         var img = document.createElement('img');
         img.src = m.url;
         img.alt = m.caption || '';
-        img.className = 'collection-media-img';
+        img.className = 'collection-media-img lane-lightbox-ignore';
+        img.setAttribute('data-lane-lightbox-ignore', '1');
         stage.appendChild(img);
       }
     }
@@ -166,7 +167,8 @@
       var img = document.createElement('img');
       img.src = item.url;
       img.alt = alt || '';
-      img.className = 'collection-media-img collection-media-img--fill';
+      img.className = 'collection-media-img collection-media-img--fill lane-lightbox-ignore';
+      img.setAttribute('data-lane-lightbox-ignore', '1');
       container.appendChild(img);
     }
   }

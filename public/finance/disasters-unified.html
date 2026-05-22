@@ -27,6 +27,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script type="module" src="../shared/voice-commands.js"></script>
+    <script type="module" src="../shared/disaster-mood-music.js"></script>
     <script type="module" src="../shared/ai-chat-widget.js"></script>
     <script type="module" src="../shared/ai-insights-card.js"></script>
     <style>
@@ -2233,6 +2234,14 @@
             welcomeHtml: processorWelcome,
             inputPlaceholder: 'Ask about processor actions for this disaster…',
             getContext: buildAIContext,
+            showMusicMute: true,
+            onOpen: async (ctx) => {
+              if (window.DisasterMoodMusic?.isMuted?.()) return;
+              await window.DisasterMoodMusic?.playForDisaster?.(
+                ctx?.selectedDisaster || selectedDisasterObj
+              );
+            },
+            onClose: () => window.DisasterMoodMusic?.stop?.(),
             onMessageSent: (message) => console.log('Disaster expert message:', message),
             onMessageReceived: (response) => console.log('Disaster expert response:', response)
           });

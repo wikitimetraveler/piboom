@@ -22,6 +22,9 @@ class AIChatWidget {
         this.buttonTitle = config.buttonTitle || 'AI Assistant';
         this.welcomeHtml = config.welcomeHtml || null;
         this.inputPlaceholder = config.inputPlaceholder || 'Ask me anything about your loan pipeline...';
+        this.onOpen = config.onOpen || null;
+        this.onClose = config.onClose || null;
+        this.showMusicMute = config.showMusicMute === true;
         
         this.isOpen = false;
         this.messages = [];
@@ -50,7 +53,10 @@ class AIChatWidget {
         chatPanel.innerHTML = `
             <div class="ai-chat-header">
                 <h5 class="mb-0"><i class="bi bi-robot"></i> ${this.title}</h5>
-                <button type="button" class="btn-close btn-close-white" onclick="window.aiChatWidget?.close()" aria-label="Close"></button>
+                <div class="ai-chat-header-actions">
+                    ${this.showMusicMute ? `<button type="button" id="aiChatMusicMuteBtn" class="ai-chat-music-mute-btn" title="Toggle disaster mood music" aria-label="Toggle disaster mood music"><i class="bi bi-music-note-beamed"></i></button>` : ''}
+                    <button type="button" class="btn-close btn-close-white" onclick="window.aiChatWidget?.close()" aria-label="Close"></button>
+                </div>
             </div>
             <div class="ai-chat-messages" id="aiChatMessages">
                 <div class="ai-chat-welcome">
@@ -130,6 +136,29 @@ class AIChatWidget {
                     justify-content: space-between;
                     align-items: center;
                     border-radius: 12px 12px 0 0;
+                }
+                .ai-chat-header-actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                }
+                .ai-chat-music-mute-btn {
+                    border: none;
+                    background: rgba(255, 255, 255, 0.15);
+                    color: white;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .ai-chat-music-mute-btn:hover {
+                    background: rgba(255, 255, 255, 0.25);
+                }
+                .ai-chat-music-mute-btn.is-muted {
+                    opacity: 0.55;
                 }
                 .ai-chat-messages {
                     flex: 1;
@@ -225,6 +254,7 @@ class AIChatWidget {
     attachEventListeners() {
         const input = document.getElementById('aiChatInput');
         const sendBtn = document.getElementById('aiChatSendBtn');
+        const musicMuteBtn = document.getElementById('aiChatMusicMuteBtn');
         
         if (input) {
             input.addEventListener('keypress', (e) => {
@@ -232,6 +262,29 @@ class AIChatWidget {
                     this.sendMessage();
                 }
             });
+        }
+
+        if (musicMuteBtn) {
+            this.updateMusicMuteButton();
+            musicMuteBtn.addEventListener('click', () => {
+                if (window.DisasterMoodMusic?.toggleMuted) {
+                    window.DisasterMoodMusic.toggleMuted();
+                    this.updateMusicMuteButton();
+                }
+            });
+        }
+    }
+
+    updateMusicMuteButton() {
+        const musicMuteBtn = document.getElementById('aiChatMusicMuteBtn');
+        if (!musicMuteBtn) return;
+        const muted = window.DisasterMoodMusic?.isMuted?.() === true;
+        musicMuteBtn.classList.toggle('is-muted', muted);
+        musicMuteBtn.title = muted ? 'Disaster mood music muted' : 'Disaster mood music on';
+        musicMuteBtn.setAttribute('aria-label', musicMuteBtn.title);
+        const icon = musicMuteBtn.querySelector('i');
+        if (icon) {
+            icon.className = muted ? 'bi bi-volume-mute' : 'bi bi-music-note-beamed';
         }
     }
 
@@ -250,6 +303,16 @@ class AIChatWidget {
             this.isOpen = true;
             document.getElementById('aiChatInput')?.focus();
         }
+        if (this.onOpen) {
+            Promise.resolve()
+                .then(async () => {
+                    const ctx = typeof this.getContext === 'function'
+                        ? await Promise.resolve(this.getContext())
+                        : this.context;
+                    await this.onOpen(ctx);
+                })
+                .catch((err) => console.warn('AI chat onOpen failed:', err));
+        }
     }
 
     close() {
@@ -257,6 +320,13 @@ class AIChatWidget {
         if (panel) {
             panel.classList.remove('open');
             this.isOpen = false;
+        }
+        if (this.onClose) {
+            try {
+                this.onClose();
+            } catch (err) {
+                console.warn('AI chat onClose failed:', err);
+            }
         }
     }
 

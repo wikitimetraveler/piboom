@@ -87,9 +87,16 @@
       removeOverlay();
       return;
     }
+    const loginModal = document.getElementById(LOGIN_MODAL_ID);
+    if (loginModal) {
+      const overlay = document.getElementById(OVERLAY_ID);
+      if (overlay) overlay.style.display = 'none';
+      return;
+    }
     createOverlay();
-    const modal = document.getElementById(LOGIN_MODAL_ID);
-    if (!modal && typeof window.showLoginPopup === 'function') {
+    const overlay = document.getElementById(OVERLAY_ID);
+    if (overlay) overlay.style.display = 'flex';
+    if (!loginModal && typeof window.showLoginPopup === 'function') {
       window.showLoginPopup();
     }
   };
