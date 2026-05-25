@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { Router } from 'express';
 import { listSpots, addSpot, updateSpot, deleteSpot, getGoogleMapsKey, importSpots } from '../controllers/local-spots.controller.js';
 import localSpotsAIController from '../controllers/local-spots-ai.controller.js';

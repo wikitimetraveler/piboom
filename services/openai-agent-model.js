@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Default Chat Completions model for **text** agents (chat, JSON routing, LangChain-style helpers).
  *
  * - Global: `OPENAI_AGENT_MODEL` (default `gpt-4o`).

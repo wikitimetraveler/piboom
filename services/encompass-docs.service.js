@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import fs from 'fs';

@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared Text-to-Speech helper
  *
  * Provides a Google TTS-first helper with safe browser fallback.

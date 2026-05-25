@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Test script for LangChain + PostgreSQL conversation memory
  * Run with: node test-langchain-memory.js
  */

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { getPool } from '../services/database.service.js';
 import { getGoogleBrowserApiKey } from '../lib/google-api-key.js';
 

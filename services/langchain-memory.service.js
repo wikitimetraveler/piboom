@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { ChatOpenAI } from "@langchain/openai";
 import { BufferMemory } from "@langchain/classic/memory";
 import { ConversationChain } from "@langchain/classic/chains";

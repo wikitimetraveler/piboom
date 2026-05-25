@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { describe, test, expect } from '@jest/globals';
 import { MUSICBRAINZ_USER_AGENT, mbGet } from '../../services/musicbrainz.service.js';
 

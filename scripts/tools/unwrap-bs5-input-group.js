@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Remove BS4 input-group-prepend / input-group-append wrappers (flat structure for BS5).
  */
 import fs from 'fs';

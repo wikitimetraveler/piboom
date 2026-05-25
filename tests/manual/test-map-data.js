@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import 'dotenv/config';
 import axios from 'axios';
 import { getGoogleServerApiKey } from './lib/google-api-key.js';

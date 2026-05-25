@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Central map marker icon definitions for Google Maps.
  * Uses Data URI SVGs for no external requests and easy theming.
  * @see docs/FRONTEND_PATTERNS.md

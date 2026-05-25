@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import '../../public/shared/brRuleParser.js';
 
 const { parseBRConditionSnippet, extractFieldIdsFromConditionText, generateUnitTestFromBRRule } =

@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Processor assignment tool — config in localStorage + PostgreSQL, calls /api/encompass-hub/processor-assignment/run
  */
 (function () {

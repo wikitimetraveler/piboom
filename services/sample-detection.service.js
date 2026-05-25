@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { mbGet } from './musicbrainz.service.js';
 
 class SampleDetectionService {

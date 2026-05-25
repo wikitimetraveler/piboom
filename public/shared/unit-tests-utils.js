@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared utilities for unit test parsing and comparison.
  * Used by unit-tests.js (browser) and run-finance-unit-tests.js (Node).
  */

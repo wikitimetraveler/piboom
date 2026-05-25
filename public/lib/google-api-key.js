@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Helper utilities for managing Google API keys with separate
  * browser (HTTP referrer restricted) and server (IP/server-side)
  * credentials. Falls back to the legacy GOOGLE_API_KEY to avoid

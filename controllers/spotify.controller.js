@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import SpotifyWebApi from 'spotify-web-api-node';
 
 // Spotify OAuth Configuration - dynamically set redirect URI based on environment

@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared Collection Page Utilities
  * Used by: critter-collection, tree-collection, fish-collection, music/collection, bike-collection
  * FRONTEND_PATTERNS.md - Discovery/Collection pages

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { normalizeEncompassOAuthUrl } from '../../services/encompass-auth.service.js';
 
 describe('encompass-auth normalizeEncompassOAuthUrl', () => {

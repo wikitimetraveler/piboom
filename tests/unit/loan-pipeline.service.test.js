@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import {
   normalizeCountyName,
   filterLoansByDistance

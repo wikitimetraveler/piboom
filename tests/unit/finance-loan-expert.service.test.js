@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { describe, expect, it } from '@jest/globals';
 import { askLoanProgramExpert } from '../../services/finance-loan-expert.service.js';
 

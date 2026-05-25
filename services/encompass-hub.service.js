@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import axios from 'axios';
 import { clearEncompassTokenCache, ensureEncompassToken, encompassEnvStorage } from './encompass-auth.service.js';
 import {

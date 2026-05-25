@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { getPool } from './database.service.js';
 
 const VALID_ENV = new Set(['correspondent', 'retail']);

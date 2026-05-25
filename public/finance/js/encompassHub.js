@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 const statusChip = document.getElementById('statusChip');
 const refreshStatusBtn = document.getElementById('refreshStatusBtn');
 const pipelineForm = document.getElementById('pipelineForm');

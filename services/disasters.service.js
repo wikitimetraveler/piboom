@@ -91,7 +91,8 @@ CREATE INDEX IF NOT EXISTS idx_disasters_fips ON disasters (county_fips);
 const CREATE_FIRE_CAMERAS_SQL = `
 CREATE TABLE IF NOT EXISTS fire_cameras (
   id SERIAL PRIMARY KEY,
-  source_id TEXT NOT NULL UNIQUE,
+  source TEXT NOT NULL DEFAULT 'alertcalifornia',
+  source_id TEXT NOT NULL,
   name TEXT,
   lat DOUBLE PRECISION NOT NULL,
   lng DOUBLE PRECISION NOT NULL,
@@ -102,16 +103,45 @@ CREATE TABLE IF NOT EXISTS fire_cameras (
   network_url TEXT,
   image_url TEXT,
   status TEXT,
+  hazard_types JSONB DEFAULT '[]'::jsonb,
+  media_type TEXT,
+  refresh_minutes INT,
+  last_image_at TIMESTAMPTZ,
   raw JSONB,
   geocoded_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (source, source_id)
 );
 `;
 
 const FIRE_CAMERAS_INDEXES_SQL = `
 CREATE INDEX IF NOT EXISTS idx_fire_cameras_state ON fire_cameras (state_abbr);
 CREATE INDEX IF NOT EXISTS idx_fire_cameras_county ON fire_cameras (county_name);
+CREATE INDEX IF NOT EXISTS idx_fire_cameras_source ON fire_cameras (source);
+CREATE INDEX IF NOT EXISTS idx_fire_cameras_source_state ON fire_cameras (source, state_abbr);
+CREATE INDEX IF NOT EXISTS idx_fire_cameras_hazard_types ON fire_cameras USING GIN (hazard_types);
+`;
+
+const FIRE_CAMERAS_MIGRATION_SQL = `
+ALTER TABLE fire_cameras ADD COLUMN IF NOT EXISTS source TEXT NOT NULL DEFAULT 'alertcalifornia';
+ALTER TABLE fire_cameras ADD COLUMN IF NOT EXISTS hazard_types JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE fire_cameras ADD COLUMN IF NOT EXISTS media_type TEXT;
+ALTER TABLE fire_cameras ADD COLUMN IF NOT EXISTS refresh_minutes INT;
+ALTER TABLE fire_cameras ADD COLUMN IF NOT EXISTS last_image_at TIMESTAMPTZ;
+UPDATE fire_cameras SET source = 'alertcalifornia' WHERE source IS NULL OR TRIM(source) = '';
+UPDATE fire_cameras SET hazard_types = '["fire"]'::jsonb
+  WHERE hazard_types IS NULL OR hazard_types = '[]'::jsonb;
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'fire_cameras_source_id_key'
+  ) THEN
+    ALTER TABLE fire_cameras DROP CONSTRAINT fire_cameras_source_id_key;
+  END IF;
+EXCEPTION WHEN undefined_object THEN NULL;
+END $$;
+CREATE UNIQUE INDEX IF NOT EXISTS fire_cameras_source_source_id_key ON fire_cameras (source, source_id);
 `;
 
 /** Max reverse-geocode calls per camera ingest run (fixed mount locations, once only). */
@@ -127,6 +157,7 @@ export async function initFireCamerasSchema() {
     return;
   }
   await pool.query(CREATE_FIRE_CAMERAS_SQL);
+  await pool.query(FIRE_CAMERAS_MIGRATION_SQL);
   await pool.query(FIRE_CAMERAS_INDEXES_SQL);
 }
 
@@ -395,15 +426,16 @@ export async function upsertDisasters(batch) {
 }
 
 /**
- * Upsert fixed ALERTCalifornia camera mounts into fire_cameras (not disasters).
+ * Upsert fixed hazard webcam mounts into fire_cameras (not disasters).
  */
-export async function upsertFireCameras(batch) {
+export async function upsertHazardWebcams(batch) {
   if (!Array.isArray(batch) || batch.length === 0) return { upserted: 0 };
   const pool = getPool();
   if (!pool) throw new Error('Database not initialized');
 
   const CHUNK_SIZE = 100;
   let upserted = 0;
+  const COLS = 18;
 
   for (let i = 0; i < batch.length; i += CHUNK_SIZE) {
     const chunk = batch.slice(i, i + CHUNK_SIZE);
@@ -411,40 +443,54 @@ export async function upsertFireCameras(batch) {
     try {
       const values = [];
       const tuples = chunk.map((c, idx) => {
-        const base = idx * 13;
+        const base = idx * COLS;
+        const hazardTypes = Array.isArray(c.hazard_types)
+          ? JSON.stringify(c.hazard_types)
+          : (c.hazard_types ? JSON.stringify(c.hazard_types) : '[]');
         values.push(
+          c.source || 'alertcalifornia',
           c.source_id,
           c.name || null,
           c.lat,
           c.lng,
           c.county_name || null,
           c.county_fips || null,
-          c.state_abbr || 'CA',
+          c.state_abbr || null,
           c.camera_url || null,
           c.network_url || null,
           c.image_url || null,
           c.status || null,
+          hazardTypes,
+          c.media_type || null,
+          c.refresh_minutes != null ? c.refresh_minutes : null,
+          c.last_image_at || null,
           c.raw || null,
           c.geocoded_at || null
         );
-        return `($${base + 1},$${base + 2},$${base + 3},$${base + 4},$${base + 5},$${base + 6},$${base + 7},$${base + 8},$${base + 9},$${base + 10},$${base + 11},$${base + 12},$${base + 13},NOW())`;
+        const p = (n) => `$${base + n}`;
+        return `(${p(1)},${p(2)},${p(3)},${p(4)},${p(5)},${p(6)},${p(7)},${p(8)},${p(9)},${p(10)},${p(11)},${p(12)},${p(13)}::jsonb,${p(14)},${p(15)},${p(16)},${p(17)},${p(18)},NOW())`;
       });
       const text = `
         INSERT INTO fire_cameras (
-          source_id, name, lat, lng, county_name, county_fips, state_abbr,
-          camera_url, network_url, image_url, status, raw, geocoded_at, updated_at
+          source, source_id, name, lat, lng, county_name, county_fips, state_abbr,
+          camera_url, network_url, image_url, status, hazard_types, media_type,
+          refresh_minutes, last_image_at, raw, geocoded_at, updated_at
         ) VALUES ${tuples.join(',')}
-        ON CONFLICT (source_id) DO UPDATE SET
+        ON CONFLICT (source, source_id) DO UPDATE SET
           name = EXCLUDED.name,
-          lat = COALESCE(fire_cameras.lat, EXCLUDED.lat),
-          lng = COALESCE(fire_cameras.lng, EXCLUDED.lng),
-          county_name = COALESCE(fire_cameras.county_name, EXCLUDED.county_name),
-          county_fips = COALESCE(fire_cameras.county_fips, EXCLUDED.county_fips),
-          state_abbr = COALESCE(fire_cameras.state_abbr, EXCLUDED.state_abbr),
+          lat = COALESCE(EXCLUDED.lat, fire_cameras.lat),
+          lng = COALESCE(EXCLUDED.lng, fire_cameras.lng),
+          county_name = COALESCE(EXCLUDED.county_name, fire_cameras.county_name),
+          county_fips = COALESCE(EXCLUDED.county_fips, fire_cameras.county_fips),
+          state_abbr = COALESCE(EXCLUDED.state_abbr, fire_cameras.state_abbr),
           camera_url = COALESCE(EXCLUDED.camera_url, fire_cameras.camera_url),
           network_url = COALESCE(EXCLUDED.network_url, fire_cameras.network_url),
           image_url = COALESCE(EXCLUDED.image_url, fire_cameras.image_url),
           status = COALESCE(EXCLUDED.status, fire_cameras.status),
+          hazard_types = COALESCE(EXCLUDED.hazard_types, fire_cameras.hazard_types),
+          media_type = COALESCE(EXCLUDED.media_type, fire_cameras.media_type),
+          refresh_minutes = COALESCE(EXCLUDED.refresh_minutes, fire_cameras.refresh_minutes),
+          last_image_at = COALESCE(EXCLUDED.last_image_at, fire_cameras.last_image_at),
           raw = COALESCE(EXCLUDED.raw, fire_cameras.raw),
           geocoded_at = COALESCE(fire_cameras.geocoded_at, EXCLUDED.geocoded_at),
           updated_at = NOW()
@@ -456,8 +502,19 @@ export async function upsertFireCameras(batch) {
     }
   }
 
-  console.log(`📹 upsertFireCameras: ${upserted} rows from ${batch.length} cameras`);
+  console.log(`📹 upsertHazardWebcams: ${upserted} rows from ${batch.length} cameras`);
   return { upserted };
+}
+
+/** @deprecated use upsertHazardWebcams */
+export async function upsertFireCameras(batch) {
+  const normalized = batch.map((c) => ({
+    ...c,
+    source: c.source || 'alertcalifornia',
+    hazard_types: c.hazard_types || ['fire'],
+    media_type: c.media_type || 'live_stream',
+  }));
+  return upsertHazardWebcams(normalized);
 }
 
 /** Remove legacy camera rows mistakenly stored in disasters. */
@@ -1416,7 +1473,9 @@ export async function ingestCaFireCameras() {
 
     const existingBySourceId = new Map();
     const existingRes = await pool.query(
-      'SELECT source_id, county_name, county_fips, geocoded_at FROM fire_cameras'
+      `SELECT source_id, county_name, county_fips, geocoded_at
+       FROM fire_cameras
+       WHERE source = 'alertcalifornia'`
     );
     for (const row of existingRes.rows) {
       existingBySourceId.set(String(row.source_id), row);
@@ -1454,13 +1513,15 @@ export async function ingestCaFireCameras() {
         existing?.county_fips &&
         existing.county_fips !== '06000'
       );
+      const hasPersistedGeocode = alreadyGeocoded || hasStoredCounty;
 
-      if (hasCountyFromFeed) {
+      if (hasPersistedGeocode) {
+        countyName = existing.county_name || countyName;
+        countyFips = existing.county_fips || countyFips;
+        geocodedAt = existing.geocoded_at || null;
+      } else if (hasCountyFromFeed) {
         geocodedAt = geocodeTimestamp();
-      } else if (hasStoredCounty) {
-        countyName = existing.county_name;
-        countyFips = existing.county_fips;
-      } else if (!alreadyGeocoded && geocodeCount < MAX_CAMERA_GEOCODES_PER_RUN) {
+      } else if (geocodeCount < MAX_CAMERA_GEOCODES_PER_RUN) {
         try {
           const geo = await reverseGeocodeWithCache(lat, lng);
           if (geo.county) {
@@ -1480,9 +1541,11 @@ export async function ingestCaFireCameras() {
       } else if (existing) {
         countyName = existing.county_name || countyName;
         countyFips = existing.county_fips || countyFips;
+        geocodedAt = existing.geocoded_at || null;
       }
 
       batch.push({
+        source: 'alertcalifornia',
         source_id: sourceId,
         name: camera.name || 'Fire Camera',
         lat,
@@ -1494,12 +1557,16 @@ export async function ingestCaFireCameras() {
         network_url: camera.network_url || null,
         image_url: camera.image_url || null,
         status: camera.status || 'active',
+        hazard_types: ['fire'],
+        media_type: 'live_stream',
+        refresh_minutes: 5,
         geocoded_at: geocodedAt,
         raw: {
           ...camera,
           camera_type: 'fire_monitoring',
-          network: 'ALERTCalifornia'
-        }
+          network: 'ALERTCalifornia',
+          attribution: 'ALERTCalifornia / ALERTWest',
+        },
       });
     }
 

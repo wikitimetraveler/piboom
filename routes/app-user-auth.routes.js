@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { Router } from 'express';
 import { postLogout, postVerifyUserPassword } from '../controllers/app-user-auth.controller.js';
 

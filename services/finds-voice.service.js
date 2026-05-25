@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Plain-text summary for TTS (client calls POST /api/voice/synthesize).
  * @param {object} find - normalized find from rowToFind (id, title, category, status, score, scoreLabel, payload, …)
  */

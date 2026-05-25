@@ -30,6 +30,8 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 |-----------|------|
 | Disasters controller | `controllers/disasters.controller.js` |
 | Disasters service | `services/disasters.service.js` |
+| Hazard webcam ingest | `services/hazard-webcam-ingest.service.js` |
+| Hazard webcams UI | `public/finance/disasters-webcams.html`, `public/finance/js/hazard-webcam-viewer.js` |
 | Disaster risk service | `services/disaster-risk.service.js` |
 | Loan pipeline controller | `controllers/loan-pipeline.controller.js` |
 | Loan pipeline AI | `controllers/loan-pipeline-ai.controller.js` |
@@ -45,8 +47,10 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 | POST | `/refresh` | Refresh from all sources (FEMA, FIRMS, USGS, NWS, NHC) |
 | GET | `/stats` | Stats |
 | GET | `/export.csv` | CSV export |
-| GET | `/cameras` | ALERTCalifornia fire cameras — query: `state`, `county` (ILIKE), `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — Haversine filter, nearest-first, each row includes `distance_miles` when geo is used |
-| POST | `/refresh-cameras` | Refresh camera feed (requires disaster refresh access) |
+| GET | `/cameras` | Hazard webcams (national catalog) — query: `state`, `county` (ILIKE), `source`, `hazard` (JSONB tag), `mediaType`, `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — Haversine filter, nearest-first, each row includes `distance_miles` when geo is used |
+| GET | `/cameras/stats` | Counts by source + last update time |
+| GET | `/cameras/:id/snapshot` | Latest still image URL (USGS NIMS resolves via listFiles on demand) |
+| POST | `/refresh-cameras` | Ingest hazard webcams — query/body `sources=all` or comma list (`alertcalifornia`, `usgs_nims`, `usgs_volcano`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`); requires disaster refresh access |
 
 ### Loan Pipeline (`/api/loan-pipeline`)
 
@@ -81,8 +85,37 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 ## Environment Variables
 
 - `NASA_API_KEY` – NASA FIRMS fire data
-- `DATABASE_URL` – PostgreSQL (disasters table)
-- `MAPBOX_ACCESS_TOKEN` – Geocoding (loan addresses, disaster county/state lookup)
+- `DATABASE_URL` – PostgreSQL (disasters table, `fire_cameras` hazard webcams)
+- `MAPBOX_ACCESS_TOKEN` – Geocoding (loan addresses, disaster county/state lookup, ALERTCalifornia camera county backfill)
+- `WEBCOOS_API_TOKEN` – NOAA WebCOOS assets API (required for WebCOOS webcam ingest)
+- `USGS_NIMS_API_KEY` – Optional USGS NIMS API key (higher rate limits if enforced)
+- `ARCGIS_API_KEY` – Optional ArcGIS key for ALERTCalifornia ingest
+- `DISASTER_REFRESH_TOKEN` – Bearer token for `POST /api/disasters/refresh-cameras` when not on localhost
+
+## Hazard webcams (fixed mounts)
+
+Webcams are **fixed mounts** stored in Postgres `fire_cameras` (not rolling disaster events). Sources:
+
+| Source | Provider | Hazard tags | Media |
+|--------|----------|-------------|-------|
+| `alertcalifornia` | ALERTCalifornia ArcGIS | fire | live / still |
+| `usgs_nims` | USGS NIMS hydrology cams | river, flood, snow, hazard | still_image |
+| `usgs_volcano` | USGS Volcano Hazards Program | volcano | still_image |
+| `webcoos` | NOAA WebCOOS | coastal | live_stream / still |
+| `ucsd_hpwren` | HPWREN curated seeds | fire, hazard | still_image |
+| `ucsd_pier` | Scripps COOL Lab pier | coastal | live_stream |
+
+Ingest is **manual / separate cron** (heavy; can upsert 1000+ rows):
+
+```bash
+npm run refresh:hazard-webcams
+# or subset:
+node scripts/refresh-hazard-webcams.js --sources=usgs_nims,alertcalifornia
+```
+
+UCSD mounts are seeded from `data/hazard-webcam-seeds.json`. Each row stores `image_url`, `media_type`, `refresh_minutes`, and `hazard_types` for viewer refresh and future AI snapshot analysis (`nearbyCameras` in Disaster Processor Expert context).
+
+UI: [`public/finance/disasters-webcams.html`](../public/finance/disasters-webcams.html) (legacy [`disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html) redirects).
 
 ## Daily Refresh
 

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import axios from 'axios';
 import { getGoogleServerApiKey } from '../lib/google-api-key.js';
 import { mbGet } from '../services/musicbrainz.service.js';

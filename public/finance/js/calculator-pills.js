@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * @deprecated Kept for backward compatibility only. New calculator HTML should use
  * static `.tool-pills` + `worksheets-shell.css` (same pattern as `unit-tests.html` / rollout calculators).
  */

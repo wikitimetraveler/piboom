@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 /**
+ * Development work by David Lane
+ */
+/**
  * Migrate existing unit test files from disk to database (file_content BYTEA).
  * Run on the machine that has data/unit-tests/ with the Excel files.
  * After migration, the library will work from any machine sharing the same DB.

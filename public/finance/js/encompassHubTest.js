@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 const endpointSelect = document.getElementById('endpointSelect');
 const testForm = document.getElementById('testForm');
 const responseBody = document.getElementById('responseBody');

@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Encompass loan batch update — env-scoped native/custom field catalogs, AG Grid, Excel/CSV import.
  */
 (function () {

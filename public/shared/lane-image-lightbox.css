@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 /* Sitewide image lightbox — z-index above Bootstrap modal (1055) */
 .lane-image-lightbox {
   position: fixed;

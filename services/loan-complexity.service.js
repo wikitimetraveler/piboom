@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Configurable loan complexity scoring from pipeline-style flat field maps.
  * Rules are JSON: { id?, points, when: Condition | { all: [] } | { any: [] } }
  */

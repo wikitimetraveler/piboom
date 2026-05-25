@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { getPool } from '../services/database.service.js';
 import {
   initDisastersSchema,
@@ -12,6 +15,12 @@ import {
   filterFireCamerasByDistance,
   sortCamerasByDistance
 } from '../services/disasters.service.js';
+import {
+  ingestHazardWebcams,
+  getHazardWebcamById,
+  getHazardWebcamStats,
+  resolveUsgsNimsLatestImage,
+} from '../services/hazard-webcam-ingest.service.js';
 import { geocodeCountyStateWithCache } from '../services/geocoding-cache.service.js';
 import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
 
@@ -186,22 +195,102 @@ export async function refreshDisasters(req, res) {
 
 export async function refreshCameras(req, res) {
   try {
-    console.log('📹 Manual camera feed refresh requested');
-    const result = await ingestCaFireCameras();
-    res.json({ 
-      success: true, 
-      message: 'Camera feed refreshed', 
+    const sources = req.query.sources || req.body?.sources || 'all';
+    console.log('📹 Manual hazard webcam refresh requested:', sources);
+    const result = await ingestHazardWebcams({ sources });
+    res.json({
+      success: true,
+      message: 'Hazard webcam catalog refreshed',
       data: result,
-      warning: 'Camera feed creates many records. Use sparingly for review purposes only.'
+      warning: 'Camera ingest can upsert many records. Use sparingly; not part of daily disaster refresh.',
     });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Failed to refresh camera feed', details: e.message });
   }
 }
 
+function mapCameraRow(row) {
+  const hazardTypes = row.hazard_types;
+  return {
+    id: row.id,
+    source: row.source || 'alertcalifornia',
+    event_type: 'camera',
+    source_id: row.source_id,
+    title: row.name,
+    name: row.name,
+    county_name: row.county_name,
+    state_abbr: row.state_abbr,
+    lat: row.lat,
+    lng: row.lng,
+    camera_url: row.camera_url,
+    network_url: row.network_url,
+    image_url: row.image_url,
+    media_type: row.media_type,
+    refresh_minutes: row.refresh_minutes,
+    hazard_types: hazardTypes,
+    severity: row.status,
+    status: row.status,
+    last_image_at: row.last_image_at,
+    raw: row.raw,
+    start_time: row.updated_at,
+    updated_at: row.updated_at,
+  };
+}
+
+export async function cameraStats(req, res) {
+  try {
+    const stats = await getHazardWebcamStats();
+    res.json({ success: true, data: stats });
+  } catch (e) {
+    res.status(500).json({ success: false, error: 'Failed to get camera stats', details: e.message });
+  }
+}
+
+export async function cameraSnapshot(req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isFinite(id)) {
+      return res.status(400).json({ success: false, error: 'Invalid camera id' });
+    }
+    const row = await getHazardWebcamById(id);
+    if (!row) {
+      return res.status(404).json({ success: false, error: 'Camera not found' });
+    }
+
+    let imageUrl = row.image_url;
+    if (row.source === 'usgs_nims') {
+      try {
+        const latest = await resolveUsgsNimsLatestImage(row);
+        if (latest) imageUrl = latest;
+      } catch (e) {
+        console.warn('USGS NIMS snapshot failed:', e.message);
+      }
+    }
+
+    if (!imageUrl && row.media_type === 'still_image') {
+      return res.status(404).json({ success: false, error: 'No snapshot available for this camera' });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: row.id,
+        source: row.source,
+        image_url: imageUrl,
+        camera_url: row.camera_url,
+        media_type: row.media_type,
+        refresh_minutes: row.refresh_minutes,
+        attribution: row.raw?.attribution || null,
+      },
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: 'Failed to get camera snapshot', details: e.message });
+  }
+}
+
 export async function listCameras(req, res) {
   try {
-    const { state, county, limit = 100, offset = 0, nearLat, nearLng, radiusMiles } = req.query;
+    const { state, county, limit = 100, offset = 0, nearLat, nearLng, radiusMiles, source, hazard, mediaType } = req.query;
     const pool = getPool();
     if (!pool) throw new Error('Database not initialized');
 
@@ -235,6 +324,18 @@ export async function listCameras(req, res) {
       values.push(`%${String(county).trim()}%`);
       clauses.push(`county_name ILIKE $${values.length}`);
     }
+    if (source) {
+      values.push(String(source).trim().toLowerCase());
+      clauses.push(`LOWER(TRIM(source)) = $${values.length}`);
+    }
+    if (hazard) {
+      values.push(JSON.stringify([String(hazard).trim().toLowerCase()]));
+      clauses.push(`hazard_types @> $${values.length}::jsonb`);
+    }
+    if (mediaType) {
+      values.push(String(mediaType).trim().toLowerCase());
+      clauses.push(`LOWER(TRIM(COALESCE(media_type,''))) = $${values.length}`);
+    }
     if (hasGeo) {
       clauses.push('lat IS NOT NULL AND lng IS NOT NULL');
     }
@@ -250,8 +351,9 @@ export async function listCameras(req, res) {
 
     const camerasResult = await pool.query(
       `SELECT
-        id, source_id, name, county_name, state_abbr, lat, lng,
-        camera_url, network_url, image_url, status, raw, updated_at
+        id, source, source_id, name, county_name, state_abbr, lat, lng,
+        camera_url, network_url, image_url, status, media_type, refresh_minutes,
+        hazard_types, last_image_at, raw, updated_at
       FROM fire_cameras
       ${where}
       ORDER BY name ASC NULLS LAST
@@ -259,20 +361,7 @@ export async function listCameras(req, res) {
       values.concat([fetchLimit, fetchOffset])
     );
 
-    let cameras = camerasResult.rows.map((row) => ({
-      id: row.id,
-      source: 'alertcalifornia',
-      event_type: 'camera',
-      source_id: row.source_id,
-      title: row.name,
-      county_name: row.county_name,
-      state_abbr: row.state_abbr || 'CA',
-      lat: row.lat,
-      lng: row.lng,
-      severity: row.status,
-      raw: row.raw,
-      start_time: row.updated_at
-    }));
+    let cameras = camerasResult.rows.map(mapCameraRow);
 
     let total = countResult.rows[0]?.total || 0;
 
@@ -347,6 +436,8 @@ export default {
   refreshDisasters,
   refreshCameras,
   listCameras,
+  cameraStats,
+  cameraSnapshot,
   statsDisasters,
   exportCsv,
 };

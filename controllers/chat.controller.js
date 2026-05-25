@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import OpenAI from 'openai';
 import axios from 'axios';
 import { getConversationChain, getUserConversationHistory, clearUserConversationHistory, getUserConversationStats } from '../services/langchain-memory.service.js';

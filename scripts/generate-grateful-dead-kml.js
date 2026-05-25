@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 #!/usr/bin/env node
 
 /**

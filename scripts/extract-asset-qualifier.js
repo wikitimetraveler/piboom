@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 #!/usr/bin/env node
 // Minimal Excel extractor for Asset Qualifier workbook
 // Usage: node scripts/extract-asset-qualifier.js "data/30 Retail Lending - Asset Qualifier Calculator, August 10, 2022.xlsx" > asset-qualifier.json

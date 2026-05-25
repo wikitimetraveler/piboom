@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Finds API client — passes userId on every request (multi-user collections).
  */
 (function (global) {

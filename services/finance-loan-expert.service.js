@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { analyzeScenario, normalizeScenario } from './gse-scenario.service.js';
 import { readInvestorOverlays, readSources } from './gse-source.service.js';
 

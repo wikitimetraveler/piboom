@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Central MusicBrainz Web Service client — single User-Agent, JSON, ~1 req/s (queued).
  * @see https://musicbrainz.org/doc/MusicBrainz_API
  */

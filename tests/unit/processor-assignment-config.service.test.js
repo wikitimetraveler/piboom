@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 
 describe('processor-assignment-config.service', () => {

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { getPool } from './database.service.js';
 import { DISASTER_ROLLING_WINDOW_DAYS } from './disasters.service.js';
 

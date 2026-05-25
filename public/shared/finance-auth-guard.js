@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 (() => {
   const FINANCE_PATH_PREFIX = '/finance/';
   const LOGIN_MODAL_ID = 'loginModal';

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 const resultsMeta = document.getElementById('resultsMeta');
 const statusChip = document.getElementById('statusChip');
 const refreshBtn = document.getElementById('refreshBtn');

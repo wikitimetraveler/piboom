@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import OpenAI from 'openai';
 import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
 import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';

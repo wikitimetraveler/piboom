@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Regression: extractArithmeticComparisons must capture full arithmetic expressions
  * including divide-by-12 sub-expressions (BR*24, FR0124, FR0324) and BR*12 sums.
  */

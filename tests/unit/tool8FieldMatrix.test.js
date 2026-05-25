@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import '../../public/shared/tool8FieldMatrix.js';
 
 const { parseTool8FieldMatrixJson, generateUnitTestFromTool8FieldMatrix, stripBrackets } = globalThis.tool8FieldMatrix;

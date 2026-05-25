@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import 'dotenv/config';
 import pg from 'pg';
 

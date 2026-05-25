@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { resolveTrack, TRACK_RELATIVE_PATHS } from '../../lib/disaster-mood-music.js';
 import { resolveSafeMusicPath } from '../../lib/audio-path.js';
 import path from 'path';

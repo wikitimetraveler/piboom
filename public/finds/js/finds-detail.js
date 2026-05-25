@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Find detail — load, edit, voice note, TTS summary.
  */
 (function () {

@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Test Mapbox Geocoding API
  * 
  * This script tests Mapbox geocoding and compares it to Nominatim

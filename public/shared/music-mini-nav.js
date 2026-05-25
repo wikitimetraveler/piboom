@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Music mini-navigation (Research / Album Discovery / My Collection)
  * Uses MENU_CONFIG.MUSIC_TOOLS when available; fallback to local data.
  */

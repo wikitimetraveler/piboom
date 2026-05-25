@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import {
   FINANCE_SESSION_COOKIE,
   FINANCE_SESSION_VALUE,

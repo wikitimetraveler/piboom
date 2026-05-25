@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { jest, describe, test, expect, beforeEach } from '@jest/globals';
 
 describe('runProcessorAssignment product eligibility', () => {

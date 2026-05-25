@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import express from 'express';
 import * as disastersController from '../controllers/disasters.controller.js';
 
@@ -47,7 +50,9 @@ router.post('/refresh', requireDisasterRefreshAccess, disastersController.refres
 // Manual camera feed refresh (for review purposes)
 router.post('/refresh-cameras', requireDisasterRefreshAccess, disastersController.refreshCameras);
 
-// List camera records (for review)
+// List camera records (fixed hazard webcams)
+router.get('/cameras/stats', disastersController.cameraStats);
+router.get('/cameras/:id/snapshot', disastersController.cameraSnapshot);
 router.get('/cameras', disastersController.listCameras);
 
 // Stats

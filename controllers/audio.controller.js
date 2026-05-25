@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import fs from 'fs';
 import { listFiles, playFile, stop, setVolume } from '../services/audio.service.js';import { config } from '../config/index.js';
 import { resolveSafeMusicPath } from '../lib/audio-path.js';

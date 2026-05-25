@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Ambient mood music for disaster AI chat panels.
  * Plays local MP3s from music/disasters/ via /api/audio/stream/.
  */

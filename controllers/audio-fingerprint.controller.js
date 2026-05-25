@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import AudioFingerprintService from '../services/audio-fingerprint.service.js';
 
 const fingerprintService = new AudioFingerprintService();

@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Finds discovery (New find) — photos (gallery / camera / live), address + geo, AI analyze, save.
  */
 (function () {

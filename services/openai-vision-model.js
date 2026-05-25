@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Default Chat Completions model for multimodal (image) requests across discovery agents.
  *
  * - Global override: `OPENAI_VISION_MODEL` (default `gpt-4o`).

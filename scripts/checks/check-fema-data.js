@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { config } from 'dotenv';
 import { initializeDatabase, getPool } from './services/database.service.js';
 

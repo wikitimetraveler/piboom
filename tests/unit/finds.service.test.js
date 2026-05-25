@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { describe, test, expect } from '@jest/globals';
 import { computeTreasureScore, scoreLabelFromScore } from '../../services/finds.service.js';
 

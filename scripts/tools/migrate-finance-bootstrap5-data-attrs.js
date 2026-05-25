@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Bootstrap 5 data-bs-* and common v4 utility class migrations for public/finance/*.html
  */
 import fs from 'fs';

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { describe, expect, test } from '@jest/globals';
 import '../../public/shared/gse-encompass-field-map.js';
 

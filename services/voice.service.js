@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { spawn, exec } from 'child_process';
 import { run } from '../lib/exec.js';
 import { config } from '../config/index.js';

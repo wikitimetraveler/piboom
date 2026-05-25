@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import '../../public/shared/customFieldCalcParser.js';
 
 const {

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import crypto from 'crypto';
 import { getPool } from './database.service.js';
 

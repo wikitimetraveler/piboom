@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * One-off: swap Bootstrap 4.5.2 StackPath URLs for 5.3.3 jsDelivr in public/finance/*.html
  */
 import fs from 'fs';

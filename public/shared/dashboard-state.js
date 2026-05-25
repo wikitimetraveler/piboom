@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Command Center dashboard state manager.
  * Stores recent tools, last actions, favorites, and resume state in localStorage.
  * All data is scoped per signed-in user (loggedInUserId). When not logged in,

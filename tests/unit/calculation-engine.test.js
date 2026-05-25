@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import '../../public/shared/calculationEngine.js';
 
 const { createAssetQualifierConfig } = globalThis;

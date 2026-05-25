@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 // Shared poster utilities (render, download, share)
 async function renderPosterCanvas(element, options = {}) {
   if (!window.html2canvas) {

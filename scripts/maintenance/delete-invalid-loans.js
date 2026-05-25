@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Script to delete loans with invalid zip codes that couldn't be fixed
  * Run with: node delete-invalid-loans.js
  */

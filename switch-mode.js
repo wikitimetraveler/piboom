@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 #!/usr/bin/env node
 
 // Simple mode switcher for BOOM project

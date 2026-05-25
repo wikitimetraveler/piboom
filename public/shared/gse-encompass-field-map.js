@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Map Encompass field-reader responses to GSE analyzer scenario JSON (no PII in output).
  * Field ID list mirrors services/encompass-hub.service.js PIPELINE_FIELDS (minus BorrowerName)
  * plus purchase price, first-time buyer, and monthly income candidates.

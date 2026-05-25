@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * CSS poster templates for non-AI poster generation.
  * Receives: { imageUrl, artist, album, title, subtitle, venue, date, fontFamily, qrDataUrl?, frame? }
  */

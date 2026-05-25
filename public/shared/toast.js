@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared toast notification module.
  * Use showToast(message, options) or showToast(title, message, type) for backward compat.
  * @see docs/FRONTEND_PATTERNS.md

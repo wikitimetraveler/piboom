@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';

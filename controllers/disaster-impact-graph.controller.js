@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import disasterImpactGraphService from '../services/disaster-impact-graph.service.js';
 
 function parseDepth(rawDepth) {

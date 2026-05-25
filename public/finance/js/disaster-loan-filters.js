@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared disaster → loan filter helpers (Pipeline Risk + Disasters Unified).
  */
 (function (global) {

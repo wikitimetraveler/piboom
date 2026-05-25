@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { describe, expect, it } from '@jest/globals';
 import { evaluateProduct } from '../../services/gse-rules.service.js';
 

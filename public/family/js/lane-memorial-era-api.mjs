@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Client-side U.S. era context for Lane Memorial (general history only — not family evidence).
  * Pure date logic + dataset loaders for browser and tests.
  */

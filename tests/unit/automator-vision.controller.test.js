@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { sanitizeAutomatorVisionLine } from '../../controllers/automator-vision.controller.js';
 
 describe('automator vision line sanitization', () => {

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 // Test script for Pi mode voice system
 import { config } from './config/index.js';
 

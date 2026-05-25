@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * User Password Protection System
  *
  * Verifies action passwords via POST /api/auth/verify-user-password.

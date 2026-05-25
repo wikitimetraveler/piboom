@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Tool 8 (Alchemist) — field matrix JSON produced by transformXML().
  * Each row: { FieldID, Label, CType, Calendar, Method } optional Row for DataTables.
  * @see public/finance/js/tool8.js transformXML()

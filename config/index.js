@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import 'dotenv/config';
 import path from 'path';
 import { fileURLToPath } from 'url';

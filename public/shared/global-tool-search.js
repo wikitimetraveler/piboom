@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Global Tool Search — Command Palette (Ctrl+K)
  * Requires tool-search-index.js and modern-navbar.js (for search button).
  */

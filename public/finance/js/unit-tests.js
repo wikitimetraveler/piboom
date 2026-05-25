@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 const statusChip = document.getElementById('statusChip');
 const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');

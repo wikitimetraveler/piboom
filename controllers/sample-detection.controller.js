@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import SampleDetectionService from '../services/sample-detection.service.js';
 
 const sampleService = new SampleDetectionService();

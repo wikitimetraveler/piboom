@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { getPool } from './database.service.js';
 import fetch from 'node-fetch';
 import fs from 'fs/promises';

@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import 'dotenv/config';
 import { getGoogleBrowserApiKey, getGoogleServerApiKey } from './lib/google-api-key.js';
 

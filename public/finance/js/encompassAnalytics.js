@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 const filtersForm = document.getElementById('analyticsFilters');
 const stateInput = document.getElementById('analyticsState');
 const limitInput = document.getElementById('analyticsLimit');

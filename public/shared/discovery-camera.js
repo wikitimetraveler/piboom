@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Canonical getUserMedia video constraints for discovery tools (same site = same permission).
  * Use on album, nature, finds, fish, bike pages so the browser reuses one camera grant.
  */

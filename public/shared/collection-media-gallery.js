@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared multi-photo / video slideshow for collection pages.
  * Vanilla JS; include collection-media-gallery.css.
  */

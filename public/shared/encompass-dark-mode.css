@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared Encompass Dark Mode Theme
  * Used across unit-tests, tool9, encompass-assistant, custom/native fields, hub, etc.
  * Toggle via encompass-api.js; preference stored in localStorage.

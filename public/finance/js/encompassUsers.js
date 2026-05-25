@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 const filtersForm = document.getElementById('userFilters');
 const searchInput = document.getElementById('userSearch');
 const personaNameInput = document.getElementById('personaName');

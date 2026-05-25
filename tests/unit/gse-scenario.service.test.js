@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { describe, expect, it } from '@jest/globals';
 import { analyzeScenario, normalizeScenario } from '../../services/gse-scenario.service.js';
 

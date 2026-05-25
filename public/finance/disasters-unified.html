@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Development work by David Lane -->
 <!--
   ==============================================================================
   Disasters Unified Dashboard
@@ -722,7 +723,7 @@
             <button type="button" class="source-chip" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
               <i class="bi bi-droplet"></i> Flood zones
             </button>
-            <a class="source-chip text-decoration-none" href="disasters-ca-cameras.html" title="Fixed ALERTCalifornia camera mounts (separate page)">
+            <a class="source-chip text-decoration-none" href="disasters-webcams.html" target="_blank" rel="noopener noreferrer" title="National hazard webcams (USGS, WebCOOS, ALERTCalifornia, UCSD)">
               <i class="bi bi-camera-video"></i> CA fire cameras
             </a>
           </div>
@@ -909,7 +910,7 @@
                   <div class="card mt-3" id="duNearbyCamerasCard" style="display: none;">
                     <div class="card-header py-2">
                       <strong class="small"><i class="bi bi-camera-video"></i> Nearby fire cameras</strong>
-                      <small class="text-muted d-block" id="duNearbyCamerasSubtitle">ALERTCalifornia cameras near selection</small>
+                      <small class="text-muted d-block" id="duNearbyCamerasSubtitle">Hazard webcams near selection</small>
                     </div>
                     <div class="card-body py-2" id="duNearbyCamerasList">
                       <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
@@ -934,7 +935,7 @@
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="/finance/js/disaster-loan-filters.js"></script>
     <script src="/finance/js/disaster-camera-filters.js"></script>
-    <script src="/finance/js/ca-fire-camera-viewer.js"></script>
+    <script src="/finance/js/hazard-webcam-viewer.js"></script>
     <script>
       let disastersGridApi = null;
       let map, markers = [], loanMarkers = [];
@@ -2200,7 +2201,7 @@
         el.innerHTML = `<strong>${title}</strong> · ${county}${county && state ? ', ' : ''}${state}
           · ${loanLine} · ${camLine}
           · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>
-          · <a href="disasters-ca-cameras.html" class="alert-link">CA cameras</a>
+          · <a href="disasters-webcams.html" class="alert-link">Hazard webcams</a>
           · <a href="pipeline-risk-dashboard.html" class="alert-link">FEMA pipeline risk</a>`;
         el.style.display = 'block';
       }

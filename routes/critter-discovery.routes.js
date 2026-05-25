@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import express from 'express';
 import { identifyCritterFromImage, getCritterInfo, chatWithCritterExpert } from '../controllers/critter-discovery.controller.js';
 

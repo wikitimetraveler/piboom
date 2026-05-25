@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import OpenAI from 'openai';
 import { FIND_CATEGORIES } from './finds.service.js';
 import { resolveOpenAiVisionModel } from './openai-vision-model.js';

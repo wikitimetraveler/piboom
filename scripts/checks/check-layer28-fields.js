@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 async function checkLayer28Fields() {
   const baseUrl = 'https://hazards.fema.gov/arcgis/rest/services/public/NFHL/MapServer';
   const testLat = 29.7604; // Houston

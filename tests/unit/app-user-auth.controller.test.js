@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { jest } from '@jest/globals';
 
 jest.unstable_mockModule('../../services/app-user-auth.service.js', () => ({

@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Global tool search index - name, url, category, keywords for fuzzy search.
  * Used by global-tool-search.js for Ctrl+K / search overlay.
  */

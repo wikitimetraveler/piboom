@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Data-driven eligibility hints (not underwriting).
  * @param {object} scenario normalized scenario
  * @param {object} productRow from fannie-products / freddie-products (full rules)

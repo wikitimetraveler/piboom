@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Sitewide click-to-expand image lightbox.
  * @see docs/FRONTEND_PATTERNS.md
  */

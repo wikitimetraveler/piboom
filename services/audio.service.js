@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import fs from 'fs';
 import path from 'path';
 import { config } from '../config/index.js';

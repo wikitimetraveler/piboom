@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import path from 'path';
 import fs from 'fs/promises';
 import { fileURLToPath } from 'url';

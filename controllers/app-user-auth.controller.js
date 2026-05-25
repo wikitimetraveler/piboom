@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { verifyAppUserPassword } from '../services/app-user-auth.service.js';
 import {
   financeSessionClearCookieHeader,

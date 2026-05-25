@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared Encompass Dark Mode toggle.
  * Include encompass-dark-mode.css and this script on Encompass tool pages.
  * Preference stored in localStorage (encompassDarkMode: 'true' | 'false').

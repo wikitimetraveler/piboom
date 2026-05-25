@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Unit Tests — HyperFrames-style workflow story (TTS via /shared/tts.js).
  * Depends: showAccordionSection on window (set by unit-tests.js), speakNarrationAwaitEnd.
  */

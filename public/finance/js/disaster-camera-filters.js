@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Shared disaster / loan → nearby fire camera helpers (Pipeline Risk + Disasters Unified).
  */
 (function (global) {
@@ -43,6 +46,15 @@
     }
     if (options?.county) {
       params.set('county', String(options.county).trim());
+    }
+    if (options?.source) {
+      params.set('source', String(options.source).trim().toLowerCase());
+    }
+    if (options?.hazard) {
+      params.set('hazard', String(options.hazard).trim().toLowerCase());
+    }
+    if (options?.mediaType) {
+      params.set('mediaType', String(options.mediaType).trim().toLowerCase());
     }
 
     if (center && Number.isFinite(center.lat) && Number.isFinite(center.lng)) {
@@ -171,9 +183,10 @@
     return key;
   }
 
-  function getCameraMapIcon() {
+  function getCameraMapIcon(camera) {
+    const src = (camera && camera.source) || 'alertcalifornia';
     if (global.mapIcons && typeof global.mapIcons.getDisasterIconForMarker === 'function') {
-      return global.mapIcons.getDisasterIconForMarker('camera', 'alertcalifornia');
+      return global.mapIcons.getDisasterIconForMarker('camera', src);
     }
     if (global.mapIcons && global.mapIcons.disaster && global.mapIcons.disaster.camera) {
       const c = global.mapIcons.disaster.camera;
@@ -196,14 +209,15 @@
    */
   function addCameraMarkersToMap(gmap, cameras, markerBucket) {
     if (!gmap || !Array.isArray(cameras)) return;
-    const icon = getCameraMapIcon();
     cameras.forEach((camera, index) => {
       const lat = parseFloat(camera.lat);
       const lng = parseFloat(camera.lng);
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+      const icon = getCameraMapIcon(camera);
       const key = storeCameraForViewer(camera, index);
-      const title = camera.title || camera.name || 'Fire Camera';
+      const title = camera.title || camera.name || 'Webcam';
       const dist = formatCameraDistanceMi(camera);
+      const loc = [camera.county_name, camera.state_abbr].filter(Boolean).join(', ') || '—';
       const marker = new google.maps.Marker({
         position: { lat, lng },
         map: gmap,
@@ -211,7 +225,7 @@
         icon
       });
       const info = new google.maps.InfoWindow({
-        content: `<div style="min-width:180px;"><strong>${escapeHtml(title)}</strong><br>${escapeHtml(camera.county_name || '')}, CA<br>${dist !== '—' ? dist + ' away' : ''}<br><button type="button" class="btn btn-sm btn-warning mt-1" onclick="openCameraViewerFromMarker('${key}')">View feed</button></div>`
+        content: `<div style="min-width:180px;"><strong>${escapeHtml(title)}</strong><br><span class="text-muted small">${escapeHtml(camera.source || '')}</span><br>${escapeHtml(loc)}<br>${dist !== '—' ? dist + ' away' : ''}<br><button type="button" class="btn btn-sm btn-warning mt-1" onclick="openCameraViewerFromMarker('${key}')">View feed</button></div>`
       });
       marker.addListener('click', () => info.open(gmap, marker));
       markerBucket.push({ marker, key });
@@ -226,12 +240,13 @@
     cameras.forEach((camera, index) => {
       const key = storeCameraForViewer(camera, index);
       const name = escapeHtml(camera.title || camera.name || 'Camera');
-      const county = escapeHtml(camera.county_name || '');
+      const loc = escapeHtml([camera.county_name, camera.state_abbr].filter(Boolean).join(', ') || '—');
+      const src = escapeHtml(camera.source || '');
       const dist = escapeHtml(formatCameraDistanceMi(camera));
       html += `<div class="list-group-item d-flex justify-content-between align-items-center px-0 py-2">
         <div class="me-2">
           <div class="fw-semibold small">${name}</div>
-          <div class="text-muted small">${county}${county ? ', CA' : 'CA'} · ${dist}</div>
+          <div class="text-muted small">${src ? src + ' · ' : ''}${loc} · ${dist}</div>
         </div>
         <button type="button" class="btn btn-sm btn-outline-warning" onclick="openCameraViewerFromMarker('${key}')">
           <i class="bi bi-camera-video"></i> View

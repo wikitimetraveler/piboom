@@ -1,4 +1,7 @@
 /**
+ * Development work by David Lane
+ */
+/**
  * Finds dashboard — list by status, link to discovery/detail.
  */
 (function () {

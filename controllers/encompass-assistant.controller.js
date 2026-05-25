@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import express from 'express';
 import encompassDocsService from '../services/encompass-docs.service.js';
 import { ChatOpenAI } from '@langchain/openai';

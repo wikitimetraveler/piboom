@@ -1,3 +1,6 @@
+/**
+ * Development work by David Lane
+ */
 import { jest } from '@jest/globals';
 
 process.env.OPENAI_API_KEY = 'test-key';
