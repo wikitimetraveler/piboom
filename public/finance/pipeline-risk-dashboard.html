@@ -895,6 +895,7 @@
                                             <!-- Flood zone info is now shown via loan markers (color-coded) -->
                                         </div>
                                         <div id="map" style="width: 100%;"></div>
+                                        <p class="text-muted small mt-2 mb-0" id="mapLoadHint">Loan properties shown at US overview. Click <strong>Load FEMA (Real-time)</strong> to add disaster markers.</p>
                                         <div class="mt-2">
                                             <small class="text-muted">
                                                 <span class="badge bg-danger me-1">●</span> Disaster Areas<br>
@@ -995,11 +996,11 @@
                                 </div>
                                 <div class="card mt-3" id="nearbyCamerasCard" style="display: none;">
                                     <div class="card-header py-2">
-                                        <h6 class="mb-0"><i class="bi bi-camera-video"></i> Nearby fire cameras</h6>
+                                        <h6 class="mb-0"><i class="bi bi-camera-video"></i> Nearby hazard webcams</h6>
                                         <small class="text-muted" id="nearbyCamerasSubtitle">Hazard webcams near selection</small>
                                     </div>
                                     <div class="card-body py-2" id="nearbyCamerasList">
-                                        <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
+                                        <p class="text-muted small mb-0">Select a disaster or loan to load hazard webcams.</p>
                                     </div>
                                 </div>
                             </div>
@@ -1034,11 +1035,11 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <p class="mb-1"><strong>Location:</strong> <span id="cameraViewerLocation"></span></p>
-                        <p class="mb-0"><strong>Site ID:</strong> <span id="cameraViewerSiteId"></span></p>
+                        <p class="mb-1"><strong>Mount:</strong> <span id="cameraViewerSiteId"></span></p>
+                        <p class="mb-0 small text-muted" id="cameraViewerAttribution"></p>
                     </div>
                     <div style="position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 8px; overflow: hidden;">
-                        <iframe id="cameraFeedFrame" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allowfullscreen loading="lazy"></iframe>
-                        <img id="cameraFeedImg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none;" alt="Camera Feed">
+                        <img id="cameraFeedImg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none;" alt="Camera still">
                         <div id="cameraFeedError" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; text-align: center; display: none;">
                             <i class="bi-exclamation-triangle" style="font-size: 2rem;"></i>
                             <p class="mt-2">Unable to load camera feed</p>
@@ -1046,7 +1047,7 @@
                     </div>
                     <div class="mt-3 text-center">
                         <button type="button" class="btn btn-primary" id="refreshFeedImgBtn"><i class="bi-arrow-clockwise"></i> Refresh Image</button>
-                        <a id="cameraViewerLink" href="#" target="_blank" rel="noopener" class="btn btn-outline-primary ms-2"><i class="bi-box-arrow-up-right"></i> Open in New Tab</a>
+                        <a id="cameraViewerLink" href="#" target="_blank" rel="noopener" class="btn btn-outline-primary ms-2"><i class="bi-box-arrow-up-right"></i> Open source page</a>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -1114,6 +1115,9 @@
         let selectedLoan = null; // Store selected loan for info panel
         let cameraMarkers = [];
         let cameraLoadContext = 'disaster';
+        let cachedLiteLoans = null;
+        let cachedLiteLoansPromise = null;
+        let pipelineOverlayDismissed = false;
 
         function clearCameraMarkers() {
             cameraMarkers.forEach((entry) => entry.marker && entry.marker.setMap(null));
@@ -1151,7 +1155,7 @@
             } catch (err) {
                 console.error('Error loading nearby cameras:', err);
                 $('#nearbyCamerasSubtitle').text('Failed to load cameras');
-                $('#nearbyCamerasList').html('<p class="text-danger small mb-0">Could not load fire cameras.</p>');
+                $('#nearbyCamerasList').html('<p class="text-danger small mb-0">Could not load hazard webcams.</p>');
             }
         }
 
@@ -1215,9 +1219,11 @@
             });
             // Initialize voice recognition
             initializeVoiceRecognition();
-            // Load all encompass loans and FEMA data on page load
-            loadAllLoansOnMap();
-            loadAllFEMADisastersOnMap();
+
+            const mapAccordion = document.getElementById('collapseMapYouTube');
+            if (mapAccordion) {
+                mapAccordion.addEventListener('shown.bs.collapse', refreshMapLayout);
+            }
         });
 
         // Initialize user login
@@ -1388,67 +1394,110 @@
                     overlay.classList.add('hidden');
                     setTimeout(() => {
                         overlay.style.display = 'none';
+                        refreshMapLayout();
                     }, 500);
                 }, 500);
             }
         }
 
+        function dismissPipelineOverlay() {
+            if (pipelineOverlayDismissed) return;
+            pipelineOverlayDismissed = true;
+            hidePipelineLoading();
+        }
+
+        function refreshMapLayout() {
+            if (!map || typeof google === 'undefined' || !google.maps) return;
+            google.maps.event.trigger(map, 'resize');
+        }
+
+        function showNationalMapOverview() {
+            if (!map) return;
+            map.setCenter({ lat: 39.8283, lng: -98.5795 });
+            map.setZoom(4);
+        }
+
+        async function fetchLiteLoans(forceRefresh = false) {
+            if (!forceRefresh && cachedLiteLoans) return cachedLiteLoans;
+            if (!forceRefresh && cachedLiteLoansPromise) return cachedLiteLoansPromise;
+
+            cachedLiteLoansPromise = (async () => {
+                const resp = await fetch('/api/loan-pipeline/loans?lite=1');
+                const json = await resp.json();
+                if (!resp.ok || !json.success) {
+                    throw new Error(json.error || `HTTP ${resp.status}`);
+                }
+                cachedLiteLoans = json.data.loans || [];
+                return cachedLiteLoans;
+            })();
+
+            try {
+                return await cachedLiteLoansPromise;
+            } finally {
+                cachedLiteLoansPromise = null;
+            }
+        }
+
+        function clearDashboardBanner() {
+            const banner = document.getElementById('dashboardStatusBanner');
+            if (banner) banner.style.display = 'none';
+        }
+
         // Load dashboard data and update all charts
         async function loadDashboardData() {
+            const safetyTimer = setTimeout(dismissPipelineOverlay, 15000);
+
             try {
                 updateLoadingStatusPipeline('Loading loan pipeline statistics...', 10);
-                
+
                 const response = await fetch('/api/loan-pipeline/stats');
                 const data = await response.json();
-                
-                if (data.success) {
-                    updateLoadingStatusPipeline('Updating statistics...', 40);
-                    updateStatistics(data.data);
-                    
-                    updateLoadingStatusPipeline('Loading loan data for charts...', 60);
-                    await updateAllCharts(data.data);
-                    
-                    updateLoadingStatusPipeline('Finalizing dashboard...', 90);
-                    updateLoadingStatusPipeline('Complete!', 100);
-                    
-                    // Hide loading overlay after a short delay
-                    setTimeout(() => {
-                        hidePipelineLoading();
-                    }, 800);
+
+                if (!data.success) {
+                    updateLoadingStatusPipeline('Error loading statistics.', 100);
+                    showAlert(data.error || 'Failed to load pipeline statistics', 'danger');
+                    return;
+                }
+
+                updateLoadingStatusPipeline('Updating statistics...', 40);
+                updateStatistics(data.data);
+                updateLoadingStatusPipeline('Ready!', 100);
+                dismissPipelineOverlay();
+
+                showDashboardBanner('Loading charts and map markers…', 'info', 0);
+                try {
+                    const loans = await fetchLiteLoans(true);
+                    await updateAllCharts(data.data, loans);
+                    if (map) {
+                        updateMapWithLoans(loans);
+                        showNationalMapOverview();
+                        refreshMapLayout();
+                    }
+                    clearDashboardBanner();
+                } catch (bgError) {
+                    console.error('Background chart/map load failed:', bgError);
+                    showAlert('Charts or map markers failed to load — try refreshing.', 'warning');
                 }
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
                 updateLoadingStatusPipeline('Error loading data. Please refresh.', 100);
-                setTimeout(() => {
-                    hidePipelineLoading();
-                }, 2000);
+                showAlert('Error loading dashboard data', 'danger');
+            } finally {
+                clearTimeout(safetyTimer);
+                dismissPipelineOverlay();
             }
         }
 
         // Update all charts with pipeline data
-        async function updateAllCharts(stats) {
-            // Get all loans for detailed charts
-            const loansResponse = await fetch('/api/loan-pipeline/loans');
-            const loansData = await loansResponse.json();
-            const loans = loansData.success ? loansData.data.loans : [];
+        async function updateAllCharts(stats, loans) {
+            const loanRows = Array.isArray(loans) ? loans : [];
 
-            // Risk Distribution Chart
             updateRiskDistributionChart(stats.riskLevels);
-
-            // Milestone Chart
             updateMilestoneChart(stats.milestones);
-
-            // Loan Amount Distribution Chart
-            updateLoanAmountChart(loans);
-
-            // State Distribution Chart
+            updateLoanAmountChart(loanRows);
             updateStateDistributionChart(stats.topStates);
-
-            // Milestone Timeline Chart
-            updateMilestoneTimelineChart(loans);
-
-            // Risk Score Distribution Chart
-            updateRiskScoreChart(loans);
+            updateMilestoneTimelineChart(loanRows);
+            updateRiskScoreChart(loanRows);
         }
 
         // Risk Distribution Chart (Doughnut)
@@ -1946,23 +1995,20 @@
             }
         }
 
-        // Load all encompass loans on map on page load
+        // Load all encompass loans on map (uses shared lite cache)
         async function loadAllLoansOnMap() {
             try {
-                // Wait for map to be initialized
                 if (!map) {
                     setTimeout(loadAllLoansOnMap, 500);
                     return;
                 }
-                
-                console.log('Loading all encompass loans on map...');
-                const response = await fetch('/api/loan-pipeline/loans');
-                const data = await response.json();
-                
-                if (data.success && data.data.loans) {
-                    updateMapWithLoans(data.data.loans);
-                    console.log(`Loaded ${data.data.loans.length} loans on map`);
-                }
+
+                console.log('Loading encompass loans on map (lite)...');
+                const loans = await fetchLiteLoans(true);
+                updateMapWithLoans(loans);
+                showNationalMapOverview();
+                refreshMapLayout();
+                console.log(`Loaded ${loans.length} loans on map`);
             } catch (error) {
                 console.error('Error loading all loans on map:', error);
             }
@@ -2201,17 +2247,23 @@
             $('#progressText').text(text);
         }
 
-        // Show alert
-        function showAlert(message, type) {
+        // Show alert (autoHideMs 0 = stay visible until cleared)
+        function showAlert(message, type, autoHideMs = 5000) {
             const banner = document.getElementById('dashboardStatusBanner');
             if (!banner) return;
             const mapped = type === 'danger' ? 'danger' : (type === 'success' ? 'success' : (type === 'info' ? 'info' : 'warning'));
             banner.className = `alert alert-${mapped} dashboard-status-banner`;
             banner.textContent = message;
             banner.style.display = 'block';
-            setTimeout(() => {
-                banner.style.display = 'none';
-            }, 5000);
+            if (autoHideMs > 0) {
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, autoHideMs);
+            }
+        }
+
+        function showDashboardBanner(message, type, autoHideMs = 0) {
+            showAlert(message, type, autoHideMs);
         }
 
         // Populate FEMA disasters table (store full object for coordinates access)
@@ -3033,23 +3085,20 @@
                         },
                         onClose: () => window.DisasterMoodMusic?.stop?.(),
                         getContext: async () => {
-                            // Get current loans for context
-                            let loans = [];
-                            try {
-                                const loansResponse = await fetch('/api/loan-pipeline/loans');
-                                const loansData = await loansResponse.json();
-                                if (loansData.success && loansData.data.loans) {
-                                    loans = loansData.data.loans.slice(0, 20); // Include sample of loans
+                            let loans = cachedLiteLoans || [];
+                            if (!loans.length) {
+                                try {
+                                    loans = await fetchLiteLoans();
+                                } catch (e) {
+                                    console.warn('Could not load loans for AI context:', e);
                                 }
-                            } catch (e) {
-                                console.warn('Could not load loans for AI context:', e);
                             }
-                            
+
                             return {
                                 filters: currentFilters,
                                 selectedDisaster: selectedDisasterObj,
                                 stats: getCurrentStats(),
-                                loans: loans
+                                loans: loans.slice(0, 20)
                             };
                         },
                         onMessageSent: (message) => {

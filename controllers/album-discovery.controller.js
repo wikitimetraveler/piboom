@@ -217,6 +217,7 @@ export async function getAlbums(req, res) {
       const albums = data['release-groups'].map(releaseGroup => ({
         title: releaseGroup.title,
         year: releaseGroup['first-release-date'] ? releaseGroup['first-release-date'].substring(0, 4) : 'Unknown',
+        releaseDate: releaseGroup['first-release-date'] || null,
         genre: releaseGroup.tags ? releaseGroup.tags.map(tag => tag.name).join(', ') : 'Unknown',
         artist: artist,
         coverArt: `https://coverartarchive.org/release-group/${releaseGroup.id}/front-250`,

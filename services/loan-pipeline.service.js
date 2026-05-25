@@ -996,24 +996,39 @@ export function filterLoansByDistance(loans, nearLat, nearLng, radiusMiles) {
 }
 
 /**
+ * Column lists for loan list queries (lite omits heavy JSON blobs).
+ */
+export const LOAN_SELECT_LITE = `
+        id, loan_number, borrower_name, property_address, city, state, county, zip_code,
+        latitude, longitude, loan_amount, loan_type, milestone,
+        disaster_risk_score, disaster_declaration_count,
+        flood_zone, flood_zone_type, dfirm_id, base_flood_elevation, last_flood_zone_check,
+        last_risk_analysis, created_at, updated_at`;
+
+export const LOAN_SELECT_FULL = `
+        id, loan_number, borrower_name, property_address, city, state, county, zip_code,
+        latitude, longitude, loan_amount, loan_type, milestone,
+        disaster_risk_score, disaster_declaration_count, fema_data,
+        flood_zone, flood_zone_type, dfirm_id, base_flood_elevation, flood_zone_data, last_flood_zone_check,
+        last_risk_analysis, encompass_loan_guid, created_at, updated_at`;
+
+/**
  * Get all loans with risk data
  * @param {Object} filters - Optional filters (milestone, state, county, riskLevel, nearLat, nearLng, radiusMiles)
+ * @param {{ lite?: boolean }} [options] - When lite is true, omit fema_data, flood_zone_data, encompass_loan_guid
  * @returns {Promise<Array>} Array of loan objects
  */
-export async function getAllLoans(filters = {}) {
+export async function getAllLoans(filters = {}, options = {}) {
   const pool = getPool();
   if (!pool) {
     throw new Error('Database not initialized');
   }
 
   try {
+    const lite = options.lite === true;
+    const selectCols = lite ? LOAN_SELECT_LITE : LOAN_SELECT_FULL;
     let query = `
-      SELECT 
-        id, loan_number, borrower_name, property_address, city, state, county, zip_code,
-        latitude, longitude, loan_amount, loan_type, milestone,
-        disaster_risk_score, disaster_declaration_count, fema_data,
-        flood_zone, flood_zone_type, dfirm_id, base_flood_elevation, flood_zone_data, last_flood_zone_check,
-        last_risk_analysis, encompass_loan_guid, created_at, updated_at
+      SELECT ${selectCols}
       FROM loans
     `;
     

@@ -101,7 +101,8 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 |--------|------|-------------|
 | GET | `/api/disasters` | List disasters |
 | POST | `/api/disasters/refresh` | Refresh all sources |
-| POST | `/api/disasters/refresh-cameras` | Ingest multi-source hazard webcams into `fire_cameras` (manual / `npm run refresh:hazard-webcams`; not daily disaster refresh). Query/body: `sources=all` or comma list |
+| POST | `/api/disasters/refresh-cameras` | Ingest multi-source hazard webcams into `fire_cameras` (manual / `npm run refresh:hazard-webcams`; not daily disaster refresh). Query/body: `sources=all` or comma list (`alertcalifornia`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`); requires disaster refresh access |
+| GET | `/api/disasters/geocode-address` | Forward geocode for hazard webcam address search (`q`). Uses `geocodeAddressFree` (Mapbox/Nominatim); fallback when client Google geocoder fails |
 | GET | `/api/disasters/cameras` | List fixed camera mounts from `fire_cameras` (not rolling disaster events). Query: `state`, `county`, `source`, `hazard`, `mediaType`, geo (`nearLat`, `nearLng`, `radiusMiles`) |
 | GET | `/api/disasters/cameras/stats` | Webcam counts by source |
 | GET | `/api/disasters/cameras/:id/snapshot` | Latest still image URL (USGS NIMS on-demand) |
@@ -151,7 +152,14 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/nature-collection/share` | Share nature collection |
 | GET | `/api/nature-collection/share/:id` | Get shared nature collection |
 | * | `/api/genealogy/*` | Family data, people, stats |
+| GET | `/api/grateful-dead/shows/by-date?year=&month=&day=` | Grateful Dead shows on a calendar date |
 | * | `/api/grateful-dead/*` | Shows, KML, geocoding |
+| GET | `/api/music-pilgrimage/atlas/overview` | Pilgrimage atlas stats and top venues |
+| GET | `/api/music-pilgrimage/atlas` | Combined map/timeline stops (query: year, city, state, mode, clientId) |
+| GET | `/api/music-pilgrimage/atlas/stops/:id` | Stop detail with setlist and nearby shows |
+| GET | `/api/music-pilgrimage/atlas/venues` | Venue index |
+| GET/POST/DELETE | `/api/music-pilgrimage/bookmarks` | Personal favorites, wishlist, visited |
+| GET/POST/DELETE | `/api/music-pilgrimage/routes` | Saved filter routes (clientId) |
 | * | `/api/concert-collection/*` | Concert collection |
 | * | `/api/kml/*` | KML upload, YouTube search |
 | * | `/api/poster-generator/*` | Poster generation |

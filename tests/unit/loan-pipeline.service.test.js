@@ -3,7 +3,9 @@
  */
 import {
   normalizeCountyName,
-  filterLoansByDistance
+  filterLoansByDistance,
+  LOAN_SELECT_LITE,
+  LOAN_SELECT_FULL
 } from '../../services/loan-pipeline.service.js';
 
 describe('loan-pipeline.service geo filters', () => {
@@ -37,5 +39,16 @@ describe('loan-pipeline.service geo filters', () => {
     ];
     const result = filterLoansByDistance(loans, 29.76, -95.37, 10);
     expect(result).toHaveLength(0);
+  });
+});
+
+describe('getAllLoans lite mode', () => {
+  test('LOAN_SELECT_LITE omits heavy JSON columns', () => {
+    expect(LOAN_SELECT_LITE).not.toMatch(/fema_data/);
+    expect(LOAN_SELECT_LITE).not.toMatch(/flood_zone_data/);
+    expect(LOAN_SELECT_LITE).not.toMatch(/encompass_loan_guid/);
+    expect(LOAN_SELECT_FULL).toMatch(/fema_data/);
+    expect(LOAN_SELECT_FULL).toMatch(/flood_zone_data/);
+    expect(LOAN_SELECT_FULL).toMatch(/encompass_loan_guid/);
   });
 });

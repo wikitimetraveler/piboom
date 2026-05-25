@@ -107,6 +107,8 @@
     const et = (eventType || '').toLowerCase();
     const src = (source || '').toLowerCase();
     if (et === 'camera' || src === 'alertcalifornia') return disaster.camera;
+    if (src === 'faa_weathercam') return disaster.storm;
+    if (src === 'usgs_volcano') return disaster.fire;
     if (et.includes('fire') || et.includes('wildfire') || src === 'firms') return disaster.fire;
     if (et.includes('earthquake') || et.includes('quake') || src === 'usgs') return disaster.earthquake;
     if (et.includes('storm') || et.includes('hurricane') || et.includes('tornado') || et.includes('wind') || src === 'nws' || src === 'nhc') return disaster.storm;

@@ -78,15 +78,18 @@ export async function getAllLoans(req, res) {
         delete filters[key];
       }
     });
-    
-    const loans = await loanPipelineService.getAllLoans(filters);
+
+    const lite = req.query.lite === '1' || req.query.lite === 'true';
+
+    const loans = await loanPipelineService.getAllLoans(filters, { lite });
     
     res.json({
       success: true,
       data: {
         loans,
         count: loans.length,
-        filters
+        filters,
+        lite
       }
     });
   } catch (error) {

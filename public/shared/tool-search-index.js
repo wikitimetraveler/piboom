@@ -41,6 +41,7 @@
     { name: 'Song Identifier', url: '/music/song-identifier.html', category: 'Music', keywords: 'Shazam identify' },
     { name: 'Spotify', url: '/music/spotify-dashboard.html', category: 'Music', keywords: 'spotify dashboard' },
     { name: 'Time Machine', url: '/music/music-time-machine.html', category: 'Music', keywords: 'history date' },
+    { name: 'Pilgrimage Atlas', url: '/music/music-pilgrimage-atlas.html', category: 'Music', keywords: 'grateful dead tour map journey venues pilgrimage' },
     { name: 'Grateful Dead Shows', url: '/music/my-grateful-dead-shows.html', category: 'Music', keywords: 'dead shows' },
     { name: 'Sample Detector', url: '/music/sample-detector.html', category: 'Music', keywords: 'sample cover' },
     { name: 'Music KML', url: '/music/kml-viewer.html', category: 'Music', keywords: 'map timeline geographic upload' },

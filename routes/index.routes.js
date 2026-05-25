@@ -25,6 +25,7 @@ import sampleDetectionRoutes from './sample-detection.routes.js';
 import encompassAssistantRoutes from './encompass-assistant.routes.js';
 import kmlRoutes from './kml.routes.js';
 import gratefulDeadTourRoutes from './grateful-dead-tour.routes.js';
+import musicPilgrimageRoutes from './music-pilgrimage.routes.js';
 import userShowAttendanceRoutes from './user-show-attendance.routes.js';
 import concertCollectionRoutes from './concert-collection.routes.js';
 import loanPipelineRoutes from './loan-pipeline.routes.js';
@@ -69,6 +70,7 @@ export default function buildRoutes(io) {
   api.use('/encompass', encompassAssistantRoutes);
   api.use('/kml', kmlRoutes);
   api.use('/grateful-dead', gratefulDeadTourRoutes);
+  api.use('/music-pilgrimage', musicPilgrimageRoutes);
   api.use('/user-attendance', userShowAttendanceRoutes);
   api.use('/concert-collection', concertCollectionRoutes);
   api.use('/loan-pipeline', loanPipelineRoutes);

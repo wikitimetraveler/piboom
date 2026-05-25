@@ -20,8 +20,11 @@ import {
   getHazardWebcamById,
   getHazardWebcamStats,
   resolveUsgsNimsLatestImage,
+  resolveUsgsVolcanoLatestImage,
+  resolveFaaWeatherCamLatestImage,
 } from '../services/hazard-webcam-ingest.service.js';
 import { geocodeCountyStateWithCache } from '../services/geocoding-cache.service.js';
+import { geocodeAddressFree } from '../services/free-geocoding.service.js';
 import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
 
 // Ensure schema on startup (best-effort)
@@ -267,6 +270,24 @@ export async function cameraSnapshot(req, res) {
       }
     }
 
+    if (row.source === 'usgs_volcano') {
+      try {
+        const latest = await resolveUsgsVolcanoLatestImage(row);
+        if (latest) imageUrl = latest;
+      } catch (e) {
+        console.warn('USGS volcano snapshot failed:', e.message);
+      }
+    }
+
+    if (row.source === 'faa_weathercam') {
+      try {
+        const latest = await resolveFaaWeatherCamLatestImage(row);
+        if (latest) imageUrl = latest;
+      } catch (e) {
+        console.warn('FAA WeatherCam snapshot failed:', e.message);
+      }
+    }
+
     if (!imageUrl && row.media_type === 'still_image') {
       return res.status(404).json({ success: false, error: 'No snapshot available for this camera' });
     }
@@ -431,6 +452,31 @@ export async function exportCsv(req, res) {
   }
 }
 
+export async function geocodeAddress(req, res) {
+  try {
+    const q = String(req.query.q || '').trim();
+    if (!q) {
+      return res.status(400).json({ success: false, error: 'Query parameter q is required' });
+    }
+    const result = await geocodeAddressFree(q);
+    const lat = result?.latitude;
+    const lng = result?.longitude;
+    if (lat == null || lng == null || Number.isNaN(+lat) || Number.isNaN(+lng)) {
+      return res.status(404).json({ success: false, error: 'No coordinates found', query: q });
+    }
+    res.json({
+      success: true,
+      query: q,
+      latitude: +lat,
+      longitude: +lng,
+      label: result.display_name || q,
+    });
+  } catch (e) {
+    console.error('❌ Disaster geocode error:', e);
+    res.status(500).json({ success: false, error: 'Geocoding failed', details: e.message });
+  }
+}
+
 export default {
   listDisasters,
   refreshDisasters,
@@ -440,6 +486,7 @@ export default {
   cameraSnapshot,
   statsDisasters,
   exportCsv,
+  geocodeAddress,
 };
 
 

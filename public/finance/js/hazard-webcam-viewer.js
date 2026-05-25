@@ -1,5 +1,6 @@
 /**
  * Multi-source hazard webcam viewer (ALERTCalifornia, USGS, WebCOOS, UCSD).
+ * Still-image only in the modal — live feeds open via "Open source page".
  */
 (function () {
   'use strict';
@@ -30,7 +31,8 @@
     const map = {
       alertcalifornia: 'ALERTCalifornia',
       usgs_nims: 'USGS',
-      usgs_volcano: 'USGS Volcano',
+      usgs_volcano: 'USGS / AVO Volcano',
+      faa_weathercam: 'FAA WeatherCams',
       webcoos: 'NOAA WebCOOS',
       ucsd_hpwren: 'HPWREN / UCSD',
       ucsd_pier: 'Scripps COOL Lab',
@@ -38,13 +40,72 @@
     return map[source] || source || 'Webcam';
   }
 
-  async function resolveImageUrl(cameraData) {
-    if (cameraData.image_url) return cameraData.image_url;
-    const raw = parseRaw(cameraData);
-    const fromRaw = raw.image_url || raw.imageURL || raw.imageUrl;
-    if (fromRaw) return fromRaw;
+  function isDeadFaaLegacyUrl(url) {
+    return /avcams(?:plus)?\.faa\.gov/i.test(String(url || ''));
+  }
 
-    if (cameraData.id && (cameraData.media_type === 'still_image' || cameraData.source === 'usgs_nims')) {
+  function sanitizeExternalUrl(url) {
+    if (!url || isDeadFaaLegacyUrl(url)) return null;
+    return url;
+  }
+
+  function sanitizeImageUrl(url) {
+    if (!url || isDeadFaaLegacyUrl(url)) return null;
+    return url;
+  }
+
+  function bustCache(url) {
+    return url + (url.includes('?') ? '&' : '?') + 't=' + Date.now();
+  }
+
+  function showStillImage(cameraImg, cameraError, imageUrl, cameraData, feedUrl) {
+    if (!imageUrl || !cameraImg) {
+      if (cameraError) {
+        cameraError.innerHTML = feedUrl
+          ? '<i class="bi-exclamation-triangle" style="font-size: 2rem;"></i>'
+            + '<p class="mt-2 mb-0">No snapshot available — use <strong>Open source page</strong> for the live feed.</p>'
+          : '<i class="bi-exclamation-triangle" style="font-size: 2rem;"></i>'
+            + '<p class="mt-2 mb-0">No snapshot available — try Refresh image or Open source page.</p>';
+        cameraError.style.display = 'block';
+      }
+      if (cameraImg) cameraImg.style.display = 'none';
+      return;
+    }
+
+    if (cameraError) cameraError.style.display = 'none';
+    cameraImg.onerror = async () => {
+      const fresh = await resolveImageUrl(cameraData);
+      if (fresh && fresh !== cameraImg.src) {
+        cameraImg.src = bustCache(fresh);
+      } else if (cameraError) {
+        cameraError.innerHTML = '<i class="bi-exclamation-triangle" style="font-size: 2rem;"></i>'
+          + '<p class="mt-2 mb-0">Unable to load snapshot — use Open source page.</p>';
+        cameraError.style.display = 'block';
+      }
+    };
+    cameraImg.src = bustCache(imageUrl);
+    cameraImg.style.display = 'block';
+
+    const intervalMs = (cameraData.refresh_minutes || 10) * 60 * 1000;
+    window.cameraRefreshInterval = setInterval(async () => {
+      const fresh = await resolveImageUrl(cameraData);
+      const next = fresh || imageUrl;
+      cameraImg.src = bustCache(next);
+    }, Math.min(intervalMs, 60000));
+  }
+
+  async function resolveImageUrl(cameraData) {
+    const raw = parseRaw(cameraData);
+    const fromStored = sanitizeImageUrl(
+      cameraData.image_url
+      || raw.newestImage?.imageUrl
+      || raw.image_url
+      || raw.imageURL
+      || raw.imageUrl
+    );
+    if (fromStored) return fromStored;
+
+    if (cameraData.id) {
       try {
         const res = await fetch(`/api/disasters/cameras/${cameraData.id}/snapshot`);
         const json = await res.json();
@@ -62,21 +123,22 @@
 
     activeCameraId = cameraData.id || null;
     const raw = parseRaw(cameraData);
-    const cameraUrl =
+    const cameraUrl = sanitizeExternalUrl(
       cameraData.camera_url ||
       raw.camera_url ||
       raw.cameraURL ||
       raw.cameraUrl ||
-      null;
-    const networkUrl =
+      null
+    );
+    const networkUrl = sanitizeExternalUrl(
       cameraData.network_url ||
       raw.network_url ||
       raw.networkURL ||
       raw.networkUrl ||
-      null;
+      null
+    );
     const cameraName = cameraData.title || cameraData.name || raw.name || 'Hazard Webcam';
     const siteId = raw.site_id || raw.siteId || raw.SITE_ID || cameraData.source_id || null;
-    const mediaType = cameraData.media_type || raw.media_type || null;
     const attribution = raw.attribution || sourceLabel(cameraData.source);
 
     const titleEl = document.getElementById('cameraViewerTitle');
@@ -84,7 +146,6 @@
     const siteEl = document.getElementById('cameraViewerSiteId');
     const attrEl = document.getElementById('cameraViewerAttribution');
     const linkEl = document.getElementById('cameraViewerLink');
-    const cameraFrame = document.getElementById('cameraFeedFrame');
     const cameraImg = document.getElementById('cameraFeedImg');
     const cameraError = document.getElementById('cameraFeedError');
 
@@ -101,6 +162,10 @@
 
     const imageUrl = await resolveImageUrl(cameraData);
     let feedUrl = cameraUrl || networkUrl;
+    if (!feedUrl && cameraData.source === 'faa_weathercam') {
+      const faaSiteId = raw.siteId || String(cameraData.source_id || '').split(':')[0];
+      if (faaSiteId) feedUrl = `https://weathercams.faa.gov/site/${faaSiteId}`;
+    }
     if (!feedUrl && siteId && cameraData.source === 'alertcalifornia') {
       feedUrl = `https://cameras.alertcalifornia.org/?id=${siteId}`;
     }
@@ -121,32 +186,7 @@
       window.cameraRefreshInterval = null;
     }
 
-    const useStill =
-      mediaType === 'still_image' ||
-      (!feedUrl && imageUrl) ||
-      cameraData.source === 'usgs_nims' ||
-      cameraData.source === 'usgs_volcano';
-
-    if (useStill && imageUrl && cameraImg) {
-      if (cameraFrame) cameraFrame.style.display = 'none';
-      const bust = () => imageUrl + (imageUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-      cameraImg.src = bust();
-      cameraImg.style.display = 'block';
-      const intervalMs = (cameraData.refresh_minutes || 10) * 60 * 1000;
-      window.cameraRefreshInterval = setInterval(async () => {
-        const fresh = await resolveImageUrl(cameraData);
-        cameraImg.src = (fresh || imageUrl) + ((fresh || imageUrl).includes('?') ? '&' : '?') + 't=' + Date.now();
-      }, Math.min(intervalMs, 60000));
-    } else if (feedUrl && cameraFrame) {
-      cameraFrame.src = feedUrl;
-      cameraFrame.style.display = 'block';
-      if (cameraImg) cameraImg.style.display = 'none';
-    } else if (cameraError) {
-      cameraError.textContent = 'No camera feed URL found for this mount';
-      cameraError.style.display = 'block';
-      if (cameraFrame) cameraFrame.style.display = 'none';
-      if (cameraImg) cameraImg.style.display = 'none';
-    }
+    showStillImage(cameraImg, cameraError, imageUrl, cameraData, feedUrl);
 
     const modalEl = document.getElementById('cameraViewerModal');
     if (modalEl && window.bootstrap) {
@@ -163,22 +203,27 @@
         clearInterval(window.cameraRefreshInterval);
         window.cameraRefreshInterval = null;
       }
-      const frame = document.getElementById('cameraFeedFrame');
-      if (frame) frame.src = '';
+      const img = document.getElementById('cameraFeedImg');
+      if (img) {
+        img.src = '';
+        img.style.display = 'none';
+      }
     });
 
     const refreshBtn = document.getElementById('refreshFeedImgBtn');
     if (refreshBtn) {
       refreshBtn.addEventListener('click', async function () {
-        const img = document.getElementById('cameraFeedImg');
         const key = Object.keys(window.cameraDataStore || {}).find(
           (k) => window.cameraDataStore[k]?.id === activeCameraId
         );
         const cam = key ? window.cameraDataStore[key] : null;
         if (cam && typeof window.showCameraViewer === 'function') {
           await window.showCameraViewer(cam);
-        } else if (img && img.src) {
-          img.src = img.src.replace(/([?&])t=\d+/, '') + (img.src.includes('?') ? '&' : '?') + 't=' + Date.now();
+        } else {
+          const img = document.getElementById('cameraFeedImg');
+          if (img && img.src) {
+            img.src = img.src.replace(/([?&])t=\d+/, '') + (img.src.includes('?') ? '&' : '?') + 't=' + Date.now();
+          }
         }
       });
     }

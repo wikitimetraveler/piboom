@@ -50,6 +50,9 @@ router.post('/refresh', requireDisasterRefreshAccess, disastersController.refres
 // Manual camera feed refresh (for review purposes)
 router.post('/refresh-cameras', requireDisasterRefreshAccess, disastersController.refreshCameras);
 
+// Forward geocode for hazard webcam address search fallback
+router.get('/geocode-address', disastersController.geocodeAddress);
+
 // List camera records (fixed hazard webcams)
 router.get('/cameras/stats', disastersController.cameraStats);
 router.get('/cameras/:id/snapshot', disastersController.cameraSnapshot);

@@ -4,6 +4,7 @@
 import express from 'express';
 import {
   getShows,
+  getShowsByDate,
   getShowById,
   importData,
   generateKML,
@@ -16,6 +17,9 @@ const router = express.Router();
 
 // GET /api/grateful-dead/shows - List all shows (paginated)
 router.get('/shows', getShows);
+
+// GET /api/grateful-dead/shows/by-date?year=&month=&day=
+router.get('/shows/by-date', getShowsByDate);
 
 // GET /api/grateful-dead/shows/:id - Get single show details
 router.get('/shows/:id', getShowById);

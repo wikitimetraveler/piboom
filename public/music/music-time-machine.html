@@ -404,6 +404,14 @@ document.getElementById('timeMachineDate').max = new Date().toISOString().split(
 // Set default date to a fun historical date (e.g., Woodstock - August 15, 1969)
 document.getElementById('timeMachineDate').value = '1969-08-15';
 
+// Deep link: /music/music-time-machine.html?date=YYYY-MM-DD
+(function applyDateFromQuery() {
+  const dateParam = new URLSearchParams(window.location.search).get('date');
+  if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) {
+    document.getElementById('timeMachineDate').value = dateParam;
+  }
+})();
+
 // Show empty state initially
 document.getElementById('emptyState').style.display = 'block';
 
@@ -459,15 +467,24 @@ async function loadHistoryForDate(date) {
     const day = date.getDate();
     const year = date.getFullYear();
 
-    // Fetch data from our backend
-    const response = await fetch(`/api/music-history?month=${month}&day=${day}&year=${year}`);
-    const data = await response.json();
+    // Fetch data from our backend (history + Grateful Dead shows in parallel)
+    const [historyResponse, deadResponse] = await Promise.all([
+      fetch(`/api/music-history?month=${month}&day=${day}&year=${year}`),
+      fetch(`/api/grateful-dead/shows/by-date?month=${month}&day=${day}&year=${year}`)
+    ]);
+    const data = await historyResponse.json();
+    let deadShows = [];
+    try {
+      const deadJson = await deadResponse.json();
+      if (deadJson.success) deadShows = deadJson.shows || [];
+    } catch (_) {}
     
     // Debug logging
     console.log('📊 Received data:', data);
     console.log('Albums:', data.albums?.length || 0);
     console.log('Videos:', data.videos?.length || 0);
     console.log('MapData:', data.mapData?.length || 0);
+    console.log('Dead shows:', deadShows.length);
 
     // Display the date
     document.getElementById('currentDateDisplay').textContent = dateStr;
@@ -479,7 +496,7 @@ async function loadHistoryForDate(date) {
     document.getElementById('emptyState').style.display = 'none';
 
     // Display the history
-    displayHistory(data);
+    displayHistory(data, deadShows);
 
   } catch (error) {
     console.error('Error loading history:', error);
@@ -494,9 +511,76 @@ async function loadHistoryForDate(date) {
 }
 
 // Display history data
-function displayHistory(data) {
+function parseDeadSetlistPreview(setlistRaw) {
+  try {
+    const sets = typeof setlistRaw === 'string' ? JSON.parse(setlistRaw) : setlistRaw;
+    if (!Array.isArray(sets)) return '';
+    const songs = [];
+    for (const set of sets) {
+      if (set.song && Array.isArray(set.song)) {
+        for (const song of set.song) {
+          if (song.name) songs.push(song.name);
+        }
+      }
+    }
+    return songs.slice(0, 8).join(' · ');
+  } catch (_) {
+    return '';
+  }
+}
+
+function createWikiEventsCard(events) {
+  return createHistoryCard(
+    'Music history notes',
+    'bi-book',
+    events.map((event) => ({
+      title: event.title || `${event.year || ''} music event`,
+      details: event.description || ''
+    }))
+  );
+}
+
+function createDeadShowCard(shows) {
+  const card = document.createElement('div');
+  card.className = 'history-card';
+  card.style.gridColumn = '1 / -1';
+
+  const itemsHtml = shows.map((show) => {
+    const preview = parseDeadSetlistPreview(show.setlist);
+    const location = [show.city, show.state].filter(Boolean).join(', ');
+    return `
+      <div class="history-item">
+        <div class="history-item-title">${show.venue_name || 'Grateful Dead show'}</div>
+        <div class="history-item-details">${location}${preview ? `<br><span style="opacity:0.85">${preview}</span>` : ''}</div>
+      </div>
+    `;
+  }).join('');
+
+  card.innerHTML = `
+    <div class="history-card-header">
+      <i class="bi bi-calendar-event history-card-icon"></i>
+      <div class="history-card-title">Grateful Dead on this date</div>
+    </div>
+    ${itemsHtml}
+    <div style="margin-top: 12px;">
+      <a href="/music/my-grateful-dead-shows.html" class="btn btn-sm btn-outline-light">Browse my Dead shows</a>
+      <a href="/music/music-pilgrimage-atlas.html" class="btn btn-sm btn-outline-light ms-2">Pilgrimage Atlas</a>
+    </div>
+  `;
+  return card;
+}
+
+function displayHistory(data, deadShows) {
   const grid = document.getElementById('historyGrid');
   grid.innerHTML = '';
+
+  if (deadShows && deadShows.length > 0) {
+    grid.appendChild(createDeadShowCard(deadShows));
+  }
+
+  if (data.events && data.events.length > 0) {
+    grid.appendChild(createWikiEventsCard(data.events));
+  }
 
   // Albums Released
   if (data.albums && data.albums.length > 0) {

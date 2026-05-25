@@ -59,6 +59,53 @@ export async function getShows(req, res) {
 }
 
 /**
+ * Get Grateful Dead shows on a specific calendar date (YYYY-MM-DD).
+ */
+export async function getShowsByDate(req, res) {
+  try {
+    const year = parseInt(req.query.year, 10);
+    const month = parseInt(req.query.month, 10);
+    const day = parseInt(req.query.day, 10);
+
+    if (!year || !month || !day) {
+      return res.status(400).json({
+        success: false,
+        error: 'year, month, and day query parameters are required'
+      });
+    }
+
+    const pool = getPool();
+    if (!pool) {
+      return res.status(500).json({
+        success: false,
+        error: 'Database not available'
+      });
+    }
+
+    const monthStr = String(month).padStart(2, '0');
+    const dayStr = String(day).padStart(2, '0');
+    const dateKey = `${year}-${monthStr}-${dayStr}`;
+
+    const result = await pool.query(
+      `SELECT * FROM grateful_dead_shows WHERE show_date = $1 ORDER BY venue_name ASC`,
+      [dateKey]
+    );
+
+    res.json({
+      success: true,
+      date: dateKey,
+      shows: result.rows
+    });
+  } catch (error) {
+    console.error('Error getting shows by date:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+}
+
+/**
  * Get single show by ID
  */
 export async function getShowById(req, res) {

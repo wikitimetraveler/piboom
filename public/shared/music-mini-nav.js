@@ -13,6 +13,7 @@
     { href: '/music/song-identifier.html', label: 'Song ID', icon: 'bi-music-note-beamed', title: 'Identify songs' },
     { href: '/music/spotify-dashboard.html', label: 'Spotify', icon: 'bi-spotify', title: 'Spotify dashboard' },
     { href: '/music/music-time-machine.html', label: 'Time Machine', icon: 'bi-clock-history', title: 'Music time machine' },
+    { href: '/music/music-pilgrimage-atlas.html', label: 'Pilgrimage Atlas', icon: 'bi-compass', title: 'Grateful Dead map journey' },
     { href: '/music/kml-viewer.html', label: 'KML Timeline', icon: 'bi-globe2', title: 'KML map timeline' },
     { href: '/music/musical-google-earth-files.html', label: 'Google Earth KML', icon: 'bi-cloud-arrow-down', title: 'KML for Google Earth Pro' },
     { href: '/music/my-grateful-dead-shows.html', label: 'Dead Shows', icon: 'bi-calendar-event', title: 'Grateful Dead shows' },

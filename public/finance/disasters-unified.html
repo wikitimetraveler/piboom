@@ -936,6 +936,7 @@
     <script src="/finance/js/disaster-loan-filters.js"></script>
     <script src="/finance/js/disaster-camera-filters.js"></script>
     <script src="/finance/js/hazard-webcam-viewer.js"></script>
+    <script type="module" src="/shared/disaster-kml-export.js"></script>
     <script>
       let disastersGridApi = null;
       let map, markers = [], loanMarkers = [];
@@ -2198,13 +2199,39 @@
         const camLine = lastNearbyCameras.length
           ? `${lastNearbyCameras.length} fire camera(s) nearby`
           : 'No nearby cameras in range';
+        const canKml = window.DisasterKmlExport?.canExportCinematicKml?.({
+          disaster: selectedDisasterObj,
+          loans: lastAffectedLoans,
+          cameras: lastNearbyCameras,
+        });
+        const kmlBtn = canKml
+          ? ` · <button type="button" class="btn btn-sm btn-warning py-0 px-2 align-baseline" id="duExportCinematicKmlBtn" onclick="exportCinematicDisasterKml()" title="Google Earth tour with loans, webcams, and disaster mood audio"><i class="bi bi-globe-americas"></i> Export Google Earth KML</button>`
+          : '';
         el.innerHTML = `<strong>${title}</strong> · ${county}${county && state ? ', ' : ''}${state}
           · ${loanLine} · ${camLine}
-          · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>
+          · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>${kmlBtn}
           · <a href="disasters-webcams.html" class="alert-link">Hazard webcams</a>
           · <a href="pipeline-risk-dashboard.html" class="alert-link">FEMA pipeline risk</a>`;
         el.style.display = 'block';
       }
+
+      function exportCinematicDisasterKml() {
+        if (!window.DisasterKmlExport?.exportCinematicKmlFromPageState) {
+          setDashboardStatus('KML export is still loading — try again in a moment.', 'warning');
+          return;
+        }
+        const result = window.DisasterKmlExport.exportCinematicKmlFromPageState({
+          selectedDisaster: selectedDisasterObj,
+          lastAffectedLoans,
+          lastNearbyCameras,
+          lastLoanFilterMeta,
+        });
+        setDashboardStatus(
+          result.message || (result.success ? 'KML downloaded.' : 'Could not export KML.'),
+          result.success ? 'success' : 'warning'
+        );
+      }
+      window.exportCinematicDisasterKml = exportCinematicDisasterKml;
 
       function refreshAIOnSelection() {
         updateSelectionContextStrip();
@@ -2412,17 +2439,10 @@
               <p class="mb-0"><strong>Site ID:</strong> <span id="cameraViewerSiteId"></span></p>
             </div>
             <div class="camera-feed-container" style="position: relative; width: 100%; padding-bottom: 56.25%; background: #000; border-radius: 8px; overflow: hidden;">
-              <iframe 
-                id="cameraFeedFrame" 
-                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
-                allowfullscreen
-                loading="lazy">
-              </iframe>
               <img 
                 id="cameraFeedImg" 
                 style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; display: none;"
-                alt="Camera Feed"
-                onerror="this.style.display='none'; document.getElementById('cameraFeedError').style.display='block';">
+                alt="Camera still">
               <div id="cameraFeedError" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #fff; text-align: center; display: none;">
                 <i class="bi-exclamation-triangle" style="font-size: 2rem;"></i>
                 <p class="mt-2">Unable to load camera feed</p>

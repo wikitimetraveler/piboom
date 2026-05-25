@@ -15,12 +15,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const NIMS_BASE = 'https://api.waterdata.usgs.gov/nims/v0';
 const USGS_VOLCANO_GEOJSON =
   'https://volcview.wr.usgs.gov/ashcam-api/webcamApi/geojson?lat1=90&lat2=-90&long1=-180&long2=180';
+const AVO_VOLCANO_GEOJSON =
+  'https://avo-volcview.wr.usgs.gov/ashcam-api/webcamApi/geojson?lat1=90&lat2=-90&long1=-180&long2=180';
+export const FAA_SITES_URL = 'https://weathercams.faa.gov/api/sites';
+export const FAA_SUMMARY_URL = 'https://weathercams.faa.gov/api/summary';
 const WEBCOOS_ASSETS = 'https://app.webcoos.org/webcoos/api/v1/assets/';
 
 export const HAZARD_WEBCAM_SOURCES = [
   'alertcalifornia',
   'usgs_nims',
   'usgs_volcano',
+  'faa_weathercam',
   'webcoos',
   'ucsd_hpwren',
   'ucsd_pier',
@@ -29,6 +34,12 @@ export const HAZARD_WEBCAM_SOURCES = [
 const FETCH_HEADERS = {
   Accept: 'application/json',
   'User-Agent': 'DevConnectLabs-DisasterService/1.0',
+};
+
+const FAA_HEADERS = {
+  Accept: '*/*',
+  'User-Agent': 'DevConnectLabs-DisasterService/1.0',
+  Referer: 'https://weathercams.faa.gov/',
 };
 
 function nimsApiKey() {
@@ -52,6 +63,40 @@ function inferStateFromCoords(lat, lng) {
   if (lat == null || lng == null) return null;
   if (lat >= 24 && lat <= 50 && lng >= -125 && lng <= -66) return null;
   return null;
+}
+
+function inferAlaskaStateFromCoords(lat, lng) {
+  if (lat == null || lng == null) return null;
+  if (lat >= 51 && lat <= 72 && lng >= -180 && lng <= -129) return 'AK';
+  return null;
+}
+
+function isDeadFaaLegacyUrl(url) {
+  return /avcams(?:plus)?\.faa\.gov/i.test(String(url || ''));
+}
+
+function resolveVolcanoImageUrl(props) {
+  return props?.newestImage?.imageUrl
+    || props?.imageUrl
+    || props?.latestImageUrl
+    || null;
+}
+
+function resolveVolcanoPageUrl(props, feed, code) {
+  const external = props?.externalUrl;
+  if (external && !isDeadFaaLegacyUrl(external)) {
+    return external;
+  }
+  if (feed === 'avo') {
+    return code ? `https://avo.alaska.edu/webcam/` : 'https://avo.alaska.edu/webcam/';
+  }
+  return 'https://volcview.wr.usgs.gov/';
+}
+
+function volcanoAshcamImageApiBase(feed) {
+  return feed === 'avo'
+    ? 'https://avo-volcview.wr.usgs.gov/ashcam-api/imageApi'
+    : 'https://volcview.wr.usgs.gov/ashcam-api/imageApi';
 }
 
 function inferHazardTypesFromText(text) {
@@ -118,10 +163,11 @@ export function normalizeUsgsNimsCamera(cam) {
 }
 
 /** @param {object} feature GeoJSON feature */
-export function normalizeUsgsVolcanoFeature(feature) {
+export function normalizeUsgsVolcanoFeature(feature, opts = {}) {
   if (!feature) return null;
   const props = feature.properties || feature;
   const geom = feature.geometry || {};
+  const feed = opts.feed === 'avo' ? 'avo' : 'usgs';
   let lat = null;
   let lng = null;
   if (geom.type === 'Point' && Array.isArray(geom.coordinates)) {
@@ -135,22 +181,126 @@ export function normalizeUsgsVolcanoFeature(feature) {
   const code = props.webcamCode || props.code || props.id;
   if (!code) return null;
 
+  const volcanoName = props.volcanoName || props.volcano_name || props.volcano || props.vName || null;
+  const cameraName = props.webcamName || props.name || `Volcano cam ${code}`;
+  const displayName = volcanoName ? `${volcanoName} — ${cameraName}` : cameraName;
+  const image_url = resolveVolcanoImageUrl(props);
+
   return {
     source: 'usgs_volcano',
     source_id: String(code),
-    name: props.webcamName || props.name || `Volcano cam ${code}`,
+    name: displayName,
     lat,
     lng,
-    state_abbr: props.state || null,
-    camera_url: props.externalUrl || `https://volcview.wr.usgs.gov/`,
-    image_url: props.imageUrl || props.latestImageUrl || null,
+    state_abbr: props.state || inferAlaskaStateFromCoords(lat, lng),
+    camera_url: resolveVolcanoPageUrl(props, feed, code),
+    image_url,
     status: 'active',
     hazard_types: ['volcano', 'hazard'],
     media_type: 'still_image',
     refresh_minutes: 15,
     raw: {
       ...props,
-      attribution: 'USGS Volcano Hazards Program',
+      feed,
+      webcamCode: code,
+      volcanoName,
+      vnum: props.vnum || props.volcanoNumber || props.volcano_number || null,
+      attribution: feed === 'avo'
+        ? 'Alaska Volcano Observatory (AVO) / USGS Ashcam'
+        : 'USGS Volcano Hazards Program',
+    },
+  };
+}
+
+/** Latest still from USGS/AVO Ashcam image API (on-demand snapshot). */
+export async function resolveUsgsVolcanoLatestImage(row) {
+  const raw = row?.raw && typeof row.raw === 'object' ? row.raw : {};
+  const code = raw.webcamCode || row.source_id;
+  if (!code) return null;
+  const feed = raw.feed === 'avo' ? 'avo' : 'usgs';
+  const base = volcanoAshcamImageApiBase(feed);
+  const data = await fetchJson(`${base}/webcam/${encodeURIComponent(code)}/1/newestFirst/1`);
+  const images = data?.images || data?.payload?.images || [];
+  const first = images[0];
+  return first?.imageUrl || first?.image_url || null;
+}
+
+/** Refresh FAA still from summary API (on-demand snapshot). */
+export async function resolveFaaWeatherCamLatestImage(row) {
+  const raw = row?.raw && typeof row.raw === 'object' ? row.raw : {};
+  const siteId = raw.siteId ?? String(row.source_id || '').split(':')[0];
+  if (!siteId) return null;
+  const direction = raw.direction ?? String(row.source_id || '').split(':')[1];
+  const summary = await fetchJson(
+    `${FAA_SUMMARY_URL}?siteId=${encodeURIComponent(siteId)}&related=true`,
+    { headers: FAA_HEADERS }
+  );
+  const cameras = summary?.payload?.site?.cameras || [];
+  for (const cam of cameras) {
+    const camDir = cam?.cameraDirection ?? cam?.direction;
+    if (direction && camDir && String(camDir) !== String(direction)) continue;
+    const images = cam?.currentImages || cam?.images || [];
+    const imageUri = images[0]?.imageUri ?? cam?.imageUri;
+    if (imageUri) return imageUri;
+  }
+  return null;
+}
+
+/** Prefer richer duplicate volcano webcam rows (image URL, AVO feed). */
+export function pickBetterVolcanoRow(a, b) {
+  const score = (row) => {
+    let s = 0;
+    if (row?.image_url) s += 2;
+    if (row?.raw?.feed === 'avo') s += 1;
+    if (row?.raw?.volcanoName) s += 0.5;
+    return s;
+  };
+  return score(b) > score(a) ? b : a;
+}
+
+/** Dedupe usgs_volcano mounts by source_id. */
+export function mergeVolcanoWebcamRows(rows) {
+  const byId = new Map();
+  for (const row of rows) {
+    if (!row?.source_id) continue;
+    const existing = byId.get(row.source_id);
+    byId.set(row.source_id, existing ? pickBetterVolcanoRow(existing, row) : row);
+  }
+  return Array.from(byId.values());
+}
+
+/** @param {object} site FAA site record */
+export function normalizeFaaWeatherCam(site, camera, image) {
+  const siteId = site?.siteId ?? site?.id;
+  const direction = camera?.cameraDirection ?? camera?.direction ?? 'UNK';
+  const lat = toNum(site?.latitude ?? site?.lat);
+  const lng = toNum(site?.longitude ?? site?.lng ?? site?.lon);
+  if (siteId == null || lat == null || lng == null) return null;
+
+  const imageUri = image?.imageUri ?? image?.image_url ?? image?.url;
+  if (!imageUri) return null;
+
+  const siteName = site?.siteName ?? site?.name ?? `FAA site ${siteId}`;
+  return {
+    source: 'faa_weathercam',
+    source_id: `${siteId}:${direction}`,
+    name: `${siteName} — ${direction} view`,
+    lat,
+    lng,
+    state_abbr: site?.state ?? site?.stateCode ?? null,
+    county_name: site?.county ?? null,
+    camera_url: `https://weathercams.faa.gov/site/${siteId}`,
+    network_url: 'https://weathercams.faa.gov/',
+    image_url: imageUri,
+    status: 'active',
+    hazard_types: ['aviation', 'weather', 'hazard'],
+    media_type: 'still_image',
+    refresh_minutes: 10,
+    raw: {
+      siteId,
+      direction,
+      imageTimestamp: image?.imageTimestamp ?? image?.timestamp ?? null,
+      attribution: site?.attribution || 'FAA Aviation Weather Camera Program',
     },
   };
 }
@@ -246,6 +396,126 @@ async function fetchJson(url, options = {}) {
   return res.json();
 }
 
+async function mapPoolLimit(items, limit, fn) {
+  const results = [];
+  let index = 0;
+  async function worker() {
+    while (index < items.length) {
+      const i = index++;
+      try {
+        const value = await fn(items[i], i);
+        if (Array.isArray(value)) results.push(...value);
+        else if (value) results.push(value);
+      } catch (e) {
+        console.warn('Pool task failed:', e.message);
+      }
+    }
+  }
+  const workers = Math.min(Math.max(1, limit), items.length || 1);
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+  return results;
+}
+
+function parseFaaSitesPayload(data) {
+  if (Array.isArray(data?.payload)) return data.payload;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.payload?.sites)) return data.payload.sites;
+  return [];
+}
+
+export async function ingestUsgsVolcanoWebcams() {
+  await initFireCamerasSchema();
+  const [globalResult, avoResult] = await Promise.allSettled([
+    fetchJson(USGS_VOLCANO_GEOJSON),
+    fetchJson(AVO_VOLCANO_GEOJSON),
+  ]);
+
+  const tagged = [];
+  if (globalResult.status === 'fulfilled') {
+    const features = globalResult.value.features || [];
+    for (const feature of features) tagged.push({ feature, feed: 'usgs' });
+  } else {
+    console.warn('⚠️  USGS volcano GeoJSON failed:', globalResult.reason?.message);
+  }
+  if (avoResult.status === 'fulfilled') {
+    const features = avoResult.value.features || [];
+    for (const feature of features) tagged.push({ feature, feed: 'avo' });
+  } else {
+    console.warn('⚠️  AVO volcano GeoJSON failed:', avoResult.reason?.message);
+  }
+
+  if (!tagged.length) {
+    throw new Error('No volcano webcam feeds available');
+  }
+
+  const rows = tagged
+    .map(({ feature, feed }) => normalizeUsgsVolcanoFeature(feature, { feed }))
+    .filter(Boolean);
+  const batch = mergeVolcanoWebcamRows(rows);
+  const result = await upsertHazardWebcams(batch);
+  return {
+    upserted: result.upserted || 0,
+    fetched: tagged.length,
+    normalized: batch.length,
+    dedupedFrom: rows.length,
+  };
+}
+
+export async function ingestFaaWeatherCams() {
+  await initFireCamerasSchema();
+  const data = await fetchJson(FAA_SITES_URL, { headers: FAA_HEADERS });
+  const sites = parseFaaSitesPayload(data);
+  let sitesProcessed = 0;
+
+  const batch = await mapPoolLimit(sites, 8, async (site) => {
+    const siteId = site?.siteId ?? site?.id;
+    const lat = toNum(site?.latitude ?? site?.lat);
+    const lng = toNum(site?.longitude ?? site?.lng ?? site?.lon);
+    if (siteId == null || lat == null || lng == null) return [];
+
+    const summary = await fetchJson(
+      `${FAA_SUMMARY_URL}?siteId=${encodeURIComponent(siteId)}&related=true`,
+      { headers: FAA_HEADERS }
+    );
+    sitesProcessed += 1;
+    if (sitesProcessed % 50 === 0) {
+      console.log(`📹 FAA WeatherCams: ${sitesProcessed}/${sites.length} sites`);
+    }
+
+    const sitePayload = summary?.payload?.site ?? summary?.site ?? {};
+    const mergedSite = {
+      ...site,
+      siteId,
+      siteName: sitePayload.siteName ?? site.siteName ?? site.name,
+      latitude: lat,
+      longitude: lng,
+    };
+    const cameras = sitePayload.cameras || [];
+    const rows = [];
+    for (const cam of cameras) {
+      const images = cam.currentImages || cam.images || [];
+      if (images.length) {
+        for (const img of images) {
+          const row = normalizeFaaWeatherCam(mergedSite, cam, img);
+          if (row) rows.push(row);
+        }
+      } else if (cam.imageUri) {
+        const row = normalizeFaaWeatherCam(mergedSite, cam, { imageUri: cam.imageUri });
+        if (row) rows.push(row);
+      }
+    }
+    return rows;
+  });
+
+  const result = await upsertHazardWebcams(batch);
+  return {
+    upserted: result.upserted || 0,
+    fetched: sites.length,
+    normalized: batch.length,
+    sitesProcessed,
+  };
+}
+
 export async function ingestUsgsNimsWebcams() {
   await initFireCamerasSchema();
   const url = appendApiKey(`${NIMS_BASE}/cameras`);
@@ -254,15 +524,6 @@ export async function ingestUsgsNimsWebcams() {
   const batch = list.map(normalizeUsgsNimsCamera).filter(Boolean);
   const result = await upsertHazardWebcams(batch);
   return { upserted: result.upserted || 0, fetched: list.length, normalized: batch.length };
-}
-
-export async function ingestUsgsVolcanoWebcams() {
-  await initFireCamerasSchema();
-  const data = await fetchJson(USGS_VOLCANO_GEOJSON);
-  const features = data.features || (Array.isArray(data) ? data : []);
-  const batch = features.map(normalizeUsgsVolcanoFeature).filter(Boolean);
-  const result = await upsertHazardWebcams(batch);
-  return { upserted: result.upserted || 0, fetched: features.length, normalized: batch.length };
 }
 
 export async function ingestWebCoosWebcams() {
@@ -301,6 +562,7 @@ const INGEST_HANDLERS = {
   alertcalifornia: ingestCaFireCameras,
   usgs_nims: ingestUsgsNimsWebcams,
   usgs_volcano: ingestUsgsVolcanoWebcams,
+  faa_weathercam: ingestFaaWeatherCams,
   webcoos: ingestWebCoosWebcams,
   ucsd_hpwren: ingestUcsdWebcams,
   ucsd_pier: ingestUcsdWebcams,

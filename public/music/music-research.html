@@ -163,6 +163,16 @@
     color: var(--ice-primary);
     margin-top: 0.25rem;
   }
+
+  .timeline-album-cover {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 0.75rem;
+    float: left;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
   
   .timeline-marker {
     position: absolute;
@@ -2215,6 +2225,11 @@ function searchArtistByName(artistName) {
   document.getElementById('membersList').innerHTML = '';
   document.getElementById('videoGrid').innerHTML = '';
   document.getElementById('timeline').innerHTML = '';
+
+  currentTimelineArtist = artistName;
+  timelineMapEvents = [];
+  timelineAlbumEvents = [];
+  timelineArtistEvents = [];
   
   // Auto-expand YouTube section when videos are loaded
   setTimeout(() => {
@@ -2273,6 +2288,7 @@ function searchArtistByName(artistName) {
   searchBandMembers(artistName);
   searchYouTube(artistName);
   searchMapData(artistName);
+  searchDiscographyAlbums(artistName);
 }
 
 function showLoading(elementId, show) {
@@ -2399,6 +2415,73 @@ function searchBandMembers(artistName) {
   });
 }
 
+let timelineMapEvents = [];
+let timelineAlbumEvents = [];
+let timelineArtistEvents = [];
+let currentTimelineArtist = '';
+
+function albumToTimelineEvent(album) {
+  return {
+    date: album.releaseDate && album.releaseDate !== '9999-12-31' ? album.releaseDate : (album.year || 'Unknown'),
+    title: `Album: ${album.title}`,
+    description: album.type || 'Album release',
+    location: album.year || 'Unknown',
+    type: 'album',
+    sortDate: parseDate(album.releaseDate || album.year),
+    coverArt: album.coverArt,
+    artist: album.artist,
+    albumTitle: album.title
+  };
+}
+
+function mergeTimelineEvents(mapEvents, albumEvents, artistEvents) {
+  const events = [];
+  if (mapEvents && mapEvents.length) {
+    events.push(...mapEvents.map((event) => ({
+      ...event,
+      sortDate: event.sortDate || parseDate(event.date)
+    })));
+  } else if (artistEvents && artistEvents.length) {
+    events.push(...artistEvents);
+  }
+
+  const seen = new Set(events.map((event) => `${event.type}|${event.title}|${event.date}`));
+
+  (albumEvents || []).forEach((album) => {
+    const event = albumToTimelineEvent(album);
+    const key = `${event.type}|${event.title}|${event.date}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      events.push(event);
+    }
+  });
+
+  events.sort((a, b) => (a.sortDate || parseDate(a.date)) - (b.sortDate || parseDate(b.date)));
+  return events;
+}
+
+function refreshMergedTimeline() {
+  const merged = mergeTimelineEvents(timelineMapEvents, timelineAlbumEvents, timelineArtistEvents);
+  displayTimelineEvents(merged);
+}
+
+function searchDiscographyAlbums(artistName) {
+  fetch('/api/music-research/albums', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ artist: artistName })
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    if (currentTimelineArtist !== artistName) return;
+    timelineAlbumEvents = data.albums || [];
+    refreshMergedTimeline();
+  })
+  .catch((error) => {
+    console.error('Error loading discography albums:', error);
+  });
+}
+
 function searchMapData(artistName) {
   // Get map data for birth places
   fetch('/api/music-research/map-data', {
@@ -2413,19 +2496,16 @@ function searchMapData(artistName) {
     showLoading('timelineLoading', false);
     showLoading('mapLoading', false);
     if (data.mapData && data.mapData.length > 0) {
-      // Use enhanced timeline events from backend if available
-      if (data.timelineEvents && data.timelineEvents.length > 0) {
-        displayTimelineEvents(data.timelineEvents);
-      } else {
-        displayTimeline(data.mapData, artistName);
-      }
+      timelineMapEvents = data.timelineEvents || [];
+      refreshMergedTimeline();
       initMapWithData(data.mapData, artistName);
     } else {
-      // Show message but keep the map - don't destroy it
-      document.getElementById('timeline').innerHTML = 
-        '<div class="alert alert-info">No birth place data found for timeline. Map will remain visible.</div>';
-      // Don't clear the map - keep it as is
-      // The map will stay in its current state (either initial state or previous search)
+      timelineMapEvents = data.timelineEvents || [];
+      refreshMergedTimeline();
+      if (!timelineMapEvents.length && !timelineAlbumEvents.length && !timelineArtistEvents.length) {
+        document.getElementById('timeline').innerHTML =
+          '<div class="alert alert-info">No birth place data found for timeline. Map will remain visible.</div>';
+      }
     }
   })
   .catch(error => {
@@ -2568,9 +2648,9 @@ function createTimelineFromArtistData(data) {
   
   // Sort events chronologically
   events.sort((a, b) => a.sortDate - b.sortDate);
-  
-  // Display events
-  displayTimelineEvents(events);
+
+  timelineArtistEvents = events;
+  refreshMergedTimeline();
 }
 
 function displayTimeline(mapData, artistName) {
@@ -2597,6 +2677,27 @@ function displayTimeline(mapData, artistName) {
   displayTimelineEvents(events);
 }
 
+function openAlbumYouTube(artist, album) {
+  if (!artist || !album) return;
+  $('#youtubeVideos').collapse('show');
+  showLoading('youtubeLoading', true);
+  fetch('/api/music-research/youtube-album', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ artist, album })
+  })
+  .then((response) => response.json())
+  .then((data) => {
+    showLoading('youtubeLoading', false);
+    displayYouTubeVideos(data);
+    document.getElementById('videoGrid')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  })
+  .catch((error) => {
+    showLoading('youtubeLoading', false);
+    console.error('Album YouTube search failed:', error);
+  });
+}
+
 function displayTimelineEvents(events) {
   const timeline = document.getElementById('timeline');
   
@@ -2606,18 +2707,25 @@ function displayTimelineEvents(events) {
   }
   
   let html = '';
-  events.forEach(event => {
+  events.forEach((event, index) => {
     const hasCoordinates = event.coordinates && event.coordinates.lat && event.coordinates.lng;
-    const clickHandler = hasCoordinates ? 
-      `onclick="focusOnLocation(${event.coordinates.lat}, ${event.coordinates.lng}, '${event.location}')"` : 
+    const clickHandler = hasCoordinates ?
+      `onclick="focusOnLocation(${event.coordinates.lat}, ${event.coordinates.lng}, '${String(event.location || '').replace(/'/g, "\\'")}')"` :
+      (event.type === 'album' && event.artist && event.albumTitle ?
+        `onclick="openAlbumYouTube('${String(event.artist).replace(/'/g, "\\'")}', '${String(event.albumTitle).replace(/'/g, "\\'")}')"` :
+        '');
+    const cursor = hasCoordinates || event.type === 'album' ? 'pointer' : 'default';
+    const coverHtml = event.coverArt ?
+      `<img src="${event.coverArt}" alt="" class="timeline-album-cover" onerror="this.style.display='none'">` :
       '';
-    
+
     html += `
-      <div class="timeline-event ${event.type}" ${clickHandler} style="cursor: ${hasCoordinates ? 'pointer' : 'default'}">
+      <div class="timeline-event ${event.type}" ${clickHandler} style="cursor: ${cursor}">
         <div class="timeline-marker"></div>
+        ${coverHtml}
         <div class="timeline-date">${event.date}</div>
         <div class="timeline-title">${event.title}</div>
-        <div class="timeline-description">${event.description}</div>
+        <div class="timeline-description">${event.description}${event.type === 'album' ? ' · Click for YouTube' : ''}</div>
         <div class="timeline-location"><i class="bi-geo-alt"></i> ${event.location}</div>
       </div>
     `;

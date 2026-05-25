@@ -586,6 +586,57 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_attendance_was_there ON user_show_attendance(was_there)
     `);
 
+    // Music Pilgrimage Atlas — personal bookmarks and saved routes (browser clientId)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS music_pilgrimage_bookmarks (
+        id SERIAL PRIMARY KEY,
+        client_id UUID NOT NULL,
+        show_id INTEGER REFERENCES grateful_dead_shows(id) ON DELETE CASCADE,
+        venue_name VARCHAR(255),
+        city VARCHAR(255),
+        state VARCHAR(100),
+        bookmark_type VARCHAR(20) NOT NULL CHECK (bookmark_type IN ('favorite', 'wishlist', 'visited')),
+        notes TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CHECK (
+          show_id IS NOT NULL
+          OR (venue_name IS NOT NULL AND city IS NOT NULL)
+        )
+      )
+    `);
+
+    await pool.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_mp_bookmarks_show_unique
+      ON music_pilgrimage_bookmarks (client_id, show_id, bookmark_type)
+      WHERE show_id IS NOT NULL
+    `);
+
+    await pool.query(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_mp_bookmarks_venue_unique
+      ON music_pilgrimage_bookmarks (client_id, venue_name, city, state, bookmark_type)
+      WHERE show_id IS NULL
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_mp_bookmarks_client ON music_pilgrimage_bookmarks(client_id)
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS music_pilgrimage_saved_routes (
+        id SERIAL PRIMARY KEY,
+        client_id UUID NOT NULL,
+        label VARCHAR(120) NOT NULL,
+        filter_config JSONB NOT NULL DEFAULT '{}',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_mp_routes_client ON music_pilgrimage_saved_routes(client_id)
+    `);
+
     // Create artists table for expandable concert collections
     await pool.query(`
       CREATE TABLE IF NOT EXISTS artists (

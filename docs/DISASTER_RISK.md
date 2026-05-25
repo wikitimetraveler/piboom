@@ -31,7 +31,7 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 | Disasters controller | `controllers/disasters.controller.js` |
 | Disasters service | `services/disasters.service.js` |
 | Hazard webcam ingest | `services/hazard-webcam-ingest.service.js` |
-| Hazard webcams UI | `public/finance/disasters-webcams.html`, `public/finance/js/hazard-webcam-viewer.js` |
+| Hazard webcams UI | `public/finance/disasters-webcams.html`, `public/finance/js/hazard-webcam-viewer.js`, `public/finance/js/hazard-webcam-address-search.js` |
 | Disaster risk service | `services/disaster-risk.service.js` |
 | Loan pipeline controller | `controllers/loan-pipeline.controller.js` |
 | Loan pipeline AI | `controllers/loan-pipeline-ai.controller.js` |
@@ -50,7 +50,7 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 | GET | `/cameras` | Hazard webcams (national catalog) — query: `state`, `county` (ILIKE), `source`, `hazard` (JSONB tag), `mediaType`, `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — Haversine filter, nearest-first, each row includes `distance_miles` when geo is used |
 | GET | `/cameras/stats` | Counts by source + last update time |
 | GET | `/cameras/:id/snapshot` | Latest still image URL (USGS NIMS resolves via listFiles on demand) |
-| POST | `/refresh-cameras` | Ingest hazard webcams — query/body `sources=all` or comma list (`alertcalifornia`, `usgs_nims`, `usgs_volcano`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`); requires disaster refresh access |
+| POST | `/refresh-cameras` | Ingest hazard webcams — query/body `sources=all` or comma list (`alertcalifornia`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`); requires disaster refresh access |
 
 ### Loan Pipeline (`/api/loan-pipeline`)
 
@@ -100,7 +100,8 @@ Webcams are **fixed mounts** stored in Postgres `fire_cameras` (not rolling disa
 |--------|----------|-------------|-------|
 | `alertcalifornia` | ALERTCalifornia ArcGIS | fire | live / still |
 | `usgs_nims` | USGS NIMS hydrology cams | river, flood, snow, hazard | still_image |
-| `usgs_volcano` | USGS Volcano Hazards Program | volcano | still_image |
+| `usgs_volcano` | USGS + AVO Ashcam (volcview + avo-volcview merged) | volcano | still_image |
+| `faa_weathercam` | FAA Aviation Weather Cameras (`weathercams.faa.gov/api`) | aviation, weather | still_image |
 | `webcoos` | NOAA WebCOOS | coastal | live_stream / still |
 | `ucsd_hpwren` | HPWREN curated seeds | fire, hazard | still_image |
 | `ucsd_pier` | Scripps COOL Lab pier | coastal | live_stream |
@@ -115,7 +116,9 @@ node scripts/refresh-hazard-webcams.js --sources=usgs_nims,alertcalifornia
 
 UCSD mounts are seeded from `data/hazard-webcam-seeds.json`. Each row stores `image_url`, `media_type`, `refresh_minutes`, and `hazard_types` for viewer refresh and future AI snapshot analysis (`nearbyCameras` in Disaster Processor Expert context).
 
-UI: [`public/finance/disasters-webcams.html`](../public/finance/disasters-webcams.html) (legacy [`disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html) redirects).
+UI: [`public/finance/disasters-webcams.html`](../public/finance/disasters-webcams.html) (legacy [`disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html) redirects with `?state=CA&hazard=fire&source=alertcalifornia`).
+
+**Address search:** Google Places autocomplete on the catalog page centers the map, draws a radius circle, and loads nearest mounts via `GET /api/disasters/cameras?nearLat=&nearLng=&radiusMiles=`. Deep links: `?lat=&lng=&radius=&address=`. Alaska volcano preset: `?state=AK&hazard=volcano`. If client Google geocode fails, search falls back to `GET /api/disasters/geocode-address?q=` (Mapbox/Nominatim via `geocodeAddressFree`; camera ingest geocode cache unchanged).
 
 ## Daily Refresh
 
@@ -152,6 +155,26 @@ When the floating **Disaster Processor Expert** AI chat opens on:
 Implementation: `public/shared/disaster-mood-music.js`, mapping in `lib/disaster-mood-music.js`, streamed via `/api/audio/stream/disasters%2F<file>.mp3`.
 
 Mute: music icon in the AI chat header, or `localStorage` key `dc_disaster_music_muted` = `1`. See `music/disasters/README.md`.
+
+## Cinematic Google Earth KML (Unified Disasters)
+
+On `public/finance/disasters-unified.html`, after you select a disaster and the page loads nearby **Encompass loans** and **hazard webcams**, use **Export Google Earth KML** in the selection banner. This is a **manual** action — nothing auto-downloads on row click.
+
+The export uses the **current page state** (same loan list and camera list shown in the UI, same radius/scope filters).
+
+| Layer | Contents |
+|-------|----------|
+| Selected disaster | Event placemark + optional radius ring |
+| Affected Encompass loans | Risk-colored loan placemarks from the grid |
+| Nearby hazard webcams | Camera placemarks with feed/snapshot links |
+| `gx:Tour` | Guided flyover: disaster → loans → webcams → overview |
+| `gx:SoundCue` | Disaster mood track via `/api/audio/stream/disasters%2F<file>.mp3` |
+
+**Google Earth only:** `gx:Tour` and `gx:SoundCue` require Google Earth (desktop or web). Generic KML viewers may show placemarks but not the tour or audio.
+
+**Audio fallback:** If the mapped MP3 is missing under `music/disasters/`, the KML still downloads; the tour runs without sound.
+
+Implementation: `lib/disaster-kml-export.js`, browser wrapper `public/shared/disaster-kml-export.js`.
 
 ## Related
 
