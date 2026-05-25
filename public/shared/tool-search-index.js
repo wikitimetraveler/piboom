@@ -52,6 +52,7 @@
     { name: 'Black Light Zone', url: '/entertainment/blacklight.html', category: 'Entertainment', keywords: 'cosmic neon' },
     { name: 'Poster Generator', url: '/entertainment/poster-generator.html', category: 'Entertainment', keywords: 'AI poster art' },
     { name: 'Art Gallery', url: '/entertainment/art-gallery.html', category: 'Entertainment', keywords: 'gallery art' },
+    { name: 'Coffee Dreams', url: '/entertainment/coffee-dreams.html', category: 'Entertainment', keywords: 'coffee cafe gallery password vietnamese' },
     { name: 'Ouija Board', url: '/entertainment/ouija-board.html', category: 'Entertainment', keywords: 'spirit Houdini' },
     // More
     { name: 'Bike Store', url: '/bike-store-home.html', category: 'Bike', keywords: 'bikes shop' },

@@ -78,6 +78,7 @@
     { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone' },
     { href: '/entertainment/poster-generator.html', icon: 'bi-palette', label: 'Poster Generator' },
     { href: '/entertainment/art-gallery.html', icon: 'bi-image', label: 'Art Gallery' },
+    { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams' },
     { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board' },
     { divider: true },
     { href: '/#headingEntertainment', icon: 'bi-grid-3x3-gap', label: 'All Entertainment' },
