@@ -83,19 +83,10 @@ describe('disaster-kml-export', () => {
     );
   });
 
-  test('canExportCinematicKml requires disaster and data', () => {
-    expect(canExportCinematicKml({ disaster: null, loans: [sampleLoan], cameras: [] })).toBe(false);
-    expect(canExportCinematicKml({ disaster: sampleDisaster, loans: [], cameras: [] })).toBe(false);
-    expect(canExportCinematicKml({
-      disaster: sampleDisaster,
-      loans: [sampleLoan],
-      cameras: [],
-    })).toBe(true);
-    expect(canExportCinematicKml({
-      disaster: sampleDisaster,
-      loans: [],
-      cameras: [sampleCamera],
-    })).toBe(true);
+  test('canExportCinematicKml requires a selected disaster', () => {
+    expect(canExportCinematicKml({ disaster: null })).toBe(false);
+    expect(canExportCinematicKml({ disaster: sampleDisaster })).toBe(true);
+    expect(canExportCinematicKml({ disaster: sampleDisaster, loans: [], cameras: [] })).toBe(true);
   });
 
   test('generateCinematicDisasterKml includes folders, tour, and audio cue', () => {

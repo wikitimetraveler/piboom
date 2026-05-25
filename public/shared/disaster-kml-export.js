@@ -61,14 +61,10 @@ export function exportCinematicKmlFromPageState(pageState) {
     lastNearbyCameras = [],
   } = pageState || {};
 
-  if (!canExportCinematicKml({
-    disaster: selectedDisaster,
-    loans: lastAffectedLoans,
-    cameras: lastNearbyCameras,
-  })) {
+  if (!canExportCinematicKml({ disaster: selectedDisaster })) {
     return {
       success: false,
-      message: 'Select a disaster with at least one nearby loan or hazard webcam before exporting.',
+      message: 'Select a disaster in the grid before exporting Google Earth KML.',
     };
   }
 

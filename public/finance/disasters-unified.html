@@ -659,7 +659,7 @@
           <a class="btn btn-outline-secondary" href="/finance/index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
         </div>
         <p class="workflow-hint mb-3" id="workflowHint">
-          <strong>Workflow:</strong> 1) Enable sources → 2) Filter grid → 3) Click a row → 4) Review loans &amp; cameras → 5) Ask the processor expert (chat button or selection banner).
+          <strong>Workflow:</strong> 1) Enable sources → 2) Filter grid → 3) Click a row → 4) Review loans &amp; cameras → 5) Export Google Earth KML or ask the processor expert.
         </p>
         <div class="row g-3" id="statsRow">
           <div class="col-md-3">
@@ -728,6 +728,9 @@
             </a>
           </div>
           <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center mt-3 pt-2 border-top" id="unifiedToolbarActions">
+            <button type="button" class="btn btn-outline-warning btn-sm" id="duExportCinematicKmlToolbarBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
+              <i class="bi bi-globe-americas"></i> Google Earth KML
+            </button>
             <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn"><i class="bi-funnel"></i> Apply filters</button>
             <button type="button" class="btn btn-primary btn-sm" id="refreshBtn"><i class="bi-arrow-repeat"></i> Refresh data</button>
             <button type="button" class="btn btn-warning btn-sm" id="voiceControlBtn" onclick="toggleVoiceControl()" title="Voice: filter by state (e.g. show California), apply filters, show loans. Use the chat mic to talk to the processor expert.">
@@ -869,9 +872,14 @@
           <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans">
             <div class="accordion-body">
               <div class="card" id="encompassLoansCard" style="display: none;">
-                <div class="card-header">
-                  <strong><i class="bi-bank"></i> Affected Encompass Loans</strong>
-                  <small class="text-muted d-block" id="encompassLoansSubtitle">Loans near selected disaster</small>
+                <div class="card-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+                  <div>
+                    <strong><i class="bi-bank"></i> Affected Encompass Loans</strong>
+                    <small class="text-muted d-block" id="encompassLoansSubtitle">Loans near selected disaster</small>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline-warning" id="duExportCinematicKmlLoansBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
+                    <i class="bi bi-globe-americas"></i> Google Earth KML
+                  </button>
                 </div>
                 <div class="card-body">
                   <div class="row g-2 align-items-end mb-3" id="duLoanFilterToolbar">
@@ -2188,6 +2196,7 @@
         const el = document.getElementById('selectionContextStrip');
         if (!el || !selectedDisasterObj) {
           if (el) el.style.display = 'none';
+          updateKmlExportButtons();
           return;
         }
         const title = selectedDisasterObj.title || selectedDisasterObj.declarationTitle || 'Selected disaster';
@@ -2199,20 +2208,28 @@
         const camLine = lastNearbyCameras.length
           ? `${lastNearbyCameras.length} fire camera(s) nearby`
           : 'No nearby cameras in range';
-        const canKml = window.DisasterKmlExport?.canExportCinematicKml?.({
-          disaster: selectedDisasterObj,
-          loans: lastAffectedLoans,
-          cameras: lastNearbyCameras,
-        });
-        const kmlBtn = canKml
-          ? ` · <button type="button" class="btn btn-sm btn-warning py-0 px-2 align-baseline" id="duExportCinematicKmlBtn" onclick="exportCinematicDisasterKml()" title="Google Earth tour with loans, webcams, and disaster mood audio"><i class="bi bi-globe-americas"></i> Export Google Earth KML</button>`
-          : '';
         el.innerHTML = `<strong>${title}</strong> · ${county}${county && state ? ', ' : ''}${state}
           · ${loanLine} · ${camLine}
-          · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>${kmlBtn}
+          · <button type="button" class="btn btn-sm btn-warning py-0 px-2 align-baseline" onclick="exportCinematicDisasterKml()" title="Google Earth tour with loans, webcams, and disaster mood audio"><i class="bi bi-globe-americas"></i> Google Earth KML</button>
+          · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>
           · <a href="disasters-webcams.html" class="alert-link">Hazard webcams</a>
           · <a href="pipeline-risk-dashboard.html" class="alert-link">FEMA pipeline risk</a>`;
         el.style.display = 'block';
+        updateKmlExportButtons();
+      }
+
+      function updateKmlExportButtons() {
+        const ready = !!selectedDisasterObj
+          && window.DisasterKmlExport?.canExportCinematicKml?.({ disaster: selectedDisasterObj });
+        const title = ready
+          ? `Export Google Earth KML (${lastAffectedLoans.length} loans, ${lastNearbyCameras.length} webcams)`
+          : 'Select a disaster in the grid first';
+        ['duExportCinematicKmlToolbarBtn', 'duExportCinematicKmlLoansBtn'].forEach((id) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          btn.disabled = !ready;
+          btn.title = title;
+        });
       }
 
       function exportCinematicDisasterKml() {
