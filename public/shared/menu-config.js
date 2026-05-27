@@ -14,7 +14,7 @@
     { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, field guide', demoOnly: false },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike', domain: 'bike', title: 'Bike shop, peloton, discover', demoOnly: false },
     { href: '/ai/voice-dj.html', icon: 'bi-robot', label: 'AI & Voice', domain: 'ai', title: 'Wolfman Dave, Levi, voice guide', demoOnly: false },
-    { href: '/entertainment/player.html', icon: 'bi-stars', label: 'Entertainment', domain: 'entertainment', title: 'Boombox, visualizer, posters', demoOnly: false },
+    { href: '/entertainment/index.html', icon: 'bi-stars', label: 'Entertainment', domain: 'entertainment', title: 'Entertainment hub - boombox, visualizer, posters', demoOnly: false },
     { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local', domain: 'local', title: 'Local spots map', demoOnly: false },
     { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds', domain: 'finds', title: 'Thrift & vintage discovery', demoOnly: false },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family', domain: 'family', title: 'Lane Family hub — tree, museum, and tools', demoOnly: false },
@@ -81,7 +81,18 @@
     { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams' },
     { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board' },
     { divider: true },
-    { href: '/#headingEntertainment', icon: 'bi-grid-3x3-gap', label: 'All Entertainment' },
+    { href: '/entertainment/index.html', icon: 'bi-grid-3x3-gap', label: 'Entertainment Hub' },
+  ];
+
+  /** Entertainment hub tool grid */
+  const ENTERTAINMENT_TOOLS = [
+    { href: '/entertainment/player.html', icon: 'bi-volume-up', label: 'The Boombox', title: 'Boombox audio player' },
+    { href: '/entertainment/visualizer.html', icon: 'bi-palette-fill', label: 'Psychedelic Visualizer', title: 'Psychedelic visualizer' },
+    { href: '/entertainment/blacklight.html', icon: 'bi-lightning', label: 'Black Light Zone', title: 'Black light neon scene' },
+    { href: '/entertainment/poster-generator.html', icon: 'bi-palette', label: 'Poster Generator', title: 'Generate psychedelic posters' },
+    { href: '/entertainment/art-gallery.html', icon: 'bi-image', label: 'Art Gallery', title: 'Entertainment art gallery' },
+    { href: '/entertainment/coffee-dreams.html', icon: 'bi-cup-hot', label: 'Coffee Dreams', title: 'Private coffee photo gallery' },
+    { href: '/entertainment/ouija-board.html', icon: 'bi-magic', label: 'Ouija Board', title: 'Spirit board experience' },
   ];
 
   /** Navbar More dropdown items */
@@ -216,6 +227,7 @@
       { items: getDomainTiles(demoMode), category: 'Domain' },
       { items: FINANCE_TOOLS, category: 'Worksheets' },
       { items: ENCOMPASS_TOOLS, category: 'Encompass' },
+      { items: ENTERTAINMENT_TOOLS, category: 'Entertainment' },
       { items: NATURE_TOOLS, category: 'Nature' },
       { items: BIKE_TOOLS, category: 'Bike' },
       { items: MUSIC_TOOLS, category: 'Music' }
@@ -265,6 +277,7 @@
     NAV_MORE,
     FINANCE_TOOLS,
     ENCOMPASS_TOOLS,
+    ENTERTAINMENT_TOOLS,
     NATURE_TOOLS,
     BIKE_TOOLS,
     MUSIC_TOOLS,

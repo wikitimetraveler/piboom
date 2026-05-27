@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entertainment Hub - DevConnect Labs</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/shared/styles.css">
+  <script src="/shared/menu-config.js"></script>
+  <script src="/shared/modern-navbar.js"></script>
+
+  <style>
+    main.container {
+      padding-top: 20px;
+    }
+
+    .floating-stars {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    .star-symbol {
+      position: absolute;
+      font-size: 28px;
+      color: rgba(147, 112, 219, 0.45);
+      animation: floatStar 18s linear infinite;
+      opacity: 0;
+      z-index: 6;
+    }
+
+    .star-symbol:nth-child(1) { left: 8%; animation-delay: 0s; }
+    .star-symbol:nth-child(2) { left: 18%; animation-delay: 2s; }
+    .star-symbol:nth-child(3) { left: 28%; animation-delay: 4s; }
+    .star-symbol:nth-child(4) { left: 38%; animation-delay: 6s; }
+    .star-symbol:nth-child(5) { left: 48%; animation-delay: 8s; }
+    .star-symbol:nth-child(6) { left: 58%; animation-delay: 10s; }
+    .star-symbol:nth-child(7) { left: 68%; animation-delay: 12s; }
+    .star-symbol:nth-child(8) { left: 78%; animation-delay: 14s; }
+    .star-symbol:nth-child(9) { left: 88%; animation-delay: 16s; }
+
+    @keyframes floatStar {
+      0% {
+        transform: translateY(100vh) rotate(0deg) scale(0.9);
+        opacity: 0;
+      }
+      8% {
+        opacity: 0.7;
+      }
+      92% {
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-120px) rotate(240deg) scale(1.1);
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .floating-stars * {
+        animation: none !important;
+      }
+    }
+
+    .entertainment-grid {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+<div class="floating-stars" aria-hidden="true">
+  <div class="star-symbol">✦</div>
+  <div class="star-symbol">✧</div>
+  <div class="star-symbol">✦</div>
+  <div class="star-symbol">✧</div>
+  <div class="star-symbol">✦</div>
+  <div class="star-symbol">✧</div>
+  <div class="star-symbol">✦</div>
+  <div class="star-symbol">✧</div>
+  <div class="star-symbol">✦</div>
+</div>
+
+<modern-navbar></modern-navbar>
+
+<main class="container">
+  <header class="page-hero" aria-labelledby="entertainmentHeroTitle">
+    <h1 id="entertainmentHeroTitle" class="page-hero__title">Entertainment</h1>
+    <p class="page-hero__lead">Boombox, visual experiments, gallery pages, and late-night curiosities in one place.</p>
+  </header>
+
+  <div class="domain-grid domain-grid-sm entertainment-grid" id="entertainmentToolGrid"><!-- populated by menu-config --></div>
+</main>
+
+<footer class="footer">
+  <div class="container text-center">
+    <div class="footer-content">
+      <strong>DevConnect Labs</strong> — Entertainment hub and gallery tools — <span id="dt"></span> — All Rights Reserved
+    </div>
+  </div>
+</footer>
+
+<script src="/shared/user-login.js"></script>
+<script src="/shared/voice-widget.js"></script>
+<script src="/shared/dark-mode.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  const grid = document.getElementById('entertainmentToolGrid');
+  if (grid && window.MENU_CONFIG && window.MENU_CONFIG.ENTERTAINMENT_TOOLS) {
+    grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.ENTERTAINMENT_TOOLS);
+  }
+
+  if (typeof initVoiceWidget === 'function') {
+    initVoiceWidget({
+      position: 'bottom-right',
+      theme: 'blue'
+    });
+  }
+});
+
+document.getElementById('dt').textContent = new Date().toLocaleDateString();
+</script>
+</body>
+</html>

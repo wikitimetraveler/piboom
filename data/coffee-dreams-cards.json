@@ -1,76 +1,81 @@
 {
   "title": "Coffee Dreams",
-  "subtitle": "Seven café moods — Saigon to rainy window",
+  "subtitle": "Eight café moods — Saigon to rainy window",
+  "activeVenueId": "cafe-168",
+  "venues": {
+    "cafe-168": {
+      "name": "Cafe 168",
+      "address": "10287 Slater Ave, Fountain Valley, CA"
+    },
+    "cafe-368": {
+      "name": "Cafe 368",
+      "address": "10287 Slater Ave, Fountain Valley, CA"
+    }
+  },
   "cards": [
     {
       "id": "iced-coffee-queen",
       "title": "The Iced Coffee Queen",
       "caption": "Vietnamese iced coffee, condensed milk glass, café neon, confident pose.",
       "moodClass": "mood-neon",
-      "imageUrl": "https://images.unsplash.com/photo-1559498233-5c00ebf68553?w=1200&q=80&auto=format&fit=crop",
-      "photographer": "Nathan Dumlao",
-      "photographerUrl": "https://unsplash.com/@nate_dumlao",
-      "unsplashPhotoUrl": "https://unsplash.com/photos/black-ceramic-mug-on-white-saucer-5c00ebf68553"
+      "imageUrl": "/family/assets/Iced%20Coffeee%20Queen.png",
+      "creditText": "Private photo"
     },
     {
       "id": "saigon-night-barista",
       "title": "The Saigon Night Barista",
       "caption": "Night-market lighting, espresso machine, soft glow, stylish modern outfit.",
       "moodClass": "mood-night",
-      "imageUrl": "https://images.unsplash.com/photo-1514434758352-8c46e114875d?w=1200&q=80&auto=format&fit=crop",
-      "photographer": "Nathan Dumlao",
-      "photographerUrl": "https://unsplash.com/@nate_dumlao",
-      "unsplashPhotoUrl": "https://unsplash.com/photos/person-making-latte-art-8c46e114875d"
+      "imageUrl": "/family/assets/saigin%20Night.png",
+      "creditText": "Private photo"
     },
     {
       "id": "garden-cafe-girl",
       "title": "The Garden Café Girl",
       "caption": "Outdoor tropical café, plants, sunlight, relaxed smile.",
       "moodClass": "mood-garden",
-      "imageUrl": "https://images.unsplash.com/photo-1493857157302-86d31ad44b27?w=1200&q=80&auto=format&fit=crop",
-      "photographer": "Nathan Dumlao",
-      "photographerUrl": "https://unsplash.com/@nate_dumlao",
-      "unsplashPhotoUrl": "https://unsplash.com/photos/coffee-shop-interior-86d31ad44b27"
+      "imageUrl": "/family/assets/GArdn%20Cafe.png",
+      "creditText": "Private photo"
     },
     {
       "id": "retro-cafe-hostess",
       "title": "The Retro Café Hostess",
       "caption": "1970s Vietnamese café vibe, vintage dress, old fan, warm sepia tones.",
       "moodClass": "mood-retro",
-      "imageUrl": "https://images.unsplash.com/photo-1501339847306-ac706a0af766?w=1200&q=80&auto=format&fit=crop",
-      "photographer": "Nathan Dumlao",
-      "photographerUrl": "https://unsplash.com/@nate_dumlao",
-      "unsplashPhotoUrl": "https://unsplash.com/photos/coffee-shop-interior-ac706a0af766"
+      "imageUrl": "/family/assets/rETRO%20gIRL.png",
+      "creditText": "Private photo"
     },
     {
       "id": "boba-coffee-model",
       "title": "The Boba & Coffee Model",
       "caption": "Modern Asian café, playful but tasteful, colorful drink props.",
       "moodClass": "mood-boba",
-      "imageUrl": "https://images.unsplash.com/photo-1622495809151-61d27a8e7c77?w=1200&q=80&auto=format&fit=crop",
-      "photographer": "Rosalind Chang",
-      "photographerUrl": "https://unsplash.com/@rosalind_chang",
-      "unsplashPhotoUrl": "https://unsplash.com/photos/clear-drinking-glass-with-red-liquid-61d27a8e7c77"
+      "imageUrl": "/family/assets/Bobo.png",
+      "creditText": "Private photo"
     },
     {
       "id": "motorcycle-cafe-girl",
       "title": "The Motorcycle Café Girl",
       "caption": "Scooter parked outside, street café, urban Vietnam-inspired background.",
       "moodClass": "mood-street",
-      "imageUrl": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80&auto=format&fit=crop",
-      "photographer": "Annie Spratt",
-      "photographerUrl": "https://unsplash.com/@anniespratt",
-      "unsplashPhotoUrl": "https://unsplash.com/photos/woman-riding-motor-scooter-fcd25c85cd64"
+      "imageUrl": "/family/assets/motorcycleGirl.png",
+      "creditText": "Private photo"
     },
     {
       "id": "rainy-window-girl",
       "title": "The Rainy Window Girl",
       "caption": "Sitting by a rainy café window, holding hot coffee, moody cinematic card.",
       "moodClass": "mood-rain",
-      "imageUrl": "https://images.unsplash.com/photo-1517704718517-8e28046a1ee2?w=1200&q=80&auto=format&fit=crop",
-      "photographer": "Nathan Dumlao",
-      "photographerUrl": "https://unsplash.com/@nate_dumlao",
-      "unsplashPhotoUrl": "https://unsplash.com/photos/person-holding-mug-8e28046a1ee2"
+      "imageUrl": "/family/assets/The%20Rainy%20Window%20Girl.png",
+      "creditText": "Private photo"
+    },
+    {
+      "id": "tattooed-barista",
+      "title": "The Tattooed Barista",
+      "caption": "Saigon coffee queen energy, full tattoo sleeves, espresso machine, vintage playing-card style.",
+      "moodClass": "mood-night",
+      "imageUrl": "/family/assets/tatooed.png",
+      "creditText": "Private photo"
     }
   ]
 }

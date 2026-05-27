@@ -321,6 +321,9 @@
               <p class="small text-muted mt-2 mb-0" id="gseAiHelp">
                 Best results: ask one scenario-specific question at a time (program compare, overlay blockers, docs, or next-step ops).
               </p>
+              <p class="small text-muted mt-2 mb-0">
+                Voice commands: click the mic and say <span class="font-monospace">analyze scenario</span>, <span class="font-monospace">load pipeline loan 42</span>, <span class="font-monospace">show FHA</span>, or <span class="font-monospace">read summary</span>.
+              </p>
             </div>
             <div class="col-md-3 d-flex flex-column justify-content-end gap-2">
               <button type="button" class="btn btn-primary" id="btnAskLoanExpert">Ask AI Expert</button>
@@ -362,6 +365,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <script src="/shared/tts.js" defer></script>
+    <script src="/shared/voice-widget.js" defer></script>
     <script src="/shared/encompass-api.js" defer></script>
     <script src="/shared/gse-encompass-field-map.js" defer></script>
     <script src="/js/gse-analyzer.js" defer></script>

@@ -12,11 +12,51 @@
   let suggestionsApi;
   let lastProductsAll = [];
   let productFilter = 'all';
+  let voiceWidgetInstance;
+  let lastSummarySnapshot = null;
 
   function setBusy(el, busy) {
     if (!el) return;
     el.disabled = !!busy;
     el.setAttribute('aria-busy', busy ? 'true' : 'false');
+  }
+
+  function plainText(value) {
+    return String(value || '')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function speak(text, options) {
+    const message = plainText(text);
+    if (!message) return false;
+    if (typeof window.speakWithGoogle === 'function') {
+      window.speakWithGoogle(message, 'en-US-Standard-D', options || {});
+      return true;
+    }
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(message);
+        utterance.rate = options && options.speakingRate ? options.speakingRate : 1;
+        window.speechSynthesis.speak(utterance);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+    return false;
+  }
+
+  function stopSpeechPlayback() {
+    if (typeof window.stopSpeech === 'function') {
+      window.stopSpeech();
+      return;
+    }
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
   }
 
   function encompassFetch(url, options) {
@@ -263,18 +303,149 @@
     statusEl.classList.toggle('text-muted', !isError);
   }
 
-  async function loadFromPipeline() {
+  function setProductFilter(mode) {
+    const idMap = {
+      all: 'gseFilterAll',
+      gse: 'gseFilterGse',
+      fha: 'gseFilterFha',
+      va: 'gseFilterVa',
+      usda: 'gseFilterUsda'
+    };
+    productFilter = mode;
+    setFilterChipActive(idMap[mode] || idMap.all);
+    applyProductFilter();
+  }
+
+  function buildGseSummarySpeech() {
+    const snap = lastSummarySnapshot;
+    if (!snap || !snap.summary) {
+      return 'Run Analyze first to hear the current GSE summary.';
+    }
+    const summary = snap.summary;
+    const parts = [
+      `Best fit: ${summary.bestFit || 'unknown'}.`,
+      `Risk: ${summary.riskLevel || 'unknown'}.`,
+      `Conforming status: ${summary.conformingStatus || 'unknown'}.`
+    ];
+    if (summary.loanLimit && Number.isFinite(Number(summary.loanLimit.amount))) {
+      parts.push(`Loan limit: ${Number(summary.loanLimit.amount).toLocaleString()} dollars${summary.loanLimit.highCostArea ? ' in a high-cost area' : ''}.`);
+    }
+    if (summary.failedOverlayCount != null) {
+      parts.push(`Overlay issues: ${summary.failedOverlayCount}.`);
+    }
+    if (snap.warnings && snap.warnings.length) {
+      parts.push(`Warning: ${snap.warnings[0]}`);
+    }
+    return parts.join(' ');
+  }
+
+  function speakGseSummary() {
+    return speak(buildGseSummarySpeech(), { speakingRate: 0.98 });
+  }
+
+  function initializeVoiceWidget() {
+    if (typeof initVoiceWidget !== 'function') return;
+    voiceWidgetInstance = initVoiceWidget({
+      position: 'bottom-right',
+      theme: 'blue',
+      onCommand: handleVoiceCommand
+    });
+  }
+
+  function handleVoiceCommand(rawCommand) {
+    const command = String(rawCommand || '').toLowerCase().trim();
+    const question = $('gseAiQuestion');
+    const pipelineInput = $('gsePipelineLoanId');
+    if (!command) return;
+
+    if (command.includes('stop speech') || command.includes('stop talking') || command.includes('be quiet')) {
+      stopSpeechPlayback();
+      return;
+    }
+
+    if (command.includes('read summary') || command.includes('speak summary') || command.includes('read results')) {
+      speakGseSummary();
+      return;
+    }
+
+    const pipelineMatch = command.match(/load (?:pipeline )?(?:loan )?#?(\d{1,8})/);
+    if (pipelineMatch) {
+      if (pipelineInput) pipelineInput.value = pipelineMatch[1];
+      speak(`Loading pipeline loan ${pipelineMatch[1]}.`);
+      loadFromPipeline({ voiceFeedback: true });
+      return;
+    }
+    if (command.includes('load pipeline')) {
+      speak('Say load pipeline loan and then a number.');
+      return;
+    }
+
+    if (command.includes('analyze')) {
+      speak('Analyzing scenario.');
+      runAnalyze({ voiceFeedback: true, speakSummary: true });
+      return;
+    }
+
+    if (command.includes('loan limit') || command.includes('lookup limit')) {
+      speak('Looking up loan limits.');
+      runLoanLimits({ voiceFeedback: true });
+      return;
+    }
+
+    if (command.includes('show all')) {
+      setProductFilter('all');
+      speak('Showing all products.');
+      return;
+    }
+    if (command.includes('show gse') || command.includes('gse only')) {
+      setProductFilter('gse');
+      speak('Showing GSE products only.');
+      return;
+    }
+    if (command.includes('show fha')) {
+      setProductFilter('fha');
+      speak('Showing FHA products.');
+      return;
+    }
+    if (command.includes('show va')) {
+      setProductFilter('va');
+      speak('Showing V A products.');
+      return;
+    }
+    if (command.includes('show usda') || command.includes('show rural')) {
+      setProductFilter('usda');
+      speak('Showing U S D A products.');
+      return;
+    }
+
+    if (command.includes('ask expert')) {
+      const currentQuestion = question ? String(question.value || '').trim() : '';
+      if (!currentQuestion) {
+        speak('Enter an expert question first, then say ask expert.');
+        return;
+      }
+      speak('Asking the AI expert.');
+      runLoanExpert(undefined, { voiceFeedback: true });
+      return;
+    }
+
+    speak('Command not recognized for the GSE analyzer. Try analyze scenario, load pipeline loan 42, show FHA, or read summary.');
+  }
+
+  async function loadFromPipeline(options = {}) {
     const loadBtn = $('btnLoadPipeline');
     const idRaw = $('gsePipelineLoanId').value.trim();
     const loanId = parseInt(idRaw, 10);
     if (!idRaw || Number.isNaN(loanId) || loanId < 1) {
       setPipelineStatus('Enter a positive pipeline loan id.', true);
+      if (options.voiceFeedback) speak('Enter a positive pipeline loan id.');
       return;
     }
 
     const api = fieldMapApi();
     if (!api || !Array.isArray(api.GSE_ENCOMPASS_FIELD_IDS)) {
       setPipelineStatus('Field map script failed to load. Check console.', true);
+      if (options.voiceFeedback) speak('The GSE field map failed to load.');
       return;
     }
 
@@ -284,10 +455,9 @@
       const lpRes = await fetch(`/api/loan-pipeline/loans/${loanId}`);
       const lpJson = await lpRes.json().catch(() => ({}));
       if (!lpRes.ok || !lpJson.success) {
-        setPipelineStatus(
-          (lpJson.error && String(lpJson.error)) || `Pipeline request failed (${lpRes.status}).`,
-          true
-        );
+        const msg = (lpJson.error && String(lpJson.error)) || `Pipeline request failed (${lpRes.status}).`;
+        setPipelineStatus(msg, true);
+        if (options.voiceFeedback) speak(msg);
         return;
       }
       const loan = lpJson.data && lpJson.data.loan;
@@ -297,6 +467,7 @@
           'This pipeline row has no <code>encompass_loan_guid</code>. Load is only enabled when the loan is linked to Encompass.',
           true
         );
+        if (options.voiceFeedback) speak('This pipeline loan is not linked to Encompass.');
         return;
       }
 
@@ -319,6 +490,7 @@
           (typeof ehJson === 'string' ? ehJson : '') ||
           `Encompass field-reader failed (${ehRes.status}).`;
         setPipelineStatus(String(msg), true);
+        if (options.voiceFeedback) speak(msg);
         return;
       }
 
@@ -330,6 +502,7 @@
             .join('')}</ul>`,
           true
         );
+        if (options.voiceFeedback) speak((mapped.errors || [])[0] || 'Could not map the scenario.');
         return;
       }
 
@@ -342,6 +515,7 @@
       if (!validateRes.ok || !validateJson.success) {
         const msg = (validateJson.errors && validateJson.errors.join('; ')) || validateJson.error || 'Validation failed';
         setPipelineStatus(`<strong>Scenario validation failed.</strong> ${msg}`, true);
+        if (options.voiceFeedback) speak(msg);
         return;
       }
 
@@ -358,14 +532,20 @@
         `Loaded scenario from pipeline <strong>#${loanId}</strong>${loanNo ? ` (loan #${loanNo})` : ''}. Review fields, then Analyze.`,
         false
       );
+      if (options.voiceFeedback) speak(`Pipeline loan ${loanId} loaded. Review the fields, then analyze.`);
     } catch (e) {
       setPipelineStatus(String(e.message || e), true);
+      if (options.voiceFeedback) speak(e.message || String(e));
     } finally {
       setBusy(loadBtn, false);
     }
   }
 
   function setSummary(summary, warnings) {
+    lastSummarySnapshot = {
+      summary: summary || null,
+      warnings: Array.isArray(warnings) ? [...warnings] : []
+    };
     $('gseBestFit').textContent = summary ? summary.bestFit : '—';
     $('gseRisk').textContent = summary ? summary.riskLevel : '—';
     $('gseConf').textContent = summary ? summary.conformingStatus : '—';
@@ -383,7 +563,7 @@
     wEl.setAttribute('role', warnings && warnings.length ? 'alert' : 'status');
   }
 
-  async function runAnalyze() {
+  async function runAnalyze(options = {}) {
     const btn = $('btnAnalyze');
     setBusy(btn, true);
     try {
@@ -402,6 +582,7 @@
       const data = await res.json();
       if (!res.ok || !data.success) {
         const msg = (data.errors && data.errors.join('; ')) || data.error || 'Request failed';
+        if (options.voiceFeedback) speak(msg);
         alert(msg);
         return;
       }
@@ -415,14 +596,18 @@
         const sCnt = $('gseSuggestionCount');
         if (sCnt) sCnt.textContent = `${suggestionRows.length} item${suggestionRows.length === 1 ? '' : 's'}`;
       }
+      if (options.speakSummary) {
+        speakGseSummary();
+      }
     } catch (e) {
+      if (options.voiceFeedback) speak(e.message || String(e));
       alert(e.message || String(e));
     } finally {
       setBusy(btn, false);
     }
   }
 
-  async function runLoanLimits() {
+  async function runLoanLimits(options = {}) {
     const state = $('state').value.trim();
     const county = $('county').value.trim();
     const units = $('units').value || '1';
@@ -431,8 +616,12 @@
     );
     const data = await res.json();
     if (!res.ok || !data.success) {
+      if (options.voiceFeedback) speak(data.error || 'Loan limit lookup failed.');
       alert(data.error || 'Lookup failed');
       return;
+    }
+    if (options.voiceFeedback) {
+      speak(`Conforming limit is ${data.conformingLimit.toLocaleString()} dollars for ${county}, ${state}, ${units} unit${String(units) === '1' ? '' : 's'}.`);
     }
     alert(`Conforming limit (1–4 unit lookup): $${data.conformingLimit.toLocaleString()} (${data.year})`);
   }
@@ -484,10 +673,11 @@
     box.focus({ preventScroll: false });
   }
 
-  async function runLoanExpert(questionText) {
+  async function runLoanExpert(questionText, options = {}) {
     const askBtn = $('btnAskLoanExpert');
     const q = String(questionText || $('gseAiQuestion').value || '').trim();
     if (!q) {
+      if (options.voiceFeedback) speak('Enter a question for the AI Loan Program Expert.');
       alert('Enter a question for the AI Loan Program Expert.');
       return;
     }
@@ -506,8 +696,9 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
         const msg = (data.errors && data.errors.join('; ')) || data.error || 'Loan expert request failed';
-        alert(msg);
         setAiStatus(`Error: ${msg}`, true);
+        if (options.voiceFeedback) speak(msg);
+        alert(msg);
         return;
       }
       renderLoanExpertResult(data);
@@ -515,6 +706,7 @@
     } catch (e) {
       const msg = e.message || String(e);
       setAiStatus(`Error: ${msg}`, true);
+      if (options.voiceFeedback) speak(msg);
       alert(msg);
     } finally {
       setBusy(askBtn, false);
@@ -551,6 +743,7 @@
     bindFilter('gseFilterVa', 'va');
     bindFilter('gseFilterUsda', 'usda');
     applyProductFilter();
+    initializeVoiceWidget();
 
     const askBtn = $('btnAskLoanExpert');
     if (askBtn) askBtn.addEventListener('click', () => runLoanExpert());

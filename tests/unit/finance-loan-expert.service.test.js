@@ -52,4 +52,31 @@ describe('finance-loan-expert.service', () => {
     const badScenario = askLoanProgramExpert({ question: 'test', scenario: {} });
     expect(badScenario.success).toBe(false);
   });
+
+  it('changes expert mode and content based on the question', () => {
+    const compare = askLoanProgramExpert({
+      question: 'Compare Fannie HomeReady vs Freddie Home Possible for this scenario.',
+      scenario
+    });
+    const blockers = askLoanProgramExpert({
+      question: 'What investor overlay issues are most likely to stop this file?',
+      scenario
+    });
+    const docs = askLoanProgramExpert({
+      question: 'What documents do we need upfront for the best-fit programs?',
+      scenario
+    });
+
+    expect(compare.success).toBe(true);
+    expect(blockers.success).toBe(true);
+    expect(docs.success).toBe(true);
+
+    expect(compare.expertMode).toBe('product-compare');
+    expect(blockers.expertMode).toBe('overlay-blocker-review');
+    expect(docs.expertMode).toBe('docs-upfront');
+
+    expect(compare.recommendation).not.toEqual(blockers.recommendation);
+    expect(docs.requiredVerifications.length).toBeGreaterThan(0);
+    expect(Array.isArray(blockers.overlayRisks)).toBe(true);
+  });
 });

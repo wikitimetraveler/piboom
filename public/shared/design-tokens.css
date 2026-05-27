@@ -14,6 +14,18 @@
   --zen-surface: #f8fafc;
   --zen-surface-muted: #e2e8f0;
 
+  /* Heritage primary (warm, calm, elegant alternative to zen) */
+  --heritage-primary: #6a4f3b;
+  --heritage-primary-hover: #533d2e;
+  --heritage-primary-rgb: 106, 79, 59;
+  --heritage-muted: #6e655c;
+  --heritage-border: rgba(106, 79, 59, 0.16);
+  --heritage-card-bg: rgba(255, 250, 244, 0.97);
+  --heritage-dark: #1f1b17;
+  --heritage-surface: #f6f2eb;
+  --heritage-surface-muted: #e7ddd1;
+  --heritage-highlight: #b89b5e;
+
   /* Finance / worksheet layout aliases */
   --primary-blue: var(--zen-primary);
   --primary-blue-hover: var(--zen-primary-hover);
@@ -67,4 +79,46 @@
   --lane-heritage-ink-soft: var(--lf-ink-soft);
   --lane-heritage-accent: var(--lf-accent);
   --lane-heritage-muted: var(--lf-muted);
+
+  /* Site shell aliases (navbar + shared pages) */
+  --site-primary: var(--zen-primary);
+  --site-primary-hover: var(--zen-primary-hover);
+  --site-primary-rgb: var(--zen-primary-rgb);
+  --site-muted: var(--zen-muted);
+  --site-border: var(--zen-border);
+  --site-card-bg: var(--zen-card-bg);
+  --site-dark: var(--zen-dark);
+  --site-surface: var(--zen-surface);
+  --site-surface-muted: var(--zen-surface-muted);
+  --site-highlight: var(--ice-secondary);
+}
+
+:root[data-site-theme="heritage"] {
+  --site-primary: var(--heritage-primary);
+  --site-primary-hover: var(--heritage-primary-hover);
+  --site-primary-rgb: var(--heritage-primary-rgb);
+  --site-muted: var(--heritage-muted);
+  --site-border: var(--heritage-border);
+  --site-card-bg: var(--heritage-card-bg);
+  --site-dark: var(--heritage-dark);
+  --site-surface: var(--heritage-surface);
+  --site-surface-muted: var(--heritage-surface-muted);
+  --site-highlight: var(--heritage-highlight);
+
+  /* Remap shared semantic aliases so existing site chrome follows the theme. */
+  --primary-blue: var(--heritage-primary);
+  --primary-blue-hover: var(--heritage-primary-hover);
+  --text-dark: var(--heritage-dark);
+  --text-muted: var(--heritage-muted);
+  --border-light: var(--heritage-border);
+  --background-light: var(--heritage-surface);
+  --ice-primary: var(--heritage-primary);
+  --ice-secondary: var(--heritage-highlight);
+  --ice-dark: var(--heritage-dark);
+  --ice-light: color-mix(in srgb, white 72%, var(--heritage-surface) 28%);
+  --ice-glow: rgba(var(--heritage-primary-rgb), 0.18);
+  --ice-border: var(--heritage-border);
+  --text: var(--text-dark);
+  --muted: var(--text-muted);
+  --border: var(--border-light);
 }

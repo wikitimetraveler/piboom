@@ -52,26 +52,117 @@
       margin: 0;
     }
 
+    .cd-venue-note {
+      margin-top: 0.85rem;
+      font-size: 0.8rem;
+      color: #d4c4b0;
+      letter-spacing: 0.04em;
+    }
+
+    .cd-venue-switcher {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .cd-venue-toggle {
+      border: 1px solid rgba(200, 121, 65, 0.4);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--cd-cream);
+      border-radius: 999px;
+      padding: 0.5rem 1rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .cd-venue-toggle:hover {
+      border-color: rgba(200, 121, 65, 0.75);
+      background: rgba(200, 121, 65, 0.16);
+      transform: translateY(-1px);
+    }
+
+    .cd-venue-toggle.is-active {
+      background: linear-gradient(135deg, rgba(200, 121, 65, 0.95), rgba(156, 90, 52, 0.95));
+      border-color: rgba(255, 225, 195, 0.4);
+      color: #fff8f1;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.24);
+    }
+
     .cd-card {
       position: relative;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      height: 100%;
+      min-height: 28rem;
+      perspective: 1200px;
+      transition: transform 0.35s ease;
+    }
+
+    .cd-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .cd-card:focus-visible {
+      outline: none;
+    }
+
+    .cd-card:focus-visible .cd-card-face {
+      box-shadow: 0 0 0 3px rgba(200, 121, 65, 0.45), 0 24px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    .cd-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 28rem;
+      transform-style: preserve-3d;
+      transition: transform 0.7s ease;
+    }
+
+    .cd-card.flipped .cd-card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .cd-card-face {
+      position: absolute;
+      inset: 0;
       border-radius: 1rem;
       overflow: hidden;
       border: 1px solid rgba(255, 200, 150, 0.12);
       background: rgba(0, 0, 0, 0.35);
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
-      transition: transform 0.35s ease, box-shadow 0.35s ease;
-      cursor: pointer;
-      height: 100%;
+      backface-visibility: hidden;
+      transition: box-shadow 0.35s ease;
     }
 
-    .cd-card:hover {
-      transform: translateY(-6px);
+    .cd-card:hover .cd-card-face {
       box-shadow: 0 24px 50px rgba(0, 0, 0, 0.45);
+    }
+
+    .cd-card-front {
+      transform: rotateY(0deg);
+    }
+
+    .cd-card-back {
+      transform: rotateY(180deg);
+      padding: 1.25rem;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 55%),
+        linear-gradient(160deg, #23130d 0%, #3b2418 45%, #1b0f0b 100%);
     }
 
     .cd-card-img-wrap {
       position: relative;
-      aspect-ratio: 4 / 5;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
     }
 
@@ -128,6 +219,85 @@
 
     .cd-card-credit a:hover {
       text-decoration: underline;
+    }
+
+    .cd-card-hint {
+      font-size: 0.72rem;
+      color: #c9b8a8;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .cd-card-back-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 0.85rem;
+      border: 1px solid rgba(255, 200, 150, 0.12);
+      background: rgba(18, 10, 8, 0.7);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+      padding: 1.35rem;
+      text-align: center;
+    }
+
+    .cd-card-back-kicker {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--cd-caramel);
+    }
+
+    .cd-card-back-title {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 600;
+    }
+
+    .cd-card-back-address {
+      margin: 0;
+      max-width: 18rem;
+      color: #e5d7c6;
+      line-height: 1.55;
+    }
+
+    .cd-card-qr-shell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 160px;
+      height: 160px;
+      padding: 0.5rem;
+      border-radius: 0.9rem;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px rgba(42, 24, 16, 0.08), 0 10px 28px rgba(0, 0, 0, 0.28);
+    }
+
+    .cd-card-qr-shell img,
+    .cd-card-qr-shell canvas {
+      width: 144px;
+      height: 144px;
+      display: block;
+    }
+
+    .cd-card-map-link {
+      color: var(--cd-cream);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .cd-card-map-link:hover {
+      color: #fff;
+      text-decoration: underline;
+    }
+
+    .cd-card-back-note {
+      font-size: 0.75rem;
+      color: #bba997;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
     }
 
     .mood-neon .cd-card-img-wrap::after {
@@ -194,6 +364,8 @@
       <p class="small text-uppercase mb-2" style="color: var(--cd-caramel); letter-spacing: 0.2em;">Private gallery</p>
       <h1>Coffee Dreams</h1>
       <p id="cdSubtitle">Seven café moods — Saigon to rainy window</p>
+      <div id="cdVenueSwitcher" class="cd-venue-switcher" aria-label="Venue switcher"></div>
+      <p id="cdVenueNote" class="cd-venue-note"></p>
     </header>
 
     <div class="container-xl pb-2">
@@ -201,21 +373,139 @@
     </div>
 
     <footer class="cd-footer">
-      <p class="mb-1">Photos via <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer">Unsplash</a> — free to use with attribution.</p>
       <p class="mb-0">Developed by David E Lane</p>
     </footer>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   <script>
     function escapeHtml(str) {
       return String(str || '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
-    function buildCardHtml(card, index) {
+    const coffeeQrCache = new Map();
+    let coffeeGalleryData = null;
+    let coffeeActiveVenueId = '';
+
+    function buildMapSearchUrl(name, address, explicitUrl) {
+      const rawUrl = String(explicitUrl || '').trim();
+      if (rawUrl) return rawUrl;
+
+      const query = [name, address].filter(Boolean).join(', ');
+      if (!query) return '';
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    }
+
+    function generateQrDataUrl(url, size = 144) {
+      if (!window.QRCode || !url) return '';
+
+      const cacheKey = `${size}:${url}`;
+      if (coffeeQrCache.has(cacheKey)) {
+        return coffeeQrCache.get(cacheKey);
+      }
+
+      const mount = document.createElement('div');
+      mount.style.cssText = `position:absolute;left:-9999px;top:-9999px;width:${size}px;height:${size}px;`;
+      document.body.appendChild(mount);
+
+      try {
+        new window.QRCode(mount, { text: url, width: size, height: size });
+        const canvas = mount.querySelector('canvas');
+        const img = mount.querySelector('img');
+        const dataUrl = canvas ? canvas.toDataURL('image/png') : (img ? img.src : '');
+        coffeeQrCache.set(cacheKey, dataUrl || '');
+        return dataUrl || '';
+      } catch (err) {
+        return '';
+      } finally {
+        if (mount.parentNode) {
+          mount.parentNode.removeChild(mount);
+        }
+      }
+    }
+
+    function getVenueEntries(data) {
+      return Object.entries(data && typeof data.venues === 'object' ? data.venues : {});
+    }
+
+    function getDefaultVenueConfig(data, activeVenueIdOverride) {
+      const venues = data && typeof data.venues === 'object' ? data.venues : {};
+      const activeVenueId = String(activeVenueIdOverride || data?.activeVenueId || '').trim();
+      const activeVenue = activeVenueId && venues[activeVenueId] ? venues[activeVenueId] : null;
+      const firstVenueKey = Object.keys(venues)[0] || '';
+      const firstVenue = firstVenueKey ? venues[firstVenueKey] : null;
+      const fallbackName = String(data?.defaultLocationName || 'Coffee Dreams Location').trim();
+      const fallbackAddress = String(data?.defaultLocationAddress || '').trim();
+      const selectedVenue = activeVenue || firstVenue || {};
+
+      return {
+        id: activeVenue ? activeVenueId : (firstVenueKey || 'default'),
+        name: String(selectedVenue.name || fallbackName).trim(),
+        address: String(selectedVenue.address || fallbackAddress).trim()
+      };
+    }
+
+    function getCardLocation(card, data, activeVenueIdOverride) {
+      const venues = data && typeof data.venues === 'object' ? data.venues : {};
+      const venueId = String(card?.venueId || activeVenueIdOverride || data?.activeVenueId || '').trim();
+      const venue = venueId && venues[venueId] ? venues[venueId] : getDefaultVenueConfig(data, activeVenueIdOverride);
+      const locationName = String(card?.locationName || venue?.name || '').trim();
+      const locationAddress = String(card?.locationAddress || venue?.address || '').trim();
+      const locationUrl = buildMapSearchUrl(locationName, locationAddress, card?.locationUrl);
+
+      return {
+        name: locationName,
+        address: locationAddress,
+        url: locationUrl,
+        qrDataUrl: generateQrDataUrl(locationUrl)
+      };
+    }
+
+    function renderVenueSwitcher(data, activeVenueIdOverride) {
+      const switcher = document.getElementById('cdVenueSwitcher');
+      if (!switcher) return;
+
+      const venues = getVenueEntries(data);
+      if (venues.length < 2) {
+        switcher.innerHTML = '';
+        return;
+      }
+
+      const activeVenue = getDefaultVenueConfig(data, activeVenueIdOverride);
+      switcher.innerHTML = venues.map(([venueId, venue]) => {
+        const name = escapeHtml(venue?.name || venueId);
+        const activeClass = venueId === activeVenue.id ? ' is-active' : '';
+        return `<button type="button" class="cd-venue-toggle${activeClass}" data-venue-id="${escapeHtml(venueId)}" aria-pressed="${venueId === activeVenue.id ? 'true' : 'false'}">${name}</button>`;
+      }).join('');
+
+      switcher.querySelectorAll('[data-venue-id]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const nextVenueId = String(button.getAttribute('data-venue-id') || '').trim();
+          if (!nextVenueId || nextVenueId === coffeeActiveVenueId) return;
+          setCoffeeVenue(nextVenueId);
+        });
+      });
+    }
+
+    function renderVenueNote(data, activeVenueIdOverride) {
+      const note = document.getElementById('cdVenueNote');
+      if (!note) return;
+
+      const venue = getDefaultVenueConfig(data, activeVenueIdOverride);
+      if (!venue.name && !venue.address) {
+        note.textContent = '';
+        return;
+      }
+
+      note.textContent = `Back of each card opens ${venue.name}${venue.address ? `, ${venue.address}` : ''}. Use the buttons above to switch venues fast.`;
+    }
+
+    function buildCardHtml(card, index, location) {
       const moodClass = escapeHtml(card.moodClass || '');
       const title = escapeHtml(card.title);
       const caption = escapeHtml(card.caption);
@@ -224,25 +514,107 @@
       const photographer = escapeHtml(card.photographer);
       const photographerUrl = escapeHtml(card.photographerUrl);
       const photoUrl = escapeHtml(card.unsplashPhotoUrl);
+      const creditText = escapeHtml(card.creditText);
+      const creditUrl = escapeHtml(card.creditUrl);
+      const locationName = escapeHtml(location.name || 'Coffee Dreams Location');
+      const locationAddress = escapeHtml(location.address || '');
+      const locationUrl = escapeHtml(location.url || '');
+      const qrDataUrl = escapeHtml(location.qrDataUrl || '');
+      const hasPhotographerCredit = photographer && photographerUrl && photoUrl;
+      const hasLinkedTextCredit = creditText && creditUrl;
+      const hasPlainTextCredit = creditText && !creditUrl;
+      const mapLinkHtml = location.url
+        ? `<a class="cd-card-map-link" href="${locationUrl}" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>`
+        : '';
+      const qrHtml = location.qrDataUrl
+        ? `<img src="${qrDataUrl}" alt="QR code for ${locationName}" loading="lazy" decoding="async"/>`
+        : '<span class="small text-dark">Map link unavailable</span>';
+      const creditHtml = hasPhotographerCredit
+        ? `<p class="cd-card-credit mb-0">
+            Photo by <a href="${photographerUrl}" target="_blank" rel="noopener noreferrer">${photographer}</a>
+            · <a href="${photoUrl}" target="_blank" rel="noopener noreferrer">Unsplash</a>
+          </p>`
+        : hasLinkedTextCredit
+          ? `<p class="cd-card-credit mb-0">
+              <a href="${creditUrl}" target="_blank" rel="noopener noreferrer">${creditText}</a>
+            </p>`
+          : hasPlainTextCredit
+            ? `<p class="cd-card-credit mb-0">${creditText}</p>`
+            : '';
 
       return `
         <div class="col-12 col-md-6 col-lg-4">
-          <article class="cd-card ${moodClass}" tabindex="0" role="button" aria-label="${title}"
-            data-card-index="${index}">
-            <div class="cd-card-img-wrap">
-              <img src="${img}" alt="${alt}" loading="lazy" decoding="async"/>
-              <div class="cd-card-overlay"></div>
-              <div class="cd-card-body">
-                <h2 class="cd-card-title">${title}</h2>
-                <p class="cd-card-caption">${caption}</p>
-                <p class="cd-card-credit mb-0">
-                  Photo by <a href="${photographerUrl}" target="_blank" rel="noopener noreferrer">${photographer}</a>
-                  · <a href="${photoUrl}" target="_blank" rel="noopener noreferrer">Unsplash</a>
-                </p>
+          <article class="cd-card ${moodClass}" tabindex="0" role="button" aria-label="${title} card, flip for location QR"
+            aria-pressed="false" data-card-index="${index}">
+            <div class="cd-card-inner">
+              <div class="cd-card-face cd-card-front">
+                <div class="cd-card-img-wrap">
+                  <img src="${img}" alt="${alt}" loading="lazy" decoding="async"/>
+                  <div class="cd-card-overlay"></div>
+                  <div class="cd-card-body">
+                    <h2 class="cd-card-title">${title}</h2>
+                    <p class="cd-card-caption">${caption}</p>
+                    ${creditHtml}
+                    <p class="cd-card-hint mb-0"><i class="bi bi-arrow-repeat"></i> Flip for QR</p>
+                  </div>
+                </div>
+              </div>
+              <div class="cd-card-face cd-card-back">
+                <div class="cd-card-back-inner">
+                  <div class="cd-card-back-kicker">Scan for location</div>
+                  <h2 class="cd-card-back-title">${locationName}</h2>
+                  <p class="cd-card-back-address">${locationAddress}</p>
+                  <div class="cd-card-qr-shell">${qrHtml}</div>
+                  ${mapLinkHtml}
+                  <div class="cd-card-back-note">Tap card to flip back</div>
+                </div>
               </div>
             </div>
           </article>
         </div>`;
+    }
+
+    function setCardFlipped(cardEl, shouldFlip) {
+      const isFlipped = Boolean(shouldFlip);
+      cardEl.classList.toggle('flipped', isFlipped);
+      cardEl.setAttribute('aria-pressed', isFlipped ? 'true' : 'false');
+    }
+
+    function toggleCard(cardEl) {
+      setCardFlipped(cardEl, !cardEl.classList.contains('flipped'));
+    }
+
+    function bindCardInteractions(grid) {
+      grid.querySelectorAll('.cd-card').forEach((cardEl) => {
+        cardEl.addEventListener('click', (event) => {
+          if (event.target.closest('a')) return;
+          toggleCard(cardEl);
+        });
+
+        cardEl.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          toggleCard(cardEl);
+        });
+      });
+    }
+
+    function renderGallery() {
+      const grid = document.getElementById('coffeeDreamsGrid');
+      if (!grid || !coffeeGalleryData) return;
+
+      renderVenueSwitcher(coffeeGalleryData, coffeeActiveVenueId);
+      renderVenueNote(coffeeGalleryData, coffeeActiveVenueId);
+      const cards = Array.isArray(coffeeGalleryData.cards) ? coffeeGalleryData.cards : [];
+      grid.innerHTML = cards
+        .map((card, index) => buildCardHtml(card, index, getCardLocation(card, coffeeGalleryData, coffeeActiveVenueId)))
+        .join('');
+      bindCardInteractions(grid);
+    }
+
+    function setCoffeeVenue(nextVenueId) {
+      coffeeActiveVenueId = String(nextVenueId || '').trim();
+      renderGallery();
     }
 
     async function loadGallery() {
@@ -252,12 +624,13 @@
       try {
         const res = await fetch('/data/coffee-dreams-cards.json');
         const data = await res.json();
+        coffeeGalleryData = data;
+        coffeeActiveVenueId = getDefaultVenueConfig(data).id;
         if (data.subtitle) {
           const sub = document.getElementById('cdSubtitle');
           if (sub) sub.textContent = data.subtitle;
         }
-        const cards = Array.isArray(data.cards) ? data.cards : [];
-        grid.innerHTML = cards.map((card, index) => buildCardHtml(card, index)).join('');
+        renderGallery();
       } catch (err) {
         grid.innerHTML = '<div class="col-12"><p class="text-warning">Could not load gallery cards.</p></div>';
         console.error(err);
