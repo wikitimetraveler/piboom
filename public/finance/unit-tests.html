@@ -786,6 +786,23 @@
         backdrop-filter: blur(4px);
       }
 
+      .unit-tests-story-overlay-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+
+      .unit-tests-story-overlay-body {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .unit-tests-story-stop-btn {
+        pointer-events: auto;
+        flex-shrink: 0;
+      }
+
       .unit-tests-story-scene-title {
         color: var(--text-dark, #1f2937);
       }
@@ -793,6 +810,10 @@
       .unit-tests-story-spotlight.section-card-header {
         box-shadow: inset 0 0 0 2px var(--zen-primary, #4a90a4);
         border-radius: 12px;
+      }
+
+      .unit-tests-story-spotlight.btn {
+        box-shadow: 0 0 0 2px var(--zen-primary, #4a90a4);
       }
 
       body.unit-tests-night-theme .unit-tests-story-mode-inner {
@@ -1752,6 +1773,31 @@
         font-weight: 600;
       }
 
+      #liveScenarioBuilderSectionCard .section-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      #liveScenarioBuilderSectionCard .section-card-header .section-title {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .scenario-builder-popout-btn {
+        flex-shrink: 0;
+        z-index: 1;
+      }
+
+      #scenarioBuilderPopoutModal .scenario-builder-grid-wrapper {
+        max-height: min(58vh, 520px);
+      }
+
+      #scenarioBuilderPopoutModal .modal-footer .input-group {
+        max-width: 28rem;
+        flex: 1 1 16rem;
+      }
+
       @media (max-width: 768px) {
         .hero {
           flex-direction: column;
@@ -2014,8 +2060,7 @@
       }
       body.unit-tests-focus-mode .tool-pills,
       body.unit-tests-focus-mode .unit-tests-workflow-tips-block,
-      body.unit-tests-focus-mode .unit-tests-story-mode,
-      body.unit-tests-focus-mode .section-sidebar {
+      body.unit-tests-focus-mode .unit-tests-story-mode {
         display: none !important;
       }
       body.unit-tests-focus-mode .section-content-area {
@@ -2109,7 +2154,7 @@
         </div>
 
         <!-- Excel Unit Tests — power lane: Generate + Download -->
-        <div class="unit-tests-command-bar d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div class="unit-tests-command-bar d-flex justify-content-between align-items-center flex-wrap gap-2" id="unitTestsCommandBar">
           <div class="d-flex align-items-center flex-wrap gap-2 min-w-0">
             <h5 class="mb-0 fw-semibold"><i class="bi-file-earmark-spreadsheet me-2"></i>Excel Unit Tests</h5>
             <span class="badge text-bg-light border d-none" id="unitTestsFileNameChip" title="Loaded workbook"></span>
@@ -2133,7 +2178,7 @@
             <button type="button" class="btn btn-success btn-sm" id="exportExcelBtn" disabled title="Download the current test workbook as Excel">
               <i class="bi-file-earmark-excel me-1"></i>Download Excel
             </button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" id="unitTestsFocusModeBtn" aria-pressed="false" title="Hide tool switcher, workflow tips, story mode, and sidebar">
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="unitTestsFocusModeBtn" aria-pressed="false" title="Focus layout: hide top tool switcher, tips, and story mode (left Workflow steps stay visible)">
               <i class="bi-arrows-angle-contract me-1"></i>Focus
             </button>
             <div class="dropdown">
@@ -2245,7 +2290,7 @@
           </div>
           <div class="modal-body">
             <p class="text-muted mb-2">
-              Select an Encompass custom field with a calculation (e.g. <code>[CX.TEST] = 1 + [353]</code>).
+              Select an Encompass custom field with a calculation (e.g. <code>[CUST11FV]</code> tax next-due rollup or <code>[CX.TEST] = 1 + [353]</code>).
               We will generate SET and COMPARE steps to test it.
             </p>
             <p class="small text-muted mb-3 mb-0">
@@ -2353,6 +2398,36 @@
       </div>
     </div>
 
+    <!-- Live Scenario Builder pop-out (same DOM block as inline — preserves all controls) -->
+    <div class="modal fade" id="scenarioBuilderPopoutModal" tabindex="-1" role="dialog" aria-labelledby="scenarioBuilderPopoutModalLabel" aria-hidden="true" data-bs-backdrop="static">
+      <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="scenarioBuilderPopoutModalLabel">
+              <i class="bi-calculator me-2"></i>Live Scenario Builder
+            </h5>
+            <button type="button" class="btn btn-sm btn-outline-secondary me-2" id="scenarioBuilderDockBtn" title="Dock back into the workflow section">
+              <i class="bi-box-arrow-in-down-left me-1"></i>Dock
+            </button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="scenarioBuilderPopoutHost"></div>
+          <div class="modal-footer flex-wrap align-items-center gap-2">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><i class="bi-key"></i></span>
+              <input type="text" class="form-control" id="scenarioBuilderPopoutLoanGuid" placeholder="Loan GUID for Apply &amp; Run" aria-label="Loan GUID for scenario builder run" />
+            </div>
+            <button type="button" class="btn btn-sm btn-success" id="scenarioPopoutApplyAndRunBtn">
+              <i class="bi-play-fill me-1"></i>Apply &amp; Run
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="scenarioPopoutDockFooterBtn">
+              <i class="bi-box-arrow-in-down-left me-1"></i>Dock
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <main class="container-fluid unit-tests-main pb-3 px-4">
       <div class="row">
         <div class="col-12">
@@ -2362,12 +2437,12 @@
               <div class="section-sidebar-title">Workflow</div>
               <ul class="section-sidebar-nav" id="sectionSidebarNav">
                 <li><a href="#collapseTestScenarios" data-bs-target="#collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-1-circle"></i> Step 1: Test Scenarios</a></li>
+                <li><a href="#collapseSelectedField" data-bs-target="#collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-input-cursor-text"></i> Selected Field</a></li>
                 <li><a href="#collapseLiveScenarioBuilder" data-bs-target="#collapseLiveScenarioBuilder" data-heading="headingLiveScenarioBuilder" id="sidebarLiveScenarioBuilder" style="display: none;"><i class="bi-calculator"></i> Live Scenario Builder</a></li>
                 <li><a href="#collapseTestGrid" data-bs-target="#collapseTestGrid" data-heading="headingTestGrid"><i class="bi-2-circle"></i> Step 2: Test Grid</a></li>
                 <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-3-circle"></i> Step 3: Run tests</a></li>
                 <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-4-circle"></i> Step 4: Sign-off</a></li>
                 <li><a href="#collapseTestLibrary" data-bs-target="#collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
-                <li><a href="#collapseSelectedField" data-bs-target="#collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-input-cursor-text"></i> Selected Field</a></li>
                 <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Advanced</span></li>
                 <li><a href="#collapseLearnMode" data-bs-target="#collapseLearnMode" data-heading="headingLearnMode"><i class="bi-mortarboard"></i> Learn Mode</a></li>
                 <li><a href="#collapseAIAssistant" data-bs-target="#collapseAIAssistant" data-heading="headingAIAssistant"><i class="bi-robot"></i> AI Assistant</a></li>
@@ -2390,11 +2465,11 @@
                 </div>
               </div>
               <p class="small text-muted mb-2 mb-sm-1" id="unitTestsOfflineDemoDisclaimer">
-                If the grid has no data yet, <strong>Play highlight reel</strong> loads the offline sample workbook first (SET / COMPARE rows and scenarios). It does not call Encompass or run live field calculations.
+                If the grid has no data yet, <strong>Play highlight reel</strong> loads the offline sample workbook first (<strong>CUST11FV</strong> tax next-due rollup — SET / COMPARE rows and scenarios). It does not call Encompass or run live field calculations.
               </p>
               <p class="unit-tests-story-copy small text-muted mb-2">
-                HyperFrames-style reel: scenarios → grid → run tests (QA, GUID, execute) → sign-off &amp; library (when step intros are on).
-                <strong>Narrate scenes</strong> is on by default; uncheck for a silent reel. Same audio stack as Lane tools (<code>/shared/tts.js</code>). Runs once, no loop. <kbd>Escape</kbd> stops playback.
+                HyperFrames-style reel: custom field → scenarios → grid → run tests (QA, GUID, execute) → sign-off &amp; library (when step intros are on).
+                <strong>Narrate scenes</strong> is on by default; uncheck for a silent reel. Same audio stack as Lane tools (<code>/shared/tts.js</code>). Runs once, no loop. <kbd>Escape</kbd> or <strong>Stop</strong> on the overlay ends playback.
               </p>
               <div class="unit-tests-story-options" role="group" aria-label="Story mode options">
                 <label class="unit-tests-story-option">
@@ -2407,9 +2482,14 @@
                 </label>
               </div>
               <div class="unit-tests-story-overlay d-none" id="unitTestsStoryOverlay" aria-live="polite">
-                <p class="unit-tests-story-scene-kicker mb-1 small text-uppercase text-muted" id="unitTestsStorySceneKicker"></p>
-                <h2 class="unit-tests-story-scene-title h6 mb-1" id="unitTestsStorySceneTitle"></h2>
-                <p class="unit-tests-story-scene-copy mb-0 small" id="unitTestsStorySceneCopy"></p>
+                <div class="unit-tests-story-overlay-head">
+                  <div class="unit-tests-story-overlay-body">
+                    <p class="unit-tests-story-scene-kicker mb-1 small text-uppercase text-muted" id="unitTestsStorySceneKicker"></p>
+                    <h2 class="unit-tests-story-scene-title h6 mb-1" id="unitTestsStorySceneTitle"></h2>
+                    <p class="unit-tests-story-scene-copy mb-0 small" id="unitTestsStorySceneCopy"></p>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline-secondary unit-tests-story-stop-btn d-none" id="unitTestsStoryStopBtn" aria-label="Stop highlight reel">Stop</button>
+                </div>
               </div>
             </div>
           </section>
@@ -2548,18 +2628,38 @@
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
-                      <p class="text-muted mb-3"><small>Click a scenario to highlight its column. Use <strong>Run</strong> to execute it. Click the <strong>Edit</strong> button on a scenario card to edit its description.</small></p>
+                      <p class="text-muted mb-3"><small>Click a scenario card to select it (or use the <strong>Scenario</strong> dropdown in Step 3), then <strong>Run</strong>. Each card also has its own <strong>Run</strong> button. Use <strong>Edit</strong> on a card to change its description.</small></p>
                       <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
               </div>
             </div>
-            <!-- Live Scenario Builder (directly above Step 2 Test Grid when shown) -->
+            <!-- Selected Field (when generated from custom field) — above Live Scenario Builder -->
+            <div class="section-card section-card-hidden" id="selectedFieldAccordionCard" data-collapse-target="collapseSelectedField" style="display: none;">
+              <div class="section-card-header collapsed" tabindex="0" id="headingSelectedField" role="button" data-bs-toggle="collapse" data-bs-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
+                <span class="section-title"><i class="bi-input-cursor-text"></i> Selected Field</span>
+                <i class="bi-chevron-down"></i>
+              </div>
+              <div id="collapseSelectedField" class="collapse section-card-body" aria-labelledby="headingSelectedField">
+                      <div id="selectedFieldContent" class="selected-field-details">
+                        <!-- Populated by loadGeneratedTestData when source is custom field -->
+                      </div>
+              </div>
+            </div>
+            <!-- Live Scenario Builder (below Selected Field; above Step 2 Test Grid when shown) -->
             <div class="section-card section-card-hidden" id="liveScenarioBuilderSectionCard" data-collapse-target="collapseLiveScenarioBuilder" style="display: none;">
               <div class="section-card-header collapsed" tabindex="0" id="headingLiveScenarioBuilder" role="button" data-bs-toggle="collapse" data-bs-target="#collapseLiveScenarioBuilder" aria-expanded="false" aria-controls="collapseLiveScenarioBuilder">
                 <span class="section-title"><i class="bi-calculator me-1"></i> Live Scenario Builder</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary scenario-builder-popout-btn d-none" id="scenarioBuilderPopoutBtn" title="Pop out scenario builder" aria-label="Pop out scenario builder">
+                  <i class="bi-box-arrow-up-right"></i>
+                </button>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseLiveScenarioBuilder" class="collapse section-card-body" aria-labelledby="headingLiveScenarioBuilder">
-                <p class="text-muted small mb-3">Edit mock values and see the calculation result. No Set/Get—single calc only. <strong>Null all</strong> sets every value to the literal <code>null</code> (same convention as the unit test grid). <strong>Label / aliases</strong> pulls Encompass descriptions when the hub metadata is loaded.</p>
+                <p class="text-muted small mb-3">Edit mock values and see the calculation result locally, then <strong>Apply</strong> or <strong>Apply &amp; Run</strong> against a loan GUID (same Encompass SET/GET/COMPARE APIs as the main test run). Use <strong>Pop out</strong> to keep the builder open while you work elsewhere on the page. <strong>Null all</strong> sets every value to the literal <code>null</code> (same convention as the unit test grid).</p>
+                <div id="scenarioBuilderInlineHost">
+                  <p id="scenarioBuilderPoppedOutHint" class="small text-muted d-none mb-2">
+                    Scenario builder is open in the pop-out panel.
+                    <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="scenarioBuilderDockFromHintBtn">Dock here</button>
+                  </p>
                 <div id="liveScenarioBuilderContainer" style="display: none;">
                   <div class="scenario-builder-grid-wrapper mb-3">
                     <table class="table table-sm table-bordered scenario-builder-grid" id="scenarioBuilderGrid">
@@ -2587,6 +2687,9 @@
                         <button type="button" class="btn btn-outline-primary scenario-apply-mode" data-mode="all" title="Every Test column">All</button>
                       </div>
                       <button type="button" class="btn btn-sm btn-primary" id="scenarioApplyToGridBtn"><i class="bi-check2-circle me-1"></i>Apply</button>
+                      <button type="button" class="btn btn-sm btn-success" id="scenarioApplyAndRunBtn" title="Apply builder values, then run SET/GET/COMPARE for the selected scenario column(s) against the loan GUID">
+                        <i class="bi-play-fill me-1"></i>Apply &amp; Run
+                      </button>
                     </div>
                     <div class="d-flex flex-wrap align-items-center gap-2">
                       <button type="button" class="btn btn-sm btn-outline-secondary" id="scenarioFillTool8Btn" title="Fill empty builder inputs using the same sample map as Alchemist (Tool 8)">
@@ -2601,6 +2704,7 @@
                     <label class="mb-1 fw-semibold"><small>Result</small></label>
                     <div id="scenarioBuilderResult" class="form-control-plaintext scenario-builder-result-display" readonly>—</div>
                   </div>
+                </div>
                 </div>
               </div>
             </div>
@@ -2642,6 +2746,7 @@
                       <div id="unitTestsQaHighlightsCard" class="alert alert-light border-start border-4 rounded mb-3 unit-tests-qa-highlights" role="region" aria-label="QA highlights">
                         <p class="fw-semibold text-dark mb-2"><i class="bi-patch-check-fill me-1 text-primary"></i>QA highlights</p>
                         <ul class="small text-muted mb-2 ps-3">
+                          <li class="mb-1">Choose a scenario in the Step 3 dropdown (or a scenario card), then <strong>Run</strong>—one Test column at a time. Use <strong>Run all scenarios</strong> in Advanced for a full workbook run.</li>
                           <li class="mb-1">Runs are <strong>SET</strong> / <strong>COMPARE</strong> rows from your Excel-style grid against a loan GUID—upload, tune scenarios, run, sign off.</li>
                           <li class="mb-1">Custom-field calcs use assignment form <code>[CX.FIELD] = expression</code>. The spreadsheet <code>=</code> at the very start is not part of Encompass—strip it when pasting.</li>
                           <li class="mb-0">Sanity-check with <strong>Generate → From custom field</strong> and <strong>Live Scenario Builder</strong> when inputs are editable.</li>
@@ -2668,7 +2773,10 @@
                             <label for="loanGuidInput" class="mb-1 text-muted"><small>Loan GUID</small></label>
                             <div class="input-group input-group-sm">
                               <input type="text" class="form-control" id="loanGuidInput" placeholder="Enter Loan GUID for API calls" />
-                              <button class="btn btn-success" id="runTestsBtn" style="display: none;">
+                              <select class="form-select form-select-sm" id="runScenarioSelect" aria-label="Scenario to run" style="display: none; max-width: 150px; flex: 0 1 auto;" disabled>
+                                <option value="">Scenario…</option>
+                              </select>
+                              <button class="btn btn-success" id="runTestsBtn" style="display: none;" title="Run the selected scenario only">
                                   <i class="bi-play-circle"></i> Run
                                 </button>
                                 <button class="btn btn-outline-secondary" type="button" id="clearLoanGuidBtn">
@@ -2689,6 +2797,9 @@
                         </div>
                         <div class="collapse mt-2" id="runAdvancedOptions">
                           <div class="d-flex flex-wrap align-items-center gap-2">
+                            <button class="btn btn-outline-primary btn-sm" id="runAllScenariosBtn" title="Run every Test column (full workbook)">
+                              <i class="bi-collection-play"></i> Run all scenarios
+                            </button>
                             <button class="btn btn-outline-secondary btn-sm" id="showAllColumnsBtn" title="Show Step, Action, Description, Target columns">
                               <i class="bi-layout-three-columns"></i> All Columns
                             </button>
@@ -2789,18 +2900,6 @@
                       </div>
               </div>
             </div>
-            <!-- Selected Field (when generated from custom field) -->
-            <div class="section-card section-card-hidden" id="selectedFieldAccordionCard" data-collapse-target="collapseSelectedField" style="display: none;">
-              <div class="section-card-header collapsed" tabindex="0" id="headingSelectedField" role="button" data-bs-toggle="collapse" data-bs-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
-                <span class="section-title"><i class="bi-input-cursor-text"></i> Selected Field</span>
-                <i class="bi-chevron-down"></i>
-              </div>
-              <div id="collapseSelectedField" class="collapse section-card-body" aria-labelledby="headingSelectedField">
-                      <div id="selectedFieldContent" class="selected-field-details">
-                        <!-- Populated by loadGeneratedTestData when source is custom field -->
-                      </div>
-              </div>
-            </div>
             </div>
           </div>
         </div>
@@ -2814,11 +2913,6 @@
       <div class="container">
         <div class="footer-content">
           <div class="tool-product-credits-footer" role="contentinfo" aria-label="Product credits">
-            <div class="credits-block">
-              <span class="credits-label">Product director</span>
-              <span class="credits-name">Tez Patel</span>
-            </div>
-            <span class="credits-sep" aria-hidden="true"></span>
             <div class="credits-block">
               <span class="credits-label">Developer</span>
               <span class="credits-name">David Lane</span>

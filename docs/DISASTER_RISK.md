@@ -24,6 +24,18 @@ Disaster data feeds, loan pipeline risk analysis, and the Disaster Risk AI assis
 
 Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng, etc.).
 
+### PostGIS spatial graph (Render Postgres)
+
+When `CREATE EXTENSION postgis` succeeds at startup, the app adds generated `geom geography(Point,4326)` columns (from existing lat/lng) on **`disasters`**, **`fire_cameras`**, and **`loans`**, with GiST indexes. Proximity uses `ST_DWithin` and KNN (`geom <-> point`) via `services/disaster-spatial.service.js`. If PostGIS is unavailable, behavior falls back to in-app Haversine (unchanged API shapes).
+
+Impact graph seeding adds **`NEAR`** edges (`disaster_event → loan`) from a spatial join when PostGIS is present. **pgRouting is not used** (not on Render’s extension allowlist).
+
+| Component | Path |
+|-----------|------|
+| PostGIS bootstrap | `services/database.service.js` (`ensurePostgisExtension`, `ensureTableGeomColumn`) |
+| Spatial queries | `services/disaster-spatial.service.js` |
+| NEAR edge seed | `services/disaster-impact-graph.service.js` (`seedNearSpatialEdges`) |
+
 ## Key Paths
 
 | Component | Path |
@@ -47,7 +59,9 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 | POST | `/refresh` | Refresh from all sources (FEMA, FIRMS, USGS, NWS, NHC) |
 | GET | `/stats` | Stats |
 | GET | `/export.csv` | CSV export |
-| GET | `/cameras` | Hazard webcams (national catalog) — query: `state`, `county` (ILIKE), `source`, `hazard` (JSONB tag), `mediaType`, `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — Haversine filter, nearest-first, each row includes `distance_miles` when geo is used |
+| GET | `/geocode-address` | Forward geocode for webcam address search (`q` query param) |
+| GET | `/near` | Nearby disasters, webcams, and loans — query: `lat`, `lng`, `radiusMiles` (1–500, default 50), `types` (comma: `disasters`, `cameras`, `loans`; default all), `limit` (max 500). PostGIS when available; Haversine fallback otherwise. Each row includes `distance_miles` when applicable. |
+| GET | `/cameras` | Hazard webcams (national catalog) — query: `state`, `county` (ILIKE), `source`, `hazard` (JSONB tag), `mediaType`, `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — PostGIS `ST_DWithin`/KNN when available, else Haversine; nearest-first, each row includes `distance_miles` when geo is used |
 | GET | `/cameras/stats` | Counts by source + last update time |
 | GET | `/cameras/:id/snapshot` | Latest still image URL (USGS NIMS resolves via listFiles on demand) |
 | POST | `/refresh-cameras` | Ingest hazard webcams — query/body `sources=all` or comma list (`alertcalifornia`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`); requires disaster refresh access |
@@ -56,7 +70,7 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/loans` | All loans — query: `milestone`, `state`, `county` (ILIKE), `riskLevel` (`low`/`medium`/`high`), `nearLat`, `nearLng`, `radiusMiles` (1–500; Haversine filter after SQL; requires loan coordinates) |
+| GET | `/loans` | All loans — query: `milestone`, `state`, `county` (ILIKE), `riskLevel` (`low`/`medium`/`high`), `nearLat`, `nearLng`, `radiusMiles` (1–500; PostGIS radius filter when available, else Haversine; requires loan coordinates) |
 | GET | `/loans/:id` | Single loan |
 | POST | `/generate` | Generate test loans |
 | POST | `/analyze` | Risk analysis for all loans |
@@ -155,6 +169,20 @@ When the floating **Disaster Processor Expert** AI chat opens on:
 Implementation: `public/shared/disaster-mood-music.js`, mapping in `lib/disaster-mood-music.js`, streamed via `/api/audio/stream/disasters%2F<file>.mp3`.
 
 Mute: music icon in the AI chat header, or `localStorage` key `dc_disaster_music_muted` = `1`. See `music/disasters/README.md`.
+
+## Unified Disasters UI (source command deck)
+
+`public/finance/disasters-unified.html` surfaces multi-source provenance in the **source command deck**:
+
+| UI element | Meaning |
+|------------|---------|
+| **Freshness dot (green)** | Source is enabled and returned rows in the current grid load |
+| **Freshness dot (amber)** | Source is enabled but returned zero rows (check filters or run **Refresh data**) |
+| **Freshness dot (gray)** | Source is disabled |
+| **Count badge** | Rows from that provider in the loaded grid |
+| **· N DB** | Aggregate count from `GET /api/disasters/stats` (`bySource`) when the API is available |
+
+Styles live in `public/finance/css/disasters-unified.css`. Per-source `last_refresh_at` is a future backend enhancement; until then, freshness is load-time heuristic only.
 
 ## Cinematic Google Earth KML (Unified Disasters)
 

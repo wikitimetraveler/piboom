@@ -103,6 +103,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | POST | `/api/disasters/refresh` | Refresh all sources |
 | POST | `/api/disasters/refresh-cameras` | Ingest multi-source hazard webcams into `fire_cameras` (manual / `npm run refresh:hazard-webcams`; not daily disaster refresh). Query/body: `sources=all` or comma list (`alertcalifornia`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`); requires disaster refresh access |
 | GET | `/api/disasters/geocode-address` | Forward geocode for hazard webcam address search (`q`). Uses `geocodeAddressFree` (Mapbox/Nominatim); fallback when client Google geocoder fails |
+| GET | `/api/disasters/near` | Nearby disasters, webcams, loans — query: `lat`, `lng`, `radiusMiles`, `types` (`disasters,cameras,loans`), `limit` (PostGIS or Haversine fallback) |
 | GET | `/api/disasters/cameras` | List fixed camera mounts from `fire_cameras` (not rolling disaster events). Query: `state`, `county`, `source`, `hazard`, `mediaType`, geo (`nearLat`, `nearLng`, `radiusMiles`) |
 | GET | `/api/disasters/cameras/stats` | Webcam counts by source |
 | GET | `/api/disasters/cameras/:id/snapshot` | Latest still image URL (USGS NIMS on-demand) |
@@ -131,6 +132,8 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | * | `/api/audio/*` | Audio routes |
 | * | `/api/voice/*` | Voice (init, start, stop, speak, etc.) |
 | * | `/api/music-research/*` | Knowledge graph, Wikipedia, MusicBrainz, etc. |
+| POST | `/api/music-research/map-data` | Birth/formation map points; MusicBrainz fallback for dates/places when Wikidata is sparse; **503** + `{ rateLimited: true }` only if both Wikimedia and MusicBrainz fail; `{ wikipediaRateLimited: true }` when map used MB-only due to 429 |
+| POST | `/api/music-research/wikipedia` | Artist Wikipedia/Wikidata summary; MusicBrainz fills missing `birthDate`/`birthPlace`; on Wikimedia 429 returns MB payload with `wikipediaRateLimited: true` when possible |
 | * | `/api/album-discovery/*` | Album AI analysis, search |
 | * | `/api/spotify/*` | Spotify auth, profile, playlists |
 | * | `/api/collection/*` | Collection CRUD |

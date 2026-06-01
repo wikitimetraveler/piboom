@@ -63,41 +63,6 @@ const darkModeStyles = `
     color: var(--text-primary);
   }
 
-  body.dark-mode[data-site-theme="heritage"] {
-    --site-primary: #c4a48a;
-    --site-primary-hover: #d6b59b;
-    --site-primary-rgb: 196, 164, 138;
-    --site-muted: #afa495;
-    --site-border: rgba(196, 164, 138, 0.24);
-    --site-card-bg: rgba(40, 34, 30, 0.96);
-    --site-dark: #14100d;
-    --site-surface: #201a16;
-    --site-surface-muted: #312720;
-    --site-highlight: #d7bf84;
-
-    --primary-blue: var(--site-primary);
-    --primary-blue-hover: var(--site-primary-hover);
-    --text-dark: #f5efe7;
-    --text-muted: #d4cbc0;
-    --border-light: var(--site-border);
-    --background-light: var(--site-surface);
-    --ice-primary: var(--site-primary);
-    --ice-secondary: var(--site-highlight);
-    --ice-dark: var(--text-dark);
-    --ice-light: rgba(196, 164, 138, 0.12);
-    --ice-glow: rgba(196, 164, 138, 0.26);
-    --ice-border: var(--site-border);
-    --text: var(--text-dark);
-    --muted: var(--text-muted);
-    --border: var(--border-light);
-    --bg-primary: var(--site-surface);
-    --bg-secondary: var(--site-surface-muted);
-    --text-primary: var(--text-dark);
-    --text-secondary: var(--text-muted);
-
-    background: linear-gradient(135deg, var(--site-surface) 0%, var(--site-surface-muted) 50%, #43362d 100%);
-  }
-
   /* Lane heritage (magazine, hub, shell tools) */
   body.dark-mode.lane-magazine-page,
   body.dark-mode.lane-major-achievers-page,

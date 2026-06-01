@@ -65,6 +65,7 @@
 **Columns with Coordinates:**
 - `lat` (DOUBLE PRECISION) - Disaster latitude ✅ **GEOCODED** (via free service)
 - `lng` (DOUBLE PRECISION) - Disaster longitude ✅ **GEOCODED**
+- `geom` (geography Point,4326) - **Generated** from lat/lng when PostGIS is enabled (GiST index `idx_disasters_geom`)
 
 **Geographic Data:**
 - `county_fips` (CHAR 5) - County FIPS code (required)
@@ -427,6 +428,18 @@
 - No charges for geocoding operations
 - Rate limit: 1 request/second (automatically handled)
 - Fallback to alternative free services if Nominatim fails
+
+### 🌐 **PostGIS (disaster spatial graph)**
+
+On Render managed Postgres, run once at startup: `CREATE EXTENSION IF NOT EXISTS postgis` (non-fatal if unavailable).
+
+| Table | Generated column | Index |
+|-------|------------------|-------|
+| `disasters` | `geom` from `lat`/`lng` | `idx_disasters_geom` (GiST) |
+| `fire_cameras` | `geom` from `lat`/`lng` | `idx_fire_cameras_geom` (GiST) |
+| `loans` | `geom` from `latitude`/`longitude` | `idx_loans_geom` (GiST) |
+
+**Services:** `services/disaster-spatial.service.js` (proximity queries), `services/disaster-impact-graph.service.js` (`NEAR` edges via `ST_DWithin`). **API:** `GET /api/disasters/near`.
 
 ---
 

@@ -1,4 +1,5 @@
 import { calculateDistance } from './disasters.service.js';
+import { resolveLoansNearPoint } from './disaster-spatial.service.js';
 
 /**
  * Loan Pipeline Service
@@ -1078,21 +1079,31 @@ export async function getAllLoans(filters = {}, options = {}) {
 
     query += ` ORDER BY created_at DESC`;
 
-    const result = await pool.query(query, params);
-    let rows = result.rows;
-
-    if (
+    const hasGeoFilter =
       filters.nearLat != null &&
       filters.nearLng != null &&
-      filters.radiusMiles != null
-    ) {
-      rows = filterLoansByDistance(
-        rows,
-        filters.nearLat,
-        filters.nearLng,
-        filters.radiusMiles
-      );
+      filters.radiusMiles != null;
+
+    if (hasGeoFilter) {
+      const spatial = await resolveLoansNearPoint({
+        lat: filters.nearLat,
+        lng: filters.nearLng,
+        radiusMiles: filters.radiusMiles,
+        limit: 5000,
+        offset: 0,
+        filters: {
+          milestone: filters.milestone,
+          state: filters.state,
+          county: filters.county,
+          riskLevel: filters.riskLevel
+        },
+        lite
+      });
+      return spatial.rows;
     }
+
+    const result = await pool.query(query, params);
+    let rows = result.rows;
 
     return rows;
   } catch (error) {

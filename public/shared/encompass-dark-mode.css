@@ -669,3 +669,61 @@
 .encompass-dark-mode .loan-info-panel {
   background: linear-gradient(135deg, #4b5563 0%, #6b7280 100%) !important;
 }
+
+/* Unified Disasters dashboard (disasters-unified.html) */
+.encompass-dark-mode.du-page {
+  background: #1f2937;
+  color: #f3f4f6;
+}
+.encompass-dark-mode .du-command-deck,
+.encompass-dark-mode .du-page .card {
+  background: #374151;
+  border-color: #4b5563;
+}
+.encompass-dark-mode .du-page .card-body {
+  color: #e5e7eb;
+}
+.encompass-dark-mode .source-chip {
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #e5e7eb;
+}
+.encompass-dark-mode .source-chip .source-chip-count {
+  background: rgba(0, 0, 0, 0.25);
+}
+.encompass-dark-mode .du-page .form-control,
+.encompass-dark-mode .du-page .form-select {
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #f3f4f6;
+}
+.encompass-dark-mode .footer {
+  background: #374151;
+  border-color: #4b5563;
+}
+.encompass-dark-mode .tool-product-credits-footer .credits-name {
+  color: #f9fafb;
+}
+.encompass-dark-mode .du-page #disastersAccordion {
+  background: #374151;
+  border-color: #4b5563;
+}
+.encompass-dark-mode .du-page #disastersAccordion .accordion-button {
+  background: #4b5563;
+  color: #f3f4f6;
+}
+.encompass-dark-mode .du-page #disastersAccordion .accordion-button:not(.collapsed) {
+  background: #374151;
+  color: #93c5fd;
+}
+.encompass-dark-mode .du-page #disastersAccordion .accordion-body {
+  background: #374151;
+}
+.encompass-dark-mode .du-filters-body select[multiple].form-control {
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #f3f4f6;
+}
+.encompass-dark-mode .du-filters-body .form-label {
+  color: #e5e7eb;
+}

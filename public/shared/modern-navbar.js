@@ -40,64 +40,37 @@
  */
 
 const SITE_THEME_KEY = 'devConnectLabs_siteTheme';
-const SITE_THEMES = [
-  { id: 'zen', label: 'Zen', icon: 'bi-droplet-half' },
-  { id: 'heritage', label: 'Heritage', icon: 'bi-gem' }
-];
 
-function normalizeSiteTheme(themeId) {
-  return SITE_THEMES.some((theme) => theme.id === themeId) ? themeId : 'zen';
-}
-
-function getPreferredSiteTheme() {
-  try {
-    return normalizeSiteTheme(localStorage.getItem(SITE_THEME_KEY) || 'zen');
-  } catch (_) {
-    return 'zen';
-  }
-}
-
-function setDocumentSiteTheme(themeId) {
-  const safeTheme = normalizeSiteTheme(themeId);
-  document.documentElement.setAttribute('data-site-theme', safeTheme);
-  if (document.body) {
-    document.body.setAttribute('data-site-theme', safeTheme);
-  }
-  document.dispatchEvent(new CustomEvent('site-theme-changed', {
-    detail: { themeId: safeTheme }
-  }));
-}
-
-function initSiteTheme() {
+function clearSitewideThemePreference() {
   if (typeof document === 'undefined') return;
-  setDocumentSiteTheme(getPreferredSiteTheme());
+  try {
+    localStorage.removeItem(SITE_THEME_KEY);
+  } catch (_) {}
+  document.documentElement.removeAttribute('data-site-theme');
+  if (document.body) {
+    document.body.removeAttribute('data-site-theme');
+  }
 }
 
 if (typeof window !== 'undefined') {
-  initSiteTheme();
-  document.addEventListener('DOMContentLoaded', initSiteTheme, { once: true });
+  clearSitewideThemePreference();
+  document.addEventListener('DOMContentLoaded', clearSitewideThemePreference, { once: true });
 }
 
 class ModernNavbar extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.handleSiteThemeChange = (event) => {
-      this.syncSiteThemeButtons(event?.detail?.themeId || getPreferredSiteTheme());
-    };
   }
 
   connectedCallback() {
+    clearSitewideThemePreference();
     this.ensureMenuConfig().then(() => {
       this.render();
       this.attachEventListeners();
       this.injectToolSearchScripts();
       this.injectImageLightbox();
     });
-  }
-
-  disconnectedCallback() {
-    document.removeEventListener('site-theme-changed', this.handleSiteThemeChange);
   }
 
   injectImageLightbox() {
@@ -174,7 +147,6 @@ class ModernNavbar extends HTMLElement {
     const brand = this.getAttribute('brand') || 'DevConnect Labs';
     const compact = this.hasAttribute('compact');
     const demoMode = this.isDemoMode();
-    const activeTheme = getPreferredSiteTheme();
     const cfg = window.MENU_CONFIG || {};
     const navFinance = cfg.NAV_FINANCE || [];
     const navMusic = cfg.NAV_MUSIC || [];
@@ -240,43 +212,6 @@ class ModernNavbar extends HTMLElement {
           background: linear-gradient(135deg, rgba(var(--site-primary-rgb, 74, 144, 164), 0.2), rgba(var(--site-primary-rgb, 74, 144, 164), 0.26));
           border-color: var(--site-primary, #4a90a4);
           transform: translateY(-2px);
-        }
-
-        .theme-switcher {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.25rem;
-          padding: 0.2rem;
-          border-radius: 999px;
-          background: rgba(var(--site-primary-rgb, 74, 144, 164), 0.08);
-          border: 1px solid rgba(var(--site-primary-rgb, 74, 144, 164), 0.15);
-        }
-
-        .site-theme-btn {
-          border: none;
-          background: transparent;
-          color: #334155;
-          border-radius: 999px;
-          padding: 0.3rem 0.7rem;
-          font-size: 0.82rem;
-          font-weight: 600;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.35rem;
-          cursor: pointer;
-          transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .site-theme-btn:hover {
-          color: var(--site-primary, #4a90a4);
-          background: rgba(var(--site-primary-rgb, 74, 144, 164), 0.1);
-          transform: translateY(-1px);
-        }
-
-        .site-theme-btn.active {
-          background: linear-gradient(135deg, var(--site-primary, #4a90a4), var(--site-primary-hover, #3d7a8a));
-          color: #ffffff;
-          box-shadow: 0 6px 18px rgba(var(--site-primary-rgb, 74, 144, 164), 0.28);
         }
         
         /* Modern Dropdown Menus */
@@ -449,10 +384,6 @@ class ModernNavbar extends HTMLElement {
             flex-direction: column;
             align-items: stretch;
           }
-
-          .theme-switcher {
-            justify-content: center;
-          }
           
           .dropdown-menu {
             position: static;
@@ -523,24 +454,6 @@ class ModernNavbar extends HTMLElement {
                 <button class="nav-link" id="navSearchBtn" type="button" aria-label="Search tools (Ctrl+K)" title="Search tools (Ctrl+K)" style="background:none;border:none;cursor:pointer;padding:0.35rem 0.75rem;">
                   <i class="bi-search"></i> Search
                 </button>
-              </li>
-            </ul>
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <div class="theme-switcher" role="group" aria-label="Site theme">
-                  ${SITE_THEMES.map((theme) => `
-                    <button
-                      class="site-theme-btn${theme.id === activeTheme ? ' active' : ''}"
-                      type="button"
-                      data-theme="${theme.id}"
-                      aria-pressed="${theme.id === activeTheme ? 'true' : 'false'}"
-                      title="Switch to ${theme.label} theme"
-                    >
-                      <i class="bi ${theme.icon}"></i>
-                      <span>${theme.label}</span>
-                    </button>
-                  `).join('')}
-                </div>
               </li>
             </ul>
             <!-- User Login (LEFT SIDE) -->
@@ -623,9 +536,6 @@ class ModernNavbar extends HTMLElement {
   }
 
   attachEventListeners() {
-    document.removeEventListener('site-theme-changed', this.handleSiteThemeChange);
-    document.addEventListener('site-theme-changed', this.handleSiteThemeChange);
-
     // Scroll effect
     window.addEventListener('scroll', () => {
       const navbar = this.shadowRoot.querySelector('.modern-navbar');
@@ -684,12 +594,6 @@ class ModernNavbar extends HTMLElement {
       document.dispatchEvent(new CustomEvent('open-tool-search', { bubbles: true }));
     });
 
-    this.shadowRoot.querySelectorAll('.site-theme-btn').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        this.setSiteTheme(btn.dataset.theme || 'zen');
-      });
-    });
-
     // User login button
     const userBtn = this.shadowRoot.querySelector('#navUserBtn');
     userBtn?.addEventListener('click', (e) => {
@@ -711,7 +615,6 @@ class ModernNavbar extends HTMLElement {
 
     // Initialize user display
     this.updateUserDisplay();
-    this.syncSiteThemeButtons();
   }
 
   markActiveNavItems() {
@@ -750,27 +653,9 @@ class ModernNavbar extends HTMLElement {
     }
   }
 
-  syncSiteThemeButtons(themeId = getPreferredSiteTheme()) {
-    this.shadowRoot.querySelectorAll('.site-theme-btn').forEach((btn) => {
-      const isActive = btn.dataset.theme === themeId;
-      btn.classList.toggle('active', isActive);
-      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-    });
-  }
-
-  setSiteTheme(themeId) {
-    const safeTheme = normalizeSiteTheme(themeId);
-    try {
-      localStorage.setItem(SITE_THEME_KEY, safeTheme);
-    } catch (_) {}
-    setDocumentSiteTheme(safeTheme);
-    this.syncSiteThemeButtons(safeTheme);
-  }
-
   // Public method to update user display (can be called from outside)
   refresh() {
     this.updateUserDisplay();
-    this.syncSiteThemeButtons();
   }
 }
 

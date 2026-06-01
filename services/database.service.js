@@ -52,6 +52,92 @@ import pg from 'pg';
 const { Pool } = pg;
 
 let pool = null;
+/** @type {boolean|null} null until first check; cached thereafter */
+let postgisAvailable = null;
+
+/**
+ * Enable PostGIS extension (idempotent). Non-fatal — logs warning and returns false on failure.
+ * @returns {Promise<boolean>}
+ */
+export async function ensurePostgisExtension() {
+  if (!pool) {
+    postgisAvailable = false;
+    return false;
+  }
+  try {
+    await pool.query('CREATE EXTENSION IF NOT EXISTS postgis');
+    postgisAvailable = true;
+    console.log('✅ PostGIS extension enabled');
+    return true;
+  } catch (err) {
+    postgisAvailable = false;
+    console.warn(`⚠️ PostGIS extension not available: ${err.message}`);
+    return false;
+  }
+}
+
+/**
+ * Whether PostGIS is installed (cached after first check).
+ * @returns {Promise<boolean>}
+ */
+export async function isPostgisAvailable() {
+  if (postgisAvailable !== null) return postgisAvailable;
+  if (!pool) {
+    postgisAvailable = false;
+    return false;
+  }
+  try {
+    const { rows } = await pool.query(
+      `SELECT 1 FROM pg_extension WHERE extname = 'postgis' LIMIT 1`
+    );
+    postgisAvailable = rows.length > 0;
+  } catch {
+    postgisAvailable = false;
+  }
+  return postgisAvailable;
+}
+
+/** Reset cached PostGIS flag (tests only). */
+export function resetPostgisAvailabilityCache() {
+  postgisAvailable = null;
+}
+
+const GEOM_TABLE_ALLOWLIST = new Set(['disasters', 'fire_cameras', 'loans']);
+
+/**
+ * Add generated geography(Point,4326) column + GiST index when PostGIS is available.
+ * @param {string} tableName
+ * @param {string} latCol
+ * @param {string} lngCol
+ * @param {string} indexName
+ * @returns {Promise<boolean>}
+ */
+export async function ensureTableGeomColumn(tableName, latCol, lngCol, indexName) {
+  if (!(await isPostgisAvailable())) return false;
+  if (!GEOM_TABLE_ALLOWLIST.has(tableName)) {
+    throw new Error(`ensureTableGeomColumn: table not allowlisted: ${tableName}`);
+  }
+  const colCheck = await pool.query(
+    `SELECT 1 FROM information_schema.columns
+     WHERE table_schema = 'public' AND table_name = $1 AND column_name = 'geom'
+     LIMIT 1`,
+    [tableName]
+  );
+  if (!colCheck.rows.length) {
+    await pool.query(`
+      ALTER TABLE ${tableName}
+      ADD COLUMN geom geography(Point, 4326)
+      GENERATED ALWAYS AS (
+        CASE
+          WHEN ${latCol} IS NOT NULL AND ${lngCol} IS NOT NULL
+          THEN ST_SetSRID(ST_MakePoint(${lngCol}::double precision, ${latCol}::double precision), 4326)::geography
+        END
+      ) STORED
+    `);
+  }
+  await pool.query(`CREATE INDEX IF NOT EXISTS ${indexName} ON ${tableName} USING GIST (geom)`);
+  return true;
+}
 
 export function initializeDatabase() {
   // DATABASE_URL is REQUIRED - fail if not provided
@@ -109,6 +195,8 @@ export async function createTables() {
       }
       throw new Error(`Database connection failed: ${connError.message}`);
     }
+
+    await ensurePostgisExtension();
 
     // Create users table with passwords
     await pool.query(`
@@ -824,6 +912,12 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_loans_flood_zone ON loans(flood_zone)
     `);
 
+    try {
+      await ensureTableGeomColumn('loans', 'latitude', 'longitude', 'idx_loans_geom');
+    } catch (geomErr) {
+      console.warn(`⚠️ loans geom column skipped: ${geomErr.message}`);
+    }
+
     // Create test_executions table for unit test tracking
     await pool.query(`
       CREATE TABLE IF NOT EXISTS test_executions (
@@ -1171,6 +1265,10 @@ export function getPool() {
 export default {
   initializeDatabase,
   createTables,
-  getPool
+  getPool,
+  ensurePostgisExtension,
+  isPostgisAvailable,
+  ensureTableGeomColumn,
+  resetPostgisAvailabilityCache
 };
 

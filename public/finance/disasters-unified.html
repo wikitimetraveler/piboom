@@ -23,6 +23,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="/shared/design-tokens.css" />
     <link href="../shared/modern-navbar.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/finance/css/disasters-unified.css" />
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
@@ -31,664 +32,101 @@
     <script type="module" src="../shared/disaster-mood-music.js"></script>
     <script type="module" src="../shared/ai-chat-widget.js"></script>
     <script type="module" src="../shared/ai-insights-card.js"></script>
-    <style>
-      :root {
-        --primary-color: var(--zen-primary, #4a90a4);
-        --wildfire: linear-gradient(135deg, #ff6b35, #f7931e);
-        --earthquake: linear-gradient(135deg, #8b4513, #a0522d);
-        --hurricane: linear-gradient(135deg, #1e88e5, #1565c0);
-        --flood: linear-gradient(135deg, #29b6f6, #0277bd);
-        --severe: linear-gradient(135deg, #ef5350, #c62828);
-        --default-gradient: linear-gradient(135deg, #667eea, #764ba2);
-        --desert-sand: #f4e4bc;
-        --desert-tan: #d4a574;
-        --desert-orange: #e67e22;
-        --desert-brown: #8b4513;
-        --coyote-brown: #a0522d;
-        --road-runner-blue: #3498db;
-        --acme-red: #e74c3c;
-      }
-
-      body {
-        background: var(--zen-surface, #f8fafc);
-        min-height: 100vh;
-        font-family: 'Inter', 'Segoe UI', sans-serif;
-        position: relative;
-        color: var(--text-dark, #1f2937);
-      }
-
-      .card-header {
-        background: linear-gradient(135deg, var(--zen-primary, #4a90a4), var(--zen-primary-hover, #3d7a8a));
-        color: #fff;
-        border-radius: 12px 12px 0 0 !important;
-      }
-
-      .workflow-hint {
-        font-size: 0.875rem;
-        color: var(--text-muted, #6b7280);
-        margin-bottom: 0.75rem;
-        line-height: 1.5;
-      }
-
-      #encompassLoansGrid.ag-theme-alpine {
-        width: 100%;
-        height: 360px;
-      }
-
-      /* Disaster Loading Overlay - Modern & Cool */
-      #roadRunnerLoading {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-        z-index: 9999;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        transition: opacity 0.5s ease, visibility 0.5s ease;
-      }
-
-      #roadRunnerLoading.hidden {
-        opacity: 0;
-        visibility: hidden;
-      }
-
-      .loading-container {
-        text-align: center;
-        color: #60a5fa;
-        position: relative;
-      }
-
-      .disaster-icon {
-        font-size: 8rem;
-        animation: disasterPulse 1.5s ease-in-out infinite;
-        text-shadow: 0 0 30px rgba(96, 165, 250, 0.6), 0 0 60px rgba(96, 165, 250, 0.3);
-        margin-bottom: 1rem;
-        filter: drop-shadow(0 0 20px rgba(96, 165, 250, 0.5));
-      }
-
-      @keyframes disasterPulse {
-        0%, 100% {
-          transform: scale(1) rotate(0deg);
-          opacity: 1;
-        }
-        25% {
-          transform: scale(1.1) rotate(-5deg);
-          opacity: 0.9;
-        }
-        50% {
-          transform: scale(1.2) rotate(0deg);
-          opacity: 0.8;
-        }
-        75% {
-          transform: scale(1.1) rotate(5deg);
-          opacity: 0.9;
-        }
-      }
-
-      .loading-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #60a5fa;
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(96, 165, 250, 0.5);
-        margin-bottom: 0.5rem;
-        font-family: 'Inter', sans-serif;
-        letter-spacing: 2px;
-      }
-
-      .loading-subtitle {
-        font-size: 1.2rem;
-        color: #93c5fd;
-        margin-bottom: 2rem;
-        font-style: italic;
-        text-shadow: 0 0 10px rgba(147, 197, 253, 0.5);
-      }
-
-      .data-stream {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-        margin: 2rem 0;
-        flex-wrap: wrap;
-      }
-
-      .data-icon {
-        font-size: 2.5rem;
-        animation: dataFlow 2s ease-in-out infinite;
-        animation-delay: calc(var(--delay) * 0.3s);
-        filter: drop-shadow(0 0 10px rgba(96, 165, 250, 0.6));
-      }
-
-      @keyframes dataFlow {
-        0%, 100% {
-          transform: translateY(0) scale(1);
-          opacity: 0.7;
-        }
-        50% {
-          transform: translateY(-20px) scale(1.2);
-          opacity: 1;
-        }
-      }
-
-      .loading-progress-disaster {
-        width: 400px;
-        height: 10px;
-        background: rgba(96, 165, 250, 0.2);
-        border-radius: 10px;
-        overflow: hidden;
-        margin-top: 2rem;
-        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-
-      .loading-progress-bar-disaster {
-        height: 100%;
-        background: linear-gradient(90deg, #60a5fa, #3b82f6, #2563eb, #3b82f6, #60a5fa);
-        background-size: 200% 100%;
-        border-radius: 10px;
-        transition: width 0.3s ease;
-        animation: progressShimmer 2s linear infinite;
-        box-shadow: 0 0 20px rgba(96, 165, 250, 0.6);
-        width: 0%;
-      }
-
-      @keyframes progressShimmer {
-        0% {
-          background-position: 200% 0;
-        }
-        100% {
-          background-position: -200% 0;
-        }
-      }
-
-      .loading-text {
-        color: #cbd5e1;
-        font-size: 1rem;
-        margin-top: 1rem;
-        font-weight: 500;
-        text-shadow: 0 0 10px rgba(203, 213, 225, 0.5);
-      }
-
-      .circuit-container {
-        display: flex;
-        justify-content: center;
-        gap: 0.5rem;
-        margin-top: 1.5rem;
-      }
-
-      .circuit-node {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: #60a5fa;
-        box-shadow: 0 0 15px rgba(96, 165, 250, 0.8);
-        animation: circuitPulse 1.5s ease-in-out infinite;
-        animation-delay: calc(var(--delay) * 0.2s);
-      }
-
-      @keyframes circuitPulse {
-        0%, 100% {
-          transform: scale(1);
-          opacity: 0.5;
-        }
-        50% {
-          transform: scale(1.5);
-          opacity: 1;
-        }
-      }
-
-      .container-xxl { 
-        max-width: 1400px;
-        position: relative;
-        z-index: 1;
-      }
-
-      .page-header {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        margin-bottom: 2rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e5e7eb;
-      }
-
-      .page-header h1 {
-        color: #1f2937;
-        font-weight: 600;
-        font-size: 1.75rem;
-        margin-bottom: 0;
-      }
-
-      .card {
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        background: white;
-        transition: all 0.2s ease;
-        overflow: hidden;
-      }
-
-      .card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-color: #d1d5db;
-      }
-
-      .card-header {
-        background: #f9fafb;
-        color: #1f2937;
-        font-weight: 600;
-        padding: 1rem 1.5rem;
-        border-bottom: 2px solid #e5e7eb;
-        font-size: 0.95rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      #map { 
-        height: clamp(320px, 52vh, 680px);
-        width: 100%; 
-        border-radius: 12px;
-        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      #youtubeResults {
-        max-height: clamp(320px, 52vh, 680px);
-      }
-
-      .dashboard-status-banner {
-        display: none;
-      }
-
-      .filters .form-label { 
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 0.5rem;
-      }
-
-      .form-control, .form-select {
-        border-radius: 10px;
-        border: 2px solid #e5e7eb;
-        transition: all 0.3s ease;
-        padding: 0.75rem 1rem;
-      }
-
-      .form-control:focus, .form-select:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        outline: none;
-      }
-
-      .btn {
-        border-radius: 10px;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        transition: all 0.3s ease;
-        border: none;
-      }
-
-      .btn-primary {
-        background: #2563eb;
-        color: white;
-        border-color: #2563eb;
-      }
-
-      .btn-primary:hover {
-        background: #1d4ed8;
-        border-color: #1d4ed8;
-      }
-
-      .btn-outline-primary {
-        border: 1px solid #2563eb;
-        color: #2563eb;
-        background: white;
-      }
-
-      .btn-outline-primary:hover {
-        background: #2563eb;
-        color: white;
-      }
-
-      .btn-outline-secondary {
-        border: 1px solid #6b7280;
-        color: #6b7280;
-        background: white;
-      }
-
-      .btn-outline-secondary:hover {
-        background: #6b7280;
-        color: white;
-      }
-
-      /* Disaster type row colors - subtle background tints */
-      #disastersGrid.ag-theme-alpine {
-        width: 100%;
-        height: 520px;
-      }
-      #disastersGrid .ag-row.disaster-wildfire { background-color: #fff7ed; }
-      #disastersGrid .ag-row.disaster-earthquake { background-color: #fef3f2; }
-      #disastersGrid .ag-row.disaster-hurricane { background-color: #eff6ff; }
-      #disastersGrid .ag-row.disaster-flood { background-color: #f0f9ff; }
-      #disastersGrid .ag-row.disaster-severe { background-color: #fef2f2; }
-      #disastersGrid .ag-row.disaster-active { box-shadow: inset 3px 0 0 #2563eb; }
-
-      #disastersGrid .ag-row { cursor: pointer; }
-
-      /* Event type icons */
-      .event-icon {
-        font-size: 1.2rem;
-        margin-right: 0.5rem;
-        display: inline-block;
-        vertical-align: middle;
-        white-space: nowrap;
-      }
-
-      /* YouTube results */
-      #youtubeResults .card {
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid #e5e7eb;
-        transition: all 0.2s ease;
-      }
-
-      #youtubeResults .card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-color: #d1d5db;
-      }
-
-      /* Encompass loans */
-      #encompassLoansCard {
-        animation: slideDown 0.5s ease;
-      }
-      #encompassLoansGrid .ag-row {
-        cursor: pointer;
-      }
-
-      @keyframes slideDown {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Source badges - professional styling with fixed width */
-      .source-badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-        border: 1px solid transparent;
-        white-space: nowrap;
-        vertical-align: middle;
-        width: 90px;
-        text-align: center;
-        box-sizing: border-box;
-      }
-
-      .source-fema { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
-      .source-firms { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-      .source-usgs { background: #fef3c7; color: #92400e; border-color: #fde68a; }
-      .source-alertcalifornia { background: #fef3c7; color: #d97706; border-color: #fbbf24; }
-      .source-nws { background: #cffafe; color: #0e7490; border-color: #67e8f9; }
-      .source-nhc { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
-      .source-floodzones { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
-
-      /* Risk badges */
-      .risk-badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-      .risk-low { background: #d1fae5; color: #065f46; }
-      .risk-medium { background: #fef3c7; color: #92400e; }
-      .risk-high { background: #fee2e2; color: #991b1b; }
-      .risk-critical { background: #7c2d12; color: #fee2e2; }
-
-      /* Active disaster indicator - removed to prevent layout shift */
-
-      /* Stats cards - professional */
-      .stat-card {
-        background: white;
-        border-radius: 8px;
-        padding: 1.25rem;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        transition: all 0.2s ease;
-        border: 1px solid #e5e7eb;
-      }
-
-      .stat-card:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-color: #d1d5db;
-      }
-
-      .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #1f2937;
-        line-height: 1.2;
-      }
-
-      .stat-label {
-        color: #6b7280;
-        font-size: 0.8125rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-top: 0.5rem;
-      }
-
-      /* Loading animation */
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-
-      .loading {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(102, 126, 234, 0.3);
-        border-top-color: #667eea;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      /* Map marker pulse */
-      .marker-pulse {
-        animation: markerPulse 2s ease-in-out infinite;
-      }
-
-      @keyframes markerPulse {
-        0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.2); opacity: 0.7; }
-        100% { transform: scale(1); opacity: 1; }
-      }
-
-      /* Disaster source chips — quick toggle (aligned with Risk Analysis dashboard) */
-      .disaster-source-selector {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        padding: 0.5rem 0;
-      }
-      .source-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border: 2px solid #e5e7eb;
-        border-radius: 25px;
-        background: white;
-        color: #6b7280;
-        font-weight: 500;
-        font-size: 0.8125rem;
-        cursor: pointer;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-      }
-      .source-chip:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-        border-color: #d1d5db;
-      }
-      .source-chip i { font-size: 0.95rem; }
-      .source-chip-active {
-        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
-        color: white;
-        border-color: var(--primary-color);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
-      }
-      .source-chip[data-source="fema"].source-chip-active { background: linear-gradient(135deg, #2563eb, #3b82f6); }
-      .source-chip[data-source="firms"].source-chip-active { background: linear-gradient(135deg, #ef4444, #f87171); }
-      .source-chip[data-source="usgs"].source-chip-active { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #1f2937; }
-      .source-chip[data-source="nws"].source-chip-active { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
-      .source-chip[data-source="nhc"].source-chip-active { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-      .source-chip[data-source="gdacs"].source-chip-active { background: linear-gradient(135deg, #6b7280, #9ca3af); }
-      .source-chip[data-source="floodzones"].source-chip-active { background: linear-gradient(135deg, #06b6d4, #67e8f9); }
-      .source-chip[data-source="alertcalifornia"].source-chip-active { background: linear-gradient(135deg, #ea580c, #fb923c); }
-
-      /* Page footer — product credits (matches unit-tests / tool4) */
-      .footer {
-        margin-top: 2rem;
-        padding: 1.25rem 0 1.5rem;
-        background: #fff;
-        border-top: 1px solid #e5e7eb;
-        flex-shrink: 0;
-      }
-      .footer-content {
-        text-align: center;
-      }
-      .tool-product-credits-footer {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: center;
-        gap: 0.75rem 1.5rem;
-        margin-bottom: 1rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e5e7eb;
-      }
-      .tool-product-credits-footer .credits-block {
-        text-align: center;
-      }
-      .tool-product-credits-footer .credits-label {
-        display: block;
-        font-size: 0.65rem;
-        text-transform: uppercase;
-        letter-spacing: 0.14em;
-        font-weight: 600;
-        color: #64748b;
-        margin-bottom: 0.2rem;
-      }
-      .tool-product-credits-footer .credits-name {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #0f172a;
-        letter-spacing: 0.02em;
-      }
-      .footer-meta-line {
-        font-size: 0.8rem;
-        color: #64748b;
-      }
-
-      @media (max-width: 768px) {
-        #map, #youtubeResults {
-          height: clamp(280px, 48vh, 520px);
-          max-height: clamp(280px, 48vh, 520px);
-        }
-        #statsRow .col-md-3 {
-          flex: 0 0 50%;
-          max-width: 50%;
-        }
-      }
-    </style>
   </head>
-  <body>
-    <!-- Disaster Loading Overlay -->
-    <div id="roadRunnerLoading">
+  <body class="du-page">
+    <div id="roadRunnerLoading" aria-live="polite" aria-busy="true">
       <div class="loading-container">
-        <div class="disaster-icon">🌍</div>
-        <div class="loading-title">Disaster Watch</div>
-        <div class="loading-subtitle">Loading disaster data from multiple sources...</div>
-        
-        <div class="data-stream">
-          <div class="data-icon" style="--delay: 0">🔥</div>
-          <div class="data-icon" style="--delay: 1">🌊</div>
-          <div class="data-icon" style="--delay: 2">🌍</div>
-          <div class="data-icon" style="--delay: 3">🌀</div>
-          <div class="data-icon" style="--delay: 4">⚡</div>
+        <div class="loading-icon-ring"><i class="bi bi-globe-americas" aria-hidden="true"></i></div>
+        <div class="loading-title">Unified Disaster Intelligence</div>
+        <div class="loading-subtitle" id="loadingIngestSubtitle">Ingesting FEMA · NASA FIRMS · USGS · NWS · NHC</div>
+        <div class="data-stream" aria-hidden="true">
+          <span class="data-icon" style="--delay: 0"><i class="bi bi-shield-check"></i></span>
+          <span class="data-icon" style="--delay: 1"><i class="bi bi-fire"></i></span>
+          <span class="data-icon" style="--delay: 2"><i class="bi bi-geo-alt"></i></span>
+          <span class="data-icon" style="--delay: 3"><i class="bi bi-cloud-lightning"></i></span>
+          <span class="data-icon" style="--delay: 4"><i class="bi bi-tornado"></i></span>
         </div>
-
         <div class="loading-progress-disaster">
           <div class="loading-progress-bar-disaster" id="loadingProgressBarDisaster"></div>
         </div>
-
-        <div class="loading-text" id="loadingStatusDisaster">Initializing disaster monitoring...</div>
-
-        <div class="circuit-container">
+        <div class="loading-text" id="loadingStatusDisaster">Initializing multi-source monitoring…</div>
+        <div class="circuit-container" aria-hidden="true">
           <div class="circuit-node" style="--delay: 0"></div>
           <div class="circuit-node" style="--delay: 1"></div>
           <div class="circuit-node" style="--delay: 2"></div>
           <div class="circuit-node" style="--delay: 3"></div>
           <div class="circuit-node" style="--delay: 4"></div>
-          <div class="circuit-node" style="--delay: 5"></div>
-          <div class="circuit-node" style="--delay: 6"></div>
-          <div class="circuit-node" style="--delay: 7"></div>
         </div>
       </div>
     </div>
 
     <modern-navbar></modern-navbar>
 
-    <div class="container-xxl py-4">
-      <div class="page-header">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h1 class="mb-0"><i class="bi-fire"></i> Unified Disasters <small class="text-muted">(90-day, Multi-Source)</small></h1>
-          <a class="btn btn-outline-secondary" href="/finance/index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
+    <header class="du-hero">
+      <div class="du-hero-inner">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+          <div>
+            <p class="du-hero-kicker mb-1">90-day window · Multi-source hazard intelligence</p>
+            <h1 class="mb-0"><i class="bi-shield-exclamation me-2"></i>Unified Disasters</h1>
+            <ul class="du-workflow-pills" id="workflowHint" aria-label="Workflow steps">
+              <li><span class="step-num">1</span> Enable sources</li>
+              <li><span class="step-num">2</span> Filter grid</li>
+              <li><span class="step-num">3</span> Select event</li>
+              <li><span class="step-num">4</span> Loans &amp; cameras</li>
+              <li><span class="step-num">5</span> KML or AI expert</li>
+            </ul>
+          </div>
+          <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
+            <a class="btn btn-light btn-sm" href="/finance/index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
+            <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Hazard Webcams</a>
+            <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html"><i class="bi-diagram-3"></i> Impact Graph</a>
+            <button type="button" class="btn btn-warning btn-sm" id="refreshBtnHero"><i class="bi-arrow-repeat"></i> Refresh</button>
+          </div>
         </div>
-        <p class="workflow-hint mb-3" id="workflowHint">
-          <strong>Workflow:</strong> 1) Enable sources → 2) Filter grid → 3) Click a row → 4) Review loans &amp; cameras → 5) Export Google Earth KML or ask the processor expert.
-        </p>
-        <div class="row g-3" id="statsRow">
-          <div class="col-md-3">
-            <div class="stat-card">
-              <div class="stat-number" id="totalDisasters">0</div>
-              <div class="stat-label">Total Disaster Events</div>
+        <div class="row g-3 du-stats-row" id="statsRow">
+          <div class="col-md-3 col-6">
+            <div class="du-stat-card du-stat-card--total">
+              <div class="du-stat-icon"><i class="bi-layers"></i></div>
+              <div>
+                <div class="stat-number" id="totalDisasters">0</div>
+                <div class="stat-label">Total events</div>
+              </div>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="stat-card">
-              <div class="stat-number" id="activeFires">0</div>
-              <div class="stat-label">Active Fires</div>
+          <div class="col-md-3 col-6">
+            <div class="du-stat-card du-stat-card--fire">
+              <div class="du-stat-icon"><i class="bi-fire"></i></div>
+              <div>
+                <div class="stat-number" id="activeFires">0</div>
+                <div class="stat-label">Active fires</div>
+              </div>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="stat-card">
-              <div class="stat-number" id="earthquakes">0</div>
-              <div class="stat-label">Earthquakes</div>
+          <div class="col-md-3 col-6">
+            <div class="du-stat-card du-stat-card--quake">
+              <div class="du-stat-icon"><i class="bi-geo-alt"></i></div>
+              <div>
+                <div class="stat-number" id="earthquakes">0</div>
+                <div class="stat-label">Earthquakes</div>
+              </div>
             </div>
           </div>
-          <div class="col-md-3">
-            <div class="stat-card">
-              <div class="stat-number" id="affectedCounties">0</div>
-              <div class="stat-label">Affected Counties</div>
+          <div class="col-md-3 col-6">
+            <div class="du-stat-card du-stat-card--counties">
+              <div class="du-stat-icon"><i class="bi-map"></i></div>
+              <div>
+                <div class="stat-number" id="affectedCounties">0</div>
+                <div class="stat-label">Affected counties</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div id="dashboardStatusBanner" class="alert alert-warning dashboard-status-banner mt-3 mb-0" role="alert"></div>
+    </header>
+
+    <div class="container-xxl du-main py-2">
+      <div id="dashboardStatusBanner" class="alert alert-warning dashboard-status-banner mb-2" role="alert"></div>
+      <div id="sourceHealthLine" class="mb-2" aria-live="polite"></div>
       <div id="aiInsightsContainer" class="mb-3">
         <div id="aiInsightsIdle" class="card border bg-light shadow-sm mb-0">
           <div class="card-body py-2 small text-muted mb-0">
@@ -698,33 +136,55 @@
       </div>
       <div id="selectionContextStrip" class="alert alert-primary py-2 small mb-3" style="display: none;" role="status"></div>
 
-      <div class="card mb-4">
+      <div class="card mb-4 du-command-deck">
         <div class="card-body py-3">
-          <label class="form-label mb-2"><strong>Disaster sources</strong> <small class="text-muted">(click to toggle; loads immediately)</small></label>
+          <p class="du-command-deck-label mb-2">Source command deck</p>
+          <p class="small text-muted mb-2">Toggle providers — counts reflect the loaded grid; DB totals when available.</p>
           <div class="disaster-source-selector" id="unifiedSourceChips">
-            <button type="button" class="source-chip source-chip-active" data-source="fema" onclick="toggleUnifiedSourceChip(this, 'fema')">
+            <button type="button" class="source-chip source-chip-active freshness-ok" data-source="fema" onclick="toggleUnifiedSourceChip(this, 'fema')">
+              <span class="freshness-dot" aria-hidden="true"></span>
               <i class="bi bi-shield-check"></i> FEMA
+              <span class="source-chip-count" data-source-count="fema">0</span>
+              <span class="source-chip-db-total" data-source-db="fema" hidden></span>
             </button>
-            <button type="button" class="source-chip" data-source="firms" onclick="toggleUnifiedSourceChip(this, 'firms')">
+            <button type="button" class="source-chip freshness-off" data-source="firms" onclick="toggleUnifiedSourceChip(this, 'firms')">
+              <span class="freshness-dot" aria-hidden="true"></span>
               <i class="bi bi-fire"></i> NASA FIRMS
+              <span class="source-chip-count" data-source-count="firms">0</span>
+              <span class="source-chip-db-total" data-source-db="firms" hidden></span>
             </button>
-            <button type="button" class="source-chip source-chip-active" data-source="usgs" onclick="toggleUnifiedSourceChip(this, 'usgs')">
+            <button type="button" class="source-chip source-chip-active freshness-ok" data-source="usgs" onclick="toggleUnifiedSourceChip(this, 'usgs')">
+              <span class="freshness-dot" aria-hidden="true"></span>
               <i class="bi bi-geo-alt"></i> USGS
+              <span class="source-chip-count" data-source-count="usgs">0</span>
+              <span class="source-chip-db-total" data-source-db="usgs" hidden></span>
             </button>
-            <button type="button" class="source-chip source-chip-active" data-source="nws" onclick="toggleUnifiedSourceChip(this, 'nws')">
+            <button type="button" class="source-chip source-chip-active freshness-ok" data-source="nws" onclick="toggleUnifiedSourceChip(this, 'nws')">
+              <span class="freshness-dot" aria-hidden="true"></span>
               <i class="bi bi-cloud-lightning"></i> NOAA/NWS
+              <span class="source-chip-count" data-source-count="nws">0</span>
+              <span class="source-chip-db-total" data-source-db="nws" hidden></span>
             </button>
-            <button type="button" class="source-chip source-chip-active" data-source="nhc" onclick="toggleUnifiedSourceChip(this, 'nhc')">
+            <button type="button" class="source-chip source-chip-active freshness-ok" data-source="nhc" onclick="toggleUnifiedSourceChip(this, 'nhc')">
+              <span class="freshness-dot" aria-hidden="true"></span>
               <i class="bi bi-tornado"></i> NHC
+              <span class="source-chip-count" data-source-count="nhc">0</span>
+              <span class="source-chip-db-total" data-source-db="nhc" hidden></span>
             </button>
-            <button type="button" class="source-chip" data-source="gdacs" onclick="toggleUnifiedSourceChip(this, 'gdacs')">
+            <button type="button" class="source-chip freshness-off" data-source="gdacs" onclick="toggleUnifiedSourceChip(this, 'gdacs')">
+              <span class="freshness-dot" aria-hidden="true"></span>
               <i class="bi bi-globe"></i> GDACS
+              <span class="source-chip-count" data-source-count="gdacs">0</span>
+              <span class="source-chip-db-total" data-source-db="gdacs" hidden></span>
             </button>
-            <button type="button" class="source-chip" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
+            <button type="button" class="source-chip freshness-off" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
+              <span class="freshness-dot" aria-hidden="true"></span>
               <i class="bi bi-droplet"></i> Flood zones
+              <span class="source-chip-count" data-source-count="floodzones">0</span>
+              <span class="source-chip-db-total" data-source-db="floodzones" hidden></span>
             </button>
-            <a class="source-chip text-decoration-none" href="disasters-webcams.html" target="_blank" rel="noopener noreferrer" title="National hazard webcams (USGS, WebCOOS, ALERTCalifornia, UCSD)">
-              <i class="bi bi-camera-video"></i> CA fire cameras
+            <a class="source-chip source-chip-link" href="disasters-webcams.html" title="National hazard webcams catalog">
+              <i class="bi bi-camera-video"></i> Hazard webcams
             </a>
           </div>
           <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center mt-3 pt-2 border-top" id="unifiedToolbarActions">
@@ -750,49 +210,48 @@
             </button>
           </h2>
           <div id="collapseFilters" class="accordion-collapse collapse" aria-labelledby="headingFilters">
-            <div class="accordion-body">
-              <div class="card">
-                <div class="card-body filters">
-                  <div class="row g-3">
-                    <div class="col-md-3">
-                      <label class="form-label">State</label>
-                      <input id="stateInput" class="form-control" placeholder="e.g., CA">
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">County</label>
-                      <input id="countyInput" class="form-control" placeholder="e.g., Harris">
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">Source</label>
-                      <select id="sourceInput" class="form-select" multiple>
-                        <option value="fema" selected>FEMA</option>
-                        <option value="firms">NASA FIRMS</option>
-                        <option value="usgs" selected>USGS</option>
-                        <option value="nws" selected>NOAA/NWS</option>
-                        <option value="nhc" selected>NHC</option>
-                        <option value="gdacs">GDACS</option>
-                        <option value="floodzones">Flood Zones (NFHL)</option>
-                      </select>
-                    </div>
-                    <div class="col-md-3">
-                      <label class="form-label">Event</label>
-                      <select id="eventInput" class="form-select" multiple>
-                        <option value="wildfire">Wildfire</option>
-                        <option value="earthquake">Earthquake</option>
-                        <option value="hurricane">Hurricane</option>
-                        <option value="flood">Flood</option>
-                        <option value="severe">Severe</option>
-                      </select>
-                    </div>
-                    <div class="col-12 d-flex gap-2 justify-content-end align-items-center flex-wrap">
-                      <div class="form-check form-check-inline me-2">
-                        <input type="checkbox" id="skipFemaCheck" class="form-check-input">
-                        <label class="form-check-label small text-muted" for="skipFemaCheck">Skip FEMA</label>
-                      </div>
-                      <a class="btn btn-outline-secondary btn-sm" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
-                      <span class="small text-muted">Apply, Refresh, and Voice are on the toolbar above source chips.</span>
-                    </div>
+            <div class="accordion-body du-filters-body">
+              <p class="du-filters-source-hint mb-3">
+                <i class="bi bi-info-circle me-1"></i>
+                Use the <strong>source command deck</strong> above for quick toggles. Refine here with state, county, source, and event — then click <strong>Apply filters</strong> on the command deck.
+              </p>
+              <div class="row g-3 align-items-start">
+                <div class="col-md-3 col-sm-6">
+                  <label class="form-label" for="stateInput">State</label>
+                  <input id="stateInput" class="form-control" placeholder="e.g., CA" autocomplete="off">
+                </div>
+                <div class="col-md-3 col-sm-6">
+                  <label class="form-label" for="countyInput">County</label>
+                  <input id="countyInput" class="form-control" placeholder="e.g., Harris" autocomplete="off">
+                </div>
+                <div class="col-md-3 col-sm-6">
+                  <label class="form-label" for="sourceInput">Source <span class="text-muted fw-normal">(Ctrl+click)</span></label>
+                  <select id="sourceInput" class="form-control du-filter-multiselect" multiple size="6" aria-label="Filter by disaster source">
+                    <option value="fema" selected>FEMA</option>
+                    <option value="firms">NASA FIRMS</option>
+                    <option value="usgs" selected>USGS</option>
+                    <option value="nws" selected>NOAA/NWS</option>
+                    <option value="nhc" selected>NHC</option>
+                    <option value="gdacs">GDACS</option>
+                    <option value="floodzones">Flood Zones (NFHL)</option>
+                  </select>
+                </div>
+                <div class="col-md-3 col-sm-6">
+                  <label class="form-label" for="eventInput">Event <span class="text-muted fw-normal">(Ctrl+click)</span></label>
+                  <select id="eventInput" class="form-control du-filter-multiselect" multiple size="6" aria-label="Filter by event type">
+                    <option value="wildfire">Wildfire</option>
+                    <option value="earthquake">Earthquake</option>
+                    <option value="hurricane">Hurricane</option>
+                    <option value="flood">Flood</option>
+                    <option value="severe">Severe</option>
+                  </select>
+                </div>
+                <div class="col-12 d-flex gap-2 justify-content-end align-items-center flex-wrap pt-1 border-top">
+                  <div class="form-check form-check-inline me-2 mb-0">
+                    <input type="checkbox" id="skipFemaCheck" class="form-check-input">
+                    <label class="form-check-label small" for="skipFemaCheck">Skip FEMA on refresh</label>
                   </div>
+                  <a class="btn btn-outline-secondary btn-sm" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
                 </div>
               </div>
             </div>
@@ -808,7 +267,7 @@
           </h2>
           <div id="collapseDisasters" class="accordion-collapse collapse show" aria-labelledby="headingDisasters">
             <div class="accordion-body">
-              <div class="card">
+              <div class="card du-data-panel">
                 <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos and loans)</small></div>
                 <div class="card-body">
                   <div id="firmsDeferredAlert" class="alert alert-info py-2 small d-flex align-items-center gap-2 mb-3" role="status">
@@ -837,21 +296,25 @@
             <div class="accordion-body">
               <div class="row g-3">
                 <div class="col-md-6">
-                  <div class="card">
-                    <div class="card-header"><strong><i class="bi-geo-alt"></i> Map</strong></div>
+                  <div class="card du-data-panel du-map-panel">
+                    <div class="card-header"><strong><i class="bi-geo-alt"></i> Selected event map</strong></div>
                     <div class="card-body">
                       <div id="map"></div>
                     </div>
                   </div>
                 </div>
                 <div class="col-md-6">
-                  <div class="card">
-                    <div class="card-header"><strong><i class="bi-youtube"></i> Disaster Videos</strong></div>
+                  <div class="card du-data-panel du-youtube-panel">
+                    <div class="card-header"><strong><i class="bi-youtube"></i> Disaster videos</strong></div>
                     <div class="card-body">
-                      <div id="youtubeResults" style="overflow-y: auto;">
-                        <div class="text-center text-muted">
-                          <i class="bi-youtube"></i><br>
-                          Click on a disaster to search for related videos
+                      <div class="du-youtube-skeleton" id="youtubeSkeleton">
+                        <div class="placeholder col-12" style="height: 120px;"></div>
+                        <div class="placeholder col-10" style="height: 1rem;"></div>
+                      </div>
+                      <div id="youtubeResults">
+                        <div class="du-youtube-empty" id="youtubeEmptyState">
+                          <i class="bi-youtube"></i>
+                          <p class="mb-0">Select a disaster row to search related videos</p>
                         </div>
                       </div>
                     </div>
@@ -871,7 +334,7 @@
           </h2>
           <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans">
             <div class="accordion-body">
-              <div class="card" id="encompassLoansCard" style="display: none;">
+              <div class="card du-data-panel" id="encompassLoansCard" style="display: none;">
                 <div class="card-header d-flex flex-wrap justify-content-between align-items-start gap-2">
                   <div>
                     <strong><i class="bi-bank"></i> Affected Encompass Loans</strong>
@@ -1032,10 +495,82 @@
         }
       }
 
+      const UNIFIED_SOURCE_KEYS = ['fema', 'firms', 'usgs', 'nws', 'nhc', 'gdacs', 'floodzones'];
+
+      function normalizeSourceKeyForDeck(source) {
+        const s = String(source || '').trim().toLowerCase();
+        if (s === 'noaa') return 'nws';
+        if (s === 'nfhl' || s === 'flood') return 'floodzones';
+        return s;
+      }
+
       function createSourceBadgeHtml(source) {
-        const src = String(source || '').trim().toLowerCase();
+        const src = normalizeSourceKeyForDeck(source);
         if (!src) return '';
-        return `<span class="source-badge source-${src}">${src.toUpperCase()}</span>`;
+        const label = src === 'floodzones' ? 'FLOOD' : src.toUpperCase();
+        return `<span class="source-badge source-${src}">${label}</span>`;
+      }
+
+      function renderSourceDeckCounts(rows) {
+        const counts = {};
+        UNIFIED_SOURCE_KEYS.forEach((k) => { counts[k] = 0; });
+        (rows || []).forEach((r) => {
+          const k = normalizeSourceKeyForDeck(r.source);
+          if (Object.prototype.hasOwnProperty.call(counts, k)) counts[k] += 1;
+        });
+        UNIFIED_SOURCE_KEYS.forEach((k) => {
+          const el = document.querySelector(`[data-source-count="${k}"]`);
+          if (el) el.textContent = String(counts[k] || 0);
+        });
+        window.__lastSourceDeckCounts = counts;
+        updateSourceFreshnessDots();
+        updateSourceHealthLine();
+      }
+
+      async function refreshSourceStatsFromApi() {
+        const data = await getDisasterStats();
+        const bySource = data?.bySource || [];
+        bySource.forEach((row) => {
+          const k = normalizeSourceKeyForDeck(row.source);
+          const el = document.querySelector(`[data-source-db="${k}"]`);
+          if (el && row.count != null) {
+            el.textContent = `· ${row.count} DB`;
+            el.hidden = false;
+          }
+        });
+      }
+
+      function updateSourceFreshnessDots() {
+        const counts = window.__lastSourceDeckCounts || {};
+        document.querySelectorAll('#unifiedSourceChips .source-chip[data-source]').forEach((chip) => {
+          const key = chip.getAttribute('data-source');
+          if (!key) return;
+          chip.classList.remove('freshness-ok', 'freshness-warn', 'freshness-off');
+          const active = chip.classList.contains('source-chip-active');
+          const n = counts[key] || 0;
+          if (!active) chip.classList.add('freshness-off');
+          else if (n > 0) chip.classList.add('freshness-ok');
+          else chip.classList.add('freshness-warn');
+        });
+      }
+
+      function updateSourceHealthLine() {
+        const el = document.getElementById('sourceHealthLine');
+        if (!el) return;
+        const counts = window.__lastSourceDeckCounts || {};
+        const activeChips = [...document.querySelectorAll('#unifiedSourceChips .source-chip-active[data-source]')];
+        const stale = activeChips
+          .map((c) => c.getAttribute('data-source'))
+          .filter((k) => k && (counts[k] || 0) === 0);
+        if (!activeChips.length) {
+          el.innerHTML = '<i class="bi bi-info-circle me-1"></i>Enable at least one source in the command deck.';
+          return;
+        }
+        if (stale.length) {
+          el.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i><span class="text-warning">Active but empty this load:</span> ${stale.map((s) => s.toUpperCase()).join(', ')} — try Refresh or widen filters.`;
+        } else {
+          el.innerHTML = `<i class="bi bi-check-circle text-success me-1"></i>${activeChips.length} source(s) reporting rows in the current grid.`;
+        }
       }
 
       function htmlCellRenderer(html) {
@@ -1424,8 +959,10 @@
           loadDisasters();
         });
         $('#refreshBtn').on('click', refreshDisasters);
+        document.getElementById('refreshBtnHero')?.addEventListener('click', refreshDisasters);
 
         loadYouTubeAPI();
+        refreshSourceStatsFromApi();
         loadDisasters();
         // Load all encompass loans on map on page load
         loadAllLoansOnMap();
@@ -1433,10 +970,11 @@
 
       function syncSourceChipsFromSelect() {
         const selected = new Set($('#sourceInput').val() || []);
-        document.querySelectorAll('#unifiedSourceChips .source-chip').forEach((chip) => {
+        document.querySelectorAll('#unifiedSourceChips .source-chip[data-source]').forEach((chip) => {
           chip.classList.toggle('source-chip-active', selected.has(chip.getAttribute('data-source')));
         });
         updateFirmsDeferredAlert();
+        updateSourceFreshnessDots();
       }
 
       function updateFirmsDeferredAlert() {
@@ -2105,13 +1643,15 @@
         const fires = rows.filter(r => r.event_type?.toLowerCase() === 'wildfire').length;
         const quakes = rows.filter(r => r.event_type?.toLowerCase() === 'earthquake').length;
         const counties = new Set(rows.filter(r => r.county_name).map(r => `${r.county_name}, ${r.state_abbr}`)).size;
-        
+
+        renderSourceDeckCounts(rows);
+        void refreshSourceStatsFromApi();
+
         $('#totalDisasters').text(total).css('animation', 'none').offset().offset; // Trigger reflow
         $('#activeFires').text(fires);
         $('#earthquakes').text(quakes);
         $('#affectedCounties').text(counties);
-        
-        // Animate numbers
+
         animateNumber('#totalDisasters', total);
         animateNumber('#activeFires', fires);
         animateNumber('#earthquakes', quakes);
@@ -2146,7 +1686,7 @@
         } catch (e) {
           console.warn('Could not load disaster stats:', e);
         }
-        return { displayedRows: disastersGridApi?.getDisplayedRowCount?.() ?? 0 };
+        return { bySource: [], byEvent: [], byState: [], displayedRows: disastersGridApi?.getDisplayedRowCount?.() ?? 0 };
       }
 
       async function buildAIContext() {

@@ -11,6 +11,8 @@ const exportExcelBtn = document.getElementById('exportExcelBtn');
 const scanSetFieldsBtn = document.getElementById('scanSetFieldsBtn');
 const clearAndReloadBtn = document.getElementById('clearAndReloadBtn');
 const runTestsBtn = document.getElementById('runTestsBtn');
+const runScenarioSelect = document.getElementById('runScenarioSelect');
+const RUN_SCENARIO_SESSION_KEY = 'unitTestsLastRunScenario';
 const clearBtn = document.getElementById('clearBtn');
 const fillEmptyTestNullBtn = document.getElementById('fillEmptyTestNullBtn');
 const searchInput = document.getElementById('searchInput');
@@ -156,7 +158,11 @@ function initUnitTestsChromePrefs() {
   } catch (_) {}
   applyUnitTestsFocusMode(focusOn);
   document.getElementById('unitTestsFocusModeBtn')?.addEventListener('click', () => {
-    applyUnitTestsFocusMode(!isUnitTestsFocusMode());
+    const next = !isUnitTestsFocusMode();
+    applyUnitTestsFocusMode(next);
+    if (!next) {
+      showToast('Full layout restored (tool switcher and tips).', 'info');
+    }
   });
 
   document.getElementById('moreUploadExcelBtn')?.addEventListener('click', () => {
@@ -204,6 +210,72 @@ let lastRunSummary = null;
 let lastRunCellResults = {}; // { 'rowIndex-field': 'pass'|'fail' } for cell shading
 
 const RECENT_RUNS_KEY = 'unitTestsRecentRuns';
+
+function getUnitTestEncompassEnv() {
+  try {
+    return window.encompassApi?.getEncompassEnv?.() || 'correspondent';
+  } catch (_) {
+    return 'correspondent';
+  }
+}
+
+function readLoanGuidStoreByEnv() {
+  const u = utDescUtils();
+  const key = u.UNIT_TEST_LOAN_GUID_BY_ENV_KEY || 'unitTestsLoanGuidByEnv';
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function writeLoanGuidForEnv(env, guid) {
+  const u = utDescUtils();
+  const key = u.UNIT_TEST_LOAN_GUID_BY_ENV_KEY || 'unitTestsLoanGuidByEnv';
+  const store = readLoanGuidStoreByEnv();
+  const normalizedEnv = env === 'retail' ? 'retail' : 'correspondent';
+  if (guid) {
+    store[normalizedEnv] = guid;
+  } else {
+    delete store[normalizedEnv];
+  }
+  try {
+    localStorage.setItem(key, JSON.stringify(store));
+  } catch (_) {}
+}
+
+function defaultLoanGuidForEnv(env) {
+  const u = utDescUtils();
+  const defaults = u.DEFAULT_UNIT_TEST_LOAN_GUID_BY_ENV || {};
+  const normalizedEnv = env === 'retail' ? 'retail' : 'correspondent';
+  return String(defaults[normalizedEnv] || '').trim();
+}
+
+function resolveInitialLoanGuid() {
+  try {
+    const p = new URLSearchParams(window.location.search);
+    const fromUrl = String(p.get('loanGuid') || '').trim();
+    if (fromUrl) return fromUrl;
+  } catch (_) {}
+  const env = getUnitTestEncompassEnv();
+  const stored = String(readLoanGuidStoreByEnv()[env] || '').trim();
+  if (stored) return stored;
+  return defaultLoanGuidForEnv(env);
+}
+
+function applyLoanGuid(guid) {
+  currentLoanGuid = String(guid || '').trim();
+  if (loanGuidInput) loanGuidInput.value = currentLoanGuid;
+  updateLoanGuidChipDisplay(currentLoanGuid);
+  syncScenarioBuilderPopoutLoanGuid();
+}
+
+function initDefaultLoanGuid() {
+  applyLoanGuid(resolveInitialLoanGuid());
+}
 
 /** Short-lived cache so BR generate + grid metadata share one hub fetch */
 let _hubFieldListsCache = null;
@@ -369,6 +441,44 @@ DatePickerCellEditor.prototype.afterGuiAttached = function() {
   this.dateInput.focus();
 };
 DatePickerCellEditor.prototype.destroy = function() {};
+
+/**
+ * Editable dropdown (combobox) cell editor: a text input backed by a <datalist> of
+ * enumerated values. Lets the user pick a known option OR type a custom value when the
+ * enumerated list is wrong/incomplete (e.g. a Yes/No field whose real values are Yes/No).
+ */
+function EditableSelectCellEditor() {}
+EditableSelectCellEditor.prototype.init = function(params) {
+  this.params = params;
+  const cp = params.cellEditorParams || params;
+  const values = Array.isArray(cp.values) ? cp.values.map((v) => String(v)) : [];
+  this.gui = document.createElement('div');
+  this.gui.className = 'ag-cell-edit-input editable-select-cell-editor';
+  this.gui.style.minWidth = '120px';
+  this.input = document.createElement('input');
+  this.input.type = 'text';
+  this.input.setAttribute('autocomplete', 'off');
+  this.input.style.width = '100%';
+  this.input.value = params.value == null ? '' : String(params.value);
+  this.listId = 'editable-select-' + Math.random().toString(36).slice(2);
+  this.datalist = document.createElement('datalist');
+  this.datalist.id = this.listId;
+  values.forEach((v) => {
+    const opt = document.createElement('option');
+    opt.value = v;
+    this.datalist.appendChild(opt);
+  });
+  this.input.setAttribute('list', this.listId);
+  this.gui.appendChild(this.input);
+  this.gui.appendChild(this.datalist);
+};
+EditableSelectCellEditor.prototype.getGui = function() { return this.gui; };
+EditableSelectCellEditor.prototype.getValue = function() { return this.input.value; };
+EditableSelectCellEditor.prototype.afterGuiAttached = function() {
+  this.input.focus();
+  this.input.select();
+};
+EditableSelectCellEditor.prototype.destroy = function() {};
 
 function setStatus(text, status = 'info', icon = 'bi-info-circle') {
   statusChip.className = `status-chip ${status}`;
@@ -801,19 +911,14 @@ function generateColumnDefs(headers, rows) {
       colDef.minWidth = 90;
       colDef.width = 110;
       colDef.headerClass = 'test-scenario-column';
-      colDef.editable = true;
+      // GET rows are read-only: their value is populated by the GET call, not authored.
+      colDef.editable = (params) => String(params.data?.Action || params.data?.action || '').trim().toUpperCase() !== 'GET';
       // Type-aware cell editors based on row metadata (from Encompass field definitions)
       colDef.cellEditorSelector = (params) => {
         let meta = params.data && params.data._fieldMetadata;
         if (!meta && params.data && params.data.Target && typeof currentFieldMetadata === 'object') {
           const fieldId = extractFieldId(params.data.Target);
           meta = fieldId ? (currentFieldMetadata[fieldId] || currentFieldMetadata[params.data.Target]) : null;
-        }
-        // Infer from field ID suffix (.DT, .date, .dttm) when no API metadata
-        if (!meta && params.data && params.data.Target) {
-          const fieldId = extractFieldId(params.data.Target);
-          const inferred = fieldId && window.customFieldCalcParser?.inferDateTypeFromFieldId?.(fieldId);
-          if (inferred) meta = inferred;
         }
         // Infer from @ notation in Target (e.g. [@748] = date/DateTime) - Excel rows lack _fieldMetadata
         if (!meta && params.data && params.data.Target && window.customFieldCalcParser?.isDateFieldByNotation) {
@@ -825,16 +930,30 @@ function generateColumnDefs(headers, rows) {
               : { dataType: 'Date', format: '', description: 'Date (from @)' };
           }
         }
-        // Fallback: only explicit (Date) / (DateTime) tags in Description — avoid matching the word "date"
-        // elsewhere (misleading) which forced DatePicker and cleared non-date text input.
-        if (!meta && params.data && params.data.Description) {
-          const desc = String(params.data.Description || '').toLowerCase();
-          if (desc.includes('(datetime)')) meta = { dataType: 'DateTime', format: '', description: 'DateTime (from Description)' };
-          else if (desc.includes('(date)')) meta = { dataType: 'Date', format: '', description: 'Date (from Description)' };
+        // Heuristic date inference (field ID / description names a date). Many such fields are
+        // typed String in Encompass, so only offer a date picker on SET (write) rows; COMPARE /
+        // expected / GET cells stay free text so building test cases is never coerced to a date.
+        const actionIsSet = String(params.data?.Action || params.data?.action || '').trim().toUpperCase() === 'SET';
+        if (!meta && actionIsSet && params.data && params.data.Target) {
+          const fieldId = extractFieldId(params.data.Target);
+          const inferred = fieldId && window.customFieldCalcParser?.inferDateTypeFromFieldId?.(fieldId);
+          if (inferred) meta = inferred;
+        }
+        if (!meta && actionIsSet && params.data && params.data.Description) {
+          const desc = String(params.data.Description || '');
+          // Explicit (Date)/(DateTime) tags first, then loose "date"/"date/time" wording.
+          const low = desc.toLowerCase();
+          if (low.includes('(datetime)')) meta = { dataType: 'DateTime', format: '', description: 'DateTime (from Description)' };
+          else if (low.includes('(date)')) meta = { dataType: 'Date', format: '', description: 'Date (from Description)' };
+          else {
+            const inferred = window.customFieldCalcParser?.inferDateTypeFromText?.(desc);
+            if (inferred) meta = inferred;
+          }
         }
         const dt = (meta && meta.dataType) ? String(meta.dataType).toLowerCase() : '';
         if (meta && Array.isArray(meta.options) && meta.options.length > 0) {
-          return { component: 'agSelectCellEditor', params: { values: meta.options } };
+          // Editable combobox so a wrong/incomplete enumerated list can be overridden by typing.
+          return { component: 'EditableSelectCellEditor', params: { values: meta.options } };
         }
         if (/integer/i.test(dt)) {
           return { component: 'agNumberCellEditor', params: { precision: 0, step: 1 } };
@@ -856,7 +975,9 @@ function generateColumnDefs(headers, rows) {
           };
         }
         if (/boolean|yesno/i.test(dt)) {
-          return { component: 'agSelectCellEditor', params: { values: ['Y', 'N'] } };
+          // Editable combobox: many Yes/No fields use Yes/No (not Y/N); allow override by typing.
+          const ynValues = (meta && Array.isArray(meta.options) && meta.options.length > 0) ? meta.options : ['Y', 'N'];
+          return { component: 'EditableSelectCellEditor', params: { values: ynValues } };
         }
         return null; // default text editor
       };
@@ -951,7 +1072,7 @@ function initializeGrid() {
     columnDefs: columnDefs,
     rowData: [],
     getRowId: (params) => String(params.data?.__rowIndex ?? params.rowIndex ?? ''),
-    components: { DatePickerCellEditor: DatePickerCellEditor },
+    components: { DatePickerCellEditor: DatePickerCellEditor, EditableSelectCellEditor: EditableSelectCellEditor },
     theme: 'legacy',
     singleClickEdit: true,
     defaultColDef: {
@@ -1012,6 +1133,21 @@ function setGridRows(rows) {
   
   // Auto-size columns
   safeSizeColumnsToFit();
+}
+
+/**
+ * Clear test-column values on GET-action rows. GET values are read from the loan by the GET
+ * call, never authored, so they start empty and only fill in once a GET runs.
+ */
+function clearGetActionTestValues() {
+  if (!Array.isArray(allData) || allData.length === 0) return;
+  const testCols = (typeof getOrderedTestColumns === 'function') ? getOrderedTestColumns() : [];
+  if (!testCols.length) return;
+  allData.forEach((row) => {
+    const action = String(row.Action || row.action || '').trim().toUpperCase();
+    if (action !== 'GET') return;
+    testCols.forEach((c) => { if (c.field) row[c.field] = ''; });
+  });
 }
 
 function safeSizeColumnsToFit() {
@@ -1137,6 +1273,64 @@ function hideNonTestColumns() {
   nonTestFields.forEach((field) => {
     if (field) gridApi.setColumnVisible(field, false);
   });
+}
+
+/** Show Step/Action/Description/Target and only the chosen Test (or Reset) column. */
+function focusScenarioColumn(testNumber) {
+  if (!gridApi || typeof gridApi.setColumnVisible !== 'function') return;
+  const testCols = getOrderedTestColumns();
+  if (testCols.length === 0) return;
+  getNonTestColumnFields().forEach((field) => {
+    if (field) gridApi.setColumnVisible(field, true);
+  });
+  const target = String(testNumber);
+  testCols.forEach((col) => {
+    if (col.field) gridApi.setColumnVisible(col.field, col.testNumber === target);
+  });
+}
+
+function scenarioSelectLabel(testNumber) {
+  if (String(testNumber).toUpperCase() === 'RESET') return 'Reset';
+  return `Test ${testNumber}`;
+}
+
+function refreshRunScenarioSelect(preferredTestNumber) {
+  if (!runScenarioSelect) return;
+  const options = getOrderedTestColumns().filter((c) => c.testNumber);
+  runScenarioSelect.innerHTML = '';
+  if (options.length === 0) {
+    runScenarioSelect.disabled = true;
+    runScenarioSelect.style.display = 'none';
+    return;
+  }
+  options.forEach((col) => {
+    const opt = document.createElement('option');
+    opt.value = String(col.testNumber);
+    opt.textContent = scenarioSelectLabel(col.testNumber);
+    runScenarioSelect.appendChild(opt);
+  });
+  runScenarioSelect.disabled = false;
+  runScenarioSelect.style.display = '';
+  let pick = preferredTestNumber != null && preferredTestNumber !== ''
+    ? String(preferredTestNumber)
+    : sessionStorage.getItem(RUN_SCENARIO_SESSION_KEY);
+  if (!pick || !options.some((c) => String(c.testNumber) === pick)) {
+    pick = String(options[0].testNumber);
+  }
+  runScenarioSelect.value = pick;
+  sessionStorage.setItem(RUN_SCENARIO_SESSION_KEY, pick);
+}
+
+function setRunScenarioSelectValue(testNumber) {
+  if (!runScenarioSelect || testNumber == null || testNumber === '') return;
+  const value = String(testNumber);
+  if (![...runScenarioSelect.options].some((o) => o.value === value)) return;
+  runScenarioSelect.value = value;
+  sessionStorage.setItem(RUN_SCENARIO_SESSION_KEY, value);
+}
+
+function getSelectedRunScenarioNumber() {
+  return runScenarioSelect?.value?.trim() || null;
 }
 
 function showAllColumns() {
@@ -1290,8 +1484,12 @@ function extractFieldMetadataFromReaderResponse(data, fieldId) {
   const desc = match.description ?? match.Description ?? match.longDescription ?? match.shortDescription ?? '';
   const type = match.type ?? match.Type ?? match.dataType ?? match.dataTypeName ?? match.valueType ?? '';
   const format = match.format ?? match.Format ?? match.formatType ?? match.displayFormat ?? '';
-  if (!desc && !type && !format) return null;
-  return { description: desc, type: type, format: format };
+  const rawOpts = match.options ?? match.Options ?? match.values ?? match.Values ?? match.enum ?? match.Enum;
+  const options = Array.isArray(rawOpts) && rawOpts.length > 0
+    ? rawOpts.map((o) => (o && typeof o === 'object' ? (o.value ?? o.key ?? o.label ?? o.text ?? String(o)) : String(o)))
+    : null;
+  if (!desc && !type && !format && !options) return null;
+  return { description: desc, type: type, format: format, ...(options ? { options } : {}) };
 }
 
 /**
@@ -1305,6 +1503,23 @@ function extractFieldMetadataFromReaderResponse(data, fieldId) {
 function maybeUpdateDescriptionFromApi(row, fieldId, apiData, gridApi, rowIndex) {
   const desc = String(row.Description || row.description || '').trim();
   const utils = utDescUtils();
+  // Capture enumerated options from the reader response regardless of description state,
+  // so the field renders as a dropdown in the grid / scenario builder.
+  const readerMeta = extractFieldMetadataFromReaderResponse(apiData, fieldId);
+  if (readerMeta && Array.isArray(readerMeta.options) && readerMeta.options.length > 0) {
+    if (typeof currentFieldMetadata !== 'object' || !currentFieldMetadata) currentFieldMetadata = {};
+    const existing = currentFieldMetadata[fieldId] || {};
+    currentFieldMetadata[fieldId] = {
+      ...existing,
+      options: readerMeta.options,
+      dataType: existing.dataType || readerMeta.type || 'String',
+    };
+    row._fieldMetadata = {
+      ...(row._fieldMetadata || {}),
+      options: readerMeta.options,
+      dataType: (row._fieldMetadata && row._fieldMetadata.dataType) || readerMeta.type || 'String',
+    };
+  }
   const needsRefresh =
     typeof utils.descriptionNeedsMetadataRefresh === 'function'
       ? utils.descriptionNeedsMetadataRefresh(desc)
@@ -1327,8 +1542,71 @@ function maybeUpdateDescriptionFromApi(row, fieldId, apiData, gridApi, rowIndex)
   }
 }
 
+/**
+ * Resolve whether a field being written is a date/datetime, using API metadata first
+ * then the same heuristics (notation / field-id / description) used for editors.
+ * @returns {'Date'|'DateTime'|null}
+ */
+function dateTypeForWrite(fieldId, row) {
+  const parser = window.customFieldCalcParser;
+  const fromMeta = (m) => {
+    const dt = m && m.dataType ? String(m.dataType).toLowerCase() : '';
+    if (/datetime/.test(dt)) return 'DateTime';
+    if (/date/.test(dt)) return 'Date';
+    return null;
+  };
+  let t = fromMeta(row && row._fieldMetadata);
+  if (!t && typeof currentFieldMetadata === 'object' && fieldId) {
+    t = fromMeta(currentFieldMetadata[fieldId]);
+  }
+  if (!t && row && row.Target && parser?.isDateFieldByNotation) {
+    const rawId = getRawFieldIdFromTarget(row.Target);
+    if (rawId && parser.isDateFieldByNotation(rawId)) {
+      t = String(row.Description || '').toLowerCase().includes('(datetime)') ? 'DateTime' : 'Date';
+    }
+  }
+  if (!t && fieldId && parser?.inferDateTypeFromFieldId) {
+    const inferred = parser.inferDateTypeFromFieldId(fieldId);
+    if (inferred) t = inferred.dataType;
+  }
+  if (!t && row && row.Description && parser?.inferDateTypeFromText) {
+    const inferred = parser.inferDateTypeFromText(row.Description);
+    if (inferred) t = inferred.dataType;
+  }
+  return t;
+}
+
+/**
+ * Coerce a date value to US MM/DD/YYYY (date portion). Keeps a time portion for DateTime.
+ * Returns the original value unchanged when it does not parse as a date.
+ */
+function coerceDateValueToUs(value, isDateTime) {
+  if (value === null || value === undefined) return value;
+  const s = String(value).trim();
+  if (!s) return value;
+  if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) return value; // already US format
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  let y, m, d;
+  if (iso) {
+    y = iso[1]; m = iso[2]; d = iso[3];
+  } else {
+    return value; // not a recognizable date string — pass through (validated by field-writer)
+  }
+  const usDate = `${m}/${d}/${y}`;
+  if (isDateTime) {
+    const tm = s.match(/[T\s](\d{2}:\d{2}(?::\d{2})?)/);
+    if (tm) return `${usDate} ${tm[1]}`;
+  }
+  return usDate;
+}
+
 function buildFieldWriterPayload(fieldId, value, row) {
-  const payload = [{ id: fieldId, value }];
+  let outValue = value;
+  const dateType = dateTypeForWrite(fieldId, row);
+  if (dateType) {
+    outValue = coerceDateValueToUs(value, dateType === 'DateTime');
+  }
+  const payload = [{ id: fieldId, value: outValue }];
   const lockValue = row.Lock ?? row.lock ?? row.Locked ?? row.locked;
   if (lockValue !== undefined && lockValue !== '') {
     const lockNormalized = String(lockValue).toLowerCase().trim();
@@ -1589,11 +1867,13 @@ function displayTestDescriptions(testDescriptions) {
         card.classList.remove('test-scenario-active');
       });
       cardElement.classList.add('test-scenario-active');
+      setRunScenarioSelectValue(test.testNumber);
       highlightTestColumn(test.testNumber);
     });
 
     runBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      setRunScenarioSelectValue(test.testNumber);
       runTests(test.testNumber);
     });
 
@@ -2070,7 +2350,11 @@ async function runTests(singleTestNumber) {
   try {
     setStatus('Running tests...', 'info', 'bi-clock-history');
     runTestsBtn.disabled = true;
-    hideNonTestColumns();
+    if (isSingleRun) {
+      focusScenarioColumn(singleTestNumber);
+    } else {
+      hideNonTestColumns();
+    }
     if (!isSingleRun) {
       testResultsContainer.style.display = 'block';
       testResultsList.innerHTML = '<div class="text-center p-4"><i class="bi-hourglass-split" style="font-size: 2rem;"></i><p class="mt-2">Running tests...</p></div>';
@@ -2533,6 +2817,11 @@ function clearData() {
   setHeroPostLoadActionsVisible(false);
   setUnitTestsWelcomeVisible(true);
   runTestsBtn.style.display = 'none';
+  if (runScenarioSelect) {
+    runScenarioSelect.style.display = 'none';
+    runScenarioSelect.disabled = true;
+    runScenarioSelect.innerHTML = '<option value="">Scenario…</option>';
+  }
   clearBtn.style.display = 'none';
   if (fillEmptyTestNullBtn) fillEmptyTestNullBtn.style.display = 'none';
   testResultsContainer.style.display = 'none';
@@ -2564,6 +2853,8 @@ function clearData() {
   const selectedFieldCard = document.getElementById('selectedFieldAccordionCard');
   if (selectedFieldCard) selectedFieldCard.style.display = 'none';
   currentScenarioBuilderField = null;
+  hideScenarioBuilderPopoutModal();
+  dockScenarioBuilderInline();
   const builderContainer = document.getElementById('liveScenarioBuilderContainer');
   if (builderContainer) builderContainer.style.display = 'none';
   setLiveScenarioBuilderSectionVisible(false);
@@ -2648,6 +2939,7 @@ async function hydrateLoadedUnitTestData(options) {
   columnDefs = generateColumnDefs(headers, rows);
   allData = rows.map((r, i) => ({ ...r, __rowIndex: i }));
   lastRunCellResults = {};
+  clearGetActionTestValues();
 
   initializeGrid();
   setGridRows(allData);
@@ -2676,6 +2968,7 @@ async function hydrateLoadedUnitTestData(options) {
   } else {
     hideTestDescriptions();
   }
+  refreshRunScenarioSelect();
 
   uploadArea.style.display = 'none';
   setHeroPostLoadActionsVisible(true);
@@ -3196,29 +3489,42 @@ fillEmptyTestNullBtn?.addEventListener('click', (e) => {
 loanGuidInput?.addEventListener('input', (e) => {
   currentLoanGuid = e.target.value.trim();
   updateLoanGuidChipDisplay(currentLoanGuid);
+  syncScenarioBuilderPopoutLoanGuid();
+  if (currentLoanGuid) {
+    writeLoanGuidForEnv(getUnitTestEncompassEnv(), currentLoanGuid);
+  }
 });
 
 clearLoanGuidBtn?.addEventListener('click', () => {
-  currentLoanGuid = '';
-  if (loanGuidInput) {
-    loanGuidInput.value = '';
-  }
-  updateLoanGuidChipDisplay('');
+  writeLoanGuidForEnv(getUnitTestEncompassEnv(), '');
+  applyLoanGuid('');
 });
 
 recentRunsSelect?.addEventListener('change', (e) => {
   const selected = e.target.value;
   if (!selected) return;
-  currentLoanGuid = selected;
-  if (loanGuidInput) {
-    loanGuidInput.value = selected;
-  }
-  updateLoanGuidChipDisplay(selected);
+  applyLoanGuid(selected);
+  writeLoanGuidForEnv(getUnitTestEncompassEnv(), selected);
 });
 
 runTestsBtn?.addEventListener('click', (e) => {
   e.preventDefault();
+  const n = getSelectedRunScenarioNumber();
+  if (!n) {
+    showToast('Choose a scenario to run', 'warning');
+    return;
+  }
+  runTests(n);
+});
+
+document.getElementById('runAllScenariosBtn')?.addEventListener('click', (e) => {
+  e.preventDefault();
   runTests();
+});
+
+runScenarioSelect?.addEventListener('change', () => {
+  const n = getSelectedRunScenarioNumber();
+  if (n) sessionStorage.setItem(RUN_SCENARIO_SESSION_KEY, n);
 });
 
 failFirstBtn?.addEventListener('click', (e) => {
@@ -3339,9 +3645,29 @@ function handleVoiceCommand(rawCommand = '') {
     return;
   }
 
-  if (command.includes('run tests') || command.includes('run test')) {
-    speak('Running tests');
+  if (command.includes('run all tests') || command.includes('run all scenarios')) {
+    speak('Running all scenarios');
     runTests();
+    return;
+  }
+
+  if (command.includes('run test') || command.includes('run tests') || command.includes('run scenario')) {
+    const numMatch = command.match(/(?:test|scenario)\s*#?\s*(\d+)/i) || command.match(/\b(\d+)\b/);
+    if (numMatch) {
+      const n = numMatch[1];
+      speak(`Running test ${n}`);
+      setRunScenarioSelectValue(n);
+      runTests(n);
+      return;
+    }
+    const selected = getSelectedRunScenarioNumber();
+    if (selected) {
+      speak(`Running test ${selected}`);
+      runTests(selected);
+    } else {
+      speak('Choose a scenario first');
+      showToast('Choose a scenario to run', 'warning');
+    }
     return;
   }
 
@@ -3553,6 +3879,9 @@ let currentScenarioBuilderField = null;
 /** How many grid scenario columns to fill from Live Scenario Builder: one | five | all */
 let scenarioApplyMode = 'one';
 
+/** Live Scenario Builder is moved into the pop-out modal while open. */
+let scenarioBuilderPopoutOpen = false;
+
 /**
  * Resolve which ag-Grid column fields receive builder values.
  * @param {'one'|'five'|'all'} mode
@@ -3681,6 +4010,133 @@ function applyScenarioBuilderValuesToGrid() {
   showToast(`Applied to ${colFields.length} column(s), ${rowsTouched} SET row(s), ${cells} cell(s).`, 'ok');
 }
 
+function syncScenarioBuilderPopoutUi() {
+  const container = document.getElementById('liveScenarioBuilderContainer');
+  const popoutBtn = document.getElementById('scenarioBuilderPopoutBtn');
+  const hint = document.getElementById('scenarioBuilderPoppedOutHint');
+  const builderVisible = container && container.style.display !== 'none';
+  if (popoutBtn) {
+    popoutBtn.classList.toggle('d-none', !builderVisible || scenarioBuilderPopoutOpen);
+  }
+  if (hint) {
+    hint.classList.toggle('d-none', !scenarioBuilderPopoutOpen);
+  }
+}
+
+function syncScenarioBuilderPopoutLoanGuid() {
+  const pop = document.getElementById('scenarioBuilderPopoutLoanGuid');
+  if (pop) {
+    pop.value = (loanGuidInput && loanGuidInput.value) || currentLoanGuid || '';
+  }
+}
+
+function dockScenarioBuilderInline() {
+  const container = document.getElementById('liveScenarioBuilderContainer');
+  const inlineHost = document.getElementById('scenarioBuilderInlineHost');
+  const hint = document.getElementById('scenarioBuilderPoppedOutHint');
+  if (!container || !inlineHost) return;
+  if (hint && hint.parentElement === inlineHost) {
+    inlineHost.insertBefore(container, hint.nextSibling);
+  } else {
+    inlineHost.appendChild(container);
+  }
+  scenarioBuilderPopoutOpen = false;
+  syncScenarioBuilderPopoutUi();
+}
+
+function popoutScenarioBuilder() {
+  const container = document.getElementById('liveScenarioBuilderContainer');
+  const popoutHost = document.getElementById('scenarioBuilderPopoutHost');
+  const modalEl = document.getElementById('scenarioBuilderPopoutModal');
+  if (!container || container.style.display === 'none' || !popoutHost || !modalEl) {
+    showToast('Load a custom field to open the scenario builder.', 'warning');
+    return;
+  }
+  popoutHost.appendChild(container);
+  scenarioBuilderPopoutOpen = true;
+  syncScenarioBuilderPopoutUi();
+  syncScenarioBuilderPopoutLoanGuid();
+  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+    bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
+}
+
+function ensureLoanGuidForScenarioRun() {
+  const pop = document.getElementById('scenarioBuilderPopoutLoanGuid');
+  const guid = String((pop && pop.value) || (loanGuidInput && loanGuidInput.value) || currentLoanGuid || '').trim();
+  if (!guid) {
+    showToast('Enter a Loan GUID to run against Encompass.', 'warning');
+    const focusEl = scenarioBuilderPopoutOpen && pop ? pop : loanGuidInput;
+    focusEl?.focus();
+    return false;
+  }
+  applyLoanGuid(guid);
+  if (pop) pop.value = guid;
+  writeLoanGuidForEnv(getUnitTestEncompassEnv(), guid);
+  return true;
+}
+
+function getScenarioColumnsToApplyAndRun() {
+  const sel = document.getElementById('scenarioApplyColumnSelect');
+  const startField = sel && !sel.disabled ? sel.value : '';
+  return getTargetColumnFieldsForApply(scenarioApplyMode, startField);
+}
+
+async function applyScenarioBuilderAndRun() {
+  if (!ensureLoanGuidForScenarioRun()) return;
+  const colFields = getScenarioColumnsToApplyAndRun();
+  if (!colFields.length) {
+    showToast('Select a scenario column.', 'warning');
+    return;
+  }
+  if (!gridApi || !allData || allData.length === 0) {
+    showToast('Load a unit test grid first.', 'warning');
+    return;
+  }
+  const container = document.getElementById('liveScenarioBuilderContainer');
+  if (!container || container.style.display === 'none') {
+    showToast('Open the Live Scenario Builder first (generate from a custom field).', 'warning');
+    return;
+  }
+  applyScenarioBuilderValuesToGrid();
+  const ordered = getOrderedTestColumns();
+  for (let i = 0; i < colFields.length; i++) {
+    const col = ordered.find((c) => c.field === colFields[i]);
+    if (col && col.testNumber) {
+      await runTests(String(col.testNumber));
+    }
+  }
+}
+
+function hideScenarioBuilderPopoutModal() {
+  const modalEl = document.getElementById('scenarioBuilderPopoutModal');
+  if (!modalEl || typeof bootstrap === 'undefined' || !bootstrap.Modal) return;
+  const inst = bootstrap.Modal.getInstance(modalEl);
+  if (inst) inst.hide();
+  else dockScenarioBuilderInline();
+}
+
+function initializeScenarioBuilderPopout() {
+  const modalEl = document.getElementById('scenarioBuilderPopoutModal');
+  document.getElementById('scenarioBuilderPopoutBtn')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    popoutScenarioBuilder();
+  });
+  document.getElementById('scenarioBuilderDockBtn')?.addEventListener('click', () => hideScenarioBuilderPopoutModal());
+  document.getElementById('scenarioBuilderDockFromHintBtn')?.addEventListener('click', () => hideScenarioBuilderPopoutModal());
+  document.getElementById('scenarioPopoutDockFooterBtn')?.addEventListener('click', () => hideScenarioBuilderPopoutModal());
+  modalEl?.addEventListener('hidden.bs.modal', () => dockScenarioBuilderInline());
+  document.getElementById('scenarioPopoutApplyAndRunBtn')?.addEventListener('click', () => {
+    void applyScenarioBuilderAndRun();
+  });
+  const popGuid = document.getElementById('scenarioBuilderPopoutLoanGuid');
+  popGuid?.addEventListener('input', (e) => {
+    currentLoanGuid = String(e.target.value || '').trim();
+    if (loanGuidInput) loanGuidInput.value = currentLoanGuid;
+    updateLoanGuidChipDisplay(currentLoanGuid);
+  });
+}
+
 /**
  * Fill empty scenario builder inputs from Tool 8 / Alchemist sample map.
  */
@@ -3771,6 +4227,9 @@ function initializeScenarioBuilderApplyControls() {
     });
   });
   document.getElementById('scenarioApplyToGridBtn')?.addEventListener('click', () => applyScenarioBuilderValuesToGrid());
+  document.getElementById('scenarioApplyAndRunBtn')?.addEventListener('click', () => {
+    void applyScenarioBuilderAndRun();
+  });
   document.getElementById('scenarioFillTool8Btn')?.addEventListener('click', () => fillScenarioBuilderInputsFromTool8Samples());
   document.getElementById('scenarioBuilderNullAllBtn')?.addEventListener('click', () => nullAllScenarioBuilderInputs());
 }
@@ -3792,6 +4251,11 @@ function getScenarioBuilderFieldMeta(fieldId, opts) {
   }
   if (!meta && fieldId && window.customFieldCalcParser?.isNumberFieldByNotation?.(fieldId)) {
     meta = { dataType: 'Decimal', format: '', description: 'Number (from #)' };
+  }
+  // Heuristic from the field's description/label (e.g. "Submit Date/Time") when API has no type.
+  if (!meta && opts && opts.description && window.customFieldCalcParser?.inferDateTypeFromText) {
+    const inferred = window.customFieldCalcParser.inferDateTypeFromText(opts.description);
+    if (inferred) meta = inferred;
   }
   const expr = opts && opts.expression ? String(opts.expression) : '';
   if (expr && window.customFieldCalcParser?.collectDateDiffFieldIdsFromExpression) {
@@ -3822,21 +4286,28 @@ function createScenarioBuilderInput(fieldId, initialValue, dataAttr, opts) {
   const val = initialValue !== undefined && initialValue !== null ? String(initialValue) : '';
 
   if (meta && Array.isArray(meta.options) && meta.options.length > 0) {
-    const sel = document.createElement('select');
-    sel.className = 'form-control form-control-sm';
-    sel.setAttribute('data-field-id', dataAttr);
-    const empty = document.createElement('option');
-    empty.value = '';
-    empty.textContent = '—';
-    sel.appendChild(empty);
+    // Editable combobox (input + datalist): pick a known enumerated value or type a custom
+    // one when the option list is wrong/incomplete (e.g. Yes/No vs Y/N).
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'form-control form-control-sm';
+    inp.setAttribute('autocomplete', 'off');
+    inp.setAttribute('data-field-id', dataAttr);
+    inp.value = val;
+    // <datalist> must live in the DOM (it can't be a child of <input>); key it to the field
+    // and replace any stale copy so re-renders don't accumulate orphaned lists.
+    const listId = 'sb-options-' + String(dataAttr).replace(/[^a-z0-9]/gi, '_');
+    document.getElementById(listId)?.remove();
+    const datalist = document.createElement('datalist');
+    datalist.id = listId;
     meta.options.forEach((opt) => {
       const o = document.createElement('option');
       o.value = opt;
-      o.textContent = opt;
-      if (String(opt) === val) o.selected = true;
-      sel.appendChild(o);
+      datalist.appendChild(o);
     });
-    return sel;
+    inp.setAttribute('list', listId);
+    document.body.appendChild(datalist);
+    return inp;
   }
   if (/integer/i.test(dt)) {
     const inp = document.createElement('input');
@@ -4037,7 +4508,7 @@ function renderScenarioBuilder(field) {
     tr.appendChild(tdLabel);
     const tdVal = document.createElement('td');
     tdVal.className = 'value-cell';
-    const input = createScenarioBuilderInput(fid, initialVal, displayId, { expression: calc });
+    const input = createScenarioBuilderInput(fid, initialVal, displayId, { expression: calc, description: labelLine });
     input.setAttribute('data-field-id-raw', fid);
     const onChange = () => runScenarioCalculation();
     input.addEventListener('input', onChange);
@@ -4051,6 +4522,7 @@ function renderScenarioBuilder(field) {
   setLiveScenarioBuilderSectionVisible(true);
   runScenarioCalculation();
   refreshScenarioApplyToolbar();
+  syncScenarioBuilderPopoutUi();
 }
 
 /**
@@ -4109,12 +4581,13 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
       if (sidebarSelectedField) sidebarSelectedField.style.display = '';
       currentScenarioBuilderField = field;
       renderScenarioBuilder(field);
+      if (collapseSelectedField) {
+        showAccordionSection('collapseSelectedField');
+        bsCollapseShow(collapseSelectedField);
+      }
       const lsbAfter = document.getElementById('liveScenarioBuilderContainer');
       if (lsbAfter && lsbAfter.style.display === 'block') {
         showAccordionSection('collapseLiveScenarioBuilder');
-      }
-      if (collapseSelectedField) {
-        bsCollapseShow(collapseSelectedField);
       }
     } else if (selectedFieldCard) {
       selectedFieldCard.style.display = 'none';
@@ -4161,12 +4634,13 @@ async function loadGeneratedTestData(headers, rows, testDescriptions, sourceName
 
 /** Embedded fallback if `/finance/fixtures/unit-tests-offline-demo.json` is missing. */
 const UNIT_TESTS_OFFLINE_DEMO_FIELD_EMBEDDED = {
-  fieldId: 'CX.UT.DEMO',
-  calculation: '[CX.UT.DEMO] = [353] + 50000',
+  fieldId: 'CUST11FV',
+  calculation:
+    '[CUST11FV] = IIf(IIf(([CX.PROPTAX.NEXTDUEDT.CHECK] = "Y" OrElse DateDiff("D", TODAY, [VEND.X441]) < 30) AndAlso IsDate([VEND.X441]), True,False) OrElse IIf(([CX.CITYTAX.NEXTDUEDT.CHECK] = "Y"  OrElse DateDiff("D", TODAY, [VEND.X453]) < 30) AndAlso IsDate([VEND.X453]), True,False) OrElse IIf(([CX.SCHOOLTAX.NEXTDUEDT.CHECK] = "Y"  OrElse DateDiff("D", TODAY, [VEND.X462]) < 30) AndAlso IsDate([VEND.X462]), True,False) OrElse IIf(([CX.OTHERTAX.NEXTDUEDT.CHECK]= "Y"  OrElse DateDiff("D", TODAY, [VEND.X480]) < 30) AndAlso IsDate([VEND.X480]), True,False) ,"Y","N")',
   description:
-    'Offline demo only: representative calculated custom field for Unit Test grid / Story Mode. Values are synthesized; not connected to Encompass.',
-  dataType: 'Decimal',
-  format: 'DECIMAL_2',
+    'Tax next-due rollup: Y if any tax stream is flagged or due within 30 days (offline demo; not connected to Encompass).',
+  dataType: 'String',
+  format: 'YN',
 };
 
 /**
@@ -4362,9 +4836,9 @@ async function loadMetadataForSetRowsFromEncompass() {
       fieldMeta[key].isCalculated = fieldMeta[key].isCalculated || isCalc;
       if (!fieldMeta[key].source) fieldMeta[key].source = source;
       if (desc) fieldMeta[key].description = fieldMeta[key].description || desc;
-      const isDropdownFormat = /^(DROPDOWN|DROPDOWNLIST|SELECT|LIST|COMBO|AUDIT|PICKLIST)$/i.test(fmt);
-      const allowOptsByFormat = isDropdownFormat || /^(AUDIT|PICKLIST|ENUMERATED)/i.test(fmt);
-      if (options && options.length > 0 && allowOptsByFormat) {
+      // Any field the API reports with an enumerated option list becomes a dropdown,
+      // regardless of the reported format string.
+      if (options && options.length > 0) {
         fieldMeta[key].options = options;
         fieldMeta[key].dataType = fieldMeta[key].dataType || 'String';
       }
@@ -5148,7 +5622,7 @@ function initializeSectionSidebar() {
   if (!nav) return;
 
   // On load: hide section cards and collapse; then open Test Scenarios (Step 1) — upload/generate stays in the Excel Unit Tests hero band above
-  var sectionIds = ['collapseTestScenarios', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLearnMode', 'collapseAIAssistant'];
+  var sectionIds = ['collapseTestScenarios', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (el) {
@@ -5198,7 +5672,7 @@ function initializeSectionSidebar() {
   });
 
   // Sync sidebar active state when sections expand/collapse (from header clicks, voice, or sidebar)
-  var sectionIds = ['collapseTestScenarios', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseSelectedField', 'collapseLearnMode', 'collapseAIAssistant'];
+  var sectionIds = ['collapseTestScenarios', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -5238,6 +5712,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeGenerateFromCustomField();
   initializeGenerateFromBRRule();
   initializeScenarioBuilderApplyControls();
+  initializeScenarioBuilderPopout();
   initializeSectionSidebar();
   initUnitTestsChromePrefs();
   if (exportExcelBtn) exportExcelBtn.disabled = true;
@@ -5245,7 +5720,7 @@ document.addEventListener('DOMContentLoaded', () => {
   welcomeUploadBtn?.addEventListener('click', () => fileInput?.click());
   const qaTipsListenBtn = document.getElementById('qaTipsListenBtn');
   qaTipsListenBtn?.addEventListener('click', () => speak(getUnitTestsQaTipsSpeakScript()));
-  updateLoanGuidChipDisplay(currentLoanGuid);
+  initDefaultLoanGuid();
   renderRecentRunsSelect();
   loadTestLibrary();
   loadBrRuleLibrary();
@@ -5261,6 +5736,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof window !== 'undefined') {
     window.addEventListener('encompassEnvChanged', () => {
       _hubFieldListsCache = null;
+      applyLoanGuid(resolveInitialLoanGuid());
     });
   }
   if (failFirstBtn) {

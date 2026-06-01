@@ -1,8 +1,9 @@
 /**
  * Development work by David Lane
  */
-import { getPool } from './database.service.js';
+import { getPool, isPostgisAvailable } from './database.service.js';
 import { DISASTER_ROLLING_WINDOW_DAYS } from './disasters.service.js';
+import { milesToMeters } from './disaster-spatial.service.js';
 
 const VALID_NODE_TYPES = new Set([
   'disaster_event',
@@ -74,6 +75,76 @@ function ensurePool() {
   const pool = getPool();
   if (!pool) throw new Error('Database not initialized');
   return pool;
+}
+
+const DEFAULT_NEAR_RADIUS_MILES = 50;
+
+/**
+ * Create disaster_event --NEAR--> loan edges from PostGIS spatial join.
+ * @returns {Promise<{ skipped?: boolean, reason?: string, edges: number }>}
+ */
+export async function seedNearSpatialEdges(options = {}) {
+  if (!(await isPostgisAvailable())) {
+    return { skipped: true, reason: 'postgis unavailable', edges: 0 };
+  }
+
+  const pool = ensurePool();
+  const radiusMiles = options.radiusMiles ?? DEFAULT_NEAR_RADIUS_MILES;
+  const meters = milesToMeters(radiusMiles);
+  const disasterNodeByKey = options.disasterNodeByKey;
+  const loanNodeByLoanNumber = options.loanNodeByLoanNumber;
+
+  if (!disasterNodeByKey || !loanNodeByLoanNumber) {
+    return { skipped: true, reason: 'missing node maps', edges: 0 };
+  }
+
+  const { rows } = await pool.query(
+    `SELECT
+      d.id AS disaster_row_id,
+      d.source_id,
+      l.loan_number,
+      ST_Distance(d.geom, l.geom) AS distance_meters
+    FROM disasters d
+    JOIN loans l
+      ON d.geom IS NOT NULL
+     AND l.geom IS NOT NULL
+     AND ST_DWithin(d.geom, l.geom, $1)
+    WHERE d.start_time >= NOW() - INTERVAL '${DISASTER_ROLLING_WINDOW_DAYS} days'
+      AND d.event_type <> 'camera'
+    ORDER BY distance_meters ASC
+    LIMIT 500`,
+    [meters]
+  );
+
+  let edges = 0;
+  for (const row of rows) {
+    const disasterExternalId = String(row.source_id || row.disaster_row_id);
+    const loanExternalId = String(row.loan_number);
+    const disasterNodeId = disasterNodeByKey.get(disasterExternalId);
+    const loanNodeId = loanNodeByLoanNumber.get(loanExternalId);
+    if (!disasterNodeId || !loanNodeId) continue;
+
+    const distanceMeters = Number(row.distance_meters) || meters;
+    const confidence = Math.max(
+      0.5,
+      Math.min(0.95, 1 - (distanceMeters / meters) * 0.45)
+    );
+
+    await upsertEdge({
+      from_node_id: disasterNodeId,
+      to_node_id: loanNodeId,
+      edge_type: 'NEAR',
+      confidence,
+      source: 'postgis-spatial',
+      metadata_json: {
+        distance_meters: distanceMeters,
+        radius_miles: radiusMiles
+      }
+    });
+    edges += 1;
+  }
+
+  return { edges };
 }
 
 export async function initDisasterImpactGraphSchema() {
@@ -734,6 +805,15 @@ export async function seedGraphFromExistingDisasterData(options = {}) {
     edgeCount += 1;
   }
 
+  const nearResult = await seedNearSpatialEdges({
+    disasterNodeByKey,
+    loanNodeByLoanNumber,
+    radiusMiles: DEFAULT_NEAR_RADIUS_MILES
+  });
+  if (nearResult.edges) {
+    edgeCount += nearResult.edges;
+  }
+
   return {
     nodes: {
       counties: countyNodeByFips.size,
@@ -743,7 +823,8 @@ export async function seedGraphFromExistingDisasterData(options = {}) {
       milestones: milestoneNodeByName.size,
       processors: processorNodeByName.size
     },
-    edgesSeeded: edgeCount
+    edgesSeeded: edgeCount,
+    nearSpatial: nearResult
   };
 }
 
@@ -786,6 +867,7 @@ export default {
   ensureDisasterImpactGraphReady,
   initDisasterImpactGraphSchema,
   seedGraphFromExistingDisasterData,
+  seedNearSpatialEdges,
   refreshDisasterImpactGraphFromCurrentData,
   upsertNode,
   upsertEdge,

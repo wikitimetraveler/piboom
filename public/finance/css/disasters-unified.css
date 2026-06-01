@@ -1,0 +1,693 @@
+/**
+ * Unified Disasters dashboard — hazard command center chrome
+ * @see public/finance/disasters-unified.html
+ */
+
+body.du-page {
+  background: var(--zen-surface, #f8fafc);
+  min-height: 100vh;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  color: var(--text-dark, #1f2937);
+  overflow-x: hidden;
+}
+
+.du-main {
+  max-width: 1400px;
+  position: relative;
+  z-index: 1;
+}
+
+/* —— Loading overlay —— */
+#roadRunnerLoading {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, var(--du-hero-from) 0%, #1e293b 45%, #334155 100%);
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+#roadRunnerLoading.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.loading-container {
+  text-align: center;
+  color: #93c5fd;
+  max-width: 32rem;
+  padding: 1.5rem;
+}
+
+.loading-icon-ring {
+  font-size: 4rem;
+  color: #60a5fa;
+  margin-bottom: 1rem;
+  animation: duLoadPulse 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(96, 165, 250, 0.45));
+}
+
+@keyframes duLoadPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.85; }
+}
+
+.loading-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+}
+
+.loading-subtitle {
+  font-size: 1rem;
+  color: #93c5fd;
+  margin-bottom: 1.5rem;
+}
+
+.data-stream {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.data-stream .data-icon {
+  font-size: 1.75rem;
+  color: #60a5fa;
+  animation: duDataFlow 2s ease-in-out infinite;
+  animation-delay: calc(var(--delay, 0) * 0.25s);
+}
+
+@keyframes duDataFlow {
+  0%, 100% { transform: translateY(0); opacity: 0.65; }
+  50% { transform: translateY(-8px); opacity: 1; }
+}
+
+.loading-progress-disaster {
+  width: min(400px, 90vw);
+  height: 8px;
+  background: rgba(96, 165, 250, 0.2);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.loading-progress-bar-disaster {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #60a5fa, var(--zen-primary, #4a90a4), #60a5fa);
+  background-size: 200% 100%;
+  animation: duProgressShimmer 2s linear infinite;
+  transition: width 0.3s ease;
+}
+
+@keyframes duProgressShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.loading-text {
+  font-size: 0.9rem;
+  color: #cbd5e1;
+  margin-top: 1rem;
+}
+
+.circuit-container {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+}
+
+.circuit-node {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #60a5fa;
+  animation: duCircuitPulse 1.4s ease-in-out infinite;
+  animation-delay: calc(var(--delay, 0) * 0.15s);
+}
+
+@keyframes duCircuitPulse {
+  0%, 100% { opacity: 0.35; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.35); }
+}
+
+/* —— Hero band —— */
+.du-hero {
+  background: linear-gradient(135deg, var(--du-hero-from) 0%, #1e3a5f 40%, var(--du-hero-to) 100%);
+  color: #fff;
+  padding: 1.75rem 0 1.25rem;
+  margin: 0 calc(50% - 50vw) 1.5rem;
+  width: 100vw;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.25);
+}
+
+.du-hero-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.du-hero h1 {
+  font-size: 1.65rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.du-hero .du-hero-kicker {
+  font-size: 0.85rem;
+  opacity: 0.88;
+  font-weight: 500;
+}
+
+.du-workflow-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.du-workflow-pills li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.du-workflow-pills .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 0.65rem;
+}
+
+.du-hero-actions .btn {
+  font-weight: 600;
+}
+
+/* Stat tiles in hero */
+.du-stats-row {
+  margin-top: 1.25rem;
+}
+
+.du-stat-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.du-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.du-stat-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.du-stat-card--total .du-stat-icon { background: rgba(255, 255, 255, 0.2); color: #fff; }
+.du-stat-card--fire .du-stat-icon { background: rgba(239, 68, 68, 0.35); color: #fecaca; }
+.du-stat-card--quake .du-stat-icon { background: rgba(245, 158, 11, 0.35); color: #fde68a; }
+.du-stat-card--counties .du-stat-icon { background: rgba(6, 182, 212, 0.35); color: #a5f3fc; }
+
+.du-stat-card .stat-number {
+  font-size: 1.65rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.du-stat-card .stat-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 0.2rem;
+}
+
+/* —— Workspace cards —— */
+.du-page .card {
+  border: 1px solid var(--border-light, #e5e7eb);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, 0.05));
+  background: #fff;
+  overflow: hidden;
+}
+
+.du-page .card:hover {
+  box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.08));
+}
+
+/* Gradient headers only on data panels (grid/map), not the filters form */
+.du-page .du-data-panel > .card-header {
+  background: linear-gradient(135deg, var(--zen-primary, #4a90a4), var(--zen-primary-hover, #3d7a8a));
+  color: #fff;
+  font-weight: 600;
+  border-bottom: none;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.95rem;
+}
+
+.du-page .du-data-panel > .card-header .text-muted {
+  color: rgba(255, 255, 255, 0.82) !important;
+}
+
+/* Accordion chrome */
+.du-page #disastersAccordion {
+  border: 1px solid var(--border-light, #e5e7eb);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.du-page #disastersAccordion .accordion-item {
+  border: none;
+  border-bottom: 1px solid var(--border-light, #e5e7eb);
+}
+
+.du-page #disastersAccordion .accordion-item:last-child {
+  border-bottom: none;
+}
+
+.du-page #disastersAccordion .accordion-button {
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.15rem;
+  background: #f9fafb;
+  color: var(--text-dark, #1f2937);
+  box-shadow: none;
+}
+
+.du-page #disastersAccordion .accordion-button:not(.collapsed) {
+  background: #fff;
+  color: var(--zen-primary, #4a90a4);
+  box-shadow: none;
+}
+
+.du-page #disastersAccordion .accordion-button:focus {
+  box-shadow: 0 0 0 3px rgba(var(--zen-primary-rgb, 74, 144, 164), 0.2);
+  border-color: transparent;
+}
+
+.du-page #disastersAccordion .accordion-body {
+  padding: 1rem 1.15rem 1.15rem;
+  background: #fff;
+}
+
+.du-command-deck {
+  border-radius: 12px;
+  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  background: linear-gradient(180deg, #fff 0%, var(--zen-surface, #f8fafc) 100%);
+}
+
+.du-command-deck-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #6b7280);
+}
+
+#sourceHealthLine {
+  font-size: 0.8rem;
+  color: var(--text-muted, #6b7280);
+  margin-top: 0.5rem;
+}
+
+#sourceHealthLine .text-warning { color: #b45309 !important; }
+
+.dashboard-status-banner {
+  display: none;
+}
+
+.dashboard-status-banner:not(:empty) {
+  display: block;
+}
+
+/* Source command deck chips */
+.disaster-source-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  padding: 0.35rem 0;
+}
+
+.source-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem 0.55rem 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  color: #4b5563;
+  font-weight: 600;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.source-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.source-chip .freshness-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--du-fresh-off);
+  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.3);
+}
+
+.source-chip.freshness-ok .freshness-dot {
+  background: var(--du-fresh-ok);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.35);
+}
+
+.source-chip.freshness-warn .freshness-dot {
+  background: var(--du-fresh-warn);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+}
+
+.source-chip.freshness-off .freshness-dot {
+  background: var(--du-fresh-off);
+}
+
+.source-chip-count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.06);
+  margin-left: 0.15rem;
+}
+
+.source-chip-active .source-chip-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.source-chip-db-total {
+  font-size: 0.65rem;
+  opacity: 0.75;
+  font-weight: 500;
+}
+
+.source-chip-active {
+  color: #fff;
+  border-color: transparent;
+}
+
+.source-chip[data-source="fema"].source-chip-active { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.source-chip[data-source="firms"].source-chip-active { background: linear-gradient(135deg, #ef4444, #f87171); }
+.source-chip[data-source="usgs"].source-chip-active { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #1f2937; }
+.source-chip[data-source="nws"].source-chip-active { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
+.source-chip[data-source="nhc"].source-chip-active { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+.source-chip[data-source="gdacs"].source-chip-active { background: linear-gradient(135deg, #6b7280, #9ca3af); }
+.source-chip[data-source="floodzones"].source-chip-active { background: linear-gradient(135deg, #06b6d4, #67e8f9); }
+
+.source-chip-link {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+
+/* Sticky selection context */
+#selectionContextStrip {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 100;
+  border-radius: 10px;
+  border: 1px solid rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.12);
+}
+
+/* Grids */
+#disastersGrid.ag-theme-alpine {
+  width: 100%;
+  height: 520px;
+}
+
+#encompassLoansGrid.ag-theme-alpine {
+  width: 100%;
+  height: 360px;
+}
+
+#disastersGrid .ag-row.disaster-wildfire { background-color: #fff7ed; }
+#disastersGrid .ag-row.disaster-earthquake { background-color: #fef3f2; }
+#disastersGrid .ag-row.disaster-hurricane { background-color: #eff6ff; }
+#disastersGrid .ag-row.disaster-flood { background-color: #f0f9ff; }
+#disastersGrid .ag-row.disaster-severe { background-color: #fef2f2; }
+#disastersGrid .ag-row.disaster-active {
+  box-shadow: inset 4px 0 0 var(--zen-primary, #4a90a4);
+  background-color: #f0f9ff !important;
+}
+
+#disastersGrid .ag-row { cursor: pointer; }
+
+/* Source provenance badges */
+.source-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  min-width: 4.5rem;
+  text-align: center;
+}
+
+.source-fema { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+.source-firms { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.source-usgs { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+.source-alertcalifornia { background: #fef3c7; color: #d97706; border-color: #fbbf24; }
+.source-nws { background: #cffafe; color: #0e7490; border-color: #67e8f9; }
+.source-nhc { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+.source-gdacs { background: #f3f4f6; color: #374151; border-color: #d1d5db; }
+.source-floodzones { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
+
+.risk-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.risk-low { background: #d1fae5; color: #065f46; }
+.risk-medium { background: #fef3c7; color: #92400e; }
+.risk-high { background: #fee2e2; color: #991b1b; }
+.risk-critical { background: #7c2d12; color: #fee2e2; }
+
+/* Map + YouTube panels */
+.du-map-panel .card-body,
+.du-youtube-panel .card-body {
+  padding: 0.75rem;
+}
+
+.du-map-panel #map {
+  height: clamp(320px, 52vh, 680px);
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.du-youtube-panel #youtubeResults {
+  max-height: clamp(320px, 52vh, 680px);
+  overflow-y: auto;
+  min-height: 200px;
+}
+
+.du-youtube-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-muted, #6b7280);
+}
+
+.du-youtube-empty i {
+  font-size: 2.5rem;
+  opacity: 0.5;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.du-youtube-skeleton {
+  display: none;
+  padding: 1rem;
+}
+
+.du-youtube-skeleton.is-loading {
+  display: block;
+}
+
+.du-youtube-skeleton .placeholder {
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+/* Filters panel — no nested card (was clipping / fighting accordion styles) */
+.du-filters-body {
+  padding: 0;
+}
+
+.du-filters-body .form-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.35rem;
+}
+
+.du-filters-body .du-filters-source-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted, #6b7280);
+  margin-bottom: 0.35rem;
+  line-height: 1.35;
+}
+
+/* Bootstrap form-select + multiple is broken — use sized multi-select */
+.du-filters-body select[multiple].form-control,
+.du-filters-body select[multiple].du-filter-multiselect {
+  display: block;
+  width: 100%;
+  min-height: 7.5rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.du-filters-body select[multiple] option {
+  padding: 0.2rem 0.35rem;
+  border-radius: 4px;
+}
+
+.du-filters-body select[multiple] option:checked {
+  background: linear-gradient(135deg, var(--zen-primary, #4a90a4), var(--zen-primary-hover, #3d7a8a));
+  color: #fff;
+}
+
+.du-page .form-control:focus,
+.du-page .form-select:focus {
+  border-color: var(--zen-primary, #4a90a4);
+  box-shadow: 0 0 0 3px rgba(var(--zen-primary-rgb, 74, 144, 164), 0.15);
+}
+
+.du-filters-body .form-control:not(select[multiple]) {
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.du-page .btn-primary {
+  background: var(--zen-primary, #4a90a4);
+  border-color: var(--zen-primary, #4a90a4);
+}
+
+.du-page .btn-primary:hover {
+  background: var(--zen-primary-hover, #3d7a8a);
+  border-color: var(--zen-primary-hover, #3d7a8a);
+}
+
+#encompassLoansCard {
+  animation: duSlideDown 0.4s ease;
+}
+
+@keyframes duSlideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.footer {
+  margin-top: 2rem;
+  padding: 1.25rem 0 1.5rem;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+}
+
+.tool-product-credits-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tool-product-credits-footer .credits-label {
+  display: block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.tool-product-credits-footer .credits-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.footer-meta-line {
+  font-size: 0.8rem;
+  color: #64748b;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .du-hero h1 { font-size: 1.35rem; }
+  .du-stats-row .col-md-3 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  .du-map-panel #map,
+  .du-youtube-panel #youtubeResults {
+    height: clamp(280px, 48vh, 520px);
+    max-height: clamp(280px, 48vh, 520px);
+  }
+}

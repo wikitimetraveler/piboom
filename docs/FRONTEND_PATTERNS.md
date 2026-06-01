@@ -9,7 +9,7 @@ Conventions for tables, grids, shared components, and themes. Use this when buil
 | **AG Grid** (ag-grid-community) | Unit-test execution grid, Encompass custom/native field browsers | alpine | `unit-tests.js`, `encompassCustomFields.js`, `encompassNativeFields.js` |
 | **DataTables** | Pipeline, disasters, risk dashboards, tools | Bootstrap 5 | `pipeline-risk-dashboard.html`, loan pipeline tables, disaster tables |
 
-**Rule:** Use AG Grid for Encompass field browsers and unit-test grids. Use DataTables for pipeline, disasters, and general tabular data.
+**Rule:** Use AG Grid for Encompass field browsers, unit-test grids, and **Unified Disasters** (`disasters-unified.html`). Use DataTables for pipeline risk and other general tabular data.
 
 ### AG Grid
 
@@ -44,7 +44,7 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 
 **Footer credit:** Add `<div data-lane-site-credit></div>` and [`public/family/js/lane-site-credit.js`](../public/family/js/lane-site-credit.js) before closing `</main>` (styles in [`lane-shell.css`](../public/family/css/lane-shell.css)). Copy: “Developed by David E Lane · AI-assisted development” plus date.
 
-**Unified Disasters** ([`public/finance/disasters-unified.html`](../public/finance/disasters-unified.html)) uses the finance `tool-product-credits-footer` pattern inline (label **Developed by**, name **David E Lane**) — same labels as unit-tests/tool4, without the product-director block.
+**Unified Disasters** ([`public/finance/disasters-unified.html`](../public/finance/disasters-unified.html)) uses AG Grid for the disasters and loans tables, page chrome in [`public/finance/css/disasters-unified.css`](../public/finance/css/disasters-unified.css) (gradient hero, source command deck with freshness dots), and the finance `tool-product-credits-footer` pattern (label **Developed by**, name **David E Lane**).
 
 **CA fire cameras** ([`public/finance/disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html)): fixed ALERTCalifornia mounts on a separate page; data from `GET /api/disasters/cameras` (`fire_cameras` table). Unified Disasters links here only (no camera layer on the disaster map). Ingest: `npm run refresh:fire-cameras` or `POST /api/disasters/refresh-cameras`.
 
@@ -78,6 +78,24 @@ Use `navigator.geolocation.getCurrentPosition` with `enableHighAccuracy: true` a
 | `public/shared/ai-insights-card.js` | AI insights card (module) |
 | `public/shared/calculationEngine.js` | Calculation engine |
 | `public/shared/calcEngineLibrary.js` | calcMath library |
+| `public/shared/map-icons.js` | Shared Google Maps marker SVGs (`mapIcons.get*ForMarker`) — disasters, collections, music research |
+
+### Map marker icons (`map-icons.js`)
+
+Load before creating markers when using custom pins (not default red dots):
+
+```html
+<script src="/shared/map-icons.js"></script>
+```
+
+| Helper | Use |
+|--------|-----|
+| `mapIcons.getDisasterIconForMarker(eventType, source)` | Unified disasters, risk dashboards |
+| `mapIcons.getLoanIconForMarker(score)` | Encompass loan points on hazard maps |
+| `mapIcons.getCollectionIconForMarker('tree' \| 'fish' \| …)` | Nature / bike collection maps |
+| `mapIcons.getMusicOriginIconForMarker('birth' \| 'formation')` | [`public/music/music-research.html`](../public/music/music-research.html) — teal star pin = personal birth; amber notes pin = band formation |
+
+Music Research map payloads from `POST /api/music-research/map-data` include `eventType` on each point (`birth` for members and solo artists, `formation` for the main band origin). `getBirthplaceIconForMarker()` remains as an alias for `getMusicOriginIconForMarker('birth')`.
 
 ## Finance / Worksheets shell (Bootstrap 5)
 

@@ -11,9 +11,7 @@ import {
   ingestUsgsQuakes,
   ingestNwsCap,
   ingestNhc,
-  ingestCaFireCameras,
-  filterFireCamerasByDistance,
-  sortCamerasByDistance
+  ingestCaFireCameras
 } from '../services/disasters.service.js';
 import {
   ingestHazardWebcams,
@@ -26,6 +24,11 @@ import {
 import { geocodeCountyStateWithCache } from '../services/geocoding-cache.service.js';
 import { geocodeAddressFree } from '../services/free-geocoding.service.js';
 import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
+import {
+  resolveCamerasNearPoint,
+  resolveDisastersNearPoint,
+  resolveLoansNearPoint
+} from '../services/disaster-spatial.service.js';
 
 // Ensure schema on startup (best-effort)
 initDisastersSchema().catch(() => {});
@@ -362,35 +365,46 @@ export async function listCameras(req, res) {
     }
     const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
 
-    const countResult = await pool.query(
-      `SELECT COUNT(*)::int AS total FROM fire_cameras ${where}`,
-      values
-    );
-
-    const fetchLimit = hasGeo ? MAX_LIMIT : rowLimit;
-    const fetchOffset = hasGeo ? 0 : rowOffset;
-
-    const camerasResult = await pool.query(
-      `SELECT
-        id, source, source_id, name, county_name, state_abbr, lat, lng,
-        camera_url, network_url, image_url, status, media_type, refresh_minutes,
-        hazard_types, last_image_at, raw, updated_at
-      FROM fire_cameras
-      ${where}
-      ORDER BY name ASC NULLS LAST
-      LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
-      values.concat([fetchLimit, fetchOffset])
-    );
-
-    let cameras = camerasResult.rows.map(mapCameraRow);
-
-    let total = countResult.rows[0]?.total || 0;
+    let cameras;
+    let total;
 
     if (hasGeo) {
-      cameras = filterFireCamerasByDistance(cameras, parsedNearLat, parsedNearLng, parsedRadius);
-      total = cameras.length;
-      cameras = sortCamerasByDistance(cameras, parsedNearLat, parsedNearLng);
-      cameras = cameras.slice(rowOffset, rowOffset + rowLimit);
+      const spatial = await resolveCamerasNearPoint({
+        lat: parsedNearLat,
+        lng: parsedNearLng,
+        radiusMiles: parsedRadius,
+        limit: rowLimit,
+        offset: rowOffset,
+        filters: {
+          state,
+          county,
+          source,
+          hazard,
+          mediaType
+        }
+      });
+      cameras = spatial.rows.map(mapCameraRow);
+      total = spatial.total;
+    } else {
+      const countResult = await pool.query(
+        `SELECT COUNT(*)::int AS total FROM fire_cameras ${where}`,
+        values
+      );
+
+      const camerasResult = await pool.query(
+        `SELECT
+          id, source, source_id, name, county_name, state_abbr, lat, lng,
+          camera_url, network_url, image_url, status, media_type, refresh_minutes,
+          hazard_types, last_image_at, raw, updated_at
+        FROM fire_cameras
+        ${where}
+        ORDER BY name ASC NULLS LAST
+        LIMIT $${values.length + 1} OFFSET $${values.length + 2}`,
+        values.concat([rowLimit, rowOffset])
+      );
+
+      cameras = camerasResult.rows.map(mapCameraRow);
+      total = countResult.rows[0]?.total || 0;
     }
 
     res.json({
@@ -411,6 +425,68 @@ export async function listCameras(req, res) {
   } catch (e) {
     console.error('❌ Error listing cameras:', e);
     res.status(500).json({ success: false, error: 'Failed to list cameras', details: e.message });
+  }
+}
+
+export async function listNear(req, res) {
+  try {
+    const lat = parseFloat(req.query.lat);
+    const lng = parseFloat(req.query.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Query parameters lat and lng are required numeric values'
+      });
+    }
+
+    let radiusMiles = parseFloat(req.query.radiusMiles);
+    if (!Number.isFinite(radiusMiles) || radiusMiles < 1) {
+      radiusMiles = 50;
+    } else if (radiusMiles > 500) {
+      radiusMiles = 500;
+    }
+
+    const parsedLimit = parseInt(req.query.limit, 10);
+    const limit = Number.isFinite(parsedLimit) && parsedLimit > 0
+      ? Math.min(parsedLimit, 500)
+      : 100;
+
+    const typeParam = String(req.query.types || 'disasters,cameras,loans');
+    const types = new Set(
+      typeParam.split(',').map((t) => t.trim().toLowerCase()).filter(Boolean)
+    );
+
+    const payload = {
+      lat,
+      lng,
+      radiusMiles,
+      limit,
+      disasters: [],
+      cameras: [],
+      loans: [],
+      counts: { disasters: 0, cameras: 0, loans: 0 }
+    };
+
+    if (types.has('disasters')) {
+      const result = await resolveDisastersNearPoint({ lat, lng, radiusMiles, limit });
+      payload.disasters = result.rows;
+      payload.counts.disasters = result.total;
+    }
+    if (types.has('cameras')) {
+      const result = await resolveCamerasNearPoint({ lat, lng, radiusMiles, limit });
+      payload.cameras = result.rows.map(mapCameraRow);
+      payload.counts.cameras = result.total;
+    }
+    if (types.has('loans')) {
+      const result = await resolveLoansNearPoint({ lat, lng, radiusMiles, limit, lite: true });
+      payload.loans = result.rows;
+      payload.counts.loans = result.total;
+    }
+
+    res.json({ success: true, data: payload });
+  } catch (e) {
+    console.error('❌ Error listing nearby disaster entities:', e);
+    res.status(500).json({ success: false, error: 'Failed to list nearby entities', details: e.message });
   }
 }
 
@@ -482,6 +558,7 @@ export default {
   refreshDisasters,
   refreshCameras,
   listCameras,
+  listNear,
   cameraStats,
   cameraSnapshot,
   statsDisasters,

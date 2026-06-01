@@ -83,13 +83,25 @@
     const full = chaptersEnabled();
     const scenes = [];
     scenes.push({
+      scrollEl: () =>
+        document.getElementById('generateFromCustomFieldBtn') ||
+        document.getElementById('unitTestsCommandBar'),
+      kicker: 'Step 1',
+      title: 'Generate from custom field',
+      copy: 'Pick a calculated field like CUST11FV (tax next-due rollup), preview SET/COMPARE steps, then Generate & load.',
+      narration: norm(
+        'Step 1, Generate from custom field. Pick a calculated Encompass field such as CUST11FV, review the preview of set and compare steps, then generate and load the workbook.'
+      ),
+      durationMs: SCENE_MS,
+    });
+    scenes.push({
       collapseId: 'collapseTestScenarios',
       scrollEl: () => document.getElementById('headingTestScenarios'),
-      kicker: 'Step 1',
+      kicker: 'Step 2',
       title: 'Test Scenarios',
       copy: 'Run one scenario or coordinate runs from the cards.',
       narration: norm(
-        'Step 1, Scenarios. Pick a scenario column, run from the cards, or coordinate runs from the grid.'
+        'Step 2, Scenarios. Pick a scenario column, run from the cards, or coordinate runs from the grid.'
       ),
       durationMs: SCENE_MS,
     });
@@ -97,11 +109,11 @@
       scenes.push({
         collapseId: 'collapseLiveScenarioBuilder',
         scrollEl: () => document.getElementById('headingLiveScenarioBuilder'),
-        kicker: 'Step 1b',
+        kicker: 'Step 2b',
         title: 'Live Scenario Builder',
         copy: 'Edit mock values, preview the result instantly, then apply values into SET rows for one, five, or all test columns.',
         narration: norm(
-          'Step one B, Live Scenario Builder. Edit mock values, inspect the live result, then apply those values to set rows across one, five, or all test columns.'
+          'Step two B, Live Scenario Builder. Edit mock values, inspect the live result, then apply those values to set rows across one, five, or all test columns.'
         ),
         durationMs: SCENE_MS,
       });
@@ -109,22 +121,22 @@
     scenes.push({
       collapseId: 'collapseTestGrid',
       scrollEl: () => document.getElementById('headingTestGrid'),
-      kicker: 'Step 2',
+      kicker: 'Step 3',
       title: 'Test Grid',
       copy: 'Inspect SET and COMPARE rows, search columns, and review scenario results.',
       narration: norm(
-        'Step 2, Test Grid. Review your steps, targets, and scenario columns. Use search and filters after data is loaded.'
+        'Step 3, Test Grid. Review your steps, targets, and scenario columns. Use search and filters after data is loaded.'
       ),
       durationMs: SCENE_MS,
     });
     scenes.push({
       collapseId: 'collapseUnitTestData',
       scrollEl: () => document.getElementById('headingUnitTestData'),
-      kicker: 'Step 3',
+      kicker: 'Step 4',
       title: 'Run tests / Unit Test Data',
       copy: 'Upload or generate a workbook, read QA highlights, then enter a loan GUID and use Run with the sticky bar.',
       narration: norm(
-        'Step 3, Run tests. Use QA highlights for formulas, enter a loan GUID, then run from the sticky bar. Upload and generate also live in the Excel Unit Tests bar above.'
+        'Step 4, Run tests. Use QA highlights for formulas, enter a loan GUID, then run from the sticky bar. Upload and generate also live in the Excel Unit Tests bar above.'
       ),
       durationMs: SCENE_MS,
     });
@@ -132,10 +144,10 @@
       scenes.push({
         collapseId: 'collapseOverallSignOff',
         scrollEl: () => document.getElementById('headingOverallSignOff'),
-        kicker: 'Step 4',
+        kicker: 'Step 5',
         title: 'Sign-off',
         copy: 'Collect tester confirmations when the run is accepted.',
-        narration: norm('Step 4, Sign-off. Confirm completion when testers agree the suite passed.'),
+        narration: norm('Step 5, Sign-off. Confirm completion when testers agree the suite passed.'),
         durationMs: SCENE_MS,
       });
       scenes.push({
@@ -198,6 +210,12 @@
     });
   }
 
+  function updateStoryStopBtn(visible) {
+    const stopBtn = document.getElementById('unitTestsStoryStopBtn');
+    if (!stopBtn) return;
+    stopBtn.classList.toggle('d-none', !visible);
+  }
+
   function setOverlay(scene) {
     const overlay = document.getElementById('unitTestsStoryOverlay');
     const kEl = document.getElementById('unitTestsStorySceneKicker');
@@ -210,6 +228,7 @@
       kEl.textContent = '';
       tEl.textContent = '';
       cEl.textContent = '';
+      updateStoryStopBtn(false);
       return;
     }
     overlay.classList.remove('d-none');
@@ -217,6 +236,7 @@
     kEl.textContent = scene.kicker || '';
     tEl.textContent = scene.title || '';
     cEl.textContent = scene.copy || '';
+    updateStoryStopBtn(state.running);
   }
 
   function stopNarration() {
@@ -333,13 +353,18 @@
     const has = buildScenes().length > 0;
     btn.disabled = !has && !state.running;
     btn.setAttribute('aria-pressed', state.running ? 'true' : 'false');
-    btn.textContent = state.running ? 'Pause highlight reel' : 'Play highlight reel';
+    btn.textContent = state.running ? 'Stop highlight reel' : 'Play highlight reel';
+    updateStoryStopBtn(state.running);
   }
 
   function init() {
     if (listenersBound) return;
     listenersBound = true;
     loadOpts();
+
+    document.getElementById('unitTestsStoryStopBtn')?.addEventListener('click', () => {
+      if (state.running) stopStoryMode(false);
+    });
 
     document.getElementById('unitTestsStoryToggle')?.addEventListener('click', async () => {
       if (state.running) {

@@ -53,6 +53,9 @@ router.post('/refresh-cameras', requireDisasterRefreshAccess, disastersControlle
 // Forward geocode for hazard webcam address search fallback
 router.get('/geocode-address', disastersController.geocodeAddress);
 
+// Nearby disasters, webcams, and loans (PostGIS when available)
+router.get('/near', disastersController.listNear);
+
 // List camera records (fixed hazard webcams)
 router.get('/cameras/stats', disastersController.cameraStats);
 router.get('/cameras/:id/snapshot', disastersController.cameraSnapshot);

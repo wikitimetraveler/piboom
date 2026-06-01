@@ -19,8 +19,7 @@ await jest.unstable_mockModule('../../services/disasters.service.js', () => ({
   ingestNwsCap: jest.fn(),
   ingestNhc: jest.fn(),
   ingestCaFireCameras: jest.fn(),
-  filterFireCamerasByDistance: jest.fn(),
-  sortCamerasByDistance: jest.fn(),
+  DISASTER_ROLLING_WINDOW_DAYS: 90
 }));
 
 await jest.unstable_mockModule('../../services/hazard-webcam-ingest.service.js', () => ({
@@ -38,6 +37,12 @@ await jest.unstable_mockModule('../../services/geocoding-cache.service.js', () =
 
 await jest.unstable_mockModule('../../services/disaster-impact-graph.service.js', () => ({
   refreshDisasterImpactGraphFromCurrentData: jest.fn(),
+}));
+
+await jest.unstable_mockModule('../../services/disaster-spatial.service.js', () => ({
+  resolveCamerasNearPoint: jest.fn(),
+  resolveDisastersNearPoint: jest.fn(),
+  resolveLoansNearPoint: jest.fn(),
 }));
 
 const { geocodeAddress } = await import('../../controllers/disasters.controller.js');

@@ -121,6 +121,15 @@ export function formatDescriptionFromMeta(meta, existingDesc = '') {
   return sanitizeDescriptionText(existingDesc || '');
 }
 
+/** localStorage key: `{ correspondent?: string, retail?: string }` */
+export const UNIT_TEST_LOAN_GUID_BY_ENV_KEY = 'unitTestsLoanGuidByEnv';
+
+/** Pre-filled loan GUID on Worksheets unit test page when none is stored yet. */
+export const DEFAULT_UNIT_TEST_LOAN_GUID_BY_ENV = {
+  correspondent: '6368dcda-7d71-466e-81af-7e3ed2ca5090',
+  retail: 'f31324f5-a9a7-4f99-841e-42988a073634'
+};
+
 /** True when Description should be refreshed from Encompass metadata. */
 export function descriptionNeedsMetadataRefresh(desc) {
   const d = String(desc || '').trim();

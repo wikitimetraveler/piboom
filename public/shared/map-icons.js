@@ -76,6 +76,39 @@
     }
   };
 
+  /** Music research — birth vs band formation on music-research map */
+  const music = {
+    birthplace: {
+      url: svgToDataUri(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' +
+        '<path fill="#4a90a4" stroke="#3d7a8a" stroke-width="1.2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>' +
+        '<path fill="#fff" d="M12 6.2l1.1 2.2 2.4.35-1.75 1.7.41 2.4L12 11.4l-2.16 1.45.41-2.4-1.75-1.7 2.4-.35z"/>' +
+        '</svg>'
+      ),
+      scaledSize: { width: SIZE, height: SIZE },
+      anchor: { x: ANCHOR, y: SIZE }
+    },
+    formation: {
+      url: svgToDataUri(
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' +
+        '<path fill="#D97706" stroke="#B45309" stroke-width="1.2" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>' +
+        '<path fill="#fff" d="M9.2 7.2h1.4v5.2H9.2zm3.2 1.1h1.4v4.1h-1.4zm3.2 1.2h1.4v2.9h-1.4z"/>' +
+        '</svg>'
+      ),
+      scaledSize: { width: SIZE, height: SIZE },
+      anchor: { x: ANCHOR, y: SIZE }
+    }
+  };
+
+  function iconConfigForGoogleMaps(c) {
+    if (typeof google === 'undefined' || !google.maps) return { url: c.url };
+    return {
+      url: c.url,
+      scaledSize: new google.maps.Size(c.scaledSize.width, c.scaledSize.height),
+      anchor: c.anchor ? new google.maps.Point(c.anchor.x, c.anchor.y) : undefined
+    };
+  }
+
   /** Loan risk icons (Encompass loan points on disasters map) */
   const loanSize = 24;
   const loanAnchor = 12;
@@ -189,16 +222,42 @@
     };
   }
 
+  /**
+   * Get music research map icon by origin type.
+   * @param {string} eventType - 'birth' | 'formation' (defaults to birth)
+   */
+  function getMusicOriginIcon(eventType) {
+    const type = String(eventType || 'birth').toLowerCase();
+    return type === 'formation' ? music.formation : music.birthplace;
+  }
+
+  /**
+   * Get music research map icon ready for Google Maps Marker.
+   * @param {string} eventType - 'birth' | 'formation'
+   */
+  function getMusicOriginIconForMarker(eventType) {
+    return iconConfigForGoogleMaps(getMusicOriginIcon(eventType));
+  }
+
+  /** @deprecated Use getMusicOriginIconForMarker('birth') */
+  function getBirthplaceIconForMarker() {
+    return getMusicOriginIconForMarker('birth');
+  }
+
   global.mapIcons = {
     collection,
     disaster,
     loan,
+    music,
     getDisasterIcon,
     getLoanIcon,
     getDisasterIconForMarker,
     getLoanIconForMarker,
     getLoanIconByFloodZoneForMarker,
     getCollectionIconForMarker,
+    getMusicOriginIcon,
+    getMusicOriginIconForMarker,
+    getBirthplaceIconForMarker,
     SIZE,
     ANCHOR
   };

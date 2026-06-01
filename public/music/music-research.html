@@ -202,6 +202,67 @@
   .timeline-event.other .timeline-marker {
     background: #6c757d;
   }
+
+  /* Google Maps birthplace / formation info popups */
+  .music-map-infowindow {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    min-width: 220px;
+    max-width: 280px;
+    padding: 0.15rem 0.1rem 0.1rem;
+  }
+  .music-map-infowindow-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    margin-bottom: 0.5rem;
+  }
+  .music-map-infowindow-badge.birth {
+    background: rgba(74, 144, 164, 0.15);
+    color: #3d7a8a;
+  }
+  .music-map-infowindow-badge.formation {
+    background: rgba(217, 119, 6, 0.15);
+    color: #b45309;
+  }
+  .music-map-infowindow-badge.member {
+    background: rgba(102, 126, 234, 0.15);
+    color: #5a67d8;
+  }
+  .music-map-infowindow-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a2856;
+    margin: 0 0 0.45rem;
+    line-height: 1.35;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+  .music-map-infowindow-title i {
+    color: #4a90a4;
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+  }
+  .music-map-infowindow-body {
+    font-size: 0.875rem;
+    color: #647196;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .music-map-infowindow-meta {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 0.35rem;
+  }
+
+  .member-card.member-card--map-focus {
+    border-color: #4a90a4 !important;
+    box-shadow: 0 6px 20px rgba(74, 144, 164, 0.25) !important;
+  }
   
   .youtube-container {
     background: rgba(255,255,255,.95);
@@ -892,6 +953,7 @@
 </footer>
 
 <script src="/shared/voice-widget.js"></script>
+<script src="/shared/map-icons.js"></script>
 <script src="/shared/scripts.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <!-- Google Knowledge Graph Widget -->
@@ -2263,7 +2325,7 @@ function searchArtistByName(artistName) {
     setTimeout(() => {
       const mapContainer = document.getElementById('mapContainer');
       if (mapContainer) {
-        mapContainer.scrollIntoView({ behavior: 'smooth' });
+        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 300);
   };
@@ -2320,8 +2382,15 @@ function searchKnowledgeGraph(artistName) {
   });
 }
 
+function showWikimediaRateLimitNotice() {
+  const msg = 'Wikipedia is temporarily rate-limiting requests. Please wait a minute and try again.';
+  if (typeof showToast === 'function') {
+    showToast(msg, { type: 'warning', title: 'Rate limited' });
+  }
+  return msg;
+}
+
 function searchWikipedia(artistName) {
-  // This uses Wikipedia API (free, no auth needed)
   fetch('/api/music-research/wikipedia', {
     method: 'POST',
     headers: {
@@ -2329,14 +2398,28 @@ function searchWikipedia(artistName) {
     },
     body: JSON.stringify({ artist: artistName })
   })
-  .then(response => response.json())
-  .then(data => {
+  .then(async (response) => {
+    const data = await response.json();
     showLoading('artistLoading', false);
+    if (!response.ok) {
+      const msg = data.rateLimited
+        ? showWikimediaRateLimitNotice()
+        : (data.error || 'Error loading artist information. Please try again.');
+      document.getElementById('artistContent').innerHTML =
+        `<div class="alert alert-warning">${msg}</div>`;
+      return;
+    }
+    if (data.wikipediaRateLimited && typeof showToast === 'function') {
+      showToast('Artist details loaded from MusicBrainz; Wikipedia was temporarily unavailable.', {
+        type: 'info',
+        title: 'Partial data'
+      });
+    }
     displayArtistInfo(data);
   })
   .catch(error => {
     showLoading('artistLoading', false);
-    document.getElementById('artistContent').innerHTML = 
+    document.getElementById('artistContent').innerHTML =
       '<div class="alert alert-warning">Error loading artist information. Please try again.</div>';
     console.error('Error:', error);
   });
@@ -2483,7 +2566,6 @@ function searchDiscographyAlbums(artistName) {
 }
 
 function searchMapData(artistName) {
-  // Get map data for birth places
   fetch('/api/music-research/map-data', {
     method: 'POST',
     headers: {
@@ -2491,10 +2573,24 @@ function searchMapData(artistName) {
     },
     body: JSON.stringify({ artist: artistName })
   })
-  .then(response => response.json())
-  .then(data => {
+  .then(async (response) => {
+    const data = await response.json();
     showLoading('timelineLoading', false);
     showLoading('mapLoading', false);
+    if (!response.ok) {
+      const msg = data.rateLimited
+        ? showWikimediaRateLimitNotice()
+        : (data.error || 'Error loading timeline data. Please try again.');
+      document.getElementById('timeline').innerHTML =
+        `<div class="alert alert-warning">${msg}</div>`;
+      return;
+    }
+    if (data.wikipediaRateLimited && typeof showToast === 'function') {
+      showToast('Birth places loaded from MusicBrainz; Wikipedia was temporarily unavailable.', {
+        type: 'info',
+        title: 'Partial data'
+      });
+    }
     if (data.mapData && data.mapData.length > 0) {
       timelineMapEvents = data.timelineEvents || [];
       refreshMergedTimeline();
@@ -2659,12 +2755,16 @@ function displayTimeline(mapData, artistName) {
   
   // Create events from map data
   mapData.forEach((location, index) => {
+    const eventType = location.eventType || 'birth';
+    const isFormation = eventType === 'formation';
     events.push({
       date: 'Unknown',
-      title: `Birth Place: ${location.name}`,
-      description: `Birth place of ${artistName}${index > 0 ? ' band member' : ''}`,
+      title: isFormation ? `Formation: ${location.name}` : `Birth Place: ${location.name}`,
+      description: location.memberName
+        ? `Birth place of ${location.memberName}${location.memberInstrument ? ` (${location.memberInstrument})` : ''}`
+        : (isFormation ? `Formation / origin of ${artistName}` : `Birth place of ${artistName}${index > 0 ? ' band member' : ''}`),
       location: location.name,
-      type: 'birth',
+      type: eventType,
       sortDate: new Date(1900, 0, 1), // Default to early date for unknown dates
       coordinates: { lat: location.lat, lng: location.lng }
     });
@@ -2726,7 +2826,7 @@ function displayTimelineEvents(events) {
         <div class="timeline-date">${event.date}</div>
         <div class="timeline-title">${event.title}</div>
         <div class="timeline-description">${event.description}${event.type === 'album' ? ' · Click for YouTube' : ''}</div>
-        <div class="timeline-location"><i class="bi-geo-alt"></i> ${event.location}</div>
+        <div class="timeline-location"><i class="bi-geo-alt-fill"></i> ${event.location}${hasCoordinates ? ' · View on map' : ''}</div>
       </div>
     `;
   });
@@ -2735,22 +2835,35 @@ function displayTimelineEvents(events) {
 }
 
 function focusOnLocation(lat, lng, location) {
-  if (!map || !lat || !lng) {
+  if (!window.map || !lat || !lng) {
     console.log('Map not available or coordinates missing');
     return;
   }
-  
-  // Center map on the location
-  map.setCenter({ lat: lat, lng: lng });
-  map.setZoom(10);
-  
-  // Find and highlight the corresponding marker
-  markers.forEach(marker => {
-    if (marker.getPosition().lat() === lat && marker.getPosition().lng() === lng) {
-      // Trigger marker click to show info window
+
+  scrollToMapSection();
+
+  const target = { lat: Number(lat), lng: Number(lng) };
+  window.map.setCenter(target);
+  window.map.setZoom(10);
+
+  const marker = (window.mapMarkers || markers || []).find((m) => {
+    const pos = m.position || (m.getPosition && {
+      lat: m.getPosition().lat(),
+      lng: m.getPosition().lng()
+    });
+    if (!pos) return false;
+    return Math.abs(pos.lat - target.lat) < 0.02 && Math.abs(pos.lng - target.lng) < 0.02;
+  });
+
+  if (marker) {
+    if (marker.infoWindow) {
+      openMapInfoWindow(marker.infoWindow, window.map, marker);
+    } else {
       google.maps.event.trigger(marker, 'click');
     }
-  });
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+    setTimeout(() => marker.setAnimation(null), 2000);
+  }
 }
 
 function parseDate(dateString) {
@@ -2816,7 +2929,7 @@ function displayBandMembers(data) {
     html += `
       <div class="col-lg-6 col-md-6 mb-3">
         <div class="member-card" style="min-height: 350px; border: 1px solid #e9ecef; border-radius: 12px; background: rgba(248,249,250,0.95); transition: all 0.3s ease; cursor: pointer; overflow: auto; position: relative;"
-             onclick="focusOnMemberLocation('${member.name.replace(/'/g, "\\'")}', '${location.replace(/'/g, "\\'")}')"
+             onclick="focusOnMemberLocation('${member.name.replace(/'/g, "\\'")}', '${location.replace(/'/g, "\\'").replace(/"/g, '&quot;')}')"
              onmouseover="this.style.borderColor='#3498db'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';" 
              onmouseout="this.style.borderColor='#e9ecef'; this.style.transform='translateY(0)'; this.style.boxShadow='none';"
              title="Click to view ${member.name}'s birth place on map">
@@ -2931,6 +3044,17 @@ function getInstrumentIcon(instrument) {
 // Focus on a specific member's location on the map
 function focusOnMemberLocation(memberName, location) {
   console.log(`🎯 Focusing on ${memberName} at ${location}`);
+
+  scrollToMapSection();
+
+  document.querySelectorAll('.member-card.member-card--map-focus').forEach((el) => {
+    el.classList.remove('member-card--map-focus');
+  });
+  document.querySelectorAll('.member-card').forEach((card) => {
+    if (card.textContent && card.textContent.includes(memberName)) {
+      card.classList.add('member-card--map-focus');
+    }
+  });
   
   // Check if Google Maps is loaded
   if (typeof google === 'undefined' || !google.maps) {
@@ -2976,9 +3100,8 @@ function focusOnMemberLocation(memberName, location) {
     window.map.setCenter(marker.position);
     window.map.setZoom(10);
     
-    // Open the info window if available
     if (marker.infoWindow) {
-      marker.infoWindow.open(window.map, marker);
+      openMapInfoWindow(marker.infoWindow, window.map, marker);
     }
     
     // Add a highlight effect
@@ -3004,24 +3127,18 @@ function focusOnMemberLocation(memberName, location) {
             position: position,
             map: window.map,
             title: `${memberName} - ${location}`,
-            icon: {
-              url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-            },
+            icon: musicMapIcon('birth'),
             animation: google.maps.Animation.DROP
           });
           
           // Create info window
           const infoWindow = new google.maps.InfoWindow({
-            content: `
-              <div style="padding: 10px;">
-                <h6><i class="bi-geo-alt"></i> ${location}</h6>
-                <p class="mb-0">Birth place of ${memberName}</p>
-              </div>
-            `
+            content: musicMapInfoHtml({ name: location, memberName }, memberName),
+            maxWidth: 300
           });
           
           tempMarker.addListener('click', () => {
-            infoWindow.open(window.map, tempMarker);
+            openMapInfoWindow(infoWindow, window.map, tempMarker);
           });
           
           // Store marker info
@@ -3035,10 +3152,8 @@ function focusOnMemberLocation(memberName, location) {
           }
           window.mapMarkers.push(tempMarker);
           
-          // Open info window
-          infoWindow.open(window.map, tempMarker);
+          openMapInfoWindow(infoWindow, window.map, tempMarker);
           
-          // Add bounce animation
           tempMarker.setAnimation(google.maps.Animation.BOUNCE);
           setTimeout(() => {
             tempMarker.setAnimation(null);
@@ -3085,6 +3200,74 @@ function playVideo(videoId) {
 // Global map variable
 let map = null;
 let markers = [];
+let activeMapInfoWindow = null;
+
+function escapeMapHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function scrollToMapSection() {
+  if (typeof $ !== 'undefined' && $('#searchAndResults').length) {
+    $('#searchAndResults').collapse('show');
+  }
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      const mapContainer = document.getElementById('mapContainer');
+      if (mapContainer) {
+        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 280);
+  });
+}
+
+function openMapInfoWindow(infoWindow, mapInstance, marker) {
+  if (!infoWindow || !mapInstance) return;
+  if (activeMapInfoWindow) {
+    activeMapInfoWindow.close();
+  }
+  infoWindow.open(mapInstance, marker);
+  activeMapInfoWindow = infoWindow;
+}
+
+function musicMapIcon(eventType) {
+  return mapIcons.getMusicOriginIconForMarker(eventType || 'birth');
+}
+
+function musicMapInfoHtml(location, artistName) {
+  const place = escapeMapHtml(location.name);
+  const artist = escapeMapHtml(artistName);
+
+  if (location.memberName) {
+    const member = escapeMapHtml(location.memberName);
+    const instrument = location.memberInstrument
+      ? escapeMapHtml(location.memberInstrument)
+      : '';
+    return `<div class="music-map-infowindow">
+      <span class="music-map-infowindow-badge member">Band member</span>
+      <div class="music-map-infowindow-title"><i class="bi-geo-alt-fill"></i><span>${place}</span></div>
+      <p class="music-map-infowindow-body">Birth place of <strong>${member}</strong>${instrument ? ` · ${instrument}` : ''}</p>
+    </div>`;
+  }
+
+  const type = location.eventType || 'birth';
+  if (type === 'formation') {
+    return `<div class="music-map-infowindow">
+      <span class="music-map-infowindow-badge formation">Formation</span>
+      <div class="music-map-infowindow-title"><i class="bi-geo-alt-fill"></i><span>${place}</span></div>
+      <p class="music-map-infowindow-body">Where <strong>${artist}</strong> formed or began.</p>
+    </div>`;
+  }
+
+  return `<div class="music-map-infowindow">
+    <span class="music-map-infowindow-badge birth">Birth place</span>
+    <div class="music-map-infowindow-title"><i class="bi-geo-alt-fill"></i><span>${place}</span></div>
+    <p class="music-map-infowindow-body">Birth place of <strong>${artist}</strong></p>
+  </div>`;
+}
 
 function initializeMap(artistName) {
   console.log('🗺️ Loading map...');
@@ -3116,44 +3299,26 @@ function initBasicMap(artistName) {
       return;
     }
     
-    // Ayers Rock (Uluru) coordinates
-    const ayersRock = { lat: -25.3444, lng: 131.0369 };
+    console.log('🗺️ Initializing music research map (world view)...');
     
-    console.log('🗺️ Initializing map with Ayers Rock...');
-    
-    // Create map centered on Ayers Rock
     map = new google.maps.Map(mapElement, {
-      zoom: 8,
-      center: ayersRock,
-      mapTypeId: 'satellite'
+      zoom: 2,
+      center: { lat: 20, lng: 0 },
+      mapTypeId: 'satellite',
+      styles: [
+        {
+          featureType: 'poi',
+          elementType: 'labels',
+          stylers: [{ visibility: 'off' }]
+        }
+      ]
     });
     
-    // Add Ayers Rock marker
-    const marker = new google.maps.Marker({
-      position: ayersRock,
-      map: map,
-      title: `Uluru (Ayers Rock) - Search: ${artistName}`,
-      label: '🏔️'
-    });
+    window.map = map;
+    window.geocoder = new google.maps.Geocoder();
+    window.mapMarkers = [];
     
-    const infoWindow = new google.maps.InfoWindow({
-      content: `
-        <div style="padding: 10px;">
-          <h6><i class="bi-geo-alt"></i> Uluru (Ayers Rock)</h6>
-          <p class="mb-1">Sacred site in Australia</p>
-          <p class="mb-1">Search: ${artistName}</p>
-          <p class="mb-0 small">Ready for your coordinates</p>
-        </div>
-      `
-    });
-    
-    marker.addListener('click', () => {
-      infoWindow.open(map, marker);
-    });
-    
-    markers.push(marker);
-    
-    console.log('✅ Map initialized successfully with Ayers Rock');
+    console.log('✅ Map ready — search an artist for birth and formation places');
     
   } catch (error) {
     console.error('❌ Error initializing map:', error);
@@ -3209,34 +3374,23 @@ function initMapWithData(mapData, artistName) {
       position: { lat: location.lat, lng: location.lng },
       map: map,
       title: location.name,
-      label: (index + 1).toString(),
+      label: mapData.length > 1
+        ? { text: String(index + 1), color: '#fff', fontWeight: '600', fontSize: '11px' }
+        : undefined,
       animation: google.maps.Animation.DROP,
-      icon: {
-        url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png'
-      }
+      icon: musicMapIcon(location.eventType)
     });
     
-    // Create info window content - include member name if available
-    const infoContent = location.memberName 
-      ? `<div style="padding: 10px;">
-          <h6><i class="bi-geo-alt"></i> ${location.name}</h6>
-          <p class="mb-0">Birth place of ${location.memberName}${location.memberInstrument ? ` (${location.memberInstrument})` : ''}</p>
-        </div>`
-      : `<div style="padding: 10px;">
-          <h6><i class="bi-geo-alt"></i> ${location.name}</h6>
-          <p class="mb-0">Birth place of ${artistName} ${index > 0 ? 'band member' : ''}</p>
-        </div>`;
-    
-    // Add info window
     const infoWindow = new google.maps.InfoWindow({
-      content: infoContent
+      content: musicMapInfoHtml(location, artistName),
+      maxWidth: 300
     });
     
     marker.addListener('click', () => {
-      infoWindow.open(map, marker);
+      scrollToMapSection();
+      openMapInfoWindow(infoWindow, map, marker);
     });
     
-    // Store marker with additional info for member focus
     marker.name = location.name;
     marker.memberName = location.memberName || null; // Store member name if available
     marker.infoWindow = infoWindow;
@@ -3267,25 +3421,21 @@ function addCustomMarker(lat, lng, title, label) {
     position: { lat: lat, lng: lng },
     map: map,
     title: title || 'Custom Marker',
-    label: label || 'M'
+    label: label ? { text: String(label), color: '#fff', fontWeight: '600', fontSize: '11px' } : undefined,
+    icon: musicMapIcon('birth')
   });
   
   const infoWindow = new google.maps.InfoWindow({
-    content: `
-      <div style="padding: 10px;">
-        <h6><i class="bi-geo-alt"></i> ${title || 'Custom Marker'}</h6>
-        <p class="mb-0">Lat: ${lat}, Lng: ${lng}</p>
-      </div>
-    `
+    content: musicMapInfoHtml({ name: title || 'Location', eventType: 'birth' }, title || 'Artist'),
+    maxWidth: 300
   });
   
   marker.addListener('click', () => {
-    infoWindow.open(map, marker);
+    openMapInfoWindow(infoWindow, map, marker);
   });
   
   markers.push(marker);
   
-  // Center map on new marker
   map.setCenter({ lat: lat, lng: lng });
   map.setZoom(8);
 }

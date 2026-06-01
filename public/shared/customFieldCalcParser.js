@@ -488,6 +488,21 @@
       }
     }
 
+    // DateDiff("d", TODAY, [field]) op N — Encompass tax-due style (CUST11FV and similar)
+    const dateDiffTodayRe = /DateDiff\s*\(\s*["']([^"']+)["']\s*,\s*TODAY\s*,\s*\[([^\]]+)\]\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)/gi;
+    while ((m = dateDiffTodayRe.exec(conditionString)) !== null) {
+      const value = parseFloat(m[4]);
+      if (Number.isFinite(value)) {
+        results.push({
+          type: 'dateDiffToday',
+          interval: String(m[1] || 'd').toLowerCase().trim(),
+          field: m[2].trim(),
+          op: m[3],
+          value,
+        });
+      }
+    }
+
     // [field].Contains("literal") or Not [field].Contains("literal") or Not([field].Contains("literal"))
     const containsRe = /(Not\s*\(?\s*)?\[([^\]]+)\]\.Contains\s*\(\s*"([^"]*)"\s*\)/gi;
     while ((m = containsRe.exec(conditionString)) !== null) {
@@ -654,6 +669,35 @@
     return { field1: cond.field1, val1: d1, field2: cond.field2, val2: d2 };
   }
 
+  /** Fixed demo anchor for offline unit-test scenario seeding (matches other suggested dates). */
+  const DEMO_TODAY_ANCHOR = '01/01/2025';
+
+  /**
+   * Suggested vendor due date for DateDiff("d", TODAY, [field]) op N (true branch).
+   * @param {{ field: string, op: string, value: number }} cond
+   * @returns {{ field: string, val: string }}
+   */
+  function suggestedValueForDateDiffToday(cond) {
+    const n = cond.value;
+    const op = cond.op;
+    let offsetDays = 15;
+    if (op === '<' || op === '<=') {
+      offsetDays = n <= 1 ? 0 : Math.min(Math.max(1, Math.floor(n / 2)), Math.max(0, n - 1));
+    } else if (op === '>' || op === '>=') {
+      offsetDays = n + 15;
+    } else if (op === '=') {
+      offsetDays = n;
+    } else if (op === '<>') {
+      offsetDays = n === 0 ? 15 : 0;
+    }
+    const base = parseLoanDateValue(DEMO_TODAY_ANCHOR);
+    const d = base ? new Date(base.getTime()) : new Date();
+    d.setDate(d.getDate() + offsetDays);
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return { field: cond.field, val: m + '/' + day + '/' + d.getFullYear() };
+  }
+
   /**
    * Collect field IDs that have [field] = "Y" or [field] = "N" or [field] <> Nothing in any scenario condition.
    * Used to suggest N/blank for else scenarios (condition false).
@@ -808,6 +852,12 @@
         if (norm2 && isInInputFields(norm2, inputFields) && suggested[norm2] === undefined) {
           suggested[norm2] = sv.val2;
         }
+      } else if (cv.type === 'dateDiffToday') {
+        const sv = suggestedValueForDateDiffToday(cv);
+        const norm = normalizeFieldIdForLookup(sv.field);
+        if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
+          suggested[norm] = sv.val;
+        }
       } else if (cv.type === 'nothing') {
         const norm = normalizeFieldIdForLookup(cv.fieldId);
         if (norm && isInInputFields(norm, inputFields) && suggested[norm] === undefined) {
@@ -898,8 +948,9 @@
   }
 
   /**
-   * Infer date/dateTime from custom field naming: .DT, .date, .dttm suffix, or CX.SUNRISE / CX.SUNRISE.* prefix.
-   * @param {string} fieldId - e.g. "CX.CLOSING.DT", "FI.SOMEDATE", "CX.EVENT.dttm", "CX.SUNRISE", "CX.SUNRISE.DATE"
+   * Infer date/dateTime from custom field naming: .DT, .date, .dttm suffix, the
+   * "date"/"datetime" keyword anywhere in the ID, or CX.SUNRISE / CX.SUNRISE.* prefix.
+   * @param {string} fieldId - e.g. "CX.CLOSING.DT", "FI.SOMEDATE", "CX.EVENT.dttm", "CX.SUNRISE", "CX.PV.REQ2.SUBMITDATETIME"
    * @returns {{ dataType: 'Date'|'DateTime' }|null}
    */
   function inferDateTypeFromFieldId(fieldId) {
@@ -909,6 +960,27 @@
     if (lower === 'cx.sunrise' || lower.startsWith('cx.sunrise.')) return { dataType: 'Date', format: '', description: 'Date field (CX.SUNRISE)' };
     if (lower.endsWith('.dttm')) return { dataType: 'DateTime', format: '', description: 'DateTime field (from .dttm suffix)' };
     if (lower.endsWith('.dt') || lower.endsWith('.date')) return { dataType: 'Date', format: '', description: 'Date field (from .DT/.date suffix)' };
+    // Keyword anywhere in the ID (e.g. SUBMITDATETIME, CLOSINGDATE).
+    if (lower.includes('datetime')) return { dataType: 'DateTime', format: '', description: 'DateTime field (from name)' };
+    if (lower.includes('date')) return { dataType: 'Date', format: '', description: 'Date field (from name)' };
+    return null;
+  }
+
+  /**
+   * Infer date/dateTime from free text (a field description or label).
+   * Matches "date and time"/"date/time"/"datetime" -> DateTime; "date" -> Date.
+   * @param {string} text - e.g. "Price Validation - Request #2 Submit Date/Time"
+   * @returns {{ dataType: 'Date'|'DateTime' }|null}
+   */
+  function inferDateTypeFromText(text) {
+    if (!text || typeof text !== 'string') return null;
+    const lower = String(text).toLowerCase();
+    if (/datetime|date\s*\/\s*time|date\s+and\s+time|date\s*&\s*time/.test(lower)) {
+      return { dataType: 'DateTime', format: '', description: 'DateTime field (from description)' };
+    }
+    if (/\bdate\b|date\b/.test(lower)) {
+      return { dataType: 'Date', format: '', description: 'Date field (from description)' };
+    }
     return null;
   }
 
@@ -1563,6 +1635,23 @@
     const c = cond.trim();
     if (!c) return false;
 
+    // DateDiff("d", TODAY, [field]) op N — whole condition (IIf tax-due style)
+    const todayDiff = c.match(
+      /^\s*DateDiff\s*\(\s*["']([^"']+)["']\s*,\s*TODAY\s*,\s*\[([^\]]+)\]\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/i
+    );
+    if (todayDiff) {
+      const interval = String(todayDiff[1] || 'd').toLowerCase().trim();
+      const fieldId = todayDiff[2].trim();
+      const anchor = parseLoanDateValue(DEMO_TODAY_ANCHOR) || new Date();
+      const fieldDate = parseLoanDateValue(String(getFieldValue(fieldId, values) ?? ''));
+      if (!fieldDate) return false;
+      const diff = computeDateDiffNumeric(interval, anchor, fieldDate);
+      if (diff === null) return false;
+      const target = parseFloat(todayDiff[4]);
+      if (!Number.isFinite(target)) return false;
+      return applyNumericComparison(todayDiff[3], diff, target);
+    }
+
     // DateDiff("d", [a], [b]) op N — whole condition (IIf); must run before generic numeric compares
     const soloDiff = c.match(
       /^\s*DateDiff\s*\(\s*["']([^"']+)["']\s*,\s*\[([^\]]+)\]\s*,\s*\[([^\]]+)\]\s*\)\s*(<=|>=|<>|<|>|=)\s*(-?\d+(?:\.\d+)?)\s*$/i
@@ -2175,6 +2264,7 @@
     isDateFieldByNotation: isDateFieldByNotation,
     isNumberFieldByNotation: isNumberFieldByNotation,
     inferDateTypeFromFieldId: inferDateTypeFromFieldId,
+    inferDateTypeFromText: inferDateTypeFromText,
     isSunriseField: isSunriseField,
     formatDateWithOffset: formatDateWithOffset,
     extractSingleResultField: extractSingleResultField,

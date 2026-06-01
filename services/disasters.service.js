@@ -52,7 +52,7 @@
  * ==============================================================================
  */
 
-import { getPool } from './database.service.js';
+import { getPool, ensureTableGeomColumn } from './database.service.js';
 import { reverseGeocodeCountyState } from './disaster-risk.service.js';
 import { geocodeCountyStateWithCache, reverseGeocodeWithCache } from './geocoding-cache.service.js';
 import fs from 'fs';
@@ -159,6 +159,11 @@ export async function initFireCamerasSchema() {
   await pool.query(CREATE_FIRE_CAMERAS_SQL);
   await pool.query(FIRE_CAMERAS_MIGRATION_SQL);
   await pool.query(FIRE_CAMERAS_INDEXES_SQL);
+  try {
+    await ensureTableGeomColumn('fire_cameras', 'lat', 'lng', 'idx_fire_cameras_geom');
+  } catch (geomErr) {
+    console.warn(`⚠️ fire_cameras geom column skipped: ${geomErr.message}`);
+  }
 }
 
 /**
@@ -198,6 +203,11 @@ export async function initDisastersSchema() {
     
     await pool.query('COMMIT');
     console.log('✅ Disasters schema ensured');
+    try {
+      await ensureTableGeomColumn('disasters', 'lat', 'lng', 'idx_disasters_geom');
+    } catch (geomErr) {
+      console.warn(`⚠️ disasters geom column skipped: ${geomErr.message}`);
+    }
   } catch (err) {
     await pool.query('ROLLBACK').catch(() => {});
     console.error('❌ Failed to initialize disasters schema:', err.message);
