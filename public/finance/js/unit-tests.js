@@ -1333,6 +1333,19 @@ function getSelectedRunScenarioNumber() {
   return runScenarioSelect?.value?.trim() || null;
 }
 
+function runSelectedScenarioFromPicker() {
+  const n = getSelectedRunScenarioNumber();
+  if (!n) {
+    showToast('Choose a scenario to run', 'warning');
+    return;
+  }
+  runTests(n);
+}
+
+function setRunButtonVisible(visible) {
+  if (runTestsBtn) runTestsBtn.style.display = visible ? 'inline-block' : 'none';
+}
+
 function showAllColumns() {
   if (!gridApi || typeof gridApi.setColumnVisible !== 'function') return;
   if (!Array.isArray(columnDefs)) return;
@@ -2349,10 +2362,11 @@ async function runTests(singleTestNumber) {
 
   try {
     setStatus('Running tests...', 'info', 'bi-clock-history');
-    runTestsBtn.disabled = true;
+    if (runTestsBtn) runTestsBtn.disabled = true;
     if (isSingleRun) {
       focusScenarioColumn(singleTestNumber);
     } else {
+      showAllColumns();
       hideNonTestColumns();
     }
     if (!isSingleRun) {
@@ -2373,7 +2387,7 @@ async function runTests(singleTestNumber) {
       const col = findTestColumnByNumber(String(singleTestNumber));
       if (!col) {
         showToast(`Scenario ${singleTestNumber} not found`, 'warning');
-        runTestsBtn.disabled = false;
+        if (runTestsBtn) runTestsBtn.disabled = false;
         return;
       }
       columnsToRun = [col];
@@ -2701,7 +2715,7 @@ async function runTests(singleTestNumber) {
       if (scrollToTopBtnEl) scrollToTopBtnEl.style.display = 'none';
     }
   } finally {
-    runTestsBtn.disabled = false;
+    if (runTestsBtn) runTestsBtn.disabled = false;
   }
 }
 
@@ -2816,7 +2830,7 @@ function clearData() {
   uploadArea.style.display = 'block';
   setHeroPostLoadActionsVisible(false);
   setUnitTestsWelcomeVisible(true);
-  runTestsBtn.style.display = 'none';
+  setRunButtonVisible(false);
   if (runScenarioSelect) {
     runScenarioSelect.style.display = 'none';
     runScenarioSelect.disabled = true;
@@ -2973,7 +2987,7 @@ async function hydrateLoadedUnitTestData(options) {
   uploadArea.style.display = 'none';
   setHeroPostLoadActionsVisible(true);
   setUnitTestsWelcomeVisible(false);
-  runTestsBtn.style.display = 'inline-block';
+  setRunButtonVisible(true);
   clearBtn.style.display = 'inline-block';
   if (fillEmptyTestNullBtn) fillEmptyTestNullBtn.style.display = 'inline-block';
   if (stickyActionBar) stickyActionBar.style.display = 'flex';
@@ -3509,12 +3523,7 @@ recentRunsSelect?.addEventListener('change', (e) => {
 
 runTestsBtn?.addEventListener('click', (e) => {
   e.preventDefault();
-  const n = getSelectedRunScenarioNumber();
-  if (!n) {
-    showToast('Choose a scenario to run', 'warning');
-    return;
-  }
-  runTests(n);
+  runSelectedScenarioFromPicker();
 });
 
 document.getElementById('runAllScenariosBtn')?.addEventListener('click', (e) => {
@@ -3651,7 +3660,7 @@ function handleVoiceCommand(rawCommand = '') {
     return;
   }
 
-  if (command.includes('run test') || command.includes('run tests') || command.includes('run scenario')) {
+  if (command.includes('run test') || command.includes('run scenario')) {
     const numMatch = command.match(/(?:test|scenario)\s*#?\s*(\d+)/i) || command.match(/\b(\d+)\b/);
     if (numMatch) {
       const n = numMatch[1];
@@ -3660,6 +3669,11 @@ function handleVoiceCommand(rawCommand = '') {
       runTests(n);
       return;
     }
+    speak('Say run test and a number, or run all tests');
+    return;
+  }
+
+  if (command.includes('run tests')) {
     const selected = getSelectedRunScenarioNumber();
     if (selected) {
       speak(`Running test ${selected}`);

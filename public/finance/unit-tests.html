@@ -2628,7 +2628,7 @@
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
-                      <p class="text-muted mb-3"><small>Click a scenario card to select it (or use the <strong>Scenario</strong> dropdown in Step 3), then <strong>Run</strong>. Each card also has its own <strong>Run</strong> button. Use <strong>Edit</strong> on a card to change its description.</small></p>
+                      <p class="text-muted mb-3"><small>Click a scenario card to select it, then <strong>Run</strong> in Step 3 (or on the card) to run that Test column only. Use <strong>Edit</strong> on a card to change its description.</small></p>
                       <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
               </div>
             </div>
@@ -2746,7 +2746,7 @@
                       <div id="unitTestsQaHighlightsCard" class="alert alert-light border-start border-4 rounded mb-3 unit-tests-qa-highlights" role="region" aria-label="QA highlights">
                         <p class="fw-semibold text-dark mb-2"><i class="bi-patch-check-fill me-1 text-primary"></i>QA highlights</p>
                         <ul class="small text-muted mb-2 ps-3">
-                          <li class="mb-1">Choose a scenario in the Step 3 dropdown (or a scenario card), then <strong>Run</strong>—one Test column at a time. Use <strong>Run all scenarios</strong> in Advanced for a full workbook run.</li>
+                          <li class="mb-1">Pick a scenario in the dropdown (or click a card), then <strong>Run</strong>—one Test column at a time. Use <strong>Run all scenarios</strong> in Advanced only when you need the full workbook.</li>
                           <li class="mb-1">Runs are <strong>SET</strong> / <strong>COMPARE</strong> rows from your Excel-style grid against a loan GUID—upload, tune scenarios, run, sign off.</li>
                           <li class="mb-1">Custom-field calcs use assignment form <code>[CX.FIELD] = expression</code>. The spreadsheet <code>=</code> at the very start is not part of Encompass—strip it when pasting.</li>
                           <li class="mb-0">Sanity-check with <strong>Generate → From custom field</strong> and <strong>Live Scenario Builder</strong> when inputs are editable.</li>
@@ -2776,7 +2776,7 @@
                               <select class="form-select form-select-sm" id="runScenarioSelect" aria-label="Scenario to run" style="display: none; max-width: 150px; flex: 0 1 auto;" disabled>
                                 <option value="">Scenario…</option>
                               </select>
-                              <button class="btn btn-success" id="runTestsBtn" style="display: none;" title="Run the selected scenario only">
+                              <button class="btn btn-success" id="runTestsBtn" style="display: none;" title="Run the selected scenario only (values in that Test column)">
                                   <i class="bi-play-circle"></i> Run
                                 </button>
                                 <button class="btn btn-outline-secondary" type="button" id="clearLoanGuidBtn">
