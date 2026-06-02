@@ -208,7 +208,7 @@
         </div>
       </div>
 
-      <section class="gse-exhibit-section mb-4 d-none" id="gseExhibitSection" aria-label="Program fit by agency">
+      <section class="gse-exhibit-section mb-4" id="gseExhibitSection" aria-label="Program fit by agency">
         <h2 class="h5 mb-3">Program intelligence (by agency)</h2>
         <p class="small text-muted mb-3">
           <strong>Context:</strong> what each investor or government program generally covers.
@@ -219,10 +219,19 @@
             <article class="gse-exhibit-card" data-agency="fannie">
               <div class="gse-exhibit-kicker">GSE</div>
               <h3 class="h6 mb-1">Fannie Mae</h3>
-              <p class="small gse-exhibit-context mb-2">Conforming conventional and specialty products (e.g. HomeReady).</p>
-              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitFannieEvidence">
+              <p class="small gse-exhibit-context mb-2">
+                Conforming conventional and specialty products (e.g.
+                <a href="https://singlefamily.fanniemae.com/our-lending-solutions/single-family-home-ready" target="_blank" rel="noopener noreferrer">HomeReady</a>).
+              </p>
+              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFannieLinks" aria-label="Fannie Mae official references">
+                <li class="text-muted">References loading…</li>
+              </ul>
+              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+              <p class="small gse-exhibit-verify mb-2" id="gseExhibitFannieVerify">
                 Confirm current Fannie Mae Selling Guide and SPC eligibility for this scenario. Do not rely on this tool for DU findings or approval.
               </p>
+              <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitFannieRun">Run Analyze to populate counts.</p>
               <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFannieCounts"></dl>
             </article>
@@ -231,10 +240,19 @@
             <article class="gse-exhibit-card" data-agency="freddie">
               <div class="gse-exhibit-kicker">GSE</div>
               <h3 class="h6 mb-1">Freddie Mac</h3>
-              <p class="small gse-exhibit-context mb-2">Conforming conventional paths (e.g. Home Possible).</p>
-              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitFreddieEvidence">
+              <p class="small gse-exhibit-context mb-2">
+                Conforming conventional paths (e.g.
+                <a href="https://sf.freddiemac.com/working-with-us/origination-underwriting/mortgage-products/home-possible" target="_blank" rel="noopener noreferrer">Home Possible</a>).
+              </p>
+              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFreddieLinks" aria-label="Freddie Mac official references">
+                <li class="text-muted">References loading…</li>
+              </ul>
+              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+              <p class="small gse-exhibit-verify mb-2" id="gseExhibitFreddieVerify">
                 Confirm current Freddie Mac Seller/Servicer Guide and bulletin eligibility for this scenario. Do not rely on this tool for LPA findings or approval.
               </p>
+              <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitFreddieRun">Run Analyze to populate counts.</p>
               <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFreddieCounts"></dl>
             </article>
@@ -243,10 +261,19 @@
             <article class="gse-exhibit-card gse-exhibit-card--gov" data-agency="fha">
               <div class="gse-exhibit-kicker">Government</div>
               <h3 class="h6 mb-1">FHA (HUD)</h3>
-              <p class="small gse-exhibit-context mb-2">Government-insured forward and streamline paths (Handbook 4000.1).</p>
-              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitFhaEvidence">
+              <p class="small gse-exhibit-context mb-2">
+                Government-insured forward and streamline paths (
+                <a href="https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1" target="_blank" rel="noopener noreferrer">Handbook 4000.1</a>).
+              </p>
+              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitFhaLinks" aria-label="FHA official references">
+                <li class="text-muted">References loading…</li>
+              </ul>
+              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+              <p class="small gse-exhibit-verify mb-2" id="gseExhibitFhaVerify">
                 Confirm current HUD FHA Handbook 4000.1 and applicable Mortgagee Letters. Do not rely on this tool for FHA TOTAL Scorecard or approval.
               </p>
+              <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitFhaRun">Run Analyze to populate counts.</p>
               <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitFhaCounts"></dl>
             </article>
@@ -255,10 +282,19 @@
             <article class="gse-exhibit-card gse-exhibit-card--gov" data-agency="va">
               <div class="gse-exhibit-kicker">Government</div>
               <h3 class="h6 mb-1">VA</h3>
-              <p class="small gse-exhibit-context mb-2">VA-guaranteed programs (Pamphlet 26-7).</p>
-              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitVaEvidence">
+              <p class="small gse-exhibit-context mb-2">
+                VA-guaranteed programs (
+                <a href="https://www.benefits.va.gov/WARMS/docs/admin26/m26-7/ah_26-7.pdf" target="_blank" rel="noopener noreferrer">Pamphlet 26-7</a>).
+              </p>
+              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitVaLinks" aria-label="VA official references">
+                <li class="text-muted">References loading…</li>
+              </ul>
+              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+              <p class="small gse-exhibit-verify mb-2" id="gseExhibitVaVerify">
                 Confirm current VA Lenders Handbook (VA Pamphlet 26-7) and VA circulars for this scenario. VA residual income, COE, and funding fee rules are not modeled in this prototype.
               </p>
+              <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitVaRun">Run Analyze to populate counts.</p>
               <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitVaCounts"></dl>
             </article>
@@ -267,10 +303,19 @@
             <article class="gse-exhibit-card gse-exhibit-card--gov" data-agency="usda">
               <div class="gse-exhibit-kicker">Government</div>
               <h3 class="h6 mb-1">USDA</h3>
-              <p class="small gse-exhibit-context mb-2">USDA rural housing guaranteed programs (HB-1-3555).</p>
-              <p class="small gse-exhibit-evidence mb-1" id="gseExhibitUsdaEvidence">
-                Confirm current USDA handbook (HB-1-3555), eligible-area map, and household income limits before recommendation.
+              <p class="small gse-exhibit-context mb-2">
+                USDA rural housing guaranteed programs (
+                <a href="https://www.rd.usda.gov/resources/regulations/handbooks" target="_blank" rel="noopener noreferrer">HB-1-3555</a>).
               </p>
+              <p class="small text-muted mb-1 gse-exhibit-links-label">Official references</p>
+              <ul class="list-unstyled small mb-2 gse-exhibit-links" id="gseExhibitUsdaLinks" aria-label="USDA official references">
+                <li class="text-muted">References loading…</li>
+              </ul>
+              <p class="small text-muted mb-1 gse-exhibit-verify-label"><strong>Verify:</strong></p>
+              <p class="small gse-exhibit-verify mb-2" id="gseExhibitUsdaVerify">
+                Confirm current USDA handbook (HB-1-3555), eligible-area map, and household income limits before recommendation. Do not rely on this tool for GUS findings or final USDA approval.
+              </p>
+              <p class="small text-muted mb-1 gse-exhibit-evidence-label"><strong>Evidence:</strong></p>
               <p class="small text-muted mb-2" id="gseExhibitUsdaRun">Run Analyze to populate counts.</p>
               <dl class="small row mb-0 gse-exhibit-counts" id="gseExhibitUsdaCounts"></dl>
             </article>

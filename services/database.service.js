@@ -993,6 +993,14 @@ export async function createTables() {
     `);
 
     await pool.query(`
+      CREATE TABLE IF NOT EXISTS unit_test_learn_hints (
+        client_id VARCHAR(128) PRIMARY KEY,
+        hints JSONB NOT NULL DEFAULT '{}',
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    await pool.query(`
       CREATE TABLE IF NOT EXISTS processor_assignment_tool_config (
         encompass_env VARCHAR(32) PRIMARY KEY,
         payload JSONB NOT NULL DEFAULT '{}'::jsonb,

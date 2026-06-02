@@ -62,7 +62,7 @@ export async function listDisasters(req, res) {
       const abbrList = US_STATE_ABBR.map(a => `'${a}'`).join(',');
       clauses.push(`(LEFT(county_fips, 2) IN (${fipsList}) OR (UPPER(TRIM(COALESCE(state_abbr,''))) IN (${abbrList})))`);
     }
-    if (state) { values.push(state); clauses.push(`state_abbr = $${values.length}`); }
+    if (state) { values.push(state); clauses.push(`UPPER(TRIM(state_abbr)) = UPPER($${values.length})`); }
     if (county) { values.push(county); clauses.push(`county_name ILIKE $${values.length}`); values[values.length-1] = `%${county}%`; }
     if (source) { 
       // Normalize source to lowercase for case-insensitive matching (FIRMS data stored as 'firms')

@@ -171,6 +171,14 @@ async function sendAIMessage(opts = null) {
     
     // Add assistant response
     addAIMessage('assistant', data.message, new Date(data.timestamp).toLocaleTimeString(), { speakResponse: !!window.unitTestsSpeakResponses });
+
+    if (Array.isArray(data.structuredAnalysis) && data.structuredAnalysis.length > 0) {
+      const lines = data.structuredAnalysis.map(
+        (item, i) =>
+          `${i + 1}. **${item.field || 'Field'}** (scenario ${item.scenario || '—'}): ${item.rootCause}\n   → ${item.suggestedFix}`,
+      );
+      addAIMessage('assistant', '**Structured failure analysis**\n\n' + lines.join('\n\n'));
+    }
     
     // Add to context (limit context size)
     if (chatContext.length > 20) {

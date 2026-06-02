@@ -182,6 +182,63 @@ export async function searchByFieldId(fieldId) {
 }
 
 /**
+ * Field impact: files touching fieldId and co-occurring field IDs in those workbooks.
+ * @param {string} fieldId
+ * @returns {Promise<{ fieldId: string, files: object[], coFields: string[] }>}
+ */
+export async function getFieldCoverageImpact(fieldId) {
+  const id = String(fieldId || '').trim();
+  if (!id) {
+    return { fieldId: '', files: [], coFields: [] };
+  }
+
+  const files = await searchByFieldId(id);
+  const coSet = new Set();
+  for (const file of files) {
+    const ids = Array.isArray(file.field_ids)
+      ? file.field_ids
+      : typeof file.field_ids === 'string'
+        ? JSON.parse(file.field_ids)
+        : [];
+    ids.forEach((fid) => {
+      const norm = String(fid || '').trim();
+      if (norm && norm !== id) coSet.add(norm);
+    });
+  }
+
+  return {
+    fieldId: id,
+    files,
+    coFields: [...coSet].sort((a, b) => a.localeCompare(b)),
+  };
+}
+
+/**
+ * Coverage gaps: field IDs from manifest not present in any library file.
+ * @param {string[]} fieldIds
+ * @returns {Promise<{ covered: string[], missing: string[] }>}
+ */
+export async function getCoverageGaps(fieldIds) {
+  const requested = [...new Set((fieldIds || []).map((f) => String(f).trim()).filter(Boolean))];
+  if (!requested.length) {
+    return { covered: [], missing: [] };
+  }
+
+  const pool = getPool();
+  if (!pool) {
+    return { covered: [], missing: requested };
+  }
+
+  const result = await pool.query(
+    `SELECT DISTINCT jsonb_array_elements_text(field_ids) AS fid FROM unit_test_files WHERE field_ids IS NOT NULL`,
+  );
+  const coveredSet = new Set(result.rows.map((r) => String(r.fid).trim()).filter(Boolean));
+  const covered = requested.filter((id) => coveredSet.has(id));
+  const missing = requested.filter((id) => !coveredSet.has(id));
+  return { covered, missing };
+}
+
+/**
  * Delete unit test file from DB (and disk if legacy record).
  */
 export async function deleteUnitTestFile(id) {

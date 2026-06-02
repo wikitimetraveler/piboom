@@ -43,9 +43,19 @@
       "url": "https://www.benefits.va.gov/WARMS/docs/admin26/m26-7/ah_26-7.pdf"
     },
     {
+      "id": "VA_CIRCULARS",
+      "title": "VA Lenders Circulars",
+      "url": "https://www.benefits.va.gov/WARMS/lenders_circulars.asp"
+    },
+    {
       "id": "FHA_4000_1",
       "title": "HUD FHA Single Family Housing Policy Handbook 4000.1",
       "url": "https://www.hud.gov/program_offices/housing/sfh/handbook_4000-1"
+    },
+    {
+      "id": "FHA_MORTGAGEE_LETTERS",
+      "title": "HUD FHA Mortgagee Letters",
+      "url": "https://www.hud.gov/program_offices/housing/sfh/lender/mortgagee_letters"
     },
     {
       "id": "USDA_HB_3555",
@@ -100,5 +110,12 @@
       "title": "Lender/investor overlay operations reference",
       "url": "https://singlefamily.fanniemae.com/originating-underwriting"
     }
+  },
+  "agencyExhibitLinks": {
+    "fannie": ["FANNIE_SELLING_GUIDE", "FANNIE_SPC", "FANNIE_HOMEREADY", "FHFA_LIMITS"],
+    "freddie": ["FREDDIE_SELLER_GUIDE", "FREDDIE_BULLETINS", "FREDDIE_HOME_POSSIBLE", "FHFA_LIMITS"],
+    "fha": ["FHA_4000_1", "FHA_MORTGAGEE_LETTERS"],
+    "va": ["VA_LENDERS_HANDBOOK", "VA_CIRCULARS"],
+    "usda": ["USDA_HB_3555", "USDA_ELIGIBILITY"]
   }
 }

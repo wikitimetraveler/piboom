@@ -145,14 +145,85 @@
       .join('');
   }
 
+  const EXHIBIT_LINK_UL_IDS = {
+    fannie: 'gseExhibitFannieLinks',
+    freddie: 'gseExhibitFreddieLinks',
+    fha: 'gseExhibitFhaLinks',
+    va: 'gseExhibitVaLinks',
+    usda: 'gseExhibitUsdaLinks'
+  };
+
+  const EXHIBIT_RUN_IDS = {
+    fannie: 'gseExhibitFannieRun',
+    freddie: 'gseExhibitFreddieRun',
+    fha: 'gseExhibitFhaRun',
+    va: 'gseExhibitVaRun',
+    usda: 'gseExhibitUsdaRun'
+  };
+
+  const EXHIBIT_COUNT_IDS = {
+    fannie: 'gseExhibitFannieCounts',
+    freddie: 'gseExhibitFreddieCounts',
+    fha: 'gseExhibitFhaCounts',
+    va: 'gseExhibitVaCounts',
+    usda: 'gseExhibitUsdaCounts'
+  };
+
+  function escapeHtmlAttr(value) {
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function buildSourceIndex(sourcesArray) {
+    const index = new Map();
+    for (const row of sourcesArray || []) {
+      if (row && row.id) index.set(row.id, { title: row.title || row.id, url: row.url || '' });
+    }
+    return index;
+  }
+
+  function renderExhibitReferenceLinks(metadata) {
+    const agencyLinks = metadata && metadata.agencyExhibitLinks;
+    const sourceIndex = buildSourceIndex(metadata && metadata.sources);
+    if (!agencyLinks) return;
+
+    for (const [agency, ulId] of Object.entries(EXHIBIT_LINK_UL_IDS)) {
+      const ul = $(ulId);
+      if (!ul) continue;
+      const ids = Array.isArray(agencyLinks[agency]) ? agencyLinks[agency] : [];
+      const items = ids
+        .map((id) => sourceIndex.get(id))
+        .filter((ref) => ref && ref.url);
+      if (!items.length) {
+        ul.innerHTML = '<li class="text-muted">No references configured.</li>';
+        continue;
+      }
+      ul.innerHTML = items
+        .map(
+          (ref) =>
+            `<li><a class="gse-exhibit-link" href="${escapeHtmlAttr(ref.url)}" target="_blank" rel="noopener noreferrer">${escapeHtmlAttr(ref.title)}<i class="bi bi-box-arrow-up-right gse-exhibit-link-icon" aria-hidden="true"></i></a></li>`
+        )
+        .join('');
+    }
+  }
+
+  function resetExhibitEvidenceCounts() {
+    for (const agency of Object.keys(EXHIBIT_RUN_IDS)) {
+      const runEl = $(EXHIBIT_RUN_IDS[agency]);
+      if (runEl) runEl.textContent = 'Run Analyze to populate counts.';
+      const dl = $(EXHIBIT_COUNT_IDS[agency]);
+      if (dl) dl.innerHTML = '';
+    }
+  }
+
   function renderExhibits(products) {
-    const sec = $('gseExhibitSection');
-    if (!sec) return;
     if (!products || !products.length) {
-      sec.classList.add('d-none');
+      resetExhibitEvidenceCounts();
       return;
     }
-    sec.classList.remove('d-none');
     const agg = aggregateByBucket(products);
     renderCountDl($('gseExhibitFannieCounts'), agg.fannie);
     renderCountDl($('gseExhibitFreddieCounts'), agg.freddie);
@@ -634,8 +705,11 @@
       if (products.success && $('gseProductCount')) {
         $('gseProductCount').textContent = String((products.products || []).length);
       }
-      if (sources.success && sources.data && sources.data.disclaimer && $('gseServerDisclaimer')) {
-        $('gseServerDisclaimer').textContent = sources.data.disclaimer;
+      if (sources.success && sources.data) {
+        if (sources.data.disclaimer && $('gseServerDisclaimer')) {
+          $('gseServerDisclaimer').textContent = sources.data.disclaimer;
+        }
+        renderExhibitReferenceLinks(sources.data);
       }
     } catch (_) {
       /* non-fatal */

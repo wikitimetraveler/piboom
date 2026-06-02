@@ -78,6 +78,7 @@ describe('unit-tests-ai.controller', () => {
     expect(invokeMock).toHaveBeenCalled();
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
+        structuredAnalysis: expect.any(Array),
         message: 'unit-test-response',
         context: expect.any(Array),
         timestamp: expect.any(String)

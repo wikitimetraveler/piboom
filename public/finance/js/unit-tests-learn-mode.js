@@ -12,6 +12,52 @@
   const STORAGE_KEY = 'unitTestsLearnModeExamplesV1';
   const STATE_STORAGE_KEY = 'unitTestsLearnModePatternStateV1';
   const PARSER_HINTS_KEY = 'customFieldCalcParserLearnedSetHintsV1';
+  const LEARN_HINTS_CLIENT_KEY = 'unitTestsLearnHintsClientId';
+
+  function getLearnHintsClientId() {
+    try {
+      const stored = localStorage.getItem(LEARN_HINTS_CLIENT_KEY);
+      if (stored && String(stored).trim()) return String(stored).trim();
+      const generated = 'ut-' + Math.random().toString(36).slice(2, 12);
+      localStorage.setItem(LEARN_HINTS_CLIENT_KEY, generated);
+      return generated;
+    } catch (_e) {
+      return 'default';
+    }
+  }
+
+  async function syncLearnHintsToServer(hintsDoc) {
+    try {
+      if (!hintsDoc || typeof hintsDoc !== 'object') return;
+      await fetch('/api/unit-tests/learn-hints', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId: getLearnHintsClientId(), hints: hintsDoc }),
+      });
+    } catch (_e) {
+      // offline / DB unavailable — localStorage remains source of truth
+    }
+  }
+
+  async function loadLearnHintsFromServer() {
+    try {
+      const res = await fetch(
+        '/api/unit-tests/learn-hints?clientId=' + encodeURIComponent(getLearnHintsClientId()),
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+      if (!data.success || !data.hints || typeof data.hints !== 'object') return;
+      const serverHints = data.hints.hints || data.hints;
+      if (!serverHints || typeof serverHints !== 'object' || !Object.keys(serverHints).length) return;
+      const doc = { version: 1, hints: serverHints, updatedAt: new Date().toISOString() };
+      localStorage.setItem(PARSER_HINTS_KEY, JSON.stringify(doc));
+      if (window.customFieldCalcParser && typeof window.customFieldCalcParser.reloadLearnedSetHintsCache === 'function') {
+        window.customFieldCalcParser.reloadLearnedSetHintsCache();
+      }
+    } catch (_e) {
+      // ignore
+    }
+  }
   const MAX_LIBRARY_ITEMS = 25;
 
   let lastLearnExample = null;
@@ -106,6 +152,7 @@
       if (window.customFieldCalcParser && typeof window.customFieldCalcParser.reloadLearnedSetHintsCache === 'function') {
         window.customFieldCalcParser.reloadLearnedSetHintsCache();
       }
+      void syncLearnHintsToServer(doc);
     } catch (_e) {}
   }
 
@@ -883,6 +930,7 @@
 
   toggleRunButton();
   renderLibrary();
+  void loadLearnHintsFromServer();
 
   const existingState = getPatternState();
   if (existingState && existingState.candidate && stateOutputEl) {

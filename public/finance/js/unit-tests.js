@@ -50,8 +50,10 @@ const brRuleLibraryFileInput = document.getElementById('brRuleLibraryFileInput')
 const brRuleLibraryList = document.getElementById('brRuleLibraryList');
 
 const FOCUS_MODE_KEY = 'unitTestsFocusMode';
-const TOOL_PILLS_EXPANDED_KEY = 'unitTestsToolPillsExpanded';
-const WORKFLOW_HINT_DISMISSED_KEY = 'unitTestsWorkflowHintDismissed';
+
+function getUnitTestsLaunchHelpers() {
+  return window.unitTestsLaunch || {};
+}
 
 function updateUnitTestsFileNameChip() {
   const chip = document.getElementById('unitTestsFileNameChip');
@@ -103,53 +105,6 @@ function applyUnitTestsFocusMode(on) {
 }
 
 function initUnitTestsChromePrefs() {
-  const pillsRoot = document.getElementById('unitTestsToolPills');
-  const showAll = document.getElementById('unitTestsShowAllToolsBtn');
-  const hideAll = document.getElementById('unitTestsHideAllToolsBtn');
-  let expanded = false;
-  try {
-    expanded = localStorage.getItem(TOOL_PILLS_EXPANDED_KEY) === '1';
-  } catch (_) {}
-  if (pillsRoot) pillsRoot.classList.toggle('tool-pills-show-all', expanded);
-  if (showAll) showAll.setAttribute('aria-pressed', expanded ? 'true' : 'false');
-  showAll?.addEventListener('click', () => {
-    pillsRoot?.classList.add('tool-pills-show-all');
-    showAll.setAttribute('aria-pressed', 'true');
-    try {
-      localStorage.setItem(TOOL_PILLS_EXPANDED_KEY, '1');
-    } catch (_) {}
-  });
-  hideAll?.addEventListener('click', () => {
-    pillsRoot?.classList.remove('tool-pills-show-all');
-    showAll?.setAttribute('aria-pressed', 'false');
-    try {
-      localStorage.setItem(TOOL_PILLS_EXPANDED_KEY, '0');
-    } catch (_) {}
-  });
-
-  const tipsBlock = document.getElementById('unitTestsWorkflowTipsBlock');
-  const dismissBtn = document.getElementById('unitTestsWorkflowHintDismiss');
-  let dismissed = false;
-  try {
-    dismissed = localStorage.getItem(WORKFLOW_HINT_DISMISSED_KEY) === '1';
-  } catch (_) {}
-  if (dismissed && tipsBlock) tipsBlock.classList.add('is-dismissed');
-  dismissBtn?.addEventListener('click', () => {
-    tipsBlock?.classList.add('is-dismissed');
-    try {
-      localStorage.setItem(WORKFLOW_HINT_DISMISSED_KEY, '1');
-    } catch (_) {}
-  });
-
-  const tipsCollapse = document.getElementById('unitTestsWorkflowTipsCollapse');
-  const chevron = document.getElementById('unitTestsWorkflowTipsChevron');
-  tipsCollapse?.addEventListener('shown.bs.collapse', () => {
-    chevron?.classList.replace('bi-chevron-right', 'bi-chevron-down');
-  });
-  tipsCollapse?.addEventListener('hidden.bs.collapse', () => {
-    chevron?.classList.replace('bi-chevron-down', 'bi-chevron-right');
-  });
-
   let focusOn = false;
   try {
     const p = new URLSearchParams(window.location.search);
@@ -161,7 +116,7 @@ function initUnitTestsChromePrefs() {
     const next = !isUnitTestsFocusMode();
     applyUnitTestsFocusMode(next);
     if (!next) {
-      showToast('Full layout restored (tool switcher and tips).', 'info');
+      showToast('Full layout restored.', 'info');
     }
   });
 
@@ -174,23 +129,80 @@ function initUnitTestsChromePrefs() {
   document.getElementById('moreOpenTestLibraryBtn')?.addEventListener('click', () => {
     if (typeof toggleAccordionSection === 'function') toggleAccordionSection('collapseTestLibrary');
   });
-  document.getElementById('moreShowWorkflowBtn')?.addEventListener('click', () => {
-    applyUnitTestsFocusMode(false);
-    tipsBlock?.classList.remove('is-dismissed');
-  });
 
   syncGenerateModalPrimaryButtons();
+}
 
+function setActiveWorkflowPill(key) {
+  const nav = document.getElementById('sectionSidebarNav');
+  if (!nav) return;
+  nav.querySelectorAll('a[data-bs-target], a[data-target]').forEach((a) => {
+    const target = (a.getAttribute('data-bs-target') || a.getAttribute('data-target') || '').replace(/^#/, '');
+    a.classList.toggle('active-section', target === key);
+  });
+  const genLink = nav.querySelector('a[data-workflow-action="generate"]');
+  if (genLink) genLink.classList.toggle('active-section', key === 'generate');
+  if (key === 'generate') {
+    nav.querySelectorAll('a.active-section').forEach((a) => {
+      if (a.getAttribute('data-workflow-action') !== 'generate') a.classList.remove('active-section');
+    });
+  }
+}
+
+function maybeAutoOpenGenerateOnLoad() {
   try {
     const p = new URLSearchParams(window.location.search);
-    if (p.get('generate') === '1') {
-      setTimeout(() => document.getElementById('generateFromCustomFieldBtn')?.click(), 0);
-    }
+    const launch = getUnitTestsLaunchHelpers();
+    const shouldOpen =
+      typeof launch.shouldAutoOpenGenerate === 'function'
+        ? launch.shouldAutoOpenGenerate(p, unitTestsHasLoadedData())
+        : p.get('generate') === '1' && !unitTestsHasLoadedData();
+    if (!shouldOpen) return;
+    setActiveWorkflowPill('generate');
+    setTimeout(() => document.getElementById('generateFromCustomFieldBtn')?.click(), 150);
   } catch (_) {}
+}
+
+function maybeAutoStartReelOnLoad() {
+  try {
+    const p = new URLSearchParams(window.location.search);
+    const launch = getUnitTestsLaunchHelpers();
+    const shouldStart =
+      typeof launch.shouldAutoStartReel === 'function'
+        ? launch.shouldAutoStartReel(p)
+        : p.get('reel') === '1';
+    if (!shouldStart) return;
+    const delay =
+      typeof launch.shouldLoadOfflineDemo === 'function' && launch.shouldLoadOfflineDemo(p) ? 900 : 300;
+    setTimeout(() => document.getElementById('unitTestsStoryToggle')?.click(), delay);
+  } catch (_) {}
+}
+
+function maybeLoadOfflineDemoOnLoad() {
+  try {
+    const p = new URLSearchParams(window.location.search);
+    const launch = getUnitTestsLaunchHelpers();
+    const shouldLoad =
+      typeof launch.shouldLoadOfflineDemo === 'function'
+        ? launch.shouldLoadOfflineDemo(p)
+        : p.get('demo') === '1' || p.get('storybook') === '1';
+    if (!shouldLoad) return;
+    setTimeout(() => void loadOfflineDemoUnitTest(), 0);
+  } catch (_) {}
+}
+
+function initUnitTestsDeepLinks() {
+  maybeAutoOpenGenerateOnLoad();
+  maybeLoadOfflineDemoOnLoad();
+  maybeAutoStartReelOnLoad();
 }
 
 function utDescUtils() {
   return window.unitTestsUtils || {};
+}
+
+function getCompareModeFromRow(row) {
+  return window.unitTestsUtils?.getCompareModeFromRow?.(row) || 'equals';
 }
 
 function setUnitTestsWelcomeVisible(visible) {
@@ -911,6 +923,8 @@ function generateColumnDefs(headers, rows) {
       colDef.minWidth = 90;
       colDef.width = 110;
       colDef.headerClass = 'test-scenario-column';
+      colDef.testScenarioNumber = extractTestNumberFromKey(header) || (headerLower === 'reset' ? 'RESET' : null);
+      colDef.headerTooltip = 'Right-click to run this scenario';
       // GET rows are read-only: their value is populated by the GET call, not authored.
       colDef.editable = (params) => String(params.data?.Action || params.data?.action || '').trim().toUpperCase() !== 'GET';
       // Type-aware cell editors based on row metadata (from Encompass field definitions)
@@ -1113,6 +1127,8 @@ function initializeGrid() {
       safeSizeColumnsToFit();
     });
   }
+
+  initializeTestColumnHeaderContextMenu();
 }
 
 function setGridRows(rows) {
@@ -1203,9 +1219,70 @@ function extractTestNumberFromKey(key) {
 }
 
 function getActiveTestNumber() {
-  const activeCard = document.querySelector('.test-description-card.test-scenario-active');
-  if (!activeCard) return null;
-  return activeCard.getAttribute('data-test-number');
+  return getSelectedRunScenarioNumber();
+}
+
+function scenarioLabelFromNumber(testNumber) {
+  if (String(testNumber).toUpperCase() === 'RESET') return 'Reset';
+  return `Test ${testNumber}`;
+}
+
+function getTestScenarioNumberFromHeaderEl(headerEl) {
+  if (!headerEl) return null;
+  const colId = headerEl.getAttribute('col-id');
+  let colDef = null;
+  if (gridApi && colId && typeof gridApi.getColumn === 'function') {
+    colDef = gridApi.getColumn(colId)?.getColDef?.();
+  }
+  if (!colDef && colId && Array.isArray(columnDefs)) {
+    colDef = columnDefs.find((c) => c.colId === colId || c.field === colId);
+  }
+  if (colDef?.testScenarioNumber) return colDef.testScenarioNumber;
+  const raw = String(colDef?.headerName || colDef?.field || '').trim();
+  return extractTestNumberFromKey(raw) || (raw.toLowerCase() === 'reset' ? 'RESET' : null);
+}
+
+function showTestColumnHeaderContextMenu(testNumber, clientX, clientY) {
+  hideScenarioContextMenu();
+  const label = scenarioLabelFromNumber(testNumber);
+  const menu = document.createElement('div');
+  menu.className = 'scenario-context-menu';
+  menu.setAttribute('role', 'menu');
+  menu.innerHTML = `<button type="button" role="menuitem"><i class="bi bi-play-fill me-1"></i>Run ${escapeHtml(label)}</button>`;
+  menu.style.left = `${Math.min(clientX, window.innerWidth - 200)}px`;
+  menu.style.top = `${Math.min(clientY, window.innerHeight - 80)}px`;
+  menu.querySelector('button')?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideScenarioContextMenu();
+    setRunScenarioSelectValue(testNumber);
+    runTests(String(testNumber));
+  });
+  document.body.appendChild(menu);
+}
+
+function initializeTestColumnHeaderContextMenu() {
+  const gridEl = unitTestsGrid;
+  if (!gridEl || gridEl.dataset.testHeaderContextMenu === '1') return;
+  gridEl.dataset.testHeaderContextMenu = '1';
+
+  gridEl.addEventListener('contextmenu', (e) => {
+    const header = e.target.closest('.ag-header-cell.test-scenario-column');
+    if (!header) return;
+    const testNumber = getTestScenarioNumberFromHeaderEl(header);
+    if (!testNumber) return;
+    e.preventDefault();
+    e.stopPropagation();
+    showTestColumnHeaderContextMenu(testNumber, e.clientX, e.clientY);
+  });
+
+  if (!document.body.dataset.testHeaderContextMenuDismiss) {
+    document.body.dataset.testHeaderContextMenuDismiss = '1';
+    document.addEventListener('click', hideScenarioContextMenu);
+    document.addEventListener('scroll', hideScenarioContextMenu, true);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') hideScenarioContextMenu();
+    });
+  }
 }
 
 function findTestColumnByNumber(testNumber) {
@@ -1589,35 +1666,16 @@ function dateTypeForWrite(fieldId, row) {
   return t;
 }
 
-/**
- * Coerce a date value to US MM/DD/YYYY (date portion). Keeps a time portion for DateTime.
- * Returns the original value unchanged when it does not parse as a date.
- */
-function coerceDateValueToUs(value, isDateTime) {
-  if (value === null || value === undefined) return value;
-  const s = String(value).trim();
-  if (!s) return value;
-  if (/^\d{1,2}\/\d{1,2}\/\d{4}/.test(s)) return value; // already US format
-  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  let y, m, d;
-  if (iso) {
-    y = iso[1]; m = iso[2]; d = iso[3];
-  } else {
-    return value; // not a recognizable date string — pass through (validated by field-writer)
-  }
-  const usDate = `${m}/${d}/${y}`;
-  if (isDateTime) {
-    const tm = s.match(/[T\s](\d{2}:\d{2}(?::\d{2})?)/);
-    if (tm) return `${usDate} ${tm[1]}`;
-  }
-  return usDate;
-}
-
 function buildFieldWriterPayload(fieldId, value, row) {
   let outValue = value;
   const dateType = dateTypeForWrite(fieldId, row);
-  if (dateType) {
-    outValue = coerceDateValueToUs(value, dateType === 'DateTime');
+  const parser = window.customFieldCalcParser;
+  const formatForWriter = parser?.formatDateForEncompassWriter;
+  const parseLoanDate = parser?.parseLoanDateValue;
+  const isDateTime = dateType === 'DateTime';
+  if (formatForWriter && (dateType || (parseLoanDate && parseLoanDate(value)))) {
+    const formatted = formatForWriter(value, isDateTime);
+    if (formatted !== value) outValue = formatted;
   }
   const payload = [{ id: fieldId, value: outValue }];
   const lockValue = row.Lock ?? row.lock ?? row.Locked ?? row.locked;
@@ -1807,126 +1865,6 @@ function escapeHtml(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
-}
-
-function displayTestDescriptions(testDescriptions) {
-  const container = document.getElementById('testDescriptionsContainer');
-  const accordionContainer = document.getElementById('accordionContainer');
-  const testScenariosCount = document.getElementById('testScenariosCount');
-  
-  if (!container || !accordionContainer) return;
-  
-  container.innerHTML = '';
-  accordionContainer.style.display = 'block';
-  
-  // Update test scenarios count badge
-  if (testScenariosCount) {
-    testScenariosCount.textContent = testDescriptions.length;
-  }
-  
-  testDescriptions.forEach(test => {
-    const cardElement = document.createElement('div');
-    cardElement.className = 'test-description-card';
-    cardElement.setAttribute('data-test-number', test.testNumber);
-
-    cardElement.innerHTML = `
-      <div class="scenario-card-inner">
-        <div class="scenario-card-face scenario-card-front">
-          <div class="scenario-card-header">
-            <div class="test-number-badge">${escapeHtml(String(test.testNumber))}</div>
-            <div class="test-description-text">${escapeHtml(test.description || '')}</div>
-            <button type="button" class="btn btn-sm scenario-edit-toggle ml-auto" title="Edit scenario"><i class="bi-pencil mr-1"></i>Edit</button>
-          </div>
-          <div class="scenario-card-actions">
-            <button type="button" class="btn btn-sm btn-outline-secondary scenario-copy-to-next-btn" data-copy-from="${test.testNumber}" title="Copy this column to next scenario">
-              <i class="bi-arrow-right-circle"></i> Copy to Next
-            </button>
-            <button type="button" class="scenario-run-btn" data-run-scenario="${test.testNumber}">
-              <i class="bi-play-fill"></i> Run
-            </button>
-          </div>
-        </div>
-        <div class="scenario-card-face scenario-card-back">
-          <div class="scenario-card-back-header">
-            <label class="text-muted small mb-0">Edit scenario</label>
-            <button type="button" class="scenario-flip-back-btn scenario-edit-cancel" title="Back to front"><i class="bi-arrow-left"></i> Back</button>
-          </div>
-          <textarea class="scenario-edit-input" rows="2" placeholder="Scenario description...">${escapeHtml(test.description || '')}</textarea>
-          <div class="scenario-card-back-actions">
-            <button type="button" class="btn btn-outline-secondary btn-sm scenario-edit-cancel">Cancel</button>
-            <button type="button" class="btn btn-primary btn-sm scenario-edit-save">Save</button>
-          </div>
-        </div>
-      </div>
-    `;
-
-    const frontFace = cardElement.querySelector('.scenario-card-front');
-    const editInput = cardElement.querySelector('.scenario-edit-input');
-    const runBtn = cardElement.querySelector('.scenario-run-btn');
-    const saveBtn = cardElement.querySelector('.scenario-edit-save');
-
-    function flipToBack() {
-      cardElement.classList.add('flipped');
-      setTimeout(() => editInput?.focus(), 100);
-    }
-
-    function flipToFront() {
-      cardElement.classList.remove('flipped');
-    }
-
-    frontFace.addEventListener('click', (e) => {
-      if (e.target.closest('.scenario-run-btn') || e.target.closest('.scenario-edit-toggle') || e.target.closest('.scenario-copy-to-next-btn')) return;
-      document.querySelectorAll('.test-description-card').forEach(card => {
-        card.classList.remove('test-scenario-active');
-      });
-      cardElement.classList.add('test-scenario-active');
-      setRunScenarioSelectValue(test.testNumber);
-      highlightTestColumn(test.testNumber);
-    });
-
-    runBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      setRunScenarioSelectValue(test.testNumber);
-      runTests(test.testNumber);
-    });
-
-    const copyToNextBtn = cardElement.querySelector('.scenario-copy-to-next-btn');
-    if (copyToNextBtn) {
-      copyToNextBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (copyColumnToNext(test.testNumber)) {
-          showToast(`Copied Test ${test.testNumber} to next column`, 'success');
-        } else {
-          showToast('No next column to copy to', 'warning');
-        }
-      });
-    }
-
-    const editIcon = cardElement.querySelector('.scenario-edit-toggle');
-    editIcon.addEventListener('click', (e) => {
-      e.stopPropagation();
-      flipToBack();
-    });
-
-    saveBtn.addEventListener('click', () => {
-      const newDesc = (editInput?.value || '').trim();
-      const idx = testDescriptionsData.findIndex(t => t.testNumber === test.testNumber);
-      if (idx >= 0) testDescriptionsData[idx].description = newDesc;
-      const textEl = cardElement.querySelector('.test-description-text');
-      if (textEl) textEl.textContent = newDesc || '(No description)';
-      flipToFront();
-    });
-
-    cardElement.querySelectorAll('.scenario-edit-cancel').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        editInput.value = test.description || '';
-        flipToFront();
-      });
-    });
-
-    container.appendChild(cardElement);
-  });
 }
 
 function hideScenarioContextMenu() {
@@ -2341,17 +2279,6 @@ function displayOverallSignOff(executions, dbUnavailable) {
   }
 }
 
-function hideTestDescriptions() {
-  const container = document.getElementById('testDescriptionsContainer');
-  const testScenariosCount = document.getElementById('testScenariosCount');
-  if (container) {
-    container.innerHTML = '<div class="text-muted"><small>No test scenario descriptions found in this file.</small></div>';
-  }
-  if (testScenariosCount) {
-    testScenariosCount.textContent = '0';
-  }
-}
-
 async function runTests(singleTestNumber) {
   if (!allData || allData.length === 0) {
     setStatus('No test data loaded', 'err', 'bi-exclamation-octagon');
@@ -2606,17 +2533,11 @@ async function runTests(singleTestNumber) {
                 const data = await response.json();
                 maybeUpdateDescriptionFromApi(row, fieldId, data, gridApi, i);
                 const actualValue = extractFieldValueFromReaderResponse(data, fieldId);
-                const expectedStr = String(expectedValue).trim();
-                const actualStr = actualValue === null || actualValue === undefined ? '' : String(actualValue).trim();
-                const expectedBlank = isBlankForTest(expectedStr);
-                const actualBlank = isBlankForTest(actualStr);
-                const numExpected = Number(expectedStr);
-                const numActual = Number(actualStr);
-                const bothNumeric = actualStr !== '' && expectedStr !== '' && !Number.isNaN(numExpected) && !Number.isNaN(numActual);
-                const same = expectedStr === actualStr
-                  || (expectedBlank && actualBlank)
-                  || (bothNumeric && numExpected === numActual)
-                  || (expectedStr.toLowerCase() === actualStr.toLowerCase());
+                const compareMode = getCompareModeFromRow(row);
+                const compareFn = window.unitTestsUtils?.compareValues;
+                const same = compareFn
+                  ? compareFn(actualValue, expectedValue, compareMode)
+                  : false;
                 if (same) {
                   result.status = 'info';
                   result.message = `COMPARE ${fieldId} passed • Expected: ${JSON.stringify(expectedValue)}`;
@@ -2843,7 +2764,6 @@ function clearData() {
   fileInfo.innerHTML = 'No file loaded';
   renderUnitTestsScenarioPills([], []);
   resultsMeta.textContent = '0 rows';
-  hideTestDescriptions();
   removeColumnHighlight();
   if (stickyActionBar) {
     stickyActionBar.style.display = 'none';
@@ -2977,11 +2897,8 @@ async function hydrateLoadedUnitTestData(options) {
   const execResult = await loadTestExecutionsFromDatabase(currentFileName);
   displayOverallSignOff(execResult.executions, execResult.dbUnavailable);
 
-  if (testDescriptionsData.length > 0) {
-    displayTestDescriptions(testDescriptionsData);
-  } else {
-    hideTestDescriptions();
-  }
+  const accordionContainer = document.getElementById('accordionContainer');
+  if (accordionContainer) accordionContainer.style.display = 'block';
   refreshRunScenarioSelect();
 
   uploadArea.style.display = 'none';
@@ -3326,12 +3243,14 @@ async function deleteBrRuleFromLibrary(id) {
 async function searchByFieldId(fieldId) {
   if (!fieldId || !fieldSearchResults || !fieldSearchTerm || !fieldSearchResultsList) return;
   try {
-    const [resExcel, resBr] = await Promise.all([
+    const [resExcel, resBr, resCoverage] = await Promise.all([
       fetch(`/api/unit-tests/search?fieldId=${encodeURIComponent(fieldId)}`),
       fetch(`/api/unit-tests/br-rules/search?fieldId=${encodeURIComponent(fieldId)}`),
+      fetch(`/api/unit-tests/coverage?fieldId=${encodeURIComponent(fieldId)}`),
     ]);
     const dataExcel = await resExcel.json();
     const dataBr = await resBr.json();
+    const dataCoverage = resCoverage.ok ? await resCoverage.json() : null;
 
     fieldSearchResults.style.display = 'block';
     fieldSearchTerm.textContent = fieldId;
@@ -3339,12 +3258,22 @@ async function searchByFieldId(fieldId) {
     const excelFiles = resExcel.ok && dataExcel.success && Array.isArray(dataExcel.files) ? dataExcel.files : [];
     const brFiles = resBr.ok && dataBr.success && Array.isArray(dataBr.files) ? dataBr.files : [];
 
+    const coFields =
+      dataCoverage?.success && Array.isArray(dataCoverage.coFields) ? dataCoverage.coFields : [];
+
     if (excelFiles.length === 0 && brFiles.length === 0) {
-      fieldSearchResultsList.innerHTML = '<p class="text-muted mb-0">No Excel tests or BR / Tool 8 rules reference this field.</p>';
+      let emptyMsg = '<p class="text-muted mb-0">No Excel tests or BR / Tool 8 rules reference this field.</p>';
+      if (coFields.length) {
+        emptyMsg += `<p class="small text-muted mb-0 mt-1">Related fields in library: ${coFields.slice(0, 12).map((f) => `<code>${String(f).replace(/</g, '&lt;')}</code>`).join(', ')}${coFields.length > 12 ? '…' : ''}</p>`;
+      }
+      fieldSearchResultsList.innerHTML = emptyMsg;
       return;
     }
 
     let html = '';
+    if (coFields.length > 0) {
+      html += `<div class="small text-muted mb-2">Also tested with: ${coFields.slice(0, 8).map((f) => `<code>${String(f).replace(/</g, '&lt;')}</code>`).join(', ')}${coFields.length > 8 ? ` (+${coFields.length - 8} more)` : ''}</div>`;
+    }
     if (excelFiles.length > 0) {
       html += '<div class="small fw-bold mb-1">Excel unit tests</div>';
       html += excelFiles
@@ -3588,7 +3517,7 @@ function initializeVoiceWidget() {
   });
 }
 
-/** Spoken QA script (shared by voice command and Listen button). Keep in sync with Step 3 Run tests QA highlights. */
+/** Spoken QA script (voice command "QA tips"). */
 function getUnitTestsQaTipsSpeakScript() {
   return (
     'QA tips for Unit Tests. ' +
@@ -3620,8 +3549,8 @@ function handleVoiceCommand(rawCommand = '') {
   }
 
   if (command.includes('show scenarios') || command.includes('show test scenarios') || command.includes('show tests')) {
-    showAccordionSection('collapseTestScenarios');
-    speak('Showing test scenarios');
+    showAccordionSection('collapseUnitTestData');
+    speak('Showing run tests');
     return;
   }
 
@@ -3769,6 +3698,7 @@ function showAccordionSection(sectionId) {
 function revealUnitTestGridSection() {
   const section = document.getElementById('collapseTestGrid');
   if (!section) return;
+  setActiveWorkflowPill('collapseTestGrid');
   if (!section.classList.contains('show')) {
     showAccordionSection('collapseTestGrid');
   }
@@ -3817,6 +3747,9 @@ function updateSectionSidebarActiveState(sectionId, isExpanded) {
   );
   if (link) {
     link.classList.toggle('active-section', isExpanded);
+  }
+  if (isExpanded) {
+    setActiveWorkflowPill(sectionId);
   }
 }
 
@@ -4657,15 +4590,8 @@ const UNIT_TESTS_OFFLINE_DEMO_FIELD_EMBEDDED = {
   format: 'YN',
 };
 
-/**
- * Load a synthetic custom-field-shaped workbook (same pipeline as “Generate from custom field”) without Encompass.
- * @returns {Promise<void>}
- */
-async function loadOfflineDemoUnitTest() {
-  if (!window.customFieldCalcParser?.generateUnitTestFromCustomField) {
-    setStatus('Offline demo unavailable: calculation parser not loaded', 'err', 'bi-exclamation-octagon');
-    return;
-  }
+/** @returns {Promise<object>} Offline demo custom field (CUST11FV). */
+async function fetchOfflineDemoField() {
   let field = { ...UNIT_TESTS_OFFLINE_DEMO_FIELD_EMBEDDED };
   try {
     const fixtureUrl = new URL('fixtures/unit-tests-offline-demo.json', window.location.href);
@@ -4679,6 +4605,19 @@ async function loadOfflineDemoUnitTest() {
   } catch (_) {
     /* use embedded field */
   }
+  return field;
+}
+
+/**
+ * Load a synthetic custom-field-shaped workbook (same pipeline as “Generate from custom field”) without Encompass.
+ * @returns {Promise<void>}
+ */
+async function loadOfflineDemoUnitTest() {
+  if (!window.customFieldCalcParser?.generateUnitTestFromCustomField) {
+    setStatus('Offline demo unavailable: calculation parser not loaded', 'err', 'bi-exclamation-octagon');
+    return;
+  }
+  const field = await fetchOfflineDemoField();
 
   const fallbackMeta = window.customFieldCalcParser.getFallbackFieldMetadata
     ? window.customFieldCalcParser.getFallbackFieldMetadata()
@@ -5248,6 +5187,111 @@ function initializeGenerateFromCustomField() {
       void deliverFromSelectedCustomField({ loadUi: true, autoDownload: false });
     }
   });
+
+  const STORY_DEMO_FIELD_ID = 'CUST11FV';
+
+  function pickStoryDemoFieldFromList() {
+    const want = STORY_DEMO_FIELD_ID.toLowerCase();
+    return (
+      calculatedFields.find((f) => {
+        const id = String(f.fieldId || f.id || f.Id || '').toLowerCase();
+        return id === want;
+      }) || calculatedFields[0]
+    );
+  }
+
+  function selectCalculatedFieldForStory(field) {
+    if (!field) return false;
+    const id = field.fieldId || field.id || field.Id || '';
+    if (!id) return false;
+    hiddenSelect.value = id;
+    const calc =
+      field.calculation ||
+      field.calculationExpression ||
+      field.Calculation ||
+      field.calculatedExpression ||
+      field.expression ||
+      field.formula ||
+      '';
+    searchInput.value = calc ? `[${id}] ${calc}` : `[${id}]`;
+    dropdown.style.display = 'none';
+    updatePreview();
+    return !!(confirmBtn && !confirmBtn.disabled);
+  }
+
+  /** Story / highlight reel: open Generate modal and click Generate & load (live field when Hub is up, else offline CUST11FV). */
+  window.unitTestsStoryGenerateAndLoad = async function unitTestsStoryGenerateAndLoad() {
+    if (unitTestsHasLoadedData()) return { skipped: true, reason: 'already-loaded' };
+    if (!window.customFieldCalcParser?.generateUnitTestFromCustomField) {
+      return { skipped: true, reason: 'parser-missing' };
+    }
+
+    statusEl.textContent = 'Loading custom fields...';
+    searchInput.value = '';
+    hiddenSelect.value = '';
+    searchInput.placeholder = 'Loading...';
+    dropdown.style.display = 'none';
+    setGenerateActionButtonsEnabled(false);
+    preview.style.display = 'none';
+    showBsModal(modal);
+
+    let usedLive = false;
+    try {
+      const [customRes, nativeRes] = await Promise.all([
+        (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/custom-fields'),
+        (window.encompassApi?.encompassFetch || fetch)('/api/encompass-hub/native-fields'),
+      ]);
+      if (customRes.ok) {
+        const customData = await customRes.json();
+        const customItems = Array.isArray(customData) ? customData : customData.items || customData.fields || [];
+        cachedCustomFieldsForMetadata = customItems;
+        calculatedFields = customItems.filter((item) => {
+          const calc =
+            item.calculation ||
+            item.calculationExpression ||
+            item.calculatedExpression ||
+            item.expression ||
+            item.formula ||
+            '';
+          return (item.isCalculatedField || item.isCalculated) && calc && calc.trim();
+        });
+        let nativeItems = [];
+        if (nativeRes.ok) {
+          const nativeData = await nativeRes.json();
+          nativeItems = Array.isArray(nativeData)
+            ? nativeData
+            : nativeData.items || nativeData.fields || nativeData.standardFields || [];
+        }
+        cachedNativeFieldsForMetadata = nativeItems;
+        searchInput.placeholder = 'Type to search custom fields...';
+        if (calculatedFields.length) {
+          const pick = pickStoryDemoFieldFromList();
+          if (selectCalculatedFieldForStory(pick)) {
+            statusEl.textContent = `${calculatedFields.length} calculated field${calculatedFields.length !== 1 ? 's' : ''} found. Story reel selected [${pick.fieldId || pick.id || pick.Id}].`;
+            usedLive = true;
+            await deliverFromSelectedCustomField({ loadUi: true, autoDownload: false });
+            return { live: true, fieldId: pick.fieldId || pick.id || pick.Id };
+          }
+        } else {
+          statusEl.textContent = 'No calculated custom fields in your Encompass instance.';
+        }
+      }
+    } catch (_) {
+      /* fall through to offline demo in modal */
+    }
+
+    const demoField = await fetchOfflineDemoField();
+    calculatedFields = [demoField];
+    cachedCustomFieldsForMetadata = [];
+    cachedNativeFieldsForMetadata = [];
+    searchInput.placeholder = 'Type to search custom fields...';
+    selectCalculatedFieldForStory(demoField);
+    statusEl.textContent = usedLive
+      ? 'Could not load a calculated field from Encompass. Using offline sample CUST11FV.'
+      : 'Story demo: sample field CUST11FV (offline; same as Generate & load).';
+    await deliverFromSelectedCustomField({ loadUi: true, autoDownload: false });
+    return { offline: true, fieldId: demoField.fieldId || STORY_DEMO_FIELD_ID };
+  };
 }
 
 /**
@@ -5635,8 +5679,8 @@ function initializeSectionSidebar() {
   const nav = document.getElementById('sectionSidebarNav');
   if (!nav) return;
 
-  // On load: hide section cards and collapse; then open Test Scenarios (Step 1) — upload/generate stays in the Excel Unit Tests hero band above
-  var sectionIds = ['collapseTestScenarios', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseLearnMode', 'collapseAIAssistant'];
+  // On load: hide section cards and collapse; then open Test Grid — upload/generate stays in the Excel Unit Tests hero band above
+  var sectionIds = ['collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (el) {
@@ -5663,9 +5707,14 @@ function initializeSectionSidebar() {
 
   // Sidebar click: toggle section visibility (multiple sections can stay open)
   nav.addEventListener('click', function (e) {
-    const link = e.target.closest('a[data-bs-target], a[data-target], a[data-action]');
+    const link = e.target.closest('a[data-bs-target], a[data-target], a[data-action], a[data-workflow-action]');
     if (!link) return;
     e.preventDefault();
+    if (link.getAttribute('data-workflow-action') === 'generate') {
+      setActiveWorkflowPill('generate');
+      document.getElementById('generateFromCustomFieldBtn')?.click();
+      return;
+    }
     const action = link.getAttribute('data-action');
     if (action === 'voice-help') {
       if (typeof toggleVoiceHelp === 'function') toggleVoiceHelp(true);
@@ -5686,7 +5735,7 @@ function initializeSectionSidebar() {
   });
 
   // Sync sidebar active state when sections expand/collapse (from header clicks, voice, or sidebar)
-  var sectionIds = ['collapseTestScenarios', 'collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseLearnMode', 'collapseAIAssistant'];
+  var sectionIds = ['collapseSelectedField', 'collapseLiveScenarioBuilder', 'collapseTestGrid', 'collapseUnitTestData', 'collapseOverallSignOff', 'collapseTestLibrary', 'collapseLearnMode', 'collapseAIAssistant'];
   sectionIds.forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
@@ -5698,7 +5747,7 @@ function initializeSectionSidebar() {
     });
   });
 
-  var defaultOpenId = 'collapseTestScenarios';
+  var defaultOpenId = 'collapseTestGrid';
   var defaultOpenEl = document.getElementById(defaultOpenId);
   var defaultOpenCard = getSectionCardForCollapse(defaultOpenId);
   if (defaultOpenCard) defaultOpenCard.classList.remove('section-card-hidden');
@@ -5707,6 +5756,7 @@ function initializeSectionSidebar() {
     bsCollapseShow(defaultOpenEl);
   }
   updateSectionSidebarActiveState(defaultOpenId, true);
+  setActiveWorkflowPill(defaultOpenId);
 
   document.querySelectorAll('.section-card-header[role="button"]').forEach((h) => {
     h.addEventListener('keydown', (e) => {
@@ -5729,11 +5779,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeScenarioBuilderPopout();
   initializeSectionSidebar();
   initUnitTestsChromePrefs();
+  initUnitTestsDeepLinks();
   if (exportExcelBtn) exportExcelBtn.disabled = true;
   const welcomeUploadBtn = document.getElementById('welcomeUploadBtn');
   welcomeUploadBtn?.addEventListener('click', () => fileInput?.click());
-  const qaTipsListenBtn = document.getElementById('qaTipsListenBtn');
-  qaTipsListenBtn?.addEventListener('click', () => speak(getUnitTestsQaTipsSpeakScript()));
   initDefaultLoanGuid();
   renderRecentRunsSelect();
   loadTestLibrary();
@@ -5741,12 +5790,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('unitTestsOfflineDemoBtn')?.addEventListener('click', () => {
     void loadOfflineDemoUnitTest();
   });
-  try {
-    const p = new URLSearchParams(window.location.search);
-    if (p.get('demo') === '1' || p.get('storybook') === '1') {
-      setTimeout(() => void loadOfflineDemoUnitTest(), 0);
-    }
-  } catch (_) {}
   if (typeof window !== 'undefined') {
     window.addEventListener('encompassEnvChanged', () => {
       _hubFieldListsCache = null;
@@ -5762,4 +5805,5 @@ if (typeof window !== 'undefined') {
   window.showAccordionSection = showAccordionSection;
   window.loadOfflineDemoUnitTest = loadOfflineDemoUnitTest;
   window.unitTestsHasLoadedData = unitTestsHasLoadedData;
+  window.setActiveWorkflowPill = setActiveWorkflowPill;
 }

@@ -162,6 +162,10 @@
 
     const imageUrl = await resolveImageUrl(cameraData);
     let feedUrl = cameraUrl || networkUrl;
+    if (cameraData.source === 'webcoos' && window.DisasterCameraFilters?.getWebCoosPublicUrl) {
+      const webcoosUrl = window.DisasterCameraFilters.getWebCoosPublicUrl(cameraData);
+      if (webcoosUrl) feedUrl = webcoosUrl;
+    }
     if (!feedUrl && cameraData.source === 'faa_weathercam') {
       const faaSiteId = raw.siteId || String(cameraData.source_id || '').split(':')[0];
       if (faaSiteId) feedUrl = `https://weathercams.faa.gov/site/${faaSiteId}`;

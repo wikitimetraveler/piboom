@@ -176,6 +176,60 @@
       .replace(/"/g, '&quot;');
   }
 
+  function getCameraDisplayName(camera) {
+    return String(camera?.title || camera?.name || '').trim();
+  }
+
+  function isLighthouseWebcam(camera) {
+    const name = getCameraDisplayName(camera);
+    const sid = String(camera?.source_id || '').trim();
+    return /lighthouse/i.test(name) || /lighthouse/i.test(sid);
+  }
+
+  function getWebCoosPublicUrl(camera) {
+    if (!camera || String(camera.source || '').toLowerCase() !== 'webcoos') return null;
+    const slug = String(camera.source_id || '').trim();
+    if (!slug) return null;
+    return `https://webcoos.org/cameras/${encodeURIComponent(slug)}/`;
+  }
+
+  /**
+   * @param {Array} cameras
+   * @param {string} q
+   * @returns {Array}
+   */
+  function filterCamerasByNameQuery(cameras, q) {
+    const needle = String(q || '').trim().toLowerCase();
+    if (!needle || !Array.isArray(cameras)) return cameras || [];
+    return cameras.filter((camera) => {
+      const name = getCameraDisplayName(camera).toLowerCase();
+      const sid = String(camera.source_id || '').toLowerCase();
+      return name.includes(needle) || sid.includes(needle);
+    });
+  }
+
+  /**
+   * @param {Array} cameras
+   * @param {string} q
+   * @returns {Array}
+   */
+  function findCameraByQuery(cameras, q) {
+    const needle = String(q || '').trim().toLowerCase();
+    if (!needle || !Array.isArray(cameras)) return [];
+    return cameras.filter((camera) => {
+      const name = getCameraDisplayName(camera).toLowerCase();
+      const sid = String(camera.source_id || '').toLowerCase();
+      if (sid === needle) return true;
+      if (name === needle) return true;
+      return name.includes(needle) || sid.includes(needle);
+    });
+  }
+
+  function lighthouseBadgeHtml() {
+    return '<span class="badge bg-info text-dark ms-1" title="Coastal lighthouse webcam">'
+      + '<i class="bi bi-lightbulb"></i> Lighthouse</span>';
+  }
+
   function storeCameraForViewer(camera, index) {
     global.cameraDataStore = global.cameraDataStore || {};
     const key = `cam-${camera.source_id || camera.id || index}`;
@@ -270,6 +324,12 @@
     buildDisasterCameraRequest,
     buildLoanCameraRequest,
     escapeHtml,
+    getCameraDisplayName,
+    isLighthouseWebcam,
+    getWebCoosPublicUrl,
+    filterCamerasByNameQuery,
+    findCameraByQuery,
+    lighthouseBadgeHtml,
     storeCameraForViewer,
     getCameraMapIcon,
     addCameraMarkersToMap,

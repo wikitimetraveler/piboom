@@ -6,6 +6,7 @@ import encompassDocsService from '../services/encompass-docs.service.js';
 import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import iceKnowledgeService from '../lib/knowledge/ice-knowledge.service.js';
+import { buildStructuredFailureAnalysis } from '../services/unit-tests-ai-analysis.service.js';
 
 const router = express.Router();
 
@@ -180,10 +181,13 @@ router.post('/chat', async (req, res) => {
     const response = await openai.invoke(messages);
     const aiMessage = response.content;
 
+    const structuredAnalysis = buildStructuredFailureAnalysis(testContext || {});
+
     // Return response with context
     res.json({
       message: aiMessage,
       context: combinedResults,
+      structuredAnalysis,
       timestamp: new Date().toISOString()
     });
 

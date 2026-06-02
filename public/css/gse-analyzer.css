@@ -151,9 +151,53 @@
   color: #475569;
 }
 
-.gse-exhibit-evidence {
+.gse-exhibit-links-label,
+.gse-exhibit-verify-label,
+.gse-exhibit-evidence-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.gse-exhibit-links {
+  line-height: 1.45;
+  margin-bottom: 0.5rem;
+}
+
+.gse-exhibit-links li + li {
+  margin-top: 0.28rem;
+}
+
+.gse-exhibit-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28rem;
+  color: #0d9488;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.gse-exhibit-link:hover {
+  color: #0f766e;
+  text-decoration: underline;
+}
+
+.gse-exhibit-link-icon {
+  font-size: 0.62rem;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+.gse-exhibit-context a {
+  color: #0d9488;
+  font-weight: 600;
+}
+
+.gse-exhibit-verify {
   color: #0f766e;
   font-style: italic;
+  line-height: 1.42;
 }
 
 .gse-exhibit-counts dt {

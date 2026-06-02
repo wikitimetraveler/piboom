@@ -62,7 +62,7 @@ routes/encompass-*.routes.js
 | ICE Knowledge            | `lib/knowledge/ice-knowledge.service.js`, `knowledge-sources/ice/`, `data/knowledge/ice-sources.json`            |
 | AI Chat / Memory         | `controllers/unit-tests-ai.controller.js`, `controllers/loan-pipeline-ai.controller.js`                          |
 | Screen Test tool         | `controllers/reviewer-ai.controller.js`, `routes/reviewer.routes.js`, `public/finance/tool9.html`                |
-| Unit Tests               | `public/finance/unit-tests.html`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js` — Story Mode offline demo (`?demo=1`, **Load offline demo**, or **Play highlight reel** with no grid rows yet) uses synthetic workbook data, not live Encompass.   |
+| Unit Tests               | `public/finance/unit-tests.html`, `public/shared/customFieldCalcParser.js`, `public/shared/unit-tests-utils.js` — Story Mode offline demo (`?demo=1`, **Load offline demo**, or **Play highlight reel** with no grid rows yet) uses synthetic workbook data, not live Encompass. URL deep links: `?generate=1` (open Generate modal), `?reel=1` (start highlight reel). See `docs/UNIT_TEST_LIBRARY.md` (URL parameters).   |
 | Worksheets UI            | `public/finance/` (URLs unchanged; product name Worksheets)                                                      |
 | Design tokens / dark mode | `public/shared/design-tokens.css` (`--zen-primary`, `--lf-*`, finance aliases); `public/shared/dark-mode.js` (sitewide zen); Encompass grids: `encompass-dark-mode.js` |
 | Financial calculations   | `public/shared/calculationEngine.js` (UI engine); pure helpers: `public/shared/calcEngineLibrary.js` (`calcMath`)  |

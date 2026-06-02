@@ -37,6 +37,10 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/unit-tests/files/:id` | Download unit test file |
 | DELETE | `/api/unit-tests/files/:id` | Delete unit test file from library |
 | GET | `/api/unit-tests/search` | Search tests by field ID (query: fieldId) |
+| GET | `/api/unit-tests/coverage` | Field impact: library files + co-occurring fields (query: fieldId) |
+| POST | `/api/unit-tests/coverage/gaps` | Coverage gaps for manifest field IDs (body: `{ fieldIds: string[] }`) |
+| GET | `/api/unit-tests/learn-hints` | Load team Learn Mode SET hints (query: clientId) |
+| PUT | `/api/unit-tests/learn-hints` | Save Learn Mode hints (body: `{ clientId?, hints }`) |
 | GET | `/api/unit-tests/br-rules/search` | Search saved BR / Tool 8 payloads by field ID |
 | GET | `/api/unit-tests/br-rules` | List saved business rules (XML, VB snippet, Tool 8 JSON) |
 | POST | `/api/unit-tests/br-rules/file` | Upload `.xml` / `.json` / `.txt` (multipart field `file`) |
@@ -76,7 +80,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | Method | Path | Description |
 |--------|------|-------------|
 | GET | `/api/gse/products` | Merged Fannie/Freddie/FHA/VA/USDA product catalog from `data/gse/*.json` |
-| GET | `/api/gse/sources` | `rule-metadata.json` + overlay catalog metadata (count/version) |
+| GET | `/api/gse/sources` | `rule-metadata.json` (incl. `agencyExhibitLinks` for analyzer exhibit cards) + overlay catalog metadata (count/version) |
 | POST | `/api/gse/analyze-scenario` | Body: non-PII scenario JSON → summary, product fit rows, explanation fields, overlay findings, suggestions |
 | POST | `/api/gse/import-loan-json` | Validate + normalize scenario JSON (same shape as analyze); no persistence |
 | GET | `/api/gse/loan-limits` | Query `state`, `county`, `units` → bundled FHFA sample limit row |

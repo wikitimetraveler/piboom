@@ -1225,6 +1225,46 @@
   }
 
   /**
+   * Hash suggested SET map for scenario deduplication (O(|Σ|) per scenario).
+   * @param {object} scenario
+   * @param {string[]} inputFields
+   * @param {Record<string, object>} fieldMetadata
+   * @param {object[]} allScenarios
+   * @param {number} scenarioIndex
+   */
+  function suggestedSetKeyForScenario(scenario, inputFields, fieldMetadata, allScenarios, scenarioIndex) {
+    const suggested = getSuggestedValuesForScenario(scenario, inputFields, {
+      fieldMetadata,
+      scenarioIndex,
+      allScenarios,
+    });
+    return Object.keys(suggested)
+      .sort()
+      .map((k) => `${k}=${String(suggested[k] ?? '')}`)
+      .join('|');
+  }
+
+  /**
+   * Drop scenarios whose suggested SET assignments are identical (reduces redundant Hub runs).
+   * @param {object[]|null} scenarios
+   * @param {string[]} inputFields
+   * @param {Record<string, object>} fieldMetadata
+   * @returns {object[]|null}
+   */
+  function dedupeScenariosBySuggestedSets(scenarios, inputFields, fieldMetadata) {
+    if (!scenarios || scenarios.length < 2) return scenarios;
+    const seen = new Set();
+    const out = [];
+    scenarios.forEach((s, idx) => {
+      const key = suggestedSetKeyForScenario(s, inputFields, fieldMetadata, scenarios, idx);
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push(s);
+    });
+    return out;
+  }
+
+  /**
    * Generate unit test rows from a custom field with a calculation.
    * @param {object} customField - { id, fieldId, calculation, calculationExpression, ... }
    * @param {object} [options] - optional { fieldMetadata: Record<fieldId, {dataType, format, description}> }
@@ -1282,7 +1322,10 @@
     }
 
     let scenarios = parseAllIIfScenarios(expression);
-    if (scenarios) scenarios = expandOrElseScenarios(scenarios);
+    if (scenarios) {
+      scenarios = expandOrElseScenarios(scenarios);
+      scenarios = dedupeScenariosBySuggestedSets(scenarios, inputFields, fieldMetadata);
+    }
     const maxScenarios = 20;
     const scenarioCount = Math.min(Math.max(5, (scenarios && scenarios.length) || 0), maxScenarios);
 
@@ -1572,6 +1615,27 @@
     // Fallback to JS parser for ISO datetime and other valid formats
     const out = new Date(s);
     return Number.isNaN(out.getTime()) ? null : out;
+  }
+
+  /**
+   * Format a loan date for Encompass fieldWriter (ISO, no timezone offset).
+   * Date fields: yyyy-MM-dd. DateTime: yyyy-MM-ddTHH:mm:ss
+   * @param {string|number|null|undefined} rawValue
+   * @param {boolean} [isDateTime]
+   * @returns {string|number|null|undefined} ISO string or original value if not parseable
+   */
+  function formatDateForEncompassWriter(rawValue, isDateTime) {
+    if (rawValue === null || rawValue === undefined) return rawValue;
+    const d = parseLoanDateValue(rawValue);
+    if (!d) return rawValue;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    if (!isDateTime) return `${y}-${m}-${day}`;
+    const h = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    const sec = String(d.getSeconds()).padStart(2, '0');
+    return `${y}-${m}-${day}T${h}:${min}:${sec}`;
   }
 
   /**
@@ -2247,6 +2311,7 @@
     parseIIfScenarios: parseIIfScenarios,
     parseAllIIfScenarios: parseAllIIfScenarios,
     expandOrElseScenarios: expandOrElseScenarios,
+    dedupeScenariosBySuggestedSets: dedupeScenariosBySuggestedSets,
     extractComparisonValues: extractComparisonValues,
     extractArithmeticComparisons: extractArithmeticComparisons,
     extractConditionValues: extractConditionValues,
@@ -2265,6 +2330,8 @@
     isNumberFieldByNotation: isNumberFieldByNotation,
     inferDateTypeFromFieldId: inferDateTypeFromFieldId,
     inferDateTypeFromText: inferDateTypeFromText,
+    parseLoanDateValue: parseLoanDateValue,
+    formatDateForEncompassWriter: formatDateForEncompassWriter,
     isSunriseField: isSunriseField,
     formatDateWithOffset: formatDateWithOffset,
     extractSingleResultField: extractSingleResultField,

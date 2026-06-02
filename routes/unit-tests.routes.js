@@ -12,6 +12,10 @@ import {
   listUnitTestFilesHandler,
   getUnitTestFileHandler,
   searchUnitTestsByFieldId,
+  getFieldCoverageHandler,
+  postCoverageGapsHandler,
+  getLearnHintsHandler,
+  putLearnHintsHandler,
   deleteUnitTestFileHandler,
   uploadBrRuleFileHandler,
   saveBrRuleJsonHandler,
@@ -72,6 +76,10 @@ router.get('/files', listUnitTestFilesHandler);
 router.get('/files/:id', getUnitTestFileHandler);
 router.delete('/files/:id', deleteUnitTestFileHandler);
 router.get('/search', searchUnitTestsByFieldId);
+router.get('/coverage', getFieldCoverageHandler);
+router.post('/coverage/gaps', postCoverageGapsHandler);
+router.get('/learn-hints', getLearnHintsHandler);
+router.put('/learn-hints', putLearnHintsHandler);
 
 // Business rules / Tool 8 (Alchemist) JSON library (Postgres body_text)
 router.get('/br-rules/search', searchBrRulesByFieldIdHandler);

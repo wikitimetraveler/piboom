@@ -7,6 +7,8 @@ import {
   listUnitTestFiles,
   getUnitTestFile,
   searchByFieldId,
+  getFieldCoverageImpact,
+  getCoverageGaps,
   deleteUnitTestFile,
 } from '../services/unit-tests-file.service.js';
 import {
@@ -16,6 +18,10 @@ import {
   searchBrRulesByFieldId,
   deleteBrRuleFile,
 } from '../services/business-rule-files.service.js';
+import {
+  getLearnHints,
+  saveLearnHints,
+} from '../services/unit-tests-learn-hints.service.js';
 
 /**
  * Upload unit test Excel file to library
@@ -104,6 +110,85 @@ export async function searchUnitTestsByFieldId(req, res) {
     console.error('Error searching unit test files:', error);
     return res.status(500).json({
       error: 'Failed to search unit test files',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * Field coverage impact (library files + co-occurring fields).
+ * GET /api/unit-tests/coverage?fieldId=...
+ */
+export async function getFieldCoverageHandler(req, res) {
+  try {
+    const { fieldId } = req.query;
+    if (!fieldId || !String(fieldId).trim()) {
+      return res.status(400).json({ error: 'fieldId query parameter is required' });
+    }
+    const impact = await getFieldCoverageImpact(String(fieldId).trim());
+    return res.json({ success: true, ...impact });
+  } catch (error) {
+    console.error('Error getting field coverage:', error);
+    return res.status(500).json({
+      error: 'Failed to get field coverage',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * Coverage gaps for a manifest of field IDs.
+ * POST /api/unit-tests/coverage/gaps  body: { fieldIds: string[] }
+ */
+export async function postCoverageGapsHandler(req, res) {
+  try {
+    const fieldIds = req.body?.fieldIds;
+    if (!Array.isArray(fieldIds)) {
+      return res.status(400).json({ error: 'fieldIds array is required in request body' });
+    }
+    const gaps = await getCoverageGaps(fieldIds);
+    return res.json({ success: true, ...gaps });
+  } catch (error) {
+    console.error('Error computing coverage gaps:', error);
+    return res.status(500).json({
+      error: 'Failed to compute coverage gaps',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * GET /api/unit-tests/learn-hints?clientId=...
+ */
+export async function getLearnHintsHandler(req, res) {
+  try {
+    const clientId = req.query.clientId || req.headers['x-unit-tests-client-id'];
+    const hints = await getLearnHints(clientId);
+    return res.json({ success: true, hints, clientId: clientId || 'default' });
+  } catch (error) {
+    console.error('Error loading learn hints:', error);
+    return res.status(500).json({
+      error: 'Failed to load learn hints',
+      message: error.message,
+    });
+  }
+}
+
+/**
+ * PUT /api/unit-tests/learn-hints  body: { clientId?, hints }
+ */
+export async function putLearnHintsHandler(req, res) {
+  try {
+    const { clientId, hints } = req.body || {};
+    if (!hints || typeof hints !== 'object') {
+      return res.status(400).json({ error: 'hints object is required in request body' });
+    }
+    const saved = await saveLearnHints(clientId, hints);
+    return res.json({ success: true, hints: saved, clientId: clientId || 'default' });
+  } catch (error) {
+    console.error('Error saving learn hints:', error);
+    return res.status(500).json({
+      error: 'Failed to save learn hints',
       message: error.message,
     });
   }

@@ -213,7 +213,7 @@
             <div class="accordion-body du-filters-body">
               <p class="du-filters-source-hint mb-3">
                 <i class="bi bi-info-circle me-1"></i>
-                Use the <strong>source command deck</strong> above for quick toggles. Refine here with state, county, source, and event — then click <strong>Apply filters</strong> on the command deck.
+                Source chips select providers; click <strong>Apply filters</strong> on the command deck (or below) to reload. Refine state, county, source, and event here.
               </p>
               <div class="row g-3 align-items-start">
                 <div class="col-md-3 col-sm-6">
@@ -252,6 +252,7 @@
                     <label class="form-check-label small" for="skipFemaCheck">Skip FEMA on refresh</label>
                   </div>
                   <a class="btn btn-outline-secondary btn-sm" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
+                  <button type="button" class="btn btn-outline-primary btn-sm du-apply-filters-btn"><i class="bi-funnel"></i> Apply filters</button>
                 </div>
               </div>
             </div>
@@ -954,9 +955,12 @@
         map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6}, mapTypeId: 'satellite' });
         syncSourceChipsFromSelect();
         $('#sourceInput').on('change', syncSourceChipsFromSelect);
-        $('#applyBtn').on('click', function() {
+        function onApplyFiltersClick() {
           syncSourceChipsFromSelect();
           loadDisasters();
+        }
+        $('#applyBtn, .du-apply-filters-btn').on('click', function() {
+          onApplyFiltersClick();
         });
         $('#refreshBtn').on('click', refreshDisasters);
         document.getElementById('refreshBtnHero')?.addEventListener('click', refreshDisasters);
@@ -987,24 +991,61 @@
         const on = btn.classList.contains('source-chip-active');
         $(`#sourceInput option[value="${sourceKey}"]`).prop('selected', on);
         updateFirmsDeferredAlert();
-        loadDisasters();
+        updateSourceFreshnessDots();
+      }
+
+      function readDisasterFilterInputs() {
+        const state = $('#stateInput').val().trim().toUpperCase();
+        if (state) $('#stateInput').val(state);
+        return {
+          state,
+          county: $('#countyInput').val().trim(),
+          sources: $('#sourceInput').val() || [],
+          events: $('#eventInput').val() || [],
+        };
+      }
+
+      function applyEventTypeFilter(rows, events) {
+        if (!events || events.length === 0) return rows;
+        const evSet = new Set(events.map((e) => String(e).toLowerCase()));
+        return rows.filter((d) => evSet.has(String(d.event_type || '').toLowerCase()));
+      }
+
+      function finishDisastersLoad(allRows) {
+        if (allRows.length === 0) {
+          console.warn('⚠️  No disasters found. Check:');
+          console.warn('   - Database connection');
+          console.warn('   - Date filter (90 days)');
+          console.warn('   - Source/event filters');
+          setDashboardStatus('No disaster rows matched current filters. Try broadening source, state, or date criteria.', 'info');
+        }
+        updateLoadingStatusDisaster(allRows.length ? 'Rendering disaster data...' : 'No disasters found. Check filters.', allRows.length ? 80 : 100);
+        renderTable(allRows);
+        renderMap(allRows);
+        updateStats(allRows);
+        updateLoadingStatusDisaster('Complete!', 100);
+        updateFirmsDeferredAlert();
+        hideLoading();
       }
 
       async function loadDisasters() {
         showLoading();
         setDashboardStatus('');
         updateLoadingStatusDisaster('Loading disaster data...', 10);
-        
-        const state = $('#stateInput').val().trim();
-        const county = $('#countyInput').val().trim();
-        const sources = $('#sourceInput').val() || [];
-        const events = $('#eventInput').val() || [];
-        
+
+        const { state, county, sources, events } = readDisasterFilterInputs();
+
+        if (sources.length === 0) {
+          setDashboardStatus('Select at least one source in the command deck or Filters.', 'warning');
+          finishDisastersLoad([]);
+          return;
+        }
+
         let allRows = [];
-        
+
         const dbSources = sources.filter(s => s !== 'floodzones' && s !== 'alertcalifornia');
         const needsDb = dbSources.length > 0;
-        
+
         if (needsDb) {
           try {
             updateLoadingStatusDisaster(
@@ -1017,7 +1058,6 @@
               if (state) qp.set('state', state);
               if (county) qp.set('county', county);
               qp.set('source', src);
-              if (events.length === 1) qp.set('event', events[0]);
               qp.set('since', sinceIso);
               qp.set('geocode', 'true');
               qp.set('limit', '2000');
@@ -1030,58 +1070,27 @@
             };
             const chunks = await Promise.all(dbSources.map(fetchDbSource));
             allRows = allRows.concat(chunks.flat());
-            if (events.length > 1) {
-              const evSet = new Set(events.map((e) => String(e).toLowerCase()));
-              allRows = allRows.filter((d) => evSet.has(String(d.event_type || '').toLowerCase()));
-            }
             console.log('📊 Loaded', allRows.length, 'disasters from database (selected sources)');
           } catch (e) {
             console.error('❌ Error loading disasters:', e);
             setDashboardStatus(`Unable to load one or more disaster feeds: ${e.message}`, 'danger');
           }
         }
-        
-        // Check if floodzones is selected - load flood zone data
+
         if (sources.includes('floodzones')) {
           try {
             updateLoadingStatusDisaster('Loading flood zone data...', 40);
             const floodZoneRows = await loadFloodZones(state, county);
             if (floodZoneRows.length > 0) {
-              // If only floodzones selected, render just flood zones
-              if (sources.length === 1) {
-                updateLoadingStatusDisaster('Rendering flood zone data...', 90);
-                renderTable(floodZoneRows);
-                renderMap(floodZoneRows);
-                updateLoadingStatusDisaster('Complete!', 100);
-                updateFirmsDeferredAlert();
-                hideLoading();
-                return;
-              }
-              // Otherwise, combine with other sources
               allRows = allRows.concat(floodZoneRows);
             }
           } catch (e) {
             console.error('❌ Error loading flood zones:', e);
           }
         }
-        
-        // Load CA Fire Cameras if selected
-        if (allRows.length === 0) {
-          console.warn('⚠️  No disasters found. Check:');
-          console.warn('   - Database connection');
-          console.warn('   - Date filter (90 days)');
-          console.warn('   - Source/event filters');
-          updateLoadingStatusDisaster('No disasters found. Check filters.', 100);
-          setDashboardStatus('No disaster rows matched current filters. Try broadening source, state, or date criteria.', 'info');
-        } else {
-          updateLoadingStatusDisaster('Rendering disaster data...', 80);
-          renderTable(allRows);
-          renderMap(allRows);
-          updateLoadingStatusDisaster('Complete!', 100);
-        }
 
-        updateFirmsDeferredAlert();
-        hideLoading();
+        allRows = applyEventTypeFilter(allRows, events);
+        finishDisastersLoad(allRows);
       }
       
       // Calculate risk score for a disaster based on all data sources
@@ -1198,9 +1207,12 @@
       async function refreshDisasters() {
         showLoading();
         const qp = new URLSearchParams();
-        const state = $('#stateInput').val().trim();
+        const state = $('#stateInput').val().trim().toUpperCase();
         const county = $('#countyInput').val().trim();
-        if (state) qp.set('state', state);
+        if (state) {
+          $('#stateInput').val(state);
+          qp.set('state', state);
+        }
         if (county) qp.set('county', county);
         if ($('#skipFemaCheck').is(':checked')) qp.set('skipFema', '1');
         console.log('🔄 Refreshing disasters...');
@@ -1313,7 +1325,9 @@
       function applyDuLoanFilterIfReady() {
         if (selectedDisasterObj || selectedDisasterRow) {
           loadLoansForDisaster(selectedDisasterObj, selectedDisasterRow);
+          return;
         }
+        setDashboardStatus('Select a disaster in the grid first, then adjust loan radius/county.', 'info');
       }
 
       function initializeDuLoanFilterControls() {

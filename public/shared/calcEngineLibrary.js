@@ -226,6 +226,47 @@
       if (pts >= 4) return 'high';
       if (pts >= 2) return 'medium';
       return 'low';
+    },
+
+    /**
+     * Unit Test COMPARE: parse Encompass-style date strings to UTC midnight ms (calendar day).
+     * @param {*} value
+     * @returns {number|null}
+     */
+    parseUnitTestDateMs(value) {
+      if (value === null || value === undefined) return null;
+      const raw = String(value).trim();
+      if (!raw) return null;
+      const slash = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (slash) {
+        const m = Number(slash[1]);
+        const d = Number(slash[2]);
+        const y = Number(slash[3]);
+        const dt = new Date(y, m - 1, d);
+        return Number.isNaN(dt.getTime()) ? null : dt.setHours(0, 0, 0, 0);
+      }
+      const isoDay = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (isoDay) {
+        const dt = new Date(Number(isoDay[1]), Number(isoDay[2]) - 1, Number(isoDay[3]));
+        return Number.isNaN(dt.getTime()) ? null : dt.setHours(0, 0, 0, 0);
+      }
+      const parsed = new Date(raw);
+      if (Number.isNaN(parsed.getTime())) return null;
+      return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate()).getTime();
+    },
+
+    /**
+     * Unit Test COMPARE: numeric tolerance (default 2-decimal money-style).
+     * @param {*} actual
+     * @param {*} expected
+     * @param {{ epsilon?: number }} [opts]
+     */
+    approxEqual(actual, expected, opts = {}) {
+      const epsilon = opts.epsilon ?? 0.005;
+      const a = toNumber(actual, null, { invalidValue: NaN });
+      const b = toNumber(expected, null, { invalidValue: NaN });
+      if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+      return Math.abs(a - b) <= epsilon;
     }
   };
 

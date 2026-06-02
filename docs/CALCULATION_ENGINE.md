@@ -31,6 +31,8 @@ const config = createDTICalculatorConfig({
 
 ### FHA Calculator
 
+Live worksheet: **`/finance/fha-streamline-loan-amount-calculator.html`** (uses `createFHACalculatorConfig()` + DAG-lite). HeyGen script: [CALCULATION_ENGINE_VIDEO_SCRIPT.md](CALCULATION_ENGINE_VIDEO_SCRIPT.md).
+
 ```javascript
 const config = createFHACalculatorConfig({
   prefix: 'fs',
@@ -91,4 +93,5 @@ Pass `customIds` with Encompass field IDs (native `[4002]` or custom `CX.RS.X`) 
 
 - **AGENTS.md** – Conventions: use calculationEngine + customIds
 - **docs/ENCOMPASS.md** – Encompass integration
+- **docs/CALCULATION_ENGINE_VIDEO_SCRIPT.md** – HeyGen / teleprompter script (DAG-lite explainer)
 - **Encompass Assistant** – Knows calc methods (sumRounded, calculateDTI, etc.) for Q&A

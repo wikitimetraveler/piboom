@@ -20,6 +20,8 @@ const {
   evaluateCondition,
   isSunriseField,
   formatDateWithOffset,
+  formatDateForEncompassWriter,
+  parseLoanDateValue,
   reloadLearnedSetHintsCache,
   LEARNED_SET_HINTS_STORAGE_KEY,
 } = globalThis.customFieldCalcParser;
@@ -943,6 +945,29 @@ describe('customFieldCalcParser', () => {
       const r = parseCalculationFormula('=1+2');
       expect(r.outputField).toBeNull();
       expect(r.expression).toBe('=1+2');
+    });
+  });
+
+  describe('formatDateForEncompassWriter', () => {
+    test('converts US date to yyyy-MM-dd for fieldWriter', () => {
+      expect(formatDateForEncompassWriter('01/15/2025', false)).toBe('2025-01-15');
+    });
+
+    test('passes through ISO date-only unchanged', () => {
+      expect(formatDateForEncompassWriter('2025-01-15', false)).toBe('2025-01-15');
+    });
+
+    test('formats DateTime without timezone offset', () => {
+      expect(formatDateForEncompassWriter('01/15/2025 14:30:00', true)).toBe('2025-01-15T14:30:00');
+    });
+
+    test('returns non-date values unchanged', () => {
+      expect(formatDateForEncompassWriter('Y', false)).toBe('Y');
+    });
+
+    test('parseLoanDateValue accepts common grid inputs', () => {
+      expect(parseLoanDateValue('01/15/2025')).toBeInstanceOf(Date);
+      expect(parseLoanDateValue('2025-01-15')).toBeInstanceOf(Date);
     });
   });
 });

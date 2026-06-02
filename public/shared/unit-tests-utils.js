@@ -139,3 +139,166 @@ export function descriptionNeedsMetadataRefresh(desc) {
   if (/\[[^\]]+\]/.test(d)) return true;
   return false;
 }
+
+/** Supported COMPARE modes (browser grid + headless runner). */
+export const COMPARE_MODES = [
+  'equals',
+  'approx',
+  'date',
+  'contains',
+  'regex',
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'not',
+];
+
+/**
+ * Normalize compare mode from row metadata or operator column.
+ * @param {*} raw
+ * @returns {string}
+ */
+export function normalizeCompareMode(raw) {
+  if (!raw) return 'equals';
+  const cleaned = String(raw).toLowerCase().trim();
+  if (['=', 'eq', 'equals', 'equal'].includes(cleaned)) return 'equals';
+  if (['approx', 'approximately', '~'].includes(cleaned)) return 'approx';
+  if (['date', 'dates'].includes(cleaned)) return 'date';
+  if (['contains', 'include', 'includes'].includes(cleaned)) return 'contains';
+  if (['regex', 'matches', 'match'].includes(cleaned)) return 'regex';
+  if (['gt', '>'].includes(cleaned)) return 'gt';
+  if (['gte', '>='].includes(cleaned)) return 'gte';
+  if (['lt', '<'].includes(cleaned)) return 'lt';
+  if (['lte', '<='].includes(cleaned)) return 'lte';
+  if (['not', 'neq', '!='].includes(cleaned)) return 'not';
+  if (COMPARE_MODES.includes(cleaned)) return cleaned;
+  return 'equals';
+}
+
+/**
+ * Resolve compare mode for a grid row (optional CompareMode / Operator columns).
+ * @param {Record<string, *>} [row]
+ */
+export function getCompareModeFromRow(row) {
+  if (!row || typeof row !== 'object') return 'equals';
+  const keys = Object.keys(row);
+  const find = (names) => {
+    for (const name of names) {
+      const hit = keys.find((k) => String(k).toLowerCase().trim() === name);
+      if (hit && row[hit] != null && String(row[hit]).trim() !== '') {
+        return normalizeCompareMode(row[hit]);
+      }
+    }
+    return null;
+  };
+  return (
+    find(['comparemode', 'compare mode', 'compare_mode']) ||
+    find(['operator', 'op', 'comparison']) ||
+    'equals'
+  );
+}
+
+function getCalcMath() {
+  if (typeof globalThis !== 'undefined' && globalThis.calcMath) return globalThis.calcMath;
+  return null;
+}
+
+function legacyEqualsMatch(actual, expected) {
+  const expectedStr = expected === null || expected === undefined ? '' : String(expected).trim();
+  const actualStr = actual === null || actual === undefined ? '' : String(actual).trim();
+  const expectedBlank = isBlankForTest(expectedStr);
+  const actualBlank = isBlankForTest(actualStr);
+  if (expectedBlank && actualBlank) return true;
+  if (expectedStr === actualStr) return true;
+  const numExpected = Number(expectedStr);
+  const numActual = Number(actualStr);
+  const bothNumeric =
+    actualStr !== '' &&
+    expectedStr !== '' &&
+    !Number.isNaN(numExpected) &&
+    !Number.isNaN(numActual);
+  if (bothNumeric && numExpected === numActual) return true;
+  if (expectedStr.toLowerCase() === actualStr.toLowerCase()) return true;
+  return false;
+}
+
+/**
+ * Shared COMPARE semantics for unit-tests.js and run-finance-unit-tests.js.
+ * @param {*} actual
+ * @param {*} expected
+ * @param {string} [mode] - equals | approx | date | contains | regex | gt | gte | lt | lte | not
+ * @param {{ epsilon?: number }} [opts]
+ * @returns {boolean}
+ */
+export function compareValues(actual, expected, mode = 'equals', opts = {}) {
+  const m = normalizeCompareMode(mode);
+  const calcMath = getCalcMath();
+
+  if (m === 'equals') {
+    return legacyEqualsMatch(actual, expected);
+  }
+
+  const actualStr = actual === null || actual === undefined ? '' : String(actual).trim();
+  const expectedStr = expected === null || expected === undefined ? '' : String(expected).trim();
+
+  if (m === 'contains') {
+    return actualStr.toLowerCase().includes(expectedStr.toLowerCase());
+  }
+
+  if (m === 'regex') {
+    if (!expectedStr) return false;
+    try {
+      return new RegExp(expectedStr).test(actualStr);
+    } catch {
+      return false;
+    }
+  }
+
+  if (m === 'date') {
+    const parse = calcMath?.parseUnitTestDateMs
+      ? (v) => calcMath.parseUnitTestDateMs(v)
+      : (v) => {
+          const s = String(v ?? '').trim();
+          if (!s) return null;
+          const t = Date.parse(s);
+          return Number.isNaN(t) ? null : t;
+        };
+    const aMs = parse(actual);
+    const eMs = parse(expected);
+    if (aMs == null && eMs == null) return isBlankForTest(actual) && isBlankForTest(expected);
+    return aMs != null && eMs != null && aMs === eMs;
+  }
+
+  if (m === 'approx') {
+    if (calcMath?.approxEqual) {
+      return calcMath.approxEqual(actual, expected, opts);
+    }
+    const epsilon = opts.epsilon ?? 0.005;
+    const a = Number(actualStr);
+    const b = Number(expectedStr);
+    if (Number.isNaN(a) || Number.isNaN(b)) return false;
+    return Math.abs(a - b) <= epsilon;
+  }
+
+  const numActual = Number(coerce(actual));
+  const numExpected = Number(coerce(expected));
+  if (Number.isNaN(numActual) || Number.isNaN(numExpected)) {
+    if (m === 'not') return actualStr !== expectedStr;
+    return false;
+  }
+  switch (m) {
+    case 'gt':
+      return numActual > numExpected;
+    case 'gte':
+      return numActual >= numExpected;
+    case 'lt':
+      return numActual < numExpected;
+    case 'lte':
+      return numActual <= numExpected;
+    case 'not':
+      return numActual !== numExpected;
+    default:
+      return legacyEqualsMatch(actual, expected);
+  }
+}

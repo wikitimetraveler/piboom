@@ -132,7 +132,7 @@ UCSD mounts are seeded from `data/hazard-webcam-seeds.json`. Each row stores `im
 
 UI: [`public/finance/disasters-webcams.html`](../public/finance/disasters-webcams.html) (legacy [`disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html) redirects with `?state=CA&hazard=fire&source=alertcalifornia`).
 
-**Address search:** Google Places autocomplete on the catalog page centers the map, draws a radius circle, and loads nearest mounts via `GET /api/disasters/cameras?nearLat=&nearLng=&radiusMiles=`. Deep links: `?lat=&lng=&radius=&address=`. Alaska volcano preset: `?state=AK&hazard=volcano`. If client Google geocode fails, search falls back to `GET /api/disasters/geocode-address?q=` (Mapbox/Nominatim via `geocodeAddressFree`; camera ingest geocode cache unchanged).
+**Address search:** Google Places autocomplete on the catalog page centers the map, draws a radius circle, and loads nearest mounts via `GET /api/disasters/cameras?nearLat=&nearLng=&radiusMiles=`. Deep links: `?lat=&lng=&radius=&address=`; camera by slug: `disasters-webcams.html?camera=walton_lighthouse` (also `?q=lighthouse` for name search). Alaska volcano preset: `?state=AK&hazard=volcano`. If client Google geocode fails, search falls back to `GET /api/disasters/geocode-address?q=` (Mapbox/Nominatim via `geocodeAddressFree`; camera ingest geocode cache unchanged).
 
 ## Daily Refresh
 

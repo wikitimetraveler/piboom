@@ -5,7 +5,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import ExcelJS from 'exceljs';
-import { getFieldPath, coerce as coerceUtil } from '../public/shared/unit-tests-utils.js';
+import { getFieldPath, coerce as coerceUtil, compareValues, normalizeCompareMode } from '../public/shared/unit-tests-utils.js';
+import '../public/shared/calcEngineLibrary.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -15,20 +16,11 @@ const headerAliases = {
   expected: ['expected', 'expected value', 'expectedvalue', 'value', 'calculation', 'calc', 'set'],
 };
 
-const operators = {
-  equals: (actual, expected) => actual === expected,
-  contains: (actual, expected) =>
-    typeof actual === 'string' && typeof expected === 'string' && actual.includes(expected),
-  gt: (actual, expected) => Number(actual) > Number(expected),
-  gte: (actual, expected) => Number(actual) >= Number(expected),
-  lt: (actual, expected) => Number(actual) < Number(expected),
-  lte: (actual, expected) => Number(actual) <= Number(expected),
-  not: (actual, expected) => actual !== expected,
-  regex: (actual, expected) => {
-    if (typeof actual !== 'string') return false;
-    return new RegExp(expected).test(actual);
-  },
-};
+/** @deprecated Use compareValues from unit-tests-utils — kept as alias for clarity. */
+function evaluateCompare(actual, expected, operator) {
+  const mode = normalizeCompareMode(operator);
+  return compareValues(actual, expected, mode);
+}
 
 function normalizeHeaderValue(value) {
   return String(value || '').toLowerCase().trim();
@@ -286,8 +278,7 @@ async function run() {
       const actual = getValueByPath(loan, testCase.fieldPath);
       const expected = coerce(testCase.expected);
       const actualValue = coerce(actual);
-      const evaluator = operators[testCase.operator] || operators.equals;
-      const ok = evaluator(actualValue, expected);
+      const ok = evaluateCompare(actualValue, expected, testCase.operator);
       if (ok) {
         passed += 1;
         if (verbose) {

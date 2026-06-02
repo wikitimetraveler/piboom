@@ -195,6 +195,15 @@
 
       <div class="card">
         <div class="card-body">
+          <div class="row g-2 align-items-end mb-3">
+            <div class="col-md-5">
+              <label class="form-label small fw-semibold mb-1" for="hwNameSearch"><i class="bi bi-search me-1"></i>Search by name</label>
+              <input type="text" id="hwNameSearch" class="form-control form-control-sm" placeholder="e.g. lighthouse, walton_lighthouse…" autocomplete="off">
+            </div>
+            <div class="col-md-7">
+              <p class="small text-muted mb-0">Filters the table and map. Deep link: <code>?camera=walton_lighthouse</code></p>
+            </div>
+          </div>
           <table id="camerasTable" class="table table-striped table-sm w-100">
             <thead>
               <tr id="camerasTableHead">
@@ -204,7 +213,7 @@
                 <th>State</th>
                 <th>Media</th>
                 <th>Distance (mi)</th>
-                <th></th>
+                <th>Feed</th>
               </tr>
             </thead>
             <tbody></tbody>
@@ -273,6 +282,10 @@
         let lastFilterKey = '';
         let filterDebounceTimer = null;
         let cameraMarkerRegistry = {};
+        let nameSearchQuery = '';
+        let urlCameraSlug = '';
+        let deepLinkAutoOpened = false;
+        let highlightCameraKey = null;
 
         function centerPinIcon() {
           return {
@@ -303,6 +316,8 @@
           const state = params.get('state');
           const hazard = params.get('hazard');
           const source = params.get('source');
+          const camera = params.get('camera');
+          const q = params.get('q');
 
           if (source) {
             document.getElementById('sourceFilter').value = source;
@@ -317,9 +332,29 @@
             });
           }
 
+          if (camera) {
+            urlCameraSlug = String(camera).trim();
+            nameSearchQuery = urlCameraSlug;
+            const nameEl = document.getElementById('hwNameSearch');
+            if (nameEl) nameEl.value = urlCameraSlug;
+          } else if (q) {
+            nameSearchQuery = String(q).trim();
+            const nameEl = document.getElementById('hwNameSearch');
+            if (nameEl) nameEl.value = nameSearchQuery;
+          }
+
           if (state?.toUpperCase() === 'CA' && hazard === 'fire') {
             document.getElementById('caFirePresetBanner')?.classList.remove('d-none');
           }
+        }
+
+        function getDisplayCameras() {
+          if (!DCF || !nameSearchQuery) return allCameras;
+          return DCF.filterCamerasByNameQuery(allCameras, nameSearchQuery);
+        }
+
+        function lighthouseBadgeFor(camera) {
+          return DCF && DCF.isLighthouseWebcam(camera) ? DCF.lighthouseBadgeHtml() : '';
         }
 
         function currentFilterKey() {
@@ -524,20 +559,21 @@
 
             const rank = index + 1;
             const rankClass = rank <= 3 ? ` rank-${rank}` : '';
-            const name = DCF ? DCF.escapeHtml(camera.title || camera.name || 'Camera') : (camera.title || '').replace(/</g, '&lt;');
+            const name = DCF ? DCF.escapeHtml(DCF.getCameraDisplayName(camera) || 'Camera') : (camera.title || '').replace(/</g, '&lt;');
             const loc = DCF ? DCF.escapeHtml([camera.county_name, camera.state_abbr].filter(Boolean).join(', ') || '—') : '—';
             const src = DCF ? DCF.escapeHtml(camera.source || '') : (camera.source || '');
             const dist = DCF ? DCF.formatCameraDistanceMi(camera) : (camera.distance_miles != null ? camera.distance_miles + ' mi' : '—');
+            const lhBadge = lighthouseBadgeFor(camera);
 
             html += `<div class="nearest-item" data-camera-key="${key}">
               <div class="d-flex align-items-start gap-2">
                 <span class="rank-badge${rankClass}">${rank}</span>
                 <div class="flex-grow-1 min-w-0">
-                  <div class="fw-semibold small text-truncate">${name}</div>
+                  <div class="fw-semibold small text-truncate">${name}${lhBadge}</div>
                   <div class="text-muted small">${src ? src + ' · ' : ''}${loc} · ${dist}</div>
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-warning flex-shrink-0 nearest-view-btn" data-camera-key="${key}">
-                  <i class="bi-camera-video"></i>
+                  <i class="bi-camera-video"></i> View feed
                 </button>
               </div>
             </div>`;
@@ -563,19 +599,23 @@
         function renderTable(cameras, geoMode) {
           const tbody = document.querySelector('#camerasTable tbody');
           tbody.innerHTML = '';
+          highlightCameraKey = null;
           cameras.forEach((r, i) => {
             const key = 'table_' + i;
             window.cameraDataStore[key] = r;
             const dist = r.distance_miles != null ? r.distance_miles : '—';
+            const displayName = DCF ? DCF.escapeHtml(DCF.getCameraDisplayName(r) || 'Camera') : (r.title || '').replace(/</g, '&lt;');
+            const lhBadge = lighthouseBadgeFor(r);
             const tr = document.createElement('tr');
+            tr.dataset.cameraKey = key;
             tr.innerHTML = `
-              <td>${(r.title || '').replace(/</g, '&lt;')}</td>
+              <td>${displayName}${lhBadge}</td>
               <td>${(r.source || '').replace(/</g, '&lt;')}</td>
               <td>${(r.county_name || '—').replace(/</g, '&lt;')}</td>
               <td>${r.state_abbr || '—'}</td>
               <td>${(r.media_type || '—').replace(/</g, '&lt;')}</td>
               <td>${dist}</td>
-              <td><button type="button" class="btn btn-sm btn-warning" data-camera-key="${key}"><i class="bi-camera-video"></i></button></td>`;
+              <td><button type="button" class="btn btn-sm btn-warning" data-camera-key="${key}"><i class="bi-camera-video"></i> View feed</button></td>`;
             tbody.appendChild(tr);
           });
 
@@ -591,6 +631,51 @@
             const key = $(this).data('camera-key');
             if (window.cameraDataStore[key]) window.showCameraViewer(window.cameraDataStore[key]);
           });
+        }
+
+        function applyDeepLinkCameraFocus(displayCameras) {
+          if (!urlCameraSlug || !DCF) return;
+          const matches = DCF.findCameraByQuery(displayCameras, urlCameraSlug);
+          if (!matches.length) return;
+
+          const target = matches.length === 1
+            ? matches[0]
+            : matches.find((c) => String(c.source_id || '').toLowerCase() === urlCameraSlug.toLowerCase()) || matches[0];
+
+          const key = Object.keys(window.cameraDataStore || {}).find((k) => {
+            const c = window.cameraDataStore[k];
+            return c === target
+              || (c?.source_id && target?.source_id && String(c.source_id) === String(target.source_id));
+          });
+          if (!key) return;
+
+          highlightCameraKey = key;
+          const row = document.querySelector(`#camerasTable tbody tr[data-camera-key="${key}"]`);
+          if (row) {
+            row.classList.add('table-warning');
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+
+          if (!deepLinkAutoOpened && typeof window.showCameraViewer === 'function') {
+            deepLinkAutoOpened = true;
+            window.showCameraViewer(target);
+          }
+        }
+
+        function refreshCameraViews() {
+          const displayCameras = getDisplayCameras();
+          const geo = HWS.getState();
+          const geoMode = geo.active && Number.isFinite(geo.lat) && Number.isFinite(geo.lng);
+          const radiusMiles = getRadiusMiles();
+          renderMap(displayCameras, geoMode ? geo : null, radiusMiles);
+          renderNearestList(displayCameras, geoMode ? geo : null, radiusMiles);
+          renderTable(displayCameras, geoMode);
+          applyDeepLinkCameraFocus(displayCameras);
+          const total = allCameras.length;
+          const shown = displayCameras.length;
+          document.getElementById('cameraCount').textContent = nameSearchQuery
+            ? shown + ' matching · ' + total + ' loaded'
+            : shown + ' shown · ' + total + ' total';
         }
 
         async function loadStats() {
@@ -652,7 +737,6 @@
             }
 
             allCameras = cameras;
-            document.getElementById('cameraCount').textContent = allCameras.length + ' shown · ' + total + ' total';
 
             if (geoMode) {
               setStatus(allCameras.length ? `Found ${allCameras.length} webcam${allCameras.length === 1 ? '' : 's'} nearby.` : 'No webcams in this radius.', allCameras.length ? 'ok' : 'error');
@@ -661,9 +745,7 @@
               clearGeoOverlays();
             }
 
-            renderMap(allCameras, geoMode ? geo : null, radiusMiles);
-            renderNearestList(allCameras, geoMode ? geo : null, radiusMiles);
-            renderTable(allCameras, geoMode);
+            refreshCameraViews();
             await loadStats();
             rememberFilterKey();
           } catch (e) {
@@ -721,6 +803,14 @@
         });
         document.getElementById('applyFilterBtn').addEventListener('click', loadCameras);
         document.getElementById('refreshCamerasBtn').addEventListener('click', refreshCameras);
+
+        const hwNameSearchEl = document.getElementById('hwNameSearch');
+        if (hwNameSearchEl) {
+          hwNameSearchEl.addEventListener('input', () => {
+            nameSearchQuery = hwNameSearchEl.value.trim();
+            if (allCameras.length) refreshCameraViews();
+          });
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
           initMap();

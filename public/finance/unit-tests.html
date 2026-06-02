@@ -164,6 +164,7 @@
       .ag-theme-alpine .ag-header-cell.test-scenario-column {
         background-color: rgba(74, 144, 164, 0.12) !important;
         font-weight: 600;
+        cursor: context-menu;
       }
 
       .ag-theme-alpine .ag-cell.test-scenario-cell {
@@ -426,224 +427,6 @@
         margin-top: 0.25rem;
       }
 
-      /* Test Descriptions UI – flip cards */
-      .test-descriptions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 0.75rem;
-        margin-top: 0.5rem;
-      }
-
-      .test-description-card {
-        perspective: 600px;
-        min-height: 180px;
-      }
-
-      .scenario-card-inner {
-        position: relative;
-        width: 100%;
-        min-height: 180px;
-        transition: transform 0.35s ease;
-        transform-style: preserve-3d;
-      }
-
-      .test-description-card.flipped .scenario-card-inner {
-        transform: rotateY(180deg);
-      }
-
-      .scenario-card-face {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        backface-visibility: hidden;
-        -webkit-backface-visibility: hidden;
-        border-radius: 8px;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-
-      .scenario-card-front {
-        background: linear-gradient(135deg, rgba(74, 144, 164, 0.08) 0%, rgba(74, 144, 164, 0.04) 100%);
-        border: 1px solid rgba(74, 144, 164, 0.2);
-        padding: 0.65rem 0.85rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .scenario-card-front:hover {
-        box-shadow: 0 4px 12px rgba(74, 144, 164, 0.12);
-        border-color: var(--zen-primary);
-      }
-
-      .test-description-card.test-scenario-active .scenario-card-front {
-        border-color: rgba(255, 193, 7, 0.8);
-        box-shadow: 0 4px 12px rgba(255, 193, 7, 0.25);
-        background: linear-gradient(135deg, rgba(255, 193, 7, 0.12) 0%, rgba(74, 144, 164, 0.06) 100%);
-      }
-
-      .scenario-card-front::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 3px;
-        height: 100%;
-        background: linear-gradient(180deg, var(--zen-primary) 0%, rgba(74, 144, 164, 0.6) 100%);
-      }
-
-      .test-description-card.test-scenario-active .scenario-card-front::before {
-        background: linear-gradient(180deg, rgba(255, 193, 7, 0.9) 0%, rgba(255, 193, 7, 0.6) 100%);
-        width: 4px;
-      }
-
-      .scenario-card-header {
-        display: flex;
-        align-items: flex-start;
-        gap: 0.5rem;
-      }
-
-      .scenario-card-header .ms-auto {
-        margin-left: auto;
-        flex-shrink: 0;
-      }
-
-      .scenario-edit-toggle {
-        color: var(--zen-primary) !important;
-        font-weight: 600;
-        border: 1px solid rgba(74, 144, 164, 0.3);
-        border-radius: 6px;
-        padding: 0.25rem 0.5rem !important;
-        background: rgba(74, 144, 164, 0.08);
-      }
-      .scenario-edit-toggle:hover {
-        background: rgba(74, 144, 164, 0.18);
-        border-color: var(--zen-primary);
-        color: #1a2856 !important;
-      }
-
-      .test-number-badge {
-        flex-shrink: 0;
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-        background: linear-gradient(135deg, var(--zen-primary) 0%, rgba(74, 144, 164, 0.8) 100%);
-        color: white;
-        font-weight: 700;
-        font-size: 0.7rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 6px rgba(74, 144, 164, 0.25);
-      }
-
-      .test-description-text {
-        flex: 1;
-        color: #1a2856;
-        font-size: 0.85rem;
-        line-height: 1.4;
-        font-weight: 500;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        min-height: 0;
-      }
-
-      .scenario-card-actions {
-        margin-top: auto;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.4rem;
-        align-items: center;
-      }
-
-      .scenario-copy-to-next-btn {
-        font-size: 0.75rem;
-        padding: 0.3rem 0.5rem;
-      }
-
-      .scenario-run-btn {
-        padding: 0.4rem 0.75rem;
-        font-size: 0.8rem;
-        font-weight: 600;
-        border-radius: 6px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.3rem;
-        background: linear-gradient(135deg, var(--zen-primary) 0%, rgba(74, 144, 164, 0.85) 100%);
-        border: none;
-        color: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .scenario-run-btn:hover {
-        background: linear-gradient(135deg, #3d7a8a 0%, var(--zen-primary) 100%);
-        transform: translateY(-1px);
-        box-shadow: 0 2px 8px rgba(74, 144, 164, 0.35);
-      }
-
-      .scenario-card-back {
-        transform: rotateY(180deg);
-        background: #fff;
-        border: 1px solid rgba(74, 144, 164, 0.25);
-        padding: 0.75rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-      }
-
-      .scenario-card-back-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 0.25rem;
-      }
-
-      .scenario-flip-back-btn {
-        font-size: 0.8rem;
-        padding: 0.2rem 0.5rem;
-        cursor: pointer;
-        color: var(--zen-primary);
-        background: none;
-        border: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-      }
-
-      .scenario-flip-back-btn:hover {
-        text-decoration: underline;
-      }
-
-      .scenario-card-back textarea {
-        flex: 1;
-        min-height: 56px;
-        font-size: 0.8rem;
-        resize: none;
-        border-radius: 6px;
-        border: 1px solid rgba(74, 144, 164, 0.3);
-        padding: 0.4rem;
-      }
-
-      .scenario-card-back textarea:focus {
-        border-color: var(--zen-primary);
-        outline: none;
-        box-shadow: 0 0 0 2px rgba(74, 144, 164, 0.2);
-      }
-
-      .scenario-card-back-actions {
-        display: flex;
-        gap: 0.4rem;
-        justify-content: flex-end;
-      }
-
-      .scenario-card-back-actions .btn-sm {
-        font-size: 0.75rem;
-      }
-
       .tested-by-label {
         font-size: 0.75rem;
         color: var(--zen-muted);
@@ -692,10 +475,6 @@
         background: var(--zen-card-bg) !important;
       }
 
-      .unit-tests-qa-highlights {
-        border-left-color: var(--zen-primary, #4a90a4) !important;
-      }
-
       .unit-tests-main {
         padding-top: 1.25rem;
       }
@@ -710,11 +489,37 @@
         margin-bottom: 0;
         border-top: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
       }
+      .unit-tests-story-progress {
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(74, 144, 164, 0.15);
+        overflow: hidden;
+        margin-bottom: 0.45rem;
+      }
+      .unit-tests-story-progress-fill {
+        height: 100%;
+        width: 0;
+        background: var(--zen-primary, #4a90a4);
+        border-radius: 999px;
+        transition: width 0.35s ease;
+      }
+      .unit-tests-story-finished-actions {
+        pointer-events: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+        margin-top: 0.5rem;
+      }
+      body.unit-tests-night-theme .unit-tests-story-progress {
+        background: rgba(255, 255, 255, 0.12);
+      }
+      body.unit-tests-night-theme .unit-tests-story-progress-fill {
+        background: #38bdf8;
+      }
       .unit-tests-story-mode {
         margin-bottom: 1.5rem;
         scroll-margin-top: 5rem;
       }
-      #collapseTestScenarios,
       #collapseTestGrid,
       #collapseOverallSignOff,
       #collapseUnitTestData {
@@ -776,14 +581,20 @@
         position: fixed;
         margin-top: 0;
         z-index: 1080;
-        left: 50%;
-        transform: translateX(-50%);
-        top: clamp(72px, 18vh, 160px);
+        left: auto;
+        right: auto;
+        top: auto;
+        transform: none;
         max-width: min(22rem, calc(100vw - 24px));
-        width: min(22rem, calc(100vw - 24px));
+        width: auto;
         box-shadow: 0 14px 40px rgba(15, 23, 42, 0.12);
         pointer-events: none;
-        backdrop-filter: blur(4px);
+        backdrop-filter: blur(6px);
+      }
+      @media (max-width: 576px) {
+        .unit-tests-story-overlay.unit-tests-story-overlay--floating {
+          max-width: calc(100vw - 18px);
+        }
       }
 
       .unit-tests-story-overlay-head {
@@ -804,12 +615,36 @@
       }
 
       .unit-tests-story-scene-title {
+        font-family: var(--lf-serif, Georgia, 'Times New Roman', serif);
         color: var(--text-dark, #1f2937);
+        font-size: clamp(0.95rem, 2vw, 1.15rem);
+        font-weight: 600;
+      }
+      .unit-tests-story-scene-progress {
+        font-size: 0.72rem;
+        color: var(--text-muted, #6b7280);
+        margin-bottom: 0.15rem;
       }
 
       .unit-tests-story-spotlight.section-card-header {
         box-shadow: inset 0 0 0 2px var(--zen-primary, #4a90a4);
         border-radius: 12px;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .unit-tests-story-spotlight.section-card-header {
+          animation: unit-tests-story-spotlight-pulse 1.6s ease-in-out 2;
+        }
+        .unit-tests-story-spotlight.btn {
+          animation: unit-tests-story-spotlight-btn-pulse 1.6s ease-in-out 2;
+        }
+      }
+      @keyframes unit-tests-story-spotlight-pulse {
+        0%, 100% { box-shadow: inset 0 0 0 2px var(--zen-primary, #4a90a4); }
+        50% { box-shadow: inset 0 0 0 3px rgba(74, 144, 164, 0.55), 0 0 0 4px rgba(74, 144, 164, 0.12); }
+      }
+      @keyframes unit-tests-story-spotlight-btn-pulse {
+        0%, 100% { box-shadow: 0 0 0 2px var(--zen-primary, #4a90a4); }
+        50% { box-shadow: 0 0 0 3px rgba(74, 144, 164, 0.55), 0 0 0 6px rgba(74, 144, 164, 0.12); }
       }
 
       .unit-tests-story-spotlight.btn {
@@ -876,34 +711,6 @@
         border: 1px solid rgba(255, 193, 7, 0.3);
       }
 
-      /* Switch tools - always visible pills */
-      .tool-pills {
-        background: var(--white);
-        border: 1px solid var(--border-light);
-        border-radius: 12px;
-        padding: 0.75rem 1rem;
-        box-shadow: var(--shadow-sm);
-      }
-      .tool-pills .nav {
-        flex-wrap: wrap;
-        gap: 0.25rem;
-      }
-      .tool-pills .nav-link {
-        color: var(--text-muted);
-        font-weight: 500;
-        padding: 0.4rem 0.75rem;
-        border-radius: 8px;
-        transition: all 0.2s ease;
-      }
-      .tool-pills .nav-link:hover {
-        color: var(--primary-blue);
-        background: var(--ice-light);
-      }
-      .tool-pills .nav-link.active {
-        background: var(--primary-blue);
-        color: var(--white);
-      }
-
       .overall-signoff-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -963,12 +770,6 @@
         }
         100% {
           background-color: rgba(255, 193, 7, 0.3);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .test-descriptions-grid {
-          grid-template-columns: 1fr;
         }
       }
 
@@ -1268,6 +1069,27 @@
       .section-card-body {
         padding: 1.25rem 1.5rem;
         background: var(--zen-card-bg);
+      }
+
+      .section-card-body-flush {
+        padding: 0;
+        background: transparent;
+      }
+
+      #headingTestScenarios.section-card {
+        border: none;
+        box-shadow: none;
+        background: transparent;
+      }
+
+      #headingTestScenarios.section-card:hover {
+        box-shadow: none;
+        border-color: transparent;
+      }
+
+      .unit-tests-story-spotlight.section-card#headingTestScenarios {
+        box-shadow: inset 0 0 0 2px var(--zen-primary, #4a90a4);
+        border-radius: 12px;
       }
 
       .section-card-body.collapse:not(.show) {
@@ -1844,9 +1666,6 @@
       body.unit-tests-night-theme .btn-outline-secondary{border-color:#6b7280!important;color:#9ca3af!important}
       body.unit-tests-night-theme .btn-outline-secondary:hover{background:#6b7280!important;color:#f9fafb!important}
       body.unit-tests-night-theme .btn-primary,body.unit-tests-night-theme .btn-success{background:#059669!important;border-color:#059669!important}
-      body.unit-tests-night-theme .tool-pills{background:#4b5563!important;border-color:#6b7280!important}
-      body.unit-tests-night-theme .tool-pills .nav-link{color:#9ca3af!important}
-      body.unit-tests-night-theme .tool-pills .nav-link.active{background:#059669!important;color:#fff!important}
       body.unit-tests-night-theme .ag-theme-alpine{--ag-background-color:#374151!important;--ag-foreground-color:#f3f4f6!important;--ag-header-background-color:#4b5563!important;--ag-header-foreground-color:#f9fafb!important;--ag-odd-row-background-color:#374151!important;--ag-row-hover-color:#4b5563!important;--ag-border-color:#6b7280!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-root,body.unit-tests-night-theme .ag-theme-alpine .ag-body-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-center-cols-viewport,body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-cell,body.unit-tests-night-theme .ag-theme-alpine .ag-row{background:#374151!important;color:#f3f4f6!important;border-color:#6b7280!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-header,body.unit-tests-night-theme .ag-theme-alpine .ag-header-cell{background:#4b5563!important}
@@ -1856,17 +1675,6 @@
       body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-pass{background:rgba(52,211,153,0.2)!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-cell.test-scenario-cell.cell-fail{background:rgba(248,113,113,0.3)!important}
       body.unit-tests-night-theme .ag-theme-alpine .ag-row:hover .ag-cell.test-scenario-cell.cell-fail{background:rgba(248,113,113,0.4)!important}
-      body.unit-tests-night-theme .test-description-card .scenario-card-front,body.unit-tests-night-theme .test-description-card .scenario-card-back{background:#6b7280!important;border:1px solid rgba(255,255,255,0.12)!important;color:#f9fafb!important;box-shadow:0 1px 3px rgba(0,0,0,0.15)!important}
-      body.unit-tests-night-theme .test-description-card .test-description-text{color:#f9fafb!important}
-      body.unit-tests-night-theme .test-description-card .scenario-edit-toggle{color:#38bdf8!important;background:rgba(56,189,248,0.15)!important;border-color:rgba(56,189,248,0.4)!important}
-      body.unit-tests-night-theme .test-description-card .scenario-edit-toggle:hover{background:rgba(56,189,248,0.25)!important;color:#7dd3fc!important}
-      body.unit-tests-night-theme .test-description-card .scenario-run-btn{background:linear-gradient(135deg,#059669 0%,#10b981 100%)!important;color:#fff!important}
-      body.unit-tests-night-theme .test-description-card .scenario-run-btn:hover{background:linear-gradient(135deg,#10b981 0%,#34d399 100%)!important;box-shadow:0 2px 8px rgba(5,150,105,0.35)!important}
-      body.unit-tests-night-theme .test-description-card .test-number-badge{background:linear-gradient(135deg,#059669 0%,#10b981 100%)!important;color:#fff!important;box-shadow:0 2px 6px rgba(5,150,105,0.3)!important}
-      body.unit-tests-night-theme .test-description-card.test-scenario-active .scenario-card-front{border-color:rgba(251,191,36,0.6)!important;box-shadow:0 4px 12px rgba(251,191,36,0.2)!important;background:linear-gradient(135deg,rgba(251,191,36,0.15) 0%,rgba(251,191,36,0.06) 100%)!important}
-      body.unit-tests-night-theme .test-description-card.test-scenario-active .scenario-card-front::before{background:linear-gradient(180deg,rgba(251,191,36,0.8) 0%,rgba(251,191,36,0.5) 100%)!important}
-      body.unit-tests-night-theme .scenario-card-back textarea{background:#4b5563!important;border-color:#6b7280!important;color:#f3f4f6!important}
-      body.unit-tests-night-theme .scenario-flip-back-btn{color:#38bdf8!important}
       body.unit-tests-night-theme .scenario-context-menu{background:#4b5563!important;border-color:#6b7280!important;box-shadow:0 4px 12px rgba(0,0,0,0.2)!important}
       body.unit-tests-night-theme .scenario-context-menu button{color:#f9fafb!important}
       body.unit-tests-night-theme .scenario-context-menu button:hover{background:#6b7280!important}
@@ -2026,16 +1834,6 @@
         color: #d1d5db !important;
       }
 
-      /* Compact tool switcher + command bar */
-      .tool-pills-compact .tool-pills-expanded-wrap.d-none {
-        display: none !important;
-      }
-      .tool-pills-compact.tool-pills-show-all .tool-pills-compact-row {
-        display: none !important;
-      }
-      .tool-pills-compact.tool-pills-show-all .tool-pills-expanded-wrap {
-        display: block !important;
-      }
       .unit-tests-command-bar {
         padding: 0.35rem 0;
       }
@@ -2050,16 +1848,6 @@
         text-overflow: ellipsis;
         vertical-align: middle;
       }
-      .unit-tests-workflow-tips-block {
-        margin-top: 0.65rem;
-        padding-top: 0.65rem;
-        border-top: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
-      }
-      .unit-tests-workflow-tips-block.is-dismissed {
-        display: none !important;
-      }
-      body.unit-tests-focus-mode .tool-pills,
-      body.unit-tests-focus-mode .unit-tests-workflow-tips-block,
       body.unit-tests-focus-mode .unit-tests-story-mode {
         display: none !important;
       }
@@ -2108,51 +1896,6 @@
 
     <div class="main-content">
       <div class="container">
-        <!-- Switch tools — compact dropdown (optional expand to pills) -->
-        <div class="tool-pills tool-pills-compact d-flex flex-column mb-3" id="unitTestsToolPills">
-          <div class="tool-pills-compact-row d-flex flex-wrap align-items-center gap-2">
-            <span class="text-muted small fw-semibold"><i class="bi-grid-3x3-gap-fill text-primary me-1"></i>Worksheets</span>
-            <div class="dropdown">
-              <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="unitTestsToolsDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                Other tools
-              </button>
-              <ul class="dropdown-menu dropdown-menu-sm shadow-sm" aria-labelledby="unitTestsToolsDropdownBtn">
-                <li><span class="dropdown-item-text small text-muted">Unit Test (current)</span></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="tool2.html"><i class="bi-code-slash me-2"></i>Parser</a></li>
-                <li><a class="dropdown-item" href="tool3.html"><i class="bi-globe me-2"></i>Mashup</a></li>
-                <li><a class="dropdown-item" href="tool4.html"><i class="bi-gear me-2"></i>Automator</a></li>
-                <li><a class="dropdown-item" href="tool5.html"><i class="bi-rulers me-2"></i>Ruler</a></li>
-                <li><a class="dropdown-item" href="tool6.html"><i class="bi-arrow-repeat me-2"></i>Transformer</a></li>
-                <li><a class="dropdown-item" href="tool8.html"><i class="bi-magic me-2"></i>Alchemist</a></li>
-                <li><a class="dropdown-item" href="tool9.html"><i class="bi-camera-reels me-2"></i>Screen Test</a></li>
-              </ul>
-            </div>
-            <button type="button" class="btn btn-link btn-sm text-muted px-1" id="unitTestsShowAllToolsBtn" aria-pressed="false">
-              Show all tools
-            </button>
-          </div>
-          <div class="tool-pills-expanded-wrap d-none">
-            <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between">
-              <div class="d-flex align-items-center mb-2 mb-lg-0 text-muted">
-                <i class="bi-grid-3x3-gap-fill text-primary me-2"></i>
-                <span class="fw-bold">Switch tools</span>
-              </div>
-              <ul class="nav nav-pills" id="toolPillNav">
-            <li class="nav-item"><a class="nav-link active" href="unit-tests.html"><i class="bi-check2-circle me-1"></i>Unit Test</a></li>
-            <li class="nav-item"><a class="nav-link" href="tool2.html"><i class="bi-code-slash me-1"></i>Parser</a></li>
-            <li class="nav-item"><a class="nav-link" href="tool3.html"><i class="bi-globe me-1"></i>Mashup</a></li>
-            <li class="nav-item"><a class="nav-link" href="tool4.html"><i class="bi-gear me-1"></i>Automator</a></li>
-            <li class="nav-item"><a class="nav-link" href="tool5.html"><i class="bi-rulers me-1"></i>Ruler</a></li>
-            <li class="nav-item"><a class="nav-link" href="tool6.html"><i class="bi-arrow-repeat me-1"></i>Transformer</a></li>
-            <li class="nav-item"><a class="nav-link" href="tool8.html"><i class="bi-magic me-1"></i>Alchemist</a></li>
-            <li class="nav-item"><a class="nav-link" href="tool9.html"><i class="bi-camera-reels me-1"></i>Screen Test</a></li>
-              </ul>
-            </div>
-            <button type="button" class="btn btn-link btn-sm text-muted px-0 mt-1" id="unitTestsHideAllToolsBtn">Hide tool pills</button>
-          </div>
-        </div>
-
         <!-- Excel Unit Tests — power lane: Generate + Download -->
         <div class="unit-tests-command-bar d-flex justify-content-between align-items-center flex-wrap gap-2" id="unitTestsCommandBar">
           <div class="d-flex align-items-center flex-wrap gap-2 min-w-0">
@@ -2178,7 +1921,7 @@
             <button type="button" class="btn btn-success btn-sm" id="exportExcelBtn" disabled title="Download the current test workbook as Excel">
               <i class="bi-file-earmark-excel me-1"></i>Download Excel
             </button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" id="unitTestsFocusModeBtn" aria-pressed="false" title="Focus layout: hide top tool switcher, tips, and story mode (left Workflow steps stay visible)">
+            <button type="button" class="btn btn-outline-secondary btn-sm" id="unitTestsFocusModeBtn" aria-pressed="false" title="Focus layout: hide story mode (section sidebar stays visible)">
               <i class="bi-arrows-angle-contract me-1"></i>Focus
             </button>
             <div class="dropdown">
@@ -2194,11 +1937,6 @@
                 <li>
                   <button type="button" class="dropdown-item" id="moreOpenTestLibraryBtn">
                     <i class="bi-folder2-open me-2"></i>Test Library
-                  </button>
-                </li>
-                <li>
-                  <button type="button" class="dropdown-item" id="moreShowWorkflowBtn">
-                    <i class="bi-list-columns me-2"></i>Show full workflow
                   </button>
                 </li>
                 <li><hr class="dropdown-divider" /></li>
@@ -2238,19 +1976,6 @@
             </div>
             <input type="file" id="libraryFileInput" accept=".xlsx" style="display: none;" />
             <button type="button" class="d-none" id="generateFromBRRuleBtn" tabindex="-1" aria-hidden="true">BR</button>
-          </div>
-        </div>
-
-        <div class="unit-tests-workflow-tips-block" id="unitTestsWorkflowTipsBlock">
-          <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
-            <button type="button" class="btn btn-link btn-sm text-muted px-0 text-decoration-none" data-bs-toggle="collapse" data-bs-target="#unitTestsWorkflowTipsCollapse" aria-expanded="false" aria-controls="unitTestsWorkflowTipsCollapse" id="unitTestsWorkflowTipsToggle">
-              <i class="bi-chevron-right me-1" id="unitTestsWorkflowTipsChevron"></i>Workflow tips
-            </button>
-            <span class="small text-muted">Full QA: scenarios → grid → run → sign-off.</span>
-            <button type="button" class="btn-close btn-sm" id="unitTestsWorkflowHintDismiss" aria-label="Dismiss workflow tips"></button>
-          </div>
-          <div class="collapse" id="unitTestsWorkflowTipsCollapse">
-            <p class="unit-tests-workflow-hint small text-muted mb-0 mt-2">Use <strong>Generate</strong> for a calculated custom field or BR rule, <strong>Download Excel</strong> when ready, or <strong>More → Upload</strong> for an existing workbook. Then follow: <strong>Step 1</strong> test scenarios, <strong>Step 2</strong> test grid, <strong>Step 3</strong> run tests (QA, loan GUID, execute), <strong>Step 4</strong> sign-off. Open <strong>Test Library</strong> from More or the sidebar.</p>
           </div>
         </div>
       </div>
@@ -2436,12 +2161,12 @@
             <nav class="section-sidebar" aria-label="Section navigation">
               <div class="section-sidebar-title">Workflow</div>
               <ul class="section-sidebar-nav" id="sectionSidebarNav">
-                <li><a href="#collapseTestScenarios" data-bs-target="#collapseTestScenarios" data-heading="headingTestScenarios"><i class="bi-1-circle"></i> Step 1: Test Scenarios</a></li>
+                <li><a href="#" data-workflow-action="generate" id="sidebarGenerate"><i class="bi-magic"></i> Generate</a></li>
                 <li><a href="#collapseSelectedField" data-bs-target="#collapseSelectedField" data-heading="headingSelectedField" id="sidebarSelectedField" style="display: none;"><i class="bi-input-cursor-text"></i> Selected Field</a></li>
                 <li><a href="#collapseLiveScenarioBuilder" data-bs-target="#collapseLiveScenarioBuilder" data-heading="headingLiveScenarioBuilder" id="sidebarLiveScenarioBuilder" style="display: none;"><i class="bi-calculator"></i> Live Scenario Builder</a></li>
-                <li><a href="#collapseTestGrid" data-bs-target="#collapseTestGrid" data-heading="headingTestGrid"><i class="bi-2-circle"></i> Step 2: Test Grid</a></li>
-                <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-3-circle"></i> Step 3: Run tests</a></li>
-                <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-4-circle"></i> Step 4: Sign-off</a></li>
+                <li><a href="#collapseTestGrid" data-bs-target="#collapseTestGrid" data-heading="headingTestGrid"><i class="bi-table"></i> Test Grid</a></li>
+                <li><a href="#collapseUnitTestData" data-bs-target="#collapseUnitTestData" data-heading="headingUnitTestData"><i class="bi-play-circle"></i> Run tests</a></li>
+                <li><a href="#collapseOverallSignOff" data-bs-target="#collapseOverallSignOff" data-heading="headingOverallSignOff"><i class="bi-check2-square"></i> Sign-off</a></li>
                 <li><a href="#collapseTestLibrary" data-bs-target="#collapseTestLibrary" data-heading="headingTestLibrary"><i class="bi-folder2-open"></i> Test Library</a></li>
                 <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Advanced</span></li>
                 <li><a href="#collapseLearnMode" data-bs-target="#collapseLearnMode" data-heading="headingLearnMode"><i class="bi-mortarboard"></i> Learn Mode</a></li>
@@ -2459,17 +2184,17 @@
                   <button type="button" class="btn btn-sm btn-outline-primary" id="unitTestsStoryToggle" aria-pressed="false">
                     Play highlight reel
                   </button>
-                  <button type="button" class="btn btn-sm btn-outline-secondary" id="unitTestsOfflineDemoBtn">
-                    Load offline demo (sample custom field)
-                  </button>
-                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="unitTestsOfflineDemoBtn">
+                  Load offline demo (sample custom field)
+                </button>
               </div>
-              <p class="small text-muted mb-2 mb-sm-1" id="unitTestsOfflineDemoDisclaimer">
-                If the grid has no data yet, <strong>Play highlight reel</strong> loads the offline sample workbook first (<strong>CUST11FV</strong> tax next-due rollup — SET / COMPARE rows and scenarios). It does not call Encompass or run live field calculations.
+              <p class="small text-muted mb-2" id="unitTestsOfflineDemoDisclaimer">
+                Highlight reel opens <strong>Generate &amp; load</strong> first—live <strong>CUST11FV</strong> when Encompass is connected, otherwise the offline sample field (same parser pipeline).
               </p>
+              </div>
               <p class="unit-tests-story-copy small text-muted mb-2">
-                HyperFrames-style reel: custom field → scenarios → grid → run tests (QA, GUID, execute) → sign-off &amp; library (when step intros are on).
-                <strong>Narrate scenes</strong> is on by default; uncheck for a silent reel. Same audio stack as Lane tools (<code>/shared/tts.js</code>). Runs once, no loop. <kbd>Escape</kbd> or <strong>Stop</strong> on the overlay ends playback.
+                Guided reel walks Generate → Test Grid → Run tests → Sign-off (plus library, Learn Mode, and voice when step intros are on).
+                Narration uses the same TTS stack as Lane tools. Press <kbd>Escape</kbd> or <strong>Stop</strong> on the caption to end playback.
               </p>
               <div class="unit-tests-story-options" role="group" aria-label="Story mode options">
                 <label class="unit-tests-story-option">
@@ -2480,16 +2205,6 @@
                   <input type="checkbox" id="unitTestsStoryNarrate" checked />
                   <span>Narrate scenes</span>
                 </label>
-              </div>
-              <div class="unit-tests-story-overlay d-none" id="unitTestsStoryOverlay" aria-live="polite">
-                <div class="unit-tests-story-overlay-head">
-                  <div class="unit-tests-story-overlay-body">
-                    <p class="unit-tests-story-scene-kicker mb-1 small text-uppercase text-muted" id="unitTestsStorySceneKicker"></p>
-                    <h2 class="unit-tests-story-scene-title h6 mb-1" id="unitTestsStorySceneTitle"></h2>
-                    <p class="unit-tests-story-scene-copy mb-0 small" id="unitTestsStorySceneCopy"></p>
-                  </div>
-                  <button type="button" class="btn btn-sm btn-outline-secondary unit-tests-story-stop-btn d-none" id="unitTestsStoryStopBtn" aria-label="Stop highlight reel">Stop</button>
-                </div>
               </div>
             </div>
           </section>
@@ -2621,17 +2336,6 @@
         <!-- Section Cards Container - multiple can stay open -->
         <div class="col-12 mb-4" id="accordionContainer">
           <div class="section-cards" id="testAccordion">
-            <!-- Test Scenarios -->
-            <div class="section-card section-card-hidden" data-collapse-target="collapseTestScenarios">
-              <div class="section-card-header collapsed" tabindex="0" id="headingTestScenarios" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestScenarios" aria-expanded="false" aria-controls="collapseTestScenarios">
-                <span class="section-title"><i class="bi-1-circle"></i> Step 1: Test Scenarios <span class="badge text-bg-primary ms-2" id="testScenariosCount"></span></span>
-                <i class="bi-chevron-down"></i>
-              </div>
-              <div id="collapseTestScenarios" class="collapse section-card-body" aria-labelledby="headingTestScenarios">
-                      <p class="text-muted mb-3"><small>Click a scenario card to select it, then <strong>Run</strong> in Step 3 (or on the card) to run that Test column only. Use <strong>Edit</strong> on a card to change its description.</small></p>
-                      <div id="testDescriptionsContainer" class="test-descriptions-grid"></div>
-              </div>
-            </div>
             <!-- Selected Field (when generated from custom field) — above Live Scenario Builder -->
             <div class="section-card section-card-hidden" id="selectedFieldAccordionCard" data-collapse-target="collapseSelectedField" style="display: none;">
               <div class="section-card-header collapsed" tabindex="0" id="headingSelectedField" role="button" data-bs-toggle="collapse" data-bs-target="#collapseSelectedField" aria-expanded="false" aria-controls="collapseSelectedField">
@@ -2711,7 +2415,7 @@
             <!-- Test Grid -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseTestGrid">
               <div class="section-card-header collapsed" tabindex="0" id="headingTestGrid" role="button" data-bs-toggle="collapse" data-bs-target="#collapseTestGrid" aria-expanded="false" aria-controls="collapseTestGrid">
-                <span class="section-title"><i class="bi-2-circle"></i> Step 2: Test Grid <span class="badge text-bg-info ms-2" id="testGridCount"></span></span>
+                <span class="section-title"><i class="bi-table"></i> Test Grid <span class="badge text-bg-info ms-2" id="testGridCount"></span></span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseTestGrid" class="collapse section-card-body" aria-labelledby="headingTestGrid">
@@ -2725,10 +2429,10 @@
                       </div>
               </div>
             </div>
-            <!-- Unit Test Data: Run tests - Step 3 (QA, GUID, execute; upload also in hero band above) -->
+            <!-- Unit Test Data: Run tests (QA, GUID, execute; upload also in hero band above) -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseUnitTestData">
               <div class="section-card-header collapsed" tabindex="0" id="headingUnitTestData" role="button" data-bs-toggle="collapse" data-bs-target="#collapseUnitTestData" aria-expanded="false" aria-controls="collapseUnitTestData">
-                <span class="section-title"><i class="bi-3-circle"></i> Step 3: Run tests / Unit Test Data</span>
+                <span class="section-title"><i class="bi-play-circle"></i> Run tests</span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseUnitTestData" class="collapse section-card-body" aria-labelledby="headingUnitTestData">
@@ -2742,18 +2446,6 @@
                             <i class="bi-upload me-1"></i>Upload Excel
                           </button>
                         </div>
-                      </div>
-                      <div id="unitTestsQaHighlightsCard" class="alert alert-light border-start border-4 rounded mb-3 unit-tests-qa-highlights" role="region" aria-label="QA highlights">
-                        <p class="fw-semibold text-dark mb-2"><i class="bi-patch-check-fill me-1 text-primary"></i>QA highlights</p>
-                        <ul class="small text-muted mb-2 ps-3">
-                          <li class="mb-1">Pick a scenario in the dropdown (or click a card), then <strong>Run</strong>—one Test column at a time. Use <strong>Run all scenarios</strong> in Advanced only when you need the full workbook.</li>
-                          <li class="mb-1">Runs are <strong>SET</strong> / <strong>COMPARE</strong> rows from your Excel-style grid against a loan GUID—upload, tune scenarios, run, sign off.</li>
-                          <li class="mb-1">Custom-field calcs use assignment form <code>[CX.FIELD] = expression</code>. The spreadsheet <code>=</code> at the very start is not part of Encompass—strip it when pasting.</li>
-                          <li class="mb-0">Sanity-check with <strong>Generate → From custom field</strong> and <strong>Live Scenario Builder</strong> when inputs are editable.</li>
-                        </ul>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" id="qaTipsListenBtn" aria-label="Listen to QA tips aloud">
-                          <i class="bi-volume-up me-1"></i>Listen to QA tips
-                        </button>
                       </div>
                       <!-- Wrapper keeps file info + action bar together so they are not overwritten by test results below -->
                       <div class="unit-test-data-header" id="unitTestDataHeader">
@@ -2859,7 +2551,7 @@
             <!-- Overall Test Sign-off -->
             <div class="section-card section-card-hidden" data-collapse-target="collapseOverallSignOff">
               <div class="section-card-header collapsed" tabindex="0" id="headingOverallSignOff" role="button" data-bs-toggle="collapse" data-bs-target="#collapseOverallSignOff" aria-expanded="false" aria-controls="collapseOverallSignOff">
-                <span class="section-title"><i class="bi-4-circle"></i> Step 4: Test Sign-off <span class="badge text-bg-success ms-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
+                <span class="section-title"><i class="bi-check2-square"></i> Test Sign-off <span class="badge text-bg-success ms-2" id="signOffCompleteBadge" style="display: none;">3/3</span></span>
                 <i class="bi-chevron-down"></i>
               </div>
               <div id="collapseOverallSignOff" class="collapse section-card-body" aria-labelledby="headingOverallSignOff">
@@ -2936,8 +2628,8 @@
       </div>
       <ul class="voice-command-list">
         <li>
-          <span>"Show scenarios"</span>
-          Opens Step 1 Test Scenarios.
+          <span>"Show scenarios"</span> / <span>"Show run tests"</span>
+          Opens Step 3 Run tests (scenario dropdown and pills).
         </li>
         <li>
           <span>"Show grid"</span>
@@ -2945,7 +2637,7 @@
         </li>
         <li>
           <span>"Show run tests"</span> / <span>"Open run tests"</span>
-          Opens Step 3 Run tests (QA highlights, loan GUID, execute).
+          Opens Step 3 Run tests (loan GUID, execute).
         </li>
         <li>
           <span>"Show sign-off"</span> / <span>"Open sign-off"</span>
@@ -2973,7 +2665,7 @@
         </li>
         <li>
           <span>"QA tips" / "Formula help"</span>
-          Opens Step 3 Run tests, expands QA highlights, reads calculation and workflow tips aloud.
+          Opens Step 3 Run tests and reads calculation and workflow tips aloud.
         </li>
         <li>
           <span>AI Speak button</span>
@@ -3005,7 +2697,11 @@
     <script src="/shared/encompassFieldTestValues.js"></script>
     <script type="module">
       import * as u from '/shared/unit-tests-utils.js';
+      import * as launch from '/shared/unit-tests-launch.js';
+      import * as storyScenes from '/shared/unit-tests-story-scenes.js';
       window.unitTestsUtils = u;
+      window.unitTestsLaunch = launch;
+      window.unitTestsStoryScenes = storyScenes;
     </script>
     <script src="/shared/tts.js"></script>
     <script src="/shared/voice-widget.js"></script>
@@ -3040,6 +2736,25 @@
         });
       })();
     </script>
+    <div class="unit-tests-story-overlay d-none" id="unitTestsStoryOverlay" aria-live="polite">
+      <div class="unit-tests-story-overlay-head">
+        <div class="unit-tests-story-overlay-body">
+          <p class="unit-tests-story-scene-progress mb-0" id="unitTestsStorySceneProgress" hidden></p>
+          <div class="unit-tests-story-progress" id="unitTestsStoryProgressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Highlight reel progress">
+            <div class="unit-tests-story-progress-fill" id="unitTestsStoryProgressFill"></div>
+          </div>
+          <p class="unit-tests-story-scene-kicker mb-1 small text-uppercase text-muted" id="unitTestsStorySceneKicker"></p>
+          <h2 class="unit-tests-story-scene-title h6 mb-1" id="unitTestsStorySceneTitle"></h2>
+          <p class="unit-tests-story-scene-copy mb-0 small" id="unitTestsStorySceneCopy"></p>
+          <div class="unit-tests-story-finished-actions d-none" id="unitTestsStoryFinishedActions">
+            <button type="button" class="btn btn-sm btn-outline-primary" id="unitTestsStoryReplayBtn">Replay</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="unitTestsStoryOpenGridBtn">Open Test Grid</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary unit-tests-story-stop-btn d-none" id="unitTestsStoryStopBtn" aria-label="Stop highlight reel">Stop</button>
+      </div>
+    </div>
+
     <script defer src="/finance/js/unit-tests.js"></script>
     <script defer src="/finance/js/unit-tests-story-mode.js"></script>
     <script defer src="/finance/js/unit-tests-ai.js"></script>

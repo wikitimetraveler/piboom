@@ -4,6 +4,8 @@
 **Duration:** 3–5 minutes  
 **Format:** Screen recording + voiceover or AI avatar
 
+**On-page copy:** Hero, onboarding, and highlight-reel scene text in `public/finance/unit-tests.html` and `public/shared/unit-tests-story-scenes.js` mirror this script for live demos.
+
 ---
 
 ## Intro (0:00–0:30)
