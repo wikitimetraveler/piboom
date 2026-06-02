@@ -12,11 +12,24 @@
 
   function injectEnvSwitcher() {
     if (document.getElementById('encompassEnvSwitcher')) return;
+    const mount = document.getElementById('encompassEnvSwitcherMount');
     const div = document.createElement('div');
     div.id = 'encompassEnvSwitcher';
-    div.style.cssText = 'position:fixed;top:70px;right:70px;z-index:999;background:#fff;border:1px solid #dee2e6;border-radius:8px;padding:8px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);font-size:0.85rem;';
-    div.innerHTML = '<label style="margin-right:6px;font-weight:600;">Env:</label><select id="encompassEnvSelectGlobal" style="padding:4px 8px;border-radius:4px;border:1px solid #ced4da;"><option value="correspondent">Correspondent</option><option value="retail">Retail</option></select>';
-    document.body.appendChild(div);
+    if (mount) {
+      div.className = 'encompass-env-switcher d-flex align-items-center gap-2';
+      div.innerHTML =
+        '<label class="small text-muted mb-0 fw-semibold" for="encompassEnvSelectGlobal">Env</label>' +
+        '<select id="encompassEnvSelectGlobal" class="form-select form-select-sm" style="width:auto;min-width:9.5rem;">' +
+        '<option value="correspondent">Correspondent</option><option value="retail">Retail</option></select>';
+    } else {
+      div.style.cssText =
+        'position:fixed;top:70px;right:70px;z-index:999;background:#fff;border:1px solid #dee2e6;border-radius:8px;padding:8px 12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);font-size:0.85rem;';
+      div.innerHTML =
+        '<label style="margin-right:6px;font-weight:600;">Env:</label>' +
+        '<select id="encompassEnvSelectGlobal" style="padding:4px 8px;border-radius:4px;border:1px solid #ced4da;">' +
+        '<option value="correspondent">Correspondent</option><option value="retail">Retail</option></select>';
+    }
+    (mount || document.body).appendChild(div);
     const sel = document.getElementById('encompassEnvSelectGlobal');
     sel.value = getEncompassEnv();
     sel.addEventListener('change', () => {

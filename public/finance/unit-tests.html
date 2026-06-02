@@ -1866,9 +1866,19 @@
         color: #fff;
         border-color: var(--primary-blue, #2563eb);
       }
-      body.unit-tests-night-theme #unitTestsFocusModeBtn.btn-outline-secondary {
+      body.unit-tests-night-theme #unitTestsFocusModeBtn.btn-outline-secondary,
+      body.unit-tests-night-theme #unitTestsNightToggle.btn-outline-secondary {
         color: #e5e7eb;
         border-color: #6b7280;
+      }
+      body.unit-tests-night-theme #unitTestsNightToggle.btn-outline-secondary:hover {
+        background: #6b7280;
+        color: #f9fafb;
+      }
+      body.unit-tests-night-theme .encompass-env-switcher .form-select {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: #f3f4f6;
       }
       body.unit-tests-night-theme.unit-tests-focus-mode #unitTestsFocusModeBtn {
         background: #38bdf8 !important;
@@ -1885,7 +1895,19 @@
           <i class="bi-check2-circle me-2"></i>Unit Test
         </a>
         <div class="navbar-collapse">
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav ms-auto align-items-center gap-1">
+            <li class="nav-item d-flex align-items-center" id="encompassEnvSwitcherMount"></li>
+            <li class="nav-item">
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm px-2"
+                id="unitTestsNightToggle"
+                title="Switch to dark mode"
+                aria-label="Switch to dark mode"
+              >
+                <i class="bi-moon-stars-fill" aria-hidden="true"></i>
+              </button>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="/index.html"><i class="bi-house me-1"></i>Back to Menu</a>
             </li>
@@ -2706,22 +2728,44 @@
     <script src="/shared/tts.js"></script>
     <script src="/shared/voice-widget.js"></script>
     <script>
-      (function(){
-        var KEY='unitTestsNightMode';
-        function isOn(){try{return localStorage.getItem(KEY)==='true'}catch(e){return false}}
-        function set(on){try{localStorage.setItem(KEY,on?'true':'false')}catch(e){}document.body.classList.toggle('unit-tests-night-theme',on)}
-        function init(){
-          set(isOn());
-          if(!document.getElementById('unitTestsNightToggle')){
-            var b=document.createElement('button');b.id='unitTestsNightToggle';b.type='button';b.className='dark-mode-toggle';
-            b.style.cssText='position:fixed;top:80px;right:16px;z-index:999;width:40px;height:40px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;color:#1e293b;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)';
-            function updateBtn(){var on=document.body.classList.contains('unit-tests-night-theme');b.innerHTML=on?'<i class="bi bi-sun-fill"></i>':'<i class="bi bi-moon-stars-fill"></i>';b.title=on?'Switch to light mode':'Switch to dark mode';b.setAttribute('aria-label',on?'Switch to light mode':'Switch to dark mode');b.style.background=on?'#4b5563':'#fff';b.style.color=on?'#f9fafb':'#374151';b.style.borderColor=on?'#6b7280':'#e2e8f0';}
-            updateBtn();
-            b.onclick=function(){set(!document.body.classList.contains('unit-tests-night-theme'));updateBtn();};
-            document.body.appendChild(b);
+      (function () {
+        var KEY = 'unitTestsNightMode';
+        function isOn() {
+          try {
+            return localStorage.getItem(KEY) === 'true';
+          } catch (e) {
+            return false;
           }
         }
-        if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+        function set(on) {
+          try {
+            localStorage.setItem(KEY, on ? 'true' : 'false');
+          } catch (e) {}
+          document.body.classList.toggle('unit-tests-night-theme', on);
+        }
+        function init() {
+          set(isOn());
+          var b = document.getElementById('unitTestsNightToggle');
+          if (!b) return;
+          function updateBtn() {
+            var on = document.body.classList.contains('unit-tests-night-theme');
+            b.innerHTML = on
+              ? '<i class="bi-sun-fill" aria-hidden="true"></i>'
+              : '<i class="bi-moon-stars-fill" aria-hidden="true"></i>';
+            b.title = on ? 'Switch to light mode' : 'Switch to dark mode';
+            b.setAttribute('aria-label', on ? 'Switch to light mode' : 'Switch to dark mode');
+          }
+          updateBtn();
+          b.onclick = function () {
+            set(!document.body.classList.contains('unit-tests-night-theme'));
+            updateBtn();
+          };
+        }
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', init);
+        } else {
+          init();
+        }
       })();
     </script>
     <script>
