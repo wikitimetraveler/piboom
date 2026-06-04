@@ -421,6 +421,23 @@
             outline: 3px solid rgba(37, 99, 235, 0.28);
             outline-offset: 2px;
         }
+        #videoDropZone {
+            transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+            border-style: dashed !important;
+        }
+        #videoDropZone.video-dropzone-active {
+            border-color: var(--primary-blue) !important;
+            background: var(--ice-light);
+            color: var(--primary-blue);
+        }
+        #videoDropZone:focus-visible {
+            outline: 3px solid rgba(37, 99, 235, 0.28);
+            outline-offset: 2px;
+        }
+        #videoPreview {
+            max-height: 320px;
+            background: #0f172a;
+        }
         .footer-meta-line {
             font-size: 0.8rem;
             color: var(--text-muted);
@@ -579,6 +596,23 @@
                             </div>
                         </div>
                         <div id="imageStatus" class="small text-muted mt-2" role="status" aria-live="polite">No image loaded.</div>
+                    </div>
+                    <div class="p-3 border rounded bg-light mb-3">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                            <div>
+                                <div class="fw-semibold">Video (MP4)</div>
+                                <div class="small text-muted">Load an MP4 (about 50 MB is fine) to preview locally, then download a copy. Nothing is uploaded — the file stays in your browser memory until you clear or leave the page.</div>
+                            </div>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="uploadVideoBtn"><i class="bi-upload me-1"></i>Load MP4</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="downloadVideoBtn" disabled><i class="bi-download me-1"></i>Download</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="clearVideoBtn" disabled><i class="bi-x-lg me-1"></i>Clear</button>
+                            </div>
+                        </div>
+                        <input type="file" id="videoFileInput" accept="video/mp4,.mp4,video/*" style="display:none;">
+                        <div id="videoDropZone" class="mt-2 p-2 border rounded text-center small text-muted" tabindex="0" role="button" aria-label="MP4 drop zone">Drop an MP4 here or click Load MP4.</div>
+                        <video id="videoPreview" class="w-100 border rounded mt-2" style="display:none;" controls playsinline preload="metadata"></video>
+                        <div id="videoStatus" class="small text-muted mt-2" role="status" aria-live="polite">No video loaded.</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="ruleOutput">Field Definitions</label>
@@ -894,6 +928,157 @@
 
         let automatorImageData = null;
         let automatorCameraStream = null;
+        let automatorVideoObjectUrl = null;
+        let automatorVideoFile = null;
+        /** Soft cap — 50 MB typical; allow headroom for larger exports without server upload. */
+        const AUTOMATOR_VIDEO_MAX_BYTES = 200 * 1024 * 1024;
+
+        function formatAutomatorFileSize(bytes) {
+            if (!Number.isFinite(bytes) || bytes < 0) return '—';
+            if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+            return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+        }
+
+        function setAutomatorVideoControlsLoading(loading) {
+            ['uploadVideoBtn', 'downloadVideoBtn', 'clearVideoBtn'].forEach((id) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                if (loading) {
+                    btn.disabled = true;
+                } else {
+                    btn.disabled = id === 'uploadVideoBtn' ? false : !automatorVideoFile;
+                }
+            });
+            const zone = document.getElementById('videoDropZone');
+            if (zone) {
+                zone.setAttribute('aria-busy', loading ? 'true' : 'false');
+                zone.style.pointerEvents = loading ? 'none' : '';
+                zone.style.opacity = loading ? '0.65' : '';
+            }
+        }
+
+        function formatVideoDuration(seconds) {
+            if (!Number.isFinite(seconds) || seconds <= 0) return '';
+            const total = Math.round(seconds);
+            const m = Math.floor(total / 60);
+            const s = total % 60;
+            return `${m}:${String(s).padStart(2, '0')}`;
+        }
+
+        function setVideoStatus(message, level = 'muted') {
+            const el = document.getElementById('videoStatus');
+            if (!el) return;
+            const classByLevel = {
+                muted: 'text-muted',
+                info: 'text-primary',
+                success: 'text-success',
+                warning: 'text-warning',
+                danger: 'text-danger',
+            };
+            el.className = `small mt-2 ${classByLevel[level] || classByLevel.muted}`;
+            el.textContent = message;
+        }
+
+        function revokeAutomatorVideoUrl() {
+            if (automatorVideoObjectUrl) {
+                URL.revokeObjectURL(automatorVideoObjectUrl);
+                automatorVideoObjectUrl = null;
+            }
+        }
+
+        function clearAutomatorVideo() {
+            revokeAutomatorVideoUrl();
+            automatorVideoFile = null;
+            const preview = document.getElementById('videoPreview');
+            if (preview) {
+                preview.removeAttribute('src');
+                preview.load();
+                preview.style.display = 'none';
+            }
+            setAutomatorVideoControlsLoading(false);
+            document.getElementById('downloadVideoBtn').disabled = true;
+            document.getElementById('clearVideoBtn').disabled = true;
+            setVideoStatus('No video loaded.', 'muted');
+        }
+
+        function isAutomatorVideoFile(file) {
+            if (!file) return false;
+            const name = String(file.name || '').toLowerCase();
+            const type = String(file.type || '').toLowerCase();
+            return type === 'video/mp4' || type.startsWith('video/') || name.endsWith('.mp4');
+        }
+
+        function loadAutomatorVideoFile(file) {
+            if (!file) return;
+            if (!isAutomatorVideoFile(file)) {
+                setVideoStatus('Only MP4 / video files are supported.', 'warning');
+                return;
+            }
+            if (file.size > AUTOMATOR_VIDEO_MAX_BYTES) {
+                setVideoStatus(
+                    `File is ${formatAutomatorFileSize(file.size)} — max ${formatAutomatorFileSize(AUTOMATOR_VIDEO_MAX_BYTES)} in this tool (keeps the tab responsive).`,
+                    'warning'
+                );
+                return;
+            }
+
+            revokeAutomatorVideoUrl();
+            automatorVideoFile = file;
+            const preview = document.getElementById('videoPreview');
+            const sizeLabel = formatAutomatorFileSize(file.size);
+            setAutomatorVideoControlsLoading(true);
+            setVideoStatus(`Loading ${file.name} (${sizeLabel})…`, 'info');
+            preview.style.display = 'block';
+
+            automatorVideoObjectUrl = URL.createObjectURL(file);
+            preview.preload = 'metadata';
+
+            const onReady = () => {
+                preview.removeEventListener('loadedmetadata', onReady);
+                preview.removeEventListener('error', onFail);
+                setAutomatorVideoControlsLoading(false);
+                document.getElementById('downloadVideoBtn').disabled = false;
+                document.getElementById('clearVideoBtn').disabled = false;
+                const dur = formatVideoDuration(preview.duration);
+                const durPart = dur ? ` · ${dur}` : '';
+                setVideoStatus(
+                    `Ready: ${file.name} (${sizeLabel}${durPart}). Preview below or Download — large files may take a moment to start playback.`,
+                    'success'
+                );
+            };
+
+            const onFail = () => {
+                preview.removeEventListener('loadedmetadata', onReady);
+                preview.removeEventListener('error', onFail);
+                revokeAutomatorVideoUrl();
+                automatorVideoFile = null;
+                preview.removeAttribute('src');
+                preview.load();
+                preview.style.display = 'none';
+                setAutomatorVideoControlsLoading(false);
+                setVideoStatus('Could not read that video file. Try another MP4 export.', 'danger');
+            };
+
+            preview.addEventListener('loadedmetadata', onReady);
+            preview.addEventListener('error', onFail);
+            preview.src = automatorVideoObjectUrl;
+            preview.load();
+        }
+
+        function downloadAutomatorVideo() {
+            if (!automatorVideoFile || !automatorVideoObjectUrl) {
+                setVideoStatus('Load an MP4 before downloading.', 'warning');
+                return;
+            }
+            const anchor = document.createElement('a');
+            anchor.href = automatorVideoObjectUrl;
+            anchor.download = automatorVideoFile.name || 'automator-video.mp4';
+            anchor.rel = 'noopener';
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+            setVideoStatus(`Download started: ${automatorVideoFile.name}`, 'info');
+        }
 
         function setImageStatus(message, level = 'muted') {
             const el = document.getElementById('imageStatus');
@@ -1262,6 +1447,11 @@
                 captureCameraBtn: document.getElementById('captureCameraBtn'),
                 stopCameraBtn: document.getElementById('stopCameraBtn'),
                 extractFieldsBtn: document.getElementById('extractFieldsBtn'),
+                videoFileInput: document.getElementById('videoFileInput'),
+                videoDropZone: document.getElementById('videoDropZone'),
+                uploadVideoBtn: document.getElementById('uploadVideoBtn'),
+                downloadVideoBtn: document.getElementById('downloadVideoBtn'),
+                clearVideoBtn: document.getElementById('clearVideoBtn'),
             };
             
             els.ruleInput.addEventListener('input', generateRules);
@@ -1406,6 +1596,33 @@
             els.extractFieldsBtn.addEventListener('click', extractFieldsFromImage);
             els.updateFieldsBtn.disabled = true;
 
+            els.uploadVideoBtn.addEventListener('click', () => els.videoFileInput.click());
+            els.videoFileInput.addEventListener('change', (event) => {
+                const file = event.target.files?.[0];
+                loadAutomatorVideoFile(file);
+                event.target.value = '';
+            });
+            els.downloadVideoBtn.addEventListener('click', downloadAutomatorVideo);
+            els.clearVideoBtn.addEventListener('click', clearAutomatorVideo);
+            els.videoDropZone.addEventListener('click', () => els.videoFileInput.click());
+            els.videoDropZone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                els.videoDropZone.classList.add('video-dropzone-active');
+            });
+            els.videoDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                els.videoDropZone.classList.add('video-dropzone-active');
+            });
+            els.videoDropZone.addEventListener('dragleave', () => {
+                els.videoDropZone.classList.remove('video-dropzone-active');
+            });
+            els.videoDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                els.videoDropZone.classList.remove('video-dropzone-active');
+                const file = e.dataTransfer?.files?.[0];
+                loadAutomatorVideoFile(file);
+            });
+
             // Add voice commands for automator
             if (typeof voiceController !== 'undefined') {
                 // Override the processCommand method to add automator-specific commands
@@ -1443,6 +1660,7 @@
                         setAutomatorImage(null);
                         stopAutomatorCamera();
                         setImageStatus('No image loaded.', 'muted');
+                        clearAutomatorVideo();
                         return;
                     }
                     
@@ -1456,6 +1674,10 @@
                     originalProcessCommand.call(this, command);
                 };
             }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            revokeAutomatorVideoUrl();
         });
 
         // Make voice controller globally accessible for debugging

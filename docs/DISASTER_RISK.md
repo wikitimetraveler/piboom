@@ -22,7 +22,7 @@ Disaster data feeds, loan pipeline risk analysis, and the Disaster Risk AI assis
 | **NWS** | Weather alerts | `https://api.weather.gov/alerts/active?status=actual&message_type=alert` |
 | **NHC** | Hurricanes | NHC feeds |
 
-Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng, etc.).
+Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng, etc.). Full table reference (including `fire_cameras`, `loans`, impact graph, and PostGIS): **`docs/UNIFIED_DISASTERS_DB_SCHEMA.md`**.
 
 ### PostGIS spatial graph (Render Postgres)
 
@@ -206,5 +206,7 @@ Implementation: `lib/disaster-kml-export.js`, browser wrapper `public/shared/dis
 
 ## Related
 
+- **docs/UNIFIED_DISASTERS_DB_SCHEMA.md** – Postgres tables, graph approach, and SQL snippets for Unified Disasters
+- **docs/UNIFIED_DISASTERS_DB_SCHEMA_VIDEO_SCRIPT.md** – HeyGen / teleprompter script (schema + graph explainer)
 - **docs/AI_SYSTEM.md** – Disaster Risk AI architecture
 - **docs/API_ROUTES.md** – Full API index

@@ -2,6 +2,8 @@
 
 Lane family data is now modeled in PostgreSQL with a relational graph shape and dataset registry.
 
+For the canonical **`laneData.json`** person/link fields, edge direction, and relation types, see [LANE_FAMILY_TREE_SCHEMA.md](./LANE_FAMILY_TREE_SCHEMA.md).
+
 ## Tables
 
 - `lane_person`: one row per person (`person_id`) with selected indexed columns and full source payload in `payload`.

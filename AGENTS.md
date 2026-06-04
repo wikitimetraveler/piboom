@@ -98,9 +98,13 @@ Key files:
 * `docs/CALCULATION_ENGINE.md`
 * `docs/SCREEN_TEST.md`
 * `docs/DISASTER_RISK.md`
+* `docs/UNIFIED_DISASTERS_DB_SCHEMA.md`
+* `docs/UNIFIED_DISASTERS_DB_SCHEMA_VIDEO_SCRIPT.md`
 * `docs/API_ROUTES.md`
 * `docs/CONFIG.md`
 * `docs/FRONTEND_PATTERNS.md`
+* `docs/LANE_FAMILY_TREE_SCHEMA.md` (Lane `laneData.json` nodes/links + Postgres graph)
+* `docs/LANE_POSTGRES_GRAPH.md` (Lane Postgres import / `lane_dataset` registry)
 * `docs/PROJECT_STRUCTURE.md`
 * `docs/DATABASE_SETUP.md`
 * `docs/GLOSSARY.md`

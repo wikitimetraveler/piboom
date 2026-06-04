@@ -60,6 +60,8 @@
 
 ## 2. **`disasters`** - Unified Disaster Data
 
+**Unified Disasters pages:** See **`docs/UNIFIED_DISASTERS_DB_SCHEMA.md`** for page-to-table mapping, `fire_cameras`, impact graph (`graph_nodes` / `graph_edges`), and graph-vs-spatial approach.
+
 **Purpose:** Stores disaster data from multiple sources (FEMA, NOAA, NASA, NWS, etc.)
 
 **Columns with Coordinates:**

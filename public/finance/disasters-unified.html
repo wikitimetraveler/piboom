@@ -397,6 +397,115 @@
 
     </div>
 
+    <!-- Bottom pull-up: Postgres schema + impact graph (see docs/UNIFIED_DISASTERS_DB_SCHEMA.md) -->
+    <button
+      type="button"
+      class="du-schema-sheet-tab"
+      id="duSchemaSheetTab"
+      aria-expanded="false"
+      aria-controls="duSchemaSheetPanel"
+    >
+      <span class="du-schema-sheet-tab-handle" aria-hidden="true"></span>
+      <i class="bi bi-database me-1" aria-hidden="true"></i>
+      <span>Data model &amp; graph</span>
+      <i class="bi bi-chevron-up du-schema-sheet-tab-chevron" aria-hidden="true"></i>
+    </button>
+    <div class="du-schema-sheet" id="duSchemaSheet" aria-hidden="true">
+      <div class="du-schema-sheet-backdrop" id="duSchemaSheetBackdrop" tabindex="-1"></div>
+      <div
+        class="du-schema-sheet-panel"
+        id="duSchemaSheetPanel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="duSchemaSheetTitle"
+      >
+        <div class="du-schema-sheet-grab" aria-hidden="true"></div>
+        <header class="du-schema-sheet-header">
+          <h2 class="h6 mb-0" id="duSchemaSheetTitle">
+            <i class="bi bi-diagram-3 me-1"></i>Database &amp; impact graph
+          </h2>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="duSchemaSheetClose" aria-label="Close data model panel">
+            <i class="bi bi-chevron-down"></i>
+          </button>
+        </header>
+        <div class="du-schema-sheet-body">
+          <section class="du-schema-sheet-video-block mb-3" aria-label="Database and graph overview video">
+            <h3 class="du-schema-sheet-kicker">Overview video</h3>
+            <div class="du-schema-sheet-video-wrap">
+              <video
+                class="du-schema-sheet-video"
+                controls
+                preload="metadata"
+                playsinline
+                title="Unified Disasters database and graph model walkthrough"
+                src="/finance/assets/unified-disasters-db-graph-walkthrough.mp4"
+              ></video>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+              <a
+                class="btn btn-sm btn-outline-primary"
+                href="/finance/assets/unified-disasters-db-graph-walkthrough.mp4"
+                download="unified-disasters-db-graph-walkthrough.mp4"
+              >
+                <i class="bi bi-download me-1" aria-hidden="true"></i>Download MP4
+              </a>
+              <span class="small text-muted">1080p · captioned walkthrough</span>
+            </div>
+          </section>
+          <p class="small text-muted mb-3">
+            Unified Disasters reads shared Postgres tables—no page-specific schema. Events refresh on a
+            <strong>90-day</strong> window.
+          </p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h3 class="du-schema-sheet-kicker">Fact tables</h3>
+              <ul class="du-schema-sheet-list small mb-0">
+                <li><code>disasters</code> — FEMA, FIRMS, USGS, NWS, NHC events (grid + map)</li>
+                <li><code>fire_cameras</code> — fixed hazard webcams (not disaster rows)</li>
+                <li><code>loans</code> — pipeline properties, risk scores, flood zones</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h3 class="du-schema-sheet-kicker">Two ways to link disasters → loans</h3>
+              <table class="table table-sm table-bordered du-schema-sheet-table mb-2">
+                <thead>
+                  <tr><th>Model</th><th>How</th><th>Used here</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Spatial</strong></td>
+                    <td><code>GET /api/disasters/near</code> (PostGIS or Haversine)</td>
+                    <td>Live selection, nearby loans &amp; cameras</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Graph</strong></td>
+                    <td><code>graph_nodes</code> + <code>graph_edges</code> (reseed)</td>
+                    <td><a href="/disaster-impact-graph.html">Impact Graph</a> prototype</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="small mb-0">
+                Graph chain: county → disaster → zip → loan → milestone → processor, plus
+                <strong>NEAR</strong> edges from spatial seed (~50 mi).
+              </p>
+            </div>
+          </div>
+          <details class="du-schema-sheet-details mt-3">
+            <summary class="small fw-semibold">Edge types (impact graph)</summary>
+            <p class="small text-muted mb-2 mt-2">
+              <code>HAS_DECLARATION</code>, <code>CONTAINS</code>, <code>AFFECTS</code>,
+              <code>NEAR</code>, <code>CURRENTLY_IN</code>, <code>ASSIGNED_TO</code>
+            </p>
+          </details>
+          <p class="small text-muted mb-0 mt-3">
+            <i class="bi bi-book me-1"></i>Repo docs:
+            <code>docs/UNIFIED_DISASTERS_DB_SCHEMA.md</code>,
+            <code>docs/UNIFIED_DISASTERS_DB_SCHEMA_VIDEO_SCRIPT.md</code>
+          </p>
+        </div>
+      </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
@@ -2057,6 +2166,29 @@
       document.addEventListener('DOMContentLoaded', function () {
         var el = document.getElementById('disastersFooterDate');
         if (el) el.textContent = new Date().toLocaleDateString();
+
+        var sheet = document.getElementById('duSchemaSheet');
+        var tab = document.getElementById('duSchemaSheetTab');
+        var backdrop = document.getElementById('duSchemaSheetBackdrop');
+        var closeBtn = document.getElementById('duSchemaSheetClose');
+        if (!sheet || !tab) return;
+
+        function setSchemaSheetOpen(open) {
+          var on = !!open;
+          sheet.classList.toggle('du-schema-sheet--open', on);
+          sheet.setAttribute('aria-hidden', on ? 'false' : 'true');
+          tab.setAttribute('aria-expanded', on ? 'true' : 'false');
+          document.body.classList.toggle('du-schema-sheet-open', on);
+        }
+
+        tab.addEventListener('click', function () {
+          setSchemaSheetOpen(!sheet.classList.contains('du-schema-sheet--open'));
+        });
+        backdrop.addEventListener('click', function () { setSchemaSheetOpen(false); });
+        if (closeBtn) closeBtn.addEventListener('click', function () { setSchemaSheetOpen(false); });
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && sheet.classList.contains('du-schema-sheet--open')) setSchemaSheetOpen(false);
+        });
       });
     </script>
   <script src="/shared/finance-auth-guard.js"></script>
