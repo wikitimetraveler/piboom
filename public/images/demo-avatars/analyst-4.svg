@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Analyst Four">
+  <rect width="128" height="128" fill="#e9ecef"/>
+  <circle cx="64" cy="48" r="22" fill="#6c757d"/>
+  <path d="M24 112c8-28 32-40 40-40s32 12 40 40" fill="#6c757d"/>
+  <text x="64" y="118" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#495057">A4</text>
+</svg>

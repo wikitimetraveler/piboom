@@ -109,17 +109,20 @@ export async function createTables(): Promise<void> {
       )
     `);
 
-    // Insert default users with passwords if they don't exist
-    await pool.query(`
-      INSERT INTO users (id, name, password, avatar, color, description)
-      VALUES 
-        ('cosmic-turtle', 'The Cosmic Turtle', 'Dufus', '/images/cosmic turtle.png', '#00CED1', 'Cosmic explorer of sound'),
-        ('wizened-wizard', 'The Wizened Wizard', 'Giraffe Pizza', '/images/genie.png', '#9370DB', 'Master of musical mysteries'),
-        ('jerry-garcia', 'Jerry Garcia', 'Fooze', '/images/jerry.png', '#FF6347', 'Grateful for great tunes'),
-        ('easy-levi', 'Easy Rider Levi', 'Zip Knot', '/images/levi.png', '#4682B4', 'Biker hippie trucker'),
-        ('fuzz-maestro', 'Fuzz Maestro', 'Fly Dog', '/images/fuzz.png', '#FF8C00', 'Keeper of the fuzz')
-      ON CONFLICT (id) DO NOTHING
-    `);
+    for (const user of [
+      { id: 'demo-analyst-1', name: 'Analyst One', password: 'Dufus', avatar: '/images/demo-avatars/analyst-1.svg', color: '#0d6efd', description: 'Demo workspace profile' },
+      { id: 'demo-analyst-2', name: 'Analyst Two', password: 'P@te1374', avatar: '/images/demo-avatars/analyst-2.svg', color: '#5a6a85', description: 'Demo workspace profile' },
+      { id: 'demo-analyst-3', name: 'Analyst Three', password: 'Fooze', avatar: '/images/demo-avatars/analyst-3.svg', color: '#198754', description: 'Demo workspace profile' },
+      { id: 'demo-analyst-4', name: 'Analyst Four', password: 'Zip Knot', avatar: '/images/demo-avatars/analyst-4.svg', color: '#6f42c1', description: 'Demo workspace profile' },
+      { id: 'demo-analyst-5', name: 'Analyst Five', password: 'Fly Dog', avatar: '/images/demo-avatars/analyst-5.svg', color: '#fd7e14', description: 'Demo workspace profile' },
+    ]) {
+      await pool.query(
+        `INSERT INTO users (id, name, password, avatar, color, description)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT (id) DO NOTHING`,
+        [user.id, user.name, user.password, user.avatar, user.color, user.description]
+      );
+    }
 
     // Create records table for vinyl/album collection
     await pool.query(`

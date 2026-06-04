@@ -27,6 +27,9 @@
     });
 
   const ensureAuthScripts = async () => {
+    if (!window.DEMO_USERS) {
+      await loadScript('/shared/demo-users.js');
+    }
     if (!window.isLoggedIn || !window.showLoginPopup) {
       await loadScript('/shared/user-login.js');
     }

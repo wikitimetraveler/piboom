@@ -16,7 +16,7 @@
       const v = localStorage.getItem('findsUserId');
       if (v) return v;
     } catch (_) {}
-    return 'cosmic-turtle';
+    return 'demo-analyst-1';
   }
 
   function q(url) {

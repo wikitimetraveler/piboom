@@ -21,12 +21,8 @@
  * - Collection filtering by user
  * - Color-coded user identification
  * 
- * User Accounts:
- * - cosmic-turtle: The Cosmic Turtle (turquoise)
- * - wizened-wizard: The Wizened Wizard (purple)
- * - jerry-garcia: Jerry Garcia (red)
- * - easy-levi: Easy Levi (green)
- * - fuzz-maestro: The Fuzz Maestro (gold)
+ * User Accounts (corp-friendly demo profiles; see demo-users.js):
+ * - demo-analyst-1 … demo-analyst-5
  * 
  * Technical Implementation:
  * - Array-based user database
@@ -43,48 +39,11 @@
  * ==============================================================================
  */
 
-const USERS = [
-  {
-    id: 'cosmic-turtle',
-    name: 'The Cosmic Turtle',
-    avatar: '/images/cosmic turtle.png',
-    color: '#00CED1', // turquoise
-    description: 'Cosmic explorer of sound'
-  },
-  {
-    id: 'wizened-wizard',
-    name: 'The Wizened Wizard',
-    avatar: '/images/steven.png',
-    color: '#9370DB', // medium purple
-    description: 'Master of musical mysteries'
-  },
-  {
-    id: 'jerry-garcia',
-    name: 'Jerry Garcia',
-    avatar: '/images/jerry.png',
-    color: '#FF6347', // tomato red
-    description: 'Grateful for great tunes'
-  },
-  {
-    id: 'easy-levi',
-    name: 'Easy Rider Levi',
-    avatar: '/images/levi.png',
-    color: '#4682B4', // steel blue
-    description: 'Biker hippie trucker'
-  },
-  {
-    id: 'fuzz-maestro',
-    name: 'Fuzz Maestro',
-    avatar: '/images/fuzz.png',
-    color: '#FF8C00', // dark orange
-    description: 'Keeper of the fuzz'
-  }
-];
+const USERS = window.DEMO_USERS || [];
 
-// Get current user from localStorage or default to The Cosmic Turtle
+// Get current user from localStorage or default to first demo profile
 function getCurrentUser() {
   const savedUserId = localStorage.getItem('currentUserId');
-  // Default to The Cosmic Turtle (first user)
   const user = USERS.find(u => u.id === savedUserId) || USERS[0];
   return user;
 }

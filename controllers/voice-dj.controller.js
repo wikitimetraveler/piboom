@@ -15,7 +15,7 @@ const openai = new OpenAI({
 // Process voice DJ command with LangChain memory
 export async function processVoiceCommand(req, res) {
   try {
-    const { command, userId = 'cosmic-turtle' } = req.body;
+    const { command, userId = 'demo-analyst-1' } = req.body;
     
     if (!command) {
       return res.status(400).json({ error: 'Command is required' });

@@ -6,11 +6,11 @@ import { ConversationChain } from 'langchain/chains';
 import { BaseMessage } from '@langchain/core/messages';
 
 export type UserId = 
-  | 'cosmic-turtle'
-  | 'easy-levi'
-  | 'wizened-wizard'
-  | 'jerry-garcia'
-  | 'fuzz-maestro'
+  | 'demo-analyst-1'
+  | 'demo-analyst-2'
+  | 'demo-analyst-3'
+  | 'demo-analyst-4'
+  | 'demo-analyst-5'
   | string;
 
 export type ConversationRole = 'user' | 'assistant' | 'system';

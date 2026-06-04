@@ -39,7 +39,7 @@ describe('app-user-auth.controller', () => {
 
   test('postVerifyUserPassword sets finance session cookie when valid', async () => {
     verifyAppUserPassword.mockResolvedValue({ valid: true });
-    const req = { body: { userId: 'easy-levi', password: 'x' } };
+    const req = { body: { userId: 'demo-analyst-4', password: 'x' } };
     const res = mockRes();
     await postVerifyUserPassword(req, res);
     expect(res.body).toEqual({ valid: true });
@@ -48,7 +48,7 @@ describe('app-user-auth.controller', () => {
 
   test('postVerifyUserPassword returns 503 when database unavailable', async () => {
     verifyAppUserPassword.mockResolvedValue({ valid: false, reason: 'unavailable' });
-    const req = { body: { userId: 'easy-levi', password: 'x' } };
+    const req = { body: { userId: 'demo-analyst-4', password: 'x' } };
     const res = mockRes();
     await postVerifyUserPassword(req, res);
     expect(res.statusCode).toBe(503);

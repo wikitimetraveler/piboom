@@ -71,14 +71,8 @@ function hasFinanceSessionCookie() {
   } catch (_) {}
 })();
 
-// Use USERS from user-selector.js if already loaded, otherwise define it here
-window.USERS = window.USERS || [
-  { id: 'cosmic-turtle', name: 'The Cosmic Turtle', avatar: '/images/cosmic turtle.png', color: '#00CED1' },
-  { id: 'wizened-wizard', name: 'The Wizened Wizard', avatar: '/images/steven.png', color: '#9370DB' },
-  { id: 'jerry-garcia', name: 'Jerry Garcia', avatar: '/images/jerry.png', color: '#FF6347' },
-  { id: 'easy-levi', name: 'Easy Rider Levi', avatar: '/images/levi.png', color: '#4682B4' },
-  { id: 'fuzz-maestro', name: 'Fuzz Maestro', avatar: '/images/fuzz.png', color: '#FF8C00' }
-];
+// Requires /shared/demo-users.js (corp-friendly profiles)
+window.USERS = window.DEMO_USERS || window.USERS || [];
 
 // Check if logged in
 function isLoggedIn() {

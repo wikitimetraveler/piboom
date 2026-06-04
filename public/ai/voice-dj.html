@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
   <link rel="stylesheet" href="/shared/styles.css"/>
   <script src="/shared/modern-navbar.js"></script>
+  <script src="/shared/demo-users.js"></script>
   <script src="/shared/user-selector.js"></script>
   <style>
     body {
@@ -426,29 +427,8 @@
     <h5 style="text-align: center; color: #6b9d8a; margin-bottom: 20px;">
       <i class="bi-person-circle"></i> Select User (Each has their own conversation memory)
     </h5>
-    <div class="user-grid">
-      <div class="user-card-dj active" data-user="cosmic-turtle" onclick="selectDJUser('cosmic-turtle')">
-        <img src="/images/cosmic turtle.png" alt="Cosmic Turtle" class="user-icon-dj">
-        <div class="user-name-dj">Cosmic Turtle</div>
-      </div>
-      <div class="user-card-dj" data-user="easy-levi" onclick="selectDJUser('easy-levi')">
-        <img src="/images/levi.png" alt="Easy Levi" class="user-icon-dj">
-        <div class="user-name-dj">Easy Levi</div>
-      </div>
-      <div class="user-card-dj" data-user="wizened-wizard" onclick="selectDJUser('wizened-wizard')">
-        <img src="/images/steven.png" alt="Wizened Wizard" class="user-icon-dj">
-        <div class="user-name-dj">Wizened Wizard</div>
-      </div>
-      <div class="user-card-dj" data-user="jerry-garcia" onclick="selectDJUser('jerry-garcia')">
-        <img src="/images/jerry.png" alt="Jerry Garcia" class="user-icon-dj">
-        <div class="user-name-dj">Jerry Garcia</div>
-      </div>
-      <div class="user-card-dj" data-user="fuzz-maestro" onclick="selectDJUser('fuzz-maestro')">
-        <img src="/images/fuzz.png" alt="Fuzz Maestro" class="user-icon-dj">
-        <div class="user-name-dj">Fuzz Maestro</div>
-      </div>
-    </div>
-    <input type="hidden" id="selectedUserId" value="cosmic-turtle">
+    <div class="user-grid" id="voiceDjUserGrid"></div>
+    <input type="hidden" id="selectedUserId" value="demo-analyst-1">
   </div>
 
   <!-- Voice Interface -->
@@ -536,8 +516,22 @@
 let recognition = null;
 let isListening = false;
 
+function renderVoiceDjUserGrid() {
+  const grid = document.getElementById('voiceDjUserGrid');
+  const users = window.DEMO_USERS || [];
+  if (!grid || !users.length) return;
+  const activeId = document.getElementById('selectedUserId')?.value || users[0].id;
+  grid.innerHTML = users.map((user) => `
+    <div class="user-card-dj ${user.id === activeId ? 'active' : ''}" data-user="${user.id}" onclick="selectDJUser('${user.id}')">
+      <img src="${user.avatar}" alt="${user.name}" class="user-icon-dj">
+      <div class="user-name-dj">${user.name}</div>
+    </div>
+  `).join('');
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+  renderVoiceDjUserGrid();
   createUserSelector('userSelectorContainer', {
     title: 'Your DJ Profile',
     showAllOption: false

@@ -17,7 +17,7 @@ import {
   getUserConversationStats 
 } from './services/langchain-memory.service.js';
 
-const testUserId = 'easy-levi';
+const testUserId = 'demo-analyst-4';
 const testSessionId = 'test-session';
 
 async function runTests() {

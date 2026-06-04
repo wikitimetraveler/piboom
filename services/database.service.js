@@ -49,11 +49,62 @@
 
 import bcrypt from 'bcryptjs';
 import pg from 'pg';
+import {
+  DEMO_USERS_SEED,
+  DEMO_USER_ID_MIGRATION_TABLES,
+  LEGACY_DEMO_USER_ID_MAP,
+} from '../lib/demo-users.js';
 const { Pool } = pg;
 
 let pool = null;
 /** @type {boolean|null} null until first check; cached thereafter */
 let postgisAvailable = null;
+
+/**
+ * Rename legacy whimsical demo user IDs and refresh profile metadata.
+ */
+async function migrateLegacyDemoUserIds() {
+  if (!pool) return;
+
+  for (const [oldId, newId] of Object.entries(LEGACY_DEMO_USER_ID_MAP)) {
+    const seed = DEMO_USERS_SEED.find((u) => u.id === newId);
+    if (!seed) continue;
+
+    const { rows: oldRows } = await pool.query('SELECT id FROM users WHERE id = $1', [oldId]);
+    if (!oldRows.length) continue;
+
+    const { rows: newRows } = await pool.query('SELECT id FROM users WHERE id = $1', [newId]);
+    if (newRows.length) {
+      await pool.query('DELETE FROM users WHERE id = $1', [oldId]);
+    } else {
+      await pool.query(
+        `UPDATE users
+         SET id = $1, name = $2, avatar = $3, color = $4, description = $5
+         WHERE id = $6`,
+        [newId, seed.name, seed.avatar, seed.color, seed.description, oldId]
+      );
+    }
+
+    for (const table of DEMO_USER_ID_MIGRATION_TABLES) {
+      try {
+        await pool.query(`UPDATE ${table} SET user_id = $1 WHERE user_id = $2`, [newId, oldId]);
+      } catch (err) {
+        if (err.code !== '42P01') {
+          console.warn(`⚠️ demo user id migration (${table}): ${err.message}`);
+        }
+      }
+    }
+  }
+
+  for (const user of DEMO_USERS_SEED) {
+    await pool.query(
+      `UPDATE users
+       SET name = $2, avatar = $3, color = $4, description = $5
+       WHERE id = $1`,
+      [user.id, user.name, user.avatar, user.color, user.description]
+    );
+  }
+}
 
 /**
  * Enable PostGIS extension (idempotent). Non-fatal — logs warning and returns false on failure.
@@ -211,17 +262,16 @@ export async function createTables() {
       )
     `);
 
-    // Insert default users with passwords if they don't exist
-    await pool.query(`
-      INSERT INTO users (id, name, password, avatar, color, description)
-      VALUES 
-        ('cosmic-turtle', 'The Cosmic Turtle', 'Dufus', '/images/cosmic turtle.png', '#00CED1', 'Cosmic explorer of sound'),
-        ('wizened-wizard', 'The Wizened Wizard', 'P@te1374', '/images/genie.png', '#9370DB', 'Master of musical mysteries'),
-        ('jerry-garcia', 'Jerry Garcia', 'Fooze', '/images/jerry.png', '#FF6347', 'Grateful for great tunes'),
-        ('easy-levi', 'Easy Rider Levi', 'Zip Knot', '/images/levi.png', '#4682B4', 'Biker hippie trucker'),
-        ('fuzz-maestro', 'Fuzz Maestro', 'Fly Dog', '/images/fuzz.png', '#FF8C00', 'Keeper of the fuzz')
-      ON CONFLICT (id) DO NOTHING
-    `);
+    for (const user of DEMO_USERS_SEED) {
+      await pool.query(
+        `INSERT INTO users (id, name, password, avatar, color, description)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT (id) DO NOTHING`,
+        [user.id, user.name, user.password, user.avatar, user.color, user.description]
+      );
+    }
+
+    await migrateLegacyDemoUserIds();
 
     await pool.query(`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash VARCHAR(255)
@@ -240,13 +290,15 @@ export async function createTables() {
       );
     }
 
-    // Canonical password for wizened-wizard (bcrypt; legacy plaintext cleared)
-    const wizenedWizardPassword = 'P@te1374';
-    const wizenedWizardHash = await bcrypt.hash(wizenedWizardPassword, 10);
-    await pool.query(
-      `UPDATE users SET password_hash = $1, password = $2 WHERE id = $3`,
-      [wizenedWizardHash, '', 'wizened-wizard']
-    );
+    // Canonical password for demo-analyst-2 (bcrypt; legacy plaintext cleared)
+    const analystTwo = DEMO_USERS_SEED.find((u) => u.id === 'demo-analyst-2');
+    if (analystTwo?.password) {
+      const analystTwoHash = await bcrypt.hash(analystTwo.password, 10);
+      await pool.query(
+        `UPDATE users SET password_hash = $1, password = $2 WHERE id = $3`,
+        [analystTwoHash, '', 'demo-analyst-2']
+      );
+    }
 
     // Create records table for vinyl/album collection
     await pool.query(`

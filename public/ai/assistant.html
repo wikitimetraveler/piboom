@@ -712,29 +712,8 @@
     <!-- User Selector - Icon Grid -->
     <div class="user-switcher mb-3">
       <label class="form-label mb-2"><small>Select User:</small></label>
-      <div class="user-grid">
-        <div class="user-card active" data-user="cosmic-turtle" onclick="selectUser('cosmic-turtle')">
-          <img src="/images/cosmic turtle.png" alt="Cosmic Turtle" class="user-icon">
-          <div class="user-name">Cosmic Turtle</div>
-        </div>
-        <div class="user-card" data-user="easy-levi" onclick="selectUser('easy-levi')">
-          <img src="/images/levi.png" alt="Easy Levi" class="user-icon">
-          <div class="user-name">Easy Levi</div>
-        </div>
-        <div class="user-card" data-user="wizened-wizard" onclick="selectUser('wizened-wizard')">
-          <img src="/images/steven.png" alt="Wizened Wizard" class="user-icon">
-          <div class="user-name">Wizened Wizard</div>
-        </div>
-        <div class="user-card" data-user="jerry-garcia" onclick="selectUser('jerry-garcia')">
-          <img src="/images/jerry.png" alt="Jerry Garcia" class="user-icon">
-          <div class="user-name">Jerry Garcia</div>
-        </div>
-        <div class="user-card" data-user="fuzz-maestro" onclick="selectUser('fuzz-maestro')">
-          <img src="/images/fuzz.png" alt="Fuzz Maestro" class="user-icon">
-          <div class="user-name">Fuzz Maestro</div>
-        </div>
-      </div>
-      <input type="hidden" id="userSelect" value="cosmic-turtle">
+      <div class="user-grid" id="assistantUserGrid"></div>
+      <input type="hidden" id="userSelect" value="demo-analyst-1">
     </div>
     
     <!-- Assistant Switcher -->
@@ -842,6 +821,7 @@
   </div>
 </footer>
 
+<script src="/shared/demo-users.js"></script>
 <script>
 let conversationCount = 0;
 let voiceEnabled = false;
@@ -1938,8 +1918,22 @@ function searchOtherArtist() {
   }
 }
 
+function renderAssistantUserGrid() {
+  const grid = document.getElementById('assistantUserGrid');
+  const users = window.DEMO_USERS || [];
+  if (!grid || !users.length) return;
+  const activeId = document.getElementById('userSelect')?.value || users[0].id;
+  grid.innerHTML = users.map((user) => `
+    <div class="user-card ${user.id === activeId ? 'active' : ''}" data-user="${user.id}" onclick="selectUser('${user.id}')">
+      <img src="${user.avatar}" alt="${user.name}" class="user-icon">
+      <div class="user-name">${user.name}</div>
+    </div>
+  `).join('');
+}
+
 // Load conversation history when page loads
 window.addEventListener('DOMContentLoaded', function() {
+  renderAssistantUserGrid();
   console.log('🎵 DevConnect Labs Assistant loaded with LangChain + PostgreSQL memory!');
   const userId = document.getElementById('userSelect').value;
   console.log(`👤 Current user: ${userId}`);
