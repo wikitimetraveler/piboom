@@ -1,0 +1,18 @@
+{
+  "description": "COMPARE semantics fixture — no live Encompass; used by unit-tests-compare-integration.test.js",
+  "cases": [
+    { "actual": "hello", "expected": "HELLO", "mode": "equals", "pass": true },
+    { "actual": 0.1, "expected": 0.3, "mode": "approx", "pass": false },
+    { "actual": 0.30000000004, "expected": 0.3, "mode": "approx", "pass": true },
+    { "actual": "01/15/2025", "expected": "2025-01-15", "mode": "date", "pass": true },
+    { "actual": "Refinance Conv", "expected": "refi", "mode": "contains", "pass": true },
+    { "actual": "ABC123", "expected": "^[A-Z]+\\d+$", "mode": "regex", "pass": true },
+    { "actual": "", "expected": "null", "mode": "equals", "pass": true }
+  ],
+  "hubMock": {
+    "loanGuid": "00000000-0000-0000-0000-000000000001",
+    "fieldReader": {
+      "CX.DEMO": "ExpectedValue"
+    }
+  }
+}

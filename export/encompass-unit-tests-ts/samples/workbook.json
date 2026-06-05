@@ -1,0 +1,34 @@
+{
+  "meta": { "name": "Property tax flag sample", "loanGuid": "00000000-0000-0000-0000-000000000001" },
+  "headers": ["Step", "Action", "Target", "Description", "Test 1", "Test 2"],
+  "testDescriptions": [
+    { "testNumber": "1", "description": "Property tax flagged Y" },
+    { "testNumber": "2", "description": "Property tax flagged N" }
+  ],
+  "rows": [
+    {
+      "Step": "1",
+      "Action": "SET",
+      "Target": "[CX.PROPTAX.NEXTDUEDT.CHECK]",
+      "Description": "Property tax next-due check",
+      "Test 1": "Y",
+      "Test 2": "N"
+    },
+    {
+      "Step": "2",
+      "Action": "SET",
+      "Target": "[VEND.X441]",
+      "Description": "Property tax due date",
+      "Test 1": "01/15/2025",
+      "Test 2": "06/01/2030"
+    },
+    {
+      "Step": "3",
+      "Action": "COMPARE",
+      "Target": "[CX.PROPTAX.NEXTDUEDT.CHECK]",
+      "Description": "Verify property tax flag",
+      "Test 1": "Y",
+      "Test 2": "N"
+    }
+  ]
+}

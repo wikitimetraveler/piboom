@@ -1,0 +1,15 @@
+{
+  "name": "encompass-unit-tests-ts",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Portable TypeScript export of piBoom Encompass unit test logic",
+  "workspaces": [
+    "packages/core",
+    "packages/react-shell"
+  ],
+  "scripts": {
+    "test": "npm test -w @encompass-unit-tests/core",
+    "build": "npm run build -w @encompass-unit-tests/core && npm run build -w @encompass-unit-tests/react-shell",
+    "dev": "npm run dev -w @encompass-unit-tests/react-shell"
+  }
+}

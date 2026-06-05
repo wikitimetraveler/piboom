@@ -1,0 +1,21 @@
+{
+  "loanGuid": "00000000-0000-0000-0000-000000000001",
+  "fields": {
+    "CX.PROPTAX.NEXTDUEDT.CHECK": "",
+    "VEND.X441": "",
+    "CX.CITYTAX.NEXTDUEDT.CHECK": "N",
+    "CX.SCHOOLTAX.NEXTDUEDT.CHECK": "N",
+    "CX.OTHERTAX.NEXTDUEDT.CHECK": "N",
+    "VEND.X453": "",
+    "VEND.X462": "",
+    "VEND.X480": ""
+  },
+  "calculatedFields": {
+    "CUST11FV": {
+      "calculation": "[CUST11FV] = IIf(IIf(([CX.PROPTAX.NEXTDUEDT.CHECK] = \"Y\" OrElse DateDiff(\"D\", TODAY, [VEND.X441]) < 30) AndAlso IsDate([VEND.X441]), True,False) OrElse IIf(([CX.CITYTAX.NEXTDUEDT.CHECK] = \"Y\"  OrElse DateDiff(\"D\", TODAY, [VEND.X453]) < 30) AndAlso IsDate([VEND.X453]), True,False) OrElse IIf(([CX.SCHOOLTAX.NEXTDUEDT.CHECK] = \"Y\"  OrElse DateDiff(\"D\", TODAY, [VEND.X462]) < 30) AndAlso IsDate([VEND.X462]), True,False) OrElse IIf(([CX.OTHERTAX.NEXTDUEDT.CHECK]= \"Y\"  OrElse DateDiff(\"D\", TODAY, [VEND.X480]) < 30) AndAlso IsDate([VEND.X480]), True,False) ,\"Y\",\"N\")",
+      "dataType": "String",
+      "format": "YN",
+      "description": "Tax next-due rollup"
+    }
+  }
+}
