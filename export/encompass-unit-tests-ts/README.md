@@ -6,12 +6,17 @@ Standalone export copied from piBoom unit-test logic for use on a work machine.
 
 ## Setup (work computer)
 
+**Download from piBoom (no git):** Unit Tests page → **More** → **Download TypeScript work shell (ZIP)**, or open  
+`/api/unit-tests/ts-export` while the app is running (zipped on demand from this folder). Unzip anywhere, then:
+
 ```bash
-cd export/encompass-unit-tests-ts
+cd encompass-unit-tests-ts
 npm install
 npm test
 npm run dev
 ```
+
+**Or from git:** `git pull` then `cd export/encompass-unit-tests-ts` and run the same commands.
 
 ## Inputs (no Encompass API)
 

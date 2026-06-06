@@ -22,6 +22,34 @@ import {
   getLearnHints,
   saveLearnHints,
 } from '../services/unit-tests-learn-hints.service.js';
+import {
+  exportFolderExists,
+  streamTsExportZip,
+  TS_EXPORT_ZIP_NAME,
+} from '../services/unit-tests-export.service.js';
+
+/**
+ * Download portable TypeScript export bundle (on-demand zip).
+ * GET /api/unit-tests/ts-export
+ */
+export async function downloadTsExportHandler(req, res) {
+  try {
+    if (!exportFolderExists()) {
+      return res.status(404).json({ error: 'TypeScript export bundle not found' });
+    }
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${TS_EXPORT_ZIP_NAME}"`);
+    await streamTsExportZip(res);
+  } catch (error) {
+    console.error('Error streaming TS export zip:', error);
+    if (!res.headersSent) {
+      return res.status(500).json({
+        error: 'Failed to create export zip',
+        message: error.message,
+      });
+    }
+  }
+}
 
 /**
  * Upload unit test Excel file to library

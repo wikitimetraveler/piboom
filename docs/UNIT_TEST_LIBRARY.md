@@ -20,6 +20,10 @@ Examples:
 - `/finance/unit-tests.html?demo=1&reel=1` — offline sample + highlight reel
 - `/finance/unit-tests.html?generate=1` — jump straight to Generate modal
 
+## TypeScript work shell (portable export)
+
+Download a zip of the standalone TypeScript + React export (no Encompass API) from the Unit Tests page: **More** → **Download TypeScript work shell (ZIP)**. API: `GET /api/unit-tests/ts-export` (zipped on demand from `export/encompass-unit-tests-ts/`). Unzip, `npm install`, `npm run dev`, then load `samples/workbook.json` and `samples/loan-snapshot.json`.
+
 ## Search by Field ID
 
 **API:** `GET /api/unit-tests/search?fieldId=CX.TYPE`

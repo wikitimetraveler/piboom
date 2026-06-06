@@ -23,6 +23,7 @@ import {
   getBrRuleFileHandler,
   searchBrRulesByFieldIdHandler,
   deleteBrRuleFileHandler,
+  downloadTsExportHandler,
 } from '../controllers/unit-tests.controller.js';
 import unitTestsAIController from '../controllers/unit-tests-ai.controller.js';
 
@@ -72,6 +73,7 @@ router.post('/files', (req, res, next) => {
     next();
   });
 }, uploadUnitTestFile);
+router.get('/ts-export', downloadTsExportHandler);
 router.get('/files', listUnitTestFilesHandler);
 router.get('/files/:id', getUnitTestFileHandler);
 router.delete('/files/:id', deleteUnitTestFileHandler);
