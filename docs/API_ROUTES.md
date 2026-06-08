@@ -167,6 +167,11 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 | GET | `/api/music-pilgrimage/atlas/venues` | Venue index |
 | GET/POST/DELETE | `/api/music-pilgrimage/bookmarks` | Personal favorites, wishlist, visited |
 | GET/POST/DELETE | `/api/music-pilgrimage/routes` | Saved filter routes (clientId) |
+| GET | `/api/music-graph/collection/:userId` | Collection-seeded music graph subgraph (`?depth=`) |
+| GET | `/api/music-graph/artist/:key` | Artist neighborhood by MBID or slug |
+| POST | `/api/music-graph/refresh` | Reseed from `records` + MusicBrainz (`{ userId?, force? }`) |
+| GET | `/api/music-graph/:nodeId` | Traversal from node (`?depth=`) |
+| GET | `/api/music-graph/:nodeId/summary` | Node/edge type counts |
 | * | `/api/concert-collection/*` | Concert collection |
 | * | `/api/kml/*` | KML upload, YouTube search |
 | * | `/api/poster-generator/*` | Poster generation |
