@@ -179,6 +179,7 @@
     { href: '/music/music-research.html', icon: 'bi-search', label: 'Music Research', title: 'Search albums, artists, Spotify' },
     { href: '/music/album-discovery.html', icon: 'bi-disc', label: 'Album Discovery', title: 'Discover albums' },
     { href: '/music/collection.html', icon: 'bi-collection-fill', label: 'My Collection', title: 'Your music collection' },
+    { href: '/music/music-graph.html', icon: 'bi-diagram-3', label: 'Music Graph', title: 'Collection graph explorer (artist, album, show, member)' },
     { href: '/music/song-identifier.html', icon: 'bi-music-note-beamed', label: 'Song ID', title: 'Identify songs' },
     { href: '/music/spotify-dashboard.html', icon: 'bi-spotify', label: 'Spotify', title: 'Spotify dashboard' },
     { href: '/music/music-time-machine.html', icon: 'bi-clock-history', label: 'Time Machine', title: 'Music time machine' },

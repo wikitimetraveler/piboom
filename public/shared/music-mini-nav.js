@@ -10,6 +10,7 @@
     { href: '/music/music-research.html', label: 'Music Research', icon: 'bi-search', title: 'Search albums, artists, Spotify' },
     { href: '/music/album-discovery.html', label: 'Album Discovery', icon: 'bi-disc', title: 'Discover albums' },
     { href: '/music/collection.html', label: 'My Collection', icon: 'bi-collection-fill', title: 'Your music collection' },
+    { href: '/music/music-graph.html', label: 'Music Graph', icon: 'bi-diagram-3', title: 'Collection graph explorer' },
     { href: '/music/song-identifier.html', label: 'Song ID', icon: 'bi-music-note-beamed', title: 'Identify songs' },
     { href: '/music/spotify-dashboard.html', label: 'Spotify', icon: 'bi-spotify', title: 'Spotify dashboard' },
     { href: '/music/music-time-machine.html', label: 'Time Machine', icon: 'bi-clock-history', title: 'Music time machine' },

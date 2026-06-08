@@ -25,6 +25,13 @@ Collection-seeded music knowledge graph stored in dedicated Postgres adjacency-l
 
 Reseed is idempotent (`ON CONFLICT` upserts). Collection ownership is stored on album node `metadata_json` (`recordId`, `userId`, storage zone/slot).
 
+## UI
+
+- Page: [`public/music/music-graph.html`](../public/music/music-graph.html)
+- Script: [`public/music/js/music-graph.js`](../public/music/js/music-graph.js)
+
+Deep link: `/music/music-graph.html?artist=Grateful%20Dead`
+
 ## API
 
 Base path: `/api/music-graph`

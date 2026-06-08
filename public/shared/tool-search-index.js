@@ -38,6 +38,7 @@
     { name: 'Music Research', url: '/music/music-research.html', category: 'Music', keywords: 'artist search' },
     { name: 'Album Discovery', url: '/music/album-discovery.html', category: 'Music', keywords: 'albums covers' },
     { name: 'My Collection', url: '/music/collection.html', category: 'Music', keywords: 'album collection' },
+    { name: 'Music Graph', url: '/music/music-graph.html', category: 'Music', keywords: 'graph artist album member show venue collection musicbrainz' },
     { name: 'Song Identifier', url: '/music/song-identifier.html', category: 'Music', keywords: 'Shazam identify' },
     { name: 'Spotify', url: '/music/spotify-dashboard.html', category: 'Music', keywords: 'spotify dashboard' },
     { name: 'Time Machine', url: '/music/music-time-machine.html', category: 'Music', keywords: 'history date' },
