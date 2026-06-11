@@ -1,0 +1,21 @@
+/**
+ * Development work by David Lane
+ */
+import { Router } from 'express';
+import {
+  getHeygenHealth,
+  getHeygenAvatars,
+  getHeygenVoices,
+  postHeygenVideo,
+  getHeygenVideoStatus
+} from '../controllers/heygen.controller.js';
+
+const router = Router();
+
+router.get('/health', getHeygenHealth);
+router.get('/avatars', getHeygenAvatars);
+router.get('/voices', getHeygenVoices);
+router.post('/videos', postHeygenVideo);
+router.get('/videos/:videoId', getHeygenVideoStatus);
+
+export default router;

@@ -47,6 +47,7 @@ import gseRoutes from './gse.routes.js';
 import financeRoutes from './finance.routes.js';
 import disasterImpactGraphRoutes from './disaster-impact-graph.routes.js';
 import musicGraphRoutes from './music-graph.routes.js';
+import heygenRoutes from './heygen.routes.js';
 
 export default function buildRoutes(io) {
   const api = Router();
@@ -94,6 +95,7 @@ export default function buildRoutes(io) {
   api.use('/finance', financeRoutes);
   api.use('/disaster-impact-graph', disasterImpactGraphRoutes);
   api.use('/music-graph', musicGraphRoutes);
+  api.use('/heygen', heygenRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;
 }
