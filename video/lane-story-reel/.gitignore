@@ -1,0 +1,4 @@
+# Regenerable QA artifacts (npx hyperframes snapshot / inspect)
+snapshots/
+.hyperframes/
+node_modules/

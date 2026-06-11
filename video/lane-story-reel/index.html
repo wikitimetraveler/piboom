@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #13151a;
+      }
+      :root {
+        --bg: #13151a;
+        --surface: #1b1e26;
+        --surface-soft: #232830;
+        --text: #ece8df;
+        --muted: #b6b0a5;
+        --accent: #ae9a78;
+        --gold: #c4b896;
+        --border: rgba(236, 232, 223, 0.14);
+        --serif: Georgia, 'Times New Roman', serif;
+        --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+      }
+      body {
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+        color: var(--text);
+      }
+
+      /* --- scene frame --- */
+      .scene {
+        position: absolute;
+        inset: 0;
+        background: var(--bg);
+        overflow: hidden;
+      }
+      .scene-glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 1100px 700px at 30% 38%,
+          rgba(174, 154, 120, 0.10),
+          rgba(19, 21, 26, 0) 70%
+        );
+        pointer-events: none;
+      }
+      .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 110px 150px;
+        gap: 28px;
+      }
+      .kicker {
+        color: var(--accent);
+        font-size: 27px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      .rule {
+        width: 220px;
+        height: 1px;
+        background: var(--accent);
+        transform-origin: left center;
+        opacity: 0.85;
+      }
+      h1.title {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-weight: 400;
+        font-size: 100px;
+        line-height: 1.06;
+        max-width: 1500px;
+      }
+      .subtitle {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        color: var(--gold);
+        font-size: 38px;
+      }
+      .copy {
+        font-size: 33px;
+        line-height: 1.5;
+        color: var(--muted);
+        max-width: 1180px;
+      }
+      .trail {
+        font-size: 24px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-top: 14px;
+      }
+
+      /* two-column exhibit layout */
+      .exhibit {
+        flex-direction: row;
+        align-items: center;
+        gap: 90px;
+      }
+      .exhibit .text-col {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .exhibit .copy {
+        max-width: 860px;
+      }
+      .plate {
+        flex: 0 0 600px;
+        width: 600px;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 48px rgba(0, 0, 0, 0.35);
+        padding: 18px;
+      }
+      .plate .img-frame {
+        width: 100%;
+        height: 640px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+      .plate img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .plate figcaption {
+        padding: 18px 6px 4px;
+        font-size: 21px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+
+      /* magazine pull-quote (scene 4) */
+      .pullquote {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        font-size: 64px;
+        line-height: 1.2;
+        color: var(--gold);
+        max-width: 1280px;
+      }
+      .smallnote {
+        font-size: 23px;
+        color: var(--muted);
+        letter-spacing: 0.04em;
+      }
+
+      /* lunar stats (scene 5) */
+      .stats {
+        display: flex;
+        gap: 56px;
+        margin-top: 8px;
+      }
+      .stat {
+        border-left: 1px solid var(--accent);
+        padding-left: 24px;
+      }
+      .stat .label {
+        font-size: 20px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 6px;
+      }
+      .stat .value {
+        font-size: 40px;
+        font-variant-numeric: tabular-nums;
+        color: var(--text);
+        font-family: Georgia, 'Times New Roman', serif;
+      }
+
+      /* chronology (scene 6) */
+      .chrono {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        margin-top: 10px;
+      }
+      .chrono-row {
+        display: flex;
+        align-items: baseline;
+        gap: 36px;
+      }
+      .chrono-year {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 44px;
+        color: var(--gold);
+        font-variant-numeric: tabular-nums;
+        flex: 0 0 150px;
+        text-align: right;
+      }
+      .chrono-label {
+        font-size: 30px;
+        color: var(--text);
+      }
+      .chrono-label .src {
+        color: var(--muted);
+        font-size: 24px;
+      }
+      .closing {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        font-size: 30px;
+        color: var(--muted);
+        margin-top: 26px;
+      }
+
+      .vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 200;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse 1600px 1000px at 50% 50%,
+          rgba(0, 0, 0, 0) 62%,
+          rgba(0, 0, 0, 0.34) 100%
+        );
+      }
+
+      #s1 { z-index: 10; }
+      #s2 { z-index: 20; }
+      #s3 { z-index: 30; }
+      #s4 { z-index: 40; }
+      #s5 { z-index: 50; }
+      #s6 { z-index: 60; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="55"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- Scene 1 · Welcome chapter card -->
+      <div id="s1" class="scene clip" data-start="0" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content" style="align-items: center; text-align: center">
+          <p class="kicker" id="s1-kicker">Lane Legacy Museum</p>
+          <div class="rule" id="s1-rule" style="transform-origin: center"></div>
+          <h1 class="title" id="s1-title">A guided reel through the gallery</h1>
+          <p class="copy" id="s1-copy" style="text-align: center">
+            A quiet chronological gallery — from colonial Boston onward through later Lane
+            generations, drawn from cited records and Lane Genealogies Vol.&nbsp;I (1891).
+          </p>
+          <p class="trail" id="s1-trail">
+            Boston origins · compilers · 1884 press · lunar naming · prominent Lanes
+          </p>
+        </div>
+      </div>
+
+      <!-- Scene 2 · Opening exhibit: William E Lane of Boston -->
+      <div id="s2" class="scene clip" data-start="7" data-duration="11" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <div class="text-col">
+            <p class="kicker" id="s2-kicker">Opening exhibit</p>
+            <div class="rule" id="s2-rule"></div>
+            <h1 class="title" id="s2-title">William E Lane<br />of Boston</h1>
+            <p class="subtitle" id="s2-sub">Exhibit 1 · colonial chronology anchor</p>
+            <p class="copy" id="s2-copy">
+              Cordwainer of Boston — Hartford and Lynn appearances, freeman 1657, and the Mary
+              Brewer marriage. The chronology that later Lanes extend from.
+            </p>
+          </div>
+          <figure class="plate" id="s2-plate">
+            <div class="img-frame">
+              <img id="s2-img" data-layout-allow-overflow src="assets/william-e-lane-boston-hero.png" alt="Portrait plate associated with William E Lane of Boston" />
+            </div>
+            <figcaption>Portrait plate · Lane genealogy book materials</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Scene 3 · Historians / compilers -->
+      <div id="s3" class="scene clip" data-start="17" data-duration="10.5" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate" id="s3-plate">
+            <div class="img-frame">
+              <img id="s3-img" data-layout-allow-overflow src="assets/frontispiece-title-1891.png" alt="Frontispiece, Lane Genealogies Vol. I, 1891" />
+            </div>
+            <figcaption>Frontispiece · Lane Genealogies Vol. I (1891)</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker" id="s3-kicker">Historians · compilers</p>
+            <div class="rule" id="s3-rule"></div>
+            <h1 class="title" id="s3-title">Honoring the compilers</h1>
+            <p class="copy" id="s3-copy">
+              Volume I (1891) was generations in the making. Behind the plaques and printed
+              volumes stand compilers and trustees — the editorial labor that condensed
+              centuries into book form, now brought to life as an interactive family map.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 4 · Popular Science Monthly, May 1884 -->
+      <div id="s4" class="scene clip" data-start="26.5" data-duration="11" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <p class="kicker" id="s4-kicker">Popular Science Monthly · May 1884</p>
+          <div class="rule" id="s4-rule"></div>
+          <h1 class="title" id="s4-title">George G. Lane</h1>
+          <p class="pullquote" id="s4-quote">&ldquo;Was He an Idiot?&rdquo;</p>
+          <p class="copy" id="s4-copy">
+            A national magazine profile of a Hampton Falls man with calendrical gifts and
+            singular abilities — noted in the Lane genealogy by his brother, Levi E. Lane.
+          </p>
+          <p class="smallnote" id="s4-note">
+            Period language overlaps today&rsquo;s idea of &ldquo;idiot savant&rdquo; — quoted strictly as historical wording.
+          </p>
+        </div>
+      </div>
+
+      <!-- Scene 5 · Lunar nomenclature -->
+      <div id="s5" class="scene clip" data-start="36.5" data-duration="10.5" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <div class="text-col">
+            <p class="kicker" id="s5-kicker">Lunar nomenclature</p>
+            <div class="rule" id="s5-rule"></div>
+            <h1 class="title" id="s5-title">Lane crater<br />observatory</h1>
+            <p class="copy" id="s5-copy">
+              Jonathan Homer Lane&rsquo;s solar models helped launch stellar structure theory.
+              The far-side crater <em>Lane</em> honors him (IAU, 1970).
+            </p>
+            <div class="stats" id="s5-stats">
+              <div class="stat">
+                <div class="label">Latitude</div>
+                <div class="value">&minus;9.5&deg;</div>
+              </div>
+              <div class="stat">
+                <div class="label">Longitude</div>
+                <div class="value">132.36&deg;</div>
+              </div>
+              <div class="stat">
+                <div class="label">Diameter</div>
+                <div class="value">53.76 km</div>
+              </div>
+            </div>
+          </div>
+          <figure class="plate" id="s5-plate">
+            <div class="img-frame">
+              <img id="s5-img" data-layout-allow-overflow src="assets/lane-crater.png" alt="USGS feature context for Lane crater" style="object-position: 100% 50%" />
+            </div>
+            <figcaption>USGS Gazetteer of Planetary Nomenclature · feature 3268</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Scene 6 · Chronology close -->
+      <div id="s6" class="scene clip" data-start="46" data-duration="9" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content" id="s6-inner">
+          <p class="kicker" id="s6-kicker">Prominent Lanes · chronology</p>
+          <div class="rule" id="s6-rule"></div>
+          <h1 class="title" id="s6-title" style="font-size: 84px">Chronological highlights</h1>
+          <div class="chrono">
+            <div class="chrono-row" id="s6-r1">
+              <div class="chrono-year">1657</div>
+              <div class="chrono-label">William E Lane made freeman, Boston</div>
+            </div>
+            <div class="chrono-row" id="s6-r2">
+              <div class="chrono-year">1777</div>
+              <div class="chrono-label">Battle of Bennington &mdash; Lt. Ezekiel falls; Lt. John promoted <span class="src">(Vol. I)</span></div>
+            </div>
+            <div class="chrono-row" id="s6-r3">
+              <div class="chrono-year">1859</div>
+              <div class="chrono-label">Capt. Aaron G. Lane founds Lane&rsquo;s Crossing on the Mojave</div>
+            </div>
+            <div class="chrono-row" id="s6-r4">
+              <div class="chrono-year">1884</div>
+              <div class="chrono-label">Popular Science Monthly profiles George G. Lane</div>
+            </div>
+            <div class="chrono-row" id="s6-r5">
+              <div class="chrono-year">1970</div>
+              <div class="chrono-label">IAU names lunar crater <em>Lane</em> for Jonathan Homer Lane</div>
+            </div>
+          </div>
+          <p class="closing" id="s6-closing">
+            Continue on the memorial wall — births, deaths, places, and book-sourced excerpts.
+          </p>
+        </div>
+      </div>
+
+      <!-- Narration · Google Cloud TTS via /api/voice/synthesize (make-narration.mjs) -->
+      <audio id="nar-1" data-start="0.4" data-duration="7" data-track-index="5" src="assets/narration/scene1.mp3" data-volume="1"></audio>
+      <audio id="nar-2" data-start="7.6" data-duration="9.9" data-track-index="5" src="assets/narration/scene2.mp3" data-volume="1"></audio>
+      <audio id="nar-3" data-start="17.6" data-duration="7.8" data-track-index="5" src="assets/narration/scene3.mp3" data-volume="1"></audio>
+      <audio id="nar-4" data-start="27.1" data-duration="9.4" data-track-index="5" src="assets/narration/scene4.mp3" data-volume="1"></audio>
+      <audio id="nar-5" data-start="37.1" data-duration="8.7" data-track-index="5" src="assets/narration/scene5.mp3" data-volume="1"></audio>
+      <audio id="nar-6" data-start="46.6" data-duration="7" data-track-index="5" src="assets/narration/scene6.mp3" data-volume="1"></audio>
+
+      <div class="vignette"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* --- Scene 1 · Welcome (0–8) --- */
+      tl.from("#s1-kicker", { opacity: 0, letterSpacing: "0.5em", duration: 1.0, ease: "power2.out" }, 0.3);
+      tl.from("#s1-rule", { scaleX: 0, duration: 0.8, ease: "expo.out" }, 0.7);
+      tl.from("#s1-title", { opacity: 0, y: 46, duration: 0.9, ease: "power3.out" }, 0.9);
+      tl.from("#s1-copy", { opacity: 0, y: 28, duration: 0.7, ease: "power1.out" }, 1.5);
+      tl.from("#s1-trail", { opacity: 0, duration: 0.9, ease: "sine.out" }, 2.2);
+
+      /* --- crossfade into Scene 2 (7–17) --- */
+      tl.from("#s2", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 7);
+      tl.from("#s2-kicker", { opacity: 0, x: -34, duration: 0.6, ease: "power2.out" }, 7.7);
+      tl.from("#s2-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 7.9);
+      tl.from("#s2-title", { opacity: 0, y: 50, duration: 0.8, ease: "power3.out" }, 8.0);
+      tl.from("#s2-sub", { opacity: 0, duration: 0.6, ease: "sine.out" }, 8.5);
+      tl.from("#s2-copy", { opacity: 0, y: 26, duration: 0.7, ease: "power1.out" }, 8.7);
+      tl.from("#s2-plate", { opacity: 0, x: 70, duration: 0.9, ease: "power2.out" }, 8.1);
+      tl.fromTo("#s2-img", { scale: 1.1 }, { scale: 1.0, duration: 9.8, ease: "none" }, 8.1);
+
+      /* --- crossfade into Scene 3 (17–27.5) --- */
+      tl.from("#s3", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 17);
+      tl.from("#s3-plate", { opacity: 0, x: -70, duration: 0.9, ease: "power2.out" }, 17.8);
+      tl.fromTo("#s3-img", { scale: 1.08 }, { scale: 1.0, duration: 9.5, ease: "none" }, 17.8);
+      tl.from("#s3-kicker", { opacity: 0, x: 34, duration: 0.6, ease: "power3.out" }, 18.0);
+      tl.from("#s3-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 18.2);
+      tl.from("#s3-title", { opacity: 0, y: 44, duration: 0.8, ease: "power2.out" }, 18.3);
+      tl.from("#s3-copy", { opacity: 0, y: 24, duration: 0.7, ease: "sine.out" }, 18.8);
+
+      /* --- crossfade into Scene 4 (26.5–37.5) --- */
+      tl.from("#s4", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 26.5);
+      tl.from("#s4-kicker", { opacity: 0, letterSpacing: "0.46em", duration: 0.9, ease: "power2.out" }, 27.2);
+      tl.from("#s4-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 27.4);
+      tl.from("#s4-title", { opacity: 0, y: 48, duration: 0.8, ease: "power3.out" }, 27.5);
+      tl.from("#s4-quote", { opacity: 0, x: -52, duration: 0.9, ease: "power2.out" }, 28.1);
+      tl.from("#s4-copy", { opacity: 0, y: 26, duration: 0.7, ease: "sine.out" }, 28.7);
+      tl.from("#s4-note", { opacity: 0, duration: 0.8, ease: "power1.out" }, 29.4);
+
+      /* --- crossfade into Scene 5 (36.5–47) --- */
+      tl.from("#s5", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 36.5);
+      tl.from("#s5-kicker", { opacity: 0, x: -34, duration: 0.6, ease: "power2.out" }, 37.2);
+      tl.from("#s5-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 37.4);
+      tl.from("#s5-title", { opacity: 0, y: 48, duration: 0.8, ease: "power3.out" }, 37.5);
+      tl.from("#s5-copy", { opacity: 0, y: 26, duration: 0.7, ease: "sine.out" }, 38.0);
+      tl.from("#s5-stats .stat", { opacity: 0, y: 30, duration: 0.6, ease: "power2.out", stagger: 0.14 }, 38.5);
+      tl.from("#s5-plate", { opacity: 0, x: 70, duration: 0.9, ease: "power2.out" }, 37.6);
+      tl.fromTo("#s5-img", { scale: 1.12 }, { scale: 1.0, duration: 9.2, ease: "none" }, 37.6);
+
+      /* --- crossfade into Scene 6 (46–55) --- */
+      tl.from("#s6", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 46);
+      tl.from("#s6-kicker", { opacity: 0, x: -30, duration: 0.6, ease: "power2.out" }, 46.7);
+      tl.from("#s6-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 46.9);
+      tl.from("#s6-title", { opacity: 0, y: 40, duration: 0.7, ease: "power3.out" }, 47.0);
+      tl.from(["#s6-r1", "#s6-r2", "#s6-r3", "#s6-r4", "#s6-r5"], { opacity: 0, x: -44, duration: 0.55, ease: "power2.out", stagger: 0.22 }, 47.5);
+      tl.from("#s6-closing", { opacity: 0, duration: 0.8, ease: "sine.out" }, 49.2);
+
+      /* final scene only: fade to black */
+      tl.to("#s6-inner", { opacity: 0, duration: 1.3, ease: "power2.inOut" }, 53.5);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
