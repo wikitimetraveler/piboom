@@ -402,7 +402,7 @@
       "personQuery": "Jonathan Homer Lane",
       "caption": "Astrophysicist · Lane–Emden equation; lunar crater Lane; uncle of William Homer Lane in this tree",
       "eraLabel": "1819 Geneseo, N.Y. – 1880 Washington, D.C.",
-      "blurb": "Vol. I lists him under Mark Lane as first child: Exeter Academy, Yale 1846, coast survey in Washington. Standard biography adds Patent Office and Weights and Measures work and the gaseous-sun analysis behind stellar-structure theory. In this graph he is paternal uncle of William Homer Lane (id 108) and grand-uncle of Alderman Homer R Lane (id 112).",
+      "blurb": "Vol. I lists him under Mark Lane as first child: Exeter Academy, Yale 1846, coast survey in Washington. Standard biography adds Patent Office and Weights and Measures work and the gaseous-sun analysis behind stellar-structure theory. In this graph he is paternal uncle of William Homer Lane (id 108) and grand-uncle of Alderman Homer R Lane (id 112). Kinship-first chapter: /family/lane-scientific-lane.html",
       "imageUrl": "/family/assets/jonathan-homer-lane.png",
       "imageCaption": "Jonathan Homer Lane — astrophysicist; namesake of lunar crater Lane.",
       "imageCredit": "Lane family / genealogy compilation",
@@ -414,7 +414,7 @@
         },
         {
           "label": "USGS — Lane (lunar crater) nomenclature",
-          "url": "https://planetarynames.wr.usgs.gov/Feature/3315",
+          "url": "https://planetarynames.wr.usgs.gov/Feature/3268",
           "kind": "moon"
         },
         {
@@ -442,6 +442,16 @@
       "imageCredit": "Lane family / genealogy compilation",
       "links": [
         {
+          "label": "Mojave pioneer chapter",
+          "url": "/family/lane-aaron-g-lane.html",
+          "kind": "other"
+        },
+        {
+          "label": "Major achievers card",
+          "url": "/family/lane-major-achievers.html?slug=aaron-g-lane",
+          "kind": "other"
+        },
+        {
           "label": "Wikipedia — Lane's Crossing",
           "url": "https://en.wikipedia.org/wiki/Lane%27s_Crossing",
           "kind": "other"
@@ -453,7 +463,7 @@
     "title": "Lane crater observatory",
     "subtitle": "LROC QuickMap · USGS planetary names · “Lunar-5” spotlight",
     "featureName": "Lane",
-    "body": "Jonathan Homer Lane’s solar models helped launch stellar structure theory. The Moon’s Lane crater (~54 km) sits in Mare Cognitum — explore it in NASA’s LROC QuickMap or read the official USGS feature sheet.",
+    "body": "Jonathan Homer Lane’s solar models helped launch stellar structure theory. The Moon’s Lane crater (~54 km) on the far side honors him (IAU 1970) — explore it in NASA’s LROC QuickMap or read the official USGS feature sheet. Chapter: /family/lane-scientific-lane.html",
     "nomenclatureOrigin": "Jonathan Homer; American physicist, astrophysicist (1819-1880).",
     "latitude": -9.5,
     "longitude": 132.36,
@@ -506,7 +516,7 @@
     "imageCredit": "Full Moon (Clementine data) — Wikimedia / NASA",
     "quickMapUrl": "https://quickmap.lroc.im-ldi.com/",
     "moonTrekUrl": "https://trek.nasa.gov/moon/",
-    "usgsUrl": "https://planetarynames.wr.usgs.gov/Feature/3315"
+    "usgsUrl": "https://planetarynames.wr.usgs.gov/Feature/3268"
   },
   "media": [
     {

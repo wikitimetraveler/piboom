@@ -10,6 +10,7 @@
   let stops = [];
   let selectedStopId = null;
   let overview = null;
+  let preserveMapViewNext = false;
 
   function getClientId() {
     let id = localStorage.getItem(CLIENT_KEY);
@@ -131,6 +132,7 @@
         sel.value = row.year;
         document.querySelectorAll('.year-chip').forEach((c) => c.classList.remove('active'));
         chip.classList.add('active');
+        preserveMapViewNext = true;
         loadAtlas();
       });
       chips.appendChild(chip);
@@ -143,6 +145,8 @@
 
   async function loadAtlas() {
     syncUrl();
+    const preserveMapView = preserveMapViewNext;
+    preserveMapViewNext = false;
     const params = buildQueryParams();
     document.getElementById('timelineList').innerHTML =
       '<div class="detail-empty"><span class="spinner-border spinner-border-sm"></span> Loading journey…</div>';
@@ -155,12 +159,13 @@
       document.getElementById('stopCountLabel').textContent = `${data.stats.returned} / ${data.stats.total} stops`;
       renderTimeline(stops);
       await ensureMap();
-      renderMapMarkers(stops, data.mapBounds);
+      renderMapMarkers(stops, data.mapBounds, { fit: !preserveMapView });
       const showParam = qs('show');
+      const mapOpts = { panMap: !preserveMapView };
       if (showParam) {
-        selectStop(parseInt(showParam, 10), false);
+        selectStop(parseInt(showParam, 10), false, mapOpts);
       } else if (stops.length) {
-        selectStop(stops[0].id, false);
+        selectStop(stops[0].id, false, mapOpts);
       }
     } catch (e) {
       document.getElementById('timelineList').innerHTML =
@@ -232,8 +237,9 @@
     markers = [];
   }
 
-  function renderMapMarkers(list, bounds) {
+  function renderMapMarkers(list, bounds, options = {}) {
     if (!map) return;
+    const fit = options.fit !== false;
     clearMarkers();
     const latLngBounds = new google.maps.LatLngBounds();
     let hasPoint = false;
@@ -253,6 +259,8 @@
       latLngBounds.extend(pos);
     });
 
+    if (!fit) return;
+
     if (hasPoint && list.length > 1) {
       map.fitBounds(latLngBounds, 48);
     } else if (hasPoint && list.length === 1) {
@@ -261,7 +269,7 @@
     }
   }
 
-  async function selectStop(id, scrollTimeline) {
+  async function selectStop(id, scrollTimeline, options = {}) {
     selectedStopId = id;
     renderTimeline(stops);
     if (scrollTimeline) {
@@ -269,7 +277,7 @@
       card?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
     const stop = stops.find((s) => s.id === id);
-    if (stop?.lat != null && map) {
+    if (options.panMap !== false && stop?.lat != null && map) {
       map.panTo({ lat: stop.lat, lng: stop.lng });
       map.setZoom(Math.max(map.getZoom(), 8));
     }

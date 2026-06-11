@@ -73,6 +73,7 @@ const darkModeStyles = `
   body.dark-mode.lane-memorial-page,
   body.dark-mode.lane-occ-page,
   body.dark-mode.lane-direct-page,
+  body.dark-mode.lane-scientific-page,
   body.dark-mode.lane-pdf-gallery-root {
     --lf-bg: #1a1917;
     --lf-bg-elevated: #242220;

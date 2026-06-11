@@ -1,0 +1,103 @@
+{
+  "title": "The Endless Tour",
+  "subtitle": "1965–1995 · eight stops across thirty years",
+  "stats": { "shows": "2,300+", "years": "30", "milestones": "50" },
+  "stops": [
+    {
+      "id": "s1",
+      "year": "1965",
+      "kicker": "Early years",
+      "title": "Fillmore Auditorium",
+      "place": "San Francisco, CA",
+      "body": "First public show under the name Grateful Dead — Bill Graham's venue became their spiritual home.",
+      "lat": 37.7837,
+      "lng": -122.4331,
+      "photo": "fillmore.jpg",
+      "photoCaption": "Fillmore Auditorium — Wikimedia Commons"
+    },
+    {
+      "id": "s2",
+      "year": "1967",
+      "kicker": "Summer of Love",
+      "title": "Human Be-In",
+      "place": "Golden Gate Park · San Francisco",
+      "body": "Thirty thousand gathered in the park — the Dead alongside Jefferson Airplane, Leary's call to tune in.",
+      "lat": 37.7694,
+      "lng": -122.4783
+    },
+    {
+      "id": "s3",
+      "year": "1972",
+      "kicker": "Golden era",
+      "title": "Sunshine Daydream",
+      "place": "Veneta, Oregon",
+      "body": "An outdoor benefit on a hot August day — peak performance, later immortalized on film.",
+      "lat": 44.0465,
+      "lng": -123.3456
+    },
+    {
+      "id": "s4",
+      "year": "1974",
+      "kicker": "Wall of Sound",
+      "title": "Winterland",
+      "place": "San Francisco, CA",
+      "body": "Six hundred forty-one speakers — seventy-five tons of PA. Revolutionary concert sound, then farewell.",
+      "lat": 37.7838,
+      "lng": -122.4244
+    },
+    {
+      "id": "s5",
+      "year": "1977",
+      "kicker": "Peak year",
+      "title": "Barton Hall",
+      "place": "Cornell University · Ithaca, NY",
+      "body": "May eighth — widely hailed as the greatest show. Scarlet Begonias into Fire on the Mountain.",
+      "lat": 42.4487,
+      "lng": -76.4833,
+      "photo": "barton-hall.jpg",
+      "photoCaption": "Barton Hall, Cornell — Wikimedia Commons"
+    },
+    {
+      "id": "s6",
+      "year": "1978",
+      "kicker": "Egypt adventure",
+      "title": "Great Pyramids",
+      "place": "Giza, Egypt",
+      "body": "Three nights at the pyramids during a lunar eclipse — among the most mystical performances in rock history.",
+      "lat": 29.9792,
+      "lng": 31.1342,
+      "photo": "giza.jpg",
+      "photoCaption": "Great Pyramid of Giza — Wikimedia Commons"
+    },
+    {
+      "id": "s7",
+      "year": "1989",
+      "kicker": "Late tour",
+      "title": "Alpine Valley",
+      "place": "East Troy, Wisconsin",
+      "body": "Midwest outdoor amphitheater — a Deadhead mecca in the natural bowl of Wisconsin.",
+      "lat": 42.7783,
+      "lng": -88.3923
+    },
+    {
+      "id": "s8",
+      "year": "1995",
+      "kicker": "The end",
+      "title": "Soldier Field",
+      "place": "Chicago, IL",
+      "body": "July ninth — the last concert with Jerry Garcia. Show number two thousand three hundred eighteen.",
+      "lat": 41.8623,
+      "lng": -87.6167
+    }
+  ],
+  "endCard": {
+    "title": "The tour never really ended",
+    "body": "Explore every stop in the Live Music Pilgrimage Atlas.",
+    "url": "/music/music-pilgrimage-atlas.html?mode=tour"
+  },
+  "soundtrack": {
+    "source": "Internet Archive audience recording",
+    "identifier": "gd1977-05-08.152379.aud.petrunis.flac2448",
+    "note": "Non-commercial taper exchange per Grateful Dead digital policy"
+  }
+}

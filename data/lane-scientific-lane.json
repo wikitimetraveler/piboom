@@ -1,0 +1,193 @@
+{
+  "personId": 94,
+  "slug": "jonathan-homer-lane",
+  "hero": {
+    "kicker": "Family pride · Cousin branch",
+    "title": "Jonathan Homer Lane",
+    "subtitle": "Not on the direct line — but in the family. An astrophysicist whose name still rides on the Moon and in the Lane–Emden equation.",
+    "era": "1819 Geneseo, N.Y. — 1880 Washington, D.C.",
+    "portraitUrl": "/family/assets/jonathan-homer-lane.png",
+    "portraitCaption": "Jonathan Homer Lane — pencil sketch preserved with C. S. Peirce's 1878 Photometric Researches distribution list (Grupo de Estudios Peirceanos, Univ. de Navarra)."
+  },
+  "kinship": {
+    "anchorPersonId": 112,
+    "anchorName": "Alderman Homer R Lane",
+    "summary": "Anchor of the line: Alderman Homer R Lane (b. 1893). Jonathan Homer is his grand-uncle — brother of his grandfather David Tenney Lane, and uncle of William Homer Lane. A cousin-branch achievement — worth knowing even though the direct line runs through David, not Mark's eldest son.",
+    "steps": [
+      { "relation": "Direct line anchor", "name": "Alderman Homer R Lane", "personId": 112, "years": "1893–1970?" },
+      { "relation": "His father", "name": "David E Lane", "personId": 111, "years": "1886–1965?" },
+      { "relation": "His grandfather", "name": "David Tenney Lane", "personId": 97, "years": "1826–1901?" },
+      { "relation": "His grand-uncle (Jonathan's branch)", "name": "Jonathan Homer Lane", "personId": 94, "years": "1819–1880", "highlight": true },
+      { "relation": "Great-grandfather — shared with Jonathan's branch", "name": "Mark Lane (teacher, Stratham → Geneseo)", "personId": 86, "years": "1744–1844" }
+    ]
+  },
+  "homerNameThread": {
+    "title": "Why “Homer” keeps showing up in the line",
+    "lede": "Vol. I gives Jonathan the middle name Homer at birth. Later generations in the David Tenney Lane branch carried Homer forward — almost certainly in memory of this uncle, not as a random given name.",
+    "entries": [
+      {
+        "name": "Jonathan Homer Lane",
+        "personId": 94,
+        "role": "Source of the name",
+        "note": "Listed in Vol. I as “Jonathan Homer,” b. Aug. 1819 — first child of Mark Lane × Henrietta Tenney."
+      },
+      {
+        "name": "William Homer Lane",
+        "personId": 108,
+        "role": "Nephew",
+        "note": "Son of David Tenney Lane; middle name Homer ties him to his uncle Jonathan Homer Lane (paternal uncle)."
+      },
+      {
+        "name": "Alderman Homer R Lane",
+        "personId": 112,
+        "role": "Grand-nephew (direct-line anchor)",
+        "note": "Homer again in the middle; grand-uncle is Jonathan Homer Lane via David Tenney Lane."
+      }
+    ],
+    "caution": "Middle-name motives are inferred from kinship and naming pattern — not spelled out sentence-for-sentence in Vol. I. Treat as strong family-context reading, not a quoted book claim."
+  },
+  "evidence": [
+    {
+      "tier": "Evidence",
+      "label": "Lane Genealogies Vol. I (1891)",
+      "body": "Mark Lane child roster: Jonathan Homer, b. Aug. 1819; Exeter Academy 1839; Yale 1846; coast survey official, Washington; d. 1880.",
+      "links": [
+        { "label": "PDF gallery — page 77 roster", "url": "/family/lane-pdf-gallery.html?pdfPage=77" },
+        { "label": "Internet Archive facsimile", "url": "https://archive.org/details/lanegenealogies01chap", "external": true }
+      ]
+    },
+    {
+      "tier": "Context",
+      "label": "Modern science references",
+      "body": "Patent Office examiner, gaseous-Sun analysis (1870), Lane–Emden equation, IAU lunar crater Lane (1970). These sources extend the book line — they are not Vol. I text.",
+      "links": [
+        { "label": "Wikipedia — Jonathan Homer Lane", "url": "https://en.wikipedia.org/wiki/Jonathan_Homer_Lane", "external": true },
+        { "label": "Primary paper (DOI)", "url": "https://doi.org/10.2475/ajs.s2-50.148.57", "external": true },
+        { "label": "Yale — stellar structure note", "url": "http://www.astro.yale.edu/demarque/lane.html", "external": true }
+      ]
+    }
+  ],
+  "timeline": [
+    { "id": "tl-1819", "year": "1819", "title": "Born Geneseo, N.Y.", "body": "Son of Mark Lane (Stratham teacher → western settlement) and Henrietta Tenney.", "placeId": "geneseo" },
+    { "id": "tl-1839", "year": "1839", "title": "Phillips Exeter Academy", "body": "NH schooling — keeps the Stratham/New Hampshire branch in his story.", "placeId": "exeter" },
+    { "id": "tl-1846", "year": "1846", "title": "Yale", "body": "Graduated; studied under astronomer Denison Olmsted.", "placeId": "new-haven" },
+    { "id": "tl-1847", "year": "1847–48", "title": "U.S. Coast Survey", "body": "Federal work in Washington, D.C.", "placeId": "washington" },
+    { "id": "tl-1848", "year": "1848–57", "title": "U.S. Patent Office", "body": "Principal examiner from 1851; removed after an administration change in 1857.", "placeId": "washington" },
+    { "id": "tl-1860", "year": "1860–66", "title": "Franklin, Pennsylvania", "body": "Lived with his blacksmith brother; pursued low-temperature apparatus experiments.", "placeId": "franklin" },
+    { "id": "tl-1869", "year": "1869–80", "title": "Office of Weights and Measures", "body": "Treasury department work — predecessor lineage to NIST.", "placeId": "washington" },
+    { "id": "tl-1870", "year": "1870", "title": "Gaseous Sun paper", "body": "American Journal of Science — first detailed hydrostatic model of the Sun as a gas sphere.", "placeId": "washington" },
+    { "id": "tl-1880", "year": "1880", "title": "Died Washington, D.C.", "body": "Never married; buried in the federal city he served.", "placeId": "washington" },
+    { "id": "tl-1970", "year": "1970", "title": "Lunar crater Lane", "body": "IAU names far-side crater for Jonathan Homer Lane.", "mapMode": "moon" }
+  ],
+  "places": {
+    "title": "Map — where this branch lived",
+    "lede": "Every pin below is a stop in the Mark Lane branch story — from Stratham schoolteaching west to Geneseo, then down to Venango County, Pennsylvania, where Vol. I says Mark settled “in or near Franklin, Venango Co., Penn.” Franklin and Oil City sit eight miles apart on the Allegheny. The book roster runs to the great-grandfather generation; the family stayed on — Dad and his sister were born here.",
+    "censusNote": "Extending past the book: Vol. I (1891) carries this branch to great-grandfather David E Lane (b. 1886) — Alderman Homer R Lane (b. 1893, two years after the book went to print) was added to the graph from family research. The 1850–1900 federal census for Venango County corroborates the book roster (John Mark b. 1823, David Tenney b. 1826, William Homer b. 1851, David E b. 1886 — all Franklin, PA in the graph), and the 1900–1950 census plus Oil City/Franklin vital records will document Homer R's generation onward, down to Dad and Aunt Peg.",
+    "items": [
+      {
+        "id": "stratham",
+        "name": "Stratham, N.H.",
+        "kind": "evidence",
+        "years": "1700s–early 1800s",
+        "lat": 43.019,
+        "lng": -70.9117,
+        "note": "Vol. I: Mark Lane “was a teacher in Stratham and vicinity” before heading west. The old New Hampshire seat of this branch.",
+        "personIds": [{ "id": 86, "name": "Mark Lane" }]
+      },
+      {
+        "id": "geneseo",
+        "name": "Geneseo, N.Y.",
+        "kind": "evidence",
+        "years": "1810s",
+        "lat": 42.7959,
+        "lng": -77.8169,
+        "note": "Mark Lane “settled in Geneseo, Livingston Co., N.Y.” — Jonathan Homer Lane born here, Aug. 1819.",
+        "personIds": [{ "id": 86, "name": "Mark Lane" }, { "id": 94, "name": "Jonathan Homer Lane" }]
+      },
+      {
+        "id": "exeter",
+        "name": "Exeter, N.H.",
+        "kind": "evidence",
+        "years": "1839",
+        "lat": 42.9814,
+        "lng": -70.9478,
+        "note": "Phillips Exeter Academy — Jonathan's NH schooling kept the Stratham-branch tie alive.",
+        "personIds": [{ "id": 94, "name": "Jonathan Homer Lane" }]
+      },
+      {
+        "id": "new-haven",
+        "name": "New Haven, Conn.",
+        "kind": "evidence",
+        "years": "1846",
+        "lat": 41.3083,
+        "lng": -72.9279,
+        "note": "Yale — graduated 1846; studied under astronomer Denison Olmsted.",
+        "personIds": [{ "id": 94, "name": "Jonathan Homer Lane" }]
+      },
+      {
+        "id": "washington",
+        "name": "Washington, D.C.",
+        "kind": "evidence",
+        "years": "1847–57 · 1869–80",
+        "lat": 38.9072,
+        "lng": -77.0369,
+        "note": "Coast Survey, Patent Office principal examiner, Office of Weights and Measures. The 1870 gaseous-Sun paper was written here; died 1880.",
+        "personIds": [{ "id": 94, "name": "Jonathan Homer Lane" }]
+      },
+      {
+        "id": "franklin",
+        "name": "Franklin, Pa. (Venango Co.)",
+        "kind": "evidence",
+        "highlight": true,
+        "years": "1820s onward · Jonathan 1860–66",
+        "lat": 41.3979,
+        "lng": -79.8314,
+        "note": "Vol. I: Mark Lane settled “in or near Franklin, Venango Co., Penn.” (d. 1844). Jonathan returned 1860–66 to live with his blacksmith brother and run low-temperature experiments. The graph shows generations born here: John Mark (1823), David Tenney (1826), William Homer (1851), David E (1886) — plus Alderman Homer R (1893), added past the book's coverage.",
+        "personIds": [
+          { "id": 86, "name": "Mark Lane" },
+          { "id": 96, "name": "John Mark Lane" },
+          { "id": 97, "name": "David Tenney Lane" },
+          { "id": 108, "name": "William Homer Lane" },
+          { "id": 111, "name": "David E Lane" },
+          { "id": 112, "name": "Alderman Homer R Lane" }
+        ]
+      },
+      {
+        "id": "oil-city",
+        "name": "Oil City, Pa. (Venango Co.)",
+        "kind": "family",
+        "highlight": true,
+        "years": "1900s · Dad & Aunt Peg born here",
+        "lat": 41.4339,
+        "lng": -79.7064,
+        "note": "Eight miles up the Allegheny from Franklin. Dad and his sister — Aunt Peg, keeper of the “John” stories — were born here, generations beyond Vol. I's coverage (the book ends at the great-grandfather generation). The book's John of this branch is John Mark Lane, b. 1823 Franklin. Census and vital records will extend the printed line to these born-in-Oil-City generations.",
+        "personIds": [{ "id": 96, "name": "John Mark Lane" }]
+      }
+    ]
+  },
+  "sciencePlain": {
+    "title": "What he figured out (plain English)",
+    "beats": [
+      "Most astronomers in his day still pictured the Sun as partly solid. Lane treated it as a ball of gas held up by its own heat and gravity.",
+      "His math was wrong on the surface temperature (Stefan's law wasn't published yet), but the interior reasoning pointed toward millions of degrees at the core — directionally right.",
+      "Robert Emden extended the model; together their Lane–Emden equation still appears in astrophysics courses for polytropic stars."
+    ]
+  },
+  "lunar": {
+    "title": "A Lane on the Moon",
+    "body": "Crater Lane (~54 km) on the lunar far side honors Jonathan Homer Lane (IAU 1970). It is a cousin-branch honor — the family name in planetary nomenclature.",
+    "lat": -9.5,
+    "lng": 132.36,
+    "diameterKm": 53.76,
+    "usgsUrl": "https://planetarynames.wr.usgs.gov/Feature/3268",
+    "museumUrl": "/family/lane-museum.html?lunar=1"
+  },
+  "cta": [
+    { "label": "Watch the film (73s, narrated)", "url": "/family/assets/video/lane-scientific-presentation.mp4", "icon": "bi-film" },
+    { "label": "Open in family tree", "url": "/family/genealogy.html?id=94", "icon": "bi-diagram-3" },
+    { "label": "Lane Museum exhibit", "url": "/family/lane-museum.html", "icon": "bi-building" },
+    { "label": "Trading card (legendary)", "url": "/family/lane-trading-cards.html", "icon": "bi-collection" },
+    { "label": "Major achievers entry", "url": "/family/lane-major-achievers.html?slug=jonathan-homer-lane", "icon": "bi-award" },
+    { "label": "Your direct line", "url": "/family/lane-direct-ancestor-story.html", "icon": "bi-signpost-2" }
+  ]
+}

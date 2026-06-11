@@ -170,11 +170,15 @@
       ],
       "externalLinks": [
         { "label": "Wikipedia — Jonathan Homer Lane", "url": "https://en.wikipedia.org/wiki/Jonathan_Homer_Lane", "kind": "wikipedia" },
-        { "label": "USGS — Lane (lunar crater)", "url": "https://planetarynames.wr.usgs.gov/Feature/3315", "kind": "reference" },
+        { "label": "USGS — Lane (lunar crater)", "url": "https://planetarynames.wr.usgs.gov/Feature/3268", "kind": "reference" },
+        { "label": "Primary paper (DOI)", "url": "https://doi.org/10.2475/ajs.s2-50.148.57", "kind": "reference" },
         { "label": "Wikipedia — Lane–Emden equation", "url": "https://en.wikipedia.org/wiki/Lane%E2%80%93Emden_equation", "kind": "wikipedia" }
       ],
       "verificationStatus": "corroborated",
-      "siteLinks": [{ "label": "Lane Museum + lunar exhibit", "url": "/family/lane-museum.html" }]
+      "siteLinks": [
+        { "label": "Scientific Lane chapter", "url": "/family/lane-scientific-lane.html" },
+        { "label": "Lane Museum + lunar exhibit", "url": "/family/lane-museum.html" }
+      ]
     },
     {
       "slug": "george-g-lane",
@@ -222,15 +226,48 @@
       "personId": 1024,
       "branch": "California / Mojave",
       "eraLabel": "1817–1883",
-      "achievementSummary": "Mexican-American War veteran and Forty-niner; established Lane's Crossing ranch and traveler store on the Mojave River (1859), a Victor Valley pioneer site.",
+      "achievementSummary": "Mexican-American War veteran and Forty-niner; first permanent settler on the Mojave River; founded Lane's Crossing (1858–65) on the Mormon Road — the Last Crossing before Cajon Pass.",
+      "expandedCard": true,
+      "detailLead": "Piermont, N.H. farmer turned frontier station-keeper at the Lower Narrows ford where Mormon Road, Mojave Road, and Mohave Trail traffic converged.",
+      "detailBullets": [
+        "Co. H, 9th U.S. Infantry (1847–48); malaria at Puebla; California Gold Rush by 1850.",
+        "Lane's Crossing ranch & store — first settlement on the Mojave River; sold 1865 for Bryman alfalfa ranch.",
+        "Twin Moses Lane died at Acapulco en route to California; niece Eldora Richmond nursed Aaron at Halleck, 1883."
+      ],
+      "routeCorridors": ["Mormon Road", "Mojave Road", "Mohave Trail", "Old Spanish Trail"],
+      "bookQuote": "XV. CAPT. AARON G.⁶ (twin brother to Moses), b. 23 Dec., 1817, went to California in 1849… died unm. 14 Sept., 1883, at Lane's Crossing of the Mojave river.",
+      "galleryImages": [
+        {
+          "url": "/family/assets/lane-aaron/mojave-narrows-1905.jpg",
+          "alt": "Mojave River Narrows near Victorville, ca. 1905",
+          "caption": "Lower Narrows — Lane's Crossing ford"
+        },
+        {
+          "url": "/family/assets/lane-aaron/gold-miners-long-tom.jpg",
+          "alt": "California gold miners, ca. 1850",
+          "caption": "Forty-niner era (context)"
+        },
+        {
+          "url": "/family/assets/lane-aaron/mojave-desert-vista.jpg",
+          "alt": "Mojave Desert landscape",
+          "caption": "High Desert · Victor Valley"
+        }
+      ],
       "bookEvidence": [
-        { "kind": "node-text", "source": "laneData.json", "note": "Went to California 1849; widely known in early Mojave corridor." }
+        { "kind": "node-text", "source": "laneData.json", "note": "Went to California 1849; widely known in early Mojave corridor; Mrs. Richmond niece at Halleck." },
+        { "kind": "node-text", "source": "laneData.json", "note": "Twin Moses P. Lane d. Acapulco 1852; dau. Eldora m. George Richmond." }
       ],
       "externalLinks": [
-        { "label": "Wikipedia — Lane's Crossing", "url": "https://en.wikipedia.org/wiki/Lane%27s_Crossing", "kind": "wikipedia" }
+        { "label": "Wikipedia — Lane's Crossing", "url": "https://en.wikipedia.org/wiki/Lane%27s_Crossing", "kind": "wikipedia" },
+        { "label": "Pioneer of the Mojave (Thompson)", "url": "http://members.uia.net/rdthompson/lane1.html", "kind": "book" },
+        { "label": "HMDB — Mojave River Crossing", "url": "https://www.hmdb.org/m.asp?m=73472", "kind": "marker" }
       ],
       "verificationStatus": "corroborated",
-      "siteLinks": [{ "label": "Lane Museum exhibit", "url": "/family/lane-museum.html" }]
+      "siteLinks": [
+        { "label": "Mojave pioneer chapter", "url": "/family/lane-aaron-g-lane.html", "primary": true },
+        { "label": "Lane Museum exhibit", "url": "/family/lane-museum.html" },
+        { "label": "Mexican-American War", "url": "/family/lane-war-history.html#laneWarTab-mexican-american-war" }
+      ]
     },
     {
       "slug": "hampton-monument-committee",

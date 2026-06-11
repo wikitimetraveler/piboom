@@ -1,5 +1,7 @@
 # Subagents + Skills — HeyGen Script
 
+> **Note:** HeyGen API integration was removed from the repo; paste these scripts manually into HeyGen (or similar) via Cursor workflow.
+
 **Target:** Mixed technical audience (engineering + product)  
 **Duration:** 2-3 minutes  
 **Format:** HeyGen avatar + screen capture

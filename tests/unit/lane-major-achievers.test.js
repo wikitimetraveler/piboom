@@ -50,6 +50,18 @@ describe('lane-major-achievers.json', () => {
     expect(doc.stats.tierB).toBe(tierB);
     expect(doc.stats.tierC).toBe(tierC);
   });
+
+  test('aaron-g-lane expanded card links to Mojave pioneer chapter', () => {
+    const aaron = doc.achievers.find((a) => a.slug === 'aaron-g-lane');
+    expect(aaron).toBeDefined();
+    expect(aaron.expandedCard).toBe(true);
+    expect(Array.isArray(aaron.galleryImages)).toBe(true);
+    expect(aaron.galleryImages.length).toBeGreaterThanOrEqual(2);
+    const chapter = (aaron.siteLinks || []).find((l) => l.url === '/family/lane-aaron-g-lane.html');
+    expect(chapter).toBeDefined();
+    expect(chapter.primary).toBe(true);
+    expect(chapter.label).toMatch(/Mojave/i);
+  });
 });
 
 describe('lane-magazine-issue-02.json', () => {

@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0f1218;
+      }
+      :root {
+        --bg: #0f1218;
+        --surface: #171b24;
+        --surface-2: #1e2430;
+        --text: #ece8df;
+        --muted: #a8a397;
+        --blue: #8eb4d9;
+        --gold: #c4a574;
+        --border: rgba(236, 232, 223, 0.14);
+      }
+      body {
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+        color: var(--text);
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        background: var(--bg);
+        overflow: hidden;
+      }
+      .scene-glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 1200px 760px at 32% 36%,
+          rgba(80, 120, 180, 0.14),
+          rgba(15, 18, 24, 0) 70%
+        );
+        pointer-events: none;
+      }
+      .scene-stars {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .star {
+        position: absolute;
+        border-radius: 50%;
+        background: #dfe8f2;
+      }
+      .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 110px 150px;
+        gap: 26px;
+      }
+      .kicker {
+        color: var(--gold);
+        font-size: 26px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      .rule {
+        width: 220px;
+        height: 1px;
+        background: var(--gold);
+        transform-origin: left center;
+        opacity: 0.85;
+      }
+      h1.title {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-weight: 400;
+        font-size: 102px;
+        line-height: 1.05;
+        max-width: 1520px;
+      }
+      .subtitle {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        color: var(--blue);
+        font-size: 40px;
+      }
+      .copy {
+        font-size: 33px;
+        line-height: 1.5;
+        color: var(--muted);
+        max-width: 1160px;
+      }
+      .era {
+        font-size: 28px;
+        letter-spacing: 0.1em;
+        color: var(--blue);
+      }
+
+      .exhibit {
+        flex-direction: row;
+        align-items: center;
+        gap: 90px;
+      }
+      .exhibit .text-col {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .exhibit .copy {
+        max-width: 840px;
+      }
+      .plate {
+        flex: 0 0 620px;
+        width: 620px;
+        display: flex;
+        flex-direction: column;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 48px rgba(0, 0, 0, 0.4);
+        padding: 18px;
+      }
+      .plate .img-frame {
+        width: 100%;
+        height: 660px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: #f4f1ea;
+      }
+      .plate img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .plate figcaption {
+        padding: 18px 6px 4px;
+        font-size: 21px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+
+      /* portrait study — bigger plate, face-origin push */
+      .plate--portrait {
+        flex: 0 0 700px;
+        width: 700px;
+      }
+      .plate--portrait .img-frame {
+        height: 740px;
+      }
+      #s2-img {
+        transform-origin: 38% 38%;
+      }
+
+      .chrono {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 8px;
+      }
+      .chrono-row {
+        display: flex;
+        align-items: baseline;
+        gap: 34px;
+      }
+      .chrono-year {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 42px;
+        color: var(--gold);
+        font-variant-numeric: tabular-nums;
+        flex: 0 0 230px;
+        text-align: right;
+      }
+      .chrono-label {
+        font-size: 31px;
+        color: var(--text);
+      }
+      .chrono-label .sub {
+        color: var(--muted);
+        font-size: 24px;
+      }
+
+      /* kinship chain */
+      .chain {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 6px;
+      }
+      .chain-row {
+        display: flex;
+        align-items: baseline;
+        gap: 26px;
+        padding-left: 26px;
+        border-left: 2px solid rgba(142, 180, 217, 0.4);
+      }
+      .chain-row.is-highlight {
+        border-left-color: var(--gold);
+      }
+      .chain-rel {
+        font-size: 21px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--blue);
+        flex: 0 0 380px;
+      }
+      .chain-row.is-highlight .chain-rel {
+        color: var(--gold);
+      }
+      .chain-name {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 38px;
+      }
+      .chain-years {
+        font-size: 24px;
+        color: var(--muted);
+      }
+
+      /* science scene */
+      .sun {
+        position: absolute;
+        right: 180px;
+        top: 50%;
+        width: 560px;
+        height: 560px;
+        margin-top: -280px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 42% 40%,
+          rgba(244, 226, 188, 0.95),
+          rgba(196, 165, 116, 0.85) 38%,
+          rgba(150, 110, 70, 0.5) 62%,
+          rgba(15, 18, 24, 0) 72%
+        );
+      }
+      .equation {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 64px;
+        color: var(--text);
+        letter-spacing: 0.02em;
+      }
+      .equation .frac {
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        font-size: 0.62em;
+        line-height: 1.1;
+      }
+      .equation .frac span {
+        display: block;
+        padding: 0 12px;
+      }
+      .equation .frac span:first-child {
+        border-bottom: 2px solid var(--text);
+      }
+      .eq-credit {
+        font-size: 26px;
+        color: var(--muted);
+      }
+
+      .stats {
+        display: flex;
+        gap: 52px;
+        margin-top: 8px;
+      }
+      .stat {
+        border-left: 1px solid var(--gold);
+        padding-left: 24px;
+      }
+      .stat .label {
+        font-size: 20px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 6px;
+      }
+      .stat .value {
+        font-size: 40px;
+        font-variant-numeric: tabular-nums;
+        font-family: Georgia, 'Times New Roman', serif;
+      }
+
+      .vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 200;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse 1600px 1000px at 50% 50%,
+          rgba(0, 0, 0, 0) 62%,
+          rgba(0, 0, 0, 0.36) 100%
+        );
+      }
+
+      #s1 { z-index: 10; }
+      #s2 { z-index: 20; }
+      #s3 { z-index: 30; }
+      #s4 { z-index: 40; }
+      #s5 { z-index: 50; }
+      #s6 { z-index: 60; }
+      #s7 { z-index: 70; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="73"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- S1 · Title (0–11.5) -->
+      <div id="s1" class="scene clip" data-start="0" data-duration="11.5" data-track-index="1">
+        <div class="scene-stars" data-starfield="11"></div>
+        <div class="scene-glow"></div>
+        <div class="scene-content" style="align-items: center; text-align: center">
+          <p class="kicker" id="s1-kicker">Lane Family · Scientific Lane</p>
+          <div class="rule" id="s1-rule" style="transform-origin: center"></div>
+          <h1 class="title" id="s1-title">Jonathan Homer Lane</h1>
+          <p class="subtitle" id="s1-sub">The family&rsquo;s astrophysicist</p>
+          <p class="era" id="s1-era">1819 Geneseo, N.Y. &mdash; 1880 Washington, D.C.</p>
+        </div>
+      </div>
+
+      <!-- S2 · Portrait study (10.5–21.5) -->
+      <div id="s2" class="scene clip" data-start="10.5" data-duration="11" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate plate--portrait" id="s2-plate">
+            <div class="img-frame">
+              <img id="s2-img" data-layout-allow-overflow src="assets/jhl-portrait-sketch.png" alt="Pencil sketch profile portrait of Jonathan Homer Lane" />
+            </div>
+            <figcaption>
+              Pencil sketch in profile &mdash; the only known portrait. Preserved with C.&nbsp;S. Peirce&rsquo;s 1878
+              <em>Photometric Researches</em> distribution list (Grupo de Estudios Peirceanos, Univ. de Navarra).
+            </figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker" id="s2-kicker">Portrait study</p>
+            <div class="rule" id="s2-rule"></div>
+            <h1 class="title" id="s2-title" style="font-size: 84px">The only known<br />portrait</h1>
+            <p class="copy" id="s2-copy">
+              No studio photograph of him is known to survive. This pencil sketch endures
+              because Charles S. Peirce put Lane on the list of 28 American scientists to
+              receive <em>Photometric Researches</em> in 1878 &mdash; and scholars kept the list.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S3 · Kinship / Homer thread (20.5–30) -->
+      <div id="s3" class="scene clip" data-start="20.5" data-duration="9.5" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <p class="kicker" id="s3-kicker">How he fits the family</p>
+          <div class="rule" id="s3-rule"></div>
+          <h1 class="title" id="s3-title" style="font-size: 78px">Why &ldquo;Homer&rdquo; keeps showing up</h1>
+          <div class="chain">
+            <div class="chain-row is-highlight" id="s3-r1">
+              <span class="chain-rel">The source · grand-uncle</span>
+              <span class="chain-name">Jonathan Homer Lane</span>
+              <span class="chain-years">1819&ndash;1880</span>
+            </div>
+            <div class="chain-row" id="s3-r2">
+              <span class="chain-rel">His brother</span>
+              <span class="chain-name">David Tenney Lane</span>
+              <span class="chain-years">1826&ndash;1901</span>
+            </div>
+            <div class="chain-row" id="s3-r3">
+              <span class="chain-rel">Nephew</span>
+              <span class="chain-name">William <em>Homer</em> Lane</span>
+              <span class="chain-years">1851&ndash;1920</span>
+            </div>
+            <div class="chain-row" id="s3-r4">
+              <span class="chain-rel">Grandfather · added past the book</span>
+              <span class="chain-name">Alderman <em>Homer</em> R Lane</span>
+              <span class="chain-years">1893&ndash;1970</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S4 · Life arc (29–40.5) -->
+      <div id="s4" class="scene clip" data-start="29" data-duration="11.5" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <p class="kicker" id="s4-kicker">Life arc</p>
+          <div class="rule" id="s4-rule"></div>
+          <h1 class="title" id="s4-title" style="font-size: 84px">Schoolhouse to capital</h1>
+          <div class="chrono">
+            <div class="chrono-row" id="s4-r1">
+              <div class="chrono-year">1819</div>
+              <div class="chrono-label">Born Geneseo, N.Y. <span class="sub">son of Mark Lane, Stratham teacher gone west</span></div>
+            </div>
+            <div class="chrono-row" id="s4-r2">
+              <div class="chrono-year">1839</div>
+              <div class="chrono-label">Phillips Exeter Academy <span class="sub">the New Hampshire tie</span></div>
+            </div>
+            <div class="chrono-row" id="s4-r3">
+              <div class="chrono-year">1846</div>
+              <div class="chrono-label">Yale <span class="sub">under astronomer Denison Olmsted</span></div>
+            </div>
+            <div class="chrono-row" id="s4-r4">
+              <div class="chrono-year">1848&ndash;57</div>
+              <div class="chrono-label">U.S. Patent Office, Washington <span class="sub">principal examiner from 1851</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S5 · Venango County (39.5–54) -->
+      <div id="s5" class="scene clip" data-start="39.5" data-duration="14.5" data-track-index="1">
+        <div class="scene-glow" style="background: radial-gradient(ellipse 1200px 760px at 68% 40%, rgba(196, 165, 116, 0.12), rgba(15, 18, 24, 0) 70%)"></div>
+        <div class="scene-content">
+          <p class="kicker" id="s5-kicker">Venango County, Pennsylvania</p>
+          <div class="rule" id="s5-rule"></div>
+          <h1 class="title" id="s5-title" style="font-size: 84px">Franklin &amp; Oil City</h1>
+          <p class="subtitle" id="s5-sub">Eight miles apart on the Allegheny &mdash; where this branch put down roots</p>
+          <div class="chrono">
+            <div class="chrono-row" id="s5-r1">
+              <div class="chrono-year">1820s</div>
+              <div class="chrono-label">Mark Lane settles &ldquo;in or near Franklin, Venango Co., Penn.&rdquo; <span class="sub">Vol. I</span></div>
+            </div>
+            <div class="chrono-row" id="s5-r2">
+              <div class="chrono-year">1860&ndash;66</div>
+              <div class="chrono-label">Jonathan returns &mdash; six years with his blacksmith brother <span class="sub">low-temperature experiments</span></div>
+            </div>
+            <div class="chrono-row" id="s5-r3">
+              <div class="chrono-year">5 gens</div>
+              <div class="chrono-label">Born in Franklin: John Mark, David Tenney, William Homer, David E <span class="sub">+ Grandfather Homer R, added past the book</span></div>
+            </div>
+            <div class="chrono-row" id="s5-r4">
+              <div class="chrono-year">1900s</div>
+              <div class="chrono-label">Dad &amp; Aunt Peg born in Oil City <span class="sub">the stories of &ldquo;John&rdquo; live here</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S6 · Science (53–63.5) -->
+      <div id="s6" class="scene clip" data-start="53" data-duration="10.5" data-track-index="2">
+        <div class="scene-stars" data-starfield="66"></div>
+        <div class="sun" id="s6-sun"></div>
+        <div class="scene-content" style="max-width: 1150px">
+          <p class="kicker" id="s6-kicker">The gaseous Sun · 1870</p>
+          <div class="rule" id="s6-rule"></div>
+          <h1 class="title" id="s6-title" style="font-size: 80px">A ball of gas, held<br />up by its own heat</h1>
+          <p class="equation" id="s6-eq">
+            <span class="frac"><span>1</span><span>&xi;&sup2;</span></span>
+            &nbsp;<span class="frac"><span>d</span><span>d&xi;</span></span>
+            <span style="font-size: 1.15em">(</span>&xi;&sup2;
+            <span class="frac"><span>d&theta;</span><span>d&xi;</span></span>
+            <span style="font-size: 1.15em">)</span>
+            &nbsp;+&nbsp; &theta;<sup>n</sup> &nbsp;=&nbsp; 0
+          </p>
+          <p class="eq-credit" id="s6-credit">The Lane&ndash;Emden equation &mdash; still taught in stellar structure courses.</p>
+        </div>
+      </div>
+
+      <!-- S7 · Crater close (62.5–73) -->
+      <div id="s7" class="scene clip" data-start="62.5" data-duration="10.5" data-track-index="1">
+        <div class="scene-stars" data-starfield="77"></div>
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit" id="s7-inner">
+          <div class="text-col">
+            <p class="kicker" id="s7-kicker">Lunar nomenclature · IAU 1970</p>
+            <div class="rule" id="s7-rule"></div>
+            <h1 class="title" id="s7-title" style="font-size: 88px">The Moon<br />remembers</h1>
+            <div class="stats" id="s7-stats">
+              <div class="stat">
+                <div class="label">Latitude</div>
+                <div class="value">&minus;9.5&deg;</div>
+              </div>
+              <div class="stat">
+                <div class="label">Longitude</div>
+                <div class="value">132.36&deg;</div>
+              </div>
+              <div class="stat">
+                <div class="label">Diameter</div>
+                <div class="value">53.76 km</div>
+              </div>
+            </div>
+          </div>
+          <figure class="plate" id="s7-plate">
+            <div class="img-frame" style="background: #0b0d12">
+              <img id="s7-img" data-layout-allow-overflow src="assets/lane-crater.png" alt="USGS feature context for Lane crater" style="object-position: 100% 50%" />
+            </div>
+            <figcaption>Crater Lane, lunar far side &mdash; USGS Gazetteer of Planetary Nomenclature.</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Narration · Google Cloud TTS via /api/voice/synthesize (make-narration.mjs) -->
+      <audio id="nar-1" data-start="0.5" data-duration="10.1" data-track-index="5" src="assets/narration/scene1.mp3" data-volume="1"></audio>
+      <audio id="nar-2" data-start="11.2" data-duration="9.96" data-track-index="5" src="assets/narration/scene2.mp3" data-volume="1"></audio>
+      <audio id="nar-3" data-start="21.2" data-duration="8.5" data-track-index="5" src="assets/narration/scene3.mp3" data-volume="1"></audio>
+      <audio id="nar-4" data-start="29.9" data-duration="10.1" data-track-index="5" src="assets/narration/scene4.mp3" data-volume="1"></audio>
+      <audio id="nar-5" data-start="40.3" data-duration="12.8" data-track-index="5" src="assets/narration/scene5.mp3" data-volume="1"></audio>
+      <audio id="nar-6" data-start="53.7" data-duration="8.5" data-track-index="5" src="assets/narration/scene6.mp3" data-volume="1"></audio>
+      <audio id="nar-7" data-start="63.2" data-duration="8.8" data-track-index="5" src="assets/narration/scene7.mp3" data-volume="1"></audio>
+
+      <div class="vignette"></div>
+    </div>
+
+    <script>
+      /* Deterministic starfields (seeded PRNG — no Math.random) */
+      function mulberry32(seed) {
+        return function () {
+          seed |= 0;
+          seed = (seed + 0x6d2b79f5) | 0;
+          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+      document.querySelectorAll('.scene-stars').forEach(function (host) {
+        const rand = mulberry32(Number(host.dataset.starfield) || 1);
+        let html = '';
+        for (let i = 0; i < 110; i++) {
+          const x = (rand() * 100).toFixed(2);
+          const y = (rand() * 100).toFixed(2);
+          const s = (0.8 + rand() * 2.2).toFixed(2);
+          const o = (0.25 + rand() * 0.65).toFixed(2);
+          html += '<span class="star" style="left:' + x + '%;top:' + y + '%;width:' + s + 'px;height:' + s + 'px;opacity:' + o + '"></span>';
+        }
+        host.innerHTML = html;
+      });
+
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* S1 · Title (0–11.5) */
+      tl.from("#s1-kicker", { opacity: 0, letterSpacing: "0.5em", duration: 1.0, ease: "power2.out" }, 0.3);
+      tl.from("#s1-rule", { scaleX: 0, duration: 0.8, ease: "expo.out" }, 0.7);
+      tl.from("#s1-title", { opacity: 0, y: 48, duration: 0.9, ease: "power3.out" }, 0.9);
+      tl.from("#s1-sub", { opacity: 0, duration: 0.7, ease: "sine.out" }, 1.6);
+      tl.from("#s1-era", { opacity: 0, y: 22, duration: 0.7, ease: "power1.out" }, 2.1);
+      tl.fromTo("#s1 .scene-stars", { y: 0 }, { y: -26, duration: 11.5, ease: "none" }, 0);
+
+      /* S2 · Portrait study (10.5–21.5) — slow push toward the face */
+      tl.from("#s2", { opacity: 0, duration: 1.1, ease: "power1.inOut" }, 10.5);
+      tl.from("#s2-plate", { opacity: 0, x: -70, duration: 0.9, ease: "power2.out" }, 11.3);
+      tl.fromTo("#s2-img", { scale: 1.0 }, { scale: 1.22, duration: 9.8, ease: "sine.inOut" }, 11.5);
+      tl.from("#s2-kicker", { opacity: 0, x: 34, duration: 0.6, ease: "power3.out" }, 11.6);
+      tl.from("#s2-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 11.8);
+      tl.from("#s2-title", { opacity: 0, y: 44, duration: 0.8, ease: "power2.out" }, 11.9);
+      tl.from("#s2-copy", { opacity: 0, y: 24, duration: 0.7, ease: "sine.out" }, 12.5);
+
+      /* S3 · Kinship chain (20.5–30) */
+      tl.from("#s3", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 20.5);
+      tl.from("#s3-kicker", { opacity: 0, x: -32, duration: 0.6, ease: "power2.out" }, 21.2);
+      tl.from("#s3-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 21.4);
+      tl.from("#s3-title", { opacity: 0, y: 42, duration: 0.8, ease: "power3.out" }, 21.5);
+      tl.from(["#s3-r1", "#s3-r2", "#s3-r3", "#s3-r4"], { opacity: 0, x: -46, duration: 0.6, ease: "power2.out", stagger: 0.22 }, 22.2);
+
+      /* S4 · Life arc (29–40.5) */
+      tl.from("#s4", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 29);
+      tl.from("#s4-kicker", { opacity: 0, letterSpacing: "0.46em", duration: 0.9, ease: "power2.out" }, 29.7);
+      tl.from("#s4-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 29.9);
+      tl.from("#s4-title", { opacity: 0, y: 44, duration: 0.8, ease: "power3.out" }, 30.0);
+      tl.from(["#s4-r1", "#s4-r2", "#s4-r3", "#s4-r4"], { opacity: 0, y: 30, duration: 0.55, ease: "power2.out", stagger: 0.24 }, 30.7);
+
+      /* S5 · Venango County (39.5–54) */
+      tl.from("#s5", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 39.5);
+      tl.from("#s5-kicker", { opacity: 0, x: -32, duration: 0.6, ease: "power2.out" }, 40.2);
+      tl.from("#s5-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 40.4);
+      tl.from("#s5-title", { opacity: 0, y: 46, duration: 0.8, ease: "power3.out" }, 40.5);
+      tl.from("#s5-sub", { opacity: 0, duration: 0.7, ease: "sine.out" }, 41.1);
+      tl.from(["#s5-r1", "#s5-r2", "#s5-r3", "#s5-r4"], { opacity: 0, x: -46, duration: 0.6, ease: "power2.out", stagger: 0.5 }, 41.8);
+
+      /* S6 · Science (53–63.5) */
+      tl.from("#s6", { opacity: 0, duration: 1.0, ease: "power1.inOut" }, 53);
+      tl.from("#s6-sun", { opacity: 0, scale: 0.86, duration: 1.6, ease: "sine.out" }, 53.6);
+      tl.fromTo("#s6-sun", { rotation: 0 }, { rotation: 6, duration: 9.0, ease: "none" }, 54.2);
+      tl.from("#s6-kicker", { opacity: 0, x: -32, duration: 0.6, ease: "power2.out" }, 53.8);
+      tl.from("#s6-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 54.0);
+      tl.from("#s6-title", { opacity: 0, y: 44, duration: 0.8, ease: "power3.out" }, 54.1);
+      tl.from("#s6-eq", { opacity: 0, y: 30, duration: 0.9, ease: "power2.out" }, 55.0);
+      tl.from("#s6-credit", { opacity: 0, duration: 0.8, ease: "sine.out" }, 55.9);
+
+      /* S7 · Crater close (62.5–73) */
+      tl.from("#s7", { opacity: 0, duration: 1.1, ease: "power1.inOut" }, 62.5);
+      tl.from("#s7-kicker", { opacity: 0, x: -32, duration: 0.6, ease: "power2.out" }, 63.3);
+      tl.from("#s7-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 63.5);
+      tl.from("#s7-title", { opacity: 0, y: 46, duration: 0.8, ease: "power3.out" }, 63.6);
+      tl.from("#s7-stats .stat", { opacity: 0, y: 30, duration: 0.6, ease: "power2.out", stagger: 0.16 }, 64.3);
+      tl.from("#s7-plate", { opacity: 0, x: 70, duration: 0.9, ease: "power2.out" }, 63.8);
+      tl.fromTo("#s7-img", { scale: 1.14 }, { scale: 1.0, duration: 8.6, ease: "none" }, 63.8);
+
+      /* final scene only: fade to black */
+      tl.to("#s7-inner", { opacity: 0, duration: 1.3, ease: "power2.inOut" }, 71.4);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

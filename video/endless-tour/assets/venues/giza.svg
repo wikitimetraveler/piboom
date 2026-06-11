@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1638"/>
+      <stop offset="100%" stop-color="#f093fb"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#g)"/>
+  <polygon points="640,120 820,620 460,620" fill="rgba(238,232,255,0.25)" stroke="#c4b5fd" stroke-width="3"/>
+  <text x="640" y="680" fill="#eee8ff" font-family="Georgia, serif" font-size="40" text-anchor="middle">Great Pyramids · Giza · 1978</text>
+</svg>

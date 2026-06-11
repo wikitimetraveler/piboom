@@ -1531,7 +1531,13 @@
     {
       "name": "Jonathan Homer Lane",
       "id": 94,
-      "text": "Lane Genealogies Vol. I (Mark Lane × Henrietta Tenney roster): b. Aug. 1819; Phillips Exeter Academy 1839; Yale 1846; coast survey work in Washington; d. 1880 per book line (Washington, D.C.). Parents in this graph: Mark Lane (id 86), Henrieita Tenney (id 93). Kinship in this file: paternal uncle of William Homer Lane (id 108); grand-uncle (great-uncle) of Alderman Homer R Lane (id 112) via David Tenney Lane (id 97). Standard biography adds Geneseo, N.Y., birth (9 Aug. 1819), U.S. Patent Office principal examiner to 1857, Office of Weights and Measures from 1869, and the Lane–Emden work on gaseous stellar structure; the Moon’s Lane crater is named for him. Wikipedia and USGS links are modern reference tier, not Vol. I text.",
+      "text": "Lane Genealogies Vol. I (Mark Lane × Henrietta Tenney roster): b. Aug. 1819; Phillips Exeter Academy 1839; Yale 1846; coast survey work in Washington; d. 1880 per book line (Washington, D.C.). Parents in this graph: Mark Lane (id 86), Henrieita Tenney (id 93). Kinship in this file: paternal uncle of William Homer Lane (id 108); grand-uncle (great-uncle) of Alderman Homer R Lane (id 112) via David Tenney Lane (id 97). Homer name thread: Jonathan Homer at birth is the likely source for Homer middle names in the David Tenney Lane branch (William Homer, Alderman Homer R) — family-context reading; see /family/lane-scientific-lane.html. Standard biography adds Geneseo, N.Y., birth (9 Aug. 1819), U.S. Patent Office principal examiner to 1857, Office of Weights and Measures from 1869, and the Lane–Emden work on gaseous stellar structure; the Moon’s Lane crater is named for him. Wikipedia and USGS links are modern reference tier, not Vol. I text.",
+      "occupation": [
+        { "job": "coast survey official" },
+        { "government": "U.S. Patent Office principal examiner" },
+        { "government": "Office of Weights and Measures" },
+        { "text": "astrophysicist; gaseous-Sun analysis (1870)" }
+      ],
       "generation": 7,
       "gender": "M",
       "lastName": "",
@@ -1741,7 +1747,7 @@
     {
       "name": "William Homer Lane",
       "id": 108,
-      "text": "Paternal uncle: Jonathan Homer Lane (id 94) — astrophysicist; lunar crater Lane namesake (Lane–Emden equation).",
+      "text": "Middle name Homer: paternal uncle Jonathan Homer Lane (id 94) — astrophysicist; lunar crater Lane namesake (Lane–Emden equation). See /family/lane-scientific-lane.html.",
       "generation": 8,
       "gender": "M",
       "lastName": "",
@@ -1797,7 +1803,7 @@
     {
       "name": "Alderman Homer R Lane",
       "id": 112,
-      "text": "Grand-uncle (great-uncle): Jonathan Homer Lane (id 94), brother of paternal grandfather David Tenney Lane (id 97).",
+      "text": "Middle name Homer: grand-uncle Jonathan Homer Lane (id 94), brother of paternal grandfather David Tenney Lane (id 97); astrophysicist and lunar crater namesake. See /family/lane-scientific-lane.html.",
       "generation": 9,
       "gender": "M",
       "lastName": "",

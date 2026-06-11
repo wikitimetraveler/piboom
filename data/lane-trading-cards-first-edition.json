@@ -451,14 +451,20 @@
       "frontImage": "/family/assets/jonathan-homer-lane.png",
       "summary": "Astrophysicist whose name carries forward to lunar nomenclature.",
       "facts": [
-        "Associated with early stellar structure theory in public references.",
-        "Lane crater naming reflects scientific legacy in lunar cartography."
+        "Vol. I: Exeter Academy 1839, Yale 1846, coast survey in Washington; grand-uncle of Alderman Homer R Lane.",
+        "1870 gaseous-Sun analysis; Lane–Emden equation; IAU lunar crater Lane (1970).",
+        "Middle name Homer is the source thread for William Homer Lane and later Homer names in the David Tenney Lane branch."
       ],
       "citations": [
         {
           "label": "USGS planetary nomenclature: Lane crater",
           "kind": "moon",
-          "url": "https://planetarynames.wr.usgs.gov/Feature/3315"
+          "url": "https://planetarynames.wr.usgs.gov/Feature/3268"
+        },
+        {
+          "label": "Scientific Lane chapter",
+          "kind": "internal",
+          "url": "/family/lane-scientific-lane.html"
         },
         {
           "label": "Lane Museum lunar exhibit",

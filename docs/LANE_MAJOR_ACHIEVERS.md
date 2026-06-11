@@ -46,7 +46,7 @@ Staged research from the 1891 book and existing site curation, with conservative
 
 | Person | Achievement | External |
 |--------|-------------|----------|
-| **Jonathan Homer Lane** (1819–1880) | Gaseous-sun analysis; Lane–Emden equation; lunar crater | [Wikipedia](https://en.wikipedia.org/wiki/Jonathan_Homer_Lane), [USGS crater](https://planetarynames.wr.usgs.gov/Feature/3315) |
+| **Jonathan Homer Lane** (1819–1880) | Gaseous-sun analysis; Lane–Emden equation; lunar crater | [Scientific Lane chapter](/family/lane-scientific-lane.html), [Wikipedia](https://en.wikipedia.org/wiki/Jonathan_Homer_Lane), [USGS crater](https://planetarynames.wr.usgs.gov/Feature/3268) |
 | **George G. Lane** (Hampton Falls) | Popular Science *Was He an Idiot?* (May 1884) calendrical profile | [Wikisource](https://en.wikisource.org/wiki/Popular_Science_Monthly/Volume_25/May_1884/Was_He_an_Idiot%3F) |
 | **Capt. Aaron G. Lane** (1817–1883) | Mojave pioneer; Lane's Crossing (1859) | [Wikipedia](https://en.wikipedia.org/wiki/Lane%27s_Crossing) |
 

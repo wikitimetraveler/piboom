@@ -82,8 +82,9 @@
       );
     }
     (Array.isArray(achiever.siteLinks) ? achiever.siteLinks : []).forEach((link) => {
+      const primary = link.primary === true;
       parts.push(
-        `<a class="btn btn-outline-secondary btn-sm" href="${esc(link.url)}">${esc(link.label || link.url)}</a>`
+        `<a class="btn ${primary ? 'btn-primary' : 'btn-outline-secondary'} btn-sm" href="${esc(link.url)}">${esc(link.label || link.url)}</a>`
       );
     });
     (Array.isArray(achiever.externalLinks) ? achiever.externalLinks : []).forEach((link) => {
@@ -92,6 +93,42 @@
       );
     });
     return parts.length ? `<div class="lma-card__links">${parts.join('')}</div>` : '';
+  }
+
+  function renderExpandedBody(achiever) {
+    if (!achiever.expandedCard) return '';
+    const parts = [];
+    if (achiever.detailLead) {
+      parts.push(`<p class="lma-card__detail-lead">${esc(achiever.detailLead)}</p>`);
+    }
+    const bullets = Array.isArray(achiever.detailBullets) ? achiever.detailBullets : [];
+    if (bullets.length) {
+      parts.push(
+        `<ul class="lma-card__detail-bullets">${bullets.map((b) => `<li>${esc(b)}</li>`).join('')}</ul>`
+      );
+    }
+    const routes = Array.isArray(achiever.routeCorridors) ? achiever.routeCorridors : [];
+    if (routes.length) {
+      parts.push(
+        `<div class="lma-card__routes" aria-label="Settlement routes"><span class="lma-card__routes-label">Routes:</span> ${routes.map((r) => `<span class="lma-route-chip">${esc(r)}</span>`).join('')}</div>`
+      );
+    }
+    if (achiever.bookQuote) {
+      parts.push(
+        `<blockquote class="lma-card__quote"><strong>Evidence:</strong> ${esc(achiever.bookQuote)}</blockquote>`
+      );
+    }
+    const gallery = Array.isArray(achiever.galleryImages) ? achiever.galleryImages : [];
+    if (gallery.length) {
+      const thumbs = gallery
+        .map(
+          (g) =>
+            `<figure class="lma-card__gallery-item"><img src="${esc(g.url)}" alt="${esc(g.alt || achiever.displayName)}" loading="lazy" decoding="async" /><figcaption>${esc(g.caption || '')}</figcaption></figure>`
+        )
+        .join('');
+      parts.push(`<div class="lma-card__gallery">${thumbs}</div>`);
+    }
+    return parts.length ? `<div class="lma-card__expanded">${parts.join('')}</div>` : '';
   }
 
   function renderCard(achiever, highlightSlug) {
@@ -104,9 +141,10 @@
       ? `<span class="lma-badge lma-badge--verify">${esc(achiever.verificationStatus)}</span>`
       : '';
     const highlight = highlightSlug && achiever.slug === highlightSlug ? ' is-highlight' : '';
+    const expandedClass = achiever.expandedCard ? ' lma-card--expanded' : '';
 
     return `
-      <article class="lma-card${highlight}" id="achiever-${esc(achiever.slug)}" data-slug="${esc(achiever.slug)}" data-tier="${esc(achiever.tier)}">
+      <article class="lma-card${expandedClass}${highlight}" id="achiever-${esc(achiever.slug)}" data-slug="${esc(achiever.slug)}" data-tier="${esc(achiever.tier)}">
         ${renderPortrait(achiever.slug, achiever.displayName)}
         <div class="lma-card__body">
           <div class="lma-card__head">
@@ -116,6 +154,7 @@
           </div>
           <p class="lma-card__meta">${esc(achiever.eraLabel || '')}${achiever.branch ? ` · ${esc(achiever.branch)}` : ''}</p>
           <p class="lma-card__summary">${esc(achiever.achievementSummary || '')}</p>
+          ${renderExpandedBody(achiever)}
           ${catMarkup}
           ${renderLinks(achiever)}
         </div>

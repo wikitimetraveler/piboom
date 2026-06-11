@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0; width: 1920px; height: 1080px; overflow: hidden;
+        background: #0f0c29; color: #eee8ff;
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+      }
+      .scene {
+        position: absolute; inset: 0; background: #0f0c29; overflow: hidden;
+      }
+      .scene-glow {
+        position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(ellipse 1000px 640px at 28% 42%, rgba(102, 126, 234, 0.18), transparent 68%);
+      }
+      .scene-glow--rose {
+        background: radial-gradient(ellipse 900px 580px at 72% 38%, rgba(240, 147, 251, 0.12), transparent 70%);
+      }
+      .scene-content {
+        position: relative; display: flex; width: 100%; height: 100%;
+        padding: 88px 120px; gap: 64px; align-items: center;
+      }
+      .scene-content--title {
+        flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 24px;
+      }
+      .kicker {
+        color: #c4b5fd; font-size: 24px; letter-spacing: 0.2em; text-transform: uppercase;
+      }
+      .rule {
+        width: 200px; height: 1px; background: linear-gradient(90deg, #667eea, #f093fb);
+        transform-origin: left center;
+      }
+      .rule--center { transform-origin: center; }
+      h1.title {
+        font-family: Georgia, 'Times New Roman', serif; font-weight: 400;
+        font-size: 88px; line-height: 1.05; max-width: 920px;
+      }
+      h1.title--lg { font-size: 104px; max-width: 1400px; }
+      .place {
+        font-family: Georgia, serif; font-style: italic; color: #f093fb; font-size: 34px;
+      }
+      .copy {
+        font-size: 30px; line-height: 1.5; color: #a89ec4; max-width: 720px;
+      }
+      .stats {
+        display: flex; gap: 48px; margin-top: 12px;
+      }
+      .stat .label {
+        font-size: 18px; letter-spacing: 0.16em; text-transform: uppercase; color: #667eea;
+      }
+      .stat .value {
+        font-family: Georgia, serif; font-size: 44px; color: #eee8ff;
+      }
+      .map-col { flex: 0 0 560px; display: flex; flex-direction: column; gap: 16px; }
+      .text-col { flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+      .route-map {
+        width: 560px; height: 400px; border: 1px solid rgba(196, 181, 253, 0.22);
+        border-radius: 8px; background: #1a1638;
+        box-shadow: 0 20px 48px rgba(0, 0, 0, 0.45);
+      }
+      .route-map svg { width: 100%; height: 100%; display: block; }
+      .plate {
+        border: 1px solid rgba(196, 181, 253, 0.25); border-radius: 6px;
+        overflow: hidden; background: #242043;
+      }
+      .plate img {
+        width: 100%; height: 200px; object-fit: cover; display: block;
+      }
+      .plate figcaption {
+        padding: 10px 12px; font-size: 17px; color: #a89ec4;
+      }
+      .end-cta {
+        font-size: 28px; color: #c4b5fd; letter-spacing: 0.06em; margin-top: 8px;
+      }
+      .vignette {
+        position: absolute; inset: 0; z-index: 200; pointer-events: none;
+        background: radial-gradient(ellipse 1500px 950px at 50% 50%, transparent 60%, rgba(0,0,0,0.38) 100%);
+      }
+      #s0 { z-index: 10; } #s1 { z-index: 20; } #s2 { z-index: 30; } #s3 { z-index: 40; }
+      #s4 { z-index: 50; } #s5 { z-index: 60; } #s6 { z-index: 70; } #s7 { z-index: 80; }
+      #s8 { z-index: 90; } #s9 { z-index: 100; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="94" data-width="1920" data-height="1080">
+
+      <!-- S0 · Title -->
+      <div id="s0" class="scene clip" data-start="0" data-duration="10" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content scene-content--title">
+          <p class="kicker" id="s0-kicker">Live Music Pilgrimage · Grateful Dead</p>
+          <div class="rule rule--center" id="s0-rule"></div>
+          <h1 class="title title--lg" id="s0-title">The Endless Tour</h1>
+          <p class="place" id="s0-sub">1965 – 1995</p>
+          <div class="stats" id="s0-stats">
+            <div class="stat"><div class="label">Shows</div><div class="value">2,300+</div></div>
+            <div class="stat"><div class="label">Years</div><div class="value">30</div></div>
+            <div class="stat"><div class="label">Stops in this reel</div><div class="value">8</div></div>
+          </div>
+          <div class="map-col" id="s0-map-wrap" style="flex:none;width:720px;margin-top:12px">
+            <div class="route-map" id="s0-map" style="width:720px;height:320px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S1 · 1965 Fillmore -->
+      <div id="s1" class="scene clip" data-start="9" data-duration="10" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="map-col">
+            <div class="route-map" id="s1-map"></div>
+            <figure class="plate" id="s1-plate">
+              <img id="s1-img" data-layout-allow-overflow src="assets/venues/fillmore.jpg" alt="Fillmore Auditorium" />
+              <figcaption>Fillmore West — Wikimedia Commons</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s1-kicker">1965 · Early years</p>
+            <div class="rule" id="s1-rule"></div>
+            <h1 class="title" id="s1-title">Fillmore Auditorium</h1>
+            <p class="place" id="s1-place">San Francisco, California</p>
+            <p class="copy" id="s1-copy">First public show under the name Grateful Dead. Bill Graham&rsquo;s venue became their spiritual home.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S2 · 1967 Be-In -->
+      <div id="s2" class="scene clip" data-start="18" data-duration="11" data-track-index="1">
+        <div class="scene-glow scene-glow--rose"></div>
+        <div class="scene-content">
+          <div class="map-col">
+            <div class="route-map" id="s2-map"></div>
+            <figure class="plate" id="s2-plate">
+              <img id="s2-img" data-layout-allow-overflow src="assets/venues/be-in.jpg" alt="Golden Gate Park" />
+              <figcaption>Golden Gate Park — Wikimedia Commons</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s2-kicker">1967 · Summer of Love</p>
+            <div class="rule" id="s2-rule"></div>
+            <h1 class="title" id="s2-title">Human Be-In</h1>
+            <p class="place" id="s2-place">Golden Gate Park · San Francisco</p>
+            <p class="copy" id="s2-copy">Thirty thousand in the park — the Dead alongside Jefferson Airplane, and Timothy Leary&rsquo;s call to tune in.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S3 · 1972 Veneta -->
+      <div id="s3" class="scene clip" data-start="28" data-duration="10" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="map-col">
+            <div class="route-map" id="s3-map"></div>
+            <figure class="plate" id="s3-plate">
+              <img id="s3-img" data-layout-allow-overflow src="assets/venues/veneta.jpg" alt="Veneta Oregon" />
+              <figcaption>Veneta, Oregon — Wikimedia Commons</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s3-kicker">1972 · Golden era</p>
+            <div class="rule" id="s3-rule"></div>
+            <h1 class="title" id="s3-title">Sunshine Daydream</h1>
+            <p class="place" id="s3-place">Veneta, Oregon</p>
+            <p class="copy" id="s3-copy">Outdoor benefit on a hot August day — peak performance, later immortalized on film.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S4 · 1974 Winterland -->
+      <div id="s4" class="scene clip" data-start="37" data-duration="10" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="map-col">
+            <div class="route-map" id="s4-map"></div>
+            <figure class="plate" id="s4-plate">
+              <img id="s4-img" data-layout-allow-overflow src="assets/venues/winterland.jpg" alt="Winterland Ballroom" />
+              <figcaption>Winterland Ballroom — Wikimedia Commons</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s4-kicker">1974 · Wall of Sound</p>
+            <div class="rule" id="s4-rule"></div>
+            <h1 class="title" id="s4-title">Winterland</h1>
+            <p class="place" id="s4-place">San Francisco, California</p>
+            <p class="copy" id="s4-copy">Six hundred forty-one speakers — seventy-five tons of PA. Revolutionary sound, then farewell before the hiatus.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S5 · 1977 Cornell -->
+      <div id="s5" class="scene clip" data-start="45" data-duration="11" data-track-index="2">
+        <div class="scene-glow scene-glow--rose"></div>
+        <div class="scene-content">
+          <div class="map-col">
+            <div class="route-map" id="s5-map"></div>
+            <figure class="plate" id="s5-plate">
+              <img id="s5-img" data-layout-allow-overflow src="assets/venues/cornell-ticket.jpg" alt="Barton Hall Cornell" />
+              <figcaption>Barton Hall, Cornell University · Wikimedia Commons</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s5-kicker">1977 · Peak year</p>
+            <div class="rule" id="s5-rule"></div>
+            <h1 class="title" id="s5-title">Barton Hall</h1>
+            <p class="place" id="s5-place">Cornell University · Ithaca, NY</p>
+            <p class="copy" id="s5-copy">May 8 — Scarlet Begonias into Fire on the Mountain. The show every Deadhead argues about.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S6 · 1978 Egypt -->
+      <div id="s6" class="scene clip" data-start="55" data-duration="10" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="map-col">
+            <div class="route-map" id="s6-map"></div>
+            <figure class="plate" id="s6-plate">
+              <img id="s6-img" data-layout-allow-overflow src="assets/venues/giza.jpg" alt="Great Pyramid Giza" />
+              <figcaption>Great Pyramid of Giza · Wikimedia Commons</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s6-kicker">1978 · Egypt adventure</p>
+            <div class="rule" id="s6-rule"></div>
+            <h1 class="title" id="s6-title">Great Pyramids</h1>
+            <p class="place" id="s6-place">Giza, Egypt</p>
+            <p class="copy" id="s6-copy">Three nights during a lunar eclipse — among the most mystical performances in rock history.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S7 · 1989 Alpine -->
+      <div id="s7" class="scene clip" data-start="64" data-duration="10" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="map-col">
+            <div class="route-map" id="s7-map"></div>
+            <figure class="plate" id="s7-plate">
+              <img id="s7-img" data-layout-allow-overflow src="assets/venues/alpine-valley.jpg" alt="Alpine Valley Music Theatre" />
+              <figcaption>Alpine Valley Music Theatre — Wikimedia Commons</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s7-kicker">1989 · Late tour</p>
+            <div class="rule" id="s7-rule"></div>
+            <h1 class="title" id="s7-title">Alpine Valley</h1>
+            <p class="place" id="s7-place">East Troy, Wisconsin</p>
+            <p class="copy" id="s7-copy">Outdoor amphitheater in the Midwest bowl — a Deadhead mecca through the late era.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S8 · 1995 Soldier Field -->
+      <div id="s8" class="scene clip" data-start="72" data-duration="11" data-track-index="1">
+        <div class="scene-glow scene-glow--rose"></div>
+        <div class="scene-content">
+          <div class="map-col">
+            <div class="route-map" id="s8-map"></div>
+            <figure class="plate" id="s8-plate">
+              <img id="s8-img" data-layout-allow-overflow src="assets/venues/soldier-field.jpg" alt="Soldier Field Chicago" />
+              <figcaption>Soldier Field, Chicago — Wikimedia Commons</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s8-kicker">1995 · The end</p>
+            <div class="rule" id="s8-rule"></div>
+            <h1 class="title" id="s8-title">Soldier Field</h1>
+            <p class="place" id="s8-place">Chicago, Illinois</p>
+            <p class="copy" id="s8-copy">July 9 — the last concert with Jerry Garcia. Show #2,318. Box of Rain at the close.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S9 · End card -->
+      <div id="s9" class="scene clip" data-start="82" data-duration="12" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content scene-content--title" id="s9-inner">
+          <p class="kicker" id="s9-kicker">Pilgrimage Atlas</p>
+          <div class="rule rule--center" id="s9-rule"></div>
+          <h1 class="title" id="s9-title">The tour never really ended</h1>
+          <p class="copy" id="s9-copy" style="text-align:center;max-width:980px">
+            Explore every stop — dates, venues, setlists, and archive.org tapes — in the Live Music Pilgrimage Atlas.
+          </p>
+          <p class="end-cta" id="s9-cta">/music/music-pilgrimage-atlas.html</p>
+          <div class="map-col" id="s9-map-wrap" style="flex:none;width:720px;margin-top:16px">
+            <div class="route-map" id="s9-map" style="width:720px;height:280px"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audience bed · Internet Archive Cornell 5/8/77 (see make-soundtrack.mjs) -->
+      <audio id="bed" data-start="0" data-duration="94" data-track-index="4" src="assets/soundtrack-bed.mp3" data-volume="0.14"></audio>
+
+      <audio id="nar-0" data-start="0.4" data-duration="8.35" data-track-index="5" src="assets/narration/scene0.mp3" data-volume="1"></audio>
+      <audio id="nar-1" data-start="9.4" data-duration="9.43" data-track-index="6" src="assets/narration/scene1.mp3" data-volume="1"></audio>
+      <audio id="nar-2" data-start="18.4" data-duration="10.82" data-track-index="7" src="assets/narration/scene2.mp3" data-volume="1"></audio>
+      <audio id="nar-3" data-start="28.4" data-duration="9.72" data-track-index="8" src="assets/narration/scene3.mp3" data-volume="1"></audio>
+      <audio id="nar-4" data-start="37.4" data-duration="8.69" data-track-index="9" src="assets/narration/scene4.mp3" data-volume="1"></audio>
+      <audio id="nar-5" data-start="45.4" data-duration="10.75" data-track-index="10" src="assets/narration/scene5.mp3" data-volume="1"></audio>
+      <audio id="nar-6" data-start="55.4" data-duration="9.22" data-track-index="11" src="assets/narration/scene6.mp3" data-volume="1"></audio>
+      <audio id="nar-7" data-start="64.4" data-duration="8.62" data-track-index="12" src="assets/narration/scene7.mp3" data-volume="1"></audio>
+      <audio id="nar-8" data-start="72.4" data-duration="10.97" data-track-index="13" src="assets/narration/scene8.mp3" data-volume="1"></audio>
+      <audio id="nar-9" data-start="82.4" data-duration="7.99" data-track-index="14" src="assets/narration/scene9.mp3" data-volume="1"></audio>
+
+      <div class="vignette"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+
+      const STOPS = [
+        { lat: 37.7837, lng: -122.4331 },
+        { lat: 37.7694, lng: -122.4783 },
+        { lat: 44.0465, lng: -123.3456 },
+        { lat: 37.7838, lng: -122.4244 },
+        { lat: 42.4487, lng: -76.4833 },
+        { lat: 29.9792, lng: 31.1342 },
+        { lat: 42.7783, lng: -88.3923 },
+        { lat: 41.8623, lng: -87.6167 }
+      ];
+      const US = { north: 49.5, south: 28, west: -125, east: -66 };
+      const WORLD = { north: 52, south: 22, west: -128, east: 42 };
+
+      function proj(lat, lng, b, w, h, pad) {
+        pad = pad || 36;
+        const iw = w - pad * 2;
+        const ih = h - pad * 2;
+        return {
+          x: pad + ((lng - b.west) / (b.east - b.west)) * iw,
+          y: pad + ((b.north - lat) / (b.north - b.south)) * ih
+        };
+      }
+
+      function mapSvg(activeIdx, bounds, w, h) {
+        const pts = STOPS.map((s, i) => {
+          const p = proj(s.lat, s.lng, bounds, w, h);
+          return { ...p, i };
+        });
+        const lineTo = activeIdx < 0 ? pts.length - 1 : activeIdx;
+        const linePts = pts.slice(0, lineTo + 1).map((p) => p.x + ',' + p.y).join(' ');
+        const pins = pts
+          .map((p) => {
+            const on = p.i <= lineTo;
+            const hot = p.i === activeIdx || (activeIdx < 0 && p.i === pts.length - 1);
+            const r = hot ? 11 : on ? 7 : 5;
+            const fill = hot ? '#f093fb' : on ? '#667eea' : '#4a4570';
+            const op = on ? 1 : 0.45;
+            return '<circle cx="' + p.x + '" cy="' + p.y + '" r="' + r + '" fill="' + fill + '" opacity="' + op + '" />';
+          })
+          .join('');
+        return (
+          '<svg viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg">' +
+          '<rect width="100%" height="100%" fill="#1a1638"/>' +
+          '<path d="M36,' + (h * 0.55) + ' Q' + (w * 0.35) + ',' + (h * 0.35) + ' ' + (w * 0.55) + ',' + (h * 0.5) +
+          ' T' + (w - 36) + ',' + (h * 0.48) + '" fill="none" stroke="rgba(102,126,234,0.15)" stroke-width="2"/>' +
+          (linePts ? '<polyline points="' + linePts + '" fill="none" stroke="url(#rg)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' : '') +
+          '<defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#f093fb"/></linearGradient></defs>' +
+          pins +
+          '</svg>'
+        );
+      }
+
+      function mountMaps() {
+        const usMaps = ['s0-map', 's1-map', 's2-map', 's3-map', 's4-map', 's5-map', 's7-map', 's8-map', 's9-map'];
+        const idxMap = { 's0-map': -1, 's1-map': 0, 's2-map': 1, 's3-map': 2, 's4-map': 3, 's5-map': 4, 's7-map': 6, 's8-map': 7, 's9-map': 7 };
+        usMaps.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const w = id.startsWith('s0') || id.startsWith('s9') ? 720 : 560;
+          const h = id.startsWith('s0') ? 320 : id.startsWith('s9') ? 280 : 400;
+          el.innerHTML = mapSvg(idxMap[id], US, w, h);
+        });
+        const s6 = document.getElementById('s6-map');
+        if (s6) s6.innerHTML = mapSvg(5, WORLD, 560, 400);
+      }
+      mountMaps();
+
+      const tl = gsap.timeline({ paused: true });
+
+      /* S0 title */
+      tl.from('#s0-kicker', { opacity: 0, letterSpacing: '0.45em', duration: 0.9, ease: 'power2.out' }, 0.3);
+      tl.from('#s0-rule', { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 0.6);
+      tl.from('#s0-title', { opacity: 0, y: 40, duration: 0.85, ease: 'power3.out' }, 0.8);
+      tl.from('#s0-sub', { opacity: 0, duration: 0.6, ease: 'sine.out' }, 1.2);
+      tl.from('#s0-stats .stat', { opacity: 0, y: 24, duration: 0.55, stagger: 0.12, ease: 'power2.out' }, 1.5);
+      tl.from('#s0-map-wrap', { opacity: 0, scale: 0.96, duration: 0.9, ease: 'power2.out' }, 1.8);
+
+      function sceneIn(prefix, start, hasPlate) {
+        tl.from('#' + prefix, { opacity: 0, duration: 0.85, ease: 'power1.inOut' }, start);
+        tl.from('#' + prefix + '-map', { opacity: 0, x: -40, duration: 0.7, ease: 'power2.out' }, start + 0.5);
+        tl.from('#' + prefix + '-kicker', { opacity: 0, x: -28, duration: 0.55, ease: 'power2.out' }, start + 0.65);
+        tl.from('#' + prefix + '-rule', { scaleX: 0, duration: 0.6, ease: 'expo.out' }, start + 0.75);
+        tl.from('#' + prefix + '-title', { opacity: 0, y: 36, duration: 0.75, ease: 'power3.out' }, start + 0.85);
+        tl.from('#' + prefix + '-place', { opacity: 0, duration: 0.55, ease: 'sine.out' }, start + 1.15);
+        tl.from('#' + prefix + '-copy', { opacity: 0, y: 20, duration: 0.65, ease: 'power1.out' }, start + 1.35);
+        if (hasPlate) {
+          tl.from('#' + prefix + '-plate', { opacity: 0, y: 24, duration: 0.75, ease: 'power2.out' }, start + 0.9);
+          tl.fromTo('#' + prefix + '-img', { scale: 1.08 }, { scale: 1, duration: 8.5, ease: 'none' }, start + 0.9);
+        }
+      }
+
+      sceneIn('s1', 9, true);
+      sceneIn('s2', 18, true);
+      sceneIn('s3', 28, true);
+      sceneIn('s4', 37, true);
+      sceneIn('s5', 45, true);
+      sceneIn('s6', 55, true);
+      sceneIn('s7', 64, true);
+      sceneIn('s8', 72, true);
+
+      tl.from('#s9', { opacity: 0, duration: 0.9, ease: 'power1.inOut' }, 82);
+      tl.from('#s9-kicker', { opacity: 0, letterSpacing: '0.4em', duration: 0.8, ease: 'power2.out' }, 82.6);
+      tl.from('#s9-rule', { scaleX: 0, duration: 0.65, ease: 'expo.out' }, 82.9);
+      tl.from('#s9-title', { opacity: 0, y: 32, duration: 0.8, ease: 'power3.out' }, 83.1);
+      tl.from('#s9-copy', { opacity: 0, y: 20, duration: 0.65, ease: 'sine.out' }, 83.6);
+      tl.from('#s9-cta', { opacity: 0, duration: 0.7, ease: 'power1.out' }, 84.2);
+      tl.from('#s9-map-wrap', { opacity: 0, scale: 0.97, duration: 0.85, ease: 'power2.out' }, 84.5);
+      tl.to('#s9-inner', { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 92.2);
+
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>

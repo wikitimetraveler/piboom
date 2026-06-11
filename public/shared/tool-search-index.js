@@ -64,6 +64,7 @@
     { name: 'Levi Assistant', url: '/ai/assistant.html', category: 'AI', keywords: 'AI chat' },
     { name: 'Voice Guide', url: '/ai/voice-guide.html', category: 'AI', keywords: 'voice commands' },
     { name: 'Lane Family', url: '/family/lane-family.html', category: 'Family', keywords: 'lane genealogy museum hub family exhibits' },
+    { name: 'Scientific Lane', url: '/family/lane-scientific-lane.html', category: 'Family', keywords: 'jonathan homer lane astrophysicist crater homer cousin branch' },
     { name: 'Nature Hub', url: '/nature/nature-hub.html', category: 'Nature', keywords: 'map gallery field guide share trees critters' },
     { name: 'Tree Discovery', url: '/nature/tree-discovery.html', category: 'Nature', keywords: 'tree Smokey identify' },
     { name: 'Tree Collection', url: '/nature/tree-collection.html', category: 'Nature', keywords: 'trees forest' },

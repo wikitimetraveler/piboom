@@ -1,0 +1,183 @@
+{
+  "personId": 1024,
+  "slug": "aaron-g-lane",
+  "hero": {
+    "kicker": "Major achiever · Mojave crossing pioneer",
+    "title": "Captain Aaron G. Lane",
+    "subtitle": "Piermont farmer, Mexican War veteran, Forty-niner — first permanent settler on the Mojave River at Lane's Crossing on the Mormon Road.",
+    "era": "1817 Piermont, N.H. — 1883 Bryman, California",
+    "portraitUrl": "/family/assets/aaron-g-lane.png",
+    "portraitCaption": "Exhibit portrait — Lane Museum card and major-achievers roster."
+  },
+  "kinship": {
+    "anchorPersonId": 112,
+    "anchorName": "Alderman Homer R Lane",
+    "summary": "Aaron G. Lane is Homer Lane's first cousin, three times removed (Vol. I). Twin brother Moses P. Lane died at Acapulco en route to California; Moses's daughter Eldora Richmond nursed Aaron at Halleck in 1883.",
+    "steps": [
+      { "relation": "Direct line anchor", "name": "Alderman Homer R Lane", "personId": 112, "years": "1893–1970?" },
+      { "relation": "Mojave pioneer (cousin branch)", "name": "Captain Aaron G. Lane", "personId": 1024, "years": "1817–1883", "highlight": true },
+      { "relation": "Twin brother", "name": "Moses P. Lane", "personId": 1023, "years": "1817–1852 · d. Acapulco" },
+      { "relation": "Niece (Moses's daughter)", "name": "Eldora Richmond", "personId": null, "years": "Halleck, Cal." }
+    ]
+  },
+  "familyThread": {
+    "title": "Moses Lane & the Richmonds",
+    "lede": "Vol. I ties Aaron's late life to his twin's line — Moses never reached California; Eldora closed the story at Halleck.",
+    "entries": [
+      {
+        "name": "Moses P. Lane",
+        "personId": 1023,
+        "role": "Twin brother",
+        "note": "Died 21 June 1852 at Acapulco, Mexico, on his way to California — probably to join Aaron."
+      },
+      {
+        "name": "Eldora (Mrs. George) Richmond",
+        "personId": null,
+        "role": "Niece & nurse",
+        "note": "Moses's daughter; Aaron's home was in her household at Halleck. She nursed him in 1882–83."
+      }
+    ],
+    "caution": "Eldora's person node may be incomplete in the graph — relationship is book-clear; graph links need review."
+  },
+  "evidence": [
+    {
+      "tier": "Evidence",
+      "label": "Lane Genealogies Vol. I (1891), p. 148",
+      "body": "CAPT. AARON G.⁶ (twin brother to Moses), b. 23 Dec., 1817, went to California in 1849, and was widely known in the early history of the state. He died unm. 14 Sept., 1883, at Lane's Crossing of the Mojave river. His home was in the family of Mrs. Richmond, his neice, in Halleck, Cal.",
+      "links": [
+        { "label": "Archive — p. 148", "url": "https://archive.org/details/lanegenealogies01chap/page/148/mode/1up", "external": true },
+        { "label": "PDF gallery", "url": "/family/lane-pdf-gallery.html?pdfPage=148" }
+      ]
+    },
+    {
+      "tier": "Context",
+      "label": "Mojave corridor & routes",
+      "body": "Lane's Crossing was the Last Crossing of the Mojave on the Mormon Road — travelers left the river here for Cajon Pass. Thompson's Pioneer of the Mojave, Wikipedia, USC/LOC photos, and HMDB markers extend the book line.",
+      "links": [
+        { "label": "Wikipedia — Lane's Crossing", "url": "https://en.wikipedia.org/wiki/Lane%27s_Crossing", "external": true },
+        { "label": "Pioneer of the Mojave", "url": "http://members.uia.net/rdthompson/lane1.html", "external": true },
+        { "label": "HMDB — Mojave River Crossing", "url": "https://www.hmdb.org/m.asp?m=73472", "external": true }
+      ]
+    }
+  ],
+  "timeline": [
+    { "id": "tl-1817", "year": "1817", "title": "Born Piermont, N.H.", "body": "Youngest son of Jonathan Lane and Mary Towle; twin to Moses P. Lane.", "placeId": "piermont" },
+    { "id": "tl-1847", "year": "1847–48", "title": "Mexico & malaria", "body": "Co. H, 9th U.S. Infantry; invalid pension 1849 after fever at Puebla.", "placeId": "puebla" },
+    { "id": "tl-1850", "year": "1850", "title": "Forty-niner", "body": "Panama crossing; Mother Lode ventures; then San Bernardino.", "placeId": "mother-lode" },
+    { "id": "tl-1858", "year": "1858–65", "title": "Lane's Crossing", "body": "Ranch and store at Lower Narrows — first settlement on the Mojave River.", "placeId": "lanes-crossing" },
+    { "id": "tl-1865", "year": "1865–83", "title": "Bryman ranch", "body": "Alfalfa, Camp Cady provisioning, civic offices; sold the crossing.", "placeId": "bryman" },
+    { "id": "tl-1883", "year": "1883", "title": "Died at Bryman", "body": "14 Sept.; nursed by niece Eldora Richmond at Halleck.", "placeId": "bryman" }
+  ],
+  "places": {
+    "title": "Map — New Hampshire to the Mojave",
+    "lede": "Select a moment on the right — the map flies to that stop. Pins trace Aaron's arc from Piermont to Lane's Crossing and Bryman.",
+    "items": [
+      {
+        "id": "piermont",
+        "name": "Piermont, N.H.",
+        "kind": "evidence",
+        "years": "1817–1850",
+        "lat": 43.844,
+        "lng": -72.096,
+        "note": "Peaked Mountain farm; NH militia with twin Moses. Departure for Mexico and California.",
+        "personIds": [{ "id": 1024, "name": "Aaron G. Lane" }]
+      },
+      {
+        "id": "puebla",
+        "name": "Puebla, Mexico",
+        "kind": "context",
+        "years": "1847–1848",
+        "lat": 19.041,
+        "lng": -98.206,
+        "note": "9th Infantry march; malaria during siege — shaped his move west.",
+        "personIds": [{ "id": 1024, "name": "Aaron G. Lane" }]
+      },
+      {
+        "id": "mother-lode",
+        "name": "Mother Lode, Calif.",
+        "kind": "context",
+        "years": "1850",
+        "lat": 38.2,
+        "lng": -120.5,
+        "note": "Gold Rush diggings before San Bernardino and the desert corridor.",
+        "personIds": [{ "id": 1024, "name": "Aaron G. Lane" }]
+      },
+      {
+        "id": "lanes-crossing",
+        "name": "Lane's Crossing",
+        "kind": "evidence",
+        "highlight": true,
+        "years": "1858–1865",
+        "lat": 34.575,
+        "lng": -117.332,
+        "note": "Lower Narrows ford — Last Crossing of the Mojave. Turner Ranch / Victorville today.",
+        "personIds": [{ "id": 1024, "name": "Aaron G. Lane" }]
+      },
+      {
+        "id": "bryman",
+        "name": "Bryman / Halleck",
+        "kind": "evidence",
+        "years": "1865–1883",
+        "lat": 34.52,
+        "lng": -117.38,
+        "note": "Downriver alfalfa ranch; niece Eldora Richmond; death 14 Sept. 1883.",
+        "personIds": [{ "id": 1024, "name": "Aaron G. Lane" }]
+      }
+    ]
+  },
+  "routes": {
+    "title": "Western settlement routes",
+    "beats": [
+      "Mohave Trail — indigenous trade route at Lower Narrows (Serrano-Vanyume village Tobiabit).",
+      "Old Spanish Trail (1830s) — New Mexico to Alta California; western arm crossed below the narrows.",
+      "Mormon Road — Salt Lake to Los Angeles; Last Crossing before Cajon Pass.",
+      "Mojave Road (1858+) — Prescott AZ to Wilmington CA through Lane's station."
+    ],
+    "diagramUrl": "/family/assets/lane-aaron/mojave-routes.svg",
+    "siteDiagramUrl": "/family/assets/lane-aaron/lanes-crossing-site.svg"
+  },
+  "photoGallery": {
+    "title": "Historical photos",
+    "lede": "Committed site assets — public domain or labeled CC where noted.",
+    "items": [
+      {
+        "url": "/family/assets/lane-aaron/mojave-narrows-1905.jpg",
+        "alt": "Mojave River Narrows near Victorville, ca. 1905–1910",
+        "caption": "Lower Narrows — same ford as Lane's Crossing",
+        "credit": "CHS-1481 / USC Digital Library (PD)"
+      },
+      {
+        "url": "/family/assets/lane-aaron/nh-connecticut-river-valley.jpg",
+        "alt": "Connecticut River Valley, New Hampshire",
+        "caption": "Piermont region context (Bierstadt, ca. 1865–68)",
+        "credit": "Berkshire Museum (PD)"
+      },
+      {
+        "url": "/family/assets/lane-aaron/cerro-gordo-1847.jpg",
+        "alt": "Battle of Cerro Gordo, 1847",
+        "caption": "Mexican-American War era (campaign context)",
+        "credit": "Library of Congress PGA 11191 (PD)"
+      },
+      {
+        "url": "/family/assets/lane-aaron/gold-miners-long-tom.jpg",
+        "alt": "California gold miners, ca. 1850",
+        "caption": "Forty-niner era",
+        "credit": "George H. Johnson / Nelson-Atkins (PD)"
+      },
+      {
+        "url": "/family/assets/lane-aaron/mojave-desert-vista.jpg",
+        "alt": "Mojave Desert landscape",
+        "caption": "High Desert · San Bernardino County",
+        "credit": "Stan Shebs (CC BY-SA 3.0)"
+      }
+    ]
+  },
+  "cta": [
+    { "label": "Major achievers card", "url": "/family/lane-major-achievers.html?slug=aaron-g-lane", "icon": "bi-award" },
+    { "label": "Jonathan Homer Lane (Scientific Lane)", "url": "/family/lane-scientific-lane.html", "icon": "bi-moon-stars" },
+    { "label": "Mexican-American War context", "url": "/family/lane-war-history.html#laneWarTab-mexican-american-war", "icon": "bi-flag" },
+    { "label": "Lane Museum exhibit", "url": "/family/lane-museum.html", "icon": "bi-building" },
+    { "label": "Open in family tree", "url": "/family/genealogy.html?id=1024", "icon": "bi-diagram-3" },
+    { "label": "Memorial wall", "url": "/family/lane-memorial-wall.html?personId=1024", "icon": "bi-bookmark" }
+  ]
+}

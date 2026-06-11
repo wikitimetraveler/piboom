@@ -17,6 +17,7 @@
     { href: '/family/lane-historians.html', label: 'Historians' },
     { href: '/family/lane-museum.html', label: 'Museum' },
     { href: '/family/lane-trading-cards.html', label: 'Cards' },
+    { href: '/family/lane-scientific-lane.html', label: 'Scientific' },
     { href: '/family/lane-was-he-an-idiot.html', label: 'PS 1884' },
     { href: '/family/lane-war-history.html', label: 'War' },
     { href: '/family/lane-memorial-wall.html', label: 'Memorial' },
