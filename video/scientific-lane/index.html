@@ -53,11 +53,107 @@
         position: absolute;
         inset: 0;
         pointer-events: none;
+        transform-origin: 50% 42%;
+      }
+      .scene-nebula {
+        position: absolute;
+        inset: -8%;
+        pointer-events: none;
+        opacity: 0.72;
+        mix-blend-mode: screen;
+      }
+      .scene-nebula--a {
+        background:
+          radial-gradient(ellipse 980px 620px at 22% 38%, rgba(90, 140, 220, 0.38), transparent 68%),
+          radial-gradient(ellipse 760px 520px at 78% 62%, rgba(140, 90, 180, 0.28), transparent 72%);
+      }
+      .scene-nebula--b {
+        background:
+          radial-gradient(ellipse 1100px 420px at 50% 88%, rgba(196, 165, 116, 0.14), transparent 70%),
+          radial-gradient(ellipse 640px 640px at 62% 28%, rgba(60, 110, 190, 0.22), transparent 65%);
+      }
+      .galaxy-band {
+        position: absolute;
+        left: -12%;
+        top: 18%;
+        width: 124%;
+        height: 38%;
+        pointer-events: none;
+        opacity: 0.34;
+        transform: rotate(-18deg);
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(180, 200, 240, 0.06) 18%,
+          rgba(220, 230, 255, 0.22) 42%,
+          rgba(196, 165, 116, 0.12) 58%,
+          rgba(180, 200, 240, 0.08) 78%,
+          transparent 100%
+        );
+        filter: blur(18px);
       }
       .star {
         position: absolute;
         border-radius: 50%;
         background: #dfe8f2;
+        box-shadow: 0 0 0 rgba(223, 232, 242, 0);
+      }
+      .star--bright {
+        background: #f4f8ff;
+        box-shadow: 0 0 6px rgba(180, 210, 255, 0.85), 0 0 14px rgba(142, 180, 217, 0.45);
+      }
+      .star--gold {
+        background: #f0dcc0;
+        box-shadow: 0 0 5px rgba(196, 165, 116, 0.75), 0 0 12px rgba(196, 165, 116, 0.35);
+      }
+      .star--blue {
+        background: #b8d4f0;
+        box-shadow: 0 0 4px rgba(142, 180, 217, 0.7);
+      }
+      .scene-universe .scene-glow {
+        background:
+          radial-gradient(ellipse 1400px 900px at 50% 44%, rgba(100, 150, 220, 0.28), rgba(15, 18, 24, 0) 72%),
+          radial-gradient(ellipse 900px 600px at 18% 72%, rgba(196, 165, 116, 0.12), rgba(15, 18, 24, 0) 68%);
+      }
+      .cosmic-flare {
+        position: absolute;
+        left: 50%;
+        top: 42%;
+        width: 1280px;
+        height: 1280px;
+        margin-left: -640px;
+        margin-top: -640px;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0;
+        mix-blend-mode: screen;
+        background: radial-gradient(
+          circle at 50% 50%,
+          rgba(255, 246, 228, 0.72) 0%,
+          rgba(196, 165, 116, 0.42) 12%,
+          rgba(142, 180, 217, 0.28) 28%,
+          rgba(80, 120, 190, 0.1) 48%,
+          transparent 68%
+        );
+      }
+      .opening-ring {
+        position: absolute;
+        left: 50%;
+        top: 42%;
+        width: 420px;
+        height: 420px;
+        margin-left: -210px;
+        margin-top: -210px;
+        border-radius: 50%;
+        pointer-events: none;
+        opacity: 0;
+        border: 2px solid rgba(196, 165, 116, 0.55);
+        box-shadow:
+          0 0 40px rgba(142, 180, 217, 0.35),
+          inset 0 0 30px rgba(142, 180, 217, 0.18);
+      }
+      #s1-title {
+        text-shadow: 0 0 48px rgba(142, 180, 217, 0.22);
       }
       .scene-content {
         position: relative;
@@ -325,14 +421,19 @@
       data-height="1080"
     >
       <!-- S1 · Title (0–11.5) -->
-      <div id="s1" class="scene clip" data-start="0" data-duration="11.5" data-track-index="1">
-        <div class="scene-stars" data-starfield="11"></div>
-        <div class="scene-glow"></div>
-        <div class="scene-content" style="align-items: center; text-align: center">
+      <div id="s1" class="scene scene-universe clip" data-start="0" data-duration="11.5" data-track-index="1">
+        <div class="scene-nebula scene-nebula--a" id="s1-nebula-a" data-layout-allow-overflow></div>
+        <div class="scene-nebula scene-nebula--b" id="s1-nebula-b" data-layout-allow-overflow></div>
+        <div class="galaxy-band" id="s1-galaxy" data-layout-allow-overflow></div>
+        <div class="scene-stars" id="s1-stars" data-starfield="11" data-star-count="260" data-layout-allow-overflow></div>
+        <div class="scene-glow" id="s1-glow"></div>
+        <div class="cosmic-flare" id="s1-flare" data-layout-allow-overflow></div>
+        <div class="opening-ring" id="s1-ring" data-layout-allow-overflow></div>
+        <div class="scene-content" id="s1-inner" style="align-items: center; text-align: center">
           <p class="kicker" id="s1-kicker">Lane Family · Scientific Lane</p>
           <div class="rule" id="s1-rule" style="transform-origin: center"></div>
           <h1 class="title" id="s1-title">Jonathan Homer Lane</h1>
-          <p class="subtitle" id="s1-sub">The family&rsquo;s astrophysicist</p>
+          <p class="subtitle" id="s1-sub">The family&rsquo;s astrophysicist &mdash; published as Lane, H.&nbsp;J.</p>
           <p class="era" id="s1-era">1819 Geneseo, N.Y. &mdash; 1880 Washington, D.C.</p>
         </div>
       </div>
@@ -468,13 +569,16 @@
             <span style="font-size: 1.15em">)</span>
             &nbsp;+&nbsp; &theta;<sup>n</sup> &nbsp;=&nbsp; 0
           </p>
-          <p class="eq-credit" id="s6-credit">The Lane&ndash;Emden equation &mdash; still taught in stellar structure courses.</p>
+          <p class="eq-credit" id="s6-credit">Lane, H.&nbsp;J. (1870). <em>Am. J. Sci.</em> &mdash; gaseous Sun held up by internal heat; basis of the Lane&ndash;Emden equation.</p>
         </div>
       </div>
 
       <!-- S7 · Crater close (62.5–73) -->
-      <div id="s7" class="scene clip" data-start="62.5" data-duration="10.5" data-track-index="1">
-        <div class="scene-stars" data-starfield="77"></div>
+      <div id="s7" class="scene scene-universe clip" data-start="62.5" data-duration="10.5" data-track-index="1">
+        <div class="scene-nebula scene-nebula--a" id="s7-nebula-a" data-layout-allow-overflow></div>
+        <div class="scene-nebula scene-nebula--b" id="s7-nebula-b" data-layout-allow-overflow></div>
+        <div class="galaxy-band" id="s7-galaxy" data-layout-allow-overflow></div>
+        <div class="scene-stars" data-starfield="77" data-star-count="220" data-layout-allow-overflow></div>
         <div class="scene-glow"></div>
         <div class="scene-content exhibit" id="s7-inner">
           <div class="text-col">
@@ -530,13 +634,28 @@
       }
       document.querySelectorAll('.scene-stars').forEach(function (host) {
         const rand = mulberry32(Number(host.dataset.starfield) || 1);
+        const count = Number(host.dataset.starCount) || 110;
         let html = '';
-        for (let i = 0; i < 110; i++) {
+        for (let i = 0; i < count; i++) {
           const x = (rand() * 100).toFixed(2);
           const y = (rand() * 100).toFixed(2);
-          const s = (0.8 + rand() * 2.2).toFixed(2);
-          const o = (0.25 + rand() * 0.65).toFixed(2);
-          html += '<span class="star" style="left:' + x + '%;top:' + y + '%;width:' + s + 'px;height:' + s + 'px;opacity:' + o + '"></span>';
+          const roll = rand();
+          let cls = 'star';
+          let s;
+          let o;
+          if (roll > 0.94) {
+            cls += ' star--bright';
+            s = (2.4 + rand() * 3.2).toFixed(2);
+            o = (0.72 + rand() * 0.28).toFixed(2);
+          } else if (roll > 0.88) {
+            cls += roll > 0.91 ? ' star--gold' : ' star--blue';
+            s = (1.6 + rand() * 2.4).toFixed(2);
+            o = (0.55 + rand() * 0.4).toFixed(2);
+          } else {
+            s = (0.8 + rand() * 2.2).toFixed(2);
+            o = (0.25 + rand() * 0.65).toFixed(2);
+          }
+          html += '<span class="' + cls + '" style="left:' + x + '%;top:' + y + '%;width:' + s + 'px;height:' + s + 'px;opacity:' + o + '"></span>';
         }
         host.innerHTML = html;
       });
@@ -544,13 +663,24 @@
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
 
-      /* S1 · Title (0–11.5) */
-      tl.from("#s1-kicker", { opacity: 0, letterSpacing: "0.5em", duration: 1.0, ease: "power2.out" }, 0.3);
-      tl.from("#s1-rule", { scaleX: 0, duration: 0.8, ease: "expo.out" }, 0.7);
-      tl.from("#s1-title", { opacity: 0, y: 48, duration: 0.9, ease: "power3.out" }, 0.9);
-      tl.from("#s1-sub", { opacity: 0, duration: 0.7, ease: "sine.out" }, 1.6);
-      tl.from("#s1-era", { opacity: 0, y: 22, duration: 0.7, ease: "power1.out" }, 2.1);
-      tl.fromTo("#s1 .scene-stars", { y: 0 }, { y: -26, duration: 11.5, ease: "none" }, 0);
+      /* S1 · Title (0–11.5) — opening punch */
+      tl.fromTo("#s1-flare", { opacity: 0, scale: 0.35 }, { opacity: 0.95, scale: 1.18, duration: 0.55, ease: "expo.out" }, 0);
+      tl.to("#s1-flare", { opacity: 0.18, scale: 1.42, duration: 1.4, ease: "power2.out" }, 0.55);
+      tl.fromTo("#s1-ring", { opacity: 0, scale: 0.55 }, { opacity: 0.85, scale: 1.0, duration: 0.45, ease: "expo.out" }, 0.12);
+      tl.to("#s1-ring", { opacity: 0, scale: 2.35, duration: 1.15, ease: "power3.out" }, 0.57);
+      tl.fromTo("#s1-stars", { scale: 1.48, y: 140, opacity: 0.15 }, { scale: 1.1, y: -8, opacity: 1, duration: 2.0, ease: "power4.out" }, 0);
+      tl.fromTo("#s1-stars", { scale: 1.1, y: -8 }, { scale: 1.0, y: -62, duration: 9.5, ease: "power1.out" }, 2.0);
+      tl.fromTo("#s1-nebula-a", { opacity: 0, scale: 1.32 }, { opacity: 0.92, scale: 1.0, duration: 1.8, ease: "expo.out" }, 0);
+      tl.fromTo("#s1-nebula-b", { opacity: 0, x: -64 }, { opacity: 0.78, x: 32, duration: 11.5, ease: "none" }, 0.2);
+      tl.fromTo("#s1-galaxy", { opacity: 0, x: -120 }, { opacity: 0.52, x: 72, duration: 11.5, ease: "none" }, 0.15);
+      tl.fromTo("#s1-glow", { opacity: 0.2 }, { opacity: 1, duration: 1.2, ease: "expo.out" }, 0);
+      tl.from("#s1-kicker", { opacity: 0, letterSpacing: "0.62em", y: 18, duration: 0.75, ease: "expo.out" }, 0.45);
+      tl.from("#s1-rule", { scaleX: 0, duration: 0.65, ease: "expo.out" }, 0.85);
+      tl.from("#s1-title", { opacity: 0, y: 64, scale: 1.16, duration: 1.0, ease: "back.out(1.35)" }, 0.95);
+      tl.from("#s1-sub", { opacity: 0, y: 28, duration: 0.65, ease: "power3.out" }, 1.55);
+      tl.from("#s1-era", { opacity: 0, y: 24, duration: 0.65, ease: "power2.out" }, 1.95);
+      tl.fromTo("#s1-inner", { scale: 0.985 }, { scale: 1, duration: 2.4, ease: "sine.out" }, 0.95);
+      tl.fromTo("#s1 .star--bright", { opacity: 0.35 }, { opacity: 1, duration: 1.4, ease: "sine.inOut", yoyo: true, repeat: 6, stagger: { each: 0.28, from: "random" } }, 0.35);
 
       /* S2 · Portrait study (10.5–21.5) — slow push toward the face */
       tl.from("#s2", { opacity: 0, duration: 1.1, ease: "power1.inOut" }, 10.5);
@@ -595,6 +725,11 @@
 
       /* S7 · Crater close (62.5–73) */
       tl.from("#s7", { opacity: 0, duration: 1.1, ease: "power1.inOut" }, 62.5);
+      tl.fromTo("#s7 .scene-stars", { scale: 1.0, y: 0 }, { scale: 1.12, y: -52, duration: 8.7, ease: "power1.in" }, 62.5);
+      tl.fromTo("#s7-nebula-a", { opacity: 0.28, scale: 0.96 }, { opacity: 0.92, scale: 1.08, duration: 10.5, ease: "power1.in" }, 62.5);
+      tl.fromTo("#s7-nebula-b", { opacity: 0.22, x: 0 }, { opacity: 0.78, x: -42, duration: 10.5, ease: "none" }, 62.5);
+      tl.fromTo("#s7-galaxy", { opacity: 0.18, x: 0 }, { opacity: 0.48, x: -90, duration: 10.5, ease: "none" }, 62.5);
+      tl.fromTo("#s7 .star--bright", { opacity: 0.55 }, { opacity: 1, duration: 1.6, ease: "sine.inOut", yoyo: true, repeat: 4, stagger: { each: 0.42, from: "random" } }, 63.0);
       tl.from("#s7-kicker", { opacity: 0, x: -32, duration: 0.6, ease: "power2.out" }, 63.3);
       tl.from("#s7-rule", { scaleX: 0, duration: 0.7, ease: "expo.out" }, 63.5);
       tl.from("#s7-title", { opacity: 0, y: 46, duration: 0.8, ease: "power3.out" }, 63.6);
@@ -602,8 +737,10 @@
       tl.from("#s7-plate", { opacity: 0, x: 70, duration: 0.9, ease: "power2.out" }, 63.8);
       tl.fromTo("#s7-img", { scale: 1.14 }, { scale: 1.0, duration: 8.6, ease: "none" }, 63.8);
 
-      /* final scene only: fade to black */
+      /* final scene only: fade content then pull into the void */
       tl.to("#s7-inner", { opacity: 0, duration: 1.3, ease: "power2.inOut" }, 71.4);
+      tl.to("#s7 .scene-stars", { opacity: 0.35, scale: 1.28, y: -72, duration: 1.5, ease: "power3.in" }, 71.2);
+      tl.to(["#s7-nebula-a", "#s7-nebula-b", "#s7-galaxy"], { opacity: 0.12, duration: 1.5, ease: "power2.in" }, 71.2);
 
       window.__timelines["main"] = tl;
     </script>

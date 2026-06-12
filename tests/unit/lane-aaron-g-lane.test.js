@@ -56,4 +56,10 @@ describe('lane-aaron-g-lane.json', () => {
       }
     });
   });
+
+  test('cta includes narrated film asset', () => {
+    const film = (doc.cta || []).find((c) => c.url?.includes('lane-aaron-mojave-presentation.mp4'));
+    expect(film).toBeDefined();
+    expect(film.label).toMatch(/film/i);
+  });
 });

@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #0f1218;
+      }
+      :root {
+        --bg: #0f1218;
+        --surface: #171b24;
+        --text: #ece8df;
+        --muted: #a8a397;
+        --blue: #8eb4d9;
+        --gold: #c4a574;
+        --border: rgba(236, 232, 223, 0.14);
+      }
+      body {
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+        color: var(--text);
+      }
+
+      .scene {
+        position: absolute;
+        inset: 0;
+        background: var(--bg);
+        overflow: hidden;
+      }
+      .scene-glow {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+      }
+      .scene-glow--warm {
+        background: radial-gradient(
+          ellipse 1200px 760px at 38% 42%,
+          rgba(196, 165, 116, 0.16),
+          rgba(15, 18, 24, 0) 70%
+        );
+      }
+      .scene-glow--cool {
+        background: radial-gradient(
+          ellipse 1100px 700px at 62% 38%,
+          rgba(142, 180, 217, 0.12),
+          rgba(15, 18, 24, 0) 68%
+        );
+      }
+      .scene-content {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        padding: 110px 150px;
+        gap: 26px;
+      }
+      .kicker {
+        color: var(--gold);
+        font-size: 26px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      .rule {
+        width: 220px;
+        height: 1px;
+        background: var(--gold);
+        transform-origin: left center;
+        opacity: 0.85;
+      }
+      h1.title {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-weight: 400;
+        font-size: 96px;
+        line-height: 1.05;
+        max-width: 1520px;
+      }
+      .subtitle {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        color: var(--blue);
+        font-size: 38px;
+      }
+      .copy {
+        font-size: 33px;
+        line-height: 1.5;
+        color: var(--muted);
+        max-width: 1160px;
+      }
+      .era {
+        font-size: 28px;
+        letter-spacing: 0.1em;
+        color: var(--blue);
+      }
+
+      .exhibit {
+        flex-direction: row;
+        align-items: center;
+        gap: 90px;
+      }
+      .exhibit .text-col {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+        flex: 1 1 auto;
+        min-width: 0;
+      }
+      .exhibit .copy {
+        max-width: 840px;
+      }
+      .plate {
+        flex: 0 0 620px;
+        width: 620px;
+        display: flex;
+        flex-direction: column;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 24px 48px rgba(0, 0, 0, 0.4);
+        padding: 18px;
+      }
+      .plate .img-frame {
+        width: 100%;
+        height: 660px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: #1a1410;
+      }
+      .plate img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .plate figcaption {
+        padding: 18px 6px 4px;
+        font-size: 21px;
+        color: var(--muted);
+        letter-spacing: 0.02em;
+      }
+      .plate--portrait {
+        flex: 0 0 680px;
+        width: 680px;
+      }
+      .plate--portrait .img-frame {
+        height: 720px;
+        background: #f4f1ea;
+      }
+      .plate--hero {
+        flex: 0 0 740px;
+        width: 740px;
+      }
+      .plate--hero .img-frame {
+        height: 780px;
+      }
+      #s2-img,
+      #s5-img {
+        transform-origin: 50% 55%;
+      }
+
+      .chrono {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 8px;
+      }
+      .chrono-row {
+        display: flex;
+        align-items: baseline;
+        gap: 34px;
+      }
+      .chrono-year {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 42px;
+        color: var(--gold);
+        font-variant-numeric: tabular-nums;
+        flex: 0 0 230px;
+        text-align: right;
+      }
+      .chrono-label {
+        font-size: 31px;
+        color: var(--text);
+      }
+      .chrono-label .sub {
+        color: var(--muted);
+        font-size: 24px;
+      }
+
+      .chain {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        margin-top: 6px;
+      }
+      .chain-row {
+        display: flex;
+        align-items: baseline;
+        gap: 26px;
+        padding-left: 26px;
+        border-left: 2px solid rgba(142, 180, 217, 0.4);
+      }
+      .chain-row.is-highlight {
+        border-left-color: var(--gold);
+      }
+      .chain-rel {
+        font-size: 21px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--blue);
+        flex: 0 0 380px;
+      }
+      .chain-row.is-highlight .chain-rel {
+        color: var(--gold);
+      }
+      .chain-name {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 38px;
+      }
+      .chain-years {
+        font-size: 24px;
+        color: var(--muted);
+      }
+
+      .route-grid {
+        display: flex;
+        gap: 40px;
+        margin-top: 12px;
+      }
+      .route-plate {
+        flex: 1;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 16px;
+        border-radius: 2px;
+      }
+      .route-plate img {
+        width: 100%;
+        height: 380px;
+        object-fit: contain;
+        display: block;
+        background: #1e2430;
+      }
+      .route-plate figcaption {
+        font-size: 20px;
+        color: var(--muted);
+        margin-top: 12px;
+      }
+
+      .dual-plates {
+        display: flex;
+        gap: 28px;
+        margin-top: 8px;
+      }
+      .dual-plates .mini-plate {
+        flex: 1;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        overflow: hidden;
+      }
+      .dual-plates .mini-plate img {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        display: block;
+      }
+      .dual-plates .mini-plate figcaption {
+        padding: 12px 14px;
+        font-size: 18px;
+        color: var(--muted);
+      }
+
+      .stats {
+        display: flex;
+        gap: 52px;
+        margin-top: 8px;
+      }
+      .stat {
+        border-left: 1px solid var(--gold);
+        padding-left: 24px;
+      }
+      .stat .label {
+        font-size: 20px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-bottom: 6px;
+      }
+      .stat .value {
+        font-size: 36px;
+        font-variant-numeric: tabular-nums;
+        font-family: Georgia, 'Times New Roman', serif;
+      }
+
+      .quote {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-style: italic;
+        font-size: 30px;
+        line-height: 1.45;
+        color: var(--text);
+        max-width: 980px;
+        border-left: 3px solid var(--gold);
+        padding-left: 28px;
+        margin-top: 8px;
+      }
+
+      .vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 200;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse 1600px 1000px at 50% 50%,
+          rgba(0, 0, 0, 0) 62%,
+          rgba(0, 0, 0, 0.36) 100%
+        );
+      }
+
+      #s1 { z-index: 10; }
+      #s2 { z-index: 20; }
+      #s3 { z-index: 30; }
+      #s4 { z-index: 40; }
+      #s5 { z-index: 50; }
+      #s6 { z-index: 60; }
+      #s7 { z-index: 70; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="73"
+      data-width="1920"
+      data-height="1080"
+    >
+      <!-- S1 · Title (0–11.5) -->
+      <div id="s1" class="scene clip" data-start="0" data-duration="11.5" data-track-index="1">
+        <div class="scene-glow scene-glow--warm"></div>
+        <div class="scene-content" style="align-items: center; text-align: center">
+          <p class="kicker" id="s1-kicker">Lane Family · Mojave Pioneer</p>
+          <div class="rule" id="s1-rule" style="transform-origin: center"></div>
+          <h1 class="title" id="s1-title">Captain Aaron G. Lane</h1>
+          <p class="subtitle" id="s1-sub">Last Crossing of the Mojave</p>
+          <p class="era" id="s1-era">1817 Piermont, N.H. &mdash; 1883 Bryman, California</p>
+        </div>
+      </div>
+
+      <!-- S2 · Portrait & Piermont (10.5–21.5) -->
+      <div id="s2" class="scene clip" data-start="10.5" data-duration="11" data-track-index="2">
+        <div class="scene-glow scene-glow--cool"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate plate--portrait" id="s2-plate">
+            <div class="img-frame">
+              <img id="s2-img" data-layout-allow-overflow src="assets/aaron-g-lane.png" alt="Captain Aaron G. Lane portrait" />
+            </div>
+            <figcaption>Exhibit portrait &mdash; Lane Museum card and major-achievers roster.</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker" id="s2-kicker">Piermont, New Hampshire</p>
+            <div class="rule" id="s2-rule"></div>
+            <h1 class="title" id="s2-title" style="font-size: 84px">Peaked Mountain<br />farm</h1>
+            <p class="copy" id="s2-copy">
+              Youngest son of Jonathan Lane and Mary Towle; twin to Moses P. Lane.
+              Vol.&nbsp;I places his birth at Piermont, 23&nbsp;December 1817 &mdash; before Mexico,
+              California, and the desert corridor.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- S3 · Moses & Eldora (20.5–30) -->
+      <div id="s3" class="scene clip" data-start="20.5" data-duration="9.5" data-track-index="1">
+        <div class="scene-glow scene-glow--warm"></div>
+        <div class="scene-content">
+          <p class="kicker" id="s3-kicker">Twin Moses &amp; the Richmonds</p>
+          <div class="rule" id="s3-rule"></div>
+          <h1 class="title" id="s3-title" style="font-size: 78px">Family thread</h1>
+          <div class="chain">
+            <div class="chain-row is-highlight" id="s3-r1">
+              <span class="chain-rel">Subject · Mojave pioneer</span>
+              <span class="chain-name">Aaron G. Lane</span>
+              <span class="chain-years">1817&ndash;1883</span>
+            </div>
+            <div class="chain-row" id="s3-r2">
+              <span class="chain-rel">Twin brother</span>
+              <span class="chain-name">Moses P. Lane</span>
+              <span class="chain-years">d. Acapulco 1852</span>
+            </div>
+            <div class="chain-row" id="s3-r3">
+              <span class="chain-rel">Niece &amp; nurse</span>
+              <span class="chain-name">Eldora Richmond</span>
+              <span class="chain-years">Halleck, Cal.</span>
+            </div>
+            <div class="chain-row" id="s3-r4">
+              <span class="chain-rel">Cousin branch anchor</span>
+              <span class="chain-name">Homer R Lane</span>
+              <span class="chain-years">1st cousin 3&times; removed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S4 · Mexico & Gold Rush (29–41) -->
+      <div id="s4" class="scene clip" data-start="29" data-duration="12" data-track-index="2">
+        <div class="scene-glow scene-glow--cool"></div>
+        <div class="scene-content">
+          <p class="kicker" id="s4-kicker">1847&ndash;1850</p>
+          <div class="rule" id="s4-rule"></div>
+          <h1 class="title" id="s4-title" style="font-size: 84px">Mexico to Mother Lode</h1>
+          <div class="chrono">
+            <div class="chrono-row" id="s4-r1">
+              <div class="chrono-year">1847&ndash;48</div>
+              <div class="chrono-label">Co.&nbsp;H, 9th U.S. Infantry <span class="sub">malaria at Puebla; invalid pension 1849</span></div>
+            </div>
+            <div class="chrono-row" id="s4-r2">
+              <div class="chrono-year">1849</div>
+              <div class="chrono-label">California <span class="sub">Vol.&nbsp;I: &ldquo;went to California in 1849&rdquo;</span></div>
+            </div>
+            <div class="chrono-row" id="s4-r3">
+              <div class="chrono-year">1850</div>
+              <div class="chrono-label">Forty-niner diggings <span class="sub">then San Bernardino and the desert corridor</span></div>
+            </div>
+          </div>
+          <div class="dual-plates" id="s4-plates">
+            <figure class="mini-plate">
+              <img src="assets/cerro-gordo-1847.jpg" alt="Battle of Cerro Gordo, 1847" />
+              <figcaption>Mexican-American War era &mdash; Library of Congress (context)</figcaption>
+            </figure>
+            <figure class="mini-plate">
+              <img src="assets/gold-miners-long-tom.jpg" alt="California gold miners, ca. 1850" />
+              <figcaption>Forty-niner era &mdash; Nelson-Atkins (PD)</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <!-- S5 · Lane's Crossing (40.5–54) -->
+      <div id="s5" class="scene clip" data-start="40.5" data-duration="13.5" data-track-index="1">
+        <div class="scene-glow scene-glow--warm"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate plate--hero" id="s5-plate">
+            <div class="img-frame">
+              <img id="s5-img" data-layout-allow-overflow src="assets/mojave-narrows-1905.jpg" alt="Mojave River Narrows near Victorville, ca. 1905" />
+            </div>
+            <figcaption>Lower Narrows &mdash; same ford as Lane&rsquo;s Crossing. CHS-1481 / USC Digital Library (PD).</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker" id="s5-kicker">1858&ndash;1865</p>
+            <div class="rule" id="s5-rule"></div>
+            <h1 class="title" id="s5-title" style="font-size: 88px">Lane&rsquo;s<br />Crossing</h1>
+            <p class="copy" id="s5-copy">
+              Ranch and traveler store at the Lower Narrows &mdash; first permanent settlement on the Mojave River.
+              The <strong>Last Crossing</strong> on the Mormon Road before Cajon Pass. Sold in 1865 for the Bryman alfalfa ranch.
+            </p>
+            <div class="stats" id="s5-stats">
+              <div class="stat">
+                <div class="label">Latitude</div>
+                <div class="value">34.575&deg; N</div>
+              </div>
+              <div class="stat">
+                <div class="label">Longitude</div>
+                <div class="value">117.332&deg; W</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S6 · Routes (51–62) -->
+      <div id="s6" class="scene clip" data-start="51" data-duration="11" data-track-index="2">
+        <div class="scene-glow scene-glow--cool"></div>
+        <div class="scene-content">
+          <p class="kicker" id="s6-kicker">Western settlement routes</p>
+          <div class="rule" id="s6-rule"></div>
+          <h1 class="title" id="s6-title" style="font-size: 80px">Roads at the narrows</h1>
+          <div class="route-grid" id="s6-routes">
+            <figure class="route-plate">
+              <img src="assets/mojave-routes.svg" alt="Mojave corridor routes diagram" />
+              <figcaption>Mohave Trail · Old Spanish Trail · Mormon Road · Mojave Road</figcaption>
+            </figure>
+            <figure class="route-plate">
+              <img src="assets/lanes-crossing-site.svg" alt="Lane's Crossing site diagram" />
+              <figcaption>Lane&rsquo;s Crossing station &mdash; Lower Narrows ford</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <!-- S7 · Close (61–73) -->
+      <div id="s7" class="scene clip" data-start="61" data-duration="12" data-track-index="1">
+        <div class="scene-glow scene-glow--warm"></div>
+        <div class="scene-content exhibit" id="s7-inner">
+          <div class="text-col">
+            <p class="kicker" id="s7-kicker">Lane Genealogies Vol.&nbsp;I · p.&nbsp;148</p>
+            <div class="rule" id="s7-rule"></div>
+            <h1 class="title" id="s7-title" style="font-size: 84px">The desert<br />remembers</h1>
+            <p class="quote" id="s7-quote">
+              &ldquo;Died unm. 14 Sept., 1883, at Lane&rsquo;s Crossing of the Mojave river.
+              His home was in the family of Mrs. Richmond, his neice, in Halleck, Cal.&rdquo;
+            </p>
+            <div class="stats" id="s7-stats">
+              <div class="stat">
+                <div class="label">Died</div>
+                <div class="value">14 Sept. 1883</div>
+              </div>
+              <div class="stat">
+                <div class="label">Place</div>
+                <div class="value">Bryman / Halleck</div>
+              </div>
+            </div>
+          </div>
+          <figure class="plate" id="s7-plate">
+            <div class="img-frame">
+              <img id="s7-img" data-layout-allow-overflow src="assets/mojave-desert-vista.jpg" alt="Mojave Desert landscape" />
+            </div>
+            <figcaption>High Desert · San Bernardino County (Stan Shebs, CC BY-SA 3.0)</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Narration · Google Cloud TTS (make-narration.mjs) -->
+      <audio id="nar-1" class="clip" data-start="0.5" data-duration="10" data-track-index="5" src="assets/narration/scene1.mp3" data-volume="1"></audio>
+      <audio id="nar-2" class="clip" data-start="10.6" data-duration="10" data-track-index="5" src="assets/narration/scene2.mp3" data-volume="1"></audio>
+      <audio id="nar-3" class="clip" data-start="20.6" data-duration="10" data-track-index="5" src="assets/narration/scene3.mp3" data-volume="1"></audio>
+      <audio id="nar-4" class="clip" data-start="30.6" data-duration="11" data-track-index="5" src="assets/narration/scene4.mp3" data-volume="1"></audio>
+      <audio id="nar-5" class="clip" data-start="41.7" data-duration="10" data-track-index="5" src="assets/narration/scene5.mp3" data-volume="1"></audio>
+      <audio id="nar-6" class="clip" data-start="51.7" data-duration="9" data-track-index="5" src="assets/narration/scene6.mp3" data-volume="1"></audio>
+      <audio id="nar-7" class="clip" data-start="60.7" data-duration="11" data-track-index="5" src="assets/narration/scene7.mp3" data-volume="1"></audio>
+
+      <div class="vignette"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      /* S1 · Title */
+      tl.from('#s1-kicker', { opacity: 0, letterSpacing: '0.5em', duration: 1.0, ease: 'power2.out' }, 0.3);
+      tl.from('#s1-rule', { scaleX: 0, duration: 0.8, ease: 'expo.out' }, 0.7);
+      tl.from('#s1-title', { opacity: 0, y: 48, duration: 0.9, ease: 'power3.out' }, 0.9);
+      tl.from('#s1-sub', { opacity: 0, duration: 0.7, ease: 'sine.out' }, 1.6);
+      tl.from('#s1-era', { opacity: 0, y: 22, duration: 0.7, ease: 'power1.out' }, 2.1);
+
+      /* S2 · Portrait */
+      tl.from('#s2', { opacity: 0, duration: 1.1, ease: 'power1.inOut' }, 10.5);
+      tl.from('#s2-plate', { opacity: 0, x: -70, duration: 0.9, ease: 'power2.out' }, 11.3);
+      tl.fromTo('#s2-img', { scale: 1.0 }, { scale: 1.12, duration: 9.8, ease: 'sine.inOut' }, 11.5);
+      tl.from('#s2-kicker', { opacity: 0, x: 34, duration: 0.6, ease: 'power3.out' }, 11.6);
+      tl.from('#s2-rule', { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 11.8);
+      tl.from('#s2-title', { opacity: 0, y: 44, duration: 0.8, ease: 'power2.out' }, 11.9);
+      tl.from('#s2-copy', { opacity: 0, y: 24, duration: 0.7, ease: 'sine.out' }, 12.5);
+
+      /* S3 · Family */
+      tl.from('#s3', { opacity: 0, duration: 1.0, ease: 'power1.inOut' }, 20.5);
+      tl.from('#s3-kicker', { opacity: 0, x: -32, duration: 0.6, ease: 'power2.out' }, 21.2);
+      tl.from('#s3-rule', { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 21.4);
+      tl.from('#s3-title', { opacity: 0, y: 42, duration: 0.8, ease: 'power3.out' }, 21.5);
+      tl.from(['#s3-r1', '#s3-r2', '#s3-r3', '#s3-r4'], { opacity: 0, x: -46, duration: 0.6, ease: 'power2.out', stagger: 0.22 }, 22.2);
+
+      /* S4 · Mexico & Gold */
+      tl.from('#s4', { opacity: 0, duration: 1.0, ease: 'power1.inOut' }, 29);
+      tl.from('#s4-kicker', { opacity: 0, letterSpacing: '0.46em', duration: 0.9, ease: 'power2.out' }, 29.7);
+      tl.from('#s4-rule', { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 29.9);
+      tl.from('#s4-title', { opacity: 0, y: 44, duration: 0.8, ease: 'power3.out' }, 30.0);
+      tl.from(['#s4-r1', '#s4-r2', '#s4-r3'], { opacity: 0, y: 30, duration: 0.55, ease: 'power2.out', stagger: 0.24 }, 30.7);
+      tl.from('#s4-plates', { opacity: 0, y: 36, duration: 0.8, ease: 'power2.out' }, 32.0);
+
+      /* S5 · Lane's Crossing */
+      tl.from('#s5', { opacity: 0, duration: 1.1, ease: 'power1.inOut' }, 40.5);
+      tl.from('#s5-plate', { opacity: 0, x: -80, duration: 0.9, ease: 'power2.out' }, 41.3);
+      tl.fromTo('#s5-img', { scale: 1.05 }, { scale: 1.18, duration: 11.8, ease: 'sine.inOut' }, 41.5);
+      tl.from('#s5-kicker', { opacity: 0, x: 34, duration: 0.6, ease: 'power3.out' }, 41.6);
+      tl.from('#s5-rule', { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 41.8);
+      tl.from('#s5-title', { opacity: 0, y: 44, duration: 0.8, ease: 'power2.out' }, 41.9);
+      tl.from('#s5-copy', { opacity: 0, y: 24, duration: 0.7, ease: 'sine.out' }, 42.5);
+      tl.from('#s5-stats .stat', { opacity: 0, y: 28, duration: 0.6, ease: 'power2.out', stagger: 0.16 }, 43.2);
+
+      /* S6 · Routes */
+      tl.from('#s6', { opacity: 0, duration: 1.0, ease: 'power1.inOut' }, 51);
+      tl.from('#s6-kicker', { opacity: 0, x: -32, duration: 0.6, ease: 'power2.out' }, 51.8);
+      tl.from('#s6-rule', { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 52.0);
+      tl.from('#s6-title', { opacity: 0, y: 44, duration: 0.8, ease: 'power3.out' }, 52.1);
+      tl.from('#s6-routes .route-plate', { opacity: 0, y: 40, duration: 0.7, ease: 'power2.out', stagger: 0.2 }, 52.8);
+
+      /* S7 · Close */
+      tl.from('#s7', { opacity: 0, duration: 1.1, ease: 'power1.inOut' }, 61);
+      tl.from('#s7-kicker', { opacity: 0, x: -32, duration: 0.6, ease: 'power2.out' }, 61.8);
+      tl.from('#s7-rule', { scaleX: 0, duration: 0.7, ease: 'expo.out' }, 62.0);
+      tl.from('#s7-title', { opacity: 0, y: 46, duration: 0.8, ease: 'power3.out' }, 62.1);
+      tl.from('#s7-quote', { opacity: 0, x: -30, duration: 0.9, ease: 'power2.out' }, 62.7);
+      tl.from('#s7-stats .stat', { opacity: 0, y: 30, duration: 0.6, ease: 'power2.out', stagger: 0.16 }, 63.4);
+      tl.from('#s7-plate', { opacity: 0, x: 70, duration: 0.9, ease: 'power2.out' }, 62.3);
+      tl.fromTo('#s7-img', { scale: 1.1 }, { scale: 1.0, duration: 9.5, ease: 'none' }, 62.3);
+      tl.to('#s7-inner', { opacity: 0, duration: 1.3, ease: 'power2.inOut' }, 71.2);
+
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>

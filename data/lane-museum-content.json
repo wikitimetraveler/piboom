@@ -442,6 +442,11 @@
       "imageCredit": "Lane family / genealogy compilation",
       "links": [
         {
+          "label": "Watch the film (73s)",
+          "url": "/family/assets/video/lane-aaron-mojave-presentation.mp4",
+          "kind": "other"
+        },
+        {
           "label": "Mojave pioneer chapter",
           "url": "/family/lane-aaron-g-lane.html",
           "kind": "other"

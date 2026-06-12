@@ -173,6 +173,7 @@
     ]
   },
   "cta": [
+    { "label": "Watch the film (73s, narrated)", "url": "/family/assets/video/lane-aaron-mojave-presentation.mp4", "icon": "bi-film" },
     { "label": "Major achievers card", "url": "/family/lane-major-achievers.html?slug=aaron-g-lane", "icon": "bi-award" },
     { "label": "Jonathan Homer Lane (Scientific Lane)", "url": "/family/lane-scientific-lane.html", "icon": "bi-moon-stars" },
     { "label": "Mexican-American War context", "url": "/family/lane-war-history.html#laneWarTab-mexican-american-war", "icon": "bi-flag" },

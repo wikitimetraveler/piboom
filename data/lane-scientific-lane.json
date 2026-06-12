@@ -4,7 +4,7 @@
   "hero": {
     "kicker": "Family pride · Cousin branch",
     "title": "Jonathan Homer Lane",
-    "subtitle": "Not on the direct line — but in the family. An astrophysicist whose name still rides on the Moon and in the Lane–Emden equation.",
+    "subtitle": "Vol. I lists him as Jonathan Homer — not on the direct line, but in the family. He published science as Lane, H. J. (Homer J. Lane). An astrophysicist whose name still rides on the Moon and in the Lane–Emden equation.",
     "era": "1819 Geneseo, N.Y. — 1880 Washington, D.C.",
     "portraitUrl": "/family/assets/jonathan-homer-lane.png",
     "portraitCaption": "Jonathan Homer Lane — pencil sketch preserved with C. S. Peirce's 1878 Photometric Researches distribution list (Grupo de Estudios Peirceanos, Univ. de Navarra)."
@@ -12,7 +12,7 @@
   "kinship": {
     "anchorPersonId": 112,
     "anchorName": "Alderman Homer R Lane",
-    "summary": "Anchor of the line: Alderman Homer R Lane (b. 1893). Jonathan Homer is his grand-uncle — brother of his grandfather David Tenney Lane, and uncle of William Homer Lane. A cousin-branch achievement — worth knowing even though the direct line runs through David, not Mark's eldest son.",
+    "summary": "Anchor of the line: Alderman Homer R Lane (b. 1893). Jonathan Homer is his grand-uncle — brother of his grandfather David Tenney Lane, and uncle of William Homer Lane. He signed his 1870 gaseous-Sun paper as Lane, H. J. A cousin-branch achievement — worth knowing even though the direct line runs through David, not Mark's eldest son.",
     "steps": [
       { "relation": "Direct line anchor", "name": "Alderman Homer R Lane", "personId": 112, "years": "1893–1970?" },
       { "relation": "His father", "name": "David E Lane", "personId": 111, "years": "1886–1965?" },
@@ -23,13 +23,13 @@
   },
   "homerNameThread": {
     "title": "Why “Homer” keeps showing up in the line",
-    "lede": "Vol. I gives Jonathan the middle name Homer at birth. Later generations in the David Tenney Lane branch carried Homer forward — almost certainly in memory of this uncle, not as a random given name.",
+    "lede": "Vol. I gives Jonathan the middle name Homer at birth. He published his gaseous-Sun paper as Lane, H. J. (Homer J. Lane). Later generations in the David Tenney Lane branch carried Homer forward — almost certainly in memory of this uncle, not as a random given name.",
     "entries": [
       {
         "name": "Jonathan Homer Lane",
         "personId": 94,
         "role": "Source of the name",
-        "note": "Listed in Vol. I as “Jonathan Homer,” b. Aug. 1819 — first child of Mark Lane × Henrietta Tenney."
+        "note": "Listed in Vol. I as “Jonathan Homer,” b. Aug. 1819 — first child of Mark Lane × Henrietta Tenney. Published science as Lane, H. J."
       },
       {
         "name": "William Homer Lane",
@@ -50,7 +50,7 @@
     {
       "tier": "Evidence",
       "label": "Lane Genealogies Vol. I (1891)",
-      "body": "Mark Lane child roster: Jonathan Homer, b. Aug. 1819; Exeter Academy 1839; Yale 1846; coast survey official, Washington; d. 1880.",
+      "body": "Mark Lane child roster: Jonathan Homer, b. Aug. 1819; Exeter Academy 1839; Yale 1846; coast survey official, Washington; d. 1880. Published science as Lane, H. J.",
       "links": [
         { "label": "PDF gallery — page 77 roster", "url": "/family/lane-pdf-gallery.html?pdfPage=77" },
         { "label": "Internet Archive facsimile", "url": "https://archive.org/details/lanegenealogies01chap", "external": true }
@@ -59,10 +59,10 @@
     {
       "tier": "Context",
       "label": "Modern science references",
-      "body": "Patent Office examiner, gaseous-Sun analysis (1870), Lane–Emden equation, IAU lunar crater Lane (1970). These sources extend the book line — they are not Vol. I text.",
+      "body": "Patent Office examiner; gaseous-Sun analysis (1870) as Lane, H. J.; Lane–Emden equation; IAU lunar crater Lane (1970). These sources extend the book line — they are not Vol. I text.",
       "links": [
+        { "label": "Primary paper — Lane, H. J. (1870)", "url": "https://doi.org/10.2475/ajs.s2-50.148.57", "external": true },
         { "label": "Wikipedia — Jonathan Homer Lane", "url": "https://en.wikipedia.org/wiki/Jonathan_Homer_Lane", "external": true },
-        { "label": "Primary paper (DOI)", "url": "https://doi.org/10.2475/ajs.s2-50.148.57", "external": true },
         { "label": "Yale — stellar structure note", "url": "http://www.astro.yale.edu/demarque/lane.html", "external": true }
       ]
     }
@@ -75,7 +75,7 @@
     { "id": "tl-1848", "year": "1848–57", "title": "U.S. Patent Office", "body": "Principal examiner from 1851; removed after an administration change in 1857.", "placeId": "washington" },
     { "id": "tl-1860", "year": "1860–66", "title": "Franklin, Pennsylvania", "body": "Lived with his blacksmith brother; pursued low-temperature apparatus experiments.", "placeId": "franklin" },
     { "id": "tl-1869", "year": "1869–80", "title": "Office of Weights and Measures", "body": "Treasury department work — predecessor lineage to NIST.", "placeId": "washington" },
-    { "id": "tl-1870", "year": "1870", "title": "Gaseous Sun paper", "body": "American Journal of Science — first detailed hydrostatic model of the Sun as a gas sphere.", "placeId": "washington" },
+    { "id": "tl-1870", "year": "1870", "title": "Gaseous Sun paper", "body": "Lane, H. J. On the theoretical temperature of the Sun… American Journal of Science, s2-50(148), 57–74. First detailed hydrostatic model of the Sun as a gas sphere.", "placeId": "washington", "links": [{ "label": "DOI", "url": "https://doi.org/10.2475/ajs.s2-50.148.57", "external": true }] },
     { "id": "tl-1880", "year": "1880", "title": "Died Washington, D.C.", "body": "Never married; buried in the federal city he served.", "placeId": "washington" },
     { "id": "tl-1970", "year": "1970", "title": "Lunar crater Lane", "body": "IAU names far-side crater for Jonathan Homer Lane.", "mapMode": "moon" }
   ],
@@ -111,7 +111,7 @@
         "years": "1839",
         "lat": 42.9814,
         "lng": -70.9478,
-        "note": "Phillips Exeter Academy — Jonathan's NH schooling kept the Stratham-branch tie alive.",
+        "note": "Phillips Exeter Academy — his NH schooling kept the Stratham-branch tie alive.",
         "personIds": [{ "id": 94, "name": "Jonathan Homer Lane" }]
       },
       {
@@ -131,7 +131,7 @@
         "years": "1847–57 · 1869–80",
         "lat": 38.9072,
         "lng": -77.0369,
-        "note": "Coast Survey, Patent Office principal examiner, Office of Weights and Measures. The 1870 gaseous-Sun paper was written here; died 1880.",
+        "note": "Coast Survey, Patent Office principal examiner, Office of Weights and Measures. Lane, H. J. (1870) gaseous-Sun paper written here; died 1880.",
         "personIds": [{ "id": 94, "name": "Jonathan Homer Lane" }]
       },
       {

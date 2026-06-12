@@ -265,6 +265,7 @@
       "verificationStatus": "corroborated",
       "siteLinks": [
         { "label": "Mojave pioneer chapter", "url": "/family/lane-aaron-g-lane.html", "primary": true },
+        { "label": "Watch the film (73s)", "url": "/family/assets/video/lane-aaron-mojave-presentation.mp4" },
         { "label": "Lane Museum exhibit", "url": "/family/lane-museum.html" },
         { "label": "Mexican-American War", "url": "/family/lane-war-history.html#laneWarTab-mexican-american-war" }
       ]

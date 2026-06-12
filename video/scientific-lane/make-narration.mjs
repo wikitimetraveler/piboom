@@ -20,7 +20,7 @@ const OUT_DIR = path.resolve('assets/narration');
 const SCENES = [
   {
     id: 'scene1',
-    text: 'Jonathan Homer Lane, eighteen nineteen to eighteen eighty — the family\u2019s astrophysicist. His name rides on the Moon, and in the Lane\u2013Emden equation.'
+    text: 'Jonathan Homer Lane — published as Lane, H. J. — eighteen nineteen to eighteen eighty. The family\u2019s astrophysicist. His name rides on the Moon, and in the Lane\u2013Emden equation.'
   },
   {
     id: 'scene2',
@@ -40,7 +40,7 @@ const SCENES = [
   },
   {
     id: 'scene6',
-    text: 'In eighteen seventy he modeled the Sun as a ball of gas held up by its own heat and gravity — the first step toward stellar structure theory.'
+    text: 'In eighteen seventy, as Lane, H. J., he modeled the Sun as a ball of gas held up by its own heat and gravity — the first step toward stellar structure theory.'
   },
   {
     id: 'scene7',
