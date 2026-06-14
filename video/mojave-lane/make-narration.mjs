@@ -40,7 +40,7 @@ const SCENES = [
   },
   {
     id: 'scene6',
-    text: 'Mohave Trail, Old Spanish Trail, Mormon Road, Mojave Road — indigenous trade paths and wagon roads converged at his station.'
+    text: 'At the Lower Narrows, ancient trade paths and wagon roads met. The Mohave Trail, the Mormon Road, and the Mojave Road all funneled travelers to Aaron Lane\u2019s station \u2014 the last ford on the Mojave River before Cajon Pass.'
   },
   {
     id: 'scene7',
