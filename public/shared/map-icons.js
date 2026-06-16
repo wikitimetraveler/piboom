@@ -149,6 +149,49 @@
     return disaster.default;
   }
 
+  /** Disaster event markers tinted by computed risk tier (unified disasters overview map) */
+  const riskTierSize = 22;
+  const riskTierAnchor = 11;
+  const riskTierColors = {
+    critical: { fill: '#7c2d12', stroke: '#450a0a' },
+    high: { fill: '#DC2626', stroke: '#991B1B' },
+    medium: { fill: '#F59E0B', stroke: '#B45309' },
+    low: { fill: '#22C55E', stroke: '#15803D' },
+    none: { fill: '#94A3B8', stroke: '#64748B' }
+  };
+
+  /**
+   * Map unified-disaster heuristic score to tier label.
+   * @param {number} score
+   */
+  function getDisasterRiskTier(score) {
+    const n = Number(score) || 0;
+    if (n >= 10) return 'critical';
+    if (n >= 6) return 'high';
+    if (n >= 3) return 'medium';
+    if (n > 0) return 'low';
+    return 'none';
+  }
+
+  /**
+   * Circular marker colored by risk tier for disaster overview maps.
+   * @param {number} riskScore
+   */
+  function getDisasterRiskTierIconForMarker(riskScore) {
+    const tier = getDisasterRiskTier(riskScore);
+    const c = riskTierColors[tier];
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' +
+      `<circle cx="12" cy="12" r="9" fill="${c.fill}" stroke="${c.stroke}" stroke-width="2"/>` +
+      '<circle cx="12" cy="12" r="3.5" fill="#fff" opacity="0.9"/>' +
+      '</svg>';
+    const cfg = {
+      url: svgToDataUri(svg),
+      scaledSize: { width: riskTierSize, height: riskTierSize },
+      anchor: { x: riskTierAnchor, y: riskTierAnchor }
+    };
+    return iconConfigForGoogleMaps(cfg);
+  }
+
   /**
    * Get loan icon config by risk score.
    * @param {number} score - disaster_risk_score
@@ -252,6 +295,8 @@
     getDisasterIcon,
     getLoanIcon,
     getDisasterIconForMarker,
+    getDisasterRiskTier,
+    getDisasterRiskTierIconForMarker,
     getLoanIconForMarker,
     getLoanIconByFloodZoneForMarker,
     getCollectionIconForMarker,

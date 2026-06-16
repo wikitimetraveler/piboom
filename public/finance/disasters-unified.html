@@ -70,7 +70,7 @@
             <h1 class="mb-0"><i class="bi-shield-exclamation me-2"></i>Unified Disasters</h1>
             <ul class="du-workflow-pills" id="workflowHint" aria-label="Workflow steps">
               <li><span class="step-num">1</span> Enable sources</li>
-              <li><span class="step-num">2</span> Filter grid</li>
+              <li><span class="step-num">2</span> Review hotspots</li>
               <li><span class="step-num">3</span> Select event</li>
               <li><span class="step-num">4</span> Loans &amp; cameras</li>
               <li><span class="step-num">5</span> KML or AI expert</li>
@@ -200,6 +200,53 @@
         </div>
       </div>
 
+      <div class="card mb-4 du-risk-intel" id="duRiskIntelCard">
+        <div class="card-body py-3">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <p class="du-command-deck-label mb-0">Risk intelligence</p>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="duClearHotspotFilter" hidden>
+              <i class="bi bi-x-lg"></i> Clear location filter
+            </button>
+          </div>
+          <p class="small text-muted mb-3">
+            Hotspots and top events from the loaded grid. Click a hotspot to filter the disasters table and load county loans; click an event to drill down.
+          </p>
+          <div class="row g-3">
+            <div class="col-lg-7">
+              <h3 class="du-risk-intel-kicker">Risk hotspots</h3>
+              <div class="table-responsive">
+                <table class="table table-sm table-hover du-hotspot-table mb-0" id="duHotspotTable" aria-label="Risk hotspots by county">
+                  <thead>
+                    <tr>
+                      <th>Location</th>
+                      <th class="text-end">Events</th>
+                      <th class="text-end">Peak risk</th>
+                      <th>Dominant type</th>
+                    </tr>
+                  </thead>
+                  <tbody id="duHotspotTableBody">
+                    <tr><td colspan="4" class="text-muted small">Loading…</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <h3 class="du-risk-intel-kicker">Top events</h3>
+              <div id="duTopEventsList" class="du-top-events-list" aria-label="Highest risk events">
+                <p class="text-muted small mb-0">Loading…</p>
+              </div>
+            </div>
+          </div>
+          <p class="small text-muted mt-3 mb-0 du-risk-map-legend" id="duRiskMapLegend" hidden>
+            <span class="du-risk-legend-dot du-risk-legend--critical"></span> Critical (10+)
+            <span class="du-risk-legend-dot du-risk-legend--high"></span> High (6–9)
+            <span class="du-risk-legend-dot du-risk-legend--medium"></span> Moderate (3–5)
+            <span class="du-risk-legend-dot du-risk-legend--low"></span> Low (&lt;3)
+            <span class="du-risk-legend-dot du-risk-legend--none"></span> Minimal
+          </p>
+        </div>
+      </div>
+
       <!-- Bootstrap Accordion -->
       <div class="accordion mb-4" id="disastersAccordion">
         <!-- Accordion Item 1: Filters -->
@@ -298,7 +345,10 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <div class="card du-data-panel du-map-panel">
-                    <div class="card-header"><strong><i class="bi-geo-alt"></i> Selected event map</strong></div>
+                    <div class="card-header">
+                      <strong><i class="bi-geo-alt"></i> Hazard map</strong>
+                      <small class="text-muted d-block">Markers colored by risk tier · click to select event</small>
+                    </div>
                     <div class="card-body">
                       <div id="map"></div>
                     </div>
@@ -536,6 +586,9 @@
       let aiInsightsCard = null;
       let voiceRecognition = null;
       let isVoiceListening = false;
+      let lastGridRows = [];
+      let lastLoadedDisasterRows = [];
+      let activeHotspotKey = null;
 
       function clearCameraMarkers() {
         cameraMarkers.forEach((entry) => entry.marker && entry.marker.setMap(null));
@@ -1073,6 +1126,7 @@
         });
         $('#refreshBtn').on('click', refreshDisasters);
         document.getElementById('refreshBtnHero')?.addEventListener('click', refreshDisasters);
+        document.getElementById('duClearHotspotFilter')?.addEventListener('click', clearHotspotGridFilter);
 
         loadYouTubeAPI();
         refreshSourceStatsFromApi();
@@ -1140,6 +1194,9 @@
       async function loadDisasters() {
         showLoading();
         setDashboardStatus('');
+        activeHotspotKey = null;
+        const clearHotspotBtn = document.getElementById('duClearHotspotFilter');
+        if (clearHotspotBtn) clearHotspotBtn.hidden = true;
         updateLoadingStatusDisaster('Loading disaster data...', 10);
 
         const { state, county, sources, events } = readDisasterFilterInputs();
@@ -1272,6 +1329,227 @@
         if (score < 10) return `<span class="risk-badge risk-high">High (${score.toFixed(1)})</span>`;
         return `<span class="risk-badge risk-critical">Critical (${score.toFixed(1)})</span>`;
       }
+
+      function formatDominantEventType(eventType) {
+        const et = String(eventType || '').trim().toLowerCase();
+        if (!et) return '—';
+        if (et.includes('wildfire') || et === 'fire') return 'Wildfire';
+        if (et.includes('earthquake')) return 'Earthquake';
+        if (et.includes('hurricane') || et.includes('tornado')) return 'Storm';
+        if (et.includes('flood')) return 'Flood';
+        if (et.includes('severe')) return 'Severe';
+        if (et === 'camera') return 'Camera';
+        return et.charAt(0).toUpperCase() + et.slice(1);
+      }
+
+      function hotspotKeyForRow(row) {
+        const state = String(row.state || row.state_abbr || '').trim().toUpperCase();
+        const county = String(row.county || row.county_name || '').trim();
+        if (!state) return '';
+        return county ? `${county}|${state}` : `*|${state}`;
+      }
+
+      function aggregateRiskHotspots(gridRows) {
+        const map = new Map();
+        (gridRows || []).forEach((row) => {
+          if (!row || row.isCamera) return;
+          const state = String(row.state || '').trim().toUpperCase();
+          if (!state) return;
+          const county = String(row.county || '').trim();
+          const key = hotspotKeyForRow(row);
+          let agg = map.get(key);
+          if (!agg) {
+            agg = {
+              key,
+              state,
+              county,
+              eventCount: 0,
+              peakRisk: 0,
+              dominantTypes: {},
+              topRow: null
+            };
+            map.set(key, agg);
+          }
+          agg.eventCount += 1;
+          const risk = Number(row.riskScore) || 0;
+          agg.peakRisk = Math.max(agg.peakRisk, risk);
+          const et = String(row.eventType || 'other').toLowerCase();
+          agg.dominantTypes[et] = (agg.dominantTypes[et] || 0) + 1;
+          if (!agg.topRow || risk > (agg.topRow.riskScore || 0)) {
+            agg.topRow = row;
+          }
+        });
+        return [...map.values()]
+          .map((agg) => {
+            const dominantEntry = Object.entries(agg.dominantTypes).sort((a, b) => b[1] - a[1])[0];
+            return {
+              key: agg.key,
+              state: agg.state,
+              county: agg.county,
+              eventCount: agg.eventCount,
+              peakRisk: agg.peakRisk,
+              dominantType: dominantEntry ? dominantEntry[0] : '',
+              topRow: agg.topRow
+            };
+          })
+          .sort((a, b) => b.peakRisk - a.peakRisk || b.eventCount - a.eventCount)
+          .slice(0, 10);
+      }
+
+      function getTopRiskEvents(gridRows, limit = 8) {
+        return (gridRows || [])
+          .filter((row) => row && !row.isCamera)
+          .sort((a, b) => (b.riskScore || 0) - (a.riskScore || 0) || (b.startTime || 0) - (a.startTime || 0))
+          .slice(0, limit);
+      }
+
+      function renderRiskIntelligencePanel(gridRows) {
+        const hotspots = aggregateRiskHotspots(gridRows);
+        const topEvents = getTopRiskEvents(gridRows);
+        const tbody = document.getElementById('duHotspotTableBody');
+        const topList = document.getElementById('duTopEventsList');
+        const legend = document.getElementById('duRiskMapLegend');
+
+        if (tbody) {
+          if (!hotspots.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-muted small">No geocoded events in the current load — widen sources or filters.</td></tr>';
+          } else {
+            tbody.innerHTML = hotspots.map((h) => {
+              const location = h.county
+                ? `${h.county}, ${h.state}`
+                : `${h.state} (statewide)`;
+              const active = activeHotspotKey === h.key ? ' du-hotspot-row--active' : '';
+              return `<tr class="du-hotspot-row${active}" data-hotspot-key="${h.key}" tabindex="0" role="button" aria-label="Filter to ${location}">
+                <td><strong>${location}</strong></td>
+                <td class="text-end">${h.eventCount}</td>
+                <td class="text-end">${getRiskBadge(h.peakRisk)}</td>
+                <td>${formatDominantEventType(h.dominantType)}</td>
+              </tr>`;
+            }).join('');
+          }
+        }
+
+        if (topList) {
+          if (!topEvents.length) {
+            topList.innerHTML = '<p class="text-muted small mb-0">No events to rank yet.</p>';
+          } else {
+            topList.innerHTML = topEvents.map((row) => {
+              const loc = [row.county, row.state].filter(Boolean).join(', ');
+              const title = row.title || row.eventType || 'Event';
+              return `<button type="button" class="du-top-event-item" data-event-title="${title.replace(/"/g, '&quot;')}">
+                <span class="du-top-event-title">${title}</span>
+                <span class="du-top-event-meta text-muted">${loc} · ${getRiskBadge(row.riskScore || 0)}</span>
+              </button>`;
+            }).join('');
+            topList.querySelectorAll('.du-top-event-item').forEach((btn, idx) => {
+              btn.addEventListener('click', () => {
+                const row = topEvents[idx];
+                if (row?.disasterObj) selectDisaster(null, row.disasterObj);
+              });
+            });
+          }
+        }
+
+        if (legend) {
+          legend.hidden = !gridRows || gridRows.length === 0;
+        }
+
+        document.querySelectorAll('.du-hotspot-row').forEach((tr) => {
+          tr.addEventListener('click', () => {
+            const key = tr.getAttribute('data-hotspot-key');
+            const hotspot = hotspots.find((h) => h.key === key);
+            if (hotspot) applyHotspotSelection(hotspot);
+          });
+          tr.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              tr.click();
+            }
+          });
+        });
+      }
+
+      function applyHotspotGridFilter(hotspot) {
+        if (!disastersGridApi || !hotspot) return;
+        const model = { state: {
+          filterType: 'text',
+          type: 'equals',
+          filter: hotspot.state
+        } };
+        if (hotspot.county) {
+          model.county = {
+            filterType: 'text',
+            type: 'contains',
+            filter: hotspot.county
+          };
+        }
+        if (typeof disastersGridApi.setFilterModel === 'function') {
+          disastersGridApi.setFilterModel(model);
+        } else if (disastersGridApi.setGridOption) {
+          disastersGridApi.setGridOption('filterModel', model);
+        }
+        activeHotspotKey = hotspot.key;
+        const clearBtn = document.getElementById('duClearHotspotFilter');
+        if (clearBtn) clearBtn.hidden = false;
+        renderRiskIntelligencePanel(lastGridRows);
+      }
+
+      function clearHotspotGridFilter() {
+        activeHotspotKey = null;
+        if (disastersGridApi?.setFilterModel) {
+          disastersGridApi.setFilterModel(null);
+        } else if (disastersGridApi?.setGridOption) {
+          disastersGridApi.setGridOption('filterModel', null);
+        }
+        const clearBtn = document.getElementById('duClearHotspotFilter');
+        if (clearBtn) clearBtn.hidden = true;
+        renderRiskIntelligencePanel(lastGridRows);
+        setDashboardStatus('Location filter cleared.', 'info');
+      }
+
+      function applyHotspotSelection(hotspot) {
+        if (!hotspot) return;
+        $('#stateInput').val(hotspot.state);
+        $('#countyInput').val(hotspot.county || '');
+        applyHotspotGridFilter(hotspot);
+
+        const locationLabel = hotspot.county
+          ? `${hotspot.county}, ${hotspot.state}`
+          : hotspot.state;
+        setDashboardStatus(`Filtered to ${locationLabel} — loading loans for this area.`, 'info');
+
+        const collapseLoans = document.getElementById('collapseLoans');
+        if (collapseLoans) {
+          new bootstrap.Collapse(collapseLoans, { show: true });
+        }
+
+        if (hotspot.topRow?.disasterObj) {
+          selectDisaster(null, hotspot.topRow.disasterObj);
+          return;
+        }
+
+        $('#encompassLoansCard').show();
+        $('#duLoanScopeMode').val('county');
+        syncDuLoanRadiusControls();
+        loadLoansForDisaster(
+          { state_abbr: hotspot.state, county_name: hotspot.county, title: locationLabel },
+          null
+        );
+      }
+
+      function getDisasterMarkerIconForRisk(r, allRows, riskScore) {
+        const score = riskScore != null ? riskScore : calculateDisasterRiskScore(r, allRows);
+        if (window.mapIcons?.getDisasterRiskTierIconForMarker) {
+          return window.mapIcons.getDisasterRiskTierIconForMarker(score);
+        }
+        if (window.mapIcons?.getDisasterIconForMarker) {
+          return window.mapIcons.getDisasterIconForMarker(r.event_type, r.source);
+        }
+        return {
+          url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+          scaledSize: new google.maps.Size(24, 24)
+        };
+      }
       
       // Load flood zones as disaster-like entries
       async function loadFloodZones(state = null, county = null) {
@@ -1332,6 +1610,7 @@
       }
 
       function renderTable(rows) {
+        lastLoadedDisasterRows = rows || [];
         const seen = new Set();
         const uniqueRows = rows.filter((r) => {
           const key = `${r.source || ''}_${r.source_id || ''}_${r.start_time || ''}`;
@@ -1341,12 +1620,17 @@
         });
 
         const gridRows = uniqueRows.map((r, idx) => buildDisasterGridRow(r, uniqueRows, idx));
+        lastGridRows = gridRows;
         setDisastersGridRows(gridRows);
         updateStats(rows);
+        renderRiskIntelligencePanel(gridRows);
 
         if (disastersGridApi?.applyColumnState) {
           disastersGridApi.applyColumnState({
-            state: [{ colId: 'startTime', sort: 'desc' }],
+            state: [
+              { colId: 'riskScore', sort: 'desc', sortIndex: 0 },
+              { colId: 'startTime', sort: 'desc', sortIndex: 1 }
+            ],
             defaultState: { sort: null }
           });
         }
@@ -1363,6 +1647,7 @@
         let any = false;
         cameraIndex = 0; // Reset camera index
         const mapRows = [];
+        const allRows = rows || lastLoadedDisasterRows || [];
         rows.forEach(r => {
           // Support lat/lng, latitude/longitude, avg_latitude/avg_longitude
           const lat = r.lat ?? r.latitude ?? r.avg_latitude;
@@ -1378,24 +1663,27 @@
             const item = mapRows[i];
             const r = item.row;
             const pos = { lat: item.lat, lng: item.lng };
-            const disasterIcon = window.mapIcons && window.mapIcons.getDisasterIconForMarker
-              ? window.mapIcons.getDisasterIconForMarker(r.event_type, r.source)
-              : { url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png', scaledSize: new google.maps.Size(24, 24) };
+            const isCameraMarker = r.event_type === 'camera' || r.source === 'alertcalifornia' ||
+              (r.title && r.title.toLowerCase().includes('camera'));
+            const riskScore = calculateDisasterRiskScore(r, allRows);
+            const disasterIcon = isCameraMarker && window.mapIcons?.getDisasterIconForMarker
+              ? window.mapIcons.getDisasterIconForMarker('camera', r.source)
+              : getDisasterMarkerIconForRisk(r, allRows, riskScore);
+            let cameraDataKey = null;
             const marker = new google.maps.Marker({
               position: pos,
               map,
-              title: r.title || r.event_type,
+              title: isCameraMarker
+                ? (r.title || 'Camera')
+                : `${r.title || r.event_type} (risk ${riskScore.toFixed(1)})`,
               icon: disasterIcon,
-              zIndex: 100
+              zIndex: isCameraMarker ? 50 : Math.round(100 + riskScore * 10)
             });
-            const isCameraMarker = r.event_type === 'camera' || r.source === 'alertcalifornia' ||
-              (r.title && r.title.toLowerCase().includes('camera'));
-            let cameraDataKey = null;
             if (isCameraMarker) {
               cameraDataKey = `camera_${cameraIndex++}`;
               window.cameraDataStore[cameraDataKey] = r;
             }
-            let infoContent = `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name || ''}, ${r.state_abbr || ''}<br>${r.start_time ? new Date(r.start_time).toLocaleString() : ''}`;
+            let infoContent = `<div><strong>${r.title || r.event_type}</strong><br>${r.county_name || ''}, ${r.state_abbr || ''}<br>${r.start_time ? new Date(r.start_time).toLocaleString() : ''}<br><span class="text-muted small">Risk: ${riskScore.toFixed(1)}</span>`;
             if (isCameraMarker && cameraDataKey) {
               infoContent += `<br><br><button class="btn btn-sm btn-warning" onclick="window.openCameraViewerFromMarker('${cameraDataKey}')" style="margin-top: 8px;">
                 <i class="bi-camera-video"></i> View Camera Feed
