@@ -4,6 +4,10 @@
  */
 (function () {
   const DATA_URL = '/data/lane-heygen-lines.json';
+  const DEFAULT_PUBLIC_ORIGIN = 'https://www.thelanefamily.us';
+  const QR_SIZE_POSTER = 104;
+  const QR_SIZE_SHIRT = 104;
+  const QR_SIZE_CARD = 88;
   let catalog = null;
   let person = null;
   let avatarDataUrl = null;
@@ -20,11 +24,16 @@
       .replace(/"/g, '&quot;');
   }
 
+  function publicOrigin() {
+    const base = catalog?.brand?.publicSiteUrl || DEFAULT_PUBLIC_ORIGIN;
+    return String(base).replace(/\/$/, '');
+  }
+
   function lineLandingUrl(slug) {
     const personEntry = catalog?.people?.[slug];
     const params = new URLSearchParams({ person: slug });
     if (personEntry?.popupShort) params.set('short', '1');
-    return new URL(`/family/lane-heygen-line.html?${params}`, window.location.origin).href;
+    return new URL(`/family/lane-heygen-line.html?${params}`, publicOrigin()).href;
   }
 
   function posterSrc() {
@@ -35,13 +44,16 @@
     if (!window.QRCode || !url) return null;
     const node = document.createElement('div');
     node.style.cssText = `width:${size}px;height:${size}px;`;
-    new window.QRCode(node, { text: url, width: size, height: size });
+    const opts = { text: url, width: size, height: size, colorDark: '#000000', colorLight: '#ffffff' };
+    if (window.QRCode.CorrectLevel) opts.correctLevel = window.QRCode.CorrectLevel.H;
+    new window.QRCode(node, opts);
     return node;
   }
 
   function mountQr(host, url, size) {
     if (!host) return;
     host.innerHTML = '';
+    host.classList.add('lhp-qr-frame');
     const node = generateQrNode(url, size);
     if (node) host.appendChild(node);
   }
@@ -98,7 +110,7 @@
         <span class="lhp-poster-qr-label">Scan · hear the line</span>
         <span class="lhp-poster-qr-heygen">${esc(catalog?.brand?.attributionShort || 'HeyGen')}</span>
       </div>`;
-    mountQr($('lhpPosterQr'), qrUrl, 72);
+    mountQr($('lhpPosterQr'), qrUrl, QR_SIZE_POSTER);
   }
 
   function renderShirt() {
@@ -129,7 +141,7 @@
           <div class="lhp-shirt-qr" id="lhpShirtQr"></div>
         </div>
       </div>`;
-    mountQr($('lhpShirtQr'), qrUrl, 72);
+    mountQr($('lhpShirtQr'), qrUrl, QR_SIZE_SHIRT);
   }
 
   function renderCard() {
@@ -152,7 +164,7 @@
           ${esc(person.cardScanHint || person.tagline || '')}
         </div>
       </div>`;
-    mountQr($('lhpCardQr'), qrUrl, 56);
+    mountQr($('lhpCardQr'), qrUrl, QR_SIZE_CARD);
   }
 
   function renderMeta() {
@@ -194,22 +206,30 @@
       const ctx = canvas.getContext('2d');
       ctx.drawImage(poster, 0, 0, canvas.width, canvas.height);
 
-      const qrSize = Math.round(canvas.width * 0.13);
-      const pad = Math.round(canvas.width * 0.025);
+      const qrSize = Math.round(canvas.width * 0.17);
+      const pad = Math.round(canvas.width * 0.03);
       const labelH = Math.round(qrSize * 0.28);
       const boxW = qrSize + pad * 2;
       const boxH = qrSize + pad * 2 + labelH;
       const x = canvas.width - boxW - pad * 2;
       const y = canvas.height - boxH - pad * 2 - Math.max(28, Math.round(canvas.height * 0.028));
+      const borderW = Math.max(4, Math.round(canvas.width * 0.004));
 
       drawPosterCreditStrip(ctx, canvas.width, canvas.height);
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
-      ctx.strokeStyle = '#b8860b';
-      ctx.lineWidth = Math.max(2, Math.round(canvas.width * 0.002));
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.98)';
       ctx.beginPath();
       ctx.roundRect(x, y, boxW, boxH, pad);
       ctx.fill();
+
+      ctx.strokeStyle = '#1a1410';
+      ctx.lineWidth = borderW;
+      ctx.stroke();
+
+      ctx.strokeStyle = '#b8860b';
+      ctx.lineWidth = Math.max(2, Math.round(borderW * 0.55));
+      ctx.beginPath();
+      ctx.roundRect(x + borderW * 0.6, y + borderW * 0.6, boxW - borderW * 1.2, boxH - borderW * 1.2, pad);
       ctx.stroke();
 
       ctx.drawImage(qrCanvas, x + pad, y + pad, qrSize, qrSize);
@@ -250,15 +270,34 @@
     }
   }
 
+  function exportQrCanvas(qrCanvas, size = 512) {
+    const quiet = Math.round(size * 0.12);
+    const border = Math.max(6, Math.round(size * 0.015));
+    const total = size + quiet * 2 + border * 2;
+    const out = document.createElement('canvas');
+    out.width = total;
+    out.height = total;
+    const ctx = out.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, total, total);
+    ctx.strokeStyle = '#1a1410';
+    ctx.lineWidth = border;
+    ctx.strokeRect(border / 2, border / 2, total - border, total - border);
+    ctx.strokeStyle = '#b8860b';
+    ctx.lineWidth = Math.max(2, Math.round(border * 0.6));
+    ctx.strokeRect(border + 2, border + 2, total - border * 2 - 4, total - border * 2 - 4);
+    ctx.drawImage(qrCanvas, border + quiet, border + quiet, size, size);
+    return out;
+  }
+
   async function exportQrOnly() {
     const qrUrl = lineLandingUrl(person.slug);
     const node = generateQrNode(qrUrl, 512);
     if (!node) return;
     const canvas = node.querySelector('canvas');
-    const dataUrl = canvas ? canvas.toDataURL('image/png') : null;
-    if (dataUrl && window.posterUtils) {
-      window.posterUtils.downloadDataUrl(dataUrl, `lane-heygen-qr-${person.slug}.png`);
-    }
+    if (!canvas || !window.posterUtils) return;
+    const framed = exportQrCanvas(canvas, 512);
+    window.posterUtils.downloadDataUrl(window.posterUtils.canvasToDataUrl(framed), `lane-heygen-qr-${person.slug}.png`);
   }
 
   function bindEvents() {

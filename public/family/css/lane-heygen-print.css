@@ -113,29 +113,53 @@
 
 .lhp-poster-qr-stack {
   position: absolute;
-  right: 3.5%;
+  right: 3%;
   bottom: calc(2.5% + 1.4rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2rem;
-  background: rgba(255, 255, 255, 0.96);
-  padding: 0.35rem 0.4rem 0.3rem;
-  border-radius: 6px;
-  border: 2px solid #b8860b;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.98);
+  padding: 0.5rem 0.55rem 0.4rem;
+  border-radius: 8px;
+  border: 3px solid #1a1410;
+  outline: 2px solid #b8860b;
+  outline-offset: 2px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
   line-height: 1.2;
 }
 
-.lhp-poster-qr-stack canvas,
-.lhp-poster-qr-stack img {
+.lhp-qr-frame {
+  display: inline-block;
+  background: #fff;
+  padding: 6px;
+  border: 3px solid #1a1410;
+  outline: 2px solid #b8860b;
+  outline-offset: 1px;
+  border-radius: 6px;
+  line-height: 0;
+}
+
+.lhp-qr-frame canvas,
+.lhp-qr-frame img {
   display: block;
-  width: 72px !important;
-  height: 72px !important;
+}
+
+.lhp-poster-qr-stack .lhp-qr-frame canvas,
+.lhp-poster-qr-stack .lhp-qr-frame img {
+  width: 104px !important;
+  height: 104px !important;
+}
+
+.lhp-poster-qr-stack > .lhp-qr-frame {
+  border: none;
+  outline: none;
+  padding: 0;
+  background: transparent;
 }
 
 .lhp-poster-qr-label {
-  font-size: 0.52rem;
+  font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -238,16 +262,13 @@
 
 .lhp-shirt-qr {
   flex-shrink: 0;
-  background: #fff;
-  padding: 4px;
-  border-radius: 4px;
 }
 
-.lhp-shirt-qr canvas,
-.lhp-shirt-qr img {
+.lhp-shirt-qr.lhp-qr-frame canvas,
+.lhp-shirt-qr.lhp-qr-frame img {
   display: block;
-  width: 72px !important;
-  height: 72px !important;
+  width: 104px !important;
+  height: 104px !important;
 }
 
 .lhp-heygen-badge {
@@ -339,10 +360,10 @@
   border-top: 1px solid rgba(184, 134, 11, 0.35);
 }
 
-.lhp-card-foot-qr canvas,
-.lhp-card-foot-qr img {
-  width: 56px !important;
-  height: 56px !important;
+.lhp-card-foot-qr.lhp-qr-frame canvas,
+.lhp-card-foot-qr.lhp-qr-frame img {
+  width: 88px !important;
+  height: 88px !important;
 }
 
 .lhp-card-scan {
