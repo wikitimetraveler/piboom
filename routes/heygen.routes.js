@@ -7,7 +7,9 @@ import {
   getHeygenAvatars,
   getHeygenVoices,
   postHeygenVideo,
-  getHeygenVideoStatus
+  getHeygenVideoStatus,
+  getHeygenSchemaScript,
+  postHeygenDisasterBriefing
 } from '../controllers/heygen.controller.js';
 
 const router = Router();
@@ -15,6 +17,8 @@ const router = Router();
 router.get('/health', getHeygenHealth);
 router.get('/avatars', getHeygenAvatars);
 router.get('/voices', getHeygenVoices);
+router.get('/scripts/schema', getHeygenSchemaScript);
+router.post('/videos/briefing', postHeygenDisasterBriefing);
 router.post('/videos', postHeygenVideo);
 router.get('/videos/:videoId', getHeygenVideoStatus);
 

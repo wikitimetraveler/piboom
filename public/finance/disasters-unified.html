@@ -502,6 +502,52 @@
               <span class="small text-muted">1080p · captioned walkthrough</span>
             </div>
           </section>
+          <section class="du-heygen-studio mb-3" id="duHeygenStudio" aria-label="HeyGen AI video studio">
+            <div class="du-heygen-studio-head">
+              <div>
+                <h3 class="du-schema-sheet-kicker mb-1">HeyGen studio</h3>
+                <p class="small text-muted mb-0">AI avatar narrates the schema walkthrough or a live briefing for your selected event.</p>
+              </div>
+              <span class="du-heygen-studio-badge"><i class="bi bi-stars me-1"></i>HEYGEN_API_KEY</span>
+            </div>
+            <p class="small text-muted mb-2" id="duHeygenUnconfigured" hidden>
+              Set <code>HEYGEN_API_KEY</code> in the server environment to enable avatar video generation.
+            </p>
+            <div id="duHeygenConfigured" hidden>
+              <div class="row g-2 mb-2">
+                <div class="col-md-6">
+                  <label class="form-label small mb-1" for="duHeygenAvatar">Avatar</label>
+                  <select class="form-select form-select-sm" id="duHeygenAvatar" aria-label="HeyGen avatar"></select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small mb-1" for="duHeygenVoice">Voice</label>
+                  <select class="form-select form-select-sm" id="duHeygenVoice" aria-label="HeyGen voice"></select>
+                </div>
+              </div>
+              <div class="du-heygen-mode mb-2" role="radiogroup" aria-label="Script mode">
+                <label><input type="radio" name="duHeygenMode" id="duHeygenModeSchema" value="schema" checked> Schema walkthrough (~2 min)</label>
+                <label><input type="radio" name="duHeygenMode" id="duHeygenModeBriefing" value="briefing"> Live event briefing</label>
+              </div>
+              <label class="form-label small mb-1" for="duHeygenScriptPreview">Script preview</label>
+              <textarea class="form-control du-heygen-script mb-2" id="duHeygenScriptPreview" rows="5" readonly aria-label="HeyGen script preview"></textarea>
+              <div class="d-flex flex-wrap align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-primary" id="duHeygenGenerateBtn">
+                  <i class="bi bi-camera-reels me-1"></i>Generate video
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="duHeygenPreviewBtn">Refresh script</button>
+                <span class="du-heygen-status small text-muted" id="duHeygenStatus" role="status" aria-live="polite"></span>
+              </div>
+              <div class="du-heygen-progress mt-2" id="duHeygenProgress" hidden aria-hidden="true">
+                <div class="du-heygen-progress-bar"></div>
+              </div>
+              <div class="du-heygen-result" id="duHeygenResult" hidden>
+                <video id="duHeygenResultVideo" controls playsinline preload="metadata" class="du-schema-sheet-video"></video>
+                <a class="btn btn-sm btn-outline-primary mt-2" id="duHeygenDownloadLink" href="#" download target="_blank" rel="noopener noreferrer">
+                  <i class="bi bi-download me-1"></i>Download from HeyGen
+                </a>
+              </div>
+            </div>
+          </section>
           <p class="small text-muted mb-3">
             Unified Disasters reads shared Postgres tables—no page-specific schema. Events refresh on a
             <strong>90-day</strong> window.
@@ -589,6 +635,7 @@
       let lastGridRows = [];
       let lastLoadedDisasterRows = [];
       let activeHotspotKey = null;
+      let heygenStudio = null;
 
       function clearCameraMarkers() {
         cameraMarkers.forEach((entry) => entry.marker && entry.marker.setMap(null));
@@ -1064,6 +1111,25 @@
         
         initializeVoiceRecognition();
         initializeAIComponents().catch((err) => console.error('AI init failed:', err));
+        import('/finance/js/disaster-heygen-studio.js')
+          .then(({ initDisasterHeygenStudio }) =>
+            initDisasterHeygenStudio({
+              getBriefingContext() {
+                const radiusEl = document.getElementById('radiusInput');
+                const radiusMiles = radiusEl ? Number(radiusEl.value) || 50 : 50;
+                return {
+                  disaster: selectedDisasterObj,
+                  loanCount: lastAffectedLoans.length,
+                  cameraCount: lastNearbyCameras.length,
+                  radiusMiles
+                };
+              }
+            })
+          )
+          .then((studio) => {
+            heygenStudio = studio;
+          })
+          .catch((err) => console.warn('HeyGen studio unavailable:', err));
         // Initialize camera data store and functions BEFORE table is created
         window.cameraDataStore = window.cameraDataStore || {};
         
@@ -2161,6 +2227,7 @@
           : 'No nearby cameras in range';
         el.innerHTML = `<strong>${title}</strong> · ${county}${county && state ? ', ' : ''}${state}
           · ${loanLine} · ${camLine}
+          · <button type="button" class="btn btn-sm btn-info py-0 px-2 align-baseline text-white" onclick="openDisasterHeygenBriefing()" title="Generate a HeyGen avatar briefing for this event"><i class="bi bi-camera-reels"></i> AI video briefing</button>
           · <button type="button" class="btn btn-sm btn-warning py-0 px-2 align-baseline" onclick="exportCinematicDisasterKml()" title="Google Earth tour with loans, webcams, and disaster mood audio"><i class="bi bi-globe-americas"></i> Google Earth KML</button>
           · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>
           · <a href="disasters-webcams.html" class="alert-link">Hazard webcams</a>
@@ -2201,9 +2268,19 @@
       }
       window.exportCinematicDisasterKml = exportCinematicDisasterKml;
 
+      function openDisasterHeygenBriefing() {
+        if (!selectedDisasterObj) {
+          setDashboardStatus('Select a disaster in the grid first.', 'warning');
+          return;
+        }
+        heygenStudio?.openBriefingMode?.();
+      }
+      window.openDisasterHeygenBriefing = openDisasterHeygenBriefing;
+
       function refreshAIOnSelection() {
         updateSelectionContextStrip();
         refreshAIContext();
+        heygenStudio?.refreshScriptPreview?.();
         if (aiInsightsCard && selectedDisasterObj) {
           aiInsightsCard.generateInsights(getCurrentFilters(), 'disaster', selectedDisasterObj);
         } else {

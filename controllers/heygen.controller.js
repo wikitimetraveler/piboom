@@ -8,6 +8,10 @@ import {
   createAvatarVideo,
   getVideoStatus
 } from '../services/heygen.service.js';
+import {
+  getSchemaWalkthrough,
+  getDisasterBriefingPayload
+} from '../services/disaster-heygen.service.js';
 
 function handleHeygenError(res, e, fallback) {
   if (e.code === 'HEYGEN_NOT_CONFIGURED') {
@@ -56,5 +60,42 @@ export async function getHeygenVideoStatus(req, res) {
     res.json({ success: true, status: data?.status, videoUrl: data?.video_url || null, data });
   } catch (e) {
     handleHeygenError(res, e, 'Failed to fetch video status');
+  }
+}
+
+/** Pre-written Unified Disasters schema walkthrough script (see docs/UNIFIED_DISASTERS_DB_SCHEMA_VIDEO_SCRIPT.md). */
+export function getHeygenSchemaScript(req, res) {
+  res.json({ success: true, ...getSchemaWalkthrough() });
+}
+
+/**
+ * Preview or render a spoken briefing for a selected disaster row.
+ * POST body: { disaster, loanCount?, cameraCount?, radiusMiles?, avatarId?, voiceId?, render?: boolean }
+ * When render is true and avatarId is set, starts HeyGen video generation.
+ */
+export async function postHeygenDisasterBriefing(req, res) {
+  try {
+    const { disaster, loanCount, cameraCount, radiusMiles, avatarId, voiceId, render, aspectRatio } =
+      req.body || {};
+    if (!disaster || typeof disaster !== 'object') {
+      return res.status(400).json({ success: false, error: 'disaster object is required' });
+    }
+    const payload = getDisasterBriefingPayload(disaster, { loanCount, cameraCount, radiusMiles });
+    if (!render) {
+      return res.json({ success: true, preview: true, ...payload });
+    }
+    if (!avatarId) {
+      return res.status(400).json({ success: false, error: 'avatarId is required when render is true' });
+    }
+    const data = await createAvatarVideo({
+      avatarId,
+      voiceId,
+      script: payload.script,
+      title: payload.title,
+      aspectRatio: aspectRatio || payload.aspectRatio
+    });
+    res.json({ success: true, preview: false, videoId: data?.video_id, ...payload, data });
+  } catch (e) {
+    handleHeygenError(res, e, 'Failed to create disaster briefing video');
   }
 }

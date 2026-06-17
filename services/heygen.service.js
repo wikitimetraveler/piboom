@@ -44,26 +44,47 @@ async function heygenRequest(path, { method = 'GET', body } = {}) {
   return json?.data ?? json;
 }
 
-/** Cursor-paginated list helper (v3 uses has_more / next_token). */
-async function listAll(path, itemsKey) {
+/** Cursor-paginated list helper (v3: { data: [...], has_more, next_token }). */
+async function listAll(path, { maxPages = 1 } = {}) {
   const items = [];
   let nextToken = null;
+  let pages = 0;
   do {
     const qs = nextToken ? `${path.includes('?') ? '&' : '?'}token=${encodeURIComponent(nextToken)}` : '';
-    const data = await heygenRequest(`${path}${qs}`);
-    const page = data?.[itemsKey] || data?.items || [];
+    const res = await fetch(`${HEYGEN_BASE}${path}${qs}`, {
+      method: 'GET',
+      headers: {
+        'X-Api-Key': getApiKey(),
+        'Content-Type': 'application/json'
+      }
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message =
+        json?.error?.message || json?.message || `HeyGen API GET ${path} failed (${res.status})`;
+      const err = new Error(message);
+      err.status = res.status;
+      err.details = json;
+      throw err;
+    }
+    const data = json?.data;
+    const page = Array.isArray(data)
+      ? data
+      : data?.avatars || data?.voices || data?.items || [];
     items.push(...page);
-    nextToken = data?.has_more ? data?.next_token : null;
+    pages += 1;
+    nextToken = json?.has_more && pages < maxPages ? json?.next_token : null;
   } while (nextToken);
   return items;
 }
 
+/** Avatar looks (outfit/pose IDs used as avatar_id in POST /v3/videos). */
 export async function listAvatars() {
-  return listAll('/v3/avatars', 'avatars');
+  return listAll('/v3/avatars/looks?limit=50', { maxPages: 1 });
 }
 
 export async function listVoices() {
-  return listAll('/v3/voices', 'voices');
+  return listAll('/v3/voices?limit=100', { maxPages: 2 });
 }
 
 /**
