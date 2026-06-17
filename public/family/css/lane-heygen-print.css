@@ -1,0 +1,429 @@
+/* Lane × HeyGen print kit — t-shirt art + trading card for local print shops */
+
+.lhp-page {
+  --lhp-ink: #1a1410;
+  --lhp-gold: #b8860b;
+  --lhp-paper: #faf7f2;
+  --lhp-heygen: #4f46e5;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--lhp-ink);
+  background: #eceae4;
+}
+
+.lhp-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.lhp-hero {
+  margin-bottom: 1.5rem;
+}
+
+.lhp-kicker {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--lhp-heygen);
+  margin-bottom: 0.35rem;
+}
+
+.lhp-title {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  margin-bottom: 0.5rem;
+}
+
+.lhp-lede {
+  max-width: 52rem;
+  color: #4b5563;
+  margin-bottom: 0;
+}
+
+.lhp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.25rem 0;
+}
+
+.lhp-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 992px) {
+  .lhp-grid {
+    grid-template-columns: 1fr 320px;
+    align-items: start;
+  }
+}
+
+.lhp-artboard {
+  background: var(--lhp-paper);
+  border: 1px solid #d4cfc4;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 8px 28px rgba(26, 20, 16, 0.08);
+}
+
+.lhp-artboard-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+/* Full legacy poster + QR overlay */
+.lhp-poster-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  line-height: 0;
+}
+
+.lhp-poster-canvas img.lhp-poster-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(26, 20, 16, 0.15);
+}
+
+.lhp-poster-credit-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.35rem 0.55rem;
+  background: rgba(15, 23, 42, 0.88);
+  color: #d4af37;
+  font-size: clamp(0.48rem, 1.6vw, 0.62rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1.3;
+  text-align: left;
+  border-radius: 0 0 6px 6px;
+}
+
+.lhp-poster-qr-stack {
+  position: absolute;
+  right: 3.5%;
+  bottom: calc(2.5% + 1.4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 0.35rem 0.4rem 0.3rem;
+  border-radius: 6px;
+  border: 2px solid #b8860b;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  line-height: 1.2;
+}
+
+.lhp-poster-qr-stack canvas,
+.lhp-poster-qr-stack img {
+  display: block;
+  width: 72px !important;
+  height: 72px !important;
+}
+
+.lhp-poster-qr-label {
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #1a1410;
+  text-align: center;
+  max-width: 5.5rem;
+}
+
+.lhp-poster-qr-heygen {
+  font-size: 0.48rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4f46e5;
+}
+
+/* T-shirt print area — 10×12 in at 72dpi screen preview; export at 2× */
+.lhp-shirt-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  aspect-ratio: 5 / 6;
+  background: #111827;
+  border-radius: 8px;
+  overflow: hidden;
+  color: #f8fafc;
+}
+
+.lhp-shirt-inner {
+  position: absolute;
+  inset: 8%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.lhp-shirt-portraits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  align-items: end;
+  min-height: 0;
+}
+
+.lhp-shirt-portraits img {
+  width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
+}
+
+.lhp-shirt-portraits .lhp-avatar-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  border: 2px dashed rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+  min-height: 120px;
+  padding: 0.35rem;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lhp-shirt-portraits .lhp-avatar-slot img {
+  border: none;
+}
+
+.lhp-avatar-slot-hint {
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 0.25rem;
+}
+
+.lhp-shirt-name {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: clamp(1rem, 3vw, 1.35rem);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.lhp-shirt-tagline {
+  font-size: 0.72rem;
+  color: rgba(248, 250, 252, 0.78);
+  margin: 0;
+}
+
+.lhp-shirt-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.lhp-shirt-qr {
+  flex-shrink: 0;
+  background: #fff;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.lhp-shirt-qr canvas,
+.lhp-shirt-qr img {
+  display: block;
+  width: 72px !important;
+  height: 72px !important;
+}
+
+.lhp-heygen-badge {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #a5b4fc;
+  text-align: left;
+  line-height: 1.35;
+}
+
+.lhp-heygen-badge strong {
+  display: block;
+  color: #e0e7ff;
+  font-size: 0.68rem;
+}
+
+/* Trading card — 2.5 × 3.5 */
+.lhp-card-canvas {
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  aspect-ratio: 2.5 / 3.5;
+  background: linear-gradient(165deg, #fffef9 0%, #f3ebe0 100%);
+  border: 2px solid var(--lhp-gold);
+  border-radius: 10px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  box-shadow: inset 0 0 0 1px rgba(184, 134, 11, 0.25);
+}
+
+.lhp-card-face {
+  position: relative;
+  padding: 0.65rem 0.65rem 0.35rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.lhp-card-tier {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--lhp-gold);
+}
+
+.lhp-card-portrait-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lhp-card-portrait-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.lhp-card-name {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 0.95rem;
+  text-align: center;
+  margin: 0.35rem 0 0;
+  line-height: 1.15;
+}
+
+.lhp-card-years {
+  text-align: center;
+  font-size: 0.68rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.lhp-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  padding: 0.45rem 0.55rem;
+  background: rgba(26, 20, 16, 0.04);
+  border-top: 1px solid rgba(184, 134, 11, 0.35);
+}
+
+.lhp-card-foot-qr canvas,
+.lhp-card-foot-qr img {
+  width: 56px !important;
+  height: 56px !important;
+}
+
+.lhp-card-scan {
+  font-size: 0.58rem;
+  line-height: 1.3;
+  color: #374151;
+}
+
+.lhp-card-scan strong {
+  display: block;
+  font-size: 0.62rem;
+  color: var(--lhp-heygen);
+}
+
+.lhp-side-panel .card-body {
+  font-size: 0.88rem;
+}
+
+.lhp-spec-list {
+  padding-left: 1.1rem;
+  margin-bottom: 0;
+}
+
+.lhp-spec-list li + li {
+  margin-top: 0.35rem;
+}
+
+.lhp-script-box {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  max-height: 9rem;
+  overflow-y: auto;
+}
+
+.lhp-attribution {
+  margin-top: 1rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  font-size: 0.78rem;
+  color: #3730a3;
+}
+
+.lhp-credits {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d4cfc4;
+  text-align: center;
+}
+
+.lhp-credits-line {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.lhp-credits-line a {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+@media print {
+  body.lhp-page {
+    background: #fff;
+  }
+
+  .lhp-no-print {
+    display: none !important;
+  }
+
+  .lhp-wrap {
+    max-width: none;
+    padding: 0;
+  }
+
+  .lhp-artboard {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

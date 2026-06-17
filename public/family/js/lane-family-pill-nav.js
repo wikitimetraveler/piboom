@@ -11,8 +11,7 @@
 (function () {
   const LINKS = [
     { href: '/family/lane-family.html', label: 'Hub' },
-    { href: '/family/lane-magazine.html', label: 'Issue 1', issue: '01' },
-    { href: '/family/lane-magazine.html?issue=02', label: 'Issue 2', issue: '02' },
+    { href: '/family/lane-heygen-print.html', label: 'HeyGen' },
     { href: '/family/lane-major-achievers.html', label: 'Achievers' },
     { href: '/family/lane-historians.html', label: 'Historians' },
     { href: '/family/lane-museum.html', label: 'Museum' },

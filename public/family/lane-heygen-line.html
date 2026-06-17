@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lane HeyGen Line — DevConnect Labs</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="/family/css/lane-heygen-line.css" />
+</head>
+<body class="lhl-page">
+  <main class="lhl-wrap">
+    <article class="lhl-card" id="lhlCard" hidden>
+      <img class="lhl-portrait" id="lhlPortrait" alt="" />
+      <div class="lhl-body">
+        <p class="lhl-kicker">Lane Legacy · HeyGen line</p>
+        <h1 class="lhl-name" id="lhlName"></h1>
+        <p class="lhl-years" id="lhlYears"></p>
+        <p class="lhl-tagline" id="lhlTagline"></p>
+        <div class="lhl-play-wrap" id="lhlPlayWrap"></div>
+        <div class="lhl-links" id="lhlLinks"></div>
+      </div>
+    </article>
+    <p id="lhlLoading" class="text-center text-muted">Loading…</p>
+    <p class="lhl-heygen-foot" id="lhlHeygenFoot"></p>
+    <footer class="lhl-credits" role="contentinfo" aria-label="Credits">
+      <p class="lhl-credits-dev" id="lhlCreditsDev"></p>
+    </footer>
+  </main>
+
+  <div class="lhl-popup-backdrop" id="lhlPopup" hidden role="dialog" aria-modal="true" aria-labelledby="lhlPopupTitle">
+    <div class="lhl-popup">
+      <div class="lhl-popup-head">
+        <span id="lhlPopupTitle">Hear the line</span>
+        <button type="button" class="btn btn-sm btn-close" id="lhlPopupClose" aria-label="Close"></button>
+      </div>
+      <div class="lhl-popup-body" id="lhlPopupBody"></div>
+    </div>
+  </div>
+
+  <script src="/family/js/lane-heygen-line.js"></script>
+</body>
+</html>

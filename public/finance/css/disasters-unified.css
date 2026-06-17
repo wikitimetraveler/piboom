@@ -3,6 +3,65 @@
  * @see public/finance/disasters-unified.html
  */
 
+body.du-demo-popup-active #roadRunnerLoading {
+  display: none !important;
+}
+
+.du-heygen-demo-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.du-heygen-demo-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.82);
+}
+
+.du-heygen-demo-panel {
+  position: relative;
+  width: min(100%, 720px);
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.du-heygen-demo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.du-heygen-demo-body {
+  padding: 0;
+  background: #000;
+}
+
+.du-heygen-demo-video {
+  display: block;
+  width: 100%;
+  max-height: min(56vh, 480px);
+  object-fit: contain;
+  background: #000;
+}
+
+.du-heygen-demo-footer {
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+}
+
 body.du-page {
   background: var(--zen-surface, #f8fafc);
   min-height: 100vh;

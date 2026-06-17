@@ -3,13 +3,23 @@
  */
 import {
   SCHEMA_WALKTHROUGH_SCRIPT,
+  SCHEMA_DEMO_SHORT_SCRIPT,
   buildDisasterBriefingScript,
   buildDisasterBriefingTitle,
   getSchemaWalkthrough,
+  getSchemaDemoShort,
   getDisasterBriefingPayload
 } from '../../services/disaster-heygen.service.js';
 
 describe('disaster-heygen.service', () => {
+  test('getSchemaDemoShort returns booth popup script', () => {
+    const payload = getSchemaDemoShort();
+    expect(payload.title).toBe('Unified Disasters Demo');
+    expect(payload.script).toBe(SCHEMA_DEMO_SHORT_SCRIPT);
+    expect(payload.script).toMatch(/Unified Disasters/);
+    expect(payload.script.length).toBeLessThan(SCHEMA_WALKTHROUGH_SCRIPT.length);
+  });
+
   test('getSchemaWalkthrough returns canonical script', () => {
     const payload = getSchemaWalkthrough();
     expect(payload.title).toBe('Unified Disasters Schema');

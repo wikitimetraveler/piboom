@@ -1,0 +1,155 @@
+/* Lane HeyGen line — mobile QR landing (scan shirt → hear avatar) */
+
+.lhl-page {
+  --lhl-ink: #1a1410;
+  --lhl-heygen: #4f46e5;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #eef2ff 0%, #faf7f2 45%, #eceae4 100%);
+  color: var(--lhl-ink);
+}
+
+.lhl-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2.5rem;
+}
+
+.lhl-card {
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 12px 40px rgba(26, 20, 16, 0.1);
+  overflow: hidden;
+}
+
+.lhl-portrait {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  background: #111827;
+  display: block;
+}
+
+.lhl-body {
+  padding: 1rem 1.1rem 1.25rem;
+}
+
+.lhl-kicker {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--lhl-heygen);
+  margin-bottom: 0.25rem;
+}
+
+.lhl-name {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 1.45rem;
+  margin: 0 0 0.15rem;
+}
+
+.lhl-years {
+  color: #6b7280;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.lhl-tagline {
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
+.lhl-play-wrap {
+  margin-bottom: 0.75rem;
+}
+
+.lhl-video {
+  width: 100%;
+  border-radius: 10px;
+  background: #0f172a;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+}
+
+.lhl-pending {
+  padding: 1rem;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  font-size: 0.85rem;
+  color: #475569;
+  text-align: center;
+}
+
+.lhl-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.lhl-heygen-foot {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.72rem;
+  color: #6366f1;
+}
+
+.lhl-heygen-foot a {
+  color: inherit;
+  font-weight: 600;
+}
+
+.lhl-credits {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.lhl-credits-dev {
+  font-size: 0.72rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.lhl-credits-dev a {
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.lhl-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1050;
+}
+
+.lhl-popup-backdrop[hidden] {
+  display: none !important;
+}
+
+.lhl-popup {
+  width: min(100%, 420px);
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.lhl-popup-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.lhl-popup-body {
+  padding: 0.75rem;
+}

@@ -17,6 +17,15 @@ export const SCHEMA_WALKTHROUGH_SCRIPT = [
 
 export const SCHEMA_WALKTHROUGH_TITLE = 'Unified Disasters Schema';
 
+/** ~25s booth / shirt popup — trimmed from the schema walkthrough. */
+export const SCHEMA_DEMO_SHORT_SCRIPT = [
+  'This is Unified Disasters — one dashboard for FEMA declarations, wildfires, earthquakes, hurricanes, and weather alerts.',
+  'Each event links to Encompass pipeline loans and hazard webcams nearby, refreshed on a rolling ninety-day window.',
+  'Tap Open Unified Disasters below to explore hotspots, counties, and AI briefings on a real event.'
+].join(' ');
+
+export const SCHEMA_DEMO_SHORT_TITLE = 'Unified Disasters Demo';
+
 function pickDisasterField(disaster, keys, fallback = '') {
   if (!disaster || typeof disaster !== 'object') return fallback;
   for (const key of keys) {
@@ -73,6 +82,14 @@ export function getSchemaWalkthrough() {
   return {
     title: SCHEMA_WALKTHROUGH_TITLE,
     script: SCHEMA_WALKTHROUGH_SCRIPT,
+    aspectRatio: '16:9'
+  };
+}
+
+export function getSchemaDemoShort() {
+  return {
+    title: SCHEMA_DEMO_SHORT_TITLE,
+    script: SCHEMA_DEMO_SHORT_SCRIPT,
     aspectRatio: '16:9'
   };
 }

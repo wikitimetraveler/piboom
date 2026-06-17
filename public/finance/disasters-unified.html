@@ -34,6 +34,7 @@
     <script type="module" src="../shared/ai-insights-card.js"></script>
   </head>
   <body class="du-page">
+    <script src="/finance/js/disaster-heygen-popup.js"></script>
     <div id="roadRunnerLoading" aria-live="polite" aria-busy="true">
       <div class="loading-container">
         <div class="loading-icon-ring"><i class="bi bi-globe-americas" aria-hidden="true"></i></div>
@@ -1106,8 +1107,10 @@
       }
 
       $(function init() {
-        // Show loading initially
-        showLoading();
+        // Show loading initially (skip in shirt / booth popup demo mode)
+        if (!window.__DU_POPUP_DEMO__) {
+          showLoading();
+        }
         
         initializeVoiceRecognition();
         initializeAIComponents().catch((err) => console.error('AI init failed:', err));

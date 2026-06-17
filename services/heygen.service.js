@@ -88,6 +88,55 @@ export async function listVoices() {
 }
 
 /**
+ * Upload a local image/audio/video for HeyGen (POST /v3/assets).
+ * @param {string} filePath
+ * @returns {Promise<{ asset_id: string, url?: string }>}
+ */
+export async function uploadHeygenAsset(filePath) {
+  const { readFile } = await import('node:fs/promises');
+  const { basename } = await import('node:path');
+  const buffer = await readFile(filePath);
+  const form = new FormData();
+  const blob = new Blob([buffer]);
+  form.append('file', blob, basename(filePath));
+  const res = await fetch(`${HEYGEN_BASE}/v3/assets`, {
+    method: 'POST',
+    headers: { 'X-Api-Key': getApiKey() },
+    body: form
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const message =
+      json?.error?.message || json?.message || `HeyGen asset upload failed (${res.status})`;
+    const err = new Error(message);
+    err.status = res.status;
+    err.details = json;
+    throw err;
+  }
+  const data = json?.data ?? json;
+  if (!data?.asset_id) throw new Error('HeyGen asset upload did not return asset_id');
+  return data;
+}
+
+/**
+ * Create a reusable photo avatar from an uploaded asset or public URL.
+ * @returns {Promise<string>} avatar look id for POST /v3/videos
+ */
+export async function createPhotoAvatar({ name, assetId, imageUrl }) {
+  if (!assetId && !imageUrl) throw new Error('assetId or imageUrl is required');
+  const file = assetId
+    ? { type: 'asset_id', asset_id: assetId }
+    : { type: 'url', url: imageUrl };
+  const data = await heygenRequest('/v3/avatars', {
+    method: 'POST',
+    body: { type: 'photo', name: name || 'Photo avatar', file }
+  });
+  const avatarId = data?.avatar_item?.id || data?.id;
+  if (!avatarId) throw new Error('HeyGen did not return a photo avatar id');
+  return avatarId;
+}
+
+/**
  * Create an avatar video from a script.
  * @param {object} opts
  * @param {string} opts.avatarId - HeyGen avatar ID (video avatar or photo avatar look ID)
@@ -106,7 +155,9 @@ export async function createAvatarVideo({
   title,
   resolution = '1080p',
   aspectRatio = 'auto',
-  callbackUrl
+  callbackUrl,
+  motionPrompt,
+  expressiveness
 }) {
   if (!avatarId) throw new Error('avatarId is required');
   if (!script || !script.trim()) throw new Error('script is required');
@@ -120,6 +171,8 @@ export async function createAvatarVideo({
   if (voiceId) body.voice_id = voiceId;
   if (title) body.title = title;
   if (callbackUrl) body.callback_url = callbackUrl;
+  if (motionPrompt) body.motion_prompt = motionPrompt;
+  if (expressiveness) body.expressiveness = expressiveness;
   return heygenRequest('/v3/videos', { method: 'POST', body });
 }
 

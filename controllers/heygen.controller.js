@@ -10,6 +10,7 @@ import {
 } from '../services/heygen.service.js';
 import {
   getSchemaWalkthrough,
+  getSchemaDemoShort,
   getDisasterBriefingPayload
 } from '../services/disaster-heygen.service.js';
 
@@ -66,6 +67,11 @@ export async function getHeygenVideoStatus(req, res) {
 /** Pre-written Unified Disasters schema walkthrough script (see docs/UNIFIED_DISASTERS_DB_SCHEMA_VIDEO_SCRIPT.md). */
 export function getHeygenSchemaScript(req, res) {
   res.json({ success: true, ...getSchemaWalkthrough() });
+}
+
+/** ~25s shirt / booth popup script for Unified Disasters. */
+export function getHeygenDemoScript(req, res) {
+  res.json({ success: true, ...getSchemaDemoShort() });
 }
 
 /**

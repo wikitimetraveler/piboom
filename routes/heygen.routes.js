@@ -9,6 +9,7 @@ import {
   postHeygenVideo,
   getHeygenVideoStatus,
   getHeygenSchemaScript,
+  getHeygenDemoScript,
   postHeygenDisasterBriefing
 } from '../controllers/heygen.controller.js';
 
@@ -18,6 +19,7 @@ router.get('/health', getHeygenHealth);
 router.get('/avatars', getHeygenAvatars);
 router.get('/voices', getHeygenVoices);
 router.get('/scripts/schema', getHeygenSchemaScript);
+router.get('/scripts/demo', getHeygenDemoScript);
 router.post('/videos/briefing', postHeygenDisasterBriefing);
 router.post('/videos', postHeygenVideo);
 router.get('/videos/:videoId', getHeygenVideoStatus);

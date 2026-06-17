@@ -34,6 +34,7 @@
     "strip:lane-military-engagements": "node scripts/tools/strip-lane-military-engagements.mjs",
     "strip:lane-military-engagements:write": "node scripts/tools/strip-lane-military-engagements.mjs --write",
     "export:lane-trading-cards-snapshot": "node scripts/tools/export-lane-trading-cards-snapshot.mjs",
+    "generate:lane-heygen-line": "node scripts/tools/generate-lane-heygen-line.mjs",
     "migrate:lane-json-postgres": "node scripts/migrate-lane-json-to-postgres.mjs"
   },
   "dependencies": {

@@ -183,6 +183,8 @@
     "museumUrl": "/family/lane-museum.html?lunar=1"
   },
   "cta": [
+    { "label": "HeyGen line — hear Jonathan speak", "url": "/family/lane-heygen-line.html?person=jonathan-homer-lane", "icon": "bi-camera-reels" },
+    { "label": "Print kit (poster + QR)", "url": "/family/lane-heygen-print.html?person=jonathan-homer-lane", "icon": "bi-printer" },
     { "label": "Watch the film (73s, narrated)", "url": "/family/assets/video/lane-scientific-presentation.mp4", "icon": "bi-film" },
     { "label": "Open in family tree", "url": "/family/genealogy.html?id=94", "icon": "bi-diagram-3" },
     { "label": "Lane Museum exhibit", "url": "/family/lane-museum.html", "icon": "bi-building" },
