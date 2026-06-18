@@ -18,12 +18,23 @@ const {
   normalizeWebCoosAsset,
   normalizeSeedMount,
   normalizeFaaWeatherCam,
+  normalizeAlertWestCamera,
+  normalizeHpwrenCamera,
+  flattenHpwrenSites,
+  parseHpwrenSitesJs,
+  normalizeCaltransCctv,
+  normalize511NyCamera,
+  isAlertWestNonCaUsState,
   mergeVolcanoWebcamRows,
   pickBetterVolcanoRow,
   ingestWebCoosWebcams,
   ingestUsgsNimsWebcams,
   ingestUsgsVolcanoWebcams,
   ingestFaaWeatherCams,
+  ingestAlertWestWebcams,
+  ingestHpwrenWebcams,
+  ingestCaltransCwwp2Webcams,
+  ingestDot511NyWebcams,
 } = await import('../../services/hazard-webcam-ingest.service.js');
 
 describe('hazard-webcam-ingest normalizers', () => {
@@ -244,6 +255,103 @@ describe('hazard-webcam-ingest normalizers', () => {
       hazard_types: ['fire'],
     });
   });
+
+  test('isAlertWestNonCaUsState accepts US states except CA', () => {
+    expect(isAlertWestNonCaUsState('OR')).toBe(true);
+    expect(isAlertWestNonCaUsState('CA')).toBe(false);
+    expect(isAlertWestNonCaUsState('AB')).toBe(false);
+  });
+
+  test('normalizeAlertWestCamera maps non-CA wildfire mount', () => {
+    const row = normalizeAlertWestCamera({
+      name: 'Axis-BaldyMtn',
+      source: 'Baldy_Mtn',
+      site: {
+        id: '11128',
+        latitude: '42.29751',
+        longitude: '-122.75098',
+        county: 'jackson',
+        state: 'OR',
+      },
+      image: { url: 'https://alertwest.live/api/firecams/v0/currentimage?name=Axis-BaldyMtn' },
+    });
+
+    expect(row).toMatchObject({
+      source: 'alertwest',
+      source_id: 'Axis-BaldyMtn',
+      state_abbr: 'OR',
+      county_name: 'Jackson',
+      hazard_types: ['fire', 'hazard'],
+    });
+    expect(normalizeAlertWestCamera({
+      name: 'Axis-MtAukum1',
+      site: { latitude: '38.57', longitude: '-120.72', state: 'CA' },
+    })).toBeNull();
+  });
+
+  test('parseHpwrenSitesJs and flattenHpwrenSites map active cameras', () => {
+    const js = 'var sites = {"bh":{"name":"Boucher Hill","lat":33.33,"long":-116.91,"cams":{"bh-n-mobo-c":{"name":"North","imager":"color","active":"y"}}}};';
+    const sites = parseHpwrenSitesJs(js);
+    const rows = flattenHpwrenSites(sites);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toMatchObject({
+      source: 'ucsd_hpwren',
+      source_id: 'hpwren:bh-n-mobo-c',
+      lat: 33.33,
+      lng: -116.91,
+    });
+    expect(normalizeHpwrenCamera('bh', sites.bh, 'bh-n-mobo-m', { active: 'n' })).toBeNull();
+  });
+
+  test('normalizeCaltransCctv maps in-service CCTV row', () => {
+    const row = normalizeCaltransCctv({
+      cctv: {
+        index: '1',
+        inService: 'true',
+        location: {
+          district: '7',
+          locationName: 'I-110 : (196) Avenue 26 Off Ramp',
+          latitude: '34.0837',
+          longitude: '-118.2215',
+          county: 'Los Angeles',
+          route: 'I-110',
+        },
+        imageData: {
+          streamingVideoURL: 'https://wzmedia.dot.ca.gov/D7/CCTV-196.stream/playlist.m3u8',
+          static: {
+            currentImageURL: 'https://cwwp2.dot.ca.gov/data/d7/cctv/image/example.jpg',
+            currentImageUpdateFrequency: '2',
+          },
+        },
+      },
+    });
+
+    expect(row).toMatchObject({
+      source: 'caltrans_cwwp2',
+      source_id: 'd07:1',
+      state_abbr: 'CA',
+      media_type: 'live_stream',
+    });
+    expect(row.hazard_types).toEqual(expect.arrayContaining(['storm', 'hazard']));
+  });
+
+  test('normalize511NyCamera maps NY DOT camera', () => {
+    const row = normalize511NyCamera({
+      ID: 42,
+      Name: 'I-87 at Exit 15',
+      Latitude: 41.1,
+      Longitude: -73.9,
+      URL: 'https://511ny.org/cameras/example.jpg',
+      Roadway: 'I-87',
+    });
+
+    expect(row).toMatchObject({
+      source: 'dot_511ny',
+      source_id: '42',
+      state_abbr: 'NY',
+      image_url: 'https://511ny.org/cameras/example.jpg',
+    });
+  });
 });
 
 describe('ingestWebCoosWebcams', () => {
@@ -397,5 +505,90 @@ describe('ingestFaaWeatherCams (mocked fetch)', () => {
       expect.objectContaining({ source: 'faa_weathercam', source_id: '585:N' }),
     ]);
     expect(result).toMatchObject({ upserted: 1, fetched: 1, normalized: 1, sitesProcessed: 1 });
+  });
+});
+
+describe('ingestAlertWestWebcams (mocked fetch)', () => {
+  const originalFetch = global.fetch;
+
+  beforeEach(() => {
+    upsertHazardWebcams.mockClear();
+    initFireCamerasSchema.mockClear();
+  });
+
+  afterEach(() => {
+    global.fetch = originalFetch;
+  });
+
+  test('filters out CA cameras and upserts non-CA mounts', async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ([
+        {
+          name: 'Axis-BaldyMtn',
+          site: { latitude: '42.29', longitude: '-122.75', state: 'OR' },
+          image: { url: 'https://example/aw.jpg' },
+        },
+        {
+          name: 'Axis-MtAukum1',
+          site: { latitude: '38.57', longitude: '-120.72', state: 'CA' },
+          image: { url: 'https://example/ca.jpg' },
+        },
+      ]),
+    });
+
+    const result = await ingestAlertWestWebcams();
+
+    expect(upsertHazardWebcams).toHaveBeenCalledWith([
+      expect.objectContaining({ source: 'alertwest', source_id: 'Axis-BaldyMtn' }),
+    ]);
+    expect(result).toMatchObject({ upserted: 1, fetched: 2, normalized: 1 });
+  });
+});
+
+describe('ingestDot511NyWebcams', () => {
+  const prev = process.env.NY511_API_KEY;
+  const originalFetch = global.fetch;
+
+  beforeEach(() => {
+    upsertHazardWebcams.mockClear();
+    initFireCamerasSchema.mockClear();
+  });
+
+  afterEach(() => {
+    if (prev === undefined) delete process.env.NY511_API_KEY;
+    else process.env.NY511_API_KEY = prev;
+    global.fetch = originalFetch;
+  });
+
+  test('skips gracefully when NY511_API_KEY is missing', async () => {
+    delete process.env.NY511_API_KEY;
+    const result = await ingestDot511NyWebcams();
+    expect(result).toEqual({
+      upserted: 0,
+      skipped: true,
+      reason: 'missing NY511_API_KEY',
+    });
+  });
+
+  test('fetches 511NY cameras when key is set', async () => {
+    process.env.NY511_API_KEY = 'test-key';
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ([
+        { ID: 9, Name: 'Sample', Latitude: 40.7, Longitude: -73.9, URL: 'https://511ny.org/x.jpg' },
+      ]),
+    });
+
+    const result = await ingestDot511NyWebcams();
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining('511ny.org/api/v2/get/cameras'),
+      expect.any(Object)
+    );
+    expect(upsertHazardWebcams).toHaveBeenCalledWith([
+      expect.objectContaining({ source: 'dot_511ny', source_id: '9' }),
+    ]);
+    expect(result).toMatchObject({ upserted: 1, fetched: 1, normalized: 1 });
   });
 });

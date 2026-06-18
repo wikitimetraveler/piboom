@@ -9,15 +9,11 @@
   /** Home page domain tiles. demoOnly: true = shown only in demo mode (?demo=1) */
   const DOMAIN_TILES = [
     { href: '/music/music-research.html', icon: 'bi-music-note-beamed', label: 'Music', domain: 'music', title: 'Music research, albums, Spotify, song ID', demoOnly: false },
+    { href: '/finance/disasters-unified.html', icon: 'bi-shield-exclamation', label: 'Unified Disasters', domain: 'disasters', title: 'Unified Disasters — hazard monitoring and pipeline risk', demoOnly: false },
+    { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, field guide', demoOnly: false },
+    { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family', domain: 'family', title: 'Lane Family hub — tree, museum, and tools', demoOnly: false },
     { href: '/finance/index.html', icon: 'bi-bank', label: 'Worksheets', domain: 'finance', title: 'Worksheets — Encompass, calculators, unit tests', demoOnly: true },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', domain: 'encompass', title: 'Encompass Hub, pipeline, loan APIs', demoOnly: true },
-    { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, field guide', demoOnly: false },
-    { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike', domain: 'bike', title: 'Bike shop, peloton, discover', demoOnly: false },
-    { href: '/ai/voice-dj.html', icon: 'bi-robot', label: 'AI & Voice', domain: 'ai', title: 'Wolfman Dave, Levi, voice guide', demoOnly: false },
-    { href: '/entertainment/index.html', icon: 'bi-stars', label: 'Entertainment', domain: 'entertainment', title: 'Entertainment hub - boombox, visualizer, posters', demoOnly: false },
-    { href: '/local/local-spots.html', icon: 'bi-geo-alt-fill', label: 'Local', domain: 'local', title: 'Local spots map', demoOnly: false },
-    { href: '/finds/index.html', icon: 'bi-search-heart', label: 'Finds', domain: 'finds', title: 'Thrift & vintage discovery', demoOnly: false },
-    { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family', domain: 'family', title: 'Lane Family hub — tree, museum, and tools', demoOnly: false },
   ];
 
   /** Navbar Worksheets dropdown items (URLs under /finance/) */
@@ -25,6 +21,7 @@
     { href: '/finance/index.html', icon: 'bi-calculator', label: 'Worksheets Hub' },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub' },
     { href: '/finance/disasters-unified.html', icon: 'bi-globe', label: 'Unified Disasters' },
+    { href: '/finance/heygen-library.html', icon: 'bi-collection-play', label: 'HeyGen Video Library' },
     { href: '/finance/loan-batch-update.html', icon: 'bi-layers-half', label: 'Loan batch update' },
     { href: '/finance/encompass-assistant.html', icon: 'bi-robot', label: 'Encompass Assistant' },
     { href: '/finance/unit-tests.html', icon: 'bi-check2-circle', label: 'Unit Tests' },
@@ -195,7 +192,7 @@
     if (demoMode) {
       return DOMAIN_TILES.filter(t => t.demoOnly);
     }
-    return DOMAIN_TILES;
+    return DOMAIN_TILES.filter(t => !t.demoOnly);
   }
 
   function makeToolId(item, href) {

@@ -573,6 +573,13 @@ export function normalizeFemaV2ToUnified(disasters) {
   }).filter(r => r.county_fips || (r.county_name && r.state_abbr));
 }
 
+/** VIIRS CSV uses single-letter confidence (l/n/h); GeoJSON may use full words. */
+export function normalizeFirmsConfidence(raw) {
+  const c = String(raw ?? '').toLowerCase().trim();
+  const letterMap = { l: 'low', n: 'nominal', h: 'high' };
+  return letterMap[c] || c;
+}
+
 /** NASA FIRMS (active fires) - VIIRS NRT GeoJSON **/
 export async function ingestFirmsNrt() {
   // Get MAP_KEY (FIRMS-specific) or fallback to NASA_API_KEY
@@ -719,7 +726,7 @@ export async function ingestFirmsNrt() {
     
     // Get brightness and confidence
     const brightness = props.brightness ? parseFloat(props.brightness) : null;
-    const confidence = (props.confidence || '').toLowerCase().trim();
+    const confidence = normalizeFirmsConfidence(props.confidence);
     
     // Filter by confidence (explicit threshold: nominal+ or high-only)
     const confRank = confidenceRank[confidence] ?? -1;
@@ -961,7 +968,8 @@ export async function ingestUsgsQuakes() {
 }
 
 /** NOAA/NWS CAP Alerts (US) **/
-export async function ingestNwsCap() {
+export async function ingestNwsCap(options = {}) {
+  const { source = 'nws', eventFilter = null } = options;
   const url = 'https://api.weather.gov/alerts/active?status=actual&message_type=alert';
   let data;
   try {
@@ -982,6 +990,7 @@ export async function ingestNwsCap() {
   let geocodingCalls = 0;
   
   for (const f of feats) {
+    if (eventFilter && !eventFilter(f)) continue;
     const props = f.properties || {};
     // Try to use areaDesc to get county/state; NWS formats: "County, ST" or "County1; County2 Counties, ST"
     let county = null, state = null, fips = null;
@@ -1048,7 +1057,7 @@ export async function ingestNwsCap() {
     if (!fips && (lat || lng)) fips = '00000';
     const start = props.effective || props.onset || props.sent || new Date().toISOString();
     const rec = {
-      source: 'nws',
+      source,
       event_type: (props.event || 'severe').toLowerCase(),
       county_fips: fips,
       county_name: county || 'Unknown',
@@ -1191,11 +1200,17 @@ export async function ingestFema() {
   return result;
 }
 
-/** NHC Active Cyclones (best available JSON proxy) — simple placeholder using NWS CAP hurricane events **/
+/** NHC Active Cyclones — hurricane/tropical alerts from NWS CAP, stored as source nhc. */
 export async function ingestNhc() {
-  // For now, derive from NWS CAP hurricane-related alerts to populate hurricane event_type
-  const res = await ingestNwsCap();
-  return res;
+  const hurricanePattern = /\b(hurricane|tropical storm|tropical depression|typhoon|cyclone|post-tropical|storm surge)\b/i;
+  return ingestNwsCap({
+    source: 'nhc',
+    eventFilter: (f) => {
+      const p = f.properties || {};
+      const text = `${p.event || ''} ${p.headline || ''}`;
+      return hurricanePattern.test(text);
+    },
+  });
 }
 
 /**

@@ -30,12 +30,15 @@
   function sourceLabel(source) {
     const map = {
       alertcalifornia: 'ALERTCalifornia',
+      alertwest: 'ALERTWest',
       usgs_nims: 'USGS',
       usgs_volcano: 'USGS / AVO Volcano',
       faa_weathercam: 'FAA WeatherCams',
       webcoos: 'NOAA WebCOOS',
       ucsd_hpwren: 'HPWREN / UCSD',
       ucsd_pier: 'Scripps COOL Lab',
+      caltrans_cwwp2: 'Caltrans CWWP2',
+      dot_511ny: '511NY / NYSDOT',
     };
     return map[source] || source || 'Webcam';
   }
@@ -172,6 +175,11 @@
     }
     if (!feedUrl && siteId && cameraData.source === 'alertcalifornia') {
       feedUrl = `https://cameras.alertcalifornia.org/?id=${siteId}`;
+    }
+    if (!feedUrl && cameraData.source === 'alertwest') {
+      const awName = raw.alertwest_name || cameraData.source_id;
+      if (awName) feedUrl = `https://alertwest.live/?camera=${encodeURIComponent(awName)}`;
+      else feedUrl = 'https://alertwest.live/';
     }
 
     if (linkEl) {

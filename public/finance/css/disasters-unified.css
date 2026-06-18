@@ -261,6 +261,17 @@ body.du-page {
   font-size: 0.65rem;
 }
 
+.du-workflow-pills li.du-workflow-pill-active {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.du-workflow-pills li.du-workflow-pill-active .step-num {
+  background: #fff;
+  color: var(--du-hero-from, #0f2744);
+}
+
 .du-hero-actions .btn {
   font-weight: 600;
 }
@@ -391,10 +402,240 @@ body.du-page {
   background: #fff;
 }
 
-.du-command-deck {
+/* Collapsible section cards (unit-tests pattern) */
+.du-section-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.du-section-card {
   border-radius: 12px;
   border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.du-section-card:hover {
+  box-shadow: 0 4px 14px rgba(74, 144, 164, 0.1);
+  border-color: rgba(74, 144, 164, 0.28);
+}
+
+.du-section-card.du-command-deck {
   background: linear-gradient(180deg, #fff 0%, var(--zen-surface, #f8fafc) 100%);
+}
+
+.du-section-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1.15rem;
+  background: rgba(74, 144, 164, 0.06);
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.28s ease, border-color 0.28s ease;
+  user-select: none;
+}
+
+.du-section-card-header:hover {
+  background: rgba(74, 144, 164, 0.12);
+}
+
+.du-section-card-header[aria-expanded="true"] {
+  background: rgba(74, 144, 164, 0.1);
+  border-bottom-color: var(--zen-border, rgba(74, 144, 164, 0.18));
+}
+
+.du-section-card-header:focus {
+  outline: none;
+}
+
+.du-section-card-header:focus-visible {
+  box-shadow: inset 0 0 0 3px rgba(var(--zen-primary-rgb, 74, 144, 164), 0.35);
+  position: relative;
+  z-index: 1;
+}
+
+.du-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-dark, #1f2937);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.du-section-title > i {
+  font-size: 1.05rem;
+  color: var(--zen-primary, #4a90a4);
+}
+
+.du-section-heading {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.du-hotspot-filter-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  max-width: 12rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#duHotspotFilterStrip .du-hotspot-filter-strip-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.du-section-step-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: var(--zen-primary, #4a90a4);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.du-section-chevron {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  color: var(--text-muted, #6b7280);
+  transition: transform 0.25s ease;
+}
+
+.du-section-card-header[aria-expanded="true"] .du-section-chevron {
+  transform: rotate(180deg);
+}
+
+.du-section-card-body {
+  padding: 1rem 1.15rem 1.15rem;
+  background: transparent;
+}
+
+.du-section-card-body.collapse:not(.show) {
+  display: none;
+}
+
+/* Section pills menu (unit-tests sidebar pattern, horizontal) */
+.du-section-pills-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+.du-section-pills-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7280);
+  flex-shrink: 0;
+}
+
+.du-section-pills-menu .nav-pills .nav-link {
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted, #6b7280);
+  padding: 0.35rem 0.8rem;
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.du-section-pills-menu .nav-pills .nav-link:hover {
+  background: rgba(74, 144, 164, 0.08);
+  color: var(--zen-primary, #4a90a4);
+}
+
+.du-section-pills-menu .nav-pills .nav-link.active {
+  background: rgba(74, 144, 164, 0.14);
+  color: var(--zen-primary, #4a90a4);
+  border-color: rgba(74, 144, 164, 0.28);
+}
+
+.du-mocked-loans .du-loan-pills-menu {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.75rem 0.85rem;
+  background: var(--zen-surface, #f8fafc);
+}
+
+.du-loan-panel-pills .nav-link {
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+}
+
+.du-loan-filter-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+}
+
+.du-loan-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.du-loan-filter-pills--disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.du-loan-pills-kicker {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted, #6b7280);
+  margin-right: 0.15rem;
+}
+
+.du-filter-pill {
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+  background: #fff;
+  color: #1e40af;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.7rem;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.du-filter-pill:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.du-filter-pill-active {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  border-color: #2563eb;
+  color: #fff;
 }
 
 .du-command-deck-label {
@@ -532,6 +773,12 @@ body.du-page {
   height: 360px;
 }
 
+#encompassLoansGrid .ag-row { cursor: pointer; }
+#encompassLoansGrid .ag-row.ag-row-selected {
+  background-color: #ecfdf5 !important;
+  box-shadow: inset 4px 0 0 #059669;
+}
+
 #disastersGrid .ag-row.disaster-wildfire { background-color: #fff7ed; }
 #disastersGrid .ag-row.disaster-earthquake { background-color: #fef3f2; }
 #disastersGrid .ag-row.disaster-hurricane { background-color: #eff6ff; }
@@ -543,6 +790,10 @@ body.du-page {
 }
 
 #disastersGrid .ag-row { cursor: pointer; }
+#disastersGrid .ag-row.ag-row-selected {
+  background-color: #dbeafe !important;
+  box-shadow: inset 4px 0 0 var(--zen-primary, #2563eb);
+}
 
 /* Source provenance badges */
 .source-badge {
@@ -580,12 +831,6 @@ body.du-page {
 .risk-medium { background: #fef3c7; color: #92400e; }
 .risk-high { background: #fee2e2; color: #991b1b; }
 .risk-critical { background: #7c2d12; color: #fee2e2; }
-
-/* Risk intelligence panel */
-.du-risk-intel {
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-}
 
 .du-risk-intel-kicker {
   font-size: 0.75rem;
@@ -837,17 +1082,29 @@ body.du-page {
   text-align: center;
 }
 
-/* —— Bottom pull-up: data model & graph —— */
-.du-schema-sheet-tab {
+/* —— Bottom dock: data model, impact graph video, HeyGen card —— */
+.du-bottom-dock {
   position: fixed;
   left: 50%;
   bottom: 0;
   z-index: 1040;
   transform: translateX(-50%);
+  display: flex;
+  align-items: flex-end;
+  gap: 0.2rem;
+  max-width: calc(100vw - 1rem);
+  padding: 0 0.25rem;
+}
+
+.du-schema-sheet-tab {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: none;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.45rem 1.1rem 0.5rem;
+  padding: 0.45rem 1rem 0.5rem;
   border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.35));
   border-bottom: none;
   border-radius: 12px 12px 0 0;
@@ -858,6 +1115,67 @@ body.du-page {
   color: var(--zen-primary, #4a90a4);
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.du-impact-graph-tab {
+  color: #0f766e;
+  border-color: rgba(15, 118, 110, 0.35);
+}
+
+.du-impact-graph-tab:hover {
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.du-heygen-pull-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.85rem 0.45rem;
+  border: 1px solid #93c5fd;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  background: linear-gradient(145deg, #f8fbff 0%, #eef6ff 100%);
+  box-shadow: 0 -4px 20px rgba(37, 99, 235, 0.15);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1d4ed8;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+
+.du-heygen-pull-card:hover {
+  background: linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%);
+}
+
+.du-heygen-pull-card > .bi-camera-reels {
+  font-size: 1.1rem;
+}
+
+.du-heygen-pull-card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.15;
+}
+
+.du-heygen-pull-card-kicker {
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.du-heygen-pull-card-label {
+  font-size: 0.78rem;
+}
+
+.du-heygen-sheet .du-heygen-studio {
+  border: none;
+  padding: 0;
+  background: transparent;
 }
 
 .du-schema-sheet-tab:hover {
@@ -876,7 +1194,8 @@ body.du-page {
   transition: transform 0.25s ease;
 }
 
-body.du-schema-sheet-open .du-schema-sheet-tab-chevron {
+body.du-pull-sheet-open .du-schema-sheet-tab-chevron,
+body.du-pull-sheet-open .du-heygen-pull-card .du-schema-sheet-tab-chevron {
   transform: rotate(180deg);
 }
 
@@ -1069,24 +1388,73 @@ body.du-schema-sheet-open .du-schema-sheet-tab-chevron {
   object-fit: contain;
 }
 
-body.du-schema-sheet-open {
+body.du-pull-sheet-open {
   overflow: hidden;
 }
 
-body.du-schema-sheet-open .du-schema-sheet-tab {
+body.du-pull-sheet-open .du-bottom-dock {
   opacity: 0;
   pointer-events: none;
 }
 
 @media (max-width: 768px) {
+  .du-bottom-dock {
+    gap: 0.1rem;
+    max-width: 100vw;
+  }
+  .du-schema-sheet-tab,
+  .du-heygen-pull-card {
+    padding: 0.4rem 0.55rem 0.45rem;
+    font-size: 0.72rem;
+  }
+  .du-schema-sheet-tab-handle {
+    display: none;
+  }
+  .du-heygen-pull-card-label {
+    display: none;
+  }
   .du-hero h1 { font-size: 1.35rem; }
   .du-stats-row .col-md-3 {
     flex: 0 0 50%;
     max-width: 50%;
   }
+  .du-section-card-header {
+    padding: 0.75rem 0.9rem;
+  }
+  .du-hotspot-filter-badge {
+    max-width: 8rem;
+  }
   .du-map-panel #map,
   .du-youtube-panel #youtubeResults {
     height: clamp(280px, 48vh, 520px);
     max-height: clamp(280px, 48vh, 520px);
+  }
+}
+
+@media (max-width: 576px) {
+  #duClearHotspotFilter .du-clear-hotspot-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  #duClearHotspotFilter .du-clear-hotspot-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 }

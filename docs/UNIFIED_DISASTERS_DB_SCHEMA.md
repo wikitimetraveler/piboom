@@ -219,7 +219,7 @@ Plus **direct** `disaster_event --NEAR--> loan` when coordinates exist (stronges
 | Column | Type | Notes |
 |--------|------|--------|
 | `id` | SERIAL PK | |
-| `source` | TEXT NOT NULL | `alertcalifornia`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier` |
+| `source` | TEXT NOT NULL | `alertcalifornia`, `alertwest`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`, `caltrans_cwwp2`, `dot_511ny` |
 | `source_id` | TEXT NOT NULL | Provider camera id |
 | `name` | TEXT | Display name |
 | `lat`, `lng` | DOUBLE PRECISION NOT NULL | Mount coordinates |

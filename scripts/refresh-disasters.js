@@ -1,7 +1,7 @@
+#!/usr/bin/env node
 /**
  * Development work by David Lane
  */
-#!/usr/bin/env node
 
 import 'dotenv/config';
 

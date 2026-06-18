@@ -13,34 +13,5 @@
       "refresh_minutes": 1,
       "attribution": "Scripps Institution of Oceanography / COOL Lab"
     }
-  ],
-  "ucsd_hpwren": [
-    {
-      "source_id": "hpwren:bm-n-mobo-c",
-      "name": "HPWREN — Mt. Woodson (sample)",
-      "lat": 33.0097,
-      "lng": -116.9797,
-      "state_abbr": "CA",
-      "county_name": "San Diego",
-      "network_url": "https://www.hpwren.ucsd.edu/cameras/",
-      "image_url": "https://www.hpwren.ucsd.edu/cameras/LTA/bm-n-mobo-c/large/latest.jpg",
-      "hazard_types": ["fire", "hazard"],
-      "media_type": "still_image",
-      "refresh_minutes": 1,
-      "attribution": "HPWREN (hpwren.ucsd.edu)"
-    },
-    {
-      "source_id": "hpwren:bm-w-mobo-c",
-      "name": "HPWREN — Palomar area (sample)",
-      "lat": 33.3564,
-      "lng": -116.8658,
-      "state_abbr": "CA",
-      "county_name": "San Diego",
-      "network_url": "https://www.hpwren.ucsd.edu/cameras/",
-      "hazard_types": ["fire", "hazard"],
-      "media_type": "still_image",
-      "refresh_minutes": 1,
-      "attribution": "HPWREN (hpwren.ucsd.edu)"
-    }
   ]
 }

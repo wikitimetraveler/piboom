@@ -105,7 +105,7 @@ All API routes are mounted under `/api`. Base URL examples assume `http://localh
 |--------|------|-------------|
 | GET | `/api/disasters` | List disasters |
 | POST | `/api/disasters/refresh` | Refresh all sources |
-| POST | `/api/disasters/refresh-cameras` | Ingest multi-source hazard webcams into `fire_cameras` (manual / `npm run refresh:hazard-webcams`; not daily disaster refresh). Query/body: `sources=all` or comma list (`alertcalifornia`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`); requires disaster refresh access |
+| POST | `/api/disasters/refresh-cameras` | Ingest multi-source hazard webcams into `fire_cameras` (manual / `npm run refresh:hazard-webcams`; not daily disaster refresh). Query/body: `sources=all` or comma list (`alertcalifornia`, `alertwest`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`, `caltrans_cwwp2`, `dot_511ny`); requires disaster refresh access |
 | GET | `/api/disasters/geocode-address` | Forward geocode for hazard webcam address search (`q`). Uses `geocodeAddressFree` (Mapbox/Nominatim); fallback when client Google geocoder fails |
 | GET | `/api/disasters/near` | Nearby disasters, webcams, loans — query: `lat`, `lng`, `radiusMiles`, `types` (`disasters,cameras,loans`), `limit` (PostGIS or Haversine fallback) |
 | GET | `/api/disasters/cameras` | List fixed camera mounts from `fire_cameras` (not rolling disaster events). Query: `state`, `county`, `source`, `hazard`, `mediaType`, geo (`nearLat`, `nearLng`, `radiusMiles`) |

@@ -13,6 +13,10 @@ import {
   getSchemaDemoShort,
   getDisasterBriefingPayload
 } from '../services/disaster-heygen.service.js';
+import {
+  getHeygenVideoLibrary,
+  registerHeygenApiVideo
+} from '../services/heygen-library.service.js';
 
 function handleHeygenError(res, e, fallback) {
   if (e.code === 'HEYGEN_NOT_CONFIGURED') {
@@ -44,12 +48,32 @@ export async function getHeygenVoices(req, res) {
 
 export async function postHeygenVideo(req, res) {
   try {
-    const { avatarId, script, voiceId, title, resolution, aspectRatio, callbackUrl } = req.body || {};
+    const { avatarId, script, voiceId, title, resolution, aspectRatio, callbackUrl, libraryId, libraryDomain } =
+      req.body || {};
     if (!avatarId || !script) {
       return res.status(400).json({ success: false, error: 'avatarId and script are required' });
     }
     const data = await createAvatarVideo({ avatarId, script, voiceId, title, resolution, aspectRatio, callbackUrl });
-    res.json({ success: true, videoId: data?.video_id, data });
+    const videoId = data?.video_id;
+    const regId =
+      libraryId ||
+      `disasters-${videoId || Date.now()}-${String(title || 'video')
+        .slice(0, 24)
+        .replace(/\W+/g, '-')
+        .toLowerCase()}`;
+    if (videoId) {
+      await registerHeygenApiVideo({
+        id: regId,
+        videoId,
+        title: title || 'HeyGen video',
+        domain: libraryDomain || 'disasters',
+        variant: 'generated',
+        script: String(script).slice(0, 500),
+        sourcePage: '/finance/heygen-library.html',
+        studioPage: '/finance/disasters-unified.html#duHeygenStudio'
+      });
+    }
+    res.json({ success: true, videoId, libraryId: regId, data });
   } catch (e) {
     handleHeygenError(res, e, 'Failed to create video');
   }
@@ -61,6 +85,16 @@ export async function getHeygenVideoStatus(req, res) {
     res.json({ success: true, status: data?.status, videoUrl: data?.video_url || null, data });
   } catch (e) {
     handleHeygenError(res, e, 'Failed to fetch video status');
+  }
+}
+
+/** All HeyGen videos on this site — Lane lines, disaster demos, API registry. */
+export async function getHeygenLibrary(req, res) {
+  try {
+    const domain = req.query.domain ? String(req.query.domain) : undefined;
+    res.json({ success: true, ...(await getHeygenVideoLibrary({ domain })) });
+  } catch (e) {
+    handleHeygenError(res, e, 'Failed to load HeyGen library');
   }
 }
 
@@ -100,7 +134,23 @@ export async function postHeygenDisasterBriefing(req, res) {
       title: payload.title,
       aspectRatio: aspectRatio || payload.aspectRatio
     });
-    res.json({ success: true, preview: false, videoId: data?.video_id, ...payload, data });
+    const videoId = data?.video_id;
+    const disasterTitle = payload.title || disaster.title || 'Disaster briefing';
+    const regId = `disasters-briefing-${videoId || Date.now()}`;
+    if (videoId) {
+      await registerHeygenApiVideo({
+        id: regId,
+        videoId,
+        title: disasterTitle,
+        domain: 'disasters',
+        variant: 'briefing',
+        script: payload.script,
+        sourcePage: '/finance/heygen-library.html',
+        studioPage: '/finance/disasters-unified.html#duHeygenStudio',
+        tags: ['briefing']
+      });
+    }
+    res.json({ success: true, preview: false, videoId, libraryId: regId, ...payload, data });
   } catch (e) {
     handleHeygenError(res, e, 'Failed to create disaster briefing video');
   }

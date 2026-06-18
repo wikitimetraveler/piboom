@@ -11,7 +11,7 @@
   @since      2024
   
   @description
-  Aggregated FEMA, NOAA, and NASA disaster intelligence for Encompass, including
+  Aggregated FEMA, NOAA, and NASA disaster intelligence with mocked loan overlays,
   map overlays, county filters, and live event summaries.
 -->
 <html lang="en">
@@ -25,8 +25,8 @@
     <link href="../shared/modern-navbar.css" rel="stylesheet" />
     <link rel="stylesheet" href="/finance/css/disasters-unified.css" />
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/styles/ag-grid.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/styles/ag-theme-alpine.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script type="module" src="../shared/voice-commands.js"></script>
     <script type="module" src="../shared/disaster-mood-music.js"></script>
@@ -136,10 +136,27 @@
         </div>
       </div>
       <div id="selectionContextStrip" class="alert alert-primary py-2 small mb-3" style="display: none;" role="status"></div>
+      <div id="duHotspotFilterStrip" class="alert alert-info py-2 small mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="status" hidden>
+        <span class="du-hotspot-filter-strip-text">
+          <i class="bi bi-funnel-fill me-1" aria-hidden="true"></i>
+          Disasters grid filtered to <strong id="duHotspotFilterLabel">—</strong>
+        </span>
+        <button type="button" class="btn btn-sm btn-outline-secondary flex-shrink-0" id="duClearHotspotFilter" aria-label="Clear location filter">
+          <i class="bi bi-x-lg" aria-hidden="true"></i> <span class="du-clear-hotspot-label">Clear location filter</span>
+        </button>
+      </div>
 
-      <div class="card mb-4 du-command-deck">
-        <div class="card-body py-3">
-          <p class="du-command-deck-label mb-2">Source command deck</p>
+      <div class="du-section-cards mb-4">
+      <div class="du-section-card du-command-deck">
+        <div class="du-section-card-header" tabindex="0" id="headingCommandDeck" role="button" data-bs-toggle="collapse" data-bs-target="#collapseCommandDeck" aria-expanded="true" aria-controls="collapseCommandDeck">
+          <span class="du-section-title">
+            <span class="du-section-step-pill" aria-hidden="true">1</span>
+            <i class="bi bi-sliders" aria-hidden="true"></i>
+            <h2 class="du-section-heading mb-0">Source command deck</h2>
+          </span>
+          <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
+        </div>
+        <div id="collapseCommandDeck" class="collapse show du-section-card-body" aria-labelledby="headingCommandDeck">
           <p class="small text-muted mb-2">Toggle providers — counts reflect the loaded grid; DB totals when available.</p>
           <div class="disaster-source-selector" id="unifiedSourceChips">
             <button type="button" class="source-chip source-chip-active freshness-ok" data-source="fema" onclick="toggleUnifiedSourceChip(this, 'fema')">
@@ -201,14 +218,17 @@
         </div>
       </div>
 
-      <div class="card mb-4 du-risk-intel" id="duRiskIntelCard">
-        <div class="card-body py-3">
-          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-            <p class="du-command-deck-label mb-0">Risk intelligence</p>
-            <button type="button" class="btn btn-sm btn-outline-secondary" id="duClearHotspotFilter" hidden>
-              <i class="bi bi-x-lg"></i> Clear location filter
-            </button>
-          </div>
+      <div class="du-section-card du-risk-intel" id="duRiskIntelCard">
+        <div class="du-section-card-header" tabindex="0" id="headingRiskIntel" role="button" data-bs-toggle="collapse" data-bs-target="#collapseRiskIntel" aria-expanded="true" aria-controls="collapseRiskIntel">
+          <span class="du-section-title">
+            <span class="du-section-step-pill" aria-hidden="true">2</span>
+            <i class="bi bi-speedometer2" aria-hidden="true"></i>
+            <h2 class="du-section-heading mb-0">Risk intelligence</h2>
+            <span class="badge rounded-pill text-bg-primary du-hotspot-filter-badge" id="duHotspotFilterBadge" hidden></span>
+          </span>
+          <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
+        </div>
+        <div id="collapseRiskIntel" class="collapse show du-section-card-body" aria-labelledby="headingRiskIntel">
           <p class="small text-muted mb-3">
             Hotspots and top events from the loaded grid. Click a hotspot to filter the disasters table and load county loans; click an event to drill down.
           </p>
@@ -247,6 +267,33 @@
           </p>
         </div>
       </div>
+      </div>
+
+      <nav class="du-section-pills-menu mb-3" id="duSectionPillsMenu" aria-label="Dashboard sections">
+        <span class="du-section-pills-label">Sections</span>
+        <ul class="nav nav-pills flex-wrap gap-1">
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-du-section-target="collapseFilters" data-du-section-step="3">
+              <i class="bi bi-funnel me-1"></i>Filters
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link active" data-du-section-target="collapseDisasters" data-du-section-step="3">
+              <i class="bi bi-shield-exclamation me-1"></i>Disasters
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-du-section-target="collapseMapYouTube" data-du-section-step="3">
+              <i class="bi bi-geo-alt me-1"></i>Map &amp; videos
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-du-section-target="collapseLoans" data-du-section-step="4">
+              <i class="bi bi-bank me-1"></i>Mocked loan data
+            </button>
+          </li>
+        </ul>
+      </nav>
 
       <!-- Bootstrap Accordion -->
       <div class="accordion mb-4" id="disastersAccordion">
@@ -377,92 +424,158 @@
           </div>
         </div>
 
-        <!-- Accordion Item 4: Encompass Loans -->
-        <div class="accordion-item">
-          <h2 class="accordion-header" id="headingLoans">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseLoans" aria-expanded="false" aria-controls="collapseLoans">
-              <i class="bi bi-bank me-2"></i> Encompass Loans
-            </button>
-          </h2>
-          <div id="collapseLoans" class="accordion-collapse collapse" aria-labelledby="headingLoans">
-            <div class="accordion-body">
-              <div class="card du-data-panel" id="encompassLoansCard" style="display: none;">
-                <div class="card-header d-flex flex-wrap justify-content-between align-items-start gap-2">
-                  <div>
-                    <strong><i class="bi-bank"></i> Affected Encompass Loans</strong>
-                    <small class="text-muted d-block" id="encompassLoansSubtitle">Loans near selected disaster</small>
-                  </div>
-                  <button type="button" class="btn btn-sm btn-outline-warning" id="duExportCinematicKmlLoansBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
-                    <i class="bi bi-globe-americas"></i> Google Earth KML
+      </div>
+
+      <div class="du-section-cards mb-4">
+        <div class="du-section-card du-mocked-loans" id="duMockedLoansSection">
+          <div
+            class="du-section-card-header collapsed"
+            tabindex="0"
+            id="headingLoans"
+            role="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseLoans"
+            aria-expanded="false"
+            aria-controls="collapseLoans"
+          >
+            <span class="du-section-title">
+              <span class="du-section-step-pill" aria-hidden="true">4</span>
+              <i class="bi bi-bank" aria-hidden="true"></i>
+              <h2 class="du-section-heading mb-0">Mocked loan data</h2>
+            </span>
+            <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
+          </div>
+          <div id="collapseLoans" class="collapse du-section-card-body" aria-labelledby="headingLoans">
+            <div class="du-loan-pills-menu mb-3">
+              <ul class="nav nav-pills du-loan-panel-pills mb-2" id="duLoanPanelPills" role="tablist" aria-label="Mocked loan panels">
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link active" id="duLoanPanelLoansTab" data-du-loan-panel="loans" role="tab" aria-selected="true" aria-controls="duLoanPanelLoans">
+                    <i class="bi bi-table me-1"></i>Mocked loans
                   </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button type="button" class="nav-link" id="duLoanPanelCamerasTab" data-du-loan-panel="cameras" role="tab" aria-selected="false" aria-controls="duLoanPanelCameras">
+                    <i class="bi bi-camera-video me-1"></i>Fire cameras
+                  </button>
+                </li>
+              </ul>
+              <div class="du-loan-filter-pills-wrap">
+                <div class="du-loan-filter-pills" role="group" aria-label="Loan scope">
+                  <span class="du-loan-pills-kicker">Scope</span>
+                  <button type="button" class="du-filter-pill du-filter-pill-active" data-du-loan-scope="distance">Within distance</button>
+                  <button type="button" class="du-filter-pill" data-du-loan-scope="county">By county</button>
                 </div>
-                <div class="card-body">
-                  <div class="row g-2 align-items-end mb-3" id="duLoanFilterToolbar">
-                    <div class="col-md-3 col-6">
-                      <label class="form-label small mb-1" for="duLoanScopeMode">Scope</label>
-                      <select class="form-select form-select-sm" id="duLoanScopeMode">
-                        <option value="distance">Within distance</option>
-                        <option value="county">By county</option>
-                      </select>
-                    </div>
-                    <div class="col-md-3 col-6">
-                      <label class="form-label small mb-1" for="duLoanRadiusMiles">Radius</label>
-                      <select class="form-select form-select-sm" id="duLoanRadiusMiles">
-                        <option value="10">10 mi</option>
-                        <option value="25">25 mi</option>
-                        <option value="50" selected>50 mi</option>
-                        <option value="100">100 mi</option>
-                        <option value="custom">Custom…</option>
-                      </select>
-                    </div>
-                    <div class="col-md-2 col-6" id="duLoanRadiusCustomWrap" style="display: none;">
-                      <label class="form-label small mb-1" for="duLoanRadiusCustom">Miles</label>
-                      <input type="number" class="form-control form-control-sm" id="duLoanRadiusCustom" min="1" max="500" value="50">
-                    </div>
-                    <div class="col-md-auto col-6">
-                      <button type="button" class="btn btn-sm btn-outline-primary" id="duLoanFilterApplyBtn">
-                        <i class="bi bi-funnel"></i> Apply
-                      </button>
-                    </div>
+                <div class="du-loan-filter-pills" id="duLoanRadiusPills" role="group" aria-label="Search radius">
+                  <span class="du-loan-pills-kicker">Radius</span>
+                  <button type="button" class="du-filter-pill" data-du-loan-radius="10">10 mi</button>
+                  <button type="button" class="du-filter-pill" data-du-loan-radius="25">25 mi</button>
+                  <button type="button" class="du-filter-pill du-filter-pill-active" data-du-loan-radius="50">50 mi</button>
+                  <button type="button" class="du-filter-pill" data-du-loan-radius="100">100 mi</button>
+                  <button type="button" class="du-filter-pill" data-du-loan-radius="custom">Custom</button>
+                </div>
+              </div>
+              <select class="visually-hidden" id="duLoanScopeMode" aria-hidden="true" tabindex="-1">
+                <option value="distance">Within distance</option>
+                <option value="county">By county</option>
+              </select>
+              <select class="visually-hidden" id="duLoanRadiusMiles" aria-hidden="true" tabindex="-1">
+                <option value="10">10 mi</option>
+                <option value="25">25 mi</option>
+                <option value="50" selected>50 mi</option>
+                <option value="100">100 mi</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </div>
+            <div class="card du-data-panel" id="encompassLoansCard" style="display: none;">
+              <div class="card-header d-flex flex-wrap justify-content-between align-items-start gap-2">
+                <div>
+                  <strong><i class="bi-bank"></i> Nearby mocked loan data</strong>
+                  <small class="text-muted d-block" id="encompassLoansSubtitle">Mocked loan data near selected disaster (demo dataset)</small>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-warning" id="duExportCinematicKmlLoansBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
+                  <i class="bi bi-globe-americas"></i> Google Earth KML
+                </button>
+              </div>
+              <div class="card-body">
+                <div id="duLoanRadiusCustomBar" class="du-loan-custom-radius mb-3" hidden>
+                  <label class="form-label small mb-1" for="duLoanRadiusCustom">Custom radius (miles)</label>
+                  <div class="d-flex flex-wrap align-items-center gap-2">
+                    <input type="number" class="form-control form-control-sm" id="duLoanRadiusCustom" min="1" max="500" value="50" style="max-width: 7rem;" aria-describedby="duLoanRadiusCustomHint">
+                    <span class="small text-muted" id="duLoanRadiusCustomHint">Updates mocked loans and cameras on change</span>
                   </div>
+                </div>
+                <div id="duLoanPanelLoans" class="du-loan-panel" role="tabpanel" aria-labelledby="duLoanPanelLoansTab">
                   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                    <small class="text-muted mb-0">Sort and filter loans like the disasters grid. Click a row to focus the map.</small>
+                    <small class="text-muted mb-0">Sort and filter mocked loans like the disasters grid. Click a row to focus the map.</small>
                     <input type="text" id="loansQuickFilter" class="form-control form-control-sm" style="max-width: 240px;" placeholder="Quick filter loans…" aria-label="Quick filter loans">
                   </div>
                   <div id="encompassLoansGrid" class="ag-theme-alpine"></div>
-                  <div class="card mt-3" id="duNearbyCamerasCard" style="display: none;">
-                    <div class="card-header py-2">
+                </div>
+                <div id="duLoanPanelCameras" class="du-loan-panel" role="tabpanel" aria-labelledby="duLoanPanelCamerasTab" hidden>
+                  <div class="card border-0 shadow-none" id="duNearbyCamerasCard" style="display: none;">
+                    <div class="card-header py-2 px-0 bg-transparent border-0">
                       <strong class="small"><i class="bi bi-camera-video"></i> Nearby fire cameras</strong>
                       <small class="text-muted d-block" id="duNearbyCamerasSubtitle">Hazard webcams near selection</small>
                     </div>
-                    <div class="card-body py-2" id="duNearbyCamerasList">
+                    <div class="card-body py-2 px-0" id="duNearbyCamerasList">
                       <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
                     </div>
                   </div>
+                  <p class="text-muted small mb-0" id="duNearbyCamerasIdle">Select a disaster or mocked loan to load cameras.</p>
                 </div>
               </div>
             </div>
+            <p class="small text-muted mb-0" id="duMockedLoansIdle">Select a disaster in the grid to load mocked loan data and nearby fire cameras.</p>
           </div>
         </div>
       </div>
 
     </div>
 
-    <!-- Bottom pull-up: Postgres schema + impact graph (see docs/UNIFIED_DISASTERS_DB_SCHEMA.md) -->
-    <button
-      type="button"
-      class="du-schema-sheet-tab"
-      id="duSchemaSheetTab"
-      aria-expanded="false"
-      aria-controls="duSchemaSheetPanel"
-    >
-      <span class="du-schema-sheet-tab-handle" aria-hidden="true"></span>
-      <i class="bi bi-database me-1" aria-hidden="true"></i>
-      <span>Data model &amp; graph</span>
-      <i class="bi bi-chevron-up du-schema-sheet-tab-chevron" aria-hidden="true"></i>
-    </button>
-    <div class="du-schema-sheet" id="duSchemaSheet" aria-hidden="true">
-      <div class="du-schema-sheet-backdrop" id="duSchemaSheetBackdrop" tabindex="-1"></div>
+    <!-- Bottom dock: data model, impact graph video, HeyGen card (see docs/UNIFIED_DISASTERS_DB_SCHEMA.md) -->
+    <div class="du-bottom-dock" id="duBottomDock">
+      <button
+        type="button"
+        class="du-schema-sheet-tab"
+        id="duSchemaSheetTab"
+        aria-expanded="false"
+        aria-controls="duSchemaSheetPanel"
+      >
+        <span class="du-schema-sheet-tab-handle" aria-hidden="true"></span>
+        <i class="bi bi-database me-1" aria-hidden="true"></i>
+        <span>Data model</span>
+        <i class="bi bi-chevron-up du-schema-sheet-tab-chevron" aria-hidden="true"></i>
+      </button>
+      <button
+        type="button"
+        class="du-schema-sheet-tab du-impact-graph-tab"
+        id="duImpactGraphSheetTab"
+        aria-expanded="false"
+        aria-controls="duImpactGraphSheetPanel"
+      >
+        <span class="du-schema-sheet-tab-handle" aria-hidden="true"></span>
+        <i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>
+        <span>Impact graph · video</span>
+        <i class="bi bi-chevron-up du-schema-sheet-tab-chevron" aria-hidden="true"></i>
+      </button>
+      <button
+        type="button"
+        class="du-heygen-pull-card"
+        id="duHeygenPullCard"
+        aria-expanded="false"
+        aria-controls="duHeygenSheetPanel"
+      >
+        <i class="bi bi-camera-reels" aria-hidden="true"></i>
+        <span class="du-heygen-pull-card-text">
+          <span class="du-heygen-pull-card-kicker">HeyGen</span>
+          <span class="du-heygen-pull-card-label">Avatar studio</span>
+        </span>
+        <i class="bi bi-chevron-up du-schema-sheet-tab-chevron" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="du-schema-sheet" id="duSchemaSheet" aria-hidden="true" data-du-pull-sheet>
+      <div class="du-schema-sheet-backdrop" id="duSchemaSheetBackdrop" tabindex="-1" data-du-pull-backdrop></div>
       <div
         class="du-schema-sheet-panel"
         id="duSchemaSheetPanel"
@@ -473,22 +586,84 @@
         <div class="du-schema-sheet-grab" aria-hidden="true"></div>
         <header class="du-schema-sheet-header">
           <h2 class="h6 mb-0" id="duSchemaSheetTitle">
-            <i class="bi bi-diagram-3 me-1"></i>Database &amp; impact graph
+            <i class="bi bi-database me-1"></i>Postgres data model
           </h2>
-          <button type="button" class="btn btn-sm btn-outline-secondary" id="duSchemaSheetClose" aria-label="Close data model panel">
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="duSchemaSheetClose" aria-label="Close data model panel" data-du-pull-close>
             <i class="bi bi-chevron-down"></i>
           </button>
         </header>
         <div class="du-schema-sheet-body">
-          <section class="du-schema-sheet-video-block mb-3" aria-label="Database and graph overview video">
-            <h3 class="du-schema-sheet-kicker">Overview video</h3>
+          <p class="small text-muted mb-3">
+            Unified Disasters reads shared Postgres tables—no page-specific schema. Events refresh on a
+            <strong>90-day</strong> window.
+          </p>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h3 class="du-schema-sheet-kicker">Fact tables</h3>
+              <ul class="du-schema-sheet-list small mb-0">
+                <li><code>disasters</code> — FEMA, FIRMS, USGS, NWS, NHC events (grid + map)</li>
+                <li><code>fire_cameras</code> — fixed hazard webcams (not disaster rows)</li>
+                <li><code>loans</code> — mocked pipeline properties, risk scores, flood zones</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h3 class="du-schema-sheet-kicker">Spatial link (live dashboard)</h3>
+              <table class="table table-sm table-bordered du-schema-sheet-table mb-2">
+                <thead>
+                  <tr><th>Model</th><th>How</th><th>Used here</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Spatial</strong></td>
+                    <td><code>GET /api/disasters/near</code> (PostGIS or Haversine)</td>
+                    <td>Live selection, nearby loans &amp; cameras</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="small mb-0">
+                Radius search powers the grid selection strip, loan map pins, and hazard webcam panel on this page.
+              </p>
+            </div>
+          </div>
+          <p class="small text-muted mb-0 mt-3">
+            <i class="bi bi-book me-1"></i>Repo docs:
+            <code>docs/UNIFIED_DISASTERS_DB_SCHEMA.md</code>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="du-schema-sheet du-impact-graph-sheet" id="duImpactGraphSheet" aria-hidden="true" data-du-pull-sheet>
+      <div class="du-schema-sheet-backdrop" id="duImpactGraphSheetBackdrop" tabindex="-1" data-du-pull-backdrop></div>
+      <div
+        class="du-schema-sheet-panel"
+        id="duImpactGraphSheetPanel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="duImpactGraphSheetTitle"
+      >
+        <div class="du-schema-sheet-grab" aria-hidden="true"></div>
+        <header class="du-schema-sheet-header">
+          <h2 class="h6 mb-0" id="duImpactGraphSheetTitle">
+            <i class="bi bi-diagram-3 me-1"></i>Impact graph · walkthrough video
+          </h2>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="duImpactGraphSheetClose" aria-label="Close impact graph panel" data-du-pull-close>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+        </header>
+        <div class="du-schema-sheet-body">
+          <section class="du-schema-sheet-video-block mb-3" aria-label="Impact graph overview video">
+            <h3 class="du-schema-sheet-kicker">Walkthrough video</h3>
+            <p class="small text-muted mb-2">
+              County → disaster → zip → loan → milestone → processor—the persisted graph model and how it complements spatial search.
+            </p>
             <div class="du-schema-sheet-video-wrap">
               <video
                 class="du-schema-sheet-video"
                 controls
                 preload="metadata"
                 playsinline
-                title="Unified Disasters database and graph model walkthrough"
+                title="Unified Disasters impact graph walkthrough"
                 src="/finance/assets/unified-disasters-db-graph-walkthrough.mp4"
               ></video>
             </div>
@@ -501,15 +676,82 @@
                 <i class="bi bi-download me-1" aria-hidden="true"></i>Download MP4
               </a>
               <span class="small text-muted">1080p · captioned walkthrough</span>
+              <a class="btn btn-sm btn-outline-secondary ms-auto" href="/disaster-impact-graph.html">
+                <i class="bi bi-box-arrow-up-right me-1"></i>Open graph prototype
+              </a>
             </div>
           </section>
-          <section class="du-heygen-studio mb-3" id="duHeygenStudio" aria-label="HeyGen AI video studio">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <h3 class="du-schema-sheet-kicker">Graph tables</h3>
+              <ul class="du-schema-sheet-list small mb-0">
+                <li><code>graph_nodes</code> — county, disaster, zip, loan, milestone, processor</li>
+                <li><code>graph_edges</code> — typed relationships (reseed from spatial + declarations)</li>
+              </ul>
+            </div>
+            <div class="col-md-6">
+              <h3 class="du-schema-sheet-kicker">Graph link (multi-hop)</h3>
+              <table class="table table-sm table-bordered du-schema-sheet-table mb-2">
+                <thead>
+                  <tr><th>Model</th><th>How</th><th>Used here</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Graph</strong></td>
+                    <td><code>graph_nodes</code> + <code>graph_edges</code> (reseed)</td>
+                    <td><a href="/disaster-impact-graph.html">Impact Graph</a> prototype</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="small mb-0">
+                Graph chain: county → disaster → zip → loan → milestone → processor, plus
+                <strong>NEAR</strong> edges from spatial seed (~50 mi).
+              </p>
+            </div>
+          </div>
+          <details class="du-schema-sheet-details mt-3">
+            <summary class="small fw-semibold">Edge types (impact graph)</summary>
+            <p class="small text-muted mb-2 mt-2">
+              <code>HAS_DECLARATION</code>, <code>CONTAINS</code>, <code>AFFECTS</code>,
+              <code>NEAR</code>, <code>CURRENTLY_IN</code>, <code>ASSIGNED_TO</code>
+            </p>
+          </details>
+          <p class="small text-muted mb-0 mt-3">
+            <i class="bi bi-book me-1"></i>Video script:
+            <code>docs/UNIFIED_DISASTERS_DB_SCHEMA_VIDEO_SCRIPT.md</code>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="du-schema-sheet du-heygen-sheet" id="duHeygenSheet" aria-hidden="true" data-du-pull-sheet>
+      <div class="du-schema-sheet-backdrop" id="duHeygenSheetBackdrop" tabindex="-1" data-du-pull-backdrop></div>
+      <div
+        class="du-schema-sheet-panel"
+        id="duHeygenSheetPanel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="duHeygenSheetTitle"
+      >
+        <div class="du-schema-sheet-grab" aria-hidden="true"></div>
+        <header class="du-schema-sheet-header">
+          <h2 class="h6 mb-0" id="duHeygenSheetTitle">
+            <i class="bi bi-camera-reels me-1"></i>HeyGen avatar studio
+          </h2>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="duHeygenSheetClose" aria-label="Close HeyGen studio" data-du-pull-close>
+            <i class="bi bi-chevron-down"></i>
+          </button>
+        </header>
+        <div class="du-schema-sheet-body">
+          <section class="du-heygen-studio" id="duHeygenStudio" aria-label="HeyGen AI video studio">
             <div class="du-heygen-studio-head">
               <div>
-                <h3 class="du-schema-sheet-kicker mb-1">HeyGen studio</h3>
                 <p class="small text-muted mb-0">AI avatar narrates the schema walkthrough or a live briefing for your selected event.</p>
               </div>
               <span class="du-heygen-studio-badge"><i class="bi bi-stars me-1"></i>HEYGEN_API_KEY</span>
+              <a class="btn btn-sm btn-outline-secondary" href="/finance/heygen-library.html">
+                <i class="bi bi-collection-play me-1"></i>Video library
+              </a>
             </div>
             <p class="small text-muted mb-2" id="duHeygenUnconfigured" hidden>
               Set <code>HEYGEN_API_KEY</code> in the server environment to enable avatar video generation.
@@ -543,84 +785,40 @@
               </div>
               <div class="du-heygen-result" id="duHeygenResult" hidden>
                 <video id="duHeygenResultVideo" controls playsinline preload="metadata" class="du-schema-sheet-video"></video>
-                <a class="btn btn-sm btn-outline-primary mt-2" id="duHeygenDownloadLink" href="#" download target="_blank" rel="noopener noreferrer">
-                  <i class="bi bi-download me-1"></i>Download from HeyGen
-                </a>
+                <div class="d-flex flex-wrap gap-2 mt-2">
+                  <a class="btn btn-sm btn-outline-primary" id="duHeygenDownloadLink" href="#" download target="_blank" rel="noopener noreferrer" hidden>
+                    <i class="bi bi-download me-1"></i>Download from HeyGen
+                  </a>
+                  <a class="btn btn-sm btn-outline-secondary" id="duHeygenLibraryLink" href="/finance/heygen-library.html" hidden>
+                    <i class="bi bi-collection-play me-1"></i>View in library
+                  </a>
+                </div>
               </div>
             </div>
           </section>
-          <p class="small text-muted mb-3">
-            Unified Disasters reads shared Postgres tables—no page-specific schema. Events refresh on a
-            <strong>90-day</strong> window.
-          </p>
-          <div class="row g-3">
-            <div class="col-md-6">
-              <h3 class="du-schema-sheet-kicker">Fact tables</h3>
-              <ul class="du-schema-sheet-list small mb-0">
-                <li><code>disasters</code> — FEMA, FIRMS, USGS, NWS, NHC events (grid + map)</li>
-                <li><code>fire_cameras</code> — fixed hazard webcams (not disaster rows)</li>
-                <li><code>loans</code> — pipeline properties, risk scores, flood zones</li>
-              </ul>
-            </div>
-            <div class="col-md-6">
-              <h3 class="du-schema-sheet-kicker">Two ways to link disasters → loans</h3>
-              <table class="table table-sm table-bordered du-schema-sheet-table mb-2">
-                <thead>
-                  <tr><th>Model</th><th>How</th><th>Used here</th></tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><strong>Spatial</strong></td>
-                    <td><code>GET /api/disasters/near</code> (PostGIS or Haversine)</td>
-                    <td>Live selection, nearby loans &amp; cameras</td>
-                  </tr>
-                  <tr>
-                    <td><strong>Graph</strong></td>
-                    <td><code>graph_nodes</code> + <code>graph_edges</code> (reseed)</td>
-                    <td><a href="/disaster-impact-graph.html">Impact Graph</a> prototype</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p class="small mb-0">
-                Graph chain: county → disaster → zip → loan → milestone → processor, plus
-                <strong>NEAR</strong> edges from spatial seed (~50 mi).
-              </p>
-            </div>
-          </div>
-          <details class="du-schema-sheet-details mt-3">
-            <summary class="small fw-semibold">Edge types (impact graph)</summary>
-            <p class="small text-muted mb-2 mt-2">
-              <code>HAS_DECLARATION</code>, <code>CONTAINS</code>, <code>AFFECTS</code>,
-              <code>NEAR</code>, <code>CURRENTLY_IN</code>, <code>ASSIGNED_TO</code>
-            </p>
-          </details>
-          <p class="small text-muted mb-0 mt-3">
-            <i class="bi bi-book me-1"></i>Repo docs:
-            <code>docs/UNIFIED_DISASTERS_DB_SCHEMA.md</code>,
-            <code>docs/UNIFIED_DISASTERS_DB_SCHEMA_VIDEO_SCRIPT.md</code>
-          </p>
         </div>
       </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.min.noStyle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/dist/ag-grid-community.min.noStyle.js"></script>
     <script src="../shared/modern-navbar.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI&libraries=places"></script>
     <script src="/shared/map-icons.js"></script>
-    <!-- Google API for YouTube -->
-    <script src="https://apis.google.com/js/api.js"></script>
     <script src="/finance/js/disaster-loan-filters.js"></script>
     <script src="/finance/js/disaster-camera-filters.js"></script>
     <script src="/finance/js/hazard-webcam-viewer.js"></script>
     <script type="module" src="/shared/disaster-kml-export.js"></script>
     <script>
       let disastersGridApi = null;
-      let map, markers = [], loanMarkers = [];
+      let map, markers = [], disasterMarkerEntries = [], loanMarkers = [];
+      let activeDisasterInfoWindow = null;
+      let lastGridSelectKey = '';
+      let lastGridSelectAt = 0;
       let encompassLoansGridApi = null;
-      let youtubeAPIReady = false;
       let selectedDisaster = null;
+      let youtubeBrowserApiKey = null;
+      let youtubeBrowserApiKeyPromise = null;
       let selectedDisasterObj = null;
       let selectedDisasterRow = null;
       let selectedLoan = null;
@@ -636,6 +834,7 @@
       let lastGridRows = [];
       let lastLoadedDisasterRows = [];
       let activeHotspotKey = null;
+      let activeHotspot = null;
       let heygenStudio = null;
 
       function clearCameraMarkers() {
@@ -653,6 +852,7 @@
           DisasterCameraFilters.buildNearbyCamerasListHtml(cameras, emptyMsg)
         );
         $('#duNearbyCamerasCard').show();
+        $('#duNearbyCamerasIdle').hide();
         clearCameraMarkers();
         if (map) {
           DisasterCameraFilters.addCameraMarkersToMap(map, cameras, cameraMarkers);
@@ -790,6 +990,96 @@
         return wrap;
       }
 
+      function disasterMatchKey(r) {
+        if (!r) return '';
+        return `${r.source || ''}|${r.source_id || ''}|${r.start_time || ''}|${r.lat ?? r.latitude ?? ''}|${r.lng ?? r.longitude ?? ''}`;
+      }
+
+      function handleDisastersGridRowSelect(rowData) {
+        const obj = rowData?.disasterObj;
+        if (!obj) return;
+        const key = disasterMatchKey(obj);
+        const now = Date.now();
+        if (key === lastGridSelectKey && now - lastGridSelectAt < 250) return;
+        lastGridSelectKey = key;
+        lastGridSelectAt = now;
+        selectDisaster(null, obj);
+      }
+
+      function bindDisastersGridEvents(api, gridEl) {
+        if (!api || !gridEl) return;
+
+        const onRowSelect = (event) => {
+          if (event?.event?.target?.closest('button')) return;
+          handleDisastersGridRowSelect(event.data);
+        };
+
+        if (typeof api.addEventListener === 'function') {
+          api.addEventListener('rowClicked', onRowSelect);
+        } else if (typeof api.setGridOption === 'function') {
+          api.setGridOption('onRowClicked', onRowSelect);
+        }
+
+        gridEl.addEventListener('click', (domEvent) => {
+          if (domEvent.target.closest('button, .ag-header, .ag-floating-filter, .ag-paging-panel, .ag-header-row')) return;
+          const rowEl = domEvent.target.closest('.ag-row:not(.ag-header-row)');
+          if (!rowEl || !api) return;
+          const rowIndex = Number(rowEl.getAttribute('row-index'));
+          if (Number.isNaN(rowIndex)) return;
+          let rowNode = null;
+          if (typeof api.getDisplayedRowAtIndex === 'function') {
+            rowNode = api.getDisplayedRowAtIndex(rowIndex);
+          }
+          if (rowNode?.data?.disasterObj) {
+            handleDisastersGridRowSelect(rowNode.data);
+          }
+        });
+
+        const refreshGridLayout = () => refreshDisastersGridLayout();
+        ['collapseDisasters', 'collapseMapYouTube'].forEach((id) => {
+          document.getElementById(id)?.addEventListener('shown.bs.collapse', refreshGridLayout);
+        });
+      }
+
+      function highlightSelectedDisasterInGrid(disasterObj) {
+        if (!disastersGridApi || !disasterObj) return;
+        const key = disasterMatchKey(disasterObj);
+        if (typeof disastersGridApi.deselectAll === 'function') {
+          disastersGridApi.deselectAll();
+        }
+        disastersGridApi.forEachNode?.((node) => {
+          if (node.data?.disasterObj && disasterMatchKey(node.data.disasterObj) === key) {
+            node.setSelected?.(true);
+          }
+        });
+      }
+
+      function focusMapOnDisaster(disasterObj) {
+        if (!map || !disasterObj) return;
+        const key = disasterMatchKey(disasterObj);
+        const entry = disasterMarkerEntries.find((e) => disasterMatchKey(e.row) === key);
+        const lat = parseFloat(disasterObj.lat ?? disasterObj.latitude ?? disasterObj.avg_latitude);
+        const lng = parseFloat(disasterObj.lng ?? disasterObj.longitude ?? disasterObj.avg_longitude);
+
+        if (activeDisasterInfoWindow) {
+          activeDisasterInfoWindow.close();
+          activeDisasterInfoWindow = null;
+        }
+
+        if (entry) {
+          map.setCenter(entry.marker.getPosition());
+          map.setZoom(Math.max(map.getZoom() || 8, 10));
+          entry.info.open(map, entry.marker);
+          activeDisasterInfoWindow = entry.info;
+          return;
+        }
+
+        if (Number.isFinite(lat) && Number.isFinite(lng)) {
+          map.setCenter({ lat, lng });
+          map.setZoom(10);
+        }
+      }
+
       function buildDisasterGridRow(r, allRows, idx) {
         const eventType = String(r.event_type || '').trim();
         const source = String(r.source || '').trim().toLowerCase();
@@ -905,11 +1195,12 @@
           paginationPageSize: 25,
           paginationPageSizeSelector: [10, 25, 50, 100],
           animateRows: true,
+          rowSelection: 'single',
+          suppressRowClickSelection: false,
           getRowClass: (params) => (params.data?.rowClasses || []).join(' '),
           onRowClicked: (event) => {
             if (event.event?.target?.closest('button')) return;
-            const obj = event.data?.disasterObj;
-            if (obj) selectDisaster(null, obj);
+            handleDisastersGridRowSelect(event.data);
           },
           onCellClicked: (event) => {
             if (event.column?.getColId() !== 'actions') return;
@@ -926,6 +1217,7 @@
           new agGrid.Grid(gridEl, gridOptions);
           disastersGridApi = gridOptions.api;
         }
+        bindDisastersGridEvents(disastersGridApi, gridEl);
 
         $('#disastersQuickFilter').on('input', function () {
           const text = $(this).val();
@@ -1012,6 +1304,8 @@
           paginationPageSize: 10,
           paginationPageSizeSelector: [10, 25, 50],
           animateRows: true,
+          rowSelection: 'single',
+          suppressRowClickSelection: false,
           onRowClicked: (event) => {
             const loan = event.data?.loanObj;
             if (!loan) return;
@@ -1035,6 +1329,7 @@
           new agGrid.Grid(gridEl, gridOptions);
           encompassLoansGridApi = gridOptions.api;
         }
+        bindEncompassLoansGridEvents(encompassLoansGridApi, gridEl);
 
         $('#loansQuickFilter').on('input', function () {
           const text = $(this).val();
@@ -1054,6 +1349,7 @@
         } else if (typeof encompassLoansGridApi.setRowData === 'function') {
           encompassLoansGridApi.setRowData(rows);
         }
+        refreshEncompassLoansGridLayout();
       }
 
       function setDisastersGridRows(rows) {
@@ -1183,7 +1479,7 @@
         initDisastersGrid();
         initEncompassLoansGrid();
         initializeDuLoanFilterControls();
-        map = new google.maps.Map(document.getElementById('map'), { zoom: 4, center: {lat:39.8, lng:-98.6}, mapTypeId: 'satellite' });
+        initDisastersMap();
         syncSourceChipsFromSelect();
         $('#sourceInput').on('change', syncSourceChipsFromSelect);
         function onApplyFiltersClick() {
@@ -1195,14 +1491,330 @@
         });
         $('#refreshBtn').on('click', refreshDisasters);
         document.getElementById('refreshBtnHero')?.addEventListener('click', refreshDisasters);
-        document.getElementById('duClearHotspotFilter')?.addEventListener('click', clearHotspotGridFilter);
+        document.getElementById('duClearHotspotFilter')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearHotspotGridFilter();
+        });
+        initDuSectionCards();
+        initDuSectionPillsMenu();
+        initDuLoanPillsMenu();
 
-        loadYouTubeAPI();
         refreshSourceStatsFromApi();
+        loadYouTubeBrowserApiKey();
         loadDisasters();
         // Load all encompass loans on map on page load
         loadAllLoansOnMap();
       });
+
+      function initDisastersMap() {
+        const mapEl = document.getElementById('map');
+        if (!mapEl) return;
+
+        const bootMap = () => {
+          if (map || typeof google === 'undefined' || !google.maps?.Map) return;
+          map = new google.maps.Map(mapEl, {
+            zoom: 4,
+            center: { lat: 39.8, lng: -98.6 },
+            mapTypeId: 'satellite'
+          });
+          if (lastLoadedDisasterRows.length) {
+            renderMap(lastLoadedDisasterRows);
+          }
+          if (selectedDisasterObj) {
+            focusMapOnDisaster(selectedDisasterObj);
+          }
+        };
+
+        if (typeof google !== 'undefined' && google.maps?.Map) {
+          bootMap();
+          return;
+        }
+
+        loadYouTubeBrowserApiKey().then((apiKey) => {
+          if (!apiKey) {
+            console.warn('Google Maps API key not available');
+            return;
+          }
+          if (document.querySelector('script[data-du-google-maps]')) {
+            const wait = setInterval(() => {
+              if (typeof google !== 'undefined' && google.maps?.Map) {
+                clearInterval(wait);
+                bootMap();
+              }
+            }, 100);
+            return;
+          }
+          window.__duInitGoogleMap = bootMap;
+          const script = document.createElement('script');
+          script.dataset.duGoogleMaps = '1';
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&callback=__duInitGoogleMap`;
+          script.async = true;
+          script.defer = true;
+          document.head.appendChild(script);
+        });
+      }
+
+      function syncDuWorkflowPill(stepNum) {
+        const hint = document.getElementById('workflowHint');
+        if (!hint || !stepNum) return;
+        hint.querySelectorAll('li').forEach((li, idx) => {
+          li.classList.toggle('du-workflow-pill-active', idx + 1 === stepNum);
+        });
+      }
+
+      function initDuSectionCards() {
+        function updateDuSectionHeaderState(sectionId, expanded) {
+          const id = String(sectionId || '').replace(/^#/, '').trim();
+          const trigger = document.querySelector(
+            `[data-bs-target="#${id}"], [data-bs-target="${id}"]`
+          );
+          if (!trigger) return;
+          trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+          trigger.classList.toggle('collapsed', !expanded);
+        }
+
+        function syncDuWorkflowPillLocal(stepNum) {
+          syncDuWorkflowPill(stepNum);
+        }
+
+        document.querySelectorAll('.du-section-card-header[role="button"]').forEach((header) => {
+          header.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              header.click();
+            }
+          });
+          header.querySelectorAll('.du-section-header-action, button, a.btn').forEach((action) => {
+            action.addEventListener('click', (e) => e.stopPropagation());
+          });
+        });
+
+        ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans'].forEach((sectionId, idx) => {
+          const el = document.getElementById(sectionId);
+          if (!el) return;
+          const step = sectionId === 'collapseLoans' ? 4 : idx + 1;
+          updateDuSectionHeaderState(sectionId, el.classList.contains('show'));
+          el.addEventListener('shown.bs.collapse', () => {
+            updateDuSectionHeaderState(sectionId, true);
+            syncDuWorkflowPillLocal(step);
+            if (sectionId === 'collapseLoans') {
+              setDuSectionPillActive('collapseLoans');
+            }
+          });
+          el.addEventListener('hidden.bs.collapse', () => {
+            updateDuSectionHeaderState(sectionId, false);
+          });
+        });
+
+        syncDuWorkflowPill(1);
+      }
+
+      function setDuSectionPillActive(targetId) {
+        document.querySelectorAll('#duSectionPillsMenu .nav-link').forEach((link) => {
+          link.classList.toggle('active', link.getAttribute('data-du-section-target') === targetId);
+        });
+      }
+
+      function showDuAccordionSection(targetId, { exclusive = true } = {}) {
+        const accordionIds = ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'];
+        if (!accordionIds.includes(targetId) || typeof bootstrap === 'undefined') return;
+        accordionIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          const instance = bootstrap.Collapse.getOrCreateInstance(el, { toggle: false });
+          if (id === targetId) instance.show();
+          else if (exclusive) instance.hide();
+        });
+        const btn = document.querySelector(`[data-bs-target="#${targetId}"]`);
+        if (btn) {
+          btn.classList.toggle('collapsed', false);
+          btn.setAttribute('aria-expanded', 'true');
+        }
+      }
+
+      function revealDisasterSelectionPanels() {
+        showDuAccordionSection('collapseDisasters', { exclusive: false });
+        showDuAccordionSection('collapseMapYouTube', { exclusive: false });
+        expandDuLoansSection();
+        setDuSectionPillActive('collapseMapYouTube');
+        syncDuWorkflowPill(3);
+        setTimeout(() => {
+          refreshDisastersGridLayout();
+          refreshEncompassLoansGridLayout();
+          document.querySelector('.du-youtube-panel')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 200);
+      }
+
+      function refreshDisastersGridLayout() {
+        if (!disastersGridApi) return;
+        if (typeof disastersGridApi.sizeColumnsToFit === 'function') {
+          disastersGridApi.sizeColumnsToFit();
+        }
+        if (map && typeof google !== 'undefined' && google.maps?.event) {
+          google.maps.event.trigger(map, 'resize');
+        }
+      }
+
+      function openDuDashboardSection(targetId, stepNum) {
+        if (!targetId) return;
+        const accordionIds = ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'];
+        if (accordionIds.includes(targetId)) {
+          showDuAccordionSection(targetId, { exclusive: true });
+        }
+        if (targetId === 'collapseLoans') {
+          const el = document.getElementById('collapseLoans');
+          if (el && typeof bootstrap !== 'undefined') {
+            bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
+          }
+          document.getElementById('headingLoans')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        setDuSectionPillActive(targetId);
+        if (stepNum) syncDuWorkflowPill(Number(stepNum));
+      }
+
+      function initDuSectionPillsMenu() {
+        const menu = document.getElementById('duSectionPillsMenu');
+        if (!menu) return;
+        menu.querySelectorAll('[data-du-section-target]').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openDuDashboardSection(
+              btn.getAttribute('data-du-section-target'),
+              btn.getAttribute('data-du-section-step')
+            );
+          });
+        });
+        ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('shown.bs.collapse', () => setDuSectionPillActive(id));
+        });
+      }
+
+      function setDuLoanPanel(panel) {
+        const loansPanel = document.getElementById('duLoanPanelLoans');
+        const camerasPanel = document.getElementById('duLoanPanelCameras');
+        const isLoans = panel !== 'cameras';
+        if (loansPanel) loansPanel.hidden = !isLoans;
+        if (camerasPanel) camerasPanel.hidden = isLoans;
+        document.querySelectorAll('#duLoanPanelPills [data-du-loan-panel]').forEach((btn) => {
+          const active = btn.getAttribute('data-du-loan-panel') === (isLoans ? 'loans' : 'cameras');
+          btn.classList.toggle('active', active);
+          btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+      }
+
+      function syncDuLoanFilterPillsFromSelects() {
+        const scope = $('#duLoanScopeMode').val() || 'distance';
+        const radius = $('#duLoanRadiusMiles').val() || '50';
+        document.querySelectorAll('[data-du-loan-scope]').forEach((btn) => {
+          btn.classList.toggle('du-filter-pill-active', btn.getAttribute('data-du-loan-scope') === scope);
+        });
+        document.querySelectorAll('[data-du-loan-radius]').forEach((btn) => {
+          btn.classList.toggle('du-filter-pill-active', btn.getAttribute('data-du-loan-radius') === radius);
+        });
+        const radiusGroup = document.getElementById('duLoanRadiusPills');
+        if (radiusGroup) {
+          radiusGroup.classList.toggle('du-loan-filter-pills--disabled', scope !== 'distance');
+        }
+        const customBar = document.getElementById('duLoanRadiusCustomBar');
+        if (customBar) {
+          customBar.hidden = scope !== 'distance' || radius !== 'custom';
+        }
+      }
+
+      function initDuLoanPillsMenu() {
+        setDuLoanPanel('loans');
+        syncDuLoanFilterPillsFromSelects();
+
+        document.querySelectorAll('#duLoanPanelPills [data-du-loan-panel]').forEach((btn) => {
+          btn.addEventListener('click', () => setDuLoanPanel(btn.getAttribute('data-du-loan-panel')));
+        });
+
+        document.querySelectorAll('[data-du-loan-scope]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const scope = btn.getAttribute('data-du-loan-scope');
+            $('#duLoanScopeMode').val(scope).trigger('change');
+            syncDuLoanFilterPillsFromSelects();
+          });
+        });
+
+        document.querySelectorAll('[data-du-loan-radius]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if ($('#duLoanScopeMode').val() !== 'distance') return;
+            const radius = btn.getAttribute('data-du-loan-radius');
+            $('#duLoanRadiusMiles').val(radius).trigger('change');
+            syncDuLoanFilterPillsFromSelects();
+          });
+        });
+      }
+
+      function showMockedLoansWorkspace() {
+        $('#duMockedLoansIdle').hide();
+        $('#encompassLoansCard').show();
+        $('#duNearbyCamerasCard').show();
+        $('#duNearbyCamerasIdle').hide();
+      }
+
+      function refreshEncompassLoansGridLayout() {
+        if (!encompassLoansGridApi) return;
+        if (typeof encompassLoansGridApi.sizeColumnsToFit === 'function') {
+          encompassLoansGridApi.sizeColumnsToFit();
+        }
+        if (map && typeof google !== 'undefined' && google.maps?.event) {
+          google.maps.event.trigger(map, 'resize');
+        }
+      }
+
+      function expandDuLoansSection() {
+        showMockedLoansWorkspace();
+        setDuLoanPanel('loans');
+        const el = document.getElementById('collapseLoans');
+        if (el && typeof bootstrap !== 'undefined') {
+          bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
+        }
+        const header = document.getElementById('headingLoans');
+        if (header) {
+          header.classList.remove('collapsed');
+          header.setAttribute('aria-expanded', 'true');
+        }
+        setTimeout(refreshEncompassLoansGridLayout, 150);
+      }
+
+      function bindEncompassLoansGridEvents(api, gridEl) {
+        if (!api || !gridEl) return;
+        const onLoanRowSelect = (event) => {
+          const loan = event?.data?.loanObj;
+          if (!loan) return;
+          selectedLoan = loan;
+          cameraLoadContext = 'loan';
+          if (api.deselectAll) api.deselectAll();
+          if (event.node?.setSelected) event.node.setSelected(true);
+          loadNearbyCamerasForLoan(loan);
+          refreshAIOnSelection();
+          if (loan.latitude && loan.longitude && map) {
+            map.setCenter({ lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) });
+            map.setZoom(10);
+          }
+        };
+        if (typeof api.addEventListener === 'function') {
+          api.addEventListener('rowClicked', onLoanRowSelect);
+        }
+        gridEl.addEventListener('click', (domEvent) => {
+          if (domEvent.target.closest('button, .ag-header, .ag-floating-filter, .ag-paging-panel, .ag-header-row')) return;
+          const rowEl = domEvent.target.closest('.ag-row:not(.ag-header-row)');
+          if (!rowEl || !api) return;
+          const rowIndex = Number(rowEl.getAttribute('row-index'));
+          if (Number.isNaN(rowIndex)) return;
+          const rowNode = typeof api.getDisplayedRowAtIndex === 'function'
+            ? api.getDisplayedRowAtIndex(rowIndex)
+            : null;
+          if (rowNode?.data?.loanObj) {
+            onLoanRowSelect({ data: rowNode.data, node: rowNode });
+          }
+        });
+        document.getElementById('collapseLoans')?.addEventListener('shown.bs.collapse', refreshEncompassLoansGridLayout);
+      }
 
       function syncSourceChipsFromSelect() {
         const selected = new Set($('#sourceInput').val() || []);
@@ -1264,8 +1876,8 @@
         showLoading();
         setDashboardStatus('');
         activeHotspotKey = null;
-        const clearHotspotBtn = document.getElementById('duClearHotspotFilter');
-        if (clearHotspotBtn) clearHotspotBtn.hidden = true;
+        activeHotspot = null;
+        updateHotspotFilterUi();
         updateLoadingStatusDisaster('Loading disaster data...', 10);
 
         const { state, county, sources, events } = readDisasterFilterInputs();
@@ -1538,6 +2150,29 @@
         });
       }
 
+      function updateHotspotFilterUi() {
+        const strip = document.getElementById('duHotspotFilterStrip');
+        const labelEl = document.getElementById('duHotspotFilterLabel');
+        const badge = document.getElementById('duHotspotFilterBadge');
+        if (!activeHotspot) {
+          if (strip) strip.hidden = true;
+          if (badge) {
+            badge.hidden = true;
+            badge.textContent = '';
+          }
+          return;
+        }
+        const locationLabel = activeHotspot.county
+          ? `${activeHotspot.county}, ${activeHotspot.state}`
+          : activeHotspot.state;
+        if (labelEl) labelEl.textContent = locationLabel;
+        if (badge) {
+          badge.textContent = locationLabel;
+          badge.hidden = false;
+        }
+        if (strip) strip.hidden = false;
+      }
+
       function applyHotspotGridFilter(hotspot) {
         if (!disastersGridApi || !hotspot) return;
         const model = { state: {
@@ -1558,20 +2193,20 @@
           disastersGridApi.setGridOption('filterModel', model);
         }
         activeHotspotKey = hotspot.key;
-        const clearBtn = document.getElementById('duClearHotspotFilter');
-        if (clearBtn) clearBtn.hidden = false;
+        activeHotspot = hotspot;
+        updateHotspotFilterUi();
         renderRiskIntelligencePanel(lastGridRows);
       }
 
       function clearHotspotGridFilter() {
         activeHotspotKey = null;
+        activeHotspot = null;
+        updateHotspotFilterUi();
         if (disastersGridApi?.setFilterModel) {
           disastersGridApi.setFilterModel(null);
         } else if (disastersGridApi?.setGridOption) {
           disastersGridApi.setGridOption('filterModel', null);
         }
-        const clearBtn = document.getElementById('duClearHotspotFilter');
-        if (clearBtn) clearBtn.hidden = true;
         renderRiskIntelligencePanel(lastGridRows);
         setDashboardStatus('Location filter cleared.', 'info');
       }
@@ -1587,17 +2222,15 @@
           : hotspot.state;
         setDashboardStatus(`Filtered to ${locationLabel} — loading loans for this area.`, 'info');
 
-        const collapseLoans = document.getElementById('collapseLoans');
-        if (collapseLoans) {
-          new bootstrap.Collapse(collapseLoans, { show: true });
-        }
+        openDuDashboardSection('collapseLoans', 4);
 
         if (hotspot.topRow?.disasterObj) {
           selectDisaster(null, hotspot.topRow.disasterObj);
           return;
         }
 
-        $('#encompassLoansCard').show();
+        showMockedLoansWorkspace();
+        openDuDashboardSection('collapseLoans', 4);
         $('#duLoanScopeMode').val('county');
         syncDuLoanRadiusControls();
         loadLoansForDisaster(
@@ -1710,8 +2343,14 @@
       let cameraIndex = 0;
       
       function renderMap(rows) {
-        markers.forEach(m => m.setMap(null));
+        if (!map) return;
+        if (activeDisasterInfoWindow) {
+          activeDisasterInfoWindow.close();
+          activeDisasterInfoWindow = null;
+        }
+        markers.forEach((m) => m.setMap(null));
         markers = [];
+        disasterMarkerEntries = [];
         const bounds = new google.maps.LatLngBounds();
         let any = false;
         cameraIndex = 0; // Reset camera index
@@ -1763,12 +2402,17 @@
               content: infoContent
             });
             marker.addListener('click', () => {
+              if (activeDisasterInfoWindow) activeDisasterInfoWindow.close();
               info.open(map, marker);
+              activeDisasterInfoWindow = info;
               if (!isCameraMarker) {
                 selectDisaster([r.source, r.event_type, r.county_name, r.state_abbr, r.start_time, r.end_time, r.title], r);
               }
             });
             markers.push(marker);
+            if (!isCameraMarker) {
+              disasterMarkerEntries.push({ marker, info, row: r });
+            }
             bounds.extend(pos);
             any = true;
           }
@@ -1776,7 +2420,12 @@
             window.requestAnimationFrame(() => renderChunk(endIndex));
             return;
           }
-          if (any) map.fitBounds(bounds);
+          if (selectedDisasterObj) {
+            focusMapOnDisaster(selectedDisasterObj);
+            highlightSelectedDisasterInGrid(selectedDisasterObj);
+          } else if (any) {
+            map.fitBounds(bounds);
+          }
         }
         renderChunk(0);
       }
@@ -1785,7 +2434,7 @@
         const isDistance = $('#duLoanScopeMode').val() === 'distance';
         $('#duLoanRadiusMiles').prop('disabled', !isDistance);
         $('#duLoanRadiusCustom').prop('disabled', !isDistance);
-        DisasterLoanFilters.syncRadiusCustomVisibility('duLoanRadiusMiles', 'duLoanRadiusCustomWrap');
+        syncDuLoanFilterPillsFromSelects();
       }
 
       function applyDuLoanFilterIfReady() {
@@ -1816,10 +2465,6 @@
           applyDuLoanFilterIfReady();
           refreshNearbyCameras();
         });
-        $('#duLoanFilterApplyBtn').on('click', function () {
-          applyDuLoanFilterIfReady();
-          refreshNearbyCameras();
-        });
         $('#duLoanScopeMode').on('change', function () {
           syncDuLoanRadiusControls();
           applyDuLoanFilterIfReady();
@@ -1836,14 +2481,13 @@
         const county = disasterObj?.county_name || disasterData[2] || '';
         const riskScore = disasterObj?.risk_score || 0;
         
+        const eventType = disasterObj?.event_type || disasterData?.[1] || '';
+        
         console.log('Selecting disaster:', title, state, county, 'Risk:', riskScore);
         
         if (riskScore > 0) {
           console.log(`⚠️  Risk Score: ${riskScore.toFixed(1)}`);
         }
-        
-        $('#encompassLoansCard').show();
-        new bootstrap.Collapse(document.getElementById('collapseLoans'), { show: true });
 
         if (state) $('#stateInput').val(state);
         if (county) $('#countyInput').val(county);
@@ -1854,21 +2498,10 @@
 
         loadLoansForDisaster(disasterObj, selectedDisasterRow);
         loadNearbyCamerasForDisaster(disasterObj, selectedDisasterRow);
-        
-        // Search YouTube
-        if (title) {
-          if (disasterObj && disasterObj.lat && disasterObj.lng) {
-            searchYouTube(title, disasterObj.lat, disasterObj.lng, '50mi');
-          } else {
-            searchYouTubeForDisaster(title, state, county);
-          }
-        }
-        
-        // Focus map on disaster
-        if (disasterObj && disasterObj.lat && disasterObj.lng) {
-          map.setCenter({ lat: parseFloat(disasterObj.lat), lng: parseFloat(disasterObj.lng) });
-          map.setZoom(10);
-        }
+        searchYouTubeForDisaster(title, state, county, eventType, disasterObj);
+        revealDisasterSelectionPanels();
+        highlightSelectedDisasterInGrid(disasterObj);
+        focusMapOnDisaster(disasterObj);
         refreshAIOnSelection();
       }
 
@@ -1895,6 +2528,9 @@
       }
 
       async function loadLoansForDisaster(disasterObj, disasterData) {
+        expandDuLoansSection();
+        $('#encompassLoansSubtitle').text('Loading mocked loans near selected disaster…');
+
         const normalizedDisaster = DisasterLoanFilters.normalizeDisasterForFilters(disasterObj, disasterData);
         let mode = $('#duLoanScopeMode').val() || DisasterLoanFilters.defaultScopeMode(normalizedDisaster, disasterData);
         const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('duLoanRadiusMiles', 'duLoanRadiusCustom');
@@ -1912,6 +2548,8 @@
         });
 
         if (!built.state) {
+          setEncompassLoansGridRows([]);
+          $('#encompassLoansSubtitle').text('Selected disaster has no state — cannot match mocked loans.');
           setDashboardStatus('Selected disaster has no state — cannot load loans.', 'warning');
           return;
         }
@@ -1935,7 +2573,7 @@
             };
             let loanSub = DisasterLoanFilters.formatLoanFilterSubtitle(meta, loans.length);
             if (!loans.length) {
-              loanSub += ' — No Encompass loans in this radius/county; widen radius or verify county.';
+              loanSub += ' — No mocked loans in this radius/county; widen radius or verify county.';
             }
             $('#encompassLoansSubtitle').text(loanSub);
             lastAffectedLoans = loans;
@@ -1952,10 +2590,12 @@
           setEncompassLoansGridRows([]);
           lastAffectedLoans = [];
           lastLoanFilterMeta = null;
+          $('#encompassLoansSubtitle').text('Failed to load mocked loans — try again.');
         }
       }
 
       function populateEncompassLoansTable(loans) {
+        expandDuLoansSection();
         if (!loans || loans.length === 0) {
           setEncompassLoansGridRows([]);
           return;
@@ -1984,6 +2624,7 @@
 
       // Update map with loan markers
       function updateMapWithLoans(loans) {
+        if (!map) return;
         loanMarkers.forEach(m => m.marker && m.marker.setMap(null));
         loanMarkers = [];
         
@@ -2016,90 +2657,100 @@
         });
       }
 
-      // Load YouTube API
-      function loadYouTubeAPI() {
-        if (typeof gapi === 'undefined') {
-          setTimeout(loadYouTubeAPI, 500);
-          return;
-        }
-
-        gapi.load("client", () => {
-          gapi.client.init({
-            apiKey: "AIzaSyDwVl1Cpi3DBIBUoCnWrLuV2oOT7mbMnNI",
-            discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest"]
-          }).then(() => {
-            console.log("YouTube API loaded successfully!");
-            youtubeAPIReady = true;
-          }).catch(error => {
-            console.error("Error loading YouTube API:", error);
-            youtubeAPIReady = false;
-          });
-        });
-      }
-
-      // Search YouTube for disaster
-      function searchYouTubeForDisaster(disasterTitle, state, county) {
-        if (!youtubeAPIReady) {
-          setTimeout(() => {
-            if (youtubeAPIReady) {
-              const query = disasterTitle || `${state} ${county} disaster`;
-              searchYouTube(query);
-            }
-          }, 1000);
-          return;
-        }
-
-        const query = disasterTitle || `${state} ${county} disaster`;
-        searchYouTube(query);
-      }
-
-      // Search YouTube
-      function searchYouTube(query, lat = null, lng = null, radius = null) {
-        if (!gapi.client || !gapi.client.youtube) {
-          loadYouTubeAPI();
-          return;
-        }
-
-        let requestParams = {
-          part: "snippet",
-          q: query,
-          type: "video",
-          maxResults: 5
-        };
-
-        if (lat && lng && radius) {
-          requestParams.location = `${lat},${lng}`;
-          requestParams.locationRadius = radius;
-        }
-
-        gapi.client.youtube.search.list(requestParams)
-          .then(response => {
-            const results = response.result.items;
-            displayYouTubeResults(results);
+      function loadYouTubeBrowserApiKey() {
+        if (youtubeBrowserApiKey) return Promise.resolve(youtubeBrowserApiKey);
+        if (youtubeBrowserApiKeyPromise) return youtubeBrowserApiKeyPromise;
+        youtubeBrowserApiKeyPromise = fetch('/api/music-research/google-api-key')
+          .then((resp) => resp.json())
+          .then((data) => {
+            youtubeBrowserApiKey = data.apiKey || null;
+            return youtubeBrowserApiKey;
           })
-          .catch(error => {
-            console.error("YouTube API error:", error);
-            const youtubeResultsDiv = document.getElementById("youtubeResults");
-            if (youtubeResultsDiv) {
-              youtubeResultsDiv.innerHTML = '<div class="text-center text-danger">Error searching YouTube. Please try again.</div>';
-            }
+          .catch((err) => {
+            console.error('YouTube API key fetch failed:', err);
+            youtubeBrowserApiKey = null;
+            return null;
           });
+        return youtubeBrowserApiKeyPromise;
       }
 
-      // Display YouTube results
+      // Browser-side YouTube search (referrer-restricted key works from the page, not server-side)
+      async function searchYouTubeForDisaster(disasterTitle, state, county, eventType, disasterObj) {
+        const youtubeResultsDiv = document.getElementById('youtubeResults');
+        if (!youtubeResultsDiv) return;
+
+        const queryParts = [
+          disasterTitle,
+          county,
+          state,
+          eventType && !disasterTitle?.toLowerCase().includes(String(eventType).toLowerCase()) ? eventType : '',
+        ].filter(Boolean);
+        const query = queryParts.join(' ').trim() || `${state || ''} ${county || ''} disaster`.trim();
+        if (!query) {
+          youtubeResultsDiv.innerHTML = '<div class="text-center text-muted">No search terms for this disaster.</div>';
+          return;
+        }
+
+        youtubeResultsDiv.innerHTML = '<div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm"></div> Searching videos…</div>';
+
+        try {
+          const apiKey = await loadYouTubeBrowserApiKey();
+          if (!apiKey) throw new Error('Google browser API key not configured');
+
+          const params = new URLSearchParams({
+            part: 'snippet',
+            q: query,
+            type: 'video',
+            maxResults: '5',
+            key: apiKey,
+          });
+          const lat = disasterObj?.lat;
+          const lng = disasterObj?.lng;
+          if (lat != null && lng != null) {
+            params.set('location', `${lat},${lng}`);
+            params.set('locationRadius', '50mi');
+          }
+
+          const resp = await fetch(`https://www.googleapis.com/youtube/v3/search?${params.toString()}`);
+          const data = await resp.json();
+          if (!resp.ok) {
+            throw new Error(data.error?.message || `HTTP ${resp.status}`);
+          }
+
+          const videos = (data.items || []).map((item) => ({
+            videoId: item.id?.videoId,
+            title: item.snippet?.title,
+            description: item.snippet?.description,
+            thumbnail: item.snippet?.thumbnails?.medium?.url || item.snippet?.thumbnails?.default?.url,
+          }));
+          displayYouTubeResults(videos);
+        } catch (error) {
+          console.error('YouTube search error:', error);
+          youtubeResultsDiv.innerHTML = `<div class="text-center text-danger">Error searching YouTube: ${error.message || 'Please try again.'}</div>`;
+        }
+      }
+
       function displayYouTubeResults(videos) {
-        const youtubeResultsDiv = document.getElementById("youtubeResults");
+        const youtubeResultsDiv = document.getElementById('youtubeResults');
+        if (!youtubeResultsDiv) return;
         if (videos && videos.length > 0) {
-          youtubeResultsDiv.innerHTML = videos.map(video => `
+          youtubeResultsDiv.innerHTML = videos.slice(0, 5).map((video) => {
+            const thumb = video.thumbnail || '';
+            const title = video.title || 'Video';
+            const desc = (video.description || '').substring(0, 100);
+            const watchUrl = video.videoId
+              ? `https://www.youtube.com/watch?v=${video.videoId}`
+              : (video.url || '#');
+            return `
             <div class="card mb-2">
-              <img src="${video.snippet.thumbnails.default.url}" class="card-img-top" alt="${video.snippet.title}">
+              <img src="${thumb}" class="card-img-top" alt="${title}">
               <div class="card-body p-2">
-                <h6 class="card-title small">${video.snippet.title}</h6>
-                <p class="card-text small">${(video.snippet.description || '').substring(0, 100)}...</p>
-                <a href="https://www.youtube.com/watch?v=${video.id.videoId}" target="_blank" class="btn btn-sm btn-primary"><i class="bi-play-circle"></i> Watch</a>
+                <h6 class="card-title small">${title}</h6>
+                <p class="card-text small">${desc}${desc ? '…' : ''}</p>
+                <a href="${watchUrl}" target="_blank" rel="noopener" class="btn btn-sm btn-primary"><i class="bi-play-circle"></i> Watch</a>
               </div>
-            </div>
-          `).join('');
+            </div>`;
+          }).join('');
         } else {
           youtubeResultsDiv.innerHTML = '<div class="text-center text-muted"><i class="bi-youtube"></i><br>No videos found</div>';
         }
@@ -2224,7 +2875,7 @@
         const county = selectedDisasterObj.county_name || '';
         const loanLine = lastLoanFilterMeta
           ? DisasterLoanFilters.formatLoanFilterSubtitle(lastLoanFilterMeta, lastAffectedLoans.length)
-          : `${lastAffectedLoans.length} affected loan(s)`;
+          : `${lastAffectedLoans.length} mocked loan(s)`;
         const camLine = lastNearbyCameras.length
           ? `${lastNearbyCameras.length} fire camera(s) nearby`
           : 'No nearby cameras in range';
@@ -2243,7 +2894,7 @@
         const ready = !!selectedDisasterObj
           && window.DisasterKmlExport?.canExportCinematicKml?.({ disaster: selectedDisasterObj });
         const title = ready
-          ? `Export Google Earth KML (${lastAffectedLoans.length} loans, ${lastNearbyCameras.length} webcams)`
+          ? `Export Google Earth KML (${lastAffectedLoans.length} mocked loans, ${lastNearbyCameras.length} webcams)`
           : 'Select a disaster in the grid first';
         ['duExportCinematicKmlToolbarBtn', 'duExportCinematicKmlLoansBtn'].forEach((id) => {
           const btn = document.getElementById(id);
@@ -2535,31 +3186,65 @@
         var el = document.getElementById('disastersFooterDate');
         if (el) el.textContent = new Date().toLocaleDateString();
 
-        var sheet = document.getElementById('duSchemaSheet');
-        var tab = document.getElementById('duSchemaSheetTab');
-        var backdrop = document.getElementById('duSchemaSheetBackdrop');
-        var closeBtn = document.getElementById('duSchemaSheetClose');
-        if (!sheet || !tab) return;
+        var pullConfigs = [
+          { sheetId: 'duSchemaSheet', tabId: 'duSchemaSheetTab' },
+          { sheetId: 'duImpactGraphSheet', tabId: 'duImpactGraphSheetTab' },
+          { sheetId: 'duHeygenSheet', tabId: 'duHeygenPullCard' }
+        ];
 
-        function setSchemaSheetOpen(open) {
+        function setPullSheetOpen(sheetId, open) {
           var on = !!open;
-          sheet.classList.toggle('du-schema-sheet--open', on);
-          sheet.setAttribute('aria-hidden', on ? 'false' : 'true');
-          tab.setAttribute('aria-expanded', on ? 'true' : 'false');
-          document.body.classList.toggle('du-schema-sheet-open', on);
+          pullConfigs.forEach(function (cfg) {
+            var sheet = document.getElementById(cfg.sheetId);
+            var tab = document.getElementById(cfg.tabId);
+            if (!sheet || !tab) return;
+            var isTarget = cfg.sheetId === sheetId;
+            var isOpen = on && isTarget;
+            sheet.classList.toggle('du-schema-sheet--open', isOpen);
+            sheet.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+            tab.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+          });
+          document.body.classList.toggle('du-pull-sheet-open', on);
         }
 
-        tab.addEventListener('click', function () {
-          setSchemaSheetOpen(!sheet.classList.contains('du-schema-sheet--open'));
+        function getOpenSheetId() {
+          var open = pullConfigs.find(function (cfg) {
+            var sheet = document.getElementById(cfg.sheetId);
+            return sheet && sheet.classList.contains('du-schema-sheet--open');
+          });
+          return open ? open.sheetId : null;
+        }
+
+        pullConfigs.forEach(function (cfg) {
+          var sheet = document.getElementById(cfg.sheetId);
+          var tab = document.getElementById(cfg.tabId);
+          if (!sheet || !tab) return;
+
+          tab.addEventListener('click', function () {
+            var isOpen = sheet.classList.contains('du-schema-sheet--open');
+            setPullSheetOpen(cfg.sheetId, !isOpen);
+          });
+
+          sheet.querySelectorAll('[data-du-pull-backdrop], [data-du-pull-close]').forEach(function (el) {
+            el.addEventListener('click', function () { setPullSheetOpen(cfg.sheetId, false); });
+          });
         });
-        backdrop.addEventListener('click', function () { setSchemaSheetOpen(false); });
-        if (closeBtn) closeBtn.addEventListener('click', function () { setSchemaSheetOpen(false); });
+
         document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape' && sheet.classList.contains('du-schema-sheet--open')) setSchemaSheetOpen(false);
+          if (e.key === 'Escape' && getOpenSheetId()) setPullSheetOpen(getOpenSheetId(), false);
         });
+
+        window.duOpenPullSheet = function (sheetId) {
+          if (sheetId) setPullSheetOpen(sheetId, true);
+        };
+
+        if (location.hash === '#duHeygenStudio' || location.hash === '#duHeygenPullCard') {
+          setPullSheetOpen('duHeygenSheet', true);
+        } else if (location.hash === '#duImpactGraphSheet') {
+          setPullSheetOpen('duImpactGraphSheet', true);
+        }
       });
     </script>
-  <script src="/shared/finance-auth-guard.js"></script>
   <script src="/shared/encompass-dark-mode.js"></script>
   </body>
 </html>

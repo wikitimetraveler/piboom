@@ -676,9 +676,61 @@
   color: #f3f4f6;
 }
 .encompass-dark-mode .du-command-deck,
+.encompass-dark-mode .du-section-card,
 .encompass-dark-mode .du-page .card {
   background: #374151;
   border-color: #4b5563;
+}
+.encompass-dark-mode .du-section-card.du-command-deck {
+  background: linear-gradient(180deg, #374151 0%, #2d3748 100%);
+}
+.encompass-dark-mode .du-section-card-header {
+  background: rgba(74, 144, 164, 0.14);
+  color: #f3f4f6;
+}
+.encompass-dark-mode .du-section-card-header:hover {
+  background: rgba(74, 144, 164, 0.22);
+}
+.encompass-dark-mode .du-section-card-header[aria-expanded="true"] {
+  background: rgba(74, 144, 164, 0.18);
+  border-bottom-color: #4b5563;
+}
+.encompass-dark-mode .du-section-card-header:focus-visible {
+  box-shadow: inset 0 0 0 3px rgba(56, 189, 248, 0.45);
+}
+.encompass-dark-mode .du-section-title,
+.encompass-dark-mode .du-section-heading {
+  color: #f3f4f6;
+}
+.encompass-dark-mode .du-section-title > i {
+  color: #38bdf8;
+}
+.encompass-dark-mode .du-section-chevron {
+  color: #9ca3af;
+}
+.encompass-dark-mode .du-section-card-body {
+  color: #e5e7eb;
+}
+.encompass-dark-mode .du-section-step-pill {
+  background: #38bdf8;
+  color: #0f172a;
+}
+.encompass-dark-mode #duHotspotFilterStrip {
+  background: #1e3a5f;
+  border-color: #2563eb;
+  color: #dbeafe;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-secondary {
+  color: #dbeafe;
+  border-color: #60a5fa;
+}
+.encompass-dark-mode #duHotspotFilterStrip .btn-outline-secondary:hover {
+  background: #2563eb;
+  color: #fff;
+}
+.encompass-dark-mode .du-hotspot-filter-badge {
+  background: #2563eb !important;
+  color: #eff6ff !important;
 }
 .encompass-dark-mode .du-page .card-body {
   color: #e5e7eb;

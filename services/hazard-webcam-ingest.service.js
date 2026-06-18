@@ -1,5 +1,5 @@
 /**
- * Multi-source hazard webcam ingest (USGS NIMS, volcano, WebCOOS, UCSD, ALERTCalifornia).
+ * Multi-source hazard webcam ingest (USGS NIMS, volcano, WebCOOS, UCSD, ALERTCalifornia, ALERTWest, DOT).
  */
 import fs from 'fs';
 import path from 'path';
@@ -20,15 +20,22 @@ const AVO_VOLCANO_GEOJSON =
 export const FAA_SITES_URL = 'https://weathercams.faa.gov/api/sites';
 export const FAA_SUMMARY_URL = 'https://weathercams.faa.gov/api/summary';
 const WEBCOOS_ASSETS = 'https://app.webcoos.org/webcoos/api/v1/assets/';
+export const ALERTWEST_CAMERAS_URL = 'https://alertwest.live/api/firecams/v0/cameras';
+export const HPWREN_SITES_URL = 'https://www.hpwren.ucsd.edu/cameras/sites.js';
+export const CALTRANS_CWWP2_DISTRICTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+const NY511_CAMERAS_URL = 'https://511ny.org/api/v2/get/cameras';
 
 export const HAZARD_WEBCAM_SOURCES = [
   'alertcalifornia',
+  'alertwest',
   'usgs_nims',
   'usgs_volcano',
   'faa_weathercam',
   'webcoos',
   'ucsd_hpwren',
   'ucsd_pier',
+  'caltrans_cwwp2',
+  'dot_511ny',
 ];
 
 const FETCH_HEADERS = {
@@ -109,7 +116,242 @@ function inferHazardTypesFromText(text) {
   if (/coast|beach|tide|ocean|harbor|bay/.test(t)) tags.add('coastal');
   if (/volcano|ash|lava/.test(t)) tags.add('volcano');
   if (/fire|wildfire|burn/.test(t)) tags.add('fire');
+  if (/storm|severe|wind|blizzard|winter|fog|visibility|weather/.test(t)) tags.add('storm');
+  if (/traffic|highway|freeway|interstate|bridge|tunnel/.test(t)) tags.add('visibility');
   return Array.from(tags);
+}
+
+function inferDotHazardTypes(text) {
+  const tags = new Set(inferHazardTypesFromText(text));
+  tags.add('hazard');
+  tags.add('storm');
+  return Array.from(tags);
+}
+
+/** Non-CA US states on ALERTWest (CA covered by alertcalifornia ingest). */
+export function isAlertWestNonCaUsState(state) {
+  const st = String(state || '').toUpperCase();
+  if (!/^[A-Z]{2}$/.test(st) || st === 'CA') return false;
+  if (st === 'AB') return false;
+  return true;
+}
+
+/** @param {object} cam ALERTWest firecams API camera record */
+export function normalizeAlertWestCamera(cam) {
+  if (!cam?.name) return null;
+  const site = cam.site || {};
+  const lat = toNum(site.latitude ?? site.lat);
+  const lng = toNum(site.longitude ?? site.lng ?? site.lon);
+  const state = String(site.state || '').toUpperCase();
+  if (lat == null || lng == null || !isAlertWestNonCaUsState(state)) return null;
+
+  const imageUrl = cam.image?.url || null;
+  const county = site.county
+    ? String(site.county).replace(/\b\w/g, (c) => c.toUpperCase())
+    : null;
+  const label = String(cam.name).replace(/^Axis-/, '').replace(/_/g, ' ');
+
+  return {
+    source: 'alertwest',
+    source_id: String(cam.name),
+    name: label,
+    lat,
+    lng,
+    state_abbr: state,
+    county_name: county,
+    camera_url: `https://alertwest.live/?camera=${encodeURIComponent(cam.name)}`,
+    network_url: 'https://alertwest.live/',
+    image_url: imageUrl,
+    status: 'active',
+    hazard_types: ['fire', 'hazard'],
+    media_type: imageUrl ? 'still_image' : 'live_stream',
+    refresh_minutes: 2,
+    raw: {
+      alertwest_name: cam.name,
+      site_id: site.id || null,
+      source_key: cam.source || null,
+      attribution: 'ALERTWest / Oregon Hazards Lab partners',
+    },
+  };
+}
+
+/** Extract `var sites = { ... };` object from HPWREN sites.js. */
+export function parseHpwrenSitesJs(text) {
+  const marker = 'var sites = ';
+  const start = text.indexOf(marker);
+  if (start < 0) throw new Error('HPWREN sites.js missing sites object');
+
+  let i = start + marker.length;
+  while (text[i] === ' ') i += 1;
+  if (text[i] !== '{') throw new Error('HPWREN sites.js malformed');
+
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+  for (let end = i; end < text.length; end += 1) {
+    const ch = text[end];
+    if (inString) {
+      if (escape) escape = false;
+      else if (ch === '\\') escape = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') {
+      inString = true;
+      continue;
+    }
+    if (ch === '{') depth += 1;
+    else if (ch === '}') {
+      depth -= 1;
+      if (depth === 0) {
+        return JSON.parse(text.slice(i, end + 1));
+      }
+    }
+  }
+  throw new Error('HPWREN sites.js unterminated object');
+}
+
+/** @param {string} siteKey HPWREN site slug */
+export function normalizeHpwrenCamera(siteKey, site, camId, cam) {
+  if (!site || !cam || cam.active !== 'y') return null;
+  const lat = toNum(site.lat);
+  const lng = toNum(site.long ?? site.lng ?? site.lon);
+  if (lat == null || lng == null) return null;
+
+  const siteName = site.name || siteKey;
+  const camName = cam.name || camId;
+  const imager = cam.imager ? ` (${cam.imager})` : '';
+
+  return {
+    source: 'ucsd_hpwren',
+    source_id: `hpwren:${camId}`,
+    name: `${siteName} — ${camName}${imager}`,
+    lat,
+    lng,
+    state_abbr: 'CA',
+    county_name: null,
+    camera_url: `https://www.hpwren.ucsd.edu/cameras/?site=${encodeURIComponent(siteKey)}`,
+    network_url: 'https://www.hpwren.ucsd.edu/cameras/',
+    image_url: `https://www.hpwren.ucsd.edu/cameras/LTA/${encodeURIComponent(camId)}/large/latest.jpg`,
+    status: 'active',
+    hazard_types: ['fire', 'hazard', 'storm'],
+    media_type: 'still_image',
+    refresh_minutes: 1,
+    raw: {
+      hpwren_site: siteKey,
+      hpwren_cam_id: camId,
+      imager: cam.imager || null,
+      attribution: 'HPWREN (hpwren.ucsd.edu)',
+    },
+  };
+}
+
+export function flattenHpwrenSites(sites) {
+  const rows = [];
+  if (!sites || typeof sites !== 'object') return rows;
+  for (const [siteKey, site] of Object.entries(sites)) {
+    const cams = site?.cams;
+    if (!cams || typeof cams !== 'object') continue;
+    for (const [camId, cam] of Object.entries(cams)) {
+      const row = normalizeHpwrenCamera(siteKey, site, camId, cam);
+      if (row) rows.push(row);
+    }
+  }
+  return rows;
+}
+
+/** @param {object} entry Caltrans CWWP2 CCTV row */
+export function normalizeCaltransCctv(entry) {
+  const cctv = entry?.cctv || entry;
+  if (!cctv) return null;
+  if (String(cctv.inService || '').toLowerCase() !== 'true') return null;
+
+  const loc = cctv.location || {};
+  const lat = toNum(loc.latitude ?? loc.lat);
+  const lng = toNum(loc.longitude ?? loc.lng ?? loc.lon);
+  if (lat == null || lng == null) return null;
+
+  const district = String(loc.district || cctv.district || '').padStart(2, '0');
+  const index = String(cctv.index || loc.index || '');
+  if (!district || !index) return null;
+
+  const locationName = loc.locationName || loc.nearbyPlace || `District ${district} CCTV`;
+  const staticImg = cctv.imageData?.static || {};
+  const image_url = staticImg.currentImageURL || null;
+  const streamUrl = cctv.imageData?.streamingVideoURL || null;
+  const hazardText = `${locationName} ${loc.route || ''} ${loc.direction || ''} ${loc.county || ''}`;
+
+  return {
+    source: 'caltrans_cwwp2',
+    source_id: `d${district}:${index}`,
+    name: locationName,
+    lat,
+    lng,
+    state_abbr: 'CA',
+    county_name: loc.county || null,
+    camera_url: streamUrl || `https://cwwp2.dot.ca.gov/tools/showImages.htm`,
+    network_url: 'https://cwwp2.dot.ca.gov/documentation/cctv/cctv.htm',
+    image_url,
+    status: 'active',
+    hazard_types: inferDotHazardTypes(hazardText),
+    media_type: streamUrl ? 'live_stream' : 'still_image',
+    refresh_minutes: parseInt(staticImg.currentImageUpdateFrequency, 10) || 2,
+    raw: {
+      district,
+      route: loc.route || null,
+      direction: loc.direction || null,
+      attribution: 'Caltrans CWWP2',
+    },
+  };
+}
+
+/** @param {object} cam 511NY camera record */
+export function normalize511NyCamera(cam) {
+  if (!cam) return null;
+  const id = cam.ID ?? cam.Id ?? cam.id ?? cam.CameraID ?? cam.cameraId;
+  const lat = toNum(cam.Latitude ?? cam.latitude ?? cam.lat);
+  const lng = toNum(cam.Longitude ?? cam.longitude ?? cam.lng ?? cam.lon);
+  if (id == null || lat == null || lng == null) return null;
+
+  const name =
+    cam.Name ??
+    cam.name ??
+    cam.Location ??
+    cam.location ??
+    cam.Roadway ??
+    `NY DOT cam ${id}`;
+  const image_url =
+    cam.URL ??
+    cam.Url ??
+    cam.url ??
+    cam.ImageUrl ??
+    cam.imageUrl ??
+    cam.ViewImage ??
+    null;
+  const video_url = cam.VideoUrl ?? cam.videoUrl ?? cam.VideoURL ?? null;
+  const hazardText = `${name} ${cam.Roadway || ''} ${cam.Direction || ''}`;
+
+  return {
+    source: 'dot_511ny',
+    source_id: String(id),
+    name: String(name),
+    lat,
+    lng,
+    state_abbr: 'NY',
+    county_name: cam.County ?? cam.county ?? null,
+    camera_url: video_url || image_url || 'https://511ny.org/',
+    network_url: 'https://511ny.org/',
+    image_url,
+    status: 'active',
+    hazard_types: inferDotHazardTypes(hazardText),
+    media_type: video_url ? 'live_stream' : 'still_image',
+    refresh_minutes: 2,
+    raw: {
+      roadway: cam.Roadway ?? cam.roadway ?? null,
+      direction: cam.Direction ?? cam.direction ?? null,
+      attribution: '511NY / NYSDOT',
+    },
+  };
 }
 
 /** @param {object} cam USGS NIMS camera record */
@@ -380,7 +622,7 @@ export function normalizeSeedMount(seed, source) {
 
 function loadSeedFile() {
   const filePath = path.resolve(__dirname, '..', 'data', 'hazard-webcam-seeds.json');
-  if (!fs.existsSync(filePath)) return { ucsd_pier: [], ucsd_hpwren: [] };
+  if (!fs.existsSync(filePath)) return { ucsd_pier: [] };
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
@@ -394,6 +636,18 @@ async function fetchJson(url, options = {}) {
     throw new Error(`HTTP ${res.status} ${url}: ${text.slice(0, 200)}`);
   }
   return res.json();
+}
+
+async function fetchText(url, options = {}) {
+  const res = await fetch(url, {
+    ...options,
+    headers: { ...FETCH_HEADERS, ...(options.headers || {}) },
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    throw new Error(`HTTP ${res.status} ${url}: ${text.slice(0, 200)}`);
+  }
+  return res.text();
 }
 
 async function mapPoolLimit(items, limit, fn) {
@@ -542,7 +796,87 @@ export async function ingestWebCoosWebcams() {
   return { upserted: result.upserted || 0, fetched: list.length, normalized: batch.length };
 }
 
-export async function ingestUcsdWebcams() {
+export async function ingestAlertWestWebcams() {
+  await initFireCamerasSchema();
+  const list = await fetchJson(ALERTWEST_CAMERAS_URL);
+  const cameras = Array.isArray(list) ? list : (list.cameras || list.data || []);
+  const batch = cameras.map(normalizeAlertWestCamera).filter(Boolean);
+  const result = await upsertHazardWebcams(batch);
+  return {
+    upserted: result.upserted || 0,
+    fetched: cameras.length,
+    normalized: batch.length,
+    skippedCa: cameras.length - batch.length,
+  };
+}
+
+export async function ingestHpwrenWebcams() {
+  await initFireCamerasSchema();
+  const text = await fetchText(HPWREN_SITES_URL);
+  const sites = parseHpwrenSitesJs(text);
+  const batch = flattenHpwrenSites(sites);
+  const result = await upsertHazardWebcams(batch);
+  return {
+    upserted: result.upserted || 0,
+    fetched: batch.length,
+    normalized: batch.length,
+    sites: Object.keys(sites || {}).length,
+  };
+}
+
+export async function ingestCaltransCwwp2Webcams() {
+  await initFireCamerasSchema();
+  const batch = [];
+  let fetched = 0;
+
+  for (const district of CALTRANS_CWWP2_DISTRICTS) {
+    const d = String(district).padStart(2, '0');
+    const url = `https://cwwp2.dot.ca.gov/data/d${district}/cctv/cctvStatusD${d}.json`;
+    try {
+      const data = await fetchJson(url);
+      const rows = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+      fetched += rows.length;
+      for (const row of rows) {
+        const normalized = normalizeCaltransCctv(row);
+        if (normalized) batch.push(normalized);
+      }
+    } catch (e) {
+      console.warn(`⚠️  Caltrans district ${district} failed:`, e.message);
+    }
+  }
+
+  const result = await upsertHazardWebcams(batch);
+  return {
+    upserted: result.upserted || 0,
+    fetched,
+    normalized: batch.length,
+    districts: CALTRANS_CWWP2_DISTRICTS.length,
+  };
+}
+
+export async function ingestDot511NyWebcams() {
+  const apiKey = String(process.env.NY511_API_KEY || process.env.NY511_DEVELOPER_KEY || '').trim();
+  if (!apiKey) {
+    console.warn('⚠️  NY511_API_KEY not set; skipping 511NY ingest');
+    return { upserted: 0, skipped: true, reason: 'missing NY511_API_KEY' };
+  }
+
+  await initFireCamerasSchema();
+  const url = `${NY511_CAMERAS_URL}?key=${encodeURIComponent(apiKey)}`;
+  const data = await fetchJson(url);
+  const list = Array.isArray(data)
+    ? data
+    : (data.cameras || data.Cameras || data.results || data.data || []);
+  const batch = list.map(normalize511NyCamera).filter(Boolean);
+  const result = await upsertHazardWebcams(batch);
+  return {
+    upserted: result.upserted || 0,
+    fetched: list.length,
+    normalized: batch.length,
+  };
+}
+
+export async function ingestUcsdPierWebcams() {
   await initFireCamerasSchema();
   const seeds = loadSeedFile();
   const batch = [];
@@ -550,22 +884,25 @@ export async function ingestUcsdWebcams() {
     const n = normalizeSeedMount(row, 'ucsd_pier');
     if (n) batch.push(n);
   }
-  for (const row of seeds.ucsd_hpwren || []) {
-    const n = normalizeSeedMount(row, 'ucsd_hpwren');
-    if (n) batch.push(n);
-  }
   const result = await upsertHazardWebcams(batch);
   return { upserted: result.upserted || 0, fetched: batch.length };
 }
 
+export async function ingestUcsdWebcams() {
+  return ingestUcsdPierWebcams();
+}
+
 const INGEST_HANDLERS = {
   alertcalifornia: ingestCaFireCameras,
+  alertwest: ingestAlertWestWebcams,
   usgs_nims: ingestUsgsNimsWebcams,
   usgs_volcano: ingestUsgsVolcanoWebcams,
   faa_weathercam: ingestFaaWeatherCams,
   webcoos: ingestWebCoosWebcams,
-  ucsd_hpwren: ingestUcsdWebcams,
-  ucsd_pier: ingestUcsdWebcams,
+  ucsd_hpwren: ingestHpwrenWebcams,
+  ucsd_pier: ingestUcsdPierWebcams,
+  caltrans_cwwp2: ingestCaltransCwwp2Webcams,
+  dot_511ny: ingestDot511NyWebcams,
 };
 
 function parseSourcesArg(sources) {
@@ -594,9 +931,6 @@ export async function ingestHazardWebcams(opts = {}) {
     }
     try {
       console.log(`📹 Ingest hazard webcams: ${src}`);
-      if (src === 'ucsd_hpwren' || src === 'ucsd_pier') {
-        if (results.ucsd_hpwren || results.ucsd_pier) continue;
-      }
       results[src] = await handler();
     } catch (e) {
       console.warn(`⚠️  Ingest ${src} failed:`, e.message);

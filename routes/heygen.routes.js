@@ -10,12 +10,14 @@ import {
   getHeygenVideoStatus,
   getHeygenSchemaScript,
   getHeygenDemoScript,
-  postHeygenDisasterBriefing
+  postHeygenDisasterBriefing,
+  getHeygenLibrary
 } from '../controllers/heygen.controller.js';
 
 const router = Router();
 
 router.get('/health', getHeygenHealth);
+router.get('/library', getHeygenLibrary);
 router.get('/avatars', getHeygenAvatars);
 router.get('/voices', getHeygenVoices);
 router.get('/scripts/schema', getHeygenSchemaScript);

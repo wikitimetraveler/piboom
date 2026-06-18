@@ -64,7 +64,7 @@ Impact graph seeding adds **`NEAR`** edges (`disaster_event → loan`) from a sp
 | GET | `/cameras` | Hazard webcams (national catalog) — query: `state`, `county` (ILIKE), `source`, `hazard` (JSONB tag), `mediaType`, `limit`, `offset`; geo: `nearLat`, `nearLng`, `radiusMiles` (1–500, default 50 when geo set) — PostGIS `ST_DWithin`/KNN when available, else Haversine; nearest-first, each row includes `distance_miles` when geo is used |
 | GET | `/cameras/stats` | Counts by source + last update time |
 | GET | `/cameras/:id/snapshot` | Latest still image URL (USGS NIMS resolves via listFiles on demand) |
-| POST | `/refresh-cameras` | Ingest hazard webcams — query/body `sources=all` or comma list (`alertcalifornia`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`); requires disaster refresh access |
+| POST | `/refresh-cameras` | Ingest hazard webcams — query/body `sources=all` or comma list (`alertcalifornia`, `alertwest`, `usgs_nims`, `usgs_volcano`, `faa_weathercam`, `webcoos`, `ucsd_hpwren`, `ucsd_pier`, `caltrans_cwwp2`, `dot_511ny`); requires disaster refresh access |
 
 ### Loan Pipeline (`/api/loan-pipeline`)
 
@@ -102,6 +102,7 @@ Impact graph seeding adds **`NEAR`** edges (`disaster_event → loan`) from a sp
 - `DATABASE_URL` – PostgreSQL (disasters table, `fire_cameras` hazard webcams)
 - `MAPBOX_ACCESS_TOKEN` – Geocoding (loan addresses, disaster county/state lookup, ALERTCalifornia camera county backfill)
 - `WEBCOOS_API_TOKEN` – NOAA WebCOOS assets API (required for WebCOOS webcam ingest)
+- `NY511_API_KEY` – 511NY developer key (required for `dot_511ny` ingest)
 - `USGS_NIMS_API_KEY` – Optional USGS NIMS API key (higher rate limits if enforced)
 - `ARCGIS_API_KEY` – Optional ArcGIS key for ALERTCalifornia ingest
 - `DISASTER_REFRESH_TOKEN` – Bearer token for `POST /api/disasters/refresh-cameras` when not on localhost
@@ -113,12 +114,15 @@ Webcams are **fixed mounts** stored in Postgres `fire_cameras` (not rolling disa
 | Source | Provider | Hazard tags | Media |
 |--------|----------|-------------|-------|
 | `alertcalifornia` | ALERTCalifornia ArcGIS | fire | live / still |
+| `alertwest` | ALERTWest firecams API (non-CA US states) | fire | still_image |
 | `usgs_nims` | USGS NIMS hydrology cams | river, flood, snow, hazard | still_image |
 | `usgs_volcano` | USGS + AVO Ashcam (volcview + avo-volcview merged) | volcano | still_image |
 | `faa_weathercam` | FAA Aviation Weather Cameras (`weathercams.faa.gov/api`) | aviation, weather | still_image |
 | `webcoos` | NOAA WebCOOS | coastal | live_stream / still |
-| `ucsd_hpwren` | HPWREN curated seeds | fire, hazard | still_image |
+| `ucsd_hpwren` | HPWREN `sites.js` catalog | fire, hazard, storm | still_image |
 | `ucsd_pier` | Scripps COOL Lab pier | coastal | live_stream |
+| `caltrans_cwwp2` | Caltrans CWWP2 district CCTV JSON | storm, flood, visibility | still / live_stream |
+| `dot_511ny` | 511NY traffic cameras | storm, flood, visibility | still / live_stream |
 
 Ingest is **manual / separate cron** (heavy; can upsert 1000+ rows):
 
@@ -128,7 +132,7 @@ npm run refresh:hazard-webcams
 node scripts/refresh-hazard-webcams.js --sources=usgs_nims,alertcalifornia
 ```
 
-UCSD mounts are seeded from `data/hazard-webcam-seeds.json`. Each row stores `image_url`, `media_type`, `refresh_minutes`, and `hazard_types` for viewer refresh and future AI snapshot analysis (`nearbyCameras` in Disaster Processor Expert context).
+UCSD pier mounts are seeded from `data/hazard-webcam-seeds.json`. HPWREN mounts are loaded from `https://www.hpwren.ucsd.edu/cameras/sites.js` at ingest time. Each row stores `image_url`, `media_type`, `refresh_minutes`, and `hazard_types` for viewer refresh and future AI snapshot analysis (`nearbyCameras` in Disaster Processor Expert context).
 
 UI: [`public/finance/disasters-webcams.html`](../public/finance/disasters-webcams.html) (legacy [`disasters-ca-cameras.html`](../public/finance/disasters-ca-cameras.html) redirects with `?state=CA&hazard=fire&source=alertcalifornia`).
 

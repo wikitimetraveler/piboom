@@ -55,7 +55,8 @@ export function initDisasterHeygenStudio(options = {}) {
     progress: $('duHeygenProgress'),
     resultWrap: $('duHeygenResult'),
     resultVideo: $('duHeygenResultVideo'),
-    downloadLink: $('duHeygenDownloadLink')
+    downloadLink: $('duHeygenDownloadLink'),
+    libraryLink: $('duHeygenLibraryLink')
   };
 
   let avatars = [];
@@ -63,6 +64,7 @@ export function initDisasterHeygenStudio(options = {}) {
   let schemaPayload = null;
   let pollTimer = null;
   let activeVideoId = null;
+  let activeLibraryId = null;
 
   function getMode() {
     return els.modeBriefing?.checked ? 'briefing' : 'schema';
@@ -119,13 +121,20 @@ export function initDisasterHeygenStudio(options = {}) {
     }
   }
 
-  function showResult(videoUrl) {
+  function showResult(videoUrl, libraryId) {
     if (!els.resultWrap || !els.resultVideo) return;
     els.resultWrap.hidden = false;
     els.resultVideo.src = videoUrl;
     if (els.downloadLink) {
       els.downloadLink.href = videoUrl;
       els.downloadLink.hidden = false;
+    }
+    if (els.libraryLink) {
+      const href = libraryId
+        ? `/finance/heygen-library.html#${encodeURIComponent(libraryId)}`
+        : '/finance/heygen-library.html';
+      els.libraryLink.href = href;
+      els.libraryLink.hidden = false;
     }
   }
 
@@ -204,7 +213,7 @@ export function initDisasterHeygenStudio(options = {}) {
         if (status === 'completed' && data.videoUrl) {
           setGenerating(false);
           setStatus(els.status, 'Video ready — playing below.', 'success');
-          showResult(data.videoUrl);
+          showResult(data.videoUrl, activeLibraryId);
           activeVideoId = null;
           return;
         }
@@ -246,6 +255,8 @@ export function initDisasterHeygenStudio(options = {}) {
     clearPoll();
     if (els.resultWrap) els.resultWrap.hidden = true;
     if (els.resultVideo) els.resultVideo.removeAttribute('src');
+    if (els.libraryLink) els.libraryLink.hidden = true;
+    activeLibraryId = null;
 
     try {
       let payload;
@@ -280,6 +291,7 @@ export function initDisasterHeygenStudio(options = {}) {
       const videoId = payload.videoId || payload.data?.video_id;
       if (!videoId) throw new Error('HeyGen did not return a video id.');
       activeVideoId = videoId;
+      activeLibraryId = payload.libraryId || null;
       setStatus(els.status, `Queued video ${videoId} — waiting for HeyGen…`, 'info');
       await pollVideo(videoId);
     } catch (e) {
@@ -317,9 +329,13 @@ export function initDisasterHeygenStudio(options = {}) {
       refreshScriptPreview,
       openBriefingMode() {
         if (els.modeBriefing) els.modeBriefing.checked = true;
-        const sheet = document.getElementById('duSchemaSheet');
-        if (sheet && !sheet.classList.contains('du-schema-sheet--open')) {
-          document.getElementById('duSchemaSheetTab')?.click();
+        if (typeof window.duOpenPullSheet === 'function') {
+          window.duOpenPullSheet('duHeygenSheet');
+        } else {
+          const sheet = document.getElementById('duHeygenSheet');
+          if (sheet && !sheet.classList.contains('du-schema-sheet--open')) {
+            document.getElementById('duHeygenPullCard')?.click();
+          }
         }
         refreshScriptPreview();
         els.root?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
