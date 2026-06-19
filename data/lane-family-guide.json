@@ -1,0 +1,58 @@
+{
+  "slug": "lane-family-guide",
+  "title": "Lane Family · Quick start",
+  "kicker": "Scan · watch · explore",
+  "tagline": "Ninety seconds to Memorial, Museum, shirt QR stories, and the 1891 book plates.",
+  "landingPath": "/family/lane-family-guide.html",
+  "shortLandingPath": "/family/lane-family-guide.html?autoplay=1",
+  "publicSiteUrl": "https://www.thelanefamily.us",
+  "cardImageUrl": "/family/assets/lane-family-guide-card.png",
+  "portraitUrl": "/family/assets/DavidELane.png",
+  "tradingCard": {
+    "coverImage": "/family/assets/DavidELane.png",
+    "coverKicker": "Lane Legacy Museum",
+    "coverTitle": "How to use this site",
+    "coverDates": "Memorial · Museum · QR · Plates",
+    "coverMeta": "Site guide · scan to watch",
+    "footerTitle": "How to use this site",
+    "footerDates": "90-second tour"
+  },
+  "heygenTitle": "Lane Family — how to use this site",
+  "heygenAvatarMode": "photo",
+  "heygenMotionPrompt": "warm welcoming nod, colonial time-traveler guide speaking directly to camera",
+  "heygenExpressiveness": "low",
+  "heygenVoiceId": "828b59f834fd4c7188da322b6d9b6c75",
+  "heygenScript": "Hello. I am David Lane — your guide to this family site. Start at the Memorial wall for names and dates. Open the Museum for stories arranged by era. Scan a shirt QR code to hear an ancestor speak, or watch a HyperFrame story reel. Trading cards and the plate gallery point back to Lane Genealogies, eighteen ninety-one. Remember: Context is general history; Evidence is what the book and our records actually say. Welcome home to the Lane line.",
+  "heygenScriptShort": "Hello. I am David Lane. Memorial wall for names, Museum for stories, scan a shirt QR to hear an ancestor, plates for the eighteen ninety-one book. Context is background — Evidence is what the record says. Welcome to the Lane Family site.",
+  "steps": [
+    {
+      "n": 1,
+      "title": "Memorial wall",
+      "body": "Names, dates, and birth-era chronology — your fastest lookup.",
+      "href": "/family/lane-memorial-wall.html"
+    },
+    {
+      "n": 2,
+      "title": "Lane Museum",
+      "body": "Docent-style exhibits from colonial roots through the Gilded Age.",
+      "href": "/family/lane-museum.html"
+    },
+    {
+      "n": 3,
+      "title": "Scan a shirt QR",
+      "body": "Four-up legacy shirts open HeyGen lines or HyperFrame story reels.",
+      "href": "/family/lane-heygen-print.html"
+    },
+    {
+      "n": 4,
+      "title": "Book plates",
+      "body": "Evidence from Lane Genealogies Vol. I — cite the plate, not the vibe.",
+      "href": "/family/lane-pdf-gallery.html"
+    }
+  ],
+  "qrLandingUrl": "https://www.thelanefamily.us/family/lane-family-guide.html?autoplay=1",
+  "heygenPhotoAvatarId": "619a5cab58db423bbbecd9b03379c466",
+  "heygenVideoIdShort": "3d04fd7826004f4085a28a5779002e8c",
+  "heygenVideoUrlShort": "/family/assets/video/lane-family-guide-heygen-short.mp4",
+  "heygenVideoLocalShort": "/family/assets/video/lane-family-guide-heygen-short.mp4"
+}

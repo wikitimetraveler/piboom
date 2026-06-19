@@ -37,6 +37,9 @@
       <button type="button" class="btn btn-sm btn-outline-primary" id="lhpExportShirtPng">
         <i class="bi bi-download"></i> T-shirt PNG
       </button>
+      <button type="button" class="btn btn-sm btn-primary" id="lhpExportQuartetPng">
+        <i class="bi bi-grid-2x2"></i> 4-up shirt PNG
+      </button>
       <button type="button" class="btn btn-sm btn-outline-primary" id="lhpExportCardPng">
         <i class="bi bi-download"></i> Card PNG
       </button>
@@ -58,9 +61,22 @@
           <div class="lhp-artboard-label">Legacy poster + QR · full resolution export for t-shirt / print</div>
           <div id="lhpPosterArt" class="lhp-poster-canvas"></div>
         </section>
+        <section class="lhp-artboard mb-3" aria-label="Four-up t-shirt print art">
+          <div class="lhp-artboard-label">Boston quartet · 4 museum posters + QR (William → Sarah → Jonathan → Cornet John) — export for print shop</div>
+          <div id="lhpQuartetArt" class="lhp-quartet-canvas"></div>
+        </section>
         <section class="lhp-artboard mb-3" aria-label="T-shirt print art">
-          <div class="lhp-artboard-label">Alternate layout · portrait + HeyGen avatar slot</div>
+          <div class="lhp-artboard-label">Single subject · portrait + HeyGen avatar slot</div>
           <div id="lhpShirtArt" class="lhp-shirt-canvas"></div>
+        </section>
+        <section class="lhp-artboard mb-3" aria-label="Site quick-start share card">
+          <div class="lhp-artboard-label">Site guide card · generic trading-card cover (DavidELane) + QR · 2.5×3.5 in</div>
+          <div class="lhp-guide-card-wrap">
+            <a href="/family/assets/lane-family-guide-card.png" download="lane-family-guide-card.png" class="lhp-guide-card-link">
+              <img src="/family/assets/lane-family-guide-card.png" alt="Lane Family quick start card with QR code" class="lhp-guide-card-img" />
+            </a>
+            <p class="small text-muted mt-2 mb-0">QR opens <a href="/family/lane-family-guide.html?autoplay=1">lane-family-guide.html</a> with the HeyGen walkthrough.</p>
+          </div>
         </section>
         <section class="lhp-artboard" aria-label="Trading card">
           <div class="lhp-artboard-label">Trading card · 2.5×3.5 in</div>
@@ -72,7 +88,7 @@
         <div class="card border-0 shadow-sm mb-3">
           <div class="card-body">
             <h2 class="h6 mb-2">QR destination</h2>
-            <p class="small text-muted mb-2">Scans open the mobile HeyGen line landing page. Shirt QR uses the short popup script when <code>popupShort</code> is set.</p>
+            <p class="small text-muted mb-2">Scans open the landing page per subject: William and Cornet John → HeyGen short line; Sarah → HyperFrame reel; Jonathan → full Scientific Lane story.</p>
             <code class="small d-block text-break" id="lhpQrUrl">—</code>
             <a class="small d-inline-block mt-2" id="lhpQrPreview" href="#" target="_blank" rel="noopener">Open landing page</a>
           </div>
@@ -113,6 +129,7 @@
   <script src="/family/js/lane-site-credit.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   <script src="/shared/poster-utils.js"></script>
+  <script src="/family/js/lane-public-origin.js"></script>
   <script src="/family/js/lane-heygen-print.js"></script>
 </body>
 </html>

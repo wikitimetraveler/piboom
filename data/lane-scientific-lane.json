@@ -9,6 +9,13 @@
     "portraitUrl": "/family/assets/jonathan-homer-lane.png",
     "portraitCaption": "Jonathan Homer Lane — pencil sketch preserved with C. S. Peirce's 1878 Photometric Researches distribution list (Grupo de Estudios Peirceanos, Univ. de Navarra)."
   },
+  "hyperframeFilm": {
+    "kicker": "HyperFrame story · Scientific Lane",
+    "title": "The gaseous Sun, Patent Office years, and lunar naming",
+    "videoUrl": "/family/assets/video/lane-scientific-presentation.mp4",
+    "durationLabel": "73 seconds · narrated",
+    "posterUrl": "/family/assets/jonathan-homer-lane.png"
+  },
   "kinship": {
     "anchorPersonId": 112,
     "anchorName": "Alderman Homer R Lane",
@@ -183,9 +190,8 @@
     "museumUrl": "/family/lane-museum.html?lunar=1"
   },
   "cta": [
+    { "label": "Full HyperFrame story (73s, narrated)", "url": "/family/lane-scientific-lane.html?story=1", "icon": "bi-film" },
     { "label": "HeyGen line — hear Jonathan speak", "url": "/family/lane-heygen-line.html?person=jonathan-homer-lane", "icon": "bi-camera-reels" },
-    { "label": "Print kit (poster + QR)", "url": "/family/lane-heygen-print.html?person=jonathan-homer-lane", "icon": "bi-printer" },
-    { "label": "Watch the film (73s, narrated)", "url": "/family/assets/video/lane-scientific-presentation.mp4", "icon": "bi-film" },
     { "label": "Open in family tree", "url": "/family/genealogy.html?id=94", "icon": "bi-diagram-3" },
     { "label": "Lane Museum exhibit", "url": "/family/lane-museum.html", "icon": "bi-building" },
     { "label": "Trading card (legendary)", "url": "/family/lane-trading-cards.html", "icon": "bi-collection" },

@@ -71,6 +71,93 @@ body.lane-scientific-page {
   margin: 0 0 1.25rem;
 }
 
+.sl-panel--film {
+  border-color: rgba(142, 180, 217, 0.28);
+  background: linear-gradient(165deg, rgba(23, 27, 36, 0.98) 0%, rgba(15, 18, 24, 0.98) 100%);
+}
+
+.sl-film-meta {
+  font-size: 0.8125rem;
+  color: var(--sl-muted);
+  margin: 0 0 1rem;
+}
+
+.sl-film-wrap {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  border: 1px solid var(--sl-border);
+  background: #000;
+  margin-bottom: 0.75rem;
+}
+
+.sl-film-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.sl-film-fullscreen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid rgba(142, 180, 217, 0.45);
+  background: rgba(142, 180, 217, 0.08);
+  color: var(--sl-accent);
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sl-film-fullscreen-btn:hover {
+  background: rgba(142, 180, 217, 0.16);
+  color: #dceaf8;
+}
+
+.sl-story-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.sl-story-dialog {
+  width: min(100%, 960px);
+  background: var(--sl-surface);
+  border: 1px solid var(--sl-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.sl-story-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--sl-border);
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.sl-story-body {
+  padding: 0.75rem;
+}
+
+.sl-story-video {
+  display: block;
+  width: 100%;
+  max-height: 75vh;
+  background: #000;
+  border-radius: 0.35rem;
+}
+
 .sl-portrait {
   border: 1px solid var(--sl-border);
   border-radius: 0.5rem;

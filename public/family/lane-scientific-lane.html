@@ -30,6 +30,9 @@
     </p>
 
     <header id="slHero"></header>
+
+    <section class="sl-panel sl-panel--film" id="slHyperframeFilm" aria-labelledby="slFilmTitle" hidden></section>
+
     <p class="sl-evidence-note"><strong>Context:</strong> general history and science background. <strong>Evidence:</strong> Lane Genealogies Vol. I and graph-backed kinship in <code>laneData.json</code>.</p>
 
     <section class="sl-panel" id="slKinship" aria-labelledby="slKinshipTitle"></section>
@@ -43,6 +46,16 @@
     <div id="slError" class="sl-error small mt-2" role="alert"></div>
     <div class="text-center px-2 mt-4" data-lane-site-credit></div>
   </main>
+
+  <div class="sl-story-backdrop" id="slStoryModal" hidden role="dialog" aria-modal="true" aria-labelledby="slStoryModalTitle">
+    <div class="sl-story-dialog">
+      <div class="sl-story-head">
+        <span id="slStoryModalTitle">Scientific Lane — HyperFrame story</span>
+        <button type="button" class="btn btn-sm btn-close btn-close-white" id="slStoryModalClose" aria-label="Close"></button>
+      </div>
+      <div class="sl-story-body" id="slStoryModalBody"></div>
+    </div>
+  </div>
 
   <script src="/family/js/lane-site-credit.js"></script>
   <script src="/shared/tts.js"></script>

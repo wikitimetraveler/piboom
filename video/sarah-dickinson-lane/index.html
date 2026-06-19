@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #13151a;
+        color: #ece8df;
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+      }
+      :root {
+        --bg: #13151a;
+        --accent: #ae9a78;
+        --muted: #b6b0a5;
+        --serif: Georgia, 'Times New Roman', serif;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        background: var(--bg);
+        overflow: hidden;
+      }
+      .scene-glow {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 1100px 700px at 30% 38%,
+          rgba(174, 154, 120, 0.10),
+          rgba(19, 21, 26, 0) 70%
+        );
+        pointer-events: none;
+      }
+      .scene-content {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding: 110px 150px;
+        gap: 80px;
+      }
+      .text-col { flex: 1; min-width: 0; }
+      .kicker {
+        color: var(--accent);
+        font-size: 27px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      .rule {
+        width: 220px;
+        height: 1px;
+        background: var(--accent);
+        transform-origin: left center;
+        margin: 18px 0 28px;
+      }
+      h1.title {
+        font-family: var(--serif);
+        font-size: 92px;
+        line-height: 1.05;
+        margin-bottom: 18px;
+      }
+      .subtitle {
+        font-size: 28px;
+        color: var(--muted);
+        margin-bottom: 28px;
+      }
+      .copy {
+        font-size: 30px;
+        line-height: 1.55;
+        color: #d1ccc3;
+        max-width: 820px;
+      }
+      .plate {
+        flex: 0 0 520px;
+        margin: 0;
+      }
+      .img-frame {
+        background: #1b1e26;
+        border: 1px solid rgba(236, 232, 223, 0.14);
+        border-radius: 8px;
+        padding: 18px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+      }
+      .img-frame img {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
+      figcaption {
+        margin-top: 14px;
+        font-size: 22px;
+        color: var(--muted);
+        text-align: center;
+      }
+      .vignette {
+        position: absolute;
+        inset: 0;
+        z-index: 200;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse 1600px 1000px at 50% 50%,
+          rgba(0, 0, 0, 0) 62%,
+          rgba(0, 0, 0, 0.34) 100%
+        );
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="28"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div id="s1" class="scene clip" data-start="0" data-duration="28" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s1-kicker">Hadley frontier · Vol. I</p>
+            <div class="rule" id="s1-rule"></div>
+            <h1 class="title" id="s1-title">Sarah Dickinson<br />Lane</h1>
+            <p class="subtitle" id="s1-sub">Wife of Samuel² · Connecticut River household</p>
+            <p class="copy" id="s1-copy">
+              Lane Genealogies places Samuel Lane in Hadley with Sarah Dickinson and their children.
+              The compilation records her later hardship: widowhood, remarriage to Martin Kellogg,
+              and the 10 February 1704 French and Indian raid — taken captive to Canada with four children.
+              Most returned; one daughter remained. Family narrative from Volume One.
+            </p>
+          </div>
+          <figure class="plate" id="s1-plate">
+            <div class="img-frame">
+              <img src="assets/sarah-dickinson-lane.png" alt="Sarah Dickinson Lane portrait" data-layout-allow-overflow />
+            </div>
+            <figcaption>Portrait plate · Lane genealogy book materials</figcaption>
+          </figure>
+        </div>
+      </div>
+      <div class="vignette"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.from('#s1-kicker', { opacity: 0, letterSpacing: '0.5em', duration: 1.0, ease: 'power2.out' }, 0.4);
+      tl.from('#s1-rule', { scaleX: 0, duration: 0.8, ease: 'expo.out' }, 0.8);
+      tl.from('#s1-title', { opacity: 0, y: 46, duration: 0.9, ease: 'power3.out' }, 1.0);
+      tl.from('#s1-sub', { opacity: 0, y: 24, duration: 0.7, ease: 'power1.out' }, 1.6);
+      tl.from('#s1-copy', { opacity: 0, y: 28, duration: 0.9, ease: 'power1.out' }, 2.2);
+      tl.from('#s1-plate', { opacity: 0, x: 60, duration: 1.0, ease: 'power2.out' }, 1.4);
+      window.__timelines.main = tl;
+    </script>
+  </body>
+</html>

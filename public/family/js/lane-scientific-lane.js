@@ -23,6 +23,73 @@
     return `<a href="/family/genealogy.html?id=${encodeURIComponent(personId)}">${esc(name)}</a>`;
   }
 
+  function storyModeRequested() {
+    const q = new URLSearchParams(window.location.search);
+    return q.get('story') === '1' || q.get('story') === 'true' || q.get('reel') === '1';
+  }
+
+  function renderHyperframeFilm(film) {
+    const el = document.getElementById('slHyperframeFilm');
+    if (!el || !film?.videoUrl) return null;
+    el.hidden = false;
+    el.innerHTML = `
+      <p class="sl-kicker">${esc(film.kicker || 'HyperFrame story')}</p>
+      <h2 id="slFilmTitle">${esc(film.title || 'Scientific Lane presentation')}</h2>
+      <p class="sl-film-meta">${esc(film.durationLabel || '')}</p>
+      <div class="sl-film-wrap">
+        <video
+          class="sl-film-video"
+          id="slFilmVideo"
+          controls
+          playsinline
+          preload="metadata"
+          poster="${esc(film.posterUrl || '')}"
+          src="${esc(film.videoUrl)}"
+        ></video>
+      </div>
+      <button type="button" class="sl-film-fullscreen-btn" id="slFilmFullscreenBtn">
+        <i class="bi bi-arrows-fullscreen" aria-hidden="true"></i> Play full-screen story
+      </button>`;
+    return film;
+  }
+
+  function openStoryModal(film, autoplay) {
+    const modal = document.getElementById('slStoryModal');
+    const body = document.getElementById('slStoryModalBody');
+    const title = document.getElementById('slStoryModalTitle');
+    if (!modal || !body || !film?.videoUrl) return;
+    if (title) {
+      title.textContent = film.title || 'Scientific Lane — HyperFrame story';
+    }
+    body.innerHTML = `<video class="sl-story-video" id="slStoryVideo" controls playsinline${autoplay ? ' autoplay' : ''} preload="metadata" poster="${esc(film.posterUrl || '')}" src="${esc(film.videoUrl)}"></video>`;
+    modal.hidden = false;
+    if (autoplay) {
+      body.querySelector('#slStoryVideo')?.play?.().catch(() => {});
+    }
+  }
+
+  function closeStoryModal() {
+    const modal = document.getElementById('slStoryModal');
+    const video = document.getElementById('slStoryVideo');
+    if (video) video.pause();
+    if (modal) modal.hidden = true;
+    const body = document.getElementById('slStoryModalBody');
+    if (body) body.innerHTML = '';
+  }
+
+  function bindHyperframeFilm(film) {
+    if (!film) return;
+    document.getElementById('slFilmFullscreenBtn')?.addEventListener('click', () => openStoryModal(film, true));
+    document.getElementById('slStoryModalClose')?.addEventListener('click', closeStoryModal);
+    document.getElementById('slStoryModal')?.addEventListener('click', (e) => {
+      if (e.target?.id === 'slStoryModal') closeStoryModal();
+    });
+    if (storyModeRequested()) {
+      openStoryModal(film, true);
+      document.getElementById('slHyperframeFilm')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
   function renderHero(hero) {
     const el = document.getElementById('slHero');
     if (!el || !hero) return;
@@ -514,6 +581,8 @@
       if (!res.ok) throw new Error(`Failed to load chapter data (${res.status})`);
       const data = await res.json();
       renderHero(data.hero);
+      const film = renderHyperframeFilm(data.hyperframeFilm);
+      bindHyperframeFilm(film);
       renderKinship(data.kinship, data.hero);
       renderHomer(data.homerNameThread);
       renderEvidence(data.evidence);

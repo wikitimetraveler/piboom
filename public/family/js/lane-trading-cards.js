@@ -27,6 +27,7 @@
   });
   const VIEW_STORAGE_KEY = 'laneTradingCardsView';
   const DEFAULT_CARD_DATES = 'Unknown - Unknown';
+  const DEFAULT_PUBLIC_ORIGIN = 'https://www.thelanefamily.us';
   const state = {
     cards: [],
     filteredCards: [],
@@ -123,13 +124,17 @@
   }
 
   function getCardQrTargetUrl(card) {
+    const origin =
+      typeof window.lanePublicOrigin === 'function'
+        ? window.lanePublicOrigin()
+        : DEFAULT_PUBLIC_ORIGIN;
     if (card?.cardId) {
       return new URL(
         `/family/lane-trading-cards.html?cardId=${encodeURIComponent(String(card.cardId))}`,
-        window.location.origin
+        `${origin}/`
       ).href;
     }
-    return new URL('/family/lane-trading-cards.html', window.location.origin).href;
+    return new URL('/family/lane-trading-cards.html', `${origin}/`).href;
   }
 
   function generateTradingCardQr(url, size = 108) {

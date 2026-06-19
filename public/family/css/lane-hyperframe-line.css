@@ -1,0 +1,139 @@
+/* Lane HyperFrame line — mobile QR landing (scan shirt → watch story reel) */
+
+.lhf-page {
+  --lhf-ink: #1a1410;
+  --lhf-accent: #ae9a78;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #1b1e26 0%, #13151a 55%, #0f1115 100%);
+  color: #ece8df;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.lhf-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2.5rem;
+}
+
+.lhf-card {
+  background: #1b1e26;
+  border-radius: 16px;
+  border: 1px solid rgba(236, 232, 223, 0.12);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
+  overflow: hidden;
+}
+
+.lhf-portrait {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+  background: #111827;
+  display: block;
+}
+
+.lhf-body {
+  padding: 1rem 1.1rem 1.25rem;
+}
+
+.lhf-kicker {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--lhf-accent);
+  margin-bottom: 0.35rem;
+}
+
+.lhf-name {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin: 0 0 0.25rem;
+}
+
+.lhf-years {
+  font-size: 0.82rem;
+  color: #b6b0a5;
+  margin: 0 0 0.35rem;
+}
+
+.lhf-tagline {
+  font-size: 0.88rem;
+  color: #d1ccc3;
+  margin: 0 0 0.85rem;
+  line-height: 1.45;
+}
+
+.lhf-video {
+  width: 100%;
+  border-radius: 10px;
+  background: #000;
+  display: block;
+}
+
+.lhf-pending {
+  padding: 0.85rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(174, 154, 120, 0.35);
+  font-size: 0.88rem;
+}
+
+.lhf-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+}
+
+.lhf-links .btn {
+  font-size: 0.78rem;
+}
+
+.lhf-credits {
+  margin-top: 1.25rem;
+  text-align: center;
+}
+
+.lhf-credits-dev {
+  font-size: 0.72rem;
+  color: #8b8680;
+  margin: 0;
+}
+
+.lhf-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.lhf-popup {
+  width: min(100%, 520px);
+  background: #1b1e26;
+  border-radius: 14px;
+  border: 1px solid rgba(236, 232, 223, 0.14);
+  overflow: hidden;
+}
+
+.lhf-popup-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(236, 232, 223, 0.1);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.lhf-popup-body {
+  padding: 0.75rem;
+}
+
+.lhf-popup-body .lhf-video {
+  max-height: 70vh;
+}

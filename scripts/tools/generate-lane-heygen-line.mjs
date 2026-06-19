@@ -5,7 +5,8 @@
  * Usage:
  *   node scripts/tools/generate-lane-heygen-line.mjs --person cornet-john-lane --force
  *   node scripts/tools/generate-lane-heygen-line.mjs --person cornet-john-lane --photo
- *   node scripts/tools/generate-lane-heygen-line.mjs --person cornet-john-lane --short --force --direct --cache-local
+ *   node scripts/tools/generate-lane-heygen-line.mjs --person sarah-dickinson-lane --photo --short --force --direct --cache-local
+ *   node scripts/tools/generate-lane-heygen-line.mjs --person jonathan-homer-lane --photo --short --smoke --force --direct --cache-local
  *   node scripts/tools/generate-lane-heygen-line.mjs --person cornet-john-lane --download-local
  */
 import 'dotenv/config';
@@ -163,6 +164,9 @@ function pickVoiceForPerson(person) {
   if (argValue('--voice-id') || person.heygenVoiceId) {
     return argValue('--voice-id') || person.heygenVoiceId;
   }
+  if (person.slug === 'sarah-dickinson-lane') {
+    return '42d00d4aac5441279d8536cd6b52c53c';
+  }
   // Male English narrator default for colonial / scientific lines
   return '828b59f834fd4c7188da322b6d9b6c75';
 }
@@ -211,10 +215,15 @@ async function main() {
     return;
   }
 
-  const script = short
-    ? person.heygenScriptShort || person.heygenScript
-    : person.heygenScript;
+  const script = hasFlag('--smoke')
+    ? 'HeyGen lane test, ready to ship.'
+    : short
+      ? person.heygenScriptShort || person.heygenScript
+      : person.heygenScript;
   if (!script) throw new Error(short ? 'heygenScriptShort is missing' : 'heygenScript is missing');
+  if (hasFlag('--smoke')) {
+    console.log('Smoke test (~5s clip, uses API credits)');
+  }
 
   const usePhoto =
     hasFlag('--photo') ||

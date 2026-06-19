@@ -25,19 +25,37 @@
   }
 
   function publicOrigin() {
+    if (typeof window.lanePublicOrigin === 'function') {
+      return window.lanePublicOrigin(catalog?.brand?.publicSiteUrl);
+    }
     const base = catalog?.brand?.publicSiteUrl || DEFAULT_PUBLIC_ORIGIN;
     return String(base).replace(/\/$/, '');
   }
 
-  function lineLandingUrl(slug) {
+  function qrDestinationUrl(slug) {
     const personEntry = catalog?.people?.[slug];
+    if (personEntry?.qrLandingPath) {
+      const path = personEntry.qrLandingPath.startsWith('/')
+        ? personEntry.qrLandingPath
+        : `/${personEntry.qrLandingPath}`;
+      return new URL(path, publicOrigin()).href;
+    }
     const params = new URLSearchParams({ person: slug });
     if (personEntry?.popupShort) params.set('short', '1');
     return new URL(`/family/lane-heygen-line.html?${params}`, publicOrigin()).href;
   }
 
+  /** @deprecated use qrDestinationUrl */
+  function lineLandingUrl(slug) {
+    return qrDestinationUrl(slug);
+  }
+
   function posterSrc() {
     return person?.posterUrl || person?.portraitUrl || '';
+  }
+
+  function quartetPosterSrc(entry) {
+    return entry?.posterUrl || entry?.portraitUrl || '';
   }
 
   function generateQrNode(url, size) {
@@ -309,6 +327,9 @@
       exportArt('#lhpCardArt', `lane-heygen-card-${person.slug}.png`)
     );
     $('lhpExportQrPng')?.addEventListener('click', exportQrOnly);
+    $('lhpExportQuartetPng')?.addEventListener('click', () =>
+      exportArt('#lhpQuartetArt', 'lane-heygen-shirt-quartet-4up.png')
+    );
     $('lhpPrintBtn')?.addEventListener('click', () => window.print());
     $('lhpAvatarUpload')?.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
@@ -330,12 +351,54 @@
     });
   }
 
+  function quartetSlugs() {
+    const slugs = catalog?.shirtQuartet;
+    if (!Array.isArray(slugs) || !slugs.length) return [];
+    return slugs.filter((slug) => catalog?.people?.[slug]);
+  }
+
+  function renderQuartet() {
+    const host = $('lhpQuartetArt');
+    if (!host) return;
+    const slugs = quartetSlugs();
+    if (!slugs.length) {
+      host.innerHTML = '<p class="small text-muted mb-0">No shirt quartet configured.</p>';
+      return;
+    }
+    host.innerHTML = `<div class="lhp-quartet-grid">${slugs
+      .map((slug, index) => {
+        const p = catalog.people[slug];
+        const qrUrl = qrDestinationUrl(slug);
+        const order = index + 1;
+        return `<div class="lhp-quartet-cell" data-slug="${esc(slug)}">
+          <span class="lhp-quartet-order">${order}</span>
+          <div class="lhp-quartet-art">
+            <img src="${esc(quartetPosterSrc(p))}" alt="${esc(p.name)}" crossorigin="anonymous" />
+          </div>
+          <h3 class="lhp-quartet-name">${esc(p.name)}</h3>
+          <p class="lhp-quartet-years">${esc(p.years || '')}</p>
+          <p class="lhp-quartet-tagline">${esc(p.tagline || '')}</p>
+          <p class="lhp-quartet-bio">${esc(p.shirtBio || p.tagline || '')}</p>
+          <div class="lhp-quartet-qr" id="lhpQuartetQr-${esc(slug)}"></div>
+          <span class="lhp-quartet-scan">Scan · story ${order}/4</span>
+        </div>`;
+      })
+      .join('')}</div>`;
+    slugs.forEach((slug) => {
+      mountQr($(`lhpQuartetQr-${slug}`), qrDestinationUrl(slug), 88);
+    });
+  }
+
   function populatePersonSelect() {
     const select = $('lhpPersonSelect');
     if (!select || !catalog?.people) return;
-    const entries = Object.values(catalog.people).sort((a, b) =>
-      String(a.name || '').localeCompare(String(b.name || ''))
-    );
+    const quartet = new Set(quartetSlugs());
+    const entries = Object.values(catalog.people).sort((a, b) => {
+      const aq = quartet.has(a.slug) ? quartetSlugs().indexOf(a.slug) : 99;
+      const bq = quartet.has(b.slug) ? quartetSlugs().indexOf(b.slug) : 99;
+      if (aq !== bq) return aq - bq;
+      return String(a.name || '').localeCompare(String(b.name || ''));
+    });
     select.innerHTML = entries
       .map((p) => `<option value="${esc(p.slug)}">${esc(p.name)}</option>`)
       .join('');
@@ -361,6 +424,7 @@
       populatePersonSelect();
       const slug = $('lhpPersonSelect')?.value || 'jonathan-homer-lane';
       setActivePerson(slug);
+      renderQuartet();
       bindEvents();
     } catch (err) {
       $('lhpError').hidden = false;

@@ -189,6 +189,127 @@
   color: #f8fafc;
 }
 
+/* Four-up t-shirt grid — Boston quartet */
+.lhp-quartet-canvas {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  aspect-ratio: 1;
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 48%, #0f172a 100%);
+  border-radius: 12px;
+  padding: 3%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.lhp-quartet-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3%;
+  width: 100%;
+  height: 100%;
+}
+
+.lhp-quartet-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: center;
+  padding: 0.35rem 0.25rem 0.25rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.lhp-quartet-order {
+  position: absolute;
+  top: 0.25rem;
+  left: 0.35rem;
+  font-size: 0.55rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #a5b4fc;
+  background: rgba(79, 70, 229, 0.25);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+}
+
+.lhp-quartet-art {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lhp-quartet-art img {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: center top;
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.5));
+}
+
+.lhp-quartet-years {
+  font-size: clamp(0.48rem, 1.5vw, 0.58rem);
+  color: #c4b896;
+  margin: 0.08rem 0 0;
+  font-weight: 600;
+}
+
+.lhp-quartet-bio {
+  font-size: clamp(0.42rem, 1.4vw, 0.52rem);
+  color: rgba(248, 250, 252, 0.55);
+  margin: 0.08rem 0 0.12rem;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+.lhp-quartet-name {
+  font-family: 'Libre Baskerville', Georgia, serif;
+  font-size: clamp(0.55rem, 2.2vw, 0.72rem);
+  line-height: 1.15;
+  margin: 0.2rem 0 0;
+  color: #f8fafc;
+}
+
+.lhp-quartet-tagline {
+  font-size: clamp(0.45rem, 1.6vw, 0.55rem);
+  color: rgba(248, 250, 252, 0.65);
+  margin: 0.1rem 0 0.15rem;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lhp-quartet-qr.lhp-qr-frame canvas,
+.lhp-quartet-qr.lhp-qr-frame img {
+  width: 72px !important;
+  height: 72px !important;
+}
+
+.lhp-quartet-scan {
+  font-size: 0.48rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #a5b4fc;
+  margin-top: 0.1rem;
+}
+
 .lhp-shirt-inner {
   position: absolute;
   inset: 8%;
@@ -427,6 +548,25 @@
 .lhp-credits-line a {
   color: #4f46e5;
   font-weight: 600;
+}
+
+.lhp-guide-card-wrap {
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+.lhp-guide-card-link {
+  display: block;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 2px solid var(--lhp-gold);
+  box-shadow: 0 8px 24px rgba(26, 20, 16, 0.12);
+}
+
+.lhp-guide-card-img {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 @media print {

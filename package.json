@@ -35,6 +35,9 @@
     "strip:lane-military-engagements:write": "node scripts/tools/strip-lane-military-engagements.mjs --write",
     "export:lane-trading-cards-snapshot": "node scripts/tools/export-lane-trading-cards-snapshot.mjs",
     "generate:lane-heygen-line": "node scripts/tools/generate-lane-heygen-line.mjs",
+    "generate:lane-family-guide-card": "node scripts/tools/generate-lane-family-guide-card.mjs",
+    "generate:lane-family-guide-video": "node scripts/tools/generate-lane-family-guide-video.mjs --short --force --cache-local",
+    "smoke:heygen-lane": "node scripts/tools/generate-lane-heygen-line.mjs --person jonathan-homer-lane --photo --short --smoke --force --direct --cache-local",
     "migrate:lane-json-postgres": "node scripts/migrate-lane-json-to-postgres.mjs"
   },
   "dependencies": {
