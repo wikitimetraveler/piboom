@@ -9,6 +9,7 @@
     "publicSiteUrl": "https://www.thelanefamily.us"
   },
   "shirtDesign": {
+    "frontPanelUrl": "/family/assets/david-lane-time-traveler-front-panel.png",
     "heroName": "David Lane",
     "heroSubtitle": "TIME TRAVELER",
     "frontArtUrl": "/family/assets/david-lane-time-traveler-art.png",

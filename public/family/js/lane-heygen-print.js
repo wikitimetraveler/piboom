@@ -169,14 +169,14 @@
     </svg>`;
   }
 
-  function renderShirt() {
-    const host = $('lhpShirtArt');
-    if (!host) return;
-    const design = shirtDesign();
-    const qrUrl = shirtQrUrl();
-    host.innerHTML = `
-      <div class="lhp-tt-sheet">
-        <article class="lhp-tt-panel lhp-tt-front" aria-label="T-shirt front">
+  function renderShirtFrontPanel(design) {
+    const panelUrl = design.frontPanelUrl;
+    if (panelUrl) {
+      return `<article class="lhp-tt-panel lhp-tt-front lhp-tt-front-full" aria-label="T-shirt front">
+          <img class="lhp-tt-front-panel-img" src="${esc(panelUrl)}" alt="${esc(design.heroName || 'David Lane')} — Time Traveler shirt front" crossorigin="anonymous" />
+        </article>`;
+    }
+    return `<article class="lhp-tt-panel lhp-tt-front" aria-label="T-shirt front">
           <h1 class="lhp-tt-name">${esc(design.heroName || 'David Lane')}</h1>
           <p class="lhp-tt-sub">
             <span class="lhp-tt-flourish" aria-hidden="true"></span>
@@ -193,7 +193,17 @@
             <span class="lhp-tt-rule" aria-hidden="true"></span>
           </p>
           <div class="lhp-tt-compass">${ttCompassSvg()}</div>
-        </article>
+        </article>`;
+  }
+
+  function renderShirt() {
+    const host = $('lhpShirtArt');
+    if (!host) return;
+    const design = shirtDesign();
+    const qrUrl = shirtQrUrl();
+    host.innerHTML = `
+      <div class="lhp-tt-sheet">
+        ${renderShirtFrontPanel(design)}
         <article class="lhp-tt-panel lhp-tt-back" aria-label="T-shirt back">
           <h2 class="lhp-tt-scan">${esc(design.backHeadline || 'SCAN THE STORY')}</h2>
           <div class="lhp-tt-flourish-divider" aria-hidden="true"></div>
