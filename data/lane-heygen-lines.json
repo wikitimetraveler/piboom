@@ -9,16 +9,22 @@
     "publicSiteUrl": "https://www.thelanefamily.us"
   },
   "shirtDesign": {
-    "frontPanelUrl": "/family/assets/david-lane-time-traveler-front-panel.png",
-    "heroName": "David Lane",
+    "brandMark": "Lane Legacy",
+    "heroName": "David E Lane",
     "heroSubtitle": "TIME TRAVELER",
-    "frontArtUrl": "/family/assets/david-lane-time-traveler-art.png",
+    "frontArtUrl": "/family/assets/david-lane-time-traveler-scene.png",
+    "shirtPreviewColor": "#152238",
     "followLine": "FOLLOW MY LANE HISTORY",
     "eraLine": "COLONIAL TIMES",
+    "backKicker": "Lane Family",
     "backHeadline": "SCAN THE STORY",
-    "backFeatures": "AI History • Voice • Video • Data",
+    "backQrHint": "Scan · HeyGen guide",
+    "backFeatures": "AI History · Voice · Video · Data",
     "siteLabel": "thelanefamily.us",
-    "qrLandingPath": "/family/lane-family.html"
+    "backCreditDev": "Developed by David E Lane",
+    "backCreditAi": "AI assists from Cursor and HeyGen",
+    "qrLandingPath": "/family/lane-family-guide.html?autoplay=1",
+    "qrPopup": true
   },
   "shirtQuartet": [
     "william-e-lane-boston",

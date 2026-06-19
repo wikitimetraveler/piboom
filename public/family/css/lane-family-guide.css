@@ -178,3 +178,44 @@
   object-fit: cover;
   display: block;
 }
+
+.lfg-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1050;
+}
+
+.lfg-popup-backdrop[hidden] {
+  display: none !important;
+}
+
+.lfg-popup {
+  width: min(100%, 420px);
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.lfg-popup-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.lfg-popup-body {
+  padding: 0.75rem;
+}
+
+.lfg-popup-video {
+  border-radius: 10px;
+}

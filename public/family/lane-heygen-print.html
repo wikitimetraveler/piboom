@@ -35,13 +35,13 @@
         <i class="bi bi-download"></i> Poster + QR PNG
       </button>
       <button type="button" class="btn btn-sm btn-outline-primary" id="lhpExportShirtFrontPng">
-        <i class="bi bi-download"></i> Shirt front PNG
+        <i class="bi bi-download"></i> Print front PNG
       </button>
       <button type="button" class="btn btn-sm btn-outline-primary" id="lhpExportShirtBackPng">
-        <i class="bi bi-download"></i> Shirt back PNG
+        <i class="bi bi-download"></i> Print back PNG
       </button>
       <button type="button" class="btn btn-sm btn-primary" id="lhpExportShirtPng">
-        <i class="bi bi-download"></i> Shirt front + back PNG
+        <i class="bi bi-download"></i> Print front + back PNG
       </button>
       <button type="button" class="btn btn-sm btn-primary" id="lhpExportQuartetPng">
         <i class="bi bi-grid-2x2"></i> 4-up shirt PNG
@@ -67,10 +67,27 @@
           <div class="lhp-artboard-label">Boston quartet · 4 museum posters + QR (William → Sarah → Jonathan → Cornet John) — export for print shop</div>
           <div id="lhpQuartetArt" class="lhp-quartet-canvas"></div>
         </section>
-        <section class="lhp-artboard mb-3" aria-label="T-shirt print art">
-          <div class="lhp-artboard-label">David Lane Time Traveler · front + back (gold on black) — export PNG for print shop</div>
-          <p class="small text-muted mb-2">Reference mockup: <a href="/family/assets/david-lane-time-traveler-shirt-mockup.png" target="_blank" rel="noopener">view full mockup</a></p>
-          <div id="lhpShirtArt" class="lhp-shirt-canvas"></div>
+        <section class="lhp-artboard mb-3" aria-label="Shirt print art">
+          <div class="lhp-artboard-label">David E Lane Time Traveler · premium print art · transparent PNG · gold on navy</div>
+          <p class="small text-muted mb-2">Museum-quality layout for print shop — click previews to download front or back PNG.</p>
+          <div class="lhp-shirt-print-grid">
+            <figure class="lhp-shirt-print-figure">
+              <figcaption class="lhp-shirt-print-cap">Front</figcaption>
+              <a href="#" id="lhpShirtFrontDownload" class="lhp-shirt-print-link" download="david-lane-time-traveler-print-front.png">
+                <div class="lhp-shirt-print-frame">
+                  <div id="lhpShirtFrontMount" class="lhp-tt-preview-mount"></div>
+                </div>
+              </a>
+            </figure>
+            <figure class="lhp-shirt-print-figure">
+              <figcaption class="lhp-shirt-print-cap">Back</figcaption>
+              <a href="#" id="lhpShirtBackDownload" class="lhp-shirt-print-link" download="david-lane-time-traveler-print-back.png">
+                <div class="lhp-shirt-print-frame">
+                  <div id="lhpShirtBackMount" class="lhp-tt-preview-mount"></div>
+                </div>
+              </a>
+            </figure>
+          </div>
         </section>
         <section class="lhp-artboard mb-3" aria-label="Site quick-start share card">
           <div class="lhp-artboard-label">Site guide card · generic trading-card cover (DavidELane) + QR · 2.5×3.5 in</div>
@@ -78,7 +95,7 @@
             <a href="/family/assets/lane-family-guide-card.png" download="lane-family-guide-card.png" class="lhp-guide-card-link">
               <img src="/family/assets/lane-family-guide-card.png" alt="Lane Family quick start card with QR code" class="lhp-guide-card-img" />
             </a>
-            <p class="small text-muted mt-2 mb-0">QR opens <a href="/family/lane-family-guide.html?autoplay=1">lane-family-guide.html</a> with the HeyGen walkthrough.</p>
+            <p class="small text-muted mt-2 mb-0">QR opens HeyGen popup at <a href="/family/lane-family-guide.html?autoplay=1">lane-family-guide.html?autoplay=1</a>.</p>
           </div>
         </section>
         <section class="lhp-artboard" aria-label="Trading card">
@@ -110,7 +127,7 @@
           <div class="card-body">
             <h2 class="h6 mb-2">Print shop notes</h2>
             <ul class="lhp-spec-list small">
-              <li><strong>Time Traveler shirt:</strong> export front, back, or combined sheet — gold on black, QR scans to the Lane Family hub. Back QR target: minimum 2.5 in square at final print size.</li>
+              <li><strong>Time Traveler shirt:</strong> transparent PNG — gold ink on navy tee. Back QR opens HeyGen popup (<code>lane-family-guide.html?autoplay=1</code>). Back QR target: minimum 2.5 in square at final print size.</li>
               <li><strong>Poster + QR:</strong> use the primary export — your Lane Legacy Museum infographic with QR bottom-right.</li>
               <li><strong>Card:</strong> 2.5×3.5 in cardstock; QR must scan at arm's length.</li>
               <li><strong>300 DPI:</strong> use exported PNGs (2× scale ≈ 144 DPI screen → ask shop to upsample if needed).</li>
@@ -131,6 +148,7 @@
 
   <script src="/family/js/lane-site-credit.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="/shared/poster-utils.js"></script>
   <script src="/family/js/lane-public-origin.js"></script>
   <script src="/family/js/lane-heygen-print.js"></script>

@@ -17,6 +17,21 @@
       .replace(/"/g, '&quot;');
   }
 
+  function isAutoplayQr() {
+    return new URLSearchParams(window.location.search).get('autoplay') === '1';
+  }
+
+  function showPopup(title, innerHtml) {
+    $('lfgPopupTitle').textContent = title;
+    $('lfgPopupBody').innerHTML = innerHtml;
+    $('lfgPopup').hidden = false;
+  }
+
+  function hidePopup() {
+    $('lfgPopup').hidden = true;
+    $('lfgPopupBody').innerHTML = '';
+  }
+
   async function resolveVideoUrl(guide) {
     const local = guide.heygenVideoLocalShort || guide.heygenVideoLocal;
     if (local) return local;
@@ -72,12 +87,15 @@
       const videoUrl = await resolveVideoUrl(guide);
       const video = $('lfgVideo');
       const wrap = $('lfgVideoWrap');
+      const popupTitle = guide.heygenTitle || guide.title || 'David Lane · HeyGen';
       if (videoUrl && video && wrap) {
         video.src = videoUrl;
         wrap.hidden = false;
-        if (new URLSearchParams(window.location.search).get('autoplay') === '1') {
-          video.autoplay = true;
-          video.play().catch(() => {});
+        if (isAutoplayQr()) {
+          showPopup(
+            popupTitle,
+            `<video class="lfg-video lfg-popup-video" controls playsinline autoplay preload="metadata" src="${esc(videoUrl)}"></video>`
+          );
         }
       }
 
@@ -94,6 +112,11 @@
     } catch (err) {
       $('lfgTagline').textContent = err.message || 'Could not load guide.';
     }
+
+    $('lfgPopupClose')?.addEventListener('click', hidePopup);
+    $('lfgPopup')?.addEventListener('click', (e) => {
+      if (e.target === $('lfgPopup')) hidePopup();
+    });
   }
 
   document.addEventListener('DOMContentLoaded', init);

@@ -6,10 +6,17 @@
   const DATA_URL = '/data/lane-heygen-lines.json';
   const DEFAULT_PUBLIC_ORIGIN = 'https://www.thelanefamily.us';
   const QR_SIZE_POSTER = 104;
-  const QR_SIZE_TT_BACK = 188;
+  const QR_SIZE_TT_BACK = 176;
   const QR_SIZE_CARD = 88;
+  const SHIRT_PANEL_W = 360;
+  const SHIRT_PANEL_H = 500;
+  const SHIRT_EXPORT_SCALE = 4;
+  const TT_GOLD = '#c9a961';
+  const TT_GOLD_LIGHT = '#e8d5a8';
+  const TT_GOLD_DIM = '#a8894a';
   let catalog = null;
   let person = null;
+  let shirtPreviewUrls = { front: '', back: '', sheet: '' };
 
   function $(id) {
     return document.getElementById(id);
@@ -152,7 +159,7 @@
 
   function shirtQrUrl() {
     const design = shirtDesign();
-    const path = design.qrLandingPath || '/family/lane-family.html';
+    const path = design.qrLandingPath || '/family/lane-family-guide.html?autoplay=1';
     if (typeof window.lanePublicUrl === 'function') {
       return window.lanePublicUrl(path, catalog?.brand?.publicSiteUrl);
     }
@@ -162,29 +169,27 @@
 
   function ttCompassSvg() {
     return `<svg class="lhp-tt-compass-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-      <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="2"/>
-      <polygon points="32,8 36,32 32,28 28,32" fill="currentColor"/>
-      <polygon points="32,56 36,32 32,36 28,32" fill="currentColor" opacity="0.45"/>
-      <circle cx="32" cy="32" r="3" fill="currentColor"/>
+      <circle cx="32" cy="32" r="29" fill="none" stroke="currentColor" stroke-width="1.25" opacity="0.55"/>
+      <circle cx="32" cy="32" r="24" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <polygon points="32,6 35,32 32,27 29,32" fill="currentColor"/>
+      <polygon points="32,58 35,32 32,37 29,32" fill="currentColor" opacity="0.5"/>
+      <text x="32" y="13" text-anchor="middle" font-size="6" font-family="Georgia,serif" fill="currentColor">N</text>
+      <circle cx="32" cy="32" r="2.5" fill="currentColor"/>
     </svg>`;
   }
 
   function renderShirtFrontPanel(design) {
-    const panelUrl = design.frontPanelUrl;
-    if (panelUrl) {
-      return `<article class="lhp-tt-panel lhp-tt-front lhp-tt-front-full" aria-label="T-shirt front">
-          <img class="lhp-tt-front-panel-img" src="${esc(panelUrl)}" alt="${esc(design.heroName || 'David Lane')} — Time Traveler shirt front" crossorigin="anonymous" />
-        </article>`;
-    }
-    return `<article class="lhp-tt-panel lhp-tt-front" aria-label="T-shirt front">
-          <h1 class="lhp-tt-name">${esc(design.heroName || 'David Lane')}</h1>
+    return `<article class="lhp-tt-panel lhp-tt-front" aria-label="Shirt front print art">
+          <p class="lhp-tt-brand-mark">${esc(design.brandMark || 'Lane Legacy')}</p>
+          <h1 class="lhp-tt-name">${esc(design.heroName || 'David E Lane')}</h1>
+          <div class="lhp-tt-title-rule" aria-hidden="true"></div>
           <p class="lhp-tt-sub">
             <span class="lhp-tt-flourish" aria-hidden="true"></span>
             ${esc(design.heroSubtitle || 'TIME TRAVELER')}
             <span class="lhp-tt-flourish" aria-hidden="true"></span>
           </p>
           <div class="lhp-tt-art-frame">
-            <img src="${esc(design.frontArtUrl || '/family/assets/david-lane-time-traveler-art.png')}" alt="${esc(design.heroName || 'David Lane')} — colonial time traveler portrait" crossorigin="anonymous" />
+            <img src="${esc(design.frontArtUrl || '/family/assets/david-lane-time-traveler-scene.png')}" alt="${esc(design.heroName || 'David E Lane')} — colonial time traveler scene" crossorigin="anonymous" />
           </div>
           <p class="lhp-tt-follow">${esc(design.followLine || 'FOLLOW MY LANE HISTORY')}</p>
           <p class="lhp-tt-era">
@@ -196,23 +201,312 @@
         </article>`;
   }
 
+  function shirtBackCredits(design) {
+    const dev = design.backCreditDev || 'Developed by David E Lane';
+    const ai = design.backCreditAi || 'AI assists from Cursor and HeyGen';
+    return { dev, ai };
+  }
+
+  function renderShirtBackPanelHtml(design, credits) {
+    return `<article class="lhp-tt-panel lhp-tt-back" aria-label="Shirt back print art">
+          <p class="lhp-tt-back-kicker">${esc(design.backKicker || 'Lane Family')}</p>
+          <h2 class="lhp-tt-scan">${esc(design.backHeadline || 'SCAN THE STORY')}</h2>
+          <div class="lhp-tt-title-rule lhp-tt-title-rule--back" aria-hidden="true"></div>
+          <div class="lhp-tt-qr" id="lhpShirtQr"></div>
+          <p class="lhp-tt-qr-hint">${esc(design.backQrHint || 'Scan · HeyGen guide')}</p>
+          <p class="lhp-tt-features">${esc(design.backFeatures || 'AI History · Voice · Video · Data')}</p>
+          <p class="lhp-tt-site">${esc(design.siteLabel || 'thelanefamily.us')}</p>
+          <div class="lhp-tt-credits-rule" aria-hidden="true"></div>
+          <div class="lhp-tt-credits" aria-label="Credits">
+            <p class="lhp-tt-credit-line">${esc(credits.dev)}</p>
+            <p class="lhp-tt-credit-line lhp-tt-credit-line--ai">${esc(credits.ai)}</p>
+          </div>
+        </article>`;
+  }
+
+  async function ensureShirtFonts() {
+    if (!document.fonts?.load) return;
+    await Promise.all([
+      document.fonts.load('700 28px "Libre Baskerville"'),
+      document.fonts.load('700 17px "Libre Baskerville"'),
+      document.fonts.load('600 9px Inter'),
+      document.fonts.load('600 7px Inter'),
+    ]).catch(() => {});
+  }
+
+  function createShirtCanvas(w, h, scale) {
+    const canvas = document.createElement('canvas');
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    ctx.scale(scale, scale);
+    return { canvas, ctx };
+  }
+
+  function drawCenteredText(ctx, text, x, y, font, color) {
+    ctx.font = font;
+    ctx.fillStyle = color;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(text, x, y);
+  }
+
+  function drawCenterLine(ctx, cx, y, width, color) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - width / 2, y);
+    ctx.lineTo(cx + width / 2, y);
+    ctx.stroke();
+  }
+
+  function drawArtFrame(ctx, x, y, w, h) {
+    ctx.strokeStyle = TT_GOLD;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, w, h);
+    ctx.strokeStyle = TT_GOLD_LIGHT;
+    const o = 7;
+    ctx.beginPath();
+    ctx.moveTo(x, y + o);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x + o, y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x + w - o, y + h);
+    ctx.lineTo(x + w, y + h);
+    ctx.lineTo(x + w, y + h - o);
+    ctx.stroke();
+  }
+
+  async function composeShirtFrontCanvas(design) {
+    await ensureShirtFonts();
+    const W = SHIRT_PANEL_W;
+    const H = SHIRT_PANEL_H;
+    const { canvas, ctx } = createShirtCanvas(W, H, SHIRT_EXPORT_SCALE);
+    const cx = W / 2;
+
+    drawCenteredText(
+      ctx,
+      String(design.brandMark || 'Lane Legacy').toUpperCase(),
+      cx,
+      22,
+      '600 9px Inter, system-ui, sans-serif',
+      TT_GOLD_LIGHT
+    );
+    drawCenteredText(
+      ctx,
+      design.heroName || 'David E Lane',
+      cx,
+      44,
+      '700 28px "Libre Baskerville", Georgia, serif',
+      TT_GOLD_LIGHT
+    );
+    drawCenterLine(ctx, cx, 78, 150, TT_GOLD);
+    drawCenteredText(
+      ctx,
+      String(design.heroSubtitle || 'TIME TRAVELER').toUpperCase(),
+      cx,
+      90,
+      '700 11px "Libre Baskerville", Georgia, serif',
+      TT_GOLD
+    );
+
+    const frameX = 38;
+    const frameY = 112;
+    const frameW = 284;
+    const frameH = 240;
+    drawArtFrame(ctx, frameX, frameY, frameW, frameH);
+    try {
+      const img = await loadImage(design.frontArtUrl || '/family/assets/david-lane-time-traveler-scene.png');
+      ctx.drawImage(img, frameX + 5, frameY + 5, frameW - 10, frameH - 10);
+    } catch (_) {
+      /* scene optional */
+    }
+
+    drawCenteredText(
+      ctx,
+      String(design.followLine || 'FOLLOW MY LANE HISTORY').toUpperCase(),
+      cx,
+      368,
+      '700 10px "Libre Baskerville", Georgia, serif',
+      TT_GOLD_LIGHT
+    );
+    drawCenterLine(ctx, cx - 52, 396, 36, TT_GOLD_DIM);
+    drawCenteredText(
+      ctx,
+      String(design.eraLine || 'COLONIAL TIMES').toUpperCase(),
+      cx,
+      388,
+      '700 9px "Libre Baskerville", Georgia, serif',
+      TT_GOLD_DIM
+    );
+    drawCenterLine(ctx, cx + 52, 396, 36, TT_GOLD_DIM);
+
+    return canvas;
+  }
+
+  async function composeShirtBackCanvas(design, qrUrl) {
+    await ensureShirtFonts();
+    const credits = shirtBackCredits(design);
+    const W = SHIRT_PANEL_W;
+    const H = SHIRT_PANEL_H;
+    const { canvas, ctx } = createShirtCanvas(W, H, SHIRT_EXPORT_SCALE);
+    const cx = W / 2;
+
+    drawCenteredText(
+      ctx,
+      String(design.backKicker || 'Lane Family').toUpperCase(),
+      cx,
+      24,
+      '600 9px Inter, system-ui, sans-serif',
+      TT_GOLD_LIGHT
+    );
+    drawCenteredText(
+      ctx,
+      String(design.backHeadline || 'SCAN THE STORY').toUpperCase(),
+      cx,
+      46,
+      '700 17px "Libre Baskerville", Georgia, serif',
+      TT_GOLD_LIGHT
+    );
+    drawCenterLine(ctx, cx, 74, 120, TT_GOLD);
+
+    const qrSize = QR_SIZE_TT_BACK;
+    const qrPad = 11;
+    const box = qrSize + qrPad * 2;
+    const qx = cx - box / 2;
+    const qy = 88;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(qx, qy, box, box);
+    ctx.strokeStyle = TT_GOLD;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(qx + 1.5, qy + 1.5, box - 3, box - 3);
+
+    const qrNode = generateQrNode(qrUrl, qrSize);
+    const qrCanvas = qrNode?.querySelector('canvas');
+    if (qrCanvas && qrCanvas.width > 0 && qrCanvas.height > 0) {
+      ctx.drawImage(qrCanvas, qx + qrPad, qy + qrPad, qrSize, qrSize);
+    }
+
+    let y = qy + box + 14;
+    drawCenteredText(
+      ctx,
+      String(design.backQrHint || 'Scan · HeyGen guide').toUpperCase(),
+      cx,
+      y,
+      '700 8px Inter, system-ui, sans-serif',
+      TT_GOLD_LIGHT
+    );
+    y += 18;
+    drawCenteredText(
+      ctx,
+      design.backFeatures || 'AI History · Voice · Video · Data',
+      cx,
+      y,
+      '600 9px Inter, system-ui, sans-serif',
+      TT_GOLD
+    );
+    y += 22;
+    drawCenteredText(
+      ctx,
+      design.siteLabel || 'thelanefamily.us',
+      cx,
+      y,
+      '700 14px "Libre Baskerville", Georgia, serif',
+      TT_GOLD_LIGHT
+    );
+    y += 28;
+    drawCenterLine(ctx, cx, y, 110, TT_GOLD_DIM);
+    y += 10;
+    drawCenteredText(ctx, credits.dev.toUpperCase(), cx, y, '600 7px Inter, system-ui, sans-serif', TT_GOLD_DIM);
+    y += 12;
+    drawCenteredText(ctx, credits.ai.toUpperCase(), cx, y, '600 7px Inter, system-ui, sans-serif', TT_GOLD_DIM);
+
+    return canvas;
+  }
+
+  async function composeShirtSheetCanvas(design, qrUrl) {
+    const front = await composeShirtFrontCanvas(design);
+    const back = await composeShirtBackCanvas(design, qrUrl);
+    const scale = SHIRT_EXPORT_SCALE;
+    const sheet = document.createElement('canvas');
+    sheet.width = SHIRT_PANEL_W * 2 * scale;
+    sheet.height = SHIRT_PANEL_H * scale;
+    const ctx = sheet.getContext('2d');
+    ctx.drawImage(front, 0, 0);
+    ctx.drawImage(back, SHIRT_PANEL_W * scale, 0);
+    return sheet;
+  }
+
   function renderShirt() {
-    const host = $('lhpShirtArt');
-    if (!host) return;
+    const frontMount = $('lhpShirtFrontMount');
+    const backMount = $('lhpShirtBackMount');
+    if (!frontMount || !backMount) return;
     const design = shirtDesign();
     const qrUrl = shirtQrUrl();
-    host.innerHTML = `
-      <div class="lhp-tt-sheet">
-        ${renderShirtFrontPanel(design)}
-        <article class="lhp-tt-panel lhp-tt-back" aria-label="T-shirt back">
-          <h2 class="lhp-tt-scan">${esc(design.backHeadline || 'SCAN THE STORY')}</h2>
-          <div class="lhp-tt-flourish-divider" aria-hidden="true"></div>
-          <div class="lhp-tt-qr" id="lhpShirtQr"></div>
-          <p class="lhp-tt-features">${esc(design.backFeatures || 'AI History • Voice • Video • Data')}</p>
-          <p class="lhp-tt-site">${esc(design.siteLabel || 'thelanefamily.us')}</p>
-        </article>
-      </div>`;
+    const credits = shirtBackCredits(design);
+    frontMount.innerHTML = renderShirtFrontPanel(design);
+    backMount.innerHTML = renderShirtBackPanelHtml(design, credits);
     mountQr($('lhpShirtQr'), qrUrl, QR_SIZE_TT_BACK);
+    const previewColor = design.shirtPreviewColor || '#152238';
+    document.documentElement.style.setProperty('--lhp-shirt-preview', previewColor);
+    refreshShirtPreviews();
+  }
+
+  async function refreshShirtPreviews() {
+    if (!window.posterUtils) return;
+    const design = shirtDesign();
+    const qrUrl = shirtQrUrl();
+    try {
+      const frontCanvas = await composeShirtFrontCanvas(design);
+      const backCanvas = await composeShirtBackCanvas(design, qrUrl);
+      const sheetCanvas = await composeShirtSheetCanvas(design, qrUrl);
+
+      shirtPreviewUrls.front = window.posterUtils.canvasToDataUrl(frontCanvas);
+      shirtPreviewUrls.back = window.posterUtils.canvasToDataUrl(backCanvas);
+      shirtPreviewUrls.sheet = window.posterUtils.canvasToDataUrl(sheetCanvas);
+
+      const frontLink = $('lhpShirtFrontDownload');
+      const backLink = $('lhpShirtBackDownload');
+      if (frontLink) frontLink.href = shirtPreviewUrls.front;
+      if (backLink) backLink.href = shirtPreviewUrls.back;
+
+      $('lhpError').hidden = true;
+    } catch (err) {
+      $('lhpError').hidden = false;
+      $('lhpError').textContent = err.message || 'Could not render shirt print previews.';
+    }
+  }
+
+  function downloadShirtPreview(kind, filename) {
+    const dataUrl = shirtPreviewUrls[kind];
+    if (!dataUrl || !window.posterUtils) {
+      refreshShirtPreviews().then(() => {
+        const retry = shirtPreviewUrls[kind];
+        if (retry) window.posterUtils.downloadDataUrl(retry, filename);
+      });
+      return;
+    }
+    window.posterUtils.downloadDataUrl(dataUrl, filename);
+  }
+
+  async function exportArt(selector, filename, options = {}) {
+    const el = document.querySelector(selector);
+    if (!el || !window.posterUtils) {
+      $('lhpError').hidden = false;
+      $('lhpError').textContent = 'Export utilities not loaded.';
+      return;
+    }
+    try {
+      const scale = options.scale || 2;
+      const renderOpts = { scale };
+      if (options.backgroundColor !== undefined) renderOpts.backgroundColor = options.backgroundColor;
+      const canvas = await window.posterUtils.renderPosterCanvas(el, renderOpts);
+      window.posterUtils.downloadDataUrl(window.posterUtils.canvasToDataUrl(canvas), filename);
+    } catch (err) {
+      $('lhpError').hidden = false;
+      $('lhpError').textContent = err.message || 'Export failed.';
+    }
   }
 
   function renderCard() {
@@ -324,23 +618,6 @@
     }
   }
 
-  async function exportArt(selector, filename, options = {}) {
-    const el = document.querySelector(selector);
-    if (!el || !window.posterUtils) {
-      $('lhpError').hidden = false;
-      $('lhpError').textContent = 'Export utilities not loaded.';
-      return;
-    }
-    try {
-      const scale = options.scale || 2;
-      const canvas = await window.posterUtils.renderPosterCanvas(el, { scale, backgroundColor: null });
-      window.posterUtils.downloadDataUrl(window.posterUtils.canvasToDataUrl(canvas), filename);
-    } catch (err) {
-      $('lhpError').hidden = false;
-      $('lhpError').textContent = err.message || 'Export failed.';
-    }
-  }
-
   function exportQrCanvas(qrCanvas, size = 512) {
     const quiet = Math.round(size * 0.12);
     const border = Math.max(6, Math.round(size * 0.015));
@@ -374,13 +651,13 @@
   function bindEvents() {
     $('lhpExportPosterPng')?.addEventListener('click', exportPosterWithQr);
     $('lhpExportShirtPng')?.addEventListener('click', () =>
-      exportArt('.lhp-tt-sheet', 'david-lane-time-traveler-shirt-sheet.png', { scale: 3, backgroundColor: '#000000' })
+      downloadShirtPreview('sheet', 'david-lane-time-traveler-print-sheet.png')
     );
     $('lhpExportShirtFrontPng')?.addEventListener('click', () =>
-      exportArt('.lhp-tt-front', 'david-lane-time-traveler-shirt-front.png', { scale: 3, backgroundColor: '#000000' })
+      downloadShirtPreview('front', 'david-lane-time-traveler-print-front.png')
     );
     $('lhpExportShirtBackPng')?.addEventListener('click', () =>
-      exportArt('.lhp-tt-back', 'david-lane-time-traveler-shirt-back.png', { scale: 3, backgroundColor: '#000000' })
+      downloadShirtPreview('back', 'david-lane-time-traveler-print-back.png')
     );
     $('lhpExportCardPng')?.addEventListener('click', () =>
       exportArt('#lhpCardArt', `lane-heygen-card-${person.slug}.png`)

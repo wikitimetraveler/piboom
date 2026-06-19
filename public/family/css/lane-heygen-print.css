@@ -177,152 +177,243 @@
   color: #4f46e5;
 }
 
-/* David Lane Time Traveler t-shirt — front + back on black */
-.lhp-shirt-canvas {
-  width: 100%;
-  max-width: 720px;
+/* David Lane Time Traveler — premium print art */
+.lhp-shirt-print-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  max-width: 760px;
   margin: 0 auto;
-  background: #050505;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+.lhp-shirt-print-figure {
+  margin: 0;
+  text-align: center;
+}
+
+.lhp-shirt-print-cap {
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.lhp-shirt-print-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.lhp-shirt-print-link:hover .lhp-shirt-print-frame {
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.28);
+}
+
+.lhp-shirt-print-frame {
+  background: var(--lhp-shirt-preview, #152238);
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.2);
+  line-height: 0;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.lhp-shirt-print-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.lhp-tt-preview-mount {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+.lhp-tt-preview-mount .lhp-tt-panel {
+  min-height: 420px;
+  width: 100%;
+}
+
+.lhp-tt-preview-mount .lhp-tt-title-rule,
+.lhp-tt-preview-mount .lhp-tt-credits-rule,
+.lhp-tt-preview-mount .lhp-tt-rule {
+  background: var(--lhp-tt-gold-dim);
 }
 
 .lhp-tt-sheet {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
-  min-height: 420px;
+  min-height: 480px;
 }
 
 .lhp-tt-panel {
-  --lhp-tt-gold: #c9a227;
-  background: #000;
+  --lhp-tt-gold: #c9a961;
+  --lhp-tt-gold-light: #e8d5a8;
+  --lhp-tt-gold-dim: rgba(201, 169, 97, 0.72);
+  background: transparent;
   color: var(--lhp-tt-gold);
-  font-family: 'Libre Baskerville', Georgia, serif;
+  font-family: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1.35rem 1rem 1.1rem;
-  min-height: 420px;
+  padding: 1.5rem 1.15rem 1.25rem;
+  min-height: 480px;
 }
 
-.lhp-tt-front-full {
-  padding: 0;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.lhp-tt-front-panel-img {
-  width: 100%;
-  height: 100%;
-  min-height: 420px;
-  object-fit: contain;
-  object-position: center top;
-  display: block;
+.lhp-tt-brand-mark,
+.lhp-tt-back-kicker {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: clamp(0.46rem, 1.3vw, 0.54rem);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--lhp-tt-gold-light);
+  margin: 0 0 0.5rem;
+  opacity: 0.92;
 }
 
 .lhp-tt-name {
-  font-size: clamp(1.35rem, 3.8vw, 1.85rem);
+  font-size: clamp(1.45rem, 4vw, 2rem);
   font-weight: 700;
-  letter-spacing: 0.04em;
-  margin: 0 0 0.35rem;
-  line-height: 1.05;
-  color: var(--lhp-tt-gold);
+  letter-spacing: 0.06em;
+  margin: 0 0 0.4rem;
+  line-height: 1.02;
+  color: var(--lhp-tt-gold-light);
+}
+
+.lhp-tt-title-rule {
+  width: min(72%, 9.5rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lhp-tt-gold) 18%, var(--lhp-tt-gold-light) 50%, var(--lhp-tt-gold) 82%, transparent);
+  margin: 0 0 0.55rem;
+  opacity: 0.9;
+}
+
+.lhp-tt-title-rule--back {
+  width: min(58%, 7.5rem);
+  margin-bottom: 0.75rem;
 }
 
 .lhp-tt-sub {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  font-size: clamp(0.62rem, 1.8vw, 0.78rem);
-  letter-spacing: 0.22em;
+  gap: 0.55rem;
+  font-size: clamp(0.58rem, 1.65vw, 0.72rem);
+  letter-spacing: 0.26em;
   font-weight: 700;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.85rem;
   color: var(--lhp-tt-gold);
 }
 
 .lhp-tt-flourish {
   display: inline-block;
-  width: 1.1rem;
-  height: 0.55rem;
-  border-top: 1px solid var(--lhp-tt-gold);
-  border-bottom: 1px solid var(--lhp-tt-gold);
-  opacity: 0.85;
+  width: 1.25rem;
+  height: 0.45rem;
+  border-top: 1px solid var(--lhp-tt-gold-dim);
+  opacity: 0.95;
 }
 
 .lhp-tt-art-frame {
-  width: min(88%, 260px);
-  aspect-ratio: 312 / 248;
-  padding: 5px;
-  border: 2px solid var(--lhp-tt-gold);
-  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.35);
-  margin-bottom: 0.75rem;
-  background: #0a0a0a;
+  position: relative;
+  width: min(90%, 268px);
+  aspect-ratio: 4 / 5;
+  padding: 7px;
+  border: 1px solid var(--lhp-tt-gold);
+  outline: 1px solid rgba(232, 213, 168, 0.35);
+  outline-offset: 3px;
+  margin-bottom: 0.85rem;
+  background: transparent;
   line-height: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.lhp-tt-art-frame::before,
+.lhp-tt-art-frame::after {
+  content: '';
+  position: absolute;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-color: var(--lhp-tt-gold-light);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.lhp-tt-art-frame::before {
+  top: 3px;
+  left: 3px;
+  border-width: 1px 0 0 1px;
+}
+
+.lhp-tt-art-frame::after {
+  bottom: 3px;
+  right: 3px;
+  border-width: 0 1px 1px 0;
 }
 
 .lhp-tt-art-frame img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: center;
+  object-fit: cover;
+  object-position: center 12%;
   display: block;
 }
 
 .lhp-tt-follow {
-  font-size: clamp(0.58rem, 1.7vw, 0.72rem);
-  letter-spacing: 0.14em;
+  font-size: clamp(0.54rem, 1.55vw, 0.66rem);
+  letter-spacing: 0.18em;
   font-weight: 700;
-  margin: 0 0 0.45rem;
+  margin: 0 0 0.4rem;
+  color: var(--lhp-tt-gold-light);
 }
 
 .lhp-tt-era {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  font-size: clamp(0.52rem, 1.5vw, 0.64rem);
-  letter-spacing: 0.18em;
+  gap: 0.55rem;
+  font-size: clamp(0.48rem, 1.4vw, 0.58rem);
+  letter-spacing: 0.22em;
   font-weight: 700;
-  margin: 0 0 0.55rem;
+  margin: 0 0 0.65rem;
+  color: var(--lhp-tt-gold-dim);
 }
 
 .lhp-tt-rule {
   display: inline-block;
-  width: 1.75rem;
+  width: 2rem;
   height: 1px;
-  background: var(--lhp-tt-gold);
-  opacity: 0.75;
+  background: linear-gradient(90deg, transparent, var(--lhp-tt-gold-dim));
+  opacity: 0.85;
+}
+
+.lhp-tt-era .lhp-tt-rule:last-child {
+  background: linear-gradient(90deg, var(--lhp-tt-gold-dim), transparent);
 }
 
 .lhp-tt-compass {
   margin-top: auto;
   color: var(--lhp-tt-gold);
+  opacity: 0.88;
 }
 
 .lhp-tt-compass-icon {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.5rem;
+  height: 1.5rem;
   display: block;
 }
 
 .lhp-tt-scan {
-  font-size: clamp(0.95rem, 2.8vw, 1.2rem);
-  letter-spacing: 0.16em;
+  font-size: clamp(0.88rem, 2.5vw, 1.08rem);
+  letter-spacing: 0.2em;
   font-weight: 700;
-  margin: 0.35rem 0 0.55rem;
-}
-
-.lhp-tt-flourish-divider {
-  width: 2.5rem;
-  height: 0.65rem;
-  border-top: 1px solid var(--lhp-tt-gold);
-  border-bottom: 1px solid var(--lhp-tt-gold);
-  margin-bottom: 0.85rem;
-  opacity: 0.85;
+  margin: 0 0 0.35rem;
+  color: var(--lhp-tt-gold-light);
 }
 
 .lhp-tt-back {
@@ -331,36 +422,84 @@
 
 .lhp-tt-qr.lhp-qr-frame {
   background: #fff;
-  padding: 10px;
-  border: 3px solid #fff;
-  outline: 2px solid var(--lhp-tt-gold);
-  outline-offset: 3px;
-  border-radius: 4px;
-  margin: 0.25rem 0 0.85rem;
+  padding: 11px;
+  border: none;
+  outline: none;
+  border-radius: 6px;
+  margin: 0 0 0.45rem;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.95),
+    0 0 0 3px var(--lhp-tt-gold),
+    0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .lhp-tt-qr.lhp-qr-frame canvas,
 .lhp-tt-qr.lhp-qr-frame img {
-  width: 188px !important;
-  height: 188px !important;
+  width: 176px !important;
+  height: 176px !important;
+}
+
+.lhp-tt-qr-hint {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: clamp(0.44rem, 1.25vw, 0.52rem);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 0 0 0.55rem;
+  color: var(--lhp-tt-gold-light);
 }
 
 .lhp-tt-features {
-  font-size: clamp(0.58rem, 1.6vw, 0.72rem);
-  letter-spacing: 0.08em;
-  font-weight: 700;
-  margin: 0 0 0.65rem;
-  line-height: 1.35;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: clamp(0.5rem, 1.45vw, 0.62rem);
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  margin: 0 0 0.55rem;
+  line-height: 1.5;
+  color: var(--lhp-tt-gold);
 }
 
 .lhp-tt-site {
-  font-size: clamp(0.72rem, 2vw, 0.92rem);
-  letter-spacing: 0.06em;
+  font-size: clamp(0.68rem, 1.9vw, 0.84rem);
+  letter-spacing: 0.1em;
   font-weight: 700;
-  margin: auto 0 0.35rem;
+  margin: 0 0 0.65rem;
+  color: var(--lhp-tt-gold-light);
+}
+
+.lhp-tt-credits-rule {
+  width: min(68%, 8.5rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--lhp-tt-gold-dim) 50%, transparent);
+  margin: auto 0 0.45rem;
+  opacity: 0.75;
+}
+
+.lhp-tt-credits {
+  padding-bottom: 0.15rem;
+}
+
+.lhp-tt-credit-line {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: clamp(0.38rem, 1.1vw, 0.46rem);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  line-height: 1.55;
+  margin: 0;
+  color: var(--lhp-tt-gold-dim);
+}
+
+.lhp-tt-credit-line--ai {
+  letter-spacing: 0.11em;
+  opacity: 0.88;
 }
 
 @media (max-width: 640px) {
+  .lhp-shirt-print-grid {
+    grid-template-columns: 1fr;
+  }
+
   .lhp-tt-sheet {
     grid-template-columns: 1fr;
   }

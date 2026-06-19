@@ -7,7 +7,7 @@ async function renderPosterCanvas(element, options = {}) {
     throw new Error('html2canvas is not available');
   }
   const scale = options.scale || 2;
-  const backgroundColor = options.backgroundColor || '#ffffff';
+  const backgroundColor = options.backgroundColor !== undefined ? options.backgroundColor : '#ffffff';
   return window.html2canvas(element, {
     scale,
     backgroundColor,
