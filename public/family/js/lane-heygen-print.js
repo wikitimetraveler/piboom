@@ -28,8 +28,7 @@
     if (typeof window.lanePublicOrigin === 'function') {
       return window.lanePublicOrigin(catalog?.brand?.publicSiteUrl);
     }
-    const base = catalog?.brand?.publicSiteUrl || DEFAULT_PUBLIC_ORIGIN;
-    return String(base).replace(/\/$/, '');
+    return DEFAULT_PUBLIC_ORIGIN;
   }
 
   function qrDestinationUrl(slug) {
@@ -38,11 +37,18 @@
       const path = personEntry.qrLandingPath.startsWith('/')
         ? personEntry.qrLandingPath
         : `/${personEntry.qrLandingPath}`;
-      return new URL(path, publicOrigin()).href;
+      if (typeof window.lanePublicUrl === 'function') {
+        return window.lanePublicUrl(path, catalog?.brand?.publicSiteUrl);
+      }
+      return new URL(path, `${publicOrigin()}/`).href;
     }
     const params = new URLSearchParams({ person: slug });
     if (personEntry?.popupShort) params.set('short', '1');
-    return new URL(`/family/lane-heygen-line.html?${params}`, publicOrigin()).href;
+    const path = `/family/lane-heygen-line.html?${params}`;
+    if (typeof window.lanePublicUrl === 'function') {
+      return window.lanePublicUrl(path, catalog?.brand?.publicSiteUrl);
+    }
+    return new URL(path, `${publicOrigin()}/`).href;
   }
 
   /** @deprecated use qrDestinationUrl */

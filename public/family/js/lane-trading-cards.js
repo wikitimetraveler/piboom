@@ -124,17 +124,11 @@
   }
 
   function getCardQrTargetUrl(card) {
-    const origin =
-      typeof window.lanePublicOrigin === 'function'
-        ? window.lanePublicOrigin()
-        : DEFAULT_PUBLIC_ORIGIN;
-    if (card?.cardId) {
-      return new URL(
-        `/family/lane-trading-cards.html?cardId=${encodeURIComponent(String(card.cardId))}`,
-        `${origin}/`
-      ).href;
-    }
-    return new URL('/family/lane-trading-cards.html', `${origin}/`).href;
+    const path = card?.cardId
+      ? `/family/lane-trading-cards.html?cardId=${encodeURIComponent(String(card.cardId))}`
+      : '/family/lane-trading-cards.html';
+    if (typeof window.lanePublicUrl === 'function') return window.lanePublicUrl(path);
+    return new URL(path, `${DEFAULT_PUBLIC_ORIGIN}/`).href;
   }
 
   function generateTradingCardQr(url, size = 108) {

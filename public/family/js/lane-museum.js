@@ -203,20 +203,24 @@ function getFeaturedMainMedia(cms, featuredStory) {
 }
 
 function getMuseumQrTargetUrl(poster) {
-  if (!poster) return window.location.href;
+  function pub(path) {
+    if (typeof window.lanePublicUrl === 'function') return window.lanePublicUrl(path);
+    return new URL(path, 'https://www.thelanefamily.us/').href;
+  }
+  if (!poster) return pub('/family/lane-museum.html');
   if (poster.kind === 'prominent') {
     const entry = poster.prominentEntry || {};
     const person = entry.person || {};
     const pid = person.id != null ? person.id : entry.personId;
     if (pid != null) {
-      return new URL(`/family/lane-memorial-wall.html?personId=${encodeURIComponent(String(pid))}`, window.location.origin).href;
+      return pub(`/family/lane-memorial-wall.html?personId=${encodeURIComponent(String(pid))}`);
     }
   }
   if (poster.kind === 'lunar') {
     const lunar = cachedLunarExhibit || {};
-    return resolveQuickMapHref(lunar) || window.location.href;
+    return resolveQuickMapHref(lunar) || pub('/family/lane-museum.html');
   }
-  return `${window.location.origin}/family/lane-museum.html#museumFeaturedPanel`;
+  return pub('/family/lane-museum.html#museumFeaturedPanel');
 }
 
 function buildMuseumTemplateData(poster) {
@@ -525,7 +529,10 @@ async function shareMuseumPoster() {
     const dataUrl = window.posterUtils.canvasToDataUrl(canvas);
     const title = currentMuseumPoster.shareTitle || 'Lane Legacy Museum';
     const shareData = await window.posterUtils.uploadPosterShare(dataUrl, title, 'museum');
-    const shareUrl = new URL(shareData.shareUrl, window.location.origin).toString();
+    const shareUrl =
+      typeof window.lanePublicUrl === 'function'
+        ? window.lanePublicUrl(shareData.shareUrl)
+        : new URL(shareData.shareUrl, 'https://www.thelanefamily.us/').toString();
     const linkEl = document.getElementById('museumPosterShareLink');
     if (linkEl) linkEl.value = shareUrl;
     const slug = (currentMuseumPoster.fileSlug || 'exhibit').replace(/[^a-z0-9-]+/gi, '-');

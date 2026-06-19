@@ -25,8 +25,8 @@ const FOOTER_H = 112;
 const INNER_W = CARD_W - PAD * 2;
 const ART_H = CARD_H - PAD * 2 - FOOTER_H - 12;
 
-function publicOrigin(guide) {
-  return String(guide?.publicSiteUrl || 'https://www.thelanefamily.us').replace(/\/$/, '');
+function publicOrigin() {
+  return 'https://www.thelanefamily.us';
 }
 
 function xmlEscape(value) {
@@ -150,7 +150,7 @@ async function main() {
 
   const landing = new URL(
     guide.shortLandingPath || `${guide.landingPath}?autoplay=1`,
-    `${publicOrigin(guide)}/`
+    `${publicOrigin()}/`
   ).href;
   const cardOut = path.join(PUBLIC_ASSETS, 'lane-family-guide-card.png');
 
