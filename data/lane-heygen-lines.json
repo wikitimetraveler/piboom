@@ -8,6 +8,17 @@
     "attributionShort": "HeyGen",
     "publicSiteUrl": "https://www.thelanefamily.us"
   },
+  "shirtDesign": {
+    "heroName": "David Lane",
+    "heroSubtitle": "TIME TRAVELER",
+    "frontArtUrl": "/family/assets/david-lane-time-traveler-art.png",
+    "followLine": "FOLLOW MY LANE HISTORY",
+    "eraLine": "COLONIAL TIMES",
+    "backHeadline": "SCAN THE STORY",
+    "backFeatures": "AI History • Voice • Video • Data",
+    "siteLabel": "thelanefamily.us",
+    "qrLandingPath": "/family/lane-family.html"
+  },
   "shirtQuartet": [
     "william-e-lane-boston",
     "sarah-dickinson-lane",
@@ -23,6 +34,7 @@
       "shirtBio": "Freeman 1657 · Mary (Kelway) & Mary (Brewer) · Samuel toward Hadley",
       "portraitUrl": "/family/assets/william-e-lane-boston.png",
       "posterUrl": "/family/assets/william-e-lane-boston.png",
+      "portraitPrompt": "1650s Massachusetts Bay cordwainer: brown doublet, white falling-band collar, holding a leather shoe. Headwear: dark knitted Monmouth cap (rounded wool, visible knit texture, brimless workingman's cap) — not a beret, not a tricorn, not a pilgrim hat. Typography for t-shirt print: same text sizes as layout; pure black body copy on 95% cream panels; extra-bold navy section headers; bold serif footer (no script); maximum contrast, no thin hairlines.",
       "chapterUrl": "/family/lane-museum.html",
       "chapterLinkLabel": "Lane Museum · opening exhibit",
       "cardTier": "Legendary",
@@ -36,8 +48,8 @@
       "heygenScript": "Hello. I am William Lane — the Boston line begins with me. Freeman of Massachusetts Bay in sixteen fifty-seven, cordwainer in the town records, husband of Mary and father of Samuel who carried our name toward Hadley and Hampton. You are standing at the root of the Lane family tree. Open the museum from the link below to walk forward through centuries.",
       "heygenScriptShort": "Hello. I am William Lane of Boston — the root of the Lane line. Freeman sixteen fifty-seven. Scan the museum link below to continue the chronology. Thank you for visiting.",
       "popupShort": true,
-      "heygenPhotoAvatarId": "cfaefdbd439d47c4b30312d05cb296fe",
-      "heygenVideoIdShort": "7c0e987ddc434199a62c60a67353f5db",
+      "heygenPhotoAvatarId": "bf58845b438644feb1ab1484f15576d1",
+      "heygenVideoIdShort": "732c94a93f444b449f52c04e13445225",
       "heygenVideoUrlShort": "/family/assets/video/william-e-lane-boston-heygen-short.mp4",
       "heygenVideoLocalShort": "/family/assets/video/william-e-lane-boston-heygen-short.mp4"
     },

@@ -32,7 +32,8 @@
     <script type="module" src="../shared/disaster-mood-music.js"></script>
     <script type="module" src="../shared/ai-chat-widget.js"></script>
     <script type="module" src="../shared/ai-insights-card.js"></script>
-  </head>
+    <link rel="stylesheet" href="/finance/css/disaster-ai-scan-card.css" />
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   <body class="du-page">
     <script src="/finance/js/disaster-heygen-popup.js"></script>
     <div id="roadRunnerLoading" aria-live="polite" aria-busy="true">
@@ -70,19 +71,28 @@
             <p class="du-hero-kicker mb-1">90-day window · Multi-source hazard intelligence</p>
             <h1 class="mb-0"><i class="bi-shield-exclamation me-2"></i>Unified Disasters</h1>
             <ul class="du-workflow-pills" id="workflowHint" aria-label="Workflow steps">
-              <li><span class="step-num">1</span> Enable sources</li>
-              <li><span class="step-num">2</span> Review hotspots</li>
-              <li><span class="step-num">3</span> Select event</li>
-              <li><span class="step-num">4</span> Loans &amp; cameras</li>
-              <li><span class="step-num">5</span> KML or AI expert</li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseCommandDeck" data-du-section-step="1"><span class="step-num">1</span> Enable sources</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseRiskIntel" data-du-section-step="2"><span class="step-num">2</span> Review hotspots</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseDisasters" data-du-section-step="3"><span class="step-num">3</span> Select event</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseLoans" data-du-section-step="4"><span class="step-num">4</span> Loans &amp; cameras</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duBottomDock" data-du-section-step="5"><span class="step-num">5</span> KML or AI expert</button></li>
             </ul>
           </div>
           <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
             <a class="btn btn-light btn-sm" href="/finance/index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Hazard Webcams</a>
             <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html"><i class="bi-diagram-3"></i> Impact Graph</a>
-            <button type="button" class="btn btn-warning btn-sm" id="refreshBtnHero"><i class="bi-arrow-repeat"></i> Refresh</button>
+            <button type="button" class="btn btn-outline-light btn-sm" id="duDailyBriefingListenBtn" title="Spoken daily US hazard briefing via Google TTS">
+              <i class="bi bi-volume-up"></i> Listen briefing
+            </button>
+            <button type="button" class="btn btn-outline-light btn-sm" id="duDailyBriefingStopBtn" hidden title="Stop spoken briefing">
+              <i class="bi bi-stop-fill"></i> Stop
+            </button>
+            <button type="button" class="btn btn-warning btn-sm" id="refreshBtnHero" title="Fetch FEMA, FIRMS, USGS, NWS, NHC live APIs and upsert into Postgres (1–3 min)">
+              <i class="bi bi-cloud-download"></i> Pull all sources
+            </button>
           </div>
+          <p class="du-daily-briefing-status small text-white-50 mb-0 mt-2" id="duDailyBriefingStatus" role="status" aria-live="polite"></p>
         </div>
         <div class="row g-3 du-stats-row" id="statsRow">
           <div class="col-md-3 col-6">
@@ -128,6 +138,58 @@
     <div class="container-xxl du-main py-2">
       <div id="dashboardStatusBanner" class="alert alert-warning dashboard-status-banner mb-2" role="alert"></div>
       <div id="sourceHealthLine" class="mb-2" aria-live="polite"></div>
+
+      <nav class="du-section-pills-menu du-section-pills-menu--sticky mb-3" id="duSectionPillsMenu" aria-label="Dashboard sections">
+        <span class="du-section-pills-label">Sections</span>
+        <ul class="nav nav-pills flex-wrap gap-1">
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-du-section-target="collapseCommandDeck" data-du-section-step="1">
+              <i class="bi bi-sliders me-1"></i>Sources
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-du-section-target="collapseRiskIntel" data-du-section-step="2">
+              <i class="bi bi-speedometer2 me-1"></i>Risk intel
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-du-section-target="collapseFilters" data-du-section-step="3">
+              <i class="bi bi-funnel me-1"></i>Filters
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link active" data-du-section-target="collapseDisasters" data-du-section-step="3">
+              <i class="bi bi-shield-exclamation me-1"></i>Disasters
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-du-section-target="collapseMapYouTube" data-du-section-step="3">
+              <i class="bi bi-geo-alt me-1"></i>Map &amp; videos
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-du-section-target="collapseLoans" data-du-section-step="4">
+              <i class="bi bi-bank me-1"></i>Mocked loans
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="card du-web-crawl-panel mb-3" id="duWebCrawlPanel" aria-label="Live web hazard headlines">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+          <div>
+            <strong class="small"><i class="bi bi-newspaper me-1" aria-hidden="true"></i>Web hazard headlines</strong>
+            <span class="du-web-crawl-status small text-muted d-block" id="duWebCrawlStatus" role="status" aria-live="polite">Loading crawl…</span>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-secondary" id="duWebCrawlRefreshBtn" title="Refresh RSS, Atom, and GDELT headlines">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Refresh crawl
+          </button>
+        </div>
+        <div class="card-body py-2">
+          <ul class="du-crawl-headline-list list-unstyled mb-0" id="duWebCrawlList"></ul>
+        </div>
+      </div>
+
       <div id="aiInsightsContainer" class="mb-3">
         <div id="aiInsightsIdle" class="card border bg-light shadow-sm mb-0">
           <div class="card-body py-2 small text-muted mb-0">
@@ -157,7 +219,10 @@
           <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
         </div>
         <div id="collapseCommandDeck" class="collapse show du-section-card-body" aria-labelledby="headingCommandDeck">
-          <p class="small text-muted mb-2">Toggle providers — counts reflect the loaded grid; DB totals when available.</p>
+          <p class="small text-muted mb-2">
+            <strong>Pull all sources</strong> hits live FEMA · FIRMS · USGS · NWS · NHC APIs, geocodes county locations for the map, and writes rows into Postgres (<code>disasters</code>).
+            The grid below reads from that database — it does not call those APIs on its own.
+          </p>
           <div class="disaster-source-selector" id="unifiedSourceChips">
             <button type="button" class="source-chip source-chip-active freshness-ok" data-source="fema" onclick="toggleUnifiedSourceChip(this, 'fema')">
               <span class="freshness-dot" aria-hidden="true"></span>
@@ -189,12 +254,6 @@
               <span class="source-chip-count" data-source-count="nhc">0</span>
               <span class="source-chip-db-total" data-source-db="nhc" hidden></span>
             </button>
-            <button type="button" class="source-chip freshness-off" data-source="gdacs" onclick="toggleUnifiedSourceChip(this, 'gdacs')">
-              <span class="freshness-dot" aria-hidden="true"></span>
-              <i class="bi bi-globe"></i> GDACS
-              <span class="source-chip-count" data-source-count="gdacs">0</span>
-              <span class="source-chip-db-total" data-source-db="gdacs" hidden></span>
-            </button>
             <button type="button" class="source-chip freshness-off" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
               <span class="freshness-dot" aria-hidden="true"></span>
               <i class="bi bi-droplet"></i> Flood zones
@@ -210,7 +269,10 @@
               <i class="bi bi-globe-americas"></i> Google Earth KML
             </button>
             <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn"><i class="bi-funnel"></i> Apply filters</button>
-            <button type="button" class="btn btn-primary btn-sm" id="refreshBtn"><i class="bi-arrow-repeat"></i> Refresh data</button>
+            <button type="button" class="btn btn-primary btn-sm" id="refreshBtn" title="Pull FEMA, NASA FIRMS, USGS, NWS, and NHC into Postgres — may take 1–3 minutes">
+              <i class="bi bi-cloud-download"></i> Pull all sources
+            </button>
+            <span class="small text-muted du-source-pull-status" id="duSourcePullStatus" role="status" aria-live="polite"></span>
             <button type="button" class="btn btn-warning btn-sm" id="voiceControlBtn" onclick="toggleVoiceControl()" title="Voice: filter by state (e.g. show California), apply filters, show loans. Use the chat mic to talk to the processor expert.">
               <i class="bi bi-mic"></i> <span id="voiceControlText">Voice</span>
             </button>
@@ -269,32 +331,6 @@
       </div>
       </div>
 
-      <nav class="du-section-pills-menu mb-3" id="duSectionPillsMenu" aria-label="Dashboard sections">
-        <span class="du-section-pills-label">Sections</span>
-        <ul class="nav nav-pills flex-wrap gap-1">
-          <li class="nav-item">
-            <button type="button" class="nav-link" data-du-section-target="collapseFilters" data-du-section-step="3">
-              <i class="bi bi-funnel me-1"></i>Filters
-            </button>
-          </li>
-          <li class="nav-item">
-            <button type="button" class="nav-link active" data-du-section-target="collapseDisasters" data-du-section-step="3">
-              <i class="bi bi-shield-exclamation me-1"></i>Disasters
-            </button>
-          </li>
-          <li class="nav-item">
-            <button type="button" class="nav-link" data-du-section-target="collapseMapYouTube" data-du-section-step="3">
-              <i class="bi bi-geo-alt me-1"></i>Map &amp; videos
-            </button>
-          </li>
-          <li class="nav-item">
-            <button type="button" class="nav-link" data-du-section-target="collapseLoans" data-du-section-step="4">
-              <i class="bi bi-bank me-1"></i>Mocked loan data
-            </button>
-          </li>
-        </ul>
-      </nav>
-
       <!-- Bootstrap Accordion -->
       <div class="accordion mb-4" id="disastersAccordion">
         <!-- Accordion Item 1: Filters -->
@@ -327,7 +363,6 @@
                     <option value="usgs" selected>USGS</option>
                     <option value="nws" selected>NOAA/NWS</option>
                     <option value="nhc" selected>NHC</option>
-                    <option value="gdacs">GDACS</option>
                     <option value="floodzones">Flood Zones (NFHL)</option>
                   </select>
                 </div>
@@ -446,6 +481,13 @@
             <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
           </div>
           <div id="collapseLoans" class="collapse du-section-card-body" aria-labelledby="headingLoans">
+            <div class="d-flex flex-wrap align-items-start gap-3 mb-3">
+              <div class="flex-grow-1" style="min-width: 12rem;">
+                <p class="small fw-semibold mb-1"><i class="bi bi-qr-code me-1" aria-hidden="true"></i>Step 4 · Processor expert</p>
+                <p class="small text-muted mb-0">Click the card to flip · scan the QR on your phone to open AI triage for mocked loans and nearby cameras.</p>
+              </div>
+              <div id="disasterAiScanCardMount" class="flex-shrink-0" aria-label="AI scan share card"></div>
+            </div>
             <div class="du-loan-pills-menu mb-3">
               <ul class="nav nav-pills du-loan-panel-pills mb-2" id="duLoanPanelPills" role="tablist" aria-label="Mocked loan panels">
                 <li class="nav-item" role="presentation">
@@ -906,7 +948,7 @@
         }
       }
 
-      const UNIFIED_SOURCE_KEYS = ['fema', 'firms', 'usgs', 'nws', 'nhc', 'gdacs', 'floodzones'];
+      const UNIFIED_SOURCE_KEYS = ['fema', 'firms', 'usgs', 'nws', 'nhc', 'floodzones'];
 
       function normalizeSourceKeyForDeck(source) {
         const s = String(source || '').trim().toLowerCase();
@@ -941,14 +983,24 @@
       async function refreshSourceStatsFromApi() {
         const data = await getDisasterStats();
         const bySource = data?.bySource || [];
+        let dbTotal = 0;
         bySource.forEach((row) => {
           const k = normalizeSourceKeyForDeck(row.source);
           const el = document.querySelector(`[data-source-db="${k}"]`);
+          const count = Number(row.count) || 0;
+          dbTotal += count;
           if (el && row.count != null) {
             el.textContent = `· ${row.count} DB`;
             el.hidden = false;
           }
         });
+        if (dbTotal === 0) {
+          setDashboardStatus(
+            'Postgres has no disaster rows yet. Click Pull all sources to fetch live APIs into the database (takes a few minutes).',
+            'warning',
+          );
+        }
+        return dbTotal;
       }
 
       function updateSourceFreshnessDots() {
@@ -1429,6 +1481,14 @@
             heygenStudio = studio;
           })
           .catch((err) => console.warn('HeyGen studio unavailable:', err));
+        import('/finance/js/disaster-daily-briefing-tts.js')
+          .then(({ initDisasterDailyBriefingTts }) => initDisasterDailyBriefingTts())
+          .catch((err) => console.warn('Daily briefing TTS unavailable:', err));
+        import('/finance/js/disaster-web-crawl-panel.js')
+          .then(({ initDisasterWebCrawlPanel }) => {
+            window.duWebCrawlPanel = initDisasterWebCrawlPanel();
+          })
+          .catch((err) => console.warn('Web crawl panel unavailable:', err));
         // Initialize camera data store and functions BEFORE table is created
         window.cameraDataStore = window.cameraDataStore || {};
         
@@ -1497,9 +1557,17 @@
         });
         initDuSectionCards();
         initDuSectionPillsMenu();
+        initDuWorkflowPills();
         initDuLoanPillsMenu();
 
-        refreshSourceStatsFromApi();
+        refreshSourceStatsFromApi().then((dbTotal) => {
+          const params = new URLSearchParams(window.location.search);
+          if (params.get('pull') === '1' || params.get('ingest') === '1') {
+            void refreshDisasters();
+          } else if (dbTotal === 0) {
+            setSourcePullStatus('Database empty — use Pull all sources for live API ingest.');
+          }
+        });
         loadYouTubeBrowserApiKey();
         loadDisasters();
         // Load all encompass loans on map on page load
@@ -1658,18 +1726,47 @@
       function openDuDashboardSection(targetId, stepNum) {
         if (!targetId) return;
         const accordionIds = ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'];
+        const sectionCardIds = ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans'];
+        const sectionHeadingIds = {
+          collapseCommandDeck: 'headingCommandDeck',
+          collapseRiskIntel: 'headingRiskIntel',
+          collapseLoans: 'headingLoans',
+          collapseFilters: 'headingFilters',
+          collapseDisasters: 'headingDisasters',
+          collapseMapYouTube: 'headingMapYouTube',
+        };
+
         if (accordionIds.includes(targetId)) {
           showDuAccordionSection(targetId, { exclusive: true });
+          document.getElementById(sectionHeadingIds[targetId])?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        if (targetId === 'collapseLoans') {
-          const el = document.getElementById('collapseLoans');
+
+        if (sectionCardIds.includes(targetId)) {
+          const el = document.getElementById(targetId);
           if (el && typeof bootstrap !== 'undefined') {
             bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
           }
-          document.getElementById('headingLoans')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          document.getElementById(sectionHeadingIds[targetId])?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+
+        if (targetId === 'duBottomDock') {
+          document.getElementById('duBottomDock')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
         setDuSectionPillActive(targetId);
         if (stepNum) syncDuWorkflowPill(Number(stepNum));
+      }
+
+      function initDuWorkflowPills() {
+        document.querySelectorAll('#workflowHint [data-du-section-target]').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            openDuDashboardSection(
+              btn.getAttribute('data-du-section-target'),
+              btn.getAttribute('data-du-section-step')
+            );
+          });
+        });
       }
 
       function initDuSectionPillsMenu() {
@@ -1688,6 +1785,16 @@
           const el = document.getElementById(id);
           if (!el) return;
           el.addEventListener('shown.bs.collapse', () => setDuSectionPillActive(id));
+        });
+        ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans'].forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.addEventListener('shown.bs.collapse', () => {
+            setDuSectionPillActive(id);
+            if (id === 'collapseCommandDeck') syncDuWorkflowPill(1);
+            if (id === 'collapseRiskIntel') syncDuWorkflowPill(2);
+            if (id === 'collapseLoans') syncDuWorkflowPill(4);
+          });
         });
       }
 
@@ -1895,10 +2002,7 @@
 
         if (needsDb) {
           try {
-            updateLoadingStatusDisaster(
-              'Loading disasters (parallel sources; geocoding up to ~40 lookups per source request)...',
-              28
-            );
+            updateLoadingStatusDisaster('Loading disasters from database…', 28);
             const sinceIso = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString();
             const fetchDbSource = async (src) => {
               const qp = new URLSearchParams();
@@ -1906,7 +2010,6 @@
               if (county) qp.set('county', county);
               qp.set('source', src);
               qp.set('since', sinceIso);
-              qp.set('geocode', 'true');
               qp.set('limit', '2000');
               const resp = await fetch(`/api/disasters?${qp.toString()}`);
               if (!resp.ok) {
@@ -2293,23 +2396,124 @@
         }
       }
 
-      async function refreshDisasters() {
-        showLoading();
-        const qp = new URLSearchParams();
-        const state = $('#stateInput').val().trim().toUpperCase();
-        const county = $('#countyInput').val().trim();
-        if (state) {
-          $('#stateInput').val(state);
-          qp.set('state', state);
-        }
-        if (county) qp.set('county', county);
-        if ($('#skipFemaCheck').is(':checked')) qp.set('skipFema', '1');
-        console.log('🔄 Refreshing disasters...');
-        const refreshResp = await fetch(`/api/disasters/refresh?${qp.toString()}`, { method: 'POST' });
-        const refreshJson = await refreshResp.json();
-        console.log('🔄 Refresh response:', refreshJson);
-        await loadDisasters();
+      function setSourcePullStatus(message, tone = 'muted') {
+        const el = document.getElementById('duSourcePullStatus');
+        if (!el) return;
+        el.textContent = message || '';
+        el.className = `small du-source-pull-status text-${tone === 'muted' ? 'muted' : tone}`;
       }
+
+      function setPullButtonsBusy(busy) {
+        ['refreshBtnHero', 'refreshBtn'].forEach((id) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+          btn.disabled = !!busy;
+          if (busy) {
+            btn.dataset.duOriginalHtml = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Pulling…';
+          } else if (btn.dataset.duOriginalHtml) {
+            btn.innerHTML = btn.dataset.duOriginalHtml;
+            delete btn.dataset.duOriginalHtml;
+          }
+        });
+      }
+
+      function formatIngestSummary(data) {
+        const labels = {
+          fema: 'FEMA',
+          firms: 'FIRMS',
+          usgs: 'USGS',
+          nws: 'NWS',
+          nhc: 'NHC',
+        };
+        const parts = [];
+        for (const [key, label] of Object.entries(labels)) {
+          const row = data?.[key];
+          if (!row) continue;
+          if (row.error) {
+            parts.push(`${label} failed`);
+          } else if (row.skipped === 'skipped') {
+            parts.push(`${label} skipped`);
+          } else {
+            const inserted = row.inserted ?? 0;
+            const skipped = row.skipped ?? 0;
+            parts.push(`${label} +${inserted}${skipped ? ` (${skipped} dup)` : ''}`);
+          }
+        }
+        return parts.join(' · ');
+      }
+
+      async function refreshDisasters() {
+        const startedAt = Date.now();
+        const qp = new URLSearchParams();
+        if ($('#skipFemaCheck').is(':checked')) qp.set('skipFema', '1');
+
+        const pullSteps = [
+          { pct: 12, msg: 'Pulling FEMA disaster declarations…' },
+          { pct: 28, msg: 'Pulling NASA FIRMS wildfire detections…' },
+          { pct: 44, msg: 'Pulling USGS earthquake feed…' },
+          { pct: 60, msg: 'Pulling NOAA/NWS weather alerts…' },
+          { pct: 76, msg: 'Pulling NHC tropical alerts…' },
+          { pct: 88, msg: 'Refreshing impact graph…' },
+        ];
+        let stepIdx = 0;
+
+        showLoading();
+        setPullButtonsBusy(true);
+        setSourcePullStatus('Pulling all disaster APIs into Postgres…');
+        setDashboardStatus('Pulling FEMA, FIRMS, USGS, NWS, and NHC — this can take a few minutes.', 'info');
+        updateLoadingStatusDisaster(pullSteps[0].msg, pullSteps[0].pct);
+        const subtitle = document.getElementById('loadingIngestSubtitle');
+        if (subtitle) subtitle.textContent = 'FEMA · NASA FIRMS · USGS · NWS · NHC';
+
+        const progressTimer = setInterval(() => {
+          stepIdx = Math.min(stepIdx + 1, pullSteps.length - 1);
+          updateLoadingStatusDisaster(pullSteps[stepIdx].msg, pullSteps[stepIdx].pct);
+          setSourcePullStatus(pullSteps[stepIdx].msg);
+        }, 12000);
+
+        try {
+          console.log('🔄 Pulling all disaster sources...');
+          const refreshResp = await fetch(`/api/disasters/refresh?${qp.toString()}`, { method: 'POST' });
+          const refreshJson = await refreshResp.json();
+          console.log('🔄 Pull all sources response:', refreshJson);
+
+          if (!refreshResp.ok || !refreshJson?.success) {
+            const err = refreshJson?.error || refreshJson?.details || `HTTP ${refreshResp.status}`;
+            throw new Error(err);
+          }
+
+          const elapsedSec = Math.round((Date.now() - startedAt) / 1000);
+          const summary = formatIngestSummary(refreshJson.data);
+          updateLoadingStatusDisaster('Reloading grid from database…', 92);
+          setSourcePullStatus(`${summary} (${elapsedSec}s)`);
+          setDashboardStatus(`All sources pulled in ${elapsedSec}s. ${summary}`, 'success');
+
+          await loadDisasters();
+          await refreshSourceStatsFromApi();
+
+          if (window.duWebCrawlPanel?.refresh) {
+            void window.duWebCrawlPanel.refresh();
+          }
+        } catch (error) {
+          console.error('❌ Pull all sources failed:', error);
+          const msg = error.message || 'Pull all sources failed';
+          setSourcePullStatus(msg, 'danger');
+          setDashboardStatus(
+            msg.includes('401') || msg.includes('403') || msg.includes('localhost')
+              ? `${msg} — refresh requires localhost access or DISASTER_REFRESH_TOKEN on the server.`
+              : msg,
+            'danger',
+          );
+          updateLoadingStatusDisaster('Pull failed — see status banner.', 100);
+          hideLoading();
+        } finally {
+          clearInterval(progressTimer);
+          setPullButtonsBusy(false);
+        }
+      }
+
+      window.duRefreshAllSources = refreshDisasters;
 
       function renderTable(rows) {
         lastLoadedDisasterRows = rows || [];
@@ -2985,6 +3189,23 @@
           });
           window.aiInsightsCard = aiInsightsCard;
         }
+
+        if (window.DisasterAiScanCard) {
+          window.DisasterAiScanCard.mount(document.getElementById('disasterAiScanCardMount'), {
+            title: 'Disaster processor expert',
+            kicker: 'Scan · ask · triage',
+            hint: 'Click to flip · scan QR on your phone',
+            scanUrl: `${window.location.origin}/finance/disasters-unified.html`,
+            openAi: true,
+            imageUrl: '/family/assets/DavidELane.png',
+            onOpenAi: openProcessorExpert,
+          });
+        }
+
+        if (new URLSearchParams(window.location.search).get('openAi') === '1') {
+          openDuDashboardSection('collapseLoans', 4);
+          setTimeout(() => openProcessorExpert(), 600);
+        }
       }
 
       // Get current filters
@@ -3245,6 +3466,7 @@
         }
       });
     </script>
+  <script src="/finance/js/disaster-ai-scan-card.js"></script>
   <script src="/shared/encompass-dark-mode.js"></script>
   </body>
 </html>

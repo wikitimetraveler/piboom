@@ -6,8 +6,17 @@
   const LOGIN_MODAL_ID = 'loginModal';
   const OVERLAY_ID = 'financeAuthOverlay';
   const CHECK_INTERVAL_MS = 600;
+  const PUBLIC_FINANCE_PAGES = new Set([
+    '/finance/disasters-unified.html',
+    '/finance/disasters-webcams.html',
+  ]);
 
-  if (!window.location.pathname.toLowerCase().startsWith(FINANCE_PATH_PREFIX)) {
+  const financePath = window.location.pathname.toLowerCase();
+  if (!financePath.startsWith(FINANCE_PATH_PREFIX)) {
+    return;
+  }
+
+  if (PUBLIC_FINANCE_PAGES.has(financePath)) {
     return;
   }
 

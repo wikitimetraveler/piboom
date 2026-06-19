@@ -34,8 +34,14 @@
       <button type="button" class="btn btn-sm btn-primary" id="lhpExportPosterPng">
         <i class="bi bi-download"></i> Poster + QR PNG
       </button>
-      <button type="button" class="btn btn-sm btn-outline-primary" id="lhpExportShirtPng">
-        <i class="bi bi-download"></i> T-shirt PNG
+      <button type="button" class="btn btn-sm btn-outline-primary" id="lhpExportShirtFrontPng">
+        <i class="bi bi-download"></i> Shirt front PNG
+      </button>
+      <button type="button" class="btn btn-sm btn-outline-primary" id="lhpExportShirtBackPng">
+        <i class="bi bi-download"></i> Shirt back PNG
+      </button>
+      <button type="button" class="btn btn-sm btn-primary" id="lhpExportShirtPng">
+        <i class="bi bi-download"></i> Shirt front + back PNG
       </button>
       <button type="button" class="btn btn-sm btn-primary" id="lhpExportQuartetPng">
         <i class="bi bi-grid-2x2"></i> 4-up shirt PNG
@@ -49,10 +55,6 @@
       <button type="button" class="btn btn-sm btn-outline-secondary" id="lhpPrintBtn">
         <i class="bi bi-printer"></i> Print sheet
       </button>
-      <label class="btn btn-sm btn-outline-dark mb-0">
-        <i class="bi bi-image"></i> Upload HeyGen frame
-        <input type="file" id="lhpAvatarUpload" accept="image/*" hidden />
-      </label>
     </div>
 
     <div class="lhp-grid">
@@ -66,7 +68,8 @@
           <div id="lhpQuartetArt" class="lhp-quartet-canvas"></div>
         </section>
         <section class="lhp-artboard mb-3" aria-label="T-shirt print art">
-          <div class="lhp-artboard-label">Single subject · portrait + HeyGen avatar slot</div>
+          <div class="lhp-artboard-label">David Lane Time Traveler · front + back (gold on black) — export PNG for print shop</div>
+          <p class="small text-muted mb-2">Reference mockup: <a href="/family/assets/david-lane-time-traveler-shirt-mockup.png" target="_blank" rel="noopener">view full mockup</a></p>
           <div id="lhpShirtArt" class="lhp-shirt-canvas"></div>
         </section>
         <section class="lhp-artboard mb-3" aria-label="Site quick-start share card">
@@ -107,8 +110,8 @@
           <div class="card-body">
             <h2 class="h6 mb-2">Print shop notes</h2>
             <ul class="lhp-spec-list small">
+              <li><strong>Time Traveler shirt:</strong> export front, back, or combined sheet — gold on black, QR scans to the Lane Family hub.</li>
               <li><strong>Poster + QR:</strong> use the primary export — your Lane Legacy Museum infographic with QR bottom-right.</li>
-              <li><strong>T-shirt:</strong> give the shop the Poster + QR PNG; DTG on light or dark garment.</li>
               <li><strong>Card:</strong> 2.5×3.5 in cardstock; QR must scan at arm's length.</li>
               <li><strong>300 DPI:</strong> use exported PNGs (2× scale ≈ 144 DPI screen → ask shop to upsample if needed).</li>
             </ul>

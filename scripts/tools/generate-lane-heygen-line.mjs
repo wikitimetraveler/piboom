@@ -172,9 +172,14 @@ function pickVoiceForPerson(person) {
 }
 
 async function main() {
-  const personSlug = argValue('--person');
+  let personSlug = argValue('--person');
   if (!personSlug) {
-    console.error('Usage: node scripts/tools/generate-lane-heygen-line.mjs --person <slug> [--photo] [--force]');
+    personSlug = process.argv.slice(2).find((a) => !a.startsWith('-'));
+  }
+  if (!personSlug) {
+    console.error('Usage: node scripts/tools/generate-lane-heygen-line.mjs --person <slug> [--photo] [--short] [--force] [--direct] [--cache-local]');
+    console.error('       node scripts/tools/generate-lane-heygen-line.mjs <slug> [--photo] …  (slug as first positional arg)');
+    console.error('npm:   npm run generate:lane-heygen-line -- --person <slug> [--photo] …');
     process.exit(1);
   }
 

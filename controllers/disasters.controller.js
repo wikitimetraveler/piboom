@@ -11,7 +11,8 @@ import {
   ingestUsgsQuakes,
   ingestNwsCap,
   ingestNhc,
-  ingestCaFireCameras
+  ingestCaFireCameras,
+  backfillDisasterGeocodes,
 } from '../services/disasters.service.js';
 import {
   ingestHazardWebcams,
@@ -29,6 +30,15 @@ import {
   resolveDisastersNearPoint,
   resolveLoansNearPoint
 } from '../services/disaster-spatial.service.js';
+import { buildDailyBriefing } from '../services/disaster-daily-briefing.service.js';
+import { crawlDisasterWeb } from '../services/disaster-web-crawler.service.js';
+import {
+  buildDisasterLiveCacheKey,
+  checkDisasterLiveRateLimit,
+  getDisasterLiveCache,
+  getRequestIp,
+  setDisasterLiveCache,
+} from '../lib/disaster-live-endpoint-guard.js';
 
 // Ensure schema on startup (best-effort)
 initDisastersSchema().catch(() => {});
@@ -36,7 +46,7 @@ initDisastersSchema().catch(() => {});
 /** US state FIPS codes (first 2 digits of county_fips) */
 const US_STATE_FIPS = ['01','02','04','05','06','08','09','10','11','12','13','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','44','45','46','47','48','49','50','51','53','54','55','56','60','66','69','72','78'];
 /** US state abbreviations - for records with county_fips=00000 (FIPS lookup failed) */
-const US_STATE_ABBR = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','PEN','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','AS','GU','MP','PR','VI'];
+const US_STATE_ABBR = ['AL','AK','AZ','AR','CA','CO','CT','DE','DC','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','AS','GU','MP','PR','VI'];
 
 export async function listDisasters(req, res) {
   try {
@@ -176,6 +186,18 @@ export async function refreshDisasters(req, res) {
   try {
     const { includeCameras, skipFema } = req.query; // Optional: ?includeCameras=true&skipFema=1
     const results = {};
+    const pipeline = {
+      mode: 'live_api_to_postgres',
+      table: 'disasters',
+      sources: [
+        { id: 'fema', endpoint: 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries', enabled: skipFema !== '1' && skipFema !== 'true' },
+        { id: 'firms', endpoint: 'https://firms.modaps.eosdis.nasa.gov/api/' },
+        { id: 'usgs', endpoint: 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson' },
+        { id: 'nws', endpoint: 'https://api.weather.gov/alerts/active' },
+        { id: 'nhc', endpoint: 'NWS CAP (hurricane/tropical filter)' },
+      ],
+    };
+
     if (skipFema !== '1' && skipFema !== 'true') {
       results.fema = await ingestFema();
     } else {
@@ -185,6 +207,9 @@ export async function refreshDisasters(req, res) {
     results.usgs = await ingestUsgsQuakes();
     results.nws = await ingestNwsCap();
     results.nhc = await ingestNhc();
+
+    const geocodeBackfill = await backfillDisasterGeocodes();
+    results.geocodeBackfill = geocodeBackfill;
     
     // Camera feed only if explicitly requested (manual review)
     if (includeCameras === 'true' || includeCameras === '1') {
@@ -193,7 +218,11 @@ export async function refreshDisasters(req, res) {
     }
     
     const graph = await refreshDisasterImpactGraphFromCurrentData();
-    res.json({ success: true, message: 'Refreshed disasters', data: { ...results, graph } });
+    res.json({
+      success: true,
+      message: 'Live disaster APIs ingested into Postgres',
+      data: { ...results, graph, pipeline },
+    });
   } catch (e) {
     res.status(500).json({ success: false, error: 'Failed to refresh disasters', details: e.message });
   }
@@ -490,6 +519,90 @@ export async function listNear(req, res) {
   }
 }
 
+export async function dailyBriefing(req, res) {
+  const endpoint = 'daily-briefing';
+  try {
+    const ip = getRequestIp(req);
+    const rate = checkDisasterLiveRateLimit(ip, endpoint);
+    if (!rate.ok) {
+      res.setHeader('Retry-After', String(rate.retryAfterSec));
+      return res.status(429).json({
+        success: false,
+        error: 'Rate limit exceeded for daily briefing',
+        retryAfterSec: rate.retryAfterSec,
+      });
+    }
+
+    const days = parseInt(req.query.days, 10);
+    const minMagnitude = parseFloat(req.query.minMagnitude);
+    const includeFirms = req.query.includeFirms !== 'false' && req.query.includeFirms !== '0';
+    const includeWebCrawl = req.query.includeWebCrawl === 'true' || req.query.includeWebCrawl === '1';
+    const crawlMaxAgeHours = parseInt(req.query.crawlMaxAgeHours, 10);
+    const cacheParams = {
+      days: Number.isFinite(days) ? days : 7,
+      minMagnitude: Number.isFinite(minMagnitude) ? minMagnitude : 2.5,
+      includeFirms,
+      includeWebCrawl,
+      crawlMaxAgeHours: Number.isFinite(crawlMaxAgeHours) ? crawlMaxAgeHours : 72,
+    };
+    const cacheKey = buildDisasterLiveCacheKey(endpoint, cacheParams);
+    const cached = getDisasterLiveCache(endpoint, cacheKey);
+    if (cached) {
+      return res.json({ success: true, data: cached, cached: true });
+    }
+
+    const data = await buildDailyBriefing(cacheParams);
+    setDisasterLiveCache(endpoint, cacheKey, data);
+    res.json({ success: true, data });
+  } catch (e) {
+    console.error('❌ Daily disaster briefing error:', e);
+    res.status(500).json({ success: false, error: 'Failed to build daily briefing', details: e.message });
+  }
+}
+
+export async function webCrawl(req, res) {
+  const endpoint = 'web-crawl';
+  try {
+    const ip = getRequestIp(req);
+    const rate = checkDisasterLiveRateLimit(ip, endpoint);
+    if (!rate.ok) {
+      res.setHeader('Retry-After', String(rate.retryAfterSec));
+      return res.status(429).json({
+        success: false,
+        error: 'Rate limit exceeded for disaster web crawl',
+        retryAfterSec: rate.retryAfterSec,
+      });
+    }
+
+    const maxAgeHours = parseInt(req.query.maxAgeHours, 10);
+    const includeGdelt = req.query.includeGdelt !== 'false' && req.query.includeGdelt !== '0';
+    const feedIds = req.query.feedIds
+      ? String(req.query.feedIds).split(',').map((s) => s.trim()).filter(Boolean)
+      : undefined;
+    const cacheParams = {
+      maxAgeHours: Number.isFinite(maxAgeHours) ? maxAgeHours : 72,
+      includeGdelt,
+      feedIds: feedIds?.join(',') || '',
+    };
+    const cacheKey = buildDisasterLiveCacheKey(endpoint, cacheParams);
+    const cached = getDisasterLiveCache(endpoint, cacheKey);
+    if (cached) {
+      return res.json({ success: true, data: cached, cached: true });
+    }
+
+    const data = await crawlDisasterWeb({
+      maxAgeHours: cacheParams.maxAgeHours,
+      feedIds,
+      includeGdelt,
+    });
+    setDisasterLiveCache(endpoint, cacheKey, data);
+    res.json({ success: true, data });
+  } catch (e) {
+    console.error('❌ Disaster web crawl error:', e);
+    res.status(500).json({ success: false, error: 'Failed to crawl disaster web feeds', details: e.message });
+  }
+}
+
 export async function statsDisasters(req, res) {
   try {
     const pool = getPool();
@@ -561,6 +674,8 @@ export default {
   listNear,
   cameraStats,
   cameraSnapshot,
+  dailyBriefing,
+  webCrawl,
   statsDisasters,
   exportCsv,
   geocodeAddress,

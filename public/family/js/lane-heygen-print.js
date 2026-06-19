@@ -6,11 +6,10 @@
   const DATA_URL = '/data/lane-heygen-lines.json';
   const DEFAULT_PUBLIC_ORIGIN = 'https://www.thelanefamily.us';
   const QR_SIZE_POSTER = 104;
-  const QR_SIZE_SHIRT = 104;
+  const QR_SIZE_TT_BACK = 188;
   const QR_SIZE_CARD = 88;
   let catalog = null;
   let person = null;
-  let avatarDataUrl = null;
 
   function $(id) {
     return document.getElementById(id);
@@ -108,6 +107,16 @@
     return `${dev} · Avatar narration by ${heygen}`;
   }
 
+  function drawOutlinedText(ctx, text, x, y, fill, stroke, lineWidth, font) {
+    ctx.font = font;
+    ctx.textAlign = 'center';
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = stroke;
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = fill;
+    ctx.fillText(text, x, y);
+  }
+
   function drawPosterCreditStrip(ctx, width, height) {
     const stripH = Math.max(28, Math.round(height * 0.028));
     const fontPx = Math.max(11, Math.round(stripH * 0.42));
@@ -137,35 +146,63 @@
     mountQr($('lhpPosterQr'), qrUrl, QR_SIZE_POSTER);
   }
 
+  function shirtDesign() {
+    return catalog?.shirtDesign || {};
+  }
+
+  function shirtQrUrl() {
+    const design = shirtDesign();
+    const path = design.qrLandingPath || '/family/lane-family.html';
+    if (typeof window.lanePublicUrl === 'function') {
+      return window.lanePublicUrl(path, catalog?.brand?.publicSiteUrl);
+    }
+    const normalized = path.startsWith('/') ? path : `/${path}`;
+    return new URL(normalized, `${publicOrigin()}/`).href;
+  }
+
+  function ttCompassSvg() {
+    return `<svg class="lhp-tt-compass-icon" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" stroke-width="2"/>
+      <polygon points="32,8 36,32 32,28 28,32" fill="currentColor"/>
+      <polygon points="32,56 36,32 32,36 28,32" fill="currentColor" opacity="0.45"/>
+      <circle cx="32" cy="32" r="3" fill="currentColor"/>
+    </svg>`;
+  }
+
   function renderShirt() {
     const host = $('lhpShirtArt');
-    if (!host || !person) return;
-    const qrUrl = lineLandingUrl(person.slug);
+    if (!host) return;
+    const design = shirtDesign();
+    const qrUrl = shirtQrUrl();
     host.innerHTML = `
-      <div class="lhp-shirt-inner">
-        <div class="lhp-shirt-portraits">
-          <img src="${esc(person.portraitUrl)}" alt="${esc(person.name)} — legacy portrait" crossorigin="anonymous" />
-          <div class="lhp-avatar-slot" id="lhpAvatarSlot">
-            ${
-              avatarDataUrl
-                ? `<img src="${avatarDataUrl}" alt="HeyGen avatar frame" />`
-                : `<span class="lhp-avatar-slot-hint">HeyGen avatar<br/>upload frame →</span>`
-            }
+      <div class="lhp-tt-sheet">
+        <article class="lhp-tt-panel lhp-tt-front" aria-label="T-shirt front">
+          <h1 class="lhp-tt-name">${esc(design.heroName || 'David Lane')}</h1>
+          <p class="lhp-tt-sub">
+            <span class="lhp-tt-flourish" aria-hidden="true"></span>
+            ${esc(design.heroSubtitle || 'TIME TRAVELER')}
+            <span class="lhp-tt-flourish" aria-hidden="true"></span>
+          </p>
+          <div class="lhp-tt-art-frame">
+            <img src="${esc(design.frontArtUrl || '/family/assets/david-lane-time-traveler-art.png')}" alt="${esc(design.heroName || 'David Lane')} — colonial time traveler portrait" crossorigin="anonymous" />
           </div>
-        </div>
-        <div>
-          <h2 class="lhp-shirt-name">${esc(person.name)}</h2>
-          <p class="lhp-shirt-tagline">${esc(person.tagline)}</p>
-        </div>
-        <div class="lhp-shirt-footer">
-          <div class="lhp-heygen-badge">
-            <strong>Scan · Hear the line</strong>
-            ${esc(catalog?.brand?.attributionShort || 'HeyGen')} avatar
-          </div>
-          <div class="lhp-shirt-qr" id="lhpShirtQr"></div>
-        </div>
+          <p class="lhp-tt-follow">${esc(design.followLine || 'FOLLOW MY LANE HISTORY')}</p>
+          <p class="lhp-tt-era">
+            <span class="lhp-tt-rule" aria-hidden="true"></span>
+            ${esc(design.eraLine || 'COLONIAL TIMES')}
+            <span class="lhp-tt-rule" aria-hidden="true"></span>
+          </p>
+          <div class="lhp-tt-compass">${ttCompassSvg()}</div>
+        </article>
+        <article class="lhp-tt-panel lhp-tt-back" aria-label="T-shirt back">
+          <h2 class="lhp-tt-scan">${esc(design.backHeadline || 'SCAN THE STORY')}</h2>
+          <div class="lhp-tt-flourish-divider" aria-hidden="true"></div>
+          <div class="lhp-tt-qr" id="lhpShirtQr"></div>
+          <p class="lhp-tt-features">${esc(design.backFeatures || 'AI History • Voice • Video • Data')}</p>
+          <p class="lhp-tt-site">${esc(design.siteLabel || 'thelanefamily.us')}</p>
+        </article>
       </div>`;
-    mountQr($('lhpShirtQr'), qrUrl, QR_SIZE_SHIRT);
+    mountQr($('lhpShirtQr'), qrUrl, QR_SIZE_TT_BACK);
   }
 
   function renderCard() {
@@ -259,14 +296,13 @@
       ctx.drawImage(qrCanvas, x + pad, y + pad, qrSize, qrSize);
 
       const fontPx = Math.max(12, Math.round(qrSize * 0.11));
-      ctx.fillStyle = '#1a1410';
-      ctx.font = `800 ${fontPx}px Inter, system-ui, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.fillText('SCAN · HEAR THE LINE', x + boxW / 2, y + pad + qrSize + fontPx * 0.85);
-
-      ctx.fillStyle = '#4f46e5';
-      ctx.font = `700 ${Math.max(10, Math.round(fontPx * 0.85))}px Inter, system-ui, sans-serif`;
-      ctx.fillText('HEYGEN', x + boxW / 2, y + pad + qrSize + fontPx * 1.65);
+      const heygenPx = Math.max(10, Math.round(fontPx * 0.85));
+      const labelFont = `800 ${fontPx}px Inter, system-ui, sans-serif`;
+      const heygenFont = `800 ${heygenPx}px Inter, system-ui, sans-serif`;
+      const labelY = y + pad + qrSize + fontPx * 0.85;
+      const heygenY = y + pad + qrSize + fontPx * 1.65;
+      drawOutlinedText(ctx, 'SCAN · HEAR THE LINE', x + boxW / 2, labelY, '#1a1410', '#ffffff', Math.max(3, Math.round(fontPx * 0.22)), labelFont);
+      drawOutlinedText(ctx, 'HEYGEN', x + boxW / 2, heygenY, '#4f46e5', '#ffffff', Math.max(2, Math.round(heygenPx * 0.2)), heygenFont);
 
       window.posterUtils.downloadDataUrl(
         window.posterUtils.canvasToDataUrl(canvas),
@@ -278,7 +314,7 @@
     }
   }
 
-  async function exportArt(selector, filename) {
+  async function exportArt(selector, filename, options = {}) {
     const el = document.querySelector(selector);
     if (!el || !window.posterUtils) {
       $('lhpError').hidden = false;
@@ -286,7 +322,8 @@
       return;
     }
     try {
-      const canvas = await window.posterUtils.renderPosterCanvas(el, { scale: 2, backgroundColor: null });
+      const scale = options.scale || 2;
+      const canvas = await window.posterUtils.renderPosterCanvas(el, { scale, backgroundColor: null });
       window.posterUtils.downloadDataUrl(window.posterUtils.canvasToDataUrl(canvas), filename);
     } catch (err) {
       $('lhpError').hidden = false;
@@ -327,26 +364,22 @@
   function bindEvents() {
     $('lhpExportPosterPng')?.addEventListener('click', exportPosterWithQr);
     $('lhpExportShirtPng')?.addEventListener('click', () =>
-      exportArt('#lhpShirtArt', `lane-heygen-shirt-${person.slug}.png`)
+      exportArt('.lhp-tt-sheet', 'david-lane-time-traveler-shirt-sheet.png', { scale: 3, backgroundColor: '#000000' })
+    );
+    $('lhpExportShirtFrontPng')?.addEventListener('click', () =>
+      exportArt('.lhp-tt-front', 'david-lane-time-traveler-shirt-front.png', { scale: 3, backgroundColor: '#000000' })
+    );
+    $('lhpExportShirtBackPng')?.addEventListener('click', () =>
+      exportArt('.lhp-tt-back', 'david-lane-time-traveler-shirt-back.png', { scale: 3, backgroundColor: '#000000' })
     );
     $('lhpExportCardPng')?.addEventListener('click', () =>
       exportArt('#lhpCardArt', `lane-heygen-card-${person.slug}.png`)
     );
     $('lhpExportQrPng')?.addEventListener('click', exportQrOnly);
     $('lhpExportQuartetPng')?.addEventListener('click', () =>
-      exportArt('#lhpQuartetArt', 'lane-heygen-shirt-quartet-4up.png')
+      exportArt('#lhpQuartetArt', 'lane-heygen-shirt-quartet-4up.png', { scale: 3 })
     );
     $('lhpPrintBtn')?.addEventListener('click', () => window.print());
-    $('lhpAvatarUpload')?.addEventListener('change', (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        avatarDataUrl = reader.result;
-        renderShirt();
-      };
-      reader.readAsDataURL(file);
-    });
     $('lhpPersonSelect')?.addEventListener('change', () => {
       try {
         setActivePerson($('lhpPersonSelect').value);
@@ -418,7 +451,6 @@
     person = catalog?.people?.[slug];
     if (!person) throw new Error(`Unknown Lane HeyGen line: ${slug}`);
     renderPoster();
-    renderShirt();
     renderCard();
     renderMeta();
   }
@@ -428,6 +460,7 @@
       const res = await fetch(DATA_URL);
       catalog = await res.json();
       populatePersonSelect();
+      renderShirt();
       const slug = $('lhpPersonSelect')?.value || 'jonathan-homer-lane';
       setActivePerson(slug);
       renderQuartet();

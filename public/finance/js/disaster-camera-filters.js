@@ -124,7 +124,7 @@
     }
     const normalized = DLF.normalizeDisasterForFilters(disasterObj, disasterData);
     const hasCoords = DLF.disasterHasCoords(normalized, disasterData);
-    const state = DLF.getDisasterState(disasterObj, disasterData) || 'CA';
+    const state = DLF.getDisasterState(disasterObj, disasterData) || '';
     const county = DLF.getDisasterCounty(disasterObj, disasterData);
     const label = DLF.getDisasterTitle(disasterObj, disasterData);
 
@@ -147,7 +147,7 @@
    */
   function buildLoanCameraRequest(loan, radiusMiles) {
     const coords = resolveLoanCoords(loan);
-    const state = (loan?.state || 'CA').toString().trim();
+    const state = (loan?.state || '').toString().trim();
     const county = loan?.county
       ? (global.DisasterLoanFilters?.normalizeCounty(loan.county) || loan.county)
       : '';

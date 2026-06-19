@@ -61,6 +61,12 @@ router.get('/cameras/stats', disastersController.cameraStats);
 router.get('/cameras/:id/snapshot', disastersController.cameraSnapshot);
 router.get('/cameras', disastersController.listCameras);
 
+// Live daily briefing (no DB required)
+router.get('/daily-briefing', disastersController.dailyBriefing);
+
+// Allowlisted web crawler (RSS/Atom + shallow .gov indexes)
+router.get('/web-crawl', disastersController.webCrawl);
+
 // Stats
 router.get('/stats', disastersController.statsDisasters);
 

@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "description": "Allowlisted disaster web crawler feeds. Add newspaper RSS only when the publisher explicitly offers a public RSS/Atom feed (do not scrape paywalled HTML).",
+  "feeds": [
+    {
+      "id": "nws-active-atom",
+      "type": "atom",
+      "url": "https://api.weather.gov/alerts/active.atom",
+      "source": "nws",
+      "publisher": "NOAA National Weather Service",
+      "trustTier": "official",
+      "maxItems": 40,
+      "keywordFilter": true
+    },
+    {
+      "id": "usgs-quakes-day-atom",
+      "type": "atom",
+      "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.atom",
+      "source": "usgs",
+      "publisher": "USGS Earthquake Hazards Program",
+      "trustTier": "official",
+      "maxItems": 15,
+      "keywordFilter": false
+    },
+    {
+      "id": "usgs-quakes-significant-atom",
+      "type": "atom",
+      "url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.atom",
+      "source": "usgs",
+      "publisher": "USGS Earthquake Hazards Program",
+      "trustTier": "official",
+      "maxItems": 10,
+      "keywordFilter": false
+    }
+  ],
+  "htmlIndexes": [],
+  "gdelt": {
+    "enabled": true,
+    "id": "gdelt-doc-us-disasters",
+    "timespan": "24h",
+    "maxRecords": 20,
+    "minRequestGapMs": 5500,
+    "query": "(flood OR wildfire OR earthquake OR hurricane OR tornado OR \"flash flood\" OR evacuation OR FEMA) sourcecountry:US"
+  },
+  "femaRegionalRss": [
+    {
+      "id": "fema-region-1",
+      "enabled": false,
+      "type": "rss",
+      "url": "https://www.fema.gov/region-i/rss.xml",
+      "source": "fema",
+      "publisher": "FEMA Region 1",
+      "trustTier": "official",
+      "maxItems": 8,
+      "keywordFilter": false,
+      "note": "Disabled until feed stabilizes (403/503 observed 2026-06)."
+    },
+    {
+      "id": "fema-region-4",
+      "enabled": false,
+      "type": "rss",
+      "url": "https://www.fema.gov/region-iv/rss.xml",
+      "source": "fema",
+      "publisher": "FEMA Region 4",
+      "trustTier": "official",
+      "maxItems": 8,
+      "keywordFilter": false,
+      "note": "Disabled until feed stabilizes (403/503 observed 2026-06)."
+    },
+    {
+      "id": "fema-region-9",
+      "enabled": false,
+      "type": "rss",
+      "url": "https://www.fema.gov/region-ix/rss.xml",
+      "source": "fema",
+      "publisher": "FEMA Region 9",
+      "trustTier": "official",
+      "maxItems": 8,
+      "keywordFilter": false,
+      "note": "Disabled until feed stabilizes (403/503 observed 2026-06)."
+    }
+  ],
+  "newspaperRssExamples": [
+    {
+      "note": "Example only — verify terms before enabling. Many papers offer free city/metro RSS.",
+      "id": "example-metro-rss",
+      "enabled": false,
+      "type": "rss",
+      "url": "https://example.com/news/local/rss.xml",
+      "source": "news",
+      "publisher": "Local newspaper (RSS)",
+      "trustTier": "news",
+      "maxItems": 10,
+      "keywordFilter": true
+    }
+  ]
+}

@@ -114,8 +114,22 @@ class ModernNavbar extends HTMLElement {
     idx.onload = () => {
       const search = document.createElement('script');
       search.src = '/shared/global-tool-search.js';
+      search.onload = () => {
+        if (window.__pendingToolSearchOpen) {
+          window.__pendingToolSearchOpen = false;
+          window.openGlobalToolSearch?.();
+        }
+      };
       document.head.appendChild(search);
     };
+  }
+
+  openToolSearch() {
+    if (typeof window.openGlobalToolSearch === 'function') {
+      window.openGlobalToolSearch();
+      return;
+    }
+    window.__pendingToolSearchOpen = true;
   }
 
   isDemoMode() {
@@ -591,7 +605,7 @@ class ModernNavbar extends HTMLElement {
     const searchBtn = this.shadowRoot.querySelector('#navSearchBtn');
     searchBtn?.addEventListener('click', (e) => {
       e.preventDefault();
-      document.dispatchEvent(new CustomEvent('open-tool-search', { bubbles: true }));
+      this.openToolSearch();
     });
 
     // User login button

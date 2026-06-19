@@ -1,0 +1,177 @@
+/**
+ * Hazard Webcams — extends Unified Disasters chrome (disasters-unified.css)
+ * @see public/finance/disasters-webcams.html
+ */
+
+body.hw-page {
+  padding-bottom: 2.75rem;
+}
+
+.hw-hero .du-stat-card--cameras .du-stat-icon {
+  background: rgba(96, 165, 250, 0.35);
+  color: #bfdbfe;
+}
+
+.hw-hero .du-stat-card--fire .du-stat-icon {
+  background: rgba(239, 68, 68, 0.35);
+  color: #fecaca;
+}
+
+.hw-hero .du-stat-card--coastal .du-stat-icon {
+  background: rgba(6, 182, 212, 0.35);
+  color: #a5f3fc;
+}
+
+.hw-hero .du-stat-card--sources .du-stat-icon {
+  background: rgba(167, 139, 250, 0.35);
+  color: #ddd6fe;
+}
+
+#statusBar:empty {
+  display: none;
+}
+
+.hw-source-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.hw-source-stats .source-stat {
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.3rem 0.65rem;
+}
+
+.hw-address-panel {
+  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border-radius: 12px;
+  background: linear-gradient(135deg, #fff 0%, var(--zen-surface, #f8fafc) 100%);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  padding: 1rem 1.15rem;
+}
+
+.hw-filters-panel {
+  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  padding: 1rem 1.15rem;
+}
+
+.hw-hazard-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hw-hazard-pills .hazard-chip {
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+  border: 1px solid rgba(74, 144, 164, 0.22);
+  background: #fff;
+  color: var(--text-muted, #6b7280);
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.hw-hazard-pills .hazard-chip:hover {
+  background: rgba(74, 144, 164, 0.08);
+  color: var(--zen-primary, #4a90a4);
+}
+
+.hw-hazard-pills .hazard-chip.active {
+  background: rgba(74, 144, 164, 0.14);
+  color: var(--zen-primary, #4a90a4);
+  border-color: rgba(74, 144, 164, 0.35);
+}
+
+.hw-map-panel,
+.hw-nearest-panel {
+  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.hw-map-panel .hw-panel-header,
+.hw-nearest-panel .hw-panel-header {
+  padding: 0.65rem 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--zen-border, rgba(74, 144, 164, 0.12));
+  background: var(--zen-surface, #f8fafc);
+}
+
+#map {
+  height: 420px;
+  width: 100%;
+}
+
+.hw-nearest-list {
+  height: 420px;
+  overflow-y: auto;
+}
+
+.hw-nearest-item {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.hw-nearest-item:hover {
+  background: rgba(74, 144, 164, 0.06);
+}
+
+.hw-nearest-item:last-child {
+  border-bottom: none;
+}
+
+.hw-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #e9ecef;
+  color: #495057;
+}
+
+.hw-rank-badge.rank-1 { background: #ffd700; color: #5c4a00; }
+.hw-rank-badge.rank-2 { background: #c0c0c0; color: #333; }
+.hw-rank-badge.rank-3 { background: #cd7f32; color: #fff; }
+
+.geo-subtitle {
+  font-size: 0.85rem;
+  color: var(--zen-primary, #4a90a4);
+  font-weight: 500;
+}
+
+@keyframes hwPulse {
+  0% { box-shadow: 0 0 0 0 rgba(74, 144, 164, 0.45); }
+  70% { box-shadow: 0 0 0 12px rgba(74, 144, 164, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 144, 164, 0); }
+}
+
+.hw-center-pin {
+  animation: hwPulse 2s infinite;
+}
+
+.hw-catalog-panel .card-header {
+  font-weight: 600;
+}
+
+.hw-count-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+}

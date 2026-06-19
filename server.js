@@ -113,9 +113,16 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 /** Paths that are allowed without finance session cookie (scripts, styles, images for /finance/ pages). */
 const FINANCE_PUBLIC_FILE = /\.(js|mjs|css|png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|eot|map|json|txt|xml|kml|wasm)$/i;
 
+/** Finance HTML pages that are open without login (public hazard tools). */
+const FINANCE_PUBLIC_PAGES = new Set([
+  '/finance/disasters-unified.html',
+  '/finance/disasters-webcams.html',
+]);
+
 function financePathNeedsSession(urlPath) {
   if (urlPath === '/finance' || urlPath === '/finance/') return true;
   if (!urlPath.startsWith('/finance/')) return false;
+  if (FINANCE_PUBLIC_PAGES.has(urlPath)) return false;
   return !FINANCE_PUBLIC_FILE.test(urlPath);
 }
 

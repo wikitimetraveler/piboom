@@ -146,6 +146,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS fire_cameras_source_source_id_key ON fire_came
 
 /** Max reverse-geocode calls per camera ingest run (fixed mount locations, once only). */
 const MAX_CAMERA_GEOCODES_PER_RUN = 50;
+const MAX_BACKFILL_GEOCODES = parseInt(process.env.DISASTER_GEOCODE_BACKFILL_LIMIT || '80', 10) || 80;
 
 /**
  * Initialize fire_cameras schema (idempotent).
@@ -226,6 +227,59 @@ export async function pruneOldDisasters() {
   } catch (e) {
     console.warn('⚠️  pruneOldDisasters failed:', e.message);
   }
+}
+
+/**
+ * Forward-geocode disasters missing lat/lng but with county + state.
+ * Runs after ingest/refresh — not on routine grid reads.
+ */
+export async function backfillDisasterGeocodes(options = {}) {
+  const pool = getPool();
+  if (!pool) return { geocoded: 0, candidates: 0, skipped: 'no_pool' };
+
+  const limit = Number.isFinite(options.limit) ? options.limit : MAX_BACKFILL_GEOCODES;
+  const { rows } = await pool.query(
+    `SELECT DISTINCT
+       LOWER(REPLACE(COALESCE(county_name,''), ' County', '')) AS county_key,
+       UPPER(TRIM(COALESCE(state_abbr,''))) AS state_abbr,
+       county_name
+     FROM disasters
+     WHERE (lat IS NULL OR lng IS NULL)
+       AND TRIM(COALESCE(county_name,'')) <> ''
+       AND TRIM(COALESCE(state_abbr,'')) <> ''
+     LIMIT $1`,
+    [limit]
+  );
+
+  let geocoded = 0;
+  for (const row of rows) {
+    const county = String(row.county_name || '').replace(/\s*County$/i, '').trim();
+    const state = String(row.state_abbr || '').trim().toUpperCase();
+    if (!county || !state) continue;
+    try {
+      const coords = await geocodeCountyStateWithCache(county, state);
+      if (coords?.latitude != null && coords?.longitude != null) {
+        await pool.query(
+          `UPDATE disasters SET lat = $1, lng = $2
+           WHERE LOWER(REPLACE(COALESCE(county_name,''), ' County', '')) = $3
+             AND UPPER(TRIM(COALESCE(state_abbr,''))) = $4
+             AND (lat IS NULL OR lng IS NULL)`,
+          [coords.latitude, coords.longitude, county.toLowerCase(), state]
+        );
+        geocoded += 1;
+        if (!coords.cached) {
+          await new Promise((resolve) => setTimeout(resolve, 1100));
+        }
+      }
+    } catch (e) {
+      console.warn(`⚠️  Backfill geocode failed for ${county}, ${state}:`, e.message);
+    }
+  }
+
+  if (geocoded > 0) {
+    console.log(`📍 Backfilled geocodes for ${geocoded} county/state group(s)`);
+  }
+  return { geocoded, candidates: rows.length };
 }
 
 /**

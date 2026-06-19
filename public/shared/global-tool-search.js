@@ -144,12 +144,12 @@
           justify-content: center;
           padding-top: 12vh;
           opacity: 0;
-          visibility: hidden;
-          transition: opacity 0.18s, visibility 0.18s;
+          pointer-events: none;
+          transition: opacity 0.18s;
         }
         #globalToolSearchOverlay.show {
           opacity: 1;
-          visibility: visible;
+          pointer-events: auto;
         }
         @keyframes cpSlideIn {
           from { opacity: 0; transform: translateY(-16px) scale(0.97); }
@@ -312,6 +312,8 @@
       </div>
     `;
     overlay.tabIndex = -1;
+    overlay.setAttribute('inert', '');
+    overlay.setAttribute('aria-hidden', 'true');
     document.body.appendChild(overlay);
 
     const input = overlay.querySelector('.cp-input');
@@ -319,6 +321,20 @@
     let selectedIndex = 0;
     let currentResults = [];
     let currentTerm = '';
+
+    function focusSearchInput() {
+      if (!input) return;
+      input.focus({ preventScroll: true });
+    }
+
+    function scheduleSearchInputFocus() {
+      focusSearchInput();
+      requestAnimationFrame(() => {
+        focusSearchInput();
+        requestAnimationFrame(focusSearchInput);
+      });
+      setTimeout(focusSearchInput, 0);
+    }
 
     function renderResults(results, term) {
       currentResults = results;
@@ -365,15 +381,19 @@
 
     function openSearch() {
       overlay.classList.add('show');
+      overlay.removeAttribute('inert');
+      overlay.setAttribute('aria-hidden', 'false');
       input.value = '';
       renderResults(searchTools(''), '');
-      requestAnimationFrame(() => input.focus());
       selectedIndex = 0;
       trackSearchOpen();
+      scheduleSearchInputFocus();
     }
 
     function closeSearch() {
       overlay.classList.remove('show');
+      overlay.setAttribute('inert', '');
+      overlay.setAttribute('aria-hidden', 'true');
       input.blur();
     }
 
@@ -434,7 +454,7 @@
   function init() {
     createOverlay();
     document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         window.openGlobalToolSearch?.();
       }

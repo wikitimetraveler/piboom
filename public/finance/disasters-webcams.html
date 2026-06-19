@@ -9,106 +9,114 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
     <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body { background: #f5f7fa; font-family: 'Inter', 'Segoe UI', sans-serif; min-height: 100vh; }
-      .page-header {
-        background: linear-gradient(135deg, #1e3a5f, #2980b9);
-        color: #fff;
-        padding: 1.25rem 0;
-        margin-bottom: 1.5rem;
-      }
-      #map { height: 420px; width: 100%; border-radius: 8px; border: 1px solid #e5e7eb; }
-      .source-stat { font-size: 0.85rem; }
-      .hazard-chip.active { background: #2980b9; color: #fff; border-color: #2980b9; }
-      #statusBar { min-height: 1.5rem; }
-      .address-hero {
-        background: linear-gradient(135deg, #fff 0%, #f0f7ff 100%);
-        border: 1px solid #c5dff5;
-        border-radius: 12px;
-        box-shadow: 0 4px 18px rgba(41, 128, 185, 0.08);
-        padding: 1rem 1.25rem;
-        margin-bottom: 1.25rem;
-      }
-      .address-hero .form-control:focus {
-        border-color: #2980b9;
-        box-shadow: 0 0 0 0.2rem rgba(41, 128, 185, 0.2);
-      }
-      .nearest-panel {
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        background: #fff;
-        height: 420px;
-        overflow-y: auto;
-      }
-      .nearest-panel-header {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        background: linear-gradient(135deg, #1e3a5f, #2980b9);
-        color: #fff;
-        padding: 0.65rem 0.85rem;
-        font-size: 0.9rem;
-        font-weight: 600;
-        border-radius: 7px 7px 0 0;
-      }
-      .nearest-item {
-        padding: 0.65rem 0.85rem;
-        border-bottom: 1px solid #f0f0f0;
-        cursor: pointer;
-        transition: background 0.15s ease;
-      }
-      .nearest-item:hover { background: #f8fbff; }
-      .nearest-item:last-child { border-bottom: none; }
-      .rank-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 1.5rem;
-        height: 1.5rem;
-        border-radius: 999px;
-        font-size: 0.7rem;
-        font-weight: 700;
-        background: #e9ecef;
-        color: #495057;
-      }
-      .rank-badge.rank-1 { background: #ffd700; color: #5c4a00; }
-      .rank-badge.rank-2 { background: #c0c0c0; color: #333; }
-      .rank-badge.rank-3 { background: #cd7f32; color: #fff; }
-      .geo-subtitle { font-size: 0.85rem; color: #2980b9; font-weight: 500; }
-      @keyframes hwPulse {
-        0% { box-shadow: 0 0 0 0 rgba(41, 128, 185, 0.5); }
-        70% { box-shadow: 0 0 0 12px rgba(41, 128, 185, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(41, 128, 185, 0); }
-      }
-      .hw-center-pin { animation: hwPulse 2s infinite; }
-    </style>
+    <link rel="stylesheet" href="/shared/design-tokens.css" />
+    <link href="/shared/modern-navbar.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/finance/css/disasters-unified.css" />
+    <link rel="stylesheet" href="/finance/css/disasters-webcams.css" />
+    <link rel="stylesheet" href="/finance/css/disaster-ai-scan-card.css" />
+    <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
   </head>
-  <body>
-    <header class="page-header">
-      <div class="container">
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+  <body class="du-page hw-page">
+    <modern-navbar></modern-navbar>
+
+    <header class="du-hero hw-hero">
+      <div class="du-hero-inner">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
           <div>
-            <h1 class="h4 mb-1"><i class="bi-camera-video me-2"></i>Hazard Webcams</h1>
-            <p class="mb-0 small opacity-90">USGS · NOAA WebCOOS · ALERTCalifornia · UCSD — <a href="disasters-unified.html" class="text-white text-decoration-underline">Unified Disasters</a></p>
+            <p class="du-hero-kicker mb-1">National catalog · Fixed hazard mounts</p>
+            <h1 class="mb-0"><i class="bi-camera-video me-2"></i>Hazard Webcams</h1>
+            <ul class="du-workflow-pills" id="hwWorkflowHint" aria-label="Workflow steps">
+              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionSearch"><span class="step-num">1</span> Search address</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionFilters"><span class="step-num">2</span> Filter sources</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionMap"><span class="step-num">3</span> Map &amp; nearest</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionCatalog"><span class="step-num">4</span> Full catalog</button></li>
+            </ul>
           </div>
-          <div class="d-flex flex-wrap gap-2">
-            <a href="disasters-unified.html" class="btn btn-light btn-sm"><i class="bi-arrow-left"></i> Unified Disasters</a>
-            <button type="button" class="btn btn-warning btn-sm" id="refreshCamerasBtn"><i class="bi-arrow-repeat"></i> Refresh all sources</button>
+          <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
+            <a class="btn btn-light btn-sm" href="disasters-unified.html"><i class="bi-arrow-left"></i> Unified Disasters</a>
+            <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html"><i class="bi-diagram-3"></i> Impact Graph</a>
+            <button type="button" class="btn btn-warning btn-sm" id="refreshCamerasBtn" title="Ingest all hazard webcam sources into Postgres">
+              <i class="bi-arrow-repeat"></i> Refresh all sources
+            </button>
+          </div>
+        </div>
+        <div class="row g-3 du-stats-row" id="hwStatsRow">
+          <div class="col-md-3 col-6">
+            <div class="du-stat-card du-stat-card--cameras">
+              <div class="du-stat-icon"><i class="bi-camera-video"></i></div>
+              <div>
+                <div class="stat-number" id="hwStatTotal">—</div>
+                <div class="stat-label">Total mounts</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="du-stat-card du-stat-card--fire">
+              <div class="du-stat-icon"><i class="bi-fire"></i></div>
+              <div>
+                <div class="stat-number" id="hwStatFire">—</div>
+                <div class="stat-label">Fire webcams</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="du-stat-card du-stat-card--coastal">
+              <div class="du-stat-icon"><i class="bi-water"></i></div>
+              <div>
+                <div class="stat-number" id="hwStatCoastal">—</div>
+                <div class="stat-label">Coastal (WebCOOS)</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="du-stat-card du-stat-card--sources">
+              <div class="du-stat-icon"><i class="bi-broadcast"></i></div>
+              <div>
+                <div class="stat-number" id="hwStatSources">—</div>
+                <div class="stat-label">Active sources</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="container pb-4">
-      <div id="statusBar" class="small text-muted mb-2"></div>
+    <div class="container-xxl du-main py-2">
+      <div id="statusBar" class="small text-muted mb-2" role="status" aria-live="polite"></div>
       <div id="caFirePresetBanner" class="alert alert-info alert-dismissible fade show d-none py-2 mb-2" role="alert">
         Showing California fire webcams — use Clear address or reset filters for the national catalog.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       </div>
       <div id="geoSubtitle" class="geo-subtitle mb-2" style="display:none;"></div>
-      <div id="sourceStatsRow" class="d-flex flex-wrap gap-2 mb-3"></div>
 
-      <div class="address-hero">
+      <nav class="du-section-pills-menu du-section-pills-menu--sticky mb-3" id="hwSectionPills" aria-label="Webcam sections">
+        <span class="du-section-pills-label">Sections</span>
+        <ul class="nav nav-pills flex-wrap gap-1">
+          <li class="nav-item">
+            <button type="button" class="nav-link active" data-hw-section="hwSectionSearch">
+              <i class="bi bi-geo-alt me-1"></i>Search
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-hw-section="hwSectionFilters">
+              <i class="bi bi-funnel me-1"></i>Filters
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-hw-section="hwSectionMap">
+              <i class="bi bi-map me-1"></i>Map
+            </button>
+          </li>
+          <li class="nav-item">
+            <button type="button" class="nav-link" data-hw-section="hwSectionCatalog">
+              <i class="bi bi-table me-1"></i>Catalog
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div id="hwSectionSearch" class="hw-address-panel mb-3">
         <div class="row g-2 align-items-end">
           <div class="col-lg-5">
             <label class="form-label small fw-semibold mb-1" for="hwAddressInput"><i class="bi-geo-alt me-1"></i>Search by address</label>
@@ -139,7 +147,13 @@
         </div>
       </div>
 
-      <div class="row g-3 mb-3">
+      <div id="hwSectionFilters" class="hw-filters-panel mb-3">
+        <p class="small text-muted mb-3 mb-md-2">
+          <i class="bi bi-info-circle me-1"></i>
+          USGS · NOAA WebCOOS · ALERTCalifornia · UCSD · Caltrans · 511NY — filter by source, state, county, or hazard type.
+        </p>
+        <div id="sourceStatsRow" class="hw-source-stats mb-3"></div>
+        <div class="row g-3 align-items-end">
         <div class="col-md-3">
           <label class="form-label">Source</label>
           <select id="sourceFilter" class="form-select form-select-sm">
@@ -168,36 +182,51 @@
           <button type="button" class="btn btn-primary btn-sm w-100" id="applyFilterBtn"><i class="bi-funnel"></i> Apply</button>
         </div>
         <div class="col-md-2 d-flex align-items-end justify-content-md-end">
-          <span id="cameraCount" class="badge bg-secondary"></span>
+          <span id="cameraCount" class="badge bg-primary hw-count-badge"></span>
+        </div>
+        </div>
+
+        <div class="hw-hazard-pills mt-3" id="hazardChips">
+        <span class="text-muted small align-self-center me-1">Hazard:</span>
+        <button type="button" class="hazard-chip active" data-hazard="">All</button>
+        <button type="button" class="hazard-chip" data-hazard="coastal">Coastal</button>
+        <button type="button" class="hazard-chip" data-hazard="river">River</button>
+        <button type="button" class="hazard-chip" data-hazard="fire">Fire</button>
+        <button type="button" class="hazard-chip" data-hazard="volcano">Volcano</button>
+        <button type="button" class="hazard-chip" data-hazard="flood">Flood</button>
         </div>
       </div>
 
-      <div class="mb-3 d-flex flex-wrap gap-2" id="hazardChips">
-        <span class="text-muted small align-self-center me-1">Hazard:</span>
-        <button type="button" class="btn btn-sm btn-outline-secondary hazard-chip active" data-hazard="">All</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary hazard-chip" data-hazard="coastal">Coastal</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary hazard-chip" data-hazard="river">River</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary hazard-chip" data-hazard="fire">Fire</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary hazard-chip" data-hazard="volcano">Volcano</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary hazard-chip" data-hazard="flood">Flood</button>
-      </div>
-
-      <div class="row g-3 mb-4">
+      <div class="row g-3 mb-4" id="hwSectionMap">
         <div class="col-lg-8">
-          <div id="map"></div>
+          <div class="hw-map-panel">
+            <div class="hw-panel-header"><i class="bi-map me-1"></i> Hazard map</div>
+            <div id="map"></div>
+          </div>
         </div>
         <div class="col-lg-4">
-          <div class="nearest-panel" id="nearestPanel">
-            <div class="nearest-panel-header"><i class="bi-bullseye me-1"></i> Nearest webcams</div>
-            <div id="nearestList">
+          <div class="hw-nearest-panel" id="nearestPanel">
+            <div class="hw-panel-header"><i class="bi-bullseye me-1"></i> Nearest webcams</div>
+            <div class="hw-nearest-list" id="nearestList">
               <p class="text-muted small p-3 mb-0">Enter an address above to find nearby hazard webcams.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card du-data-panel hw-catalog-panel mb-4" id="hwSectionCatalog">
+        <div class="card-header py-2">
+          <strong><i class="bi-table me-1"></i> National catalog</strong>
+          <small class="text-muted d-block">Search by name, sort columns, or open a live feed</small>
+        </div>
         <div class="card-body">
+          <div class="d-flex flex-wrap align-items-start gap-3 mb-3 pb-3 border-bottom">
+            <div class="flex-grow-1" style="min-width: 12rem;">
+              <p class="small fw-semibold mb-1"><i class="bi bi-qr-code me-1" aria-hidden="true"></i>Step 4 · Processor expert</p>
+              <p class="small text-muted mb-0">Flip the card · scan to open Unified Disasters AI for loan triage alongside this catalog.</p>
+            </div>
+            <div id="disasterAiScanCardMount" class="flex-shrink-0" aria-label="AI scan share card"></div>
+          </div>
           <div class="row g-2 align-items-end mb-3">
             <div class="col-md-5">
               <label class="form-label small fw-semibold mb-1" for="hwNameSearch"><i class="bi bi-search me-1"></i>Search by name</label>
@@ -223,7 +252,25 @@
           </table>
         </div>
       </div>
-    </main>
+    </div>
+
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <div class="tool-product-credits-footer" role="contentinfo" aria-label="Product credits">
+            <div class="credits-block">
+              <span class="credits-label">Developed by</span>
+              <span class="credits-name">David E Lane</span>
+            </div>
+          </div>
+          <div class="footer-meta-line">
+            <span id="hwFooterDate"></span>
+            <span class="mx-1">·</span>
+            <span>Hazard Webcams · DevConnect Labs</span>
+          </div>
+        </div>
+      </div>
+    </footer>
 
     <div class="modal fade" id="cameraViewerModal" tabindex="-1" aria-labelledby="cameraViewerModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-xl modal-dialog-centered">
@@ -294,7 +341,7 @@
           return {
             path: google.maps.SymbolPath.CIRCLE,
             scale: 10,
-            fillColor: '#2980b9',
+            fillColor: '#4a90a4',
             fillOpacity: 1,
             strokeColor: '#fff',
             strokeWeight: 3
@@ -449,9 +496,9 @@
             map,
             center: { lat: geo.lat, lng: geo.lng },
             radius: radiusMiles * 1609.34,
-            fillColor: '#2980b9',
+            fillColor: '#4a90a4',
             fillOpacity: 0.12,
-            strokeColor: '#2980b9',
+            strokeColor: '#4a90a4',
             strokeOpacity: 0.65,
             strokeWeight: 2,
             clickable: false
@@ -568,9 +615,9 @@
             const dist = DCF ? DCF.formatCameraDistanceMi(camera) : (camera.distance_miles != null ? camera.distance_miles + ' mi' : '—');
             const lhBadge = lighthouseBadgeFor(camera);
 
-            html += `<div class="nearest-item" data-camera-key="${key}">
+            html += `<div class="hw-nearest-item" data-camera-key="${key}">
               <div class="d-flex align-items-start gap-2">
-                <span class="rank-badge${rankClass}">${rank}</span>
+                <span class="hw-rank-badge${rankClass}">${rank}</span>
                 <div class="flex-grow-1 min-w-0">
                   <div class="fw-semibold small text-truncate">${name}${lhBadge}</div>
                   <div class="text-muted small">${src ? src + ' · ' : ''}${loc} · ${dist}</div>
@@ -583,7 +630,7 @@
           });
           listEl.innerHTML = html;
 
-          listEl.querySelectorAll('.nearest-item').forEach((row) => {
+          listEl.querySelectorAll('.hw-nearest-item').forEach((row) => {
             row.addEventListener('click', (event) => {
               if (event.target.closest('.nearest-view-btn')) return;
               const key = row.getAttribute('data-camera-key');
@@ -686,11 +733,62 @@
             const resp = await fetch('/api/disasters/cameras/stats');
             const json = await resp.json();
             if (!json.success) return;
+            const bySource = json.data.bySource || [];
+            const total = json.data.total || 0;
+            const fireSources = new Set(['alertcalifornia', 'alertwest']);
+            const fireCount = bySource
+              .filter((s) => fireSources.has(String(s.source || '').toLowerCase()))
+              .reduce((sum, s) => sum + Number(s.count || 0), 0);
+            const coastalCount = bySource
+              .filter((s) => String(s.source || '').toLowerCase() === 'webcoos')
+              .reduce((sum, s) => sum + Number(s.count || 0), 0);
+            const activeSources = bySource.filter((s) => Number(s.count) > 0).length;
+
+            const setStat = (id, value) => {
+              const el = document.getElementById(id);
+              if (el) el.textContent = value;
+            };
+            setStat('hwStatTotal', total.toLocaleString());
+            setStat('hwStatFire', fireCount.toLocaleString());
+            setStat('hwStatCoastal', coastalCount.toLocaleString());
+            setStat('hwStatSources', String(activeSources));
+
             const row = document.getElementById('sourceStatsRow');
-            row.innerHTML = (json.data.bySource || []).map((s) =>
-              `<span class="badge bg-light text-dark border source-stat">${s.source}: ${s.count}</span>`
-            ).join('') + `<span class="badge bg-primary source-stat">Total: ${json.data.total || 0}</span>`;
+            if (row) {
+              row.innerHTML = bySource.map((s) =>
+                `<span class="badge bg-light text-dark border source-stat">${s.source}: ${s.count}</span>`
+              ).join('') + `<span class="badge bg-primary source-stat">Total: ${total}</span>`;
+            }
           } catch (_) {}
+        }
+
+        function initHwSectionNav() {
+          function scrollToSection(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (!el) return;
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+
+          function setActiveSection(sectionId) {
+            document.querySelectorAll('#hwSectionPills [data-hw-section]').forEach((btn) => {
+              btn.classList.toggle('active', btn.getAttribute('data-hw-section') === sectionId);
+            });
+            document.querySelectorAll('#hwWorkflowHint [data-hw-section]').forEach((btn) => {
+              const li = btn.closest('li');
+              if (li) {
+                li.classList.toggle('du-workflow-pill-active', btn.getAttribute('data-hw-section') === sectionId);
+              }
+            });
+          }
+
+          document.querySelectorAll('[data-hw-section]').forEach((btn) => {
+            btn.addEventListener('click', (e) => {
+              e.preventDefault();
+              const sectionId = btn.getAttribute('data-hw-section');
+              scrollToSection(sectionId);
+              setActiveSection(sectionId);
+            });
+          });
         }
 
         async function loadCameras() {
@@ -817,7 +915,10 @@
 
         document.addEventListener('DOMContentLoaded', () => {
           initMap();
+          initHwSectionNav();
           applyFilterPresetsFromUrl();
+          const footerDate = document.getElementById('hwFooterDate');
+          if (footerDate) footerDate.textContent = new Date().toLocaleDateString();
           HWS.initAddressSearch({
             onSearch: onAddressSearch,
             onClear: onAddressClear,
@@ -825,10 +926,26 @@
             radiusCustomId: 'hwRadiusCustom',
             radiusCustomWrapId: 'hwRadiusCustomWrap'
           });
+          if (window.DisasterAiScanCard) {
+            window.DisasterAiScanCard.mount(document.getElementById('disasterAiScanCardMount'), {
+              title: 'Disaster processor expert',
+              kicker: 'Scan · webcams + AI',
+              hint: 'Click to flip · scan QR',
+              scanUrl: `${window.location.origin}/finance/disasters-unified.html`,
+              openAi: true,
+              imageUrl: '/family/assets/DavidELane.png',
+              openLabel: 'Open AI',
+              onOpenAi: () => {
+                window.location.href = '/finance/disasters-unified.html?openAi=1';
+              },
+            });
+          }
           loadCameras();
         });
       })();
     </script>
-    <script src="/shared/finance-auth-guard.js"></script>
+    <script src="/finance/js/disaster-ai-scan-card.js"></script>
+    <script src="/shared/modern-navbar.js"></script>
+    <script src="/shared/encompass-dark-mode.js"></script>
   </body>
 </html>

@@ -166,6 +166,7 @@
   color: #1a1410;
   text-align: center;
   max-width: 5.5rem;
+  text-shadow: 0 0 1px #fff, 0 1px 1px rgba(255, 255, 255, 0.95);
 }
 
 .lhp-poster-qr-heygen {
@@ -176,17 +177,180 @@
   color: #4f46e5;
 }
 
-/* T-shirt print area — 10×12 in at 72dpi screen preview; export at 2× */
+/* David Lane Time Traveler t-shirt — front + back on black */
 .lhp-shirt-canvas {
-  position: relative;
   width: 100%;
-  max-width: 480px;
+  max-width: 720px;
   margin: 0 auto;
-  aspect-ratio: 5 / 6;
-  background: #111827;
-  border-radius: 8px;
+  background: #050505;
+  border-radius: 10px;
   overflow: hidden;
-  color: #f8fafc;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+}
+
+.lhp-tt-sheet {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  min-height: 420px;
+}
+
+.lhp-tt-panel {
+  --lhp-tt-gold: #c9a227;
+  background: #000;
+  color: var(--lhp-tt-gold);
+  font-family: 'Libre Baskerville', Georgia, serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.35rem 1rem 1.1rem;
+  min-height: 420px;
+}
+
+.lhp-tt-name {
+  font-size: clamp(1.35rem, 3.8vw, 1.85rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.35rem;
+  line-height: 1.05;
+  color: var(--lhp-tt-gold);
+}
+
+.lhp-tt-sub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-size: clamp(0.62rem, 1.8vw, 0.78rem);
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: var(--lhp-tt-gold);
+}
+
+.lhp-tt-flourish {
+  display: inline-block;
+  width: 1.1rem;
+  height: 0.55rem;
+  border-top: 1px solid var(--lhp-tt-gold);
+  border-bottom: 1px solid var(--lhp-tt-gold);
+  opacity: 0.85;
+}
+
+.lhp-tt-art-frame {
+  width: min(78%, 220px);
+  aspect-ratio: 1;
+  padding: 4px;
+  border: 2px solid var(--lhp-tt-gold);
+  box-shadow: inset 0 0 0 1px rgba(201, 162, 39, 0.35);
+  margin-bottom: 0.75rem;
+  background: #0a0a0a;
+}
+
+.lhp-tt-art-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.lhp-tt-follow {
+  font-size: clamp(0.58rem, 1.7vw, 0.72rem);
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  margin: 0 0 0.45rem;
+}
+
+.lhp-tt-era {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: clamp(0.52rem, 1.5vw, 0.64rem);
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  margin: 0 0 0.55rem;
+}
+
+.lhp-tt-rule {
+  display: inline-block;
+  width: 1.75rem;
+  height: 1px;
+  background: var(--lhp-tt-gold);
+  opacity: 0.75;
+}
+
+.lhp-tt-compass {
+  margin-top: auto;
+  color: var(--lhp-tt-gold);
+}
+
+.lhp-tt-compass-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: block;
+}
+
+.lhp-tt-scan {
+  font-size: clamp(0.95rem, 2.8vw, 1.2rem);
+  letter-spacing: 0.16em;
+  font-weight: 700;
+  margin: 0.35rem 0 0.55rem;
+}
+
+.lhp-tt-flourish-divider {
+  width: 2.5rem;
+  height: 0.65rem;
+  border-top: 1px solid var(--lhp-tt-gold);
+  border-bottom: 1px solid var(--lhp-tt-gold);
+  margin-bottom: 0.85rem;
+  opacity: 0.85;
+}
+
+.lhp-tt-back {
+  justify-content: flex-start;
+}
+
+.lhp-tt-qr.lhp-qr-frame {
+  background: #fff;
+  padding: 10px;
+  border: 3px solid #fff;
+  outline: 2px solid var(--lhp-tt-gold);
+  outline-offset: 3px;
+  border-radius: 4px;
+  margin: 0.25rem 0 0.85rem;
+}
+
+.lhp-tt-qr.lhp-qr-frame canvas,
+.lhp-tt-qr.lhp-qr-frame img {
+  width: 188px !important;
+  height: 188px !important;
+}
+
+.lhp-tt-features {
+  font-size: clamp(0.58rem, 1.6vw, 0.72rem);
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin: 0 0 0.65rem;
+  line-height: 1.35;
+}
+
+.lhp-tt-site {
+  font-size: clamp(0.72rem, 2vw, 0.92rem);
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  margin: auto 0 0.35rem;
+}
+
+@media (max-width: 640px) {
+  .lhp-tt-sheet {
+    grid-template-columns: 1fr;
+  }
+
+  .lhp-tt-panel {
+    min-height: auto;
+  }
 }
 
 /* Four-up t-shirt grid — Boston quartet */
@@ -254,7 +418,7 @@
   max-height: 100%;
   object-fit: contain;
   object-position: center top;
-  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.5));
+  filter: contrast(1.14) brightness(1.03) drop-shadow(0 3px 10px rgba(0, 0, 0, 0.5));
 }
 
 .lhp-quartet-years {
@@ -279,9 +443,11 @@
 .lhp-quartet-name {
   font-family: 'Libre Baskerville', Georgia, serif;
   font-size: clamp(0.55rem, 2.2vw, 0.72rem);
+  font-weight: 700;
   line-height: 1.15;
   margin: 0.2rem 0 0;
-  color: #f8fafc;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85), 0 0 1px #000;
 }
 
 .lhp-quartet-tagline {
@@ -305,108 +471,13 @@
   font-size: 0.48rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-weight: 700;
-  color: #a5b4fc;
+  font-weight: 800;
+  color: #c7d2fe;
   margin-top: 0.1rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
 }
 
-.lhp-shirt-inner {
-  position: absolute;
-  inset: 8%;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  gap: 0.5rem;
-  text-align: center;
-}
-
-.lhp-shirt-portraits {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  align-items: end;
-  min-height: 0;
-}
-
-.lhp-shirt-portraits img {
-  width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.45));
-}
-
-.lhp-shirt-portraits .lhp-avatar-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  border: 2px dashed rgba(255, 255, 255, 0.35);
-  border-radius: 8px;
-  min-height: 120px;
-  padding: 0.35rem;
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.lhp-shirt-portraits .lhp-avatar-slot img {
-  border: none;
-}
-
-.lhp-avatar-slot-hint {
-  font-size: 0.62rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
-  margin-top: 0.25rem;
-}
-
-.lhp-shirt-name {
-  font-family: 'Libre Baskerville', Georgia, serif;
-  font-size: clamp(1rem, 3vw, 1.35rem);
-  line-height: 1.2;
-  margin: 0;
-}
-
-.lhp-shirt-tagline {
-  font-size: 0.72rem;
-  color: rgba(248, 250, 252, 0.78);
-  margin: 0;
-}
-
-.lhp-shirt-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding-top: 0.35rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.lhp-shirt-qr {
-  flex-shrink: 0;
-}
-
-.lhp-shirt-qr.lhp-qr-frame canvas,
-.lhp-shirt-qr.lhp-qr-frame img {
-  display: block;
-  width: 104px !important;
-  height: 104px !important;
-}
-
-.lhp-heygen-badge {
-  font-size: 0.58rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: #a5b4fc;
-  text-align: left;
-  line-height: 1.35;
-}
-
-.lhp-heygen-badge strong {
-  display: block;
-  color: #e0e7ff;
-  font-size: 0.68rem;
-}
+/* legacy shirt layout removed — see .lhp-tt-* Time Traveler panels above */
 
 /* Trading card — 2.5 × 3.5 */
 .lhp-card-canvas {
