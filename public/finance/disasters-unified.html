@@ -135,46 +135,26 @@
       </div>
     </header>
 
-    <div class="container-xxl du-main py-2">
+    <div class="container-fluid du-main py-2 px-4">
       <div id="dashboardStatusBanner" class="alert alert-warning dashboard-status-banner mb-2" role="alert"></div>
       <div id="sourceHealthLine" class="mb-2" aria-live="polite"></div>
 
-      <nav class="du-section-pills-menu du-section-pills-menu--sticky mb-3" id="duSectionPillsMenu" aria-label="Dashboard sections">
-        <span class="du-section-pills-label">Sections</span>
-        <ul class="nav nav-pills flex-wrap gap-1">
-          <li class="nav-item">
-            <button type="button" class="nav-link" data-du-section-target="collapseCommandDeck" data-du-section-step="1">
-              <i class="bi bi-sliders me-1"></i>Sources
-            </button>
-          </li>
-          <li class="nav-item">
-            <button type="button" class="nav-link" data-du-section-target="collapseRiskIntel" data-du-section-step="2">
-              <i class="bi bi-speedometer2 me-1"></i>Risk intel
-            </button>
-          </li>
-          <li class="nav-item">
-            <button type="button" class="nav-link" data-du-section-target="collapseFilters" data-du-section-step="3">
-              <i class="bi bi-funnel me-1"></i>Filters
-            </button>
-          </li>
-          <li class="nav-item">
-            <button type="button" class="nav-link active" data-du-section-target="collapseDisasters" data-du-section-step="3">
-              <i class="bi bi-shield-exclamation me-1"></i>Disasters
-            </button>
-          </li>
-          <li class="nav-item">
-            <button type="button" class="nav-link" data-du-section-target="collapseMapYouTube" data-du-section-step="3">
-              <i class="bi bi-geo-alt me-1"></i>Map &amp; videos
-            </button>
-          </li>
-          <li class="nav-item">
-            <button type="button" class="nav-link" data-du-section-target="collapseLoans" data-du-section-step="4">
-              <i class="bi bi-bank me-1"></i>Mocked loans
-            </button>
-          </li>
-        </ul>
-      </nav>
+      <div class="unit-tests-layout">
+        <nav class="section-sidebar" id="duSectionPillsMenu" aria-label="Section navigation">
+          <div class="section-sidebar-title">Workflow</div>
+          <ul class="section-sidebar-nav" id="duSectionSidebarNav">
+            <li><a href="#" data-bs-target="#collapseCommandDeck" data-heading="headingCommandDeck" data-du-section-step="1"><i class="bi bi-sliders"></i> Sources</a></li>
+            <li><a href="#" data-bs-target="#collapseRiskIntel" data-heading="headingRiskIntel" data-du-section-step="2"><i class="bi bi-speedometer2"></i> Risk intel</a></li>
+            <li><a href="#" data-bs-target="#collapseFilters" data-heading="headingFilters" data-du-section-step="3"><i class="bi bi-funnel"></i> Filters</a></li>
+            <li><a href="#" class="active-section" data-bs-target="#collapseDisasters" data-heading="headingDisasters" data-du-section-step="3"><i class="bi bi-shield-exclamation"></i> Disasters</a></li>
+            <li><a href="#" data-bs-target="#collapseMapYouTube" data-heading="headingMapYouTube" data-du-section-step="3"><i class="bi bi-geo-alt"></i> Map &amp; videos</a></li>
+            <li><a href="#" data-bs-target="#collapseLoans" data-heading="headingLoans" data-du-section-step="4"><i class="bi bi-bank"></i> Mocked loans</a></li>
+            <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Tools</span></li>
+            <li><a href="#" data-du-section-target="duBottomDock" data-du-section-step="5"><i class="bi bi-box-arrow-up"></i> KML &amp; AI expert</a></li>
+          </ul>
+        </nav>
 
+        <div class="section-content-area">
       <div class="card du-web-crawl-panel mb-3" id="duWebCrawlPanel" aria-label="Live web hazard headlines">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
           <div>
@@ -209,8 +189,8 @@
       </div>
 
       <div class="du-section-cards mb-4">
-      <div class="du-section-card du-command-deck">
-        <div class="du-section-card-header" tabindex="0" id="headingCommandDeck" role="button" data-bs-toggle="collapse" data-bs-target="#collapseCommandDeck" aria-expanded="true" aria-controls="collapseCommandDeck">
+      <div class="du-section-card du-command-deck du-section-card-hidden" data-du-collapse-target="collapseCommandDeck">
+        <div class="du-section-card-header collapsed" tabindex="0" id="headingCommandDeck" role="button" data-bs-toggle="collapse" data-bs-target="#collapseCommandDeck" aria-expanded="false" aria-controls="collapseCommandDeck">
           <span class="du-section-title">
             <span class="du-section-step-pill" aria-hidden="true">1</span>
             <i class="bi bi-sliders" aria-hidden="true"></i>
@@ -218,7 +198,7 @@
           </span>
           <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
         </div>
-        <div id="collapseCommandDeck" class="collapse show du-section-card-body" aria-labelledby="headingCommandDeck">
+        <div id="collapseCommandDeck" class="collapse du-section-card-body" aria-labelledby="headingCommandDeck">
           <p class="small text-muted mb-2">
             <strong>Pull all sources</strong> hits live FEMA · FIRMS · USGS · NWS · NHC APIs, geocodes county locations for the map, and writes rows into Postgres (<code>disasters</code>).
             The grid below reads from that database — it does not call those APIs on its own.
@@ -280,8 +260,8 @@
         </div>
       </div>
 
-      <div class="du-section-card du-risk-intel" id="duRiskIntelCard">
-        <div class="du-section-card-header" tabindex="0" id="headingRiskIntel" role="button" data-bs-toggle="collapse" data-bs-target="#collapseRiskIntel" aria-expanded="true" aria-controls="collapseRiskIntel">
+      <div class="du-section-card du-risk-intel du-section-card-hidden" id="duRiskIntelCard" data-du-collapse-target="collapseRiskIntel">
+        <div class="du-section-card-header collapsed" tabindex="0" id="headingRiskIntel" role="button" data-bs-toggle="collapse" data-bs-target="#collapseRiskIntel" aria-expanded="false" aria-controls="collapseRiskIntel">
           <span class="du-section-title">
             <span class="du-section-step-pill" aria-hidden="true">2</span>
             <i class="bi bi-speedometer2" aria-hidden="true"></i>
@@ -290,7 +270,7 @@
           </span>
           <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
         </div>
-        <div id="collapseRiskIntel" class="collapse show du-section-card-body" aria-labelledby="headingRiskIntel">
+        <div id="collapseRiskIntel" class="collapse du-section-card-body" aria-labelledby="headingRiskIntel">
           <p class="small text-muted mb-3">
             Hotspots and top events from the loaded grid. Click a hotspot to filter the disasters table and load county loans; click an event to drill down.
           </p>
@@ -331,9 +311,9 @@
       </div>
       </div>
 
-      <!-- Bootstrap Accordion -->
       <div class="accordion mb-4" id="disastersAccordion">
         <!-- Accordion Item 1: Filters -->
+        <div class="du-nav-section du-section-card-hidden" data-du-collapse-target="collapseFilters">
         <div class="accordion-item">
           <h2 class="accordion-header" id="headingFilters">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFilters" aria-expanded="false" aria-controls="collapseFilters">
@@ -388,8 +368,10 @@
             </div>
           </div>
         </div>
+        </div>
 
         <!-- Accordion Item 2: Disasters Table -->
+        <div class="du-nav-section" data-du-collapse-target="collapseDisasters">
         <div class="accordion-item">
           <h2 class="accordion-header" id="headingDisasters">
             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDisasters" aria-expanded="true" aria-controls="collapseDisasters">
@@ -415,15 +397,17 @@
             </div>
           </div>
         </div>
+        </div>
 
         <!-- Accordion Item 3: Map & YouTube -->
+        <div class="du-nav-section du-section-card-hidden" data-du-collapse-target="collapseMapYouTube">
         <div class="accordion-item">
           <h2 class="accordion-header" id="headingMapYouTube">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMapYouTube" aria-expanded="true" aria-controls="collapseMapYouTube">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMapYouTube" aria-expanded="false" aria-controls="collapseMapYouTube">
               <i class="bi bi-geo-alt me-2"></i> Map & Disaster Videos
             </button>
           </h2>
-          <div id="collapseMapYouTube" class="accordion-collapse collapse show" aria-labelledby="headingMapYouTube">
+          <div id="collapseMapYouTube" class="accordion-collapse collapse" aria-labelledby="headingMapYouTube">
             <div class="accordion-body">
               <div class="row g-3">
                 <div class="col-md-6">
@@ -458,11 +442,12 @@
             </div>
           </div>
         </div>
+        </div>
 
       </div>
 
       <div class="du-section-cards mb-4">
-        <div class="du-section-card du-mocked-loans" id="duMockedLoansSection">
+        <div class="du-section-card du-mocked-loans du-section-card-hidden" id="duMockedLoansSection" data-du-collapse-target="collapseLoans">
           <div
             class="du-section-card-header collapsed"
             tabindex="0"
@@ -554,21 +539,25 @@
                   <div id="encompassLoansGrid" class="ag-theme-alpine"></div>
                 </div>
                 <div id="duLoanPanelCameras" class="du-loan-panel" role="tabpanel" aria-labelledby="duLoanPanelCamerasTab" hidden>
-                  <div class="card border-0 shadow-none" id="duNearbyCamerasCard" style="display: none;">
-                    <div class="card-header py-2 px-0 bg-transparent border-0">
-                      <strong class="small"><i class="bi bi-camera-video"></i> Nearby fire cameras</strong>
-                      <small class="text-muted d-block" id="duNearbyCamerasSubtitle">Hazard webcams near selection</small>
-                    </div>
-                    <div class="card-body py-2 px-0" id="duNearbyCamerasList">
-                      <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
-                    </div>
-                  </div>
-                  <p class="text-muted small mb-0" id="duNearbyCamerasIdle">Select a disaster or mocked loan to load cameras.</p>
+                  <p class="text-muted small mb-0">Nearby hazard webcams for the current disaster or loan selection.</p>
                 </div>
+                <div class="card mt-3 du-data-panel" id="duNearbyCamerasCard" style="display: none;">
+                  <div class="card-header py-2">
+                    <strong class="small"><i class="bi bi-camera-video"></i> Nearby fire cameras</strong>
+                    <small class="text-muted d-block" id="duNearbyCamerasSubtitle">Hazard webcams near selection</small>
+                  </div>
+                  <div class="card-body py-2" id="duNearbyCamerasList">
+                    <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
+                  </div>
+                </div>
+                <p class="text-muted small mb-0 mt-2" id="duNearbyCamerasIdle">Select a disaster or mocked loan to load cameras.</p>
               </div>
             </div>
             <p class="small text-muted mb-0" id="duMockedLoansIdle">Select a disaster in the grid to load mocked loan data and nearby fire cameras.</p>
           </div>
+        </div>
+      </div>
+
         </div>
       </div>
 
@@ -893,8 +882,13 @@
         $('#duNearbyCamerasList').html(
           DisasterCameraFilters.buildNearbyCamerasListHtml(cameras, emptyMsg)
         );
-        $('#duNearbyCamerasCard').show();
-        $('#duNearbyCamerasIdle').hide();
+        const camerasCard = document.getElementById('duNearbyCamerasCard');
+        const camerasIdle = document.getElementById('duNearbyCamerasIdle');
+        if (camerasCard) {
+          camerasCard.style.display = '';
+          camerasCard.hidden = false;
+        }
+        if (camerasIdle) camerasIdle.hidden = true;
         clearCameraMarkers();
         if (map) {
           DisasterCameraFilters.addCameraMarkersToMap(map, cameras, cameraMarkers);
@@ -1556,7 +1550,7 @@
           clearHotspotGridFilter();
         });
         initDuSectionCards();
-        initDuSectionPillsMenu();
+        initDuSectionSidebar();
         initDuWorkflowPills();
         initDuLoanPillsMenu();
 
@@ -1674,13 +1668,109 @@
           });
         });
 
-        syncDuWorkflowPill(1);
+        syncDuWorkflowPill(3);
+      }
+
+      const DU_SIDEBAR_SECTION_IDS = [
+        'collapseCommandDeck',
+        'collapseRiskIntel',
+        'collapseFilters',
+        'collapseDisasters',
+        'collapseMapYouTube',
+        'collapseLoans',
+      ];
+
+      function duBsCollapseShow(el) {
+        if (!el || typeof bootstrap === 'undefined') return;
+        bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
+      }
+
+      function duBsCollapseHide(el, onHidden) {
+        if (!el || typeof bootstrap === 'undefined') return;
+        const instance = bootstrap.Collapse.getOrCreateInstance(el, { toggle: false });
+        if (onHidden) {
+          el.addEventListener('hidden.bs.collapse', function handler() {
+            el.removeEventListener('hidden.bs.collapse', handler);
+            onHidden();
+          });
+        }
+        instance.hide();
+      }
+
+      function getDuNavSectionForCollapse(sectionId) {
+        const id = String(sectionId || '').replace(/^#/, '').trim();
+        const el = document.getElementById(id);
+        if (!el) return null;
+        if (id === 'collapseLoans') return document.getElementById('duMockedLoansSection');
+        if (id === 'collapseRiskIntel') return document.getElementById('duRiskIntelCard');
+        const navSection = el.closest('.du-nav-section');
+        if (navSection) return navSection;
+        return el.closest('.du-section-card');
+      }
+
+      function updateDuSectionHeaderState(sectionId, expanded) {
+        const id = String(sectionId || '').replace(/^#/, '').trim();
+        const trigger = document.querySelector(
+          `[data-bs-target="#${id}"], [data-bs-target="${id}"]`
+        );
+        if (!trigger) return;
+        trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        trigger.classList.toggle('collapsed', !expanded);
       }
 
       function setDuSectionPillActive(targetId) {
-        document.querySelectorAll('#duSectionPillsMenu .nav-link').forEach((link) => {
-          link.classList.toggle('active', link.getAttribute('data-du-section-target') === targetId);
+        const nav = document.getElementById('duSectionSidebarNav');
+        if (!nav) return;
+        nav.querySelectorAll('[data-bs-target], [data-du-section-target]').forEach((link) => {
+          const linkTarget =
+            (link.getAttribute('data-bs-target') || link.getAttribute('data-du-section-target') || '').replace(/^#/, '');
+          link.classList.toggle('active-section', linkTarget === targetId);
         });
+      }
+
+      function updateDuSectionSidebarActiveState(sectionId, isExpanded) {
+        const nav = document.getElementById('duSectionSidebarNav');
+        if (!nav) return;
+        const id = String(sectionId || '').replace(/^#/, '').trim();
+        const link = nav.querySelector(
+          'a[data-bs-target="#' + id + '"], a[data-bs-target="' + id + '"], a[data-du-section-target="' + id + '"]'
+        );
+        if (link) {
+          link.classList.toggle('active-section', isExpanded);
+        }
+        if (isExpanded) {
+          const step = link?.getAttribute('data-du-section-step');
+          if (step) syncDuWorkflowPill(Number(step));
+        }
+      }
+
+      function showDuDashboardSectionCard(sectionId) {
+        const id = String(sectionId || '').replace(/^#/, '').trim();
+        const section = document.getElementById(id);
+        if (!section || section.classList.contains('show')) return;
+        const card = getDuNavSectionForCollapse(id);
+        if (card) card.classList.remove('du-section-card-hidden');
+        updateDuSectionHeaderState(id, true);
+        duBsCollapseShow(section);
+        setDuSectionPillActive(id);
+      }
+
+      function toggleDuDashboardSectionCard(sectionId) {
+        const id = String(sectionId || '').replace(/^#/, '').trim();
+        const section = document.getElementById(id);
+        if (!section) return;
+        const card = getDuNavSectionForCollapse(id);
+        const isExpanded = section.classList.contains('show');
+        if (isExpanded) {
+          updateDuSectionHeaderState(id, false);
+          duBsCollapseHide(section, card ? function () { card.classList.add('du-section-card-hidden'); } : undefined);
+          updateDuSectionSidebarActiveState(id, false);
+        } else {
+          if (card) card.classList.remove('du-section-card-hidden');
+          updateDuSectionHeaderState(id, true);
+          duBsCollapseShow(section);
+          updateDuSectionSidebarActiveState(id, true);
+        }
       }
 
       function showDuAccordionSection(targetId, { exclusive = true } = {}) {
@@ -1701,8 +1791,8 @@
       }
 
       function revealDisasterSelectionPanels() {
-        showDuAccordionSection('collapseDisasters', { exclusive: false });
-        showDuAccordionSection('collapseMapYouTube', { exclusive: false });
+        showDuDashboardSectionCard('collapseDisasters');
+        showDuDashboardSectionCard('collapseMapYouTube');
         expandDuLoansSection();
         setDuSectionPillActive('collapseMapYouTube');
         syncDuWorkflowPill(3);
@@ -1736,16 +1826,8 @@
           collapseMapYouTube: 'headingMapYouTube',
         };
 
-        if (accordionIds.includes(targetId)) {
-          showDuAccordionSection(targetId, { exclusive: true });
-          document.getElementById(sectionHeadingIds[targetId])?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-
-        if (sectionCardIds.includes(targetId)) {
-          const el = document.getElementById(targetId);
-          if (el && typeof bootstrap !== 'undefined') {
-            bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
-          }
+        if (accordionIds.includes(targetId) || sectionCardIds.includes(targetId)) {
+          showDuDashboardSectionCard(targetId);
           document.getElementById(sectionHeadingIds[targetId])?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
@@ -1769,46 +1851,82 @@
         });
       }
 
-      function initDuSectionPillsMenu() {
-        const menu = document.getElementById('duSectionPillsMenu');
-        if (!menu) return;
-        menu.querySelectorAll('[data-du-section-target]').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            openDuDashboardSection(
-              btn.getAttribute('data-du-section-target'),
-              btn.getAttribute('data-du-section-step')
-            );
-          });
+      function initDuSectionSidebar() {
+        const nav = document.getElementById('duSectionSidebarNav');
+        if (!nav) return;
+
+        DU_SIDEBAR_SECTION_IDS.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.remove('show');
+            try {
+              const inst = bootstrap?.Collapse?.getInstance(el);
+              if (inst) inst.hide();
+            } catch (_) {}
+          }
+          const card = getDuNavSectionForCollapse(id);
+          if (card) card.classList.add('du-section-card-hidden');
         });
-        ['collapseFilters', 'collapseDisasters', 'collapseMapYouTube'].forEach((id) => {
+        nav.querySelectorAll('.active-section').forEach((a) => a.classList.remove('active-section'));
+
+        nav.addEventListener('click', (e) => {
+          const link = e.target.closest('a[data-bs-target], a[data-du-section-target]');
+          if (!link) return;
+          e.preventDefault();
+          const bottomDockTarget = link.getAttribute('data-du-section-target');
+          if (bottomDockTarget === 'duBottomDock') {
+            openDuDashboardSection('duBottomDock', link.getAttribute('data-du-section-step'));
+            return;
+          }
+          const target = link.getAttribute('data-bs-target');
+          if (!target) return;
+          toggleDuDashboardSectionCard(target);
+          const heading = document.getElementById(link.getAttribute('data-heading'));
+          if (heading) {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                heading.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              });
+            });
+          }
+        });
+
+        DU_SIDEBAR_SECTION_IDS.forEach((id) => {
           const el = document.getElementById(id);
           if (!el) return;
-          el.addEventListener('shown.bs.collapse', () => setDuSectionPillActive(id));
+          el.addEventListener('shown.bs.collapse', () => updateDuSectionSidebarActiveState(id, true));
+          el.addEventListener('hidden.bs.collapse', () => updateDuSectionSidebarActiveState(id, false));
         });
-        ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans'].forEach((id) => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          el.addEventListener('shown.bs.collapse', () => {
-            setDuSectionPillActive(id);
-            if (id === 'collapseCommandDeck') syncDuWorkflowPill(1);
-            if (id === 'collapseRiskIntel') syncDuWorkflowPill(2);
-            if (id === 'collapseLoans') syncDuWorkflowPill(4);
-          });
-        });
+
+        const defaultOpenId = 'collapseDisasters';
+        showDuDashboardSectionCard(defaultOpenId);
+        updateDuSectionSidebarActiveState(defaultOpenId, true);
+        syncDuWorkflowPill(3);
       }
 
       function setDuLoanPanel(panel) {
         const loansPanel = document.getElementById('duLoanPanelLoans');
         const camerasPanel = document.getElementById('duLoanPanelCameras');
+        const camerasCard = document.getElementById('duNearbyCamerasCard');
+        const camerasIdle = document.getElementById('duNearbyCamerasIdle');
         const isLoans = panel !== 'cameras';
         if (loansPanel) loansPanel.hidden = !isLoans;
         if (camerasPanel) camerasPanel.hidden = isLoans;
+        // Cameras card lives outside the tab panels so it stays visible on the loans tab (stacked layout).
+        if (camerasCard && camerasCard.style.display !== 'none') {
+          camerasCard.hidden = false;
+        }
+        if (camerasIdle && camerasCard && camerasCard.style.display !== 'none') {
+          camerasIdle.hidden = true;
+        }
         document.querySelectorAll('#duLoanPanelPills [data-du-loan-panel]').forEach((btn) => {
           const active = btn.getAttribute('data-du-loan-panel') === (isLoans ? 'loans' : 'cameras');
           btn.classList.toggle('active', active);
           btn.setAttribute('aria-selected', active ? 'true' : 'false');
         });
+        if (!isLoans && camerasCard && camerasCard.style.display !== 'none') {
+          camerasCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
       }
 
       function syncDuLoanFilterPillsFromSelects() {
@@ -1876,15 +1994,7 @@
       function expandDuLoansSection() {
         showMockedLoansWorkspace();
         setDuLoanPanel('loans');
-        const el = document.getElementById('collapseLoans');
-        if (el && typeof bootstrap !== 'undefined') {
-          bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
-        }
-        const header = document.getElementById('headingLoans');
-        if (header) {
-          header.classList.remove('collapsed');
-          header.setAttribute('aria-expanded', 'true');
-        }
+        showDuDashboardSectionCard('collapseLoans');
         setTimeout(refreshEncompassLoansGridLayout, 150);
       }
 
@@ -2644,6 +2754,11 @@
       function applyDuLoanFilterIfReady() {
         if (selectedDisasterObj || selectedDisasterRow) {
           loadLoansForDisaster(selectedDisasterObj, selectedDisasterRow);
+          refreshNearbyCameras();
+          return;
+        }
+        if (cameraLoadContext === 'loan' && selectedLoan) {
+          loadNearbyCamerasForLoan(selectedLoan);
           return;
         }
         setDashboardStatus('Select a disaster in the grid first, then adjust loan radius/county.', 'info');
@@ -2663,11 +2778,9 @@
         $('#duLoanRadiusMiles').on('change', function () {
           syncDuLoanRadiusControls();
           applyDuLoanFilterIfReady();
-          refreshNearbyCameras();
         });
         $('#duLoanRadiusCustom').on('change', function () {
           applyDuLoanFilterIfReady();
-          refreshNearbyCameras();
         });
         $('#duLoanScopeMode').on('change', function () {
           syncDuLoanRadiusControls();

@@ -1,0 +1,115 @@
+.mhl-page {
+  min-height: 100vh;
+  background: linear-gradient(160deg, #f0f9ff 0%, #e8f5e9 50%, #f8fafc 100%);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+.mhl-wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+.mhl-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  border: 1px solid rgba(52, 152, 219, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+}
+
+.mhl-kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+}
+
+.mhl-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.mhl-lede {
+  color: #475569;
+  line-height: 1.55;
+  margin-bottom: 1.25rem;
+}
+
+.mhl-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.mhl-video {
+  width: 100%;
+  border-radius: 12px;
+  background: #000;
+}
+
+.mhl-pending {
+  padding: 1rem;
+  background: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+}
+
+.mhl-heygen-foot {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 1.5rem;
+}
+
+.mhl-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  background: rgba(15, 35, 55, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.mhl-popup-backdrop[hidden] {
+  display: none !important;
+}
+
+.mhl-popup {
+  width: min(100%, 720px);
+  background: #fff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+}
+
+.mhl-popup-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, rgba(144, 238, 144, 0.15), rgba(135, 206, 250, 0.15));
+}
+
+.mhl-popup-body {
+  padding: 0;
+  background: #000;
+}
+
+.mhl-popup-body video {
+  display: block;
+  width: 100%;
+  max-height: min(56vh, 480px);
+}
+
+.mhl-popup-foot {
+  padding: 1rem;
+  border-top: 1px solid #e5e7eb;
+}

@@ -1,0 +1,22 @@
+{
+  "title": "Music Research Demo",
+  "brand": {
+    "developmentBy": "David E Lane",
+    "attribution": "Avatar narration powered by HeyGen",
+    "attributionUrl": "https://www.heygen.com"
+  },
+  "heygenTitle": "Music Research Demo",
+  "heygenVoiceId": "828b59f834fd4c7188da322b6d9b6c75",
+  "heygenMotionPrompt": "subtle nod, warm scholarly presenter speaking to camera",
+  "heygenExpressiveness": "low",
+  "heygenScriptShort": "Welcome to Music Research — your Historian guide to artists through era, place, and evidence. Search a name above: timeline, map, and sources assemble around the artist. Ask in chat — I separate documented fact from interpretation. Tap Open Music Research below to explore — or try Time Machine and the Pilgrimage Atlas for deeper roads.",
+  "qrLandingPath": "/music/music-research.html?demo=heygen",
+  "qrPopupPath": "/music/music-historian-line.html?short=1&autoplay=1",
+  "ctaLabel": "Open Music Research",
+  "ctaHref": "/music/music-research.html",
+  "relatedLinks": [
+    { "label": "Time Machine", "href": "/music/music-time-machine.html" },
+    { "label": "Pilgrimage Atlas", "href": "/music/music-pilgrimage-atlas.html" },
+    { "label": "Album Discovery", "href": "/music/album-discovery.html" }
+  ]
+}

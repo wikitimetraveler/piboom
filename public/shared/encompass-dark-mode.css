@@ -675,6 +675,24 @@
   background: #1f2937;
   color: #f3f4f6;
 }
+.encompass-dark-mode .section-sidebar {
+  background: #374151;
+  border-color: #4b5563;
+}
+.encompass-dark-mode .section-sidebar-title {
+  color: #9ca3af;
+}
+.encompass-dark-mode .section-sidebar-nav a {
+  color: #9ca3af;
+}
+.encompass-dark-mode .section-sidebar-nav a:hover {
+  background: #4b5563;
+  color: #38bdf8;
+}
+.encompass-dark-mode .section-sidebar-nav a.active-section {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
 .encompass-dark-mode .du-command-deck,
 .encompass-dark-mode .du-section-card,
 .encompass-dark-mode .du-page .card {

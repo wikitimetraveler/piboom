@@ -72,7 +72,7 @@ body.du-page {
 }
 
 .du-main {
-  max-width: 1400px;
+  max-width: none;
   position: relative;
   z-index: 1;
 }
@@ -543,7 +543,144 @@ body.du-page {
   display: none;
 }
 
-/* Section pills menu (unit-tests sidebar pattern, horizontal) */
+/* Section sidebar nav — same pattern as unit-tests.html */
+.unit-tests-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.section-sidebar {
+  flex: 0 0 200px;
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  background: var(--zen-card-bg, #fff);
+  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  z-index: 200;
+}
+
+.section-sidebar-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.section-sidebar-nav li {
+  margin-bottom: 0.25rem;
+}
+
+.section-sidebar-nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted, #6b7280);
+  text-decoration: none;
+  transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-sidebar-nav a:hover {
+  background: rgba(74, 144, 164, 0.1);
+  color: var(--zen-primary, #4a90a4);
+}
+
+.section-sidebar-nav a.active-section {
+  background: rgba(74, 144, 164, 0.12);
+  color: var(--zen-primary, #4a90a4);
+  font-weight: 600;
+}
+
+.section-sidebar-nav a i {
+  font-size: 1rem;
+  opacity: 0.85;
+}
+
+.section-sidebar-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--zen-muted, #6b7280);
+  text-transform: uppercase;
+  padding: 0.5rem 0.65rem 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.section-content-area {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 991px) {
+  .unit-tests-layout {
+    flex-direction: column;
+  }
+
+  .section-sidebar {
+    flex: none;
+    width: 100%;
+    max-height: none;
+    position: static;
+  }
+
+  .section-sidebar-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .section-sidebar-nav li {
+    margin-bottom: 0;
+  }
+}
+
+.du-section-card-hidden,
+.du-nav-section.du-section-card-hidden {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  border-width: 0 !important;
+  pointer-events: none;
+  visibility: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              margin 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.du-section-cards .du-section-card-hidden {
+  margin-top: -1rem !important;
+  margin-bottom: -1rem !important;
+}
+
+.du-section-card,
+.du-nav-section {
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              margin 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s ease,
+              border-color 0.25s ease;
+}
+
+.du-section-card:not(.du-section-card-hidden),
+.du-nav-section:not(.du-section-card-hidden) {
+  max-height: 5000px;
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Horizontal pills menu (disasters-webcams.html) */
 .du-section-pills-menu {
   display: flex;
   flex-wrap: wrap;
