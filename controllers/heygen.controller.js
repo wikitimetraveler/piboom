@@ -69,7 +69,7 @@ export async function postHeygenVideo(req, res) {
         domain: libraryDomain || 'disasters',
         variant: 'generated',
         script: String(script).slice(0, 500),
-        sourcePage: '/finance/heygen-library.html',
+        sourcePage: '/heygen-hub.html',
         studioPage: '/finance/disasters-unified.html#duHeygenStudio'
       });
     }
@@ -92,7 +92,8 @@ export async function getHeygenVideoStatus(req, res) {
 export async function getHeygenLibrary(req, res) {
   try {
     const domain = req.query.domain ? String(req.query.domain) : undefined;
-    res.json({ success: true, ...(await getHeygenVideoLibrary({ domain })) });
+    const kind = req.query.kind ? String(req.query.kind) : undefined;
+    res.json({ success: true, ...(await getHeygenVideoLibrary({ domain, kind })) });
   } catch (e) {
     handleHeygenError(res, e, 'Failed to load HeyGen library');
   }
@@ -145,7 +146,7 @@ export async function postHeygenDisasterBriefing(req, res) {
         domain: 'disasters',
         variant: 'briefing',
         script: payload.script,
-        sourcePage: '/finance/heygen-library.html',
+        sourcePage: '/heygen-hub.html',
         studioPage: '/finance/disasters-unified.html#duHeygenStudio',
         tags: ['briefing']
       });

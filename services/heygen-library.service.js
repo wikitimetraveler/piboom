@@ -1,5 +1,5 @@
 /**
- * Unified HeyGen video catalog — Lane lines, disaster demos, and API registry.
+ * Unified HeyGen + HyperFrames catalog — Lane lines, disaster/music demos, reels, API registry.
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -10,6 +10,8 @@ const ROOT = path.resolve(__dirname, '..');
 const REGISTRY_PATH = path.join(ROOT, 'data/heygen-video-library.json');
 const LANE_LINES_PATH = path.join(ROOT, 'data/lane-heygen-lines.json');
 const DISASTER_DEMO_PATH = path.join(ROOT, 'data/disaster-heygen-demo.json');
+const MUSIC_DEMO_PATH = path.join(ROOT, 'data/music-heygen-demo.json');
+const HYPERFRAMES_LIBRARY_PATH = path.join(ROOT, 'data/hyperframes-library.json');
 
 function pickUrl(...candidates) {
   for (const raw of candidates) {
@@ -19,17 +21,36 @@ function pickUrl(...candidates) {
   return null;
 }
 
-function entryBase({ id, videoId, title, domain, variant, videoUrl, portraitUrl, sourcePage, studioPage, script, tags, generatedAt }) {
+function entryBase({
+  id,
+  kind = 'heygen',
+  videoId,
+  title,
+  domain,
+  variant,
+  videoUrl,
+  portraitUrl,
+  sourcePage,
+  studioPage,
+  projectDir,
+  subtitle,
+  script,
+  tags,
+  generatedAt
+}) {
   return {
     id,
+    kind,
     videoId: videoId || null,
-    title: title || 'HeyGen video',
+    title: title || (kind === 'hyperframes' ? 'HyperFrames reel' : 'HeyGen video'),
     domain: domain || 'other',
-    variant: variant || 'full',
-    videoUrl,
+    variant: variant || (kind === 'hyperframes' ? 'reel' : 'full'),
+    videoUrl: videoUrl || null,
     portraitUrl: portraitUrl || null,
     sourcePage: sourcePage || null,
     studioPage: studioPage || null,
+    projectDir: projectDir || null,
+    subtitle: subtitle || null,
     scriptPreview: script ? String(script).slice(0, 280) : null,
     tags: tags || [],
     generatedAt: generatedAt || null,
@@ -111,6 +132,66 @@ function disasterDemoEntry(demo) {
   ];
 }
 
+function musicDemoEntry(demo) {
+  if (!demo) return [];
+  const url = pickUrl(demo.heygenVideoLocalShort, demo.heygenVideoUrlShort);
+  if (!url && !demo.heygenVideoIdShort) return [];
+  return [
+    entryBase({
+      id: 'music-research-demo',
+      videoId: demo.heygenVideoIdShort,
+      title: demo.title || 'Music Research Demo',
+      domain: 'music',
+      variant: 'demo',
+      videoUrl: url,
+      sourcePage: demo.qrLandingPath || '/music/music-research.html?demo=heygen',
+      studioPage: demo.qrPopupPath || '/music/music-historian-line.html?short=1',
+      script: demo.heygenScriptShort || null,
+      tags: ['music', 'demo', 'popup', 'historian'],
+      generatedAt: demo.generatedAt || null
+    })
+  ];
+}
+
+function hyperframesEntries(catalog) {
+  const projects = catalog?.projects || [];
+  return projects.map((project) =>
+    entryBase({
+      id: `hf-${project.id}`,
+      kind: 'hyperframes',
+      title: project.title || project.id,
+      domain: project.domain || 'other',
+      variant: 'reel',
+      videoUrl: project.videoUrl || null,
+      sourcePage: project.sourcePage || null,
+      projectDir: project.projectDir || null,
+      subtitle: project.subtitle || null,
+      tags: ['hyperframes', project.domain || 'other', 'google-tts']
+    })
+  );
+}
+
+function sortItems(items) {
+  return [...items].sort((a, b) => {
+    if (a.kind !== b.kind) return a.kind === 'heygen' ? -1 : 1;
+    const da = a.generatedAt || '';
+    const db = b.generatedAt || '';
+    if (da !== db) return db.localeCompare(da);
+    return String(a.title).localeCompare(String(b.title));
+  });
+}
+
+function filterItems(items, { domain, kind } = {}) {
+  let filtered = items;
+  if (kind === 'heygen' || kind === 'hyperframes') {
+    filtered = filtered.filter((v) => v.kind === kind);
+  }
+  if (domain) {
+    filtered = filtered.filter((v) => v.domain === domain);
+  }
+  return filtered;
+}
+
 async function readJsonSafe(filePath) {
   try {
     return JSON.parse(await readFile(filePath, 'utf8'));
@@ -129,36 +210,37 @@ async function saveRegistry(registry) {
   await writeFile(REGISTRY_PATH, `${JSON.stringify(registry, null, 2)}\n`, 'utf8');
 }
 
-/** Merge Lane catalog, disaster demo, and API registry (registry wins on duplicate id). */
-export async function getHeygenVideoLibrary({ domain } = {}) {
-  const [laneCatalog, disasterDemo, registry] = await Promise.all([
+/** Merge HeyGen avatar videos, HyperFrames reels, and API registry (registry wins on duplicate id). */
+export async function getHeygenVideoLibrary({ domain, kind } = {}) {
+  const [laneCatalog, disasterDemo, musicDemo, hyperframesCatalog, registry] = await Promise.all([
     readJsonSafe(LANE_LINES_PATH),
     readJsonSafe(DISASTER_DEMO_PATH),
+    readJsonSafe(MUSIC_DEMO_PATH),
+    readJsonSafe(HYPERFRAMES_LIBRARY_PATH),
     loadRegistry()
   ]);
 
   const byId = new Map();
   for (const item of laneEntries(laneCatalog || {})) byId.set(item.id, item);
   for (const item of disasterDemoEntry(disasterDemo)) byId.set(item.id, item);
+  for (const item of musicDemoEntry(musicDemo)) byId.set(item.id, item);
   for (const item of registry.videos || []) {
-    if (item?.id) byId.set(item.id, { ...byId.get(item.id), ...item });
+    if (item?.id) byId.set(item.id, { ...byId.get(item.id), ...item, kind: item.kind || 'heygen' });
   }
 
-  let videos = [...byId.values()].filter((v) => v.videoUrl || v.videoId);
-  if (domain) {
-    videos = videos.filter((v) => v.domain === domain);
-  }
-  videos.sort((a, b) => {
-    const da = a.generatedAt || '';
-    const db = b.generatedAt || '';
-    if (da !== db) return db.localeCompare(da);
-    return String(a.title).localeCompare(String(b.title));
-  });
+  const heygenVideos = [...byId.values()].filter((v) => v.videoUrl || v.videoId);
+  const hyperframes = hyperframesEntries(hyperframesCatalog || {});
+  const allItems = sortItems([...heygenVideos, ...hyperframes]);
+  const items = filterItems(allItems, { domain, kind });
 
   return {
     configured: Boolean(process.env.HEYGEN_API_KEY?.trim()),
-    count: videos.length,
-    videos
+    count: heygenVideos.length,
+    hyperframesCount: hyperframes.length,
+    totalCount: allItems.length,
+    videos: kind === 'hyperframes' ? [] : filterItems(heygenVideos, { domain }),
+    hyperframes: kind === 'heygen' ? [] : filterItems(hyperframes, { domain }),
+    items
   };
 }
 
@@ -199,7 +281,7 @@ export async function registerHeygenApiVideo({
       domain,
       variant,
       videoUrl,
-      sourcePage: sourcePage || '/finance/heygen-library.html',
+      sourcePage: sourcePage || '/heygen-hub.html',
       studioPage: studioPage || '/finance/disasters-unified.html#duHeygenStudio',
       script,
       tags: ['heygen-api', domain, variant, ...tags],

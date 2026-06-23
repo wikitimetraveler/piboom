@@ -11,7 +11,8 @@
 (function () {
   const LINKS = [
     { href: '/family/lane-family.html', label: 'Hub' },
-    { href: '/family/lane-heygen-print.html', label: 'HeyGen' },
+    { href: '/heygen-hub.html', label: 'Videos' },
+    { href: '/family/lane-heygen-print.html', label: 'Print' },
     { href: '/family/lane-major-achievers.html', label: 'Achievers' },
     { href: '/family/lane-historians.html', label: 'Historians' },
     { href: '/family/lane-museum.html', label: 'Museum' },

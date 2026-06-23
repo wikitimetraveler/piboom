@@ -131,8 +131,8 @@ export function initDisasterHeygenStudio(options = {}) {
     }
     if (els.libraryLink) {
       const href = libraryId
-        ? `/finance/heygen-library.html#${encodeURIComponent(libraryId)}`
-        : '/finance/heygen-library.html';
+        ? `/heygen-hub.html#${encodeURIComponent(libraryId)}`
+        : '/heygen-hub.html';
       els.libraryLink.href = href;
       els.libraryLink.hidden = false;
     }

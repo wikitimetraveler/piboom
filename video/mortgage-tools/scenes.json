@@ -1,0 +1,65 @@
+{
+  "title": "DevConnect Mortgage Tools",
+  "subtitle": "Worksheets · Encompass · hazard · AI",
+  "scenes": [
+    {
+      "id": "s0",
+      "kicker": "DevConnect Labs",
+      "title": "Mortgage tools platform",
+      "body": "Worksheets and Encompass integrations in one browser — no React, service-layer backend.",
+      "chip": "Bootstrap · vanilla JS · Postgres"
+    },
+    {
+      "id": "s1",
+      "kicker": "Encompass Hub",
+      "title": "Pipeline in the browser",
+      "body": "Hub APIs, loan reads, batch updates, and field explorers wired to your Encompass tenant.",
+      "chip": "encompass-hub.html"
+    },
+    {
+      "id": "s2",
+      "kicker": "Unit Tests",
+      "title": "Prove custom field calcs",
+      "body": "Generate tests from calculated fields, edit scenarios in the grid, run against live loan GUIDs.",
+      "chip": "unit-tests.html"
+    },
+    {
+      "id": "s3",
+      "kicker": "Screen Test",
+      "title": "Manifest review with AI",
+      "body": "Upload Encompass form manifests — reviewer AI flags layout and field issues before ship.",
+      "chip": "tool9.html"
+    },
+    {
+      "id": "s4",
+      "kicker": "Worksheets",
+      "title": "Calculators that share math",
+      "body": "DTI, FHA streamline, LTV, amortization — one calculation engine, consistent rounding.",
+      "chip": "calcEngineLibrary.js"
+    },
+    {
+      "id": "s5",
+      "kicker": "Unified Disasters",
+      "title": "Hazard meets pipeline",
+      "body": "FEMA, wildfire, earthquake, and alert feeds linked to loans and hazard webcams on one map.",
+      "chip": "disasters-unified.html"
+    },
+    {
+      "id": "s6",
+      "kicker": "Encompass Assistant",
+      "title": "ICE knowledge + docs",
+      "body": "LangChain memory, ICE knowledge index, and Encompass docs — answers grounded in your repo.",
+      "chip": "encompass-assistant.html"
+    },
+    {
+      "id": "s7",
+      "kicker": "Operations",
+      "title": "Processor assignment · risk",
+      "body": "Score loan complexity, route processors, and monitor pipeline risk — then open Worksheets.",
+      "chip": "/finance/index.html"
+    }
+  ],
+  "endCard": {
+    "url": "/finance/index.html"
+  }
+}

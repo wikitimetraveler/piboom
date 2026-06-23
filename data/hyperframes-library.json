@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "projects": [
+    {
+      "id": "endless-tour",
+      "domain": "music",
+      "title": "Grateful Dead — Endless Tour era reel",
+      "subtitle": "Pilgrimage Atlas · ~94s · Google TTS",
+      "videoUrl": "/music/assets/video/endless-tour-reel.mp4",
+      "sourcePage": "/music/music-pilgrimage-atlas.html",
+      "projectDir": "video/endless-tour"
+    },
+    {
+      "id": "music-research",
+      "domain": "music",
+      "title": "Music Research — Historian tour",
+      "subtitle": "Timeline · map · Historian · ~58s",
+      "videoUrl": "/music/assets/video/music-research-reel.mp4",
+      "sourcePage": "/music/music-research.html",
+      "projectDir": "video/music-research"
+    },
+    {
+      "id": "lane-story-reel",
+      "domain": "lane",
+      "title": "Lane Legacy Museum — guided reel",
+      "subtitle": "Museum chronology · ~55s",
+      "videoUrl": "/family/assets/video/lane-museum-reel.mp4",
+      "sourcePage": "/family/lane-museum.html",
+      "projectDir": "video/lane-story-reel"
+    },
+    {
+      "id": "mojave-lane",
+      "domain": "lane",
+      "title": "Aaron G. Lane — Mojave Crossing",
+      "subtitle": "Lane routes presentation",
+      "videoUrl": "/family/assets/video/lane-aaron-mojave-presentation.mp4",
+      "sourcePage": "/family/lane-mojave.html",
+      "projectDir": "video/mojave-lane"
+    },
+    {
+      "id": "scientific-lane",
+      "domain": "lane",
+      "title": "Jonathan Homer Lane — scientific legacy",
+      "subtitle": "Lane crater · solar theory",
+      "videoUrl": "/family/assets/video/lane-scientific-presentation.mp4",
+      "sourcePage": "/family/lane-historians.html",
+      "projectDir": "video/scientific-lane"
+    },
+    {
+      "id": "george-g-lane-idiot",
+      "domain": "lane",
+      "title": "George G. Lane — Was He an Idiot?",
+      "subtitle": "Popular Science Monthly · 1884",
+      "videoUrl": "/family/assets/video/george-g-lane-idiot-presentation.mp4",
+      "sourcePage": "/family/was-he-an-idiot.html",
+      "projectDir": "video/george-g-lane-idiot"
+    },
+    {
+      "id": "sarah-dickinson-lane",
+      "domain": "lane",
+      "title": "Sarah Dickinson Lane",
+      "subtitle": "Lane family presentation reel",
+      "videoUrl": "/family/assets/video/sarah-dickinson-lane-presentation.mp4",
+      "sourcePage": "/family/lane-heygen-line.html?person=sarah-dickinson-lane",
+      "projectDir": "video/sarah-dickinson-lane"
+    },
+    {
+      "id": "mortgage-tools",
+      "domain": "finance",
+      "title": "DevConnect mortgage tools reel",
+      "subtitle": "Worksheets · Encompass · disasters · ~66s",
+      "videoUrl": "/finance/assets/video/mortgage-tools-reel.mp4",
+      "sourcePage": "/finance/index.html",
+      "projectDir": "video/mortgage-tools"
+    }
+  ]
+}

@@ -25,6 +25,23 @@ describe('heygen-library.service', () => {
     expect(disasters.videos.every((v) => v.domain === 'disasters')).toBe(true);
   });
 
+  test('getHeygenVideoLibrary includes HyperFrames reels', async () => {
+    const result = await getHeygenVideoLibrary();
+    expect(result.hyperframesCount).toBeGreaterThan(0);
+    expect(result.items.some((v) => v.kind === 'hyperframes')).toBe(true);
+    expect(result.items.some((v) => v.id === 'hf-endless-tour')).toBe(true);
+  });
+
+  test('getHeygenVideoLibrary filters by kind', async () => {
+    const hf = await getHeygenVideoLibrary({ kind: 'hyperframes' });
+    expect(hf.items.every((v) => v.kind === 'hyperframes')).toBe(true);
+    expect(hf.videos).toEqual([]);
+
+    const heygen = await getHeygenVideoLibrary({ kind: 'heygen' });
+    expect(heygen.items.every((v) => v.kind === 'heygen')).toBe(true);
+    expect(heygen.hyperframes).toEqual([]);
+  });
+
   test('lane entries include full and short variants when present', async () => {
     const lane = await getHeygenVideoLibrary({ domain: 'lane' });
     const slugs = new Set(lane.videos.map((v) => v.id));

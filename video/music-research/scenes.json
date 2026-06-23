@@ -1,0 +1,58 @@
+{
+  "title": "Music Research",
+  "subtitle": "Historian · era · place · evidence",
+  "scenes": [
+    {
+      "id": "s0",
+      "kicker": "DevConnect Labs · Music",
+      "title": "Music Research",
+      "body": "One search assembles timeline, map, sources, and chat around an artist.",
+      "chip": "Historian guide"
+    },
+    {
+      "id": "s1",
+      "kicker": "Knowledge Graph",
+      "title": "Fast factual anchor",
+      "body": "Google entity cards give a quick anchor before you go deeper.",
+      "chip": "Search · KG · Wikipedia · Chat"
+    },
+    {
+      "id": "s2",
+      "kicker": "Timeline",
+      "title": "Chronological context",
+      "body": "Births, band formation, releases — era at a glance.",
+      "chip": "Birth · Formation · Album"
+    },
+    {
+      "id": "s3",
+      "kicker": "Map",
+      "title": "Place matters",
+      "body": "Teal pins mark personal origins; amber marks where the band formed.",
+      "chip": "Origins on the map"
+    },
+    {
+      "id": "s4",
+      "kicker": "Historian",
+      "title": "Ask with guardrails",
+      "body": "Chat separates documented fact from interpretation — no invented setlists.",
+      "chip": "AI Historian"
+    },
+    {
+      "id": "s5",
+      "kicker": "Discovery suite",
+      "title": "Time Machine · Atlas",
+      "body": "On-this-date history and the Grateful Dead pilgrimage map — same research stack.",
+      "chip": "Album Discovery · Collection"
+    },
+    {
+      "id": "s6",
+      "kicker": "Open the tools",
+      "title": "Start with an artist you love",
+      "body": "music-research.html — search once, explore everywhere.",
+      "chip": "/music/music-research.html"
+    }
+  ],
+  "endCard": {
+    "url": "/music/music-research.html"
+  }
+}

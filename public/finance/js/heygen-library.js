@@ -1,10 +1,11 @@
 /**
- * HeyGen video library UI — /api/heygen/library
+ * HeyGen + HyperFrames hub UI — /api/heygen/library
  * Development work by David Lane
  */
 (function () {
   let activeDomain = '';
-  let videos = [];
+  let activeKind = '';
+  let items = [];
 
   function $(id) {
     return document.getElementById(id);
@@ -19,21 +20,36 @@
   }
 
   function domainLabel(domain) {
-    if (domain === 'lane') return 'Lane';
-    if (domain === 'disasters') return 'Disasters';
-    return domain || 'Other';
+    const map = {
+      lane: 'Lane',
+      music: 'Music',
+      disasters: 'Disasters',
+      finance: 'Finance'
+    };
+    return map[domain] || domain || 'Other';
+  }
+
+  function kindLabel(kind) {
+    return kind === 'hyperframes' ? 'HyperFrames' : 'HeyGen';
   }
 
   function variantLabel(variant) {
-    const map = { full: 'Full line', short: 'Short popup', demo: 'Demo', briefing: 'Briefing', generated: 'Generated' };
+    const map = {
+      full: 'Full line',
+      short: 'Short popup',
+      demo: 'Demo',
+      briefing: 'Briefing',
+      generated: 'Generated',
+      reel: 'Reel'
+    };
     return map[variant] || variant || 'Video';
   }
 
-  async function resolvePlayUrl(video) {
-    if (video.videoUrl) return video.videoUrl;
-    if (!video.videoId) return null;
+  async function resolvePlayUrl(item) {
+    if (item.videoUrl) return item.videoUrl;
+    if (item.kind === 'hyperframes' || !item.videoId) return null;
     try {
-      const res = await fetch(`/api/heygen/videos/${encodeURIComponent(video.videoId)}`);
+      const res = await fetch(`/api/heygen/videos/${encodeURIComponent(item.videoId)}`);
       const json = await res.json();
       return json.videoUrl || json.data?.video_url || null;
     } catch {
@@ -41,33 +57,47 @@
     }
   }
 
-  function renderCard(video, playUrl) {
+  function renderCard(item, playUrl) {
+    const isHyper = item.kind === 'hyperframes';
     const hasPlay = Boolean(playUrl);
     const media = hasPlay
       ? `<video controls playsinline preload="metadata" src="${esc(playUrl)}"></video>`
-      : video.portraitUrl
-        ? `<img src="${esc(video.portraitUrl)}" alt="" />`
-        : `<div class="hvl-pending"><i class="bi bi-hourglass-split"></i><br/>Rendering… poll with Refresh</div>`;
+      : item.portraitUrl
+        ? `<img src="${esc(item.portraitUrl)}" alt="" />`
+        : `<div class="hvl-pending"><i class="bi bi-${isHyper ? 'film' : 'hourglass-split'}"></i><br/>${isHyper ? 'Render pending — run npm run render in project dir' : 'Rendering… poll with Refresh'}</div>`;
 
     const links = [
-      video.sourcePage ? `<a class="btn btn-sm btn-outline-primary" href="${esc(video.sourcePage)}">Open page</a>` : '',
-      video.studioPage ? `<a class="btn btn-sm btn-outline-secondary" href="${esc(video.studioPage)}">Studio</a>` : '',
-      video.videoId
-        ? `<button type="button" class="btn btn-sm btn-link p-0 hvl-copy-id" data-id="${esc(video.videoId)}">Copy ID</button>`
+      item.sourcePage ? `<a class="btn btn-sm btn-outline-primary" href="${esc(item.sourcePage)}">Open page</a>` : '',
+      item.studioPage ? `<a class="btn btn-sm btn-outline-secondary" href="${esc(item.studioPage)}">Studio</a>` : '',
+      item.projectDir
+        ? `<span class="btn btn-sm btn-link p-0 text-muted hvl-project-dir" title="HyperFrames project">${esc(item.projectDir)}</span>`
+        : '',
+      item.videoId
+        ? `<button type="button" class="btn btn-sm btn-link p-0 hvl-copy-id" data-id="${esc(item.videoId)}">Copy ID</button>`
         : ''
     ]
       .filter(Boolean)
       .join('');
 
-    return `<article class="hvl-card" data-id="${esc(video.id)}" id="${esc(video.id)}">
+    const badgeClass = isHyper ? 'hyperframes' : esc(item.domain);
+    const metaParts = [
+      kindLabel(item.kind),
+      domainLabel(item.domain),
+      variantLabel(item.variant),
+      item.hostedLocally && hasPlay ? 'Hosted on site' : hasPlay ? 'Cloud URL' : 'Pending',
+      item.generatedAt ? new Date(item.generatedAt).toLocaleDateString() : null
+    ].filter(Boolean);
+
+    return `<article class="hvl-card" data-id="${esc(item.id)}" id="${esc(item.id)}">
       <div class="hvl-card-media">
-        <span class="hvl-card-badge hvl-card-badge--${esc(video.domain)}">${esc(domainLabel(video.domain))} · ${esc(variantLabel(video.variant))}</span>
+        <span class="hvl-card-badge hvl-card-badge--${badgeClass}">${esc(kindLabel(item.kind))} · ${esc(domainLabel(item.domain))}</span>
         ${media}
       </div>
       <div class="hvl-card-body">
-        <h2 class="hvl-card-title">${esc(video.title)}</h2>
-        <p class="hvl-card-meta">${video.hostedLocally ? 'Hosted on site' : playUrl ? 'HeyGen cloud URL' : 'Pending render'}${video.generatedAt ? ` · ${esc(new Date(video.generatedAt).toLocaleDateString())}` : ''}</p>
-        ${video.scriptPreview ? `<p class="hvl-card-script">${esc(video.scriptPreview)}</p>` : ''}
+        <h2 class="hvl-card-title">${esc(item.title)}</h2>
+        ${item.subtitle ? `<p class="hvl-card-subtitle">${esc(item.subtitle)}</p>` : ''}
+        <p class="hvl-card-meta">${esc(metaParts.join(' · '))}</p>
+        ${item.scriptPreview ? `<p class="hvl-card-script">${esc(item.scriptPreview)}</p>` : ''}
         <div class="hvl-card-actions">${links}</div>
       </div>
     </article>`;
@@ -78,18 +108,22 @@
     const grid = $('hvlGrid');
     if (status) status.textContent = 'Loading library…';
     try {
-      const qs = activeDomain ? `?domain=${encodeURIComponent(activeDomain)}` : '';
+      const params = new URLSearchParams();
+      if (activeDomain) params.set('domain', activeDomain);
+      if (activeKind) params.set('kind', activeKind);
+      const qs = params.toString() ? `?${params.toString()}` : '';
       const res = await fetch(`/api/heygen/library${qs}`);
       const json = await res.json();
       if (!json.success) throw new Error(json.error || 'Load failed');
-      videos = json.videos || [];
-      if (!videos.length) {
-        grid.innerHTML = `<div class="hvl-empty col-12">No videos yet. Generate from <a href="/finance/disasters-unified.html#duHeygenPullCard">Unified Disasters</a> or <a href="/family/lane-heygen-print.html">Lane print kit</a>.</div>`;
+      items = json.items || [...(json.videos || []), ...(json.hyperframes || [])];
+      if (!items.length) {
+        grid.innerHTML =
+          '<div class="hvl-empty col-12">Nothing here yet. Generate HeyGen clips from Unified Disasters or Lane print kit, or render HyperFrames reels under <code>video/</code>.</div>';
       } else {
         const cards = await Promise.all(
-          videos.map(async (v) => {
-            const playUrl = await resolvePlayUrl(v);
-            return renderCard(v, playUrl);
+          items.map(async (item) => {
+            const playUrl = await resolvePlayUrl(item);
+            return renderCard(item, playUrl);
           })
         );
         grid.innerHTML = cards.join('');
@@ -104,7 +138,9 @@
         }
       }
       if (status) {
-        status.textContent = `${videos.length} video${videos.length === 1 ? '' : 's'}${activeDomain ? ` · ${domainLabel(activeDomain)}` : ''}${json.configured ? '' : ' · HEYGEN_API_KEY not set (cloud poll may fail)'}`;
+        const heygenCount = json.count ?? 0;
+        const hfCount = json.hyperframesCount ?? 0;
+        status.textContent = `${items.length} shown · ${heygenCount} HeyGen · ${hfCount} HyperFrames${json.configured ? '' : ' · HEYGEN_API_KEY not set (cloud poll may fail)'}`;
       }
     } catch (err) {
       if (status) status.textContent = err.message || 'Could not load library.';
@@ -112,23 +148,28 @@
     }
   }
 
-  function bindFilters() {
-    document.querySelectorAll('.hvl-filter').forEach((btn) => {
+  function bindFilterGroup(selector, activeKey, reload) {
+    document.querySelectorAll(selector).forEach((btn) => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.hvl-filter').forEach((b) => {
+        document.querySelectorAll(selector).forEach((b) => {
           b.classList.toggle('active', b === btn);
           b.classList.toggle('btn-primary', b === btn);
           b.classList.toggle('btn-outline-primary', b !== btn);
         });
-        activeDomain = btn.getAttribute('data-domain') || '';
+        reload(btn.getAttribute(activeKey) || '');
         loadLibrary();
       });
     });
-    $('hvlRefreshBtn')?.addEventListener('click', loadLibrary);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    bindFilters();
+    bindFilterGroup('.hvl-kind-filter', 'data-kind', (value) => {
+      activeKind = value;
+    });
+    bindFilterGroup('.hvl-domain-filter', 'data-domain', (value) => {
+      activeDomain = value;
+    });
+    $('hvlRefreshBtn')?.addEventListener('click', loadLibrary);
     loadLibrary();
   });
 })();

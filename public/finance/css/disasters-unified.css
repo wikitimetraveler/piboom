@@ -917,6 +917,22 @@ body.du-page {
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.12);
 }
 
+.du-nws-alert-list .list-group-item {
+  border-left: 0;
+  border-right: 0;
+}
+
+.du-nws-severity-badge {
+  background: rgba(6, 182, 212, 0.15);
+  color: #0e7490;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+#duNwsGridFilterStrip {
+  border-color: rgba(6, 182, 212, 0.35);
+}
+
 /* Grids */
 #disastersGrid.ag-theme-alpine {
   width: 100%;

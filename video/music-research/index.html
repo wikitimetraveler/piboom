@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: #0f1e2e; color: #f0f9ff;
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+      }
+      :root {
+        --bg: #0f1e2e; --surface: #1a2f45; --text: #f0f9ff; --muted: #94a3b8;
+        --ice: #87cefa; --mint: #90ee90; --border: rgba(135, 206, 250, 0.22);
+      }
+      .scene { position: absolute; inset: 0; background: var(--bg); overflow: hidden; }
+      .scene-glow {
+        position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(ellipse 900px 560px at 72% 40%, rgba(135, 206, 250, 0.14), transparent 70%);
+      }
+      .scene-content {
+        position: relative; display: flex; align-items: center; gap: 72px;
+        width: 100%; height: 100%; padding: 96px 120px;
+      }
+      .text-col { flex: 1; display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+      .kicker {
+        color: var(--ice); font-size: 24px; letter-spacing: 0.22em; text-transform: uppercase;
+      }
+      .rule { width: 180px; height: 1px; background: linear-gradient(90deg, var(--ice), var(--mint)); transform-origin: left; }
+      h1.title {
+        font-family: Georgia, 'Times New Roman', serif; font-weight: 400;
+        font-size: 82px; line-height: 1.08; max-width: 920px;
+      }
+      .copy { font-size: 30px; line-height: 1.5; color: var(--muted); max-width: 780px; }
+      .panel {
+        flex: 0 0 520px; background: var(--surface); border: 1px solid var(--border);
+        border-radius: 16px; padding: 28px; box-shadow: 0 24px 48px rgba(0,0,0,0.35);
+      }
+      .panel-label { font-size: 16px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ice); margin-bottom: 16px; }
+      .chip {
+        display: inline-block; padding: 10px 16px; margin: 6px 6px 0 0;
+        border-radius: 999px; background: rgba(135, 206, 250, 0.12);
+        border: 1px solid var(--border); font-size: 20px; color: var(--text);
+      }
+      .mock-bar {
+        height: 14px; border-radius: 999px; background: rgba(148, 163, 184, 0.25); margin-bottom: 12px;
+      }
+      .mock-bar.accent { background: linear-gradient(90deg, var(--ice), var(--mint)); width: 72%; }
+      .vignette {
+        position: absolute; inset: 0; z-index: 200; pointer-events: none;
+        background: radial-gradient(ellipse 1500px 900px at 50% 50%, transparent 62%, rgba(0,0,0,0.35) 100%);
+      }
+      #s0 { z-index: 10; } #s1 { z-index: 20; } #s2 { z-index: 30; } #s3 { z-index: 40; }
+      #s4 { z-index: 50; } #s5 { z-index: 60; } #s6 { z-index: 70; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="58" data-width="1920" data-height="1080">
+
+      <div id="s0" class="scene clip" data-start="0" data-duration="9" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s0-kicker">DevConnect Labs · Music</p>
+            <div class="rule" id="s0-rule"></div>
+            <h1 class="title" id="s0-title">Music Research</h1>
+            <p class="copy" id="s0-copy">One search assembles timeline, map, sources, and chat around an artist.</p>
+          </div>
+          <div class="panel" id="s0-panel">
+            <div class="panel-label">Historian guide</div>
+            <div class="mock-bar accent"></div>
+            <div class="mock-bar" style="width:90%"></div>
+            <div class="mock-bar" style="width:65%"></div>
+            <span class="chip">Era · Place · Evidence</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s1" class="scene clip" data-start="8" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s1-kicker">Knowledge Graph</p>
+            <div class="rule" id="s1-rule"></div>
+            <h1 class="title" id="s1-title">Fast factual anchor</h1>
+            <p class="copy" id="s1-copy">Google entity cards give a quick anchor before you go deeper.</p>
+          </div>
+          <div class="panel" id="s1-panel">
+            <div class="panel-label">Search modes</div>
+            <span class="chip">Knowledge Graph</span><span class="chip">Wikipedia</span><span class="chip">Chat</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s2" class="scene clip" data-start="15" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s2-kicker">Timeline</p>
+            <div class="rule" id="s2-rule"></div>
+            <h1 class="title" id="s2-title">Chronological context</h1>
+            <p class="copy" id="s2-copy">Births, band formation, releases — era at a glance.</p>
+          </div>
+          <div class="panel" id="s2-panel">
+            <div class="panel-label">Event types</div>
+            <span class="chip">Birth</span><span class="chip">Formation</span><span class="chip">Album</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s3" class="scene clip" data-start="22" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s3-kicker">Map</p>
+            <div class="rule" id="s3-rule"></div>
+            <h1 class="title" id="s3-title">Place matters</h1>
+            <p class="copy" id="s3-copy">Teal pins mark personal origins; amber marks where the band formed.</p>
+          </div>
+          <div class="panel" id="s3-panel">
+            <div class="panel-label">Origins on the map</div>
+            <span class="chip" style="border-color:#5eead4">Birth</span><span class="chip" style="border-color:#fbbf24">Formation</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s4" class="scene clip" data-start="29" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s4-kicker">Historian</p>
+            <div class="rule" id="s4-rule"></div>
+            <h1 class="title" id="s4-title">Ask with guardrails</h1>
+            <p class="copy" id="s4-copy">Chat separates documented fact from interpretation — no invented setlists.</p>
+          </div>
+          <div class="panel" id="s4-panel">
+            <div class="panel-label">AI Historian</div>
+            <span class="chip">Documented fact</span><span class="chip">Interpretation labeled</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s5" class="scene clip" data-start="36" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s5-kicker">Discovery suite</p>
+            <div class="rule" id="s5-rule"></div>
+            <h1 class="title" id="s5-title">Time Machine · Atlas</h1>
+            <p class="copy" id="s5-copy">On-this-date history and the Grateful Dead pilgrimage map — same research stack.</p>
+          </div>
+          <div class="panel" id="s5-panel">
+            <div class="panel-label">Related tools</div>
+            <span class="chip">Time Machine</span><span class="chip">Pilgrimage Atlas</span><span class="chip">Album Discovery</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s6" class="scene clip" data-start="43" data-duration="15" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content" id="s6-inner">
+          <div class="text-col">
+            <p class="kicker" id="s6-kicker">Open the tools</p>
+            <div class="rule" id="s6-rule"></div>
+            <h1 class="title" id="s6-title">Start with an artist you love</h1>
+            <p class="copy" id="s6-copy">music-research.html — search once, explore everywhere.</p>
+          </div>
+          <div class="panel" id="s6-panel">
+            <div class="panel-label">Deep link</div>
+            <span class="chip">/music/music-research.html</span>
+          </div>
+        </div>
+      </div>
+
+      <audio id="nar-0" data-start="0.4" data-duration="7.2" data-track-index="5" src="assets/narration/scene0.mp3" data-volume="1"></audio>
+      <audio id="nar-1" data-start="8.4" data-duration="6.5" data-track-index="6" src="assets/narration/scene1.mp3" data-volume="1"></audio>
+      <audio id="nar-2" data-start="15.4" data-duration="6.2" data-track-index="7" src="assets/narration/scene2.mp3" data-volume="1"></audio>
+      <audio id="nar-3" data-start="22.4" data-duration="6.8" data-track-index="8" src="assets/narration/scene3.mp3" data-volume="1"></audio>
+      <audio id="nar-4" data-start="29.4" data-duration="6.4" data-track-index="9" src="assets/narration/scene4.mp3" data-volume="1"></audio>
+      <audio id="nar-5" data-start="36.4" data-duration="7.0" data-track-index="10" src="assets/narration/scene5.mp3" data-volume="1"></audio>
+      <audio id="nar-6" data-start="43.4" data-duration="5.8" data-track-index="11" src="assets/narration/scene6.mp3" data-volume="1"></audio>
+
+      <div class="vignette"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      function sceneIn(id, start, withPanel) {
+        const p = `#${id}`;
+        tl.from(p, { opacity: 0, duration: 0.85, ease: 'power1.inOut' }, start);
+        tl.from(`${p}-kicker`, { opacity: 0, letterSpacing: '0.42em', duration: 0.7, ease: 'power2.out' }, start + 0.5);
+        tl.from(`${p}-rule`, { scaleX: 0, duration: 0.6, ease: 'expo.out' }, start + 0.75);
+        tl.from(`${p}-title`, { opacity: 0, y: 40, duration: 0.75, ease: 'power3.out' }, start + 0.85);
+        tl.from(`${p}-copy`, { opacity: 0, y: 22, duration: 0.65, ease: 'power1.out' }, start + 1.35);
+        if (withPanel) tl.from(`${p}-panel`, { opacity: 0, x: 48, duration: 0.8, ease: 'power2.out' }, start + 0.9);
+      }
+
+      sceneIn('s0', 0, true);
+      sceneIn('s1', 8, true);
+      sceneIn('s2', 15, true);
+      sceneIn('s3', 22, true);
+      sceneIn('s4', 29, true);
+      sceneIn('s5', 36, true);
+      sceneIn('s6', 43, true);
+      tl.to('#s6-inner', { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 56);
+
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>

@@ -187,6 +187,15 @@
           <i class="bi bi-x-lg" aria-hidden="true"></i> <span class="du-clear-hotspot-label">Clear location filter</span>
         </button>
       </div>
+      <div id="duNwsGridFilterStrip" class="alert alert-info py-2 small mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="status" hidden>
+        <span class="du-nws-filter-strip-text">
+          <i class="bi bi-cloud-lightning me-1" aria-hidden="true"></i>
+          Disasters grid showing NOAA/NWS alerts for <strong id="duNwsGridFilterLabel">—</strong>
+        </span>
+        <button type="button" class="btn btn-sm btn-outline-secondary flex-shrink-0" id="duClearNwsGridFilter" aria-label="Clear weather alert grid filter">
+          <i class="bi bi-x-lg" aria-hidden="true"></i> Show all sources
+        </button>
+      </div>
 
       <div class="du-section-cards mb-4">
       <div class="du-section-card du-command-deck du-section-card-hidden" data-du-collapse-target="collapseCommandDeck">
@@ -381,14 +390,20 @@
           <div id="collapseDisasters" class="accordion-collapse collapse show" aria-labelledby="headingDisasters">
             <div class="accordion-body">
               <div class="card du-data-panel">
-                <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos and loans)</small></div>
+                <div class="card-header"><strong>Disasters</strong> <small class="text-muted">(Click a row to view related videos, loans, cameras, and weather alerts)</small></div>
                 <div class="card-body">
                   <div id="firmsDeferredAlert" class="alert alert-info py-2 small d-flex align-items-center gap-2 mb-3" role="status">
                     <i class="bi bi-info-circle flex-shrink-0"></i>
                     <span><strong>NASA FIRMS</strong> (active fire hotspots) is not loaded. Turn on the <strong>NASA FIRMS</strong> source above or in Filters, then use <strong>Apply</strong> if you changed the multiselect only.</span>
                   </div>
                   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
-                    <small class="text-muted mb-0">Use column header filters to sort and filter. Quick filter searches all columns.</small>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                      <small class="text-muted mb-0">Use column header filters to sort and filter. Quick filter searches all columns.</small>
+                      <div class="form-check form-switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="duShowNwsInGrid" checked>
+                        <label class="form-check-label small" for="duShowNwsInGrid">Show only NWS alerts in grid on selection</label>
+                      </div>
+                    </div>
                     <input type="text" id="disastersQuickFilter" class="form-control form-control-sm" style="max-width: 280px;" placeholder="Quick filter (e.g. CA, wildfire, USGS)…" aria-label="Quick filter disasters grid">
                   </div>
                   <div id="disastersGrid" class="ag-theme-alpine"></div>
@@ -551,9 +566,19 @@
                   </div>
                 </div>
                 <p class="text-muted small mb-0 mt-2" id="duNearbyCamerasIdle">Select a disaster or mocked loan to load cameras.</p>
+                <div class="card mt-3 du-data-panel" id="duNearbyWeatherAlertsCard" style="display: none;">
+                  <div class="card-header py-2">
+                    <strong class="small"><i class="bi bi-cloud-lightning"></i> Nearby weather alerts</strong>
+                    <small class="text-muted d-block" id="duNearbyWeatherAlertsSubtitle">NOAA/NWS CAP alerts near selection</small>
+                  </div>
+                  <div class="card-body py-2" id="duNearbyWeatherAlertsList">
+                    <p class="text-muted small mb-0">Select a disaster to load related weather alerts.</p>
+                  </div>
+                </div>
+                <p class="text-muted small mb-0 mt-2" id="duNearbyWeatherAlertsIdle">Select a disaster to load nearby NOAA/NWS alerts.</p>
               </div>
             </div>
-            <p class="small text-muted mb-0" id="duMockedLoansIdle">Select a disaster in the grid to load mocked loan data and nearby fire cameras.</p>
+            <p class="small text-muted mb-0" id="duMockedLoansIdle">Select a disaster in the grid to load mocked loan data, nearby fire cameras, and weather alerts.</p>
           </div>
         </div>
       </div>
@@ -780,7 +805,7 @@
                 <p class="small text-muted mb-0">AI avatar narrates the schema walkthrough or a live briefing for your selected event.</p>
               </div>
               <span class="du-heygen-studio-badge"><i class="bi bi-stars me-1"></i>HEYGEN_API_KEY</span>
-              <a class="btn btn-sm btn-outline-secondary" href="/finance/heygen-library.html">
+              <a class="btn btn-sm btn-outline-secondary" href="/heygen-hub.html">
                 <i class="bi bi-collection-play me-1"></i>Video library
               </a>
             </div>
@@ -820,7 +845,7 @@
                   <a class="btn btn-sm btn-outline-primary" id="duHeygenDownloadLink" href="#" download target="_blank" rel="noopener noreferrer" hidden>
                     <i class="bi bi-download me-1"></i>Download from HeyGen
                   </a>
-                  <a class="btn btn-sm btn-outline-secondary" id="duHeygenLibraryLink" href="/finance/heygen-library.html" hidden>
+                  <a class="btn btn-sm btn-outline-secondary" id="duHeygenLibraryLink" href="/heygen-hub.html" hidden>
                     <i class="bi bi-collection-play me-1"></i>View in library
                   </a>
                 </div>
@@ -838,6 +863,7 @@
     <script src="/shared/map-icons.js"></script>
     <script src="/finance/js/disaster-loan-filters.js"></script>
     <script src="/finance/js/disaster-camera-filters.js"></script>
+    <script src="/finance/js/disaster-weather-alert-filters.js"></script>
     <script src="/finance/js/hazard-webcam-viewer.js"></script>
     <script type="module" src="/shared/disaster-kml-export.js"></script>
     <script>
@@ -858,6 +884,9 @@
       let lastAffectedLoans = [];
       let lastLoanFilterMeta = null;
       let lastNearbyCameras = [];
+      let lastNearbyWeatherAlerts = [];
+      let nwsGridFilterActive = false;
+      let nwsGridFilterContext = null;
       let aiChatWidget = null;
       let aiInsightsCard = null;
       let voiceRecognition = null;
@@ -940,6 +969,129 @@
         } else if (selectedDisasterObj || selectedDisasterRow) {
           loadNearbyCamerasForDisaster(selectedDisasterObj, selectedDisasterRow);
         }
+      }
+
+      function renderNearbyWeatherAlertsUI(alerts, meta) {
+        const subtitle = DisasterWeatherAlertFilters.formatWeatherAlertFilterSubtitle(meta, alerts.length);
+        $('#duNearbyWeatherAlertsSubtitle').text(subtitle);
+        const emptyMsg = meta.hasGeo === false
+          ? 'No coordinates for distance filter — showing NWS alerts for county/state if available.'
+          : `No NOAA/NWS alerts within ${meta.radiusMiles || 50} mi of this location.`;
+        $('#duNearbyWeatherAlertsList').html(
+          DisasterWeatherAlertFilters.buildNearbyWeatherAlertsListHtml(alerts, emptyMsg)
+        );
+        const alertsCard = document.getElementById('duNearbyWeatherAlertsCard');
+        const alertsIdle = document.getElementById('duNearbyWeatherAlertsIdle');
+        if (alertsCard) {
+          alertsCard.style.display = '';
+          alertsCard.hidden = false;
+        }
+        if (alertsIdle) alertsIdle.hidden = true;
+        lastNearbyWeatherAlerts = alerts;
+        updateSelectionContextStrip();
+        refreshAIContext();
+      }
+
+      async function loadNearbyWeatherAlertsForDisaster(disasterObj, disasterData) {
+        const scopeMode = $('#duLoanScopeMode').val() || 'distance';
+        const radiusMiles = DisasterLoanFilters.getSelectedRadiusMiles('duLoanRadiusMiles', 'duLoanRadiusCustom');
+        const req = DisasterWeatherAlertFilters.buildDisasterWeatherAlertRequest(
+          disasterObj,
+          disasterData,
+          radiusMiles,
+          lastLoadedDisasterRows,
+          scopeMode
+        );
+        try {
+          const { alerts, meta } = await DisasterWeatherAlertFilters.fetchNearbyWeatherAlerts(req.center, {
+            ...req.options,
+            radiusMiles: req.center ? radiusMiles : null,
+            scopeMode
+          });
+          meta.hasGeo = !!req.center && scopeMode === 'distance';
+          meta.radiusMiles = req.center && scopeMode === 'distance' ? radiusMiles : null;
+          renderNearbyWeatherAlertsUI(alerts, meta);
+        } catch (err) {
+          console.error('Error loading nearby weather alerts:', err);
+          $('#duNearbyWeatherAlertsSubtitle').text('Failed to load weather alerts');
+          $('#duNearbyWeatherAlertsList').html('<p class="text-danger small mb-0">Could not load NOAA/NWS alerts.</p>');
+        }
+      }
+
+      function refreshNearbyWeatherAlerts() {
+        if (selectedDisasterObj || selectedDisasterRow) {
+          loadNearbyWeatherAlertsForDisaster(selectedDisasterObj, selectedDisasterRow);
+        }
+      }
+
+      window.selectNearbyWeatherAlert = function selectNearbyWeatherAlert(index) {
+        const alert = lastNearbyWeatherAlerts[index];
+        if (!alert) return;
+        selectDisaster(null, alert);
+      };
+
+      function isDuShowNwsInGridEnabled() {
+        const el = document.getElementById('duShowNwsInGrid');
+        return !!el?.checked;
+      }
+
+      function updateNwsGridFilterUi() {
+        const strip = document.getElementById('duNwsGridFilterStrip');
+        const labelEl = document.getElementById('duNwsGridFilterLabel');
+        if (!nwsGridFilterActive || !nwsGridFilterContext) {
+          if (strip) strip.hidden = true;
+          return;
+        }
+        const locationLabel = nwsGridFilterContext.county
+          ? `${nwsGridFilterContext.county}, ${nwsGridFilterContext.state}`
+          : nwsGridFilterContext.state;
+        if (labelEl) labelEl.textContent = locationLabel || 'selected area';
+        if (strip) strip.hidden = false;
+      }
+
+      function refreshNwsGridExternalFilter() {
+        if (!disastersGridApi) return;
+        if (typeof disastersGridApi.onFilterChanged === 'function') {
+          disastersGridApi.onFilterChanged();
+        } else if (typeof disastersGridApi.refreshClientSideRowModel === 'function') {
+          disastersGridApi.refreshClientSideRowModel('filter');
+        }
+      }
+
+      function applyNwsGridFilterFromSelection(disasterObj, disasterData) {
+        if (!isDuShowNwsInGridEnabled()) {
+          clearNwsGridFilter(false);
+          return;
+        }
+        const context = DisasterWeatherAlertFilters.buildGridFilterContextFromDisaster(disasterObj, disasterData);
+        if (!context?.state) {
+          clearNwsGridFilter(false);
+          return;
+        }
+        nwsGridFilterActive = true;
+        nwsGridFilterContext = context;
+        updateNwsGridFilterUi();
+        refreshNwsGridExternalFilter();
+      }
+
+      function clearNwsGridFilter(uncheckToggle) {
+        nwsGridFilterActive = false;
+        nwsGridFilterContext = null;
+        updateNwsGridFilterUi();
+        if (uncheckToggle) {
+          const toggle = document.getElementById('duShowNwsInGrid');
+          if (toggle) toggle.checked = false;
+        }
+        refreshNwsGridExternalFilter();
+      }
+
+      function disastersGridExternalFilterPresent() {
+        return nwsGridFilterActive && !!nwsGridFilterContext;
+      }
+
+      function disastersGridExternalFilterPass(node) {
+        if (!disastersGridExternalFilterPresent()) return true;
+        return DisasterWeatherAlertFilters.rowPassesNwsGridFilter(node.data, nwsGridFilterContext);
       }
 
       const UNIFIED_SOURCE_KEYS = ['fema', 'firms', 'usgs', 'nws', 'nhc', 'floodzones'];
@@ -1243,6 +1395,8 @@
           animateRows: true,
           rowSelection: 'single',
           suppressRowClickSelection: false,
+          isExternalFilterPresent: disastersGridExternalFilterPresent,
+          doesExternalFilterPass: disastersGridExternalFilterPass,
           getRowClass: (params) => (params.data?.rowClasses || []).join(' '),
           onRowClicked: (event) => {
             if (event.event?.target?.closest('button')) return;
@@ -1548,6 +1702,17 @@
         document.getElementById('duClearHotspotFilter')?.addEventListener('click', (e) => {
           e.stopPropagation();
           clearHotspotGridFilter();
+        });
+        document.getElementById('duClearNwsGridFilter')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearNwsGridFilter(true);
+        });
+        document.getElementById('duShowNwsInGrid')?.addEventListener('change', () => {
+          if (isDuShowNwsInGridEnabled() && (selectedDisasterObj || selectedDisasterRow)) {
+            applyNwsGridFilterFromSelection(selectedDisasterObj, selectedDisasterRow);
+          } else {
+            clearNwsGridFilter(false);
+          }
         });
         initDuSectionCards();
         initDuSectionSidebar();
@@ -1979,6 +2144,8 @@
         $('#encompassLoansCard').show();
         $('#duNearbyCamerasCard').show();
         $('#duNearbyCamerasIdle').hide();
+        $('#duNearbyWeatherAlertsCard').show();
+        $('#duNearbyWeatherAlertsIdle').hide();
       }
 
       function refreshEncompassLoansGridLayout() {
@@ -2650,6 +2817,9 @@
             defaultState: { sort: null }
           });
         }
+        if (disastersGridExternalFilterPresent()) {
+          refreshNwsGridExternalFilter();
+        }
       }
 
       // Store camera data by index for marker info windows
@@ -2755,6 +2925,7 @@
         if (selectedDisasterObj || selectedDisasterRow) {
           loadLoansForDisaster(selectedDisasterObj, selectedDisasterRow);
           refreshNearbyCameras();
+          refreshNearbyWeatherAlerts();
           return;
         }
         if (cameraLoadContext === 'loan' && selectedLoan) {
@@ -2815,6 +2986,8 @@
 
         loadLoansForDisaster(disasterObj, selectedDisasterRow);
         loadNearbyCamerasForDisaster(disasterObj, selectedDisasterRow);
+        loadNearbyWeatherAlertsForDisaster(disasterObj, selectedDisasterRow);
+        applyNwsGridFilterFromSelection(disasterObj, selectedDisasterRow);
         searchYouTubeForDisaster(title, state, county, eventType, disasterObj);
         revealDisasterSelectionPanels();
         highlightSelectedDisasterInGrid(disasterObj);
@@ -3153,6 +3326,11 @@
             count: lastNearbyCameras.length,
             sample: lastNearbyCameras.slice(0, 5)
           },
+          nearbyWeatherAlerts: {
+            count: lastNearbyWeatherAlerts.length,
+            sample: lastNearbyWeatherAlerts.slice(0, 10)
+          },
+          nwsGridFilterActive: disastersGridExternalFilterPresent(),
           stats: await getDisasterStats()
         };
       }
@@ -3196,8 +3374,11 @@
         const camLine = lastNearbyCameras.length
           ? `${lastNearbyCameras.length} fire camera(s) nearby`
           : 'No nearby cameras in range';
+        const nwsLine = lastNearbyWeatherAlerts.length
+          ? `${lastNearbyWeatherAlerts.length} weather alert(s) nearby`
+          : 'No nearby NWS alerts in range';
         el.innerHTML = `<strong>${title}</strong> · ${county}${county && state ? ', ' : ''}${state}
-          · ${loanLine} · ${camLine}
+          · ${loanLine} · ${camLine} · ${nwsLine}
           · <button type="button" class="btn btn-sm btn-info py-0 px-2 align-baseline text-white" onclick="openDisasterHeygenBriefing()" title="Generate a HeyGen avatar briefing for this event"><i class="bi bi-camera-reels"></i> AI video briefing</button>
           · <button type="button" class="btn btn-sm btn-warning py-0 px-2 align-baseline" onclick="exportCinematicDisasterKml()" title="Google Earth tour with loans, webcams, and disaster mood audio"><i class="bi bi-globe-americas"></i> Google Earth KML</button>
           · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>
