@@ -3692,6 +3692,16 @@
             <span class="mx-1">·</span>
             <span>Unified Disasters · DevConnect Labs</span>
           </div>
+          <div
+            class="du-footer-quote mt-2"
+            id="duSecretQuote"
+            role="button"
+            tabindex="0"
+            title="Turn on, tune in, drop out"
+            aria-label="Turn on, tune in, drop out"
+          >
+            🍄 &ldquo;Turn on, tune in, drop out&rdquo; 🍄
+          </div>
         </div>
       </div>
     </footer>
@@ -3758,6 +3768,62 @@
         } else if (location.hash === '#duImpactGraphSheet') {
           setPullSheetOpen('duImpactGraphSheet', true);
         }
+
+        // Footer easter egg — 6 clicks on the quote opens Encompass Hub (not Worksheets).
+        (function initDuEncompassHubEasterEgg() {
+          var quote = document.getElementById('duSecretQuote');
+          var listenBtn = document.getElementById('duDailyBriefingListenBtn');
+          var stopBtn = document.getElementById('duDailyBriefingStopBtn');
+          if (!quote) return;
+
+          var clickCount = 0;
+          var clickTimer = null;
+          var HUB_URL = '/finance/encompass-hub.html';
+          var TARGET_CLICKS = 6;
+          var RESET_MS = 1400;
+
+          function pulseQuote(el) {
+            el.classList.add('du-footer-quote--pulse');
+            setTimeout(function () { el.classList.remove('du-footer-quote--pulse'); }, 220);
+          }
+
+          function goToEncompassHub(el) {
+            el.classList.add('du-footer-quote--unlock');
+            document.body.style.transition = 'opacity 0.85s ease-out';
+            document.body.style.opacity = '0';
+            setTimeout(function () {
+              window.location.href = HUB_URL;
+            }, 850);
+          }
+
+          function registerClick(el) {
+            clickCount += 1;
+            pulseQuote(el);
+            clearTimeout(clickTimer);
+            clickTimer = setTimeout(function () { clickCount = 0; }, RESET_MS);
+            if (clickCount >= TARGET_CLICKS) {
+              clickCount = 0;
+              clearTimeout(clickTimer);
+              goToEncompassHub(el);
+            }
+          }
+
+          quote.addEventListener('click', function () { registerClick(quote); });
+          quote.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              registerClick(quote);
+            }
+          });
+
+          // Listen + Stop in the hero also advance the same counter (pairs with footer taps).
+          if (listenBtn) {
+            listenBtn.addEventListener('click', function () { registerClick(quote); });
+          }
+          if (stopBtn) {
+            stopBtn.addEventListener('click', function () { registerClick(quote); });
+          }
+        })();
       });
     </script>
   <script src="/finance/js/disaster-ai-scan-card.js"></script>
