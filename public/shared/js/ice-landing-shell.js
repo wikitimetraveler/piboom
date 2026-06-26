@@ -333,7 +333,7 @@
       const showAll = document.getElementById('showAllWrap');
       const demo = isDemoMode();
       if (grid) grid.innerHTML = p.renderSiteCards(p.getPortfolioSites(demo));
-      if (demo && hint) hint.textContent = 'Demo focus — Worksheets and Encompass on devconnectlabs.com';
+      if (demo && hint) hint.textContent = 'Demo focus — Worksheets and Encompass on this site';
       if (showAll) showAll.style.display = demo ? 'block' : 'none';
     }
 

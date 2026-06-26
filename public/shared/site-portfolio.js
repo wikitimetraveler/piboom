@@ -5,8 +5,57 @@
 (function (global) {
   'use strict';
 
-  /** Primary platform host (DevConnect Labs deployment). */
+  /** DevConnect Labs marketing host. */
   const PRIMARY_HOST = 'devconnectlabs.com';
+  /** Lane family production host (same app deployment). */
+  const LANE_FAMILY_HOST = 'thelanefamily.us';
+
+  function normalizeHostname(hostname) {
+    return String(hostname || '')
+      .toLowerCase()
+      .replace(/^www\./, '');
+  }
+
+  function isLaneFamilyHost(hostname) {
+    const h = normalizeHostname(hostname);
+    return h === LANE_FAMILY_HOST || h.endsWith('.' + LANE_FAMILY_HOST);
+  }
+
+  function isDeploymentHost(hostname) {
+    const h = normalizeHostname(hostname);
+    if (!h || h === 'localhost' || h === '127.0.0.1') return true;
+    if (h.endsWith('.onrender.com')) return true;
+    if (h === PRIMARY_HOST || h.endsWith('.' + PRIMARY_HOST)) return true;
+    if (isLaneFamilyHost(h)) return true;
+    return false;
+  }
+
+  function currentHostname() {
+    return (global.location && global.location.hostname) || '';
+  }
+
+  /** Same-origin static app — links stay on whichever host served the page. */
+  function hostMatchesDeployment() {
+    return isDeploymentHost(currentHostname());
+  }
+
+  function resolveDisplayDomain(site) {
+    if (hostMatchesDeployment()) {
+      const h = normalizeHostname(currentHostname());
+      if (h && h !== 'localhost' && h !== '127.0.0.1') {
+        return h;
+      }
+    }
+    return site.domain || PRIMARY_HOST;
+  }
+
+  function isCrossOriginUrl(url) {
+    try {
+      return new URL(url, global.location.origin).origin !== global.location.origin;
+    } catch (_) {
+      return false;
+    }
+  }
 
   /**
    * @typedef {Object} PortfolioSite
@@ -70,8 +119,8 @@
       id: 'family',
       label: 'Lane Family',
       tagline: 'Genealogy, museum, memorial wall, plate gallery',
-      domain: 'thelanefamily.us',
-      absoluteUrl: 'https://www.thelanefamily.us',
+      domain: LANE_FAMILY_HOST,
+      path: '/family/lane-family.html',
       icon: 'bi-house-heart',
     },
     {
@@ -184,25 +233,32 @@
     },
   ];
 
-  function hostMatchesPrimary() {
-    const h = (global.location && global.location.hostname) || '';
-    return !h || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.onrender.com') || h === PRIMARY_HOST || h === 'www.' + PRIMARY_HOST;
-  }
-
   /** Resolve live URL for a portfolio site. */
   function resolveSiteUrl(site) {
-    if (site.absoluteUrl) return site.absoluteUrl;
     const path = site.path || '/';
-    if (hostMatchesPrimary()) {
+    if (hostMatchesDeployment()) {
       try {
         return new URL(path, global.location.origin).href;
       } catch (_) {
         return path;
       }
     }
+    if (site.absoluteUrl) {
+      const base = site.absoluteUrl.replace(/\/$/, '');
+      return path === '/' ? base : base + path;
+    }
     const host = site.domain || PRIMARY_HOST;
-    const base = host.startsWith('http') ? host : 'https://' + host.replace(/^www\./, 'www.');
+    const base = host.startsWith('http') ? host : 'https://www.' + host.replace(/^www\./, '');
     return base.replace(/\/$/, '') + path;
+  }
+
+  /** href for anchors — relative on current deployment (thelanefamily.us, devconnectlabs, localhost). */
+  function resolveSiteHref(site) {
+    const path = site.path || '/';
+    if (hostMatchesDeployment()) {
+      return path;
+    }
+    return resolveSiteUrl(site);
   }
 
   function getPortfolioSites(demoMode) {
@@ -275,11 +331,11 @@
 
   function renderFeaturedSites(sites) {
     return sites
-      .slice(0, 6)
+      .slice(0, 8)
       .map((site) => {
-        const url = resolveSiteUrl(site);
-        const domain = site.domain || PRIMARY_HOST;
-        const external = !!site.absoluteUrl;
+        const href = resolveSiteHref(site);
+        const domain = resolveDisplayDomain(site);
+        const external = /^https?:\/\//i.test(href) && isCrossOriginUrl(href);
         const authRequired = !!site.authRequired;
         const targetAttr = external ? ' target="_blank" rel="noopener noreferrer"' : '';
         const lockBadge = authRequired
@@ -291,7 +347,7 @@
           '<a class="ice-featured__item' +
           lockedClass +
           '" href="' +
-          url +
+          href +
           '"' +
           targetAttr +
           authAttr +
@@ -337,13 +393,17 @@
   function renderSiteCards(sites) {
     return sites
       .map((site) => {
-        const url = resolveSiteUrl(site);
-        const domain = site.domain || PRIMARY_HOST;
+        const href = resolveSiteHref(site);
+        const domain = resolveDisplayDomain(site);
         const title = (site.tagline || site.label).replace(/"/g, '&quot;');
+        const external = /^https?:\/\//i.test(href) && isCrossOriginUrl(href);
+        const targetAttr = external ? ' target="_blank" rel="noopener noreferrer"' : '';
         return (
           '<a class="ice-site-card" href="' +
-          url +
-          '" target="_blank" rel="noopener noreferrer" title="' +
+          href +
+          '"' +
+          targetAttr +
+          ' title="' +
           title +
           '" data-site-id="' +
           site.id +
@@ -371,6 +431,7 @@
 
   global.SITE_PORTFOLIO = {
     PRIMARY_HOST,
+    LANE_FAMILY_HOST,
     PORTFOLIO_SITES,
     STACK_CHIPS,
     STACK_GROUPS,
@@ -378,6 +439,9 @@
     CONTACT_ITEMS,
     getPortfolioSites,
     resolveSiteUrl,
+    resolveSiteHref,
+    resolveDisplayDomain,
+    hostMatchesDeployment,
     renderDock,
     renderFeaturedSites,
     renderContactCards,
