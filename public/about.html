@@ -1,0 +1,49 @@
+<!doctype html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>About — David Lane</title>
+<meta name="description" content="David Lane — DevConnect Labs: Encompass integration, loan tooling, and unified disaster monitoring. Live API or standalone mock data."/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+<link rel="stylesheet" href="/shared/design-tokens.css"/>
+<link rel="stylesheet" href="/shared/css/ice-landing.css"/>
+<script src="/shared/site-portfolio.js"></script>
+</head>
+<body class="ice-landing" data-ice-page="about">
+
+<div class="ice-landing__sky" aria-hidden="true"></div>
+<div class="ice-landing__ice-wrap" aria-hidden="true"><canvas id="iceCanvas"></canvas></div>
+<div class="ice-landing__horizon" aria-hidden="true"></div>
+
+<header class="ice-topbar">
+  <a class="ice-wordmark" href="/">David Lane</a>
+  <span class="ice-topbar__meta">About</span>
+</header>
+
+<main class="ice-landing__main ice-landing__main--scroll">
+  <section class="ice-panel ice-panel--wide ice-panel--glass">
+    <p class="ice-kicker">About</p>
+    <h1 class="ice-title ice-title--sub">Platform overview</h1>
+    <div class="ice-prose">
+      <p>I'm <strong>David Lane</strong>, engineer behind <strong>DevConnect Labs</strong>. The platform centers on <strong>Encompass integration</strong> — OAuth-backed APIs, loan pipeline and custom-field tooling — plus <strong>unified disaster monitoring</strong>. Many tools plug into live Encompass when configured; others run standalone with real feeds or offline mock data for demos and CI.</p>
+      <p>I ship service-layer Node.js APIs, PostgreSQL-backed features, and LangChain + OpenAI assistants with persistent memory. <strong>OpenAI Vision (GPT-4o)</strong> powers image-driven tooling such as Automator field parsing and manifest review; <strong>HeyGen</strong> handles avatar video for demos and QR-triggered guide popups. The frontend is Bootstrap and vanilla JavaScript — no React — with AG Grid and DataTables where tables matter.</p>
+      <p>On hub pages, press <kbd>Ctrl+K</kbd> to search all tools. <a href="/?demo=1">Demo mode</a> narrows the catalog to Worksheets and Encompass.</p>
+    </div>
+    <div class="ice-cta-row" style="margin-top:1.75rem">
+      <a class="ice-btn ice-btn--solid" href="/stack.html">Technical stack <i class="bi bi-layers"></i></a>
+      <a class="ice-btn" href="/sites.html">All sites <i class="bi bi-globe2"></i></a>
+    </div>
+  </section>
+</main>
+
+<p class="ice-footer">David Lane · DevConnect Labs</p>
+
+<nav class="ice-dock" id="iceDock" aria-label="Primary"></nav>
+<button type="button" class="ice-theme-toggle" id="iceThemeToggle" aria-label="Toggle theme">AUTO</button>
+
+<script src="/shared/js/ice-ocean-scene.js"></script>
+<script src="/shared/js/ice-landing-shell.js"></script>
+</body>
+</html>

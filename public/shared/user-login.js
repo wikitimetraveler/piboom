@@ -157,12 +157,20 @@ function setupLoginModalAccessibility(modal) {
 
 function redirectAfterLoginIfNeeded() {
   const params = new URLSearchParams(window.location.search);
-  const returnToRaw = params.get('returnTo');
+  let returnToRaw = params.get('returnTo');
+  if (!returnToRaw) {
+    try {
+      returnToRaw = sessionStorage.getItem('featuredAuthReturnTo');
+    } catch (_) {}
+  }
   if (!returnToRaw) return false;
   try {
     const dest = new URL(returnToRaw, window.location.origin);
     if (dest.origin === window.location.origin && dest.pathname.startsWith('/finance')) {
       setFinanceSessionCookie();
+      try {
+        sessionStorage.removeItem('featuredAuthReturnTo');
+      } catch (_) {}
       window.location.replace(dest.pathname + dest.search + dest.hash);
       return true;
     }
@@ -512,4 +520,6 @@ window.logout = logout;
 window.isLoggedIn = isLoggedIn;
 window.getLoggedInUser = getLoggedInUser;
 window.updateNavbarUserDisplay = updateNavbarUserDisplay;
+window.hasFinanceSessionCookie = hasFinanceSessionCookie;
+window.setFinanceSessionCookie = setFinanceSessionCookie;
 

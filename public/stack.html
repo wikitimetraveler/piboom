@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- Development work by David Lane -->
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Stack — David Lane</title>
+<meta name="description" content="Platform, AI, Encompass, frontend, and data stack behind DevConnect Labs."/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+<link rel="stylesheet" href="/shared/design-tokens.css"/>
+<link rel="stylesheet" href="/shared/css/ice-landing.css"/>
+<script src="/shared/site-portfolio.js"></script>
+</head>
+<body class="ice-landing" data-ice-page="stack">
+
+<div class="ice-landing__sky" aria-hidden="true"></div>
+<div class="ice-landing__ice-wrap" aria-hidden="true"><canvas id="iceCanvas"></canvas></div>
+<div class="ice-landing__horizon" aria-hidden="true"></div>
+
+<header class="ice-topbar">
+  <a class="ice-wordmark" href="/">David Lane</a>
+  <span class="ice-topbar__meta">Stack</span>
+</header>
+
+<main class="ice-landing__main ice-landing__main--scroll">
+  <section class="ice-panel ice-panel--wide ice-panel--glass">
+    <p class="ice-kicker">Stack</p>
+    <h1 class="ice-title ice-title--sub">What I ship with</h1>
+    <p class="ice-lead" style="margin-bottom:1.5rem">Technologies and patterns across DevConnect Labs — from Postgres to Encompass APIs to LangChain memory.</p>
+    <div class="ice-stack-grid" id="stackChips"></div>
+    <div id="stackGroups"></div>
+  </section>
+</main>
+
+<p class="ice-footer">David Lane · DevConnect Labs</p>
+
+<nav class="ice-dock" id="iceDock" aria-label="Primary"></nav>
+<button type="button" class="ice-theme-toggle" id="iceThemeToggle" aria-label="Toggle theme">AUTO</button>
+
+<script src="/shared/js/ice-ocean-scene.js"></script>
+<script src="/shared/js/ice-landing-shell.js"></script>
+</body>
+</html>
