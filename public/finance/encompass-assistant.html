@@ -23,28 +23,57 @@
     <title>Encompass AI Assistant - DevConnect Labs</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
+    <link rel="stylesheet" href="/shared/design-tokens.css"/>
     <link rel="stylesheet" href="/shared/styles.css"/>
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css"/>
     <script src="/shared/modern-navbar.js"></script>
     <style>
+        :root {
+            --ea-header-bg: linear-gradient(135deg, var(--zen-dark) 0%, color-mix(in srgb, var(--zen-primary) 38%, var(--zen-dark)) 100%);
+            --ea-btn-bg: linear-gradient(135deg, var(--zen-primary) 0%, var(--zen-primary-hover) 100%);
+            --ea-voice-bg: linear-gradient(135deg, var(--ice-secondary) 0%, var(--zen-primary) 100%);
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(
+                145deg,
+                color-mix(in srgb, #ffffff 78%, var(--zen-surface) 22%) 0%,
+                color-mix(in srgb, var(--zen-surface) 55%, var(--zen-primary) 8%) 42%,
+                color-mix(in srgb, #ffffff 52%, var(--zen-primary) 48%) 100%
+            );
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-dark);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 14% 18%, rgba(var(--zen-primary-rgb), 0.2) 0%, transparent 44%),
+                radial-gradient(circle at 88% 10%, rgba(91, 168, 138, 0.14) 0%, transparent 40%),
+                radial-gradient(circle at 72% 82%, rgba(var(--zen-primary-rgb), 0.12) 0%, transparent 46%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         .chat-container {
-            background: white;
+            background: var(--zen-card-bg);
+            border: 1px solid var(--zen-border);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 32px rgba(var(--zen-primary-rgb), 0.12);
             margin: 20px auto;
             max-width: 1200px;
             overflow: hidden;
             min-height: 80vh;
+            backdrop-filter: blur(8px);
         }
 
         .chat-header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: var(--ea-header-bg);
             color: white;
             padding: 15px;
             text-align: center;
@@ -63,9 +92,9 @@
         }
 
         .input-section {
-            background: #f8f9fa;
+            background: color-mix(in srgb, var(--zen-surface) 80%, white 20%);
             padding: 15px;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--zen-border);
         }
 
         .input-group {
@@ -88,12 +117,12 @@
         }
 
         .message-input:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+            border-color: var(--zen-primary);
+            box-shadow: 0 0 0 3px rgba(var(--zen-primary-rgb), 0.18);
         }
 
         .btn-send {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            background: var(--ea-btn-bg);
             color: white;
             border: none;
             border-radius: 50%;
@@ -105,16 +134,16 @@
             justify-content: center;
             font-size: 18px;
             transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            box-shadow: 0 4px 15px rgba(var(--zen-primary-rgb), 0.32);
         }
 
         .btn-send:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+            box-shadow: 0 6px 20px rgba(var(--zen-primary-rgb), 0.4);
         }
 
         .btn-voice {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: var(--ea-voice-bg);
             color: white;
             border: none;
             border-radius: 50%;
@@ -152,8 +181,8 @@
 
         .sidebar {
             width: 300px;
-            background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
+            background: color-mix(in srgb, var(--zen-surface) 75%, white 25%);
+            border-right: 1px solid var(--zen-border);
             padding: 20px;
             overflow-y: auto;
         }
@@ -169,10 +198,11 @@
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            background: #f8f9fa;
+            background: color-mix(in srgb, var(--zen-surface) 70%, white 30%);
             border-radius: 15px;
             margin-bottom: 20px;
             min-height: 400px;
+            border: 1px solid var(--zen-border);
         }
 
         .message {
@@ -186,7 +216,7 @@
         }
 
         .user-message {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            background: var(--ea-btn-bg);
             color: white;
             margin-left: auto;
             text-align: right;
@@ -194,7 +224,7 @@
 
         .ai-message {
             background: white;
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--zen-border);
             margin-right: auto;
         }
 
@@ -210,7 +240,7 @@
 
         .source-meta {
             font-size: 12px;
-            color: #1565c0;
+            color: var(--zen-primary);
             margin-top: 2px;
         }
 
@@ -222,7 +252,7 @@
         .source-snippet {
             margin-top: 4px;
             font-size: 13px;
-            color: #0d47a1;
+            color: var(--zen-primary-hover);
         }
 
         .quick-action {
@@ -241,11 +271,11 @@
         }
 
         .quick-action:hover {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            background: var(--ea-btn-bg);
             color: white;
-            border-color: #007bff;
+            border-color: var(--zen-primary);
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+            box-shadow: 0 4px 15px rgba(var(--zen-primary-rgb), 0.28);
         }
 
         .typing-indicator {
@@ -268,7 +298,7 @@
         .typing-dots span {
             width: 8px;
             height: 8px;
-            background: #007bff;
+            background: var(--zen-primary);
             border-radius: 50%;
             animation: typing 1.4s infinite;
         }
@@ -282,7 +312,7 @@
         }
 
         .section-title {
-            color: #2c3e50;
+            color: var(--zen-dark);
             margin-bottom: 15px;
             font-size: 18px;
             font-weight: 600;
@@ -297,7 +327,7 @@
         }
 
         .accordion-header {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: var(--ea-header-bg);
             color: white;
             padding: 15px 20px;
             cursor: pointer;
@@ -309,7 +339,7 @@
         }
 
         .accordion-header:hover {
-            background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+            background: linear-gradient(135deg, color-mix(in srgb, var(--zen-primary) 25%, var(--zen-dark)) 0%, var(--zen-dark) 100%);
         }
 
         .accordion-icon {
@@ -370,43 +400,40 @@
 
         /* Navigation Styles */
         .modern-navbar {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(135, 206, 250, 0.2);
+            border-bottom: 1px solid var(--zen-border);
             padding: 1rem 0;
             position: sticky;
             top: 0;
             z-index: 1000;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 20px rgba(var(--zen-primary-rgb), 0.08);
         }
         
         .navbar-brand-modern {
             font-size: 1.4rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--zen-dark);
         }
         
         .nav-user-btn {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            border: 2px solid rgba(102, 126, 234, 0.3);
+            background: rgba(var(--zen-primary-rgb), 0.08);
+            border: 2px solid var(--zen-border);
             border-radius: 25px;
             padding: 8px 20px;
             transition: all 0.3s ease;
         }
         
         .nav-user-btn:hover {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
-            border-color: #667eea;
+            background: rgba(var(--zen-primary-rgb), 0.14);
+            border-color: var(--zen-primary);
             transform: translateY(-2px);
         }
 
         /* Footer Styles */
         .footer {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            background: var(--ea-header-bg);
             color: white;
             padding: 20px 0;
             margin-top: 40px;
