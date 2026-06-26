@@ -58,6 +58,15 @@
       authRequired: true,
     },
     {
+      id: 'encompass',
+      label: 'Encompass Hub',
+      tagline: 'Pipeline, loan APIs, processor assignment',
+      domain: PRIMARY_HOST,
+      path: '/finance/encompass-hub.html',
+      icon: 'bi-columns-gap',
+      authRequired: true,
+    },
+    {
       id: 'family',
       label: 'Lane Family',
       tagline: 'Genealogy, museum, memorial wall, plate gallery',
@@ -72,15 +81,6 @@
       domain: PRIMARY_HOST,
       path: '/finance/index.html',
       icon: 'bi-bank',
-      demoOnly: true,
-    },
-    {
-      id: 'encompass',
-      label: 'Encompass Hub',
-      tagline: 'Pipeline, loan APIs, processor assignment',
-      domain: PRIMARY_HOST,
-      path: '/finance/encompass-hub.html',
-      icon: 'bi-columns-gap',
       demoOnly: true,
     },
   ];
