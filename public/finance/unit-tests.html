@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
     <link rel="stylesheet" href="/shared/design-tokens.css" />
-    <link rel="stylesheet" href="/shared/collection-styles.css" />
     <script src="/shared/menu-config.js"></script>
     <style>
       body {
@@ -19,39 +18,75 @@
         line-height: 1.6;
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         color: var(--text-dark);
-        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: linear-gradient(
+          145deg,
+          color-mix(in srgb, #ffffff 78%, var(--zen-surface) 22%) 0%,
+          color-mix(in srgb, var(--zen-surface) 55%, var(--zen-primary) 8%) 42%,
+          color-mix(in srgb, #ffffff 52%, var(--zen-primary) 48%) 100%
+        );
         position: relative;
         overflow-x: hidden;
       }
 
-      /* Blue zen animated background (matches tool3) */
+      /* Zen atmosphere — soft teal + sage orbs */
       body::before {
         content: '';
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
+        inset: 0;
         background:
-          radial-gradient(circle at 20% 80%, var(--ice-glow) 0%, transparent 50%),
-          radial-gradient(circle at 80% 20%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
-          radial-gradient(circle at 40% 40%, rgba(46, 204, 113, 0.05) 0%, transparent 50%);
-        animation: backgroundFloat 20s ease-in-out infinite;
+          radial-gradient(circle at 14% 18%, rgba(var(--zen-primary-rgb), 0.22) 0%, transparent 44%),
+          radial-gradient(circle at 88% 10%, rgba(91, 168, 138, 0.16) 0%, transparent 40%),
+          radial-gradient(circle at 72% 82%, rgba(var(--zen-primary-rgb), 0.14) 0%, transparent 46%),
+          radial-gradient(circle at 22% 88%, rgba(255, 255, 255, 0.65) 0%, transparent 36%);
+        animation: backgroundFloat 24s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -2;
+      }
+
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.35) 0%,
+          transparent 28%,
+          transparent 72%,
+          rgba(var(--zen-primary-rgb), 0.06) 100%
+        );
         pointer-events: none;
         z-index: -1;
       }
+
       @keyframes backgroundFloat {
-        0%, 100% { transform: translate(0, 0) scale(1); }
-        25% { transform: translate(-10px, -10px) scale(1.05); }
-        50% { transform: translate(10px, -5px) scale(0.95); }
-        75% { transform: translate(-5px, 10px) scale(1.02); }
+        0%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        33% { transform: translate(-8px, -6px) scale(1.03); opacity: 0.95; }
+        66% { transform: translate(6px, -4px) scale(0.98); opacity: 1; }
       }
 
-      /* Navbar - exact copy from tool4 */
+      @media (prefers-reduced-motion: reduce) {
+        body::before {
+          animation: none;
+        }
+      }
+
+      .btn-primary {
+        --bs-btn-bg: var(--zen-primary);
+        --bs-btn-border-color: var(--zen-primary);
+        --bs-btn-hover-bg: var(--zen-primary-hover);
+        --bs-btn-hover-border-color: var(--zen-primary-hover);
+        --bs-btn-active-bg: var(--zen-primary-hover);
+        --bs-btn-active-border-color: var(--zen-primary-hover);
+        box-shadow: 0 4px 14px rgba(var(--zen-primary-rgb), 0.28);
+      }
+
+      /* Navbar — zen glass */
       .navbar {
-        background: var(--white) !important;
-        box-shadow: var(--shadow-sm);
-        border-bottom: 1px solid var(--border-light);
+        background: rgba(255, 255, 255, 0.88) !important;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: var(--shadow-sm), 0 8px 24px rgba(var(--zen-primary-rgb), 0.08);
+        border-bottom: 1px solid var(--zen-border);
         padding: 1rem 0;
         position: relative;
         overflow: hidden;
@@ -72,11 +107,14 @@
         100% { left: 100%; }
       }
       .navbar .navbar-brand {
-        color: var(--text-dark) !important;
+        color: var(--zen-dark) !important;
         font-weight: 600;
         font-size: 1.25rem;
         position: relative;
         z-index: 1;
+      }
+      .navbar .navbar-brand i {
+        color: var(--zen-primary);
       }
       .navbar .nav-link {
         color: var(--text-muted) !important;
@@ -86,10 +124,29 @@
         z-index: 1;
       }
       .navbar .nav-link:hover {
-        color: var(--primary-blue) !important;
+        color: var(--zen-primary) !important;
       }
       .main-content { padding: 1rem 0; }
       .main-content .container { max-width: 1200px; }
+
+      .unit-tests-command-bar {
+        padding: 0.65rem 1rem;
+        margin-bottom: 0.75rem;
+        border-radius: var(--zen-radius, 16px);
+        background: rgba(255, 255, 255, 0.72);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--zen-border);
+        box-shadow: var(--zen-shadow, 0 8px 32px rgba(var(--zen-primary-rgb), 0.1));
+      }
+
+      .unit-tests-command-bar h5 {
+        color: var(--zen-dark);
+      }
+
+      .unit-tests-command-bar h5 i {
+        color: var(--zen-primary);
+      }
       .hero {
         padding: 0.5rem 1rem;
         display: flex;
@@ -118,10 +175,12 @@
       }
 
       .card {
-        border-radius: 18px;
+        border-radius: var(--zen-radius, 16px);
         border: 1px solid var(--zen-border);
-        box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+        box-shadow: var(--zen-shadow, 0 8px 32px rgba(var(--zen-primary-rgb), 0.1));
         background: var(--zen-card-bg);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
       }
 
       .badge-soft {
@@ -1644,7 +1703,10 @@
     </style>
     <style id="unit-tests-night-theme">
       /* Unit Tests Dark Mode - professional grey palette (softer than black) */
-      body.unit-tests-night-theme{background:#374151!important;color:#f3f4f6!important}
+      body.unit-tests-night-theme{
+        background: linear-gradient(160deg, #1a2856 0%, #243b53 48%, #1a3d4a 100%) !important;
+        color:#f3f4f6!important;
+      }
       body.unit-tests-night-theme .navbar{background:#4b5563!important;border-color:#6b7280!important}
       body.unit-tests-night-theme .navbar .navbar-brand,body.unit-tests-night-theme .navbar .nav-link{color:#f9fafb!important}
       body.unit-tests-night-theme .navbar .nav-link:hover{color:#38bdf8!important}
@@ -1834,9 +1896,6 @@
         color: #d1d5db !important;
       }
 
-      .unit-tests-command-bar {
-        padding: 0.35rem 0;
-      }
       .unit-tests-command-actions .btn:disabled {
         opacity: 0.55;
       }
