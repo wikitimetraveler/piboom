@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="/shared/design-tokens.css" />
     <link href="../shared/modern-navbar.css" rel="stylesheet" />
     <link rel="stylesheet" href="/finance/css/disasters-unified.css" />
+    <link rel="stylesheet" href="/shared/css/section-sidebar-shell.css" />
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/styles/ag-grid.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/styles/ag-theme-alpine.css" />
@@ -82,6 +83,9 @@
             <a class="btn btn-light btn-sm" href="/finance/index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
             <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Hazard Webcams</a>
             <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html"><i class="bi-diagram-3"></i> Impact Graph</a>
+            <a class="btn btn-outline-light btn-sm" href="/finance/assets/video/unified-disasters-reel.mp4" target="_blank" rel="noopener" title="HyperFrames narrated tour of this dashboard">
+              <i class="bi bi-film"></i> Watch tour
+            </a>
             <button type="button" class="btn btn-outline-light btn-sm" id="duDailyBriefingListenBtn" title="Spoken daily US hazard briefing via Google TTS">
               <i class="bi bi-volume-up"></i> Listen briefing
             </button>
@@ -157,16 +161,30 @@
         <div class="section-content-area">
       <div class="card du-web-crawl-panel mb-3" id="duWebCrawlPanel" aria-label="Live web hazard headlines">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
-          <div>
-            <strong class="small"><i class="bi bi-newspaper me-1" aria-hidden="true"></i>Web hazard headlines</strong>
+          <button
+            type="button"
+            class="du-web-crawl-toggle btn btn-link btn-sm text-start text-decoration-none text-body p-0 flex-grow-1"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseWebCrawl"
+            aria-expanded="false"
+            aria-controls="collapseWebCrawl"
+            id="headingWebCrawl"
+          >
+            <strong class="small d-inline-flex align-items-center gap-1">
+              <i class="bi bi-newspaper" aria-hidden="true"></i>
+              Web hazard headlines
+              <i class="bi bi-chevron-down du-web-crawl-chevron small opacity-75" aria-hidden="true"></i>
+            </strong>
             <span class="du-web-crawl-status small text-muted d-block" id="duWebCrawlStatus" role="status" aria-live="polite">Loading crawl…</span>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary" id="duWebCrawlRefreshBtn" title="Refresh RSS, Atom, and GDELT headlines">
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-secondary flex-shrink-0" id="duWebCrawlRefreshBtn" title="Refresh RSS, Atom, and GDELT headlines">
             <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Refresh crawl
           </button>
         </div>
-        <div class="card-body py-2">
-          <ul class="du-crawl-headline-list list-unstyled mb-0" id="duWebCrawlList"></ul>
+        <div id="collapseWebCrawl" class="collapse" aria-labelledby="headingWebCrawl">
+          <div class="card-body py-2">
+            <ul class="du-crawl-headline-list list-unstyled mb-0" id="duWebCrawlList"></ul>
+          </div>
         </div>
       </div>
 
@@ -178,15 +196,7 @@
         </div>
       </div>
       <div id="selectionContextStrip" class="alert alert-primary py-2 small mb-3" style="display: none;" role="status"></div>
-      <div id="duHotspotFilterStrip" class="alert alert-info py-2 small mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="status" hidden>
-        <span class="du-hotspot-filter-strip-text">
-          <i class="bi bi-funnel-fill me-1" aria-hidden="true"></i>
-          Disasters grid filtered to <strong id="duHotspotFilterLabel">—</strong>
-        </span>
-        <button type="button" class="btn btn-sm btn-outline-secondary flex-shrink-0" id="duClearHotspotFilter" aria-label="Clear location filter">
-          <i class="bi bi-x-lg" aria-hidden="true"></i> <span class="du-clear-hotspot-label">Clear location filter</span>
-        </button>
-      </div>
+
       <div id="duNwsGridFilterStrip" class="alert alert-info py-2 small mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="status" hidden>
         <span class="du-nws-filter-strip-text">
           <i class="bi bi-cloud-lightning me-1" aria-hidden="true"></i>
@@ -511,8 +521,8 @@
                   <span class="du-loan-pills-kicker">Radius</span>
                   <button type="button" class="du-filter-pill" data-du-loan-radius="10">10 mi</button>
                   <button type="button" class="du-filter-pill" data-du-loan-radius="25">25 mi</button>
-                  <button type="button" class="du-filter-pill du-filter-pill-active" data-du-loan-radius="50">50 mi</button>
-                  <button type="button" class="du-filter-pill" data-du-loan-radius="100">100 mi</button>
+                  <button type="button" class="du-filter-pill" data-du-loan-radius="50">50 mi</button>
+                  <button type="button" class="du-filter-pill du-filter-pill-active" data-du-loan-radius="100">100 mi</button>
                   <button type="button" class="du-filter-pill" data-du-loan-radius="custom">Custom</button>
                 </div>
               </div>
@@ -523,8 +533,8 @@
               <select class="visually-hidden" id="duLoanRadiusMiles" aria-hidden="true" tabindex="-1">
                 <option value="10">10 mi</option>
                 <option value="25">25 mi</option>
-                <option value="50" selected>50 mi</option>
-                <option value="100">100 mi</option>
+                <option value="50">50 mi</option>
+                <option value="100" selected>100 mi</option>
                 <option value="custom">Custom…</option>
               </select>
             </div>
@@ -542,7 +552,7 @@
                 <div id="duLoanRadiusCustomBar" class="du-loan-custom-radius mb-3" hidden>
                   <label class="form-label small mb-1" for="duLoanRadiusCustom">Custom radius (miles)</label>
                   <div class="d-flex flex-wrap align-items-center gap-2">
-                    <input type="number" class="form-control form-control-sm" id="duLoanRadiusCustom" min="1" max="500" value="50" style="max-width: 7rem;" aria-describedby="duLoanRadiusCustomHint">
+                    <input type="number" class="form-control form-control-sm" id="duLoanRadiusCustom" min="1" max="500" value="100" style="max-width: 7rem;" aria-describedby="duLoanRadiusCustomHint">
                     <span class="small text-muted" id="duLoanRadiusCustomHint">Updates mocked loans and cameras on change</span>
                   </div>
                 </div>
@@ -653,6 +663,17 @@
             Unified Disasters reads shared Postgres tables—no page-specific schema. Events refresh on a
             <strong>90-day</strong> window.
           </p>
+          <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+            <button
+              type="button"
+              class="btn btn-warning btn-sm"
+              id="duIngestPostgresBtn"
+              title="POST /api/disasters/refresh — pull FEMA, FIRMS, USGS, NWS, and NHC live APIs and upsert into the disasters table (1–3 min)"
+            >
+              <i class="bi bi-database-down"></i> Pull APIs → repopulate Postgres
+            </button>
+            <span class="small text-muted" id="duIngestPostgresStatus" role="status" aria-live="polite"></span>
+          </div>
           <div class="row g-3">
             <div class="col-md-6">
               <h3 class="du-schema-sheet-kicker">Fact tables</h3>
@@ -907,7 +928,7 @@
         $('#duNearbyCamerasSubtitle').text(subtitle);
         const emptyMsg = meta.hasGeo === false
           ? 'No coordinates for distance filter — showing county/state matches if available.'
-          : `No cameras within ${meta.radiusMiles || 50} mi of this location.`;
+          : `No cameras within ${meta.radiusMiles || DisasterLoanFilters.DEFAULT_RADIUS_MILES} mi of this location.`;
         $('#duNearbyCamerasList').html(
           DisasterCameraFilters.buildNearbyCamerasListHtml(cameras, emptyMsg)
         );
@@ -976,7 +997,7 @@
         $('#duNearbyWeatherAlertsSubtitle').text(subtitle);
         const emptyMsg = meta.hasGeo === false
           ? 'No coordinates for distance filter — showing NWS alerts for county/state if available.'
-          : `No NOAA/NWS alerts within ${meta.radiusMiles || 50} mi of this location.`;
+          : `No NOAA/NWS alerts within ${meta.radiusMiles || DisasterLoanFilters.DEFAULT_RADIUS_MILES} mi of this location.`;
         $('#duNearbyWeatherAlertsList').html(
           DisasterWeatherAlertFilters.buildNearbyWeatherAlertsListHtml(alerts, emptyMsg)
         );
@@ -1603,6 +1624,10 @@
       }
 
       $(function init() {
+        import('/shared/disaster-refresh-client.js')
+          .then(({ captureDisasterRefreshTokenFromUrl }) => captureDisasterRefreshTokenFromUrl())
+          .catch((err) => console.warn('Disaster refresh client unavailable:', err));
+
         // Show loading initially (skip in shirt / booth popup demo mode)
         if (!window.__DU_POPUP_DEMO__) {
           showLoading();
@@ -1615,7 +1640,7 @@
             initDisasterHeygenStudio({
               getBriefingContext() {
                 const radiusEl = document.getElementById('radiusInput');
-                const radiusMiles = radiusEl ? Number(radiusEl.value) || 50 : 50;
+                const radiusMiles = radiusEl ? Number(radiusEl.value) || DisasterLoanFilters.DEFAULT_RADIUS_MILES : DisasterLoanFilters.DEFAULT_RADIUS_MILES;
                 return {
                   disaster: selectedDisasterObj,
                   loanCount: lastAffectedLoans.length,
@@ -1699,10 +1724,7 @@
         });
         $('#refreshBtn').on('click', refreshDisasters);
         document.getElementById('refreshBtnHero')?.addEventListener('click', refreshDisasters);
-        document.getElementById('duClearHotspotFilter')?.addEventListener('click', (e) => {
-          e.stopPropagation();
-          clearHotspotGridFilter();
-        });
+        document.getElementById('duIngestPostgresBtn')?.addEventListener('click', refreshDisasters);
         document.getElementById('duClearNwsGridFilter')?.addEventListener('click', (e) => {
           e.stopPropagation();
           clearNwsGridFilter(true);
@@ -1715,7 +1737,11 @@
           }
         });
         initDuSectionCards();
+        initHotspotFilterBadge();
         initDuSectionSidebar();
+        if (typeof initSectionSidebarShell === 'function') {
+          initSectionSidebarShell({ storageKey: 'duSectionSidebarOpen' });
+        }
         initDuWorkflowPills();
         initDuLoanPillsMenu();
 
@@ -1920,6 +1946,24 @@
         setDuSectionPillActive(id);
       }
 
+      function hideDuDashboardSectionCard(sectionId) {
+        const id = String(sectionId || '').replace(/^#/, '').trim();
+        const section = document.getElementById(id);
+        if (!section || !section.classList.contains('show')) return;
+        const card = getDuNavSectionForCollapse(id);
+        updateDuSectionHeaderState(id, false);
+        duBsCollapseHide(section, card ? function () { card.classList.add('du-section-card-hidden'); } : undefined);
+        updateDuSectionSidebarActiveState(id, false);
+      }
+
+      function showExclusiveDuDashboardSection(sectionId) {
+        const id = String(sectionId || '').replace(/^#/, '').trim();
+        DU_SIDEBAR_SECTION_IDS.forEach((sid) => {
+          if (sid !== id) hideDuDashboardSectionCard(sid);
+        });
+        showDuDashboardSectionCard(id);
+      }
+
       function toggleDuDashboardSectionCard(sectionId) {
         const id = String(sectionId || '').replace(/^#/, '').trim();
         const section = document.getElementById(id);
@@ -1992,6 +2036,9 @@
         };
 
         if (accordionIds.includes(targetId) || sectionCardIds.includes(targetId)) {
+          DU_SIDEBAR_SECTION_IDS.forEach((sid) => {
+            if (sid !== targetId) hideDuDashboardSectionCard(sid);
+          });
           showDuDashboardSectionCard(targetId);
           document.getElementById(sectionHeadingIds[targetId])?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -2045,7 +2092,7 @@
           }
           const target = link.getAttribute('data-bs-target');
           if (!target) return;
-          toggleDuDashboardSectionCard(target);
+          showExclusiveDuDashboardSection(target.replace(/^#/, ''));
           const heading = document.getElementById(link.getAttribute('data-heading'));
           if (heading) {
             requestAnimationFrame(() => {
@@ -2096,7 +2143,7 @@
 
       function syncDuLoanFilterPillsFromSelects() {
         const scope = $('#duLoanScopeMode').val() || 'distance';
-        const radius = $('#duLoanRadiusMiles').val() || '50';
+        const radius = $('#duLoanRadiusMiles').val() || String(DisasterLoanFilters.DEFAULT_RADIUS_MILES);
         document.querySelectorAll('[data-du-loan-scope]').forEach((btn) => {
           btn.classList.toggle('du-filter-pill-active', btn.getAttribute('data-du-loan-scope') === scope);
         });
@@ -2531,26 +2578,44 @@
       }
 
       function updateHotspotFilterUi() {
-        const strip = document.getElementById('duHotspotFilterStrip');
-        const labelEl = document.getElementById('duHotspotFilterLabel');
         const badge = document.getElementById('duHotspotFilterBadge');
         if (!activeHotspot) {
-          if (strip) strip.hidden = true;
           if (badge) {
             badge.hidden = true;
             badge.textContent = '';
+            badge.removeAttribute('title');
+            badge.removeAttribute('role');
+            badge.removeAttribute('tabindex');
           }
           return;
         }
         const locationLabel = activeHotspot.county
           ? `${activeHotspot.county}, ${activeHotspot.state}`
           : activeHotspot.state;
-        if (labelEl) labelEl.textContent = locationLabel;
         if (badge) {
           badge.textContent = locationLabel;
           badge.hidden = false;
+          badge.title = 'Clear location filter';
+          badge.setAttribute('role', 'button');
+          badge.setAttribute('tabindex', '0');
         }
-        if (strip) strip.hidden = false;
+      }
+
+      function initHotspotFilterBadge() {
+        const badge = document.getElementById('duHotspotFilterBadge');
+        if (!badge || badge.dataset.clearBound) return;
+        badge.dataset.clearBound = '1';
+        badge.addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearHotspotGridFilter();
+        });
+        badge.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            e.stopPropagation();
+            clearHotspotGridFilter();
+          }
+        });
       }
 
       function applyHotspotGridFilter(hotspot) {
@@ -2681,7 +2746,7 @@
       }
 
       function setPullButtonsBusy(busy) {
-        ['refreshBtnHero', 'refreshBtn'].forEach((id) => {
+        ['refreshBtnHero', 'refreshBtn', 'duIngestPostgresBtn'].forEach((id) => {
           const btn = document.getElementById(id);
           if (!btn) return;
           btn.disabled = !!busy;
@@ -2751,8 +2816,10 @@
 
         try {
           console.log('🔄 Pulling all disaster sources...');
-          const refreshResp = await fetch(`/api/disasters/refresh?${qp.toString()}`, { method: 'POST' });
-          const refreshJson = await refreshResp.json();
+          const { postDisasterRefresh } = await import('/shared/disaster-refresh-client.js');
+          const { resp: refreshResp, json: refreshJson } = await postDisasterRefresh('/api/disasters/refresh', {
+            searchParams: qp,
+          });
           console.log('🔄 Pull all sources response:', refreshJson);
 
           if (!refreshResp.ok || !refreshJson?.success) {
@@ -2764,6 +2831,8 @@
           const summary = formatIngestSummary(refreshJson.data);
           updateLoadingStatusDisaster('Reloading grid from database…', 92);
           setSourcePullStatus(`${summary} (${elapsedSec}s)`);
+          const ingestStatus = document.getElementById('duIngestPostgresStatus');
+          if (ingestStatus) ingestStatus.textContent = `Postgres updated — ${summary}`;
           setDashboardStatus(`All sources pulled in ${elapsedSec}s. ${summary}`, 'success');
 
           await loadDisasters();
@@ -2776,6 +2845,8 @@
           console.error('❌ Pull all sources failed:', error);
           const msg = error.message || 'Pull all sources failed';
           setSourcePullStatus(msg, 'danger');
+          const ingestStatus = document.getElementById('duIngestPostgresStatus');
+          if (ingestStatus) ingestStatus.textContent = msg;
           setDashboardStatus(
             msg.includes('401') || msg.includes('403') || msg.includes('localhost')
               ? `${msg} — refresh requires localhost access or DISASTER_REFRESH_TOKEN on the server.`
@@ -2998,19 +3069,36 @@
       // Load all encompass loans on map on page load
       async function loadAllLoansOnMap() {
         try {
-          // Wait for map to be initialized
           if (!map) {
             setTimeout(loadAllLoansOnMap, 500);
             return;
           }
-          
-          console.log('Loading all encompass loans on map...');
+
+          console.log('Loading all encompass loans on map…');
           const response = await fetch('/api/loan-pipeline/loans');
           const data = await response.json();
-          
+
           if (data.success && data.data.loans) {
-            updateMapWithLoans(data.data.loans);
-            console.log(`Loaded ${data.data.loans.length} loans on map`);
+            const loans = data.data.loans;
+            updateMapWithLoans(loans);
+            const rows = loans.map((loan) => buildEncompassLoanGridRow(loan));
+            rows.sort((a, b) => (a.distanceKm || 999999) - (b.distanceKm || 999999));
+            setEncompassLoansGridRows(rows);
+            lastAffectedLoans = loans;
+            lastLoanFilterMeta = {
+              mode: 'all',
+              state: '',
+              county: '',
+              title: 'All mocked loans',
+              radiusMiles: null,
+            };
+            const n = loans.length;
+            const defaultMi = DisasterLoanFilters.DEFAULT_RADIUS_MILES;
+            $('#encompassLoansSubtitle').text(
+              `${n} mocked loan${n === 1 ? '' : 's'} on map — open Mocked loans or select a disaster to filter within ${defaultMi} mi (default).`
+            );
+            updateSelectionContextStrip();
+            console.log(`Loaded ${n} loans on map (grid preloaded; ${defaultMi} mi default radius)`);
           }
         } catch (error) {
           console.error('Error loading all loans on map:', error);
@@ -3826,6 +3914,7 @@
         })();
       });
     </script>
+  <script src="/shared/js/section-sidebar-shell.js"></script>
   <script src="/finance/js/disaster-ai-scan-card.js"></script>
   <script src="/shared/encompass-dark-mode.js"></script>
   </body>

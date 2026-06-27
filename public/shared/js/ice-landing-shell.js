@@ -314,6 +314,14 @@
     });
   }
 
+  function initPlatformBranding() {
+    const p = window.SITE_PORTFOLIO;
+    if (!p || !p.PLATFORM_NAME) return;
+    document.querySelectorAll('.ice-platform-name').forEach((el) => {
+      el.textContent = p.PLATFORM_NAME;
+    });
+  }
+
   function initPageModules() {
     const page = document.body.getAttribute('data-ice-page');
     const p = window.SITE_PORTFOLIO;
@@ -355,6 +363,7 @@
     initThemeToggle();
     initHeroWriteOn();
     initEasterEgg();
+    initPlatformBranding();
     initPageModules();
   });
 

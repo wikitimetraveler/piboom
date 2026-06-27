@@ -36,8 +36,8 @@
           <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
             <a class="btn btn-light btn-sm" href="disasters-unified.html"><i class="bi-arrow-left"></i> Unified Disasters</a>
             <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html"><i class="bi-diagram-3"></i> Impact Graph</a>
-            <button type="button" class="btn btn-warning btn-sm" id="refreshCamerasBtn" title="Ingest all hazard webcam sources into Postgres">
-              <i class="bi-arrow-repeat"></i> Refresh all sources
+            <button type="button" class="btn btn-warning btn-sm" id="refreshCamerasBtn" title="POST /api/disasters/refresh-cameras — ingest all hazard webcam sources into Postgres fire_cameras table">
+              <i class="bi-database-down"></i> Pull webcams → Postgres
             </button>
           </div>
         </div>
@@ -855,16 +855,18 @@
         }
 
         async function refreshCameras() {
-          setStatus('Refreshing all hazard webcam sources (may take several minutes)…');
+          setStatus('Pulling all hazard webcam APIs into Postgres (may take several minutes)…');
           document.getElementById('refreshCamerasBtn').disabled = true;
           try {
-            const resp = await fetch('/api/disasters/refresh-cameras?sources=all', { method: 'POST' });
-            const json = await resp.json();
+            const { postDisasterRefresh } = await import('/shared/disaster-refresh-client.js');
+            const { resp, json } = await postDisasterRefresh('/api/disasters/refresh-cameras', {
+              searchParams: new URLSearchParams({ sources: 'all' }),
+            });
             if (!resp.ok || !json.success) throw new Error(json.error || json.details || 'HTTP ' + resp.status);
-            setStatus('Refresh complete.', 'ok');
+            setStatus('Postgres fire_cameras table updated.', 'ok');
             await loadCameras();
           } catch (e) {
-            setStatus('Refresh failed (localhost or DISASTER_REFRESH_TOKEN): ' + e.message, 'error');
+            setStatus('Ingest failed (localhost or DISASTER_REFRESH_TOKEN): ' + e.message, 'error');
           } finally {
             document.getElementById('refreshCamerasBtn').disabled = false;
           }
@@ -914,6 +916,9 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+          import('/shared/disaster-refresh-client.js')
+            .then(({ captureDisasterRefreshTokenFromUrl }) => captureDisasterRefreshTokenFromUrl())
+            .catch((err) => console.warn('Disaster refresh client unavailable:', err));
           initMap();
           initHwSectionNav();
           applyFilterPresetsFromUrl();

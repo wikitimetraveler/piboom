@@ -7,6 +7,8 @@
 
   /** DevConnect Labs marketing host. */
   const PRIMARY_HOST = 'devconnectlabs.com';
+  /** Public platform name (replaces “DevConnect Labs” on portfolio pages). */
+  const PLATFORM_NAME = 'LOS AI Labs';
   /** Lane family production host (same app deployment). */
   const LANE_FAMILY_HOST = 'thelanefamily.us';
 
@@ -87,6 +89,14 @@
       domain: PRIMARY_HOST,
       path: '/finance/disasters-unified.html',
       icon: 'bi-shield-exclamation',
+    },
+    {
+      id: 'heygen-hub',
+      label: 'HeyGen Hub',
+      tagline: 'Avatar clips and HyperFrames narrated reels',
+      domain: PRIMARY_HOST,
+      path: '/heygen-hub.html',
+      icon: 'bi-film',
     },
     {
       id: 'unit-tests',
@@ -432,6 +442,7 @@
   global.SITE_PORTFOLIO = {
     PRIMARY_HOST,
     LANE_FAMILY_HOST,
+    PLATFORM_NAME,
     PORTFOLIO_SITES,
     STACK_CHIPS,
     STACK_GROUPS,

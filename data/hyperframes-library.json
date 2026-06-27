@@ -72,6 +72,33 @@
       "videoUrl": "/finance/assets/video/mortgage-tools-reel.mp4",
       "sourcePage": "/finance/index.html",
       "projectDir": "video/mortgage-tools"
+    },
+    {
+      "id": "unit-tests",
+      "domain": "finance",
+      "title": "Encompass Unit Test tool",
+      "subtitle": "Generate · grid · run · library · ~58s",
+      "videoUrl": "/finance/assets/video/unit-tests-reel.mp4",
+      "sourcePage": "/finance/unit-tests.html",
+      "projectDir": "video/unit-tests"
+    },
+    {
+      "id": "unified-disasters",
+      "domain": "disasters",
+      "title": "Unified Disasters — hazard command center",
+      "subtitle": "Multi-source ingest · map · loans · webcams · ~58s",
+      "videoUrl": "/finance/assets/video/unified-disasters-reel.mp4",
+      "sourcePage": "/finance/disasters-unified.html",
+      "projectDir": "video/unified-disasters"
+    },
+    {
+      "id": "tech-stack",
+      "domain": "platform",
+      "title": "DevConnect Labs tech stack reel",
+      "subtitle": "Platform · AI · Encompass · frontend · ~58s",
+      "videoUrl": "/shared/assets/video/tech-stack-reel.mp4",
+      "sourcePage": "/stack.html",
+      "projectDir": "video/tech-stack"
     }
   ]
 }

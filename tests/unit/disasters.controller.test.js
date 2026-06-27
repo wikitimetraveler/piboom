@@ -19,6 +19,8 @@ await jest.unstable_mockModule('../../services/disasters.service.js', () => ({
   ingestNwsCap: jest.fn(),
   ingestNhc: jest.fn(),
   ingestCaFireCameras: jest.fn(),
+  backfillDisasterGeocodes: jest.fn(),
+  pruneOldDisasters: jest.fn(),
   DISASTER_ROLLING_WINDOW_DAYS: 90
 }));
 

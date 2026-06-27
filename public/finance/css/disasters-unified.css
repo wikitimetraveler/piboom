@@ -503,9 +503,8 @@ body.du-page {
   white-space: nowrap;
 }
 
-#duHotspotFilterStrip .du-hotspot-filter-strip-text {
-  flex: 1 1 auto;
-  min-width: 0;
+.du-hotspot-filter-badge[role="button"] {
+  cursor: pointer;
 }
 
 .du-section-step-pill {
@@ -543,27 +542,7 @@ body.du-page {
   display: none;
 }
 
-/* Section sidebar nav — same pattern as unit-tests.html */
-.unit-tests-layout {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-}
-
-.section-sidebar {
-  flex: 0 0 200px;
-  position: sticky;
-  top: 90px;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  background: var(--zen-card-bg, #fff);
-  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
-  border-radius: 12px;
-  padding: 0.75rem;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-  z-index: 200;
-}
-
+/* Section sidebar nav links — layout/slide in section-sidebar-shell.css */
 .section-sidebar-nav {
   list-style: none;
   padding: 0;
@@ -612,34 +591,6 @@ body.du-page {
   text-transform: uppercase;
   padding: 0.5rem 0.65rem 0.25rem;
   margin-bottom: 0.25rem;
-}
-
-.section-content-area {
-  flex: 1;
-  min-width: 0;
-}
-
-@media (max-width: 991px) {
-  .unit-tests-layout {
-    flex-direction: column;
-  }
-
-  .section-sidebar {
-    flex: none;
-    width: 100%;
-    max-height: none;
-    position: static;
-  }
-
-  .section-sidebar-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .section-sidebar-nav li {
-    margin-bottom: 0;
-  }
 }
 
 .du-section-card-hidden,
@@ -1660,6 +1611,25 @@ body.du-pull-sheet-open .du-bottom-dock {
 /* ?? Web crawl headline panel ?? */
 .du-web-crawl-panel .card-header {
   background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%);
+}
+
+.du-web-crawl-toggle {
+  border: 0;
+  box-shadow: none;
+}
+
+.du-web-crawl-toggle:hover,
+.du-web-crawl-toggle:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+.du-web-crawl-chevron {
+  transition: transform 0.25s ease;
+}
+
+.du-web-crawl-toggle[aria-expanded="true"] .du-web-crawl-chevron {
+  transform: rotate(180deg);
 }
 
 .du-crawl-headline-list {

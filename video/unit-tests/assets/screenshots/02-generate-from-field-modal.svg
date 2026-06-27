@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#0f172a" opacity="0.55"/>
+  <rect x="180" y="60" width="600" height="420" rx="12" fill="#fff" stroke="#4a90a4" stroke-width="2"/>
+  <text x="210" y="98" fill="#0f172a" font-family="Georgia,serif" font-size="22">Generate from Custom Field</text>
+  <rect x="210" y="118" width="540" height="36" rx="6" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="222" y="142" fill="#334155" font-family="Consolas,monospace" font-size="14">[CUST11FV] = [353] + 1</text>
+  <text x="210" y="188" fill="#64748b" font-family="Segoe UI,sans-serif" font-size="13">Preview  SET and COMPARE steps</text>
+  <rect x="210" y="200" width="540" height="180" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="226" y="228" fill="#4a90a4" font-family="Segoe UI,sans-serif" font-size="12" font-weight="600">SET</text>
+  <text x="226" y="252" fill="#64748b" font-family="Segoe UI,sans-serif" font-size="12">[353] ’ Test 1</text>
+  <text x="226" y="280" fill="#4a90a4" font-family="Segoe UI,sans-serif" font-size="12" font-weight="600">COMPARE</text>
+  <text x="226" y="304" fill="#64748b" font-family="Segoe UI,sans-serif" font-size="12">[CUST11FV] expected vs actual</text>
+  <rect x="210" y="400" width="160" height="40" rx="8" fill="#4a90a4"/>
+  <text x="290" y="425" text-anchor="middle" fill="#fff" font-family="Segoe UI,sans-serif" font-size="14" font-weight="600">Generate &amp; Load</text>
+  <text x="480" y="510" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI,sans-serif" font-size="13">Placeholder · 02-generate-from-field-modal.png</text>
+</svg>

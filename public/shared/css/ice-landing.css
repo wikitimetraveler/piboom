@@ -725,6 +725,50 @@ body.ice-landing.dark-mode .ice-panel--hero-card {
   font-size: 0.9rem;
 }
 
+.ice-stack-reel {
+  margin-bottom: 1.75rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--ice-radius);
+  border: 1px solid var(--ice-line);
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.ice-stack-reel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.ice-stack-reel__copy {
+  margin: 0 0 0.85rem;
+  font-size: 0.92rem;
+  color: var(--ice-ink-soft);
+}
+
+.ice-stack-reel__player video {
+  width: 100%;
+  max-height: 420px;
+  border-radius: calc(var(--ice-radius) - 4px);
+  background: #152238;
+  border: 1px solid var(--ice-line);
+}
+
+.ice-stack-reel__pending {
+  margin: 0;
+  color: var(--ice-muted);
+}
+
+.ice-stack-reel__pending code {
+  font-size: 0.85em;
+}
+
+body.ice-landing.dark-mode .ice-stack-reel {
+  background: rgba(15, 28, 48, 0.55);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 .ice-stack-group {
   margin-bottom: 1.75rem;
 }

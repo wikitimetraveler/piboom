@@ -13,6 +13,7 @@ import {
   ingestNhc,
   ingestCaFireCameras,
   backfillDisasterGeocodes,
+  pruneOldDisasters,
 } from '../services/disasters.service.js';
 import {
   ingestHazardWebcams,
@@ -210,6 +211,9 @@ export async function refreshDisasters(req, res) {
 
     const geocodeBackfill = await backfillDisasterGeocodes();
     results.geocodeBackfill = geocodeBackfill;
+
+    await pruneOldDisasters();
+    results.prune = { ok: true };
     
     // Camera feed only if explicitly requested (manual review)
     if (includeCameras === 'true' || includeCameras === '1') {

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f8fafc"/>
+  <rect x="16" y="16" width="928" height="508" rx="10" fill="#fff" stroke="#e2e8f0"/>
+  <rect x="32" y="32" width="896" height="44" fill="#f1f5f9" rx="6"/>
+  <text x="48" y="60" fill="#0f172a" font-family="Georgia,serif" font-size="17">AI Assistant · Unit Testing</text>
+  <rect x="48" y="96" width="420" height="56" rx="10" fill="#e0f2fe"/>
+  <text x="64" y="130" fill="#0c4a6e" font-family="Segoe UI,sans-serif" font-size="13">How do I test a date field?</text>
+  <rect x="48" y="168" width="520" height="100" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="64" y="196" fill="#334155" font-family="Segoe UI,sans-serif" font-size="12">Use SET rows with a DateTime target.</text>
+  <text x="64" y="218" fill="#334155" font-family="Segoe UI,sans-serif" font-size="12">The grid opens a date picker for DateTime fields.</text>
+  <rect x="48" y="300" width="896" height="180" rx="8" fill="#fafafa" stroke="#e2e8f0" stroke-dasharray="6 4"/>
+  <text x="64" y="330" fill="#64748b" font-family="Segoe UI,sans-serif" font-size="12" font-weight="600">Learn Mode</text>
+  <text x="64" y="354" fill="#64748b" font-family="Segoe UI,sans-serif" font-size="12">VB parser + worked grid case ’ templates</text>
+  <text x="480" y="510" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI,sans-serif" font-size="13">Placeholder · 08-ai-assistant.png</text>
+</svg>

@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        width: 1920px; height: 1080px; overflow: hidden;
+        background: #0f172a; color: #f8fafc;
+        font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+      }
+      :root {
+        --bg: #0f172a; --surface: #1e293b; --text: #f8fafc; --muted: #94a3b8;
+        --zen: #4a90a4; --accent: #38bdf8; --pass: #22c55e; --fail: #ef4444;
+        --border: rgba(74, 144, 164, 0.25);
+      }
+      .scene { position: absolute; inset: 0; background: var(--bg); overflow: hidden; }
+      .scene-glow {
+        position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(ellipse 920px 580px at 28% 44%, rgba(74, 144, 164, 0.18), transparent 70%);
+      }
+      .scene-content {
+        position: relative; display: flex; align-items: center; gap: 56px;
+        width: 100%; height: 100%; padding: 80px 96px;
+      }
+      .scene-content--title {
+        flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 20px;
+      }
+      .text-col { flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+      .asset-col { flex: 0 0 760px; display: flex; flex-direction: column; gap: 10px; }
+      .kicker {
+        color: var(--accent); font-size: 22px; letter-spacing: 0.2em; text-transform: uppercase;
+      }
+      .rule { width: 180px; height: 1px; background: var(--zen); transform-origin: left; }
+      .rule--center { transform-origin: center; }
+      h1.title {
+        font-family: Georgia, 'Times New Roman', serif; font-weight: 400;
+        font-size: 68px; line-height: 1.08; max-width: 720px;
+      }
+      h1.title--lg { font-size: 82px; max-width: 1200px; }
+      .copy { font-size: 27px; line-height: 1.5; color: var(--muted); max-width: 680px; }
+      .chip {
+        display: inline-block; padding: 8px 14px; margin: 6px 6px 0 0;
+        border-radius: 8px; background: rgba(74, 144, 164, 0.12);
+        border: 1px solid var(--border); font-size: 17px; color: var(--text);
+      }
+      .plate {
+        border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+        background: #fff; box-shadow: 0 28px 56px rgba(0, 0, 0, 0.42);
+      }
+      .plate img {
+        width: 100%; height: 428px; object-fit: cover; object-position: top center; display: block;
+      }
+      .plate--hero img { height: 320px; }
+      .plate figcaption {
+        padding: 12px 16px; font-size: 16px; color: var(--muted); background: var(--surface);
+        border-top: 1px solid var(--border);
+      }
+      .plate--placeholder figcaption { color: var(--accent); font-size: 14px; letter-spacing: 0.04em; }
+      .end-cta {
+        font-size: 26px; color: var(--accent); letter-spacing: 0.04em; margin-top: 4px;
+      }
+      .vignette {
+        position: absolute; inset: 0; z-index: 200; pointer-events: none;
+        background: radial-gradient(ellipse 1500px 900px at 50% 50%, transparent 62%, rgba(0,0,0,0.35) 100%);
+      }
+      #s0 { z-index: 10; } #s1 { z-index: 20; } #s2 { z-index: 30; } #s3 { z-index: 40; }
+      #s4 { z-index: 50; } #s5 { z-index: 60; } #s6 { z-index: 70; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="58" data-width="1920" data-height="1080">
+
+      <div id="s0" class="scene clip" data-start="0" data-duration="9" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content scene-content--title">
+          <p class="kicker" id="s0-kicker">DevConnect Labs · Encompass</p>
+          <div class="rule rule--center" id="s0-rule"></div>
+          <h1 class="title title--lg" id="s0-title">Unit Test tool</h1>
+          <p class="copy" id="s0-copy">Prove custom field calculations against real loan data — SET, GET, and COMPARE in one browser grid.</p>
+          <figure class="plate plate--hero plate--placeholder" id="s0-plate" style="width:760px;margin-top:8px">
+            <img id="s0-img" data-layout-allow-overflow src="assets/screenshots/01-unit-tests-overview.svg" alt="Unit Tests overview — grid and toolbar" />
+            <figcaption>Unit Tests · AG Grid · Worksheets</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <div id="s1" class="scene clip" data-start="8" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s1-kicker">Step 1</p>
+            <div class="rule" id="s1-rule"></div>
+            <h1 class="title" id="s1-title">Generate &amp; load</h1>
+            <p class="copy" id="s1-copy">Load from Excel or generate from a calculated custom field. Preview SET and COMPARE steps, then load into the grid.</p>
+            <span class="chip">Generate from custom field</span><span class="chip">Import Excel</span>
+          </div>
+          <div class="asset-col">
+            <figure class="plate plate--placeholder" id="s1-plate">
+              <img id="s1-img" data-layout-allow-overflow src="assets/screenshots/02-generate-from-field-modal.svg" alt="Generate from custom field modal" />
+              <figcaption>Generate &amp; Load · SET / COMPARE preview</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <div id="s2" class="scene clip" data-start="15" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="asset-col">
+            <figure class="plate plate--placeholder" id="s2-plate">
+              <img id="s2-img" data-layout-allow-overflow src="assets/screenshots/03-editable-cells-date-picker.svg" alt="Editable test grid with date picker" />
+              <figcaption>Test Grid · type-aware editors</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s2-kicker">Step 2</p>
+            <div class="rule" id="s2-rule"></div>
+            <h1 class="title" id="s2-title">Test Grid</h1>
+            <p class="copy" id="s2-copy">All cells are editable. Date fields get a date picker; numbers and booleans use type-aware editors.</p>
+            <span class="chip">SET</span><span class="chip">COMPARE</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s3" class="scene clip" data-start="22" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s3-kicker">Step 3</p>
+            <div class="rule" id="s3-rule"></div>
+            <h1 class="title" id="s3-title">Run tests</h1>
+            <p class="copy" id="s3-copy">Enter a Loan GUID from your Encompass pipeline. Pass and fail shading shows whether calculated values match.</p>
+            <span class="chip" style="border-color:rgba(34,197,94,.45);color:#bbf7d0">Pass</span>
+            <span class="chip" style="border-color:rgba(239,68,68,.45);color:#fecaca">Fail</span>
+          </div>
+          <div class="asset-col">
+            <figure class="plate plate--placeholder" id="s3-plate">
+              <img id="s3-img" data-layout-allow-overflow src="assets/screenshots/05-run-results-pass-fail.svg" alt="Run tests pass and fail results in grid" />
+              <figcaption>Run Tests · live Encompass API</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <div id="s4" class="scene clip" data-start="29" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="asset-col">
+            <figure class="plate plate--placeholder" id="s4-plate">
+              <img id="s4-img" data-layout-allow-overflow src="assets/screenshots/07-export-import.svg" alt="Test Library search and export" />
+              <figcaption>Test Library · search by field ID</figcaption>
+            </figure>
+          </div>
+          <div class="text-col">
+            <p class="kicker" id="s4-kicker">Library</p>
+            <div class="rule" id="s4-rule"></div>
+            <h1 class="title" id="s4-title">Search · export · reload</h1>
+            <p class="copy" id="s4-copy">Search by field ID for impact analysis. Export to Excel or CSV and reload saved workbooks from the Test Library.</p>
+            <span class="chip">field_ids · Postgres</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="s5" class="scene clip" data-start="36" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content">
+          <div class="text-col">
+            <p class="kicker" id="s5-kicker">Learn &amp; AI</p>
+            <div class="rule" id="s5-rule"></div>
+            <h1 class="title" id="s5-title">Parser training · assistant</h1>
+            <p class="copy" id="s5-copy">Learn Mode pairs VB parser logic with worked cases. The AI Assistant answers unit-testing and Encompass questions.</p>
+            <span class="chip">Learn Mode</span><span class="chip">AI chat</span>
+          </div>
+          <div class="asset-col">
+            <figure class="plate plate--placeholder" id="s5-plate">
+              <img id="s5-img" data-layout-allow-overflow src="assets/screenshots/08-ai-assistant.svg" alt="AI Assistant and Learn Mode panels" />
+              <figcaption>Learn Mode · AI Assistant</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <div id="s6" class="scene clip" data-start="43" data-duration="15" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content" id="s6-inner">
+          <div class="text-col">
+            <p class="kicker" id="s6-kicker">Try it</p>
+            <div class="rule" id="s6-rule"></div>
+            <h1 class="title" id="s6-title">Offline demo + highlight reel</h1>
+            <p class="copy" id="s6-copy">Open unit-tests.html with the sample field, then play the in-page highlight reel to walk every section.</p>
+            <p class="end-cta" id="s6-cta">/finance/unit-tests.html?demo=1&amp;reel=1</p>
+          </div>
+          <div class="asset-col">
+            <figure class="plate plate--placeholder" id="s6-plate">
+              <img id="s6-img" data-layout-allow-overflow src="assets/screenshots/09-story-mode.svg" alt="Story Mode highlight reel controls" />
+              <figcaption>Story Mode · Play highlight reel</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+
+      <audio id="nar-0" data-start="0.4" data-duration="7.2" data-track-index="5" src="assets/narration/scene0.mp3" data-volume="1"></audio>
+      <audio id="nar-1" data-start="8.4" data-duration="6.8" data-track-index="6" src="assets/narration/scene1.mp3" data-volume="1"></audio>
+      <audio id="nar-2" data-start="15.4" data-duration="6.5" data-track-index="7" src="assets/narration/scene2.mp3" data-volume="1"></audio>
+      <audio id="nar-3" data-start="22.4" data-duration="6.6" data-track-index="8" src="assets/narration/scene3.mp3" data-volume="1"></audio>
+      <audio id="nar-4" data-start="29.4" data-duration="7.0" data-track-index="9" src="assets/narration/scene4.mp3" data-volume="1"></audio>
+      <audio id="nar-5" data-start="36.4" data-duration="6.8" data-track-index="10" src="assets/narration/scene5.mp3" data-volume="1"></audio>
+      <audio id="nar-6" data-start="43.4" data-duration="5.8" data-track-index="11" src="assets/narration/scene6.mp3" data-volume="1"></audio>
+
+      <div class="vignette"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      function sceneIn(id, start, opts) {
+        const o = opts || {};
+        const p = `#${id}`;
+        tl.from(p, { opacity: 0, duration: 0.85, ease: 'power1.inOut' }, start);
+        tl.from(`${p}-kicker`, { opacity: 0, letterSpacing: '0.38em', duration: 0.7, ease: 'power2.out' }, start + 0.5);
+        tl.from(`${p}-rule`, { scaleX: 0, duration: 0.6, ease: 'expo.out' }, start + 0.75);
+        tl.from(`${p}-title`, { opacity: 0, y: 40, duration: 0.75, ease: 'power3.out' }, start + 0.85);
+        tl.from(`${p}-copy`, { opacity: 0, y: 22, duration: 0.65, ease: 'power1.out' }, start + 1.35);
+        if (o.plate) {
+          tl.from(`${p}-plate`, { opacity: 0, x: o.plateX || 56, duration: 0.85, ease: 'power2.out' }, start + 0.9);
+          tl.from(`${p}-img`, { scale: 1.05, duration: 1.05, ease: 'power2.out' }, start + 1.0);
+        }
+        if (o.cta) tl.from(`${p}-cta`, { opacity: 0, y: 16, duration: 0.6, ease: 'power1.out' }, start + 1.6);
+      }
+
+      sceneIn('s0', 0, { plate: true, plateX: 0 });
+      sceneIn('s1', 8, { plate: true });
+      sceneIn('s2', 15, { plate: true, plateX: -56 });
+      sceneIn('s3', 22, { plate: true });
+      sceneIn('s4', 29, { plate: true, plateX: -56 });
+      sceneIn('s5', 36, { plate: true });
+      sceneIn('s6', 43, { plate: true, cta: true });
+      tl.to('#s6-inner', { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 56);
+
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>

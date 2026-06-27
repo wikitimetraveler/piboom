@@ -1,0 +1,169 @@
+/**
+ * Collapsible workflow sidebar — Unified Disasters, Unit Tests, etc.
+ */
+.unit-tests-layout {
+  position: relative;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.section-sidebar-shell__toggle {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  position: sticky;
+  top: 90px;
+  z-index: 210;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.22));
+  border-radius: 10px;
+  background: var(--zen-card-bg, #fff);
+  color: var(--zen-primary, #4a90a4);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.section-sidebar-shell__toggle:hover {
+  background: rgba(74, 144, 164, 0.08);
+  border-color: rgba(74, 144, 164, 0.35);
+}
+
+.section-sidebar-shell__toggle[aria-expanded="true"] {
+  background: rgba(74, 144, 164, 0.1);
+}
+
+.section-sidebar-drawer {
+  flex: 0 0 200px;
+  width: 200px;
+  max-width: 200px;
+  min-width: 0;
+  overflow: hidden;
+  transition: flex-basis 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.28s ease;
+}
+
+body.section-sidebar-collapsed .section-sidebar-drawer {
+  flex-basis: 0;
+  width: 0;
+  max-width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.section-sidebar {
+  width: 200px;
+  min-width: 200px;
+  position: sticky;
+  top: 90px;
+  max-height: calc(100vh - 120px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--zen-card-bg, #fff);
+  border: 1px solid var(--zen-border, rgba(74, 144, 164, 0.18));
+  border-radius: 12px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  z-index: 200;
+}
+
+.section-content-area {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  transition: max-width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.section-sidebar-collapsed .section-content-area {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+.section-sidebar-shell__backdrop {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .unit-tests-layout {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .section-sidebar-shell__toggle {
+    position: fixed;
+    left: 0.75rem;
+    bottom: 1rem;
+    top: auto;
+    z-index: 1200;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 999px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.18);
+  }
+
+  .section-sidebar-drawer {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: min(280px, 88vw);
+    max-width: min(280px, 88vw);
+    flex-basis: auto;
+    z-index: 1150;
+    transform: translateX(-110%);
+    opacity: 1;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body.section-sidebar-open .section-sidebar-drawer {
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  body.section-sidebar-collapsed .section-sidebar-drawer {
+    transform: translateX(-110%);
+    width: min(280px, 88vw);
+    max-width: min(280px, 88vw);
+    flex-basis: auto;
+    opacity: 1;
+  }
+
+  .section-sidebar {
+    position: static;
+    width: min(280px, 88vw);
+    min-width: min(280px, 88vw);
+    height: 100%;
+    max-height: none;
+    border-radius: 0 12px 12px 0;
+  }
+
+  body.section-sidebar-open .section-sidebar-shell__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1140;
+    background: rgba(15, 23, 42, 0.45);
+  }
+
+  .section-sidebar-nav {
+    display: block;
+  }
+
+  .section-sidebar-nav li {
+    margin-bottom: 0.25rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .du-page .du-hero .du-workflow-pills {
+    display: none;
+  }
+}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f8fafc"/>
+  <rect x="16" y="80" width="928" height="120" rx="14" fill="#fff" stroke="rgba(74,144,164,0.35)" stroke-width="2"/>
+  <text x="32" y="112" fill="#64748b" font-family="Segoe UI,sans-serif" font-size="11" letter-spacing="2">STORY MODE</text>
+  <rect x="32" y="124" width="180" height="32" rx="6" fill="#4a90a4"/>
+  <text x="122" y="145" text-anchor="middle" fill="#fff" font-family="Segoe UI,sans-serif" font-size="13">Play highlight reel</text>
+  <rect x="224" y="124" width="220" height="32" rx="6" fill="#fff" stroke="#cbd5e1"/>
+  <text x="334" y="145" text-anchor="middle" fill="#475569" font-family="Segoe UI,sans-serif" font-size="12">Load offline demo</text>
+  <text x="32" y="178" fill="#64748b" font-family="Segoe UI,sans-serif" font-size="12">Generate ’ Grid ’ Run ’ Sign-off · optional narration</text>
+  <rect x="200" y="240" width="560" height="48" rx="8" fill="#1e293b"/>
+  <text x="480" y="270" text-anchor="middle" fill="#38bdf8" font-family="Consolas,monospace" font-size="15">/finance/unit-tests.html?demo=1&amp;reel=1</text>
+  <text x="480" y="510" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI,sans-serif" font-size="13">Placeholder · 09-story-mode.png</text>
+</svg>

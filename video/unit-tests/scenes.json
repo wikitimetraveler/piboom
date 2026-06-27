@@ -1,0 +1,66 @@
+{
+  "title": "Encompass Unit Test Tool",
+  "subtitle": "Generate · grid · run · library",
+  "assetsDir": "assets/screenshots",
+  "scenes": [
+    {
+      "id": "s0",
+      "kicker": "DevConnect Labs · Encompass",
+      "title": "Unit Test tool",
+      "body": "Prove custom field calculations against real loan data — SET, GET, and COMPARE in one browser grid.",
+      "screenshot": "01-unit-tests-overview.svg",
+      "pngTarget": "01-unit-tests-overview.png"
+    },
+    {
+      "id": "s1",
+      "kicker": "Step 1",
+      "title": "Generate & load",
+      "body": "Load from Excel or generate from a calculated custom field. Preview SET and COMPARE steps, then load into the grid.",
+      "screenshot": "02-generate-from-field-modal.svg",
+      "pngTarget": "02-generate-from-field-modal.png"
+    },
+    {
+      "id": "s2",
+      "kicker": "Step 2",
+      "title": "Test Grid",
+      "body": "All cells are editable. Date fields get a date picker; numbers and booleans use type-aware editors.",
+      "screenshot": "03-editable-cells-date-picker.svg",
+      "pngTarget": "03-editable-cells-date-picker.png"
+    },
+    {
+      "id": "s3",
+      "kicker": "Step 3",
+      "title": "Run tests",
+      "body": "Enter a Loan GUID from your Encompass pipeline. Pass and fail shading shows whether calculated values match.",
+      "screenshot": "05-run-results-pass-fail.svg",
+      "pngTarget": "05-run-results-pass-fail.png"
+    },
+    {
+      "id": "s4",
+      "kicker": "Library",
+      "title": "Search · export · reload",
+      "body": "Search by field ID for impact analysis. Export to Excel or CSV and reload saved workbooks from the Test Library.",
+      "screenshot": "07-export-import.svg",
+      "pngTarget": "07-export-import.png"
+    },
+    {
+      "id": "s5",
+      "kicker": "Learn & AI",
+      "title": "Parser training · assistant",
+      "body": "Learn Mode pairs VB parser logic with worked cases. The AI Assistant answers unit-testing and Encompass questions.",
+      "screenshot": "08-ai-assistant.svg",
+      "pngTarget": "08-ai-assistant.png"
+    },
+    {
+      "id": "s6",
+      "kicker": "Try it",
+      "title": "Offline demo + highlight reel",
+      "body": "Open unit-tests.html with the sample field, then play the in-page highlight reel to walk every section.",
+      "screenshot": "09-story-mode.svg",
+      "pngTarget": "09-story-mode.png"
+    }
+  ],
+  "endCard": {
+    "url": "/finance/unit-tests.html?demo=1&reel=1"
+  }
+}

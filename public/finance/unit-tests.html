@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
     <link rel="stylesheet" href="/shared/design-tokens.css" />
+    <link rel="stylesheet" href="/shared/css/section-sidebar-shell.css" />
     <script src="/shared/menu-config.js"></script>
     <style>
       body {
@@ -1526,24 +1527,7 @@
         word-break: break-all;
       }
 
-      /* Section sidebar nav - compact vertical nav for sections */
-      .unit-tests-layout {
-        display: flex;
-        gap: 1.5rem;
-        align-items: flex-start;
-      }
-      .section-sidebar {
-        flex: 0 0 200px;
-        position: sticky;
-        top: 90px;
-        max-height: calc(100vh - 120px);
-        overflow-y: auto;
-        background: var(--zen-card-bg);
-        border: 1px solid var(--zen-border);
-        border-radius: 12px;
-        padding: 0.75rem;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-      }
+      /* Section sidebar nav links — layout/slide in section-sidebar-shell.css */
       .section-sidebar-nav {
         list-style: none;
         padding: 0;
@@ -1586,29 +1570,6 @@
         text-transform: uppercase;
         padding: 0.5rem 0.65rem 0.25rem;
         margin-bottom: 0.25rem;
-      }
-      .section-content-area {
-        flex: 1;
-        min-width: 0;
-      }
-      @media (max-width: 991px) {
-        .unit-tests-layout {
-          flex-direction: column;
-        }
-        .section-sidebar {
-          flex: none;
-          width: 100%;
-          max-height: none;
-          position: static;
-        }
-        .section-sidebar-nav {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
-        }
-        .section-sidebar-nav li {
-          margin-bottom: 0;
-        }
       }
 
       /* Live Scenario Builder */
@@ -2278,6 +2239,9 @@
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="unitTestsOfflineDemoBtn">
                   Load offline demo (sample custom field)
                 </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="unitTestsHyperframeTourBtn" data-bs-toggle="modal" data-bs-target="#unitTestsHyperframeModal" title="~58s narrated HyperFrames tour">
+                  <i class="bi bi-film"></i> Watch HyperFrame tour
+                </button>
               </div>
               <p class="small text-muted mb-2" id="unitTestsOfflineDemoDisclaimer">
                 Highlight reel opens <strong>Generate &amp; load</strong> first—live <strong>CUST11FV</strong> when Encompass is connected, otherwise the offline sample field (same parser pipeline).
@@ -2286,6 +2250,7 @@
               <p class="unit-tests-story-copy small text-muted mb-2">
                 Guided reel walks Generate → Test Grid → Run tests → Sign-off (plus library, Learn Mode, and voice when step intros are on).
                 Narration uses the same TTS stack as Lane tools. Press <kbd>Escape</kbd> or <strong>Stop</strong> on the caption to end playback.
+                Or watch the <strong>HyperFrame tour</strong> video (~58s) for a shareable overview.
               </p>
               <div class="unit-tests-story-options" role="group" aria-label="Story mode options">
                 <label class="unit-tests-story-option">
@@ -2873,6 +2838,46 @@
       </div>
     </div>
 
+    <div class="modal fade" id="unitTestsHyperframeModal" tabindex="-1" aria-labelledby="unitTestsHyperframeModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title h5" id="unitTestsHyperframeModalLabel">Unit Test tool — HyperFrame tour</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0 bg-dark">
+            <video id="unitTestsHyperframeVideo" class="w-100" controls playsinline preload="metadata" poster="">
+              <source src="/finance/assets/video/unit-tests-reel.mp4" type="video/mp4" />
+              Your browser does not support HTML5 video.
+            </video>
+          </div>
+          <div class="modal-footer flex-wrap justify-content-between gap-2">
+            <p class="small text-muted mb-0">Google TTS narration · project <code>video/unit-tests</code></p>
+            <div class="d-flex flex-wrap gap-2">
+              <a class="btn btn-sm btn-outline-secondary" href="/heygen-hub.html">HeyGen &amp; HyperFrames Hub</a>
+              <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        var modal = document.getElementById('unitTestsHyperframeModal');
+        var video = document.getElementById('unitTestsHyperframeVideo');
+        if (!modal || !video) return;
+        modal.addEventListener('shown.bs.modal', function () {
+          video.currentTime = 0;
+          video.play().catch(function () {});
+        });
+        modal.addEventListener('hidden.bs.modal', function () {
+          video.pause();
+        });
+      })();
+    </script>
+
+    <script src="/shared/js/section-sidebar-shell.js"></script>
     <script defer src="/finance/js/unit-tests.js"></script>
     <script defer src="/finance/js/unit-tests-story-mode.js"></script>
     <script defer src="/finance/js/unit-tests-ai.js"></script>

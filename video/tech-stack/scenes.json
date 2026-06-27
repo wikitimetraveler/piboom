@@ -1,0 +1,58 @@
+{
+  "title": "DevConnect Labs Tech Stack",
+  "subtitle": "Platform · AI · Encompass · frontend · data",
+  "scenes": [
+    {
+      "id": "s0",
+      "kicker": "DevConnect Labs",
+      "title": "Full-stack platform",
+      "body": "One Node repo hosts Encompass tooling, AI assistants, unified disasters, music research, and Lane genealogy.",
+      "chip": "Multi-domain · service layer"
+    },
+    {
+      "id": "s1",
+      "kicker": "Platform",
+      "title": "Node · Postgres · CI",
+      "body": "Express routes call services — not fat controllers. PostgreSQL holds graphs, disasters, config, and chat memory. Jest keeps CI green.",
+      "chip": "Node.js · Express · PostgreSQL · Jest"
+    },
+    {
+      "id": "s2",
+      "kicker": "AI & assistants",
+      "title": "LangChain · Vision · RAG",
+      "body": "OpenAI powers Encompass Assistant, loan pipeline AI, and Screen Test. ICE knowledge RAG grounds answers. HeyGen avatars and HyperFrames explain the product.",
+      "chip": "LangChain · GPT-4o · ICE RAG · HeyGen"
+    },
+    {
+      "id": "s3",
+      "kicker": "Mortgage / Encompass",
+      "title": "Hub · calcs · ops",
+      "body": "Encompass Hub APIs, shared calculationEngine math, processor assignment scoring, and Unit Tests with Automator manifest review.",
+      "chip": "encompass-hub · unit-tests · tool9"
+    },
+    {
+      "id": "s4",
+      "kicker": "Frontend",
+      "title": "Bootstrap · vanilla JS",
+      "body": "No React — AG Grid and DataTables where grids matter. Design tokens, dark mode, and a sitewide voice widget.",
+      "chip": "design-tokens.css · modern-navbar"
+    },
+    {
+      "id": "s5",
+      "kicker": "Data & maps",
+      "title": "Hazard · geo · music",
+      "body": "FEMA, NASA FIRMS, NOAA, and USGS feed unified disasters. Google Maps geocodes family and hazard layers. MusicBrainz and Wikimedia power music research.",
+      "chip": "disasters-unified · genealogy · music-research"
+    },
+    {
+      "id": "s6",
+      "kicker": "Explore",
+      "title": "Stack page · video hub",
+      "body": "Browse grouped stack cards on stack.html — or every HeyGen clip and HyperFrames reel on the public video hub.",
+      "chip": "/stack.html · /heygen-hub.html"
+    }
+  ],
+  "endCard": {
+    "url": "/stack.html"
+  }
+}

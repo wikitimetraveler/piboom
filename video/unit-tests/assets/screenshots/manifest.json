@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "note": "Drop real PNGs here (1920×1080 or cropped 16:9). Update src in index.html from .svg to .png when ready.",
+  "scenes": [
+    {
+      "id": "s0",
+      "placeholder": "01-unit-tests-overview.svg",
+      "pngTarget": "01-unit-tests-overview.png",
+      "captures": "Full page, grid + toolbar"
+    },
+    {
+      "id": "s1",
+      "placeholder": "02-generate-from-field-modal.svg",
+      "pngTarget": "02-generate-from-field-modal.png",
+      "captures": "Generate modal, field expression + preview"
+    },
+    {
+      "id": "s2",
+      "placeholder": "03-editable-cells-date-picker.svg",
+      "pngTarget": "03-editable-cells-date-picker.png",
+      "captures": "Grid with date picker or type-aware editor"
+    },
+    {
+      "id": "s3",
+      "placeholder": "05-run-results-pass-fail.svg",
+      "pngTarget": "05-run-results-pass-fail.png",
+      "captures": "Green/red pass-fail grid shading"
+    },
+    {
+      "id": "s4",
+      "placeholder": "07-export-import.svg",
+      "pngTarget": "07-export-import.png",
+      "captures": "Test Library search + export"
+    },
+    {
+      "id": "s5",
+      "placeholder": "08-ai-assistant.svg",
+      "pngTarget": "08-ai-assistant.png",
+      "captures": "Learn Mode or AI Assistant panel"
+    },
+    {
+      "id": "s6",
+      "placeholder": "09-story-mode.svg",
+      "pngTarget": "09-story-mode.png",
+      "captures": "Story Mode panel + highlight reel CTA"
+    }
+  ],
+  "optional": [
+    { "pngTarget": "04-action-dropdown.png", "captures": "GET/SET/COMPARE dropdown" },
+    { "pngTarget": "06-results-panel.png", "captures": "Results summary panel" }
+  ]
+}

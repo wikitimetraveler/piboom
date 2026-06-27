@@ -5,8 +5,8 @@
  * Shared disaster → loan filter helpers (Pipeline Risk + Disasters Unified).
  */
 (function (global) {
-  const RADIUS_STORAGE_KEY = 'disasterLoanRadiusMiles';
-  const DEFAULT_RADIUS_MILES = 50;
+  const RADIUS_STORAGE_KEY = 'disasterLoanRadiusMilesV2';
+  const DEFAULT_RADIUS_MILES = 100;
 
   function calculateDistance(lat1, lng1, lat2, lng2) {
     if (lat1 == null || lng1 == null || lat2 == null || lng2 == null) {

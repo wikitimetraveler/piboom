@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f8fafc"/>
+  <rect x="16" y="16" width="928" height="508" rx="8" fill="#fff" stroke="#e2e8f0"/>
+  <rect x="16" y="16" width="928" height="40" fill="#1e293b" rx="8"/>
+  <text x="32" y="44" fill="#f8fafc" font-family="Segoe UI,sans-serif" font-size="13">Step · Target · Action · Test 1 · Test 2</text>
+  <rect x="32" y="72" width="896" height="32" fill="#f1f5f9"/>
+  <text x="48" y="92" fill="#334155" font-family="Segoe UI,sans-serif" font-size="12">1 · [353] · SET</text>
+  <rect x="520" y="80" width="140" height="18" rx="4" fill="#fff" stroke="#4a90a4" stroke-width="2"/>
+  <rect x="32" y="112" width="896" height="32" fill="#fff"/>
+  <text x="48" y="132" fill="#334155" font-family="Segoe UI,sans-serif" font-size="12">2 · [CUST11FV] · COMPARE</text>
+  <rect x="280" y="160" width="220" height="200" rx="8" fill="#fff" stroke="#4a90a4" stroke-width="2" filter="url(#sh)"/>
+  <defs><filter id="sh"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.25"/></filter></defs>
+  <text x="300" y="188" fill="#0f172a" font-family="Segoe UI,sans-serif" font-size="13" font-weight="600">Date picker</text>
+  <rect x="300" y="200" width="180" height="28" rx="4" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="312" y="220" fill="#334155" font-family="Segoe UI,sans-serif" font-size="12">01/15/2026</text>
+  <g fill="#e2e8f0">
+    <rect x="300" y="244" width="24" height="24" rx="4"/><rect x="332" y="244" width="24" height="24" rx="4"/>
+    <rect x="364" y="244" width="24" height="24" rx="4" fill="#4a90a4" opacity="0.4"/>
+  </g>
+  <text x="480" y="510" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI,sans-serif" font-size="13">Placeholder · 03-editable-cells-date-picker.png</text>
+</svg>

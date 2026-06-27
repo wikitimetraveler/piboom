@@ -3712,6 +3712,34 @@ function revealUnitTestGridSection() {
   }
 }
 
+function hideAccordionSection(sectionId) {
+  const id = String(sectionId || '').replace(/^#/, '').trim();
+  const section = document.getElementById(id);
+  if (!section || !section.classList.contains('show')) return;
+  const card = getSectionCardForCollapse(id);
+  updateSectionHeaderState(id, false);
+  bsCollapseHide(section, card ? function () { card.classList.add('section-card-hidden'); } : undefined);
+}
+
+const SECTION_SIDEBAR_IDS = [
+  'collapseSelectedField',
+  'collapseLiveScenarioBuilder',
+  'collapseTestGrid',
+  'collapseUnitTestData',
+  'collapseOverallSignOff',
+  'collapseTestLibrary',
+  'collapseLearnMode',
+  'collapseAIAssistant',
+];
+
+function showExclusiveAccordionSection(sectionId) {
+  const id = String(sectionId || '').replace(/^#/, '').trim();
+  SECTION_SIDEBAR_IDS.forEach((sid) => {
+    if (sid !== id) hideAccordionSection(sid);
+  });
+  showAccordionSection(id);
+}
+
 function toggleAccordionSection(sectionId) {
   const id = String(sectionId || '').replace(/^#/, '').trim();
   const section = document.getElementById(id);
@@ -5721,8 +5749,8 @@ function initializeSectionSidebar() {
       return;
     }
     const target = link.getAttribute('data-bs-target') || link.getAttribute('data-target');
-    if (target && typeof toggleAccordionSection === 'function') {
-      toggleAccordionSection(target);
+    if (target && typeof showExclusiveAccordionSection === 'function') {
+      showExclusiveAccordionSection(target);
       const heading = document.getElementById(link.getAttribute('data-heading'));
       if (heading) {
         requestAnimationFrame(() => {
@@ -5757,6 +5785,10 @@ function initializeSectionSidebar() {
   }
   updateSectionSidebarActiveState(defaultOpenId, true);
   setActiveWorkflowPill(defaultOpenId);
+
+  if (typeof initSectionSidebarShell === 'function') {
+    initSectionSidebarShell({ storageKey: 'unitTestsSectionSidebarOpen' });
+  }
 
   document.querySelectorAll('.section-card-header[role="button"]').forEach((h) => {
     h.addEventListener('keydown', (e) => {

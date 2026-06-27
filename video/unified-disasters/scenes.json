@@ -1,0 +1,58 @@
+{
+  "title": "Unified Disasters",
+  "subtitle": "Multi-source hazard · pipeline overlap · AI",
+  "scenes": [
+    {
+      "id": "s0",
+      "kicker": "DevConnect Labs · Operations",
+      "title": "Unified Disasters",
+      "body": "One command center for FEMA declarations, wildfires, earthquakes, hurricanes, and weather alerts.",
+      "chip": "90-day hazard intelligence"
+    },
+    {
+      "id": "s1",
+      "kicker": "Multi-source ingest",
+      "title": "Five live feeds",
+      "body": "Pull FEMA, NASA FIRMS, USGS, NWS, and NHC into shared Postgres on demand.",
+      "chip": "FEMA · FIRMS · USGS · NWS · NHC"
+    },
+    {
+      "id": "s2",
+      "kicker": "Hotspot map",
+      "title": "Rolling ninety-day window",
+      "body": "Counties and events on one map — filter by source, state, and event type.",
+      "chip": "Map overlays · AG Grid"
+    },
+    {
+      "id": "s3",
+      "kicker": "Command deck",
+      "title": "Select an event",
+      "body": "Enable sources, review hotspots, pick a row — nearby loans and cameras load automatically.",
+      "chip": "Spatial radius search"
+    },
+    {
+      "id": "s4",
+      "kicker": "Pipeline overlap",
+      "title": "Hazard meets loans",
+      "body": "Mock Encompass pipeline properties with risk scores and flood zones tied to each disaster.",
+      "chip": "GET /api/disasters/near"
+    },
+    {
+      "id": "s5",
+      "kicker": "Ground truth",
+      "title": "Webcams and briefings",
+      "body": "Hazard camera catalog nearby plus a daily US hazard briefing via Google TTS.",
+      "chip": "disasters-webcams.html"
+    },
+    {
+      "id": "s6",
+      "kicker": "Open the dashboard",
+      "title": "AI processor expert",
+      "body": "Ask the unified disaster processor, export KML, or explore the impact graph.",
+      "chip": "/finance/disasters-unified.html"
+    }
+  ],
+  "endCard": {
+    "url": "/finance/disasters-unified.html"
+  }
+}
