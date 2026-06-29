@@ -36,6 +36,16 @@ var activeHotspotKey = null;
 var activeHotspot = null;
 var heygenStudio = null;
 
+/** Sidebar section collapse ids (section-sidebar-shell) */
+var DU_SIDEBAR_SECTION_IDS = [
+  'collapseCommandDeck',
+  'collapseRiskIntel',
+  'collapseFilters',
+  'collapseDisasters',
+  'collapseMapYouTube',
+  'collapseLoans',
+];
+
 var cameraIndex = 0;
 
 
