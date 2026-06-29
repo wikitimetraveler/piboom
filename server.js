@@ -11,7 +11,7 @@ import { config } from './config/index.js';
 import buildRoutes from './routes/index.routes.js';
 import { initializeDatabase, createTables } from './services/database.service.js';
 import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
-import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
+import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema, backfillDisasterGeocodes } from './services/disasters.service.js';
 import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
 import { hasFinanceSession } from './lib/finance-session.js';
 import { scheduleDailyAt } from './lib/disaster-daily-scheduler.js';
@@ -223,10 +223,10 @@ async function runScheduledDisasterIngest(label = 'Disaster scheduler') {
   await runSource('fema', ingestFema);
 
   try {
-    const graphRes = await refreshDisasterImpactGraphFromCurrentData();
-    console.log(`✅ ${label} graph refresh complete`, graphRes);
-  } catch (graphErr) {
-    console.warn(`⚠️ ${label} graph refresh failed`, { error: graphErr.message });
+    const geocodeBackfill = await backfillDisasterGeocodes();
+    console.log(`✅ ${label} geocode backfill complete`, geocodeBackfill);
+  } catch (geocodeErr) {
+    console.warn(`⚠️ ${label} geocode backfill failed`, { error: geocodeErr.message });
   }
 
   try {
@@ -234,6 +234,13 @@ async function runScheduledDisasterIngest(label = 'Disaster scheduler') {
     console.log(`✅ ${label} prune complete`);
   } catch (pruneErr) {
     console.warn(`⚠️ ${label} prune failed`, { error: pruneErr.message });
+  }
+
+  try {
+    const graphRes = await refreshDisasterImpactGraphFromCurrentData();
+    console.log(`✅ ${label} graph refresh complete`, graphRes);
+  } catch (graphErr) {
+    console.warn(`⚠️ ${label} graph refresh failed`, { error: graphErr.message });
   }
 
   console.log(`✅ ${label} run complete`, { elapsedMs: Date.now() - startedAt });

@@ -105,7 +105,7 @@ Impact graph seeding adds **`NEAR`** edges (`disaster_event → loan`) from a sp
 - `NY511_API_KEY` – 511NY developer key (required for `dot_511ny` ingest)
 - `USGS_NIMS_API_KEY` – Optional USGS NIMS API key (higher rate limits if enforced)
 - `ARCGIS_API_KEY` – Optional ArcGIS key for ALERTCalifornia ingest
-- `DISASTER_REFRESH_TOKEN` – Bearer token for `POST /api/disasters/refresh-cameras` when not on localhost
+- `DISASTER_REFRESH_TOKEN` – Bearer token or `x-disaster-refresh-token` for `POST /api/disasters/refresh` and `POST /api/disasters/refresh-cameras` when not on localhost
 
 ## Hazard webcams (fixed mounts)
 

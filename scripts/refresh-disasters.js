@@ -22,7 +22,8 @@ import {
   ingestUsgsQuakes,
   ingestNwsCap,
   ingestNhc,
-  pruneOldDisasters
+  pruneOldDisasters,
+  backfillDisasterGeocodes,
 } from '../services/disasters.service.js';
 import { refreshDisasterImpactGraphFromCurrentData } from '../services/disaster-impact-graph.service.js';
 
@@ -65,6 +66,10 @@ async function main() {
     console.log('📥 Ingesting NHC hurricanes...');
     const nhc = await ingestNhc();
     console.log(`   NHC: ${nhc?.inserted ?? 0} inserted`);
+
+    console.log('📍 Backfilling disaster geocodes...');
+    const geocodeBackfill = await backfillDisasterGeocodes();
+    console.log('   Geocode backfill complete', geocodeBackfill || {});
 
     console.log('🧹 Pruning disasters older than 90 days...');
     await pruneOldDisasters();
