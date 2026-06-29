@@ -14,6 +14,7 @@ import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema } from './services/disasters.service.js';
 import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
 import { hasFinanceSession } from './lib/finance-session.js';
+import { scheduleDailyAt } from './lib/disaster-daily-scheduler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -202,60 +203,51 @@ app.get('/share/collection/:id', (req, res) => {
 
 app.get('/health', (req,res)=>res.json({ok:true, mode: config.mode, platform: process.platform}));
 
-if (config.autoIngestDisasters) {
-  // Simple scheduler (once per day) for disaster data sources
-  setInterval(async () => {
-    const startedAt = Date.now();
+async function runScheduledDisasterIngest(label = 'Disaster scheduler') {
+  const startedAt = Date.now();
+  const runSource = async (sourceLabel, fn) => {
     try {
-      const results = {};
-      const runSource = async (label, fn) => {
-        try {
-          results[label] = await fn();
-          console.log(`✅ Disaster scheduler source complete: ${label}`, results[label]);
-        } catch (err) {
-          results[label] = { error: err.message };
-          console.warn(`⚠️ Disaster scheduler source failed: ${label}`, { error: err.message });
-        }
-      };
-      await runSource('firms', ingestFirmsNrt);
-      await runSource('usgs', ingestUsgsQuakes);
-      await runSource('nws', ingestNwsCap);
-      await runSource('nhc', ingestNhc);
-      await runSource('fema', ingestFema);
-      // Camera feed disabled - too many records (198k+)
-      // await ingestCaFireCameras();
-      try {
-        const graphRes = await refreshDisasterImpactGraphFromCurrentData();
-        console.log('✅ Disaster scheduler graph refresh complete', graphRes);
-      } catch (graphErr) {
-        console.warn('⚠️ Disaster scheduler graph refresh failed', { error: graphErr.message });
-      }
-      console.log('✅ Disaster scheduler run complete', {
-        elapsedMs: Date.now() - startedAt
-      });
-    } catch (e) {
-      console.warn('⚠️ Disaster scheduler run failed (non-fatal)', {
-        error: e.message,
-        elapsedMs: Date.now() - startedAt
-      });
+      const result = await fn();
+      console.log(`✅ ${label} source complete: ${sourceLabel}`, result);
+      return result;
+    } catch (err) {
+      console.warn(`⚠️ ${label} source failed: ${sourceLabel}`, { error: err.message });
+      return { error: err.message };
     }
-  }, 24 * 60 * 60 * 1000); // Once per day (24 hours)
-} else {
-  console.log('⏸️ Skipping automatic disaster refresh scheduler');
+  };
+
+  await runSource('firms', ingestFirmsNrt);
+  await runSource('usgs', ingestUsgsQuakes);
+  await runSource('nws', ingestNwsCap);
+  await runSource('nhc', ingestNhc);
+  await runSource('fema', ingestFema);
+
+  try {
+    const graphRes = await refreshDisasterImpactGraphFromCurrentData();
+    console.log(`✅ ${label} graph refresh complete`, graphRes);
+  } catch (graphErr) {
+    console.warn(`⚠️ ${label} graph refresh failed`, { error: graphErr.message });
+  }
+
+  try {
+    await pruneOldDisasters();
+    console.log(`✅ ${label} prune complete`);
+  } catch (pruneErr) {
+    console.warn(`⚠️ ${label} prune failed`, { error: pruneErr.message });
+  }
+
+  console.log(`✅ ${label} run complete`, { elapsedMs: Date.now() - startedAt });
 }
 
-// Nightly prune — same 24h cadence as ingest (90-day rolling window in disasters.service)
 if (config.autoIngestDisasters) {
-  setInterval(async () => {
-    try {
-      await pruneOldDisasters();
-      console.log('✅ Disaster prune run complete');
-    } catch (err) {
-      console.warn('⚠️ Disaster prune run failed', { error: err.message });
-    }
-  }, 24 * 60 * 60 * 1000); // Once per day (24 hours)
+  scheduleDailyAt({
+    timeZone: 'America/Los_Angeles',
+    hour: 6,
+    label: 'Disaster daily ingest (6:00 AM Pacific)',
+    run: () => runScheduledDisasterIngest('Disaster daily ingest'),
+  });
 } else {
-  console.log('⏸️ Skipping disaster pruning (auto ingestion disabled)');
+  console.log('⏸️ Skipping automatic disaster refresh scheduler');
 }
 
 app.get('*', (req,res)=>{
