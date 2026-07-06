@@ -6,6 +6,12 @@ import OpenAI from 'openai';
 import { config } from '../config/index.js';
 import { resolveOpenAiVisionModel } from '../services/openai-vision-model.js';
 import { mbGet } from '../services/musicbrainz.service.js';
+import {
+  clampMaxAlbums,
+  identifyShelfAlbumsFromImage,
+  identifySingleAlbumFromImage,
+  identifyStackAlbumsFromImages,
+} from '../services/album-discovery-vision.service.js';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
@@ -305,134 +311,96 @@ export async function searchAlbum(req, res) {
   }
 }
 
+function visionQuotaResponse(res) {
+  return res.status(503).json({
+    error: 'AI service temporarily unavailable',
+    message: 'OpenAI API quota exceeded. Please try again later.',
+  });
+}
+
+function visionErrorResponse(res, error, label) {
+  console.error(`Error ${label}:`, error);
+  if (error.code === 'insufficient_quota') {
+    return visionQuotaResponse(res);
+  }
+  return res.status(500).json({
+    error: `Failed to ${label}`,
+    message: error.message,
+  });
+}
+
 // Identify album from image using OpenAI Vision
 export async function identifyAlbumFromImage(req, res) {
   try {
     const { imageData } = req.body;
-    
+
     if (!imageData) {
       return res.status(400).json({ error: 'Image data is required' });
     }
 
     console.log('🖼️ Analyzing album cover image with AI...');
-
-    // Use OpenAI Vision API to identify the album
-    const completion = await openai.chat.completions.create({
-      model: resolveOpenAiVisionModel('ALBUM_VISION_MODEL'),
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert music historian and album cover identifier. When shown an album cover, you identify the album name, artist, and provide relevant details. Be precise and confident in your identification."
-        },
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: "Please identify this album cover and estimate its value. Provide the exact album name, artist name, release year, genre, a brief description, AND estimated market value in USD. Consider: original pressing vs reissue, condition (assume VG+ if visible), rarity, and current collector market. Format your response as JSON with fields: albumName, artistName, year, genre, description, estimatedValue (number, no $ sign)."
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: imageData
-              }
-            }
-          ]
-        }
-      ],
-      max_tokens: 500,
-      temperature: 0.3 // Lower temperature for more precise identification
-    });
-
-    const aiResponse = completion.choices[0].message.content;
+    const model = resolveOpenAiVisionModel('ALBUM_VISION_MODEL');
+    const { aiResponse, album } = await identifySingleAlbumFromImage(openai, model, imageData);
     console.log('🤖 AI Response:', aiResponse);
 
-    // Parse the AI response (try to extract JSON or parse text)
-    let albumInfo;
-    try {
-      // Try to parse as JSON first
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        albumInfo = JSON.parse(jsonMatch[0]);
-      } else {
-        // Fallback: extract info from text
-        albumInfo = extractAlbumInfoFromText(aiResponse);
-      }
-    } catch (parseError) {
-      console.log('⚠️ JSON parse failed, extracting from text');
-      albumInfo = extractAlbumInfoFromText(aiResponse);
-    }
-
-    if (albumInfo && albumInfo.albumName && albumInfo.artistName) {
-      res.json({
+    if (album) {
+      return res.json({
         success: true,
-        albumName: albumInfo.albumName,
-        artistName: albumInfo.artistName,
-        year: albumInfo.year || 'Unknown',
-        genre: albumInfo.genre || 'Unknown',
-        description: albumInfo.description || 'Album identified by AI vision',
-        estimatedValue: albumInfo.estimatedValue || null
-      });
-    } else {
-      res.json({
-        success: false,
-        message: 'Could not identify the album from this image'
+        albumName: album.albumName,
+        artistName: album.artistName,
+        year: album.year,
+        genre: album.genre,
+        description: album.description,
+        estimatedValue: album.estimatedValue,
+        confidence: album.confidence,
       });
     }
 
-  } catch (error) {
-    console.error('Error identifying album from image:', error);
-    
-    if (error.code === 'insufficient_quota') {
-      return res.status(503).json({ 
-        error: 'AI service temporarily unavailable',
-        message: 'OpenAI API quota exceeded. Please try again later.'
-      });
-    }
-    
-    res.status(500).json({ 
-      error: 'Failed to identify album from image',
-      message: error.message 
+    return res.json({
+      success: false,
+      message: 'Could not identify the album from this image',
     });
+  } catch (error) {
+    return visionErrorResponse(res, error, 'identify album from image');
   }
 }
 
-// Extract album info from text response (fallback)
-function extractAlbumInfoFromText(text) {
-  const info = {
-    albumName: '',
-    artistName: '',
-    year: '',
-    genre: '',
-    description: '',
-    estimatedValue: null
-  };
+// Identify up to 5 albums from shelf photo or image stack
+export async function identifyAlbumsFromImages(req, res) {
+  try {
+    const { imageData, images, mode = 'shelf', maxAlbums = 5 } = req.body;
+    const cap = clampMaxAlbums(maxAlbums);
+    const model = resolveOpenAiVisionModel('ALBUM_VISION_MODEL');
 
-  // Try to extract album name
-  const albumMatch = text.match(/album[:\s]+["']?([^"'\n]+)["']?/i);
-  if (albumMatch) info.albumName = albumMatch[1].trim();
+    if (mode === 'stack') {
+      if (!Array.isArray(images) || images.length === 0) {
+        return res.status(400).json({ error: 'images array is required for stack mode' });
+      }
+      console.log(`🖼️ Analyzing ${Math.min(images.length, cap)} album image(s) in stack mode...`);
+      const { albums } = await identifyStackAlbumsFromImages(openai, model, images, cap);
+      return res.json({
+        success: albums.length > 0,
+        albums,
+        meta: { mode: 'stack', requested: cap, identified: albums.length, model },
+        message: albums.length ? undefined : 'Could not identify albums from the provided images',
+      });
+    }
 
-  // Try to extract artist name
-  const artistMatch = text.match(/artist[:\s]+["']?([^"'\n]+)["']?/i);
-  if (artistMatch) info.artistName = artistMatch[1].trim();
+    if (!imageData) {
+      return res.status(400).json({ error: 'imageData is required for shelf mode' });
+    }
 
-  // Try to extract year
-  const yearMatch = text.match(/(\d{4})/);
-  if (yearMatch) info.year = yearMatch[1];
+    console.log(`🖼️ Analyzing shelf photo for up to ${cap} albums...`);
+    const { aiResponse, albums } = await identifyShelfAlbumsFromImage(openai, model, imageData, cap);
+    console.log('🤖 AI shelf response:', aiResponse);
 
-  // Try to extract genre
-  const genreMatch = text.match(/genre[:\s]+["']?([^"'\n]+)["']?/i);
-  if (genreMatch) info.genre = genreMatch[1].trim();
-
-  // Try to extract estimated value
-  const valueMatch = text.match(/value[:\s]+\$?(\d+(?:\.\d{2})?)/i);
-  if (valueMatch) info.estimatedValue = parseFloat(valueMatch[1]);
-
-  // Use first sentence as description
-  const sentences = text.split(/[.!?]/);
-  if (sentences.length > 0) {
-    info.description = sentences[0].trim();
+    return res.json({
+      success: albums.length > 0,
+      albums,
+      meta: { mode: 'shelf', requested: cap, identified: albums.length, model },
+      message: albums.length ? undefined : 'Could not identify any albums in this photo',
+    });
+  } catch (error) {
+    return visionErrorResponse(res, error, 'identify albums from images');
   }
-
-  return info;
 }

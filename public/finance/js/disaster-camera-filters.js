@@ -272,16 +272,27 @@
       const title = camera.title || camera.name || 'Webcam';
       const dist = formatCameraDistanceMi(camera);
       const loc = [camera.county_name, camera.state_abbr].filter(Boolean).join(', ') || '—';
-      const marker = new google.maps.Marker({
-        position: { lat, lng },
-        map: gmap,
-        title,
-        icon
-      });
+      const marker = (global.googleAdvancedMarkers || window.googleAdvancedMarkers)?.createMapMarker
+        ? (global.googleAdvancedMarkers || window.googleAdvancedMarkers).createMapMarker({
+            position: { lat, lng },
+            map: gmap,
+            title,
+            icon,
+          })
+        : new google.maps.Marker({
+            position: { lat, lng },
+            map: gmap,
+            title,
+            icon,
+          });
       const info = new google.maps.InfoWindow({
         content: `<div style="min-width:180px;"><strong>${escapeHtml(title)}</strong><br><span class="text-muted small">${escapeHtml(camera.source || '')}</span><br>${escapeHtml(loc)}<br>${dist !== '—' ? dist + ' away' : ''}<br><button type="button" class="btn btn-sm btn-warning mt-1" onclick="openCameraViewerFromMarker('${key}')">View feed</button></div>`
       });
-      marker.addListener('click', () => info.open(gmap, marker));
+      marker.addListener('click', () => {
+        const gam = global.googleAdvancedMarkers || window.googleAdvancedMarkers;
+        if (gam?.openMapInfoWindow) gam.openMapInfoWindow(info, gmap, marker);
+        else info.open(gmap, marker);
+      });
       markerBucket.push({ marker, key });
     });
   }

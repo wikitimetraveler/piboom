@@ -627,11 +627,132 @@ export function normalizeFemaV2ToUnified(disasters) {
   }).filter(r => r.county_fips || (r.county_name && r.state_abbr));
 }
 
-/** VIIRS CSV uses single-letter confidence (l/n/h); GeoJSON may use full words. */
+/** Build 5-digit county FIPS from FEMA declaration fields. */
+export function resolveFemaCountyFips(item, countyName, stateAbbr) {
+  const stateFips = String(item?.fipsStateCode ?? '').trim().padStart(2, '0');
+  const countyPart = String(item?.fipsCountyCode ?? '').trim().padStart(3, '0');
+  if (stateFips && countyPart && stateFips !== '00' && countyPart !== '000') {
+    return `${stateFips}${countyPart}`;
+  }
+  return mapCountyToFips(countyName, stateAbbr) || null;
+}
+
+/** Normalize one FEMA DisasterDeclarationsSummaries row for upsert. */
+export function resolveFemaDeclarationFields(item) {
+  let county = null;
+  if (item?.designatedArea) {
+    county = String(item.designatedArea)
+      .replace(/\s*\((County|Municipio|Municipality|Parish|Borough|Census Area|Island|Islands)\)$/i, '')
+      .trim();
+  }
+
+  const state = item?.state ? String(item.state).trim().toUpperCase() : null;
+  const fips = resolveFemaCountyFips(item, county, state);
+
+  let lat = null;
+  let lng = null;
+  if (item?.latitude != null && item?.longitude != null) {
+    const parsedLat = parseFloat(item.latitude);
+    const parsedLng = parseFloat(item.longitude);
+    if (Number.isFinite(parsedLat) && Number.isFinite(parsedLng)) {
+      lat = parsedLat;
+      lng = parsedLng;
+    }
+  }
+
+  const sourceId = String(item?.id || item?.disasterNumber || item?.declarationTitle || '').trim();
+  if (!sourceId) return null;
+
+  return {
+    source: 'fema',
+    event_type: (item.incidentType || 'disaster').toLowerCase(),
+    county_fips: fips || '00000',
+    county_name: county,
+    state_abbr: state,
+    start_time: item.incidentBeginDate || item.declarationDate || new Date().toISOString(),
+    end_time: item.incidentEndDate || null,
+    severity: null,
+    title: item.declarationTitle || item.title || 'FEMA Disaster',
+    lat,
+    lng,
+    source_id: sourceId,
+    raw: item,
+  };
+}
+
+/** VIIRS CSV uses single-letter confidence (l/n/h); GeoJSON may use 0–100 or words. */
 export function normalizeFirmsConfidence(raw) {
   const c = String(raw ?? '').toLowerCase().trim();
+  if (/^\d+$/.test(c)) {
+    const n = parseInt(c, 10);
+    if (n >= 80) return 'high';
+    if (n >= 50) return 'nominal';
+    return 'low';
+  }
   const letterMap = { l: 'low', n: 'nominal', h: 'high' };
   return letterMap[c] || c;
+}
+
+const FIRMS_CONFIDENCE_RANK = { low: 0, nominal: 1, high: 2 };
+
+/** Read FIRMS quality thresholds from env (combined pulls use these). */
+export function getFirmsQualityThresholds() {
+  const minConfidence = String(process.env.FIRMS_MIN_CONFIDENCE || 'high').toLowerCase().trim();
+  return {
+    minConfidence,
+    minConfidenceRank: FIRMS_CONFIDENCE_RANK[minConfidence] ?? FIRMS_CONFIDENCE_RANK.high,
+    minBrightness: parseInt(process.env.FIRMS_MIN_BRIGHTNESS || '330', 10) || 330,
+    minFrp: parseFloat(process.env.FIRMS_MIN_FRP || '4') || 4,
+    clusterRadiusKm: parseFloat(process.env.FIRMS_CLUSTER_RADIUS_KM || '5') || 5,
+    minClusterSize: parseInt(process.env.FIRMS_MIN_CLUSTER_SIZE || '2', 10) || 2,
+    highBrightness: parseInt(process.env.FIRMS_HIGH_BRIGHTNESS || '350', 10) || 350,
+    highFrp: parseFloat(process.env.FIRMS_HIGH_FRP || '8') || 8,
+  };
+}
+
+/** Normalize FIRMS feature/CSV properties for quality scoring. */
+export function parseFirmsDetectionProps(props = {}) {
+  const brightnessRaw = props.bright_ti4 ?? props.brightness ?? props.bright_ti5;
+  const brightness = brightnessRaw != null && brightnessRaw !== '' ? parseFloat(brightnessRaw) : null;
+  const frpRaw = props.frp ?? props.FRP;
+  const frp = frpRaw != null && frpRaw !== '' ? parseFloat(frpRaw) : null;
+  return {
+    brightness: Number.isFinite(brightness) ? brightness : null,
+    frp: Number.isFinite(frp) ? frp : null,
+    confidence: normalizeFirmsConfidence(props.confidence),
+    daynight: String(props.daynight ?? props.day_night ?? '').trim().toUpperCase(),
+    type: String(props.type ?? '').trim().toLowerCase(),
+  };
+}
+
+/** Stage 1: confidence must meet threshold (default high). */
+export function passesFirmsConfidenceGate(confidence, thresholds = getFirmsQualityThresholds()) {
+  const rank = FIRMS_CONFIDENCE_RANK[confidence] ?? -1;
+  return rank >= thresholds.minConfidenceRank;
+}
+
+/** Stage 2: thermal signal — brightness or fire radiative power. */
+export function passesFirmsThermalGate(detection, thresholds = getFirmsQualityThresholds()) {
+  const { brightness, frp } = detection;
+  const brightOk = brightness != null && brightness >= thresholds.minBrightness;
+  const frpOk = frp != null && frp >= thresholds.minFrp;
+  return brightOk || frpOk;
+}
+
+/**
+ * Stage 3: likely actual fire — clustered hotspots OR strong solo detection.
+ * Filters isolated low-confidence thermal noise (e.g. industrial heat).
+ */
+export function isLikelyActualFirmsFire(detection, clusterSize, thresholds = getFirmsQualityThresholds()) {
+  if (!passesFirmsConfidenceGate(detection.confidence, thresholds)) return false;
+  if (!passesFirmsThermalGate(detection, thresholds)) return false;
+
+  const inCluster = clusterSize >= thresholds.minClusterSize;
+  const strongSolo =
+    (detection.brightness != null && detection.brightness >= thresholds.highBrightness)
+    || (detection.frp != null && detection.frp >= thresholds.highFrp);
+
+  return inCluster || strongSolo;
 }
 
 /** NASA FIRMS (active fires) - VIIRS NRT GeoJSON **/
@@ -714,6 +835,8 @@ export async function ingestFirmsNrt() {
       // VIIRS CSV uses bright_ti4; MODIS uses brightness
       const brightIdx = headers.indexOf('bright_ti4') >= 0 ? headers.indexOf('bright_ti4') : headers.indexOf('brightness');
       const confIdx = headers.indexOf('confidence');
+      const frpIdx = headers.indexOf('frp');
+      const daynightIdx = headers.indexOf('daynight');
       
       // Convert CSV to GeoJSON-like structure
       geo = {
@@ -737,7 +860,10 @@ export async function ingestFirmsNrt() {
             acq_date: values[dateIdx]?.trim() || '',
             acq_time: values[timeIdx]?.trim() || '',
             brightness: values[brightIdx] ? parseFloat(values[brightIdx]) : null,
+            bright_ti4: values[brightIdx] ? parseFloat(values[brightIdx]) : null,
             confidence: values[confIdx] ? values[confIdx].trim() : '',
+            frp: frpIdx >= 0 && values[frpIdx] ? parseFloat(values[frpIdx]) : null,
+            daynight: daynightIdx >= 0 ? values[daynightIdx]?.trim() : '',
             id: `${lat},${lng},${values[dateIdx] || Date.now()}`
           }
         });
@@ -753,49 +879,34 @@ export async function ingestFirmsNrt() {
     }
   } catch (e) {
     console.warn('FIRMS fetch failed:', e.message);
-    return { inserted: 0, skipped: 0 };
+    return { inserted: 0, skipped: 0, fetched: 0, prepared: 0, error: e.message };
   }
   const feats = (geo && geo.features) ? geo.features : [];
-  
-  // Filter configuration for significant fires
-  const MIN_BRIGHTNESS = parseInt(process.env.FIRMS_MIN_BRIGHTNESS || '330', 10) || 330;
-  const MIN_CONFIDENCE = String(process.env.FIRMS_MIN_CONFIDENCE || 'nominal').toLowerCase().trim(); // nominal|high
-  const CLUSTER_RADIUS_KM = parseFloat(process.env.FIRMS_CLUSTER_RADIUS_KM || '5') || 5; // km - fires within this radius are considered a cluster
-  const MIN_CLUSTER_SIZE = parseInt(process.env.FIRMS_MIN_CLUSTER_SIZE || '2', 10) || 2;
-  const confidenceRank = { low: 0, nominal: 1, high: 2 };
-  const minConfidenceRank = confidenceRank[MIN_CONFIDENCE] ?? confidenceRank.nominal;
-  
-  // First pass: filter by confidence and brightness
+
+  const thresholds = getFirmsQualityThresholds();
+
   const significantFires = [];
   let filteredByConfidence = 0;
-  let filteredByBrightness = 0;
-  
+  let filteredBySignal = 0;
+
   for (const f of feats) {
     const props = f.properties || {};
     const coords = (f.geometry && f.geometry.coordinates) || [];
     const lat = coords[1];
     const lng = coords[0];
-    
+
     if (!lat || !lng) continue;
-    
-    // Get brightness and confidence
-    const brightness = props.brightness ? parseFloat(props.brightness) : null;
-    const confidence = normalizeFirmsConfidence(props.confidence);
-    
-    // Filter by confidence (explicit threshold: nominal+ or high-only)
-    const confRank = confidenceRank[confidence] ?? -1;
-    if (confRank < minConfidenceRank) {
+
+    const detection = parseFirmsDetectionProps(props);
+    if (!passesFirmsConfidenceGate(detection.confidence, thresholds)) {
       filteredByConfidence++;
       continue;
     }
-    
-    // Filter by brightness (skip fires below threshold)
-    if (brightness === null || brightness < MIN_BRIGHTNESS) {
-      filteredByBrightness++;
+    if (!passesFirmsThermalGate(detection, thresholds)) {
+      filteredBySignal++;
       continue;
     }
-    
-    // Parse date/time from FIRMS CSV format (acq_date: YYYY-MM-DD, acq_time: HHMM)
+
     let start = new Date().toISOString();
     if (props.acq_date) {
       const dateStr = props.acq_date.trim();
@@ -808,79 +919,72 @@ export async function ingestFirmsNrt() {
         start = new Date().toISOString();
       }
     }
-    
+
     significantFires.push({
       lat,
       lng,
-      brightness,
-      confidence,
+      detection,
       start,
       props,
-      coords: [lng, lat]
+      coords: [lng, lat],
     });
   }
-  
+
   console.log(`🔥 FIRMS: Filtered ${feats.length} detections:`);
-  console.log(`   - ${filteredByConfidence} filtered by confidence < ${MIN_CONFIDENCE}`);
-  console.log(`   - ${filteredByBrightness} filtered by brightness < ${MIN_BRIGHTNESS}K`);
-  console.log(`   - ${significantFires.length} significant fires remaining`);
-  
-  // Second pass: Cluster detection to identify larger fire areas
-  const clusters = new Map(); // clusterId -> [fires]
-  const fireToCluster = new Map(); // fire index -> clusterId
-  
-  // Simple clustering: group fires within CLUSTER_RADIUS_KM
+  console.log(`   - ${filteredByConfidence} filtered by confidence`);
+  console.log(`   - ${filteredBySignal} filtered by weak thermal/FRP signal`);
+  console.log(`   - ${significantFires.length} candidate fire detections remaining`);
+
+  const clusters = new Map();
+  const fireToCluster = new Map();
+  const CLUSTER_RADIUS_KM = thresholds.clusterRadiusKm;
+
   for (let i = 0; i < significantFires.length; i++) {
     const fire1 = significantFires[i];
     let assignedCluster = null;
-    
-    // Check if this fire is near any existing cluster
+
     for (const [clusterId, clusterFires] of clusters.entries()) {
       const clusterCenter = clusterFires[0];
       const distance = calculateDistance(
         fire1.lat, fire1.lng,
-        clusterCenter.lat, clusterCenter.lng
+        clusterCenter.lat, clusterCenter.lng,
       );
-      
+
       if (distance <= CLUSTER_RADIUS_KM) {
         assignedCluster = clusterId;
         break;
       }
     }
-    
+
     if (assignedCluster) {
       clusters.get(assignedCluster).push(fire1);
       fireToCluster.set(i, assignedCluster);
     } else {
-      // Create new cluster
       const newClusterId = `cluster_${i}`;
       clusters.set(newClusterId, [fire1]);
       fireToCluster.set(i, newClusterId);
     }
   }
-  
-  // Filter: include fires in clusters OR single fires with sufficient brightness
-  const HIGH_BRIGHTNESS_THRESHOLD = 350; // Single fires at/above this are included
+
   const finalFires = [];
-  let filteredByCluster = 0;
-  
+  let filteredByLikelyFire = 0;
+
   for (let i = 0; i < significantFires.length; i++) {
     const fire = significantFires[i];
     const clusterId = fireToCluster.get(i);
     const clusterSize = clusters.get(clusterId)?.length || 0;
-    
-    // Include if: part of cluster OR very high brightness
-    if (clusterSize >= MIN_CLUSTER_SIZE || fire.brightness >= HIGH_BRIGHTNESS_THRESHOLD) {
+
+    if (isLikelyActualFirmsFire(fire.detection, clusterSize, thresholds)) {
       finalFires.push(fire);
     } else {
-      filteredByCluster++;
+      filteredByLikelyFire++;
     }
   }
-  
-  console.log(`🔥 FIRMS: Clustering analysis:`);
+
+  console.log(`🔥 FIRMS: Likely-fire gate:`);
   console.log(`   - ${clusters.size} fire clusters identified`);
-  console.log(`   - ${filteredByCluster} fires filtered (too isolated)`);
-  console.log(`   - ${finalFires.length} significant fires ready for ingestion`);
+  console.log(`   - ${filteredByLikelyFire} filtered (unlikely isolated noise)`);
+  console.log(`   - ${finalFires.length} likely fires ready for ingestion`);
   
   // Third pass: Geocode and prepare records
   // Limit: 500 with Mapbox (was 100 for Nominatim 1 req/sec). Override via FIRMS_GEOCODE_LIMIT env.
@@ -893,7 +997,8 @@ export async function ingestFirmsNrt() {
   await loadFipsReference();
   
   for (const fire of finalFires) {
-    const { lat, lng, brightness, confidence, start, props } = fire;
+    const { lat, lng, detection, start, props } = fire;
+    const { brightness, confidence, frp } = detection;
     let county = null, state = null, fips = null;
     
     // Only geocode if we haven't exceeded the limit (prevents runaway costs)
@@ -926,8 +1031,8 @@ export async function ingestFirmsNrt() {
       state_abbr: state,
       start_time: start,
       end_time: null,
-      severity: `${confidence} (${brightness}K)`,
-      title: `Fire ${brightness ? `(${brightness}K)` : ''}`.trim(),
+      severity: `${confidence}${brightness != null ? ` (${brightness}K)` : ''}${frp != null ? ` FRP ${frp}MW` : ''}`.trim(),
+      title: `Wildfire${brightness != null ? ` (${brightness}K)` : frp != null ? ` (FRP ${frp}MW)` : ''}`.trim(),
       lat, lng,
       source_id: String(props.id || `${lat},${lng},${start}`),
       raw: props
@@ -949,8 +1054,19 @@ export async function ingestFirmsNrt() {
   
   console.log(`🔥 FIRMS: Prepared ${batch.length} records for database insertion`);
   const result = await upsertDisasters(batch);
-  console.log(`🔥 FIRMS: Inserted ${result.inserted}, skipped ${result.skipped}`);
-  return result;
+  const summary = {
+    ...result,
+    fetched: feats.length,
+    prepared: batch.length,
+    likelyFire: finalFires.length,
+    filtered: {
+      confidence: filteredByConfidence,
+      weakSignal: filteredBySignal,
+      unlikelyFire: filteredByLikelyFire,
+    },
+  };
+  console.log(`🔥 FIRMS: Inserted ${summary.inserted}, skipped ${summary.skipped}, fetched ${summary.fetched}, likely ${summary.likelyFire}`);
+  return summary;
 }
 
 /** USGS Earthquakes GeoJSON (past day) **/
@@ -1133,125 +1249,89 @@ export async function ingestNwsCap(options = {}) {
 /** FEMA Disaster Declarations (last 90 days) **/
 export async function ingestFema() {
   const baseUrl = 'https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries';
-  
-  // Calculate date 90 days ago
+
   const ninetyDaysAgo = new Date();
-  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
-  const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0]; // YYYY-MM-DD
-  
-  // Query FEMA API for disasters in last 90 days (no state/county filter to get all)
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - DISASTER_ROLLING_WINDOW_DAYS);
+  const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0];
+
   const filter = `incidentBeginDate ge ${ninetyDaysAgoStr}`;
   const url = `${baseUrl}?$filter=${encodeURIComponent(filter)}&$top=1000&$orderby=incidentBeginDate desc`;
-  
+
   let data;
   try {
     console.log(`🏛️  FEMA: Querying disasters since ${ninetyDaysAgoStr}`);
     const resp = await fetch(url, {
       headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'DevConnectLabs-Disasters/1.0'
-      }
+        Accept: 'application/json',
+        'User-Agent': 'DevConnectLabs-Disasters/1.0',
+      },
     });
-    
+
     if (!resp.ok) {
       throw new Error(`FEMA API error: ${resp.status} ${resp.statusText}`);
     }
-    
+
     data = await resp.json();
   } catch (e) {
     console.warn('⚠️  FEMA fetch failed:', e.message);
-    return { inserted: 0, skipped: 0 };
+    return { inserted: 0, skipped: 0, fetched: 0, prepared: 0, error: e.message };
   }
-  
+
   const disasters = data.DisasterDeclarationsSummaries || [];
   console.log(`🏛️  FEMA: Retrieved ${disasters.length} disaster declarations`);
-  
-  // Filter to ensure only last 90 days
+
   const cutoffDate = new Date(ninetyDaysAgoStr);
-  const recentDisasters = disasters.filter(disaster => {
+  const recentDisasters = disasters.filter((disaster) => {
     if (disaster.incidentBeginDate) {
-      const disasterDate = new Date(disaster.incidentBeginDate);
-      return disasterDate >= cutoffDate;
+      return new Date(disaster.incidentBeginDate) >= cutoffDate;
     }
     return false;
   });
-  
-  console.log(`🏛️  FEMA: ${recentDisasters.length} disasters within 90-day window`);
-  
+
+  console.log(`🏛️  FEMA: ${recentDisasters.length} disasters within ${DISASTER_ROLLING_WINDOW_DAYS}-day window`);
+
   const batch = [];
-  const coordCache = new Map(); // county|state -> {lat,lng} to avoid duplicate geocoding
+  const coordCache = new Map();
   await loadFipsReference();
-  
+
   for (const item of recentDisasters) {
-    // Extract county from designatedArea (format: "Harris (County)")
-    let county = null;
-    if (item.designatedArea) {
-      county = item.designatedArea.replace(/\s*\(County\)$/i, '').trim();
-    }
-    
-    const state = item.state || null;
-    let fips = null;
-    
-    // Get FIPS code if we have county and state
-    if (county && state) {
-      fips = mapCountyToFips(county, state);
-    }
-    
-    // Get coordinates if available (some FEMA records have them)
-    let lat = null, lng = null;
-    if (item.latitude && item.longitude) {
-      lat = parseFloat(item.latitude);
-      lng = parseFloat(item.longitude);
-    }
-    // Geocode county/state when coordinates missing (needed for map display)
-    if ((!lat || !lng) && county && state) {
-      const cacheKey = `${county}|${state}`;
+    const rec = resolveFemaDeclarationFields(item);
+    if (!rec || !(rec.county_fips !== '00000' || (rec.county_name && rec.state_abbr))) continue;
+
+    if ((!rec.lat || !rec.lng) && rec.county_name && rec.state_abbr) {
+      const cacheKey = `${rec.county_name}|${rec.state_abbr}`;
       let coords = coordCache.get(cacheKey);
       if (!coords) {
         try {
-          coords = await geocodeCountyStateWithCache(county, state);
+          coords = await geocodeCountyStateWithCache(rec.county_name, rec.state_abbr);
           if (coords?.latitude && coords?.longitude) {
             coordCache.set(cacheKey, { lat: coords.latitude, lng: coords.longitude });
           }
         } catch (e) {
-          // Continue without coords - record still useful for table view
+          // Continue without coords
         }
       }
       if (coords?.lat && coords?.lng) {
-        lat = coords.lat;
-        lng = coords.lng;
+        rec.lat = coords.lat;
+        rec.lng = coords.lng;
       } else if (coords?.latitude && coords?.longitude) {
-        lat = coords.latitude;
-        lng = coords.longitude;
+        rec.lat = coords.latitude;
+        rec.lng = coords.longitude;
       }
     }
-    
-    const rec = {
-      source: 'fema',
-      event_type: (item.incidentType || 'disaster').toLowerCase(),
-      county_fips: fips || '00000', // Use placeholder if no FIPS
-      county_name: county,
-      state_abbr: state,
-      start_time: item.incidentBeginDate || item.declarationDate || new Date().toISOString(),
-      end_time: item.incidentEndDate || null,
-      severity: null,
-      title: item.declarationTitle || item.title || 'FEMA Disaster',
-      lat,
-      lng,
-      source_id: String(item.disasterNumber || item.id || item.declarationTitle || ''),
-      raw: item
-    };
-    
-    // Allow records without FIPS if we have county/state (they can be filtered later)
-    if (rec.county_fips || (rec.county_name && rec.state_abbr)) {
-      batch.push(rec);
-    }
+
+    batch.push(rec);
   }
-  
+
   console.log(`🏛️  FEMA: Prepared ${batch.length} records for database insertion`);
   const result = await upsertDisasters(batch);
-  console.log(`🏛️  FEMA: Inserted ${result.inserted}, skipped ${result.skipped}`);
-  return result;
+  const summary = {
+    ...result,
+    fetched: recentDisasters.length,
+    prepared: batch.length,
+  };
+  console.log(`🏛️  FEMA: Inserted ${summary.inserted}, skipped ${summary.skipped}, fetched ${summary.fetched}`);
+  return summary;
 }
 
 /** NHC Active Cyclones — hurricane/tropical alerts from NWS CAP, stored as source nhc. */

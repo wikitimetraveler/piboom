@@ -35,6 +35,7 @@ router.get('/web-crawl', disastersController.webCrawl);
 
 // Stats
 router.get('/stats', disastersController.statsDisasters);
+router.get('/county-summary', disastersController.countySummaryByState);
 
 // CSV Export
 router.get('/export.csv', disastersController.exportCsv);

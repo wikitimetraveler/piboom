@@ -739,8 +739,8 @@ body.du-page {
 }
 
 .du-filter-pill-active {
-  background: linear-gradient(135deg, #2563eb, #3b82f6);
-  border-color: #2563eb;
+  background: linear-gradient(135deg, var(--zen-primary, #4a90a4), var(--zen-primary-light, #6ba8b8));
+  border-color: var(--zen-primary, #4a90a4);
   color: #fff;
 }
 
@@ -845,7 +845,7 @@ body.du-page {
   border-color: transparent;
 }
 
-.source-chip[data-source="fema"].source-chip-active { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+.source-chip[data-source="fema"].source-chip-active { background: linear-gradient(135deg, var(--zen-primary, #4a90a4), var(--zen-primary-light, #6ba8b8)); }
 .source-chip[data-source="firms"].source-chip-active { background: linear-gradient(135deg, #ef4444, #f87171); }
 .source-chip[data-source="usgs"].source-chip-active { background: linear-gradient(135deg, #f59e0b, #fbbf24); color: #1f2937; }
 .source-chip[data-source="nws"].source-chip-active { background: linear-gradient(135deg, #06b6d4, #22d3ee); }
@@ -859,13 +859,64 @@ body.du-page {
 }
 
 /* Sticky selection context */
-#selectionContextStrip {
+#selectionContextStrip,
+.du-selection-strip {
   position: sticky;
   top: 0.5rem;
   z-index: 100;
   border-radius: 10px;
-  border: 1px solid rgba(37, 99, 235, 0.35);
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.12);
+  border: 1px solid color-mix(in srgb, var(--zen-primary, #4a90a4) 35%, transparent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--zen-primary, #4a90a4) 12%, transparent);
+}
+
+.du-selection-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.du-selection-strip-summary {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.du-selection-strip-title {
+  display: block;
+  margin-bottom: 0.15rem;
+}
+
+.du-selection-strip-meta {
+  display: block;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.du-selection-strip-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.du-selection-strip-btn .du-selection-strip-btn-label {
+  margin-left: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .du-selection-strip-btn .du-selection-strip-btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
 .du-nws-alert-list .list-group-item {
@@ -913,8 +964,8 @@ body.du-page {
 
 #disastersGrid .ag-row { cursor: pointer; }
 #disastersGrid .ag-row.ag-row-selected {
-  background-color: #dbeafe !important;
-  box-shadow: inset 4px 0 0 var(--zen-primary, #2563eb);
+  background-color: color-mix(in srgb, var(--zen-primary, #4a90a4) 15%, #fff) !important;
+  box-shadow: inset 4px 0 0 var(--zen-primary, #4a90a4);
 }
 
 /* Source provenance badges */
@@ -981,8 +1032,8 @@ body.du-page {
 }
 
 .du-hotspot-row--active {
-  background: rgba(37, 99, 235, 0.12);
-  outline: 1px solid rgba(37, 99, 235, 0.35);
+  background: color-mix(in srgb, var(--zen-primary, #4a90a4) 12%, transparent);
+  outline: 1px solid color-mix(in srgb, var(--zen-primary, #4a90a4) 35%, transparent);
 }
 
 .du-top-events-list {
@@ -1663,7 +1714,7 @@ body.du-pull-sheet-open .du-bottom-dock {
   font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.35;
-  color: var(--zen-primary, #2563eb);
+  color: var(--zen-primary, #4a90a4);
   text-decoration: none;
 }
 
@@ -1688,4 +1739,286 @@ body.du-pull-sheet-open .du-bottom-dock {
     flex: 1 1 auto;
     text-align: right;
   }
+}
+
+/* —— Hazard lens (Leaflet geo picker) —— */
+.du-geo-picker-map {
+  height: clamp(340px, 58vh, 720px);
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: inset 0 2px 10px rgba(15, 23, 42, 0.08);
+  z-index: 1;
+}
+
+.du-geo-rail {
+  background: var(--zen-surface, #f8fafc);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1rem;
+  max-height: clamp(340px, 58vh, 720px);
+  display: flex;
+  flex-direction: column;
+}
+
+.du-geo-county-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.du-geo-county-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.45rem 0.65rem;
+  background: #fff;
+  font-size: 0.875rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.du-geo-county-row:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.du-geo-county-row--active {
+  border-color: var(--zen-primary, #4a90a4);
+  background: #dbeafe;
+  font-weight: 600;
+}
+
+.du-geo-county-meta {
+  font-size: 0.75rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.du-geo-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.du-geo-crumb {
+  font-size: 0.875rem;
+}
+
+.du-geo-crumb--link {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--zen-primary, #4a90a4);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.du-geo-crumb--active {
+  font-weight: 600;
+  color: var(--text-dark, #1f2937);
+}
+
+.du-geo-crumb-sep {
+  font-size: 0.65rem;
+  opacity: 0.5;
+}
+
+.du-geo-tooltip {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.du-geo-stage--collapsed .du-geo-stage-body {
+  display: none;
+}
+
+.du-geo-stage--collapsed .du-geo-stage-header {
+  border-bottom: none;
+}
+
+.du-intel-stage--pending {
+  opacity: 0.45;
+  pointer-events: none;
+  user-select: none;
+  filter: grayscale(0.15);
+}
+
+.du-stats-row--hidden {
+  visibility: hidden;
+  height: 0;
+  overflow: hidden;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.du-stats-row--placeholder .stat-number {
+  opacity: 0.55;
+}
+
+.du-stats-row--placeholder .du-stat-card {
+  border-style: dashed;
+}
+
+.du-geo-active-crumb {
+  font-size: 0.8rem;
+}
+
+/* Desktop workflow strip (replaces hidden pills on lg+) */
+.du-workflow-strip {
+  display: none;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.85rem 0 0;
+}
+
+.du-workflow-strip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.du-workflow-strip-btn .step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 0.62rem;
+}
+
+.du-workflow-strip-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.du-workflow-strip-btn.du-workflow-strip-active {
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.du-workflow-strip-btn.du-workflow-strip-active .step-num {
+  background: #fff;
+  color: var(--du-hero-from, #0f2744);
+}
+
+@media (min-width: 992px) {
+  .du-workflow-strip {
+    display: flex;
+  }
+}
+
+/* Inline loading (filter reload — no full-screen overlay) */
+.du-inline-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.du-inline-loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: duInlineShimmer 1.2s ease-in-out infinite;
+}
+
+#statsRow.du-inline-loading::after {
+  border-radius: 12px;
+}
+
+#disastersGrid.du-inline-loading::after,
+.du-grid-shell.du-inline-loading::after {
+  min-height: 520px;
+  border-radius: 8px;
+}
+
+@keyframes duInlineShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Shared pull progress */
+.du-pull-progress {
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--zen-primary, #4a90a4) 8%, #fff);
+  border: 1px solid color-mix(in srgb, var(--zen-primary, #4a90a4) 20%, transparent);
+}
+
+.du-pull-progress-track {
+  height: 4px;
+  background: rgba(74, 144, 164, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.35rem;
+}
+
+.du-pull-progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--zen-primary, #4a90a4), var(--zen-primary-light, #6ba8b8));
+  transition: width 0.4s ease;
+}
+
+/* Geo choropleth legend */
+.du-geo-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  align-items: center;
+}
+
+.du-geo-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.du-geo-legend-swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  display: inline-block;
+}
+
+.du-geo-legend--none { background: #e2e8f0; }
+.du-geo-legend--low { background: #93c5fd; }
+.du-geo-legend--medium { background: #fbbf24; }
+.du-geo-legend--high { background: #ef4444; }
+
+.du-geo-load-ready {
+  animation: duGeoLoadPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes duGeoLoadPulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--zen-primary, #4a90a4) 40%, transparent); }
+  50% { box-shadow: 0 0 0 6px transparent; }
 }

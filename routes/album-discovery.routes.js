@@ -6,7 +6,8 @@ import {
   analyzeAlbumsWithAI, 
   getAlbums, 
   searchAlbum, 
-  identifyAlbumFromImage 
+  identifyAlbumFromImage,
+  identifyAlbumsFromImages,
 } from '../controllers/album-discovery.controller.js';
 
 const router = express.Router();
@@ -22,5 +23,8 @@ router.post('/search-album', searchAlbum);
 
 // Identify album from uploaded image
 router.post('/identify-image', identifyAlbumFromImage);
+
+// Identify up to 5 albums (shelf photo or image stack)
+router.post('/identify-images', identifyAlbumsFromImages);
 
 export default router;

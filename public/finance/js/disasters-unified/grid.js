@@ -840,12 +840,17 @@ function updateStats(rows) {
 
 function animateNumber(selector, target) {
   const $el = $(selector);
-  const current = parseInt($el.text()) || 0;
+  const raw = $el.text().trim();
+  const current = raw === '—' ? 0 : (parseInt(raw, 10) || 0);
+  if (target === 0 && !$el.closest('.du-stats-row--placeholder').length) {
+    $el.text(target);
+    return;
+  }
   const duration = 1000;
   const steps = 30;
   const increment = (target - current) / steps;
   let step = 0;
-  
+
   const timer = setInterval(() => {
     step++;
     const value = Math.round(current + (increment * step));

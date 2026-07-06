@@ -1,4 +1,28 @@
 {
   "version": 1,
-  "videos": []
+  "videos": [
+    {
+      "id": "disasters-briefing-8d358bc039b84fa4b8d195f474b53d9a",
+      "kind": "heygen",
+      "videoId": "8d358bc039b84fa4b8d195f474b53d9a",
+      "title": "Hurricane Demo (TX)",
+      "domain": "disasters",
+      "variant": "briefing",
+      "videoUrl": null,
+      "portraitUrl": null,
+      "sourcePage": "/heygen-hub.html",
+      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "Unified Disasters briefing. You are looking at Hurricane Demo—a Hurricane event from FEMA, centered in Harris, TX. Reporting started May 31, 2026. Within 50 miles we currently track 12 pipeline loans and 3 hazard webcams. On the command deck, review nearby exposure, export a Goog",
+      "tags": [
+        "heygen-api",
+        "disasters",
+        "briefing",
+        "briefing"
+      ],
+      "generatedAt": "2026-06-30T06:42:51.332Z",
+      "hostedLocally": false
+    }
+  ]
 }

@@ -116,6 +116,39 @@ function toggleUnifiedSourceChip(btn, sourceKey) {
   $(`#sourceInput option[value="${sourceKey}"]`).prop('selected', on);
   updateFirmsDeferredAlert();
   updateSourceFreshnessDots();
+  scheduleFilterApply();
+}
+
+function scheduleFilterApply() {
+  if (!duCountyIntelLoaded) return;
+  clearTimeout(duFilterApplyTimer);
+  duFilterApplyTimer = setTimeout(() => {
+    duFilterApplyTimer = null;
+    syncSourceChipsFromSelect();
+    loadDisasters();
+  }, DU_FILTER_APPLY_DEBOUNCE_MS);
+}
+
+function applyFiltersNow() {
+  clearTimeout(duFilterApplyTimer);
+  duFilterApplyTimer = null;
+  if (!duCountyIntelLoaded) {
+    setDashboardStatus('Select a state and county on the hazard lens map first.', 'warning');
+    return;
+  }
+  syncSourceChipsFromSelect();
+  loadDisasters();
+}
+
+/** Enable a source in the multiselect + chip (e.g. after combined pull ingests FIRMS). */
+function ensureUnifiedSourceSelected(sourceKey) {
+  const opt = $(`#sourceInput option[value="${sourceKey}"]`);
+  if (!opt.length) return;
+  opt.prop('selected', true);
+  const chip = document.querySelector(`#unifiedSourceChips .source-chip[data-source="${sourceKey}"]`);
+  if (chip) chip.classList.add('source-chip-active');
+  updateFirmsDeferredAlert();
+  updateSourceFreshnessDots();
 }
 
 function readDisasterFilterInputs() {
@@ -143,28 +176,36 @@ function finishDisastersLoad(allRows) {
     console.warn('   - Source/event filters');
     setDashboardStatus('No disaster rows matched current filters. Try broadening source, state, or date criteria.', 'info');
   }
-  updateLoadingStatusDisaster(allRows.length ? 'Rendering disaster data...' : 'No disasters found. Check filters.', allRows.length ? 80 : 100);
   renderTable(allRows);
   renderMap(allRows);
   updateStats(allRows);
-  updateLoadingStatusDisaster('Complete!', 100);
   updateFirmsDeferredAlert();
-  hideLoading();
+  setDuInlineLoading(false);
 }
 
 async function loadDisasters() {
-  showLoading();
+  const gen = ++duLoadDisastersGeneration;
+  setDuInlineLoading(true);
   setDashboardStatus('');
   activeHotspotKey = null;
   activeHotspot = null;
   updateHotspotFilterUi();
-  updateLoadingStatusDisaster('Loading disaster data...', 10);
 
   const { state, county, sources, events } = readDisasterFilterInputs();
 
+  if (!state || !county) {
+    if (gen === duLoadDisastersGeneration) {
+      finishDisastersLoad([]);
+      setDashboardStatus('Select a state and county on the hazard lens map to load disaster intelligence.', 'info');
+    }
+    return;
+  }
+
   if (sources.length === 0) {
-    setDashboardStatus('Select at least one source in the command deck or Filters.', 'warning');
-    finishDisastersLoad([]);
+    if (gen === duLoadDisastersGeneration) {
+      setDashboardStatus('Select at least one source in the command deck or Filters.', 'warning');
+      finishDisastersLoad([]);
+    }
     return;
   }
 
@@ -175,7 +216,6 @@ async function loadDisasters() {
 
   if (needsDb) {
     try {
-      updateLoadingStatusDisaster('Loading disasters from database…', 28);
       const sinceIso = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString();
       const fetchDbSource = async (src) => {
         const qp = new URLSearchParams();
@@ -196,13 +236,16 @@ async function loadDisasters() {
       console.log('📊 Loaded', allRows.length, 'disasters from database (selected sources)');
     } catch (e) {
       console.error('❌ Error loading disasters:', e);
-      setDashboardStatus(`Unable to load one or more disaster feeds: ${e.message}`, 'danger');
+      if (gen === duLoadDisastersGeneration) {
+        setDashboardStatus(`Unable to load one or more disaster feeds: ${e.message}`, 'danger');
+      }
     }
   }
 
+  if (gen !== duLoadDisastersGeneration) return;
+
   if (sources.includes('floodzones')) {
     try {
-      updateLoadingStatusDisaster('Loading flood zone data...', 40);
       const floodZoneRows = await loadFloodZones(state, county);
       if (floodZoneRows.length > 0) {
         allRows = allRows.concat(floodZoneRows);
@@ -211,6 +254,8 @@ async function loadDisasters() {
       console.error('❌ Error loading flood zones:', e);
     }
   }
+
+  if (gen !== duLoadDisastersGeneration) return;
 
   allRows = applyEventTypeFilter(allRows, events);
   finishDisastersLoad(allRows);
@@ -262,6 +307,24 @@ function setSourcePullStatus(message, tone = 'muted') {
   el.className = `small du-source-pull-status text-${tone === 'muted' ? 'muted' : tone}`;
 }
 
+function setDuPullProgress(message, pct, { visible = true } = {}) {
+  const wrap = document.getElementById('duPullProgress');
+  const bar = document.getElementById('duPullProgressBar');
+  const msgEl = document.getElementById('duPullProgressMsg');
+  if (wrap) {
+    if (!visible || (!message && pct == null)) {
+      wrap.hidden = true;
+    } else {
+      wrap.hidden = false;
+      if (bar && pct != null) bar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+      if (msgEl) msgEl.textContent = message || '';
+    }
+  }
+  setSourcePullStatus(message, 'muted');
+  const ingestStatus = document.getElementById('duIngestPostgresStatus');
+  if (ingestStatus && message) ingestStatus.textContent = message;
+}
+
 function setPullButtonsBusy(busy) {
   ['refreshBtnHero', 'refreshBtn', 'duIngestPostgresBtn'].forEach((id) => {
     const btn = document.getElementById(id);
@@ -295,8 +358,17 @@ function formatIngestSummary(data) {
       parts.push(`${label} skipped`);
     } else {
       const inserted = row.inserted ?? 0;
+      const fetched = row.fetched ?? row.prepared ?? null;
       const skipped = row.skipped ?? 0;
-      parts.push(`${label} +${inserted}${skipped ? ` (${skipped} dup)` : ''}`);
+      if (fetched != null && row.likelyFire != null && row.likelyFire !== fetched) {
+        parts.push(`${label} +${inserted}/${row.likelyFire} likely (${fetched} scanned)`);
+      } else if (fetched != null && inserted === 0 && skipped > 0) {
+        parts.push(`${label} ${fetched} ok (${skipped} dup)`);
+      } else if (fetched != null) {
+        parts.push(`${label} +${inserted}/${fetched}`);
+      } else {
+        parts.push(`${label} +${inserted}${skipped ? ` (${skipped} dup)` : ''}`);
+      }
     }
   }
   return parts.join(' · ');
@@ -317,18 +389,17 @@ async function refreshDisasters() {
   ];
   let stepIdx = 0;
 
-  showLoading();
+  showLoadingOverlay(pullSteps[0].msg, pullSteps[0].pct);
   setPullButtonsBusy(true);
-  setSourcePullStatus('Pulling all disaster APIs into Postgres…');
+  setDuPullProgress(pullSteps[0].msg, pullSteps[0].pct);
   setDashboardStatus('Pulling FEMA, FIRMS, USGS, NWS, and NHC — this can take a few minutes.', 'info');
-  updateLoadingStatusDisaster(pullSteps[0].msg, pullSteps[0].pct);
   const subtitle = document.getElementById('loadingIngestSubtitle');
   if (subtitle) subtitle.textContent = 'FEMA · NASA FIRMS · USGS · NWS · NHC';
 
   const progressTimer = setInterval(() => {
     stepIdx = Math.min(stepIdx + 1, pullSteps.length - 1);
     updateLoadingStatusDisaster(pullSteps[stepIdx].msg, pullSteps[stepIdx].pct);
-    setSourcePullStatus(pullSteps[stepIdx].msg);
+    setDuPullProgress(pullSteps[stepIdx].msg, pullSteps[stepIdx].pct);
   }, 12000);
 
   try {
@@ -344,16 +415,39 @@ async function refreshDisasters() {
       throw new Error(err);
     }
 
+    if (refreshJson.data?.fema?.error) {
+      console.warn('FEMA ingest error during combined pull:', refreshJson.data.fema.error);
+    }
+
     const elapsedSec = Math.round((Date.now() - startedAt) / 1000);
     const summary = formatIngestSummary(refreshJson.data);
     updateLoadingStatusDisaster('Reloading grid from database…', 92);
-    setSourcePullStatus(`${summary} (${elapsedSec}s)`);
-    const ingestStatus = document.getElementById('duIngestPostgresStatus');
-    if (ingestStatus) ingestStatus.textContent = `Postgres updated — ${summary}`;
-    setDashboardStatus(`All sources pulled in ${elapsedSec}s. ${summary}`, 'success');
+    setDuPullProgress(`${summary} (${elapsedSec}s)`, 92);
+    const femaFetched = refreshJson.data?.fema?.fetched;
+    const statusMsg = femaFetched != null
+      ? `All sources pulled in ${elapsedSec}s. FEMA: ${femaFetched} declarations. ${summary}`
+      : `All sources pulled in ${elapsedSec}s. ${summary}`;
+    setDashboardStatus(statusMsg, refreshJson.data?.fema?.error ? 'warning' : 'success');
 
-    await loadDisasters();
     await refreshSourceStatsFromApi();
+
+    const firmsResult = refreshJson.data?.firms;
+    if (firmsResult && !firmsResult.error && (firmsResult.prepared > 0 || firmsResult.likelyFire > 0)) {
+      ensureUnifiedSourceSelected('firms');
+    }
+
+    if (typeof duCountyIntelLoaded !== 'undefined' && duCountyIntelLoaded) {
+      await loadDisasters();
+      hideLoadingOverlay();
+      setDuPullProgress('', null, { visible: false });
+    } else {
+      updateLoadingStatusDisaster('Complete!', 100);
+      hideLoadingOverlay();
+      setDuPullProgress('', null, { visible: false });
+      if (!refreshJson.data?.fema?.error) {
+        setDashboardStatus(`${statusMsg} Select a county on the hazard lens to view rows.`, 'success');
+      }
+    }
 
     if (window.duWebCrawlPanel?.refresh) {
       void window.duWebCrawlPanel.refresh();
@@ -361,9 +455,8 @@ async function refreshDisasters() {
   } catch (error) {
     console.error('❌ Pull all sources failed:', error);
     const msg = error.message || 'Pull all sources failed';
+    setDuPullProgress(msg, 100);
     setSourcePullStatus(msg, 'danger');
-    const ingestStatus = document.getElementById('duIngestPostgresStatus');
-    if (ingestStatus) ingestStatus.textContent = msg;
     setDashboardStatus(
       msg.includes('401') || msg.includes('403') || msg.includes('localhost')
         ? `${msg} — refresh requires localhost access or DISASTER_REFRESH_TOKEN on the server.`
@@ -371,10 +464,11 @@ async function refreshDisasters() {
       'danger',
     );
     updateLoadingStatusDisaster('Pull failed — see status banner.', 100);
-    hideLoading();
+    hideLoadingOverlay();
   } finally {
     clearInterval(progressTimer);
     setPullButtonsBusy(false);
+    setTimeout(() => setDuPullProgress('', null, { visible: false }), 4000);
   }
 }
 

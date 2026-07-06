@@ -729,6 +729,49 @@
     margin: 10px 0;
     color: #0b7285;
   }
+
+  .multi-album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .multi-album-card {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: var(--zen-shadow);
+    text-align: left;
+  }
+
+  .multi-album-card--low {
+    border-color: #ffc107;
+    background: rgba(255, 193, 7, 0.08);
+  }
+
+  .multi-album-card__thumb {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    background: #f0f0f0;
+  }
+
+  .multi-album-card__meta {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  .multi-shelf-preview {
+    max-width: 100%;
+    max-height: 520px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+  }
   
   /* Toast Notifications */
   .toast-container {
@@ -931,7 +974,7 @@
         <i class="bi-x"></i>
       </button>
       <h2 class="text-center mb-4"><i class="bi-disc"></i> Album Discovery</h2>
-      <p class="text-center mb-4">Search by band name, album name, or upload an album cover image!</p>
+      <p class="text-center mb-4">Search by band name, album name, upload a cover, or identify up to 5 albums in one shelf photo!</p>
       
       <!-- Search Mode Tabs -->
       <div class="text-center mb-3">
@@ -947,6 +990,9 @@
           </button>
           <button type="button" class="btn btn-outline-success" id="cameraModeBtn" onclick="switchInputMode('camera')">
             <i class="bi-camera"></i> Use Camera
+          </button>
+          <button type="button" class="btn btn-outline-warning" id="multiModeBtn" onclick="switchInputMode('multi')">
+            <i class="bi-collection"></i> Multi (5)
           </button>
         </div>
       </div>
@@ -1095,6 +1141,53 @@
               </div>
             </div>
           </div>
+
+          <!-- Multi-album shelf identify (up to 5) -->
+          <div id="multiSearchMode" class="text-center mb-3" style="display: none;">
+            <div class="mb-3">
+              <label for="multiAlbumImageInput" class="btn btn-lg btn-warning" style="cursor: pointer;">
+                <i class="bi-cloud-upload"></i> Choose Shelf Photo
+                <input type="file" id="multiAlbumImageInput" accept="image/*" style="display: none;" onchange="handleMultiImageUpload(event)">
+              </label>
+            </div>
+            <div id="multiImageStatus" class="camera-status camera-status--info" style="display: inline-flex;">
+              <i class="bi-collection"></i>
+              <span>Lay up to 5 album covers in frame, then upload one shelf photo.</span>
+            </div>
+            <div class="camera-instructions">
+              <strong>Best results when:</strong>
+              <ul>
+                <li>Covers are spread out so each title is readable.</li>
+                <li>Photo is taken from above or straight-on with good light.</li>
+                <li>Up to <strong>5</strong> distinct albums in one shot.</li>
+              </ul>
+            </div>
+            <div id="multiImagePreview" style="display: none; margin-top: 15px;">
+              <div style="background: #f0f0f0; padding: 20px; border-radius: 15px; display: inline-block;">
+                <img id="multiPreviewImg" src="" alt="Shelf preview" class="multi-shelf-preview">
+                <div style="margin-top: 10px; color: #666; font-size: 0.9rem;">
+                  <i class="bi-info-circle"></i> <span id="multiImageDimensions"></span>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-warning btn-lg" onclick="analyzeMultiAlbumImage()">
+                  <i class="bi-magic"></i> Identify Up To 5 Albums
+                </button>
+                <button class="btn btn-secondary" onclick="clearMultiImageUpload()">
+                  <i class="bi-x-circle"></i> Clear & Choose Another
+                </button>
+              </div>
+            </div>
+            <div id="multiIdentifyResults" class="multi-album-grid" style="display: none;"></div>
+            <div id="multiBulkActions" class="mt-3" style="display: none;">
+              <button class="btn btn-success btn-lg" onclick="addSelectedMultiAlbumsToCollection()">
+                <i class="bi-plus-circle"></i> Add Selected to Collection
+              </button>
+              <button class="btn btn-outline-secondary" onclick="clearMultiResults()">
+                <i class="bi-arrow-counterclockwise"></i> Start Over
+              </button>
+            </div>
+          </div>
           
           <!-- KG Widget Results Display -->
           <div id="kgCard" class="mt-3"></div>
@@ -1220,8 +1313,10 @@
 <script>
 let currentArtist = '';
 let voiceEnabled = false;
-let currentInputMode = 'band'; // 'band', 'album', 'image', or 'camera'
+let currentInputMode = 'band'; // 'band', 'album', 'image', 'camera', or 'multi'
 let uploadedImageData = null;
+let multiImageData = null;
+let multiIdentifyResults = [];
 const photoLocation = { lat: null, lng: null, label: '' };
 const deviceLocation = { lat: null, lng: null };
 let addAddressAutocomplete = null;
@@ -1953,7 +2048,7 @@ function handleAlbumKeypress(event) {
   }
 }
 
-// Switch between input modes (band, album, image, camera)
+// Switch between input modes (band, album, image, camera, multi)
 function switchInputMode(mode) {
   // Stop camera if switching away from camera mode
   if (currentInputMode === 'camera' && mode !== 'camera') {
@@ -1967,12 +2062,14 @@ function switchInputMode(mode) {
   document.getElementById('albumModeBtn').className = mode === 'album' ? 'btn btn-primary' : 'btn btn-outline-primary';
   document.getElementById('imageModeBtn').className = mode === 'image' ? 'btn btn-success' : 'btn btn-outline-success';
   document.getElementById('cameraModeBtn').className = mode === 'camera' ? 'btn btn-success' : 'btn btn-outline-success';
+  document.getElementById('multiModeBtn').className = mode === 'multi' ? 'btn btn-warning' : 'btn btn-outline-warning';
   
   // Show/hide appropriate search interfaces
   document.getElementById('bandSearchMode').style.display = mode === 'band' ? 'block' : 'none';
   document.getElementById('albumSearchMode').style.display = mode === 'album' ? 'block' : 'none';
   document.getElementById('imageSearchMode').style.display = mode === 'image' ? 'block' : 'none';
   document.getElementById('cameraSearchMode').style.display = mode === 'camera' ? 'block' : 'none';
+  document.getElementById('multiSearchMode').style.display = mode === 'multi' ? 'block' : 'none';
   
   // Focus on the appropriate input
   if (mode === 'band') {
@@ -2054,6 +2151,213 @@ function clearImageUpload() {
   document.getElementById('albumImageInput').value = '';
   document.getElementById('imagePreview').style.display = 'none';
   document.getElementById('previewImg').src = '';
+}
+
+function updateMultiImageStatus(message, type = 'info') {
+  const statusEl = document.getElementById('multiImageStatus');
+  if (!statusEl) return;
+  statusEl.className = `camera-status camera-status--${type}`;
+  const icon = CAMERA_STATUS_ICONS[type] || CAMERA_STATUS_ICONS.info;
+  statusEl.innerHTML = `<i class="bi ${icon}"></i><span>${message}</span>`;
+}
+
+function handleMultiImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  resetPhotoLocation();
+
+  if (!file.type.startsWith('image/')) {
+    updateMultiImageStatus('Please choose an image file.', 'error');
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    updateMultiImageStatus('Image must be under 10 MB.', 'error');
+    return;
+  }
+
+  extractGpsFromFile(file);
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    multiImageData = e.target.result;
+    clearMultiResults(false);
+
+    const img = document.getElementById('multiPreviewImg');
+    img.src = multiImageData;
+    document.getElementById('multiImagePreview').style.display = 'block';
+    updateMultiImageStatus('Shelf photo ready. Tap Identify Up To 5 Albums.', 'success');
+
+    img.onload = function() {
+      document.getElementById('multiImageDimensions').textContent =
+        `Original: ${img.naturalWidth} × ${img.naturalHeight}px`;
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearMultiImageUpload() {
+  multiImageData = null;
+  resetPhotoLocation();
+  document.getElementById('multiAlbumImageInput').value = '';
+  document.getElementById('multiImagePreview').style.display = 'none';
+  document.getElementById('multiPreviewImg').src = '';
+  clearMultiResults(false);
+  updateMultiImageStatus('Lay up to 5 album covers in frame, then upload one shelf photo.', 'info');
+}
+
+function clearMultiResults(resetImage = true) {
+  multiIdentifyResults = [];
+  const resultsEl = document.getElementById('multiIdentifyResults');
+  const actionsEl = document.getElementById('multiBulkActions');
+  if (resultsEl) {
+    resultsEl.innerHTML = '';
+    resultsEl.style.display = 'none';
+  }
+  if (actionsEl) actionsEl.style.display = 'none';
+  if (resetImage) clearMultiImageUpload();
+}
+
+function escapeMultiHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderMultiIdentifyResults() {
+  const resultsEl = document.getElementById('multiIdentifyResults');
+  const actionsEl = document.getElementById('multiBulkActions');
+  if (!resultsEl) return;
+
+  if (!multiIdentifyResults.length) {
+    resultsEl.style.display = 'none';
+    if (actionsEl) actionsEl.style.display = 'none';
+    return;
+  }
+
+  resultsEl.style.display = 'grid';
+  if (actionsEl) actionsEl.style.display = 'block';
+
+  resultsEl.innerHTML = multiIdentifyResults.map((album, i) => {
+    const low = album.confidence === 'low';
+    const valueHtml = album.estimatedValue
+      ? `<div class="multi-album-card__meta"><i class="bi-cash-coin text-success"></i> Est. $${(parseFloat(album.estimatedValue) / 2).toFixed(2)} <small class="text-muted">(AI÷2)</small></div>`
+      : '';
+    return `
+      <div class="multi-album-card ${low ? 'multi-album-card--low' : ''}">
+        <img src="${multiImageData}" alt="#${album.index}" class="multi-album-card__thumb">
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="checkbox" id="multiSelect${i}" ${album.selected ? 'checked' : ''} onchange="toggleMultiAlbumSelected(${i})">
+          <label class="form-check-label" for="multiSelect${i}"><strong>#${album.index}</strong> ${low ? '<span class="badge bg-warning text-dark">Review</span>' : ''}</label>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small mb-0">Album</label>
+          <input class="form-control form-control-sm" value="${escapeMultiHtml(album.albumName)}" onchange="updateMultiAlbumField(${i}, 'albumName', this.value)">
+        </div>
+        <div class="mb-2">
+          <label class="form-label small mb-0">Artist</label>
+          <input class="form-control form-control-sm" value="${escapeMultiHtml(album.artistName)}" onchange="updateMultiAlbumField(${i}, 'artistName', this.value)">
+        </div>
+        <div class="multi-album-card__meta">${escapeMultiHtml(album.year || 'Unknown')} · ${escapeMultiHtml(album.genre || 'Unknown')}</div>
+        ${valueHtml}
+        <button class="btn btn-sm btn-outline-success mt-2" onclick="showAddModal('${album.artistName.replace(/'/g, "\\'")}', '${album.albumName.replace(/'/g, "\\'")}', '${album.year || ''}', '${album.genre || ''}', '${multiImageData}', null, true, ${album.estimatedValue || 'null'})">
+          <i class="bi-plus-circle"></i> Add This One
+        </button>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleMultiAlbumSelected(index) {
+  if (!multiIdentifyResults[index]) return;
+  const el = document.getElementById(`multiSelect${index}`);
+  multiIdentifyResults[index].selected = el ? el.checked : true;
+}
+
+function updateMultiAlbumField(index, field, value) {
+  if (!multiIdentifyResults[index]) return;
+  multiIdentifyResults[index][field] = value;
+}
+
+async function analyzeMultiAlbumImage() {
+  if (!multiImageData) {
+    updateMultiImageStatus('Upload a shelf photo first.', 'warning');
+    return;
+  }
+
+  document.getElementById('loadingState').style.display = 'block';
+  updateMultiImageStatus('Analyzing shelf photo…', 'info');
+
+  try {
+    const response = await fetch('/api/album-discovery/identify-images', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mode: 'shelf',
+        imageData: multiImageData,
+        maxAlbums: 5,
+      }),
+    });
+
+    const data = await response.json();
+    document.getElementById('loadingState').style.display = 'none';
+
+    if (data.success && Array.isArray(data.albums) && data.albums.length) {
+      multiIdentifyResults = data.albums.map((album) => ({ ...album, selected: true }));
+      renderMultiIdentifyResults();
+      const count = data.albums.length;
+      updateMultiImageStatus(`Identified ${count} album${count === 1 ? '' : 's'}. Review and add to collection.`, 'success');
+      if (data.albums[0]?.artistName) {
+        currentArtist = data.albums[0].artistName;
+        document.getElementById('kgBand').value = data.albums[0].artistName;
+      }
+    } else {
+      updateMultiImageStatus(data.message || 'Could not identify albums in this photo.', 'warning');
+      if (typeof showToast === 'function') {
+        showToast('No albums found', data.message || 'Try a clearer shelf photo with readable covers.', 'warning');
+      }
+    }
+  } catch (error) {
+    console.error('Error analyzing multi album image:', error);
+    document.getElementById('loadingState').style.display = 'none';
+    updateMultiImageStatus('Failed to analyze shelf photo.', 'error');
+  }
+}
+
+async function addSelectedMultiAlbumsToCollection() {
+  const selected = multiIdentifyResults.filter((album) => album.selected);
+  if (!selected.length) {
+    if (typeof showToast === 'function') showToast('Nothing selected', 'Check at least one album to add.', 'warning');
+    return;
+  }
+
+  let added = 0;
+  let skipped = 0;
+  for (const album of selected) {
+    try {
+      await showAddModal(
+        album.artistName,
+        album.albumName,
+        album.year || '',
+        album.genre || '',
+        multiImageData,
+        null,
+        false,
+        album.estimatedValue || null
+      );
+      added += 1;
+    } catch (error) {
+      skipped += 1;
+    }
+  }
+
+  if (typeof showToast === 'function') {
+    showToast('Batch add complete', `Processed ${selected.length} album(s).`, 'success');
+  }
 }
 
 // Start camera for live capture
@@ -2332,6 +2636,8 @@ function addAnotherAlbum() {
   } else if (currentInputMode === 'image') {
     // If in image upload mode, clear and reset
     clearImageUpload();
+  } else if (currentInputMode === 'multi') {
+    clearMultiImageUpload();
   }
 }
 

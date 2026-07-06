@@ -205,6 +205,11 @@ export async function refreshDisasters(req, res) {
       results.fema = { inserted: 0, skipped: 'skipped' };
     }
     results.firms = await ingestFirmsNrt();
+    if (results.firms?.error) {
+      console.warn('⚠️  FIRMS ingest error:', results.firms.error);
+    } else {
+      console.log(`🔥 FIRMS combined pull: ${results.firms.likelyFire ?? 0} likely fires, ${results.firms.inserted ?? 0} inserted`);
+    }
     results.usgs = await ingestUsgsQuakes();
     results.nws = await ingestNwsCap();
     results.nhc = await ingestNhc();
@@ -620,6 +625,34 @@ export async function statsDisasters(req, res) {
   }
 }
 
+/** Per-county event counts for a state (90-day window) — geo picker badges. */
+export async function countySummaryByState(req, res) {
+  try {
+    const state = String(req.query.state || '').trim().toUpperCase();
+    if (!state) {
+      return res.status(400).json({ success: false, error: 'state query parameter is required' });
+    }
+    const pool = getPool();
+    if (!pool) throw new Error('Database not initialized');
+    const sinceIso = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString();
+    const { rows } = await pool.query(
+      `SELECT county_name,
+              COUNT(*)::int AS event_count,
+              array_agg(DISTINCT source) AS sources
+       FROM disasters
+       WHERE UPPER(TRIM(COALESCE(state_abbr, ''))) = $1
+         AND start_time >= $2
+         AND COALESCE(TRIM(county_name), '') <> ''
+       GROUP BY county_name
+       ORDER BY county_name`,
+      [state, sinceIso]
+    );
+    res.json({ success: true, data: { state, counties: rows } });
+  } catch (e) {
+    res.status(500).json({ success: false, error: 'Failed to get county summary', details: e.message });
+  }
+}
+
 export async function exportCsv(req, res) {
   try {
     const pool = getPool();
@@ -681,6 +714,7 @@ export default {
   dailyBriefing,
   webCrawl,
   statsDisasters,
+  countySummaryByState,
   exportCsv,
   geocodeAddress,
 };

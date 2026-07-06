@@ -7,7 +7,7 @@
  */
 
 function clearCameraMarkers() {
-  cameraMarkers.forEach((entry) => entry.marker && entry.marker.setMap(null));
+  cameraMarkers.forEach((entry) => googleAdvancedMarkers.removeMapMarker(entry.marker));
   cameraMarkers = [];
 }
 
@@ -22,11 +22,12 @@ function renderNearbyCamerasUI(cameras, meta) {
   );
   const camerasCard = document.getElementById('duNearbyCamerasCard');
   const camerasIdle = document.getElementById('duNearbyCamerasIdle');
+  const onCamerasTab = document.getElementById('duLoanPanelCamerasTab')?.classList.contains('active');
   if (camerasCard) {
     camerasCard.style.display = '';
-    camerasCard.hidden = false;
+    camerasCard.hidden = !onCamerasTab;
   }
-  if (camerasIdle) camerasIdle.hidden = true;
+  if (camerasIdle) camerasIdle.hidden = onCamerasTab || camerasCard?.style.display === 'none';
   clearCameraMarkers();
   if (map) {
     DisasterCameraFilters.addCameraMarkersToMap(map, cameras, cameraMarkers);
@@ -135,10 +136,19 @@ function refreshNearbyWeatherAlerts() {
 
 function syncDuWorkflowPill(stepNum) {
   const hint = document.getElementById('workflowHint');
-  if (!hint || !stepNum) return;
-  hint.querySelectorAll('li').forEach((li, idx) => {
-    li.classList.toggle('du-workflow-pill-active', idx + 1 === stepNum);
-  });
+  if (hint && stepNum) {
+    hint.querySelectorAll('li').forEach((li, idx) => {
+      li.classList.toggle('du-workflow-pill-active', idx + 1 === stepNum);
+    });
+  }
+  const strip = document.getElementById('workflowStripDesktop');
+  if (strip && stepNum) {
+    strip.querySelectorAll('[data-du-section-step]').forEach((btn) => {
+      const active = Number(btn.getAttribute('data-du-section-step')) === stepNum;
+      btn.classList.toggle('du-workflow-strip-active', active);
+      btn.setAttribute('aria-current', active ? 'step' : 'false');
+    });
+  }
 }
 
 function initDuSectionCards() {
@@ -275,6 +285,10 @@ function hideDuDashboardSectionCard(sectionId) {
 
 function showExclusiveDuDashboardSection(sectionId) {
   const id = String(sectionId || '').replace(/^#/, '').trim();
+  if (duMultiPanelMode) {
+    showDuDashboardSectionCard(id);
+    return;
+  }
   DU_SIDEBAR_SECTION_IDS.forEach((sid) => {
     if (sid !== id) hideDuDashboardSectionCard(sid);
   });
@@ -316,6 +330,60 @@ function showDuAccordionSection(targetId, { exclusive = true } = {}) {
   }
 }
 
+function revealDuCountyIntelPanels(state, county) {
+  duCountyIntelLoaded = true;
+  duMultiPanelMode = true;
+  duSelectedGeoState = state;
+  duSelectedGeoCounty = county;
+
+  $('#stateInput').val(state);
+  $('#countyInput').val(county);
+
+  const geoStage = document.getElementById('duGeoStage');
+  const intelStage = document.getElementById('duIntelStage');
+  const crumb = document.getElementById('duGeoActiveCrumb');
+  if (geoStage) geoStage.classList.add('du-geo-stage--collapsed');
+  if (intelStage) intelStage.classList.remove('du-intel-stage--pending');
+  if (crumb) {
+    crumb.textContent = `${county}, ${state}`;
+    crumb.hidden = false;
+  }
+  document.getElementById('duGeoChangeCountyBtn')?.removeAttribute('hidden');
+
+  const statsRow = document.getElementById('statsRow');
+  statsRow?.classList.remove('du-stats-row--placeholder');
+  statsRow?.classList.remove('du-stats-row--hidden');
+  setDashboardStatus(`Loading hazard intelligence for ${county}, ${state}…`, 'info');
+
+  showDuDashboardSectionCard('collapseCommandDeck');
+  showDuDashboardSectionCard('collapseFilters');
+  showDuDashboardSectionCard('collapseDisasters');
+  showDuDashboardSectionCard('collapseMapYouTube');
+
+  initDisastersMap();
+  syncSourceChipsFromSelect();
+  loadDisasters();
+
+  $('#duLoanScopeMode').val('county');
+  syncDuLoanRadiusControls();
+  loadLoansForDisaster(
+    { state_abbr: state, county_name: county, title: `${county}, ${state}` },
+    null
+  );
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('state', state);
+  url.searchParams.set('county', county);
+  url.searchParams.set('load', '1');
+  window.history.replaceState({}, '', url);
+
+  openDuDashboardSection('collapseDisasters', 3);
+}
+
+window.onDuCountyConfirmed = function onDuCountyConfirmed(state, county) {
+  revealDuCountyIntelPanels(String(state || '').toUpperCase(), String(county || '').trim());
+};
+
 function revealDisasterSelectionPanels() {
   showDuDashboardSectionCard('collapseDisasters');
   showDuDashboardSectionCard('collapseMapYouTube');
@@ -343,10 +411,14 @@ function openDuDashboardSection(targetId, stepNum) {
   };
 
   if (accordionIds.includes(targetId) || sectionCardIds.includes(targetId)) {
-    DU_SIDEBAR_SECTION_IDS.forEach((sid) => {
-      if (sid !== targetId) hideDuDashboardSectionCard(sid);
-    });
-    showDuDashboardSectionCard(targetId);
+    if (duMultiPanelMode) {
+      showDuDashboardSectionCard(targetId);
+    } else {
+      DU_SIDEBAR_SECTION_IDS.forEach((sid) => {
+        if (sid !== targetId) hideDuDashboardSectionCard(sid);
+      });
+      showDuDashboardSectionCard(targetId);
+    }
     document.getElementById(sectionHeadingIds[targetId])?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
@@ -354,12 +426,16 @@ function openDuDashboardSection(targetId, stepNum) {
     document.getElementById('duBottomDock')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  if (targetId === 'duGeoStage') {
+    document.getElementById('duGeoStage')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   setDuSectionPillActive(targetId);
   if (stepNum) syncDuWorkflowPill(Number(stepNum));
 }
 
 function initDuWorkflowPills() {
-  document.querySelectorAll('#workflowHint [data-du-section-target]').forEach((btn) => {
+  document.querySelectorAll('#workflowHint [data-du-section-target], #workflowStripDesktop [data-du-section-target]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       openDuDashboardSection(
@@ -420,7 +496,7 @@ function initDuSectionSidebar() {
   const defaultOpenId = 'collapseDisasters';
   showDuDashboardSectionCard(defaultOpenId);
   updateDuSectionSidebarActiveState(defaultOpenId, true);
-  syncDuWorkflowPill(3);
+  syncDuWorkflowPill(duCountyIntelLoaded ? 3 : 1);
 }
 
 function setDuLoanPanel(panel) {
@@ -431,20 +507,20 @@ function setDuLoanPanel(panel) {
   const isLoans = panel !== 'cameras';
   if (loansPanel) loansPanel.hidden = !isLoans;
   if (camerasPanel) camerasPanel.hidden = isLoans;
-  // Cameras card lives outside the tab panels so it stays visible on the loans tab (stacked layout).
-  if (camerasCard && camerasCard.style.display !== 'none') {
-    camerasCard.hidden = false;
+  if (camerasCard) {
+    const showCard = !isLoans && camerasCard.style.display !== 'none';
+    camerasCard.hidden = !showCard;
   }
-  if (camerasIdle && camerasCard && camerasCard.style.display !== 'none') {
-    camerasIdle.hidden = true;
+  if (camerasIdle) {
+    camerasIdle.hidden = isLoans || (camerasCard && camerasCard.style.display !== 'none');
   }
   document.querySelectorAll('#duLoanPanelPills [data-du-loan-panel]').forEach((btn) => {
     const active = btn.getAttribute('data-du-loan-panel') === (isLoans ? 'loans' : 'cameras');
     btn.classList.toggle('active', active);
     btn.setAttribute('aria-selected', active ? 'true' : 'false');
   });
-  if (!isLoans && camerasCard && camerasCard.style.display !== 'none') {
-    camerasCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  if (!isLoans && camerasPanel) {
+    camerasPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 }
 
@@ -496,10 +572,15 @@ function initDuLoanPillsMenu() {
 function showMockedLoansWorkspace() {
   $('#duMockedLoansIdle').hide();
   $('#encompassLoansCard').show();
-  $('#duNearbyCamerasCard').show();
-  $('#duNearbyCamerasIdle').hide();
   $('#duNearbyWeatherAlertsCard').show();
   $('#duNearbyWeatherAlertsIdle').hide();
+  const camerasCard = document.getElementById('duNearbyCamerasCard');
+  const onCamerasTab = document.getElementById('duLoanPanelCamerasTab')?.classList.contains('active');
+  if (camerasCard) {
+    camerasCard.style.display = '';
+    camerasCard.hidden = !onCamerasTab;
+  }
+  $('#duNearbyCamerasIdle').toggle(!onCamerasTab);
 }
 
 function refreshEncompassLoansGridLayout() {
@@ -743,30 +824,71 @@ function showInsightsIdlePlaceholder() {
 function updateSelectionContextStrip() {
   const el = document.getElementById('selectionContextStrip');
   if (!el || !selectedDisasterObj) {
-    if (el) el.style.display = 'none';
+    if (el) el.hidden = true;
     updateKmlExportButtons();
     return;
   }
   const title = selectedDisasterObj.title || selectedDisasterObj.declarationTitle || 'Selected disaster';
   const state = selectedDisasterObj.state_abbr || '';
   const county = selectedDisasterObj.county_name || '';
+  const location = [county, state].filter(Boolean).join(', ');
   const loanLine = lastLoanFilterMeta
     ? DisasterLoanFilters.formatLoanFilterSubtitle(lastLoanFilterMeta, lastAffectedLoans.length)
     : `${lastAffectedLoans.length} mocked loan(s)`;
   const camLine = lastNearbyCameras.length
-    ? `${lastNearbyCameras.length} fire camera(s) nearby`
-    : 'No nearby cameras in range';
+    ? `${lastNearbyCameras.length} fire camera(s)`
+    : 'No cameras in range';
   const nwsLine = lastNearbyWeatherAlerts.length
-    ? `${lastNearbyWeatherAlerts.length} weather alert(s) nearby`
-    : 'No nearby NWS alerts in range';
-  el.innerHTML = `<strong>${title}</strong> · ${county}${county && state ? ', ' : ''}${state}
-    · ${loanLine} · ${camLine} · ${nwsLine}
-    · <button type="button" class="btn btn-sm btn-info py-0 px-2 align-baseline text-white" onclick="openDisasterHeygenBriefing()" title="Generate a HeyGen avatar briefing for this event"><i class="bi bi-camera-reels"></i> AI video briefing</button>
-    · <button type="button" class="btn btn-sm btn-warning py-0 px-2 align-baseline" onclick="exportCinematicDisasterKml()" title="Google Earth tour with loans, webcams, and disaster mood audio"><i class="bi bi-globe-americas"></i> Google Earth KML</button>
-    · <button type="button" class="btn btn-sm btn-light py-0 px-2 align-baseline" onclick="openProcessorExpert()"><i class="bi bi-robot"></i> Ask processor expert</button>
-    · <a href="disasters-webcams.html" class="alert-link">Hazard webcams</a>
-    · <a href="pipeline-risk-dashboard.html" class="alert-link">FEMA pipeline risk</a>`;
-  el.style.display = 'block';
+    ? `${lastNearbyWeatherAlerts.length} weather alert(s)`
+    : 'No NWS alerts in range';
+
+  el.hidden = false;
+  el.className = 'du-selection-strip alert alert-primary py-2 small mb-3';
+  el.innerHTML = '';
+
+  const summary = document.createElement('div');
+  summary.className = 'du-selection-strip-summary';
+  summary.innerHTML = `<strong class="du-selection-strip-title">${duEscapeHtml(title)}</strong>
+    <span class="du-selection-strip-meta text-muted">${duEscapeHtml(location)} · ${duEscapeHtml(loanLine)} · ${duEscapeHtml(camLine)} · ${duEscapeHtml(nwsLine)}</span>`;
+
+  const actions = document.createElement('div');
+  actions.className = 'du-selection-strip-actions';
+  actions.setAttribute('role', 'group');
+  actions.setAttribute('aria-label', 'Selection actions');
+
+  const primaryActions = [
+    { label: 'AI video briefing', icon: 'bi-camera-reels', className: 'btn-info text-white', onclick: 'openDisasterHeygenBriefing()' },
+    { label: 'Google Earth KML', icon: 'bi-globe-americas', className: 'btn-warning', onclick: 'exportCinematicDisasterKml()' },
+    { label: 'Processor expert', icon: 'bi-robot', className: 'btn-light', onclick: 'openProcessorExpert()' },
+  ];
+  primaryActions.forEach((act) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `btn btn-sm ${act.className} du-selection-strip-btn`;
+    btn.title = act.label;
+    btn.setAttribute('aria-label', act.label);
+    btn.innerHTML = `<i class="bi ${act.icon}" aria-hidden="true"></i><span class="du-selection-strip-btn-label">${act.label}</span>`;
+    btn.addEventListener('click', () => {
+      if (act.onclick === 'openDisasterHeygenBriefing()') openDisasterHeygenBriefing();
+      else if (act.onclick === 'exportCinematicDisasterKml()') exportCinematicDisasterKml();
+      else openProcessorExpert();
+    });
+    actions.appendChild(btn);
+  });
+
+  const overflow = document.createElement('div');
+  overflow.className = 'dropdown du-selection-strip-overflow';
+  overflow.innerHTML = `<button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="More actions">
+    <i class="bi bi-three-dots" aria-hidden="true"></i><span class="du-selection-strip-btn-label">More</span>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><a class="dropdown-item" href="disasters-webcams.html"><i class="bi bi-camera-video me-1"></i>Hazard webcams</a></li>
+    <li><a class="dropdown-item" href="pipeline-risk-dashboard.html"><i class="bi bi-graph-up me-1"></i>FEMA pipeline risk</a></li>
+  </ul>`;
+  actions.appendChild(overflow);
+
+  el.appendChild(summary);
+  el.appendChild(actions);
   updateKmlExportButtons();
 }
 
@@ -1099,12 +1221,15 @@ $(function init() {
   initDisastersGrid();
   initEncompassLoansGrid();
   initializeDuLoanFilterControls();
-  initDisastersMap();
   syncSourceChipsFromSelect();
-  $('#sourceInput').on('change', syncSourceChipsFromSelect);
-  function onApplyFiltersClick() {
+  $('#sourceInput').on('change', () => {
     syncSourceChipsFromSelect();
-    loadDisasters();
+    scheduleFilterApply();
+  });
+  $('#eventInput').on('change', scheduleFilterApply);
+  $('#stateInput, #countyInput').on('change', scheduleFilterApply);
+  function onApplyFiltersClick() {
+    applyFiltersNow();
   }
   $('#applyBtn, .du-apply-filters-btn').on('click', function() {
     onApplyFiltersClick();
@@ -1141,9 +1266,11 @@ $(function init() {
     }
   });
   loadYouTubeBrowserApiKey();
-  loadDisasters();
-  // Load all encompass loans on map on page load
-  loadAllLoansOnMap();
+  if (typeof initDuGeoPicker === 'function') {
+    initDuGeoPicker();
+  } else {
+    hideLoading();
+  }
 });
 
 $(document).on('click', '.camera-view-btn', function(e) {

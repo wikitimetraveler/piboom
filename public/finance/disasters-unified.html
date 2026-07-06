@@ -23,6 +23,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet" crossorigin="anonymous">
     <link rel="stylesheet" href="/shared/design-tokens.css" />
     <link href="../shared/modern-navbar.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
     <link rel="stylesheet" href="/finance/css/disasters-unified.css" />
     <link rel="stylesheet" href="/shared/css/section-sidebar-shell.css" />
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
@@ -42,7 +43,7 @@
       <div class="loading-container">
         <div class="loading-icon-ring"><i class="bi bi-globe-americas" aria-hidden="true"></i></div>
         <div class="loading-title">Unified Disaster Intelligence</div>
-        <div class="loading-subtitle" id="loadingIngestSubtitle">Ingesting FEMA · NASA FIRMS · USGS · NWS · NHC</div>
+        <div class="loading-subtitle" id="loadingIngestSubtitle">Loading hazard lens map…</div>
         <div class="data-stream" aria-hidden="true">
           <span class="data-icon" style="--delay: 0"><i class="bi bi-shield-check"></i></span>
           <span class="data-icon" style="--delay: 1"><i class="bi bi-fire"></i></span>
@@ -53,7 +54,7 @@
         <div class="loading-progress-disaster">
           <div class="loading-progress-bar-disaster" id="loadingProgressBarDisaster"></div>
         </div>
-        <div class="loading-text" id="loadingStatusDisaster">Initializing multi-source monitoring…</div>
+        <div class="loading-text" id="loadingStatusDisaster">Choose a state and county to begin…</div>
         <div class="circuit-container" aria-hidden="true">
           <div class="circuit-node" style="--delay: 0"></div>
           <div class="circuit-node" style="--delay: 1"></div>
@@ -73,12 +74,19 @@
             <p class="du-hero-kicker mb-1">90-day window · Multi-source hazard intelligence</p>
             <h1 class="mb-0"><i class="bi-shield-exclamation me-2"></i>Unified Disasters</h1>
             <ul class="du-workflow-pills" id="workflowHint" aria-label="Workflow steps">
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseCommandDeck" data-du-section-step="1"><span class="step-num">1</span> Enable sources</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseRiskIntel" data-du-section-step="2"><span class="step-num">2</span> Review hotspots</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseDisasters" data-du-section-step="3"><span class="step-num">3</span> Select event</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> Pick state</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duGeoStage" data-du-section-step="2"><span class="step-num">2</span> Pick county</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseDisasters" data-du-section-step="3"><span class="step-num">3</span> Review events</button></li>
               <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseLoans" data-du-section-step="4"><span class="step-num">4</span> Loans &amp; cameras</button></li>
               <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duBottomDock" data-du-section-step="5"><span class="step-num">5</span> KML or AI expert</button></li>
             </ul>
+            <nav class="du-workflow-strip" id="workflowStripDesktop" aria-label="Workflow steps">
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> State</button>
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duGeoStage" data-du-section-step="2"><span class="step-num">2</span> County</button>
+              <button type="button" class="du-workflow-strip-btn du-workflow-strip-active" data-du-section-target="collapseDisasters" data-du-section-step="3" aria-current="step"><span class="step-num">3</span> Events</button>
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="collapseLoans" data-du-section-step="4"><span class="step-num">4</span> Loans</button>
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duBottomDock" data-du-section-step="5"><span class="step-num">5</span> Tools</button>
+            </nav>
           </div>
           <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
             <a class="btn btn-light btn-sm" href="/finance/index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
@@ -99,12 +107,12 @@
           </div>
           <p class="du-daily-briefing-status small text-white-50 mb-0 mt-2" id="duDailyBriefingStatus" role="status" aria-live="polite"></p>
         </div>
-        <div class="row g-3 du-stats-row" id="statsRow">
+        <div class="row g-3 du-stats-row du-stats-row--placeholder" id="statsRow">
           <div class="col-md-3 col-6">
             <div class="du-stat-card du-stat-card--total">
               <div class="du-stat-icon"><i class="bi-layers"></i></div>
               <div>
-                <div class="stat-number" id="totalDisasters">0</div>
+                <div class="stat-number" id="totalDisasters">—</div>
                 <div class="stat-label">Total events</div>
               </div>
             </div>
@@ -113,7 +121,7 @@
             <div class="du-stat-card du-stat-card--fire">
               <div class="du-stat-icon"><i class="bi-fire"></i></div>
               <div>
-                <div class="stat-number" id="activeFires">0</div>
+                <div class="stat-number" id="activeFires">—</div>
                 <div class="stat-label">Active fires</div>
               </div>
             </div>
@@ -122,7 +130,7 @@
             <div class="du-stat-card du-stat-card--quake">
               <div class="du-stat-icon"><i class="bi-geo-alt"></i></div>
               <div>
-                <div class="stat-number" id="earthquakes">0</div>
+                <div class="stat-number" id="earthquakes">—</div>
                 <div class="stat-label">Earthquakes</div>
               </div>
             </div>
@@ -131,7 +139,7 @@
             <div class="du-stat-card du-stat-card--counties">
               <div class="du-stat-icon"><i class="bi-map"></i></div>
               <div>
-                <div class="stat-number" id="affectedCounties">0</div>
+                <div class="stat-number" id="affectedCounties">—</div>
                 <div class="stat-label">Affected counties</div>
               </div>
             </div>
@@ -142,6 +150,12 @@
 
     <div class="container-fluid du-main py-2 px-4">
       <div id="dashboardStatusBanner" class="alert alert-warning dashboard-status-banner mb-2" role="alert"></div>
+      <div id="duPullProgress" class="du-pull-progress mb-2" hidden role="status" aria-live="polite">
+        <div class="du-pull-progress-track" aria-hidden="true">
+          <div class="du-pull-progress-bar" id="duPullProgressBar"></div>
+        </div>
+        <span class="du-pull-progress-msg small text-muted" id="duPullProgressMsg"></span>
+      </div>
       <div id="sourceHealthLine" class="mb-2" aria-live="polite"></div>
 
       <div class="unit-tests-layout">
@@ -160,6 +174,54 @@
         </nav>
 
         <div class="section-content-area">
+      <!-- Hazard lens: Leaflet state/county picker (Engine A) -->
+      <section class="card du-geo-stage mb-4" id="duGeoStage" aria-label="State and county hazard lens">
+        <div class="card-header du-geo-stage-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <div>
+            <strong><i class="bi bi-binoculars me-1"></i> Hazard lens</strong>
+            <span class="text-muted small d-block">Choose a state and county — disaster data loads only after you confirm</span>
+          </div>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="badge text-bg-primary du-geo-active-crumb" id="duGeoActiveCrumb" hidden></span>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="duGeoChangeCountyBtn" hidden>
+              <i class="bi bi-arrow-repeat"></i> Change area
+            </button>
+          </div>
+        </div>
+        <div class="card-body du-geo-stage-body">
+          <nav class="du-geo-breadcrumb mb-2" id="duGeoBreadcrumb" aria-label="Location"></nav>
+          <p class="du-geo-picker-status small mb-2 text-muted" id="duGeoPickerStatus" role="status"></p>
+          <div class="row g-3">
+            <div class="col-lg-8">
+              <div id="duGeoPickerMap" class="du-geo-picker-map" role="application" aria-label="United States map"></div>
+              <div class="du-geo-legend small text-muted mt-2" aria-label="Event density legend">
+                <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--none"></span> None</span>
+                <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--low"></span> Low</span>
+                <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--medium"></span> Moderate</span>
+                <span class="du-geo-legend-item"><span class="du-geo-legend-swatch du-geo-legend--high"></span> High</span>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="du-geo-rail">
+                <label class="form-label small fw-semibold" for="duGeoStateSelect">State</label>
+                <select id="duGeoStateSelect" class="form-select form-select-sm mb-3" aria-label="Select US state">
+                  <option value="">— Select state —</option>
+                </select>
+                <div id="duGeoCountyPanel" class="d-none">
+                  <label class="form-label small fw-semibold" for="duGeoCountySearch">Counties</label>
+                  <input type="search" id="duGeoCountySearch" class="form-control form-control-sm mb-2" placeholder="Search counties…" autocomplete="off">
+                  <div class="du-geo-county-list" id="duGeoCountyList" role="listbox" aria-label="Counties in selected state"></div>
+                </div>
+                <button type="button" class="btn btn-primary w-100 mt-3" id="duGeoLoadBtn" disabled>
+                  <i class="bi bi-radar"></i> Select a county to load intelligence
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="duIntelStage" class="du-intel-stage du-intel-stage--pending">
       <div class="card du-web-crawl-panel mb-3" id="duWebCrawlPanel" aria-label="Live web hazard headlines">
         <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
           <button
@@ -196,7 +258,7 @@
           </div>
         </div>
       </div>
-      <div id="selectionContextStrip" class="alert alert-primary py-2 small mb-3" style="display: none;" role="status"></div>
+      <div id="selectionContextStrip" class="du-selection-strip alert alert-primary py-2 small mb-3" hidden role="status" aria-label="Selected disaster context"></div>
 
       <div id="duNwsGridFilterStrip" class="alert alert-info py-2 small mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="status" hidden>
         <span class="du-nws-filter-strip-text">
@@ -268,7 +330,7 @@
             <button type="button" class="btn btn-outline-warning btn-sm" id="duExportCinematicKmlToolbarBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
               <i class="bi bi-globe-americas"></i> Google Earth KML
             </button>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn"><i class="bi-funnel"></i> Apply filters</button>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn" title="Reload grid immediately (sources also auto-apply)"><i class="bi-arrow-repeat"></i> Reload now</button>
             <button type="button" class="btn btn-primary btn-sm" id="refreshBtn" title="Pull FEMA, NASA FIRMS, USGS, NWS, and NHC into Postgres — may take 1–3 minutes">
               <i class="bi bi-cloud-download"></i> Pull all sources
             </button>
@@ -344,7 +406,7 @@
             <div class="accordion-body du-filters-body">
               <p class="du-filters-source-hint mb-3">
                 <i class="bi bi-info-circle me-1"></i>
-                Source chips select providers; click <strong>Apply filters</strong> on the command deck (or below) to reload. Refine state, county, source, and event here.
+                Source chips and multiselects <strong>auto-reload</strong> the grid when changed. Refine state, county, source, and event type here.
               </p>
               <div class="row g-3 align-items-start">
                 <div class="col-md-3 col-sm-6">
@@ -382,7 +444,7 @@
                     <label class="form-check-label small" for="skipFemaCheck">Skip FEMA on refresh</label>
                   </div>
                   <a class="btn btn-outline-secondary btn-sm" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
-                  <button type="button" class="btn btn-outline-primary btn-sm du-apply-filters-btn"><i class="bi-funnel"></i> Apply filters</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm du-apply-filters-btn" title="Reload grid immediately"><i class="bi-arrow-repeat"></i> Reload now</button>
                 </div>
               </div>
             </div>
@@ -417,7 +479,9 @@
                     </div>
                     <input type="text" id="disastersQuickFilter" class="form-control form-control-sm" style="max-width: 280px;" placeholder="Quick filter (e.g. CA, wildfire, USGS)…" aria-label="Quick filter disasters grid">
                   </div>
-                  <div id="disastersGrid" class="ag-theme-alpine"></div>
+                  <div class="du-grid-shell position-relative">
+                    <div id="disastersGrid" class="ag-theme-alpine"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -565,18 +629,17 @@
                   <div id="encompassLoansGrid" class="ag-theme-alpine"></div>
                 </div>
                 <div id="duLoanPanelCameras" class="du-loan-panel" role="tabpanel" aria-labelledby="duLoanPanelCamerasTab" hidden>
-                  <p class="text-muted small mb-0">Nearby hazard webcams for the current disaster or loan selection.</p>
-                </div>
-                <div class="card mt-3 du-data-panel" id="duNearbyCamerasCard" style="display: none;">
-                  <div class="card-header py-2">
-                    <strong class="small"><i class="bi bi-camera-video"></i> Nearby fire cameras</strong>
-                    <small class="text-muted d-block" id="duNearbyCamerasSubtitle">Hazard webcams near selection</small>
+                  <div class="card du-data-panel" id="duNearbyCamerasCard" style="display: none;">
+                    <div class="card-header py-2">
+                      <strong class="small"><i class="bi bi-camera-video"></i> Nearby fire cameras</strong>
+                      <small class="text-muted d-block" id="duNearbyCamerasSubtitle">Hazard webcams near selection</small>
+                    </div>
+                    <div class="card-body py-2" id="duNearbyCamerasList">
+                      <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
+                    </div>
                   </div>
-                  <div class="card-body py-2" id="duNearbyCamerasList">
-                    <p class="text-muted small mb-0">Select a disaster or loan to load cameras.</p>
-                  </div>
+                  <p class="text-muted small mb-0 mt-2" id="duNearbyCamerasIdle">Select a disaster or mocked loan to load cameras.</p>
                 </div>
-                <p class="text-muted small mb-0 mt-2" id="duNearbyCamerasIdle">Select a disaster or mocked loan to load cameras.</p>
                 <div class="card mt-3 du-data-panel" id="duNearbyWeatherAlertsCard" style="display: none;">
                   <div class="card-header py-2">
                     <strong class="small"><i class="bi bi-cloud-lightning"></i> Nearby weather alerts</strong>
@@ -594,10 +657,12 @@
         </div>
       </div>
 
-        </div>
-      </div>
+      </div><!-- /duIntelStage -->
 
-    </div>
+        </div><!-- /section-content-area -->
+      </div><!-- /unit-tests-layout -->
+
+    </div><!-- /container-fluid du-main -->
 
     <!-- Bottom dock: data model, impact graph video, HeyGen card (see docs/UNIFIED_DISASTERS_DB_SCHEMA.md) -->
     <div class="du-bottom-dock" id="duBottomDock">
@@ -883,12 +948,17 @@
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@32.3.3/dist/ag-grid-community.min.noStyle.js"></script>
     <script src="../shared/modern-navbar.js"></script>
     <script src="/shared/map-icons.js"></script>
+    <script src="/shared/google-advanced-markers.js"></script>
     <script src="/finance/js/disaster-loan-filters.js"></script>
     <script src="/finance/js/disaster-camera-filters.js"></script>
     <script src="/finance/js/disaster-weather-alert-filters.js"></script>
     <script src="/finance/js/hazard-webcam-viewer.js"></script>
     <script type="module" src="/shared/disaster-kml-export.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
     <script src="/finance/js/disasters-unified/core.js"></script>
+    <script src="/finance/js/disasters-unified/geo-data.js"></script>
+    <script src="/finance/js/disasters-unified/geo-picker.js"></script>
     <script src="/finance/js/disasters-unified/ingest.js"></script>
     <script src="/finance/js/disasters-unified/grid.js"></script>
     <script src="/finance/js/disasters-unified/map.js"></script>

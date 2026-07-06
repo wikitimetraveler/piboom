@@ -15,8 +15,22 @@
   "ctaLabel": "Open Music Research",
   "ctaHref": "/music/music-research.html",
   "relatedLinks": [
-    { "label": "Time Machine", "href": "/music/music-time-machine.html" },
-    { "label": "Pilgrimage Atlas", "href": "/music/music-pilgrimage-atlas.html" },
-    { "label": "Album Discovery", "href": "/music/album-discovery.html" }
-  ]
+    {
+      "label": "Time Machine",
+      "href": "/music/music-time-machine.html"
+    },
+    {
+      "label": "Pilgrimage Atlas",
+      "href": "/music/music-pilgrimage-atlas.html"
+    },
+    {
+      "label": "Album Discovery",
+      "href": "/music/album-discovery.html"
+    }
+  ],
+  "heygenAvatarId": "f6a9e6cdffe14958b516b6c18759c2d9",
+  "heygenVideoIdShort": "78bc686d8f3e4efebcf95f7b93cc7fcf",
+  "heygenVideoUrlShort": "/music/assets/video/music-research-heygen-short.mp4",
+  "generatedAt": "2026-06-30T06:41:50.654Z",
+  "heygenVideoLocalShort": "/music/assets/video/music-research-heygen-short.mp4"
 }

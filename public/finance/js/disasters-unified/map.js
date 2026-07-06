@@ -19,9 +19,12 @@ function focusMapOnDisaster(disasterObj) {
   }
 
   if (entry) {
-    map.setCenter(entry.marker.getPosition());
-    map.setZoom(Math.max(map.getZoom() || 8, 10));
-    entry.info.open(map, entry.marker);
+    const pos = googleAdvancedMarkers.getMapMarkerPosition(entry.marker);
+    if (pos) {
+      map.setCenter(pos);
+      map.setZoom(Math.max(map.getZoom() || 8, 10));
+    }
+    googleAdvancedMarkers.openMapInfoWindow(entry.info, map, entry.marker);
     activeDisasterInfoWindow = entry.info;
     return;
   }
@@ -41,7 +44,8 @@ function initDisastersMap() {
     map = new google.maps.Map(mapEl, {
       zoom: 4,
       center: { lat: 39.8, lng: -98.6 },
-      mapTypeId: 'satellite'
+      mapTypeId: 'satellite',
+      mapId: googleAdvancedMarkers.DEFAULT_MAP_ID,
     });
     if (lastLoadedDisasterRows.length) {
       renderMap(lastLoadedDisasterRows);
@@ -73,7 +77,7 @@ function initDisastersMap() {
     window.__duInitGoogleMap = bootMap;
     const script = document.createElement('script');
     script.dataset.duGoogleMaps = '1';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=places&loading=async&callback=__duInitGoogleMap`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&libraries=${googleAdvancedMarkers.MAP_LIBRARIES}&loading=async&callback=__duInitGoogleMap`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
@@ -100,7 +104,7 @@ function renderMap(rows) {
     activeDisasterInfoWindow.close();
     activeDisasterInfoWindow = null;
   }
-  markers.forEach((m) => m.setMap(null));
+  markers.forEach((m) => googleAdvancedMarkers.removeMapMarker(m));
   markers = [];
   disasterMarkerEntries = [];
   const bounds = new google.maps.LatLngBounds();
@@ -130,14 +134,14 @@ function renderMap(rows) {
         ? window.mapIcons.getDisasterIconForMarker('camera', r.source)
         : getDisasterMarkerIconForRisk(r, allRows, riskScore);
       let cameraDataKey = null;
-      const marker = new google.maps.Marker({
+      const marker = googleAdvancedMarkers.createMapMarker({
         position: pos,
         map,
         title: isCameraMarker
           ? (r.title || 'Camera')
           : `${r.title || r.event_type} (risk ${riskScore.toFixed(1)})`,
         icon: disasterIcon,
-        zIndex: isCameraMarker ? 50 : Math.round(100 + riskScore * 10)
+        zIndex: isCameraMarker ? 50 : Math.round(100 + riskScore * 10),
       });
       if (isCameraMarker) {
         cameraDataKey = `camera_${cameraIndex++}`;
@@ -155,7 +159,7 @@ function renderMap(rows) {
       });
       marker.addListener('click', () => {
         if (activeDisasterInfoWindow) activeDisasterInfoWindow.close();
-        info.open(map, marker);
+        googleAdvancedMarkers.openMapInfoWindow(info, map, marker);
         activeDisasterInfoWindow = info;
         if (!isCameraMarker) {
           selectDisaster([r.source, r.event_type, r.county_name, r.state_abbr, r.start_time, r.end_time, r.title], r);
@@ -222,7 +226,7 @@ async function loadAllLoansOnMap() {
 
 function updateMapWithLoans(loans) {
   if (!map) return;
-  loanMarkers.forEach(m => m.marker && m.marker.setMap(null));
+  loanMarkers.forEach((m) => googleAdvancedMarkers.removeMapMarker(m.marker));
   loanMarkers = [];
   
   if (!loans) return;
@@ -232,12 +236,12 @@ function updateMapWithLoans(loans) {
       const loanIcon = window.mapIcons && window.mapIcons.getLoanIconForMarker
         ? window.mapIcons.getLoanIconForMarker(loan.disaster_risk_score)
         : { url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png', scaledSize: new google.maps.Size(24, 24) };
-      const marker = new google.maps.Marker({
+      const marker = googleAdvancedMarkers.createMapMarker({
         position: { lat: parseFloat(loan.latitude), lng: parseFloat(loan.longitude) },
-        map: map,
+        map,
         title: `Loan ${loan.loan_number}`,
         icon: loanIcon,
-        zIndex: 10
+        zIndex: 10,
       });
       const infoWindow = new google.maps.InfoWindow({
         content: `<div>
@@ -248,7 +252,7 @@ function updateMapWithLoans(loans) {
           <div>Risk: ${getRiskLevel(loan.disaster_risk_score)}</div>
         </div>`
       });
-      marker.addListener('click', () => infoWindow.open(map, marker));
+      marker.addListener('click', () => googleAdvancedMarkers.openMapInfoWindow(infoWindow, map, marker));
       loanMarkers.push({ loanId: loan.id, marker });
     }
   });

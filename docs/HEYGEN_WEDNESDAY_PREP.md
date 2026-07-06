@@ -25,7 +25,7 @@ Cached MP4s play offline after first load — no HeyGen API at demo time.
 ### Before the session
 
 - [ ] **Disasters** — MP4 already at `public/finance/assets/disaster-heygen-demo.mp4` (regenerate only if you want a new take)
-- [ ] **Music** — paste booth script from [`MUSIC_RESEARCH_HEYGEN_SCRIPT.md`](MUSIC_RESEARCH_HEYGEN_SCRIPT.md) into HeyGen; save MP4 to `public/music/assets/video/music-research-heygen-short.mp4` **or** run `node scripts/tools/generate-music-heygen-demo.mjs --force --direct --cache-local`
+- [x] **Music** — cached at `public/music/assets/video/music-research-heygen-short.mp4` (see [`HEYGEN_OFFICE_HOURS_PREP.md`](HEYGEN_OFFICE_HOURS_PREP.md))
 - [ ] Reuse avatar/voice IDs from `data/disaster-heygen-demo.json` (business) — copy into music catalog if you want one presenter voice
 - [ ] Test both popup URLs in browser
 

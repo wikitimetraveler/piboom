@@ -41,7 +41,8 @@
     "generate:lane-family-guide-card": "node scripts/tools/generate-lane-family-guide-card.mjs",
     "generate:lane-family-guide-video": "node scripts/tools/generate-lane-family-guide-video.mjs --short --force --cache-local",
     "smoke:heygen-lane": "node scripts/tools/generate-lane-heygen-line.mjs --person jonathan-homer-lane --photo --short --smoke --force --direct --cache-local",
-    "migrate:lane-json-postgres": "node scripts/migrate-lane-json-to-postgres.mjs"
+    "migrate:lane-json-postgres": "node scripts/migrate-lane-json-to-postgres.mjs",
+    "build:us-geo": "node scripts/tools/build-us-geo-assets.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",
@@ -76,6 +77,7 @@
     "cross-env": "^10.1.0",
     "jest": "^30.2.0",
     "sharp": "^0.34.5",
+    "topojson-client": "^3.1.0",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
   },

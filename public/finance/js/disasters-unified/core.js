@@ -35,6 +35,52 @@ var lastLoadedDisasterRows = [];
 var activeHotspotKey = null;
 var activeHotspot = null;
 var heygenStudio = null;
+var duCountyIntelLoaded = false;
+var duSelectedGeoState = null;
+var duSelectedGeoCounty = null;
+var duMultiPanelMode = false;
+var duLoadDisastersGeneration = 0;
+var duFilterApplyTimer = null;
+var DU_FILTER_APPLY_DEBOUNCE_MS = 400;
+
+function duEscapeHtml(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function showLoadingOverlay(message, progress) {
+  const el = document.getElementById('roadRunnerLoading');
+  if (!el) return;
+  el.classList.remove('hidden');
+  el.setAttribute('aria-busy', 'true');
+  if (message != null) updateLoadingStatusDisaster(message, progress ?? 0);
+}
+
+function hideLoadingOverlay() {
+  const el = document.getElementById('roadRunnerLoading');
+  if (!el) return;
+  setTimeout(() => {
+    el.classList.add('hidden');
+    el.setAttribute('aria-busy', 'false');
+  }, 300);
+}
+
+function setDuInlineLoading(active, targets) {
+  const ids = targets || ['disastersGrid', 'statsRow', 'sourceHealthLine'];
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('du-inline-loading', !!active);
+    if (id === 'disastersGrid') {
+      el.closest('.du-grid-shell')?.classList.toggle('du-inline-loading', !!active);
+    }
+    if (active) el.setAttribute('aria-busy', 'true');
+    else el.removeAttribute('aria-busy');
+  });
+}
 
 /** Sidebar section collapse ids (section-sidebar-shell) */
 var DU_SIDEBAR_SECTION_IDS = [
@@ -51,14 +97,11 @@ var cameraIndex = 0;
 
 
 function showLoading() {
-  $('#roadRunnerLoading').removeClass('hidden');
-  updateLoadingStatusDisaster('Initializing disaster monitoring...', 0);
+  showLoadingOverlay('Initializing disaster monitoring...', 0);
 }
 
 function hideLoading() {
-  setTimeout(() => {
-    $('#roadRunnerLoading').addClass('hidden');
-  }, 500);
+  hideLoadingOverlay();
 }
 
 function setDashboardStatus(message, variant = 'warning') {

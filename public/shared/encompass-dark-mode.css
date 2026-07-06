@@ -797,3 +797,93 @@
 .encompass-dark-mode .du-filters-body .form-label {
   color: #e5e7eb;
 }
+
+/* Extended du-page surfaces */
+.encompass-dark-mode .du-hero {
+  background: linear-gradient(135deg, #1e3a4a 0%, #1e293b 45%, #0f172a 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+}
+.encompass-dark-mode .du-workflow-strip-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #e5e7eb;
+}
+.encompass-dark-mode .du-workflow-strip-btn.du-workflow-strip-active {
+  background: rgba(74, 144, 164, 0.35);
+  border-color: rgba(107, 168, 184, 0.55);
+}
+.encompass-dark-mode .du-geo-stage,
+.encompass-dark-mode .du-geo-rail {
+  background: #374151;
+  border-color: #4b5563;
+}
+.encompass-dark-mode .du-geo-picker-map {
+  border-color: #4b5563;
+}
+.encompass-dark-mode .du-geo-county-row {
+  background: #2d3748;
+  border-color: #4b5563;
+  color: #e5e7eb;
+}
+.encompass-dark-mode .du-geo-county-row:hover {
+  background: #374151;
+}
+.encompass-dark-mode .du-geo-county-row--active {
+  border-color: var(--zen-primary-light, #6ba8b8);
+  background: rgba(74, 144, 164, 0.2);
+}
+.encompass-dark-mode .du-selection-strip {
+  background: #1e3a4a;
+  border-color: rgba(107, 168, 184, 0.45);
+  color: #e0f2fe;
+}
+.encompass-dark-mode .du-selection-strip .text-muted {
+  color: #94a3b8 !important;
+}
+.encompass-dark-mode .du-pull-progress {
+  background: rgba(74, 144, 164, 0.12);
+  border-color: rgba(107, 168, 184, 0.3);
+}
+.encompass-dark-mode .du-bottom-dock {
+  background: #1f2937;
+  border-color: #4b5563;
+}
+.encompass-dark-mode .du-schema-sheet-panel {
+  background: #374151;
+  color: #f3f4f6;
+}
+.encompass-dark-mode .du-web-crawl-panel,
+.encompass-dark-mode #aiInsightsIdle {
+  background: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #e5e7eb !important;
+}
+.encompass-dark-mode #roadRunnerLoading {
+  background: linear-gradient(145deg, #0f172a 0%, #1e293b 45%, #334155 100%);
+}
+.encompass-dark-mode .du-data-panel > .card-header {
+  background: linear-gradient(135deg, #2d4a56 0%, #1e3a4a 100%) !important;
+  color: #f3f4f6 !important;
+}
+.encompass-dark-mode .du-inline-loading::after {
+  background: linear-gradient(
+    90deg,
+    rgba(55, 65, 81, 0) 0%,
+    rgba(75, 85, 99, 0.65) 50%,
+    rgba(55, 65, 81, 0) 100%
+  );
+}
+.encompass-dark-mode #disastersGrid.ag-theme-alpine,
+.encompass-dark-mode #encompassLoansGrid.ag-theme-alpine {
+  --ag-background-color: #374151;
+  --ag-foreground-color: #f3f4f6;
+  --ag-header-background-color: #4b5563;
+  --ag-header-foreground-color: #f9fafb;
+  --ag-odd-row-background-color: #374151;
+  --ag-row-hover-color: #4b5563;
+  --ag-border-color: #6b7280;
+  --ag-selected-row-background-color: rgba(74, 144, 164, 0.25);
+}
+.encompass-dark-mode #disastersGrid .ag-row.ag-row-selected {
+  background-color: rgba(74, 144, 164, 0.22) !important;
+}
