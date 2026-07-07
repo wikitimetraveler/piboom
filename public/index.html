@@ -4,67 +4,78 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>David Lane — Encompass Admin/Developer</title>
-<meta name="description" content="David Lane — AI agents and full-stack apps for Encompass integration, loan tooling, and Unified Disaster Monitoring."/>
+<title>David Lane — Encompass Admin/Developer · LOS AI Labs</title>
+<meta name="description" content="David Lane — Encompass admin/developer for ICE integrations, loan pipeline tooling, and AI on the mortgage stack. Live demos: unit tests, disasters, processor assignment."/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/shared/design-tokens.css"/>
-<link rel="stylesheet" href="/shared/css/ice-landing.css"/>
+<link rel="stylesheet" href="/shared/css/portfolio-shell.css"/>
 <script src="/shared/site-portfolio.js"></script>
 </head>
-<body class="ice-landing" data-ice-page="home">
+<body class="portfolio-page" data-portfolio-page="home">
 
-<div class="ice-landing__sky" aria-hidden="true"></div>
-<div class="ice-landing__ice-wrap" aria-hidden="true"><canvas id="iceCanvas"></canvas></div>
-<div class="ice-landing__horizon" aria-hidden="true"></div>
-
-<header class="ice-topbar ice-topbar--home">
-  <span class="ice-topbar__meta">Encompass Admin/Developer</span>
+<header class="portfolio-header">
+  <a class="portfolio-brand" href="/">
+    <span class="portfolio-brand__name">David Lane</span>
+    <span class="portfolio-brand__sub">LOS AI Labs</span>
+  </a>
+  <nav class="portfolio-nav" id="portfolioNav" aria-label="Primary"></nav>
+  <div class="portfolio-header__actions">
+    <button type="button" class="portfolio-theme-btn" id="portfolioThemeToggle" aria-label="Toggle theme">AUTO</button>
+  </div>
 </header>
 
-<main class="ice-landing__main">
-  <section class="ice-panel ice-panel--hero-card">
-    <h1 class="ice-title ice-title--calligraphy" data-easter-egg data-ice-write>David Lane</h1>
-    <div class="ice-scroll-reel" aria-label="Focus areas">
-      <div class="ice-scroll-reel__mask">
-        <div class="ice-scroll-reel__track" id="iceRoleTrack">
-          <p class="ice-scroll-line" data-ice-write>Encompass Admin/Developer</p>
-          <p class="ice-scroll-line">AI Assisted Development And Tooling</p>
-          <p class="ice-scroll-line">Real Time Disaster Reporting</p>
-          <p class="ice-scroll-line" aria-hidden="true">Encompass Admin/Developer</p>
-          <p class="ice-scroll-line" aria-hidden="true">AI Assisted Development And Tooling</p>
-          <p class="ice-scroll-line" aria-hidden="true">Real Time Disaster Reporting</p>
-        </div>
-      </div>
+<main class="portfolio-main">
+  <section class="portfolio-hero" aria-labelledby="portfolioHeroTitle">
+    <p class="portfolio-hero__role">Encompass Admin / Developer</p>
+    <h1 id="portfolioHeroTitle" class="portfolio-hero__title">ICE integrations, loan ops tooling, and AI on the mortgage stack.</h1>
+    <p class="portfolio-hero__lead">I build production Node.js platforms for Encompass admins — custom field testing, pipeline automation, hazard intelligence, and LangChain assistants grounded in ICE knowledge.</p>
+    <div class="portfolio-hero__cta">
+      <a class="portfolio-btn portfolio-btn--primary" href="/work.html">View Encompass work <i class="bi bi-briefcase" aria-hidden="true"></i></a>
+      <a class="portfolio-btn portfolio-btn--ghost" href="/contact.html">Contact <i class="bi bi-envelope" aria-hidden="true"></i></a>
     </div>
-    <p class="ice-lead">I build AI agents and the full-stack apps that host them — Encompass integration, loan tooling, and Unified Disaster Monitoring.</p>
-    <div class="ice-cta-row">
-      <a class="ice-btn ice-btn--solid" href="/about.html">About me <i class="bi bi-arrow-right"></i></a>
-      <a class="ice-btn" href="/heygen-hub.html">HeyGen Hub <i class="bi bi-film"></i></a>
-      <a class="ice-btn" href="/sites.html">View sites</a>
-    </div>
-    <div class="ice-float-icons" aria-label="Quick links">
-      <a href="/stack.html" title="Stack"><i class="bi bi-layers"></i></a>
-      <a href="/finance/encompass-assistant.html" title="Encompass Assistant"><i class="bi bi-robot"></i></a>
-      <a href="/ai/assistant.html" title="AI Assistant"><i class="bi bi-chat-dots"></i></a>
-      <a href="/contact.html" title="Contact"><i class="bi bi-envelope"></i></a>
-    </div>
+    <p class="portfolio-hero__disclaimer" id="portfolioDataDisclaimer" role="note">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      Only public mocked-up loan data is used for Encompass demos — all other data is real-time.
+    </p>
   </section>
 
-  <div class="ice-featured">
-    <p class="ice-featured__label">Live properties</p>
-    <div class="ice-featured__grid" id="featuredSites"></div>
-  </div>
+  <section class="portfolio-section" aria-labelledby="capabilitiesTitle">
+    <p class="portfolio-kicker">What I do</p>
+    <h2 id="capabilitiesTitle" class="portfolio-section__title">Mortgage technology consulting</h2>
+    <div class="portfolio-cap-grid" id="portfolioCapabilities"></div>
+  </section>
+
+  <section class="portfolio-section" aria-labelledby="featuredTitle">
+    <div class="portfolio-section__head">
+      <div>
+        <p class="portfolio-kicker">Featured work</p>
+        <h2 id="featuredTitle" class="portfolio-section__title">Live demos</h2>
+      </div>
+      <a class="portfolio-btn portfolio-btn--outline" href="/work.html">All projects</a>
+    </div>
+    <div class="portfolio-case-grid" id="portfolioFeatured"></div>
+  </section>
+
+  <section class="portfolio-section" aria-labelledby="moreTitle">
+    <p class="portfolio-kicker">More tools</p>
+    <h2 id="moreTitle" class="portfolio-section__title">Encompass &amp; mortgage stack</h2>
+    <p class="portfolio-section__lead">Additional hubs, assistants, and calculators — some require finance login on this deployment.</p>
+    <div class="portfolio-project-grid" id="portfolioMoreProjects"></div>
+  </section>
+
+  <section class="portfolio-section" aria-labelledby="stackTitle">
+    <p class="portfolio-kicker">Stack</p>
+    <h2 id="stackTitle" class="portfolio-section__title">What I ship with</h2>
+    <div class="portfolio-stack-chips" id="portfolioStackChips"></div>
+    <p class="portfolio-other-link">Full breakdown on <a href="/stack.html">the stack page</a> · Open to <strong>FTE</strong> and <strong>contract consulting</strong>.</p>
+  </section>
 </main>
 
-<p class="ice-footer">David Lane · <span class="ice-platform-name"></span> · <span id="iceYear"></span></p>
+<footer class="portfolio-footer">
+  David Lane · <span data-platform-name>LOS AI Labs</span> · <span id="portfolioYear"></span>
+  · <a href="/family/lane-family.html">Other work (Lane family)</a>
+</footer>
 
-<nav class="ice-dock" id="iceDock" aria-label="Primary"></nav>
-<button type="button" class="ice-theme-toggle" id="iceThemeToggle" aria-label="Toggle theme">AUTO</button>
-
-<script src="/shared/demo-users.js"></script>
-<script src="/shared/user-login.js"></script>
-<script>document.getElementById('iceYear').textContent = new Date().getFullYear();</script>
-<script src="/shared/js/ice-ocean-scene.js"></script>
-<script src="/shared/js/ice-landing-shell.js"></script>
+<script src="/shared/js/portfolio-shell.js"></script>
 </body>
 </html>

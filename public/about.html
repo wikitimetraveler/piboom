@@ -5,45 +5,57 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>About — David Lane</title>
-<meta name="description" content="David Lane — LOS AI Labs: Encompass integration, loan tooling, and Unified Disaster Monitoring. Live API or standalone mock data."/>
+<meta name="description" content="About David Lane — Encompass admin/developer, ICE integrations, AI on the loan stack. FTE and contract consulting."/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"/>
 <link rel="stylesheet" href="/shared/design-tokens.css"/>
-<link rel="stylesheet" href="/shared/css/ice-landing.css"/>
+<link rel="stylesheet" href="/shared/css/portfolio-shell.css"/>
 <script src="/shared/site-portfolio.js"></script>
 </head>
-<body class="ice-landing" data-ice-page="about">
+<body class="portfolio-page" data-portfolio-page="about">
 
-<div class="ice-landing__sky" aria-hidden="true"></div>
-<div class="ice-landing__ice-wrap" aria-hidden="true"><canvas id="iceCanvas"></canvas></div>
-<div class="ice-landing__horizon" aria-hidden="true"></div>
-
-<header class="ice-topbar">
-  <a class="ice-wordmark" href="/">David Lane</a>
-  <span class="ice-topbar__meta">About</span>
+<header class="portfolio-header">
+  <a class="portfolio-brand" href="/">
+    <span class="portfolio-brand__name">David Lane</span>
+    <span class="portfolio-brand__sub">LOS AI Labs</span>
+  </a>
+  <nav class="portfolio-nav" id="portfolioNav" aria-label="Primary"></nav>
+  <div class="portfolio-header__actions">
+    <button type="button" class="portfolio-theme-btn" id="portfolioThemeToggle" aria-label="Toggle theme">AUTO</button>
+  </div>
 </header>
 
-<main class="ice-landing__main ice-landing__main--scroll">
-  <section class="ice-panel ice-panel--wide ice-panel--glass">
-    <p class="ice-kicker">About</p>
-    <h1 class="ice-title ice-title--sub">Platform overview</h1>
-    <div class="ice-prose">
-      <p>I'm <strong>David Lane</strong>, engineer behind <strong>LOS AI Labs</strong>. The platform centers on <strong>Encompass integration</strong> — OAuth-backed APIs, loan pipeline and custom-field tooling — plus <strong>Unified Disaster Monitoring</strong>. Many tools plug into live Encompass when configured; others run standalone with real feeds or offline mock data for demos and CI.</p>
-      <p>I ship service-layer Node.js APIs, PostgreSQL-backed features, and LangChain + OpenAI assistants with persistent memory. <strong>OpenAI Vision (GPT-4o)</strong> powers image-driven tooling such as Automator field parsing and manifest review; <strong>HeyGen</strong> handles avatar video for demos and QR-triggered guide popups. The frontend is Bootstrap and vanilla JavaScript — no React — with AG Grid and DataTables where tables matter.</p>
-      <p>On hub pages, press <kbd>Ctrl+K</kbd> to search all tools. <a href="/?demo=1">Demo mode</a> narrows the catalog to Worksheets and Encompass.</p>
+<main class="portfolio-main">
+  <section class="portfolio-panel">
+    <p class="portfolio-kicker">About</p>
+    <h1 class="portfolio-section__title">Encompass engineering for hire</h1>
+    <div class="portfolio-prose">
+      <p>I'm <strong>David Lane</strong>, engineer behind <strong>LOS AI Labs</strong>. I specialize in <strong>Encompass administration and development</strong> — ICE OAuth integrations, custom and native field tooling, loan pipeline automation, and AI assistants grounded in indexed ICE knowledge.</p>
+      <p>I ship <strong>service-layer Node.js APIs</strong>, PostgreSQL-backed features, and Bootstrap + vanilla JS frontends (AG Grid where tables matter). Many tools connect to live Encompass when configured; others run with real public feeds or offline demo data for interviews and CI.</p>
+      <p><strong>How I engage:</strong></p>
+      <ul>
+        <li>Full-time roles — Encompass admin/developer, integration engineer, mortgage platform IC</li>
+        <li>Contract consulting — ICE integrations, custom field libraries, AI workflow design</li>
+        <li>Architecture review — service boundaries, test strategy, Encompass API usage</li>
+      </ul>
+      <p><strong>Representative outcomes:</strong></p>
+      <ul>
+        <li>Unit Test Library — parser-driven custom field regression with workbook ingest and AG Grid compare</li>
+        <li>Processor Assignment — rules engine with Postgres config and optional AI scoring</li>
+        <li>Unified Disasters — multi-source hazard ingest, county-scoped intelligence, pipeline risk context</li>
+        <li>Encompass Assistant — LangChain chat with ICE knowledge RAG and persistent memory</li>
+      </ul>
     </div>
-    <div class="ice-cta-row" style="margin-top:1.75rem">
-      <a class="ice-btn ice-btn--solid" href="/stack.html">Technical stack <i class="bi bi-layers"></i></a>
-      <a class="ice-btn" href="/sites.html">All sites <i class="bi bi-globe2"></i></a>
+    <div class="portfolio-hero__cta" style="margin-top:1.25rem">
+      <a class="portfolio-btn portfolio-btn--primary" href="/work.html">View live demos</a>
+      <a class="portfolio-btn portfolio-btn--outline" href="/contact.html">Contact</a>
     </div>
   </section>
 </main>
 
-<p class="ice-footer">David Lane · <span class="ice-platform-name"></span></p>
+<footer class="portfolio-footer">
+  David Lane · <span data-platform-name>LOS AI Labs</span> · <span id="portfolioYear"></span>
+</footer>
 
-<nav class="ice-dock" id="iceDock" aria-label="Primary"></nav>
-<button type="button" class="ice-theme-toggle" id="iceThemeToggle" aria-label="Toggle theme">AUTO</button>
-
-<script src="/shared/js/ice-ocean-scene.js"></script>
-<script src="/shared/js/ice-landing-shell.js"></script>
+<script src="/shared/js/portfolio-shell.js"></script>
 </body>
 </html>

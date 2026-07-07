@@ -1,191 +1,68 @@
 <!DOCTYPE html>
 <!-- Development work by David Lane -->
-<!--
-  ==============================================================================
-  Worksheets Hub Landing Page
-  ==============================================================================
-  
-  @file       index.html
-  @author     David Lane
-  @version    1.0.0
-  @since      2024
-  
-  @description
-  Central navigation hub for DevConnect Labs financial calculators, showcasing FHA,
-  VA, disaster, and analytics tools in a single curated layout.
--->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Worksheets - DevConnect Labs</title>
+  <title>Worksheets — David Lane · LOS AI Labs</title>
+  <meta name="description" content="Encompass tools, FHA/VA calculators, disaster maps, and developer utilities — Worksheets hub by David Lane."/>
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="/shared/styles.css">
+  <link rel="stylesheet" href="/shared/design-tokens.css">
+  <link rel="stylesheet" href="/shared/css/portfolio-shell.css">
   <script src="/shared/menu-config.js"></script>
-  <script src="/shared/modern-navbar.js"></script>
-
-  <style>
-    /* Compact page spacing */
-    main.container {
-      padding-top: 20px;
-    }
-
-    /* Floating worksheet symbols */
-    .floating-cash {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 5;
-      overflow: hidden;
-    }
-
-    .cash-symbol {
-      position: absolute;
-      font-size: 28px;
-      animation: floatCash 18s linear infinite;
-      opacity: 0;
-      z-index: 6;
-    }
-
-    .cash-symbol.dollar {
-      color: rgba(52, 199, 89, 0.55);
-    }
-
-    .cash-symbol.coin {
-      color: rgba(240, 196, 15, 0.6);
-    }
-
-    .cash-symbol:nth-child(1) { left: 8%; animation-delay: 0s; }
-    .cash-symbol:nth-child(2) { left: 18%; animation-delay: 2s; }
-    .cash-symbol:nth-child(3) { left: 28%; animation-delay: 4s; }
-    .cash-symbol:nth-child(4) { left: 38%; animation-delay: 6s; }
-    .cash-symbol:nth-child(5) { left: 48%; animation-delay: 8s; }
-    .cash-symbol:nth-child(6) { left: 58%; animation-delay: 10s; }
-    .cash-symbol:nth-child(7) { left: 68%; animation-delay: 12s; }
-    .cash-symbol:nth-child(8) { left: 78%; animation-delay: 14s; }
-    .cash-symbol:nth-child(9) { left: 88%; animation-delay: 16s; }
-
-    @keyframes floatCash {
-      0% {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 0;
-      }
-      8% {
-        opacity: 0.65;
-      }
-      92% {
-        opacity: 0.65;
-      }
-      100% {
-        transform: translateY(-120px) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .floating-cash * {
-        animation: none !important;
-      }
-    }
-    
-    .finance-grid { max-width: 900px; margin: 0 auto; }
-  </style>
+  <script src="/shared/site-portfolio.js"></script>
 </head>
-<body>
-<div class="particles" id="particles"></div>
-<div class="floating-cash" aria-hidden="true">
-  <div class="cash-symbol dollar">$</div>
-  <div class="cash-symbol coin">¢</div>
-  <div class="cash-symbol dollar">$</div>
-  <div class="cash-symbol coin">¢</div>
-  <div class="cash-symbol dollar">$</div>
-  <div class="cash-symbol coin">¢</div>
-  <div class="cash-symbol dollar">$</div>
-  <div class="cash-symbol coin">¢</div>
-  <div class="cash-symbol dollar">$</div>
-</div>
+<body class="portfolio-page portfolio-finance-hub" data-portfolio-page="finance">
 
-<!-- Modern Navbar Web Component -->
-<modern-navbar></modern-navbar>
+<header class="portfolio-header">
+  <a class="portfolio-brand" href="/">
+    <span class="portfolio-brand__name">David Lane</span>
+    <span class="portfolio-brand__sub">LOS AI Labs</span>
+  </a>
+  <nav class="portfolio-nav" id="portfolioNav" aria-label="Primary"></nav>
+  <div class="portfolio-header__actions">
+    <a class="portfolio-btn portfolio-btn--outline portfolio-header__back" href="/work.html">Portfolio</a>
+    <button type="button" class="portfolio-theme-btn" id="portfolioThemeToggle" aria-label="Toggle theme">AUTO</button>
+  </div>
+</header>
 
-<main class="container">
-  <header class="page-hero" aria-labelledby="worksheetsHeroTitle">
-    <h1 id="worksheetsHeroTitle" class="page-hero__title">Worksheets</h1>
-    <p class="page-hero__lead">Calculators, Encompass tools, disaster maps, and developer utilities—pick a tool below.</p>
-  </header>
-
-  <div class="domain-grid domain-grid-sm finance-grid" id="financeToolGrid"><!-- populated by menu-config --></div>
-  
+<main class="portfolio-main">
+  <section class="portfolio-section">
+    <p class="portfolio-kicker">Worksheets</p>
+    <h1 class="portfolio-section__title">Mortgage calculators &amp; Encompass tools</h1>
+    <p class="portfolio-section__lead">FHA and VA worksheets, ICE-integrated hubs, disaster intelligence, and developer utilities. Some tools require finance login on this host.</p>
+    <div class="portfolio-finance-grid" id="financeToolGrid" aria-label="Finance tools"></div>
+  </section>
 </main>
 
-<div class="voice-help" id="helpPanel">
-  <div class="d-flex justify-content-between align-items-center mb-2">
-    <h4 class="m-0">Worksheets</h4>
-    <button class="btn btn-link p-0" id="closeHelp"><i class="bi-x-circle"></i></button>
-  </div>
-  <ul class="mb-0">
-    <li><strong>📊 Calculators:</strong> FHA Streamline and Asset Qualifier worksheets for loan analysis</li>
-    <li><strong>🛡️ Disaster Analysis:</strong> Track FEMA disasters and analyze loan pipeline risk</li>
-    <li><strong>🤖 Encompass:</strong> AI assistant for Encompass Developer Connect integration</li>
-    <li><strong>🔧 Developer Tools:</strong> Parser, Mashup, Automator, Ruler, Transformer, Alchemist, The Screen Test (form code)</li>
-  </ul>
-</div>
-
-<footer class="footer">
-  <div class="container text-center">
-    <div class="footer-content">
-      <strong>DevConnect Labs</strong> — Calculators, Encompass tools, and Worksheets — <span id="dt"></span> — All Rights Reserved
-    </div>
-  </div>
+<footer class="portfolio-footer">
+  David Lane · <span data-platform-name>LOS AI Labs</span> · <span id="portfolioYear"></span>
+  · <a href="/">Portfolio home</a>
 </footer>
 
 <script src="/shared/demo-users.js"></script>
 <script src="/shared/user-login.js"></script>
 <script src="/shared/user-passwords.js"></script>
-<script src="/shared/voice-widget.js"></script>
 <script src="/shared/dark-mode.js"></script>
+<script src="/shared/js/portfolio-shell.js"></script>
 <script>
-// Populate finance tool grid from menu config
 window.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('financeToolGrid');
-  if (grid && window.MENU_CONFIG && window.MENU_CONFIG.FINANCE_TOOLS) {
-    grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.FINANCE_TOOLS);
-  }
+  if (!grid || !window.MENU_CONFIG || !window.MENU_CONFIG.FINANCE_TOOLS) return;
+  grid.innerHTML = window.MENU_CONFIG.FINANCE_TOOLS.map(function (item) {
+    const title = (item.title || item.label || '').replace(/"/g, '&quot;');
+    const label = (item.label || '').replace(/"/g, '&quot;');
+    const icon = item.icon || 'bi-box';
+    const href = item.href || '#';
+    return (
+      '<a class="portfolio-finance-tile" href="' + href + '" title="' + title + '">' +
+      '<i class="bi ' + icon + '" aria-hidden="true"></i>' +
+      '<span>' + label + '</span></a>'
+    );
+  }).join('');
 });
-
-// Initialize voice widget
-window.addEventListener('DOMContentLoaded', () => {
-  if (typeof initVoiceWidget === 'function') {
-    initVoiceWidget({
-      position: 'bottom-right',
-      theme: 'blue'
-    });
-  }
-});
-
-document.getElementById('dt').textContent = new Date().toLocaleDateString();
-
-// Help panel functionality
-const showHelpBtn = document.getElementById('showHelp');
-const closeHelpBtn = document.getElementById('closeHelp');
-const helpPanel = document.getElementById('helpPanel');
-
-if (showHelpBtn && helpPanel) {
-  showHelpBtn.onclick = (e) => {
-    e.preventDefault(); 
-    helpPanel.classList.add('show');
-  };
-}
-
-if (closeHelpBtn && helpPanel) {
-  closeHelpBtn.onclick = () => helpPanel.classList.remove('show');
-}
 </script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/shared/finance-auth-guard.js"></script>
 </body>
 </html>

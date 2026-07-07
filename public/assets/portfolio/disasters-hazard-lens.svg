@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f8fafc"/>
+  <rect width="960" height="48" fill="#4a90a4"/>
+  <text x="24" y="32" fill="#fff" font-family="Segoe UI,sans-serif" font-size="16" font-weight="600">Hazard lens · county choropleth</text>
+  <rect x="16" y="64" width="580" height="420" rx="8" fill="#e0f2fe" stroke="#7dd3fc"/>
+  <path d="M120 180 L200 140 L280 200 L240 280 L160 260 Z" fill="#4a90a4" opacity="0.35" stroke="#4a90a4"/>
+  <path d="M280 160 L380 120 L420 220 L340 300 L260 240 Z" fill="#f59e0b" opacity="0.4" stroke="#d97706"/>
+  <path d="M400 200 L520 180 L560 280 L480 340 L400 300 Z" fill="#ef4444" opacity="0.35" stroke="#dc2626"/>
+  <rect x="612" y="64" width="332" height="420" rx="8" fill="#fff" stroke="#e2e8f0"/>
+  <rect x="628" y="88" width="140" height="20" rx="4" fill="#4a90a4" opacity="0.3"/>
+  <rect x="628" y="120" width="300" height="16" rx="3" fill="#e2e8f0"/>
+  <rect x="628" y="148" width="300" height="16" rx="3" fill="#f1f5f9"/>
+  <rect x="628" y="176" width="300" height="16" rx="3" fill="#e2e8f0"/>
+  <rect x="628" y="220" width="120" height="12" rx="2" fill="#22c55e"/>
+  <rect x="628" y="244" width="90" height="12" rx="2" fill="#f59e0b"/>
+  <rect x="628" y="268" width="140" height="12" rx="2" fill="#ef4444"/>
+  <text x="480" y="510" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI,sans-serif" font-size="13">County gate · FEMA / FIRMS / USGS / NWS</text>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f8fafc"/>
+  <rect x="16" y="16" width="200" height="36" rx="6" fill="#fff" stroke="#cbd5e1"/>
+  <text x="28" y="40" fill="#64748b" font-family="Segoe UI,sans-serif" font-size="12">Loan GUID ······</text>
+  <rect x="228" y="16" width="120" height="36" rx="6" fill="#4a90a4"/>
+  <text x="288" y="40" text-anchor="middle" fill="#fff" font-family="Segoe UI,sans-serif" font-size="13" font-weight="600">Run Tests</text>
+  <rect x="16" y="64" width="928" height="400" rx="8" fill="#fff" stroke="#e2e8f0"/>
+  <rect x="16" y="64" width="928" height="36" fill="#1e293b" rx="8"/>
+  <text x="32" y="88" fill="#f8fafc" font-family="Segoe UI,sans-serif" font-size="12">Results · Test 1 · Test 2 · Test 3</text>
+  <rect x="32" y="120" width="896" height="36" fill="#dcfce7" stroke="#22c55e" stroke-width="1"/>
+  <text x="48" y="143" fill="#166534" font-family="Segoe UI,sans-serif" font-size="12">PASS · [CUST11FV] = 125000</text>
+  <rect x="32" y="164" width="896" height="36" fill="#fee2e2" stroke="#ef4444" stroke-width="1"/>
+  <text x="48" y="187" fill="#991b1b" font-family="Segoe UI,sans-serif" font-size="12">FAIL · [CUST11FV] expected 125000 got 124500</text>
+  <rect x="32" y="208" width="896" height="36" fill="#dcfce7"/>
+  <text x="48" y="231" fill="#166534" font-family="Segoe UI,sans-serif" font-size="12">PASS · [353]</text>
+  <rect x="720" y="280" width="200" height="120" rx="8" fill="#f8fafc" stroke="#e2e8f0"/>
+  <text x="740" y="308" fill="#0f172a" font-family="Segoe UI,sans-serif" font-size="13" font-weight="600">Summary</text>
+  <text x="740" y="332" fill="#22c55e" font-family="Segoe UI,sans-serif" font-size="12">2 passed</text>
+  <text x="740" y="354" fill="#ef4444" font-family="Segoe UI,sans-serif" font-size="12">1 failed</text>
+  <text x="480" y="510" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI,sans-serif" font-size="13">Placeholder · 05-run-results-pass-fail.png</text>
+</svg>

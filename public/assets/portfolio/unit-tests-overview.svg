@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <rect width="960" height="540" fill="#f8fafc"/>
+  <rect width="960" height="48" fill="#4a90a4"/>
+  <text x="24" y="32" fill="#fff" font-family="Segoe UI,sans-serif" font-size="16" font-weight="600">Encompass Unit Tests</text>
+  <rect x="16" y="64" width="928" height="36" rx="6" fill="#e2e8f0"/>
+  <rect x="24" y="72" width="120" height="20" rx="4" fill="#4a90a4" opacity="0.35"/>
+  <rect x="156" y="72" width="88" height="20" rx="4" fill="#cbd5e1"/>
+  <rect x="16" y="112" width="928" height="32" fill="#1e293b"/>
+  <rect x="24" y="120" width="80" height="16" rx="2" fill="#64748b"/>
+  <rect x="120" y="120" width="100" height="16" rx="2" fill="#64748b"/>
+  <rect x="240" y="120" width="72" height="16" rx="2" fill="#64748b"/>
+  <rect x="340" y="120" width="88" height="16" rx="2" fill="#64748b"/>
+  <g fill="#f1f5f9">
+    <rect x="16" y="152" width="928" height="28"/><rect x="16" y="188" width="928" height="28"/>
+    <rect x="16" y="224" width="928" height="28"/><rect x="16" y="260" width="928" height="28"/>
+    <rect x="16" y="296" width="928" height="28"/><rect x="16" y="332" width="928" height="28"/>
+  </g>
+  <rect x="400" y="196" width="120" height="20" rx="3" fill="#bbf7d0" stroke="#22c55e"/>
+  <rect x="540" y="196" width="120" height="20" rx="3" fill="#fecaca" stroke="#ef4444"/>
+  <text x="480" y="510" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI,sans-serif" font-size="13">Placeholder · replace with 01-unit-tests-overview.png</text>
+</svg>
