@@ -23,7 +23,7 @@ function hasFlag(flag) {
 }
 
 function run(cmd, args) {
-  const r = spawnSync(cmd, args, { stdio: 'inherit', shell: process.platform === 'win32' });
+  const r = spawnSync(cmd, args, { stdio: 'inherit', shell: false, windowsHide: true });
   if (r.status !== 0) throw new Error(`${cmd} failed (${r.status})`);
 }
 

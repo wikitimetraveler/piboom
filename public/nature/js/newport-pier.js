@@ -6,7 +6,10 @@
   const API_CATALOG = '/api/newport-pier/catalog';
   const API_SAVE = '/api/newport-pier/stops/save';
   const API_EXPORT = '/api/newport-pier/stops/export';
+  const API_CACHE_CLIP = '/api/newport-pier/stops/cache-clip';
   const API_HEALTH = '/api/newport-pier/health';
+  const API_REEL_RENDER = '/api/newport-pier/reel/render';
+  const API_REEL_STATUS = '/api/newport-pier/reel/render/status';
   const STORAGE_AVATAR = 'np-heygen-avatar-id';
   const STORAGE_VOICE = 'np-heygen-voice-id';
   const STORAGE_CLIPS = 'np-heygen-stop-clips';
@@ -25,9 +28,15 @@
   let narrateOn = true;
   let pollTimer = null;
   let serverSaveReady = false;
+  let reelRenderReady = false;
   let activeVideoId = null;
   let activeLibraryId = null;
+  let lastHeygenVideoId = null;
   let generateAllRunning = false;
+  let studioReady = false;
+  let studioInitPromise = null;
+  let reelPollTimer = null;
+  let reelSkipNarration = false;
 
   function $(id) {
     return document.getElementById(id);
@@ -251,9 +260,25 @@
     if (useId) select.value = useId;
   }
 
+  async function parseJsonResponse(res) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      if (text.trimStart().startsWith('<')) {
+        const err = new Error(
+          `Server returned HTML (${res.status}) — restart npm run dev to load API routes, or run: npm run render:newport-pier-reel:local`
+        );
+        err.code = 'HTML_RESPONSE';
+        throw err;
+      }
+      throw new Error(`Invalid JSON from server (${res.status})`);
+    }
+  }
+
   async function fetchJson(url, init) {
     const res = await fetch(url, init);
-    const json = await res.json().catch(() => ({}));
+    const json = await parseJsonResponse(res);
     if (!res.ok || json.success === false) {
       throw new Error(json.error || json.message || `Request failed (${res.status})`);
     }
@@ -465,6 +490,43 @@
     syncStudioFields();
   }
 
+  async function cacheClipOnServer(stop, clipUrl, videoId) {
+    if (!stop?.id || !clipUrl) return null;
+    try {
+      const res = await fetchJson(API_CACHE_CLIP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stopId: stop.id, clipUrl, videoId: videoId || null })
+      });
+      if (res.stop) Object.assign(stop, res.stop);
+      if (res.localClipUrl) {
+        writeClipOverride(stop.id, res.localClipUrl);
+        $('npStudioClipUrl').value = res.localClipUrl;
+      }
+      return res;
+    } catch (e) {
+      console.warn('Clip cache failed (bake may still work with fresh URL):', e.message);
+      return null;
+    }
+  }
+
+  function bakeErrorHint(message, stopId) {
+    const m = String(message || '');
+    if (/403|CLIP_DOWNLOAD|expired|Signature|Key-Pair-Id|Forbidden/i.test(m)) {
+      return ' Re-generate the HeyGen clip (Generate clip), wait until it finishes — the clip is cached locally for baking.';
+    }
+    if (/CLIP_NOT_FOUND|not found/i.test(m) && !/403/i.test(m)) {
+      return ' Save a clip URL or generate a new HeyGen clip for this stop.';
+    }
+    if (/NO_AVATAR/i.test(m)) {
+      return ' Generate a clip or pick an avatar with a preview photo.';
+    }
+    if (/COMPOSITE_FAILED|ffmpeg/i.test(m) && !/403|Signature|Key-Pair-Id/i.test(m)) {
+      return ` Try: npm run composite:newport-pier-stop -- --stop ${stopId}`;
+    }
+    return '';
+  }
+
   async function bakeStopVideo() {
     const stop = catalog.stops?.[activeStopIndex];
     if (!stop) return;
@@ -489,22 +551,20 @@
           stopId: stop.id,
           clipUrl: clipUrl || null,
           avatarImageUrl: avatarImageUrl || null,
+          videoId: lastHeygenVideoId || null,
           durationSec: 12
         })
       });
       if (apiRes.stop) Object.assign(stop, apiRes.stop);
       const url = apiRes.videoUrl;
-      setPresenterSaveStatus(
-        `${apiRes.message || 'Baked.'} <a href="${url}" download>Download MP4</a>`,
-        'success'
-      );
+      const statusEl = $('npPresenterSaveStatus');
+      if (statusEl) {
+        statusEl.innerHTML = `${apiRes.message || 'Baked.'} <a href="${esc(url)}" download>Download MP4</a>`;
+        statusEl.className = 'small text-success mb-0 mt-1';
+      }
       setStatus(`Baked composite → ${url}`, 'success');
     } catch (e) {
-      const hint =
-        e.message && e.message.includes('ffmpeg')
-          ? ' Install ffmpeg and add it to PATH, or run: npm run composite:newport-pier-stop -- --stop ' +
-            stop.id
-          : '';
+      const hint = bakeErrorHint(e.message, stop.id);
       setPresenterSaveStatus(`Bake failed: ${e.message}.${hint}`, 'warning');
     } finally {
       if (btn) btn.disabled = false;
@@ -940,14 +1000,134 @@
       );
     }
     const compositeNote = reel.videoUrl
-      ? '<p class="small text-muted mt-2 mb-0">Rendered MP4 — run <code>npm run publish:newport-pier-reel</code> to refresh.</p>'
-      : '<p class="small text-warning mt-2 mb-0">MP4 not published yet — run <code>npm run publish:newport-pier-reel</code> (needs HyperFrames CLI + ffmpeg).</p>';
+      ? '<p class="small text-muted mt-2 mb-0">Rendered MP4 — click <strong>Render HyperFrame reel</strong> above to refresh.</p>'
+      : '<p class="small text-warning mt-2 mb-0">MP4 not published yet — click <strong>Render HyperFrame reel</strong> (needs HyperFrames CLI + ffmpeg on the server).</p>';
     wrap.innerHTML = `
       <div class="np-side-card">
         <h2 class="h6 mb-2"><i class="bi bi-film"></i> ${title}</h2>
         ${parts.join('')}
         ${compositeNote}
       </div>`;
+  }
+
+  function clearReelPoll() {
+    if (reelPollTimer) {
+      clearTimeout(reelPollTimer);
+      reelPollTimer = null;
+    }
+  }
+
+  function setReelProgress(phase, message) {
+    const wrap = $('npReelProgress');
+    const bar = $('npReelProgressBar');
+    const text = $('npReelProgressText');
+    if (!wrap || !bar || !text) return;
+    wrap.hidden = false;
+    const pct =
+      phase === 'narration' ? 20 : phase === 'render' ? 55 : phase === 'copy' ? 85 : phase === 'complete' ? 100 : 10;
+    bar.style.width = `${pct}%`;
+    bar.classList.toggle('progress-bar-animated', phase !== 'complete' && phase !== 'failed');
+    text.textContent = message || phase || '';
+  }
+
+  function finishReelRender(success, message, videoUrl) {
+    clearReelPoll();
+    const btn = $('npReelRenderBtn');
+    const skipBtn = $('npReelSkipNarrationBtn');
+    if (btn) btn.disabled = false;
+    if (skipBtn) skipBtn.disabled = false;
+    setReelProgress(success ? 'complete' : 'failed', message);
+    if (success && videoUrl && catalog?.reel) {
+      catalog.reel.videoUrl = videoUrl;
+      renderReel();
+    }
+    setStatus(message, success ? 'success' : 'danger');
+  }
+
+  async function pollReelRenderStatus() {
+    try {
+      const data = await fetchJson(API_REEL_STATUS);
+      const status = data.status || 'idle';
+      if (status === 'running') {
+        setReelProgress(data.phase, data.message);
+        reelPollTimer = setTimeout(pollReelRenderStatus, 2500);
+        return;
+      }
+      if (status === 'complete') {
+        finishReelRender(true, data.message || 'HyperFrame reel published.', data.videoUrl);
+        return;
+      }
+      if (status === 'failed') {
+        finishReelRender(false, data.error || 'HyperFrame render failed.');
+        return;
+      }
+      finishReelRender(false, 'Render ended without output.');
+    } catch (e) {
+      finishReelRender(false, e.message || 'Could not poll render status.');
+    }
+  }
+
+  async function startReelRender() {
+    const btn = $('npReelRenderBtn');
+    const skipBtn = $('npReelSkipNarrationBtn');
+    if (btn?.disabled) return;
+    if (btn) btn.disabled = true;
+    if (skipBtn) skipBtn.disabled = true;
+    setReelProgress('starting', 'Starting local HyperFrame render (no HeyGen)…');
+    try {
+      const res = await fetch(API_REEL_RENDER, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skipNarration: reelSkipNarration })
+      });
+      const data = await parseJsonResponse(res);
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `Render request failed (${res.status})`);
+      }
+      setReelProgress('running', data.message || 'Render queued…');
+      reelPollTimer = setTimeout(pollReelRenderStatus, 1500);
+    } catch (e) {
+      finishReelRender(
+        false,
+        `${e.message || 'Render failed.'} Try: npm run render:newport-pier-reel:local`
+      );
+    }
+  }
+
+  function bindReelRender() {
+    $('npReelRenderBtn')?.addEventListener('click', () => {
+      reelSkipNarration = false;
+      startReelRender();
+    });
+    $('npReelSkipNarrationBtn')?.addEventListener('click', () => {
+      reelSkipNarration = true;
+      startReelRender();
+    });
+  }
+
+  function ensureStudioReady() {
+    if (studioReady) return Promise.resolve();
+    if (!studioInitPromise) {
+      studioInitPromise = initStudio().then(() => {
+        studioReady = true;
+      });
+    }
+    return studioInitPromise;
+  }
+
+  function bindStudioLazy() {
+    const details = $('npStudioDetails');
+    details?.addEventListener('toggle', () => {
+      if (details.open) ensureStudioReady();
+    });
+    $('npPresenterGenerateBtn')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      ensureStudioReady().then(() => {
+        $('npStudioDetails') && ($('npStudioDetails').open = true);
+        $('npStudioGenerateBtn')?.click();
+        $('npStudioGenerateBtn')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+    });
   }
 
   function clearPoll() {
@@ -967,6 +1147,7 @@
           const status = data.status || data.data?.status;
           if (status === 'completed' && data.videoUrl) {
             setStudioGenerating(false);
+            lastHeygenVideoId = videoId;
             activeVideoId = null;
             $('npStudioGenerateBtn')?.removeAttribute('disabled');
             $('npStudioGenerateAllBtn')?.removeAttribute('disabled');
@@ -976,10 +1157,12 @@
               writeClipOverride(stop.id, data.videoUrl);
               setPipDismissed(false);
               $('npStudioClipUrl').value = data.videoUrl;
+              await cacheClipOnServer(stop, data.videoUrl, videoId);
               await saveStop();
               renderAvatarPanel(stop);
             } else if (stop) {
               $('npStudioClipUrl').value = data.videoUrl;
+              await cacheClipOnServer(stop, data.videoUrl, videoId);
             }
             if (/\.webm(\?|$)/i.test(data.videoUrl)) {
               setStatus('Transparent WebM ready — floats over pier video.', 'success');
@@ -1111,11 +1294,6 @@
     });
     $('npStudioAvatar')?.addEventListener('change', syncAvatarThumb);
 
-    $('npPresenterGenerateBtn')?.addEventListener('click', () => {
-      $('npStudioGenerateBtn')?.click();
-      $('npStudioGenerateBtn')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-
     $('npStudioStop')?.addEventListener('change', (e) => {
       activeStopIndex = Number(e.target.value) || 0;
       syncStudioFields();
@@ -1184,20 +1362,34 @@
 
   async function probeServerSave() {
     try {
-      const res = await fetch(API_HEALTH);
-      serverSaveReady = res.ok;
+      const json = await fetchJson(API_HEALTH);
+      serverSaveReady = true;
+      reelRenderReady = json.capabilities?.reelRender === true;
     } catch {
       serverSaveReady = false;
+      reelRenderReady = false;
     }
     const banner = $('npServerSaveBanner');
-    if (!banner) return;
-    if (serverSaveReady) {
-      banner.hidden = true;
-      return;
+    if (banner) {
+      if (serverSaveReady && reelRenderReady) {
+        banner.hidden = true;
+      } else if (!serverSaveReady) {
+        banner.hidden = false;
+        banner.textContent =
+          'Server save is offline — data stays in this browser only. Restart npm run dev (or redeploy) to write data/newport-pier-fish.json for everyone.';
+      } else {
+        banner.hidden = false;
+        banner.className = 'alert alert-warning py-2 small mb-2';
+        banner.textContent =
+          'Server is running an older build — restart npm run dev for HyperFrame reel render, or run: npm run render:newport-pier-reel:local';
+      }
     }
-    banner.hidden = false;
-    banner.textContent =
-      'Server save is offline — data stays in this browser only. Restart npm run dev (or redeploy) to write data/newport-pier-fish.json for everyone.';
+    const hint = $('npReelRenderHint');
+    if (hint && !reelRenderReady) {
+      hint.innerHTML =
+        'Reel API not loaded on this server — <strong>restart npm run dev</strong> or run <code>npm run render:newport-pier-reel:local</code> in a terminal.';
+      hint.className = 'small text-warning';
+    }
   }
 
   async function loadCatalog() {
@@ -1224,7 +1416,8 @@
     renderFishRail();
     renderHyperframeSection();
     renderReel();
-    await initStudio();
+    bindReelRender();
+    bindStudioLazy();
     await probeServerSave();
     goToStop(activeStopIndex, { playClip: false });
     if (storyRequested()) runStory();

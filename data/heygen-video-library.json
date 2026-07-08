@@ -93,14 +93,14 @@
     {
       "id": "nature-pier-deep-rail",
       "kind": "heygen",
-      "videoId": "dc0a73b6b7134c408f5a0b6c173d013e",
+      "videoId": "864622003b9e42eeb2767e0076642c89",
       "title": "Newport Pier — Deep water rail",
       "domain": "nature",
       "variant": "generated",
       "videoUrl": null,
       "portraitUrl": null,
-      "sourcePage": "/heygen-hub.html",
-      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "sourcePage": "/nature/newport-pier.html",
+      "studioPage": "/nature/newport-pier.html",
       "projectDir": null,
       "subtitle": null,
       "scriptPreview": "Over deeper sand here, California halibut and slot-sized white seabass patrol the bottom. Drop a live sardine or a soft plastic on a Carolina rig and work the edges of the pilings.",
@@ -109,7 +109,7 @@
         "nature",
         "generated"
       ],
-      "generatedAt": "2026-07-08T05:52:15.824Z",
+      "generatedAt": "2026-07-08T06:44:52.414Z",
       "hostedLocally": false
     }
   ]

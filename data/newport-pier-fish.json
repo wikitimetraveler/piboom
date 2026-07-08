@@ -54,7 +54,8 @@
         "pacific-sardine"
       ],
       "heygenScript": "Halfway to the first benches, the water deepens slightly. Surfperch stay in the suds while Pacific sardine schools sometimes push through — great fun on sabiki or small hooks when they are thick.",
-      "heygenVideoUrl": null
+      "heygenVideoUrl": null,
+      "compositeVideoUrl": "/nature/assets/newport-pier/composites/first-bench.mp4"
     },
     {
       "id": "mid-pier",
@@ -83,7 +84,7 @@
       ],
       "heygenScript": "Over deeper sand here, California halibut and slot-sized white seabass patrol the bottom. Drop a live sardine or a soft plastic on a Carolina rig and work the edges of the pilings.",
       "heygenVideoUrl": null,
-      "heygenVideoAlphaUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/20b61966d58a4ff7b906c3ccbef64908/dc0a73b6b7134c408f5a0b6c173d013e.webm?Expires=1784094831&Signature=SPcAnsjM3DS2DKdWjjMw4RCC1kygvkhk0eoFjbxsrM7lr28YB7poxiFQYyeVR0KeBnm5KSDBlShBaFoVSswmFGGPBHA8ynhZ5T4Cd2peop-HHzMhqj-KUxhk3wyckaSaNPwkZuUsqvUI7hhgRic-fNGJ5NVECve3m0IQ86Z7dKa2LLngmJR7tRf4sffCmDkRP49jgfHNZcQCrf-n9mQ~XNrRfww9J36OcNt5lmWz2EH1ykxot1IW~XWMCxf53GQyZ0s5WUZc3Ki-uHTE7p7C9UH~q3JxQ~v6Jn6AUyatMrNxPvcWtjhtZOSNGFD8jBciZbkHRfkz5oHfJ~Ce~NBNXw__&Key-Pair-Id=K38HBHX5LX3X2H"
+      "heygenVideoAlphaUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/20b61966d58a4ff7b906c3ccbef64908/864622003b9e42eeb2767e0076642c89.webm?Expires=1784098006&Signature=WpfolZE~M6Xkoe14uc4BguDCWiAG3~GA7fkJvOPsBN03iQWvrL8t3upJwUz7CNM9RsG97cFMpCoNsbAeSxUY11xdNya1zN0ujliyC3sWDGufS4~Mm~8UsMcIRDbGj7KD7eK168AJ5DcNTSrHQ3q2ztFZXXx4cGSDnALM72exrzrFxd6Vg2cXTVjqkfVj2mmKzPn5f6qgUWLgmuMrvr~gX5PWVIL8EdVL3JxWTi99XW3kNM1V1f95e0uVW9z9I-ORlh1pV-RGD~3kPsqKxWZAZjFrcbJdHVKRl5lzckOlfeMgPuJZO4GnlHc1EyqXsAH9~Jiro~UZh8GManI5NO8DXA__&Key-Pair-Id=K38HBHX5LX3X2H"
     },
     {
       "id": "outer-pier",

@@ -88,8 +88,10 @@
         <span class="badge text-bg-secondary np-studio-health" id="npStudioHealth" hidden>API</span>
         <a class="btn btn-sm btn-outline-secondary ms-auto" href="/heygen-hub.html"><i class="bi bi-collection-play"></i> Video hub</a>
       </div>
-      <p class="small text-muted">Avatar clips, transparent PiP, FFmpeg bake, and HyperFrame reel — <strong>Save stop</strong> writes <code>data/newport-pier-fish.json</code> for everyone.</p>
-      <div id="npStudioUnconfigured" hidden class="alert alert-warning py-2 small mb-2">HeyGen API not configured on the server — TTS and manual URLs still work.</div>
+      <p class="small text-muted">Optional avatar clips via HeyGen — API runs only when you click <strong>Generate clip</strong> or <strong>Generate all stops</strong>. HyperFrame reel is separate and fully local (no HeyGen).</p>
+      <details class="np-studio-details" id="npStudioDetails">
+        <summary class="small fw-semibold mb-2">Open HeyGen studio (explicit API use)</summary>
+      <div id="npStudioUnconfigured" hidden class="alert alert-warning py-2 small mb-2">HeyGen API not configured on the server — browser TTS and manual clip URLs still work.</div>
       <div id="npStudioConfigured">
         <div class="np-studio-grid mb-2">
           <div>
@@ -196,20 +198,31 @@
         </div>
         <p class="np-status small text-muted mt-2 mb-0" id="npStudioStatus" role="status" aria-live="polite"></p>
       </div>
+      </details>
     </section>
 
     <section class="np-hyperframe-card mt-4" id="npHyperframeCard" aria-label="HyperFrame reel" hidden>
       <h2 class="h6 mb-2"><i class="bi bi-film"></i> HyperFrame reel</h2>
-      <p class="small text-muted mb-2">Animated pier guide (GSAP scenes). Preview in browser, then render to MP4 for the reel section below.</p>
-      <ol class="small text-muted mb-2">
-        <li>Preview: <code>npm run preview:newport-pier-reel</code> (or open the iframe)</li>
-        <li>Validate: <code>npm run check:newport-pier-reel</code></li>
-        <li>Render MP4: <code>npm run render:newport-pier-reel</code></li>
-        <li>Publish: <code>npm run publish:newport-pier-reel</code> → copies to <code>public/nature/assets/newport-pier/newport-pier-reel.mp4</code></li>
-        <li>Optional narration: <code>cd video/newport-pier &amp;&amp; npm run narration</code></li>
-        <li>Optional HeyGen per-stop clips: <code>cd video/newport-pier &amp;&amp; npm run heygen</code> (server + <code>HEYGEN_API_KEY</code>)</li>
-      </ol>
-      <div class="np-hyperframe-preview-wrap">
+      <p class="small text-muted mb-2">
+        Local GSAP scenes + optional Google TTS narration. Renders to MP4 via HyperFrames CLI — no HeyGen API.
+        HeyGen studio above is optional for per-stop avatar clips only.
+      </p>
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+        <button type="button" class="btn btn-primary btn-sm" id="npReelRenderBtn">
+          <i class="bi bi-camera-reels"></i> Render HyperFrame reel
+        </button>
+        <button type="button" class="btn btn-outline-secondary btn-sm" id="npReelSkipNarrationBtn" title="Skip TTS; use existing narration MP3s if any">
+          Skip narration
+        </button>
+        <span class="small text-muted" id="npReelRenderHint">Dev server required — or run <code>npm run render:newport-pier-reel:local</code></span>
+      </div>
+      <div class="np-reel-progress mt-2" id="npReelProgress" hidden role="status" aria-live="polite">
+        <div class="progress" style="height: 6px">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" id="npReelProgressBar" style="width: 0%"></div>
+        </div>
+        <p class="small text-muted mb-0 mt-1" id="npReelProgressText"></p>
+      </div>
+      <div class="np-hyperframe-preview-wrap mt-2">
         <iframe class="np-hyperframe-preview" id="npHyperframePreview" title="HyperFrame preview" loading="lazy"></iframe>
       </div>
     </section>

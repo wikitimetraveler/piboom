@@ -206,6 +206,11 @@ async function loadRegistry() {
   return { version: 1, videos: [] };
 }
 
+export async function getHeygenRegistryEntry(id) {
+  const registry = await loadRegistry();
+  return registry.videos.find((v) => v.id === id) || null;
+}
+
 async function saveRegistry(registry) {
   await writeFile(REGISTRY_PATH, `${JSON.stringify(registry, null, 2)}\n`, 'utf8');
 }

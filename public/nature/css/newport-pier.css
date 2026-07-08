@@ -475,6 +475,19 @@ body.np-page {
   min-height: 360px;
 }
 
+.np-reel-progress .progress {
+  background: rgba(243, 251, 255, 0.08);
+}
+
+.np-studio-details summary {
+  cursor: pointer;
+  color: var(--np-muted, #8eb4d9);
+}
+
+.np-studio-details[open] summary {
+  margin-bottom: 0.5rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .np-overlay {
     transition: none;
