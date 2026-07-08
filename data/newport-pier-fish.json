@@ -1,0 +1,209 @@
+{
+  "version": 1,
+  "location": {
+    "name": "Newport Beach Pier",
+    "city": "Newport Beach",
+    "state": "CA",
+    "lat": 33.6054,
+    "lng": -117.9298
+  },
+  "hero": {
+    "kicker": "Newport Beach Pier · School of Fish",
+    "title": "Pier walk & catch guide",
+    "subtitle": "Freeze-frame stops along the rail — what anglers catch at each stretch."
+  },
+  "video": {
+    "src": "/nature/assets/newport-pier/walk.mp4",
+    "poster": "/nature/assets/newport-pier/stop-shore-end.jpg",
+    "durationSec": 300
+  },
+  "reel": {
+    "title": "Newport Pier — HyperFrame reel",
+    "hyperframeUrl": "/video/newport-pier/index.html",
+    "videoUrl": "/nature/assets/newport-pier/newport-pier-reel.mp4"
+  },
+  "avatar": {
+    "avatarId": "50b2818bcadf4493b81aa22001b41613",
+    "voiceId": "d2f4f24783d04e22ab49ee8fdc3715e0",
+    "label": "My avatar",
+    "pipMode": "webm",
+    "pipStyle": "circle"
+  },
+  "stops": [
+    {
+      "id": "shore-end",
+      "label": "Shore end",
+      "timeSec": 0,
+      "posterUrl": "/nature/assets/newport-pier/stop-shore-end.jpg",
+      "kicker": "Stop 1 · Shore",
+      "fish": [
+        "barred-surfperch",
+        "california-corbina"
+      ],
+      "heygenScript": "Welcome to Newport Beach Pier. At the shore end, surf anglers target barred surfperch and California corbina in the wash. Light tackle, sand crabs, and fresh mussels are the go-to baits here.",
+      "heygenVideoUrl": null
+    },
+    {
+      "id": "first-bench",
+      "label": "First benches",
+      "timeSec": 60,
+      "posterUrl": "/nature/assets/newport-pier/stop-first-bench.jpg",
+      "kicker": "Stop 2 · First benches",
+      "fish": [
+        "barred-surfperch",
+        "pacific-sardine"
+      ],
+      "heygenScript": "Halfway to the first benches, the water deepens slightly. Surfperch stay in the suds while Pacific sardine schools sometimes push through — great fun on sabiki or small hooks when they are thick.",
+      "heygenVideoUrl": null
+    },
+    {
+      "id": "mid-pier",
+      "label": "Mid pier",
+      "timeSec": 120,
+      "posterUrl": "/nature/assets/newport-pier/stop-mid-pier.jpg",
+      "kicker": "Stop 3 · Mid pier",
+      "fish": [
+        "pacific-mackerel",
+        "pacific-bonito",
+        "pacific-sardine"
+      ],
+      "heygenScript": "Mid pier is prime pelagic territory. Pacific mackerel and sardine run close to the structure in summer and fall. When bonito blitz through, cast a shiny lure fast — they will not wait.",
+      "heygenVideoUrl": null
+    },
+    {
+      "id": "deep-rail",
+      "label": "Deep water rail",
+      "timeSec": 180,
+      "posterUrl": "/nature/assets/newport-pier/stop-deep-rail.jpg",
+      "kicker": "Stop 4 · Deep rail",
+      "fish": [
+        "california-halibut",
+        "white-seabass",
+        "pacific-mackerel"
+      ],
+      "heygenScript": "Over deeper sand here, California halibut and slot-sized white seabass patrol the bottom. Drop a live sardine or a soft plastic on a Carolina rig and work the edges of the pilings.",
+      "heygenVideoUrl": null,
+      "heygenVideoAlphaUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/20b61966d58a4ff7b906c3ccbef64908/dc0a73b6b7134c408f5a0b6c173d013e.webm?Expires=1784094831&Signature=SPcAnsjM3DS2DKdWjjMw4RCC1kygvkhk0eoFjbxsrM7lr28YB7poxiFQYyeVR0KeBnm5KSDBlShBaFoVSswmFGGPBHA8ynhZ5T4Cd2peop-HHzMhqj-KUxhk3wyckaSaNPwkZuUsqvUI7hhgRic-fNGJ5NVECve3m0IQ86Z7dKa2LLngmJR7tRf4sffCmDkRP49jgfHNZcQCrf-n9mQ~XNrRfww9J36OcNt5lmWz2EH1ykxot1IW~XWMCxf53GQyZ0s5WUZc3Ki-uHTE7p7C9UH~q3JxQ~v6Jn6AUyatMrNxPvcWtjhtZOSNGFD8jBciZbkHRfkz5oHfJ~Ce~NBNXw__&Key-Pair-Id=K38HBHX5LX3X2H"
+    },
+    {
+      "id": "outer-pier",
+      "label": "Outer pier",
+      "timeSec": 240,
+      "posterUrl": "/nature/assets/newport-pier/stop-outer-pier.jpg",
+      "kicker": "Stop 5 · Outer pier",
+      "fish": [
+        "shovelnose-guitarfish",
+        "leopard-shark",
+        "california-halibut"
+      ],
+      "heygenScript": "Near the outer rail, shovelnose guitarfish and leopard shark cruise the sandy bottom. Most anglers practice catch and release on sharks — use circle hooks and keep halibut within legal size.",
+      "heygenVideoUrl": null
+    },
+    {
+      "id": "pier-tip",
+      "label": "Pier tip",
+      "timeSec": 270,
+      "posterUrl": "/nature/assets/newport-pier/stop-pier-tip.jpg",
+      "kicker": "Stop 6 · Pier tip",
+      "fish": [
+        "pacific-mackerel",
+        "pacific-bonito",
+        "white-seabass"
+      ],
+      "heygenScript": "At the tip you are over the deepest water. Mackerel and bonito circle the end on favorable tides. White seabass occasionally show for patient anglers with live bait — check current regulations before you keep anything.",
+      "heygenVideoUrl": null
+    }
+  ],
+  "fish": [
+    {
+      "id": "barred-surfperch",
+      "commonName": "Barred Surfperch",
+      "scientific": "Amphistichus argenteus",
+      "season": "Year-round",
+      "bait": "Sand crabs, mussels, worms",
+      "imageUrl": "/nature/assets/newport-pier/fish/barred-surfperch.jpg",
+      "notes": "Common from the rails in the surf zone; light tackle.",
+      "imageCredit": "Wikimedia Commons: Barred Surfperch.jpg"
+    },
+    {
+      "id": "california-corbina",
+      "commonName": "California Corbina",
+      "scientific": "Menticirrhus undulatus",
+      "season": "Spring–fall",
+      "bait": "Sand crabs, ghost shrimp",
+      "imageUrl": "/nature/assets/newport-pier/fish/california-corbina.JPG",
+      "notes": "Shallow surf specialist; finicky bite.",
+      "imageCredit": "Wikimedia Commons: California corbina.JPG"
+    },
+    {
+      "id": "pacific-mackerel",
+      "commonName": "Pacific Mackerel",
+      "scientific": "Scomber japonicus",
+      "season": "Year-round; peaks summer",
+      "bait": "Sabiki, small shiny lures",
+      "imageUrl": "/nature/assets/newport-pier/fish/pacific-mackerel.png",
+      "notes": "Fast schools along the pier; great for kids.",
+      "imageCredit": "Wikimedia Commons: Scomber japonicus.png"
+    },
+    {
+      "id": "pacific-sardine",
+      "commonName": "Pacific Sardine",
+      "scientific": "Sardinops sagax",
+      "season": "Seasonal runs",
+      "bait": "Sabiki rigs",
+      "imageUrl": "/nature/assets/newport-pier/fish/pacific-sardine.jpg",
+      "notes": "Also used as live bait for larger species.",
+      "imageCredit": "Wikimedia Commons: Pacific sardine (Sardinops sagax) 01.jpg"
+    },
+    {
+      "id": "pacific-bonito",
+      "commonName": "Pacific Bonito",
+      "scientific": "Sarda chiliensis",
+      "season": "Warm months",
+      "bait": "Feather jigs, shiny spoons",
+      "imageUrl": "/nature/assets/newport-pier/fish/pacific-bonito.jpg",
+      "notes": "Fast retrieve when a blitz is on.",
+      "imageCredit": "Wikimedia Commons: Sarda chiliensis.jpg"
+    },
+    {
+      "id": "california-halibut",
+      "commonName": "California Halibut",
+      "scientific": "Paralichthys californicus",
+      "season": "Spring–fall",
+      "bait": "Live sardine, anchovy, soft plastics",
+      "imageUrl": "/nature/assets/newport-pier/fish/california-halibut.jpg",
+      "notes": "Work sandy bottom near pilings; mind size limits.",
+      "imageCredit": "Wikimedia Commons: Halibut 300.jpg"
+    },
+    {
+      "id": "white-seabass",
+      "commonName": "White Seabass",
+      "scientific": "Atractoscion nobilis",
+      "season": "Spring–summer",
+      "bait": "Live squid, sardine",
+      "imageUrl": "/nature/assets/newport-pier/fish/white-seabass.jpg",
+      "notes": "Slot limit applies; prized catch from the end.",
+      "imageCredit": "Wikimedia Commons: Atractoscion nobilis mspc096.jpg"
+    },
+    {
+      "id": "shovelnose-guitarfish",
+      "commonName": "Shovelnose Guitarfish",
+      "scientific": "Pseudobatos productus",
+      "season": "Year-round",
+      "bait": "Squid, anchovy on bottom",
+      "imageUrl": "/nature/assets/newport-pier/fish/shovelnose-guitarfish.JPG",
+      "notes": "Bottom ray; firm fight on pier tackle.",
+      "imageCredit": "Wikimedia Commons: Shovelnose guitarfish.JPG"
+    },
+    {
+      "id": "leopard-shark",
+      "commonName": "Leopard Shark",
+      "scientific": "Triakis semifasciata",
+      "season": "Summer–fall",
+      "bait": "Squid, mackerel chunks",
+      "imageUrl": "/nature/assets/newport-pier/fish/leopard-shark.jpg",
+      "notes": "Catch and release common; use circle hooks.",
+      "imageCredit": "Wikimedia Commons: Triakis semifasciata Gratwicke.jpg"
+    }
+  ]
+}

@@ -133,7 +133,7 @@ function applyFiltersNow() {
   clearTimeout(duFilterApplyTimer);
   duFilterApplyTimer = null;
   if (!duCountyIntelLoaded) {
-    setDashboardStatus('Select a state and county on the hazard lens map first.', 'warning');
+    setDashboardStatus('Select a state or county on the hazard lens map first.', 'warning');
     return;
   }
   syncSourceChipsFromSelect();
@@ -160,6 +160,88 @@ function readDisasterFilterInputs() {
     sources: $('#sourceInput').val() || [],
     events: $('#eventInput').val() || [],
   };
+}
+
+function normalizeCountyKey(name) {
+  return String(name || '').replace(/\s+County$/i, '').trim().toLowerCase();
+}
+
+function filterRowsByCounty(rows, county) {
+  const key = normalizeCountyKey(county);
+  if (!key) return rows;
+  return (rows || []).filter((r) => {
+    const cn = normalizeCountyKey(r.county_name);
+    return cn === key || cn.includes(key) || key.includes(cn);
+  });
+}
+
+function applyCountyDisasterFilter(county) {
+  const state = duSelectedGeoState || $('#stateInput').val().trim().toUpperCase();
+  const { events } = readDisasterFilterInputs();
+  duGeoLoadScope = 'county';
+  duSelectedGeoCounty = county;
+  $('#countyInput').val(county);
+
+  let rows = filterRowsByCounty(duStateDisasterRows, county);
+  rows = applyEventTypeFilter(rows, events);
+  finishDisastersLoad(rows);
+
+  const label = `${county}, ${state}`;
+  setDashboardStatus(
+    rows.length
+      ? `Showing ${rows.length} event${rows.length === 1 ? '' : 's'} in ${label} (filtered from statewide data).`
+      : `No events in ${label} for current filters — try another county or broaden sources.`,
+    rows.length ? 'success' : 'info'
+  );
+
+  const crumb = document.getElementById('duGeoActiveCrumb');
+  if (crumb) {
+    crumb.textContent = label;
+    crumb.hidden = false;
+  }
+
+  $('#duLoanScopeMode').val('county');
+  syncDuLoanRadiusControls();
+  loadLoansForDisaster(
+    { state_abbr: state, county_name: county, title: label },
+    null
+  );
+
+  const url = new URL(window.location.href);
+  url.searchParams.set('state', state);
+  url.searchParams.set('county', county);
+  url.searchParams.set('load', '1');
+  window.history.replaceState({}, '', url);
+}
+
+function clearCountyDisasterFilter() {
+  const state = duSelectedGeoState || $('#stateInput').val().trim().toUpperCase();
+  if (!state || !duStateDisasterRows.length) return;
+  duGeoLoadScope = 'state';
+  duSelectedGeoCounty = null;
+  $('#countyInput').val('');
+  const { events } = readDisasterFilterInputs();
+  const rows = applyEventTypeFilter(duStateDisasterRows, events);
+  finishDisastersLoad(rows);
+  const stateLabel = typeof duGeoData !== 'undefined' && duGeoData.stateName
+    ? duGeoData.stateName(state)
+    : state;
+  setDashboardStatus(`Showing all ${rows.length} statewide event${rows.length === 1 ? '' : 's'} in ${stateLabel}. Pick a county to narrow.`, 'info');
+  const crumb = document.getElementById('duGeoActiveCrumb');
+  if (crumb) {
+    crumb.textContent = `${stateLabel} (all counties)`;
+    crumb.hidden = false;
+  }
+  const url = new URL(window.location.href);
+  url.searchParams.set('state', state);
+  url.searchParams.delete('county');
+  url.searchParams.set('load', '1');
+  window.history.replaceState({}, '', url);
+}
+
+if (typeof window !== 'undefined') {
+  window.clearCountyDisasterFilter = clearCountyDisasterFilter;
+  window.applyCountyDisasterFilter = applyCountyDisasterFilter;
 }
 
 function applyEventTypeFilter(rows, events) {
@@ -192,11 +274,36 @@ async function loadDisasters() {
   updateHotspotFilterUi();
 
   const { state, county, sources, events } = readDisasterFilterInputs();
+  const scope = duGeoLoadScope || (county ? 'county' : (state ? 'state' : null));
 
-  if (!state || !county) {
+  if (scope === 'county' && county && duStateDisasterRows.length && duSelectedGeoState === state) {
+    const rows = applyEventTypeFilter(filterRowsByCounty(duStateDisasterRows, county), events);
+    if (gen === duLoadDisastersGeneration) {
+      finishDisastersLoad(rows);
+    }
+    return;
+  }
+
+  if ((scope === 'state' || scope === 'county') && !state) {
     if (gen === duLoadDisastersGeneration) {
       finishDisastersLoad([]);
-      setDashboardStatus('Select a state and county on the hazard lens map to load disaster intelligence.', 'info');
+      setDashboardStatus('Select a state on the hazard lens map first.', 'info');
+    }
+    return;
+  }
+  if (scope === 'county' && !county) {
+    if (gen === duLoadDisastersGeneration) {
+      finishDisastersLoad([]);
+      setDashboardStatus('Click a county on the map to load hazard intelligence.', 'info');
+    }
+    return;
+  }
+  if (scope === 'usa') {
+    // nationwide — no state required
+  } else if (!scope) {
+    if (gen === duLoadDisastersGeneration) {
+      finishDisastersLoad([]);
+      setDashboardStatus('Pick a county, load an entire state, or load all USA.', 'info');
     }
     return;
   }
@@ -220,10 +327,10 @@ async function loadDisasters() {
       const fetchDbSource = async (src) => {
         const qp = new URLSearchParams();
         if (state) qp.set('state', state);
-        if (county) qp.set('county', county);
+        if (scope === 'county' && county) qp.set('county', county);
         qp.set('source', src);
         qp.set('since', sinceIso);
-        qp.set('limit', '2000');
+        qp.set('limit', scope === 'usa' ? '5000' : '2000');
         const resp = await fetch(`/api/disasters?${qp.toString()}`);
         if (!resp.ok) {
           throw new Error(`Disaster source ${src} failed: HTTP ${resp.status}`);
@@ -246,7 +353,9 @@ async function loadDisasters() {
 
   if (sources.includes('floodzones')) {
     try {
-      const floodZoneRows = await loadFloodZones(state, county);
+      const floodState = scope === 'usa' ? null : state;
+      const floodCounty = scope === 'county' && county ? county : null;
+      const floodZoneRows = await loadFloodZones(floodState, floodCounty);
       if (floodZoneRows.length > 0) {
         allRows = allRows.concat(floodZoneRows);
       }
@@ -258,6 +367,13 @@ async function loadDisasters() {
   if (gen !== duLoadDisastersGeneration) return;
 
   allRows = applyEventTypeFilter(allRows, events);
+
+  if (scope === 'state' && state) {
+    duStateDisasterRows = allRows.slice();
+  } else if (scope === 'usa') {
+    duStateDisasterRows = [];
+  }
+
   finishDisastersLoad(allRows);
 }
 

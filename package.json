@@ -42,7 +42,15 @@
     "generate:lane-family-guide-video": "node scripts/tools/generate-lane-family-guide-video.mjs --short --force --cache-local",
     "smoke:heygen-lane": "node scripts/tools/generate-lane-heygen-line.mjs --person jonathan-homer-lane --photo --short --smoke --force --direct --cache-local",
     "migrate:lane-json-postgres": "node scripts/migrate-lane-json-to-postgres.mjs",
-    "build:us-geo": "node scripts/tools/build-us-geo-assets.mjs"
+    "build:us-geo": "node scripts/tools/build-us-geo-assets.mjs",
+    "ingest:newport-pier": "node scripts/tools/ingest-newport-pier-video.mjs --input \"C:/Users/levij/Downloads/IMG_0847.MOV\"",
+    "download:newport-pier-fish": "node scripts/tools/download-newport-pier-fish-images.mjs",
+    "postprocess:heygen-pip": "node scripts/tools/postprocess-heygen-pip.mjs",
+    "composite:newport-pier-stop": "node scripts/tools/composite-newport-pier-stop.mjs",
+    "preview:newport-pier-reel": "npm run dev --prefix video/newport-pier",
+    "check:newport-pier-reel": "npm run check --prefix video/newport-pier",
+    "render:newport-pier-reel": "npm run render --prefix video/newport-pier",
+    "publish:newport-pier-reel": "npm run render:newport-pier-reel && node scripts/tools/copy-newport-pier-reel.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",

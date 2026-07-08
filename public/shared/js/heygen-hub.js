@@ -26,6 +26,7 @@
       music: 'Music',
       disasters: 'Disasters',
       finance: 'Finance',
+      nature: 'Nature',
       platform: 'Platform'
     };
     return map[domain] || domain || 'Other';

@@ -99,6 +99,15 @@
       "videoUrl": "/shared/assets/video/tech-stack-reel.mp4",
       "sourcePage": "/stack.html",
       "projectDir": "video/tech-stack"
+    },
+    {
+      "id": "newport-pier",
+      "domain": "nature",
+      "title": "Newport Beach Pier — fish walk",
+      "subtitle": "Pier stops · species · ~64s · Google TTS",
+      "videoUrl": "/nature/assets/newport-pier/newport-pier-reel.mp4",
+      "sourcePage": "/nature/newport-pier.html",
+      "projectDir": "video/newport-pier"
     }
   ]
 }

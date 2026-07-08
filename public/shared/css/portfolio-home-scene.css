@@ -1,0 +1,148 @@
+/**
+ * Home — dynamic zen gradient atmosphere (matches sitewide styles.css palette)
+ */
+.portfolio-page--home {
+  --pf-zen-from: color-mix(in srgb, white 72%, var(--zen-surface, #f8fafc) 28%);
+  --pf-zen-mid: var(--zen-surface-muted, #e2e8f0);
+  --pf-zen-to: color-mix(in srgb, white 65%, var(--zen-primary, #4a90a4) 35%);
+  --pf-zen-glow: rgba(var(--zen-primary-rgb, 74, 144, 164), 0.2);
+  --pf-zen-accent: rgba(91, 168, 138, 0.14);
+  background: var(--pf-zen-from);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Layer 1 — breathing zen gradient */
+.portfolio-page--home::before {
+  content: '';
+  position: fixed;
+  inset: -40%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 72% 58% at 18% 22%, rgba(255, 255, 255, 0.52), transparent 58%),
+    radial-gradient(ellipse 64% 52% at 82% 78%, var(--pf-zen-glow), transparent 52%),
+    radial-gradient(ellipse 48% 42% at 52% 48%, var(--pf-zen-accent), transparent 58%),
+    linear-gradient(
+      135deg,
+      var(--pf-zen-from) 0%,
+      var(--pf-zen-mid) 48%,
+      var(--pf-zen-to) 100%
+    );
+  background-size: 100% 100%, 100% 100%, 100% 100%, 280% 280%;
+  animation: pfZenGradientShift 20s var(--zen-ease, cubic-bezier(0.4, 0, 0.2, 1)) infinite alternate;
+}
+
+/* Layer 2 — soft drifting glow */
+.portfolio-page--home::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    radial-gradient(circle at 28% 62%, rgba(255, 255, 255, 0.28) 0%, transparent 42%),
+    radial-gradient(circle at 72% 32%, rgba(var(--zen-primary-rgb, 74, 144, 164), 0.16) 0%, transparent 40%);
+  animation: pfZenGlowDrift 14s ease-in-out infinite alternate;
+}
+
+@keyframes pfZenGradientShift {
+  0% {
+    background-position: 0% 0%, 0% 0%, 0% 0%, 0% 50%;
+    transform: scale(1) rotate(0deg);
+  }
+  100% {
+    background-position: 6% 4%, -5% 7%, 4% -3%, 100% 50%;
+    transform: scale(1.03) rotate(0.4deg);
+  }
+}
+
+@keyframes pfZenGlowDrift {
+  from { transform: translate(-2.5%, -1%) scale(1); }
+  to { transform: translate(2.5%, 1.5%) scale(1.05); }
+}
+
+/* Content above gradient */
+.portfolio-page--home .portfolio-header {
+  position: sticky;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.78);
+  border-bottom-color: rgba(var(--zen-primary-rgb, 74, 144, 164), 0.15);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+
+.portfolio-page--home .portfolio-main,
+.portfolio-page--home .portfolio-footer {
+  position: relative;
+  z-index: 10;
+}
+
+.portfolio-page--home .portfolio-hero {
+  animation: pfHeroRise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.portfolio-page--home .portfolio-cap-card,
+.portfolio-page--home .portfolio-case-card,
+.portfolio-page--home .portfolio-project-card,
+.portfolio-page--home .portfolio-panel {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.2s ease;
+}
+
+.portfolio-page--home .portfolio-cap-card:hover,
+.portfolio-page--home .portfolio-case-card:hover,
+.portfolio-page--home .portfolio-project-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(var(--zen-primary-rgb, 74, 144, 164), 0.12);
+  border-color: rgba(var(--zen-primary-rgb, 74, 144, 164), 0.28);
+}
+
+.portfolio-page--home .portfolio-section {
+  animation: pfSectionFade 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.portfolio-page--home .portfolio-section:nth-of-type(2) { animation-delay: 0.08s; }
+.portfolio-page--home .portfolio-section:nth-of-type(3) { animation-delay: 0.14s; }
+.portfolio-page--home .portfolio-section:nth-of-type(4) { animation-delay: 0.2s; }
+.portfolio-page--home .portfolio-section:nth-of-type(5) { animation-delay: 0.26s; }
+
+@keyframes pfHeroRise {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pfSectionFade {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.portfolio-page--home .portfolio-footer {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  border-top-color: rgba(var(--zen-primary-rgb, 74, 144, 164), 0.15);
+}
+
+/* Dark theme */
+.portfolio-page--home.portfolio-dark {
+  --pf-zen-from: color-mix(in srgb, #0f172a 88%, var(--zen-primary, #4a90a4) 12%);
+  --pf-zen-mid: #1e293b;
+  --pf-zen-to: color-mix(in srgb, #0f172a 72%, var(--zen-primary, #4a90a4) 28%);
+  --pf-zen-glow: rgba(var(--zen-primary-rgb, 74, 144, 164), 0.28);
+  --pf-zen-accent: rgba(91, 168, 138, 0.1);
+  background: var(--pf-zen-from);
+}
+
+.portfolio-page--home.portfolio-dark .portfolio-header,
+.portfolio-page--home.portfolio-dark .portfolio-footer {
+  background: rgba(17, 24, 39, 0.82);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-page--home::before,
+  .portfolio-page--home::after,
+  .portfolio-page--home .portfolio-hero,
+  .portfolio-page--home .portfolio-section {
+    animation: none !important;
+  }
+}

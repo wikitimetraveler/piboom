@@ -21,6 +21,9 @@
       try {
         localStorage.setItem(THEME_KEY, mode);
       } catch (_) {}
+      if (window.ICE_OCEAN_SCENE && typeof window.ICE_OCEAN_SCENE.setNight === 'function') {
+        window.ICE_OCEAN_SCENE.setNight(dark ? 1 : 0);
+      }
     }
 
     function systemDark() {

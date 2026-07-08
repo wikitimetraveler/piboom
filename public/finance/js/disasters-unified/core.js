@@ -36,8 +36,12 @@ var activeHotspotKey = null;
 var activeHotspot = null;
 var heygenStudio = null;
 var duCountyIntelLoaded = false;
+/** @type {'county'|'state'|'usa'|null} */
+var duGeoLoadScope = null;
 var duSelectedGeoState = null;
 var duSelectedGeoCounty = null;
+/** Full state fetch cache — county picks filter this client-side */
+var duStateDisasterRows = [];
 var duMultiPanelMode = false;
 var duLoadDisastersGeneration = 0;
 var duFilterApplyTimer = null;

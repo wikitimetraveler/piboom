@@ -1,0 +1,50 @@
+{
+  "license": "See individual Wikimedia Commons file pages",
+  "images": [
+    {
+      "id": "barred-surfperch",
+      "file": "barred-surfperch.jpg",
+      "source": "File:Barred Surfperch.jpg"
+    },
+    {
+      "id": "california-corbina",
+      "file": "california-corbina.JPG",
+      "source": "File:California corbina.JPG"
+    },
+    {
+      "id": "pacific-mackerel",
+      "file": "pacific-mackerel.png",
+      "source": "File:Scomber japonicus.png"
+    },
+    {
+      "id": "pacific-sardine",
+      "file": "pacific-sardine.jpg",
+      "source": "File:Pacific sardine (Sardinops sagax) 01.jpg"
+    },
+    {
+      "id": "pacific-bonito",
+      "file": "pacific-bonito.jpg",
+      "source": "File:Sarda chiliensis.jpg"
+    },
+    {
+      "id": "california-halibut",
+      "file": "california-halibut.jpg",
+      "source": "File:Halibut 300.jpg"
+    },
+    {
+      "id": "white-seabass",
+      "file": "white-seabass.jpg",
+      "source": "File:Atractoscion nobilis mspc096.jpg"
+    },
+    {
+      "id": "shovelnose-guitarfish",
+      "file": "shovelnose-guitarfish.JPG",
+      "source": "File:Shovelnose guitarfish.JPG"
+    },
+    {
+      "id": "leopard-shark",
+      "file": "leopard-shark.jpg",
+      "source": "File:Triakis semifasciata Gratwicke.jpg"
+    }
+  ]
+}

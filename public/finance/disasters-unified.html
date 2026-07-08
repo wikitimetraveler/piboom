@@ -179,7 +179,7 @@
         <div class="card-header du-geo-stage-header d-flex flex-wrap justify-content-between align-items-center gap-2">
           <div>
             <strong><i class="bi bi-binoculars me-1"></i> Hazard lens</strong>
-            <span class="text-muted small d-block">Choose a state and county — disaster data loads only after you confirm</span>
+            <span class="text-muted small d-block">Pick a state for the county overlay — click a county to load (or load entire state / USA)</span>
           </div>
           <div class="d-flex align-items-center gap-2 flex-wrap">
             <span class="badge text-bg-primary du-geo-active-crumb" id="duGeoActiveCrumb" hidden></span>
@@ -212,8 +212,14 @@
                   <input type="search" id="duGeoCountySearch" class="form-control form-control-sm mb-2" placeholder="Search counties…" autocomplete="off">
                   <div class="du-geo-county-list" id="duGeoCountyList" role="listbox" aria-label="Counties in selected state"></div>
                 </div>
-                <button type="button" class="btn btn-primary w-100 mt-3" id="duGeoLoadBtn" disabled>
-                  <i class="bi bi-radar"></i> Select a county to load intelligence
+                <button type="button" class="btn btn-outline-primary w-100 mt-2" id="duGeoLoadUsaBtn">
+                  <i class="bi bi-globe-americas"></i> Load all USA
+                </button>
+                <button type="button" class="btn btn-outline-warning w-100 mt-2" id="duGeoLoadStateBtn" disabled>
+                  <i class="bi bi-map"></i> Load entire state
+                </button>
+                <button type="button" class="btn btn-outline-secondary w-100 mt-2" id="duGeoClearCountyBtn" style="display: none;">
+                  <i class="bi bi-x-circle"></i> Show all counties in state
                 </button>
               </div>
             </div>

@@ -330,22 +330,32 @@ function showDuAccordionSection(targetId, { exclusive = true } = {}) {
   }
 }
 
-function revealDuCountyIntelPanels(state, county) {
+function revealDuIntelShell({ scope, state, county, statusMsg, keepGeoExpanded = true }) {
   duCountyIntelLoaded = true;
   duMultiPanelMode = true;
-  duSelectedGeoState = state;
-  duSelectedGeoCounty = county;
+  duGeoLoadScope = scope;
+  duSelectedGeoState = state || null;
+  duSelectedGeoCounty = county || null;
 
-  $('#stateInput').val(state);
-  $('#countyInput').val(county);
+  $('#stateInput').val(state || '');
+  $('#countyInput').val(county || '');
 
   const geoStage = document.getElementById('duGeoStage');
   const intelStage = document.getElementById('duIntelStage');
   const crumb = document.getElementById('duGeoActiveCrumb');
-  if (geoStage) geoStage.classList.add('du-geo-stage--collapsed');
+  if (geoStage) {
+    geoStage.classList.remove('du-geo-stage--collapsed');
+    geoStage.classList.toggle('du-geo-stage--has-data', true);
+  }
   if (intelStage) intelStage.classList.remove('du-intel-stage--pending');
   if (crumb) {
-    crumb.textContent = `${county}, ${state}`;
+    if (scope === 'usa') crumb.textContent = 'United States';
+    else if (scope === 'state') {
+      const stateLabel = typeof duGeoData !== 'undefined' && duGeoData.stateName
+        ? duGeoData.stateName(state)
+        : state;
+      crumb.textContent = `${stateLabel} (all counties)`;
+    } else crumb.textContent = `${county}, ${state}`;
     crumb.hidden = false;
   }
   document.getElementById('duGeoChangeCountyBtn')?.removeAttribute('hidden');
@@ -353,7 +363,7 @@ function revealDuCountyIntelPanels(state, county) {
   const statsRow = document.getElementById('statsRow');
   statsRow?.classList.remove('du-stats-row--placeholder');
   statsRow?.classList.remove('du-stats-row--hidden');
-  setDashboardStatus(`Loading hazard intelligence for ${county}, ${state}…`, 'info');
+  if (statusMsg) setDashboardStatus(statusMsg, 'info');
 
   showDuDashboardSectionCard('collapseCommandDeck');
   showDuDashboardSectionCard('collapseFilters');
@@ -362,27 +372,128 @@ function revealDuCountyIntelPanels(state, county) {
 
   initDisastersMap();
   syncSourceChipsFromSelect();
-  loadDisasters();
-
-  $('#duLoanScopeMode').val('county');
-  syncDuLoanRadiusControls();
-  loadLoansForDisaster(
-    { state_abbr: state, county_name: county, title: `${county}, ${state}` },
-    null
-  );
-
-  const url = new URL(window.location.href);
-  url.searchParams.set('state', state);
-  url.searchParams.set('county', county);
-  url.searchParams.set('load', '1');
-  window.history.replaceState({}, '', url);
-
-  openDuDashboardSection('collapseDisasters', 3);
+  setTimeout(() => {
+    if (typeof window.duGeoPickerInvalidate === 'function') window.duGeoPickerInvalidate();
+  }, 350);
 }
 
-window.onDuCountyConfirmed = function onDuCountyConfirmed(state, county) {
-  revealDuCountyIntelPanels(String(state || '').toUpperCase(), String(county || '').trim());
+function revealDuStateIntelPanels(state) {
+  const st = String(state || '').toUpperCase();
+  const stateLabel = typeof duGeoData !== 'undefined' && duGeoData.stateName
+    ? duGeoData.stateName(st)
+    : st;
+
+  duGeoLoadScope = 'state';
+  duSelectedGeoCounty = null;
+  $('#countyInput').val('');
+  revealDuIntelShell({
+    scope: 'state',
+    state: st,
+    county: null,
+    statusMsg: `Loading statewide hazard intelligence for ${stateLabel}…`,
+  });
+
+  loadDisasters().then(() => {
+    setDashboardStatus(
+      `Loaded statewide data for ${stateLabel}. Click a county to narrow, or keep browsing the map.`,
+      'success'
+    );
+    $('#duLoanScopeMode').val('county');
+    syncDuLoanRadiusControls();
+    loadLoansForDisaster(
+      { state_abbr: st, county_name: '', title: `${stateLabel} (statewide)` },
+      null
+    );
+    const url = new URL(window.location.href);
+    url.searchParams.set('state', st);
+    url.searchParams.delete('county');
+    url.searchParams.set('load', '1');
+    window.history.replaceState({}, '', url);
+    openDuDashboardSection('collapseDisasters', 3);
+  });
+}
+
+function revealDuUsaIntelPanels() {
+  duStateDisasterRows = [];
+  revealDuIntelShell({
+    scope: 'usa',
+    state: '',
+    county: '',
+    statusMsg: 'Loading nationwide hazard intelligence (90-day window)…',
+  });
+  $('#stateInput').val('');
+  $('#countyInput').val('');
+  loadDisasters().then(() => {
+    setEncompassLoansGridRows([]);
+    $('#encompassLoansSubtitle').text('Nationwide view — select a disaster for loan context.');
+    const url = new URL(window.location.href);
+    url.searchParams.delete('state');
+    url.searchParams.delete('county');
+    url.searchParams.set('scope', 'usa');
+    url.searchParams.set('load', '1');
+    window.history.replaceState({}, '', url);
+    openDuDashboardSection('collapseDisasters', 3);
+  });
+}
+
+window.onDuCountyFiltered = function onDuCountyFiltered(state, county) {
+  const st = String(state || '').toUpperCase();
+  const co = String(county || '').trim();
+  if (!st || !co) return;
+
+  if (duStateDisasterRows.length && duSelectedGeoState === st) {
+    revealDuIntelShell({
+      scope: 'county',
+      state: st,
+      county: co,
+      statusMsg: `Filtering to ${co}, ${st}…`,
+    });
+    applyCountyDisasterFilter(co);
+    openDuDashboardSection('collapseDisasters', 3);
+    return;
+  }
+
+  duGeoLoadScope = 'county';
+  duSelectedGeoState = st;
+  duSelectedGeoCounty = co;
+  revealDuIntelShell({
+    scope: 'county',
+    state: st,
+    county: co,
+    statusMsg: `Loading hazard intelligence for ${co}, ${st}…`,
+  });
+
+  loadDisasters().then(() => {
+    $('#duLoanScopeMode').val('county');
+    syncDuLoanRadiusControls();
+    loadLoansForDisaster(
+      { state_abbr: st, county_name: co, title: `${co}, ${st}` },
+      null
+    );
+    const url = new URL(window.location.href);
+    url.searchParams.set('state', st);
+    url.searchParams.set('county', co);
+    url.searchParams.set('load', '1');
+    window.history.replaceState({}, '', url);
+    openDuDashboardSection('collapseDisasters', 3);
+  });
 };
+
+window.onDuStateConfirmed = function onDuStateConfirmed(state) {
+  revealDuStateIntelPanels(String(state || '').toUpperCase());
+};
+
+window.onDuUsaConfirmed = function onDuUsaConfirmed() {
+  revealDuUsaIntelPanels();
+};
+
+window.onDuCountyConfirmed = function onDuCountyConfirmed(state, county) {
+  window.onDuCountyFiltered(state, county);
+};
+
+function revealDuCountyIntelPanels(state, county) {
+  window.onDuCountyFiltered(state, county);
+}
 
 function revealDisasterSelectionPanels() {
   showDuDashboardSectionCard('collapseDisasters');

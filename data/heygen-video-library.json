@@ -23,6 +23,94 @@
       ],
       "generatedAt": "2026-06-30T06:42:51.332Z",
       "hostedLocally": false
+    },
+    {
+      "id": "nature-pier-first-bench",
+      "kind": "heygen",
+      "videoId": "bacf80b94af04bf7ba214d525f399199",
+      "title": "Newport Pier — First benches",
+      "domain": "nature",
+      "variant": "generated",
+      "videoUrl": null,
+      "portraitUrl": null,
+      "sourcePage": "/heygen-hub.html",
+      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "Halfway to the first benches, the water deepens slightly. Surfperch stay in the suds while Pacific sardine schools sometimes push through — great fun on sabiki or small hooks when they are thick.",
+      "tags": [
+        "heygen-api",
+        "nature",
+        "generated"
+      ],
+      "generatedAt": "2026-07-08T05:35:55.099Z",
+      "hostedLocally": false
+    },
+    {
+      "id": "nature-pier-mid-pier",
+      "kind": "heygen",
+      "videoId": "20d3327a47f349eabde702c93a6bdd8c",
+      "title": "Newport Pier — Mid pier",
+      "domain": "nature",
+      "variant": "generated",
+      "videoUrl": null,
+      "portraitUrl": null,
+      "sourcePage": "/heygen-hub.html",
+      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "Mid pier is prime pelagic territory. Pacific mackerel and sardine run close to the structure in summer and fall. When bonito blitz through, cast a shiny lure fast — they will not wait.",
+      "tags": [
+        "heygen-api",
+        "nature",
+        "generated"
+      ],
+      "generatedAt": "2026-07-08T05:44:11.540Z",
+      "hostedLocally": false
+    },
+    {
+      "id": "nature-pier-shore-end",
+      "kind": "heygen",
+      "videoId": "651dc2d27c8d4c1a8371793ecb579eee",
+      "title": "Newport Pier — Shore end",
+      "domain": "nature",
+      "variant": "generated",
+      "videoUrl": null,
+      "portraitUrl": null,
+      "sourcePage": "/heygen-hub.html",
+      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "Welcome to Newport Beach Pier. At the shore end, surf anglers target barred surfperch and California corbina in the wash. Light tackle, sand crabs, and fresh mussels are the go-to baits here.",
+      "tags": [
+        "heygen-api",
+        "nature",
+        "generated"
+      ],
+      "generatedAt": "2026-07-08T05:46:58.461Z",
+      "hostedLocally": false
+    },
+    {
+      "id": "nature-pier-deep-rail",
+      "kind": "heygen",
+      "videoId": "dc0a73b6b7134c408f5a0b6c173d013e",
+      "title": "Newport Pier — Deep water rail",
+      "domain": "nature",
+      "variant": "generated",
+      "videoUrl": null,
+      "portraitUrl": null,
+      "sourcePage": "/heygen-hub.html",
+      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "Over deeper sand here, California halibut and slot-sized white seabass patrol the bottom. Drop a live sardine or a soft plastic on a Carolina rig and work the edges of the pilings.",
+      "tags": [
+        "heygen-api",
+        "nature",
+        "generated"
+      ],
+      "generatedAt": "2026-07-08T05:52:15.824Z",
+      "hostedLocally": false
     }
   ]
 }

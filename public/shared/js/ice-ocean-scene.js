@@ -34,7 +34,8 @@
   let uniforms = {};
 
   function isDarkTheme() {
-    return document.body.classList.contains('dark-mode');
+    return document.body.classList.contains('dark-mode')
+      || document.body.classList.contains('portfolio-dark');
   }
 
   function nightValue() {

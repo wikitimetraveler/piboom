@@ -1840,6 +1840,14 @@ body.du-pull-sheet-open .du-bottom-dock {
   display: none;
 }
 
+.du-geo-stage--has-data .du-geo-stage-header {
+  border-bottom: 1px solid var(--border, #dee2e6);
+}
+
+.du-geo-stage--has-data {
+  border-color: rgba(29, 78, 216, 0.35);
+}
+
 .du-geo-stage--collapsed .du-geo-stage-header {
   border-bottom: none;
 }

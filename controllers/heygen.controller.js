@@ -48,12 +48,39 @@ export async function getHeygenVoices(req, res) {
 
 export async function postHeygenVideo(req, res) {
   try {
-    const { avatarId, script, voiceId, title, resolution, aspectRatio, callbackUrl, libraryId, libraryDomain } =
-      req.body || {};
+    const {
+      avatarId,
+      script,
+      voiceId,
+      title,
+      resolution,
+      aspectRatio,
+      callbackUrl,
+      libraryId,
+      libraryDomain,
+      outputFormat,
+      removeBackground,
+      background,
+      motionPrompt,
+      expressiveness
+    } = req.body || {};
     if (!avatarId || !script) {
       return res.status(400).json({ success: false, error: 'avatarId and script are required' });
     }
-    const data = await createAvatarVideo({ avatarId, script, voiceId, title, resolution, aspectRatio, callbackUrl });
+    const data = await createAvatarVideo({
+      avatarId,
+      script,
+      voiceId,
+      title,
+      resolution,
+      aspectRatio,
+      callbackUrl,
+      outputFormat,
+      removeBackground,
+      background,
+      motionPrompt,
+      expressiveness
+    });
     const videoId = data?.video_id;
     const regId =
       libraryId ||
@@ -62,6 +89,11 @@ export async function postHeygenVideo(req, res) {
         .replace(/\W+/g, '-')
         .toLowerCase()}`;
     if (videoId) {
+      const studioPage =
+        req.body?.libraryStudioPage ||
+        (libraryDomain === 'nature'
+          ? '/nature/newport-pier.html'
+          : '/finance/disasters-unified.html#duHeygenStudio');
       await registerHeygenApiVideo({
         id: regId,
         videoId,
@@ -69,8 +101,8 @@ export async function postHeygenVideo(req, res) {
         domain: libraryDomain || 'disasters',
         variant: 'generated',
         script: String(script).slice(0, 500),
-        sourcePage: '/heygen-hub.html',
-        studioPage: '/finance/disasters-unified.html#duHeygenStudio'
+        sourcePage: libraryDomain === 'nature' ? '/nature/newport-pier.html' : '/heygen-hub.html',
+        studioPage
       });
     }
     res.json({ success: true, videoId, libraryId: regId, data });

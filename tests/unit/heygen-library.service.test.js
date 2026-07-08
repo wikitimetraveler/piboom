@@ -42,6 +42,13 @@ describe('heygen-library.service', () => {
     expect(heygen.hyperframes).toEqual([]);
   });
 
+  test('getHeygenVideoLibrary includes nature HyperFrames reel', async () => {
+    const nature = await getHeygenVideoLibrary({ domain: 'nature', kind: 'hyperframes' });
+    expect(nature.items.some((v) => v.id === 'hf-newport-pier')).toBe(true);
+    const pier = nature.items.find((v) => v.id === 'hf-newport-pier');
+    expect(pier?.sourcePage).toBe('/nature/newport-pier.html');
+  });
+
   test('lane entries include full and short variants when present', async () => {
     const lane = await getHeygenVideoLibrary({ domain: 'lane' });
     const slugs = new Set(lane.videos.map((v) => v.id));

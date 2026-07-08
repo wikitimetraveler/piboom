@@ -146,13 +146,14 @@ app.use('/finance/encompass-assistant.html', (req, res, next) => {
 app.locals.io = io;
 
 app.use(requireFinanceSession);
+app.use('/api', buildRoutes(io));
 app.use('/lib', express.static(path.join(__dirname, 'lib')));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/video', express.static(path.join(__dirname, 'video')));
 app.use('/data', express.static(path.join(__dirname, 'data'))); // Serve KML files
 app.get('/vendor/exceljs.min.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'node_modules', 'exceljs', 'dist', 'exceljs.min.js'));
 });
-app.use('/api', buildRoutes(io));
 
 app.get('/share/poster/:id', async (req, res) => {
   try {

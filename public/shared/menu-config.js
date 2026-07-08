@@ -157,6 +157,7 @@
     { href: '/nature/critter-discovery.html', icon: 'bi-bug', label: 'Critter Discovery', title: 'Discover critters' },
     { href: '/nature/critter-collection.html', icon: 'bi-collection', label: 'Critter Collection', title: 'Your critter collection' },
     { href: '/nature/fish-identification.html', icon: 'bi-droplet', label: 'Fish ID', title: 'Identify fish' },
+    { href: '/nature/newport-pier.html', icon: 'bi-water', label: 'Newport Pier Guide', title: 'Newport Beach Pier fish walk' },
     { href: '/nature/fish-collection.html', icon: 'bi-collection', label: 'Fish Collection', title: 'Your fish collection' },
     { href: '/nature/rock-discovery.html', icon: 'bi-gem', label: 'Rocky The Rock Star', title: 'Rubies, gems & meteorites — Rocky The Rock Star' },
     { href: '/nature/rock-collection.html', icon: 'bi-circle', label: 'Rock Collection', title: 'Your rock specimens' },

@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #0a2540; }
+      :root {
+        --bg: #0a2540;
+        --surface: #12325f;
+        --text: #f3fbff;
+        --muted: #8eb4d9;
+        --blue: #0d6efd;
+        --gold: #c4a574;
+        --border: rgba(243, 251, 255, 0.14);
+      }
+      body { font-family: system-ui, 'Segoe UI', Roboto, sans-serif; color: var(--text); }
+      .scene { position: absolute; inset: 0; background: var(--bg); overflow: hidden; }
+      .scene-glow {
+        position: absolute; inset: 0; pointer-events: none;
+        background: radial-gradient(ellipse 1100px 700px at 40% 35%, rgba(13, 110, 253, 0.14), transparent 68%);
+      }
+      .scene-content {
+        position: relative; display: flex; flex-direction: column; justify-content: center;
+        width: 100%; height: 100%; padding: 100px 140px; gap: 22px;
+      }
+      .kicker { color: var(--gold); font-size: 24px; letter-spacing: 0.22em; text-transform: uppercase; }
+      .rule { width: 200px; height: 1px; background: var(--gold); transform-origin: left center; }
+      h1.title { font-family: Georgia, serif; font-weight: 400; font-size: 88px; line-height: 1.05; max-width: 1400px; }
+      .copy { font-size: 30px; line-height: 1.5; color: var(--muted); max-width: 1000px; }
+      .exhibit { flex-direction: row; align-items: center; gap: 72px; }
+      .text-col { display: flex; flex-direction: column; gap: 22px; flex: 1; min-width: 0; }
+      .plate {
+        flex: 0 0 580px; background: var(--surface); border: 1px solid var(--border);
+        padding: 14px; box-shadow: 0 24px 48px rgba(0,0,0,0.35);
+      }
+      .plate .img-frame { width: 100%; height: 640px; overflow: hidden; border: 1px solid var(--border); background: #000; }
+      .plate img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .plate figcaption { padding: 14px 4px 2px; font-size: 19px; color: var(--muted); }
+      .fish-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+      .fish-chip {
+        display: flex; align-items: center; gap: 10px; padding: 8px 14px 8px 8px;
+        background: var(--surface); border: 1px solid var(--border); border-radius: 999px; font-size: 22px;
+      }
+      .fish-chip img { width: 44px; height: 44px; object-fit: contain; }
+      .vignette {
+        position: absolute; inset: 0; z-index: 200; pointer-events: none;
+        background: radial-gradient(ellipse 1600px 1000px at 50% 50%, transparent 62%, rgba(0,0,0,0.32) 100%);
+      }
+      #s0 { z-index: 10; } #s1 { z-index: 20; } #s2 { z-index: 30; } #s3 { z-index: 40; }
+      #s4 { z-index: 50; } #s5 { z-index: 60; } #s6 { z-index: 70; } #s7 { z-index: 80; } #s8 { z-index: 90; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="64" data-width="1920" data-height="1080">
+      <div id="s0" class="scene clip" data-start="0" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content" style="align-items:center;text-align:center">
+          <p class="kicker">Newport Beach Pier · School of Fish</p>
+          <div class="rule" style="transform-origin:center;margin:0 auto"></div>
+          <h1 class="title">Pier walk &amp; catch guide</h1>
+          <p class="copy" style="text-align:center">Six stops along the rail — filmed on the pier, July 2026.</p>
+        </div>
+      </div>
+
+      <div id="s1" class="scene clip" data-start="7" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate">
+            <div class="img-frame"><img id="s1-img" src="/nature/assets/newport-pier/stop-shore-end.jpg" alt="Shore end" /></div>
+            <figcaption>Stop 1 · Shore end</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker">Stop 1 · Shore</p>
+            <div class="rule"></div>
+            <h1 class="title" style="font-size:72px">Surf zone</h1>
+            <p class="copy">Barred surfperch and California corbina — sand crabs and mussels in the wash.</p>
+            <div class="fish-row">
+              <span class="fish-chip"><img src="/nature/assets/newport-pier/fish/barred-surfperch.svg" alt="" />Barred surfperch</span>
+              <span class="fish-chip"><img src="/nature/assets/newport-pier/fish/california-corbina.svg" alt="" />California corbina</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="s2" class="scene clip" data-start="14" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate">
+            <div class="img-frame"><img id="s2-img" src="/nature/assets/newport-pier/stop-first-bench.jpg" alt="First benches" /></div>
+            <figcaption>Stop 2 · First benches</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker">Stop 2 · Benches</p>
+            <div class="rule"></div>
+            <h1 class="title" style="font-size:72px">First benches</h1>
+            <p class="copy">Surfperch in the suds; Pacific sardine schools when they push through.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="s3" class="scene clip" data-start="21" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate">
+            <div class="img-frame"><img id="s3-img" src="/nature/assets/newport-pier/stop-mid-pier.jpg" alt="Mid pier" /></div>
+            <figcaption>Stop 3 · Mid pier</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker">Stop 3 · Mid pier</p>
+            <div class="rule"></div>
+            <h1 class="title" style="font-size:72px">Pelagic alley</h1>
+            <p class="copy">Mackerel, sardine, and seasonal Pacific bonito along the structure.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="s4" class="scene clip" data-start="28" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate">
+            <div class="img-frame"><img id="s4-img" src="/nature/assets/newport-pier/stop-deep-rail.jpg" alt="Deep rail" /></div>
+            <figcaption>Stop 4 · Deep rail</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker">Stop 4 · Deep rail</p>
+            <div class="rule"></div>
+            <h1 class="title" style="font-size:72px">Halibut water</h1>
+            <p class="copy">California halibut and slot white seabass over deeper sand.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="s5" class="scene clip" data-start="35" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate">
+            <div class="img-frame"><img id="s5-img" src="/nature/assets/newport-pier/stop-outer-pier.jpg" alt="Outer pier" /></div>
+            <figcaption>Stop 5 · Outer pier</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker">Stop 5 · Outer pier</p>
+            <div class="rule"></div>
+            <h1 class="title" style="font-size:72px">Shark flat</h1>
+            <p class="copy">Shovelnose guitarfish and leopard shark — mostly catch and release.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="s6" class="scene clip" data-start="42" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content exhibit">
+          <figure class="plate">
+            <div class="img-frame"><img id="s6-img" src="/nature/assets/newport-pier/stop-pier-tip.jpg" alt="Pier tip" /></div>
+            <figcaption>Stop 6 · Pier tip</figcaption>
+          </figure>
+          <div class="text-col">
+            <p class="kicker">Stop 6 · Tip</p>
+            <div class="rule"></div>
+            <h1 class="title" style="font-size:72px">The end</h1>
+            <p class="copy">Deepest water — mackerel, bonito, and occasional white seabass.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="s7" class="scene clip" data-start="49" data-duration="8" data-track-index="2">
+        <div class="scene-glow"></div>
+        <div class="scene-content" style="align-items:center;text-align:center">
+          <p class="kicker">School of Fish</p>
+          <div class="rule" style="transform-origin:center;margin:0 auto"></div>
+          <h1 class="title" style="font-size:76px">Nine species cataloged</h1>
+          <p class="copy" style="text-align:center">Surf perch to pelagics to bottom sharks — extend the JSON anytime.</p>
+        </div>
+      </div>
+
+      <div id="s8" class="scene clip" data-start="56" data-duration="8" data-track-index="1">
+        <div class="scene-glow"></div>
+        <div class="scene-content" style="align-items:center;text-align:center">
+          <p class="kicker">DevConnect Labs</p>
+          <div class="rule" style="transform-origin:center;margin:0 auto"></div>
+          <h1 class="title" style="font-size:80px">Open the pier guide</h1>
+          <p class="copy" style="text-align:center">/nature/newport-pier.html — freeze your walk, pick your avatar, add more fish.</p>
+        </div>
+      </div>
+
+      <div class="vignette"></div>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      document.querySelectorAll('.scene.clip').forEach((scene) => {
+        gsap.set(scene, { opacity: 0 });
+      });
+
+      function sceneIn(id, start, dur) {
+        const scene = document.getElementById(id);
+        if (!scene) return;
+        tl.to(scene, { opacity: 1, duration: 0.65, ease: 'power2.out' }, start);
+        const kicker = scene.querySelector('.kicker');
+        const rule = scene.querySelector('.rule');
+        if (kicker) tl.from(kicker, { opacity: 0, y: 18, duration: 0.55, ease: 'power2.out' }, start + 0.25);
+        if (rule) tl.from(rule, { scaleX: 0, duration: 0.6, ease: 'expo.out' }, start + 0.4);
+        scene.querySelectorAll('.title, .copy, .fish-row').forEach((el, i) => {
+          tl.from(el, { opacity: 0, y: 22, duration: 0.55, ease: 'power2.out' }, start + 0.5 + i * 0.1);
+        });
+        const img = scene.querySelector('.plate img');
+        if (img) {
+          tl.fromTo(img, { scale: 1.08 }, { scale: 1, duration: Math.max(2, dur - 1), ease: 'none' }, start + 0.55);
+        }
+        if (id !== 's8') {
+          tl.to(scene, { opacity: 0, duration: 0.55, ease: 'power2.in' }, start + dur - 0.55);
+        }
+      }
+
+      sceneIn('s0', 0, 8);
+      sceneIn('s1', 7, 8);
+      sceneIn('s2', 14, 8);
+      sceneIn('s3', 21, 8);
+      sceneIn('s4', 28, 8);
+      sceneIn('s5', 35, 8);
+      sceneIn('s6', 42, 8);
+      sceneIn('s7', 49, 8);
+      sceneIn('s8', 56, 8);
+
+      window.__timelines.main = tl;
+    </script>
+  </body>
+</html>

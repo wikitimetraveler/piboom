@@ -107,14 +107,21 @@
   }
 
   function updateLoadButton() {
-    const btn = $('#duGeoLoadBtn');
-    if (!btn) return;
-    const ready = selectedState && selectedCounty;
-    btn.disabled = !ready;
-    btn.classList.toggle('du-geo-load-ready', !!ready);
-    btn.innerHTML = ready
-      ? `<i class="bi bi-radar"></i> Load ${duEscapeHtml(selectedCounty)}, ${duEscapeHtml(selectedState)}`
-      : '<i class="bi bi-radar"></i> Select a county to load intelligence';
+    const stateBtn = $('#duGeoLoadStateBtn');
+    const clearBtn = $('#duGeoClearCountyBtn');
+    if (stateBtn) {
+      const ready = !!selectedState;
+      stateBtn.disabled = !ready;
+      const stateLabel = ready && typeof duGeoData !== 'undefined'
+        ? duGeoData.stateName(selectedState)
+        : selectedState;
+      stateBtn.innerHTML = ready
+        ? `<i class="bi bi-map"></i> Load all of ${duEscapeHtml(stateLabel || selectedState)}`
+        : '<i class="bi bi-map"></i> Load entire state';
+    }
+    if (clearBtn) {
+      clearBtn.style.display = selectedState && selectedCounty && duStateDisasterRows.length ? 'block' : 'none';
+    }
   }
 
   function pickCounty(name) {
@@ -122,13 +129,17 @@
     if (countiesLayer) countiesLayer.setStyle(styleCountyLayer);
     renderCountyList(selectedState, geoCacheCounties());
     updateLoadButton();
-    setPickerStatus(`Selected ${selectedCounty}, ${selectedState}. Click load to fetch hazard data.`, 'primary');
+    setPickerStatus(`Selected ${selectedCounty}, ${selectedState}. Loading county hazards…`, 'primary');
 
     const feature = (geoCacheCounties().features || []).find(
       (f) => duGeoData.normalizeCountyName(f.properties?.name).toLowerCase() === selectedCounty.toLowerCase()
     );
     if (feature && pickerMap) {
       pickerMap.fitBounds(L.geoJSON(feature).getBounds(), { padding: [24, 24], maxZoom: 10 });
+    }
+
+    if (typeof global.onDuCountyFiltered === 'function') {
+      global.onDuCountyFiltered(selectedState, selectedCounty);
     }
   }
 
@@ -180,12 +191,13 @@
       if (!opts.skipFit) {
         pickerMap.fitBounds(countiesLayer.getBounds(), { padding: [20, 20], maxZoom: 8 });
       }
-      setPickerStatus(`${geojson.features.length} counties — click map or list, then load intelligence.`, 'success');
+      setPickerStatus(`${geojson.features.length} counties — click a county to load hazards, or load entire state.`, 'success');
     } catch (e) {
       console.error(e);
       setPickerStatus(`Could not load counties for ${st}. Run npm run build:us-geo.`, 'danger');
     }
     updateLoadButton();
+    setTimeout(() => pickerMap?.invalidateSize(), 150);
   }
 
   function resetToUs() {
@@ -193,6 +205,8 @@
     selectedCounty = null;
     cachedCountyGeo = null;
     countySummary = {};
+    duStateDisasterRows = [];
+    duGeoLoadScope = null;
     if (countiesLayer) {
       countiesLayer.remove();
       countiesLayer = null;
@@ -248,11 +262,27 @@
     });
   }
 
-  function confirmCountyLoad() {
-    if (!selectedState || !selectedCounty) return;
-    if (typeof global.onDuCountyConfirmed === 'function') {
-      global.onDuCountyConfirmed(selectedState, selectedCounty);
+  function confirmStateLoad() {
+    if (!selectedState) return;
+    selectedCounty = null;
+    if (countiesLayer) countiesLayer.setStyle(styleCountyLayer);
+    if (cachedCountyGeo) renderCountyList(selectedState, cachedCountyGeo);
+    updateLoadButton();
+    if (typeof global.onDuStateConfirmed === 'function') {
+      global.onDuStateConfirmed(selectedState);
     }
+  }
+
+  function confirmClearCountyFilter() {
+    if (!selectedState) return;
+    selectedCounty = null;
+    updateLoadButton();
+    renderCountyList(selectedState, geoCacheCounties());
+    if (countiesLayer) countiesLayer.setStyle(styleCountyLayer);
+    if (typeof global.clearCountyDisasterFilter === 'function') {
+      global.clearCountyDisasterFilter();
+    }
+    setPickerStatus(`Showing all counties in ${selectedState}. Click a county to filter.`, 'info');
   }
 
   async function initDuGeoPicker() {
@@ -284,10 +314,16 @@
     $('#duGeoCountySearch')?.addEventListener('input', () => {
       if (selectedState && cachedCountyGeo) renderCountyList(selectedState, cachedCountyGeo);
     });
-    $('#duGeoLoadBtn')?.addEventListener('click', confirmCountyLoad);
+    $('#duGeoLoadStateBtn')?.addEventListener('click', confirmStateLoad);
+    $('#duGeoClearCountyBtn')?.addEventListener('click', confirmClearCountyFilter);
+    $('#duGeoLoadUsaBtn')?.addEventListener('click', () => {
+      if (typeof global.onDuUsaConfirmed === 'function') global.onDuUsaConfirmed();
+    });
     $('#duGeoChangeCountyBtn')?.addEventListener('click', () => {
       duCountyIntelLoaded = false;
       duMultiPanelMode = false;
+      duStateDisasterRows = [];
+      duGeoLoadScope = null;
       document.getElementById('duGeoStage')?.classList.remove('du-geo-stage--collapsed');
       document.getElementById('duIntelStage')?.classList.add('du-intel-stage--pending');
       document.getElementById('duGeoActiveCrumb')?.setAttribute('hidden', '');
@@ -308,11 +344,14 @@
     const params = new URLSearchParams(window.location.search);
     const urlState = params.get('state')?.toUpperCase();
     const urlCounty = params.get('county');
-    if (urlState && duGeoData.ST_TO_FIPS[urlState]) {
+    if (params.get('scope') === 'usa' && typeof global.onDuUsaConfirmed === 'function') {
+      global.onDuUsaConfirmed();
+    } else if (urlState && duGeoData.ST_TO_FIPS[urlState]) {
       await selectState(urlState);
       if (urlCounty) {
         pickCounty(urlCounty);
-        if (params.get('load') === '1') confirmCountyLoad();
+      } else if (params.get('load') === '1') {
+        confirmStateLoad();
       }
     }
 
@@ -322,4 +361,7 @@
 
   global.initDuGeoPicker = initDuGeoPicker;
   global.duGeoPickerReset = resetToUs;
+  global.duGeoPickerInvalidate = function duGeoPickerInvalidate() {
+    pickerMap?.invalidateSize();
+  };
 })(typeof window !== 'undefined' ? window : globalThis);

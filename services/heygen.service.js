@@ -157,7 +157,10 @@ export async function createAvatarVideo({
   aspectRatio = 'auto',
   callbackUrl,
   motionPrompt,
-  expressiveness
+  expressiveness,
+  outputFormat,
+  removeBackground,
+  background
 }) {
   if (!avatarId) throw new Error('avatarId is required');
   if (!script || !script.trim()) throw new Error('script is required');
@@ -173,6 +176,9 @@ export async function createAvatarVideo({
   if (callbackUrl) body.callback_url = callbackUrl;
   if (motionPrompt) body.motion_prompt = motionPrompt;
   if (expressiveness) body.expressiveness = expressiveness;
+  if (outputFormat) body.output_format = outputFormat;
+  if (removeBackground != null) body.remove_background = removeBackground;
+  if (background) body.background = background;
   return heygenRequest('/v3/videos', { method: 'POST', body });
 }
 
