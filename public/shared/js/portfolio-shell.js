@@ -88,15 +88,44 @@
   function initHome() {
     const pf = getPortfolio();
     if (!pf) return;
+    const loggedIn = typeof window.isLoggedIn === 'function' && window.isLoggedIn();
+
     const caps = document.getElementById('portfolioCapabilities');
     if (caps) caps.innerHTML = pf.renderCapabilities();
+
+    const featuredSection = document.getElementById('portfolioFeaturedSection');
     const featured = document.getElementById('portfolioFeatured');
-    if (featured) featured.innerHTML = pf.renderFeaturedCaseStudies();
+    const featuredTitle = document.getElementById('featuredTitle');
+    const featuredLead = document.getElementById('portfolioFeaturedLead');
+    if (featured) {
+      const html = pf.renderFeaturedCaseStudies({ showThumbs: false });
+      featured.innerHTML = html;
+      if (featuredSection) {
+        featuredSection.classList.toggle('is-empty', !html.trim());
+      }
+      if (featuredTitle) {
+        featuredTitle.textContent = loggedIn ? 'Live demos' : 'Public live demos';
+      }
+      if (featuredLead) {
+        featuredLead.textContent = loggedIn
+          ? 'Featured Encompass and hazard tools — open a demo or read the case study.'
+          : 'Open these without login. Encompass tools unlock after you pass the wall of fire.';
+      }
+    }
+
+    const moreSection = document.getElementById('portfolioMoreSection');
     const more = document.getElementById('portfolioMoreProjects');
     if (more) {
-      const projects = pf.getPortfolioProjects({ excludeOther: true, includeDemo: true }).filter((p) => !p.featured);
-      more.innerHTML = pf.renderProjectCards(projects);
+      const projects = pf
+        .getPortfolioProjects({ excludeOther: true, includeDemo: true })
+        .filter((p) => !p.featured);
+      const html = pf.renderProjectCards(projects, { showThumbs: false });
+      more.innerHTML = html;
+      if (moreSection) {
+        moreSection.classList.toggle('is-empty', !html.trim());
+      }
     }
+
     const chips = document.getElementById('portfolioStackChips');
     if (chips) chips.innerHTML = pf.renderPortfolioStackChips();
   }
@@ -223,9 +252,97 @@
     root.innerHTML = pf.renderCaseStudyPage(project);
   }
 
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector('script[src="' + src + '"]')) {
+        resolve();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = src;
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load ' + src));
+      document.head.appendChild(script);
+    });
+  }
+
+  function ensureAuthScripts() {
+    const tasks = [];
+    if (!window.DEMO_USERS) tasks.push(loadScript('/shared/demo-users.js'));
+    if (typeof window.isLoggedIn !== 'function') tasks.push(loadScript('/shared/user-login.js'));
+    if (typeof window.verifyUserPassword !== 'function') tasks.push(loadScript('/shared/user-passwords.js'));
+    return Promise.all(tasks);
+  }
+
+  function isPortfolioLoggedIn() {
+    return typeof window.isLoggedIn === 'function' && !!window.isLoggedIn();
+  }
+
+  function renderAuthButton() {
+    const actions = document.querySelector('.portfolio-header__actions');
+    if (!actions) return null;
+
+    let btn = document.getElementById('portfolioAuthBtn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.id = 'portfolioAuthBtn';
+      btn.className = 'portfolio-auth-btn';
+      const themeBtn = document.getElementById('portfolioThemeToggle');
+      if (themeBtn && themeBtn.parentNode === actions) {
+        actions.insertBefore(btn, themeBtn);
+      } else {
+        actions.prepend(btn);
+      }
+      btn.addEventListener('click', onAuthButtonClick);
+    }
+
+    if (isPortfolioLoggedIn() && typeof window.getLoggedInUser === 'function') {
+      const user = window.getLoggedInUser();
+      const name = user && user.name ? user.name.split(' ').slice(-1)[0] : 'Account';
+      btn.classList.add('portfolio-auth-btn--out');
+      btn.setAttribute('aria-label', 'Log out as ' + name);
+      btn.innerHTML =
+        (user && user.avatar
+          ? '<img class="portfolio-auth-btn__avatar" src="' + user.avatar + '" alt="" />'
+          : '<i class="bi bi-person-check" aria-hidden="true"></i>') +
+        '<span>' + name + ' · Log out</span>';
+    } else {
+      btn.classList.remove('portfolio-auth-btn--out');
+      btn.setAttribute('aria-label', 'Log in');
+      btn.innerHTML = '<i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Log in</span>';
+    }
+    return btn;
+  }
+
+  function onAuthButtonClick(event) {
+    event.preventDefault();
+    ensureAuthScripts()
+      .then(() => {
+        if (isPortfolioLoggedIn()) {
+          if (typeof window.logout === 'function') {
+            window.logout();
+          }
+          return;
+        }
+        if (typeof window.showLoginPopup === 'function') {
+          window.showLoginPopup();
+        }
+      })
+      .catch((err) => {
+        console.error('Portfolio auth scripts failed', err);
+      });
+  }
+
+  function initAuthControls() {
+    renderAuthButton();
+  }
+
   function init() {
     initNav();
     initThemeToggle();
+    initAuthControls();
     const page = document.body.getAttribute('data-portfolio-page');
     if (page === 'home') initHome();
     else if (page === 'work') {
@@ -244,4 +361,11 @@
   } else {
     init();
   }
+
+  window.addEventListener('user-logged-in', () => {
+    renderAuthButton();
+    const page = document.body.getAttribute('data-portfolio-page');
+    if (page === 'home') initHome();
+    else if (page === 'work' && !document.getElementById('portfolioCaseStudy')) initWork();
+  });
 })();

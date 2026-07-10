@@ -477,6 +477,24 @@ function updateNavbarUserDisplay() {
       ${user.name}
     `;
   }
+
+  const portfolioAuthBtn = document.getElementById('portfolioAuthBtn');
+  if (portfolioAuthBtn) {
+    if (user) {
+      const name = user.name ? user.name.split(' ').slice(-1)[0] : 'Account';
+      portfolioAuthBtn.classList.add('portfolio-auth-btn--out');
+      portfolioAuthBtn.setAttribute('aria-label', 'Log out as ' + name);
+      portfolioAuthBtn.innerHTML =
+        (user.avatar
+          ? '<img class="portfolio-auth-btn__avatar" src="' + user.avatar + '" alt="" />'
+          : '<i class="bi bi-person-check" aria-hidden="true"></i>') +
+        '<span>' + name + ' · Log out</span>';
+    } else {
+      portfolioAuthBtn.classList.remove('portfolio-auth-btn--out');
+      portfolioAuthBtn.setAttribute('aria-label', 'Log in');
+      portfolioAuthBtn.innerHTML = '<i class="bi bi-box-arrow-in-right" aria-hidden="true"></i><span>Log in</span>';
+    }
+  }
 }
 
 // Initialize on page load
@@ -503,12 +521,42 @@ window.addEventListener('DOMContentLoaded', () => {
     try {
       const dest = new URL(returnToRaw, window.location.origin);
       if (dest.origin === window.location.origin && dest.pathname.startsWith('/finance')) {
-        showLoginPopup();
+        try {
+          sessionStorage.removeItem('financeFireGateDismissed');
+        } catch (_) {}
+        const onHome =
+          window.location.pathname === '/' ||
+          window.location.pathname === '/index.html';
+        const mountFireGate = () => {
+          if (typeof window.FinanceFireGate?.mount === 'function') {
+            window.FinanceFireGate.mount({ homeMode: onHome }).then(() => {
+              showLoginPopup();
+            }).catch(() => showLoginPopup());
+            return;
+          }
+          showLoginPopup();
+        };
+        if (window.FinanceFireGate) {
+          mountFireGate();
+        } else {
+          const script = document.createElement('script');
+          script.src = '/shared/js/finance-fire-gate.js';
+          script.async = true;
+          script.onload = mountFireGate;
+          script.onerror = () => showLoginPopup();
+          document.head.appendChild(script);
+        }
       }
     } catch (_) {}
   }
 
   updateNavbarUserDisplay();
+});
+
+window.addEventListener('user-logged-in', () => {
+  if (window.FinanceFireGate && window.FinanceFireGate.isMounted()) {
+    window.FinanceFireGate.unmount();
+  }
 });
 
 // Export functions

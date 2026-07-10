@@ -21,7 +21,9 @@ function updateNwsGridFilterUi() {
   const locationLabel = nwsGridFilterContext.county
     ? `${nwsGridFilterContext.county}, ${nwsGridFilterContext.state}`
     : nwsGridFilterContext.state;
-  if (labelEl) labelEl.textContent = locationLabel || 'selected area';
+  const modeLabel =
+    nwsGridFilterContext.filterMode === 'nws-only' ? 'NWS alerts only' : 'all sources in area';
+  if (labelEl) labelEl.textContent = `${locationLabel || 'selected area'} (${modeLabel})`;
   if (strip) strip.hidden = false;
 }
 
@@ -67,7 +69,7 @@ function disastersGridExternalFilterPresent() {
 
 function disastersGridExternalFilterPass(node) {
   if (!disastersGridExternalFilterPresent()) return true;
-  return DisasterWeatherAlertFilters.rowPassesNwsGridFilter(node.data, nwsGridFilterContext);
+  return DisasterWeatherAlertFilters.rowPassesSelectionGridFilter(node.data, nwsGridFilterContext);
 }
 
 function htmlCellRenderer(html) {

@@ -64,10 +64,13 @@
   }
 
   function searchTools(term) {
+    const index = typeof window.getVisibleToolIndex === 'function'
+      ? window.getVisibleToolIndex()
+      : (window.TOOL_INDEX || []);
     const t = (term || '').toLowerCase().trim();
-    if (!t) return window.TOOL_INDEX.slice(0, MAX_RESULTS);
+    if (!t) return index.slice(0, MAX_RESULTS);
     const words = t.split(/\s+/).filter(Boolean);
-    return window.TOOL_INDEX.filter((tool) => {
+    return index.filter((tool) => {
       const haystack = `${(tool.name || '').toLowerCase()} ${(tool.category || '').toLowerCase()} ${(tool.keywords || '').toLowerCase()}`;
       return words.every((w) => haystack.includes(w));
     }).slice(0, MAX_RESULTS);
@@ -76,9 +79,12 @@
   function getRecentTools(max) {
     try {
       const recent = window.DashboardState?.getRecentTools?.(max) || [];
-      const byUrl = new Map(window.TOOL_INDEX.map(t => [t.url, t]));
+      const visible = typeof window.getVisibleToolIndex === 'function'
+        ? window.getVisibleToolIndex()
+        : (window.TOOL_INDEX || []);
+      const byUrl = new Map(visible.map(t => [t.url, t]));
       return recent
-        .map(r => byUrl.get(r.url) || (r.url ? { name: r.label || r.url, url: r.url, category: r.category || 'General' } : null))
+        .map(r => byUrl.get(r.url) || null)
         .filter(Boolean)
         .slice(0, max);
     } catch (_) {

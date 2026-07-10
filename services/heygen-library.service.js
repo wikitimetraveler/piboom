@@ -11,6 +11,9 @@ const REGISTRY_PATH = path.join(ROOT, 'data/heygen-video-library.json');
 const LANE_LINES_PATH = path.join(ROOT, 'data/lane-heygen-lines.json');
 const DISASTER_DEMO_PATH = path.join(ROOT, 'data/disaster-heygen-demo.json');
 const MUSIC_DEMO_PATH = path.join(ROOT, 'data/music-heygen-demo.json');
+const CALC_ENGINE_DEMO_PATH = path.join(ROOT, 'data/calc-engine-heygen-demo.json');
+const UNIT_TESTS_DEMO_PATH = path.join(ROOT, 'data/unit-tests-heygen-demo.json');
+const SVEN_UX_DEMO_PATH = path.join(ROOT, 'data/sven-ux-heygen-demo.json');
 const HYPERFRAMES_LIBRARY_PATH = path.join(ROOT, 'data/hyperframes-library.json');
 
 function pickUrl(...candidates) {
@@ -153,6 +156,35 @@ function musicDemoEntry(demo) {
   ];
 }
 
+function financeBoothEntry(demo, { id, tags }) {
+  if (!demo) return [];
+  const url = pickUrl(demo.heygenVideoLocalShort, demo.heygenVideoUrlShort);
+  if (!url && !demo.heygenVideoIdShort) return [];
+  return [
+    entryBase({
+      id,
+      videoId: demo.heygenVideoIdShort,
+      title: demo.title || demo.heygenTitle || 'Finance Demo',
+      domain: 'finance',
+      variant: 'demo',
+      videoUrl: url,
+      sourcePage: demo.qrLandingPath || null,
+      studioPage: demo.ctaHref || null,
+      script: demo.heygenScriptShort || null,
+      tags: ['finance', 'demo', 'popup', ...(tags || [])],
+      generatedAt: demo.generatedAt || null
+    })
+  ];
+}
+
+function financeDemoEntries(calcDemo, unitDemo, svenDemo) {
+  return [
+    ...financeBoothEntry(calcDemo, { id: 'finance-calc-engine-demo', tags: ['calc-engine', 'dag-lite'] }),
+    ...financeBoothEntry(unitDemo, { id: 'finance-unit-tests-demo', tags: ['unit-tests'] }),
+    ...financeBoothEntry(svenDemo, { id: 'finance-sven-ux-demo', tags: ['sven', 'ux'] })
+  ];
+}
+
 function hyperframesEntries(catalog) {
   const projects = catalog?.projects || [];
   return projects.map((project) =>
@@ -217,10 +249,14 @@ async function saveRegistry(registry) {
 
 /** Merge HeyGen avatar videos, HyperFrames reels, and API registry (registry wins on duplicate id). */
 export async function getHeygenVideoLibrary({ domain, kind } = {}) {
-  const [laneCatalog, disasterDemo, musicDemo, hyperframesCatalog, registry] = await Promise.all([
+  const [laneCatalog, disasterDemo, musicDemo, calcDemo, unitDemo, svenDemo, hyperframesCatalog, registry] =
+    await Promise.all([
     readJsonSafe(LANE_LINES_PATH),
     readJsonSafe(DISASTER_DEMO_PATH),
     readJsonSafe(MUSIC_DEMO_PATH),
+    readJsonSafe(CALC_ENGINE_DEMO_PATH),
+    readJsonSafe(UNIT_TESTS_DEMO_PATH),
+    readJsonSafe(SVEN_UX_DEMO_PATH),
     readJsonSafe(HYPERFRAMES_LIBRARY_PATH),
     loadRegistry()
   ]);
@@ -229,6 +265,7 @@ export async function getHeygenVideoLibrary({ domain, kind } = {}) {
   for (const item of laneEntries(laneCatalog || {})) byId.set(item.id, item);
   for (const item of disasterDemoEntry(disasterDemo)) byId.set(item.id, item);
   for (const item of musicDemoEntry(musicDemo)) byId.set(item.id, item);
+  for (const item of financeDemoEntries(calcDemo, unitDemo, svenDemo)) byId.set(item.id, item);
   for (const item of registry.videos || []) {
     if (item?.id) byId.set(item.id, { ...byId.get(item.id), ...item, kind: item.kind || 'heygen' });
   }

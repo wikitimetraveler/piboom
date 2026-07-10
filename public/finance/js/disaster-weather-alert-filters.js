@@ -224,6 +224,12 @@
   function rowPassesNwsGridFilter(rowData, context) {
     if (!rowData || !context) return true;
     if (!isNwsAlert(rowData.disasterObj || rowData)) return false;
+    return rowPassesAdminGridFilter(rowData, context);
+  }
+
+  /** All sources in selected state/county (FEMA, USGS, NWS, etc.). */
+  function rowPassesAdminGridFilter(rowData, context) {
+    if (!rowData || !context) return true;
     const state = String(context.state || '').trim().toUpperCase();
     if (state && String(rowData.state || rowData.state_abbr || '').trim().toUpperCase() !== state) {
       return false;
@@ -234,14 +240,25 @@
     return true;
   }
 
+  function rowPassesSelectionGridFilter(rowData, context) {
+    if (!rowData || !context) return true;
+    if (context.filterMode === 'nws-only') {
+      return rowPassesNwsGridFilter(rowData, context);
+    }
+    return rowPassesAdminGridFilter(rowData, context);
+  }
+
   function buildGridFilterContextFromDisaster(disasterObj, disasterData) {
     const DLF = global.DisasterLoanFilters;
     if (!DLF) return null;
     const state = DLF.getDisasterState(disasterObj, disasterData);
     if (!state) return null;
+    const normalized = DLF.normalizeDisasterForFilters(disasterObj, disasterData);
+    const subject = disasterObj || normalized;
     return {
       state,
-      county: DLF.getDisasterCounty(disasterObj, disasterData) || ''
+      county: DLF.getDisasterCounty(disasterObj, disasterData) || '',
+      filterMode: isNwsAlert(subject) ? 'nws-only' : 'admin-area'
     };
   }
 
@@ -291,6 +308,8 @@
     formatAlertEventType,
     buildNearbyWeatherAlertsListHtml,
     rowPassesNwsGridFilter,
+    rowPassesAdminGridFilter,
+    rowPassesSelectionGridFilter,
     buildGridFilterContextFromDisaster,
     escapeHtml
   };

@@ -8,7 +8,7 @@
       "title": "Hurricane Demo (TX)",
       "domain": "disasters",
       "variant": "briefing",
-      "videoUrl": null,
+      "videoUrl": "/finance/assets/video/disasters-briefing-8d358bc039b84fa4b8d195f474b53d9a.mp4",
       "portraitUrl": null,
       "sourcePage": "/heygen-hub.html",
       "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
@@ -22,7 +22,8 @@
         "briefing"
       ],
       "generatedAt": "2026-06-30T06:42:51.332Z",
-      "hostedLocally": false
+      "hostedLocally": true,
+      "cachedAt": "2026-07-10T06:19:10.466Z"
     },
     {
       "id": "nature-pier-first-bench",
@@ -31,10 +32,10 @@
       "title": "Newport Pier — First benches",
       "domain": "nature",
       "variant": "generated",
-      "videoUrl": null,
+      "videoUrl": "/nature/assets/video/nature-pier-first-bench.mp4",
       "portraitUrl": null,
-      "sourcePage": "/heygen-hub.html",
-      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "sourcePage": "/nature/newport-pier.html",
+      "studioPage": "/nature/newport-pier.html",
       "projectDir": null,
       "subtitle": null,
       "scriptPreview": "Halfway to the first benches, the water deepens slightly. Surfperch stay in the suds while Pacific sardine schools sometimes push through — great fun on sabiki or small hooks when they are thick.",
@@ -44,29 +45,8 @@
         "generated"
       ],
       "generatedAt": "2026-07-08T05:35:55.099Z",
-      "hostedLocally": false
-    },
-    {
-      "id": "nature-pier-mid-pier",
-      "kind": "heygen",
-      "videoId": "20d3327a47f349eabde702c93a6bdd8c",
-      "title": "Newport Pier — Mid pier",
-      "domain": "nature",
-      "variant": "generated",
-      "videoUrl": null,
-      "portraitUrl": null,
-      "sourcePage": "/heygen-hub.html",
-      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
-      "projectDir": null,
-      "subtitle": null,
-      "scriptPreview": "Mid pier is prime pelagic territory. Pacific mackerel and sardine run close to the structure in summer and fall. When bonito blitz through, cast a shiny lure fast — they will not wait.",
-      "tags": [
-        "heygen-api",
-        "nature",
-        "generated"
-      ],
-      "generatedAt": "2026-07-08T05:44:11.540Z",
-      "hostedLocally": false
+      "hostedLocally": true,
+      "cachedAt": "2026-07-10T06:19:11.558Z"
     },
     {
       "id": "nature-pier-shore-end",
@@ -75,10 +55,10 @@
       "title": "Newport Pier — Shore end",
       "domain": "nature",
       "variant": "generated",
-      "videoUrl": null,
+      "videoUrl": "/nature/assets/video/nature-pier-shore-end.mp4",
       "portraitUrl": null,
-      "sourcePage": "/heygen-hub.html",
-      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "sourcePage": "/nature/newport-pier.html",
+      "studioPage": "/nature/newport-pier.html",
       "projectDir": null,
       "subtitle": null,
       "scriptPreview": "Welcome to Newport Beach Pier. At the shore end, surf anglers target barred surfperch and California corbina in the wash. Light tackle, sand crabs, and fresh mussels are the go-to baits here.",
@@ -88,7 +68,8 @@
         "generated"
       ],
       "generatedAt": "2026-07-08T05:46:58.461Z",
-      "hostedLocally": false
+      "hostedLocally": true,
+      "cachedAt": "2026-07-10T06:19:38.938Z"
     },
     {
       "id": "nature-pier-deep-rail",
@@ -97,7 +78,7 @@
       "title": "Newport Pier — Deep water rail",
       "domain": "nature",
       "variant": "generated",
-      "videoUrl": null,
+      "videoUrl": "/nature/assets/video/nature-pier-deep-rail.mp4",
       "portraitUrl": null,
       "sourcePage": "/nature/newport-pier.html",
       "studioPage": "/nature/newport-pier.html",
@@ -110,7 +91,81 @@
         "generated"
       ],
       "generatedAt": "2026-07-08T06:44:52.414Z",
-      "hostedLocally": false
+      "hostedLocally": true,
+      "cachedAt": "2026-07-10T06:19:46.745Z"
+    },
+    {
+      "id": "nature-pier-mid-pier",
+      "kind": "heygen",
+      "videoId": "d95c3b1a3e224f18806d006e210d36b4",
+      "title": "Newport Pier — Mid pier",
+      "domain": "nature",
+      "variant": "generated",
+      "videoUrl": "/nature/assets/video/nature-pier-mid-pier.mp4",
+      "portraitUrl": null,
+      "sourcePage": "/nature/newport-pier.html",
+      "studioPage": "/nature/newport-pier.html",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "Mid pier is prime pelagic territory. Pacific mackerel and sardine run close to the structure in summer and fall. When bonito blitz through, cast a shiny lure fast — they will not wait.",
+      "tags": [
+        "heygen-api",
+        "nature",
+        "generated"
+      ],
+      "generatedAt": "2026-07-08T16:58:22.927Z",
+      "hostedLocally": true,
+      "cachedAt": "2026-07-10T06:19:48.917Z"
+    },
+    {
+      "id": "nature-pier-outer-pier",
+      "kind": "heygen",
+      "videoId": "9c5df401df8341a79779ac27d5967159",
+      "title": "Newport Pier — Outer pier",
+      "domain": "nature",
+      "variant": "generated",
+      "videoUrl": "/nature/assets/video/nature-pier-outer-pier.mp4",
+      "portraitUrl": null,
+      "sourcePage": "/nature/newport-pier.html",
+      "studioPage": "/nature/newport-pier.html",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "Near the outer rail, shovelnose guitarfish and leopard shark cruise the sandy bottom. Most anglers practice catch and release on sharks — use circle hooks and keep halibut within legal size.",
+      "tags": [
+        "heygen-api",
+        "nature",
+        "generated",
+        "newport-pier",
+        "outer-pier"
+      ],
+      "generatedAt": "2026-07-10T06:25:24.164Z",
+      "hostedLocally": true,
+      "cachedAt": "2026-07-10T06:34:59.796Z"
+    },
+    {
+      "id": "nature-pier-pier-tip",
+      "kind": "heygen",
+      "videoId": "d2566582db82457fb01807530678bb28",
+      "title": "Newport Pier — Pier tip",
+      "domain": "nature",
+      "variant": "generated",
+      "videoUrl": "/nature/assets/video/nature-pier-pier-tip.mp4",
+      "portraitUrl": null,
+      "sourcePage": "/nature/newport-pier.html",
+      "studioPage": "/nature/newport-pier.html",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "At the tip you are over the deepest water. Mackerel and bonito circle the end on favorable tides. White seabass occasionally show for patient anglers with live bait — check current regulations before you keep anything.",
+      "tags": [
+        "heygen-api",
+        "nature",
+        "generated",
+        "newport-pier",
+        "pier-tip"
+      ],
+      "generatedAt": "2026-07-10T06:26:45.297Z",
+      "hostedLocally": true,
+      "cachedAt": "2026-07-10T06:35:00.969Z"
     }
   ]
 }

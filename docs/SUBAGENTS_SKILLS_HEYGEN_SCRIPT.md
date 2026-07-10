@@ -1,6 +1,6 @@
 # Subagents + Skills — HeyGen Script
 
-> **Note:** HeyGen API integration was removed from the repo; paste these scripts manually into HeyGen (or similar) via Cursor workflow.
+> **Note:** HeyGen v3 API is live at `/api/heygen/*` (`services/heygen.service.js`). Regenerate booth clips with `npm run generate:disaster-heygen-demo` or render from the live studio on Unified Disasters. For this subagents tour, paste scripts into HeyGen manually or use `POST /api/heygen/videos` with `HEYGEN_API_KEY` configured.
 
 **Target:** Mixed technical audience (engineering + product)  
 **Duration:** 2-3 minutes  

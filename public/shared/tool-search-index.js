@@ -8,33 +8,45 @@
 (function (global) {
   'use strict';
 
+  const FINANCE_PUBLIC_PATHS = {
+    '/finance/disasters-unified.html': true,
+    '/finance/disasters-webcams.html': true,
+  };
+
+  function pathRequiresAuth(url) {
+    if (!url) return false;
+    let path = String(url).split('?')[0].split('#')[0].toLowerCase();
+    if (!path.startsWith('/finance/')) return false;
+    return !FINANCE_PUBLIC_PATHS[path];
+  }
+
   const TOOL_INDEX = [
     // Worksheets (calculators & disasters; paths remain /finance/)
-    { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets' },
-    { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API' },
-    { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API' },
-    { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter' },
-    { name: 'Processor assignment', url: '/finance/processor-assignment-mock.html', category: 'Encompass', keywords: 'processor assign complexity capacity associates mock demo synthetic offline' },
-    { name: 'Processor assignment (live Encompass)', url: '/finance/processor-assignment.html', category: 'Encompass', keywords: 'processor assign live encompass pipeline associates PUT' },
-    { name: 'Test Endpoints', url: '/finance/encompass-hub-test.html', category: 'Encompass', keywords: 'API test' },
-    { name: 'Pipeline Risk Dashboard', url: '/finance/pipeline-risk-dashboard.html', category: 'Encompass', keywords: 'disaster FEMA risk' },
-    { name: 'Unit Tests', url: '/finance/unit-tests.html', category: 'Encompass', keywords: 'excel test runner' },
-    { name: 'The Screen Test', url: '/finance/tool9.html', category: 'Encompass', keywords: 'form manifest XML' },
-    { name: 'Encompass Users', url: '/finance/encompass-users.html', category: 'Encompass', keywords: 'users directory' },
-    { name: 'Native Loan Fields', url: '/finance/encompass-native-fields.html', category: 'Encompass', keywords: 'field definitions' },
-    { name: 'Custom Loan Fields', url: '/finance/encompass-custom-fields.html', category: 'Encompass', keywords: 'custom fields' },
-    { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Worksheets', keywords: 'FHA refinance' },
-    { name: 'Asset Qualifier', url: '/finance/asset-qualifier-calculator.html', category: 'Worksheets', keywords: 'asset retirement' },
-    { name: 'DTI Calculator', url: '/finance/dti-calculator.html', category: 'Worksheets', keywords: 'debt income ratio' },
-    { name: 'Closing Cost Calculator', url: '/finance/closing-cost-calculator.html', category: 'Worksheets', keywords: 'closing fees' },
-    { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Worksheets', keywords: 'VA refinance' },
-    { name: 'Disasters Unified', url: '/finance/disasters-unified.html', category: 'Worksheets', keywords: 'FEMA disaster' },
-    { name: 'The Parser', url: '/finance/tool2.html', category: 'Encompass', keywords: 'JSON parser' },
-    { name: 'The Mashup', url: '/finance/tool3.html', category: 'Encompass', keywords: 'FEMA disaster data' },
-    { name: 'The Automator', url: '/finance/tool4.html', category: 'Encompass', keywords: 'automation workflow' },
-    { name: 'The Ruler', url: '/finance/tool5.html', category: 'Encompass', keywords: 'field analyzer' },
-    { name: 'The Transformer', url: '/finance/tool6.html', category: 'Encompass', keywords: 'XML JSON converter' },
-    { name: 'The Alchemist', url: '/finance/tool8.html', category: 'Encompass', keywords: 'code converter' },
+    { name: 'Worksheets Hub', url: '/finance/index.html', category: 'Worksheets', keywords: 'calculator hub worksheets', requiresAuth: true },
+    { name: 'Encompass Assistant', url: '/finance/encompass-assistant.html', category: 'Encompass', keywords: 'AI robot mortgage API', requiresAuth: true },
+    { name: 'Encompass Hub', url: '/finance/encompass-hub.html', category: 'Encompass', keywords: 'pipeline loans API', requiresAuth: true },
+    { name: 'Loan batch update', url: '/finance/loan-batch-update.html', category: 'Encompass', keywords: 'batch update loanBatch custom fields filter', requiresAuth: true },
+    { name: 'Processor assignment', url: '/finance/processor-assignment-mock.html', category: 'Encompass', keywords: 'processor assign complexity capacity associates mock demo synthetic offline', requiresAuth: true },
+    { name: 'Processor assignment (live Encompass)', url: '/finance/processor-assignment.html', category: 'Encompass', keywords: 'processor assign live encompass pipeline associates PUT', requiresAuth: true },
+    { name: 'Test Endpoints', url: '/finance/encompass-hub-test.html', category: 'Encompass', keywords: 'API test', requiresAuth: true },
+    { name: 'Pipeline Risk Dashboard', url: '/finance/pipeline-risk-dashboard.html', category: 'Encompass', keywords: 'disaster FEMA risk', requiresAuth: true },
+    { name: 'Unit Tests', url: '/finance/unit-tests.html', category: 'Encompass', keywords: 'excel test runner', requiresAuth: true },
+    { name: 'The Screen Test', url: '/finance/tool9.html', category: 'Encompass', keywords: 'form manifest XML', requiresAuth: true },
+    { name: 'Encompass Users', url: '/finance/encompass-users.html', category: 'Encompass', keywords: 'users directory', requiresAuth: true },
+    { name: 'Native Loan Fields', url: '/finance/encompass-native-fields.html', category: 'Encompass', keywords: 'field definitions', requiresAuth: true },
+    { name: 'Custom Loan Fields', url: '/finance/encompass-custom-fields.html', category: 'Encompass', keywords: 'custom fields', requiresAuth: true },
+    { name: 'FHA Streamline', url: '/finance/fha-streamline-calculator.html', category: 'Worksheets', keywords: 'FHA refinance', requiresAuth: true },
+    { name: 'Asset Qualifier', url: '/finance/asset-qualifier-calculator.html', category: 'Worksheets', keywords: 'asset retirement', requiresAuth: true },
+    { name: 'DTI Calculator', url: '/finance/dti-calculator.html', category: 'Worksheets', keywords: 'debt income ratio', requiresAuth: true },
+    { name: 'Closing Cost Calculator', url: '/finance/closing-cost-calculator.html', category: 'Worksheets', keywords: 'closing fees', requiresAuth: true },
+    { name: 'VA IRRRL', url: '/finance/va-irrrl-calculator.html', category: 'Worksheets', keywords: 'VA refinance', requiresAuth: true },
+    { name: 'Disasters Unified', url: '/finance/disasters-unified.html', category: 'Worksheets', keywords: 'FEMA disaster', requiresAuth: false },
+    { name: 'The Parser', url: '/finance/tool2.html', category: 'Encompass', keywords: 'JSON parser', requiresAuth: true },
+    { name: 'The Mashup', url: '/finance/tool3.html', category: 'Encompass', keywords: 'FEMA disaster data', requiresAuth: true },
+    { name: 'The Automator', url: '/finance/tool4.html', category: 'Encompass', keywords: 'automation workflow', requiresAuth: true },
+    { name: 'The Ruler', url: '/finance/tool5.html', category: 'Encompass', keywords: 'field analyzer', requiresAuth: true },
+    { name: 'The Transformer', url: '/finance/tool6.html', category: 'Encompass', keywords: 'XML JSON converter', requiresAuth: true },
+    { name: 'The Alchemist', url: '/finance/tool8.html', category: 'Encompass', keywords: 'code converter', requiresAuth: true },
     // Music
     { name: 'Music Research', url: '/music/music-research.html', category: 'Music', keywords: 'artist search' },
     { name: 'Album Discovery', url: '/music/album-discovery.html', category: 'Music', keywords: 'albums covers' },
@@ -76,5 +88,21 @@
     { name: 'Home', url: '/', category: 'Hub', keywords: 'hub index' },
   ];
 
+  function toolRequiresAuth(tool) {
+    if (!tool) return false;
+    if (typeof tool.requiresAuth === 'boolean') return tool.requiresAuth;
+    return pathRequiresAuth(tool.url);
+  }
+
+  function getVisibleToolIndex(loggedIn) {
+    const authed = typeof loggedIn === 'boolean'
+      ? loggedIn
+      : (typeof global.isLoggedIn === 'function' && !!global.isLoggedIn());
+    if (authed) return TOOL_INDEX.slice();
+    return TOOL_INDEX.filter((tool) => !toolRequiresAuth(tool));
+  }
+
   global.TOOL_INDEX = TOOL_INDEX;
+  global.getVisibleToolIndex = getVisibleToolIndex;
+  global.toolRequiresAuth = toolRequiresAuth;
 })(typeof window !== 'undefined' ? window : globalThis);

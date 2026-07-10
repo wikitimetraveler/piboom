@@ -1,0 +1,18 @@
+{
+  "title": "Unit Tests Demo",
+  "brand": {
+    "developmentBy": "David E Lane",
+    "attribution": "Avatar narration powered by HeyGen"
+  },
+  "heygenTitle": "Unit Tests Demo",
+  "heygenScriptShort": "This is the DevConnect Labs Unit Test tool — test Encompass custom field calculations against real loan data without leaving your browser. Generate tests from a calculated field, edit values with type-aware editors, then run against a Loan GUID for pass or fail results. Tap Open Unit Tests below to try Story Mode or load your own workbook.",
+  "heygenAvatarId": "f6a9e6cdffe14958b516b6c18759c2d9",
+  "heygenVoiceId": "828b59f834fd4c7188da322b6d9b6c75",
+  "ctaLabel": "Open Unit Tests",
+  "ctaHref": "/finance/unit-tests.html",
+  "qrLandingPath": "/finance/unit-tests.html?demo=heygen",
+  "heygenVideoIdShort": "38b4300089264e159cd08d85fe6593da",
+  "heygenVideoUrlShort": "/finance/assets/video/unit-tests-heygen-short.mp4",
+  "generatedAt": "2026-07-10T06:16:50.170Z",
+  "heygenVideoLocalShort": "/finance/assets/video/unit-tests-heygen-short.mp4"
+}

@@ -48,19 +48,27 @@
 <script src="/shared/js/portfolio-shell.js"></script>
 <script>
 window.addEventListener('DOMContentLoaded', () => {
-  const grid = document.getElementById('financeToolGrid');
-  if (!grid || !window.MENU_CONFIG || !window.MENU_CONFIG.FINANCE_TOOLS) return;
-  grid.innerHTML = window.MENU_CONFIG.FINANCE_TOOLS.map(function (item) {
-    const title = (item.title || item.label || '').replace(/"/g, '&quot;');
-    const label = (item.label || '').replace(/"/g, '&quot;');
-    const icon = item.icon || 'bi-box';
-    const href = item.href || '#';
-    return (
-      '<a class="portfolio-finance-tile" href="' + href + '" title="' + title + '">' +
-      '<i class="bi ' + icon + '" aria-hidden="true"></i>' +
-      '<span>' + label + '</span></a>'
-    );
-  }).join('');
+  function renderFinanceTools() {
+    const grid = document.getElementById('financeToolGrid');
+    if (!grid || !window.MENU_CONFIG || !window.MENU_CONFIG.FINANCE_TOOLS) return;
+    const loggedIn = typeof window.isLoggedIn === 'function' && window.isLoggedIn();
+    const tools = window.MENU_CONFIG.filterToolsByAuth
+      ? window.MENU_CONFIG.filterToolsByAuth(window.MENU_CONFIG.FINANCE_TOOLS, loggedIn)
+      : window.MENU_CONFIG.FINANCE_TOOLS;
+    grid.innerHTML = tools.map(function (item) {
+      const title = (item.title || item.label || '').replace(/"/g, '&quot;');
+      const label = (item.label || '').replace(/"/g, '&quot;');
+      const icon = item.icon || 'bi-box';
+      const href = item.href || '#';
+      return (
+        '<a class="portfolio-finance-tile" href="' + href + '" title="' + title + '">' +
+        '<i class="bi ' + icon + '" aria-hidden="true"></i>' +
+        '<span>' + label + '</span></a>'
+      );
+    }).join('');
+  }
+  renderFinanceTools();
+  window.addEventListener('user-logged-in', renderFinanceTools);
 });
 </script>
 <script src="/shared/finance-auth-guard.js"></script>

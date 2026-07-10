@@ -557,10 +557,14 @@
     <script src="/shared/finance-auth-guard.js"></script>
     <script>
       (function () {
-        var grid = document.getElementById('encompassToolGrid');
-        if (grid && window.MENU_CONFIG && window.MENU_CONFIG.ENCOMPASS_TOOLS) {
-          grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.ENCOMPASS_TOOLS);
+        function renderEncompassTools() {
+          var grid = document.getElementById('encompassToolGrid');
+          if (grid && window.MENU_CONFIG && window.MENU_CONFIG.ENCOMPASS_TOOLS) {
+            grid.innerHTML = window.MENU_CONFIG.renderDomainGridItems(window.MENU_CONFIG.ENCOMPASS_TOOLS);
+          }
         }
+        renderEncompassTools();
+        window.addEventListener('user-logged-in', renderEncompassTools);
       })();
     </script>
   </body>

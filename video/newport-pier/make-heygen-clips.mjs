@@ -1,7 +1,10 @@
 /**
  * Generate HeyGen avatar clips per pier stop from data/newport-pier-fish.json.
- * Requires HEYGEN_API_KEY and avatar/voice in assets/heygen/config.json (or catalog.avatar).
+ * Prefer the root batch tool (poll, cache, PiP, catalog sync):
+ *   npm run generate:newport-pier-heygen
+ *   npm run generate:newport-pier-heygen:render
  *
+ * This stub queues jobs via the local API when the server is running.
  * Usage: node make-heygen-clips.mjs
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';

@@ -46,7 +46,7 @@ async function main() {
 
   let vf = `chromakey=${key}:0.14:0.06,format=yuva420p`;
   if (circle) {
-    vf += `,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte(hypot(X-(W/2),Y-(H/2)),min(W,H)/2-2),alpha(X,Y),0)'`;
+    vf += `,geq=r='r(X,Y)':g='g(X,Y)':b='b(X,Y)':a='if(lte(hypot(X-(W/2),Y-(H/2)),min(W,H)/2-2),alpha(X,Y),0)',format=yuva420p`;
   }
 
   console.log(`Chromakey ${key}${circle ? ' + circle mask' : ''} → ${outputPath}`);

@@ -188,6 +188,12 @@
     { href: '/music/sample-detector.html', icon: 'bi-magnet', label: 'Sample Detector', title: 'Detect samples and covers' },
   ];
 
+  /** Public /finance pages (no login). Keep in sync with server.js FINANCE_PUBLIC_PAGES. */
+  const FINANCE_PUBLIC_PATHS = [
+    '/finance/disasters-unified.html',
+    '/finance/disasters-webcams.html',
+  ];
+
   /** Get home domain tiles, optionally filtered for demo mode */
   function getDomainTiles(demoMode) {
     if (demoMode) {
@@ -207,6 +213,63 @@
       .replace(/^-+|-+$/g, '') || 'home';
   }
 
+  function normalizeHrefPath(href) {
+    if (!href) return '';
+    try {
+      return new URL(href, 'http://local').pathname.toLowerCase();
+    } catch (_) {
+      return String(href).split('?')[0].split('#')[0].toLowerCase();
+    }
+  }
+
+  /** True when href is under /finance/ and not a public disaster page. */
+  function pathRequiresAuth(href) {
+    const path = normalizeHrefPath(href);
+    if (!path.startsWith('/finance/')) return false;
+    return FINANCE_PUBLIC_PATHS.indexOf(path) === -1;
+  }
+
+  function itemRequiresAuth(item) {
+    if (!item || item.divider) return false;
+    if (typeof item.requiresAuth === 'boolean') return item.requiresAuth;
+    return pathRequiresAuth(item.href);
+  }
+
+  /**
+   * Hide login-required finance/Encompass tools when logged out.
+   * Preserves dividers only when they still separate visible items.
+   */
+  function filterToolsByAuth(items, loggedIn) {
+    if (!items || !items.length) return [];
+    if (loggedIn) return items.slice();
+    const filtered = [];
+    items.forEach(function (item) {
+      if (!item) return;
+      if (item.divider) {
+        filtered.push(item);
+        return;
+      }
+      if (!itemRequiresAuth(item)) {
+        filtered.push(item);
+      }
+    });
+    const cleaned = [];
+    filtered.forEach(function (item) {
+      if (item.divider) {
+        if (!cleaned.length || cleaned[cleaned.length - 1].divider) return;
+        cleaned.push(item);
+        return;
+      }
+      cleaned.push(item);
+    });
+    if (cleaned.length && cleaned[cleaned.length - 1].divider) cleaned.pop();
+    return cleaned;
+  }
+
+  function isUserLoggedIn() {
+    return typeof global.isLoggedIn === 'function' && !!global.isLoggedIn();
+  }
+
   function normalizeToolItem(item, options) {
     const basePath = (options && options.basePath) || '';
     const href = item.href.startsWith('/') ? item.href : basePath + item.href;
@@ -217,11 +280,14 @@
       label: item.label || 'Tool',
       title: item.title || item.label || 'Tool',
       category: item.category || (options && options.category) || 'General',
-      domain: item.domain || ''
+      domain: item.domain || '',
+      requiresAuth: itemRequiresAuth(Object.assign({}, item, { href: href }))
     };
   }
 
-  function getAllTools(demoMode) {
+  function getAllTools(demoMode, options) {
+    const opts = options || {};
+    const loggedIn = typeof opts.loggedIn === 'boolean' ? opts.loggedIn : isUserLoggedIn();
     const groups = [
       { items: getDomainTiles(demoMode), category: 'Domain' },
       { items: FINANCE_TOOLS, category: 'Worksheets' },
@@ -233,7 +299,7 @@
     ];
     const tools = [];
     groups.forEach((group) => {
-      (group.items || []).forEach((item) => {
+      filterToolsByAuth(group.items || [], loggedIn).forEach((item) => {
         if (item && !item.divider && item.href) {
           tools.push(normalizeToolItem(item, { category: group.category }));
         }
@@ -244,7 +310,10 @@
 
   /** Render domain grid HTML from items array */
   function renderDomainGridItems(items, options) {
-    return items.map(function (item) {
+    const opts = options || {};
+    const loggedIn = typeof opts.loggedIn === 'boolean' ? opts.loggedIn : isUserLoggedIn();
+    const visible = filterToolsByAuth(items || [], loggedIn);
+    return visible.map(function (item) {
       const normalized = normalizeToolItem(item, options);
       const domain = normalized.domain ? ' data-domain="' + normalized.domain + '"' : '';
       const title = normalized.title.replace(/"/g, '&quot;');
@@ -264,10 +333,14 @@
 
   const MENU_CONFIG = {
     DOMAIN_TILES,
+    FINANCE_PUBLIC_PATHS,
     getDomainTiles,
     getAllTools,
     makeToolId,
     normalizeToolItem,
+    pathRequiresAuth,
+    itemRequiresAuth,
+    filterToolsByAuth,
     renderDomainGridItems,
     NAV_FINANCE,
     NAV_ENCOMPASS,

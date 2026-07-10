@@ -6,9 +6,12 @@
  */
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const OUT = path.resolve('assets/heygen');
 const BASE = process.env.API_BASE || 'http://localhost:3000';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.resolve(__dirname, '../..');
 
 const SCRIPTS = {
   intro:
@@ -28,6 +31,18 @@ try {
 }
 
 if (!config.avatarId || !config.voiceId) {
+  try {
+    const pier = JSON.parse(
+      await (await import('node:fs/promises')).readFile(path.join(ROOT, 'data/newport-pier-fish.json'), 'utf8')
+    );
+    config.avatarId = config.avatarId || pier.avatar?.avatarId;
+    config.voiceId = config.voiceId || pier.avatar?.voiceId;
+  } catch {
+    /* optional fallback */
+  }
+}
+
+if (!config.avatarId || !config.voiceId) {
   console.log('HeyGen config missing — write assets/heygen/config.json with { "avatarId", "voiceId" }');
   console.log('List options: GET /api/heygen/avatars and /api/heygen/voices');
   console.log('Scripts saved to assets/heygen/scripts.json');
@@ -35,7 +50,7 @@ if (!config.avatarId || !config.voiceId) {
 }
 
 for (const [kind, script] of Object.entries(SCRIPTS)) {
-  const res = await fetch(`${BASE}/api/heygen/video`, {
+  const res = await fetch(`${BASE}/api/heygen/videos`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -52,7 +67,7 @@ for (const [kind, script] of Object.entries(SCRIPTS)) {
     continue;
   }
   const videoId = json.data?.video_id || json.video_id;
-  console.log(`${kind}: video_id=${videoId} — poll GET /api/heygen/video/${videoId}`);
+  console.log(`${kind}: video_id=${videoId} — poll GET /api/heygen/videos/${videoId}`);
   await writeFile(path.join(OUT, `${kind}-job.json`), JSON.stringify({ videoId, script }, null, 2));
 }
 

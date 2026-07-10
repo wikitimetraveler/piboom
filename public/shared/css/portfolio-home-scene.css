@@ -66,7 +66,7 @@
 /* Content above gradient */
 .portfolio-page--home .portfolio-header {
   position: sticky;
-  z-index: 100;
+  z-index: 11500;
   background: rgba(255, 255, 255, 0.78);
   border-bottom-color: rgba(var(--zen-primary-rgb, 74, 144, 164), 0.15);
   backdrop-filter: blur(14px) saturate(1.2);

@@ -1,0 +1,63 @@
+/**
+ * Finance booth HeyGen popup — ?demo=heygen or ?short=1
+ */
+
+body.fi-demo-popup-active .floating-notes {
+  display: none;
+}
+
+.fi-heygen-demo-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.fi-heygen-demo-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+}
+
+.fi-heygen-demo-panel {
+  position: relative;
+  width: min(100%, 720px);
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.fi-heygen-demo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(16, 185, 129, 0.1));
+}
+
+.fi-heygen-demo-body {
+  padding: 0;
+  background: #000;
+}
+
+.fi-heygen-demo-video {
+  display: block;
+  width: 100%;
+  max-height: min(56vh, 480px);
+  object-fit: contain;
+  background: #000;
+}
+
+.fi-heygen-demo-footer {
+  padding: 1rem 1.25rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+}

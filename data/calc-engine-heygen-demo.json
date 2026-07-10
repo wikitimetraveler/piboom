@@ -1,0 +1,18 @@
+{
+  "title": "Calculations Engine Demo",
+  "brand": {
+    "developmentBy": "David E Lane",
+    "attribution": "Avatar narration powered by HeyGen"
+  },
+  "heygenTitle": "Calculations Engine Demo",
+  "heygenScriptShort": "This is our FHA Streamline Loan Amount worksheet — spreadsheet logic wired through one shared Calculations Engine with DAG-lite. Change an additional amount and G15 through G30 cascade automatically — no hand-wired listeners. Pure math lives in calcMath; bindings live in calculationEngine.js. Open the worksheet below to see one keystroke update the whole chain.",
+  "heygenAvatarId": "f6a9e6cdffe14958b516b6c18759c2d9",
+  "heygenVoiceId": "828b59f834fd4c7188da322b6d9b6c75",
+  "ctaLabel": "Open FHA Loan Amount Worksheet",
+  "ctaHref": "/finance/fha-streamline-loan-amount-calculator.html",
+  "qrLandingPath": "/finance/fha-streamline-loan-amount-calculator.html?demo=heygen",
+  "heygenVideoIdShort": "a545cd43009a45cdae82b791b6938c88",
+  "heygenVideoUrlShort": "/finance/assets/video/calc-engine-heygen-short.mp4",
+  "generatedAt": "2026-07-10T06:14:50.278Z",
+  "heygenVideoLocalShort": "/finance/assets/video/calc-engine-heygen-short.mp4"
+}

@@ -145,16 +145,36 @@ class ModernNavbar extends HTMLElement {
     try { return localStorage.getItem('demoMode') === '1'; } catch (_) { return false; }
   }
 
-  renderDropdownItems(items) {
-    if (!items || !items.length) return '';
+  isUserLoggedIn() {
+    return typeof window.isLoggedIn === 'function' && !!window.isLoggedIn();
+  }
+
+  getVisibleNavItems(items) {
     const cfg = window.MENU_CONFIG;
-    if (!cfg) return '';
+    if (!items || !items.length) return [];
+    if (cfg && typeof cfg.filterToolsByAuth === 'function') {
+      return cfg.filterToolsByAuth(items, this.isUserLoggedIn());
+    }
+    return items;
+  }
+
+  renderDropdownItems(items) {
+    const visible = this.getVisibleNavItems(items);
+    if (!visible.length) return '';
     const currentPath = location.pathname;
-    return items.map(function (it) {
+    return visible.map(function (it) {
       if (it.divider) return '<div class="dropdown-divider"></div>';
       const isActive = it.href && (currentPath === it.href || (it.href !== '/' && currentPath.endsWith(it.href)));
       return '<a class="dropdown-item' + (isActive ? ' active' : '') + '" href="' + it.href + '"><i class="bi ' + it.icon + '"></i> ' + it.label + '</a>';
     }).join('\n                  ');
+  }
+
+  refreshFinanceDropdown() {
+    const cfg = window.MENU_CONFIG || {};
+    const menu = this.shadowRoot?.querySelector('#navFinanceDropdown .dropdown-menu');
+    if (!menu) return;
+    menu.innerHTML = this.renderDropdownItems(cfg.NAV_FINANCE || []);
+    this.markActiveNavItems();
   }
 
   render() {
@@ -670,6 +690,7 @@ class ModernNavbar extends HTMLElement {
   // Public method to update user display (can be called from outside)
   refresh() {
     this.updateUserDisplay();
+    this.refreshFinanceDropdown();
   }
 }
 

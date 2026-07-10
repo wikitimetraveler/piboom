@@ -46,18 +46,19 @@
     <div class="portfolio-cap-grid" id="portfolioCapabilities"></div>
   </section>
 
-  <section class="portfolio-section" aria-labelledby="featuredTitle">
+  <section class="portfolio-section" id="portfolioFeaturedSection" aria-labelledby="featuredTitle">
     <div class="portfolio-section__head">
       <div>
         <p class="portfolio-kicker">Featured work</p>
-        <h2 id="featuredTitle" class="portfolio-section__title">Live demos</h2>
+        <h2 id="featuredTitle" class="portfolio-section__title">Public live demos</h2>
+        <p class="portfolio-section__lead" id="portfolioFeaturedLead">Open these without login. Encompass tools unlock after you pass the wall of fire.</p>
       </div>
       <a class="portfolio-btn portfolio-btn--outline" href="/work.html">All projects</a>
     </div>
     <div class="portfolio-case-grid" id="portfolioFeatured"></div>
   </section>
 
-  <section class="portfolio-section" aria-labelledby="moreTitle">
+  <section class="portfolio-section" id="portfolioMoreSection" aria-labelledby="moreTitle">
     <p class="portfolio-kicker">More tools</p>
     <h2 id="moreTitle" class="portfolio-section__title">Encompass &amp; mortgage stack</h2>
     <p class="portfolio-section__lead">Additional hubs, assistants, and calculators — some require finance login on this deployment.</p>
@@ -77,6 +78,46 @@
   · <a href="/family/lane-family.html">Other work (Lane family)</a>
 </footer>
 
+<script src="/shared/demo-users.js"></script>
+<script src="/shared/user-login.js"></script>
+<script src="/shared/user-passwords.js"></script>
+<script src="/shared/js/finance-fire-gate.js"></script>
 <script src="/shared/js/portfolio-shell.js"></script>
+<script>
+(function () {
+  function isHomeLoggedIn() {
+    return typeof window.isLoggedIn === 'function' && window.isLoggedIn();
+  }
+
+  function wasDismissed() {
+    try {
+      return sessionStorage.getItem('financeFireGateDismissed') === '1';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function mountHomeFireWall() {
+    if (isHomeLoggedIn() || wasDismissed()) return;
+    if (!window.FinanceFireGate || typeof window.FinanceFireGate.mount !== 'function') return;
+    window.FinanceFireGate.mount({ homeMode: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountHomeFireWall);
+  } else {
+    mountHomeFireWall();
+  }
+
+  window.addEventListener('user-logged-in', function () {
+    try {
+      sessionStorage.removeItem('financeFireGateDismissed');
+    } catch (_) {}
+    if (window.FinanceFireGate && window.FinanceFireGate.isMounted()) {
+      window.FinanceFireGate.unmount();
+    }
+  });
+})();
+</script>
 </body>
 </html>

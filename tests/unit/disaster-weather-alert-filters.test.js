@@ -72,6 +72,27 @@ describe('DisasterWeatherAlertFilters', () => {
     expect(DWAF.rowPassesNwsGridFilter({ source: 'fema', state: 'CA', county: 'Sonoma' }, { state: 'CA' })).toBe(false);
   });
 
+  test('rowPassesAdminGridFilter matches all sources in state/county', () => {
+    const gridRow = { source: 'fema', state: 'CA', county: 'Sonoma County', disasterObj: femaRow };
+    expect(DWAF.rowPassesAdminGridFilter(gridRow, { state: 'CA', county: 'Sonoma' })).toBe(true);
+    expect(DWAF.rowPassesAdminGridFilter(gridRow, { state: 'TX', county: 'Sonoma' })).toBe(false);
+    expect(DWAF.rowPassesAdminGridFilter({ source: 'nws', state: 'CA', county: 'Sonoma' }, { state: 'CA' })).toBe(true);
+  });
+
+  test('rowPassesSelectionGridFilter uses filterMode', () => {
+    const nwsGrid = { source: 'nws', state: 'CA', county: 'Sonoma', disasterObj: nwsRow };
+    const femaGrid = { source: 'fema', state: 'CA', county: 'Sonoma', disasterObj: femaRow };
+    expect(
+      DWAF.rowPassesSelectionGridFilter(femaGrid, { state: 'CA', county: 'Sonoma', filterMode: 'admin-area' })
+    ).toBe(true);
+    expect(
+      DWAF.rowPassesSelectionGridFilter(femaGrid, { state: 'CA', county: 'Sonoma', filterMode: 'nws-only' })
+    ).toBe(false);
+    expect(
+      DWAF.rowPassesSelectionGridFilter(nwsGrid, { state: 'CA', county: 'Sonoma', filterMode: 'nws-only' })
+    ).toBe(true);
+  });
+
   test('excludeAlertByKey removes selected alert', () => {
     const key = DWAF.alertMatchKey(nwsRow);
     const { alerts } = DWAF.fetchWeatherAlertsFromLocalRows(

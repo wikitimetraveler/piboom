@@ -1,0 +1,18 @@
+{
+  "title": "Sven UX Demo",
+  "brand": {
+    "developmentBy": "David E Lane",
+    "attribution": "Avatar narration powered by HeyGen"
+  },
+  "heygenTitle": "Sven UX Demo",
+  "heygenScriptShort": "You say you're on Bootstrap five. Then I find mr-2 in the markup. That's not a margin — that's the ghost of Bootstrap four, waving hello. The living use me-2. I'm Sven, your UX guide for DevConnect Labs — one clear title, one obvious action, and interfaces that admit when they're thinking.",
+  "heygenAvatarId": "f6a9e6cdffe14958b516b6c18759c2d9",
+  "heygenVoiceId": "828b59f834fd4c7188da322b6d9b6c75",
+  "ctaLabel": "Explore the Stack",
+  "ctaHref": "/stack.html",
+  "qrLandingPath": "/stack.html?demo=heygen",
+  "heygenVideoIdShort": "16e43f5db369412eb099e2655db6265d",
+  "heygenVideoUrlShort": "/finance/assets/video/sven-ux-heygen-short.mp4",
+  "generatedAt": "2026-07-10T06:18:48.264Z",
+  "heygenVideoLocalShort": "/finance/assets/video/sven-ux-heygen-short.mp4"
+}

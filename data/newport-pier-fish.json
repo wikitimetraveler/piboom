@@ -41,7 +41,9 @@
         "california-corbina"
       ],
       "heygenScript": "Welcome to Newport Beach Pier. At the shore end, surf anglers target barred surfperch and California corbina in the wash. Light tackle, sand crabs, and fresh mussels are the go-to baits here.",
-      "heygenVideoUrl": null
+      "heygenVideoUrl": "/nature/assets/video/nature-pier-shore-end.mp4",
+      "heygenVideoId": "651dc2d27c8d4c1a8371793ecb579eee",
+      "heygenVideoAlphaUrl": "/nature/assets/video/nature-pier-shore-end-pip.webm"
     },
     {
       "id": "first-bench",
@@ -54,8 +56,10 @@
         "pacific-sardine"
       ],
       "heygenScript": "Halfway to the first benches, the water deepens slightly. Surfperch stay in the suds while Pacific sardine schools sometimes push through — great fun on sabiki or small hooks when they are thick.",
-      "heygenVideoUrl": null,
-      "compositeVideoUrl": "/nature/assets/newport-pier/composites/first-bench.mp4"
+      "heygenVideoUrl": "/nature/assets/video/nature-pier-first-bench.mp4",
+      "compositeVideoUrl": "/nature/assets/newport-pier/composites/first-bench.mp4",
+      "heygenVideoId": "bacf80b94af04bf7ba214d525f399199",
+      "heygenVideoAlphaUrl": "/nature/assets/video/nature-pier-first-bench-pip.webm"
     },
     {
       "id": "mid-pier",
@@ -69,7 +73,9 @@
         "pacific-sardine"
       ],
       "heygenScript": "Mid pier is prime pelagic territory. Pacific mackerel and sardine run close to the structure in summer and fall. When bonito blitz through, cast a shiny lure fast — they will not wait.",
-      "heygenVideoUrl": null
+      "heygenVideoUrl": "/nature/assets/video/nature-pier-mid-pier.mp4",
+      "heygenVideoAlphaUrl": "/nature/assets/video/nature-pier-mid-pier-pip.webm",
+      "heygenVideoId": "d95c3b1a3e224f18806d006e210d36b4"
     },
     {
       "id": "deep-rail",
@@ -83,8 +89,9 @@
         "pacific-mackerel"
       ],
       "heygenScript": "Over deeper sand here, California halibut and slot-sized white seabass patrol the bottom. Drop a live sardine or a soft plastic on a Carolina rig and work the edges of the pilings.",
-      "heygenVideoUrl": null,
-      "heygenVideoAlphaUrl": "https://files2.heygen.ai/aws_pacific/avatar_tmp/20b61966d58a4ff7b906c3ccbef64908/864622003b9e42eeb2767e0076642c89.webm?Expires=1784098006&Signature=WpfolZE~M6Xkoe14uc4BguDCWiAG3~GA7fkJvOPsBN03iQWvrL8t3upJwUz7CNM9RsG97cFMpCoNsbAeSxUY11xdNya1zN0ujliyC3sWDGufS4~Mm~8UsMcIRDbGj7KD7eK168AJ5DcNTSrHQ3q2ztFZXXx4cGSDnALM72exrzrFxd6Vg2cXTVjqkfVj2mmKzPn5f6qgUWLgmuMrvr~gX5PWVIL8EdVL3JxWTi99XW3kNM1V1f95e0uVW9z9I-ORlh1pV-RGD~3kPsqKxWZAZjFrcbJdHVKRl5lzckOlfeMgPuJZO4GnlHc1EyqXsAH9~Jiro~UZh8GManI5NO8DXA__&Key-Pair-Id=K38HBHX5LX3X2H"
+      "heygenVideoUrl": "/nature/assets/video/nature-pier-deep-rail.mp4",
+      "heygenVideoAlphaUrl": "/nature/assets/video/nature-pier-deep-rail-pip.webm",
+      "heygenVideoId": "864622003b9e42eeb2767e0076642c89"
     },
     {
       "id": "outer-pier",
@@ -98,7 +105,9 @@
         "california-halibut"
       ],
       "heygenScript": "Near the outer rail, shovelnose guitarfish and leopard shark cruise the sandy bottom. Most anglers practice catch and release on sharks — use circle hooks and keep halibut within legal size.",
-      "heygenVideoUrl": null
+      "heygenVideoUrl": "/nature/assets/video/nature-pier-outer-pier.mp4",
+      "heygenVideoId": "9c5df401df8341a79779ac27d5967159",
+      "heygenVideoAlphaUrl": "/nature/assets/video/nature-pier-outer-pier-pip.webm"
     },
     {
       "id": "pier-tip",
@@ -112,7 +121,9 @@
         "white-seabass"
       ],
       "heygenScript": "At the tip you are over the deepest water. Mackerel and bonito circle the end on favorable tides. White seabass occasionally show for patient anglers with live bait — check current regulations before you keep anything.",
-      "heygenVideoUrl": null
+      "heygenVideoUrl": "/nature/assets/video/nature-pier-pier-tip.mp4",
+      "heygenVideoId": "d2566582db82457fb01807530678bb28",
+      "heygenVideoAlphaUrl": "/nature/assets/video/nature-pier-pier-tip-pip.webm"
     }
   ],
   "fish": [

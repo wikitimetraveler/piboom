@@ -23,6 +23,11 @@ describe('heygen-library.service', () => {
     const disasters = await getHeygenVideoLibrary({ domain: 'disasters' });
     expect(disasters.videos.length).toBeGreaterThan(0);
     expect(disasters.videos.every((v) => v.domain === 'disasters')).toBe(true);
+
+    const finance = await getHeygenVideoLibrary({ domain: 'finance' });
+    expect(finance.videos.length).toBeGreaterThanOrEqual(3);
+    expect(finance.videos.every((v) => v.domain === 'finance')).toBe(true);
+    expect(finance.videos.some((v) => v.id === 'finance-calc-engine-demo')).toBe(true);
   });
 
   test('getHeygenVideoLibrary includes HyperFrames reels', async () => {

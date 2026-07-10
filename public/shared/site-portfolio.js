@@ -381,6 +381,8 @@
       path: '/gse-analyzer.html',
       icon: 'bi-calculator',
       category: 'encompass',
+      featured: true,
+      featuredOrder: 4,
       problem: 'Model GSE scenario ratios with shared calculationEngine helpers.',
       consultingBlurb: 'Pure calcMath helpers and scenario UI for mortgage worksheet workflows.',
       stack: ['calculationEngine', 'calcMath', 'Bootstrap'],
@@ -405,6 +407,7 @@
       icon: 'bi-bank',
       category: 'encompass',
       demoOnly: true,
+      authRequired: true,
       problem: 'Curated calculator and Encompass tool entry point.',
       consultingBlurb: 'Bootstrap hub with shared calculationEngine and finance auth guard.',
       stack: ['calculationEngine', 'Bootstrap', 'Worksheets'],
@@ -569,11 +572,22 @@
     return resolveSiteUrl(site);
   }
 
-  function getPortfolioSites(demoMode) {
+  function getPortfolioSites(demoMode, options) {
+    const opts = options || {};
+    let list;
     if (demoMode) {
-      return PORTFOLIO_SITES.filter((s) => s.demoOnly);
+      list = PORTFOLIO_SITES.filter((s) => s.demoOnly);
+    } else {
+      list = PORTFOLIO_SITES.filter((s) => !s.demoOnly);
     }
-    return PORTFOLIO_SITES.filter((s) => !s.demoOnly);
+    const loggedIn =
+      typeof opts.loggedIn === 'boolean'
+        ? opts.loggedIn
+        : typeof global.isLoggedIn === 'function' && !!global.isLoggedIn();
+    if (!loggedIn && opts.hideAuthRequired !== false) {
+      list = list.filter((s) => !s.authRequired);
+    }
+    return list;
   }
 
   function getPortfolioProjects(options) {
@@ -592,6 +606,13 @@
     }
     if (opts.excludeOther) {
       list = list.filter((p) => p.category !== 'other');
+    }
+    const loggedIn =
+      typeof opts.loggedIn === 'boolean'
+        ? opts.loggedIn
+        : typeof global.isLoggedIn === 'function' && !!global.isLoggedIn();
+    if (!loggedIn && opts.hideAuthRequired !== false) {
+      list = list.filter((p) => !p.authRequired);
     }
     return list.sort((a, b) => {
       if (a.featured && b.featured) return (a.featuredOrder || 0) - (b.featuredOrder || 0);
@@ -663,13 +684,18 @@
       .join('');
   }
 
-  function renderFeaturedCaseStudies() {
+  function renderFeaturedCaseStudies(options) {
+    const opts = options || {};
+    const showThumbs = opts.showThumbs === true;
     return getPortfolioProjects({ featuredOnly: true })
       .map((project) => {
         const demoHref = resolveProjectHref(project);
         const studyHref = project.caseStudy ? resolveCaseStudyHref(project) : demoHref;
         const thumb =
-          project.caseStudy && project.caseStudy.screenshots && project.caseStudy.screenshots[0]
+          showThumbs &&
+          project.caseStudy &&
+          project.caseStudy.screenshots &&
+          project.caseStudy.screenshots[0]
             ? '<a class="portfolio-case-card__thumb" href="' +
               studyHref +
               '"><img src="' +
@@ -719,7 +745,9 @@
       .join('');
   }
 
-  function renderProjectCards(projects) {
+  function renderProjectCards(projects, options) {
+    const opts = options || {};
+    const showThumbs = opts.showThumbs !== false;
     return (projects || [])
       .map((project) => {
         const demoHref = resolveProjectHref(project);
@@ -741,14 +769,17 @@
             '</span>'
         );
         const thumb =
-          project.caseStudy && project.caseStudy.screenshots && project.caseStudy.screenshots[0]
+          showThumbs &&
+          project.caseStudy &&
+          project.caseStudy.screenshots &&
+          project.caseStudy.screenshots[0]
             ? '<div class="portfolio-project-card__thumb"><img src="' +
               escapeHtml(project.caseStudy.screenshots[0].src) +
               '" alt="" loading="lazy" width="960" height="540"/></div>'
             : '';
         return (
           '<a class="portfolio-project-card' +
-          (project.caseStudy ? ' portfolio-project-card--has-study' : '') +
+          (project.caseStudy && showThumbs ? ' portfolio-project-card--has-study' : '') +
           '" href="' +
           href +
           '"' +
@@ -987,7 +1018,9 @@
   }
 
   function renderFeaturedSites(sites) {
-    return sites
+    const loggedIn = typeof global.isLoggedIn === 'function' && !!global.isLoggedIn();
+    const visible = (sites || []).filter((site) => loggedIn || !site.authRequired);
+    return visible
       .slice(0, 8)
       .map((site) => {
         const href = resolveSiteHref(site);
