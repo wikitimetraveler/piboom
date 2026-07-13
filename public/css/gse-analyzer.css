@@ -209,6 +209,38 @@
   text-align: right;
 }
 
+.gse-delivery-section {
+  margin-top: 0.25rem;
+}
+
+.gse-delivery-card {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(37, 99, 235, 0.28);
+  background: linear-gradient(165deg, #eff6ff 0%, #f8fafc 55%, #f1f5f9 100%);
+  padding: 1rem 1.15rem 1.15rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.gse-delivery-card .gse-exhibit-kicker {
+  color: #3b82f6;
+}
+
+.gse-delivery-card .gse-exhibit-verify {
+  color: #1d4ed8;
+}
+
+.gse-delivery-card .gse-exhibit-link {
+  color: #2563eb;
+}
+
+.gse-delivery-card .gse-exhibit-link:hover {
+  color: #1d4ed8;
+}
+
+.gse-delivery-card .gse-exhibit-context a {
+  color: #2563eb;
+}
+
 .gse-ai-chip {
   white-space: normal;
   border-radius: 999px;

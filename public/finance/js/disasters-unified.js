@@ -2348,7 +2348,7 @@
                 <div>${loan.property_address}</div>
                 <div>${loan.city}, ${loan.state} ${loan.zip_code || ''}</div>
                 <div>County: ${loan.county || ''}</div>
-                <div>Risk: ${getRiskLevel(loan.disaster_risk_score)}</div>
+                <div>Ops triage: ${getRiskLevel(loan.disaster_risk_score)}</div>
               </div>`
             });
             marker.addListener('click', () => infoWindow.open(map, marker));

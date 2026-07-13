@@ -70,50 +70,67 @@
     <header class="du-hero">
       <div class="du-hero-inner">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
-          <div>
+          <div class="du-hero-brand">
             <p class="du-hero-kicker mb-1">90-day window · Multi-source hazard intelligence</p>
-            <h1 class="mb-0"><i class="bi-shield-exclamation me-2"></i>Unified Disasters</h1>
-            <ul class="du-workflow-pills" id="workflowHint" aria-label="Workflow steps">
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> Pick state</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duGeoStage" data-du-section-step="2"><span class="step-num">2</span> Pick county</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseDisasters" data-du-section-step="3"><span class="step-num">3</span> Review events</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseLoans" data-du-section-step="4"><span class="step-num">4</span> Loans &amp; cameras</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duBottomDock" data-du-section-step="5"><span class="step-num">5</span> KML or AI expert</button></li>
-            </ul>
-            <nav class="du-workflow-strip" id="workflowStripDesktop" aria-label="Workflow steps">
-              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> State</button>
-              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duGeoStage" data-du-section-step="2"><span class="step-num">2</span> County</button>
-              <button type="button" class="du-workflow-strip-btn du-workflow-strip-active" data-du-section-target="collapseDisasters" data-du-section-step="3" aria-current="step"><span class="step-num">3</span> Events</button>
-              <button type="button" class="du-workflow-strip-btn" data-du-section-target="collapseLoans" data-du-section-step="4"><span class="step-num">4</span> Loans</button>
-              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duBottomDock" data-du-section-step="5"><span class="step-num">5</span> Tools</button>
+            <h1 class="mb-1"><i class="bi-shield-exclamation me-2"></i>Unified Disasters</h1>
+            <p class="du-hero-lead small text-white-50 mb-0">Pick a place, review events, then triage nearby loans — live map proximity, not a loss probability.</p>
+            <nav class="du-workflow-strip" id="workflowStripDesktop" aria-label="Workflow: Place, Events, Loans, Tools">
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> Place</button>
+              <button type="button" class="du-workflow-strip-btn du-workflow-strip-active" data-du-section-target="collapseDisasters" data-du-section-step="2" aria-current="step"><span class="step-num">2</span> Events</button>
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="collapseLoans" data-du-section-step="3"><span class="step-num">3</span> Loans</button>
+              <button type="button" class="du-workflow-strip-btn" data-du-section-target="duBottomDock" data-du-section-step="4"><span class="step-num">4</span> Tools</button>
             </nav>
+            <!-- Mobile mirror of the same 4-step path (desktop strip is authoritative on lg+) -->
+            <ul class="du-workflow-pills" id="workflowHint" aria-label="Workflow steps">
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duGeoStage" data-du-section-step="1"><span class="step-num">1</span> Place</button></li>
+              <li class="du-workflow-pill-active"><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseDisasters" data-du-section-step="2"><span class="step-num">2</span> Events</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="collapseLoans" data-du-section-step="3"><span class="step-num">3</span> Loans</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-du-section-target="duBottomDock" data-du-section-step="4"><span class="step-num">4</span> Tools</button></li>
+            </ul>
           </div>
           <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
-            <a class="btn btn-light btn-sm" href="/finance/index.html"><i class="bi-arrow-left"></i> Worksheets Hub</a>
-            <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Hazard Webcams</a>
-            <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html"><i class="bi-diagram-3"></i> Impact Graph</a>
-            <a class="btn btn-outline-light btn-sm" href="/finance/assets/video/unified-disasters-reel.mp4" target="_blank" rel="noopener" title="HyperFrames narrated tour of this dashboard">
-              <i class="bi bi-film"></i> Watch tour
-            </a>
-            <button type="button" class="btn btn-outline-light btn-sm" id="duDailyBriefingListenBtn" title="Spoken daily US hazard briefing via Google TTS">
-              <i class="bi bi-volume-up"></i> Listen briefing
-            </button>
-            <button type="button" class="btn btn-outline-light btn-sm" id="duDailyBriefingStopBtn" hidden title="Stop spoken briefing">
-              <i class="bi bi-stop-fill"></i> Stop
-            </button>
+            <a class="btn btn-outline-light btn-sm" href="/finance/index.html"><i class="bi-arrow-left"></i> Hub</a>
+            <a class="btn btn-outline-light btn-sm" href="disasters-webcams.html"><i class="bi-camera-video"></i> Webcams</a>
             <button type="button" class="btn btn-warning btn-sm" id="refreshBtnHero" title="Fetch FEMA, FIRMS, USGS, NWS, NHC live APIs and upsert into Postgres (1–3 min)">
               <i class="bi bi-cloud-download"></i> Pull all sources
             </button>
+            <div class="dropdown">
+              <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="duHeroMoreMenu" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">
+                More
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="duHeroMoreMenu">
+                <li>
+                  <a class="dropdown-item" href="/disaster-impact-graph.html" title="Persisted graph NEAR edges — as-of last reseed (seeded_at), not live /near distance">
+                    <i class="bi-diagram-3 me-1"></i> Impact Graph <span class="text-muted small">(as-of reseed)</span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/finance/assets/video/unified-disasters-reel.mp4" target="_blank" rel="noopener">
+                    <i class="bi bi-film me-1"></i> Watch tour
+                  </a>
+                </li>
+                <li>
+                  <button type="button" class="dropdown-item" id="duDailyBriefingListenBtn" title="Spoken daily US hazard briefing via Google TTS">
+                    <i class="bi bi-volume-up me-1"></i> Listen briefing
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="dropdown-item" id="duDailyBriefingStopBtn" hidden title="Stop spoken briefing">
+                    <i class="bi bi-stop-fill me-1"></i> Stop briefing
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
-          <p class="du-daily-briefing-status small text-white-50 mb-0 mt-2" id="duDailyBriefingStatus" role="status" aria-live="polite"></p>
+          <p class="du-daily-briefing-status small text-white-50 mb-0 w-100" id="duDailyBriefingStatus" role="status" aria-live="polite"></p>
         </div>
-        <div class="row g-3 du-stats-row du-stats-row--placeholder" id="statsRow">
+        <div class="row g-2 du-stats-row du-stats-row--compact du-stats-row--placeholder mt-3" id="statsRow" aria-label="Events in current view">
           <div class="col-md-3 col-6">
             <div class="du-stat-card du-stat-card--total">
               <div class="du-stat-icon"><i class="bi-layers"></i></div>
               <div>
                 <div class="stat-number" id="totalDisasters">—</div>
-                <div class="stat-label">Total events</div>
+                <div class="stat-label">Events in view</div>
               </div>
             </div>
           </div>
@@ -140,7 +157,7 @@
               <div class="du-stat-icon"><i class="bi-map"></i></div>
               <div>
                 <div class="stat-number" id="affectedCounties">—</div>
-                <div class="stat-label">Affected counties</div>
+                <div class="stat-label">Counties</div>
               </div>
             </div>
           </div>
@@ -162,14 +179,20 @@
         <nav class="section-sidebar" id="duSectionPillsMenu" aria-label="Section navigation">
           <div class="section-sidebar-title">Workflow</div>
           <ul class="section-sidebar-nav" id="duSectionSidebarNav">
-            <li><a href="#" data-bs-target="#collapseCommandDeck" data-heading="headingCommandDeck" data-du-section-step="1"><i class="bi bi-sliders"></i> Sources</a></li>
+            <li><a href="#" data-du-section-target="duGeoStage" data-du-section-step="1"><i class="bi bi-binoculars"></i> Place</a></li>
+            <li><a href="#" class="active-section" data-bs-target="#collapseDisasters" data-heading="headingDisasters" data-du-section-step="2"><i class="bi bi-shield-exclamation"></i> Events</a></li>
+            <li><a href="#" data-bs-target="#collapseCommandDeck" data-heading="headingCommandDeck" data-du-section-step="2"><i class="bi bi-sliders"></i> Sources</a></li>
+            <li><a href="#" data-bs-target="#collapseFilters" data-heading="headingFilters" data-du-section-step="2"><i class="bi bi-funnel"></i> Filters</a></li>
             <li><a href="#" data-bs-target="#collapseRiskIntel" data-heading="headingRiskIntel" data-du-section-step="2"><i class="bi bi-speedometer2"></i> Risk intel</a></li>
-            <li><a href="#" data-bs-target="#collapseFilters" data-heading="headingFilters" data-du-section-step="3"><i class="bi bi-funnel"></i> Filters</a></li>
-            <li><a href="#" class="active-section" data-bs-target="#collapseDisasters" data-heading="headingDisasters" data-du-section-step="3"><i class="bi bi-shield-exclamation"></i> Disasters</a></li>
-            <li><a href="#" data-bs-target="#collapseMapYouTube" data-heading="headingMapYouTube" data-du-section-step="3"><i class="bi bi-geo-alt"></i> Map &amp; videos</a></li>
-            <li><a href="#" data-bs-target="#collapseLoans" data-heading="headingLoans" data-du-section-step="4"><i class="bi bi-bank"></i> Mocked loans</a></li>
+            <li><a href="#" data-bs-target="#collapseMapYouTube" data-heading="headingMapYouTube" data-du-section-step="2"><i class="bi bi-geo-alt"></i> Map &amp; videos</a></li>
+            <li><a href="#" data-bs-target="#collapseLoans" data-heading="headingLoans" data-du-section-step="3"><i class="bi bi-bank"></i> Loans</a></li>
             <li class="mt-2"><span class="small text-uppercase text-muted px-2 d-block">Tools</span></li>
-            <li><a href="#" data-du-section-target="duBottomDock" data-du-section-step="5"><i class="bi bi-box-arrow-up"></i> KML &amp; AI expert</a></li>
+            <li><a href="#" data-du-section-target="duBottomDock" data-du-section-step="4"><i class="bi bi-box-arrow-up"></i> KML &amp; AI</a></li>
+            <li>
+              <a href="/disaster-impact-graph.html" data-du-section-step="4" title="Persisted graph — as-of reseed (seeded_at), not live /near">
+                <i class="bi bi-diagram-3"></i> Impact Graph <span class="small text-muted">reseed</span>
+              </a>
+            </li>
           </ul>
         </nav>
 
@@ -266,6 +289,54 @@
       </div>
       <div id="selectionContextStrip" class="du-selection-strip alert alert-primary py-2 small mb-3" hidden role="status" aria-label="Selected disaster context"></div>
 
+      <!-- Sticky source chips (always visible) — Pull lives on hero #refreshBtnHero -->
+      <div class="du-source-chip-bar mb-3" id="duSourceChipBar" aria-label="Source filters">
+        <div class="disaster-source-selector" id="unifiedSourceChips">
+          <button type="button" class="source-chip source-chip-active freshness-ok" data-source="fema" onclick="toggleUnifiedSourceChip(this, 'fema')">
+            <span class="freshness-dot" aria-hidden="true"></span>
+            <i class="bi bi-shield-check"></i> FEMA
+            <span class="source-chip-count" data-source-count="fema">0</span>
+            <span class="source-chip-db-total" data-source-db="fema" hidden></span>
+          </button>
+          <button type="button" class="source-chip freshness-off" data-source="firms" onclick="toggleUnifiedSourceChip(this, 'firms')">
+            <span class="freshness-dot" aria-hidden="true"></span>
+            <i class="bi bi-fire"></i> NASA FIRMS
+            <span class="source-chip-count" data-source-count="firms">0</span>
+            <span class="source-chip-db-total" data-source-db="firms" hidden></span>
+          </button>
+          <button type="button" class="source-chip source-chip-active freshness-ok" data-source="usgs" onclick="toggleUnifiedSourceChip(this, 'usgs')">
+            <span class="freshness-dot" aria-hidden="true"></span>
+            <i class="bi bi-geo-alt"></i> USGS
+            <span class="source-chip-count" data-source-count="usgs">0</span>
+            <span class="source-chip-db-total" data-source-db="usgs" hidden></span>
+          </button>
+          <button type="button" class="source-chip source-chip-active freshness-ok" data-source="nws" onclick="toggleUnifiedSourceChip(this, 'nws')">
+            <span class="freshness-dot" aria-hidden="true"></span>
+            <i class="bi bi-cloud-lightning"></i> NOAA/NWS
+            <span class="source-chip-count" data-source-count="nws">0</span>
+            <span class="source-chip-db-total" data-source-db="nws" hidden></span>
+          </button>
+          <button type="button" class="source-chip source-chip-active freshness-ok" data-source="nhc" onclick="toggleUnifiedSourceChip(this, 'nhc')">
+            <span class="freshness-dot" aria-hidden="true"></span>
+            <i class="bi bi-tornado"></i> NHC
+            <span class="source-chip-count" data-source-count="nhc">0</span>
+            <span class="source-chip-db-total" data-source-db="nhc" hidden></span>
+          </button>
+          <button type="button" class="source-chip freshness-off" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
+            <span class="freshness-dot" aria-hidden="true"></span>
+            <i class="bi bi-droplet"></i> Flood zones
+            <span class="source-chip-count" data-source-count="floodzones">0</span>
+            <span class="source-chip-db-total" data-source-db="floodzones" hidden></span>
+          </button>
+          <a class="source-chip source-chip-link" href="disasters-webcams.html" title="National hazard webcams catalog">
+            <i class="bi bi-camera-video"></i> Hazard webcams
+          </a>
+        </div>
+        <p class="small text-muted mb-0 mt-1">
+          Chips filter the grid (auto-reload). To ingest APIs into Postgres, use <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="duFocusPullBtn">Pull all sources</button> in the hero.
+        </p>
+      </div>
+
       <div id="duNwsGridFilterStrip" class="alert alert-info py-2 small mb-3 d-flex flex-wrap align-items-center justify-content-between gap-2" role="status" hidden>
         <span class="du-nws-filter-strip-text">
           <i class="bi bi-cloud-lightning me-1" aria-hidden="true"></i>
@@ -280,66 +351,25 @@
       <div class="du-section-card du-command-deck du-section-card-hidden" data-du-collapse-target="collapseCommandDeck">
         <div class="du-section-card-header collapsed" tabindex="0" id="headingCommandDeck" role="button" data-bs-toggle="collapse" data-bs-target="#collapseCommandDeck" aria-expanded="false" aria-controls="collapseCommandDeck">
           <span class="du-section-title">
-            <span class="du-section-step-pill" aria-hidden="true">1</span>
             <i class="bi bi-sliders" aria-hidden="true"></i>
             <h2 class="du-section-heading mb-0">Source command deck</h2>
+            <span class="badge rounded-pill text-bg-secondary">Events</span>
           </span>
           <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
         </div>
         <div id="collapseCommandDeck" class="collapse du-section-card-body" aria-labelledby="headingCommandDeck">
           <p class="small text-muted mb-2">
-            <strong>Pull all sources</strong> hits live FEMA · FIRMS · USGS · NWS · NHC APIs, geocodes county locations for the map, and writes rows into Postgres (<code>disasters</code>).
-            The grid below reads from that database — it does not call those APIs on its own.
+            <strong>Pull all sources</strong> (hero) hits live FEMA · FIRMS · USGS · NWS · NHC APIs and writes into Postgres.
+            Source chips above filter the grid — they do not call those APIs.
           </p>
-          <div class="disaster-source-selector" id="unifiedSourceChips">
-            <button type="button" class="source-chip source-chip-active freshness-ok" data-source="fema" onclick="toggleUnifiedSourceChip(this, 'fema')">
-              <span class="freshness-dot" aria-hidden="true"></span>
-              <i class="bi bi-shield-check"></i> FEMA
-              <span class="source-chip-count" data-source-count="fema">0</span>
-              <span class="source-chip-db-total" data-source-db="fema" hidden></span>
-            </button>
-            <button type="button" class="source-chip freshness-off" data-source="firms" onclick="toggleUnifiedSourceChip(this, 'firms')">
-              <span class="freshness-dot" aria-hidden="true"></span>
-              <i class="bi bi-fire"></i> NASA FIRMS
-              <span class="source-chip-count" data-source-count="firms">0</span>
-              <span class="source-chip-db-total" data-source-db="firms" hidden></span>
-            </button>
-            <button type="button" class="source-chip source-chip-active freshness-ok" data-source="usgs" onclick="toggleUnifiedSourceChip(this, 'usgs')">
-              <span class="freshness-dot" aria-hidden="true"></span>
-              <i class="bi bi-geo-alt"></i> USGS
-              <span class="source-chip-count" data-source-count="usgs">0</span>
-              <span class="source-chip-db-total" data-source-db="usgs" hidden></span>
-            </button>
-            <button type="button" class="source-chip source-chip-active freshness-ok" data-source="nws" onclick="toggleUnifiedSourceChip(this, 'nws')">
-              <span class="freshness-dot" aria-hidden="true"></span>
-              <i class="bi bi-cloud-lightning"></i> NOAA/NWS
-              <span class="source-chip-count" data-source-count="nws">0</span>
-              <span class="source-chip-db-total" data-source-db="nws" hidden></span>
-            </button>
-            <button type="button" class="source-chip source-chip-active freshness-ok" data-source="nhc" onclick="toggleUnifiedSourceChip(this, 'nhc')">
-              <span class="freshness-dot" aria-hidden="true"></span>
-              <i class="bi bi-tornado"></i> NHC
-              <span class="source-chip-count" data-source-count="nhc">0</span>
-              <span class="source-chip-db-total" data-source-db="nhc" hidden></span>
-            </button>
-            <button type="button" class="source-chip freshness-off" data-source="floodzones" onclick="toggleUnifiedSourceChip(this, 'floodzones')">
-              <span class="freshness-dot" aria-hidden="true"></span>
-              <i class="bi bi-droplet"></i> Flood zones
-              <span class="source-chip-count" data-source-count="floodzones">0</span>
-              <span class="source-chip-db-total" data-source-db="floodzones" hidden></span>
-            </button>
-            <a class="source-chip source-chip-link" href="disasters-webcams.html" title="National hazard webcams catalog">
-              <i class="bi bi-camera-video"></i> Hazard webcams
-            </a>
-          </div>
-          <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center mt-3 pt-2 border-top" id="unifiedToolbarActions">
+          <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center mt-2 pt-2 border-top" id="unifiedToolbarActions">
             <button type="button" class="btn btn-outline-warning btn-sm" id="duExportCinematicKmlToolbarBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
               <i class="bi bi-globe-americas"></i> Google Earth KML
             </button>
-            <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn" title="Reload grid immediately (sources also auto-apply)"><i class="bi-arrow-repeat"></i> Reload now</button>
-            <button type="button" class="btn btn-primary btn-sm" id="refreshBtn" title="Pull FEMA, NASA FIRMS, USGS, NWS, and NHC into Postgres — may take 1–3 minutes">
-              <i class="bi bi-cloud-download"></i> Pull all sources
-            </button>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="applyBtn" title="Reload grid immediately (sources also auto-apply)"><i class="bi-arrow-repeat"></i> Reload grid</button>
+            <a class="btn btn-outline-secondary btn-sm" href="#refreshBtnHero" id="duJumpToPullLink" title="Jump to primary Pull control in the hero">
+              <i class="bi bi-cloud-download"></i> Pull (hero)
+            </a>
             <span class="small text-muted du-source-pull-status" id="duSourcePullStatus" role="status" aria-live="polite"></span>
             <button type="button" class="btn btn-warning btn-sm" id="voiceControlBtn" onclick="toggleVoiceControl()" title="Voice: filter by state (e.g. show California), apply filters, show loans. Use the chat mic to talk to the processor expert.">
               <i class="bi bi-mic"></i> <span id="voiceControlText">Voice</span>
@@ -351,9 +381,9 @@
       <div class="du-section-card du-risk-intel du-section-card-hidden" id="duRiskIntelCard" data-du-collapse-target="collapseRiskIntel">
         <div class="du-section-card-header collapsed" tabindex="0" id="headingRiskIntel" role="button" data-bs-toggle="collapse" data-bs-target="#collapseRiskIntel" aria-expanded="false" aria-controls="collapseRiskIntel">
           <span class="du-section-title">
-            <span class="du-section-step-pill" aria-hidden="true">2</span>
             <i class="bi bi-speedometer2" aria-hidden="true"></i>
             <h2 class="du-section-heading mb-0">Risk intelligence</h2>
+            <span class="badge rounded-pill text-bg-secondary">Events</span>
             <span class="badge rounded-pill text-bg-primary du-hotspot-filter-badge" id="duHotspotFilterBadge" hidden></span>
           </span>
           <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
@@ -371,7 +401,7 @@
                     <tr>
                       <th>Location</th>
                       <th class="text-end">Events</th>
-                      <th class="text-end">Peak risk</th>
+                      <th class="text-end" title="Peak event intensity in this area — not loan ops triage">Peak intensity</th>
                       <th>Dominant type</th>
                     </tr>
                   </thead>
@@ -450,7 +480,7 @@
                     <label class="form-check-label small" for="skipFemaCheck">Skip FEMA on refresh</label>
                   </div>
                   <a class="btn btn-outline-secondary btn-sm" href="/api/disasters/export.csv"><i class="bi-download"></i> Export CSV</a>
-                  <button type="button" class="btn btn-outline-primary btn-sm du-apply-filters-btn" title="Reload grid immediately"><i class="bi-arrow-repeat"></i> Reload now</button>
+                  <button type="button" class="btn btn-outline-primary btn-sm du-apply-filters-btn" title="Reload grid immediately"><i class="bi-arrow-repeat"></i> Reload grid</button>
                 </div>
               </div>
             </div>
@@ -473,7 +503,7 @@
                 <div class="card-body">
                   <div id="firmsDeferredAlert" class="alert alert-info py-2 small d-flex align-items-center gap-2 mb-3" role="status">
                     <i class="bi bi-info-circle flex-shrink-0"></i>
-                    <span><strong>NASA FIRMS</strong> (active fire hotspots) is not loaded. Turn on the <strong>NASA FIRMS</strong> source above or in Filters, then use <strong>Apply</strong> if you changed the multiselect only.</span>
+                    <span><strong>NASA FIRMS</strong> (active fire hotspots) is not loaded. Turn on the <strong>NASA FIRMS</strong> chip above or in Filters — sources <strong>auto-reload</strong> the grid (or use <strong>Reload grid</strong>).</span>
                   </div>
                   <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
                     <div class="d-flex flex-wrap align-items-center gap-3">
@@ -555,16 +585,16 @@
             aria-controls="collapseLoans"
           >
             <span class="du-section-title">
-              <span class="du-section-step-pill" aria-hidden="true">4</span>
+              <span class="du-section-step-pill" aria-hidden="true">3</span>
               <i class="bi bi-bank" aria-hidden="true"></i>
-              <h2 class="du-section-heading mb-0">Mocked loan data</h2>
+              <h2 class="du-section-heading mb-0">Loans · ops triage</h2>
             </span>
             <i class="bi bi-chevron-down du-section-chevron" aria-hidden="true"></i>
           </div>
           <div id="collapseLoans" class="collapse du-section-card-body" aria-labelledby="headingLoans">
             <div class="d-flex flex-wrap align-items-start gap-3 mb-3">
               <div class="flex-grow-1" style="min-width: 12rem;">
-                <p class="small fw-semibold mb-1"><i class="bi bi-qr-code me-1" aria-hidden="true"></i>Step 4 · Processor expert</p>
+                <p class="small fw-semibold mb-1"><i class="bi bi-qr-code me-1" aria-hidden="true"></i>Step 3 · Processor expert</p>
                 <p class="small text-muted mb-0">Click the card to flip · scan the QR on your phone to open AI triage for mocked loans and nearby cameras.</p>
               </div>
               <div id="disasterAiScanCardMount" class="flex-shrink-0" aria-label="AI scan share card"></div>
@@ -613,7 +643,7 @@
               <div class="card-header d-flex flex-wrap justify-content-between align-items-start gap-2">
                 <div>
                   <strong><i class="bi-bank"></i> Nearby mocked loan data</strong>
-                  <small class="text-muted d-block" id="encompassLoansSubtitle">Mocked loan data near selected disaster (demo dataset)</small>
+                  <small class="text-muted d-block" id="encompassLoansSubtitle">Live proximity (<code>/near</code>) · demo loans · ops triage rank (0–15), not a loss probability</small>
                 </div>
                 <button type="button" class="btn btn-sm btn-outline-warning" id="duExportCinematicKmlLoansBtn" onclick="exportCinematicDisasterKml()" disabled title="Select a disaster in the grid first">
                   <i class="bi bi-globe-americas"></i> Google Earth KML
@@ -740,9 +770,9 @@
               type="button"
               class="btn btn-warning btn-sm"
               id="duIngestPostgresBtn"
-              title="POST /api/disasters/refresh — pull FEMA, FIRMS, USGS, NWS, and NHC live APIs and upsert into the disasters table (1–3 min)"
+              title="Same ingest as hero Pull all sources — FEMA/FIRMS/USGS/NWS/NHC → Postgres"
             >
-              <i class="bi bi-database-down"></i> Pull APIs → repopulate Postgres
+              <i class="bi bi-database-down"></i> Pull APIs (same as hero)
             </button>
             <span class="small text-muted" id="duIngestPostgresStatus" role="status" aria-live="polite"></span>
           </div>
@@ -752,7 +782,7 @@
               <ul class="du-schema-sheet-list small mb-0">
                 <li><code>disasters</code> — FEMA, FIRMS, USGS, NWS, NHC events (grid + map)</li>
                 <li><code>fire_cameras</code> — fixed hazard webcams (not disaster rows)</li>
-                <li><code>loans</code> — mocked pipeline properties, risk scores, flood zones</li>
+                <li><code>loans</code> — mocked pipeline properties, <strong>ops triage</strong> scores (not probabilities), flood zones</li>
               </ul>
             </div>
             <div class="col-md-6">
@@ -763,14 +793,15 @@
                 </thead>
                 <tbody>
                   <tr>
-                    <td><strong>Spatial</strong></td>
+                    <td><strong>Spatial (live)</strong></td>
                     <td><code>GET /api/disasters/near</code> (PostGIS or Haversine)</td>
-                    <td>Live selection, nearby loans &amp; cameras</td>
+                    <td>Live selection, nearby loans &amp; cameras — operational truth</td>
                   </tr>
                 </tbody>
               </table>
               <p class="small mb-0">
                 Radius search powers the grid selection strip, loan map pins, and hazard webcam panel on this page.
+                Do <strong>not</strong> equate this with graph <code>NEAR</code> edges (those are as-of last reseed only).
               </p>
             </div>
           </div>
@@ -854,7 +885,9 @@
               </table>
               <p class="small mb-0">
                 Graph chain: county → disaster → zip → loan → milestone → processor, plus
-                <strong>NEAR</strong> edges from spatial seed (~50 mi).
+                <strong>NEAR</strong> edges from spatial seed (~50 mi, per-disaster cap).
+                Graph <code>NEAR</code> carries <code>seeded_at</code> in edge metadata — stale until reseed;
+                live proximity uses <code>GET /api/disasters/near</code> only.
               </p>
             </div>
           </div>
@@ -862,7 +895,8 @@
             <summary class="small fw-semibold">Edge types (impact graph)</summary>
             <p class="small text-muted mb-2 mt-2">
               <code>HAS_DECLARATION</code>, <code>CONTAINS</code>, <code>AFFECTS</code>,
-              <code>NEAR</code>, <code>CURRENTLY_IN</code>, <code>ASSIGNED_TO</code>
+              <code>NEAR</code> (heuristic link strength, not a probability),
+              <code>CURRENTLY_IN</code>, <code>ASSIGNED_TO</code>
             </p>
           </details>
           <p class="small text-muted mb-0 mt-3">

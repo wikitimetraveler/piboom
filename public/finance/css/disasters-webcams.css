@@ -132,6 +132,12 @@ body.hw-page {
   border-bottom: none;
 }
 
+.hw-nearest-item:focus-visible {
+  outline: 2px solid var(--zen-primary, #4a90a4);
+  outline-offset: 2px;
+  background: color-mix(in srgb, var(--zen-primary, #4a90a4) 8%, transparent);
+}
+
 .hw-rank-badge {
   display: inline-flex;
   align-items: center;
@@ -163,6 +169,12 @@ body.hw-page {
 
 .hw-center-pin {
   animation: hwPulse 2s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hw-center-pin {
+    animation: none !important;
+  }
 }
 
 .hw-catalog-panel .card-header {

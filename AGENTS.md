@@ -68,7 +68,7 @@ routes/encompass-*.routes.js
 | Financial calculations   | `public/shared/calculationEngine.js` (UI engine); pure helpers: `public/shared/calcEngineLibrary.js` (`calcMath`)  |
 | GSE scenario analyzer      | `public/gse-analyzer.html`, `routes/gse.routes.js`, `controllers/gse.controller.js`, `services/gse-scenario.service.js`, `data/gse/` |
 | AG Grid pages            | `unit-tests.html`, `encompass-custom-fields.html`, `encompass-native-fields.html`                                |
-| Hazard webcams (national) | `services/hazard-webcam-ingest.service.js`, `public/finance/disasters-webcams.html`, `npm run refresh:hazard-webcams` — see `docs/DISASTER_RISK.md` |
+| Hazard webcams (national) | `services/hazard-webcam-ingest.service.js`, `public/finance/disasters-webcams.html`, `npm run refresh:hazard-webcams` — see `docs/DISASTER_RISK.md`. Loan `disaster_risk_score` = **ops triage** (not probability); live `GET /api/disasters/near` ≠ graph `NEAR` without `seeded_at`. |
 | Lane family / genealogy | `public/family/`, `services/genealogy.service.js`, `routes/genealogy.routes.js` — maps: Google Maps JS (loader `lane-family-google-maps.js`) + server geocode `geocodeAddressFree` via `/api/genealogy/*`; see `docs/FRONTEND_PATTERNS.md` (Lane / family maps). **Lane hub/tool footer credit** (presentation + software byline): `public/family/js/lane-site-credit.js`. **Image lightbox:** `public/shared/lane-image-lightbox.js` (sitewide via `modern-navbar.js`; museum exhibit card uses `openElement` on `#museumPosterContent`). |
 
 ### Lane PDF plate gallery (tracked assets)

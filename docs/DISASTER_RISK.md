@@ -28,7 +28,17 @@ Schema: `disasters` table (county_fips, source, event_type, start_time, lat, lng
 
 When `CREATE EXTENSION postgis` succeeds at startup, the app adds generated `geom geography(Point,4326)` columns (from existing lat/lng) on **`disasters`**, **`fire_cameras`**, and **`loans`**, with GiST indexes. Proximity uses `ST_DWithin` and KNN (`geom <-> point`) via `services/disaster-spatial.service.js`. If PostGIS is unavailable, behavior falls back to in-app Haversine (unchanged API shapes).
 
+**Live `/near` vs graph `NEAR`:** `GET /api/disasters/near` is **operational truth** (query-time geometry). Impact-graph `NEAR` edges are a **persisted seed** (per-disaster nearest-N, default 25) with `seeded_at` in edge `metadata_json`. Do not treat graph `NEAR` as live proximity without checking that freshness stamp; reseed via disaster refresh / graph seed jobs.
+
 Impact graph seeding adds **`NEAR`** edges (`disaster_event → loan`) from a spatial join when PostGIS is present. **pgRouting is not used** (not on Render’s extension allowlist).
+
+### Loan ops triage score (not a probability)
+
+`disaster_risk_score` on loans is an **ops triage** ranking from FEMA declaration contribution (optional distance × recency weights) plus an explicit flood-zone weight table in `services/disaster-risk.service.js`. It is **not** \(P(\text{loss})\) and does **not** fuse FIRMS/USGS/NWS — those stay on the multi-hazard `/near` / Unified Disasters channel.
+
+### FIRMS clustering
+
+FIRMS NRT detections are clustered with **union-find single-linkage** (`clusterFirmsDetectionsByDistance`): membership is order-independent; elongated fronts can chain beyond diameter \(2r\). Centroids are computed per component for logging. Quality gates (confidence / thermal / cluster-or-strong-solo) remain precision-oriented.
 
 | Component | Path |
 |-----------|------|

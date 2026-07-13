@@ -28,11 +28,11 @@ Read and align with:
 
 ```
 controllers/disasters.controller.js     → thin HTTP, refresh auth
-services/disasters.service.js         → FEMA, FIRMS, USGS, NWS, NHC ingest + prune
+services/disasters.service.js         → FEMA/FIRMS/USGS/NWS/NHC ingest + prune; FIRMS QA + clusterFirmsDetectionsByDistance
 services/hazard-webcam-ingest.service.js → national webcam catalog (separate cadence)
-services/disaster-spatial.service.js  → PostGIS ST_DWithin / Haversine fallback
-services/disaster-impact-graph.service.js → NEAR edges, graph reseed
-services/disaster-risk.service.js     → loan/FEMA overlap analysis
+services/disaster-spatial.service.js  → PostGIS ST_DWithin / Haversine fallback (live /near)
+services/disaster-impact-graph.service.js → graph reseed; NEAR = per-disaster nearest-N + seeded_at
+services/disaster-risk.service.js     → loan ops triage (FEMA + flood table; not a probability)
 services/disaster-heygen.service.js     → HeyGen script builders
 services/disaster-daily-briefing.service.js → daily briefing payloads
 lib/disaster-daily-scheduler.js       → 6:00 AM America/Los_Angeles wall-clock schedule
@@ -49,7 +49,7 @@ scripts/refresh-hazard-webcams.js       → webcam ingest (NOT part of daily dis
 | Source | Service fn | Notes |
 |--------|------------|-------|
 | FEMA | `ingestFema()` | Open API v2; skip with `SKIP_FEMA=1` |
-| NASA FIRMS | `ingestFirmsNrt()` | Requires `NASA_API_KEY` |
+| NASA FIRMS | `ingestFirmsNrt()` | Requires `NASA_API_KEY`; union-find cluster + quality gates |
 | USGS | `ingestUsgsQuakes()` | all_day geojson feed |
 | NWS | `ingestNwsCap()` | active CAP alerts |
 | NHC | `ingestNhc()` | tropical via NWS filter |
@@ -74,16 +74,27 @@ scripts/refresh-hazard-webcams.js       → webcam ingest (NOT part of daily dis
 |------|---------|
 | `disasters-unified.html` | Multi-source grid, source command deck, processor AI, KML export |
 | `disasters-webcams.html` | National hazard webcam catalog + address search |
-| `pipeline-risk-dashboard.html` | Loan pipeline risk map + AI |
+| `pipeline-risk-dashboard.html` | Loan pipeline **ops triage** map + AI (scores are not probabilities) |
 | `disaster-mood-music.js` | Ambient audio when processor AI opens |
 
 AG Grid on Unified Disasters: use modern `rowSelection: { mode: 'singleRow', enableClickSelection: true }` — not legacy `rowSelection: 'single'`.
+
+## Semantics (geometry vs risk)
+
+| Artifact | Meaning |
+|----------|---------|
+| `GET /api/disasters/near` | **Live** proximity — operational truth (PostGIS or Haversine) |
+| Graph `NEAR` edges | **Persisted** seed (per-disaster nearest-N, default 25); `metadata_json.seeded_at` freshness; not a live substitute for `/near` |
+| `disaster_risk_score` / `calculateRiskScore` | **Ops triage** = FEMA declaration contribution (± distance×recency when distances exist) + `FLOOD_ZONE_TRIAGE_WEIGHTS`. Not \(P(\text{loss})\). Multi-hazard (FIRMS/USGS/NWS/NHC) is a **separate** `/near` channel. |
+| Graph path `confidence` | Heuristic; `COALESCE(e.confidence, 0.5)` — never remap explicit `0` → `0.5` |
+| FIRMS clusters | `clusterFirmsDetectionsByDistance` — union-find single-linkage; order-independent; chaining can exceed diameter \(2r\) |
+| Coordinates | `Number.isFinite`; reject null/`''` before `Number()`; allow `0°` |
 
 ## When invoked
 
 1. **Classify the task** — ingest, schema, spatial, UI, AI briefing, HeyGen video, ops/scheduling, new source evaluation, or test fix
 2. **Read the smallest doc slice** — `DISASTER_RISK.md` + schema doc section as needed
-3. **Trace the path** — controller → service → DB table; confirm PostGIS vs Haversine fallback
+3. **Trace the path** — controller → service → DB table; confirm PostGIS vs Haversine fallback; keep live `/near` distinct from graph `NEAR`
 4. **Apply the right skill** — source modeling rubric for new providers; regression-tester for red CI
 5. **Smallest safe change** — thin controllers, mocked externals in tests, no unrelated refactors
 
@@ -95,6 +106,8 @@ AG Grid on Unified Disasters: use modern `rowSelection: { mode: 'singleRow', ena
 - **Refresh auth** — localhost open; production needs `DISASTER_REFRESH_TOKEN`
 - **Camera ingest guardrails** — warn on bulk upsert; keep separate from daily disaster refresh
 - **Impact graph** — reseed after ingest via `refreshDisasterImpactGraphFromCurrentData()`; reconcile with `refresh-disasters.js` when changing seed logic
+- **UI/docs language** — say “ops triage score,” never “probability of loss,” for loan scores
+- **Flood zones** — explicit table only (`floodZoneTriageWeight`); no substring heuristics
 
 ## API quick reference
 
@@ -103,13 +116,14 @@ AG Grid on Unified Disasters: use modern `rowSelection: { mode: 'singleRow', ena
 | `GET /api/disasters` | List with state/county/source/since filters |
 | `POST /api/disasters/refresh` | Live API → Postgres (all event sources) |
 | `POST /api/disasters/refresh-cameras` | Webcam catalog ingest |
-| `GET /api/disasters/near` | disasters + cameras + loans by radius |
+| `GET /api/disasters/near` | **Live** disasters + cameras + loans by radius (not graph NEAR) |
 | `GET /api/disasters/stats` | Per-source counts for freshness deck |
 | `GET /api/disasters/cameras` | Webcam catalog with geo filters |
 
 ## Tests & CI
 
 - Primary: `tests/unit/disasters.controller.test.js`
+- Scoring / spatial / FIRMS: `disaster-risk-score.test.js`, `disasters-firms-quality.test.js`, `disaster-impact-graph-spatial.test.js`, `disaster-spatial.service.test.js`
 - Mock external APIs; never require live FEMA/NASA in CI
 - Run `npm run ci` after disaster controller/service changes
 - Hard blockers: missing `DATABASE_URL`, missing `NASA_API_KEY` for FIRMS-only local runs
@@ -143,7 +157,7 @@ When assessing FEMA/NOAA/NASA/USGS or a candidate provider:
 
 **Scheduling / ops:** [AUTO_INGEST_DISASTERS, Render env, manual refresh]
 
-**Risks:** [freshness, rate limits, PostGIS absent, token auth]
+**Risks:** [freshness, rate limits, PostGIS absent, token auth, /near vs graph NEAR confusion]
 
 **Smallest next step:** [one concrete slice]
 ```
@@ -157,5 +171,8 @@ For source evaluations, append the **Rubric Summary** and **Recommendation** blo
 - Do not call live FEMA/NASA/USGS from Jest without mocks
 - Do not assume `render.yaml` applies on Render — confirm Blueprint vs dashboard env vars
 - Do not disable tests to green CI
+- Do not label loan `disaster_risk_score` as a probability
+- Do not treat graph `NEAR` as live `/near` without `seeded_at`
+- Do not reintroduce flood-zone substring matching or seed-first FIRMS clustering
 
 When the task is pure Encompass Hub design (no disaster domain), defer to `encompass-architect`. When the task is generic code style only, defer to `code-reviewer` or `refactor`.

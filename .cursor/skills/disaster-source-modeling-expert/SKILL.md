@@ -9,6 +9,8 @@ description: Designs, reviews, and evaluates candidate disaster-source data work
 
 Use this skill to build, review, or evaluate candidate disaster-source pipelines with reliable source quality checks and clear implementation guidance.
 
+**Repo companion:** `.cursor/agents/disaster-expert.md` (product/ops owner). Docs: `docs/DISASTER_RISK.md`, `docs/UNIFIED_DISASTERS_DB_SCHEMA.md`.
+
 ## Quick Start
 
 1. Identify the user goal:
@@ -24,6 +26,31 @@ Use this skill to build, review, or evaluate candidate disaster-source pipelines
 4. Produce:
    - A working checklist while implementing
    - A final structured report
+
+## DevConnect Labs invariants (non-negotiable)
+
+Encode these in designs, reviews, UI copy, and AI prompts:
+
+| Concern | Rule |
+|---------|------|
+| **Ops triage vs probability** | `loans.disaster_risk_score` / `calculateRiskScore` is an **ops triage** ranking (FEMA declarations ± distance×recency + `FLOOD_ZONE_TRIAGE_WEIGHTS`). It is **not** \(P(\text{loss})\) and must not be labeled as a probability in docs/UI/scripts. |
+| **Two proximity channels** | **Live:** `GET /api/disasters/near` (PostGIS `ST_DWithin` or Haversine) = operational truth. **Graph:** `NEAR` edges from `seedNearSpatialEdges` are persisted, per-disaster nearest-N (default 25), with `metadata_json.seeded_at`. Never equate them without that freshness stamp. |
+| **Multi-hazard channel** | FIRMS / USGS / NWS / NHC stay on Unified Disasters + `/near`. Do **not** fold them into the loan ops triage score unless the product explicitly asks for a new fused model. |
+| **Flood weights** | Use the explicit zone→weight table (`floodZoneTriageWeight` / `FLOOD_ZONE_TRIAGE_WEIGHTS`). Do not reintroduce substring heuristics (`includes('V')`, etc.). |
+| **Coordinates** | Use `Number.isFinite` (and reject null/`''` before `Number()`). Do not treat `0` as missing (equator / prime meridian). |
+| **FIRMS clustering** | `clusterFirmsDetectionsByDistance` — union-find **single-linkage**, order-independent membership, centroids per component. Document chaining (diameter can exceed \(2r\)). Quality gates remain precision-oriented. |
+| **Graph path confidence** | Heuristic link strength. Multiply with `COALESCE(e.confidence, 0.5)` — do **not** remap explicit `0` → `0.5` via `NULLIF`. |
+| **Webcam cadence** | `fire_cameras` ingest stays off the daily disaster refresh job. |
+
+### Key implementation paths
+
+| Area | Path / symbol |
+|------|----------------|
+| Event ingest + FIRMS QA/cluster | `services/disasters.service.js` |
+| Ops triage score | `services/disaster-risk.service.js` (`calculateRiskScore`, `floodZoneTriageWeight`, …) |
+| Live proximity | `services/disaster-spatial.service.js` |
+| Graph NEAR seed | `services/disaster-impact-graph.service.js` (`seedNearSpatialEdges`) |
+| Tests | `tests/unit/disaster-risk-score.test.js`, `disasters-firms-quality.test.js`, `disaster-impact-graph-spatial.test.js` |
 
 ## Modeling Workflow
 
@@ -47,6 +74,7 @@ Use this sequence for new or updated pipelines.
    - Consumer-facing schema
    - Sort/priority rules
    - Conflict resolution across sources
+   - Which channel consumes the source: events table, `/near`, ops triage, graph only, or AI context
 
 ## Review Workflow
 
@@ -55,15 +83,24 @@ Use this when evaluating existing code or data models.
 1. Check source assumptions
    - Hard-coded source behavior without validation
    - Missing retries/backoff or timeout handling
+   - Silent empty success vs hard fail on provider outages
 2. Check schema correctness
    - Ambiguous IDs or missing provenance
    - Timezone/geo normalization gaps
+   - Event upsert `ON CONFLICT DO NOTHING` (no refresh of mutated fields)
 3. Check scoring behavior
    - Scores without documented thresholds
    - Freshness/reliability logic not aligned with source cadence
-4. Check operational safety
+   - Loan score mislabeled as probability
+   - Flood substring rules instead of zone table
+   - Live `/near` confused with graph `NEAR` without `seeded_at`
+4. Check spatial / clustering correctness
+   - Falsy coordinate guards (`!lat`) that drop valid `0`
+   - FIRMS seed-first greedy clustering (should be union-find)
+   - Global-only NEAR edge caps that starve sparse regions
+5. Check operational safety
    - No guardrails for stale feeds
-   - Silent failures or weak error surfacing
+   - Webcam bulk ingest accidentally on daily schedule
 
 ## Candidate Source Evaluation Workflow
 
@@ -81,6 +118,7 @@ Use this when assessing a possible new disaster source before integration.
 4. Validate integration cost and value
    - Estimated implementation complexity (low/medium/high)
    - Expected quality uplift versus existing source set
+   - Target channel: events / cameras / triage / graph / AI-only
 5. Apply weighted rubric and thresholds
    - Score all categories from 1-5
    - Compute weighted overall score
@@ -171,7 +209,10 @@ Task Progress:
 - [ ] Evaluate candidate source fit (coverage, licensing, fields)
 - [ ] Validate canonical schema (IDs, geo, time, provenance)
 - [ ] Score candidate with weighted rubric and compute overall score
+- [ ] Assign output channel (events /near / triage / graph / AI)
 - [ ] Implement or verify quality scoring rules
+- [ ] Verify ops-triage vs probability labeling
+- [ ] Verify live /near vs graph NEAR + seeded_at
 - [ ] Add/verify stale-source and failure guardrails
 - [ ] Validate output mapping and conflict resolution
 - [ ] Decide recommendation (Adopt, Pilot, Reject)
@@ -199,6 +240,9 @@ Return this structure at completion:
 - Weighted overall score: [0.00 to 5.00]
 - Hard gates triggered: [None | list]
 
+## Channel mapping
+- Events / /near / ops triage / graph / AI: [which apply]
+
 ## Risks
 - [Data freshness, reliability, schema, or operational risks]
 
@@ -215,4 +259,5 @@ Return this structure at completion:
 - Prefer smallest safe changes that keep behavior stable.
 - Keep controllers thin and place business logic in services.
 - Do not add speculative sources or undocumented assumptions.
+- Do not introduce React or parallel disaster math libraries.
 - When data is missing or external access is unavailable, report a blocker clearly and propose the smallest next step.

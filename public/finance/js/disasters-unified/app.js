@@ -178,10 +178,10 @@ function initDuSectionCards() {
     });
   });
 
-  ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans'].forEach((sectionId, idx) => {
+  ['collapseCommandDeck', 'collapseRiskIntel', 'collapseLoans'].forEach((sectionId) => {
     const el = document.getElementById(sectionId);
     if (!el) return;
-    const step = sectionId === 'collapseLoans' ? 4 : idx + 1;
+    const step = sectionId === 'collapseLoans' ? 3 : 2;
     updateDuSectionHeaderState(sectionId, el.classList.contains('show'));
     el.addEventListener('shown.bs.collapse', () => {
       updateDuSectionHeaderState(sectionId, true);
@@ -195,7 +195,7 @@ function initDuSectionCards() {
     });
   });
 
-  syncDuWorkflowPill(3);
+  syncDuWorkflowPill(2);
 }
 
 function duBsCollapseShow(el) {
@@ -500,7 +500,7 @@ function revealDisasterSelectionPanels() {
   showDuDashboardSectionCard('collapseMapYouTube');
   expandDuLoansSection();
   setDuSectionPillActive('collapseMapYouTube');
-  syncDuWorkflowPill(3);
+  syncDuWorkflowPill(2);
   setTimeout(() => {
     refreshDisastersGridLayout();
     refreshEncompassLoansGridLayout();
@@ -579,9 +579,9 @@ function initDuSectionSidebar() {
     const link = e.target.closest('a[data-bs-target], a[data-du-section-target]');
     if (!link) return;
     e.preventDefault();
-    const bottomDockTarget = link.getAttribute('data-du-section-target');
-    if (bottomDockTarget === 'duBottomDock') {
-      openDuDashboardSection('duBottomDock', link.getAttribute('data-du-section-step'));
+    const sectionTarget = link.getAttribute('data-du-section-target');
+    if (sectionTarget === 'duBottomDock' || sectionTarget === 'duGeoStage') {
+      openDuDashboardSection(sectionTarget, link.getAttribute('data-du-section-step'));
       return;
     }
     const target = link.getAttribute('data-bs-target');
@@ -607,7 +607,7 @@ function initDuSectionSidebar() {
   const defaultOpenId = 'collapseDisasters';
   showDuDashboardSectionCard(defaultOpenId);
   updateDuSectionSidebarActiveState(defaultOpenId, true);
-  syncDuWorkflowPill(duCountyIntelLoaded ? 3 : 1);
+  syncDuWorkflowPill(duCountyIntelLoaded ? 2 : 1);
 }
 
 function setDuLoanPanel(panel) {
@@ -793,7 +793,7 @@ function selectDisaster(disasterData, disasterObj) {
 
 async function loadLoansForDisaster(disasterObj, disasterData) {
   expandDuLoansSection();
-  $('#encompassLoansSubtitle').text('Loading mocked loans near selected disaster…');
+  $('#encompassLoansSubtitle').text('Loading loans via live /near…');
 
   const normalizedDisaster = DisasterLoanFilters.normalizeDisasterForFilters(disasterObj, disasterData);
   let mode = $('#duLoanScopeMode').val() || DisasterLoanFilters.defaultScopeMode(normalizedDisaster, disasterData);
@@ -837,7 +837,9 @@ async function loadLoansForDisaster(disasterObj, disasterData) {
       };
       let loanSub = DisasterLoanFilters.formatLoanFilterSubtitle(meta, loans.length);
       if (!loans.length) {
-        loanSub += ' — No mocked loans in this radius/county; widen radius or verify county.';
+        loanSub += ' — No demo loans in this live /near radius/county; widen radius or verify county.';
+      } else {
+        loanSub += ' · ops triage rank (not a probability)';
       }
       $('#encompassLoansSubtitle').text(loanSub);
       lastAffectedLoans = loans;
@@ -960,6 +962,7 @@ function updateSelectionContextStrip() {
   const summary = document.createElement('div');
   summary.className = 'du-selection-strip-summary';
   summary.innerHTML = `<strong class="du-selection-strip-title">${duEscapeHtml(title)}</strong>
+    <span class="badge text-bg-light border du-live-near-chip me-1" title="Live GET /api/disasters/near — not graph NEAR">Live /near</span>
     <span class="du-selection-strip-meta text-muted">${duEscapeHtml(location)} · ${duEscapeHtml(loanLine)} · ${duEscapeHtml(camLine)} · ${duEscapeHtml(nwsLine)}</span>`;
 
   const actions = document.createElement('div');
@@ -994,7 +997,8 @@ function updateSelectionContextStrip() {
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
     <li><a class="dropdown-item" href="disasters-webcams.html"><i class="bi bi-camera-video me-1"></i>Hazard webcams</a></li>
-    <li><a class="dropdown-item" href="pipeline-risk-dashboard.html"><i class="bi bi-graph-up me-1"></i>FEMA pipeline risk</a></li>
+    <li><a class="dropdown-item" href="pipeline-risk-dashboard.html"><i class="bi bi-graph-up me-1"></i>FEMA pipeline ops triage</a></li>
+    <li><a class="dropdown-item" href="/disaster-impact-graph.html" title="Persisted graph NEAR — as-of reseed (seeded_at), not live distance"><i class="bi bi-diagram-3 me-1"></i>Impact Graph <span class="text-muted small">(as-of reseed)</span></a></li>
   </ul>`;
   actions.appendChild(overflow);
 
@@ -1345,9 +1349,19 @@ $(function init() {
   $('#applyBtn, .du-apply-filters-btn').on('click', function() {
     onApplyFiltersClick();
   });
-  $('#refreshBtn').on('click', refreshDisasters);
   document.getElementById('refreshBtnHero')?.addEventListener('click', refreshDisasters);
   document.getElementById('duIngestPostgresBtn')?.addEventListener('click', refreshDisasters);
+  const focusPull = () => {
+    const heroPull = document.getElementById('refreshBtnHero');
+    if (!heroPull) return;
+    heroPull.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    heroPull.focus({ preventScroll: true });
+  };
+  document.getElementById('duFocusPullBtn')?.addEventListener('click', focusPull);
+  document.getElementById('duJumpToPullLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    focusPull();
+  });
   document.getElementById('duClearNwsGridFilter')?.addEventListener('click', (e) => {
     e.stopPropagation();
     clearNwsGridFilter(true);

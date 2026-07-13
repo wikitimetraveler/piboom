@@ -25,6 +25,20 @@ Use [`AGENTS.md`](../../../AGENTS.md) (DevOps Agent Mission, Hard Blockers, Pref
 
 Do not disable tests, delete assertions, or weaken coverage to make CI pass unless the user explicitly asks.
 
+## Disaster-domain tests (mock externals)
+
+When fixing disaster / FIRMS / spatial / triage failures, prefer these suites and keep FEMA/NASA/USGS mocked:
+
+| Suite | Covers |
+|-------|--------|
+| `tests/unit/disaster-risk-score.test.js` | Ops triage + flood zone table |
+| `tests/unit/disasters-firms-quality.test.js` | FIRMS gates, Haversine guards, union-find cluster |
+| `tests/unit/disaster-impact-graph-spatial.test.js` | Graph NEAR per-disaster seed query |
+| `tests/unit/disaster-spatial.service.test.js` | PostGIS `/near` path |
+| `tests/unit/disasters.controller.test.js` | HTTP / refresh auth |
+
+Do not “fix” triage semantics by labeling scores as probabilities in assertions or fixtures.
+
 ## Hard blockers
 
 Stop and report **BLOCKED** when `AGENTS.md` says so: missing env vars, credentials, DB unavailable, network-only deps unreachable, missing fixtures, install not run, or build cannot execute. Propose the smallest next step (e.g. `.env.example`, mock service).

@@ -39,6 +39,8 @@ Do not: rapid cuts, exaggerated expressions, stock-photo backgrounds
 ```
 
 For **disaster briefing** tone: urgent but controlled; no alarmist music cues in script.
+Say **ops triage score** for loan risk ranks — never imply calibrated loss probability.
+If mentioning proximity, prefer live map/`/near` language; graph `NEAR` only with a freshness/reseed caveat.
 
 For **Lane / heritage**: warmer delivery; slightly slower on names and dates.
 

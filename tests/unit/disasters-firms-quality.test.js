@@ -5,6 +5,8 @@ import {
   passesFirmsThermalGate,
   isLikelyActualFirmsFire,
   getFirmsQualityThresholds,
+  clusterFirmsDetectionsByDistance,
+  calculateDistance,
 } from '../../services/disasters.service.js';
 
 describe('FIRMS quality gate (combined pull)', () => {
@@ -37,5 +39,46 @@ describe('FIRMS quality gate (combined pull)', () => {
   test('low confidence detections fail gate', () => {
     const low = parseFirmsDetectionProps({ confidence: 'low', bright_ti4: 400, frp: 10 });
     expect(passesFirmsConfidenceGate(low.confidence, thresholds)).toBe(false);
+  });
+});
+
+describe('calculateDistance coordinate guards', () => {
+  test('allows 0° coordinates (equator / prime meridian)', () => {
+    const d = calculateDistance(0, 0, 0, 1);
+    expect(d).not.toBeNull();
+    expect(d).toBeGreaterThan(100);
+  });
+
+  test('rejects non-finite coordinates', () => {
+    expect(calculateDistance(null, -118, 34, -118)).toBeNull();
+    expect(calculateDistance(34, NaN, 34, -118)).toBeNull();
+  });
+});
+
+describe('clusterFirmsDetectionsByDistance (union-find)', () => {
+  test('chains collinear points within radius into one component (order-independent)', () => {
+    // Spacing 4 km < default 5 km radius; A—B—C should be one cluster
+    const chain = [
+      { lat: 34.0, lng: -118.0 },
+      { lat: 34.0 + (4 / 111), lng: -118.0 },
+      { lat: 34.0 + (8 / 111), lng: -118.0 },
+    ];
+    const forward = clusterFirmsDetectionsByDistance(chain, 5);
+    const reverse = clusterFirmsDetectionsByDistance([...chain].reverse(), 5);
+
+    expect(forward.componentCount).toBe(1);
+    expect(reverse.componentCount).toBe(1);
+    expect(forward.clusterSizeByIndex).toEqual([3, 3, 3]);
+    expect(reverse.clusterSizeByIndex).toEqual([3, 3, 3]);
+  });
+
+  test('keeps far points in separate components', () => {
+    const fires = [
+      { lat: 34.0, lng: -118.0 },
+      { lat: 35.0, lng: -118.0 },
+    ];
+    const { componentCount, clusterSizeByIndex } = clusterFirmsDetectionsByDistance(fires, 5);
+    expect(componentCount).toBe(2);
+    expect(clusterSizeByIndex).toEqual([1, 1]);
   });
 });

@@ -177,11 +177,20 @@
         style: styleCountyLayer,
         onEachFeature: (feature, layer) => {
           const name = duGeoData.normalizeCountyName(feature.properties?.name);
-          layer.bindTooltip(name, { sticky: true, className: 'du-geo-tooltip' });
+          const summary = countySummary[name.toLowerCase()] || {};
+          const count = Number(summary.event_count) || 0;
+          if (count > 0) {
+            layer.bindTooltip(String(count), {
+              permanent: true,
+              direction: 'center',
+              className: 'du-geo-tooltip du-geo-count-label',
+              opacity: 0.95,
+            });
+          } else {
+            layer.bindTooltip(name, { sticky: true, className: 'du-geo-tooltip' });
+          }
           layer.on({
-            mouseover: (e) => {
-              e.target.setStyle({ weight: 2, fillOpacity: 0.75 });
-            },
+            mouseover: (e) => e.target.setStyle({ weight: 2, fillOpacity: 0.75 }),
             mouseout: (e) => countiesLayer.resetStyle(e.target),
             click: () => pickCounty(name),
           });
@@ -233,11 +242,20 @@
       onEachFeature: (feature, layer) => {
         const abbr = feature.properties?.state_abbr;
         const name = feature.properties?.state_name || abbr;
-        const count = feature.properties?.event_count || 0;
-        layer.bindTooltip(`${name}${count ? ` · ${count} events` : ''}`, {
-          sticky: true,
-          className: 'du-geo-tooltip',
-        });
+        const count = Number(feature.properties?.event_count) || 0;
+        if (count > 0) {
+          layer.bindTooltip(String(count), {
+            permanent: true,
+            direction: 'center',
+            className: 'du-geo-tooltip du-geo-count-label',
+            opacity: 0.95,
+          });
+        } else {
+          layer.bindTooltip(name || abbr || '', {
+            sticky: true,
+            className: 'du-geo-tooltip',
+          });
+        }
         layer.on({
           mouseover: (e) => e.target.setStyle({ weight: 2, fillOpacity: 0.72 }),
           mouseout: (e) => statesLayer.resetStyle(e.target),
@@ -245,6 +263,15 @@
         });
       },
     }).addTo(pickerMap);
+
+    const withEvents = (geojson.features || []).filter((f) => Number(f.properties?.event_count) > 0).length;
+    const totalEvents = (geojson.features || []).reduce((sum, f) => sum + (Number(f.properties?.event_count) || 0), 0);
+    if (totalEvents > 0) {
+      setPickerStatus(
+        `${totalEvents.toLocaleString()} events across ${withEvents} state${withEvents === 1 ? '' : 's'} — numbers shown on the map. Click a state to drill in.`,
+        'success'
+      );
+    }
   }
 
   function populateStateSelect() {

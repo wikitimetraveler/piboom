@@ -78,10 +78,16 @@ function ensurePool() {
 }
 
 const DEFAULT_NEAR_RADIUS_MILES = 50;
+/** Max NEAR loan edges per disaster (stratified; avoids metro monopoly). */
+const DEFAULT_NEAR_PER_DISASTER = 25;
+/** Global safety cap across all disasters after per-disaster ranking. */
+const DEFAULT_NEAR_GLOBAL_CAP = 2000;
 
 /**
  * Create disaster_event --NEAR--> loan edges from PostGIS spatial join.
- * @returns {Promise<{ skipped?: boolean, reason?: string, edges: number }>}
+ * Per-disaster nearest-N (default 25), then global cap — not a single global 500.
+ * Edge confidence is a heuristic link strength, not P(impact).
+ * @returns {Promise<{ skipped?: boolean, reason?: string, edges: number, seededAt?: string, perDisasterCap?: number }>}
  */
 export async function seedNearSpatialEdges(options = {}) {
   if (!(await isPostgisAvailable())) {
@@ -91,29 +97,40 @@ export async function seedNearSpatialEdges(options = {}) {
   const pool = ensurePool();
   const radiusMiles = options.radiusMiles ?? DEFAULT_NEAR_RADIUS_MILES;
   const meters = milesToMeters(radiusMiles);
+  const perDisasterCap = options.perDisasterCap ?? DEFAULT_NEAR_PER_DISASTER;
+  const globalCap = options.globalCap ?? DEFAULT_NEAR_GLOBAL_CAP;
   const disasterNodeByKey = options.disasterNodeByKey;
   const loanNodeByLoanNumber = options.loanNodeByLoanNumber;
+  const seededAt = new Date().toISOString();
 
   if (!disasterNodeByKey || !loanNodeByLoanNumber) {
     return { skipped: true, reason: 'missing node maps', edges: 0 };
   }
 
   const { rows } = await pool.query(
-    `SELECT
-      d.id AS disaster_row_id,
-      d.source_id,
-      l.loan_number,
-      ST_Distance(d.geom, l.geom) AS distance_meters
-    FROM disasters d
-    JOIN loans l
-      ON d.geom IS NOT NULL
-     AND l.geom IS NOT NULL
-     AND ST_DWithin(d.geom, l.geom, $1)
-    WHERE d.start_time >= NOW() - INTERVAL '${DISASTER_ROLLING_WINDOW_DAYS} days'
-      AND d.event_type <> 'camera'
-    ORDER BY distance_meters ASC
-    LIMIT 500`,
-    [meters]
+    `SELECT disaster_row_id, source_id, loan_number, distance_meters
+     FROM (
+       SELECT
+         d.id AS disaster_row_id,
+         d.source_id,
+         l.loan_number,
+         ST_Distance(d.geom, l.geom) AS distance_meters,
+         ROW_NUMBER() OVER (
+           PARTITION BY d.id
+           ORDER BY ST_Distance(d.geom, l.geom) ASC
+         ) AS rn
+       FROM disasters d
+       JOIN loans l
+         ON d.geom IS NOT NULL
+        AND l.geom IS NOT NULL
+        AND ST_DWithin(d.geom, l.geom, $1)
+       WHERE d.start_time >= NOW() - INTERVAL '${DISASTER_ROLLING_WINDOW_DAYS} days'
+         AND d.event_type <> 'camera'
+     ) ranked
+     WHERE rn <= $2
+     ORDER BY distance_meters ASC
+     LIMIT $3`,
+    [meters, perDisasterCap, globalCap]
   );
 
   let edges = 0;
@@ -138,13 +155,16 @@ export async function seedNearSpatialEdges(options = {}) {
       source: 'postgis-spatial',
       metadata_json: {
         distance_meters: distanceMeters,
-        radius_miles: radiusMiles
+        radius_miles: radiusMiles,
+        seeded_at: seededAt,
+        // Live GET /api/disasters/near is operational truth; this edge is as-of seeded_at only.
+        proximity_channel: 'graph_near_seed'
       }
     });
     edges += 1;
   }
 
-  return { edges };
+  return { edges, seededAt, perDisasterCap, globalCap };
 }
 
 export async function initDisasterImpactGraphSchema() {
@@ -472,7 +492,7 @@ export async function calculateRiskPath(startNodeId) {
         CASE WHEN e.from_node_id = rw.node_id THEN e.to_node_id ELSE e.from_node_id END AS node_id,
         rw.start_node_id,
         rw.depth + 1 AS depth,
-        (rw.path_confidence * COALESCE(NULLIF(e.confidence, 0), 0.5))::numeric AS path_confidence,
+        (rw.path_confidence * COALESCE(e.confidence, 0.5))::numeric AS path_confidence,
         rw.node_path || CASE WHEN e.from_node_id = rw.node_id THEN e.to_node_id ELSE e.from_node_id END,
         rw.edge_path || e.id
       FROM risk_walk rw

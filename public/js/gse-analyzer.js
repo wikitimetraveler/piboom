@@ -187,19 +187,18 @@
 
   function renderExhibitReferenceLinks(metadata) {
     const agencyLinks = metadata && metadata.agencyExhibitLinks;
+    const deliveryLinks = metadata && metadata.deliveryExhibitLinks;
     const sourceIndex = buildSourceIndex(metadata && metadata.sources);
-    if (!agencyLinks) return;
 
-    for (const [agency, ulId] of Object.entries(EXHIBIT_LINK_UL_IDS)) {
+    function fillLinkList(ulId, ids) {
       const ul = $(ulId);
-      if (!ul) continue;
-      const ids = Array.isArray(agencyLinks[agency]) ? agencyLinks[agency] : [];
-      const items = ids
+      if (!ul) return;
+      const items = (Array.isArray(ids) ? ids : [])
         .map((id) => sourceIndex.get(id))
         .filter((ref) => ref && ref.url);
       if (!items.length) {
         ul.innerHTML = '<li class="text-muted">No references configured.</li>';
-        continue;
+        return;
       }
       ul.innerHTML = items
         .map(
@@ -207,6 +206,69 @@
             `<li><a class="gse-exhibit-link" href="${escapeHtmlAttr(ref.url)}" target="_blank" rel="noopener noreferrer">${escapeHtmlAttr(ref.title)}<i class="bi bi-box-arrow-up-right gse-exhibit-link-icon" aria-hidden="true"></i></a></li>`
         )
         .join('');
+    }
+
+    if (agencyLinks) {
+      for (const [agency, ulId] of Object.entries(EXHIBIT_LINK_UL_IDS)) {
+        fillLinkList(ulId, agencyLinks[agency]);
+      }
+    }
+
+    if (deliveryLinks) {
+      fillLinkList('gseExhibitGinnieLinks', deliveryLinks.ginnie);
+    }
+  }
+
+  function resetGinnieDeliveryEvidence() {
+    const runEl = $('gseExhibitGinnieRun');
+    if (runEl) {
+      runEl.textContent =
+        'Run Analyze to see whether FHA / VA / USDA product fits suggest possible Ginnie Mae MBS delivery.';
+    }
+    const dl = $('gseExhibitGinnieCounts');
+    if (dl) dl.innerHTML = '';
+  }
+
+  function renderGinnieDelivery(products) {
+    if (!products || !products.length) {
+      resetGinnieDeliveryEvidence();
+      return;
+    }
+    const agg = aggregateByBucket(products);
+    const gov = {
+      fha: agg.fha,
+      va: agg.va,
+      usda: agg.usda
+    };
+    const catalogTotal = gov.fha.total + gov.va.total + gov.usda.total;
+    const candidate =
+      gov.fha.fit +
+      gov.fha.possible +
+      gov.va.fit +
+      gov.va.possible +
+      gov.usda.fit +
+      gov.usda.possible;
+
+    const dl = $('gseExhibitGinnieCounts');
+    if (dl) {
+      dl.innerHTML = [
+        ['Gov products', catalogTotal],
+        ['Fit / possible', candidate],
+        ['FHA fit+poss', gov.fha.fit + gov.fha.possible],
+        ['VA fit+poss', gov.va.fit + gov.va.possible],
+        ['USDA fit+poss', gov.usda.fit + gov.usda.possible]
+      ]
+        .map(([k, v]) => `<dt class="col-6">${k}</dt><dd class="col-6">${v}</dd>`)
+        .join('');
+    }
+
+    const runEl = $('gseExhibitGinnieRun');
+    if (!runEl) return;
+    if (candidate > 0) {
+      runEl.textContent = `Last analysis: ${candidate} FHA/VA/USDA catalog row(s) with fit or possible-fit. Those paths may support Ginnie Mae MBS delivery after program approval and issuer compliance—not underwriting eligibility.`;
+    } else {
+      runEl.textContent =
+        'Last analysis: no FHA/VA/USDA fit or possible-fit rows. Ginnie Mae MBS delivery typically applies only after a government-insured or guaranteed loan is approved.';
     }
   }
 
@@ -217,6 +279,7 @@
       const dl = $(EXHIBIT_COUNT_IDS[agency]);
       if (dl) dl.innerHTML = '';
     }
+    resetGinnieDeliveryEvidence();
   }
 
   function renderExhibits(products) {
@@ -240,6 +303,7 @@
     setRun('gseExhibitFhaRun', agg.fha.total);
     setRun('gseExhibitVaRun', agg.va.total);
     setRun('gseExhibitUsdaRun', agg.usda.total);
+    renderGinnieDelivery(products);
   }
 
   function initProductsGrid() {

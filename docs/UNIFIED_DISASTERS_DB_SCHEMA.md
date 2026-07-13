@@ -122,7 +122,7 @@ flowchart TB
 | `HAS_DECLARATION` | county → disaster_event | County has this declaration/event | `disasters-seed`, ~0.9 |
 | `AFFECTS` | disaster_event → zip, or county → disaster | Disaster affects ZIP/county area | county/zip heuristics, ~0.7–0.85 |
 | `CONTAINS` | county → zip → loan | Geography contains loan | `loan-seed`, ~0.92–0.95 |
-| `NEAR` | disaster_event → loan | **PostGIS** `ST_DWithin` (~50 mi default); distance in `metadata_json` | `postgis-spatial`; confidence scales with distance |
+| `NEAR` | disaster_event → loan | **PostGIS** `ST_DWithin` (~50 mi); per-disaster nearest-N then global cap; `seeded_at` + distance in `metadata_json` | `postgis-spatial`; heuristic confidence scales with distance (not a probability) |
 | `CURRENTLY_IN` | loan → milestone | Loan’s pipeline milestone | `loan-seed`, ~0.97 |
 | `ASSIGNED_TO` | milestone → processor | Milestone tied to processor label | `loan-seed`, ~0.75 |
 | `LOCATED_IN`, `HAS_ALERT`, `HAS_RISK`, `REQUIRES_REVIEW` | reserved | In schema; limited seed usage today |
@@ -139,7 +139,7 @@ Plus **direct** `disaster_event --NEAR--> loan` when coordinates exist (stronges
 2. **Load facts** — Up to 400 recent `disasters` (90-day window, exclude `event_type = 'camera'`) and 400 `loans`.
 3. **Upsert nodes** — Counties, disaster events, zips, loans, milestones, processors.
 4. **Semantic edges** — `HAS_DECLARATION`, `CONTAINS`, `AFFECTS` (county/disaster/zip), `CURRENTLY_IN`, `ASSIGNED_TO`.
-5. **Spatial edges** — `seedNearSpatialEdges()` joins `disasters.geom` ↔ `loans.geom` with `ST_DWithin` (50 mi), writes `NEAR` with `distance_meters` in metadata.
+5. **Spatial edges** — `seedNearSpatialEdges()` joins `disasters.geom` ↔ `loans.geom` with `ST_DWithin` (50 mi), ranks by distance **per disaster** (`ROW_NUMBER` / nearest 25), writes `NEAR` with `distance_meters` + `seeded_at` in metadata.
 6. **Full refresh** — `refreshDisasterImpactGraphFromCurrentData()` truncates edges/nodes and reseeds (destructive rebuild).
 
 **TODOs in code** (not yet automated after daily disaster refresh): reconcile reseed with `refresh-disasters.js`, richer FEMA/FIRMS/NWS node types, production Encompass processor assignment.
@@ -167,11 +167,13 @@ Plus **direct** `disaster_event --NEAR--> loan` when coordinates exist (stronges
 | Concern | Unified Disasters | Impact graph |
 |---------|-------------------|--------------|
 | Data freshness | Reads `disasters` / `fire_cameras` / `loans` directly | Graph is **stale until reseed** |
-| Loan discovery | Radius from selected lat/lng (`/near`) | Multi-hop paths (county, zip, NEAR, milestone) |
+| Loan discovery | Radius from selected lat/lng (`/near`) — **live operational truth** | Multi-hop paths (county, zip, NEAR, milestone) |
+| `NEAR` semantics | N/A (query-time distance) | Persisted edges with `metadata_json.seeded_at`; per-disaster nearest-N (default 25), not a live substitute for `/near` |
 | Webcams | `fire_cameras` via `/near` | Not modeled as graph nodes today |
+| Loan score | `disaster_risk_score` = **ops triage** (FEMA + flood table; not a probability) | May appear in node metadata; same semantics |
 | Processor ops context | AI + grid selection | Explicit `loan → milestone → processor` edges |
 
-**Recommendation:** Treat **`disasters` + `loans` + PostGIS** as operational truth for maps and AI; use the **graph** for relationship analytics, county-wide impact prototypes, and explaining *why* a loan might be tied to an event (not only *how far* it is).
+**Recommendation:** Treat **`disasters` + `loans` + PostGIS `/near`** as operational truth for maps and AI; use the **graph** for relationship analytics, county-wide impact prototypes, and explaining *why* a loan might be tied to an event (not only *how far* it is). Never equate live `/near` with graph `NEAR` without the edge `seeded_at` freshness stamp.
 
 ---
 
@@ -261,7 +263,7 @@ Plus **direct** `disaster_event --NEAR--> loan` when coordinates exist (stronges
 | `property_address`, `city`, `state`, `county`, `zip_code` | VARCHAR | Address for geocode |
 | `latitude`, `longitude` | DECIMAL | Property coordinates |
 | `loan_amount`, `loan_type`, `milestone` | | Pipeline metadata |
-| `disaster_risk_score` | INTEGER DEFAULT 0 | 0–15 style score |
+| `disaster_risk_score` | INTEGER DEFAULT 0 | **Ops triage** score 0–15 (FEMA declarations ± distance/recency + flood-zone table). Not a loss probability; multi-hazard live events are a separate `/near` channel. |
 | `disaster_declaration_count` | INTEGER DEFAULT 0 | Recent declaration count |
 | `fema_data` | JSONB | Cached FEMA overlap payload (GIN index) |
 | `last_risk_analysis` | TIMESTAMP | |

@@ -25,6 +25,7 @@ description: Applies DevConnect Labs patterns for LangChain, OpenAI, and Encompa
 | Encompass Assistant (docs + ICE RAG, chat, summary) | `controllers/encompass-assistant.controller.js`, `public/finance/encompass-assistant.html` |
 | LangChain REST API (`/api/chat/langchain/*`) | `routes/chat.routes.js`, wired to LangChain memory service |
 | Loan pipeline AI | `controllers/loan-pipeline-ai.controller.js` → `services/langchain-memory.service.js` |
+| Disaster Processor Expert | `POST /api/loan-pipeline/ai/chat-disaster-expert` (`expertProfile: processor`, `sessionId: unified-disaster-processor`); Unified Disasters page context |
 | Unit Tests AI | `controllers/unit-tests-ai.controller.js` |
 | Screen Test / form manifest AI | `controllers/reviewer-ai.controller.js`, `public/finance/tool9.html` |
 | Optional loan complexity scoring (processors) | `services/loan-complexity-ai.service.js` (see `docs/PROCESSOR_ASSIGNMENT.md`) |
@@ -37,12 +38,18 @@ Thin controllers call services; do not duplicate retrieval or memory wiring in r
 2. **Memory** — Prefer existing `langchain-memory.service.js` helpers and DB history for conversational flows (`GET/POST/DELETE` `/api/chat/langchain/*` per `docs/AI_SYSTEM.md`).
 3. **Testing** — Mock `@langchain/openai` and `@langchain/core/messages` in unit tests (`tests/unit/encompass-assistant.controller.test.js` style); mock `langchain-memory.service.js` where the controller depends on chains.
 4. **Calculations vs AI** — Encompass field math belongs in `public/shared/calculationEngine.js`; AI explains or maps behavior—it does not replace the engine unless the product asks for that explicitly.
+5. **Disaster Processor Expert** — When packing context (`selectedDisaster`, `nearbyLoans`, `nearbyCameras`):
+   - Call loan `disaster_risk_score` an **ops triage** score (FEMA + flood table) — **not** a loss probability.
+   - Live nearby lists come from `GET /api/disasters/near`; do not treat graph `NEAR` as live without `seeded_at`.
+   - Multi-hazard events (FIRMS/USGS/NWS/NHC) are a separate channel from the loan ops triage score.
+   - See `docs/DISASTER_RISK.md` and `.cursor/skills/disaster-source-modeling-expert/SKILL.md`.
 
 ## Checklist before shipping AI changes
 
 - [ ] Reuse existing services; no parallel RAG pipelines.
 - [ ] After ICE source changes: `npm run build:ice-knowledge`.
 - [ ] Assistant/system prompts stay accurate if APIs or UI capabilities change.
+- [ ] Disaster prompts use “ops triage,” not “probability,” for loan scores.
 - [ ] Frontend stays Bootstrap + vanilla JS (no React).
 - [ ] Credential failures: align with `.env.example` / `docs/CONFIG.md`; document blockers rather than weakening tests.
 

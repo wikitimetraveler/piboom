@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, FHA, and USDA materials, plus lender/investor overlay examples. It is informational decision support only, not underwriting, not DU/LPA/TOTAL/GUS, and not a commitment to lend. Always confirm eligibility in current agency guides, AUS findings, investor overlays, and compliance policy.",
+  "version": "1.2.0",
+  "disclaimer": "This tool summarizes publicly published Fannie Mae, Freddie Mac, FHFA, VA, FHA, USDA, and Ginnie Mae (MBS delivery) materials, plus lender/investor overlay examples. It is informational decision support only, not underwriting, not DU/LPA/TOTAL/GUS, not Ginnie Mae pool eligibility, and not a commitment to lend. Always confirm eligibility in current agency guides, AUS findings, investor overlays, issuer requirements, and compliance policy.",
   "sources": [
     {
       "id": "FANNIE_SELLING_GUIDE",
@@ -71,6 +71,21 @@
       "id": "INVESTOR_OVERLAYS",
       "title": "Investor Overlay Operations Reference (internal modeling profile)",
       "url": "https://singlefamily.fanniemae.com/originating-underwriting"
+    },
+    {
+      "id": "GINNIE_MBS_GUIDE",
+      "title": "Ginnie Mae MBS Guide",
+      "url": "https://www.ginniemae.gov/issuers/program_guidelines/Pages/mbs_guide.aspx"
+    },
+    {
+      "id": "GINNIE_MBS_CHAPTERS",
+      "title": "Ginnie Mae MBS Guide Chapters (library)",
+      "url": "https://www.ginniemae.gov/issuers/program_guidelines/Pages/MBSGuideLib.aspx"
+    },
+    {
+      "id": "GINNIE_ISSUER",
+      "title": "Ginnie Mae — Becoming an Issuer",
+      "url": "https://www.ginniemae.gov/about_us/how_to_participate/Pages/becoming_an_issuer.aspx"
     }
   ],
   "sourceRefs": {
@@ -117,5 +132,8 @@
     "fha": ["FHA_4000_1", "FHA_MORTGAGEE_LETTERS"],
     "va": ["VA_LENDERS_HANDBOOK", "VA_CIRCULARS"],
     "usda": ["USDA_HB_3555", "USDA_ELIGIBILITY"]
+  },
+  "deliveryExhibitLinks": {
+    "ginnie": ["GINNIE_MBS_GUIDE", "GINNIE_MBS_CHAPTERS", "GINNIE_ISSUER"]
   }
 }

@@ -36,6 +36,7 @@
     
     <!-- Custom CSS -->
     <link href="../shared/modern-navbar.css" rel="stylesheet">
+    <link rel="stylesheet" href="/shared/design-tokens.css" />
     <link rel="stylesheet" href="/shared/encompass-dark-mode.css" />
     <!-- Voice Commands & AI Components -->
     <script type="module" src="../shared/voice-commands.js"></script>
@@ -44,17 +45,17 @@
     <script type="module" src="../shared/ai-insights-card.js"></script>
     <style>
         :root {
-            --primary-color: #2563eb;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --info-color: #06b6d4;
-            --dark-color: #1f2937;
-            --light-color: #f8fafc;
+            --primary-color: var(--zen-primary, #4a90a4);
+            --success-color: var(--zen-success, #10b981);
+            --warning-color: var(--zen-warning, #f59e0b);
+            --danger-color: var(--zen-danger, #ef4444);
+            --info-color: var(--zen-info, #06b6d4);
+            --dark-color: var(--zen-text, #1f2937);
+            --light-color: var(--zen-bg, #f8fafc);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: var(--zen-font-sans, 'Segoe UI', system-ui, sans-serif);
             background-color: var(--light-color);
             color: var(--dark-color);
         }
@@ -65,14 +66,17 @@
         }
 
         .card {
-            border: none;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid color-mix(in srgb, var(--zen-border, #e2e8f0) 80%, transparent);
+            box-shadow: none;
             border-radius: 12px;
+            background: var(--zen-surface, #fff);
         }
 
         .card-header {
-            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
-            color: white;
+            background: var(--zen-surface, #fff);
+            color: var(--zen-text, #1f2937);
+            border-bottom: 1px solid var(--zen-border, #e2e8f0);
+            border-left: 3px solid var(--zen-primary, #4a90a4);
             border-radius: 12px 12px 0 0 !important;
             font-weight: 600;
         }
@@ -732,7 +736,7 @@
                             <div class="col-md-6 mb-3">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h5 class="mb-0"><i class="bi bi-speedometer2"></i> Risk Score Distribution</h5>
+                                        <h5 class="mb-0"><i class="bi bi-speedometer2"></i> Ops Triage Score Distribution</h5>
                                     </div>
                                     <div class="card-body">
                                         <canvas id="riskScoreChart" style="max-height: 300px;"></canvas>
@@ -779,12 +783,12 @@
                                     <input class="form-control" id="countyFilter" placeholder="e.g., Harris">
                                 </div>
                                 <div class="col-md-3 mb-3">
-                                    <label class="form-label">Risk Level</label>
+                                    <label class="form-label">Ops triage level</label>
                                     <select class="form-select" id="riskFilter">
-                                        <option value="">All Risk Levels</option>
-                                        <option value="low">Low Risk</option>
-                                        <option value="medium">Moderate Risk</option>
-                                        <option value="high">High Risk</option>
+                                        <option value="">All triage levels</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Moderate</option>
+                                        <option value="high">High</option>
                                     </select>
                                 </div>
                                 <div class="col-md-3 mb-3">
@@ -982,7 +986,7 @@
                                                 <th>County</th>
                                                 <th>Loan Amount</th>
                                                 <th>Milestone</th>
-                                                <th>Risk Level</th>
+                                                <th title="Ops triage rank (0–15) — FEMA + flood weights, not a loss probability">Ops triage</th>
                                                 <th>Distance</th>
                                                 <th>Encompass GUID</th>
                                                 <th>Last Analysis</th>
@@ -2627,12 +2631,12 @@
                 <div class="loan-info-section">
                     <h6><i class="bi bi-shield-check"></i> Risk Assessment</h6>
                     <div class="loan-info-item">
-                        <span class="loan-info-label">Risk Level</span>
+                        <span class="loan-info-label">Ops triage level</span>
                         <span class="loan-info-value"><span class="risk-badge ${riskClass}">${riskLevel}</span></span>
                     </div>
                     <div class="loan-info-item">
-                        <span class="loan-info-label">Risk Score</span>
-                        <span class="loan-info-value">${loan.disaster_risk_score || 0}/10</span>
+                        <span class="loan-info-label">Ops triage score</span>
+                        <span class="loan-info-value" title="FEMA declarations + flood zone weights — not a loss probability">${loan.disaster_risk_score || 0}/15</span>
                     </div>
                     <div class="loan-info-item">
                         <span class="loan-info-label">Disaster Count</span>
@@ -2875,7 +2879,7 @@
                     if (loan.county) {
                         infoContent += `<p style="margin: 5px 0;"><strong>County:</strong> ${loan.county}</p>`;
                     }
-                    infoContent += `<p style="margin: 5px 0;"><strong>Risk Level:</strong> ${getRiskLevel(loan.disaster_risk_score)}</p>`;
+                    infoContent += `<p style="margin: 5px 0;"><strong>Ops triage:</strong> ${getRiskLevel(loan.disaster_risk_score)}</p>`;
 
                     if (loan.flood_zone) {
                         const fz = loan.flood_zone.toUpperCase();

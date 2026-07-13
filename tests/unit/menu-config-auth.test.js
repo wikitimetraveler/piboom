@@ -42,12 +42,8 @@ describe('menu-config auth filtering', () => {
     expect(visible.length).toBe(MENU_CONFIG.ENCOMPASS_TOOLS.length);
   });
 
-  test('NAV_FINANCE logged-out view keeps public disasters and GSE', () => {
-    const visible = MENU_CONFIG.filterToolsByAuth(MENU_CONFIG.NAV_FINANCE, false);
-    const hrefs = visible.filter((t) => t.href).map((t) => t.href);
-    expect(hrefs).toContain('/finance/disasters-unified.html');
-    expect(hrefs).toContain('/gse-analyzer.html');
-    expect(hrefs).not.toContain('/finance/encompass-hub.html');
-    expect(hrefs).not.toContain('/finance/unit-tests.html');
+  test('pathRequiresAuth gates processor assignment tools', () => {
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment.html')).toBe(true);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/processor-assignment-mock.html')).toBe(true);
   });
 });

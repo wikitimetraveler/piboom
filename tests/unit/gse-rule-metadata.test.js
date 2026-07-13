@@ -32,4 +32,18 @@ describe('gse rule-metadata.json', () => {
     expect(byId.get('FHA_MORTGAGEE_LETTERS')?.url).toContain('mortgagee_letters');
     expect(byId.get('VA_CIRCULARS')?.url).toContain('lenders_circulars');
   });
+
+  it('exposes Ginnie Mae delivery references (not an underwriting agency bucket)', () => {
+    expect(metadata.deliveryExhibitLinks).toBeDefined();
+    expect(Array.isArray(metadata.deliveryExhibitLinks.ginnie)).toBe(true);
+    expect(metadata.deliveryExhibitLinks.ginnie.length).toBeGreaterThan(0);
+    expect(metadata.agencyExhibitLinks.ginnie).toBeUndefined();
+
+    const byId = new Map((metadata.sources || []).map((s) => [s.id, s]));
+    for (const id of metadata.deliveryExhibitLinks.ginnie) {
+      const source = byId.get(id);
+      expect(source).toBeDefined();
+      expect(source.url).toMatch(/^https:\/\/www\.ginniemae\.gov\//);
+    }
+  });
 });

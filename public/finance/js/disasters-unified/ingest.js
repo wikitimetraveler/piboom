@@ -442,7 +442,7 @@ function setDuPullProgress(message, pct, { visible = true } = {}) {
 }
 
 function setPullButtonsBusy(busy) {
-  ['refreshBtnHero', 'refreshBtn', 'duIngestPostgresBtn'].forEach((id) => {
+  ['refreshBtnHero', 'duIngestPostgresBtn'].forEach((id) => {
     const btn = document.getElementById(id);
     if (!btn) return;
     btn.disabled = !!busy;

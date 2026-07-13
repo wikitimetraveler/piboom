@@ -223,8 +223,9 @@ function initDisastersGrid() {
     { field: 'title', headerName: 'Title', minWidth: 200, flex: 2, filter: 'agTextColumnFilter' },
     {
       field: 'riskScore',
-      headerName: 'Risk Score',
-      width: 140,
+      headerName: 'Event intensity',
+      headerTooltip: 'Relative event intensity from loaded hazard data — not a loan ops triage score',
+      width: 150,
       filter: 'agNumberColumnFilter',
       cellRenderer: (params) => htmlCellRenderer(getRiskBadge(params.value ?? 0))
     },
@@ -342,14 +343,16 @@ function initEncompassLoansGrid() {
     { field: 'milestone', headerName: 'Milestone', width: 120, filter: 'agTextColumnFilter' },
     {
       field: 'riskBadge',
-      headerName: 'Risk',
-      width: 110,
+      headerName: 'Ops triage',
+      headerTooltip: 'FEMA declarations + flood zone weights (0–15) — not a loss probability',
+      width: 120,
       filter: 'agTextColumnFilter',
       cellRenderer: (params) => htmlCellRenderer(params.value)
     },
     {
       field: 'distanceKm',
-      headerName: 'Distance',
+      headerName: 'Live /near',
+      headerTooltip: 'Distance from live GET /api/disasters/near — not graph NEAR edges',
       width: 120,
       filter: 'agNumberColumnFilter',
       cellRenderer: (params) => htmlCellRenderer(params.data?.distanceHtml || '')

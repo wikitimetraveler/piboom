@@ -327,14 +327,24 @@ function mapCountyToFips(countyName, stateAbbr) {
  * @returns {number} Distance in kilometers
  */
 export function calculateDistance(lat1, lng1, lat2, lng2) {
-  if (!lat1 || !lng1 || !lat2 || !lng2) {
-    return null; // Return null if coordinates are missing
+  // Reject null/undefined/'' before Number() — Number(null)===0 would falsely allow missing coords
+  const raw = [lat1, lng1, lat2, lng2];
+  if (raw.some((v) => v === null || v === undefined || v === '')) {
+    return null;
+  }
+  const φ1 = Number(lat1);
+  const λ1 = Number(lng1);
+  const φ2 = Number(lat2);
+  const λ2 = Number(lng2);
+  // Number.isFinite: allow 0° (equator / prime meridian); reject NaN/Infinity
+  if (![φ1, λ1, φ2, λ2].every(Number.isFinite)) {
+    return null;
   }
   const R = 6371; // Earth's radius in km
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const dLat = (φ2 - φ1) * Math.PI / 180;
+  const dLng = (λ2 - λ1) * Math.PI / 180;
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.cos(φ1 * Math.PI / 180) * Math.cos(φ2 * Math.PI / 180) *
             Math.sin(dLng / 2) * Math.sin(dLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
@@ -755,6 +765,83 @@ export function isLikelyActualFirmsFire(detection, clusterSize, thresholds = get
   return inCluster || strongSolo;
 }
 
+/**
+ * Cluster FIRMS detections with union-find single-linkage (DBSCAN-lite).
+ *
+ * Membership is order-independent: any pair within `radiusKm` is united, so
+ * collinear chains A—B—C with consecutive spacing ≤ r form one component
+ * (unlike seed-first greedy clustering). Component diameter can exceed 2r
+ * via chaining — documented tradeoff for better recall of elongated fronts.
+ *
+ * Complexity: O(n²) pairwise distance checks (acceptable for NRT VIIRS slices).
+ *
+ * @param {Array<{ lat: number, lng: number }>} fires
+ * @param {number} radiusKm
+ * @returns {{ clusterSizeByIndex: number[], centroids: Map<number, { lat: number, lng: number, size: number }>, componentCount: number }}
+ */
+export function clusterFirmsDetectionsByDistance(fires, radiusKm) {
+  const n = fires.length;
+  const parent = Array.from({ length: n }, (_, i) => i);
+  const rank = new Array(n).fill(0);
+
+  function find(x) {
+    while (parent[x] !== x) {
+      parent[x] = parent[parent[x]];
+      x = parent[x];
+    }
+    return x;
+  }
+
+  function union(a, b) {
+    let ra = find(a);
+    let rb = find(b);
+    if (ra === rb) return;
+    if (rank[ra] < rank[rb]) {
+      const tmp = ra;
+      ra = rb;
+      rb = tmp;
+    }
+    parent[rb] = ra;
+    if (rank[ra] === rank[rb]) rank[ra] += 1;
+  }
+
+  const r = Number(radiusKm);
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const d = calculateDistance(fires[i].lat, fires[i].lng, fires[j].lat, fires[j].lng);
+      if (d != null && Number.isFinite(r) && d <= r) {
+        union(i, j);
+      }
+    }
+  }
+
+  const members = new Map();
+  for (let i = 0; i < n; i++) {
+    const root = find(i);
+    if (!members.has(root)) members.set(root, []);
+    members.get(root).push(i);
+  }
+
+  const clusterSizeByIndex = new Array(n).fill(1);
+  const centroids = new Map();
+  for (const [root, idxs] of members.entries()) {
+    let latSum = 0;
+    let lngSum = 0;
+    for (const i of idxs) {
+      latSum += Number(fires[i].lat);
+      lngSum += Number(fires[i].lng);
+      clusterSizeByIndex[i] = idxs.length;
+    }
+    centroids.set(root, {
+      lat: latSum / idxs.length,
+      lng: lngSum / idxs.length,
+      size: idxs.length,
+    });
+  }
+
+  return { clusterSizeByIndex, centroids, componentCount: members.size };
+}
+
 /** NASA FIRMS (active fires) - VIIRS NRT GeoJSON **/
 export async function ingestFirmsNrt() {
   // Get MAP_KEY (FIRMS-specific) or fallback to NASA_API_KEY
@@ -895,7 +982,7 @@ export async function ingestFirmsNrt() {
     const lat = coords[1];
     const lng = coords[0];
 
-    if (!lat || !lng) continue;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
 
     const detection = parseFirmsDetectionProps(props);
     if (!passesFirmsConfidenceGate(detection.confidence, thresholds)) {
@@ -935,44 +1022,18 @@ export async function ingestFirmsNrt() {
   console.log(`   - ${filteredBySignal} filtered by weak thermal/FRP signal`);
   console.log(`   - ${significantFires.length} candidate fire detections remaining`);
 
-  const clusters = new Map();
-  const fireToCluster = new Map();
-  const CLUSTER_RADIUS_KM = thresholds.clusterRadiusKm;
-
-  for (let i = 0; i < significantFires.length; i++) {
-    const fire1 = significantFires[i];
-    let assignedCluster = null;
-
-    for (const [clusterId, clusterFires] of clusters.entries()) {
-      const clusterCenter = clusterFires[0];
-      const distance = calculateDistance(
-        fire1.lat, fire1.lng,
-        clusterCenter.lat, clusterCenter.lng,
-      );
-
-      if (distance <= CLUSTER_RADIUS_KM) {
-        assignedCluster = clusterId;
-        break;
-      }
-    }
-
-    if (assignedCluster) {
-      clusters.get(assignedCluster).push(fire1);
-      fireToCluster.set(i, assignedCluster);
-    } else {
-      const newClusterId = `cluster_${i}`;
-      clusters.set(newClusterId, [fire1]);
-      fireToCluster.set(i, newClusterId);
-    }
-  }
+  // Union-find single-linkage (order-independent membership). See clusterFirmsDetectionsByDistance.
+  const { clusterSizeByIndex, componentCount } = clusterFirmsDetectionsByDistance(
+    significantFires,
+    thresholds.clusterRadiusKm
+  );
 
   const finalFires = [];
   let filteredByLikelyFire = 0;
 
   for (let i = 0; i < significantFires.length; i++) {
     const fire = significantFires[i];
-    const clusterId = fireToCluster.get(i);
-    const clusterSize = clusters.get(clusterId)?.length || 0;
+    const clusterSize = clusterSizeByIndex[i] || 1;
 
     if (isLikelyActualFirmsFire(fire.detection, clusterSize, thresholds)) {
       finalFires.push(fire);
@@ -982,7 +1043,7 @@ export async function ingestFirmsNrt() {
   }
 
   console.log(`🔥 FIRMS: Likely-fire gate:`);
-  console.log(`   - ${clusters.size} fire clusters identified`);
+  console.log(`   - ${componentCount} fire clusters identified (union-find / single-linkage)`);
   console.log(`   - ${filteredByLikelyFire} filtered (unlikely isolated noise)`);
   console.log(`   - ${finalFires.length} likely fires ready for ingestion`);
   
@@ -1002,7 +1063,7 @@ export async function ingestFirmsNrt() {
     let county = null, state = null, fips = null;
     
     // Only geocode if we haven't exceeded the limit (prevents runaway costs)
-    if (lat && lng && geocodingCalls < MAX_GEOCODING_CALLS) {
+    if (Number.isFinite(lat) && Number.isFinite(lng) && geocodingCalls < MAX_GEOCODING_CALLS) {
       try {
         const rev = await reverseGeocodeCountyState(lat, lng);
         county = rev.county; 

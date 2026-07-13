@@ -55,7 +55,9 @@ describe('seedNearSpatialEdges', () => {
 
     expect(poolQuery).toHaveBeenCalledWith(
       expect.stringContaining('ST_DWithin'),
-      [1609.34 * 25]
+      [1609.34 * 25, 25, 2000]
     );
+    expect(poolQuery.mock.calls[0][0]).toContain('PARTITION BY d.id');
+    expect(poolQuery.mock.calls[0][0]).toContain('ROW_NUMBER()');
   });
 });

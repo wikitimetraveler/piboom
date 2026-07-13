@@ -50,7 +50,7 @@ Audience: … | Goal: … | Target: [30s | 60s | 2m] | Aspect: [16:9 | 9:16]
 
 - **Professional demos** (Encompass, Unit Tests, disasters): calm authority, no hype adjectives; show the tool within 20s for ≤2 min cuts.
 - **Lane / family**: warmer tone; cite **Context vs Evidence** when mixing history and records (`storybook-framing`).
-- **Unified Disasters HeyGen**: script builders live in `services/disaster-heygen.service.js`; UI in `public/finance/js/disaster-heygen-*.js`.
+- **Unified Disasters HeyGen**: script builders live in `services/disaster-heygen.service.js`; UI in `public/finance/js/disaster-heygen-*.js`. In narration, call loan scores **ops triage** (not probability); distinguish live map proximity (`/near`) from graph `NEAR` (as-of last reseed / `seeded_at`).
 - **Lane QR / guide popups**: portrait lines in `data/lane-heygen-lines.json`; print kit `public/family/lane-heygen-print.html`.
 - **Video script docs**: `docs/*_VIDEO_SCRIPT.md`, `docs/SVEN_UX_VIDEO_SCRIPT.md`, `docs/UNIT_TEST_VIDEO_SCRIPT.md` — match their section structure when extending.
 - **Public library**: `/heygen-hub.html` + `GET /api/heygen/library` (`public/shared/js/heygen-hub.js`).

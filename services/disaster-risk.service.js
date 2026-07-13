@@ -405,8 +405,12 @@ export async function analyzeLoanRisk(loan) {
       }
     }
     
-    // Calculate risk score (includes flood zone risk)
-    const riskScore = calculateRiskScore(femaData, loan);
+    // Ops triage score (FEMA + flood zone). Multi-hazard live events are a separate /near channel.
+    const riskScore = calculateRiskScore({
+      ...femaData,
+      disasters: disastersWithDistance,
+      disasterCount: femaData.disasterCount
+    }, loan, { useDistanceRecency: true });
     
     // Find closest disaster
     const closestDisaster = disastersWithDistance.find(d => d.distanceKm !== null) || null;
@@ -682,50 +686,125 @@ export function findDisastersWithinRadius(loan, disasters, radiusKm = 50) {
 }
 
 /**
- * Calculate risk score from FEMA data and flood zone
- * @param {Object} femaData - FEMA API response data
- * @param {Object} loan - Loan object with flood zone data (optional)
- * @returns {number} Risk score (0-10+)
+ * Calculate ops-triage score from FEMA declarations + flood zone.
+ * This is NOT a loss probability or actuarial model.
+ *
+ * Channel A (this score): FEMA declaration contribution + explicit flood-zone weights.
+ * Channel B (separate): multi-hazard live events via Unified Disasters / GET /api/disasters/near
+ * (FIRMS, USGS, NWS, NHC) — do not fold into this score.
+ *
+ * @param {Object} femaData - FEMA payload ({ disasterCount, disasters[] })
+ * @param {Object} loan - Loan with flood_zone / flood_zone_type (optional)
+ * @param {Object} [options]
+ * @param {boolean} [options.useDistanceRecency=true] - Weight declarations by distance + recency when fields exist
+ * @returns {number} Ops triage score (0–15)
  */
-function calculateRiskScore(femaData, loan = null) {
-  let baseScore = 0;
-  
-  // Calculate base score from disaster declarations
-  if (femaData && femaData.disasters) {
-    const disasterCount = femaData.disasterCount || 0;
-    // Simple scoring algorithm:
-    // 0-2 disasters: Low risk (0-2)
-    // 3-5 disasters: Medium risk (3-5)  
-    // 6+ disasters: High risk (6+)
-    baseScore = Math.min(disasterCount, 10); // Cap at 10 for display purposes
-  }
-  
-  // Add flood zone risk if loan has flood zone data
+export function calculateRiskScore(femaData, loan = null, options = {}) {
+  const useDistanceRecency = options.useDistanceRecency !== false;
+  let baseScore = declarationTriageContribution(femaData, { useDistanceRecency });
+
   if (loan && loan.flood_zone) {
-    const floodZone = loan.flood_zone.toUpperCase();
-    
-    // High-risk flood zones (A, AE, AO, AH, A99, V, VE, etc.)
-    if (floodZone.startsWith('A') || floodZone.startsWith('V')) {
-      // Add 2-4 points based on zone type
-      if (floodZone.includes('V') || floodZone.includes('AE') || floodZone.includes('AO')) {
-        baseScore += 4; // High-risk coastal or riverine flooding
-      } else if (floodZone.includes('AH') || floodZone.includes('A99')) {
-        baseScore += 3; // Moderate-high risk
-      } else {
-        baseScore += 2; // Standard high-risk zone
-      }
+    baseScore += floodZoneTriageWeight(loan.flood_zone, loan.flood_zone_type);
+  }
+
+  return Math.min(Math.round(baseScore * 10) / 10, 15);
+}
+
+/** Explicit FEMA NFHL zone → ops-triage weight (not a probability). */
+export const FLOOD_ZONE_TRIAGE_WEIGHTS = Object.freeze({
+  VE: 4,
+  V: 4,
+  AO: 4,
+  AE: 4,
+  AH: 3,
+  A99: 3,
+  A: 2,
+  D: 0.5,
+  X: 0,
+});
+
+const FLOOD_ZONE_PREFIX_ORDER = ['A99', 'VE', 'AE', 'AO', 'AH', 'V', 'A'];
+
+/**
+ * Map a flood zone code to an ops-triage weight via exact / longest-prefix table lookup.
+ * @param {string} floodZone
+ * @param {string|null} [floodZoneType]
+ * @returns {number}
+ */
+export function floodZoneTriageWeight(floodZone, floodZoneType = null) {
+  const z = String(floodZone || '').toUpperCase().trim();
+  if (!z) return 0;
+
+  if (Object.prototype.hasOwnProperty.call(FLOOD_ZONE_TRIAGE_WEIGHTS, z)) {
+    if (z === 'X' && floodZoneType && String(floodZoneType).toLowerCase().includes('shaded')) {
+      return 1;
     }
-    // Moderate-risk zones (X shaded, D)
-    else if (floodZone.includes('X') && loan.flood_zone_type && loan.flood_zone_type.includes('Shaded')) {
-      baseScore += 1; // Moderate risk
-    }
-    // Zone D (undetermined) adds minimal risk
-    else if (floodZone === 'D') {
-      baseScore += 0.5;
+    return FLOOD_ZONE_TRIAGE_WEIGHTS[z];
+  }
+
+  for (const prefix of FLOOD_ZONE_PREFIX_ORDER) {
+    if (z.startsWith(prefix) && Object.prototype.hasOwnProperty.call(FLOOD_ZONE_TRIAGE_WEIGHTS, prefix)) {
+      return FLOOD_ZONE_TRIAGE_WEIGHTS[prefix];
     }
   }
-  
-  return Math.min(Math.round(baseScore * 10) / 10, 15); // Cap at 15, allow decimals
+
+  if (z.startsWith('X') && floodZoneType && String(floodZoneType).toLowerCase().includes('shaded')) {
+    return 1;
+  }
+  return 0;
+}
+
+/** Closer declarations contribute more to ops triage (miles). Unknown → mid weight. */
+export function distanceTriageWeight(distanceMiles) {
+  if (distanceMiles == null || !Number.isFinite(Number(distanceMiles))) return 0.5;
+  const d = Number(distanceMiles);
+  if (d <= 10) return 1;
+  if (d <= 25) return 0.75;
+  if (d <= 50) return 0.5;
+  if (d <= 100) return 0.25;
+  return 0.1;
+}
+
+/** Newer declarations contribute more (incident / declaration date). Unknown → mid weight. */
+export function recencyTriageWeight(isoDate, nowMs = Date.now()) {
+  if (!isoDate) return 0.5;
+  const t = new Date(isoDate).getTime();
+  if (!Number.isFinite(t)) return 0.5;
+  const ageDays = (nowMs - t) / (86400 * 1000);
+  if (ageDays <= 14) return 1;
+  if (ageDays <= 30) return 0.75;
+  if (ageDays <= 60) return 0.5;
+  if (ageDays <= 90) return 0.25;
+  return 0.1;
+}
+
+/**
+ * FEMA declaration contribution (capped at 10). Optional distance × recency weights.
+ * @param {Object} femaData
+ * @param {{ useDistanceRecency?: boolean }} [options]
+ * @returns {number}
+ */
+export function declarationTriageContribution(femaData, options = {}) {
+  const disasters = Array.isArray(femaData?.disasters) ? femaData.disasters : [];
+  const rawCount = Number(femaData?.disasterCount ?? disasters.length) || 0;
+  // Only leave raw-count mode when at least one declaration has a distance — preserves
+  // backward-compatible integer triage when geocoding distances are absent.
+  const hasDistance = disasters.some((d) => d.distanceMiles != null || d.distanceKm != null);
+  const useWeights = options.useDistanceRecency !== false && hasDistance;
+
+  if (!useWeights || disasters.length === 0) {
+    return Math.min(rawCount, 10);
+  }
+
+  let sum = 0;
+  for (const d of disasters) {
+    const miles = d.distanceMiles != null
+      ? Number(d.distanceMiles)
+      : (d.distanceKm != null ? Number(d.distanceKm) * 0.621371 : null);
+    const date = d.incidentBeginDate || d.declarationDate;
+    sum += distanceTriageWeight(miles) * recencyTriageWeight(date);
+  }
+  return Math.min(Math.round(sum * 10) / 10, 10);
 }
 
 /**
@@ -956,6 +1035,11 @@ export default {
   analyzeLoanRisk,
   batchAnalyzeRisk,
   calculateRiskScore,
+  floodZoneTriageWeight,
+  declarationTriageContribution,
+  distanceTriageWeight,
+  recencyTriageWeight,
+  FLOOD_ZONE_TRIAGE_WEIGHTS,
   generateKMLForLoans,
   analyzeAllLoans,
   calculateLoanToDisasterDistances,

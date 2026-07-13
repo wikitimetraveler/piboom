@@ -20,28 +20,29 @@
   <body class="du-page hw-page">
     <modern-navbar></modern-navbar>
 
-    <header class="du-hero hw-hero">
+    <header class="du-hero hw-hero hw-hero--compact">
       <div class="du-hero-inner">
         <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
           <div>
             <p class="du-hero-kicker mb-1">National catalog · Fixed hazard mounts</p>
-            <h1 class="mb-0"><i class="bi-camera-video me-2"></i>Hazard Webcams</h1>
+            <h1 class="mb-1"><i class="bi-camera-video me-2"></i>Hazard Webcams</h1>
+            <p class="du-hero-lead small text-white-50 mb-2">Search an address to load nearest mounts — filters and catalog follow.</p>
             <ul class="du-workflow-pills" id="hwWorkflowHint" aria-label="Workflow steps">
-              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionSearch"><span class="step-num">1</span> Search address</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionFilters"><span class="step-num">2</span> Filter sources</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionMap"><span class="step-num">3</span> Map &amp; nearest</button></li>
-              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionCatalog"><span class="step-num">4</span> Full catalog</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionSearch"><span class="step-num">1</span> Search</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionFilters"><span class="step-num">2</span> Filter</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionMap"><span class="step-num">3</span> Map</button></li>
+              <li><button type="button" class="du-workflow-pill-btn" data-hw-section="hwSectionCatalog"><span class="step-num">4</span> Catalog</button></li>
             </ul>
           </div>
           <div class="du-hero-actions d-flex flex-wrap gap-2 align-items-center">
             <a class="btn btn-light btn-sm" href="disasters-unified.html"><i class="bi-arrow-left"></i> Unified Disasters</a>
-            <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html"><i class="bi-diagram-3"></i> Impact Graph</a>
+            <a class="btn btn-outline-light btn-sm" href="/disaster-impact-graph.html" title="Persisted graph — as-of reseed, not live /near"><i class="bi-diagram-3"></i> Impact Graph</a>
             <button type="button" class="btn btn-warning btn-sm" id="refreshCamerasBtn" title="POST /api/disasters/refresh-cameras — ingest all hazard webcam sources into Postgres fire_cameras table">
-              <i class="bi-database-down"></i> Pull webcams → Postgres
+              <i class="bi-database-down"></i> Pull webcams
             </button>
           </div>
         </div>
-        <div class="row g-3 du-stats-row" id="hwStatsRow">
+        <div class="row g-2 du-stats-row du-stats-row--compact mt-2" id="hwStatsRow" aria-label="Catalog stats">
           <div class="col-md-3 col-6">
             <div class="du-stat-card du-stat-card--cameras">
               <div class="du-stat-icon"><i class="bi-camera-video"></i></div>
@@ -56,7 +57,7 @@
               <div class="du-stat-icon"><i class="bi-fire"></i></div>
               <div>
                 <div class="stat-number" id="hwStatFire">—</div>
-                <div class="stat-label">Fire webcams</div>
+                <div class="stat-label">Fire</div>
               </div>
             </div>
           </div>
@@ -65,7 +66,7 @@
               <div class="du-stat-icon"><i class="bi-water"></i></div>
               <div>
                 <div class="stat-number" id="hwStatCoastal">—</div>
-                <div class="stat-label">Coastal (WebCOOS)</div>
+                <div class="stat-label">Coastal</div>
               </div>
             </div>
           </div>
@@ -74,7 +75,7 @@
               <div class="du-stat-icon"><i class="bi-broadcast"></i></div>
               <div>
                 <div class="stat-number" id="hwStatSources">—</div>
-                <div class="stat-label">Active sources</div>
+                <div class="stat-label">Sources</div>
               </div>
             </div>
           </div>
@@ -615,26 +616,36 @@
             const dist = DCF ? DCF.formatCameraDistanceMi(camera) : (camera.distance_miles != null ? camera.distance_miles + ' mi' : '—');
             const lhBadge = lighthouseBadgeFor(camera);
 
-            html += `<div class="hw-nearest-item" data-camera-key="${key}">
+            html += `<div class="hw-nearest-item" role="button" tabindex="0" data-camera-key="${key}" aria-label="Focus ${name} on map">
               <div class="d-flex align-items-start gap-2">
-                <span class="hw-rank-badge${rankClass}">${rank}</span>
+                <span class="hw-rank-badge${rankClass}" aria-hidden="true">${rank}</span>
                 <div class="flex-grow-1 min-w-0">
                   <div class="fw-semibold small text-truncate">${name}${lhBadge}</div>
                   <div class="text-muted small">${src ? src + ' · ' : ''}${loc} · ${dist}</div>
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-warning flex-shrink-0 nearest-view-btn" data-camera-key="${key}">
-                  <i class="bi-camera-video"></i> View feed
+                <button type="button" class="btn btn-sm btn-outline-warning flex-shrink-0 nearest-view-btn" data-camera-key="${key}" aria-label="View feed for ${name}">
+                  <i class="bi-camera-video" aria-hidden="true"></i> View feed
                 </button>
               </div>
             </div>`;
           });
           listEl.innerHTML = html;
 
+          const activateRow = (row) => {
+            const key = row.getAttribute('data-camera-key');
+            focusCameraOnMap(key);
+          };
           listEl.querySelectorAll('.hw-nearest-item').forEach((row) => {
             row.addEventListener('click', (event) => {
               if (event.target.closest('.nearest-view-btn')) return;
-              const key = row.getAttribute('data-camera-key');
-              focusCameraOnMap(key);
+              activateRow(row);
+            });
+            row.addEventListener('keydown', (event) => {
+              if (event.target.closest('.nearest-view-btn')) return;
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                activateRow(row);
+              }
             });
           });
           listEl.querySelectorAll('.nearest-view-btn').forEach((btn) => {

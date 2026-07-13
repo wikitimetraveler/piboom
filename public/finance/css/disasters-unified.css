@@ -1836,6 +1836,24 @@ body.du-pull-sheet-open .du-bottom-dock {
   font-weight: 500;
 }
 
+.leaflet-tooltip.du-geo-count-label {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0f172a;
+  border: none;
+  border-radius: 999px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.22);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.leaflet-tooltip.du-geo-count-label::before {
+  display: none;
+}
+
 .du-geo-stage--collapsed .du-geo-stage-body {
   display: none;
 }
@@ -2029,4 +2047,50 @@ body.du-pull-sheet-open .du-bottom-dock {
 @keyframes duGeoLoadPulse {
   0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--zen-primary, #4a90a4) 40%, transparent); }
   50% { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* Sticky source chips — always visible (deck copy stays collapsible) */
+.du-source-chip-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in srgb, var(--zen-surface, #fff) 92%, transparent);
+  border: 1px solid var(--zen-border, rgba(15, 23, 42, 0.08));
+  border-radius: 0.75rem;
+  backdrop-filter: blur(8px);
+}
+
+.du-hero-lead {
+  max-width: 36rem;
+}
+
+.du-stats-row--compact .du-stat-card {
+  padding: 0.65rem 0.75rem;
+}
+
+.du-stats-row--compact .stat-number {
+  font-size: 1.25rem;
+}
+
+.du-live-near-chip {
+  font-size: 0.7rem;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-icon-ring,
+  .data-stream .data-icon,
+  .loading-progress-bar-disaster,
+  .circuit-node,
+  .du-heygen-progress-bar,
+  .du-inline-loading::after,
+  .du-geo-load-ready {
+    animation: none !important;
+  }
+
+  .loading-progress-bar-disaster {
+    background-size: 100% 100%;
+  }
 }

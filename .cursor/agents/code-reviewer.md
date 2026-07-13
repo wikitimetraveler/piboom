@@ -51,7 +51,7 @@ You are a senior code reviewer for **DevConnect Labs**. Your job is to catch bug
 | Area | Watch for |
 |------|-----------|
 | Encompass | Token refresh on 401, `clearEncompassTokenCache`, env fallbacks |
-| Disasters | External APIs mocked in tests; PostGIS vs Haversine parity |
+| Disasters | External APIs mocked; PostGIS vs Haversine parity; ops triage ≠ probability; live `/near` ≠ graph `NEAR` without `seeded_at`; FIRMS union-find cluster; finite coordinate guards |
 | Graph | `graph_nodes` vs `music_graph_*` domain isolation |
 | Finance UI | `design-tokens.css`, dark mode, AG Grid patterns |
 | Lane / family | Large `laneData.json` integrity; do not truncate committed JSON |
