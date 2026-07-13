@@ -194,18 +194,21 @@
       float core = smoothstep(0.28, 0.82, body);
       float tip = smoothstep(0.5, 1.0, body) * pow(1.0 - y, 1.1);
 
-      vec3 col = mix(vec3(0.42, 0.02, 0.0), vec3(1.0, 0.3, 0.02), core);
-      col = mix(col, vec3(1.0, 0.76, 0.14), pow(core, 1.4) * 0.9);
-      col = mix(col, vec3(1.0, 0.96, 0.82), pow(tip, 1.5) * 0.8);
+      vec3 col = mix(vec3(0.55, 0.02, 0.0), vec3(1.0, 0.38, 0.0), core);
+      col = mix(col, vec3(1.0, 0.82, 0.05), pow(core, 1.2) * 1.0);
+      col = mix(col, vec3(1.0, 0.98, 0.88), pow(tip, 1.3) * 0.95);
 
-      float base = exp(-pow(y / 0.14, 2.0)) * smoothstep(0.15, 0.75, 1.0 - abs(x));
-      col += vec3(1.0, 0.35, 0.04) * base * 0.55;
+      float base = exp(-pow(y / 0.12, 2.0)) * smoothstep(0.1, 0.8, 1.0 - abs(x));
+      col += vec3(1.0, 0.45, 0.06) * base * 0.85;
+      col += vec3(1.0, 0.72, 0.18) * base * base * 0.45;
 
-      float flicker = 0.86 + 0.14 * sin(uTime * 11.0 + uSeed * 20.0 + n * 6.0);
-      col *= flicker * uIntensity;
+      float flicker = 0.9 + 0.18 * sin(uTime * 13.0 + uSeed * 20.0 + n * 6.0)
+        + 0.08 * sin(uTime * 21.0 + uSeed * 8.0);
+      col *= flicker * uIntensity * 1.28;
+      col = mix(col, col * col * 1.15, 0.12);
 
-      float alpha = body * (0.82 + tip * 0.35) * uIntensity;
-      alpha = pow(clamp(alpha, 0.0, 1.0), 1.15);
+      float alpha = body * (0.95 + tip * 0.45) * uIntensity * 1.15;
+      alpha = pow(clamp(alpha, 0.0, 1.0), 0.92);
       if (alpha < 0.04) discard;
 
       gl_FragColor = vec4(col, alpha);
@@ -291,11 +294,11 @@
       float soft = (1.0 - smoothstep(0.35, 1.0, edge)) * smoothstep(0.0, 0.12, y) * smoothstep(1.0, 0.55, y);
       soft = pow(soft, 1.15);
       if (soft < 0.02) discard;
-      float lifeFade = pow(1.0 - vLife, 0.85);
-      vec3 hot = mix(vec3(1.0, 0.92, 0.55), vec3(1.0, 0.28, 0.02), vLife);
-      hot = mix(hot, vec3(1.0, 0.98, 0.85), soft * (1.0 - vLife) * 0.45);
-      float spark = mix(0.65, 1.0, step(0.72, fract(vSeed * 17.3)));
-      gl_FragColor = vec4(hot * spark, soft * lifeFade * 0.9);
+      float lifeFade = pow(1.0 - vLife, 0.75);
+      vec3 hot = mix(vec3(1.0, 0.95, 0.65), vec3(1.0, 0.42, 0.02), vLife);
+      hot = mix(hot, vec3(1.0, 1.0, 0.92), soft * (1.0 - vLife) * 0.65);
+      float spark = mix(0.75, 1.35, step(0.68, fract(vSeed * 17.3)));
+      gl_FragColor = vec4(hot * spark * 1.2, soft * lifeFade * 1.0);
     }
   `;
 
@@ -449,8 +452,8 @@
     const seed = colIndex * 0.73 + layerIndex * 2.17 + 0.41;
     const t = colCount > 1 ? colIndex / (colCount - 1) : 0.5;
     const x = (t - 0.5) * 6.4 + xJitter;
-    const width = 0.28 + Math.sin(seed * 4.1) * 0.07;
-    const height = 3.6 + Math.sin(seed * 2.8) * 0.55 + layerIndex * 0.12;
+    const width = 0.32 + Math.sin(seed * 4.1) * 0.08;
+    const height = 4.0 + Math.sin(seed * 2.8) * 0.65 + layerIndex * 0.15;
     const geo = new THREE.PlaneGeometry(width, height, 1, 24);
     const mat = new THREE.ShaderMaterial({
       vertexShader: FLAME_COLUMN_VERT,
@@ -474,9 +477,10 @@
 
   function buildFlameWall(THREE) {
     const layers = [
-      { cols: 18, z: 0.12, intensity: 1.0, jitter: 0.0 },
-      { cols: 15, z: -0.28, intensity: 0.82, jitter: 0.11 },
-      { cols: 12, z: 0.38, intensity: 0.68, jitter: -0.08 },
+      { cols: 22, z: 0.12, intensity: 1.38, jitter: 0.0 },
+      { cols: 18, z: -0.28, intensity: 1.18, jitter: 0.11 },
+      { cols: 15, z: 0.38, intensity: 1.0, jitter: -0.08 },
+      { cols: 12, z: -0.12, intensity: 0.88, jitter: 0.05 },
     ];
     const meshes = [];
     layers.forEach((layer, layerIndex) => {
@@ -496,7 +500,7 @@
     const h = canvas.clientHeight || window.innerHeight;
 
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x090201, 0.045);
+    scene.fog = new THREE.FogExp2(0x120401, 0.028);
 
     camera = new THREE.PerspectiveCamera(50, w / Math.max(h, 1), 0.1, 100);
     camera.position.set(0, 0.2, 4.0);
@@ -514,14 +518,18 @@
       renderer.outputColorSpace = THREE.SRGBColorSpace || renderer.outputColorSpace;
     }
 
-    scene.add(new THREE.AmbientLight(0xff4a10, 0.55));
-    heatLight = new THREE.PointLight(0xff7a20, 3.4, 16, 2);
+    scene.add(new THREE.AmbientLight(0xff5a18, 0.82));
+    heatLight = new THREE.PointLight(0xff8a28, 5.2, 18, 1.8);
     heatLight.position.set(0, -0.6, 2.0);
     scene.add(heatLight);
 
-    const fill = new THREE.PointLight(0xff2200, 1.6, 14, 2);
+    const fill = new THREE.PointLight(0xff3300, 2.8, 16, 1.8);
     fill.position.set(0, -1.2, 1.2);
     scene.add(fill);
+
+    const rim = new THREE.PointLight(0xffcc44, 1.8, 12, 2);
+    rim.position.set(0, 0.4, 1.5);
+    scene.add(rim);
 
     flameLayers = buildFlameWall(THREE);
     flameLayers.forEach((m) => scene.add(m));
@@ -543,9 +551,9 @@
     // Glowing coal bed
     const coalGeo = new THREE.CircleGeometry(3.2, 64);
     const coalMat = new THREE.MeshBasicMaterial({
-      color: 0xff3a00,
+      color: 0xff4800,
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.44,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -557,9 +565,9 @@
     const coalInner = new THREE.Mesh(
       new THREE.CircleGeometry(1.6, 48),
       new THREE.MeshBasicMaterial({
-        color: 0xffcc66,
+        color: 0xffdd77,
         transparent: true,
-        opacity: 0.22,
+        opacity: 0.38,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       })
@@ -569,9 +577,9 @@
     scene.add(coalInner);
 
     emberSystems = [
-      makeEmberSystem(THREE, 700, 5.8, 0.15, 1.0, 1.0),
-      makeEmberSystem(THREE, 320, 4.6, -0.25, 0.7, 1.35),
-      makeEmberSystem(THREE, 180, 3.8, 0.45, 1.35, 0.75),
+      makeEmberSystem(THREE, 950, 6.2, 0.15, 1.25, 1.15),
+      makeEmberSystem(THREE, 480, 5.0, -0.25, 0.95, 1.5),
+      makeEmberSystem(THREE, 280, 4.2, 0.45, 1.55, 0.9),
     ];
     emberSystems.forEach((p) => scene.add(p));
   }
@@ -614,13 +622,13 @@
     });
 
     if (heatLight) {
-      heatLight.intensity = 2.8 + Math.sin(t * 7.5) * 0.7 + Math.sin(t * 13.0) * 0.35;
-      heatLight.position.x = Math.sin(t * 1.1) * 0.25;
+      heatLight.intensity = 4.2 + Math.sin(t * 8.5) * 1.1 + Math.sin(t * 15.0) * 0.55;
+      heatLight.position.x = Math.sin(t * 1.3) * 0.3;
     }
 
     if (coalMesh) {
-      coalMesh.material.opacity = 0.22 + Math.sin(t * 5.5) * 0.06;
-      coalMesh.scale.setScalar(1 + Math.sin(t * 2.2) * 0.03);
+      coalMesh.material.opacity = 0.36 + Math.sin(t * 6.5) * 0.1;
+      coalMesh.scale.setScalar(1 + Math.sin(t * 2.5) * 0.05);
     }
 
     camera.position.x = Math.sin(t * 0.28) * 0.14;
