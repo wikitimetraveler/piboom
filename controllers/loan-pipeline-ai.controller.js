@@ -14,6 +14,7 @@ import { getConversationChain } from '../services/langchain-memory.service.js';
 import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 import { getAllLoans, getPipelineStats } from '../services/loan-pipeline.service.js';
 import { getPool } from '../services/database.service.js';
+import { findSimilarNodes } from '../services/disaster-impact-graph.service.js';
 
 // System prompt for loan pipeline AI assistant - Mortgage Operations Expert
 const LOAN_PIPELINE_SYSTEM_PROMPT = `You are an expert AI assistant specializing in mortgage operations and efficiency, with deep expertise in CORRESPONDENT and RETAIL lending channels. You help users optimize their loan pipeline operations, improve efficiency, manage disaster risk, and make data-driven decisions.
@@ -229,6 +230,32 @@ function appendDisasterExpertContext(enhancedPrompt, context = {}) {
 }
 
 /**
+ * GraphRAG: enrich the prompt with semantically similar disaster-impact graph
+ * nodes (vector similarity). Non-fatal and additive — returns the prompt
+ * unchanged when pgvector/embeddings are unavailable. This is a context/recall
+ * aid, NOT a live proximity signal or a loss-probability score.
+ */
+async function appendSemanticGraphContext(enhancedPrompt, context = {}, message = '') {
+    try {
+        const disaster = context.selectedDisaster || {};
+        const disasterLabel = disaster.label || disaster.title || disaster.name || disaster.type || '';
+        const queryText = [message, disasterLabel].filter(Boolean).join(' ').trim();
+        if (!queryText) return enhancedPrompt;
+
+        const similar = await findSimilarNodes(queryText, { limit: 5 });
+        if (!similar.length) return enhancedPrompt;
+
+        const lines = similar.map(
+            (n, i) => `S${i + 1}. [${n.nodeType}] ${n.label} (similarity ${Number(n.score).toFixed(3)})`
+        );
+        enhancedPrompt += `\n\n## SEMANTICALLY RELATED GRAPH NODES (vector match for context/recall only — not live proximity, not a probability):\n${lines.join('\n')}`;
+    } catch (err) {
+        console.warn('⚠️ semantic graph context skipped:', err.message);
+    }
+    return enhancedPrompt;
+}
+
+/**
  * Chat with AI about loan pipeline
  * POST /api/loan-pipeline/ai/chat
  */
@@ -322,6 +349,7 @@ export async function chatWithDisasterExpert(req, res) {
             resolveDisasterExpertPrompt(context, sessionId),
             context
         );
+        enhancedPrompt = await appendSemanticGraphContext(enhancedPrompt, context, message);
 
         // Get or create conversation chain
         const { chain } = await getConversationChain(userId, enhancedPrompt, sessionId);

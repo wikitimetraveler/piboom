@@ -231,11 +231,11 @@
   }
 
   async function initStatesLayer() {
-    const [topo, stats] = await Promise.all([
-      duGeoData.loadStatesTopo(),
+    const [statesFc, stats] = await Promise.all([
+      duGeoData.loadStatesGeoJson(),
       duGeoData.loadStateEventStats(),
     ]);
-    const geojson = duGeoData.statesGeoJson(topo, stats);
+    const geojson = duGeoData.decorateStatesGeoJson(statesFc, stats);
 
     statesLayer = L.geoJSON(geojson, {
       style: styleStateLayer,
@@ -361,11 +361,16 @@
       resetToUs();
     });
 
+    let stateLayerReady = false;
     try {
       await initStatesLayer();
+      stateLayerReady = true;
     } catch (e) {
-      console.error(e);
-      setPickerStatus('Could not load US state boundaries. Run npm run build:us-geo.', 'danger');
+      console.warn('US state boundary overlay unavailable; continuing with base map and selector.', e);
+      setPickerStatus(
+        `Map loaded. State outlines unavailable (${e.message || 'geo asset error'}). Use the state list or Load all USA.`,
+        'warning'
+      );
     }
 
     const params = new URLSearchParams(window.location.search);
@@ -380,10 +385,12 @@
       } else if (params.get('load') === '1') {
         confirmStateLoad();
       }
+    } else if (!urlState && !urlCounty && typeof global.onDuUsaConfirmed === 'function') {
+      global.onDuUsaConfirmed();
     }
 
     hideLoading();
-    setTimeout(() => pickerMap?.invalidateSize(), 200);
+    setTimeout(() => pickerMap?.invalidateSize(), stateLayerReady ? 200 : 150);
   }
 
   global.initDuGeoPicker = initDuGeoPicker;

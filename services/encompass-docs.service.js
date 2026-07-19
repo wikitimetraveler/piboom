@@ -6,6 +6,8 @@ import * as cheerio from 'cheerio';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getPool, isPgvectorAvailable, ensureEncompassDocsTable } from './database.service.js';
+import { embedQuery as embedQueryUtil, DEFAULT_EMBEDDING_MODEL } from '../lib/knowledge/embedding-utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,6 +17,30 @@ class EncompassDocsService {
     this.baseUrl = 'https://developer.icemortgagetechnology.com/developer-connect/docs';
     this.docsCache = new Map();
     this.docsPath = path.join(__dirname, '..', 'data', 'encompass-docs.json');
+    // Polite delay between scrape requests to avoid Developer Connect rate limiting (429).
+    this.scrapeDelayMs = Number(process.env.ENCOMPASS_DOCS_SCRAPE_DELAY_MS || 1200) || 1200;
+  }
+
+  delay(ms) {
+    if (!ms || ms <= 0) return Promise.resolve();
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  sectionKey(section) {
+    return `${section?.category || ''}|${section?.title || ''}`.toLowerCase();
+  }
+
+  // Freshly scraped sections win; previously stored sections are retained
+  // when the new scrape did not capture them (e.g. rate-limited requests).
+  mergeSections(existingSections = [], newSections = []) {
+    const byKey = new Map();
+    for (const section of existingSections) {
+      byKey.set(this.sectionKey(section), section);
+    }
+    for (const section of newSections) {
+      byKey.set(this.sectionKey(section), section);
+    }
+    return Array.from(byKey.values());
   }
 
   tokenizeQuery(query) {
@@ -23,6 +49,25 @@ class EncompassDocsService {
       .split(/[^a-z0-9]+/i)
       .map((part) => part.trim())
       .filter((part) => part.length >= 2);
+  }
+
+  // Escape user/query text before building a RegExp
+  escapeRegex(text) {
+    return `${text ?? ''}`.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // Coerce a section's content into a searchable string.
+  // Tolerates legacy records where content was stored as the scrape result object.
+  normalizeContent(value) {
+    if (value == null) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object') {
+      if (typeof value.content === 'string') return value.content;
+      if (value.content && typeof value.content === 'object') {
+        return this.normalizeContent(value.content);
+      }
+    }
+    return String(value);
   }
 
   // Scrape and cache Encompass documentation
@@ -67,14 +112,20 @@ class EncompassDocsService {
         { url: '/postman-environments', title: 'Encompass 3-Environment Collection', category: 'resources' }
       ];
 
+      let firstRequest = true;
       for (const section of sections) {
         try {
-          const content = await this.scrapeSection(section.url, section.title);
+          if (!firstRequest) await this.delay(this.scrapeDelayMs);
+          firstRequest = false;
+          const scraped = await this.scrapeSection(section.url, section.title);
+          const content = this.normalizeContent(scraped);
           if (content) {
             docs.sections.push({
               ...section,
+              url: scraped?.url || `${this.baseUrl}${section.url}`,
               content,
-              wordCount: content.split(' ').length
+              scrapedAt: scraped?.scrapedAt || new Date().toISOString(),
+              wordCount: content.split(/\s+/).filter(Boolean).length
             });
             console.log(`✅ Scraped: ${section.title}`);
           }
@@ -83,11 +134,18 @@ class EncompassDocsService {
         }
       }
 
-      // Save to cache
-      await this.saveDocs(docs);
-      console.log(`📚 Scraped ${docs.sections.length} documentation sections`);
-      
-      return docs;
+      // Merge with any existing store so a partial (rate-limited) scrape
+      // augments rather than destroys previously captured sections.
+      const existing = await this.loadDocs();
+      const merged = {
+        lastUpdated: docs.lastUpdated,
+        sections: this.mergeSections(existing?.sections || [], docs.sections)
+      };
+
+      await this.saveDocs(merged);
+      console.log(`📚 Scraped ${docs.sections.length} sections (store now has ${merged.sections.length})`);
+
+      return merged;
     } catch (error) {
       console.error('❌ Error scraping Encompass documentation:', error);
       throw error;
@@ -172,7 +230,13 @@ class EncompassDocsService {
       if (fs.existsSync(this.docsPath)) {
         const data = fs.readFileSync(this.docsPath, 'utf8');
         const docs = JSON.parse(data);
-        console.log(`📚 Loaded ${docs.sections.length} documentation sections from cache`);
+        if (docs && Array.isArray(docs.sections)) {
+          docs.sections = docs.sections.map((section) => ({
+            ...section,
+            content: this.normalizeContent(section.content)
+          }));
+        }
+        console.log(`📚 Loaded ${docs?.sections?.length || 0} documentation sections from cache`);
         return docs;
       }
       return null;
@@ -182,8 +246,8 @@ class EncompassDocsService {
     }
   }
 
-  // Search documentation
-  async searchDocs(query, limit = 5) {
+  // Keyword search over the committed JSON store (always-on fallback)
+  async searchKeyword(query, limit = 5) {
     try {
       const docs = await this.loadDocs();
       if (!docs || !docs.sections) {
@@ -195,7 +259,7 @@ class EncompassDocsService {
       const tokens = this.tokenizeQuery(query);
 
       for (const section of docs.sections) {
-        const content = section.content || '';
+        const content = this.normalizeContent(section.content);
         const title = section.title || '';
         const titleLower = title.toLowerCase();
         const contentLower = content.toLowerCase();
@@ -238,9 +302,12 @@ class EncompassDocsService {
 
           results.push({
             ...section,
+            content,
+            sourceType: section.sourceType || 'official_doc',
             score,
             tokenHits,
-            relevance: score > 15 ? 'high' : score > 5 ? 'medium' : 'low'
+            relevance: score > 15 ? 'high' : score > 5 ? 'medium' : 'low',
+            retrieval: 'keyword'
           });
         }
       }
@@ -253,6 +320,89 @@ class EncompassDocsService {
       console.error('Error searching documentation:', error);
       return [];
     }
+  }
+
+  // Embed a query for vector search; null when no API key (silent fallback).
+  async embedQuery(query) {
+    try {
+      return await embedQueryUtil(query, DEFAULT_EMBEDDING_MODEL);
+    } catch (err) {
+      console.warn('⚠️ encompass-docs vector query embedding skipped:', err.message);
+      return null;
+    }
+  }
+
+  // Semantic search over Postgres pgvector; [] when DB/pgvector/key unavailable.
+  async searchVector(query, limit = 5) {
+    const pool = getPool();
+    if (!pool || !query) return [];
+
+    const ready = await isPgvectorAvailable();
+    if (!ready) return [];
+
+    try {
+      await ensureEncompassDocsTable(pool);
+    } catch {
+      return [];
+    }
+
+    const embedding = await this.embedQuery(query);
+    if (!embedding) return [];
+
+    const vectorLiteral = `[${embedding.join(',')}]`;
+    try {
+      const { rows } = await pool.query(
+        `SELECT title, url, category, content, metadata,
+                1 - (embedding <=> $1::vector) AS score
+         FROM encompass_docs_chunks
+         WHERE embedding IS NOT NULL
+         ORDER BY embedding <=> $1::vector
+         LIMIT $2`,
+        [vectorLiteral, Math.max(1, limit)]
+      );
+
+      return rows.map((row) => ({
+        title: row.title,
+        category: row.category || 'reference',
+        content: (row.content || '').slice(0, 850),
+        url: row.url || '',
+        sourceType: row.metadata?.sourceType || 'official_doc',
+        score: Number(row.score) || 0,
+        retrieval: 'vector'
+      }));
+    } catch (err) {
+      console.warn('⚠️ encompass-docs vector search failed:', err.message);
+      return [];
+    }
+  }
+
+  /**
+   * Hybrid documentation search: pgvector when available, merged with the
+   * always-on keyword fallback. Signature is unchanged for existing callers.
+   */
+  async searchDocs(query, limit = 5) {
+    if (!query) return [];
+
+    const [vectorHits, keywordHits] = await Promise.all([
+      this.searchVector(query, limit),
+      this.searchKeyword(query, limit)
+    ]);
+
+    const merged = [];
+    const seen = new Set();
+    const ingest = (item, boost = 0) => {
+      const key = `${(item.url || '').toLowerCase()}|${(item.title || '').toLowerCase()}`;
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      merged.push({ ...item, score: (Number(item.score) || 0) + boost });
+    };
+
+    vectorHits.forEach((item) => ingest(item, 5));
+    keywordHits.forEach((item) => ingest(item, 0));
+
+    return merged
+      .sort((a, b) => (b.score || 0) - (a.score || 0))
+      .slice(0, Math.max(1, limit));
   }
 
   // Get documentation summary
@@ -272,11 +422,31 @@ class EncompassDocsService {
         categories[category]++;
       });
 
+      const pool = getPool();
+      let vectorAvailable = false;
+      let vectorCount = 0;
+      if (pool) {
+        try {
+          vectorAvailable = await isPgvectorAvailable();
+          if (vectorAvailable) {
+            const { rows } = await pool.query(
+              `SELECT COUNT(*)::int AS n FROM encompass_docs_chunks WHERE embedding IS NOT NULL`
+            );
+            vectorCount = rows[0]?.n || 0;
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+
       return {
         totalSections: docs.sections.length,
         lastUpdated: docs.lastUpdated,
         categories,
-        totalWords: docs.sections.reduce((sum, section) => sum + (section.wordCount || 0), 0)
+        totalWords: docs.sections.reduce((sum, section) => sum + (section.wordCount || 0), 0),
+        vectorAvailable,
+        vectorCount,
+        embeddingModel: DEFAULT_EMBEDDING_MODEL
       };
     } catch (error) {
       console.error('Error getting documentation summary:', error);

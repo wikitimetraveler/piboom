@@ -1683,6 +1683,42 @@ body.du-pull-sheet-open .du-bottom-dock {
   transform: rotate(180deg);
 }
 
+/* AI Insights panel (same collapsible pattern as web crawl) */
+.du-ai-insights-panel .card-header {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.du-ai-insights-toggle {
+  border: 0;
+  box-shadow: none;
+}
+
+.du-ai-insights-toggle:hover,
+.du-ai-insights-toggle:focus {
+  color: inherit;
+  text-decoration: none;
+}
+
+.du-ai-insights-chevron {
+  transition: transform 0.25s ease;
+}
+
+.du-ai-insights-toggle[aria-expanded="true"] .du-ai-insights-chevron {
+  transform: rotate(180deg);
+}
+
+.du-ai-insights-panel #aiInsightsContainer .ai-insights-card {
+  border: 0;
+  box-shadow: none;
+  border-radius: 8px;
+  padding: 0.75rem 0.25rem;
+  background: transparent;
+}
+
+.du-ai-insights-panel #aiInsightsContainer .ai-insights-header h5 {
+  font-size: 0.95rem;
+}
+
 .du-crawl-headline-list {
   display: flex;
   flex-direction: column;

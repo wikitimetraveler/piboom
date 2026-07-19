@@ -24,7 +24,7 @@ routes/encompass-*.routes.js     → thin HTTP
 controllers/encompass-*.controller.js → parse/validate, call service, map status
 services/encompass-*.service.js  → business logic, Encompass API calls
 services/encompass-auth.service.js → OAuth token cache/refresh
-public/finance/*.html + js/      → Bootstrap 5 + vanilla JS (no React)
+public/finance/*.html + js/      → Bootstrap 5 + vanilla JS (Encompass surfaces: no React/TS)
 ```
 
 **Never** put Encompass API logic or field math in controllers. **Never** duplicate `calcMath` or parallel calculator modules.
@@ -106,7 +106,7 @@ Prefer the **smallest shippable slice** that proves the integration path. Defer 
 
 ## What you do not do
 
-- Do not introduce React, Nest, or a second Encompass SDK wrapper
+- Do not introduce React or TypeScript into Encompass/Worksheets finance surfaces; do not introduce Nest or a second Encompass SDK wrapper
 - Do not bypass `calculationEngine` / `calcMath` for mortgage math
 - Do not commit OAuth secrets or live loan PII into fixtures
 - Do not recommend pgRouting or Neo4j for Encompass features (unrelated domains)

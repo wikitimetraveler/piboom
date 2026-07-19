@@ -2,6 +2,16 @@
 
 Conventions for tables, grids, shared components, and themes. Use this when building or modifying finance UIs, dashboards, or any page that uses tables or grids.
 
+## Brownfield vs greenfield
+
+| Kind | Meaning | Stack |
+|------|---------|--------|
+| **Brownfield (Encompass)** | Existing Worksheets / Hub under `public/finance/` (field browsers, unit tests, processor assignment, Screen Test) — keep working as-is | Bootstrap 5 + vanilla JS. Do **not** introduce React or TypeScript without an explicit migration. |
+| **Greenfield** | New product UIs or new domains built from scratch | Prefer **React + TypeScript**. |
+| **Brownfield (other existing pages)** | Existing Bootstrap + vanilla pages outside Encompass (some Lane/music/nature/disasters pages) | Keep current stack until an explicit migration; do not mix React/TS on the same page. |
+
+Source of truth: `AGENTS.md` + `REPO_MAP.md`.
+
 ## Tables & Grids
 
 | Library | Use case | Theme | Files |

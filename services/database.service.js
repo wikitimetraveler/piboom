@@ -662,6 +662,11 @@ export async function createTables() {
       CREATE INDEX IF NOT EXISTS idx_conversations_user ON conversations(user_id)
     `);
 
+    // Knowledge RAG chunk tables (pgvector when available) — HeyGen + Encompass/ICE
+    await ensureHeygenKnowledgeTable(pool);
+    await ensureEncompassDocsTable(pool);
+    await ensureIceKnowledgeTable(pool);
+
     // Create grateful_dead_shows table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS grateful_dead_shows (
@@ -1322,6 +1327,136 @@ export function getPool() {
   return pool;
 }
 
+let pgvectorAvailable = null;
+
+/**
+ * Enable pgvector extension (idempotent). Non-fatal — logs warning and returns false on failure.
+ * @returns {Promise<boolean>}
+ */
+export async function ensurePgvectorExtension() {
+  if (!pool) {
+    pgvectorAvailable = false;
+    return false;
+  }
+  try {
+    await pool.query('CREATE EXTENSION IF NOT EXISTS vector');
+    pgvectorAvailable = true;
+    console.log('✅ pgvector extension enabled');
+    return true;
+  } catch (err) {
+    pgvectorAvailable = false;
+    console.warn(`⚠️ pgvector extension not available: ${err.message}`);
+    return false;
+  }
+}
+
+/**
+ * Whether pgvector is installed (cached after first check).
+ * @returns {Promise<boolean>}
+ */
+export async function isPgvectorAvailable() {
+  if (pgvectorAvailable !== null) return pgvectorAvailable;
+  if (!pool) {
+    pgvectorAvailable = false;
+    return false;
+  }
+  try {
+    const { rows } = await pool.query(
+      `SELECT 1 FROM pg_extension WHERE extname = 'vector' LIMIT 1`
+    );
+    pgvectorAvailable = rows.length > 0;
+  } catch {
+    pgvectorAvailable = false;
+  }
+  return pgvectorAvailable;
+}
+
+/**
+ * Create a knowledge-chunk table with keyword columns and an optional pgvector
+ * embedding column + HNSW cosine index. Shared shape for all RAG stores
+ * (Encompass docs, ICE, HeyGen).
+ * @param {import('pg').Pool} dbPool
+ * @param {string} tableName - allowlisted knowledge table name
+ * @returns {Promise<{ table: boolean, vector: boolean }>}
+ */
+const KNOWLEDGE_VECTOR_TABLE_ALLOWLIST = new Set([
+  'encompass_docs_chunks',
+  'ice_knowledge_chunks',
+  'heygen_knowledge_chunks'
+]);
+
+async function ensureKnowledgeVectorTable(dbPool, tableName) {
+  if (!dbPool) return { table: false, vector: false };
+  if (!KNOWLEDGE_VECTOR_TABLE_ALLOWLIST.has(tableName)) {
+    throw new Error(`ensureKnowledgeVectorTable: table not allowlisted: ${tableName}`);
+  }
+
+  await dbPool.query(`
+    CREATE TABLE IF NOT EXISTS ${tableName} (
+      id SERIAL PRIMARY KEY,
+      source_id VARCHAR(255) NOT NULL UNIQUE,
+      title TEXT NOT NULL,
+      url TEXT,
+      category VARCHAR(100),
+      content TEXT NOT NULL,
+      metadata JSONB DEFAULT '{}'::jsonb,
+      content_hash VARCHAR(64),
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await dbPool.query(`
+    CREATE INDEX IF NOT EXISTS idx_${tableName}_category
+    ON ${tableName} (category)
+  `);
+
+  const vectorOk = await ensurePgvectorExtension();
+  if (!vectorOk) return { table: true, vector: false };
+
+  try {
+    await dbPool.query(`
+      ALTER TABLE ${tableName}
+      ADD COLUMN IF NOT EXISTS embedding vector(1536)
+    `);
+    // HNSW cosine index for approximate nearest-neighbor search at scale.
+    await dbPool.query(`
+      CREATE INDEX IF NOT EXISTS idx_${tableName}_embedding_hnsw
+      ON ${tableName} USING hnsw (embedding vector_cosine_ops)
+    `);
+  } catch (err) {
+    console.warn(`⚠️ ${tableName} embedding column/index: ${err.message}`);
+    return { table: true, vector: false };
+  }
+
+  return { table: true, vector: true };
+}
+
+/**
+ * Create heygen_knowledge_chunks (+ embedding + HNSW when pgvector is present).
+ * @param {import('pg').Pool} [dbPool]
+ * @returns {Promise<{ table: boolean, vector: boolean }>}
+ */
+export async function ensureHeygenKnowledgeTable(dbPool = pool) {
+  return ensureKnowledgeVectorTable(dbPool, 'heygen_knowledge_chunks');
+}
+
+/**
+ * Create encompass_docs_chunks (+ embedding + HNSW when pgvector is present).
+ * @param {import('pg').Pool} [dbPool]
+ * @returns {Promise<{ table: boolean, vector: boolean }>}
+ */
+export async function ensureEncompassDocsTable(dbPool = pool) {
+  return ensureKnowledgeVectorTable(dbPool, 'encompass_docs_chunks');
+}
+
+/**
+ * Create ice_knowledge_chunks (+ embedding + HNSW when pgvector is present).
+ * @param {import('pg').Pool} [dbPool]
+ * @returns {Promise<{ table: boolean, vector: boolean }>}
+ */
+export async function ensureIceKnowledgeTable(dbPool = pool) {
+  return ensureKnowledgeVectorTable(dbPool, 'ice_knowledge_chunks');
+}
+
 export default {
   initializeDatabase,
   createTables,
@@ -1329,6 +1464,11 @@ export default {
   ensurePostgisExtension,
   isPostgisAvailable,
   ensureTableGeomColumn,
-  resetPostgisAvailabilityCache
+  resetPostgisAvailabilityCache,
+  ensurePgvectorExtension,
+  isPgvectorAvailable,
+  ensureHeygenKnowledgeTable,
+  ensureEncompassDocsTable,
+  ensureIceKnowledgeTable
 };
 

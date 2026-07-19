@@ -409,7 +409,7 @@ function revealDuStateIntelPanels(state) {
     url.searchParams.delete('county');
     url.searchParams.set('load', '1');
     window.history.replaceState({}, '', url);
-    openDuDashboardSection('collapseDisasters', 3);
+    openDuDashboardSection('collapseDisasters', 2);
   });
 }
 
@@ -432,7 +432,7 @@ function revealDuUsaIntelPanels() {
     url.searchParams.set('scope', 'usa');
     url.searchParams.set('load', '1');
     window.history.replaceState({}, '', url);
-    openDuDashboardSection('collapseDisasters', 3);
+    openDuDashboardSection('collapseDisasters', 2);
   });
 }
 
@@ -449,7 +449,7 @@ window.onDuCountyFiltered = function onDuCountyFiltered(state, county) {
       statusMsg: `Filtering to ${co}, ${st}…`,
     });
     applyCountyDisasterFilter(co);
-    openDuDashboardSection('collapseDisasters', 3);
+    openDuDashboardSection('collapseDisasters', 2);
     return;
   }
 
@@ -475,7 +475,7 @@ window.onDuCountyFiltered = function onDuCountyFiltered(state, county) {
     url.searchParams.set('county', co);
     url.searchParams.set('load', '1');
     window.history.replaceState({}, '', url);
-    openDuDashboardSection('collapseDisasters', 3);
+    openDuDashboardSection('collapseDisasters', 2);
   });
 };
 
@@ -923,14 +923,24 @@ function openProcessorExpert() {
   }
 }
 
+function setAiInsightsPanelStatus(text) {
+  const status = document.getElementById('duAiInsightsStatus');
+  if (status) status.textContent = text || '';
+}
+
+function expandAiInsightsPanel() {
+  const el = document.getElementById('collapseAiInsights');
+  if (!el || typeof bootstrap === 'undefined' || !bootstrap.Collapse) return;
+  bootstrap.Collapse.getOrCreateInstance(el, { toggle: false }).show();
+}
+
 function showInsightsIdlePlaceholder() {
   const container = document.getElementById('aiInsightsContainer');
   if (!container) return;
+  setAiInsightsPanelStatus('Select a disaster for tailored insights');
   container.innerHTML = `
-    <div id="aiInsightsIdle" class="card border bg-light shadow-sm mb-0">
-      <div class="card-body py-2 small text-muted mb-0">
-        <i class="bi bi-lightbulb"></i> Select a disaster in the grid for tailored AI insights.
-      </div>
+    <div id="aiInsightsIdle" class="small text-muted mb-0">
+      <i class="bi bi-lightbulb" aria-hidden="true"></i> Select a disaster in the grid for tailored AI insights.
     </div>`;
 }
 
@@ -1051,6 +1061,9 @@ function refreshAIOnSelection() {
   refreshAIContext();
   heygenStudio?.refreshScriptPreview?.();
   if (aiInsightsCard && selectedDisasterObj) {
+    const title = selectedDisasterObj.title || selectedDisasterObj.declarationTitle || 'Selected disaster';
+    setAiInsightsPanelStatus(title);
+    expandAiInsightsPanel();
     aiInsightsCard.generateInsights(getCurrentFilters(), 'disaster', selectedDisasterObj);
   } else {
     showInsightsIdlePlaceholder();
@@ -1114,7 +1127,7 @@ async function initializeAIComponents() {
   }
 
   if (new URLSearchParams(window.location.search).get('openAi') === '1') {
-    openDuDashboardSection('collapseLoans', 4);
+    openDuDashboardSection('collapseLoans', 3);
     setTimeout(() => openProcessorExpert(), 600);
   }
 }
@@ -1164,6 +1177,8 @@ function initializeVoiceRecognition() {
     if (result.success) {
       setDashboardStatus(result.message || 'Done.', 'success');
       if (action.type === 'filter' && aiInsightsCard) {
+        setAiInsightsPanelStatus('Insights for current filters');
+        expandAiInsightsPanel();
         aiInsightsCard.generateInsights(getCurrentFilters(), 'filter', selectedDisasterObj);
       }
     } else {

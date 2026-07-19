@@ -58,6 +58,23 @@ The generated index powers `lib/knowledge/ice-knowledge.service.js`, which the E
 
 As long as you keep `ice-sources.json` current, the assistant will cite both the official Dev Connect docs and the ICE sample repos/Postman examples in responses.
 
+## Companion store: official Developer Connect docs
+
+RAG retrieval uses **two** committed keyword stores. This ICE index is one; the other is the official Developer Connect docs store:
+
+- **Data**: `data/encompass-docs.json`
+- **Service**: `services/encompass-docs.service.js`
+- **Refresh job**: `npm run scrape:encompass-docs` (scrape live pages) — merges into the existing store by title/category, so a rate-limited partial scrape refreshes captured pages without discarding the committed seed.
+- **Combined refresh**: `npm run refresh:encompass-knowledge` runs the docs scrape then `build:ice-knowledge`.
+- **Seed**: the file ships with concise per-page summaries + canonical URLs so retrieval works offline; the live scrape replaces summaries with full page text when Developer Connect is reachable (it aggressively rate-limits with HTTP 429, so throttle via `ENCOMPASS_DOCS_SCRAPE_DELAY_MS`, default 1200ms).
+- **Endpoint auth**: hosted `POST /api/encompass-assistant/scrape` is gated by `lib/encompass-docs-refresh-auth.js` (localhost open; otherwise `ENCOMPASS_DOCS_SCRAPE_TOKEN`).
+
+Commit both `data/knowledge/ice-sources.json` and `data/encompass-docs.json` after a refresh.
+
+## Hybrid vector retrieval (optional)
+
+Both build jobs also embed into Postgres `pgvector` tables (`ice_knowledge_chunks`, `encompass_docs_chunks`) when `OPENAI_API_KEY` + `DATABASE_URL` + the `vector` extension are available. Retrieval merges vector similarity with the committed-JSON keyword search (keyword is the always-on fallback). Skip embedding with `ICE_SKIP_EMBED=1` / `ENCOMPASS_DOCS_SKIP_EMBED=1`. Full details: `docs/VECTOR_RAG.md`.
+
 **Note:** The Screen Test (`tool9.html`) is a separate form-code review assistant that analyzes manifest XML directly; it does not use the ICE knowledge index.
 
 ## Related Documentation

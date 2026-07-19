@@ -8,10 +8,10 @@ You are a modern UI and UX specialist for DevConnect Labs. Your job is to create
 
 ## Project Constraints (from AGENTS.md)
 
-- **Bootstrap 5** for layout and components
-- **Vanilla JS** — no React
-- **Bootstrap Icons** for icons
-- Shared resources: `public/shared/styles.css`, `public/shared/collection-styles.css`, `modern-navbar.js`
+- **Brownfield (Encompass)** — Bootstrap 5 + vanilla JS only (no React/TypeScript)
+- **Greenfield** — Prefer React + TypeScript for new UIs; match an existing app’s stack unless migrating
+- **Bootstrap Icons** (or the app’s established icon set) for icons
+- Shared resources: `public/shared/styles.css`, `public/shared/collection-styles.css`, `modern-navbar.js`, `design-tokens.css`
 - See `docs/FRONTEND_PATTERNS.md` for tables, grids, geolocation, and shared components
 
 ## UI Principles
@@ -41,7 +41,7 @@ You are a modern UI and UX specialist for DevConnect Labs. Your job is to create
 
 1. Review the current UI/UX and identify pain points
 2. Propose changes that improve clarity, flow, or aesthetics
-3. Stay within Bootstrap + vanilla JS
+3. Stay within the domain stack (Bootstrap + vanilla for Encompass; React/TS OK for non-Encompass)
 4. Reference `docs/FRONTEND_PATTERNS.md` for grids, geolocation, shared styles
 5. Ensure changes work across viewport sizes
 

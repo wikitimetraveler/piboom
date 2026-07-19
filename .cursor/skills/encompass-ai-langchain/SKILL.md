@@ -50,7 +50,7 @@ Thin controllers call services; do not duplicate retrieval or memory wiring in r
 - [ ] After ICE source changes: `npm run build:ice-knowledge`.
 - [ ] Assistant/system prompts stay accurate if APIs or UI capabilities change.
 - [ ] Disaster prompts use “ops triage,” not “probability,” for loan scores.
-- [ ] Frontend stays Bootstrap + vanilla JS (no React).
+- [ ] Encompass-related frontend stays Bootstrap + vanilla JS (no React/TS on those surfaces).
 - [ ] Credential failures: align with `.env.example` / `docs/CONFIG.md`; document blockers rather than weakening tests.
 
 ## Deep reference

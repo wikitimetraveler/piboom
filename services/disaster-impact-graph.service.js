@@ -1,9 +1,10 @@
 /**
  * Development work by David Lane
  */
-import { getPool, isPostgisAvailable } from './database.service.js';
+import { getPool, isPostgisAvailable, ensurePgvectorExtension, isPgvectorAvailable } from './database.service.js';
 import { DISASTER_ROLLING_WINDOW_DAYS } from './disasters.service.js';
 import { milesToMeters } from './disaster-spatial.service.js';
+import { embedQuery as embedQueryUtil, DEFAULT_EMBEDDING_MODEL } from '../lib/knowledge/embedding-utils.js';
 
 const VALID_NODE_TYPES = new Set([
   'disaster_event',
@@ -230,6 +231,75 @@ export async function initDisasterImpactGraphSchema() {
   `;
 
   await pool.query(tableSql);
+
+  // Optional pgvector column for semantic node similarity (GraphRAG). Additive
+  // and non-fatal: structural traversal (NEAR / recursive CTE) works without it.
+  try {
+    const vectorOk = await ensurePgvectorExtension();
+    if (vectorOk) {
+      await pool.query('ALTER TABLE graph_nodes ADD COLUMN IF NOT EXISTS embedding vector(1536)');
+      await pool.query(
+        `CREATE INDEX IF NOT EXISTS idx_graph_nodes_embedding_hnsw
+         ON graph_nodes USING hnsw (embedding vector_cosine_ops)`
+      );
+    }
+  } catch (err) {
+    console.warn(`⚠️ graph_nodes embedding column/index: ${err.message}`);
+  }
+}
+
+/**
+ * Semantic (GraphRAG) node lookup: return graph nodes whose embedding is
+ * closest to the query text. Returns [] when pgvector/embeddings are
+ * unavailable so structural traversal remains the source of truth.
+ * @param {string} text
+ * @param {{ nodeType?: string|null, limit?: number }} [options]
+ * @returns {Promise<Array<{ id:number, nodeType:string, externalId:string, label:string, metadata:object, score:number }>>}
+ */
+export async function findSimilarNodes(text, { nodeType = null, limit = 5 } = {}) {
+  const pool = getPool();
+  if (!pool || !text) return [];
+  if (!(await isPgvectorAvailable())) return [];
+
+  let embedding;
+  try {
+    embedding = await embedQueryUtil(text, DEFAULT_EMBEDDING_MODEL);
+  } catch (err) {
+    console.warn('⚠️ findSimilarNodes embedding skipped:', err.message);
+    return [];
+  }
+  if (!embedding) return [];
+
+  const vectorLiteral = `[${embedding.join(',')}]`;
+  const params = [vectorLiteral, Math.max(1, limit)];
+  let typeFilter = '';
+  if (nodeType) {
+    params.push(normalizeNodeType(nodeType));
+    typeFilter = 'AND node_type = $3';
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, node_type, external_id, label, metadata_json,
+              1 - (embedding <=> $1::vector) AS score
+       FROM graph_nodes
+       WHERE embedding IS NOT NULL ${typeFilter}
+       ORDER BY embedding <=> $1::vector
+       LIMIT $2`,
+      params
+    );
+    return rows.map((row) => ({
+      id: Number(row.id),
+      nodeType: row.node_type,
+      externalId: row.external_id,
+      label: row.label,
+      metadata: row.metadata_json || {},
+      score: Number(row.score) || 0
+    }));
+  } catch (err) {
+    console.warn('⚠️ findSimilarNodes query failed:', err.message);
+    return [];
+  }
 }
 
 export async function upsertNode(node) {

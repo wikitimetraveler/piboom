@@ -11,7 +11,10 @@
 - Routes -> Controllers -> Services
 - Controllers are thin: request parsing + response formatting only
 - Services contain business logic and external integrations
-- No React. Frontend is Bootstrap + vanilla JS + AG Grid/DataTables.
+- Frontend stack — brownfield vs greenfield:
+  - **Brownfield (Encompass)** (`public/finance/` Hub/Worksheets, field browsers, unit tests, processor assignment, Screen Test): Bootstrap + vanilla JS + AG Grid/DataTables. No React/TypeScript without an explicit migration.
+  - **Greenfield** (new product UIs / new domains from scratch): Prefer React + TypeScript (modern industry default; strong portfolio complement to Encompass Bootstrap work).
+  - **Brownfield (existing non-Encompass Bootstrap pages)**: Stay as-is until an explicit migration; do not mix stacks on the same page.
 - Calculations live in `public/shared/calculationEngine.js` (factory functions)
 
 ## Backend structure

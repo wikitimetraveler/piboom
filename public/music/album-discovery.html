@@ -31,7 +31,7 @@
     .musical-note {
       position: absolute;
       font-size: 32px;
-      color: rgba(135, 206, 250, 0.6);
+      color: rgba(var(--zen-primary-rgb), 0.45);
       animation: floatNote 15s linear infinite;
       opacity: 0;
       z-index: 10;
@@ -314,7 +314,158 @@
       border-radius: 10px;
       padding: 0.75rem;
       margin-bottom: 0.5rem;
-      border: 1px solid rgba(135, 206, 250, 0.25);
+      border: 1px solid var(--ice-border);
+    }
+
+    /* Discovery hero */
+    .discovery-hero {
+      text-align: center;
+      margin-bottom: 1.25rem;
+      padding: 0.25rem 0 0.5rem;
+    }
+    .discovery-hero h1 {
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 0.35rem;
+      letter-spacing: -0.02em;
+    }
+    .discovery-hero .discovery-kicker {
+      color: var(--muted);
+      font-size: 1rem;
+      margin: 0 auto;
+      max-width: 36rem;
+      line-height: 1.45;
+    }
+
+    .search-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      justify-content: center;
+      gap: 0.5rem;
+      max-width: 920px;
+      margin: 0 auto 0.75rem;
+    }
+    .search-toolbar .source-select {
+      max-width: 11.5rem;
+      height: 50px;
+      border: 2px solid var(--border);
+      border-radius: var(--zen-radius);
+      background: rgba(255,255,255,0.95);
+      color: var(--text);
+      font-weight: 500;
+    }
+    .search-toolbar .source-select:focus {
+      border-color: var(--ice-primary);
+      box-shadow: 0 0 0 3px var(--ice-glow);
+      outline: none;
+    }
+    .search-toolbar .input-group {
+      flex: 1 1 280px;
+      margin: 0 !important;
+      max-width: none !important;
+    }
+    .search-toolbar .mic-toggle-btn {
+      height: 50px;
+      min-width: 50px;
+      border-radius: var(--zen-radius);
+      border: 2px solid var(--border);
+      background: rgba(255,255,255,0.95);
+      color: var(--zen-primary);
+    }
+    .search-toolbar .mic-toggle-btn[aria-expanded="true"],
+    .search-toolbar .mic-toggle-btn.is-active {
+      border-color: var(--ice-primary);
+      background: var(--ice-light);
+      color: var(--zen-primary);
+    }
+
+    .input-mode-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.35rem;
+      margin-bottom: 1rem;
+    }
+    .input-mode-tabs .btn {
+      border-radius: 999px;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.85rem;
+    }
+
+    .collection-setup {
+      background: rgba(255,255,255,0.95);
+      border: 1px solid var(--border);
+      border-radius: var(--zen-radius);
+      box-shadow: var(--zen-shadow);
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+    .collection-setup > .card-header {
+      background: var(--ice-light);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+    }
+    .collection-setup > .card-header h5 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .collection-setup .card-body {
+      border-top: 1px solid var(--border);
+    }
+
+    .voice-controls {
+      display: none;
+    }
+    .voice-controls.is-open {
+      display: block;
+    }
+
+    .album-card-actions {
+      margin-top: 0.65rem;
+    }
+    .album-card-actions .collection-btn {
+      width: 100%;
+    }
+    .album-card-more {
+      position: relative;
+      margin-top: 0.4rem;
+    }
+    .album-card-more summary {
+      list-style: none;
+      cursor: pointer;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding: 0.25rem;
+      user-select: none;
+    }
+    .album-card-more summary::-webkit-details-marker { display: none; }
+    .album-card-more summary:hover { color: var(--zen-primary); }
+    .album-card-more .album-secondary-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
     @media (max-width: 576px) {
       .release-day-panel {
@@ -347,7 +498,7 @@
     }
     
     .album-year {
-      background: linear-gradient(135deg, var(--ice-primary), rgba(135,206,250,0.8));
+      background: linear-gradient(135deg, var(--ice-primary), var(--zen-primary-hover));
       color: white;
       padding: 2px 8px;
       border-radius: 10px;
@@ -518,7 +669,7 @@
     .search-btn:hover {
       background: var(--ice-primary) !important;
       transform: translateY(-1px);
-      box-shadow: 0 4px 15px rgba(135,206,250,0.4);
+      box-shadow: 0 4px 15px var(--ice-glow);
     }
     
     .kge-search-picker .kge-dropdown-item {
@@ -907,114 +1058,75 @@
     <!-- User Selector -->
     <div id="userSelectorContainer"></div>
 
-    <div class="card mt-3 mb-4" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
-      <div class="card-body">
-        <h5 class="card-title mb-3"><i class="bi-geo-alt"></i> Collection Address</h5>
-        <div class="form-group">
-          <label for="addStreet">Street Address</label>
-          <input type="text" id="addStreet" class="form-control" placeholder="Start typing an address">
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="addCity">City</label>
-            <input type="text" id="addCity" class="form-control" placeholder="City">
-          </div>
-          <div class="form-group col-md-3">
-            <label for="addState">State</label>
-            <input type="text" id="addState" class="form-control" placeholder="CA" maxlength="2">
-          </div>
-          <div class="form-group col-md-3">
-            <label for="addZip">Zip</label>
-            <input type="text" id="addZip" class="form-control" placeholder="Zip">
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="addCounty">County</label>
-          <input type="text" id="addCounty" class="form-control" placeholder="County">
-        </div>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="addLatitude">Latitude</label>
-            <input type="text" id="addLatitude" class="form-control" placeholder="lat" readonly>
-          </div>
-          <div class="form-group col-md-6">
-            <label for="addLongitude">Longitude</label>
-            <input type="text" id="addLongitude" class="form-control" placeholder="lng" readonly>
-          </div>
-        </div>
-        <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="useMyLocationAlbum()">
-          <i class="bi-geo-alt-fill"></i> Use my phone's location
-        </button>
-        <small class="form-text text-muted d-block mt-2">Used as the default location when adding albums to your collection. Location is requested when you open the page.</small>
-      </div>
-    </div>
-
-    <div class="card mt-3 mb-4" style="border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 6px 20px rgba(0,0,0,0.08);">
-      <div class="card-body">
-        <h5 class="card-title mb-3"><i class="bi-box-seam"></i> Physical shelf (vinyl)</h5>
-        <p class="small text-muted mb-3">Optional. Choose a zone (A–G); the slot defaults to the next free number for that zone. You can change the number before adding.</p>
-        <div class="form-row">
-          <div class="form-group col-md-6">
-            <label for="addStorageZone">Zone</label>
-            <select id="addStorageZone" class="form-control">
-              <option value="">— Not set —</option>
-            </select>
-          </div>
-          <div class="form-group col-md-6">
-            <label for="addStorageSlot">Slot #</label>
-            <input type="number" id="addStorageSlot" class="form-control" min="1" step="1" placeholder="Pick zone first" disabled>
-          </div>
-        </div>
-      </div>
-    </div>
-    
     <!-- Album Discovery with Google Knowledge Graph -->
     <div class="kg-widget-container">
-      <button class="btn btn-sm btn-outline-secondary float-right" onclick="closeKGWidget()" style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+      <button class="btn btn-sm btn-outline-secondary float-right" onclick="closeKGWidget()" style="position: absolute; top: 10px; right: 10px; z-index: 10;" aria-label="Close search panel">
         <i class="bi-x"></i>
       </button>
-      <h2 class="text-center mb-4"><i class="bi-disc"></i> Album Discovery</h2>
-      <p class="text-center mb-4">Search by band name, album name, upload a cover, or identify up to 5 albums in one shelf photo!</p>
-      
+
+      <header class="discovery-hero">
+        <h1><i class="bi-disc" aria-hidden="true"></i> Album Discovery</h1>
+        <p class="discovery-kicker">Search a band, upload a cover, or scan your shelf — then add what you find to your collection.</p>
+      </header>
+
       <!-- Search Mode Tabs -->
-      <div class="text-center mb-3">
-        <div class="btn-group" role="group">
-          <button type="button" class="btn btn-primary" id="bandModeBtn" onclick="switchInputMode('band')">
-            <i class="bi-people-fill"></i> Search Band
-          </button>
-          <button type="button" class="btn btn-outline-primary" id="albumModeBtn" onclick="switchInputMode('album')">
-            <i class="bi-disc"></i> Search Album
-          </button>
-          <button type="button" class="btn btn-outline-success" id="imageModeBtn" onclick="switchInputMode('image')">
-            <i class="bi-image"></i> Upload Image
-          </button>
-          <button type="button" class="btn btn-outline-success" id="cameraModeBtn" onclick="switchInputMode('camera')">
-            <i class="bi-camera"></i> Use Camera
-          </button>
-          <button type="button" class="btn btn-outline-warning" id="multiModeBtn" onclick="switchInputMode('multi')">
-            <i class="bi-collection"></i> Multi (5)
-          </button>
-        </div>
+      <div class="input-mode-tabs" role="group" aria-label="Search input mode">
+        <button type="button" class="btn btn-primary" id="bandModeBtn" onclick="switchInputMode('band')">
+          <i class="bi-people-fill"></i> Band
+        </button>
+        <button type="button" class="btn btn-outline-primary" id="albumModeBtn" onclick="switchInputMode('album')">
+          <i class="bi-disc"></i> Album
+        </button>
+        <button type="button" class="btn btn-outline-success" id="imageModeBtn" onclick="switchInputMode('image')">
+          <i class="bi-image"></i> Image
+        </button>
+        <button type="button" class="btn btn-outline-success" id="cameraModeBtn" onclick="switchInputMode('camera')">
+          <i class="bi-camera"></i> Camera
+        </button>
+        <button type="button" class="btn btn-outline-warning" id="multiModeBtn" onclick="switchInputMode('multi')">
+          <i class="bi-collection"></i> Shelf (5)
+        </button>
       </div>
       
       <div class="row" style="width: 100%; margin: 0;">
         <div class="col-12" style="width: 100%; padding: 0 15px;">
           <!-- Band/Artist Search (default) -->
-          <div id="bandSearchMode" class="text-center mb-3">
-            <div class="input-group input-group-lg">
-              <input id="kgBand" class="form-control search-input" placeholder="Search a band or artist…" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
-              <div class="input-group-append">
-                <button class="btn btn-primary search-btn" type="button" onclick="searchAlbums()">
-                  <i class="bi-search"></i> Search Albums
-                </button>
+          <div id="bandSearchMode" class="mb-3">
+            <div class="search-toolbar">
+              <label for="searchSourceSelect" class="sr-only">Search source</label>
+              <select id="searchSourceSelect" class="custom-select source-select" aria-label="Search source" onchange="handleSourceSelectChange()">
+                <option value="kg">Knowledge Graph</option>
+                <option value="wiki">Wikipedia</option>
+                <option value="chat">ChatGPT</option>
+              </select>
+              <div class="input-group input-group-lg">
+                <label for="kgBand" class="sr-only">Search a band or artist</label>
+                <input id="kgBand" class="form-control search-input" placeholder="Search a band or artist…" aria-label="Search a band or artist" onkeypress="handleSearchKeypress(event)" oninput="updateModeButtonText()">
+                <div class="input-group-append">
+                  <button class="btn btn-primary search-btn" type="button" onclick="searchAlbums()">
+                    <i class="bi-search"></i> Search
+                  </button>
+                </div>
               </div>
+              <button type="button" class="btn mic-toggle-btn" id="voicePanelToggle" aria-expanded="false" aria-controls="voiceControlsPanel" title="Voice search" onclick="toggleVoicePanel()">
+                <i class="bi-mic" aria-hidden="true"></i>
+                <span class="sr-only">Toggle voice search</span>
+              </button>
+            </div>
+            <!-- Keep legacy mode button ids for JS compatibility (visually hidden) -->
+            <div class="sr-only" aria-hidden="true">
+              <button type="button" id="kgBtn" onclick="handleModeButtonClick('kg')">Knowledge Graph</button>
+              <button type="button" id="wikiBtn" onclick="handleModeButtonClick('wiki')">Wikipedia</button>
+              <button type="button" id="chatBtn" onclick="handleModeButtonClick('chat')">ChatGPT</button>
+              <span id="modeBadge"><span id="modeText">Loading...</span></span>
             </div>
           </div>
           
           <!-- Album Name Search -->
           <div id="albumSearchMode" class="text-center mb-3" style="display: none;">
             <div class="input-group input-group-lg">
-              <input id="albumNameInput" class="form-control search-input" placeholder="Enter album name (e.g., Dark Side of the Moon)…" onkeypress="handleAlbumKeypress(event)">
+              <label for="albumNameInput" class="sr-only">Search by album name</label>
+              <input id="albumNameInput" class="form-control search-input" placeholder="Enter album name (e.g., Dark Side of the Moon)…" aria-label="Search by album name" onkeypress="handleAlbumKeypress(event)">
               <div class="input-group-append">
                 <button class="btn btn-primary search-btn" type="button" onclick="searchByAlbumName()">
                   <i class="bi-search"></i> Find Album
@@ -1209,52 +1321,100 @@
             </div>
           </div>
           
-          <div class="text-center mt-3">
-            <span class="badge badge-info" id="modeBadge">
-              <i class="bi-cloud"></i> <span id="modeText">Loading...</span>
-            </span>
-            <div class="mt-2">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-primary active" id="kgBtn" onclick="handleModeButtonClick('kg')">
-                  <i class="bi-google"></i> Knowledge Graph
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="wikiBtn" onclick="handleModeButtonClick('wiki')">
-                  <i class="bi-wikipedia"></i> Wikipedia
-                </button>
-                <button type="button" class="btn btn-sm btn-outline-success" id="chatBtn" onclick="handleModeButtonClick('chat')">
-                  <i class="bi-robot"></i> ChatGPT
-                </button>
-              </div>
-            </div>
-          </div>
+        </div>
+      </div>
+
+      <!-- Voice Controls (collapsed by default; opened via mic toggle) -->
+      <div class="voice-controls" id="voiceControlsPanel" hidden>
+        <h5><i class="bi-mic"></i> Voice Search</h5>
+        <p class="mb-3">Try saying "Search for The Beatles" or "Find Pink Floyd albums"</p>
+        <button class="btn btn-primary" id="initVoiceBtn" onclick="initVoice()">
+          <i class="bi-mic"></i> Initialize Voice
+        </button>
+        <button class="btn btn-success" id="startVoiceBtn" onclick="startVoice()" disabled>
+          <i class="bi-mic-fill"></i> Start Listening
+        </button>
+        <button class="btn btn-warning" id="stopVoiceBtn" onclick="stopVoice()" disabled>
+          <i class="bi-mic-mute"></i> Stop Listening
+        </button>
+        <button class="btn btn-info" id="testVoiceBtn" onclick="testVoice()" disabled>
+          <i class="bi-volume-up"></i> Test Voice
+        </button>
+        <button class="btn btn-info" id="speakAnalysisBtn" onclick="speakCurrentAnalysis()" disabled>
+          <i class="bi-volume-up"></i> Speak Analysis
+        </button>
+        <button class="btn btn-danger" id="stopSpeakingBtn" onclick="stopSpeaking()">
+          <i class="bi-stop-circle"></i> Stop Speech
+        </button>
+        <div id="voiceStatus" class="voice-status ready" style="display: none;">
+          Voice ready - Click "Start Listening" to begin
         </div>
       </div>
     </div>
 
-    <!-- Voice Controls -->
-    <div class="voice-controls">
-      <h5><i class="bi-mic"></i> Voice Search</h5>
-      <p class="mb-3">Use your voice to search for albums! Try saying "Search for The Beatles" or "Find Pink Floyd albums"</p>
-      <button class="btn btn-primary" id="initVoiceBtn" onclick="initVoice()">
-        <i class="bi-mic"></i> Initialize Voice
-      </button>
-      <button class="btn btn-success" id="startVoiceBtn" onclick="startVoice()" disabled>
-        <i class="bi-mic-fill"></i> Start Listening
-      </button>
-      <button class="btn btn-warning" id="stopVoiceBtn" onclick="stopVoice()" disabled>
-        <i class="bi-mic-mute"></i> Stop Listening
-      </button>
-      <button class="btn btn-info" id="testVoiceBtn" onclick="testVoice()" disabled>
-        <i class="bi-volume-up"></i> Test Voice
-      </button>
-      <button class="btn btn-info" id="speakAnalysisBtn" onclick="speakCurrentAnalysis()" disabled>
-        <i class="bi-volume-up"></i> Speak Analysis
-      </button>
-      <button class="btn btn-danger" id="stopSpeakingBtn" onclick="stopSpeaking()">
-        <i class="bi-stop-circle"></i> Stop Speech
-      </button>
-      <div id="voiceStatus" class="voice-status ready" style="display: none;">
-        Voice ready - Click "Start Listening" to begin
+    <!-- Collection setup (deferred; used when adding albums) -->
+    <div class="collection-setup card">
+      <div class="card-header" id="collectionSetupHeader" data-toggle="collapse" data-target="#collectionSetupBody" aria-expanded="false" aria-controls="collectionSetupBody" role="button" tabindex="0">
+        <h5>
+          <span><i class="bi-geo-alt" aria-hidden="true"></i> Collection setup</span>
+          <i class="bi-chevron-down" aria-hidden="true"></i>
+        </h5>
+      </div>
+      <div id="collectionSetupBody" class="collapse">
+        <div class="card-body">
+          <h6 class="mb-3"><i class="bi-geo-alt"></i> Collection Address</h6>
+          <div class="form-group">
+            <label for="addStreet">Street Address</label>
+            <input type="text" id="addStreet" class="form-control" placeholder="Start typing an address">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="addCity">City</label>
+              <input type="text" id="addCity" class="form-control" placeholder="City">
+            </div>
+            <div class="form-group col-md-3">
+              <label for="addState">State</label>
+              <input type="text" id="addState" class="form-control" placeholder="CA" maxlength="2">
+            </div>
+            <div class="form-group col-md-3">
+              <label for="addZip">Zip</label>
+              <input type="text" id="addZip" class="form-control" placeholder="Zip">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="addCounty">County</label>
+            <input type="text" id="addCounty" class="form-control" placeholder="County">
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="addLatitude">Latitude</label>
+              <input type="text" id="addLatitude" class="form-control" placeholder="lat" readonly>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="addLongitude">Longitude</label>
+              <input type="text" id="addLongitude" class="form-control" placeholder="lng" readonly>
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline-success btn-sm mt-2" onclick="useMyLocationAlbum()">
+            <i class="bi-geo-alt-fill"></i> Use my phone's location
+          </button>
+          <small class="form-text text-muted d-block mt-2 mb-4">Default location when adding albums. Expand this only if you need to set address or shelf slot first.</small>
+
+          <h6 class="mb-3"><i class="bi-box-seam"></i> Physical shelf (vinyl)</h6>
+          <p class="small text-muted mb-3">Optional. Choose a zone (A–G); the slot defaults to the next free number for that zone.</p>
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label for="addStorageZone">Zone</label>
+              <select id="addStorageZone" class="form-control">
+                <option value="">— Not set —</option>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label for="addStorageSlot">Slot #</label>
+              <input type="number" id="addStorageSlot" class="form-control" min="1" step="1" placeholder="Pick zone first" disabled>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1979,12 +2139,6 @@ function makeKGWidgetCompact() {
       kgContainer.appendChild(toggleButton);
     }
     
-    // Also hide the voice controls and AI info to save more space
-    const voiceControls = document.querySelector('.voice-controls');
-    if (voiceControls) {
-      voiceControls.style.display = 'none';
-    }
-    
   }
 }
 
@@ -1993,7 +2147,6 @@ function toggleKGWidgetExpansion() {
   const kgContainer = document.querySelector('.kg-widget-container');
   const toggleBtn = kgContainer.querySelector('.kg-toggle-btn');
   const kgCard = document.getElementById('kgCard');
-  const voiceControls = document.querySelector('.voice-controls');
   
   if (kgContainer.classList.contains('compact')) {
     // Expand
@@ -2005,11 +2158,6 @@ function toggleKGWidgetExpansion() {
     if (kgCard && kgCard.innerHTML.trim()) {
       kgCard.style.display = 'block';
     }
-    
-    // Show voice controls when expanded
-    if (voiceControls) {
-      voiceControls.style.display = 'block';
-    }
   } else {
     // Collapse
     kgContainer.classList.add('compact');
@@ -2020,12 +2168,24 @@ function toggleKGWidgetExpansion() {
     if (kgCard) {
       kgCard.style.display = 'none';
     }
-    
-    // Hide voice controls when collapsed
-    if (voiceControls) {
-      voiceControls.style.display = 'none';
-    }
   }
+}
+
+function toggleVoicePanel() {
+  const panel = document.getElementById('voiceControlsPanel');
+  const btn = document.getElementById('voicePanelToggle');
+  if (!panel || !btn) return;
+  const open = !panel.classList.contains('is-open');
+  panel.classList.toggle('is-open', open);
+  panel.hidden = !open;
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  btn.classList.toggle('is-active', open);
+}
+
+function handleSourceSelectChange() {
+  const select = document.getElementById('searchSourceSelect');
+  if (!select) return;
+  switchSearchMode(select.value);
 }
 
 // Close KG widget completely
@@ -2704,75 +2864,54 @@ function searchArtist() {
 }
 
 function updateModeButtonText() {
-  const kgWidget = document.getElementById('kgBand');
-  const hasText = kgWidget && kgWidget.value.trim().length > 0;
-  
-  const kgBtn = document.getElementById('kgBtn');
-  const wikiBtn = document.getElementById('wikiBtn');
-  const chatBtn = document.getElementById('chatBtn');
-  
-  if (hasText) {
-    // Show search functionality
-    kgBtn.innerHTML = '<i class="bi-google"></i> Search KG';
-    wikiBtn.innerHTML = '<i class="bi-wikipedia"></i> Search Wiki';
-    chatBtn.innerHTML = '<i class="bi-robot"></i> Ask AI';
-  } else {
-    // Show mode selection
-    kgBtn.innerHTML = '<i class="bi-google"></i> Knowledge Graph';
-    wikiBtn.innerHTML = '<i class="bi-wikipedia"></i> Wikipedia';
-    chatBtn.innerHTML = '<i class="bi-robot"></i> ChatGPT';
-  }
+  // Source control is a select; no dynamic button labels needed.
 }
 
 function handleModeButtonClick(mode) {
   const kgWidget = document.getElementById('kgBand');
   const hasText = kgWidget && kgWidget.value.trim().length > 0;
   
+  switchSearchMode(mode);
+
   if (hasText) {
-    // If there's text, perform search
     const artist = kgWidget.value.trim();
     currentArtist = artist;
     searchAlbums();
-  } else {
-    // If no text, just switch the mode
-    switchSearchMode(mode);
   }
 }
 
 function switchSearchMode(mode) {
   searchMode = mode;
+
+  const sourceSelect = document.getElementById('searchSourceSelect');
+  if (sourceSelect && sourceSelect.value !== mode) {
+    sourceSelect.value = mode;
+  }
+
+  const kgBtn = document.getElementById('kgBtn');
+  const wikiBtn = document.getElementById('wikiBtn');
+  const chatBtn = document.getElementById('chatBtn');
+  if (kgBtn) kgBtn.className = mode === 'kg' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary';
+  if (wikiBtn) wikiBtn.className = mode === 'wiki' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary';
+  if (chatBtn) chatBtn.className = mode === 'chat' ? 'btn btn-sm btn-success' : 'btn btn-sm btn-outline-success';
   
-  // Update button states
-  document.getElementById('kgBtn').className = mode === 'kg' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary';
-  document.getElementById('wikiBtn').className = mode === 'wiki' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary';
-  document.getElementById('chatBtn').className = mode === 'chat' ? 'btn btn-sm btn-success' : 'btn btn-sm btn-outline-success';
-  
-  // Show/hide appropriate elements
   const kgWidget = document.getElementById('kgBand');
   const kgCard = document.getElementById('kgCard');
   
-  // Always show the KG widget input, but change its behavior based on mode
   if (kgWidget) {
     kgWidget.style.display = 'block';
-    kgWidget.focus();
-    
-    // Update placeholder text based on mode
     if (mode === 'chat') {
       kgWidget.placeholder = 'Ask ChatGPT anything about music...';
     } else if (mode === 'kg') {
-      kgWidget.placeholder = 'Search a band or artist… (Google Knowledge Graph)';
+      kgWidget.placeholder = 'Search a band or artist…';
     } else {
-      kgWidget.placeholder = 'Search a band or artist… (Wikipedia)';
+      kgWidget.placeholder = 'Search a band or artist…';
     }
   }
   
-  // Show/hide KG results card
   if (kgCard) {
     kgCard.style.display = mode === 'chat' ? 'none' : 'block';
   }
-  
-  // Update button text to reflect current state
-  updateModeButtonText();
 }
 
 
@@ -3258,22 +3397,29 @@ function displayAlbums(albums) {
     const safeMbId = escapeAlbumHtml(album.musicBrainzId);
     
     albumCard.innerHTML = `
-      <img src="${safeCover}" alt="${safeTitle}" class="album-cover" 
+      <img src="${safeCover}" alt="${safeTitle}" class="album-cover" loading="lazy"
            onerror="this.src='https://via.placeholder.com/200x200/87CEEB/FFFFFF?text=No+Cover'">
       <div class="album-info">
         <h5>${safeTitle}</h5>
         <p>${safeArtist}</p>
         <p>${escapeAlbumHtml(album.type)}</p>
         <span class="album-year">${safeYear}</span>
-        <button type="button" class="btn btn-outline-info btn-sm mt-2 w-100 release-day-btn">
-          <i class="bi-clock-history"></i> Release Day
-        </button>
-        <button type="button" class="btn btn-primary btn-sm mt-2 w-100 youtube-btn">
-          <i class="bi-youtube"></i> Find Videos
-        </button>
-        <button type="button" class="btn btn-success btn-sm mt-2 w-100 collection-btn">
-          <i class="bi-plus-circle"></i> Add to Collection
-        </button>
+        <div class="album-card-actions">
+          <button type="button" class="btn btn-success btn-sm collection-btn">
+            <i class="bi-plus-circle"></i> Add to Collection
+          </button>
+          <details class="album-card-more">
+            <summary>More</summary>
+            <div class="album-secondary-actions">
+              <button type="button" class="btn btn-outline-info btn-sm w-100 release-day-btn">
+                <i class="bi-clock-history"></i> Release Day
+              </button>
+              <button type="button" class="btn btn-outline-primary btn-sm w-100 youtube-btn">
+                <i class="bi-youtube"></i> Find Videos
+              </button>
+            </div>
+          </details>
+        </div>
       </div>
     `;
 
@@ -3288,6 +3434,9 @@ function displayAlbums(albums) {
     albumCard.querySelector('.collection-btn').addEventListener('click', (event) => {
       event.stopPropagation();
       showAddModal(album.artist, album.title, album.year, album.genre, album.coverArt, album.musicBrainzId);
+    });
+    albumCard.querySelector('.album-card-more')?.addEventListener('click', (event) => {
+      event.stopPropagation();
     });
     
     albumGrid.appendChild(albumCard);

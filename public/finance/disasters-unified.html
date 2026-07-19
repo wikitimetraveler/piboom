@@ -280,10 +280,32 @@
         </div>
       </div>
 
-      <div id="aiInsightsContainer" class="mb-3">
-        <div id="aiInsightsIdle" class="card border bg-light shadow-sm mb-0">
-          <div class="card-body py-2 small text-muted mb-0">
-            <i class="bi bi-lightbulb"></i> Select a disaster in the grid for tailored AI insights.
+      <div class="card du-ai-insights-panel mb-3" id="duAiInsightsPanel" aria-label="AI insights">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-2">
+          <button
+            type="button"
+            class="du-ai-insights-toggle btn btn-link btn-sm text-start text-decoration-none text-body p-0 flex-grow-1"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapseAiInsights"
+            aria-expanded="false"
+            aria-controls="collapseAiInsights"
+            id="headingAiInsights"
+          >
+            <strong class="small d-inline-flex align-items-center gap-1">
+              <i class="bi bi-lightbulb" aria-hidden="true"></i>
+              AI Insights
+              <i class="bi bi-chevron-down du-ai-insights-chevron small opacity-75" aria-hidden="true"></i>
+            </strong>
+            <span class="du-ai-insights-status small text-muted d-block" id="duAiInsightsStatus" role="status" aria-live="polite">Select a disaster for tailored insights</span>
+          </button>
+        </div>
+        <div id="collapseAiInsights" class="collapse" aria-labelledby="headingAiInsights">
+          <div class="card-body py-2">
+            <div id="aiInsightsContainer">
+              <div id="aiInsightsIdle" class="small text-muted mb-0">
+                <i class="bi bi-lightbulb" aria-hidden="true"></i> Select a disaster in the grid for tailored AI insights.
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -995,7 +1017,7 @@
     <script src="/finance/js/hazard-webcam-viewer.js"></script>
     <script type="module" src="/shared/disaster-kml-export.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/topojson-client@3/dist/topojson-client.min.js"></script>
+    <script src="/shared/vendor/topojson-client.min.js"></script>
     <script src="/finance/js/disasters-unified/core.js"></script>
     <script src="/finance/js/disasters-unified/geo-data.js"></script>
     <script src="/finance/js/disasters-unified/geo-picker.js"></script>

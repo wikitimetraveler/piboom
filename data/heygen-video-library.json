@@ -166,6 +166,29 @@
       "generatedAt": "2026-07-10T06:26:45.297Z",
       "hostedLocally": true,
       "cachedAt": "2026-07-10T06:35:00.969Z"
+    },
+    {
+      "id": "disasters-briefing-0110c37ce2334ca6a39f2d7ed6e99ac6",
+      "kind": "heygen",
+      "videoId": "0110c37ce2334ca6a39f2d7ed6e99ac6",
+      "title": "M 1.1 - 4 km W of The Geysers, CA (CA)",
+      "domain": "disasters",
+      "variant": "briefing",
+      "videoUrl": null,
+      "portraitUrl": null,
+      "sourcePage": "/heygen-hub.html",
+      "studioPage": "/finance/disasters-unified.html#duHeygenStudio",
+      "projectDir": null,
+      "subtitle": null,
+      "scriptPreview": "Unified Disasters briefing. You are looking at M 1.1 - 4 km W of The Geysers, CA—a earthquake event from USGS, centered in Sonoma, CA. Reporting started July 19, 2026. Within 100 miles we currently track 48 pipeline loans and 20 hazard webcams. On the command deck, review nearby ",
+      "tags": [
+        "heygen-api",
+        "disasters",
+        "briefing",
+        "briefing"
+      ],
+      "generatedAt": "2026-07-19T23:27:43.087Z",
+      "hostedLocally": false
     }
   ]
 }

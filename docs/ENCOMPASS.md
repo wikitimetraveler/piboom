@@ -26,10 +26,11 @@ Key fields: `Loan.LoanGuid`, `Loan.LoanNumber`, `Loan.LoanStatus`, `Loan.Current
 
 AI assistant for Encompass Developer Connect:
 
-- Uses **encompass-docs.service.js** – Search official docs
-- Uses **ice-knowledge.service.js** – Search ICE repos, Postman, sample code
+- Uses **encompass-docs.service.js** – Search official Developer Connect docs (`data/encompass-docs.json`; refresh with `npm run scrape:encompass-docs`)
+- Uses **ice-knowledge.service.js** – Search ICE repos, Postman, sample code (`data/knowledge/ice-sources.json`; build with `npm run build:ice-knowledge`)
 - System prompt includes DevConnect Labs tech stack, calculations class, Encompass context
-- Endpoints: `/search`, `/chat`, `/summary`
+- Endpoints: `/search`, `/chat`, `/summary`, `/scrape` (admin, token-gated)
+- Refresh both stores together: `npm run refresh:encompass-knowledge`
 
 ### 3. Knowledge Sources (`knowledge-sources/ice/`)
 
@@ -40,6 +41,8 @@ AI assistant for Encompass Developer Connect:
 | `docs/` | HTML/Markdown snapshots from Developer Connect |
 
 Build index: `npm run build:ice-knowledge` → `data/knowledge/ice-sources.json`.  
+Companion docs store (official Developer Connect pages): `npm run scrape:encompass-docs` → `data/encompass-docs.json`.  
+Both jobs also embed into pgvector (`ice_knowledge_chunks`, `encompass_docs_chunks`) for hybrid keyword+semantic retrieval when a DB + `OPENAI_API_KEY` are available; keyword search is the offline fallback. See `docs/VECTOR_RAG.md`.  
 Tracker: `docs/ICE_KNOWLEDGE_SOURCES.md`.
 
 ### 4. ScreenBindings / In-App Binding
@@ -124,6 +127,7 @@ AI-powered review of Encompass manifest XML form code:
 
 - [ ] Keep `ICE_KNOWLEDGE_SOURCES.md` and `ice-sources.json` updated
 - [ ] Run `npm run build:ice-knowledge` after ICE repo/doc changes
+- [ ] Run `npm run scrape:encompass-docs` (or `npm run refresh:encompass-knowledge`) to refresh Developer Connect docs; commit updated `data/encompass-docs.json`
 - [ ] Use calculations class + `customIds` for financial fields
 - [ ] Assume web/cloud/phone deployment only
 - [ ] Follow existing service/controller/route patterns

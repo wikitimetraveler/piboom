@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const SHADER_VERSION = '5';
+  const SHADER_VERSION = '7';
   const SHADER_URL = '/shared/shaders/ice-ocean-raymarch.glsl?v=' + SHADER_VERSION;
 
   const VERT_SRC = `#version 300 es

@@ -229,6 +229,46 @@ export async function clearUserConversationHistory(userId, sessionId = 'default'
 }
 
 /**
+ * Persist a single user/assistant turn without running a ConversationChain.
+ * Used by RAG assistants that call ChatOpenAI with a custom system prompt.
+ */
+export async function persistConversationTurn(userId, sessionId, userContent, assistantContent, assistantType = 'heygen') {
+  const pool = getPool();
+  if (!pool || !userId || !sessionId) return false;
+
+  try {
+    const conversationResult = await pool.query(
+      `INSERT INTO conversations (user_id, session_id, assistant_type, updated_at)
+       VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+       ON CONFLICT (user_id, session_id)
+       DO UPDATE SET updated_at = CURRENT_TIMESTAMP, assistant_type = COALESCE(conversations.assistant_type, EXCLUDED.assistant_type)
+       RETURNING id`,
+      [userId, sessionId, assistantType]
+    );
+    const conversationId = conversationResult.rows[0].id;
+
+    if (userContent) {
+      await pool.query(
+        `INSERT INTO messages (conversation_id, user_id, role, content)
+         VALUES ($1, $2, 'user', $3)`,
+        [conversationId, userId, userContent]
+      );
+    }
+    if (assistantContent) {
+      await pool.query(
+        `INSERT INTO messages (conversation_id, user_id, role, content)
+         VALUES ($1, $2, 'assistant', $3)`,
+        [conversationId, userId, assistantContent]
+      );
+    }
+    return true;
+  } catch (error) {
+    console.error('❌ Error persisting conversation turn:', error.message);
+    return false;
+  }
+}
+
+/**
  * Get conversation statistics for a user
  */
 export async function getUserConversationStats(userId) {
@@ -261,6 +301,7 @@ export default {
   getConversationChain,
   getUserConversationHistory,
   clearUserConversationHistory,
-  getUserConversationStats
+  getUserConversationStats,
+  persistConversationTurn
 };
 

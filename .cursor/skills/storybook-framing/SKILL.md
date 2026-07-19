@@ -14,7 +14,7 @@ description: >-
 
 ## Project constraints
 
-- **Bootstrap 5** + **vanilla JS** only (`AGENTS.md`). No React.
+- Canonical Lane pages use **Bootstrap 5** + **vanilla JS**. New non-Encompass apps may use React + TypeScript per `AGENTS.md`; keep StoryBook framing patterns stack-agnostic where possible.
 - Canonical reference implementation: `public/family/lane-memorial-wall.html`, `public/family/css/lane-memorial-wall.css`, `public/family/js/lane-memorial-wall.js`.
 - Shared patterns: `docs/FRONTEND_PATTERNS.md`; shell/nav: `public/family/css/lane-shell.css`, pill nav as used on sibling pages.
 

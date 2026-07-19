@@ -8,7 +8,9 @@ const isPostgisAvailable = jest.fn();
 
 await jest.unstable_mockModule('../../services/database.service.js', () => ({
   getPool: () => ({ query: poolQuery }),
-  isPostgisAvailable
+  isPostgisAvailable,
+  ensurePgvectorExtension: jest.fn().mockResolvedValue(false),
+  isPgvectorAvailable: jest.fn().mockResolvedValue(false)
 }));
 
 await jest.unstable_mockModule('../../services/disasters.service.js', () => ({

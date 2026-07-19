@@ -26,7 +26,8 @@
 
 **On-screen:**  
 - Open `AGENTS.md`  
-- Highlight conventions: service-layer logic, no React, Bootstrap + vanilla JS  
+- Highlight conventions: service-layer logic; Encompass = Bootstrap + vanilla JS; non-Encompass may use React + TypeScript  
+
 - Show `.cursor/skills/` and briefly reveal examples: `regression-tester`, `genealogy-american-history`, `nature-discovery-bootstrap`
 
 ---
@@ -150,7 +151,7 @@ Use this read when the audience is mostly IC engineers and you want stack-level 
 ### Skills (0:20-1:00)
 
 **Narration:**  
-> "Skills live under `.cursor/skills/` in `SKILL.md` files. The agent is supposed to read the right skill for the job instead of free-styling. We have domain skills, for things like genealogy OCR cleanup and Bootstrap migration under `public/nature/`, and we have process skills, like regression-tester, which is aligned with our Jest CI and fix-the-first-failure rule. `AGENTS.md` still wins on stack: no React, Bootstrap 5 and vanilla JavaScript in the static tools, and business logic in `services/` with thin request handlers. Skills operationalize that."
+> "Skills live under `.cursor/skills/` in `SKILL.md` files. The agent is supposed to read the right skill for the job instead of free-styling. We have domain skills, for things like genealogy OCR cleanup and Bootstrap migration under `public/nature/`, and we have process skills, like regression-tester, which is aligned with our Jest CI and fix-the-first-failure rule. `AGENTS.md` still wins on stack: Encompass-related tools stay Bootstrap 5 and vanilla JavaScript—no React or TypeScript there—while non-Encompass apps may use React and TypeScript. Business logic stays in `services/` with thin request handlers. Skills operationalize that."
 
 ### Subagents (1:00-1:40)
 

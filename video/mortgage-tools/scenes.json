@@ -6,7 +6,7 @@
       "id": "s0",
       "kicker": "DevConnect Labs",
       "title": "Mortgage tools platform",
-      "body": "Worksheets and Encompass integrations in one browser — no React, service-layer backend.",
+      "body": "Worksheets and Encompass integrations in one browser — Bootstrap + vanilla JS, service-layer backend.",
       "chip": "Bootstrap · vanilla JS · Postgres"
     },
     {

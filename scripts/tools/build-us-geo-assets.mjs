@@ -42,6 +42,23 @@ async function main() {
   fs.writeFileSync(path.join(GEO_DIR, 'us-states.topojson'), JSON.stringify(statesTopo));
   console.log('  → public/finance/assets/geo/us-states.topojson');
 
+  const statesFc = feature(statesTopo, statesTopo.objects.states);
+  statesFc.features = (statesFc.features || []).map((f) => {
+    const fips = String(f.id ?? '').padStart(2, '0');
+    const abbr = FIPS_TO_ST[fips] || '';
+    return {
+      ...f,
+      properties: {
+        ...(f.properties || {}),
+        state_fips: fips,
+        state_abbr: abbr,
+        name: f.properties?.name || abbr,
+      },
+    };
+  });
+  fs.writeFileSync(path.join(GEO_DIR, 'us-states.geojson'), JSON.stringify(statesFc));
+  console.log(`  → public/finance/assets/geo/us-states.geojson (${statesFc.features.length} states)`);
+
   console.log('Fetching US counties TopoJSON…');
   const countiesTopo = await fetchJson(COUNTIES_URL);
   const allFeatures = feature(countiesTopo, countiesTopo.objects.counties).features;

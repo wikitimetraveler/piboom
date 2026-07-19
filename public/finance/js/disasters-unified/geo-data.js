@@ -33,7 +33,7 @@
     GU: 'Guam', MP: 'Northern Mariana Islands', PR: 'Puerto Rico', VI: 'U.S. Virgin Islands',
   };
 
-  const geoCache = { statesTopo: null, countiesByState: {}, stateStats: null, countySummary: {} };
+  const geoCache = { statesTopo: null, statesGeo: null, countiesByState: {}, stateStats: null, countySummary: {} };
 
   function normalizeCountyName(name) {
     return String(name || '').replace(/\s+County$/i, '').trim();
@@ -53,6 +53,22 @@
     if (geoCache.statesTopo) return geoCache.statesTopo;
     geoCache.statesTopo = await fetchJson(`${GEO_BASE}/us-states.topojson`);
     return geoCache.statesTopo;
+  }
+
+  /** Prefer GeoJSON (no topojson-client required); fall back to TopoJSON conversion. */
+  async function loadStatesGeoJson() {
+    if (geoCache.statesGeo) return geoCache.statesGeo;
+    try {
+      geoCache.statesGeo = await fetchJson(`${GEO_BASE}/us-states.geojson`);
+      return geoCache.statesGeo;
+    } catch (geoErr) {
+      console.warn('us-states.geojson unavailable, falling back to TopoJSON:', geoErr.message);
+      const topo = await loadStatesTopo();
+      const convert = global.topojson?.feature;
+      if (!convert) throw new Error('topojson-client not loaded (needed for us-states.topojson fallback)');
+      geoCache.statesGeo = convert(topo, topo.objects.states);
+      return geoCache.statesGeo;
+    }
   }
 
   async function loadStateCounties(stateAbbr) {
@@ -109,25 +125,35 @@
     return '#ef4444';
   }
 
+  function decorateStatesGeoJson(fc, stateStats) {
+    const max = Math.max(1, ...Object.values(stateStats || {}));
+    const out = {
+      type: 'FeatureCollection',
+      features: (fc.features || []).map((f) => {
+        const fips = String(f.properties?.state_fips || f.id || '').padStart(2, '0');
+        const abbr = f.properties?.state_abbr || FIPS_TO_ST[fips] || '';
+        const count = abbr ? (stateStats[abbr] || 0) : 0;
+        return {
+          ...f,
+          properties: {
+            ...(f.properties || {}),
+            state_fips: fips,
+            state_abbr: abbr,
+            state_name: stateName(abbr),
+            event_count: count,
+            fill: heatColor(count, max),
+          },
+        };
+      }),
+    };
+    return out;
+  }
+
+  /** @deprecated Prefer loadStatesGeoJson + decorateStatesGeoJson */
   function statesGeoJson(statesTopo, stateStats) {
     const convert = global.topojson?.feature;
     if (!convert) throw new Error('topojson-client not loaded');
-    const fc = convert(statesTopo, statesTopo.objects.states);
-    const max = Math.max(1, ...Object.values(stateStats || {}));
-    fc.features.forEach((f) => {
-      const fips = String(f.id ?? '').padStart(2, '0');
-      const abbr = FIPS_TO_ST[fips];
-      const count = abbr ? (stateStats[abbr] || 0) : 0;
-      f.properties = {
-        ...(f.properties || {}),
-        state_fips: fips,
-        state_abbr: abbr || '',
-        state_name: stateName(abbr),
-        event_count: count,
-        fill: heatColor(count, max),
-      };
-    });
-    return fc;
+    return decorateStatesGeoJson(convert(statesTopo, statesTopo.objects.states), stateStats);
   }
 
   global.duGeoData = {
@@ -137,10 +163,12 @@
     stateName,
     normalizeCountyName,
     loadStatesTopo,
+    loadStatesGeoJson,
     loadStateCounties,
     loadStateEventStats,
     loadCountySummary,
     heatColor,
+    decorateStatesGeoJson,
     statesGeoJson,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -15,7 +15,7 @@ You are a refactoring specialist for DevConnect Labs. Your job is to improve cod
   - `services/encompass-*.service.js`
   - `controllers/encompass-*.controller.js`
   - `routes/encompass-*.routes.js`
-- Frontend: Bootstrap + vanilla JS (no React)
+- Frontend: brownfield Encompass = Bootstrap + vanilla JS (no React/TS); greenfield = prefer React + TypeScript (`AGENTS.md`)
 - Calculations: `public/shared/calculationEngine.js`
 
 ## When Invoked

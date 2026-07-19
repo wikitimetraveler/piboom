@@ -109,7 +109,7 @@
       if (featuredLead) {
         featuredLead.textContent = loggedIn
           ? 'Featured Encompass and hazard tools — open a demo or read the case study.'
-          : 'Open these without login. Encompass tools unlock after you pass the wall of fire.';
+          : 'Open these without login. Encompass tools unlock after you pass through the ice.';
       }
     }
 

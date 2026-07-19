@@ -6,10 +6,21 @@ import { promises as fsp } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
+import dotenv from 'dotenv';
+import {
+  DEFAULT_EMBEDDING_MODEL,
+  embedTexts,
+  hashContent,
+  chunkText,
+  toVectorLiteral
+} from '../lib/knowledge/embedding-utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.join(__dirname, '..');
+dotenv.config({ path: path.join(ROOT_DIR, '.env') });
+
+const SKIP_EMBED = process.env.ICE_SKIP_EMBED === '1';
 
 const SOURCE_ROOT = path.join(ROOT_DIR, 'knowledge-sources', 'ice');
 const OUTPUT_DIR = path.join(ROOT_DIR, 'data', 'knowledge');
@@ -262,6 +273,181 @@ const processDocs = async () => {
   }
 };
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** True for transient Render/pg pool drops that are safe to retry. */
+const isTransientDbError = (err) => {
+  const msg = String(err?.message || err || '').toLowerCase();
+  return (
+    msg.includes('connection terminated') ||
+    msg.includes('connection ended') ||
+    msg.includes('econnreset') ||
+    msg.includes('econnrefused') ||
+    msg.includes('server closed the connection') ||
+    msg.includes('timeout exceeded when trying to connect') ||
+    err?.code === '57P01' || // admin_shutdown
+    err?.code === '57P02' || // crash_shutdown
+    err?.code === '57P03' // cannot_connect_now
+  );
+};
+
+/**
+ * Run a pool.query with reconnect+retry on transient disconnects.
+ * Long ICE embeds against Render Postgres routinely hit idle drops; without
+ * this the whole job dies after hours of progress.
+ */
+const withDbRetry = async (databaseService, sql, params, label = 'query') => {
+  const maxAttempts = 5;
+  let lastErr;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      let pool = databaseService.getPool();
+      if (!pool) {
+        databaseService.initializeDatabase();
+        pool = databaseService.getPool();
+      }
+      if (!pool) throw new Error('Database pool unavailable');
+      return await pool.query(sql, params);
+    } catch (err) {
+      lastErr = err;
+      if (!isTransientDbError(err) || attempt === maxAttempts) throw err;
+      const backoffMs = Math.min(30_000, 1000 * 2 ** (attempt - 1));
+      warn(`${label} failed (${err.message}); reconnecting in ${backoffMs}ms (attempt ${attempt}/${maxAttempts})`);
+      try {
+        const old = databaseService.getPool();
+        if (old) await old.end().catch(() => {});
+      } catch { /* ignore */ }
+      databaseService.initializeDatabase();
+      await sleep(backoffMs);
+    }
+  }
+  throw lastErr;
+};
+
+/**
+ * Chunk record content, embed in batches, and upsert into ice_knowledge_chunks.
+ * Uses content_hash to skip unchanged chunks on re-runs. Non-fatal: falls back
+ * to JSON-only when OPENAI_API_KEY / DATABASE_URL / pgvector are unavailable.
+ */
+const embedRecords = async () => {
+  if (SKIP_EMBED) {
+    log('Skipping embeddings (ICE_SKIP_EMBED=1)');
+    return { vectorReady: false, upserted: 0 };
+  }
+
+  const apiKey = (process.env.OPENAI_API_KEY || '').trim();
+  if (!apiKey) {
+    warn('OPENAI_API_KEY missing — JSON index only (no vectors)');
+    return { vectorReady: false, upserted: 0 };
+  }
+  if (!process.env.DATABASE_URL) {
+    warn('DATABASE_URL missing — JSON index only (no vectors)');
+    return { vectorReady: false, upserted: 0 };
+  }
+
+  const databaseService = await import('../services/database.service.js');
+  databaseService.initializeDatabase();
+  const pool = databaseService.getPool();
+  if (!pool) {
+    warn('Database pool unavailable — JSON index only');
+    return { vectorReady: false, upserted: 0 };
+  }
+
+  const schema = await databaseService.ensureIceKnowledgeTable(pool);
+  if (!schema.vector) {
+    warn('pgvector not available — JSON index only');
+    return { vectorReady: false, upserted: 0 };
+  }
+
+  // Expand records into embeddable chunks.
+  const chunks = [];
+  for (const record of records) {
+    const parts = chunkText(record.content || record.excerpt || '');
+    parts.forEach((part, idx) => {
+      chunks.push({
+        sourceId: `${record.id}:${idx}`,
+        title: parts.length > 1 ? `${record.title} (${idx + 1}/${parts.length})` : record.title,
+        url: record.url || null,
+        category: record.category || 'reference',
+        content: part,
+        contentHash: hashContent(part),
+        metadata: {
+          sourceType: record.sourceType,
+          repo: record.repo || null,
+          path: record.path || null,
+          tags: record.tags || []
+        }
+      });
+    });
+  }
+
+  // Skip chunks whose content is unchanged since the last build.
+  const existing = new Map();
+  try {
+    const { rows } = await withDbRetry(
+      databaseService,
+      'SELECT source_id, content_hash FROM ice_knowledge_chunks',
+      undefined,
+      'load hashes'
+    );
+    for (const row of rows) existing.set(row.source_id, row.content_hash);
+  } catch { /* first run: table just created */ }
+
+  const todo = chunks.filter((c) => existing.get(c.sourceId) !== c.contentHash);
+  log(`Embedding ${todo.length}/${chunks.length} chunks (skipping ${chunks.length - todo.length} unchanged)`);
+
+  let upserted = 0;
+  const batchSize = 16;
+  const upsertSql = `INSERT INTO ice_knowledge_chunks
+           (source_id, title, url, category, content, metadata, content_hash, embedding, updated_at)
+         VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8::vector, CURRENT_TIMESTAMP)
+         ON CONFLICT (source_id) DO UPDATE SET
+           title = EXCLUDED.title,
+           url = EXCLUDED.url,
+           category = EXCLUDED.category,
+           content = EXCLUDED.content,
+           metadata = EXCLUDED.metadata,
+           content_hash = EXCLUDED.content_hash,
+           embedding = EXCLUDED.embedding,
+           updated_at = CURRENT_TIMESTAMP`;
+
+  for (let i = 0; i < todo.length; i += batchSize) {
+    const batch = todo.slice(i, i + batchSize);
+    const embeddings = await embedTexts(
+      batch.map((c) => `${c.title}\n\n${c.content}`),
+      apiKey,
+      DEFAULT_EMBEDDING_MODEL
+    );
+
+    for (let j = 0; j < batch.length; j++) {
+      const c = batch[j];
+      const embedding = embeddings[j];
+      if (!embedding) continue;
+      await withDbRetry(
+        databaseService,
+        upsertSql,
+        [
+          c.sourceId,
+          c.title,
+          c.url,
+          c.category,
+          c.content,
+          JSON.stringify(c.metadata),
+          c.contentHash,
+          toVectorLiteral(embedding)
+        ],
+        `upsert ${c.sourceId}`
+      );
+      upserted += 1;
+    }
+    if (i % (batchSize * 20) === 0) {
+      log(`Embedded ${Math.min(i + batchSize, todo.length)}/${todo.length}`);
+    }
+  }
+
+  return { vectorReady: chunks.length > 0, upserted };
+};
+
 const buildSummary = () => {
   const counts = records.reduce((acc, record) => {
     const type = record.sourceType || 'unknown';
@@ -283,9 +469,14 @@ const main = async () => {
   await processPostmanCollections();
   await processDocs();
 
+  const { vectorReady, upserted } = await embedRecords();
+
   const payload = {
     lastIndexed: nowIso,
     counts: buildSummary(),
+    vectorReady,
+    vectorUpserted: upserted,
+    embeddingModel: DEFAULT_EMBEDDING_MODEL,
     records
   };
 
@@ -293,6 +484,14 @@ const main = async () => {
   const postmanCount = records.filter((r) => r.category === 'Postman Collection').length;
   log(`Wrote ${records.length} knowledge records to ${OUTPUT_FILE}`);
   if (postmanCount > 0) log(`  Postman: ${postmanCount} requests | Repos: ${payload.counts.code_reference || 0} | Docs: ${payload.counts.official_doc || 0}`);
+  log(`Vector upserts: ${upserted} (ready=${vectorReady})`);
+
+  // Close the DB pool (if opened) so the process can exit cleanly.
+  try {
+    const databaseService = await import('../services/database.service.js');
+    const pool = databaseService.getPool();
+    if (pool) await pool.end();
+  } catch { /* no pool to close */ }
 };
 
 main().catch((err) => {

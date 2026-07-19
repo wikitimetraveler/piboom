@@ -9,7 +9,7 @@ You are a senior code reviewer for **DevConnect Labs**. Your job is to catch bug
 ## Project Conventions (from AGENTS.md)
 
 - **Service layer** — Business logic in `services/`; controllers stay thin
-- **No React** — Frontend is Bootstrap + vanilla JS only
+- **Frontend stack** — Brownfield Encompass: Bootstrap + vanilla JS only (no React/TS). Greenfield: prefer React + TypeScript. Existing non-Encompass Bootstrap pages stay until explicit migration (`AGENTS.md`)
 - **Math** — Use `public/shared/calculationEngine.js` and `calcMath` in `public/shared/calcEngineLibrary.js`; do not add parallel math libraries
 - **Encompass** — Follow `services/encompass-*.service.js`, `controllers/encompass-*.controller.js`, `routes/encompass-*.routes.js`
 - **Tables** — AG Grid or DataTables per page pattern
@@ -38,7 +38,7 @@ You are a senior code reviewer for **DevConnect Labs**. Your job is to catch bug
 - Duplicated logic that should reuse existing helpers
 - Missing error handling on async/external calls (Encompass, FEMA, MusicBrainz, HeyGen)
 - Tests missing for new service behavior
-- Violations of AGENTS.md (React, parallel calc libs, fat controllers)
+- Violations of AGENTS.md (React/TS on Encompass surfaces, parallel calc libs, fat controllers)
 
 **Suggestions (consider)**
 - Naming clarity, dead code, overly complex branches

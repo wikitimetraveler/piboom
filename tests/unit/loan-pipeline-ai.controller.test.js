@@ -20,6 +20,10 @@ await jest.unstable_mockModule('../../services/database.service.js', () => ({
   getPool: jest.fn()
 }));
 
+await jest.unstable_mockModule('../../services/disaster-impact-graph.service.js', () => ({
+  findSimilarNodes: jest.fn().mockResolvedValue([])
+}));
+
 const {
   chatWithAI,
   chatWithDisasterExpert

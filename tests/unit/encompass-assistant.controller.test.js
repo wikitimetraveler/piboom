@@ -30,14 +30,24 @@ await jest.unstable_mockModule('@langchain/core/messages', () => ({
 await jest.unstable_mockModule('../../services/encompass-docs.service.js', () => ({
   default: {
     searchDocs: jest.fn().mockResolvedValue([
-      { title: 'Doc', content: 'Content', repo: 'developer-connect' }
-    ])
+      {
+        title: 'Doc',
+        content: 'Content',
+        repo: 'developer-connect',
+        retrieval: 'vector',
+        score: 0.9
+      }
+    ]),
+    getDocsSummary: jest.fn().mockResolvedValue({ totalSections: 1, vectorCount: 0 })
   }
 }));
 
 await jest.unstable_mockModule('../../lib/knowledge/ice-knowledge.service.js', () => ({
   default: {
-    search: jest.fn().mockResolvedValue([{ title: 'KB', content: 'KB content', repo: 'ice' }])
+    search: jest.fn().mockResolvedValue([
+      { title: 'KB', content: 'KB content', repo: 'ice', retrieval: 'keyword', score: 4 }
+    ]),
+    getSummary: jest.fn().mockResolvedValue({ totalRecords: 1, vectorCount: 0 })
   }
 }));
 
@@ -80,6 +90,10 @@ describe('encompass-assistant.controller', () => {
       expect.objectContaining({
         message: 'mock-response',
         context: expect.any(Array),
+        retrieval: expect.objectContaining({ hybrid: true }),
+        sources: expect.arrayContaining([
+          expect.objectContaining({ id: 'S1', retrieval: expect.any(String) })
+        ]),
         timestamp: expect.any(String)
       })
     );

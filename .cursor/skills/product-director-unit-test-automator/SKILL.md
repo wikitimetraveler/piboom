@@ -12,7 +12,7 @@ Use this skill to align implementation and validation with Product Director expe
 
 ## Operating Rules
 1. Keep scope tight to Unit Test and Automator unless the user asks broader.
-2. Favor small safe diffs and preserve existing Bootstrap + vanilla JS patterns.
+2. Favor small safe diffs and preserve existing Bootstrap + vanilla JS patterns on Encompass Unit Test / Automator surfaces (no React/TS there).
 3. Treat controllers as thin and keep business logic out of UI files unless already in-page.
 4. Verify both function and UX clarity (labels, button states, status messages, empty states).
 

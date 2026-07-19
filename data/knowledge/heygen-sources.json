@@ -1,0 +1,93 @@
+{
+  "lastIndexed": "2026-07-19T02:38:37.059Z",
+  "vectorReady": false,
+  "vectorUpserted": 0,
+  "embeddingModel": "text-embedding-3-small",
+  "records": [
+    {
+      "id": "local:docs/devconnect-heygen-integration.md:0",
+      "title": "Devconnect Heygen Integration",
+      "category": "local-docs",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/devconnect-heygen-integration.md",
+      "content": "# DevConnect Labs — HeyGen integration map\n\n## Public surfaces\n\n| Surface | Path |\n|---------|------|\n| Video hub | `/heygen-hub.html` |\n| API expert (this RAG) | panel on hub → `POST /api/heygen-assistant/chat` |\n| Disaster studio | `/finance/disasters-unified.html#duHeygenStudio` |\n| Lane print / QR lines | `/family/lane-heygen-print.html`, `data/lane-heygen-lines.json` |\n\n## Backend\n\n| Piece | Path |\n|-------|------|\n| Thin routes | `routes/heygen.routes.js` |\n| Video client | `services/heygen.service.js` |\n| Library catalog | `services/heygen-library.service.js` |\n| Expert RAG | `services/heygen-knowledge.service.js` |\n| Expert controller | `controllers/heygen-assistant.controller.js` |\n| Env | `HEYGEN_API_KEY`, `OPENAI_API_KEY`, `DATABASE_URL` |\n\n## Generate vs ask\n\n- **Generate video**: `POST /api/heygen/videos` (requires `HEYGEN_API_KEY`).\n- **Ask API questions**: `POST /api/heygen-assistant/chat` (RAG + LangChain memory; retrieval only).\n\n## Voice UX\n\nHub expert uses mic (Web Speech API) for input and `/shared/tts.js` (`speakWithGoogle`)\nfor spoken answers — same pattern as Encompass Assistant and Unit Tests AI.",
+      "excerpt": "# DevConnect Labs — HeyGen integration map\n\n## Public surfaces\n\n| Surface | Path |\n|---------|------|\n| Video hub | `/heygen-hub.html` |\n| API expert (this RAG) | panel on hub → `POST /api/heygen-assistant/chat` |\n| Disaster studio | `/finance/disasters-unified.html#duHeygenStudio` |\n| Lane print / QR lines | `/family/lane-heygen-print.html`, `data/lane-heygen-lines.json` |\n\n## Backend\n\n| Piece | ",
+      "tags": [
+        "heygen",
+        "local",
+        "docs",
+        "devconnect-heygen-integration.md"
+      ],
+      "contentHash": "1abb46305a8f8691016e5d28fa3d128c"
+    },
+    {
+      "id": "local:docs/heygen-v3-capabilities.md:0",
+      "title": "Heygen V3 Capabilities (1/4)",
+      "category": "local-docs",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/heygen-v3-capabilities.md",
+      "content": "# HeyGen API v3 — capabilities overview (DevConnect Labs seed)\n\nSource of truth for live docs: https://developers.heygen.com/docs/quick-start  \nMachine index: https://developers.heygen.com/llms.txt (or Mintlify mirror).\n\nAuth header: `X-Api-Key: $HEYGEN_API_KEY`. Prefer MCP → CLI → raw API for agents.\n\n## Flagship: Video Agent (`POST /v3/video-agents`)\n\n- Natural-language prompt → script, avatar/voice selection, scene composition, render.\n- Modes: `generate` (fire-and-forget) and `chat` (multi-turn revisions).\n- Optional: `avatar_id`, `voice_id`, `style_id`, `orientation` (`landscape`|`portrait`),\n  `files` (asset_ids), `callback_url` / `callback_id`.\n- Poll `GET /v3/video-agents/{session_id}` for progress/`video_id`; then\n  `GET /v3/videos/{video_id}` for `video_url`. Or use webhooks.\n\nStyles: `GET /v3/video-agents/styles`. Interactive sessions support storyboard review\nand follow-up messages before final render.\n\n## Direct video (`POST /v3/videos`)\n\n- Structured JSON: you choose avatar look, voice, and script (or audio).\n- Engines: Avatar IV (default), Avatar III, Avatar V (highest fidelity, opt-in).\n- Types include avatar, image-to-video, cinematic_avatar.\n- Defaults often recom",
+      "excerpt": "# HeyGen API v3 — capabilities overview (DevConnect Labs seed)\n\nSource of truth for live docs: https://developers.heygen.com/docs/quick-start  \nMachine index: https://developers.heygen.com/llms.txt (or Mintlify mirror).\n\nAuth header: `X-Api-Key: $HEYGEN_API_KEY`. Prefer MCP → CLI → raw API for agents.\n\n## Flagship: Video Agent (`POST /v3/video-agents`)\n\n- Natural-language prompt → script, avatar/v",
+      "tags": [
+        "heygen",
+        "local",
+        "docs",
+        "heygen-v3-capabilities.md"
+      ],
+      "contentHash": "644ebbe8b84dc00cb7f1326c4a4287e4"
+    },
+    {
+      "id": "local:docs/heygen-v3-capabilities.md:1",
+      "title": "Heygen V3 Capabilities (2/4)",
+      "category": "local-docs",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/heygen-v3-capabilities.md",
+      "content": "Avatar IV (default), Avatar III, Avatar V (highest fidelity, opt-in).\n- Types include avatar, image-to-video, cinematic_avatar.\n- Defaults often recommended: `aspect_ratio: \"auto\"`, `resolution: \"1080p\"`.\n- Batch: up to 100 creates per batch call; poll one batch id.\n\n## Avatars\n\n- **Group** = character identity; **look** = outfit/pose. Pass **look id** as `avatar_id`.\n- Create from footage (digital twin), photo, or text prompt (`POST /v3/avatars`).\n- Consent flow required for private digital twins.\n- List looks: `GET /v3/avatars/looks`. List groups: avatar groups endpoints.\n- Avatar Realtime / Live Avatar: streaming / conversational (separate product surfaces).\n\n## Voices & audio\n\n- List/search voices; design custom voices from a description; clone from audio.\n- Starfish TTS: `POST /v3/voices/speech` (engine-compatible voices).\n- Background music & SFX: semantic search via audio catalog endpoints.\n\n## Translation, lipsync, proofread\n\n- Video Translation (speed / precision) with voice clone + lip-sync (30+ languages;\n  marketing materials cite broader dialect coverage for translation product).\n- Lipsync speed vs precision on existing videos.\n- Proofread sessions: edit SRT before fin",
+      "excerpt": "Avatar IV (default), Avatar III, Avatar V (highest fidelity, opt-in).\n- Types include avatar, image-to-video, cinematic_avatar.\n- Defaults often recommended: `aspect_ratio: \"auto\"`, `resolution: \"1080p\"`.\n- Batch: up to 100 creates per batch call; poll one batch id.\n\n## Avatars\n\n- **Group** = character identity; **look** = outfit/pose. Pass **look id** as `avatar_id`.\n- Create from footage (digita",
+      "tags": [
+        "heygen",
+        "local",
+        "docs",
+        "heygen-v3-capabilities.md"
+      ],
+      "contentHash": "731a209c00462ec3d6d81edc7a3712c3"
+    },
+    {
+      "id": "local:docs/heygen-v3-capabilities.md:2",
+      "title": "Heygen V3 Capabilities (3/4)",
+      "category": "local-docs",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/heygen-v3-capabilities.md",
+      "content": "als cite broader dialect coverage for translation product).\n- Lipsync speed vs precision on existing videos.\n- Proofread sessions: edit SRT before final translation render.\n- Batch translation / lipsync / assets supported.\n\n## Assets, webhooks, HyperFrames\n\n- `POST /v3/assets` — image/video/audio/PDF (size limits apply).\n- Webhooks for completion/failure; signing secrets on create/rotate.\n- HyperFrames: HTML/CSS/JS compositions → rendered video\n  (`POST /v3/hyperframes/renders`). Distinct from avatar Video Agent.\n\n## Versioning\n\n- Prefer **v3 only**. Legacy v1/v2 supported until **October 31, 2026**.\n- See endpoint version comparison in official docs.\n\n## DevConnect Labs wrappers (this repo)\n\n- HTTP client: `services/heygen.service.js` — looks, voices, assets, `POST /v3/videos`, poll.\n- Routes: `/api/heygen/*` (health, library, avatars, voices, scripts, videos).\n- Hub UI: `/heygen-hub.html` + library registry `data/heygen-video-library.json`.\n- Domain scripts: disaster / finance / music / Lane HeyGen helpers.\n- Expert chat (RAG): `/api/heygen-assistant/*` — does **not** generate videos; explains API\n  and points at `/api/heygen/videos` for generation.\n- Cursor skills: heygen-video ",
+      "excerpt": "als cite broader dialect coverage for translation product).\n- Lipsync speed vs precision on existing videos.\n- Proofread sessions: edit SRT before final translation render.\n- Batch translation / lipsync / assets supported.\n\n## Assets, webhooks, HyperFrames\n\n- `POST /v3/assets` — image/video/audio/PDF (size limits apply).\n- Webhooks for completion/failure; signing secrets on create/rotate.\n- HyperF",
+      "tags": [
+        "heygen",
+        "local",
+        "docs",
+        "heygen-v3-capabilities.md"
+      ],
+      "contentHash": "d1d768702c53222ef74e6abc2312849d"
+    },
+    {
+      "id": "local:docs/heygen-v3-capabilities.md:3",
+      "title": "Heygen V3 Capabilities (4/4)",
+      "category": "local-docs",
+      "sourceType": "local",
+      "url": "",
+      "path": "docs/heygen-v3-capabilities.md",
+      "content": "i/heygen-assistant/*` — does **not** generate videos; explains API\n  and points at `/api/heygen/videos` for generation.\n- Cursor skills: heygen-video / heygen-avatar (v3 Video Agent pipeline); movie-director-heygen-expert.\n\n## Agent rules (from HeyGen docs)\n\n1. Do not invent curl flows before verifying auth (MCP / CLI / `HEYGEN_API_KEY`).\n2. Video Agent for prompt-driven prototypes; direct `/v3/videos` for brand-controlled pipelines.\n3. Never paste API keys into chat UIs.",
+      "excerpt": "i/heygen-assistant/*` — does **not** generate videos; explains API\n  and points at `/api/heygen/videos` for generation.\n- Cursor skills: heygen-video / heygen-avatar (v3 Video Agent pipeline); movie-director-heygen-expert.\n\n## Agent rules (from HeyGen docs)\n\n1. Do not invent curl flows before verifying auth (MCP / CLI / `HEYGEN_API_KEY`).\n2. Video Agent for prompt-driven prototypes; direct `/v3/vi",
+      "tags": [
+        "heygen",
+        "local",
+        "docs",
+        "heygen-v3-capabilities.md"
+      ],
+      "contentHash": "07f7af72238d631a1c3c7946785a8add"
+    }
+  ]
+}

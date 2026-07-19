@@ -133,7 +133,9 @@ npm run pi
 - **OpenAI GPT** - AI assistant models
 
 ### Frontend
-- **Bootstrap 5** - UI framework
+- **Dual frontend stack (brownfield vs greenfield):** Bootstrap + vanilla JS for brownfield Encompass mortgage tooling; React + TypeScript for greenfield product UIs
+- **Brownfield** - Existing UIs kept on Bootstrap 5 + vanilla JS (Encompass / Worksheets finance surfaces; other existing pages until migrated)
+- **Greenfield** - New UIs built from scratch prefer React + TypeScript
 - **AG Grid** - Interactive grids (unit-test execution, Encompass custom/native field browsers)
 - **DataTables** - Advanced tables (pipeline, disasters, risk dashboards, tools)
 - **Google Maps API** - Interactive mapping and geocoding

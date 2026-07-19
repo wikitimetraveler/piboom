@@ -20,7 +20,7 @@ Act as a scholarly music historian for piBoom: ground answers in verifiable sour
 ## Project constraints
 
 - **Backend:** Node.js / Express; logic in `services/`, thin `controllers/`, routes under `routes/`.
-- **Frontend:** Bootstrap + vanilla JS only (`AGENTS.md`). No React.
+- **Frontend:** Existing music pages are Bootstrap + vanilla JS; React + TypeScript allowed for new non-Encompass music UIs (`AGENTS.md`).
 - **Music nav:** `public/shared/music-mini-nav.js` + `MENU_CONFIG.MUSIC_TOOLS` in `public/shared/menu-config.js`.
 - **External APIs:** mock in tests; respect rate limits in production code.
 

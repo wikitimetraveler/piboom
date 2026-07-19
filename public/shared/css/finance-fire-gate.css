@@ -1,9 +1,21 @@
 /**
- * Wall of Fire — finance / Encompass auth gate
+ * Ocean Ice Flower — finance / Encompass auth gate (zen ocean)
  * Development work by David Lane
  */
 
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap');
+
 .finance-fire-gate {
+  --oif-abyss: #0a1628;
+  --oif-deep: #1a2856;
+  --oif-teal: #4a90a4;
+  --oif-teal-rgb: 74, 144, 164;
+  --oif-mint: #5ba88a;
+  --oif-frost: #e8f4f8;
+  --oif-crystal: #b8e0ec;
+  --oif-glow: rgba(74, 144, 164, 0.35);
+  --oif-foam: rgba(232, 244, 248, 0.92);
+
   position: fixed;
   inset: 0;
   z-index: 11000;
@@ -12,7 +24,7 @@
   justify-content: center;
   padding: 24px;
   overflow: hidden;
-  background: #070201;
+  background: var(--oif-abyss);
 }
 
 .finance-fire-gate__canvas {
@@ -31,61 +43,42 @@
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 95% 75% at 50% 115%, rgba(255, 90, 0, 0.92) 0%, transparent 48%),
-    radial-gradient(ellipse 60% 50% at 18% 85%, rgba(255, 50, 0, 0.62) 0%, transparent 44%),
-    radial-gradient(ellipse 60% 50% at 82% 85%, rgba(255, 170, 0, 0.58) 0%, transparent 44%),
-    radial-gradient(ellipse 45% 35% at 50% 68%, rgba(255, 220, 60, 0.42) 0%, transparent 55%),
-    linear-gradient(180deg, #1a0602 0%, #070201 38%, #3a0e02 100%);
-  animation: finance-fire-pulse 1.8s ease-in-out infinite alternate;
+    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(74, 144, 164, 0.55) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 35% at 50% 55%, rgba(184, 224, 236, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(91, 168, 138, 0.28) 0%, transparent 45%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(74, 144, 164, 0.32) 0%, transparent 45%),
+    linear-gradient(180deg, #0f2744 0%, #0a1628 40%, #1a2856 100%);
 }
 
 .finance-fire-gate__fallback::before,
 .finance-fire-gate__fallback::after {
   content: '';
   position: absolute;
-  bottom: -8%;
-  height: 72%;
-  border-radius: 50% 50% 0 0;
-  filter: blur(28px);
-  opacity: 0.9;
-  animation: finance-fire-rise 1.9s ease-in-out infinite alternate;
+  bottom: -6%;
+  height: 58%;
+  border-radius: 50% 50% 40% 40%;
+  filter: blur(36px);
+  opacity: 0.72;
   transform-origin: 50% 100%;
 }
 
 .finance-fire-gate__fallback::before {
-  left: 8%;
-  right: 8%;
+  left: 10%;
+  right: 10%;
   background:
-    radial-gradient(ellipse 18% 95% at 8% 100%, rgba(255, 60, 0, 0.85) 0%, transparent 72%),
-    radial-gradient(ellipse 16% 90% at 22% 100%, rgba(255, 90, 0, 0.7) 0%, transparent 70%),
-    radial-gradient(ellipse 20% 92% at 38% 100%, rgba(255, 50, 0, 0.8) 0%, transparent 72%),
-    radial-gradient(ellipse 18% 88% at 52% 100%, rgba(255, 110, 0, 0.75) 0%, transparent 70%),
-    radial-gradient(ellipse 17% 91% at 66% 100%, rgba(255, 70, 0, 0.78) 0%, transparent 71%),
-    radial-gradient(ellipse 19% 93% at 80% 100%, rgba(255, 95, 0, 0.72) 0%, transparent 70%),
-    radial-gradient(ellipse 16% 87% at 94% 100%, rgba(255, 55, 0, 0.8) 0%, transparent 72%);
+    radial-gradient(ellipse 22% 80% at 20% 100%, rgba(74, 144, 164, 0.55) 0%, transparent 70%),
+    radial-gradient(ellipse 24% 85% at 50% 100%, rgba(184, 224, 236, 0.4) 0%, transparent 72%),
+    radial-gradient(ellipse 22% 80% at 80% 100%, rgba(91, 168, 138, 0.4) 0%, transparent 70%);
 }
 
 .finance-fire-gate__fallback::after {
-  left: 22%;
-  right: 22%;
-  height: 55%;
-  filter: blur(16px);
-  animation-duration: 1.35s;
-  animation-direction: alternate-reverse;
+  left: 28%;
+  right: 28%;
+  height: 42%;
+  filter: blur(22px);
   background:
-    radial-gradient(ellipse 22% 88% at 30% 100%, rgba(255, 210, 70, 0.75) 0%, transparent 68%),
-    radial-gradient(ellipse 20% 85% at 55% 100%, rgba(255, 140, 20, 0.65) 0%, transparent 66%),
-    radial-gradient(ellipse 18% 82% at 78% 100%, rgba(255, 180, 50, 0.6) 0%, transparent 65%);
-}
-
-@keyframes finance-fire-pulse {
-  from { filter: brightness(1.0) saturate(1.35) contrast(1.12); }
-  to { filter: brightness(1.35) saturate(1.65) contrast(1.18); }
-}
-
-@keyframes finance-fire-rise {
-  from { transform: translateY(8%) scaleX(0.94) scaleY(0.96); opacity: 0.75; }
-  to { transform: translateY(-6%) scaleX(1.06) scaleY(1.08); opacity: 1; }
+    radial-gradient(ellipse 40% 90% at 50% 100%, rgba(232, 244, 248, 0.35) 0%, transparent 68%),
+    radial-gradient(ellipse 28% 70% at 35% 100%, rgba(74, 144, 164, 0.3) 0%, transparent 65%);
 }
 
 .finance-fire-gate__veil {
@@ -94,9 +87,54 @@
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 75% 60% at 50% 40%, rgba(8, 2, 0, 0.02) 0%, rgba(8, 2, 0, 0.48) 100%),
-    linear-gradient(180deg, rgba(5, 1, 0, 0.35) 0%, transparent 26%, transparent 58%, rgba(5, 1, 0, 0.55) 100%);
-  box-shadow: inset 0 0 160px rgba(255, 80, 0, 0.32), inset 0 -80px 120px rgba(255, 40, 0, 0.22);
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(10, 22, 40, 0.08) 0%, rgba(10, 22, 40, 0.52) 100%),
+    linear-gradient(180deg, rgba(10, 22, 40, 0.4) 0%, transparent 28%, transparent 55%, rgba(10, 22, 40, 0.55) 100%);
+  box-shadow: inset 0 0 140px rgba(74, 144, 164, 0.18), inset 0 -60px 100px rgba(26, 40, 86, 0.35);
+}
+
+/* Soft ice-flower bloom behind the card */
+.finance-fire-gate__bloom {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  z-index: 1;
+  width: min(72vw, 520px);
+  height: min(72vw, 520px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(232, 244, 248, 0.22) 0%, transparent 28%),
+    conic-gradient(
+      from 0deg,
+      rgba(184, 224, 236, 0.0) 0deg,
+      rgba(184, 224, 236, 0.35) 20deg,
+      rgba(74, 144, 164, 0.0) 40deg,
+      rgba(91, 168, 138, 0.28) 60deg,
+      rgba(184, 224, 236, 0.0) 80deg,
+      rgba(184, 224, 236, 0.32) 100deg,
+      rgba(74, 144, 164, 0.0) 120deg,
+      rgba(91, 168, 138, 0.26) 140deg,
+      rgba(184, 224, 236, 0.0) 160deg,
+      rgba(184, 224, 236, 0.3) 180deg,
+      rgba(74, 144, 164, 0.0) 200deg,
+      rgba(91, 168, 138, 0.24) 220deg,
+      rgba(184, 224, 236, 0.0) 240deg,
+      rgba(184, 224, 236, 0.32) 260deg,
+      rgba(74, 144, 164, 0.0) 280deg,
+      rgba(91, 168, 138, 0.26) 300deg,
+      rgba(184, 224, 236, 0.0) 320deg,
+      rgba(184, 224, 236, 0.28) 340deg,
+      rgba(184, 224, 236, 0.0) 360deg
+    );
+  filter: blur(8px);
+  mix-blend-mode: screen;
+  animation: finance-ice-bloom 28s linear infinite;
+}
+
+@keyframes finance-ice-bloom {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 .finance-fire-gate__skyline {
@@ -109,22 +147,54 @@
   transform: translateX(-50%);
   pointer-events: none;
   text-align: center;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(1.8rem, 7vw, 4.2rem);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 214, 140, 0.88);
+  font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.85rem, 6.5vw, 3.8rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--oif-foam);
   text-shadow:
-    0 0 18px rgba(255, 90, 0, 0.85),
-    0 0 48px rgba(255, 40, 0, 0.55),
-    0 4px 24px rgba(0, 0, 0, 0.55);
-  animation: finance-fire-skyline 2.8s ease-in-out infinite alternate;
+    0 0 22px rgba(74, 144, 164, 0.55),
+    0 0 48px rgba(91, 168, 138, 0.28),
+    0 4px 24px rgba(0, 0, 0, 0.45);
 }
 
-@keyframes finance-fire-skyline {
-  from { opacity: 0.72; filter: brightness(0.95); letter-spacing: 0.06em; }
-  to { opacity: 1; filter: brightness(1.18); letter-spacing: 0.1em; }
+.finance-fire-gate__ai {
+  display: inline-block;
+  font-style: italic;
+  background: linear-gradient(
+    105deg,
+    var(--oif-crystal) 0%,
+    #ffffff 28%,
+    var(--oif-mint) 52%,
+    var(--oif-teal) 72%,
+    var(--oif-crystal) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 10px rgba(184, 224, 236, 0.55))
+    drop-shadow(0 0 22px rgba(74, 144, 164, 0.4));
+  animation: finance-ai-shimmer 3.2s ease-in-out infinite;
+}
+
+@keyframes finance-ai-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    filter: drop-shadow(0 0 8px rgba(184, 224, 236, 0.4))
+      drop-shadow(0 0 16px rgba(74, 144, 164, 0.28));
+    transform: translateY(0);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: drop-shadow(0 0 16px rgba(232, 244, 248, 0.75))
+      drop-shadow(0 0 32px rgba(91, 168, 138, 0.55));
+    transform: translateY(-1px);
+  }
 }
 
 .finance-fire-gate__card .finance-fire-gate__ember {
@@ -139,21 +209,21 @@
   padding: 2rem 1.75rem 1.5rem;
   text-align: center;
   border-radius: 20px;
-  color: #fff8f0;
+  color: var(--oif-frost);
   background:
-    linear-gradient(165deg, rgba(42, 16, 8, 0.82) 0%, rgba(18, 6, 4, 0.9) 100%);
-  border: 1px solid rgba(255, 140, 60, 0.45);
+    linear-gradient(165deg, rgba(26, 40, 86, 0.82) 0%, rgba(10, 22, 40, 0.9) 100%);
+  border: 1px solid rgba(74, 144, 164, 0.42);
   box-shadow:
-    0 0 0 1px rgba(255, 80, 0, 0.15),
-    0 24px 80px rgba(0, 0, 0, 0.55),
-    0 0 80px rgba(255, 70, 10, 0.35),
-    inset 0 1px 0 rgba(255, 200, 120, 0.2);
+    0 0 0 1px rgba(184, 224, 236, 0.08),
+    0 24px 80px rgba(0, 0, 0, 0.45),
+    0 0 80px rgba(74, 144, 164, 0.28),
+    inset 0 1px 0 rgba(232, 244, 248, 0.18);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  animation: finance-fire-card-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: finance-ice-card-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes finance-fire-card-in {
+@keyframes finance-ice-card-in {
   from {
     opacity: 0;
     transform: translateY(18px) scale(0.96);
@@ -172,25 +242,24 @@
   height: 3.25rem;
   margin-bottom: 0.85rem;
   border-radius: 50%;
-  font-size: 1.65rem;
+  font-size: 1.55rem;
   line-height: 1;
-  background: radial-gradient(circle at 40% 35%, #ffcc66 0%, #ff5a14 45%, #8b1a00 100%);
+  color: var(--oif-frost);
+  background: radial-gradient(circle at 40% 35%, #e8f4f8 0%, #4a90a4 52%, #1a2856 100%);
   box-shadow:
-    0 0 24px rgba(255, 100, 20, 0.7),
-    0 0 48px rgba(255, 60, 0, 0.35);
-  animation: finance-fire-ember 1.6s ease-in-out infinite alternate;
+    0 0 24px rgba(74, 144, 164, 0.65),
+    0 0 48px rgba(91, 168, 138, 0.28);
 }
 
-@keyframes finance-fire-ember {
-  from { transform: scale(1) rotate(-4deg); filter: brightness(0.95); }
-  to { transform: scale(1.08) rotate(4deg); filter: brightness(1.15); }
+.finance-fire-gate__ember .bi {
+  font-size: 1.45rem;
 }
 
 .finance-fire-gate__copy {
   margin: 0 0 1.35rem;
   font-size: 0.95rem;
   line-height: 1.45;
-  color: rgba(255, 230, 200, 0.82);
+  color: rgba(232, 244, 248, 0.84);
 }
 
 .finance-fire-gate__btn {
@@ -202,45 +271,182 @@
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, background 0.15s ease;
 }
 
 .finance-fire-gate__btn:focus-visible {
-  outline: 2px solid #ffc070;
+  outline: 2px solid #b8e0ec;
   outline-offset: 3px;
 }
 
 .finance-fire-gate__btn--primary {
-  color: #2a0c04;
-  background: linear-gradient(135deg, #ffd080 0%, #ff8a2a 45%, #ff4d00 100%);
-  box-shadow: 0 8px 28px rgba(255, 80, 0, 0.4);
+  color: #1a2856;
+  background: linear-gradient(135deg, #e8f4f8 0%, #4a90a4 55%, #3d7a8a 100%);
+  box-shadow: 0 8px 28px rgba(74, 144, 164, 0.4);
 }
 
 .finance-fire-gate__btn--primary:hover {
   transform: translateY(-1px);
-  filter: brightness(1.06);
-  box-shadow: 0 12px 32px rgba(255, 80, 0, 0.5);
+  filter: brightness(1.05);
+  box-shadow: 0 12px 32px rgba(74, 144, 164, 0.5);
 }
 
 .finance-fire-gate__btn--ghost {
   margin-top: 0.65rem;
-  color: #ffc090;
+  color: #b8e0ec;
   background: transparent;
-  border: 1px solid rgba(255, 140, 60, 0.45);
+  border: 1px solid rgba(74, 144, 164, 0.45);
 }
 
 .finance-fire-gate__btn--ghost:hover {
-  background: rgba(255, 100, 30, 0.12);
-  border-color: rgba(255, 180, 80, 0.65);
+  background: rgba(74, 144, 164, 0.12);
+  border-color: rgba(184, 224, 236, 0.65);
+}
+
+/* ── Light mode: zen blues + greens, same ice floes underneath ── */
+.finance-fire-gate.finance-fire-gate--light {
+  --oif-abyss: #d8eef6;
+  --oif-deep: #4a90a4;
+  --oif-frost: #152238;
+  --oif-foam: #1a2856;
+  --oif-crystal: #3d7a8a;
+  background: #c5e6f0;
+}
+
+.finance-fire-gate--light .finance-fire-gate__fallback {
+  background:
+    radial-gradient(ellipse 90% 70% at 50% 110%, rgba(74, 144, 164, 0.45) 0%, transparent 52%),
+    radial-gradient(ellipse 42% 36% at 50% 52%, rgba(91, 168, 138, 0.28) 0%, transparent 58%),
+    radial-gradient(ellipse 50% 40% at 18% 78%, rgba(91, 168, 138, 0.32) 0%, transparent 46%),
+    radial-gradient(ellipse 50% 40% at 82% 78%, rgba(74, 144, 164, 0.35) 0%, transparent 46%),
+    linear-gradient(180deg, #8ec8de 0%, #b5e0ec 42%, #9dd4c4 100%);
+}
+
+.finance-fire-gate--light .finance-fire-gate__fallback::before {
+  background:
+    radial-gradient(ellipse 22% 80% at 20% 100%, rgba(74, 144, 164, 0.4) 0%, transparent 70%),
+    radial-gradient(ellipse 24% 85% at 50% 100%, rgba(232, 244, 248, 0.55) 0%, transparent 72%),
+    radial-gradient(ellipse 22% 80% at 80% 100%, rgba(91, 168, 138, 0.42) 0%, transparent 70%);
+}
+
+.finance-fire-gate--light .finance-fire-gate__fallback::after {
+  background:
+    radial-gradient(ellipse 40% 90% at 50% 100%, rgba(255, 255, 255, 0.45) 0%, transparent 68%),
+    radial-gradient(ellipse 28% 70% at 35% 100%, rgba(91, 168, 138, 0.35) 0%, transparent 65%);
+}
+
+.finance-fire-gate--light .finance-fire-gate__veil {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 42%, rgba(255, 255, 255, 0.12) 0%, rgba(74, 144, 164, 0.22) 100%),
+    linear-gradient(180deg, rgba(180, 220, 232, 0.45) 0%, transparent 30%, transparent 58%, rgba(91, 168, 138, 0.28) 100%);
+  box-shadow: inset 0 0 120px rgba(74, 144, 164, 0.15), inset 0 -50px 90px rgba(91, 168, 138, 0.18);
+}
+
+.finance-fire-gate--light .finance-fire-gate__bloom {
+  opacity: 0.7;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.45) 0%, transparent 30%),
+    conic-gradient(
+      from 0deg,
+      rgba(74, 144, 164, 0.0) 0deg,
+      rgba(74, 144, 164, 0.4) 20deg,
+      rgba(91, 168, 138, 0.0) 40deg,
+      rgba(91, 168, 138, 0.42) 60deg,
+      rgba(74, 144, 164, 0.0) 80deg,
+      rgba(74, 144, 164, 0.38) 100deg,
+      rgba(91, 168, 138, 0.0) 120deg,
+      rgba(91, 168, 138, 0.4) 140deg,
+      rgba(74, 144, 164, 0.0) 160deg,
+      rgba(74, 144, 164, 0.36) 180deg,
+      rgba(91, 168, 138, 0.0) 200deg,
+      rgba(91, 168, 138, 0.38) 220deg,
+      rgba(74, 144, 164, 0.0) 240deg,
+      rgba(74, 144, 164, 0.4) 260deg,
+      rgba(91, 168, 138, 0.0) 280deg,
+      rgba(91, 168, 138, 0.4) 300deg,
+      rgba(74, 144, 164, 0.0) 320deg,
+      rgba(74, 144, 164, 0.35) 340deg,
+      rgba(74, 144, 164, 0.0) 360deg
+    );
+}
+
+.finance-fire-gate--light .finance-fire-gate__skyline {
+  color: #152238;
+  text-shadow:
+    0 0 18px rgba(255, 255, 255, 0.75),
+    0 0 36px rgba(91, 168, 138, 0.35),
+    0 2px 12px rgba(74, 144, 164, 0.25);
+}
+
+.finance-fire-gate--light .finance-fire-gate__ai {
+  background: linear-gradient(
+    105deg,
+    #2a6b7a 0%,
+    #4a90a4 28%,
+    #5ba88a 52%,
+    #1a2856 72%,
+    #4a90a4 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(74, 144, 164, 0.45))
+    drop-shadow(0 0 16px rgba(91, 168, 138, 0.3));
+}
+
+.finance-fire-gate--light .finance-fire-gate__card {
+  color: #152238;
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.88) 0%, rgba(232, 244, 248, 0.92) 100%);
+  border: 1px solid rgba(74, 144, 164, 0.35);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 20px 60px rgba(26, 40, 86, 0.14),
+    0 0 64px rgba(91, 168, 138, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.finance-fire-gate--light .finance-fire-gate__copy {
+  color: rgba(26, 40, 86, 0.78);
+}
+
+.finance-fire-gate--light .finance-fire-gate__ember {
+  color: #e8f4f8;
+  background: radial-gradient(circle at 40% 35%, #ffffff 0%, #5ba88a 48%, #4a90a4 100%);
+  box-shadow:
+    0 0 22px rgba(91, 168, 138, 0.55),
+    0 0 40px rgba(74, 144, 164, 0.3);
+}
+
+.finance-fire-gate--light .finance-fire-gate__btn--primary {
+  color: #ffffff;
+  background: linear-gradient(135deg, #5ba88a 0%, #4a90a4 55%, #3d7a8a 100%);
+  box-shadow: 0 8px 24px rgba(74, 144, 164, 0.35);
+}
+
+.finance-fire-gate--light .finance-fire-gate__btn--ghost {
+  color: #1a2856;
+  border-color: rgba(74, 144, 164, 0.4);
+}
+
+.finance-fire-gate--light .finance-fire-gate__btn--ghost:hover {
+  background: rgba(74, 144, 164, 0.1);
+  border-color: rgba(91, 168, 138, 0.55);
+}
+
+.finance-fire-gate--light .finance-fire-gate__btn:focus-visible {
+  outline-color: #4a90a4;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .finance-fire-gate__fallback,
-  .finance-fire-gate__fallback::before,
-  .finance-fire-gate__fallback::after,
-  .finance-fire-gate__ember,
   .finance-fire-gate__card,
-  .finance-fire-gate__skyline {
+  .finance-fire-gate__bloom,
+  .finance-fire-gate__ai {
     animation: none !important;
+  }
+
+  .finance-fire-gate__ai {
+    transform: none;
   }
 }

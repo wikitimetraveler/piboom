@@ -33,8 +33,8 @@
     {
       "id": "s4",
       "kicker": "Frontend",
-      "title": "Bootstrap · vanilla JS",
-      "body": "No React — AG Grid and DataTables where grids matter. Design tokens, dark mode, and a sitewide voice widget.",
+      "title": "Brownfield · greenfield",
+      "body": "Brownfield Encompass stays Bootstrap + vanilla JS. Greenfield apps prefer React + TypeScript. AG Grid, design tokens, dark mode.",
       "chip": "design-tokens.css · modern-navbar"
     },
     {

@@ -165,8 +165,9 @@ vec3 starColor(vec3 rd) {
 // ── Sky (base gradient — stars added after duotone) ───────────
 vec3 skyColor(vec3 rd) {
   float t = clamp(rd.y * 0.5 + 0.5, 0.0, 1.0);
-  vec3 dayTop = vec3(0.28, 0.52, 0.68);
-  vec3 dayHor = vec3(0.38, 0.62, 0.78);
+  // Day: light zen blues + soft mint green at the horizon
+  vec3 dayTop = vec3(0.42, 0.72, 0.88);
+  vec3 dayHor = vec3(0.55, 0.82, 0.78);
   vec3 nightTop = vec3(0.02, 0.04, 0.09);
   vec3 nightHor = vec3(0.06, 0.1, 0.18);
   return mix(mix(nightHor, nightTop, t), mix(dayHor, dayTop, t), 1.0 - uNight);
@@ -192,10 +193,11 @@ vec3 shadeHit(vec3 ro, vec3 rd, float t, float matId) {
   float spec = pow(max(dot(reflect(-lightDir, n), -rd), 0.0), 64.0);
   float fresnel = pow(1.0 - max(dot(n, -rd), 0.0), 3.0);
 
-  vec3 deepWater = vec3(0.04, 0.18, 0.32);
-  vec3 shallow = vec3(0.15, 0.48, 0.68);
+  // Day leans light teal + mint; night keeps deep arctic blues
+  vec3 deepWater = mix(vec3(0.12, 0.42, 0.48), vec3(0.04, 0.18, 0.32), uNight);
+  vec3 shallow = mix(vec3(0.28, 0.68, 0.62), vec3(0.15, 0.48, 0.68), uNight);
   vec3 foam = vec3(0.82, 0.92, 0.98);
-  vec3 iceCol = vec3(0.78, 0.9, 0.97);
+  vec3 iceCol = mix(vec3(0.88, 0.96, 0.94), vec3(0.78, 0.9, 0.97), uNight);
   vec3 iceSpec = vec3(0.95, 0.98, 1.0);
 
   vec3 col;
@@ -203,20 +205,21 @@ vec3 shadeHit(vec3 ro, vec3 rd, float t, float matId) {
     float crest = smoothstep(-0.02, 0.14, waveHeight(p.xz) - waveHeight(p.xz + vec2(0.03)));
     col = mix(deepWater, shallow, diff * 0.65 + 0.2);
     col = mix(col, foam, crest * 0.35);
-    col += vec3(0.5, 0.7, 0.9) * spec * 0.45;
+    col += mix(vec3(0.45, 0.85, 0.7), vec3(0.5, 0.7, 0.9), uNight) * spec * 0.45;
     col += shallow * fresnel * 0.25;
     float dist = length(p.xz) * 0.04;
-    col = mix(col, vec3(0.02, 0.1, 0.2), clamp(dist, 0.0, 0.65));
+    vec3 farWater = mix(vec3(0.2, 0.52, 0.58), vec3(0.02, 0.1, 0.2), uNight);
+    col = mix(col, farWater, clamp(dist, 0.0, 0.65));
   } else {
     col = iceCol * (0.55 + diff * 0.45);
     col += iceSpec * spec * 0.85;
-    col += vec3(0.6, 0.8, 0.95) * fresnel * 0.3;
+    col += mix(vec3(0.55, 0.85, 0.75), vec3(0.6, 0.8, 0.95), uNight) * fresnel * 0.3;
     float frost = smoothstep(0.3, 0.9, fbm(p.xz * 3.0 + uTime * 0.05));
     col = mix(col, vec3(0.95, 0.98, 1.0), frost * 0.15);
   }
 
   float fog = 1.0 - exp(-t * 0.045);
-  vec3 fogCol = mix(vec3(0.5, 0.72, 0.85), vec3(0.04, 0.07, 0.12), uNight);
+  vec3 fogCol = mix(vec3(0.55, 0.82, 0.78), vec3(0.04, 0.07, 0.12), uNight);
   col = mix(col, fogCol, fog * 0.7);
   return col;
 }
@@ -226,14 +229,32 @@ vec3 duotone(vec3 col) {
   float luma = dot(col, vec3(0.299, 0.587, 0.114));
   luma = smoothstep(0.02, 0.98, luma);
 
-  vec3 dayLo = vec3(0.04, 0.16, 0.28);
-  vec3 dayHi = vec3(0.35, 0.72, 0.92);
+  vec3 dayLo = vec3(0.12, 0.42, 0.48);
+  vec3 dayHi = vec3(0.55, 0.88, 0.82);
   vec3 nightLo = vec3(0.01, 0.02, 0.05);
   vec3 nightHi = vec3(0.82, 0.88, 0.96);
 
   vec3 lo = mix(dayLo, nightLo, uNight);
   vec3 hi = mix(dayHi, nightHi, uNight);
   return mix(lo, hi, luma);
+}
+
+// Soft ice-flower bloom in screen space (petals + frost core)
+vec3 iceFlowerBloom(vec2 uv, float night) {
+  vec2 c = uv - vec2(0.5, 0.48);
+  c.x *= uResolution.x / max(uResolution.y, 1.0);
+  float r = length(c);
+  float ang = atan(c.y, c.x) + uTime * 0.04;
+  float petals = pow(abs(sin(ang * 3.0)), 2.35);
+  float ring = smoothstep(0.42, 0.18, r) * smoothstep(0.02, 0.14, r);
+  float core = exp(-r * 9.0) * 0.55;
+  float frost = fbm(c * 3.2 + uTime * 0.05);
+  float bloom = (petals * ring * (0.55 + frost * 0.45) + core) * mix(0.22, 0.38, night);
+  vec3 teal = vec3(0.29, 0.56, 0.64);
+  vec3 mint = vec3(0.36, 0.66, 0.54);
+  vec3 frostCol = vec3(0.91, 0.96, 0.98);
+  return mix(teal, frostCol, clamp(core * 1.8 + petals * 0.35, 0.0, 1.0)) * bloom
+    + mint * bloom * 0.25;
 }
 
 void main() {
@@ -261,6 +282,8 @@ void main() {
   if (uNight > 0.5 && isSky) {
     col += starColor(rd) * 1.35;
   }
+
+  col += iceFlowerBloom(uv, uNight);
 
   col = pow(col, vec3(0.92));
   fragColor = vec4(col, 1.0);

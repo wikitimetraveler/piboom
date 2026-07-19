@@ -1,32 +1,74 @@
 /**
- * Finance Wall of Fire — realistic Three.js flame wall.
+ * Ocean Ice Flower — WebGL2 ice-ocean auth gate (zen).
+ * Uses public/shared/shaders/ice-ocean-raymarch.glsl
  * Development work by David Lane
  */
 (function (global) {
   'use strict';
 
-  const THREE_CDN = 'https://unpkg.com/three@0.161.0/build/three.min.js';
   const OVERLAY_ID = 'financeAuthOverlay';
+  const SHADER_VERSION = '7';
+  const SHADER_URL = '/shared/shaders/ice-ocean-raymarch.glsl?v=' + SHADER_VERSION;
 
-  let renderer = null;
-  let scene = null;
-  let camera = null;
+  const VERT_SRC = `#version 300 es
+    in vec2 aPos;
+    out vec2 vUv;
+    void main() {
+      vUv = aPos * 0.5 + 0.5;
+      gl_Position = vec4(aPos, 0.0, 1.0);
+    }
+  `;
+
+  let gl = null;
+  let program = null;
   let rafId = 0;
   let startTime = 0;
-  let lastFrame = 0;
   let resizeHandler = null;
   let visHandler = null;
-  let flameLayers = [];
-  let emberSystems = [];
-  let heatLight = null;
-  let coalMesh = null;
-  let smokeMesh = null;
+  let themeObserver = null;
   let running = false;
+  let pixelScale = 1;
+  let uniforms = {};
+  let frameSamples = [];
+  let lastQualityAdjust = 0;
+  let nightUniform = 1;
+
+  function isDarkTheme() {
+    const body = document.body;
+    if (!body) return true;
+    if (body.classList.contains('portfolio-dark') || body.classList.contains('dark-mode')) {
+      return true;
+    }
+    if (body.classList.contains('portfolio-page') || body.classList.contains('ice-landing')) {
+      return false;
+    }
+    try {
+      const saved = localStorage.getItem('portfolioTheme') || localStorage.getItem('iceLandingTheme');
+      if (saved === 'light') return false;
+      if (saved === 'dark') return true;
+      if (saved === 'auto' && global.matchMedia) {
+        return global.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
+    } catch (_) {}
+    return !!(global.matchMedia && global.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  function nightValue() {
+    return isDarkTheme() ? 1 : 0;
+  }
+
+  function syncThemeToOverlay() {
+    nightUniform = nightValue();
+    const overlay = document.getElementById(OVERLAY_ID);
+    if (!overlay) return;
+    overlay.classList.toggle('finance-fire-gate--light', nightUniform < 0.5);
+    overlay.classList.toggle('finance-fire-gate--dark', nightUniform >= 0.5);
+  }
 
   let burnAudio = null;
   let songPlaying = false;
   const SONG_MUTE_KEY = 'financeFireGateMuteSong';
-  /** Real MP3: Loyalty Freak Music — I'M ON FIRE (CC0). Not The Trammps' Disco Inferno. */
+  /** Ambient bed optional — same CC0 file; quiet for ice theme. */
   const BURN_SONG_URL = '/shared/audio/im-on-fire.mp3';
 
   function isSongMuted() {
@@ -77,30 +119,20 @@
     try {
       const audio = new Audio(BURN_SONG_URL);
       audio.loop = true;
-      audio.volume = 0.72;
+      audio.volume = 0.32;
       audio.preload = 'auto';
       burnAudio = audio;
       songPlaying = true;
 
       audio.onerror = () => {
-        console.warn(
-          'Wall of Fire song missing at public/shared/audio/im-on-fire.mp3'
-        );
         songPlaying = false;
         burnAudio = null;
-        const copy = document.querySelector('.finance-fire-gate__copy');
-        if (copy && !copy.dataset.songHint) {
-          copy.dataset.songHint = '1';
-          copy.textContent +=
-            ' (Song file missing — add public/shared/audio/im-on-fire.mp3.)';
-        }
       };
 
       await audio.play();
     } catch (err) {
-      // Autoplay blocked — first tap on the wall will retry via unlock handler
       songPlaying = false;
-      console.warn('Wall of Fire song autoplay waiting for tap:', err && err.message);
+      console.warn('Ocean Ice Flower song autoplay waiting for tap:', err && err.message);
     }
   }
 
@@ -114,218 +146,8 @@
     }
   }
 
-  const FLAME_VERT = /* glsl */ `
-    varying vec2 vUv;
-    void main() {
-      vUv = uv;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-    }
-  `;
-
-  // Narrow flame column — teardrop alpha kills the rectangular plane edges
-  const FLAME_COLUMN_VERT = /* glsl */ `
-    varying vec2 vUv;
-    uniform float uTime;
-    uniform float uSeed;
-    void main() {
-      vUv = uv;
-      vec3 pos = position;
-      float sway = sin(uv.y * 7.5 + uTime * (2.4 + uSeed) + uSeed * 12.0) * 0.14 * uv.y;
-      sway += sin(uv.y * 13.0 - uTime * 3.1 + uSeed * 5.0) * 0.05 * uv.y;
-      pos.x += sway;
-      pos.z += cos(uv.y * 5.0 + uTime * 1.8 + uSeed) * 0.04 * uv.y;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-    }
-  `;
-
-  const FLAME_COLUMN_FRAG = /* glsl */ `
-    precision highp float;
-    varying vec2 vUv;
-    uniform float uTime;
-    uniform float uIntensity;
-    uniform float uSeed;
-
-    float hash(vec2 p) {
-      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
-    }
-
-    float noise(vec2 p) {
-      vec2 i = floor(p);
-      vec2 f = fract(p);
-      vec2 u = f * f * (3.0 - 2.0 * f);
-      float a = hash(i);
-      float b = hash(i + vec2(1.0, 0.0));
-      float c = hash(i + vec2(0.0, 1.0));
-      float d = hash(i + vec2(1.0, 1.0));
-      return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-    }
-
-    float fbm(vec2 p) {
-      float v = 0.0;
-      float a = 0.5;
-      for (int i = 0; i < 5; i++) {
-        v += a * noise(p);
-        p = p * 2.05 + vec2(1.7, 9.2);
-        a *= 0.5;
-      }
-      return v;
-    }
-
-    void main() {
-      vec2 uv = vUv;
-      float x = (uv.x - 0.5) * 2.0;
-      float y = uv.y;
-
-      float width = mix(0.92, 0.05, pow(y, 0.78));
-      float edge = abs(x) / max(width, 0.04);
-      float body = 1.0 - smoothstep(0.42, 1.0, edge);
-      body *= smoothstep(0.0, 0.07, y) * smoothstep(1.02, 0.22, y);
-      body *= 0.45 + 0.55 * (1.0 - y);
-
-      float rise = uTime * (1.35 + fract(uSeed * 0.31) * 0.8) + uSeed * 4.0;
-      float n = fbm(vec2(x * 1.6 + uSeed, y * 4.2 - rise));
-      float n2 = fbm(vec2(x * 3.0 + uSeed * 2.0, y * 7.0 - rise * 1.6));
-      body *= 0.42 + 0.85 * n;
-      body += n2 * 0.18 * (1.0 - y);
-      body = clamp(body, 0.0, 1.2);
-
-      if (body < 0.06) discard;
-
-      float core = smoothstep(0.28, 0.82, body);
-      float tip = smoothstep(0.5, 1.0, body) * pow(1.0 - y, 1.1);
-
-      vec3 col = mix(vec3(0.55, 0.02, 0.0), vec3(1.0, 0.38, 0.0), core);
-      col = mix(col, vec3(1.0, 0.82, 0.05), pow(core, 1.2) * 1.0);
-      col = mix(col, vec3(1.0, 0.98, 0.88), pow(tip, 1.3) * 0.95);
-
-      float base = exp(-pow(y / 0.12, 2.0)) * smoothstep(0.1, 0.8, 1.0 - abs(x));
-      col += vec3(1.0, 0.45, 0.06) * base * 0.85;
-      col += vec3(1.0, 0.72, 0.18) * base * base * 0.45;
-
-      float flicker = 0.9 + 0.18 * sin(uTime * 13.0 + uSeed * 20.0 + n * 6.0)
-        + 0.08 * sin(uTime * 21.0 + uSeed * 8.0);
-      col *= flicker * uIntensity * 1.28;
-      col = mix(col, col * col * 1.15, 0.12);
-
-      float alpha = body * (0.95 + tip * 0.45) * uIntensity * 1.15;
-      alpha = pow(clamp(alpha, 0.0, 1.0), 0.92);
-      if (alpha < 0.04) discard;
-
-      gl_FragColor = vec4(col, alpha);
-    }
-  `;
-
-  const SMOKE_FRAG = /* glsl */ `
-    precision highp float;
-    varying vec2 vUv;
-    uniform float uTime;
-
-    float hash(vec2 p) {
-      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-    }
-    float noise(vec2 p) {
-      vec2 i = floor(p);
-      vec2 f = fract(p);
-      float a = hash(i);
-      float b = hash(i + vec2(1.0, 0.0));
-      float c = hash(i + vec2(0.0, 1.0));
-      float d = hash(i + vec2(1.0, 1.0));
-      vec2 u = f * f * (3.0 - 2.0 * f);
-      return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
-    }
-    float fbm(vec2 p) {
-      float v = 0.0;
-      float a = 0.5;
-      for (int i = 0; i < 5; i++) {
-        v += a * noise(p);
-        p *= 2.03;
-        a *= 0.5;
-      }
-      return v;
-    }
-
-    void main() {
-      vec2 uv = vUv;
-      float t = uTime * 0.35;
-      float n = fbm(vec2(uv.x * 2.5, uv.y * 1.6 - t));
-      float plume = smoothstep(0.35, 0.9, n) * smoothstep(0.12, 0.6, uv.y) * smoothstep(1.1, 0.5, uv.y);
-      float side = smoothstep(0.05, 0.25, uv.x) * smoothstep(0.95, 0.75, uv.x);
-      float a = plume * side * 0.18;
-      if (a < 0.01) discard;
-      vec3 col = vec3(0.08, 0.06, 0.05);
-      gl_FragColor = vec4(col, a);
-    }
-  `;
-
-  const EMBER_VERT = /* glsl */ `
-    attribute float aSpeed;
-    attribute float aSize;
-    attribute float aSeed;
-    uniform float uTime;
-    varying float vLife;
-    varying float vSeed;
-    void main() {
-      vSeed = aSeed;
-      vec3 p = position;
-      float life = fract(aSeed + uTime * aSpeed * 0.12);
-      vLife = life;
-      p.y += life * 3.6;
-      p.x += sin(uTime * (1.2 + aSeed) + aSeed * 40.0) * 0.18 * life;
-      p.z += cos(uTime * (0.9 + aSeed * 0.5) + aSeed * 20.0) * 0.12 * life;
-      vec4 mv = modelViewMatrix * vec4(p, 1.0);
-      float fade = 1.0 - life;
-      gl_PointSize = aSize * (280.0 / max(-mv.z, 0.5)) * (0.55 + fade * 0.9);
-      gl_Position = projectionMatrix * mv;
-    }
-  `;
-
-  const EMBER_FRAG = /* glsl */ `
-    precision highp float;
-    varying float vLife;
-    varying float vSeed;
-    void main() {
-      vec2 p = gl_PointCoord;
-      p.y = 1.0 - p.y;
-      float x = (p.x - 0.5) * 2.0;
-      float y = p.y;
-      float width = mix(1.0, 0.08, pow(y, 0.65));
-      float edge = abs(x) / max(width, 0.05);
-      if (edge > 1.0 || y < 0.0 || y > 1.0) discard;
-      float soft = (1.0 - smoothstep(0.35, 1.0, edge)) * smoothstep(0.0, 0.12, y) * smoothstep(1.0, 0.55, y);
-      soft = pow(soft, 1.15);
-      if (soft < 0.02) discard;
-      float lifeFade = pow(1.0 - vLife, 0.75);
-      vec3 hot = mix(vec3(1.0, 0.95, 0.65), vec3(1.0, 0.42, 0.02), vLife);
-      hot = mix(hot, vec3(1.0, 1.0, 0.92), soft * (1.0 - vLife) * 0.65);
-      float spark = mix(0.75, 1.35, step(0.68, fract(vSeed * 17.3)));
-      gl_FragColor = vec4(hot * spark * 1.2, soft * lifeFade * 1.0);
-    }
-  `;
-
   function prefersReducedMotion() {
     return !!(global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  }
-
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
-      if (global.THREE) {
-        resolve();
-        return;
-      }
-      const existing = document.querySelector('script[src="' + src + '"]');
-      if (existing) {
-        existing.addEventListener('load', () => resolve());
-        existing.addEventListener('error', () => reject(new Error('Failed to load Three.js')));
-        if (global.THREE) resolve();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = src;
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load Three.js'));
-      document.head.appendChild(script);
-    });
   }
 
   function ensureStyles() {
@@ -337,6 +159,12 @@
     document.head.appendChild(link);
   }
 
+  function gateCopy(homeMode) {
+    return homeMode
+      ? 'Encompass and Worksheets tools stay behind the ice flower until you log in. Public demos remain open beyond the bloom.'
+      : 'Worksheets and Encompass tools rest beyond the ice until you log in.';
+  }
+
   function createOverlayShell(options) {
     const opts = options || {};
     const homeMode = !!opts.homeMode;
@@ -346,9 +174,6 @@
       return overlay;
     }
 
-    const copy = homeMode
-      ? 'Encompass and Worksheets tools burn behind this wall until you log in. Public demos stay open beyond the flames.'
-      : 'Worksheets and Encompass tools stay behind the wall of fire until you log in.';
     const secondaryLabel = homeMode ? 'Continue to Public Portfolio' : 'Back to Home';
     const secondaryId = homeMode ? 'financeAuthDismissBtn' : 'financeAuthHomeBtn';
 
@@ -363,17 +188,25 @@
       '<canvas class="finance-fire-gate__canvas" id="financeFireCanvas" aria-hidden="true"></canvas>' +
       '<div class="finance-fire-gate__fallback" id="financeFireFallback" hidden aria-hidden="true"></div>' +
       '<div class="finance-fire-gate__veil" aria-hidden="true"></div>' +
-      '<h2 class="finance-fire-gate__skyline" id="financeFireGateTitle">Burn Baby Burn</h2>' +
+      '<div class="finance-fire-gate__bloom" aria-hidden="true"></div>' +
+      '<h2 class="finance-fire-gate__skyline" id="financeFireGateTitle">LOS <span class="finance-fire-gate__ai" aria-label="AI">ai</span> Labs</h2>' +
       '<div class="finance-fire-gate__card">' +
-      '<div class="finance-fire-gate__ember" aria-hidden="true">🔥</div>' +
-      '<p class="finance-fire-gate__copy">' + copy + '</p>' +
-      '<button type="button" class="finance-fire-gate__btn finance-fire-gate__btn--primary" id="financeAuthLoginBtn">Log In to Pass Through</button>' +
+      '<div class="finance-fire-gate__ember" aria-hidden="true"><i class="bi bi-snow2"></i></div>' +
+      '<p class="finance-fire-gate__copy">' +
+      gateCopy(homeMode) +
+      '</p>' +
+      '<button type="button" class="finance-fire-gate__btn finance-fire-gate__btn--primary" id="financeAuthLoginBtn">Enter through the Ice</button>' +
       '<button type="button" class="finance-fire-gate__btn finance-fire-gate__btn--ghost" id="financeAuthMuteBtn" aria-pressed="false">Mute song</button>' +
-      '<button type="button" class="finance-fire-gate__btn finance-fire-gate__btn--ghost" id="' + secondaryId + '">' + secondaryLabel + '</button>' +
+      '<button type="button" class="finance-fire-gate__btn finance-fire-gate__btn--ghost" id="' +
+      secondaryId +
+      '">' +
+      secondaryLabel +
+      '</button>' +
       '</div>';
 
     document.body.appendChild(overlay);
     document.body.style.overflow = 'hidden';
+    syncThemeToOverlay();
 
     overlay.querySelector('#financeAuthLoginBtn')?.addEventListener('click', () => {
       if (typeof global.showLoginPopup === 'function') {
@@ -394,7 +227,6 @@
     });
     updateMuteButton();
 
-    // Autoplay often needs a gesture — first tap starts the jam if blocked
     const unlockSong = () => {
       if (!isSongMuted()) {
         playBurnSong();
@@ -410,233 +242,87 @@
     overlay.dataset.homeMode = homeMode ? '1' : '0';
     const titleEl = overlay.querySelector('#financeFireGateTitle');
     const copyEl = overlay.querySelector('.finance-fire-gate__copy');
-    if (titleEl) titleEl.textContent = 'Burn Baby Burn';
-    if (copyEl) {
-      copyEl.textContent = homeMode
-        ? 'Encompass and Worksheets tools burn behind this wall until you log in. Public demos stay open beyond the flames.'
-        : 'Worksheets and Encompass tools stay behind the wall of fire until you log in.';
+    if (titleEl) {
+      titleEl.innerHTML =
+        'LOS <span class="finance-fire-gate__ai" aria-label="AI">ai</span> Labs';
+    }
+    if (copyEl) copyEl.textContent = gateCopy(homeMode);
+  }
+
+  function compileShader(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src);
+    gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      const log = gl.getShaderInfoLog(sh);
+      gl.deleteShader(sh);
+      throw new Error(log || 'Shader compile failed');
+    }
+    return sh;
+  }
+
+  function createProgram(vs, fs) {
+    const p = gl.createProgram();
+    gl.attachShader(p, compileShader(gl.VERTEX_SHADER, vs));
+    gl.attachShader(p, compileShader(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+      throw new Error(gl.getProgramInfoLog(p) || 'Program link failed');
+    }
+    return p;
+  }
+
+  function resizeCanvas(canvas) {
+    if (!canvas || !gl) return;
+    const w = Math.max(1, Math.floor((canvas.clientWidth || window.innerWidth) * pixelScale));
+    const h = Math.max(1, Math.floor((canvas.clientHeight || window.innerHeight) * pixelScale));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    gl.viewport(0, 0, w, h);
+  }
+
+  function adaptQuality(frameMs) {
+    // Canvas resize clears the buffer and looks like a blink — only step down
+    // when consistently slow, with a long cooldown so it can't oscillate.
+    frameSamples.push(frameMs);
+    if (frameSamples.length < 90) return;
+    const avg = frameSamples.reduce((a, b) => a + b, 0) / frameSamples.length;
+    frameSamples = [];
+    const now = performance.now();
+    if (now - lastQualityAdjust < 8000) return;
+    if (avg > 24 && pixelScale > 0.55) {
+      pixelScale = Math.max(0.55, pixelScale * 0.85);
+      lastQualityAdjust = now;
+      if (gl && gl.canvas) resizeCanvas(gl.canvas);
     }
   }
 
-  function makeEmberSystem(THREE, count, spreadX, z, sizeScale, speedScale) {
-    const positions = new Float32Array(count * 3);
-    const speeds = new Float32Array(count);
-    const sizes = new Float32Array(count);
-    const seeds = new Float32Array(count);
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * spreadX;
-      positions[i * 3 + 1] = -1.6 + Math.random() * 0.6;
-      positions[i * 3 + 2] = z + (Math.random() - 0.5) * 0.8;
-      speeds[i] = (0.55 + Math.random() * 1.4) * speedScale;
-      sizes[i] = (0.035 + Math.random() * 0.09) * sizeScale;
-      seeds[i] = Math.random();
-    }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    geo.setAttribute('aSpeed', new THREE.BufferAttribute(speeds, 1));
-    geo.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
-    geo.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
-    const mat = new THREE.ShaderMaterial({
-      vertexShader: EMBER_VERT,
-      fragmentShader: EMBER_FRAG,
-      uniforms: { uTime: { value: 0 } },
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      alphaTest: 0.03,
-    });
-    return new THREE.Points(geo, mat);
-  }
-
-  function makeFlameColumn(THREE, colIndex, colCount, layerIndex, intensity, z, xJitter) {
-    const seed = colIndex * 0.73 + layerIndex * 2.17 + 0.41;
-    const t = colCount > 1 ? colIndex / (colCount - 1) : 0.5;
-    const x = (t - 0.5) * 6.4 + xJitter;
-    const width = 0.32 + Math.sin(seed * 4.1) * 0.08;
-    const height = 4.0 + Math.sin(seed * 2.8) * 0.65 + layerIndex * 0.15;
-    const geo = new THREE.PlaneGeometry(width, height, 1, 24);
-    const mat = new THREE.ShaderMaterial({
-      vertexShader: FLAME_COLUMN_VERT,
-      fragmentShader: FLAME_COLUMN_FRAG,
-      uniforms: {
-        uTime: { value: 0 },
-        uIntensity: { value: intensity },
-        uSeed: { value: seed },
-      },
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      side: THREE.DoubleSide,
-    });
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set(x, -1.55 + height * 0.5, z);
-    mesh.rotation.z = Math.sin(seed * 3.3) * 0.04;
-    mesh.userData.layerIndex = layerIndex;
-    return mesh;
-  }
-
-  function buildFlameWall(THREE) {
-    const layers = [
-      { cols: 22, z: 0.12, intensity: 1.38, jitter: 0.0 },
-      { cols: 18, z: -0.28, intensity: 1.18, jitter: 0.11 },
-      { cols: 15, z: 0.38, intensity: 1.0, jitter: -0.08 },
-      { cols: 12, z: -0.12, intensity: 0.88, jitter: 0.05 },
-    ];
-    const meshes = [];
-    layers.forEach((layer, layerIndex) => {
-      for (let i = 0; i < layer.cols; i++) {
-        const jitter = layer.jitter + (Math.sin(i * 1.9 + layerIndex) * 0.07);
-        meshes.push(
-          makeFlameColumn(THREE, i, layer.cols, layerIndex, layer.intensity, layer.z, jitter)
-        );
-      }
-    });
-    return meshes;
-  }
-
-  function buildScene(canvas) {
-    const THREE = global.THREE;
-    const w = canvas.clientWidth || window.innerWidth;
-    const h = canvas.clientHeight || window.innerHeight;
-
-    scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x120401, 0.028);
-
-    camera = new THREE.PerspectiveCamera(50, w / Math.max(h, 1), 0.1, 100);
-    camera.position.set(0, 0.2, 4.0);
-
-    renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-      antialias: true,
-      alpha: false,
-      powerPreference: 'high-performance',
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(w, h, false);
-    renderer.setClearColor(0x070201, 1);
-    if (renderer.outputColorSpace !== undefined) {
-      renderer.outputColorSpace = THREE.SRGBColorSpace || renderer.outputColorSpace;
-    }
-
-    scene.add(new THREE.AmbientLight(0xff5a18, 0.82));
-    heatLight = new THREE.PointLight(0xff8a28, 5.2, 18, 1.8);
-    heatLight.position.set(0, -0.6, 2.0);
-    scene.add(heatLight);
-
-    const fill = new THREE.PointLight(0xff3300, 2.8, 16, 1.8);
-    fill.position.set(0, -1.2, 1.2);
-    scene.add(fill);
-
-    const rim = new THREE.PointLight(0xffcc44, 1.8, 12, 2);
-    rim.position.set(0, 0.4, 1.5);
-    scene.add(rim);
-
-    flameLayers = buildFlameWall(THREE);
-    flameLayers.forEach((m) => scene.add(m));
-
-    // Rising smoke plume behind flames
-    const smokeGeo = new THREE.PlaneGeometry(7.2, 5.0, 1, 1);
-    const smokeMat = new THREE.ShaderMaterial({
-      vertexShader: FLAME_VERT,
-      fragmentShader: SMOKE_FRAG,
-      uniforms: { uTime: { value: 0 } },
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.NormalBlending,
-    });
-    smokeMesh = new THREE.Mesh(smokeGeo, smokeMat);
-    smokeMesh.position.set(0, 0.35, -0.7);
-    scene.add(smokeMesh);
-
-    // Glowing coal bed
-    const coalGeo = new THREE.CircleGeometry(3.2, 64);
-    const coalMat = new THREE.MeshBasicMaterial({
-      color: 0xff4800,
-      transparent: true,
-      opacity: 0.44,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-    });
-    coalMesh = new THREE.Mesh(coalGeo, coalMat);
-    coalMesh.rotation.x = -Math.PI / 2;
-    coalMesh.position.set(0, -1.7, 0.35);
-    scene.add(coalMesh);
-
-    const coalInner = new THREE.Mesh(
-      new THREE.CircleGeometry(1.6, 48),
-      new THREE.MeshBasicMaterial({
-        color: 0xffdd77,
-        transparent: true,
-        opacity: 0.38,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-    );
-    coalInner.rotation.x = -Math.PI / 2;
-    coalInner.position.set(0, -1.68, 0.35);
-    scene.add(coalInner);
-
-    emberSystems = [
-      makeEmberSystem(THREE, 950, 6.2, 0.15, 1.25, 1.15),
-      makeEmberSystem(THREE, 480, 5.0, -0.25, 0.95, 1.5),
-      makeEmberSystem(THREE, 280, 4.2, 0.45, 1.55, 0.9),
-    ];
-    emberSystems.forEach((p) => scene.add(p));
-  }
-
-  function onResize() {
-    if (!renderer || !camera) return;
-    const canvas = renderer.domElement;
-    const w = canvas.clientWidth || window.innerWidth;
-    const h = canvas.clientHeight || window.innerHeight;
-    camera.aspect = w / Math.max(h, 1);
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h, false);
-  }
-
-  function tick(now) {
-    if (!running || !renderer || !scene || !camera) return;
-    rafId = requestAnimationFrame(tick);
+  function render(now) {
+    if (!running || !gl || !program) return;
+    rafId = requestAnimationFrame(render);
     if (document.hidden) return;
 
-    const t = (now - startTime) * 0.001;
-    const dt = Math.min(0.05, ((now - lastFrame) || 16) * 0.001);
-    lastFrame = now;
+    const t0 = performance.now();
+    if (!startTime) startTime = now;
+    const elapsed = (now - startTime) * 0.001;
 
-    flameLayers.forEach((mesh, i) => {
-      if (mesh.material && mesh.material.uniforms) {
-        mesh.material.uniforms.uTime.value = t + (mesh.userData.layerIndex || 0) * 0.45;
-      }
-      const seed = mesh.material?.uniforms?.uSeed?.value || i;
-      mesh.rotation.z = Math.sin(t * 0.4 + seed) * 0.018;
-    });
+    gl.useProgram(program);
+    gl.uniform1f(uniforms.uTime, elapsed);
+    gl.uniform1f(uniforms.uNight, nightUniform);
+    gl.uniform2f(uniforms.uResolution, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    gl.uniform2f(uniforms.uFocal, 1.35, 1.35);
 
-    if (smokeMesh && smokeMesh.material && smokeMesh.material.uniforms) {
-      smokeMesh.material.uniforms.uTime.value = t;
+    if (nightUniform >= 0.5) {
+      gl.clearColor(0.04, 0.08, 0.14, 1);
+    } else {
+      gl.clearColor(0.32, 0.62, 0.78, 1);
     }
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
 
-    emberSystems.forEach((points) => {
-      if (points.material && points.material.uniforms) {
-        points.material.uniforms.uTime.value = t;
-      }
-    });
-
-    if (heatLight) {
-      heatLight.intensity = 4.2 + Math.sin(t * 8.5) * 1.1 + Math.sin(t * 15.0) * 0.55;
-      heatLight.position.x = Math.sin(t * 1.3) * 0.3;
-    }
-
-    if (coalMesh) {
-      coalMesh.material.opacity = 0.36 + Math.sin(t * 6.5) * 0.1;
-      coalMesh.scale.setScalar(1 + Math.sin(t * 2.5) * 0.05);
-    }
-
-    camera.position.x = Math.sin(t * 0.28) * 0.14;
-    camera.position.y = 0.18 + Math.sin(t * 0.19) * 0.05;
-    camera.position.z = 4.0 + Math.sin(t * 0.15) * 0.08;
-    camera.lookAt(0, 0.1, 0);
-
-    renderer.render(scene, camera);
+    adaptQuality(performance.now() - t0);
   }
 
   function showFallback(overlay) {
@@ -644,15 +330,6 @@
     const fallback = overlay.querySelector('#financeFireFallback');
     if (canvas) canvas.hidden = true;
     if (fallback) fallback.hidden = false;
-  }
-
-  function disposeObject(obj) {
-    if (!obj) return;
-    if (obj.geometry) obj.geometry.dispose();
-    if (obj.material) {
-      if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
-      else obj.material.dispose();
-    }
   }
 
   function disposeScene() {
@@ -669,23 +346,58 @@
       document.removeEventListener('visibilitychange', visHandler);
       visHandler = null;
     }
-    flameLayers.forEach(disposeObject);
-    emberSystems.forEach(disposeObject);
-    disposeObject(smokeMesh);
-    disposeObject(coalMesh);
-    flameLayers = [];
-    emberSystems = [];
-    smokeMesh = null;
-    coalMesh = null;
-    heatLight = null;
-    if (renderer) {
+    if (gl) {
       try {
-        renderer.dispose();
+        const ext = gl.getExtension('WEBGL_lose_context');
+        if (ext) ext.loseContext();
       } catch (_) {}
-      renderer = null;
+      gl = null;
     }
-    scene = null;
-    camera = null;
+    program = null;
+    uniforms = {};
+    frameSamples = [];
+    lastQualityAdjust = 0;
+  }
+
+  function disposeThemeObserver() {
+    if (themeObserver) {
+      themeObserver.disconnect();
+      themeObserver = null;
+    }
+  }
+
+  async function bootIceOcean(canvas) {
+    const fragSrc = await fetch(SHADER_URL).then((r) => {
+      if (!r.ok) throw new Error('Shader fetch failed');
+      return r.text();
+    });
+
+    gl = canvas.getContext('webgl2', {
+      alpha: false,
+      antialias: false,
+      powerPreference: 'high-performance',
+    });
+    if (!gl) throw new Error('WebGL2 unavailable');
+
+    program = createProgram(VERT_SRC, fragSrc);
+
+    const posBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+
+    const aPos = gl.getAttribLocation(program, 'aPos');
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+    uniforms = {
+      uTime: gl.getUniformLocation(program, 'uTime'),
+      uNight: gl.getUniformLocation(program, 'uNight'),
+      uResolution: gl.getUniformLocation(program, 'uResolution'),
+      uFocal: gl.getUniformLocation(program, 'uFocal'),
+    };
+
+    pixelScale = Math.min(window.devicePixelRatio || 1, 1.15);
+    resizeCanvas(canvas);
   }
 
   async function mount(options) {
@@ -699,8 +411,14 @@
       if (card) card.style.display = 'none';
     }
 
-    // Kick off Burn Baby Burn as soon as the wall appears
     playBurnSong();
+    syncThemeToOverlay();
+    if (!themeObserver) {
+      themeObserver = new MutationObserver(() => {
+        syncThemeToOverlay();
+      });
+      themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    }
 
     if (prefersReducedMotion()) {
       showFallback(overlay);
@@ -709,30 +427,29 @@
 
     const canvas = overlay.querySelector('#financeFireCanvas');
     try {
-      await loadScript(THREE_CDN);
-      if (!global.THREE || !canvas) {
+      if (!canvas) {
         showFallback(overlay);
         return overlay;
       }
       disposeScene();
-      buildScene(canvas);
-      startTime = performance.now();
-      lastFrame = startTime;
+      await bootIceOcean(canvas);
+      syncThemeToOverlay();
+      startTime = 0;
       running = true;
-      resizeHandler = onResize;
+      resizeHandler = () => resizeCanvas(canvas);
       window.addEventListener('resize', resizeHandler);
       visHandler = () => {
         if (!document.hidden && running && !rafId) {
-          rafId = requestAnimationFrame(tick);
+          rafId = requestAnimationFrame(render);
         }
       };
       document.addEventListener('visibilitychange', visHandler);
-      rafId = requestAnimationFrame(tick);
+      rafId = requestAnimationFrame(render);
       const fallback = overlay.querySelector('#financeFireFallback');
       if (fallback) fallback.hidden = true;
-      if (canvas) canvas.hidden = false;
+      canvas.hidden = false;
     } catch (err) {
-      console.warn('Finance fire gate: WebGL unavailable, using fallback', err);
+      console.warn('Ocean Ice Flower gate: WebGL unavailable, using fallback', err);
       showFallback(overlay);
     }
     return overlay;
@@ -741,6 +458,7 @@
   function unmount() {
     stopBurnSong();
     disposeScene();
+    disposeThemeObserver();
     const overlay = document.getElementById(OVERLAY_ID);
     if (overlay) overlay.remove();
     document.body.style.overflow = '';
@@ -760,11 +478,10 @@
         cancelAnimationFrame(rafId);
         rafId = 0;
       }
-    } else if (renderer && scene && camera && !prefersReducedMotion()) {
+    } else if (gl && program && !prefersReducedMotion()) {
       running = true;
-      startTime = performance.now();
-      lastFrame = startTime;
-      rafId = requestAnimationFrame(tick);
+      startTime = 0;
+      rafId = requestAnimationFrame(render);
     }
   }
 

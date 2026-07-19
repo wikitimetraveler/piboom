@@ -22,6 +22,13 @@ Central reference for environment variables used by DevConnect Labs. **Never com
 | `ENCOMPASS_AUTH_URL` | OAuth token URL (default: `https://concept.api.elliemae.com/oauth2/v1/token`) |
 | `ENCOMPASS_API_BASE` | API base URL (default: `https://concept.api.elliemae.com/encompass/v1`) |
 | `ENCOMPASS_WEBHOOK_SIGNING_KEY` | Webhook signature verification |
+| `ENCOMPASS_DOCS_SCRAPE_TOKEN` | Bearer / `x-encompass-docs-scrape-token` for hosted `POST /api/encompass-assistant/scrape` (localhost open when unset) |
+| `ENCOMPASS_DOCS_SCRAPE_DELAY_MS` | Throttle between Developer Connect scrape requests (default 1200ms) |
+| `ENCOMPASS_EMBEDDING_MODEL` | Embedding model for hybrid vector RAG (default `text-embedding-3-small`) |
+| `ENCOMPASS_DOCS_SKIP_EMBED` / `ICE_SKIP_EMBED` | `1` = build JSON index only, skip pgvector embeddings |
+| `GRAPH_EMBED_FORCE` | `1` = re-embed all disaster-graph nodes (`npm run embed:graph-nodes`) |
+
+Hybrid vector RAG + GraphRAG details: `docs/VECTOR_RAG.md`.
 
 ## Geocoding & Maps
 

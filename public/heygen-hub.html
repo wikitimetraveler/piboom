@@ -62,7 +62,66 @@
       <a class="btn btn-sm btn-outline-dark" href="/nature/newport-pier.html">
         <i class="bi bi-water"></i> Newport Pier
       </a>
+      <a class="btn btn-sm btn-outline-primary" href="#hvlExpertPanel">
+        <i class="bi bi-robot"></i> API Expert
+      </a>
     </div>
+
+    <section class="hvl-expert" id="hvlExpertPanel" aria-labelledby="hvlExpertTitle">
+      <div class="hvl-expert-head">
+        <div>
+          <p class="hvl-kicker mb-1">LangChain · RAG · voice</p>
+          <h2 class="hvl-expert-title" id="hvlExpertTitle">HeyGen API Expert</h2>
+          <p class="hvl-expert-lede">
+            Ask about Video Agent, direct <code>/v3/videos</code>, avatars, translation, HyperFrames, or this app’s
+            <code>/api/heygen</code> wrappers. Answers use retrieved docs (Postgres vectors when available) and
+            persistent LangChain memory — mic in, TTS out.
+          </p>
+        </div>
+        <span class="hvl-expert-badge" id="hvlExpertHealth" title="Knowledge index">…</span>
+      </div>
+
+      <div class="hvl-expert-quick">
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-hvl-expert-q="What's the difference between Video Agent and POST /v3/videos?">
+          Video Agent vs direct
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-hvl-expert-q="How do avatar groups and looks relate to avatar_id?">
+          Avatars &amp; looks
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-hvl-expert-q="How does DevConnect Labs generate a HeyGen video via /api/heygen/videos?">
+          Our /api/heygen
+        </button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" data-hvl-expert-q="How do webhooks and polling work for completed videos?">
+          Webhooks &amp; poll
+        </button>
+      </div>
+
+      <div class="hvl-expert-log" id="hvlExpertLog" role="log" aria-live="polite"></div>
+
+      <div class="hvl-expert-compose input-group">
+        <input
+          type="text"
+          class="form-control"
+          id="hvlExpertInput"
+          placeholder="Ask the HeyGen API expert…"
+          autocomplete="off"
+          aria-label="Message for HeyGen API expert"
+        />
+        <button type="button" class="btn btn-outline-secondary hvl-expert-voice" id="hvlExpertVoiceBtn" title="Voice input">
+          <i class="bi bi-mic" id="hvlExpertVoiceIcon"></i>
+        </button>
+        <button type="button" class="btn btn-outline-secondary" id="hvlExpertTapHear" style="display: none;" title="Tap to hear">
+          <i class="bi bi-volume-up-fill"></i>
+        </button>
+        <button type="button" class="btn btn-primary" id="hvlExpertSendBtn" title="Send">
+          <i class="bi bi-send"></i>
+        </button>
+      </div>
+      <div class="hvl-expert-footer">
+        <p class="small text-muted mb-0" id="hvlExpertStatus" role="status"></p>
+        <button type="button" class="btn btn-link btn-sm px-0" id="hvlExpertClearBtn">Clear chat</button>
+      </div>
+    </section>
 
     <p class="small text-muted mb-2" id="hvlStatus" role="status" aria-live="polite"></p>
     <div class="hvl-grid" id="hvlGrid" aria-live="polite"></div>
@@ -74,6 +133,8 @@
     </footer>
   </main>
 
+  <script src="/shared/tts.js"></script>
+  <script src="/shared/js/heygen-api-expert.js"></script>
   <script src="/shared/js/heygen-hub.js"></script>
 </body>
 </html>

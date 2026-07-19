@@ -187,6 +187,20 @@ router.post('/chat', async (req, res) => {
     res.json({
       message: aiMessage,
       context: combinedResults,
+      sources: combinedResults.slice(0, 8).map((item, idx) => ({
+        id: `S${idx + 1}`,
+        title: item.title || null,
+        repo: item.repo || null,
+        category: item.category || null,
+        sourceType: item.sourceType || null,
+        url: item.url || null,
+        retrieval: item.retrieval || null
+      })),
+      retrieval: {
+        vectorHits: combinedResults.filter((r) => r.retrieval === 'vector').length,
+        keywordHits: combinedResults.filter((r) => r.retrieval === 'keyword').length,
+        hybrid: true
+      },
       structuredAnalysis,
       timestamp: new Date().toISOString()
     });

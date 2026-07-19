@@ -154,7 +154,8 @@
     { label: 'OpenAI Vision', icon: 'bi-eye' },
     { label: 'HeyGen', icon: 'bi-camera-reels' },
     { label: 'Encompass / ICE APIs', icon: 'bi-bank2' },
-    { label: 'Bootstrap + vanilla JS', icon: 'bi-layout-text-window' },
+    { label: 'Brownfield: Bootstrap + vanilla JS', icon: 'bi-layout-text-window' },
+    { label: 'Greenfield: React + TypeScript', icon: 'bi-filetype-tsx' },
     { label: 'AG Grid & DataTables', icon: 'bi-table' },
     { label: 'Google Maps & geocoding', icon: 'bi-geo-alt' },
     { label: 'FEMA / NASA / NOAA feeds', icon: 'bi-cloud-lightning-rain' },
@@ -192,7 +193,8 @@
     {
       title: 'Frontend',
       items: [
-        { label: 'Bootstrap + vanilla JS', detail: 'No React — AG Grid and DataTables where needed', icon: 'bi-layout-text-window' },
+        { label: 'Brownfield (Encompass)', detail: 'Bootstrap + vanilla JS · AG Grid and DataTables', icon: 'bi-layout-text-window' },
+        { label: 'Greenfield apps', detail: 'React + TypeScript preferred for new product UIs', icon: 'bi-filetype-tsx' },
         { label: 'Design tokens', detail: 'Zen palette, dark mode, Lane heritage accents', icon: 'bi-palette' },
         { label: 'Voice widget', detail: 'Sitewide speech commands and TTS', icon: 'bi-mic' },
       ],

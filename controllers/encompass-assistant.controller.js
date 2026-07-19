@@ -6,6 +6,7 @@ import encompassDocsService from '../services/encompass-docs.service.js';
 import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import iceKnowledgeService from '../lib/knowledge/ice-knowledge.service.js';
+import { requireEncompassDocsScrapeAccess } from '../lib/encompass-docs-refresh-auth.js';
 
 const router = express.Router();
 
@@ -289,7 +290,14 @@ router.post('/chat', async (req, res) => {
         category: item.category || null,
         sourceType: item.sourceType || null,
         url: item.url || null,
+        retrieval: item.retrieval || null,
+        score: Number.isFinite(Number(item.score)) ? Number(item.score) : null
       })),
+      retrieval: {
+        vectorHits: combinedResults.filter((r) => r.retrieval === 'vector').length,
+        keywordHits: combinedResults.filter((r) => r.retrieval === 'keyword').length,
+        hybrid: true
+      },
       timestamp: new Date().toISOString()
     });
 
@@ -305,8 +313,16 @@ router.post('/chat', async (req, res) => {
 // Get documentation summary
 router.get('/summary', async (req, res) => {
   try {
-    const summary = await encompassDocsService.getDocsSummary();
-    res.json(summary);
+    const [docsSummary, iceSummary] = await Promise.all([
+      encompassDocsService.getDocsSummary(),
+      iceKnowledgeService.getSummary()
+    ]);
+    res.json({
+      docs: docsSummary,
+      ice: iceSummary,
+      hybridRag: true,
+      vectorStores: ['encompass_docs_chunks', 'ice_knowledge_chunks']
+    });
   } catch (error) {
     console.error('❌ Error getting docs summary:', error);
     res.status(500).json({ 
@@ -317,7 +333,7 @@ router.get('/summary', async (req, res) => {
 });
 
 // Scrape documentation (admin endpoint)
-router.post('/scrape', async (req, res) => {
+router.post('/scrape', requireEncompassDocsScrapeAccess, async (req, res) => {
   try {
     console.log('🔄 Starting Encompass documentation scraping...');
     const docs = await encompassDocsService.scrapeDocumentation();

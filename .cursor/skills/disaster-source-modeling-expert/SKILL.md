@@ -259,5 +259,5 @@ Return this structure at completion:
 - Prefer smallest safe changes that keep behavior stable.
 - Keep controllers thin and place business logic in services.
 - Do not add speculative sources or undocumented assumptions.
-- Do not introduce React or parallel disaster math libraries.
+- Do not introduce parallel disaster math libraries. React/TS is OK for non-Encompass disaster UIs per `AGENTS.md`.
 - When data is missing or external access is unavailable, report a blocker clearly and propose the smallest next step.

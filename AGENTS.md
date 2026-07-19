@@ -23,7 +23,10 @@ Primary active domains:
 The system runs on:
 
 * **Node.js / Express backend**
-* **Bootstrap + vanilla JS frontend**
+* **Frontend (brownfield vs greenfield):**
+  * **Brownfield** — Existing UIs you must keep working. Primary case: Encompass / Worksheets finance surfaces under `public/finance/` (Hub, field browsers, unit tests, processor assignment, Screen Test). Stack: **Bootstrap + vanilla JS**. Do **not** introduce React or TypeScript without an explicit migration request.
+  * **Greenfield** — New product UIs built from scratch (or new domains with no existing frontend). Prefer **React + TypeScript** — the usual modern frontend stack, also useful to demonstrate in a portfolio alongside Encompass Bootstrap work. Examples: new Lane/family, music, nature, or disasters UIs; other new domains.
+  * **Brownfield non-Encompass pages** — Existing Bootstrap + vanilla pages outside Encompass may stay as-is until an explicit migration; do not mix React/TS onto the same page without that request.
 * **PostgreSQL**
 * **LangChain + OpenAI assistants**
 
@@ -32,8 +35,11 @@ The system runs on:
 # Non-Negotiable Conventions
 
 * Prefer **service-layer logic in `services/`** over controllers.
-* Do **not introduce React**. Frontend is Bootstrap + vanilla JS.
-* Tables use **AG Grid or DataTables** depending on page.
+* **Frontend stack — brownfield vs greenfield:**
+  * **Brownfield (Encompass)** — Keep Bootstrap + vanilla JS. No React/TypeScript on those surfaces unless explicitly migrating.
+  * **Greenfield (new non-Encompass UIs)** — Prefer **React + TypeScript**. Prefer colocated app folders; keep service-layer backend conventions (`routes/` → thin controllers → `services/`).
+  * **Brownfield (existing non-Encompass Bootstrap pages)** — Preserve the current stack until an explicit migration.
+* Tables use **AG Grid or DataTables** depending on page (Encompass grids stay on the existing AG Grid + vanilla patterns).
 * Calculations must use:
 
 `public/shared/calculationEngine.js`
@@ -69,6 +75,7 @@ routes/encompass-*.routes.js
 | GSE scenario analyzer      | `public/gse-analyzer.html`, `routes/gse.routes.js`, `controllers/gse.controller.js`, `services/gse-scenario.service.js`, `data/gse/` |
 | AG Grid pages            | `unit-tests.html`, `encompass-custom-fields.html`, `encompass-native-fields.html`                                |
 | Hazard webcams (national) | `services/hazard-webcam-ingest.service.js`, `public/finance/disasters-webcams.html`, `npm run refresh:hazard-webcams` — see `docs/DISASTER_RISK.md`. Loan `disaster_risk_score` = **ops triage** (not probability); live `GET /api/disasters/near` ≠ graph `NEAR` without `seeded_at`. |
+| HeyGen hub + API Expert | `/heygen-hub.html` (library + voice/TTS expert panel); video API `/api/heygen/*`; expert RAG `/api/heygen-assistant/*` (`services/heygen-knowledge.service.js`, pgvector table `heygen_knowledge_chunks`); build `npm run build:heygen-knowledge` — see `docs/HEYGEN_KNOWLEDGE.md`. |
 | Lane family / genealogy | `public/family/`, `services/genealogy.service.js`, `routes/genealogy.routes.js` — maps: Google Maps JS (loader `lane-family-google-maps.js`) + server geocode `geocodeAddressFree` via `/api/genealogy/*`; see `docs/FRONTEND_PATTERNS.md` (Lane / family maps). **Lane hub/tool footer credit** (presentation + software byline): `public/family/js/lane-site-credit.js`. **Image lightbox:** `public/shared/lane-image-lightbox.js` (sitewide via `modern-navbar.js`; museum exhibit card uses `openElement` on `#museumPosterContent`). |
 
 ### Lane PDF plate gallery (tracked assets)

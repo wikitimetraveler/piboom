@@ -7,7 +7,7 @@ description: Builds or migrates public/nature discovery and collection static HT
 
 ## Project constraints
 
-- **Bootstrap 5** + **vanilla JS** only (`AGENTS.md`). No React.
+- This skill targets existing **Bootstrap 5** + **vanilla JS** nature pages. New non-Encompass apps may use React + TypeScript per `AGENTS.md`; do not mix stacks on the same page without an explicit migration.
 - Shared assets: `/shared/styles.css`, `/shared/menu-config.js`, `/shared/modern-navbar.js`, `/shared/user-selector.js` as needed.
 - Deeper patterns: `docs/FRONTEND_PATTERNS.md`.
 

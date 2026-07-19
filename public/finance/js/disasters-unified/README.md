@@ -11,5 +11,7 @@ Load **in this order** from `disasters-unified.html`:
 7. `app.js` — selection, AI, bootstrap
 
 Geo assets: `npm run build:us-geo` → `public/finance/assets/geo/`
+(writes `us-states.geojson`, `us-states.topojson`, and `counties/*.geojson` — **commit these** so production does not need a build step).
+State outlines load from `us-states.geojson` (no CDN). Fallback: local `/shared/vendor/topojson-client.min.js` + topojson.
 
 Regenerate from monolith: `node scripts/tools/split-disasters-unified.mjs`
