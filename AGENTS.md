@@ -119,6 +119,7 @@ Key files:
 * `docs/IIF_PARSER_PHASE2.md`
 * `docs/UNIT_TEST_LIBRARY.md`
 * `docs/UNIT_TEST_VIDEO_SCRIPT.md` (video shot list: unit tests)
+* `docs/ICE_RAG_VIDEO_SCRIPT.md` (HyperFrames technical reel: Encompass ICE hybrid RAG)
 * `docs/SVEN_UX_VIDEO_SCRIPT.md` (video shot list: Sven UI/UX series)
 * `docs/MUSIC_GRAPH.md` (collection-seeded music graph: artist → album → venue → show → member)
 

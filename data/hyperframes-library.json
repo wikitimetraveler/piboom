@@ -101,6 +101,15 @@
       "projectDir": "video/tech-stack"
     },
     {
+      "id": "ice-rag",
+      "domain": "finance",
+      "title": "Encompass ICE RAG — hybrid retrieval",
+      "subtitle": "pgvector · keyword fallback · assistants · ~90s",
+      "videoUrl": "/shared/assets/video/ice-rag-reel.mp4",
+      "sourcePage": "/finance/encompass-assistant.html",
+      "projectDir": "video/ice-rag"
+    },
+    {
       "id": "newport-pier",
       "domain": "nature",
       "title": "Newport Beach Pier — fish walk",

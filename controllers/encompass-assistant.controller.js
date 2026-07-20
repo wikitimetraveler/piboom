@@ -7,6 +7,11 @@ import { ChatOpenAI } from '@langchain/openai';
 import { HumanMessage, SystemMessage } from '@langchain/core/messages';
 import iceKnowledgeService from '../lib/knowledge/ice-knowledge.service.js';
 import { requireEncompassDocsScrapeAccess } from '../lib/encompass-docs-refresh-auth.js';
+import {
+  RAG_GRAPH_EXPLAINER,
+  buildRagRuntimeNote,
+  isRagArchitectureQuestion
+} from '../lib/knowledge/rag-explain-prompt.js';
 
 const router = express.Router();
 
@@ -89,10 +94,16 @@ const ENCOMPASS_SYSTEM_PROMPT = `You are an expert AI assistant for Encompass De
 - **Multi-API mashup architecture** - Combining multiple data sources for comprehensive solutions
 - **Real-time event processing** - Socket.IO for live updates and notifications
 - **Persistent conversation memory** - LangChain with PostgreSQL backing for context retention
+- **Hybrid RAG (you use this every turn)** - ICE knowledge + Developer Connect docs via keyword JSON + optional pgvector; see "two currents, one dock" below
+- **Disaster graph DB / GraphRAG (sibling)** - \`graph_nodes\` + edges for Unified Disasters; structural \`NEAR\` plus \`findSimilarNodes\` embeddings — not live \`/near\`
 - **Voice-controlled interface** - Speech-to-text integration for hands-free operation
 - **RESTful API design** - Express.js routes with JSON responses
 - **Error handling patterns** - Structured error responses and logging
 - **Environment variable management** - .env file for API keys and configuration
+
+${RAG_GRAPH_EXPLAINER}
+
+When the user asks how this assistant knows things, how RAG works, pgvector, GraphRAG, or our graph database — answer with the "two currents, one dock" model first, then the technical map. Name the stores you search this turn (ICE + Encompass docs). Retrieval only; never imply live ICE API execution from RAG hits.
 
 ### Financial Calculation Engine:
 - **CalculationsEngine Class** - Reusable, decoupled calculation framework for financial calculators (located in public/shared/calculationEngine.js)
@@ -244,10 +255,12 @@ router.post('/chat', async (req, res) => {
 
     console.log(`💬 Encompass AI Chat: "${message}"`);
     
-    // Search for relevant documentation + knowledge base entries
-    const [docResultsRaw, knowledgeResultsRaw] = await Promise.all([
+    // Search for relevant documentation + knowledge base entries (+ summaries for RAG status)
+    const [docResultsRaw, knowledgeResultsRaw, docsSummary, iceSummary] = await Promise.all([
       encompassDocsService.searchDocs(message, 3),
-      iceKnowledgeService.search(message, 10)
+      iceKnowledgeService.search(message, 10),
+      encompassDocsService.getDocsSummary().catch(() => null),
+      iceKnowledgeService.getSummary().catch(() => null)
     ]);
     const docResults = (docResultsRaw || []).map(result => ({
       ...result,
@@ -262,6 +275,28 @@ router.post('/chat', async (req, res) => {
     
     // Build context from search results
     const docsContext = buildDocsContext(combinedResults);
+    const ragRuntime = buildRagRuntimeNote([
+      {
+        label: 'ICE knowledge',
+        vectorReady: Boolean(iceSummary?.vectorAvailable && iceSummary?.vectorCount > 0),
+        store: 'ice-sources.json',
+        table: 'ice_knowledge_chunks'
+      },
+      {
+        label: 'Encompass docs',
+        vectorReady: Boolean(
+          docsSummary &&
+            typeof docsSummary === 'object' &&
+            docsSummary.vectorAvailable &&
+            docsSummary.vectorCount > 0
+        ),
+        store: 'encompass-docs.json',
+        table: 'encompass_docs_chunks'
+      }
+    ]);
+    const architectureNudge = isRagArchitectureQuestion(message)
+      ? '\n\n(User asked about RAG/graph architecture — lead with "two currents, one dock".)'
+      : '';
     const contextMessages = Array.isArray(context)
       ? context
         .filter((msg) => typeof msg === 'string' && msg.trim() !== '')
@@ -270,7 +305,7 @@ router.post('/chat', async (req, res) => {
 
     // Prepare messages
     const messages = [
-      new SystemMessage(ENCOMPASS_SYSTEM_PROMPT + docsContext),
+      new SystemMessage(ENCOMPASS_SYSTEM_PROMPT + ragRuntime + architectureNudge + docsContext),
       ...contextMessages,
       new HumanMessage(message)
     ];

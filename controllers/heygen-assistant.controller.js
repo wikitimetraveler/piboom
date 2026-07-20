@@ -13,6 +13,11 @@ import {
 } from '../services/langchain-memory.service.js';
 import { resolveOpenAiAgentModel } from '../services/openai-agent-model.js';
 import { heygenConfigured } from '../services/heygen.service.js';
+import {
+  RAG_GRAPH_EXPLAINER,
+  buildRagRuntimeNote,
+  isRagArchitectureQuestion
+} from '../lib/knowledge/rag-explain-prompt.js';
 
 const router = express.Router();
 
@@ -31,6 +36,9 @@ const HEYGEN_SYSTEM_PROMPT = `You are the HeyGen API Expert for DevConnect Labs 
 - Hub library: \`/heygen-hub.html\` + \`GET /api/heygen/library\`
 - You answer questions; you do **not** call HeyGen to render videos here. For generation, point users to \`POST /api/heygen/videos\` or the Disaster/Lane studios.
 - Env: \`HEYGEN_API_KEY\`, \`OPENAI_API_KEY\`, \`DATABASE_URL\` (memory + optional pgvector RAG)
+- **Your own grounding:** hybrid RAG over HeyGen docs (\`heygen_knowledge_chunks\` + \`data/knowledge/heygen-sources.json\`). Same "two currents, one dock" pattern as Encompass ICE RAG. Disaster **GraphRAG** (\`graph_nodes\`) is a sibling system used by Unified Disasters / loan-pipeline AI — explain it when asked about graphs, but you do not query the disaster graph in this chat.
+
+${RAG_GRAPH_EXPLAINER}
 
 ## Response style
 1. Accurate, concise, actionable — cite retrieved docs as [S1], [S2] when relevant.
@@ -39,6 +47,7 @@ const HEYGEN_SYSTEM_PROMPT = `You are the HeyGen API Expert for DevConnect Labs 
 4. Never ask the user to paste an API key into chat.
 5. Distinguish HyperFrames (HTML→video) from avatar Video Agent.
 6. Keep answers speakable: clear sentences; avoid huge tables when a short list works (users may hear answers via TTS).
+7. If asked how *you* know things / RAG / vectors / graphs — use the "two currents, one dock" explainer, name \`heygen_knowledge_chunks\`, and mention live status from the runtime note.
 
 If context is thin, say what is uncertain and point to https://developers.heygen.com/docs/quick-start.`;
 
@@ -154,8 +163,24 @@ router.post('/chat', async (req, res) => {
       });
     }
 
-    const searchHits = await heygenKnowledgeService.search(String(message), 6);
+    const [searchHits, knowledgeSummary] = await Promise.all([
+      heygenKnowledgeService.search(String(message), 6),
+      heygenKnowledgeService.getSummary().catch(() => null)
+    ]);
     const docsContext = buildDocsContext(searchHits);
+    const ragRuntime = buildRagRuntimeNote([
+      {
+        label: 'HeyGen API knowledge',
+        vectorReady: Boolean(
+          knowledgeSummary?.vectorAvailable && knowledgeSummary?.vectorCount > 0
+        ),
+        store: 'heygen-sources.json',
+        table: 'heygen_knowledge_chunks'
+      }
+    ]);
+    const architectureNudge = isRagArchitectureQuestion(message)
+      ? '\n\n(User asked about RAG/graph architecture — lead with "two currents, one dock". Name heygen_knowledge_chunks; GraphRAG is the disaster sibling.)'
+      : '';
 
     const historyRows = await getUserConversationHistory(userId, sessionId, 16);
     const historyMessages = historyRows.map((row) => {
@@ -178,7 +203,7 @@ router.post('/chat', async (req, res) => {
     });
 
     const messages = [
-      new SystemMessage(HEYGEN_SYSTEM_PROMPT + docsContext),
+      new SystemMessage(HEYGEN_SYSTEM_PROMPT + ragRuntime + architectureNudge + docsContext),
       ...historyMessages,
       ...extraContext,
       new HumanMessage(String(message))

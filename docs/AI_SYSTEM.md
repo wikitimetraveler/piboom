@@ -75,6 +75,10 @@ Overview of DevConnect Labs's AI integration for assistants, memory, and retriev
 
 RAG is **hybrid**: committed-JSON keyword search plus optional Postgres `pgvector` semantic search (full details in `docs/VECTOR_RAG.md`). Keyword is the always-on fallback, so retrieval still works in a fresh clone, offline, or without a DB. When `DATABASE_URL` + `OPENAI_API_KEY` + pgvector are present, each store also runs a cosine vector search and merges results. The Encompass Assistant and Unit Tests AI both search both stores, assemble context, then call the LLM.
 
+### Explaining RAG + graph DBs to users
+
+Encompass Assistant and HeyGen API Expert share a speakable architecture story in [`lib/knowledge/rag-explain-prompt.js`](../lib/knowledge/rag-explain-prompt.js): **“two currents, one dock”** (keyword + vector → hybrid merge) and the **graph archipelago** (structural `NEAR` + GraphRAG `findSimilarNodes`). Chat turns inject a live retrieval-status note (vector ready vs keyword-only). Quick-prompt chips on `/finance/encompass-assistant.html` and `/heygen-hub.html` trigger that explainer.
+
 | Store | Data file / table | Service | Build / maintain job |
 |-------|-------------------|---------|----------------------|
 | ICE knowledge (repos, Postman, doc snapshots) | `data/knowledge/ice-sources.json` + `ice_knowledge_chunks` | `lib/knowledge/ice-knowledge.service.js` | `npm run build:ice-knowledge` → `scripts/build-ice-knowledge.js` |

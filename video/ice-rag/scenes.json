@@ -1,0 +1,65 @@
+{
+  "title": "Encompass ICE RAG — hybrid retrieval",
+  "subtitle": "Sources · pgvector · keyword fallback · assistants",
+  "scenes": [
+    {
+      "id": "s0",
+      "kicker": "LOS AI Labs",
+      "title": "Hybrid RAG for Encompass",
+      "body": "Two knowledge stores ground the assistants: ICE artifacts plus Developer Connect docs. Keyword JSON always works; pgvector adds semantic recall when Postgres and OpenAI are available.",
+      "chip": "retrieval · not execution"
+    },
+    {
+      "id": "s1",
+      "kicker": "Stores",
+      "title": "ICE · Dev Connect docs",
+      "body": "ice-knowledge.service reads data/knowledge/ice-sources.json and ice_knowledge_chunks. encompass-docs.service reads data/encompass-docs.json and encompass_docs_chunks. Same hybrid pattern, separate tables.",
+      "chip": "ice_knowledge_chunks · encompass_docs_chunks"
+    },
+    {
+      "id": "s2",
+      "kicker": "Ingest",
+      "title": "Repos · Postman · docs",
+      "body": "Drop ICE sample repos, Postman collections, and Dev Connect snapshots under knowledge-sources/ice/. Scrape merges Developer Connect pages by title/category — partial scrapes do not wipe the seed.",
+      "chip": "knowledge-sources/ice/ · scrape merge"
+    },
+    {
+      "id": "s3",
+      "kicker": "Build",
+      "title": "Normalize · hash · embed",
+      "body": "npm run build:ice-knowledge normalizes records into ice-sources.json. npm run scrape:encompass-docs refreshes docs JSON. Both backfills upsert pgvector rows by content_hash — unchanged chunks skip re-embed.",
+      "chip": "build:ice-knowledge · scrape:encompass-docs"
+    },
+    {
+      "id": "s4",
+      "kicker": "Vectors",
+      "title": "1536-d · HNSW cosine",
+      "body": "OpenAI text-embedding-3-small via embedding-utils. ensureKnowledgeVectorTable creates embedding vector(1536) plus an HNSW cosine index. Search uses embedding <=> query; score is 1 minus distance.",
+      "chip": "text-embedding-3-small · HNSW"
+    },
+    {
+      "id": "s5",
+      "kicker": "Search",
+      "title": "Promise.all · merge · boost",
+      "body": "search() runs searchVector and searchKeyword in parallel. Vector hits get +5 score boost, then dedupe by repo|url|title. No DATABASE_URL, pgvector, or API key — vector lane returns []; keyword lane still answers.",
+      "chip": "hybrid · keyword fallback"
+    },
+    {
+      "id": "s6",
+      "kicker": "Consumers",
+      "title": "Assistant · Unit Tests AI",
+      "body": "encompass-assistant.controller and unit-tests-ai search both stores, assemble context, then call the LLM. executionAllowed stays false — retrieval only, never live ICE API execution from RAG hits.",
+      "chip": "/api/encompass-assistant/*"
+    },
+    {
+      "id": "s7",
+      "kicker": "Ops",
+      "title": "refresh:encompass-knowledge",
+      "body": "Combined refresh scrapes docs then rebuilds ICE. Toggle ENCOMPASS_DOCS_SKIP_EMBED or ICE_SKIP_EMBED for JSON-only. GraphRAG on graph_nodes.embedding is a sibling path for disaster pipeline AI — not live /near proximity.",
+      "chip": "docs/VECTOR_RAG.md · docs/AI_SYSTEM.md"
+    }
+  ],
+  "endCard": {
+    "url": "/finance/encompass-assistant.html"
+  }
+}

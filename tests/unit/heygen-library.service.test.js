@@ -54,6 +54,14 @@ describe('heygen-library.service', () => {
     expect(pier?.sourcePage).toBe('/nature/newport-pier.html');
   });
 
+  test('getHeygenVideoLibrary includes ICE RAG HyperFrames reel', async () => {
+    const finance = await getHeygenVideoLibrary({ domain: 'finance', kind: 'hyperframes' });
+    expect(finance.items.some((v) => v.id === 'hf-ice-rag')).toBe(true);
+    const ice = finance.items.find((v) => v.id === 'hf-ice-rag');
+    expect(ice?.videoUrl).toBe('/shared/assets/video/ice-rag-reel.mp4');
+    expect(ice?.projectDir).toBe('video/ice-rag');
+  });
+
   test('lane entries include full and short variants when present', async () => {
     const lane = await getHeygenVideoLibrary({ domain: 'lane' });
     const slugs = new Set(lane.videos.map((v) => v.id));
