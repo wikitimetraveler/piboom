@@ -104,7 +104,7 @@
       "id": "ice-rag",
       "domain": "finance",
       "title": "Encompass ICE RAG — hybrid retrieval",
-      "subtitle": "pgvector · keyword fallback · assistants · ~90s",
+      "subtitle": "pgvector · keyword fallback · assistants · ~92s · Google TTS",
       "videoUrl": "/shared/assets/video/ice-rag-reel.mp4",
       "sourcePage": "/finance/encompass-assistant.html",
       "projectDir": "video/ice-rag"

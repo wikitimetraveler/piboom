@@ -1,6 +1,6 @@
 # HyperFrames — Encompass ICE RAG (technical)
 
-~90s narrated architecture reel: dual stores, ingest/build, pgvector HNSW, hybrid merge, assistant consumers, ops refresh.
+~92s narrated architecture reel: dual stores, ingest/build, pgvector HNSW, hybrid merge, assistant consumers, ops refresh.
 
 ## Commands
 
