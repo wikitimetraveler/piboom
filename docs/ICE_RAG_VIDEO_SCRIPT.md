@@ -41,18 +41,25 @@ Exact strings live in `video/ice-rag/make-narration.mjs`. Spoken copy covers:
 
 ---
 
-## Produce
+## Produce (audio is mandatory)
+
+`npm run render` in `video/ice-rag` **refuses** to run unless every narration MP3 exists and is audible (`ensure-audio`). Prefer the one-shot publish from repo root:
 
 ```bash
-# from repo root (TTS needs the app)
+# TTS needs the app running
 npm start
 
-# in another shell
+# another shell — narrate → ensure audio → render → publish → verify MP4 audio
+npm run publish:ice-rag-reel
+```
+
+Manual:
+
+```bash
 cd video/ice-rag
 npm run narration
-npm run check
+npm run ensure-audio
 npm run render
-# copy renders/*.mp4 → public/shared/assets/video/ice-rag-reel.mp4
 ```
 
 Preview: `cd video/ice-rag && npm run dev`

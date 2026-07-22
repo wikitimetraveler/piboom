@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "npx --yes hyperframes@0.6.88 preview",
     "check": "npx --yes hyperframes@0.6.88 lint && npx --yes hyperframes@0.6.88 validate && npx --yes hyperframes@0.6.88 inspect",
-    "render": "npx --yes hyperframes@0.6.88 render",
-    "narration": "node make-narration.mjs"
+    "ensure-audio": "node ../../scripts/tools/ensure-hyperframes-audio.mjs --cwd .",
+    "narration": "node make-narration.mjs",
+    "render:raw": "npx --yes hyperframes@0.6.88 render",
+    "render": "npm run ensure-audio && npm run render:raw",
+    "publish": "node ../../scripts/tools/publish-ice-rag-reel.mjs"
   }
 }

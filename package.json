@@ -62,7 +62,9 @@
     "check:newport-pier-reel": "npm run check --prefix video/newport-pier",
     "render:newport-pier-reel": "npm run render --prefix video/newport-pier",
     "render:newport-pier-reel:local": "node scripts/tools/render-newport-pier-reel-local.mjs",
-    "publish:newport-pier-reel": "npm run render:newport-pier-reel && node scripts/tools/copy-newport-pier-reel.mjs"
+    "publish:newport-pier-reel": "npm run render:newport-pier-reel && node scripts/tools/copy-newport-pier-reel.mjs",
+    "ensure-audio:ice-rag": "npm run ensure-audio --prefix video/ice-rag",
+    "publish:ice-rag-reel": "node scripts/tools/publish-ice-rag-reel.mjs"
   },
   "dependencies": {
     "@google-cloud/speech": "^5.0.0",
