@@ -143,7 +143,6 @@
       domain: PRIMARY_HOST,
       path: '/finance/index.html',
       icon: 'bi-bank',
-      demoOnly: true,
     },
   ];
 
@@ -408,8 +407,8 @@
       path: '/finance/index.html',
       icon: 'bi-bank',
       category: 'encompass',
-      demoOnly: true,
-      authRequired: true,
+      featured: true,
+      featuredOrder: 5,
       problem: 'Curated calculator and Encompass tool entry point.',
       consultingBlurb: 'Bootstrap hub with shared calculationEngine and finance auth guard.',
       stack: ['calculationEngine', 'Bootstrap', 'Worksheets'],

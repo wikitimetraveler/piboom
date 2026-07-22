@@ -267,10 +267,42 @@
         });
     };
 
+    const PUBLIC_FINANCE_PATHS = {
+      '/finance': true,
+      '/finance/': true,
+      '/finance/index.html': true,
+      '/finance/fha-streamline-calculator.html': true,
+      '/finance/fha-streamline-loan-amount-calculator.html': true,
+      '/finance/fha-streamline-ntb-calculator.html': true,
+      '/finance/asset-qualifier-calculator.html': true,
+      '/finance/dti-calculator.html': true,
+      '/finance/cashout-refinance-calculator.html': true,
+      '/finance/amortization-schedule-calculator.html': true,
+      '/finance/closing-cost-calculator.html': true,
+      '/finance/ltv-calculator.html': true,
+      '/finance/va-irrrl-calculator.html': true,
+      '/finance/disasters-unified.html': true,
+      '/finance/disasters-webcams.html': true,
+    };
+
+    const isPublicFinancePath = (pathOnly) => {
+      const path = String(pathOnly || '').toLowerCase();
+      if (PUBLIC_FINANCE_PATHS[path]) return true;
+      if (window.MENU_CONFIG && typeof window.MENU_CONFIG.pathRequiresAuth === 'function') {
+        return !window.MENU_CONFIG.pathRequiresAuth(path);
+      }
+      return false;
+    };
+
     links.forEach((link) => {
       link.addEventListener('click', (event) => {
         const destPath = toFinancePath(link.getAttribute('href') || '');
         if (!destPath.startsWith('/finance')) return;
+
+        const pathOnly = destPath.split('?')[0].split('#')[0];
+        if (isPublicFinancePath(pathOnly)) {
+          return;
+        }
 
         event.preventDefault();
         event.stopPropagation();

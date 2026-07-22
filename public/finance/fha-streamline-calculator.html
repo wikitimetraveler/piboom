@@ -1451,10 +1451,9 @@
 
       <!-- Login Integration Script -->
       <script>
-         // Initialize user display
+         // Initialize user display (Worksheets are public — login is optional)
          function initializeUser() {
-            if (!isLoggedIn()) {
-               showLoginPopup();
+            if (typeof isLoggedIn !== 'function' || !isLoggedIn()) {
                return;
             }
             
