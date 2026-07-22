@@ -19,7 +19,9 @@ describe('menu-config auth filtering', () => {
     MENU_CONFIG = loadMenuConfig();
   });
 
-  test('pathRequiresAuth treats disasters as public and Encompass hub as gated', () => {
+  test('pathRequiresAuth treats Worksheets and disasters as public and Encompass as gated', () => {
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/index.html')).toBe(false);
+    expect(MENU_CONFIG.pathRequiresAuth('/finance/fha-streamline-calculator.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-unified.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/disasters-webcams.html')).toBe(false);
     expect(MENU_CONFIG.pathRequiresAuth('/finance/encompass-hub.html')).toBe(true);
@@ -31,6 +33,7 @@ describe('menu-config auth filtering', () => {
     const visible = MENU_CONFIG.filterToolsByAuth(MENU_CONFIG.ENCOMPASS_TOOLS, false);
     const hrefs = visible.map((t) => t.href);
     expect(hrefs).toContain('/finance/disasters-unified.html');
+    expect(hrefs).toContain('/finance/index.html');
     expect(hrefs).toContain('/gse-analyzer.html');
     expect(hrefs).not.toContain('/finance/encompass-assistant.html');
     expect(hrefs).not.toContain('/finance/unit-tests.html');

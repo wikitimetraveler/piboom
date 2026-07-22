@@ -12,7 +12,7 @@
     { href: '/finance/disasters-unified.html', icon: 'bi-shield-exclamation', label: 'Unified Disasters', domain: 'disasters', title: 'Unified Disasters — hazard monitoring and pipeline risk', demoOnly: false },
     { href: '/nature/nature-hub.html', icon: 'bi-tree-fill', label: 'Nature', domain: 'nature', title: 'Trees, critters, field guide', demoOnly: false },
     { href: '/family/lane-family.html', icon: 'bi-house-heart', label: 'Lane Family', domain: 'family', title: 'Lane Family hub — tree, museum, and tools', demoOnly: false },
-    { href: '/finance/index.html', icon: 'bi-bank', label: 'Worksheets', domain: 'finance', title: 'Worksheets — Encompass, calculators, unit tests', demoOnly: true },
+    { href: '/finance/index.html', icon: 'bi-bank', label: 'Worksheets', domain: 'finance', title: 'Worksheets — Encompass, calculators, unit tests', demoOnly: false },
     { href: '/finance/encompass-hub.html', icon: 'bi-columns-gap', label: 'Encompass Hub', domain: 'encompass', title: 'Encompass Hub, pipeline, loan APIs', demoOnly: true },
   ];
 
@@ -190,6 +190,17 @@
 
   /** Public /finance pages (no login). Keep in sync with server.js FINANCE_PUBLIC_PAGES. */
   const FINANCE_PUBLIC_PATHS = [
+    '/finance/index.html',
+    '/finance/fha-streamline-calculator.html',
+    '/finance/fha-streamline-loan-amount-calculator.html',
+    '/finance/fha-streamline-ntb-calculator.html',
+    '/finance/asset-qualifier-calculator.html',
+    '/finance/dti-calculator.html',
+    '/finance/cashout-refinance-calculator.html',
+    '/finance/amortization-schedule-calculator.html',
+    '/finance/closing-cost-calculator.html',
+    '/finance/ltv-calculator.html',
+    '/finance/va-irrrl-calculator.html',
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
   ];

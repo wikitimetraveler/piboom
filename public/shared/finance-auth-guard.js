@@ -6,16 +6,31 @@
   const FINANCE_PATH_PREFIX = '/finance/';
   const CHECK_INTERVAL_MS = 600;
   const PUBLIC_FINANCE_PAGES = new Set([
+    '/finance/index.html',
+    '/finance/fha-streamline-calculator.html',
+    '/finance/fha-streamline-loan-amount-calculator.html',
+    '/finance/fha-streamline-ntb-calculator.html',
+    '/finance/asset-qualifier-calculator.html',
+    '/finance/dti-calculator.html',
+    '/finance/cashout-refinance-calculator.html',
+    '/finance/amortization-schedule-calculator.html',
+    '/finance/closing-cost-calculator.html',
+    '/finance/ltv-calculator.html',
+    '/finance/va-irrrl-calculator.html',
     '/finance/disasters-unified.html',
     '/finance/disasters-webcams.html',
   ]);
 
   const financePath = window.location.pathname.toLowerCase();
-  if (!financePath.startsWith(FINANCE_PATH_PREFIX)) {
+  if (!financePath.startsWith(FINANCE_PATH_PREFIX) && financePath !== '/finance') {
     return;
   }
 
-  if (PUBLIC_FINANCE_PAGES.has(financePath)) {
+  const isPublicHub =
+    financePath === '/finance' ||
+    financePath === '/finance/' ||
+    financePath === '/finance/index.html';
+  if (isPublicHub || PUBLIC_FINANCE_PAGES.has(financePath)) {
     return;
   }
 
