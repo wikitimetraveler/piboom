@@ -25,9 +25,11 @@
 
   <main class="gz-main">
     <section class="gz-hero container">
-    <button type="button" class="gz-hero-donut" id="gzHeroDonut" aria-label="Glazed donut — click to explode"></button>
       <div class="gz-hero-inner">
-        <h1 class="gz-brand">Glazed</h1>
+        <div class="gz-hero-title-row">
+          <h1 class="gz-brand">Glazed</h1>
+          <button type="button" class="gz-hero-donut" id="gzHeroDonut" aria-label="Glazed donut — click to explode"></button>
+        </div>
         <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Steal a recipe. Meet Savy Donuts and Smoothies on Harbor.</p>
         <div class="gz-hero-cta">
           <a class="gz-btn gz-btn-primary" href="#gzCase">
@@ -36,9 +38,6 @@
           <a class="gz-btn gz-btn-ghost" href="#gzSmoothies">
             <i class="bi bi-cup-straw"></i> Smoothies
           </a>
-          <button type="button" class="gz-btn gz-btn-ghost" id="gzMeetPipHero">
-            <i class="bi bi-mic-fill"></i> Meet Pip
-          </button>
         </div>
       </div>
     </section>
@@ -111,16 +110,11 @@
           </div>
         </div>
 
-        <aside class="gz-map-pip" aria-label="Ask Pip about Savy Donuts and Smoothies">
-          <img class="gz-map-pip-portrait" src="/donuts/assets/pip-baker-portrait.png" width="64" height="64" alt=""/>
-          <div class="gz-map-pip-copy">
-            <h3>Pip — AI assistant</h3>
-            <p>Ask me about Savy Donuts and Smoothies on Harbor, pairings, or what’s on the case. Same Pip as the HeyGen guide.</p>
-          </div>
-          <button type="button" class="gz-btn gz-btn-frost" id="gzAskPipMap">
-            <i class="bi bi-chat-dots-fill"></i> Open Pip chat
-          </button>
-        </aside>
+        <p class="gz-map-pip-note">
+          Questions about the shop or pairings?
+          <button type="button" class="gz-text-link" id="gzAskPipMap">Ask Pip</button>
+          from the dock above or the chat bubble.
+        </p>
       </section>
 
       <p class="gz-footer-note">Glazed · Fan tribute to Savy Donuts &amp; Smoothies on Harbor · Pip by HeyGen · Development by David E Lane</p>

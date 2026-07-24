@@ -48,6 +48,9 @@
     else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   }
 
+  window.gzSpeakPip = speak;
+  window.gzStopPipSpeak = stopSpeak;
+
   function setSpeaking(on) {
     document.getElementById('gzGuide')?.classList.toggle('is-speaking', !!on);
   }
@@ -188,10 +191,13 @@
   }
 
   function cardHtml(item, kind) {
-    const tags = (item.flavorTags || []).map((t) => `<span class="gz-tag">${esc(t)}</span>`).join('');
+    const tags = (item.flavorTags || [])
+      .slice(0, 2)
+      .map((t) => `<span class="gz-tag">${esc(t)}</span>`)
+      .join('');
     const kicker = kind === 'smoothie' ? 'Smoothie' : 'Donut';
     return `
-      <button type="button" class="gz-card" data-id="${esc(item.id)}" data-kind="${esc(kind)}" aria-label="${esc(item.name)} — click to flip for recipe and history">
+      <article class="gz-card" data-id="${esc(item.id)}" data-kind="${esc(kind)}" tabindex="0" role="button" aria-pressed="false" aria-label="${esc(item.name)} — flip for recipe and history">
         <div class="gz-card-inner">
           <div class="gz-face gz-face--front">
             <div class="gz-donut-stage">${productArt(item)}</div>
@@ -205,7 +211,7 @@
           </div>
           <div class="gz-face gz-face--back">
             <div class="gz-back-scroll">
-              <p class="gz-back-kicker">Other side</p>
+              <p class="gz-back-kicker">Recipe &amp; story</p>
               <h3 class="gz-back-title">${esc(item.name)}</h3>
               ${recipeHtml(item.recipe)}
               <div class="gz-back-block">
@@ -213,17 +219,28 @@
                 <p>${esc(item.history || '')}</p>
               </div>
             </div>
+            <p class="gz-scroll-cue" hidden><i class="bi bi-chevron-down"></i> Scroll</p>
             <div class="gz-back-actions">
-              <span class="gz-btn gz-btn-sm gz-btn-frost gz-hear" data-hear="${esc(item.id)}" role="button" tabindex="0">
+              <button type="button" class="gz-btn gz-btn-sm gz-btn-frost gz-hear" data-hear="${esc(item.id)}">
                 <i class="bi bi-soundwave"></i> Hear Pip
-              </span>
-              <span class="gz-btn gz-btn-sm gz-btn-ink gz-flip-back" role="button" tabindex="0">
+              </button>
+              <button type="button" class="gz-btn gz-btn-sm gz-btn-ink gz-flip-back">
                 <i class="bi bi-arrow-counterclockwise"></i> Flip back
-              </span>
+              </button>
             </div>
           </div>
         </div>
-      </button>`;
+      </article>`;
+  }
+
+  function updateCardScrollCue(card) {
+    const scroll = card?.querySelector('.gz-back-scroll');
+    const cue = card?.querySelector('.gz-scroll-cue');
+    const face = card?.querySelector('.gz-face--back');
+    if (!scroll || !cue || !face) return;
+    const overflows = scroll.scrollHeight > scroll.clientHeight + 12;
+    cue.hidden = !overflows;
+    face.classList.toggle('has-scroll', overflows);
   }
 
   function wireSugar() {
@@ -248,7 +265,7 @@
     const pieces = Array.from({ length: 9 }, () => '<span class="gz-hero-piece"></span>').join('');
     const crumbs = Array.from({ length: 14 }, (_, i) => {
       const angle = (i / 14) * Math.PI * 2;
-      const dist = 90 + (i % 5) * 28;
+      const dist = 36 + (i % 5) * 12;
       const cx = Math.round(Math.cos(angle) * dist);
       const cy = Math.round(Math.sin(angle) * dist);
       const delay = (i * 0.04).toFixed(2);
@@ -260,7 +277,7 @@
     el.setAttribute('aria-label', 'Glazed donut — click to explode');
     el.innerHTML = `
       <div class="gz-hero-stage">
-        <img class="gz-hero-whole" src="${src}" alt="Classic glazed donut" width="460" height="460" draggable="false"/>
+        <img class="gz-hero-whole" src="${src}" alt="Classic glazed donut" width="220" height="220" draggable="false"/>
         <div class="gz-hero-pieces" aria-hidden="true">${pieces}</div>
         ${crumbs}
         <div class="gz-sparkle-overlay" aria-hidden="true">
@@ -324,11 +341,6 @@
     }
 
     document.getElementById('gzMeetPip')?.addEventListener('click', playWelcome);
-    document.getElementById('gzMeetPipHero')?.addEventListener('click', () => {
-      document.getElementById('gzGuide')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      playWelcome();
-    });
-
     document.getElementById('gzStopPip')?.addEventListener('click', () => {
       stopSpeak();
       window.GlazedHeygen?.stopIntro();
@@ -344,6 +356,15 @@
         }
       })
       .catch(() => {});
+  }
+
+  function setCardFlipped(card, flipped) {
+    if (!card) return;
+    card.classList.toggle('is-flipped', flipped);
+    card.setAttribute('aria-pressed', flipped ? 'true' : 'false');
+    if (flipped) {
+      window.requestAnimationFrame(() => updateCardScrollCue(card));
+    }
   }
 
   function bindCards(items, gridId) {
@@ -369,25 +390,37 @@
       if (flipBack) {
         e.preventDefault();
         e.stopPropagation();
-        flipBack.closest('.gz-card')?.classList.remove('is-flipped');
+        setCardFlipped(flipBack.closest('.gz-card'), false);
         return;
       }
 
       const card = e.target.closest('.gz-card');
-      if (!card) return;
+      if (!card || e.target.closest('button')) return;
       grid.querySelectorAll('.gz-card.is-flipped').forEach((c) => {
-        if (c !== card) c.classList.remove('is-flipped');
+        if (c !== card) setCardFlipped(c, false);
       });
-      card.classList.toggle('is-flipped');
+      setCardFlipped(card, !card.classList.contains('is-flipped'));
     });
 
     grid.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (e.target.closest('.gz-hear, .gz-flip-back')) return;
       const card = e.target.closest('.gz-card');
-      if (!card || e.target.closest('.gz-hear, .gz-flip-back')) return;
+      if (!card || e.target !== card) return;
       e.preventDefault();
-      card.click();
+      grid.querySelectorAll('.gz-card.is-flipped').forEach((c) => {
+        if (c !== card) setCardFlipped(c, false);
+      });
+      setCardFlipped(card, !card.classList.contains('is-flipped'));
     });
+
+    grid.addEventListener('scroll', (e) => {
+      const scroll = e.target.closest?.('.gz-back-scroll');
+      if (!scroll) return;
+      const cue = scroll.parentElement?.querySelector('.gz-scroll-cue');
+      if (!cue) return;
+      cue.hidden = scroll.scrollTop > 12 || scroll.scrollHeight <= scroll.clientHeight + 12;
+    }, true);
   }
 
   async function init() {

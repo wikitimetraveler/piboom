@@ -1,8 +1,44 @@
 /**
  * Pip AI chat widget wiring for Glazed (ES module)
+ * Replies speak aloud with Pip's female Google TTS voice.
  * Development work by David Lane
  */
 import AIChatWidget from '/shared/ai-chat-widget.js';
+
+const PIP_TTS_VOICE = 'en-US-Standard-F';
+const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 0.05, speakingRate: 1.02 };
+
+function forSpeech(text) {
+  return String(text || '')
+    .replace(/[*_`#~>]/g, ' ')
+    .replace(/https?:\/\/\S+/gi, ' ')
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 800);
+}
+
+function speakPip(text) {
+  const clean = forSpeech(text);
+  if (!clean) return;
+  if (typeof window.gzSpeakPip === 'function') {
+    window.gzSpeakPip(clean);
+    return;
+  }
+  if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
+  if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
+  if (typeof window.speakWithGoogle === 'function') {
+    window.speakWithGoogle(clean, PIP_TTS_VOICE, PIP_TTS_OPTS);
+    return;
+  }
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(clean);
+    u.rate = 1.02;
+    u.pitch = 1.05;
+    window.speechSynthesis.speak(u);
+  }
+}
 
 function initPipChat() {
   window.aiChatWidget = new AIChatWidget({
@@ -14,8 +50,11 @@ function initPipChat() {
     inputPlaceholder: 'Ask Pip about donuts, smoothies, or Savy on Harbor…',
     welcomeHtml: `
       <img src="/donuts/assets/pip-baker-portrait.png" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin-bottom:8px;border:2px solid #f5c76a"/>
-      <p>Hey — I'm <strong>Pip</strong>. Ask me about the case, smoothie pairings, or how to find <strong>Savy Donuts &amp; Smoothies</strong> on Harbor.</p>
-      <small class="text-muted">Try: "What's good with Mango Sunrise?" or "Where is Savy Donuts and Smoothies on Harbor?"</small>`
+      <p>Hey — I'm <strong>Pip</strong>, your chatty donut buddy. I answer in text <em>and</em> speak aloud in my voice.</p>
+      <small class="text-muted">Try: "What's good with Mango Sunrise?" or "Where is Savy on Harbor?" — then tell me how I sound!</small>`,
+    onMessageReceived: (response) => {
+      speakPip(response);
+    }
   });
 
   const style = document.createElement('style');
@@ -25,7 +64,7 @@ function initPipChat() {
       bottom: 24px;
       right: 24px;
       z-index: 1200;
-      box-shadow: 0 8px 24px rgba(232, 90, 122, 0.55) !important;
+      box-shadow: 0 8px 20px rgba(232, 90, 122, 0.4) !important;
     }
     body.gz-page .ai-chat-button::after {
       content: 'Ask Pip';
@@ -42,6 +81,24 @@ function initPipChat() {
       border-radius: 999px;
       border: 1px solid rgba(245, 199, 106, 0.35);
       pointer-events: none;
+    }
+    body.gz-page .dark-mode-toggle {
+      bottom: 100px;
+      right: 28px;
+      z-index: 1190;
+    }
+    @media (max-width: 767.98px) {
+      body.gz-page .ai-chat-button::after {
+        display: none;
+      }
+      body.gz-page .ai-chat-button {
+        bottom: 20px;
+        right: 16px;
+      }
+      body.gz-page .dark-mode-toggle {
+        bottom: 92px;
+        right: 20px;
+      }
     }
     body.gz-page .ai-chat-panel {
       z-index: 1201;
