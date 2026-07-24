@@ -15,66 +15,14 @@
       .replace(/"/g, '&quot;');
   }
 
-  /** Pip HeyGen voice (Radiant Riley) — same ID as avatar intro video */
-  const PIP_HEYGEN_VOICE_FALLBACK = '0ed165284d1c4dc9b600d3129821146a';
-  /** Google female fallback only if HeyGen TTS fails */
+  /** Pip = feminine Google TTS (fast). HeyGen Starfish kept for intro video only. */
   const PIP_TTS_VOICE = 'en-US-Standard-F';
   const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 0.05, speakingRate: 1.02 };
 
-  let pipVoiceId = PIP_HEYGEN_VOICE_FALLBACK;
-  let pipAudio = null;
-
-  async function loadPipVoiceId() {
-    try {
-      const res = await fetch('/data/donuts-heygen-demo.json', { cache: 'no-store' });
-      const demo = await res.json();
-      if (demo?.heygenVoiceId) pipVoiceId = demo.heygenVoiceId;
-    } catch (_) {
-      /* keep fallback */
-    }
-  }
-
-  function stopPipAudio() {
-    if (pipAudio) {
-      try {
-        pipAudio.pause();
-        pipAudio = null;
-      } catch (_) {
-        /* ignore */
-      }
-    }
-  }
-
-  async function speakWithHeygenPip(text) {
-    const res = await fetch('/api/heygen/speech', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voiceId: pipVoiceId, speed: 1 })
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok || !data.success || !data.audioUrl) {
-      throw new Error(data.error || 'HeyGen speech failed');
-    }
-    stopPipAudio();
-    if (typeof window.stopSpeaking === 'function') window.stopSpeaking();
-    else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-
-    pipAudio = new Audio(data.audioUrl);
-    pipAudio.volume = 0.9;
-    await pipAudio.play();
-    return true;
-  }
-
-  async function speak(text) {
+  function speak(text) {
     if (!text) return;
     if (typeof window.ensureAudioUnlock === 'function') window.ensureAudioUnlock();
     if (typeof window.primeSpeechSynthesis === 'function') window.primeSpeechSynthesis();
-    try {
-      await speakWithHeygenPip(text);
-      return;
-    } catch (err) {
-      console.warn('Pip HeyGen voice unavailable, falling back to female Google TTS', err);
-    }
     if (typeof window.speakWithGoogle === 'function') {
       window.speakWithGoogle(text, PIP_TTS_VOICE, PIP_TTS_OPTS);
       return;
@@ -96,7 +44,6 @@
   }
 
   function stopSpeak() {
-    stopPipAudio();
     if (typeof window.stopSpeaking === 'function') window.stopSpeaking();
     else if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   }
@@ -296,13 +243,53 @@
   function renderHeroDonut() {
     const el = document.getElementById('gzHeroDonut');
     if (!el) return;
+
+    const src = '/donuts/assets/products/classic-glazed.png';
+    const pieces = Array.from({ length: 9 }, () => '<span class="gz-hero-piece"></span>').join('');
+    const crumbs = Array.from({ length: 14 }, (_, i) => {
+      const angle = (i / 14) * Math.PI * 2;
+      const dist = 90 + (i % 5) * 28;
+      const cx = Math.round(Math.cos(angle) * dist);
+      const cy = Math.round(Math.sin(angle) * dist);
+      const delay = (i * 0.04).toFixed(2);
+      return `<span class="gz-hero-crumb" style="--cx:${cx}px;--cy:${cy}px;left:50%;top:50%;animation-delay:${delay}s"></span>`;
+    }).join('');
+
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-label', 'Glazed donut — click to explode');
     el.innerHTML = `
-      <div class="gz-product-photo gz-hero-photo">
-        <img src="/donuts/assets/products/classic-glazed.png" alt="" width="320" height="320"/>
+      <div class="gz-hero-stage">
+        <img class="gz-hero-whole" src="${src}" alt="Classic glazed donut" width="460" height="460" draggable="false"/>
+        <div class="gz-hero-pieces" aria-hidden="true">${pieces}</div>
+        ${crumbs}
         <div class="gz-sparkle-overlay" aria-hidden="true">
           <span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
       </div>`;
+
+    el.querySelectorAll('.gz-hero-piece').forEach((piece) => {
+      piece.style.backgroundImage = `url("${src}")`;
+    });
+
+    let exploding = false;
+    function explode() {
+      if (exploding) return;
+      exploding = true;
+      el.classList.add('is-exploding');
+      window.setTimeout(() => {
+        el.classList.remove('is-exploding');
+        exploding = false;
+      }, 1050);
+    }
+
+    el.addEventListener('click', explode);
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        explode();
+      }
+    });
   }
 
   function bindGuide(brand) {
@@ -406,7 +393,6 @@
   async function init() {
     wireSugar();
     renderHeroDonut();
-    await loadPipVoiceId();
 
     const grid = document.getElementById('gzGrid');
     const smoothieGrid = document.getElementById('gzSmoothieGrid');

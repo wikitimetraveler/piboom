@@ -204,14 +204,108 @@ body.gz-page {
 
 .gz-hero-donut {
   position: absolute;
-  right: -4%;
-  top: 12%;
-  width: min(48vw, 420px);
+  right: -2%;
+  top: 8%;
+  width: min(52vw, 460px);
   aspect-ratio: 1;
   z-index: 1;
-  animation: gz-float 5.5s ease-in-out infinite;
+  cursor: pointer;
   filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.45));
-  opacity: 0.95;
+  opacity: 0.98;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+.gz-hero-donut:focus-visible {
+  outline: 2px solid var(--gz-glaze);
+  outline-offset: 6px;
+  border-radius: 16px;
+}
+
+.gz-hero-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.gz-hero-whole {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  animation: gz-float 5.5s ease-in-out infinite;
+  pointer-events: none;
+  user-select: none;
+}
+
+.gz-hero-donut.is-exploding .gz-hero-whole {
+  opacity: 0;
+  animation: none;
+}
+
+.gz-hero-pieces {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.gz-hero-piece {
+  position: absolute;
+  width: 33.333%;
+  height: 33.333%;
+  background-size: 300% 300%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.gz-hero-donut.is-exploding .gz-hero-piece {
+  animation: gz-explode-piece 0.95s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+.gz-hero-piece:nth-child(1) { top: 0; left: 0; background-position: 0% 0%; --dx: -120px; --dy: -90px; --rot: -28deg; animation-delay: 0s; }
+.gz-hero-piece:nth-child(2) { top: 0; left: 33.333%; background-position: 50% 0%; --dx: 12px; --dy: -130px; --rot: 12deg; animation-delay: 0.03s; }
+.gz-hero-piece:nth-child(3) { top: 0; left: 66.666%; background-position: 100% 0%; --dx: 130px; --dy: -85px; --rot: 32deg; animation-delay: 0.05s; }
+.gz-hero-piece:nth-child(4) { top: 33.333%; left: 0; background-position: 0% 50%; --dx: -150px; --dy: 8px; --rot: -40deg; animation-delay: 0.04s; }
+.gz-hero-piece:nth-child(5) { top: 33.333%; left: 33.333%; background-position: 50% 50%; --dx: 20px; --dy: -20px; --rot: 8deg; animation-delay: 0.02s; }
+.gz-hero-piece:nth-child(6) { top: 33.333%; left: 66.666%; background-position: 100% 50%; --dx: 155px; --dy: 14px; --rot: 38deg; animation-delay: 0.06s; }
+.gz-hero-piece:nth-child(7) { top: 66.666%; left: 0; background-position: 0% 100%; --dx: -110px; --dy: 120px; --rot: -18deg; animation-delay: 0.07s; }
+.gz-hero-piece:nth-child(8) { top: 66.666%; left: 33.333%; background-position: 50% 100%; --dx: -8px; --dy: 140px; --rot: 15deg; animation-delay: 0.08s; }
+.gz-hero-piece:nth-child(9) { top: 66.666%; left: 66.666%; background-position: 100% 100%; --dx: 125px; --dy: 125px; --rot: 42deg; animation-delay: 0.05s; }
+
+@keyframes gz-explode-piece {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.55);
+  }
+}
+
+.gz-hero-crumb {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ffd98a 0%, #e8a84a 60%, transparent 70%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gz-hero-donut.is-exploding .gz-hero-crumb {
+  animation: gz-crumb-fly 0.9s ease-out forwards;
+}
+
+@keyframes gz-crumb-fly {
+  0% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(var(--cx), var(--cy)) scale(0.2); }
 }
 
 @keyframes gz-float {
@@ -226,10 +320,10 @@ body.gz-page {
 
 @media (max-width: 767.98px) {
   .gz-hero-donut {
-    width: min(70vw, 260px);
-    top: 4%;
-    right: -8%;
-    opacity: 0.55;
+    width: min(72vw, 280px);
+    top: 2%;
+    right: -4%;
+    opacity: 0.9;
   }
 
   .gz-hero {
@@ -631,8 +725,10 @@ body.gz-page {
   width: 100%;
 }
 
-.gz-hero-photo img {
-  border-radius: 50%;
+.gz-hero-photo img,
+.gz-hero-whole {
+  border-radius: 0;
+  object-fit: contain;
 }
 
 .gz-sparkle-overlay {
@@ -780,10 +876,13 @@ body.gz-page {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gz-sparkle-overlay span,
-  .gz-sparkle {
+  .gz-hero-whole,
+  .gz-hero-donut.is-exploding .gz-hero-piece,
+  .gz-hero-donut.is-exploding .gz-hero-crumb {
     animation: none !important;
-    opacity: 0.55;
+  }
+  .gz-hero-donut.is-exploding .gz-hero-whole {
+    opacity: 0.35;
   }
 }
 
@@ -870,6 +969,7 @@ body.gz-demo-popup-active {
   .gz-hero-line,
   .gz-hero-cta,
   .gz-hero-donut,
+  .gz-hero-whole,
   .gz-sugar span,
   .gz-guide-portrait,
   .gz-donut-stage::after,
