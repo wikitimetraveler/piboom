@@ -1,0 +1,27 @@
+{
+  "id": "donuts-glazed-pip-intro",
+  "title": "Glazed — Meet Pip",
+  "ctaLabel": "Browse donuts & smoothies",
+  "ctaHref": "/donuts/",
+  "brand": {
+    "attribution": "Avatar narration powered by HeyGen",
+    "developmentBy": "David E Lane"
+  },
+  "heygenScriptShort": "Hey! I'm Pip — welcome to Glazed, celebrating Savy Donuts and Smoothies on Harbor. Flip any donut or smoothie card for the recipe and the story. Ask me in chat too — I'm your baker guide.",
+  "heygenVideoLocalShort": "/donuts/assets/video/glazed-pip-intro.mp4",
+  "heygenVideoUrlShort": "https://files2.heygen.ai/aws_pacific/avatar_tmp/20b61966d58a4ff7b906c3ccbef64908/509450c5a8be4ec9acba8df64a663546.mp4?Expires=1785472108&Signature=KhQAQwPxAMF5awBhHtTnxFhYaJoLtTvwmY57ZiIFBPRe7IvRY~i7VLr-q2v7mjFl991qw3FieVy~iSCrArVtgRClb-UQuzOOE~fsnmzZK8bfAgnrlrYcpXMNmku3YfwnRXOUYfLjYMi~kDjpnRSdBc7W5KZe~gnu6Ll9lwGF-IGoqAyHZWqoIGIzJ6pi79YUXTSPxqbCybceVrIp99E7I4z54VuNRD809kSXVAtJ09UTWi6Lh7YSYfsvn4Eyn3bdhjbZLYd69IQqgiIc9POEFa2natknfh02XQkyWSaB4Za9fdi0SCDfthjzPx8o0zH29~YaV4-abQFAhi91Vqy90A__&Key-Pair-Id=K38HBHX5LX3X2H",
+  "avatar": {
+    "name": "Pip",
+    "file": "AVATAR-PIP.md",
+    "portrait": "/donuts/assets/pip-baker-portrait.png",
+    "status": "heygen-ready-with-video",
+    "lookId": "cb616e2f45ca49649eb4a2d18618bfc8",
+    "groupId": "7257b18e73864f9582759c39a51069b1",
+    "voiceId": "0ed165284d1c4dc9b600d3129821146a"
+  },
+  "heygenAvatarId": "cb616e2f45ca49649eb4a2d18618bfc8",
+  "heygenAvatarGroupId": "7257b18e73864f9582759c39a51069b1",
+  "heygenVoiceId": "0ed165284d1c4dc9b600d3129821146a",
+  "heygenVoiceName": "Radiant Riley - Friendly 😊",
+  "heygenVideoIdShort": "509450c5a8be4ec9acba8df64a663546"
+}

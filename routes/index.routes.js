@@ -49,6 +49,7 @@ import disasterImpactGraphRoutes from './disaster-impact-graph.routes.js';
 import musicGraphRoutes from './music-graph.routes.js';
 import heygenRoutes from './heygen.routes.js';
 import heygenAssistantRoutes from './heygen-assistant.routes.js';
+import donutsRoutes from './donuts.routes.js';
 import newportPierRoutes from './newport-pier.routes.js';
 
 export default function buildRoutes(io) {
@@ -99,6 +100,7 @@ export default function buildRoutes(io) {
   api.use('/music-graph', musicGraphRoutes);
   api.use('/heygen', heygenRoutes);
   api.use('/heygen-assistant', heygenAssistantRoutes);
+  api.use('/donuts', donutsRoutes);
   api.use('/newport-pier', newportPierRoutes);
   api.use('/', musicHistoryRoutes); // Music history and concert finder
   return api;

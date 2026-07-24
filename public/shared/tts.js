@@ -180,8 +180,16 @@
       utterance.pitch = mobile ? 1.0 : (typeof options.pitch === 'number' ? options.pitch : 1.0);
       utterance.volume = typeof options.volume === 'number' ? options.volume : 0.8;
       const voices = window.speechSynthesis.getVoices();
-      const deep = voices.find(v => /male|daniel|david|alex/i.test(v.name));
-      if (deep) utterance.voice = deep;
+      const preferFemale = options.preferFemale === true || options.gender === 'female';
+      const picked = preferFemale
+        ? voices.find((v) =>
+            /female|samantha|karen|zira|susan|victoria|moira|fiona|siri|google us english female|microsoft zira/i.test(
+              `${v.name} ${v.voiceURI || ''}`
+            )
+          ) ||
+          voices.find((v) => /en(-|_)?us/i.test(v.lang) && !/male|david|daniel|alex|mark|george/i.test(v.name))
+        : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
+      if (picked) utterance.voice = picked;
       // Don't set voice if empty (iOS) - use default
       window.speechSynthesis.speak(utterance);
       return true;
@@ -240,8 +248,16 @@
         utterance.pitch = mobile ? 1.0 : (typeof options.pitch === 'number' ? options.pitch : 1.0);
         utterance.volume = typeof options.volume === 'number' ? options.volume : 0.85;
         const voices = window.speechSynthesis.getVoices();
-        const deep = voices.find(v => /male|daniel|david|alex/i.test(v.name));
-        if (deep) utterance.voice = deep;
+        const preferFemale = options.preferFemale === true || options.gender === 'female';
+        const picked = preferFemale
+          ? voices.find((v) =>
+              /female|samantha|karen|zira|susan|victoria|moira|fiona|siri|google us english female|microsoft zira/i.test(
+                `${v.name} ${v.voiceURI || ''}`
+              )
+            ) ||
+            voices.find((v) => /en(-|_)?us/i.test(v.lang) && !/male|david|daniel|alex|mark|george/i.test(v.name))
+          : voices.find((v) => /male|daniel|david|alex/i.test(v.name));
+        if (picked) utterance.voice = picked;
         utterance.onend = () => resolve();
         utterance.onerror = () => resolve();
         window.speechSynthesis.speak(utterance);

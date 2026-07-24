@@ -94,6 +94,7 @@
   /** Navbar More dropdown items */
   const NAV_MORE = [
     { href: '/heygen-hub.html', icon: 'bi-collection-play', label: 'HeyGen & HyperFrames', title: 'All HeyGen avatar videos and HyperFrames reels (public)' },
+    { href: '/donuts/', icon: 'bi-hearts', label: 'Glazed', title: 'Glazed — donut gallery with Pip the baker' },
     { href: '/gse-analyzer.html', icon: 'bi-graph-up-arrow', label: 'GSE scenario analyzer' },
     { href: '/bike-store-home.html', icon: 'bi-bicycle', label: 'Bike Store' },
     { href: '/ai/voice-dj.html', icon: 'bi-mic', label: 'Wolfman Dave' },

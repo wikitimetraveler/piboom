@@ -11,7 +11,8 @@ import {
   getHeygenSchemaScript,
   getHeygenDemoScript,
   postHeygenDisasterBriefing,
-  getHeygenLibrary
+  getHeygenLibrary,
+  postHeygenSpeech
 } from '../controllers/heygen.controller.js';
 
 const router = Router();
@@ -20,6 +21,7 @@ router.get('/health', getHeygenHealth);
 router.get('/library', getHeygenLibrary);
 router.get('/avatars', getHeygenAvatars);
 router.get('/voices', getHeygenVoices);
+router.post('/speech', postHeygenSpeech);
 router.get('/scripts/schema', getHeygenSchemaScript);
 router.get('/scripts/demo', getHeygenDemoScript);
 router.post('/videos/briefing', postHeygenDisasterBriefing);

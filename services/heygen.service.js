@@ -88,6 +88,31 @@ export async function listVoices() {
 }
 
 /**
+ * HeyGen Starfish TTS — same voice IDs as avatar videos when engine=starfish.
+ * @param {object} opts
+ * @param {string} opts.text
+ * @param {string} opts.voiceId
+ * @param {number} [opts.speed]
+ * @returns {Promise<{ audio_url: string, duration?: number }>}
+ */
+export async function generateSpeech({ text, voiceId, speed = 1 }) {
+  if (!text || !String(text).trim()) throw new Error('text is required');
+  if (!voiceId) throw new Error('voiceId is required');
+  const data = await heygenRequest('/v3/voices/speech', {
+    method: 'POST',
+    body: {
+      text: String(text).trim().slice(0, 5000),
+      voice_id: voiceId,
+      input_type: 'text',
+      speed: Math.min(2, Math.max(0.5, Number(speed) || 1)),
+      language: 'en'
+    }
+  });
+  if (!data?.audio_url) throw new Error('HeyGen speech did not return audio_url');
+  return data;
+}
+
+/**
  * Upload a local image/audio/video for HeyGen (POST /v3/assets).
  * @param {string} filePath
  * @returns {Promise<{ asset_id: string, url?: string }>}

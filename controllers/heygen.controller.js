@@ -6,7 +6,8 @@ import {
   listAvatars,
   listVoices,
   createAvatarVideo,
-  getVideoStatus
+  getVideoStatus,
+  generateSpeech
 } from '../services/heygen.service.js';
 import {
   getSchemaWalkthrough,
@@ -43,6 +44,28 @@ export async function getHeygenVoices(req, res) {
     res.json({ success: true, voices: await listVoices() });
   } catch (e) {
     handleHeygenError(res, e, 'Failed to list voices');
+  }
+}
+
+/** Starfish TTS — reuse avatar voice_id for audio-only Pip / booth lines */
+export async function postHeygenSpeech(req, res) {
+  try {
+    const { text, voiceId, speed } = req.body || {};
+    if (!text || !String(text).trim()) {
+      return res.status(400).json({ success: false, error: 'text is required' });
+    }
+    if (!voiceId) {
+      return res.status(400).json({ success: false, error: 'voiceId is required' });
+    }
+    const data = await generateSpeech({ text, voiceId, speed });
+    res.json({
+      success: true,
+      audioUrl: data.audio_url,
+      duration: data.duration,
+      requestId: data.request_id || null
+    });
+  } catch (e) {
+    handleHeygenError(res, e, 'Failed to generate speech');
   }
 }
 

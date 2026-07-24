@@ -1,0 +1,662 @@
+{
+  "brand": {
+    "name": "Glazed",
+    "tagline": "Flip a treat. Steal a recipe. Meet Savy Donuts and Smoothies on Harbor.",
+    "guideName": "Pip",
+    "guideTitle": "Head baker & glaze gossip",
+    "guidePortrait": "/donuts/assets/pip-baker-portrait.png",
+    "welcomeScript": "Hey! I'm Pip — welcome to Glazed, celebrating Savy Donuts and Smoothies on Harbor. Flip any donut or smoothie card for the recipe and the story. Ask me in chat too — I'm your baker guide."
+  },
+  "shop": {
+    "name": "Savy Donuts & Smoothies",
+    "signImage": "/donuts/assets/savvy-sign.png",
+    "address": "940 S Harbor Blvd, Santa Ana, CA 92704",
+    "crossStreets": "South Harbor near Kent — Anaheim / Santa Ana corridor",
+    "cityNote": "South Anaheim Harbor corridor (Santa Ana address)",
+    "phone": "+1 657-232-0098",
+    "lat": 33.734921,
+    "lng": -117.920417,
+    "note": "Real local counter — Glazed is a fan tribute page, not affiliated with the shop.",
+    "mapsUrl": "https://www.google.com/maps/search/?api=1&query=940+S+Harbor+Blvd+Santa+Ana+CA+92704"
+  },
+  "donuts": [
+    {
+      "id": "classic-glazed",
+      "name": "Classic Glazed",
+      "tagline": "The shiny original",
+      "flavorTags": [
+        "yeast",
+        "glaze",
+        "classic"
+      ],
+      "image": "/donuts/assets/products/classic-glazed.png",
+      "visual": {
+        "dough": "#d4a574",
+        "icing": "#fff6e8",
+        "icingShine": "#ffffff",
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "12 donuts",
+        "time": "About 2 hours (mostly rising)",
+        "ingredients": [
+          "2¼ tsp active dry yeast",
+          "¾ cup warm milk",
+          "¼ cup sugar",
+          "1 large egg + 1 yolk",
+          "¼ cup melted butter",
+          "2½ cups all-purpose flour",
+          "½ tsp salt",
+          "Oil for frying",
+          "Glaze: 2 cups powdered sugar, 3–4 tbsp milk, 1 tsp vanilla"
+        ],
+        "steps": [
+          "Bloom yeast in warm milk with a pinch of sugar until foamy.",
+          "Mix in sugar, eggs, butter, flour, and salt; knead until smooth and soft.",
+          "Rise until doubled, roll to ½ inch, cut rings, and rise again.",
+          "Fry at 350°F until golden; drain on a rack.",
+          "Dip warm donuts in vanilla glaze and let them shine."
+        ]
+      },
+      "history": "Yeast-raised rings with a thin sugar glaze became an American bakery staple in the early 20th century, riding the rise of doughnut shops and chain counters. The glaze isn’t just sweet — it seals in moisture so the pillowy crumb stays soft for hours.",
+      "avatarScript": "Classic Glazed is the handshake of the donut world — yeast dough, hot oil, and a glassy vanilla coat."
+    },
+    {
+      "id": "boston-cream",
+      "name": "Boston Cream",
+      "tagline": "Custard heart, chocolate hat",
+      "flavorTags": [
+        "filled",
+        "custard",
+        "chocolate"
+      ],
+      "image": "/donuts/assets/products/boston-cream.png",
+      "visual": {
+        "dough": "#c9956a",
+        "icing": "#3b2416",
+        "icingShine": "#6b3f2a",
+        "filled": true,
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "10 filled donuts",
+        "time": "About 2½ hours",
+        "ingredients": [
+          "1 batch yeast donut dough (see Classic Glazed)",
+          "Custard: 2 cups milk, ½ cup sugar, 4 yolks, 3 tbsp cornstarch, 1 tsp vanilla, 2 tbsp butter",
+          "Chocolate ganache: 6 oz dark chocolate, ½ cup warm cream"
+        ],
+        "steps": [
+          "Fry round yeast donuts until deep golden; cool.",
+          "Cook custard until thick; chill until pipeable.",
+          "Poke a hole and pipe in custard.",
+          "Dip tops in glossy chocolate ganache."
+        ]
+      },
+      "history": "Boston cream donuts borrow the spirit of Boston cream pie — sponge, custard, and chocolate turned into a portable filled treat.",
+      "avatarScript": "Boston Cream is dessert cosplay: vanilla custard inside, chocolate on top."
+    },
+    {
+      "id": "raspberry-jelly",
+      "name": "Raspberry Jelly",
+      "tagline": "Powdered sugar, secret jam",
+      "flavorTags": [
+        "filled",
+        "fruit",
+        "powdered"
+      ],
+      "image": "/donuts/assets/products/raspberry-jelly.png",
+      "visual": {
+        "dough": "#d2a06c",
+        "icing": "#f7f0e8",
+        "icingShine": "#ffffff",
+        "sprinkle": "#c6284a",
+        "filled": true,
+        "powdered": true,
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "12 jelly donuts",
+        "time": "About 2 hours",
+        "ingredients": [
+          "1 batch yeast donut dough",
+          "1 cup raspberry jam",
+          "Powdered sugar for dusting"
+        ],
+        "steps": [
+          "Fry round donuts; cool slightly.",
+          "Warm jam and pipe into the center.",
+          "Dust generously in powdered sugar."
+        ]
+      },
+      "history": "Jelly-filled doughnuts travel with Central and Eastern European traditions into North American bakeries — raspberry cuts through fried dough with bright acid.",
+      "avatarScript": "Raspberry Jelly is the plot twist donut — quiet powdered exterior, then a berry burst."
+    },
+    {
+      "id": "old-fashioned",
+      "name": "Old-Fashioned",
+      "tagline": "Craggy cake, deep glaze pools",
+      "flavorTags": [
+        "cake",
+        "sour cream",
+        "classic"
+      ],
+      "image": "/donuts/assets/products/old-fashioned.png",
+      "visual": {
+        "dough": "#b8864e",
+        "icing": "#ffe9c9",
+        "icingShine": "#fff8ee",
+        "craggy": true,
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "10 cake donuts",
+        "time": "About 45 minutes",
+        "ingredients": [
+          "2 cups cake flour",
+          "1½ tsp baking powder",
+          "½ tsp baking soda",
+          "¾ tsp salt",
+          "½ tsp nutmeg",
+          "½ cup sugar",
+          "2 tbsp butter, softened",
+          "2 egg yolks",
+          "½ cup sour cream",
+          "Oil for frying",
+          "Simple vanilla glaze"
+        ],
+        "steps": [
+          "Cream butter and sugar; beat in yolks and sour cream.",
+          "Fold in dry ingredients; chill briefly.",
+          "Cut rings and fry until deeply golden with cracked edges.",
+          "Dip in thin glaze so it pools in every crevice."
+        ]
+      },
+      "history": "Old-fashioned cake donuts lean on sour cream for tenderness and signature cracks — denser than yeast rings, built to catch glaze.",
+      "avatarScript": "Old-Fashioned is the crunchy-edged cousin — cake crumb, nutmeg hush, glaze in every crack."
+    },
+    {
+      "id": "maple-walnut",
+      "name": "Maple Walnut",
+      "tagline": "Forest-sweet glaze, toasted crunch",
+      "flavorTags": [
+        "maple",
+        "nuts",
+        "autumn"
+      ],
+      "image": "/donuts/assets/products/maple-walnut.png",
+      "visual": {
+        "dough": "#c48a52",
+        "icing": "#c47a2c",
+        "icingShine": "#e8a84a",
+        "sprinkle": "#6b4423",
+        "nuts": true,
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "12 donuts",
+        "time": "About 2 hours",
+        "ingredients": [
+          "1 batch yeast or cake donuts",
+          "Maple glaze: 1½ cups powdered sugar, 3 tbsp maple syrup, 1–2 tbsp milk, pinch salt",
+          "¾ cup toasted chopped walnuts"
+        ],
+        "steps": [
+          "Fry and cool donuts until just warm.",
+          "Whisk maple glaze until thick but pourable.",
+          "Dip tops, then press on toasted walnuts."
+        ]
+      },
+      "history": "Maple syrup has deep roots in Indigenous North American foodways and New England sugarhouses — bakery maple glazes turned that sweetness into a cold-weather favorite.",
+      "avatarScript": "Maple Walnut tastes like autumn trees — sticky maple shine and walnut crunch."
+    },
+    {
+      "id": "french-cruller",
+      "name": "French Cruller",
+      "tagline": "Airy ridges, whisper-light glaze",
+      "flavorTags": [
+        "choux",
+        "ridged",
+        "light"
+      ],
+      "image": "/donuts/assets/products/french-cruller.png",
+      "visual": {
+        "dough": "#e0b888",
+        "icing": "#fff9f0",
+        "icingShine": "#ffffff",
+        "cruller": true,
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "10 crullers",
+        "time": "About 1 hour",
+        "ingredients": [
+          "1 cup water",
+          "½ cup butter",
+          "1 tbsp sugar",
+          "¼ tsp salt",
+          "1 cup all-purpose flour",
+          "4 large eggs",
+          "Oil for frying",
+          "Honey or vanilla glaze"
+        ],
+        "steps": [
+          "Make choux paste; beat in eggs one at a time.",
+          "Pipe rings with a star tip.",
+          "Fry until puffed, hollow, and golden.",
+          "Glaze lightly so the ridges stay visible."
+        ]
+      },
+      "history": "French crullers use pâte à choux — the same airy dough behind éclairs — piped into ridged rings and fried.",
+      "avatarScript": "French Cruller is the ballerina of the case — choux dough and a glaze that almost floats."
+    },
+    {
+      "id": "chocolate-frosted",
+      "name": "Chocolate Frosted",
+      "tagline": "Party sprinkles, cocoa crown",
+      "flavorTags": [
+        "chocolate",
+        "sprinkles",
+        "classic"
+      ],
+      "image": "/donuts/assets/products/chocolate-frosted.png",
+      "visual": {
+        "dough": "#c9956a",
+        "icing": "#3d2314",
+        "icingShine": "#6b3a22",
+        "sprinkle": "#ff7a9a",
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "12 donuts",
+        "time": "About 2 hours",
+        "ingredients": [
+          "1 batch yeast donuts",
+          "Chocolate frosting: 2 cups powdered sugar, ⅓ cup cocoa, 3–4 tbsp milk, 1 tsp vanilla",
+          "Rainbow sprinkles"
+        ],
+        "steps": [
+          "Fry and cool donuts.",
+          "Whisk frosting until thick and glossy.",
+          "Dip tops and shower with sprinkles before it sets."
+        ]
+      },
+      "history": "Chocolate-frosted rings with sprinkles became the kid-counter favorite mid-century — cocoa frosting sticks better than thin glaze for holding candy colors.",
+      "avatarScript": "Chocolate Frosted is pure celebration energy — cocoa hat and a confetti of sprinkles."
+    },
+    {
+      "id": "strawberry-sprinkle",
+      "name": "Strawberry Sprinkle",
+      "tagline": "Pink frost, weekend vibes",
+      "flavorTags": [
+        "strawberry",
+        "sprinkles",
+        "fun"
+      ],
+      "image": "/donuts/assets/products/strawberry-sprinkle.png",
+      "visual": {
+        "dough": "#d4a574",
+        "icing": "#ff8fab",
+        "icingShine": "#ffc2d4",
+        "sprinkle": "#ffffff",
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "12 donuts",
+        "time": "About 2 hours",
+        "ingredients": [
+          "1 batch yeast donuts",
+          "Strawberry frosting: 2 cups powdered sugar, 2–3 tbsp strawberry puree or jam, splash of milk",
+          "Pink and white sprinkles"
+        ],
+        "steps": [
+          "Fry and cool donuts.",
+          "Beat frosting until smooth and bright pink.",
+          "Dip and decorate with sprinkles."
+        ]
+      },
+      "history": "Strawberry frosting rode the wave of mid-century soda-fountain colors — bright pink became a bakery shorthand for fun long before Instagram.",
+      "avatarScript": "Strawberry Sprinkle is Glazed’s pink wink — berry frost and a sparkle of candy."
+    },
+    {
+      "id": "lemon-poppy",
+      "name": "Lemon Poppy",
+      "tagline": "Zest and tiny crunch",
+      "flavorTags": [
+        "citrus",
+        "poppy",
+        "bright"
+      ],
+      "image": "/donuts/assets/products/lemon-poppy.png",
+      "visual": {
+        "dough": "#e0b888",
+        "icing": "#f5e6a3",
+        "icingShine": "#fff8c9",
+        "sprinkle": "#2a1810",
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "12 donuts",
+        "time": "About 1 hour",
+        "ingredients": [
+          "1 batch cake or yeast donuts",
+          "Lemon glaze: 1½ cups powdered sugar, 2–3 tbsp lemon juice, zest of 1 lemon",
+          "1 tbsp poppy seeds"
+        ],
+        "steps": [
+          "Fry or bake donuts; cool slightly.",
+          "Whisk lemon glaze; stir in most of the poppy seeds.",
+          "Dip and finish with a pinch more seeds and zest."
+        ]
+      },
+      "history": "Lemon-poppy is a muffin classic that jumped the counter — citrus cuts richness, and poppy seeds add a delicate crunch without heavy topping.",
+      "avatarScript": "Lemon Poppy wakes up the case — sunshine glaze and tiny seed crackle."
+    },
+    {
+      "id": "apple-fritter",
+      "name": "Apple Fritter",
+      "tagline": "No ring required",
+      "flavorTags": [
+        "apple",
+        "fritter",
+        "glaze"
+      ],
+      "image": "/donuts/assets/products/apple-fritter.png",
+      "visual": {
+        "dough": "#c48a52",
+        "icing": "#fff0d4",
+        "icingShine": "#ffffff",
+        "craggy": true,
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "10 fritters",
+        "time": "About 45 minutes",
+        "ingredients": [
+          "2 cups diced apple",
+          "1¼ cups flour",
+          "2 tbsp sugar",
+          "1½ tsp baking powder",
+          "½ tsp cinnamon",
+          "⅓ cup milk",
+          "1 egg",
+          "Oil for frying",
+          "Vanilla glaze"
+        ],
+        "steps": [
+          "Toss apples with dry ingredients; fold in milk and egg.",
+          "Scoop irregular mounds into 350°F oil.",
+          "Fry until deep golden; glaze while warm."
+        ]
+      },
+      "history": "Fritters are older than the ring donut — fruit batter fried in oil shows up across many cultures. Apple fritters became a U.S. bakery staple for fall mornings.",
+      "avatarScript": "Apple Fritter breaks the ring rule — crispy edges, soft apple pockets, sticky glaze."
+    },
+    {
+      "id": "cinnamon-sugar",
+      "name": "Cinnamon Sugar",
+      "tagline": "Warm spice, no frosting drama",
+      "flavorTags": [
+        "cinnamon",
+        "sugar",
+        "classic"
+      ],
+      "image": "/donuts/assets/products/cinnamon-sugar.png",
+      "visual": {
+        "dough": "#c9956a",
+        "icing": "#c47a2c",
+        "icingShine": "#e8a84a",
+        "powdered": true,
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "12 donuts",
+        "time": "About 45 minutes",
+        "ingredients": [
+          "1 batch cake donuts",
+          "½ cup sugar",
+          "1½ tsp cinnamon",
+          "2 tbsp melted butter (optional toss)"
+        ],
+        "steps": [
+          "Fry cake donuts until golden.",
+          "Toss warm donuts in cinnamon sugar (butter helps it cling).",
+          "Serve while still fragrant."
+        ]
+      },
+      "history": "Cinnamon sugar is the simplest finish — spice and crystals instead of glaze — beloved for coffee-shop mornings and kid counters alike.",
+      "avatarScript": "Cinnamon Sugar is cozy minimalism — warm spice that sticks to your fingers."
+    },
+    {
+      "id": "matcha-white-chocolate",
+      "name": "Matcha White Chocolate",
+      "tagline": "Green tea gloss, sweet drizzle",
+      "flavorTags": [
+        "matcha",
+        "modern",
+        "drizzle"
+      ],
+      "image": "/donuts/assets/products/matcha-white-chocolate.png",
+      "visual": {
+        "dough": "#d4a574",
+        "icing": "#7a9b5a",
+        "icingShine": "#b5d48a",
+        "sprinkle": "#ffffff",
+        "sparkle": true
+      },
+      "recipe": {
+        "yield": "12 donuts",
+        "time": "About 2 hours",
+        "ingredients": [
+          "1 batch yeast donuts",
+          "Matcha glaze: 1½ cups powdered sugar, 1–1½ tsp culinary matcha, 2–3 tbsp milk",
+          "2 oz melted white chocolate for drizzle"
+        ],
+        "steps": [
+          "Fry and cool donuts.",
+          "Whisk matcha glaze until smooth and vivid.",
+          "Dip tops, then zigzag white chocolate."
+        ]
+      },
+      "history": "Matcha moved from tea ceremony into pastry cases worldwide in the 2010s — paired with white chocolate it balances bitter green notes with creamy sweetness.",
+      "avatarScript": "Matcha White Chocolate is the modern looker — jade glaze with a sweet white drizzle."
+    }
+  ],
+  "smoothies": [
+    {
+      "id": "mango-sunrise",
+      "name": "Mango Sunrise",
+      "tagline": "Tropical gold in a cup",
+      "flavorTags": [
+        "mango",
+        "tropical",
+        "creamy"
+      ],
+      "image": "/donuts/assets/products/mango-smoothie.png",
+      "visual": {
+        "kind": "smoothie",
+        "fill": "#f4a261",
+        "shine": "#ffd59a"
+      },
+      "recipe": {
+        "yield": "2 servings",
+        "time": "5 minutes",
+        "ingredients": [
+          "2 cups frozen mango",
+          "1 banana",
+          "¾ cup orange juice or coconut milk",
+          "½ cup yogurt (optional)",
+          "Honey to taste"
+        ],
+        "steps": [
+          "Blend until silky.",
+          "Add liquid to reach a thick sip.",
+          "Pour cold and serve with a straw."
+        ]
+      },
+      "history": "Mango smoothies rode the 1990s–2000s juice-bar boom — ripe mango’s natural sweetness needs little sugar, so the drink stays bright and thick.",
+      "avatarScript": "Mango Sunrise is liquid sunshine — thick gold you can drink beside a warm donut."
+    },
+    {
+      "id": "berry-blast",
+      "name": "Berry Blast",
+      "tagline": "Purple power, berry punch",
+      "flavorTags": [
+        "berry",
+        "antioxidant",
+        "tart"
+      ],
+      "image": "/donuts/assets/products/berry-blast-smoothie.png",
+      "visual": {
+        "kind": "smoothie",
+        "fill": "#7b2d5e",
+        "shine": "#c77daf"
+      },
+      "recipe": {
+        "yield": "2 servings",
+        "time": "5 minutes",
+        "ingredients": [
+          "2 cups mixed frozen berries",
+          "1 banana",
+          "¾ cup apple juice or milk",
+          "Splash of lemon",
+          "Honey optional"
+        ],
+        "steps": [
+          "Blend until smooth and vivid purple-red.",
+          "Taste for tartness; sweeten lightly if needed.",
+          "Serve immediately."
+        ]
+      },
+      "history": "Berry blends became smoothie-bar staples for color and punchy flavor — a tart counterpoint to sweet bakery cases.",
+      "avatarScript": "Berry Blast is the bold cup — deep berry color that wakes up the counter."
+    },
+    {
+      "id": "tropical-green",
+      "name": "Tropical Green",
+      "tagline": "Spinach sneaks into paradise",
+      "flavorTags": [
+        "green",
+        "pineapple",
+        "fresh"
+      ],
+      "image": "/donuts/assets/products/tropical-green-smoothie.png",
+      "visual": {
+        "kind": "smoothie",
+        "fill": "#5a8f4a",
+        "shine": "#a8d48a"
+      },
+      "recipe": {
+        "yield": "2 servings",
+        "time": "5 minutes",
+        "ingredients": [
+          "1 cup spinach",
+          "1 cup frozen pineapple",
+          "1 banana",
+          "¾ cup coconut water",
+          "Juice of ½ lime"
+        ],
+        "steps": [
+          "Blend spinach with liquid first.",
+          "Add fruit and blend until bright green.",
+          "Serve cold."
+        ]
+      },
+      "history": "Green smoothies popularized veggies-in-a-cup in the 2010s — pineapple and banana keep spinach friendly for first-timers.",
+      "avatarScript": "Tropical Green is the sneaky healthy one — paradise flavor with a leafy wink."
+    },
+    {
+      "id": "strawberry-banana",
+      "name": "Strawberry Banana",
+      "tagline": "The classic duo",
+      "flavorTags": [
+        "strawberry",
+        "banana",
+        "classic"
+      ],
+      "image": "/donuts/assets/products/strawberry-banana-smoothie.png",
+      "visual": {
+        "kind": "smoothie",
+        "fill": "#e85a7a",
+        "shine": "#ffb3c1"
+      },
+      "recipe": {
+        "yield": "2 servings",
+        "time": "5 minutes",
+        "ingredients": [
+          "1½ cups frozen strawberries",
+          "1 ripe banana",
+          "¾ cup milk or yogurt",
+          "Honey optional"
+        ],
+        "steps": [
+          "Blend until creamy pink.",
+          "Adjust thickness with milk.",
+          "Pour and garnish with a berry if you like."
+        ]
+      },
+      "history": "Strawberry-banana is the gateway smoothie — soft fruit, familiar sweetness, and the drink most people order first at a donut-and-smoothie counter.",
+      "avatarScript": "Strawberry Banana is the classic handshake of the smoothie board — pink, creamy, forever."
+    },
+    {
+      "id": "cookies-cream",
+      "name": "Cookies & Cream",
+      "tagline": "Milkshake energy, smoothie chill",
+      "flavorTags": ["cookies", "cream", "dessert"],
+      "image": "/donuts/assets/products/cookies-cream-smoothie.png",
+      "visual": {
+        "kind": "smoothie",
+        "fill": "#5c4033",
+        "shine": "#c4a484"
+      },
+      "recipe": {
+        "yield": "2 servings",
+        "time": "5 minutes",
+        "ingredients": [
+          "2 cups vanilla ice cream or frozen yogurt",
+          "1 cup milk",
+          "8 chocolate sandwich cookies",
+          "½ tsp vanilla"
+        ],
+        "steps": [
+          "Blend milk, ice cream, and vanilla until smooth.",
+          "Pulse in cookies so you still get crunchy bits.",
+          "Pour and top with cookie crumbs."
+        ]
+      },
+      "history": "Cookies-and-cream jumped from ice cream aisles into blender bars — a dessert cup that fits right beside a glazed donut case.",
+      "avatarScript": "Cookies & Cream is the dessert twin of the board — creamy, cookie-crunch, zero regrets."
+    },
+    {
+      "id": "pb-banana",
+      "name": "PB Banana Cocoa",
+      "tagline": "Peanut butter hug in a cup",
+      "flavorTags": ["peanut butter", "banana", "chocolate"],
+      "image": "/donuts/assets/products/pb-banana-smoothie.png",
+      "visual": {
+        "kind": "smoothie",
+        "fill": "#8b5a2b",
+        "shine": "#d4a574"
+      },
+      "recipe": {
+        "yield": "2 servings",
+        "time": "5 minutes",
+        "ingredients": [
+          "2 frozen bananas",
+          "2 tbsp peanut butter",
+          "1 tbsp cocoa powder",
+          "1 cup milk",
+          "Honey optional",
+          "Pinch of salt"
+        ],
+        "steps": [
+          "Blend until thick and silky.",
+          "Taste for sweetness; add honey if needed.",
+          "Serve with a peanut-butter swirl if you’re feeling fancy."
+        ]
+      },
+      "history": "Peanut butter–banana drinks grew up in home kitchens and gyms, then landed on smoothie boards as the filling, savory-sweet option next to fruit cups.",
+      "avatarScript": "PB Banana Cocoa is the power hug — nutty, chocolatey, and perfect after a maple donut."
+    }
+  ]
+}
