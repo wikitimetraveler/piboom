@@ -13,7 +13,7 @@ import { initializeDatabase, createTables } from './services/database.service.js
 import { refreshGenealogyCachesFromPostgres } from './services/genealogy.service.js';
 import { ingestFirmsNrt, ingestUsgsQuakes, ingestNwsCap, ingestNhc, ingestFema, ingestCaFireCameras, pruneOldDisasters, initDisastersSchema, backfillDisasterGeocodes } from './services/disasters.service.js';
 import { ensureDisasterImpactGraphReady, refreshDisasterImpactGraphFromCurrentData } from './services/disaster-impact-graph.service.js';
-import { hasFinanceSession } from './lib/finance-session.js';
+import { financePathNeedsSession, hasFinanceSession } from './lib/finance-session.js';
 import { scheduleDailyAt } from './lib/disaster-daily-scheduler.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -110,33 +110,6 @@ app.use(
   })
 ); // Support base64 image uploads
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
-/** Paths that are allowed without finance session cookie (scripts, styles, images for /finance/ pages). */
-const FINANCE_PUBLIC_FILE = /\.(js|mjs|css|png|jpg|jpeg|gif|svg|webp|ico|woff2?|ttf|eot|map|json|txt|xml|kml|wasm)$/i;
-
-/** Finance HTML pages that are open without login (Worksheets hub, calculators, public hazard tools). */
-const FINANCE_PUBLIC_PAGES = new Set([
-  '/finance/index.html',
-  '/finance/fha-streamline-calculator.html',
-  '/finance/fha-streamline-loan-amount-calculator.html',
-  '/finance/fha-streamline-ntb-calculator.html',
-  '/finance/asset-qualifier-calculator.html',
-  '/finance/dti-calculator.html',
-  '/finance/cashout-refinance-calculator.html',
-  '/finance/amortization-schedule-calculator.html',
-  '/finance/closing-cost-calculator.html',
-  '/finance/ltv-calculator.html',
-  '/finance/va-irrrl-calculator.html',
-  '/finance/disasters-unified.html',
-  '/finance/disasters-webcams.html',
-]);
-
-function financePathNeedsSession(urlPath) {
-  if (urlPath === '/finance' || urlPath === '/finance/') return false;
-  if (!urlPath.startsWith('/finance/')) return false;
-  if (FINANCE_PUBLIC_PAGES.has(urlPath)) return false;
-  return !FINANCE_PUBLIC_FILE.test(urlPath);
-}
 
 function requireFinanceSession(req, res, next) {
   if (req.method !== 'GET' && req.method !== 'HEAD') return next();

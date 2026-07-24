@@ -44,9 +44,19 @@
   }
 
   async function fetchJson(url) {
-    const res = await fetch(url);
+    const res = await fetch(url, { redirect: 'follow' });
     if (!res.ok) throw new Error(`Geo fetch failed: ${url} (${res.status})`);
-    return res.json();
+    const ct = (res.headers.get('content-type') || '').toLowerCase();
+    const text = await res.text();
+    const trimmed = text.trim();
+    if (ct.includes('text/html') || trimmed.startsWith('<!DOCTYPE') || trimmed.startsWith('<!doctype') || trimmed.startsWith('<html')) {
+      throw new Error(`Geo fetch returned HTML instead of JSON (${url}) — check finance public asset allowlist / login gate`);
+    }
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      throw new Error(`Geo fetch invalid JSON (${url}): ${e.message}`);
+    }
   }
 
   async function loadStatesTopo() {
