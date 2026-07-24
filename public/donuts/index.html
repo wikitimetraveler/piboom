@@ -25,19 +25,21 @@
 
   <main class="gz-main">
     <section class="gz-hero container">
-      <div class="gz-hero-inner">
-        <div class="gz-hero-title-row">
+      <div class="gz-hero-layout">
+        <div class="gz-hero-inner">
           <h1 class="gz-brand">Glazed</h1>
-          <button type="button" class="gz-hero-donut" id="gzHeroDonut" aria-label="Glazed donut — click to explode"></button>
+          <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Steal a recipe. Meet Savy Donuts and Smoothies on Harbor.</p>
+          <div class="gz-hero-cta">
+            <a class="gz-btn gz-btn-primary" href="#gzCase">
+              <i class="bi bi-arrow-down-circle"></i> Donuts
+            </a>
+            <a class="gz-btn gz-btn-ghost" href="#gzSmoothies">
+              <i class="bi bi-cup-straw"></i> Smoothies
+            </a>
+          </div>
         </div>
-        <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Steal a recipe. Meet Savy Donuts and Smoothies on Harbor.</p>
-        <div class="gz-hero-cta">
-          <a class="gz-btn gz-btn-primary" href="#gzCase">
-            <i class="bi bi-arrow-down-circle"></i> Donuts
-          </a>
-          <a class="gz-btn gz-btn-ghost" href="#gzSmoothies">
-            <i class="bi bi-cup-straw"></i> Smoothies
-          </a>
+        <div class="gz-hero-orb" aria-hidden="false">
+          <button type="button" class="gz-hero-donut" id="gzHeroDonut" aria-label="Glazed donut — click to explode"></button>
         </div>
       </div>
     </section>

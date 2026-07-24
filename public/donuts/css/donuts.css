@@ -92,8 +92,8 @@ body.gz-page {
   position: relative;
   min-height: min(72vh, 640px);
   display: flex;
-  align-items: flex-end;
-  padding: 2rem 0 3.5rem;
+  align-items: center;
+  padding: 2.5rem 0 3.5rem;
   overflow: hidden;
 }
 
@@ -102,39 +102,25 @@ body.gz-page {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 55% 45%, rgba(245, 199, 106, 0.12), transparent 42%),
+    radial-gradient(circle at 72% 42%, rgba(245, 199, 106, 0.1), transparent 40%),
     linear-gradient(180deg, transparent 30%, rgba(18, 12, 9, 0.85) 100%);
   pointer-events: none;
 }
 
-.gz-hero::after {
-  content: "";
-  position: absolute;
-  right: -8%;
-  top: 8%;
-  width: min(48vw, 520px);
-  height: min(48vw, 520px);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 40% 40%, rgba(255, 217, 138, 0.22), transparent 55%),
-    radial-gradient(circle at 70% 65%, rgba(232, 90, 122, 0.12), transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.85;
+.gz-hero-layout {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, min(42vw, 420px));
+  gap: clamp(1rem, 3vw, 2.5rem);
+  align-items: center;
 }
 
 .gz-hero-inner {
   position: relative;
   z-index: 2;
-  max-width: min(920px, 100%);
-}
-
-.gz-hero-title-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: clamp(0.75rem, 2.5vw, 1.75rem);
-  margin: 0 0 0.85rem;
+  max-width: 34rem;
 }
 
 .gz-brand {
@@ -143,7 +129,7 @@ body.gz-page {
   font-size: clamp(3.6rem, 12vw, 7rem);
   line-height: 0.9;
   letter-spacing: -0.03em;
-  margin: 0;
+  margin: 0 0 0.85rem;
   background: linear-gradient(135deg, var(--gz-cream) 10%, var(--gz-glaze) 45%, var(--gz-frost) 90%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -226,25 +212,48 @@ body.gz-page {
   background: rgba(255, 244, 232, 0.14);
 }
 
+.gz-hero-orb {
+  position: relative;
+  justify-self: end;
+  width: min(100%, 420px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 42% 38%, rgba(255, 232, 180, 0.45) 0%, rgba(255, 217, 138, 0.22) 32%, rgba(232, 90, 122, 0.1) 58%, transparent 72%);
+  box-shadow:
+    0 0 0 1px rgba(255, 217, 138, 0.12),
+    0 24px 60px rgba(0, 0, 0, 0.35);
+  animation: gz-brand-in 0.9s ease-out 0.08s both;
+}
+
+.gz-hero-orb::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 244, 232, 0.12), transparent 70%);
+  pointer-events: none;
+}
+
 .gz-hero-donut {
   position: relative;
-  flex: 0 0 auto;
-  width: clamp(96px, 16vw, 168px);
+  width: 68%;
   aspect-ratio: 1;
   z-index: 1;
   cursor: pointer;
-  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, 0.4));
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.45));
   opacity: 0.98;
   border: none;
   background: transparent;
   padding: 0;
-  animation: gz-brand-in 0.9s ease-out 0.08s both;
 }
 
 .gz-hero-donut:focus-visible {
   outline: 2px solid var(--gz-glaze);
-  outline-offset: 6px;
-  border-radius: 16px;
+  outline-offset: 8px;
+  border-radius: 50%;
 }
 
 .gz-hero-stage {
@@ -289,15 +298,15 @@ body.gz-page {
   animation: gz-explode-piece 0.95s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
 }
 
-.gz-hero-piece:nth-child(1) { top: 0; left: 0; background-position: 0% 0%; --dx: -52px; --dy: -40px; --rot: -28deg; animation-delay: 0s; }
-.gz-hero-piece:nth-child(2) { top: 0; left: 33.333%; background-position: 50% 0%; --dx: 6px; --dy: -56px; --rot: 12deg; animation-delay: 0.03s; }
-.gz-hero-piece:nth-child(3) { top: 0; left: 66.666%; background-position: 100% 0%; --dx: 56px; --dy: -38px; --rot: 32deg; animation-delay: 0.05s; }
-.gz-hero-piece:nth-child(4) { top: 33.333%; left: 0; background-position: 0% 50%; --dx: -64px; --dy: 4px; --rot: -40deg; animation-delay: 0.04s; }
-.gz-hero-piece:nth-child(5) { top: 33.333%; left: 33.333%; background-position: 50% 50%; --dx: 8px; --dy: -10px; --rot: 8deg; animation-delay: 0.02s; }
-.gz-hero-piece:nth-child(6) { top: 33.333%; left: 66.666%; background-position: 100% 50%; --dx: 66px; --dy: 6px; --rot: 38deg; animation-delay: 0.06s; }
-.gz-hero-piece:nth-child(7) { top: 66.666%; left: 0; background-position: 0% 100%; --dx: -48px; --dy: 52px; --rot: -18deg; animation-delay: 0.07s; }
-.gz-hero-piece:nth-child(8) { top: 66.666%; left: 33.333%; background-position: 50% 100%; --dx: -4px; --dy: 60px; --rot: 15deg; animation-delay: 0.08s; }
-.gz-hero-piece:nth-child(9) { top: 66.666%; left: 66.666%; background-position: 100% 100%; --dx: 54px; --dy: 54px; --rot: 42deg; animation-delay: 0.05s; }
+.gz-hero-piece:nth-child(1) { top: 0; left: 0; background-position: 0% 0%; --dx: -90px; --dy: -70px; --rot: -28deg; animation-delay: 0s; }
+.gz-hero-piece:nth-child(2) { top: 0; left: 33.333%; background-position: 50% 0%; --dx: 10px; --dy: -100px; --rot: 12deg; animation-delay: 0.03s; }
+.gz-hero-piece:nth-child(3) { top: 0; left: 66.666%; background-position: 100% 0%; --dx: 100px; --dy: -65px; --rot: 32deg; animation-delay: 0.05s; }
+.gz-hero-piece:nth-child(4) { top: 33.333%; left: 0; background-position: 0% 50%; --dx: -110px; --dy: 6px; --rot: -40deg; animation-delay: 0.04s; }
+.gz-hero-piece:nth-child(5) { top: 33.333%; left: 33.333%; background-position: 50% 50%; --dx: 14px; --dy: -16px; --rot: 8deg; animation-delay: 0.02s; }
+.gz-hero-piece:nth-child(6) { top: 33.333%; left: 66.666%; background-position: 100% 50%; --dx: 115px; --dy: 10px; --rot: 38deg; animation-delay: 0.06s; }
+.gz-hero-piece:nth-child(7) { top: 66.666%; left: 0; background-position: 0% 100%; --dx: -85px; --dy: 90px; --rot: -18deg; animation-delay: 0.07s; }
+.gz-hero-piece:nth-child(8) { top: 66.666%; left: 33.333%; background-position: 50% 100%; --dx: -6px; --dy: 105px; --rot: 15deg; animation-delay: 0.08s; }
+.gz-hero-piece:nth-child(9) { top: 66.666%; left: 66.666%; background-position: 100% 100%; --dx: 95px; --dy: 95px; --rot: 42deg; animation-delay: 0.05s; }
 
 @keyframes gz-explode-piece {
   0% {
@@ -343,39 +352,32 @@ body.gz-page {
 }
 
 @media (max-width: 767.98px) {
-  .gz-hero-donut {
-    width: clamp(72px, 18vw, 110px);
-  }
-
   .gz-hero {
     min-height: auto;
-    padding-top: 2.5rem;
-    align-items: flex-end;
+    padding-top: 1.75rem;
+    padding-bottom: 2.5rem;
+    align-items: flex-start;
   }
 
-  .gz-hero::after {
-    width: min(70vw, 280px);
-    height: min(70vw, 280px);
-    right: -18%;
-    top: 0;
-    opacity: 0.55;
+  .gz-hero-layout {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 1.25rem;
   }
 
-  .gz-hero-title-row {
-    flex-wrap: nowrap;
+  .gz-hero-orb {
+    justify-self: center;
+    width: min(72vw, 260px);
+  }
+
+  .gz-hero-donut {
+    width: 72%;
   }
 }
 
 @media (min-width: 992px) {
-  .gz-hero-donut {
-    width: clamp(160px, 14vw, 220px);
-  }
-
-  .gz-hero::after {
-    right: 4%;
-    top: 12%;
-    width: min(42vw, 560px);
-    height: min(42vw, 560px);
+  .gz-hero-orb {
+    width: min(100%, 460px);
   }
 }
 

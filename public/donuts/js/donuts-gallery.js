@@ -265,7 +265,7 @@
     const pieces = Array.from({ length: 9 }, () => '<span class="gz-hero-piece"></span>').join('');
     const crumbs = Array.from({ length: 14 }, (_, i) => {
       const angle = (i / 14) * Math.PI * 2;
-      const dist = 36 + (i % 5) * 12;
+      const dist = 70 + (i % 5) * 22;
       const cx = Math.round(Math.cos(angle) * dist);
       const cy = Math.round(Math.sin(angle) * dist);
       const delay = (i * 0.04).toFixed(2);
