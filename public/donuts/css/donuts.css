@@ -784,8 +784,8 @@ body.gz-page {
 }
 
 .gz-origin-thumb {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
   flex: 0 0 auto;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));

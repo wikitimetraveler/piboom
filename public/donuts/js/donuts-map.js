@@ -6,10 +6,10 @@
   'use strict';
 
   const FALLBACK_DONUT_ICON = '/donuts/assets/products/classic-glazed-cutout.png';
-  /** Map markers ~1/3 of prior size (reduced by ~2/3) */
-  const ORIGIN_MARKER_SIZE = 16;
-  const SHOP_MARKER_SIZE = 18;
-  const LIST_THUMB_SIZE = 22;
+  /** Map markers — doubled after the shrink pass (readable type icons) */
+  const ORIGIN_MARKER_SIZE = 32;
+  const SHOP_MARKER_SIZE = 36;
+  const LIST_THUMB_SIZE = 28;
 
   function absoluteUrl(path) {
     const p = path || FALLBACK_DONUT_ICON;

@@ -726,6 +726,8 @@
     wireSugar();
     wireOrbSprinkles();
     renderHeroDonut();
+    const yearEl = document.getElementById('gzFooterYear');
+    if (yearEl) yearEl.textContent = `© ${new Date().getFullYear()}`;
 
     const grid = document.getElementById('gzGrid');
     const smoothieGrid = document.getElementById('gzSmoothieGrid');
