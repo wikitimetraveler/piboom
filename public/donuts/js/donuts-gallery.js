@@ -15,9 +15,9 @@
       .replace(/"/g, '&quot;');
   }
 
-  /** Pip = young female Google Neural2 (matches baker avatar). HeyGen intro video keeps Radiant Riley. */
-  const PIP_TTS_VOICE = 'en-US-Neural2-H';
-  const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 1.6, speakingRate: 1.06 };
+  /** Pip = young female Google Standard-F (reliable in prod; Neural2 often unavailable). */
+  const PIP_TTS_VOICE = 'en-US-Standard-F';
+  const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 2.2, speakingRate: 1.06 };
 
   function speak(text) {
     if (!text) return;

@@ -209,35 +209,44 @@ export class VoiceService {
   // Speak using Google Cloud Text-to-Speech (NEW - high quality!)
   async speakWithGoogle(text, voice = 'en-US-Standard-D', options = {}) {
     if (!this.ttsClient) return false;
-    
-    try {
-      const pitch = Number.isFinite(Number(options.pitch)) ? Number(options.pitch) : 0;
-      const speakingRate = Number.isFinite(Number(options.speakingRate))
-        ? Number(options.speakingRate)
-        : 1.0;
-      const languageCode = String(voice || '').split('-').slice(0, 2).join('-') || 'en-US';
 
-      const request = {
-        input: { text: text },
-        voice: { 
-          languageCode,
-          name: voice // Different voices available
-        },
-        audioConfig: { 
-          audioEncoding: 'MP3',
-          pitch,
-          speakingRate
-        },
-      };
-
-      const [response] = await this.ttsClient.synthesizeSpeech(request);
-      
-      // Return the audio content as base64 for frontend playback
-      return response.audioContent.toString('base64');
-    } catch (error) {
-      console.error('Google TTS error:', error);
-      return null;
+    const pitch = Number.isFinite(Number(options.pitch)) ? Number(options.pitch) : 0;
+    const speakingRate = Number.isFinite(Number(options.speakingRate))
+      ? Number(options.speakingRate)
+      : 1.0;
+    // If a Neural/Chirp voice fails in prod, fall back to Standard female/male.
+    const voiceChain = [voice];
+    if (/Neural2|Wavenet|Chirp|Studio|Journey/i.test(String(voice || ''))) {
+      if (/-[FGHC]$/i.test(voice) || /female/i.test(String(options.gender || ''))) {
+        voiceChain.push('en-US-Standard-F');
+      } else {
+        voiceChain.push('en-US-Standard-D');
+      }
     }
+
+    for (const voiceName of voiceChain) {
+      try {
+        const languageCode = String(voiceName || '').split('-').slice(0, 2).join('-') || 'en-US';
+        const request = {
+          input: { text: text },
+          voice: {
+            languageCode,
+            name: voiceName
+          },
+          audioConfig: {
+            audioEncoding: 'MP3',
+            pitch,
+            speakingRate
+          }
+        };
+
+        const [response] = await this.ttsClient.synthesizeSpeech(request);
+        return response.audioContent.toString('base64');
+      } catch (error) {
+        console.error('Google TTS error:', voiceName, error.message || error);
+      }
+    }
+    return null;
   }
 
   // Speak text using text-to-speech with debounce

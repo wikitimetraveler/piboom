@@ -5,24 +5,112 @@
 (function () {
   'use strict';
 
-  const REEL_URL = '/data/donuts-story-reel.json';
+  const REEL_URLS = ['/data/donuts-story-reel.json', '/donuts/data/donuts-story-reel.json'];
   const STORAGE_NA = 'glazedStoryNarrate';
   const GAP_MS = 320;
-  const DEFAULT_VOICE = 'en-US-Neural2-H';
-  const DEFAULT_OPTS = { pitch: 1.6, speakingRate: 1.06, preferFemale: true, gender: 'female' };
+  /** Standard-F is widely available on GCP; Neural2 often missing in prod. */
+  const DEFAULT_VOICE = 'en-US-Standard-F';
+  const DEFAULT_OPTS = { pitch: 2.2, speakingRate: 1.06, preferFemale: true, gender: 'female' };
+  const TTS_TIMEOUT_MS = 9000;
+
+  /** Embedded fallback so Play works even if /data JSON 404s in prod */
+  const FALLBACK_CONFIG = {
+    portrait: '/donuts/assets/pip-baker-portrait.png',
+    voice: DEFAULT_VOICE,
+    pitch: DEFAULT_OPTS.pitch,
+    speakingRate: DEFAULT_OPTS.speakingRate,
+    scenes: [
+      {
+        id: 'open',
+        kicker: 'HyperFrame',
+        title: 'Meet Glazed',
+        copy: 'I’m Pip — flip a treat, steal a recipe, and find Savy on Harbor.',
+        narration: 'Hey! I’m Pip. Welcome to Glazed — a playful tour of Savy Donuts and Smoothies on Harbor.',
+        anchor: 'gzHero',
+        spotlight: '.gz-hero-orb',
+        action: 'explodeHero',
+        durationMs: 5200
+      },
+      {
+        id: 'pip',
+        kicker: 'Your guide',
+        title: 'Pip at the counter',
+        copy: 'Hear my HeyGen welcome anytime — or keep touring with me.',
+        narration: 'That’s me in the dock. Tap Hear welcome for my HeyGen intro, or stick with the reel.',
+        anchor: 'gzGuide',
+        spotlight: '#gzGuide',
+        durationMs: 4800
+      },
+      {
+        id: 'dozen',
+        kicker: 'Baker’s dozen',
+        title: 'Today’s case',
+        copy: 'Flip any donut for recipe and story. Here’s a peek at the back.',
+        narration: 'Here’s the baker’s dozen. Flip a card for the recipe and a little history.',
+        anchor: 'gzCase',
+        spotlight: '#gzGrid .gz-card',
+        action: 'flipFirstDonut',
+        durationMs: 6200
+      },
+      {
+        id: 'smoothies',
+        kicker: 'Cold cups',
+        title: 'Smoothie board',
+        copy: 'Pair a donut with something icy from the Savy counter energy.',
+        narration: 'And the smoothie board — cold cups ready to pair with a warm glaze.',
+        anchor: 'gzSmoothies',
+        spotlight: '#gzSmoothieGrid .gz-card',
+        action: 'unflipCards',
+        durationMs: 5000
+      },
+      {
+        id: 'shop',
+        kicker: 'Harbor',
+        title: 'Find Savy',
+        copy: 'Real counter on South Harbor near Kent — pin it and go.',
+        narration: 'Find Savy on South Harbor near Kent. I’m a fan tribute — go taste the real thing.',
+        anchor: 'gzShop',
+        spotlight: '#gzShopMap',
+        durationMs: 5200
+      },
+      {
+        id: 'ask',
+        kicker: 'Chat',
+        title: 'Ask Pip',
+        copy: 'Questions about pairings or the case? I’m in the dock and the chat bubble.',
+        narration: 'Ask me anything about the case, smoothies, or finding Savy. See you at the counter!',
+        anchor: 'gzGuide',
+        spotlight: '#gzAskPip',
+        durationMs: 4800
+      }
+    ]
+  };
 
   const state = {
+    ready: false,
     running: false,
     paused: false,
     playbackToken: 0,
     scenes: [],
     index: 0,
     config: null,
-    reducedMotion: false
+    reducedMotion: false,
+    pendingPlay: false
   };
 
   function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
+  }
+
+  function withTimeout(promise, ms) {
+    let timer;
+    const timeout = new Promise((resolve) => {
+      timer = setTimeout(() => resolve('__timeout__'), ms);
+    });
+    return Promise.race([promise, timeout]).then((result) => {
+      clearTimeout(timer);
+      return result;
+    });
   }
 
   async function waitWhilePaused(token) {
@@ -74,18 +162,28 @@
       gender: 'female',
       isCancelled: () => !state.running || state.paused
     };
-    if (typeof window.speakNarrationAwaitEnd === 'function') {
-      return window.speakNarrationAwaitEnd(clean, { ...opts, voice });
-    }
-    if (typeof window.gzSpeakPip === 'function') {
-      window.gzSpeakPip(clean);
-      return sleep(Math.min(12000, 900 + clean.length * 55));
-    }
-    if (typeof window.speakWithGoogle === 'function') {
-      window.speakWithGoogle(clean, voice, opts);
-      return sleep(Math.min(12000, 900 + clean.length * 55));
-    }
-    return Promise.resolve();
+
+    const speakPromise = (async () => {
+      try {
+        if (typeof window.speakNarrationAwaitEnd === 'function') {
+          await window.speakNarrationAwaitEnd(clean, { ...opts, voice });
+          return;
+        }
+        if (typeof window.gzSpeakPip === 'function') {
+          window.gzSpeakPip(clean);
+          await sleep(Math.min(8000, 800 + clean.length * 45));
+          return;
+        }
+        if (typeof window.speakWithGoogle === 'function') {
+          await window.speakWithGoogle(clean, voice, opts);
+          await sleep(Math.min(8000, 800 + clean.length * 45));
+        }
+      } catch (err) {
+        console.warn('Glazed reel narration failed', err);
+      }
+    })();
+
+    return withTimeout(speakPromise, TTS_TIMEOUT_MS).then(() => undefined);
   }
 
   function clearSpotlight() {
@@ -164,6 +262,13 @@
     }
   }
 
+  function setPlayEnabled(on) {
+    ['gzStoryPlay', 'gzStoryPlayHero'].forEach((id) => {
+      const btn = document.getElementById(id);
+      if (btn) btn.disabled = !on;
+    });
+  }
+
   function setUiRunning(running) {
     document.body.classList.toggle('gz-story-running', running);
     const play = document.getElementById('gzStoryPlay');
@@ -214,7 +319,10 @@
   }
 
   async function runReel(fromIndex = 0) {
-    if (!state.scenes.length) return;
+    if (!state.scenes.length) {
+      console.warn('Glazed story reel: no scenes loaded');
+      return;
+    }
     state.running = true;
     state.paused = false;
     const token = ++state.playbackToken;
@@ -236,6 +344,10 @@
   }
 
   function togglePlay() {
+    if (!state.ready) {
+      state.pendingPlay = true;
+      return;
+    }
     if (state.running && !state.paused) {
       state.paused = true;
       stopAudio();
@@ -252,7 +364,7 @@
     runReel(0);
   }
 
-  async function waitForCase(timeoutMs = 8000) {
+  async function waitForCase(timeoutMs = 10000) {
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
       if (document.querySelector('#gzGrid .gz-card')) return true;
@@ -261,17 +373,32 @@
     return Boolean(document.querySelector('#gzGrid .gz-card'));
   }
 
+  async function fetchReelJson(url) {
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
+
   async function loadConfig() {
-    try {
-      const res = await fetch(REEL_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      state.config = await res.json();
-      state.scenes = Array.isArray(state.config.scenes) ? state.config.scenes : [];
-    } catch (err) {
-      console.warn('Glazed story reel failed to load', err);
-      state.config = { portrait: '/donuts/assets/pip-baker-portrait.png' };
-      state.scenes = [];
+    for (const url of REEL_URLS) {
+      try {
+        const data = await fetchReelJson(url);
+        if (Array.isArray(data.scenes) && data.scenes.length) {
+          state.config = {
+            ...data,
+            voice: data.voice || DEFAULT_VOICE,
+            pitch: data.pitch ?? DEFAULT_OPTS.pitch,
+            speakingRate: data.speakingRate ?? DEFAULT_OPTS.speakingRate
+          };
+          state.scenes = data.scenes;
+          return;
+        }
+      } catch (err) {
+        console.warn('Glazed story reel fetch failed', url, err);
+      }
     }
+    state.config = { ...FALLBACK_CONFIG };
+    state.scenes = FALLBACK_CONFIG.scenes.slice();
   }
 
   function bindUi() {
@@ -295,8 +422,11 @@
   async function init() {
     state.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     loadNarratePref();
+    setPlayEnabled(false);
     bindUi();
     await loadConfig();
+    state.ready = true;
+    setPlayEnabled(true);
 
     const panel = document.getElementById('gzStoryPanel');
     if (panel) panel.hidden = !state.scenes.length;
@@ -307,6 +437,13 @@
       toggle: togglePlay,
       isRunning: () => state.running
     };
+
+    if (state.pendingPlay) {
+      state.pendingPlay = false;
+      await waitForCase();
+      runReel(0);
+      return;
+    }
 
     const params = new URLSearchParams(window.location.search);
     if (params.get('reel') === '1' && state.scenes.length) {

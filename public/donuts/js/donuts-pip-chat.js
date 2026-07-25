@@ -5,9 +5,9 @@
  */
 import AIChatWidget from '/shared/ai-chat-widget.js';
 
-/** Young female Neural2 — warmer/lighter to match Pip’s baker avatar */
-const PIP_TTS_VOICE = 'en-US-Neural2-H';
-const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 1.6, speakingRate: 1.06 };
+/** Young female Standard-F — reliable in prod; pitch up for youthful baker Pip */
+const PIP_TTS_VOICE = 'en-US-Standard-F';
+const PIP_TTS_OPTS = { preferFemale: true, gender: 'female', pitch: 2.2, speakingRate: 1.06 };
 
 function forSpeech(text) {
   return String(text || '')

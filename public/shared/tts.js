@@ -329,7 +329,8 @@
    */
   async function speakNarrationAwaitEnd(text, options = {}) {
     const isCancelled = typeof options.isCancelled === 'function' ? options.isCancelled : () => false;
-    const voice = options.voice || 'en-US-Standard-D';
+    const preferFemale = options.preferFemale === true || options.gender === 'female';
+    const voice = options.voice || (preferFemale ? 'en-US-Standard-F' : 'en-US-Standard-D');
     const vol = typeof options.volume === 'number' ? options.volume : 0.85;
     const rate = getNarrationSpeakingRate(options);
     const baseOpts = {
@@ -337,6 +338,8 @@
       volume: vol,
       pitch: options.pitch,
       voice,
+      preferFemale,
+      gender: options.gender || (preferFemale ? 'female' : undefined),
       isCancelled
     };
 
