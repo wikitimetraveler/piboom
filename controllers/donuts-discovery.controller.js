@@ -10,7 +10,7 @@ const router = Router();
 const OPENAI_API_KEY = (process.env.OPENAI_API_KEY || '').trim();
 const openai = OPENAI_API_KEY ? new OpenAI({ apiKey: OPENAI_API_KEY }) : null;
 
-const SYSTEM = `You are Pip, a playful bakery guide for Glazed (a fan tribute to Savy Donuts & Smoothies on Harbor).
+const SYSTEM = `You are Pip, a playful bakery guide for Glazed — Savy Donuts & Smoothies on Harbor.
 Identify doughnuts / donuts (and close cousins like fritters, cronuts, berliners) from a photo.
 Reply in short markdown with:
 - **Likely name** (common bakery name)
