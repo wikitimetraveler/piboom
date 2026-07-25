@@ -121,7 +121,7 @@
         throw new Error(data.error || data.message || `HTTP ${res.status}`);
       }
       if (out) out.innerHTML = formatMd(data.result || '');
-      setStatus('Identified — history nibble only, no recipes.', 'info');
+      setStatus('Identified — history nibble only.', 'info');
       if (typeof window.gzSpeakPip === 'function') {
         const plain = String(data.result || '')
           .replace(/[*_`#]/g, ' ')

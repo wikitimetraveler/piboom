@@ -41,7 +41,7 @@ router.post('/vision-id', async (req, res) => {
           content: [
             {
               type: 'text',
-              text: userPrompt || 'Identify this donut from the photo. History vibes welcome — no recipes.'
+              text: userPrompt || 'Identify this donut from the photo. History vibes welcome.'
             },
             { type: 'image_url', image_url: { url: imageData } }
           ]
