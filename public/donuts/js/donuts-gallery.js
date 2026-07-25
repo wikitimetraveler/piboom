@@ -265,13 +265,15 @@
       .map((t) => `<span class="gz-tag">${esc(t)}</span>`)
       .join('');
     const isSmoothie = kind === 'smoothie';
-    const kicker = isSmoothie ? 'Smoothie' : 'Donut';
-    const pairLabel = isSmoothie ? 'Pair with a donut' : 'Pair with a smoothie';
-    const flipHint = isSmoothie ? 'Flip for blend notes &amp; history' : 'Flip for history &amp; origins';
-    const backKicker = isSmoothie ? 'Blend &amp; story' : 'History &amp; origins';
-    const openLabel = isSmoothie ? 'Open blend notes' : 'Open full story';
-    const openIcon = isSmoothie ? 'bi-cup-straw' : 'bi-book-half';
-    const bodyBits = isSmoothie
+    const isSubmarine = kind === 'submarine';
+    const isRecipeBased = isSmoothie || isSubmarine;
+    const kicker = isSubmarine ? 'Submarine' : isSmoothie ? 'Smoothie' : 'Donut';
+    const pairLabel = isRecipeBased ? 'Pair with a donut' : 'Pair with a smoothie';
+    const flipHint = isRecipeBased ? 'Flip for recipe &amp; history' : 'Flip for history &amp; origins';
+    const backKicker = isRecipeBased ? 'Recipe &amp; story' : 'History &amp; origins';
+    const openLabel = isRecipeBased ? 'Open full recipe' : 'Open full story';
+    const openIcon = isSubmarine ? 'bi-basket2' : isSmoothie ? 'bi-cup-straw' : 'bi-book-half';
+    const bodyBits = isRecipeBased
       ? `${recipeHtml(item.recipe)}
               <div class="gz-back-block">
                 <h4>History</h4>
@@ -283,7 +285,7 @@
               </div>
               ${originHtml(item.origin).replace('data-origin-id=""', `data-origin-id="${esc(item.id)}"`)}`;
     return `
-      <article class="gz-card" data-id="${esc(item.id)}" data-kind="${esc(kind)}" tabindex="0" role="button" aria-pressed="false" aria-label="${esc(item.name)} — flip for ${isSmoothie ? 'blend notes and history' : 'history and origins'}">
+      <article class="gz-card" data-id="${esc(item.id)}" data-kind="${esc(kind)}" tabindex="0" role="button" aria-pressed="false" aria-label="${esc(item.name)} — flip for ${isRecipeBased ? 'recipe and history' : 'history and origins'}">
         <div class="gz-card-inner">
           <div class="gz-face gz-face--front">
             <div class="gz-donut-stage">${productArt(item)}</div>
@@ -731,6 +733,7 @@
 
     const grid = document.getElementById('gzGrid');
     const smoothieGrid = document.getElementById('gzSmoothieGrid');
+    const submarineGrid = document.getElementById('gzSubmarineGrid');
     const loading = document.getElementById('gzLoading');
 
     try {
@@ -740,6 +743,7 @@
       const brand = data.brand || {};
       const donuts = Array.isArray(data.donuts) ? data.donuts : [];
       const smoothies = Array.isArray(data.smoothies) ? data.smoothies : [];
+      const submarines = Array.isArray(data.submarines) ? data.submarines : [];
 
       document.getElementById('gzHeroLine').textContent =
         brand.tagline || 'Flip a treat. Hear the history. Meet Savy Donuts and Smoothies on Harbor.';
@@ -761,7 +765,10 @@
       smoothies.forEach((s) => {
         byId[s.id] = { ...s, kind: 'smoothie' };
       });
-      window.GlazedCatalog = { donuts, smoothies, byId, shop: data.shop || null };
+      submarines.forEach((sub) => {
+        byId[sub.id] = { ...sub, kind: 'submarine' };
+      });
+      window.GlazedCatalog = { donuts, smoothies, submarines, byId, shop: data.shop || null };
 
       if (grid) {
         grid.innerHTML = donuts.length
@@ -775,6 +782,13 @@
           ? smoothies.map((s) => cardHtml(s, 'smoothie')).join('')
           : '<p class="gz-empty">Smoothie board is warming up — try again shortly.</p>';
         bindCards(smoothies, 'gzSmoothieGrid');
+      }
+
+      if (submarineGrid) {
+        submarineGrid.innerHTML = submarines.length
+          ? submarines.map((sub) => cardHtml(sub, 'submarine')).join('')
+          : '<p class="gz-empty">Submarine menu coming soon — check back shortly.</p>';
+        bindCards(submarines, 'gzSubmarineGrid');
       }
     } catch (err) {
       console.error('Glazed gallery failed to load', err);
