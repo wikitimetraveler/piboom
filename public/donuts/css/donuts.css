@@ -776,9 +776,26 @@ body.gz-page {
   border-radius: 12px;
   padding: 0.65rem 0.8rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.7rem;
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.gz-origin-thumb {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+.gz-origin-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
 }
 
 .gz-origin-link span {
@@ -788,8 +805,15 @@ body.gz-page {
 
 .gz-origin-link:hover,
 .gz-origin-link:focus-visible {
-  border-color: rgba(255, 122, 154, 0.45);
+  border-color: rgba(255, 122, 154, 0.55);
+  background: rgba(42, 24, 16, 0.85);
   outline: none;
+  transform: translateY(-1px);
+}
+
+.gz-origin-link.is-active {
+  border-color: rgba(255, 122, 154, 0.75);
+  box-shadow: 0 0 0 2px rgba(232, 90, 122, 0.25);
 }
 
 .gz-origins-map-wrap,

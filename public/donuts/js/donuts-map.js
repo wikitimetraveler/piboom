@@ -5,14 +5,24 @@
 (function () {
   'use strict';
 
-  const DONUT_ICON_URL = '/donuts/assets/products/classic-glazed-cutout.png';
+  const DONUT_ICON_PATH = '/donuts/assets/products/classic-glazed-cutout.png';
 
-  function donutIcon(google, size) {
+  function donutIconUrl() {
+    try {
+      return new URL(DONUT_ICON_PATH, window.location.origin).href;
+    } catch (_) {
+      return DONUT_ICON_PATH;
+    }
+  }
+
+  function donutIcon(size) {
     const s = size || 44;
+    const g = window.google?.maps;
+    if (!g?.Size || !g?.Point) return undefined;
     return {
-      url: DONUT_ICON_URL,
-      scaledSize: new google.maps.Size(s, s),
-      anchor: new google.maps.Point(s / 2, s / 2)
+      url: donutIconUrl(),
+      scaledSize: new g.Size(s, s),
+      anchor: new g.Point(Math.round(s / 2), Math.round(s / 2))
     };
   }
 
@@ -22,6 +32,29 @@
       return window.laneFamilyLoadGoogleMaps();
     }
     return false;
+  }
+
+  function placeDonutMarker(opts) {
+    const g = window.google.maps;
+    const icon = donutIcon(opts.size || 44);
+    try {
+      return new g.Marker({
+        position: opts.position,
+        map: opts.map,
+        title: opts.title || '',
+        icon,
+        animation: opts.animation,
+        optimized: false
+      });
+    } catch (err) {
+      console.warn('Donut marker icon failed — using default pin', err);
+      return new g.Marker({
+        position: opts.position,
+        map: opts.map,
+        title: opts.title || '',
+        animation: opts.animation
+      });
+    }
   }
 
   async function initMap(shop) {
@@ -90,18 +123,18 @@
       fullscreenControl: true
     });
 
-    const marker = new google.maps.Marker({
+    const marker = placeDonutMarker({
       position: { lat, lng },
       map,
       title: shop.name || 'Savy Donuts & Smoothies',
-      icon: donutIcon(google.maps, 52),
+      size: 52,
       animation: google.maps.Animation.DROP
     });
 
     const info = new google.maps.InfoWindow({
       content: `<div style="color:#1a100c;max-width:220px">
-        <strong>${shop.name || 'Savy'}</strong><br/>
-        <span style="font-size:12px">${shop.address || ''}</span>
+        <strong>${escapeHtml(shop.name || 'Savy')}</strong><br/>
+        <span style="font-size:12px">${escapeHtml(shop.address || '')}</span>
       </div>`
     });
     marker.addListener('click', () => info.open({ map, anchor: marker }));
@@ -123,22 +156,8 @@
       })
       .filter(Boolean);
 
-    if (list) {
-      list.innerHTML = pins.length
-        ? pins
-            .map(
-              (p) => `<li>
-                <button type="button" class="gz-origin-link" data-lat="${p.lat}" data-lng="${p.lng}" data-id="${p.id}">
-                  <strong>${escapeHtml(p.name)}</strong>
-                  <span>${escapeHtml(p.origin.place || '')}${p.origin.year ? ` · ${escapeHtml(String(p.origin.year))}` : ''}</span>
-                </button>
-              </li>`
-            )
-            .join('')
-        : '<li class="text-muted">Origin pins coming soon.</li>';
-    }
-
     if (!pins.length) {
+      if (list) list.innerHTML = '<li class="text-muted">Origin pins coming soon.</li>';
       if (status) {
         status.hidden = false;
         status.textContent = 'No invention pins loaded yet.';
@@ -148,11 +167,26 @@
 
     const ok = await loadMaps();
     if (!ok || !window.google?.maps) {
+      // Still render clickable rows (list-only mode)
+      if (list) {
+        list.innerHTML = pins
+          .map(
+            (p) => `<li>
+              <button type="button" class="gz-origin-link" data-id="${escapeHtml(p.id)}" disabled>
+                <strong>${escapeHtml(p.name)}</strong>
+                <span>${escapeHtml(p.origin.place || '')}${
+              p.origin.year ? ` · ${escapeHtml(String(p.origin.year))}` : ''
+            }</span>
+              </button>
+            </li>`
+          )
+          .join('');
+      }
       if (status) {
         status.hidden = false;
         status.textContent =
           window.__laneGoogleMapsUnavailableReason ||
-          'Origins map couldn’t load — use the place list beside it.';
+          'Origins map couldn’t load — place list is still here.';
       }
       return;
     }
@@ -168,41 +202,76 @@
       streetViewControl: false,
       fullscreenControl: true
     });
-    map.fitBounds(bounds, 48);
+
+    try {
+      map.fitBounds(bounds, 56);
+    } catch (_) {
+      map.fitBounds(bounds);
+    }
 
     const info = new google.maps.InfoWindow();
     const byId = {};
 
+    function focusPin(id) {
+      const entry = byId[id];
+      if (!entry) return;
+      const { marker, pin } = entry;
+      info.setContent(`<div style="color:#1a100c;max-width:260px">
+        <strong>${escapeHtml(pin.name)}</strong><br/>
+        <span style="font-size:12px">${escapeHtml(pin.origin.place || '')}${
+        pin.origin.year ? ` · ${escapeHtml(String(pin.origin.year))}` : ''
+      }</span>
+        <p style="font-size:12px;margin:6px 0 0">${escapeHtml(pin.origin.note || pin.history || '')}</p>
+      </div>`);
+      info.open({ map, anchor: marker });
+      map.panTo({ lat: pin.lat, lng: pin.lng });
+      if (map.getZoom() < 4) map.setZoom(4);
+      list?.querySelectorAll('.gz-origin-link').forEach((btn) => {
+        btn.classList.toggle('is-active', btn.getAttribute('data-id') === id);
+      });
+    }
+
     pins.forEach((p) => {
-      const marker = new google.maps.Marker({
+      const marker = placeDonutMarker({
         position: { lat: p.lat, lng: p.lng },
         map,
         title: `${p.name} — ${p.origin.place || ''}`,
-        icon: donutIcon(google.maps, 40)
+        size: 48
       });
       byId[p.id] = { marker, pin: p };
-      marker.addListener('click', () => {
-        info.setContent(`<div style="color:#1a100c;max-width:260px">
-          <strong>${escapeHtml(p.name)}</strong><br/>
-          <span style="font-size:12px">${escapeHtml(p.origin.place || '')}${
-          p.origin.year ? ` · ${escapeHtml(String(p.origin.year))}` : ''
-        }</span>
-          <p style="font-size:12px;margin:6px 0 0">${escapeHtml(p.origin.note || p.history || '')}</p>
-        </div>`);
-        info.open({ map, anchor: marker });
-        map.panTo(marker.getPosition());
-      });
+      marker.addListener('click', () => focusPin(p.id));
     });
 
-    list?.addEventListener('click', (e) => {
-      const btn = e.target.closest('.gz-origin-link');
-      if (!btn) return;
-      const entry = byId[btn.getAttribute('data-id')];
-      if (!entry) return;
-      google.maps.event.trigger(entry.marker, 'click');
-    });
+    if (list) {
+      list.innerHTML = pins
+        .map(
+          (p) => `<li>
+            <button type="button" class="gz-origin-link" data-id="${escapeHtml(p.id)}" aria-label="Show ${escapeHtml(p.name)} on map">
+              <img class="gz-origin-thumb" src="${DONUT_ICON_PATH}" alt="" width="28" height="28"/>
+              <span class="gz-origin-copy">
+                <strong>${escapeHtml(p.name)}</strong>
+                <span>${escapeHtml(p.origin.place || '')}${
+            p.origin.year ? ` · ${escapeHtml(String(p.origin.year))}` : ''
+          }</span>
+              </span>
+            </button>
+          </li>`
+        )
+        .join('');
 
-    window.GlazedOriginsMap = { map, byId };
+      list.onclick = (e) => {
+        const btn = e.target.closest('.gz-origin-link');
+        if (!btn || btn.disabled) return;
+        e.preventDefault();
+        focusPin(btn.getAttribute('data-id'));
+      };
+    }
+
+    window.GlazedOriginsMap = {
+      map,
+      byId,
+      focusPin
+    };
   }
 
   function escapeHtml(value) {

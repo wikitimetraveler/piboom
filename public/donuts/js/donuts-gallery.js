@@ -360,10 +360,11 @@
 
   function jumpToOrigin(id) {
     document.getElementById('gzOrigins')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    const entry = window.GlazedOriginsMap?.byId?.[id];
-    if (entry?.marker && window.google?.maps) {
-      window.setTimeout(() => google.maps.event.trigger(entry.marker, 'click'), 400);
-    }
+    window.setTimeout(() => {
+      if (typeof window.GlazedOriginsMap?.focusPin === 'function') {
+        window.GlazedOriginsMap.focusPin(id);
+      }
+    }, 400);
   }
 
   function askPipPairing(item) {
