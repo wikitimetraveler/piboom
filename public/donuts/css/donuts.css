@@ -825,6 +825,27 @@ body.gz-page {
   border: 1px solid rgba(245, 199, 106, 0.28);
 }
 
+.gz-map-reset-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 10;
+  background: rgba(26, 16, 12, 0.85);
+  backdrop-filter: blur(8px);
+  color: #f5c76a;
+  border: 1px solid rgba(245, 199, 106, 0.3);
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.gz-map-reset-btn:hover {
+  background: rgba(26, 16, 12, 0.95);
+  border-color: #f5c76a;
+  transform: translateY(-1px);
+}
+
 .gz-origins-map,
 .gz-shop-map {
   width: 100%;

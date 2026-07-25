@@ -293,6 +293,23 @@
       byId,
       focusPin
     };
+
+    // Reset button — zoom back out to show all pins
+    const resetBtn = document.getElementById('gzOriginsMapReset');
+    if (resetBtn) {
+      resetBtn.hidden = false;
+      resetBtn.onclick = () => {
+        info.close();
+        try {
+          map.fitBounds(bounds, 56);
+        } catch (_) {
+          map.fitBounds(bounds);
+        }
+        list?.querySelectorAll('.gz-origin-link').forEach((btn) => {
+          btn.classList.remove('is-active');
+        });
+      };
+    }
   }
 
   function escapeHtml(value) {
