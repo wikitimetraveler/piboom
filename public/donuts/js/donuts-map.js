@@ -5,22 +5,33 @@
 (function () {
   'use strict';
 
-  const DONUT_ICON_PATH = '/donuts/assets/products/classic-glazed-cutout.png';
+  const FALLBACK_DONUT_ICON = '/donuts/assets/products/classic-glazed-cutout.png';
+  /** Map markers ~1/3 of prior size (reduced by ~2/3) */
+  const ORIGIN_MARKER_SIZE = 16;
+  const SHOP_MARKER_SIZE = 18;
+  const LIST_THUMB_SIZE = 22;
 
-  function donutIconUrl() {
+  function absoluteUrl(path) {
+    const p = path || FALLBACK_DONUT_ICON;
     try {
-      return new URL(DONUT_ICON_PATH, window.location.origin).href;
+      return new URL(p, window.location.origin).href;
     } catch (_) {
-      return DONUT_ICON_PATH;
+      return p;
     }
   }
 
-  function donutIcon(size) {
-    const s = size || 44;
+  function productIconPath(item) {
+    if (item?.image) return item.image;
+    if (item?.id === 'classic-glazed') return FALLBACK_DONUT_ICON;
+    return FALLBACK_DONUT_ICON;
+  }
+
+  function donutIcon(imagePath, size) {
+    const s = size || ORIGIN_MARKER_SIZE;
     const g = window.google?.maps;
     if (!g?.Size || !g?.Point) return undefined;
     return {
-      url: donutIconUrl(),
+      url: absoluteUrl(imagePath || FALLBACK_DONUT_ICON),
       scaledSize: new g.Size(s, s),
       anchor: new g.Point(Math.round(s / 2), Math.round(s / 2))
     };
@@ -36,7 +47,7 @@
 
   function placeDonutMarker(opts) {
     const g = window.google.maps;
-    const icon = donutIcon(opts.size || 44);
+    const icon = donutIcon(opts.imagePath, opts.size || ORIGIN_MARKER_SIZE);
     try {
       return new g.Marker({
         position: opts.position,
@@ -127,7 +138,8 @@
       position: { lat, lng },
       map,
       title: shop.name || 'Savy Donuts & Smoothies',
-      size: 52,
+      imagePath: FALLBACK_DONUT_ICON,
+      size: SHOP_MARKER_SIZE,
       animation: google.maps.Animation.DROP
     });
 
@@ -236,7 +248,8 @@
         position: { lat: p.lat, lng: p.lng },
         map,
         title: `${p.name} — ${p.origin.place || ''}`,
-        size: 48
+        imagePath: productIconPath(p),
+        size: ORIGIN_MARKER_SIZE
       });
       byId[p.id] = { marker, pin: p };
       marker.addListener('click', () => focusPin(p.id));
@@ -244,10 +257,11 @@
 
     if (list) {
       list.innerHTML = pins
-        .map(
-          (p) => `<li>
+        .map((p) => {
+          const thumb = productIconPath(p);
+          return `<li>
             <button type="button" class="gz-origin-link" data-id="${escapeHtml(p.id)}" aria-label="Show ${escapeHtml(p.name)} on map">
-              <img class="gz-origin-thumb" src="${DONUT_ICON_PATH}" alt="" width="28" height="28"/>
+              <img class="gz-origin-thumb" src="${escapeHtml(thumb)}" alt="" width="${LIST_THUMB_SIZE}" height="${LIST_THUMB_SIZE}"/>
               <span class="gz-origin-copy">
                 <strong>${escapeHtml(p.name)}</strong>
                 <span>${escapeHtml(p.origin.place || '')}${
@@ -255,8 +269,8 @@
           }</span>
               </span>
             </button>
-          </li>`
-        )
+          </li>`;
+        })
         .join('');
 
       list.onclick = (e) => {
