@@ -57,8 +57,8 @@ function initPipChat() {
     inputPlaceholder: 'Ask Pip about donuts, smoothies, or Savy on Harbor…',
     welcomeHtml: `
       <img src="/donuts/assets/pip-baker-portrait.png" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover;margin-bottom:8px;border:2px solid #f5c76a"/>
-      <p>Hey — I'm <strong>Pip</strong>, your chatty donut buddy. I answer in text <em>and</em> speak aloud in my voice.</p>
-      <small class="text-muted">Try: "What's good with Mango Sunrise?" or "Where is Savy on Harbor?" — then tell me how I sound!</small>`,
+      <p>Hey — I'm <strong>Pip</strong>, your chatty donut buddy. I share history and pairings — not recipes for the donuts.</p>
+      <small class="text-muted">Try: "Where did Boston Cream come from?" or "Where is Savy on Harbor?"</small>`,
     onMessageReceived: (response) => {
       speakPip(response);
     }

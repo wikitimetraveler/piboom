@@ -1,11 +1,11 @@
 {
   "brand": {
     "name": "Glazed",
-    "tagline": "Flip a treat. Steal a recipe. Meet Savy Donuts and Smoothies on Harbor.",
+    "tagline": "Flip a treat. Hear the history. Meet Savy Donuts and Smoothies on Harbor.",
     "guideName": "Pip",
     "guideTitle": "Head baker & glaze gossip",
     "guidePortrait": "/donuts/assets/pip-baker-portrait.png",
-    "welcomeScript": "Hey! I'm Pip — welcome to Glazed, celebrating Savy Donuts and Smoothies on Harbor. Flip any donut or smoothie card for the recipe and the story. Ask me in chat too — I'm your baker guide."
+    "welcomeScript": "Hey! I'm Pip — welcome to Glazed, celebrating Savy Donuts and Smoothies on Harbor. Flip any donut for its story and where it came from. Smoothies still share blend notes. Ask me in chat too — I'm your baker guide."
   },
   "shop": {
     "name": "Savy Donuts & Smoothies",
@@ -36,30 +36,15 @@
         "icingShine": "#ffffff",
         "sparkle": true
       },
-      "recipe": {
-        "yield": "12 donuts",
-        "time": "About 2 hours (mostly rising)",
-        "ingredients": [
-          "2¼ tsp active dry yeast",
-          "¾ cup warm milk",
-          "¼ cup sugar",
-          "1 large egg + 1 yolk",
-          "¼ cup melted butter",
-          "2½ cups all-purpose flour",
-          "½ tsp salt",
-          "Oil for frying",
-          "Glaze: 2 cups powdered sugar, 3–4 tbsp milk, 1 tsp vanilla"
-        ],
-        "steps": [
-          "Bloom yeast in warm milk with a pinch of sugar until foamy.",
-          "Mix in sugar, eggs, butter, flour, and salt; knead until smooth and soft.",
-          "Rise until doubled, roll to ½ inch, cut rings, and rise again.",
-          "Fry at 350°F until golden; drain on a rack.",
-          "Dip warm donuts in vanilla glaze and let them shine."
-        ]
-      },
-      "history": "Yeast-raised rings with a thin sugar glaze became an American bakery staple in the early 20th century, riding the rise of doughnut shops and chain counters. The glaze isn’t just sweet — it seals in moisture so the pillowy crumb stays soft for hours.",
-      "avatarScript": "Classic Glazed is the handshake of the donut world — yeast dough, hot oil, and a glassy vanilla coat."
+      "history": "The ring doughnut’s origin story usually points to Rockport, Maine, where Captain Hanson Gregory said he punched out the soggy middle in 1847. Dutch olykoeks (“oil cakes”) had already arrived with New Amsterdam settlers, but the hole made frying even and created the American ring. By the early 1900s, automated doughnut machines and thin sugar glaze turned the shiny yeast ring into a breakfast staple from New York counters to West Coast shops — glaze sealing moisture so the crumb stays soft for hours.",
+      "avatarScript": "Classic Glazed is the handshake of the donut world — yeast dough, hot oil, and a glassy vanilla coat.",
+      "origin": {
+        "place": "Rockport, Maine, USA",
+        "year": "1847",
+        "lat": 44.1845,
+        "lng": -69.1089,
+        "note": "Captain Hanson Gregory claimed inventing the ring doughnut by knocking out the soggy center."
+      }
     },
     {
       "id": "boston-cream",
@@ -78,23 +63,15 @@
         "filled": true,
         "sparkle": true
       },
-      "recipe": {
-        "yield": "10 filled donuts",
-        "time": "About 2½ hours",
-        "ingredients": [
-          "1 batch yeast donut dough (see Classic Glazed)",
-          "Custard: 2 cups milk, ½ cup sugar, 4 yolks, 3 tbsp cornstarch, 1 tsp vanilla, 2 tbsp butter",
-          "Chocolate ganache: 6 oz dark chocolate, ½ cup warm cream"
-        ],
-        "steps": [
-          "Fry round yeast donuts until deep golden; cool.",
-          "Cook custard until thick; chill until pipeable.",
-          "Poke a hole and pipe in custard.",
-          "Dip tops in glossy chocolate ganache."
-        ]
-      },
-      "history": "Boston cream donuts borrow the spirit of Boston cream pie — sponge, custard, and chocolate turned into a portable filled treat.",
-      "avatarScript": "Boston Cream is dessert cosplay: vanilla custard inside, chocolate on top."
+      "history": "Boston cream pie (really a cake) became a Massachusetts pride dish in the 1800s: sponge, vanilla custard, chocolate top. Bakers later compressed that idea into a filled yeast doughnut — custard piped inside, chocolate ganache on top. By the mid-20th century it was a New England bakery fixture and a Dunkin’-era classic nationwide, a portable echo of Boston’s favorite “pie.”",
+      "avatarScript": "Boston Cream is dessert cosplay: vanilla custard inside, chocolate on top.",
+      "origin": {
+        "place": "Boston, Massachusetts, USA",
+        "year": "1850s–1900s",
+        "lat": 42.3601,
+        "lng": -71.0589,
+        "note": "Named for Boston cream pie — custard + chocolate — remade as a filled yeast doughnut."
+      }
     },
     {
       "id": "raspberry-jelly",
@@ -115,22 +92,15 @@
         "powdered": true,
         "sparkle": true
       },
-      "recipe": {
-        "yield": "12 jelly donuts",
-        "time": "About 2 hours",
-        "ingredients": [
-          "1 batch yeast donut dough",
-          "1 cup raspberry jam",
-          "Powdered sugar for dusting"
-        ],
-        "steps": [
-          "Fry round donuts; cool slightly.",
-          "Warm jam and pipe into the center.",
-          "Dust generously in powdered sugar."
-        ]
-      },
-      "history": "Jelly-filled doughnuts travel with Central and Eastern European traditions into North American bakeries — raspberry cuts through fried dough with bright acid.",
-      "avatarScript": "Raspberry Jelly is the plot twist donut — quiet powdered exterior, then a berry burst."
+      "history": "Jelly doughnuts descend from Central and Eastern European fried filled pastries — German Berliners, Polish pączki — brought into North American bakeries by immigrant bakers. Powdered sugar hides the surprise; raspberry’s bright acid cuts rich fried dough. In the U.S. they became carnival and bakery-case standards, especially around holidays and Sunday mornings.",
+      "avatarScript": "Raspberry Jelly is the plot twist donut — quiet powdered exterior, then a berry burst.",
+      "origin": {
+        "place": "Central Europe → North America",
+        "year": "1800s",
+        "lat": 52.52,
+        "lng": 13.405,
+        "note": "Cousin to Berliners and Polish pączki; jelly-filled rounds crossed the Atlantic with immigrant bakers."
+      }
     },
     {
       "id": "old-fashioned",
@@ -149,31 +119,15 @@
         "craggy": true,
         "sparkle": true
       },
-      "recipe": {
-        "yield": "10 cake donuts",
-        "time": "About 45 minutes",
-        "ingredients": [
-          "2 cups cake flour",
-          "1½ tsp baking powder",
-          "½ tsp baking soda",
-          "¾ tsp salt",
-          "½ tsp nutmeg",
-          "½ cup sugar",
-          "2 tbsp butter, softened",
-          "2 egg yolks",
-          "½ cup sour cream",
-          "Oil for frying",
-          "Simple vanilla glaze"
-        ],
-        "steps": [
-          "Cream butter and sugar; beat in yolks and sour cream.",
-          "Fold in dry ingredients; chill briefly.",
-          "Cut rings and fry until deeply golden with cracked edges.",
-          "Dip in thin glaze so it pools in every crevice."
-        ]
-      },
-      "history": "Old-fashioned cake donuts lean on sour cream for tenderness and signature cracks — denser than yeast rings, built to catch glaze.",
-      "avatarScript": "Old-Fashioned is the crunchy-edged cousin — cake crumb, nutmeg hush, glaze in every crack."
+      "history": "Unlike puffy yeast rings, old-fashioned cake donuts use chemical leavening and often sour cream for tenderness. The cracked, craggy surface isn’t a flaw — it’s the signature that holds thick glaze in little pools. Midwestern and neighborhood American bakeries perfected the style in the early 1900s as a denser, dunkable cousin to the yeast raised ring.",
+      "avatarScript": "Old-Fashioned is the crunchy-edged cousin — cake crumb, nutmeg hush, glaze in every crack.",
+      "origin": {
+        "place": "American Midwest bakery counters",
+        "year": "early 1900s",
+        "lat": 41.8781,
+        "lng": -87.6298,
+        "note": "Sour-cream cake rings with craggy cracks — denser than yeast, built to catch glaze pools."
+      }
     },
     {
       "id": "maple-walnut",
@@ -193,22 +147,15 @@
         "nuts": true,
         "sparkle": true
       },
-      "recipe": {
-        "yield": "12 donuts",
-        "time": "About 2 hours",
-        "ingredients": [
-          "1 batch yeast or cake donuts",
-          "Maple glaze: 1½ cups powdered sugar, 3 tbsp maple syrup, 1–2 tbsp milk, pinch salt",
-          "¾ cup toasted chopped walnuts"
-        ],
-        "steps": [
-          "Fry and cool donuts until just warm.",
-          "Whisk maple glaze until thick but pourable.",
-          "Dip tops, then press on toasted walnuts."
-        ]
-      },
-      "history": "Maple syrup has deep roots in Indigenous North American foodways and New England sugarhouses — bakery maple glazes turned that sweetness into a cold-weather favorite.",
-      "avatarScript": "Maple Walnut tastes like autumn trees — sticky maple shine and walnut crunch."
+      "history": "Maple sugar and syrup are rooted in Indigenous foodways across the northeastern woodlands. Colonial and New England sugarhouses later commercialized the spring sap run. Bakeries turned that forest sweetness into maple glaze; toasted walnuts add crunch that echoes Vermont and Canadian sugar-shack seasons more than tropical fruit shops.",
+      "avatarScript": "Maple Walnut tastes like autumn trees — sticky maple shine and walnut crunch.",
+      "origin": {
+        "place": "Northeastern woodlands / New England",
+        "year": "Indigenous → colonial sugarhouses",
+        "lat": 44.2619,
+        "lng": -72.5806,
+        "note": "Maple syrup has deep Indigenous roots; New England bakeries turned it into cold-weather glaze."
+      }
     },
     {
       "id": "french-cruller",
@@ -227,28 +174,15 @@
         "cruller": true,
         "sparkle": true
       },
-      "recipe": {
-        "yield": "10 crullers",
-        "time": "About 1 hour",
-        "ingredients": [
-          "1 cup water",
-          "½ cup butter",
-          "1 tbsp sugar",
-          "¼ tsp salt",
-          "1 cup all-purpose flour",
-          "4 large eggs",
-          "Oil for frying",
-          "Honey or vanilla glaze"
-        ],
-        "steps": [
-          "Make choux paste; beat in eggs one at a time.",
-          "Pipe rings with a star tip.",
-          "Fry until puffed, hollow, and golden.",
-          "Glaze lightly so the ridges stay visible."
-        ]
-      },
-      "history": "French crullers use pâte à choux — the same airy dough behind éclairs — piped into ridged rings and fried.",
-      "avatarScript": "French Cruller is the ballerina of the case — choux dough and a glaze that almost floats."
+      "history": "“Cruller” names vary, but the French-style ring uses pâte à choux — the same cooked dough behind éclairs and cream puffs — piped with a star tip so ridges catch a light glaze. It fries hollow and airy, a European pastry technique that found a second life in North American doughnut cases as the lightest bite in the box.",
+      "avatarScript": "French Cruller is the ballerina of the case — choux dough and a glaze that almost floats.",
+      "origin": {
+        "place": "France (pâte à choux tradition)",
+        "year": "1800s",
+        "lat": 48.8566,
+        "lng": 2.3522,
+        "note": "Ridged rings of choux pastry — the same airy dough family as éclairs — fried and lightly glazed."
+      }
     },
     {
       "id": "chocolate-frosted",
@@ -267,22 +201,15 @@
         "sprinkle": "#ff7a9a",
         "sparkle": true
       },
-      "recipe": {
-        "yield": "12 donuts",
-        "time": "About 2 hours",
-        "ingredients": [
-          "1 batch yeast donuts",
-          "Chocolate frosting: 2 cups powdered sugar, ⅓ cup cocoa, 3–4 tbsp milk, 1 tsp vanilla",
-          "Rainbow sprinkles"
-        ],
-        "steps": [
-          "Fry and cool donuts.",
-          "Whisk frosting until thick and glossy.",
-          "Dip tops and shower with sprinkles before it sets."
-        ]
-      },
-      "history": "Chocolate-frosted rings with sprinkles became the kid-counter favorite mid-century — cocoa frosting sticks better than thin glaze for holding candy colors.",
-      "avatarScript": "Chocolate Frosted is pure celebration energy — cocoa hat and a confetti of sprinkles."
+      "history": "Once American doughnut shops scaled yeast rings, thick chocolate frosting beat thin glaze for holding sprinkles. Mid-century counters and national chains made the cocoa crown + candy jimmies a childhood default — less about Old World pastry lineage, more about soda-fountain color and Saturday mornings.",
+      "avatarScript": "Chocolate Frosted is pure celebration energy — cocoa hat and a confetti of sprinkles.",
+      "origin": {
+        "place": "United States doughnut shops",
+        "year": "mid-20th century",
+        "lat": 40.7128,
+        "lng": -74.006,
+        "note": "Thick cocoa frosting + sprinkles became the kid-counter classic once chains scaled yeast rings."
+      }
     },
     {
       "id": "strawberry-sprinkle",
@@ -301,22 +228,15 @@
         "sprinkle": "#ffffff",
         "sparkle": true
       },
-      "recipe": {
-        "yield": "12 donuts",
-        "time": "About 2 hours",
-        "ingredients": [
-          "1 batch yeast donuts",
-          "Strawberry frosting: 2 cups powdered sugar, 2–3 tbsp strawberry puree or jam, splash of milk",
-          "Pink and white sprinkles"
-        ],
-        "steps": [
-          "Fry and cool donuts.",
-          "Beat frosting until smooth and bright pink.",
-          "Dip and decorate with sprinkles."
-        ]
-      },
-      "history": "Strawberry frosting rode the wave of mid-century soda-fountain colors — bright pink became a bakery shorthand for fun long before Instagram.",
-      "avatarScript": "Strawberry Sprinkle is Glazed’s pink wink — berry frost and a sparkle of candy."
+      "history": "Pink strawberry frosting is a mid-century American bakery color language — soda fountains, birthday boxes, and “fun” frosting long before Instagram. The flavor is often strawberry puree or oil in a sweet frosting base; sprinkles turn it into weekend energy on a classic yeast ring.",
+      "avatarScript": "Strawberry Sprinkle is Glazed’s pink wink — berry frost and a sparkle of candy.",
+      "origin": {
+        "place": "American soda-fountain bakeries",
+        "year": "mid-20th century",
+        "lat": 34.0522,
+        "lng": -118.2437,
+        "note": "Bright pink frost rode mid-century soda-fountain color — bakery shorthand for “fun” long before social media."
+      }
     },
     {
       "id": "lemon-poppy",
@@ -335,22 +255,15 @@
         "sprinkle": "#2a1810",
         "sparkle": true
       },
-      "recipe": {
-        "yield": "12 donuts",
-        "time": "About 1 hour",
-        "ingredients": [
-          "1 batch cake or yeast donuts",
-          "Lemon glaze: 1½ cups powdered sugar, 2–3 tbsp lemon juice, zest of 1 lemon",
-          "1 tbsp poppy seeds"
-        ],
-        "steps": [
-          "Fry or bake donuts; cool slightly.",
-          "Whisk lemon glaze; stir in most of the poppy seeds.",
-          "Dip and finish with a pinch more seeds and zest."
-        ]
-      },
-      "history": "Lemon-poppy is a muffin classic that jumped the counter — citrus cuts richness, and poppy seeds add a delicate crunch without heavy topping.",
-      "avatarScript": "Lemon Poppy wakes up the case — sunshine glaze and tiny seed crackle."
+      "history": "Lemon and poppy seed traveled with Central European baking (think Austrian and Hungarian cakes) into American morning pastry. Citrus oil brightens fried dough; tiny poppy seeds add nutty crunch. It reads sunny and bakery-European even when sold beside chocolate-frosted American classics.",
+      "avatarScript": "Lemon Poppy wakes up the case — sunshine glaze and tiny seed crackle.",
+      "origin": {
+        "place": "Central Europe → American bakeries",
+        "year": "1900s",
+        "lat": 48.2082,
+        "lng": 16.3738,
+        "note": "Lemon and poppy seed traveled with Central European baking into sunny American morning cases."
+      }
     },
     {
       "id": "apple-fritter",
@@ -369,28 +282,15 @@
         "craggy": true,
         "sparkle": true
       },
-      "recipe": {
-        "yield": "10 fritters",
-        "time": "About 45 minutes",
-        "ingredients": [
-          "2 cups diced apple",
-          "1¼ cups flour",
-          "2 tbsp sugar",
-          "1½ tsp baking powder",
-          "½ tsp cinnamon",
-          "⅓ cup milk",
-          "1 egg",
-          "Oil for frying",
-          "Vanilla glaze"
-        ],
-        "steps": [
-          "Toss apples with dry ingredients; fold in milk and egg.",
-          "Scoop irregular mounds into 350°F oil.",
-          "Fry until deep golden; glaze while warm."
-        ]
-      },
-      "history": "Fritters are older than the ring donut — fruit batter fried in oil shows up across many cultures. Apple fritters became a U.S. bakery staple for fall mornings.",
-      "avatarScript": "Apple Fritter breaks the ring rule — crispy edges, soft apple pockets, sticky glaze."
+      "history": "Fritters are older than tidy rings — irregular fried dough studded with fruit. American fairgrounds and orchard belts (Pennsylvania, Ohio, New England) made apple fritters a cold-weather and carnival favorite: cinnamon, chunks of apple, and a glaze that clings to every jagged edge.",
+      "avatarScript": "Apple Fritter breaks the ring rule — crispy edges, soft apple pockets, sticky glaze.",
+      "origin": {
+        "place": "American fair & orchard belts",
+        "year": "1800s–1900s",
+        "lat": 40.2732,
+        "lng": -76.8867,
+        "note": "Irregular fried apple dough — carnival and orchard country energy more than tidy ring geometry."
+      }
     },
     {
       "id": "cinnamon-sugar",
@@ -409,23 +309,15 @@
         "powdered": true,
         "sparkle": true
       },
-      "recipe": {
-        "yield": "12 donuts",
-        "time": "About 45 minutes",
-        "ingredients": [
-          "1 batch cake donuts",
-          "½ cup sugar",
-          "1½ tsp cinnamon",
-          "2 tbsp melted butter (optional toss)"
-        ],
-        "steps": [
-          "Fry cake donuts until golden.",
-          "Toss warm donuts in cinnamon sugar (butter helps it cling).",
-          "Serve while still fragrant."
-        ]
-      },
-      "history": "Cinnamon sugar is the simplest finish — spice and crystals instead of glaze — beloved for coffee-shop mornings and kid counters alike.",
-      "avatarScript": "Cinnamon Sugar is cozy minimalism — warm spice that sticks to your fingers."
+      "history": "Cinnamon-sugar coatings echo Spanish and colonial New World sweets (think churros and spiced fried dough). U.S. shops made the warm sugar shake a simple classic — no frosting required — just spice, crunch, and heat from the fryer.",
+      "avatarScript": "Cinnamon Sugar is cozy minimalism — warm spice that sticks to your fingers.",
+      "origin": {
+        "place": "Spanish / colonial Americas influence",
+        "year": "long tradition",
+        "lat": 40.4168,
+        "lng": -3.7038,
+        "note": "Cinnamon-sugar coatings echo Spanish and colonial sweets; American shops made the warm shake iconic."
+      }
     },
     {
       "id": "matcha-white-chocolate",
@@ -444,22 +336,15 @@
         "sprinkle": "#ffffff",
         "sparkle": true
       },
-      "recipe": {
-        "yield": "12 donuts",
-        "time": "About 2 hours",
-        "ingredients": [
-          "1 batch yeast donuts",
-          "Matcha glaze: 1½ cups powdered sugar, 1–1½ tsp culinary matcha, 2–3 tbsp milk",
-          "2 oz melted white chocolate for drizzle"
-        ],
-        "steps": [
-          "Fry and cool donuts.",
-          "Whisk matcha glaze until smooth and vivid.",
-          "Dip tops, then zigzag white chocolate."
-        ]
-      },
-      "history": "Matcha moved from tea ceremony into pastry cases worldwide in the 2010s — paired with white chocolate it balances bitter green notes with creamy sweetness.",
-      "avatarScript": "Matcha White Chocolate is the modern looker — jade glaze with a sweet white drizzle."
+      "history": "Matcha’s home is Japanese tea culture; late 20th- and 21st-century cafés folded it into global pastry. On a doughnut, grassy umami meets sweet white chocolate so the tea note stays friendly. It’s a modern fusion case item — Kyoto green meeting American fryer tradition.",
+      "avatarScript": "Matcha White Chocolate is the modern looker — jade glaze with a sweet white drizzle.",
+      "origin": {
+        "place": "Japan → global café culture",
+        "year": "late 20th–21st c.",
+        "lat": 35.0116,
+        "lng": 135.7681,
+        "note": "Matcha moved from tea ceremony into modern pastry; white chocolate softens the grassy bitterness."
+      }
     },
     {
       "id": "blueberry-cake",
@@ -477,31 +362,15 @@
         "sprinkle": "#3d2a6d",
         "sparkle": true
       },
-      "recipe": {
-        "yield": "A baker’s dozen",
-        "time": "About 45 minutes",
-        "ingredients": [
-          "2 cups all-purpose flour",
-          "¾ cup sugar",
-          "2 tsp baking powder",
-          "½ tsp salt",
-          "½ tsp nutmeg",
-          "¾ cup buttermilk",
-          "2 large eggs",
-          "3 tbsp melted butter",
-          "1 cup fresh or frozen blueberries",
-          "Glaze: 1½ cups powdered sugar, 2–3 tbsp blueberry puree or milk, splash of lemon"
-        ],
-        "steps": [
-          "Whisk dry ingredients; fold in buttermilk, eggs, and butter.",
-          "Gently fold blueberries — don’t crush them.",
-          "Pipe or spoon into a donut pan (or fry cake rings at 365°F).",
-          "Bake at 375°F about 12 minutes, or fry until deep golden.",
-          "Cool slightly, then dip in blueberry glaze."
-        ]
-      },
-      "history": "A baker’s dozen means the lucky extra — once a goodwill cushion so customers never got shorted by weight. Blueberry cake donuts carry that counter-culture spirit: dense, fruity, and the one that rounds out the box.",
-      "avatarScript": "Blueberry Cake is the baker’s dozen lucky extra — purple-kissed cake crumb."
+      "history": "Wild lowbush blueberries shaped Maine and Northeast baking — muffins, pies, and cake crumbs. Blueberry cake doughnuts borrow that orchard-and-coast pantry: tender cake crumb, berry pockets, and a nod to summer markets along the Downeast shore.",
+      "avatarScript": "Blueberry Cake is the baker’s dozen lucky extra — purple-kissed cake crumb.",
+      "origin": {
+        "place": "Maine & Northeast blueberry country",
+        "year": "20th century bakery staple",
+        "lat": 44.3106,
+        "lng": -69.7795,
+        "note": "Wild blueberries shaped Northeastern cake tradition — crumb cake energy in doughnut form."
+      }
     }
   ],
   "smoothies": [

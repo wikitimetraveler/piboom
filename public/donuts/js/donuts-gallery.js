@@ -241,15 +241,49 @@
     'pb-banana': 'maple-walnut'
   };
 
+  function originHtml(origin) {
+    if (!origin || !origin.place) return '';
+    return `
+      <div class="gz-back-block gz-origin-block">
+        <h4>Where it began</h4>
+        <p class="gz-origin-place">
+          <i class="bi bi-geo-alt-fill"></i>
+          ${esc(origin.place)}${origin.year ? ` · ${esc(String(origin.year))}` : ''}
+        </p>
+        ${origin.note ? `<p>${esc(origin.note)}</p>` : ''}
+        ${
+          Number.isFinite(Number(origin.lat)) && Number.isFinite(Number(origin.lng))
+            ? `<button type="button" class="gz-text-link gz-origin-jump" data-origin-id="">Show on invention map</button>`
+            : ''
+        }
+      </div>`;
+  }
+
   function cardHtml(item, kind) {
     const tags = (item.flavorTags || [])
       .slice(0, 2)
       .map((t) => `<span class="gz-tag">${esc(t)}</span>`)
       .join('');
-    const kicker = kind === 'smoothie' ? 'Smoothie' : 'Donut';
-    const pairLabel = kind === 'smoothie' ? 'Pair with a donut' : 'Pair with a smoothie';
+    const isSmoothie = kind === 'smoothie';
+    const kicker = isSmoothie ? 'Smoothie' : 'Donut';
+    const pairLabel = isSmoothie ? 'Pair with a donut' : 'Pair with a smoothie';
+    const flipHint = isSmoothie ? 'Flip for blend notes &amp; history' : 'Flip for history &amp; origins';
+    const backKicker = isSmoothie ? 'Blend &amp; story' : 'History &amp; origins';
+    const openLabel = isSmoothie ? 'Open blend notes' : 'Open full story';
+    const openIcon = isSmoothie ? 'bi-cup-straw' : 'bi-book-half';
+    const bodyBits = isSmoothie
+      ? `${recipeHtml(item.recipe)}
+              <div class="gz-back-block">
+                <h4>History</h4>
+                <p>${esc(item.history || '')}</p>
+              </div>`
+      : `<div class="gz-back-block">
+                <h4>History</h4>
+                <p>${esc(item.history || '')}</p>
+              </div>
+              ${originHtml(item.origin).replace('data-origin-id=""', `data-origin-id="${esc(item.id)}"`)}`;
     return `
-      <article class="gz-card" data-id="${esc(item.id)}" data-kind="${esc(kind)}" tabindex="0" role="button" aria-pressed="false" aria-label="${esc(item.name)} — flip for recipe and history">
+      <article class="gz-card" data-id="${esc(item.id)}" data-kind="${esc(kind)}" tabindex="0" role="button" aria-pressed="false" aria-label="${esc(item.name)} — flip for ${isSmoothie ? 'blend notes and history' : 'history and origins'}">
         <div class="gz-card-inner">
           <div class="gz-face gz-face--front">
             <div class="gz-donut-stage">${productArt(item)}</div>
@@ -258,28 +292,24 @@
               <h3>${esc(item.name)}</h3>
               <p class="gz-tagline">${esc(item.tagline || '')}</p>
               <div class="gz-tags">${tags}</div>
-              <p class="gz-flip-hint"><i class="bi bi-arrow-repeat"></i> Flip for recipe &amp; history</p>
+              <p class="gz-flip-hint"><i class="bi bi-arrow-repeat"></i> ${flipHint}</p>
             </div>
           </div>
           <div class="gz-face gz-face--back">
             <div class="gz-back-scroll">
-              <p class="gz-back-kicker">Recipe &amp; story</p>
+              <p class="gz-back-kicker">${backKicker}</p>
               <h3 class="gz-back-title">${esc(item.name)}</h3>
-              ${recipeHtml(item.recipe)}
-              <div class="gz-back-block">
-                <h4>History</h4>
-                <p>${esc(item.history || '')}</p>
-              </div>
+              ${bodyBits}
             </div>
             <button type="button" class="gz-scroll-cue gz-recipe-open" data-recipe="${esc(item.id)}" hidden>
-              <i class="bi bi-arrows-fullscreen"></i> Full recipe
+              <i class="bi bi-arrows-fullscreen"></i> ${openLabel}
             </button>
             <div class="gz-back-actions">
               <button type="button" class="gz-btn gz-btn-sm gz-btn-frost gz-hear" data-hear="${esc(item.id)}">
                 <i class="bi bi-soundwave"></i> Hear Pip
               </button>
               <button type="button" class="gz-btn gz-btn-sm gz-btn-ghost gz-recipe-open" data-recipe="${esc(item.id)}">
-                <i class="bi bi-book"></i> Open recipe
+                <i class="bi ${openIcon}"></i> ${openLabel}
               </button>
               <button type="button" class="gz-btn gz-btn-sm gz-btn-ink gz-pair" data-pair="${esc(item.id)}">
                 <i class="bi bi-hearts"></i> ${pairLabel}
@@ -293,19 +323,30 @@
       </article>`;
   }
 
-  function openRecipeSheet(item) {
+  function openStorySheet(item) {
     const sheet = document.getElementById('gzRecipeSheet');
     const title = document.getElementById('gzRecipeSheetTitle');
     const body = document.getElementById('gzRecipeSheetBody');
     if (!sheet || !body || !item) return;
-    if (title) title.textContent = item.name || 'Recipe & story';
+    const isSmoothie = item.kind === 'smoothie' || !!item.recipe;
+    if (title) title.textContent = item.name || (isSmoothie ? 'Blend & story' : 'History & origins');
+    const originBlock = item.origin
+      ? `<div class="gz-back-block gz-recipe-sheet-history">
+          <h4>Where it began</h4>
+          <p class="gz-origin-place"><i class="bi bi-geo-alt-fill"></i> ${esc(item.origin.place || '')}${
+          item.origin.year ? ` · ${esc(String(item.origin.year))}` : ''
+        }</p>
+          ${item.origin.note ? `<p>${esc(item.origin.note)}</p>` : ''}
+        </div>`
+      : '';
     body.innerHTML = `
       <p class="gz-recipe-sheet-tagline">${esc(item.tagline || '')}</p>
-      ${recipeHtml(item.recipe, { lightbox: true })}
-      <div class="gz-back-block gz-recipe-sheet-history">
+      ${isSmoothie ? recipeHtml(item.recipe, { lightbox: true }) : ''}
+      <div class="gz-back-block ${isSmoothie ? 'gz-recipe-sheet-history' : ''}">
         <h4>History</h4>
         <p>${esc(item.history || '')}</p>
-      </div>`;
+      </div>
+      ${isSmoothie ? '' : originBlock}`;
     sheet.hidden = false;
     document.body.classList.add('gz-recipe-open');
     document.getElementById('gzRecipeSheetClose')?.focus?.();
@@ -315,6 +356,14 @@
     const sheet = document.getElementById('gzRecipeSheet');
     if (sheet) sheet.hidden = true;
     document.body.classList.remove('gz-recipe-open');
+  }
+
+  function jumpToOrigin(id) {
+    document.getElementById('gzOrigins')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const entry = window.GlazedOriginsMap?.byId?.[id];
+    if (entry?.marker && window.google?.maps) {
+      window.setTimeout(() => google.maps.event.trigger(entry.marker, 'click'), 400);
+    }
   }
 
   function askPipPairing(item) {
@@ -577,12 +626,12 @@
     if (flipped) {
       window.requestAnimationFrame(() => {
         updateCardScrollCue(card);
-        // Long recipes → open readable lightbox after flip (card stays a teaser)
+        // Long story → open readable lightbox after flip (card stays a teaser)
         const face = card.querySelector('.gz-face--back');
         const id = card.getAttribute('data-id');
         const catalog = window.GlazedCatalog?.byId || {};
         if (face?.classList.contains('has-scroll') && id && catalog[id]) {
-          window.setTimeout(() => openRecipeSheet(catalog[id]), 280);
+          window.setTimeout(() => openStorySheet(catalog[id]), 280);
         }
       });
     }
@@ -607,11 +656,22 @@
         return;
       }
 
+      const originJump = e.target.closest('.gz-origin-jump');
+      if (originJump) {
+        e.preventDefault();
+        e.stopPropagation();
+        jumpToOrigin(
+          originJump.getAttribute('data-origin-id') ||
+            originJump.closest('.gz-card')?.getAttribute('data-id')
+        );
+        return;
+      }
+
       const recipeBtn = e.target.closest('.gz-recipe-open');
       if (recipeBtn) {
         e.preventDefault();
         e.stopPropagation();
-        openRecipeSheet(byId[recipeBtn.getAttribute('data-recipe')]);
+        openStorySheet(byId[recipeBtn.getAttribute('data-recipe')]);
         return;
       }
 
@@ -642,7 +702,7 @@
 
     grid.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
-      if (e.target.closest('.gz-hear, .gz-flip-back, .gz-recipe-open, .gz-pair')) return;
+      if (e.target.closest('.gz-hear, .gz-flip-back, .gz-recipe-open, .gz-pair, .gz-origin-jump')) return;
       const card = e.target.closest('.gz-card');
       if (!card || e.target !== card) return;
       e.preventDefault();
@@ -679,11 +739,14 @@
       const smoothies = Array.isArray(data.smoothies) ? data.smoothies : [];
 
       document.getElementById('gzHeroLine').textContent =
-        brand.tagline || 'Flip a treat. Steal a recipe. Meet Savy Donuts and Smoothies on Harbor.';
+        brand.tagline || 'Flip a treat. Hear the history. Meet Savy Donuts and Smoothies on Harbor.';
       bindGuide(brand);
 
       if (data.shop && window.GlazedShopMap?.initMap) {
         window.GlazedShopMap.initMap(data.shop);
+      }
+      if (window.GlazedShopMap?.initOriginsMap) {
+        window.GlazedShopMap.initOriginsMap(donuts);
       }
 
       if (loading) loading.hidden = true;

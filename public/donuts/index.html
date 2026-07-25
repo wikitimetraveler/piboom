@@ -28,13 +28,16 @@
       <div class="gz-hero-layout">
         <div class="gz-hero-inner">
           <h1 class="gz-brand">Glazed</h1>
-          <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Steal a recipe. Meet Savy Donuts and Smoothies on Harbor.</p>
+          <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Hear the history. Meet Savy Donuts and Smoothies on Harbor.</p>
           <div class="gz-hero-cta">
             <a class="gz-btn gz-btn-primary" href="#gzCase">
               <i class="bi bi-arrow-down-circle"></i> Baker's Dozen
             </a>
-            <a class="gz-btn gz-btn-ghost" href="#gzSmoothies">
-              <i class="bi bi-cup-straw"></i> Smoothies
+            <a class="gz-btn gz-btn-ghost" href="#gzOrigins">
+              <i class="bi bi-globe2"></i> Invention map
+            </a>
+            <a class="gz-btn gz-btn-ghost" href="#gzDiscover">
+              <i class="bi bi-camera"></i> Donut cam
             </a>
             <button type="button" class="gz-btn gz-btn-ghost" id="gzStoryPlayHero">
               <i class="bi bi-film"></i> Play reel
@@ -109,16 +112,68 @@
       <section class="gz-section" id="gzCase">
         <div class="gz-section-head">
           <h2>Baker’s Dozen</h2>
-          <p>A baker’s dozen — flip for recipe and history. Ask Pip in chat or tap Hear Pip on a card.</p>
+          <p>Flip for history and where each style began — no recipes on the donuts (shop owner vibe). Hear Pip anytime.</p>
         </div>
         <p class="gz-loading" id="gzLoading">Warming the fryer…</p>
         <div class="gz-grid" id="gzGrid"></div>
       </section>
 
+      <section class="gz-section" id="gzOrigins">
+        <div class="gz-section-head">
+          <h2>Invention map</h2>
+          <p>Donut pins where these styles were born or took off — tap a pin or a name. Fan history, not official shop lore.</p>
+        </div>
+        <div class="gz-origins-layout">
+          <ul class="gz-origins-list" id="gzOriginsList"></ul>
+          <div class="gz-origins-map-wrap">
+            <div id="gzOriginsMap" class="gz-origins-map" role="img" aria-label="Map of donut invention places"></div>
+            <p id="gzOriginsMapStatus" class="gz-shop-map-status">Loading invention map…</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="gz-section" id="gzDiscover">
+        <div class="gz-section-head">
+          <h2>Donut discovery cam</h2>
+          <p>Snap or upload an unknown donut — Pip identifies it and shares a history nibble (no recipes).</p>
+        </div>
+        <div class="gz-discover-panel">
+          <div class="gz-discover-controls">
+            <button type="button" class="gz-btn gz-btn-primary gz-btn-sm" id="gzDiscoverStart">
+              <i class="bi bi-camera-video"></i> Start camera
+            </button>
+            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzDiscoverCapture">
+              <i class="bi bi-camera"></i> Capture
+            </button>
+            <button type="button" class="gz-btn gz-btn-frost gz-btn-sm" id="gzDiscoverIdentify">
+              <i class="bi bi-magic"></i> Identify donut
+            </button>
+            <button type="button" class="gz-btn gz-btn-ghost gz-btn-sm" id="gzDiscoverStop">
+              <i class="bi bi-stop-fill"></i> Stop
+            </button>
+            <label class="gz-btn gz-btn-ghost gz-btn-sm gz-file-label">
+              <i class="bi bi-upload"></i> Upload photo
+              <input type="file" id="gzDiscoverFile" accept="image/*" capture="environment" hidden/>
+            </label>
+          </div>
+          <p class="gz-discover-status" id="gzDiscoverStatus" hidden></p>
+          <div class="gz-discover-media">
+            <div class="gz-discover-live" id="gzDiscoverLive" hidden>
+              <video id="gzDiscoverVideo" playsinline muted autoplay></video>
+            </div>
+            <div class="gz-discover-preview" id="gzDiscoverPreview" hidden>
+              <img id="gzDiscoverShot" alt="Captured donut" hidden/>
+            </div>
+            <canvas id="gzDiscoverCanvas" hidden></canvas>
+          </div>
+          <div class="gz-discover-result" id="gzDiscoverResult" hidden></div>
+        </div>
+      </section>
+
       <section class="gz-section" id="gzSmoothies">
         <div class="gz-section-head">
           <h2>Smoothie board</h2>
-          <p>Cold cups from the Savy counter energy — flip for blend recipes and a little history.</p>
+          <p>Cold cups from the Savy counter energy — flip for blend notes and a little history.</p>
         </div>
         <div class="gz-grid" id="gzSmoothieGrid"></div>
       </section>
@@ -182,18 +237,20 @@
     <div class="gz-recipe-sheet-backdrop" id="gzRecipeSheetBackdrop"></div>
     <div class="gz-recipe-sheet-panel">
       <header class="gz-recipe-sheet-header">
-        <h2 id="gzRecipeSheetTitle">Recipe &amp; story</h2>
-        <button type="button" class="btn-close btn-close-white" id="gzRecipeSheetClose" aria-label="Close recipe"></button>
+        <h2 id="gzRecipeSheetTitle">History &amp; origins</h2>
+        <button type="button" class="btn-close btn-close-white" id="gzRecipeSheetClose" aria-label="Close story"></button>
       </header>
       <div class="gz-recipe-sheet-body" id="gzRecipeSheetBody"></div>
     </div>
   </div>
 
   <script src="/shared/tts.js"></script>
+  <script src="/shared/discovery-camera.js"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
   <script src="/donuts/js/donuts-heygen-popup.js"></script>
   <script src="/donuts/js/donuts-map.js"></script>
   <script src="/donuts/js/donuts-gallery.js"></script>
+  <script src="/donuts/js/donuts-discovery.js"></script>
   <script src="/donuts/js/donuts-story-reel.js"></script>
   <script type="module" src="/donuts/js/donuts-pip-chat.js"></script>
 </body>
