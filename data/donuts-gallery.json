@@ -577,5 +577,231 @@
       "history": "Peanut butter–banana drinks grew up in home kitchens and gyms, then landed on smoothie boards as the filling, savory-sweet option next to fruit cups.",
       "avatarScript": "PB Banana Cocoa is the power hug — nutty, chocolatey, and perfect after a maple donut."
     }
+  ],
+  "submarines": [
+    {
+      "id": "italian-sub",
+      "name": "Italian Sub",
+      "tagline": "Classic deli stack",
+      "flavorTags": [
+        "cold",
+        "salami",
+        "provolone"
+      ],
+      "image": "/donuts/assets/products/italian-sub.png",
+      "visual": {
+        "kind": "submarine",
+        "bread": "#e8c89a",
+        "filling": "#c4423a"
+      },
+      "recipe": {
+        "yield": "1 sub",
+        "time": "10 minutes",
+        "ingredients": [
+          "1 sub roll (6-8 inch)",
+          "3 slices salami",
+          "3 slices capicola or ham",
+          "2 slices provolone",
+          "Shredded lettuce",
+          "Sliced tomato and onion",
+          "Banana peppers",
+          "Oil, vinegar, oregano"
+        ],
+        "steps": [
+          "Split roll and drizzle with oil and vinegar.",
+          "Layer meats and cheese.",
+          "Add lettuce, tomato, onion, and peppers.",
+          "Season with oregano, salt, and pepper.",
+          "Wrap tight and slice in half."
+        ]
+      },
+      "history": "Italian subs descend from Italian-American deli culture — cold cuts, provolone, and vinegar-oil dressing on a long roll. The combo traveled from East Coast corner shops into national sandwich chains.",
+      "avatarScript": "Italian Sub is the deli classic — layers of salami, provolone, and vinegar bite."
+    },
+    {
+      "id": "turkey-club",
+      "name": "Turkey Club Sub",
+      "tagline": "Triple-decker energy, sub style",
+      "flavorTags": [
+        "turkey",
+        "bacon",
+        "toasted"
+      ],
+      "image": "/donuts/assets/products/turkey-club-sub.png",
+      "visual": {
+        "kind": "submarine",
+        "bread": "#d4a574",
+        "filling": "#e8c4a0"
+      },
+      "recipe": {
+        "yield": "1 sub",
+        "time": "12 minutes",
+        "ingredients": [
+          "1 sub roll, toasted",
+          "4 oz sliced turkey",
+          "3 strips cooked bacon",
+          "2 slices cheddar or Swiss",
+          "Lettuce and tomato",
+          "Mayo and mustard"
+        ],
+        "steps": [
+          "Toast roll until golden.",
+          "Spread mayo and mustard on both sides.",
+          "Layer turkey, bacon, and cheese.",
+          "Add lettuce and tomato.",
+          "Close, slice, and serve warm."
+        ]
+      },
+      "history": "The club sandwich — turkey, bacon, lettuce, tomato — was born in American social clubs in the late 1800s. Sub shops stretched it onto a long roll for a bigger, messier version.",
+      "avatarScript": "Turkey Club Sub is the triple-stack hero — turkey, bacon, and toasted warmth."
+    },
+    {
+      "id": "ham-swiss",
+      "name": "Ham & Swiss",
+      "tagline": "Simple, reliable, perfect",
+      "flavorTags": [
+        "ham",
+        "swiss",
+        "mustard"
+      ],
+      "image": "/donuts/assets/products/ham-swiss-sub.png",
+      "visual": {
+        "kind": "submarine",
+        "bread": "#f0d8b8",
+        "filling": "#f4e4c8"
+      },
+      "recipe": {
+        "yield": "1 sub",
+        "time": "8 minutes",
+        "ingredients": [
+          "1 sub roll",
+          "4 oz sliced ham",
+          "2 slices Swiss cheese",
+          "Lettuce",
+          "Tomato",
+          "Dijon mustard",
+          "Mayo optional"
+        ],
+        "steps": [
+          "Split roll and spread mustard.",
+          "Layer ham and Swiss.",
+          "Add lettuce and tomato.",
+          "Season lightly, close, and serve."
+        ]
+      },
+      "history": "Ham and Swiss is the dependable lunch counter staple — no frills, just quality meat, good cheese, and a swipe of mustard.",
+      "avatarScript": "Ham & Swiss is the quiet classic — dependable, mustard-kissed, always right."
+    },
+    {
+      "id": "veggie-sub",
+      "name": "Veggie Sub",
+      "tagline": "Garden crunch, no guilt",
+      "flavorTags": [
+        "vegetarian",
+        "fresh",
+        "light"
+      ],
+      "image": "/donuts/assets/products/veggie-sub.png",
+      "visual": {
+        "kind": "submarine",
+        "bread": "#e8c89a",
+        "filling": "#7a9b5a"
+      },
+      "recipe": {
+        "yield": "1 sub",
+        "time": "8 minutes",
+        "ingredients": [
+          "1 sub roll",
+          "2 slices provolone or mozzarella",
+          "Sliced cucumber, tomato, onion",
+          "Lettuce and spinach",
+          "Banana peppers and olives",
+          "Oil, vinegar, oregano"
+        ],
+        "steps": [
+          "Split roll and drizzle with oil and vinegar.",
+          "Layer cheese and all vegetables.",
+          "Season with oregano and pepper.",
+          "Close and serve cold."
+        ]
+      },
+      "history": "Veggie subs rose alongside health-conscious eating in the 1980s–90s — proof that a sub doesn't need meat to be satisfying if the veggies are fresh and seasoned right.",
+      "avatarScript": "Veggie Sub is the garden hero — crisp, bright, and a vinegar kick."
+    },
+    {
+      "id": "meatball-sub",
+      "name": "Meatball Sub",
+      "tagline": "Hot, saucy, messy joy",
+      "flavorTags": [
+        "hot",
+        "marinara",
+        "mozzarella"
+      ],
+      "image": "/donuts/assets/products/meatball-sub.png",
+      "visual": {
+        "kind": "submarine",
+        "bread": "#c9956a",
+        "filling": "#8b3a2a"
+      },
+      "recipe": {
+        "yield": "1 sub",
+        "time": "15 minutes",
+        "ingredients": [
+          "1 sub roll, toasted",
+          "4-5 cooked meatballs",
+          "½ cup marinara sauce",
+          "2 slices mozzarella or provolone",
+          "Grated parmesan",
+          "Fresh basil optional"
+        ],
+        "steps": [
+          "Toast roll lightly.",
+          "Heat meatballs in marinara.",
+          "Place meatballs in roll, spoon sauce over.",
+          "Top with cheese and melt under broiler.",
+          "Garnish with parmesan and basil."
+        ]
+      },
+      "history": "Meatball subs are Italian-American comfort food — marinara, melted cheese, and soft bread soaking up every drop. A hot sub staple from corner delis to chains.",
+      "avatarScript": "Meatball Sub is the messy winner — hot marinara, melted mozz, no napkin enough."
+    },
+    {
+      "id": "tuna-sub",
+      "name": "Tuna Salad Sub",
+      "tagline": "Cold, creamy, old-school",
+      "flavorTags": [
+        "tuna",
+        "cold",
+        "classic"
+      ],
+      "image": "/donuts/assets/products/tuna-sub.png",
+      "visual": {
+        "kind": "submarine",
+        "bread": "#f0d8b8",
+        "filling": "#e8dcc8"
+      },
+      "recipe": {
+        "yield": "1 sub",
+        "time": "10 minutes",
+        "ingredients": [
+          "1 sub roll",
+          "1 can tuna, drained",
+          "2 tbsp mayo",
+          "1 tsp Dijon mustard",
+          "Diced celery and onion",
+          "Lettuce and tomato",
+          "Salt and pepper"
+        ],
+        "steps": [
+          "Mix tuna, mayo, mustard, celery, and onion.",
+          "Season with salt and pepper.",
+          "Split roll and spread tuna salad.",
+          "Add lettuce and tomato.",
+          "Serve cold."
+        ]
+      },
+      "history": "Tuna salad subs are American lunch-counter heritage — canned tuna, mayo, and celery on a soft roll. Simple, filling, and a staple since mid-century diners.",
+      "avatarScript": "Tuna Salad Sub is the retro champ — creamy, cold, and always lunch-ready."
+    }
   ]
 }
