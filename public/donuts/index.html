@@ -29,6 +29,28 @@
         <div class="gz-hero-inner">
           <h1 class="gz-brand">Glazed</h1>
           <p class="gz-hero-line" id="gzHeroLine">Flip a treat. Hear the history. Meet Savy Donuts and Smoothies on Harbor.</p>
+          
+          <div class="gz-fresh-drop-countdown" id="gzFreshDropCountdown">
+            <div class="gz-countdown-label">🔥 Fresh Drop In</div>
+            <div class="gz-countdown-clock">
+              <div class="gz-countdown-unit">
+                <div class="gz-countdown-value" id="gzCountHours">00</div>
+                <div class="gz-countdown-unit-label">Hours</div>
+              </div>
+              <div class="gz-countdown-separator">:</div>
+              <div class="gz-countdown-unit">
+                <div class="gz-countdown-value" id="gzCountMinutes">00</div>
+                <div class="gz-countdown-unit-label">Minutes</div>
+              </div>
+              <div class="gz-countdown-separator">:</div>
+              <div class="gz-countdown-unit">
+                <div class="gz-countdown-value" id="gzCountSeconds">00</div>
+                <div class="gz-countdown-unit-label">Seconds</div>
+              </div>
+            </div>
+            <div class="gz-countdown-message" id="gzCountdownMessage">Fresh glazed drops at 6:00 AM daily</div>
+          </div>
+          
           <div class="gz-hero-cta">
             <a class="gz-btn gz-btn-primary" href="#gzCase">
               <i class="bi bi-arrow-down-circle"></i> Baker's Dozen
@@ -118,7 +140,7 @@
       <section class="gz-section" id="gzCase">
         <div class="gz-section-head">
           <h2>Baker’s Dozen</h2>
-          <p>Flip for history and where each style began — no recipes on the donuts (shop owner vibe). Hear Pip anytime.</p>
+          <p>Flip for history and where each style began. Hear Pip anytime.</p>
         </div>
         <p class="gz-loading" id="gzLoading">Warming the fryer…</p>
         <div class="gz-grid" id="gzGrid"></div>
@@ -144,7 +166,7 @@
       <section class="gz-section" id="gzDiscover">
         <div class="gz-section-head">
           <h2>Donut discovery cam</h2>
-          <p>Snap or upload an unknown donut — Pip identifies it and shares a history nibble (no recipes).</p>
+          <p>Snap or upload an unknown donut — Pip identifies it and shares a history nibble.</p>
         </div>
         <div class="gz-discover-panel">
           <div class="gz-discover-controls">
@@ -190,7 +212,7 @@
       <section class="gz-section" id="gzSubmarines">
         <div class="gz-section-head">
           <h2>Submarine menu</h2>
-          <p>Hot and cold subs from the Savy deli — flip for recipes and sandwich stories.</p>
+          <p>Hot and cold subs from the Savy deli — flip for sandwich stories and build notes.</p>
         </div>
         <div class="gz-grid" id="gzSubmarineGrid"></div>
       </section>
@@ -264,11 +286,77 @@
   <script src="/shared/tts.js"></script>
   <script src="/shared/discovery-camera.js"></script>
   <script src="/family/js/lane-family-google-maps.js"></script>
+  <script src="/shared/google-advanced-markers.js"></script>
   <script src="/donuts/js/donuts-heygen-popup.js"></script>
   <script src="/donuts/js/donuts-map.js"></script>
   <script src="/donuts/js/donuts-gallery.js"></script>
   <script src="/donuts/js/donuts-discovery.js"></script>
   <script src="/donuts/js/donuts-story-reel.js"></script>
   <script type="module" src="/donuts/js/donuts-pip-chat.js"></script>
+  
+  <script>
+    // Fresh Drop Countdown Clock
+    (function() {
+      const FRESH_DROP_HOUR = 6; // 6 AM daily fresh drop time
+      
+      function getNextFreshDropTime() {
+        const now = new Date();
+        const freshDrop = new Date();
+        freshDrop.setHours(FRESH_DROP_HOUR, 0, 0, 0);
+        
+        // If we've passed today's drop time, set for tomorrow
+        if (now >= freshDrop) {
+          freshDrop.setDate(freshDrop.getDate() + 1);
+        }
+        
+        return freshDrop;
+      }
+      
+      function padZero(num) {
+        return String(num).padStart(2, '0');
+      }
+      
+      function updateCountdown() {
+        const now = new Date();
+        const nextDrop = getNextFreshDropTime();
+        const diff = nextDrop - now;
+        
+        if (diff <= 0) {
+          // Fresh donuts are dropping right now!
+          document.getElementById('gzCountHours').textContent = '00';
+          document.getElementById('gzCountMinutes').textContent = '00';
+          document.getElementById('gzCountSeconds').textContent = '00';
+          document.getElementById('gzCountdownMessage').textContent = '🔥 Fresh donuts dropping NOW! 🔥';
+          return;
+        }
+        
+        // Calculate time remaining
+        const hours = Math.floor(diff / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        // Update display
+        document.getElementById('gzCountHours').textContent = padZero(hours);
+        document.getElementById('gzCountMinutes').textContent = padZero(minutes);
+        document.getElementById('gzCountSeconds').textContent = padZero(seconds);
+        
+        // Update message
+        const dropTime = nextDrop.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true 
+        });
+        const dropDay = nextDrop.toDateString() === now.toDateString() ? 'today' : 'tomorrow';
+        document.getElementById('gzCountdownMessage').textContent = 
+          `Fresh glazed drops at ${dropTime} ${dropDay}`;
+      }
+      
+      // Initialize countdown
+      updateCountdown();
+      
+      // Update every second
+      setInterval(updateCountdown, 1000);
+    })();
+  </script>
 </body>
 </html>

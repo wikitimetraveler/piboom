@@ -191,6 +191,132 @@ body.gz-page {
   animation: gz-brand-in 0.9s ease-out 0.12s both;
 }
 
+/* —— Fresh Drop Countdown —— */
+.gz-fresh-drop-countdown {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, rgba(255, 122, 154, 0.18), rgba(245, 199, 106, 0.12));
+  padding: 1rem 1.5rem;
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(245, 199, 106, 0.3);
+  margin: 0 0 1.75rem;
+  box-shadow: 
+    0 8px 24px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  animation: gz-countdown-float 3s ease-in-out infinite, gz-brand-in 0.9s ease-out 0.18s both;
+}
+
+.gz-countdown-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gz-glaze);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.gz-countdown-clock {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gz-countdown-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.gz-countdown-value {
+  font-family: var(--gz-font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--gz-cream);
+  text-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(245, 199, 106, 0.4);
+  animation: gz-countdown-pulse 2s ease-in-out infinite;
+}
+
+.gz-countdown-unit-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--gz-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
+}
+
+.gz-countdown-separator {
+  font-family: var(--gz-font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 700;
+  color: var(--gz-frost);
+  opacity: 0.7;
+  animation: gz-countdown-blink 1.5s ease-in-out infinite;
+  margin: 0 -0.25rem;
+  text-shadow: 0 0 12px rgba(255, 122, 154, 0.5);
+}
+
+.gz-countdown-message {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--gz-muted);
+  font-style: italic;
+}
+
+@keyframes gz-countdown-pulse {
+  0%, 100% { 
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% { 
+    transform: scale(1.08);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes gz-countdown-blink {
+  0%, 49%, 100% { 
+    opacity: 0.7;
+  }
+  50%, 99% { 
+    opacity: 0.2;
+  }
+}
+
+@keyframes gz-countdown-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@media (max-width: 768px) {
+  .gz-fresh-drop-countdown {
+    padding: 0.875rem 1.25rem;
+  }
+  
+  .gz-countdown-unit {
+    min-width: 50px;
+  }
+  
+  .gz-countdown-value {
+    font-size: 1.75rem;
+  }
+  
+  .gz-countdown-separator {
+    font-size: 1.75rem;
+  }
+}
+
 .gz-hero-cta {
   display: flex;
   flex-wrap: wrap;
@@ -789,6 +915,21 @@ body.gz-page {
   object-fit: contain;
   flex: 0 0 auto;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+.gz-origin-pin-badge {
+  flex: 0 0 auto;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #1a100c;
+  background: linear-gradient(145deg, #f5c76a, #e8a54b);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
 
 .gz-origin-copy {
